@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common/Platform.hpp"
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 
 #ifdef XRAY_STATIC_BUILD
 #define XRLC_LIGHT_STUB_API

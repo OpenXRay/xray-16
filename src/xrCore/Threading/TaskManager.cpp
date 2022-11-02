@@ -22,6 +22,7 @@
 
 #include <thread>
 #include <mutex>
+#include <SDL_events.h>
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <immintrin.h>
@@ -193,7 +194,7 @@ public:
 // Get fast spin-loop timings
 void CalcIterations()
 {
-    ThreadPriorityHelper priority;
+    [[maybe_unused]] ThreadPriorityHelper priority;
 
     volatile bool dummy = false;
     const u64 frequency = CPU::qpc_freq;
@@ -214,11 +215,11 @@ TaskManager::TaskManager()
 {
     s_main_thread_worker = &s_tl_worker;
 
-    const u32 threads = CPU::ID.n_threads - OTHER_THREADS_COUNT;
+    const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
     workers.reserve(threads);
     for (u32 i = 0; i < threads; ++i)
     {
-        Threading::SpawnThread(task_worker_entry, "X-Ray Task Worker Thread", 0, this);
+        Threading::SpawnThread(task_worker_entry, "Task Worker", 0, this);
     }
     CalcIterations();
     while (threads != workersCount.load(std::memory_order_consume))
@@ -296,7 +297,7 @@ void TaskManager::TaskWorkerStart()
 
     const u32 fastIterations = ttapi_dwFastIter;
 
-    int iteration = 0;
+    u32 iteration = 0;
     Task* task;
     while (true)
     {
@@ -432,6 +433,8 @@ void TaskManager::Wait(const Task& task)
     while (!task.IsFinished())
     {
         ExecuteOneTask();
+        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+            SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
 
@@ -440,6 +443,8 @@ void TaskManager::WaitForChildren(const Task& task)
     while (!task.HasChildren())
     {
         ExecuteOneTask();
+        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+            SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
 

@@ -178,7 +178,7 @@ bool CSheduler::internal_Unregister(ISheduled* object, bool realTime, bool warn_
     return false;
 }
 
-#ifdef DEBUG
+#ifndef MASTER_GOLD
 bool CSheduler::Registered(ISheduled* object) const
 {
     u32 count = 0;
@@ -242,7 +242,7 @@ bool CSheduler::Registered(ISheduled* object) const
     VERIFY(!count || count == 1);
     return count == 1;
 }
-#endif // DEBUG
+#endif // !MASTER_GOLD
 
 void CSheduler::Register(ISheduled* A, bool RT)
 {

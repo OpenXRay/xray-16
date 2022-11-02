@@ -45,7 +45,6 @@
 #include "game_cl_base.h"
 #include "game_cl_single.h"
 #include "xrMessages.h"
-#include "string_table.h"
 #include "xrCDB/Intersect.hpp"
 
 #include "alife_registry_wrappers.h"
@@ -79,6 +78,8 @@
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
 const float respawn_auto = 7.f;
+
+constexpr float default_feedback_duration = 0.2f;
 
 extern float cammera_into_collision_shift;
 extern int g_first_person_death;
@@ -496,6 +497,7 @@ void CActor::Hit(SHit* pHDS)
     }
 #endif // DEBUG
 
+    float feedback_duration = default_feedback_duration;
     bool bPlaySound = true;
     if (!g_Alive())
         bPlaySound = false;
@@ -555,6 +557,67 @@ void CActor::Hit(SHit* pHDS)
             point.y += CameraHeight();
             S.play_at_pos(this, point);
         }
+        if (S.get_length_sec() > default_feedback_duration)
+            feedback_duration = S.get_length_sec();
+    }
+
+    float high_freq_feedback = clampr(HDS.damage(), 0.f, 1.f);
+    if (high_freq_feedback < 0.01f)
+        high_freq_feedback *= 100.f;
+    else
+        high_freq_feedback *= 10.f;
+
+    float low_freq_feedback;
+    switch (HDS.hit_type)
+    {
+    case ALife::eHitTypeShock:
+    case ALife::eHitTypeRadiation:
+        low_freq_feedback = 0.f;
+        break;
+
+    case ALife::eHitTypeBurn:
+    case ALife::eHitTypeLightBurn:
+    case ALife::eHitTypeChemicalBurn:
+    case ALife::eHitTypeTelepatic:
+        if (HDS.damage() < 0.01f)
+        {
+            low_freq_feedback = 0.f;
+            break;
+        }
+        [[fallthrough]];
+
+    default:
+    {
+        low_freq_feedback = clampr(HDS.phys_impulse(), 0.f, 1.f);
+        if (fis_zero(low_freq_feedback))
+            low_freq_feedback = high_freq_feedback;
+        else if (low_freq_feedback >= 10.f)
+            low_freq_feedback /= 100.f;
+        else if (low_freq_feedback >= 1.f)
+            low_freq_feedback /= 10.f;
+        else if (low_freq_feedback >= 0.1f)
+            low_freq_feedback /= 5.f;
+        break;
+    }
+    } // switch (HDS.hit_type)
+
+    // Feedback with low freq for a little,
+    // feedback with high freq rest of the time.
+    if (!GEnv.isDedicatedServer && ALife::eHitTypeExplosion == HDS.hit_type)
+    {
+        m_controller_feedback =
+        {
+            /*.high_freq    =*/ high_freq_feedback,
+            /*.duration     =*/ feedback_duration,
+            /*.submit_time  =*/ Device.fTimeGlobal,
+            /*.update_time  =*/ Device.fTimeGlobal + default_feedback_duration,
+            /*.needs_update =*/ true
+        };
+    }
+
+    if (!GEnv.isDedicatedServer && !m_sndShockEffector)
+    {
+        pInput->Feedback(CInput::FeedbackController, low_freq_feedback, high_freq_feedback, feedback_duration);
     }
 
     // slow actor, only when he gets hit
@@ -659,7 +722,7 @@ void CActor::HitMark(float P, Fvector dir, IGameObject* who_object, s16 element,
     if (/*(hit_type==ALife::eHitTypeFireWound||hit_type==ALife::eHitTypeWound_2) && */
         g_Alive() && Local() && (Level().CurrentEntity() == this))
     {
-        HUD().HitMarked(0, P, dir);
+        HUD().HitMarked(dir);
 
         CEffectorCam* ce = Cameras().GetCamEffector((ECamEffectorType)effFireHit);
         if (ce)
@@ -893,12 +956,12 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
         {
             SwitchOutBorder(new_border_state);
         }
-#ifdef DEBUG
+#ifndef MASTER_GOLD
         if (!psActorFlags.test(AF_NO_CLIP))
+#endif
+        {
             character_physics_support()->movement()->GetPosition(Position());
-#else // DEBUG
-        character_physics_support()->movement()->GetPosition(Position());
-#endif // DEBUG
+        }
         character_physics_support()->movement()->bSleep = false;
     }
 
@@ -1083,6 +1146,35 @@ void CActor::UpdateCL()
         else
             xr_delete(m_sndShockEffector);
     }
+    // Feedback with low freq for a little,
+    // feedback with high freq rest of the time.
+    if (m_controller_feedback.needs_update)
+    {
+        if (Device.fTimeGlobal >= m_controller_feedback.update_time)
+        {
+            const float remaining_duration = m_controller_feedback.duration - (Device.fTimeGlobal - m_controller_feedback.submit_time);
+
+            if (remaining_duration <= EPS_L)
+                m_controller_feedback = {};
+            else
+            {
+                const float frequency_part = m_controller_feedback.high_freq / m_controller_feedback.duration;
+                const float frequency = m_controller_feedback.high_freq - frequency_part;
+
+                pInput->Feedback(CInput::FeedbackController, 0.f, frequency, remaining_duration);
+                m_controller_feedback =
+                {
+                    /*.high_freq    =*/ frequency,
+                    /*.duration     =*/ remaining_duration,
+                    /*.submit_time  =*/ Device.fTimeGlobal,
+                    /*.update_time  =*/ Device.fTimeGlobal + default_feedback_duration,
+                    /*.needs_update =*/ true
+                };
+            }
+        }
+        
+    }
+
     Fmatrix trans;
     if (cam_Active() == cam_FirstEye())
     {
@@ -1340,7 +1432,7 @@ void CActor::shedule_Update(u32 DT)
         CGameObject* game_object = smart_cast<CGameObject*>(RQ.O);
         m_pUsableObject = game_object;
         m_pInvBoxWeLookingAt = smart_cast<CInventoryBox*>(game_object);
-        m_pPersonWeLookingAt = smart_cast<CInventoryOwner*>(game_object);
+        m_pPersonWeLookingAt = game_object->cast_inventory_owner();
         m_pVehicleWeLookingAt = smart_cast<CHolderCustom*>(game_object);
         CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(game_object);
 
@@ -1913,7 +2005,7 @@ IFactoryObject* CActor::_construct()
 bool CActor::use_center_to_aim() const { return (!!(mstate_real & mcCrouch)); }
 bool CActor::can_attach(const CInventoryItem* inventory_item) const
 {
-    const CAttachableItem* item = smart_cast<const CAttachableItem*>(inventory_item);
+    const CAttachableItem* item = smart_cast<const CAttachableItem*>(inventory_item); // XXX: CInventoryItem cannot be casted to CAttachableItem
     if (!item || /*!item->enabled() ||*/ !item->can_be_attached())
         return (false);
 

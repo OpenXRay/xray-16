@@ -18,7 +18,7 @@ void message_filter::filter(u16 const& msg_type, u32 const& msg_subtype, msg_typ
 {
     msg_type_subtype_t msgid(msg_type, msg_subtype);
     R_ASSERT2(m_filters.find(msgid) == m_filters.end(), "message filter already exist");
-    m_filters.insert(std::make_pair(msgid, found_func));
+    m_filters.emplace(msgid, found_func);
 }
 
 void message_filter::remove_filter(u16 const& msg_type, u32 const& msg_subtype)

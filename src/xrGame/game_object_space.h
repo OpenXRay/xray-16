@@ -61,6 +61,10 @@ enum ECallbackType : u32
     eKeyHold,
     eMouseMove,
     eMouseWheel,
+    eControllerPress,
+    eControllerRelease,
+    eControllerHold,
+    eControllerAttitudeChange,
     // Inventory
     eItemToBelt,
     eItemToSlot,

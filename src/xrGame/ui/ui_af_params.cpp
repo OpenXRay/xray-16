@@ -6,7 +6,6 @@
 #include "Common/object_broker.h"
 #include "UIXmlInit.h"
 #include "UIHelper.h"
-#include "string_table.h"
 
 u32 const red_clr = color_argb(255, 210, 50, 50);
 u32 const green_clr = color_argb(255, 170, 170, 170);

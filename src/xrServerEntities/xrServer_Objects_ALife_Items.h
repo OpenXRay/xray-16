@@ -42,6 +42,13 @@ public:
         u8 common;
     };
 
+private:
+    static constexpr
+    bool check_mask(const u8& mask, const u8& test)
+    {
+        return mask & test;
+    }
+
 public:
     float m_fCondition;
     float m_fMass;

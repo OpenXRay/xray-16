@@ -125,6 +125,7 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("set_callback", (void (CScriptGameObject::*)(GameObject::ECallbackType, const luabind::functor<void>&,
                                  const luabind::object&))(&CScriptGameObject::SetCallback))
         .def("set_callback", (void (CScriptGameObject::*)(GameObject::ECallbackType))(&CScriptGameObject::SetCallback))
+        .def("clear_callbacks", &CScriptGameObject::ClearCallbacks) //Graff46
 
         .def("set_patrol_extrapolate_callback",
             (void (CScriptGameObject::*)())(&CScriptGameObject::set_patrol_extrapolate_callback))
@@ -225,8 +226,8 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("set_home", (void (CScriptGameObject::*)(u32, float, float, bool, float))(&CScriptGameObject::set_home))
         .def("set_home", +[](CScriptGameObject* self, pcstr name, float r_min, float r_max, bool aggressive)
         {
-            constexpr float defaultMiddleRadius = 20; // taken from COP mob_home.script
-            self->set_home(name, r_min, r_max, aggressive, defaultMiddleRadius);
+            const float r_middle = (r_min + r_max) / 2;
+            self->set_home(name, r_min, r_max, aggressive, r_middle);
         })
         .def("remove_home", &CScriptGameObject::remove_home)
         .def("berserk", &CScriptGameObject::berserk)
@@ -273,6 +274,8 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
             (void (CScriptGameObject::*)(const Fvector*))(&CScriptGameObject::set_desired_direction))
         .def("set_patrol_path", &CScriptGameObject::set_patrol_path)
         .def("inactualize_patrol_path", &CScriptGameObject::inactualize_patrol_path)
+        .def("inactualize_level_path", &CScriptGameObject::inactualize_level_path)
+        .def("inactualize_game_path", &CScriptGameObject::inactualize_game_path)
         .def("set_dest_level_vertex_id", &CScriptGameObject::set_dest_level_vertex_id)
         .def("set_dest_game_vertex_id", &CScriptGameObject::set_dest_game_vertex_id)
         .def("set_movement_selection_type", &CScriptGameObject::set_movement_selection_type)

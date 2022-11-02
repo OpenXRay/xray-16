@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 
 #include "UIEditKeyBind.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Common/object_broker.h"
 #include "xrEngine/XR_IOConsole.h"
 
@@ -88,9 +88,6 @@ bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
         if (!m_keyboard)
             return true;
 
-        if (m_isGamepadBinds && (mouse_btn <= XR_CONTROLLER_BUTTON_A || mouse_btn >= XR_CONTROLLER_BUTTON_DPAD_RIGHT))
-            return true;
-
         SetValue();
         OnFocusLost();
 
@@ -119,11 +116,14 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     string64 message;
     if (m_isEditMode)
     {
-        m_keyboard = DikToPtr(dik, true);
-        if (!m_keyboard)
+        const bool is_gamepad_key = dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX;
+
+        // strictly separate keyboard/mouse from gamepad bindings
+        if (m_isGamepadBinds != is_gamepad_key)
             return true;
 
-        if (m_isGamepadBinds && (dik <= XR_CONTROLLER_BUTTON_A || dik >= XR_CONTROLLER_BUTTON_DPAD_RIGHT))
+        m_keyboard = DikToPtr(dik, true);
+        if (!m_keyboard)
             return true;
 
         SetValue();
@@ -135,6 +135,35 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         SendMessage2Group("key_binding", message);
         return true;
     }
+    return false;
+}
+
+bool CUIEditKeyBind::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    if (CUIStatic::OnControllerAction(axis, x, y, controller_action))
+        return true;
+
+    if (m_isEditMode)
+    {
+        // strictly separate keyboard/mouse from gamepad bindings
+        if (!m_isGamepadBinds)
+            return true;
+
+        m_keyboard = DikToPtr(axis, true);
+        if (!m_keyboard)
+            return true;
+
+        SetValue();
+
+        string64 message;
+        xr_strcpy(message, m_action->action_name);
+        xr_strcat(message, "=");
+        xr_strcat(message, m_keyboard->key_name);
+        OnFocusLost();
+        SendMessage2Group("key_binding", message);
+        return true;
+    }
+
     return false;
 }
 

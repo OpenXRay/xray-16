@@ -22,7 +22,7 @@ public:
     void Load(LPCSTR section);
     void Update(float dist, float radius, ALife::EHitType hit_type);
     void Stop();
-    float xr_stdcall GetFactor();
+    float GetFactor();
 
 private:
     void Activate();

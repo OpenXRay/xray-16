@@ -3,7 +3,6 @@
 #include "ScrollView/UIScrollView.h"
 #include "Common/object_broker.h"
 #include "Static/UIStatic.h"
-#include "xrEngine/xr_input_xinput.h"
 
 CUIListBoxItem::CUIListBoxItem(float height) : m_text(NULL), tag(u32(-1))
 {

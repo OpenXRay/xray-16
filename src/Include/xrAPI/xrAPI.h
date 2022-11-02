@@ -26,7 +26,6 @@ public:
     IDebugRender* DRender;
     CDUInterface* DU;
     IUIRender* UIRender;
-    CGameMtlLibrary* PGMLib;
     IRenderFactory* RenderFactory;
     CScriptEngine* ScriptEngine;
     AISpaceBase* AISpace;

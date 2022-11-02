@@ -15,9 +15,8 @@
 #include "editor_environment_effects_manager.hpp"
 #include "editor_environment_detail.hpp"
 
-using editor::environment::effects::effect;
-using editor::environment::effects::manager;
-
+namespace editor::environment::effects
+{
 effect::effect(manager const& manager, shared_str const& id)
     : m_manager(manager), m_property_holder(0), m_id(id), m_sound("")
 {
@@ -109,7 +108,7 @@ void effect::fill(XRay::Editor::property_holder_collection* collection)
     m_property_holder->add_property("particles", "properties", "this option is responsible for effect particles",
         particles.c_str(), particles, &*m_manager.environment().particle_ids().begin(),
         m_manager.environment().particle_ids().size(), XRay::Editor::property_holder_base::value_editor_tree_view,
-                                    XRay::Editor::property_holder_base::cannot_enter_text);
+        XRay::Editor::property_holder_base::cannot_enter_text);
 
     string_getter.bind(this, &effect::sound_getter);
     string_setter.bind(this, &effect::sound_setter);
@@ -147,3 +146,4 @@ void effect::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 XRay::Editor::property_holder_base* effect::object() { return m_property_holder; }
+} // namespace editor::environment::effects

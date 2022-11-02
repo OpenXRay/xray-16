@@ -93,7 +93,13 @@ void CRender::create()
     o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
     o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
     o.no_detail_textures = !ps_r2_ls_flags.test(R1FLAG_DETAIL_TEXTURES);
+
     c_ldynamic_props = "L_dynamic_props";
+    c_sbase = "s_base";
+    c_ssky0 = "s_sky0";
+    c_ssky1 = "s_sky1";
+    c_sclouds0 = "s_clouds0";
+    c_sclouds1 = "s_clouds1";
 
     o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
     if (o.no_ram_textures)
@@ -158,7 +164,7 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
-void CRender::BeforeFrame()
+void CRender::BeforeRender()
 {
     if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
         return;
@@ -495,8 +501,7 @@ void CRender::Calculate()
     {
         Fvector box_radius;
         box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
-        Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
-        Sectors_xrc.box_query(rmPortals, Device.vCameraPosition, box_radius);
+        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
         for (int K = 0; K < Sectors_xrc.r_count(); K++)
         {
             CPortal* pPortal = (CPortal*)Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];

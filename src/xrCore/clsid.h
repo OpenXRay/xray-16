@@ -1,7 +1,7 @@
 #pragma once
 #ifndef _CLSID_H
 #define _CLSID_H
-#include "_types.h"
+#include "xr_types.h"
 
 //***** CLASS ID type
 typedef u64 CLASS_ID;
@@ -12,7 +12,7 @@ typedef u64 CLASS_ID;
 
 #define MK_CLSID_INV(a, b, c, d, e, f, g, h) MK_CLSID(h, g, f, e, d, c, b, a)
 
-extern XRCORE_API void __stdcall CLSID2TEXT(CLASS_ID id, pstr text);
-extern XRCORE_API CLASS_ID __stdcall TEXT2CLSID(LPCSTR text);
+extern XRCORE_API void CLSID2TEXT(CLASS_ID id, pstr text);
+extern XRCORE_API CLASS_ID TEXT2CLSID(LPCSTR text);
 
 #endif

@@ -513,7 +513,7 @@ int ComplexJtLimit::solve_aux(float v, float tan_v, float* solns) const
         b = sin_eq.beta - tan_v * cos_eq.beta;
         c = sin_eq.xi - tan_v * cos_eq.xi;
 
-        PsiEquation p(a, b, c);
+        eqn::PsiEquation p(a, b, c);
 
         n = p.roots(solns);
     }

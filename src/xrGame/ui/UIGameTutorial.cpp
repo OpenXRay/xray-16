@@ -5,7 +5,7 @@
 #include "UIXmlInit.h"
 #include "Common/object_broker.h"
 #include "xrEngine/xr_input.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 #include "xrEngine/XR_IOConsole.h"
@@ -97,6 +97,7 @@ CUISequencer::CUISequencer()
 {
     m_UIWindow = nullptr;
     m_pStoredInputReceiver = nullptr;
+    m_name = nullptr;
     m_flags.zero();
 }
 
@@ -118,6 +119,7 @@ bool CUISequencer::Start(LPCSTR tutor_name)
 
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 
+    m_name = tutor_name;
     m_UIWindow = xr_new<CUIWindow>();
 
     m_flags.set(etsPlayEachItem, !!uiXml.ReadInt("play_each_item", 0, 0));
@@ -193,6 +195,7 @@ bool CUISequencer::Start(LPCSTR tutor_name)
 
     if (m_start_lua_function.size())
         CallFunction(m_start_lua_function);
+
     return true;
 }
 
@@ -234,6 +237,8 @@ extern CUISequencer* g_tutorial2;
 
 void CUISequencer::Destroy()
 {
+    m_name = nullptr;
+
     if (m_stop_lua_function.size())
         CallFunction(m_stop_lua_function);
 
@@ -436,6 +441,54 @@ void CUISequencer::IR_OnKeyboardPress(int dik)
 
     if (b && !GrabInput() && m_pStoredInputReceiver)
         m_pStoredInputReceiver->IR_OnKeyboardPress(dik);
+}
+
+void CUISequencer::IR_OnControllerPress(int key, float x, float y)
+{
+    if (m_sequencer_items.size())
+        m_sequencer_items.front()->OnControllerPress(key);
+
+    bool b = true;
+    if (m_sequencer_items.size())
+        b &= m_sequencer_items.front()->AllowKey(key);
+
+    bool binded = IsBinded(kQUIT, key);
+    if (b && binded)
+    {
+        Stop();
+        return;
+    }
+
+    if (binded && CurrentGameUI())
+    {
+        if (CurrentGameUI()->GetActorMenu().IsShown())
+        {
+            CurrentGameUI()->HideActorMenu();
+            return;
+        }
+        if (CurrentGameUI()->GetPdaMenu().IsShown())
+        {
+            CurrentGameUI()->HidePdaMenu();
+            return;
+        }
+        Console->Execute("main_menu");
+        return;
+    }
+
+    if (b && !GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnControllerPress(key, x, y);
+}
+
+void CUISequencer::IR_OnControllerRelease(int key, float x, float y)
+{
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnControllerRelease(key, x, y);
+}
+
+void CUISequencer::IR_OnControllerHold(int key, float x, float y)
+{
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnControllerHold(key, x, y);
 }
 
 void CUISequencer::IR_OnActivate()

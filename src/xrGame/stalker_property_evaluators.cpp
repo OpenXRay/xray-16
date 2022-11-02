@@ -41,7 +41,7 @@ using namespace StalkerDecisionSpace;
 
 typedef CStalkerPropertyEvaluator::_value_type _value_type;
 
-const float wounded_enemy_reached_distance = 3.f;
+extern const float wounded_enemy_reached_distance = 3.f;
 
 //////////////////////////////////////////////////////////////////////////
 // CStalkerPropertyEvaluatorALife

@@ -14,7 +14,7 @@
 #endif
 #endif
 
-#if defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) // XXX: remove
 #include <math.h>
 #endif
 
@@ -32,23 +32,7 @@ static void ApplyTexgen(const Fmatrix& mVP)
 {
     Fmatrix mTexgen;
 
-#ifdef USE_OGL
-    Fmatrix mTexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-#elif !defined(USE_DX9)
-    Fmatrix mTexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-#else // USE_DX9
+#if defined(USE_DX9)
     float _w = float(RDEVICE.dwWidth);
     float _h = float(RDEVICE.dwHeight);
     float o_w = (.5f / _w);
@@ -60,6 +44,24 @@ static void ApplyTexgen(const Fmatrix& mVP)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
     };
+#elif defined(USE_DX11)
+    Fmatrix mTexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
+#elif defined(USE_OGL)
+    Fmatrix mTexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
+#else
+#   error No graphics API selected or enabled!
 #endif
 
     mTexgen.mul(mTexelAdjust, mVP);
@@ -152,7 +154,7 @@ void CParticleEffect::OnFrame(u32 frame_dt)
         m_MemDT += frame_dt;
 
         int StepCount = 0;
-        if (m_MemDT >= uDT_STEP)
+        if (m_MemDT >= static_cast<s32>(uDT_STEP))
         {
             // allow maximum of three steps (99ms) to avoid slowdown after loading
             // it will really skip updates at less than 10fps, which is unplayable

@@ -28,6 +28,8 @@ set(COMPILE_OUTPUT_FOLDER ${CMAKE_SOURCE_DIR}/bin/${ARCH_TYPE}/${CMAKE_BUILD_TYP
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
+set(CMAKE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
+set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "armv*")
@@ -38,20 +40,25 @@ elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "e2k")
     set(PROJECT_PLATFORM_E2K TRUE)
 endif()
 
-if (NOT MASTER_GOLD)
-    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        set(MASTER_GOLD ON CACHE BOOL "" FORCE)
-    else()
-        set(MASTER_GOLD OFF CACHE BOOL "" FORCE)
-    endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set(MASTER_GOLD_DEFAULT_VALUE ON)
+else()
+    set(MASTER_GOLD_DEFAULT_VALUE OFF)
 endif()
 
+option(MASTER_GOLD "Build with MASTER_GOLD" ${MASTER_GOLD_DEFAULT_VALUE})
 message(STATUS "MASTER_GOLD: ${MASTER_GOLD}")
 if (MASTER_GOLD)
     add_definitions(-DMASTER_GOLD)
 endif()
 
-option(USE_CRYPTOPP "Use Crypto++ Library (REQUIRED FOR MULTIPLAYER)" OFF)
+option(STATIC_BUILD "Use static build" ${MASTER_GOLD})
+message(STATUS "STATIC_BUILD: ${STATIC_BUILD}")
+if (STATIC_BUILD)
+    # XXX: Uncomment only after build with XRAY_STATIC_BUILD is fixed
+    #add_definitions(-DXRAY_STATIC_BUILD)
+endif()
 
 # Memory allocator option
 set(MEMORY_ALLOCATOR "mimalloc" CACHE STRING "Use specific memory allocator (mimalloc/standard)")
@@ -121,19 +128,39 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         message(FATAL_ERROR "Building with a MCST lcc version less than 1.25 is not supported.")
     endif()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-command-line-argument -Wno-inconsistent-missing-override")
-    if (NOT USED_CXX_LIB)
-        set(USED_CXX_LIB "libstdcpp" CACHE STRING "" FORCE)
+    # XXX: Remove -fdelayed-template-parsing
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdelayed-template-parsing -Wno-unused-command-line-argument -Wno-inconsistent-missing-override")
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
+    if (NOT XRAY_CXX_LIB)
+        include(CheckCXXCompilerFlag)
+        CHECK_CXX_COMPILER_FLAG("-stdlib=libc++" LIBCPP_AVAILABLE)
+        CHECK_CXX_COMPILER_FLAG("-stdlib=libstdc++" LIBSTDCPP_AVAILABLE)
+
+        if (LIBCPP_AVAILABLE)
+            set(XRAY_CXX_LIB "libc++" CACHE STRING "" FORCE)
+        elseif (LIBSTDCPP_AVAILABLE)
+            set(XRAY_CXX_LIB "libstdc++" CACHE STRING "" FORCE)
+        else()
+            message("Neither libstdc++ nor libc++ are available. Hopefully, system has another custom stdlib?")
+        endif()
     endif()
-    if (USED_CXX_LIB STREQUAL "libstdcpp")
+
+    if (XRAY_CXX_LIB STREQUAL "libstdc++")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
-    elseif (USED_CXX_LIB STREQUAL "libcpp")
+    elseif (XRAY_CXX_LIB STREQUAL "libc++")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
     endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes -Wl,--no-undefined -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes -fvisibility=hidden")
+if (APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-undefined,error")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-undefined")
+endif()
 
 #set(SANITIZE_FLAGS "-fsanitize=address  -fsanitize=leak -fno-omit-frame-pointer -g -fsanitize=undefined -fno-sanitize=vptr")
 #if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -160,11 +187,23 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=sse -msse3")
 endif()
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=gold")
+option(XRAY_USE_DEFAULT_LINKER "Don't select linker, use system default." OFF)
 
-if (USE_CRYPTOPP)
-    add_definitions(-DUSE_CRYPTOPP)
+if (NOT XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER AND NOT APPLE) # XXX: check if we can remove check for Apple
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("-fuse-ld=gold" GOLD_LINKER_AVAILABLE)
+    CHECK_CXX_COMPILER_FLAG("-fuse-ld=lld" LLD_LINKER_AVAILABLE)
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND LLD_LINKER_AVAILABLE)
+        set(XRAY_LINKER "lld" CACHE STRING "" FORCE)
+    elseif (GOLD_LINKER_AVAILABLE)
+        set(XRAY_LINKER "gold" CACHE STRING "" FORCE)
+    endif()
+endif()
+
+if (XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=${XRAY_LINKER}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=${XRAY_LINKER}")
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -185,24 +224,27 @@ message("CMake build ${CMAKE_BUILD_TYPE}, CFLAGS=${CMAKE_C_FLAGS}, CXXFLAGS=${CM
 add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION -DM_NOSTDCONTAINERS_EXT)
 add_definitions(-DLUABIND_DYNAMIC_LINK) #self-explanatory
 add_definitions(-DdSINGLE) # for ODE and xrPhysics
+if (MASTER_GOLD)
+    add_definitions(-DLUABIND_NO_EXCEPTIONS)
+    add_definitions(-DLUABIND_NO_ERROR_CHECKING)
+    add_definitions(-DdNODEBUG)
+endif()
 
 set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
 
 if (NOT WIN32)
+    find_package(SDL2 REQUIRED)
+    find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
-    find_package(FreeImage REQUIRED)
-    find_package(FreeImagePlus REQUIRED)
-    find_package(LockFile REQUIRED)
     find_package(OpenAL REQUIRED)
-    if (USE_CRYPTOPP)
-        find_package(Crypto++ REQUIRED)
+    find_package(JPEG)
+    if (JPEG_FOUND)
+        set(USE_CXIMAGE TRUE)
     endif()
-    find_package(Theora REQUIRED)
     find_package(Ogg REQUIRED)
-    find_package(SDL REQUIRED)
+    find_package(Vorbis REQUIRED)
+    find_package(Theora REQUIRED)
     find_package(LZO REQUIRED)
-    find_package(JPEG REQUIRED)
-    find_package(PCRE REQUIRED)
 endif()
 
 # XXX: move to LuaJIT
@@ -232,6 +274,30 @@ include_directories(
 )
 
 add_subdirectory(Externals)
+
+set(CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS}"
+    "-Wall"
+    #"-Werror"
+    #"-Wextra"
+    #"-pedantic"
+    "-Wno-unknown-pragmas"
+    "-Wno-strict-aliasing"
+    "-Wno-class-memaccess"
+    "-Wno-parentheses"
+    "-Wno-unused-label"
+    "-Wno-switch"
+    #"-Wno-padded"
+    #"-Wno-c++98-compat"
+    #"-Wno-c++98-compat-pedantic"
+    #"-Wno-c++11-compat"
+    #"-Wno-c++11-compat-pedantic"
+    #"-Wno-c++14-compat"
+    #"-Wno-c++14-compat-pedantic"
+    #"-Wno-newline-eof"
+)
+string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
 add_subdirectory(src)
 add_subdirectory(res)
 

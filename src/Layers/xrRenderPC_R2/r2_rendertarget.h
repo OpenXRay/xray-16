@@ -13,15 +13,20 @@ class light;
 
 class CRenderTarget : public IRender_Target
 {
-private:
     u32 dwWidth;
     u32 dwHeight;
     u32 dwAccumulatorClearMark;
 
 public:
+    enum eStencilOptimizeMode
+    {
+        SO_Light = 0, //	Default
+        SO_Combine, //	Default
+    };
+
     u32 dwLightMarkerID;
-    //
-    IBlender* b_accum_spot;
+
+    IBlender* b_accum_spot{};
 
 #ifdef DEBUG
     struct dbg_line_t
@@ -75,10 +80,7 @@ public:
     ref_rt rt_smap_depth; // 24(32) bit,	depth
 
     // Textures
-    IDirect3DVolumeTexture9* t_material_surf;
     ref_texture t_material;
-
-    IDirect3DTexture9* t_noise_surf[TEX_jitter_count];
     ref_texture t_noise[TEX_jitter_count];
 
 private:
@@ -112,9 +114,9 @@ private:
     IndexStagingBuffer g_accum_volumetric_ib;
 
     // SSAO
-    ref_shader s_ssao;
     ref_rt rt_ssao_temp;
     ref_rt rt_half_depth;
+    ref_shader s_ssao;
 
     // Bloom
     ref_geom g_bloom_build;
@@ -175,7 +177,7 @@ private:
 
 public:
     CRenderTarget();
-    ~CRenderTarget();
+    ~CRenderTarget() override;
 
     void build_textures();
 
@@ -202,7 +204,6 @@ public:
 
     void u_stencil_optimize(BOOL common_stencil = TRUE);
     void u_compute_texgen_screen(Fmatrix& dest);
-    void u_compute_texgen_screen_asd(Fmatrix& dest);
     void u_compute_texgen_jitter(Fmatrix& dest);
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
@@ -211,12 +212,12 @@ public:
     bool u_DBT_enable(float zMin, float zMax);
     void u_DBT_disable();
 
-    void phase_ssao();
-    void phase_downsamp();
     void phase_scene_prepare();
     void phase_scene_begin();
     void phase_scene_end();
     void phase_occq();
+    void phase_ssao();
+    void phase_downsamp();
     void phase_wallmarks();
     void phase_smap_direct(light* L, u32 sub_phase);
     void phase_smap_direct_tsh(light* L, u32 sub_phase);
@@ -255,21 +256,22 @@ public:
     void phase_combine_volumetric();
     void phase_pp();
 
-    virtual void set_blur(float f) { param_blur = f; }
-    virtual void set_gray(float f) { param_gray = f; }
-    virtual void set_duality_h(float f) { param_duality_h = _abs(f); }
-    virtual void set_duality_v(float f) { param_duality_v = _abs(f); }
-    virtual void set_noise(float f) { param_noise = f; }
-    virtual void set_noise_scale(float f) { param_noise_scale = f; }
-    virtual void set_noise_fps(float f) { param_noise_fps = _abs(f) + EPS_S; }
-    virtual void set_color_base(u32 f) { param_color_base = f; }
-    virtual void set_color_gray(u32 f) { param_color_gray = f; }
-    virtual void set_color_add(const Fvector& f) { param_color_add = f; }
-    virtual u32 get_width() { return dwWidth; }
-    virtual u32 get_height() { return dwHeight; }
-    virtual void set_cm_imfluence(float f) { param_color_map_influence = f; }
-    virtual void set_cm_interpolate(float f) { param_color_map_interpolate = f; }
-    virtual void set_cm_textures(const shared_str& tex0, const shared_str& tex1)
+    u32 get_width() override { return dwWidth; }
+    u32 get_height() override { return dwHeight; }
+
+    void set_blur(float f) override { param_blur = f; }
+    void set_gray(float f) override { param_gray = f; }
+    void set_duality_h(float f) override { param_duality_h = _abs(f); }
+    void set_duality_v(float f) override { param_duality_v = _abs(f); }
+    void set_noise(float f) override { param_noise = f; }
+    void set_noise_scale(float f) override { param_noise_scale = f; }
+    void set_noise_fps(float f) override { param_noise_fps = _abs(f) + EPS_S; }
+    void set_color_base(u32 f) override { param_color_base = f; }
+    void set_color_gray(u32 f) override { param_color_gray = f; }
+    void set_color_add(const Fvector& f) override { param_color_add = f; }
+    void set_cm_imfluence(float f) override { param_color_map_influence = f; }
+    void set_cm_interpolate(float f) override { param_color_map_interpolate = f; }
+    void set_cm_textures(const shared_str& tex0, const shared_str& tex1) override
     {
         color_map_manager.SetTextures(tex0, tex1);
     }
@@ -282,21 +284,20 @@ public:
     void DoAsyncScreenshot();
 
 #ifdef DEBUG
-    IC void dbg_addline(Fvector& P0, Fvector& P1, u32 c)
+    void dbg_addline(const Fvector& P0, const Fvector& P1, u32 c)
     {
-        dbg_lines.push_back(dbg_line_t());
-        dbg_lines.back().P0 = P0;
-        dbg_lines.back().P1 = P1;
-        dbg_lines.back().color = c;
+        dbg_lines.emplace_back(dbg_line_t{ P0, P1, c });
     }
-    IC void dbg_addbox(const Fbox& box, const u32& color)
+
+    void dbg_addbox(const Fbox& box, const u32& color)
     {
         Fvector c, r;
         box.getcenter(c);
         box.getradius(r);
         dbg_addbox(c, r.x, r.y, r.z, color);
     }
-    IC void dbg_addbox(const Fvector& c, float rx, float ry, float rz, u32 color)
+
+    void dbg_addbox(const Fvector& c, float rx, float ry, float rz, u32 color)
     {
         Fvector p1, p2, p3, p4, p5, p6, p7, p8;
 
@@ -325,9 +326,9 @@ public:
         dbg_addline(p3, p7, color);
         dbg_addline(p4, p8, color);
     }
-    IC void dbg_addplane(Fplane& P0, u32 /*c*/) { dbg_planes.push_back(P0); }
+    void dbg_addplane(Fplane& P0, u32 /*c*/) { dbg_planes.emplace_back(P0); }
 #else
-    IC void dbg_addline(Fvector& P0, Fvector& P1, u32 c) {}
-    IC void dbg_addplane(Fplane& P0, u32 c) {}
+    void dbg_addline(Fvector& /*P0*/, Fvector& /*P1*/, u32 /*c*/) {}
+    void dbg_addplane(Fplane& /*P0*/, u32 /*c*/) {}
 #endif
 };

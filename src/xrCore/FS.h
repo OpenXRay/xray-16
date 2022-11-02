@@ -5,7 +5,7 @@
 
 #ifndef fsH
 #define fsH
-#include "_types.h"
+#include "xr_types.h"
 #include "_bitwise.h"
 #include "_compressed_normal.h"
 #include "_vector2.h"
@@ -419,8 +419,10 @@ class XRCORE_API CVirtualFileRW final : public IReader
 private:
 #if defined(XR_PLATFORM_WINDOWS)
     void *hSrcFile, *hSrcMap;
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
     int hSrcFile;
+#else
+#   error Select or add implementation for your platform
 #endif
 
 public:

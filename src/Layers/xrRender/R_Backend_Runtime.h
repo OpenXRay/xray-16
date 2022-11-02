@@ -7,15 +7,15 @@
 #include "SH_Constant.h"
 #include "SH_RT.h"
 
-#ifdef USE_OGL
+#if defined(USE_DX9)
+#include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
+#elif defined(USE_DX11)
+#include "Layers/xrRenderDX11/dx11R_Backend_Runtime.h"
+#include "Layers/xrRenderDX11/StateManager/dx11State.h"
+#elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glR_Backend_Runtime.h"
 #include "Layers/xrRenderGL/glState.h"
-#elif !defined(USE_DX9)
-#include "Layers/xrRenderDX10/dx10R_Backend_Runtime.h"
-#include "Layers/xrRenderDX10/StateManager/dx10State.h"
-#else // USE_DX9
-#include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
-#endif // USE_OGL
+#endif
 
 IC void R_xforms::set_c_w(R_constant* C)
 {
@@ -59,36 +59,38 @@ IC void CBackend::set_xform_project(const Fmatrix& M) { xforms.set_P(M); }
 IC const Fmatrix& CBackend::get_xform_world() { return xforms.get_W(); }
 IC const Fmatrix& CBackend::get_xform_view() { return xforms.get_V(); }
 IC const Fmatrix& CBackend::get_xform_project() { return xforms.get_P(); }
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+IC ID3DRenderTargetView* CBackend::get_RT(u32 ID)
+#elif defined(USE_OGL)
 IC GLuint CBackend::get_RT(u32 ID)
 #else
-IC ID3DRenderTargetView* CBackend::get_RT(u32 ID)
-#endif // USE_OGL
+#   error No graphics API selected or enabled!
+#endif
 {
     VERIFY((ID >= 0) && (ID < 4));
 
     return pRT[ID];
 }
 
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+IC ID3DDepthStencilView* CBackend::get_ZB()
+#elif defined(USE_OGL)
 IC GLuint CBackend::get_ZB()
 #else
-IC ID3DDepthStencilView* CBackend::get_ZB()
-#endif // USE_OGL
+#   error No graphics API selected or enabled!
+#endif
 {
     return pZB;
 }
 ICF void CBackend::set_States(SState* _state)
 {
-//	DX10 Manages states using it's own algorithm. Don't mess with it.
+//	DX11 Manages states using it's own algorithm. Don't mess with it.
 #ifdef USE_DX9
     if (state != _state->state)
 #endif
     {
         PGO(Msg("PGO:state_block"));
-#ifdef DEBUG
         stat.states++;
-#endif
         state = _state->state;
         state->Apply();
     }
@@ -110,7 +112,7 @@ IC void CBackend::set_Matrices(SMatrixList* _M)
                     matrices[it] = mat;
                     mat->Calculate();
                     set_xform(D3DTS_TEXTURE0 + it, mat->xform);
-                    //				stat.matrices		++;
+                    stat.matrices++;
                 }
             }
         }
@@ -118,24 +120,31 @@ IC void CBackend::set_Matrices(SMatrixList* _M)
 }
 #endif
 
-IC void CBackend::set_Element(ShaderElement* S, u32 pass)
+IC void CBackend::set_Pass(SPass* P)
 {
-    SPass& P = *(S->passes[pass]);
-    set_States(P.state);
-    set_PS(P.ps);
-    set_VS(P.vs);
-#ifdef USE_DX11
-    set_GS(P.gs);
-    set_HS(P.hs);
-    set_DS(P.ds);
-    set_CS(P.cs);
+    set_States(P->state);
+#ifdef USE_OGL
+    if (P->pp)
+        set_PP(P->pp);
+    else
 #endif
-    set_Constants(P.constants);
-    set_Textures(P.T);
+    {
+        set_PS(P->ps);
+        set_VS(P->vs);
+#ifdef USE_DX11
+        set_GS(P->gs);
+        set_HS(P->hs);
+        set_DS(P->ds);
+        set_CS(P->cs);
+#endif
+    }
+    set_Constants(P->constants);
+    set_Textures(P->T);
 #ifdef _EDITOR
-    set_Matrices(P.M);
+    set_Matrices(P->M);
 #endif
 }
 
+ICF void CBackend::set_Element(ShaderElement* S, u32 pass) { set_Pass(S->passes[pass]); }
 ICF void CBackend::set_Shader(Shader* S, u32 pass) { set_Element(S->E[0], pass); }
 #endif

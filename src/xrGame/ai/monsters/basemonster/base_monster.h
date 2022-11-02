@@ -51,7 +51,7 @@ class text_tree;
 
 class anti_aim_ability;
 
-class CBaseMonster : public CCustomMonster, public CStepManager
+class CBaseMonster : public CCustomMonster, public CStepManager, public CInventoryOwner
 {
 protected:
     using inherited = CCustomMonster;
@@ -73,8 +73,10 @@ public:
     virtual CScriptEntity* cast_script_entity() { return this; }
     virtual CBaseMonster* cast_base_monster() { return this; }
     virtual CGameObject* cast_game_object() { return this; }
+    virtual CInventoryOwner* cast_inventory_owner() override { return CallOfPripyatMode ? nullptr : this; }
 
 public:
+    virtual void renderable_Render(IRenderable* root) override { return inherited::renderable_Render(root); }
     virtual bool renderable_ShadowReceive() { return TRUE; }
     virtual void Die(IGameObject* who);
     virtual void HitSignal(float amount, Fvector& vLocalDir, IGameObject* who, s16 element);
@@ -141,8 +143,11 @@ public:
 
     virtual void HitEntityInJump(const CEntity* pEntity) {}
     virtual void on_before_sell(CInventoryItem* item);
+    virtual bool unlimited_ammo() override { return false; }
+
     float GetSatiety() { return 0.5f; }
     void ChangeSatiety(float v) {}
+
     // ---------------------------------------------------------------------------------
     // Process scripts
     // ---------------------------------------------------------------------------------

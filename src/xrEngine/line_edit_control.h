@@ -95,26 +95,26 @@ private:
     void update_key_states();
     void update_bufs();
 
-    void xr_stdcall undo_buf();
-    void xr_stdcall select_all_buf();
-    void xr_stdcall flip_insert_mode();
+    void undo_buf();
+    void select_all_buf();
+    void flip_insert_mode();
 
-    void xr_stdcall copy_to_clipboard();
-    void xr_stdcall paste_from_clipboard();
-    void xr_stdcall cut_to_clipboard();
+    void copy_to_clipboard();
+    void paste_from_clipboard();
+    void cut_to_clipboard();
 
-    void xr_stdcall move_pos_home();
-    void xr_stdcall move_pos_end();
-    void xr_stdcall move_pos_left();
-    void xr_stdcall move_pos_right();
-    void xr_stdcall move_pos_left_word();
-    void xr_stdcall move_pos_right_word();
+    void move_pos_home();
+    void move_pos_end();
+    void move_pos_left();
+    void move_pos_right();
+    void move_pos_left_word();
+    void move_pos_right_word();
 
-    void xr_stdcall delete_selected_back();
-    void xr_stdcall delete_selected_forward();
-    void xr_stdcall delete_word_back();
-    void xr_stdcall delete_word_forward();
-    void xr_stdcall SwitchKL();
+    void delete_selected_back();
+    void delete_selected_forward();
+    void delete_word_back();
+    void delete_word_forward();
+    void SwitchKL();
 
     void create_key_state(int const dik, key_state state);
 

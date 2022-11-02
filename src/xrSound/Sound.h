@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCore/_flags.h"
 #include "xrCore/xr_resource.h"
 #include "xrCore/_vector3d.h"
@@ -150,7 +150,7 @@ public:
 typedef resptr_core<ref_sound_data, resptr_base<ref_sound_data>> ref_sound_data_ptr;
 
 /// definition (Sound Callback)
-typedef void __stdcall sound_event(const ref_sound_data_ptr& S, float range);
+typedef void sound_event(const ref_sound_data_ptr& S, float range);
 
 namespace CDB
 {
@@ -161,6 +161,7 @@ namespace CDB
 // XXX tamlin: Tag NOVTABLE ?
 class XRSOUND_API ISoundManager
 {
+    virtual void _initialize_devices_list() = 0;
     virtual void _initialize() = 0;
     virtual void _clear() = 0;
 
@@ -170,7 +171,8 @@ protected:
     virtual void _destroy_data(ref_sound_data& S) = 0;
 
 public:
-    virtual ~ISoundManager() {}
+    virtual ~ISoundManager() = default;
+    static void _create_devices_list();
     static void _create();
     static void _destroy();
 
@@ -221,7 +223,7 @@ class CSound_UserDataVisitor;
 class CSound_UserData : public xr_resource
 {
 public:
-    virtual ~CSound_UserData() {}
+    virtual ~CSound_UserData() = default;
     virtual void accept(CSound_UserDataVisitor*) = 0;
     virtual void invalidate() = 0;
 };

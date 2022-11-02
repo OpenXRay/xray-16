@@ -1,4 +1,4 @@
-#https://raw.githubusercontent.com/freeorion/freeorion/master/cmake/FindOgg.cmake
+#https://github.com/freeorion/freeorion/blob/master/cmake/FindOgg.cmake
 #.rst:
 # FindOgg
 # -------

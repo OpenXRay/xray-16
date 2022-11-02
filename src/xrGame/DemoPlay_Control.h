@@ -57,12 +57,12 @@ private:
     void deactivate_filter();
     void process_action(); // pause game and changes demo play speed if it's need
 
-    void __stdcall on_round_start_impl(u32 message, u32 subtype, NET_Packet& packet);
-    void __stdcall on_kill_impl(u32 message, u32 subtype, NET_Packet& packet);
-    void __stdcall on_die_impl(u32 message, u32 subtype, NET_Packet& packet);
-    void __stdcall on_artefactdelivering_impl(u32 message, u32 subtype, NET_Packet& packet);
-    void __stdcall on_artefactcapturing_impl(u32 message, u32 subtype, NET_Packet& packet);
-    void __stdcall on_artefactloosing_impl(u32 message, u32 subtype, NET_Packet& packet);
+    void on_round_start_impl(u32 message, u32 subtype, NET_Packet& packet);
+    void on_kill_impl(u32 message, u32 subtype, NET_Packet& packet);
+    void on_die_impl(u32 message, u32 subtype, NET_Packet& packet);
+    void on_artefactdelivering_impl(u32 message, u32 subtype, NET_Packet& packet);
+    void on_artefactcapturing_impl(u32 message, u32 subtype, NET_Packet& packet);
+    void on_artefactloosing_impl(u32 message, u32 subtype, NET_Packet& packet);
 }; // class demoplay_control
 
 #endif //#ifndef DEMOPLAY_CONTROL

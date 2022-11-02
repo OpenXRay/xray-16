@@ -1,7 +1,7 @@
 #ifndef perlinH
 #define perlinH
 
-#define SAMPLE_SIZE 256
+#define PERLIN_SAMPLE_SIZE 256
 
 class ENGINE_API CPerlinNoiseCustom
 {
@@ -9,7 +9,7 @@ protected:
     int mSeed;
     bool mReady;
 
-    int p[SAMPLE_SIZE + SAMPLE_SIZE + 2];
+    int p[PERLIN_SAMPLE_SIZE + PERLIN_SAMPLE_SIZE + 2];
 
 protected:
     int mOctaves;
@@ -38,7 +38,7 @@ class ENGINE_API CPerlinNoise1D : public CPerlinNoiseCustom
 {
 private:
     float noise(float arg);
-    float g1[SAMPLE_SIZE + SAMPLE_SIZE + 2];
+    float g1[PERLIN_SAMPLE_SIZE + PERLIN_SAMPLE_SIZE + 2];
 
     void init();
     float mPrevContiniousTime;
@@ -55,7 +55,7 @@ private:
     float noise(const Fvector2& vec);
     void normalize(float v[2]);
 
-    float g2[SAMPLE_SIZE + SAMPLE_SIZE + 2][2];
+    float g2[PERLIN_SAMPLE_SIZE + PERLIN_SAMPLE_SIZE + 2][2];
 
     void init();
 
@@ -70,7 +70,7 @@ private:
     float noise(const Fvector3& vec);
     void normalize(float v[3]);
 
-    float g3[SAMPLE_SIZE + SAMPLE_SIZE + 2][3];
+    float g3[PERLIN_SAMPLE_SIZE + PERLIN_SAMPLE_SIZE + 2][3];
 
     void init();
 

@@ -7,14 +7,13 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #pragma comment(lib, "winmm.lib")
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
 #include <unistd.h>
 #endif
 #include "xrCore.h"
-#include "Math/MathUtil.hpp"
 #include "xrCore/_std_extensions.h"
 #include "Threading/TaskManager.hpp"
 
@@ -46,6 +45,12 @@ static u32 init_counter = 0;
 #endif
 #endif
 
+#ifdef GITHUB_ACTIONS
+#if EXPAND(GITHUB_ACTIONS) == 1
+#undef GITHUB_ACTIONS
+#endif
+#endif
+
 #ifndef GIT_INFO_CURRENT_COMMIT
 #define GIT_INFO_CURRENT_COMMIT unknown
 #endif
@@ -54,144 +59,7 @@ static u32 init_counter = 0;
 #define GIT_INFO_CURRENT_BRANCH unknown
 #endif
 
-void PrintBuildInfo()
-{
-    pcstr name = "Custom";
-    pcstr buildId = nullptr;
-    pcstr builder = nullptr;
-    pcstr commit = Core.GetBuildCommit();
-    pcstr branch = Core.GetBuildBranch();
-
-#if defined(CI)
-#if defined(APPVEYOR)
-    name = "AppVeyor";
-    buildId = MACRO_TO_STRING(APPVEYOR_BUILD_VERSION);
-    builder = MACRO_TO_STRING(APPVEYOR_ACCOUNT_NAME);
-#elif defined(TRAVIS)
-    name = "Travis";
-    buildId = MACRO_TO_STRING(TRAVIS_BUILD_NUMBER);
-#else
-#pragma TODO("PrintCI for other CIs")
-    name = "CI";
-    builder = "Unknown CI";
-#endif
-#endif
-
-    string512 buf;
-    strconcat(buf, name, " build "); // "%s build "
-
-    if (buildId)
-        strconcat(buf, buf, buildId, " "); // "id "
-
-    strconcat(buf, buf, "from commit[", commit, "]"); // "from commit[hash]"
-    strconcat(buf, buf, " branch[", branch, "]"); // " branch[name]"
-
-    if (builder)
-        strconcat(buf, buf, " (built by ", builder, ")"); // " (built by builder)"
-
-    Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
-}
-
-void SDLLogOutput(void* /*userdata*/,
-    int category,
-    SDL_LogPriority priority,
-    const char* message)
-{
-    pcstr from;
-    switch (category)
-    {
-    case SDL_LOG_CATEGORY_APPLICATION:
-        from = "application";
-        break;
-
-    case SDL_LOG_CATEGORY_ERROR:
-        from = "error";
-        break;
-
-    case SDL_LOG_CATEGORY_ASSERT:
-        from = "assert";
-        break;
-
-    case SDL_LOG_CATEGORY_SYSTEM:
-        from = "system";
-        break;
-
-    case SDL_LOG_CATEGORY_AUDIO:
-        from = "audio";
-        break;
-
-    case SDL_LOG_CATEGORY_VIDEO:
-        from = "video";
-        break;
-
-    case SDL_LOG_CATEGORY_RENDER:
-        from = "render";
-        break;
-
-    case SDL_LOG_CATEGORY_INPUT:
-        from = "input";
-        break;
-
-    case SDL_LOG_CATEGORY_TEST:
-        from = "test";
-        break;
-
-    case SDL_LOG_CATEGORY_CUSTOM:
-        from = "custom";
-        break;
-
-    default:
-        from = "unknown";
-        break;
-    }
-
-    char mark;
-    pcstr type;
-    switch (priority)
-    {
-    case SDL_LOG_PRIORITY_VERBOSE:
-        mark = '%';
-        type = "verbose";
-        break;
-
-    case SDL_LOG_PRIORITY_DEBUG:
-        mark = '#';
-        type = "debug";
-        break;
-
-    case SDL_LOG_PRIORITY_INFO:
-        mark = '=';
-        type = "info";
-        break;
-
-    case SDL_LOG_PRIORITY_WARN:
-        mark = '~';
-        type = "warn";
-        break;
-
-    case SDL_LOG_PRIORITY_ERROR:
-        mark = '!';
-        type = "error";
-        break;
-
-    case SDL_LOG_PRIORITY_CRITICAL:
-        mark = '$';
-        type = "critical";
-        break;
-
-    default:
-        mark = ' ';
-        type = "unknown";
-        break;
-    }
-
-    constexpr pcstr format = "%c [sdl][%s][%s]: %s";
-    const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
-    pstr buf = (pstr)xr_alloca(size);
-
-    xr_sprintf(buf, size, format, mark, from, type, message);
-    Log(buf);
-}
+void SDLLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message);
 
 const pcstr xrCore::buildDate = __DATE__;
 const pcstr xrCore::buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
@@ -207,10 +75,93 @@ xrCore::xrCore()
     CalculateBuildId();
 }
 
+void xrCore::CalculateBuildId()
+{
+    const int startDay = 31;
+    const int startMonth = 1;
+    const int startYear = 1999;
+    const char* monthId[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+    const int daysInMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    int days;
+    int months = 0;
+    int years;
+    string16 month;
+    string256 buffer;
+    xr_strcpy(buffer, buildDate);
+    sscanf(buffer, "%s %d %d", month, &days, &years);
+    for (int i = 0; i < 12; i++)
+    {
+        if (xr_stricmp(monthId[i], month))
+            continue;
+        months = i;
+        break;
+    }
+    buildId = (years - startYear) * 365 + days - startDay;
+    for (int i = 0; i < months; i++)
+        buildId += daysInMonth[i];
+    for (int i = 0; i < startMonth - 1; i++)
+        buildId -= daysInMonth[i];
+}
+
+void xrCore::PrintBuildInfo()
+{
+    Msg("%s %s build %d, %s (%s)", ApplicationName, XRAY_BUILD_CONFIGURATION, buildId, buildDate, XRAY_BUILD_CONFIGURATION2);
+
+    pcstr name      = "Custom";
+    pcstr buildUniqueId = nullptr;
+    pcstr buildId   = nullptr;
+    pcstr builder   = nullptr;
+    pcstr commit    = GetBuildCommit();
+    pcstr branch    = GetBuildBranch();
+
+#if defined(CI)
+#   if defined(APPVEYOR)
+    name            = "AppVeyor";
+    buildUniqueId   = MACRO_TO_STRING(APPVEYOR_BUILD_ID);
+    buildId         = MACRO_TO_STRING(APPVEYOR_BUILD_VERSION);
+    builder         = MACRO_TO_STRING(APPVEYOR_ACCOUNT_NAME);
+#   elif defined(TRAVIS)
+    name            = "Travis";
+    buildUniqueId   = MACRO_TO_STRING(TRAVIS_BUILD_ID);
+    buildId         = MACRO_TO_STRING(TRAVIS_BUILD_NUMBER);
+    builder         = MACRO_TO_STRING(TRAVIS_REPO_SLUG);
+#   elif defined(GITHUB_ACTIONS)
+    name            = "GitHub Actions";
+    buildUniqueId   = MACRO_TO_STRING(GITHUB_RUN_ID);
+    buildId         = MACRO_TO_STRING(GITHUB_RUN_NUMBER);
+    builder         = MACRO_TO_STRING(GITHUB_REPOSITORY);
+#else
+#   pragma TODO("PrintBuildInfo for other CIs")
+    name            = "CI";
+    builder         = "Unknown CI";
+#   endif
+#endif
+
+    string512 buf;
+    strconcat(buf, name, " build "); // "%s build "
+
+    if (buildId)
+    {
+        strconcat(buf, buf, buildId, " "); // "id "
+        if (buildUniqueId)
+            strconcat(buf, buf, "(", buildUniqueId, ") "); // "(unique id) "
+    }
+
+    strconcat(buf, buf, "from commit[", commit, "]"); // "from commit[hash]"
+    strconcat(buf, buf, " branch[", branch, "]"); // " branch[name]"
+
+    if (builder)
+        strconcat(buf, buf, " (built by ", builder, ")"); // " (built by builder)"
+
+    Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
+}
+
 void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
-    Threading::SetThreadName(NULL, "X-Ray Primary thread");
+    Threading::SetCurrentThreadName("Primary thread");
     xr_strcpy(ApplicationName, _ApplicationName);
+    PrintBuildInfo();
+
     if (0 == init_counter)
     {
         PluginMode = plugin;
@@ -230,7 +181,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
-#else
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
         char* pref_path = nullptr;
         if (strstr(Core.Params, "-fsltx"))
             pref_path = SDL_GetBasePath();
@@ -245,6 +196,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         }
         SDL_strlcpy(ApplicationPath, pref_path, sizeof(ApplicationPath));
         SDL_free(pref_path);
+#else
+#   error Select or add implementation for your platform
 #endif
 
 #ifdef _EDITOR
@@ -259,32 +212,55 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
 #if defined(XR_PLATFORM_WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
-#else
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
         getcwd(WorkingPath, sizeof(WorkingPath));
 
         /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
-        * I propose adding shaders from /usr/share/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
+        * I propose adding shaders from <CMAKE_INSTALL_FULL_DATAROOTDIR>/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
         * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
         if (!strstr(Core.Params, "-fsltx"))
         {
             chdir(ApplicationPath);
-            string_path tmp;
+            constexpr pcstr install_dir = MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR);
+            string_path tmp, tmp_lnk;
             xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
             struct stat statbuf;
             ZeroMemory(&statbuf, sizeof(statbuf));
-            int res = lstat(tmp, &statbuf);
-            if (-1 == res || !S_ISLNK(statbuf.st_mode))
-                symlink("/usr/share/openxray/fsgame.ltx", tmp);
+            /* First check if following symlinks returns success.
+             * If it doesn't, additionally check if not following symlinks is successful (catches symlink itself being broken),
+             * -> delete the symlink if it is.
+             * Then, make a new symlink to our resources.
+             * This doesn't account for other stat errors (EACCES, ENAMETOOLONG, ENOENT caused by missing path component) */
+            int res = stat(tmp, &statbuf);
+            if (res != 0)
+            {
+                ZeroMemory(&statbuf, sizeof(statbuf));
+                res = lstat(tmp, &statbuf);
+                if (res == 0)
+                    xr_unlink(tmp);
+                xr_sprintf(tmp_lnk, "%s/openxray/fsgame.ltx", install_dir);
+                symlink(tmp_lnk, tmp);
+            }
             xr_sprintf(tmp, "%sgamedata/shaders/gl", ApplicationPath);
             ZeroMemory(&statbuf, sizeof(statbuf));
-            res = lstat(tmp, &statbuf);
-            if (-1 == res || !S_ISLNK(statbuf.st_mode))
+            res = stat(tmp, &statbuf);
+            if (res != 0)
             {
-                mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);
+                ZeroMemory(&statbuf, sizeof(statbuf));
+                res = lstat(tmp, &statbuf);
+                if (res == 0)
+                    xr_unlink(tmp);
+                else
+                {
+                    mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                    mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                }
+                xr_sprintf(tmp_lnk, "%s/openxray/gamedata/shaders/gl", install_dir);
+                symlink(tmp_lnk, tmp);
             }
         }
+#else
+#   error Select or add implementation for your platform
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
@@ -294,7 +270,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
         uid_t uid = geteuid();
         struct passwd *pw = getpwuid(uid);
         if(pw)
@@ -308,20 +284,19 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         }
 
         gethostname(CompName, sizeof(CompName));
+#else
+#   error Select or add implementation for your platform
 #endif
 
         Memory._initialize();
 
         SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
-        Msg("%s %s build %d, %s", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
-        PrintBuildInfo();
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
-        R_ASSERT(CPU::ID.hasFeature(CpuFeature::SSE));
+        R_ASSERT(SDL_HasSSE());
 #endif
         TaskScheduler = xr_make_unique<TaskManager>();
-        XRay::Math::Initialize();
         // xrDebug::Initialize ();
 
         rtc_initialize();
@@ -357,13 +332,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #endif
         FS._initialize(flags, nullptr, fs_fname);
         EFS._initialize();
-#ifdef DEBUG
-#ifndef _EDITOR
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
-        Msg("Process heap 0x%08x", GetProcessHeap());
-#endif
-#endif
-#endif // DEBUG
     }
     SetLogCB(cb);
     init_counter++;
@@ -391,63 +359,12 @@ void xrCore::_destroy()
     }
 }
 
-constexpr pcstr xrCore::GetBuildConfiguration()
-{
-#ifdef NDEBUG
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-    return "Rx64";
-#else
-    return "Rx86";
-#endif
-#elif defined(MIXED)
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-    return "Mx64";
-#else
-    return "Mx86";
-#endif
-#else
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-    return "Dx64";
-#else
-    return "Dx86";
-#endif
-#endif
-}
-
 void xrCore::CoInitializeMultithreaded() const
 {
 #if defined(XR_PLATFORM_WINDOWS)
     if (!strstr(Params, "-weather"))
         CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 #endif
-}
-
-void xrCore::CalculateBuildId()
-{
-    const int startDay = 31;
-    const int startMonth = 1;
-    const int startYear = 1999;
-    const char* monthId[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-    const int daysInMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    int days;
-    int months = 0;
-    int years;
-    string16 month;
-    string256 buffer;
-    xr_strcpy(buffer, buildDate);
-    sscanf(buffer, "%s %d %d", month, &days, &years);
-    for (int i = 0; i < 12; i++)
-    {
-        if (xr_stricmp(monthId[i], month))
-            continue;
-        months = i;
-        break;
-    }
-    buildId = (years - startYear) * 365 + days - startDay;
-    for (int i = 0; i < months; i++)
-        buildId += daysInMonth[i];
-    for (int i = 0; i < startMonth - 1; i++)
-        buildId -= daysInMonth[i];
 }
 
 #if defined(XR_PLATFORM_WINDOWS)
@@ -480,3 +397,42 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
     return TRUE;
 }
 #endif
+
+void SDLLogOutput(void* /*userdata*/, int category, SDL_LogPriority priority, const char* message)
+{
+    pcstr from;
+    switch (category)
+    {
+    case SDL_LOG_CATEGORY_APPLICATION:  from = "application"; break;
+    case SDL_LOG_CATEGORY_ERROR:        from = "error"; break;
+    case SDL_LOG_CATEGORY_ASSERT:       from = "assert"; break;
+    case SDL_LOG_CATEGORY_SYSTEM:       from = "system"; break;
+    case SDL_LOG_CATEGORY_AUDIO:        from = "audio"; break;
+    case SDL_LOG_CATEGORY_VIDEO:        from = "video"; break;
+    case SDL_LOG_CATEGORY_RENDER:       from = "render"; break;
+    case SDL_LOG_CATEGORY_INPUT:        from = "input"; break;
+    case SDL_LOG_CATEGORY_TEST:         from = "test"; break;
+    case SDL_LOG_CATEGORY_CUSTOM:       from = "custom"; break;
+    default:                            from = "unknown"; break;
+    }
+
+    char mark;
+    pcstr type;
+    switch (priority)
+    {
+    case SDL_LOG_PRIORITY_VERBOSE:      mark = '%'; type = "verbose"; break;
+    case SDL_LOG_PRIORITY_DEBUG:        mark = '#'; type = "debug"; break;
+    case SDL_LOG_PRIORITY_INFO:         mark = '='; type = "info"; break;
+    case SDL_LOG_PRIORITY_WARN:         mark = '~'; type = "warn"; break;
+    case SDL_LOG_PRIORITY_ERROR:        mark = '!'; type = "error"; break;
+    case SDL_LOG_PRIORITY_CRITICAL:     mark = '$'; type = "critical"; break;
+    default:                            mark = ' '; type = "unknown"; break;
+    }
+
+    constexpr pcstr format = "%c [sdl][%s][%s]: %s";
+    const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
+    pstr buf = (pstr)xr_alloca(size);
+
+    xr_sprintf(buf, size, format, mark, from, type, message);
+    Log(buf);
+}

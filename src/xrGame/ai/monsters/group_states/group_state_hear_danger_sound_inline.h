@@ -6,13 +6,9 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateGroupHearDangerousSoundAbstract CStateGroupHearDangerousSound<_Object>
-
-#define LEADER_RADIUS 20.f
-#define FIND_POINT_ATTEMPTS 5
 
 TEMPLATE_SPECIALIZATION
 CStateGroupHearDangerousSoundAbstract::CStateGroupHearDangerousSound(_Object* obj) : inherited(obj)

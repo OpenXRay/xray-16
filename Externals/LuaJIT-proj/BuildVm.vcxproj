@@ -36,13 +36,13 @@
     <PostBuildEvent>
       <Command>set ALL_LIB=lib_base.c lib_math.c lib_bit.c lib_string.c lib_table.c lib_io.c lib_os.c lib_package.c lib_debug.c lib_jit.c lib_ffi.c
 
-cd ..\LuaJIT\src
-"$(OutDir)$(TargetName)" -m peobj -o $(OutDir)lj_vm_$(PlatformShortName).obj
-"$(OutDir)$(TargetName)" -m bcdef -o $(OutDir)lj_bcdef.h %25ALL_LIB%25
-"$(OutDir)$(TargetName)" -m ffdef -o $(OutDir)lj_ffdef.h %25ALL_LIB%25
-"$(OutDir)$(TargetName)" -m libdef -o $(OutDir)lj_libdef.h %25ALL_LIB%25
-"$(OutDir)$(TargetName)" -m recdef -o $(OutDir)lj_recdef.h %25ALL_LIB%25
-"$(OutDir)$(TargetName)" -m folddef -o $(OutDir)lj_folddef.h lj_opt_fold.c
+cd $(xrExternals)LuaJIT\src
+"$(OutDir)$(TargetName)" -m peobj -o "$(OutDir)lj_vm_$(PlatformShortName).obj"
+"$(OutDir)$(TargetName)" -m bcdef -o "$(OutDir)lj_bcdef.h" %25ALL_LIB%25
+"$(OutDir)$(TargetName)" -m ffdef -o "$(OutDir)lj_ffdef.h" %25ALL_LIB%25
+"$(OutDir)$(TargetName)" -m libdef -o "$(OutDir)lj_libdef.h" %25ALL_LIB%25
+"$(OutDir)$(TargetName)" -m recdef -o "$(OutDir)lj_recdef.h" %25ALL_LIB%25
+"$(OutDir)$(TargetName)" -m folddef -o "$(OutDir)lj_folddef.h" lj_opt_fold.c
       </Command>
     </PostBuildEvent>
     <Link>

@@ -84,7 +84,7 @@ public:
 protected:
     void add_faction(CUIXml& xml, shared_str const& faction_id);
     void clear_all_factions();
-    bool xr_stdcall SortingLessFunction(CUIWindow* left, CUIWindow* right);
+    bool SortingLessFunction(CUIWindow* left, CUIWindow* right);
     void get_value_from_script();
 
     void add_achievement(CUIXml& xml, shared_str const& achiev_id);

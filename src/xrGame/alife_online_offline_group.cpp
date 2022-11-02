@@ -19,11 +19,6 @@
 #include "alife_monster_movement_manager.h"
 #include "alife_monster_detail_path_manager.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 extern void setup_location_types_line(GameGraph::TERRAIN_VECTOR& m_vertex_types, LPCSTR string);
 
 CSE_ALifeItemWeapon* CSE_ALifeOnlineOfflineGroup::tpfGetBestWeapon(ALife::EHitType& tHitType, float& fHitPower)
@@ -102,7 +97,7 @@ void CSE_ALifeOnlineOfflineGroup::register_member(ALife::_OBJECT_ID member_id)
     }
     VERIFY((monster->m_group_id == 0xffff) || (monster->m_group_id == ID));
     monster->m_group_id = ID;
-    m_members.insert(std::make_pair(member_id, monster));
+    m_members.emplace(member_id, monster);
 
     if (!empty)
         return;

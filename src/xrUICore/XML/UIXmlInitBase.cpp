@@ -1,6 +1,5 @@
 #include "pch.hpp"
 #include "UIXmlInitBase.h"
-#include "xrEngine/StringTable/IStringTable.h"
 #include "Windows/UIFrameWindow.h"
 #include "Windows/UITextFrameLineWnd.h"
 #include "Buttons/UICheckButton.h"
@@ -17,7 +16,6 @@
 
 #include "UITextureMaster.h"
 #include "Lines/UILines.h"
-#include "xrEngine/xr_input_xinput.h"
 
 #define ARIAL_FONT_NAME "arial"
 
@@ -341,7 +339,7 @@ bool CUIXmlInitBase::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUILines*
 
     shared_str text = xml_doc.Read(path, index, NULL);
     if (text.size())
-        pLines->SetText(gStringTable->translate(text).c_str());
+        pLines->SetText(StringTable().translate(text).c_str());
 
     return true;
 }
@@ -413,7 +411,7 @@ bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, LPCSTR path, int index, CUI3t
 
     LPCSTR text_hint = xml_doc.ReadAttrib(path, index, "hint", NULL);
     if (text_hint)
-        pWnd->m_hint_text = gStringTable->translate(text_hint);
+        pWnd->m_hint_text = StringTable().translate(text_hint);
 
     return true;
 }

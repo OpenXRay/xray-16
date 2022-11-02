@@ -20,14 +20,14 @@ class color_components
 public:
     color_components(property_color_base ^ holder);
 
-    float xr_stdcall red_getter();
-    void xr_stdcall red_setter(float);
+    float red_getter();
+    void red_setter(float);
 
-    float xr_stdcall green_getter();
-    void xr_stdcall green_setter(float);
+    float green_getter();
+    void green_setter(float);
 
-    float xr_stdcall blue_getter();
-    void xr_stdcall blue_setter(float);
+    float blue_getter();
+    void blue_setter(float);
 
 private:
     gcroot<property_color_base ^> m_holder;

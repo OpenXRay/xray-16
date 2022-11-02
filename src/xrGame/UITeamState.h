@@ -6,7 +6,6 @@
 #include "ui/UIXmlInit.h"
 
 #include "game_cl_base.h"
-#include "string_table.h"
 #include "game_base.h"
 #include "Level.h"
 
@@ -55,7 +54,7 @@ private:
     UITeamPanels* m_teamPanels;
 
     UITeamState();
-    bool __stdcall SortingLessFunction(CUIWindow* left, CUIWindow* right);
+    bool SortingLessFunction(CUIWindow* left, CUIWindow* right);
     int InitScrollPanels();
 
     int m_last_panel;

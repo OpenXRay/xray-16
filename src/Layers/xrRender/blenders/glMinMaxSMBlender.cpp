@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "glMinMaxSMBlender.h"
+#include "dx11MinMaxSMBlender.h"
 
 void CBlender_createminmax::Compile(CBlender_Compile& C)
 {

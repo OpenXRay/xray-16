@@ -58,28 +58,26 @@
 #error Provide your definitions here
 #endif
 
-#ifndef _CPPUNWIND//def NDEBUG
-#define XR_NOEXCEPT throw()
-#define XR_NOEXCEPT_OP(x)
-#else
+#ifdef __cpp_exceptions
 #define XR_NOEXCEPT noexcept
 #define XR_NOEXCEPT_OP(x) noexcept(x)
+#else
+#define XR_NOEXCEPT throw()
+#define XR_NOEXCEPT_OP(x)
 #endif
 
 #if defined(MASTER_GOLD)
 //  release master gold
-#   if defined(_CPPUNWIND)
-//#       error Please disable exceptions... // XXX: temporary fix
+#   if defined(__cpp_exceptions) && defined(XR_PLATFORM_WINDOWS)
+#       error Please disable exceptions...
 #   endif
 #   define XRAY_EXCEPTIONS 0
-#   define LUABIND_NO_EXCEPTIONS
 #else
 //  release, debug or mixed
-#   if !defined(_CPPUNWIND)
+#   if !defined(__cpp_exceptions)
 #       error Please enable exceptions...
 #   endif
 #   define XRAY_EXCEPTIONS 1
-#   define LUABIND_FORCE_ENABLE_EXCEPTIONS // XXX: add this to luabind, because it automatically defines LUABIND_NO_EXCEPTIONS when NDEBUG is defined
 #endif
 
 #ifndef _MT
@@ -93,6 +91,7 @@
 // We use xr_* instead of defining e.g. strupr => _strupr, since the macro definition could
 // come before the std. header file declaring it, and thereby renaming that one too.
 #ifdef _MSC_VER
+#include <malloc.h>
 #define xr_alloca _alloca
 #define xr_strupr _strupr
 #define xr_strlwr _strlwr

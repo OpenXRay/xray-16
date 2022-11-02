@@ -176,8 +176,6 @@ public:
 IC IGameState::~IGameState() {}
 class game_GameState : public FactoryObjectBase, public virtual IGameState
 {
-    friend void game_GameState_script_register(lua_State* luaState);
-
 protected:
     EGameIDs m_type;
     u16 m_phase;
@@ -219,6 +217,10 @@ public:
     static CLASS_ID getCLASS_ID(LPCSTR game_type_name, bool bServer);
 
     // moved from game_sv_base (time routines)
+
+private:
+    friend void game_GameState_script_register(lua_State* luaState);
+
 private:
     // scripts
     u64 m_qwStartProcessorTime;

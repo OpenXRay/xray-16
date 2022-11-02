@@ -1,3 +1,5 @@
+#pragma once
+
 void CPHSimpleCharacter::UpdateStaticDamage(dContact* c, SGameMtl* tri_material, bool bo1)
 {
     const dReal* v = dBodyGetLinearVel(m_body);
@@ -60,7 +62,7 @@ void CPHSimpleCharacter::UpdateDynamicDamage(dContact* c, u16 obj_material_idx, 
     // DeltaK=m1*m2*(v1-v2)^2/(2*(m1+m2))
     if (accepted_energy > 0.f)
     {
-        SGameMtl* obj_material = GMLibrary().GetMaterialByIdx(obj_material_idx);
+        SGameMtl* obj_material = GMLib.GetMaterialByIdx(obj_material_idx);
         c_vel = dSqrt(accepted_energy / m_mass * 2.f) * obj_material->fBounceDamageFactor;
     }
     else
@@ -139,11 +141,11 @@ IC void CPHSimpleCharacter::foot_material_update(u16 contact_material_idx, u16 f
     if (m_elevator_state.UpdateMaterial(*p_lastMaterialIDX))
         return;
     if (*p_lastMaterialIDX != u16(-1) &&
-        GMLibrary().GetMaterialByIdx(*p_lastMaterialIDX)->Flags.test(SGameMtl::flPassable) && !b_foot_mtl_check)
+        GMLib.GetMaterialByIdx(*p_lastMaterialIDX)->Flags.test(SGameMtl::flPassable) && !b_foot_mtl_check)
         return;
     b_foot_mtl_check = false;
 
-    const SGameMtl* contact_material = GMLibrary().GetMaterialByIdx(contact_material_idx);
+    const SGameMtl* contact_material = GMLib.GetMaterialByIdx(contact_material_idx);
 
     if (contact_material->Flags.test(SGameMtl::flPassable))
     {

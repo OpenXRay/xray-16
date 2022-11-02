@@ -22,7 +22,7 @@
 #include "xrServerEntities/xrServer_Objects_ALife_Monsters.h"
 #include "cover_evaluators.h"
 #include "xrServer.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrServerEntities/character_info.h"
 #include "Actor.h"
@@ -1243,7 +1243,7 @@ void CAI_Stalker::fill_bones_body_parts(LPCSTR bone_id, const ECriticalWoundType
     auto I = body_part_section.Data.cbegin();
     auto E = body_part_section.Data.cend();
     for (; I != E; ++I)
-        m_bones_body_parts.insert(std::make_pair(kinematics->LL_BoneID((*I).first), u32(wound_type)));
+        m_bones_body_parts.emplace(kinematics->LL_BoneID((*I).first), u32(wound_type));
 }
 
 void CAI_Stalker::on_before_change_team()

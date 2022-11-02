@@ -13,7 +13,7 @@ void CStateBurerShield<Object>::initialize()
 {
     inherited::initialize();
     this->object->set_script_capture(false);
-    m_last_shield_started = current_time();
+    m_last_shield_started = xr_current_time();
     m_next_particle_allowed = 0;
     m_started = false;
 
@@ -24,18 +24,18 @@ void CStateBurerShield<Object>::initialize()
 template <class Object>
 void CStateBurerShield<Object>::execute()
 {
-    if (!m_started) // && current_time() > m_last_shield_started + TTime(m_shield_start_anim_length_sec*1000) )
+    if (!m_started) // && xr_current_time() > m_last_shield_started + TTime(m_shield_start_anim_length_sec*1000) )
     {
         m_started = true;
         this->object->ActivateShield();
     }
 
-    if (m_started && this->object->m_shield_keep_particle != 0 && current_time() > m_next_particle_allowed)
+    if (m_started && this->object->m_shield_keep_particle != 0 && xr_current_time() > m_next_particle_allowed)
     {
         this->object->CParticlesPlayer::StartParticles(
             this->object->m_shield_keep_particle, Fvector().set(0, 1, 0), this->object->ID(), -1, true);
 
-        m_next_particle_allowed = current_time() + this->object->m_shield_keep_particle_period;
+        m_next_particle_allowed = xr_current_time() + this->object->m_shield_keep_particle_period;
     }
 
     this->object->face_enemy();
@@ -63,7 +63,7 @@ void CStateBurerShield<Object>::critical_finalize()
 template <class Object>
 bool CStateBurerShield<Object>::check_start_conditions()
 {
-    if (current_time() < m_last_shield_started + this->object->m_shield_time + this->object->m_shield_cooldown)
+    if (xr_current_time() < m_last_shield_started + this->object->m_shield_time + this->object->m_shield_cooldown)
         return false;
 
     if (!this->object->EnemyMan.enemy_see_me_now())
@@ -75,7 +75,7 @@ bool CStateBurerShield<Object>::check_start_conditions()
 template <class Object>
 bool CStateBurerShield<Object>::check_completion()
 {
-    if (current_time() > m_last_shield_started + this->object->m_shield_time)
+    if (xr_current_time() > m_last_shield_started + this->object->m_shield_time)
         return true;
 
     CEntityAlive const* enemy = this->object->EnemyMan.get_enemy();

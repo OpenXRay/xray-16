@@ -180,7 +180,7 @@ extern int DXTCompressBump(LPCSTR out_name, u8* raw_data, u8* normal_map,
     u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
 extern "C" XR_EXPORT
-int __stdcall DXTCompress(pcstr out_name, u8* raw_data, u8* normal_map,
+int DXTCompress(pcstr out_name, u8* raw_data, u8* normal_map,
     u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth)
 {
     switch (fmt->type)

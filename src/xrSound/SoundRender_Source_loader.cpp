@@ -1,7 +1,5 @@
 #include "stdafx.h"
-#if defined(XR_PLATFORM_WINDOWS)
-#include <msacm.h>
-#endif
+
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 
@@ -76,7 +74,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
 #ifdef DEBUG
     if (ovi->channels == 2)
         Msg("stereo sound source [%s]", pName);
-#endif // #ifdef DEBUG
+#endif
 
     ZeroMemory(&m_wformat, sizeof(WAVEFORMATEX));
 
@@ -122,10 +120,18 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
             m_fMaxAIDist = F.r_float();
         }
         else
+        {
+#ifndef MASTER_GOLD
             Log("! Invalid ogg-comment version, file: ", pName);
+#endif
+        }
     }
     else
+    {
+#ifndef MASTER_GOLD
         Log("! Missing ogg-comment, file: ", pName);
+#endif
+    }
 
     R_ASSERT3_CURE(m_fMaxAIDist >= 0.1f && m_fMaxDist >= 0.1f, "Invalid max distance.", pName, !crashOnError,
     {

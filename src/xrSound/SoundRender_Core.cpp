@@ -5,25 +5,25 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 #include "SoundRender_Emitter.h"
+
 #if defined(XR_PLATFORM_WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
+#define OPENAL
 #include <eax/eax.h>
-#pragma warning(pop)
 #endif
 
-int psSoundTargets = 32;
-Flags32 psSoundFlags = {ss_Hardware | ss_EAX};
-float psSoundOcclusionScale = 0.5f;
-float psSoundCull = 0.01f;
-float psSoundRolloff = 0.75f;
-u32 psSoundModel = 0;
-float psSoundVEffects = 1.0f;
-float psSoundVFactor = 1.0f;
+XRSOUND_API int psSoundTargets = 32;
+XRSOUND_API Flags32 psSoundFlags = { ss_Hardware | ss_EAX };
+XRSOUND_API float psSoundOcclusionScale = 0.5f;
+XRSOUND_API float psSoundCull = 0.01f;
+XRSOUND_API float psSoundRolloff = 0.75f;
+XRSOUND_API u32 psSoundModel = 0;
+XRSOUND_API float psSoundVEffects = 1.0f;
+XRSOUND_API float psSoundVFactor = 1.0f;
 
-float psSoundVMusic = 1.f;
-int psSoundCacheSizeMB = 32;
-u32 psSoundPrecacheAll = 1;
+XRSOUND_API float psSoundVMusic = 1.f;
+XRSOUND_API int psSoundCacheSizeMB = 32;
+XRSOUND_API u32 psSoundPrecacheAll = 1;
+
 CSoundRender_Core* SoundRender = nullptr;
 
 CSoundRender_Core::CSoundRender_Core()
@@ -413,8 +413,7 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
     if (geom_ENV)
     {
         Fvector dir = {0, -1, 0};
-        geom_DB.ray_options(CDB::OPT_ONLYNEAREST);
-        geom_DB.ray_query(geom_ENV, P, dir, 1000.f);
+        geom_DB.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, dir, 1000.f);
         if (geom_DB.r_count())
         {
             CDB::RESULT* r = geom_DB.r_begin();

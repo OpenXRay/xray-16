@@ -36,8 +36,8 @@ public:
     virtual property_holder_type* object();
 
 private:
-    pcstr const* xr_stdcall collection();
-    u32 xr_stdcall collection_size();
+    pcstr const* collection();
+    u32 collection_size();
 
     property_holder_type* m_property_holder;
     effects::manager const& m_manager;

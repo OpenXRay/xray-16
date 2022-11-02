@@ -59,7 +59,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
             if (phase == PHASE_NORMAL)
             {
                 uLastLTRACK++;
-                if (lstRenderables.size())
+                if (!lstRenderables.empty())
                     uID_LTRACK = uLastLTRACK % lstRenderables.size();
 
                 // update light-vis for current entity / actor
@@ -157,12 +157,12 @@ void CRender::render_menu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->get_base_zb()); // LDR RT
+        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->rt_Base_Depth); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
     // Distort
     {
-        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->get_base_zb()); // Now RT is a distortion mask
+        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->rt_Base_Depth); // Now RT is a distortion mask
         RCache.ClearRT(Target->rt_Generic_1, color_rgba(127, 127, 0, 127));
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
@@ -183,7 +183,16 @@ void CRender::render_menu()
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
     FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
+    pv++;
+    pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
+    pv++;
+    pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+    pv++;
+    pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+    pv++;
+#elif defined(USE_OGL)
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
     pv++;
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
@@ -193,15 +202,8 @@ void CRender::render_menu()
     pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
     pv++;
 #else
-    pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
-    pv++;
-    pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
-    pv++;
-    pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
-    pv++;
-    pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
-    pv++;
-#endif // USE_OGL
+#   error No graphics API selected or enabled!
+#endif
     RCache.Vertex.Unlock(4, Target->g_menu->vb_stride);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }
@@ -212,9 +214,9 @@ void CRender::Render()
     PIX_EVENT(CRender_Render);
 
     g_r = 1;
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
 #endif
 
@@ -230,7 +232,7 @@ void CRender::Render()
 
     if (!(g_pGameLevel && g_hud) || bMenu)
     {
-#ifndef USE_DX9 // XXX: probably we can just enable this on DX9 too
+#if defined(USE_DX11) || defined(USE_OGL) // XXX: probably we can just enable this on DX9 too
         Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
 #endif
         return;
@@ -349,16 +351,14 @@ void CRender::Render()
     Target->phase_occq();
     LP_normal.clear();
     LP_pending.clear();
-#ifndef USE_DX9
-    if (o.dx10_msaa)
+#if defined(USE_DX11) || defined(USE_OGL)
+    if (o.msaa)
     {
         RCache.set_ZB(Target->rt_MSAADepth->pZRT);
     }
 #endif
     {
         PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-        // perform tests
-        auto count = 0;
         light_Package& LP = Lights.package;
 
         // stats
@@ -367,10 +367,11 @@ void CRender::Render()
         Stats.l_total = Stats.l_shadowed + Stats.l_unshadowed;
 
         // perform tests
+        size_t count = 0;
         count = _max(count, LP.v_point.size());
         count = _max(count, LP.v_spot.size());
         count = _max(count, LP.v_shadowed.size());
-        for (auto it = 0; it < count; it++)
+        for (size_t it = 0; it < count; it++)
         {
             if (it < LP.v_point.size())
             {
@@ -466,15 +467,15 @@ void CRender::Render()
         Lights_LastFrame.clear();
     }
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     // full screen pass to mark msaa-edge pixels in highest stencil bit
-    if (o.dx10_msaa)
+    if (o.msaa)
     {
         PIX_EVENT(MARK_MSAA_EDGES);
         Target->mark_msaa_edges();
     }
 
-    //	TODO: DX10: Implement DX10 rain.
+    //	TODO: DX11: Implement DX11 rain.
     if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
     {
         PIX_EVENT(DEFER_RAIN);
@@ -505,11 +506,11 @@ void CRender::Render()
         RCache.set_xform_project(Device.mProject);
         RCache.set_xform_view(Device.mView);
         // Stencil - write 0x1 at pixel pos -
-#ifdef USE_DX9
+#if defined(USE_DX9)
         RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-#else
-        if (!o.dx10_msaa)
+#elif defined(USE_DX11) || defined(USE_OGL)
+        if (!o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -545,12 +546,12 @@ void CRender::Render()
         Target->phase_combine();
     }
 
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
 }
 
 void CRender::render_forward()
 {
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
     o.distortion = o.distortion_enabled; // enable distorion
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)

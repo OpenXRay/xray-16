@@ -1,52 +1,110 @@
 project(xrSound)
 
-set(SRC_FILES
-    "guids.cpp"
-    #"MusicStream.cpp"
-    #"MusicStream.h"
-    "OpenALDeviceList.cpp"
-    "OpenALDeviceList.h"
-    "Sound.cpp"
-    "Sound.h"
+set(CACHE_SRC
     "SoundRender_Cache.cpp"
     "SoundRender_Cache.h"
-    "SoundRender_CoreA.cpp"
-    "SoundRender_CoreA.h"
+)
+
+set(CORE_SRC
     "SoundRender_Core.cpp"
-    "SoundRender_CoreD.cpp"
-    "SoundRender_CoreD.h"
     "SoundRender_Core.h"
     "SoundRender_Core_Processor.cpp"
     "SoundRender_Core_SourceManager.cpp"
     "SoundRender_Core_StartStop.cpp"
+)
+
+set(CORE_OPENAL_SRC
+    "OpenALDeviceList.cpp"
+    "OpenALDeviceList.h"
+    "SoundRender_CoreA.cpp"
+    "SoundRender_CoreA.h"
+)
+
+#set(CORE_DIRECTSOUND_SRC
+#    "SoundRender_CoreD.cpp"
+#    "SoundRender_CoreD.h"
+#)
+
+set(EMITTER_SRC
     "SoundRender_Emitter.cpp"
-    "SoundRender_Emitter_FSM.cpp"
     "SoundRender_Emitter.h"
+    "SoundRender_Emitter_FSM.cpp"
     "SoundRender_Emitter_StartStop.cpp"
     "SoundRender_Emitter_streamer.cpp"
+)
+
+set(ENVIRONMENT_SRC
     "SoundRender_Environment.cpp"
     "SoundRender_Environment.h"
+)
+
+set(KERNEL_SRC
+    "guids.cpp"
+    "Sound.cpp"
+    "Sound.h"
     "SoundRender.h"
+    "stdafx.cpp"
+    "stdafx.h"
+)
+
+set(SOURCE_SRC
     "SoundRender_Source.cpp"
     "SoundRender_Source.h"
     "SoundRender_Source_loader.cpp"
-    "SoundRender_TargetA.cpp"
-    "SoundRender_TargetA.h"
-    "SoundRender_Target.cpp"
-    "SoundRender_TargetD.cpp"
-    "SoundRender_TargetD.h"
-    "SoundRender_Target.h"
-    "stdafx.cpp"
-    "stdafx.h"
-    #"xr_cda.cpp"
-    #"xr_cda.h"
-    #"xr_streamsnd.cpp"
-    #"xr_streamsnd.h"
 )
 
-group_sources(SRC_FILES)
+set(TARGET_SRC
+    "SoundRender_Target.cpp"
+    "SoundRender_Target.h"
+)
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+set(TARGET_OPENAL_SRC
+    "SoundRender_TargetA.cpp"
+    "SoundRender_TargetA.h"
+)
+
+#set(TARGET_DIRECTSOUND_SRC
+#    "SoundRender_TargetD.cpp"
+#    "SoundRender_TargetD.h"
+#)
+
+#set(STREAMING_SRC
+#    "MusicStream.cpp"
+#    "MusicStream.h"
+#    "xr_streamsnd.cpp"
+#    "xr_streamsnd.h"
+#)
+
+#set(CDAUDIO_SRC
+#    "xr_cda.cpp"
+#    "xr_cda.h"
+#)
+
+source_group("Cache" FILES ${CACHE_SRC})
+source_group("Core" FILES ${CORE_SRC})
+source_group("Core\\OpenAL" FILES ${CORE_OPENAL_SRC})
+#source_group("Core\\DirectSound" FILES ${CORE_DIRECTSOUND_SRC})
+source_group("Emitter" FILES ${EMITTER_SRC})
+source_group("Environment" FILES ${ENVIRONMENT_SRC})
+source_group("Kernel" FILES ${KERNEL_SRC})
+source_group("Source" FILES ${SOURCE_SRC})
+source_group("Target" FILES ${TARGET_SRC})
+source_group("Target\\OpenAL" FILES ${TARGET_OPENAL_SRC})
+#source_group("Target\\DirectSound" FILES ${TARGET_DIRECTSOUND_SRC})
+
+add_library(${PROJECT_NAME} SHARED
+    ${CACHE_SRC}
+    ${CORE_SRC}
+    ${CORE_OPENAL_SRC}
+    #${CORE_DIRECTSOUND_SRC}
+    ${EMITTER_SRC}
+    ${ENVIRONMENT_SRC}
+    ${KERNEL_SRC}
+    ${SOURCE_SRC}
+    ${TARGET_SRC}
+    ${TARGET_OPENAL_SRC}
+    #${TARGET_DIRECTSOUND_SRC}
+)
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
@@ -56,7 +114,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/Externals/libogg/include
     ${CMAKE_SOURCE_DIR}/Externals/openal/include
     ${OGG_INCLUDE_DIRS}
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -65,10 +123,10 @@ target_link_libraries(${PROJECT_NAME}
     xrMiscMath
     xrAPI
     xrCDB
+    ${OPENAL_LIBRARY}
     ${OGG_LIBRARIES}
-    openal
-    vorbis
-    vorbisfile
+    Vorbis::Vorbis
+    Vorbis::VorbisFile
 )
 
 target_compile_definitions(${PROJECT_NAME}

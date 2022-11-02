@@ -24,13 +24,14 @@ IGame_Level::IGame_Level()
     bReady = false;
     pCurrentEntity = NULL;
     pCurrentViewEntity = NULL;
-    Device.DumpResourcesMemoryUsage();
+#ifndef MASTER_GOLD
+    GEnv.Render->ResourcesDumpMemoryUsage();
+#endif
 }
 
 IGame_Level::~IGame_Level()
 {
     if (strstr(Core.Params, "-nes_texture_storing"))
-        // Device.Resources->StoreNecessaryTextures();
         GEnv.Render->ResourcesStoreNecessaryTextures();
     xr_delete(pLevel);
 
@@ -44,7 +45,9 @@ IGame_Level::~IGame_Level()
     ///////////////////////////////////////////
     GEnv.Sound->set_geometry_occ(nullptr);
     GEnv.Sound->set_handler(nullptr);
-    Device.DumpResourcesMemoryUsage();
+#ifndef MASTER_GOLD
+    GEnv.Render->ResourcesDumpMemoryUsage();
+#endif
 
     u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
     if (GEnv.Render)
@@ -67,12 +70,12 @@ void IGame_Level::net_Stop()
 
 //-------------------------------------------------------------------------------------------
 // extern CStatTimer tscreate;
-void __stdcall _sound_event(const ref_sound_data_ptr& S, float range)
+void _sound_event(const ref_sound_data_ptr& S, float range)
 {
     if (g_pGameLevel && S && S->feedback)
         g_pGameLevel->SoundEvent_Register(S, range);
 }
-static void __stdcall build_callback(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt, void* params)
+static void build_callback(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt, void* params)
 {
     g_pGameLevel->Load_GameSpecific_CFORM(T, Tcnt);
 }

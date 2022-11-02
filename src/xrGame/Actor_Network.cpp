@@ -14,7 +14,7 @@
 #include "xrPhysics/IPHWorld.h"
 #include "xrPhysics/ActorCameraCollision.h"
 #include "Level.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "game_cl_base.h"
 #include "InfoPortion.h"
 #include "alife_registry_wrappers.h"
@@ -56,6 +56,8 @@ int g_cl_InterpolationType = 0;
 u32 g_cl_InterpolationMaxPoints = 0;
 int g_dwInputUpdateDelta = 20;
 BOOL net_cl_inputguaranteed = FALSE;
+int g_start_game_vertex_id = 0;
+Fvector g_start_position{};
 CActor* g_actor = NULL;
 
 CActor* Actor()

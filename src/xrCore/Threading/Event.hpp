@@ -1,10 +1,10 @@
 #pragma once
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 
 class XRCORE_API Event
 {
     void* handle;
-#if defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
     struct EventHandle
     {
         pthread_mutex_t mutex;

@@ -23,8 +23,9 @@ namespace Opcode
 class OPCODE_Model;
 class AABBNoLeafNode;
 };
-template <class T> class _box3;
-using Fbox = _box3<float>;
+
+struct Fbox3;
+using Fbox = Fbox3;
 class Lock;
 
 
@@ -55,7 +56,7 @@ public:
 static_assert(sizeof(TRI) == 16, "TRI always should be 16 bytes on any architecture.");
 
 // Build callback
-typedef void __stdcall build_callback(Fvector* V, int Vcnt, TRI* T, int Tcnt, void* params);
+typedef void build_callback(Fvector* V, int Vcnt, TRI* T, int Tcnt, void* params);
 
 // Model definition
 class XRCDB_API MODEL : Noncopyable
@@ -142,26 +143,15 @@ enum
 // Collider itself
 class XRCDB_API COLLIDER
 {
-    // Ray data and methods
-    u32 ray_mode;
-    u32 box_mode;
-    u32 frustum_mode;
-
     // Result management
     xr_vector<RESULT> rd;
 
 public:
-    COLLIDER();
     ~COLLIDER();
-
-    ICF void ray_options(u32 f) { ray_mode = f; }
-    void ray_query(const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range = 10000.f);
-
-    ICF void box_options(u32 f) { box_mode = f; }
-    void box_query(const MODEL* m_def, const Fvector& b_center, const Fvector& b_dim);
-
-    ICF void frustum_options(u32 f) { frustum_mode = f; }
-    void frustum_query(const MODEL* m_def, const CFrustum& F);
+    
+    void ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range = 10000.f);
+    void box_query(u32 box_mode, const MODEL* m_def, const Fvector& b_center, const Fvector& b_dim);
+    void frustum_query(u32 frustum_mode, const MODEL* m_def, const CFrustum& F);
 
     ICF RESULT* r_begin() { return &*rd.begin(); };
     //ICF RESULT* r_end() { return &*rd.end(); };

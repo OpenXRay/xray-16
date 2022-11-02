@@ -425,15 +425,12 @@ static void SOR_LCP (int m, int nb, dRealMutablePtr J, int *jb, dxBody * const *
 #endif
 #ifdef RANDOMLY_REORDER_CONSTRAINTS
 		if ((iteration & 3) == 0) {
-			std::random_shuffle	(order,order+m);
-			/*
 			for (i=1; i<m; ++i) {
 				IndexError tmp = order[i];
 				int swapi = dRandInt(i+1);
 				order[i] = order[swapi];
 				order[swapi] = tmp;
 			}
-			*/
 		}
 #endif
 

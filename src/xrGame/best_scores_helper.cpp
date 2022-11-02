@@ -50,13 +50,13 @@ void best_scores_helper::fill_best_results(gamespy_profile::all_best_scores_t& d
     using namespace gamespy_profile;
     write_max();
     dest_br.clear();
-    dest_br.insert(std::make_pair(bst_kills_in_row, m_max_kills_in_row));
-    dest_br.insert(std::make_pair(bst_kinife_kills_in_row, m_max_knife_kills_in_row));
-    dest_br.insert(std::make_pair(bst_backstabs_in_row, m_max_backstab_kills_in_row));
-    dest_br.insert(std::make_pair(bst_head_shots_in_row, m_max_headshots_kills_in_row));
-    dest_br.insert(std::make_pair(bst_eye_kills_in_row, m_max_eyeshots_kills_in_row));
-    dest_br.insert(std::make_pair(bst_bleed_kills_in_row, m_max_bleed_kills_in_row));
-    dest_br.insert(std::make_pair(bst_explosive_kills_in_row, m_max_explosive_kills_in_row));
+    dest_br.emplace(bst_kills_in_row, m_max_kills_in_row);
+    dest_br.emplace(bst_kinife_kills_in_row, m_max_knife_kills_in_row);
+    dest_br.emplace(bst_backstabs_in_row, m_max_backstab_kills_in_row);
+    dest_br.emplace(bst_head_shots_in_row, m_max_headshots_kills_in_row);
+    dest_br.emplace(bst_eye_kills_in_row, m_max_eyeshots_kills_in_row);
+    dest_br.emplace(bst_bleed_kills_in_row, m_max_bleed_kills_in_row);
+    dest_br.emplace(bst_explosive_kills_in_row, m_max_explosive_kills_in_row);
 }
 
 bool best_scores_helper::OnPlayerBringArtefact(game_PlayerState const* ps)

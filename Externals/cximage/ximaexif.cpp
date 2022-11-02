@@ -37,12 +37,12 @@ CxImageJPG::CxExifInfo::~CxExifInfo()
 bool CxImageJPG::CxExifInfo::DecodeExif(CxFile * hFile, int nReadMode)
 {
     int a;
-    int HaveCom = FALSE;
+    bool HaveCom = false;
 
     a = hFile->GetC();
 
     if (a != 0xff || hFile->GetC() != M_SOI){
-        return FALSE;
+        return false;
     }
 
     for(;;){
@@ -139,7 +139,7 @@ bool CxImageJPG::CxExifInfo::DecodeExif(CxFile * hFile, int nReadMode)
 
             case M_EOI:   // in case it's a tables-only JPEG stream
                 printf("No image in jpeg!\n");
-                return FALSE;
+                return false;
 
             case M_COM: // Comment section
                 if (HaveCom || ((nReadMode & EXIF_READ_EXIF) == 0)){
@@ -148,7 +148,7 @@ bool CxImageJPG::CxExifInfo::DecodeExif(CxFile * hFile, int nReadMode)
 					Sections[SectionsRead].Data=0;
                 }else{
                     process_COM(Data, itemlen);
-                    HaveCom = TRUE;
+                    HaveCom = true;
                 }
                 break;
 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#pragma hdrstop
+
+#include "SH_Matrix.h"
 
 void CMatrix::Calculate()
 {

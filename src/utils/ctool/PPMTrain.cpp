@@ -10,7 +10,7 @@
 #define NOMINMAX
 #include <windows.h>
 #define XR_PLATFORM_WINDOWS
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #pragma hdrstop
 #include "PPMT_SA.hpp"
 

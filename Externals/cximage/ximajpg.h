@@ -26,15 +26,10 @@
 
 #if CXIMAGE_SUPPORT_JPG
 
+#include <jpeglib.h>
+#include <jerror.h>
+
 #define CXIMAGEJPG_SUPPORT_EXIF 1
-#define XMD_H
-#define HAVE_BOOLEAN
-extern "C" {
- #include <jpeg/jpeglib.h>
- #include <jpeg/jerror.h>
-}
-#undef HAVE_BOOLEAN
-#undef XMD_H
 
 class DLL_EXP CxImageJPG: public CxImage
 {
@@ -219,7 +214,7 @@ public:
 			ERREXIT(cinfo, JERR_FILE_WRITE);
 		pDest->next_output_byte = pDest->m_pBuffer;
 		pDest->free_in_buffer = eBufSize;
-		return TRUE;
+		return true;
 	}
 
 	static void TermDestination(j_compress_ptr cinfo)
@@ -240,7 +235,7 @@ public:
 	static void InitSource(j_decompress_ptr cinfo)
 	{
 		CxFileJpg* pSource = (CxFileJpg*)cinfo->src;
-		pSource->m_bStartOfFile = TRUE;
+		pSource->m_bStartOfFile = true;
 	}
 
 	static boolean FillInputBuffer(j_decompress_ptr cinfo)
@@ -259,8 +254,8 @@ public:
 		}
 		pSource->next_input_byte = pSource->m_pBuffer;
 		pSource->bytes_in_buffer = nbytes;
-		pSource->m_bStartOfFile = FALSE;
-		return TRUE;
+		pSource->m_bStartOfFile = false;
+		return true;
 	}
 
 	static void SkipInputData(j_decompress_ptr cinfo, long num_bytes)
@@ -270,7 +265,7 @@ public:
 			while (num_bytes > (long)pSource->bytes_in_buffer){
 				num_bytes -= (long)pSource->bytes_in_buffer;
 				FillInputBuffer(cinfo);
-				// note we assume that fill_input_buffer will never return FALSE,
+				// note we assume that fill_input_buffer will never return false,
 				// so suspension need not be handled.
 			}
 			pSource->next_input_byte += (size_t) num_bytes;

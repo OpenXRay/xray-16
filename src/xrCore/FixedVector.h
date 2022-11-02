@@ -1,9 +1,9 @@
 #pragma once
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCore/xrDebug_macros.h"
 
 // deprecated, use xr_array instead
-template <class T, std::size_t dim>
+template <class T, size_t dim>
 class svector
 {
 public:

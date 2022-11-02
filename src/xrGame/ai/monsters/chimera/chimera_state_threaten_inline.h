@@ -29,10 +29,6 @@ void CStateChimeraThreatenAbstract::reinit()
     m_last_time_threaten = 0;
 }
 
-#define MIN_DIST_TO_ENEMY 3.f
-#define MORALE_THRESHOLD 0.8f
-#define THREATEN_DELAY 10000
-
 TEMPLATE_SPECIALIZATION
 bool CStateChimeraThreatenAbstract::check_start_conditions()
 {

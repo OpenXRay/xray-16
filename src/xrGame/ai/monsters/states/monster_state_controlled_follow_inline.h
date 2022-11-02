@@ -9,11 +9,6 @@
 
 #define CStateMonsterControlledFollowAbstract CStateMonsterControlledFollow<_Object>
 
-#define STOP_DISTANCE 2.f
-#define STAY_DISTANCE 5 * STOP_DISTANCE
-#define MIN_TIME_OUT 4000
-#define MAX_TIME_OUT 6000
-
 TEMPLATE_SPECIALIZATION
 CStateMonsterControlledFollowAbstract::CStateMonsterControlledFollow(_Object* obj) : inherited(obj)
 {
@@ -85,9 +80,5 @@ void CStateMonsterControlledFollowAbstract::setup_substates()
     }
 }
 
-#undef STOP_DISTANCE
-#undef STAY_DISTANCE
-#undef MIN_TIME_OUT
-#undef MAX_TIME_OUT
 #undef TEMPLATE_SPECIALIZATION
 #undef CStateMonsterControlledFollowAbstract

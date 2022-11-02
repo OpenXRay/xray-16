@@ -11,15 +11,16 @@
 #include "xrEngine/profiler.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _VertexEvaluator, typename _vertex_id_type, typename _index_type\
->
+    template <typename _VertexEvaluator, typename _vertex_id_type, typename _index_type>
 
-#define CLevelManagerTemplate CBasePathManager<CLevelGraph, _VertexEvaluator, _vertex_id_type, _index_type>
+#define CLevelManagerTemplate CBaseLevelPathManager<_VertexEvaluator, _vertex_id_type, _index_type>
 
 TEMPLATE_SPECIALIZATION
-IC CLevelManagerTemplate::CBasePathManager(CRestrictedObject* object) : inherited(object) {}
+IC CLevelManagerTemplate::CBaseLevelPathManager(CRestrictedObject* object) : inherited(object) {}
+
 TEMPLATE_SPECIALIZATION
 IC void CLevelManagerTemplate::reinit(const CLevelGraph* graph) { inherited::reinit(graph); }
+
 TEMPLATE_SPECIALIZATION
 IC bool CLevelManagerTemplate::actual() const
 {

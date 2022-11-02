@@ -7,7 +7,7 @@
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIDialogHolder.h"
 #include "game_cl_base.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Level.h"
 
 CUIChatWnd::CUIChatWnd() : sendNextMessageToAll(true) {}

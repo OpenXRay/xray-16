@@ -6,11 +6,6 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 void CRender::level_Load(IReader* fs)
 {
     R_ASSERT(nullptr != g_pGameLevel);
@@ -240,7 +235,9 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             // count, size
             u32 vCount = fs->r_u32();
             u32 vSize = GetDeclVertexSize(dcl, 0);
+#ifndef MASTER_GOLD
             Msg("* [Loading VB] %d verts, %d Kb", vCount, (vCount * vSize) / 1024);
+#endif
 
             // Create and fill
             _VB[i].Create(vCount * vSize);
@@ -269,7 +266,9 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
         for (u32 i = 0; i < count; i++)
         {
             u32 iCount = fs->r_u32();
+#ifndef MASTER_GOLD
             Msg("* [Loading IB] %d indices, %d Kb", iCount, (iCount * 2) / 1024);
+#endif
 
             // Create and fill
             _IB[i].Create(iCount * 2);
@@ -345,7 +344,7 @@ void CRender::LoadSectors(IReader* fs)
     if (count)
     {
         bool do_rebuild = true;
-        const bool use_cache = strstr(Core.Params, "-cdb_cache");
+        const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
 
         string_path fName;
         strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");

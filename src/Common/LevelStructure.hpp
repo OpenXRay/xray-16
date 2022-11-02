@@ -170,12 +170,23 @@ public:
     friend class CRenumbererConverter;
 };
 
-struct NodeCompressedOld
+struct NodeCompressed8
 {
     u8 data[12];
     NodeCompressed::SCover cover;
     u16 plane;
     NodePosition p;
+
+    operator NodeCompressed() const
+    {
+        NodeCompressed  node;
+        CopyMemory      (node.data, data, sizeof(data) / sizeof(u8));
+        node.high   =   cover;
+        node.low    =   cover;
+        node.plane  =   plane;
+        node.p      =   p;
+        return node;
+    }
 };
 
 #endif

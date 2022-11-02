@@ -27,10 +27,7 @@
 #include "xrCore/xr_token.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include <objbase.h>
-#pragma warning(pop)
 #endif
 
 #ifdef _EDITOR
@@ -40,7 +37,7 @@ log_fn_ptr_type* pLog = nullptr;
 void __cdecl al_log(char* msg) { Log(msg); }
 ALDeviceList::ALDeviceList()
 {
-#if defined(XR_PLATFORM_WINDOWS)
+#if !defined(MASTER_GOLD) && defined(XR_PLATFORM_WINDOWS)
     pLog = al_log;
 #endif
     snd_device_id = (u32)-1;
@@ -65,7 +62,9 @@ void ALDeviceList::Enumerate()
     int major, minor, index;
     pcstr actualDeviceName;
 
+#ifndef MASTER_GOLD
     Msg("SOUND: OpenAL: enumerate devices...");
+#endif
     // have a set of vectors storing the device list, selection status, spec version #, and XRAM support status
     // -- empty all the lists and reserve space for 10 devices
     m_devices.clear();
@@ -74,14 +73,20 @@ void ALDeviceList::Enumerate()
     CoUninitialize();
 #endif
     // grab function pointers for 1.0-API functions, and if successful proceed to enumerate all devices
-    if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT"))
+    if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT"))
+        Msg("~ SOUND: OpenAL: EnumerationExtension NOT Present");
+    else
     {
+#ifndef MASTER_GOLD
         Msg("SOUND: OpenAL: EnumerationExtension Present");
+#endif
 
         devices = (pstr)alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
+#ifdef DEBUG
         Msg("devices %s", devices);
+#endif
         xr_strcpy(m_defaultDeviceName, (pstr)alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
-        Msg("SOUND: OpenAL: system  default SndDevice name is %s", m_defaultDeviceName);
+        Msg("SOUND: OpenAL: system default sound device name is %s", m_defaultDeviceName);
 
         // ManowaR
         // "Generic Hardware" device on software AC'97 codecs introduce
@@ -96,7 +101,7 @@ void ALDeviceList::Enumerate()
         if (0 == xr_stricmp(m_defaultDeviceName, AL_GENERIC_HARDWARE))
         {
             xr_strcpy(m_defaultDeviceName, AL_GENERIC_SOFTWARE);
-            Msg("SOUND: OpenAL: default SndDevice name set to %s", m_defaultDeviceName);
+            Msg("SOUND: OpenAL: default sound device name set to %s", m_defaultDeviceName);
         }
 #endif
 
@@ -131,23 +136,20 @@ void ALDeviceList::Enumerate()
 
                         m_devices.back().props.efx = alcIsExtensionPresent(device, "ALC_EXT_EFX") == AL_TRUE;
                         m_devices.back().props.xram = alIsExtensionPresent("EAX_RAM") == AL_TRUE;
-
                         ++index;
                     }
                     alcDestroyContext(context);
                 }
                 else
-                    Msg("SOUND: OpenAL: cant create context for %s", device);
+                    Msg("~ SOUND: OpenAL: cant create context for %s", device);
                 alcCloseDevice(device);
             }
             else
-                Msg("SOUND: OpenAL: cant open device %s", devices);
+                Msg("~ SOUND: OpenAL: cant open device %s", devices);
 
             devices += xr_strlen(devices) + 1;
         }
     }
-    else
-        Msg("SOUND: OpenAL: EnumerationExtension NOT Present");
 
     // make token
     u32 _cnt = GetNumDevices();
@@ -161,8 +163,17 @@ void ALDeviceList::Enumerate()
     }
     //--
 
-    if (0 != GetNumDevices())
-        Msg("SOUND: OpenAL: All available devices:");
+    if (0 == GetNumDevices())
+    {
+        Log("SOUND: OpenAL: No devices available.");
+    }
+#ifdef MASTER_GOLD
+    else { /* do nothing */ }
+#else
+    else
+    {
+        Log("SOUND: OpenAL: All available devices:");
+    }
 
     int majorVersion, minorVersion;
 
@@ -174,6 +185,7 @@ void ALDeviceList::Enumerate()
             GetDeviceDesc(j).props.eax, GetDeviceDesc(j).props.efx ? "yes" : "no",
             GetDeviceDesc(j).props.xram ? "yes" : "no");
     }
+#endif
 
     Core.CoInitializeMultithreaded();
 }

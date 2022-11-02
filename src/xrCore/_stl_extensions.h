@@ -1,6 +1,6 @@
 #pragma once
 
-#include "_types.h"
+#include "xr_types.h"
 #include "_rect.h"
 #include "_plane.h"
 #include "_vector2.h"
@@ -30,4 +30,3 @@
 // STL extensions
 #include "FixedVector.h"
 #include "buffer_vector.h"
-#include "xr_vector_defs.h"

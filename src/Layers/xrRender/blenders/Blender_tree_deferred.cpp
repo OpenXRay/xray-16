@@ -61,7 +61,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         uber_deffer(C, false, tvs, "base", oBlend.value);
         break;
     case SE_R2_SHADOW: // smap-spot
-        //	TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
+        //	TODO: DX11: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
         if (oBlend.value)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
         else
@@ -96,7 +96,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             tvs_s="shadow_direct_tree"; 
     }
 
-    bool bUseATOC = (oBlend.value && (RImplementation.o.dx10_msaa_alphatest==CRender::MSAA_ATEST_DX10_0_ATOC));
+    bool bUseATOC = (oBlend.value && (RImplementation.o.msaa_alphatest==CRender::MSAA_ATEST_DX10_0_ATOC));
 
     switch (C.iElement)
     {
@@ -108,7 +108,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_StencilRef(0x01);
             //	Alpha to coverage.
-            C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+            C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
             C.r_End();
         }
 
@@ -129,7 +129,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             C.r_StencilRef(0x01);
             C.r_ColorWriteEnable(false, false, false, false);
             //	Alpha to coverage.
-            C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+            C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
             C.r_End();
         }
 
@@ -143,11 +143,11 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         break;
 
     case SE_R2_SHADOW:  // smap-spot
-        // TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
+        // TODO: DX11: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
         if (oBlend.value)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
         else
-            C.r_Pass(tvs_s, "shadow_direct_base", FALSE);
+            C.r_Pass(tvs_s, "null", FALSE);
         C.SampledImage("smp_linear", "s_base", C.L_textures[0]);
         C.r_ColorWriteEnable(false, false, false, false);
         C.r_End();

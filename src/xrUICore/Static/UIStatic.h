@@ -43,6 +43,16 @@ public:
     virtual void SetText(pcstr txt) { TextItemControl()->SetText(txt); }
     virtual void SetTextST(pcstr txt) { TextItemControl()->SetTextST(txt); }
 
+    u32 GetTextColor()
+    {
+        return TextItemControl()->GetTextColor();
+    }
+
+    void SetTextColor(u32 color)
+    {
+        TextItemControl()->SetTextColor(color);
+    }
+
     void SetTextColor_script(int a, int r, int g, int b)
     {
         TextItemControl()->SetTextColor(color_argb(a, r, g, b));

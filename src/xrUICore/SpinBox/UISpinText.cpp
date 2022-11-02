@@ -1,7 +1,6 @@
 #include "pch.hpp"
 #include "UISpinText.h"
 #include "Lines/UILines.h"
-#include "xrEngine/StringTable/IStringTable.h"
 #include "xrCore/xr_token.h"
 
 CUISpinText::CUISpinText() : m_curItem(-1) {}
@@ -9,7 +8,7 @@ void CUISpinText::AddItem_(const char* item, int id)
 {
     SInfo _info;
     _info._orig = item;
-    _info._transl = gStringTable->translate(item);
+    _info._transl = StringTable().translate(item);
     _info._id = id;
 
     m_list.push_back(_info);

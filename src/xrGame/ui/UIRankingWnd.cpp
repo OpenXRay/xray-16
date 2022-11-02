@@ -21,7 +21,6 @@
 #include "character_community.h"
 #include "character_reputation.h"
 #include "relation_registry.h"
-#include "string_table.h"
 #include "UICharacterInfo.h"
 #include "xrUICore/ui_base.h"
 
@@ -380,7 +379,7 @@ void CUIRankingWnd::get_favorite_weapon()
     }
 }
 
-bool xr_stdcall CUIRankingWnd::SortingLessFunction(CUIWindow* left, CUIWindow* right)
+bool CUIRankingWnd::SortingLessFunction(CUIWindow* left, CUIWindow* right)
 {
     CUIRankFaction* lpi = smart_cast<CUIRankFaction*>(left);
     CUIRankFaction* rpi = smart_cast<CUIRankFaction*>(right);

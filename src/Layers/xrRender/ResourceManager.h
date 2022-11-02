@@ -13,7 +13,7 @@
 // refs
 struct lua_State;
 
-class dx10ConstantBuffer;
+class dx11ConstantBuffer;
 
 // defs
 class ECORE_API CResourceManager
@@ -38,7 +38,7 @@ public:
     //	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
     using map_VS = xr_map<const char*, SVS*, str_pred>;
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     using map_GS = xr_map<const char*, SGS*, str_pred>;
 #endif
 
@@ -46,6 +46,9 @@ public:
     using map_HS = xr_map<const char*, SHS*, str_pred>;
     using map_DS = xr_map<const char*, SDS*, str_pred>;
     using map_CS = xr_map<const char*, SCS*, str_pred>;
+#endif
+#if defined(USE_OGL)
+    using map_PP = xr_map<const char*, SPP*, str_pred>;
 #endif
 
     using map_PS = xr_map<const char*, SPS*, str_pred>;
@@ -62,14 +65,17 @@ private:
     map_VS m_vs;
     map_PS m_ps;
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     map_GS m_gs;
 #endif
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     map_DS m_ds;
     map_HS m_hs;
     map_CS m_cs;
+#endif
+#if defined(USE_OGL)
+    map_PP m_pp;
 #endif
 
     map_TD m_td;
@@ -79,8 +85,8 @@ private:
     xr_vector<SGeometry*> v_geoms;
     xr_vector<R_constant_table*> v_constant_tables;
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-    xr_vector<dx10ConstantBuffer*> v_constant_buffer;
+#if defined(USE_DX11)
+    xr_vector<dx11ConstantBuffer*> v_constant_buffer;
     xr_vector<SInputSignature*> v_input_signature;
 #endif
 
@@ -145,9 +151,9 @@ public:
     R_constant_table* _CreateConstantTable(R_constant_table& C);
     void _DeleteConstantTable(const R_constant_table* C);
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-    dx10ConstantBuffer* _CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
-    void _DeleteConstantBuffer(const dx10ConstantBuffer* pBuffer);
+#if defined(USE_DX11)
+    dx11ConstantBuffer* _CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
+    void _DeleteConstantBuffer(const dx11ConstantBuffer* pBuffer);
 
     SInputSignature* _CreateInputSignature(ID3DBlob* pBlob);
     void _DeleteInputSignature(const SInputSignature* pSignature);
@@ -158,7 +164,14 @@ public:
 
 //	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
 //	DX10 cut void							_DeleteRTC			(const CRTC*	RT	);
-#ifndef USE_DX9
+
+#if defined(USE_OGL)
+    SPP* _CreatePP(pcstr vs, pcstr ps, pcstr gs, pcstr hs, pcstr ds);
+    bool _LinkPP(SPass& pass);
+    void _DeletePP(const SPP* p);
+#endif
+
+#if defined(USE_DX11) || defined(USE_OGL)
     SGS* _CreateGS(LPCSTR Name);
     void _DeleteGS(const SGS* GS);
 #endif
@@ -263,6 +276,23 @@ private:
 
     template <typename T>
     bool DestroyShader(const T* sh);
+
+    template <typename T>
+    bool reclaim(xr_vector<T*>& vec, const T* ptr)
+    {
+        auto it = vec.begin();
+        const auto end = vec.cend();
+
+        for (; it != end; ++it)
+        {
+            if (*it == ptr)
+            {
+                vec.erase(it);
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 #endif // ResourceManagerH

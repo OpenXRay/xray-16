@@ -5,6 +5,8 @@
 template <typename _Object>
 class CStateMonsterEat : public CState<_Object>
 {
+    static constexpr u32 TIME_NOT_HUNGRY = 20000;
+
 protected:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;

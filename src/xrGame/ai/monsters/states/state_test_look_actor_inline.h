@@ -3,8 +3,7 @@
 #include "Level.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterLookActorAbstract CStateMonsterLookActor<_Object>
 
@@ -34,6 +33,7 @@ void CStateMonsterTurnAwayFromActorAbstract::execute()
 
 TEMPLATE_SPECIALIZATION
 void CStateMonstertTestIdleAbstract::execute() { this->object->set_action(ACT_STAND_IDLE); }
+
 #undef TEMPLATE_SPECIALIZATION
 #undef CStateMonsterLookActorAbstract
 #undef CStateMonsterTurnAwayFromActorAbstract

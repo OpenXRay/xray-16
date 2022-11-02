@@ -57,7 +57,7 @@ dMatrixComparison::~dMatrixComparison()
 
 
 dReal dMatrixComparison::nextMatrix (dReal *A, int n, int m, int lower_tri,
-				     char *name, ...)
+				     const char *name, ...)
 {
   if (A==0 || n < 1 || m < 1 || name==0) dDebug (0,"bad args to nextMatrix");
   int num = n*dPAD(m);

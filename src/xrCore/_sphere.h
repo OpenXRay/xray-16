@@ -1,72 +1,66 @@
 #pragma once
-#ifndef _F_SPHERE_H_
-#define _F_SPHERE_H_
+
 #include "_vector3d.h"
 
-template <class T>
-struct _sphere;
-
-typedef _sphere<float> Fsphere;
-typedef _sphere<double> Dsphere;
-
-template <class T>
-struct _sphere
+struct Fsphere
 {
-    _vector3<T> P;
-    T R;
+    Fvector3 P;
+    float R;
 
 public:
-    IC void set(const _vector3<T>& _P, T _R)
+    void set(const Fvector3& _P, float _R)
     {
         P.set(_P);
         R = _R;
     }
-    IC void set(const _sphere<T>& S)
+
+    void set(const Fsphere& S)
     {
         P.set(S.P);
         R = S.R;
     }
-    IC void identity()
+
+    void identity()
     {
         P.set(0, 0, 0);
         R = 1;
     }
 
-    enum ERP_Result
+    enum ERP_Result : u32
     {
         rpNone = 0,
         rpOriginInside = 1,
         rpOriginOutside = 2,
-        fcv_forcedword = u32(-1)
     };
+
     // Ray-sphere intersection
-    ICF ERP_Result intersect(const _vector3<T>& S, const _vector3<T>& D, T range, int& quantity, T afT[2]) const
+    ICF ERP_Result intersect(const Fvector3& S, const Fvector3& D, float range, int& quantity, float afT[2]) const
     {
         // set up quadratic Q(t) = a*t^2 + 2*b*t + c
-        _vector3<T> kDiff;
+        Fvector3 kDiff;
         kDiff.sub(S, P);
-        T fA = range * range;
-        T fB = kDiff.dotproduct(D) * range;
-        T fC = kDiff.square_magnitude() - R * R;
+        float fA = range * range;
+        const float fB = kDiff.dotproduct(D) * range;
+        const float fC = kDiff.square_magnitude() - R * R;
         ERP_Result result = rpNone;
 
-        T fDiscr = fB * fB - fA * fC;
-        if (fDiscr < (T)0.0)
+        const float fDiscr = fB * fB - fA * fC;
+        if (fDiscr < 0.0f)
         {
             quantity = 0;
         }
-        else if (fDiscr > (T)0.0)
+        else if (fDiscr > 0.0f)
         {
-            T fRoot = _sqrt(fDiscr);
-            T fInvA = ((T)1.0) / fA;
+            const float fRoot = _sqrt(fDiscr);
+            const float fInvA = (1.0f) / fA;
             afT[0] = range * (-fB - fRoot) * fInvA;
             afT[1] = range * (-fB + fRoot) * fInvA;
-            if (afT[0] >= (T)0.0)
+            if (afT[0] >= 0.0f)
             {
                 quantity = 2;
                 result = rpOriginOutside;
             }
-            else if (afT[1] >= (T)0.0)
+            else if (afT[1] >= 0.0f)
             {
                 quantity = 1;
                 afT[0] = afT[1];
@@ -78,7 +72,7 @@ public:
         else
         {
             afT[0] = range * (-fB / fA);
-            if (afT[0] >= (T)0.0)
+            if (afT[0] >= 0.0f)
             {
                 quantity = 1;
                 result = rpOriginOutside;
@@ -102,7 +96,7 @@ public:
      range2 =range*range;
      }
      */
-    ICF ERP_Result intersect_full(const _vector3<T>& start, const _vector3<T>& dir, T& dist) const
+    ICF ERP_Result intersect_full(const Fvector3& start, const Fvector3& dir, float& dist) const
     {
         int quantity;
         float afT[2];
@@ -119,10 +113,10 @@ public:
         return result;
     }
 
-    ICF ERP_Result intersect(const _vector3<T>& start, const _vector3<T>& dir, T& dist) const
+    ICF ERP_Result intersect(const Fvector3& start, const Fvector3& dir, float& dist) const
     {
         int quantity;
-        T afT[2];
+        float afT[2];
         ERP_Result result = intersect(start, dir, dist, quantity, afT);
         if (rpNone != result)
         {
@@ -136,19 +130,19 @@ public:
         return rpNone;
     }
 
-    IC ERP_Result intersect2(const _vector3<T>& S, const _vector3<T>& D, T& range) const
+    ERP_Result intersect2(const Fvector3& S, const Fvector3& D, float& range) const
     {
-        _vector3<T> Q;
+        Fvector3 Q;
         Q.sub(P, S);
 
-        T R2 = R * R;
-        T c2 = Q.square_magnitude();
-        T v = Q.dotproduct(D);
-        T d = R2 - (c2 - v * v);
+        float R2 = R * R;
+        float c2 = Q.square_magnitude();
+        float v = Q.dotproduct(D);
+        float d = R2 - (c2 - v * v);
 
         if (d > 0.f)
         {
-            T _range = v - _sqrt(d);
+            float _range = v - _sqrt(d);
             if (_range < range)
             {
                 range = _range;
@@ -157,27 +151,31 @@ public:
         }
         return rpNone;
     }
-    ICF BOOL intersect(const _vector3<T>& S, const _vector3<T>& D) const
+
+    ICF BOOL intersect(const Fvector3& S, const Fvector3& D) const
     {
-        _vector3<T> Q;
+        Fvector3 Q;
         Q.sub(P, S);
 
-        T c = Q.magnitude();
-        T v = Q.dotproduct(D);
-        T d = R * R - (c * c - v * v);
+        float c = Q.magnitude();
+        float v = Q.dotproduct(D);
+        float d = R * R - (c * c - v * v);
         return (d > 0);
     }
-    ICF BOOL intersect(const _sphere<T>& S) const
+
+    ICF BOOL intersect(const Fsphere& S) const
     {
-        T SumR = R + S.R;
+        float SumR = R + S.R;
         return P.distance_to_sqr(S.P) < SumR * SumR;
     }
-    IC BOOL contains(const _vector3<T>& PT) const { return P.distance_to_sqr(PT) <= (R * R + EPS_S); }
+
+    BOOL contains(const Fvector3& PT) const { return P.distance_to_sqr(PT) <= (R * R + EPS_S); }
+
     // returns true if this wholly contains the argument sphere
-    IC BOOL contains(const _sphere<T>& S) const
+    BOOL contains(const Fsphere& S) const
     {
         // can't contain a sphere that's bigger than me !
-        const T RDiff = R - S.R;
+        const float RDiff = R - S.R;
         if (RDiff < 0)
             return false;
 
@@ -185,15 +183,12 @@ public:
     }
 
     // return's volume of sphere
-    IC T volume() const { return T(PI_MUL_4 / 3) * (R * R * R); }
+    float volume() const { return (PI_MUL_4 / 3.f) * (R * R * R); }
 };
 
-template <class T>
-bool _valid(const _sphere<T>& s)
+inline bool _valid(const Fsphere& s)
 {
     return _valid(s.P) && _valid(s.R);
 }
 
 void XRCORE_API Fsphere_compute(Fsphere& dest, const Fvector* verts, int count);
-
-#endif

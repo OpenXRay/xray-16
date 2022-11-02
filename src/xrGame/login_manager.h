@@ -103,7 +103,7 @@ private:
 
     login_operation_cb m_login_operation_cb;
 
-    void __stdcall only_log_login(profile const* res_profile, char const* description);
+    void only_log_login(profile const* res_profile, char const* description);
     ////callbacks
     static void __cdecl login_cb(GPConnection* connection, void* arg, void* param);
 

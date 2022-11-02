@@ -95,6 +95,15 @@ void CInfoPortion::load_shared(LPCSTR)
         THROW(article_str_id);
         info_data()->m_ArticlesDisable.emplace_back(article_str_id);
     }
+
+    info_data()->m_GameTasks.clear();
+    const int task_num = pXML->GetNodesNum(pNode, "task");
+    for (int i = 0; i < task_num; ++i)
+    {
+        cpcstr task_str_id = pXML->Read(pNode, "task", i, nullptr);
+        THROW(task_str_id);
+        info_data()->m_GameTasks.emplace_back(task_str_id);
+    }
 }
 
 void CInfoPortion::InitXmlIdToIndex()

@@ -7,7 +7,7 @@
 #include "Weapon.h"
 #include "WeaponMagazinedWGrenade.h"
 #include "WeaponKnife.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "eatable_item_object.h"
 #include "Missile.h"
 #include "ui/UIMpTradeWnd.h"
@@ -537,35 +537,6 @@ void game_cl_Deathmatch::TryToDefuseAllWeapons(aditional_ammo_t& dest_ammo)
             TryToDefuseWeapon(tmp_weapon, all_items, dest_ammo);
     }
 }
-
-struct AmmoSearcherPredicate
-{
-    u16 additional_ammo_count;
-    shared_str ammo_section;
-
-    AmmoSearcherPredicate(u16 ammo_elapsed, shared_str const& ammo_sect)
-        : additional_ammo_count(ammo_elapsed), ammo_section(ammo_sect)
-    {
-    }
-
-    bool operator()(PIItem const& item)
-    {
-        CWeaponAmmo* temp_ammo = smart_cast<CWeaponAmmo*>(item);
-        if (!temp_ammo)
-            return false;
-
-        if (temp_ammo->m_boxCurr >= temp_ammo->m_boxSize)
-            return false;
-
-        if (temp_ammo->cNameSect() != ammo_section)
-            return false;
-
-        if ((temp_ammo->m_boxCurr + additional_ammo_count) < temp_ammo->m_boxSize)
-            return false;
-
-        return true;
-    }
-};
 
 void game_cl_Deathmatch::AdditionalAmmoInserter(aditional_ammo_t::value_type const& sect_name)
 {

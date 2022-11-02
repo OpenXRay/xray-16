@@ -3,9 +3,9 @@
 #include "Cursor/UICursor.h"
 #include "Include/xrRender/DebugRender.h"
 #include "Include/xrRender/UIRender.h"
-#include "xrEngine/xr_input_xinput.h"
 
 xr_vector<Frect> g_wnds_rects;
+xr_vector<Frect> g_focused_wnds_rects;
 BOOL g_show_wnd_rect2 = FALSE;
 
 XRUICORE_API void clean_wnd_rects()
@@ -15,7 +15,16 @@ XRUICORE_API void clean_wnd_rects()
 #endif // DEBUG
 }
 
-void add_rect_to_draw(Frect r) { g_wnds_rects.push_back(r); }
+void add_rect_to_draw(Frect&& r)
+{
+    g_wnds_rects.emplace_back(r);
+}
+
+void add_focused_rect_to_draw(Frect&& r)
+{
+    g_focused_wnds_rects.emplace_back(r);
+}
+
 void draw_rect(Frect& r, u32 color)
 {
 #ifdef DEBUG
@@ -39,21 +48,25 @@ void draw_rect(Frect& r, u32 color)
 
 XRUICORE_API void draw_wnds_rects()
 {
-    if (0 == g_wnds_rects.size())
+    if (g_wnds_rects.empty() && g_focused_wnds_rects.empty())
         return;
 
-    xr_vector<Frect>::iterator it = g_wnds_rects.begin();
-    xr_vector<Frect>::iterator it_e = g_wnds_rects.end();
-
-    for (; it != it_e; ++it)
+    for (Frect& rect : g_wnds_rects)
     {
-        Frect& r = *it;
-        UI().ClientToScreenScaled(r.lt, r.lt.x, r.lt.y);
-        UI().ClientToScreenScaled(r.rb, r.rb.x, r.rb.y);
-        draw_rect(r, color_rgba(255, 0, 0, 255));
-    };
+        UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
+        UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
+        draw_rect(rect, color_rgba(255, 0, 0, 255));
+    }
+
+    for (Frect& rect : g_focused_wnds_rects)
+    {
+        UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
+        UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
+        draw_rect(rect, color_rgba(0, 255, 0, 255));
+    }
 
     g_wnds_rects.clear();
+    g_focused_wnds_rects.clear();
 }
 
 CUIWindow::CUIWindow()
@@ -91,7 +104,10 @@ void CUIWindow::Draw()
     {
         Frect r;
         GetAbsoluteRect(r);
-        add_rect_to_draw(r);
+        if (CursorOverWindow())
+            add_focused_rect_to_draw(std::move(r));
+        else
+            add_rect_to_draw(std::move(r));
     }
 #endif
 }
@@ -369,13 +385,17 @@ bool CUIWindow::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUIWindow::OnKeyboardHold(int dik)
+//реакция на геймпад
+bool CUIWindow::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
 {
     bool result;
 
+    //если есть дочернее окно,захватившее клавиатуру, то
+    //сообщение направляем ему сразу
+    // XXX: introduce m_pControllerCapturer?
     if (NULL != m_pKeyboardCapturer)
     {
-        result = m_pKeyboardCapturer->OnKeyboardHold(dik);
+        result = m_pKeyboardCapturer->OnControllerAction(axis, x, y, controller_action);
 
         if (result)
             return true;
@@ -387,13 +407,12 @@ bool CUIWindow::OnKeyboardHold(int dik)
     {
         if ((*it)->IsEnabled())
         {
-            result = (*it)->OnKeyboardHold(dik);
+            result = (*it)->OnControllerAction(axis, x, y, controller_action);
 
             if (result)
                 return true;
         }
     }
-
     return false;
 }
 

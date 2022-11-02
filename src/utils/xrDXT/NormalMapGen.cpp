@@ -523,7 +523,7 @@ int DXTCompressBump(
     pitch = w * 4;
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
     Image()
-        .Create(w, h, T_height_gloss, ImageFormat::RGBA8)
+        .Create(w, h, T_height_gloss, ImageDataFormat::RGBA8)
         .SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\0-height-gloss.tga", true);
 #endif
     if (T_normal_map)
@@ -537,14 +537,14 @@ int DXTCompressBump(
     }
     u8* T_normal_1 = pSrc->GetImageDataPointer();
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
-    Image().Create(w, h, T_normal_1, ImageFormat::RGBA8).SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\1-normal_1.tga", true);
+    Image().Create(w, h, T_normal_1, ImageDataFormat::RGBA8).SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\1-normal_1.tga", true);
 #endif
     gloss_power = 0.0f;
     // T_height_gloss.a (gloss) -> T_normal_1 + reverse of channels
     TW_Iterate_1OP(w, h, pitch, T_normal_1, T_height_gloss, it_gloss_rev);
     gloss_power /= float(w * h);
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
-    Image().Create(w, h, T_normal_1, ImageFormat::RGBA8).SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\2-normal_1.tga", true);
+    Image().Create(w, h, T_normal_1, ImageDataFormat::RGBA8).SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\2-normal_1.tga", true);
 #endif
     STextureParams fmt0;
     fmt0.flags.assign(STextureParams::flGenerateMipMaps);
@@ -563,7 +563,7 @@ int DXTCompressBump(
             u8* T_normal_1U = img->GetDecompDataPointer();
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
             Image()
-                .Create(w, h, T_normal_1U, TGAImageFormat::RGBA8)
+                .Create(w, h, T_normal_1U, TGAImageDataFormat::RGBA8)
                 .SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\3-normal_1U.tga", true);
 #endif
             // Calculate difference
@@ -571,7 +571,7 @@ int DXTCompressBump(
             TW_Iterate_2OP(w, h, pitch, T_normal_1D, T_normal_1, T_normal_1U, it_difference);
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
             Image()
-                .Create(w, h, T_normal_1D, ImageFormat::RGBA8)
+                .Create(w, h, T_normal_1D, ImageDataFormat::RGBA8)
                 .SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\4-normal_1D.tga", true);
 #endif
             // Rescale by virtual height
@@ -642,7 +642,7 @@ int DXTCompressBump(
             TW_Iterate_1OP(w, h, pitch, T_normal_1D, T_height_pf, it_height_rev);
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
             Image()
-                .Create(w, h, T_normal_1D, ImageFormat::RGBA8)
+                .Create(w, h, T_normal_1D, ImageDataFormat::RGBA8)
                 .SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\5-normal_1D.tga", true);
 #endif
             // Compress

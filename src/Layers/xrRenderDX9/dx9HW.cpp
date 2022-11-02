@@ -2,12 +2,42 @@
 
 #include "dx9HW.h"
 
-ENGINE_API extern u32 Vid_SelectedRefreshRate;
-
 CHW HW;
 
-CHW::CHW() {}
-CHW::~CHW() {}
+CHW::CHW()
+{
+    if (!ThisInstanceIsGlobal())
+        return;
+
+    Device.seqAppActivate.Add(this);
+    Device.seqAppDeactivate.Add(this);
+}
+
+CHW::~CHW()
+{
+    if (!ThisInstanceIsGlobal())
+        return;
+
+    Device.seqAppActivate.Remove(this);
+    Device.seqAppDeactivate.Remove(this);
+}
+
+void CHW::OnAppActivate()
+{
+    if (!DevPP.Windowed)
+    {
+        ShowWindow(DevPP.hDeviceWindow, SW_RESTORE);
+    }
+}
+
+void CHW::OnAppDeactivate()
+{
+    if (!DevPP.Windowed)
+    {
+        if (psDeviceMode.WindowStyle == rsFullscreen || psDeviceMode.WindowStyle == rsFullscreenBorderless)
+            ShowWindow(DevPP.hDeviceWindow, SW_MINIMIZE);
+    }
+}
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -35,7 +65,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
     CreateD3D();
 
-    const bool bWindowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
+    const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
@@ -73,7 +103,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     }
     else
     {
-        switch (psCurrentBPP)
+        switch (psDeviceMode.BitsPerPixel)
         {
         case 32:
             fTarget = D3DFMT_X8R8G8B8;
@@ -162,20 +192,20 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     else
     {
         P.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        P.FullScreen_RefreshRateInHz = Vid_SelectedRefreshRate;
+        P.FullScreen_RefreshRateInHz = psDeviceMode.RefreshRate;
     }
 
 
     // Create the device
     const auto GPU = selectGPU();
     auto result = pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
-        GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
+        GPU | D3DCREATE_MULTITHREADED | D3DCREATE_NOWINDOWCHANGES, //. ? locks at present
         &P, &pDevice);
 
     if (FAILED(result))
     {
         result = pD3D->CreateDevice(DevAdapter, m_DriverType, P.hDeviceWindow,
-            GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
+            GPU | D3DCREATE_MULTITHREADED | D3DCREATE_NOWINDOWCHANGES, //. ? locks at present
             &P, &pDevice);
     }
     if (D3DERR_DEVICELOST == result)
@@ -206,7 +236,6 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 #endif
     const u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
-    Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 }
 
 void CHW::DestroyDevice()
@@ -233,13 +262,13 @@ void CHW::Reset()
     DevPP.BackBufferHeight = Device.dwHeight;
 
     // Windoze
-    const bool bWindowed = ThisInstanceIsGlobal() ? !psDeviceFlags.is(rsFullscreen) : true;
+    const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
     DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
     DevPP.Windowed = bWindowed;
     if (!bWindowed)
     {
         DevPP.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        DevPP.FullScreen_RefreshRateInHz = Vid_SelectedRefreshRate;
+        DevPP.FullScreen_RefreshRateInHz = psDeviceMode.RefreshRate;
     }
     else
     {

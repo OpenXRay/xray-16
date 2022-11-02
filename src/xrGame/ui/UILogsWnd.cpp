@@ -22,17 +22,13 @@
 #include "game_news.h"
 #include "alife_time_manager.h"
 #include "alife_registry_wrappers.h"
-#include "string_table.h"
 #include "UINewsItemWnd.h"
 #include "xrEngine/xr_input.h"
+#include "date_time.h"
 
 #define PDA_LOGS_XML "pda_logs.xml"
 
-extern u64 generate_time(u32 years, u32 months, u32 days, u32 hours, u32 minutes, u32 seconds, u32 milliseconds = 0);
-extern void split_time(
-    u64 time, u32& years, u32& months, u32& days, u32& hours, u32& minutes, u32& seconds, u32& milliseconds);
-
-u64 const day2ms = u64(24 * 60 * 60 * 1000);
+u64 constexpr day2ms = u64(24 * 60 * 60 * 1000);
 
 CUILogsWnd::CUILogsWnd()
 {
@@ -356,25 +352,21 @@ bool CUILogsWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         break;
         }
     }
+    else if (keyboard_action == WINDOW_KEY_HOLD)
+    {
+        switch (dik)
+        {
+        case SDL_SCANCODE_UP:
+        case SDL_SCANCODE_DOWN:
+        case SDL_SCANCODE_PAGEUP:
+        case SDL_SCANCODE_PAGEDOWN:
+            on_scroll_keys(dik);
+            return true;
+        }
+    }
+
     m_ctrl_press = false;
     return inherited::OnKeyboardAction(dik, keyboard_action);
-}
-
-bool CUILogsWnd::OnKeyboardHold(int dik)
-{
-    switch (dik)
-    {
-    case SDL_SCANCODE_UP:
-    case SDL_SCANCODE_DOWN:
-    case SDL_SCANCODE_PAGEUP:
-    case SDL_SCANCODE_PAGEDOWN:
-    {
-        on_scroll_keys(dik);
-        return true;
-    }
-    break;
-    }
-    return inherited::OnKeyboardHold(dik);
 }
 
 void CUILogsWnd::on_scroll_keys(int dik)

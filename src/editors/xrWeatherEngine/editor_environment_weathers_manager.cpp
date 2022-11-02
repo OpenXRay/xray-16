@@ -18,26 +18,28 @@
 #include "property_collection.hpp"
 #include "editor_environment_manager.hpp"
 
-using editor::environment::weathers::manager;
-using editor::environment::weathers::weather;
-using editor::environment::detail::logical_string_predicate;
+using weathers_manager = editor::environment::weathers::manager;
 
 template <>
-void property_collection<manager::weather_container_type, manager>::display_name(
+void property_collection<weathers_manager::weather_container_type, weathers_manager>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<manager::weather_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<weathers_manager::weather_container_type, weathers_manager>::create()
 {
-    weather* object = xr_new<weather>(&m_holder.m_manager, generate_unique_id("weather_unique_id_").c_str());
+    using editor::environment::weathers::weather;
+
+    auto* object = xr_new<weather>(&m_holder.m_manager, generate_unique_id("weather_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
 
-manager::manager(editor::environment::manager* manager) : m_manager(*manager), m_collection(0), m_changed(true)
+namespace editor::environment::weathers
+{
+manager::manager(environment::manager* manager) : m_manager(*manager), m_changed(true)
 {
     m_collection = xr_new<collection_type>(&m_weathers, this, &m_changed);
 }
@@ -57,7 +59,7 @@ void manager::load()
     VERIFY(file_list);
     xr_string id;
 
-    for (const auto &i : *file_list)
+    for (const auto& i : *file_list)
     {
         u32 length = xr_strlen(i);
         if (length <= 4)
@@ -77,7 +79,7 @@ void manager::load()
 
         id = i;
         id[length - 4] = 0;
-        weather* object = xr_new<weather>(&m_manager, id.c_str());
+        auto* object = xr_new<weather>(&m_manager, id.c_str());
         object->load();
         object->fill(m_collection);
         m_weathers.push_back(object);
@@ -88,7 +90,7 @@ void manager::load()
 
 void manager::save()
 {
-    for (const auto &i : m_weathers)
+    for (const auto& i : m_weathers)
         i->save();
 }
 
@@ -116,7 +118,7 @@ pcstr const* manager::frames_getter(pcstr weather_id) const
     m_times_ids.resize(times.size());
 
     auto j = m_times_ids.begin();
-    for (const auto &i : times)
+    for (const auto& i : times)
         *j++ = xr_strdup(i->id().c_str());
 
     return (&*m_times_ids.begin());
@@ -169,10 +171,10 @@ manager::weather_ids_type const& manager::weather_ids() const
     m_weather_ids.resize(m_weathers.size());
 
     auto j = m_weather_ids.begin();
-    for (const auto &i : m_weathers)
+    for (const auto& i : m_weathers)
         *j++ = xr_strdup(i->id().c_str());
 
-    std::sort(m_weather_ids.begin(), m_weather_ids.end(), logical_string_predicate());
+    std::sort(m_weather_ids.begin(), m_weather_ids.end(), detail::logical_string_predicate());
 
     return (m_weather_ids);
 }
@@ -209,7 +211,7 @@ bool manager::paste_current_time_frame(char const* buffer, u32 const& buffer_siz
     if (!m_manager.Current[0])
         return (false);
 
-    for (const auto &i : m_weathers)
+    for (const auto& i : m_weathers)
     {
         if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
@@ -225,7 +227,7 @@ bool manager::paste_target_time_frame(char const* buffer, u32 const& buffer_size
     if (!m_manager.Current[1])
         return (false);
 
-    for (const auto &i : m_weathers)
+    for (const auto& i : m_weathers)
     {
         if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
@@ -238,7 +240,7 @@ bool manager::paste_target_time_frame(char const* buffer, u32 const& buffer_size
 
 bool manager::add_time_frame(char const* buffer, u32 const& buffer_size)
 {
-    for (const auto &i : m_weathers)
+    for (const auto& i : m_weathers)
     {
         if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
@@ -254,7 +256,7 @@ void manager::reload_current_time_frame()
     if (!m_manager.Current[0])
         return;
 
-    for (const auto &i : m_weathers)
+    for (const auto& i : m_weathers)
     {
         if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
@@ -269,7 +271,7 @@ void manager::reload_target_time_frame()
     if (!m_manager.Current[1])
         return;
 
-    for (const auto &i : m_weathers)
+    for (const auto& i : m_weathers)
     {
         if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
@@ -281,7 +283,7 @@ void manager::reload_target_time_frame()
 
 void manager::reload_current_weather()
 {
-    for (const auto &i : m_weathers)
+    for (const auto& i : m_weathers)
     {
         if (m_manager.CurrentWeatherName._get() != i->id()._get())
             continue;
@@ -296,4 +298,4 @@ void manager::reload()
     delete_data(m_weathers);
     load();
 }
-
+} // namespace editor::environment::weathers
