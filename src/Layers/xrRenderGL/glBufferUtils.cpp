@@ -173,7 +173,7 @@ void IterVertexDeclaration(const VertexElement* dxdecl, F&& callback)
 void SetVertexDeclaration(const VertexElement* dxdecl)
 {
     auto stride = GetDeclVertexSize(dxdecl, 0);
-    IterVertexDeclaration(dxdecl, 
+    IterVertexDeclaration(dxdecl,
     [&](GLuint location, GLint size, GLenum type, GLboolean normalized, intptr_t offset, GLuint /*stream*/) 
     {
         CHK_GL(glVertexAttribPointer(
@@ -184,11 +184,12 @@ void SetVertexDeclaration(const VertexElement* dxdecl)
 void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
 {
     RCache.set_Format(decl);
-    IterVertexDeclaration(dxdecl, 
+    IterVertexDeclaration(dxdecl,
     [](GLuint location, GLint size, GLenum type, GLboolean normalized, GLuint offset, GLuint stream) 
     {
         CHK_GL(glEnableVertexAttribArray(location));
-        if (GLEW_ARB_vertex_attrib_binding) {
+        if (GLEW_ARB_vertex_attrib_binding)
+        {
             CHK_GL(glVertexAttribFormat(location, size, type, normalized, offset));
             CHK_GL(glVertexAttribBinding(location, stream));
         }
@@ -253,7 +254,7 @@ void IterVertexDeclaration(u32 FVF, F&& callback)
 void SetVertexDeclaration(u32 FVF)
 {
     auto stride = GetFVFVertexSize(FVF);
-    IterVertexDeclaration(FVF, 
+    IterVertexDeclaration(FVF,
     [&](GLuint location, GLint size, GLenum type, GLboolean normalized, intptr_t offset, GLuint /*stream*/) 
     {
         CHK_GL(glVertexAttribPointer(
@@ -264,11 +265,12 @@ void SetVertexDeclaration(u32 FVF)
 void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
 {
     RCache.set_Format(decl);
-    IterVertexDeclaration(FVF, 
+    IterVertexDeclaration(FVF,
     [](GLuint location, GLint size, GLenum type, GLboolean normalized, GLuint offset, GLuint stream) 
     {
         CHK_GL(glEnableVertexAttribArray(location));
-        if (GLEW_ARB_vertex_attrib_binding) {
+        if (GLEW_ARB_vertex_attrib_binding)
+        {
             CHK_GL(glVertexAttribFormat(location, size, type, normalized, offset));
             CHK_GL(glVertexAttribBinding(location, stream));
         }
