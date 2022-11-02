@@ -109,8 +109,7 @@ void ALDeviceList::Enumerate()
         // go through device list (each device terminated with a single NULL, list terminated with double NULL)
         while (*devices != '\0')
         {
-            ALCdevice* device = alcOpenDevice(devices);
-            if (device)
+            if (ALCdevice* device = alcOpenDevice(devices))
             {
                 ALCcontext* context = alcCreateContext(device, nullptr);
                 if (context)
@@ -123,19 +122,21 @@ void ALDeviceList::Enumerate()
                     {
                         alcGetIntegerv(device, ALC_MAJOR_VERSION, sizeof(int), &major);
                         alcGetIntegerv(device, ALC_MINOR_VERSION, sizeof(int), &minor);
-                        m_devices.emplace_back(actualDeviceName, minor, major);
-                        m_devices.back().props.eax = 0;
-                        if (alIsExtensionPresent("EAX2.0"))
-                            m_devices.back().props.eax = 2;
-                        if (alIsExtensionPresent("EAX3.0"))
-                            m_devices.back().props.eax = 3;
-                        if (alIsExtensionPresent("EAX4.0"))
-                            m_devices.back().props.eax = 4;
-                        if (alIsExtensionPresent("EAX5.0"))
-                            m_devices.back().props.eax = 5;
 
-                        m_devices.back().props.efx = alcIsExtensionPresent(device, "ALC_EXT_EFX") == AL_TRUE;
-                        m_devices.back().props.xram = alIsExtensionPresent("EAX_RAM") == AL_TRUE;
+                        auto& addedDevice = m_devices.emplace_back(actualDeviceName, minor, major);
+                        addedDevice.props.eax = 0;
+                        if (alIsExtensionPresent("EAX2.0"))
+                            addedDevice.props.eax = 2;
+                        if (alIsExtensionPresent("EAX3.0"))
+                            addedDevice.props.eax = 3;
+                        if (alIsExtensionPresent("EAX4.0"))
+                            addedDevice.props.eax = 4;
+                        if (alIsExtensionPresent("EAX5.0"))
+                            addedDevice.props.eax = 5;
+
+                        addedDevice.props.efx = alcIsExtensionPresent(device, "ALC_EXT_EFX") == AL_TRUE;
+                        addedDevice.props.xram = alIsExtensionPresent("EAX_RAM") == AL_TRUE;
+
                         ++index;
                     }
                     alcDestroyContext(context);
