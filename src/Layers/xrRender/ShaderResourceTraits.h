@@ -61,7 +61,8 @@ inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr
 
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    if (GLEW_VERSION_4_3) 
+        CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
     if (HW.ShaderBinarySupported)
         CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
@@ -92,7 +93,8 @@ inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLe
 
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    if (GLEW_VERSION_4_3)
+        CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
 
     CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
@@ -116,7 +118,8 @@ static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint g
 {
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    if (GLEW_VERSION_4_3)
+        CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     // XXX: support caching for monolithic programs
     //if (HW.ShaderBinarySupported)
     //    CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));

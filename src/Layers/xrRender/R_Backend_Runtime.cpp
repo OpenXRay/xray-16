@@ -238,7 +238,7 @@ void CBackend::set_Textures(STextureList* _T)
     {
         std::pair<u32, ref_texture>& loader = *_it;
         u32 load_id = loader.first;
-        CTexture* load_surf = &*loader.second;
+        CTexture* load_surf = loader.second._get();
         //if (load_id < 256) {
         if (load_id < CTexture::rstVertex)
         {

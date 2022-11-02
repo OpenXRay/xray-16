@@ -118,6 +118,10 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     }
 
     // Initialize OpenGL Extension Wrangler
+#ifdef XR_PLATFORM_APPLE
+    // This is essential for complete OpenGL 4.1 load on mac
+    glewExperimental = GL_TRUE;
+#endif
     GLenum err = glewInit();
     if (GLEW_OK != err)
     {
@@ -128,8 +132,11 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     UpdateVSync();
 
 #ifdef DEBUG
-    CHK_GL(glEnable(GL_DEBUG_OUTPUT));
-    CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
+    if (GLEW_KHR_debug)  // NOTE: this extension is only available starting with OpenGL 4.3
+    {
+        CHK_GL(glEnable(GL_DEBUG_OUTPUT));
+        CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
+    }
 #endif // DEBUG
 
     int iMaxVTFUnits, iMaxCTIUnits;
@@ -280,10 +287,12 @@ bool CHW::ThisInstanceIsGlobal() const
 
 void CHW::BeginPixEvent(pcstr name) const
 {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name);
+    if (GLEW_KHR_debug)
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name);
 }
 
 void CHW::EndPixEvent() const
 {
-    glPopDebugGroup();
+    if (GLEW_KHR_debug)
+        glPopDebugGroup();
 }

@@ -487,7 +487,7 @@ public:
     {
         if (!ctable)
             return;
-        set_c(&*ctable->get(name), std::forward<Args>(args)...);
+        set_c(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
     template<typename... Args>
@@ -495,7 +495,7 @@ public:
     {
         if (!ctable)
             return;
-        set_ca(&*ctable->get(name), std::forward<Args>(args)...);
+        set_ca(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
     // constants - shared_str (average)
@@ -504,7 +504,7 @@ public:
     {
         if (!ctable)
             return;
-        set_c(&*ctable->get(name), std::forward<Args>(args)...);
+        set_c(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
     template<typename... Args>
@@ -512,7 +512,7 @@ public:
     {
         if (!ctable)
             return;
-        set_ca(&*ctable->get(name), std::forward<Args>(args)...);
+        set_ca(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
     // Rendering

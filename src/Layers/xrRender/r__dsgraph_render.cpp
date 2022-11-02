@@ -26,8 +26,9 @@ bool cmp_ssa(const T &lhs, const T &rhs)
 template <typename T>
 bool cmp_pass(const T& left, const T& right)
 {
-    return left->first->equal(*right->first)
-        || left->second.ssa > right->second.ssa;
+    if (left->first->equal(*right->first))
+        return false;
+    return left->second.ssa >= right->second.ssa;
 }
 
 void R_dsgraph_structure::r_dsgraph_render_graph(u32 _priority)

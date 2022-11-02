@@ -32,6 +32,7 @@ class CCoverEvaluator : public CCoverEvaluatorBase
 
 public:
     CCoverEvaluator(CRestrictedObject* object);
+    virtual ~CCoverEvaluator() = default;
 
     // setup by cover_manager
     void initialize(const Fvector& start_position);

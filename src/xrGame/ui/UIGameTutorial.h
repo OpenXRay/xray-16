@@ -26,7 +26,10 @@ protected:
 
 public:
     IInputReceiver* m_pStoredInputReceiver;
+
     CUISequencer();
+    virtual ~CUISequencer() = default;
+
     bool Start(LPCSTR tutor_name);
     void Stop();
     void Next();
@@ -129,6 +132,8 @@ class CUISequenceSimpleItem : public CUISequenceItem
 
         virtual void Start();
         virtual void Stop();
+
+        virtual ~SSubItem() = default;
     };
     using SubItemVec = xr_vector<SSubItem>;
     SubItemVec m_subitems;

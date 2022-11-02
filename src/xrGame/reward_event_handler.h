@@ -11,7 +11,7 @@ class reward_event_handler
 {
 public:
     reward_event_handler(game_state_accumulator* pstate) : m_player_state_accum(pstate) {}
-    ~reward_event_handler(){};
+    virtual ~reward_event_handler(){};
     virtual bool OnWeapon_Fire(u16 sender, u16 sender_weapon_id) = 0;
     virtual bool OnBullet_Fire(u16 sender, u16 sender_weapon_id, const Fvector& position, const Fvector& direction) = 0;
     virtual bool OnBullet_Hit(
