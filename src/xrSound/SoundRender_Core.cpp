@@ -57,8 +57,8 @@ CSoundRender_Core::~CSoundRender_Core()
 
 void CSoundRender_Core::_initialize()
 {
-    Log("* sound: EAX 2.0 extension:", bEAX ? "present" : "absent");
-    Log("* sound: EAX 2.0 deferred:", bDeferredEAX ? "present" : "absent");
+    Log("* sound: Creative EAX extension:", bEAX ? "present" : "absent");
+    Log("* sound: Creative EAX deferred:", bDeferredEAX ? "present" : "absent");
     Timer.Start();
 
     // load environment
