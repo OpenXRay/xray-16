@@ -184,7 +184,8 @@ constexpr WeaponTypes convert_weapon_type_soc_cs(int type)
 
 inline WeaponTypes convert_weapon_type(int type)
 {
-    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "convert_weapon_type_soc_cs", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode)))
+    cpcstr weaponTypeSystem = pSettingsOpenXRay->read_if_exists<pcstr>("compatibility", "ef_weapon_type_system", psGameMode.is_any(CallOfPripyatMode) ? "cop" : "soc_cs");
+    if (xr_strcmp(weaponTypeSystem, "soc_cs") == 0)
         return convert_weapon_type_soc_cs(type);
 
     return convert_weapon_type_cop(type);
