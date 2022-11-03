@@ -172,18 +172,16 @@ inline pcstr GetLoadingScreenXML()
             return LoadingScreenXML16x9ShadowOfChernobyl;
         return LoadingScreenXMLClearSky;
     }
-    else if (xr_strcmp(loadingScreenType, "cs"))
+    if (xr_strcmp(loadingScreenType, "cs"))
     {
         if (is_wide)
             return LoadingScreenXML16x9ClearSky;
         return LoadingScreenXMLClearSky;
     }
-    else
-    {
-        if (is_wide)
-            return LoadingScreenXML16x9;
-        return LoadingScreenXML;
-    }
+    // Call of Pripyat
+    if (is_wide)
+        return LoadingScreenXML16x9;
+    return LoadingScreenXML;
 }
 
 inline pcstr GetLoadingScreenTexturesDescr()
@@ -200,5 +198,4 @@ inline pcstr GetLoadingScreenTexturesDescr()
     }
     // Call of Pripyat
     return LoadingScreenXMLTexturesDescription;
-
 }
