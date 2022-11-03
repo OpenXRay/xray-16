@@ -198,7 +198,7 @@ inline pcstr GetLoadingScreenTexturesDescr()
     {
         return LoadingScreenXMLClearSkyTexturesDescription;
     }
-
+    // Call of Pripyat
     return LoadingScreenXMLTexturesDescription;
 
 }
