@@ -172,7 +172,7 @@ inline pcstr GetLoadingScreenXML()
             return LoadingScreenXML16x9ShadowOfChernobyl;
         return LoadingScreenXMLClearSky;
     }
-    if (xr_strcmp(loadingScreenType, "cs"))
+    if (xr_strcmp(loadingScreenType, "cs") == 0)
     {
         if (is_wide)
             return LoadingScreenXML16x9ClearSky;
