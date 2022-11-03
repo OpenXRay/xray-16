@@ -164,19 +164,21 @@ R"(<w>
 inline pcstr GetLoadingScreenXML()
 {
     const bool is_wide = UICore::is_widescreen();
-    const pcstr loadingScreenType = pSettingsOpenXRay->read_if_exists<pcstr>("gameplay", "loading_screen", "cop");
+    cpcstr loadingScreenType = pSettingsOpenXRay->read_if_exists<pcstr>("ui", "loading_screen", "cop");
 
-    if (loadingScreenType == "soc" || loadingScreenType == "shoc")
+    if (xr_strcmp(loadingScreenType, "soc") == 0 || xr_strcmp(loadingScreenType, "shoc") == 0)
     {
         if (is_wide)
             return LoadingScreenXML16x9ShadowOfChernobyl;
         return LoadingScreenXMLClearSky;
-    } else if (loadingScreenType == "cs")
+    }
+    else if (xr_strcmp(loadingScreenType, "cs"))
     {
         if (is_wide)
             return LoadingScreenXML16x9ClearSky;
         return LoadingScreenXMLClearSky;
-    } else
+    }
+    else
     {
         if (is_wide)
             return LoadingScreenXML16x9;
@@ -186,10 +188,16 @@ inline pcstr GetLoadingScreenXML()
 
 inline pcstr GetLoadingScreenTexturesDescr()
 {
-    const pcstr loadingScreenType = pSettingsOpenXRay->read_if_exists<pcstr>("gameplay", "loading_screen", "cop");
+    cpcstr loadingScreenType = pSettingsOpenXRay->read_if_exists<pcstr>("ui", "loading_screen", "cop");
 
-    if (loadingScreenType == "soc" || loadingScreenType == "shoc" || loadingScreenType == "cs")
+    if (xr_strcmp(loadingScreenType, "soc") == 0 || xr_strcmp(loadingScreenType, "shoc") == 0)
+    {
         return LoadingScreenXMLClearSkyTexturesDescription;
+    }
+    if (xr_strcmp(loadingScreenType, "cs") == 0)
+    {
+        return LoadingScreenXMLClearSkyTexturesDescription;
+    }
 
     return LoadingScreenXMLTexturesDescription;
 
