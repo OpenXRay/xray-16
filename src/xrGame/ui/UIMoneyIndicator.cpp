@@ -4,7 +4,7 @@
 #include "UIXmlInit.h"
 #include "UIGameLog.h"
 
-CUIMoneyIndicator::CUIMoneyIndicator()
+CUIMoneyIndicator::CUIMoneyIndicator() : CUIWindow("CUIMoneyIndicator")
 {
     AttachChild(&m_back);
     AttachChild(&m_money_amount);

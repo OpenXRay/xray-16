@@ -4,7 +4,7 @@
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/Static/UIStatic.h"
 
-UITeamPanels::UITeamPanels()
+UITeamPanels::UITeamPanels() : CUIWindow("UITeamPanels")
 {
     need_update_players = false;
     need_update_panels = false;

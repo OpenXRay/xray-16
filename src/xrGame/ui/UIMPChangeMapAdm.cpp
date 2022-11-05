@@ -10,7 +10,7 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "UIGameCustom.h"
 
-CUIMpChangeMapAdm::CUIMpChangeMapAdm()
+CUIMpChangeMapAdm::CUIMpChangeMapAdm() : CUIWindow("CUIMpChangeMapAdm")
 {
     map_pic = xr_new<CUIStatic>();
     map_pic->SetAutoDelete(true);
@@ -33,7 +33,6 @@ CUIMpChangeMapAdm::CUIMpChangeMapAdm()
     AttachChild(btn_ok);
 }
 
-CUIMpChangeMapAdm::~CUIMpChangeMapAdm() {}
 void CUIMpChangeMapAdm::Init(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "change_map_adm", 0, this);

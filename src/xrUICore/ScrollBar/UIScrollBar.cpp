@@ -6,7 +6,7 @@
 #include "XML/UITextureMaster.h"
 #include "Cursor/UICursor.h"
 
-CUIScrollBar::CUIScrollBar()
+CUIScrollBar::CUIScrollBar() : CUIWindow("CUIScrollBar")
 {
     m_iMinPos = 1;
     m_iMaxPos = 1;

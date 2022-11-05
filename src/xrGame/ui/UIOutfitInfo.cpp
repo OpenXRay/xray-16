@@ -38,7 +38,7 @@ constexpr cpcstr immunity_st_names[] =
     nullptr
 };
 
-CUIOutfitImmunity::CUIOutfitImmunity()
+CUIOutfitImmunity::CUIOutfitImmunity() : CUIWindow("CUIOutfitImmunity")
 {
     AttachChild(&m_name);
     AttachChild(&m_progress);
@@ -91,7 +91,7 @@ void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
 
 // ===========================================================================================
 
-CUIOutfitInfo::CUIOutfitInfo()
+CUIOutfitInfo::CUIOutfitInfo() : CUIWindow("CUIOutfitInfo")
 {
     m_Prop_line = nullptr;
     for (auto& item : m_items)

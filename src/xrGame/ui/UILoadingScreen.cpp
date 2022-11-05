@@ -17,7 +17,8 @@
 #include "xrUICore/XML/UITextureMaster.h"
 
 UILoadingScreen::UILoadingScreen()
-    : loadingProgress(nullptr), loadingProgressPercent(nullptr),
+    : CUIWindow("UILoadingScreen"),
+      loadingProgress(nullptr), loadingProgressPercent(nullptr),
       loadingLogo(nullptr),     loadingStage(nullptr),
       loadingHeader(nullptr),   loadingTipNumber(nullptr), loadingTip(nullptr)
 {

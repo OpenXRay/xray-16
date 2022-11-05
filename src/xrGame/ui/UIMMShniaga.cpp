@@ -43,7 +43,7 @@ void CUIMMMagnifer::ResetPPMode()
 
 ////////////////////////////////////////////
 
-CUIMMShniaga::CUIMMShniaga()
+CUIMMShniaga::CUIMMShniaga() : CUIWindow("CUIMMShniaga")
 {
     m_sound = xr_new<CMMSound>();
 

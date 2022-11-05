@@ -25,7 +25,7 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 #pragma warning(push)
 #pragma warning(disable : 4826) // XXX: Do something with that __int64 cast
 
-CUIMapList::CUIMapList()
+CUIMapList::CUIMapList() : CUIWindow("CUIMapList")
 {
     m_pMapInfo = NULL;
     m_pMapPic = NULL;

@@ -120,7 +120,7 @@ bool CUISequencer::Start(LPCSTR tutor_name)
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 
     m_name = tutor_name;
-    m_UIWindow = xr_new<CUIWindow>();
+    m_UIWindow = xr_new<CUIWindow>("Window");
 
     m_flags.set(etsPlayEachItem, !!uiXml.ReadInt("play_each_item", 0, 0));
     m_flags.set(etsPersistent, !!uiXml.Read("persistent", 0, 0));

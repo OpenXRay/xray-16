@@ -457,7 +457,7 @@ void CWeapon::Load(LPCSTR section)
         m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
         if (!GEnv.isDedicatedServer)
         {
-            m_UIScope = xr_new<CUIWindow>();
+            m_UIScope = xr_new<CUIWindow>("Scope UI");
             shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
             LoadScope(scope_tex_name);
         }

@@ -6,7 +6,7 @@
 #include "xrUICore/ScrollView/UIScrollView.h"
 #include "xrEngine/xr_level_controller.h"
 
-CUIKeyBinding::CUIKeyBinding() : m_isGamepadBinds(false)
+CUIKeyBinding::CUIKeyBinding() : CUIWindow("CUIKeyBinding"), m_isGamepadBinds(false)
 {
     for (u8 i = 0; i < 3; ++i)
         AttachChild(&m_header[i]);

@@ -53,8 +53,9 @@ using namespace InventoryUtilities;
 static constexpr pcstr MAININGAME_XML = "maingame.xml";
 
 CUIMainIngameWnd::CUIMainIngameWnd()
-    : /*m_pGrenade(NULL),m_pItem(NULL),*/ m_pPickUpItem(nullptr), m_pMPChatWnd(nullptr), UIArtefactIcon(nullptr),
-      m_pMPLogWnd(nullptr), UIArtefactPanel(nullptr)
+    : CUIWindow("CUIMainIngameWnd"), /*m_pGrenade(NULL),m_pItem(NULL),*/
+      UIArtefactPanel(nullptr), UIArtefactIcon(nullptr), m_pMPChatWnd(nullptr),
+      m_pMPLogWnd(nullptr), m_pPickUpItem(nullptr)
 
 {
     UIZoneMap = xr_new<CUIZoneMap>();

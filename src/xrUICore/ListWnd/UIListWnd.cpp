@@ -10,7 +10,7 @@
 // разделитель для интерактивных строк в листе
 static const char cSeparatorChar = '%';
 
-CUIListWnd::CUIListWnd()
+CUIListWnd::CUIListWnd() : CUIWindow("CUIListWnd")
 {
     m_ActiveBackgroundFrame = nullptr;
     m_bListActivity = true;

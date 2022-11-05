@@ -7,6 +7,7 @@
 #include "Level.h"
 
 CUIStatsPlayerInfo::CUIStatsPlayerInfo(xr_vector<PI_FIELD_INFO>* info, CGameFont* pF, u32 text_col)
+    : CUIWindow("CUIStatsPlayerInfo")
 {
     m_field_info = info;
 

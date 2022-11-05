@@ -262,7 +262,7 @@ void CUIGameCustom::Load()
     R_ASSERT(!PdaMenu);
     PdaMenu = xr_new<CUIPdaWnd>();
     R_ASSERT(!Window);
-    Window = xr_new<CUIWindow>();
+    Window = xr_new<CUIWindow>("Window");
     R_ASSERT(!UIMainIngameWnd);
     UIMainIngameWnd = xr_new<CUIMainIngameWnd>();
     UIMainIngameWnd->Init();

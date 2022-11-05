@@ -69,9 +69,9 @@ XRUICORE_API void draw_wnds_rects()
     g_focused_wnds_rects.clear();
 }
 
-CUIWindow::CUIWindow()
-    : m_pParentWnd(NULL), m_pMouseCapturer(NULL), m_pMessageTarget(NULL), m_pKeyboardCapturer(NULL),
-      m_bAutoDelete(false), m_bCursorOverWindow(false), m_dwFocusReceiveTime(0), m_bCustomDraw(false)
+CUIWindow::CUIWindow(pcstr window_name)
+    : m_windowName(window_name), m_pParentWnd(NULL), m_pMouseCapturer(NULL), m_pKeyboardCapturer(NULL), m_pMessageTarget(NULL),
+      m_dwFocusReceiveTime(0), m_bAutoDelete(false), m_bCursorOverWindow(false), m_bCustomDraw(false)
 {
     Show(true);
     Enable(true);

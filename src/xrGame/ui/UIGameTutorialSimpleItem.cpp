@@ -99,7 +99,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     }
 
     // ui-components
-    m_UIWindow = xr_new<CUIWindow>();
+    m_UIWindow = xr_new<CUIWindow>("Window");
     m_UIWindow->SetAutoDelete(false);
     XML_NODE _lsr = xml->GetLocalRoot();
 

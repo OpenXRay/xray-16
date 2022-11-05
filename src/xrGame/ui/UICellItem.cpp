@@ -331,7 +331,7 @@ void CUICellItem::SetCustomDraw(ICustomDrawCellItem* c)
 
 // -------------------------------------------------------------------------------------------------
 
-CUIDragItem::CUIDragItem(CUICellItem* parent)
+CUIDragItem::CUIDragItem(CUICellItem* parent) : CUIWindow("CUIDragItem")
 {
     m_custom_draw = NULL;
     m_back_list = NULL;

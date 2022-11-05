@@ -16,6 +16,7 @@
 LPCSTR GameTypeToStringEx(u32 gt, bool bShort);
 
 CServerList::CServerList()
+    : CUIWindow("CServerList")
 {
 #ifdef XR_PLATFORM_WINDOWS
     CGameSpy_BrowsersWrapper::UpdateCallback updateCb;

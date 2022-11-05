@@ -1,13 +1,15 @@
 #pragma once
 #include "xrUICore/Static/UIStatic.h"
 
-class CUIPdaMsgListItem : public CUIColorAnimConrollerContainer
+class CUIPdaMsgListItem final : public CUIColorAnimConrollerContainer
 {
-    typedef CUIColorAnimConrollerContainer inherited;
+    using inherited = CUIColorAnimConrollerContainer;
 
 public:
+    CUIPdaMsgListItem() : CUIColorAnimConrollerContainer("CUIPdaMsgListItem") {}
+
     void InitPdaMsgListItem(const Fvector2& size);
-    virtual void SetFont(CGameFont* pFont);
+    void SetFont(CGameFont* pFont) override;
 
     CUIStatic UIIcon;
     CUITextWnd UITimeText;

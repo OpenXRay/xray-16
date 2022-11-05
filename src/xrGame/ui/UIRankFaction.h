@@ -15,7 +15,7 @@ class CUITextWnd;
 class CUIProgressBar;
 class CActor;
 
-class CUIRankFaction : public CUIWindow
+class CUIRankFaction final : public CUIWindow
 {
     FactionState m_faction_state;
 
@@ -47,7 +47,6 @@ class CUIRankFaction : public CUIWindow
 public:
     CUIRankFaction();
     CUIRankFaction(shared_str const& faction_id);
-    virtual ~CUIRankFaction();
 
     void init_from_xml(CUIXml& xml);
     void rating(u8 new_sn, bool force = false);

@@ -17,7 +17,8 @@
 
 
 CUITalkDialogWnd::CUITalkDialogWnd()
-    : m_uiXml(nullptr),
+    : CUIWindow("CUITalkDialogWnd"),
+      m_uiXml(nullptr),
       m_pParent(nullptr),
       mechanic_mode(false),
       m_ClickedQuestionID(""),
@@ -34,6 +35,7 @@ CUITalkDialogWnd::CUITalkDialogWnd()
       m_uOurReplicsColor(0) {}
 
 CUITalkDialogWnd::~CUITalkDialogWnd() { xr_delete(m_uiXml); }
+
 void CUITalkDialogWnd::InitTalkDialogWnd()
 {
     constexpr pcstr TALK_XML = "talk.xml";
@@ -340,6 +342,7 @@ void CUITalkDialogWnd::UpdateButtonsLayout(bool b_disable_break, bool trade_enab
 
 void CUIQuestionItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 CUIQuestionItem::CUIQuestionItem(CUIXml* xml_doc, LPCSTR path)
+    : CUIWindow("CUIQuestionItem")
 {
     CUIXmlInit::InitWindow(*xml_doc, path, 0, this);
 
@@ -372,6 +375,7 @@ void CUIQuestionItem::OnTextClicked(CUIWindow* w, void*)
 }
 
 CUIAnswerItem::CUIAnswerItem(CUIXml* xml_doc, LPCSTR path)
+    : CUIWindow("CUIAnswerItem")
 {
     CUIXmlInit::InitWindow(*xml_doc, path, 0, this);
 

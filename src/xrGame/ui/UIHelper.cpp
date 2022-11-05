@@ -26,7 +26,7 @@ CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* 
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = xr_new<CUIWindow>();
+    auto ui = xr_new<CUIWindow>("<noname>");
     if (!CUIXmlInit::InitWindow(xml, ui_path, 0, ui, critical) && !critical)
     {
         xr_delete(ui);
