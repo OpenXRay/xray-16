@@ -255,7 +255,7 @@ void CUIActorMenu::Update()
     case mmDeadBodySearch:
     {
         // Alundaio: remove distance check when opening inventory boxes
-        //CheckDistance(); 
+        //CheckDistance();
         break;
     }
     default: R_ASSERT(0); break;
@@ -941,13 +941,13 @@ bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_
         return true;
     }
 
-    if (item_slot == INV_SLOT_3 && l == m_pLists[eInventoryPistolList])
+    if (item_slot == INV_SLOT_3 && l == m_pLists[eInventoryPistolList] && CallOfPripyatMode)
     {
         ret_slot = INV_SLOT_2;
         return true;
     }
 
-    if (item_slot == INV_SLOT_2 && l == m_pLists[eInventoryAutomaticList])
+    if (item_slot == INV_SLOT_2 && l == m_pLists[eInventoryAutomaticList] && CallOfPripyatMode)
     {
         ret_slot = INV_SLOT_3;
         return true;
