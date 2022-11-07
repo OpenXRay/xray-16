@@ -242,6 +242,8 @@ IC void volume_lerp(float& c, float t, float s, float dt)
 
 bool CSoundRender_Emitter::update_culling(float dt)
 {
+    float fAttFactor = 1.0f; //--#SM+#--
+
     if (b2D)
     {
         occluder_volume = 1.f;
@@ -274,15 +276,30 @@ bool CSoundRender_Emitter::update_culling(float dt)
             SoundRender->get_occlusion(p_source.position, .2f, occluder);
         volume_lerp(occluder_volume, occ, 1.f, dt);
         clamp(occluder_volume, 0.f, 1.f);
+
+        // Calc linear fade --#SM+#--
+        // https://www.desmos.com/calculator/lojovfugle
+        const float fMinDistDiff = dist - p_source.min_distance;
+        if (fMinDistDiff > 0.0f)
+        {
+            const float fMaxDistDiff = p_source.max_distance - p_source.min_distance;
+            fAttFactor = pow(1.0f - (fMinDistDiff / fMaxDistDiff), psSoundLinearFadeFactor);
+        }
     }
     clamp(fade_volume, 0.f, 1.f);
+
     // Update smoothing
     smooth_volume = .9f * smooth_volume +
         .1f * (p_source.base_volume * p_source.volume *
                   (owner_data->s_type == st_Effect ? psSoundVEffects * psSoundVFactor : psSoundVMusic) *
                   occluder_volume * fade_volume);
+
+    // Add linear fade --#SM+#--
+    smooth_volume *= fAttFactor;
+
     if (smooth_volume < psSoundCull)
         return FALSE; // allow volume to go up
+
     // Here we has enought "PRIORITY" to be soundable
     // If we are playing already, return OK
     // --- else check availability of resources
