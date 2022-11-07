@@ -18,6 +18,14 @@ void CSoundRender_Emitter::set_position(const Fvector& pos)
     bMoved = true;
 }
 
+void CSoundRender_Emitter::set_frequency(float scale)
+{
+    VERIFY(_valid(scale));
+    p_source.freq = scale;
+    if (!fis_zero(fTimeToStop) && fTimeToStop != 0xffffffff)
+        fTimeToStop = SoundRender->fTimer_Value + ((get_length_sec() - (SoundRender->fTimer_Value - fTimeStarted)) / (scale * psSoundTimeFactor));
+}
+
 CSoundRender_Emitter::CSoundRender_Emitter()
 {
 #ifdef DEBUG

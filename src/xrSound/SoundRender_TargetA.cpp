@@ -181,10 +181,15 @@ void CSoundRender_TargetA::fill_parameters()
     VERIFY2(m_pEmitter, SE->source()->file_name());
     float _pitch = m_pEmitter->p_source.freq;
     clamp(_pitch, EPS_L, 2.f);
-    if (!fsimilar(_pitch, cache_pitch))
+    if (!fsimilar(cache_pitch, _pitch * psSoundTimeFactor))
     {
-        cache_pitch = _pitch;
-        A_CHK(alSourcef(pSource, AL_PITCH, _pitch));
+        cache_pitch = _pitch * psSoundTimeFactor;
+
+        // Only update time to stop for non-looped sounds
+        if (!m_pEmitter->iPaused && (m_pEmitter->m_current_state == CSoundRender_Emitter::stStarting || m_pEmitter->m_current_state == CSoundRender_Emitter::stPlaying || m_pEmitter->m_current_state == CSoundRender_Emitter::stSimulating))
+            m_pEmitter->fTimeToStop = SoundRender->fTimer_Value + ((m_pEmitter->get_length_sec() - (SoundRender->fTimer_Value - m_pEmitter->fTimeStarted)) / cache_pitch);
+
+        A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
     }
     VERIFY2(m_pEmitter, SE->source()->file_name());
 }
