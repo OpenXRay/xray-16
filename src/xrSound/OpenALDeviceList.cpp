@@ -87,7 +87,7 @@ void ALDeviceList::IterateAndAddDevicesString(pcstr devices)
                         addedDevice.props.eax = 5;
 
                     addedDevice.props.efx = alcIsExtensionPresent(device, "ALC_EXT_EFX") == AL_TRUE;
-                    addedDevice.props.xram = alIsExtensionPresent("EAX_RAM") == AL_TRUE;
+                    addedDevice.props.xram = alIsExtensionPresent("EAX-RAM") == AL_TRUE;
                 }
                 alcDestroyContext(context);
             }
