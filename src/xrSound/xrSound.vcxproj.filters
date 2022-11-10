@@ -78,6 +78,9 @@
     <ClInclude Include="SoundRender_EffectsA_EAX.h">
       <Filter>Effects\OpenAL</Filter>
     </ClInclude>
+    <ClInclude Include="SoundRender_EffectsA_EFX.h">
+      <Filter>Effects\OpenAL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="guids.cpp">
@@ -138,6 +141,9 @@
       <Filter>Cache</Filter>
     </ClCompile>
     <ClCompile Include="SoundRender_EffectsA_EAX.cpp">
+      <Filter>Effects\OpenAL</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundRender_EffectsA_EFX.cpp">
       <Filter>Effects\OpenAL</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,13 +4,18 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
 
+#if __has_include(<openal/efx.h>)
+#   include <openal/efx.h>
+#endif
+
 xr_vector<u8> g_target_temp_data;
 
-CSoundRender_TargetA::CSoundRender_TargetA() : CSoundRender_Target()
+CSoundRender_TargetA::CSoundRender_TargetA(ALuint slot) : CSoundRender_Target()
 {
     cache_gain = 0.f;
     cache_pitch = 1.f;
     pSource = 0;
+    pAuxSlot = slot;
     buf_block = 0;
 }
 
@@ -30,6 +35,10 @@ bool CSoundRender_TargetA::_initialize()
         A_CHK(alSourcef(pSource, AL_MAX_GAIN, 1.f));
         A_CHK(alSourcef(pSource, AL_GAIN, cache_gain));
         A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
+#if __has_include(<openal/efx.h>)
+        if (pAuxSlot != ALuint(-1))
+            A_CHK(alSource3i(pSource, AL_AUXILIARY_SEND_FILTER, pAuxSlot, 0, AL_FILTER_NULL));
+#endif
         return true;
     }
     Msg("! sound: OpenAL: Can't create source. Error: %s.", static_cast<pcstr>(alGetString(error)));

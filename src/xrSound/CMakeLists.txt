@@ -32,6 +32,8 @@ set(EFFECTS_SRC
 set(EFFECTS_OPENAL_SRC
     "SoundRender_EffectsA_EAX.cpp"
     "SoundRender_EffectsA_EAX.h"
+    "SoundRender_EffectsA_EFX.cpp"
+    "SoundRender_EffectsA_EFX.h"
 )
 
 set(EMITTER_SRC
