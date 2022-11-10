@@ -11,29 +11,36 @@
 #endif
 
 #ifdef DEBUG
-#define A_CHK(expr)                                                \
-    {                                                              \
-        alGetError();                                              \
-        expr;                                                      \
-        ALenum err_ = alGetError();                               \
+#define A_CHK(expr)                                             \
+    do                                                          \
+    {                                                           \
+        alGetError();                                           \
+        expr;                                                   \
+        ALenum err_ = alGetError();                             \
         VERIFY2(err_ == AL_NO_ERROR, (pcstr)alGetString(err_)); \
-    }
-#define AC_CHK(expr)                                                          \
-    {                                                                         \
-        alcGetError(pDevice);                                                 \
-        expr;                                                                 \
-        ALCenum err_ = alcGetError(pDevice);                                 \
+    } while (false)
+
+#define AC_CHK(expr)                                                       \
+    do                                                                     \
+    {                                                                      \
+        alcGetError(pDevice);                                              \
+        expr;                                                              \
+        ALCenum err_ = alcGetError(pDevice);                               \
         VERIFY2(err_ == ALC_NO_ERROR, (pcstr)alcGetString(pDevice, err_)); \
-    }
+    } while (false)
+
 #else
 #define A_CHK(expr) \
+    do              \
     {               \
         expr;       \
-    }
+    } while (false)
+
 #define AC_CHK(expr) \
+    do               \
     {                \
         expr;        \
-    }
+    } while (false)
 #endif
 
 class ALDeviceList;
