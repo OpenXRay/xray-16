@@ -25,6 +25,15 @@ set(CORE_OPENAL_SRC
 #    "SoundRender_CoreD.h"
 #)
 
+set(EFFECTS_SRC
+    "SoundRender_Effects.h"
+)
+
+set(EFFECTS_OPENAL_SRC
+    "SoundRender_EffectsA_EAX.cpp"
+    "SoundRender_EffectsA_EAX.h"
+)
+
 set(EMITTER_SRC
     "SoundRender_Emitter.cpp"
     "SoundRender_Emitter.h"
@@ -84,6 +93,8 @@ source_group("Cache" FILES ${CACHE_SRC})
 source_group("Core" FILES ${CORE_SRC})
 source_group("Core\\OpenAL" FILES ${CORE_OPENAL_SRC})
 #source_group("Core\\DirectSound" FILES ${CORE_DIRECTSOUND_SRC})
+source_group("Effects" FILES ${EFFECTS_SRC})
+source_group("Effects\\OpenAL" FILES ${EFFECTS_OPENAL_SRC})
 source_group("Emitter" FILES ${EMITTER_SRC})
 source_group("Environment" FILES ${ENVIRONMENT_SRC})
 source_group("Kernel" FILES ${KERNEL_SRC})
@@ -97,6 +108,8 @@ add_library(${PROJECT_NAME} SHARED
     ${CORE_SRC}
     ${CORE_OPENAL_SRC}
     #${CORE_DIRECTSOUND_SRC}
+    ${EFFECTS_SRC}
+    ${EFFECTS_OPENAL_SRC}
     ${EMITTER_SRC}
     ${ENVIRONMENT_SRC}
     ${KERNEL_SRC}
