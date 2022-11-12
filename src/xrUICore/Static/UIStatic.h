@@ -33,7 +33,7 @@ private:
     void EnableHeading_int(bool b) { m_bHeading = b; }
 public:
     CUIStatic();
-    virtual ~CUIStatic();
+    ~CUIStatic() override;
 
     virtual void Draw();
     virtual void Update();

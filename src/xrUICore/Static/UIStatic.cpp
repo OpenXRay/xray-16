@@ -35,6 +35,7 @@ CUIStatic::CUIStatic()
 }
 
 CUIStatic::~CUIStatic() { xr_delete(m_pTextControl); }
+
 void CUIStatic::SetXformLightAnim(LPCSTR lanim, bool bCyclic)
 {
     if (lanim && lanim[0] != 0)
