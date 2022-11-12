@@ -8,7 +8,6 @@
 
 #include "pch_script.h"
 #include "Common/object_broker.h"
-#include "string_table.h"
 
 #include "UIInvUpgrade.h"
 
@@ -22,7 +21,8 @@
 
 #include "UIInventoryUpgradeWnd.h"
 
-UIUpgrade::UIUpgrade(CUIInventoryUpgradeWnd* parent_wnd, bool cellBorder) : m_point(NULL)
+UIUpgrade::UIUpgrade(CUIInventoryUpgradeWnd* parent_wnd, bool cellBorder)
+    : CUIWindow("UIInvUpgrade"), m_point(nullptr)
 {
     VERIFY(parent_wnd);
     m_parent_wnd = parent_wnd;
@@ -390,6 +390,7 @@ void UIUpgrade::update_item(CInventoryItem* inv_item)
         m_state_lock = true;
         break;
     case inventory::upgrade::result_e_precondition_money:
+    case inventory::upgrade::result_e_cant_do:
         m_state = STATE_DISABLED_PREC_MONEY;
         m_state_lock = false;
         break;

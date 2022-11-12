@@ -354,7 +354,7 @@ void CLevel::CatchStartingSpawns()
     tmp_msg_filter->filter(M_SPAWN, fake_sub_msg, spawns_catcher);
 }
 
-void __stdcall CLevel::MSpawnsCatchCallback(u32 message, u32 subtype, NET_Packet& packet)
+void CLevel::MSpawnsCatchCallback(u32 message, u32 subtype, NET_Packet& packet)
 {
     // see SimulateServerUpdate and using of message_filter
     m_starting_spawns_pos = m_prev_packet_pos;

@@ -48,7 +48,7 @@ protected:
 };
 
 template <class T>
-CUIInteractiveBackground<T>::CUIInteractiveBackground()
+CUIInteractiveBackground<T>::CUIInteractiveBackground() : CUIWindow("CUIInteractiveBackground")
 {
     ZeroMemory(m_states, S_Total * sizeof(T*));
 }

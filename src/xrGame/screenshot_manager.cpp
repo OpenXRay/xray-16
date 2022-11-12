@@ -5,32 +5,10 @@
 #include "xrCore/Compression/ppmd_compressor.h"
 #include "screenshots_writer.h"
 
-#ifdef DEBUG
-#define CXIMAGE_AS_SHARED_LIBRARY
+#if __has_include("ximage.h")
+#   include "ximage.h"
+#   include "xmemfile.h"
 #endif
-
-#ifdef XR_PLATFORM_WINDOWS
-#include <ddraw.h>
-#endif
-
-#include "ximage.h"
-#include "xmemfile.h"
-
-void* cxalloc(size_t size) { return xr_malloc(size); }
-void cxfree(void* ptr) { xr_free(ptr); }
-void* cxrealloc(void* ptr, size_t size) { return xr_realloc(ptr, size); }
-/*
-void jpeg_encode_callback(long progress)
-{
-#ifdef DEBUG
-    Msg("* JPEG encoding progress : %d%%", progress);
-#endif
-    if (progress % 5 == 0)
-    {
-        if (!SwitchToThread())
-            Sleep(10);
-    }
-}*/
 
 screenshot_manager::screenshot_manager()
 {
@@ -56,7 +34,7 @@ screenshot_manager::~screenshot_manager()
     xr_free(m_buffer_for_compress);
     if (m_make_start_event)
     {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // FIXME!!!
         SetEvent(m_make_start_event);
         WaitForSingleObject(m_make_done_event, INFINITE); // thread stoped
         CloseHandle(m_make_done_event);
@@ -112,6 +90,7 @@ void screenshot_manager::prepare_image()
 
 void screenshot_manager::make_jpeg_file()
 {
+#if __has_include("ximage.h")
     u32* sizes = reinterpret_cast<u32*>(m_result_writer.pointer());
     u32 width = *sizes;
     u32 height = *(++sizes);
@@ -133,8 +112,13 @@ void screenshot_manager::make_jpeg_file()
 
     m_jpeg_buffer_size = static_cast<u32>(tmp_mem_file.Tell());
 
-#ifdef DEBUG
+#   ifdef DEBUG
     Msg("* JPEG encoded to %d bytes", m_jpeg_buffer_size);
+#   endif
+#else
+    m_jpeg_buffer = nullptr;
+    m_jpeg_buffer_size = 0;
+    VERIFY(!"Not implemented.");
 #endif
 }
 
@@ -167,7 +151,7 @@ void screenshot_manager::shedule_Update(u32 dt)
         }
         else
         {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // FIXME!!!
             u32 thread_result = WaitForSingleObject(m_make_done_event, 0);
             R_ASSERT((thread_result != WAIT_ABANDONED) && (thread_result != WAIT_FAILED));
             if (thread_result == WAIT_OBJECT_0)
@@ -199,8 +183,8 @@ void screenshot_manager::shedule_Update(u32 dt)
                     }
                 }
         #endif //#ifdef DEBUG*/
+#ifdef XR_PLATFORM_WINDOWS // FIXME!!!
         ULONG_PTR process_affinity_mask, tmp_dword;
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
         GetProcessAffinityMask(GetCurrentProcess(), &process_affinity_mask, &tmp_dword);
         process_screenshot(btwCount1(static_cast<u32>(process_affinity_mask)) == 1);
 #endif
@@ -256,7 +240,7 @@ void screenshot_manager::set_draw_downloads(bool draw)
 
 void screenshot_manager::process_screenshot(bool singlecore)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // FIXME!!!
     if (m_make_start_event)
     {
         SetEvent(m_make_start_event);
@@ -267,7 +251,7 @@ void screenshot_manager::process_screenshot(bool singlecore)
 #endif
     Threading::SpawnThread(&screenshot_manager::screenshot_maker_thread, "screenshot_maker", 0, this);
 }
-void __stdcall screenshot_manager::jpeg_compress_cb(long progress)
+void screenshot_manager::jpeg_compress_cb(long progress)
 {
     /*#ifdef DEBUG
         Msg("* JPEG encoding progress : %d%%", progress);
@@ -282,7 +266,7 @@ void __stdcall screenshot_manager::jpeg_compress_cb(long progress)
 void screenshot_manager::screenshot_maker_thread(void* arg_ptr)
 {
     screenshot_manager* this_ptr = static_cast<screenshot_manager*>(arg_ptr);
-#ifndef XR_PLATFORM_LINUX // FIXME!!
+#ifdef XR_PLATFORM_WINDOWS // FIXME!!
     u32 wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {

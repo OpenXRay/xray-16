@@ -3,13 +3,14 @@
 
 #include "xrCore/Animation/Bone.hpp"
 #include "xrCore/Animation/Envelope.hpp"
-#include "xrEngine/GameMtlLib.h"
 
 void SJointIKData::clamp_by_limits(Fvector& dest_xyz)
 {
     switch (type)
     {
-    case jtRigid: dest_xyz.set(0.f, 0.f, 0.f); break;
+    case jtRigid:
+        dest_xyz.set(0.f, 0.f, 0.f);
+        break;
     case jtJoint:
         clamp(dest_xyz.x, limits[0].limit.x, limits[0].limit.y);
         clamp(dest_xyz.y, limits[1].limit.x, limits[1].limit.y);
@@ -215,6 +216,7 @@ void CBone::BoneMove(const Fvector& _amount)
     switch (IK_data.type)
     {
     case jtSlider:
+    {
         amount.x = 0.f;
         amount.y = 0.f;
         rest_i_transform.transform(mot_offset);
@@ -222,6 +224,7 @@ void CBone::BoneMove(const Fvector& _amount)
         clamp(mot_offset.z, rest_offset.z + IK_data.limits[0].limit.x, rest_offset.z + IK_data.limits[0].limit.y);
         rest_transform.transform(mot_offset);
         break;
+    }
     } // XXX: other cases are missing
 }
 

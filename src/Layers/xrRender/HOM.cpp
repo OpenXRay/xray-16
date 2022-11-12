@@ -4,8 +4,7 @@
 
 #include "stdafx.h"
 
-#include <tbb/blocked_range.h>
-#include <tbb/parallel_for.h>
+#include "xrCore/Threading/ParallelFor.hpp"
 
 #include "HOM.h"
 #include "occRasterizer.h"
@@ -13,19 +12,6 @@
 #include "xrEngine/PerformanceAlert.hpp"
 
 float psOSSR = .001f;
-
-void __stdcall CHOM::MT_RENDER()
-{
-    MT.Enter();
-    if (MT_frame_rendered != Device.dwFrame)
-    {
-        CFrustum ViewBase;
-        ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-        Enable();
-        Render(ViewBase);
-    }
-    MT.Leave();
-}
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -100,7 +86,9 @@ void CHOM::Load()
     // Create RASTER-triangles
     m_pTris = xr_alloc<occTri>(u32(CL.getTS()));
 
-    FOR_START(u32, 0, CL.getTS(), it)
+    xr_parallel_for(TaskRange<u32>(0, CL.getTS()), [&](const TaskRange<u32>& range)
+    {
+        for (u32 it = range.begin(); it != range.end(); ++it)
         {
             CDB::TRI& clT = CL.getT()[it];
             occTri& rT = m_pTris[it];
@@ -120,12 +108,12 @@ void CHOM::Load()
             rT.skip = 0;
             rT.center.add(v0, v1).add(v2).div(3.f);
         }
-    FOR_END
+    });
 
     // Create AABB-tree
     m_pModel = xr_new<CDB::MODEL>();
     m_pModel->set_version(fs->get_age());
-    bool bUseCache = strstr(Core.Params, "-cdb_cache");
+    bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
 
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
     FS.update_path(fName, "$app_data_root$", fName);
@@ -185,23 +173,24 @@ void CHOM::Render_DB(CFrustum& base)
 {
     // Update projection matrices on every frame to ensure valid HOM culling
     float view_dim = occ_dim_0;
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         view_dim / 2.f + 0 + 0, view_dim / 2.f + 0 + 0, 0.0f, 1.0f};
     Fmatrix m_viewport_01 = {1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         1.f / 2.f + 0 + 0, 1.f / 2.f + 0 + 0, 0.0f, 1.0f};
-#else
+#elif defined(USE_OGL)
     Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         view_dim / 2.f + 0 + 0, view_dim / 2.f + 0 + 0, 0.0f, 1.0f};
     Fmatrix m_viewport_01 = {1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         1.f / 2.f + 0 + 0, 1.f / 2.f + 0 + 0, 0.0f, 1.0f};
-#endif // !USE_OGL
+#else
+#   error No graphics API selected or enabled!
+#endif
     m_xform.mul(m_viewport, Device.mFullTransform);
     m_xform_01.mul(m_viewport_01, Device.mFullTransform);
 
     // Query DB
-    xrc.frustum_options(0);
-    xrc.frustum_query(m_pModel, base);
+    xrc.frustum_query(0, m_pModel, base);
     if (0 == xrc.r_count())
         return;
 
@@ -278,8 +267,15 @@ void CHOM::Render(CFrustum& base)
     Raster.clear();
     Render_DB(base);
     Raster.propagade();
-    MT_frame_rendered = Device.dwFrame;
     stats.Total.End();
+}
+
+void CHOM::MT_RENDER(Task& /*thisTask*/, void* /*data*/)
+{
+    CFrustum ViewBase;
+    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+    Enable();
+    Render(ViewBase);
 }
 
 ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, float _x, float _y, float _z)
@@ -451,10 +447,10 @@ void CHOM::OnRender()
             // draw solid
             Device.SetNearer(TRUE);
             RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
             RCache.set_c("tfactor", float(color_get_R(0x80FFFFFF)) / 255.f, float(color_get_G(0x80FFFFFF)) / 255.f, \
                 float(color_get_B(0x80FFFFFF)) / 255.f, float(color_get_A(0x80FFFFFF)) / 255.f);
-#endif // !USE_DX9
+#endif
             RCache.dbg_Draw(D3DPT_TRIANGLELIST, &*poly.begin(), poly.size() / 3);
             Device.SetNearer(FALSE);
             // draw wire
@@ -467,9 +463,9 @@ void CHOM::OnRender()
                 Device.SetNearer(TRUE);
             }
             RCache.set_Shader(RImplementation.m_SelectionShader);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
             RCache.set_c("tfactor", 1.f, 1.f, 1.f, 1.f);
-#endif // !USE_DX9
+#endif
             RCache.dbg_Draw(D3DPT_LINELIST, &*line.begin(), line.size() / 2);
             if (bDebug)
             {

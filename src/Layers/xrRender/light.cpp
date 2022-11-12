@@ -79,14 +79,13 @@ void light::set_texture(LPCSTR name)
     s_volumetric.create("accum_volumetric", name);
 #else //    (RENDER!=R_R3) && (RENDER!=R_R4) && (RENDER!=R_GL)
     s_volumetric.create("accum_volumetric_nomsaa", name);
-    if (RImplementation.o.dx10_msaa)
+    if (RImplementation.o.msaa)
     {
-        int bound = 1;
+        u32 bound = 1;
+        if (!RImplementation.o.msaa_opt)
+            bound = RImplementation.o.msaa_samples;
 
-        if (!RImplementation.o.dx10_msaa_opt)
-            bound = RImplementation.o.dx10_msaa_samples;
-
-        for (int i = 0; i < bound; ++i)
+        for (u32 i = 0; i < bound; ++i)
         {
             s_spot_msaa[i].create(RImplementation.Target->b_accum_spot_msaa[i],
                 strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name), name);
@@ -314,11 +313,9 @@ void light::xform_calc()
     }
 }
 
-// +X, -X, +Y, -Y, +Z, -Z
-static Fvector cmNorm[6] = {
-    {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, -1.f}, {0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}};
-static Fvector cmDir[6] = {
-    {1.f, 0.f, 0.f}, {-1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, -1.f, 0.f}, {0.f, 0.f, 1.f}, {0.f, 0.f, -1.f}};
+//                           +X,                -X,                +Y,                 -Y,                +Z,                -Z
+Fvector cmNorm[6] = { { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, -1.f }, { 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f } };
+Fvector cmDir [6] = { { 1.f, 0.f, 0.f }, {-1.f, 0.f, 0.f }, { 0.f, 1.f,  0.f }, { 0.f,-1.f, 0.f }, { 0.f, 0.f, 1.f }, { 0.f, 0.f,-1.f } };
 
 void light::Export(light_Package& package)
 {
@@ -351,12 +348,12 @@ void light::Export(light_Package& package)
 
 // Holger - do we need to export msaa stuff as well ?
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-                if (RImplementation.o.dx10_msaa)
+                if (RImplementation.o.msaa)
                 {
                     int bound = 1;
 
-                    if (!RImplementation.o.dx10_msaa_opt)
-                        bound = RImplementation.o.dx10_msaa_samples;
+                    if (!RImplementation.o.msaa_opt)
+                        bound = RImplementation.o.msaa_samples;
 
                     for (int i = 0; i < bound; ++i)
                     {

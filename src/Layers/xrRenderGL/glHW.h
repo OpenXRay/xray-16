@@ -2,10 +2,10 @@
 
 #include "Layers/xrRender/HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
-#include "SDL.h"
-#include "SDL_syswm.h"
 
 class CHW
+    : public pureAppActivate,
+      public pureAppDeactivate
 {
 public:
     CHW();
@@ -29,19 +29,25 @@ public:
     void EndScene();
     void Present();
 
+public:
+    void OnAppActivate() override;
+    void OnAppDeactivate() override;
+
 private:
     void UpdateViews();
     bool ThisInstanceIsGlobal() const;
+
+public:
+    void BeginPixEvent(pcstr name) const;
+    void EndPixEvent() const;
 
 public:
     CHWCaps Caps;
 
     u32 BackBufferCount{};
     u32 CurrentBackBuffer{};
-
-    CHW* pDevice;
-    GLuint pPP;
-    GLuint pFB;
+    
+    GLuint pFB{};
 
     SDL_Window* m_window{};
     SDL_Window* m_helper_window{};
@@ -53,6 +59,7 @@ public:
     pcstr OpenGLVersionString;
     pcstr ShadingVersion;
     std::pair<GLint, GLint> OpenGLVersion;
+    bool SeparateShaderObjectsSupported;
     bool ShaderBinarySupported;
     bool ComputeShadersSupported;
 };

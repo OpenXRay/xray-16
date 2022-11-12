@@ -88,7 +88,7 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
 
     CUIXmlInit::InitWindow(uiXml, buff, 0, this);
 
-    m_wrk_area = xr_new<CUIWindow>();
+    m_wrk_area = xr_new<CUIWindow>("Work area");
 
     xr_sprintf(buff, "%s:wrk_area", p->ui_xml_tag());
 

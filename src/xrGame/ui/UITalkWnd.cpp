@@ -10,8 +10,7 @@
 #include "PhraseDialog.h"
 #include "PhraseDialogManager.h"
 #include "game_cl_base.h"
-#include "string_table.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrEngine/CameraBase.h"
 #include "UIXmlInit.h"
 #include "xrUICore/Buttons/UI3tButton.h"
@@ -201,6 +200,13 @@ void CUITalkWnd::Update()
             HideDialog();
     }
 
+    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
+    if (pGameSP)
+    {
+        if (pGameSP->TopInputReceiver() == this && !UITalkDialogWnd->IsShown())
+            UITalkDialogWnd->Show();
+    }
+
     if (m_bNeedToUpdateQuestions)
     {
         UpdateQuestions();
@@ -214,7 +220,7 @@ void CUITalkWnd::Update()
     {
         CGameObject* pOtherGO = smart_cast<CGameObject*>(m_pOthersInvOwner);
         Fvector P = pOtherGO->Position();
-        P.y += 1.8f;
+        P.y += 1.8f; // XXX: get head bone position or maybe even track this automatically in the sound system, if possible. Look at CUITalkWnd::PlaySnd()
         m_sound.set_position(P);
     }
 }
@@ -304,7 +310,7 @@ void CUITalkWnd::AddAnswer(const shared_str& text, LPCSTR SpeakerName)
     }
     PlaySnd(text.c_str());
 
-    bool i_am = (0 == xr_strcmp(SpeakerName, m_pOurInvOwner->Name()));
+    bool i_am = (0 == xr_strcmp(SpeakerName, m_pOurInvOwner->Name())); // XXX: not reliable when both persons have same names
     UITalkDialogWnd->AddAnswer(SpeakerName, *StringTable().translate(text), i_am);
 }
 
@@ -315,12 +321,11 @@ void CUITalkWnd::SwitchToTrade()
         CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
         if (pGameSP)
         {
-            /*			if ( pGameSP->MainInputReceiver() )
-                        {
-                            pGameSP->MainInputReceiver()->HideDialog();
-                        }*/
+            UITalkDialogWnd->Hide();
+            StopSnd();
+
             pGameSP->StartTrade(m_pOurInvOwner, m_pOthersInvOwner);
-        } // pGameSP
+        }
     }
 }
 
@@ -331,10 +336,9 @@ void CUITalkWnd::SwitchToUpgrade()
         CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
         if (pGameSP)
         {
-            /*			if ( pGameSP->MainInputReceiver() )
-                        {
-                            pGameSP->MainInputReceiver()->HideDialog();
-                        }*/
+            UITalkDialogWnd->Hide();
+            StopSnd();
+
             pGameSP->StartUpgrade(m_pOurInvOwner, m_pOthersInvOwner);
         }
     }
@@ -354,10 +358,14 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         }
         else if (IsBinded(kSPRINT_TOGGLE, dik))
         {
-            if (UITalkDialogWnd->mechanic_mode)
-                SwitchToUpgrade();
-            else
-                SwitchToTrade();
+            if (!m_pOthersInvOwner->NeedOsoznanieMode())
+            {
+                if (UITalkDialogWnd->mechanic_mode)
+                    SwitchToUpgrade();
+                else
+                    SwitchToTrade();
+                return true;
+            }
         }
     }
 
@@ -396,7 +404,7 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
         {
             CGameObject* pOtherGO = smart_cast<CGameObject*>(m_pOthersInvOwner);
             Fvector P = pOtherGO->Position();
-            P.y += 1.8f;
+            P.y += 1.8f; // XXX: check if we can automatically track head bone position, look at CUITalkWnd::Update()
             m_sound.create(fn, st_Effect, sg_SourceType);
             m_sound.play_at_pos(0, P);
         }

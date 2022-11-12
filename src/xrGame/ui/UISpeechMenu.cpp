@@ -6,7 +6,6 @@
 #include "UIXmlInit.h"
 #include "game_cl_mp.h"
 #include "Level.h"
-#include "string_table.h"
 
 CUISpeechMenu::CUISpeechMenu(LPCSTR section_name)
 {

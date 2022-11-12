@@ -63,8 +63,6 @@ private:
     IPHWorldUpdateCallbck* m_update_callback;
     CObjectSpace* m_object_space;
     CObjectList* m_level_objects;
-    CRenderDeviceBase* m_device;
-    ;
 
 public:
     xr_vector<ISpatial*> r_spatial;
@@ -95,7 +93,7 @@ public:
 
     // IC	dSpaceID					GetSpace						()			{return Space;}	;
     IC bool Exist() { return b_exist; }
-    void Create(bool mt, CObjectSpace* os, CObjectList* lo, CRenderDeviceBase* dv);
+    void Create(bool mt, CObjectSpace* os, CObjectList* lo);
     void SetGravity(float g);
     IC float Gravity() { return m_gravity; }
     void AddObject(CPHObject* object);
@@ -140,11 +138,6 @@ public:
     {
         VERIFY(m_level_objects);
         return *m_level_objects;
-    }
-    CRenderDeviceBase& Device()
-    {
-        VERIFY(m_device);
-        return *m_device;
     }
 
 //	void						AddCall							(CPHCondition*c,CPHAction*a);

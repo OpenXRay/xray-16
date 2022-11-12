@@ -40,7 +40,6 @@ const float MAX_DIST_FACTOR = 0.95f;
 // environment
 CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
 {
-    bNeed_re_create_env = false;
     bWFX = false;
     Current[0] = 0;
     Current[1] = 0;

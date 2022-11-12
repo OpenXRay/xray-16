@@ -1,4 +1,4 @@
-// glHW.cpp: implementation of the DX10 specialisation of CHW.
+// glHW.cpp: implementation of the OpenGL specialisation of CHW.
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -16,9 +16,55 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
         Log(message, id);
 }
 
-CHW::CHW() : pDevice(this), pPP(0), pFB(0) {}
+void UpdateVSync()
+{
+    if (psDeviceFlags.test(rsVSync))
+    {
+        // Try adaptive vsync first
+        if (SDL_GL_SetSwapInterval(-1) == -1)
+            SDL_GL_SetSwapInterval(1);
+    }
+    else
+    {
+        SDL_GL_SetSwapInterval(0);
+    }
+}
 
-CHW::~CHW() {}
+CHW::CHW()
+{
+    if (!ThisInstanceIsGlobal())
+        return;
+
+    Device.seqAppActivate.Add(this);
+    Device.seqAppDeactivate.Add(this);
+}
+
+CHW::~CHW()
+{
+    if (!ThisInstanceIsGlobal())
+        return;
+
+    Device.seqAppActivate.Remove(this);
+    Device.seqAppDeactivate.Remove(this);
+}
+
+void CHW::OnAppActivate()
+{
+    if (m_window)
+    {
+        SDL_RestoreWindow(m_window);
+    }
+}
+
+void CHW::OnAppDeactivate()
+{
+    if (m_window)
+    {
+        if (psDeviceMode.WindowStyle == rsFullscreen || psDeviceMode.WindowStyle == rsFullscreenBorderless)
+            SDL_MinimizeWindow(m_window);
+    }
+}
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -39,13 +85,13 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     m_context = SDL_GL_CreateContext(m_window);
     if (m_context == nullptr)
     {
-        Msg("Could not create drawing context: %s", SDL_GetError());
+        Log("! Could not create drawing context:", SDL_GetError());
         return;
     }
 
     if (MakeContextCurrent(IRender::PrimaryContext) != 0)
     {
-        Msg("Could not make context current. %s", SDL_GetError());
+        Log("! Could not make context current:", SDL_GetError());
         return;
     }
 
@@ -67,23 +113,30 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     if (MakeContextCurrent(IRender::PrimaryContext) != 0)
     {
-        Msg("Could not make context current after creating helper context."
-            " %s", SDL_GetError());
+        Log("! Could not make context current after creating helper context:", SDL_GetError());
         return;
     }
 
     // Initialize OpenGL Extension Wrangler
-    if (glewInit() != GLEW_OK)
+#ifdef XR_PLATFORM_APPLE
+    // This is essential for complete OpenGL 4.1 load on mac
+    glewExperimental = GL_TRUE;
+#endif
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
     {
-        Msg("Could not initialize glew.");
+        Log("! Could not initialize glew:", (pcstr)glewGetErrorString(err));
         return;
     }
 
-    Console->Execute("rs_v_sync apply");
+    UpdateVSync();
 
 #ifdef DEBUG
-    CHK_GL(glEnable(GL_DEBUG_OUTPUT));
-    CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
+    if (GLEW_KHR_debug)  // NOTE: this extension is only available starting with OpenGL 4.3
+    {
+        CHK_GL(glEnable(GL_DEBUG_OUTPUT));
+        CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
+    }
 #endif // DEBUG
 
     int iMaxVTFUnits, iMaxCTIUnits;
@@ -102,6 +155,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     Msg("* GPU OpenGL shading language version: %s", ShadingVersion);
     Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
+    SeparateShaderObjectsSupported = GLEW_ARB_separate_shader_objects;
     ShaderBinarySupported = GLEW_ARB_get_program_binary;
     ComputeShadersSupported = false; // XXX: Implement compute shaders support
 
@@ -128,9 +182,9 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset()
 {
-    CHK_GL(glDeleteProgramPipelines(1, &pPP));
     CHK_GL(glDeleteFramebuffers(1, &pFB));
     UpdateViews();
+    UpdateVSync();
 }
 
 void CHW::SetPrimaryAttributes()
@@ -184,10 +238,6 @@ int CHW::MakeContextCurrent(IRender::RenderContext context) const
 
 void CHW::UpdateViews()
 {
-    // Create the program pipeline used for rendering with shaders
-    glGenProgramPipelines(1, &pPP);
-    CHK_GL(glBindProgramPipeline(pPP));
-
     // Create the default framebuffer
     glGenFramebuffers(1, &pFB);
     CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
@@ -225,12 +275,24 @@ std::pair<u32, u32> CHW::GetSurfaceSize()
 {
     return
     {
-        psCurrentVidMode[0],
-        psCurrentVidMode[1]
+        psDeviceMode.Width,
+        psDeviceMode.Height
     };
 }
 
 bool CHW::ThisInstanceIsGlobal() const
 {
     return this == &HW;
+}
+
+void CHW::BeginPixEvent(pcstr name) const
+{
+    if (GLEW_KHR_debug)
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name);
+}
+
+void CHW::EndPixEvent() const
+{
+    if (GLEW_KHR_debug)
+        glPopDebugGroup();
 }

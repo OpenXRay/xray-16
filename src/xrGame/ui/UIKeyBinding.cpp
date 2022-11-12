@@ -4,15 +4,21 @@
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIEditKeyBind.h"
 #include "xrUICore/ScrollView/UIScrollView.h"
-#include "xr_level_controller.h"
-#include "string_table.h"
+#include "xrEngine/xr_level_controller.h"
 
-CUIKeyBinding::CUIKeyBinding() : m_isGamepadBinds(false)
+CUIKeyBinding::CUIKeyBinding() : CUIWindow("CUIKeyBinding"), m_isGamepadBinds(false)
 {
     for (u8 i = 0; i < 3; ++i)
         AttachChild(&m_header[i]);
 
     AttachChild(&m_frame);
+
+    pInput->RegisterKeyMapChangeWatcher(this, REG_PRIORITY_NORMAL);
+}
+
+CUIKeyBinding::~CUIKeyBinding()
+{
+    pInput->RemoveKeyMapChangeWatcher(this);
 }
 
 void CUIKeyBinding::InitFromXml(CUIXml& xml_doc, LPCSTR path)
@@ -38,7 +44,7 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
 {
     string256 buf;
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_keybinding.xml");
+    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, m_isGamepadBinds ? "ui_keybinding_gamepad.xml" : "ui_keybinding.xml");
 
     int groupsCount = xml_doc.GetNodesNum("", 0, "group");
 
@@ -90,7 +96,7 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
             if (!m_isGamepadBinds)
                 editKB->AssignProps(exe, "key_binding");
             else
-                editKB->AssignProps(exe, "key_binding_gpad");
+                editKB->AssignProps(exe, "key_binding_gamepad");
             item->AttachChild(editKB);
 
             if (!m_isGamepadBinds)
@@ -109,6 +115,21 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
 #ifdef DEBUG
     CheckStructure(xml_doc);
 #endif
+}
+
+void CUIKeyBinding::OnKeyMapChanged()
+{
+    for (CUIWindow* item : m_scroll_wnd->Items())
+    {
+        for (CUIWindow* wnd : item->GetChildWndList())
+        {
+            CUIEditKeyBind* keybind = smart_cast<CUIEditKeyBind*>(wnd);
+            if (!keybind)
+                continue;
+
+            keybind->SetValue(); // re-apply
+        }
+    }
 }
 
 #ifdef DEBUG

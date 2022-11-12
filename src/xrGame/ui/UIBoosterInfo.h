@@ -11,7 +11,8 @@ class CUIBoosterInfo : public CUIWindow
 {
 public:
     CUIBoosterInfo();
-    virtual ~CUIBoosterInfo();
+    ~CUIBoosterInfo() override;
+
     bool InitFromXml(CUIXml& xml);
     void SetInfo(const shared_str& section);
 
@@ -27,11 +28,10 @@ protected:
 
 // -----------------------------------
 
-class UIBoosterInfoItem : public CUIWindow
+class UIBoosterInfoItem final : public CUIWindow
 {
 public:
     UIBoosterInfoItem();
-    virtual ~UIBoosterInfoItem();
 
     void Init(CUIXml& xml, LPCSTR section);
     void SetCaption(LPCSTR name);

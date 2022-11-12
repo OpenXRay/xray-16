@@ -43,17 +43,13 @@ bool TestOpenGLSupport()
     if (!windowTest.successful())
         return false;
 
-    if (glewInit() != GLEW_OK)
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
     {
-        Log("~ Could not initialize glew.");
-        return false;
+         Log("~ Could not initialize glew:", (pcstr)glewGetErrorString(err));
+         return false;
     }
 
-    if (!glewIsSupported("GL_ARB_separate_shader_objects"))
-    {
-        Log("~ GL_ARB_separate_shader_objects not supported");
-        return false;
-    }
     return true;
 }
 

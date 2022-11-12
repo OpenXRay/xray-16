@@ -57,15 +57,14 @@ void CTeleWhirlwind::draw_out_impact(Fvector& dir, float& val)
     m_saved_impacts.erase(m_saved_impacts.begin());
 }
 
-static bool RemovePred(CTelekineticObject* tele_object)
-{
-    return (!tele_object->get_object() || tele_object->get_object()->getDestroy());
-}
-
 void CTeleWhirlwind::clear_notrelevant()
 {
     //убрать все объеты со старыми параметрами
-    objects.erase(std::remove_if(objects.begin(), objects.end(), &RemovePred), objects.end());
+    const auto it = std::remove_if(objects.begin(), objects.end(), [](CTelekineticObject* tele_object)
+    {
+        return (!tele_object->get_object() || tele_object->get_object()->getDestroy());
+    });
+    objects.erase(it, objects.end());
 }
 
 void CTeleWhirlwind::play_destroy(CTeleWhirlwindObject* obj) {}

@@ -1,9 +1,11 @@
 #include "stdafx.h"
-#include "./glRainBlender.h"
+#include "dx11RainBlender.h"
 
 void CBlender_rain::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
+
+    RImplementation.m_SMAPSize = RImplementation.o.rain_smapsize;
 
     switch (C.iElement)
     {
@@ -18,7 +20,7 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         C.r_Sampler_clw("s_material", r2_material);
         C.r_Sampler_rtf("s_accumulator", r2_RT_accum);
         C.r_Sampler("s_lmap", r2_sunmask);
-        C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
+        C.r_Sampler_cmp("s_smap", r2_RT_smap_rain);
 
         jitter(C);
 
@@ -42,7 +44,7 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         C.r_Sampler_clw("s_material", r2_material);
         //C.r_Sampler_rtf		("s_accumulator",	r2_RT_accum);
         C.r_Sampler("s_lmap", r2_sunmask);
-        C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
+        C.r_Sampler_cmp("s_smap", r2_RT_smap_rain);
 
         C.r_Sampler_rtf("s_diffuse", r2_RT_albedo);
 
@@ -72,7 +74,7 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         C.r_Sampler_clw("s_material", r2_material);
         //C.r_Sampler_rtf		("s_accumulator",	r2_RT_accum);
         C.r_Sampler("s_lmap", r2_sunmask);
-        C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
+        C.r_Sampler_cmp("s_smap", r2_RT_smap_rain);
 
         jitter(C);
 
@@ -82,7 +84,7 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         C.r_Sampler_rtf("s_patched_normal", r2_RT_accum);
 
         //	Normal can be packed into R and G
-        if (RImplementation.o.dx10_gbuffer_opt)
+        if (RImplementation.o.gbuffer_opt)
             C.r_ColorWriteEnable(true, true, false, false);
         else
             C.r_ColorWriteEnable(true, true, true, false);
@@ -103,7 +105,7 @@ void CBlender_rain::Compile(CBlender_Compile& C)
         C.r_Sampler_clw("s_material", r2_material);
         //C.r_Sampler_rtf		("s_accumulator",	r2_RT_accum);
         C.r_Sampler("s_lmap", r2_sunmask);
-        C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
+        C.r_Sampler_cmp("s_smap", r2_RT_smap_rain);
 
         jitter(C);
 
@@ -121,12 +123,8 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
         break;
     }
-}
 
-void CBlender_rain_msaa::SetDefine(LPCSTR Name, LPCSTR Definition)
-{
-    this->Name = Name;
-    this->Definition = Definition;
+    RImplementation.m_SMAPSize = RImplementation.o.smapsize;
 }
 
 void CBlender_rain_msaa::Compile(CBlender_Compile& C)
@@ -134,9 +132,11 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     if (Name)
-        GEnv.Render->m_MSAASample = atoi(Definition);
+        RImplementation.m_MSAASample = atoi(Definition);
     else
-        GEnv.Render->m_MSAASample = -1;
+        RImplementation.m_MSAASample = -1;
+
+    RImplementation.m_SMAPSize = RImplementation.o.rain_smapsize;
 
     switch (C.iElement)
     {
@@ -151,7 +151,7 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
         C.r_Sampler_clw("s_material", r2_material);
         //C.r_Sampler_rtf		("s_accumulator",	r2_RT_accum);
         C.r_Sampler("s_lmap", r2_sunmask);
-        C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
+        C.r_Sampler_cmp("s_smap", r2_RT_smap_rain);
 
         C.r_Sampler_rtf("s_diffuse", r2_RT_albedo);
 
@@ -163,7 +163,7 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
         //C.r_Sampler		("s_water",	"water" DELIMITER "water_normal");
 
         C.r_Sampler("s_water", "water" DELIMITER "water_SBumpVolume");
-        //C.r_dx10Texture		("s_waterFall",	"water" DELIMITER "water_normal");
+        //C.r_dx11Texture		("s_waterFall",	"water" DELIMITER "water_normal");
         C.r_Sampler("s_waterFall", "water" DELIMITER "water_flowing_nmap");
 
         C.r_End();
@@ -181,7 +181,7 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
         C.r_Sampler_clw("s_material", r2_material);
         //C.r_Sampler_rtf		("s_accumulator",	r2_RT_accum);
         C.r_Sampler("s_lmap", r2_sunmask);
-        C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
+        C.r_Sampler_cmp("s_smap", r2_RT_smap_rain);
 
         jitter(C);
 
@@ -191,7 +191,7 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
         C.r_Sampler_rtf("s_patched_normal", r2_RT_accum);
 
         //	Normal can be packed into R and G
-        if (RImplementation.o.dx10_gbuffer_opt)
+        if (RImplementation.o.gbuffer_opt)
             C.r_ColorWriteEnable(true, true, false, false);
         else
             C.r_ColorWriteEnable(true, true, true, false);
@@ -211,7 +211,7 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
         C.r_Sampler_clw("s_material", r2_material);
         //C.r_Sampler_rtf		("s_accumulator",	r2_RT_accum);
         C.r_Sampler("s_lmap", r2_sunmask);
-        C.r_Sampler_cmp("s_smap", r2_RT_smap_depth);
+        C.r_Sampler_cmp("s_smap", r2_RT_smap_rain);
 
         jitter(C);
 
@@ -229,5 +229,6 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
 
         break;
     }
-    GEnv.Render->m_MSAASample = -1;
+    RImplementation.m_MSAASample = -1;
+    RImplementation.m_SMAPSize = RImplementation.o.smapsize;
 }

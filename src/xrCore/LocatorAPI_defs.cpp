@@ -2,15 +2,13 @@
 #pragma hdrstop
 
 #include "LocatorAPI_defs.h"
-#pragma warning(push)
-#pragma warning(disable : 4995)
+
 #if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #include <direct.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #endif
 #include <fcntl.h>
-#pragma warning(pop)
 
 //////////////////////////////////////////////////////////////////////
 // FS_File
@@ -105,6 +103,17 @@ LPCSTR FS_Path::_update(string_path& dest, LPCSTR src) const
     R_ASSERT(src);
     string_path temp;
     xr_strcpy(temp, sizeof(temp), src);
+
+#if !defined(XR_PLATFORM_WINDOWS) // XXX: replace with runtime check for case-sensitivity
+    string_path fullPath;
+    strconcat(fullPath, m_Path, temp);
+    if (FS.exist(fullPath, FSType::External) || FS.exist(fullPath, FSType::Virtual))
+    {
+        xr_strcpy(dest, fullPath);
+        return dest;
+    }
+#endif
+
     xr_strlwr(temp);
     strconcat(sizeof(dest), dest, m_Path, temp);
     return xr_fs_strlwr(dest);

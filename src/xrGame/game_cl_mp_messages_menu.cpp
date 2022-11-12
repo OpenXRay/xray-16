@@ -4,7 +4,6 @@
 #include "xrMessages.h"
 #include "Level.h"
 #include "ui/UIMessagesWindow.h"
-#include "string_table.h"
 #include "map_manager.h"
 #include "map_location.h"
 #include "UIGameCustom.h"

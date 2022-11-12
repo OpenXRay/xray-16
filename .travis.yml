@@ -3,10 +3,12 @@ dist: focal
 cache: ccache
 language: cpp
 
-#branches:
+branches:
+  except:
+    - /^dependabot\/.*$/
 #  only:
 #  - linux
-#  - xd_dev
+#  - dev
 #  - "/^v\\d+\\./"
 
 os:
@@ -15,47 +17,10 @@ os:
 matrix:
   include:
     - arch: arm64
-      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-      addons: &gcc8
-        apt:
-          sources:
-            - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages:
-            - g++-8
+      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Release
 
-#    - arch: arm64
-#      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-#      addons: *gcc8
-
-    - arch: amd64
-      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-      addons: *gcc8
-
-    - arch: amd64
-      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-      addons: *gcc8
-
-#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-#      addons: &clang50
-#        apt:
-#          sources:
-#            - llvm-toolchain-trusty-5.0
-#          packages:
-#            - clang-5.0
-
-#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
-#      addons: *clang50
-
-#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-#      addons: &clang60
-#        apt:
-#          sources:
-#            - llvm-toolchain-trusty-6.0
-#          packages:
-#            - clang-6.0
-
-#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
-#      addons: *clang60
+    - arch: arm64
+      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
 
 install:
   - export CC=${C_COMPILER}
@@ -72,7 +37,7 @@ before_script:
   - mkdir bin && cd bin
 
   - if [ $TARGET_CPU == x64 ]; then
-       sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libtbb-dev libcrypto++-dev liblockfile-dev libfreeimage3 libfreeimage-dev libfreeimageplus-dev liblua5.1-0-dev libssl-dev libogg-dev libtheora-bin libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev libpcre3-dev libsdl2-2.0-0 libsdl2-dev libgl1 libgl1-mesa-dev libgl1-mesa-dev libgl-dev;
+       sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libcrypto++-dev liblua5.1-0-dev libssl-dev libogg-dev libtheora-bin libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev libsdl2-2.0-0 libsdl2-dev libgl1 libgl1-mesa-dev libgl1-mesa-dev libgl-dev;
        
        if [ $TRAVIS_CPU_ARCH == arm64 ]; then
           sudo apt-get install -y snapd

@@ -7,6 +7,8 @@
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#else
+#error Add your platform here
 #endif
 
 #if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
@@ -212,3 +214,10 @@ float turbulence3(const Fvector& v, float freq, int octaves)
     }
     return sum * boost;
 }
+
+#undef B
+#undef DOT
+#undef AT
+#undef S_CURVE
+#undef LERP
+#undef PN_SETUP

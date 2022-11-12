@@ -549,7 +549,7 @@ struct raii_guard : private Noncopyable
 
     ~raii_guard()
     {
-#ifdef DEBUG
+#if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
         const bool lua_studio_connected = !!m_script_engine->debugger();
         if (!lua_studio_connected)
 #endif
@@ -675,6 +675,7 @@ static void log_callback(void* context, const char* message)
 
 void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine)
 {
+#ifdef XR_PLATFORM_WINDOWS
     engine = 0;
     world = 0;
     u32 const old_error_mode = SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -702,10 +703,14 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
     s_old_log_callback = SetLogCB(LogCallback(log_callback, this));
     RunJITCommand(state, "off()");
     world->add(state);
+#else
+    VERIFY(!"Not implemented");
+#endif
 }
 
 void CScriptEngine::finalize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine)
 {
+#ifdef XR_PLATFORM_WINDOWS
     world->remove(state);
     VERIFY(world);
     s_destroy_world(world);
@@ -713,6 +718,9 @@ void CScriptEngine::finalize_lua_studio(lua_State* state, cs::lua_studio::world*
     VERIFY(engine);
     xr_delete(engine);
     SetLogCB(s_old_log_callback);
+#else
+    VERIFY(!"Not implemented");
+#endif
 }
 
 void CScriptEngine::try_connect_to_debugger()
@@ -965,7 +973,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
     luajit::open_lib(lua(), LUA_BITLIBNAME, luaopen_bit);
     luajit::open_lib(lua(), LUA_FFILIBNAME, luaopen_ffi);
-#ifdef DEBUG
+#ifndef MASTER_GOLD
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif
 
@@ -1120,7 +1128,7 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& ob
 void CScriptEngine::add_script_process(const ScriptProcessor& process_id, CScriptProcess* script_process)
 {
     VERIFY(m_script_processes.find(process_id) == m_script_processes.end());
-    m_script_processes.insert(std::make_pair(process_id, script_process));
+    m_script_processes.emplace(process_id, script_process);
 }
 
 CScriptProcess* CScriptEngine::script_process(const ScriptProcessor& process_id) const

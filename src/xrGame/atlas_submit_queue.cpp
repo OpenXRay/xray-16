@@ -151,7 +151,7 @@ void atlas_submit_queue::do_atlas_submit_all(gamespy_gp::profile const* profile)
 #endif
 }
 
-void __stdcall atlas_submit_queue::atlas_submitted(bool result, char const* err_string)
+void atlas_submit_queue::atlas_submitted(bool result, char const* err_string)
 {
     if (result)
     {

@@ -4,7 +4,7 @@
 #include "inventory_item.h"
 #include "UIDragDropListEx.h"
 #include "eatable_item.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrEngine/xr_input.h"
 #include "Level.h"
 #include "Common/object_broker.h"
@@ -331,7 +331,7 @@ void CUICellItem::SetCustomDraw(ICustomDrawCellItem* c)
 
 // -------------------------------------------------------------------------------------------------
 
-CUIDragItem::CUIDragItem(CUICellItem* parent)
+CUIDragItem::CUIDragItem(CUICellItem* parent) : CUIWindow("CUIDragItem")
 {
     m_custom_draw = NULL;
     m_back_list = NULL;

@@ -63,7 +63,7 @@ public:
   void clearUpperTriangle();
   void clearLowerTriangle();
   void makeRandom (dReal range);
-  void print (char *fmt = "%10.4f ", FILE *f=stdout);
+  void print (const char *fmt = "%10.4f ", FILE *f=stdout);
   dReal maxDifference (const dMatrix &);
 };
 

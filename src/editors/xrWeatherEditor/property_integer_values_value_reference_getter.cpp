@@ -57,7 +57,7 @@ void property_integer_values_value_reference_getter::SetValue(Object ^ object)
 IList ^ property_integer_values_value_reference_getter::collection()
 {
     ArrayList ^ collection = gcnew ArrayList();
-    LPCSTR const* values = (*m_collection_getter)();
+    pcstr const* values = (*m_collection_getter)();
     for (u32 i = 0, n = (*m_collection_size_getter)(); i < n; ++i)
         collection->Add(to_string(values[i]));
 

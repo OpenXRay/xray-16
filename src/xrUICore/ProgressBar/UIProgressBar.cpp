@@ -1,7 +1,7 @@
 #include "pch.hpp"
 #include "UIProgressBar.h"
 
-CUIProgressBar::CUIProgressBar(void)
+CUIProgressBar::CUIProgressBar() : CUIWindow("CUIProgressBar")
 {
     m_MinPos = 1.0f;
     m_MaxPos = 1.0f + EPS;
@@ -72,6 +72,13 @@ void CUIProgressBar::SetProgressPos(float _Pos)
 {
     m_ProgressPos.y = _Pos;
     clamp(m_ProgressPos.y, m_MinPos, m_MaxPos);
+    UpdateProgressBar();
+}
+
+void CUIProgressBar::ForceSetProgressPos(float pos)
+{
+    clamp(pos, m_MinPos, m_MaxPos);
+    m_ProgressPos = { pos, pos };
     UpdateProgressBar();
 }
 

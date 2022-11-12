@@ -177,32 +177,28 @@ void CBlender_Screen_SET::CompileProgrammed(CBlender_Compile& C)
     {
     case 6:
         // Usually for wallmarks
-        C.PassSET_VS("stub_notransform_t");
-        C.PassSET_PS("stub_default_ma");
+        C.PassSET_Shaders("stub_notransform_t", "stub_default_ma");
         break;
 
     case 9:
         // 4x R
-        C.PassSET_VS("stub_notransform_t_m4");
-        C.PassSET_PS("stub_default");
+        C.PassSET_Shaders("stub_notransform_t_m4", "stub_default");
         break;
 
     case 7:
     case 8:
         // 2x R
-        C.PassSET_VS("stub_notransform_t_m2");
-        C.PassSET_PS("stub_default");
+        C.PassSET_Shaders("stub_notransform_t_m2", "stub_default");
         break;
 
     default:
         // 1x R
-        C.PassSET_VS("stub_notransform_t");
-        C.PassSET_PS("stub_default");
+        C.PassSET_Shaders("stub_notransform_t", "stub_default");
         break;
     }
 
     VERIFY2(C.L_textures.size() > 0, "Not enough textures");
-    const u32 stage = C.SampledImage("s_base", "s_base", C.L_textures[0]);
+    const u32 stage = C.SampledImage("smp_base", "s_base", C.L_textures[0]);
     if (oClamp.value)
     {
         C.i_Address(stage, D3DTADDRESS_CLAMP);

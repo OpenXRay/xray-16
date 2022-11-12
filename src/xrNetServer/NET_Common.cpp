@@ -153,7 +153,7 @@ void MultipacketSender::_FlushSendBuffer(u32 timeout, Buffer* buf)
         // dump/log if needed
 
 #if NET_LOG_PACKETS
-        Msg("#send %smulti-packet %u    flags= %08X", (buf->last_flags & DPNSEND_IMMEDIATELLY) ? "IMMEDIATE " : "",
+        Msg("# send %smulti-packet %u    flags= %08X", (buf->last_flags & DPNSEND_IMMEDIATELLY) ? "IMMEDIATE " : "",
             buf->buffer.B.count, buf->last_flags);
 #endif // NET_LOG_PACKETS
 
@@ -196,7 +196,7 @@ void MultipacketReciever::RecievePacket(const void* packet_data, u32 packet_sz, 
         data, sizeof(data), (u8*)packet_data + sizeof(MultipacketHeader), packet_sz - sizeof(MultipacketHeader));
 
 #if NET_LOG_PACKETS
-    Msg("#receive multi-packet %u", packet_sz);
+    Msg("# receive multi-packet %u", packet_sz);
 #endif
 
     if (strstr(Core.Params, "-dump_traffic"))

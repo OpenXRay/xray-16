@@ -52,7 +52,7 @@ public:
     }
 
 private:
-    return_type __stdcall proxy_execution(param1_type arg1, param2_type arg2)
+    return_type proxy_execution(param1_type arg1, param2_type arg2)
     {
         if (pending_active)
         {

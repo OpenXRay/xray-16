@@ -141,7 +141,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/lzo/include
     ${CMAKE_SOURCE_DIR}/Externals/luabind
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(xrUICore
@@ -152,7 +152,7 @@ target_link_libraries(xrUICore
     xrMiscMath
     xrCore
     xrLuabind
-    ${SDL_LIBRARIES}
+    ${SDL2_LIBRARIES}
 )
 
 if (WIN32)
@@ -167,10 +167,12 @@ target_compile_definitions(${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
-    COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp"
 )
 
-cotire(${PROJECT_NAME})
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "pch.hpp"
+)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY
     DESTINATION ${CMAKE_INSTALL_LIBDIR}

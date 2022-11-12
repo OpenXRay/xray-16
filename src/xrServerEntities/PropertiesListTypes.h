@@ -16,7 +16,6 @@
 #endif
 
 // fwd. decl.
-using RStringVec = xr_vector<shared_str>;
 struct xr_rtoken;
 
 #pragma pack(push, 1)
@@ -357,7 +356,7 @@ public:
 class ButtonValue : public PropValue
 {
 public:
-    RStringVec value;
+    xr_vector<shared_str> value;
     int btn_num;
     typedef fastdelegate::FastDelegate3<ButtonValue*, bool&, bool&> TOnBtnClick;
     TOnBtnClick OnBtnClickEvent;

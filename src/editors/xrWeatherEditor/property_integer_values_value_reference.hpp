@@ -23,7 +23,7 @@ private:
     typedef System::Collections::IList IList;
 
 public:
-    property_integer_values_value_reference(int& value, LPCSTR const* values, u32 const& value_count);
+    property_integer_values_value_reference(int& value, pcstr const* values, u32 const& value_count);
     virtual Object ^ GetValue() override;
     virtual void SetValue(Object ^ object) override;
     virtual IList ^ collection();

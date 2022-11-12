@@ -1,6 +1,7 @@
 project(xrNetServer)
 
 set(SRC_FILES
+    "guids.cpp"
     "ip_filter.cpp"
     "ip_filter.h"
     "NET_AuthCheck.cpp"
@@ -48,10 +49,12 @@ target_compile_definitions(${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
-    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
 )
 
-cotire(${PROJECT_NAME})
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "stdafx.h"
+)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY
     DESTINATION ${CMAKE_INSTALL_LIBDIR}

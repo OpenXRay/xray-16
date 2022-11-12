@@ -32,7 +32,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/sdk/include
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -45,7 +45,7 @@ target_link_libraries(${PROJECT_NAME}
     xrScriptEngine
     xrAPI
     xrMiscMath
-    ${SDL_LIBRARIES}
+    ${SDL2_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -55,10 +55,12 @@ target_compile_definitions(${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
-    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
 )
 
-cotire(${PROJECT_NAME})
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "stdafx.h"
+)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY
     DESTINATION ${CMAKE_INSTALL_LIBDIR}

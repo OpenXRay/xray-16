@@ -19,7 +19,6 @@ class UILoadingScreen : public ILoadingScreen, public CUIWindow
     Lock loadingLock;
     bool alwaysShowStage;
 
-    CUIStatic* loadingProgressBackground;
     CUIProgressBar* loadingProgress;
     CUIStatic* loadingProgressPercent;
     CUIStatic* loadingLogo;
@@ -34,12 +33,11 @@ public:
 
     void Initialize() override;
 
-    void Show(bool status) override;
+    void Show(bool show) override;
     bool IsShown() override;
 
     void Update(const int stagesCompleted, const int stagesTotal) override;
-    void ForceDrop() override;
-    void ForceFinish() override;
+    void Draw() override;
 
     void SetLevelLogo(const char* name) override;
     void SetStageTitle(const char* title) override;

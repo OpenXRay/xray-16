@@ -5,9 +5,8 @@
 #include "XML/UIXmlInitBase.h"
 #include "XML/UITextureMaster.h"
 #include "Cursor/UICursor.h"
-#include "xrEngine/xr_input_xinput.h"
 
-CUIScrollBar::CUIScrollBar()
+CUIScrollBar::CUIScrollBar() : CUIWindow("CUIScrollBar")
 {
     m_iMinPos = 1;
     m_iMaxPos = 1;
@@ -286,17 +285,20 @@ void CUIScrollBar::UpdateScrollBar()
 
 u32 last_hold_time = 0;
 
-bool CUIScrollBar::OnKeyboardHold(int dik)
+bool CUIScrollBar::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == MOUSE_1 && (last_hold_time + m_hold_delay) < Device.dwTimeContinual) // 100
+    if (keyboard_action == WINDOW_KEY_HOLD)
     {
-        if (OnMouseDownEx())
+        if (dik == MOUSE_1 && (last_hold_time + m_hold_delay) < Device.dwTimeContinual) // 100
         {
-            last_hold_time = Device.dwTimeContinual;
-            return true;
+            if (OnMouseDownEx())
+            {
+                last_hold_time = Device.dwTimeContinual;
+                return true;
+            }
         }
     }
-    return inherited::OnKeyboardHold(dik);
+    return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
 bool CUIScrollBar::OnMouseAction(float x, float y, EUIMessages mouse_action)

@@ -20,7 +20,7 @@ LogCallback LogCB = 0;
 
 bool ForceFlushLog = false;
 IWriter* LogWriter = nullptr;
-size_t CachedLog = 0;
+//size_t CachedLog = 0;
 
 void FlushLog()
 {
@@ -29,7 +29,7 @@ void FlushLog()
         logCS.Enter();
         if (LogWriter)
             LogWriter->flush();
-        CachedLog = 0;
+        //CachedLog = 0;
         logCS.Leave();
     }
 }
@@ -66,9 +66,9 @@ void AddOne(const char* split)
 #else
         LogWriter->w_printf("%s\r\n", split);
 #endif
-        CachedLog += xr_strlen(split) + 2;
+        //CachedLog += xr_strlen(split) + 2;
 
-        if (ForceFlushLog || CachedLog >= 32768)
+        if (ForceFlushLog /*|| CachedLog >= 32768*/)
             FlushLog();
 
         //-RvP

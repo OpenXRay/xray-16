@@ -6,7 +6,7 @@
 #include "xrServer_Objects_ALife_Items.h"
 #include "ExplosiveRocket.h"
 #include "Actor.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Level.h"
 #include "Common/object_broker.h"
 #include "game_base_space.h"
@@ -883,7 +883,6 @@ void CWeaponMagazinedWGrenade::net_Spawn_install_upgrades(Upgrades_type saved_up
     // this is intended behaviour
 }
 
-#include "string_table.h"
 bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
 {
     VERIFY(m_pInventory);

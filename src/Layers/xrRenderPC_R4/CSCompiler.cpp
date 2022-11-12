@@ -54,7 +54,7 @@ CSCompiler& CSCompiler::defSampler(LPCSTR ResourceName)
     if (0 == xr_strcmp(ResourceName, "smp_base"))
     {
         // i_Address( stage, D3DTADDRESS_WRAP);
-        // i_dx10FilterAnizo( stage, TRUE);
+        // i_dx11FilterAnizo( stage, TRUE);
         desc.AddressU = desc.AddressV = desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
         desc.Filter = D3D11_FILTER_ANISOTROPIC;
         desc.MaxAnisotropy = 8;
@@ -77,8 +77,8 @@ CSCompiler& CSCompiler::defSampler(LPCSTR ResourceName)
     {
         // i_Address( stage, D3DTADDRESS_CLAMP);
         // i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
-        // RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFILTER, TRUE);
-        // RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFUNC, D3D_COMPARISON_LESS_EQUAL);
+        // RS.SetSAMP(stage, XRDX11SAMP_COMPARISONFILTER, TRUE);
+        // RS.SetSAMP(stage, XRDX11SAMP_COMPARISONFUNC, D3D_COMPARISON_LESS_EQUAL);
         desc.AddressU = desc.AddressV = desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
         desc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
         desc.ComparisonFunc = D3D_COMPARISON_LESS_EQUAL;
@@ -152,7 +152,7 @@ CSCompiler& CSCompiler::defTexture(LPCSTR ResourceName, ref_texture texture)
     if (!C)
         return *this;
 
-    R_ASSERT(C->type == RC_dx10texture);
+    R_ASSERT(C->type == RC_dx11texture);
     u32 stage = C->samp.index;
 
     if (stage >= m_Textures.size())

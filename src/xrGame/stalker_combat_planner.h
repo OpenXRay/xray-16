@@ -33,7 +33,7 @@ protected:
     void add_actions();
 
 public:
-    void xr_stdcall on_best_cover_changed(const CCoverPoint* new_cover, const CCoverPoint* old_cover);
+    void on_best_cover_changed(const CCoverPoint* new_cover, const CCoverPoint* old_cover);
 
 public:
     CStalkerCombatPlanner(CAI_Stalker* object = 0, LPCSTR action_name = "");

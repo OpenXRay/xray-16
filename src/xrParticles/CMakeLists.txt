@@ -1,32 +1,38 @@
 project(xrParticles)
 
-set(SRC_FILES
-    "noise.h"
-    "noise.cpp"
-    "particle_actions_collection.h"
-    "particle_actions_collection.cpp"
-    "particle_actions_collection_io.cpp"
-    "particle_actions.h"
-    "particle_actions.cpp"
-    "particle_core.h"
-    "particle_core.cpp"
-    "particle_effect.h"
-    "particle_effect.cpp"
-    "particle_manager.h"
-    "particle_manager.cpp"
+set(KERNEL_SRC
     "psystem.h"
     "stdafx.h"
     "stdafx.cpp"
 )
 
-group_sources(SRC_FILES)
+set(PARTICLE_API_SRC
+    "noise.cpp"
+    "noise.h"
+    "particle_actions.cpp"
+    "particle_actions.h"
+    "particle_actions_collection.cpp"
+    "particle_actions_collection.h"
+    "particle_actions_collection_io.cpp"
+    "particle_core.cpp"
+    "particle_core.h"
+    "particle_effect.cpp"
+    "particle_effect.h"
+    "particle_manager.cpp"
+    "particle_manager.h"
+)
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+source_group("Kernel" FILES ${KERNEL_SRC})
+source_group("ParticleAPI" FILES ${PARTICLE_API_SRC})
+
+add_library(${PROJECT_NAME} SHARED
+    ${KERNEL_SRC}
+    ${PARTICLE_API_SRC}
+)
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/Externals/sse2neon/include
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -43,10 +49,12 @@ target_compile_definitions(${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
-    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
 )
 
-cotire(${PROJECT_NAME})
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "stdafx.h"
+)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY
     DESTINATION ${CMAKE_INSTALL_LIBDIR}

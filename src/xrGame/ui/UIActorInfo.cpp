@@ -14,13 +14,13 @@
 #include "character_community.h"
 #include "character_reputation.h"
 #include "relation_registry.h"
-#include "string_table.h"
 
 constexpr cpcstr ACTOR_STATISTIC_XML = "actor_statistic.xml";
 constexpr cpcstr ACTOR_CHARACTER_XML = "pda_dialog_character.xml";
 
 CUIActorInfoWnd::CUIActorInfoWnd()
-    : UIInfoFrame(nullptr), UIInfoHeader(nullptr),
+    : CUIWindow("CUIActorInfoWnd"),
+      UIInfoFrame(nullptr), UIInfoHeader(nullptr),
       UICharIconFrame(nullptr), UICharIconHeader(nullptr),
       UIAnimatedIcon(nullptr), UICharacterWindow(nullptr),
       UICharacterInfo(nullptr), UIMasterList(nullptr),
@@ -70,7 +70,7 @@ bool CUIActorInfoWnd::Init()
     UICharIconFrame->AttachChild(UIMasterList);
     CUIXmlInit::InitScrollView(uiXml, "master_list", 0, UIMasterList);
 
-    UICharacterWindow = xr_new<CUIWindow>();
+    UICharacterWindow = xr_new<CUIWindow>("Character window");
     UICharacterWindow->SetAutoDelete(true);
     UICharIconFrame->AttachChild(UICharacterWindow);
     CUIXmlInit::InitWindow(uiXml, "character_info", 0, UICharacterWindow);
@@ -292,8 +292,8 @@ void CUIActorInfoWnd::FillReputationDetails(CUIXml* xml, LPCSTR path)
 
 
 CUIActorStaticticHeader::CUIActorStaticticHeader(CUIActorInfoWnd* w)
-    : m_actorInfoWnd(w), m_stored_alpha(0),
-      m_text1(nullptr), m_text2(nullptr) {}
+    : CUIWindow("CUIActorStaticticHeader"), m_actorInfoWnd(w),
+      m_stored_alpha(0), m_text1(nullptr), m_text2(nullptr) {}
 
 void CUIActorStaticticHeader::Init(CUIXml* xml, LPCSTR path, int idx_in_xml)
 {

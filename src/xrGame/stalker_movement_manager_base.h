@@ -14,12 +14,12 @@
 #include "ai_monster_space.h"
 #include "stalker_movement_params.h"
 
-#ifdef DEBUG
+#ifndef MASTER_GOLD
 #include "detail_path_manager.h"
 #include "ai/stalker/ai_stalker.h"
-#else // #ifdef DEBUG
+#else
 #include "detail_path_manager_space.h"
-#endif // #ifdef DEBUG
+#endif
 
 using namespace MonsterSpace;
 

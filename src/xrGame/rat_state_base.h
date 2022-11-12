@@ -20,6 +20,7 @@ private:
 
 public:
     IC rat_state_base();
+    virtual ~rat_state_base() = default;
     void construct(CAI_Rat* object);
     virtual void initialize() = 0;
     virtual void execute() = 0;

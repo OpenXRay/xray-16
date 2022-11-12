@@ -8,7 +8,6 @@
 #include "UIDemoPlayControl.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "xrEngine/XR_IOConsole.h"
-#include "string_table.h"
 #include "Level.h"
 #include "DemoInfo.h"
 #include "DemoPlay_Control.h"
@@ -82,7 +81,7 @@ void CUIDemoPlayControl::Init()
     CUIXmlInit::Init3tButton(xml_doc, "demo_play_control:btn_repeat_rewind", 0, m_repeat_rewind_btn);
     CUIXmlInit::InitProgressBar(xml_doc, "demo_play_control:progress", 0, m_progress_bar);
     CUIXmlInit::InitTextWnd(xml_doc, "demo_play_control:static_demo_status", 0, m_static_demo_status);
-    CUIWindow tmp_prop_boxes_wnd;
+    CUIWindow tmp_prop_boxes_wnd("tmp_prop_boxes_wnd");
     CUIXmlInit::InitWindow(xml_doc, "demo_play_control:rewind_property_boxes", 0, &tmp_prop_boxes_wnd);
 
     Register(m_restart_btn);
@@ -172,7 +171,7 @@ void CUIDemoPlayControl::InitAllPlayers()
 
 bool CUIDemoPlayControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if ((dik == SDL_SCANCODE_LCTRL) && (keyboard_action == WINDOW_KEY_RELEASED))
+    if (IsBinded(kCROUCH, dik) && (keyboard_action == WINDOW_KEY_RELEASED))
     {
         m_last_curr_pos = GetUICursor().GetCursorPosition();
         m_rewind_type->Hide();

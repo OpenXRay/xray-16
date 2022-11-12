@@ -33,7 +33,6 @@
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
 #include "ui/UIGameTutorial.h"
-#include "string_table.h"
 #include "ui/UIInventoryUtilities.h"
 #include "alife_object_registry.h"
 #include "xrServer_Objects_ALife_Monsters.h"
@@ -42,9 +41,6 @@
 #include "raypick.h"
 #include "xrCDB/xr_collide_defs.h"
 #include "xrNetServer/NET_Messages.h"
-
-using namespace luabind;
-using namespace luabind::policy;
 
 LPCSTR command_line() { return Core.Params; }
 bool IsDynamicMusic() { return !!psActorFlags.test(AF_DYNAMIC_MUSIC); }
@@ -236,7 +232,6 @@ void map_change_spot_hint(u16 id, LPCSTR spot_type, LPCSTR text)
 void map_remove_object_spot(u16 id, LPCSTR spot_type) { Level().MapManager().RemoveMapLocation(spot_type, id); }
 u16 map_has_object_spot(u16 id, LPCSTR spot_type) { return Level().MapManager().HasMapLocation(spot_type, id); }
 bool patrol_path_exists(LPCSTR patrol_path) { return (!!ai().patrol_paths().path(patrol_path, true)); }
-LPCSTR get_name() { return (*Level().name()); }
 void prefetch_sound(LPCSTR name) { Level().PrefetchSound(name); }
 CClientSpawnManager& get_client_spawn_manager() { return (Level().client_spawn_manager()); }
 
@@ -309,8 +304,8 @@ void remove_call(const luabind::functor<bool>& condition, const luabind::functor
 
 void add_call(const luabind::object& lua_object, LPCSTR condition, LPCSTR action)
 {
-    luabind::functor<bool> _condition = object_cast<luabind::functor<bool>>(lua_object[condition]);
-    luabind::functor<void> _action = object_cast<luabind::functor<void>>(lua_object[action]);
+    luabind::functor<bool> _condition = luabind::object_cast<luabind::functor<bool>>(lua_object[condition]);
+    luabind::functor<void> _action = luabind::object_cast<luabind::functor<void>>(lua_object[action]);
     CPHScriptObjectConditionN* c = xr_new<CPHScriptObjectConditionN>(lua_object, _condition);
     CPHScriptObjectActionN* a = xr_new<CPHScriptObjectActionN>(lua_object, _action);
     Level().ph_commander_scripts().add_call_unique(c, c, a, a);
@@ -645,7 +640,7 @@ void iterate_online_objects(luabind::functor<bool> functor)
     }
 }
 
-// KD: raypick	
+// KD: raypick
 bool ray_pick(const Fvector& start, const Fvector& dir, float range,
               collide::rq_target tgt, script_rq_result& script_R,
               CScriptGameObject* ignore_object)
@@ -668,6 +663,9 @@ struct EnumCallbackType {};
 
 IC static void CLevel_Export(lua_State* luaState)
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     class_<CEnvDescriptor>("CEnvDescriptor")
         .def_readonly("fog_density", &CEnvDescriptor::fog_density)
         .def_readonly("far_plane", &CEnvDescriptor::far_plane),
@@ -686,6 +684,11 @@ IC static void CLevel_Export(lua_State* luaState)
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),
+        def("get_start_time", +[]() { return xrTime(Level().GetStartGameTime()); }),
+        def("valid_vertex", +[](u32 level_vertex_id)
+        {
+            return ai().level_graph().valid_vertex_id(level_vertex_id);
+        }),
         //Alundaio: END
 
         def("iterate_online_objects", &iterate_online_objects),
@@ -710,7 +713,8 @@ IC static void CLevel_Export(lua_State* luaState)
 
         def("high_cover_in_direction", high_cover_in_direction), def("low_cover_in_direction", low_cover_in_direction),
         def("vertex_in_direction", vertex_in_direction), def("rain_factor", rain_factor),
-        def("patrol_path_exists", patrol_path_exists), def("vertex_position", vertex_position), def("name", get_name),
+        def("patrol_path_exists", patrol_path_exists), def("vertex_position", vertex_position),
+        def("name", +[]() { return Level().name().c_str(); }),
         def("prefetch_sound", prefetch_sound),
 
         def("client_spawn_manager", get_client_spawn_manager),
@@ -878,7 +882,10 @@ IC static void CLevel_Export(lua_State* luaState)
         def("start_tutorial", &start_tutorial),
         def("stop_tutorial", &stop_tutorial),
         def("has_active_tutorial", &has_active_tutotial),
-        def("translate_string", &translate_string)
+	    def("active_tutorial_name", +[](){ return g_tutorial->GetTutorName(); }),
+        def("translate_string", &translate_string),
+        def("reload_language", +[]() { StringTable().ReloadLanguage(); }),
+        def("log_stack_trace", &xrDebug::LogStackTrace)
     ];
 
 };

@@ -18,7 +18,7 @@ void CUICell::Clear()
     m_item = NULL;
 }
 
-CUIDragDropListEx::CUIDragDropListEx()
+CUIDragDropListEx::CUIDragDropListEx() : CUIWindow("CUIDragDropListEx")
 {
     m_flags.zero();
     m_container = xr_new<CUICellContainer>(this);
@@ -200,7 +200,8 @@ Ivector2 CUIDragDropListEx::CalculateCapacity(int desiredCells)
         {
             const int half = desiredCells / 2;
             const bool beltCellsAreEven = desiredCells % 2 == 0;
-            R_ASSERT2(beltCellsAreEven, "Wrong max_belt value or wrong cells markup.");
+            R_ASSERT2(beltCellsAreEven, "Wrong max_belt value or wrong cells markup."); // XXX: add support for not even amount of capacity
+            R_ASSERT2(half <= cap.x, "Requesting more cells than markup has.");
             return { half, half };
         }
         else if (cap.x > cap.y) // horizontal
@@ -224,7 +225,7 @@ Ivector2 CUIDragDropListEx::CalculateCapacity(int desiredCells)
     }
     else if (cap.y > 1) // one-line vertical, simple
     {
-        return { cap.y, desiredCells };
+        return { cap.x, desiredCells };
     }
     NODEFAULT;
     return { 0, 0 };
@@ -638,6 +639,7 @@ CUICell& CUIDragDropListEx::GetCellAt(const Ivector2& pos) { return m_container-
 // =================================================================================================
 
 CUICellContainer::CUICellContainer(CUIDragDropListEx* parent)
+    : CUIWindow("CUICellContainer")
 {
     m_pParentDragDropList = parent;
     hShader->create("hud" DELIMITER "fog_of_war", "ui" DELIMITER "ui_grid");

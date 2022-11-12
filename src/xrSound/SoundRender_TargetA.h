@@ -10,6 +10,7 @@ class CSoundRender_TargetA : public CSoundRender_Target
     // OpenAL
     ALuint pSource;
     ALuint pBuffers[sdef_target_count];
+    ALuint pAuxSlot; // EFX
     float cache_gain;
     float cache_pitch;
 
@@ -17,7 +18,7 @@ class CSoundRender_TargetA : public CSoundRender_Target
     void fill_block(ALuint BufferID);
 
 public:
-    CSoundRender_TargetA();
+    CSoundRender_TargetA(ALuint slot);
     virtual ~CSoundRender_TargetA();
 
     bool _initialize() override;

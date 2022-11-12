@@ -79,7 +79,7 @@ private:
 
     void save_file(gamespy_gp::profile const* profile);
 
-    void __stdcall onlylog_operation(bool const result, char const* err_descr);
+    void onlylog_operation(bool const result, char const* err_descr);
 
     static void fill_private_key(crypto::xr_dsa::private_key_t& priv_key_dest);
 

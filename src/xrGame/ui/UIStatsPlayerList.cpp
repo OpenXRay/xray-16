@@ -4,7 +4,6 @@
 #include "game_cl_artefacthunt.h"
 #include "UIStatsPlayerInfo.h"
 #include "UIStatsIcon.h"
-#include "string_table.h"
 #include "Level.h"
 #include "xrUICore/Static/UIStatic.h"
 #include "UIXmlInit.h"
@@ -167,7 +166,7 @@ void CUIStatsPlayerList::InitHeader(CUIXml& xml_doc, LPCSTR path)
 void CUIStatsPlayerList::InitTeamHeader(CUIXml& xml_doc, LPCSTR path)
 {
     string256 _path;
-    m_header_team = xr_new<CUIWindow>();
+    m_header_team = xr_new<CUIWindow>("Team header");
     m_header_team->SetAutoDelete(true);
     CUIXmlInit::InitWindow(xml_doc, strconcat(sizeof(_path), _path, path, ":team_header"), 0, m_header_team);
     m_header_team->SetWidth(this->GetDesiredChildWidth());

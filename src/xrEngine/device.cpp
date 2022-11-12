@@ -1,39 +1,34 @@
 #include "stdafx.h"
 #include "xrCDB/Frustum.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-// mmsystem.h
-#define MMNOSOUND
-#define MMNOMIDI
-#define MMNOAUX
-#define MMNOMIXER
-#define MMNOJOY
-#if defined(XR_PLATFORM_WINDOWS)
-#include <mmsystem.h>
-#endif
-#include "SDL.h"
-#pragma warning(pop)
-
-#include <thread>
-
 #include "x_ray.h"
 #include "Render.h"
 
 #include "xrCore/FS_impl.h"
+#include "xrCore/Threading/TaskManager.hpp"
 
 #include "Include/editor/ide.hpp"
 
-#include "xrEngine/TaskScheduler.hpp"
-
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "splash.h"
+
+#include <thread>
+
+#include <SDL.h>
+
+// mmsystem.h
+#if defined(XR_PLATFORM_WINDOWS)
+#define MMNOSOUND
+#define MMNOMIDI
+#define MMNOAUX
+#define MMNOMIXER
+#define MMNOJOY
+#include <mmsystem.h>
+#endif
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -42,8 +37,6 @@ ENGINE_API bool g_bRendering = false;
 
 const u32 CRenderDeviceData::MaximalWaitTime = 16;
 constexpr size_t MAX_WINDOW_EVENTS = 32;
-
-extern int ps_always_active;
 
 bool g_bLoaded = false;
 ref_light precache_light = 0;
@@ -104,7 +97,7 @@ void CRenderDevice::RenderEnd(void)
             Msg("* End of synchronization A[%d] R[%d]", b_is_Active, b_is_Ready);
             FIND_CHUNK_COUNTER_FLUSH();
             CheckPrivilegySlowdown();
-            if (g_pGamePersistent->GameType() == 1 && !ps_always_active) // haCk
+            if (g_pGamePersistent->GameType() == 1 && !psDeviceFlags.test(rsAlwaysActive)) // haCk
             {
                 Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
                 if ((flags & SDL_WINDOW_INPUT_FOCUS) == 0)
@@ -115,71 +108,26 @@ void CRenderDevice::RenderEnd(void)
     g_bRendering = false;
     // end scene
     // Present goes here, so call OA Frame end.
-#if !defined(XR_PLATFORM_LINUX)
     if (g_SASH.IsBenchmarkRunning())
-        g_SASH.DisplayFrame(Device.fTimeGlobal);
-#endif
+        g_SASH.DisplayFrame(fTimeGlobal);
+
     GEnv.Render->End();
+
+    vCameraPositionSaved = vCameraPosition;
+    vCameraDirectionSaved = vCameraDirection;
+    vCameraTopSaved = vCameraTop;
+    vCameraRightSaved = vCameraRight;
+
+    mFullTransformSaved = mFullTransform;
+    mViewSaved = mView;
+    mProjectSaved = mProject;
 
     if (load_finished && m_editor)
         m_editor->on_load_finished();
 }
 
-// XXX: make it work correct in all situations
-void CRenderDevice::RenderThreadProc(void* context)
-{
-    auto& device = *static_cast<CRenderDevice*>(context);
-    while (true)
-    {
-        device.renderProcessFrame.Wait();
-        if (device.mt_bMustExit)
-        {
-            device.renderThreadExit.Set();
-            return;
-        }
-
-        if (!GEnv.isDedicatedServer)
-        {
-            // all rendering is done here
-            CStatTimer renderTotalReal;
-            renderTotalReal.FrameStart();
-            renderTotalReal.Begin();
-            if (device.b_is_Active && device.RenderBegin())
-            {
-                device.seqRender.Process();
-                device.CalcFrameStats();
-                device.Statistic->Show();
-                device.RenderEnd(); // Present goes here
-            }
-            renderTotalReal.End();
-            renderTotalReal.FrameEnd();
-            device.stats.RenderTotal.accum = renderTotalReal.accum;
-        }
-        device.renderFrameDone.Set();
-    }
-}
-
-void CRenderDevice::SecondaryThreadProc(void* context)
-{
-    auto& device = *static_cast<CRenderDevice*>(context);
-    while (true)
-    {
-        device.syncProcessFrame.Wait();
-        if (device.mt_bMustExit)
-        {
-            device.syncThreadExit.Set();
-            return;
-        }
-        for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
-            device.seqParallel[pit]();
-        device.seqParallel.clear();
-        device.seqFrameMT.Process();
-        device.syncFrameDone.Set();
-    }
-}
-
 #include "IGame_Level.h"
-void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
+void CRenderDevice::PreCache(u32 amount, bool draw_loadscreen, bool wait_user_input)
 {
     if (GEnv.isDedicatedServer)
         amount = 0;
@@ -196,10 +144,9 @@ void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_use
         precache_light->set_range(5.0f);
         precache_light->set_active(true);
     }
-    if (amount && b_draw_loadscreen && !load_screen_renderer.b_registered)
+    if (amount && draw_loadscreen && !load_screen_renderer.IsActive())
     {
-        pApp->LoadForceDrop();
-        load_screen_renderer.start(b_wait_user_input);
+        load_screen_renderer.Start(wait_user_input);
     }
 }
 
@@ -251,10 +198,8 @@ bool CRenderDevice::BeforeFrame()
         return false;
     }
 
-#if !defined(XR_PLATFORM_LINUX)
-    if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
+    if (!dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
-#endif
 
     return true;
 }
@@ -274,18 +219,11 @@ void CRenderDevice::BeforeRender()
     }
 
     // Matrices
+    mInvView.invert(mView);
     mFullTransform.mul(mProject, mView);
-    GEnv.Render->SetCacheXform(mView, mProject);
     mInvFullTransform.invert_44(mFullTransform);
-
-    vCameraPositionSaved = vCameraPosition;
-    vCameraDirectionSaved = vCameraDirection;
-    vCameraTopSaved = vCameraTop;
-    vCameraRightSaved = vCameraRight;
-
-    mFullTransformSaved = mFullTransform;
-    mViewSaved = mView;
-    mProjectSaved = mProject;
+    GEnv.Render->BeforeRender();
+    GEnv.Render->SetCacheXform(mView, mProject);
 }
 
 void CRenderDevice::DoRender()
@@ -310,6 +248,14 @@ void CRenderDevice::DoRender()
     stats.RenderTotal.accum = renderTotalReal.accum;
 }
 
+void CRenderDevice::ProcessParallelSequence(Task&, void*)
+{
+    for (u32 pit = 0; pit < seqParallel.size(); pit++)
+        seqParallel[pit]();
+    seqParallel.clear();
+    seqFrameMT.Process();
+}
+
 void CRenderDevice::ProcessFrame()
 {
     if (!BeforeFrame())
@@ -317,14 +263,11 @@ void CRenderDevice::ProcessFrame()
 
     const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
 
-    GEnv.Render->BeforeFrame();
     FrameMove();
 
     BeforeRender();
 
-    // renderProcessFrame.Set(); // allow render thread to do its job
-    syncProcessFrame.Set(); // allow secondary thread to do its job
-    //mtProcessingAllowed = true;
+    const auto& processSeqParallel = TaskScheduler->AddTask("Secondary Thread Proc", { this, &CRenderDevice::ProcessParallelSequence });
 
     DoRender();
 
@@ -336,17 +279,13 @@ void CRenderDevice::ProcessFrame()
     if (GEnv.isDedicatedServer)
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
 
-    else if (Device.Paused())
+    else if (Paused())
         updateDelta = 16; // 16 ms, ~60 FPS max while paused
 
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);
 
-    syncFrameDone.Wait(); // wait until secondary thread finish its job
-    // renderFrameDone.Wait(); // wait until render thread finish its job
-    //while (!TaskScheduler->TaskQueueIsEmpty())
-    //    std::this_thread::yield();
-    //mtProcessingAllowed = false;
+    TaskScheduler->Wait(processSeqParallel);
 
     if (!b_is_Active)
         Sleep(1);
@@ -381,6 +320,30 @@ void CRenderDevice::message_loop()
 
             switch (event.type)
             {
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+            case SDL_DISPLAYEVENT:
+            {
+                switch (event.display.type)
+                {
+                case SDL_DISPLAYEVENT_ORIENTATION:
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+                case SDL_DISPLAYEVENT_CONNECTED:
+                case SDL_DISPLAYEVENT_DISCONNECTED:
+#endif
+                    CleanupVideoModes();
+                    FillVideoModes();
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+                    if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
+#else
+                    if (event.display.display == psDeviceMode.Monitor)
+#endif
+                        Reset();
+                    else
+                        UpdateWindowProps();
+                    break;
+                }
+            }
+#endif
             case SDL_WINDOWEVENT:
             {
                 switch (event.window.event)
@@ -391,14 +354,13 @@ void CRenderDevice::message_loop()
 
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
                 {
-                    if (!psDeviceFlags.is(rsFullscreen))
+                    if (psDeviceMode.WindowStyle != rsFullscreen)
                     {
-                        if (psCurrentVidMode[0] == event.window.data1 && psCurrentVidMode[1] == event.window.data2)
+                        if (psDeviceMode.Width == event.window.data1 && psDeviceMode.Height == event.window.data2)
                             break; // we don't need to reset device if resolution wasn't really changed
 
-                        string32 buff;
-                        xr_sprintf(buff, sizeof(buff), "vid_mode %dx%d", event.window.data1, event.window.data2);
-                        Console->Execute(buff);
+                        psDeviceMode.Width = event.window.data1;
+                        psDeviceMode.Height = event.window.data2;
 
                         Reset();
                     }
@@ -432,8 +394,8 @@ void CRenderDevice::message_loop()
                     break;
 
                 case SDL_WINDOWEVENT_CLOSE:
-                    SDL_Event quit = { SDL_QUIT };
-                    SDL_PushEvent(&quit);
+                    Engine.Event.Defer("KERNEL:disconnect");
+                    Engine.Event.Defer("KERNEL:quit");
                 }
             }
             }
@@ -458,10 +420,10 @@ void CRenderDevice::Run()
     dwTimeGlobal = 0;
     Timer_MM_Delta = 0;
     {
-        u32 time_mm = timeGetTime();
-        while (timeGetTime() == time_mm)
+        u32 time_mm = CPU::GetTicks();
+        while (CPU::GetTicks() == time_mm)
             ; // wait for next tick
-        u32 time_system = timeGetTime();
+        u32 time_system = CPU::GetTicks();
         u32 time_local = TimerAsync();
         Timer_MM_Delta = time_system - time_local;
     }
@@ -470,13 +432,12 @@ void CRenderDevice::Run()
     seqAppStart.Process();
 
     splash::hide();
-    SDL_HideWindow(m_sdlWnd);
+    SDL_HideWindow(m_sdlWnd); // workaround for SDL bug
+    UpdateWindowProps();
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
-    UpdateWindowProps(!psDeviceFlags.is(rsFullscreen));
     if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    OnWM_Activate(1, 0);
 
     // Message cycle
     message_loop();
@@ -485,12 +446,6 @@ void CRenderDevice::Run()
     mt_bMustExit = true;
 
     seqAppEnd.Process();
-    
-    // renderProcessFrame.Set();
-    // renderThreadExit.Wait();
-    
-    syncProcessFrame.Set();
-    syncThreadExit.Wait();
 }
 
 u32 app_inactive_time = 0;
@@ -539,7 +494,7 @@ void CRenderDevice::FrameMove()
     stats.EngineTotal.Begin();
     // TODO: HACK to test loading screen.
     // if(!g_bLoaded)
-    Device.seqFrame.Process();
+    seqFrame.Process();
     g_bLoaded = true;
     // else
     // seqFrame.Process(rp_Frame);
@@ -615,22 +570,30 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     else
         pInput->GrabInput(false);
 
-    const bool isGameActive = ps_always_active || isWndActive;
+    b_is_Active = isWndActive || psDeviceFlags.test(rsAlwaysActive);
 
-    if (isGameActive != Device.b_is_Active)
+    if (isWndActive != b_is_InFocus)
     {
-        Device.b_is_Active = isGameActive;
-        if (Device.b_is_Active)
+        b_is_InFocus = isWndActive;
+        if (b_is_InFocus)
         {
-            Device.seqAppActivate.Process();
+            seqAppActivate.Process();
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
         }
         else
         {
             app_inactive_time_start = TimerMM.GetElapsed_ms();
-            Device.seqAppDeactivate.Process();
+            seqAppDeactivate.Process();
         }
     }
+}
+
+void CRenderDevice::time_factor(const float time_factor)
+{
+    Timer.time_factor(time_factor);
+    TimerGlobal.time_factor(time_factor);
+    if (!strstr(Core.Params, "-sound_constant_speed"))
+        psSoundTimeFactor = time_factor; //--#SM+#--
 }
 
 void CRenderDevice::AddSeqFrame(pureFrame* f, bool mt)
@@ -663,28 +626,37 @@ SCRIPT_EXPORT(Device, (),
     ];
 });
 
-CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false), b_need_user_input(false) {}
-void CLoadScreenRenderer::start(bool b_user_input)
+void CLoadScreenRenderer::Start(bool b_user_input)
 {
+    Device.seqFrame.Add(this, 0);
     Device.seqRender.Add(this, 0);
-    b_registered = true;
-    b_need_user_input = b_user_input;
+    m_registered = true;
+    m_need_user_input = b_user_input;
 
-    pApp->LoadForceDrop();
     pApp->ShowLoadingScreen(true);
+    pApp->LoadBegin();
 }
 
-void CLoadScreenRenderer::stop()
+void CLoadScreenRenderer::Stop()
 {
-    if (!b_registered)
+    if (!m_registered)
         return;
+    Device.seqFrame.Remove(this);
     Device.seqRender.Remove(this);
 
-    b_registered = false;
-    b_need_user_input = false;
+    m_registered = false;
+    m_need_user_input = false;
 
-    pApp->LoadForceFinish();
     pApp->ShowLoadingScreen(false);
+    pApp->LoadEnd();
 }
 
-void CLoadScreenRenderer::OnRender() { pApp->load_draw_internal(true); }
+void CLoadScreenRenderer::OnFrame()
+{
+    pApp->LoadStage(false);
+}
+
+void CLoadScreenRenderer::OnRender()
+{
+    pApp->load_draw_internal();
+}

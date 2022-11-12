@@ -9,6 +9,16 @@
 #include "xrCore/FixedVector.h"
 #include "xrCDB/Frustum.h"
 
+#ifdef XRAY_STATIC_BUILD
+#   define XRUICORE_API
+#else
+#   ifdef XRUICORE_EXPORTS
+#      define XRUICORE_API XR_EXPORT
+#   else
+#      define XRUICORE_API XR_IMPORT
+#   endif
+#endif
+
 typedef FactoryPtr<IUIShader> ui_shader;
 
 constexpr float UI_BASE_WIDTH = 1024.0f;

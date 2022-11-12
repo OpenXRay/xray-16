@@ -163,6 +163,8 @@ public:
 
     PSS poolSI; // pool из которого выделяются SlotItem
 
+    Fvector EYE;
+
     void UpdateVisibleM();
     void UpdateVisibleS();
 
@@ -189,10 +191,12 @@ public:
     void hw_Load_Shaders();
     void hw_Unload();
     void hw_Render();
-#ifndef USE_DX9
+#if defined(USE_DX9)
+    void hw_Render_dump(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
+#elif defined(USE_DX11) || defined(USE_OGL)
     void hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
 #else
-    void hw_Render_dump(ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
+#   error No graphics API selected or enabled!
 #endif
 
     // get unpacked slot
@@ -219,7 +223,7 @@ public:
     volatile u32 m_frame_calc;
     volatile u32 m_frame_rendered;
 
-    void __stdcall MT_CALC();
+    void MT_CALC();
     ICF void MT_SYNC()
     {
         if (m_frame_calc == RDEVICE.dwFrame)

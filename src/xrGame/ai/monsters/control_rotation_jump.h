@@ -19,6 +19,13 @@ struct SControlRotationJumpData : public ControlCom::IComData
 
 class CControlRotationJump : public CControl_ComCustom<SControlRotationJumpData>
 {
+    static constexpr s32 ROTATION_JUMP_DELAY_MIN = 3000;
+    static constexpr s32 ROTATION_JUMP_DELAY_MAX = 5000;
+
+    static constexpr float CHECK_YAW = 150.f * PI / 180.f;
+    static constexpr float START_SPEED_DELTA = 2.f;
+
+private:
     typedef CControl_ComCustom<SControlRotationJumpData> inherited;
     u32 m_time_next_rotation_jump;
 

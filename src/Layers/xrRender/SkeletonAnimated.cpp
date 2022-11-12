@@ -632,11 +632,6 @@ void CKinematicsAnimated::Release()
 }
 
 CKinematicsAnimated::~CKinematicsAnimated() { IBoneInstances_Destroy(); }
-CKinematicsAnimated::CKinematicsAnimated()
-    : CKinematics(), IKinematicsAnimated(), blend_instances(nullptr), m_Partition(nullptr), m_blend_destroy_callback(nullptr),
-      m_update_tracks_callback(nullptr), Update_LastTime(0)
-{
-}
 
 void CKinematicsAnimated::IBoneInstances_Create()
 {
@@ -747,7 +742,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
                 if (!FS.exist(fn, "$game_meshes$", nm))
                 {
 #ifdef _EDITOR
-                    Msg("!Can't find motion file '%s'.", nm);
+                    Msg("! Can't find motion file '%s'.", nm);
                     return;
 #else
                     xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'.", nm);
@@ -787,7 +782,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
                 if (!FS.exist(fn, "$game_meshes$", nm))
                 {
 #ifdef _EDITOR
-                    Msg("!Can't find motion file '%s'.", nm);
+                    Msg("! Can't find motion file '%s'.", nm);
                     return;
 #else
                     xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'.", nm);

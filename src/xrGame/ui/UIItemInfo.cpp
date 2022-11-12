@@ -7,7 +7,6 @@
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
-#include "string_table.h"
 #include "inventory_item.h"
 #include "UIInventoryUtilities.h"
 #include "PhysicsShellHolder.h"
@@ -29,7 +28,7 @@ extern const LPCSTR g_inventory_upgrade_xml;
 #define INV_GRID_WIDTH2 40.0f
 #define INV_GRID_HEIGHT2 40.0f
 
-CUIItemInfo::CUIItemInfo()
+CUIItemInfo::CUIItemInfo() : CUIWindow("CUIItemInfo")
 {
     UIItemImageSize.set(0.0f, 0.0f);
 

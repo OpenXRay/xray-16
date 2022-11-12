@@ -8,10 +8,11 @@
 #include "xrEngine/EnnumerateVertices.h"
 #include "xrCore/xrDebug_macros.h"
 
-#ifdef USE_TBB_PARALLEL
 // XXX: test the parallel code in the load_hw()
-// and then uncomment the include
-//#include <tbb/parallel_for_each.h>
+//#define PARALLEL_BONE_VERTICES_PROCESSING
+
+#ifdef PARALLEL_BONE_VERTICES_PROCESSING
+#include <xrCore/Threading/ParallelFor.hpp>
 #endif
 
 #ifdef DEBUG
@@ -112,7 +113,7 @@ ICF void set_vertice_hw(vertHW_4W<T>* dst, const vertBoned4W* src)
 // If vertex count is bigger than this value,
 // then it's reasonable to process vertices in parallel
 // XXX: determine value dynamically, it should be different for different CPUs
-constexpr auto PROCESS_VERTICES_IN_PARALLEL_BORDER = 10000; // XXX: rough value
+constexpr auto PARALLEL_BONE_VERTICES_PROCESSING_MIN_VERTICES = 10000; // XXX: rough value
 
 template <typename TDst, typename TSrc>
 void load_hw(Fvisual& V, const TSrc* src)
@@ -128,11 +129,11 @@ void load_hw(Fvisual& V, const TSrc* src)
     // XXX: install some Ultra HD models pack and test the parallel code
     // For the original game models parallel code is always slower...
     // But I don't want to enable untested code.
-#if 0//def USE_TBB_PARALLEL
-    if (V.vCount > PROCESS_VERTICES_IN_PARALLEL_BORDER)
+#ifdef PARALLEL_BONE_VERTICES_PROCESSING
+    if (V.vCount > PARALLEL_BONE_VERTICES_PROCESSING_MIN_VERTICES)
     {
         using range_value_type = decltype(Fvisual::vCount);
-        auto setVertices = [dst, src](tbb::blocked_range<range_value_type> range)
+        auto setVertices = [dst, src](TaskRange<range_value_type> range)
         {
             const TSrc* src2 = &src[range.begin()];
             TDst* dst2 = &dst[range.begin()];
@@ -144,8 +145,8 @@ void load_hw(Fvisual& V, const TSrc* src)
                 src2++;
             }
         };
-        tbb::blocked_range<range_value_type> range(0, V.vCount);
-        tbb::parallel_for(range, setVertices);
+        TaskRange<range_value_type> range(0, V.vCount);
+        xr_parallel_for(range, setVertices);
     }
     else
 #endif

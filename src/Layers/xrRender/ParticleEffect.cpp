@@ -1,18 +1,20 @@
 #include "stdafx.h"
 #pragma hdrstop
 #include "ParticleEffect.h"
-#include "tbb/parallel_for.h"
-#include "tbb/blocked_range.h"
+
+#include "xrCore/Threading/ParallelFor.hpp"
 
 #ifndef _EDITOR
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#else
+#error Add your platform here
 #endif
 #endif
 
-#if defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) // XXX: remove
 #include <math.h>
 #endif
 
@@ -30,23 +32,7 @@ static void ApplyTexgen(const Fmatrix& mVP)
 {
     Fmatrix mTexgen;
 
-#ifdef USE_OGL
-    Fmatrix mTexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-#elif !defined(USE_DX9)
-    Fmatrix mTexelAdjust =
-    {
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    };
-#else // USE_DX9
+#if defined(USE_DX9)
     float _w = float(RDEVICE.dwWidth);
     float _h = float(RDEVICE.dwHeight);
     float o_w = (.5f / _w);
@@ -58,6 +44,24 @@ static void ApplyTexgen(const Fmatrix& mVP)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
     };
+#elif defined(USE_DX11)
+    Fmatrix mTexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, -0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
+#elif defined(USE_OGL)
+    Fmatrix mTexelAdjust =
+    {
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.5f, 0.5f, 0.0f, 1.0f
+    };
+#else
+#   error No graphics API selected or enabled!
 #endif
 
     mTexgen.mul(mTexelAdjust, mVP);
@@ -150,7 +154,7 @@ void CParticleEffect::OnFrame(u32 frame_dt)
         m_MemDT += frame_dt;
 
         int StepCount = 0;
-        if (m_MemDT >= uDT_STEP)
+        if (m_MemDT >= static_cast<s32>(uDT_STEP))
         {
             // allow maximum of three steps (99ms) to avoid slowdown after loading
             // it will really skip updates at less than 10fps, which is unplayable
@@ -481,15 +485,6 @@ ICF void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const
 
 extern ENGINE_API float psHUD_FOV;
 
-struct PRS_PARAMS
-{
-    FVF::LIT* pv;
-    u32 p_from;
-    u32 p_to;
-    PAPI::Particle* particles;
-    CParticleEffect* pPE;
-};
-
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 ICF void magnitude_sse(Fvector& vec, float& res) // XXX: move this to Fvector class
 {
@@ -514,14 +509,16 @@ ICF void magnitude_sse(Fvector& vec, float& res)
 #error Specify your platform explicitly
 #endif
 
-void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, CParticleEffect * pPE)
+void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles)
 {
     float sina = 0.0f, cosa = 0.0f;
     // Xottab_DUTY: changed angle to be float instead of DWORD
     // But it must be 0xFFFFFFFF or otherwise some particles won't play
     float angle = float(0xFFFFFFFF); // XXX: check if we can replace with flt_max
 
-    FOR_START(u32, 0, count, i)
+    const auto renderParticles = [&, this](const TaskRange<u32>& range)
+    {
+        for (u32 i = range.begin(); i != range.end(); ++i)
         {
             PAPI::Particle& m = particles[i];
             Fvector2 lt, rb;
@@ -539,36 +536,36 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
 
             _mm_prefetch(64 + (char*)&particles[i + 1], _MM_HINT_NTA);
 
-            if (pPE->m_Def->m_Flags.is(CPEDef::dfFramed))
-                pPE->m_Def->m_Frame.CalculateTC(iFloor(float(m.frame) / 255.f), lt, rb);
+            if (m_Def->m_Flags.is(CPEDef::dfFramed))
+                m_Def->m_Frame.CalculateTC(iFloor(float(m.frame) / 255.f), lt, rb);
 
             float r_x = m.size.x * 0.5f;
             float r_y = m.size.y * 0.5f;
             float speed = 0.f;
             bool speed_calculated = false;
 
-            if (pPE->m_Def->m_Flags.is(CPEDef::dfVelocityScale))
+            if (m_Def->m_Flags.is(CPEDef::dfVelocityScale))
             {
                 magnitude_sse(m.vel, speed);
                 speed_calculated = true;
-                r_x += speed * pPE->m_Def->m_VelocityScale.x;
-                r_y += speed * pPE->m_Def->m_VelocityScale.y;
+                r_x += speed * m_Def->m_VelocityScale.x;
+                r_y += speed * m_Def->m_VelocityScale.y;
             }
 
-            if (pPE->m_Def->m_Flags.is(CPEDef::dfAlignToPath))
+            if (m_Def->m_Flags.is(CPEDef::dfAlignToPath))
             {
                 if (!speed_calculated)
                     magnitude_sse(m.vel, speed);
 
-                if ((speed < EPS_S) && pPE->m_Def->m_Flags.is(CPEDef::dfWorldAlign))
+                if ((speed < EPS_S) && m_Def->m_Flags.is(CPEDef::dfWorldAlign))
                 {
                     Fmatrix M;
-                    M.setXYZ(pPE->m_Def->m_APDefaultRotation);
-                    if (pPE->m_RT_Flags.is(CParticleEffect::flRT_XFORM))
+                    M.setXYZ(m_Def->m_APDefaultRotation);
+                    if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
                     {
                         Fvector p;
-                        pPE->m_XFORM.transform_tiny(p, m.pos);
-                        M.mulA_43(pPE->m_XFORM);
+                        m_XFORM.transform_tiny(p, m.pos);
+                        M.mulA_43(m_XFORM);
                         FillSprite(pv, M.k, M.i, p, lt, rb, r_x, r_y, m.color, sina, cosa);
                     }
                     else
@@ -576,7 +573,7 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                         FillSprite(pv, M.k, M.i, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
                     }
                 }
-                else if ((speed >= EPS_S) && pPE->m_Def->m_Flags.is(CPEDef::dfFaceAlign))
+                else if ((speed >= EPS_S) && m_Def->m_Flags.is(CPEDef::dfFaceAlign))
                 {
                     Fmatrix M;
                     M.identity();
@@ -588,11 +585,11 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                     M.i.normalize();
                     M.j.crossproduct(M.k, M.i);
                     M.j.normalize();
-                    if (pPE->m_RT_Flags.is(CParticleEffect::flRT_XFORM))
+                    if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
                     {
                         Fvector p;
-                        pPE->m_XFORM.transform_tiny(p, m.pos);
-                        M.mulA_43(pPE->m_XFORM);
+                        m_XFORM.transform_tiny(p, m.pos);
+                        M.mulA_43(m_XFORM);
                         FillSprite(pv, M.j, M.i, p, lt, rb, r_x, r_y, m.color, sina, cosa);
                     }
                     else
@@ -606,12 +603,12 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                     if (speed >= EPS_S)
                         dir.div(m.vel, speed);
                     else
-                        dir.setHP(-pPE->m_Def->m_APDefaultRotation.y, -pPE->m_Def->m_APDefaultRotation.x);
-                    if (pPE->m_RT_Flags.is(CParticleEffect::flRT_XFORM))
+                        dir.setHP(-m_Def->m_APDefaultRotation.y, -m_Def->m_APDefaultRotation.x);
+                    if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
                     {
                         Fvector p, d;
-                        pPE->m_XFORM.transform_tiny(p, m.pos);
-                        pPE->m_XFORM.transform_dir(d, dir);
+                        m_XFORM.transform_tiny(p, m.pos);
+                        m_XFORM.transform_dir(d, dir);
                         FillSprite(pv, p, d, lt, rb, r_x, r_y, m.color, sina, cosa);
                     }
                     else
@@ -622,10 +619,10 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
             }
             else
             {
-                if (pPE->m_RT_Flags.is(CParticleEffect::flRT_XFORM))
+                if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
                 {
                     Fvector p;
-                    pPE->m_XFORM.transform_tiny(p, m.pos);
+                    m_XFORM.transform_tiny(p, m.pos);
                     FillSprite(pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, p, lt, rb, r_x, r_y, m.color, sina, cosa);
                 }
                 else
@@ -634,7 +631,15 @@ void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle * particles, C
                 }
             }
         }
-    FOR_END
+    };
+    // XXX: it turned out that singlethreaded code works way faster
+    // But on processors with small caches it may work slower, profiling needed
+    //if (count > (TaskScheduler->GetWorkersCount() * 64))
+    //    xr_parallel_for(TaskRange<u32>(0, count), renderParticles);
+    //else
+    {
+        renderParticles(TaskRange<u32>(0, count));
+    }
 }
 
 void CParticleEffect::Render(float)
@@ -662,7 +667,7 @@ void CParticleEffect::Render(float)
         {
             FVF::LIT* pv_start = (FVF::LIT*)RCache.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
 
-            ParticleRenderStream(pv_start, p_cnt, particles, this);
+            ParticleRenderStream(pv_start, p_cnt, particles);
 
             dwCount = p_cnt << 2;
 

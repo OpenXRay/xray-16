@@ -84,7 +84,7 @@ public:
     virtual void RefreshList();
 
 private:
-    void xr_stdcall OnUpdate() { RefreshList(); }
+    void OnUpdate() { RefreshList(); }
 
 protected:
     bool IsValidItem(ServerInfo& item);

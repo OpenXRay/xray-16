@@ -4,7 +4,7 @@
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/Static/UIStatic.h"
 
-UITeamPanels::UITeamPanels()
+UITeamPanels::UITeamPanels() : CUIWindow("UITeamPanels")
 {
     need_update_players = false;
     need_update_panels = false;
@@ -69,7 +69,7 @@ void UITeamPanels::InitAllTeams(shared_str const& team_node)
         tempTeamPanel->Init(uiXml, team_node.c_str(), i);
         tempTeamPanel->SetAutoDelete(true);
         AttachChild(tempTeamPanel);
-        myPanels.insert(std::make_pair(shared_str(tempTeamName), tempTeamPanel));
+        myPanels.emplace(shared_str(tempTeamName), tempTeamPanel);
     }
 }
 

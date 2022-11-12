@@ -3,6 +3,16 @@
 #include "xrCore/_vector3d.h"
 #include "xrCommon/math_funcs_inline.h"
 
+#ifdef XRAY_STATIC_BUILD
+#   define PARTICLES_API
+#else
+#   ifdef XR_PARTICLES_EXPORTS
+#      define PARTICLES_API XR_EXPORT
+#   else
+#      define PARTICLES_API XR_IMPORT
+#   endif
+#endif
+
 // Actually this must be < sqrt(MAXFLOAT) since we store this value squared.
 #define P_MAXFLOAT 1.0e16f
 

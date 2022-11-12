@@ -51,7 +51,7 @@ public:
     Fsphere m_Bounds; // 16     world space
 public:
     CSkeletonWallmark(CKinematics* p, const Fmatrix* m, ref_shader s, const Fvector& cp, float ts)
-        : m_Parent(p), m_XForm(m), m_Shader(s), m_fTimeStart(ts), m_ContactPoint(cp)
+        : m_Parent(p), m_XForm(m), m_Shader(s), m_ContactPoint(cp), m_fTimeStart(ts)
     {
 #ifdef DEBUG
         used_in_render = u32(-1);

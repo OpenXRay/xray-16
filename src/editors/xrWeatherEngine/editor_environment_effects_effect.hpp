@@ -32,14 +32,14 @@ public:
     inline pcstr id() const { return m_id.c_str(); }
 
 private:
-    pcstr xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(pcstr value);
+    pcstr id_getter() const;
+    void id_setter(pcstr value);
 
-    float xr_stdcall wind_blast_longitude_getter() const;
-    void xr_stdcall wind_blast_longitude_setter(float value);
+    float wind_blast_longitude_getter() const;
+    void wind_blast_longitude_setter(float value);
 
-    pcstr xr_stdcall sound_getter();
-    void xr_stdcall sound_setter(pcstr value);
+    pcstr sound_getter();
+    void sound_setter(pcstr value);
 
     using property_holder_type = XRay::Editor::property_holder_base;
 

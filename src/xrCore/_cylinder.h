@@ -1,24 +1,15 @@
 #pragma once
+
 #include "_vector3d.h"
 
-template <class T>
-class _cylinder
+struct XRCORE_API Fcylinder
 {
-public:
-    using TYPE = T;
-    using Self = _cylinder<T>;
-    using VEC_TYPE = _vector3<T>;
-    using SelfRef = Self&;
-    using SelfCRef = const Self&;
+    Fvector3 m_center;
+	Fvector3 m_direction;
+    float m_height;
+    float m_radius;
 
-public:
-	VEC_TYPE m_center;
-	VEC_TYPE m_direction;
-    T m_height;
-    T m_radius;
-
-public:
-    IC SelfRef invalidate()
+    auto& invalidate()
     {
         m_center.set(0, 0, 0);
         m_direction.set(0, 0, 0);
@@ -34,24 +25,19 @@ public:
         cyl_none
     };
 
-    int intersect(const VEC_TYPE& start, const VEC_TYPE& dir, T afT[2], ecode code[2]) const;
+    int intersect(const Fvector3& start, const Fvector3& dir, float afT[2], ecode code[2]) const;
 
-    enum ERP_Result
+    enum ERP_Result : u32
     {
         rpNone = 0,
         rpOriginInside = 1,
         rpOriginOutside = 2,
-        fcv_forcedword = u32(-1)
     };
 
-    ERP_Result intersect(const VEC_TYPE& start, const VEC_TYPE& dir, T& dist) const;
+    ERP_Result intersect(const Fvector3& start, const Fvector3& dir, float& dist) const;
 };
 
-using Fcylinder = _cylinder<float>;
-using Dcylinder = _cylinder<double>;
-
-template <class T>
-bool _valid(const _cylinder<T>& c)
+inline bool _valid(const Fcylinder& c)
 {
     return _valid(c.m_center) && _valid(c.m_direction) && _valid(c.m_height) && _valid(c.m_radius);
 }

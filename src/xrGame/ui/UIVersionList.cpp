@@ -4,6 +4,7 @@
 #include "xrUICore/ListBox/UIListBoxItem.h"
 
 CUIVersionList::CUIVersionList()
+    : CUIWindow("CUIVersionList")
 {
     itemsCount = 0;
 

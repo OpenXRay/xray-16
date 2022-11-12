@@ -32,7 +32,7 @@ configs_dumper::configs_dumper()
 
 configs_dumper::~configs_dumper()
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // XXX: use Event class, enable on other platforms
     if (m_make_start_event)
     {
         SetEvent(m_make_start_event);
@@ -46,7 +46,7 @@ configs_dumper::~configs_dumper()
 
 void configs_dumper::shedule_Update(u32 dt)
 {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // XXX: use Event class, enable on other platforms
     u32 thread_result = WaitForSingleObject(m_make_done_event, 0);
     R_ASSERT((thread_result != WAIT_ABANDONED) && (thread_result != WAIT_FAILED));
     R_ASSERT(m_state == ds_active);
@@ -207,8 +207,8 @@ void configs_dumper::dump_config(complete_callback_t complete_cb)
         return;
     }
 
+#ifdef XR_PLATFORM_WINDOWS // XXX: use Event class, enable on other platforms
     ULONG_PTR process_affinity_mask, tmp_dword;
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
     GetProcessAffinityMask(GetCurrentProcess(), &process_affinity_mask, &tmp_dword);
     bool single_core = (btwCount1(static_cast<u32>(process_affinity_mask)) == 1);
     if (single_core)
@@ -250,7 +250,7 @@ void configs_dumper::compress_configs()
 void configs_dumper::dumper_thread(void* my_ptr)
 {
     configs_dumper* this_ptr = static_cast<configs_dumper*>(my_ptr);
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // XXX: use Event class, enable on other platforms
     u32 wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {
@@ -272,7 +272,7 @@ void configs_dumper::dumper_thread(void* my_ptr)
 #endif
 }
 
-void __stdcall configs_dumper::yield_cb(long progress)
+void configs_dumper::yield_cb(long progress)
 {
     if (progress % 5 == 0)
     {
@@ -280,7 +280,7 @@ void __stdcall configs_dumper::yield_cb(long progress)
     }
 }
 
-void __stdcall configs_dumper::switch_thread()
+void configs_dumper::switch_thread()
 {
     if (!SwitchToThread())
         Sleep(10);

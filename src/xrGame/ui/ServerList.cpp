@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "ServerList.h"
 #include "UIXmlInit.h"
-#include "string_table.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrUICore/EditBox/UIEditBox.h"
 #include "UIMessageBoxEx.h"
@@ -17,6 +16,7 @@
 LPCSTR GameTypeToStringEx(u32 gt, bool bShort);
 
 CServerList::CServerList()
+    : CUIWindow("CServerList")
 {
 #ifdef XR_PLATFORM_WINDOWS
     CGameSpy_BrowsersWrapper::UpdateCallback updateCb;

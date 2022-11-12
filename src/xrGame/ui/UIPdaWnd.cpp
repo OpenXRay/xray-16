@@ -62,7 +62,8 @@ CUIPdaWnd::~CUIPdaWnd()
     if (pUILogsWnd)
         delete_data(pUILogsWnd);
     delete_data(m_hint_wnd);
-    delete_data(UINoice);
+    if (UINoice)
+        delete_data(UINoice);
 }
 
 void CUIPdaWnd::Init()
@@ -126,7 +127,8 @@ void CUIPdaWnd::Init()
 
     UINoice = xr_new<CUIStatic>();
     UINoice->SetAutoDelete(true);
-    CUIXmlInit::InitStatic(uiXml, "noice_static", 0, UINoice);
+    if (!CUIXmlInit::InitStatic(uiXml, "noice_static", 0, UINoice, false))
+        xr_delete(UINoice);
 
     // XXX: dynamically determine if we need to rearrange the tabs
     if (ClearSkyMode)
@@ -298,7 +300,8 @@ void CUIPdaWnd::Draw()
     inherited::Draw();
     //.	DrawUpdatedSections();
     DrawHint();
-    UINoice->Draw(); // over all
+    if (UINoice)
+        UINoice->Draw(); // over all
 }
 
 void CUIPdaWnd::DrawHint()

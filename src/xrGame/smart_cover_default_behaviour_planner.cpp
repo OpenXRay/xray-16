@@ -16,9 +16,10 @@
 #include "stalker_property_evaluators.h"
 #include "script_game_object.h"
 
+
+namespace smart_cover
+{
 using namespace StalkerDecisionSpace;
-using smart_cover::default_behaviour_planner;
-using smart_cover::animation_planner;
 
 default_behaviour_planner::default_behaviour_planner(animation_planner* object, LPCSTR action_name)
     : inherited(object, action_name)
@@ -72,4 +73,5 @@ void default_behaviour_planner::add_actions()
     action->setup(&object(), inherited_action::m_storage);
 }
 
-LPCSTR default_behaviour_planner::object_name() const { return ("default_behaviour_planner"); }
+pcstr default_behaviour_planner::object_name() const { return ("default_behaviour_planner"); }
+} // namespace smart_cover

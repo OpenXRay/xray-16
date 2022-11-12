@@ -301,7 +301,6 @@ set(SRC_FILES
     "BottleItem.h"
     "BreakableObject.cpp"
     "BreakableObject.h"
-    "CalculateTriangle.h"
     "CameraEffector.cpp"
     "CameraEffector.h"
     "CameraFirstEye.cpp"
@@ -440,8 +439,6 @@ set(SRC_FILES
     "detail_path_manager_inline.h"
     "detail_path_manager_smooth.cpp"
     "detail_path_manager_space.h"
-    "DisablingParams.cpp"
-    "DisablingParams.h"
     "doors_actor.cpp"
     "doors_actor.h"
     "doors_door.cpp"
@@ -483,8 +480,6 @@ set(SRC_FILES
     "ef_storage_script.cpp"
     "ElectricBall.cpp"
     "ElectricBall.h"
-    "ElevatorState.cpp"
-    "ElevatorState.h"
     "EliteDetector.cpp"
     "EliteDetector.h"
     "encyclopedia_article.cpp"
@@ -498,6 +493,7 @@ set(SRC_FILES
     "entity_alive_inline.h"
     "EntityCondition.cpp"
     "EntityCondition.h"
+    "EntityCondition_script.cpp"
     "Entity.cpp"
     "Entity.h"
     "event_conditions_collection.cpp"
@@ -542,13 +538,13 @@ set(SRC_FILES
     "game_base.h"
     "game_base_kill_type.h"
     "game_base_menu_events.h"
-    #"game_base_script.cpp"
+    "game_base_script.cpp"
     "game_cl_artefacthunt.cpp"
     "game_cl_artefacthunt.h"
     "game_cl_artefacthunt_snd_msg.h"
     "game_cl_base.cpp"
     "game_cl_base.h"
-    #"game_cl_base_script.cpp"
+    "game_cl_base_script.cpp"
     "game_cl_base_weapon_usage_statistic.cpp"
     "game_cl_base_weapon_usage_statistic.h"
     "game_cl_base_weapon_usage_statistic_save.cpp"
@@ -567,8 +563,8 @@ set(SRC_FILES
     "game_cl_mp.h"
     "game_cl_mp_messages_menu.cpp"
     "game_cl_mp_messages_menu.h"
-    #"game_cl_mp_script.cpp"
-    #"game_cl_mp_script.h"
+    "game_cl_mp_script.cpp"
+    "game_cl_mp_script.h"
     "game_cl_mp_snd_messages.cpp"
     "game_cl_mp_snd_messages.h"
     "game_cl_single.cpp"
@@ -599,7 +595,7 @@ set(SRC_FILES
     "game_sv_base_console_vars.h"
     "game_sv_base.cpp"
     "game_sv_base.h"
-    #"game_sv_base_script.cpp"
+    "game_sv_base_script.cpp"
     "game_sv_capture_the_artefact_buy_event.cpp"
     "game_sv_capture_the_artefact.cpp"
     "game_sv_capture_the_artefact.h"
@@ -608,15 +604,15 @@ set(SRC_FILES
     "game_sv_deathmatch.cpp"
     "game_sv_deathmatch.h"
     "game_sv_deathmatch_process_event.cpp"
-    #"game_sv_deathmatch_script.cpp"
+    "game_sv_deathmatch_script.cpp"
     "game_sv_event_queue.cpp"
     "game_sv_event_queue.h"
     "game_sv_item_respawner.cpp"
     "game_sv_item_respawner.h"
     "game_sv_mp.cpp"
     "game_sv_mp.h"
-    #"game_sv_mp_script.cpp"
-    #"game_sv_mp_script.h"
+    "game_sv_mp_script.cpp"
+    "game_sv_mp_script.h"
     "game_sv_mp_team.h"
     "game_sv_mp_vote_flags.h"
     "game_sv_single.cpp"
@@ -763,7 +759,6 @@ set(SRC_FILES
     "item_manager.cpp"
     "item_manager.h"
     "item_manager_inline.h"
-    "key_binding_registrator_script.cpp"
     "killer_victim_velocity_angle.cpp"
     "killer_victim_velocity_angle.h"
     "kills_store.cpp"
@@ -1534,8 +1529,6 @@ set(SRC_FILES
     "step_manager.cpp"
     "step_manager_defs.h"
     "step_manager.h"
-    "string_table.cpp"
-    "string_table.h"
     "team_base_zone.cpp"
     "team_base_zone.h"
     "team_hierarchy_holder.cpp"
@@ -1700,8 +1693,6 @@ set(SRC_FILES
     "xrGameSpyServer_callbacks.h"
     "xrGameSpyServer.cpp"
     "xrGameSpyServer.h"
-    "xr_level_controller.cpp"
-    "xr_level_controller.h"
     "xrServer_balance.cpp"
     #"xr_Server_BattlEye.cpp"
     #"xr_Server_BattlEye.h"
@@ -2553,9 +2544,7 @@ set(SRC_FILES
     "../xrServerEntities/object_item_single_inline.h"
     "../xrServerEntities/pch_script.cpp"
     "../xrServerEntities/pch_script.h"
-    "../xrServerEntities/PHNetState.cpp"
     "../xrServerEntities/PHNetState.h"
-    "../xrServerEntities/PHSynchronize.cpp"
     "../xrServerEntities/PHSynchronize.h"
     "../xrServerEntities/PropertiesListHelper.h"
     "../xrServerEntities/PropertiesListTypes.h"
@@ -2634,14 +2623,13 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/xrServerEntities
-    ${CMAKE_SOURCE_DIR}/Externals/cximage
+    $<$<BOOL:${USE_CXIMAGE}>:${CMAKE_SOURCE_DIR}/Externals/cximage>
     ${CMAKE_SOURCE_DIR}/Externals/GameSpy/src
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/ode/include
     ${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc
-    ${CMAKE_SOURCE_DIR}/Externals
     ${CMAKE_SOURCE_DIR}/sdk/include
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -2655,24 +2643,43 @@ target_link_libraries(${PROJECT_NAME}
     xrUICore
     xrSound
     xrScriptEngine
-    cximage
+    $<$<BOOL:${USE_CXIMAGE}>:cximage>
     xrGameSpy
     ${LUA_LIBRARIES}
     xrCDB
     xrPhysics
     xrNetServer
-    ${SDL_LIBRARIES}
+    ${SDL2_LIBRARIES}
 )
+
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DXRGAME_EXPORTS
 )
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    PREFIX ""
-    COTIRE_CXX_PREFIX_HEADER_INIT "StdAfx.h"
+
+target_compile_options(${PROJECT_NAME}
+    PRIVATE
+    -Wno-trigraphs
 )
 
-cotire(${PROJECT_NAME})
+if ((CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo") AND PROJECT_PLATFORM_E2K) # E2K: hack for debug compile (MCST lcc compiler does not support a file > 4Gb, this is a bug in EDG frontend)
+    target_compile_options(${PROJECT_NAME} 
+        PRIVATE
+        -g0 
+    )
+    message(STATUS "Build type is ${CMAKE_BUILD_TYPE}, so disable generation of debug info for xrGame module, because MCST lcc compiler does not support a file > 4 GB (this is a bug in EDG frontend).")
+endif()
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    UNITY_BUILD_BATCH_SIZE 50
+)
+
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "$<$<COMPILE_LANGUAGE:CXX>:StdAfx.h>"
+    "$<$<COMPILE_LANGUAGE:CXX>:pch_script.h>"
+)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY
     DESTINATION ${CMAKE_INSTALL_LIBDIR}

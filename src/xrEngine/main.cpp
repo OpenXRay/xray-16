@@ -4,10 +4,7 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <process.h>
-#elif defined(XR_PLATFORM_LINUX)
-#include <lockfile.h>
 #endif
-#include <locale.h>
 
 #include "IGame_Persistent.h"
 #include "xrNetServer/NET_AuthCheck.h"
@@ -20,20 +17,14 @@
 #include "xrCDB/ISpatial.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Text_Console.h"
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 #include "xr_ioc_cmd.h"
-#include "MonitorManager.hpp"
-#include "TaskScheduler.hpp"
 
-#ifdef MASTER_GOLD
-#define NO_MULTI_INSTANCES
-#endif
+#include "xrCore/Threading/TaskManager.hpp"
 
 // global variables
 ENGINE_API CInifile* pGameIni = nullptr;
@@ -70,7 +61,7 @@ private:
 
 public:
     explicit PathIncludePred(const xr_auth_strings_t* ignoredPaths) : ignored(ignoredPaths) {}
-    bool xr_stdcall IsIncluded(pcstr path)
+    bool IsIncluded(pcstr path)
     {
         if (!ignored)
             return true;
@@ -182,6 +173,7 @@ ENGINE_API void InitInput()
 }
 
 ENGINE_API void destroyInput() { xr_delete(pInput); }
+ENGINE_API void InitSoundDeviceList() { ISoundManager::_create_devices_list(); }
 ENGINE_API void InitSound() { ISoundManager::_create(); }
 ENGINE_API void destroySound() { ISoundManager::_destroy(); }
 ENGINE_API void destroySettings()
@@ -209,9 +201,6 @@ ENGINE_API void destroyEngine()
 {
     Device.Destroy();
     Engine.Destroy();
-#if defined(XR_PLATFORM_LINUX)
-    lockfile_remove("/var/lock/stalker-cop.lock");
-#endif
 }
 
 void execUserScript()
@@ -228,8 +217,8 @@ void CheckAndSetupRenderer()
         return;
     }
 
-    if (strstr(Core.Params, "-gl"))
-        Console->Execute("renderer renderer_gl");
+    if (strstr(Core.Params, "-rgl"))
+        Console->Execute("renderer renderer_rgl");
     else if (strstr(Core.Params, "-r4"))
         Console->Execute("renderer renderer_r4");
     else if (strstr(Core.Params, "-r3"))
@@ -273,23 +262,9 @@ void CheckPrivilegySlowdown()
 #endif
 }
 
-void CreateApplication()
-{
-    pApp = xr_new<CApplication>();
-#ifdef XR_PLATFORM_WINDOWS // XXX: Remove this macro check
-    if (GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(xr_new<TextLoadingScreen>());
-#endif
-}
-
-void CreateSpatialSpace()
-{
-    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
-    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
-}
-
 ENGINE_API void Startup()
 {
+    InitSoundDeviceList();
     execUserScript();
     InitSound();
 
@@ -301,55 +276,59 @@ ENGINE_API void Startup()
     if (loadArgs)
         Console->Execute(loadArgs + 1);
 
-    // Create task scheduler
-    TaskScheduler = std::make_unique<TaskManager>();
-    TaskScheduler->Initialize();
-
     // Initialize APP
-    Event lightAnimCreated, applicationCreated, spatialCreated;
-    TaskScheduler->AddTask("LALib.OnCreate()", [&]()
+    const auto& createLightAnim = TaskScheduler->AddTask("LALib.OnCreate()", [](Task&, void*)
     {
         LALib.OnCreate();
-    }, nullptr, nullptr, &lightAnimCreated);
+    });
 
-    TaskScheduler->AddTask("CreateApplication()", CreateApplication,
-        nullptr, nullptr, &applicationCreated);
-
-    TaskScheduler->AddTask("CreateSpatialSpace()", CreateSpatialSpace,
-        nullptr, nullptr, &spatialCreated);
+    const auto& createApplication = TaskScheduler->AddTask("CreateApplication()", [](Task&, void*)
+    {
+        pApp = xr_new<CApplication>();
+#ifdef XR_PLATFORM_WINDOWS // XXX: Remove this macro check
+        if (GEnv.isDedicatedServer)
+            pApp->SetLoadingScreen(xr_new<TextLoadingScreen>());
+#endif
+    });
+    const auto& createSpatialSpace = TaskScheduler->AddTask("CreateSpatialSpace()", [](Task&, void*)
+    {
+        g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
+        g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
+    });
 
     Device.Create();
-    Device.WaitEvent(lightAnimCreated);
-    Device.WaitEvent(applicationCreated);
-    Device.WaitEvent(spatialCreated);
+    TaskScheduler->Wait(createLightAnim);
+    TaskScheduler->Wait(createApplication);
+    TaskScheduler->Wait(createSpatialSpace);
+
+    Console->Show();
 
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
     R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
 
     // Main cycle
     Device.Run();
+
     // Destroy APP
     xr_delete(g_SpatialSpacePhysic);
     xr_delete(g_SpatialSpace);
     DEL_INSTANCE(g_pGamePersistent);
     xr_delete(pApp);
     Engine.Event.Dump();
+
     // Destroying
     destroyInput();
-#if !defined(XR_PLATFORM_LINUX)
     if (!g_bBenchmark && !g_SASH.IsRunning())
-#endif
         destroySettings();
+
     LALib.OnDestroy();
-#if !defined(XR_PLATFORM_LINUX)
+
     if (!g_bBenchmark && !g_SASH.IsRunning())
-#endif
         destroyConsole();
-#if !defined(XR_PLATFORM_LINUX)
     else
         Console->Destroy();
-#endif
-    g_monitors.Destroy();
+
+    Device.CleanupVideoModes();
     destroyEngine();
     destroySound();
 }
@@ -358,20 +337,6 @@ ENGINE_API int RunApplication()
 {
     R_ASSERT2(Core.Params, "Core must be initialized");
 
-#ifdef NO_MULTI_INSTANCES
-    if (!GEnv.isDedicatedServer)
-    {
-#if defined(XR_PLATFORM_WINDOWS)
-        CreateMutex(nullptr, true, "Local\\STALKER-COP");
-        if (GetLastError() == ERROR_ALREADY_EXISTS)
-            return 2;
-#elif defined(XR_PLATFORM_LINUX)
-        int lock_res = lockfile_create("/var/lock/stalker-cop.lock", 0, L_PID);
-        if(L_ERROR == lock_res)
-            return 2;
-#endif
-    }
-#endif
     *g_sLaunchOnExit_app = 0;
     *g_sLaunchOnExit_params = 0;
 
@@ -385,7 +350,7 @@ ENGINE_API int RunApplication()
 
     FPU::m24r();
 
-    g_monitors.Initialize();
+    Device.FillVideoModes();
     InitInput();
     InitConsole();
 
@@ -435,10 +400,10 @@ bool CheckBenchmark()
         const size_t sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
-#if !defined(XR_PLATFORM_LINUX)
-        g_SASH.Init(sashArg);
-        g_SASH.MainLoop();
-#endif
+
+        if (g_SASH.Init(sashArg))
+            g_SASH.MainLoop();
+
         return true;
     }
 

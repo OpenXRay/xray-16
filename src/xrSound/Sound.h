@@ -1,10 +1,20 @@
 #pragma once
 
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCore/_flags.h"
 #include "xrCore/xr_resource.h"
 #include "xrCore/_vector3d.h"
 #include "xrCommon/xr_vector.h" // DEFINE_VECTOR
+
+#ifdef XRAY_STATIC_BUILD
+#   define XRSOUND_API
+#else
+#   ifdef XRSOUND_EXPORTS
+#      define XRSOUND_API XR_EXPORT
+#   else
+#      define XRSOUND_API XR_IMPORT
+#   endif
+#endif
 
 constexpr pcstr SNDENV_FILENAME = "sEnvironment.xr";
 #define OGG_COMMENT_VERSION 0x0003
@@ -32,6 +42,9 @@ XRSOUND_API extern float psSoundVFactor;
 XRSOUND_API extern float psSoundVMusic;
 XRSOUND_API extern float psSoundRolloff;
 XRSOUND_API extern float psSoundOcclusionScale;
+XRSOUND_API extern float psSoundVelocityAlpha; // Cribbledirge: Alpha value for moving average.
+XRSOUND_API extern float psSoundTimeFactor; //--#SM+#--
+XRSOUND_API extern float psSoundLinearFadeFactor; //--#SM+#--
 XRSOUND_API extern Flags32 psSoundFlags;
 XRSOUND_API extern int psSoundTargets;
 XRSOUND_API extern int psSoundCacheSizeMB;
@@ -96,13 +109,48 @@ class XRSOUND_API CSound_environment
 class XRSOUND_API CSound_params
 {
 public:
-    Fvector position;
+    Fvector position{};
+    Fvector velocity{};  // Cribbledirge.  Added for doppler effect.
+    Fvector curVelocity{};  // Current velocity.
+    Fvector prevVelocity{};  // Previous velocity.
+    Fvector accVelocity{};  // Velocity accumulator (for moving average).
     float base_volume;
     float volume;
     float freq;
     float min_distance;
     float max_distance;
     float max_ai_distance;
+
+    // Functions added by Cribbledirge for doppler effect.
+    void update_position(const Fvector& newPosition)
+    {
+        // If the position has been set already, start getting a moving average of the velocity.
+        if (set)
+        {
+            prevVelocity.set(accVelocity);
+            curVelocity.sub(newPosition, position);
+            accVelocity.set(curVelocity.mul(psSoundVelocityAlpha).add(prevVelocity.mul(1.f - psSoundVelocityAlpha)));
+        }
+        else
+        {
+            set = true;
+        }
+        position.set(newPosition);
+    }
+
+    void update_velocity(const float dt)
+    {
+        velocity.set(accVelocity).div(dt);
+    }
+
+private:
+    // A variable in place to determine if the position has been set.  This is to prevent artifacts when
+    // the position jumps from its initial position of zero to something greatly different.  This is a big
+    // issue in moving average calculation.  We want the velocity to always start at zero for when the sound
+    // was initiated, or else things will sound really really weird.
+    bool set{};
+
+    // End Cribbledirge.
 };
 
 /// definition (Sound Interface)
@@ -140,7 +188,7 @@ public:
 typedef resptr_core<ref_sound_data, resptr_base<ref_sound_data>> ref_sound_data_ptr;
 
 /// definition (Sound Callback)
-typedef void __stdcall sound_event(const ref_sound_data_ptr& S, float range);
+typedef void sound_event(const ref_sound_data_ptr& S, float range);
 
 namespace CDB
 {
@@ -151,6 +199,7 @@ namespace CDB
 // XXX tamlin: Tag NOVTABLE ?
 class XRSOUND_API ISoundManager
 {
+    virtual void _initialize_devices_list() = 0;
     virtual void _initialize() = 0;
     virtual void _clear() = 0;
 
@@ -160,7 +209,8 @@ protected:
     virtual void _destroy_data(ref_sound_data& S) = 0;
 
 public:
-    virtual ~ISoundManager() {}
+    virtual ~ISoundManager() = default;
+    static void _create_devices_list();
     static void _create();
     static void _destroy();
 
@@ -211,7 +261,7 @@ class CSound_UserDataVisitor;
 class CSound_UserData : public xr_resource
 {
 public:
-    virtual ~CSound_UserData() {}
+    virtual ~CSound_UserData() = default;
     virtual void accept(CSound_UserDataVisitor*) = 0;
     virtual void invalidate() = 0;
 };

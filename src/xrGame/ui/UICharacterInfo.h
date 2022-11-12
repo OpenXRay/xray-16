@@ -11,6 +11,7 @@ class CUIStatic;
 class CCharacterInfo;
 class CUIXml;
 class CUIScrollView;
+
 class CUICharacterInfo : public CUIWindow
 {
 private:

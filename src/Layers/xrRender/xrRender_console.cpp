@@ -3,6 +3,7 @@
 
 #include "xrRender_console.h"
 #include "xrCore/xr_token.h"
+#include "xrCore/Animation/SkeletonMotions.hpp"
 
 u32 ps_Preset = 2;
 const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
@@ -22,12 +23,11 @@ const xr_token qsmapsize_token[] =
     { "3072", 3072 },
     { "3584", 3584 },
     { "4096", 4096 },
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if values more than 8192 are supported on OpenGL
     { "5120", 5120 },
     { "6144", 6144 },
     { "7168", 7168 },
     { "8192", 8192 },
-#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if this really supported on OpenGL
     { "9216", 9216 },
     { "10240", 10240 },
     { "11264", 11264 },
@@ -36,7 +36,6 @@ const xr_token qsmapsize_token[] =
     { "14336", 14336 },
     { "15360", 15360 },
     { "16384", 16384 },
-#endif // defined(USE_DX11) || defined(USE_OGL)
 #endif // !USE_DX9
     { nullptr, 0 }
 };
@@ -49,14 +48,14 @@ const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st
 
 u32 ps_r_ssao = 3;
 const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     {"st_opt_ultra", 4},
 #endif
     {nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; // = 0;
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
-#if !defined(USE_DX9) && !defined(USE_OGL) // TODO: OGL: fix ultra and extreme settings
+#if defined(USE_DX11) // TODO: OGL: fix ultra and extreme settings
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
 #endif // !USE_DX9
     {nullptr, 0}};
@@ -91,7 +90,7 @@ const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autod
 extern int psSkeletonUpdate;
 extern float r__dtex_range;
 
-Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW }; // All renders
+Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW | RFLAG_NO_RAM_TEXTURES }; // All renders
 
 //int ps_r__Supersample = 1;
 int ps_r__LightSleepFrames = 10;
@@ -248,8 +247,8 @@ float ps_r2_gloss_factor = 4.0f;
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-#include "Layers/xrRenderDX10/StateManager/dx10SamplerStateCache.h"
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
 #endif
 
 //-----------------------------------------------------------------------
@@ -287,17 +286,21 @@ class CCC_tf_Aniso : public CCC_Integer
 public:
     void apply()
     {
+#if defined(USE_DX9) || defined(USE_DX11)
         if (nullptr == HW.pDevice)
             return;
+#endif
         int val = *value;
         clamp(val, 1, 16);
-#if defined(USE_OGL)
-        // OGL: don't set aniso here because it will be updated after vid restart
-#elif !defined(USE_DX9)
-        SSManager.SetMaxAnisotropy(val);
-#else
+#if defined(USE_DX9)
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
+#elif defined(USE_DX11)
+        SSManager.SetMaxAnisotropy(val);
+#elif defined(USE_OGL)
+        // OGL: don't set aniso here because it will be updated after vid restart
+#else
+#   error No graphics API selected or enabled!
 #endif
     }
     CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16){};
@@ -317,14 +320,16 @@ class CCC_tf_MipBias : public CCC_Float
 public:
     void apply()
     {
+#if defined(USE_DX9) || defined(USE_DX11)
         if (nullptr == HW.pDevice)
             return;
+#endif
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-        SSManager.SetMipLODBias(*value);
-#elif defined(USE_DX9)
+#if defined(USE_DX9)
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
+#elif defined(USE_DX11)
+        SSManager.SetMipLODBias(*value);
 #endif
     }
 
@@ -482,7 +487,7 @@ public:
     virtual void Execute(LPCSTR /*args*/)
     {
         // TODO: OGL: Implement memory usage statistics.
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
         u32 m_base = 0;
         u32 c_base = 0;
         u32 m_lmaps = 0;
@@ -516,7 +521,41 @@ public:
 
         Msg("\nTotal             \t \t %f \t %f \t %f ", vb_video + ib_video + rt_video,
             textures_managed + vb_managed + ib_managed + rt_managed, vb_system + ib_system + rt_system);
-#endif // USE_OGL
+#endif // !USE_OGL
+    }
+};
+
+class CCC_DumpResources final : public IConsole_Command
+{
+public:
+    CCC_DumpResources(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr /*args*/) override
+    {
+        RImplementation.Models->dump();
+        RImplementation.Resources->Dump(false);
+    }
+};
+
+class CCC_MotionsStat final : public IConsole_Command
+{
+public:
+    CCC_MotionsStat(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr /*args*/) override
+    {
+        g_pMotionsContainer->dump();
+    }
+};
+
+class CCC_TexturesStat final : public IConsole_Command
+{
+public:
+    CCC_TexturesStat(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr /*args*/) override
+    {
+        RImplementation.Resources->_DumpMemoryUsage();
     }
 };
 
@@ -655,17 +694,6 @@ public:
     }
 };
 
-class CCC_DumpResources : public IConsole_Command
-{
-public:
-    CCC_DumpResources(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR /*args*/)
-    {
-        RImplementation.Models->dump();
-        RImplementation.Resources->Dump(false);
-    }
-};
-
 #ifdef DEBUG
 class CCC_SunshaftsIntensity : public CCC_Float
 {
@@ -677,9 +705,9 @@ public:
 
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)
-#ifdef DEBUG
+#   ifndef MASTER_GOLD
 
-#include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
+#   include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
 
 class CCC_Fog_Reload : public IConsole_Command
 {
@@ -687,7 +715,7 @@ public:
     CCC_Fog_Reload(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR /*args*/) { FluidManager.UpdateProfiles(); }
 };
-#endif // DEBUG
+#   endif // MASTER_GOLD
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
 //-----------------------------------------------------------------------
@@ -696,9 +724,11 @@ void xrRender_initconsole()
     CMD3(CCC_Preset, "_preset", &ps_Preset, qpreset_token);
 
     CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128);
-#ifdef DEBUG
+#ifndef MASTER_GOLD
     CMD1(CCC_DumpResources, "dump_resources");
-#endif // DEBUG
+    CMD1(CCC_MotionsStat, "stat_motions");
+    CMD1(CCC_TexturesStat, "stat_textures");
+#endif
 
     CMD4(CCC_Float, "r__dtex_range", &r__dtex_range, 5, 175);
 
@@ -928,9 +958,9 @@ void xrRender_initconsole()
 
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)
-#ifdef DEBUG
+#   ifndef MASTER_GOLD
     CMD1(CCC_Fog_Reload, "r3_fog_reload");
-#endif // DEBUG
+#   endif
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);

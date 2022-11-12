@@ -1,57 +1,88 @@
+/*
+    Copyright (c) 2014-2021 OpenXRay
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
 #pragma once
 
 #include "Event.hpp"
 #include "Task.hpp"
 
-//#define TASKS_PROFILER
+class TaskWorker;
 
-#ifdef PROFILE_TASKS
-#ifdef DEBUG // Because it's slower
-constexpr u64 SIMPLE_TASK_ACCEPTABLE_EXECUTION_TIME = 16; // ms
-constexpr u64 COMPLEX_TASK_ACCEPTABLE_EXECUTION_TIME = 32; // ms
-#else
-constexpr u64 SIMPLE_TASK_ACCEPTABLE_EXECUTION_TIME = 8; // ms
-constexpr u64 COMPLEX_TASK_ACCEPTABLE_EXECUTION_TIME = 16; // ms
-#endif
-#endif
-
-constexpr u64 ABNORMAL_EXECUTION_TIME = 1000; // ms
-constexpr u64 BIG_EXECUTION_TIME = 500; // ms
-
-class XRCORE_API TaskManagerBase
+class XRCORE_API TaskManager final
 {
-#ifdef USE_TBB_PARALLEL
-    xr_vector<Task*> tasks;
+private:
+    xr_vector<TaskWorker*> workers;
+    Lock workersLock;
 
-    Lock lock;
-    Event mainThreadExit;
-    u32 taskerSleepTime;
-    bool shouldStop;
+    std::atomic_size_t workersCount{};
+    std::atomic_size_t activeWorkersCount{};
 
-    static void taskManagerThread(void* thisPtr);
-#endif
+    std::atomic_bool shouldStop{};
 
-protected:
-    friend class Task;
-    virtual void SpawnTask(Task* task, bool shortcut = false);
-    virtual void TaskDone(Task* task, u64 executionTime);
+    CRandom random; // non-atomic intentionally, possible data-races can make it even more random
+
+private:
+    static void task_worker_entry(void* this_ptr);
+    ICN void TaskWorkerStart();
+
+    [[nodiscard]] Task* TryToSteal(TaskWorker* thief);
+
+    static void ExecuteTask(Task& task);
+    static void FinalizeTask(Task& task);
+
+    [[nodiscard]] ICF static Task* AllocateTask();
+    static void ICF IncrementTaskJobsCounter(Task& parent);
+
+private:
+    void SetThreadStatus(bool active);
+    void WakeUpIfNeeded();
 
 public:
-    TaskManagerBase();
+    TaskManager();
+    ~TaskManager();
 
-    void Initialize();
-    void Destroy();
+public:
+    // TaskFunc is at the end for fancy in-place lambdas
+    // Create a task, but don't run it yet
+    [[nodiscard]] Task& CreateTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    [[nodiscard]] Task& CreateTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
-    bool TaskQueueIsEmpty() const;
+    // Create a task as child, but don't run it yet
+    [[nodiscard]] Task& CreateTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    [[nodiscard]] Task& CreateTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
-    void AddTask(pcstr name, Task::TaskFunc taskFunc,
-        Task::IsAllowedCallback callback = nullptr, Task::DoneCallback done = nullptr,
-        Event* doneEvent = nullptr);
+    // Run task
+    void PushTask(Task& task);
 
-    void RemoveTask(Task::TaskFunc&& func);
-    void RemoveTasksWithName(pcstr name);
+    // Shortcut: create a task and run it immediately
+    Task& AddTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    Task& AddTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
-    virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) = 0;
+    // Shortcut: create task and run it immediately
+    Task& AddTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    Task& AddTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+
+public:
+    void Wait(const Task& task);
+    void WaitForChildren(const Task& task);
+    bool ExecuteOneTask();
+
+public:
+    [[nodiscard]] size_t GetWorkersCount() const;
+    [[nodiscard]] size_t GetActiveWorkersCount() const;
+    void GetStats(size_t& allocated, size_t& allocatedWithFallback, size_t& pushed, size_t& finished);
 };
 
-extern XRCORE_API xr_unique_ptr<TaskManagerBase> TaskScheduler;
+extern XRCORE_API xr_unique_ptr<TaskManager> TaskScheduler;

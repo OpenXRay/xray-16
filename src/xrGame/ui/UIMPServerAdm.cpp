@@ -8,14 +8,14 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "UIDialogWnd.h"
 
-CUIMpServerAdm::CUIMpServerAdm()
+CUIMpServerAdm::CUIMpServerAdm() : CUIWindow("CUIMpServerAdm")
 {
     m_pBackBtn = xr_new<CUI3tButton>();
     m_pBackBtn->SetAutoDelete(true);
     AttachChild(m_pBackBtn);
     m_pBackBtn->Show(false);
 
-    m_pMainSelectionWnd = xr_new<CUIWindow>();
+    m_pMainSelectionWnd = xr_new<CUIWindow>("Main selection window");
     m_pMainSelectionWnd->SetAutoDelete(true);
     AttachChild(m_pMainSelectionWnd);
 
@@ -49,7 +49,7 @@ CUIMpServerAdm::CUIMpServerAdm()
     m_pMainSelectionWnd->AttachChild(m_pVoteStopBtn);
     m_pVoteStopBtn->SetMessageTarget(this);
 
-    m_pWeatherSelectionWnd = xr_new<CUIWindow>();
+    m_pWeatherSelectionWnd = xr_new<CUIWindow>("Weather selection window");
     m_pWeatherSelectionWnd->SetAutoDelete(true);
     AttachChild(m_pWeatherSelectionWnd);
 
@@ -83,7 +83,7 @@ CUIMpServerAdm::CUIMpServerAdm()
     m_pWeatherChangeRateBtn->SetMessageTarget(this);
     m_pWeatherSelectionWnd->Show(false);
 
-    m_pGameTypeSelectionWnd = xr_new<CUIWindow>();
+    m_pGameTypeSelectionWnd = xr_new<CUIWindow>("Game type selection window");
     m_pGameTypeSelectionWnd->SetAutoDelete(true);
     AttachChild(m_pGameTypeSelectionWnd);
 
@@ -108,7 +108,7 @@ CUIMpServerAdm::CUIMpServerAdm()
     m_pAHBtn->SetMessageTarget(this);
     m_pGameTypeSelectionWnd->Show(false);
 
-    m_pGameLimitsSelectionWnd = xr_new<CUIWindow>();
+    m_pGameLimitsSelectionWnd = xr_new<CUIWindow>("Game limit selection window");
     m_pGameLimitsSelectionWnd->SetAutoDelete(true);
     AttachChild(m_pGameLimitsSelectionWnd);
 
@@ -220,7 +220,6 @@ CUIMpServerAdm::CUIMpServerAdm()
     m_pGameLimitsSelectionWnd->Show(false);
 }
 
-CUIMpServerAdm::~CUIMpServerAdm() {}
 void CUIMpServerAdm::Init(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "server_adm", 0, this);

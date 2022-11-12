@@ -14,11 +14,11 @@ class CBoneInstance;
 class CUIArtefactDetectorBase
 {
 public:
-    virtual ~CUIArtefactDetectorBase(){};
-    virtual void update(){};
+    virtual ~CUIArtefactDetectorBase() = default;
+    virtual void update() {}
 };
 
-class CUIDetectorWave : public CUIFrameLineWnd
+class CUIDetectorWave final : public CUIFrameLineWnd
 {
     typedef CUIFrameLineWnd inherited;
 
@@ -33,7 +33,7 @@ public:
     virtual void Update();
 };
 
-class CUIArtefactDetectorSimple : public CUIArtefactDetectorBase
+class CUIArtefactDetectorSimple final : public CUIArtefactDetectorBase
 {
     typedef CUIArtefactDetectorBase inherited;
 
@@ -49,14 +49,14 @@ class CUIArtefactDetectorSimple : public CUIArtefactDetectorBase
     void setup_internals();
 
 public:
-    virtual ~CUIArtefactDetectorSimple();
+    ~CUIArtefactDetectorSimple() override;
     void update();
     void Flash(bool bOn, float fRelPower);
 
     void construct(CSimpleDetector* p);
 };
 
-class CUIArtefactDetectorElite : public CUIArtefactDetectorBase, public CUIWindow
+class CUIArtefactDetectorElite final : public CUIArtefactDetectorBase, public CUIWindow
 {
     typedef CUIArtefactDetectorBase inherited;
 
@@ -77,15 +77,17 @@ class CUIArtefactDetectorElite : public CUIArtefactDetectorBase, public CUIWindo
     void GetUILocatorMatrix(Fmatrix& _m);
 
 public:
-    virtual void update();
-    virtual void Draw();
+    CUIArtefactDetectorElite() : CUIWindow("CUIArtefactDetectorElite") {}
+
+    void update() override;
+    void Draw() override;
 
     void construct(CEliteDetector* p);
     void Clear();
     void RegisterItemToDraw(const Fvector& p, const shared_str& palette_idx);
 };
 
-class CUIArtefactDetectorAdv : public CUIArtefactDetectorBase
+class CUIArtefactDetectorAdv final : public CUIArtefactDetectorBase
 {
     typedef CUIArtefactDetectorBase inherited;
 
@@ -96,8 +98,7 @@ class CUIArtefactDetectorAdv : public CUIArtefactDetectorBase
     u16 m_bid;
 
 public:
-    virtual ~CUIArtefactDetectorAdv();
-    virtual void update();
+    void update() override;
     void construct(CAdvancedDetector* p);
     void SetValue(const float v1, const Fvector& v2);
     float CurrentYRotation() const;

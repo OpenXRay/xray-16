@@ -2,6 +2,8 @@
 #include "xrCore/FMesh.hpp"
 #include "FLOD.h"
 
+namespace flod
+{
 struct _hw
 {
     Fvector p0;
@@ -14,7 +16,9 @@ struct _hw
     u32 rgbh0;
     u32 rgbh1;
 };
-static VertexElement dwDecl[] = {
+
+static VertexElement dwDecl[] =
+{
     {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos-0
     {0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 1}, // pos-1
     {0, 24, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0}, // nrm-0
@@ -24,7 +28,9 @@ static VertexElement dwDecl[] = {
     {0, 60, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1}, // uv
     {0, 68, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 2}, // rgbh-0
     {0, 72, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 3}, // rgbh-1
-    D3DDECL_END()};
+    D3DDECL_END()
+};
+}
 
 void FLOD::Load(LPCSTR name, IReader* data, u32 dwFlags)
 {
@@ -53,7 +59,7 @@ void FLOD::Load(LPCSTR name, IReader* data, u32 dwFlags)
     }
 
     // VS
-    geom.create(dwDecl, RCache.Vertex.Buffer(), RCache.QuadIB);
+    geom.create(flod::dwDecl, RCache.Vertex.Buffer(), RCache.QuadIB);
 
     // lod correction
     Fvector3 S;
@@ -99,7 +105,7 @@ void FLOD::Render(float /*LOD*/)
     // Fill VB
     _face&		F					= facets[best_id];
     u32			vOffset				= 0;
-    _hw*		V					= (_hw*) RCache.Vertex.Lock(4,geom->vb_stride,vOffset);
+    auto*		V					= (flod::_hw*) RCache.Vertex.Lock(4,geom->vb_stride,vOffset);
     V[0].set	(F.v[0].v,F.N,F.v[0].c_rgb_hemi,F.v[0].t.x,F.v[0].t.y);
     V[1].set	(F.v[1].v,F.N,F.v[1].c_rgb_hemi,F.v[1].t.x,F.v[1].t.y);
     V[2].set	(F.v[2].v,F.N,F.v[2].c_rgb_hemi,F.v[2].t.x,F.v[2].t.y);

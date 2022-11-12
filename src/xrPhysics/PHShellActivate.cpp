@@ -11,13 +11,6 @@
 #include "PhysicsShellAnimator.h"
 #include "Include/xrRender/Kinematics.h"
 
-///////////////////////////////////////////////////////////////
-//#pragma warning(push)
-///#pragma warning(disable:4995)
-
-//#pragma warning(pop)
-///////////////////////////////////////////////////////////////////
-
 #include "ExtendedGeom.h"
 
 #include "PHElement.h"

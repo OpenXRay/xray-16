@@ -14,33 +14,26 @@ public:
     virtual void Compile(CBlender_Compile& C)
     {
         C.r_Pass("sky2", "sky2", FALSE, TRUE, FALSE);
-#ifdef USE_OGL
-        if (HW.Caps.geometry.bVTF)
-        {
-            C.r_Sampler_clf("s_sky0", "$null");
-            C.r_Sampler_clf("s_sky1", "$null");
-            C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
-		}
-        else
-        {
-            C.r_Sampler_clf("s_sky0", r2_T_sky0);
-            C.r_Sampler_clf("s_sky1", r2_T_sky1);
-            C.r_Sampler_rtf("s_tonemap", r2_RT_luminance_cur);
-        }
-        C.PassSET_ZB(FALSE, FALSE);
-#elif !defined(USE_DX9)
-        // C.r_Sampler_clf		("s_sky0",		"$null"			);
-        // C.r_Sampler_clf		("s_sky1",		"$null"			);
-        C.r_dx10Texture("s_sky0", "$null");
-        C.r_dx10Texture("s_sky1", "$null");
-        C.r_dx10Sampler("smp_rtlinear");
-        // C.r_Sampler_rtf		("s_tonemap",	"$user$tonemap"	);	//. hack
-        C.r_dx10Texture("s_tonemap", "$user$tonemap"); //. hack
-        C.PassSET_ZB(FALSE, FALSE);
-#else // USE_DX9
+#if defined(USE_DX9)
         C.r_Sampler_clf("s_sky0", "$null");
         C.r_Sampler_clf("s_sky1", "$null");
         C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
+#elif defined(USE_DX11)
+        // C.r_Sampler_clf		("s_sky0",		"$null"			);
+        // C.r_Sampler_clf		("s_sky1",		"$null"			);
+        C.r_dx11Texture("s_sky0", "$null");
+        C.r_dx11Texture("s_sky1", "$null");
+        C.r_dx11Sampler("smp_rtlinear");
+        // C.r_Sampler_rtf		("s_tonemap",	"$user$tonemap"	);	//. hack
+        C.r_dx11Texture("s_tonemap", "$user$tonemap"); //. hack
+        C.PassSET_ZB(FALSE, FALSE);
+#elif defined(USE_OGL)
+        C.r_Sampler_clf("s_sky0", "$null");
+        C.r_Sampler_clf("s_sky1", "$null");
+        C.r_Sampler_rtf("s_tonemap", "$user$tonemap"); //. hack
+        C.PassSET_ZB(FALSE, FALSE);
+#else
+#   error No graphics API selected or enabled!
 #endif
         C.r_End();
     }
@@ -77,7 +70,7 @@ public:
     STextureList clouds_r_textures;
 };
 
-class dxEnvironmentRender : public IEnvironmentRender
+class dxEnvironmentRender : public IEnvironmentRender, public CDeviceResetNotifier
 {
 public:
     dxEnvironmentRender();
@@ -90,6 +83,7 @@ public:
     virtual void RenderClouds(CEnvironment& env);
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();
+    virtual void OnDeviceReset();
     virtual particles_systems::library_interface const& particles_systems_library();
 
 private:
@@ -97,13 +91,18 @@ private:
 
     ref_shader sh_2sky;
     ref_geom sh_2geom;
+    u32 tonemap_tstage_2sky;
 
     ref_shader clouds_sh;
     ref_geom clouds_geom;
+    u32 tonemap_tstage_clouds;
 
     ref_texture tonemap;
     ref_texture tsky0, tsky1;
-    ref_texture tclouds0, tclouds1;
+    u32 tsky0_tstage;
+    u32 tsky1_tstage;
+    u32 tclouds0_tstage;
+    u32 tclouds1_tstage;
 };
 
 #endif //	EnvironmentRender_included

@@ -1,59 +1,50 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "SDL.h"
-#include "SDL_syswm.h"
-
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "log.h"
-#if defined(XR_PLATFORM_WINDOWS)
-#include "Debug/dxerr.h"
-#endif
 #include "Threading/ScopeLock.hpp"
 
-#pragma warning(push)
-#pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
 #if defined(XR_PLATFORM_WINDOWS)
+#include "Debug/dxerr.h"
 #include "Debug/MiniDump.h"
-#pragma warning(pop)
-#include <malloc.h>
-#include <direct.h>
 #endif
 
-#if defined(XR_PLATFORM_WINDOWS)
-#ifdef __BORLANDC__
-#include "d3d9.h"
-#include "d3dx9.h"
-#include "D3DX_Wrapper.h"
-#pragma comment(lib, "EToolsB.lib")
-#define USE_BUG_TRAP
-#else
-#define USE_BUG_TRAP
+#include <SDL.h>
+
+#ifdef XR_PLATFORM_WINDOWS
+#   define USE_BUG_TRAP
 static BOOL bException = FALSE;
-#endif
-#endif
-
-#ifndef USE_BUG_TRAP
-#include <exception>
 #endif
 
 #ifdef USE_BUG_TRAP
-#include <BugTrap/source/Client/BugTrap.h>
+#   include <BugTrap/source/Client/BugTrap.h>
+#else
+#   include <exception>
 #endif
 
+#include <csignal>
+
 #if defined(XR_PLATFORM_WINDOWS)
-#include <new.h> // for _set_new_mode
-#include <signal.h> // for signals
-#include <errorrep.h> // ReportFault
+#   include <SDL_syswm.h>
+#   include <direct.h>
+#   include <new.h> // for _set_new_mode
+#   include <errorrep.h> // ReportFault
 #elif defined(XR_PLATFORM_LINUX)
-#include <sys/user.h>
-#include <sys/ptrace.h>
-#include <cxxabi.h>
-#include <dlfcn.h>
-#include <execinfo.h>
+#   include <sys/user.h>
+#   include <sys/ptrace.h>
+#   include <cxxabi.h>
+#   include <dlfcn.h>
+#   if __has_include(<execinfo.h>)
+#       include <execinfo.h>
+#   endif
+#elif defined(XR_PLATFORM_APPLE)
+#   include <sys/types.h>
+#   include <sys/ptrace.h>
+#   define PTRACE_TRACEME PT_TRACE_ME
+#   define PTRACE_DETACH PT_DETACH
 #endif
-#pragma comment(lib, "FaultRep.lib")
 
 #ifdef DEBUG
 #define USE_OWN_ERROR_MESSAGE_WINDOW
@@ -82,17 +73,6 @@ constexpr SDL_MessageBoxButtonData buttons[] =
     { SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT |
       SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT,
          (int)AssertionResult::abort, "Cancel" }
-};
-
-SDL_MessageBoxData messageboxdata =
-{
-    SDL_MESSAGEBOX_ERROR,
-    nullptr,
-    "Fatal error",
-    "Vse clomalocb, tashite novyy dvizhok",
-    SDL_arraysize(buttons),
-    buttons,
-    nullptr
 };
 
 AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode)
@@ -140,12 +120,15 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
         return AssertionResult::ok;
     }
 
-    if (windowHandler)
-        messageboxdata.window =  windowHandler->GetApplicationWindow();
-    messageboxdata.title = title;
-    messageboxdata.message = message;
+    SDL_MessageBoxData data =
+    {
+        SDL_MESSAGEBOX_ERROR,
+        windowHandler ? windowHandler->GetApplicationWindow() : nullptr,
+        title, message, SDL_arraysize(buttons), buttons
+    };
+
     int button = -1;
-    SDL_ShowMessageBox(&messageboxdata, &button);
+    SDL_ShowMessageBox(&data, &button);
     return (AssertionResult)button;
 #endif
 }
@@ -182,21 +165,27 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
 }
 
 IWindowHandler* xrDebug::windowHandler = nullptr;
+IUserConfigHandler* xrDebug::userConfigHandler = nullptr;
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
 xrDebug::OutOfMemoryCallbackFunc xrDebug::OutOfMemoryCallback = nullptr;
-xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
-xrDebug::DialogHandler xrDebug::OnDialog = nullptr;
 string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
 bool xrDebug::ShowErrorMessage = false;
 
 bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
+#ifdef PROFILE_CRITICAL_SECTIONS
+Lock xrDebug::failLock(MUTEX_PROFILE_ID(xrDebug::Backend));
+#else
+Lock xrDebug::failLock;
+#endif
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
+#else
+#   error Select or add implementation for your platform
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
@@ -309,7 +298,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 {
     ScopeLock Lock(&dbgHelpLock);
 
-    SStringVec traceResult;
+    xr_vector<xr_string> traceResult;
     STACKFRAME stackFrame = {};
     xr_string frameStr;
 
@@ -354,7 +343,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 }
 #endif // defined(XR_PLATFORM_WINDOWS)
 
-SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
+xr_vector<xr_string> xrDebug::BuildStackTrace(u16 maxFramesCount)
 {
 #if defined(XR_PLATFORM_WINDOWS)
     CONTEXT currentThreadCtx = {};
@@ -371,7 +360,7 @@ SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
 
 void xrDebug::LogStackTrace(const char* header)
 {
-    SStringVec stackTrace = BuildStackTrace();
+    xr_vector<xr_string> stackTrace = BuildStackTrace();
     Msg("%s", header);
     for (const auto& frame : stackTrace)
     {
@@ -441,35 +430,39 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) && __has_include(<execinfo.h>)
     void *array[20];
     int nptrs = backtrace(array, 20);     // get void*'s for all entries on the stack
     char **strings = backtrace_symbols(array, nptrs);
 
-    if(strings)
+    if (strings)
     {
-        for (size_t i = 0; i < nptrs; i++)
+        size_t demangledBufSize = 0;
+        char* demangledName = nullptr;
+        for (int i = 0; i < nptrs; i++)
         {
             char* functionName = strings[i];
-            char* demangledName = nullptr;
+
             Dl_info info;
 
             if (dladdr(array[i], &info))
             {
-                int status = -1;
-                demangledName = abi::__cxa_demangle(info.dli_sname, nullptr,
-                    nullptr, &status);
-                if (status == 0)
+                if (info.dli_sname)
                 {
-                    functionName = demangledName;
+                    int status = -1;
+                    demangledName = abi::__cxa_demangle(info.dli_sname, demangledName, &demangledBufSize, &status);
+                    if (status == 0)
+                    {
+                        functionName = demangledName;
+                    }
                 }
             }
             Log(functionName);
-    #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
+#   ifdef USE_OWN_ERROR_MESSAGE_WINDOW
             buffer += xr_sprintf(buffer, bufferSize, "%s\n", functionName);
-    #endif // USE_OWN_ERROR_MESSAGE_WINDOW
-            ::free(demangledName);
+#   endif // USE_OWN_ERROR_MESSAGE_WINDOW
         }
+        ::free(demangledName);
     }
 #endif
     FlushLog();
@@ -496,15 +489,13 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
                    const char* arg2)
 {
-#ifdef PROFILE_CRITICAL_SECTIONS
-    static Lock lock(MUTEX_PROFILE_ID(xrDebug::Backend));
-#else
-    static Lock lock;
-#endif
-    lock.Enter();
+    ScopeLock lock(&failLock);
+
+    if (windowHandler)
+        windowHandler->OnErrorDialog(true); // Call it only after locking so that multiple threads won't call this function simultaneously.
+
     ErrorAfterDialog = true;
     string4096 assertionInfo;
-    auto size = sizeof(assertionInfo);
     GatherInfo(assertionInfo, sizeof(assertionInfo), loc, expr, desc, arg1, arg2);
 
     if (ShowErrorMessage)
@@ -517,16 +508,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
             "\r\n");
     }
 
-    if (OnCrash)
-        OnCrash();
-
-    if (OnDialog)
-        OnDialog(true);
-
     FlushLog();
-
-    if (windowHandler)
-        windowHandler->DisableFullscreen();
 
     bool resetFullscreen = false;
     AssertionResult result = AssertionResult::abort;
@@ -563,13 +545,9 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
         } // switch (result)
     }
 
-    if (OnDialog)
-        OnDialog(false);
-
     if (resetFullscreen)
-        windowHandler->ResetFullscreen();
+        windowHandler->OnErrorDialog(false); // Call it only before unlocking so that multiple threads won't call this function simultaneously.
 
-    lock.Leave();
     return result;
 }
 
@@ -581,11 +559,10 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 
 void xrDebug::DoExit(const std::string& message)
 {
-    if (windowHandler)
-        windowHandler->DisableFullscreen();
+    ScopeLock lock(&failLock);
 
-    if (OnDialog)
-        OnDialog(true);
+    if (windowHandler)
+        windowHandler->OnErrorDialog(true);
 
     FlushLog();
 
@@ -604,18 +581,15 @@ void xrDebug::DoExit(const std::string& message)
     exit(1);
 #endif
     // if you're under debugger, you can jump here manually
-    if (OnDialog)
-        OnDialog(false);
-
     if (windowHandler)
-        windowHandler->ResetFullscreen();
+        windowHandler->OnErrorDialog(false);
 }
 
 LPCSTR xrDebug::ErrorToString(long code)
 {
     const char* result = nullptr;
-    static string1024 descStorage;
 #if defined(XR_PLATFORM_WINDOWS)
+    static string1024 descStorage;
     DXGetErrorDescription(code, descStorage, sizeof(descStorage));
     if (!result)
     {
@@ -649,28 +623,30 @@ extern LPCSTR log_name();
 void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 {
 #if defined(USE_BUG_TRAP) && defined(XR_PLATFORM_WINDOWS)
-    if (!xr_FS || !FS.m_Flags.test(CLocatorAPI::flReady))
-        return;
-    string_path logDir;
-    __try
+    if (xr_FS && FS.m_Flags.test(CLocatorAPI::flReady))
     {
-        FS.update_path(logDir, "$logs$", "");
-        if (logDir[0] != _DELIMITER && logDir[1] != ':')
+        string_path cfg_full_name;
+        __try
         {
-            string256 currentDir;
-            _getcwd(currentDir, sizeof(currentDir));
-            string256 relDir;
-            xr_strcpy(relDir, logDir);
-            strconcat(sizeof(logDir), logDir, currentDir, DELIMITER, relDir);
+            // Code below copied from CCC_LoadCFG::Execute (xr_ioc_cmd.cpp)
+            // XXX: Refactor Console to accept user config filename on initialization or even construction!
+            // XXX: Maybe refactor CCC_LoadCFG, move code for loading user.ltx into a generic function
+            const auto cfg_name = userConfigHandler ? userConfigHandler->GetUserConfigFileName() : "user.ltx";
+            FS.update_path(cfg_full_name, "$app_data_root$", cfg_name);
+
+            if (!FS.exist(cfg_full_name))
+                FS.update_path(cfg_full_name, "$fs_root$", cfg_name);
+
+            if (!FS.exist(cfg_full_name))
+                xr_strcpy(cfg_full_name, cfg_name);
         }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            xr_strcpy(cfg_full_name, "user.ltx");
+        }
+        BT_AddLogFile(cfg_full_name);
     }
-    __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        xr_strcpy(logDir, "logs");
-    }
-    string_path temp;
-    strconcat(sizeof(temp), temp, logDir, log_name());
-    BT_AddLogFile(temp);
+
     if (*BugReportFile)
         BT_AddLogFile(BugReportFile);
 
@@ -726,10 +702,22 @@ void xrDebug::SetupExceptionHandler()
 void xrDebug::OnFilesystemInitialized()
 {
 #ifdef USE_BUG_TRAP
-    string_path dumpPath;
-    if (FS.update_path(dumpPath, "$app_data_root$", "reports", false))
+    string_path path{};
+    FS.update_path(path, "$logs$", "", false);
+    if (!path[0] || path[0] != _DELIMITER && path[1] != ':') // relative path
     {
-        BT_SetReportFilePath(dumpPath);
+        string_path currentDir;
+        _getcwd(currentDir, sizeof(currentDir));
+        string_path relDir;
+        xr_strcpy(relDir, path);
+        strconcat(path, currentDir, DELIMITER, relDir);
+    }
+    xr_strcat(path, log_name());
+    BT_AddLogFile(path);
+
+    if (FS.update_path(path, "$app_data_root$", "reports", false))
+    {
+        BT_SetReportFilePath(path);
     }
 #endif
 }
@@ -767,6 +755,8 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 {
 #if defined(XR_PLATFORM_WINDOWS)
+    ScopeLock lock(&failLock);
+
     string256 errMsg;
     FormatLastError(errMsg, sizeof(errMsg));
     if (!ErrorAfterDialog && !strstr(GetCommandLine(), "-no_call_stack_assert"))
@@ -802,10 +792,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     FlushLog();
 
     if (windowHandler)
-        windowHandler->DisableFullscreen();
-
-    if (OnDialog)
-        OnDialog(true);
+        windowHandler->OnErrorDialog(true);
 
     constexpr pcstr fatalError = "Fatal error";
 
@@ -836,11 +823,8 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (PrevFilter)
         PrevFilter(exPtrs);
 
-    if (OnDialog)
-        OnDialog(false);
-
     if (windowHandler)
-        windowHandler->ResetFullscreen();
+        windowHandler->OnErrorDialog(false);
 
     return EXCEPTION_CONTINUE_SEARCH;
 #else
@@ -855,6 +839,8 @@ void _terminate()
     if (strstr(GetCommandLine(), "-silent_error_mode"))
         exit(-1);
 #endif
+    //ScopeLock lock(&failLock);
+
     string4096 assertionInfo;
     xrDebug::GatherInfo(assertionInfo,sizeof(assertionInfo), DEBUG_INFO, nullptr, "Unexpected application termination");
     xr_strcat(assertionInfo, "Press OK to abort execution\r\n");
@@ -869,10 +855,10 @@ static void handler_base(const char* reason)
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }
 
+#if defined(XR_PLATFORM_WINDOWS)
 static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* function, const wchar_t* file,
                                       unsigned int line, uintptr_t reserved)
 {
-#if defined(XR_PLATFORM_WINDOWS)
     bool ignoreAlways = false;
     string4096 mbExpression;
     string4096 mbFunction;
@@ -894,10 +880,13 @@ static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* 
         xr_strcpy(mbFile, __FILE__);
     }
     xrDebug::Fail(ignoreAlways, {mbFile, int(line), mbFunction}, mbExpression, "invalid parameter");
-#endif
 }
+#endif
 
+#if defined(XR_PLATFORM_WINDOWS)
 static void pure_call_handler() { handler_base("pure virtual function call"); }
+#endif
+
 #ifdef XRAY_USE_EXCEPTIONS
 static void unexpected_handler() { handler_base("unexpected program termination"); }
 #endif
@@ -917,12 +906,12 @@ void xrDebug::OnThreadSpawn()
     // std::set_terminate(_terminate);
 #endif
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
-    signal(SIGABRT, abort_handler);
-    signal(SIGABRT_COMPAT, abort_handler);
-    signal(SIGFPE, floating_point_handler);
-    signal(SIGILL, illegal_instruction_handler);
-    signal(SIGINT, 0);
-    signal(SIGTERM, termination_handler);
+    std::signal(SIGABRT, abort_handler);
+    std::signal(SIGABRT_COMPAT, abort_handler);
+    std::signal(SIGFPE, floating_point_handler);
+    std::signal(SIGILL, illegal_instruction_handler);
+    std::signal(SIGINT, 0);
+    std::signal(SIGTERM, termination_handler);
     _set_invalid_parameter_handler(&invalid_parameter_handler);
     _set_new_mode(1);
     _set_new_handler(&out_of_memory_handler);
@@ -931,12 +920,12 @@ void xrDebug::OnThreadSpawn()
     std::set_unexpected(_terminate);
 #endif
 #else //XR_PLATFORM_WINDOWS
-    signal(SIGABRT, abort_handler);
-    signal(SIGFPE, floating_point_handler);
-    signal(SIGILL, illegal_instruction_handler);
-    signal(SIGINT, 0);
-    signal(SIGTERM, termination_handler);
-    signal(SIGSEGV, segmentation_fault_handler);
+    std::signal(SIGABRT, abort_handler);
+    std::signal(SIGFPE, floating_point_handler);
+    std::signal(SIGILL, illegal_instruction_handler);
+    std::signal(SIGINT, 0);
+    std::signal(SIGTERM, termination_handler);
+    std::signal(SIGSEGV, segmentation_fault_handler);
 #endif
 }
 

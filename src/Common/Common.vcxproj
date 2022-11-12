@@ -35,6 +35,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Externals\submodule_check.hpp" />
     <ClInclude Include="..\xrCommon\math_funcs.h" />
     <ClInclude Include="..\xrCommon\math_funcs_inline.h" />
     <ClInclude Include="..\xrCommon\misc_math_types.h" />
@@ -81,7 +82,7 @@
     <ClCompile Include="NvMender2003\NVMeshMender.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CommonImportExport.inl" />
+    <None Include="PlatformApple.inl" />
     <None Include="PlatformBSD.inl" />
   </ItemGroup>
   <ItemGroup>

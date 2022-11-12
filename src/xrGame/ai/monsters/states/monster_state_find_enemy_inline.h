@@ -6,8 +6,7 @@
 #include "monster_state_find_enemy_look.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterFindEnemyAbstract CStateMonsterFindEnemy<_Object>
 
@@ -39,3 +38,6 @@ void CStateMonsterFindEnemyAbstract::reselect_state()
     case eStateFindEnemy_WalkAround: this->select_state(eStateFindEnemy_WalkAround); break;
     }
 }
+
+#undef TEMPLATE_SPECIALIZATION
+#undef CStateMonsterFindEnemyAbstract

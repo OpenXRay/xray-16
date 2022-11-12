@@ -190,7 +190,7 @@ public:
     game_cl_mp();
     virtual ~game_cl_mp();
 
-    void xr_stdcall OnBuySpawn(CUIWindow* pWnd, void* p);
+    void OnBuySpawn(CUIWindow* pWnd, void* p);
     virtual void TranslateGameMessage(u32 msg, NET_Packet& P);
     virtual void CommonMessageOut(pcstr msg);
 
@@ -281,7 +281,7 @@ private:
     void ProcessPlayersInfoReply(NET_Packet& P);
 
 public:
-    void __stdcall SendCollectedData(u8 const* buffer, u32 buffer_size, u32 uncompressed_size);
+    void SendCollectedData(u8 const* buffer, u32 buffer_size, u32 uncompressed_size);
     void PrepareToReceiveFile(
         ClientID const& from_client, shared_str const& client_session_id, clientdata_event_t response_event);
 
@@ -296,9 +296,9 @@ public:
         game_cl_mp* m_owner;
         CMemoryWriter m_writer;
         fr_callback_binder() : m_frnode(NULL), m_active(false){}
-        void __stdcall receiving_file_callback(
+        void receiving_file_callback(
             file_transfer::receiving_status_t status, u32 bytes_received, u32 data_size);
-        void __stdcall receiving_serverinfo_callback(
+        void receiving_serverinfo_callback(
             file_transfer::receiving_status_t status, u32 bytes_received, u32 data_size);
     };
     struct detected_cheater_t
@@ -327,7 +327,7 @@ public:
     void draw_all_active_binder_states();
     void draw_downloads(bool draw);
 
-    void __stdcall sending_screenshot_callback(file_transfer::sending_status_t status, u32 bytes_sent, u32 data_size);
+    void sending_screenshot_callback(file_transfer::sending_status_t status, u32 bytes_sent, u32 data_size);
     //-------------------------------------------------------------------------------------------------
     static xr_string generate_file_name(const xr_string& base_name, const time_t* date_time = nullptr);
     static xr_string sanitize_filename(const xr_string& base_name);

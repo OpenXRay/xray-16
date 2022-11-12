@@ -97,7 +97,7 @@ bool CUIVotingCategory::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     if (WINDOW_KEY_PRESSED == keyboard_action)
     {
-        if (SDL_SCANCODE_ESCAPE == dik)
+        if (IsBinded(kQUIT, dik))
         {
             OnBtnCancel();
             return true;

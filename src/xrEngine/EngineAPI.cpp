@@ -17,14 +17,13 @@ extern xr_vector<xr_token> VidQualityToken;
 constexpr pcstr GET_RENDERER_MODULE_FUNC = "GetRendererModule";
 
 constexpr pcstr r1_library     = "xrRender_R1";
-constexpr pcstr r2_library     = "xrRender_R2";
 constexpr pcstr gl_library     = "xrRender_GL";
 
 constexpr pcstr RENDER_LIBRARIES[] =
 {
 #if defined(XR_PLATFORM_WINDOWS)
     r1_library,
-    r2_library,
+    "xrRender_R2",
     "xrRender_R4",
 #endif
     gl_library
@@ -121,6 +120,14 @@ void CEngineAPI::Initialize(void)
 
         pDestroy = (Factory_Destroy*)hGame->GetProcAddress("xrFactory_Destroy");
         R_ASSERT(pDestroy);
+
+        pInitializeGame = (InitializeGameLibraryProc)hGame->GetProcAddress("initialize_library");
+        R_ASSERT(pInitializeGame);
+
+        pFinalizeGame = (FinalizeGameLibraryProc)hGame->GetProcAddress("finalize_library");
+        R_ASSERT(pFinalizeGame);
+    	
+        pInitializeGame();
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -148,10 +155,18 @@ void CEngineAPI::Initialize(void)
 
 void CEngineAPI::Destroy(void)
 {
-    hGame = nullptr;
-    hTuner = nullptr;
+    if (pFinalizeGame)
+        pFinalizeGame();
+	
+    pInitializeGame = nullptr;
+    pFinalizeGame = nullptr;
     pCreate = nullptr;
     pDestroy = nullptr;
+	
+    hGame = nullptr;
+	
+    hTuner = nullptr;
+	
     renderers.clear();
     Engine.Event._destroy();
     XRC.r_clear_compact();
@@ -198,15 +213,9 @@ void CEngineAPI::CreateRendererList()
     {
         for (pcstr library : RENDER_LIBRARIES)
         {
-            loadLibrary(library);
+            if (loadLibrary(library) && library != r1_library)
+                r2_available = true;
         }
-
-        const auto it = std::find_if(renderers.begin(), renderers.end(), [](const RendererDesc& desc)
-        {
-            return desc.libraryName == r2_library;
-        });
-        if (it != renderers.end())
-            r2_available = true;
     }
 
     int modeIndex{};
@@ -264,16 +273,11 @@ void CEngineAPI::CreateRendererList()
     modes.emplace_back(nullptr, -1);
 }
 
-bool is_r2_available()
-{
-    return r2_available;
-}
-
 SCRIPT_EXPORT(CheckRendererSupport, (),
 {
     using namespace luabind;
     module(luaState)
     [
-        def("xrRender_test_r2_hw", &is_r2_available)
+        def("xrRender_test_r2_hw", +[](){ return r2_available; })
     ];
 });

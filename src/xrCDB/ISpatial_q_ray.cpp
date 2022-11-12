@@ -6,15 +6,18 @@
 
 #include "SDL.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#else
+#error Add your platform here
 #endif
-#pragma warning(pop)
 
+extern Fvector c_spatial_offset[8];
+
+namespace Spatial
+{
 struct alignas(16) vec_t : public Fvector3
 {
     float pad;
@@ -32,17 +35,13 @@ struct alignas(16) ray_t
     vec_t inv_dir;
     vec_t fwd_dir;
 };
-struct ray_segment_t
-{
-    float t_near, t_far;
-};
 
 ICF u32& uf(float& x) { return (u32&)x; }
-ICF BOOL isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fvector& coord)
+ICF bool isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fvector& coord)
 {
     Fvector MaxT;
     MaxT.x = MaxT.y = MaxT.z = -1.0f;
-    BOOL Inside = TRUE;
+    bool Inside = true;
 
     // Find candidate planes.
     if (ray.pos[0] < min[0])
@@ -155,7 +154,7 @@ static constexpr auto flt_plus_inf = std::numeric_limits<float>::infinity();
 alignas(16) static constexpr float ps_cst_plus_inf[4] = { flt_plus_inf, flt_plus_inf, flt_plus_inf, flt_plus_inf },
                                    ps_cst_minus_inf[4] = { -flt_plus_inf, -flt_plus_inf, -flt_plus_inf, -flt_plus_inf };
 
-ICF BOOL isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
+ICF bool isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
 {
     // you may already have those values hanging around somewhere
     const __m128 plus_inf = loadps(ps_cst_plus_inf), minus_inf = loadps(ps_cst_minus_inf);
@@ -192,7 +191,7 @@ ICF BOOL isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
     lmax = minss(lmax, lmax1);
     lmin = maxss(lmin, lmin1);
 
-    const BOOL ret = _mm_comige_ss(lmax, _mm_setzero_ps()) & _mm_comige_ss(lmax, lmin);
+    const bool ret = _mm_comige_ss(lmax, _mm_setzero_ps()) & _mm_comige_ss(lmax, lmin);
 
     storess(lmin, &dist);
     // storess	(lmax, &rs.t_far);
@@ -200,10 +199,19 @@ ICF BOOL isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
     return ret;
 }
 
-extern Fvector c_spatial_offset[8];
+#undef loadps
+#undef storess
+#undef minss
+#undef maxss
+#undef minps
+#undef maxps
+#undef mulps
+#undef subps
+#undef rotatelps
+#undef muxhps
 
 template <bool b_use_sse, bool b_first, bool b_nearest>
-class alignas(16) walker
+class alignas(16) ray_walker
 {
 public:
     ray_t ray;
@@ -213,7 +221,7 @@ public:
     ISpatial_DB* space;
 
 public:
-    walker(ISpatial_DB* _space, u32 _mask, const Fvector& _start, const Fvector& _dir, float _range)
+    ray_walker(ISpatial_DB* _space, u32 _mask, const Fvector& _start, const Fvector& _dir, float _range)
     {
         mask = _mask;
         ray.pos.set(_start);
@@ -243,7 +251,7 @@ public:
         space = _space;
     }
     // fpu
-    ICF BOOL _box_fpu(const Fvector& n_C, const float n_R, Fvector& coord)
+    ICF bool _box_fpu(const Fvector& n_C, const float n_R, Fvector& coord)
     {
         // box
         float n_vR = 2 * n_R;
@@ -252,7 +260,7 @@ public:
         return isect_fpu(BB.vMin, BB.vMax, ray, coord);
     }
     // sse
-    ICF BOOL _box_sse(const Fvector& n_C, const float n_R, float& dist)
+    ICF bool _box_sse(const Fvector& n_C, const float n_R, float& dist)
     {
         aabb_t box;
         /*
@@ -335,10 +343,13 @@ public:
         }
     }
 };
+} // namespace Spatial
 
 void ISpatial_DB::q_ray(
     xr_vector<ISpatial*>& R, u32 _o, u32 _mask_and, const Fvector& _start, const Fvector& _dir, float _range)
 {
+    using namespace Spatial;
+
     ScopeLock scope(&cs);
     Stats.Query.Begin();
     q_result = &R;
@@ -349,12 +360,12 @@ void ISpatial_DB::q_ray(
         {
             if (_o & O_ONLYNEAREST)
             {
-                walker<true, true, true> W(this, _mask_and, _start, _dir, _range);
+                ray_walker<true, true, true> W(this, _mask_and, _start, _dir, _range);
                 W.walk(m_root, m_center, m_bounds);
             }
             else
             {
-                walker<true, true, false> W(this, _mask_and, _start, _dir, _range);
+                ray_walker<true, true, false> W(this, _mask_and, _start, _dir, _range);
                 W.walk(m_root, m_center, m_bounds);
             }
         }
@@ -362,12 +373,12 @@ void ISpatial_DB::q_ray(
         {
             if (_o & O_ONLYNEAREST)
             {
-                walker<true, false, true> W(this, _mask_and, _start, _dir, _range);
+                ray_walker<true, false, true> W(this, _mask_and, _start, _dir, _range);
                 W.walk(m_root, m_center, m_bounds);
             }
             else
             {
-                walker<true, false, false> W(this, _mask_and, _start, _dir, _range);
+                ray_walker<true, false, false> W(this, _mask_and, _start, _dir, _range);
                 W.walk(m_root, m_center, m_bounds);
             }
         }
@@ -378,12 +389,12 @@ void ISpatial_DB::q_ray(
         {
             if (_o & O_ONLYNEAREST)
             {
-                walker<false, true, true> W(this, _mask_and, _start, _dir, _range);
+                ray_walker<false, true, true> W(this, _mask_and, _start, _dir, _range);
                 W.walk(m_root, m_center, m_bounds);
             }
             else
             {
-                walker<false, true, false> W(this, _mask_and, _start, _dir, _range);
+                ray_walker<false, true, false> W(this, _mask_and, _start, _dir, _range);
                 W.walk(m_root, m_center, m_bounds);
             }
         }
@@ -391,12 +402,12 @@ void ISpatial_DB::q_ray(
         {
             if (_o & O_ONLYNEAREST)
             {
-                walker<false, false, true> W(this, _mask_and, _start, _dir, _range);
+                ray_walker<false, false, true> W(this, _mask_and, _start, _dir, _range);
                 W.walk(m_root, m_center, m_bounds);
             }
             else
             {
-                walker<false, false, false> W(this, _mask_and, _start, _dir, _range);
+                ray_walker<false, false, false> W(this, _mask_and, _start, _dir, _range);
                 W.walk(m_root, m_center, m_bounds);
             }
         }

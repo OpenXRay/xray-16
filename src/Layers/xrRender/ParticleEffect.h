@@ -58,6 +58,11 @@ public:
 
     u32 RenderTO();
     virtual void Render(float LOD);
+
+private:
+    void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle* particles);
+
+public:
     virtual void Copy(dxRender_Visual* pFrom);
 
     virtual void OnDeviceCreate();

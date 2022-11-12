@@ -15,7 +15,6 @@
 #include "Inventory.h"
 #include "inventory_item.h"
 #include "InventoryBox.h"
-#include "string_table.h"
 #include "ai/monsters/basemonster/base_monster.h"
 
 void move_item_from_to(u16 from_id, u16 to_id, u16 what_id)
@@ -211,6 +210,33 @@ void CUIActorMenu::TakeAllFromPartner(CUIWindow* w, void* d)
     m_pLists[eSearchLootBagList]->ClearAll(true); // false
 }
 
+void CUIActorMenu::StoreAllToPartner(CUIWindow* w, void* d)
+{
+    VERIFY(m_pActorInvOwner);
+    if (!m_pPartnerInvOwner)
+    {
+        if (m_pInvBox)
+        {
+            StoreAllToInventoryBox();
+        }
+        return;
+    }
+
+    u32 const cnt = m_pLists[eInventoryBagList]->ItemsCount();
+    for (u32 i = 0; i < cnt; ++i)
+    {
+        CUICellItem* ci = m_pLists[eInventoryBagList]->GetItemIdx(i);
+        for (u32 j = 0; j < ci->ChildsCount(); ++j)
+        {
+            PIItem j_item = (PIItem)(ci->Child(j)->m_pData);
+            move_item_check(j_item, m_pActorInvOwner, m_pPartnerInvOwner, false);
+        }
+        PIItem item = (PIItem)(ci->m_pData);
+        move_item_check(item, m_pActorInvOwner, m_pPartnerInvOwner, false);
+    } // for i
+    m_pLists[eInventoryBagList]->ClearAll(true); // false
+}
+
 void CUIActorMenu::TakeAllFromInventoryBox()
 {
     u16 actor_id = m_pActorInvOwner->object_id();
@@ -229,4 +255,23 @@ void CUIActorMenu::TakeAllFromInventoryBox()
         move_item_from_to(m_pInvBox->ID(), actor_id, item->object_id());
     } // for i
     m_pLists[eSearchLootBagList]->ClearAll(true); // false
+}
+
+void CUIActorMenu::StoreAllToInventoryBox()
+{
+    u16 actor_id = m_pActorInvOwner->object_id();
+
+    u32 const cnt = m_pLists[eInventoryBagList]->ItemsCount();
+    for (u32 i = 0; i < cnt; ++i)
+    {
+        CUICellItem* ci = m_pLists[eInventoryBagList]->GetItemIdx(i);
+        for (u32 j = 0; j < ci->ChildsCount(); ++j)
+        {
+            PIItem j_item = (PIItem)(ci->Child(j)->m_pData);
+            move_item_from_to(actor_id, m_pInvBox->ID(), j_item->object_id());
+        }
+        PIItem item = (PIItem)(ci->m_pData);
+        move_item_from_to(actor_id, m_pInvBox->ID(), item->object_id());
+    }
+    m_pLists[eInventoryBagList]->ClearAll(true); // false
 }

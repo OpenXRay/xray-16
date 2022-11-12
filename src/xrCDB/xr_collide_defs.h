@@ -35,7 +35,7 @@ struct ray_cache
     Fvector start;
     Fvector dir;
     float range;
-    BOOL result;
+    bool result;
 
     // cached vertices
     Fvector verts[3];
@@ -51,7 +51,7 @@ struct ray_cache
         verts[2].set(0, 0, 0);
     }
 
-    void set(const Fvector& _start, const Fvector& _dir, const float _range, const BOOL _result)
+    void set(const Fvector& _start, const Fvector& _dir, const float _range, const bool _result)
     {
         start = _start;
         dir = _dir;
@@ -59,12 +59,12 @@ struct ray_cache
         result = _result;
     }
 
-    BOOL similar(const Fvector& _start, const Fvector& _dir, const float _range)
+    bool similar(const Fvector& _start, const Fvector& _dir, const float _range)
     {
         if (!_start.similar(start))
-            return FALSE;
+            return false;
         if (!fsimilar(1.f, dir.dotproduct(_dir)))
-            return FALSE;
+            return false;
         if (!fsimilar(_range, range))
             return FALSE;
         return TRUE;
@@ -113,17 +113,17 @@ struct rq_result
         return *this;
     }
 
-    IC BOOL set_if_less(CDB::RESULT* I)
+    IC bool set_if_less(CDB::RESULT* I)
     {
         if (I->range < range)
         {
             set(0, I->range, I->id);
-            return TRUE;
+            return true;
         }
         else
-            return FALSE;
+            return false;
     }
-    IC BOOL set_if_less(rq_result* R)
+    IC bool set_if_less(rq_result* R)
     {
         if (R->range < range)
         {
@@ -131,19 +131,19 @@ struct rq_result
             return TRUE;
         }
         else
-            return FALSE;
+            return false;
     }
-    IC BOOL set_if_less(IGameObject* _who, float _range, int _element)
+    IC bool set_if_less(IGameObject* _who, float _range, int _element)
     {
         if (_range < range)
         {
             set(_who, _range, _element);
-            return TRUE;
+            return true;
         }
         else
-            return FALSE;
+            return false;
     }
-    IC BOOL valid() { return (element >= 0); }
+    IC bool valid() { return (element >= 0); }
 };
 
 using rqVec = xr_vector<rq_result>;
@@ -155,7 +155,7 @@ protected:
     static bool r_sort_pred(const rq_result& a, const rq_result& b) { return a.range < b.range; }
 
 public:
-    IC BOOL append_result(IGameObject* _who, float _range, int _element, BOOL bNearest)
+    IC bool append_result(IGameObject* _who, float _range, int _element, bool bNearest)
     {
         if (bNearest && !results.empty())
         {
@@ -193,5 +193,5 @@ public:
 };
 
 typedef bool rq_callback(rq_result& result, LPVOID user_data);
-typedef BOOL test_callback(const ray_defs& rd, IGameObject* object, LPVOID user_data);
+typedef bool test_callback(const ray_defs& rd, IGameObject* object, LPVOID user_data);
 }

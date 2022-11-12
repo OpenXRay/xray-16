@@ -9,8 +9,6 @@
 
 #define CStatePoltergeistAttackHiddenAbstract CStatePoltergeistAttackHidden<_Object>
 
-#define DIST_TO_PATH_END 1.5f
-
 TEMPLATE_SPECIALIZATION
 CStatePoltergeistAttackHiddenAbstract::CStatePoltergeistAttackHidden(_Object* obj) : inherited(obj)
 {
@@ -40,7 +38,7 @@ void CStatePoltergeistAttackHiddenAbstract::select_target_for_move()
     Fvector const enemy_dir = normalize(enemy->Direction());
     Fvector const front_point = enemy_pos + (enemy_dir * fly_radius);
 
-    if (current_time() > m_fly_side_select_tick)
+    if (xr_current_time() > m_fly_side_select_tick)
     {
         Fvector const self2front = front_point - self_pos;
         bool left_side = self2enemy.x * self2front.z - self2enemy.z * self2front.x > 0.f;
@@ -50,7 +48,7 @@ void CStatePoltergeistAttackHiddenAbstract::select_target_for_move()
         }
 
         m_fly_left = left_side;
-        m_fly_side_select_tick = current_time() + (u32)(1000 * this->object->get_fly_around_change_direction_time());
+        m_fly_side_select_tick = xr_current_time() + (u32)(1000 * this->object->get_fly_around_change_direction_time());
     }
 
     Fvector const enemy2self = -fly_radius * normalize(self2enemy);

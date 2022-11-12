@@ -485,13 +485,13 @@ LPCSTR name, xr_rtoken* token, u32 t_cnt)
 }
 
 RToken16Value*	CScriptPropertiesListHelper::CreateRToken16	(PropItemVec* items, LPCSTR key, luabind::object
-object, LPCSTR name, RTokenVec* token)
+object, LPCSTR name, xr_vector<xr_rtoken>* token)
 {
     return		(PHelper().CreateRToken16(*items,key,wrap_value<shared_str>(object,name),token));
 }
 
 RToken32Value*	CScriptPropertiesListHelper::CreateRToken32	(PropItemVec* items, LPCSTR key, luabind::object
-object, LPCSTR name, RTokenVec* token)
+object, LPCSTR name, xr_vector<xr_rtoken>* token)
 {
     return		(PHelper().CreateRToken32(*items,key,wrap_value<shared_str>(object,name),token));
 }

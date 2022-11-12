@@ -1,11 +1,8 @@
 #pragma once
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterEatingAbstract CStateMonsterEating<_Object>
-
-#define TIME_TO_EAT 20000
 
 TEMPLATE_SPECIALIZATION
 CStateMonsterEatingAbstract::CStateMonsterEating(_Object* obj) : inherited(obj), corpse(nullptr), time_last_eat(0) {}

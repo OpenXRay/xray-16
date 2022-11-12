@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include <D3DX10Tex.h>
-
 static void generate_jitter(u32* dest, u32 elem_count)
 {
     const int cmax = 8;
@@ -48,14 +46,10 @@ void CRenderTarget::build_textures()
     }
     // Build material(s)
     {
-        //	Create immutable texture.
-        //	So we need to init data _before_ the creation.
         // Surface
-        // R_CHK
-        // (D3DXCreateVolumeTexture(HW.pDevice,TEX_material_LdotN,TEX_material_LdotH,4,1,0,D3DFMT_A8L8,D3DPOOL_MANAGED,&t_material_surf));
-        // t_material					= dxRenderDeviceRender::Instance().Resources->_CreateTexture(r2_material);
-        // t_material->surface_set		(t_material_surf);
-        //	Use DXGI_FORMAT_R8G8_UNORM
+        // Create immutable texture.
+        // So we need to init data _before_ the creation.
+        // Use DXGI_FORMAT_R8G8_UNORM
 
         u16 tempData[TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count];
 
@@ -77,8 +71,6 @@ void CRenderTarget::build_textures()
         subData.SysMemSlicePitch = desc.Height * subData.SysMemPitch;
 
         // Fill it (addr: x=dot(L,N),y=dot(L,H))
-        // D3DLOCKED_BOX				R;
-        // R_CHK						(t_material_surf->LockBox	(0,&R,0,0));
         for (u32 slice = 0; slice < TEX_material_Count; slice++)
         {
             for (u32 y = 0; y < TEX_material_LdotH; y++)
@@ -135,38 +127,23 @@ void CRenderTarget::build_textures()
                 }
             }
         }
-        // R_CHK		(t_material_surf->UnlockBox	(0));
 
+        ID3DTexture3D* t_material_surf;
         R_CHK(HW.pDevice->CreateTexture3D(&desc, &subData, &t_material_surf));
         t_material = RImplementation.Resources->_CreateTexture(r2_material);
         t_material->surface_set(t_material_surf);
-        // R_CHK
-        // (D3DXCreateVolumeTexture(HW.pDevice,TEX_material_LdotN,TEX_material_LdotH,4,1,0,D3DFMT_A8L8,D3DPOOL_MANAGED,&t_material_surf));
-        // t_material					= dxRenderDeviceRender::Instance().Resources->_CreateTexture(r2_material);
-        // t_material->surface_set		(t_material_surf);
 
         // #ifdef DEBUG
         // R_CHK	(D3DXSaveTextureToFile	("x:" DELIMITER "r2_material.dds",D3DXIFF_DDS,t_material_surf,0));
         // #endif
+
+        _RELEASE(t_material_surf);
     }
 
     // Build noise table
-    if (1)
     {
         // Surfaces
-        // D3DLOCKED_RECT				R[TEX_jitter_count];
-
-        // for (int it=0; it<TEX_jitter_count; it++)
-        //{
-        //	string_path					name;
-        //	xr_sprintf						(name,"%s%d",r2_jitter,it);
-        //	R_CHK	(D3DXCreateTexture
-        //(HW.pDevice,TEX_jitter,TEX_jitter,1,0,D3DFMT_Q8W8V8U8,D3DPOOL_MANAGED,&t_noise_surf[it]));
-        //	t_noise[it]					= dxRenderDeviceRender::Instance().Resources->_CreateTexture	(name);
-        //	t_noise[it]->surface_set	(t_noise_surf[it]);
-        //	R_CHK						(t_noise_surf[it]->LockRect	(0,&R[it],0,0));
-        //}
-        //	Use DXGI_FORMAT_R8G8B8A8_SNORM
+        // Use DXGI_FORMAT_R8G8B8A8_SNORM
 
         static const int sampleSize = 4;
         u32 tempData[TEX_jitter_count][TEX_jitter * TEX_jitter];
@@ -209,20 +186,15 @@ void CRenderTarget::build_textures()
             }
         }
 
-        // for (int it=0; it<TEX_jitter_count; it++)	{
-        //	R_CHK						(t_noise_surf[it]->UnlockRect(0));
-        //}
+        ID3DTexture2D* t_noise_surf[TEX_jitter_count]{};
 
         for (int it = 0; it < TEX_jitter_count - 1; it++)
         {
             string_path name;
             xr_sprintf(name, "%s%d", r2_jitter, it);
-            // R_CHK	(D3DXCreateTexture
-            // (HW.pDevice,TEX_jitter,TEX_jitter,1,0,D3DFMT_Q8W8V8U8,D3DPOOL_MANAGED,&t_noise_surf[it]));
             R_CHK(HW.pDevice->CreateTexture2D(&desc, &subData[it], &t_noise_surf[it]));
             t_noise[it] = RImplementation.Resources->_CreateTexture(name);
             t_noise[it]->surface_set(t_noise_surf[it]);
-            // R_CHK						(t_noise_surf[it]->LockRect	(0,&R[it],0,0));
         }
 
         float tempDataHBAO[TEX_jitter * TEX_jitter * 4];
@@ -273,8 +245,6 @@ void CRenderTarget::build_textures()
 
         string_path name;
         xr_sprintf(name, "%s%d", r2_jitter, it);
-        // R_CHK	(D3DXCreateTexture
-        // (HW.pDevice,TEX_jitter,TEX_jitter,1,0,D3DFMT_Q8W8V8U8,D3DPOOL_MANAGED,&t_noise_surf[it]));
         R_CHK(HW.pDevice->CreateTexture2D(&descHBAO, &subData[it], &t_noise_surf[it]));
         t_noise[it] = RImplementation.Resources->_CreateTexture(name);
         t_noise[it]->surface_set(t_noise_surf[it]);
@@ -283,6 +253,7 @@ void CRenderTarget::build_textures()
         {
             //	Autogen mipmaps
             desc.MipLevels = 0;
+            ID3DTexture2D* t_noise_surf_mipped{};
             R_CHK(HW.pDevice->CreateTexture2D(&desc, 0, &t_noise_surf_mipped));
             t_noise_mipped = RImplementation.Resources->_CreateTexture(r2_jitter_mipped);
             t_noise_mipped->surface_set(t_noise_surf_mipped);
@@ -291,7 +262,12 @@ void CRenderTarget::build_textures()
 
             HW.pContext->CopySubresourceRegion(t_noise_surf_mipped, 0, 0, 0, 0, t_noise_surf[0], 0, 0);
 
-            D3DX11FilterTexture(HW.pContext, t_noise_surf_mipped, 0, D3DX10_FILTER_POINT);
+            D3DX11FilterTexture(HW.pContext, t_noise_surf_mipped, 0, D3DX11_FILTER_POINT);
+            _RELEASE(t_noise_surf_mipped);
         }
-    }
+        for (size_t it2 = 0; it2 < TEX_jitter_count; ++it2)
+        {
+            _RELEASE(t_noise_surf[it2]);
+        }
+ }
 }

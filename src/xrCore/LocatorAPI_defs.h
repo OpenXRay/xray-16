@@ -37,7 +37,7 @@ public:
     void _set(LPCSTR add);
     void _set_root(LPCSTR root);
 
-    void __stdcall rescan_path_cb();
+    void rescan_path_cb();
 };
 
 #ifdef _EDITOR

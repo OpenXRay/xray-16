@@ -15,15 +15,15 @@ void bone_group::init(CActor* actor_ptr)
     IKinematics* V = smart_cast<IKinematics*>(actor_ptr->Visual());
     VERIFY(V);
 
-    m_bone_groups.insert(std::make_pair(V->LL_BoneID("bip01_head"), gid_head));
+    m_bone_groups.emplace(V->LL_BoneID("bip01_head"), gid_head);
 
-    m_bone_groups.insert(std::make_pair(V->LL_BoneID("eye_left"), gid_eyes));
-    m_bone_groups.insert(std::make_pair(V->LL_BoneID("eye_right"), gid_eyes));
+    m_bone_groups.emplace(V->LL_BoneID("eye_left"), gid_eyes);
+    m_bone_groups.emplace(V->LL_BoneID("eye_right"), gid_eyes);
 
-    m_bone_groups.insert(std::make_pair(V->LL_BoneID("bip01_spine"), gid_spine));
-    m_bone_groups.insert(std::make_pair(V->LL_BoneID("bip01_spine1"), gid_spine));
-    m_bone_groups.insert(std::make_pair(V->LL_BoneID("bip01_spine2"), gid_spine));
-    m_bone_groups.insert(std::make_pair(V->LL_BoneID("bip01_spine2"), gid_spine));
+    m_bone_groups.emplace(V->LL_BoneID("bip01_spine"), gid_spine);
+    m_bone_groups.emplace(V->LL_BoneID("bip01_spine1"), gid_spine);
+    m_bone_groups.emplace(V->LL_BoneID("bip01_spine2"), gid_spine);
+    m_bone_groups.emplace(V->LL_BoneID("bip01_spine2"), gid_spine);
 }
 
 bool bone_group::is_bone_in_group(u16 bone_id, enum_group_id gid) const

@@ -25,8 +25,10 @@ void lanim_cont_xf::set_defaults()
 }
 
 CUIStatic::CUIStatic()
-    : m_bTextureEnable(true), m_bStretchTexture(false), m_bHeading(false), m_bConstHeading(false), m_fHeading(0.0f),
-      m_pTextControl(NULL)
+    : CUIWindow("CUIStatic"), m_pTextControl(nullptr),
+      m_bStretchTexture(false), m_bTextureEnable(true),
+      m_bHeading(false), m_bConstHeading(false),
+      m_fHeading(0.0f)
 {
     m_TextureOffset.set(0.0f, 0.0f);
     m_lanim_xform.set_defaults();
@@ -257,7 +259,8 @@ void CUIStatic::OnFocusLost()
 }
 
 //-------------------------------------
-CUITextWnd::CUITextWnd() {}
+CUITextWnd::CUITextWnd() : CUIWindow("CUITextWnd") {}
+
 void CUITextWnd::AdjustHeightToText()
 {
     if (!fsimilar(TextItemControl().m_wndSize.x, GetWidth()))

@@ -3,7 +3,7 @@
 #ifdef XRGAME_EXPORTS
 #include "xrUICore/XML/xrUIXmlParser.h"
 #else // XRGAME_EXPORTS
-#include "xrUICore/XML/xrUIXmlParser.h"
+#include "xrUIXmlParser.h"
 #include "Common/object_broker.h"
 #endif // XRGAME_EXPORTS
 
@@ -90,9 +90,11 @@ const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_asse
 
     if (it == m_pItemDataVector->end())
     {
+#ifndef MASTER_GOLD
         int i = 0;
         for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; ++it, i++)
             Msg("[%d]=[%s]", i, *(*it).id);
+#endif
 
         R_ASSERT3(no_assert, "item not found, id", *str_id);
         return NULL;

@@ -38,8 +38,8 @@ public:
     virtual property_holder* create();
 
 public:
-    bool unique_id(LPCSTR id) const;
-    shared_str generate_unique_id(LPCSTR prefix) const;
+    bool unique_id(pcstr id) const;
+    shared_str generate_unique_id(pcstr prefix) const;
 
 private:
     inline void make_state_changed();
@@ -56,9 +56,9 @@ private:
 private:
     struct unique_id_predicate
     {
-        LPCSTR m_id;
+        pcstr m_id;
 
-        inline unique_id_predicate(LPCSTR id);
+        inline unique_id_predicate(pcstr id);
         inline bool operator()(typename container_type::value_type const& value) const;
     };
 

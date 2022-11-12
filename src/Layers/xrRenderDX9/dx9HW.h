@@ -10,6 +10,8 @@
 #endif
 
 class CHW
+    : public pureAppActivate,
+      public pureAppDeactivate
 {
 public:
     CHW();
@@ -34,6 +36,14 @@ public:
     void EndScene();
     void Present();
 
+public:
+    void OnAppActivate() override;
+    void OnAppDeactivate() override;
+
+public:
+    void BeginPixEvent(LPCWSTR wszName) const;
+    void EndPixEvent() const;
+
 private:
     u32 selectPresentInterval() const;
     u32 selectGPU() const;
@@ -57,6 +67,9 @@ public:
     IDirect3D9* pD3D = nullptr; // D3D
 
     u32 DevAdapter;
+
+    decltype(&D3DPERF_BeginEvent) d3dperf_BeginEvent = nullptr;
+    decltype(&D3DPERF_EndEvent) d3dperf_EndEvent = nullptr;
 
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;

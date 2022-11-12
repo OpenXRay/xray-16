@@ -42,7 +42,7 @@ SLuaWpnParams::~SLuaWpnParams() {}
 
 // =====================================================================
 
-CUIWpnParams::CUIWpnParams()
+CUIWpnParams::CUIWpnParams() : CUIWindow("CUIWpnParams")
 {
     AttachChild(&m_textAccuracy);
     AttachChild(&m_textDamage);
@@ -55,7 +55,6 @@ CUIWpnParams::CUIWpnParams()
     AttachChild(&m_progressRPM);
 }
 
-CUIWpnParams::~CUIWpnParams() {}
 bool CUIWpnParams::InitFromXml(CUIXml& xml_doc)
 {
     if (!xml_doc.NavigateToNode("wpn_params", 0))
@@ -247,13 +246,12 @@ bool CUIWpnParams::Check(const shared_str& wpn_section)
 
 // -------------------------------------------------------------------------------------------------
 
-CUIConditionParams::CUIConditionParams()
+CUIConditionParams::CUIConditionParams() : CUIWindow("CUIConditionParams")
 {
     AttachChild(&m_progress);
     AttachChild(&m_text);
 }
 
-CUIConditionParams::~CUIConditionParams() {}
 bool CUIConditionParams::InitFromXml(CUIXml& xml_doc)
 {
     if (!xml_doc.NavigateToNode("condition_params", 0))

@@ -172,6 +172,7 @@ void CScriptGameObject::SetCallback(
 }
 
 void CScriptGameObject::SetCallback(GameObject::ECallbackType type) { object().callback(type).clear(); }
+void CScriptGameObject::ClearCallbacks() { object().clear_callbacks(); }
 void CScriptGameObject::set_fastcall(const luabind::functor<bool>& functor, const luabind::object& object)
 {
     CPHScriptGameObjectCondition* c = xr_new<CPHScriptGameObjectCondition>(object, functor, m_game_object);

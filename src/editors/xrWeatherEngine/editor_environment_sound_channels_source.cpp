@@ -12,9 +12,10 @@
 #include "ide.hpp"
 #include "editor_environment_detail.hpp"
 
-using editor::environment::sound_channels::source;
+namespace editor::environment::sound_channels
+{
+source::source(shared_str const& source) : m_property_holder(nullptr), m_source(source) {}
 
-source::source(shared_str const& source) : m_source(source), m_property_holder(0) {}
 source::~source()
 {
     if (!Device.editor())
@@ -34,3 +35,4 @@ void source::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 source::property_holder_type* source::object() { return (m_property_holder); }
+} // editor::environment::sound_channels

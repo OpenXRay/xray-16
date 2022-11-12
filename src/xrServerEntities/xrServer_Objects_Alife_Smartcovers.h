@@ -49,8 +49,8 @@ public:
 private:
     typedef xr_vector<visual_data> visuals_collection;
 
-    void __stdcall OnChangeDescription(PropValue* sender);
-    void __stdcall OnChangeLoopholes(PropValue* sender);
+    void OnChangeDescription(PropValue* sender);
+    void OnChangeLoopholes(PropValue* sender);
 
 public:
     void set_loopholes_table_checker(BOOLValue* value);
@@ -62,7 +62,7 @@ private:
 public:
     CSE_SmartCover(LPCSTR caSection);
     virtual ~CSE_SmartCover();
-    virtual IServerEntityShape* __stdcall shape();
+    virtual IServerEntityShape* shape();
     virtual bool used_ai_locations() const /* noexcept */;
     virtual bool can_save() const /* noexcept */;
     virtual bool can_switch_online() const /* noexcept */;
@@ -73,10 +73,10 @@ public:
     void set_available_loopholes(luabind::object table);
 #endif // #ifndef AI_COMPILER
 #ifdef XRSE_FACTORY_EXPORTS
-    virtual void __stdcall on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
+    virtual void on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
-    virtual visual_data* __stdcall visual_collection() const { return &*m_visuals.begin(); }
-    virtual u32 __stdcall visual_collection_size() const { return m_visuals.size(); }
+    virtual visual_data* visual_collection() const { return &*m_visuals.begin(); }
+    virtual u32 visual_collection_size() const { return m_visuals.size(); }
 #endif // #ifdef XRSE_FACTORY_EXPORTS
 
 private:

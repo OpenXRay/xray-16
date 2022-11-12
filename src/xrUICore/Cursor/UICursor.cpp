@@ -3,9 +3,7 @@
 
 #include "Static/UIStatic.h"
 #include "Buttons/UIBtnHint.h"
-#include "xrEngine/IInputReceiver.h"
 #include "xrEngine/xr_input.h"
-#include "SDL_syswm.h"
 
 #define C_DEFAULT color_xrgb(0xff, 0xff, 0xff)
 
@@ -65,7 +63,7 @@ void CUICursor::InitInternal()
     m_static->SetTextureRect(rect);
     Fvector2 sz;
     sz.set(rect.rb);
-    sz.x *= UI().get_current_kx();
+    sz.x *= UICore::get_current_kx();
 
     m_static->SetWndSize(sz);
     m_static->SetStretchTexture(true);
@@ -116,18 +114,18 @@ Fvector2 CUICursor::GetCursorPositionDelta()
 void CUICursor::UpdateCursorPosition(int _dx, int _dy)
 {
     vPrevPos = vPos;
-    if (m_bound_to_system_cursor)
-    {
-        Ivector2 pti;
-        IInputReceiver::IR_GetMousePosWindow(pti);
-        vPos.x = (float)pti.x * correction.x;
-        vPos.y = (float)pti.y * correction.y;
-    }
-    else
+    if (pInput->IsExclusiveMode() || !m_bound_to_system_cursor)
     {
         float sens = 1.0f;
         vPos.x += _dx * sens * correction.x;
         vPos.y += _dy * sens * correction.y;
+    }
+    else
+    {
+        Ivector2 pti;
+        pInput->iGetAsyncMousePos(pti);
+        vPos.x = (float)pti.x * correction.x;
+        vPos.y = (float)pti.y * correction.y;
     }
     clamp(vPos.x, 0.f, UI_BASE_WIDTH);
     clamp(vPos.y, 0.f, UI_BASE_HEIGHT);
@@ -139,5 +137,5 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
     Ivector2 p;
     p.x = iFloor(vPos.x / correction.x);
     p.y = iFloor(vPos.y / correction.y);
-    SDL_WarpMouseInWindow(Device.m_sdlWnd, p.x, p.y);
+    pInput->iSetMousePos(p);
 }

@@ -568,10 +568,10 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         if (m_pActorInvOwner->inventory().SlotIsPersistent(slot_id) && slot_id != DETECTOR_SLOT)
             return false;
 
-        if (slot_id == INV_SLOT_2 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_3))
+        if (slot_id == INV_SLOT_2 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_3) && CallOfPripyatMode)
             return ToSlot(itm, force_place, INV_SLOT_3);
 
-        if (slot_id == INV_SLOT_3 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_2))
+        if (slot_id == INV_SLOT_3 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_2) && CallOfPripyatMode)
             return ToSlot(itm, force_place, INV_SLOT_2);
 
         CUIDragDropListEx* slot_list = GetSlotList(slot_id);
@@ -1028,7 +1028,7 @@ void CUIActorMenu::PropertiesBoxForWeapon(CUICellItem* cell_item, PIItem item, b
         }
     }
 }
-#include "string_table.h"
+
 void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
 {
     //присоединение аддонов к активному слоту (2 или 3)

@@ -23,11 +23,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Preprocessor
 //#define OPCODE_API
-#ifdef OPCODE_EXPORTS
-#define OPCODE_API XR_EXPORT
+#ifdef OPCODE_STATIC
+#   define OPCODE_API
 #else
-#define OPCODE_API XR_IMPORT
+#   ifdef OPCODE_EXPORTS
+#       define OPCODE_API XR_EXPORT
+#   else
+#       define OPCODE_API XR_IMPORT
+#   endif
 #endif
+
 #ifndef __ICECORE_H__
 
 #include <stdio.h>

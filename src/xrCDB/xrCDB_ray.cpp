@@ -1,19 +1,20 @@
 #include "stdafx.h"
 #pragma hdrstop // ???
 #include "xrCore/_fbox.h"
-#pragma warning(push)
-#pragma warning(disable : 4995)
+
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#else
+#error Add your platform here
 #endif
-#pragma warning(pop)
 
 #include "xrCDB.h"
 #include "SDL.h"
 
-using namespace CDB;
+namespace CDB
+{
 using namespace Opcode;
 
 struct alignas(16) vec_t : public Fvector3
@@ -33,17 +34,13 @@ struct alignas(16) ray_t
     vec_t inv_dir;
     vec_t fwd_dir;
 };
-struct ray_segment_t
-{
-    float t_near, t_far;
-};
 
 ICF u32& uf(float& x) { return (u32&)x; }
-ICF BOOL isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fvector& coord)
+ICF bool isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fvector& coord)
 {
     Fvector MaxT;
     MaxT.x = MaxT.y = MaxT.z = -1.0f;
-    BOOL Inside = TRUE;
+    bool Inside = true;
 
     // Find candidate planes.
     if (ray.pos[0] < min[0])
@@ -156,7 +153,7 @@ static constexpr float flt_plus_inf = std::numeric_limits<float>::infinity();
 alignas(16) static constexpr float ps_cst_plus_inf[4] = { flt_plus_inf, flt_plus_inf, flt_plus_inf, flt_plus_inf },
                                    ps_cst_minus_inf[4] = { -flt_plus_inf, -flt_plus_inf, -flt_plus_inf, -flt_plus_inf };
 
-ICF BOOL isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
+ICF bool isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
 {
     // you may already have those values hanging around somewhere
     const __m128 plus_inf = loadps(ps_cst_plus_inf), minus_inf = loadps(ps_cst_minus_inf);
@@ -193,13 +190,24 @@ ICF BOOL isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
     lmax = minss(lmax, lmax1);
     lmin = maxss(lmin, lmin1);
 
-    const BOOL ret = _mm_comige_ss(lmax, _mm_setzero_ps()) & _mm_comige_ss(lmax, lmin);
+    const bool ret = _mm_comige_ss(lmax, _mm_setzero_ps()) & _mm_comige_ss(lmax, lmin);
 
     storess(lmin, &dist);
     // storess	(lmax, &rs.t_far);
 
     return ret;
 }
+
+#undef loadps
+#undef storess
+#undef minss
+#undef maxss
+#undef minps
+#undef maxps
+#undef mulps
+#undef subps
+#undef rotatelps
+#undef muxhps
 
 template <bool bUseSSE, bool bCull, bool bFirst, bool bNearest>
 class alignas(16) ray_collider
@@ -245,7 +253,7 @@ public:
     }
 
     // fpu
-    ICF BOOL _box_fpu(const Fvector& bCenter, const Fvector& bExtents, Fvector& coord)
+    ICF bool _box_fpu(const Fvector& bCenter, const Fvector& bExtents, Fvector& coord)
     {
         Fbox BB;
         BB.vMin.sub(bCenter, bExtents);
@@ -253,7 +261,7 @@ public:
         return isect_fpu(BB.vMin, BB.vMax, ray, coord);
     }
     // sse
-    ICF BOOL _box_sse(const Fvector& bCenter, const Fvector& bExtents, float& dist)
+    ICF bool _box_sse(const Fvector& bCenter, const Fvector& bExtents, float& dist)
     {
         aabb_t box;
         /*
@@ -420,7 +428,7 @@ public:
     }
 };
 
-void COLLIDER::ray_query(const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
+void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
 {
     m_def->syncronize();
 
@@ -572,3 +580,4 @@ void COLLIDER::ray_query(const MODEL* m_def, const Fvector& r_start, const Fvect
         }
     }
 }
+} // namespace CDB

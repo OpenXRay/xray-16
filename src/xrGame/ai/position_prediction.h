@@ -18,7 +18,7 @@ public:
         float const self2enemy_mag = magnitude(enemy_pos - self_pos);
         float const self2enemy_time = self_velocity > epsilon ? self2enemy_mag / self_velocity : 0;
 
-        float const predictiton_delta_sec = (current_time() - m_last_prediction_time) / 1000.f;
+        float const predictiton_delta_sec = (xr_current_time() - m_last_prediction_time) / 1000.f;
         if (predictiton_delta_sec > 0.4f)
         {
             if (m_last_prediction_time != 0)
@@ -34,7 +34,7 @@ public:
                 }
             }
 
-            m_last_prediction_time = current_time();
+            m_last_prediction_time = xr_current_time();
             m_last_update_enemy_pos = enemy_pos;
         }
 

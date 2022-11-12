@@ -149,11 +149,11 @@ void Startup(pstr lpCmdLine)
         return;
     }
     Logger.Initialize("xrAI");
-    u32 dwStartupTime = timeGetTime();
+    u32 dwStartupTime = CPU::GetTicks();
     execute(cmd);
     // Show statistic
     string256 stats;
-    u32 dwEndTime = timeGetTime();
+    u32 dwEndTime = CPU::GetTicks();
     xr_sprintf(stats, "Time elapsed: %s", make_time((dwEndTime - dwStartupTime) / 1000).c_str());
     Logger.Success(stats);
     FlushLog();

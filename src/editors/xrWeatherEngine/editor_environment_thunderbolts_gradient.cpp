@@ -13,8 +13,8 @@
 #include "editor_environment_manager.hpp"
 #include "editor_environment_detail.hpp"
 
-using editor::environment::thunderbolts::gradient;
-
+namespace editor::environment::thunderbolts
+{
 gradient::gradient() : m_property_holder(0) {}
 gradient::~gradient()
 {
@@ -95,3 +95,4 @@ void gradient::fill(
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
         XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::remove_extension);
 }
+} // namespace editor::environment::thunderbolts

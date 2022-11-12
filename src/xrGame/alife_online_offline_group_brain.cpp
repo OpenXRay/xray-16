@@ -32,10 +32,6 @@
 #endif
 #endif
 
-#define MAX_ITEM_FOOD_COUNT 3
-#define MAX_ITEM_MEDIKIT_COUNT 3
-#define MAX_AMMO_ATTACH_COUNT 1
-
 CALifeOnlineOfflineGroupBrain::CALifeOnlineOfflineGroupBrain(object_type* object)
 {
     VERIFY(object);

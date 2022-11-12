@@ -23,7 +23,7 @@ void black_list::OnPlayerKilled(
     if (!victim_player)
         return;
 
-    m_victims.insert(std::make_pair(shared_str(victim_player->getName()), Device.dwTimeGlobal));
+    m_victims.emplace(shared_str(victim_player->getName()), Device.dwTimeGlobal);
 }
 
 void black_list::OnPlayerSpawned(game_PlayerState const* ps)

@@ -15,7 +15,7 @@ void kills_store::add_kill(shared_str const& killer, shared_str const& victim, u
     if (tmp_iter == m_kills.end())
     {
         kills_t* new_kills = xr_new<kills_t>();
-        tmp_iter = m_kills.insert(std::make_pair(search_key, new_kills)).first;
+        tmp_iter = m_kills.emplace(search_key, new_kills).first;
     }
 
     kill new_kill;

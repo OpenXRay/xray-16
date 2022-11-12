@@ -32,12 +32,4 @@
 
 extern ENGINE_API CInifile* pGameIni;
 
-#pragma comment(lib, "winmm.lib")
-#pragma comment(lib, "dxguid.lib")
-// XXX: move to script engine headers
-#ifndef DEBUG
-#define LUABIND_NO_ERROR_CHECKING
-#endif
-#define LUABIND_DONT_COPY_STRINGS
-
 #endif // _EDITOR

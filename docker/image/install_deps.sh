@@ -31,16 +31,12 @@ apt-get install -y \
   wget \
   autoconf \
   libglew-dev \
-  libfreeimage-dev \
-  libfreeimageplus-dev \
-  liblockfile-dev \
+  libjpeg-dev \
   libopenal-dev \
-  libtbb-dev \
   libcrypto++-dev \
   libogg-dev \
   libtheora-dev \
   libvorbis-dev \
   libsdl2-dev \
   liblzo2-dev \
-  libjpeg-dev \
   libreadline-dev

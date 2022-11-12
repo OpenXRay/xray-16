@@ -575,6 +575,8 @@ void CUIMiniMap::Init_internal(const shared_str& name, const CInifile& pLtx, con
     CUIStatic::SetTextureColor(0x7fffffff);
 }
 
+// XXX: examine the difference with CUILevelMap::UpdateSpots()
+// maybe we need to use inherited::UpdateSpots() here when minimap is not rounded..
 void CUIMiniMap::UpdateSpots()
 {
     DetachAll();

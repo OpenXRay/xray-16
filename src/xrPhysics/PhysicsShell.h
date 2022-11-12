@@ -5,7 +5,6 @@
 #include "ICollideValidator.h"
 #include "xrServerEntities/alife_space.h"
 #include "xrCore/_flags.h"
-#include "xrCore/xr_vector_defs.h"
 
 #include "xrEngine/IPhysicsShell.h"
 #include "iphysics_scripted.h"
@@ -30,8 +29,8 @@ typedef u32 CLClassBits;
 typedef u32 CLBits;
 struct dMass;
 struct SAllDDOParams;
-template <class T> class _cylinder; typedef _cylinder<float> Fcylinder;
-template <class T> struct _sphere; typedef _sphere<float> Fsphere;
+struct Fcylinder;
+struct Fsphere;
 template <class T> struct _obb; typedef _obb<float> Fobb;
 template <class T> struct _quaternion;  typedef _quaternion<float> Fquaternion;
 
@@ -432,20 +431,20 @@ XRPHYSICS_API CPhysicsElement* P_create_Element();
 XRPHYSICS_API CPhysicsShell* P_create_Shell();
 XRPHYSICS_API CPhysicsShell* P_create_splited_Shell();
 XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, LPCSTR fixed_bones);
-XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, U16Vec& fixed_bones);
+XRPHYSICS_API CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, xr_vector<u16>& fixed_bones);
 XRPHYSICS_API CPhysicsShell* P_build_Shell(
     IPhysicsShellHolder* obj, bool not_active_state, BONE_P_MAP* bone_map, LPCSTR fixed_bones);
 
-extern "C" XRPHYSICS_API CPhysicsShell* __stdcall P_build_Shell(
+extern "C" XRPHYSICS_API CPhysicsShell* P_build_Shell(
     IPhysicsShellHolder* obj, bool not_active_state, BONE_P_MAP* bone_map = 0, bool not_set_bone_callbacks = false);
 
 XRPHYSICS_API CPhysicsShell* P_build_SimpleShell(IPhysicsShellHolder* obj, float mass, bool not_active_state);
 XRPHYSICS_API void ApplySpawnIniToPhysicShell(CInifile const* ini, CPhysicsShell* physics_shell, bool fixed);
 void fix_bones(LPCSTR fixed_bones, CPhysicsShell* shell);
 
-extern "C" XRPHYSICS_API void __stdcall destroy_physics_shell(CPhysicsShell*& p);
+extern "C" XRPHYSICS_API void destroy_physics_shell(CPhysicsShell*& p);
 
-extern "C" XRPHYSICS_API bool __stdcall can_create_phys_shell(string1024& reason, IPhysicsShellHolder& O);
+extern "C" XRPHYSICS_API bool can_create_phys_shell(string1024& reason, IPhysicsShellHolder& O);
 
 struct NearestToPointCallback
 {

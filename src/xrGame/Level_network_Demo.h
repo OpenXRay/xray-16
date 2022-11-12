@@ -62,7 +62,7 @@ bool LoadDemoHeader();
 bool LoadPacket(NET_Packet& dest_packet, u32 global_time_delta);
 void SimulateServerUpdate();
 void CatchStartingSpawns();
-void __stdcall MSpawnsCatchCallback(u32 message, u32 subtype, NET_Packet& packet);
+void MSpawnsCatchCallback(u32 message, u32 subtype, NET_Packet& packet);
 
 DemoHeader m_demo_header;
 shared_str m_demo_server_options;

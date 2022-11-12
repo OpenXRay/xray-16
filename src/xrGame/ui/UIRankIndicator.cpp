@@ -3,7 +3,9 @@
 #include "UIXmlInit.h"
 #include "xrUICore/Static/UIStatic.h"
 
-CUIRankIndicator::CUIRankIndicator() : m_current(u8(-1)) { }
+CUIRankIndicator::CUIRankIndicator()
+    : CUIWindow("CUIRankIndicator"), m_current(u8(-1)) {}
+
 CUIRankIndicator::~CUIRankIndicator()
 {
     for (u8 i = 0; i < max_rank; ++i)

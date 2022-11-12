@@ -13,11 +13,6 @@
 #include "ai_space.h"
 #include "xrAICore/Navigation/game_graph.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 CALifeSpawnRegistry::CALifeSpawnRegistry(LPCSTR section)
 {
     m_spawn_name = "";
@@ -233,6 +228,6 @@ void CALifeSpawnRegistry::build_story_spawns()
         if (object->m_spawn_story_id == INVALID_SPAWN_STORY_ID)
             continue;
 
-        m_spawn_story_ids.insert(std::make_pair(object->m_spawn_story_id, (*I).first));
+        m_spawn_story_ids.emplace(object->m_spawn_story_id, (*I).first);
     }
 }

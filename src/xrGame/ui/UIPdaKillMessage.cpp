@@ -6,6 +6,7 @@
 const int INDENT = 3;
 
 CUIPdaKillMessage::CUIPdaKillMessage()
+    : CUIColorAnimConrollerContainer("CUIPdaKillMessage")
 {
     AttachChild(&m_victim_name);
     m_victim_name.SetTextComplexMode(false);

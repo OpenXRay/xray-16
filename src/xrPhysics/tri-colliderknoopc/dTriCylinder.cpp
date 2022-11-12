@@ -861,3 +861,5 @@ depth##ox = sidePr - dFabs(dist##ox);                                           
         dGeomGetUserData(o1)->callback(T->T, contact);
     return ret;
 }
+
+#undef RETURN0

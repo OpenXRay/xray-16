@@ -1,4 +1,4 @@
-project(OPCODE)
+project(xrOPCODE)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -71,7 +71,11 @@ set(SRC_FILES
 
 group_sources(SRC_FILES)
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+if (STATIC_BUILD)
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+else()
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+endif()
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
@@ -86,16 +90,22 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DOPCODE_EXPORTS
+    $<$<BOOL:${STATIC_BUILD}>:OPCODE_STATIC>
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
-    COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp"
+    POSITION_INDEPENDENT_CODE ON
 )
 
-cotire(${PROJECT_NAME})
-
-install(TARGETS ${PROJECT_NAME} LIBRARY
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "pch.hpp"
 )
+
+if (NOT STATIC_BUILD)
+    install(TARGETS ${PROJECT_NAME} LIBRARY
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+    )
+endif()

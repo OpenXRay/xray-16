@@ -7,7 +7,7 @@
 
 void fix_texture_name(pstr fn);
 
-void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite,
+void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite,
     BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {
     RS.Invalidate();
@@ -23,26 +23,33 @@ void CBlender_Compile::r_Pass(std::pair<cpcstr, cpcstr> _vs, LPCSTR _ps, bool bF
     PassSET_LightFog(FALSE, bFog);
 
     // Create shaders
-    SPS* ps = RImplementation.Resources->_CreatePS(_ps);
-    u32 flags = 0;
+#if defined(USE_OGL)
+    dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, "null", "null", "null");
+    if (HW.SeparateShaderObjectsSupported || !dest.pp->pp)
+#endif
+    {
+        dest.ps = RImplementation.Resources->_CreatePS(_ps);
+        ctable.merge(&dest.ps->constants);
+        u32 flags = 0;
 #if defined(USE_DX11)
-    if (ps->constants.dx9compatibility)
-        flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+        if (dest.ps->constants.dx9compatibility)
+            flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 #endif
-    SVS* vs = RImplementation.Resources->_CreateVS(_vs.first, _vs.second, flags);
-    dest.ps = ps;
-    dest.vs = vs;
-#ifndef USE_DX9
-    SGS* gs = RImplementation.Resources->_CreateGS("null");
-    dest.gs = gs;
-#ifdef USE_DX11
-    dest.hs = RImplementation.Resources->_CreateHS("null");
-    dest.ds = RImplementation.Resources->_CreateDS("null");
-    dest.cs = RImplementation.Resources->_CreateCS("null");
-#endif
+        dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
+        ctable.merge(&dest.vs->constants);
+#if defined(USE_DX11) || defined(USE_OGL)
+        dest.gs = RImplementation.Resources->_CreateGS("null");
+#    ifdef USE_DX11
+        dest.hs = RImplementation.Resources->_CreateHS("null");
+        dest.ds = RImplementation.Resources->_CreateDS("null");
+        dest.cs = RImplementation.Resources->_CreateCS("null");
+#    endif
 #endif // !USE_DX9
-    ctable.merge(&ps->constants);
-    ctable.merge(&vs->constants);
+    }
+#if defined(USE_OGL)
+    RImplementation.Resources->_LinkPP(dest);
+    ctable.merge(&dest.pp->constants);
+#endif
 
     // Last Stage - disable
     if (0 == xr_stricmp(_ps, "null"))
@@ -136,9 +143,11 @@ u32 CBlender_Compile::r_Sampler(
     if (u32(-1) != dwStage)
     {
 #if defined(USE_DX11)
-        r_dx10Texture(_name, texture, true);
-#else
+        r_dx11Texture(_name, texture, true);
+#elif defined(USE_DX9) || defined(USE_OGL)
         i_Texture(dwStage, texture);
+#else
+#   error No graphics API selected or enabled!
 #endif
 
         // force ANISO-TF for "s_base"
@@ -161,6 +170,22 @@ u32 CBlender_Compile::r_Sampler(
             fmin = D3DTEXF_ANISOTROPIC;
             fmag = D3DTEXF_ANISOTROPIC;
         }
+
+#if defined(USE_OGL)
+        if (0 == xr_strcmp(_name, "s_position"))
+        {
+            address = D3DTADDRESS_CLAMP;
+            fmin = D3DTEXF_POINT;
+            fmip = D3DTEXF_NONE;
+            fmag = D3DTEXF_POINT;
+        }
+
+        if (0 == xr_strcmp(_name, "s_smap"))
+        {
+            address = D3DTADDRESS_CLAMP;
+            fmip = D3DTEXF_NONE;
+        }
+#endif
 
         // Sampler states
         i_Address(dwStage, address);

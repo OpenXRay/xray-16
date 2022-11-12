@@ -4,7 +4,6 @@
 #include "ui/UIXmlInit.h"
 #include "xrUICore/Static/UIStatic.h"
 #include "Common/object_broker.h"
-#include "string_table.h"
 
 #include "InventoryOwner.h"
 #include "ui/UIActorMenu.h"
@@ -40,14 +39,24 @@ CUIGameCustom::CUIGameCustom()
     m_pMessagesWnd = nullptr;
     ShowGameIndicators(true);
     ShowCrosshair(true);
+
+    InventoryUtilities::CreateShaders();
 }
 
 bool g_b_ClearGameCaptions = false;
 
 CUIGameCustom::~CUIGameCustom()
 {
+    InventoryUtilities::DestroyShaders();
+
     delete_data(CustomStatics);
     g_b_ClearGameCaptions = false;
+}
+
+void CUIGameCustom::OnUIReset()
+{
+    InventoryUtilities::DestroyShaders();
+    InventoryUtilities::CreateShaders();
 }
 
 void CUIGameCustom::OnFrame()
@@ -253,7 +262,7 @@ void CUIGameCustom::Load()
     R_ASSERT(!PdaMenu);
     PdaMenu = xr_new<CUIPdaWnd>();
     R_ASSERT(!Window);
-    Window = xr_new<CUIWindow>();
+    Window = xr_new<CUIWindow>("Window");
     R_ASSERT(!UIMainIngameWnd);
     UIMainIngameWnd = xr_new<CUIMainIngameWnd>();
     UIMainIngameWnd->Init();

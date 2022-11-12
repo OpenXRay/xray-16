@@ -23,7 +23,7 @@ void IGame_Level::LL_CheckTextures()
             "Too many lmap-textures (limit: 8 textures or 32M).\n        Reduce pixel density (worse) or use more "
             "vertex "
             "lighting (better).";
-        Msg("***FATAL***: %s", msg);
+        Log("***FATAL***:", msg);
 #endif // #ifdef DEBUG
         bError = true;
     }

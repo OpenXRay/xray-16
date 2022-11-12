@@ -6,7 +6,6 @@
 #include "ui/UIXmlInit.h"
 
 #include "game_cl_base.h"
-#include "string_table.h"
 #include "Level.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 
@@ -14,7 +13,7 @@ class CUIStatic;
 
 class UITeamState;
 
-class UITeamHeader : public CUIWindow
+class UITeamHeader final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -35,7 +34,7 @@ private:
 
 public:
     UITeamHeader(UITeamState const* const parent);
-    virtual ~UITeamHeader();
+
     void Init(CUIXml& uiXml, LPCSTR path);
     virtual void Update();
 

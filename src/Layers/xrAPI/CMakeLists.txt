@@ -1,14 +1,14 @@
 project(xrAPI)
 
-set(SRC_FILES
-    "xrAPI.cpp"
+set(KERNEL_SRC
     "stdafx.h"
     "stdafx.cpp"
+    "xrAPI.cpp"
 )
 
-group_sources(SRC_FILES)
+source_group("Kernel" FILES ${KERNEL_SRC})
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+add_library(${PROJECT_NAME} SHARED ${KERNEL_SRC})
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
@@ -22,10 +22,12 @@ target_compile_definitions(${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
-    COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h"
 )
 
-cotire(${PROJECT_NAME})
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "stdafx.h"
+)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY
     DESTINATION ${CMAKE_INSTALL_LIBDIR}

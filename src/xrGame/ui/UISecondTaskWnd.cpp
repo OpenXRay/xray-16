@@ -23,13 +23,13 @@
 #include "GameTask.h"
 #include "map_location.h"
 #include "UIInventoryUtilities.h"
-#include "string_table.h"
 #include "Level.h"
 #include "GametaskManager.h"
 #include "Actor.h"
 
 UITaskListWnd::UITaskListWnd()
-    : hint_wnd(nullptr), m_background(nullptr), m_list(nullptr),
+    : CUIWindow("UITaskListWnd"),
+      hint_wnd(nullptr), m_background(nullptr), m_list(nullptr),
       m_caption(nullptr), m_bt_close(nullptr), m_orig_h(0) {}
 
 UITaskListWnd::~UITaskListWnd() {}
@@ -169,7 +169,8 @@ void UITaskListWnd::UpdateCounter()
 // - -----------------------------------------------------------------------------------------------
 
 UITaskListWndItem::UITaskListWndItem()
-    : show_hint_can(false), show_hint(false),
+    : CUIWindow("UITaskListWndItem"),
+      show_hint_can(false), show_hint(false),
       m_task(nullptr), m_name(nullptr),
       m_bt_view(nullptr), m_st_story(nullptr),
       m_bt_focus(nullptr)

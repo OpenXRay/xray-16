@@ -10,6 +10,7 @@ class UIArtefactParamItem;
 class CUIArtefactParams : public CUIWindow
 {
 public:
+    CUIArtefactParams() : CUIWindow("CUIArtefactParams") {}
     ~CUIArtefactParams() override;
     bool InitFromXml(CUIXml& xml);
     bool Check(const shared_str& af_section);

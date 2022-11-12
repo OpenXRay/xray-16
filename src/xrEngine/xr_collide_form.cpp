@@ -10,6 +10,7 @@
 
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
+
 #ifdef DEBUG
 IC float DET(const Fmatrix& a)
 {
@@ -18,20 +19,9 @@ IC float DET(const Fmatrix& a)
 }
 #include "ObjectDump.h"
 #endif
-using namespace collide;
-//----------------------------------------------------------------------
-// Class : CXR_CFObject
-// Purpose : stores collision form
-//----------------------------------------------------------------------
-ICollisionForm::ICollisionForm(IGameObject* _owner, ECollisionFormType tp)
-{
-    owner = _owner;
-    m_type = tp;
-    bv_sphere.identity();
-}
 
-ICollisionForm::~ICollisionForm() {}
-//----------------------------------------------------------------------------------
+using namespace collide;
+
 void CCF_Skeleton::SElement::center(Fvector& center) const
 {
     switch (type)

@@ -23,8 +23,8 @@ extern CScriptPropertiesListHelper* g_property_list_helper;
 extern XRay::Module prop_helper_module;
 
 extern "C" {
-FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section) { return F_entity_Create(section); }
-FACTORY_API void __stdcall destroy_entity(IServerEntity*& abstract)
+FACTORY_API IServerEntity* create_entity(LPCSTR section) { return F_entity_Create(section); }
+FACTORY_API void destroy_entity(IServerEntity*& abstract)
 {
     auto object = smart_cast<CSE_Abstract*>(abstract);
     F_entity_Destroy(object);

@@ -70,10 +70,21 @@ void CUIActorMenu::InitPartnerInfo()
 {
     if (m_pPartnerInvOwner)
     {
-        if (m_pPartnerInvOwner->use_simplified_visual())
+        CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
+        if (monster || m_pPartnerInvOwner->use_simplified_visual())
+        {
             GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
+            if (monster)
+            {
+                shared_str monster_tex_name = pSettings->r_string(monster->cNameSect(), "icon");
+                GetModeSpecificPartnerInfo(m_currMenuMode)->UIIcon().InitTexture(monster_tex_name.c_str());
+                GetModeSpecificPartnerInfo(m_currMenuMode)->UIIcon().SetStretchTexture(true);
+            }
+        }
         else
+        {
             GetModeSpecificPartnerInfo(m_currMenuMode)->InitCharacter(m_pPartnerInvOwner->object_id());
+        }
 
         SetInvBox(nullptr);
     }
@@ -244,7 +255,7 @@ void CUIActorMenu::Update()
     case mmDeadBodySearch:
     {
         // Alundaio: remove distance check when opening inventory boxes
-        //CheckDistance(); 
+        //CheckDistance();
         break;
     }
     default: R_ASSERT(0); break;
@@ -930,13 +941,13 @@ bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_
         return true;
     }
 
-    if (item_slot == INV_SLOT_3 && l == m_pLists[eInventoryPistolList])
+    if (item_slot == INV_SLOT_3 && l == m_pLists[eInventoryPistolList] && CallOfPripyatMode)
     {
         ret_slot = INV_SLOT_2;
         return true;
     }
 
-    if (item_slot == INV_SLOT_2 && l == m_pLists[eInventoryAutomaticList])
+    if (item_slot == INV_SLOT_2 && l == m_pLists[eInventoryAutomaticList] && CallOfPripyatMode)
     {
         ret_slot = INV_SLOT_3;
         return true;
