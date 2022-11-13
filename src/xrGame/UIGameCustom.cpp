@@ -116,14 +116,14 @@ StaticDrawableWrapper* CUIGameCustom::AddCustomStatic(const char* id, bool singl
 {
     if (singleInstance)
     {
-        auto it = std::find_if(CustomStatics.begin(), CustomStatics.end(), predicate_find_stat(id));
+        const auto it = std::find_if(CustomStatics.begin(), CustomStatics.end(), predicate_find_stat(id));
         if (it != CustomStatics.end())
             return *it;
     }
 
     CustomStatics.push_back(xr_new<StaticDrawableWrapper>());
     StaticDrawableWrapper* sss = CustomStatics.back();
-    sss->m_static = xr_new<CUIStatic>();
+    sss->m_static = xr_new<CUIStatic>(id);
     sss->m_name = id;
     CUIXmlInit::InitStatic(*MsgConfig, id, 0, sss->m_static);
     float ttl = MsgConfig->ReadAttribFlt(id, 0, "ttl", ttlDefault);

@@ -18,15 +18,6 @@
 #include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
-CUIZoneMap::CUIZoneMap()
-    : visible(true), m_clipFrame("UI Zone map clip frame"), m_current_map_idx(u8(-1))
-{
-    m_clock_wnd = nullptr;
-    m_pointerDistanceText = nullptr;
-}
-
-CUIZoneMap::~CUIZoneMap() {}
-
 void CUIZoneMap::Init()
 {
     CUIXml uiXml;

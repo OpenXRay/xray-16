@@ -5,7 +5,7 @@
 #include "date_time.h"
 #include "xrUICore/XML/UITextureMaster.h"
 
-CUISleepStatic::CUISleepStatic() : m_cur_time(0){};
+CUISleepStatic::CUISleepStatic() : CUIStatic("CUISleepStatic") {}
 
 void CUISleepStatic::Draw()
 {

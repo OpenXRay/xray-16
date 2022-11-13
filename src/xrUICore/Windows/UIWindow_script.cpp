@@ -38,7 +38,7 @@ Frect	get_texture_rect(LPCSTR icon_name)
 SCRIPT_EXPORT(CUIWindow, (),
 {
     // We don't change game assets.
-    // This class allowed original game scripts to not specify the window name.
+    // This class allowes original game scripts to not specify the window name.
     class CUIWindowScript : public CUIWindow
     {
     public:
@@ -177,10 +177,18 @@ SCRIPT_EXPORT(CUIFrameWindow, (CUIWindow),
 
 SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow),
 {
+    // We don't change game assets.
+    // This class allowes original game scripts to not specify the window name.
+    class CUIFrameLineWndScript : public CUIFrameLineWnd
+    {
+    public:
+        CUIFrameLineWndScript() : CUIFrameLineWnd("CUIFrameLineWndScript") {}
+    };
+
     module(luaState)
     [
-        class_<CUIFrameLineWnd, CUIWindow>("CUIFrameLineWnd")
-            .def(constructor<>())
+        class_<CUIFrameLineWnd, CUIWindow>("CUIFrameLineWndBase")
+            .def(constructor<pcstr>())
             .def("SetWidth", &CUIFrameLineWnd::SetWidth)
             .def("SetHeight", &CUIFrameLineWnd::SetHeight)
             .def("SetColor", &CUIFrameLineWnd::SetTextureColor)
@@ -189,7 +197,9 @@ SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow),
                 const Fvector2 pos { x, y };
                 const Fvector2 size { width, height };
                 self->InitFrameLineWnd(texture, pos, size, horizontal);
-            })
+            }),
+        class_<CUIFrameLineWndScript, CUIFrameLineWnd>("CUIFrameLineWnd")
+            .def(constructor<>()) 
     ];
 });
 

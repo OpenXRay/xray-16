@@ -38,7 +38,8 @@ constexpr cpcstr immunity_st_names[] =
     nullptr
 };
 
-CUIOutfitImmunity::CUIOutfitImmunity() : CUIWindow("CUIOutfitImmunity")
+CUIOutfitImmunity::CUIOutfitImmunity()
+    : CUIWindow("CUIOutfitImmunity"), m_name("Name")
 {
     AttachChild(&m_name);
     AttachChild(&m_progress);
@@ -46,7 +47,6 @@ CUIOutfitImmunity::CUIOutfitImmunity() : CUIWindow("CUIOutfitImmunity")
     m_magnitude = 1.0f;
 }
 
-CUIOutfitImmunity::~CUIOutfitImmunity() {}
 bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type)
 {
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
@@ -90,14 +90,6 @@ void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
 }
 
 // ===========================================================================================
-
-CUIOutfitInfo::CUIOutfitInfo() : CUIWindow("CUIOutfitInfo")
-{
-    m_Prop_line = nullptr;
-    for (auto& item : m_items)
-        item = nullptr;
-}
-
 void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 {
     LPCSTR base_str = "outfit_info";

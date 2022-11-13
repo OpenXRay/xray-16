@@ -11,7 +11,7 @@ class CUIRankIndicator final : public CUIWindow
     {
         max_rank = 10,
     };
-    CUIStatic* m_ranks[max_rank];
+    CUIStatic* m_ranks[max_rank]{};
     u8 m_current;
 
 public:

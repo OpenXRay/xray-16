@@ -6,6 +6,7 @@
 #include "xrEngine/XR_IOConsole.h"
 
 CUIEditKeyBind::CUIEditKeyBind(bool primary, bool isGamepadBinds /*= false*/)
+    : CUIStatic("CUIEditKeyBind")
 {
     m_primary = primary;
     m_isGamepadBinds = isGamepadBinds;
@@ -15,8 +16,6 @@ CUIEditKeyBind::CUIEditKeyBind(bool primary, bool isGamepadBinds /*= false*/)
     m_opt_backup_value = NULL;
     m_action = NULL;
 }
-
-CUIEditKeyBind::~CUIEditKeyBind() {}
 
 u32 CutStringByLength(CGameFont* font, LPCSTR src, pstr dst, u32 dst_size, float length)
 {

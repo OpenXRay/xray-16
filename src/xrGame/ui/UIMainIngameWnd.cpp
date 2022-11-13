@@ -504,7 +504,7 @@ void CUIMainIngameWnd::InitFlashingIcons(CUIXml* node)
     // Пробегаемся по всем нодам и инициализируем из них статики
     for (int i = 0; i < staticsCount; ++i)
     {
-        pIcon = xr_new<CUIStatic>();
+        pIcon = xr_new<CUIStatic>(flashingIconNodeName);
         CUIXmlInit::InitStatic(*node, flashingIconNodeName, i, pIcon);
         shared_str iconType = node->ReadAttrib(flashingIconNodeName, i, "type", "none");
 

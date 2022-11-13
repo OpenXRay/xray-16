@@ -7,7 +7,7 @@ class CUIStatic;
 class CUITextWnd;
 class UIArtefactParamItem;
 
-class CUIArtefactParams : public CUIWindow
+class CUIArtefactParams final : public CUIWindow
 {
 public:
     CUIArtefactParams() : CUIWindow("CUIArtefactParams") {}
@@ -35,11 +35,10 @@ protected:
 
 // -----------------------------------
 
-class UIArtefactParamItem : public CUIStatic
+class UIArtefactParamItem final : public CUIStatic
 {
 public:
     UIArtefactParamItem();
-    ~UIArtefactParamItem() override = default;
 
     enum class InitResult
     {

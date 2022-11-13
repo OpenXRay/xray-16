@@ -17,7 +17,7 @@ protected:
     float InitIcon(CUIStatic& refStatic, float x, IconInfo& info);
 
     CUITextWnd m_victim_name;
-    CUIStatic m_initiator;
+    CUIStatic m_initiator{ "Initiator" };
     CUITextWnd m_killer_name;
-    CUIStatic m_ext_info;
+    CUIStatic m_ext_info{ "Ext. info" };
 };

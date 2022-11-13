@@ -303,12 +303,12 @@ void CUIActorStaticticHeader::Init(CUIXml* xml, LPCSTR path, int idx_in_xml)
 
     xml->SetLocalRoot(xml->NavigateToNode(path, idx_in_xml));
 
-    m_text1 = xr_new<CUIStatic>();
+    m_text1 = xr_new<CUIStatic>("Text 1");
     m_text1->SetAutoDelete(true);
     AttachChild(m_text1);
     CUIXmlInit::InitStatic(*xml, "text_1", 0, m_text1);
 
-    m_text2 = xr_new<CUIStatic>();
+    m_text2 = xr_new<CUIStatic>("Text 2");
     m_text2->SetAutoDelete(true);
     AttachChild(m_text2);
     CUIXmlInit::InitStatic(*xml, "text_2", 0, m_text2);
@@ -355,22 +355,22 @@ void CUIActorStaticticDetail::Init(CUIXml* xml, LPCSTR path, int idx)
 
     xml->SetLocalRoot(xml->NavigateToNode(path, idx));
 
-    m_text0 = xr_new<CUIStatic>();
+    m_text0 = xr_new<CUIStatic>("Text 0");
     m_text0->SetAutoDelete(true);
     AttachChild(m_text0);
     CUIXmlInit::InitStatic(*xml, "text_0", 0, m_text0);
 
-    m_text1 = xr_new<CUIStatic>();
+    m_text1 = xr_new<CUIStatic>("Text 1");
     m_text1->SetAutoDelete(true);
     AttachChild(m_text1);
     CUIXmlInit::InitStatic(*xml, "text_1", 0, m_text1);
 
-    m_text2 = xr_new<CUIStatic>();
+    m_text2 = xr_new<CUIStatic>("Text 2");
     m_text2->SetAutoDelete(true);
     AttachChild(m_text2);
     CUIXmlInit::InitStatic(*xml, "text_2", 0, m_text2);
 
-    m_text3 = xr_new<CUIStatic>();
+    m_text3 = xr_new<CUIStatic>("Text 3");
     m_text3->SetAutoDelete(true);
     AttachChild(m_text3);
     CUIXmlInit::InitStatic(*xml, "text_3", 0, m_text3);

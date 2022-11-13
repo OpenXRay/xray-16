@@ -16,7 +16,7 @@ CUIDemoPlayControl::CUIDemoPlayControl()
 {
     m_progress_bar = xr_new<CUIProgressBar>();
     AttachChild(m_progress_bar);
-    m_background = xr_new<CUIStatic>();
+    m_background = xr_new<CUIStatic>("Background");
     AttachChild(m_background);
     m_restart_btn = xr_new<CUI3tButton>();
     AttachChild(m_restart_btn);

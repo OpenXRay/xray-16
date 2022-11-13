@@ -16,7 +16,9 @@
 LPCSTR GameTypeToStringEx(u32 gt, bool bShort);
 
 CServerList::CServerList()
-    : CUIWindow("CServerList")
+    : CUIWindow("CServerList"),
+      m_header2{ "Server properties", "Players list", "Frags", "Deaths" },
+      m_header_frames{ "Icon frame", "Server name frame", "Map frame", "Game type frame", "Players frame", "Ping frame", "Version frame" }
 {
 #ifdef XR_PLATFORM_WINDOWS
     CGameSpy_BrowsersWrapper::UpdateCallback updateCb;

@@ -2,7 +2,7 @@
 #include "ui_arrow.h"
 #include "XML/UIXmlInitBase.h"
 
-UI_Arrow::UI_Arrow()
+UI_Arrow::UI_Arrow() : CUIStatic("UI_Arrow")
 {
     m_angle_begin = 0.0f;
     m_angle_end = PI_MUL_2;
@@ -12,7 +12,6 @@ UI_Arrow::UI_Arrow()
     m_pos = 0.0f;
 }
 
-UI_Arrow::~UI_Arrow() {}
 void UI_Arrow::init_from_xml(CUIXml& xml, LPCSTR path, CUIWindow* parent)
 {
     parent->AttachChild(this);

@@ -32,7 +32,7 @@ private:
     lanim_cont_xf m_lanim_xform;
     void EnableHeading_int(bool b) { m_bHeading = b; }
 public:
-    CUIStatic();
+    CUIStatic(pcstr window_name);
     ~CUIStatic() override;
 
     virtual void Draw();

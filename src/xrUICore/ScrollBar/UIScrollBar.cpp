@@ -29,7 +29,7 @@ CUIScrollBar::CUIScrollBar() : CUIWindow("CUIScrollBar")
     m_ScrollBox->SetAutoDelete(true);
     AttachChild(m_ScrollBox);
 
-    m_FrameBackground = xr_new<CUIFrameLineWnd>();
+    m_FrameBackground = xr_new<CUIFrameLineWnd>("Frame background");
     m_FrameBackground->SetAutoDelete(true);
     AttachChild(m_FrameBackground);
 }
@@ -76,7 +76,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         strconcat(sizeof(_path), _path, profile, ":box");
         if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_ScrollBox, false))
         {
-            tempScroll = xr_new<CUIStatic>();
+            tempScroll = xr_new<CUIStatic>("temporary scroll");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempScroll, false))
                 tempScroll->Show(true);
         }
@@ -87,7 +87,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         
         if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
         {
-            tempBackground = xr_new<CUIStatic>();
+            tempBackground = xr_new<CUIStatic>("temporary background");
             tempBackground->SetWndRect(GetWndRect());
             strconcat(sizeof(_path), _path, profile, ":back");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempBackground, false))
@@ -113,7 +113,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         strconcat(sizeof(_path), _path, profile, ":box_v");
         if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_ScrollBox, false))
         {
-            tempScroll = xr_new<CUIStatic>();
+            tempScroll = xr_new<CUIStatic>("temporary scroll");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempScroll, false))
                 tempScroll->Show(true);
         }
@@ -124,7 +124,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
 
         if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
         {
-            tempBackground = xr_new<CUIStatic>();
+            tempBackground = xr_new<CUIStatic>("temporary background");
             tempBackground->SetWndRect(GetWndRect());
             strconcat(sizeof(_path), _path, profile, ":back_v");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempBackground, false))

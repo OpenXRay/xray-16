@@ -2,7 +2,8 @@
 #include "UIFrameLineWnd.h"
 #include "XML/UITextureMaster.h"
 
-CUIFrameLineWnd::CUIFrameLineWnd() : CUIWindow("CUIFrameLineWnd"), bHorizontal(true), m_bTextureVisible(false)
+CUIFrameLineWnd::CUIFrameLineWnd(pcstr window_name)
+    : CUIWindow(window_name), bHorizontal(true), m_bTextureVisible(false)
 {
     m_texture_color = color_argb(255, 255, 255, 255);
 }

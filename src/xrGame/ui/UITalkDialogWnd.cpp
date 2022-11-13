@@ -83,7 +83,7 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
         if (m_uiXml->NavigateToNode("frame_line_window", 1))
         {
             // XXX: Don't replace this with UI helper, until it's missing needed functionality to select the index
-            UIOurPhrasesFrame = xr_new<CUIFrameLineWnd>();
+            UIOurPhrasesFrame = xr_new<CUIFrameLineWnd>("Our phrases frame");
             UIOurPhrasesFrame->SetAutoDelete(true);
             AttachChild(UIOurPhrasesFrame);
             CUIXmlInitBase::InitFrameLine(*m_uiXml, "frame_line_window", 1, UIOurPhrasesFrame); // index for field is 1 (one) !!!
@@ -405,7 +405,7 @@ void CUIAnswerItem::Init(LPCSTR text, LPCSTR name)
 
 CUIAnswerItemIconed::CUIAnswerItemIconed(CUIXml* xml_doc, LPCSTR path) : CUIAnswerItem(xml_doc, path)
 {
-    m_icon = xr_new<CUIStatic>();
+    m_icon = xr_new<CUIStatic>("Icon");
     m_icon->SetAutoDelete(true);
     CUIWindow::AttachChild(m_icon);
 

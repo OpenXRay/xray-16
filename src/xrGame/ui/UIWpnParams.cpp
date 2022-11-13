@@ -246,7 +246,8 @@ bool CUIWpnParams::Check(const shared_str& wpn_section)
 
 // -------------------------------------------------------------------------------------------------
 
-CUIConditionParams::CUIConditionParams() : CUIWindow("CUIConditionParams")
+CUIConditionParams::CUIConditionParams()
+    : CUIWindow("CUIConditionParams"), m_text("Text")
 {
     AttachChild(&m_progress);
     AttachChild(&m_text);

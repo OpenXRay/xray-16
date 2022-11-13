@@ -23,11 +23,11 @@ class CUIDetectorWave final : public CUIFrameLineWnd
     typedef CUIFrameLineWnd inherited;
 
 protected:
-    float m_curr_v;
-    float m_step;
+    float m_curr_v{};
+    float m_step{};
 
 public:
-    CUIDetectorWave() : m_curr_v(0.0f), m_step(0.0f){};
+    CUIDetectorWave() : CUIFrameLineWnd("CUIDetectorWave") {}
     void InitFromXML(CUIXml& xml, LPCSTR path);
     void SetVelocity(float v);
     virtual void Update();
@@ -44,8 +44,8 @@ class CUIArtefactDetectorSimple final : public CUIArtefactDetectorBase
 
     ref_light m_flash_light;
     ref_light m_on_off_light;
-    CLAItem* m_pOnOfLAnim;
-    CLAItem* m_pFlashLAnim;
+    CLAItem* m_pOnOfLAnim{};
+    CLAItem* m_pFlashLAnim{};
     void setup_internals();
 
 public:
@@ -60,7 +60,7 @@ class CUIArtefactDetectorElite final : public CUIArtefactDetectorBase, public CU
 {
     typedef CUIArtefactDetectorBase inherited;
 
-    CUIWindow* m_wrk_area;
+    CUIWindow* m_wrk_area{};
 
     xr_map<shared_str, CUIStatic*> m_palette;
 
@@ -71,7 +71,7 @@ class CUIArtefactDetectorElite final : public CUIArtefactDetectorBase, public CU
         Fvector pos;
     };
     xr_vector<SDrawOneItem> m_items_to_draw;
-    CEliteDetector* m_parent;
+    CEliteDetector* m_parent{};
     Fmatrix m_map_attach_offset;
 
     void GetUILocatorMatrix(Fmatrix& _m);
@@ -91,7 +91,7 @@ class CUIArtefactDetectorAdv final : public CUIArtefactDetectorBase
 {
     typedef CUIArtefactDetectorBase inherited;
 
-    CAdvancedDetector* m_parent;
+    CAdvancedDetector* m_parent{};
     Fvector m_target_dir;
     float m_cur_y_rot;
     float m_curr_ang_speed;

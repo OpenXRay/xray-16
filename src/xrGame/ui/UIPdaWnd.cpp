@@ -125,7 +125,7 @@ void CUIPdaWnd::Init()
     CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl);
     UITabControl->SetMessageTarget(this);
 
-    UINoice = xr_new<CUIStatic>();
+    UINoice = xr_new<CUIStatic>("Noise");
     UINoice->SetAutoDelete(true);
     if (!CUIXmlInit::InitStatic(uiXml, "noice_static", 0, UINoice, false))
         xr_delete(UINoice);

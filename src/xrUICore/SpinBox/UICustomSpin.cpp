@@ -18,7 +18,7 @@
 
 CUICustomSpin::CUICustomSpin() : CUIWindow("CUICustomSpin")
 {
-    m_pFrameLine = xr_new<CUIFrameLineWnd>();
+    m_pFrameLine = xr_new<CUIFrameLineWnd>("Frameline");
     m_pBtnUp = xr_new<CUI3tButton>();
     m_pBtnDown = xr_new<CUI3tButton>();
     m_pLines = xr_new<CUILines>();

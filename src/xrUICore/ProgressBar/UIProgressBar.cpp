@@ -1,7 +1,8 @@
 #include "pch.hpp"
 #include "UIProgressBar.h"
 
-CUIProgressBar::CUIProgressBar() : CUIWindow("CUIProgressBar")
+CUIProgressBar::CUIProgressBar()
+    : CUIWindow("CUIProgressBar"), m_UIProgressItem("Progress"), m_UIBackgroundItem("Background")
 {
     m_MinPos = 1.0f;
     m_MaxPos = 1.0f + EPS;

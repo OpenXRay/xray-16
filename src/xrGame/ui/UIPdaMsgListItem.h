@@ -11,7 +11,7 @@ public:
     void InitPdaMsgListItem(const Fvector2& size);
     void SetFont(CGameFont* pFont) override;
 
-    CUIStatic UIIcon;
+    CUIStatic UIIcon{ "Icon" };
     CUITextWnd UITimeText;
     CUITextWnd UICaptionText;
     CUITextWnd UIMsgText;

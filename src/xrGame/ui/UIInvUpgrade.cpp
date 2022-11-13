@@ -27,19 +27,19 @@ UIUpgrade::UIUpgrade(CUIInventoryUpgradeWnd* parent_wnd, bool cellBorder)
     VERIFY(parent_wnd);
     m_parent_wnd = parent_wnd;
 
-    m_item = xr_new<CUIStatic>();
+    m_item = xr_new<CUIStatic>("Item");
     m_item->SetAutoDelete(true);
     AttachChild(m_item);
-    m_color = xr_new<CUIStatic>();
+    m_color = xr_new<CUIStatic>("Color");
     m_color->SetAutoDelete(true);
     AttachChild(m_color);
 
     if (cellBorder)
     {
-        m_border = xr_new<CUIStatic>();
+        m_border = xr_new<CUIStatic>("Border");
         m_border->SetAutoDelete(true);
         AttachChild(m_border);
-        m_ink = xr_new<CUIStatic>();
+        m_ink = xr_new<CUIStatic>("Ink");
         m_ink->SetAutoDelete(true);
         AttachChild(m_ink);
     }
@@ -411,13 +411,11 @@ void UIUpgrade::attach_point(CUIUpgradePoint* point)
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////CUIUpgradePoint//////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-CUIUpgradePoint::CUIUpgradePoint(UIUpgrade* upgr)
+CUIUpgradePoint::CUIUpgradePoint(UIUpgrade* upgr) : CUIStatic("CUIUpgradePoint")
 {
     VERIFY(upgr);
-    m_parent_upgrade = upgr;
 }
 
-CUIUpgradePoint::~CUIUpgradePoint() {}
 void CUIUpgradePoint::load_from_xml(CUIXml& ui_xml, int i_cell)
 {
     float point_x = ui_xml.ReadAttribFlt("cell", i_cell, "point_x", 0.0f);

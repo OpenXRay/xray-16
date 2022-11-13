@@ -12,11 +12,11 @@
 
 CUIMpChangeMapAdm::CUIMpChangeMapAdm() : CUIWindow("CUIMpChangeMapAdm")
 {
-    map_pic = xr_new<CUIStatic>();
+    map_pic = xr_new<CUIStatic>("Map picture");
     map_pic->SetAutoDelete(true);
     AttachChild(map_pic);
 
-    map_frame = xr_new<CUIStatic>();
+    map_frame = xr_new<CUIStatic>("Map frame");
     map_frame->SetAutoDelete(true);
     AttachChild(map_frame);
 

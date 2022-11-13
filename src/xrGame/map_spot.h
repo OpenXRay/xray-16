@@ -25,7 +25,6 @@ public:
 
 public:
     CMapSpot(CMapLocation*);
-    virtual ~CMapSpot();
     virtual void Load(CUIXml* xml, LPCSTR path);
     CMapLocation* MapLocation() { return m_map_location; }
     int get_location_level() { return m_location_level; }
@@ -64,7 +63,7 @@ public:
 };
 
 // -------------------------------------------------------------------------------------------------
-class CUIStaticOrig : public CUIStatic
+class CUIStaticOrig final : public CUIStatic
 {
 protected:
     typedef CUIStatic inherited;
@@ -72,6 +71,7 @@ protected:
     Fvector2 m_origin_size;
 
 public:
+    CUIStaticOrig() : CUIStatic("CUIStaticOrig") {}
     IC void SetWndPosOrigin(const Fvector2& pos) { m_origin_pos = pos; }
     IC void SetWndSizeOrigin(const Fvector2& size) { m_origin_size = size; }
     IC const Fvector2& GetWndPosOrigin() const { return m_origin_pos; }
@@ -81,7 +81,7 @@ public:
 
 }; // class CUIStaticOrig
 
-class CComplexMapSpot : public CMapSpot
+class CComplexMapSpot final : public CMapSpot
 {
     typedef CMapSpot inherited;
 

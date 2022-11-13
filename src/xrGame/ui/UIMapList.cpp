@@ -35,8 +35,8 @@ CUIMapList::CUIMapList() : CUIWindow("CUIMapList")
     m_pList2 = xr_new<CUIListBox>();
     m_pFrame1 = xr_new<CUIFrameWindow>();
     m_pFrame2 = xr_new<CUIFrameWindow>();
-    m_pLbl1 = xr_new<CUIFrameLineWnd>();
-    m_pLbl2 = xr_new<CUIFrameLineWnd>();
+    m_pLbl1 = xr_new<CUIFrameLineWnd>("Label 1");
+    m_pLbl2 = xr_new<CUIFrameLineWnd>("Label 2");
     m_pBtnLeft = xr_new<CUI3tButton>();
     m_pBtnRight = xr_new<CUI3tButton>();
     m_pBtnUp = xr_new<CUI3tButton>();

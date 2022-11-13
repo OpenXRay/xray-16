@@ -110,7 +110,7 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
         if (!UIBoosterInfo->InitFromXml(uiXml))
             xr_delete(UIBoosterInfo);
 
-        // UIDesc_line						= new CUIStatic();
+        // UIDesc_line						= xr_new<CUIStatic>("Description line");
         // AttachChild						(UIDesc_line);
         // UIDesc_line->SetAutoDelete		(true);
         // xml_init.InitStatic				(uiXml, "description_line", 0, UIDesc_line);
@@ -133,7 +133,7 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
 
     if (uiXml.NavigateToNode("image_static", 0))
     {
-        UIItemImage = xr_new<CUIStatic>();
+        UIItemImage = xr_new<CUIStatic>("Item Image");
         AttachChild(UIItemImage);
         UIItemImage->SetAutoDelete(true);
         CUIXmlInit::InitStatic(uiXml, "image_static", 0, UIItemImage);

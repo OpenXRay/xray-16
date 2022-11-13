@@ -24,8 +24,8 @@ void lanim_cont_xf::set_defaults()
     m_origSize.set(0, 0);
 }
 
-CUIStatic::CUIStatic()
-    : CUIWindow("CUIStatic"), m_pTextControl(nullptr),
+CUIStatic::CUIStatic(pcstr window_name)
+    : CUIWindow(window_name), m_pTextControl(nullptr),
       m_bStretchTexture(false), m_bTextureEnable(true),
       m_bHeading(false), m_bConstHeading(false),
       m_fHeading(0.0f)
