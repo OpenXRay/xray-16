@@ -383,12 +383,6 @@ void CUISequencer::IR_OnMouseMove(int x, int y)
         m_pStoredInputReceiver->IR_OnMouseMove(x, y);
 }
 
-void CUISequencer::IR_OnMouseStop(int x, int y)
-{
-    if (!GrabInput() && m_pStoredInputReceiver)
-        m_pStoredInputReceiver->IR_OnMouseStop(x, y);
-}
-
 void CUISequencer::IR_OnKeyboardRelease(int dik)
 {
     if (!GrabInput() && m_pStoredInputReceiver)

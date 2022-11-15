@@ -101,8 +101,6 @@ public:
 private:
     BENCH_SEC_SCRAMBLEMEMBER1
 
-    u32 mouseTimeStamp[COUNT_MOUSE_AXIS];
-
     std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
     std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
@@ -130,7 +128,6 @@ private:
     MessageRegistry<pureKeyMapChanged> seqKeyMapChanged;
 
 public:
-    u32 m_curTime;
     u32 m_mouseDelta;
 
     const InputStatistics& GetStats() const { return stats; }

@@ -33,7 +33,6 @@ public:
     virtual void IR_OnMouseHold(int /*btn*/) {}
     virtual void IR_OnMouseWheel(int /*x*/, int /*y*/) {}
     virtual void IR_OnMouseMove(int /*x*/, int /*y*/) {}
-    virtual void IR_OnMouseStop(int /*x*/, int /*y*/) {}
 
     virtual void IR_OnKeyboardPress(int /*dik*/) {}
     virtual void IR_OnKeyboardRelease(int /*dik*/) {}
