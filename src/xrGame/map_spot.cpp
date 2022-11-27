@@ -37,8 +37,10 @@ void CMapSpot::Load(CUIXml* xml, LPCSTR path)
     m_scale_bounds.x = xml->ReadAttribFlt(path, 0, "scale_min", -1.0f);
     if (m_bScale)
     {
+        const bool allowZeroSize = pSettingsOpenXRay->read_if_exists<bool>("ui", "allow_zero_size_map_spot", psGameMode.is(ShadowOfChernobylMode));
+
         m_scale_bounds.y = xml->ReadAttribFlt(path, 0, "scale_max", -1.0f);
-        R_ASSERT2((m_scale_bounds.x > 0 && m_scale_bounds.y > 0) || ShadowOfChernobylMode, path);
+        R_ASSERT2((m_scale_bounds.x > 0 && m_scale_bounds.y > 0) || allowZeroSize, path);
     }
     m_location_level = xml->ReadAttribInt(path, 0, "location_level", 0);
 

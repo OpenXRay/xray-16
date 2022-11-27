@@ -196,7 +196,7 @@ void CUIMotionIcon::SetLuminosity(float newPos)
 
 void CUIMotionIcon::Draw()
 {
-    if (!ClearSkyMode)
+    if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "draw_motion_icon", !psGameMode.is(ClearSkyMode)))
         inherited::Draw();
 }
 

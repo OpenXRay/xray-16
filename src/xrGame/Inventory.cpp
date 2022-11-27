@@ -78,6 +78,8 @@ CInventory::CInventory()
     m_iNextActiveSlot = NO_ACTIVE_SLOT;
     m_iPrevActiveSlot = NO_ACTIVE_SLOT;
 
+    const bool useDefaultSlotActiveness = pSettingsOpenXRay->read_if_exists<bool>("compatibility", "use_predefined_active_slots_list", psGameMode.is(ShadowOfChernobylMode));
+
     string256 temp;
     for (u16 i = FirstSlot(); i <= LastSlot(); ++i)
     {
@@ -85,7 +87,7 @@ CInventory::CInventory()
         m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
 
         xr_sprintf(temp, "slot_active_%d", i);
-        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
+        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, useDefaultSlotActiveness ? defaultSlotActiveness[i] : false);
     };
 
     m_bSlotsUseful = true;

@@ -395,12 +395,12 @@ void CUILevelMap::Draw()
                 {
                     Fvector2 sz = sp->m_originSize;
                     // XXX: try to remove if-else branches and use common code path
-                    if (ShadowOfChernobylMode)
+                    if (psGameMode.is(ShadowOfChernobylMode))
                     {
                         sz.mul(gmz);
                         sp->SetWndSize(sz);
                     }
-                    else if (ClearSkyMode)
+                    else if (psGameMode.is(ClearSkyMode))
                     {
                         if (gmz > sp->m_scale_bounds.x && gmz < sp->m_scale_bounds.y)
                         {

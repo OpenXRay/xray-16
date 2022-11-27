@@ -51,12 +51,12 @@ void CRenderDevice::Initialize()
         int icon = IDI_COP;
         pcstr title = "S.T.A.L.K.E.R.: Call of Pripyat";
 
-        if (ShadowOfChernobylMode)
+        if (psGameMode.is(ShadowOfChernobylMode))
         {
             icon = IDI_SOC;
             title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
         }
-        else if (ClearSkyMode)
+        else if (psGameMode.is(ClearSkyMode))
         {
             icon = IDI_CS;
             title = "S.T.A.L.K.E.R.: Clear Sky";

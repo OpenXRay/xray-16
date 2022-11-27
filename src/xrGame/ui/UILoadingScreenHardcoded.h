@@ -158,13 +158,15 @@ R"(<w>
 inline pcstr GetLoadingScreenXML()
 {
     const bool is_wide = UICore::is_widescreen();
-    if (ShadowOfChernobylMode)
+    cpcstr loadingScreenType = pSettingsOpenXRay->read_if_exists<pcstr>("ui", "loading_screen", "cop");
+
+    if (xr_strcmp(loadingScreenType, "soc") == 0 || xr_strcmp(loadingScreenType, "shoc") == 0)
     {
         if (is_wide)
             return LoadingScreenXML16x9ShadowOfChernobyl;
         return LoadingScreenXMLClearSky;
     }
-    if (ClearSkyMode)
+    if (xr_strcmp(loadingScreenType, "cs") == 0)
     {
         if (is_wide)
             return LoadingScreenXML16x9ClearSky;
@@ -178,11 +180,13 @@ inline pcstr GetLoadingScreenXML()
 
 inline pcstr GetLoadingScreenTexturesDescr()
 {
-    if (ShadowOfChernobylMode)
+    cpcstr loadingScreenType = pSettingsOpenXRay->read_if_exists<pcstr>("ui", "loading_screen", "cop");
+
+    if (xr_strcmp(loadingScreenType, "soc") == 0 || xr_strcmp(loadingScreenType, "shoc") == 0)
     {
         return LoadingScreenXMLClearSkyTexturesDescription;
     }
-    if (ClearSkyMode)
+    if (xr_strcmp(loadingScreenType, "cs") == 0)
     {
         return LoadingScreenXMLClearSkyTexturesDescription;
     }

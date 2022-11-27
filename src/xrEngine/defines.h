@@ -6,9 +6,12 @@ ENGINE_API extern bool bDebug;
 #define bDebug 0
 #endif
 
-extern ENGINE_API bool CallOfPripyatMode;
-extern ENGINE_API bool ClearSkyMode;
-extern ENGINE_API bool ShadowOfChernobylMode;
+enum
+{
+    CallOfPripyatMode       = (1ul << 0ul),
+    ClearSkyMode            = (1ul << 1ul),
+    ShadowOfChernobylMode   = (1ul << 2ul),
+};
 
 // textures
 ENGINE_API extern int psTextureLOD;
@@ -63,5 +66,6 @@ struct DeviceMode
 
 ENGINE_API extern DeviceMode psDeviceMode;
 ENGINE_API extern Flags32 psDeviceFlags;
+ENGINE_API extern Flags32 psGameMode;
 
 #include "Common/FSMacros.hpp"

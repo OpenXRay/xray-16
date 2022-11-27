@@ -86,7 +86,7 @@ UpgradeStateResult Group::can_install(CInventoryItem& item, UpgradeBase& test_up
             continue;
         }
         bool cant_install; // XXX Clear Sky upgrades: find a dynamic, universal solution
-        if (ClearSkyMode)
+        if (pSettingsOpenXRay->read_if_exists<bool>("compatibility", "cs_upgrades_can_install_check", psGameMode.is(ClearSkyMode)))
             cant_install = !item.has_upgrade((*ib)->id());
         else
         {

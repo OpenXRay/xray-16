@@ -129,7 +129,7 @@ void CBaseMonster::Load(LPCSTR section)
         LPCSTR protections_sect = pSettings->r_string(section, "protections_sect");
         m_fSkinArmor = READ_IF_EXISTS(pSettings, r_float, protections_sect, "skin_armor", 0.f);
         float defaultHitFraction = 0.1f;
-        if (ShadowOfChernobylMode || ClearSkyMode)
+        if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "load_default_hit_fraction", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode)))
         {
             defaultHitFraction = pSettings->read_if_exists<float>(protections_sect, "hit_fraction", defaultHitFraction);
         }

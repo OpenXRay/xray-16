@@ -105,7 +105,7 @@ static ALife::EHitType DefineCollisionHitType(u16 material_idx)
         if (GMLib.GetMaterialByIdx(material_idx)->Flags.test(SGameMtl::flInjurious))
             return ALife::eHitTypeRadiation;
     }
-    else if (ShadowOfChernobylMode || ClearSkyMode)
+    else if (pSettingsOpenXRay->read_if_exists<bool>("gameplay", "return_physic_strike_hit_type", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode)))
         return ALife::eHitTypePhysicStrike;
     return ALife::eHitTypeStrike;
 }

@@ -200,7 +200,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
             else
                 inventory().ClientEat(itm);
 
-            const bool compat = ClearSkyMode || ShadowOfChernobylMode;
+            const bool compat = pSettingsOpenXRay->read_if_exists<bool>("ui", "custom_static_3_sec_timeout", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode));
             StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("item_used", true, compat ? 3.0f : -1.0f);
 
             string1024 str;

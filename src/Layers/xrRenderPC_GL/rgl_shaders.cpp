@@ -422,7 +422,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
 
     // Shadow of Chernobyl compatibility
-    appendShaderOption(ShadowOfChernobylMode, "USE_SHOC_RESOURCES", "1");
+    appendShaderOption(psGameMode.is(ShadowOfChernobylMode), "USE_SHOC_RESOURCES", "1");
 
     // add a #define for DX10_1 MSAA support
     if (o.msaa)

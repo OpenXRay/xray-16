@@ -43,8 +43,9 @@ void CInfoPortion::load_shared(LPCSTR)
 
     if (item_data == nullptr)
     {
-        if (ShadowOfChernobylMode || ClearSkyMode)
-            Msg("! attempt to use non-existent INFOPORTION [%s]", m_InfoId.c_str());
+#ifndef MASTER_GOLD
+        Msg("! attempt to use non-existent INFOPORTION [%s]", m_InfoId.c_str());
+#endif
         return;
     }
 

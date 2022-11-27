@@ -521,7 +521,7 @@ void CWeapon::Load(LPCSTR section)
 
 void CWeapon::LoadScope(const shared_str& section)
 {
-    if (ShadowOfChernobylMode) // XXX: temporary check for SOC mode, to be removed
+    if (psGameMode.is(ShadowOfChernobylMode)) // XXX: temporary check for SOC mode, to be removed
         return;
     pWpnScopeXml.Load();
     R_ASSERT(m_UIScope);

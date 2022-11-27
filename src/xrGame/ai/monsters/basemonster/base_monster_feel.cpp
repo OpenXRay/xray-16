@@ -124,7 +124,7 @@ void CBaseMonster::HitEntity(
         {
             START_PROFILE("BaseMonster/Animation/HitEntity");
 
-            const bool compat = ClearSkyMode || ShadowOfChernobylMode;
+            const bool compat = pSettingsOpenXRay->read_if_exists<bool>("ui", "custom_static_3_sec_timeout", psGameMode.is_any(ClearSkyMode | ShadowOfChernobylMode));
             StaticDrawableWrapper* s = CurrentGameUI()->AddCustomStatic("monster_claws", false, compat ? 3.0f : -1.0f);
 
             float h1, p1;
