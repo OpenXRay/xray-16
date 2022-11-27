@@ -1320,10 +1320,9 @@ struct STraceBorderQParams
     CPHMovementControl* m_movement;
     const Fvector& m_dir;
     STraceBorderQParams(CPHMovementControl* movement, const Fvector& dir) : m_dir(dir) { m_movement = movement; }
-    STraceBorderQParams& operator=(STraceBorderQParams& p)
+    STraceBorderQParams& operator=(const STraceBorderQParams& p)
     {
-        VERIFY(FALSE);
-        return p;
+        return *this;
     }
 };
 

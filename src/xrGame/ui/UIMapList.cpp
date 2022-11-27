@@ -238,9 +238,9 @@ void CUIMapList::LoadMapList()
 {
     const auto& weathers = gMapListHelper.GetGameWeathers();
     u32 cnt = 0;
-    if (m_pWeatherSelector->GetSize() > 0);
+    if (m_pWeatherSelector->GetSize() > 0)
         m_pWeatherSelector->ClearList();
-    for (const MPWeatherDesc& weather : weathers)
+    for (const auto& weather : weathers)
         AddWeather(weather.Name, weather.StartTime, cnt++);
     if (weathers.size() > 0)
         m_pWeatherSelector->SetItemIDX(0);
