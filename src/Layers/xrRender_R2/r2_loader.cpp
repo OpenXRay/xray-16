@@ -414,11 +414,8 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
         CStreamReader* fs = base_fs->open_chunk(fsL_SWIS);
         u32 item_count = fs->r_u32();
 
-        xr_vector<FSlideWindowItem>::iterator it = SWIs.begin();
-        xr_vector<FSlideWindowItem>::iterator it_e = SWIs.end();
-
-        for (; it != it_e; ++it)
-            xr_free((*it).sw);
+        for (auto& SWI : SWIs)
+            xr_free(SWI.sw);
 
         SWIs.clear();
 
