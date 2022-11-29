@@ -314,8 +314,18 @@ void CActor::IR_OnKeyboardHold(int cmd)
         break;
 
     case kACCEL: mstate_wishful |= mcAccel; break;
-    case kL_STRAFE: mstate_wishful |= mcLStrafe; break;
-    case kR_STRAFE: mstate_wishful |= mcRStrafe; break;
+    case kL_STRAFE:
+    {
+        mstate_wishful &= ~mcSprint;
+        mstate_wishful |= mcLStrafe;
+        break;
+    }
+    case kR_STRAFE:
+    {
+        mstate_wishful &= ~mcSprint;
+        mstate_wishful |= mcRStrafe;
+        break;
+    }
     case kL_LOOKOUT: mstate_wishful |= mcLLookout; break;
     case kR_LOOKOUT: mstate_wishful |= mcRLookout; break;
     case kFWD: mstate_wishful |= mcFwd; break;
