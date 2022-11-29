@@ -9,9 +9,9 @@ static void generate_jitter(u32* dest, u32 elem_count)
         Ivector2 test;
         test.set(Random.randI(0, 256), Random.randI(0, 256));
         BOOL valid = TRUE;
-        for (u32 t = 0; t < samples.size(); t++)
+        for (auto& sample : samples)
         {
-            int dist = _abs(test.x - samples[t].x) + _abs(test.y - samples[t].y);
+            int dist = _abs(test.x - sample.x) + _abs(test.y - sample.y);
             if (dist < 32)
             {
                 valid = FALSE;

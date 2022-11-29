@@ -33,13 +33,13 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
         // Determine visibility for static geometry hierrarhy
         if (psDeviceFlags.test(rsDrawStatic))
         {
-            for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+            for (auto& s : PortalTraverser.r_sectors)
             {
-                CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+                CSector* sector = static_cast<CSector*>(s);
                 dxRender_Visual* root = sector->root();
-                for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+                for (auto& r_frustum : sector->r_frustums)
                 {
-                    add_Geometry(root, sector->r_frustums[v_it]);
+                    add_Geometry(root, r_frustum);
                 }
             }
         }
@@ -97,9 +97,8 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 
                 if (PortalTraverser.i_marker != sector->r_marker)
                     continue; // inactive (untouched) sector
-                for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+                for (auto& view : sector->r_frustums)
                 {
-                    CFrustum& view = sector->r_frustums[v_it];
                     if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
                         continue;
 
