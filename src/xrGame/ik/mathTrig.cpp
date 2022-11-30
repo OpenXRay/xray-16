@@ -38,6 +38,8 @@
 // Normalize an angle to the range -Pi..Pi
 //
 
+namespace mathTrig
+{
 // static double angle_normalize_signed(double x)
 //{
 //    while (x > M_PI)  x -= 2*M_PI;
@@ -57,15 +59,15 @@ float angle_distance(float x, float y)
 {
     unsigned int signx = x > 0.0;
     unsigned int signy = y > 0.0;
-    float dist; 
+    float dist;
 
-    dist = _abs(x-y);
+    dist = _abs(x - y);
 
     // If angles are of opposite signs check whether clockwise
     // or anticlockwise distances are closer 
     if (signx != signy)
     {
-        float temp = (2*M_PI) - dist;
+        float temp = (2 * M_PI) - dist;
         if (temp < dist)
             dist = temp;
     }
@@ -159,3 +161,4 @@ int myasin(float x, float solns[2])
 
     return 2;
 }
+} // namespace mathTrig

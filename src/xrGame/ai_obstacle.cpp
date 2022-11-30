@@ -49,11 +49,6 @@ public:
     }
 };
 
-IC Fvector construct_position(u32 level_vertex_id, float x, float z)
-{
-    return (Fvector().set(x, ai().level_graph().vertex_plane_y(level_vertex_id, x, z), z));
-}
-
 IC bool ai_obstacle::inside(const Fvector& position, const float& radius) const
 {
     for (u32 i = 0; i < PLANE_COUNT; ++i)
@@ -78,13 +73,20 @@ IC bool ai_obstacle::inside(
 
 IC bool ai_obstacle::inside(const u32& vertex_id) const
 {
-    const Fvector& position = ai().level_graph().vertex_position(vertex_id);
-    float offset = ai().level_graph().header().cell_size() * .5f - EPS_L;
-    return (inside(construct_position(vertex_id, position.x + offset, position.z + offset), EPS_L, .3f, 6) ||
-        inside(construct_position(vertex_id, position.x + offset, position.z - offset), EPS_L, .3f, 6) ||
-        inside(construct_position(vertex_id, position.x - offset, position.z + offset), EPS_L, .3f, 6) ||
-        inside(construct_position(vertex_id, position.x - offset, position.z - offset), EPS_L, .3f, 6) ||
-        inside(Fvector().set(position.x, position.y, position.z), EPS_L, .3f, 6));
+    constexpr auto construct_position = [](u32 level_vertex_id, float x, float z) -> Fvector
+    {
+        return { x, ai().level_graph().vertex_plane_y(level_vertex_id, x, z), z };
+    };
+
+    const float offset = ai().level_graph().header().cell_size() * .5f - EPS_L;
+
+    const auto& [x, y, z] = ai().level_graph().vertex_position(vertex_id);
+
+    return (inside(construct_position(vertex_id, x + offset, z + offset), EPS_L, .3f, 6) ||
+        inside(construct_position(vertex_id, x + offset, z - offset), EPS_L, .3f, 6) ||
+        inside(construct_position(vertex_id, x - offset, z + offset), EPS_L, .3f, 6) ||
+        inside(construct_position(vertex_id, x - offset, z - offset), EPS_L, .3f, 6) ||
+        inside({ x, y, z }, EPS_L, .3f, 6));
 }
 
 void ai_obstacle::compute_matrix(Fmatrix& result, const Fvector& additional)

@@ -170,18 +170,6 @@ void IClientStatistic::Clear()
     m_pimpl->dwBaseTime = TimeGlobal(m_pimpl->device_timer);
 }
 
-// {0218FA8B-515B-4bf2-9A5F-2F079D1759F3}
-static const GUID NET_GUID = {0x218fa8b, 0x515b, 0x4bf2, {0x9a, 0x5f, 0x2f, 0x7, 0x9d, 0x17, 0x59, 0xf3}};
-// {8D3F9E5E-A3BD-475b-9E49-B0E77139143C}
-static const GUID CLSID_NETWORKSIMULATOR_DP8SP_TCPIP = {
-    0x8d3f9e5e, 0xa3bd, 0x475b, {0x9e, 0x49, 0xb0, 0xe7, 0x71, 0x39, 0x14, 0x3c}};
-
-static HRESULT WINAPI Handler(PVOID pvUserContext, DWORD dwMessageType, PVOID pMessage)
-{
-    IPureServer* C = (IPureServer*)pvUserContext;
-    return C->net_Handler(dwMessageType, pMessage);
-}
-
 //------------------------------------------------------------------------------
 
 void IClient::_SendTo_LL(const void* data, u32 size, u32 flags, u32 timeout)
@@ -357,6 +345,12 @@ IPureServer::EConnect IPureServer::Connect(pcstr options, GameDescriptionData& g
             CHK_DX(CoCreateInstanceRes);
         }
         //---------------------------
+
+        const auto Handler = (PFNDPNMESSAGEHANDLER)[](PVOID pvUserContext, DWORD dwMessageType, PVOID pMessage)
+        {
+            auto* C = (IPureServer*)pvUserContext;
+            return C->net_Handler(dwMessageType, pMessage);
+        };
 
         // Initialize IDirectPlay8Client object.
 #ifdef DEBUG

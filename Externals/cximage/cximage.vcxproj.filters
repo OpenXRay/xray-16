@@ -50,6 +50,9 @@
     <ClCompile Include="xmemfile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="xiofile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xfile.h">

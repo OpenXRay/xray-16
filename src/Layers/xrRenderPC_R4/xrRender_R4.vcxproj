@@ -12,6 +12,9 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="..\..\xray_project_configuration.props" />
   </ImportGroup>
+  <PropertyGroup Label="Configuration">
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -24,6 +27,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions Condition="'$(GITHUB_ACTIONS)'!=''">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;nvapi$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -58,29 +62,29 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h" />
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.h" />
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidData.h" />
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidEmitters.h" />
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidGrid.h" />
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidManager.h" />
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidObstacles.h" />
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidRenderer.h" />
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.h" />
-    <ClInclude Include="..\xrRender\blenders\dx10RainBlender.h" />
-    <ClInclude Include="..\xrRenderDX10\dx10ConstantBuffer.h" />
-    <ClInclude Include="..\xrRenderDX10\dx10ConstantBuffer_impl.h" />
-    <ClInclude Include="..\xrRenderDX10\dx10HW.h" />
-    <ClInclude Include="..\xrRenderDX10\dx10R_Backend_Runtime.h" />
-    <ClInclude Include="..\xrRenderDX10\dx10r_constants_cache.h" />
-    <ClInclude Include="..\xrRenderDX10\dx10StateUtils.h" />
-    <ClInclude Include="..\xrRenderDX10\dx10TextureUtils.h" />
-    <ClInclude Include="..\xrRender\blenders\dx10MSAABlender.h" />
-    <ClInclude Include="..\xrRenderDX10\StateManager\dx10SamplerStateCache.h" />
-    <ClInclude Include="..\xrRenderDX10\StateManager\dx10ShaderResourceStateCache.h" />
-    <ClInclude Include="..\xrRenderDX10\StateManager\dx10State.h" />
-    <ClInclude Include="..\xrRenderDX10\StateManager\dx10StateCache.h" />
-    <ClInclude Include="..\xrRenderDX10\StateManager\dx10StateCacheImpl.h" />
-    <ClInclude Include="..\xrRenderDX10\StateManager\dx10StateManager.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidData.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
+    <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11HW.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11R_Backend_Runtime.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11r_constants_cache.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11StateUtils.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11TextureUtils.h" />
+    <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11State.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCache.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCacheImpl.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateManager.h" />
     <ClInclude Include="..\xrRenderDX11\CommonTypes.h" />
     <ClInclude Include="..\xrRender\Animation.h" />
     <ClInclude Include="..\xrRender\Blender.h" />
@@ -177,6 +181,7 @@
     <ClInclude Include="..\xrRender\SkeletonAnimated.h" />
     <ClInclude Include="..\xrRender\SkeletonCustom.h" />
     <ClInclude Include="..\xrRender\SkeletonX.h" />
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h" />
     <ClInclude Include="..\xrRender\stats_manager.h" />
     <ClInclude Include="..\xrRender\TextureDescrManager.h" />
     <ClInclude Include="..\xrRender\tss.h" />
@@ -201,6 +206,7 @@
     <ClInclude Include="..\xrRender\blenders\blender_light_spot.h" />
     <ClInclude Include="..\xrRender\blenders\blender_luminance.h" />
     <ClInclude Include="..\xrRender\blenders\blender_ssao.h" />
+    <ClInclude Include="..\xrRender_R2\r2.h" />
     <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h" />
     <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h" />
     <ClInclude Include="..\xrRender_R2\r2_types.h" />
@@ -212,47 +218,46 @@
     <ClInclude Include="..\xrRender\light_gi.h" />
     <ClInclude Include="..\xrRender\Light_Render_Direct.h" />
     <ClInclude Include="..\xrRender\light_smapvis.h" />
-    <ClInclude Include="r4.h" />
     <ClInclude Include="r4_rendertarget.h" />
     <ClInclude Include="R_Backend_LOD.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.cpp" />
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidData.cpp" />
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidEmitters.cpp" />
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidGrid.cpp" />
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidManager.cpp" />
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidObstacles.cpp" />
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidRenderer.cpp" />
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.cpp" />
-    <ClCompile Include="..\xrRenderDX10\Blender_Recorder_R3.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidData.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp" />
+    <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp" />
-    <ClCompile Include="..\xrRender\blenders\dx10RainBlender.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10BufferUtils.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10ConstantBuffer.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10DetailManager_VS.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10HW.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10HWCaps.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10ResourceManager_Resources.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10ResourceManager_Scripting.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10r_constants.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10r_constants_cache.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10SH_RT.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10SH_Texture.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10StateUtils.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10Texture.cpp" />
-    <ClCompile Include="..\xrRenderDX10\dx10TextureUtils.cpp" />
-    <ClCompile Include="..\xrRender\blenders\dx10MSAABlender.cpp" />
-    <ClCompile Include="..\xrRenderDX10\StateManager\dx10SamplerStateCache.cpp" />
-    <ClCompile Include="..\xrRenderDX10\StateManager\dx10ShaderResourceStateCache.cpp" />
-    <ClCompile Include="..\xrRenderDX10\StateManager\dx10State.cpp" />
-    <ClCompile Include="..\xrRenderDX10\StateManager\dx10StateCache.cpp" />
-    <ClCompile Include="..\xrRenderDX10\StateManager\dx10StateManager.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx11RainBlender.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11BufferUtils.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11HW.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Resources.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Scripting.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11r_constants.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11r_constants_cache.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11SH_RT.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11SH_Texture.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11StateUtils.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11Texture.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11TextureUtils.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx11MSAABlender.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateManager.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\Blender.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder.cpp" />
@@ -343,6 +348,8 @@
     <ClCompile Include="..\xrRender\SkeletonCustom.cpp" />
     <ClCompile Include="..\xrRender\SkeletonRigid.cpp" />
     <ClCompile Include="..\xrRender\SkeletonX.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp" />
     <ClCompile Include="..\xrRender\stats_manager.cpp" />
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
     <ClCompile Include="..\xrRender\tss_def.cpp" />
@@ -385,6 +392,17 @@
     <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_render.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_sun.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_point.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_spot.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_draw_rain.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_mark_msaa_edges.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_rain.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_smap_D.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_ssao.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="CSCompiler.cpp" />
     <ClCompile Include="..\xrRender\blenders\dx11HDAOCSBlender.cpp" />
@@ -398,19 +416,8 @@
     <ClCompile Include="r4_rendertarget_u_set_rt.cpp" />
     <ClCompile Include="r2_test_hw.cpp" />
     <ClCompile Include="r4_rendertarget_accum_direct.cpp" />
-    <ClCompile Include="r4_rendertarget_accum_point.cpp" />
-    <ClCompile Include="r4_rendertarget_accum_spot.cpp" />
-    <ClCompile Include="r4_rendertarget_create_minmaxSM.cpp" />
-    <ClCompile Include="r4_rendertarget_draw_rain.cpp" />
-    <ClCompile Include="r4_rendertarget_mark_msaa_edges.cpp" />
     <ClCompile Include="r4_rendertarget_phase_combine.cpp" />
     <ClCompile Include="r4_rendertarget_phase_hdao.cpp" />
-    <ClCompile Include="r4_rendertarget_phase_occq.cpp" />
-    <ClCompile Include="r4_rendertarget_phase_rain.cpp" />
-    <ClCompile Include="r4_rendertarget_phase_scene.cpp" />
-    <ClCompile Include="r4_rendertarget_phase_smap_D.cpp" />
-    <ClCompile Include="r4_rendertarget_phase_ssao.cpp" />
-    <ClCompile Include="r4_R_rain.cpp" />
     <ClCompile Include="r4_shaders.cpp" />
     <ClCompile Include="R_Backend_LOD.cpp" />
     <ClCompile Include="stdafx.cpp">

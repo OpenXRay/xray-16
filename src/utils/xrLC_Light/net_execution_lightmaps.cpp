@@ -12,13 +12,15 @@
 
 namespace lc_net
 {
-static const u32 send_receive_task_buff_size = 8;
+static constexpr size_t lightmaps_task_buff_size = 8;
+static constexpr size_t lightmaps_result_buff_size = 512 * 1024;
+
 void execution_lightmaps::send_task(IGenericStream* outStream)
 {
     {
-        u8 buff[send_receive_task_buff_size];
+        u8 buff[lightmaps_task_buff_size];
         INetMemoryBuffWriter w(outStream, sizeof(buff), buff);
-        // INetIWriterGenStream w( outStream, send_receive_task_buff_size );
+        // INetIWriterGenStream w( outStream, lightmaps_task_buff_size );
 
         R_ASSERT(from != u32(-1));
         R_ASSERT(to != u32(-1));
@@ -30,9 +32,9 @@ void execution_lightmaps::send_task(IGenericStream* outStream)
 
 bool execution_lightmaps::receive_task(IAgent* agent, u32 sessionId, IGenericStream* inStream)
 {
-    u8 buff[send_receive_task_buff_size];
+    u8 buff[lightmaps_task_buff_size];
 
-    INetBlockReader r(inStream, buff, send_receive_task_buff_size);
+    INetBlockReader r(inStream, buff, lightmaps_task_buff_size);
     // INetReaderGenStream r( inStream );
     from = r.r_u32();
     to = r.r_u32();
@@ -42,12 +44,11 @@ bool execution_lightmaps::receive_task(IAgent* agent, u32 sessionId, IGenericStr
     return true;
 }
 
-static const u32 send_receive_result_buff_size = 512 * 1024;
 void execution_lightmaps::send_result(IGenericStream* outStream)
 {
-    u8 buff[send_receive_result_buff_size];
+    u8 buff[lightmaps_result_buff_size];
     INetMemoryBuffWriter w(outStream, sizeof(buff), buff);
-    // INetIWriterGenStream w( outStream, send_receive_result_buff_size );
+    // INetIWriterGenStream w( outStream, lightmaps_result_buff_size );
     // VERIFY(deflector_id!= u32(-1));
     // w.w_u32( deflector_id );
     R_ASSERT(from != u32(-1));
@@ -69,7 +70,7 @@ void execution_lightmaps::send_result(IGenericStream* outStream)
 }
 void execution_lightmaps::receive_result(IGenericStream* outStream)
 {
-    u8 buff[send_receive_result_buff_size];
+    u8 buff[lightmaps_result_buff_size];
     INetBlockReader r(outStream, buff, sizeof(buff));
     // INetReaderGenStream r(outStream);
     // u32 id = r.r_u32();

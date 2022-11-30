@@ -1,4 +1,4 @@
-
+#pragma once
 
 IC void CPHElement::InverceLocalForm(Fmatrix& m)
 {

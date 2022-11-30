@@ -70,9 +70,8 @@ void	callback_vertex_hemi	(Vertex* V)
 {
     // calc vertex attributes
     CDB::COLLIDER			DB;
-    DB.ray_options			(0);
     base_color_c			vC;
-    LightPoint				(&DB, RCAST_Model, vC, V->P, V->N, pBuild->L_static, LP_dont_rgb+LP_dont_sun,0);
+    LightPoint				(&DB, 0, RCAST_Model, vC, V->P, V->N, pBuild->L_static, LP_dont_rgb+LP_dont_sun,0);
     V->C._set				(vC);
 }
 
@@ -155,7 +154,6 @@ void GSaveAsSMF			(MxStdModel* mdl, LPCSTR fname)
 void CBuild::xrPhase_AdaptiveHT	()
 {
     CDB::COLLIDER	DB;
-    DB.ray_options	(0);
 
     if (1)
     {
@@ -196,7 +194,7 @@ void CBuild::xrPhase_AdaptiveHT	()
             base_color_c		vC;
             Vertex*		V		= g_vertices[vit];
             V->normalFromAdj	();
-            LightPoint			(&DB, RCAST_Model, vC, V->P, V->N, pBuild->L_static, LP_dont_rgb+LP_dont_sun,0);
+            LightPoint			(&DB, 0, RCAST_Model, vC, V->P, V->N, pBuild->L_static, LP_dont_rgb+LP_dont_sun,0);
             V->C._set			(vC);
         }
     }

@@ -49,7 +49,7 @@ void CDeflector::L_Direct_Edge(CDB::COLLIDER* DB, base_lighting* LightsSelected,
         VERIFY(inlc_global_data());
         VERIFY(inlc_global_data()->RCAST_Model());
 
-        LightPoint(DB, inlc_global_data()->RCAST_Model(), C, P, N, *LightsSelected,
+        LightPoint(DB, 0, inlc_global_data()->RCAST_Model(), C, P, N, *LightsSelected,
             (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_DEFAULT, skip); //.
 
         C.mul(.5f);
@@ -79,8 +79,6 @@ void CDeflector::L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH
     Jitter_Select(Jitter, Jcount);
 
     // Lighting itself
-    DB->ray_options(0);
-
     for (u32 V = 0; V < lm.height; V++)
     {
         if (_net_session && !_net_session->test_connection())
@@ -128,7 +126,7 @@ void CDeflector::L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH
                             {
                                 VERIFY(inlc_global_data());
                                 VERIFY(inlc_global_data()->RCAST_Model());
-                                LightPoint(DB, inlc_global_data()->RCAST_Model(), C, wP, wN, *LightsSelected,
+                                LightPoint(DB, 0, inlc_global_data()->RCAST_Model(), C, wP, wN, *LightsSelected,
                                     (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_UseFaceDisable, F); //.
                                 Fcount += 1;
                             }

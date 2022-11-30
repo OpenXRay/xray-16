@@ -327,13 +327,8 @@ void SndShockEffector::Update()
 
 //////////////////////////////////////////////////////////////////////////
 
-#define DELTA_ANGLE_X 0.5f * PI / 180
-#define DELTA_ANGLE_Y 0.5f * PI / 180
-#define DELTA_ANGLE_Z 0.5f * PI / 180
-#define ANGLE_SPEED 1.5f
-
-const float _base_fov = 170.f;
-const float _max_fov_add = 30.f;
+//const float _base_fov = 170.f;
+//const float _max_fov_add = 30.f;
 
 CControllerPsyHitCamEffector::CControllerPsyHitCamEffector(ECamEffectorType type, const Fvector& src_pos,
     const Fvector& target_pos, float time, float base_fov, float dest_fov)

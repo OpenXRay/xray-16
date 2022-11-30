@@ -18,7 +18,7 @@ void CUICell::Clear()
     m_item = NULL;
 }
 
-CUIDragDropListEx::CUIDragDropListEx()
+CUIDragDropListEx::CUIDragDropListEx() : CUIWindow("CUIDragDropListEx")
 {
     m_flags.zero();
     m_container = xr_new<CUICellContainer>(this);
@@ -639,6 +639,7 @@ CUICell& CUIDragDropListEx::GetCellAt(const Ivector2& pos) { return m_container-
 // =================================================================================================
 
 CUICellContainer::CUICellContainer(CUIDragDropListEx* parent)
+    : CUIWindow("CUICellContainer")
 {
     m_pParentDragDropList = parent;
     hShader->create("hud" DELIMITER "fog_of_war", "ui" DELIMITER "ui_grid");

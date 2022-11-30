@@ -401,6 +401,7 @@ void CActor::Load(LPCSTR section)
                 sndHit[hit_type].back().create(_GetItem(hit_snds, i, buf), st_Effect, sg_SourceType);
             }
 
+            // XXX: dynamically load 'dieN' ?
             GEnv.Sound->create(
                 sndDie[0], strconcat(sizeof(buf), buf, *cName(), DELIMITER "die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
             GEnv.Sound->create(

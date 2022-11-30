@@ -1,3 +1,5 @@
+#pragma once
+
 void CPHSimpleCharacter::UpdateStaticDamage(dContact* c, SGameMtl* tri_material, bool bo1)
 {
     const dReal* v = dBodyGetLinearVel(m_body);

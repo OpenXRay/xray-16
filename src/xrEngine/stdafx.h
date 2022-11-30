@@ -32,7 +32,4 @@
 
 extern ENGINE_API CInifile* pGameIni;
 
-#pragma comment(lib, "winmm.lib")
-#pragma comment(lib, "dxguid.lib")
-
 #endif // _EDITOR

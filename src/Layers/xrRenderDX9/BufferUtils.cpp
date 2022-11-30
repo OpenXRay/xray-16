@@ -22,12 +22,6 @@ u32 GetDeclLength(const VertexElement* decl)
 }
 
 //-----------------------------------------------------------------------------
-VertexStagingBuffer::VertexStagingBuffer()
-    : m_DeviceBuffer{ nullptr }
-    , m_HostBuffer{ nullptr }
-{
-}
-
 VertexStagingBuffer::~VertexStagingBuffer()
 {
     Destroy();
@@ -119,12 +113,6 @@ size_t VertexStagingBuffer::GetVideoMemoryUsage() const
 }
 
 //-----------------------------------------------------------------------------
-IndexStagingBuffer::IndexStagingBuffer()
-    : m_DeviceBuffer{ nullptr }
-    , m_HostBuffer{ nullptr }
-{
-}
-
 IndexStagingBuffer::~IndexStagingBuffer()
 {
     Destroy();
@@ -215,11 +203,6 @@ size_t IndexStagingBuffer::GetVideoMemoryUsage() const
 }
 
 //-----------------------------------------------------------------------------
-VertexStreamBuffer::VertexStreamBuffer()
-    : m_DeviceBuffer(nullptr)
-{
-}
-
 VertexStreamBuffer::~VertexStreamBuffer()
 {
     Destroy();
@@ -270,11 +253,6 @@ bool VertexStreamBuffer::IsValid() const
 }
 
 //-----------------------------------------------------------------------------
-IndexStreamBuffer::IndexStreamBuffer()
-    : m_DeviceBuffer(nullptr)
-{
-}
-
 IndexStreamBuffer::~IndexStreamBuffer()
 {
     Destroy();

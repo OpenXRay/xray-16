@@ -37,8 +37,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Layers\xrRender\ETextureParams.cpp" />
-    <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp" />
     <ClCompile Include="..\..\xrServerEntities\smart_cast.cpp" />
+    <ClCompile Include="..\xrLoadSurface.cpp" />
     <ClCompile Include="compiler.cpp" />
     <ClCompile Include="compiler_cover.cpp" />
     <ClCompile Include="compiler_load.cpp" />

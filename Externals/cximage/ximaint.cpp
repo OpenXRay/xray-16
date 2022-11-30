@@ -689,7 +689,7 @@ float CxImage::KernelBSpline(const float x)
 
 	return (0.16666666666666666667f * (a - (4.0f * b) + (6.0f * c) - (4.0f * d)));
 
-	/* equivalent <Vladimír Kloucek>
+	/* equivalent <Vladimir Kloucek>
 	if (x < -2.0)
 		return(0.0f);
 	if (x < -1.0)
@@ -722,7 +722,7 @@ float CxImage::KernelLinear(const float t)
 //  if (-1<=t && t<0) return 1+t;
 //  return 0;
 	
-	//<Vladimír Kloucek>
+	//<Vladimir Kloucek>
 	if (t < -1.0f)
 		return 0.0f;
 	if (t < 0.0f)
@@ -1008,16 +1008,16 @@ float CxImage::KernelQuadratic(const float x)
 ////////////////////////////////////////////////////////////////////////////////
 float CxImage::KernelMitchell(const float x)
 {
-#define KM_B (1.0f/3.0f)
-#define KM_C (1.0f/3.0f)
-#define KM_P0 ((  6.0f - 2.0f * KM_B ) / 6.0f)
-#define KM_P2 ((-18.0f + 12.0f * KM_B + 6.0f * KM_C) / 6.0f)
-#define KM_P3 (( 12.0f - 9.0f  * KM_B - 6.0f * KM_C) / 6.0f)
-#define KM_Q0 ((  8.0f * KM_B + 24.0f * KM_C) / 6.0f)
-#define KM_Q1 ((-12.0f * KM_B - 48.0f * KM_C) / 6.0f)
-#define KM_Q2 ((  6.0f * KM_B + 30.0f * KM_C) / 6.0f)
-#define KM_Q3 (( -1.0f * KM_B -  6.0f * KM_C) / 6.0f)
-	
+    constexpr float KM_B  = (1.0f / 3.0f);
+    constexpr float KM_C  = (1.0f / 3.0f);
+    constexpr float KM_P0 = ((  6.0f - 2.0f * KM_B ) / 6.0f);
+    constexpr float KM_P2 = ((-18.0f + 12.0f * KM_B + 6.0f * KM_C) / 6.0f);
+    constexpr float KM_P3 = (( 12.0f - 9.0f  * KM_B - 6.0f * KM_C) / 6.0f);
+    constexpr float KM_Q0 = ((  8.0f * KM_B + 24.0f * KM_C) / 6.0f);
+    constexpr float KM_Q1 = ((-12.0f * KM_B - 48.0f * KM_C) / 6.0f);
+    constexpr float KM_Q2 = ((  6.0f * KM_B + 30.0f * KM_C) / 6.0f);
+    constexpr float KM_Q3 = (( -1.0f * KM_B -  6.0f * KM_C) / 6.0f);
+
 	if (x < -2.0)
 		return(0.0f);
 	if (x < -1.0)

@@ -6,22 +6,6 @@
 #include "Layers/xrRender/Blender_Recorder.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
-template <class T>
-BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
-{
-    auto it = vec.begin();
-    auto end = vec.end();
-    for (; it != end; ++it)
-    {
-        if (*it == ptr)
-        {
-            vec.erase(it);
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
 //--------------------------------------------------------------------------------------------------------------
 SPass* CResourceManager::_CreatePass(const SPass& proto)
 {

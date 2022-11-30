@@ -79,7 +79,7 @@ struct NET_Buffer
 class XRCORE_API NET_Packet
 {
 public:
-    IIniFileStream* inistream;
+    IIniFileStream* inistream{};
 
     void construct(const void* data, unsigned size)
     {
@@ -87,13 +87,12 @@ public:
         B.count = size;
     }
 
-    NET_Buffer B;
-    u32 r_pos;
-    u32 timeReceive;
-    bool w_allow;
+    NET_Buffer B{};
+    u32 r_pos{};
+    u32 timeReceive{};
+    bool w_allow{ true };
 
 public:
-    NET_Packet() : inistream(nullptr), B(), r_pos(0), timeReceive(0), w_allow(true) {}
     // writing - main
     IC void write_start()
     {

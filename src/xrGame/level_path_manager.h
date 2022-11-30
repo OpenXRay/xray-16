@@ -11,7 +11,7 @@
 #include "abstract_path_manager.h"
 
 template <typename _VertexEvaluator, typename _vertex_id_type, typename _index_type>
-class CBasePathManager<CLevelGraph, _VertexEvaluator, _vertex_id_type, _index_type>
+class CBaseLevelPathManager final
     : public CAbstractPathManager<CLevelGraph, _VertexEvaluator, _vertex_id_type, _index_type>
 {
     typedef CAbstractPathManager<CLevelGraph, _VertexEvaluator, _vertex_id_type, _index_type> inherited;
@@ -26,11 +26,11 @@ protected:
     IC virtual bool check_vertex(const _vertex_id_type vertex_id) const;
 
 public:
-    IC CBasePathManager(CRestrictedObject* object);
-    IC void reinit(const CLevelGraph* graph = 0);
+    IC CBaseLevelPathManager(CRestrictedObject* object);
+    IC void reinit(const CLevelGraph* graph = nullptr);
     IC bool actual() const;
     IC void on_restrictions_change();
-    IC void build_path(const _vertex_id_type start_vertex_id, const _vertex_id_type dest_vertex_id);
+    IC void build_path(const _vertex_id_type start_vertex_id, const _vertex_id_type dest_vertex_id) override;
 };
 
 #include "level_path_manager_inline.h"

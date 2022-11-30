@@ -8,6 +8,7 @@
 CUIStatsIcon::TEX_INFO CUIStatsIcon::m_tex_info[MAX_DEF_TEX][2];
 
 CUIStatsIcon::CUIStatsIcon()
+    : CUIStatic("CUIStatsIcon")
 {
     SetStretchTexture(true);
     InitTexInfo();

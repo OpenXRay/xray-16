@@ -1,15 +1,18 @@
 #include "stdafx.h"
 #include "resource.h"
+
+#include "xrEngine/main.h"
+#include "xrEngine/splash.h"
+
 #if defined(XR_PLATFORM_WINDOWS)
 #include "AccessibilityShortcuts.hpp"
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <getopt.h>
 #endif
-#include "xrEngine/main.h"
-#include "xrEngine/splash.h"
+
 #include <SDL.h>
 
 //#define PROFILE_TASK_SYSTEM
@@ -122,7 +125,7 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
     }
     return result;
 }
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 int main(int argc, char *argv[])
 {
     int result = EXIT_FAILURE;
@@ -173,4 +176,6 @@ int main(int argc, char *argv[])
 
     return result;
 }
+#else
+#   error Select or add an implementation for your platform
 #endif

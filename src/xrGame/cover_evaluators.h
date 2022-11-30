@@ -49,6 +49,7 @@ protected:
 
 public:
     CCoverEvaluatorBase(CRestrictedObject* object);
+    virtual ~CCoverEvaluatorBase() = default;
     IC const CCoverPoint* selected() const;
     IC smart_cover::loophole const* loophole() const;
     bool inertia(Fvector const& position, float radius);

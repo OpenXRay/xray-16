@@ -14,25 +14,28 @@
 #include "editor_environment_sound_channels_source.hpp"
 #include "editor_environment_sound_channels_manager.hpp"
 
-using editor::environment::sound_channels::channel;
-using editor::environment::sound_channels::source;
-using editor::environment::sound_channels::manager;
+using sound_channels_channel = editor::environment::sound_channels::channel;
 
 template <>
-void property_collection<channel::sound_container_type, channel>::display_name(
+void property_collection<sound_channels_channel::sound_container_type, sound_channels_channel>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<channel::sound_container_type, channel>::create()
+XRay::Editor::property_holder_base* property_collection<
+    sound_channels_channel::sound_container_type, sound_channels_channel>::create()
 {
-    source* object = xr_new<source>("");
+    using editor::environment::sound_channels::source;
+
+    auto object = xr_new<source>("");
     object->fill(this);
     return (object->object());
 }
 
+namespace editor::environment::sound_channels
+{
 channel::channel(manager const& manager, shared_str const& id)
     : m_manager(manager), m_property_holder(0), m_collection(0)
 {
@@ -62,7 +65,7 @@ void channel::load(const CInifile& config, pcstr sectionToReadFrom)
     string_path sound;
     for (u32 i = 0, n = _GetItemCount(sounds); i < n; ++i)
     {
-        source* object = xr_new<source>(_GetItem(sounds, i, sound));
+        auto object = xr_new<source>(_GetItem(sounds, i, sound));
         object->fill(m_collection);
         m_sounds.push_back(object);
     }
@@ -78,12 +81,12 @@ void channel::save(CInifile& config)
     config.w_s32(m_load_section.c_str(), "period3", m_sound_period.w);
 
     u32 count = 1;
-    for (const auto &i : m_sounds)
+    for (const auto& i : m_sounds)
         count += xr_strlen(i->id()) + 2;
 
     pstr temp = (pstr)xr_alloca(count * sizeof(char));
     *temp = '\0';
-    for (const auto &i : m_sounds)
+    for (const auto& i : m_sounds)
     {
         xr_strcat(temp, count, i->id());
 
@@ -97,7 +100,7 @@ void channel::save(CInifile& config)
 pcstr channel::id_getter() const { return (m_load_section.c_str()); }
 void channel::id_setter(pcstr value_)
 {
-    shared_str value = value_;
+    const shared_str value = value_;
     if (m_load_section._get() == value._get())
         return;
 
@@ -144,3 +147,4 @@ void channel::fill(XRay::Editor::property_holder_collection* collection)
 
 channel::property_holder_type* channel::object() { return (m_property_holder); }
 CEnvAmbient::SSndChannel::sounds_type& channel::sounds() { return (inherited::sounds()); }
+} // namespace editor::environment::sound_channels

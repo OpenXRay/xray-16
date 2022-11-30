@@ -2,15 +2,11 @@
 #include "NET_Common.h"
 #include "NET_Log.h"
 #include "NET_Messages.h"
-#include "stdafx.h"
+#include "stdafx.h" // XXX: why PCH is not on the top of the file???
 #include "xrCore/buffer_vector.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
-#include <functional>
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
+#include <functional>
 
 static INetLog* pSvNetLog = nullptr;
 

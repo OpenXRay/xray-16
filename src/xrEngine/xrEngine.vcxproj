@@ -149,6 +149,7 @@
     <ClCompile Include="IInputReceiver.cpp" />
     <ClCompile Include="IRenderable.cpp" />
     <ClCompile Include="ISheduled.cpp" />
+    <ClCompile Include="key_binding_registrator_script.cpp" />
     <ClCompile Include="LightAnimLibrary.cpp" />
     <ClCompile Include="line_editor.cpp" />
     <ClCompile Include="line_edit_control.cpp" />

@@ -1,11 +1,11 @@
 #pragma once
-#ifndef __V3D__
-#define __V3D__
+
 #include <algorithm>
 #include <cmath>
 #include "xr_types.h"
 #include "_random.h"
 #include "math_constants.h"
+#include "xrCommon/math_funcs_inline.h"
 
 template <class T>
 struct _vector3
@@ -363,5 +363,3 @@ double rsqrt(double v);
 bool exact_normalize(float* a);
 bool exact_normalize(Fvector3& a);
 #pragma warning(pop)
-
-#endif

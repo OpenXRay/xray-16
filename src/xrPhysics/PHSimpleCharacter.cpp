@@ -28,11 +28,6 @@
 #include "xrEngine/xr_object.h"
 #include "ph_valid_ode.h"
 
-IC bool PhOutOfBoundaries(const Fvector& v) { return v.y < phBoundaries.y1; }
-//#ifdef DEBUG
-
-//#endif
-
 const float LOSE_CONTROL_DISTANCE = 0.5f; // fly distance to lose control
 const float CLAMB_DISTANCE = 0.5f;
 const float CLIMB_GETUP_HEIGHT = 0.3f;
@@ -902,8 +897,7 @@ bool CPHSimpleCharacter::ValidateWalkOnMesh()
     query.merge(tmp);
     query.get_CD(q_c, q_d);
 
-    XRC.box_options(0);
-    XRC.box_query(inl_ph_world().ObjectSpace().GetStaticModel(), q_c, q_d);
+    XRC.box_query(0, inl_ph_world().ObjectSpace().GetStaticModel(), q_c, q_d);
     // Fvector fv_dir;fv_dir.mul(accel,1.f/mag);
     Fvector sd_dir;
     sd_dir.set(-accel.z, 0, accel.x);

@@ -13,26 +13,29 @@
 #include "editor_environment_sound_channels_channel.hpp"
 #include "editor_environment_detail.hpp"
 
-using editor::environment::sound_channels::manager;
-using editor::environment::sound_channels::channel;
-using editor::environment::detail::logical_string_predicate;
+using sound_channels_manager = editor::environment::sound_channels::manager;
 
 template <>
-void property_collection<manager::channel_container_type, manager>::display_name(
+void property_collection<sound_channels_manager::channel_container_type, sound_channels_manager>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<manager::channel_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<
+    sound_channels_manager::channel_container_type, sound_channels_manager>::create()
 {
-    channel* object = xr_new<channel>(m_holder, generate_unique_id("sound_channel_unique_id_").c_str());
+    using editor::environment::sound_channels::channel;
+
+    auto object = xr_new<channel>(m_holder, generate_unique_id("sound_channel_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
 
-manager::manager() : m_collection(0), m_changed(true)
+namespace editor::environment::sound_channels
+{
+manager::manager() : m_collection(nullptr), m_changed(true)
 {
     m_collection = xr_new<collection_type>(&m_channels, this, &m_changed);
 }
@@ -47,20 +50,19 @@ manager::~manager()
 void manager::load()
 {
     string_path file_name;
-    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), true, true, false);
+    auto config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment\\sound_channels.ltx"), true, true, false);
 
     VERIFY(m_channels.empty());
 
     typedef CInifile::Root sections_type;
-    sections_type& sections = config->sections();
+    const sections_type& sections = config->sections();
     m_channels.reserve(sections.size());
 
-    for (const auto &i : sections)
+    for (const auto& i : sections)
     {
-        channel* object = xr_new<channel>(*this, i->Name);
+        auto object = m_channels.emplace_back(xr_new<channel>(*this, i->Name));
         object->load(*config);
         object->fill(m_collection);
-        m_channels.push_back(object);
     }
 
     xr_delete(config);
@@ -69,9 +71,9 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "sound_channels.ltx"), false, false, true);
+    auto config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment\\sound_channels.ltx"), false, false, true);
 
-    for (const auto &i : m_channels)
+    for (const auto& i : m_channels)
         i->save(*config);
 
     xr_delete(config);
@@ -95,10 +97,10 @@ manager::channels_ids_type const& manager::channels_ids() const
     m_channels_ids.resize(m_channels.size());
 
     auto j = m_channels_ids.begin();
-    for (const auto &i : m_channels)
+    for (const auto& i : m_channels)
         *j++ = xr_strdup(i->id());
 
-    std::sort(m_channels_ids.begin(), m_channels_ids.end(), logical_string_predicate());
+    std::sort(m_channels_ids.begin(), m_channels_ids.end(), detail::logical_string_predicate());
 
     return (m_channels_ids);
 }
@@ -110,4 +112,4 @@ shared_str manager::unique_id(shared_str const& id) const
 
     return (m_collection->generate_unique_id(id.c_str()));
 }
-
+} // namespace editor::environment::sound_channels

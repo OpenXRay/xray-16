@@ -9,7 +9,8 @@
 #include "player_name_modifyer.h"
 #include "xrGameSpy/GameSpy_GP.h"
 #include "xrCore/os_clipboard.h"
-#ifdef XR_PLATFORM_LINUX
+
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #include <sys/types.h>
 #include <pwd.h>
 #endif
@@ -228,25 +229,29 @@ void WriteCDKey_ToRegistry(pstr cdkey)
 
 void GetPlayerName_FromRegistry(char* name, u32 const name_size)
 {
-    string256 new_name;
-#if defined(XR_PLATFORM_LINUX)
+    string256 new_name{};
+
+#if defined(XR_PLATFORM_WINDOWS)
+    if (!ReadRegistry_StrValue(REGISTRY_VALUE_USERNAME, name))
+        name[0] = 0;
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
     uid_t uid = geteuid();
-    struct passwd *pw = getpwuid(uid);
-    if(pw)
+    struct passwd* pw = getpwuid(uid);
+    if (pw)
     {
         strcpy(name, pw->pw_gecos);
         char* pos = strchr(name, ','); // pw_gecos return string
-        if(NULL != pos)
+        if (NULL != pos)
             *pos = 0;
-        if(0 == name[0])
+        if (0 == name[0])
             strcpy(name, pw->pw_name);
     }
-    if (0 == name[0])
 #else
-    if (!ReadRegistry_StrValue(REGISTRY_VALUE_USERNAME, name))
+#   error Select or add implementation for your platform
 #endif
+
+    if (!name[0])
     {
-        name[0] = 0;
         Msg("! Player name registry key (%s) not found !", REGISTRY_VALUE_USERNAME);
         return;
     }

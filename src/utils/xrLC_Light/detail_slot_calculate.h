@@ -24,6 +24,6 @@ extern thread_local Duration t_time;
 extern thread_local u64 t_count;
 
 bool detail_slot_calculate(
-    u32 _x, u32 _z, DetailSlot& DS, DWORDVec& box_result, CDB::COLLIDER& DB, base_lighting& Selected);
+    u32 _x, u32 _z, DetailSlot& DS, DWORDVec& box_result, CDB::COLLIDER& DB, u32 box_options, u32 ray_options, base_lighting& Selected);
 bool detail_slot_process(u32 _x, u32 _z, DetailSlot& DS);
 #endif // #ifndef DETAIL_SLOT_CALCULATE_H_INCLUDED

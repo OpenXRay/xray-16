@@ -7,7 +7,7 @@
 extern Fvector c_spatial_offset[8];
 
 template <bool b_first>
-class walker
+class box_walker
 {
 public:
     u32 mask;
@@ -17,7 +17,7 @@ public:
     ISpatial_DB* space;
 
 public:
-    walker(ISpatial_DB* _space, u32 _mask, const Fvector& _center, const Fvector& _size)
+    box_walker(ISpatial_DB* _space, u32 _mask, const Fvector& _center, const Fvector& _size)
     {
         mask = _mask;
         center = _center;
@@ -77,12 +77,12 @@ void ISpatial_DB::q_box(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const Fvecto
     q_result->clear();
     if (_o & O_ONLYFIRST)
     {
-        walker<true> W(this, _mask, _center, _size);
+        box_walker<true> W(this, _mask, _center, _size);
         W.walk(m_root, m_center, m_bounds);
     }
     else
     {
-        walker<false> W(this, _mask, _center, _size);
+        box_walker<false> W(this, _mask, _center, _size);
         W.walk(m_root, m_center, m_bounds);
     }
     Stats.Query.End();

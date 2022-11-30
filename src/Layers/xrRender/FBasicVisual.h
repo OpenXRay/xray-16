@@ -22,7 +22,7 @@ struct IRender_Mesh
     VertexStagingBuffer* p_rm_Vertices;
     u32 vBase;
     u32 vCount;
-    u32 vStride{ 0 };
+    u32 vStride{};
 
     // indices
     IndexStagingBuffer* p_rm_Indices;

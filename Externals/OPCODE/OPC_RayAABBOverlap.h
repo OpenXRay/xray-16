@@ -1,3 +1,5 @@
+#pragma once
+
 // Opcode 1.1: ray-AABB overlap tests based on Woo's code
 // Opcode 1.2: ray-AABB overlap tests based on the separating axis theorem
 //

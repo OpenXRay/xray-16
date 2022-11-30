@@ -9,13 +9,12 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _VertexEvaluator, typename _vertex_id_type, typename _index_type\
->
+    template <typename _VertexEvaluator, typename _vertex_id_type, typename _index_type>
 
-#define CGameManagerTemplate CBasePathManager<CGameGraph, _VertexEvaluator, _vertex_id_type, _index_type>
+#define CGameManagerTemplate CBaseGamePathManager<_VertexEvaluator, _vertex_id_type, _index_type>
 
 TEMPLATE_SPECIALIZATION
-IC CGameManagerTemplate::CBasePathManager(CRestrictedObject* object) : inherited(object) {}
+IC CGameManagerTemplate::CBaseGamePathManager(CRestrictedObject* object) : inherited(object) {}
 TEMPLATE_SPECIALIZATION
 IC void CGameManagerTemplate::reinit(const CGameGraph* graph) { inherited::reinit(graph); }
 TEMPLATE_SPECIALIZATION

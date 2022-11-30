@@ -16,11 +16,9 @@
 #ifdef XRSE_FACTORY_EXPORTS
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
-#pragma warning(push)
-#pragma warning(disable : 4995)
+
 #include <luabind/luabind.hpp>
 #include <shlwapi.h>
-#pragma warning(pop)
 
 #pragma comment(lib, "shlwapi.lib")
 static SFillPropData fp_data;

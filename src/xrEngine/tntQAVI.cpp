@@ -3,6 +3,8 @@
 
 #include "tntQAVI.h"
 
+#pragma comment(lib, "winmm.lib")
+
 CAviPlayerCustom::CAviPlayerCustom()
 {
     alpha = NULL;

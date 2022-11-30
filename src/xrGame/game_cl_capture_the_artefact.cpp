@@ -30,19 +30,27 @@
 
 #include "reward_event_generator.h"
 
-//#define TEAM0_MENU		"artefacthunt_team0"
-#define GREENTEAM_MENU "capturetheartefact_team1"
-#define BLUETEAM_MENU "capturetheartefact_team2"
-#define BASECOST_SECTION "capturetheartefact_base_cost"
-#define MESSAGE_MENUS "capturetheartefact_messages_menu"
-
-#define ARTEFACT_NEUTRAL "mp_af_neutral_location"
-#define FREE_ARTEFACT_FRIEND "mp_free_af_friend_location"
-#define FRIEND_LOCATION "mp_friend_location"
-#define ARTEFACT_FRIEND "mp_af_friend_location"
-#define ARTEFACT_ENEMY "mp_af_enemy_location"
-
+#ifndef MASTER_GOLD
 #define CLIENT_CTA_LOG
+#endif
+
+namespace detail::mp::capture_the_artefact
+{
+static constexpr pcstr GREENTEAM_MENU       = "capturetheartefact_team1";
+static constexpr pcstr BLUETEAM_MENU        = "capturetheartefact_team2";
+static constexpr pcstr BASECOST_SECTION     = "capturetheartefact_base_cost";
+static constexpr pcstr MESSAGE_MENUS        = "capturetheartefact_messages_menu";
+
+static constexpr pcstr ARTEFACT_NEUTRAL     = "mp_af_neutral_location";
+static constexpr pcstr FREE_ARTEFACT_FRIEND = "mp_free_af_friend_location";
+static constexpr pcstr FRIEND_LOCATION      = "mp_friend_location";
+static constexpr pcstr ARTEFACT_FRIEND      = "mp_af_friend_location";
+static constexpr pcstr ARTEFACT_ENEMY       = "mp_af_enemy_location";
+
+static constexpr size_t MAX_VOTE_PARAMS     = 5;
+
+static constexpr u32   PLAYER_NAME_COLOR    = 0xff40ff40;
+}
 
 game_cl_CaptureTheArtefact::game_cl_CaptureTheArtefact()
 {
@@ -99,8 +107,8 @@ void game_cl_CaptureTheArtefact::Init()
 {
     inherited::Init();
     spawn_cost = READ_IF_EXISTS(pSettings, r_s32, "capturetheartefact_gamedata", "spawn_cost", -10000);
-    LoadTeamData(GREENTEAM_MENU);
-    LoadTeamData(BLUETEAM_MENU);
+    LoadTeamData(::detail::mp::capture_the_artefact::GREENTEAM_MENU);
+    LoadTeamData(::detail::mp::capture_the_artefact::BLUETEAM_MENU);
 }
 
 void game_cl_CaptureTheArtefact::shedule_Update(u32 dt)
@@ -664,7 +672,7 @@ CUIGameCustom* game_cl_CaptureTheArtefact::createGameUI()
     // m_game_ui->Init		(0);
     // m_game_ui->Init		(1);
     // m_game_ui->Init		(2);
-    LoadMessagesMenu(MESSAGE_MENUS);
+    LoadMessagesMenu(::detail::mp::capture_the_artefact::MESSAGE_MENUS);
     return m_game_ui;
 }
 
@@ -732,6 +740,8 @@ void game_cl_CaptureTheArtefact::OnGameMenuRespond_ChangeTeam(NET_Packet& P)
 
 void game_cl_CaptureTheArtefact::UpdateMapLocations()
 {
+    using namespace ::detail::mp::capture_the_artefact;
+
     if (GEnv.isDedicatedServer)
         return;
     // updating firends indicator
@@ -818,6 +828,8 @@ void game_cl_CaptureTheArtefact::UpdateMapLocations()
 
 void game_cl_CaptureTheArtefact::OnSpawn(IGameObject* pObj)
 {
+    using namespace ::detail::mp::capture_the_artefact;
+
     inherited::OnSpawn(pObj);
 
     if (GEnv.isDedicatedServer)
@@ -1149,7 +1161,7 @@ void game_cl_CaptureTheArtefact::OnTeamChanged()
 
     shared_str const& temp_section = GetLocalPlayerTeamSection();
 
-    m_game_ui->UpdateBuyMenu(temp_section, BASECOST_SECTION);
+    m_game_ui->UpdateBuyMenu(temp_section, ::detail::mp::capture_the_artefact::BASECOST_SECTION);
     m_game_ui->UpdateSkinMenu(temp_section);
     m_game_ui->SetRank(static_cast<ETeam>(local_player->team), local_player->rank);
     m_game_ui->ReInitPlayerDefItems();
@@ -1226,9 +1238,10 @@ void game_cl_CaptureTheArtefact::PlayRankChangedSnd()
     }
 }
 
-#define MAX_VOTE_PARAMS 5
 void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
 {
+    using namespace ::detail::mp::capture_the_artefact;
+
     inherited::OnVoteStart(P);
     static char const* ttable[6][2] = {{"restart", "mp_restart"}, {"restart_fast", "mp_restart_fast"},
         {"kick", "mp_kick"}, {"ban", "mp_ban"}, {"changemap", "mp_change_map"}, {"changeweather", "mp_change_weather"}};
@@ -1540,7 +1553,6 @@ bool game_cl_CaptureTheArtefact::IsEnemy(game_PlayerState* ps)
     return (ps->team != local_player->team);
 }
 
-#define PLAYER_NAME_COLOR 0xff40ff40
 void game_cl_CaptureTheArtefact::OnRender()
 {
     game_PlayerState* lookat_player = Game().lookat_player();
@@ -1587,7 +1599,7 @@ void game_cl_CaptureTheArtefact::OnRender()
                 string64 upper_name;
                 xr_strcpy(upper_name, ps->getName());
                 _strupr(upper_name);
-                pActor->RenderText(upper_name, IPos, &dup, PLAYER_NAME_COLOR);
+                pActor->RenderText(upper_name, IPos, &dup, ::detail::mp::capture_the_artefact::PLAYER_NAME_COLOR);
             }
             if (m_bFriendlyIndicators)
             {

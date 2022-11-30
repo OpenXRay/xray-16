@@ -174,6 +174,7 @@
     <ClInclude Include="PhysicsShellAnimatorBoneData.h" />
     <ClInclude Include="physics_scripted.h" />
     <ClInclude Include="ph_valid_ode.h" />
+    <ClInclude Include="SpaceUtils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="tri-colliderknoopc\dcTriangle.h" />
     <ClInclude Include="tri-colliderknoopc\dcTriListCollider.h" />

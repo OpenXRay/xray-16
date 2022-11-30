@@ -21,10 +21,18 @@ SCRIPT_EXPORT(CUILines, (),
 
 SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 {
+    // We don't change game assets.
+    // This class allowes original game scripts to not specify the window name.
+    class CUIStaticScript : public CUIStatic
+    {
+    public:
+        CUIStaticScript() : CUIStatic("CUIStaticScript") {}
+    };
+
     module(luaState)
     [
-        class_<CUIStatic, CUIWindow>("CUIStatic")
-            .def(constructor<>())
+        class_<CUIStatic, CUIWindow>("CUIStaticBase")
+            .def(constructor<pcstr>())
 
             .def("TextControl", &CUIStatic::TextItemControl)
 
@@ -82,7 +90,10 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 
             //.def("GetClipperState", &CUIStatic::GetClipperState)
 
-            .def("SetElipsis", &CUIStatic::SetEllipsis)
+            .def("SetElipsis", &CUIStatic::SetEllipsis),
+
+        class_<CUIStaticScript, CUIStatic>("CUIStatic")
+            .def(constructor<>())
     ];
 });
 

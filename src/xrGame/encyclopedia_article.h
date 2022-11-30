@@ -20,7 +20,7 @@ struct SArticleData : CSharedResource
     shared_str group;
 
     //картинка
-    CUIStatic image;
+    CUIStatic image{ "Image" };
 
     //текст статьи
     xr_string text;

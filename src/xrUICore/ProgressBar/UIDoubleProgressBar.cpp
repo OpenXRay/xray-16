@@ -2,7 +2,7 @@
 #include "UIDoubleProgressBar.h"
 #include "XML/UIXmlInitBase.h"
 
-CUIDoubleProgressBar::CUIDoubleProgressBar()
+CUIDoubleProgressBar::CUIDoubleProgressBar() : CUIWindow("CUIDoubleProgressBar")
 {
     AttachChild(&m_progress_one);
     AttachChild(&m_progress_two);
