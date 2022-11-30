@@ -42,12 +42,13 @@ void CMovementManager::process_level_path()
 
         if (!m_build_at_once)
             break;
+
+        [[fallthrough]]; // xxx: or break?
     }
     case ePathStateContinueLevelPath:
     {
         level_path().select_intermediate_vertex();
-
-        m_path_state = ePathStateBuildDetailPath;
+        [[fallthrough]];
     }
     case ePathStateBuildDetailPath:
     {
@@ -69,9 +70,7 @@ void CMovementManager::process_level_path()
     }
     case ePathStatePathVerification:
     {
-        if (!level_path().actual())
-            m_path_state = ePathStateBuildLevelPath;
-        else if (!detail().actual())
+        if (!level_path().actual() || !detail().actual())
             m_path_state = ePathStateBuildLevelPath;
         else
         {
@@ -86,9 +85,7 @@ void CMovementManager::process_level_path()
     }
     case ePathStatePathCompleted:
     {
-        if (!level_path().actual())
-            m_path_state = ePathStateBuildLevelPath;
-        else if (!detail().actual())
+        if (!level_path().actual() || !detail().actual())
             m_path_state = ePathStateBuildLevelPath;
         break;
     }
