@@ -861,6 +861,9 @@ public:
     void SetArtefactPowerRestoreSpeed(float value);
     void SetArtefactBleedingRestoreSpeed(float value);
 
+    //CAI_Stalker
+    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
+
     //Eatable items
     void SetRemainingUses(u8 value);
     u8 GetRemainingUses();
