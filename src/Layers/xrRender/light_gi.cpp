@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/light.h"
 
-IC bool pred_LI(const light_indirect& A, const light_indirect& B) { return A.E > B.E; }
 void light::gi_generate()
 {
     indirect.clear();
@@ -15,6 +14,7 @@ void light::gi_generate()
     CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
 
+    indirect.reserve(indirect_photons * 8);
     for (int it = 0; it < int(indirect_photons * 8); it++)
     {
         Fvector dir, idir;
@@ -26,28 +26,29 @@ void light::gi_generate()
         }
         dir.normalize();
         xrc.ray_query(CDB::OPT_CULL | CDB::OPT_ONLYNEAREST, model, position, dir, range);
-        if (!xrc.r_count())
-            continue;
-        CDB::RESULT* R = RImplementation.Sectors_xrc.r_begin();
-        CDB::TRI& T = tris[R->id];
-        Fvector Tv[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
-        Fvector TN;
-        TN.mknormal(Tv[0], Tv[1], Tv[2]);
-        float dot = TN.dotproduct(idir.invert(dir));
+        if (xrc.r_count() != 0) {
+            CDB::RESULT *R = xrc.r_begin();
+            CDB::TRI &T = tris[R->id];
+            Fvector Tv[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
+            Fvector TN;
+            TN.mknormal(Tv[0], Tv[1], Tv[2]);
+            float dot = TN.dotproduct(idir.invert(dir));
 
-        light_indirect LI;
-        LI.P.mad(position, dir, R->range);
-        LI.D.reflect(dir, TN);
-        LI.E = dot * (1 - R->range / range);
-        if (LI.E < ps_r2_GI_clip)
-            continue;
-        LI.S = spatial.sector; //. BUG
-
-        indirect.push_back(LI);
+            light_indirect LI;
+            LI.E = dot * (1 - R->range / range);
+            if (LI.E > ps_r2_GI_clip) {
+                LI.P.mad(position, dir, R->range);
+                LI.D.reflect(dir, TN);
+                LI.S = spatial.sector; //. BUG
+                indirect.push_back(LI);
+            }
+        }
     }
 
     // sort & clip
-    std::sort(indirect.begin(), indirect.end(), pred_LI);
+    std::sort(indirect.begin(), indirect.end(), [](const light_indirect& A, const light_indirect& B) {
+        return A.E > B.E;
+    });
     if (indirect.size() > indirect_photons)
         indirect.erase(indirect.begin() + indirect_photons, indirect.end());
 

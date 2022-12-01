@@ -115,7 +115,6 @@ extern ECORE_API Fvector ps_r2_aa_barier; // r2-only
 extern ECORE_API Fvector ps_r2_aa_weight; // r2-only
 extern ECORE_API float ps_r2_aa_kernel; // r2-only
 extern ECORE_API float ps_r2_mblur; // .5f
-extern ECORE_API int ps_r2_GI_depth; // 1..5
 extern ECORE_API int ps_r2_GI_photons; // 8..256
 extern ECORE_API float ps_r2_GI_clip; // EPS
 extern ECORE_API float ps_r2_GI_refl; // .9f
