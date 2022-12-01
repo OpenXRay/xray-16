@@ -14,7 +14,6 @@ SCRIPT_EXPORT(CMapManager, (),
             .def("RemoveMapLocationByObjectID", &CMapManager::RemoveMapLocationByObjectID)
             .def("RemoveMapLocation", (void (CMapManager::*)(CMapLocation*))&CMapManager::RemoveMapLocation)
             .def("DisableAllPointers", &CMapManager::DisableAllPointers)
-
     ];
 });
 
