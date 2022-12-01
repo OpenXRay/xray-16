@@ -850,20 +850,43 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
     }
     else
     {
-        char* pref_path = nullptr;
-        if (strstr(Core.Params, "-fsltx"))
-            pref_path = SDL_GetBasePath();
+        // If the fs ltx exists in the current working directory use it, if not use the perf path
+        if (access(FSLTX, F_OK) == 0)
+            getcwd(full_current_directory, sizeof full_current_directory);
         else
         {
+            char* pref_path;
             if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
             else if (strstr(Core.Params, "-cs"))
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
             else
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
+
+            /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
+             * I propose adding shaders from /usr/share/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
+             * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
+            chdir(pref_path);
+            string_path tmp;
+            xr_sprintf(tmp, "%sfsgame.ltx", pref_path);
+            struct stat statbuf;
+            ZeroMemory(&statbuf, sizeof(statbuf));
+            int res = lstat(tmp, &statbuf);
+            if (-1 == res || !S_ISLNK(statbuf.st_mode))
+                symlink("/usr/share/openxray/fsgame.ltx", tmp);
+            xr_sprintf(tmp, "%sgamedata/shaders/gl", pref_path);
+            ZeroMemory(&statbuf, sizeof(statbuf));
+            res = lstat(tmp, &statbuf);
+            if (-1 == res || !S_ISLNK(statbuf.st_mode))
+            {
+                mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);
+            }
+
+            SDL_strlcpy(full_current_directory, pref_path, sizeof full_current_directory);
+            SDL_free(pref_path);
         }
-        SDL_strlcpy(full_current_directory, pref_path, sizeof full_current_directory);
-        SDL_free(pref_path);
     }
 #else
 #   error Select or add implementation for your platform

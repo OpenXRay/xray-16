@@ -1,6 +1,10 @@
 #include "stdafx.h"
 
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#include <dlfcn.h>
+#else
 #include <SDL_loadso.h>
+#endif
 
 #include "ModuleLookup.hpp"
 
@@ -26,7 +30,6 @@ void* ModuleHandle::Open(pcstr moduleName)
     Log("Loading module:", moduleName);
 
     xr_string buf(moduleName);
-
 #ifdef XR_PLATFORM_WINDOWS
     buf += ".dll";
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
@@ -37,12 +40,23 @@ void* ModuleHandle::Open(pcstr moduleName)
 #error add your platform-specific extension here
 #endif
 
+    pcstr error = nullptr;
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+    // For platforms that use rpath we have to call dlopen() from our own module
+    handle = dlopen(buf.c_str(), RTLD_NOW);
+    if (!handle)
+        error = dlerror();
+#else
     handle = SDL_LoadObject(buf.c_str());
+    if (!handle)
+        error = SDL_GetError();
+#endif
 
     if (!handle)
     {
         Log("! Failed to load module:", moduleName);
-        Log("!", SDL_GetError());
+        if (error)
+            Log("!", error);
     }
 
     return handle;
@@ -53,7 +67,11 @@ void ModuleHandle::Close()
     if (dontUnload)
         return;
 
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+    dlclose(handle);
+#else
     SDL_UnloadObject(handle);
+#endif
     handle = nullptr;
 }
 
@@ -69,12 +87,22 @@ void* ModuleHandle::operator()() const
 
 void* ModuleHandle::GetProcAddress(pcstr procName) const
 {
+    pcstr error = nullptr;
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+    const auto proc = dlsym(handle, procName);
+    if (!proc)
+        error = dlerror();
+#else
     const auto proc = SDL_LoadFunction(handle, procName);
+    if (!proc)
+        error = SDL_GetError();
+#endif
 
     if (!proc)
     {
         Log("! Failed to load function from module:", procName);
-        Log("!", SDL_GetError());
+        if (error)
+            Log("!", error);
     }
 
     return proc;

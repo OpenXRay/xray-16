@@ -182,20 +182,18 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
-        char* pref_path = nullptr;
-        if (strstr(Core.Params, "-fsltx"))
-            pref_path = SDL_GetBasePath();
-        else
+        char* base_path = SDL_GetBasePath();
+        if (!base_path)
         {
             if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
-                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
+                base_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
             else if (strstr(Core.Params, "-cs"))
-                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
+                base_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
             else
-                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
+                base_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
         }
-        SDL_strlcpy(ApplicationPath, pref_path, sizeof(ApplicationPath));
-        SDL_free(pref_path);
+        SDL_strlcpy(ApplicationPath, base_path, sizeof(ApplicationPath));
+        SDL_free(base_path);
 #else
 #   error Select or add implementation for your platform
 #endif
@@ -214,51 +212,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
         getcwd(WorkingPath, sizeof(WorkingPath));
-
-        /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
-        * I propose adding shaders from <CMAKE_INSTALL_FULL_DATAROOTDIR>/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
-        * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
-        if (!strstr(Core.Params, "-fsltx"))
-        {
-            chdir(ApplicationPath);
-            constexpr pcstr install_dir = MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR);
-            string_path tmp, tmp_lnk;
-            xr_sprintf(tmp, "%sfsgame.ltx", ApplicationPath);
-            struct stat statbuf;
-            ZeroMemory(&statbuf, sizeof(statbuf));
-            /* First check if following symlinks returns success.
-             * If it doesn't, additionally check if not following symlinks is successful (catches symlink itself being broken),
-             * -> delete the symlink if it is.
-             * Then, make a new symlink to our resources.
-             * This doesn't account for other stat errors (EACCES, ENAMETOOLONG, ENOENT caused by missing path component) */
-            int res = stat(tmp, &statbuf);
-            if (res != 0)
-            {
-                ZeroMemory(&statbuf, sizeof(statbuf));
-                res = lstat(tmp, &statbuf);
-                if (res == 0)
-                    xr_unlink(tmp);
-                xr_sprintf(tmp_lnk, "%s/openxray/fsgame.ltx", install_dir);
-                symlink(tmp_lnk, tmp);
-            }
-            xr_sprintf(tmp, "%sgamedata/shaders/gl", ApplicationPath);
-            ZeroMemory(&statbuf, sizeof(statbuf));
-            res = stat(tmp, &statbuf);
-            if (res != 0)
-            {
-                ZeroMemory(&statbuf, sizeof(statbuf));
-                res = lstat(tmp, &statbuf);
-                if (res == 0)
-                    xr_unlink(tmp);
-                else
-                {
-                    mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                    mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                }
-                xr_sprintf(tmp_lnk, "%s/openxray/gamedata/shaders/gl", install_dir);
-                symlink(tmp_lnk, tmp);
-            }
-        }
 #else
 #   error Select or add implementation for your platform
 #endif
