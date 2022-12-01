@@ -265,7 +265,7 @@ jobs:
 
   build-macos:
     name: macOS ${{ matrix.Configuration }} ${{ matrix.Platform }}
-    runs-on: macos-latest
+    runs-on: macos-11
     strategy:
       fail-fast: false
       matrix:
