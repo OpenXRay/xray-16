@@ -28,7 +28,7 @@
       <PreprocessorDefinitions>_USRDLL;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4237;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Condition="'$(GITHUB_ACTIONS)'!=''">
+    <ClCompile Condition="'$(EnableUnitySupport)'=='true'">
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MaxFilesInUnityFile Condition="$(Configuration.Contains('Release'))">50</MaxFilesInUnityFile>
     </ClCompile>
