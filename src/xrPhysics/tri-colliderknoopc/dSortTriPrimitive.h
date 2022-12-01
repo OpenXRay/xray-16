@@ -95,9 +95,8 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
         aabb.set(AABB);
         aabb.mul(ph_console::ph_tri_query_ex_aabb_rate);
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        XRC.box_options(0);
         // VERIFY( g_pGameLevel );
-        XRC.box_query(inl_ph_world().ObjectSpace().GetStaticModel(), cast_fv(p), aabb);
+        XRC.box_query(0, inl_ph_world().ObjectSpace().GetStaticModel(), cast_fv(p), aabb);
 
 #ifdef DEBUG
         debug_output().dbg_total_saved_tries() -= data->cashed_tries.size();

@@ -1,12 +1,9 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
-#define CStateMonsterHittedMoveOutAbstract CStateMonsterHittedMoveOut<_Object>
+    template <typename _Object>
 
-#define DIST_TO_PATH_END 1.5f
-#define DIST_TO_HIT_POINT 3.f
+#define CStateMonsterHittedMoveOutAbstract CStateMonsterHittedMoveOut<_Object>
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterHittedMoveOutAbstract::initialize()

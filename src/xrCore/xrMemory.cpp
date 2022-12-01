@@ -112,10 +112,12 @@ size_t xrMemory::mem_usage()
         CloseHandle(h);
     }
     return pmc.PagefileUsage;
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
     return (size_t)ru.ru_maxrss;
+#else
+#   error Select or add an implementation for your platform
 #endif
 }
 

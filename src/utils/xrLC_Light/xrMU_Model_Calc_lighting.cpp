@@ -7,7 +7,7 @@
 #include "xrface.h"
 #include "xrLC_GlobalData.h"
 
-void LightPoint(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c& C, Fvector& P, Fvector& N, base_lighting& lights,
+void LightPoint(CDB::COLLIDER* DB, u32 ray_options, CDB::MODEL* MDL, base_color_c& C, Fvector& P, Fvector& N, base_lighting& lights,
     u32 flags, Face* skip);
 union var
 {
@@ -76,7 +76,6 @@ void xrMU_Model::calc_lighting(
 
     // Perform lighting
     CDB::COLLIDER DB;
-    DB.ray_options(0);
 
     // Disable faces if needed
     /*
@@ -117,7 +116,7 @@ void xrMU_Model::calc_lighting(
             Fvector P, N;
             N.random_dir(vN, deg2rad(30.f));
             P.mad(vP, N, a);
-            LightPoint(&DB, MDL, vC, P, N, lights, flags, 0);
+            LightPoint(&DB, 0, MDL, vC, P, N, lights, flags, 0);
         }
         vC.scale(n_samples);
         vC._tmp_ = v_trans;

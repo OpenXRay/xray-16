@@ -148,8 +148,13 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
-class CControllerPsyHitCamEffector : public CEffectorCam
+class CControllerPsyHitCamEffector final : public CEffectorCam
 {
+    static constexpr float DELTA_ANGLE_X = 0.5f * PI / 180.f;
+    static constexpr float DELTA_ANGLE_Y = 0.5f * PI / 180.f;
+    static constexpr float DELTA_ANGLE_Z = 0.5f * PI / 180.f;
+    static constexpr float ANGLE_SPEED = 1.5f;
+
 protected:
     using inherited = CEffectorCam;
 

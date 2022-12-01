@@ -813,6 +813,8 @@ IC CActorCondition& CActor::conditions() const
     return (*m_entity_condition);
 }
 
+extern Fvector g_start_position;
+extern int g_start_game_vertex_id;
 extern CActor* g_actor;
 CActor* Actor();
 extern const float s_fFallTime;

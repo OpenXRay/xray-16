@@ -101,13 +101,13 @@ void CBlender_LmEbB::Compile(CBlender_Compile& C)
         else
             C.r_Pass("lmapE", "lmapE", TRUE);
 #if RENDER == R_R3 || RENDER == R_R4
-        C.r_dx10Texture("s_base", C.L_textures[0]);
-        C.r_dx10Sampler("smp_base");
-        C.r_dx10Texture("s_lmap", C.L_textures[1]);
-        C.r_dx10Sampler("smp_linear");
-        C.r_dx10Texture("s_hemi", *C.L_textures[2]);
-        C.r_dx10Sampler("smp_rtlinear");
-        C.r_dx10Texture("s_env", oT2_Name);
+        C.r_dx11Texture("s_base", C.L_textures[0]);
+        C.r_dx11Sampler("smp_base");
+        C.r_dx11Texture("s_lmap", C.L_textures[1]);
+        C.r_dx11Sampler("smp_linear");
+        C.r_dx11Texture("s_hemi", *C.L_textures[2]);
+        C.r_dx11Sampler("smp_rtlinear");
+        C.r_dx11Texture("s_env", oT2_Name);
 #else
         C.r_Sampler("s_base", C.L_textures[0]);
         C.r_Sampler("s_lmap", C.L_textures[1]);

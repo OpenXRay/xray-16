@@ -200,7 +200,8 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
 /// ----------------------------------------------------------------
 
 UIArtefactParamItem::UIArtefactParamItem()
-    : m_magnitude(1.0f), m_sign_inverse(false), m_unit_str(""),
+    : CUIStatic("UIArtefactParamItem"),
+      m_magnitude(1.0f), m_sign_inverse(false), m_unit_str(""),
       m_texture_minus(""), m_texture_plus("") {}
 
 UIArtefactParamItem::InitResult UIArtefactParamItem::Init(CUIXml& xml, pcstr section)
@@ -239,7 +240,7 @@ UIArtefactParamItem::InitResult UIArtefactParamItem::InitPlain(CUIXml& xml, pcst
     if (!CUIXmlInit::InitStatic(xml, buf, 0, this, false))
         return InitResult::Failed;
 
-    m_caption = xr_new<CUIStatic>();
+    m_caption = xr_new<CUIStatic>("Caption");
     m_caption->SetAutoDelete(true);
     AttachChild(m_caption);
     m_caption->Show(false); // hack

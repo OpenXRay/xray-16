@@ -421,8 +421,7 @@ bool CVisualMemoryManager::should_ignore_object(IGameObject const* object) const
     {
         return true;
     }
-    else
-#endif // MASTER_GOLD
+#endif
 
         if (CBaseMonster const* const monster = smart_cast<CBaseMonster const*>(object))
     {

@@ -597,3 +597,16 @@ void CScriptGameObject::RemoveMemoryVisibleObject(const MemorySpace::CVisibleObj
 
     stalker->memory().visual().remove(&memory_object);
 }
+
+void CScriptGameObject::ResetBoneProtections(pcstr imm_sect, pcstr bone_sect)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+    {
+        GEnv.ScriptEngine->script_log(
+            LuaMessageType::Error, "CAI_Stalker : cannot access class member ResetBoneProtections!");
+        return;
+    }
+
+    stalker->ResetBoneProtections(imm_sect, bone_sect);
+}

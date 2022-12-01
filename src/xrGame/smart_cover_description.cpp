@@ -6,26 +6,49 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
+
 #include "smart_cover_description.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "Common/object_broker.h"
 #include "smart_cover_loophole.h"
 #include "smart_cover_object.h"
-#include "ai_monster_space.h"
 #include "smart_cover_transition.hpp"
 
-using namespace MonsterSpace;
-using smart_cover::description;
-using smart_cover::loophole;
-using smart_cover::detail::parse_float;
-using smart_cover::detail::parse_string;
-using smart_cover::detail::parse_table;
-using smart_cover::detail::parse_fvector;
-using smart_cover::detail::parse_int;
+template <typename _data_type, typename _edge_weight_type, typename _vertex_id_type, typename _edge_data_type>
+IC void delete_data(const CGraphAbstract<_data_type, _edge_weight_type, _vertex_id_type, _edge_data_type>& graph_)
+{
+    typedef CGraphAbstract<_data_type, _edge_weight_type, _vertex_id_type, _edge_data_type> Graph;
+
+    Graph& graph = const_cast<Graph&>(graph_);
+
+    using Vertices = typename Graph::VERTICES;
+    using Edges = typename Graph::EDGES;
+
+    Vertices& verts = graph.vertices();
+
+    for (auto vi = verts.begin(); vi != verts.end(); ++vi)
+    {
+        typename Graph::CVertex* vert = (*vi).second;
+        delete_data(vert->data());
+
+        Edges& edges = const_cast<Edges&>(vert->edges());
+        for (auto ei = edges.begin(); ei != edges.end(); ++ei)
+        {
+            typename Graph::CEdge& edge = (*ei);
+            delete_data(edge.data());
+        }
+    }
+}
 
 namespace smart_cover
 {
+using detail::parse_float;
+using detail::parse_string;
+using detail::parse_table;
+using detail::parse_fvector;
+using detail::parse_int;
+
 static LPCSTR s_enter_loophole_id = "<__ENTER__>";
 static LPCSTR s_exit_loophole_id = "<__EXIT__>";
 
@@ -44,12 +67,11 @@ shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool co
 {
     return (transform_vertex(parse_string(table, identifier), in));
 }
-} // namespace smart_cover
 
 class enterable_predicate
 {
 public:
-    IC bool operator()(loophole* const& loophole) const
+    bool operator()(loophole* const& loophole) const
     {
         VERIFY(loophole);
         return (loophole->enterable());
@@ -59,7 +81,7 @@ public:
 class exitable_predicate
 {
 public:
-    IC bool operator()(loophole* const& loophole) const
+    bool operator()(loophole* const& loophole) const
     {
         VERIFY(loophole);
         return (loophole->exitable());
@@ -69,7 +91,7 @@ public:
 class usable_predicate
 {
 public:
-    IC bool operator()(loophole* const& loophole) const
+    bool operator()(loophole* const& loophole) const
     {
         VERIFY(loophole);
         return (loophole->usable());
@@ -103,7 +125,7 @@ void description::load_loopholes(shared_str const& table_id)
             continue;
         }
 
-        smart_cover::loophole* loophole = xr_new<smart_cover::loophole>(table);
+        auto* loophole = xr_new<smart_cover::loophole>(table);
         VERIFY(m_loopholes.end() == std::find_if(m_loopholes.begin(), m_loopholes.end(),
             [=](smart_cover::loophole* const lh) { return loophole->id()._get() == lh->id()._get(); }));
 
@@ -122,7 +144,7 @@ void description::process_loopholes()
 
     for (; I != E; ++I)
     {
-        ::loophole* current = *I;
+        loophole* current = *I;
         current->enterable(m_transitions.edge(transform_vertex("", true), current->id()) != 0);
         current->exitable(m_transitions.edge(current->id(), transform_vertex("", false)) != 0);
     }
@@ -181,32 +203,6 @@ void description::load_actions(luabind::object const& table, description::Action
     }
 }
 
-template <typename _data_type, typename _edge_weight_type, typename _vertex_id_type, typename _edge_data_type>
-IC void delete_data(const CGraphAbstract<_data_type, _edge_weight_type, _vertex_id_type, _edge_data_type>& graph_)
-{
-    typedef CGraphAbstract<_data_type, _edge_weight_type, _vertex_id_type, _edge_data_type> Graph;
-
-    Graph& graph = const_cast<Graph&>(graph_);
-
-    using Vertices = typename Graph::VERTICES;
-    using Edges = typename Graph::EDGES;
-
-    Vertices& verts = graph.vertices();
-
-    for (auto vi = verts.begin(); vi != verts.end(); ++vi)
-    {
-        typename Graph::CVertex* vert = (*vi).second;
-        delete_data(vert->data());
-
-        Edges& edges = const_cast<Edges&>(vert->edges());
-        for (auto ei = edges.begin(); ei != edges.end(); ++ei)
-        {
-            typename Graph::CEdge& edge = (*ei);
-            delete_data(edge.data());
-        }
-    }
-}
-
 description::~description()
 {
     delete_data(m_loopholes);
@@ -233,3 +229,4 @@ loophole const* description::get_loophole(shared_str const& loophole_id) const
 
     return (0);
 }
+} // namespace smart_cover

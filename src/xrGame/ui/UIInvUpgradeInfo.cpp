@@ -21,6 +21,7 @@
 #include "UIHelper.h"
 
 UIInvUpgradeInfo::UIInvUpgradeInfo()
+    : CUIWindow("UIInvUpgradeInfo")
 {
     m_upgrade = nullptr;
     m_background = nullptr;

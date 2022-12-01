@@ -8,7 +8,7 @@
 
 CUIOutfitDragDropList::CUIOutfitDragDropList()
 {
-    m_background = xr_new<CUIStatic>();
+    m_background = xr_new<CUIStatic>("Background");
     m_background->SetAutoDelete(true);
     CUIWindow::AttachChild(m_background);
     m_default_outfit = "npc_icon_without_outfit";

@@ -25,7 +25,7 @@ void CRenderTarget::phase_smap_spot(light* L)
     if (RImplementation.o.HW_smap)
         RCache.set_ColorWriteEnable(FALSE);
 
-    // For DX10 do it once per smap generation pass in phase_smap_spot_clear
+    // For DX11 do it once per smap generation pass in phase_smap_spot_clear
 #ifdef USE_DX9
     RCache.ClearZB(rt_smap_depth, 1.0f);
 #endif

@@ -47,7 +47,10 @@ SVS::~SVS()
 #if defined(USE_DX9) || defined(USE_DX11)
     _RELEASE(sh);
 #elif defined(USE_OGL)
-    CHK_GL(glDeleteProgram(sh));
+    if (HW.SeparateShaderObjectsSupported)
+        CHK_GL(glDeleteProgram(sh));
+    else
+        CHK_GL(glDeleteShader(sh));
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -60,7 +63,10 @@ SPS::~SPS()
 #if defined(USE_DX9) || defined(USE_DX11)
     _RELEASE(sh);
 #elif defined(USE_OGL)
-    CHK_GL(glDeleteProgram(sh));
+    if (HW.SeparateShaderObjectsSupported)
+        CHK_GL(glDeleteProgram(sh));
+    else
+        CHK_GL(glDeleteShader(sh));
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -76,7 +82,10 @@ SGS::~SGS()
 #   if defined(USE_DX11)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
-    CHK_GL(glDeleteProgram(sh));
+    if (HW.SeparateShaderObjectsSupported)
+        CHK_GL(glDeleteProgram(sh));
+    else
+        CHK_GL(glDeleteShader(sh));
 #   else
 #       error No graphics API selected or enabled!
 #   endif
@@ -89,7 +98,10 @@ SHS::~SHS()
 #   if defined(USE_DX11)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
-    CHK_GL(glDeleteProgram(sh));
+    if (HW.SeparateShaderObjectsSupported)
+        CHK_GL(glDeleteProgram(sh));
+    else
+        CHK_GL(glDeleteShader(sh));
 #   else
 #       error No graphics API selected or enabled!
 #   endif
@@ -102,7 +114,10 @@ SDS::~SDS()
 #   if defined(USE_DX11)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
-    CHK_GL(glDeleteProgram(sh));
+    if (HW.SeparateShaderObjectsSupported)
+        CHK_GL(glDeleteProgram(sh));
+    else
+        CHK_GL(glDeleteShader(sh));
 #   endif
 
     RImplementation.Resources->_DeleteDS(this);
@@ -113,7 +128,10 @@ SCS::~SCS()
 #    if defined(USE_DX11)
     _RELEASE(sh);
 #    elif defined(USE_OGL)
-    CHK_GL(glDeleteProgram(sh));
+    if (HW.SeparateShaderObjectsSupported)
+        CHK_GL(glDeleteProgram(sh));
+    else
+        CHK_GL(glDeleteShader(sh));
 #   else
 #       error No graphics API selected or enabled!
 #   endif
@@ -121,6 +139,19 @@ SCS::~SCS()
     RImplementation.Resources->_DeleteCS(this);
 }
 #endif // USE_DX11 || USE_OGL
+
+#if defined(USE_OGL)
+SPP::~SPP()
+{
+    if (HW.SeparateShaderObjectsSupported)
+        CHK_GL(glDeleteProgramPipelines(1, &pp));
+    else
+        CHK_GL(glDeleteProgram(pp));
+
+    RImplementation.Resources->_DeletePP(this);
+}
+#endif // USE_OGL
+
 
 #if defined(USE_DX11)
 ///////////////////////////////////////////////////////////////////////

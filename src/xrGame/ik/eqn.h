@@ -30,8 +30,7 @@
 
  */
 
-#ifndef _EQNH
-#define _EQNH
+#pragma once
 
 #include "aint.h"
 
@@ -39,6 +38,8 @@
 // Evaluate alpha*cos(x) + beta*sin(x) efficiently
 //
 
+namespace eqn
+{
 inline float sin_and_cos(float x, float alpha, float beta)
 {
     while (x < 0)
@@ -61,7 +62,7 @@ inline float sin_and_cos(float x, float alpha, float beta)
 struct PsiEquation
 {
     unsigned char status, num_crits, num_roots;
-    unsigned char *status_ptr, *num_roots_ptr, *num_crits_ptr;
+    unsigned char* status_ptr, * num_roots_ptr, * num_crits_ptr;
     float alpha, beta, xi;
     float crit_pts[2], root_pts[2];
 
@@ -131,5 +132,4 @@ struct PsiEquation
     //
     // int partition(float y, AngleIntList &above,  AngleIntList &below) const;
 };
-
-#endif
+} // namespace eqn

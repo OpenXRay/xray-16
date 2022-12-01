@@ -13,9 +13,12 @@
 #include "xrCore/Text/StringConversion.hpp"
 #include "Common/object_broker.h"
 #include "xr_input.h"
-#include "SDL.h"
 
 #include "edit_actions.h"
+
+#include <SDL.h>
+
+#include <locale>
 
 ENGINE_API float g_console_sensitive = 0.15f;
 

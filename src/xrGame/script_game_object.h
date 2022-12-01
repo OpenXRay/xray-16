@@ -797,8 +797,11 @@ public:
     bool is_weapon_going_to_be_strapped(CScriptGameObject const* object) const;
     
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
+    // Alundaio
+    void inactualize_level_path();
+    void inactualize_game_path();
+
     void SetHealthEx(float hp); //AVO
-    //Alundaio
     float GetLuminocityHemi();
     float GetLuminocity();
     bool Use(CScriptGameObject* obj);
@@ -863,6 +866,9 @@ public:
     void RemoveMemorySoundObject(const MemorySpace::CSoundObject& memory_object);
     void RemoveMemoryHitObject(const MemorySpace::CHitObject& memory_object);
     void RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject& memory_object);
+
+    //CAI_Stalker
+    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
 
     //Eatable items
     void SetRemainingUses(u8 value);

@@ -216,7 +216,7 @@ public:
             float min_dist = 2 * map_size;
             for (int p = 0; p < 4; ++p)
             {
-                float dist;
+                float dist = 0.0f;
                 if ((light_cuboid_polys[p].plane.n.dotproduct(view_frustum_rays[i].D)) > -0.1)
                     dist = map_size;
                 else
@@ -267,7 +267,7 @@ public:
     {
         Fmatrix trans_mat;
         trans_mat.translate(translate);
-        for (int i = 0; i < LIGHT_CUBOIDSIDEPOLYS_COUNT; ++i)
+        for (u32 i = 0; i < LIGHT_CUBOIDSIDEPOLYS_COUNT; ++i)
             light_cuboid_polys[i].plane.d -= translate.dotproduct(light_cuboid_polys[i].plane.n);
     }
 };

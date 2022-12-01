@@ -82,6 +82,7 @@
     <ClCompile Include="NvMender2003\NVMeshMender.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="PlatformApple.inl" />
     <None Include="PlatformBSD.inl" />
   </ItemGroup>
   <ItemGroup>

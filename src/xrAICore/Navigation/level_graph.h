@@ -12,6 +12,7 @@
 #include "xrAICore/Navigation/level_graph_space.h"
 #include "xrAICore/Navigation/game_graph_space.h"
 #include "xrAICore/Navigation/level_graph_manager.h"
+#include "xrCore/_plane.h"
 
 namespace LevelGraph
 {

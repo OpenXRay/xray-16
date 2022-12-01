@@ -115,6 +115,9 @@
     <None Include="PlatformBSD.inl">
       <Filter>Platform</Filter>
     </None>
+    <None Include="PlatformApple.inl">
+      <Filter>Platform</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />

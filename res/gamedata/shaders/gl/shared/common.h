@@ -26,7 +26,7 @@
 #define float4x4    mat4
 #define float3x4    mat4x3
 
-vec4	mul(int a,		vec4 b)	{ return a * b; }
+vec4	mul(int a,		vec4 b)	{ return float(a) * b; }
 vec4	mul(float a,	vec4 b)	{ return a * b; }
 vec3	mul(mat3 a,		vec3 b)	{ return a * b; }
 vec3	mul(vec3 a,		mat3 b)	{ return a * b; }
@@ -124,7 +124,7 @@ void	sincos(float x, out float s, out float c) { s = sin(x); c = cos(x); }
 
 float 	calc_cyclic 	(float x)				
 {
-	float 	phase 	= 1/(2*3.141592653589);
+	float 	phase 	= 1.0/(2.0*3.141592653589);
 	float 	sqrt2	= 1.4142136;
 	float 	sqrt2m2	= 2.8284271;
 	float 	f 	= sqrt2m2*frac(x)-sqrt2;	// [-sqrt2 .. +sqrt2] !No changes made, but this controls the grass wave (which is violent if I must say)

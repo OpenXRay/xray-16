@@ -55,15 +55,15 @@ static u8 *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
 inline void PrefetchData(void* Addr)
 {
 #if defined(_USE_PREFETCHING)
-    u8 PrefetchByte = *(volatile u8*)Addr;
-#endif /* defined(_USE_PREFETCHING) */
+    [[maybe_unused]] u8 PrefetchByte = *(volatile u8*)Addr;
+#endif
 }
 
 inline void BLK_NODE::insert(void* pv, int NU)
 {
     MEM_BLK* p = (MEM_BLK*)pv;
     link(p);
-    p->Stamp = ~0UL;
+    p->Stamp = ~(u32{});
     p->NU = NU;
     Stamp++;
 }
@@ -287,7 +287,7 @@ inline void SpecialFreeUnit(void* ptr)
         BList->insert(ptr, 1);
     else
     {
-        *(u32*)ptr = ~0UL;
+        *(u32*)ptr = ~(u32{});
         UnitsStart += UNIT_SIZE;
     }
 }

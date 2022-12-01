@@ -67,7 +67,6 @@
 
 #if defined(WIN32) || defined(_WIN32_WCE)
 #include <windows.h>
-#include <tchar.h>
 #endif
 
 #include <stdio.h>
@@ -101,23 +100,8 @@ typedef void*          HDC;
 
 typedef int boolean;
 
-#define _tfopen fopen
-
-#ifndef BOOL
-#define	BOOL bool
-#endif
-
-#ifndef TRUE
-#define	TRUE true
-#endif
-
-#ifndef FALSE
-#define	FALSE false
-#endif
-
 #ifndef TCHAR
 #define TCHAR char
-#define _T
 #endif
 
 typedef struct tagRGBQUAD {

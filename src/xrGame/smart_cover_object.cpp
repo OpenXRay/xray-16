@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
+
 #include "smart_cover_object.h"
 #include "xrServerEntities/xrServer_Objects_Alife_Smartcovers.h"
 #include "Level.h"
@@ -18,8 +19,13 @@
 #include "smart_cover_description.h"
 #include "smart_cover_loophole.h"
 #include "xrEngine/xr_collide_form.h"
-using smart_cover::object;
 
+#ifdef DEBUG
+void dbg_draw_frustum(float FOV, float _FAR, float A, Fvector& P, Fvector& D, Fvector& U);
+#endif
+
+namespace smart_cover
+{
 void object::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -82,12 +88,14 @@ bool object::net_Spawn(CSE_Abstract* server_entity)
 }
 
 void object::Center(Fvector& result) const { XFORM().transform_tiny(result, GetCForm()->getSphere().P); }
-float object::Radius() const { return (GetCForm()->getRadius()); }
-void object::UpdateCL() { NODEFAULT; }
-void object::shedule_Update(u32 dt) { NODEFAULT; }
-#ifdef DEBUG
-void dbg_draw_frustum(float FOV, float _FAR, float A, Fvector& P, Fvector& D, Fvector& U);
 
+float object::Radius() const { return (GetCForm()->getRadius()); }
+
+void object::UpdateCL() { NODEFAULT; }
+
+void object::shedule_Update(u32 dt) { NODEFAULT; }
+
+#ifdef DEBUG
 void object::OnRender()
 {
     GEnv.DRender->OnFrameEnd();
@@ -210,3 +218,4 @@ bool object::inside(Fvector const& position) const
 
     return (false);
 }
+} // namespace smart_cover

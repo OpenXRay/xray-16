@@ -13,24 +13,19 @@ public:
 };
 
 #if RENDER != R_R2
-class CBlender_accum_direct_mask_msaa : public IBlender
+class CBlender_accum_direct_mask_msaa final : public IBlender
 {
+    pcstr Name{};
+    pcstr Definition{};
+
 public:
+    CBlender_accum_direct_mask_msaa() = default;
+    CBlender_accum_direct_mask_msaa(pcstr name, pcstr definition)
+        : Name(name), Definition(definition) {}
+
     virtual LPCSTR getComment() { return "INTERNAL: mask direct light msaa"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
-    {
-        this->Name = Name;
-        this->Definition = Definition;
-    }
-
     virtual void Compile(CBlender_Compile& C);
-
-    CBlender_accum_direct_mask_msaa();
-    virtual ~CBlender_accum_direct_mask_msaa();
-
-    LPCSTR Name;
-    LPCSTR Definition;
 };
 #endif

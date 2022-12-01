@@ -23,6 +23,7 @@
     <ClCompile>
       <PreprocessorDefinitions>XRUICORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

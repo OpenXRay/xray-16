@@ -28,8 +28,6 @@ XRCORE_API ThreadHandle GetCurrentThreadHandle();
 
 XRCORE_API bool ThreadIdsAreEqual(ThreadId left, ThreadId right);
 
-XRCORE_API void SetThreadName(ThreadHandle threadHandle, pcstr name);
-
 XRCORE_API void SetCurrentThreadName(pcstr name);
 
 XRCORE_API bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist);

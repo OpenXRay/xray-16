@@ -1,13 +1,16 @@
 #include "stdafx.h"
+
+#include <tuple>
 #include <stdio.h>
 
 void LogOut(const char* format, ...)
 {
-    va_list argptr;
-    char text[4096];
+    constexpr size_t BUF_SIZE = 4096;
+    char text[BUF_SIZE];
 
+    va_list argptr;
     va_start(argptr, format);
-    vsprintf(text, format, argptr);
+    vsprintf_s(text, BUF_SIZE, format, argptr);
     va_end(argptr);
 
     // rr  printf(text);
@@ -16,15 +19,16 @@ void LogOut(const char* format, ...)
 
 void LogOut_File(const char* pszFormat, ...)
 {
-    char s[128];
+    constexpr size_t BUF_SIZE = 128;
+    char s[BUF_SIZE];
     va_list va;
     va_start(va, pszFormat);
-    vsprintf(s, pszFormat, va);
+    vsprintf_s(s, BUF_SIZE, pszFormat, va);
     va_end(va);
     fputs(s, stderr);
 
     FILE* fp;
-    fp = fopen("d3d9-null.log", "a+t");
+    std::ignore = fopen_s(&fp, "d3d9-null.log", "a+t");
     if (fp)
     {
         fprintf(fp, "%s", s);

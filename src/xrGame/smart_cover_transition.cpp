@@ -13,12 +13,12 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "Common/object_broker.h"
 
+namespace smart_cover::transitions
+{
 using smart_cover::detail::parse_table;
 using smart_cover::detail::parse_string;
 using smart_cover::detail::parse_fvector;
 using smart_cover::detail::parse_int;
-using smart_cover::transitions::action;
-using smart_cover::transitions::animation_action;
 
 action::action(luabind::object const& table)
 {
@@ -99,3 +99,4 @@ animation_action const& action::animation(MonsterSpace::EBodyState const& target
 }
 
 animation_action const& action::animation() const { return (*m_animations[Random.randI(m_animations.size())]); }
+} // namespace smart_cover::transitions

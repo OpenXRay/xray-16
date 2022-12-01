@@ -15,8 +15,6 @@
 #include "space_restriction_composition.h"
 #include "restriction_space.h"
 
-const u32 time_to_delete = 300000;
-
 CSpaceRestrictionHolder::~CSpaceRestrictionHolder() { clear(); }
 void CSpaceRestrictionHolder::clear()
 {
@@ -203,7 +201,7 @@ IC void CSpaceRestrictionHolder::collect_garbage()
     for (; I != E;)
     {
         if (!(*I).second->shape() && (*I).second->released() &&
-            (Device.dwTimeGlobal >= (*I).second->m_last_time_dec + time_to_delete))
+            (Device.dwTimeGlobal >= (*I).second->m_last_time_dec + TIME_TO_REMOVE_GARBAGE))
         {
             J = I;
             ++I;

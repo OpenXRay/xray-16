@@ -641,6 +641,45 @@ void CActorCondition::DisableBoostParameters(const SBooster& B)
     default: NODEFAULT;
     }
 }
+void CActorCondition::WoundForEach(const luabind::functor<bool>& funct)
+{
+    auto const& cur_wounds = wounds();
+    CEntityCondition::WOUND_VECTOR::const_iterator it = wounds().begin();
+    CEntityCondition::WOUND_VECTOR::const_iterator it_e = wounds().end();
+    for (; it != it_e; ++it)
+    {
+        if (funct(it) == true)
+            break;
+    }
+}
+
+void CActorCondition::BoosterForEach(const luabind::functor<bool>& funct)
+{
+    const auto& cur_booster_influences = GetCurBoosterInfluences();
+    CEntityCondition::BOOSTER_MAP::const_iterator it = cur_booster_influences.begin();
+    CEntityCondition::BOOSTER_MAP::const_iterator it_e = cur_booster_influences.end();
+    for (; it != it_e; ++it)
+    {
+        if (funct((*it).first, (*it).second.fBoostTime, (*it).second.fBoostValue) == true)
+            break;
+    }
+}
+
+bool CActorCondition::ApplyBooster_script(const SBooster& B, LPCSTR sect)
+{
+	return ApplyBooster(B, sect);
+}
+
+void CActorCondition::ClearAllBoosters()
+{
+    const auto& cur_booster_influences = GetCurBoosterInfluences();
+    CEntityCondition::BOOSTER_MAP::const_iterator it = cur_booster_influences.begin();
+    CEntityCondition::BOOSTER_MAP::const_iterator it_e = cur_booster_influences.end();
+    for (; it != it_e; ++it)
+    {
+        DisableBoostParameters((*it).second);
+    }
+}
 void CActorCondition::BoostHpRestore(const float value) { m_change_v.m_fV_HealthRestore += value; }
 void CActorCondition::BoostPowerRestore(const float value) { m_fV_SatietyPower += value; }
 void CActorCondition::BoostRadiationRestore(const float value) { m_change_v.m_fV_Radiation += value; }

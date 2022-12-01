@@ -18,7 +18,7 @@ CUIMpAdminMenu::CUIMpAdminMenu()
     m_pActiveDialog = NULL;
     m_sActiveSection = "";
 
-    m_pBack = xr_new<CUIStatic>();
+    m_pBack = xr_new<CUIStatic>("Background");
     m_pBack->SetAutoDelete(true);
     AttachChild(m_pBack);
 

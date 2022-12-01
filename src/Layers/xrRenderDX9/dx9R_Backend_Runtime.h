@@ -67,9 +67,7 @@ ICF void CBackend::set_Format(SDeclaration* _decl)
     if (decl != _decl)
     {
         PGO(Msg("PGO:v_format:%x", _decl));
-#ifdef DEBUG
         stat.decl++;
-#endif
         decl = _decl;
         CHK_DX(HW.pDevice->SetVertexDeclaration(decl->dcl));
     }
@@ -108,9 +106,7 @@ ICF void CBackend::set_Vertices(VertexBufferHandle _vb, u32 _vb_stride)
     if ((vb != _vb) || (vb_stride != _vb_stride))
     {
         PGO(Msg("PGO:VB:%x,%d", _vb, _vb_stride));
-#ifdef DEBUG
         stat.vb++;
-#endif
         vb = _vb;
         vb_stride = _vb_stride;
         CHK_DX(HW.pDevice->SetStreamSource(0, vb, 0, vb_stride));
@@ -122,9 +118,7 @@ ICF void CBackend::set_Indices(IndexBufferHandle _ib)
     if (ib != _ib)
     {
         PGO(Msg("PGO:IB:%x", _ib));
-#ifdef DEBUG
         stat.ib++;
-#endif
         ib = _ib;
         CHK_DX(HW.pDevice->SetIndices(ib));
     }
@@ -136,9 +130,9 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV,
     if (PC == 0)
         return;
 
-    stat.calls++;
-    stat.verts += countV;
-    stat.polys += PC;
+    stat.render.calls++;
+    stat.render.verts += countV;
+    stat.render.polys += PC;
     constants.flush();
     CHK_DX(HW.pDevice->DrawIndexedPrimitive(T, baseV, startV, countV, startI, PC));
     PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
@@ -150,9 +144,9 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
     if (PC == 0)
         return;
 
-    stat.calls++;
-    stat.verts += 3 * PC;
-    stat.polys += PC;
+    stat.render.calls++;
+    stat.render.verts += 3 * PC;
+    stat.render.polys += PC;
     constants.flush();
     CHK_DX(HW.pDevice->DrawPrimitive(T, startV, PC));
     PGO(Msg("PGO:DIP:%dv/%df", 3 * PC, PC));

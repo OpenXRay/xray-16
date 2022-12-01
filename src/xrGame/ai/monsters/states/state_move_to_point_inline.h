@@ -1,8 +1,7 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterMoveToPointAbstract CStateMonsterMoveToPoint<_Object>
 
@@ -127,3 +126,6 @@ bool CStateMonsterMoveToPointExAbstract::check_completion()
 
     return false;
 }
+
+#undef TEMPLATE_SPECIALIZATION
+#undef CStateMonsterMoveToPointAbstract

@@ -5,6 +5,10 @@ template <typename _Object>
 class CStateChimeraThreaten : public CState<_Object>
 {
 protected:
+    static constexpr float MIN_DIST_TO_ENEMY = 3.f;
+    static constexpr float MORALE_THRESHOLD = 0.8f;
+    static constexpr u32 THREATEN_DELAY = 10000;
+
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
     using inherited::object;

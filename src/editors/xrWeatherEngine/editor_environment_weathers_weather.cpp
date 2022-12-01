@@ -15,19 +15,18 @@
 #include "editor_environment_weathers_time.hpp"
 #include "editor_environment_manager.hpp"
 
-using editor::environment::weathers::weather;
-using editor::environment::weathers::manager;
-using editor::environment::weathers::time;
+using weathers_weather = editor::environment::weathers::weather;
 
 template <>
-void property_collection<weather::container_type, weather>::display_name(
+void property_collection<weathers_weather::container_type, weathers_weather>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<weather::container_type, weather>::create()
+XRay::Editor::property_holder_base* property_collection<
+    weathers_weather::container_type, weathers_weather>::create()
 {
     using ::editor::environment::weathers::time;
     time* object = xr_new<time>(&m_holder.m_manager, &m_holder, m_holder.generate_unique_id().c_str());
@@ -35,7 +34,9 @@ XRay::Editor::property_holder_base* property_collection<weather::container_type,
     return (object->object());
 }
 
-weather::weather(editor::environment::manager* manager, shared_str const& id)
+namespace editor::environment::weathers
+{
+weather::weather(environment::manager* manager, shared_str const& id)
     : m_manager(*manager), m_id(id), m_property_holder(0), m_collection(0)
 {
     m_collection = xr_new<collection_type>(&m_times, this);
@@ -65,9 +66,9 @@ void weather::load()
     sections_type& sections = config->sections();
     m_times.reserve(sections.size());
 
-    for (const auto &i : sections)
+    for (const auto& i : sections)
     {
-        time* object = xr_new<time>(&m_manager, this, i->Name);
+        auto* object = xr_new<time>(&m_manager, this, i->Name);
         object->load(*config);
         object->fill(m_collection);
         m_times.push_back(object);
@@ -84,7 +85,7 @@ void weather::save()
     xr_strcat(file_name, ".ltx");
     CInifile* config = xr_new<CInifile>(file_name, false, false, true);
 
-    for (const auto &i : m_times)
+    for (const auto& i : m_times)
         i->save(*config);
 
     CInifile::Destroy(config);
@@ -257,7 +258,7 @@ shared_str weather::generate_unique_id() const
 
 bool weather::save_time_frame(shared_str const& frame_id, char* buffer, u32 const& buffer_size)
 {
-    for (const auto &i : m_times)
+    for (const auto& i : m_times)
     {
         if (frame_id._get() != i->id()._get())
             continue;
@@ -280,7 +281,7 @@ bool weather::save_time_frame(shared_str const& frame_id, char* buffer, u32 cons
 
 bool weather::paste_time_frame(shared_str const& frame_id, char const* buffer, u32 const& buffer_size)
 {
-    for (const auto &i : m_times)
+    for (const auto& i : m_times)
     {
         if (frame_id._get() != i->id()._get())
             continue;
@@ -305,11 +306,11 @@ bool weather::add_time_frame(char const* buffer, u32 const& buffer_size)
         return (false);
 
     shared_str const& section = (*temp.sections().begin())->Name;
-    for (const auto &i : m_times)
+    for (const auto& i : m_times)
         if (section._get() == i->id()._get())
             return (false);
 
-    time* object = xr_new<time>(&m_manager, this, section);
+    auto* object = xr_new<time>(&m_manager, this, section);
     object->load(temp);
     object->fill(m_collection);
 
@@ -321,9 +322,10 @@ bool weather::add_time_frame(char const* buffer, u32 const& buffer_size)
         }
     }; // struct id
 
-    auto found = std::lower_bound(m_times.begin(), m_times.end(), section, &id::predicate);
+    const auto found = std::lower_bound(
+        m_times.begin(), m_times.end(), section, &id::predicate);
 
-    u32 index = u32(found - m_times.begin());
+    const u32 index = u32(found - m_times.begin());
     m_times.insert(found, object);
     m_manager.WeatherCycles[m_id].insert(m_manager.WeatherCycles[m_id].begin() + index, object);
     return (true);
@@ -336,7 +338,7 @@ void weather::reload_time_frame(shared_str const& frame_id)
     xr_strcat(file_name, ".ltx");
     CInifile* config = CInifile::Create(file_name);
 
-    for (const auto &i : m_times)
+    for (const auto& i : m_times)
     {
         if (frame_id._get() != i->id()._get())
             continue;
@@ -357,4 +359,4 @@ void weather::reload()
     delete_data(m_times);
     load();
 }
-
+} // namespace editor::environment::weathers
