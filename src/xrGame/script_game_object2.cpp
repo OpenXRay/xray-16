@@ -562,7 +562,6 @@ bool CScriptGameObject::is_there_items_to_pickup() const
     return (!!stalker->memory().item().selected());
 }
 
-
 void CScriptGameObject::RemoveDanger(const CDangerObject& dobject)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
@@ -572,7 +571,7 @@ void CScriptGameObject::RemoveDanger(const CDangerObject& dobject)
     stalker->memory().danger().remove(dobject);
 }
 
-void CScriptGameObject::RemoveMemorySoundObject(const MemorySpace::CSoundObject &memory_object)
+void CScriptGameObject::RemoveMemorySoundObject(const MemorySpace::CSoundObject& memory_object)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -581,7 +580,7 @@ void CScriptGameObject::RemoveMemorySoundObject(const MemorySpace::CSoundObject 
     stalker->memory().sound().remove(&memory_object);
 }
 
-void CScriptGameObject::RemoveMemoryHitObject(const MemorySpace::CHitObject &memory_object)
+void CScriptGameObject::RemoveMemoryHitObject(const MemorySpace::CHitObject& memory_object)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -590,7 +589,7 @@ void CScriptGameObject::RemoveMemoryHitObject(const MemorySpace::CHitObject &mem
     stalker->memory().hit().remove(&memory_object);
 }
 
-void CScriptGameObject::RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject &memory_object)
+void CScriptGameObject::RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject& memory_object)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)

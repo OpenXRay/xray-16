@@ -860,9 +860,9 @@ public:
 
     void RemoveDanger(const CDangerObject& dobject);
 
-    void RemoveMemorySoundObject(const MemorySpace::CSoundObject &memory_object);
-    void RemoveMemoryHitObject(const MemorySpace::CHitObject &memory_object);
-    void RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject &memory_object);
+    void RemoveMemorySoundObject(const MemorySpace::CSoundObject& memory_object);
+    void RemoveMemoryHitObject(const MemorySpace::CHitObject& memory_object);
+    void RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject& memory_object);
 
     //Eatable items
     void SetRemainingUses(u8 value);

@@ -112,7 +112,6 @@ void CDangerManager::remove(const CDangerObject& object)
     update();
 }
 
-
 void CDangerManager::remove_links(const IGameObject* object)
 {
     if (m_selected && (m_selected->object() == object))
