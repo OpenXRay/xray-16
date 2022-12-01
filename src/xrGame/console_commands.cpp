@@ -1200,7 +1200,7 @@ class CCC_PHFps : public CCC_Float
     static constexpr float MAX_FPS = 1000;
 #endif
 
-    float m_dummy;
+    float m_dummy = 1.f / ph_console::ph_step_time;
 
 public:
     CCC_PHFps(pcstr name) : CCC_Float(name, &m_dummy, MIN_FPS, MAX_FPS) { }
