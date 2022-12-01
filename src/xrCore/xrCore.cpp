@@ -212,6 +212,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
         getcwd(WorkingPath, sizeof(WorkingPath));
+#else
+#   error Select or add implementation for your platform
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
