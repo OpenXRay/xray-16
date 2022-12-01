@@ -23,6 +23,7 @@
     <ClCompile>
       <PreprocessorDefinitions>XRUICORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <AdditionalOptions Condition="'$(GITHUB_ACTIONS)'!=''">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
