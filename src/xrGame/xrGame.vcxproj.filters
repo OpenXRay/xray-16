@@ -9239,6 +9239,9 @@
     <ClCompile Include="ui\map_hint.cpp">
       <Filter>UI\Common\PDA\MAP</Filter>
     </ClCompile>
+    <ClCompile Include="map_script.cpp">
+      <Filter>UI\Common\PDA\MAP</Filter>
+    </ClCompile>
     <ClCompile Include="map_spot.cpp">
       <Filter>UI\Common\PDA\MAP</Filter>
     </ClCompile>

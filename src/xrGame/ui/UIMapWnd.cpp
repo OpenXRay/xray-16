@@ -17,6 +17,8 @@
 #include "xrUICore/Hint/UIHint.h"
 #include "map_hint.h"
 #include "xrUICore/Cursor/UICursor.h"
+#include "xrUICore/PropertiesBox/UIPropertiesBox.h"
+#include "xrUICore/ListBox/UIListBoxItem.h"
 #include "xrEngine/xr_input.h" //remove me !!!
 #include "UIHelper.h"
 
@@ -45,6 +47,7 @@ CUIMapWnd::CUIMapWnd(UIHint* hint)
     m_nav_timing = Device.dwTimeGlobal;
     hint_wnd = hint;
     g_map_wnd = this;
+    m_cur_location = nullptr;
 }
 
 CUIMapWnd::~CUIMapWnd()
@@ -223,6 +226,13 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
     m_ActionPlanner = xr_new<CMapActionPlanner>();
     m_ActionPlanner->setup(this);
     m_view_actor = true;
+
+    m_UIPropertiesBox = xr_new<CUIPropertiesBox>();
+    m_UIPropertiesBox->SetAutoDelete(true);
+    m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));
+    AttachChild(m_UIPropertiesBox);
+    m_UIPropertiesBox->Hide();
+    m_UIPropertiesBox->SetWindowName("property_box");
 
     return true;
 }
@@ -466,6 +476,9 @@ bool CUIMapWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
     {
         switch (mouse_action)
         {
+        case WINDOW_RBUTTON_UP:
+            ActivatePropertiesBox(NULL);
+            break;
         case WINDOW_MOUSE_MOVE:
             if (pInput->iGetAsyncBtnState(0))
             {
@@ -529,6 +542,52 @@ void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     //	inherited::SendMessage( pWnd, msg, pData);
     CUIWndCallback::OnEvent(pWnd, msg, pData);
+
+    if (pWnd == m_UIPropertiesBox && msg == PROPERTY_CLICKED && m_UIPropertiesBox->GetClickedItem())
+    {
+        luabind::functor<void> funct;
+        if (GEnv.ScriptEngine->functor("pda.property_box_clicked", funct))
+            funct(m_UIPropertiesBox, m_cur_location);
+    }
+}
+
+void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
+{
+    m_UIPropertiesBox->RemoveAll();
+
+    CMapSpot* sp = smart_cast<CMapSpot*>(w);
+    if (!sp)
+        return;
+
+    m_cur_location = sp->MapLocation();
+    if (!m_cur_location)
+        return;
+
+    luabind::functor<void> funct;
+    if (GEnv.ScriptEngine->functor("pda.property_box_add_properties", funct))
+    {
+        funct(m_UIPropertiesBox, m_cur_location->ObjectID(), (LPCSTR)m_cur_location->GetLevelName().c_str(), m_cur_location);
+    }
+
+    // Только для меток игрока
+    if (m_cur_location->IsUserDefined())
+    {
+        m_UIPropertiesBox->AddItem("st_pda_change_spot_hint", NULL, MAP_CHANGE_SPOT_HINT_ACT); // Изменяем название метки
+        m_UIPropertiesBox->AddItem("st_pda_delete_spot", NULL, MAP_REMOVE_SPOT_ACT); // Удаляем метку
+    }
+
+    if (m_UIPropertiesBox->GetItemsCount() > 0)
+    {
+        m_UIPropertiesBox->AutoUpdateSize();
+
+        Fvector2 cursor_pos;
+        Frect vis_rect;
+
+        GetAbsoluteRect(vis_rect);
+        cursor_pos = GetUICursor().GetCursorPosition();
+        cursor_pos.sub(vis_rect.lt);
+        m_UIPropertiesBox->Show(vis_rect, cursor_pos);
+    }
 }
 
 CUICustomMap* CUIMapWnd::GetMapByIdx(u16 idx)
