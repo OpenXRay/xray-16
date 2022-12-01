@@ -27,7 +27,6 @@ public:
     shared_str m_shader_name;
 
     CUICustomMap();
-    virtual ~CUICustomMap() = default;
 
     virtual void SetActivePoint(const Fvector& vNewPoint);
 

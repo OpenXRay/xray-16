@@ -15,7 +15,7 @@
 #include "GametaskManager.h"
 #include "GameTask.h"
 
-CMapSpot::CMapSpot(CMapLocation* ml) : m_map_location(ml), m_mark_focused(false)
+CMapSpot::CMapSpot(CMapLocation* ml) : CUIStatic("CMapSpot"), m_map_location(ml), m_mark_focused(false)
 {
     m_bScale = false;
     m_location_level = 0;
@@ -23,7 +23,6 @@ CMapSpot::CMapSpot(CMapLocation* ml) : m_map_location(ml), m_mark_focused(false)
     m_scale_bounds.set(-1.0f, -1.0f);
 }
 
-CMapSpot::~CMapSpot() {}
 void CMapSpot::Load(CUIXml* xml, LPCSTR path)
 {
     CUIXmlInit::InitStatic(*xml, path, 0, this);

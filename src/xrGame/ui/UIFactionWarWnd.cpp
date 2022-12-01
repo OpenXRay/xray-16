@@ -24,7 +24,7 @@
 
 constexpr pcstr PDA_FACTION_WAR_XML = "pda_fraction_war.xml";
 
-CUIFactionWarWnd::CUIFactionWarWnd(UIHint* hint)
+CUIFactionWarWnd::CUIFactionWarWnd(UIHint* hint) : CUIWindow("CUIFactionWarWnd")
 {
     Reset();
     hint_wnd = hint;
@@ -110,7 +110,7 @@ bool CUIFactionWarWnd::Init()
 	m_static_line_right		= UIHelper::CreateFrameLine( xml, "static_line_right", this );
 
 	VERIFY( hint_wnd );
-	m_war_states_parent = xr_new<CUIWindow>();
+	m_war_states_parent = xr_new<CUIWindow>("War states parent");
 	m_war_states_parent->SetAutoDelete( true );
 	AttachChild( m_war_states_parent );
 	Fvector2 pos;

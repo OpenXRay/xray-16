@@ -16,11 +16,11 @@
 CUIKickPlayer::CUIKickPlayer()
 {
     m_prev_upd_time = 0;
-    bkgrnd = xr_new<CUIStatic>();
+    bkgrnd = xr_new<CUIStatic>("Background");
     bkgrnd->SetAutoDelete(true);
     AttachChild(bkgrnd);
 
-    header = xr_new<CUIStatic>();
+    header = xr_new<CUIStatic>("Header");
     header->SetAutoDelete(true);
     AttachChild(header);
 
@@ -46,7 +46,7 @@ CUIKickPlayer::CUIKickPlayer()
     m_spin_ban_sec->SetMin(60);
     AttachChild(m_spin_ban_sec);
 
-    m_ban_sec_label = xr_new<CUIStatic>();
+    m_ban_sec_label = xr_new<CUIStatic>("Ban time label");
     m_ban_sec_label->SetAutoDelete(true);
     AttachChild(m_ban_sec_label);
 

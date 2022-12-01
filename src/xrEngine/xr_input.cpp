@@ -42,7 +42,6 @@ CInput::CInput(const bool exclusive)
     mouseState.reset();
     keyboardState.reset();
     controllerState.reset();
-    ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
     last_input_controller = -1;
 
@@ -141,8 +140,6 @@ void CInput::MouseUpdate()
         {
         case SDL_MOUSEMOTION:
             mouseMoved = true;
-            mouseTimeStamp[0] = m_curTime + event.motion.timestamp;
-            mouseTimeStamp[1] = m_curTime + event.motion.timestamp;
             offs[0] += event.motion.xrel;
             offs[1] += event.motion.yrel;
             break;
@@ -159,8 +156,6 @@ void CInput::MouseUpdate()
 
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
-            mouseTimeStamp[2] = m_curTime + event.wheel.timestamp;
-            mouseTimeStamp[3] = m_curTime + event.wheel.timestamp;
             offs[2] += event.wheel.y;
             offs[3] += event.wheel.x;
             break;
@@ -179,13 +174,6 @@ void CInput::MouseUpdate()
             cbStack.back()->IR_OnMouseMove(offs[0], offs[1]);
         if (offs[2] || offs[3])
             cbStack.back()->IR_OnMouseWheel(offs[2], offs[3]);
-    }
-    else
-    {
-        if (mouseTimeStamp[1] && m_curTime - mouseTimeStamp[1] >= m_mouseDelta)
-            cbStack.back()->IR_OnMouseStop(0, mouseTimeStamp[1] = 0);
-        if (mouseTimeStamp[0] && m_curTime - mouseTimeStamp[0] >= m_mouseDelta)
-            cbStack.back()->IR_OnMouseStop(0, mouseTimeStamp[0] = 0);
     }
 }
 
@@ -544,7 +532,6 @@ void CInput::iCapture(IInputReceiver* p)
     cbStack.back()->IR_OnActivate();
 
     // prepare for _new_ controller
-    ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
     last_input_controller = -1;
 }
@@ -579,7 +566,6 @@ void CInput::OnAppActivate(void)
     mouseState.reset();
     keyboardState.reset();
     controllerState.reset();
-    ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
     last_input_controller = -1;
 }
@@ -592,7 +578,6 @@ void CInput::OnAppDeactivate(void)
     mouseState.reset();
     keyboardState.reset();
     controllerState.reset();
-    ZeroMemory(mouseTimeStamp, sizeof(mouseTimeStamp));
     ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
     last_input_controller = -1;
 }
@@ -604,7 +589,6 @@ void CInput::OnFrame(void)
 
     stats.FrameStart();
     stats.FrameTime.Begin();
-    m_curTime = RDEVICE.TimerAsync_MMT();
 
     if (Device.dwPrecacheFrame == 0 && !Device.IsAnselActive)
     {

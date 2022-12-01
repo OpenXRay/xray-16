@@ -9,14 +9,18 @@ enum
     flVisObjNotValid = (1 << 0),
     flTargetLocked = (1 << 1),
 };
+
 struct SBinocVisibleObj
 {
-    SBinocVisibleObj(){};
-    IGameObject* m_object;
-    CUIStatic m_lt;
-    CUIStatic m_lb;
-    CUIStatic m_rt;
-    CUIStatic m_rb;
+    SBinocVisibleObj() = default;
+
+    IGameObject* m_object{}
+    ;
+    CUIStatic m_lt{ "left top" };
+    CUIStatic m_lb{ "left bottom" };
+    CUIStatic m_rt{ "right top" };
+    CUIStatic m_rb{ "right bottom" };
+
     Frect cur_rect;
 
     float m_upd_speed;

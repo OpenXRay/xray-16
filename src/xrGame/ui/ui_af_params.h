@@ -7,9 +7,10 @@ class CUIStatic;
 class CUITextWnd;
 class UIArtefactParamItem;
 
-class CUIArtefactParams : public CUIWindow
+class CUIArtefactParams final : public CUIWindow
 {
 public:
+    CUIArtefactParams() : CUIWindow("CUIArtefactParams") {}
     ~CUIArtefactParams() override;
     bool InitFromXml(CUIXml& xml);
     bool Check(const shared_str& af_section);
@@ -34,11 +35,10 @@ protected:
 
 // -----------------------------------
 
-class UIArtefactParamItem : public CUIStatic
+class UIArtefactParamItem final : public CUIStatic
 {
 public:
     UIArtefactParamItem();
-    ~UIArtefactParamItem() override = default;
 
     enum class InitResult
     {

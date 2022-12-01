@@ -2,7 +2,7 @@
 
 #include "xrUICore/Static/UIStatic.h"
 
-class CUIStatsIcon : public CUIStatic
+class CUIStatsIcon final : public CUIStatic
 {
     friend class CUIStatsPlayerList;
     friend class UITeamPanels;

@@ -1190,23 +1190,29 @@ public:
 };
 #endif // DEBUG
 
-class CCC_PHFps : public IConsole_Command
+class CCC_PHFps : public CCC_Float
 {
-public:
-    CCC_PHFps(LPCSTR N) : IConsole_Command(N){};
-    virtual void Execute(LPCSTR args)
-    {
-        float step_count = (float)atof(args);
 #ifndef DEBUG
-        clamp(step_count, 50.f, 200.f);
+    static constexpr float MIN_FPS = 50;
+    static constexpr float MAX_FPS = 200;
+#else
+    static constexpr float MIN_FPS = 1;
+    static constexpr float MAX_FPS = 1000;
 #endif
-        // IPHWorld::SetStep(1.f/step_count);
-        ph_console::ph_step_time = 1.f / step_count;
-        // physics_world()->SetStep(1.f/step_count);
+
+    float m_dummy = 1.f / ph_console::ph_step_time;
+
+public:
+    CCC_PHFps(pcstr name) : CCC_Float(name, &m_dummy, MIN_FPS, MAX_FPS) { }
+
+    void Execute(pcstr args) override
+    {
+        CCC_Float::Execute(args);
+
+        ph_console::ph_step_time = 1.f / m_dummy;
         if (physics_world())
             physics_world()->SetStep(ph_console::ph_step_time);
     }
-    void GetStatus(TStatus& S) override { xr_sprintf(S, "%3.5f", 1.f / ph_console::ph_step_time); }
 };
 
 #ifdef DEBUG

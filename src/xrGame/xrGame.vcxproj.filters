@@ -6486,9 +6486,15 @@
     <ClInclude Include="ui\UIArtefactPanel.h">
       <Filter>UI\Common\MainIngame</Filter>
     </ClInclude>
-    <ClInclude Include="ai\monsters\chimera\chimera_attack_state.h" />
-    <ClInclude Include="ai\monsters\chimera\chimera_attack_state_inline.h" />
-    <ClInclude Include="Explosive.h" />
+    <ClInclude Include="ai\monsters\chimera\chimera_attack_state.h">
+      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
+    </ClInclude>
+    <ClInclude Include="ai\monsters\chimera\chimera_attack_state_inline.h">
+      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
+    </ClInclude>
+    <ClInclude Include="Explosive.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Explosives</Filter>
+    </ClInclude>
     <ClInclude Include="game_sv_mp_script.h">
       <Filter>Core\Server\Games\server\mp_script</Filter>
     </ClInclude>

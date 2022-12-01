@@ -18,15 +18,15 @@ CUIServerInfo::CUIServerInfo()
 {
     m_dds_file_created = false;
 
-    m_background = xr_new<CUIStatic>();
+    m_background = xr_new<CUIStatic>("Background");
     AttachChild(m_background);
     m_background->SetAutoDelete(true);
 
-    m_caption = xr_new<CUIStatic>();
+    m_caption = xr_new<CUIStatic>("Caption");
     AttachChild(m_caption);
     m_caption->SetAutoDelete(true);
 
-    m_image = xr_new<CUIStatic>();
+    m_image = xr_new<CUIStatic>("Image");
     AttachChild(m_image);
     m_image->SetAutoDelete(true);
 

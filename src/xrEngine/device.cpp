@@ -588,6 +588,14 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
     }
 }
 
+void CRenderDevice::time_factor(const float time_factor)
+{
+    Timer.time_factor(time_factor);
+    TimerGlobal.time_factor(time_factor);
+    if (!strstr(Core.Params, "-sound_constant_speed"))
+        psSoundTimeFactor = time_factor; //--#SM+#--
+}
+
 void CRenderDevice::AddSeqFrame(pureFrame* f, bool mt)
 {
     if (mt)

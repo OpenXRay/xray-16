@@ -65,8 +65,6 @@ CApplication::CApplication()
     else
         Device.seqFrame.Add(&SoundProcessor);
 
-    Console->Show();
-
     // App Title
     loadingScreen = nullptr;
 }

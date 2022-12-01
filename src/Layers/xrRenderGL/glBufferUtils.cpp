@@ -145,10 +145,9 @@ u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream)
     return size;
 }
 
-void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
+template <typename F>
+void IterVertexDeclaration(const VertexElement* dxdecl, F&& callback)
 {
-    RCache.set_Format(decl);
-
     // XXX: tamlin: use 'stride', or drop it.
     // GLsizei stride = GetDeclVertexSize(dxdecl, 0);
     for (int i = 0; i < MAXD3DDECLLENGTH; ++i)
@@ -167,10 +166,123 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
             continue; // Unsupported
 
         location += desc.UsageIndex;
-        CHK_GL(glVertexAttribFormat(location, size, type, normalized, desc.Offset));
-        CHK_GL(glVertexAttribBinding(location, desc.Stream));
-        CHK_GL(glEnableVertexAttribArray(location));
+        callback(location, size, type, normalized, desc.Offset, desc.Stream);
     }
+}
+
+void SetVertexDeclaration(const VertexElement* dxdecl)
+{
+    auto stride = GetDeclVertexSize(dxdecl, 0);
+    IterVertexDeclaration(dxdecl,
+    [&](GLuint location, GLint size, GLenum type, GLboolean normalized, intptr_t offset, GLuint /*stream*/) 
+    {
+        CHK_GL(glVertexAttribPointer(
+            location, size, type, normalized, stride, (void*)offset));
+    });
+}
+
+void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
+{
+    RCache.set_Format(decl);
+    IterVertexDeclaration(dxdecl,
+    [](GLuint location, GLint size, GLenum type, GLboolean normalized, GLuint offset, GLuint stream) 
+    {
+        CHK_GL(glEnableVertexAttribArray(location));
+        if (GLEW_ARB_vertex_attrib_binding)
+        {
+            CHK_GL(glVertexAttribFormat(location, size, type, normalized, offset));
+            CHK_GL(glVertexAttribBinding(location, stream));
+        }
+    });
+}
+
+template <typename F>
+void IterVertexDeclaration(u32 FVF, F&& callback)
+{
+    u32 offset = 0;
+
+    // Position attribute
+    if (FVF & D3DFVF_XYZRHW)
+    {
+        GLuint attrib = VertexUsageList[D3DDECLUSAGE_POSITION];
+        callback(attrib, 4, GL_FLOAT, GL_FALSE, offset, 0);
+        offset += sizeof(Fvector4);
+    }
+    else if (FVF & D3DFVF_XYZ)
+    {
+        GLuint attrib = VertexUsageList[D3DDECLUSAGE_POSITION];
+        callback(attrib, 3, GL_FLOAT, GL_FALSE, offset, 0);
+        offset += sizeof(Fvector);
+    }
+
+    // Diffuse color attribute
+    if (FVF & D3DFVF_DIFFUSE)
+    {
+        GLuint attrib = VertexUsageList[D3DDECLUSAGE_COLOR];
+        callback(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, offset, 0);
+        offset += sizeof(u32);
+    }
+
+    // Specular color attribute
+    if (FVF & D3DFVF_SPECULAR)
+    {
+        GLuint attrib = VertexUsageList[D3DDECLUSAGE_COLOR] + 1;
+        callback(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, offset, 0);
+        offset += sizeof(u32);
+    }
+
+    // Texture coordinates
+    for (u32 i = 0; i < (FVF & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT; i++)
+    {
+        GLuint attrib = VertexUsageList[D3DDECLUSAGE_TEXCOORD] + i;
+
+        u32 size = 2;
+        if (FVF & D3DFVF_TEXCOORDSIZE1(i))
+            size = 1;
+        if (FVF & D3DFVF_TEXCOORDSIZE3(i))
+            size = 3;
+        if (FVF & D3DFVF_TEXCOORDSIZE4(i))
+            size = 4;
+
+        callback(attrib, size, GL_FLOAT, GL_FALSE, offset, 0);
+        offset += size * sizeof(float);
+    }
+
+    VERIFY(offset == GetFVFVertexSize(FVF));
+}
+
+void SetVertexDeclaration(u32 FVF)
+{
+    auto stride = GetFVFVertexSize(FVF);
+    IterVertexDeclaration(FVF,
+    [&](GLuint location, GLint size, GLenum type, GLboolean normalized, intptr_t offset, GLuint /*stream*/) 
+    {
+        CHK_GL(glVertexAttribPointer(
+            location, size, type, normalized, stride, reinterpret_cast<void*>(offset)));
+    });
+}
+
+void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
+{
+    RCache.set_Format(decl);
+    IterVertexDeclaration(FVF,
+    [](GLuint location, GLint size, GLenum type, GLboolean normalized, GLuint offset, GLuint stream) 
+    {
+        CHK_GL(glEnableVertexAttribArray(location));
+        if (GLEW_ARB_vertex_attrib_binding)
+        {
+            CHK_GL(glVertexAttribFormat(location, size, type, normalized, offset));
+            CHK_GL(glVertexAttribBinding(location, stream));
+        }
+    });
+}
+
+void SetGLVertexPointer(SDeclaration* decl) 
+{
+    if (!decl->dcl_code.empty()) 
+        SetVertexDeclaration(&*decl->dcl_code.begin());
+    else
+        SetVertexDeclaration(decl->FVF);
 }
 
 u32 GetFVFVertexSize(u32 FVF)
@@ -206,72 +318,6 @@ u32 GetFVFVertexSize(u32 FVF)
     }
 
     return offset;
-}
-
-void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl)
-{
-    RCache.set_Format(decl);
-
-    u32 offset = 0;
-
-    // Position attribute
-    if (FVF & D3DFVF_XYZRHW)
-    {
-        GLuint attrib = VertexUsageList[D3DDECLUSAGE_POSITION];
-        CHK_GL(glVertexAttribFormat(attrib, 4, GL_FLOAT, GL_FALSE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
-        CHK_GL(glEnableVertexAttribArray(attrib));
-        offset += sizeof(Fvector4);
-    }
-    else if (FVF & D3DFVF_XYZ)
-    {
-        GLuint attrib = VertexUsageList[D3DDECLUSAGE_POSITION];
-        CHK_GL(glVertexAttribFormat(attrib, 3, GL_FLOAT, GL_FALSE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
-        CHK_GL(glEnableVertexAttribArray(attrib));
-        offset += sizeof(Fvector);
-    }
-
-    // Diffuse color attribute
-    if (FVF & D3DFVF_DIFFUSE)
-    {
-        GLuint attrib = VertexUsageList[D3DDECLUSAGE_COLOR];
-        CHK_GL(glVertexAttribFormat(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
-        CHK_GL(glEnableVertexAttribArray(attrib));
-        offset += sizeof(u32);
-    }
-
-    // Specular color attribute
-    if (FVF & D3DFVF_SPECULAR)
-    {
-        GLuint attrib = VertexUsageList[D3DDECLUSAGE_COLOR] + 1;
-        CHK_GL(glVertexAttribFormat(attrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
-        CHK_GL(glEnableVertexAttribArray(attrib));
-        offset += sizeof(u32);
-    }
-
-    // Texture coordinates
-    for (u32 i = 0; i < (FVF & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT; i++)
-    {
-        GLuint attrib = VertexUsageList[D3DDECLUSAGE_TEXCOORD] + i;
-
-        u32 size = 2;
-        if (FVF & D3DFVF_TEXCOORDSIZE1(i))
-            size = 1;
-        if (FVF & D3DFVF_TEXCOORDSIZE3(i))
-            size = 3;
-        if (FVF & D3DFVF_TEXCOORDSIZE4(i))
-            size = 4;
-
-        CHK_GL(glVertexAttribFormat(attrib, size, GL_FLOAT, GL_FALSE, offset));
-        CHK_GL(glVertexAttribBinding(attrib, 0));
-        CHK_GL(glEnableVertexAttribArray(attrib));
-        offset += size * sizeof(float);
-    }
-
-    VERIFY(offset == GetFVFVertexSize(FVF));
 }
 
 u32 GetDeclLength(const D3DVERTEXELEMENT9* decl)
