@@ -30,4 +30,3 @@
 // STL extensions
 #include "FixedVector.h"
 #include "buffer_vector.h"
-#include "xr_vector_defs.h"

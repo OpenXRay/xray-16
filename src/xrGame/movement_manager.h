@@ -29,8 +29,11 @@ enum EDetailPathType : u32;
 template <typename _Graph, typename _VertexEvaluator, typename _vertex_id_type>
 class CBaseLocationSelector;
 
-template <typename _Graph, typename _VertexEvaluator, typename _vertex_id_type, typename _index_type>
-class CBasePathManager;
+template <typename _VertexEvaluator, typename _vertex_id_type, typename _index_type>
+class CBaseGamePathManager;
+
+template <typename _VertexEvaluator, typename _vertex_id_type, typename _index_type>
+class CBaseLevelPathManager;
 
 template <typename _dist_type, typename _index_type, typename _iteration_type>
 struct SVertexType;
@@ -79,8 +82,8 @@ protected:
 
     typedef CBaseLocationSelector<CGameGraph, SGameVertex<float, u32, u32>, u32> CGameLocationSelector;
 
-    typedef CBasePathManager<CGameGraph, SGameVertex<float, u32, u32>, u32, u32> CGamePathManager;
-    typedef CBasePathManager<CLevelGraph, SBaseParameters<float, u32, u32>, u32, u32> CLevelPathManager;
+    using CGamePathManager  = CBaseGamePathManager<SGameVertex<float, u32, u32>, u32, u32>;
+    using CLevelPathManager = CBaseLevelPathManager<SBaseParameters<float, u32, u32>, u32, u32>;
 
 private:
     enum EPathState

@@ -16,7 +16,7 @@ class poolSS
         blocks.push_back(list);
 
         // Partition
-        for (int it = 0; it < (granularity - 1); it++)
+        for (size_t it = 0; it < (granularity - 1); it++)
         {
             T* E = list + it;
             *access(E) = E + 1;

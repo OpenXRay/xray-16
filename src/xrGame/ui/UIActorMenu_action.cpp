@@ -37,17 +37,18 @@ bool CUIActorMenu::AllowItemDrops(EDDListType from, EDDListType to)
 }
 class CUITrashIcon : public ICustomDrawDragItem
 {
-    CUIStatic m_icon;
+    CUIStatic m_icon{ "Trash icon" };
 
 public:
     CUITrashIcon()
     {
-        m_icon.SetWndSize(Fvector2().set(29.0f * UI().get_current_kx(), 36.0f));
+        m_icon.SetWndSize(Fvector2().set(29.0f * UI().get_current_kx(), 36.0f)); // XXX: unhardcode size
         m_icon.SetStretchTexture(true);
         //		m_icon.SetAlignment		(waCenter);
-        m_icon.InitTexture("ui_inGame2_inv_trash");
+        m_icon.InitTexture("ui_inGame2_inv_trash"); // XXX: unhardcode texture
     }
-    virtual void OnDraw(CUIDragItem* drag_item)
+
+    void OnDraw(CUIDragItem* drag_item) override
     {
         Fvector2 pos = drag_item->GetWndPos();
         Fvector2 icon_sz = m_icon.GetWndSize();

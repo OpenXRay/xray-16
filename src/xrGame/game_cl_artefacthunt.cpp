@@ -24,16 +24,23 @@
 #include "clsid_game.h"
 #include "ui/UIActorMenu.h"
 
-#define TEAM0_MENU "artefacthunt_team0"
-#define TEAM1_MENU "artefacthunt_team1"
-#define TEAM2_MENU "artefacthunt_team2"
-
-#define MESSAGE_MENUS "ahunt_messages_menu"
-
 #include "game_cl_artefacthunt_snd_msg.h"
 #include "xrEngine/IGame_Persistent.h"
 
 #include "reward_event_generator.h"
+
+namespace detail::mp::ahunt
+{
+//static constexpr pcstr TEAM0_MENU       = "artefacthunt_team0";
+static constexpr pcstr TEAM1_MENU       = "artefacthunt_team1";
+static constexpr pcstr TEAM2_MENU       = "artefacthunt_team2";
+
+static constexpr pcstr MESSAGE_MENUS    = "ahunt_messages_menu";
+
+static constexpr pcstr ARTEFACT_NEUTRAL = "mp_af_neutral_location";
+static constexpr pcstr ARTEFACT_FRIEND  = "mp_af_friend_location";
+static constexpr pcstr ARTEFACT_ENEMY   = "mp_af_enemy_location";
+}
 
 game_cl_ArtefactHunt::game_cl_ArtefactHunt()
 {
@@ -55,8 +62,8 @@ void game_cl_ArtefactHunt::Init()
     //	pPdaMenu = new CUIPdaWnd();
     //	pMapDesc = new CUIMapDesc();
 
-    LoadTeamData(TEAM1_MENU);
-    LoadTeamData(TEAM2_MENU);
+    LoadTeamData(::detail::mp::ahunt::TEAM1_MENU);
+    LoadTeamData(::detail::mp::ahunt::TEAM2_MENU);
 
     old_artefactBearerID = 0;
     old_artefactID = 0;
@@ -298,7 +305,7 @@ CUIGameCustom* game_cl_ArtefactHunt::createGameUI()
     R_ASSERT(m_game_ui);
     m_game_ui->Load();
     m_game_ui->SetClGame(this);
-    LoadMessagesMenu(MESSAGE_MENUS);
+    LoadMessagesMenu(::detail::mp::ahunt::MESSAGE_MENUS);
     return m_game_ui;
 }
 
@@ -597,12 +604,10 @@ bool game_cl_ArtefactHunt::PlayerCanSprint(CActor* pActor)
     return true;
 };
 
-#define ARTEFACT_NEUTRAL "mp_af_neutral_location"
-#define ARTEFACT_FRIEND "mp_af_friend_location"
-#define ARTEFACT_ENEMY "mp_af_enemy_location"
-
 void game_cl_ArtefactHunt::UpdateMapLocations()
 {
+    using namespace ::detail::mp::ahunt;
+
     inherited::UpdateMapLocations();
 
     if (local_player)

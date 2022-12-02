@@ -13,13 +13,9 @@
 #include "monster_state_smart_terrain_task.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterRestAbstract CStateMonsterRest<_Object>
-
-#define TIME_DELAY_FUN 20000
-#define TIME_IDLE 60000
 
 TEMPLATE_SPECIALIZATION
 CStateMonsterRestAbstract::CStateMonsterRest(_Object* obj) : inherited(obj)

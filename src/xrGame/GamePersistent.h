@@ -49,8 +49,6 @@ private:
     void start_game_intro();
     void update_game_intro();
 
-    void create_main_menu(Task& task, void* data);
-
 #ifdef DEBUG
     u32 m_frame_counter;
     u32 m_last_stats_frame;

@@ -11,42 +11,41 @@
 #include <luabind/class.hpp>
 #include <luabind/detail/class_rep.hpp>
 
-using namespace luabind::detail;
-
-#define pstr LPSTR
-#define pcstr LPCSTR
-#define pcvoid const void*
-#define sz_cmp xr_strcmp
-#define vector_class luabind::internal_vector
 #define engine lua_studio_engine
 
-inline pstr sz_cpy(pstr destination, const u32& size, pcstr source)
+ICF int sz_cmp(pcstr S1, pcstr S2)
+{
+    return xr_strcmp(S1, S2);
+}
+
+ICF pstr sz_cpy(pstr destination, const u32& size, pcstr source)
 {
     xr_strcpy(destination, size, source);
     return destination;
 }
 
 template <int size>
-inline pstr sz_cpy(char (&destination)[size], pcstr source)
+ICF pstr sz_cpy(char (&destination)[size], pcstr source)
 {
     xr_strcpy(destination, size, source);
     return destination;
 }
 
-inline pstr sz_cat(pstr destination, const u32& size, pcstr source)
+ICF pstr sz_cat(pstr destination, const u32& size, pcstr source)
 {
     xr_strcat(destination, size, source);
     return destination;
 }
 
 template <int size>
-inline pstr sz_cat(char (&destination)[size], pcstr source)
+ICF pstr sz_cat(char (&destination)[size], pcstr source)
 {
     xr_strcat(destination, size, source);
     return destination;
 }
 
-inline u32 sz_len(pcstr string) { return (u32)xr_strlen(string); }
+ICF u32 sz_len(pcstr string) { return (u32)xr_strlen(string); }
+
 int engine::luaL_loadstring(lua_State* L, const char* s) { return ::luaL_loadstring(L, s); }
 int engine::luaL_newmetatable(lua_State* L, const char* tname) { return ::luaL_newmetatable(L, tname); }
 void engine::lua_createtable(lua_State* L, int narray, int nrec) { return ::lua_createtable(L, narray, nrec); }
@@ -107,8 +106,10 @@ const char* engine::lua_debug_get_source(lua_Debug& instance) { return instance.
 const char* engine::lua_debug_get_short_source(lua_Debug& instance) { return instance.short_src; }
 int engine::lua_debug_get_current_line(lua_Debug& instance) { return instance.currentline; }
 void engine::log(log_message_types const message_type, const char* message) {}
-char* engine::class_name(char* buffer, u32 size, class_rep& crep)
+char* engine::class_name(char* buffer, u32 size, luabind::detail::class_rep& crep)
 {
+    using namespace luabind::detail;
+
     switch (crep.get_class_type())
     {
     case class_rep::cpp_class: return sz_cpy(buffer, size, "C++ class");
@@ -122,6 +123,8 @@ char* engine::class_name(char* buffer, u32 size, class_rep& crep)
 
 void engine::type_convert_class(char* buffer, u32 size, lua_State* state, int index)
 {
+    using namespace luabind::detail;
+
     object_rep* object = get_instance(state, index);
     VERIFY2(object, "invalid object userdata");
     sz_cpy(buffer, size, "");
@@ -135,6 +138,8 @@ void engine::type_convert_class(char* buffer, u32 size, lua_State* state, int in
 
 static bool is_luabind_class(lua_State* state, int index)
 {
+    using namespace luabind::detail;
+
     class_rep* rep = static_cast<class_rep*>(lua_touserdata(state, index));
     if (!rep)
         return false;
@@ -149,13 +154,13 @@ bool engine::type_convert_instance(char* buffer, u32 size, lua_State* state, int
 {
     if (!is_luabind_class(state, index))
         return false;
-    class_name(buffer, size, *static_cast<class_rep*>(lua_touserdata(state, index)));
+    class_name(buffer, size, *static_cast<luabind::detail::class_rep*>(lua_touserdata(state, index)));
     return true;
 }
 
 void engine::type_convert_userdata(char* buffer, u32 size, lua_State* state, int index)
 {
-    if (get_instance(state, index))
+    if (luabind::detail::get_instance(state, index))
     {
         type_convert_class(buffer, size, state, index);
         return;
@@ -185,9 +190,11 @@ bool engine::type_to_string(char* buffer, u32 size, lua_State* state, int index,
 #endif
 }
 
-void engine::fill_class_info(
-    Backend& backend, char* buffer, u32 size, object_rep* object, class_rep* crep, lua_State* state)
+void engine::fill_class_info(Backend& backend, char* buffer, u32 size,
+    luabind::detail::object_rep* object, luabind::detail::class_rep* crep, lua_State* state)
 {
+    using namespace luabind::detail;
+
     R_ASSERT(!"not implemented");
     // XXX nitrocaster: fix luabind 0.9 conformance
     /*
@@ -227,9 +234,12 @@ void engine::fill_class_info(
     */
 }
 
-void engine::value_convert_class(Backend& backend, char* buffer, u32 size, class_rep* crep, lua_State* state, int index,
+void engine::value_convert_class(Backend& backend, char* buffer, u32 size,
+    luabind::detail::class_rep* crep, lua_State* state, int index,
     IconType& icon_type, bool full_description)
 {
+    using namespace luabind::detail;
+
     R_ASSERT(!"not implemented");
     // XXX nitrocaster: fix luabind 0.9 conformance
     /*
@@ -259,8 +269,11 @@ void engine::value_convert_class(Backend& backend, char* buffer, u32 size, class
     */
 }
 
-bool engine::value_convert_instance(Backend& backend, char* buffer, u32 size, object_rep* object, lua_State* state)
+bool engine::value_convert_instance(Backend& backend, char* buffer, u32 size,
+    luabind::detail::object_rep* object, lua_State* state)
 {
+    using namespace luabind::detail;
+
     R_ASSERT(!"not implemented");
     return false;
     // XXX nitrocaster: fix luabind 0.9 conformance
@@ -306,6 +319,8 @@ bool engine::value_convert_instance(Backend& backend, char* buffer, u32 size, ob
 bool engine::value_convert_instance(
     Backend& backend, char* buffer, u32 size, lua_State* state, int index, IconType& icon_type, bool full_description)
 {
+    using namespace luabind::detail;
+
     object_rep* object = get_instance(state, index);
     if (!object)
         return false;
@@ -320,6 +335,8 @@ bool engine::value_convert_instance(
 bool engine::value_to_string(
     Backend& backend, char* buffer, u32 size, lua_State* state, int index, IconType& icon_type, bool full_description)
 {
+    using namespace luabind::detail;
+
     switch (lua_type(state, index))
     {
     case engine::lua_type_string:
@@ -337,7 +354,7 @@ bool engine::value_to_string(
             if (!is_luabind_class(state, index))
             {
                 icon_type = cs::lua_studio::icon_type_unknown;
-                pcvoid user_data = lua_topointer(state, index);
+                auto* user_data = lua_topointer(state, index);
                 xr_sprintf(buffer, size, "0x%08x", *(const u32*)&user_data);
                 return true;
             }
@@ -349,7 +366,7 @@ bool engine::value_to_string(
         if (value_convert_instance(backend, buffer, size, state, index, icon_type, full_description))
             return true;
         icon_type = cs::lua_studio::icon_type_unknown;
-        pcvoid user_data = lua_topointer(state, index);
+        auto* user_data = lua_topointer(state, index);
         xr_sprintf(buffer, size, "0x%08x", *(const u32*)&user_data);
         return true;
     }
@@ -362,6 +379,8 @@ bool engine::value_to_string(
 
 void engine::push_class(lua_State* state, const char* id)
 {
+    using namespace luabind::detail;
+
     object_rep* object = get_instance(state, -1);
     VERIFY(object);
     class_rep* rep = object->crep();
@@ -372,6 +391,8 @@ void engine::push_class(lua_State* state, const char* id)
 
 void engine::push_class_base(lua_State* state, const char* id)
 {
+    using namespace luabind::detail;
+
     class_rep* rep = static_cast<class_rep*>(lua_touserdata(state, -1));
     VERIFY(rep);
     for (const auto& baseInfo : rep->bases())
@@ -388,6 +409,8 @@ void engine::push_class_base(lua_State* state, const char* id)
 
 void engine::push_class_instance(lua_State* state, const char* id)
 {
+    using namespace luabind::detail;
+
     object_rep* object = get_instance(state, -1);
     if (!object)
     {
@@ -445,8 +468,8 @@ void engine::fill_class_data(Backend& backend, ValueToExpand& value_to_expand, l
     {
         string4096 type;
         typedef class_rep::base_info base_info;
-        vector_class<base_info>::const_iterator i = crep->bases().begin();
-        vector_class<base_info>::const_iterator e = crep->bases().end();
+        auto i = crep->bases().cbegin();
+        const auto e = crep->bases().cend();
         for (; i != e; ++i)
         {
             value_to_expand.add_value((*i).base->name(), class_name(type, sizeof(type), *(*i).base),
@@ -481,6 +504,8 @@ void engine::fill_class_data(Backend& backend, ValueToExpand& value_to_expand, l
 
 void engine::expand_class(Backend& backend, ValueToExpand& value, lua_State* state)
 {
+    using namespace luabind::detail;
+
     int start = lua_gettop(state);
     class_rep* crep = static_cast<class_rep*>(lua_touserdata(state, -1));
     R_ASSERT2(crep, "invalid class userdata");
@@ -495,6 +520,8 @@ void engine::expand_class(Backend& backend, ValueToExpand& value, lua_State* sta
 
 void engine::expand_class_instance(Backend& backend, ValueToExpand& value_to_expand, lua_State* state)
 {
+    using namespace luabind::detail;
+
     R_ASSERT(!"not implemented");
     // XXX nitrocaster: fix luabind 0.9 conformance
     /*
@@ -536,6 +563,8 @@ void engine::expand_class_instance(Backend& backend, ValueToExpand& value_to_exp
 
 void engine::expand_user_data(Backend& backend, ValueToExpand& value, lua_State* state)
 {
+    using namespace luabind::detail;
+
     object_rep* object = get_instance(state, -1);
     if (object)
     {
@@ -563,3 +592,5 @@ bool engine::expand_value(Backend& backend, ValueToExpand& value, lua_State* sta
 }
 
 engine::engine() { m_instance_count = 0; }
+
+#undef engine

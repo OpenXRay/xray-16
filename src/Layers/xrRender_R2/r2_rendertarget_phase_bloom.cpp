@@ -3,6 +3,8 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 
+namespace phase_bloom
+{
 #pragma pack(push, 4)
 struct v_build
 {
@@ -66,9 +68,12 @@ void CalcGauss_wave(
     w0.add(t0);
     w1.add(t1);
 }
+}
 
 void CRenderTarget::phase_bloom()
 {
+    using namespace phase_bloom;
+
     PIX_EVENT(phase_bloom);
     u32 Offset;
 

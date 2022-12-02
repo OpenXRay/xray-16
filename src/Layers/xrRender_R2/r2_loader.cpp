@@ -10,7 +10,7 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRender/FHierrarhyVisual.h"
-#include "Layers/xrRenderDX10/3DFluid/dx103DFluidVolume.h"
+#include "Layers/xrRenderDX11/3DFluid/dx113DFluidVolume.h"
 #endif
 
 void CRender::level_Load(IReader* fs)
@@ -131,7 +131,7 @@ void CRender::level_Unload()
     // 1.
     xr_delete(rmPortals);
     pLastSector = nullptr;
-    vLastCameraPos.set(0, 0, 0);
+    Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
     for (IRender_Sector* sector : Sectors)
@@ -241,7 +241,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 #endif
 
             // Create and fill
-            //  TODO: DX10: Check fragmentation.
+            //  TODO: DX11: Check fragmentation.
             //  Check if buffer is less then 2048 kb
             _VB[i].Create(vCount * vSize);
             u8* pData = static_cast<u8*>(_VB[i].Map());
@@ -268,7 +268,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 #endif
 
             // Create and fill
-            //  TODO: DX10: Check fragmentation.
+            //  TODO: DX11: Check fragmentation.
             //  Check if buffer is less then 2048 kb
             _IB[i].Create(iCount * 2);
             u8* pData = static_cast<u8*>(_IB[i].Map());
@@ -457,7 +457,7 @@ void CRender::Load3DFluid()
             u32 cnt = F->r_u32();
             for (u32 i = 0; i < cnt; ++i)
             {
-                dx103DFluidVolume* pVolume = xr_new<dx103DFluidVolume>();
+                dx113DFluidVolume* pVolume = xr_new<dx113DFluidVolume>();
                 pVolume->Load("", F, 0);
 
                 //	Attach to sector's static geometry

@@ -1,11 +1,9 @@
 #include "stdafx.h"
 #include "string_concatenations.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE) // XXX: remove or cleanup
 int _cdecl _resetstkoflw(void)
 {
-    int stack_addr;
-
     return 0;
 }
 #endif
@@ -64,7 +62,7 @@ static inline void process(pstr& i, pcstr e, u32 const index, pcstr (&strings)[c
 
 int stack_overflow_exception_filter(int exception_code)
 {
-    if (exception_code == EXCEPTION_STACK_OVERFLOW)
+    if (exception_code == static_cast<int>(EXCEPTION_STACK_OVERFLOW))
     {
         // Do not call _resetstkoflw here, because
         // at this point, the stack is not yet unwound.

@@ -12,13 +12,10 @@
 #include "ide.hpp"
 #include "editor_environment_thunderbolts_manager.hpp"
 
-using editor::environment::thunderbolts::thunderbolt_id;
-using editor::environment::thunderbolts::manager;
-
-thunderbolt_id::thunderbolt_id(manager const& manager, shared_str const& id)
-    : m_manager(manager), m_id(id), m_property_holder(0)
+namespace editor::environment::thunderbolts
 {
-}
+thunderbolt_id::thunderbolt_id(manager const& manager, shared_str const& id)
+    : m_property_holder(nullptr), m_manager(manager), m_id(id) {}
 
 thunderbolt_id::~thunderbolt_id()
 {
@@ -49,3 +46,4 @@ void thunderbolt_id::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 thunderbolt_id::property_holder_type* thunderbolt_id::object() { return (m_property_holder); }
+} // namespace editor::environment::thunderbolts

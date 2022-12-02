@@ -169,8 +169,6 @@ void CTexture::Load()
 
     Preload();
 
-    bool bCreateView = true;
-
     // Check for OGM
     string_path fn;
     if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))

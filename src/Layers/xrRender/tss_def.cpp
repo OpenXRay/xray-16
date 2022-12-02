@@ -7,7 +7,7 @@
 #include "../xrRenderGL/glState.h"
 #endif
 
-// TODO: DX10: Implement equivalent for SimulatorStates::record for DX10
+// TODO: DX11: Implement equivalent for SimulatorStates::record for DX11
 void SimulatorStates::record(ID3DState*& state)
 {
 #if defined(USE_DX9)
@@ -121,9 +121,9 @@ BOOL SimulatorStates::equal(SimulatorStates& S)
 void SimulatorStates::clear() { States.clear(); }
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/dx10StateUtils.h"
+#include "Layers/xrRenderDX11/dx11StateUtils.h"
 
-void SimulatorStates::UpdateState(dx10State& state) const
+void SimulatorStates::UpdateState(dx11State& state) const
 {
     for (u32 it = 0; it < States.size(); it++)
     {
@@ -160,7 +160,7 @@ void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
                 break;
 
             case D3DRS_CULLMODE:
-                desc.CullMode = dx10StateUtils::ConvertCullMode((D3DCULL)S.v2);
+                desc.CullMode = dx11StateUtils::ConvertCullMode((D3DCULL)S.v2);
                 break;
             /*
             switch (S.v2)
@@ -182,14 +182,14 @@ void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
 
             //  desc.FrontCounterClockwise = FALSE;
 
-            //  TODO: DX10: Check how to scale unit for depth bias
+            //  TODO: DX11: Check how to scale unit for depth bias
             case D3DRS_DEPTHBIAS:
                 VERIFY(0);
                 break;
 
             //  desc.DepthBiasClamp = 0.0f;
 
-            //  TODO: DX10: Check slope scaled depth bias is used
+            //  TODO: DX11: Check slope scaled depth bias is used
             case D3DRS_SLOPESCALEDEPTHBIAS:
                 // desc.SlopeScaledDepthBias = 0.0f;
                 VERIFY(0);
@@ -209,7 +209,7 @@ void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
         // case 1:
         //
         // CHK_DX(HW.pDevice->SetTextureStageState  (S.v1,(D3DTEXTURESTAGESTATETYPE)S.v2,S.v3));
-        //  TODO: DX10: Enable
+        //  TODO: DX11: Enable
         //  VERIFY(!"DirectX 10 doesn't support texture stage states. Implement shader instead!");
         //  break;
     }
@@ -230,7 +230,7 @@ void SimulatorStates::UpdateDesc(D3D_DEPTH_STENCIL_DESC& desc) const
                 desc.DepthWriteMask = S.v2 ? D3D_DEPTH_WRITE_MASK_ALL : D3D_DEPTH_WRITE_MASK_ZERO;
                 break;
 
-            case D3DRS_ZFUNC: desc.DepthFunc = dx10StateUtils::ConvertCmpFunction((D3DCMPFUNC)S.v2); break;
+            case D3DRS_ZFUNC: desc.DepthFunc = dx11StateUtils::ConvertCmpFunction((D3DCMPFUNC)S.v2); break;
 
             case D3DRS_STENCILENABLE: desc.StencilEnable = S.v2 ? 1 : 0; break;
 
@@ -239,35 +239,35 @@ void SimulatorStates::UpdateDesc(D3D_DEPTH_STENCIL_DESC& desc) const
             case D3DRS_STENCILWRITEMASK: desc.StencilWriteMask = (u8)S.v2; break;
 
             case D3DRS_STENCILFAIL:
-                desc.FrontFace.StencilFailOp = dx10StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
+                desc.FrontFace.StencilFailOp = dx11StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
                 break;
 
             case D3DRS_STENCILZFAIL:
-                desc.FrontFace.StencilDepthFailOp = dx10StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
+                desc.FrontFace.StencilDepthFailOp = dx11StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
                 break;
 
             case D3DRS_STENCILPASS:
-                desc.FrontFace.StencilPassOp = dx10StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
+                desc.FrontFace.StencilPassOp = dx11StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
                 break;
 
             case D3DRS_STENCILFUNC:
-                desc.FrontFace.StencilFunc = dx10StateUtils::ConvertCmpFunction((D3DCMPFUNC)S.v2);
+                desc.FrontFace.StencilFunc = dx11StateUtils::ConvertCmpFunction((D3DCMPFUNC)S.v2);
                 break;
 
             case D3DRS_CCW_STENCILFAIL:
-                desc.BackFace.StencilFailOp = dx10StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
+                desc.BackFace.StencilFailOp = dx11StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
                 break;
 
             case D3DRS_CCW_STENCILZFAIL:
-                desc.BackFace.StencilDepthFailOp = dx10StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
+                desc.BackFace.StencilDepthFailOp = dx11StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
                 break;
 
             case D3DRS_CCW_STENCILPASS:
-                desc.BackFace.StencilPassOp = dx10StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
+                desc.BackFace.StencilPassOp = dx11StateUtils::ConvertStencilOp((D3DSTENCILOP)S.v2);
                 break;
 
             case D3DRS_CCW_STENCILFUNC:
-                desc.BackFace.StencilFunc = dx10StateUtils::ConvertCmpFunction((D3DCMPFUNC)S.v2);
+                desc.BackFace.StencilFunc = dx11StateUtils::ConvertCmpFunction((D3DCMPFUNC)S.v2);
                 break;
             }
         }
@@ -283,41 +283,41 @@ void SimulatorStates::UpdateDesc(D3D_BLEND_DESC& desc) const
         {
             switch (S.v1)
             {
-            case XRDX10RS_ALPHATOCOVERAGE:
+            case XRDX11RS_ALPHATOCOVERAGE:
                 for (int i = 0; i < 8; ++i)
                     desc.AlphaToCoverageEnable = S.v2 ? 1 : 0;
                 break;
 
             case D3DRS_SRCBLEND:
                 for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].SrcBlend = dx10StateUtils::ConvertBlendArg((D3DBLEND)S.v2);
+                    desc.RenderTarget[i].SrcBlend = dx11StateUtils::ConvertBlendArg((D3DBLEND)S.v2);
                 break;
 
             case D3DRS_DESTBLEND:
                 for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].DestBlend = dx10StateUtils::ConvertBlendArg((D3DBLEND)S.v2);
+                    desc.RenderTarget[i].DestBlend = dx11StateUtils::ConvertBlendArg((D3DBLEND)S.v2);
                 break;
 
             // D3DRS_ALPHAFUNC
 
             case D3DRS_BLENDOP:
                 for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].BlendOp = dx10StateUtils::ConvertBlendOp((D3DBLENDOP)S.v2);
+                    desc.RenderTarget[i].BlendOp = dx11StateUtils::ConvertBlendOp((D3DBLENDOP)S.v2);
                 break;
 
             case D3DRS_SRCBLENDALPHA:
                 for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].SrcBlendAlpha = dx10StateUtils::ConvertBlendArg((D3DBLEND)S.v2);
+                    desc.RenderTarget[i].SrcBlendAlpha = dx11StateUtils::ConvertBlendArg((D3DBLEND)S.v2);
                 break;
 
             case D3DRS_DESTBLENDALPHA:
                 for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].DestBlendAlpha = dx10StateUtils::ConvertBlendArg((D3DBLEND)S.v2);
+                    desc.RenderTarget[i].DestBlendAlpha = dx11StateUtils::ConvertBlendArg((D3DBLEND)S.v2);
                 break;
 
             case D3DRS_BLENDOPALPHA:
                 for (int i = 0; i < 8; ++i)
-                    desc.RenderTarget[i].BlendOpAlpha = dx10StateUtils::ConvertBlendOp((D3DBLENDOP)S.v2);
+                    desc.RenderTarget[i].BlendOpAlpha = dx11StateUtils::ConvertBlendOp((D3DBLENDOP)S.v2);
                 break;
 
             case D3DRS_ALPHABLENDENABLE:
@@ -409,7 +409,7 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
                 }
                 break;
 
-            case XRDX10SAMP_ANISOTROPICFILTER:
+            case XRDX11SAMP_ANISOTROPICFILTER:
                 if (S.v3)
                     desc.Filter = (D3D_FILTER)(desc.Filter | FilterAnisotropic);
                 // desc.Filter |= FilterAnisotropic;
@@ -418,7 +418,7 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
                 // desc.Filter &= ~FilterAnisotropic;
                 break;
 
-            case XRDX10SAMP_COMPARISONFILTER:
+            case XRDX11SAMP_COMPARISONFILTER:
                 if (S.v3)
                     desc.Filter = (D3D_FILTER)(desc.Filter | FilterComparison);
                 // desc.Filter |= FilterComparison;
@@ -429,15 +429,15 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
 
             // D3Dxx_TEXTURE_ADDRESS_MODE AddressU;
             case D3DSAMP_ADDRESSU: /* D3DTEXTUREADDRESS for U coordinate */
-                desc.AddressU = dx10StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
+                desc.AddressU = dx11StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
                 break;
 
             case D3DSAMP_ADDRESSV: /* D3DTEXTUREADDRESS for V coordinate */
-                desc.AddressV = dx10StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
+                desc.AddressV = dx11StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
                 break;
 
             case D3DSAMP_ADDRESSW: /* D3DTEXTUREADDRESS for W coordinate */
-                desc.AddressW = dx10StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
+                desc.AddressW = dx11StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
                 break;
 
             // FLOAT MipLODBias
@@ -451,7 +451,7 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
                 break;
 
             // D3Dxx_COMPARISON_FUNC ComparisonFunc;
-            case XRDX10SAMP_COMPARISONFUNC:
+            case XRDX11SAMP_COMPARISONFUNC:
                 desc.ComparisonFunc = (D3D_COMPARISON_FUNC)S.v3;
                 break;
 
@@ -466,7 +466,7 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
             break;
 
             // FLOAT MinLOD;
-            case XRDX10SAMP_MINLOD:
+            case XRDX11SAMP_MINLOD:
                 desc.MinLOD = (FLOAT)S.v3;
                 break;
 

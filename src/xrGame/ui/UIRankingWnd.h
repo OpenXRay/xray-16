@@ -19,7 +19,7 @@ class CUIFrameWindow;
 class CUICharacterInfo;
 class CUIScrollView;
 
-class CUIRankingWnd : public CUIWindow, public CUIWndCallback
+class CUIRankingWnd final : public CUIWindow, public CUIWndCallback
 {
     using inherited = CUIWindow;
 
@@ -71,7 +71,7 @@ class CUIRankingWnd : public CUIWindow, public CUIWndCallback
 
 public:
     CUIRankingWnd();
-    virtual ~CUIRankingWnd();
+    ~CUIRankingWnd() override;
 
     virtual void Show(bool status);
     virtual void Update();

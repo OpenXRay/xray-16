@@ -9,6 +9,9 @@
 #elif defined(__FreeBSD__)
 #   define XR_PLATFORM_FREEBSD
 #   define _XRAY_PLATFORM_MARKER "FreeBSD"
+#elif defined(__APPLE__)
+#   define XR_PLATFORM_APPLE
+#   define _XRAY_PLATFORM_MARKER "Apple"
 #else
 #   error Unsupported platform
 #endif
@@ -47,6 +50,8 @@
 #include "Common/PlatformLinux.inl"
 #elif defined(XR_PLATFORM_FREEBSD)
 #include "Common/PlatformBSD.inl"
+#elif defined(XR_PLATFORM_APPLE)
+#include "Common/PlatformApple.inl"
 #else
 #error Provide Platform.inl file for your platform
 #endif

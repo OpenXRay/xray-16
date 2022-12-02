@@ -32,7 +32,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/sdk/include
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -45,7 +45,7 @@ target_link_libraries(${PROJECT_NAME}
     xrScriptEngine
     xrAPI
     xrMiscMath
-    ${SDL_LIBRARIES}
+    ${SDL2_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME}

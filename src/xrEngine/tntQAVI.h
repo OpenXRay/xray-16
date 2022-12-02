@@ -5,7 +5,6 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "vfw.h"
-#include "mmsystem.h"
 #endif
 
 // replaced with standard AVIIF_KEYFRAME

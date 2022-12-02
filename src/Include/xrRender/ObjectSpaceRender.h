@@ -3,10 +3,7 @@
 #define ObjectSpaceRender_included
 
 #ifdef DEBUG
-
-template <class T>
-struct _sphere;
-typedef _sphere<float> Fsphere;
+struct Fsphere;
 
 class IObjectSpaceRender
 {
@@ -18,7 +15,6 @@ public:
     virtual void dbgAddSphere(const Fsphere& sphere, u32 colour) = 0;
     virtual void SetShader() = 0;
 };
-
 #endif // DEBUG
 
 #endif //	ObjectSpaceRender_included

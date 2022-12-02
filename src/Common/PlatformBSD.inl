@@ -17,9 +17,8 @@
 
 #include <string>
 #include <pthread_np.h>
-#define pthread_setname_np pthread_set_name_np
-#define cpu_set_t cpuset_t
 #include <pthread.h>
+#define pthread_setname_np pthread_set_name_np
 #include <fcntl.h>
 #include <sys/mman.h> // for mmap / munmap
 #include <dirent.h>
@@ -254,8 +253,14 @@ typedef dirent DirEntryType;
 #define O_SEQUENTIAL 0
 #define SH_DENYWR 0
 
+#if __has_include(<SDL_stdinc.h>)
+#include <SDL_stdinc.h>
 #define itoa SDL_itoa
 #define _itoa_s SDL_itoa
+#else
+#define itoa(...) do { static_assert(false, "SDL_stdinc.h is missing"); } while (false)
+#define _itoa_s(...) do { static_assert(false, "SDL_stdinc.h is missing"); } while (false)
+#endif
 
 #define _stricmp stricmp
 #define strcmpi stricmp
@@ -290,7 +295,7 @@ inline int strcpy_s(char *dest, size_t num, const char *source)
     return ERANGE;
 }
 
-template <std::size_t num>
+template <size_t num>
 inline int strcpy_s(char (&dest)[num], const char *source) { return strcpy_s(dest, num, source); }
 
 inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t num)
@@ -330,7 +335,7 @@ inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t n
     return EINVAL;
 }
 
-template <std::size_t dst_sz>
+template <size_t dst_sz>
 inline int strncpy_s(char (&dest)[dst_sz], const char * source, size_t num) { return strncpy_s(dest, dst_sz, source, num); }
 
 inline int strcat_s(char * dest, size_t num, const char * source)
@@ -1068,7 +1073,13 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 
-#define xr_fs_strlwr(str) str
+template <typename T>
+decltype(auto) do_nothing(const T& obj)
+{
+    return obj;
+}
+
+#define xr_fs_strlwr(str) do_nothing(str)
 #define xr_fs_nostrlwr(str) xr_strlwr(str)
 
 inline void convert_path_separators(char * path)

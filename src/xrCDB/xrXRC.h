@@ -47,27 +47,24 @@ public:
     };
     ColliderStatistics Stats;
 
-    IC void ray_options(u32 f) { CL.ray_options(f); }
-    IC void ray_query(const CDB::MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range = 10000.f)
+    IC void ray_query(u32 options, const CDB::MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range = 10000.f)
     {
         Stats.RayQuery.Begin();
-        CL.ray_query(m_def, r_start, r_dir, r_range);
+        CL.ray_query(options, m_def, r_start, r_dir, r_range);
         Stats.RayQuery.End();
     }
 
-    IC void box_options(u32 f) { CL.box_options(f); }
-    IC void box_query(const CDB::MODEL* m_def, const Fvector& b_center, const Fvector& b_dim)
+    IC void box_query(u32 options, const CDB::MODEL* m_def, const Fvector& b_center, const Fvector& b_dim)
     {
         Stats.BoxQuery.Begin();
-        CL.box_query(m_def, b_center, b_dim);
+        CL.box_query(options, m_def, b_center, b_dim);
         Stats.BoxQuery.End();
     }
 
-    IC void frustum_options(u32 f) { CL.frustum_options(f); }
-    IC void frustum_query(const CDB::MODEL* m_def, const CFrustum& F)
+    IC void frustum_query(u32 options, const CDB::MODEL* m_def, const CFrustum& F)
     {
         Stats.FrustumQuery.Begin();
-        CL.frustum_query(m_def, F);
+        CL.frustum_query(options, m_def, F);
         Stats.FrustumQuery.End();
     }
 

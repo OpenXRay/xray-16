@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "UIDialogWnd.h"
 
-CUIDialogWnd::CUIDialogWnd()
+CUIDialogWnd::CUIDialogWnd() : CUIWindow("CUIDialogWnd")
 {
     m_pParentHolder = NULL;
     m_bWorkInPause = false;

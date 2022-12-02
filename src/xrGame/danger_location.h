@@ -25,6 +25,7 @@ public:
     flags m_mask;
 
 public:
+    virtual ~CDangerLocation() = default;
     IC bool operator==(const Fvector& position) const;
     virtual bool operator==(const IGameObject* object) const;
     virtual bool useful() const;

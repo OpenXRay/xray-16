@@ -1,13 +1,12 @@
 #pragma once
-#ifndef PHNETSTATE_H
-#define PHNETSTATE_H
+
 #include "xrCore/_vector3d.h"
 #include "xrCore/_quaternion.h"
 #include "xrCommon/xr_vector.h"
 
 class NET_Packet;
 
-struct SPHNetState
+struct XRPHYSICS_API SPHNetState
 {
     Fvector linear_vel;
     Fvector angular_vel;
@@ -45,7 +44,7 @@ private:
 
 using PHNETSTATE_VECTOR = xr_vector<SPHNetState>;
 
-struct SPHBonesData
+struct XRPHYSICS_API SPHBonesData
 {
     u64 bones_mask;
     u16 root_bone;
@@ -61,4 +60,3 @@ struct SPHBonesData
     const Fvector& get_min() const { return m_min; }
     const Fvector& get_max() const { return m_max; }
 };
-#endif

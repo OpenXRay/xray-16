@@ -373,8 +373,6 @@ void CMainMenu::IR_OnMouseMove(int x, int y)
     CDialogHolder::IR_UIOnMouseMove(x, y);
 };
 
-void CMainMenu::IR_OnMouseStop(int x, int y){};
-
 bool IWantMyMouseBackScreamed = false;
 void CMainMenu::IR_OnKeyboardPress(int dik)
 {

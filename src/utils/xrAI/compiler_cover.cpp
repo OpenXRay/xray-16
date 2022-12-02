@@ -96,7 +96,7 @@ IC float rayTrace(CDB::COLLIDER* DB, Fvector& P, Fvector& D, float R, RayCache& 
     }
 
     // 2. Polygon doesn't pick - real database query
-    DB->ray_query(&Level, P, D, R);
+    DB->ray_query(CDB::OPT_CULL, &Level, P, D, R);
 
     // 3. Analyze polygons and cache nearest if possible
     if (0 == DB->r_count())
@@ -293,7 +293,6 @@ public:
 
     virtual void Execute()
     {
-        DB.ray_options(CDB::OPT_CULL);
         {
             RC rc;
             rc.C[0].set(0, 0, 0);

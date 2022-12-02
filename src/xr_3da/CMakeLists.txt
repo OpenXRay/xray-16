@@ -16,7 +16,7 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT $
 target_include_directories(${PROJECT_NAME}
     PRIVATE
     ${CMAKE_SOURCE_DIR}/src
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}

@@ -19,11 +19,7 @@
 #endif // DEBUG
 
 ///////////////////////////////////////////////////////////////
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#pragma warning(disable : 4267)
 #include "ode/ode/src/collision_kernel.h"
-#pragma warning(pop)
 ///////////////////////////////////////////////////////////////////
 
 #include "ExtendedGeom.h"

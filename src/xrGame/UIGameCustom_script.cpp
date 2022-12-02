@@ -23,6 +23,7 @@ SCRIPT_EXPORT(CUIGameCustom, (CDialogHolder), {
             .def("RemoveCustomStatic", &CUIGameCustom::RemoveCustomStatic)
             .def("HideActorMenu", &CUIGameCustom::HideActorMenu)
              //Alundaio
+            .def("ShowActorMenu", &CUIGameCustom::ShowActorMenu)
             .def("UpdateActorMenu", &CUIGameCustom::UpdateActorMenu)
             .def("CurrentItemAtCell", &CUIGameCustom::CurrentItemAtCell)
             //-Alundaio

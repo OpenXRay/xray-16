@@ -82,8 +82,8 @@ void CUIGameCTA::Init(int stage)
         m_pReinforcementInidcator->SetAutoDelete(true);
         CUIXmlInit::InitTextWnd(uiXml, "reinforcement", 0, m_pReinforcementInidcator);
 
-        m_team1_icon = xr_new<CUIStatic>();
-        m_team2_icon = xr_new<CUIStatic>();
+        m_team1_icon = xr_new<CUIStatic>("Team 1 icon");
+        m_team2_icon = xr_new<CUIStatic>("Team 2 icon");
         CUIXmlInit::InitStatic(uiXml, "team1_icon", 0, m_team1_icon);
         CUIXmlInit::InitStatic(uiXml, "team2_icon", 0, m_team2_icon);
 

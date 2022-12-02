@@ -11,8 +11,7 @@
 #include "group_state_custom.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateGroupRestAbstract CStateGroupRest<_Object>
 

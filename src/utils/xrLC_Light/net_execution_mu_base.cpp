@@ -13,6 +13,8 @@
 
 namespace lc_net
 {
+static constexpr size_t mu_base_light_result_buffer_size = 128 * 1024;
+
 void execution_mu_base_light::send_task(IGenericStream* outStream)
 {
     R_ASSERT(mu_model_id != u32(-1));
@@ -25,10 +27,9 @@ bool execution_mu_base_light::receive_task(IAgent* agent, u32 sessionId, IGeneri
     return true;
 }
 
-static const u32 send_receive_result_buffer_size = 128 * 1024;
 void execution_mu_base_light::receive_result(IGenericStream* inStream)
 {
-    u8 buff[send_receive_result_buffer_size];
+    u8 buff[mu_base_light_result_buffer_size];
     INetBlockReader r(inStream, buff, sizeof(buff));
     // INetReaderGenStream r( inStream );
     mu_model_id = r.r_u32();
@@ -42,7 +43,7 @@ void execution_mu_base_light::send_result(IGenericStream* outStream)
 {
     R_ASSERT(mu_model_id != u32(-1));
 
-    u8 buff[send_receive_result_buffer_size];
+    u8 buff[mu_base_light_result_buffer_size];
     INetMemoryBuffWriter w(outStream, sizeof(buff), buff);
     // INetIWriterGenStream w( outStream, 100 );
     w.w_u32(mu_model_id);

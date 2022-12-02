@@ -15,7 +15,6 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include <shellapi.h>
 #endif
-//#pragma comment(lib, "shell32.lib")
 
 namespace gamespy_gp
 {

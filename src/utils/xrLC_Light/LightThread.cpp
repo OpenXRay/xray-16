@@ -8,8 +8,6 @@ void LightThread::Execute()
 {
     //		DetailSlot::verify	();
     CDB::COLLIDER DB;
-    DB.ray_options(CDB::OPT_CULL);
-    DB.box_options(CDB::OPT_FULL_TEST);
     base_lighting Selected;
 
     for (u32 _z = Nstart; _z < Nend; _z++)
@@ -19,7 +17,7 @@ void LightThread::Execute()
             DetailSlot& DS = gl_data.slots_data.get_slot(_x, _z);
             if (!detail_slot_process(_x, _z, DS))
                 continue;
-            if (!detail_slot_calculate(_x, _z, DS, box_result, DB, Selected))
+            if (!detail_slot_calculate(_x, _z, DS, box_result, DB, CDB::OPT_FULL_TEST, CDB::OPT_CULL, Selected))
                 continue; //?
             gl_data.slots_data.set_slot_calculated(_x, _z);
 

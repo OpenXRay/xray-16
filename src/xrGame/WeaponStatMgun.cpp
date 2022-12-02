@@ -93,7 +93,7 @@ bool CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
     m_fire_bone = K->LL_BoneID(pUserData->r_string("mounted_weapon_definition", "fire_bone"));
     m_camera_bone = K->LL_BoneID(pUserData->r_string("mounted_weapon_definition", "camera_bone"));
 
-    U16Vec fixed_bones;
+    xr_vector<u16> fixed_bones;
     fixed_bones.push_back(K->LL_GetBoneRoot());
     PPhysicsShell() = P_build_Shell(this, false, fixed_bones);
 

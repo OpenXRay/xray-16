@@ -68,7 +68,7 @@ public:
     virtual void MasterOut(bool bCheckDevice, bool bUseCoords, bool bScaleCoords, bool bUseSkip, float _x, float _y,
         float _skip, pcstr fmt, va_list p) override;
     virtual u32 smart_strlen(pcstr S) override;
-    virtual u32 get_actions_text_length(pcstr s) override;
+    virtual std::pair<u32, u32> get_actions_text_length(pcstr s) override; // returns count of actions plus total text size of all actions
     virtual bool IsMultibyte() const override { return (uFlags & fsMultibyte); };
     virtual u16 SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, pcstr pszText) override;
     virtual u16 GetCutLengthPos(float fTargetWidth, pcstr pszText) override;

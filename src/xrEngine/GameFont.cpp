@@ -195,8 +195,9 @@ void CGameFont::OutSet(float x, float y)
 void CGameFont::OutSetI(float x, float y) { OutSet(DI2PX(x), DI2PY(y)); }
 u32 CGameFont::smart_strlen(pcstr S) { return (IsMultibyte() ? mbhMulti2Wide(NULL, NULL, 0, S) : xr_strlen(S)); }
 
-u32 CGameFont::get_actions_text_length(pcstr s)
+std::pair<u32, u32> CGameFont::get_actions_text_length(pcstr s)
 {
+    u32 count = 0;
     u32 length = 0;
 
     while (s[0])
@@ -209,16 +210,20 @@ u32 CGameFont::get_actions_text_length(pcstr s)
 
             cpcstr binding = GetActionBinding(actionId);
             length += xr_strlen(binding);
+            ++count;
         }
         ++s;
     }
-    return length;
+    return { count, length };
 }
 
 void CGameFont::OnRender()
 {
-    pFontRender->OnRender(*this);
-    strings.clear();
+    if (!strings.empty())
+    {
+        pFontRender->OnRender(*this);
+        strings.clear();
+    }
 }
 
 u16 CGameFont::GetCutLengthPos(float fTargetWidth, pcstr pszText)
@@ -392,12 +397,12 @@ float CGameFont::SizeOf_(const xr_wide_char* wsStr)
     if (!(wsStr && wsStr[0]))
         return 0;
 
-    unsigned int len = wsStr[0];
-    float X = 0.0f, fDelta = 0.0f;
+    const u16 len = wsStr[0];
+    float X = 0.0f;
 
     if (len)
     {
-        for (unsigned int j = 1; j <= len; j++)
+        for (u16 j = 1; j <= len; j++)
         {
             if (wsStr[j] == GAME_ACTION_MARK)
             {
@@ -407,20 +412,20 @@ float CGameFont::SizeOf_(const xr_wide_char* wsStr)
 
                 cpcstr binding = GetActionBinding(actionId);
 
-                const size_t sz = xr_strlen(binding);
-                xr_wide_char* wideBinding = static_cast<xr_wide_char*>(xr_alloca(sz));
-                mbhMulti2Wide(wideBinding, nullptr, sz, binding);
-                ++wideBinding;
+                xr_wide_char wideBinding[MAX_MB_CHARS];
+                const u16 bindingLen = mbhMulti2Wide(wideBinding, nullptr, MAX_MB_CHARS, binding);
 
-                while (wideBinding[0])
+                for (u16 i = 1; i <= bindingLen; ++i)
                 {
-                    X += GetCharTC(wideBinding[0]).z - 2;
-                    ++wideBinding;
+                    float fDelta = GetCharTC(wideBinding[i]).z - 2;
+                    if (IsNeedSpaceCharacter(wsStr[j]))
+                        fDelta += fXStep;
+                    X += fDelta;
                 }
             }
             else
             {
-                fDelta = GetCharTC(wsStr[j]).z - 2;
+                float fDelta = GetCharTC(wsStr[j]).z - 2;
                 if (IsNeedSpaceCharacter(wsStr[j]))
                     fDelta += fXStep;
                 X += fDelta;

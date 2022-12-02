@@ -49,7 +49,7 @@ private:
     UIHint* m_hint_wnd{};
 
 public:
-    ui_actor_state_wnd() = default;
+    ui_actor_state_wnd() : CUIWindow("ui_actor_state_wnd") {}
     ~ui_actor_state_wnd() override;
     void init_from_xml(CUIXml& xml);
     void init_from_xml(CUIXml& xml, LPCSTR path);

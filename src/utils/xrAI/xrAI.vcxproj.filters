@@ -60,9 +60,6 @@
     <ClCompile Include="compiler_save.cpp">
       <Filter>Compiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp">
-      <Filter>Compiler</Filter>
-    </ClCompile>
     <ClCompile Include="StdAfx.cpp">
       <Filter>Compiler\Kernel</Filter>
     </ClCompile>
@@ -97,6 +94,9 @@
       <Filter>ALife\guid_generator</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Layers\xrRender\ETextureParams.cpp">
+      <Filter>Compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrLoadSurface.cpp">
       <Filter>Compiler</Filter>
     </ClCompile>
   </ItemGroup>

@@ -115,17 +115,14 @@ bool CWeapon::install_upgrade_disp(LPCSTR section, bool test)
     result |=
         process_if_exists(section, "PDM_disp_crouch_no_acc", &CInifile::r_float, m_pdm.m_fPDM_disp_crouch_no_acc, test);
 
-    //	result |= process_if_exists( section, "misfire_probability", &CInifile::r_float, misfireProbability,       test
-    //);
-    //	result |= process_if_exists( section, "misfire_condition_k", &CInifile::r_float, misfireConditionK,        test
-    //);
-    result |= process_if_exists(section, "condition_shot_dec", &CInifile::r_float, conditionDecreasePerShot, test);
-    result |=
-        process_if_exists(section, "condition_queue_shot_dec", &CInifile::r_float, conditionDecreasePerQueueShot, test);
+    result |= process_if_exists(section, "misfire_probability", &CInifile::r_float, misfireProbability, test);
+    result |= process_if_exists(section, "misfire_condition_k", &CInifile::r_float, misfireConditionK, test);
     result |= process_if_exists(section, "misfire_start_condition", &CInifile::r_float, misfireStartCondition, test);
     result |= process_if_exists(section, "misfire_end_condition", &CInifile::r_float, misfireEndCondition, test);
     result |= process_if_exists(section, "misfire_start_prob", &CInifile::r_float, misfireStartProbability, test);
     result |= process_if_exists(section, "misfire_end_prob", &CInifile::r_float, misfireEndProbability, test);
+    result |= process_if_exists(section, "condition_shot_dec", &CInifile::r_float, conditionDecreasePerShot, test);
+    result |= process_if_exists(section, "condition_queue_shot_dec", &CInifile::r_float, conditionDecreasePerQueueShot, test);
 
     bool value = m_zoom_params.m_bZoomEnabled;
     bool result2 = process_if_exists_set(section, "zoom_enabled", &CInifile::r_bool, value, test);

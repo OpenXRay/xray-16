@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #include "xrTheora_Stream.h"
 
-#ifdef _EDITOR
-//# pragma comment(lib, "x:\\oggB.lib")
-//# pragma comment(lib, "x:\\theoraB.lib")
-#endif
-
 CTheoraStream::CTheoraStream()
 {
     // clear self
