@@ -5,6 +5,12 @@
 template <typename _Object>
 class CStateMonsterSquadRestFollow : public CState<_Object>
 {
+    static constexpr float STOP_DISTANCE = 2.f;
+    static constexpr float STAY_DISTANCE = 5 * STOP_DISTANCE;
+
+    static constexpr u32 MIN_TIME_OUT = 2000;
+    static constexpr u32 MAX_TIME_OUT = 3000;
+
 protected:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;

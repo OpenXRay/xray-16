@@ -4,7 +4,7 @@
 
 struct SVersionDescription;
 
-class CUIVersionList : public CUIWindow
+class CUIVersionList final : public CUIWindow
 {
     CUIListBox* versionsList;
     CUIFrameLineWnd* header;

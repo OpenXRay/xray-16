@@ -140,14 +140,12 @@ void game_sv_mp_script::OnPlayerDisconnect(ClientID id_who, pstr Name, u16 GameI
 
 #pragma warning(push)
 #pragma warning(disable : 4709)
-using namespace luabind;
-using namespace luabind::policy;
 
 template <typename T>
-struct CWrapperBase : public T, public luabind::wrap_base
+struct CGameSvMpScriptWrapperBase : public T, public luabind::wrap_base
 {
     typedef T inherited;
-    typedef CWrapperBase<T> self_type;
+    typedef CGameSvMpScriptWrapperBase<T> self_type;
     DEFINE_LUA_WRAPPER_CONST_METHOD_0(type_name, LPCSTR)
 
     DEFINE_LUA_WRAPPER_METHOD_V0(Update)
@@ -161,9 +159,9 @@ struct CWrapperBase : public T, public luabind::wrap_base
 
     game_PlayerState* createPlayerState() override
     {
-        return call_member<game_PlayerState*>(this, "createPlayerState");
+        return luabind::call_member<game_PlayerState*>(this, "createPlayerState");
         // XXX: investigate
-        //return call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
+        //return luabind::call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
     }
 
     static game_PlayerState* createPlayerState_static(inherited* ptr)
@@ -179,6 +177,8 @@ struct CWrapperBase : public T, public luabind::wrap_base
 #pragma optimize("s", on)
 void game_sv_mp_script_register(lua_State* luaState)
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<game_sv_mp, game_sv_GameState>("game_sv_mp")
@@ -192,8 +192,11 @@ void game_sv_mp_script_register(lua_State* luaState)
 
 void game_sv_mp_script_script_register(lua_State* luaState)
 {
-    using WrapType = CWrapperBase<game_sv_mp_script>;
+    using namespace luabind;
+    using namespace luabind::policy;
+
     using BaseType = game_sv_mp_script;
+    using WrapType = CGameSvMpScriptWrapperBase<game_sv_mp_script>;
 
     module(luaState)
     [

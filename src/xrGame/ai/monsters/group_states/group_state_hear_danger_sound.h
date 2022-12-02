@@ -5,6 +5,9 @@
 template <typename _Object>
 class CStateGroupHearDangerousSound : public CState<_Object>
 {
+    static constexpr float LEADER_RADIUS = 20.f;
+    static constexpr u32 FIND_POINT_ATTEMPTS = 5;
+
 protected:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;

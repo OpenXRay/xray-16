@@ -4,7 +4,7 @@
 class CUI3tButton;
 class CUIEditBox;
 
-class XRUICORE_API CUIMessageBox : public CUIStatic
+class XRUICORE_API CUIMessageBox final : public CUIStatic
 {
 private:
     typedef CUIStatic inherited;

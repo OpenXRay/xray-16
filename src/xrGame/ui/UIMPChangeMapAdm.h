@@ -9,7 +9,7 @@ class CUITextWnd;
 class CUIListBox;
 class CUI3tButton;
 
-class CUIMpChangeMapAdm : public CUIWindow, public CUIWndCallback
+class CUIMpChangeMapAdm final : public CUIWindow, public CUIWndCallback
 {
     typedef CUIWindow inherited;
     CUIStatic* map_pic;
@@ -20,7 +20,7 @@ class CUIMpChangeMapAdm : public CUIWindow, public CUIWndCallback
 
 public:
     CUIMpChangeMapAdm();
-    ~CUIMpChangeMapAdm();
+
     void Init(CUIXml& xml_doc);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0);
     void OnBtnOk();

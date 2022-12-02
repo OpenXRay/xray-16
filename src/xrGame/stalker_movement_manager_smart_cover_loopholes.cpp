@@ -612,20 +612,16 @@ void stalker_movement_manager_smart_cover::setup_movement_params()
     m_current.desired_position(&position);
 }
 
-struct loophole_id_predicate
-{
-    shared_str m_id;
-
-    IC loophole_id_predicate(shared_str const& id) : m_id(id) {}
-    IC bool operator()(smart_cover::loophole* loophole) const { return (loophole->id()._get() == m_id._get()); }
-};
-
 loophole const& stalker_movement_manager_smart_cover::loophole(
     smart_cover::cover const& cover, shared_str const& loophole_id) const
 {
-    typedef smart_cover::cover::Loopholes Loopholes;
-    Loopholes const& loopholes = cover.get_description()->loopholes();
-    Loopholes::const_iterator i = std::find_if(loopholes.begin(), loopholes.end(), loophole_id_predicate(loophole_id));
+    const auto predicate = [loophole_id](const smart_cover::loophole* loophole)
+    {
+        return (loophole->id()._get() == loophole_id._get());
+    };
+
+    const auto& loopholes = cover.get_description()->loopholes();
+    const auto  i = std::find_if(loopholes.begin(), loopholes.end(), predicate);
 
     VERIFY2(i != loopholes.end(),
         make_string("loophole [%s] not present in smart_cover [%s]", loophole_id.c_str(), cover.id().c_str()));

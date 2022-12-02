@@ -217,13 +217,11 @@ void CGamePersistent::RegisterModel(IRenderVisual* V)
 extern void clean_game_globals();
 extern void init_game_globals();
 
-void CGamePersistent::create_main_menu(Task&, void*)
-{
-    m_pMainMenu = xr_new<CMainMenu>();
-}
-
 void CGamePersistent::OnAppStart()
 {
+    // load game materials
+    GMLib.Load(); // XXX: not ready to be loaded in parallel. Crashes on Linux, rare crashes on Windows and bugs with water became mercury on Windows.
+
     // init game globals
 #ifndef XR_PLATFORM_WINDOWS
     init_game_globals();
@@ -233,17 +231,10 @@ void CGamePersistent::OnAppStart()
         init_game_globals();
     });
 #endif
-    // load game materials
-    const auto& loadMaterials = TaskScheduler->AddTask("GMLib.Load()", [](Task&, void*)
-    {
-        IRender::ScopedContext context(IRender::HelperContext);
-        GMLib.Load();
-    });
 
     SetupUIStyle();
     GEnv.UI = xr_new<UICore>();
-
-    const auto& menuCreated = TaskScheduler->AddTask("CMainMenu::CMainMenu()", { this, &CGamePersistent::create_main_menu });
+    m_pMainMenu = xr_new<CMainMenu>();
 
     inherited::OnAppStart();
 
@@ -259,8 +250,6 @@ void CGamePersistent::OnAppStart()
 #ifdef XR_PLATFORM_WINDOWS
     TaskScheduler->Wait(initializeGlobals);
 #endif
-    TaskScheduler->Wait(loadMaterials);
-    TaskScheduler->Wait(menuCreated);
 }
 
 void CGamePersistent::OnAppEnd()
@@ -509,16 +498,10 @@ void CGamePersistent::WeathersUpdate()
 
 bool allow_intro()
 {
-#if defined(XR_PLATFORM_WINDOWS)
     if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
-#else
-    if (0 != strstr(Core.Params, "-nointro"))
-#endif
-    {
         return false;
-    }
-    else
-        return true;
+
+    return true;
 }
 
 bool allow_game_intro()

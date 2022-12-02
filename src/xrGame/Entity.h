@@ -100,7 +100,7 @@ public:
     // Events
     virtual void OnEvent(NET_Packet& P, u16 type);
 
-    virtual BOOL IsVisibleForHUD() { return g_Alive(); }
+    virtual bool IsVisibleForHUD() { return !!g_Alive(); }
     virtual void g_fireParams(const CHudItem*, Fvector&, Fvector&){};
     virtual bool g_stateFire() { return true; }
     // time of entity death

@@ -44,30 +44,6 @@ CharInfoStrings* charInfoReputationStrings = NULL;
 CharInfoStrings* charInfoRankStrings = NULL;
 CharInfoStrings* charInfoGoodwillStrings = NULL;
 
-static class InventoryUtilitiesReset : public CUIResetNotifier, public pureAppStart, public pureAppEnd
-{
-public:
-    void OnAppStart() override
-    {
-        if (GEnv.isDedicatedServer)
-            return;
-        InventoryUtilities::CreateShaders();
-    }
-
-    void OnAppEnd() override
-    {
-        if (GEnv.isDedicatedServer)
-            return;
-        InventoryUtilities::DestroyShaders();
-    }
-
-    void OnUIReset() override
-    {
-        OnAppEnd();
-        OnAppStart();
-    }
-} s_inventory_utilities_reset;
-
 void InventoryUtilities::CreateShaders()
 {
     // Nothing here. All needed shaders will be created on demand
@@ -76,19 +52,10 @@ void InventoryUtilities::CreateShaders()
 void InventoryUtilities::DestroyShaders()
 {
     xr_delete(g_BuyMenuShader);
-    g_BuyMenuShader = 0;
-
     xr_delete(g_EquipmentIconsShader);
-    g_EquipmentIconsShader = 0;
-
     xr_delete(g_MPCharIconsShader);
-    g_MPCharIconsShader = 0;
-
     xr_delete(g_OutfitUpgradeIconsShader);
-    g_OutfitUpgradeIconsShader = 0;
-
     xr_delete(g_WeaponUpgradeIconsShader);
-    g_WeaponUpgradeIconsShader = 0;
 }
 
 bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)

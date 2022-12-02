@@ -18,42 +18,46 @@
 #include "editor_environment_manager.hpp"
 #include "xrEngine/IGame_Persistent.h"
 
-using editor::environment::thunderbolts::manager;
-using editor::environment::thunderbolts::thunderbolt;
-using editor::environment::thunderbolts::thunderbolt_id;
-using editor::environment::thunderbolts::collection;
-using editor::environment::detail::logical_string_predicate;
+using thunderbolts_manager = editor::environment::thunderbolts::manager;
 
 template <>
-void property_collection<manager::thunderbolt_container_type, manager>::display_name(
+void property_collection<thunderbolts_manager::thunderbolt_container_type, thunderbolts_manager>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<manager::thunderbolt_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<
+    thunderbolts_manager::thunderbolt_container_type, thunderbolts_manager>::create()
 {
-    thunderbolt* object = xr_new<thunderbolt>(&m_holder, generate_unique_id("thunderbolt_unique_id_").c_str());
+    using editor::environment::thunderbolts::thunderbolt;
+
+    auto* object = xr_new<thunderbolt>(&m_holder, generate_unique_id("thunderbolt_unique_id_").c_str());
     object->fill(m_holder.environment(), this);
     return (object->object());
 }
 
 template <>
-void property_collection<manager::collection_container_type, manager>::display_name(
+void property_collection<thunderbolts_manager::collection_container_type, thunderbolts_manager>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<manager::collection_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<
+    thunderbolts_manager::collection_container_type, thunderbolts_manager>::create()
 {
-    collection* object = xr_new<collection>(m_holder, generate_unique_id("thunderbolt_collection_unique_id_").c_str());
+    using editor::environment::thunderbolts::collection;
+
+    auto* object = xr_new<collection>(m_holder, generate_unique_id("thunderbolt_collection_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
 
+namespace editor::environment::thunderbolts
+{
 manager::manager(::editor::environment::manager* environment)
     : m_thunderbolt_collection(0), m_thunderbolts_changed(true), m_collections_collection(0),
       m_collections_changed(true), m_property_holder(0), m_environment(*environment)
@@ -92,7 +96,7 @@ void manager::load_thunderbolts()
 
     for (const auto &i : sections)
     {
-        thunderbolt* object = xr_new<thunderbolt>(this, i->Name);
+        auto* object = xr_new<thunderbolt>(this, i->Name);
         object->load(*config);
         object->fill(m_environment, m_thunderbolt_collection);
         m_thunderbolts.push_back(object);
@@ -125,7 +129,7 @@ void manager::load_collections()
 
     for (const auto &i : sections)
     {
-        collection* object = xr_new<collection>(*this, i->Name);
+        auto* object = xr_new<collection>(*this, i->Name);
         object->load(*config);
         object->fill(m_thunderbolt_collection);
         m_collections.push_back(object);
@@ -248,7 +252,7 @@ manager::thunderbolts_ids_type const& manager::thunderbolts_ids() const
     for (const auto &i : m_thunderbolts)
         *j++ = xr_strdup(i->id());
 
-    std::sort(m_thunderbolts_ids.begin(), m_thunderbolts_ids.end(), logical_string_predicate());
+    std::sort(m_thunderbolts_ids.begin(), m_thunderbolts_ids.end(), detail::logical_string_predicate());
 
     return (m_thunderbolts_ids);
 }
@@ -267,7 +271,7 @@ manager::thunderbolts_ids_type const& manager::collections_ids() const
     for (const auto &i : m_collections)
         *j++ = xr_strdup(i->id());
 
-    std::sort(m_collections_ids.begin(), m_collections_ids.end(), logical_string_predicate());
+    std::sort(m_collections_ids.begin(), m_collections_ids.end(), detail::logical_string_predicate());
 
     return (m_collections_ids);
 }
@@ -312,4 +316,4 @@ SThunderboltCollection* manager::get_collection(shared_str const& section)
     NODEFAULT;
     return nullptr;
 }
-
+} // namespace editor::environment::thunderbolts

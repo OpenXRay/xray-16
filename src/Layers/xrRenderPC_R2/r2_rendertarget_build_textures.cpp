@@ -37,10 +37,9 @@ void CRenderTarget::build_textures()
     // Build material(s)
     {
         // Surface
+        ID3DTexture3D* t_material_surf;
         R_CHK(D3DXCreateVolumeTexture(HW.pDevice, TEX_material_LdotN, TEX_material_LdotH, 4, 1, 0, D3DFMT_A8L8,
             D3DPOOL_MANAGED, &t_material_surf));
-        t_material = RImplementation.Resources->_CreateTexture(r2_material);
-        t_material->surface_set(t_material_surf);
 
         // Fill it (addr: x=dot(L,N),y=dot(L,H))
         D3DLOCKED_BOX R;
@@ -101,15 +100,23 @@ void CRenderTarget::build_textures()
             }
         }
         R_CHK(t_material_surf->UnlockBox(0));
+
+        t_material = RImplementation.Resources->_CreateTexture(r2_material);
+        t_material->surface_set(t_material_surf);
+
         // #ifdef DEBUG
         // R_CHK    (D3DXSaveTextureToFile  ("x:" DELIMITER "r2_material.dds",D3DXIFF_DDS,t_material_surf,0));
         // #endif
+
+        _RELEASE(t_material_surf);
     }
 
     // Build noise table
     {
         // Surfaces
-        D3DLOCKED_RECT R[TEX_jitter_count];
+        ID3DTexture2D* t_noise_surf[TEX_jitter_count]{};
+        D3DLOCKED_RECT R[TEX_jitter_count]{};
+
         for (int it1 = 0; it1 < TEX_jitter_count - 1; it1++)
         {
             string_path name;
@@ -139,6 +146,7 @@ void CRenderTarget::build_textures()
         for (int it3 = 0; it3 < TEX_jitter_count - 1; it3++)
         {
             R_CHK(t_noise_surf[it3]->UnlockRect(0));
+            _RELEASE(t_noise_surf[it3]);
         }
 
         // generate HBAO jitter texture (last)
@@ -177,5 +185,6 @@ void CRenderTarget::build_textures()
             }
         }
         R_CHK(t_noise_surf[it]->UnlockRect(0));
+        _RELEASE(t_noise_surf[it]);
     }
 }

@@ -7,11 +7,6 @@
 #include "control_movement_base.h"
 #include "control_animation_base.h"
 
-#define ROTATION_JUMP_DELAY_MIN 3000
-#define ROTATION_JUMP_DELAY_MAX 5000
-#define CHECK_YAW 150 * PI / 180
-#define START_SPEED_DELTA 2.f
-
 void CControlRotationJump::reinit()
 {
     inherited::reinit();

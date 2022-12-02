@@ -30,11 +30,12 @@ class CSpaceRestrictionHolder
 public:
     typedef xr_map<shared_str, CSpaceRestrictionBridge*> RESTRICTIONS;
 
+    static constexpr u32 TIME_TO_REMOVE_GARBAGE = 300000;
+
 private:
-    enum
+    enum : u32
     {
-        MAX_RESTRICTION_PER_TYPE_COUNT = u32(128),
-        dummy = u32(-1),
+        MAX_RESTRICTION_PER_TYPE_COUNT = 128,
     };
 
 private:

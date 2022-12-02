@@ -402,6 +402,7 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("get_attached_vehicle", &CScriptGameObject::GetAttachedVehicle)
 
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
+        .def("reset_bone_protections", &CScriptGameObject::ResetBoneProtections)
         .def("iterate_feel_touch", &CScriptGameObject::IterateFeelTouch)
         .def("get_luminocity_hemi", &CScriptGameObject::GetLuminocityHemi)
         .def("get_luminocity", &CScriptGameObject::GetLuminocity)
@@ -411,6 +412,10 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("force_set_position", &CScriptGameObject::ForceSetPosition)
         .def("set_spatial_type", &CScriptGameObject::SetSpatialType)
         .def("get_spatial_type", &CScriptGameObject::GetSpatialType)
+        .def("remove_danger", &CScriptGameObject::RemoveDanger)
+        .def("remove_memory_sound_object", &CScriptGameObject::RemoveMemorySoundObject)
+        .def("remove_memory_visible_object", &CScriptGameObject::RemoveMemoryVisibleObject)
+        .def("remove_memory_hit_object", &CScriptGameObject::RemoveMemoryHitObject)
 
         //For Weapons
         .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)

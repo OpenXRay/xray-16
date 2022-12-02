@@ -49,6 +49,8 @@ set(SRC_FILES
     "Actor.h"
     "ActorHelmet.cpp"
     "ActorHelmet.h"
+    "ActorBackpack.cpp"
+    "ActorBackpack.h"
     "ActorInput.cpp"
     "actor_input_handler.cpp"
     "actor_input_handler.h"
@@ -301,7 +303,6 @@ set(SRC_FILES
     "BottleItem.h"
     "BreakableObject.cpp"
     "BreakableObject.h"
-    "CalculateTriangle.h"
     "CameraEffector.cpp"
     "CameraEffector.h"
     "CameraFirstEye.cpp"
@@ -495,6 +496,7 @@ set(SRC_FILES
     "entity_alive_inline.h"
     "EntityCondition.cpp"
     "EntityCondition.h"
+    "EntityCondition_script.cpp"
     "Entity.cpp"
     "Entity.h"
     "event_conditions_collection.cpp"
@@ -760,7 +762,6 @@ set(SRC_FILES
     "item_manager.cpp"
     "item_manager.h"
     "item_manager_inline.h"
-    "key_binding_registrator_script.cpp"
     "killer_victim_velocity_angle.cpp"
     "killer_victim_velocity_angle.h"
     "kills_store.cpp"
@@ -827,6 +828,7 @@ set(SRC_FILES
     "map_location.h"
     "map_manager.cpp"
     "map_manager.h"
+    "map_script.cpp"
     "map_spot.cpp"
     "map_spot.h"
     "material_manager.cpp"
@@ -2546,9 +2548,7 @@ set(SRC_FILES
     "../xrServerEntities/object_item_single_inline.h"
     "../xrServerEntities/pch_script.cpp"
     "../xrServerEntities/pch_script.h"
-    "../xrServerEntities/PHNetState.cpp"
     "../xrServerEntities/PHNetState.h"
-    "../xrServerEntities/PHSynchronize.cpp"
     "../xrServerEntities/PHSynchronize.h"
     "../xrServerEntities/PropertiesListHelper.h"
     "../xrServerEntities/PropertiesListTypes.h"
@@ -2627,13 +2627,13 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/xrServerEntities
-    ${CMAKE_SOURCE_DIR}/Externals/cximage
+    $<$<BOOL:${USE_CXIMAGE}>:${CMAKE_SOURCE_DIR}/Externals/cximage>
     ${CMAKE_SOURCE_DIR}/Externals/GameSpy/src
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/ode/include
     ${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc
     ${CMAKE_SOURCE_DIR}/sdk/include
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -2647,13 +2647,13 @@ target_link_libraries(${PROJECT_NAME}
     xrUICore
     xrSound
     xrScriptEngine
-    cximage
+    $<$<BOOL:${USE_CXIMAGE}>:cximage>
     xrGameSpy
     ${LUA_LIBRARIES}
     xrCDB
     xrPhysics
     xrNetServer
-    ${SDL_LIBRARIES}
+    ${SDL2_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -2676,11 +2676,13 @@ endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PREFIX ""
+    UNITY_BUILD_BATCH_SIZE 50
 )
 
 target_precompile_headers(${PROJECT_NAME}
     PRIVATE
     "$<$<COMPILE_LANGUAGE:CXX>:StdAfx.h>"
+    "$<$<COMPILE_LANGUAGE:CXX>:pch_script.h>"
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY

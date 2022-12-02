@@ -134,9 +134,9 @@ inline OutputClass horrible_cast(const InputClass input)
     // Cause a compile-time error if in, out and u are not the same size.
     // If the compile fails here, it means the compiler has peculiar
     // unions which would prevent the cast from working.
-    typedef int
-        ERROR_CantUseHorrible_cast[sizeof(InputClass) == sizeof(u) && sizeof(InputClass) == sizeof(OutputClass) ? 1 :
-                                                                                                                  -1];
+    static_assert(sizeof(InputClass) == sizeof(u),           "Can't use horrible cast.");
+    static_assert(sizeof(InputClass) == sizeof(OutputClass), "Can't use horrible cast.");
+
     u.in = input;
     return u.out;
 }
@@ -203,13 +203,7 @@ template <int N>
 struct SimplifyMemFunc
 {
     template <class X, class XFuncType, class GenericMemFuncType>
-    inline static GenericClass* Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
-    {
-        // Unsupported member function type -- force a compile failure.
-        // (it's illegal to have a array with negative size).
-        typedef char ERROR_Unsupported_member_function_pointer_on_this_compiler[N - 100];
-        return 0;
-    }
+    inline static GenericClass* Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func) = delete;
 };
 
 // For compilers where all member func ptrs are the same size, everything goes here.
@@ -624,7 +618,7 @@ public:
         // WARNING! Evil hack. We store the function in the 'this' pointer!
         // Ensure that there's a compilation failure if function pointers
         // and data pointers have different sizes.
-        typedef int ERROR_CantUseEvilMethod[sizeof(GenericClass*) == sizeof(function_to_bind) ? 1 : -1];
+        static_assert(sizeof(GenericClass*) == sizeof(function_to_bind));
         m_pthis = horrible_cast<GenericClass*>(function_to_bind);
         // MSVC, SunC++ and DMC accept the following (non-standard) code:
         //  m_pthis = static_cast<GenericClass *>(static_cast<void *>(function_to_bind));

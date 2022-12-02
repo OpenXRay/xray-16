@@ -2,7 +2,6 @@
 #include "UIScrollBox.h"
 #include "Cursor/UICursor.h"
 
-CUIScrollBox::CUIScrollBox() {}
 bool CUIScrollBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     Fvector2 border;

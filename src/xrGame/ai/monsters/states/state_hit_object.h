@@ -4,6 +4,12 @@
 template <typename _Object>
 class CStateMonsterHitObject : public CState<_Object>
 {
+    static constexpr u32 TIME_OUT_STATE = 1000;
+    static constexpr u32 TIME_POINTBREAK = 500;
+    static constexpr float TEST_ANGLE = PI_DIV_6;
+    static constexpr float IMPULSE = 20.f;
+
+private:
     typedef CState<_Object> inherited;
 
     xr_vector<IGameObject*> m_nearest_objects;

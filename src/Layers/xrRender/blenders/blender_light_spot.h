@@ -13,43 +13,35 @@ public:
 };
 
 #if RENDER != R_R2
-class CBlender_accum_spot_msaa : public IBlender
+class CBlender_accum_spot_msaa final : public IBlender
 {
+    pcstr Name{};
+    pcstr Definition{};
+
 public:
+    CBlender_accum_spot_msaa() = default;
+    CBlender_accum_spot_msaa(pcstr name, pcstr definition)
+        : Name(name), Definition(definition) {}
+
     virtual LPCSTR getComment() { return "INTERNAL: accumulate spot light msaa"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
-
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
-    {
-        this->Name = Name;
-        this->Definition = Definition;
-    }
-
-    CBlender_accum_spot_msaa();
-    virtual ~CBlender_accum_spot_msaa();
-    LPCSTR Name;
-    LPCSTR Definition;
 };
 
-class CBlender_accum_volumetric_msaa : public IBlender
+class CBlender_accum_volumetric_msaa final : public IBlender
 {
+    pcstr Name{};
+    pcstr Definition{};
+
 public:
+    CBlender_accum_volumetric_msaa() = default;
+    CBlender_accum_volumetric_msaa(pcstr name, pcstr definition)
+        : Name(name), Definition(definition) {}
+
     virtual LPCSTR getComment() { return "INTERNAL: accumulate spot light msaa"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
-
-    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
-    {
-        this->Name = Name;
-        this->Definition = Definition;
-    }
-
-    CBlender_accum_volumetric_msaa();
-    virtual ~CBlender_accum_volumetric_msaa();
-    LPCSTR Name;
-    LPCSTR Definition;
 };
 #endif

@@ -56,10 +56,10 @@ void CMonsterEnemyMemory::update()
     }
 
     // XXX: monster doesn't react to sounds when Actor doesn't see him
-    // Probably this was made for optimization
+    // and the distance to an Actor being calculated, instead of the actual enemy who made the sound 
+    // Probably this was made for optimization or for immersiveness
     // But this conflicts with the ALife idea
-    if (monster->SoundMemory.IsRememberSound() && g_actor
-        && g_actor->memory().visual().visible_now(monster))
+    if (monster->SoundMemory.IsRememberSound())
     {
         SoundElem sound;
         bool dangerous;
@@ -68,11 +68,12 @@ void CMonsterEnemyMemory::update()
         {
             if (CEntityAlive const* enemy = smart_cast<CEntityAlive const*>(sound.who))
             {
-                float const xz_dist = monster->Position().distance_to_xz(enemy->Position());
-                float const y_dist = _abs(monster->Position().y - enemy->Position().y);
+                float const xz_dist = monster->Position().distance_to_xz(g_actor->Position());
+                float const y_dist = _abs(monster->Position().y - g_actor->Position().y);
 
                 if (monster->CCustomMonster::useful(&monster->memory().enemy(), enemy) && y_dist < 10 &&
-                    xz_dist < monster->get_feel_enemy_who_made_sound_max_distance())
+                    xz_dist < monster->get_feel_enemy_who_made_sound_max_distance() &&
+                    g_actor->memory().visual().visible_now(monster))
                 {
                     add_enemy(enemy);
 

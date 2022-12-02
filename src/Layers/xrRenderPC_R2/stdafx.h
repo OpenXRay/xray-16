@@ -42,6 +42,7 @@
 #include "Layers/xrRender/xrRender_console.h"
 
 #include "r2.h"
+#include "r2_rendertarget.h"
 
 IC void jitter(CBlender_Compile& C)
 {

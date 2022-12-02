@@ -6,19 +6,15 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
+
 #include "smart_cover_storage.h"
 #include "smart_cover_description.h"
+
 #include "Common/object_broker.h"
 
-static u32 const time_to_delete = 300000;
-
-using smart_cover::storage;
-using smart_cover::cover;
-using smart_cover::description;
-
-typedef storage::DescriptionPtr DescriptionPtr;
-
-DescriptionPtr storage::description(shared_str const& table_id)
+namespace smart_cover
+{
+storage::DescriptionPtr storage::description(shared_str const& table_id)
 {
     collect_garbage();
 
@@ -28,7 +24,7 @@ DescriptionPtr storage::description(shared_str const& table_id)
     if (found != m_descriptions.end())
         return (*found);
 
-    ::description* description = xr_new<::description>(table_id);
+    auto* description = xr_new<smart_cover::description>(table_id);
     m_descriptions.push_back(description);
     return (description);
 }
@@ -48,15 +44,15 @@ void storage::collect_garbage()
 {
     struct garbage
     {
-        static bool predicate(::description* const& object)
+        static bool predicate(smart_cover::description* const& object)
         {
             if (!object->released())
                 return (false);
 
-            if (Device.dwTimeGlobal < object->m_last_time_dec + time_to_delete)
+            if (Device.dwTimeGlobal < object->m_last_time_dec + TIME_TO_REMOVE_GARBAGE)
                 return (false);
 
-            ::description* temp = object;
+            auto* temp = object;
             xr_delete(temp);
             return (true);
         }
@@ -65,3 +61,4 @@ void storage::collect_garbage()
     m_descriptions.erase(
         std::remove_if(m_descriptions.begin(), m_descriptions.end(), &garbage::predicate), m_descriptions.end());
 }
+} // namespace smart_cover

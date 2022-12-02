@@ -12,10 +12,10 @@ class CUIListWnd;
 class CUIListBox;
 
 template <typename T>
-struct CWrapperBase : public T, public luabind::wrap_base
+struct CUIDialogWndExWrapperBase : public T, public luabind::wrap_base
 {
     typedef T inherited;
-    typedef CWrapperBase<T> self_type;
+    typedef CUIDialogWndExWrapperBase<T> self_type;
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action)
     {
@@ -35,8 +35,8 @@ struct CWrapperBase : public T, public luabind::wrap_base
     }
 };
 
-typedef CWrapperBase<CUIDialogWndEx> WrapType;
-typedef CUIDialogWndEx BaseType;
+using BaseType = CUIDialogWndEx;
+using WrapType = CUIDialogWndExWrapperBase<CUIDialogWndEx>;
 
 template <typename T>
 T* CUIDialogWndEx::GetControl(pcstr name)

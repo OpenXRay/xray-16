@@ -23,7 +23,7 @@ CUITrackBar::CUITrackBar()
     AttachChild(m_pSlider);
     m_pSlider->SetAutoDelete(true);
 
-    m_static = xr_new<CUIStatic>();
+    m_static = xr_new<CUIStatic>("Value as text");
     m_static->Enable(false);
     AttachChild(m_static);
     m_static->SetAutoDelete(true);

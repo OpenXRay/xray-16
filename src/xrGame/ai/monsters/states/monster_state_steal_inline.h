@@ -1,14 +1,9 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterStealAbstract CStateMonsterSteal<_Object>
-
-#define STEAL_MIN_DISTANCE 4.f
-#define STEAL_MAX_DISTANCE 15.f
-#define STEAL_MAX_PATH_ANGLE PI_DIV_6
 
 TEMPLATE_SPECIALIZATION
 CStateMonsterStealAbstract::CStateMonsterSteal(_Object* obj) : inherited(obj) {}
@@ -79,3 +74,6 @@ bool CStateMonsterStealAbstract::check_conditions()
 
     return true;
 }
+
+#undef TEMPLATE_SPECIALIZATION
+#undef CStateMonsterStealAbstract

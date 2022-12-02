@@ -20,6 +20,13 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class CVampireCameraEffector : public CEffectorCam
 {
+    static constexpr float DELTA_ANGLE_X = 10.f * PI / 180.f;
+    static constexpr float DELTA_ANGLE_Y = DELTA_ANGLE_X;
+    static constexpr float DELTA_ANGLE_Z = DELTA_ANGLE_X;
+    static constexpr float ANGLE_SPEED = 0.2f;
+    static constexpr float BEST_DISTANCE = 0.3f;
+
+private:
     typedef CEffectorCam inherited;
 
     float m_time_total;

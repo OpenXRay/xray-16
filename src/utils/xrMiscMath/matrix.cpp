@@ -1,13 +1,11 @@
 #include "pch.hpp"
 
-#include <limits>
-
 #include "xrCore/_matrix.h"
 #include "xrCore/_quaternion.h"
 #include "xrCore/xrDebug_macros.h"
 #include "xrCore/xrDebug.h"
-#include "xrCommon/math_funcs_inline.h"
 
+#include <limits>
 
 template <typename T>
 _matrix<T>& _matrix<T>::rotation(const _quaternion<T>& Q)

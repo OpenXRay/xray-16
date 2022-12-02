@@ -4,7 +4,7 @@
 #include "Buttons/UI3tButton.h"
 #include "EditBox/UIEditBox.h"
 
-CUIMessageBox::CUIMessageBox()
+CUIMessageBox::CUIMessageBox() : CUIStatic("CUIMessageBox")
 {
     m_UIButtonYesOk = NULL;
     m_UIButtonNo = NULL;
@@ -61,7 +61,7 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
     strconcat(sizeof(str), str, box_template, ":picture");
     if (uiXml.NavigateToNode(str, 0))
     {
-        m_UIStaticPicture = xr_new<CUIStatic>();
+        m_UIStaticPicture = xr_new<CUIStatic>("Picture");
         AttachChild(m_UIStaticPicture);
         CUIXmlInitBase::InitStatic(uiXml, str, 0, m_UIStaticPicture);
     }

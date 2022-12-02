@@ -11,7 +11,7 @@
 
 ButtonListDialog::ButtonListDialog()
 {
-    Background = xr_new<CUIStatic>();
+    Background = xr_new<CUIStatic>("Background");
     Background->SetAutoDelete(true);
     AttachChild(Background);
     Header = xr_new<CUITextWnd>();

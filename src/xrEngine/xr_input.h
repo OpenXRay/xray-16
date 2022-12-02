@@ -71,6 +71,12 @@ public:
         FeedbackTriggers,
     };
 
+    enum InputType
+    {
+        KeyboardMouse,
+        Controller,
+    };
+
     enum
     {
         COUNT_MOUSE_AXIS = 4,
@@ -95,8 +101,6 @@ public:
 private:
     BENCH_SEC_SCRAMBLEMEMBER1
 
-    u32 mouseTimeStamp[COUNT_MOUSE_AXIS];
-
     std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
     std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
@@ -106,6 +110,10 @@ private:
     xr_vector<IInputReceiver*> cbStack;
 
     xr_vector<SDL_GameController*> controllers;
+
+    InputType currentInputType{ KeyboardMouse };
+
+    void SetCurrentInputType(InputType type);
 
     void MouseUpdate();
     void KeyUpdate();
@@ -120,7 +128,6 @@ private:
     MessageRegistry<pureKeyMapChanged> seqKeyMapChanged;
 
 public:
-    u32 m_curTime;
     u32 m_mouseDelta;
 
     const InputStatistics& GetStats() const { return stats; }
@@ -154,6 +161,7 @@ public:
     bool IsControllerAvailable() const { return !controllers.empty(); }
     void EnableControllerSensors(bool enable);
 
+    auto GetCurrentInputType() { return currentInputType; }
 public:
     void ExclusiveMode(const bool exclusive);
     bool IsExclusiveMode() const;

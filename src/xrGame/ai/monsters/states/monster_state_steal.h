@@ -4,6 +4,11 @@
 template <typename _Object>
 class CStateMonsterSteal : public CState<_Object>
 {
+    static constexpr float STEAL_MIN_DISTANCE = 4.f;
+    static constexpr float STEAL_MAX_DISTANCE = 15.f;
+    static constexpr float STEAL_MAX_PATH_ANGLE = PI_DIV_6;
+
+private:
     typedef CState<_Object> inherited;
 
 public:
