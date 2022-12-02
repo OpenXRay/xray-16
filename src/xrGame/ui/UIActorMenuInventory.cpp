@@ -237,8 +237,8 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
     CUIDragDropListEx* all_lists[] =
     {
         m_pLists[eInventoryBeltList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
-        m_pLists[eInventorybackpackList], m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList], m_pLists[eInventoryBagList],
-        m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
+        m_pLists[eInventorybackpackList], m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList],
+        m_pLists[eInventoryBagList], m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
     };
 
     switch (action_type)

@@ -8,9 +8,7 @@ CBackpack::CBackpack()
     m_flags.set(FUsingCondition, FALSE);
 }
 
-CBackpack::~CBackpack() {}
-
-void CBackpack::Load(LPCSTR section)
+void CBackpack::Load(pcstr section)
 {
     inherited::Load(section);
 
@@ -59,12 +57,13 @@ void CBackpack::OnMoveToRuck(const SInvItemPlace& previous_place)
 
 void CBackpack::Hit(float hit_power, ALife::EHitType hit_type)
 {
-    if (IsUsingCondition() == false) return;
+    if (!IsUsingCondition())
+        return;
     hit_power *= GetHitImmunity(hit_type);
     ChangeCondition(-hit_power);
 }
 
-bool CBackpack::install_upgrade_impl(LPCSTR section, bool test)
+bool CBackpack::install_upgrade_impl(pcstr section, bool test)
 {
     bool result = inherited::install_upgrade_impl(section, test);
 

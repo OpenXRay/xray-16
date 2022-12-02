@@ -210,7 +210,7 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
         { eTrashList,              "dragdrop_trash",           nullptr,               nullptr,                   nullptr,            false },
 
-        { eInventorybackpackList,  "dragdrop_backpack",        nullptr,                "backpack_slot_highlight", nullptr,           false },
+        { eInventorybackpackList,  "dragdrop_backpack",        nullptr,               "backpack_slot_highlight", nullptr,            false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");

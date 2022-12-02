@@ -463,6 +463,7 @@ CCustomOutfit* CInventoryOwner::GetOutfit() const
 {
     return smart_cast<CCustomOutfit*>(inventory().ItemFromSlot(OUTFIT_SLOT));
 }
+
 CBackpack* CInventoryOwner::GetBackpack() const
 {
     return smart_cast<CBackpack*>(inventory().ItemFromSlot(BACKPACK_SLOT));

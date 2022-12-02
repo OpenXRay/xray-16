@@ -1,20 +1,20 @@
 #pragma once
 #include "inventory_item_object.h"
 
-class CBackpack : public CInventoryItemObject
+class CBackpack final : public CInventoryItemObject
 {
-	typedef	CInventoryItemObject inherited;
+	using inherited = CInventoryItemObject;
+
 public:
 	CBackpack();
-	virtual ~CBackpack();
 
-	virtual void Load(LPCSTR section);
+	void Load(pcstr section) override;
 
-	virtual void Hit(float P, ALife::EHitType hit_type);
+	void Hit(float P, ALife::EHitType hit_type) override;
 
-	virtual void OnMoveToSlot(const SInvItemPlace& prev);
-	virtual void OnMoveToRuck(const SInvItemPlace& previous_place);
-	virtual void OnH_A_Chield();
+	void OnMoveToSlot(const SInvItemPlace& prev) override;
+	void OnMoveToRuck(const SInvItemPlace& previous_place) override;
+	void OnH_A_Chield() override;
 
 public:
 	float m_additional_weight;
@@ -26,10 +26,10 @@ public:
     float m_fWalkAccel;
     float m_fOverweightWalkK;
 
-	virtual bool net_Spawn(CSE_Abstract* DC);
-	virtual void net_Export(NET_Packet& P);
-	virtual void net_Import(NET_Packet& P);
+	bool net_Spawn(CSE_Abstract* DC) override;
+	void net_Export(NET_Packet& P) override;
+	void net_Import(NET_Packet& P) override;
 
 protected:
-    virtual bool install_upgrade_impl(LPCSTR section, bool test);
+    bool install_upgrade_impl(pcstr section, bool test) override;
 };
