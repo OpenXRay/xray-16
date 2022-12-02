@@ -316,6 +316,8 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
     if (l == m_pLists[eInventoryBeltList])
         return iActorBelt;
 
+    if (l == m_pLists[eInventoryKnifeList] && m_pLists[eInventoryKnifeList] != nullptr)
+        return iActorSlot;
     if (l == m_pLists[eInventoryAutomaticList])
         return iActorSlot;
     if (l == m_pLists[eInventoryPistolList])
@@ -528,6 +530,8 @@ void CUIActorMenu::UpdateItemsPlace()
 
 void CUIActorMenu::clear_highlight_lists()
 {
+    if (m_pLists[eInventoryKnifeList])
+        m_pLists[eInventoryKnifeList]->Highlight(false);
     m_pLists[eInventoryPistolList]->Highlight(false);
     m_pLists[eInventoryAutomaticList]->Highlight(false);
     if (m_pLists[eInventoryHelmetList])
@@ -876,6 +880,8 @@ void CUIActorMenu::ClearAllLists()
         m_pLists[eInventoryDetectorList]->ClearAll(true);
     if (m_pLists[eInventoryBackpackList])
         m_pLists[eInventoryBackpackList]->ClearAll(true);
+    if (m_pLists[eInventoryKnifeList])
+        m_pLists[eInventoryKnifeList]->ClearAll(true);
     m_pLists[eInventoryPistolList]->ClearAll(true);
     m_pLists[eInventoryAutomaticList]->ClearAll(true);
     if (m_pQuickSlot)
