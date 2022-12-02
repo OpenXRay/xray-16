@@ -9,17 +9,14 @@
 #include "date_time.h"
 #include "ui/UIDialogWnd.h"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 #pragma warning(push)
 #pragma warning(disable : 4709)
 
 template <typename T>
-struct CWrapperBase : public T, public luabind::wrap_base
+struct CGameClMpScriptWrapperBase : public T, public luabind::wrap_base
 {
     typedef T inherited;
-    typedef CWrapperBase<T> self_type;
+    typedef CGameClMpScriptWrapperBase<T> self_type;
 
     DEFINE_LUA_WRAPPER_METHOD_0(CanBeReady, bool)
     DEFINE_LUA_WRAPPER_METHOD_V0(Init)
@@ -33,9 +30,9 @@ struct CWrapperBase : public T, public luabind::wrap_base
 
     game_PlayerState* createPlayerState() override
     {
-        return call_member<game_PlayerState*>(this, "createPlayerState");
+        return luabind::call_member<game_PlayerState*>(this, "createPlayerState");
         // XXX: investigate
-        //return call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
+        //return luabind::call_member<game_PlayerState*>(this, "createPlayerState")[adopt<0>()];
     }
 
     static game_PlayerState* createPlayerState_static(inherited* ptr)
@@ -78,6 +75,8 @@ LPCSTR game_cl_mp_script::GetRoundTime()
 
 SCRIPT_EXPORT(game_cl_GameState, (game_GameState),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<game_cl_GameState, game_GameState>("game_cl_GameState")
@@ -88,6 +87,8 @@ SCRIPT_EXPORT(game_cl_GameState, (game_GameState),
 
 SCRIPT_EXPORT(game_cl_mp, (game_cl_GameState),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<game_cl_mp, game_cl_GameState>("game_cl_mp")
@@ -97,8 +98,11 @@ SCRIPT_EXPORT(game_cl_mp, (game_cl_GameState),
 
 void game_cl_mp_script_script_register(lua_State* luaState)
 {
-    using WrapType = CWrapperBase<game_cl_mp_script>;
+    using namespace luabind;
+    using namespace luabind::policy;
+
     using BaseType = game_cl_mp_script;
+    using WrapType = CGameClMpScriptWrapperBase<game_cl_mp_script>;
 
     module(luaState)
     [

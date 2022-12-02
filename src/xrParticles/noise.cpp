@@ -214,3 +214,10 @@ float turbulence3(const Fvector& v, float freq, int octaves)
     }
     return sum * boost;
 }
+
+#undef B
+#undef DOT
+#undef AT
+#undef S_CURVE
+#undef LERP
+#undef PN_SETUP

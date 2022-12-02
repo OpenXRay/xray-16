@@ -421,8 +421,7 @@ bool CVisualMemoryManager::should_ignore_object(IGameObject const* object) const
     {
         return true;
     }
-    else
-#endif // MASTER_GOLD
+#endif
 
         if (CBaseMonster const* const monster = smart_cast<CBaseMonster const*>(object))
     {
@@ -597,6 +596,16 @@ struct CVisibleObjectPredicateEx
         return (m_object->ID() == not_yet_visible_object.m_object->ID());
     }
 };
+
+void CVisualMemoryManager::remove(const MemorySpace::CVisibleObject* visible_object)
+{
+    VISIBLES::iterator I = std::find_if(m_objects->begin(), m_objects->end(), [&](const MemorySpace::CVisibleObject& object)
+    {
+        return visible_object == &object;
+    });
+    if (I != m_objects->end())
+        m_objects->erase(I);
+}
 
 void CVisualMemoryManager::remove_links(IGameObject* object)
 {

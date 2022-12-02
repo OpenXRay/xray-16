@@ -40,12 +40,8 @@
 #include "doors.h"
 #include "xrNetServer/NET_Messages.h"
 
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
-#pragma warning(push)
-#pragma warning(disable : 4995)
+#ifdef XR_PLATFORM_WINDOWS // XXX: Just use std::atomic
 #include <intrin.h>
-#pragma warning(pop)
-
 #pragma intrinsic(_InterlockedCompareExchange)
 #endif
 
@@ -112,10 +108,12 @@ void CGameObject::MakeMeCrow()
         return;
     u32 const device_frame_id = Device.dwFrame;
     u32 const object_frame_id = dwFrame_AsCrow;
-#ifndef XR_PLATFORM_LINUX
+#ifdef XR_PLATFORM_WINDOWS // XXX: Just use std::atomic
     if ((u32)_InterlockedCompareExchange((long*)&dwFrame_AsCrow, device_frame_id, object_frame_id) == device_frame_id)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+    if (__sync_val_compare_and_swap(&dwFrame_AsCrow, object_frame_id, device_frame_id) == device_frame_id)
 #else
-     if (__sync_val_compare_and_swap(&dwFrame_AsCrow, object_frame_id, device_frame_id) == device_frame_id)
+#   error Select or add implementation for your platform
 #endif
         return;
 

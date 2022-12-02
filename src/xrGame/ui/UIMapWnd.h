@@ -45,6 +45,7 @@ private:
     CMapActionPlanner* m_ActionPlanner;
     CUIFrameLineWnd* m_UIMainMapHeader;
     CUIMapLocationHint* m_map_location_hint;
+    CMapLocation* m_cur_location;
 
 #ifdef DEBUG
 //	CUIStatic*					m_dbg_text_hint;
@@ -100,10 +101,15 @@ public:
     void MoveScrollV(float dy);
     void MoveScrollH(float dx);
 
+    void ActivatePropertiesBox(CUIWindow* w);
+
 public:
     CUICustomMap* m_tgtMap;
     Fvector2 m_tgtCenter;
     UIHint* hint_wnd;
+
+protected:
+    CUIPropertiesBox* m_UIPropertiesBox;
 
 protected:
     void init_xml_nav(CUIXml& xml, pcstr start_from, bool critical);

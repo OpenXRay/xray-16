@@ -14,8 +14,8 @@
 #include "Include/editor/ide.hpp"
 #include "ide.hpp"
 
-using editor::environment::levels::manager;
-
+namespace editor::environment::levels
+{
 static pcstr s_default_weather_id = "[default]";
 static pcstr s_level_section_id = "levels";
 
@@ -96,4 +96,5 @@ void manager::fill()
 
     ::ide().environment_levels(m_property_holder);
 }
+} // namespace editor::environment::levels
 

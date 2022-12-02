@@ -178,7 +178,7 @@ void clientdata_proxy::download_screenshot_callback(file_transfer::receiving_sta
     break;
     case file_transfer::receiving_aborted_by_peer:
     {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // XXX: Port to other platforms
         Msg("* download screenshot aborted by peer [%u]", m_chearer_id.value());
         LPCSTR error_msg;
         char bufforint[16];
@@ -238,7 +238,7 @@ void clientdata_proxy::download_config_callback(file_transfer::receiving_status_
     break;
     case file_transfer::receiving_aborted_by_peer:
     {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // XXX: Port to other platforms
         Msg("* download config aborted by peer [%u]", m_chearer_id.value());
         LPCSTR error_msg;
         char bufforint[16];

@@ -7,8 +7,8 @@
 #include "UIInventoryUtilities.h"
 #include "UIHelper.h"
 
-CUINewsItemWnd::CUINewsItemWnd() {}
-CUINewsItemWnd::~CUINewsItemWnd() {}
+CUINewsItemWnd::CUINewsItemWnd() : CUIWindow("CUINewsItemWnd") {}
+
 void CUINewsItemWnd::Init(CUIXml& uiXml, LPCSTR start_from)
 {
     CUIXmlInit::InitWindow(uiXml, start_from, 0, this);

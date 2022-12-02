@@ -18,11 +18,9 @@
 #include "ai/stalker/ai_stalker.h"
 #include "smart_cover_default_behaviour_planner.hpp"
 
+namespace smart_cover
+{
 using namespace StalkerDecisionSpace;
-using smart_cover::target_selector;
-using smart_cover::animation_planner;
-using smart_cover::target_provider;
-using smart_cover::default_behaviour_planner;
 
 void target_selector::setup(animation_planner* object, CPropertyStorage* storage)
 {
@@ -53,7 +51,7 @@ void target_selector::update()
 void target_selector::add_evaluators()
 {
     add_evaluator(eWorldPropertyLookedOut, xr_new<CPropertyEvaluatorMember<animation_planner>>((CPropertyStorage*)0,
-                                               eWorldPropertyLookedOut, true, true, "looked out"));
+        eWorldPropertyLookedOut, true, true, "looked out"));
     add_evaluator(eWorldPropertyLoopholeTooMuchTimeFiring,
         xr_new<CPropertyEvaluatorMember<animation_planner>>(
             (CPropertyStorage*)0, eWorldPropertyLoopholeTooMuchTimeFiring, true, true, "too much time firing"));
@@ -122,4 +120,5 @@ void target_selector::add_actions()
     add_operator(eWorldOperatorLoopholeTargetDefaultBehaviour, action);
 }
 
-LPCSTR target_selector::object_name() const { return ("target_selector"); }
+pcstr target_selector::object_name() const { return ("target_selector"); }
+} // namespace smart_cover

@@ -36,9 +36,10 @@
 // and operations on angles.
 //
 
-#ifndef _TRIGH
-#define _TRIGH
+#pragma once
 
+namespace mathTrig
+{
 inline float iszero(float x) { return x * x < 1e-6; }
 #if 0
 //
@@ -82,5 +83,4 @@ inline int law_of_cosines(float a, float b, float c, float& angle)
 
     return 1;
 }
-
-#endif
+} // namespace mathTrig

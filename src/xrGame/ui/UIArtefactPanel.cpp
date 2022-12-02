@@ -5,7 +5,7 @@
 
 #include "../Artefact.h"
 
-CUIArtefactPanel::CUIArtefactPanel()
+CUIArtefactPanel::CUIArtefactPanel() : CUIWindow("CUIArtefactPanel")
 {
     m_cell_size.set(50.0f, 50.0f);
     m_fScale = 0.5f;

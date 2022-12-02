@@ -1,9 +1,6 @@
 #include "pch.hpp"
 #include "script_lua_helper.hpp"
 #include "script_debugger.hpp"
-#if defined(XR_PLATFORM_LINUX)
-#include "SDL.h" // for xr_itoa
-#endif
 
 CDbgLuaHelper* CDbgLuaHelper::m_pThis = nullptr;
 lua_State* CDbgLuaHelper::L = nullptr;

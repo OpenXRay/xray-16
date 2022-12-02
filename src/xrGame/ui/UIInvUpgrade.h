@@ -133,15 +133,14 @@ public:
     CUIStatic* m_ink;
 };
 
-class CUIUpgradePoint : public CUIStatic
+class CUIUpgradePoint final : public CUIStatic
 {
 private:
     typedef CUIStatic inherited;
-    UIUpgrade* m_parent_upgrade;
+    UIUpgrade* m_parent_upgrade{};
 
 public:
     CUIUpgradePoint(UIUpgrade* upgr);
-    virtual ~CUIUpgradePoint();
     void load_from_xml(CUIXml& ui_xml, int i_cell);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnFocusReceive();

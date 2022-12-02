@@ -99,8 +99,8 @@ TEMPLATE_SIGNATURE
 void ATTACK_ON_RUN_STATE::set_movement_phaze(phaze const new_phaze)
 {
     m_phaze = new_phaze;
-    m_phaze_chosen_time = current_time();
-    m_prepare_side_chosen_time = current_time();
+    m_phaze_chosen_time = xr_current_time();
+    m_prepare_side_chosen_time = xr_current_time();
 
     if (m_phaze == go_close)
     {
@@ -141,7 +141,7 @@ void ATTACK_ON_RUN_STATE::calculate_predicted_enemy_pos()
     float const self_velocity = this->object->movement().speed();
     float const self2enemy_time = self_velocity > epsilon ? self2enemy_mag / self_velocity : 0;
 
-    float const predictiton_delta_sec = (current_time() - m_last_prediction_time) / 1000.f;
+    float const predictiton_delta_sec = (xr_current_time() - m_last_prediction_time) / 1000.f;
     if (predictiton_delta_sec > 1.f)
     {
         if (m_last_prediction_time != 0)
@@ -157,7 +157,7 @@ void ATTACK_ON_RUN_STATE::calculate_predicted_enemy_pos()
             }
         }
 
-        m_last_prediction_time = current_time();
+        m_last_prediction_time = xr_current_time();
         m_last_update_enemy_pos = enemy_pos;
     }
 
@@ -186,14 +186,14 @@ void ATTACK_ON_RUN_STATE::update_aim_side()
 
     TTime const update_side_period = (TTime)(this->object->get_attack_on_move_update_side_period() * 1000);
 
-    if (current_time() > m_attack_side_chosen_time + update_side_period)
+    if (xr_current_time() > m_attack_side_chosen_time + update_side_period)
     {
         if (m_attack_side == new_attack_side)
             m_attack_side = (new_attack_side == left) ? right : left;
         else
             m_attack_side = new_attack_side;
 
-        m_attack_side_chosen_time = current_time();
+        m_attack_side_chosen_time = xr_current_time();
     }
 
     if (m_attacking)
@@ -266,11 +266,11 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
 
     if (m_phaze == go_prepare)
     {
-        if (current_time() > m_phaze_chosen_time + prepare_time * 1000)
+        if (xr_current_time() > m_phaze_chosen_time + prepare_time * 1000)
         {
             set_movement_phaze(go_close);
         }
-        else if (self2predicted_mag < 3.f && current_time() > m_phaze_chosen_time + 3000)
+        else if (self2predicted_mag < 3.f && xr_current_time() > m_phaze_chosen_time + 3000)
         {
             set_movement_phaze(go_close);
         }
@@ -286,12 +286,12 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
     else if (m_phaze == go_close)
     {
         if (angle_between_vectors(this->object->Direction(), self2enemy) > deg2rad(140.f) && self2predicted_mag < 4.f &&
-            current_time() > m_phaze_chosen_time + 3000)
+            xr_current_time() > m_phaze_chosen_time + 3000)
         {
             set_movement_phaze(go_prepare);
         }
 
-        if (current_time() - m_phaze_chosen_time > max_go_close_time)
+        if (xr_current_time() - m_phaze_chosen_time > max_go_close_time)
         {
             set_movement_phaze(go_prepare);
         }
@@ -305,7 +305,7 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
     if (m_reach_old_target)
     {
         self2target = m_target - self_pos;
-        if (magnitude(m_target - self_pos) < 1.f || current_time() > m_reach_old_target_start_time + 1000)
+        if (magnitude(m_target - self_pos) < 1.f || xr_current_time() > m_reach_old_target_start_time + 1000)
         {
             m_reach_old_target = false;
             set_movement_phaze(go_prepare);
@@ -417,9 +417,9 @@ void ATTACK_ON_RUN_STATE::select_prepare_fallback_target()
 TEMPLATE_SIGNATURE
 void ATTACK_ON_RUN_STATE::update_try_min_time()
 {
-    if (current_time() > m_try_min_time_chosen_time + m_try_min_time_period)
+    if (xr_current_time() > m_try_min_time_chosen_time + m_try_min_time_period)
     {
-        m_try_min_time_chosen_time = current_time();
+        m_try_min_time_chosen_time = xr_current_time();
         m_try_min_time_period = 3000 + (rand() % 3000);
         m_try_min_time = !(rand() % 2);
     }
@@ -430,7 +430,7 @@ void ATTACK_ON_RUN_STATE::update_attack()
 {
     if (m_attacking)
     {
-        if (current_time() > m_attack_end_time)
+        if (xr_current_time() > m_attack_end_time)
         {
             choose_next_atack_animation();
             m_attacking = false;
@@ -483,7 +483,7 @@ void ATTACK_ON_RUN_STATE::update_attack()
                 current_atack_dist < allowed_atack_distance && current_atack_dist > disallowed_atack_distance;
 
             if (current_atack_dist < disallowed_atack_distance && m_phaze == go_close &&
-                current_time() > m_phaze_chosen_time + 3000 && enemy == main_enemy)
+                xr_current_time() > m_phaze_chosen_time + 3000 && enemy == main_enemy)
             {
                 set_movement_phaze(go_prepare);
             }
@@ -507,7 +507,7 @@ void ATTACK_ON_RUN_STATE::update_attack()
             this->object->on_attack_on_run_hit();
             m_attacking = true;
             m_reach_old_target = true;
-            m_reach_old_target_start_time = current_time();
+            m_reach_old_target_start_time = xr_current_time();
 
             update_aim_side();
 
@@ -519,7 +519,7 @@ void ATTACK_ON_RUN_STATE::update_attack()
 
             VERIFY(got_animation_info);
 
-            m_attack_end_time = current_time() + TTime(1000 * attack_animation_length);
+            m_attack_end_time = xr_current_time() + TTime(1000 * attack_animation_length);
             this->object->anim().set_override_animation(anim, m_animation_index[m_attack_side]);
         }
     }

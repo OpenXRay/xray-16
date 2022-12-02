@@ -4,6 +4,7 @@
 !.appveyor*
 !.travis.yml
 !.editorconfig
+!.vscode
 
 # exclude binaries and temporary files
 CMakeCache.txt

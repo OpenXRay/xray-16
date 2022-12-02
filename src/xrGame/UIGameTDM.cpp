@@ -30,8 +30,8 @@ void CUIGameTDM::Init(int stage)
     if (stage == 0)
     { // shared
         m_pUITeamSelectWnd = xr_new<CUISpawnWnd>();
-        m_team1_icon = xr_new<CUIStatic>();
-        m_team2_icon = xr_new<CUIStatic>();
+        m_team1_icon = xr_new<CUIStatic>("Team 1 icon");
+        m_team2_icon = xr_new<CUIStatic>("Team 2 icon");
         m_team1_score = xr_new<CUITextWnd>();
         m_team1_score->SetAutoDelete(true);
         m_team2_score = xr_new<CUITextWnd>();

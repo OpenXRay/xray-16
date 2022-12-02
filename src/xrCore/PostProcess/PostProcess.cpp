@@ -255,7 +255,9 @@ void BasicPostProcessAnimator::ResetParam(pp_params param)
     case pp_noise_f:
         m_Params[9] = xr_new<CPostProcessValue>(&m_EffectorParams.noise.fps); // noise fps
         break;
-    case pp_cm_influence: m_Params[10] = xr_new<CPostProcessValue>(&m_EffectorParams.cm_influence); break;
+    case pp_cm_influence:
+        m_Params[10] = xr_new<CPostProcessValue>(&m_EffectorParams.cm_influence);
+        break;
     }
     VERIFY(m_Params[param]);
 }

@@ -6,6 +6,8 @@
 template <typename _Object>
 class CStateMonsterRest : public CState<_Object>
 {
+    static constexpr u32 TIME_IDLE = 60000;
+
 protected:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;

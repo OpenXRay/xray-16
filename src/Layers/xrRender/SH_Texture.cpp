@@ -38,6 +38,12 @@ CTexture::~CTexture()
 
 void CTexture::surface_set(ID3DBaseTexture* surf)
 {
+#if 0//def DEBUG
+    string_path msg_buff;
+    xr_sprintf(msg_buff, "* Changing texture surface [%s] current pSurface RefCount =", cName.c_str());
+    _SHOW_REF(msg_buff, pSurface);
+#endif // DEBUG
+
     if (surf)
         surf->AddRef();
 
@@ -289,7 +295,8 @@ void CTexture::Unload()
 {
 #ifdef DEBUG
     string_path msg_buff;
-    xr_sprintf(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface RefCount=", cName.c_str());
+    xr_sprintf(msg_buff, "* Unloading texture [%s] pSurface RefCount =", cName.c_str());
+    _SHOW_REF(msg_buff, pSurface);
 #endif // DEBUG
 
     //.	if (flags.bLoaded)		Msg		("* Unloaded: %s",cName.c_str());
@@ -306,9 +313,6 @@ void CTexture::Unload()
     }
     flags.MemoryUsage = 0;
 
-#ifdef DEBUG
-    _SHOW_REF(msg_buff, pSurface);
-#endif // DEBUG
 
     _RELEASE(pSurface);
 

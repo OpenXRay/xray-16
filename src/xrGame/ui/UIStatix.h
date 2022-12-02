@@ -6,7 +6,6 @@ class CUIStatix : public CUIStatic
 {
 public:
     CUIStatix();
-    virtual ~CUIStatix();
 
     virtual void Update();
     virtual void OnFocusReceive();
@@ -16,7 +15,8 @@ public:
     bool GetSelectedState();
 
 private:
-    bool m_bSelected;
     void start_anim();
     void stop_anim();
+
+    bool m_bSelected{};
 };

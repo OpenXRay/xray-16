@@ -14,9 +14,8 @@ class IRenderVisual;
 class CBoneInstance;
 struct SEnumVerticesCallback;
 
-template <class T>
-class _box3;
-typedef _box3<float> Fbox;
+struct Fbox3;
+using Fbox = Fbox3;
 
 template <class T>
 struct _obb;

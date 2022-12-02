@@ -8,8 +8,6 @@
 
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 
-#include <malloc.h>
-
 static INetLog* pClNetLog = nullptr;
 
 #ifdef CONFIG_PROFILE_LOCKS

@@ -9,10 +9,8 @@
 #include "Include/xrAPI/xrAPI.h"
 #endif
 #include "SkeletonX.h"
+#include "SkeletonXSkinXW.h"
 #include "xrCore/FMesh.hpp"
-#include "xrCore/Math/MathUtil.hpp"
-
-using namespace XRay::Math;
 
 shared_str s_bones_array_const;
 

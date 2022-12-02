@@ -88,7 +88,7 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
 
     CUIXmlInit::InitWindow(uiXml, buff, 0, this);
 
-    m_wrk_area = xr_new<CUIWindow>();
+    m_wrk_area = xr_new<CUIWindow>("Work area");
 
     xr_sprintf(buff, "%s:wrk_area", p->ui_xml_tag());
 
@@ -105,7 +105,7 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
     {
         for (int idx = 0; idx < num; ++idx)
         {
-            CUIStatic* S = xr_new<CUIStatic>();
+            CUIStatic* S = xr_new<CUIStatic>("Palette");
             shared_str name = uiXml.ReadAttrib("palette", idx, "id");
             m_palette[name] = S;
             CUIXmlInit::InitStatic(uiXml, "palette", idx, S);
@@ -116,7 +116,7 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
     }
     else
     {
-        CUIStatic* S = xr_new<CUIStatic>();
+        CUIStatic* S = xr_new<CUIStatic>("Palette");
         m_palette[AF_SIGN] = S;
         CUIXmlInit::InitStatic(uiXml, AF_SIGN, 0, S);
         S->SetAutoDelete(true);

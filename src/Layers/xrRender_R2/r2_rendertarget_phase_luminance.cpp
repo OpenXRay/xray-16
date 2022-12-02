@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace phase_luminance
+{
 #pragma pack(push, 4)
 struct v_build
 {
@@ -16,9 +18,12 @@ struct v_filter
     Fvector4 uv[8];
 };
 #pragma pack(pop)
+}
 
 void CRenderTarget::phase_luminance()
 {
+    using namespace phase_luminance;
+
     u32 Offset = 0;
 #ifdef USE_DX9 // XXX: check why eps is 0 for other renderers
     float eps = EPS_S;

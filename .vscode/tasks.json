@@ -1,0 +1,128 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "options": {
+    "env": {
+      "LD_LIBRARY_PATH": "${workspaceFolder}/bin/x64/Release"
+    }
+  },
+  "tasks": [
+    {
+      "label": "clear",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "command": "rm",
+      "args": [
+        "-rf",
+        "bin"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "mkdir",
+      "type": "shell",
+      "command": "mkdir",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "args": [
+        "-p",
+        "bin"
+      ]
+    },
+    {
+      "label": "Configure Debug",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin"
+      },
+      "command": "cmake .. -DCMAKE_BUILD_TYPE=Debug",
+      "dependsOn": [
+        "mkdir"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Configure Release",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin"
+      },
+      "command": "CFLAGS='-march=native' CXXFLAGS='-march=native' cmake .. -DCMAKE_BUILD_TYPE=Release",
+      "dependsOn": [
+        "mkdir"
+      ]
+    },
+    {
+      "label": "Configure Mixed",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin"
+      },
+      "command": "cmake .. -DCMAKE_BUILD_TYPE=Mixed",
+      "dependsOn": [
+        "mkdir"
+      ]
+    },
+    {
+      "label": "Compile Debug",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin"
+      },
+      "command": "make -j${CPU_COUNT}",
+      "dependsOn": [
+        "mkdir",
+        "Configure Debug"
+      ]
+    },
+    {
+      "label": "Compile Release",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin"
+      },
+      "command": "make -j${CPU_COUNT}",
+      "dependsOn": [
+        "mkdir",
+        "Configure Release"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Compile Mixed",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin"
+      },
+      "command": "make -j${CPU_COUNT}",
+      "dependsOn": [
+        "mkdir",
+        "Configure Mixed"
+      ]
+    },
+    {
+      "label": "Compile",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin"
+      },
+      "command": "make -j${CPU_COUNT}",
+      "dependsOn": [
+        "mkdir"
+      ]
+    },
+    {
+      "label": "Run Release",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin/x64/Release"
+      },
+      "command": "./xr_3da -nointro -fsltx ${COC_LTX_FILE_PATH}",
+      "problemMatcher": []
+    },
+  ]
+}

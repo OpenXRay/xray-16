@@ -7,16 +7,9 @@
 #include "restricted_object.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterSquadRestAbstract CStateMonsterSquadRest<_Object>
-
-#define MIN_TIME_IDLE 5000
-#define MAX_TIME_IDLE 10000
-
-#define LEADER_RADIUS 20.f
-#define FIND_POINT_ATTEMPTS 5
 
 TEMPLATE_SPECIALIZATION
 CStateMonsterSquadRestAbstract::CStateMonsterSquadRest(_Object* obj) : inherited(obj)
@@ -88,3 +81,6 @@ void CStateMonsterSquadRestAbstract::setup_substates()
         return;
     }
 }
+
+#undef CStateMonsterSquadRestAbstract
+#undef TEMPLATE_SPECIALIZATION

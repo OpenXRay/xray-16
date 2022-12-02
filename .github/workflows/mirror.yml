@@ -4,6 +4,7 @@ on: [push, delete, workflow_dispatch]
 
 jobs:
   to_bitbucket:
+    if: github.repository == 'OpenXRay/xray-16'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

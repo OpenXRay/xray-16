@@ -4,6 +4,7 @@ pull_requests:
   do_not_increment_build_number: true
 
 skip_tags: true
+skip_branch_with_pr: true
 
 image:
 - Visual Studio 2019
@@ -72,15 +73,15 @@ for:
     - sh: |
         if [ "$PLATFORM" = "x64" ]; then
         sudo apt-get update &&
-        sudo apt-get install -y libglew-dev libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libcrypto++-dev libjpeg-dev &&
-        sudo apt-get install -y liblua5.1-0-dev libssl-dev libogg-dev libtheora-dev libvorbis-dev liblzo2-dev libncurses5-dev libsdl2-dev &&
+        sudo apt-get install -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev &&
+        sudo apt-get install -y libopenal-dev libogg-dev libtheora-dev libvorbis-dev &&
         CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION
         fi
     - sh: |
         if [ "$PLATFORM" = "x86" ]; then
         sudo dpkg --add-architecture i386 && sudo apt-get -qq update && sudo apt-get remove -y libllvm10 libgl1 libgl1-mesa-dri && sudo apt-get install -y gcc-multilib g++-8-multilib &&
-        sudo apt-get install -y libglew-dev:i386 libegl1-mesa-dev:i386 libgles2-mesa-dev:i386 libopenal-dev:i386 libcrypto++-dev:i386 libjpeg-dev:i386 &&
-        sudo apt-get install -y liblua5.1-0-dev:i386 libssl-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 liblzo2-dev:i386  libncurses5-dev:i386 libsdl2-dev:i386 &&
+        sudo apt-get install -y libsdl2-dev:i386 libglew-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 &&
+        sudo apt-get install -y libopenal-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386 &&
         CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
         fi
     - make -j $core_count package

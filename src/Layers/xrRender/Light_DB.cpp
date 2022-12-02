@@ -23,7 +23,7 @@ void CLight_DB::Load(IReader* fs)
         for (size_t i = 0; i < count; ++i)
         {
             Flight Ldata;
-            u32 controller = F->r_u32();
+            F->advance(sizeof(u32)); // u32 controller = F->r_u32();
             F->r(&Ldata, sizeof(Flight));
 
             light* L = Create();

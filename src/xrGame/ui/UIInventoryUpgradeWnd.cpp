@@ -39,7 +39,7 @@ CUIInventoryUpgradeWnd::Scheme::Scheme() {}
 CUIInventoryUpgradeWnd::Scheme::~Scheme() { delete_data(cells); }
 // =============================================================================================
 
-CUIInventoryUpgradeWnd::CUIInventoryUpgradeWnd()
+CUIInventoryUpgradeWnd::CUIInventoryUpgradeWnd() : CUIWindow("CUIInventoryUpgradeWnd")
 {
     // m_WeaponIconsShader = new ui_shader();
     //(*m_WeaponIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_actor_weapons");

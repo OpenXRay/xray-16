@@ -1,13 +1,9 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterPanicRunAbstract CStateMonsterPanicRun<_Object>
-
-#define MIN_UNSEEN_TIME 15000
-#define MIN_DIST_TO_ENEMY 15.f
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterPanicRunAbstract::initialize()
@@ -41,7 +37,5 @@ bool CStateMonsterPanicRunAbstract::check_completion()
     return true;
 }
 
-#undef DIST_TO_PATH_END
-#undef MIN_DIST_TO_ENEMY
 #undef TEMPLATE_SPECIALIZATION
 #undef CStateMonsterPanicRunAbstract

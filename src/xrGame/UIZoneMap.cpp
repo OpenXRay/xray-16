@@ -18,14 +18,6 @@
 #include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
-CUIZoneMap::CUIZoneMap() : m_current_map_idx(u8(-1)), visible(true)
-{
-    m_clock_wnd = nullptr;
-    m_pointerDistanceText = nullptr;
-}
-
-CUIZoneMap::~CUIZoneMap() {}
-
 void CUIZoneMap::Init()
 {
     CUIXml uiXml;

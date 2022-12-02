@@ -16,7 +16,7 @@ Lock g_trans_CS
     (MUTEX_PROFILE_ID(g_trans_CS))
 #endif // CONFIG_PROFILE_LOCKS
         ;
-extern XRLC_LIGHT_API void LightPoint(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c& C, Fvector& P, Fvector& N,
+extern XRLC_LIGHT_API void LightPoint(CDB::COLLIDER* DB, u32 ray_options, CDB::MODEL* MDL, base_color_c& C, Fvector& P, Fvector& N,
     base_lighting& lights, u32 flags, Face* skip);
 
 void g_trans_register_internal(Vertex* V)
@@ -137,8 +137,7 @@ public:
                 V->C._get(old);
 
                 CDB::COLLIDER DB;
-                DB.ray_options(0);
-                LightPoint(&DB, lc_global_data()->RCAST_Model(), vC, V->P, V->N, lc_global_data()->L_static(),
+                LightPoint(&DB, 0, lc_global_data()->RCAST_Model(), vC, V->P, V->N, lc_global_data()->L_static(),
                     (lc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_dont_hemi, 0);
                 vC._tmp_ = v_trans;
                 vC.mul(.5f);

@@ -15,11 +15,10 @@ class CUIChatWnd;
 struct GAME_NEWS_DATA;
 struct KillMessageStruct;
 
-class CUIMessagesWindow : public CUIWindow
+class CUIMessagesWindow final : public CUIWindow
 {
 public:
     CUIMessagesWindow();
-    virtual ~CUIMessagesWindow();
 
     void AddIconedPdaMessage(GAME_NEWS_DATA* news);
 

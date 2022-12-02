@@ -100,7 +100,7 @@ public:
     virtual void Init(int stage) {}
     virtual void Render();
     virtual void OnFrame() override;
-    virtual void OnUIReset() override {}
+    virtual void OnUIReset() override;
     IC CUIActorMenu& GetActorMenu() const { return *ActorMenu; }
     IC CUIPdaWnd& GetPdaMenu() const { return *PdaMenu; }
     bool ShowActorMenu();

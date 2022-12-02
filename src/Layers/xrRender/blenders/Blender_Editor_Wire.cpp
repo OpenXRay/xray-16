@@ -60,8 +60,7 @@ void CBlender_Editor_Wire::Compile(CBlender_Compile& C)
 
     C.PassBegin();
     {
-        C.PassSET_VS("editor");
-        C.PassSET_PS("simple_color");
+        C.PassSET_Shaders("editor", "simple_color");
     }
     C.PassEnd();
 }
