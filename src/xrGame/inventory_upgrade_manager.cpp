@@ -155,20 +155,63 @@ bool Manager::item_upgrades_exist(shared_str const& item_id)
     return true;
 }
 
+class check_upgraded_inventory_section
+{
+    const CInifile::Sect* inv_section{};
+
+public:
+    check_upgraded_inventory_section(pcstr items_section)
+    {
+        if (pSettings->section_exist(items_section))
+            inv_section = &pSettings->r_section(items_section);
+    }
+
+    [[nodiscard]]
+    bool add_anyway(shared_str const& item_id) const
+    {
+        if (!inv_section)
+            return false;
+
+        const auto ie = inv_section->Data.end();
+        const auto ib = inv_section->Data.begin();
+
+        const auto it = std::find_if(ie, ib, [&](const CInifile::Item& item)
+        {
+            return item.first == item_id;
+        });
+
+        return it != ie;
+    }
+};
+
 void Manager::load_all_inventory()
 {
-    //Alundaio: No longer the need to define upgradeable sections in [upgraded_inventory]
-    for (auto& section : pSettings->sections())
+    constexpr pcstr items_section = "upgraded_inventory";
+
+    if (g_upgrades_log == 1)
     {
-        if (!pSettings->line_exist(section->Name, "upgrades") || !pSettings->r_string(section->Name, "upgrades"))
-            continue;
+        Msg("# Inventory upgrade manager is loaded.");
+    }
 
-        if (!pSettings->line_exist(section->Name, "upgrade_scheme") || !pSettings->r_string(section->Name, "upgrade_scheme"))
-            continue;
+    const check_upgraded_inventory_section inv_section{ items_section };
 
-        add_root(section->Name);
+    // Alundaio: No longer the need to define upgradeable sections in [upgraded_inventory]
+    // Xottab_DUTY: But still follow original COP behaviour, i.e. add section anyway if it is defined in [upgraded_inventory]
+    for (const auto& section : pSettings->sections())
+    {
+        const auto& name = section->Name;
+
+        if (item_upgrades_exist(name) || inv_section.add_anyway(name.c_str()))
+        {
+            add_root(name);
+        }
     }
     //-Alundaio
+
+    if (g_upgrades_log == 1)
+    {
+        Msg("# Upgrades of inventory items loaded.");
+    }
 }
 
 void Manager::load_all_properties()
