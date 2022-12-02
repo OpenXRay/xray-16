@@ -320,7 +320,7 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
         return iActorSlot;
     if (l == m_pLists[eInventoryPistolList])
         return iActorSlot;
-    if (l == m_pLists[eInventoryBackpackList] && m_pLists[eInventoryHelmetList] != nullptr)
+    if (l == m_pLists[eInventoryBackpackList] && m_pLists[eInventoryBackpackList] != nullptr)
         return iActorSlot;
     if (l == m_pLists[eInventoryOutfitList])
         return iActorSlot;
