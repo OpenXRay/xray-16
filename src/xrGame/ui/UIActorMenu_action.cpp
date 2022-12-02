@@ -100,6 +100,7 @@ bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, C
     //-Alundaio
     return false;
 }
+
 bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 {
     InfoCurItem(NULL);
@@ -145,7 +146,7 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
     break;
     case iActorBag:
     {
-        if(!DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner))
+        if (!DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner))
             return false;
 
         ToBag(itm, true);
