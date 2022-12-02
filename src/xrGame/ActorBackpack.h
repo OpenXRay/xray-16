@@ -10,7 +10,7 @@ public:
 
     void Load(pcstr section) override;
 
-    void Hit(float P, ALife::EHitType hit_type) override;
+    virtual void Hit(float P, ALife::EHitType hit_type);
 
 public:
     float m_additional_weight;
