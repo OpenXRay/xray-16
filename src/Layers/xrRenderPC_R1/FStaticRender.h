@@ -5,6 +5,7 @@
 #include "Layers/xrRender/DetailManager.h"
 #include "GlowManager.h"
 #include "Layers/xrRender/WallmarksEngine.h"
+#include "FStaticRender_Types.h"
 #include "FStaticRender_RenderTarget.h"
 #include "Layers/xrRender/ModelPool.h"
 #include "LightShadows.h"
@@ -74,7 +75,14 @@ public:
     cl_light_PR r1_dlight_binder_PR;
     cl_light_C r1_dlight_binder_color;
     cl_light_XFORM r1_dlight_binder_xform;
+
     shared_str c_ldynamic_props;
+    shared_str c_sbase;
+    shared_str c_ssky0;
+    shared_str c_ssky1;
+    shared_str c_sclouds0;
+    shared_str c_sclouds1;
+
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
 
@@ -180,7 +188,7 @@ public:
     virtual bool occ_visible(sPoly& P) override;
 
     // Main
-    void BeforeFrame() override;
+    void BeforeRender() override;
 
     virtual void Calculate() override;
     virtual void Render() override;

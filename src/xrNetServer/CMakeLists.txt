@@ -1,6 +1,7 @@
 project(xrNetServer)
 
 set(SRC_FILES
+    "guids.cpp"
     "ip_filter.cpp"
     "ip_filter.h"
     "NET_AuthCheck.cpp"

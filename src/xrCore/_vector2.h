@@ -1,17 +1,8 @@
 #pragma once
-#ifndef __V2D__
-#define __V2D__
+
 #include "xrCore/math_constants.h"
 
 #include <algorithm>
-
-#ifdef min
-# undef min
-#endif
-#ifdef max
-# undef max
-#endif
-
 
 template <class T>
 struct _vector2
@@ -260,11 +251,10 @@ public:
 };
 
 typedef _vector2<float> Fvector2;
-typedef _vector2<double> Dvector2;
 typedef _vector2<int> Ivector2;
 
 template <class T>
 bool _valid(const _vector2<T>& v)
-{ return _valid((T)v.x) && _valid((T)v.y); }
-
-#endif
+{
+    return _valid((T)v.x) && _valid((T)v.y);
+}

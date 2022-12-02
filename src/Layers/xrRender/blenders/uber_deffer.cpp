@@ -105,7 +105,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
 
 // Uber-construct
 #if defined(USE_DX11)
-    if (bump && hq && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
+    if (bump && hq && RImplementation.o.tessellation && C.TessMethod != 0)
     {
         char hs[256], ds[256]; // = "DX11" DELIMITER "tess", ds[256] = "DX11" DELIMITER "tess";
         char params[256] = "(";
@@ -151,19 +151,19 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
         VERIFY(strstr(ps, "bump") != 0);
         C.r_TessPass(vs, hs, ds, "null", ps, FALSE);
         RImplementation.clearAllShaderOptions();
-        u32 stage = C.r_dx10Sampler("smp_bump_ds");
+        u32 stage = C.r_dx11Sampler("smp_bump_ds");
         if (stage != -1)
         {
             C.i_Address(stage, D3DTADDRESS_WRAP);
-            C.i_dx10FilterAnizo(stage, TRUE);
+            C.i_dx11FilterAnizo(stage, TRUE);
         }
         if (ps_r2_ls_flags_ext.test(R2FLAGEXT_WIREFRAME))
             C.R().SetRS(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-        C.r_dx10Texture("s_tbump", fnameA);
-        C.r_dx10Texture("s_tbumpX", fnameB); // should be before base bump
+        C.r_dx11Texture("s_tbump", fnameA);
+        C.r_dx11Texture("s_tbumpX", fnameB); // should be before base bump
         if (bHasDetailBump)
         {
-            C.r_dx10Texture("s_tdetailBumpX", texDetailBumpX);
+            C.r_dx11Texture("s_tdetailBumpX", texDetailBumpX);
         }
     }
     else
@@ -185,25 +185,25 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     // C.r_Sampler("s_detail", dt, false, D3DTADDRESS_WRAP,
     // D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR,
     // D3DTEXF_ANISOTROPIC);
-    C.r_dx10Texture("s_base", C.L_textures[0]);
-    C.r_dx10Texture("s_bumpX", fnameB); // should be before base bump
-    C.r_dx10Texture("s_bump", fnameA);
-    C.r_dx10Texture("s_bumpD", dt);
-    C.r_dx10Texture("s_detail", dt);
+    C.r_dx11Texture("s_base", C.L_textures[0]);
+    C.r_dx11Texture("s_bumpX", fnameB); // should be before base bump
+    C.r_dx11Texture("s_bump", fnameA);
+    C.r_dx11Texture("s_bumpD", dt);
+    C.r_dx11Texture("s_detail", dt);
     if (bHasDetailBump)
     {
-        C.r_dx10Texture("s_detailBump", texDetailBump);
-        C.r_dx10Texture("s_detailBumpX", texDetailBumpX);
+        C.r_dx11Texture("s_detailBump", texDetailBump);
+        C.r_dx11Texture("s_detailBumpX", texDetailBumpX);
         VERIFY(xr_strlen(texDetailBump) > 2);
         VERIFY(xr_strlen(texDetailBumpX) > 2);
     }
-    C.r_dx10Sampler("smp_base");
+    C.r_dx11Sampler("smp_base");
     if (lmap)
     {
         // C.r_Sampler("s_hemi", C.L_textures[2], false, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE,
         // D3DTEXF_LINEAR);
-        C.r_dx10Texture("s_hemi", C.L_textures[2]);
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Texture("s_hemi", C.L_textures[2]);
+        C.r_dx11Sampler("smp_rtlinear");
     }
 #elif defined(USE_DX9) || defined(USE_OGL)
     C.r_Pass(vs, ps, FALSE);
@@ -296,7 +296,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         strconcat(sizeof(fnameB), fnameB, fnameA, "#");
     }
 
-    if (bump && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
+    if (bump && RImplementation.o.tessellation && C.TessMethod != 0)
     {
         char hs[256], ds[256]; // = "DX11" DELIMITER "tess", ds[256] = "DX11" DELIMITER "tess";
         char params[256] = "(";
@@ -339,19 +339,19 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 
         C.r_TessPass(vs, hs, ds, "null", "dumb", FALSE, TRUE, TRUE, FALSE);
         RImplementation.clearAllShaderOptions();
-        C.r_dx10Texture("s_base", C.L_textures[0]);
-        C.r_dx10Texture("s_bumpX", fnameB); // should be before base bump
-        C.r_dx10Texture("s_bump", fnameA);
+        C.r_dx11Texture("s_base", C.L_textures[0]);
+        C.r_dx11Texture("s_bumpX", fnameB); // should be before base bump
+        C.r_dx11Texture("s_bump", fnameA);
         if (bHasDetailBump)
         {
-            C.r_dx10Texture("s_detailBump", texDetailBump);
-            C.r_dx10Texture("s_detailBumpX", texDetailBumpX);
+            C.r_dx11Texture("s_detailBump", texDetailBump);
+            C.r_dx11Texture("s_detailBumpX", texDetailBumpX);
         }
-        u32 stage = C.r_dx10Sampler("smp_bump_ds");
+        u32 stage = C.r_dx11Sampler("smp_bump_ds");
         if (stage != -1)
         {
             C.i_Address(stage, D3DTADDRESS_WRAP);
-            C.i_dx10FilterAnizo(stage, TRUE);
+            C.i_dx11FilterAnizo(stage, TRUE);
         }
         if (ps_r2_ls_flags_ext.test(R2FLAGEXT_WIREFRAME))
             C.R().SetRS(D3DRS_FILLMODE, D3DFILL_WIREFRAME);

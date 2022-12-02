@@ -281,6 +281,42 @@ void CMapLocation::LoadSpot(LPCSTR type)
     }
 }
 
+void CMapLocation::InitUserSpot(const shared_str& level_name, const Fvector& pos)
+{
+    m_cached.m_LevelName = level_name;
+    m_position_global = pos;
+    m_position_on_map.set(pos.x, pos.z);
+    m_cached.m_graphID = GameGraph::_GRAPH_ID(-1);
+    m_cached.m_Position.set(pos.x, pos.z);
+    m_cached.m_Direction.set(0.f, 0.f);
+
+    if (ai().get_alife())
+    {
+        const CGameGraph::SLevel& level = ai().game_graph().header().level(*level_name);
+        float min_dist = 128; // flt_max;
+
+        GameGraph::_GRAPH_ID n = ai().game_graph().header().vertex_count();
+
+        for (GameGraph::_GRAPH_ID i = 0; i < n; ++i)
+        {
+            if (ai().game_graph().vertex(i)->level_id() == level.id())
+            {
+                float distance = ai().game_graph().vertex(i)->game_point().distance_to_sqr(m_position_global);
+                if (distance < min_dist)
+                {
+                    min_dist = distance;
+                    m_cached.m_graphID = i;
+                }
+            }
+        }
+        if (!ai().game_graph().vertex(m_cached.m_graphID))
+        {
+            Msg("qweasdd! Cannot assign game vertex for CUserDefinedMapLocation [map=%s]", *level_name);
+            R_ASSERT(ai().game_graph().vertex(m_cached.m_graphID));
+        }
+    }
+}
+
 void CMapLocation::CalcPosition()
 {
     if (m_flags.test(ePosToActor) && Level().CurrentEntity())
@@ -640,6 +676,21 @@ void CMapLocation::UpdateLevelMap(CUICustomMap* map)
     }
 }
 
+void CMapLocation::HighlightSpot(bool state, const Fcolor& color)
+{
+    CUIStatic* st = smart_cast<CUIStatic*>(m_level_spot);
+    if (state)
+    {
+        u32 clr = color_rgba((u32)color.r, (u32)color.g, (u32)color.b, (u32)color.a);
+        st->SetTextureColor(clr);
+    }
+    else
+    {
+        if (st->GetTextureColor() != 0xffffffff)
+            st->SetTextureColor(0xffffffff);
+    }
+}
+
 void CMapLocation::save(IWriter& stream)
 {
     stream.w_stringZ(m_hint);
@@ -766,6 +817,11 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
     }
 
     return NULL;
+}
+
+Fvector2 CMapLocation::SpotSize()
+{
+    return m_level_spot->GetWndSize();
 }
 
 CRelationMapLocation::CRelationMapLocation(const shared_str& type, u16 object_id, u16 pInvOwnerActorID)

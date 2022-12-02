@@ -247,14 +247,6 @@ dTriArrayCallback* dGeomTriListGetArrayCallback(dGeomID g);
 
 dxGeom* dCreateTriList(dSpaceID space, dTriCallback* Callback, dTriArrayCallback* ArrayCallback);
 
-/* Setting data */
-
-void dGeomTriListBuild(dGeomID g, const dcVector3* Vertices, int VertexCount, const int* Indices, int IndexCount);
-
-/* Getting data */
-
-void dGeomTriListGetTriangle(dGeomID g, int Index, dVector3* v0, dVector3* v1, dVector3* v2);
-
 /* Internal types */
 
 class dcTriListCollider;

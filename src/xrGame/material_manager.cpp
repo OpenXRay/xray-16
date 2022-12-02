@@ -103,7 +103,7 @@ void CMaterialManager::update(float time_delta, float volume, float step_time, b
     {
         if (m_time_to_step < 0)
         {
-            SoundVec& snd_array = mtl_pair->StepSounds;
+            auto& snd_array = mtl_pair->StepSounds;
 
             if (m_run_mode && mtl_pair->BreakingSounds.size() > 0)
                 snd_array = mtl_pair->BreakingSounds;

@@ -11,11 +11,11 @@
 #include "editor_environment_suns_blend.hpp"
 #include "Include/editor/property_holder_base.hpp"
 
-using editor::environment::suns::blend;
-using editor::environment::suns::manager;
-
+namespace editor::environment::suns
+{
 blend::blend() : m_down_time(0.f), m_rise_time(0.f), m_time(0.f) {}
-void blend::load(CInifile& config, shared_str const& section)
+
+void blend::load(CInifile & config, shared_str const& section)
 {
     m_down_time = config.read_if_exists<float>(section, "blend_down_time", 60.f);
     m_rise_time = config.read_if_exists<float>(section, "blend_rise_time", 60.f);
@@ -23,7 +23,7 @@ void blend::load(CInifile& config, shared_str const& section)
 }
 
 void blend::fill(
-    manager const& manager, XRay::Editor::property_holder_base* holder, XRay::Editor::property_holder_collection* collection)
+    manager const& manager, XRay::Editor::property_holder_base * holder, XRay::Editor::property_holder_collection * collection)
 {
     XRay::Editor::property_holder_base* properties = holder;
     VERIFY(properties);
@@ -36,3 +36,4 @@ void blend::fill(
 
     properties->add_property("time", "blend", "this option is responsible for the blend time", m_time, m_time);
 }
+} // namespace editor::environment::suns

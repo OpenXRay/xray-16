@@ -2,7 +2,7 @@
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/ProgressBar/UIProgressShape.h"
 
-class CUIMotionIcon : public CUIStatic
+class CUIMotionIcon final : public CUIStatic
 {
     using inherited = CUIStatic;
 
@@ -40,8 +40,8 @@ private:
     float m_cur_pos;
 
 public:
-    virtual ~CUIMotionIcon();
     CUIMotionIcon();
+    ~CUIMotionIcon() override;
     virtual void Update();
     virtual void Draw();
     bool Init(Frect const& rect);

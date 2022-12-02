@@ -1,13 +1,15 @@
 #include "stdafx.h"
 
-#include "xrface.h"
+#include "xrFace.h"
 
-#include "xrdeflector.h"
-#include "xrLC_globaldata.h"
+#include "xrDeflector.h"
+#include "xrLC_GlobalData.h"
 #include "serialize.h"
-#include "lightmap.h"
+#include "Lightmap.h"
+
 volatile u32 dwInvalidFaces; //= 0;
 u32 InvalideFaces() { return dwInvalidFaces; }
+
 const Shader_xrLC& base_Face::Shader() const
 {
     VERIFY(inlc_global_data());

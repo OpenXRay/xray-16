@@ -3,7 +3,7 @@
 #include "Include/xrRender/UIShader.h"
 #include "Include/xrRender/UIRender.h"
 
-CUIProgressShape::CUIProgressShape()
+CUIProgressShape::CUIProgressShape() : CUIStatic("CUIProgressShape")
 {
     m_pBackground = nullptr;
     m_pTexture = nullptr;
@@ -13,9 +13,6 @@ CUIProgressShape::CUIProgressShape()
     m_angle_end = PI_MUL_2;
     m_stage = 0.f;
 };
-
-CUIProgressShape::~CUIProgressShape()
-{}
 
 void CUIProgressShape::SetPos(float pos) { m_stage = pos; }
 void CUIProgressShape::SetPos(int pos, int max)

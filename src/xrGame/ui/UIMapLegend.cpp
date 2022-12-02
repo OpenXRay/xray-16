@@ -23,8 +23,9 @@
 #include "UIInventoryUtilities.h"
 #include "Level.h"
 
-UIMapLegend::UIMapLegend() {}
+UIMapLegend::UIMapLegend() : CUIWindow("UIMapLegend") {}
 UIMapLegend::~UIMapLegend() { xr_delete(m_list); }
+
 void UIMapLegend::init_from_xml(CUIXml& xml, LPCSTR path)
 {
     CUIXmlInit::InitWindow(xml, path, 0, this);
@@ -74,8 +75,8 @@ void UIMapLegend::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 // =================================================================================================
 
-UIMapLegendItem::UIMapLegendItem() {}
-UIMapLegendItem::~UIMapLegendItem() {}
+UIMapLegendItem::UIMapLegendItem() : CUIWindow("UIMapLegendItem") {}
+
 void UIMapLegendItem::init_from_xml(CUIXml& xml, int index)
 {
     CUIXmlInit::InitWindow(xml, "item", index, this);

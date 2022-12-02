@@ -20,6 +20,9 @@
 #include "PHDynamicData.h"
 #include "xrServerEntities/PHSynchronize.h"
 #include "xrServerEntities/PHNetState.h"
+
+namespace detail::activation_shape
+{
 static float max_depth = 0.f;
 static float friction_factor = 0.f;
 static const float cfm = 1.e-10f;
@@ -31,6 +34,7 @@ static	const float static_erp				=1.f;
 static	const float dynamic_cfm				= 1.f;//static_cfm;//
 static	const float dynamic_erp				= 1.f / 1000.f;//static_erp;//
 */
+}
 
 #ifdef DEBUG
 #define CHECK_POS(pos, msg, br)                   \
@@ -49,6 +53,8 @@ extern int dTriListClass;
 static void ActivateTestDepthCallback(
     bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
+    using namespace ::detail::activation_shape;
+
     if (!do_colide || material_1->Flags.test(SGameMtl::flPassable) || material_2->Flags.test(SGameMtl::flPassable))
         return;
 
@@ -145,7 +151,7 @@ void GetMaxDepthCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* mater
     float& depth = c.geom.depth;
     float test_depth = depth;
     // save_max(max_depth,test_depth);
-    max_depth += test_depth;
+    detail::activation_shape::max_depth += test_depth;
 }
 
 void RestoreVelocityState(V_PH_WORLD_STATE& state)
@@ -215,6 +221,8 @@ void CPHActivationShape::Destroy()
 bool CPHActivationShape::Activate(
     const Fvector need_size, u16 steps, float max_displacement, float max_rotation, bool un_freeze_later /*	=false*/)
 {
+    using namespace ::detail::activation_shape;
+
 #ifdef DEBUG
     if (debug_output().ph_dbg_draw_mask().test(phDbgDrawDeathActivationBox))
     {
@@ -361,3 +369,5 @@ IPhysicsShellHolder* CPHActivationShape::ref_object()
     return ud->ph_ref_object;
 }
 #endif
+
+#undef CHECK_POS

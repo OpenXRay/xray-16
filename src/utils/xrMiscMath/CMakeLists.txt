@@ -1,7 +1,6 @@
 project(xrMiscMath)
 
 set(SRC_FILES
-    "cylinder.cpp"
     "matrix.cpp"
     "quaternion.cpp"
     "vector.cpp"

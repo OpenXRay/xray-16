@@ -32,6 +32,8 @@
 #include "StdAfx.h"
 #include "eqn.h"
 
+namespace eqn
+{
 /*
  * Put angle in range 0 .. 2*M_PI. Bounds on range of Psi
  */
@@ -341,3 +343,4 @@ int PsiEquation::partition(float y,
 }
 
 #endif
+} // namespace eqn

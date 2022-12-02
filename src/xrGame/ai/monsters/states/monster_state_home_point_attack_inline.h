@@ -8,8 +8,7 @@
 #include "ai/monsters/monster_home.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterAttackMoveToHomePointAbstract CStateMonsterAttackMoveToHomePoint<_Object>
 
@@ -51,7 +50,7 @@ void CStateMonsterAttackMoveToHomePointAbstract::select_target()
         }
     }
 
-    m_selected_target_time = current_time();
+    m_selected_target_time = xr_current_time();
 
     if (m_target_node == u32(-1))
         this->object->control().path_builder().get_node_in_radius(self_node, 5, 25, 10, m_target_node);
@@ -79,7 +78,7 @@ void CStateMonsterAttackMoveToHomePointAbstract::execute()
 {
     if (m_target_node == u32(-1))
     {
-        if (current_time() > m_selected_target_time + 500)
+        if (xr_current_time() > m_selected_target_time + 500)
             select_target();
     }
     else

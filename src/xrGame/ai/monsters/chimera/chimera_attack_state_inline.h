@@ -42,7 +42,7 @@ void ChimeraAttackState<Object>::initialize()
     this->object->MeleeChecker.init_attack();
     m_target_vertex = (u32)(-1);
     m_allow_jump = false;
-    m_last_jump_time = current_time();
+    m_last_jump_time = xr_current_time();
     m_attack_jump = false;
     m_min_run_distance = calculate_min_run_distance();
     m_capturer = this->object->com_man().get_jump_control();
@@ -164,7 +164,7 @@ bool ChimeraAttackState<Object>::select_target_for_move()
     {
         Fvector const self2enemy = enemy_pos - self_pos;
 
-        if (m_run_side == run_side_undefined || current_time() > m_run_side_select_tick)
+        if (m_run_side == run_side_undefined || xr_current_time() > m_run_side_select_tick)
         {
             Fvector const self2behind = behind_point - self_pos;
             bool left_side = self2enemy.x * self2behind.z - self2enemy.z * self2behind.x > 0.f;
@@ -174,7 +174,7 @@ bool ChimeraAttackState<Object>::select_target_for_move()
             }
 
             m_run_side = left_side ? run_side_left : run_side_right;
-            m_run_side_select_tick = current_time() + 4000;
+            m_run_side_select_tick = xr_current_time() + 4000;
         }
 
         Fvector const enemy2self = -attack_radius * normalize(self2enemy);
@@ -323,9 +323,9 @@ void ChimeraAttackState<Object>::execute()
     bool const preparing_state = (m_num_attack_jumps == max_attack_jumps);
 
     bool const can_prepare_jump =
-        preparing_state && current_time() > m_last_jump_time + this->object->get_attack_params().prepare_jump_timeout;
+        preparing_state && xr_current_time() > m_last_jump_time + this->object->get_attack_params().prepare_jump_timeout;
     bool const can_attack_jump =
-        !preparing_state && current_time() > m_last_jump_time + this->object->get_attack_params().attack_jump_timeout;
+        !preparing_state && xr_current_time() > m_last_jump_time + this->object->get_attack_params().attack_jump_timeout;
 
     bool do_move = false;
 
@@ -353,7 +353,7 @@ void ChimeraAttackState<Object>::execute()
         float const self_dir_yaw = self_dir.getH();
 
         bool const good_aiming = _abs(self2target_yaw - self_dir_yaw) < deg2rad(20.f);
-        bool const in_stealth = current_time() < m_stealth_end_tick && !this->object->EnemyMan.enemy_see_me_now();
+        bool const in_stealth = xr_current_time() < m_stealth_end_tick && !this->object->EnemyMan.enemy_see_me_now();
         if (!in_stealth)
             m_stealth_end_tick = 0;
 
@@ -387,7 +387,7 @@ void ChimeraAttackState<Object>::execute()
             {
                 m_state = state_prepare_jump;
                 float length = this->object->anim().get_animation_length(eAnimUpperAttack, 0);
-                m_state_end_tick = current_time() + u32(length * 1000);
+                m_state_end_tick = xr_current_time() + u32(length * 1000);
             }
             else
             {
@@ -405,11 +405,11 @@ void ChimeraAttackState<Object>::execute()
             this->object->anim().clear_override_animation();
         }
 
-        if (current_time() > m_state_end_tick)
+        if (xr_current_time() > m_state_end_tick)
         {
             if (jump(m_target, m_attack_jump))
             {
-                m_last_jump_time = current_time();
+                m_last_jump_time = xr_current_time();
                 if (m_attack_jump)
                 {
                     ++m_num_attack_jumps;
@@ -453,7 +453,7 @@ void ChimeraAttackState<Object>::execute()
 
             if (can_attack_from_behind)
             {
-                m_stealth_end_tick = current_time() + this->object->get_attack_params().stealth_timeout;
+                m_stealth_end_tick = xr_current_time() + this->object->get_attack_params().stealth_timeout;
             }
 
             this->object->control().capture(m_capturer, ControlCom::eControlPath);

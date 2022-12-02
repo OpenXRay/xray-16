@@ -1,4 +1,4 @@
-project(ODE)
+project(xrODE)
 
 set(SRC_FILES
     "ode/src/array.cpp"
@@ -95,17 +95,20 @@ target_include_directories(${PROJECT_NAME}
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
-    -D_SECURE_SCL=0
     -DLINUX
     -D_cdecl=
     -D__forceinline=inline
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
     POSITION_INDEPENDENT_CODE ON
+    UNITY_BUILD OFF
 )
 
-install(TARGETS ${PROJECT_NAME} LIBRARY
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
-)
+if (NOT STATIC_BUILD)
+    install(TARGETS ${PROJECT_NAME} LIBRARY
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+    )
+endif()

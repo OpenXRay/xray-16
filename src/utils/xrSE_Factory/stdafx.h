@@ -11,6 +11,9 @@
 // Hack to Include\xrRender\DrawUtils.h (used and defined in editors)
 #define ECORE_API
 
+// Hack to include xrServerEntities\PHNetState.h
+#define XRPHYSICS_API
+
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 #include "xrCore/_fbox.h"

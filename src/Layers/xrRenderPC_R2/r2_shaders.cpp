@@ -114,7 +114,7 @@ HRESULT CRender::shader_compile(
     u32 len = 0;
     // options
     {
-        xr_sprintf(c_smapsize, "%04d", u32(o.smapsize));
+        xr_sprintf(c_smapsize, "%04d", u32(m_SMAPSize));
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
         def_it++;

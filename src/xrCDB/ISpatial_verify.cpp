@@ -3,16 +3,13 @@
 
 extern Fvector c_spatial_offset[8];
 
-class walker
+class verify_walker
 {
 public:
-    u32 o_count;
-    u32 n_count;
+    u32 o_count{};
+    u32 n_count{};
 
 public:
-    walker() : o_count(0), n_count(0)
-    {
-    }
     void walk(ISpatial_NODE* N, Fvector& n_C, float n_R)
     {
         // test items
@@ -34,7 +31,7 @@ public:
 
 bool ISpatial_DB::verify()
 {
-    walker W;
+    verify_walker W;
     W.walk(m_root, m_center, m_bounds);
     bool bResult = (W.o_count == Stats.ObjectCount) && (W.n_count == Stats.NodeCount);
     VERIFY(bResult);

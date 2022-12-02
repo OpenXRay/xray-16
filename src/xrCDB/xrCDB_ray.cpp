@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop // ???
 #include "xrCore/_fbox.h"
-#pragma warning(push)
-#pragma warning(disable : 4995)
+
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
@@ -10,12 +9,12 @@
 #else
 #error Add your platform here
 #endif
-#pragma warning(pop)
 
 #include "xrCDB.h"
 #include "SDL.h"
 
-using namespace CDB;
+namespace CDB
+{
 using namespace Opcode;
 
 struct alignas(16) vec_t : public Fvector3
@@ -34,10 +33,6 @@ struct alignas(16) ray_t
     vec_t pos;
     vec_t inv_dir;
     vec_t fwd_dir;
-};
-struct ray_segment_t
-{
-    float t_near, t_far;
 };
 
 ICF u32& uf(float& x) { return (u32&)x; }
@@ -202,6 +197,17 @@ ICF bool isect_sse(const aabb_t& box, const ray_t& ray, float& dist)
 
     return ret;
 }
+
+#undef loadps
+#undef storess
+#undef minss
+#undef maxss
+#undef minps
+#undef maxps
+#undef mulps
+#undef subps
+#undef rotatelps
+#undef muxhps
 
 template <bool bUseSSE, bool bCull, bool bFirst, bool bNearest>
 class alignas(16) ray_collider
@@ -422,7 +428,7 @@ public:
     }
 };
 
-void COLLIDER::ray_query(const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
+void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
 {
     m_def->syncronize();
 
@@ -431,7 +437,7 @@ void COLLIDER::ray_query(const MODEL* m_def, const Fvector& r_start, const Fvect
     const AABBNoLeafNode* N = T->GetNodes();
     r_clear();
 
-    if (CPU::ID.hasFeature(CpuFeature::SSE))
+    if (SDL_HasSSE())
     {
         // SSE
         // Binary dispatcher
@@ -574,3 +580,4 @@ void COLLIDER::ray_query(const MODEL* m_def, const Fvector& r_start, const Fvect
         }
     }
 }
+} // namespace CDB

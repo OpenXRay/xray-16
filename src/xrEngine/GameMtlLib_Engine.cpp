@@ -3,14 +3,14 @@
 
 #ifndef GM_NON_GAME
 
-static void DestroySounds(SoundVec& lst)
+static void DestroySounds(xr_vector<ref_sound>& lst)
 {
     for (auto it : lst)
         it.destroy();
 }
 
-static void DestroyPSs(PSVec& lst) {}
-static void CreateSounds(SoundVec& lst, pcstr buf)
+static void DestroyPSs(xr_vector<shared_str>& lst) {}
+static void CreateSounds(xr_vector<ref_sound>& lst, pcstr buf)
 {
     string128 tmp;
     int cnt = _GetItemCount(buf);
@@ -29,7 +29,7 @@ static void CreateMarks(IWallMarkArray* pMarks, pcstr buf)
         pMarks->AppendMark(_GetItem(buf, k, tmp));
 }
 
-static void CreatePSs(PSVec& lst, pcstr buf)
+static void CreatePSs(xr_vector<shared_str>& lst, pcstr buf)
 {
     string256 tmp;
     int cnt = _GetItemCount(buf);

@@ -221,3 +221,31 @@ public:
     virtual void Player_AddMoney(game_PlayerState* ps, s32 MoneyAmount);
     void SpawnPlayer(ClientID id, LPCSTR N);
 };
+
+struct SearcherClientByName
+{
+    string512 player_name;
+
+    SearcherClientByName(pcstr name)
+    {
+        strncpy_s(player_name, sizeof(player_name), name, sizeof(player_name) - 1);
+        xr_strlwr(player_name);
+    }
+
+    bool operator()(IClient* client) const
+    {
+        const xrClientData* temp_client = smart_cast<xrClientData*>(client);
+        pstr tmp_player = nullptr;
+        if (!temp_client->ps)
+            return false;
+
+        STRCONCAT(tmp_player, temp_client->ps->getName());
+        xr_strlwr(tmp_player);
+
+        if (!xr_strcmp(player_name, tmp_player))
+        {
+            return true;
+        }
+        return false;
+    }
+};

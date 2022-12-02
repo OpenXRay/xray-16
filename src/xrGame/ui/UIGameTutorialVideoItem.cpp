@@ -63,11 +63,11 @@ void CUISequenceVideoItem::Load(CUIXml* xml, int idx)
     // ui-components
     if (xml->NavigateToNode("background", 0))
     {
-        m_wnd_bg = xr_new<CUIStatic>();
+        m_wnd_bg = xr_new<CUIStatic>("Background");
         m_wnd_bg->SetAutoDelete(false);
         CUIXmlInit::InitStatic(*xml, "background", 0, m_wnd_bg);
     }
-    m_wnd = xr_new<CUIStatic>();
+    m_wnd = xr_new<CUIStatic>("Video window");
     m_wnd->SetAutoDelete(false);
     CUIXmlInit::InitStatic(*xml, "video_wnd", 0, m_wnd);
     bool bFullScreen = (1 == xml->ReadAttribInt("video_wnd", 0, "fullscreen", 0));

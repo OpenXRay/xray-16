@@ -12,6 +12,7 @@ public:
     CUIStatic* m_BagWnd2{};
 
 public:
+    CUIWeightBar() : CUIWindow("CUIWeightBar") {}
     void init_from_xml(CUIXml& uiXml, pcstr path);
     void UpdateData(float weight);
     void UpdateData(CInventoryOwner* pInvOwner);

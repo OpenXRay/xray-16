@@ -5,7 +5,6 @@
 >
 
 #define CStateMonsterHideFromPointAbstract CStateMonsterHideFromPoint<_Object>
-#define DIST_TO_PATH_END 1.5f
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterHideFromPointAbstract::initialize()
@@ -53,6 +52,5 @@ bool CStateMonsterHideFromPointAbstract::check_completion()
     return false;
 }
 
-#undef DIST_TO_PATH_END
 #undef TEMPLATE_SPECIALIZATION
 #undef CStateMonsterHideFromPointAbstract

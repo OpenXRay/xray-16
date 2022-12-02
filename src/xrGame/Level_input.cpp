@@ -620,8 +620,6 @@ void CLevel::IR_OnTextInput(pcstr text)
     }
 }
 
-void CLevel::IR_OnMouseStop(int /**axis**/, int /**value**/) {}
-
 void CLevel::IR_OnControllerPress(int key, float x, float y)
 {
     if (g_bDisableAllInput)

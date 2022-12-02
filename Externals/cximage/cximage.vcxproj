@@ -48,6 +48,7 @@
     <ClCompile Include="ximapal.cpp" />
     <ClCompile Include="ximasel.cpp" />
     <ClCompile Include="ximath.cpp" />
+    <ClCompile Include="xiofile.cpp" />
     <ClCompile Include="xmemfile.cpp" />
   </ItemGroup>
   <ItemGroup>

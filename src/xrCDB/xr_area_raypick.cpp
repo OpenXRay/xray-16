@@ -31,7 +31,6 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
     VERIFY(_abs(dir.magnitude() - 1) < EPS);
     r_temp.r_clear();
 
-    xrc.ray_options(CDB::OPT_ONLYFIRST);
     collide::ray_defs Q(start, dir, range, CDB::OPT_ONLYFIRST, tgt);
 
     // dynamic test
@@ -78,7 +77,7 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
             }
 
             // 2. Polygon doesn't pick - real database query
-            xrc.ray_query(&Static, start, dir, range);
+            xrc.ray_query(CDB::OPT_ONLYFIRST, &Static, start, dir, range);
             if (0 == xrc.r_count())
             {
                 cache->set(start, dir, range, FALSE);
@@ -99,7 +98,7 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
         }
         else
         {
-            xrc.ray_query(&Static, start, dir, range);
+            xrc.ray_query(CDB::OPT_ONLYFIRST, &Static, start, dir, range);
             return xrc.r_count();
         }
     }
@@ -126,8 +125,7 @@ bool CObjectSpace::_RayPick(
     // static test
     if (tgt & rqtStatic)
     {
-        xrc.ray_options(CDB::OPT_ONLYNEAREST | CDB::OPT_CULL);
-        xrc.ray_query(&Static, start, dir, range);
+        xrc.ray_query(CDB::OPT_ONLYNEAREST | CDB::OPT_CULL, &Static, start, dir, range);
         if (xrc.r_count())
             R.set_if_less(xrc.r_begin());
     }
@@ -200,8 +198,7 @@ bool CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_de
     // Test static
     if (R.tgt & s_mask)
     {
-        xrc.ray_options(R.flags);
-        xrc.ray_query(&Static, R.start, R.dir, R.range);
+        xrc.ray_query(R.flags, &Static, R.start, R.dir, R.range);
 
         for(auto &i : *xrc.r_get())
             r_temp.append_result(rq_result().set(0, i.range, i.id));
@@ -266,8 +263,7 @@ bool CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_de
             // static test allowed
 
             // test static
-            xrc.ray_options(s_rd.flags);
-            xrc.ray_query(&Static, s_rd.start, s_rd.dir, s_rd.range);
+            xrc.ray_query(s_rd.flags, &Static, s_rd.start, s_rd.dir, s_rd.range);
 
             if (xrc.r_count())
             {
@@ -370,8 +366,7 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
             // Test static model
             if (s_rd.range > EPS)
             {
-                xrc.ray_options(s_rd.flags);
-                xrc.ray_query(&Static, s_rd.start, s_rd.dir, s_rd.range);
+                xrc.ray_query(s_rd.flags, &Static, s_rd.start, s_rd.dir, s_rd.range);
                 if (xrc.r_count())
                 {
                     if (s_res.set_if_less(xrc.r_begin()))

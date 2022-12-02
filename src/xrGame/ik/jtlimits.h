@@ -114,7 +114,7 @@ class SimpleJtLimit
 {
 private:
     int type;
-    PsiEquation psi;
+    eqn::PsiEquation psi;
     AngleInt limits;
     float sin_low, sin_high;
 
@@ -212,11 +212,11 @@ public:
 class ComplexJtLimit
 {
 private:
-    PsiEquation cos_eq; // cos(theta) equation
-    PsiEquation sin_eq; // sin(theta) equation
-    PsiEquation eq; // gamma equation
+    eqn::PsiEquation cos_eq; // cos(theta) equation
+    eqn::PsiEquation sin_eq; // sin(theta) equation
+    eqn::PsiEquation eq; // gamma equation
     int type; // Whether eq is a sin or cos of gamma
-    PsiEquation deriv; // Derivative of sin_eq/cos_eq without denom
+    eqn::PsiEquation deriv; // Derivative of sin_eq/cos_eq without denom
     AngleInt limits;
     float tan_low, tan_high;
 

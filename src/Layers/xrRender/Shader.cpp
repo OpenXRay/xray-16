@@ -40,38 +40,42 @@ void resptrcode_geom::create(VertexElement* decl, VertexBufferHandle vb, IndexBu
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-BOOL SPass::equal(const SPass& other)
+bool SPass::equal(const SPass& other) const
 {
     if (state != other.state)
-        return FALSE;
+        return false;
     if (ps != other.ps)
-        return FALSE;
+        return false;
     if (vs != other.vs)
-        return FALSE;
+        return false;
 #if defined(USE_DX11) || defined(USE_OGL)
     if (gs != other.gs)
-        return FALSE;
+        return false;
 #    ifdef USE_DX11
     if (hs != other.hs)
-        return FALSE;
+        return false;
     if (ds != other.ds)
-        return FALSE;
+        return false;
     if (cs != other.cs)
-        return FALSE;
+        return false;
 #    endif
 #endif // USE_DX11 || USE_OGL
+#ifdef USE_OGL
+    if (pp != other.pp)
+        return false;
+#endif
     if (constants != other.constants)
-        return FALSE; // is this nessesary??? (ps+vs already combines)
+        return false; // is this nessesary??? (ps+vs already combines)
 
     if (T != other.T)
-        return FALSE;
+        return false;
     if (C != other.C)
-        return FALSE;
+        return false;
 #ifdef _EDITOR
     if (M != other.M)
-        return FALSE;
+        return false;
 #endif
-    return TRUE;
+    return true;
 }
 
 //
@@ -136,26 +140,16 @@ void STextureList::clear()
 
 u32 STextureList::find_texture_stage(const shared_str& TexName) const
 {
-    u32 dwTextureStage = 0;
-
-    STextureList::const_iterator _it = this->begin();
-    STextureList::const_iterator _end = this->end();
-    for (; _it != _end; ++_it)
+    for (const auto& [stage, texture] : *this)
     {
-        const std::pair<u32, ref_texture>& loader = *_it;
-
-        //	Shadowmap texture always uses 0 texture unit
-        if (loader.second->cName == TexName)
-        {
-            //	Assign correct texture
-            dwTextureStage = loader.first;
-            break;
-        }
+        if (!texture)
+            continue;
+        if (texture->cName == TexName)
+            return stage;
     }
 
-    VERIFY(_it != _end);
-
-    return dwTextureStage;
+    VERIFY3(false, "Couldn't find texture stage", TexName.c_str());
+    return 0;
 }
 
 void STextureList::create_texture(u32 stage, pcstr textureName, bool evenIfNotNull)

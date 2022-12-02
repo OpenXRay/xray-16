@@ -5,15 +5,9 @@
 #include "../ai_monster_squad.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterSquadRestFollowAbstract CStateMonsterSquadRestFollow<_Object>
-
-#define STOP_DISTANCE 2.f
-#define STAY_DISTANCE 5 * STOP_DISTANCE
-#define MIN_TIME_OUT 2000
-#define MAX_TIME_OUT 3000
 
 TEMPLATE_SPECIALIZATION
 CStateMonsterSquadRestFollowAbstract::CStateMonsterSquadRestFollow(_Object* obj) : inherited(obj)
@@ -97,9 +91,5 @@ void CStateMonsterSquadRestFollowAbstract::setup_substates()
     }
 }
 
-#undef STOP_DISTANCE
-#undef STAY_DISTANCE
-#undef MIN_TIME_OUT
-#undef MAX_TIME_OUT
-#undef TEMPLATE_SPECIALIZATION
 #undef CStateMonsterSquadRestFollowAbstract
+#undef TEMPLATE_SPECIALIZATION

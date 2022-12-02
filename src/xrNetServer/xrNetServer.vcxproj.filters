@@ -9,6 +9,7 @@
     <ClCompile Include="NET_Log.cpp" />
     <ClCompile Include="NET_Server.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="guids.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ip_filter.h" />

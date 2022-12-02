@@ -116,7 +116,8 @@ class XRUICORE_API CUIColorAnimConrollerContainer : public CUIWindow, public CUI
     typedef CUIWindow inherited;
 
 public:
-    virtual void Update();
-    virtual void ColorAnimationSetTextureColor(u32 color, bool only_alpha);
-    virtual void ColorAnimationSetTextColor(u32 color, bool only_alpha);
+    CUIColorAnimConrollerContainer(pcstr windowName) : CUIWindow(windowName) {}
+    void Update() override;
+    void ColorAnimationSetTextureColor(u32 color, bool only_alpha) override;
+    void ColorAnimationSetTextColor(u32 color, bool only_alpha) override;
 };

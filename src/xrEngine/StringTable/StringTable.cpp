@@ -64,9 +64,7 @@ void CStringTable::Init()
     }
 #ifdef DEBUG
     Msg("StringTable: loaded %d files", fset.size());
-#endif // #ifdef DEBUG
-
-    ReparseKeyBindings();
+#endif
 }
 
 void CStringTable::FillLanguageToken()
@@ -169,7 +167,7 @@ void CStringTable::Load(LPCSTR xml_file_full)
 
         VERIFY3(string_text, "string table entry does not has a text", string_name);
 
-        const STRING_VALUE str_val = ParseLine(string_text, string_name, true);
+        const STRING_VALUE str_val = ParseLine(string_text);
 
         pData->m_StringTable[string_name] = str_val;
     }
@@ -184,73 +182,42 @@ void CStringTable::ReloadLanguage()
     Init();
 }
 
-void CStringTable::ReparseKeyBindings()
+STRING_VALUE CStringTable::ParseLine(pcstr str)
 {
-    if (!pData)
-        return;
-    auto it = pData->m_string_key_binding.begin();
-    const auto it_e = pData->m_string_key_binding.end();
+    constexpr char   ACTION_STR[]     = "$$ACTION_";
+    constexpr size_t ACTION_STR_LEN   = std::size(ACTION_STR) - 1;
 
-    for (; it != it_e; ++it)
-    {
-        pData->m_StringTable[it->first] = ParseLine(*it->second, *it->first, false);
-    }
-}
-
-STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
-{
-    constexpr char   ACTION_STR[] = "$$ACTION_";
     constexpr char   ACTION_STR_END[] = "$$";
-    constexpr size_t ACTION_STR_LEN = std::size(ACTION_STR) - 1;
     constexpr size_t ACTION_STR_END_LEN = std::size(ACTION_STR_END) - 1;
 
-    xr_string res;
-    size_t k = 0;
-    const char* b;
-
-    string256 buff;
-    string256 srcbuff;
-    bool b_hit = false;
-
-    while ((b = strstr(str + k, ACTION_STR)) != 0)
+    xr_string string{ str };
+    string.erase(std::remove_if(string.begin(), string.end(), [](char ch)
     {
-        buff[0] = 0;
-        srcbuff[0] = 0;
-        res.append(str + k, b - str - k);
-        const char* e = strstr(b + ACTION_STR_LEN, ACTION_STR_END);
+        VERIFY2(ch != GAME_ACTION_MARK,"Using of escape symbol is not allowed in localization.");
+        return ch == GAME_ACTION_MARK;
+    }), string.end());
 
-        const size_t len = (e - b - ACTION_STR_LEN);
+    size_t actionStartPos = 0;
 
-        strncpy_s(srcbuff, b + ACTION_STR_LEN, len);
-        srcbuff[len] = 0;
-        if (ActionNameToPtr(srcbuff)) // if exist, get bindings
-        {
-            [[maybe_unused]] const bool result =
-                GetActionAllBinding(srcbuff, buff, sizeof(buff));
-            VERIFY(result);
-            res.append(buff, xr_strlen(buff));
-        }
-        else // doesn't exist, insert as is
-        {
-            res.append(b, ACTION_STR_LEN + len + 2);
-        }
-
-        k = (b - str);
-        k += len;
-        k += ACTION_STR_LEN;
-        k += ACTION_STR_END_LEN;
-        b_hit = true;
-    };
-
-    if (k < xr_strlen(str))
+    while ((actionStartPos = string.find(ACTION_STR, actionStartPos)) != xr_string::npos)
     {
-        res.append(str + k);
+        const size_t actionEndPos = string.find(ACTION_STR_END, actionStartPos + ACTION_STR_LEN);
+        const xr_string actionName = string.substr(actionStartPos + ACTION_STR_LEN, actionEndPos - (actionStartPos + ACTION_STR_LEN));
+
+        if (const auto action = ActionNameToPtr(actionName.c_str())) // if exist, get bindings
+        {
+            static_assert(kLASTACTION < type_max<u8>, "Modify the code to have more than 255 actions.");
+            const char actionCode[] = { GAME_ACTION_MARK, (char)action->id, '\0' };
+            string.replace(actionStartPos, actionEndPos + ACTION_STR_END_LEN - actionStartPos, actionCode);
+            actionStartPos += std::size(actionCode) - 1;
+        }
+        else // skip
+        {
+            actionStartPos = actionEndPos + ACTION_STR_END_LEN;
+        }
     }
 
-    if (b_hit && bFirst)
-        pData->m_string_key_binding[skey] = str;
-
-    return STRING_VALUE(res.c_str());
+    return STRING_VALUE(string.c_str());
 }
 
 STRING_VALUE CStringTable::translate(const STRING_ID& str_id) const
