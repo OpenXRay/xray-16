@@ -28,7 +28,8 @@ static void CCustomOutfit_Export(lua_State* luaState)
             })
             .def("GetHitTypeProtection", +[](CCustomOutfit* self, int hit_type, pcstr element)
             {
-                return self->GetHitTypeProtection(ALife::EHitType(hit_type), s16(element));
+                const u16 elem = u16(size_t(element));
+                return self->GetHitTypeProtection(ALife::EHitType(hit_type), elem);
             })
             .def("GetBoneArmor", &CCustomOutfit::GetBoneArmor)
     ];
@@ -56,7 +57,8 @@ static void CHelmet_Export(lua_State* luaState)
             })
             .def("GetHitTypeProtection", +[](CHelmet* self, int hit_type, pcstr element)
             {
-                return self->GetHitTypeProtection(ALife::EHitType(hit_type), s16(element));
+                const u16 elem = u16(size_t(element));
+                return self->GetHitTypeProtection(ALife::EHitType(hit_type), elem);
             })
             .def("GetBoneArmor", &CHelmet::GetBoneArmor)
     ];
