@@ -5,7 +5,7 @@
 
 CBackpack::CBackpack()
 {
-    m_flags.set(FUsingCondition, FALSE);
+    m_flags.set(FUsingCondition, false);
 }
 
 void CBackpack::Load(pcstr section)
@@ -14,45 +14,15 @@ void CBackpack::Load(pcstr section)
 
     m_additional_weight = pSettings->r_float(section, "additional_inventory_weight");
     m_additional_weight2 = pSettings->r_float(section, "additional_inventory_weight2");
-    m_fPowerRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "power_restore_speed", 0.0f);
-    m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.0f);
+    m_fPowerRestoreSpeed = pSettings->read_if_exists<float>(section, "power_restore_speed", 0.0f);
+    m_fPowerLoss = pSettings->read_if_exists<float>(section, "power_loss", 1.0f);
     clamp(m_fPowerLoss, EPS, 1.0f);
 
-    m_fJumpSpeed = READ_IF_EXISTS(pSettings, r_float, section, "jump_speed", 1.f);
-    m_fWalkAccel = READ_IF_EXISTS(pSettings, r_float, section, "walk_accel", 1.f);
-    m_fOverweightWalkK = READ_IF_EXISTS(pSettings, r_float, section, "overweight_walk_accel", 1.f);
+    m_fJumpSpeed = pSettings->read_if_exists<float>(section, "jump_speed", 1.f);
+    m_fWalkAccel = pSettings->read_if_exists<float>(section, "walk_accel", 1.f);
+    m_fOverweightWalkK = pSettings->read_if_exists<float>(section, "overweight_walk_accel", 1.f);
 
-    m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", TRUE));
-}
-
-bool CBackpack::net_Spawn(CSE_Abstract* DC)
-{
-    return inherited::net_Spawn(DC);
-}
-
-void CBackpack::net_Export(NET_Packet& P)
-{
-    inherited::net_Export(P);
-}
-
-void CBackpack::net_Import(NET_Packet& P)
-{
-    inherited::net_Import(P);
-}
-
-void CBackpack::OnH_A_Chield()
-{
-    inherited::OnH_A_Chield();
-}
-
-void CBackpack::OnMoveToSlot(const SInvItemPlace& previous_place)
-{
-    inherited::OnMoveToSlot(previous_place);
-}
-
-void CBackpack::OnMoveToRuck(const SInvItemPlace& previous_place)
-{
-    inherited::OnMoveToRuck(previous_place);
+    m_flags.set(FUsingCondition, pSettings->read_if_exists<bool>(section, "use_condition", true));
 }
 
 void CBackpack::Hit(float hit_power, ALife::EHitType hit_type)
