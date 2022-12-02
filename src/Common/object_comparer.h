@@ -7,6 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+#include <functional>
+
 #include "xrCore/FixedVector.h"
 #include "xrCore/xrstring.h"
 #include "xrCommon/xr_stack.h"

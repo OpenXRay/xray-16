@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "rgl.h"
+#include "r2.h"
 
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
@@ -13,72 +13,20 @@ void CRender::addShaderOption(const char* name, const char* value)
     m_ShaderOptions += "\n";
 }
 
-void show_errors(cpcstr filename, GLuint* program, GLuint* shader)
-{
-    GLint length;
-    GLchar *errors = nullptr, *sources = nullptr;
-
-    if (program)
-    {
-        CHK_GL(glGetProgramiv(*program, GL_INFO_LOG_LENGTH, &length));
-        errors = xr_alloc<GLchar>(length);
-        CHK_GL(glGetProgramInfoLog(*program, length, nullptr, errors));
-    }
-    else if (shader)
-    {
-        CHK_GL(glGetShaderiv(*shader, GL_INFO_LOG_LENGTH, &length));
-        errors = xr_alloc<GLchar>(length);
-        CHK_GL(glGetShaderInfoLog(*shader, length, nullptr, errors));
-
-        CHK_GL(glGetShaderiv(*shader, GL_SHADER_SOURCE_LENGTH, &length));
-        sources = xr_alloc<GLchar>(length);
-        CHK_GL(glGetShaderSource(*shader, length, nullptr, sources));
-    }
-
-    Log("! shader compilation failed:", filename);
-    if (errors)
-        Log("! error: ", errors);
-
-    if (sources)
-    {
-        Log("Shader source:");
-        Log(sources);
-        Log("Shader source end.");
-    }
-    xr_free(errors);
-    xr_free(sources);
-}
-
 template <typename T>
 static GLuint create_shader(pcstr* buffer, size_t const buffer_size, cpcstr filename,
     T*& result, const GLenum* format)
 {
-    auto [shader, program] = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh, format, filename);
-
-    const bool success = shader == 0 && program != 0 && program != GLuint(-1);
+    auto [type, output] = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh, format, filename);
 
     // Parse constant, texture, sampler binding
-    if (success)
+    if (output != 0)
     {
-        result->sh = program;
-        // Let constant table parse it's data
-        result->constants.parse(&program, ShaderTypeTraits<T>::GetShaderDest());
+        result->sh = output;
+        if (type == 'p')
+            result->constants.parse(&output, ShaderTypeTraits<T>::GetShaderDest());
     }
-    else
-    {
-        if (shader != 0 && shader != GLuint(-1))
-        {
-            show_errors(filename, nullptr, &shader);
-            glDeleteShader(shader);
-        }
-        else
-        {
-            show_errors(filename, &program, nullptr);
-            glDeleteProgram(program);
-        }
-    }
-
-    return success ? program : 0;
+    return output;
 }
 
 static GLuint create_shader(cpcstr pTarget, pcstr* buffer, size_t const buffer_size,
@@ -143,7 +91,7 @@ public:
     void add(cpcstr name, cpcstr value)
     {
         // It's important to have postfix increment!
-        xr_sprintf(m_options[pos++], "#define %s\t%s\n", name, value);
+        strconcat(m_options[pos++], "#define ", name, "\t", value, "\n");
     }
 
     void finish()
@@ -165,7 +113,7 @@ class shader_sources_manager
 public:
     explicit shader_sources_manager(cpcstr name)
     {
-        xr_sprintf(m_name_comment, "// %s\n", name);
+        strconcat(m_name_comment, "// ", name, "\n");
     }
 
     ~shader_sources_manager()
@@ -291,7 +239,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Shadow map size
     {
-        xr_itoa(o.smapsize, c_smapsize, 10);
+        xr_itoa(m_SMAPSize, c_smapsize, 10);
         options.add("SMAP_size", c_smapsize);
         sh_name.append(c_smapsize);
     }
@@ -460,27 +408,32 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     // Geometry buffer optimization
-    appendShaderOption(o.dx10_gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
+    appendShaderOption(o.gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
 
     // Shader Model 4.1
-    appendShaderOption(o.dx10_sm4_1, "SM_4_1", "1");
+#ifndef XR_PLATFORM_APPLE
+    appendShaderOption(o.dx11_sm4_1, "SM_4_1", "1");
+    // Despite the fact that glsl 4.1 is claimed to be supported on macOS,
+    // the issue is that gatherTextureOffset requires compile-time constant offset argument.
+    // So it is more handy to disable its use for mac as for now.
+#endif
 
     // Minmax SM
-    appendShaderOption(o.dx10_minmax_sm, "USE_MINMAX_SM", "1");
+    appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
 
     // Shadow of Chernobyl compatibility
     appendShaderOption(ShadowOfChernobylMode, "USE_SHOC_RESOURCES", "1");
 
     // add a #define for DX10_1 MSAA support
-    if (o.dx10_msaa)
+    if (o.msaa)
     {
-        appendShaderOption(o.dx10_msaa, "USE_MSAA", "1");
+        appendShaderOption(o.msaa, "USE_MSAA", "1");
 
         {
             static char samples[2];
-            samples[0] = char(o.dx10_msaa_samples) + '0';
+            samples[0] = char(o.msaa_samples) + '0';
             samples[1] = 0;
-            appendShaderOption(o.dx10_msaa_samples, "MSAA_SAMPLES", samples);
+            appendShaderOption(o.msaa_samples, "MSAA_SAMPLES", samples);
         }
 
         {
@@ -495,9 +448,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             sh_name.append(static_cast<u32>(0));
         }
 
-        appendShaderOption(o.dx10_msaa_opt, "MSAA_OPTIMIZATION", "1");
+        appendShaderOption(o.msaa_opt, "MSAA_OPTIMIZATION", "1");
 
-        switch (o.dx10_msaa_alphatest)
+        switch (o.msaa_alphatest)
         {
         case MSAA_ATEST_DX10_0_ATOC:
             options.add("MSAA_ALPHATEST_DX10_0_ATOC", "1");
@@ -548,9 +501,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     strncpy_s(extension, pTarget, 2);
 
     u32 fileCrc = 0;
-    string_path filename, full_path;
+    string_path filename, full_path{};
     strconcat(sizeof(filename), filename, "gl" DELIMITER, name, ".", extension, DELIMITER, sh_name.c_str());
-    if (HW.ShaderBinarySupported)
+    if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported)
     {
         string_path file;
         strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename);
@@ -564,7 +517,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     GLuint program = 0;
-    if (HW.ShaderBinarySupported && FS.exist(full_path))
+    if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported && FS.exist(full_path))
     {
         IReader* file = FS.r_open(full_path);
         if (file->length() > 8)
@@ -602,7 +555,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     if (!program)
     {
 #ifdef DEBUG
-        Log("- Compile shader:", full_path);
+        Log("- Compile shader:", filename);
 #endif
         // Compile sources list
         shader_sources_manager sources(name);
@@ -611,18 +564,16 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         // Compile the shader from sources
         program = create_shader(pTarget, sources.get(), sources.length(), filename, result, nullptr);
 
-        if (HW.ShaderBinarySupported && program)
+        if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported && program)
         {
-            GLvoid* binary{};
             GLint binaryLength{};
             GLenum binaryFormat{};
-            glGetProgramiv(program, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
-            if (binaryLength)
-                binary = static_cast<GLvoid*>(xr_malloc(binaryLength));
+            CHK_GL(glGetProgramiv(program, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
 
+            GLvoid* binary = binaryLength ? xr_malloc(binaryLength) : nullptr;
             if (binary)
             {
-                glGetProgramBinary(program, binaryLength, nullptr, &binaryFormat, binary);
+                CHK_GL(glGetProgramBinary(program, binaryLength, nullptr, &binaryFormat, binary));
                 IWriter* file = FS.w_open(full_path);
 
                 file->w_string(HW.AdapterName);

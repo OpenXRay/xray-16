@@ -1,6 +1,6 @@
 #pragma once
 
-class dx10State;
+class dx11State;
 
 using D3D_SAMPLER_DESC              = D3D11_SAMPLER_DESC;
 using D3D_RASTERIZER_DESC           = D3D11_RASTERIZER_DESC;
@@ -250,8 +250,8 @@ using ID3DShaderReflectionType                  = ID3D11ShaderReflectionType;
 
 #define IID_ID3DShaderReflection IID_ID3D11ShaderReflection
 
-using ID3DState = dx10State;
-#define DX10_ONLY(expr) expr
+using ID3DState = dx11State;
+#define DX11_ONLY(expr) expr
 
 struct D3D_VIEWPORT : D3D11_VIEWPORT
 {

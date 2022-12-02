@@ -21,7 +21,9 @@
 #include "xrUICore/XML/UITextureMaster.h"
 
 CUIHudStatesWnd::CUIHudStatesWnd()
-    : m_b_force_update(true), m_timer_1sec(0), m_last_health(0.0f), m_radia_self(0.0f), m_radia_hit(0.0f)
+    : CUIWindow("CUIHudStatesWnd"),
+      m_last_health(0.0f), m_radia_self(0.0f), m_radia_hit(0.0f),
+      m_timer_1sec(0), m_b_force_update(true)
 {
     for (int i = 0; i < ALife::infl_max_count; ++i)
     {

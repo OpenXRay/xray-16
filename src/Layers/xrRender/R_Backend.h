@@ -134,6 +134,7 @@ private:
     GLuint ps;
     GLuint vs;
     GLuint gs;
+    GLuint pp;
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -149,6 +150,9 @@ private:
     LPCSTR cs_name;
 #endif // USE_DX11
 #endif // !USE_DX9
+#   ifdef USE_OGL
+    pcstr pp_name;
+#   endif
 #endif // DEBUG
 
     u32 stencil_enable;
@@ -197,12 +201,26 @@ private:
 public:
     struct _stats
     {
-        u32 polys;
-        u32 verts;
-        u32 calls;
+        struct
+        {
+            u32 calls;
+            u32 verts;
+            u32 polys;
+        } render;
+        struct
+        {
+            u32 calls;
+            u32 groups_x;
+            u32 groups_y;
+            u32 groups_z;
+        } compute;
         u32 vs;
         u32 ps;
-#ifdef DEBUG
+        u32 gs;
+        u32 hs;
+        u32 ds;
+        u32 cs;
+        u32 pp;
         u32 decl;
         u32 vb;
         u32 ib;
@@ -210,7 +228,6 @@ public:
         u32 textures; // Number of times the shader-tex changes
         u32 matrices; // Number of times the shader-xform changes
         u32 constants; // Number of times the shader-consts changes
-#endif
         u32 xforms;
         u32 target_rt;
         u32 target_zb;
@@ -330,10 +347,13 @@ public:
     IC	void						set_Matrices(ref_matrix_list& M) { set_Matrices(&*M); }
 #endif
 
-    IC void set_Element(ShaderElement* S, u32 pass = 0);
+    IC void set_Pass(SPass* P);
+    void set_Pass(ref_pass& P) { set_Pass(&*P); }
+
+    ICF void set_Element(ShaderElement* S, u32 pass = 0);
     void set_Element(ref_selement& S, u32 pass = 0) { set_Element(&*S, pass); }
 
-    IC void set_Shader(Shader* S, u32 pass = 0);
+    ICF void set_Shader(Shader* S, u32 pass = 0);
     void set_Shader(ref_shader& S, u32 pass = 0) { set_Shader(&*S, pass); }
 
     ICF void set_States(SState* _state);
@@ -341,6 +361,7 @@ public:
 
     ICF void set_Format(SDeclaration* _decl);
 
+private:
 #if defined(USE_DX9) || defined(USE_DX11)
     ICF void set_PS(ID3DPixelShader* _ps, LPCSTR _n = nullptr);
 #elif defined(USE_OGL)
@@ -362,29 +383,18 @@ public:
 
     ICF void set_DS(ID3D11DomainShader* _ds, LPCSTR _n = nullptr);
     ICF void set_DS(ref_ds& _ds) { set_DS(_ds->sh, _ds->cName.c_str()); }
-
-    ICF void set_CS(ID3D11ComputeShader* _cs, LPCSTR _n = nullptr);
-    ICF void set_CS(ref_cs& _cs) { set_CS(_cs->sh, _cs->cName.c_str()); }
 #   elif defined(USE_OGL)
     ICF void set_GS(GLuint _gs, LPCSTR _n = 0);
+
+    ICF void set_PP(GLuint _pp, pcstr _n = nullptr);
+    ICF void set_PP(ref_pp& _pp) { set_PP(_pp->pp, _pp->cName.c_str()); }
 #   endif
 #endif // USE_DX9
-
-
-#if defined(USE_DX9) || defined(USE_OGL)
-    ICF bool is_TessEnabled() { return false; }
-#elif defined(USE_DX11)
-    ICF bool is_TessEnabled();
-#else
-#   error No graphics API selected or enabled!
-#endif
 
     ICF void set_VS(ref_vs& _vs);
 
 #if defined(USE_DX11)
     ICF void set_VS(SVS* _vs);
-
-protected: //	In DX11+ we need input shader signature which is stored in ref_vs
 #endif
 
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -395,8 +405,19 @@ protected: //	In DX11+ we need input shader signature which is stored in ref_vs
 #   error No graphics API selected or enabled!
 #endif
 
-#if defined(USE_DX11)
 public:
+#if defined(USE_DX11)
+    ICF void set_CS(ID3D11ComputeShader* _cs, LPCSTR _n = nullptr);
+    ICF void set_CS(ref_cs& _cs) { set_CS(_cs->sh, _cs->cName.c_str()); }
+#endif
+
+public:
+#if defined(USE_DX9) || defined(USE_OGL)
+    ICF bool is_TessEnabled() { return false; }
+#elif defined(USE_DX11)
+    ICF bool is_TessEnabled();
+#else
+#   error No graphics API selected or enabled!
 #endif
 
     ICF void set_Vertices(VertexBufferHandle _vb, u32 _vb_stride);
@@ -439,45 +460,59 @@ public:
     template<typename... Args>
     ICF void set_c(R_constant* C, Args&&... args)
     {
-        if (C)
-            constants.set(C, std::forward<Args>(args)...);
+        if (!C)
+            return;
+#ifdef USE_OGL
+        if (!HW.SeparateShaderObjectsSupported)
+            VERIFY(C->pp.program == pp);
+#endif
+        constants.set(C, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     ICF void set_ca(R_constant* C, Args&&... args)
     {
-        if (C)
-            constants.seta(C, std::forward<Args>(args)...);
+        if (!C)
+            return;
+#ifdef USE_OGL
+        if (!HW.SeparateShaderObjectsSupported)
+            VERIFY(C->pp.program == pp);
+#endif
+        constants.seta(C, std::forward<Args>(args)...);
     }
 
     // constants - raw string (slow)
     template<typename... Args>
     ICF void set_c(cpcstr name, Args&&... args)
     {
-        if (ctable)
-            set_c(&*ctable->get(name), std::forward<Args>(args)...);
+        if (!ctable)
+            return;
+        set_c(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     ICF void set_ca(cpcstr name, Args&&... args)
     {
-        if (ctable)
-            set_ca(&*ctable->get(name), std::forward<Args>(args)...);
+        if (!ctable)
+            return;
+        set_ca(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
     // constants - shared_str (average)
     template<typename... Args>
     ICF void set_c(const shared_str& name, Args&& ... args)
     {
-        if (ctable)
-            set_c(&*ctable->get(name), std::forward<Args>(args)...);
+        if (!ctable)
+            return;
+        set_c(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     ICF void set_ca(const shared_str& name, Args&& ... args)
     {
-        if (ctable)
-            set_ca(&*ctable->get(name), std::forward<Args>(args)...);
+        if (!ctable)
+            return;
+        set_ca(ctable->get(name)._get(), std::forward<Args>(args)...);
     }
 
     // Rendering

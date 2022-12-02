@@ -1,7 +1,5 @@
 #include "stdafx.h"
-#if defined(XR_PLATFORM_WINDOWS)
-#include <msacm.h>
-#endif
+
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 

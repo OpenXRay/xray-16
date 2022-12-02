@@ -7,10 +7,7 @@
 #define CONCATENIZE(a, b) CONCATENIZE_HELPER(a, b)
 
 // Warnings
-#pragma warning(disable : 4100) // unreferenced formal parameter
 #pragma warning(disable : 4127) // conditional expression is constant
-#pragma warning(disable : 4201) // nonstandard extension used : nameless struct/union
-#pragma warning(disable : 4251) // object needs DLL interface
 #pragma warning(disable : 4345)
 
 #ifdef XR_ARCHITECTURE_X64
@@ -45,6 +42,8 @@
 
 //#include "_stl_extensions.h"
 #include "_std_extensions.h"
+#include "_rect.h"
+#include "_matrix.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_set.h"
 #include "xrsharedmem.h"
@@ -69,10 +68,6 @@ struct XRCORE_API xr_rtoken
 };
 
 #include "xr_shortcut.h"
-
-using RStringVec = xr_vector<shared_str>;
-using RStringSet = xr_set<shared_str>;
-using RTokenVec = xr_vector<xr_rtoken>;
 
 #include "FS.h"
 #include "log.h"

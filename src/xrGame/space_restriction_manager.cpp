@@ -13,8 +13,6 @@
 #include "space_restriction_bridge.h"
 #include "Common/object_broker.h"
 
-const u32 time_to_delete = 300000;
-
 struct CSpaceRestrictionManager::CClientRestriction
 {
     CRestrictionPtr m_restriction;
@@ -103,7 +101,8 @@ void CSpaceRestrictionManager::collect_garbage()
     SPACE_RESTRICTIONS::iterator E = m_space_restrictions.end();
     for (; I != E;)
     {
-        if ((*I).second->released() && (Device.dwTimeGlobal >= (*I).second->m_last_time_dec + time_to_delete))
+        if ((*I).second->released() &&
+            Device.dwTimeGlobal >= (*I).second->m_last_time_dec + TIME_TO_REMOVE_GARBAGE)
         {
             J = I;
             ++I;

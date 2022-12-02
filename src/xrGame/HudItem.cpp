@@ -65,7 +65,7 @@ void CHudItem::PlaySound(pcstr alias, const Fvector& position, u8 index)
 void CHudItem::renderable_Render(IRenderable* root)
 {
     UpdateXForm();
-    const bool _hud_render = root->renderable_HUD() && GetHUDmode();
+    const bool _hud_render = root && root->renderable_HUD() && GetHUDmode();
 
     if (_hud_render && !IsHidden())
     {

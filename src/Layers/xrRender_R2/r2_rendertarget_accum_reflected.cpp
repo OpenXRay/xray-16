@@ -76,7 +76,7 @@ void CRenderTarget::accum_reflected(light* L)
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
         draw_volume(L);
 #elif defined(USE_DX11) || defined(USE_OGL)
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
             draw_volume(L);
@@ -88,7 +88,7 @@ void CRenderTarget::accum_reflected(light* L)
             draw_volume(L);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
             {
                 RCache.set_Shader(s_accum_reflected_msaa[0]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
@@ -101,7 +101,7 @@ void CRenderTarget::accum_reflected(light* L)
             else // checked Holger
             {
 #   if defined(USE_DX11)
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     RCache.set_Shader(s_accum_reflected_msaa[i]);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
@@ -130,7 +130,7 @@ void CRenderTarget::accum_reflected(light* L)
 #ifdef USE_DX9
         draw_volume(L);
 #elif defined(USE_DX11) || defined(USE_OGL)
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
         {
             // per pixel
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
@@ -142,7 +142,7 @@ void CRenderTarget::accum_reflected(light* L)
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0x00);
             draw_volume(L);
             // per sample
-            if (RImplementation.o.dx10_msaa_opt)
+            if (RImplementation.o.msaa_opt)
             {
                 RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_VOL]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
@@ -151,7 +151,7 @@ void CRenderTarget::accum_reflected(light* L)
             else // checked holger
             {
 #   if defined(USE_DX11)
-                for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
+                for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);

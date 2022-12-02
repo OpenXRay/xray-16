@@ -35,7 +35,7 @@ void CUIDragDropReferenceList::Initialize(pcstr labelSection /*= nullptr*/, pcst
     {
         for (int j = 0; j < cellsCapacity.y; j++)
         {
-            CUIStatic* reference = m_references.emplace_back(xr_new<CUIStatic>());
+            CUIStatic* reference = m_references.emplace_back(xr_new<CUIStatic>("Item reference"));
 
             const Fvector2 pos = Fvector2().set((cellSize.x + cellSpacing.x) * i, (cellSize.y + cellSpacing.y) * j);
             const Fvector2 size = Fvector2().set(cellSize.x, cellSize.y);

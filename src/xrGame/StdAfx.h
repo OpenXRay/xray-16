@@ -6,7 +6,7 @@
 #include "Common/Common.hpp"
 
 #include "xrEngine/stdafx.h" // XXX: This seems bad. PCH's are for internal (building) use.
-#if !defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "DPlay/dplay8.h"
 #endif
 // xrEngine src file count is ~1100.
@@ -47,6 +47,7 @@
 #include "xrCore/_plane2.h" // ~450
 #include "xrAICore/AISpaceBase.hpp" // ~650
 #include "xrAICore/Navigation/game_graph.h" // ~600
+#include "xrPhysics/xrPhysics.h" // ~400
 #include "xrServerEntities/xrServer_Objects.h" // ~500
 #include "xrServerEntities/xrServer_Objects_ALife.h" // ~500
 #include "xrServerEntities/xrServer_Objects_ALife_Items.h" // ~500
@@ -56,7 +57,6 @@
 #include "xrUICore/ui_defs.h" // ~450
 #include "xrGame/entity_alive.h" // ~430
 #include "xrCore/XML/XMLDocument.hpp" // ~400
-#include "xrPhysics/xrPhysics.h" // ~400
 #include "xrEngine/Feel_Sound.h" // ~400
 #include "xrAICore/Navigation/graph_edge.h" // ~380
 #include "xrAICore/Navigation/graph_abstract.h" // ~380

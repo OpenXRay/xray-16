@@ -94,6 +94,7 @@ void CUIGameSP::OnFrame()
 
 void CUIGameSP::OnUIReset()
 {
+    inherited::OnUIReset();
     ReinitDialogs();
 }
 

@@ -160,14 +160,14 @@
     <Filter Include="Interface implementations\UI\UISequenceVideoItem">
       <UniqueIdentifier>{db5c1b3c-e054-4fac-8997-8b2f61df5efc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface implementations\MSAARender">
-      <UniqueIdentifier>{b5644c37-6f04-44e4-8343-56fec645ad53}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core_Target\ColorMap">
       <UniqueIdentifier>{7fdc926e-8c7d-4cba-a662-332feb1aada8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shading templates\GL Rain">
       <UniqueIdentifier>{07d880a0-66f9-4c25-a538-c4076b2cf662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shading templates\GL MSAA">
+      <UniqueIdentifier>{b5644c37-6f04-44e4-8343-56fec645ad53}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -221,12 +221,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\r_constants.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="glResourceManager_Resources.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
-    </ClCompile>
-    <ClCompile Include="glResourceManager_Scripting.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\tss_def.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
@@ -347,9 +341,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderGL\glStateUtils.cpp">
       <Filter>dx9 to gl Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="glr_constants.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\r__dsgraph_build.cpp">
       <Filter>Core</Filter>
@@ -519,9 +510,6 @@
     <ClCompile Include="..\xrRender\dxUISequenceVideoItem.cpp">
       <Filter>Interface implementations\UI\UISequenceVideoItem</Filter>
     </ClCompile>
-    <ClCompile Include="glTexture.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\ColorMapManager.cpp">
       <Filter>Core_Target\ColorMap</Filter>
     </ClCompile>
@@ -534,43 +522,10 @@
     <ClCompile Include="gl_rendertarget_accum_direct.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_accum_point.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_accum_spot.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_create_minmaxSM.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_draw_rain.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_mark_msaa_edges.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_combine.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_occq.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_rain.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_scene.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_smap_D.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="gl_rendertarget_phase_ssao.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\r__screenshot.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="r3_R_rain.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp">
@@ -583,7 +538,7 @@
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\glMSAABlender.cpp">
-      <Filter>Interface implementations\MSAARender</Filter>
+      <Filter>Shading templates\GL MSAA</Filter>
     </ClCompile>
     <ClCompile Include="gl_rendertarget_phase_flip.cpp">
       <Filter>Core_Target</Filter>
@@ -686,6 +641,57 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\r__sector_detect.cpp">
       <Filter>Visibility\Sector/Portal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_rain.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_smap_D.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_ssao.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glr_constants.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glResourceManager_Resources.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glResourceManager_Scripting.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glTexture.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_mark_msaa_edges.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_point.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_draw_rain.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_spot.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -871,9 +877,6 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\FHierrarhyVisual.h">
       <Filter>Refactored\Execution &amp; 3D\Visuals</Filter>
-    </ClInclude>
-    <ClInclude Include="rgl.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRenderGL\glStateUtils.h">
       <Filter>dx9 to gl Utils</Filter>
@@ -1088,15 +1091,6 @@
     <ClInclude Include="..\xrRender\r_sun_cascades.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\glRainBlender.h">
-      <Filter>Shading templates\GL Rain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\glMinMaxSMBlender.h">
-      <Filter>Shading templates</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\blenders\glMSAABlender.h">
-      <Filter>Interface implementations\MSAARender</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderGL\glHW.h">
       <Filter>Refactored\HW</Filter>
     </ClInclude>
@@ -1138,6 +1132,24 @@
     </ClInclude>
     <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ShaderResourceTraits.h">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\ShaderManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h">
+      <Filter>Shading templates\GL Rain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h">
+      <Filter>Shading templates\GL MSAA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

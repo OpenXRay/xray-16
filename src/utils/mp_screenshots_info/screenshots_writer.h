@@ -15,13 +15,6 @@ private:
     void feel_private_dsa_key();
 };
 
-extern char const* ss_info_secion;
-extern char const* ss_player_name_key;
-extern char const* ss_player_digest_key;
-// extern char const * ss_admin_name_key;
-extern char const* ss_digital_sign_key;
-extern char const* ss_creation_date;
-
 class writer
 {
 public:

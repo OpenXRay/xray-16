@@ -17,45 +17,48 @@
 #include "editor_environment_sound_channels_channel.hpp"
 #include "editor_environment_effects_effect.hpp"
 
-using editor::environment::ambients::ambient;
-using editor::environment::ambients::manager;
-using editor::environment::ambients::effect_id;
-using editor::environment::ambients::sound_id;
-using editor::environment::sound_channels::channel;
-using editor::environment::effects::effect;
+using ambients_ambient = editor::environment::ambients::ambient;
 
 template <>
-void property_collection<ambient::effect_container_type, ambient>::display_name(
+void property_collection<ambients_ambient::effect_container_type, ambients_ambient>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<ambient::effect_container_type, ambient>::create()
+XRay::Editor::property_holder_base* property_collection<
+    ambients_ambient::effect_container_type, ambients_ambient>::create()
 {
-    effect_id* object = xr_new<effect_id>(m_holder.effects_manager(), "");
+    using editor::environment::ambients::effect_id;
+
+    auto object = xr_new<effect_id>(m_holder.effects_manager(), "");
     object->fill(this);
     return (object->object());
 }
 
 template <>
-void property_collection<ambient::sound_container_type, ambient>::display_name(
+void property_collection<ambients_ambient::sound_container_type, ambients_ambient>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<ambient::sound_container_type, ambient>::create()
+XRay::Editor::property_holder_base* property_collection<
+    ambients_ambient::sound_container_type, ambients_ambient>::create()
 {
-    sound_id* object = xr_new<sound_id>(m_holder.sounds_manager(), "");
+    using editor::environment::ambients::sound_id;
+
+    auto object = xr_new<sound_id>(m_holder.sounds_manager(), "");
     object->fill(this);
     return (object->object());
 }
 
+namespace editor::environment::ambients
+{
 ambient::ambient(manager const& manager, shared_str const& id)
-    : m_manager(manager), m_property_holder(0), m_effects_collection(0), m_sounds_collection(0)
+    : m_property_holder(nullptr), m_manager(manager), m_effects_collection(nullptr), m_sounds_collection(nullptr)
 {
     m_load_section = id;
     m_effects_collection = xr_new<effect_collection_type>(&m_effects_ids, this);
@@ -76,19 +79,19 @@ ambient::~ambient()
     ::ide().destroy(m_property_holder);
 }
 
-void ambient::load(
-    const CInifile& ambients_config, const CInifile& sound_channels_config, const CInifile& effects_config, const shared_str& section)
+void ambient::load(const CInifile& ambients_config, const CInifile& sound_channels_config,
+    const CInifile& effects_config, const shared_str& section)
 {
     VERIFY(m_load_section == section);
     inherited::load(ambients_config, sound_channels_config, effects_config, m_load_section);
 
     {
         VERIFY(m_effects_ids.empty());
-        pcstr effects_string = READ_IF_EXISTS(&ambients_config, r_string, m_load_section, "effects", "");
+        const pcstr effects_string = READ_IF_EXISTS(&ambients_config, r_string, m_load_section, "effects", "");
         for (u32 i = 0, n = _GetItemCount(effects_string); i < n; ++i)
         {
             string_path temp;
-            effect_id* object = xr_new<effect_id>(m_manager.effects_manager(), _GetItem(effects_string, i, temp));
+            auto object = xr_new<effect_id>(m_manager.effects_manager(), _GetItem(effects_string, i, temp));
             object->fill(m_effects_collection);
             m_effects_ids.push_back(object);
         }
@@ -96,11 +99,11 @@ void ambient::load(
 
     {
         VERIFY(m_sound_channels_ids.empty());
-        pcstr sounds_string = READ_IF_EXISTS(&ambients_config, r_string, m_load_section, "sound_channels", "");
+        const pcstr sounds_string = READ_IF_EXISTS(&ambients_config, r_string, m_load_section, "sound_channels", "");
         for (u32 i = 0, n = _GetItemCount(sounds_string); i < n; ++i)
         {
             string_path temp;
-            sound_id* object = xr_new<sound_id>(m_manager.sounds_manager(), _GetItem(sounds_string, i, temp));
+            auto object = xr_new<sound_id>(m_manager.sounds_manager(), _GetItem(sounds_string, i, temp));
             object->fill(m_sounds_collection);
             m_sound_channels_ids.push_back(object);
         }
@@ -112,12 +115,12 @@ void ambient::save(CInifile& config)
     u32 count = 1;
     pstr temp = 0;
     {
-        for (const auto &i : m_sound_channels_ids)
+        for (const auto& i : m_sound_channels_ids)
             count += i->id().size() + 2;
 
         temp = (pstr)xr_alloca(count * sizeof(char));
         *temp = '\0';
-        for (const auto &i : m_sound_channels_ids)
+        for (const auto& i : m_sound_channels_ids)
         {
             xr_strcat(temp, count, i->id().c_str());
 
@@ -132,12 +135,12 @@ void ambient::save(CInifile& config)
 
     {
         count = 1;
-        for (const auto &i : m_effects_ids)
+        for (const auto& i : m_effects_ids)
             count += i->id().size() + 2;
 
         temp = (pstr)xr_alloca(count * sizeof(char));
         *temp = '\0';
-        for (const auto &i : m_effects_ids)
+        for (const auto& i : m_effects_ids)
         {
             xr_strcat(temp, count, i->id().c_str());
             if (&i != &m_effects_ids.back())
@@ -150,7 +153,7 @@ void ambient::save(CInifile& config)
 pcstr ambient::id_getter() const { return (m_load_section.c_str()); }
 void ambient::id_setter(pcstr value_)
 {
-    shared_str value = value_;
+    const shared_str value = value_;
     if (m_load_section._get() == value._get())
         return;
 
@@ -186,20 +189,24 @@ void ambient::fill(XRay::Editor::property_holder_collection* collection)
         "sound channels", "sounds", "this option is responsible for sound channels", m_sounds_collection);
 }
 
-ambient::property_holder_type* ambient::object() { return (m_property_holder); }
-::editor::environment::effects::manager const& ambient::effects_manager() const
+ambient::property_holder_type* ambient::object()
+{
+    return (m_property_holder);
+}
+
+effects::manager const& ambient::effects_manager() const
 {
     return (m_manager.effects_manager());
 }
 
-::editor::environment::sound_channels::manager const& ambient::sounds_manager() const
+sound_channels::manager const& ambient::sounds_manager() const
 {
     return (m_manager.sounds_manager());
 }
 
 ambient::SEffect* ambient::create_effect(const CInifile& config, pcstr id)
 {
-    effect* result = xr_new<effect>(m_manager.effects_manager(), id);
+    const auto result = xr_new<effects::effect>(m_manager.effects_manager(), id);
     result->load(config);
     result->fill(m_effects_collection);
     return (result);
@@ -207,7 +214,7 @@ ambient::SEffect* ambient::create_effect(const CInifile& config, pcstr id)
 
 ambient::SSndChannel* ambient::create_sound_channel(const CInifile& config, pcstr id, pcstr sectionToReadFrom)
 {
-    channel* result = xr_new<channel>(m_manager.sounds_manager(), id);
+    const auto result = xr_new<sound_channels::channel>(m_manager.sounds_manager(), id);
     result->load(config, sectionToReadFrom);
     result->fill(m_sounds_collection);
     return (result);
@@ -215,3 +222,4 @@ ambient::SSndChannel* ambient::create_sound_channel(const CInifile& config, pcst
 
 CEnvAmbient::EffectVec& ambient::effects() { return (inherited::effects()); }
 CEnvAmbient::SSndChannelVec& ambient::get_snd_channels() { return (inherited::get_snd_channels()); }
+} // namespace editor::environment::ambients

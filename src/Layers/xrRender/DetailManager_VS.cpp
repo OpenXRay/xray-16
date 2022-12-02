@@ -10,13 +10,18 @@
 #endif
 #include "Layers/xrRender/BufferUtils.h"
 
-const int quant = 16384;
-const int c_hdr = 10;
+namespace detail_manager
+{
+extern const int quant = 16384;
+/*extern*/ const int c_hdr = 10;
 const int c_size = 4;
 
-static VertexElement dwDecl[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
+static VertexElement dwDecl[] =
+{
+    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
     {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
-    D3DDECL_END()};
+    D3DDECL_END()
+};
 
 #pragma pack(push, 1)
 struct vertHW
@@ -32,6 +37,7 @@ short QC(float v)
     clamp(t, -32768, 32767);
     return short(t & 0xffff);
 }
+} // namespace detail_manager
 
 void CDetailManager::hw_Load()
 {
@@ -41,6 +47,8 @@ void CDetailManager::hw_Load()
 
 void CDetailManager::hw_Load_Geom()
 {
+    using namespace detail_manager;
+
     // Analyze batch-size
     hw_BatchSize = (u32(HW.Caps.geometry.dwRegisters) - c_hdr) / c_size;
     clamp<size_t>(hw_BatchSize, 0, 64);
@@ -135,6 +143,8 @@ void CDetailManager::hw_Load_Shaders()
 
 void CDetailManager::hw_Render()
 {
+    using namespace detail_manager;
+
     // Render-prepare
     //	Update timer
     //	Can't use RDEVICE.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!

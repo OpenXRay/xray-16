@@ -30,20 +30,13 @@
 #include "smart_cover_transition_animation.hpp"
 #include "animation_movement_controller.h"
 
-using smart_cover::action_base;
-using smart_cover::change_loophole;
-using smart_cover::animation_planner;
-using smart_cover::non_animated_change_loophole;
-using smart_cover::exit;
-using smart_cover::transitions::action;
-using smart_cover::transitions::animation_action;
-using namespace MonsterSpace;
-using namespace StalkerDecisionSpace;
 
 namespace smart_cover
 {
+using namespace MonsterSpace;
+using namespace StalkerDecisionSpace;
+
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
-} // namespace smart_cover
 
 //////////////////////////////////////////////////////////////////////////
 // action_base
@@ -86,10 +79,10 @@ void change_loophole::select_animation(shared_str& result)
         return;
     }
 
-    smart_cover::transitions::animation_action const& animation =
+    transitions::animation_action const& animation =
         object().movement().current_transition().animation(object().movement().target_body_state());
     VERIFY(object().movement().current_params().cover());
-    smart_cover::cover const& cover = *object().movement().current_params().cover();
+    auto const& cover = *object().movement().current_params().cover();
     shared_str const& cover_loophole_id = object().movement().current_params().cover_loophole_id();
 
     VERIFY2(cover.get_description()->transitions().edge(cover_loophole_id, smart_cover::transform_vertex("", false)),
@@ -186,3 +179,4 @@ void exit::on_animation_end()
     object().movement().go_next_loophole();
     object().movement().set_movement_type(eMovementTypeRun);
 }
+} // namespace smart_cover

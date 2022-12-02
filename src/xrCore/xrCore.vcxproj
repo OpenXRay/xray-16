@@ -26,7 +26,7 @@
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID=$(APPVEYOR_BUILD_ID);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID=$(GITHUB_RUN_ID);GITHUB_RUN_NUMBER=$(GITHUB_RUN_NUMBER);GITHUB_REPOSITORY=$(GITHUB_REPOSITORY);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;jpeg-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DbgHelp.lib;FaultRep.lib;jpeg-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>where /q git
@@ -54,7 +54,6 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Compression\rt_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor9.cpp" />
     <ClCompile Include="Media\ImageJPEG.cpp" />
-    <ClCompile Include="xr_cpuid.cpp" />
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="Crypto\trivial_encryptor.cpp" />
     <ClCompile Include="Crypto\xr_dsa.cpp" />
@@ -75,11 +74,6 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="LocatorAPI_defs.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="LzHuf.cpp" />
-    <ClCompile Include="Math\PLC_CPP.cpp" />
-    <ClCompile Include="Math\PLC_SSE.cpp" />
-    <ClCompile Include="Math\SkinXW_CPP.cpp" />
-    <ClCompile Include="Math\SkinXW_SSE.cpp" />
-    <ClCompile Include="Math\MathUtil.cpp" />
     <ClCompile Include="Media\Image.cpp" />
     <ClCompile Include="Memory\xrMemory_align.cpp" />
     <ClCompile Include="NET_utils.cpp" />
@@ -114,6 +108,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="xr_token.cpp" />
     <ClCompile Include="xr_trims.cpp" />
     <ClCompile Include="_compressed_normal.cpp" />
+    <ClCompile Include="_cylinder.cpp" />
     <ClCompile Include="_math.cpp" />
     <ClCompile Include="_sphere.cpp" />
     <ClCompile Include="_std_extensions.cpp" />
@@ -153,7 +148,6 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="Containers\AssociativeVector.hpp" />
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
     <ClInclude Include="Containers\FixedMap.h" />
-    <ClInclude Include="xr_cpuid.h" />
     <ClInclude Include="Crypto\trivial_encryptor.h" />
     <ClInclude Include="Crypto\xr_dsa.h" />
     <ClInclude Include="Crypto\xr_dsa_signer.h" />
@@ -181,12 +175,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="LocatorAPI_defs.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="lzhuf.h" />
-    <ClInclude Include="Math\PLC_CPP.hpp" />
-    <ClInclude Include="Math\PLC_SSE.hpp" />
     <ClInclude Include="Math\Random32.hpp" />
-    <ClInclude Include="Math\SkinXW_CPP.hpp" />
-    <ClInclude Include="Math\SkinXW_SSE.hpp" />
-    <ClInclude Include="Math\MathUtil.hpp" />
     <ClInclude Include="math_constants.h" />
     <ClInclude Include="Media\Image.hpp" />
     <ClInclude Include="Memory\xalloc.h" />
@@ -219,9 +208,6 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="xrCore_benchmark_macros.h" />
     <ClInclude Include="xrDebug.h" />
     <ClInclude Include="xrDebug_macros.h" />
-    <ClInclude Include="xrDelegate\xrDelegate.h" />
-    <ClInclude Include="xrDelegate\xrDelegateArguments.h" />
-    <ClInclude Include="xrDelegate\xrDelegateBinder.h" />
     <ClInclude Include="xrMemory.h" />
     <ClInclude Include="xrPool.h" />
     <ClInclude Include="xrsharedmem.h" />
@@ -232,7 +218,6 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="xr_shortcut.h" />
     <ClInclude Include="xr_token.h" />
     <ClInclude Include="xr_trims.h" />
-    <ClInclude Include="xr_vector_defs.h" />
     <ClInclude Include="_bitwise.h" />
     <ClInclude Include="_color.h" />
     <ClInclude Include="_compressed_normal.h" />
@@ -283,10 +268,10 @@ call .GitInfo.cmd</Command>
     <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Externals\mimalloc\ide\vs2019\mimalloc.vcxproj">
+    <ProjectReference Include="$(xrExternals)mimalloc\ide\vs2019\mimalloc.vcxproj">
       <Project>{abb5eae7-b3e6-432e-b636-333449892ea6}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Layers\xrAPI\xrAPI.vcxproj">
+    <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
     </ProjectReference>
   </ItemGroup>

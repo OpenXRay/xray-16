@@ -76,6 +76,7 @@ IC void update_blend(CBlend*& b)
         b = 0;
 }
 
+/*
 IC float lerp(float t, float a, float b) { return (a + t * (b - a)); }
 void y_shift_bones(IKinematics* K, float shift)
 {
@@ -83,6 +84,8 @@ void y_shift_bones(IKinematics* K, float shift)
     for (u16 i = 0; bc > i; ++i)
         K->LL_GetTransform(i).c.y += shift;
 }
+*/
+
 float CIKLimbsController::LegLengthShiftLimit(float current_shift, const SCalculateData cd[max_size])
 {
     float shift_down = -phInfinity;

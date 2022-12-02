@@ -1,6 +1,5 @@
 #pragma once
-#include <functional>
-#include <string.h>
+
 #include "xrCore/xrstring.h"
 
 struct pred_str

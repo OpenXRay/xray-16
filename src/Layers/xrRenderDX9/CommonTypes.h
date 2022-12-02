@@ -22,7 +22,7 @@ using D3D_QUERY = D3DQUERYTYPE;
 constexpr auto D3D_QUERY_EVENT = D3DQUERYTYPE_EVENT;
 constexpr auto D3D_QUERY_OCCLUSION = D3DQUERYTYPE_OCCLUSION;
 
-#define DX10_ONLY(expr) do {} while (0)
+#define DX11_ONLY(expr) do {} while (0)
 
 struct D3D_VIEWPORT : D3DVIEWPORT9
 {

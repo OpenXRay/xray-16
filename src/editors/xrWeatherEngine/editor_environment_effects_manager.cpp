@@ -6,25 +6,28 @@
 #include "editor_environment_effects_effect.hpp"
 #include "editor_environment_detail.hpp"
 
-using editor::environment::effects::manager;
-using editor::environment::effects::effect;
-using editor::environment::detail::logical_string_predicate;
+using effects_manager = editor::environment::effects::manager;
 
 template <>
-void property_collection<manager::effect_container_type, manager>::display_name(
+void property_collection<effects_manager::effect_container_type, effects_manager>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<manager::effect_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<
+    effects_manager::effect_container_type, effects_manager>::create()
 {
-    effect* object = xr_new<effect>(m_holder, generate_unique_id("effect_unique_id_").c_str());
+    using editor::environment::effects::effect;
+
+    auto* object = xr_new<effect>(m_holder, generate_unique_id("effect_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
 
+namespace editor::environment::effects
+{
 manager::manager(::editor::environment::manager* environment)
     : m_environment(*environment), m_collection(0), m_changed(true)
 {
@@ -50,7 +53,7 @@ void manager::load()
 
     for (const auto &i : sections)
     {
-        effect* object = xr_new<effect>(*this, i->Name);
+        auto* object = xr_new<effect>(*this, i->Name);
         object->load(*config);
         object->fill(m_collection);
         m_effects.push_back(object);
@@ -91,7 +94,7 @@ manager::effects_ids_type const& manager::effects_ids() const
     for (const auto &i : m_effects)
         *j++ = xr_strdup(i->id());
 
-    std::sort(m_effects_ids.begin(), m_effects_ids.end(), logical_string_predicate());
+    std::sort(m_effects_ids.begin(), m_effects_ids.end(), detail::logical_string_predicate());
 
     return (m_effects_ids);
 }
@@ -103,4 +106,4 @@ shared_str manager::unique_id(shared_str const& id) const
 
     return (m_collection->generate_unique_id(id.c_str()));
 }
-
+} // namespace editor::environment::effects

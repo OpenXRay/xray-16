@@ -89,8 +89,8 @@ class CUIDragItem : public CUIWindow, public pureRender, public pureFrame
     CUIStatic m_static;
     CUICellItem* m_pParent;
     Fvector2 m_pos_offset;
-    CUIDragDropListEx* m_back_list;
-    ICustomDrawDragItem* m_custom_draw;
+    CUIDragDropListEx* m_back_list{};
+    ICustomDrawDragItem* m_custom_draw{};
 
 public:
     CUIDragItem(CUICellItem* parent);

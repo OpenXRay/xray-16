@@ -97,6 +97,7 @@ CUISequencer::CUISequencer()
 {
     m_UIWindow = nullptr;
     m_pStoredInputReceiver = nullptr;
+    m_name = nullptr;
     m_flags.zero();
 }
 
@@ -118,7 +119,8 @@ bool CUISequencer::Start(LPCSTR tutor_name)
 
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 
-    m_UIWindow = xr_new<CUIWindow>();
+    m_name = tutor_name;
+    m_UIWindow = xr_new<CUIWindow>("Window");
 
     m_flags.set(etsPlayEachItem, !!uiXml.ReadInt("play_each_item", 0, 0));
     m_flags.set(etsPersistent, !!uiXml.Read("persistent", 0, 0));
@@ -193,6 +195,7 @@ bool CUISequencer::Start(LPCSTR tutor_name)
 
     if (m_start_lua_function.size())
         CallFunction(m_start_lua_function);
+
     return true;
 }
 
@@ -234,6 +237,8 @@ extern CUISequencer* g_tutorial2;
 
 void CUISequencer::Destroy()
 {
+    m_name = nullptr;
+
     if (m_stop_lua_function.size())
         CallFunction(m_stop_lua_function);
 
@@ -376,12 +381,6 @@ void CUISequencer::IR_OnMouseMove(int x, int y)
 {
     if (!GrabInput() && m_pStoredInputReceiver)
         m_pStoredInputReceiver->IR_OnMouseMove(x, y);
-}
-
-void CUISequencer::IR_OnMouseStop(int x, int y)
-{
-    if (!GrabInput() && m_pStoredInputReceiver)
-        m_pStoredInputReceiver->IR_OnMouseStop(x, y);
 }
 
 void CUISequencer::IR_OnKeyboardRelease(int dik)

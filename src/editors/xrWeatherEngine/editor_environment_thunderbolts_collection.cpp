@@ -14,25 +14,28 @@
 #include "editor_environment_thunderbolts_thunderbolt_id.hpp"
 #include "editor_environment_thunderbolts_manager.hpp"
 
-using editor::environment::thunderbolts::thunderbolt_id;
-using editor::environment::thunderbolts::collection;
-using editor::environment::thunderbolts::manager;
+using thunderbolts_collection = editor::environment::thunderbolts::collection;
 
 template <>
-void property_collection<collection::container_type, collection>::display_name(
+void property_collection<thunderbolts_collection::container_type, thunderbolts_collection>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<collection::container_type, collection>::create()
+XRay::Editor::property_holder_base* property_collection<
+    thunderbolts_collection::container_type, thunderbolts_collection>::create()
 {
-    thunderbolt_id* object = xr_new<thunderbolt_id>(m_holder.m_manager, "");
+    using editor::environment::thunderbolts::thunderbolt_id;
+
+    auto* object = xr_new<thunderbolt_id>(m_holder.m_manager, "");
     object->fill(this);
     return (object->object());
 }
 
+namespace editor::environment::thunderbolts
+{
 collection::collection(manager const& manager, shared_str const& id)
     : m_manager(manager), m_collection(0), m_property_holder(0)
 {
@@ -58,7 +61,7 @@ void collection::load(CInifile& config)
     CInifile::Sect& items = config.r_section(section);
     m_ids.reserve(items.Data.size());
 
-    for (const auto &i : items.Data)
+    for (const auto& i : items.Data)
     {
         thunderbolt_id* object = xr_new<thunderbolt_id>(m_manager, i.first);
         object->fill(m_collection);
@@ -70,7 +73,7 @@ void collection::load(CInifile& config)
 
 void collection::save(CInifile& config)
 {
-    for (const auto &i : m_ids)
+    for (const auto& i : m_ids)
         config.w_string(section.c_str(), i->id(), "");
 }
 
@@ -105,3 +108,4 @@ void collection::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 XRay::Editor::property_holder_base* collection::object() { return m_property_holder; }
+} // namespace editor::environment::thunderbolts

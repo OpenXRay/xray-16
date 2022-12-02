@@ -75,8 +75,8 @@ void light::vis_update()
     if (!vis.pending)
         return;
 
-    u32 frame = Device.dwFrame;
-    u32 fragments = RImplementation.occq_get(vis.query_id);
+    const u32 frame = Device.dwFrame;
+    const auto fragments = RImplementation.occq_get(vis.query_id);
     // Log					("",fragments);
     vis.visible = (fragments > cullfragments);
     vis.pending = false;

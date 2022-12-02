@@ -5,6 +5,9 @@
 template <typename _Object>
 class CStateMonsterAttackCamp : public CState<_Object>
 {
+    static constexpr float MIN_DISTANCE_TO_ENEMY = 20.f;
+
+private:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
 

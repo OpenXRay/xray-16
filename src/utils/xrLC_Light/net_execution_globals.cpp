@@ -69,11 +69,6 @@ struct list_glob<gl_last, e>
 {
 };
 
-template <class e>
-class it
-{
-};
-
 /*template< class e >
 struct list_exec;
 

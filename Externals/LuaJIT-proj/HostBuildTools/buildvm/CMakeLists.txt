@@ -6,12 +6,17 @@ if (CMAKE_VERBOSE_MAKEFILE)
     set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
 endif()
 
-string(REPLACE " " ";" HOST_ACFLAGS "${HOST_ACFLAGS}")
-string(REPLACE " " ";" HOST_ALDFLAGS "${HOST_ALDFLAGS}")
-string(REPLACE " " ";" BUILDVM_SRC "${BUILDVM_SRC}")
-string(REPLACE " " ";" BUILDVM_ARCH "${BUILDVM_ARCH}")
+separate_arguments(HOST_ACFLAGS)
+separate_arguments(HOST_ALDFLAGS)
+separate_arguments(BUILDVM_SRC NATIVE_COMMAND ${BUILDVM_SRC})
+separate_arguments(BUILDVM_ARCH)
 
-add_executable(buildvm ${BUILDVM_SRC} ${BUILDVM_ARCH})
+add_executable(buildvm)
+
+target_sources(buildvm PRIVATE
+	"${BUILDVM_SRC}"
+	"${BUILDVM_ARCH}"
+)
 
 target_include_directories(buildvm
 	PRIVATE

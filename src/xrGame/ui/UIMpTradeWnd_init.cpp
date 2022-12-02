@@ -65,7 +65,7 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
     }
     m_root_tab_control->ResetTab();
 
-    m_shop_wnd = xr_new<CUIWindow>();
+    m_shop_wnd = xr_new<CUIWindow>("Shop window");
     AttachChild(m_shop_wnd);
     m_shop_wnd->SetAutoDelete(true);
     CUIXmlInit::InitWindow(xml_doc, "shop_wnd", 0, m_shop_wnd);

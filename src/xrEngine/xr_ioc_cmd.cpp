@@ -4,9 +4,7 @@
 #include "x_ray.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 
 #include "CameraManager.h"
 #include "Environment.h"
@@ -32,10 +30,8 @@ void IConsole_Command::InvalidSyntax()
     Msg("~ Invalid syntax in call to '%s'", cName);
     Msg("~ Valid arguments: %s", I);
 
-#if !defined(XR_PLATFORM_LINUX)
     g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
     g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
-#endif
 }
 
 //-----------------------------------------------------------------------
@@ -498,8 +494,7 @@ public:
     CCC_SND_Restart(pcstr N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(pcstr args)
     {
-        if (GEnv.Sound)
-            GEnv.Sound->_restart();
+        GEnv.Sound->_restart();
     }
 };
 
@@ -731,12 +726,9 @@ ENGINE_API float psHUD_FOV = 0.45f;
 // extern int psSkeletonUpdate;
 extern int rsDVB_Size;
 extern int rsDIB_Size;
-extern int psNET_ClientUpdate;
-extern int psNET_ClientPending;
-extern int psNET_ServerUpdate;
-extern int psNET_ServerPending;
+
 extern int psNET_DedicatedSleep;
-extern char psNET_Name[32];
+
 extern Flags32 psEnvFlags;
 // extern float r__dtex_range;
 
@@ -830,7 +822,7 @@ void CCC_Register()
     CMD1(CCC_SND_Restart, "snd_restart");
     CMD3(CCC_Mask, "snd_acceleration", &psSoundFlags, ss_Hardware);
     CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EAX);
-    CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 4, 32);
+    CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 4, 256);
     CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 4, 64);
     CMD3(CCC_Token, "snd_precache_all", &psSoundPrecacheAll, snd_precache_all_token);
 
@@ -887,7 +879,7 @@ void CCC_Register()
 #endif
 
     CMD1(CCC_ExclusiveMode, "input_exclusive_mode");
-#if !defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_WINDOWS) // XXX: enable (remove ifdef) when text console will be available on Linux
     extern int g_svTextConsoleUpdateRate;
     CMD4(CCC_Integer, "sv_console_update_rate", &g_svTextConsoleUpdateRate, 1, 100);
 #endif

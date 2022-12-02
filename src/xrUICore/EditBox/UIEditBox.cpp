@@ -21,7 +21,7 @@ bool CUIEditBox::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= true*
 {
     if (!m_frameLine)
     {
-        m_frameLine = xr_new<CUIFrameLineWnd>();
+        m_frameLine = xr_new<CUIFrameLineWnd>("Frameline");
         AttachChild(m_frameLine);
         m_frameLine->SetAutoDelete(true);
     }

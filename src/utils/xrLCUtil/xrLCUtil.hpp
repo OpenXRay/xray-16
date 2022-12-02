@@ -1,7 +1,11 @@
 #pragma once
+
 #include "xrCore/xrCore.h"
+
+#ifdef XR_PLATFORM_WINDOWS
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "comctl32.lib")
+#endif
 
 #ifdef XRAY_STATIC_BUILD
 #define XRLCUTIL_API

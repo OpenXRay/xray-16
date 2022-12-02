@@ -18,12 +18,13 @@
 #include "property_container.hpp"
 #include "property_holder_include.hpp"
 
-using editor::window_ide;
 
 namespace XRay
 {
 namespace Editor
 {
+using editor::window_ide;
+
 ide_impl::ide_impl(engine_base* engine) : m_engine(engine), m_window(nullptr), m_paused(false), m_in_idle(false) {}
 ide_impl::~ide_impl() {}
 

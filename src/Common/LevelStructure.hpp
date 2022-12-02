@@ -170,7 +170,7 @@ public:
     friend class CRenumbererConverter;
 };
 
-struct NodeCompressedOld
+struct NodeCompressed8
 {
     u8 data[12];
     NodeCompressed::SCover cover;

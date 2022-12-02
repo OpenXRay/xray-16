@@ -80,7 +80,7 @@ void CRender::render_lights(light_Package& LP)
     //	if (left_some_lights_that_doesn't cast shadows)
     //		accumulate them
     HOM.Disable();
-    while (LP.v_shadowed.size())
+    while (!LP.v_shadowed.empty())
     {
         // if (has_spot_shadowed)
         xr_vector<light*> L_spot_s;
@@ -110,8 +110,8 @@ void CRender::render_lights(light_Package& LP)
             L->svis.begin();
             PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
             r_dsgraph_render_subspace(L->spatial.sector, L->X.S.combine, L->position, TRUE);
-            bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
-            bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
+            bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
+            bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
             if (bNormal || bSpecial)
             {
                 Stats.s_merged++;

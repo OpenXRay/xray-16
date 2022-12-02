@@ -6,7 +6,7 @@ float Contrast(float Input, float ContrastPower)
 {
      //piecewise contrast function
      bool IsAboveHalf = Input > 0.5 ;
-     float ToRaise = saturate(2*(IsAboveHalf ? (1.0 - Input) : Input));
+     float ToRaise = saturate(2.0*(IsAboveHalf ? (1.0 - Input) : Input));
      float Output = 0.5*pow(ToRaise, ContrastPower); 
      Output = IsAboveHalf ? (1.0 - Output) : Output;
      return Output;
@@ -63,12 +63,12 @@ float3 calc_model_lq_lighting( float3 norm_w )
 	return L_material.x*calc_model_hemi_r1(norm_w) + L_ambient.rgb + L_material.y*calc_sun_r1(norm_w);
 }
 
-float3 	unpack_normal( float3 v )	{ return 2*v-1; }
-float3 	unpack_normal( float4 v )	{ return 2*v.xyz-1; }
-float3 	unpack_bx2( float3 v )	{ return 2*v-1; }
-float3 	unpack_bx2( float4 v )	{ return 2*v.xyz-1; }
-float3 	unpack_bx4( float3 v )	{ return 4*v-2; } //!reduce the amount of stretching from 4*v-2 and increase precision
-float3 	unpack_bx4( float4 v )	{ return 4*v.xyz-2; }
+float3 	unpack_normal( float3 v )	{ return 2.0*v-1.0; }
+float3 	unpack_normal( float4 v )	{ return 2.0*v.xyz-1.0; }
+float3 	unpack_bx2( float3 v )	{ return 2.0*v-1.0; }
+float3 	unpack_bx2( float4 v )	{ return 2.0*v.xyz-1.0; }
+float3 	unpack_bx4( float3 v )	{ return 4.0*v-2.0; } //!reduce the amount of stretching from 4*v-2 and increase precision
+float3 	unpack_bx4( float4 v )	{ return 4.0*v.xyz-2.0; }
 float2 	unpack_tc_lmap( float2 tc )	{ return tc*(1.0/32768.0);	} // [-1  .. +1 ] 
 float4	unpack_color( float4 c ) { return c.bgra; }
 float4	unpack_D3DCOLOR( float4 c ) { return c.bgra; }
@@ -179,7 +179,7 @@ float3 gbuf_unpack_normal( float2 norm )
 
    res.z  = norm.x;
    res.x  = ( 2.0 * abs( norm.y ) ) - 1.0;
-   res.y = ( norm.y < 0 ? -1.0 : 1.0 ) * sqrt( abs( 1 - res.x * res.x - res.z * res.z ) );
+   res.y = ( norm.y < 0.0 ? -1.0 : 1.0 ) * sqrt( abs( 1.0 - res.x * res.x - res.z * res.z ) );
 
    return res;
 }
@@ -191,10 +191,10 @@ float gbuf_pack_hemi_mtl( float hemi, float mtl )
 	//	Clamp hemi max value
 	uint packed_hemi = ( MUST_BE_SET + ( uint( saturate(hemi) * 255.9 ) << 13 ) + ( ( packed_mtl & uint( 31 ) ) << 21 ) );
 
-   if( ( packed_hemi & USABLE_BIT_13 ) == 0 )
+   if( ( packed_hemi & USABLE_BIT_13 ) == 0u )
       packed_hemi |= USABLE_BIT_14;
 
-   if( ( packed_mtl & uint( 16 ) ) != 0 )
+   if( ( packed_mtl & uint( 16 ) ) != 0u )
       packed_hemi |= USABLE_BIT_15;
 
    return asfloat( packed_hemi );
@@ -202,14 +202,14 @@ float gbuf_pack_hemi_mtl( float hemi, float mtl )
 
 float gbuf_unpack_hemi( float mtl_hemi )
 {
-//   return float( ( asuint( mtl_hemi ) >> 13 ) & uint(255) ) * (1.0/255.0);
-	return float( ( asuint( mtl_hemi ) >> 13 ) & uint(255) ) * (1.0/254.8);
+//   return float( ( asuint( mtl_hemi ) >> 13u ) & uint(255) ) * (1.0/255.0);
+	return float( ( asuint( mtl_hemi ) >> 13u ) & uint(255) ) * (1.0/254.8);
 }
 
 float gbuf_unpack_mtl( float mtl_hemi )
 {
    uint packed_mtl       = asuint( mtl_hemi );
-   uint packed_hemi  = ( ( packed_mtl >> 21 ) & uint(15) ) + ( ( packed_mtl & USABLE_BIT_15 ) == 0 ? 0 : 16 );
+   uint packed_hemi  = ( ( packed_mtl >> 21u ) & 15u ) + ( ( packed_mtl & USABLE_BIT_15 ) == 0u ? 0u : 16u );
    return float( packed_hemi ) * (1.0/31.0) * 1.333333333;
 }
 
@@ -242,11 +242,11 @@ gbuffer_data gbuffer_load_data( float2 tc, float4 pos2d, uint iSample )
 {
 	gbuffer_data gbd;
 
-	gbd.P = float3(0,0,0);
-	gbd.hemi = 0;
-	gbd.mtl = 0;
-	gbd.C = float3(0,0,0);
-	gbd.N = float3(0,0,0);
+	gbd.P = float3(0.0,0.0,0.0);
+	gbd.hemi = 0.0;
+	gbd.mtl = 0.0;
+	gbd.C = float3(0.0,0.0,0.0);
+	gbd.N = float3(0.0,0.0,0.0);
 
 #ifndef USE_MSAA
 	float4 P	= tex2D( s_position, tc );
@@ -287,14 +287,14 @@ gbuffer_data gbuffer_load_data( float2 tc, float4 pos2d, uint iSample )
 
 gbuffer_data gbuffer_load_data( float2 tc, float4 pos2d )
 {
-   return gbuffer_load_data( tc, pos2d, 0 );
+   return gbuffer_load_data( tc, pos2d, 0u );
 }
 
 gbuffer_data gbuffer_load_data_offset( float2 tc, float2 OffsetTC, float4 pos2d )
 {
 	float4  delta	  = float4( ( OffsetTC - tc ) * pos_decompression_params2.xy, 0, 0 );
 
-	return gbuffer_load_data( OffsetTC, pos2d + delta, 0 );
+	return gbuffer_load_data( OffsetTC, pos2d + delta, 0u );
 }
 
 gbuffer_data gbuffer_load_data_offset( float2 tc, float2 OffsetTC, float4 pos2d, uint iSample )
@@ -342,12 +342,12 @@ gbuffer_data gbuffer_load_data( float2 tc, uint iSample )
 
 gbuffer_data gbuffer_load_data( float2 tc  )
 {
-   return gbuffer_load_data( tc, 0 );
+   return gbuffer_load_data( tc, 0u );
 }
 
 gbuffer_data gbuffer_load_data_offset( float2 tc, float2 OffsetTC, uint iSample )
 {
-   return gbuffer_load_data( OffsetTC, iSample );
+   return gbuffer_load_data( OffsetTC, uint(iSample) );
 }
 
 #endif // GBUFFER_OPTIMIZATION

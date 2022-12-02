@@ -17,7 +17,6 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include "SDL_opengl.h"
-#include <GL/glu.h>
 #include "SDL_opengl_glext.h"
 
 #include "Layers/xrRenderGL/CommonTypes.h"
@@ -45,7 +44,8 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/xrRender_console.h"
 
-#include "rgl.h"
+#include "r2.h"
+#include "gl_rendertarget.h"
 
 IC void jitter(CBlender_Compile& C)
 {

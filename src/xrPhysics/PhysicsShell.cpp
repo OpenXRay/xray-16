@@ -130,7 +130,7 @@ CPhysicsShell* P_build_Shell(
 
 CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, LPCSTR fixed_bones)
 {
-    U16Vec f_bones;
+    xr_vector<u16> f_bones;
     if (fixed_bones)
     {
         // IKinematics* K		= smart_cast<IKinematics*>(obj->ObjectVisual());
@@ -149,7 +149,7 @@ CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, LP
 }
 
 static BONE_P_MAP bone_map = BONE_P_MAP();
-CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, U16Vec& fixed_bones)
+CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, xr_vector<u16>& fixed_bones)
 {
     bone_map.clear();
     CPhysicsShell* pPhysicsShell = 0;

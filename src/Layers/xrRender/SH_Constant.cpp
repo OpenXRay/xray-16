@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#pragma hdrstop
+
+#include "SH_Constant.h"
 
 /*
 #include "xrCore/xr_resource.h"

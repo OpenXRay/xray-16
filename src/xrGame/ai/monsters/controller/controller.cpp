@@ -37,18 +37,14 @@
 const u32 _pmt_psy_attack_delay = 2000;
 const float _pmt_psy_attack_min_angle = deg(5);
 
-namespace detail
-{
-namespace controller
+namespace detail::controller
 {
 // default settings for tube fire:
 const u32 default_tube_condition_see_duration = 50;
 const u32 default_tube_condition_min_delay = 10000;
 const float default_tube_condition_min_distance = 10;
 const float default_stamina_hit = 0.2f;
-
-} // namespace controller
-} // namespace detail
+} // namespace detail::controller
 
 CController::CController()
 {
@@ -234,7 +230,7 @@ void CController::Load(LPCSTR section)
     LPCSTR tube_condition_min_delay_line = "tube_condition_min_delay";
     LPCSTR tube_condition_min_distance_line = "tube_condition_min_distance";
 
-    using namespace detail::controller;
+    using namespace ::detail::controller;
     m_tube_condition_see_duration = pSettings->line_exist(section, tube_see_duration_line) ?
         pSettings->r_u32(section, tube_see_duration_line) :
         default_tube_condition_see_duration;
@@ -605,7 +601,7 @@ void CController::set_psy_fire_delay_default() { m_psy_fire_delay = _pmt_psy_att
 void CController::tube_fire() { control().activate(ControlCom::eComCustom1); }
 bool CController::can_tube_fire()
 {
-    using namespace detail::controller;
+    using namespace ::detail::controller;
 
     if (0 && m_tube_at_once)
     {

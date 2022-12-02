@@ -43,18 +43,19 @@ extern "C"
         FillUIStyleToken();
         // register console commands
         CCC_RegisterCommands();
+        // register localization
+        StringTable().Init();
         // keyboard binding
         CCC_RegisterInput(); // XXX: Move to xrEngine
 #ifdef DEBUG
         g_profiler = xr_new<CProfiler>();
 #endif
-        StringTable().Init();
     }
 
     XR_EXPORT void finalize_library()
     {
         CleanupUIStyleToken();
-        CCC_DeregisterInput(); // XXX: Remove if possible
         StringTable().Destroy();
+        CCC_DeregisterInput(); // XXX: Remove if possible
  }
 }

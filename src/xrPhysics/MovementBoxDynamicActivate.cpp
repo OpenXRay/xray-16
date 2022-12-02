@@ -11,8 +11,11 @@
 #include "PHCharacter.h"
 #include "xrEngine/GameMtlLib.h"
 
+namespace detail::movement_box
+{
 ObjectContactCallbackFun* saved_callback = 0;
 static float max_depth = 0.f;
+}
 
 struct STestCallbackPars
 {
@@ -57,6 +60,8 @@ float STestFootCallbackPars::max_real_depth = 0.2f;
 template <class Pars>
 void TTestDepthCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
+    using namespace ::detail::movement_box;
+
     if (saved_callback)
         saved_callback(do_colide, bo1, c, material_1, material_2);
 
@@ -291,6 +296,8 @@ private:
 bool ActivateBoxDynamic(IPHMovementControl* mov_control, bool character_exist, u32 id, int num_it /*=8*/,
     int num_steps /*5*/, float resolve_depth /*=0.01f*/)
 {
+    using namespace ::detail::movement_box;
+
     /////////////////////////////////////////////////////////////////////////////
     // m_PhysicMovementControl->ActivateBox(id);
     VERIFY(mov_control);

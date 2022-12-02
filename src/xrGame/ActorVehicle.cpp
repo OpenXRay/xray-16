@@ -20,7 +20,6 @@
 #include "CharacterPhysicsSupport.h"
 #include "Inventory.h"
 
-#include "pch_script.h"
 #include "game_object_space.h"
 #include "xrScriptEngine/script_callback_ex.h"
 #include "script_game_object.h"

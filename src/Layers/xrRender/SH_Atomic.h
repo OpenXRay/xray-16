@@ -6,7 +6,7 @@
 #include "tss_def.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/StateManager/dx10State.h"
+#include "Layers/xrRenderDX11/StateManager/dx11State.h"
 #elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glState.h"
 #endif
@@ -119,6 +119,21 @@ typedef resptr_core<SCS, resptr_base<SCS>> ref_cs;
 
 #endif // USE_DX11 || USE_OGL
 
+#if defined(USE_OGL)
+struct ECORE_API SPP : public xr_resource_named
+{
+    // Program pipeline object
+    // or shader program if ARB_separate_shader_objects is unavailabe
+    GLuint pp{};
+    R_constant_table constants;
+
+    SPP() = default;
+    SPP(GLuint _pp) : pp(_pp) {}
+    ~SPP();
+};
+typedef resptr_core<SPP, resptr_base<SPP>> ref_pp;
+#endif // USE_OGL
+
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SState : public xr_resource_flagged
 {
@@ -138,7 +153,7 @@ struct ECORE_API SDeclaration : public xr_resource_flagged
 #elif defined(USE_DX11)
     //	Maps input signature to input layout
     xr_map<ID3DBlob*, ID3DInputLayout*> vs_to_layout;
-    xr_vector<D3D_INPUT_ELEMENT_DESC> dx10_dcl_code;
+    xr_vector<D3D_INPUT_ELEMENT_DESC> dx11_dcl_code;
 #elif defined(USE_OGL)
     u32 FVF;
     GLuint dcl;
