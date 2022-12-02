@@ -158,25 +158,25 @@ void CBlender_combine::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("sky_s0",			r2_T_sky0			);
         // C.r_Sampler_clf		("sky_s1",			r2_T_sky1			);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_diffuse", r2_RT_albedo);
-        C.r_dx10Texture("s_accumulator", r2_RT_accum);
-        C.r_dx10Texture("s_depth", r2_RT_depth);
-        C.r_dx10Texture("s_tonemap", r2_RT_luminance_cur);
-        C.r_dx10Texture("s_material", r2_material);
-        C.r_dx10Texture("env_s0", r2_T_envs0);
-        C.r_dx10Texture("env_s1", r2_T_envs1);
-        C.r_dx10Texture("sky_s0", r2_T_sky0);
-        C.r_dx10Texture("sky_s1", r2_T_sky1);
-        C.r_dx10Texture("s_occ", r2_RT_ssao_temp);
-        C.r_dx10Texture("s_half_depth", r2_RT_half_depth);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
+        C.r_dx11Texture("s_accumulator", r2_RT_accum);
+        C.r_dx11Texture("s_depth", r2_RT_depth);
+        C.r_dx11Texture("s_tonemap", r2_RT_luminance_cur);
+        C.r_dx11Texture("s_material", r2_material);
+        C.r_dx11Texture("env_s0", r2_T_envs0);
+        C.r_dx11Texture("env_s1", r2_T_envs1);
+        C.r_dx11Texture("sky_s0", r2_T_sky0);
+        C.r_dx11Texture("sky_s1", r2_T_sky1);
+        C.r_dx11Texture("s_occ", r2_RT_ssao_temp);
+        C.r_dx11Texture("s_half_depth", r2_RT_half_depth);
 
         jitter(C);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_material");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_material");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 1: // aa-edge-detection + AA :)
@@ -187,14 +187,14 @@ void CBlender_combine::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("s_bloom",			r2_RT_bloom1);
         // C.r_Sampler_clf		("s_distort",		r2_RT_generic1);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_image", r2_RT_generic0);
-        C.r_dx10Texture("s_bloom", r2_RT_bloom1);
-        C.r_dx10Texture("s_distort", r2_RT_generic1);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_image", r2_RT_generic0);
+        C.r_dx11Texture("s_bloom", r2_RT_bloom1);
+        C.r_dx11Texture("s_distort", r2_RT_generic1);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 2: // non-AA
@@ -206,14 +206,14 @@ void CBlender_combine::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("s_bloom",			r2_RT_bloom1);
         // C.r_Sampler_clf		("s_distort",		r2_RT_generic1);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_image", r2_RT_generic0);
-        C.r_dx10Texture("s_bloom", r2_RT_bloom1);
-        C.r_dx10Texture("s_distort", r2_RT_generic1);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_image", r2_RT_generic0);
+        C.r_dx11Texture("s_bloom", r2_RT_bloom1);
+        C.r_dx11Texture("s_distort", r2_RT_generic1);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 3: // aa-edge-detection + AA :) + DISTORTION
@@ -224,14 +224,14 @@ void CBlender_combine::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("s_bloom",			r2_RT_bloom1);
         // C.r_Sampler_clf		("s_distort",		r2_RT_generic1);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_image", r2_RT_generic0);
-        C.r_dx10Texture("s_bloom", r2_RT_bloom1);
-        C.r_dx10Texture("s_distort", r2_RT_generic1);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_image", r2_RT_generic0);
+        C.r_dx11Texture("s_bloom", r2_RT_bloom1);
+        C.r_dx11Texture("s_distort", r2_RT_generic1);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 4: // non-AA + DISTORTION
@@ -243,14 +243,14 @@ void CBlender_combine::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("s_bloom",			r2_RT_bloom1);
         // C.r_Sampler_clf		("s_distort",		r2_RT_generic1);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_image", r2_RT_generic0);
-        C.r_dx10Texture("s_bloom", r2_RT_bloom1);
-        C.r_dx10Texture("s_distort", r2_RT_generic1);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_image", r2_RT_generic0);
+        C.r_dx11Texture("s_bloom", r2_RT_bloom1);
+        C.r_dx11Texture("s_distort", r2_RT_generic1);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 5: // post-processing
@@ -260,9 +260,6 @@ void CBlender_combine::Compile(CBlender_Compile& C)
 }
 
 #if RENDER != R_R2
-CBlender_combine_msaa::CBlender_combine_msaa() { description.CLS = 0; }
-CBlender_combine_msaa::~CBlender_combine_msaa() {}
-//	TODO: DX10: Implement CBlender_combine::Compile
 void CBlender_combine_msaa::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
@@ -359,25 +356,25 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("sky_s0",			r2_T_sky0			);
         // C.r_Sampler_clf		("sky_s1",			r2_T_sky1			);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_diffuse", r2_RT_albedo);
-        C.r_dx10Texture("s_accumulator", r2_RT_accum);
-        C.r_dx10Texture("s_depth", r2_RT_depth);
-        C.r_dx10Texture("s_tonemap", r2_RT_luminance_cur);
-        C.r_dx10Texture("s_material", r2_material);
-        C.r_dx10Texture("s_occ", r2_RT_ssao_temp);
-        C.r_dx10Texture("s_half_depth", r2_RT_half_depth);
-        C.r_dx10Texture("env_s0", r2_T_envs0);
-        C.r_dx10Texture("env_s1", r2_T_envs1);
-        C.r_dx10Texture("sky_s0", r2_T_sky0);
-        C.r_dx10Texture("sky_s1", r2_T_sky1);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
+        C.r_dx11Texture("s_accumulator", r2_RT_accum);
+        C.r_dx11Texture("s_depth", r2_RT_depth);
+        C.r_dx11Texture("s_tonemap", r2_RT_luminance_cur);
+        C.r_dx11Texture("s_material", r2_material);
+        C.r_dx11Texture("s_occ", r2_RT_ssao_temp);
+        C.r_dx11Texture("s_half_depth", r2_RT_half_depth);
+        C.r_dx11Texture("env_s0", r2_T_envs0);
+        C.r_dx11Texture("env_s1", r2_T_envs1);
+        C.r_dx11Texture("sky_s0", r2_T_sky0);
+        C.r_dx11Texture("sky_s1", r2_T_sky1);
 
         jitter(C);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_material");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_material");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 1: // aa-edge-detection + AA :)
@@ -388,14 +385,14 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("s_bloom",			r2_RT_bloom1);
         // C.r_Sampler_clf		("s_distort",		r2_RT_generic1);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_image", r2_RT_generic0);
-        C.r_dx10Texture("s_bloom", r2_RT_bloom1);
-        C.r_dx10Texture("s_distort", r2_RT_generic1_r);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_image", r2_RT_generic0);
+        C.r_dx11Texture("s_bloom", r2_RT_bloom1);
+        C.r_dx11Texture("s_distort", r2_RT_generic1_r);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 2: // non-AA
@@ -407,14 +404,14 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("s_bloom",			r2_RT_bloom1);
         // C.r_Sampler_clf		("s_distort",		r2_RT_generic1);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_image", r2_RT_generic0);
-        C.r_dx10Texture("s_bloom", r2_RT_bloom1);
-        C.r_dx10Texture("s_distort", r2_RT_generic1_r);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_image", r2_RT_generic0);
+        C.r_dx11Texture("s_bloom", r2_RT_bloom1);
+        C.r_dx11Texture("s_distort", r2_RT_generic1_r);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 3: // aa-edge-detection + AA :) + DISTORTION
@@ -425,14 +422,14 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("s_bloom",			r2_RT_bloom1);
         // C.r_Sampler_clf		("s_distort",		r2_RT_generic1);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_image", r2_RT_generic0);
-        C.r_dx10Texture("s_bloom", r2_RT_bloom1);
-        C.r_dx10Texture("s_distort", r2_RT_generic1_r);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_image", r2_RT_generic0);
+        C.r_dx11Texture("s_bloom", r2_RT_bloom1);
+        C.r_dx11Texture("s_distort", r2_RT_generic1_r);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 4: // non-AA + DISTORTION
@@ -444,14 +441,14 @@ void CBlender_combine_msaa::Compile(CBlender_Compile& C)
         // C.r_Sampler_clf		("s_bloom",			r2_RT_bloom1);
         // C.r_Sampler_clf		("s_distort",		r2_RT_generic1);
 
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_image", r2_RT_generic0);
-        C.r_dx10Texture("s_bloom", r2_RT_bloom1);
-        C.r_dx10Texture("s_distort", r2_RT_generic1_r);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_image", r2_RT_generic0);
+        C.r_dx11Texture("s_bloom", r2_RT_bloom1);
+        C.r_dx11Texture("s_distort", r2_RT_generic1_r);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
     case 5: // post-processing

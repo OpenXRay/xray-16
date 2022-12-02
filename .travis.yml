@@ -8,7 +8,7 @@ branches:
     - /^dependabot\/.*$/
 #  only:
 #  - linux
-#  - xd_dev
+#  - dev
 #  - "/^v\\d+\\./"
 
 os:
@@ -17,47 +17,10 @@ os:
 matrix:
   include:
     - arch: arm64
-      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-      addons: &gcc8
-        apt:
-          sources:
-            - sourceline: 'ppa:ubuntu-toolchain-r/test'
-          packages:
-            - g++-8
+      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Release
 
-#    - arch: arm64
-#      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-#      addons: *gcc8
-
-    - arch: amd64
-      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-      addons: *gcc8
-
-    - arch: amd64
-      env: C_COMPILER=gcc-8 CXX_COMPILER=g++-8 TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-      addons: *gcc8
-
-#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-#      addons: &clang50
-#        apt:
-#          sources:
-#            - llvm-toolchain-trusty-5.0
-#          packages:
-#            - clang-5.0
-
-#    - env: C_COMPILER=clang-5.0 CXX_COMPILER=clang++-5.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
-#      addons: *clang50
-
-#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-#      addons: &clang60
-#        apt:
-#          sources:
-#            - llvm-toolchain-trusty-6.0
-#          packages:
-#            - clang-6.0
-
-#    - env: C_COMPILER=clang-6.0 CXX_COMPILER=clang++-6.0 TARGET_CPU=x84 BUILD_CONFIGURATION=Release
-#      addons: *clang60
+    - arch: arm64
+      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
 
 install:
   - export CC=${C_COMPILER}

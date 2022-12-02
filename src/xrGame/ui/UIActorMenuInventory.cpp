@@ -45,6 +45,7 @@ void CUIActorMenu::InitInventoryMode()
     m_pLists[eInventoryOutfitList]->Show(true);
     ShowIfExist(m_pLists[eInventoryHelmetList], true);
     ShowIfExist(m_pLists[eInventoryDetectorList], true);
+    ShowIfExist(m_pLists[eInventoryBackpackList], true);
     m_pLists[eInventoryPistolList]->Show(true);
     m_pLists[eInventoryAutomaticList]->Show(true);
     ShowIfExist(m_pQuickSlot, true);
@@ -236,8 +237,8 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
     CUIDragDropListEx* all_lists[] =
     {
         m_pLists[eInventoryBeltList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
-        m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList], m_pLists[eInventoryBagList],
-        m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
+        m_pLists[eInventoryBackpackList], m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList],
+        m_pLists[eInventoryBagList], m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
     };
 
     switch (action_type)
@@ -446,6 +447,7 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyB
     InitCellForSlot(DETECTOR_SLOT);
     InitCellForSlot(GRENADE_SLOT);
     InitCellForSlot(HELMET_SLOT);
+    InitCellForSlot(BACKPACK_SLOT);
 
     //Alundaio
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(KNIFE_SLOT))
@@ -568,10 +570,10 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         if (m_pActorInvOwner->inventory().SlotIsPersistent(slot_id) && slot_id != DETECTOR_SLOT)
             return false;
 
-        if (slot_id == INV_SLOT_2 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_3))
+        if (slot_id == INV_SLOT_2 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_3) && CallOfPripyatMode)
             return ToSlot(itm, force_place, INV_SLOT_3);
 
-        if (slot_id == INV_SLOT_3 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_2))
+        if (slot_id == INV_SLOT_3 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_2) && CallOfPripyatMode)
             return ToSlot(itm, force_place, INV_SLOT_2);
 
         CUIDragDropListEx* slot_list = GetSlotList(slot_id);
@@ -738,6 +740,8 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     case INV_SLOT_2: return m_pLists[eInventoryPistolList]; break;
 
     case INV_SLOT_3: return m_pLists[eInventoryAutomaticList]; break;
+
+    case BACKPACK_SLOT: return m_pLists[eInventoryBackpackList]; break;
 
     case OUTFIT_SLOT: return m_pLists[eInventoryOutfitList]; break;
 

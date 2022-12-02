@@ -53,7 +53,7 @@ using D3D_QUERY = enum XR_GL_QUERY
 
 using ID3DState = glState;
 
-#define DX10_ONLY(expr)			do {} while (0)
+#define DX11_ONLY(expr)			do {} while (0)
 
 using unused_t = int[0];
 

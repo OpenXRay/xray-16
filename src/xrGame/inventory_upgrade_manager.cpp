@@ -172,10 +172,10 @@ public:
         if (!inv_section)
             return false;
 
-        const auto ie = inv_section->Data.end();
         const auto ib = inv_section->Data.begin();
+        const auto ie = inv_section->Data.end();
 
-        const auto it = std::find_if(ie, ib, [&](const CInifile::Item& item)
+        const auto it = std::find_if(ib, ie, [&](const CInifile::Item& item)
         {
             return item.first == item_id;
         });
@@ -201,7 +201,7 @@ void Manager::load_all_inventory()
     {
         const auto& name = section->Name;
 
-        if (item_upgrades_exist(name) || inv_section.add_anyway(name.c_str()))
+        if (item_upgrades_exist(name) || inv_section.add_anyway(name))
         {
             add_root(name);
         }

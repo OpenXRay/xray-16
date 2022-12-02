@@ -17,6 +17,7 @@ protected:
     CUIWindow* m_UIWindow;
     ref_sound m_global_sound;
     xr_deque<CUISequenceItem*> m_sequencer_items;
+    pcstr m_name;
 
     bool GrabInput();
     CUISequenceItem* GetNextItem();
@@ -25,7 +26,10 @@ protected:
 
 public:
     IInputReceiver* m_pStoredInputReceiver;
+
     CUISequencer();
+    virtual ~CUISequencer() = default;
+
     bool Start(LPCSTR tutor_name);
     void Stop();
     void Next();
@@ -41,7 +45,6 @@ public:
     virtual void IR_OnMouseRelease(int btn);
     virtual void IR_OnMouseHold(int btn);
     virtual void IR_OnMouseMove(int x, int y);
-    virtual void IR_OnMouseStop(int x, int y);
 
     virtual void IR_OnKeyboardPress(int dik);
     virtual void IR_OnKeyboardRelease(int dik);
@@ -54,6 +57,7 @@ public:
     virtual void IR_OnMouseWheel(int x, int y);
     virtual void IR_OnActivate(void);
     bool Persistent() { return !!m_flags.test(etsPersistent); }
+    pcstr GetTutorName() { return m_name; }
     fastdelegate::FastDelegate0<> m_on_destroy_event;
 
     enum
@@ -127,6 +131,8 @@ class CUISequenceSimpleItem : public CUISequenceItem
 
         virtual void Start();
         virtual void Stop();
+
+        virtual ~SSubItem() = default;
     };
     using SubItemVec = xr_vector<SSubItem>;
     SubItemVec m_subitems;

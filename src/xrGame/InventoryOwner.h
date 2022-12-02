@@ -10,6 +10,7 @@
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "character_info.h"
 #include "inventory_space.h"
+#include "ActorBackpack.h"
 
 class CSE_Abstract;
 class CInventory;
@@ -151,6 +152,7 @@ public:
     virtual float MaxCarryWeight() const;
 
     CCustomOutfit* GetOutfit() const;
+    CBackpack* GetBackpack() const;
 
     bool CanPlayShHdRldSounds() const { return m_play_show_hide_reload_sounds; };
     void SetPlayShHdRldSounds(bool play) { m_play_show_hide_reload_sounds = play; };

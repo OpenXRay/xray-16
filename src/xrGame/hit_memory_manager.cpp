@@ -180,15 +180,6 @@ void CHitMemoryManager::add(const CHitObject& _hit_object)
     }
 }
 
-struct CRemoveOfflinePredicate
-{
-    bool operator()(const CHitObject& object) const
-    {
-        VERIFY(object.m_object);
-        return (!object.m_object || !!object.m_object->getDestroy() || object.m_object->H_Parent());
-    }
-};
-
 void CHitMemoryManager::update()
 {
     START_PROFILE("Memory Manager/hits::update")
@@ -196,7 +187,12 @@ void CHitMemoryManager::update()
     clear_delayed_objects();
 
     VERIFY(m_hits);
-    m_hits->erase(std::remove_if(m_hits->begin(), m_hits->end(), CRemoveOfflinePredicate()), m_hits->end());
+    const auto it = std::remove_if(m_hits->begin(), m_hits->end(), [](const CHitObject& object)
+    {
+        VERIFY(object.m_object);
+        return !object.m_object || !!object.m_object->getDestroy() || object.m_object->H_Parent();
+    });
+    m_hits->erase(it, m_hits->end());
 
 #ifdef USE_SELECTED_HIT
     xr_delete(m_selected_hit);
@@ -223,6 +219,16 @@ void CHitMemoryManager::enable(const IGameObject* object, bool enable)
         return;
 
     (*J).m_enabled = enable;
+}
+
+void CHitMemoryManager::remove(const MemorySpace::CHitObject* hit_object)
+{
+    HITS::iterator I = std::find_if(m_hits->begin(), m_hits->end(), [&](const MemorySpace::CHitObject& object)
+    {
+        return hit_object == &object;
+    });
+    if (I != m_hits->end())
+        m_hits->erase(I);
 }
 
 void CHitMemoryManager::remove_links(IGameObject* object)

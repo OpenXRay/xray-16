@@ -1,50 +1,50 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "SDL.h"
-#include "SDL_syswm.h"
-
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "log.h"
-#if defined(XR_PLATFORM_WINDOWS)
-#include "Debug/dxerr.h"
-#endif
 #include "Threading/ScopeLock.hpp"
 
-#pragma warning(push)
-#pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
 #if defined(XR_PLATFORM_WINDOWS)
+#include "Debug/dxerr.h"
 #include "Debug/MiniDump.h"
-#pragma warning(pop)
-#include <direct.h>
 #endif
 
-#if defined(XR_PLATFORM_WINDOWS)
-#define USE_BUG_TRAP
+#include <SDL.h>
+
+#ifdef XR_PLATFORM_WINDOWS
+#   define USE_BUG_TRAP
 static BOOL bException = FALSE;
 #endif
 
-#ifndef USE_BUG_TRAP
-#include <exception>
+#ifdef USE_BUG_TRAP
+#   include <BugTrap/source/Client/BugTrap.h>
+#else
+#   include <exception>
 #endif
 
-#ifdef USE_BUG_TRAP
-#include <BugTrap/source/Client/BugTrap.h>
-#endif
+#include <csignal>
 
 #if defined(XR_PLATFORM_WINDOWS)
-#include <new.h> // for _set_new_mode
-#include <signal.h> // for signals
-#include <errorrep.h> // ReportFault
+#   include <SDL_syswm.h>
+#   include <direct.h>
+#   include <new.h> // for _set_new_mode
+#   include <errorrep.h> // ReportFault
 #elif defined(XR_PLATFORM_LINUX)
-#include <sys/user.h>
-#include <sys/ptrace.h>
-#include <cxxabi.h>
-#include <dlfcn.h>
-#include <execinfo.h>
+#   include <sys/user.h>
+#   include <sys/ptrace.h>
+#   include <cxxabi.h>
+#   include <dlfcn.h>
+#   if __has_include(<execinfo.h>)
+#       include <execinfo.h>
+#   endif
+#elif defined(XR_PLATFORM_APPLE)
+#   include <sys/types.h>
+#   include <sys/ptrace.h>
+#   define PTRACE_TRACEME PT_TRACE_ME
+#   define PTRACE_DETACH PT_DETACH
 #endif
-#pragma comment(lib, "FaultRep.lib")
 
 #ifdef DEBUG
 #define USE_OWN_ERROR_MESSAGE_WINDOW
@@ -182,8 +182,10 @@ Lock xrDebug::failLock;
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
+#else
+#   error Select or add implementation for your platform
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
@@ -296,7 +298,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 {
     ScopeLock Lock(&dbgHelpLock);
 
-    SStringVec traceResult;
+    xr_vector<xr_string> traceResult;
     STACKFRAME stackFrame = {};
     xr_string frameStr;
 
@@ -341,7 +343,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 }
 #endif // defined(XR_PLATFORM_WINDOWS)
 
-SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
+xr_vector<xr_string> xrDebug::BuildStackTrace(u16 maxFramesCount)
 {
 #if defined(XR_PLATFORM_WINDOWS)
     CONTEXT currentThreadCtx = {};
@@ -358,7 +360,7 @@ SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
 
 void xrDebug::LogStackTrace(const char* header)
 {
-    SStringVec stackTrace = BuildStackTrace();
+    xr_vector<xr_string> stackTrace = BuildStackTrace();
     Msg("%s", header);
     for (const auto& frame : stackTrace)
     {
@@ -428,7 +430,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) && __has_include(<execinfo.h>)
     void *array[20];
     int nptrs = backtrace(array, 20);     // get void*'s for all entries on the stack
     char **strings = backtrace_symbols(array, nptrs);
@@ -437,7 +439,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
     {
         size_t demangledBufSize = 0;
         char* demangledName = nullptr;
-        for (size_t i = 0; i < nptrs; i++)
+        for (int i = 0; i < nptrs; i++)
         {
             char* functionName = strings[i];
 
@@ -456,9 +458,9 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
                 }
             }
             Log(functionName);
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
+#   ifdef USE_OWN_ERROR_MESSAGE_WINDOW
             buffer += xr_sprintf(buffer, bufferSize, "%s\n", functionName);
-#endif // USE_OWN_ERROR_MESSAGE_WINDOW
+#   endif // USE_OWN_ERROR_MESSAGE_WINDOW
         }
         ::free(demangledName);
     }
@@ -586,8 +588,8 @@ void xrDebug::DoExit(const std::string& message)
 LPCSTR xrDebug::ErrorToString(long code)
 {
     const char* result = nullptr;
-    static string1024 descStorage;
 #if defined(XR_PLATFORM_WINDOWS)
+    static string1024 descStorage;
     DXGetErrorDescription(code, descStorage, sizeof(descStorage));
     if (!result)
     {
@@ -853,10 +855,10 @@ static void handler_base(const char* reason)
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }
 
+#if defined(XR_PLATFORM_WINDOWS)
 static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* function, const wchar_t* file,
                                       unsigned int line, uintptr_t reserved)
 {
-#if defined(XR_PLATFORM_WINDOWS)
     bool ignoreAlways = false;
     string4096 mbExpression;
     string4096 mbFunction;
@@ -878,10 +880,13 @@ static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* 
         xr_strcpy(mbFile, __FILE__);
     }
     xrDebug::Fail(ignoreAlways, {mbFile, int(line), mbFunction}, mbExpression, "invalid parameter");
-#endif
 }
+#endif
 
+#if defined(XR_PLATFORM_WINDOWS)
 static void pure_call_handler() { handler_base("pure virtual function call"); }
+#endif
+
 #ifdef XRAY_USE_EXCEPTIONS
 static void unexpected_handler() { handler_base("unexpected program termination"); }
 #endif
@@ -901,12 +906,12 @@ void xrDebug::OnThreadSpawn()
     // std::set_terminate(_terminate);
 #endif
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
-    signal(SIGABRT, abort_handler);
-    signal(SIGABRT_COMPAT, abort_handler);
-    signal(SIGFPE, floating_point_handler);
-    signal(SIGILL, illegal_instruction_handler);
-    signal(SIGINT, 0);
-    signal(SIGTERM, termination_handler);
+    std::signal(SIGABRT, abort_handler);
+    std::signal(SIGABRT_COMPAT, abort_handler);
+    std::signal(SIGFPE, floating_point_handler);
+    std::signal(SIGILL, illegal_instruction_handler);
+    std::signal(SIGINT, 0);
+    std::signal(SIGTERM, termination_handler);
     _set_invalid_parameter_handler(&invalid_parameter_handler);
     _set_new_mode(1);
     _set_new_handler(&out_of_memory_handler);
@@ -915,12 +920,12 @@ void xrDebug::OnThreadSpawn()
     std::set_unexpected(_terminate);
 #endif
 #else //XR_PLATFORM_WINDOWS
-    signal(SIGABRT, abort_handler);
-    signal(SIGFPE, floating_point_handler);
-    signal(SIGILL, illegal_instruction_handler);
-    signal(SIGINT, 0);
-    signal(SIGTERM, termination_handler);
-    signal(SIGSEGV, segmentation_fault_handler);
+    std::signal(SIGABRT, abort_handler);
+    std::signal(SIGFPE, floating_point_handler);
+    std::signal(SIGILL, illegal_instruction_handler);
+    std::signal(SIGINT, 0);
+    std::signal(SIGTERM, termination_handler);
+    std::signal(SIGSEGV, segmentation_fault_handler);
 #endif
 }
 

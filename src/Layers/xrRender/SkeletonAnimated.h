@@ -75,9 +75,9 @@ public:
 #else
 private:
 #endif
-    u32 Update_LastTime;
+    u32 Update_LastTime{};
 
-    CBlendInstance* blend_instances;
+    CBlendInstance* blend_instances{};
 
     struct SMotionsSlot
     {
@@ -87,10 +87,10 @@ private:
     using MotionsSlotVec = xr_vector<SMotionsSlot>;
     MotionsSlotVec m_Motions;
 
-    CPartition* m_Partition;
+    CPartition* m_Partition{};
 
-    IBlendDestroyCallback* m_blend_destroy_callback;
-    IUpdateTracksCallback* m_update_tracks_callback;
+    IBlendDestroyCallback* m_blend_destroy_callback{};
+    IUpdateTracksCallback* m_update_tracks_callback{};
     // Blending
     svector<CBlend, MAX_BLENDED_POOL> blend_pool;
     BlendSVec blend_cycles[MAX_PARTS];
@@ -204,7 +204,6 @@ public:
     virtual IRenderVisual* dcast_RenderVisual() { return this; }
     virtual IKinematics* dcast_PKinematics() { return this; }
     virtual ~CKinematicsAnimated();
-    CKinematicsAnimated();
 
     virtual u32 mem_usage(bool bInstance)
     {

@@ -18,7 +18,7 @@ class IRenderVisual;
 class IKinematics;
 class IGameFont;
 class IPerformanceAlert;
-template <class T> class _box2; typedef _box2<float> Fbox2;
+struct Fbox2;
 struct Fcolor;
 class IReader;
 class CMemoryWriter;
@@ -284,6 +284,7 @@ public:
     bool m_hq_skinning;
     s32 m_skinning;
     s32 m_MSAASample;
+    u32 m_SMAPSize;
 
     BENCH_SEC_SCRAMBLEMEMBER1
 
@@ -440,7 +441,7 @@ public:
     virtual DeviceState GetDeviceState() = 0;
     virtual bool GetForceGPU_REF() = 0;
     virtual u32 GetCacheStatPolys() = 0;
-    virtual void BeforeFrame() = 0;
+    virtual void BeforeRender() = 0;
     virtual void Begin() = 0;
     virtual void Clear() = 0;
     virtual void End() = 0;

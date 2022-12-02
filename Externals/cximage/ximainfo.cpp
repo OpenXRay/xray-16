@@ -5,8 +5,11 @@
 
 #include "ximage.h"
 
-#if !defined(WIN32)
+#if defined(WIN32) || defined(_WIN32_WCE)
+#include <tchar.h>
+#else
 #define _tcsnicmp(a,b,c) strcasecmp(a,b)
+#define _T(x) x
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -721,32 +724,32 @@ CxImage * CxImage::GetFrame(long nFrame) const
 	return ppFrames[nFrame];
 }
 ////////////////////////////////////////////////////////////////////////////////
-short CxImage::ntohs(const short word)
+short CxImage::cx_ntohs(const short word)
 {
 	if (info.bLittleEndianHost) return word;
 	return ( (word & 0xff) << 8 ) | ( (word >> 8) & 0xff );
 }
 ////////////////////////////////////////////////////////////////////////////////
-long CxImage::ntohl(const long dword)
+long CxImage::cx_ntohl(const long dword)
 {
 	if (info.bLittleEndianHost) return dword;
 	return  ((dword & 0xff) << 24 ) | ((dword & 0xff00) << 8 ) |
 			((dword >> 8) & 0xff00) | ((dword >> 24) & 0xff);
 }
 ////////////////////////////////////////////////////////////////////////////////
-void CxImage::bihtoh(BITMAPINFOHEADER* bih)
+void CxImage::cx_bihtoh(BITMAPINFOHEADER* bih)
 {
-	bih->biSize = ntohl(bih->biSize);
-	bih->biWidth = ntohl(bih->biWidth);
-	bih->biHeight = ntohl(bih->biHeight);
-	bih->biPlanes = ntohs(bih->biPlanes);
-	bih->biBitCount = ntohs(bih->biBitCount);
-	bih->biCompression = ntohl(bih->biCompression);
-	bih->biSizeImage = ntohl(bih->biSizeImage);
-	bih->biXPelsPerMeter = ntohl(bih->biXPelsPerMeter);
-	bih->biYPelsPerMeter = ntohl(bih->biYPelsPerMeter);
-	bih->biClrUsed = ntohl(bih->biClrUsed);
-	bih->biClrImportant = ntohl(bih->biClrImportant);
+	bih->biSize = cx_ntohl(bih->biSize);
+	bih->biWidth = cx_ntohl(bih->biWidth);
+	bih->biHeight = cx_ntohl(bih->biHeight);
+	bih->biPlanes = cx_ntohs(bih->biPlanes);
+	bih->biBitCount = cx_ntohs(bih->biBitCount);
+	bih->biCompression = cx_ntohl(bih->biCompression);
+	bih->biSizeImage = cx_ntohl(bih->biSizeImage);
+	bih->biXPelsPerMeter = cx_ntohl(bih->biXPelsPerMeter);
+	bih->biYPelsPerMeter = cx_ntohl(bih->biYPelsPerMeter);
+	bih->biClrUsed = cx_ntohl(bih->biClrUsed);
+	bih->biClrImportant = cx_ntohl(bih->biClrImportant);
 }
 ////////////////////////////////////////////////////////////////////////////////
 /**
@@ -919,3 +922,8 @@ const TCHAR* CxImage::GetVersion()
 	return (CxImageVersion);
 }
 ////////////////////////////////////////////////////////////////////////////////
+
+#if !defined(WIN32) && !defined(_WIN32_WCE)
+#undef _tcsnicmp
+#undef _T
+#endif

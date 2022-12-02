@@ -7,8 +7,6 @@
 #define _WIN32_WINNT _WIN32_WINNT_WIN7
 #endif
 
-#include <sys/utime.h>
-
 #define NOGDICAPMASKS
 //#define NOSYSMETRICS
 #define NOMENUS
@@ -31,7 +29,6 @@
 #define _WIN32_DCOM
 
 #include <windows.h>
-#include <windowsx.h>
 #include <ctime>
 
 #define xr_fs_strlwr(str) xr_strlwr(str)

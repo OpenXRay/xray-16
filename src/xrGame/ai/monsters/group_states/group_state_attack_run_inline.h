@@ -4,8 +4,7 @@
 #include "ai/monsters/ai_monster_squad_manager.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateGroupAttackRunAbstract CStateGroupAttackRun<_Object>
 
@@ -251,3 +250,6 @@ bool CStateGroupAttackRunAbstract::check_start_conditions()
 
     return false;
 }
+
+#undef TEMPLATE_SPECIALIZATION
+#undef CStateGroupAttackRunAbstract

@@ -9,10 +9,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#pragma hdrstop
-#include "SDL.h"
+
 #include "os_clipboard.h"
 #include "Text/StringConversion.hpp"
+
+#include <SDL.h>
+
+#include <locale>
 
 void os_clipboard::copy_to_clipboard(pcstr buf, bool alreadyUTF8 /*= false*/)
 {
@@ -60,7 +63,7 @@ void os_clipboard::paste_from_clipboard(pstr buffer, size_t buffer_size)
     for (size_t i = 0; i < length; ++i)
     {
         const char c = buffer[i];
-        if (std::isprint(c, locale) == 0 && c != char(-1) || c == '\t' || c == '\n') // "я" = -1
+        if ((std::isprint(c, locale) == 0 && c != char(-1)) || c == '\t' || c == '\n') // "я" = -1
         {
             buffer[i] = ' ';
         }

@@ -3,6 +3,10 @@
 template <typename _Object>
 class CStateMonsterHittedHide : public CState<_Object>
 {
+    static constexpr float GOOD_DISTANCE_IN_COVER = 15.f;
+    static constexpr float MIN_HIDE_TIME = 3.f;
+
+private:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
 

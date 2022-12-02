@@ -632,11 +632,6 @@ void CKinematicsAnimated::Release()
 }
 
 CKinematicsAnimated::~CKinematicsAnimated() { IBoneInstances_Destroy(); }
-CKinematicsAnimated::CKinematicsAnimated()
-    : CKinematics(), IKinematicsAnimated(), blend_instances(nullptr), m_Partition(nullptr), m_blend_destroy_callback(nullptr),
-      m_update_tracks_callback(nullptr), Update_LastTime(0)
-{
-}
 
 void CKinematicsAnimated::IBoneInstances_Create()
 {

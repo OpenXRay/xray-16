@@ -15,11 +15,14 @@
 #include "ai/monsters/basemonster/base_monster.h"
 #include "xrEngine/IGame_Persistent.h"
 
-#define RECT_SIZE 11
+namespace detail::weapon::binoculars::vision
+{
+static constexpr float RECT_SIZE = 11.f;
 
-extern u32 C_ON_ENEMY;
-extern u32 C_ON_NEUTRAL;
-extern u32 C_ON_FRIEND;
+static constexpr u32 C_ON_ENEMY   = color_rgba(0xff, 0, 0, 0x80);
+static constexpr u32 C_ON_NEUTRAL = color_rgba(0xff, 0xff, 0x80, 0x80);
+static constexpr u32 C_ON_FRIEND  = color_rgba(0, 0xff, 0, 0x80);
+}
 
 struct FindVisObjByObject
 {
@@ -30,7 +33,9 @@ struct FindVisObjByObject
 
 void SBinocVisibleObj::create_default(u32 color)
 {
-    Frect r = {0, 0, RECT_SIZE, RECT_SIZE};
+    using namespace ::detail::weapon::binoculars::vision;
+
+    Frect r = { 0, 0, RECT_SIZE, RECT_SIZE };
     m_lt.InitTexture("ui" DELIMITER "ui_enemy_frame");
     m_lt.SetWndRect(r);
     m_lt.SetAlignment(waCenter);
@@ -73,6 +78,8 @@ void SBinocVisibleObj::Draw()
 
 void SBinocVisibleObj::Update()
 {
+    using namespace ::detail::weapon::binoculars::vision;
+
     m_flags.set(flVisObjNotValid, true);
 
     if (!m_object->Visual())

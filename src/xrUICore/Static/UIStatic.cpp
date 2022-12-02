@@ -24,15 +24,18 @@ void lanim_cont_xf::set_defaults()
     m_origSize.set(0, 0);
 }
 
-CUIStatic::CUIStatic()
-    : m_bTextureEnable(true), m_bStretchTexture(false), m_bHeading(false), m_bConstHeading(false), m_fHeading(0.0f),
-      m_pTextControl(NULL)
+CUIStatic::CUIStatic(pcstr window_name)
+    : CUIWindow(window_name), m_pTextControl(nullptr),
+      m_bStretchTexture(false), m_bTextureEnable(true),
+      m_bHeading(false), m_bConstHeading(false),
+      m_fHeading(0.0f)
 {
     m_TextureOffset.set(0.0f, 0.0f);
     m_lanim_xform.set_defaults();
 }
 
 CUIStatic::~CUIStatic() { xr_delete(m_pTextControl); }
+
 void CUIStatic::SetXformLightAnim(LPCSTR lanim, bool bCyclic)
 {
     if (lanim && lanim[0] != 0)
@@ -257,7 +260,8 @@ void CUIStatic::OnFocusLost()
 }
 
 //-------------------------------------
-CUITextWnd::CUITextWnd() {}
+CUITextWnd::CUITextWnd() : CUIWindow("CUITextWnd") {}
+
 void CUITextWnd::AdjustHeightToText()
 {
     if (!fsimilar(TextItemControl().m_wndSize.x, GetWidth()))

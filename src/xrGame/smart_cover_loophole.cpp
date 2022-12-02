@@ -6,23 +6,20 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
+
 #include "smart_cover_loophole.h"
 #include "Common/object_broker.h"
-#include "smart_cover_object.h"
-
-using smart_cover::loophole;
-using smart_cover::action;
-using smart_cover::detail::parse_string;
-using smart_cover::detail::parse_float;
-using smart_cover::detail::parse_table;
-using smart_cover::detail::parse_fvector;
-using smart_cover::detail::parse_bool;
 
 namespace smart_cover
 {
+using detail::parse_string;
+using detail::parse_float;
+using detail::parse_table;
+using detail::parse_fvector;
+using detail::parse_bool;
+
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
 shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in);
-} // namespace smart_cover
 
 loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f)
 {
@@ -194,3 +191,4 @@ void loophole::exit_position(Fvector& position) const
     if (found != m_actions.end())
         position = found->second->target_position();
 }
+} // namespace smart_cover

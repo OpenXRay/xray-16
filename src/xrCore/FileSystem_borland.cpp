@@ -12,8 +12,6 @@
 
 #include <Shlobj.h>
 
-//#pragma comment(lib, "OSDialogB.lib")
-
 int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
     if (uMsg == BFFM_INITIALIZED)

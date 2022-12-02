@@ -2,9 +2,6 @@
 
 #include "Level.h"
 
-#define GOOD_DISTANCE_FOR_TELE 15.f
-#define MAX_TIME_CHECK_FAILURE 6000
-
 template <typename Object>
 CStateBurerAttackTele<Object>::CStateBurerAttackTele(Object* obj)
     : inherited(obj), selected_object(nullptr), time_started(0),
@@ -28,7 +25,7 @@ void CStateBurerAttackTele<Object>::initialize()
     m_anim_end_tick = 0;
     m_last_grenade_scan = 0;
     m_initial_health = this->object->conditions().GetHealth();
-    m_end_tick = current_time() + this->object->m_tele_max_time;
+    m_end_tick = xr_current_time() + this->object->m_tele_max_time;
 
     // запретить взятие скриптом
     this->object->set_script_capture(false);
@@ -40,7 +37,7 @@ void CStateBurerAttackTele<Object>::execute()
     HandleGrenades();
     // 	if ( object->EnemyMan.see_enemy_now() )
     // 	{
-    // 		m_last_saw_enemy_tick					=	current_time();
+    // 		m_last_saw_enemy_tick					=	xr_current_time();
     // 	}
 
     switch (m_action)
@@ -50,12 +47,12 @@ void CStateBurerAttackTele<Object>::execute()
         if (!time_started)
         {
             float const time = this->object->anim().get_animation_length(eAnimTelekinesis, 0);
-            m_anim_end_tick = current_time() + TTime(time * 1000);
+            m_anim_end_tick = xr_current_time() + TTime(time * 1000);
             time_started = Device.dwTimeGlobal;
         }
         else
         {
-            if (current_time() > m_anim_end_tick)
+            if (xr_current_time() > m_anim_end_tick)
             {
                 m_action = ACTION_TELE_CONTINUE;
             }
@@ -72,14 +69,14 @@ void CStateBurerAttackTele<Object>::execute()
         this->object->anim().set_override_animation(eAnimTeleFire, 0);
         ExecuteTeleFire();
         float const time = this->object->anim().get_animation_length(eAnimTeleFire, 0);
-        m_anim_end_tick = current_time() + TTime(time * 1000);
+        m_anim_end_tick = xr_current_time() + TTime(time * 1000);
         m_action = ACTION_WAIT_FIRE_END;
         break;
     }
 
     case ACTION_WAIT_FIRE_END:
         this->object->anim().set_override_animation(eAnimTeleFire, 0);
-        if (current_time() > m_anim_end_tick)
+        if (xr_current_time() > m_anim_end_tick)
         {
             if (IsActiveObjects())
             {
@@ -174,7 +171,7 @@ bool CStateBurerAttackTele<Object>::check_completion()
         return true;
     }
 
-    if (current_time() > m_end_tick)
+    if (xr_current_time() > m_end_tick)
     {
         return true;
     }
@@ -323,9 +320,6 @@ void CStateBurerAttackTele<Object>::ExecuteTeleContinue()
     }
 }
 
-#define HEAD_OFFSET_INDOOR 1.f
-#define HEAD_OFFSET_OUTDOOR 5.f
-
 template <typename Object>
 void CStateBurerAttackTele<Object>::ExecuteTeleFire()
 {
@@ -374,6 +368,9 @@ bool CStateBurerAttackTele<Object>::CheckTeleStart()
 //////////////////////////////////////////////////////////////////////////
 // Выбор подходящих объектов для телекинеза
 //////////////////////////////////////////////////////////////////////////
+namespace detail::burer_attack_tele
+{
+/*
 class best_object_predicate
 {
     Fvector enemy_pos;
@@ -393,8 +390,9 @@ public:
         const float dist3 = enemy_pos.distance_to(monster_pos);
 
         return dist1 < dist3 && dist2 > dist3;
-    };
+    }
 };
+*/
 
 class best_object_predicate2
 {
@@ -416,12 +414,17 @@ public:
         return dist1 < dist2;
     }
 };
+} // namespace detail::burer_attack_tele
 
 template <typename Object>
 void CStateBurerAttackTele<Object>::SelectObjects()
 {
     std::sort(tele_objects.begin(), tele_objects.end(),
-        best_object_predicate2(this->object->Position(), this->object->EnemyMan.get_enemy()->Position()));
+        ::detail::burer_attack_tele::best_object_predicate2(
+            this->object->Position(),
+            this->object->EnemyMan.get_enemy()->Position()
+        )
+    );
 
     // выбрать объект
     for (u32 i = 0; i < tele_objects.size(); ++i)
@@ -466,7 +469,7 @@ void CStateBurerAttackTele<Object>::OnGrenadeDestroyed(CGrenade* const grenade)
 template <typename Object>
 void CStateBurerAttackTele<Object>::HandleGrenades()
 {
-    if (current_time() < m_last_grenade_scan + 1000)
+    if (xr_current_time() < m_last_grenade_scan + 1000)
     {
         return;
     }

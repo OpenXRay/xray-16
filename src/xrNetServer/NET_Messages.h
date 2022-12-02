@@ -6,11 +6,11 @@
 IC u32 net_flags(
     bool bReliable = false, bool bSequental = true, bool bHighPriority = false, bool bSendImmediatelly = false)
 {
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
-    return 0;
-#else
+#ifdef XR_PLATFORM_WINDOWS
     return (bReliable ? DPNSEND_GUARANTEED : DPNSEND_NOCOMPLETE) | (bSequental ? 0 : DPNSEND_NONSEQUENTIAL) |
         (bHighPriority ? DPNSEND_PRIORITY_HIGH : 0) | (bSendImmediatelly ? DPNSEND_IMMEDIATELLY : 0);
+#else // XXX: multiplayer on other platforms...
+    return 0;
 #endif
 }
 

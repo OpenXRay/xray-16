@@ -103,7 +103,7 @@ static int solve_R_angle(const float g[3], const float s[3], const float t[3], c
     b += b;
     c = rhs - (c + c);
 
-    n = solve_trig1(a, b, c, temp);
+    n = mathTrig::solve_trig1(a, b, c, temp);
 
     if (n == 2)
     {
@@ -158,8 +158,7 @@ static int solve_R_angle(const float g[3], const float s[3], const float t[3], c
 float get_circle_equation(const float ee[3], const float axis[3], const float pos_axis[3], float upper_len,
     float lower_len, float c[3], float u[3], float v[3], float n[3])
 {
-    float wn = norm((float*)ee);
-    float radius;
+    const float wn = norm((float*)ee);
 
     cpvector(n, ee);
     unitize(n);
@@ -169,13 +168,13 @@ float get_circle_equation(const float ee[3], const float axis[3], const float po
 
     float alpha;
 
-    if (!law_of_cosines(wn, upper_len, lower_len, alpha))
+    if (!mathTrig::law_of_cosines(wn, upper_len, lower_len, alpha))
         return 0;
 
     // center of circle (origin is location of first S joint)
     vecscalarmult(c, n, _cos(alpha) * upper_len);
 
-    radius = _sin(alpha) * upper_len;
+    const float radius = _sin(alpha) * upper_len;
 
     float temp[3];
 

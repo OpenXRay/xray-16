@@ -5,6 +5,10 @@
 template <typename _Object>
 class CStateMonsterHittedMoveOut : public CState<_Object>
 {
+    static constexpr float DIST_TO_PATH_END = 1.5f;
+    static constexpr float DIST_TO_HIT_POINT = 3.f;
+
+private:
     typedef CState<_Object> inherited;
     typedef CState<_Object>* state_ptr;
 

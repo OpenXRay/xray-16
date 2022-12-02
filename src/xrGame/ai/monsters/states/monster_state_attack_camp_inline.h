@@ -7,8 +7,7 @@
 #include "ai/monsters/monster_cover_manager.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterAttackCampAbstract CStateMonsterAttackCamp<_Object>
 
@@ -67,8 +66,6 @@ bool CStateMonsterAttackCampAbstract::check_completion()
 
     return false;
 }
-
-#define MIN_DISTANCE_TO_ENEMY 20.f
 
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackCampAbstract::check_start_conditions()
@@ -174,6 +171,6 @@ void CStateMonsterAttackCampAbstract::setup_substates()
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterAttackCampAbstract::check_force_state() {}
+
 #undef TEMPLATE_SPECIALIZATION
 #undef CStateMonsterAttackCampAbstract
-#undef MIN_DISTANCE_TO_ENEMY

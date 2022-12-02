@@ -5,6 +5,12 @@
 template <typename Object>
 class CStateBurerAttackTele : public CState<Object>
 {
+    static constexpr u32 MAX_TIME_CHECK_FAILURE = 6000;
+    //static constexpr float GOOD_DISTANCE_FOR_TELE = 15.f;
+    //static constexpr float HEAD_OFFSET_INDOOR = 1.f;
+    //static constexpr float HEAD_OFFSET_OUTDOOR = 5.f;
+
+private:
     typedef CState<Object> inherited;
 
     xr_vector<CPhysicsShellHolder*> tele_objects;

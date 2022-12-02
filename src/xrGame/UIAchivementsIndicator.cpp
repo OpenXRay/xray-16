@@ -6,7 +6,7 @@
 #include "ui/UIPdaMsgListItem.h"
 #include "profile_data_types.h"
 
-CUIAchivementIndicator::CUIAchivementIndicator()
+CUIAchivementIndicator::CUIAchivementIndicator() : CUIWindow("CUIAchivementIndicator")
 {
     m_achivement_log = xr_new<CUIGameLog>();
     AttachChild(m_achivement_log);

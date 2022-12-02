@@ -187,16 +187,15 @@ void CTelekinesis::PhDataUpdate(float step)
     }
 }
 
-static bool RemovePred(CTelekineticObject* tele_object)
-{
-    return (!tele_object->get_object() || tele_object->get_object()->getDestroy() ||
-        !tele_object->get_object()->PPhysicsShell() || !tele_object->get_object()->PPhysicsShell()->isActive());
-}
-
 void CTelekinesis::clear_notrelevant()
 {
     //убрать все объеты со старыми параметрами
-    objects.erase(std::remove_if(objects.begin(), objects.end(), &RemovePred), objects.end());
+    const auto it = std::remove_if(objects.begin(), objects.end(), [](CTelekineticObject* tele_object)
+    {
+        return (!tele_object->get_object() || tele_object->get_object()->getDestroy() ||
+            !tele_object->get_object()->PPhysicsShell() || !tele_object->get_object()->PPhysicsShell()->isActive());
+    });
+    objects.erase(it, objects.end());
 }
 
 void CTelekinesis::PhTune(float step)

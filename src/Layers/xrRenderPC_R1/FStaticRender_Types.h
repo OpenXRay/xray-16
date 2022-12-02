@@ -18,3 +18,7 @@
 
 #define r1_RT_async_ss "$user$async_ss" // surface
 
+#define r2_T_sky0 "$user$sky0"
+#define r2_T_sky1 "$user$sky1"
+
+#define r2_RT_luminance_cur "$user$tonemap" // --- result

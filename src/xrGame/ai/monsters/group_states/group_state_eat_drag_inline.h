@@ -5,8 +5,7 @@
 #include "Common/Noncopyable.hpp"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateGroupDragAbstract CStateGroupDrag<_Object>
 

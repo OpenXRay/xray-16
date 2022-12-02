@@ -100,8 +100,6 @@ class CBulletManager
     collide::rq_results rq_storage;
     collide::rq_results m_rq_results;
 
-    using SoundVec = xr_vector<ref_sound>;
-    using BulletVec = xr_vector<SBullet>;
     friend CLevel;
 
     enum EventType
@@ -126,14 +124,14 @@ class CBulletManager
     static void CalculateNewVelocity(Fvector& dest_new_vel, Fvector const& old_velocity, float ar, float life_time);
 
 protected:
-    SoundVec m_WhineSounds;
-    RStringVec m_ExplodeParticles;
+    xr_vector<ref_sound> m_WhineSounds;
+    xr_vector<shared_str> m_ExplodeParticles;
 
     //список пуль находящихся в данный момент на уровне
     //.	Lock		m_Lock				;
 
-    BulletVec m_Bullets; // working set, locked
-    BulletVec m_BulletsRendered; // copy for rendering
+    xr_vector<SBullet> m_Bullets; // working set, locked
+    xr_vector<SBullet> m_BulletsRendered; // copy for rendering
     xr_vector<_event> m_Events;
 
 #ifdef DEBUG

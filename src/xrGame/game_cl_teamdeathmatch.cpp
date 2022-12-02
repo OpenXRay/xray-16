@@ -16,10 +16,16 @@
 #include "clsid_game.h"
 #include "ui/UIActorMenu.h"
 
-#define MESSAGE_MENUS "tdm_messages_menu"
 
 #include "game_cl_teamdeathmatch_snd_messages.h"
 #include "reward_event_generator.h"
+
+namespace detail::mp::tdm
+{
+static constexpr pcstr MESSAGE_MENUS = "tdm_messages_menu";
+static constexpr pcstr FRIEND_LOCATION = "mp_friend_location";
+static constexpr u32   PLAYER_NAME_COLOR = 0xff40ff40;
+}
 
 const shared_str game_cl_TeamDeathmatch::GetTeamMenu(s16 team)
 {
@@ -175,7 +181,7 @@ CUIGameCustom* game_cl_TeamDeathmatch::createGameUI()
     R_ASSERT(m_game_ui);
     m_game_ui->Load();
     m_game_ui->SetClGame(this);
-    LoadMessagesMenu(MESSAGE_MENUS);
+    LoadMessagesMenu(::detail::mp::tdm::MESSAGE_MENUS);
     return m_game_ui;
 }
 
@@ -506,7 +512,6 @@ bool game_cl_TeamDeathmatch::IsEnemy(game_PlayerState* ps)
 };
 
 bool game_cl_TeamDeathmatch::IsEnemy(CEntityAlive* ea1, CEntityAlive* ea2) { return (ea1->g_Team() != ea2->g_Team()); };
-#define PLAYER_NAME_COLOR 0xff40ff40
 
 void game_cl_TeamDeathmatch::OnRender()
 {
@@ -540,7 +545,7 @@ void game_cl_TeamDeathmatch::OnRender()
                 VERIFY(pActor);
                 Fvector IPos = pTS->IndicatorPos;
                 IPos.y -= pTS->Indicator_r2;
-                pActor->RenderText(ps->getName(), IPos, &dup, PLAYER_NAME_COLOR);
+                pActor->RenderText(ps->getName(), IPos, &dup, ::detail::mp::tdm::PLAYER_NAME_COLOR);
             }
             if (m_bFriendlyIndicators)
             {
@@ -637,10 +642,10 @@ BOOL game_cl_TeamDeathmatch::CanCallTeamSelectMenu()
     return TRUE;
 };
 
-#define FRIEND_LOCATION "mp_friend_location"
-
 void game_cl_TeamDeathmatch::UpdateMapLocations()
 {
+    using namespace ::detail::mp::tdm;
+
     inherited::UpdateMapLocations();
     if (local_player)
     {

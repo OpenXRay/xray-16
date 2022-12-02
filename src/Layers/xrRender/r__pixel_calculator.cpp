@@ -35,9 +35,11 @@ void r_pixel_calculator::end()
     rt = nullptr;
 }
 
-//                                  +X,                -X,                +Y,                 -Y,                +Z,                -Z
-static Fvector cmNorm[6] = { { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, -1.f }, { 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f } };
-static Fvector cmDir [6] = { { 1.f, 0.f, 0.f }, {-1.f, 0.f, 0.f }, { 0.f, 1.f,  0.f }, { 0.f,-1.f, 0.f }, { 0.f, 0.f, 1.f }, { 0.f, 0.f,-1.f } };
+#if defined(USE_DX9) || defined(USE_DX11)
+// +X, -X, +Y, -Y, +Z, -Z
+extern Fvector cmNorm[6];
+extern Fvector cmDir [6];
+#endif
 
 r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
 {

@@ -13,9 +13,10 @@
 #include "ide.hpp"
 #include "editor_environment_detail.hpp"
 
-using editor::environment::suns::flare;
+namespace editor::environment::suns
+{
+flare::flare() : m_property_holder(nullptr), m_texture(""), m_opacity(0.f), m_position(0.f), m_radius(0.f) {}
 
-flare::flare() : m_property_holder(0), m_opacity(0.f), m_position(0.f), m_radius(0.f), m_texture("") {}
 flare::~flare()
 {
     if (!Device.editor())
@@ -43,4 +44,4 @@ void flare::fill(XRay::Editor::property_holder_collection* collection)
 
     properties->add_property("radius", "flare", "this option is responsible for gradient radius", m_radius, m_radius);
 }
-
+} // editor::environment::suns

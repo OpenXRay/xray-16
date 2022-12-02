@@ -8,5 +8,3 @@
 #include <stdlib.h>
 #include <objbase.h>
 #include <d3d9.h>
-
-#pragma warning(disable : 4996)
