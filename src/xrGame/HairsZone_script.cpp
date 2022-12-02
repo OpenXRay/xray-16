@@ -4,10 +4,10 @@
 #include "NoGravityZone.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CHairsZone, (CGameObject),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CHairsZone, CGameObject>("CHairsZone")
