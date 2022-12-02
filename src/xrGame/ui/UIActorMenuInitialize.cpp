@@ -210,7 +210,7 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
         { eTrashList,              "dragdrop_trash",           nullptr,               nullptr,                   nullptr,            false },
 
-        { eInventorybackpackList,  "dragdrop_backpack",        nullptr,               "backpack_slot_highlight", nullptr,            false },
+        { eInventoryBackpackList,  "dragdrop_backpack",        nullptr,               "backpack_slot_highlight", nullptr,            false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
@@ -317,7 +317,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
         // { id,                   "xml_section_name",   parent }
         { eInventoryPistolList,    "dragdrop_pistol",    m_pInventoryWnd },
         { eInventoryAutomaticList, "dragdrop_automatic", m_pInventoryWnd },
-        { eInventorybackpackList,  "dragdrop_backpack",  m_pInventoryWnd },
+        { eInventoryBackpackList,  "dragdrop_backpack",  m_pInventoryWnd },
         { eInventoryOutfitList,    "dragdrop_outfit",    m_pInventoryWnd },
         { eInventoryBeltList,      "dragdrop_belt",      m_pInventoryWnd },
         { eInventoryBagList,       "dragdrop_bag",       m_ActorWeightBar->m_BagWnd },
@@ -504,7 +504,7 @@ void CUIActorMenu::InitCallbacks()
     BindDragDropListEvents(m_pLists[eInventoryPistolList]);
     BindDragDropListEvents(m_pLists[eInventoryAutomaticList]);
 
-    BindDragDropListEvents(m_pLists[eInventorybackpackList]);
+    BindDragDropListEvents(m_pLists[eInventoryBackpackList]);
     BindDragDropListEvents(m_pLists[eInventoryOutfitList]);
     BindDragDropListEvents(m_pLists[eInventoryHelmetList]);
 

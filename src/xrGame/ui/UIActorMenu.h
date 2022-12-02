@@ -87,7 +87,7 @@ protected:
         eInventoryPistolList,
         eInventoryAutomaticList,
 
-        eInventorybackpackList,
+        eInventoryBackpackList,
         eInventoryOutfitList,
         eInventoryHelmetList,
 

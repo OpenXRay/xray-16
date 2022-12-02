@@ -320,7 +320,7 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
         return iActorSlot;
     if (l == m_pLists[eInventoryPistolList])
         return iActorSlot;
-    if (l == m_pLists[eInventorybackpackList] && m_pLists[eInventoryHelmetList] != nullptr)
+    if (l == m_pLists[eInventoryBackpackList] && m_pLists[eInventoryHelmetList] != nullptr)
         return iActorSlot;
     if (l == m_pLists[eInventoryOutfitList])
         return iActorSlot;
@@ -532,8 +532,8 @@ void CUIActorMenu::clear_highlight_lists()
     m_pLists[eInventoryAutomaticList]->Highlight(false);
     if (m_pLists[eInventoryHelmetList])
         m_pLists[eInventoryHelmetList]->Highlight(false);
-    if (m_pLists[eInventorybackpackList])
-        m_pLists[eInventorybackpackList]->Highlight(false);
+    if (m_pLists[eInventoryBackpackList])
+        m_pLists[eInventoryBackpackList]->Highlight(false);
     m_pLists[eInventoryOutfitList]->Highlight(false);
     if (m_pLists[eInventoryDetectorList])
         m_pLists[eInventoryDetectorList]->Highlight(false);
@@ -592,8 +592,8 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
     }
     if (backpack && slot_id == BACKPACK_SLOT)
     {
-        if (m_pLists[eInventorybackpackList])
-            m_pLists[eInventorybackpackList]->Highlight(true);
+        if (m_pLists[eInventoryBackpackList])
+            m_pLists[eInventoryBackpackList]->Highlight(true);
         return;
     }
     if (outfit && slot_id == OUTFIT_SLOT)
@@ -874,8 +874,8 @@ void CUIActorMenu::ClearAllLists()
         m_pLists[eInventoryHelmetList]->ClearAll(true);
     if (m_pLists[eInventoryDetectorList])
         m_pLists[eInventoryDetectorList]->ClearAll(true);
-    if (m_pLists[eInventorybackpackList])
-        m_pLists[eInventorybackpackList]->ClearAll(true);
+    if (m_pLists[eInventoryBackpackList])
+        m_pLists[eInventoryBackpackList]->ClearAll(true);
     m_pLists[eInventoryPistolList]->ClearAll(true);
     m_pLists[eInventoryAutomaticList]->ClearAll(true);
     if (m_pQuickSlot)

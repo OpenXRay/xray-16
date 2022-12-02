@@ -45,7 +45,7 @@ void CUIActorMenu::InitInventoryMode()
     m_pLists[eInventoryOutfitList]->Show(true);
     ShowIfExist(m_pLists[eInventoryHelmetList], true);
     ShowIfExist(m_pLists[eInventoryDetectorList], true);
-    ShowIfExist(m_pLists[eInventorybackpackList], true);
+    ShowIfExist(m_pLists[eInventoryBackpackList], true);
     m_pLists[eInventoryPistolList]->Show(true);
     m_pLists[eInventoryAutomaticList]->Show(true);
     ShowIfExist(m_pQuickSlot, true);
@@ -237,7 +237,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
     CUIDragDropListEx* all_lists[] =
     {
         m_pLists[eInventoryBeltList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
-        m_pLists[eInventorybackpackList], m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList],
+        m_pLists[eInventoryBackpackList], m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList],
         m_pLists[eInventoryBagList], m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
     };
 
@@ -741,7 +741,7 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
 
     case INV_SLOT_3: return m_pLists[eInventoryAutomaticList]; break;
 
-    case BACKPACK_SLOT: return m_pLists[eInventorybackpackList]; break;
+    case BACKPACK_SLOT: return m_pLists[eInventoryBackpackList]; break;
 
     case OUTFIT_SLOT: return m_pLists[eInventoryOutfitList]; break;
 
