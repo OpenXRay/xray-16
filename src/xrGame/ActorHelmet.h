@@ -6,7 +6,7 @@ struct SBoneProtections;
 
 class CHelmet : public CInventoryItemObject
 {
-    friend static void CHelmet_Export(lua_State* luaState);
+    friend void CHelmet_Export(lua_State* luaState);
     using inherited = CInventoryItemObject;
 
 public:
