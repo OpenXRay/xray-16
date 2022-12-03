@@ -6,7 +6,7 @@ struct SBoneProtections;
 
 class CCustomOutfit : public CInventoryItemObject
 {
-    friend static void CCustomOutfit_Export(lua_State* luaState);
+    friend void CCustomOutfit_Export(lua_State* luaState);
     using inherited = CInventoryItemObject;
 
 public:
