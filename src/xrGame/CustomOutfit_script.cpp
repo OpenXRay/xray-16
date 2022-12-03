@@ -3,7 +3,7 @@
 #include "ActorHelmet.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-static void CCustomOutfit_Export(lua_State* luaState)
+void CCustomOutfit_Export(lua_State* luaState)
 {
     using namespace luabind;
 
@@ -37,7 +37,7 @@ static void CCustomOutfit_Export(lua_State* luaState)
 
 SCRIPT_EXPORT_FUNC(CCustomOutfit, (CGameObject), CCustomOutfit_Export);
 
-static void CHelmet_Export(lua_State* luaState)
+void CHelmet_Export(lua_State* luaState)
 {
     using namespace luabind;
 
