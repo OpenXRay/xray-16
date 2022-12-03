@@ -94,7 +94,6 @@ void CUIArtefactDetectorAdv::construct(CAdvancedDetector* p)
     m_bid = u16(-1);
 }
 
-CUIArtefactDetectorAdv::~CUIArtefactDetectorAdv() {}
 void CUIArtefactDetectorAdv::SetValue(const float val1, const Fvector& val2) { m_target_dir = val2; }
 void CUIArtefactDetectorAdv::update()
 {

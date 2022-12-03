@@ -4,7 +4,7 @@
 #include "UIXmlInit.h"
 #include "xrUICore/Static/UIStatic.h"
 
-CUIMapInfo::CUIMapInfo()
+CUIMapInfo::CUIMapInfo() : CUIWindow("CUIMapInfo")
 {
     m_view = xr_new<CUIScrollView>();
     AttachChild(m_view);

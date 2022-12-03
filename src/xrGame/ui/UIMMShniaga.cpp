@@ -18,7 +18,8 @@
 
 extern string_path g_last_saved_game;
 
-CUIMMMagnifer::CUIMMMagnifer() : m_bPP(false) {}
+CUIMMMagnifer::CUIMMMagnifer() : CUIStatic("CUIMMMagnifer") {}
+
 CUIMMMagnifer::~CUIMMMagnifer()
 {
     if (GetPPMode())
@@ -43,13 +44,13 @@ void CUIMMMagnifer::ResetPPMode()
 
 ////////////////////////////////////////////
 
-CUIMMShniaga::CUIMMShniaga()
+CUIMMShniaga::CUIMMShniaga() : CUIWindow("CUIMMShniaga")
 {
     m_sound = xr_new<CMMSound>();
 
     m_view = xr_new<CUIScrollView>();
     AttachChild(m_view);
-    m_shniaga = xr_new<CUIStatic>();
+    m_shniaga = xr_new<CUIStatic>("Shniaga");
     AttachChild(m_shniaga);
     m_magnifier = xr_new<CUIMMMagnifer>();
     m_shniaga->AttachChild(m_magnifier);

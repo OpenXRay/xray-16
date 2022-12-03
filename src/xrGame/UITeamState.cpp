@@ -12,8 +12,10 @@
 
 #include "game_cl_mp.h"
 
-UITeamState::UITeamState() { m_artefact_count = 0; }
+UITeamState::UITeamState() : CUIWindow("UITeamState") { m_artefact_count = 0; }
+
 UITeamState::UITeamState(ETeam teamId, UITeamPanels* teamPanels)
+    : CUIWindow("UITeamState")
 {
     myTeam = teamId;
     /*myScrollList = new CUIScrollView();

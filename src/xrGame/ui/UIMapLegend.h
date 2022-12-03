@@ -19,14 +19,14 @@ class CUICheckButton;
 class CUIFrameLineWnd;
 class UIHint;
 
-class UIMapLegend : public CUIWindow
+class UIMapLegend final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
 
 public:
     UIMapLegend();
-    virtual ~UIMapLegend();
+    ~UIMapLegend() override;
 
     void init_from_xml(CUIXml& xml, LPCSTR path);
 
@@ -44,14 +44,13 @@ private: // m_
 
 // -------------------------------------------------------------------------------------------------
 
-class UIMapLegendItem : public CUIWindow
+class UIMapLegendItem final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
 
 public:
     UIMapLegendItem();
-    virtual ~UIMapLegendItem();
 
     void init_from_xml(CUIXml& xml, int index);
     //	virtual void	Update				();

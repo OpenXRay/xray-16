@@ -22,6 +22,7 @@
 #include "UIHelper.h"
 
 UIProperty::UIProperty()
+    : CUIWindow("UIInvUpgradeProperty")
 {
     m_text[0] = 0;
     m_ui_icon = NULL;
@@ -130,6 +131,7 @@ bool UIProperty::show_result(LPCSTR values)
 // =================== UIPropertiesWnd =====================================================
 
 UIInvUpgPropertiesWnd::UIInvUpgPropertiesWnd()
+    : CUIWindow("UIInvUpgPropertiesWnd")
 {
     m_properties_ui.reserve(15);
     m_temp_upgrade_vector.reserve(1);
@@ -137,6 +139,7 @@ UIInvUpgPropertiesWnd::UIInvUpgPropertiesWnd()
 }
 
 UIInvUpgPropertiesWnd::~UIInvUpgPropertiesWnd() { delete_data(m_properties_ui); }
+
 bool UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
 {
     CUIXml ui_xml;

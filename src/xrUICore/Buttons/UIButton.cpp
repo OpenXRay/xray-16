@@ -8,7 +8,7 @@
 #define PUSH_OFFSET_RIGHT 1
 #define PUSH_OFFSET_DOWN 1
 
-CUIButton::CUIButton()
+CUIButton::CUIButton() : CUIStatic("CUIButton")
 {
     m_eButtonState = BUTTON_NORMAL;
     m_bIsSwitch = false;

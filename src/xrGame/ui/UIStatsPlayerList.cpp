@@ -16,7 +16,7 @@ CUIStatsPlayerList::CUIStatsPlayerList()
     m_bSpectator = false;
     m_bStatus_mode = false;
 
-    m_header = xr_new<CUIStatic>();
+    m_header = xr_new<CUIStatic>("Header");
     m_header_team = NULL;
     m_header_text = NULL;
     m_i.c = 0xff000000;
@@ -166,12 +166,12 @@ void CUIStatsPlayerList::InitHeader(CUIXml& xml_doc, LPCSTR path)
 void CUIStatsPlayerList::InitTeamHeader(CUIXml& xml_doc, LPCSTR path)
 {
     string256 _path;
-    m_header_team = xr_new<CUIWindow>();
+    m_header_team = xr_new<CUIWindow>("Team header");
     m_header_team->SetAutoDelete(true);
     CUIXmlInit::InitWindow(xml_doc, strconcat(sizeof(_path), _path, path, ":team_header"), 0, m_header_team);
     m_header_team->SetWidth(this->GetDesiredChildWidth());
 
-    CUIStatic* logo = xr_new<CUIStatic>();
+    CUIStatic* logo = xr_new<CUIStatic>("Logo");
     logo->SetAutoDelete(true);
     CUIXmlInit::InitStatic(xml_doc, strconcat(sizeof(_path), _path, path, ":team_header:logo"), 0, logo);
     m_header_team->AttachChild(logo);

@@ -28,7 +28,7 @@
       <PreprocessorDefinitions>_USRDLL;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4237;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Condition="'$(GITHUB_ACTIONS)'!=''">
+    <ClCompile Condition="'$(EnableUnitySupport)'=='true'">
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <MaxFilesInUnityFile Condition="$(Configuration.Contains('Release'))">50</MaxFilesInUnityFile>
     </ClCompile>
@@ -123,6 +123,7 @@
     <ClInclude Include="ActorCondition.h" />
     <ClInclude Include="ActorEffector.h" />
     <ClInclude Include="ActorHelmet.h" />
+    <ClInclude Include="ActorBackpack.h" />
     <ClInclude Include="actor_anim_defs.h" />
     <ClInclude Include="actor_defs.h" />
     <ClInclude Include="Actor_Flags.h" />
@@ -1624,6 +1625,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ActorHelmet.cpp" />
+    <ClCompile Include="ActorBackpack.cpp" />
     <ClCompile Include="ActorInput.cpp" />
     <ClCompile Include="ActorMountedWeapon.cpp" />
     <ClCompile Include="ActorVehicle.cpp" />
@@ -2131,6 +2133,10 @@
     </ClCompile>
     <ClCompile Include="CustomMonster_VCPU.cpp" />
     <ClCompile Include="CustomOutfit.cpp" />
+    <ClCompile Include="CustomOutfit_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
     <ClCompile Include="CustomRocket.cpp" />
     <ClCompile Include="CustomZone.cpp" />
     <ClCompile Include="DamagableItem.cpp" />
@@ -2499,6 +2505,10 @@
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="map_location.cpp" />
     <ClCompile Include="map_manager.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="map_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
@@ -3520,7 +3530,7 @@
     <ProjectReference Include="$(xrExternals)luabind.vcxproj">
       <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\xrUICore\xrUICore.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrUICore\xrUICore.vcxproj">
       <Project>{37b3642c-b706-4c93-bc54-badadc8fc9b1}</Project>
     </ProjectReference>
   </ItemGroup>

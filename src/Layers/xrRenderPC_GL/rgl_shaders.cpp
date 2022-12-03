@@ -411,7 +411,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     appendShaderOption(o.gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
 
     // Shader Model 4.1
+#ifndef XR_PLATFORM_APPLE
     appendShaderOption(o.dx11_sm4_1, "SM_4_1", "1");
+    // Despite the fact that glsl 4.1 is claimed to be supported on macOS,
+    // the issue is that gatherTextureOffset requires compile-time constant offset argument.
+    // So it is more handy to disable its use for mac as for now.
+#endif
 
     // Minmax SM
     appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");

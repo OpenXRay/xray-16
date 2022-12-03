@@ -246,11 +246,7 @@ public:
     SDL_Window* GetApplicationWindow() override;
     void OnErrorDialog(bool beforeDialog) override;
 
-    void time_factor(const float& time_factor)
-    {
-        Timer.time_factor(time_factor);
-        TimerGlobal.time_factor(time_factor);
-    }
+    void time_factor(const float time_factor);
 
     IC const float time_factor() const
     {

@@ -54,8 +54,14 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 
     // Get caps
     GLint max_width, max_height;
+#ifdef XR_PLATFORM_APPLE
+    // https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/opengl_offscreen/opengl_offscreen.html
+    CHK_GL(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_width));
+    max_height = max_width;
+ #else
     CHK_GL(glGetIntegerv(GL_MAX_FRAMEBUFFER_WIDTH, &max_width));
     CHK_GL(glGetIntegerv(GL_MAX_FRAMEBUFFER_HEIGHT, &max_height));
+ #endif
 
     // Check width-and-height of render target surface
     // XXX: While seemingly silly, assert w/h are positive?

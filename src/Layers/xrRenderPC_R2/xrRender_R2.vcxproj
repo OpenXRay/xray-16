@@ -27,7 +27,7 @@
     <ClCompile>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R2_EXPORTS;USE_DX9;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions Condition="'$(GITHUB_ACTIONS)'!=''">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>nvapi$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -398,10 +398,10 @@
     <ProjectReference Include="$(xrExternals)luabind.vcxproj">
       <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Externals\LuaJIT-proj\LuaJIT.vcxproj">
+    <ProjectReference Include="$(xrExternals)LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Externals\oalib.vcxproj">
+    <ProjectReference Include="$(xrExternals)oalib.vcxproj">
       <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
     </ProjectReference>
   </ItemGroup>

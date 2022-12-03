@@ -3,9 +3,9 @@
 #include "KillMessageStruct.h"
 #include "xrUICore/Static/UIStatic.h"
 
-class CUIPdaKillMessage : public CUIColorAnimConrollerContainer
+class CUIPdaKillMessage final : public CUIColorAnimConrollerContainer
 {
-    typedef CUIColorAnimConrollerContainer inherited;
+    using inherited = CUIColorAnimConrollerContainer;
 
 public:
     CUIPdaKillMessage();
@@ -17,7 +17,7 @@ protected:
     float InitIcon(CUIStatic& refStatic, float x, IconInfo& info);
 
     CUITextWnd m_victim_name;
-    CUIStatic m_initiator;
+    CUIStatic m_initiator{ "Initiator" };
     CUITextWnd m_killer_name;
-    CUIStatic m_ext_info;
+    CUIStatic m_ext_info{ "Ext. info" };
 };

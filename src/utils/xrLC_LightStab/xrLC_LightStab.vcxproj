@@ -46,7 +46,7 @@
     <ProjectReference Include="$(SolutionDir)utils\xrLC_Light\xrLC_Light.vcxproj">
       <Project>{efb76d6f-0092-439c-a783-c0be10bd17c9}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
   </ItemGroup>

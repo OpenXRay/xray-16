@@ -106,7 +106,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
     }
 
     // update EAX
-    if (psSoundFlags.test(ss_EAX) && bEAX)
+    if (psSoundFlags.test(ss_EAX) && m_effects)
     {
         if (bListenerMoved)
         {
@@ -115,10 +115,9 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         }
 
         e_current.lerp(e_current, e_target, dt_sec);
-#if defined(XR_PLATFORM_WINDOWS)
-        i_eax_listener_set(&e_current);
-        i_eax_commit_setting();
-#endif
+
+        m_effects->set_listener(e_current);
+        m_effects->commit();
     }
 
     // update listener

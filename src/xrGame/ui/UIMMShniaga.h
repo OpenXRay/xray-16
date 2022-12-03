@@ -7,24 +7,24 @@ class CUIXml;
 class CUIScrollView;
 class CMMSound;
 
-class CUIMMMagnifer : public CUIStatic
+class CUIMMMagnifer final : public CUIStatic
 {
 public:
     CUIMMMagnifer();
-    virtual ~CUIMMMagnifer();
+    ~CUIMMMagnifer() override;
     void SetPPMode();
     void ResetPPMode();
-    bool GetPPMode() { return m_bPP; };
+    bool GetPPMode() const { return m_bPP; };
 
 protected:
-    bool m_bPP;
+    bool m_bPP{};
 };
 
-class CUIMMShniaga : public CUIWindow, public CDeviceResetNotifier
+class CUIMMShniaga final : public CUIWindow, public CDeviceResetNotifier
 {
 public:
     CUIMMShniaga();
-    virtual ~CUIMMShniaga();
+    ~CUIMMShniaga() override;
 
     void InitShniaga(CUIXml& xml_doc, LPCSTR path);
     virtual void Update();

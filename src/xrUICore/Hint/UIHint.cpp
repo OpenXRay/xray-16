@@ -12,7 +12,7 @@
 #include "Windows/UIFrameWindow.h"
 #include "XML/UIXmlInitBase.h"
 
-UIHint::UIHint()
+UIHint::UIHint() : CUIWindow("UIHint")
 {
     m_visible = false;
     m_rect.set(0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT);
@@ -73,7 +73,7 @@ void UIHint::Draw()
 
 // =================================================================================================
 
-UIHintWindow::UIHintWindow() : m_hint_wnd(NULL), m_hint_delay(1000), m_enable(false) {}
+UIHintWindow::UIHintWindow() : CUIWindow("UIHintWindow"), m_hint_wnd(NULL), m_hint_delay(1000), m_enable(false) {}
 void UIHintWindow::disable_hint()
 {
     if (!m_hint_wnd)

@@ -195,6 +195,7 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     constexpr std::tuple<eActorMenuListType, cpcstr, cpcstr, cpcstr, cpcstr, bool> inventory_lists[] =
     {
         // { id,                   "xml_section_name",         "condition_indicator,  "highlighter",             "blocker", is_it_critical_and_required }
+        { eInventoryKnifeList,     "dragdrop_knife",           "progess_bar_knife",   "inv_slot1_highlight",     nullptr,            false },
         { eInventoryPistolList,    "dragdrop_pistol",          "progess_bar_weapon1", "inv_slot2_highlight",     nullptr,            true },
         { eInventoryAutomaticList, "dragdrop_automatic",       "progess_bar_weapon2", "inv_slot3_highlight",     nullptr,            true },
 
@@ -216,6 +217,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
         { eSearchLootActorBagList, nullptr,                    nullptr,               nullptr,                   nullptr,            false },
 
         { eTrashList,              "dragdrop_trash",           nullptr,               nullptr,                   nullptr,            false },
+
+        { eInventoryBackpackList,  "dragdrop_backpack",        nullptr,               "backpack_slot_highlight", nullptr,            false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
@@ -324,6 +327,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
         // { id,                   "xml_section_name",   parent }
         { eInventoryPistolList,    "dragdrop_pistol",    m_pInventoryWnd },
         { eInventoryAutomaticList, "dragdrop_automatic", m_pInventoryWnd },
+        //{ eInventoryBackpackList,  "dragdrop_backpack",  m_pInventoryWnd },
         { eInventoryOutfitList,    "dragdrop_outfit",    m_pInventoryWnd },
         { eInventoryBeltList,      "dragdrop_belt",      m_pInventoryWnd },
         { eInventoryBagList,       "dragdrop_bag",       m_ActorWeightBar->m_BagWnd },
@@ -511,9 +515,11 @@ void CUIActorMenu::InitCallbacks()
     RegisterCallback(m_pUpgradeWnd ? m_pUpgradeWnd->m_btn_repair : nullptr, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::TryRepairItem));
 
+    BindDragDropListEvents(m_pLists[eInventoryKnifeList]);
     BindDragDropListEvents(m_pLists[eInventoryPistolList]);
     BindDragDropListEvents(m_pLists[eInventoryAutomaticList]);
 
+    //BindDragDropListEvents(m_pLists[eInventoryBackpackList]);
     BindDragDropListEvents(m_pLists[eInventoryOutfitList]);
     BindDragDropListEvents(m_pLists[eInventoryHelmetList]);
 
