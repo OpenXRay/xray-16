@@ -181,6 +181,33 @@ public:
 };
 
 // console commands
+class CCC_Spawn_to_inv : public IConsole_Command
+{
+public:
+    CCC_Spawn_to_inv(LPCSTR N) : IConsole_Command(N){};
+    virtual void Execute(LPCSTR args)
+    {
+        if (!g_pGameLevel)
+        {
+            Log("Error: No game level!");
+            return;
+        }
+
+        if (!pSettings->section_exist(args))
+        {
+            Msg("! Section [%s] isn`t exist...", args);
+            return;
+        }
+
+        char Name[128];
+        Name[0] = 0;
+        sscanf(args, "%s", Name);
+
+        Level().spawn_item(Name, Actor()->Position(), false, Actor()->ID());
+    }
+    virtual void Info(TInfo& I) { strcpy(I, "name,team,squad,group"); }
+};
+
 class CCC_GameDifficulty : public CCC_Token
 {
 public:
@@ -2110,6 +2137,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_ToggleNoClip, "g_no_clip");
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
     CMD1(CCC_Spawn, "g_spawn");
+    CMD1(CCC_Spawn_to_inv, "g_spawn_to_inventory");
     CMD1(CCC_Script, "run_script");
     CMD1(CCC_ScriptCommand, "run_string");
     CMD1(CCC_TimeFactor, "time_factor");
