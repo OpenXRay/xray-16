@@ -1,6 +1,6 @@
 #pragma once
 
-enum
+enum : u32
 {
     ID_NEW_AF = 300,
     ID_AF_LOST,
@@ -27,6 +27,4 @@ enum
     ID_AF_TEAM2_RETURNED,
     ID_AF_TEAM2_RETURNED_R,
     ID_AF_TEAM2_RETURNED_ENEMY,
-
-    ID_AH_forcedword = u32(-1)
 };

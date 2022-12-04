@@ -3,7 +3,7 @@
 #include "Common/GUID.hpp"
 #include "xrCore/_fbox.h"
 
-enum fsL_Chunks
+enum fsL_Chunks : u32
 {
     fsL_HEADER = 1, //*
     fsL_SHADERS = 2, //*
@@ -15,29 +15,25 @@ enum fsL_Chunks
     fsL_VB = 9, //* - Static geometry
     fsL_IB = 10, //*
     fsL_SWIS = 11, //* - collapse info, usually for trees
-    fsL_forcedword = 0xFFFFFFFF
 };
 
-enum fsESectorChunks
+enum fsESectorChunks : u32
 {
     fsP_Portals = 1, // - portal polygons
     fsP_Root = 2, // - geometry root
-    fsP_forcedword = u32(-1)
 };
 
-enum fsSLS_Chunks
+enum fsSLS_Chunks : u32
 {
     fsSLS_Description = 1, // Name of level
     fsSLS_ServerState = 2,
-    fsSLS_forcedword = u32(-1)
 };
 
-enum EBuildQuality
+enum EBuildQuality : u16
 {
     ebqDraft = 0,
     ebqHigh = 1,
     ebqCustom = 2,
-    ebq_force_u16 = u16(-1)
 };
 
 #pragma pack(push, 8)

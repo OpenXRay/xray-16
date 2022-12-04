@@ -15,13 +15,12 @@ public:
         alRight,
         alCenter
     };
-    enum
+    enum : u32
     {
         fsGradient = (1 << 0),
         fsDeviceIndependent = (1 << 1),
         fsValid = (1 << 2),
         fsMultibyte = (1 << 3),
-        fsForceDWORD = u32(-1)
     };
 
 public:

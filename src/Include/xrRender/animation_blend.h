@@ -10,13 +10,12 @@
 class CBlend
 {
 public:
-    enum ECurvature
+    enum ECurvature : u32
     {
         eFREE_SLOT = 0,
         //		eFixed,
         eAccrue,
         eFalloff,
-        eFORCEDWORD = int(-1)
     };
 
 public:

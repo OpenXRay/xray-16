@@ -53,41 +53,36 @@ XRSOUND_API extern xr_token* snd_devices_token;
 XRSOUND_API extern u32 snd_device_id;
 
 // Flags
-enum
+enum : u32
 {
     ss_Hardware = 1ul << 1ul, //!< Use hardware mixing only
     ss_EAX = 1ul << 2ul, //!< Use eax
-    ss_forcedword = u32(-1)
 };
 
-enum
+enum : u32
 {
     sq_DEFAULT,
     sq_NOVIRT,
     sq_LIGHT,
     sq_HIGH,
-    sq_forcedword = u32(-1)
 };
 
-enum
+enum : u32
 {
     sg_Undefined = 0,
     sg_SourceType = u32(-1),
-    sg_forcedword = u32(-1),
 };
 
-enum
+enum : u32
 {
     sm_Looped = 1ul << 0ul, //!< Looped
     sm_2D = 1ul << 1ul, //!< 2D mode
-    sm_forcedword = u32(-1),
 };
 
-enum esound_type
+enum esound_type : u32
 {
     st_Effect = 0,
     st_Music = 1,
-    st_forcedword = u32(-1),
 };
 
 /// definition (Sound Source)
