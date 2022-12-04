@@ -286,7 +286,7 @@ const u32 XRCL_PRODUCTION_VERSION = 14; // output
 const u32 CFORM_CURRENT_VERSION = 4;
 const u32 MAX_NODE_BIT_COUNT = 23;
 
-enum xrAI_Versions
+enum xrAI_Versions : u8
 {
     XRAI_VERSION_SOC = 8,
     XRAI_VERSION_CS = 9,
@@ -297,6 +297,12 @@ enum xrAI_Versions
 
     XRAI_CURRENT_VERSION = XRAI_VERSION_OPENXRAY
 };
+
+// Cross table and game spawn uses u32, but game graph header uses u8,
+// Make sure to be within u8 bounds...
+static_assert(XRAI_VERSION_ALLOWED  <= type_max<u8>);
+static_assert(XRAI_VERSION_OPENXRAY <= type_max<u8>);
+static_assert(XRAI_CURRENT_VERSION  <= type_max<u8>);
 
 #define ASSERT_XRAI_VERSION_MATCH(version, description)\
     R_ASSERT2((version) >= XRAI_VERSION_ALLOWED && (version) <= XRAI_CURRENT_VERSION, description);
