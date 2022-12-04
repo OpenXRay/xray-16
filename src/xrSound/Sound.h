@@ -56,7 +56,7 @@ XRSOUND_API extern u32 snd_device_id;
 enum : u32
 {
     ss_Hardware = 1ul << 1ul, //!< Use hardware mixing only
-    ss_EAX = 1ul << 2ul, //!< Use eax
+    ss_EFX = 1ul << 2ul, //!< Use efx
 };
 
 enum : u32
