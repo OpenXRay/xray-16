@@ -12,8 +12,15 @@
 //#include <eax/eax.h>
 //#endif
 
+XRSOUND_API Flags32 psSoundFlags =
+{
+    ss_Hardware
+#ifdef XR_PLATFORM_WINDOWS
+    | ss_EFX
+#endif
+};
+
 XRSOUND_API int psSoundTargets = 32;
-XRSOUND_API Flags32 psSoundFlags = { ss_Hardware | ss_EFX };
 XRSOUND_API float psSoundOcclusionScale = 0.5f;
 XRSOUND_API float psSoundVelocityAlpha = 0.05f;
 XRSOUND_API float psSoundTimeFactor = 1.0f;
