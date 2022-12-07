@@ -208,11 +208,13 @@ UICore::UICore()
     {
         m_pUICursor = xr_new<CUICursor>();
         m_pFontManager = xr_new<CFontManager>();
+        m_pStyleManager = xr_new<UIStyleManager>();
     }
     else
     {
         m_pUICursor = nullptr;
         m_pFontManager = nullptr;
+        m_pStyleManager = nullptr;
     }
     m_bPostprocess = false;
 

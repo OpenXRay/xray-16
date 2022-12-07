@@ -1,10 +1,14 @@
 #pragma once
+
 #include "ui_defs.h"
+#include "ui_styles.h"
+#include "FontManager/FontManager.h"
+
 #include "xrEngine/pure.h"
 #include "xrEngine/device.h"
+
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_stack.h"
-#include "xrUICore/FontManager/FontManager.h"
 
 class CUICursor;
 class CUIGameCustom;
@@ -17,6 +21,7 @@ class XRUICORE_API UICore : public CDeviceResetNotifier, public CUIResetNotifier
 
     bool m_bPostprocess;
 
+    UIStyleManager* m_pStyleManager;
     CFontManager* m_pFontManager;
     CUICursor* m_pUICursor;
 
@@ -30,6 +35,7 @@ public:
     UICore();
     ~UICore();
     void ReadTextureInfo();
+    auto& Styles() { return *m_pStyleManager; }
     CFontManager& Font() { return *m_pFontManager; }
     CUICursor& GetUICursor() { return *m_pUICursor; }
     IC float ClientToScreenScaledX(float left) const { return left * m_current_scale->x; };

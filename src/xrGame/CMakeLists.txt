@@ -1597,8 +1597,6 @@ set(SRC_FILES
     "UIPanelsClassFactory.h"
     "UIPlayerItem.cpp"
     "UIPlayerItem.h"
-    "UIStyle.cpp"
-    "UIStyle.h"
     "UITeamHeader.cpp"
     "UITeamHeader.h"
     "UITeamPanels.cpp"

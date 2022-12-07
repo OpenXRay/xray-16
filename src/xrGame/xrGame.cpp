@@ -11,13 +11,10 @@
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "xrEngine/xr_level_controller.h"
 #include "xrEngine/profiler.h"
-#include "UIStyle.h"
 
 void CCC_RegisterCommands();
 
 extern float g_fTimeFactor;
-
-extern UIStyle* UIStyleManager;
 
 extern "C"
 {
@@ -39,9 +36,6 @@ extern "C"
     {
         g_fTimeFactor = pSettings->r_float("alife", "time_factor"); // XXX: find a better place
 
-        // Fill ui style token
-        UIStyleManager = xr_new<UIStyle>();
-        UIStyleManager->FillUIStyleToken();
         // register console commands
         CCC_RegisterCommands();
         // register localization
@@ -55,9 +49,6 @@ extern "C"
 
     XR_EXPORT void finalize_library()
     {
-        UIStyleManager->CleanupUIStyleToken();
-        xr_delete(UIStyleManager);
-
         StringTable().Destroy();
         CCC_DeregisterInput(); // XXX: Remove if possible
  }

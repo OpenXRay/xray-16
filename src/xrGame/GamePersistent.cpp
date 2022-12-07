@@ -36,7 +36,6 @@
 #include "ui/UILoadingScreen.h"
 #include "AnselManager.h"
 #include "xrCore/Threading/TaskManager.hpp"
-#include "UIStyle.h"
 
 #include "xrPhysics/IPHWorld.h"
 
@@ -49,8 +48,6 @@
 #endif // _EDITOR
 
 #include "xrEngine/xr_level_controller.h"
-
-extern UIStyle* UIStyleManager;
 
 CGamePersistent::CGamePersistent(void)
 {
@@ -162,8 +159,6 @@ void CGamePersistent::OnAppStart()
         init_game_globals();
     });
 #endif
-
-    UIStyleManager->SetupUIStyle();
 
     GEnv.UI = xr_new<UICore>();
     m_pMainMenu = xr_new<CMainMenu>();

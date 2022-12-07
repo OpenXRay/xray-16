@@ -308,7 +308,5 @@ SCRIPT_EXPORT(CScriptXmlInit, (),
             .def("InitList", &CScriptXmlInit::InitListWnd)
             .def("InitListBox", &CScriptXmlInit::InitListBox)
             .def("InitProgressBar", &CScriptXmlInit::InitProgressBar)
-            .property("ui_path", +[]() { return UI_PATH; })
-            .property("ui_path_with_delimiter", +[]() { return UI_PATH_WITH_DELIMITER; })
     ];
 });

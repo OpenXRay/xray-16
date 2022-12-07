@@ -38,7 +38,6 @@
 #include "saved_game_wrapper.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrNetServer/NET_Messages.h"
-#include "UIStyle.h"
 
 #include "CameraLook.h"
 #include "character_hit_animations_params.h"
@@ -103,8 +102,6 @@ float g_aim_predict_time = 0.40f;
 int g_keypress_on_start = 1;
 
 ENGINE_API extern float g_console_sensitive;
-
-extern UIStyle* UIStyleManager;
 
 //Alundaio
 extern BOOL g_ai_die_in_anomaly;
@@ -1441,16 +1438,20 @@ public:
 
 class CCC_UIStyle : public CCC_Token
 {
-public:
-    CCC_UIStyle(pcstr name)
-        : CCC_Token(name, &UIStyleManager->UIStyleID, UIStyleManager->UIStyleToken.data())
-    {
-    }
+    u32 m_id = 0;
 
-    void Execute(pcstr args)
+public:
+    CCC_UIStyle(pcstr name) : CCC_Token(name, &m_id, nullptr) { }
+
+    void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
-        UIStyleManager->SetupUIStyle();
+        UI().Styles().SetupStyle(m_id);
+    }
+    
+    const xr_token* GetToken() noexcept override // may throw exceptions!
+    {
+        return UI().Styles().GetToken().data();
     }
 };
 
@@ -1461,19 +1462,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        // Hack: activate main menu to prevent crash
-        // I don't know why it crashes while in the game
-        bool shouldHideMainMenu = false;
-        if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu)
-        {
-            shouldHideMainMenu = !g_pGamePersistent->m_pMainMenu->IsActive();
-            g_pGamePersistent->m_pMainMenu->Activate(true);
-        }
-
-        Device.seqUIReset.Process();
-
-        if (shouldHideMainMenu)
-            g_pGamePersistent->m_pMainMenu->Activate(false);
+        UI().Styles().Reset();
     }
 };
 
