@@ -10,6 +10,7 @@
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "character_info.h"
 #include "inventory_space.h"
+#include "ActorBackpack.h"
 
 class CSE_Abstract;
 class CInventory;
@@ -100,7 +101,7 @@ public:
 protected:
     u32 m_money;
     // торговля
-    CTrade* m_pTrade;
+    CTrade* m_pTrade{};
     bool m_bTrading;
     bool m_bTalking;
     CInventoryOwner* m_pTalkPartner;
@@ -151,6 +152,7 @@ public:
     virtual float MaxCarryWeight() const;
 
     CCustomOutfit* GetOutfit() const;
+    CBackpack* GetBackpack() const;
 
     bool CanPlayShHdRldSounds() const { return m_play_show_hide_reload_sounds; };
     void SetPlayShHdRldSounds(bool play) { m_play_show_hide_reload_sounds = play; };
@@ -217,9 +219,9 @@ public:
 public:
     virtual bool use_simplified_visual() const { return (false); };
 private:
-    CTradeParameters* m_trade_parameters;
-    CPurchaseList* m_purchase_list;
-    BOOL m_need_osoznanie_mode;
+    CTradeParameters* m_trade_parameters{};
+    CPurchaseList* m_purchase_list{};
+    bool m_need_osoznanie_mode;
     bool m_deadbody_can_take;
     bool m_deadbody_closed;
 
@@ -235,7 +237,7 @@ public:
     virtual bool use_default_throw_force();
     virtual float missile_throw_force();
     virtual bool use_throw_randomness();
-    virtual bool NeedOsoznanieMode() { return m_need_osoznanie_mode != FALSE; }
+    virtual bool NeedOsoznanieMode() { return m_need_osoznanie_mode; }
     void deadbody_can_take(bool status);
     IC bool deadbody_can_take_status() const { return m_deadbody_can_take; }
     void deadbody_closed(bool status);

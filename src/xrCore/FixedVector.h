@@ -1,9 +1,9 @@
 #pragma once
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCore/xrDebug_macros.h"
 
 // deprecated, use xr_array instead
-template <class T, std::size_t dim>
+template <class T, size_t dim>
 class svector
 {
 public:
@@ -100,7 +100,7 @@ public:
     }
     IC void assign(iterator p, int c)
     {
-        VERIFY(c > 0 && c < dim);
+        VERIFY(c > 0 && c <= dim);
         CopyMemory(array, p, c * sizeof(value_type));
         count = c;
     }

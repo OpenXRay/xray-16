@@ -3,8 +3,7 @@
 #include "particle_actions_collection.h"
 #include "particle_effect.h"
 
-#include "tbb/parallel_for.h" 
-#include "tbb/blocked_range.h"
+#include "xrCore/Threading/ParallelFor.hpp"
 
 using namespace PAPI;
 
@@ -1619,10 +1618,12 @@ extern void noise3Init();
 
 #ifndef _EDITOR
 
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
-#include "Externals/sse2neon/sse2neon.h"
+#include "sse2neon/sse2neon.h"
+#else
+#error Add your platform here
 #endif
 
 ICF __m128 _mm_load_fvector(const Fvector& v)
@@ -1650,35 +1651,40 @@ ICF void _mm_store_fvector(Fvector& v, const __m128 R1)
     _mm_store_ss((float*)&v.z, R2);
 }
 
-struct TES_PARAMS
+void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max)
 {
-    u32 p_count;
-    ParticleEffect* effect;
-    pVector offset;
-    float age;
-    float epsilon;
-    float frequency;
-    int octaves;
-    float magnitude;
-};
+#ifdef _GPA_ENABLED
+    TAL_SCOPED_TASK_NAMED("PATurbulence::Execute()");
+#endif // _GPA_ENABLED
 
-void PATurbulenceExecuteStream(TES_PARAMS* pParams)
-{
-    pVector pV;
-    pVector vX;
-    pVector vY;
-    pVector vZ;
+    if (noise_start)
+    {
+        noise_start = 0;
+        noise3Init();
+    }
 
-    u32 count = pParams->p_count;
-    ParticleEffect* effect = pParams->effect;
-    pVector offset = pParams->offset;
-    float age = pParams->age;
-    float epsilon = pParams->epsilon;
-    float frequency = pParams->frequency;
-    int octaves = pParams->octaves;
-    float magnitude = pParams->magnitude;
+    age += dt;
 
-    FOR_START(u32, 0, count, i)
+    const u32 p_cnt = effect->p_count;
+
+    if (!p_cnt)
+        return;
+
+    const auto processRange = [&effect, this](const TaskRange<u32>& range)
+    {
+    #ifdef _GPA_ENABLED
+        TAL_SCOPED_TASK_NAMED("PATurbulenceExecuteStream()");
+
+        TAL_ID rtID = TAL_MakeID(1, Core.dwFrame, 0);
+        TAL_AddRelationThis(TAL_RELATION_IS_CHILD_OF, rtID);
+    #endif // _GPA_ENABLED
+
+        pVector pV;
+        pVector vX;
+        pVector vY;
+        pVector vZ;
+
+        for (u32 i = range.begin(); i != range.end(); ++i)
         {
             Particle& m = effect->particles[i];
 
@@ -1727,38 +1733,15 @@ void PATurbulenceExecuteStream(TES_PARAMS* pParams)
 
             _mm_store_fvector(m.vel, _mvel);
         }
-    FOR_END
-}
-
-void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max)
-{
-#ifdef _GPA_ENABLED
-    TAL_SCOPED_TASK_NAMED("PATurbulence::Execute()");
-#endif // _GPA_ENABLED
-
-    if (noise_start)
+    };
+    // XXX: it turned out that singlethreaded code works way faster
+    // But on processors with small caches it may work slower, profiling needed
+    //if (p_cnt > (TaskScheduler->GetWorkersCount() * 64))
+    //    xr_parallel_for(TaskRange<u32>(0, p_cnt), processRange);
+    //else
     {
-        noise_start = 0;
-        noise3Init();
+        processRange(TaskRange<u32>(0, p_cnt));
     }
-
-    age += dt;
-
-    u32 p_cnt = effect->p_count;
-
-    if (!p_cnt)
-        return;
-
-    TES_PARAMS tesParams;
-    tesParams.p_count = p_cnt; 
-    tesParams.effect = effect;
-    tesParams.offset = offset;
-    tesParams.age = age;
-    tesParams.epsilon = epsilon;
-    tesParams.frequency = frequency;
-    tesParams.octaves = octaves;
-    tesParams.magnitude = magnitude;
-    PATurbulenceExecuteStream(&tesParams);
 }
 
 #else

@@ -16,10 +16,10 @@ public:
 
 private:
     void RenderBack(CStatGraph& owner);
-    static void RenderBars(CStatGraph& owner, FVF::TL0uv** ppv, CStatGraph::ElementsDeq* pelements);
-    void RenderBarLines(CStatGraph& owner, FVF::TL0uv** ppv, CStatGraph::ElementsDeq* pelements) const;
-    void RenderLines(CStatGraph& owner, FVF::TL0uv** ppv, CStatGraph::ElementsDeq* pelements) const;
-    static void RenderMarkers(CStatGraph& owner, FVF::TL0uv** ppv, CStatGraph::MarkersDeq* pmarkers);
+    static void RenderBars(CStatGraph& owner, FVF::L** ppv, CStatGraph::ElementsDeq& pelements);
+    void RenderBarLines(CStatGraph& owner, FVF::L** ppv, CStatGraph::ElementsDeq& pelements) const;
+    void RenderLines(CStatGraph& owner, FVF::L** ppv, CStatGraph::ElementsDeq& pelements) const;
+    static void RenderMarkers(CStatGraph& owner, FVF::L** ppv, CStatGraph::MarkersDeq& pmarkers);
 
 private:
     ref_geom hGeomTri;

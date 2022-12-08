@@ -1,7 +1,5 @@
 #include "stdafx.h"
-#if defined(XR_PLATFORM_WINDOWS)
-#include <msacm.h>
-#endif
+
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 
@@ -47,7 +45,7 @@ void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
     i_decompress_fr(ovf, dest, left);
 }
 
-void CSoundRender_Source::LoadWave(pcstr pName)
+bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
 {
     pname = pName;
 
@@ -60,13 +58,23 @@ void CSoundRender_Source::LoadWave(pcstr pName)
 
     vorbis_info* ovi = ov_info(&ovf, -1);
     // verify
-    R_ASSERT3(ovi, "Invalid source info:", pName);
-    R_ASSERT3(ovi->rate == 44100, "Invalid source rate:", pName);
+    R_ASSERT3_CURE(ovi, "Invalid source info:", pName, !crashOnError,
+    {
+        ov_clear(&ovf);
+        FS.r_close(wave);
+        return false;
+    });
+    R_ASSERT3_CURE(ovi->rate == 44100, "Invalid source rate:", pName, !crashOnError,
+    {
+        ov_clear(&ovf);
+        FS.r_close(wave);
+        return false;
+    });
 
 #ifdef DEBUG
     if (ovi->channels == 2)
         Msg("stereo sound source [%s]", pName);
-#endif // #ifdef DEBUG
+#endif
 
     ZeroMemory(&m_wformat, sizeof(WAVEFORMATEX));
 
@@ -112,17 +120,32 @@ void CSoundRender_Source::LoadWave(pcstr pName)
             m_fMaxAIDist = F.r_float();
         }
         else
+        {
+#ifndef MASTER_GOLD
             Log("! Invalid ogg-comment version, file: ", pName);
+#endif
+        }
     }
     else
+    {
+#ifndef MASTER_GOLD
         Log("! Missing ogg-comment, file: ", pName);
-    R_ASSERT3(m_fMaxAIDist >= 0.1f && m_fMaxDist >= 0.1f, "Invalid max distance.", pName);
+#endif
+    }
+
+    R_ASSERT3_CURE(m_fMaxAIDist >= 0.1f && m_fMaxDist >= 0.1f, "Invalid max distance.", pName, !crashOnError,
+    {
+        ov_clear(&ovf);
+        FS.r_close(wave);
+        return false;
+    });
 
     ov_clear(&ovf);
     FS.r_close(wave);
+    return true;
 }
 
-bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
+bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/, bool crashOnError /*= true*/)
 {
     string_path fn, N;
     xr_strcpy(N, name);
@@ -139,16 +162,18 @@ bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
     if (!FS.exist("$level$", fn))
         FS.update_path(fn, "$game_sounds$", fn);
 
-    const bool soundExist = FS.exist(fn);
+    bool soundExist = FS.exist(fn);
     if (!soundExist && replaceWithNoSound)
     {
         Msg("! Can't find sound '%s'", name);
         FS.update_path(fn, "$game_sounds$", "$no_sound.ogg");
+        soundExist = FS.exist(fn);
     }
-    
-    if (soundExist || replaceWithNoSound)
+
+    if (soundExist)
     {
-        LoadWave(fn);
+        if (!LoadWave(fn, crashOnError))
+            return false;
         SoundRender->cache.cat_create(CAT, dwBytesTotal);
     }
 

@@ -11,7 +11,7 @@
 #include "eatable_item.h"
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrMessages.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Level.h"
 #include "ai_space.h"
 #include "EntityCondition.h"
@@ -1064,10 +1064,12 @@ bool CInventory::Eat(PIItem pIItem)
         pItemToEat->object().cNameSect().c_str());
 #endif // MP_LOGGING
 
-    if (Actor()->m_inventory == this)
+
+    CActor* pActor = smart_cast<CActor*>(Level().CurrentControlEntity());
+    if (pActor && pActor->m_inventory == this)
     {
         if (IsGameTypeSingle())
-            Actor()->callback(GameObject::eUseObject)(smart_cast<CGameObject*>(pIItem)->lua_game_object());
+            pActor->callback(GameObject::eUseObject)(smart_cast<CGameObject*>(pIItem)->lua_game_object());
 
         if (pItemToEat->IsUsingCondition() && pItemToEat->GetRemainingUses() < 1 && pItemToEat->CanDelete())
             CurrentGameUI()->GetActorMenu().RefreshCurrentItemCell();

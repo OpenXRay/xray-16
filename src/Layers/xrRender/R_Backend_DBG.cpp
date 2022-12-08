@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
 extern IC u32 GetIndexCount(D3DPRIMITIVETYPE T, u32 iPrimitiveCount);
 #endif
 
@@ -61,11 +61,13 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
     RImplementation.rmNormal();
     set_Stencil(FALSE);
     Render(T, vBase, 0, vcnt, iBase, pcnt);
-#else // USE_DX9
+#elif defined(USE_DX9)
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawIndexedPrimitiveUP(T, 0, vcnt, pcnt, pIdx, D3DFMT_INDEX16, pVerts, sizeof(FVF::L)));
-#endif // USE_OGL
+#else
+#   error No graphics API selected or enabled!
+#endif
 }
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 {
@@ -85,11 +87,13 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
     RImplementation.rmFar();
     set_Stencil(FALSE);
     Render(T, vBase, pcnt);
-#else // USE_DX9
+#elif defined(USE_DX9)
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawPrimitiveUP(T, pcnt, pVerts, sizeof(FVF::L)));
-#endif // USE_OGL
+#else
+#   error No graphics API selected or enabled!
+#endif
 }
 
 #define RGBA_GETALPHA(rgb) ((rgb) >> 24)
@@ -112,10 +116,10 @@ void CBackend::dbg_DrawOBB(Fmatrix& T, Fvector& half_dim, u32 C)
 
     u16 aabb_id[12 * 2] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 1, 5, 2, 6, 3, 7, 0, 4};
     set_xform_world(mL2W_Transform);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
         float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
-#endif // !USE_DX9
+#endif
     dbg_Draw(D3DPT_LINELIST, aabb, 8, aabb_id, 12);
 }
 void CBackend::dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C)
@@ -129,10 +133,10 @@ void CBackend::dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u3
     tri[2].color = C;
 
     set_xform_world(T);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
         float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
-#endif // !USE_DX9
+#endif
     dbg_Draw(D3DPT_TRIANGLESTRIP, tri, 1);
 }
 void CBackend::dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C)
@@ -144,10 +148,10 @@ void CBackend::dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C)
     line[1].color = C;
 
     set_xform_world(T);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
         float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
-#endif // !USE_DX9
+#endif
     dbg_Draw(D3DPT_LINELIST, line, 1);
 }
 void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
@@ -218,10 +222,10 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
     }
 
     set_xform_world(T);
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_c("tfactor", float(color_get_R(C)) / 255.f, float(color_get_G(C)) / 255.f, \
         float(color_get_B(C)) / 255.f, float(color_get_A(C)) / 255.f);
-#endif // !USE_DX9
+#endif
 
     RCache.set_FillMode(D3DFILL_WIREFRAME);
     dbg_Draw(D3DPT_TRIANGLELIST, verts, vcnt, gFaces, 224);
@@ -252,10 +256,12 @@ void CBackend::dbg_OverdrawEnd()
     OnFrameEnd();
 
     // Draw a rectangle wherever the count equal I
-#ifdef USE_DX9
+#if defined(USE_DX9)
     CHK_DX(HW.pDevice->SetFVF(FVF::F_TL));
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
     set_Geometry(vs_TL);
+#else
+#   error No graphics API defined or enabled!
 #endif
 
     // Render gradients
@@ -271,7 +277,7 @@ void CBackend::dbg_OverdrawEnd()
         pv[3].set(float(Device.dwWidth), float(0), c, 0, 0);
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILREF, I));
         CHK_DX(HW.pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pv, sizeof(FVF::TL)));
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
         u32 vBase;
         FVF::TL* pv = (FVF::TL*)Vertex.Lock(4, vs_L->vb_stride, vBase);
         pv[0].set(float(0), float(Device.dwHeight), c, 0, 0);
@@ -283,6 +289,8 @@ void CBackend::dbg_OverdrawEnd()
         set_Stencil(TRUE, D3DCMP_EQUAL, I, 0xff, 0xffffffff,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
         Render(D3DPT_TRIANGLESTRIP, vBase, 4);
+#else
+#   error No graphics API defined or enabled!
 #endif
     }
     set_Stencil(FALSE);
@@ -292,8 +300,10 @@ void CBackend::dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2)
 {
 #ifdef USE_DX9
     CHK_DX(HW.pDevice->SetRenderState(p1, p2));
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
     VERIFY(!"Not implemented");
+#else
+#   error No graphics API defined or enabled!
 #endif
 }
 
@@ -301,7 +311,9 @@ void CBackend::dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
 {
 #ifdef USE_DX9
     CHK_DX(HW.pDevice->SetSamplerState(sampler, type, value));
-#else
+#elif defined(USE_DX11) || defined(USE_OGL)
     VERIFY(!"Not implemented");
+#else
+#   error No graphics API defined or enabled!
 #endif
 }

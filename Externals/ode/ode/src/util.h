@@ -25,8 +25,9 @@
 
 #include "objects.h"
 #include "float.h"
-#if defined(XR_PLATFORM_LINUX)
-#include <cmath>
+
+#ifndef MSVC
+#include <math.h> // for fpclassify
 #endif
 
 void dInternalHandleAutoDisabling (dxWorld *world, dReal stepsize);
@@ -47,8 +48,8 @@ inline bool dValid(const float x)
     int cls = _fpclass (double(x));
     if (cls&(_FPCLASS_SNAN+_FPCLASS_QNAN+_FPCLASS_NINF+_FPCLASS_PINF+_FPCLASS_ND+_FPCLASS_PD))
        return false;
-#elif defined(XR_PLATFORM_LINUX)
-	int cls = std::fpclassify((double )x);
+#else
+	int cls = fpclassify((double )x);
     switch (cls)
     {
     case FP_NAN:

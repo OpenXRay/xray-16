@@ -63,6 +63,11 @@ BOOL CBlender_BmmD::canBeLMAPped()
     return TRUE;
 }
 
+BOOL CBlender_BmmD::canUseSteepParallax()
+{
+    return TRUE;
+}
+
 void CBlender_BmmD::CompileForEditor(CBlender_Compile& C)
 {
     C.PassBegin();

@@ -11,11 +11,10 @@ public:
     void Initialize() override;
 
     void Show(bool status) override;
+    void Draw() override;
     bool IsShown() override;
 
     void Update(int stagesCompleted, int stagesTotal) override;
-    void ForceDrop() override;
-    void ForceFinish() override;
 
     void SetLevelLogo(cpcstr name) override;
     void SetStageTitle(cpcstr title) override;

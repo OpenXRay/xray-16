@@ -7,7 +7,6 @@
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
-#include "string_table.h"
 #include "inventory_item.h"
 #include "UIInventoryUtilities.h"
 #include "PhysicsShellHolder.h"
@@ -29,7 +28,7 @@ extern const LPCSTR g_inventory_upgrade_xml;
 #define INV_GRID_WIDTH2 40.0f
 #define INV_GRID_HEIGHT2 40.0f
 
-CUIItemInfo::CUIItemInfo()
+CUIItemInfo::CUIItemInfo() : CUIWindow("CUIItemInfo")
 {
     UIItemImageSize.set(0.0f, 0.0f);
 
@@ -111,7 +110,7 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
         if (!UIBoosterInfo->InitFromXml(uiXml))
             xr_delete(UIBoosterInfo);
 
-        // UIDesc_line						= new CUIStatic();
+        // UIDesc_line						= xr_new<CUIStatic>("Description line");
         // AttachChild						(UIDesc_line);
         // UIDesc_line->SetAutoDelete		(true);
         // xml_init.InitStatic				(uiXml, "description_line", 0, UIDesc_line);
@@ -134,7 +133,7 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
 
     if (uiXml.NavigateToNode("image_static", 0))
     {
-        UIItemImage = xr_new<CUIStatic>();
+        UIItemImage = xr_new<CUIStatic>("Item Image");
         AttachChild(UIItemImage);
         UIItemImage->SetAutoDelete(true);
         CUIXmlInit::InitStatic(uiXml, "image_static", 0, UIItemImage);

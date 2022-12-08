@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common/Noncopyable.hpp"
-#include "_types.h"
+#include "xr_types.h"
 #include "xrCommon/xr_vector.h"
 #include "_math.h"
 #include "log.h"
@@ -118,7 +118,7 @@ public:
         m_time_factor = time_factor;
     }
 
-    virtual Duration getElapsedTime() const
+    Duration getElapsedTime() const override
     {
         return getElapsedTime(inherited::getElapsedTime());
     }
@@ -130,7 +130,7 @@ class XRCORE_API CTimer_paused_ex : public CTimer
 
 public:
     CTimer_paused_ex() noexcept : save_clock() {}
-    virtual ~CTimer_paused_ex() {}
+    virtual ~CTimer_paused_ex() = default;
     bool Paused() const noexcept { return paused; }
     void Pause(const bool b) noexcept
     {
@@ -151,11 +151,11 @@ public:
     }
 };
 
-class XRCORE_API CTimer_paused : public CTimer_paused_ex
+class XRCORE_API CTimer_paused final : public CTimer_paused_ex
 {
 public:
     CTimer_paused() { g_pauseMngr().Register(*this); }
-    virtual ~CTimer_paused() { g_pauseMngr().UnRegister(*this); }
+    ~CTimer_paused() override { g_pauseMngr().UnRegister(*this); }
 };
 
 extern XRCORE_API bool g_bEnableStatGather;

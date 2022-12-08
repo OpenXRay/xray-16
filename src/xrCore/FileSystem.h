@@ -14,8 +14,6 @@ protected:
         LPCSTR initial, pstr buffer, size_t sz_buf, bool bMulti = false, LPCSTR offset = 0, int start_flt_ext = -1);
 
 public:
-    EFS_Utils();
-    virtual ~EFS_Utils();
     void _initialize() {}
     void _destroy() {}
     LPCSTR GenerateName(LPCSTR base_path, LPCSTR base_name, LPCSTR def_ext, pstr out_name, size_t const out_name_size);

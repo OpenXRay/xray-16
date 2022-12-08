@@ -150,7 +150,7 @@ void msParse(pcstr c)
     }
     if (0 == xr_stricmp(c, "quit"))
     {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // XXX: fix
         TerminateProcess(GetCurrentProcess(), 0);
         Console->Execute("quit");
 #endif

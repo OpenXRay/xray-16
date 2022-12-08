@@ -9,7 +9,7 @@ shared_str CUIXml::correct_file_name(pcstr path, pcstr fn)
 {
 #ifdef XRGAME_EXPORTS
     if (0 == xr_strcmp(path, UI_PATH) || 0 == xr_strcmp(path, "UI"))
-        return UI()->get_xml_name(fn);
+        return UICore::get_xml_name(fn);
 #endif
     return fn;
 }

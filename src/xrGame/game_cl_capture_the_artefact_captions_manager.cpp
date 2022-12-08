@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "string_table.h"
+
 #include "Level.h"
 #include "ui/TeamInfo.h"
 #include "game_cl_capture_the_artefact.h"

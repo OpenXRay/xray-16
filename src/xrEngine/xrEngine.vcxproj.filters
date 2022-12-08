@@ -136,14 +136,17 @@
     <Filter Include="Interfaces\ILoadingScreen">
       <UniqueIdentifier>{84e3429f-eb46-4db1-bd1c-9af2413b1de0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering Device">
-      <UniqueIdentifier>{e4d34774-3a5b-468f-9400-12c702636fa1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game API\StringTable">
       <UniqueIdentifier>{948b4643-0f42-4027-ac44-dbe3702887f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interfaces\MonitorManager">
-      <UniqueIdentifier>{fa21495d-605e-438d-8058-79e6ff670abe}</UniqueIdentifier>
+    <Filter Include="Game API\Level Controller">
+      <UniqueIdentifier>{680dcf81-2df9-4006-b22b-17db9cf15ad3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game API\Level Controller\KeyBindings">
+      <UniqueIdentifier>{88084f61-660e-4bb7-ab64-5fd27a09d18a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Device">
+      <UniqueIdentifier>{e4d34774-3a5b-468f-9400-12c702636fa1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -370,37 +373,28 @@
       <Filter>Interfaces\ILoadingScreen</Filter>
     </ClInclude>
     <ClInclude Include="device.h">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClInclude>
     <ClInclude Include="IPerformanceAlert.hpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClInclude>
     <ClInclude Include="PerformanceAlert.hpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClInclude>
     <ClInclude Include="StatGraph.h">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClInclude>
     <ClInclude Include="Stats.h">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClInclude>
-    <ClInclude Include="xr_input_xinput.h">
-      <Filter>Interfaces\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="StringTable\IStringTable.h">
+    <ClInclude Include="StringTable\StringTable.h">
       <Filter>Game API\StringTable</Filter>
-    </ClInclude>
-    <ClInclude Include="StringTable\IStringTableDefs.h">
-      <Filter>Game API\StringTable</Filter>
-    </ClInclude>
-    <ClInclude Include="MonitorManager.hpp">
-      <Filter>Interfaces\MonitorManager</Filter>
-    </ClInclude>
-    <ClInclude Include="TaskScheduler.hpp">
-      <Filter>Interfaces\Sheduler</Filter>
     </ClInclude>
     <ClInclude Include="embedded_resources_management.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_level_controller.h">
+      <Filter>Game API\Level Controller</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -606,46 +600,43 @@
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="device.cpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="Device_create.cpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="Device_destroy.cpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="Device_Initialize.cpp">
-      <Filter>Rendering Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_Misc.cpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="Device_overdraw.cpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="Device_wndproc.cpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="PerformanceAlert.cpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="StatGraph.cpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="Stats.cpp">
-      <Filter>Rendering Device</Filter>
+      <Filter>Render\Device</Filter>
     </ClCompile>
-    <ClCompile Include="xr_input_xinput.cpp">
-      <Filter>Interfaces\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="StringTable\IStringTable.cpp">
+    <ClCompile Include="StringTable\StringTable.cpp">
       <Filter>Game API\StringTable</Filter>
     </ClCompile>
-    <ClCompile Include="MonitorManager.cpp">
-      <Filter>Interfaces\MonitorManager</Filter>
+    <ClCompile Include="Device_mode.cpp">
+      <Filter>Render\Device</Filter>
     </ClCompile>
-    <ClCompile Include="TaskScheduler.cpp">
-      <Filter>Interfaces\Sheduler</Filter>
+    <ClCompile Include="xr_level_controller.cpp">
+      <Filter>Game API\Level Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="key_binding_registrator_script.cpp">
+      <Filter>Game API\Level Controller\KeyBindings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -655,9 +646,9 @@
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="..\OpenXRay.natvis" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -18,7 +18,7 @@ class UITaskListWnd;
 class UIMapLegend;
 class UIHint;
 
-class CUITaskWnd : public CUIWindow, public CUIWndCallback
+class CUITaskWnd final : public CUIWindow, public CUIWndCallback
 {
 private:
     typedef CUIWindow inherited;
@@ -61,6 +61,7 @@ public:
 public:
     CUITaskWnd(UIHint* hint);
     virtual ~CUITaskWnd();
+
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     bool Init();
     virtual void Update();
@@ -110,17 +111,17 @@ private:
 
     void OnNextTaskClicked();
     void OnPrevTaskClicked();
-    void xr_stdcall OnShowTaskListWnd(CUIWindow* w, void* d);
-    void xr_stdcall OnTask1DbClicked(CUIWindow*, void*);
-    void xr_stdcall OnTask2DbClicked(CUIWindow*, void*);
+    void OnShowTaskListWnd(CUIWindow* w, void* d);
+    void OnTask1DbClicked(CUIWindow*, void*);
+    void OnTask2DbClicked(CUIWindow*, void*);
 
-    void xr_stdcall OnShowTreasures(CUIWindow*, void*);
-    void xr_stdcall OnShowPrimaryObjects(CUIWindow*, void*);
-    void xr_stdcall OnShowSecondaryTasks(CUIWindow*, void*);
-    void xr_stdcall OnShowQuestNpcs(CUIWindow*, void*);
+    void OnShowTreasures(CUIWindow*, void*);
+    void OnShowPrimaryObjects(CUIWindow*, void*);
+    void OnShowSecondaryTasks(CUIWindow*, void*);
+    void OnShowQuestNpcs(CUIWindow*, void*);
 };
 
-class CUITaskItem : public CUIWindow
+class CUITaskItem final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -130,7 +131,6 @@ private:
 
 public:
     CUITaskItem();
-    virtual ~CUITaskItem() = default;
 
     virtual void OnFocusReceive();
     virtual void OnFocusLost();

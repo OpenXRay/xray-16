@@ -1,14 +1,13 @@
 #pragma once
 #include "xrUICore/Static/UIStatic.h"
 
-class XRUICORE_API UI_Arrow : public CUIStatic
+class XRUICORE_API UI_Arrow final : public CUIStatic
 {
 private:
     typedef CUIStatic inherited;
 
 public:
     UI_Arrow();
-    virtual ~UI_Arrow();
 
     void init_from_xml(CUIXml& xml, LPCSTR path, CUIWindow* parent);
     void SetNewValue(float new_value);

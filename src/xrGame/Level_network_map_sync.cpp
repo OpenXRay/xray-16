@@ -3,7 +3,6 @@
 #include "xrServerMapSync.h"
 #include "xrCore/stream_reader.h"
 #include "MainMenu.h"
-#include "string_table.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrNetServer/NET_Messages.h"
 

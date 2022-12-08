@@ -19,7 +19,7 @@ class CUIFrameWindow;
 class CUICharacterInfo;
 class CUIScrollView;
 
-class CUIRankingWnd : public CUIWindow, public CUIWndCallback
+class CUIRankingWnd final : public CUIWindow, public CUIWndCallback
 {
     using inherited = CUIWindow;
 
@@ -71,7 +71,7 @@ class CUIRankingWnd : public CUIWindow, public CUIWndCallback
 
 public:
     CUIRankingWnd();
-    virtual ~CUIRankingWnd();
+    ~CUIRankingWnd() override;
 
     virtual void Show(bool status);
     virtual void Update();
@@ -84,7 +84,7 @@ public:
 protected:
     void add_faction(CUIXml& xml, shared_str const& faction_id);
     void clear_all_factions();
-    bool xr_stdcall SortingLessFunction(CUIWindow* left, CUIWindow* right);
+    bool SortingLessFunction(CUIWindow* left, CUIWindow* right);
     void get_value_from_script();
 
     void add_achievement(CUIXml& xml, shared_str const& achiev_id);

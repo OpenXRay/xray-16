@@ -9,8 +9,8 @@
 #pragma once
 #include "xrCore/_fbox2.h"
 
-IC CLevelGraph::const_vertex_iterator CLevelGraph::begin() const { return (m_nodes->front()); }
-IC CLevelGraph::const_vertex_iterator CLevelGraph::end() const { return (m_nodes->back()); }
+IC CLevelGraph::const_vertex_iterator CLevelGraph::begin() const { return (m_nodes->begin()); }
+IC CLevelGraph::const_vertex_iterator CLevelGraph::end() const { return (m_nodes->end()); }
 IC const CLevelGraph::CHeader& CLevelGraph::header() const { return (*m_header); }
 ICF bool CLevelGraph::valid_vertex_id(u32 id) const
 {
@@ -21,13 +21,13 @@ ICF bool CLevelGraph::valid_vertex_id(u32 id) const
 ICF CLevelGraph::CLevelVertex* CLevelGraph::vertex(const u32 vertex_id) const
 {
     VERIFY(valid_vertex_id(vertex_id));
-    return m_nodes->at(vertex_id);
+    return m_nodes->begin() + vertex_id;
 }
 
 ICF u32 CLevelGraph::vertex(const CLevelVertex* vertex_p) const
 {
-    VERIFY((vertex_p >= m_nodes->front()) && valid_vertex_id(u32(vertex_p - m_nodes->front())));
-    return (u32(vertex_p - m_nodes->front()));
+    VERIFY((vertex_p >= m_nodes->begin()) && valid_vertex_id(u32(vertex_p - m_nodes->begin())));
+    return (u32(vertex_p - m_nodes->begin()));
 }
 
 ICF u32 CLevelGraph::vertex(const CLevelVertex& vertex_r) const { return (vertex(&vertex_r)); }
@@ -293,8 +293,8 @@ IC void CLevelGraph::set_invalid_vertex(u32& vertex_id, CLevelVertex** vertex) c
 
 IC const u32 CLevelGraph::vertex_id(const CLevelGraph::CLevelVertex* vertex) const
 {
-    VERIFY(valid_vertex_id(u32(vertex - m_nodes->front())));
-    return (u32(vertex - m_nodes->front()));
+    VERIFY(valid_vertex_id(u32(vertex - m_nodes->begin())));
+    return (u32(vertex - m_nodes->begin()));
 }
 
 IC Fvector CLevelGraph::v3d(const Fvector2& vector2d) const { return (Fvector().set(vector2d.x, 0.f, vector2d.y)); }
@@ -556,24 +556,24 @@ template <typename P>
 IC void CLevelGraph::iterate_vertices(
     const Fvector& min_position, const Fvector& max_position, const P& predicate) const
 {
-    CLevelVertex *front = m_nodes->front(), *back = m_nodes->back();
+    const auto begin = m_nodes->begin(), end = m_nodes->end();
 
     CLevelVertex *I, *E;
     if (valid_vertex_position(min_position))
         I = std::lower_bound(
-            front, back, vertex_position(min_position).xz(), &vertex::predicate2);
+            begin, end, vertex_position(min_position).xz(), &vertex::predicate2);
     else
-        I = front;
+        I = begin;
 
     if (valid_vertex_position(max_position))
     {
         E = std::upper_bound(
-            front, back, vertex_position(max_position).xz(), &vertex::predicate);
-        if (E != (back))
+            begin, end, vertex_position(max_position).xz(), &vertex::predicate);
+        if (E != (end))
             ++E;
     }
     else
-        E = back;
+        E = end;
 
     for (; I != E; ++I)
         predicate(*I);

@@ -12,8 +12,10 @@
 
 #include "game_cl_mp.h"
 
-UITeamState::UITeamState() { m_artefact_count = 0; }
+UITeamState::UITeamState() : CUIWindow("UITeamState") { m_artefact_count = 0; }
+
 UITeamState::UITeamState(ETeam teamId, UITeamPanels* teamPanels)
+    : CUIWindow("UITeamState")
 {
     myTeam = teamId;
     /*myScrollList = new CUIScrollView();
@@ -197,7 +199,7 @@ void UITeamState::AddPlayer(ClientID const& clientId)
 
     mainUiXml->SetLocalRoot(tempRoot);
 
-    myPlayers.insert(std::make_pair(clientId, TPlayerItem(tempPlayerItem, panel_index)));
+    myPlayers.emplace(clientId, TPlayerItem(tempPlayerItem, panel_index));
 }
 
 void UITeamState::RemovePlayer(ClientID const& clientId)

@@ -2,7 +2,7 @@
 #include "Bolt.h"
 #include "ParticlesObject.h"
 #include "xrPhysics/PhysicsShell.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 
 CBolt::CBolt(void) { m_thrower_id = u16(-1); }
 CBolt::~CBolt(void) {}

@@ -45,6 +45,9 @@ Texture2D s_occ;
 #ifdef USE_HDAO
 #if SSAO_QUALITY > 3
 //#_include "ssao_hdao_new.ps"
+// TODO: XXX: remove this after implementing hdao
+#undef SSAO_QUALITY
+#define SSAO_QUALITY 3
 #endif
 #define USE_HDAO_CODE
 #if SSAO_QUALITY <=3
@@ -138,7 +141,7 @@ _out _main ( _input I, uint iSample )
 #ifdef USE_HDAO
 #ifdef SM_5
 #if SSAO_QUALITY > 3
-    float occ = tex2D( s_occ, I.tc0.xy );	
+	float occ = tex2D( s_occ, I.tc0.xy );	
 #else // SSAO_QUALITY > 3
 	float occ = calc_hdao( CS_P(P.xyz, N.xyz, I.tc0.xy, I.tcJ, I.pos2d, ISAMPLE ) );
 #endif // SSAO_QUALITY > 3
@@ -151,7 +154,7 @@ _out _main ( _input I, uint iSample )
 #endif // SM_5
 #else // USE_HDAO
 #ifdef USE_HBAO
-    float occ = float(calc_hbao(P.z, N.xyz, I.tc0.xy, I.pos2d));
+	float occ = float(calc_hbao(P.z, N.xyz, I.tc0.xy, I.pos2d));
 #else // USE_HBAO
 	float occ = calc_ssao( CS_P(P.xyz, N.xyz, I.tc0.xy, I.tcJ, I.pos2d, ISAMPLE ) );
 #endif

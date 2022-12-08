@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ThreadUtil.h"
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
 #include <pthread.h>
 #endif
 
@@ -11,10 +12,11 @@ ThreadId GetCurrThreadId() { return GetCurrentThreadId(); }
 
 ThreadHandle GetCurrentThreadHandle() { return GetCurrentThread(); }
 
-void SetThreadName(ThreadHandle threadHandle, pcstr name)
+bool ThreadIdsAreEqual(ThreadId left, ThreadId right) { return left == right; }
+
+void SetThreadNameImpl(DWORD threadId, pcstr name)
 {
     const DWORD MSVC_EXCEPTION = 0x406D1388;
-    DWORD threadId = threadHandle != NULL ? GetThreadId(threadHandle) : DWORD(-1);
 
     struct SThreadNameInfo
     {
@@ -24,9 +26,15 @@ void SetThreadName(ThreadHandle threadHandle, pcstr name)
         DWORD dwFlags;
     };
 
+    constexpr char namePrefix[] = "X-Ray ";
+    constexpr auto namePrefixSize = std::size(namePrefix); // includes null-character intentionally
+    auto fullNameSize = xr_strlen(name) + namePrefixSize;
+    auto fullName = static_cast<pstr>(xr_alloca(fullNameSize));
+    strconcat(fullNameSize, fullName, namePrefix, name);
+
     SThreadNameInfo info;
     info.dwType = 0x1000;
-    info.szName = name;
+    info.szName = fullName;
     info.dwThreadID = threadId;
     info.dwFlags = 0;
 
@@ -39,10 +47,15 @@ void SetThreadName(ThreadHandle threadHandle, pcstr name)
     }
 }
 
+void SetCurrentThreadName(pcstr name)
+{
+    SetThreadNameImpl(-1, name);
+}
+
 u32 __stdcall ThreadEntry(void* params)
 {
     SThreadStartupInfo* args = (SThreadStartupInfo*)params;
-    SetThreadName(NULL, args->threadName);
+    SetCurrentThreadName(args->threadName);
     EntryFuncType entry = args->entryFunc;
     void* arglist = args->argList;
     xr_delete(args);
@@ -85,26 +98,25 @@ void CloseThreadHandle(ThreadHandle& threadHandle)
         threadHandle = nullptr;
     }
 }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
 ThreadId GetCurrThreadId() { return pthread_self(); }
 
 ThreadHandle GetCurrentThreadHandle() { return pthread_self(); }
 
-void SetThreadName(ThreadHandle threadHandle, pcstr name)
-{
-    if (!threadHandle)
-    {
-        pthread_setname_np(pthread_self(), name);
-        return;
-    }
+bool ThreadIdsAreEqual(ThreadId left, ThreadId right) { return !!pthread_equal(left, right); }
 
-    pthread_setname_np(threadHandle, name);
+void SetCurrentThreadName(pcstr name)
+{
+    if (auto error = pthread_setname_np(pthread_self(), name) != 0)
+    {
+        Msg("SetCurrentThreadName: failed to set thread name to '%s'. Errno: '%d'", name, error);
+    }
 }
 
 void* __cdecl ThreadEntry(void* params)
 {
     SThreadStartupInfo* args = (SThreadStartupInfo*)params;
-    SetThreadName(NULL, args->threadName);
+    SetCurrentThreadName(args->threadName);
     EntryFuncType entry = args->entryFunc;
     void* arglist = args->argList;
     xr_delete(args);
@@ -146,5 +158,7 @@ bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
 void WaitThread(ThreadHandle& threadHandle) { pthread_join(threadHandle, NULL); }
 
 void CloseThreadHandle(ThreadHandle& threadHandle) { pthread_detach(threadHandle); }
+#else
+#   error Add threading code for your platform
 #endif
 } // namespace Threading

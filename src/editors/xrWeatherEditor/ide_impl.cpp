@@ -18,12 +18,13 @@
 #include "property_container.hpp"
 #include "property_holder_include.hpp"
 
-using editor::window_ide;
 
 namespace XRay
 {
 namespace Editor
 {
+using editor::window_ide;
+
 ide_impl::ide_impl(engine_base* engine) : m_engine(engine), m_window(nullptr), m_paused(false), m_in_idle(false) {}
 ide_impl::~ide_impl() {}
 
@@ -71,7 +72,7 @@ void ide_impl::on_load_finished()
 
 void ide_impl::pause() { m_window->view().pause(); }
 property_holder_base* ide_impl::create_property_holder(
-    LPCSTR display_name, property_holder_collection* collection, property_holder_holder* holder)
+    pcstr display_name, property_holder_collection* collection, property_holder_holder* holder)
 {
     return (xr_new<::property_holder>(m_engine, display_name, collection, holder));
 }

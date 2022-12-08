@@ -7,8 +7,7 @@
 #include "ai/monsters/states/monster_state_home_point_attack.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateGroupPanicAbstract CStateGroupPanic<_Object>
 

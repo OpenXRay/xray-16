@@ -8,12 +8,11 @@
 #include "Render.h"
 #include "xr_object.h"
 
-#include "Include/xrRender/DrawUtils.h"
+#include "Include/xrRender/DrawUtils.h" // for CStats::OnRender
 #include "xr_input.h"
 #include "xrCore/cdecl_cast.hpp"
-#include "xrPhysics/IPHWorld.h"
 #include "PerformanceAlert.hpp"
-#include "TaskScheduler.hpp"
+#include "xrCore/Threading/TaskManager.hpp"
 
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {0};
@@ -75,6 +74,7 @@ static optimizer vtune;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 ENGINE_API bool g_bDisableRedText = false;
+int g_bShowRedText = 1;
 CStats::CStats()
 {
     statsFont = nullptr;
@@ -87,6 +87,40 @@ CStats::~CStats()
 {
     Device.seqRender.Remove(this);
     xr_delete(statsFont);
+}
+
+static void DumpTaskManagerStatistics(IGameFont& font, IPerformanceAlert* alert)
+{
+    size_t allocated{}, allocatedWithFallback{}, pushed{}, finished{};
+    TaskScheduler->GetStats(allocated, allocatedWithFallback, pushed, finished);
+
+    static size_t allocatedPrev{};
+    static size_t allocatedWithFallbackPrev{};
+    static size_t pushedPrev{};
+    static size_t finishedPrev{};
+
+    font.OutNext("Task scheduler:    ");
+    font.OutNext("- threads:       %zu", TaskScheduler->GetWorkersCount());
+    font.OutNext("  - active:      %zu", TaskScheduler->GetActiveWorkersCount());
+    font.OutNext("- tasks:           ");
+    font.OutNext("  - total:         ");
+    font.OutNext("    - allocated: %zu", allocated);
+    font.OutNext("      - fallback:%zu", allocatedWithFallback);
+    font.OutNext("    - pushed:    %zu", pushed);
+    font.OutNext("    - finished:  %zu", finished);
+    font.OutNext("  - this frame:    ");
+    font.OutNext("    - allocated: %zu", allocated - allocatedPrev);
+    font.OutNext("      - fallback:%zu", allocatedWithFallback - allocatedWithFallbackPrev);
+    font.OutNext("    - pushed     %zu", pushed - pushedPrev);
+    font.OutNext("    - finished:  %zu", finished - finishedPrev);
+
+    if (allocatedWithFallback != allocatedWithFallbackPrev)
+        alert->Print(font, "Task scheduler overload!");
+
+    allocatedPrev = allocated;
+    allocatedWithFallbackPrev = allocatedWithFallback;
+    pushedPrev = pushed;
+    finishedPrev = finished;
 }
 
 static void DumpSpatialStatistics(IGameFont& font, IPerformanceAlert* alert, ISpatial_DB& db, float engineTotal)
@@ -146,17 +180,13 @@ void CStats::Show()
         if (g_pGameLevel)
             g_pGameLevel->DumpStatistics(font, alertPtr);
         Engine.Sheduler.DumpStatistics(font, alertPtr);
-        Engine.Scheduler.DumpStatistics(font, alertPtr);
-        if (TaskScheduler)
-            TaskScheduler->DumpStatistics(font, alertPtr);
+        DumpTaskManagerStatistics(font, alertPtr);
         if (g_pGamePersistent)
         {
             g_pGamePersistent->DumpStatistics(font, alertPtr);
         }
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
-        if (physics_world())
-            physics_world()->DumpStatistics(font, alertPtr);
         font.OutSet(200, 0);
         GEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();
@@ -169,7 +199,6 @@ void CStats::Show()
         font.OutNext("TEST 2:      %2.2fms, %d", gTestTimer2.result, gTestTimer2.count);
         font.OutNext("TEST 3:      %2.2fms, %d", gTestTimer3.result, gTestTimer3.count);
         font.OutSkip();
-        font.OutNext("CPU: %u", CPU::GetCurrentCPU());
         font.OutNext("QPC: %u", CPU::qpc_counter);
         CPU::qpc_counter = 0;
     }
@@ -182,7 +211,7 @@ void CStats::Show()
         font.SetHeight(refHeight);
     }
 #ifdef DEBUG
-    if (!g_bDisableRedText && errors.size())
+    if (!g_bDisableRedText && errors.size() && g_bShowRedText)
     {
         font.SetColor(color_rgba(255, 16, 16, 191));
         font.OutSet(400, 0);
@@ -198,6 +227,17 @@ void CStats::Show()
         const auto fps = u32(Device.GetStats().fFPS);
         fpsFont->Out(static_cast<float>(Device.dwWidth - 40), 5, "%3d", fps);
         fpsFont->OnRender();
+    }
+    if (psDeviceFlags.test(rsShowFPSGraph))
+    {
+        const auto fps = Device.GetStats().fFPS;
+        const auto fpsMidThr = 30;
+        const auto fpsMaxThr = 60;
+        fpsGraph->AppendItem(fps, color_xrgb(
+            fps <  fpsMaxThr ? 255 : 0,
+            fps >= fpsMidThr ? 255 : 0,
+            0));
+        fpsGraph->OnRender();
     }
     gTestTimer0.FrameStart();
     gTestTimer1.FrameStart();
@@ -215,6 +255,13 @@ void CStats::OnDeviceCreate()
         fpsFont = xr_new<CGameFont>("hud_font_di", CGameFont::fsDeviceIndependent);
         fpsFont->SetHeightI(0.025f);
         fpsFont->SetColor(color_rgba(250, 250, 15, 180));
+
+        fpsGraph = xr_make_unique<CStatGraph>(false);
+        fpsGraph->SetStyle(CStatGraph::EStyle::stBarLine);
+        fpsGraph->SetRect(Device.dwWidth - 390, 10 - Device.dwHeight, 300, 68, color_xrgb(255, 255, 255) , color_xrgb(50, 50, 50));
+        fpsGraph->AddMarker(CStatGraph::EStyle::stHor, 60, color_xrgb(128, 128, 128)); // Max
+        fpsGraph->AddMarker(CStatGraph::EStyle::stHor, 30, color_xrgb(70, 70, 70)); // Mid
+        fpsGraph->SetMinMax(0.0f, 100.0f, 500);
     }
 
 #ifdef DEBUG
@@ -234,6 +281,9 @@ void CStats::OnDeviceDestroy()
     SetLogCB(nullptr);
     xr_delete(statsFont);
     xr_delete(fpsFont);
+    if (fpsGraph)
+        fpsGraph->OnDeviceDestroy();
+    fpsGraph = nullptr;
 }
 
 void CStats::FilteredLog(const char* s)

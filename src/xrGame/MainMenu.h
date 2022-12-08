@@ -64,6 +64,7 @@ class CMainMenu : public IMainMenu,
         flRestoreCursor = (1 << 5),
         flGameSaveScreenshot = (1 << 6),
         flNeedVidRestart = (1 << 7),
+        flNeedUIRestart = (1 << 8),
     };
     Flags16 m_Flags;
     string_path m_screenshot_name;
@@ -134,7 +135,6 @@ protected:
 
 public:
     u32 m_deactivated_frame;
-    bool m_wasForceReloaded;
     void DestroyInternal(bool bForce) override;
 
     CMainMenu();
@@ -151,7 +151,6 @@ public:
     void IR_OnMouseHold(int btn) override;
     void IR_OnMouseWheel(int x, int y) override;
     void IR_OnMouseMove(int x, int y) override;
-    void IR_OnMouseStop(int x, int y) override;
 
     void IR_OnKeyboardPress(int dik) override;
     void IR_OnKeyboardRelease(int dik) override;
@@ -159,8 +158,9 @@ public:
 
     void IR_OnTextInput(pcstr text) override;
 
-    void IR_OnControllerPress(int btn) override;
-    void IR_OnControllerRelease(int btn) override;
+    void IR_OnControllerPress(int dik, float x, float y) override;
+    void IR_OnControllerRelease(int dik, float x, float y) override;
+    void IR_OnControllerHold(int dik, float x, float y) override;
 
     bool OnRenderPPUI_query();
     void OnRenderPPUI_main();
@@ -182,20 +182,20 @@ public:
 
     void SwitchToMultiplayerMenu();
 
-    void xr_stdcall OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL);
-    void xr_stdcall OnDownloadPatch(CUIWindow*, void*);
-    void xr_stdcall OnConnectToMasterServerOkClicked(CUIWindow*, void*);
+    void OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL);
+    void OnDownloadPatch(CUIWindow*, void*);
+    void OnConnectToMasterServerOkClicked(CUIWindow*, void*);
 
     void Show_DownloadMPMap(LPCSTR text, LPCSTR url);
-    void xr_stdcall OnDownloadMPMap_CopyURL(CUIWindow*, void*);
-    void xr_stdcall OnDownloadMPMap(CUIWindow*, void*);
+    void OnDownloadMPMap_CopyURL(CUIWindow*, void*);
+    void OnDownloadMPMap(CUIWindow*, void*);
 
     void OnSessionTerminate(LPCSTR reason);
     void OnLoadError(LPCSTR module);
 
-    void xr_stdcall OnDownloadPatchResult(bool success);
-    void xr_stdcall OnDownloadPatchProgress(u64 received, u64 total);
-    void xr_stdcall OnRunDownloadedPatch(CUIWindow*, void*);
+    void OnDownloadPatchResult(bool success);
+    void OnDownloadPatchProgress(u64 received, u64 total);
+    void OnRunDownloadedPatch(CUIWindow*, void*);
 
     void Show_CTMS_Dialog();
     void Hide_CTMS_Dialog();

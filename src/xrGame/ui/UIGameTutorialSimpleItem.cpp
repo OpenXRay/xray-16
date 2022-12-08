@@ -5,7 +5,7 @@
 #include "UIXmlInit.h"
 #include "Common/object_broker.h"
 #include "xrEngine/xr_input.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "UIGameSP.h"
 #include "Level.h"
 #include "UIPdaWnd.h"
@@ -71,19 +71,18 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     m_flags.set(etiNeedPauseSound, 0 == xr_stricmp(str, "on"));
 
     str = xml->Read("guard_key", 0, NULL);
-    m_continue_dik_guard = -1;
+    m_continue_action_guard = kNOTBINDED;
     if (str && !xr_stricmp(str, "any"))
     {
-        m_continue_dik_guard = 9999;
+        m_continue_action_guard = kLASTACTION;
         str = nullptr;
     }
     if (str)
     {
-        EGameActions cmd = ActionNameToId(str);
-        m_continue_dik_guard = GetActionDik(cmd);
+        m_continue_action_guard = ActionNameToId(str);
     }
 
-    m_flags.set(etiCanBeStopped, (m_continue_dik_guard == -1));
+    m_flags.set(etiCanBeStopped, (m_continue_action_guard == kNOTBINDED));
 
     LPCSTR str_grab_input = xml->Read("grab_input", 0, "on");
     m_flags.set(etiGrabInput, (0 == xr_stricmp(str_grab_input, "on") || 0 == xr_stricmp(str_grab_input, "1")));
@@ -100,7 +99,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     }
 
     // ui-components
-    m_UIWindow = xr_new<CUIWindow>();
+    m_UIWindow = xr_new<CUIWindow>("Window");
     m_UIWindow->SetAutoDelete(false);
     XML_NODE _lsr = xml->GetLocalRoot();
 
@@ -258,7 +257,7 @@ void CUISequenceSimpleItem::Start()
 
         if (!ui_game_sp)
         {
-            Msg("!%s:: failed to get ui_game_sp", __FUNCTION__);
+            Msg("! %s:: failed to get ui_game_sp", __FUNCTION__);
             return;
         }
 
@@ -339,11 +338,11 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
 {
     if (!m_flags.test(etiCanBeStopped))
     {
-        VERIFY(m_continue_dik_guard != -1);
-        if (m_continue_dik_guard == -1)
+        VERIFY(m_continue_action_guard != kNOTBINDED);
+        if (m_continue_action_guard == kNOTBINDED)
             m_flags.set(etiCanBeStopped, TRUE); // not binded action :(
 
-        if (m_continue_dik_guard == 9999 || dik == m_continue_dik_guard)
+        else if (m_continue_action_guard == kLASTACTION || IsBinded(m_continue_action_guard, dik))
             m_flags.set(etiCanBeStopped, TRUE); // match key
     }
 
@@ -370,13 +369,10 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
 
 void CUISequenceSimpleItem::OnMousePress(int btn)
 {
-    int dik = 0;
-    switch (btn)
-    {
-    case 0: dik = MOUSE_1; break;
-    case 1: dik = MOUSE_2; break;
-    case 2: dik = MOUSE_3; break;
-    default: return;
-    }
-    OnKeyboardPress(dik);
+    OnKeyboardPress(btn);
+}
+
+void CUISequenceSimpleItem::OnControllerPress(int key)
+{
+    OnKeyboardPress(key);
 }

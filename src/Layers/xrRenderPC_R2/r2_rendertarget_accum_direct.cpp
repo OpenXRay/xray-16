@@ -5,13 +5,34 @@
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
-static Fvector3 corners[8] = {
-    {-1, -1, 0.7}, {-1, -1, +1}, {-1, +1, +1}, {-1, +1, 0.7}, {+1, +1, +1}, {+1, +1, 0.7}, {+1, -1, +1}, {+1, -1, 0.7}};
-static u16 facetable[16][3] = {
-    {3, 2, 1}, {3, 1, 0}, {7, 6, 5}, {5, 6, 4}, {3, 5, 2}, {4, 2, 5}, {1, 6, 7}, {7, 0, 1},
-    {5, 3, 0}, {7, 5, 0},
-    {1, 4, 6}, {2, 4, 1},
+namespace accum_direct
+{
+static Fvector3 corners[8] =
+{
+    { -1, -1, 0.7f }, { -1, -1, +1   },
+    { -1, +1, +1   }, { -1, +1, 0.7f },
+    { +1, +1, +1   }, { +1, +1, 0.7f },
+    { +1, -1, +1   }, { +1, -1, 0.7f }
 };
+
+static u16 facetable[16][3] =
+{
+    { 3, 2, 1 },
+    { 3, 1, 0 },
+    { 7, 6, 5 },
+    { 5, 6, 4 },
+    { 3, 5, 2 },
+    { 4, 2, 5 },
+    { 1, 6, 7 },
+    { 7, 0, 1 },
+
+    { 5, 3, 0 },
+    { 7, 5, 0 },
+
+    { 1, 4, 6 },
+    { 2, 4, 1 },
+};
+} // namespace accum_direct
 
 void CRenderTarget::accum_direct(u32 sub_phase)
 {
@@ -105,15 +126,13 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
         // compute xforms
         FPU::m64r();
-        Fmatrix xf_invview;
-        xf_invview.invert(Device.mView);
 
         // shadow xform
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
             xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
-            m_shadow.mul(xf_project, xf_invview);
+            m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
             if ((SE_SUN_FAR == sub_phase) && (RImplementation.o.HW_smap))
@@ -144,7 +163,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
             Fvector localnormal;
             m_xform.transform_dir(localnormal, normal);
             localnormal.normalize();
-            m_clouds_shadow.mul(m_xform, xf_invview);
+            m_clouds_shadow.mul(m_xform, Device.mInvView);
             m_xform.scale(0.002f, 0.002f, 1.f);
             m_clouds_shadow.mulA_44(m_xform);
             m_xform.translate(localnormal.mul(w_shift));
@@ -174,7 +193,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
         // setup
         RCache.set_Element(s_accum_direct->E[sub_phase]);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.0f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
@@ -291,7 +310,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         Fvector dir = L_dir;
         dir.normalize().mul(-_sqrt(intensity + EPS));
         RCache.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
-        RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0);
+        RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0.0f);
 
         //if (stencil>=1 && aref_pass) stencil = light_id
         RCache.set_ColorWriteEnable(FALSE);
@@ -330,15 +349,13 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
         // compute xforms
         FPU::m64r();
-        Fmatrix xf_invview;
-        xf_invview.invert(Device.mView);
 
         // shadow xform
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
             xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
-            m_shadow.mul(xf_project, xf_invview);
+            m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
             if ((SE_SUN_FAR == sub_phase) && (RImplementation.o.HW_smap))
@@ -369,7 +386,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             Fvector localnormal;
             m_xform.transform_dir(localnormal, normal);
             localnormal.normalize();
-            m_clouds_shadow.mul(m_xform, xf_invview);
+            m_clouds_shadow.mul(m_xform, Device.mInvView);
             m_xform.scale(0.002f, 0.002f, 1.f);
             m_clouds_shadow.mulA_44(m_xform);
             m_xform.translate(localnormal.mul(w_shift));
@@ -395,11 +412,11 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         // Fill vertex buffer
         u32 i_offset;
         {
-            u16* pib = RCache.Index.Lock(sizeof(facetable) / sizeof(u16), i_offset);
-            CopyMemory(pib, &facetable, sizeof(facetable));
-            RCache.Index.Unlock(sizeof(facetable) / sizeof(u16));
+            u16* pib = RCache.Index.Lock(sizeof(accum_direct::facetable) / sizeof(u16), i_offset);
+            CopyMemory(pib, &accum_direct::facetable, sizeof(accum_direct::facetable));
+            RCache.Index.Unlock(sizeof(accum_direct::facetable) / sizeof(u16));
             // corners
-            u32 ver_count = sizeof(corners) / sizeof(Fvector3);
+            u32 ver_count = sizeof(accum_direct::corners) / sizeof(Fvector3);
             FVF::L* pv = (FVF::L*)RCache.Vertex.Lock(ver_count, g_combine_cuboid.stride(), Offset);
 
             Fmatrix inv_XDcombine;
@@ -411,7 +428,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             for (u32 i = 0; i < ver_count; ++i)
             {
                 Fvector3 tmp_vec;
-                inv_XDcombine.transform(tmp_vec, corners[i]);
+                inv_XDcombine.transform(tmp_vec, accum_direct::corners[i]);
                 pv->set(tmp_vec, C);
                 pv++;
             }
@@ -424,7 +441,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.set_Element(s_accum_direct->E[sub_phase]);
 
         RCache.set_c("m_texgen", m_Texgen);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.0f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
@@ -434,11 +451,11 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         if (sub_phase == SE_SUN_FAR)
         {
             Fvector3 view_viewspace;
-            view_viewspace.set(0, 0, 1);
+            view_viewspace.set(0.0f, 0.0f, 1.0f);
 
             m_shadow.transform_dir(view_viewspace);
             Fvector4 view_projlightspace;
-            view_projlightspace.set(view_viewspace.x, view_viewspace.y, 0, 0);
+            view_projlightspace.set(view_viewspace.x, view_viewspace.y, 0.0f, 0.0f);
             view_projlightspace.normalize();
 
             RCache.set_c("view_shadow_proj", view_projlightspace);
@@ -821,7 +838,7 @@ void CRenderTarget::accum_direct_lum()
 void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, const Fmatrix& mShadow)
 {
     PIX_EVENT(accum_direct_volumetric);
-    
+
     if ((sub_phase != SE_SUN_NEAR) && (sub_phase != SE_SUN_MIDDLE) && (sub_phase != SE_SUN_FAR))
         return;
 
@@ -852,8 +869,10 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         light* fuckingsun = (light*)RImplementation.Lights.sun._get();
 
         // Common constants (light-related)
-        Fvector L_clr;
+        Fvector L_dir, L_clr;
         L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
+        Device.mView.transform_dir(L_dir, fuckingsun->direction);
+        L_dir.normalize();
 
         //  Use g_combine_2UV that was set up by accum_direct
         //  RCache.set_Geometry         (g_combine_2UV);
@@ -865,7 +884,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
             RCache.set_CullMode(CULL_CCW);
         }
 
-        //      RCache.set_c                ("Ldynamic_dir",        L_dir.x,L_dir.y,L_dir.z,0 );
+        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, 0.f);
         RCache.set_c("m_shadow", mShadow);
         Fmatrix m_Texgen;

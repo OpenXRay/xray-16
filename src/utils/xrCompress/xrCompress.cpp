@@ -347,7 +347,7 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
     filesVFS = 0;
     filesALIAS = 0;
 
-    dwTimeStart = timeGetTime();
+    dwTimeStart = CPU::GetTicks();
     if (config_ltx && config_ltx->section_exist("header"))
     {
         CMemoryWriter W;
@@ -394,14 +394,14 @@ void xrCompressor::ClosePack()
     fs_pack_writer->close_chunk();
     // save list
     bytesDST = fs_pack_writer->tell();
-    Msg("...Writing pack desc");
+    Log("...Writing pack desc");
 
     fs_pack_writer->w_chunk(1 | CFS_CompressMark, fs_desc.pointer(), fs_desc.size());
 
     Msg("Data size: %d. Desc size: %d.", bytesDST, fs_desc.size());
     FS.w_close(fs_pack_writer);
-    Msg("Pack saved.");
-    u32 dwTimeEnd = timeGetTime();
+    Log("Pack saved.");
+    u32 dwTimeEnd = CPU::GetTicks();
     printf(
         "\n\nFiles total/skipped/VFS/aliased: %d/%d/%d/%d\nOveral: %dK/%dK, %3.1f%%\nElapsed time: %d:%d\nCompression "
         "speed: %3.1f Mb/s",
@@ -456,7 +456,7 @@ void xrCompressor::PerformWork()
     }
     else
     {
-        Msg("ERROR: folder not found.");
+        Log("ERROR: folder not found.");
     }
 }
 
@@ -480,7 +480,7 @@ void xrCompressor::GatherFiles(LPCSTR path)
     auto i_list = FS.file_list_open("$target_folder$", path, FS_ListFiles | FS_RootOnly);
     if (!i_list)
     {
-        Msg("ERROR: Unable to open file list:%s", path);
+        Log("ERROR: Unable to open file list:", path);
         return;
     }
     for (const auto &it : *i_list)
@@ -547,8 +547,8 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
             if ((0 != path_len) && (path[path_len - 1] != '\\'))
                 xr_strcat(path, "\\");
 
-            Msg("");
-            Msg("Processing folder: '%s'", path);
+            Log("");
+            Log("Processing folder:", path);
             BOOL efRecurse;
             BOOL val = IsFolderAccepted(ltx, path, efRecurse);
             if (val || (!val && !efRecurse))
@@ -559,7 +559,7 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
                 auto i_fl_list = FS.file_list_open("$target_folder$", path, folder_mask);
                 if (!i_fl_list)
                 {
-                    Msg("ERROR: Unable to open folder list:", path);
+                    Log("ERROR: Unable to open folder list:", path);
                     continue;
                 }
 

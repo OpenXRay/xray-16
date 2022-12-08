@@ -18,7 +18,7 @@
 extern pureFrame* g_pNetProcessor;
 
 bool CLevel::net_Start_client(const char* options) { return false; }
-#include "string_table.h"
+
 bool CLevel::net_start_client1()
 {
     pApp->LoadBegin();
@@ -133,7 +133,7 @@ bool CLevel::net_start_client4()
 
         // Send physics to single or multithreaded mode
 
-        create_physics_world(!!psDeviceFlags.test(mtPhysics), &ObjectSpace, &Objects, &Device);
+        create_physics_world(!!psDeviceFlags.test(mtPhysics), &ObjectSpace, &Objects);
 
         R_ASSERT(physics_world());
 

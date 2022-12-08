@@ -63,10 +63,12 @@ public:
     IC iterator insert(iterator where, const value_type& value);
     template <class TIterator>
     IC void insert(TIterator first, TIterator last);
+    IC insert_result emplace(const key_type& key, const mapped_type& value);
     IC void erase(iterator element);
     IC void erase(iterator first, iterator last);
     IC size_type erase(const key_type& key);
     IC void clear();
+    IC void reserve(size_t new_capacity);
     IC iterator find(const key_type& key);
     IC iterator lower_bound(const key_type& key);
     IC iterator upper_bound(const key_type& key);
@@ -181,6 +183,8 @@ IC typename _associative_vector::const_reverse_iterator _associative_vector::ren
 
 TEMPLATE_SPECIALIZATION
 IC void _associative_vector::clear() { inherited::clear(); }
+TEMPLATE_SPECIALIZATION
+IC void _associative_vector::reserve(size_t new_capacity) { inherited::reserve(new_capacity); }
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::size_type _associative_vector::max_size() const { return inherited::max_size(); }
 TEMPLATE_SPECIALIZATION
@@ -297,6 +301,22 @@ IC void _associative_vector::insert(TIterator first, TIterator last)
     }
     inherited::insert(end(), first, last);
     std::sort(begin(), end(), static_cast<TComparer&>(*this));
+}
+
+TEMPLATE_SPECIALIZATION
+IC typename _associative_vector::insert_result _associative_vector::emplace(const key_type& key, const mapped_type& value)
+{
+    actualize();
+    bool found = true;
+    iterator I = lower_bound(key);
+    if (I == end() || (*this)(key, (*I).first))
+    {
+        I = inherited::emplace(I, key, value);
+        found = false;
+    }
+    else
+        (*I).second = value;
+    return insert_result(I, !found);
 }
 
 TEMPLATE_SPECIALIZATION

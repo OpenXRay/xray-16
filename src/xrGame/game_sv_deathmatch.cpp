@@ -8,7 +8,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "Actor.h"
 #include "game_cl_base.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "HudItem.h"
 #include "Weapon.h"
 #include "eatable_item_object.h"
@@ -104,7 +104,7 @@ void game_sv_Deathmatch::Create(shared_str& options)
 
     switch_Phase(GAME_PHASE_PENDING);
 
-    ::Random.seed(SDL_GetTicks());
+    ::Random.seed(CPU::GetTicks());
     m_CorpseList.clear();
 
     m_AnomaliesPermanent.clear();

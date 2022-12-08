@@ -60,12 +60,12 @@ void CMonsterHome::load(LPCSTR line)
             m_radius_middle = m_object->spawn_ini()->r_float(line, "radius_middle");
             if (m_radius_middle > m_radius_max || m_radius_middle < m_radius_min)
             {
-                m_radius_middle = m_radius_min + (m_radius_max - m_radius_min) / 2;
+                m_radius_middle = (m_radius_max + m_radius_min) / 2;
             }
         }
         else
         {
-            m_radius_middle = m_radius_min + (m_radius_max - m_radius_min) / 2;
+            m_radius_middle = (m_radius_max + m_radius_min) / 2;
         }
         if (m_object->spawn_ini()->line_exist(line, "min_move_dist"))
         {
@@ -95,7 +95,7 @@ void CMonsterHome::setup(LPCSTR path_name, float min_radius, float max_radius, b
     m_radius_max = max_radius;
     if (middle_radius > max_radius || middle_radius < min_radius)
     {
-        m_radius_middle = m_radius_min + (m_radius_max - m_radius_min) / 2;
+        m_radius_middle = (m_radius_max + m_radius_min) / 2;
     }
     else
     {
@@ -112,7 +112,7 @@ void CMonsterHome::setup(u32 lv_ID, float min_radius, float max_radius, bool agg
     m_radius_max = max_radius;
     if (middle_radius > max_radius || middle_radius < min_radius)
     {
-        m_radius_middle = m_radius_min + (m_radius_max - m_radius_min) / 2;
+        m_radius_middle = (m_radius_max + m_radius_min) / 2;
     }
     else
     {
@@ -242,7 +242,7 @@ u32 CMonsterHome::get_place_in_max_home_to_direction(Fvector to_direction)
     int i = 0;
     float mAngle;
     Fvector m_dest_direction;
-    float m_res_dist = m_radius_middle + (m_radius_max - m_radius_middle) / 2 - (m_radius_max - m_radius_middle) / 10;
+    float m_res_dist = (m_radius_max + m_radius_middle) / 2 - (m_radius_max - m_radius_middle) / 10;
     float m_heading, m_pitch;
     do
     {
@@ -381,7 +381,7 @@ u32 CMonsterHome::get_place()
     {
         if (ai().level_graph().valid_vertex_id(m_level_vertex_id))
             m_object->control().path_builder().get_node_in_radius(
-                m_level_vertex_id, m_radius_min, m_radius_min + (m_radius_max - m_radius_min) / 2, 5, result);
+                m_level_vertex_id, m_radius_min, (m_radius_max + m_radius_min) / 2, 5, result);
 
         if (result == u32(-1))
         {
@@ -405,7 +405,7 @@ u32 CMonsterHome::get_place()
 
         // get_random node
         m_object->control().path_builder().get_node_in_radius(vertex->data().level_vertex_id(), m_radius_min,
-            m_radius_min + (m_radius_max - m_radius_min) / 2, 5, result);
+            (m_radius_max + m_radius_min) / 2, 5, result);
         if (result == u32(-1))
         {
             // TODO: find more acceptable decision, than return its level_vertex_id, if !accessible
@@ -430,7 +430,7 @@ u32 CMonsterHome::get_place_in_cover()
             const CCoverPoint* point =
                 m_object->CoverMan->find_cover(ai().level_graph().vertex_position(m_level_vertex_id),
                     ai().level_graph().vertex_position(m_level_vertex_id), m_radius_min,
-                    m_radius_min + (m_radius_max - m_radius_min) / 2);
+                    (m_radius_max + m_radius_min) / 2);
             if (point)
                 return point->level_vertex_id();
         }
@@ -444,7 +444,7 @@ u32 CMonsterHome::get_place_in_cover()
 
         // find cover
         const CCoverPoint* point = m_object->CoverMan->find_cover(vertex->data().position(), vertex->data().position(),
-            m_radius_min, m_radius_min + (m_radius_max - m_radius_min) / 2);
+            m_radius_min, (m_radius_max + m_radius_min) / 2);
         if (point)
             return point->level_vertex_id();
     }

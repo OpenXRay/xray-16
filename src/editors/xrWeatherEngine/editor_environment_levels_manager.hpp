@@ -41,8 +41,8 @@ public:
 private:
     void fill_levels(CInifile& config, pcstr section, pcstr category);
 
-    pcstr const* xr_stdcall collection();
-    u32 xr_stdcall collection_size();
+    pcstr const* collection();
+    u32 collection_size();
 
 private:
     struct predicate

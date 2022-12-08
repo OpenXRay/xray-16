@@ -1,7 +1,13 @@
 #include "stdafx.h"
+
 #include "r__pixel_calculator.h"
-#define rt_dimensions 1024
 #include "Layers/xrRender/FBasicVisual.h"
+
+#if defined(USE_DX9) || defined(USE_DX11)// XXX: support pixel calculator on OpenGL
+#   include <DirectXMath.h>
+#endif
+
+static constexpr u32 rt_dimensions = 1024;
 
 void r_pixel_calculator::begin()
 {
@@ -11,7 +17,7 @@ void r_pixel_calculator::begin()
     RCache.set_RT(rt->pRT);
 #ifdef USE_DX11
     RCache.set_ZB(zb->pZRT);
-#else
+#elif defined(USE_DX9) || defined(USE_OGL)
     RCache.set_ZB(zb->pRT);
 #endif
 
@@ -29,19 +35,17 @@ void r_pixel_calculator::end()
     rt = nullptr;
 }
 
+#if defined(USE_DX9) || defined(USE_DX11)
 // +X, -X, +Y, -Y, +Z, -Z
-static Fvector cmNorm[6] = {
-    {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, -1.f}, {0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}};
-static Fvector cmDir[6] = {
-    {1.f, 0.f, 0.f}, {-1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, -1.f, 0.f}, {0.f, 0.f, 1.f}, {0.f, 0.f, -1.f}};
+extern Fvector cmNorm[6];
+extern Fvector cmDir [6];
+#endif
 
 r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
 {
-    // XXX: use glm instead of D3DXMath
-#ifdef USE_OGL
-    VERIFY(!"Not implemented!");
-    return {};
-#else
+#if defined(USE_DX9) || defined(USE_DX11)
+    using namespace DirectX;
+
     r_aabb_ssa result = {0};
     float area = float(_sqr(rt_dimensions));
 
@@ -57,8 +61,10 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
         // camera - left-to-right
         mView.build_camera_dir(vFrom.invert(cmDir[face]).mul(100.f), cmDir[face], cmNorm[face]);
         aabb.xform(V->vis.box, mView);
-        D3DXMatrixOrthoOffCenterLH(
-            (D3DXMATRIX*)&mProject, aabb.vMin.x, aabb.vMax.x, aabb.vMin.y, aabb.vMax.y, aabb.vMin.z, aabb.vMax.z);
+
+        XMMATRIX project = XMMatrixOrthographicOffCenterLH(aabb.vMin.x, aabb.vMax.x, aabb.vMin.y, aabb.vMax.y, aabb.vMin.z, aabb.vMax.z);
+        XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&mProject), project);
+
         RCache.set_xform_world(Fidentity);
         RCache.set_xform_view(mView);
         RCache.set_xform_project(mProject);
@@ -79,16 +85,22 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
     {
         float pixels = (float)RImplementation.HWOCC.occq_get(id[it]);
         float coeff = clampr(pixels / area, float(0), float(1));
-        Msg("[%d]ssa_c: %1.3f,%f/%f", it, coeff, pixels, area);
+        Msg(" - [%d] ssa_c: %1.3f,%f/%f", it, coeff, pixels, area);
         result.ssa[it] = (u8)clampr(iFloor(coeff * 255.f + 0.5f), int(0), int(255));
     }
 
     return result;
+#elif defined(USE_OGL)
+    VERIFY(!"Not implemented!");
+    return {};
+#else
+#   error No graphics API selected or enabled!
 #endif
 }
 
 void r_pixel_calculator::run()
 {
+    Log("----- ssa build start -----");
     begin();
     for (u32 it = 0; it < RImplementation.Visuals.size(); it++)
     {
@@ -98,4 +110,5 @@ void r_pixel_calculator::run()
         calculate((dxRender_Visual*)RImplementation.Visuals[it]);
     }
     end();
+    Log("----- ssa build end -----");
 }

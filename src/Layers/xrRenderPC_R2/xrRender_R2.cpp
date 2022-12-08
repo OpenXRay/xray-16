@@ -13,24 +13,33 @@ class R2RendererModule final : public RendererModule
     xr_vector<pcstr> modes;
 
 public:
-    const xr_vector<pcstr>& ObtainSupportedModes() override
+    BOOL CheckCanAddMode() const
     {
+        // don't duplicate
         if (!modes.empty())
         {
-            return modes;
+            return FALSE;
         }
-        modes.emplace_back(RENDERER_R2A_MODE);
-        modes.emplace_back(RENDERER_R2_MODE);
-
-        D3DCAPS9 caps;
-        CHW hw;
-        hw.CreateD3D();
-        hw.pD3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &caps);
-        hw.DestroyD3D();
-
-        u16 ps_ver_major = u16(u32(u32(caps.PixelShaderVersion) & u32(0xf << 8ul)) >> 8);
-        if (ps_ver_major >= 3)
+        // Check if shaders are available
+        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
         {
+            Log("~ No shaders found for xrRender_R2");
+            return FALSE;
+        }
+        return xrRender_test_hw();
+    }
+
+    const xr_vector<pcstr>& ObtainSupportedModes() override
+    {
+        switch (CheckCanAddMode())
+        {
+        case TRUE:
+            modes.emplace_back(RENDERER_R2A_MODE);
+            modes.emplace_back(RENDERER_R2_MODE);
+            break;
+        case TRUE+TRUE: // XXX: remove hack
+            modes.emplace_back(RENDERER_R2A_MODE);  // don't optimize this switch with fallthrough,
+            modes.emplace_back(RENDERER_R2_MODE);   // because order matters.
             modes.emplace_back(RENDERER_R2_5_MODE);
         }
         return modes;
@@ -45,7 +54,7 @@ public:
         {
             modeIsCorrect = true;
         }
-        R_ASSERT3(modeIsCorrect, "Wrong mode passed to xrRender_R2.dll", mode);
+        R_ASSERT3(modeIsCorrect, "Wrong mode passed to xrRender_R2", mode);
     }
 
     void SetupEnv(pcstr mode) override

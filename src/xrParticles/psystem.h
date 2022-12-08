@@ -3,6 +3,16 @@
 #include "xrCore/_vector3d.h"
 #include "xrCommon/math_funcs_inline.h"
 
+#ifdef XRAY_STATIC_BUILD
+#   define PARTICLES_API
+#else
+#   ifdef XR_PARTICLES_EXPORTS
+#      define PARTICLES_API XR_EXPORT
+#   else
+#      define PARTICLES_API XR_IMPORT
+#   endif
+#endif
+
 // Actually this must be < sqrt(MAXFLOAT) since we store this value squared.
 #define P_MAXFLOAT 1.0e16f
 
@@ -122,7 +132,7 @@ using OnDeadParticleCB = void(*)(void* owner, u32 param, PAPI::Particle& P, u32 
 
 //////////////////////////////////////////////////////////////////////
 // Type codes for domains
-enum PDomainEnum
+enum PDomainEnum : u32
 {
     PDPoint = 0, // Single point
     PDLine = 1, // Line segment
@@ -135,12 +145,11 @@ enum PDomainEnum
     PDBlob = 8, // Gaussian blob
     PDDisc = 9, // Arbitrarily-oriented disc
     PDRectangle = 10, // Rhombus-shaped planar region
-    domain_enum_force_dword = u32(-1)
 };
 
 //////////////////////////////////////////////////////////////////////
 // Type codes for all actions
-enum PActionEnum
+enum PActionEnum : u32
 {
     PAAvoidID, // Avoid entering the domain of space.
     PABounceID, // Bounce particles off a domain of space.
@@ -174,7 +183,6 @@ enum PActionEnum
     PAVortexID, //
     PATurbulenceID, //
     PAScatterID, //
-    action_enum_force_dword = u32(-1)
 };
 
 struct ParticleAction;

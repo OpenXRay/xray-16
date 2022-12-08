@@ -1,3 +1,5 @@
+#pragma once
+
 extern void LogOut(const char* format, ...);
 extern void LogOut_File(const char* format, ...);
 

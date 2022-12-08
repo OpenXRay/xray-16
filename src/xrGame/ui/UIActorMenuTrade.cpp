@@ -18,7 +18,6 @@
 #include "Weapon.h"
 #include "trade_parameters.h"
 #include "inventory_item_object.h"
-#include "string_table.h"
 #include "ai/monsters/basemonster/base_monster.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
@@ -356,12 +355,12 @@ void CUIActorMenu::UpdateActor()
 
 void CUIActorMenu::UpdatePartnerBag()
 {
-    /*CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
+    CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
     if (monster || m_pPartnerInvOwner->use_simplified_visual())
     {
-        m_PartnerWeight->SetText("");
+        m_PartnerMoney->SetText("");
     }
-    else*/ if (m_pPartnerInvOwner->InfinitiveMoney())
+    else if (m_pPartnerInvOwner->InfinitiveMoney())
     {
         m_PartnerMoney->SetText("--- RU");
     }

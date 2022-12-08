@@ -11,9 +11,8 @@
 #include "Static/UIStatic.h"
 #include "Windows/UIFrameWindow.h"
 #include "XML/UIXmlInitBase.h"
-#include "xrEngine/StringTable/IStringTable.h"
 
-UIHint::UIHint()
+UIHint::UIHint() : CUIWindow("UIHint")
 {
     m_visible = false;
     m_rect.set(0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT);
@@ -74,7 +73,7 @@ void UIHint::Draw()
 
 // =================================================================================================
 
-UIHintWindow::UIHintWindow() : m_hint_wnd(NULL), m_hint_delay(1000), m_enable(false) {}
+UIHintWindow::UIHintWindow() : CUIWindow("UIHintWindow"), m_hint_wnd(NULL), m_hint_delay(1000), m_enable(false) {}
 void UIHintWindow::disable_hint()
 {
     if (!m_hint_wnd)
@@ -104,7 +103,7 @@ void UIHintWindow::set_hint_text(shared_str const& text)
 
 void UIHintWindow::set_hint_text_ST(shared_str const& text)
 {
-    set_hint_text(gStringTable->translate(text));
+    set_hint_text(StringTable().translate(text));
 }
 
 void UIHintWindow::update_hint_text()

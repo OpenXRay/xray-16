@@ -16,7 +16,7 @@ account_manager::account_manager(CGameSpy_GP* gsgp_inst)
 }
 
 account_manager::~account_manager() {}
-void __stdcall account_manager::only_log_creation_cb(bool success, char const* descr)
+void account_manager::only_log_creation_cb(bool success, char const* descr)
 {
     if (success)
     {
@@ -26,7 +26,7 @@ void __stdcall account_manager::only_log_creation_cb(bool success, char const* d
     Msg("! GameSpy account creation ERROR: %s", descr ? descr : "unknown");
 }
 
-void __stdcall account_manager::only_log_profdel_cb(bool success, char const* descr)
+void account_manager::only_log_profdel_cb(bool success, char const* descr)
 {
     if (success)
     {
@@ -36,7 +36,7 @@ void __stdcall account_manager::only_log_profdel_cb(bool success, char const* de
     Msg("! FAILED to delete GameSpy profile: %s", descr ? descr : "unknown");
 }
 
-void __stdcall account_manager::only_log_profiles(u32 const profiles_count, char const* description)
+void account_manager::only_log_profiles(u32 const profiles_count, char const* description)
 {
     if (profiles_count)
     {
@@ -49,7 +49,7 @@ void __stdcall account_manager::only_log_profiles(u32 const profiles_count, char
     }
     Msg("- No GameSpy account profiles found: %s", description ? description : "unknown error");
 }
-void __stdcall account_manager::only_log_suggestions(u32 const profiles_count, char const* description)
+void account_manager::only_log_suggestions(u32 const profiles_count, char const* description)
 {
     if (description)
         Msg("- GameSpy suggested unique nicks: %s", description);
@@ -60,7 +60,7 @@ void __stdcall account_manager::only_log_suggestions(u32 const profiles_count, c
     }
 }
 
-void __stdcall account_manager::only_log_found_email(bool found, char const* user_name)
+void account_manager::only_log_found_email(bool found, char const* user_name)
 {
     if (!found)
     {

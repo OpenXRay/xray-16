@@ -82,12 +82,10 @@ void CRenderTarget::accum_spot(light* L)
             fRange, 0.0f, view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, fBias, 1.0f};
 
         // compute xforms
-        Fmatrix xf_world;
-        xf_world.invert(Device.mView);
         Fmatrix xf_view = L->X.S.view;
         Fmatrix xf_project;
         xf_project.mul(m_TexelAdjust, L->X.S.project);
-        m_Shadow.mul(xf_view, xf_world);
+        m_Shadow.mul(xf_view, Device.mInvView);
         m_Shadow.mulA_44(xf_project);
 
         // lmap
@@ -99,7 +97,7 @@ void CRenderTarget::accum_spot(light* L)
 
         // compute xforms
         xf_project.mul(m_TexelAdjust2, L->X.S.project);
-        m_Lmap.mul(xf_view, xf_world);
+        m_Lmap.mul(xf_view, Device.mInvView);
         m_Lmap.mulA_44(xf_project);
     }
 
@@ -233,12 +231,10 @@ void CRenderTarget::accum_volumetric(light* L)
             fRange, 0.0f, view_dim / 2.f + view_sx + fTexelOffs, view_dim / 2.f + view_sy + fTexelOffs, fBias, 1.0f};
 
         // compute xforms
-        Fmatrix xf_world;
-        xf_world.invert(Device.mView);
         Fmatrix xf_view = L->X.S.view;
         Fmatrix xf_project;
         xf_project.mul(m_TexelAdjust, L->X.S.project);
-        m_Shadow.mul(xf_view, xf_world);
+        m_Shadow.mul(xf_view, Device.mInvView);
         m_Shadow.mulA_44(xf_project);
 
         // lmap
@@ -250,7 +246,7 @@ void CRenderTarget::accum_volumetric(light* L)
 
         // compute xforms
         xf_project.mul(m_TexelAdjust2, L->X.S.project);
-        m_Lmap.mul(xf_view, xf_world);
+        m_Lmap.mul(xf_view, Device.mInvView);
         m_Lmap.mulA_44(xf_project);
 
         // Compute light frustum in world space
@@ -360,7 +356,7 @@ void CRenderTarget::accum_volumetric(light* L)
         RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
         RCache.set_c("vMinBounds", aabb.x1, aabb.y1, aabb.z1, 0.f);
         //	Increase camera-space aabb z size to compensate decrease of slices number
-        RCache.set_c("vMaxBounds", aabb.x2, aabb.y2, aabb.z1 + (aabb.z2 - aabb.z1) / fQuality, 0);
+        RCache.set_c("vMaxBounds", aabb.x2, aabb.y2, aabb.z1 + (aabb.z2 - aabb.z1) / fQuality, 0.0f);
 
         //	Set up user clip planes
         {

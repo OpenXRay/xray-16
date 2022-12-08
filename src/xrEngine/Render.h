@@ -18,7 +18,7 @@ class IRenderVisual;
 class IKinematics;
 class IGameFont;
 class IPerformanceAlert;
-template <class T> class _box2; typedef _box2<float> Fbox2;
+struct Fbox2;
 struct Fcolor;
 class IReader;
 class CMemoryWriter;
@@ -163,11 +163,10 @@ enum class DeviceState
 class ENGINE_API IRender
 {
 public:
-    enum GenerationLevel
+    enum GenerationLevel : u32
     {
         GENERATION_R1 = 1,
         GENERATION_R2 = 2,
-        GENERATION_forcedword = u32(-1)
     };
 
     enum class BackendAPI : u32
@@ -178,14 +177,13 @@ public:
         OpenGL
     };
 
-    enum ScreenshotMode
+    enum ScreenshotMode : u32
     {
         SM_NORMAL = 0, // jpeg, name ignored
         SM_FOR_CUBEMAP = 1, // tga, name used as postfix
         SM_FOR_GAMESAVE = 2, // dds/dxt1,name used as full-path
         SM_FOR_LEVELMAP = 3, // tga, name used as postfix (level_name)
         SM_FOR_MPSENDING = 4,
-        SM_forcedword = u32(-1)
     };
 
     enum RenderContext
@@ -193,6 +191,15 @@ public:
         NoContext = -1,
         PrimaryContext,
         HelperContext
+    };
+
+    class ENGINE_API ScopedContext
+    {
+        RenderContext previousContext;
+
+    public:
+        ScopedContext(RenderContext context);
+        ~ScopedContext();
     };
 
     struct RenderStatistics
@@ -275,6 +282,7 @@ public:
     bool m_hq_skinning;
     s32 m_skinning;
     s32 m_MSAASample;
+    u32 m_SMAPSize;
 
     BENCH_SEC_SCRAMBLEMEMBER1
 
@@ -431,7 +439,7 @@ public:
     virtual DeviceState GetDeviceState() = 0;
     virtual bool GetForceGPU_REF() = 0;
     virtual u32 GetCacheStatPolys() = 0;
-    virtual void BeforeFrame() = 0;
+    virtual void BeforeRender() = 0;
     virtual void Begin() = 0;
     virtual void Clear() = 0;
     virtual void End() = 0;
@@ -440,5 +448,6 @@ public:
     virtual void OnAssetsChanged() = 0;
 
     virtual void ObtainRequiredWindowFlags(u32& windowFlags) = 0;
+    virtual RenderContext GetCurrentContext() const = 0;
     virtual void MakeContextCurrent(RenderContext context) = 0;
 };

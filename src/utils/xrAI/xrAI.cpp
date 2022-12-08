@@ -106,7 +106,7 @@ void execute(pstr cmd)
 
             R_ASSERT2(hFactory->IsLoaded(), "Factory DLL raised exception during loading or there is no factory DLL at all");
 
-#ifdef XR_ARCHITECTURE_X64
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
             pcstr create_entity_name = "create_entity";
             pcstr destroy_entity_name = "destroy_entity";
 #else
@@ -149,11 +149,11 @@ void Startup(pstr lpCmdLine)
         return;
     }
     Logger.Initialize("xrAI");
-    u32 dwStartupTime = timeGetTime();
+    u32 dwStartupTime = CPU::GetTicks();
     execute(cmd);
     // Show statistic
     string256 stats;
-    u32 dwEndTime = timeGetTime();
+    u32 dwEndTime = CPU::GetTicks();
     xr_sprintf(stats, "Time elapsed: %s", make_time((dwEndTime - dwStartupTime) / 1000).c_str());
     Logger.Success(stats);
     FlushLog();

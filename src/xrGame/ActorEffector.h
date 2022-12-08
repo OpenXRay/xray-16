@@ -46,7 +46,7 @@ public:
     void SetPP(CEffectorPP* p) { m_pe = p; }
     void SetCam(CEffectorCam* p) { m_ce = p; }
     virtual BOOL Valid() { return m_ce || m_pe; };
-    virtual float xr_stdcall GetFactor() = 0;
+    virtual float GetFactor() = 0;
 };
 
 class CAnimatorCamEffector : public CEffectorCam
@@ -110,7 +110,7 @@ public:
         m_factor = v;
         clamp(m_factor, 0.0f, 1.0f);
     }
-    float xr_stdcall GetFactor() { return m_factor; }
+    float GetFactor() { return m_factor; }
 };
 
 class CCameraEffectorControlled : public CAnimatorCamLerpEffector
@@ -144,12 +144,17 @@ public:
 
     virtual BOOL Valid();
     BOOL InWork();
-    virtual float xr_stdcall GetFactor();
+    virtual float GetFactor();
 };
 
 //////////////////////////////////////////////////////////////////////////
-class CControllerPsyHitCamEffector : public CEffectorCam
+class CControllerPsyHitCamEffector final : public CEffectorCam
 {
+    static constexpr float DELTA_ANGLE_X = 0.5f * PI / 180.f;
+    static constexpr float DELTA_ANGLE_Y = 0.5f * PI / 180.f;
+    static constexpr float DELTA_ANGLE_Z = 0.5f * PI / 180.f;
+    static constexpr float ANGLE_SPEED = 1.5f;
+
 protected:
     using inherited = CEffectorCam;
 

@@ -12,7 +12,6 @@
 
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
-#include "string_table.h"
 #include "Actor.h"
 #include "xrScriptEngine/script_process.hpp"
 #include "Inventory.h"
@@ -40,7 +39,7 @@ CUIInventoryUpgradeWnd::Scheme::Scheme() {}
 CUIInventoryUpgradeWnd::Scheme::~Scheme() { delete_data(cells); }
 // =============================================================================================
 
-CUIInventoryUpgradeWnd::CUIInventoryUpgradeWnd()
+CUIInventoryUpgradeWnd::CUIInventoryUpgradeWnd() : CUIWindow("CUIInventoryUpgradeWnd")
 {
     // m_WeaponIconsShader = new ui_shader();
     //(*m_WeaponIconsShader)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_actor_weapons");

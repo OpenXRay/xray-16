@@ -285,7 +285,7 @@ static struct {
   double total_t;		// total clocks used in this slot.
   double total_p;		// total percentage points used in this slot.
   int count;			// number of times this slot has been updated.
-  char *description;		// pointer to static string
+  const char *description;		// pointer to static string
 } event[MAXNUM];
 
 
@@ -308,7 +308,7 @@ static void initSlots()
 void dTimerStart (const char *description)
 {
   initSlots();
-  event[0].description = const_cast<char*> (description);
+  event[0].description = description;
   num = 1;
   serialize();
   getClockCount (event[0].cc);
@@ -320,7 +320,7 @@ void dTimerNow (const char *description)
   if (num < MAXNUM) {
     // do not serialize
     getClockCount (event[num].cc);
-    event[num].description = const_cast<char*> (description);
+    event[num].description = description;
     num++;
   }
 }
@@ -339,7 +339,7 @@ void dTimerEnd()
 //****************************************************************************
 // print report
 
-static void fprintDoubleWithPrefix (FILE *f, double a, char *fmt)
+static void fprintDoubleWithPrefix (FILE *f, double a, const char *fmt)
 {
   if (a >= 0.999999) {
     fprintf (f,fmt,a);

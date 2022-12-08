@@ -10,7 +10,7 @@
 #endif
 
 #include "game_cl_single.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "ActorCondition.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "Common/object_broker.h"
@@ -94,6 +94,7 @@ void CUIGameSP::OnFrame()
 
 void CUIGameSP::OnUIReset()
 {
+    inherited::OnUIReset();
     ReinitDialogs();
 }
 
@@ -331,7 +332,7 @@ void CChangeLevelWnd::Show(bool status)
 
         g_block_pause = true;
         Device.Pause(TRUE, TRUE, TRUE, "CChangeLevelWnd_show");
-        bShowPauseString = FALSE;
+        bShowPauseString = false;
     }
     else
     {
@@ -354,7 +355,7 @@ void CChangeLevelWnd::ShowDialog(bool bDoHideIndicators)
 
     g_block_pause = true;
     Device.Pause(TRUE, TRUE, TRUE, "CChangeLevelWnd_show");
-    bShowPauseString = FALSE;
+    bShowPauseString = false;
     inherited::ShowDialog(bDoHideIndicators);
 }
 

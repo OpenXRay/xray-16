@@ -4,9 +4,10 @@
 #include "StatGraph.h"
 //---------------------------------------------
 
-CStatGraph::CStatGraph()
+CStatGraph::CStatGraph(bool bRegister /* = true */)
 {
-    Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
+    if (bRegister)
+        Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
     OnDeviceCreate();
     mn = 0;
     mx = 1;

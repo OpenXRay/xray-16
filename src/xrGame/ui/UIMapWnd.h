@@ -45,6 +45,7 @@ private:
     CMapActionPlanner* m_ActionPlanner;
     CUIFrameLineWnd* m_UIMainMapHeader;
     CUIMapLocationHint* m_map_location_hint;
+    CMapLocation* m_cur_location;
 
 #ifdef DEBUG
 //	CUIStatic*					m_dbg_text_hint;
@@ -64,27 +65,27 @@ private:
         btn_zoom_reset = 8,
         max_btn_nav = 9
     };
-    CUI3tButton* m_btn_nav[max_btn_nav];
+    CUI3tButton* m_btn_nav[max_btn_nav]{};
     CUIStatic* m_btn_nav_parent;
     u32 m_nav_timing;
 
     void UpdateNav();
 
-    void xr_stdcall OnBtnLegend_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnUp_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnZoomMore_Push(CUIWindow*, void*);
+    void OnBtnLegend_Push(CUIWindow*, void*);
+    void OnBtnUp_Push(CUIWindow*, void*);
+    void OnBtnZoomMore_Push(CUIWindow*, void*);
 
-    void xr_stdcall OnBtnLeft_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnActor_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnRight_Push(CUIWindow*, void*);
+    void OnBtnLeft_Push(CUIWindow*, void*);
+    void OnBtnActor_Push(CUIWindow*, void*);
+    void OnBtnRight_Push(CUIWindow*, void*);
 
-    void xr_stdcall OnBtnZoomLess_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnDown_Push(CUIWindow*, void*);
-    void xr_stdcall OnBtnZoomReset_Push(CUIWindow*, void*);
+    void OnBtnZoomLess_Push(CUIWindow*, void*);
+    void OnBtnDown_Push(CUIWindow*, void*);
+    void OnBtnZoomReset_Push(CUIWindow*, void*);
 
 private:
-    void xr_stdcall OnScrollV(CUIWindow*, void*);
-    void xr_stdcall OnScrollH(CUIWindow*, void*);
+    void OnScrollV(CUIWindow*, void*);
+    void OnScrollH(CUIWindow*, void*);
 
     void OnToolNextMapClicked(CUIWindow*, void*);
     void OnToolPrevMapClicked(CUIWindow*, void*);
@@ -100,13 +101,18 @@ public:
     void MoveScrollV(float dy);
     void MoveScrollH(float dx);
 
+    void ActivatePropertiesBox(CUIWindow* w);
+
 public:
     CUICustomMap* m_tgtMap;
     Fvector2 m_tgtCenter;
     UIHint* hint_wnd;
 
 protected:
-    void init_xml_nav(CUIXml& xml);
+    CUIPropertiesBox* m_UIPropertiesBox;
+
+protected:
+    void init_xml_nav(CUIXml& xml, pcstr start_from, bool critical);
     void ShowHint(bool extra = false);
     void Activated();
 
@@ -137,7 +143,6 @@ public:
     void Hint(const shared_str& text);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
-    virtual bool OnKeyboardHold(int dik);
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 

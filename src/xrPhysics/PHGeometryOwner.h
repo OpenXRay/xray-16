@@ -62,7 +62,7 @@ public:
     void dbg_draw(float scale, u32 color, Flags32 flags) const;
 #endif
     void SetMaterial(u16 m);
-    void SetMaterial(LPCSTR m) { SetMaterial(GMLibrary().GetMaterialIdx(m)); } // aux
+    void SetMaterial(LPCSTR m) { SetMaterial(GMLib.GetMaterialIdx(m)); } // aux
     IC CODEGeom* Geom(u16 num)
     {
         R_ASSERT2(num < m_geoms.size(), "out of range");

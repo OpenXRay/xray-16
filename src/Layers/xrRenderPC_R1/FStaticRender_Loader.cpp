@@ -6,11 +6,6 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 void CRender::level_Load(IReader* fs)
 {
     R_ASSERT(nullptr != g_pGameLevel);
@@ -240,7 +235,9 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             // count, size
             u32 vCount = fs->r_u32();
             u32 vSize = GetDeclVertexSize(dcl, 0);
+#ifndef MASTER_GOLD
             Msg("* [Loading VB] %d verts, %d Kb", vCount, (vCount * vSize) / 1024);
+#endif
 
             // Create and fill
             _VB[i].Create(vCount * vSize);
@@ -269,7 +266,9 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
         for (u32 i = 0; i < count; i++)
         {
             u32 iCount = fs->r_u32();
+#ifndef MASTER_GOLD
             Msg("* [Loading IB] %d indices, %d Kb", iCount, (iCount * 2) / 1024);
+#endif
 
             // Create and fill
             _IB[i].Create(iCount * 2);
@@ -315,19 +314,12 @@ void CRender::LoadLights(IReader* fs)
     chunk->close();
 }
 
-struct b_portal
-{
-    u16 sector_front;
-    u16 sector_back;
-    svector<Fvector, 6> vertices;
-};
-
 void CRender::LoadSectors(IReader* fs)
 {
     // allocate memory for portals
     u32 size = fs->find_chunk(fsL_PORTALS);
-    R_ASSERT(0 == size % sizeof(b_portal));
-    u32 count = size / sizeof(b_portal);
+    R_ASSERT(0 == size % sizeof(CPortal::b_portal));
+    u32 count = size / sizeof(CPortal::b_portal);
     Portals.resize(count);
     for (u32 c = 0; c < count; c++)
         Portals[c] = xr_new<CPortal>();
@@ -352,7 +344,7 @@ void CRender::LoadSectors(IReader* fs)
     if (count)
     {
         bool do_rebuild = true;
-        const bool use_cache = strstr(Core.Params, "-cdb_cache");
+        const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
 
         string_path fName;
         strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
@@ -360,22 +352,27 @@ void CRender::LoadSectors(IReader* fs)
 
         // build portal model
         rmPortals = xr_new<CDB::MODEL>();
-        if (use_cache)
+        rmPortals->set_version(fs->get_age());
+        if (use_cache && FS.exist(fName) && rmPortals->deserialize(fName))
         {
-            if (!FS.exist(fName))
-                Msg("* Portals cache for '%s' not found. Building the model from scratch..", fName);
-            else
-            {
-                rmPortals->deserialize(fName);
-                do_rebuild = false;
-            }
+#ifndef MASTER_GOLD
+            Msg("* Loaded portals cache (%s)...", fName);
+#endif
+            do_rebuild = false;
+        }
+        else
+        {
+#ifndef MASTER_GOLD
+            Msg("* Portals cache for '%s' was not loaded. "
+                "Building the model from scratch..", fName);
+#endif
         }
 
         CDB::Collector CL;
         fs->find_chunk(fsL_PORTALS);
         for (u32 i = 0; i < count; i++)
         {
-            b_portal P;
+            CPortal::b_portal P;
             fs->r(&P, sizeof(P));
             CPortal* __P = (CPortal*)Portals[i];
             __P->Setup(P.vertices.begin(), P.vertices.size(), (CSector*)getSector(P.sector_front),

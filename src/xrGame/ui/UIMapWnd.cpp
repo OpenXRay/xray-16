@@ -17,13 +17,16 @@
 #include "xrUICore/Hint/UIHint.h"
 #include "map_hint.h"
 #include "xrUICore/Cursor/UICursor.h"
+#include "xrUICore/PropertiesBox/UIPropertiesBox.h"
+#include "xrUICore/ListBox/UIListBoxItem.h"
 #include "xrEngine/xr_input.h" //remove me !!!
 #include "UIHelper.h"
 
 CUIMapWnd* g_map_wnd = NULL; // quick temporary solution -(
 CUIMapWnd* GetMapWnd() { return g_map_wnd; }
+
 CUIMapWnd::CUIMapWnd(UIHint* hint)
-    : m_ActionPlanner(nullptr)
+    : CUIWindow("CUIMapWnd"), m_ActionPlanner(nullptr)
 {
     m_tgtMap = NULL;
     m_GlobalMap = NULL;
@@ -44,12 +47,14 @@ CUIMapWnd::CUIMapWnd(UIHint* hint)
     m_nav_timing = Device.dwTimeGlobal;
     hint_wnd = hint;
     g_map_wnd = this;
+    m_cur_location = nullptr;
 }
 
 CUIMapWnd::~CUIMapWnd()
 {
     delete_data(m_ActionPlanner);
     delete_data(m_GameMaps);
+    delete_data(m_map_location_hint);
     /*
     #ifdef DEBUG
         delete_data( m_dbg_text_hint );
@@ -145,12 +150,11 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
         AddCallback(m_UIMainScrollV, SCROLLBAR_VSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollV));
     }
 
-    init_xml_nav(uiXml);
+    init_xml_nav(uiXml, start_from, critical);
 
     m_map_location_hint = xr_new<CUIMapLocationHint>();
+    m_map_location_hint->SetAutoDelete(false);
     m_map_location_hint->SetCustomDraw(true);
-    m_map_location_hint->SetAutoDelete(true);
-    AttachChild(m_map_location_hint);
     strconcat(sizeof(pth), pth, start_from, ":map_hint_item");
     m_map_location_hint->Init(uiXml, pth);
 
@@ -222,6 +226,13 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
     m_ActionPlanner = xr_new<CMapActionPlanner>();
     m_ActionPlanner->setup(this);
     m_view_actor = true;
+
+    m_UIPropertiesBox = xr_new<CUIPropertiesBox>();
+    m_UIPropertiesBox->SetAutoDelete(true);
+    m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));
+    AttachChild(m_UIPropertiesBox);
+    m_UIPropertiesBox->Hide();
+    m_UIPropertiesBox->SetWindowName("property_box");
 
     return true;
 }
@@ -362,7 +373,8 @@ void CUIMapWnd::Draw()
         m_dbg_info->Draw		();
     #endif // DEBUG */
 
-    m_btn_nav_parent->Draw();
+    if (m_btn_nav_parent)
+        m_btn_nav_parent->Draw();
 }
 
 void CUIMapWnd::MapLocationRelcase(CMapLocation* ml)
@@ -396,55 +408,57 @@ void CUIMapWnd::DrawHint()
     }
 }
 
-bool CUIMapWnd::OnKeyboardHold(int dik)
-{
-    switch (dik)
-    {
-    case SDL_SCANCODE_UP:
-    case SDL_SCANCODE_DOWN:
-    case SDL_SCANCODE_LEFT:
-    case SDL_SCANCODE_RIGHT:
-    {
-        Fvector2 pos_delta;
-        pos_delta.set(0.0f, 0.0f);
-
-        if (dik == SDL_SCANCODE_UP)
-            pos_delta.y += m_map_move_step;
-        if (dik == SDL_SCANCODE_DOWN)
-            pos_delta.y -= m_map_move_step;
-        if (dik == SDL_SCANCODE_LEFT)
-            pos_delta.x += m_map_move_step;
-        if (dik == SDL_SCANCODE_RIGHT)
-            pos_delta.x -= m_map_move_step;
-        MoveMap(pos_delta);
-        return true;
-    }
-    break;
-    }
-    return inherited::OnKeyboardHold(dik);
-}
-
 bool CUIMapWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    switch (dik)
+    switch (keyboard_action)
     {
-    case SDL_SCANCODE_KP_MINUS:
+    case WINDOW_KEY_PRESSED:
     {
-        // SetZoom(GetZoom()/1.5f);
-        UpdateZoom(false);
-        // ResetActionPlanner();
-        return true;
+        switch (dik)
+        {
+        case SDL_SCANCODE_KP_MINUS:
+            // SetZoom(GetZoom()/1.5f);
+            UpdateZoom(false);
+            // ResetActionPlanner();
+            return true;
+
+        case SDL_SCANCODE_KP_PLUS:
+            // SetZoom(GetZoom()*1.5f);
+            UpdateZoom(true);
+            // ResetActionPlanner();
+            return true;
+        } // switch (dik)
     }
     break;
-    case SDL_SCANCODE_KP_PLUS:
+
+    case WINDOW_KEY_HOLD:
     {
-        // SetZoom(GetZoom()*1.5f);
-        UpdateZoom(true);
-        // ResetActionPlanner();
-        return true;
+        Fvector2 pos_delta{};
+
+        switch (GetBindedAction(dik))
+        {
+        case kUP:
+            pos_delta.y += m_map_move_step;
+            break;
+        case kDOWN:
+            pos_delta.y -= m_map_move_step;
+            break;
+        case kLEFT:
+            pos_delta.x += m_map_move_step;
+            break;
+        case kRIGHT:
+            pos_delta.x -= m_map_move_step;
+            break;
+        }
+
+        if (pos_delta.x || pos_delta.y)
+        {
+            MoveMap(pos_delta);
+            return true;
+        }
     }
     break;
-    }
+    } // switch (keyboard_action)
 
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
@@ -462,6 +476,9 @@ bool CUIMapWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
     {
         switch (mouse_action)
         {
+        case WINDOW_RBUTTON_UP:
+            ActivatePropertiesBox(NULL);
+            break;
         case WINDOW_MOUSE_MOVE:
             if (pInput->iGetAsyncBtnState(0))
             {
@@ -525,6 +542,52 @@ void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     //	inherited::SendMessage( pWnd, msg, pData);
     CUIWndCallback::OnEvent(pWnd, msg, pData);
+
+    if (pWnd == m_UIPropertiesBox && msg == PROPERTY_CLICKED && m_UIPropertiesBox->GetClickedItem())
+    {
+        luabind::functor<void> funct;
+        if (GEnv.ScriptEngine->functor("pda.property_box_clicked", funct))
+            funct(m_UIPropertiesBox, m_cur_location);
+    }
+}
+
+void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
+{
+    m_UIPropertiesBox->RemoveAll();
+
+    CMapSpot* sp = smart_cast<CMapSpot*>(w);
+    if (!sp)
+        return;
+
+    m_cur_location = sp->MapLocation();
+    if (!m_cur_location)
+        return;
+
+    luabind::functor<void> funct;
+    if (GEnv.ScriptEngine->functor("pda.property_box_add_properties", funct))
+    {
+        funct(m_UIPropertiesBox, m_cur_location->ObjectID(), (LPCSTR)m_cur_location->GetLevelName().c_str(), m_cur_location);
+    }
+
+    // Только для меток игрока
+    if (m_cur_location->IsUserDefined())
+    {
+        m_UIPropertiesBox->AddItem("st_pda_change_spot_hint", NULL, MAP_CHANGE_SPOT_HINT_ACT); // Изменяем название метки
+        m_UIPropertiesBox->AddItem("st_pda_delete_spot", NULL, MAP_REMOVE_SPOT_ACT); // Удаляем метку
+    }
+
+    if (m_UIPropertiesBox->GetItemsCount() > 0)
+    {
+        m_UIPropertiesBox->AutoUpdateSize();
+
+        Fvector2 cursor_pos;
+        Frect vis_rect;
+
+        GetAbsoluteRect(vis_rect);
+        cursor_pos = GetUICursor().GetCursorPosition();
+        cursor_pos.sub(vis_rect.lt);
+        m_UIPropertiesBox->Show(vis_rect, cursor_pos);
+    }
 }
 
 CUICustomMap* CUIMapWnd::GetMapByIdx(u16 idx)

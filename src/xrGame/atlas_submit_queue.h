@@ -58,7 +58,7 @@ private:
     gamespy_profile::store_operation_cb m_atlas_submitted;
     bool m_atlas_in_process;
 
-    void __stdcall atlas_submitted(bool result, char const* err_string);
+    void atlas_submitted(bool result, char const* err_string);
 }; // class atlas_submit_quque
 
 #endif //#ifndef ATLAS_SUBMIT_QUEUE_INCLUDED

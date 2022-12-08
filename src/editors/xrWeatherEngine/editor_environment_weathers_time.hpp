@@ -42,36 +42,36 @@ public:
         CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& M, float m_power);
 
 private:
-    pcstr const* xr_stdcall ambients_collection();
-    u32 xr_stdcall ambients_collection_size();
-    pcstr const* xr_stdcall suns_collection();
-    u32 xr_stdcall suns_collection_size();
-    pcstr const* xr_stdcall thunderbolts_collection();
-    u32 xr_stdcall thunderbolts_collection_size();
+    pcstr const* ambients_collection();
+    u32 ambients_collection_size();
+    pcstr const* suns_collection();
+    u32 suns_collection_size();
+    pcstr const* thunderbolts_collection();
+    u32 thunderbolts_collection_size();
 
 private:
-    pcstr xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(pcstr value);
-    float xr_stdcall sun_altitude_getter() const;
-    void xr_stdcall sun_altitude_setter(float value);
-    float xr_stdcall sun_longitude_getter() const;
-    void xr_stdcall sun_longitude_setter(float value);
-    float xr_stdcall sky_rotation_getter() const;
-    void xr_stdcall sky_rotation_setter(float value);
-    float xr_stdcall clouds_rotation_getter() const;
-    void xr_stdcall clouds_rotation_setter(float value);
-    float xr_stdcall wind_direction_getter() const;
-    void xr_stdcall wind_direction_setter(float value);
-    pcstr xr_stdcall ambient_getter() const;
-    void xr_stdcall ambient_setter(pcstr value);
-    pcstr xr_stdcall sun_getter() const;
-    void xr_stdcall sun_setter(pcstr value);
-    pcstr xr_stdcall thunderbolt_getter() const;
-    void xr_stdcall thunderbolt_setter(pcstr value);
-    pcstr xr_stdcall sky_texture_getter() const;
-    void xr_stdcall sky_texture_setter(pcstr value);
-    pcstr xr_stdcall clouds_texture_getter() const;
-    void xr_stdcall clouds_texture_setter(pcstr value);
+    pcstr id_getter() const;
+    void id_setter(pcstr value);
+    float sun_altitude_getter() const;
+    void sun_altitude_setter(float value);
+    float sun_longitude_getter() const;
+    void sun_longitude_setter(float value);
+    float sky_rotation_getter() const;
+    void sky_rotation_setter(float value);
+    float clouds_rotation_getter() const;
+    void clouds_rotation_setter(float value);
+    float wind_direction_getter() const;
+    void wind_direction_setter(float value);
+    pcstr ambient_getter() const;
+    void ambient_setter(pcstr value);
+    pcstr sun_getter() const;
+    void sun_setter(pcstr value);
+    pcstr thunderbolt_getter() const;
+    void thunderbolt_setter(pcstr value);
+    pcstr sky_texture_getter() const;
+    void sky_texture_setter(pcstr value);
+    pcstr clouds_texture_getter() const;
+    void clouds_texture_setter(pcstr value);
 
 private:
     shared_str m_ambient;

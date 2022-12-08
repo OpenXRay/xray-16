@@ -126,8 +126,7 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         case SE_R2_SHADOW:		// smap
                                 //if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model","dumb",	FALSE,TRUE,TRUE,FALSE);
                                 //else							C.r_Pass	("shadow_direct_model","shadow_direct_base",FALSE);
-            C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE, TRUE, FALSE);
-            C.r_Sampler		("s_base",C.L_textures[0]);
+            C.r_Pass("shadow_direct_model", "null", FALSE, TRUE, TRUE, FALSE);
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_End();
             break;
@@ -152,11 +151,11 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
             C.r_Pass(vsname, psname, TRUE, TRUE, FALSE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, 0);
             // C.r_Sampler			("s_base",	C.L_textures[0]);
             // C.r_Sampler			("s_env",	oT2_Name,false,D3DTADDRESS_CLAMP);
-            C.r_dx10Texture("s_base", C.L_textures[0]);
-            C.r_dx10Texture("s_env", oT2_Name);
+            C.r_dx11Texture("s_base", C.L_textures[0]);
+            C.r_dx11Texture("s_env", oT2_Name);
 
-            C.r_dx10Sampler("smp_base");
-            C.r_dx10Sampler("smp_rtlinear");
+            C.r_dx11Sampler("smp_base");
+            C.r_dx11Sampler("smp_rtlinear");
             C.r_End();
             break;
         }
@@ -183,9 +182,9 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
             // else							C.r_Pass	("shadow_direct_model","shadow_direct_base",FALSE);
             C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE, TRUE, FALSE);
             // C.r_Sampler		("s_base",C.L_textures[0]);
-            C.r_dx10Texture("s_base", C.L_textures[0]);
-            C.r_dx10Sampler("smp_base");
-            C.r_dx10Sampler("smp_linear");
+            C.r_dx11Texture("s_base", C.L_textures[0]);
+            C.r_dx11Sampler("smp_base");
+            C.r_dx11Sampler("smp_linear");
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_End();
             break;

@@ -10,6 +10,8 @@
 #endif
 
 class CHW
+    : public pureAppActivate,
+      public pureAppDeactivate
 {
 public:
     CHW();
@@ -27,8 +29,20 @@ public:
     static bool GivenGPUIsIntelGMA(u32 id_vendor, u32 id_device);
 
     std::pair<u32, u32> GetSurfaceSize() const;
-    void Present();
     DeviceState GetDeviceState() const;
+
+public:
+    void BeginScene();
+    void EndScene();
+    void Present();
+
+public:
+    void OnAppActivate() override;
+    void OnAppDeactivate() override;
+
+public:
+    void BeginPixEvent(LPCWSTR wszName) const;
+    void EndPixEvent() const;
 
 private:
     u32 selectPresentInterval() const;
@@ -53,6 +67,9 @@ public:
     IDirect3D9* pD3D = nullptr; // D3D
 
     u32 DevAdapter;
+
+    decltype(&D3DPERF_BeginEvent) d3dperf_BeginEvent = nullptr;
+    decltype(&D3DPERF_EndEvent) d3dperf_EndEvent = nullptr;
 
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;

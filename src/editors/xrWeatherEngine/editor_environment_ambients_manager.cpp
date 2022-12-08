@@ -15,27 +15,30 @@
 #include "editor_environment_detail.hpp"
 #include "editor_environment_manager.hpp"
 
-using editor::environment::ambients::manager;
-using editor::environment::ambients::ambient;
-using editor::environment::detail::logical_string_predicate;
+using ambients_manager = editor::environment::ambients::manager;
 
 template <>
-void property_collection<manager::ambient_container_type, manager>::display_name(
+void property_collection<ambients_manager::ambient_container_type, ambients_manager>::display_name(
     u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
 
 template <>
-XRay::Editor::property_holder_base* property_collection<manager::ambient_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<
+    ambients_manager::ambient_container_type, ambients_manager>::create()
 {
-    ambient* object = xr_new<ambient>(m_holder, generate_unique_id("ambient_unique_id_").c_str());
+    using editor::environment::ambients::ambient;
+
+    auto object = xr_new<ambient>(m_holder, generate_unique_id("ambient_unique_id_").c_str());
     object->fill(this);
     return (object->object());
 }
 
-manager::manager(::editor::environment::manager const& manager)
-    : m_manager(manager), m_property_holder(0), m_collection(0), m_changed(true)
+namespace editor::environment::ambients
+{
+manager::manager(environment::manager const& manager)
+    : m_manager(manager), m_property_holder(nullptr), m_collection(0), m_changed(true)
 {
     m_collection = xr_new<collection_type>(&m_ambients, this, &m_changed);
 }
@@ -57,11 +60,11 @@ void manager::load()
     VERIFY(m_ambients.empty());
 
     typedef CInifile::Root sections_type;
-    sections_type& sections = m_manager.m_ambients_config->sections();
+    const sections_type& sections = m_manager.m_ambients_config->sections();
     m_ambients.reserve(sections.size());
     for (const auto &i : sections)
     {
-        ambient* object = xr_new<ambient>(*this, i->Name);
+        auto object = xr_new<ambient>(*this, i->Name);
         object->load(*m_manager.m_ambients_config, *m_manager.m_sound_channels_config, *m_manager.m_effects_config, i->Name);
         object->fill(m_collection);
         m_ambients.push_back(object);
@@ -71,7 +74,7 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment" DELIMITER "ambients.ltx"), false, false, true);
+    auto config = xr_new<CInifile>(FS.update_path(file_name, "$game_config$", "environment\\ambients.ltx"), false, false, true);
 
     for (const auto &i : m_ambients)
         i->save(*config);
@@ -85,8 +88,12 @@ void manager::fill(XRay::Editor::property_holder_base* holder)
     holder->add_property("ambients", "ambients", "this option is responsible for ambients", m_collection);
 }
 
-::editor::environment::effects::manager const& manager::effects_manager() const { return (m_manager.effects()); }
-::editor::environment::sound_channels::manager const& manager::sounds_manager() const
+effects::manager const& manager::effects_manager() const
+{
+    return (m_manager.effects());
+}
+
+sound_channels::manager const& manager::sounds_manager() const
 {
     return (m_manager.sound_channels());
 }
@@ -114,7 +121,7 @@ manager::ambients_ids_type const& manager::ambients_ids() const
     for (const auto &i : m_ambients)
         *j++ = xr_strdup(i->id().c_str());
 
-    std::sort(m_ambients_ids.begin(), m_ambients_ids.end(), logical_string_predicate());
+    std::sort(m_ambients_ids.begin(), m_ambients_ids.end(), detail::logical_string_predicate());
 
     return (m_ambients_ids);
 }
@@ -127,7 +134,7 @@ ambient* manager::get_ambient(shared_str const& id) const
 
     NODEFAULT;
 #ifdef DEBUG
-    return (0);
+    return nullptr;
 #endif // #ifdef DEBUG
 }
-
+} // namespace 

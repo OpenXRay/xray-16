@@ -9,14 +9,9 @@
 
 #if CXIMAGE_SUPPORT_JPG
 
-#define XMD_H
-#define HAVE_BOOLEAN
-#include <jpeg/jmorecfg.h>
-#undef HAVE_BOOLEAN
-#undef XMD_H
-
 #include "ximaiter.h"
 #include "ximacfg.h"
+
 #include <setjmp.h>
 
 struct jpg_error_mgr {
@@ -124,26 +119,26 @@ bool CxImageJPG::Decode(CxFile * hFile)
     cinfo.src = &src;
 
 	/* Step 3: read file parameters with jpeg_read_header() */
-	(void) jpeg_read_header(&cinfo, TRUE);
+	(void) jpeg_read_header(&cinfo, true);
 
 	/* Step 4 <chupeev> handle decoder options*/
 	if ((GetCodecOption(CXIMAGE_FORMAT_JPG) & DECODE_GRAYSCALE) != 0)
 		cinfo.out_color_space = JCS_GRAYSCALE;
 	if ((GetCodecOption(CXIMAGE_FORMAT_JPG) & DECODE_QUANTIZE) != 0) {
-		cinfo.quantize_colors = TRUE;
+		cinfo.quantize_colors = true;
 		cinfo.desired_number_of_colors = GetJpegQuality();
 	}
 	if ((GetCodecOption(CXIMAGE_FORMAT_JPG) & DECODE_DITHER) != 0)
 		cinfo.dither_mode = m_nDither;
 	if ((GetCodecOption(CXIMAGE_FORMAT_JPG) & DECODE_ONEPASS) != 0)
-		cinfo.two_pass_quantize = FALSE;
+		cinfo.two_pass_quantize = false;
 	if ((GetCodecOption(CXIMAGE_FORMAT_JPG) & DECODE_NOSMOOTH) != 0)
-		cinfo.do_fancy_upsampling = FALSE;
+		cinfo.do_fancy_upsampling = false;
 
 //<DP>: Load true color images as RGB (no quantize) 
 /* Step 4: set parameters for decompression */
 /*  if (cinfo.jpeg_color_space!=JCS_GRAYSCALE) {
- *	cinfo.quantize_colors = TRUE;
+ *	cinfo.quantize_colors = true;
  *	cinfo.desired_number_of_colors = 128;
  *}
  */ //</DP>
@@ -232,7 +227,7 @@ bool CxImageJPG::Decode(CxFile * hFile)
 		(void) jpeg_read_scanlines(&cinfo, buffer, 1);
 		// info.nProgress = (long)(100*cinfo.output_scanline/cinfo.output_height);
 		//<DP> Step 6a: CMYK->RGB */ 
-		if ((cinfo.num_components==4)&&(cinfo.quantize_colors==FALSE)){
+		if ((cinfo.num_components==4)&&(cinfo.quantize_colors==false)){
 			BYTE k,*dst,*src;
 			dst=iter.GetRow();
 			src=buffer[0];
@@ -257,7 +252,7 @@ bool CxImageJPG::Decode(CxFile * hFile)
 
 	//<DP> Step 7A: Swap red and blue components
 	// not necessary if swapped red and blue definition in jmorecfg.h;ln322 <W. Morrison>
-	if ((cinfo.num_components==3)&&(cinfo.quantize_colors==FALSE)){
+	if ((cinfo.num_components==3)&&(cinfo.quantize_colors==false)){
 		BYTE* r0=GetBits();
 		for(long y=0;y<head.biHeight;y++){
 			if (info.nEscape) longjmp(jerr.setjmp_buffer, 1); // <vho> - cancel decoding
@@ -286,10 +281,12 @@ bool CxImageJPG::Decode(CxFile * hFile)
 // XXX: dirty hack.
 #undef max
 #undef min
+#define XRCORE_API XR_IMPORT
 #include "xrCore/xrDebug_macros.h" // needed for VERIFY in FTimer.h
 #include "xrCommon/math_funcs_inline.h" // needed for fis_zero() in FTimer.h
 #include "xrCore/FTimer.h"
 #include "xrCore/log.h"
+#undef XRCORE_API
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,12 +389,12 @@ bool CxImageJPG::Encode(CxFile * hFile)
 
 //#ifdef C_ARITH_CODING_SUPPORTED
 	if ((GetCodecOption(CXIMAGE_FORMAT_JPG) & ENCODE_ARITHMETIC) != 0)
-		cinfo.arith_code = TRUE;
+		cinfo.arith_code = true;
 //#endif
 
 //#ifdef ENTROPY_OPT_SUPPORTED
 	if ((GetCodecOption(CXIMAGE_FORMAT_JPG) & ENCODE_OPTIMIZE) != 0)
-		cinfo.optimize_coding = TRUE;
+		cinfo.optimize_coding = true;
 //#endif
 
 	if ((GetCodecOption(CXIMAGE_FORMAT_JPG) & ENCODE_GRAYSCALE) != 0)
@@ -453,10 +450,10 @@ bool CxImageJPG::Encode(CxFile * hFile)
 	cinfo.Y_density=(unsigned short)GetYDPI();
 
 	/* Step 4: Start compressor */
-	/* TRUE ensures that we will write a complete interchange-JPEG file.
-	* Pass TRUE unless you are very sure of what you're doing.
+	/* true ensures that we will write a complete interchange-JPEG file.
+	* Pass true unless you are very sure of what you're doing.
 	*/
-	jpeg_start_compress(&cinfo, TRUE);
+	jpeg_start_compress(&cinfo, true);
 
 	/* Step 5: while (scan lines remain to be written) */
 	/*           jpeg_write_scanlines(...); */

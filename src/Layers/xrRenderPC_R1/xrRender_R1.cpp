@@ -11,15 +11,29 @@ class R1RendererModule final : public RendererModule
     xr_vector<pcstr> modes;
 
 public:
-    const xr_vector<pcstr>& ObtainSupportedModes() override
+    bool CheckCanAddMode() const
     {
+        // don't duplicate
         if (!modes.empty())
         {
-            return modes;
+            return false;
+        }
+        // Check if shaders are available
+        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
+        {
+            Log("~ No shaders found for xrRender_R1");
+            return false;
         }
         CHW hw;
         hw.CreateD3D();
-        if (hw.pD3D)
+        const bool result = hw.pD3D;
+        hw.DestroyD3D();
+        return result;
+    }
+
+    const xr_vector<pcstr>& ObtainSupportedModes() override
+    {
+        if (CheckCanAddMode())
         {
             modes.emplace_back(RENDERER_R1_MODE);
         }
@@ -29,7 +43,7 @@ public:
     void CheckModeConsistency(pcstr mode) const
     {
         R_ASSERT3(0 == xr_strcmp(mode, RENDERER_R1_MODE),
-            "Wrong mode passed to xrRender_R1.dll", mode);
+            "Wrong mode passed to xrRender_R1", mode);
     }
 
     void SetupEnv(pcstr mode) override

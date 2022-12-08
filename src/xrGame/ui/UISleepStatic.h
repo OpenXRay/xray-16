@@ -1,12 +1,12 @@
 #pragma once
 #include "xrUICore/Static/UIStatic.h"
 
-class CUISleepStatic : public CUIStatic
+class CUISleepStatic final : public CUIStatic
 {
 private:
     typedef CUIStatic inherited;
 
-    int m_cur_time;
+    int m_cur_time{};
     CUIStaticItem m_UIStaticItem2;
 
 public:

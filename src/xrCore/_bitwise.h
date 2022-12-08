@@ -1,9 +1,8 @@
 #pragma once
-#ifndef _BITWISE_
-#define _BITWISE_
+
 #include <cmath>
 #include "math_constants.h"
-#include "_types.h"
+#include "xr_types.h"
 
 // float values defines
 #define fdSGN 0x080000000 // mask for sign bit
@@ -19,16 +18,16 @@
 #define fdRLE10 0x03ede5bdb // 1/ln10
 
 // integer math on floats
-#ifdef _M_AMD64
-IC bool negative(const float f) { return f < 0; }
-IC bool positive(const float f) { return f >= 0; }
-IC void set_negative(float& f) { f = -fabsf(f); }
-IC void set_positive(float& f) { f = fabsf(f); }
-#else
+#ifdef XR_ARCHITECTURE_X86
 IC bool negative(const float& f) { return *(unsigned*)&f & fdSGN; }
 IC bool positive(const float& f) { return (*(unsigned*)&f & fdSGN) == 0; }
 IC void set_negative(float& f) { *(unsigned*)&f |= fdSGN; }
 IC void set_positive(float& f) { *(unsigned*)&f &= ~fdSGN; }
+#else
+IC bool negative(const float f) { return std::signbit(f); }
+IC bool positive(const float f) { return !negative(f); }
+IC void set_negative(float& f) { f = -fabsf(f); }
+IC void set_positive(float& f) { f = fabsf(f); }
 #endif
 
 /*
@@ -108,13 +107,7 @@ IC bool fis_gremlin(const float& f)
     return value > 0xc0;
 }
 IC bool fis_denormal(const float& f) { return !(*(int*)&f & 0x7f800000); }
-// Approximated calculations
-IC float apx_InvSqrt(const float& n)
-{
-    long tmp = (long(0xBE800000) - *(long*)&n) >> 1;
-    float y = *(float*)&tmp;
-    return y * (1.47f - 0.47f * n * y * y);
-}
+
 // Only for [0..1] (positive) range
 IC float apx_asin(const float x)
 {
@@ -128,6 +121,6 @@ IC float apx_asin(const float x)
 
     return d;
 }
+
 // Only for [0..1] (positive) range
 IC float apx_acos(const float x) { return PI_DIV_2 - apx_asin(x); }
-#endif

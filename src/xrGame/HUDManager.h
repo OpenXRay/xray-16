@@ -31,7 +31,7 @@ public:
 
     //.				CUI*		GetUI				(){return pUI;}
     CUIGameCustom* GetGameUI() { return pUIGame; }
-    void HitMarked(int idx, float power, const Fvector& dir);
+    void HitMarked(const Fvector& dir);
     bool AddGrenade_ForMark(CGrenade* grn);
     void Update_GrenadeView(Fvector& pos_actor);
     void net_Relcase(IGameObject* obj);

@@ -4,11 +4,12 @@
 !.appveyor*
 !.travis.yml
 !.editorconfig
+!.vscode
 
 # exclude binaries and temporary files
 CMakeCache.txt
 cmake_install.cmake
-cmake-build-debug
+cmake-build-*
 install_manifest.txt
 bin/
 build/

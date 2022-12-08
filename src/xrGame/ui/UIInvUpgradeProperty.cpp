@@ -22,6 +22,7 @@
 #include "UIHelper.h"
 
 UIProperty::UIProperty()
+    : CUIWindow("UIInvUpgradeProperty")
 {
     m_text[0] = 0;
     m_ui_icon = NULL;
@@ -31,17 +32,11 @@ UIProperty::UIProperty()
 UIProperty::~UIProperty() {}
 void UIProperty::init_from_xml(CUIXml& ui_xml)
 {
-    m_ui_icon = xr_new<CUIStatic>();
-    m_ui_text = xr_new<CUITextWnd>();
-    AttachChild(m_ui_icon);
-    AttachChild(m_ui_text);
-    m_ui_icon->SetAutoDelete(true);
-    m_ui_text->SetAutoDelete(true);
-
     CUIXmlInit::InitWindow(ui_xml, "properties", 0, this);
     SetWndPos(Fvector2().set(0, 0));
-    CUIXmlInit::InitStatic(ui_xml, "properties:icon", 0, m_ui_icon);
-    CUIXmlInit::InitTextWnd(ui_xml, "properties:text", 0, m_ui_text);
+
+    m_ui_icon = UIHelper::CreateStatic(ui_xml, "properties:icon", this);
+    m_ui_text = UIHelper::CreateStatic(ui_xml, "properties:text", this);
 }
 
 bool UIProperty::init_property(shared_str const& property_id)
@@ -136,6 +131,7 @@ bool UIProperty::show_result(LPCSTR values)
 // =================== UIPropertiesWnd =====================================================
 
 UIInvUpgPropertiesWnd::UIInvUpgPropertiesWnd()
+    : CUIWindow("UIInvUpgPropertiesWnd")
 {
     m_properties_ui.reserve(15);
     m_temp_upgrade_vector.reserve(1);
@@ -143,6 +139,7 @@ UIInvUpgPropertiesWnd::UIInvUpgPropertiesWnd()
 }
 
 UIInvUpgPropertiesWnd::~UIInvUpgPropertiesWnd() { delete_data(m_properties_ui); }
+
 bool UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
 {
     CUIXml ui_xml;

@@ -38,6 +38,67 @@
         if (!ignoreAlways && !(expr))\
             xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
     } while (false)
+
+#define R_ASSERT1_CURE(expr, can_be_cured, cure)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+        {\
+            if (!can_be_cured)\
+                xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr);\
+            else\
+            {\
+                cure;\
+            }\
+        }\
+    } while (false)
+
+#define R_ASSERT2_CURE(expr, desc, can_be_cured, cure)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+        {\
+            if (!can_be_cured)\
+                xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc);\
+            else\
+            {\
+                cure;\
+            }\
+        }\
+    } while (false)
+
+#define R_ASSERT3_CURE(expr, desc, arg1, can_be_cured, cure)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+        {\
+            if (!can_be_cured)\
+                xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1);\
+            else\
+            {\
+                cure;\
+            }\
+        }\
+    } while (false)
+
+#define R_ASSERT4_CURE(expr, cure, desc, arg1, arg2, can_be_cured)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+        {\
+            if (!can_be_cured)\
+                xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
+            else\
+            {\
+                cure;\
+            }\
+        }\
+    } while (false)
+
 #define R_CHK(expr)\
     do\
     {\

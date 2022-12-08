@@ -25,7 +25,7 @@ private:
 
 public:
     property_boolean_values_value(
-        boolean_getter_type const& getter, boolean_setter_type const& setter, LPCSTR values[2]);
+        boolean_getter_type const& getter, boolean_setter_type const& setter, pcstr values[2]);
     virtual void SetValue(Object ^ object) override;
 
 public:

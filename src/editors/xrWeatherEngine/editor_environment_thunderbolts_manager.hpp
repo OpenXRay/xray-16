@@ -71,12 +71,12 @@ private:
     typedef property_collection<collection_container_type, manager> collection_collection_type;
 
 private:
-    float xr_stdcall altitude_getter() const;
-    void xr_stdcall altitude_setter(float value);
-    float xr_stdcall longitude_getter() const;
-    void xr_stdcall longitude_setter(float value);
-    float xr_stdcall tilt_getter() const;
-    void xr_stdcall tilt_setter(float value);
+    float altitude_getter() const;
+    void altitude_setter(float value);
+    float longitude_getter() const;
+    void longitude_setter(float value);
+    float tilt_getter() const;
+    void tilt_setter(float value);
 
 private:
     thunderbolt_container_type m_thunderbolts;

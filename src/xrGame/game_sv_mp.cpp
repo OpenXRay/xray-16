@@ -219,10 +219,10 @@ struct real_sender
     NET_Packet* P;
     u32 flags_to_send;
 
-#ifdef XR_PLATFORM_LINUX // FIXME!!!
-    real_sender(xrServer* server, NET_Packet* Packet, u32 flags = 0)
-#else
+#ifdef XR_PLATFORM_WINDOWS // XXX: remove this ifdef
     real_sender(xrServer* server, NET_Packet* Packet, u32 flags = DPNSEND_GUARANTEED)
+#else
+    real_sender(xrServer* server, NET_Packet* Packet, u32 flags = 0)
 #endif
     {
         server_for_send = server;
@@ -998,27 +998,6 @@ s32 game_sv_mp::ExcludeBanTimeFromVoteStr(char const* vote_string, char* new_vot
     *(start_time_str - 1) = 0;
     return ret_time;
 }
-
-struct SearcherClientByName
-{
-    string128 player_name;
-    SearcherClientByName(LPCSTR name)
-    {
-        strncpy_s(player_name, name, sizeof(player_name) - 1);
-        xr_strlwr(player_name);
-        player_name[xr_strlen(name)] = 0;
-    }
-    bool operator()(IClient* client)
-    {
-        xrClientData* temp_client = smart_cast<xrClientData*>(client);
-
-        if (!xr_strcmp(player_name, temp_client->ps->getName()))
-        {
-            return true;
-        }
-        return false;
-    }
-};
 
 void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
 {
@@ -1912,7 +1891,6 @@ void game_sv_mp::RejectGameItem(CSE_Abstract* entity)
     Level().Send(P, net_flags(TRUE, TRUE));
 }
 
-#include "string_table.h"
 void game_sv_mp::DumpOnlineStatistic()
 {
     xrGameSpyServer* srv = smart_cast<xrGameSpyServer*>(m_server);
@@ -2030,7 +2008,7 @@ void game_sv_mp::WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundResult)
 
 void game_sv_mp::async_statistics_collector::operator()(IClient* client)
 {
-    async_responses.insert(std::make_pair(client->ID, false));
+    async_responses.emplace(client->ID, false);
 }
 
 bool game_sv_mp::async_statistics_collector::all_ready() const

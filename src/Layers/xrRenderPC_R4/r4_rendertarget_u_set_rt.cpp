@@ -13,7 +13,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
         D3D_DEPTH_STENCIL_VIEW_DESC desc;
         zb->GetDesc(&desc);
 
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
             VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
 
         ID3DResource* pRes;
@@ -59,7 +59,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
     {
         D3D_DEPTH_STENCIL_VIEW_DESC desc;
         zb->GetDesc(&desc);
-        if (!RImplementation.o.dx10_msaa)
+        if (!RImplementation.o.msaa)
             VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
 
         ID3DResource* pRes;

@@ -34,7 +34,7 @@ xrGUID generate_guid()
 #endif
     static_assert(sizeof(result) >= sizeof(u64), "GUID must have size greater or equal to the long long.");
     ZeroMemory(&result, sizeof(result));
-    u64 temp = CPU::GetCLK();
+    u64 temp = CPU::QPC();
     memcpy(&result, &temp, sizeof(temp));
     return (result);
 }

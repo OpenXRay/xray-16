@@ -1,14 +1,13 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
+
+#define CStateGroupSquadMoveToRadiusExAbstract CStateGroupSquadMoveToRadiusEx<_Object>
 
 //////////////////////////////////////////////////////////////////////////
 // CStateGroupSquadMoveToRadiusEx with path rebuild options
 //////////////////////////////////////////////////////////////////////////
-
-#define CStateGroupSquadMoveToRadiusExAbstract CStateGroupSquadMoveToRadiusEx<_Object>
 
 TEMPLATE_SPECIALIZATION
 void CStateGroupSquadMoveToRadiusExAbstract::initialize()
@@ -155,3 +154,6 @@ bool CStateGroupSquadMoveToRadiusAbstract::check_completion()
 
     return false;
 }
+
+#undef TEMPLATE_SPECIALIZATION
+#undef CStateGroupSquadMoveToRadiusExAbstract

@@ -7,7 +7,7 @@
 
 // fwd. decl.
 struct b_BuildTexture;
-template <class T> class _box2; typedef _box2<float> Fbox2;
+struct Fbox2;
 
 class ImplicitDeflector
 {

@@ -177,8 +177,8 @@ public:
     void cform_write(NET_Packet& P);
     CSE_Shape();
     virtual ~CSE_Shape();
-    virtual IServerEntityShape* __stdcall shape() = 0;
-    virtual void __stdcall assign_shapes(CShapeData::shape_def* shapes, u32 cnt);
+    virtual IServerEntityShape* shape() = 0;
+    virtual void assign_shapes(CShapeData::shape_def* shapes, u32 cnt);
 };
 
 class CSE_Spectator : public CSE_Abstract
@@ -252,7 +252,7 @@ public:
 
     CSE_AbstractVisual(LPCSTR caSection);
     virtual ~CSE_AbstractVisual();
-    virtual CSE_Visual* __stdcall visual();
+    virtual CSE_Visual* visual();
     LPCSTR getStartupAnimation();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);

@@ -6,26 +6,26 @@
 #include "UIStatix.h"
 #include "xrUICore/ScrollView/UIScrollView.h"
 #include "xrUICore/Buttons/UI3tButton.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "UIGameCustom.h"
 
 CUISpawnWnd::CUISpawnWnd() : m_iCurTeam(0)
 {
-    m_pBackground = xr_new<CUIStatic>();
+    m_pBackground = xr_new<CUIStatic>("Background");
     AttachChild(m_pBackground);
-    m_pCaption = xr_new<CUIStatic>();
+    m_pCaption = xr_new<CUIStatic>("Caption");
     AttachChild(m_pCaption);
     m_pImage1 = xr_new<CUIStatix>();
     AttachChild(m_pImage1);
     m_pImage2 = xr_new<CUIStatix>();
     AttachChild(m_pImage2);
 
-    m_pFrames[0] = xr_new<CUIStatic>();
+    m_pFrames[0] = xr_new<CUIStatic>("Frame 0");
     AttachChild(m_pFrames[0]);
-    m_pFrames[1] = xr_new<CUIStatic>();
+    m_pFrames[1] = xr_new<CUIStatic>("Frame 1");
     AttachChild(m_pFrames[1]);
-    //	m_pFrames[2]	= new CUIStatic();	AttachChild(m_pFrames[2]);
+    //	m_pFrames[2]	= new CUIStatic("Frame 2");	AttachChild(m_pFrames[2]);
 
     m_pTextDesc = xr_new<CUIScrollView>();
     AttachChild(m_pTextDesc);
@@ -116,9 +116,11 @@ void CUISpawnWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
+    auto action = GetBindedAction(dik);
+
     if (WINDOW_KEY_PRESSED != keyboard_action)
     {
-        if (dik == SDL_SCANCODE_TAB)
+        if (action == kSCORES)
         {
             ShowChildren(true);
             game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -128,7 +130,7 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return false;
     }
 
-    if (dik == SDL_SCANCODE_TAB)
+    if (action == kSCORES)
     {
         ShowChildren(false);
         game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
@@ -151,17 +153,19 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             game->OnTeamSelect(1);
         return true;
     }
-    switch (dik)
+    switch (action)
     {
-    case SDL_SCANCODE_ESCAPE:
+    case kQUIT:
         HideDialog();
         game->OnTeamMenuBack();
         return true;
-    case SDL_SCANCODE_SPACE:
+
+    case kJUMP:
         HideDialog();
         game->OnTeamSelect(-1);
         return true;
-    case SDL_SCANCODE_RETURN:
+
+    case kENTER:
         HideDialog();
         if (m_pImage1->GetSelectedState())
             game->OnTeamSelect(0);
@@ -170,7 +174,7 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         else
             game->OnTeamSelect(-1);
         return true;
-    }
+    } // switch (action)
 
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }

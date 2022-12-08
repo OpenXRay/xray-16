@@ -30,5 +30,5 @@ public:
     bool OnMouseDown(int mouse_btn) override;
     bool OnMouseDownEx() override;
     void OnMouseUp(int mouse_btn) override;
-    bool OnKeyboardHold(int dik) override;
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
 };

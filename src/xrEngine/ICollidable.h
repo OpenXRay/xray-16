@@ -1,6 +1,6 @@
 #pragma once
 
-class ENGINE_API ICollisionForm;
+class ICollisionForm;
 
 class ICollidable
 {

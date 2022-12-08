@@ -11,13 +11,25 @@ class RGLRendererModule final : public RendererModule
     xr_vector<pcstr> modes;
 
 public:
-    const xr_vector<pcstr>& ObtainSupportedModes() override
+    bool CheckCanAddMode() const
     {
+        // don't duplicate
         if (!modes.empty())
         {
-            return modes;
+            return false;
         }
-        if (xrRender_test_hw())
+        // Check if shaders are available
+        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
+        {
+            Log("~ No shaders found for OpenGL");
+            return false;
+        }
+        return xrRender_test_hw();
+    }
+
+    const xr_vector<pcstr>& ObtainSupportedModes() override
+    {
+        if (CheckCanAddMode())
         {
             modes.emplace_back(RENDERER_RGL_MODE);
         }
@@ -27,7 +39,7 @@ public:
     void CheckModeConsistency(pcstr mode) const
     {
         R_ASSERT3(0 == xr_strcmp(mode, RENDERER_RGL_MODE),
-            "Wrong mode passed to xrRender_GL.dll", mode);
+            "Wrong mode passed to xrRender_GL", mode);
     }
 
     void SetupEnv(pcstr mode) override

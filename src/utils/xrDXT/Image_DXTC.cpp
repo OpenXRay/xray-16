@@ -552,10 +552,10 @@ void Image_DXTC::DecompressDXT1()
             DecodeColorBlock(pImPos, pBlock, m_nWidth, (u32*)&col_0, (u32*)&col_1, (u32*)&col_2, (u32*)&col_3);
             if (false) // Set to RGB test pattern
             {
-                pImPos = (u32*)((u32)pBase + i * 4 + j * m_nWidth * 4);
+                pImPos = (u32*)((std::uintptr_t)pBase + i * 4 + j * m_nWidth * 4);
                 *pImPos = ((i * 4) << 16) | ((j * 4) << 8) | ((63 - i) * 4);
                 // checkerboard of only col_0 and col_1 basis colors:
-                pImPos = (u32*)((u32)pBase + i * 8 + j * m_nWidth * 8);
+                pImPos = (u32*)((std::uintptr_t)pBase + i * 8 + j * m_nWidth * 8);
                 *pImPos = *((u32*)&col_0);
                 pImPos += 1 + m_nWidth;
                 *pImPos = *((u32*)&col_1);

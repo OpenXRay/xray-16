@@ -50,7 +50,6 @@
 #include "xrPhysics/console_vars.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrEngine/GameFont.h"
-#include "xrEngine/TaskScheduler.hpp"
 
 #ifdef DEBUG
 #include "level_debug.h"
@@ -443,17 +442,8 @@ void CLevel::OnFrame()
         if (g_mt_config.test(mtMap))
         {
             R_ASSERT(m_map_manager);
-            if (true)
-            {
-                Device.seqParallel.push_back(
-                    fastdelegate::FastDelegate0<>(m_map_manager, &CMapManager::Update));
-            }
-            else
-            {
-                TaskScheduler->AddTask("CMapManager::Update",
-                    { m_map_manager, &CMapManager::Update },
-                    { &Device, &CRenderDevice::IsMTProcessingAllowed });
-            }
+            Device.seqParallel.push_back(
+                fastdelegate::FastDelegate0<>(m_map_manager, &CMapManager::Update));
         }
         else
             MapManager().Update();
@@ -554,7 +544,6 @@ void CLevel::OnFrame()
     if (!GEnv.isDedicatedServer)
         GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
     m_ph_commander->update();
-    m_ph_commander_scripts->UpdateDeferred();
     m_ph_commander_scripts->update();
     stats.BulletManagerCommit.Begin();
     BulletManager().CommitRenderSet();
@@ -565,17 +554,8 @@ void CLevel::OnFrame()
         if (g_mt_config.test(mtLevelSounds))
         {
             R_ASSERT(m_level_sound_manager);
-            if (true)
-            {
-                Device.seqParallel.push_back(
-                    fastdelegate::FastDelegate0<>(m_level_sound_manager, &CLevelSoundManager::Update));
-            }
-            else
-            {
-                TaskScheduler->AddTask("CLevelSoundManager::Update",
-                    { m_level_sound_manager, &CLevelSoundManager::Update },
-                    { &Device, &CRenderDevice::IsMTProcessingAllowed });
-            }
+            Device.seqParallel.push_back(
+                fastdelegate::FastDelegate0<>(m_level_sound_manager, &CLevelSoundManager::Update));
         }
         else
             m_level_sound_manager->Update();
@@ -585,16 +565,7 @@ void CLevel::OnFrame()
     {
         if (g_mt_config.test(mtLUA_GC))
         {
-            if (true)
-            {
-                Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevel::script_gc));
-            }
-            else
-            {
-                TaskScheduler->AddTask("CLevel::script_gc",
-                    { this, &CLevel::script_gc },
-                    { &Device, &CRenderDevice::IsMTProcessingAllowed });
-            }
+            Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevel::script_gc));
         }
         else
             script_gc();
@@ -861,7 +832,7 @@ void CLevel::make_NetCorrectionPrediction()
     physics_world()->StepsNum() -= m_dwNumSteps;
     if (ph_console::g_bDebugDumpPhysicsStep && m_dwNumSteps > 10)
     {
-        Msg("!!!TOO MANY PHYSICS STEPS FOR CORRECTION PREDICTION = %d !!!", m_dwNumSteps);
+        Msg("!!! TOO MANY PHYSICS STEPS FOR CORRECTION PREDICTION = %d !!!", m_dwNumSteps);
         m_dwNumSteps = 10;
     }
     physics_world()->Freeze();

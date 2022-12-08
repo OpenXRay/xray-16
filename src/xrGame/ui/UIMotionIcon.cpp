@@ -9,6 +9,7 @@ constexpr pcstr MOTION_ICON_XML = "motion_icon.xml";
 CUIMotionIcon* g_pMotionIcon = nullptr;
 
 CUIMotionIcon::CUIMotionIcon()
+    : CUIStatic("CUIMotionIcon")
 {
     m_current_state = stLast;
     g_pMotionIcon = this;
@@ -24,6 +25,7 @@ CUIMotionIcon::CUIMotionIcon()
 }
 
 CUIMotionIcon::~CUIMotionIcon() { g_pMotionIcon = nullptr; }
+
 void CUIMotionIcon::ResetVisibility()
 {
     m_npc_visibility.clear();

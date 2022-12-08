@@ -5,9 +5,8 @@
 #include "XML/UIXmlInitBase.h"
 #include "XML/UITextureMaster.h"
 #include "Cursor/UICursor.h"
-#include "xrEngine/xr_input_xinput.h"
 
-CUIScrollBar::CUIScrollBar()
+CUIScrollBar::CUIScrollBar() : CUIWindow("CUIScrollBar")
 {
     m_iMinPos = 1;
     m_iMaxPos = 1;
@@ -30,7 +29,7 @@ CUIScrollBar::CUIScrollBar()
     m_ScrollBox->SetAutoDelete(true);
     AttachChild(m_ScrollBox);
 
-    m_FrameBackground = xr_new<CUIFrameLineWnd>();
+    m_FrameBackground = xr_new<CUIFrameLineWnd>("Frame background");
     m_FrameBackground->SetAutoDelete(true);
     AttachChild(m_FrameBackground);
 }
@@ -77,7 +76,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         strconcat(sizeof(_path), _path, profile, ":box");
         if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_ScrollBox, false))
         {
-            tempScroll = xr_new<CUIStatic>();
+            tempScroll = xr_new<CUIStatic>("temporary scroll");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempScroll, false))
                 tempScroll->Show(true);
         }
@@ -88,7 +87,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         
         if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
         {
-            tempBackground = xr_new<CUIStatic>();
+            tempBackground = xr_new<CUIStatic>("temporary background");
             tempBackground->SetWndRect(GetWndRect());
             strconcat(sizeof(_path), _path, profile, ":back");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempBackground, false))
@@ -114,7 +113,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         strconcat(sizeof(_path), _path, profile, ":box_v");
         if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_ScrollBox, false))
         {
-            tempScroll = xr_new<CUIStatic>();
+            tempScroll = xr_new<CUIStatic>("temporary scroll");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempScroll, false))
                 tempScroll->Show(true);
         }
@@ -125,7 +124,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
 
         if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
         {
-            tempBackground = xr_new<CUIStatic>();
+            tempBackground = xr_new<CUIStatic>("temporary background");
             tempBackground->SetWndRect(GetWndRect());
             strconcat(sizeof(_path), _path, profile, ":back_v");
             if (CUIXmlInitBase::InitStatic(xml_doc, _path, 0, tempBackground, false))
@@ -286,17 +285,20 @@ void CUIScrollBar::UpdateScrollBar()
 
 u32 last_hold_time = 0;
 
-bool CUIScrollBar::OnKeyboardHold(int dik)
+bool CUIScrollBar::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == MOUSE_1 && (last_hold_time + m_hold_delay) < Device.dwTimeContinual) // 100
+    if (keyboard_action == WINDOW_KEY_HOLD)
     {
-        if (OnMouseDownEx())
+        if (dik == MOUSE_1 && (last_hold_time + m_hold_delay) < Device.dwTimeContinual) // 100
         {
-            last_hold_time = Device.dwTimeContinual;
-            return true;
+            if (OnMouseDownEx())
+            {
+                last_hold_time = Device.dwTimeContinual;
+                return true;
+            }
         }
     }
-    return inherited::OnKeyboardHold(dik);
+    return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
 bool CUIScrollBar::OnMouseAction(float x, float y, EUIMessages mouse_action)

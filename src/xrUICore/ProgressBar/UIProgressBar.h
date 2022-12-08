@@ -56,8 +56,11 @@ public:
     }
     float GetRange_min() { return m_MinPos; }
     float GetRange_max() { return m_MaxPos; }
+
     void SetProgressPos(float _Pos);
+    void ForceSetProgressPos(float pos);
     float GetProgressPos() { return m_ProgressPos.y; }
+
     void ShowBackground(bool status) { m_bBackgroundPresent = status; }
     bool IsShownBackground() { return m_bBackgroundPresent; }
     virtual void Draw();

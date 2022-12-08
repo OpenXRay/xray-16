@@ -38,7 +38,7 @@ void best_scores_store::reset_scores()
 
     for (int bsidx = 0; bsidx < bst_score_types_count; ++bsidx)
     {
-        m_result_scores.insert(std::make_pair(enum_best_score_type(bsidx), 0));
+        m_result_scores.emplace(enum_best_score_type(bsidx), 0);
     };
 }
 
@@ -62,8 +62,9 @@ void best_scores_store::load_best_scores_from_ltx(CInifile& ini)
     for (int i = 0; i != bst_score_types_count; ++i)
     {
         enum_best_score_type bstype = static_cast<enum_best_score_type>(i);
-        m_ltx_result_scores.insert(
-            std::make_pair(bstype, ini.r_u32(get_best_score_name(bstype), best_score_value_line)));
+        m_ltx_result_scores.emplace(
+			bstype, ini.r_u32(get_best_score_name(bstype), best_score_value_line)
+		);
     }
 }
 
@@ -132,7 +133,7 @@ void best_scores_store::process_scores_out_response(SAKEGetMyRecordsOutput* tmp_
     {
         for (int i = 0; i < bst_score_types_count; ++i)
         {
-            m_result_scores.insert(std::make_pair(static_cast<gamespy_profile::enum_best_score_type>(i), 0));
+            m_result_scores.emplace(static_cast<gamespy_profile::enum_best_score_type>(i), 0);
         }
         return;
     }
@@ -143,7 +144,7 @@ void best_scores_store::process_scores_out_response(SAKEGetMyRecordsOutput* tmp_
         if (bst == bst_score_types_count)
             continue;
         s32 bs_value = tmp_out->mRecords[0][i].mValue.mInt; // one raw
-        m_result_scores.insert(std::make_pair(bst, bs_value));
+        m_result_scores.emplace(bst, bs_value);
     };
 }
 

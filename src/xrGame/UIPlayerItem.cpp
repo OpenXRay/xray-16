@@ -9,8 +9,10 @@
 #include "game_cl_capture_the_artefact.h"
 #include "game_cl_artefacthunt.h"
 
-UIPlayerItem::UIPlayerItem() {}
+UIPlayerItem::UIPlayerItem() : CUIWindow("UIPlayerItem") {}
+
 UIPlayerItem::UIPlayerItem(ETeam team, ClientID const& clientId, UITeamState* tstate, UITeamPanels* tpanels)
+    : CUIWindow("UIPlayerItem")
 {
     VERIFY(tstate);
     m_teamState = tstate;
@@ -57,7 +59,7 @@ void UIPlayerItem::InitTextParams(CUIXml& uiXml)
         this->AttachChild(temp_static);
         temp_static->SetAutoDelete(true);
         CUIXmlInit::InitTextWnd(uiXml, TEXTPARAM_NODE_NAME, i, temp_static);
-        m_text_params.insert(std::make_pair(shared_str(param_name), temp_static));
+        m_text_params.emplace(shared_str(param_name), temp_static);
     }
 }
 
@@ -77,7 +79,7 @@ void UIPlayerItem::InitIconParams(CUIXml& uiXml)
         this->AttachChild(temp_static);
         temp_static->SetAutoDelete(true);
         CUIXmlInit::InitStatic(uiXml, ICONPARAM_NODE_NAME, i, temp_static);
-        m_icon_params.insert(std::make_pair(shared_str(param_name), temp_static));
+        m_icon_params.emplace(shared_str(param_name), temp_static);
     }
 }
 

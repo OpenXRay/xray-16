@@ -11,7 +11,12 @@
 namespace hash_fixed_vertex_manager
 {
 extern u32 to_u32(const GraphEngineSpace::CWorldState& other);
-extern u32 to_u32(const shared_str& other);
+
+ICF u32 to_u32(shared_str const& string)
+{
+    const str_value* val = string._get();
+    return *(u32 const*)&val;
+}
 }
 
 #define TEMPLATE_SPECIALIZATION                                             \

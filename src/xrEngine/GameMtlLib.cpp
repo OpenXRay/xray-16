@@ -64,9 +64,6 @@ CGameMtlLibrary::CGameMtlLibrary()
 {
     material_index = 0;
     material_pair_index = 0;
-#if !defined(_EDITOR) && !defined(GM_NON_GAME)
-    GEnv.PGMLib = &GMLib;
-#endif
 }
 
 void CGameMtlLibrary::Load()

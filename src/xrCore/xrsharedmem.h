@@ -71,7 +71,7 @@ public:
 
 private:
     typedef xr_vector<smem_value*> cdb;
-    Lock* pcs;
+    Lock lock;
     cdb container;
 };
 XRCORE_API extern smem_container* g_pSharedMemoryContainer;

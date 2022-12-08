@@ -18,7 +18,7 @@ CUIChangeMap::CUIChangeMap()
 {
     m_prev_upd_time = 0;
 
-    bkgrnd = xr_new<CUIStatic>();
+    bkgrnd = xr_new<CUIStatic>("Background");
     bkgrnd->SetAutoDelete(true);
     AttachChild(bkgrnd);
 
@@ -26,11 +26,11 @@ CUIChangeMap::CUIChangeMap()
     header->SetAutoDelete(true);
     AttachChild(header);
 
-    map_pic = xr_new<CUIStatic>();
+    map_pic = xr_new<CUIStatic>("Map picture");
     map_pic->SetAutoDelete(true);
     AttachChild(map_pic);
 
-    map_frame = xr_new<CUIStatic>();
+    map_frame = xr_new<CUIStatic>("Map frame");
     map_frame->SetAutoDelete(true);
     AttachChild(map_frame);
 
@@ -79,7 +79,7 @@ void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
 
 bool CUIChangeMap::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == SDL_SCANCODE_ESCAPE)
+    if (IsBinded(kQUIT, dik))
     {
         OnBtnCancel();
         return true;
@@ -141,7 +141,7 @@ void CUIChangeMap::OnBtnOk()
         HideDialog();
     }
 }
-#include "string_table.h"
+
 void CUIChangeMap::FillUpList()
 {
     lst->Clear();

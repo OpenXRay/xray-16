@@ -1,5 +1,15 @@
 #pragma once
 
+#ifdef XRAY_STATIC_BUILD
+#    define ENGINE_API
+#else
+#    ifdef ENGINE_BUILD
+#        define ENGINE_API XR_EXPORT
+#    else
+#        define ENGINE_API XR_IMPORT
+#    endif
+#endif
+
 #include "EngineAPI.h"
 #include "EventAPI.h"
 #include "xrCore/xrCore_benchmark_macros.h"
@@ -13,7 +23,6 @@ public:
     CEngineAPI External;
     CEventAPI Event;
     CSheduler Sheduler;
-    XRay::Scheduler Scheduler;
 
     void Initialize();
     void Destroy();

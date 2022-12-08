@@ -21,7 +21,7 @@ private:
     typedef property_integer_reference inherited;
     typedef System::Collections::ArrayList collection_type;
     typedef System::Object Object;
-    typedef std::pair<int, LPCSTR> pair;
+    typedef std::pair<int, pcstr> pair;
 
 public:
     property_integer_enum_value_reference(int& value, pair* values, u32 const& value_count);

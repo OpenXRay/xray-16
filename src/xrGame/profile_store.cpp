@@ -236,7 +236,7 @@ void profile_store::loaded_fields(bool const result, char const* err_descr)
     tmp_cb(true, "");
 }
 
-void __stdcall profile_store::onlylog_operation(bool const result, char const* descr)
+void profile_store::onlylog_operation(bool const result, char const* descr)
 {
     if (!result)
     {
@@ -246,7 +246,7 @@ void __stdcall profile_store::onlylog_operation(bool const result, char const* d
     Msg("* Profile store: %s", descr ? descr : "");
 }
 
-void __stdcall profile_store::onlylog_completion(bool const result, char const* err_descr)
+void profile_store::onlylog_completion(bool const result, char const* err_descr)
 {
     if (!result)
     {
@@ -266,7 +266,7 @@ void profile_store::check_sake_actuality()
 {
     if (!m_awards_store->is_sake_equal_to_file() || !m_best_scores_store->is_sake_equal_to_file())
     {
-#ifndef XR_PLATFORM_LINUX // FIXME!!!
+#ifdef XR_PLATFORM_WINDOWS // XXX: Port to Linux
         __time32_t current_time;
         _time32(&current_time);
 

@@ -17,9 +17,9 @@ IC bool compare_safe(const luabind::object& o1, const luabind::object& o2)
     return (o1 == o2);
 }
 
-#if XRAY_EXCEPTIONS
+#ifndef LUABIND_NO_EXCEPTIONS
 #define process_error \
-    catch (luabind::error & e) { GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), "", LUA_ERRRUN); }
+    catch (luabind::error&) { GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), "", LUA_ERRRUN); }
 #else
 #define process_error
 #endif

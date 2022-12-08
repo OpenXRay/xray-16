@@ -95,7 +95,7 @@ SPECIALIZATION
 void PROPERTY_COLLECTION::destroy(XRay::Editor::property_holder_base* holder) { delete_data(holder->holder()); }
 
 SPECIALIZATION
-inline PROPERTY_COLLECTION::unique_id_predicate::unique_id_predicate(LPCSTR id) : m_id(id) {}
+inline PROPERTY_COLLECTION::unique_id_predicate::unique_id_predicate(pcstr id) : m_id(id) {}
 
 SPECIALIZATION
 inline bool PROPERTY_COLLECTION::unique_id_predicate::operator()(typename container_type::value_type const& value) const
@@ -104,13 +104,13 @@ inline bool PROPERTY_COLLECTION::unique_id_predicate::operator()(typename contai
 }
 
 SPECIALIZATION
-bool PROPERTY_COLLECTION::unique_id(LPCSTR id) const
+bool PROPERTY_COLLECTION::unique_id(pcstr id) const
 {
     return (std::find_if(m_container.begin(), m_container.end(), unique_id_predicate(id)) == m_container.end());
 }
 
 SPECIALIZATION
-shared_str PROPERTY_COLLECTION::generate_unique_id(LPCSTR prefix) const
+shared_str PROPERTY_COLLECTION::generate_unique_id(pcstr prefix) const
 {
     for (u32 i = 0;; ++i)
     {

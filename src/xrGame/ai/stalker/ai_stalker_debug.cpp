@@ -993,7 +993,9 @@ void CAI_Stalker::dbg_draw_vision()
     UI().Font().pFontMedium->OutNext(out_text);
 }
 
-typedef xr_vector<Fvector> COLLIDE_POINTS;
+namespace detail::stalker::debug
+{
+using COLLIDE_POINTS = xr_vector<Fvector>;
 
 class ray_query_param
 {
@@ -1049,9 +1051,12 @@ void fill_points(CCustomMonster* self, const Fvector& position, const Fvector& d
 
     pick_distance = params.m_pick_distance;
 }
+} // namespace detail::stalker::debug
 
 void draw_visiblity_rays(CCustomMonster* self, const IGameObject* object, collide::rq_results& rq_storage)
 {
+    using namespace ::detail::stalker::debug;
+
     typedef Feel::Vision::feel_visible_Item feel_visible_Item;
     typedef xr_vector<feel_visible_Item> VISIBLE_ITEMS;
 

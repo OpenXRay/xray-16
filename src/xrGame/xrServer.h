@@ -9,7 +9,7 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Server.h"
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #include "xrNetServer/empty/NET_Server.h"
 #endif
 #include "game_sv_base.h"
@@ -31,7 +31,7 @@ constexpr u32 NET_Latency = 50; // time in (ms)
 // XXX: check if u16 used for entity's id. If true, then this must be changed, if we want to increase the number of ID's.
 #ifdef XR_PLATFORM_WINDOWS
 using xrS_entities = xr_unordered_map<u16, CSE_Abstract*>;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
 // XXX: For the game engine to work correctly, the actor must always load first, the xr_unordered_map implementation for win 
 // provides this, but the CPP standard order of elements in the container is not defined, which leads to crashes when 
 // loading saved game under UNIX
@@ -141,7 +141,7 @@ private:
     u32 OnDelayedMessage(NET_Packet& P, ClientID sender); // Non-Zero means broadcasting with "flags" as returned
 
     void SendUpdatesToAll();
-    void _stdcall SendGameUpdateTo(IClient* client);
+    void SendGameUpdateTo(IClient* client);
 
 private:
     typedef CID_Generator<u32, // time identifier type
@@ -204,7 +204,7 @@ public:
 
     xrClientData* SelectBestClientToMigrateTo(CSE_Abstract* E, BOOL bForceAnother = FALSE);
     void SendConnectResult(IClient* CL, u8 res, u8 res1, pcstr ResultStr);
-    void __stdcall SendConfigFinished(ClientID const& clientId);
+    void SendConfigFinished(ClientID const& clientId);
     void SendProfileCreationError(IClient* CL, char const* reason);
     void AttachNewClient(IClient* CL);
     virtual void OnBuildVersionRespond(IClient* CL, NET_Packet& P);

@@ -37,17 +37,18 @@ bool CUIActorMenu::AllowItemDrops(EDDListType from, EDDListType to)
 }
 class CUITrashIcon : public ICustomDrawDragItem
 {
-    CUIStatic m_icon;
+    CUIStatic m_icon{ "Trash icon" };
 
 public:
     CUITrashIcon()
     {
-        m_icon.SetWndSize(Fvector2().set(29.0f * UI().get_current_kx(), 36.0f));
+        m_icon.SetWndSize(Fvector2().set(29.0f * UI().get_current_kx(), 36.0f)); // XXX: unhardcode size
         m_icon.SetStretchTexture(true);
         //		m_icon.SetAlignment		(waCenter);
-        m_icon.InitTexture("ui_inGame2_inv_trash");
+        m_icon.InitTexture("ui_inGame2_inv_trash"); // XXX: unhardcode texture
     }
-    virtual void OnDraw(CUIDragItem* drag_item)
+
+    void OnDraw(CUIDragItem* drag_item) override
     {
         Fvector2 pos = drag_item->GetWndPos();
         Fvector2 icon_sz = m_icon.GetWndSize();
@@ -324,7 +325,14 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     {
         if (WINDOW_KEY_PRESSED == keyboard_action)
         {
-            OnPressUserKey();
+            if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LCTRL))
+            {
+                OnPressUserKey(false);
+            }
+            else
+            {
+                OnPressUserKey(true);
+            }
         }
         return true;
     }
@@ -355,7 +363,7 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-void CUIActorMenu::OnPressUserKey()
+void CUIActorMenu::OnPressUserKey(bool take)
 {
     switch (m_currMenuMode)
     {
@@ -365,7 +373,14 @@ void CUIActorMenu::OnPressUserKey()
         //		OnBtnPerformTrade( this, 0 );
         break;
     case mmUpgrade: TrySetCurUpgrade(); break;
-    case mmDeadBodySearch: TakeAllFromPartner(this, 0); break;
+    case mmDeadBodySearch: 
+    {
+        if (take)
+            TakeAllFromPartner(this, 0);
+        else
+            StoreAllToPartner(this, 0);
+        break;
+    }
     default: R_ASSERT(0); break;
     }
 }

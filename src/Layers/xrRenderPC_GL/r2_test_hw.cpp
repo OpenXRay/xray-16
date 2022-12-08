@@ -38,31 +38,18 @@ public:
 
 bool TestOpenGLSupport()
 {
-    // XXX: this check should be removed after implementing support for HLSL
-    // https://github.com/OpenXRay/xray-16/issues/258
-    // Check if shaders are available
-    if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
-    {
-        Log("~ No shaders found for OpenGL");
-        return false;
-    }
-
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
     if (!windowTest.successful())
         return false;
 
-    if (glewInit() != GLEW_OK)
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
     {
-        Log("~ Could not initialize glew.");
-        return false;
+         Log("~ Could not initialize glew:", (pcstr)glewGetErrorString(err));
+         return false;
     }
 
-    if (!glewIsSupported("GL_ARB_separate_shader_objects"))
-    {
-        Log("~ GL_ARB_separate_shader_objects not supported");
-        return false;
-    }
     return true;
 }
 

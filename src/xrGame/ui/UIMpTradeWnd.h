@@ -190,38 +190,38 @@ private:
     void UpdateShop();
 
     // handlers
-    void xr_stdcall OnBtnOkClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnCancelClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnShopBackClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnRootTabChanged(CUIWindow* w, void* d);
-    void xr_stdcall OnSubLevelBtnClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnPreset1Clicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnPreset2Clicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnPreset3Clicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnPresetDefaultClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnLastSetClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnSave1PresetClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnSave2PresetClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnSave3PresetClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnResetClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnSellClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnPistolAmmoClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnPistolSilencerClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnRifleAmmoClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnRifleSilencerClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnRifleScopeClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnRifleGLClicked(CUIWindow* w, void* d);
-    void xr_stdcall OnBtnRifleAmmo2Clicked(CUIWindow* w, void* d);
+    void OnBtnOkClicked(CUIWindow* w, void* d);
+    void OnBtnCancelClicked(CUIWindow* w, void* d);
+    void OnBtnShopBackClicked(CUIWindow* w, void* d);
+    void OnRootTabChanged(CUIWindow* w, void* d);
+    void OnSubLevelBtnClicked(CUIWindow* w, void* d);
+    void OnBtnPreset1Clicked(CUIWindow* w, void* d);
+    void OnBtnPreset2Clicked(CUIWindow* w, void* d);
+    void OnBtnPreset3Clicked(CUIWindow* w, void* d);
+    void OnBtnPresetDefaultClicked(CUIWindow* w, void* d);
+    void OnBtnLastSetClicked(CUIWindow* w, void* d);
+    void OnBtnSave1PresetClicked(CUIWindow* w, void* d);
+    void OnBtnSave2PresetClicked(CUIWindow* w, void* d);
+    void OnBtnSave3PresetClicked(CUIWindow* w, void* d);
+    void OnBtnResetClicked(CUIWindow* w, void* d);
+    void OnBtnSellClicked(CUIWindow* w, void* d);
+    void OnBtnPistolAmmoClicked(CUIWindow* w, void* d);
+    void OnBtnPistolSilencerClicked(CUIWindow* w, void* d);
+    void OnBtnRifleAmmoClicked(CUIWindow* w, void* d);
+    void OnBtnRifleSilencerClicked(CUIWindow* w, void* d);
+    void OnBtnRifleScopeClicked(CUIWindow* w, void* d);
+    void OnBtnRifleGLClicked(CUIWindow* w, void* d);
+    void OnBtnRifleAmmo2Clicked(CUIWindow* w, void* d);
 
     void CheckDragItemToDestroy();
 
     // drag drop handlers
-    bool xr_stdcall OnItemDrop(CUICellItem* itm);
-    bool xr_stdcall OnItemStartDrag(CUICellItem* itm);
-    bool xr_stdcall OnItemDbClick(CUICellItem* itm);
-    bool xr_stdcall OnItemSelected(CUICellItem* itm);
-    bool xr_stdcall OnItemRButtonClick(CUICellItem* itm);
-    bool xr_stdcall OnItemLButtonClick(CUICellItem* itm);
+    bool OnItemDrop(CUICellItem* itm);
+    bool OnItemStartDrag(CUICellItem* itm);
+    bool OnItemDbClick(CUICellItem* itm);
+    bool OnItemSelected(CUICellItem* itm);
+    bool OnItemRButtonClick(CUICellItem* itm);
+    bool OnItemLButtonClick(CUICellItem* itm);
 
     void FillUpSubLevelButtons();
     void FillUpSubLevelItems();

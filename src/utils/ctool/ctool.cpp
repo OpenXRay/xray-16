@@ -11,7 +11,7 @@
 #include <windows.h>
 
 #define XR_PLATFORM_WINDOWS
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #undef FLT_MAX
 #undef FLT_MIN
 

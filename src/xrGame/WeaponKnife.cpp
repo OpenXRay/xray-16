@@ -4,7 +4,7 @@
 #include "Entity.h"
 #include "Actor.h"
 #include "Level.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "game_cl_base.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/GameMtlLib.h"
@@ -282,6 +282,12 @@ void CWeaponKnife::MakeShot(Fvector const& pos, Fvector const& dir, float const 
     bool SendHit = SendHitAllowed(H_Parent());
 
     PlaySound("sndShot", pos);
+    if (ParentIsActor())
+    {
+        const bool left = (IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_LEFT) || IsBinded(kWPN_ZOOM, XR_CONTROLLER_AXIS_TRIGGER_LEFT)) && !g_player_hud->attached_item(1);
+        const bool right = IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_LEFT) || IsBinded(kWPN_ZOOM, XR_CONTROLLER_AXIS_TRIGGER_LEFT);
+        pInput->Feedback(CInput::FeedbackTriggers, left ? k_hit : 0.0f, right ? k_hit : 0.0f, 0.1f);
+    }
 
     Level().BulletManager().AddBullet(pos, dir, m_fStartBulletSpeed, fCurrentHit, fHitImpulse_cur, H_Parent()->ID(),
         ID(), m_eHitType, fireDistance, cartridge, 1.f, SendHit);
@@ -429,8 +435,9 @@ bool CWeaponKnife::Action(u16 cmd, u32 flags)
     {
     case kWPN_ZOOM:
         if (flags & CMD_START)
+        {
             Fire2Start();
-
+        }
         return true;
     }
     return false;
@@ -756,7 +763,7 @@ void CWeaponKnife::fill_shots_list(
             victims_hits_count_t::iterator tmp_vhits_iter = m_victims_hits_count.find(curr_bone.m_victim_id);
             if (m_perv_hits_count && (tmp_vhits_iter == m_victims_hits_count.end()))
             {
-                m_victims_hits_count.insert(std::make_pair(curr_bone.m_victim_id, u16(1)));
+                m_victims_hits_count.emplace(curr_bone.m_victim_id, u16(1));
             }
             else if (m_perv_hits_count && (tmp_vhits_iter->second < m_perv_hits_count))
             {

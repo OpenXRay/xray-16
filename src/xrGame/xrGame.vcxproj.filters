@@ -556,12 +556,6 @@
     <Filter Include="AI\AMonsters\common\monster states\Steal">
       <UniqueIdentifier>{2fa0f717-0403-4c7e-ad7f-2530a88eb71c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Steal\Squad">
-      <UniqueIdentifier>{fae29cab-3d66-4aba-8a69-75b6d84dc74d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AMonsters\common\monster states\Steal\Squad\Rest">
-      <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AMonsters\common\monster states\Hunt">
       <UniqueIdentifier>{098ea533-6ac0-45d2-87d0-f7b07721ed96}</UniqueIdentifier>
     </Filter>
@@ -1228,9 +1222,6 @@
     <Filter Include="Core\Client\Level\LevelNetworkDemo">
       <UniqueIdentifier>{d79d3201-de20-4eb4-88ed-e76454a00fde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Level Controller">
-      <UniqueIdentifier>{488043bb-30c6-4821-b111-b31aabf92136}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Level Debug">
       <UniqueIdentifier>{dd7f6a82-3b47-4884-831a-9a03b196b28c}</UniqueIdentifier>
     </Filter>
@@ -1741,9 +1732,6 @@
     <Filter Include="Core\Common\SmartCast">
       <UniqueIdentifier>{e7bec78e-5e80-44b6-8e48-6b6f965e6dde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Common\StringTable">
-      <UniqueIdentifier>{22979b2b-2fb5-4c33-8c62-9462ec6ec171}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Common\Registry">
       <UniqueIdentifier>{9465b693-0ca7-42b5-bd72-821076494f14}</UniqueIdentifier>
     </Filter>
@@ -2197,9 +2185,6 @@
     <Filter Include="ScriptClasses\UI">
       <UniqueIdentifier>{b08ee833-e28c-4687-b6b5-0907349836ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ScriptClasses\KeyBindings">
-      <UniqueIdentifier>{2be23629-93c7-4bb0-997f-7c681c5a0f1d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ScriptClasses\ScriptReader">
       <UniqueIdentifier>{cfbfa419-543b-48f1-80e6-2082a84c6ecf}</UniqueIdentifier>
     </Filter>
@@ -2253,6 +2238,18 @@
     </Filter>
     <Filter Include="UI\Multiplayer\MM_MP\VersionList">
       <UniqueIdentifier>{04c90fd3-e247-4f21-b715-8dc556986837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Server\Games\server\mp_script">
+      <UniqueIdentifier>{e4a3fb7b-b6ee-40f3-a25a-be388178d29e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Server\Games\client\mp_script">
+      <UniqueIdentifier>{3063bb58-b29e-4339-9f19-764c7e8bf9fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\monster states\Rest\Squad">
+      <UniqueIdentifier>{fae29cab-3d66-4aba-8a69-75b6d84dc74d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AMonsters\common\monster states\Rest\Squad\Rest">
+      <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -3274,16 +3271,16 @@
       <Filter>AI\AMonsters\common\monster states\Steal</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_follow.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_follow_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_squad_rest_inline.h">
-      <Filter>AI\AMonsters\common\monster states\Steal\Squad\Rest</Filter>
+      <Filter>AI\AMonsters\common\monster states\Rest\Squad\Rest</Filter>
     </ClInclude>
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_attack.h">
       <Filter>AI\AMonsters\common\monster states\Home Point</Filter>
@@ -4734,9 +4731,6 @@
     <ClInclude Include="Message_Filter.h">
       <Filter>Core\Client\Level\LevelNetworkDemo</Filter>
     </ClInclude>
-    <ClInclude Include="xr_level_controller.h">
-      <Filter>Core\Client\Level Controller</Filter>
-    </ClInclude>
     <ClInclude Include="level_debug.h">
       <Filter>Core\Client\Level Debug</Filter>
     </ClInclude>
@@ -5274,6 +5268,9 @@
     <ClInclude Include="ActorHelmet.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
+    <ClInclude Include="ActorBackpack.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClInclude>
     <ClInclude Include="BoneProtections.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
@@ -5483,9 +5480,6 @@
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\smart_cast_impl2.h">
       <Filter>Core\Common\SmartCast</Filter>
-    </ClInclude>
-    <ClInclude Include="string_table.h">
-      <Filter>Core\Common\StringTable</Filter>
     </ClInclude>
     <ClInclude Include="RegistryFuncs.h">
       <Filter>Core\Common\Registry</Filter>
@@ -6237,9 +6231,6 @@
     <ClInclude Include="ui\UIGameTutorial.h">
       <Filter>UI\Tutorial</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrServerEntities\PHNetState.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="PHShellCreator.h">
       <Filter>Physics</Filter>
     </ClInclude>
@@ -6476,12 +6467,6 @@
     <ClInclude Include="ui\UIActorInfo.h">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClInclude>
-    <ClInclude Include="game_cl_mp_script.h">
-      <Filter>Core\Server\Games\client\mp</Filter>
-    </ClInclude>
-    <ClInclude Include="game_sv_mp_script.h">
-      <Filter>Core\Server\Games\server\mp</Filter>
-    </ClInclude>
     <ClInclude Include="game_sv_base.h">
       <Filter>Core\Server\Games\server\base</Filter>
     </ClInclude>
@@ -6503,6 +6488,21 @@
     </ClInclude>
     <ClInclude Include="ui\UIArtefactPanel.h">
       <Filter>UI\Common\MainIngame</Filter>
+    </ClInclude>
+    <ClInclude Include="ai\monsters\chimera\chimera_attack_state.h">
+      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
+    </ClInclude>
+    <ClInclude Include="ai\monsters\chimera\chimera_attack_state_inline.h">
+      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
+    </ClInclude>
+    <ClInclude Include="Explosive.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Explosives</Filter>
+    </ClInclude>
+    <ClInclude Include="game_sv_mp_script.h">
+      <Filter>Core\Server\Games\server\mp_script</Filter>
+    </ClInclude>
+    <ClInclude Include="game_cl_mp_script.h">
+      <Filter>Core\Server\Games\client\mp_script</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -7829,9 +7829,6 @@
     <ClCompile Include="ui_export_script.cpp">
       <Filter>ScriptClasses\UI</Filter>
     </ClCompile>
-    <ClCompile Include="key_binding_registrator_script.cpp">
-      <Filter>ScriptClasses\KeyBindings</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_reader_script.cpp">
       <Filter>ScriptClasses\ScriptReader</Filter>
     </ClCompile>
@@ -8027,9 +8024,6 @@
     <ClCompile Include="Message_Filter.cpp">
       <Filter>Core\Client\Level\LevelNetworkDemo</Filter>
     </ClCompile>
-    <ClCompile Include="xr_level_controller.cpp">
-      <Filter>Core\Client\Level Controller</Filter>
-    </ClCompile>
     <ClCompile Include="level_debug.cpp">
       <Filter>Core\Client\Level Debug</Filter>
     </ClCompile>
@@ -8113,6 +8107,9 @@
     </ClCompile>
     <ClCompile Include="entity_alive.cpp">
       <Filter>Core\Client\Objects\base\EntityAlive</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityCondition_script.cpp">
+      <Filter>Core\Client\Objects\base\EntityCondition</Filter>
     </ClCompile>
     <ClCompile Include="EntityCondition.cpp">
       <Filter>Core\Client\Objects\base\EntityCondition</Filter>
@@ -8516,6 +8513,9 @@
     <ClCompile Include="ActorHelmet.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
+    <ClCompile Include="ActorBackpack.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
     <ClCompile Include="BoneProtections.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
@@ -8755,9 +8755,6 @@
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\smart_cast_stats.cpp">
       <Filter>Core\Common\SmartCast</Filter>
-    </ClCompile>
-    <ClCompile Include="string_table.cpp">
-      <Filter>Core\Common\StringTable</Filter>
     </ClCompile>
     <ClCompile Include="RegistryFuncs.cpp">
       <Filter>Core\Common\Registry</Filter>
@@ -9248,6 +9245,9 @@
     <ClCompile Include="ui\map_hint.cpp">
       <Filter>UI\Common\PDA\MAP</Filter>
     </ClCompile>
+    <ClCompile Include="map_script.cpp">
+      <Filter>UI\Common\PDA\MAP</Filter>
+    </ClCompile>
     <ClCompile Include="map_spot.cpp">
       <Filter>UI\Common\PDA\MAP</Filter>
     </ClCompile>
@@ -9617,9 +9617,6 @@
     <ClCompile Include="ui\UIGameTutorialVideoItem.cpp">
       <Filter>UI\Tutorial</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrServerEntities\PHNetState.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
     <ClCompile Include="PHShellCreator.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
@@ -9838,12 +9835,6 @@
     <ClCompile Include="ui\UIActorInfo.cpp">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClCompile>
-    <ClCompile Include="game_cl_mp_script.cpp">
-      <Filter>Core\Server\Games\client\mp</Filter>
-    </ClCompile>
-    <ClCompile Include="game_sv_mp_script.cpp">
-      <Filter>Core\Server\Games\server\mp</Filter>
-    </ClCompile>
     <ClCompile Include="game_base_script.cpp">
       <Filter>Core\Server\Games</Filter>
     </ClCompile>
@@ -9875,22 +9866,23 @@
     <ClCompile Include="ui\UIArtefactPanel.cpp">
       <Filter>UI\Common\MainIngame</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
-      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ai\monsters\chimera\chimera_attack_state_inline.h">
-      <Filter>AI\AMonsters\monsters\Chimera\states</Filter>
-    </CustomBuild>
-    <CustomBuild Include="Explosive.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Explosives</Filter>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="game_sv_deathmatch_script.cpp">
+      <Filter>Core\Server\Games\server\deathmatch</Filter>
+    </ClCompile>
+    <ClCompile Include="game_sv_mp_script.cpp">
+      <Filter>Core\Server\Games\server\mp_script</Filter>
+    </ClCompile>
+    <ClCompile Include="game_cl_mp_script.cpp">
+      <Filter>Core\Server\Games\client\mp_script</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomOutfit_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -3,63 +3,162 @@
 #include "ResourceManager.h"
 
 #ifdef USE_OGL
-template<GLenum type>
-inline std::pair<GLuint, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr name)
+static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
 {
-    GLint status{};
+    GLint length;
+    GLchar *errors = nullptr, *sources = nullptr;
 
-    GLuint shader = glCreateShader(type);
+    if (program)
+    {
+        CHK_GL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
+        errors = xr_alloc<GLchar>(length);
+        CHK_GL(glGetProgramInfoLog(program, length, nullptr, errors));
+    }
+    else if (shader)
+    {
+        CHK_GL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length));
+        errors = xr_alloc<GLchar>(length);
+        CHK_GL(glGetShaderInfoLog(shader, length, nullptr, errors));
+
+        CHK_GL(glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length));
+        sources = xr_alloc<GLchar>(length);
+        CHK_GL(glGetShaderSource(shader, length, nullptr, sources));
+    }
+
+    Log("! shader compilation failed:", filename);
+    if (errors)
+        Log("! error: ", errors);
+
+    if (sources)
+    {
+        Log("Shader source:");
+        Log(sources);
+        Log("Shader source end.");
+    }
+    xr_free(errors);
+    xr_free(sources);
+}
+
+template<GLenum type>
+inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr name)
+{
+    const GLuint shader = glCreateShader(type);
     R_ASSERT(shader);
-    glShaderSource(shader, size, buffer, nullptr);
-    glCompileShader(shader);
+    CHK_GL(glShaderSource(shader, size, buffer, nullptr));
+    CHK_GL(glCompileShader(shader));
 
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+    GLint status{};
+    CHK_GL(glGetShaderiv(shader, GL_COMPILE_STATUS, &status));
     if (GLboolean(status) == GL_FALSE)
-        return { shader, -1 };
+    {
+        show_compile_errors(name, 0, shader);
+        CHK_GL(glDeleteShader(shader));
+        return { 's', 0 }; // 's' means "shader", 0 means error
+    }
 
-    GLuint program = glCreateProgram();
+    if (!HW.SeparateShaderObjectsSupported)
+        return { 's', shader };
+
+    const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    if (GLEW_VERSION_4_3) 
+        CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
     if (HW.ShaderBinarySupported)
         CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
 
-    glAttachShader(program, shader);
-    glBindFragDataLocation(program, 0, "SV_Target");
-    glBindFragDataLocation(program, 0, "SV_Target0");
-    glBindFragDataLocation(program, 1, "SV_Target1");
-    glBindFragDataLocation(program, 2, "SV_Target2");
-    glLinkProgram(program);
-    glDetachShader(program, shader);
-    glDeleteShader(shader);
+    CHK_GL(glAttachShader(program, shader));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
+    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+    CHK_GL(glLinkProgram(program));
+    CHK_GL(glDetachShader(program, shader));
+    CHK_GL(glDeleteShader(shader));
 
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
+    CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
     if (GLboolean(status) == GL_FALSE)
-        return { -1, program };
+    {
+        show_compile_errors(name, program, 0);
+        CHK_GL(glDeleteProgram(program));
+        return { 'p', 0 }; // 'p' means "program", 0 means error
+    }
 
-    return { 0, program };
+    return { 'p', program };
 }
 
-inline std::pair<GLuint, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLenum* format, pcstr name)
+inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLenum* format, pcstr name)
 {
     GLint status{};
 
-    GLuint program = glCreateProgram();
+    const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    if (GLEW_VERSION_4_3)
+        CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
 
-    glBindFragDataLocation(program, 0, "SV_Target");
-    glBindFragDataLocation(program, 0, "SV_Target0");
-    glBindFragDataLocation(program, 1, "SV_Target1");
-    glBindFragDataLocation(program, 2, "SV_Target2");
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
+    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
 
-    glProgramBinary(program, *format, buffer, size);
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
-    if ((GLboolean)status == GL_FALSE)
-        return { -1, program };
+    CHK_GL(glProgramBinary(program, *format, buffer, size));
+    CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
+    if (GLboolean(status) == GL_FALSE)
+    {
+        show_compile_errors(name, program, 0);
+        CHK_GL(glDeleteProgram(program));
+        return { 'p', 0 }; // 'p' means "program", 0 means error
+    }
 
-    return { 0, program };
+    return { 'p', program };
+}
+
+static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint gs)
+{
+    const GLuint program = glCreateProgram();
+    R_ASSERT(program);
+    if (GLEW_VERSION_4_3)
+        CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    // XXX: support caching for monolithic programs
+    //if (HW.ShaderBinarySupported)
+    //    CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
+
+    CHK_GL(glAttachShader(program, ps));
+    CHK_GL(glAttachShader(program, vs));
+    if (gs)
+        CHK_GL(glAttachShader(program, gs));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
+    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+    CHK_GL(glLinkProgram(program));
+    CHK_GL(glDetachShader(program, ps));
+    CHK_GL(glDetachShader(program, vs));
+    if (gs)
+        CHK_GL(glDetachShader(program, gs));
+
+    GLint status{};
+    CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
+    if (GLboolean(status) == GL_FALSE)
+    {
+        show_compile_errors(name, program, 0);
+        CHK_GL(glDeleteProgram(program));
+        return 0; // 0 means error
+    }
+    return program;
+}
+
+static GLuint GLGeneratePipeline(pcstr name, GLuint ps, GLuint vs, GLuint gs)
+{
+    GLuint pp;
+    CHK_GL(glGenProgramPipelines(1, &pp));
+    R_ASSERT(pp);
+    CHK_GL(glUseProgramStages(pp, GL_FRAGMENT_SHADER_BIT, ps));
+    CHK_GL(glUseProgramStages(pp, GL_VERTEX_SHADER_BIT,   vs));
+    CHK_GL(glUseProgramStages(pp, GL_GEOMETRY_SHADER_BIT, gs));
+    CHK_GL(glValidateProgramPipeline(pp));
+    return pp;
 }
 #endif
 
@@ -75,12 +174,12 @@ struct ShaderTypeTraits<SVS>
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
+    using ResultType = std::pair<char, GLuint>;
 #else
-#ifdef USE_DX11
-    using LinkageType = ID3D11ClassLinkage*;
-#else
+#if defined(USE_DX9)
     using LinkageType = void*;
+#elif defined(USE_DX11)
+    using LinkageType = ID3D11ClassLinkage*;
 #endif
     using HWShaderType = ID3DVertexShader*;
     using BufferType = DWORD const*;
@@ -91,28 +190,7 @@ struct ShaderTypeTraits<SVS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX9
-        return D3DXGetVertexShaderProfile(HW.pDevice); // vertex "vs_2_a";
-#elif !defined(USE_DX9) && !defined(USE_OGL)
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_10_0:
-            return "vs_4_0";
-        case D3D_FEATURE_LEVEL_10_1:
-            return "vs_4_1";
-        case D3D_FEATURE_LEVEL_11_0:
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-        case D3D_FEATURE_LEVEL_12_0:
-        case D3D_FEATURE_LEVEL_12_1:
-#endif
-            return "vs_5_0";
-        }
-#endif
-        if (HW.Caps.geometry_major >= 2)
-            return "vs_2_0";
-
-        return "vs_1_1";
+        return HW.Caps.geometry_profile;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -142,15 +220,19 @@ struct ShaderTypeTraits<SVS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#if defined(USE_DX9)
+        res = HW.pDevice->CreateVertexShader(buffer, &sh);
+        UNUSED(linkage, name);
+#elif defined(USE_DX11)
+        res = HW.pDevice->CreateVertexShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_VERTEX_SHADER>(buffer, size, name);
-#elif defined(USE_DX11)
-        res = HW.pDevice->CreateVertexShader(buffer, size, linkage, &sh);
 #else
-        res = HW.pDevice->CreateVertexShader(buffer, &sh);
+#   error No graphics API selected or enabled!
 #endif
 
         return res;
@@ -164,16 +246,16 @@ struct ShaderTypeTraits<SPS>
 {
     using MapType = CResourceManager::map_PS;
 
-#ifdef USE_OGL
+#if defined(USE_OGL)
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
+    using ResultType = std::pair<char, GLuint>;
 #else
-#ifdef USE_DX11
-    using LinkageType = ID3D11ClassLinkage*;
-#else
+#if defined(USE_DX9)
     using LinkageType = void*;
+#elif defined(USE_DX11)
+    using LinkageType = ID3D11ClassLinkage*;
 #endif
     using HWShaderType = ID3DPixelShader*;
     using BufferType = DWORD const*;
@@ -184,26 +266,7 @@ struct ShaderTypeTraits<SPS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX9
-        return D3DXGetPixelShaderProfile(HW.pDevice); // pixel "ps_2_a";
-#elif !defined(USE_DX9) && !defined(USE_OGL)
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_10_0:
-            return "ps_4_0";
-        case D3D_FEATURE_LEVEL_10_1:
-            return "ps_4_1";
-        case D3D_FEATURE_LEVEL_11_0:
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-        case D3D_FEATURE_LEVEL_12_0:
-        case D3D_FEATURE_LEVEL_12_1:
-#endif
-            return "ps_5_0";
-        }
-#endif
-
-        return "ps_2_0";
+        return HW.Caps.raster_profile;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -247,15 +310,19 @@ struct ShaderTypeTraits<SPS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#if defined(USE_DX9)
+        res = HW.pDevice->CreatePixelShader(buffer, &sh);
+        UNUSED(linkage, name);
+#elif defined(USE_DX11)
+        res = HW.pDevice->CreatePixelShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_FRAGMENT_SHADER>(buffer, size, name);
-#elif defined(USE_DX11)
-        res = HW.pDevice->CreatePixelShader(buffer, size, linkage, &sh);
 #else
-        res = HW.pDevice->CreatePixelShader(buffer, &sh);
+#       error No graphics API selected or enabled!
 #endif
 
         return res;
@@ -264,33 +331,31 @@ struct ShaderTypeTraits<SPS>
     static inline u32 GetShaderDest() { return RC_dest_pixel; }
 };
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
 template <>
 struct ShaderTypeTraits<SGS>
 {
     using MapType = CResourceManager::map_GS;
 
-#ifdef USE_OGL
-    using LinkageType = const GLenum*;
-    using HWShaderType = GLuint;
-    using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
-#else
-#ifdef USE_DX11
+#   if defined(USE_DX11)
     using LinkageType = ID3D11ClassLinkage*;
-#else
-    using LinkageType = void*;
-#endif
     using HWShaderType = ID3DGeometryShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
-#endif
+#   elif defined(USE_OGL)
+    using LinkageType = const GLenum*;
+    using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<char, GLuint>;
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
     static inline const char* GetShaderExt() { return ".gs"; }
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX11
+#   ifdef USE_DX11
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
@@ -299,13 +364,13 @@ struct ShaderTypeTraits<SGS>
             return "gs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
+#       ifdef HAS_DX11_3
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
-#endif
+#       endif
             return "gs_5_0";
         }
-#endif // USE_DX11
+#   endif // USE_DX11
         NODEFAULT;
         return "gs_4_0";
     }
@@ -321,45 +386,42 @@ struct ShaderTypeTraits<SGS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#   if defined(USE_DX11)
+        res = HW.pDevice->CreateGeometryShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#   elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_GEOMETRY_SHADER>(buffer, size, name);
-#elif defined(USE_DX11)
-        res = HW.pDevice->CreateGeometryShader(buffer, size, linkage, &sh);
-#else
-        res = HW.pDevice->CreateGeometryShader(buffer, size, &sh);
-#endif
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
         return res;
     }
 
     static inline u32 GetShaderDest() { return RC_dest_geometry; }
 };
-#endif
 
-#ifndef USE_DX9
 template <>
 struct ShaderTypeTraits<SHS>
 {
     using MapType = CResourceManager::map_HS;
 
-#ifdef USE_OGL
-    using LinkageType = const GLenum*;
-    using HWShaderType = GLuint;
-    using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
-#else
-#ifdef USE_DX11
+#   if defined(USE_DX11)
     using LinkageType = ID3D11ClassLinkage*;
-#else
-    using LinkageType = void*;
-#endif
     using HWShaderType = ID3D11HullShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
-#endif
+#   elif defined(USE_OGL)
+    using LinkageType = const GLenum*;
+    using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<char, GLuint>;
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
     static inline const char* GetShaderExt() { return ".hs"; }
 
@@ -379,14 +441,17 @@ struct ShaderTypeTraits<SHS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#   if defined(USE_DX11)
+        res = HW.pDevice->CreateHullShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#   elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_TESS_CONTROL_SHADER>(buffer, size, name);
-#else
-        res = HW.pDevice->CreateHullShader(buffer, size, linkage, &sh);
-#endif
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
         return res;
     }
@@ -399,20 +464,18 @@ struct ShaderTypeTraits<SDS>
 {
     using MapType = CResourceManager::map_DS;
 
-#ifdef USE_OGL
-    using LinkageType = const GLenum*;
-    using HWShaderType = GLuint;
-    using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
-#else
-#ifdef USE_DX11
+#if defined(USE_DX11)
     using LinkageType = ID3D11ClassLinkage*;
-#else
-    using LinkageType = void*;
-#endif
     using HWShaderType = ID3D11DomainShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
+#elif defined(USE_OGL)
+    using LinkageType = const GLenum*;
+    using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<char, GLuint>;
+#   else
+#       error No graphics API selected or enabled!
 #endif
 
     static inline const char* GetShaderExt() { return ".ds"; }
@@ -433,14 +496,17 @@ struct ShaderTypeTraits<SDS>
     {
         ResultType res{};
 
-#ifdef USE_OGL
+#   if defined(USE_DX11)
+        res = HW.pDevice->CreateDomainShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#   elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_TESS_EVALUATION_SHADER>(buffer, size, name);
-#else
-        res = HW.pDevice->CreateDomainShader(buffer, size, linkage, &sh);
-#endif
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
         return res;
     }
@@ -453,27 +519,25 @@ struct ShaderTypeTraits<SCS>
 {
     using MapType = CResourceManager::map_CS;
 
-#ifdef USE_OGL
-    using LinkageType = const GLenum*;
-    using HWShaderType = GLuint;
-    using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
-#else
-#ifdef USE_DX11
+#   if defined(USE_DX11)
     using LinkageType = ID3D11ClassLinkage*;
-#else
-    using LinkageType = void*;
-#endif
     using HWShaderType = ID3D11ComputeShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
-#endif
+#   elif defined(USE_OGL)
+    using LinkageType = const GLenum*;
+    using HWShaderType = GLuint;
+    using BufferType = pcstr*;
+    using ResultType = std::pair<char, GLuint>;
+#   else
+#       error No graphics API selected or enabled!
+#   endif
 
     static inline const char* GetShaderExt() { return ".cs"; }
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX11
+#   ifdef USE_DX11
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
@@ -482,13 +546,13 @@ struct ShaderTypeTraits<SCS>
             return "cs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
+#       ifdef HAS_DX11_3
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
-#endif
+#       endif
             return "cs_5_0";
         }
-#endif // USE_DX11
+#   endif // USE_DX11
 
         return "cs_5_0";
     }
@@ -503,14 +567,17 @@ struct ShaderTypeTraits<SCS>
         LinkageType linkage = nullptr, pcstr name = nullptr)
     {
         ResultType res{};
-        
-#ifdef USE_OGL
+
+#if defined(USE_DX11)
+        res = HW.pDevice->CreateComputeShader(buffer, size, linkage, &sh);
+        UNUSED(name);
+#elif defined(USE_OGL)
         if (linkage)
             res = GLUseBinary(buffer, size, linkage, name);
         else
             res = GLCompileShader<GL_COMPUTE_SHADER>(buffer, size, name);
 #else
-        res = HW.pDevice->CreateComputeShader(buffer, size, linkage, &sh);
+#   error No graphics API selected or enabled!
 #endif
 
         return res;
@@ -532,15 +599,13 @@ inline CResourceManager::map_VS& CResourceManager::GetShaderMap()
     return m_vs;
 }
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
 template <>
 inline CResourceManager::map_GS& CResourceManager::GetShaderMap()
 {
     return m_gs;
 }
-#endif
 
-#ifndef USE_DX9
 template <>
 inline CResourceManager::map_DS& CResourceManager::GetShaderMap()
 {
@@ -558,11 +623,10 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 {
     return m_cs;
 }
-#endif
+#endif // USE_DX11 || USE_OGL
 
 template <typename T>
-T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
-    pcstr fallbackShader /*= nullptr*/, u32 flags /*= 0*/)
+T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32 flags /*= 0*/)
 {
     typename ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<typename ShaderTypeTraits<T>::MapType>();
     pstr N = pstr(name);
@@ -603,22 +667,20 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
         // Try to open
         IReader* file = FS.r_open(cname);
 
-        // Here we can fallback to fallbackShader and then to "stub_default"
+        // Here we can fallback to "stub_default"
         bool fallback = m_shader_fallback_allowed;
-        if (!file && (fallback || fallbackShader))
+        if (!file && fallback)
         {
         fallback:
-            if (!fallbackShader)
-                fallback = false;
+            fallback = false;
 
             string_path tmp;
-            strconcat(sizeof(tmp), tmp, fallbackShader ? fallbackShader : "stub_default", ShaderTypeTraits<T>::GetShaderExt());
+            strconcat(sizeof(tmp), tmp, "stub_default", ShaderTypeTraits<T>::GetShaderExt());
 
             Msg("CreateShader: %s is missing. Replacing it with %s", cname, tmp);
             strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), tmp);
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
-            fallbackShader = nullptr;
         }
         R_ASSERT3(file, "Shader file doesnt exist", cname);
 
@@ -632,17 +694,17 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/,
         pcstr c_target, c_entry;
         ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-#   ifdef NDEBUG
-        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
-#   else
-        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | (xrDebug::DebuggerIsPresent() ? D3DCOMPILE_DEBUG : 0);
-#   endif
-#elif defined(USE_DX9)
+#if defined(USE_DX9)
 #   ifdef NDEBUG
         flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR;
 #   else
         flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | (xrDebug::DebuggerIsPresent() ? D3DXSHADER_DEBUG : 0);
+#   endif
+#elif defined(USE_DX11)
+#   ifdef NDEBUG
+        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+#   else
+        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | (xrDebug::DebuggerIsPresent() ? D3DCOMPILE_DEBUG : 0);
 #   endif
 #endif
 

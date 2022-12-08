@@ -136,7 +136,7 @@ float CObjectAnimator::GetLength() const
 #include "editors/ECore/Editor/d3dutils.h"
 #include "envelope.h"
 
-static FvectorVec path_points;
+static xr_vector<Fvector> path_points; // XXX: can cause crash on launch/exit
 
 void CObjectAnimator::DrawPath()
 {

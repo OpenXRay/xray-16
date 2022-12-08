@@ -1,8 +1,8 @@
 #pragma once
 
-#include "_types.h"
+#include "xr_types.h"
 
-#include <utility>
+#include <new>
 
 class XRCORE_API xrMemory
 {

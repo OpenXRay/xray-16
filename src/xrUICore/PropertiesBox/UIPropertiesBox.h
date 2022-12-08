@@ -34,7 +34,7 @@ public:
     void AutoUpdateSize();
 
     void ShowSubMenu();
-    void xr_stdcall OnItemReceivedFocus(CUIWindow* w, void* d);
+    void OnItemReceivedFocus(CUIWindow* w, void* d);
 
 protected:
     CUIListBox m_UIListWnd;

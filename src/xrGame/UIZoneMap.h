@@ -8,24 +8,24 @@ class CUIMiniMap;
 class CUIZoneMap
 {
 public:
-    bool visible;
+    bool visible{ true };
 
 private:
-    CUIMiniMap* m_activeMap;
+    CUIMiniMap* m_activeMap{};
 
-    CUIStatic m_background;
-    CUIStatic* m_clock_wnd;
-    CUIStatic m_center;
-    CUIStatic m_compass;
-    CUIWindow m_clipFrame;
-    CUIStatic* m_pointerDistanceText;
-    CUIStatic m_Counter;
-    CUITextWnd m_Counter_text;
-    u8 m_current_map_idx;
+    CUIStatic m_background{ "Background" };
+    CUIStatic m_center{ "Center" };
+    CUIStatic m_compass{ "Compass" };
+    CUIWindow m_clipFrame{ "Clip frame" };
+    CUIStatic m_Counter{ "Counter" };
+    CUITextWnd m_Counter_text{};
+    CUIStatic* m_clock_wnd{};
+    CUIStatic* m_pointerDistanceText{};
+
+    u8 m_current_map_idx{ u8(-1) };
 
 public:
-    CUIZoneMap();
-    virtual ~CUIZoneMap();
+    virtual ~CUIZoneMap() = default;
 
     void Init();
 

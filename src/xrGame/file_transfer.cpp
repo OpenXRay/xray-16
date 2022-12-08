@@ -197,7 +197,7 @@ void server_site::start_transfer_file(shared_str const& file_name, ClientID cons
     }
     filetransfer_node* ftnode = xr_new<filetransfer_node>(file_name, data_max_chunk_size, tstate_callback);
     dst_src_pair_t tkey = std::make_pair(to_client, from_client);
-    m_transfers.insert(std::make_pair(tkey, ftnode));
+    m_transfers.emplace(tkey, ftnode);
     if (!ftnode->opened())
     {
         Msg("! ERROR: SV: failed to open file [%s]", file_name.c_str());
@@ -215,7 +215,7 @@ void server_site::start_transfer_file(CMemoryWriter& mem_writer, u32 mem_writer_
     }
     filetransfer_node* ftnode =
         xr_new<filetransfer_node>(&mem_writer, mem_writer_max_size, data_max_chunk_size, tstate_callback, user_param);
-    m_transfers.insert(std::make_pair(std::make_pair(to_client, from_client), ftnode));
+    m_transfers.emplace(std::make_pair(to_client, from_client), ftnode);
 }
 
 void server_site::start_transfer_file(u8* data_ptr, u32 const data_size, ClientID const& to_client,
@@ -228,7 +228,7 @@ void server_site::start_transfer_file(u8* data_ptr, u32 const data_size, ClientI
     }
     filetransfer_node* ftnode =
         xr_new<filetransfer_node>(data_ptr, data_size, data_max_chunk_size, tstate_callback, user_param);
-    m_transfers.insert(std::make_pair(std::make_pair(to_client, from_client), ftnode));
+    m_transfers.emplace(std::make_pair(to_client, from_client), ftnode);
 }
 void server_site::start_transfer_file(buffer_vector<mutable_buffer_t>& vector_of_buffers, ClientID const& to_client,
     ClientID const& from_client, sending_state_callback_t& tstate_callback, u32 const user_param)
@@ -240,7 +240,7 @@ void server_site::start_transfer_file(buffer_vector<mutable_buffer_t>& vector_of
     }
     filetransfer_node* ftnode =
         xr_new<filetransfer_node>(&vector_of_buffers, data_max_chunk_size, tstate_callback, user_param);
-    m_transfers.insert(std::make_pair(std::make_pair(to_client, from_client), ftnode));
+    m_transfers.emplace(std::make_pair(to_client, from_client), ftnode);
 }
 
 void server_site::stop_transfer_file(dst_src_pair_t const& tkey)
@@ -274,7 +274,7 @@ filereceiver_node* server_site::start_receive_file(
         return NULL;
     }
     filereceiver_node* frnode = xr_new<filereceiver_node>(file_name, rstate_callback);
-    m_receivers.insert(std::make_pair(from_client, frnode));
+    m_receivers.emplace(from_client, frnode);
     if (!frnode->get_writer())
     {
         Msg("! ERROR: SV: failed to create file [%s]", file_name.c_str());
@@ -294,7 +294,7 @@ filereceiver_node* server_site::start_receive_file(
         return NULL;
     }
     filereceiver_node* frnode = xr_new<filereceiver_node>(&mem_writer, rstate_callback);
-    m_receivers.insert(std::make_pair(from_client, frnode));
+    m_receivers.emplace(from_client, frnode);
     return frnode;
 }
 
@@ -495,7 +495,7 @@ filereceiver_node* client_site::start_receive_file(
         return NULL;
     }
     filereceiver_node* frnode = xr_new<filereceiver_node>(file_name, rstate_callback);
-    m_receivers.insert(std::make_pair(from_client, frnode));
+    m_receivers.emplace(from_client, frnode);
     if (!frnode->get_writer())
     {
         Msg("! ERROR: CL: failed to create file [%s]", file_name.c_str());
@@ -515,7 +515,7 @@ filereceiver_node* client_site::start_receive_file(
     }
     mem_writer.clear();
     filereceiver_node* frnode = xr_new<filereceiver_node>(&mem_writer, rstate_callback);
-    m_receivers.insert(std::make_pair(from_client, frnode));
+    m_receivers.emplace(from_client, frnode);
     return frnode;
 }
 

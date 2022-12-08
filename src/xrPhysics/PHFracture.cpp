@@ -9,11 +9,7 @@
 #include "ph_valid_ode.h"
 #include "xrCore/Animation/Bone.hpp"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#pragma warning(disable : 4267)
 #include "ode/ode/src/joint.h"
-#pragma warning(pop)
 
 extern class CPHWorld* ph_world;
 static const float torque_factor = 10000000.f;

@@ -45,12 +45,14 @@ add_to_registry_type_list(CRelationRegistry)
 typedef CALifeAbstractRegistry<u16, TALK_CONTACT_VECTOR> CKnownContactsRegistry;
 add_to_registry_type_list(CKnownContactsRegistry)
 #define known_contacts define_constant(CKnownContactsRegistry)
+#undef registry_type_list
 #define registry_type_list save_registry_type_list(CKnownContactsRegistry)
 
 //список статей энциклопедии, которые знает актер
 typedef CALifeAbstractRegistry<u16, ARTICLE_VECTOR> CEncyclopediaRegistry;
 add_to_registry_type_list(CEncyclopediaRegistry)
 #define encyclopedia_articles define_constant(CEncyclopediaRegistry)
+#undef registry_type_list
 #define registry_type_list save_registry_type_list(CEncyclopediaRegistry)
 
     //список новостей полученных актером, состоит из новостей симуляции и сюжетных (скриптованых) новостей

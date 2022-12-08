@@ -16,6 +16,7 @@ public:
     LPCSTR getComment() override;
     BOOL canBeDetailed() override;
     BOOL canBeLMAPped() override;
+    BOOL canUseSteepParallax() override;
     void Save(IWriter& fs) override;
     void Load(IReader& fs, u16 version) override;
 

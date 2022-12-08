@@ -9,25 +9,24 @@
 #include "Level.h"
 #include "game_cl_mp.h"
 
-#include "ximage.h"
-#include "xmemfile.h"
-
-// XXX: uncomment, test and remove CxImage that is currectly used
-//#include <FreeImage/FreeImagePlus.h>
+#if __has_include("ximage.h")
+#   include "ximage.h"
+#   include "xmemfile.h"
+#endif
 
 CUIServerInfo::CUIServerInfo()
 {
     m_dds_file_created = false;
 
-    m_background = xr_new<CUIStatic>();
+    m_background = xr_new<CUIStatic>("Background");
     AttachChild(m_background);
     m_background->SetAutoDelete(true);
 
-    m_caption = xr_new<CUIStatic>();
+    m_caption = xr_new<CUIStatic>("Caption");
     AttachChild(m_caption);
     m_caption->SetAutoDelete(true);
 
-    m_image = xr_new<CUIStatic>();
+    m_image = xr_new<CUIStatic>("Image");
     AttachChild(m_image);
     m_image->SetAutoDelete(true);
 
@@ -94,18 +93,7 @@ void CUIServerInfo::InitCallbacks()
 char const* CUIServerInfo::tmp_logo_file_name = "tmp_sv_logo.dds";
 void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
 {
-    // XXX: uncomment, test and remove CxImage that is currectly used
-    /*fipImage tmpImage;
-    fipMemoryIO tmpMemFile(const_cast<BYTE*>(data_ptr), data_size);
-    
-    tmpImage.loadFromMemory(tmpMemFile);
-
-    if (!tmpImage.isValid() || tmpImage.getFIF() != FIF_JPEG);
-    {
-        Msg("! ERROR: Failed to decode server logo image as JPEG formatted.");
-        return;
-    }*/
-
+#if __has_include("ximage.h")
     CxMemFile tmp_memfile(const_cast<u8*>(data_ptr), data_size);
     CxImage tmp_image;
     if (!tmp_image.Decode(&tmp_memfile, CXIMAGE_FORMAT_JPG))
@@ -125,6 +113,9 @@ void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
     m_dds_file_created = true;
     m_image->InitTexture(tmp_logo_file_name);
     FS.file_delete("$game_saves$", tmp_logo_file_name);
+#else
+    VERIFY(!"Not implemented.");
+#endif
 }
 
 void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
@@ -152,7 +143,7 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
     m_text_body->AdjustHeightToText();
 }
 
-void xr_stdcall CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
+void CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
 {
     game_cl_mp* mp_game = smart_cast<game_cl_mp*>(&Game());
     VERIFY(mp_game);
@@ -161,7 +152,7 @@ void xr_stdcall CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
     mp_game->OnSpectatorSelect();
 }
 
-void xr_stdcall CUIServerInfo::OnNextBtnClick(CUIWindow* w, void* d)
+void CUIServerInfo::OnNextBtnClick(CUIWindow* w, void* d)
 {
     game_cl_mp* mp_game = smart_cast<game_cl_mp*>(&Game());
     VERIFY(mp_game);
@@ -172,15 +163,15 @@ void xr_stdcall CUIServerInfo::OnNextBtnClick(CUIWindow* w, void* d)
 
 bool CUIServerInfo::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    switch (dik)
+    switch (GetBindedAction(dik))
     {
-    case SDL_SCANCODE_SPACE:
-    case SDL_SCANCODE_RETURN:
+    case kJUMP:
+    case kENTER:
     {
         OnNextBtnClick(NULL, 0);
         return true;
     }
-    break;
-    }; // switch (dik)
+    } // switch (GetBindedAction(dik))
+
     return false;
 }

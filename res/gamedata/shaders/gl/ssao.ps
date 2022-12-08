@@ -32,7 +32,42 @@ float	calc_ssao( float3 P, float3 N, float2 tc, float2 tcJ )
 #endif
 #else	//	SSAO_QUALITY
 
-#if SSAO_QUALITY == 3
+#if SSAO_QUALITY == 1
+#define RINGS 2
+#define DIRS 4
+const float rads[3] = float[]
+( //I know it will be more focused in the cener, but that's OK
+	0.2000,
+	0.7071,
+	1.0000
+);
+const float angles[5] = float[]
+(
+	0.0000,
+	1.5708,
+	3.1416,
+	4.7124,
+	6.2832
+);
+#elif SSAO_QUALITY == 2
+#define RINGS  3
+#define DIRS 4
+const float rads[4] = float[]
+( //I know it will be more focused in the cener, but that's OK
+	0.20000,
+	0.57735,
+	0.81650,
+	1.00000
+);
+const float angles[5] = float[]
+(
+	0.0000,
+	1.5708,
+	3.1416,
+	4.7124,
+	6.2832
+);
+#else // SSAO_QUALITY >= 3
 #define RINGS 3
 #define DIRS 8
 const float rads[4] = float[]
@@ -54,42 +89,7 @@ const float angles[9] = float[]
 	5.4978,
 	6.2832
 );
-#elif SSAO_QUALITY == 2
-#define RINGS  3
-#define DIRS 4
-const float rads[4] = float[]
-( //I know it will be more focused in the cener, but that's OK
-	0.20000,
-	0.57735,
-	0.81650,
-	1.00000
-);
-const float angles[5] = float[]
-(
-	0.0000,
-	1.5708,
-	3.1416,
-	4.7124,
-	6.2832
-);
-#elif SSAO_QUALITY == 1
-#define RINGS 2
-#define DIRS 4
-const float rads[3] = float[]
-( //I know it will be more focused in the cener, but that's OK
-	0.2000,
-	0.7071,
-	1.0000
-);
-const float angles[5] = float[]
-(
-	0.0000,
-	1.5708,
-	3.1416,
-	4.7124,
-	6.2832
-);
-#endif
+#endif // SSAO_QUALITY
 
 uniform float ssao_noise_tile_factor;
 uniform float ssao_kernel_size;

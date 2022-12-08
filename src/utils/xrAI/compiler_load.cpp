@@ -281,7 +281,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
             for (size_t j = 0; j < 4; ++j)
             {
                 F->r(&id, 3);
-                g_nodes[i].n[j] = (*LPDWORD(&id)) & 0x00ffffff;
+                g_nodes[i].n[j] = (*reinterpret_cast<u32*>(&id)) & 0x00ffffff;
             }
 
             pl = F->r_u16();

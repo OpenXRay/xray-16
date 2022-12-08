@@ -4,7 +4,6 @@
 #include "xrServer.h"
 #include "Level.h"
 #include "game_cl_mp.h"
-#include "string_table.h"
 #include "clsid_game.h"
 #include <functional>
 #include "xrNetServer/NET_Messages.h"
@@ -737,7 +736,7 @@ void game_sv_TeamDeathmatch::OnDetachItem(CSE_ActorMP* actor, CSE_Abstract* item
             DestroyGameItem(it);
 
         for (auto& it : to_reject)
-            DestroyGameItem(it);
+            RejectGameItem(it);
     }
 }
 

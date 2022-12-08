@@ -1,25 +1,44 @@
 project(xrLCUtil)
 
-list(APPEND DIRS
-    "."
-    )
+set(SRC_FILES
+    #"ILevelCompilerLogger.hpp"
+    #"LevelCompilerLoggerWindow.hpp"
+    #"LevelCompilerLoggerWindow.cpp"
+    "pch.cpp"
+    "pch.cpp"
+    "resource.h"
+    "xrLCUtil.hpp"
+    "xrLCUtil.cpp"
+    "xrThread.hpp"
+    "xrThread.cpp"
+)
 
-add_dir("${DIRS}")
+group_sources(SRC_FILES)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../..
-    ${SDL_INCLUDE_DIRS}
-    )
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
-list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./LevelCompilerLoggerWindow.cpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./LevelCompilerLoggerWindow.hpp")
-list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./ILevelCompilerLogger.hpp")
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
 
-add_definitions(-DLEVEL_COMPILER -DXRLCUTIL_EXPORTS -D_USE_MATH_DEFINES)
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrCore
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "pch.hpp")
-cotire(${PROJECT_NAME})
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DLEVEL_COMPILER
+    -DXRLCUTIL_EXPORTS
+    -D_USE_MATH_DEFINES
+)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+)
+
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "pch.hpp"
+)

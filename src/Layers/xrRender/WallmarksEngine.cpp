@@ -31,7 +31,7 @@ struct wm_slot
 const float W_DIST_FADE = 15.f;
 const float W_DIST_FADE_SQR = W_DIST_FADE * W_DIST_FADE;
 const float I_DIST_FADE_SQR = 1.f / W_DIST_FADE_SQR;
-const int MAX_TRIS = 1024;
+const int MAX_TRIS = 1024*16; //Prevent crash when explode on burer
 
 IC bool operator==(const CWallmarksEngine::wm_slot* slot, const ref_shader& shader) { return slot->shader == shader; }
 CWallmarksEngine::wm_slot* CWallmarksEngine::FindSlot(const ref_shader& shader)
@@ -209,8 +209,7 @@ void CWallmarksEngine::AddWallmark_internal(
         bb_query.set(contact_point, contact_point);
         bb_query.grow(sz * 2.5f);
         bb_query.get_CD(bbc, bbd);
-        xrc.box_options(CDB::OPT_FULL_TEST);
-        xrc.box_query(g_pGameLevel->ObjectSpace.GetStaticModel(), bbc, bbd);
+        xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bbc, bbd);
         u32 triCount = xrc.r_count();
         if (0 == triCount)
             return;

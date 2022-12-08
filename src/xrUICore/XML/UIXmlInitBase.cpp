@@ -1,6 +1,5 @@
 #include "pch.hpp"
 #include "UIXmlInitBase.h"
-#include "xrEngine/StringTable/IStringTable.h"
 #include "Windows/UIFrameWindow.h"
 #include "Windows/UITextFrameLineWnd.h"
 #include "Buttons/UICheckButton.h"
@@ -17,7 +16,6 @@
 
 #include "UITextureMaster.h"
 #include "Lines/UILines.h"
-#include "xrEngine/xr_input_xinput.h"
 
 #define ARIAL_FONT_NAME "arial"
 
@@ -341,7 +339,7 @@ bool CUIXmlInitBase::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUILines*
 
     shared_str text = xml_doc.Read(path, index, NULL);
     if (text.size())
-        pLines->SetText(gStringTable->translate(text).c_str());
+        pLines->SetText(StringTable().translate(text).c_str());
 
     return true;
 }
@@ -413,7 +411,7 @@ bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, LPCSTR path, int index, CUI3t
 
     LPCSTR text_hint = xml_doc.ReadAttrib(path, index, "hint", NULL);
     if (text_hint)
-        pWnd->m_hint_text = gStringTable->translate(text_hint);
+        pWnd->m_hint_text = StringTable().translate(text_hint);
 
     return true;
 }
@@ -551,7 +549,7 @@ bool CUIXmlInitBase::InitProgressShape(CUIXml& xml_doc, LPCSTR path, int index, 
     strconcat(sizeof(_path), _path, path, ":back");
     if (xml_doc.NavigateToNode(_path, index))
     {
-        pWnd->m_pBackground = xr_new<CUIStatic>();
+        pWnd->m_pBackground = xr_new<CUIStatic>("Background");
         pWnd->m_pBackground->SetAutoDelete(true);
         pWnd->AttachChild(pWnd->m_pBackground);
         InitStatic(xml_doc, _path, index, pWnd->m_pBackground);
@@ -560,7 +558,7 @@ bool CUIXmlInitBase::InitProgressShape(CUIXml& xml_doc, LPCSTR path, int index, 
     strconcat(sizeof(_path), _path, path, ":front");
     if (xml_doc.NavigateToNode(_path, index))
     {
-        pWnd->m_pTexture = xr_new<CUIStatic>();
+        pWnd->m_pTexture = xr_new<CUIStatic>("Forefround");
         pWnd->m_pTexture->SetAutoDelete(true);
         pWnd->AttachChild(pWnd->m_pTexture);
         InitStatic(xml_doc, _path, index, pWnd->m_pTexture);
@@ -596,9 +594,9 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
         LPCSTR node_name = node->Value();
         if (0 == xr_stricmp(node_name, "auto_static"))
         {
-            CUIStatic* pUIStatic = xr_new<CUIStatic>();
-            InitStatic(xml_doc, "auto_static", cnt_static, pUIStatic);
             xr_sprintf(buff, "auto_static_%d", cnt_static);
+            CUIStatic* pUIStatic = xr_new<CUIStatic>(buff);
+            InitStatic(xml_doc, "auto_static", cnt_static, pUIStatic);
             pUIStatic->SetWindowName(buff);
             pUIStatic->SetAutoDelete(true);
             pParentWnd->AttachChild(pUIStatic);
@@ -607,9 +605,9 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
         }
         else if (0 == xr_stricmp(node_name, "auto_frameline"))
         {
-            CUIFrameLineWnd* pUIFrameline = xr_new<CUIFrameLineWnd>();
-            InitFrameLine(xml_doc, "auto_frameline", cnt_frameline, pUIFrameline);
             xr_sprintf(buff, "auto_frameline_%d", cnt_frameline);
+            CUIFrameLineWnd* pUIFrameline = xr_new<CUIFrameLineWnd>(buff);
+            InitFrameLine(xml_doc, "auto_frameline", cnt_frameline, pUIFrameline);
             pUIFrameline->SetWindowName(buff);
             pUIFrameline->SetAutoDelete(true);
             pParentWnd->AttachChild(pUIFrameline);
@@ -653,10 +651,9 @@ void CUIXmlInitBase::InitAutoFrameLineGroup(CUIXml& xml_doc, LPCSTR path, int in
     string64 sname;
     for (int i = 0; i < items_num; ++i)
     {
-        pUIFL = xr_new<CUIFrameLineWnd>();
-        InitFrameLine(xml_doc, "auto_frameline", i, pUIFL);
         xr_sprintf(sname, "auto_frameline_%d", i);
-        pUIFL->SetWindowName(sname);
+        pUIFL = xr_new<CUIFrameLineWnd>(sname);
+        InitFrameLine(xml_doc, "auto_frameline", i, pUIFL);
         pUIFL->SetAutoDelete(true);
         pParentWnd->AttachChild(pUIFL);
         pUIFL = NULL;

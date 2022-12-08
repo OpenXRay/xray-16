@@ -35,7 +35,7 @@ protected:
 
     virtual void RecalcSize();
     void UpdateScroll();
-    void __stdcall OnScrollV(CUIWindow*, void*);
+    void OnScrollV(CUIWindow*, void*);
     void SetRightIndention(float val);
     void SetLeftIndention(float val);
     void SetUpIndention(float val);

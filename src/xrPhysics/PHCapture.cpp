@@ -119,7 +119,7 @@ void CPHCapture::PhTune(dReal /**step**/)
 
 void CPHCapture::PullingUpdate()
 {
-    if (!m_taget_element->isActive() || inl_ph_world().Device().dwTimeGlobal - m_time_start > m_capture_time)
+    if (!m_taget_element->isActive() || Device.dwTimeGlobal - m_time_start > m_capture_time)
     {
         Release();
         return;

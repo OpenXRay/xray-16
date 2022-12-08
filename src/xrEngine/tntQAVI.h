@@ -5,9 +5,6 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "vfw.h"
-#include "mmsystem.h"
-#elif defined(XR_PLATFORM_LINUX)
-#include <FreeImage.h>
 #endif
 
 // replaced with standard AVIIF_KEYFRAME
@@ -91,7 +88,7 @@ protected:
 
 public:
     CAviPlayerCustom();
-    ~CAviPlayerCustom();
+    virtual ~CAviPlayerCustom();
 
     u32 m_dwWidth, m_dwHeight;
 

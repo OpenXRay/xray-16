@@ -52,4 +52,8 @@
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\..\sdk\binaries\$(PlatformShortName)\FreeImage.dll" />
+    <CopyFileToFolders Include="..\..\..\sdk\binaries\$(PlatformShortName)\FreeImagePlus.dll" />
+  </ItemGroup>
 </Project>

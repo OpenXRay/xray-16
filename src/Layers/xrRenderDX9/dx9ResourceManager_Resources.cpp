@@ -6,22 +6,6 @@
 #include "Layers/xrRender/Blender_Recorder.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
-template <class T>
-BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
-{
-    auto it = vec.begin();
-    auto end = vec.end();
-    for (; it != end; ++it)
-    {
-        if (*it == ptr)
-        {
-            vec.erase(it);
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
 //--------------------------------------------------------------------------------------------------------------
 SPass* CResourceManager::_CreatePass(const SPass& proto)
 {
@@ -75,7 +59,7 @@ SDeclaration* CResourceManager::_CreateDecl(VertexElement* dcl)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullptr*/, u32 flags /*= 0*/)
+SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
 {
     string_path name;
     xr_strcpy(name, shader);
@@ -98,13 +82,13 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, cpcstr fallbackShader /*= nullpt
         break;
     }
 
-    return CreateShader<SVS>(name, shader, fallbackShader, flags);
+    return CreateShader<SVS>(name, shader, flags);
 }
 
 void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 
 //--------------------------------------------------------------------------------------------------------------
-SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, nullptr, nullptr); }
+SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, nullptr); }
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
 //--------------------------------------------------------------------------------------------------------------

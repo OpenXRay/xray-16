@@ -1,8 +1,12 @@
 #include "stdafx.h"
+
+#include "xrCore/Threading/TaskManager.hpp"
+
 #include "xrEngine/IGame_Persistent.h"
-#include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/xr_object.h"
+
+#include "Layers/xrRender/FBasicVisual.h"
 
 IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
 {
@@ -20,50 +24,6 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
     // Calculate sector(s) and their objects
     if (pLastSector)
     {
-        //!!!
-        //!!! BECAUSE OF PARALLEL HOM RENDERING TRY TO DELAY ACCESS TO HOM AS MUCH AS POSSIBLE
-        //!!!
-        if (psDeviceFlags.test(rsDrawDynamic))
-        {
-            // Traverse object database
-            g_SpatialSpace->q_frustum(
-                lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
-
-            // (almost) Exact sorting order (front-to-back)
-            std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
-
-            // Determine visibility for dynamic part of scene
-            u32 uID_LTRACK = 0xffffffff;
-            if (phase == PHASE_NORMAL)
-            {
-                uLastLTRACK++;
-                if (lstRenderables.size())
-                    uID_LTRACK = uLastLTRACK % lstRenderables.size();
-
-                // update light-vis for current entity / actor
-                IGameObject* O = g_pGameLevel->CurrentViewEntity();
-                if (O)
-                {
-                    CROS_impl* R = (CROS_impl*)O->ROS();
-                    if (R)
-                        R->update(O);
-                }
-
-                // update light-vis for selected entity
-                // track lighting environment
-                if (lstRenderables.size())
-                {
-                    IRenderable* renderable = lstRenderables[uID_LTRACK]->dcast_Renderable();
-                    if (renderable)
-                    {
-                        CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
-                        if (T)
-                            T->update(renderable);
-                    }
-                }
-            }
-        }
-
         // Traverse sector/portal structure
         PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, m_ViewProjection,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE
@@ -87,6 +47,31 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
         // Traverse frustums
         if (psDeviceFlags.test(rsDrawDynamic))
         {
+            // Traverse object database
+            g_SpatialSpace->q_frustum(
+                lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
+
+            // Exact sorting order (front-to-back)
+            std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
+
+            // Determine visibility for dynamic part of scene
+            u32 uID_LTRACK = 0xffffffff;
+            if (phase == PHASE_NORMAL)
+            {
+                uLastLTRACK++;
+                if (!lstRenderables.empty())
+                    uID_LTRACK = uLastLTRACK % lstRenderables.size();
+
+                // update light-vis for current entity / actor
+                IGameObject* O = g_pGameLevel->CurrentViewEntity();
+                if (O)
+                {
+                    CROS_impl* R = (CROS_impl*)O->ROS();
+                    if (R)
+                        R->update(O);
+                }
+            }
+
             for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
             {
                 ISpatial* spatial = lstRenderables[o_it];
@@ -137,6 +122,14 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                         if (!bVisible)
                             break; // exit loop on frustums
 
+                        // update light-vis for selected entity
+                        if (o_it == uID_LTRACK && renderable->renderable_ROS())
+                        {
+                            // track lighting environment
+                            CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
+                            T->update(renderable);
+                        }
+
                         // Rendering
                         renderable->renderable_Render(renderable);
                     }
@@ -164,12 +157,12 @@ void CRender::render_menu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->get_base_zb()); // LDR RT
+        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->rt_Base_Depth); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
     // Distort
     {
-        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->get_base_zb()); // Now RT is a distortion mask
+        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->rt_Base_Depth); // Now RT is a distortion mask
         RCache.ClearRT(Target->rt_Generic_1, color_rgba(127, 127, 0, 127));
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
@@ -190,7 +183,16 @@ void CRender::render_menu()
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
     FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
+    pv++;
+    pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
+    pv++;
+    pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
+    pv++;
+    pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
+    pv++;
+#elif defined(USE_OGL)
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
     pv++;
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
@@ -200,15 +202,8 @@ void CRender::render_menu()
     pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
     pv++;
 #else
-    pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
-    pv++;
-    pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
-    pv++;
-    pv->set(float(_w + EPS), float(_h + EPS), d_Z, d_W, C, p1.x, p1.y);
-    pv++;
-    pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
-    pv++;
-#endif // USE_OGL
+#   error No graphics API selected or enabled!
+#endif
     RCache.Vertex.Unlock(4, Target->g_menu->vb_stride);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }
@@ -219,9 +214,9 @@ void CRender::Render()
     PIX_EVENT(CRender_Render);
 
     g_r = 1;
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
 #endif
 
@@ -237,7 +232,7 @@ void CRender::Render()
 
     if (!(g_pGameLevel && g_hud) || bMenu)
     {
-#ifndef USE_DX9 // XXX: probably we can just enable this on DX9 too
+#if defined(USE_DX11) || defined(USE_OGL) // XXX: probably we can just enable this on DX9 too
         Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
 #endif
         return;
@@ -259,13 +254,8 @@ void CRender::Render()
         bSUN = false;
     // Msg						("sstatic: %s, sun: %s",o.sunstatic?;"true":"false", bSUN?"true":"false");
 
-    // HOM
+    // Frustum
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-    if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
-    {
-        HOM.Enable();
-        HOM.Render(ViewBase);
-    }
 
     //******* Z-prefill calc - DEFERRER RENDERER
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
@@ -282,6 +272,7 @@ void CRender::Render()
         r_pmask(true, false); // enable priority "0"
         set_Recorder(nullptr);
         phase = PHASE_SMAP;
+        TaskScheduler->Wait(*ProcessHOMTask);
         render_main(m_zfill, false);
         r_pmask(true, false); // disable priority "1"
         BasicStats.Culling.End();
@@ -315,6 +306,8 @@ void CRender::Render()
     else
         set_Recorder(nullptr);
     phase = PHASE_NORMAL;
+    if (!ps_r2_ls_flags.test(R2FLAG_ZFILL))
+        TaskScheduler->Wait(*ProcessHOMTask);
     render_main(Device.mFullTransform, true);
     set_Recorder(nullptr);
     r_pmask(true, false); // disable priority "1"
@@ -358,16 +351,14 @@ void CRender::Render()
     Target->phase_occq();
     LP_normal.clear();
     LP_pending.clear();
-#ifndef USE_DX9
-    if (o.dx10_msaa)
+#if defined(USE_DX11) || defined(USE_OGL)
+    if (o.msaa)
     {
         RCache.set_ZB(Target->rt_MSAADepth->pZRT);
     }
 #endif
     {
         PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-        // perform tests
-        auto count = 0;
         light_Package& LP = Lights.package;
 
         // stats
@@ -376,10 +367,11 @@ void CRender::Render()
         Stats.l_total = Stats.l_shadowed + Stats.l_unshadowed;
 
         // perform tests
+        size_t count = 0;
         count = _max(count, LP.v_point.size());
         count = _max(count, LP.v_spot.size());
         count = _max(count, LP.v_shadowed.size());
-        for (auto it = 0; it < count; it++)
+        for (size_t it = 0; it < count; it++)
         {
             if (it < LP.v_point.size())
             {
@@ -475,15 +467,15 @@ void CRender::Render()
         Lights_LastFrame.clear();
     }
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     // full screen pass to mark msaa-edge pixels in highest stencil bit
-    if (o.dx10_msaa)
+    if (o.msaa)
     {
         PIX_EVENT(MARK_MSAA_EDGES);
         Target->mark_msaa_edges();
     }
 
-    //	TODO: DX10: Implement DX10 rain.
+    //	TODO: DX11: Implement DX11 rain.
     if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
     {
         PIX_EVENT(DEFER_RAIN);
@@ -514,11 +506,11 @@ void CRender::Render()
         RCache.set_xform_project(Device.mProject);
         RCache.set_xform_view(Device.mView);
         // Stencil - write 0x1 at pixel pos -
-#ifdef USE_DX9
+#if defined(USE_DX9)
         RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-#else
-        if (!o.dx10_msaa)
+#elif defined(USE_DX11) || defined(USE_OGL)
+        if (!o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -554,12 +546,12 @@ void CRender::Render()
         Target->phase_combine();
     }
 
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
 }
 
 void CRender::render_forward()
 {
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
     o.distortion = o.distortion_enabled; // enable distorion
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)

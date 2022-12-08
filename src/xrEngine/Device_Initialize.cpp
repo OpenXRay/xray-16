@@ -21,7 +21,7 @@ void CRenderDevice::initialize_weather_editor()
 
     m_editor_finalize = (finalize_function_ptr)m_editor_module->GetProcAddress("finalize");
     VERIFY(m_editor_finalize);
-#if !defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_WINDOWS)
     m_editor_initialize(m_editor);
 #endif
     VERIFY(m_editor);
@@ -86,7 +86,7 @@ void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 
 SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, void* /*data*/)
 {
-    if (!Device.AllowWindowDrag)
+    if (!Device.IsWindowDraggable())
         return SDL_HITTEST_NORMAL;
 
     SDL_Point area = *pArea; // copy
