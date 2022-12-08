@@ -900,23 +900,13 @@ IC static void CLevel_Export(lua_State* luaState)
                 return;
             }
             ai().alife().jump_to_level(level_name);
-        })
-        def("jump_to_level", &jump_to_level)
+        }),
+        def("jump_to_level", &jump_to_level),
         def("jump_to_level", +[](const Fvector& m_position, u32 m_level_vertex_id, GameGraph::_GRAPH_ID m_game_vertex_id)
         {
             jump_to_level(m_position, m_level_vertex_id, m_game_vertex_id, {})
         })
     ];
-
 };
-void jump_to_level(const Fvector& m_position, u32 m_level_vertex_id, GameGraph::_GRAPH_ID m_game_vertex_id, const Fvector& m_angles)
-{
-    NET_Packet p;
-    p.w_begin(M_CHANGE_LEVEL);
-    p.w(&m_game_vertex_id, sizeof(m_game_vertex_id));
-    p.w(&m_level_vertex_id, sizeof(m_level_vertex_id));
-    p.w_vec3(m_position);
-    p.w_vec3(m_angles);
-    Level().Send(p, net_flags(TRUE));
-}
+
 SCRIPT_EXPORT_FUNC(CLevel, (), CLevel_Export);
