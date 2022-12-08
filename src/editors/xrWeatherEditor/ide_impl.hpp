@@ -55,7 +55,7 @@ public:
 
 public:
     virtual property_holder* create_property_holder(
-        LPCSTR display_name, property_holder_collection* collection, property_holder_holder* holder);
+        pcstr display_name, property_holder_collection* collection, property_holder_holder* holder);
     virtual void destroy(property_holder*& property_holder);
     virtual void environment_levels(property_holder* property_holder);
     virtual void environment_weathers(property_holder* property_holder);

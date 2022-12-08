@@ -8,9 +8,13 @@ Texture2D	s_clouds1;
 // Pixel
 float4 	_main	( v2p I )
 {
-	float4 	s0	=	tex2D(s_clouds0, I.tc0);
-	float4 	s1	=	tex2D(s_clouds1, I.tc1);
-	float4 	mix	=	I.color * (s0 + s1);
+	float4 	s0_0	=	tex2D(s_clouds0, I.tc0);
+	float4 	s0_1	=	tex2D(s_clouds1, I.tc0);
+	float4 	s1_0	=	tex2D(s_clouds0, I.tc1);
+	float4 	s1_1	=	tex2D(s_clouds1, I.tc1);
+	float4 	s_0	=	(s0_0 + s1_0);
+	float4 	s_1	=	(s0_1 + s1_1);
+	float4 	mix	=	I.color * lerp(s_0, s_1, L_ambient.w);
 
 #ifdef USE_VTF
 	return  mix;

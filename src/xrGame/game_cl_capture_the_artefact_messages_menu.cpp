@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "string_table.h"
+
 #include "Level.h"
 #include "ui/UIMessagesWindow.h"
 #include "map_manager.h"

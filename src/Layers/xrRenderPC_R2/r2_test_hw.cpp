@@ -6,7 +6,8 @@ BOOL xrRender_test_hw()
     CHW _HW;
     _HW.CreateD3D();
 
-    VERIFY(_HW.pD3D);
+    if (!_HW.pD3D)
+        return FALSE;
 
     _HW.pD3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &caps);
     _HW.DestroyD3D();
@@ -19,5 +20,7 @@ BOOL xrRender_test_hw()
         return FALSE;
     if (mrt_count < 3)
         return FALSE;
+    if (ps_ver_major >= 3)
+        return TRUE+TRUE; // XXX: remove hack
     return TRUE;
 }

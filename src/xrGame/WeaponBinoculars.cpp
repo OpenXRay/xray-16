@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "WeaponBinoculars.h"
 
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 
 #include "Level.h"
 #include "xrUICore/Windows/UIFrameWindow.h"

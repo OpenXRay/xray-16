@@ -49,7 +49,7 @@ void player_state_marksman::OnPlayerKilled(
         float kill_dist = killer_actor->Position().distance_to(victim_actor->Position());
         if (kill_dist >= max_kill_dist)
         {
-            m_sniper_victims.insert(std::make_pair(victim_actor->cName(), kill_dist));
+            m_sniper_victims.emplace(victim_actor->cName(), kill_dist);
         }
     }
 }

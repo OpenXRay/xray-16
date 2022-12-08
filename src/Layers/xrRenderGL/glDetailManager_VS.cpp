@@ -4,23 +4,11 @@
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"
 
-const int quant = 16384;
-const int c_hdr = 10;
-const int c_size = 4;
-
-#pragma pack(push,1)
-struct vertHW
+namespace detail_manager
 {
-    float x, y, z;
-    short u, v, t, mid;
-};
-#pragma pack(pop)
-
-short QC(float v);
-//{
-//	int t=iFloor(v*float(quant)); clamp(t,-32768,32767);
-//	return short(t&0xffff);
-//}
+extern const int quant;
+//extern const int c_hdr;
+}
 
 void CDetailManager::hw_Load_Shaders()
 {
@@ -40,11 +28,14 @@ void CDetailManager::hw_Load_Shaders()
 
 void CDetailManager::hw_Render()
 {
+    using namespace detail_manager;
+
     // Render-prepare
     //	Update timer
     //	Can't use Device.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!
     float fDelta = Device.fTimeGlobal - m_global_time_old;
-    if (fDelta < 0 || fDelta > 1) fDelta = 0.03;
+    if (fDelta < 0 || fDelta > 1)
+        fDelta = 0.03f;
     m_global_time_old = Device.fTimeGlobal;
 
     m_time_rot_1 += PI_MUL_2 * fDelta / swing_current.rot1;

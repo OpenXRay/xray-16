@@ -6,6 +6,8 @@
 //  Реализация темплейтовых функций листбокса
 //=============================================================================
 
+#pragma once
+
 template <class Element>
 bool CUIListWnd::AddItem(const char* str, const float shift, void* pData,
                          int value, int insertBeforeIdx)

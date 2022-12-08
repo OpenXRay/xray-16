@@ -1,11 +1,12 @@
 #include "StdAfx.h"
 #include "DisablingParams.h"
 
-SAllDDWParams worldDisablingParams = {
+SAllDDWParams worldDisablingParams =
+{
     // object
     {
-        {0.001f, 0.1f}, // translational		vel	,	accel
-        {0.005f, 0.05f}, // rotational		vel	,	accel
+        {0.001f, 0.1f}, // translational vel, accel
+        {0.005f, 0.05f}, // rotational vel, accel
         64 // level2 frames 2^
     },
     1.5f // reanable factor

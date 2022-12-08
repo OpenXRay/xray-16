@@ -55,7 +55,7 @@ LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
 #ifdef DEBUG
 void CKinematics::DebugRender(Fmatrix& XFORM)
 {
-#ifndef USE_DX9
+#ifndef USE_DX9 // when we don't have FFP support
     RCache.set_Shader(RImplementation.m_WireShader);
 #endif
 
@@ -339,7 +339,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
     LL_Validate();
 }
 
-IC void iBuildGroups(CBoneData* B, U16Vec& tgt, u16 id, u16& last_id)
+IC void iBuildGroups(CBoneData* B, xr_vector<u16>& tgt, u16 id, u16& last_id)
 {
     if (B->IK_data.ik_flags.is(SJointIKData::flBreakable))
         id = ++last_id;
@@ -674,7 +674,7 @@ void CKinematics::AddWallmark(
     // collect collide boxes
     Fsphere test_sphere;
     test_sphere.set(cp, size);
-    U16Vec test_bones;
+    xr_vector<u16> test_bones;
     test_bones.reserve(LL_BoneCount());
     for (u16 k = 0; k < LL_BoneCount(); k++)
     {

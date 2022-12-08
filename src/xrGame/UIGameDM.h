@@ -20,10 +20,9 @@ private:
     typedef UIGameMP inherited;
 
 protected:
-    enum
+    enum : u32
     {
         flShowFragList = (1 << 1),
-        fl_force_dword = u32(-1)
     };
 
     UITeamPanels* m_pTeamPanels;

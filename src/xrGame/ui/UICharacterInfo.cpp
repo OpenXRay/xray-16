@@ -6,7 +6,6 @@
 #include "Actor.h"
 #include "Level.h"
 #include "xrServerEntities/character_info.h"
-#include "string_table.h"
 #include "relation_registry.h"
 
 #include "xrUICore/XML/xrUIXmlParser.h"
@@ -36,7 +35,7 @@ CSE_ALifeTraderAbstract* ch_info_get_from_id(u16 id)
     }
 }
 
-CUICharacterInfo::CUICharacterInfo() : m_ownerID(u16(-1)), pUIBio(NULL)
+CUICharacterInfo::CUICharacterInfo() : CUIWindow("CUICharacterInfo"), pUIBio(nullptr), m_ownerID(u16(-1))
 {
     ZeroMemory(m_icons, sizeof(m_icons));
     m_bForceUpdate = false;
@@ -324,7 +323,7 @@ void CUICharacterInfo::Update()
         m_bForceUpdate = false;
 
         CSE_ALifeTraderAbstract* T =
-            detail::object_exists_in_alife_registry(m_ownerID) ? ch_info_get_from_id(m_ownerID) : NULL;
+            ::detail::object_exists_in_alife_registry(m_ownerID) ? ch_info_get_from_id(m_ownerID) : NULL;
         if (NULL == T)
         {
             m_ownerID = u16(-1);

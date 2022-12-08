@@ -24,7 +24,7 @@ void CRenderTarget::phase_accumulator()
 #ifdef USE_DX11
         //	Igor: AMD bug workaround. Should be fixed in 8.7 catalyst
         //	Need for MSAA to work correctly.
-        if (RImplementation.o.dx10_msaa)
+        if (RImplementation.o.msaa)
         {
             HW.pContext->OMSetRenderTargets(1, &(rt_Accumulator->pRT), 0);
         }
@@ -49,7 +49,7 @@ void CRenderTarget::phase_accumulator()
         RCache.set_ColorWriteEnable();
     }
 
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     //	Restore viewport after shadow map rendering
     RImplementation.rmNormal();
 #endif

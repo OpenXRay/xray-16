@@ -4,8 +4,8 @@
 
 #include "xrCore/xr_resource.h"
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-#include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #endif
 
 class ECORE_API R_constant_setup;
@@ -16,7 +16,7 @@ enum
     RC_int = 1,
     RC_bool = 2,
     RC_sampler = 99, // DX9 shares index for sampler and texture
-    RC_dx10texture = 100, // For DX10 sampler and texture are different resources
+    RC_dx11texture = 100, // For DX11 sampler and texture are different resources
     RC_dx11UAV = 101
 };
 enum
@@ -37,11 +37,12 @@ enum
     //  Don't change this since some code relies on magic numbers
     RC_dest_pixel = (1 << 0),
     RC_dest_vertex = (1 << 1),
-    RC_dest_sampler = (1 << 2), //  For DX10 it's either sampler or texture
-    RC_dest_geometry = (1 << 3), // DX10 only
+    RC_dest_sampler = (1 << 2), //  For DX11 it's either sampler or texture
+    RC_dest_geometry = (1 << 3), // DX11 only
     RC_dest_hull = (1 << 4), // DX11 only
     RC_dest_domain = (1 << 5), //   DX11 only
     RC_dest_compute = (1 << 6), //  DX11 only
+    RC_dest_all = (1 << 7), // OpenGL only
     RC_dest_compute_cb_index_mask = 0xF0000000, // Buffer index == 0..14
     RC_dest_compute_cb_index_shift = 28,
     RC_dest_domain_cb_index_mask = 0x0F000000, // Buffer index == 0..14
@@ -74,22 +75,26 @@ struct ECORE_API R_constant_load
     u16 index; // linear index (pixel)
     u16 cls; // element class
 
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+    R_constant_load() : index(u16(-1)), cls(u16(-1)) {};
+#elif defined(USE_OGL)
     GLuint location;
     GLuint program;
 
     R_constant_load() : index(u16(-1)), cls(u16(-1)), location(0), program(0) {};
 #else
-    R_constant_load() : index(u16(-1)), cls(u16(-1)) {};
-#endif // USE_OGL
+#   error No graphics API selected or enabled!
+#endif
 
     BOOL equal(R_constant_load& C)
     {
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+        return (index == C.index) && (cls == C.cls);
+#elif defined(USE_OGL)
         return (index == C.index) && (cls == C.cls) && (location == C.location) && (program == C.program);
 #else
-        return (index == C.index) && (cls == C.cls);
-#endif // USE_OGL
+#   error No graphics API selected or enabled!
+#endif
     }
 };
 
@@ -103,12 +108,16 @@ struct ECORE_API R_constant : public xr_resource
     R_constant_load vs;
 #ifndef USE_DX9
     R_constant_load gs;
-#ifdef USE_DX11
+#   if defined(USE_DX11)
     R_constant_load hs;
     R_constant_load ds;
     R_constant_load cs;
+#   endif
 #endif
-#endif // !USE_DX9
+#ifdef USE_OGL
+    R_constant_load pp;
+#endif
+
     R_constant_load samp;
     R_constant_setup* handler;
 
@@ -124,11 +133,14 @@ struct ECORE_API R_constant : public xr_resource
         case RC_dest_sampler: return samp;
 #ifndef USE_DX9
         case RC_dest_geometry: return gs;
-#ifdef USE_DX11
+#   if defined(USE_DX11)
         case RC_dest_hull: return hs;
         case RC_dest_domain: return ds;
         case RC_dest_compute: return cs;
+#   endif
 #endif
+#ifdef USE_OGL
+        case RC_dest_all: return pp;
 #endif
         default: FATAL("invalid enumeration for shader");
         }
@@ -137,11 +149,25 @@ struct ECORE_API R_constant : public xr_resource
 
     BOOL equal(R_constant& C)
     {
-        return (!xr_strcmp(name, C.name)) && (type == C.type) && (destination == C.destination) && ps.equal(C.ps) &&
-            vs.equal(C.vs) && samp.equal(C.samp) && handler == C.handler;
+        return !xr_strcmp(name, C.name)
+            && type == C.type
+            && destination == C.destination
+            && ps.equal(C.ps)
+            && vs.equal(C.vs)
+#if defined(USE_DX11) || defined(USE_OGL)
+            && gs.equal(C.gs)
+#   if defined(USE_DX11)
+            && hs.equal(C.hs)
+            && ds.equal(C.ds)
+            && cs.equal(C.cs)
+#   endif
+#   if defined(USE_OGL)
+            && pp.equal(C.pp)
+#   endif
+#endif
+            && samp.equal(C.samp)
+            && handler == C.handler;
     }
-
-    BOOL equal(R_constant* C) { return equal(*C); }
 };
 typedef resptr_core<R_constant, resptr_base<R_constant>> ref_constant;
 
@@ -162,7 +188,7 @@ public:
     typedef xr_vector<ref_constant> c_table;
     c_table table;
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     typedef std::pair<u32, ref_cbuffer> cb_table_record;
     typedef xr_vector<cb_table_record> cb_table;
     cb_table m_CBTable;
@@ -171,7 +197,7 @@ public:
 private:
     void fatal(LPCSTR s);
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     BOOL parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination);
     BOOL parseResources(ID3DShaderReflection* pReflection, int ResNum, u32 destination);
 #endif
@@ -193,8 +219,8 @@ private:
 };
 typedef resptr_core<R_constant_table, resptr_base<R_constant_table>> ref_ctable;
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-#include "../xrRenderDX10/dx10ConstantBuffer_impl.h"
+#if defined(USE_DX11)
+#include "../xrRenderDX11/dx11ConstantBuffer_impl.h"
 #endif
 
 #endif

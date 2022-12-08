@@ -6,13 +6,9 @@ using namespace std;
 
 XRCORE_API smem_container* g_pSharedMemoryContainer = NULL;
 
-// XXXX: TODO: Use a RAII type for lock enter/leave?
-
-smem_container::smem_container() :
+smem_container::smem_container()
 #ifdef CONFIG_PROFILE_LOCKS
-    pcs(xr_new<Lock>(MUTEX_PROFILE_ID(smem_container)))
-#else
-    pcs(xr_new<Lock>())
+    : lock(MUTEX_PROFILE_ID(smem_container))
 #endif // CONFIG_PROFILE_LOCKS
 {
 }
@@ -20,14 +16,13 @@ smem_container::smem_container() :
 smem_container::~smem_container()
 {
     clean();
-    delete pcs;
 }
 
 smem_value* smem_container::dock(u32 dwCRC, u32 dwLength, void* ptr)
 {
     VERIFY(dwCRC && dwLength && ptr);
 
-    pcs->Enter();
+    ScopeLock scope(&lock);
     smem_value* result = 0;
 
     // search a place to insert
@@ -70,13 +65,12 @@ smem_value* smem_container::dock(u32 dwCRC, u32 dwLength, void* ptr)
     }
 
     // exit
-    pcs->Leave();
     return result;
 }
 
 void smem_container::clean()
 {
-    pcs->Enter();
+    ScopeLock scope(&lock);
     cdb::iterator it = container.begin();
     cdb::iterator end = container.end();
     for (; it != end; ++it)
@@ -85,37 +79,36 @@ void smem_container::clean()
     container.erase(remove(container.begin(), container.end(), (smem_value*)0), container.end());
     if (container.empty())
         container.clear();
-    pcs->Leave();
 }
 
 void smem_container::dump()
 {
-    pcs->Enter();
+    ScopeLock scope(&lock);
     cdb::iterator it = container.begin();
     cdb::iterator end = container.end();
     FILE* F = fopen("x:\\$smem_dump$.txt", "w");
     for (; it != end; ++it)
         fprintf(F, "%4u : crc[%6x], %u bytes\n", (*it)->dwReference, (*it)->dwCRC, (*it)->dwLength);
     fclose(F);
-    pcs->Leave();
 }
 
 u32 smem_container::stat_economy()
 {
-    pcs->Enter();
-    cdb::iterator it = container.begin();
-    cdb::iterator end = container.end();
     s64 counter = 0;
-    counter -= sizeof(*this);
-    counter -= sizeof(cdb::allocator_type);
-    const int node_size = 20;
-    for (; it != end; ++it)
     {
-        counter -= 16;
-        counter -= node_size;
-        counter += s64((s64((*it)->dwReference) - 1) * s64((*it)->dwLength));
+        ScopeLock scope(&lock);
+        cdb::iterator it = container.begin();
+        cdb::iterator end = container.end();
+        counter -= sizeof(*this);
+        counter -= sizeof(cdb::allocator_type);
+        const int node_size = 20; // XXX: refactor
+        for (; it != end; ++it)
+        {
+            counter -= 16;
+            counter -= node_size;
+            counter += s64((s64((*it)->dwReference) - 1) * s64((*it)->dwLength));
+        }
     }
-    pcs->Leave();
 
     return u32(s64(counter) / s64(1024));
 }

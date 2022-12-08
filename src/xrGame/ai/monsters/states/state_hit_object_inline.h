@@ -1,15 +1,9 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterHitObjectAbstract CStateMonsterHitObject<_Object>
-
-#define TEST_ANGLE PI_DIV_6
-#define TIME_OUT_STATE 1000
-#define TIME_POINTBREAK 500
-#define IMPULSE 20
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterHitObjectAbstract::initialize()

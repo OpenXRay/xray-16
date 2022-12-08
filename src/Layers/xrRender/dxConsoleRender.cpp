@@ -35,7 +35,7 @@ ICF void ClearWithShader(const Irect& rect, const Fcolor& color, ref_geom& geom,
 
 void dxConsoleRender::OnRender(bool bGame)
 {
-    Irect rect = { 0, 0, Device.dwWidth, Device.dwHeight };
+    Irect rect = { 0, 0, (int)Device.dwWidth, (int)Device.dwHeight };
     if (bGame)
         rect.y2 /= 2;
 

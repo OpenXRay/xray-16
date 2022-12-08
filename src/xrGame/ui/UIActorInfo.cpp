@@ -14,13 +14,13 @@
 #include "character_community.h"
 #include "character_reputation.h"
 #include "relation_registry.h"
-#include "string_table.h"
 
 constexpr cpcstr ACTOR_STATISTIC_XML = "actor_statistic.xml";
 constexpr cpcstr ACTOR_CHARACTER_XML = "pda_dialog_character.xml";
 
 CUIActorInfoWnd::CUIActorInfoWnd()
-    : UIInfoFrame(nullptr), UIInfoHeader(nullptr),
+    : CUIWindow("CUIActorInfoWnd"),
+      UIInfoFrame(nullptr), UIInfoHeader(nullptr),
       UICharIconFrame(nullptr), UICharIconHeader(nullptr),
       UIAnimatedIcon(nullptr), UICharacterWindow(nullptr),
       UICharacterInfo(nullptr), UIMasterList(nullptr),
@@ -70,7 +70,7 @@ bool CUIActorInfoWnd::Init()
     UICharIconFrame->AttachChild(UIMasterList);
     CUIXmlInit::InitScrollView(uiXml, "master_list", 0, UIMasterList);
 
-    UICharacterWindow = xr_new<CUIWindow>();
+    UICharacterWindow = xr_new<CUIWindow>("Character window");
     UICharacterWindow->SetAutoDelete(true);
     UICharIconFrame->AttachChild(UICharacterWindow);
     CUIXmlInit::InitWindow(uiXml, "character_info", 0, UICharacterWindow);
@@ -292,8 +292,8 @@ void CUIActorInfoWnd::FillReputationDetails(CUIXml* xml, LPCSTR path)
 
 
 CUIActorStaticticHeader::CUIActorStaticticHeader(CUIActorInfoWnd* w)
-    : m_actorInfoWnd(w), m_stored_alpha(0),
-      m_text1(nullptr), m_text2(nullptr) {}
+    : CUIWindow("CUIActorStaticticHeader"), m_actorInfoWnd(w),
+      m_stored_alpha(0), m_text1(nullptr), m_text2(nullptr) {}
 
 void CUIActorStaticticHeader::Init(CUIXml* xml, LPCSTR path, int idx_in_xml)
 {
@@ -303,12 +303,12 @@ void CUIActorStaticticHeader::Init(CUIXml* xml, LPCSTR path, int idx_in_xml)
 
     xml->SetLocalRoot(xml->NavigateToNode(path, idx_in_xml));
 
-    m_text1 = xr_new<CUIStatic>();
+    m_text1 = xr_new<CUIStatic>("Text 1");
     m_text1->SetAutoDelete(true);
     AttachChild(m_text1);
     CUIXmlInit::InitStatic(*xml, "text_1", 0, m_text1);
 
-    m_text2 = xr_new<CUIStatic>();
+    m_text2 = xr_new<CUIStatic>("Text 2");
     m_text2->SetAutoDelete(true);
     AttachChild(m_text2);
     CUIXmlInit::InitStatic(*xml, "text_2", 0, m_text2);
@@ -355,22 +355,22 @@ void CUIActorStaticticDetail::Init(CUIXml* xml, LPCSTR path, int idx)
 
     xml->SetLocalRoot(xml->NavigateToNode(path, idx));
 
-    m_text0 = xr_new<CUIStatic>();
+    m_text0 = xr_new<CUIStatic>("Text 0");
     m_text0->SetAutoDelete(true);
     AttachChild(m_text0);
     CUIXmlInit::InitStatic(*xml, "text_0", 0, m_text0);
 
-    m_text1 = xr_new<CUIStatic>();
+    m_text1 = xr_new<CUIStatic>("Text 1");
     m_text1->SetAutoDelete(true);
     AttachChild(m_text1);
     CUIXmlInit::InitStatic(*xml, "text_1", 0, m_text1);
 
-    m_text2 = xr_new<CUIStatic>();
+    m_text2 = xr_new<CUIStatic>("Text 2");
     m_text2->SetAutoDelete(true);
     AttachChild(m_text2);
     CUIXmlInit::InitStatic(*xml, "text_2", 0, m_text2);
 
-    m_text3 = xr_new<CUIStatic>();
+    m_text3 = xr_new<CUIStatic>("Text 3");
     m_text3->SetAutoDelete(true);
     AttachChild(m_text3);
     CUIXmlInit::InitStatic(*xml, "text_3", 0, m_text3);

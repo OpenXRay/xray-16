@@ -45,10 +45,10 @@ bool SpatialBase::spatial_inside()
         return FALSE;
     if (spatial.sphere.P.z > spatial.node_center.z + dr)
         return FALSE;
-    return TRUE;
+    return true;
 }
 
-BOOL verify_sp(ISpatial* sp, Fvector& node_center, float node_radius)
+bool verify_sp(ISpatial* sp, Fvector& node_center, float node_radius)
 {
     float dr = -(-node_radius + sp->GetSpatialData().sphere.R);
     if (sp->GetSpatialData().sphere.P.x < node_center.x - dr)
@@ -271,7 +271,7 @@ void ISpatial_DB::insert(ISpatial* S)
 
     const auto& spatialData = S->GetSpatialData();
 
-    BOOL bValid = _valid(spatialData.sphere.R) && _valid(spatialData.sphere.P);
+    bool bValid = _valid(spatialData.sphere.R) && _valid(spatialData.sphere.P);
     if (!bValid)
     {
         IGameObject* O = dynamic_cast<IGameObject*>(S);
@@ -279,7 +279,7 @@ void ISpatial_DB::insert(ISpatial* S)
             xrDebug::Fatal(DEBUG_INFO, "Invalid OBJECT position or radius (%s)", O->cName().c_str());
         else
         {
-#ifndef XR_PLATFORM_LINUX
+#ifdef XR_PLATFORM_WINDOWS
             CPS_Instance* P = dynamic_cast<CPS_Instance*>(S);
             if (P)
                 xrDebug::Fatal(DEBUG_INFO, "Invalid PS spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",
@@ -290,7 +290,8 @@ void ISpatial_DB::insert(ISpatial* S)
 #else
             // In Linux there is a linking issue because `CPS_Instance` belongs to xrEngine
             // and is not available to xrCDB due to source code organization
-            xrDebug::Fatal(DEBUG_INFO, "Invalid PS or other spatial position");
+            xrDebug::Fatal(DEBUG_INFO, "Invalid PS or OTHER spatial position{%3.2f,%3.2f,%3.2f} or radius{%3.2f}",
+                VPUSH(spatialData.sphere.P), spatialData.sphere.R);
 #endif // ifndef XR_PLATFORM_LINUX
         }
     }

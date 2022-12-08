@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include <tbb/parallel_for_each.h>
+#include "xrCore/Threading/ParallelForEach.hpp"
 
 #include "ResourceManager.h"
 #include "tss.h"
@@ -26,20 +26,6 @@ void fix_texture_name(LPSTR fn)
         *_ext = 0;
 }
 */
-//--------------------------------------------------------------------------------------------------------------
-template <class T>
-bool reclaim(xr_vector<T*>& vec, const T* ptr)
-{
-    auto it = vec.begin();
-    auto end = vec.end();
-    for (; it != end; ++it)
-        if (*it == ptr)
-        {
-            vec.erase(it);
-            return true;
-        }
-    return false;
-}
 
 //--------------------------------------------------------------------------------------------------------------
 IBlender* CResourceManager::_GetBlender(LPCSTR Name)
@@ -277,79 +263,41 @@ void CResourceManager::CompatibilityCheck()
     {
         IReader* skinh = open_shader("skin.h");
         R_ASSERT3(skinh, "Can't open shader", "skin.h");
-        // search for (12.f / 32768.f)
+        xr_string str(static_cast<pcstr>(skinh->pointer()), skinh->length());
+
         bool hq_skinning = true;
-        do
+        // search for (12.f / 32768.f)
+        const auto check = [&](cpcstr searchBegin, cpcstr searchEnd) -> bool
         {
-            xr_string str(static_cast<pcstr>(skinh->pointer()), skinh->length());
-
-            cpcstr begin = strstr(str.c_str(), "u_position");
+            cpcstr begin = strstr(str.c_str(), searchBegin);
             if (!begin)
-                break;
+                return false;
 
-            cpcstr end = strstr(begin, "sbones_array");
+            cpcstr end = strstr(begin, searchEnd);
             if (!end)
-                break;
+                return false;
 
             str.assign(begin, end);
             pcstr ptr = str.data();
 
-            if ((ptr = strstr(ptr, "12.f")))    // 12.f
+            if ((ptr = strstr(ptr, "12.")))     // 12.f or 12.0
+            {
                 if ((ptr = strstr(ptr, "/")))   // /
-                    if (strstr(ptr, "32768.f")) // 32768.f
+                    if (strstr(ptr, "32768."))  // 32768.f or 32768.0
+                    {
                         hq_skinning = false;    // found
-            break;
-        } while (false);
+                        return true;
+                    }
+            }
+            return false;
+        };
+        if (!check("u_position", "sbones_array"))
+        {
+            check("skinning_pos", "skinning_0");
+        }
         RImplementation.m_hq_skinning = hq_skinning;
         FS.r_close(skinh);
     }
-    // Check shadow cascades type (old SOC/CS or new COP)
-#if RENDER == R_R2
-    {
-        // Check for new cascades support on R2
-        IReader* accumSunNearCascade = open_shader("accum_sun_cascade.ps");
-        RImplementation.o.oldshadowcascades = !accumSunNearCascade;
-        ps_r2_ls_flags_ext.set(R2FLAGEXT_SUN_OLD, !accumSunNearCascade);
-        FS.r_close(accumSunNearCascade);
-    }
-#elif RENDER != R_R1
-    {
-        IReader* accumSunNear = open_shader("accum_sun_near.ps");
-        R_ASSERT3(accumSunNear, "Can't open shader", "accum_sun_near.ps");
-        bool oldCascades = false;
-        do
-        {
-            xr_string str(static_cast<cpcstr>(accumSunNear->pointer()), accumSunNear->length());
-
-            pcstr begin = strstr(str.c_str(), "float4");
-            if (!begin)
-                break;
-
-            begin = strstr(begin, "main");
-            if (!begin)
-                break;
-
-            cpcstr end = strstr(begin, "SV_Target");
-            if (!end)
-                break;
-
-            str.assign(begin, end);
-            cpcstr ptr = str.data();
-
-            if (strstr(ptr, "v2p_TL2uv"))
-            {
-                oldCascades = true;
-            }
-            else if (strstr(ptr, "v2p_volume"))
-            {
-                oldCascades = false;
-            }
-        } while (false);
-        RImplementation.o.oldshadowcascades = oldCascades;
-        ps_r2_ls_flags_ext.set(R2FLAGEXT_SUN_OLD, oldCascades);
-        FS.r_close(accumSunNear);
-    }
-#endif
 }
 
 Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
@@ -364,8 +312,16 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
 {
     if (!GEnv.isDedicatedServer)
     {
-        // TODO: DX10: When all shaders are ready switch to common path
-#ifdef USE_DX11
+#if defined(USE_DX9)
+#   ifndef _EDITOR
+        if (_lua_HasShader(s_shader))
+            return _lua_Create(s_shader, s_textures);
+        else
+#   endif
+        {
+            return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
+        }
+#else // TODO: DX11: When all shaders are ready switch to common path
         if (_lua_HasShader(s_shader))
             return _lua_Create(s_shader, s_textures);
         else
@@ -384,13 +340,6 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
                 }
             }
         }
-#else // USE_DX9
-#ifndef _EDITOR
-        if (_lua_HasShader(s_shader))
-            return _lua_Create(s_shader, s_textures);
-        else
-#endif
-            return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
 #endif
     }
     return nullptr;
@@ -410,11 +359,13 @@ void CResourceManager::DeferredUpload()
     if (!RDEVICE.b_is_Ready)
         return;
 
-#ifndef USE_OGL
-    tbb::parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
-#else
+#if defined(USE_DX9) || defined(USE_DX11)
+    xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
+#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
         texture.second->Load();
+#else
+#   error No graphics API selected or enabled!
 #endif
 }
 
@@ -423,11 +374,13 @@ void CResourceManager::DeferredUnload()
     if (!RDEVICE.b_is_Ready)
         return;
 
-#ifndef USE_OGL
-    tbb::parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
-#else
+#if defined(USE_DX9) || defined(USE_DX11)
+    xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
+#elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
         texture.second->Unload();
+#else
+#   error No graphics API selected or enabled!
 #endif
 }
 
@@ -503,7 +456,7 @@ void CResourceManager::_DumpMemoryUsage()
 
 void CResourceManager::Evict()
 {
-    // TODO: DX10: check if we really need this method
+    // TODO: DX11: check if we really need this method
 #ifdef USE_DX9
     CHK_DX(HW.pDevice->EvictManagedResources());
 #endif

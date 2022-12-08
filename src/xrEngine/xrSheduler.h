@@ -16,7 +16,7 @@ private:
         ISheduled* Object;
         u32 dwPadding; // for align-issues
 
-        IC bool operator<(Item& I) { return dwTimeForExecute > I.dwTimeForExecute; }
+        ICF bool operator<(const Item& I) const { return dwTimeForExecute > I.dwTimeForExecute; }
     };
     struct ItemReg
     {
@@ -65,9 +65,9 @@ public:
     void Process();
     void Update();
 
-#ifdef DEBUG
+#ifndef MASTER_GOLD
     bool Registered(ISheduled* object) const;
-#endif // DEBUG
+#endif
     void Register(ISheduled* A, bool RT = false);
     void Unregister(ISheduled* A);
     void EnsureOrder(ISheduled* Before, ISheduled* After);
@@ -81,81 +81,3 @@ public:
         return stats.Update;
     }
 };
-
-namespace XRay
-{
-class ENGINE_API Scheduler
-{
-    struct ItemReg
-    {
-        bool Operational;
-        bool RealtimePriority;
-        ISheduled* Object;
-    };
-
-    struct Item
-    {
-        ISheduled* Object;
-        shared_str ScheduledName;
-
-        u32 TimeForExecute;
-        u32 TimeOfLastExecute;
-
-        bool operator<(const Item& rhs) const { return TimeForExecute > rhs.TimeForExecute; }
-
-    private:
-        u32 padding; // This makes Item to be 4 bytes
-    };
-
-    struct SchedulerStatistics
-    {
-        float Load;
-        CStatTimer Update;
-
-        SchedulerStatistics() { FrameStart(); }
-        void FrameStart()
-        {
-            Load = 0.0f;
-            Update.FrameStart();
-        }
-
-        void FrameEnd() { Update.FrameEnd(); }
-    };
-
-    xr_vector<Item> RealtimeUpdateQueue;
-    xr_vector<Item> UpdateQueue;
-    xr_vector<ItemReg> RegistrationQueue;
-    bool processingNow;
-    SchedulerStatistics stats;
-
-    u64 cyclesStart;
-    u64 cyclesLimit;
-
-    void internalRegister(ItemReg&& item);
-    bool internalUnregister(ItemReg&& item, const bool warnWhenNotFound = true);
-    void processRegistrationQueue();
-
-public:
-    Scheduler() : processingNow(false), cyclesStart(0), cyclesLimit(0) {}
-
-    void Initialize();
-    void Destroy();
-    void DumpStatistics(class ::IGameFont& font, class ::IPerformanceAlert* alert);
-
-    bool Registered(ISheduled* object) const;
-
-    void Register(ISheduled* object, const bool realtime = false);
-    void Unregister(ISheduled* object);
-    void EnsureOrder(ISheduled* before, ISheduled* after);
-
-    void ProcessStep();
-    void ProcessRealtimeQueueQueue();
-    void ProcessUpdateQueue();
-
-    const CStatTimer& GetUpdateTime()
-    {
-        stats.FrameEnd();
-        return stats.Update;
-    }
-};
-}

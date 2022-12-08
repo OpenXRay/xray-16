@@ -52,10 +52,10 @@ void CPHActorCharacter::Create(dVector3 sizes)
     }
     if (slide_material_index == GAMEMTL_NONE_IDX)
     {
-        GameMtlIt mi = GMLibrary().GetMaterialIt("materials" DELIMITER "earth_slide");
-        if (mi != GMLibrary().LastMaterial())
-            slide_material_index = u16(mi - GMLibrary().FirstMaterial());
-        // slide_material_index = GMLibrary().GetMaterialIdx("earth_slide");
+        GameMtlIt mi = GMLib.GetMaterialIt("materials" DELIMITER "earth_slide");
+        if (mi != GMLib.LastMaterial())
+            slide_material_index = u16(mi - GMLib.FirstMaterial());
+        // slide_material_index = GMLib.GetMaterialIdx("earth_slide");
     }
 }
 void CPHActorCharacter::ValidateWalkOn()
@@ -300,8 +300,8 @@ void CPHActorCharacter::InitContact(dContact* c, bool& do_collide, u16 material_
     SFindPredicate fp(c, &b1);
     RESTRICTOR_I r = std::find_if(begin(m_restrictors), end(m_restrictors), fp);
     bool b_restrictor = (r != end(m_restrictors));
-    SGameMtl* material_1 = GMLibrary().GetMaterialByIdx(material_idx_1);
-    SGameMtl* material_2 = GMLibrary().GetMaterialByIdx(material_idx_2);
+    SGameMtl* material_1 = GMLib.GetMaterialByIdx(material_idx_1);
+    SGameMtl* material_2 = GMLib.GetMaterialByIdx(material_idx_2);
     if ((material_1 && material_1->Flags.test(SGameMtl::flActorObstacle)) ||
         (material_2 && material_2->Flags.test(SGameMtl::flActorObstacle)))
         do_collide = true;

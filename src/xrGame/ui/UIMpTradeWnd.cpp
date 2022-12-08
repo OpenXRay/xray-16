@@ -94,7 +94,7 @@ void CUIMpTradeWnd::OnBtnLastSetClicked(CUIWindow* w, void* d)
     ApplyPreset(_preset_idx_last);
 }
 
-void xr_stdcall CUIMpTradeWnd::OnBtnPresetDefaultClicked(CUIWindow* w, void* d)
+void CUIMpTradeWnd::OnBtnPresetDefaultClicked(CUIWindow* w, void* d)
 {
     CheckDragItemToDestroy();
     {

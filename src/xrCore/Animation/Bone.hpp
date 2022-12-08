@@ -279,7 +279,7 @@ public:
 class CBone;
 using BoneVec = xr_vector<CBone*>;
 
-class XRCORE_API CBone : public CBoneInstance, public IBoneData
+class XRCORE_API CBone final : public CBoneInstance, public IBoneData
 {
 public:
     friend class LWBoneParser;
@@ -432,7 +432,7 @@ class CBoneData;
 typedef xr_vector<CBoneData*> vecBones;
 typedef vecBones::iterator vecBonesIt;
 
-class XRCORE_API CBoneData : public IBoneData
+class XRCORE_API CBoneData final : public IBoneData
 {
 protected:
     u16 SelfID;

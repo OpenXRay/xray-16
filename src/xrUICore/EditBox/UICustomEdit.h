@@ -14,7 +14,7 @@ private:
 
 public:
     CUICustomEdit();
-    virtual ~CUICustomEdit();
+    ~CUICustomEdit() override;
 
     void Init(u32 max_char_count, bool number_only_mode = false, bool read_mode = false, bool fn_mode = false);
 
@@ -23,7 +23,6 @@ public:
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
-    virtual bool OnKeyboardHold(int dik);
 
     bool OnTextInput(pcstr text) override;
 
@@ -44,10 +43,10 @@ public:
 protected:
     void Register_callbacks();
 
-    void xr_stdcall nothing();
-    void xr_stdcall press_escape();
-    void xr_stdcall press_commit();
-    void xr_stdcall press_tab();
+    void nothing();
+    void press_escape();
+    void press_commit();
+    void press_tab();
 
 protected:
     typedef fastdelegate::FastDelegate0<void> Callback;

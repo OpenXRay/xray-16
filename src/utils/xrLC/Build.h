@@ -3,7 +3,7 @@
 #include "utils/Shader_xrLC.h"
 struct STextureParams;
 
-extern "C" bool XR_IMPORT __stdcall DXTCompress(
+extern "C" bool XR_IMPORT DXTCompress(
     LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
 #include "utils/xrLC_Light/b_build_texture.h"

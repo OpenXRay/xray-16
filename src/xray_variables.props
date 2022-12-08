@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <xrPlatform Condition="'$(Platform)'=='Win32'">Win32</xrPlatform>
+    <xrPlatform Condition="'$(Platform)'=='x86'">Win32</xrPlatform>
+    <xrPlatform Condition="'$(Platform)'=='x64'">Win64</xrPlatform>
+    <xrPlatform Condition="'$(xrPlatform)'==''">$(Platform)</xrPlatform>
+
+    <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
+    <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
+    <xrBinDir>$(xrBinRootDir)$(xrPlatform)\$(Configuration)\</xrBinDir>
+    <xrLibDir>$(xrLibRootDir)$(xrPlatform)\$(Configuration)\</xrLibDir>
+    <xrIntDir>$(SolutionDir)..\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
+    <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
+    <xrExternals>$(SolutionDir)..\Externals\</xrExternals>
+  </PropertyGroup>
+</Project>

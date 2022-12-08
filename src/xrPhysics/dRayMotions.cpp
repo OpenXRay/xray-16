@@ -3,11 +3,7 @@
 struct dContactGeom;
 int dCollideCylRay(dxGeom* o1, dxGeom* o2, int flags, dContactGeom* contact, int skip);
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#pragma warning(disable : 4267)
 #include "ode/ode/src/collision_std.h"
-#pragma warning(pop)
 
 struct dxRayMotions
 {

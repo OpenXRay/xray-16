@@ -32,8 +32,8 @@ private:
     lanim_cont_xf m_lanim_xform;
     void EnableHeading_int(bool b) { m_bHeading = b; }
 public:
-    CUIStatic();
-    virtual ~CUIStatic();
+    CUIStatic(pcstr window_name);
+    ~CUIStatic() override;
 
     virtual void Draw();
     virtual void Update();
@@ -42,6 +42,16 @@ public:
     virtual pcstr GetText() { return TextItemControl()->GetText(); }
     virtual void SetText(pcstr txt) { TextItemControl()->SetText(txt); }
     virtual void SetTextST(pcstr txt) { TextItemControl()->SetTextST(txt); }
+
+    u32 GetTextColor()
+    {
+        return TextItemControl()->GetTextColor();
+    }
+
+    void SetTextColor(u32 color)
+    {
+        TextItemControl()->SetTextColor(color);
+    }
 
     void SetTextColor_script(int a, int r, int g, int b)
     {

@@ -15,9 +15,7 @@
 #include "std_classes.h"
 #include "GameFont.h"
 #include "xrCDB/ISpatial.h"
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 #include "xrServerEntities/smart_cast.h"
 #include "xr_input.h"
 
@@ -25,8 +23,6 @@
 
 ENGINE_API CApplication* pApp = nullptr;
 extern CRenderDevice Device;
-
-ENGINE_API int ps_rs_loading_stages = 0;
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
@@ -41,63 +37,6 @@ struct _SoundProcessor : public pureFrame
         GEnv.Sound->update(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
     }
 } SoundProcessor;
-
-pcstr _GetFontTexName(pcstr section)
-{
-    static const char* tex_names[] = {"texture800", "texture", "texture1600"};
-    int def_idx = 1; // default 1024x768
-    int idx = def_idx;
-
-#if 0
-    u32 w = Device.dwWidth;
-
-    if (w <= 800) idx = 0;
-    else if (w <= 1280)idx = 1;
-    else idx = 2;
-#else
-    u32 h = Device.dwHeight;
-
-    if (h <= 600)
-        idx = 0;
-    else if (h < 1024)
-        idx = 1;
-    else
-        idx = 2;
-#endif
-
-    while (idx >= 0)
-    {
-        if (pSettings->line_exist(section, tex_names[idx]))
-            return pSettings->r_string(section, tex_names[idx]);
-        --idx;
-    }
-    return pSettings->r_string(section, tex_names[def_idx]);
-}
-
-void _InitializeFont(CGameFont*& F, pcstr section, u32 flags)
-{
-    pcstr font_tex_name = _GetFontTexName(section);
-    R_ASSERT(font_tex_name);
-
-    pcstr sh_name = pSettings->r_string(section, "shader");
-    if (!F)
-    {
-        F = xr_new<CGameFont>(sh_name, font_tex_name, flags);
-    }
-    else
-        F->Initialize(sh_name, font_tex_name);
-
-    if (pSettings->line_exist(section, "size"))
-    {
-        float sz = pSettings->r_float(section, "size");
-        if (flags & CGameFont::fsDeviceIndependent)
-            F->SetHeightI(sz);
-        else
-            F->SetHeight(sz);
-    }
-    if (pSettings->line_exist(section, "interval"))
-        F->SetInterval(pSettings->r_fvector2(section, "interval"));
-}
 
 CApplication::CApplication()
 {
@@ -118,9 +57,6 @@ CApplication::CApplication()
     Level_Current = u32(-1);
     Level_Scan();
 
-    // Font
-    pFontSystem = nullptr;
-
     // Register us
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 1000);
 
@@ -128,8 +64,6 @@ CApplication::CApplication()
         Device.seqFrameMT.Add(&SoundProcessor);
     else
         Device.seqFrame.Add(&SoundProcessor);
-
-    Console->Show();
 
     // App Title
     loadingScreen = nullptr;
@@ -140,9 +74,6 @@ extern CInput* pInput;
 CApplication::~CApplication()
 {
     Console->Hide();
-
-    // font
-    xr_delete(pFontSystem);
 
     Device.seqFrameMT.Remove(&SoundProcessor);
     Device.seqFrame.Remove(&SoundProcessor);
@@ -163,9 +94,9 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     {
         if (pInput != nullptr)
             pInput->GrabInput(false);
-#if !defined(XR_PLATFORM_LINUX)
+
         g_SASH.EndBenchmark();
-#endif
+
         SDL_Event quit = { SDL_QUIT };
         SDL_PushEvent(&quit);
 
@@ -265,10 +196,6 @@ void CApplication::LoadBegin()
     if (1 == ll_dwReference)
     {
         loaded = false;
-
-        if (!GEnv.isDedicatedServer)
-            _InitializeFont(pFontSystem, "ui_font_letterica18_russian", 0);
-
         phase_timer.Start();
         load_stage = 0;
     }
@@ -320,16 +247,6 @@ void CApplication::LoadDraw()
     Device.RenderEnd();
 }
 
-void CApplication::LoadForceDrop()
-{
-    loadingScreen->ForceDrop();
-}
-
-void CApplication::LoadForceFinish()
-{
-    loadingScreen->ForceFinish();
-}
-
 void CApplication::SetLoadStageTitle(pcstr _ls_title)
 {
     loadingScreen->SetStageTitle(_ls_title);
@@ -340,12 +257,15 @@ void CApplication::LoadTitleInt(pcstr str1, pcstr str2, pcstr str3)
     loadingScreen->SetStageTip(str1, str2, str3);
 }
 
-void CApplication::LoadStage()
+void CApplication::LoadStage(bool draw /*= true*/)
 {
     VERIFY(ll_dwReference);
-    Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
-    phase_timer.Start();
-    Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
+    if (!load_screen_renderer.IsActive())
+    {
+        Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
+        Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
+        phase_timer.Start();
+    }
 
     if (g_pGamePersistent->GameType() == 1 && !xr_strcmp(g_pGamePersistent->m_game_params.m_alife, "alife"))
         max_load_stage = 18;
@@ -353,7 +273,10 @@ void CApplication::LoadStage()
         max_load_stage = 14;
 
     loadingScreen->Show(true);
-    LoadDraw();
+    loadingScreen->Update(load_stage, max_load_stage);
+
+    if (draw)
+        LoadDraw();
     ++load_stage;
 }
 
@@ -476,11 +399,7 @@ int CApplication::Level_ID(pcstr name, pcstr ver, bool bSet)
     for (; it != it_e; ++it)
     {
         CLocatorAPI::archive& A = *it;
-#if defined(XR_PLATFORM_WINDOWS)
-        if (A.hSrcFile == nullptr)
-#elif defined(XR_PLATFORM_LINUX)
-        if (A.hSrcFile == 0)
-#endif
+        if (!A.hSrcFile)
         {
             pcstr ln = A.header->r_string("header", "level_name");
             pcstr lv = A.header->r_string("header", "level_ver");
@@ -544,17 +463,7 @@ void CApplication::LoadAllArchives()
     }
 }
 
-void CApplication::load_draw_internal(bool precaching /*= false*/)
+void CApplication::load_draw_internal()
 {
-    if (precaching)
-    {
-        const u32 total = Device.dwPrecacheTotal;
-        loadingScreen->Update(total - Device.dwPrecacheFrame, total);
-    }
-
-    else if (loadingScreen->IsShown())
-        loadingScreen->Update(load_stage, max_load_stage);
-
-    else
-        GEnv.Render->ClearTarget();
+    loadingScreen->Draw();
 }

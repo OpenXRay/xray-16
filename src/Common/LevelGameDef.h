@@ -3,20 +3,18 @@
 #define RPOINT_CHOOSE_NAME "$rpoint"
 #define ENVMOD_CHOOSE_NAME "$env_mod"
 
-enum EPointType
+enum EPointType : u32
 {
     ptRPoint = 0,
     ptEnvMod,
     ptSpawnPoint,
     ptMaxType,
-    pt_force_dword = u32(-1)
 };
 
-enum EWayType
+enum EWayType : u32
 {
     wtPatrolPath = 0,
     wtMaxType,
-    wt_force_dword = u32(-1)
 };
 
 enum ERPpointType

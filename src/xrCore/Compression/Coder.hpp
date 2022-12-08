@@ -74,7 +74,7 @@ static u32 low = 0, code = 0, range = 0;
 #pragma warning(disable : 4146)
 inline void rcEncNormalize(_PPMD_FILE* stream)
 {
-    while ((low ^ (low + range)) < TOP || range < BOT && ((range = -low & (BOT - 1)), 1))
+    while ((low ^ (low + range)) < TOP || (range < BOT && ((range = -low & (BOT - 1)), 1)))
     {
         _PPMD_E_PUTC(low >> 24, stream);
         range <<= 8;
@@ -123,7 +123,7 @@ static inline void rcInitDecoder(_PPMD_FILE* stream)
 #pragma warning(disable : 4146)
 inline void rcDecNormalize(_PPMD_FILE* stream)
 {
-    while ((low ^ (low + range)) < TOP || range < BOT && ((range = -low & (BOT - 1)), 1))
+    while ((low ^ (low + range)) < TOP || (range < BOT && ((range = -low & (BOT - 1)), 1)))
     {
         code = (code << 8) | _PPMD_D_GETC(stream);
         range <<= 8;

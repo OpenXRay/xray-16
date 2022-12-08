@@ -5,7 +5,7 @@
 #include "xrUICore/Cursor/UICursor.h"
 #include "Level.h"
 #include "Actor.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrEngine/CustomHUD.h"
 
 dlgItem::dlgItem(CUIWindow* pWnd)
@@ -342,7 +342,7 @@ bool CDialogHolder::IR_UIOnKeyboardHold(int dik)
     if (!TIR->IR_process())
         return false;
 
-    if (TIR->OnKeyboardHold(dik))
+    if (TIR->OnKeyboardAction(dik, WINDOW_KEY_HOLD))
         return true;
 
     if (!TIR->StopAnyMove() && g_pGameLevel)
@@ -405,6 +405,108 @@ bool CDialogHolder::IR_UIOnMouseMove(int dx, int dy)
             IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
             if (IR)
                 IR->IR_OnMouseMove(dx, dy);
+            return false;
+        }
+    };
+    return true;
+}
+
+bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
+{
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        return IR_UIOnKeyboardPress(dik);
+    }
+
+    CUIDialogWnd* TIR = TopInputReceiver();
+    if (!TIR)
+        return false;
+    if (!TIR->IR_process())
+        return false;
+
+    if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_PRESSED))
+        return true;
+
+    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
+    {
+        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
+        Fvector2 cPos = GetUICursor().GetCursorPosition();
+        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
+    }
+    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    {
+        IGameObject* O = Level().CurrentEntity();
+        if (O)
+        {
+            IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
+            if (IR)
+                IR->IR_OnControllerPress(dik, x, y);
+            return false;
+        }
+    };
+    return true;
+}
+
+bool CDialogHolder::IR_UIOnControllerRelease(int dik, float x, float y)
+{
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        return IR_UIOnKeyboardRelease(dik);
+    }
+
+    CUIDialogWnd* TIR = TopInputReceiver();
+    if (!TIR)
+        return false;
+    if (!TIR->IR_process())
+        return false;
+
+    if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_RELEASED))
+        return true;
+
+    if (!TIR->StopAnyMove() && g_pGameLevel)
+    {
+        IGameObject* O = Level().CurrentEntity();
+        if (O)
+        {
+            IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
+            if (IR)
+                IR->IR_OnControllerRelease(dik, x, y);
+            return false;
+        }
+    };
+    return true;
+}
+
+bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
+{
+    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    {
+        return IR_UIOnKeyboardHold(dik);
+    }
+
+    CUIDialogWnd* TIR = TopInputReceiver();
+    if (!TIR)
+        return false;
+    if (!TIR->IR_process())
+        return false;
+
+    if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_HOLD))
+        return true;
+
+    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
+    {
+        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
+        Fvector2 cPos = GetUICursor().GetCursorPosition();
+        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
+    }
+    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    {
+        IGameObject* O = Level().CurrentEntity();
+        if (O)
+        {
+            IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
+            if (IR)
+                IR->IR_OnControllerHold(dik, x, y);
             return false;
         }
     };

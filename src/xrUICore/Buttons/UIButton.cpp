@@ -4,12 +4,11 @@
 #include "Cursor/UICursor.h"
 #include "xrEngine/xr_input.h"
 #include "Windows/UIWindow.h"
-#include "xrEngine/xr_input_xinput.h"
 
 #define PUSH_OFFSET_RIGHT 1
 #define PUSH_OFFSET_DOWN 1
 
-CUIButton::CUIButton()
+CUIButton::CUIButton() : CUIStatic("CUIButton")
 {
     m_eButtonState = BUTTON_NORMAL;
     m_bIsSwitch = false;

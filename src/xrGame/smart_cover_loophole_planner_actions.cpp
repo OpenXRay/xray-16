@@ -35,18 +35,9 @@
 #include "animation_movement_controller.h"
 #include "visual_memory_manager.h"
 
-using smart_cover::loophole_action_base;
-using smart_cover::loophole_action;
-using smart_cover::loophole_action_no_sight;
-using smart_cover::loophole_lookout;
-using smart_cover::loophole_fire;
-using smart_cover::loophole_reload;
-using smart_cover::transition;
-using smart_cover::idle_2_fire_transition;
-using smart_cover::fire_2_idle_transition;
-using smart_cover::idle_2_lookout_transition;
-using smart_cover::lookout_2_idle_transition;
-using smart_cover::animation_planner;
+
+namespace smart_cover
+{
 using namespace MonsterSpace;
 using namespace StalkerDecisionSpace;
 using namespace ObjectHandlerSpace;
@@ -59,8 +50,8 @@ Fvector loophole_action_base::nearest_loophole_direction(Fvector const& position
     VERIFY(movement.current_params().cover());
     VERIFY(movement.current_params().cover_loophole());
 
-    smart_cover::cover const& cover = *movement.current_params().cover();
-    smart_cover::loophole const& loophole = *movement.current_params().cover_loophole();
+    auto const& cover = *movement.current_params().cover();
+    auto const& loophole = *movement.current_params().cover_loophole();
     Fvector fov_direction = cover.fov_direction(loophole);
     float half_fov = .5f * loophole.fov();
     float h, p;
@@ -285,7 +276,7 @@ transition::transition(CAI_Stalker* object, LPCSTR action_name, LPCSTR action_fr
     StalkerDecisionSpace::EWorldProperties state_from, StalkerDecisionSpace::EWorldProperties state_to,
     animation_planner* planner)
     : inherited(object, action_name), m_action_from(action_from), m_action_to(action_to), m_state_from(state_from),
-      m_state_to(state_to), m_planner(planner)
+    m_state_to(state_to), m_planner(planner)
 {
 }
 
@@ -528,3 +519,4 @@ void lookout_2_idle_transition::finalize()
 
     inherited::finalize();
 }
+} // namespace smart_cover

@@ -34,12 +34,12 @@ class CSE_ALifeInventoryItem;
 
 struct SFillPropData
 {
-    RTokenVec locations[4];
-    RStringVec level_ids;
-    RTokenVec story_names;
-    RTokenVec spawn_story_names;
-    RStringVec character_profiles;
-    RStringVec smart_covers;
+    xr_vector<xr_rtoken> locations[4];
+    xr_vector<shared_str> level_ids;
+    xr_vector<xr_rtoken> story_names;
+    xr_vector<xr_rtoken> spawn_story_names;
+    xr_vector<shared_str> character_profiles;
+    xr_vector<shared_str> smart_covers;
     xr_map<shared_str, u32> location_colors;
     u32 counter;
     SFillPropData();
@@ -101,7 +101,7 @@ public:
     virtual ~CSE_ALifeGraphPoint();
     virtual bool match_configuration() const /* noexcept */ { return false; }
 #ifndef XRGAME_EXPORTS
-    virtual void __stdcall on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
+    virtual void on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
 #endif
     virtual void UPDATE_Read(NET_Packet& P);
@@ -136,7 +136,7 @@ public:
 
 public:
     using inherited = CSE_Abstract;
-    GameGraph::_GRAPH_ID m_tGraphID;
+    GameGraph::_GRAPH_ID m_tGraphID; // game_vertex_id
     float m_fDistance;
     bool m_bOnline;
     bool m_bDirectControl;
@@ -325,7 +325,7 @@ class CSE_ALifeDynamicObjectVisual : public CSE_ALifeDynamicObject, public CSE_V
 public:
     CSE_ALifeDynamicObjectVisual(LPCSTR caSection);
     virtual ~CSE_ALifeDynamicObjectVisual();
-    virtual CSE_Visual* __stdcall visual();
+    virtual CSE_Visual* visual();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -363,7 +363,7 @@ public:
 
     CSE_ALifeSpaceRestrictor(LPCSTR caSection);
     virtual ~CSE_ALifeSpaceRestrictor();
-    virtual IServerEntityShape* __stdcall shape();
+    virtual IServerEntityShape* shape();
     virtual bool can_switch_offline() const /* noexcept */;
     virtual bool used_ai_locations() const /* noexcept */;
     virtual void UPDATE_Read(NET_Packet& P);
@@ -460,6 +460,13 @@ private:
     static const u32 random_limit;
     CRandom m_relevent_random;
 
+private:
+    static constexpr
+    bool check_mask(const u8& mask, const u8& test)
+    {
+        return mask & test;
+    }
+
 public:
     enum
     {
@@ -498,7 +505,7 @@ class CSE_ALifeObjectHangingLamp : public CSE_ALifeDynamicObjectVisual, public C
     using inherited2 = CSE_PHSkeleton;
 
 public:
-    void __stdcall OnChangeFlag(PropValue* sender);
+    void OnChangeFlag(PropValue* sender);
     enum
     {
         flPhysic = (1 << 0),
@@ -545,9 +552,9 @@ public:
     virtual void load(NET_Packet& tNetPacket);
     virtual bool used_ai_locations() const /* noexcept */;
     virtual bool match_configuration() const /* noexcept */;
-    virtual bool __stdcall validate();
+    virtual bool validate();
 #ifndef XRGAME_EXPORTS
-    virtual void __stdcall on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
+    virtual void on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
 #endif // #ifndef XRGAME_EXPORTS
     virtual CSE_Abstract* cast_abstract() { return this; }
@@ -586,7 +593,7 @@ public:
     virtual void load(NET_Packet& tNetPacket);
     virtual bool can_save() const /* noexcept */;
     virtual bool used_ai_locations() const /* noexcept */;
-    virtual CSE_Motion* __stdcall motion();
+    virtual CSE_Motion* motion();
     virtual CSE_Abstract* cast_abstract() { return this; }
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -663,10 +670,10 @@ public:
     virtual ~CSE_ALifeObjectClimable();
     virtual bool used_ai_locations() const /* noexcept */;
     virtual bool can_switch_offline() const /* noexcept */;
-    virtual IServerEntityShape* __stdcall shape();
+    virtual IServerEntityShape* shape();
 
 #ifndef XRGAME_EXPORTS
-    virtual void __stdcall set_additional_info(void* info);
+    virtual void set_additional_info(void* info);
 #endif
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);

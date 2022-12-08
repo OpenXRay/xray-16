@@ -185,8 +185,20 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("get_info_time", &CScriptGameObject::GetInfoTime)
 
         .def("get_task_state", &CScriptGameObject::GetGameTaskState)
+        .def("get_task_state", +[](CScriptGameObject* self, pcstr task_id)
+        {
+            return self->GetGameTaskState(task_id, ROOT_TASK_OBJECTIVE);
+        })
         .def("set_task_state", &CScriptGameObject::SetGameTaskState)
+        .def("set_task_state", +[](CScriptGameObject* self, ETaskState state, pcstr task_id)
+        {
+            self->SetGameTaskState(state, task_id, ROOT_TASK_OBJECTIVE);
+        })
         .def("give_task", &CScriptGameObject::GiveTaskToActor, adopt<2>())
+        .def("give_task", +[](CScriptGameObject* self, CGameTask* t, u32 dt, bool bCheckExisting)
+        {
+            self->GiveTaskToActor(t, dt, bCheckExisting, 0);
+        }, adopt<2>())
         .def("set_active_task", &CScriptGameObject::SetActiveTask)
         .def("is_active_task", &CScriptGameObject::IsActiveTask)
         .def("get_task", &CScriptGameObject::GetTask)
@@ -390,6 +402,7 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("get_attached_vehicle", &CScriptGameObject::GetAttachedVehicle)
 
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
+        .def("reset_bone_protections", &CScriptGameObject::ResetBoneProtections)
         .def("iterate_feel_touch", &CScriptGameObject::IterateFeelTouch)
         .def("get_luminocity_hemi", &CScriptGameObject::GetLuminocityHemi)
         .def("get_luminocity", &CScriptGameObject::GetLuminocity)
@@ -399,6 +412,10 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("force_set_position", &CScriptGameObject::ForceSetPosition)
         .def("set_spatial_type", &CScriptGameObject::SetSpatialType)
         .def("get_spatial_type", &CScriptGameObject::GetSpatialType)
+        .def("remove_danger", &CScriptGameObject::RemoveDanger)
+        .def("remove_memory_sound_object", &CScriptGameObject::RemoveMemorySoundObject)
+        .def("remove_memory_visible_object", &CScriptGameObject::RemoveMemoryVisibleObject)
+        .def("remove_memory_hit_object", &CScriptGameObject::RemoveMemoryHitObject)
 
         //For Weapons
         .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)

@@ -7,7 +7,7 @@ XRCORE_API CInifile const* pSettings = nullptr;
 XRCORE_API CInifile const* pSettingsAuth = nullptr;
 XRCORE_API CInifile const* pSettingsOpenXRay = nullptr;
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
 #include <stdint.h>
 #define MSVCRT_EINVAL	22
 #define MSVCRT_ERANGE	34
@@ -122,7 +122,7 @@ int _cdecl _ui64toa_s(uint64_t value, char *str, size_t size, int radix)
             *--pos = 'a' + digit - 10;
     } while (value != 0);
 
-    if (buffer - pos + 65 > size)
+    if (static_cast<size_t>(buffer - pos + 65) > size)
     {
         return MSVCRT_EINVAL;
     }
@@ -414,7 +414,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
         pstr comm = strchr(str, ';');
         pstr comm_1 = strchr(str, '/');
 
-        if (comm_1 && *(comm_1 + 1) == '/' && (!comm || comm && comm_1 < comm))
+        if (comm_1 && *(comm_1 + 1) == '/' && (!comm || (comm && comm_1 < comm)))
         {
             comm = comm_1;
         }
@@ -451,13 +451,19 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             R_ASSERT(path && path[0]);
             if (_GetItem(str, 1, inc_name, '"'))
             {
-                xr_fs_nostrlwr(inc_name); // compensate removed xr_strlwr on path on Linux, etc
-
                 string_path fn;
                 strconcat(sizeof fn, fn, path, inc_name);
                 if (!allow_include_func || allow_include_func(fn))
                 {
                     IReader* I = FS.r_open(fn);
+#ifndef XR_PLATFORM_WINDOWS // XXX: replace with runtime check for case-sensitivity
+                    if (I == nullptr)
+                    {
+                        xr_fs_nostrlwr(inc_name);
+                        strconcat(fn, path, inc_name);
+                        I = FS.r_open(fn);
+                    }
+#endif
                     R_ASSERT3(I, "Can't find include file:", inc_name);
                     const xr_string inc_path = EFS_Utils::ExtractFilePath(fn);
                     Load(I, inc_path.c_str(), allow_include_func);
@@ -1111,6 +1117,11 @@ void CInifile::remove_line(pcstr S, pcstr L)
         R_ASSERT(A != data.Data.end() && xr_strcmp(*A->first, L) == 0);
         data.Data.erase(A);
     }
+}
+
+void CInifile::set_readonly(bool b)
+{
+    m_flags.set(eReadOnly, b);
 }
 
 template<>

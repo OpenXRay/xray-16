@@ -89,7 +89,7 @@ void player_state_avenger::OnPlayerSpawned(game_PlayerState const* ps)
     }
     if (tmp_local_player && m_owner->is_enemies(tmp_local_player, ps))
     {
-        m_player_spawns.insert(std::make_pair(shared_str(ps->getName()), Device.dwTimeGlobal));
+        m_player_spawns.emplace(shared_str(ps->getName()), Device.dwTimeGlobal);
     }
 }
 

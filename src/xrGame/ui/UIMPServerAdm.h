@@ -11,7 +11,7 @@ class CUIEditBox;
 class CUISpinNum;
 class CUICheckButton;
 
-class CUIMpServerAdm : public CUIWindow, public CUIWndCallback
+class CUIMpServerAdm final : public CUIWindow, public CUIWndCallback
 {
     typedef CUIWindow inherited;
     CUI3tButton* m_pBackBtn;
@@ -66,7 +66,7 @@ class CUIMpServerAdm : public CUIWindow, public CUIWndCallback
 
 public:
     CUIMpServerAdm();
-    ~CUIMpServerAdm();
+
     void Init(CUIXml& xml_doc);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
     void ShowChangeWeatherBtns();

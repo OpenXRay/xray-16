@@ -20,7 +20,7 @@ void* FileDownload(pcstr fn, size_t* pdwSize = nullptr);
 void FileCompress(pcstr fn, pcstr sign, void* data, size_t size);
 void* FileDecompress(pcstr fn, pcstr sign, size_t* size = nullptr);
 
-class CFileWriter : public IWriter
+class CFileWriter final : public IWriter
 {
 private:
     FILE* hf;
@@ -38,7 +38,7 @@ public:
             const int handle = _sopen(conv_fn, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
 #ifdef _EDITOR
             if (handle == -1)
-                Msg("!Can't create file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
+                Msg("! Can't create file: '%s'. Error: '%s'.", conv_fn, _sys_errlist[errno]);
 #endif
             hf = _fdopen(handle, "wb");
         }
@@ -55,7 +55,7 @@ public:
         xr_free(conv_fn);
     }
 
-    virtual ~CFileWriter()
+    ~CFileWriter() override
     {
         if (0 != hf)
         {
@@ -112,44 +112,46 @@ public:
 };
 
 // It automatically frees memory after destruction
-class CTempReader : public IReader
+class CTempReader final : public IReader
 {
 public:
     CTempReader(void* _data, size_t _size, size_t _iterpos) : IReader(_data, _size, _iterpos) {}
-    virtual ~CTempReader();
+    ~CTempReader() override;
 };
-class CPackReader : public IReader
+class CPackReader final : public IReader
 {
     void* base_address;
 
 public:
     CPackReader(void* _base, void* _data, size_t _size) : IReader(_data, _size), base_address(_base) {}
-    virtual ~CPackReader();
+    ~CPackReader() override;
 };
-class XRCORE_API CFileReader : public IReader
+class XRCORE_API CFileReader final : public IReader
 {
 public:
     CFileReader(pcstr name);
-    virtual ~CFileReader();
+    ~CFileReader() override;
 };
-class CCompressedReader : public IReader
+class CCompressedReader final : public IReader
 {
 public:
     CCompressedReader(const char* name, const char* sign);
-    virtual ~CCompressedReader();
+    ~CCompressedReader() override;
 };
-class CVirtualFileReader : public IReader
+class CVirtualFileReader final : public IReader
 {
 private:
 #if defined(XR_PLATFORM_WINDOWS)
     void *hSrcFile, *hSrcMap;
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
     int hSrcFile;
+#else
+#   error Select or add implementation for your platform
 #endif
 
 public:
     CVirtualFileReader(pcstr cFileName);
-    virtual ~CVirtualFileReader();
+    ~CVirtualFileReader() override;
 };
 
 #endif

@@ -1,5 +1,5 @@
 #pragma once
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrEngine/pure.h"
 #include "xrEngine/IInputReceiver.h"
 #include "xrScriptEngine/Functor.hpp"
@@ -17,6 +17,7 @@ protected:
     CUIWindow* m_UIWindow;
     ref_sound m_global_sound;
     xr_deque<CUISequenceItem*> m_sequencer_items;
+    pcstr m_name;
 
     bool GrabInput();
     CUISequenceItem* GetNextItem();
@@ -25,7 +26,10 @@ protected:
 
 public:
     IInputReceiver* m_pStoredInputReceiver;
+
     CUISequencer();
+    virtual ~CUISequencer() = default;
+
     bool Start(LPCSTR tutor_name);
     void Stop();
     void Next();
@@ -41,15 +45,19 @@ public:
     virtual void IR_OnMouseRelease(int btn);
     virtual void IR_OnMouseHold(int btn);
     virtual void IR_OnMouseMove(int x, int y);
-    virtual void IR_OnMouseStop(int x, int y);
 
     virtual void IR_OnKeyboardPress(int dik);
     virtual void IR_OnKeyboardRelease(int dik);
     virtual void IR_OnKeyboardHold(int dik);
 
+    void IR_OnControllerPress(int key, float x, float y) override;
+    void IR_OnControllerRelease(int key, float x, float y) override;
+    void IR_OnControllerHold(int key, float x, float y) override;
+
     virtual void IR_OnMouseWheel(int x, int y);
     virtual void IR_OnActivate(void);
     bool Persistent() { return !!m_flags.test(etsPersistent); }
+    pcstr GetTutorName() { return m_name; }
     fastdelegate::FastDelegate0<> m_on_destroy_event;
 
     enum
@@ -101,6 +109,7 @@ public:
     virtual void OnRender() = 0;
     virtual void OnKeyboardPress(int dik) = 0;
     virtual void OnMousePress(int btn) = 0;
+    virtual void OnControllerPress(int key) = 0;
 
     virtual bool IsPlaying() = 0;
 
@@ -122,6 +131,8 @@ class CUISequenceSimpleItem : public CUISequenceItem
 
         virtual void Start();
         virtual void Stop();
+
+        virtual ~SSubItem() = default;
     };
     using SubItemVec = xr_vector<SSubItem>;
     SubItemVec m_subitems;
@@ -139,7 +150,7 @@ public:
     float m_time_length;
     string64 m_pda_section;
     Fvector2 m_desired_cursor_pos;
-    int m_continue_dik_guard;
+    EGameActions m_continue_action_guard;
     xr_vector<SActionItem> m_actions;
 
 public:
@@ -154,6 +165,7 @@ public:
     virtual void OnRender();
     virtual void OnKeyboardPress(int dik);
     virtual void OnMousePress(int btn);
+    void OnControllerPress(int key) override;
 
     virtual bool IsPlaying();
 
@@ -196,6 +208,7 @@ public:
     virtual void OnRender();
     virtual void OnKeyboardPress(int dik) {}
     virtual void OnMousePress(int btn){};
+    void OnControllerPress(int /*key*/) override {}
 
     virtual bool IsPlaying();
 };

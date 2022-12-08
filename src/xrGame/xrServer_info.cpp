@@ -66,11 +66,11 @@ void xrServer::LoadServerInfo()
     {
         return;
     }
-    m_server_logo = FS.r_open("$app_data_root$", SERVER_LOGO_FN);
+    m_server_logo = FS.r_open("$app_data_root$", SERVER_LOGO_FN); // XXX: check that the file is actually jpg
     if (!m_server_logo)
     {
         Msg("! ERROR: failed to open server logo file %s", SERVER_LOGO_FN);
-        return;
+        return; // XXX: allow submitting server rules without logo
     }
     m_server_rules = FS.r_open("$app_data_root$", SERVER_RULES_FN);
     if (!m_server_rules)
@@ -132,7 +132,7 @@ void server_info_uploader::execute_complete_cb()
     m_complete_cb.clear();
 }
 
-void __stdcall server_info_uploader::upload_server_info_callback(
+void server_info_uploader::upload_server_info_callback(
     file_transfer::sending_status_t status, u32 uploaded, u32 total)
 {
     switch (status)

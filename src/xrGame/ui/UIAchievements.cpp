@@ -8,10 +8,12 @@
 #include "xrUICore/Cursor/UICursor.h"
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include "string_table.h"
 
-CUIAchievements::CUIAchievements(CUIScrollView* parent) : m_parent(parent) {}
+CUIAchievements::CUIAchievements(CUIScrollView* parent)
+    : CUIWindow("CUIAchievements"), m_parent(parent) {}
+
 CUIAchievements::~CUIAchievements() { xr_delete(m_hint); }
+
 void CUIAchievements::init_from_xml(CUIXml& xml)
 {
     CUIXmlInit::InitWindow(xml, "achievements_itm", 0, this);

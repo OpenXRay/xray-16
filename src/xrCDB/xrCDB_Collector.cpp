@@ -75,11 +75,6 @@ void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fv
     faces.push_back(T);
 }
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 #pragma pack(push, 1)
 struct edge
 {
@@ -256,7 +251,7 @@ void Collector::calc_adjacency(xr_vector<u32>& dest)
     }
 #endif
 }
-IC BOOL similar(TRI& T1, TRI& T2)
+IC bool similar(TRI& T1, TRI& T2)
 {
     if ((T1.verts[0] == T2.verts[0]) && (T1.verts[1] == T2.verts[1]) && (T1.verts[2] == T2.verts[2]) &&
         (T1.dummy == T2.dummy))

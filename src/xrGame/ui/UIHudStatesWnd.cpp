@@ -21,7 +21,9 @@
 #include "xrUICore/XML/UITextureMaster.h"
 
 CUIHudStatesWnd::CUIHudStatesWnd()
-    : m_b_force_update(true), m_timer_1sec(0), m_last_health(0.0f), m_radia_self(0.0f), m_radia_hit(0.0f)
+    : CUIWindow("CUIHudStatesWnd"),
+      m_last_health(0.0f), m_radia_self(0.0f), m_radia_hit(0.0f),
+      m_timer_1sec(0), m_b_force_update(true)
 {
     for (int i = 0; i < ALife::infl_max_count; ++i)
     {
@@ -389,29 +391,36 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
 
         if (m_ui_weapon_sign_ammo)
         {
-            string64 temp;
-            xr_sprintf(temp, "%s/%s", m_item_info.cur_ammo.c_str(), m_item_info.total_ammo.c_str());
-
-            m_ui_weapon_sign_ammo->Show(true);
-            m_ui_weapon_sign_ammo->SetText(temp);
-
-            // hack ^ begin
-            CGameFont* pFont32 = GEnv.UI->Font().pFontGraffiti32Russian;
-            CGameFont* pFont22 = GEnv.UI->Font().pFontGraffiti22Russian;
-            CGameFont* pFont = pFont32;
-
-            if (UICore::is_widescreen())
+            if (m_item_info.cur_ammo.size() && m_item_info.total_ammo.size())
             {
-                pFont = pFont22;
-            }
-            else
-            {
-                if (m_item_info.cur_ammo.size() > 5)
+                string64 temp;
+                xr_sprintf(temp, "%s/%s", m_item_info.cur_ammo.c_str(), m_item_info.total_ammo.c_str());
+
+                m_ui_weapon_sign_ammo->Show(true);
+                m_ui_weapon_sign_ammo->SetText(temp);
+
+                // hack ^ begin
+                CGameFont* pFont32 = GEnv.UI->Font().pFontGraffiti32Russian;
+                CGameFont* pFont22 = GEnv.UI->Font().pFontGraffiti22Russian;
+                CGameFont* pFont = pFont32;
+
+                if (UICore::is_widescreen())
                 {
                     pFont = pFont22;
                 }
+                else
+                {
+                    if (xr_strlen(temp) > 5)
+                    {
+                        pFont = pFont22;
+                    }
+                }
+                m_ui_weapon_sign_ammo->SetFont(pFont);
             }
-            m_ui_weapon_sign_ammo->SetFont(pFont);
+            else
+            {
+                m_ui_weapon_sign_ammo->Show(false);  
+            }
         }
 
         m_fire_mode->Show(true);
@@ -488,14 +497,58 @@ void CUIHudStatesWnd::SetAmmoIcon(const shared_str& sect_name)
     m_ui_weapon_icon->GetUIStaticItem().SetTextureRect(texture_rect);
     m_ui_weapon_icon->SetStretchTexture(true);
 
-    float h = texture_rect.height() * 0.8f;
-    float w = texture_rect.width() * 0.8f;
-
-    // now perform only width scale for ammo, which (W)size >2
-    if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
-        w = INV_GRID_WIDTH * 1.5f;
-
-    m_ui_weapon_icon->SetWidth(w * UI().get_current_kx());
+    float w, h;
+    if (ShadowOfChernobylMode)
+    {
+        h = texture_rect.height() * 0.8f;
+        w = texture_rect.width() * (UI().is_widescreen() ? 0.7f : 0.8f);
+        float posx_16 = 30.0f;
+        float posx = 32.0f;
+        if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
+        {
+            w = INV_GRID_WIDTH * 1.6f;
+        }
+        if (texture_rect.width() < 1.01f * INV_GRID_WIDTH)
+        {
+            m_ui_weapon_icon->SetTextureOffset(UI().is_widescreen() ? posx_16 : posx, 5.0f);
+        }
+        else
+        {
+            posx_16 = 12.f;
+            posx = 14.f;
+            m_ui_weapon_icon->SetTextureOffset(UI().is_widescreen() ? posx_16 : posx, 5.0f);
+        }
+        m_ui_weapon_icon->SetWidth(w);
+    }
+    else if (ClearSkyMode)
+    {
+        h = texture_rect.height() * 0.65f;
+        w = texture_rect.width() * 0.65f;
+        float posx_16 = 8.33f;
+        float posx = 10.0f;
+        if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
+        {
+            w = INV_GRID_WIDTH * 1.5f;
+        }
+        if (texture_rect.width() < 1.01f * INV_GRID_WIDTH)
+        {
+            m_ui_weapon_icon->SetTextureOffset(UI().is_widescreen() ? posx_16 : posx, 0.0f);
+        }
+        else
+        {
+            m_ui_weapon_icon->SetTextureOffset(0.0f, 0.0f);
+        }
+        m_ui_weapon_icon->SetWidth(UI().is_widescreen() ? w * 0.833f : w);
+    }
+    else
+    {
+        h = texture_rect.height() * 0.8f;
+        w = texture_rect.width() * 0.8f;
+        // now perform only width scale for ammo, which (W)size >2
+        if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
+            w = INV_GRID_WIDTH * 1.5f;
+        m_ui_weapon_icon->SetWidth(w * UI().get_current_kx());
+    }
     m_ui_weapon_icon->SetHeight(h);
 }
 // ------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "r4.h"
+#include "r2.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
 
@@ -236,7 +236,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Shadow map size
     {
-        xr_itoa(o.smapsize, c_smap, 10);
+        xr_itoa(m_SMAPSize, c_smap, 10);
         options.add("SMAP_size", c_smap);
         sh_name.append(c_smap);
     }
@@ -391,10 +391,10 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     // Geometry buffer optimization
-    appendShaderOption(o.dx10_gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
+    appendShaderOption(o.gbuffer_opt, "GBUFFER_OPTIMIZATION", "1");
 
     // Shader Model 4.1
-    appendShaderOption(o.dx10_sm4_1, "SM_4_1", "1");
+    appendShaderOption(o.dx11_sm4_1, "SM_4_1", "1");
 
     // Shader Model 5.0
     appendShaderOption(HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0, "SM_5", "1");
@@ -409,24 +409,24 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     appendShaderOption(HW.SAD4ShaderInstructions, "SAD4_SUPPORTED", "1");
 
     // Minmax SM
-    appendShaderOption(o.dx10_minmax_sm, "USE_MINMAX_SM", "1");
+    appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
 
     // Be carefull!!!!! this should be at the end to correctly generate
     // compiled shader name;
     // add a #define for DX10_1 MSAA support
-    if (o.dx10_msaa)
+    if (o.msaa)
     {
-        appendShaderOption(o.dx10_msaa, "USE_MSAA", "1");
+        appendShaderOption(o.msaa, "USE_MSAA", "1");
 
         // Number of samples
         {
-            c_msaa_samples[0] = char(o.dx10_msaa_samples) + '0';
+            c_msaa_samples[0] = char(o.msaa_samples) + '0';
             c_msaa_samples[1] = 0;
-            appendShaderOption(o.dx10_msaa_samples, "MSAA_SAMPLES", c_msaa_samples);
+            appendShaderOption(o.msaa_samples, "MSAA_SAMPLES", c_msaa_samples);
         }
         // Current sample
         {
-            if (m_MSAASample < 0 || o.dx10_msaa_opt)
+            if (m_MSAASample < 0 || o.msaa_opt)
                 c_msaa_current_sample[0] = '0';
             else
                 c_msaa_current_sample[0] = '0' + char(m_MSAASample);
@@ -436,9 +436,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
                 "ISAMPLE", c_msaa_current_sample);
         }
 
-        appendShaderOption(o.dx10_msaa_opt, "MSAA_OPTIMIZATION", "1");
+        appendShaderOption(o.msaa_opt, "MSAA_OPTIMIZATION", "1");
 
-        switch (o.dx10_msaa_alphatest)
+        switch (o.msaa_alphatest)
         {
         case MSAA_ATEST_DX10_0_ATOC:
             options.add("MSAA_ALPHATEST_DX10_0_ATOC", "1");
@@ -486,11 +486,22 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     char extension[3];
     strncpy_s(extension, pTarget, 2);
 
+    pcstr renderer;
+    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+        renderer = "r4" DELIMITER;
+    else if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+        renderer = "r3" DELIMITER;
+    else
+    {
+        renderer = "r4_level9" DELIMITER;
+        R_ASSERT(!"Feature levels lower than 10.0 are unsupported");
+    }
+
     string_path filename;
-    strconcat(sizeof(filename), filename, "r4" DELIMITER, name, ".", extension);
+    strconcat(sizeof(filename), filename, renderer, name, ".", extension);
 
     string_path folder_name, folder;
-    strconcat(sizeof(folder), folder, "r4" DELIMITER "objects" DELIMITER, filename);
+    strconcat(sizeof(folder), folder, renderer, "objects" DELIMITER, filename);
 
     FS.update_path(folder_name, "$game_shaders$", folder);
     xr_strcat(folder_name, DELIMITER);
@@ -550,7 +561,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         includer Includer;
         LPD3DBLOB pShaderBuf = NULL;
         LPD3DBLOB pErrorBuf = NULL;
-        _result = D3DCompile(fs->pointer(), fs->length(), "", options.data(),
+        _result = HW.D3DCompile(fs->pointer(), fs->length(), "", options.data(),
             &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
 
         if (FAILED(_result) && pErrorBuf)
@@ -560,7 +571,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             {
                 pErrorBuf = nullptr;
                 Flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-                _result = D3DCompile(fs->pointer(), fs->length(), "", options.data(),
+                _result = HW.D3DCompile(fs->pointer(), fs->length(), "", options.data(),
                     &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
             }
         }

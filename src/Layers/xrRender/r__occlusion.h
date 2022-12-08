@@ -18,10 +18,12 @@ private:
     struct _Q
     {
         u32 order;
-#ifdef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
+        ID3DQuery* Q;
+#elif defined(USE_OGL)
         GLuint Q;
 #else
-        ID3DQuery* Q;
+#   error No graphics API selected or enabled!
 #endif
     };
 
@@ -32,10 +34,12 @@ private:
     xr_vector<_Q> used; // id's are generated from this and it is cleared from back only
     xr_vector<u32> fids; // free id's
 public:
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     typedef u64 occq_result;
-#else
+#elif defined(USE_DX9) || defined(USE_OGL)
     typedef u32 occq_result;
+#else
+#   error No graphics API selected or enabled!
 #endif
 public:
     R_occlusion();

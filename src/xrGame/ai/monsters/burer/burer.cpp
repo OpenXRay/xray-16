@@ -17,7 +17,7 @@
 #include "ai/monsters/anti_aim_ability.h"
 #include "Inventory.h"
 #include "ActorCondition.h"
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "Weapon.h"
 #include "xrCore/_vector3d_ext.h"
 #include "ai/monsters/control_direction_base.h"
@@ -239,7 +239,7 @@ void CBurer::shedule_Update(u32 dt)
 }
 
 void CBurer::CheckSpecParams(u32 spec_params) {}
-void xr_stdcall CBurer::StaminaHit()
+void CBurer::StaminaHit()
 {
     if (GodMode())
     {

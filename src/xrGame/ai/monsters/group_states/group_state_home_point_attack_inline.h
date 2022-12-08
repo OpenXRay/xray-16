@@ -7,20 +7,9 @@
 #include "ai/monsters/monster_home.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateGroupAttackMoveToHomePointAbstract CStateGroupAttackMoveToHomePoint<_Object>
-
-namespace detail
-{
-namespace dog
-{
-const float scare_distance2enemy = 20.f; // distance on which dog can be scared of enemy
-
-} // namespace dog
-
-} // namespace detail
 
 //////////////////////////////////////////////////////////////////////////
 // Construct Substates
@@ -116,16 +105,16 @@ bool CStateGroupAttackMoveToHomePointAbstract::check_start_conditions()
     {
         if (!m_first_tick_enemy_inaccessible)
         {
-            m_first_tick_enemy_inaccessible = current_time();
+            m_first_tick_enemy_inaccessible = xr_current_time();
         }
 
-        m_last_tick_enemy_inaccessible = current_time();
+        m_last_tick_enemy_inaccessible = xr_current_time();
 
-        return current_time() - m_first_tick_enemy_inaccessible > 3000;
+        return xr_current_time() - m_first_tick_enemy_inaccessible > 3000;
     }
     else
     {
-        if (m_last_tick_enemy_inaccessible && current_time() - m_last_tick_enemy_inaccessible > 3000)
+        if (m_last_tick_enemy_inaccessible && xr_current_time() - m_last_tick_enemy_inaccessible > 3000)
         {
             m_first_tick_enemy_inaccessible = 0;
             m_last_tick_enemy_inaccessible = 0;

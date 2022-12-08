@@ -25,10 +25,8 @@
 #include "editor_environment_ambients_ambient.hpp"
 #include "xrEngine/xr_efflensflare.h"
 
-using editor::environment::manager;
-using editor::environment::detail::logical_string_predicate;
-using particles_systems::library_interface;
-
+namespace editor::environment
+{
 manager::manager()
     : m_suns(0), m_levels(0), m_effects(0), m_sound_channels(0), m_ambients(0), m_thunderbolts(0), m_weathers(0)
 {
@@ -109,7 +107,7 @@ void manager::load_weathers()
 {
     m_weathers->load();
 
-    for (auto &i : WeatherCycles)
+    for (auto& i : WeatherCycles)
     {
         R_ASSERT3(i.second.size() > 1, "Environment in weather must >=2", *i.first);
         std::sort(i.second.begin(), i.second.end(), sort_env_etl_pred);
@@ -132,7 +130,7 @@ manager::shader_ids_type const& manager::shader_ids() const
     u32 count = stream->r_u32();
     m_shader_ids.resize(count);
 
-    for (auto &i : m_shader_ids)
+    for (auto& i : m_shader_ids)
     {
         string_path buffer;
         stream->r_stringZ(buffer, sizeof(buffer));
@@ -142,7 +140,7 @@ manager::shader_ids_type const& manager::shader_ids() const
     stream->close();
     FS.r_close(reader);
 
-    std::sort(m_shader_ids.begin(), m_shader_ids.end(), logical_string_predicate());
+    std::sort(m_shader_ids.begin(), m_shader_ids.end(), detail::logical_string_predicate());
 
     return (m_shader_ids);
 }
@@ -152,13 +150,13 @@ manager::particle_ids_type const& manager::particle_ids() const
     if (!m_particle_ids.empty())
         return (m_particle_ids);
 
-    library_interface const& library = m_pRender->particles_systems_library();
+    auto const& library = m_pRender->particles_systems_library();
     PS::CPGDef const* const* i = library.particles_group_begin();
     PS::CPGDef const* const* e = library.particles_group_end();
     for (; i != e; library.particles_group_next(i))
         m_particle_ids.push_back(library.particles_group_id(**i).c_str());
 
-    std::sort(m_particle_ids.begin(), m_particle_ids.end(), logical_string_predicate());
+    std::sort(m_particle_ids.begin(), m_particle_ids.end(), detail::logical_string_predicate());
     return (m_particle_ids);
 }
 
@@ -172,10 +170,10 @@ manager::light_animator_ids_type const& manager::light_animator_ids() const
     m_light_animator_ids.resize(light_animators.size());
 
     auto j = m_light_animator_ids.begin();
-    for (const auto &i : light_animators)
+    for (const auto& i : light_animators)
         *j++ = xr_strdup(i->cName.c_str());
 
-    std::sort(m_light_animator_ids.begin(), m_light_animator_ids.end(), logical_string_predicate());
+    std::sort(m_light_animator_ids.begin(), m_light_animator_ids.end(), detail::logical_string_predicate());
 
     return (m_light_animator_ids);
 }
@@ -212,3 +210,4 @@ SThunderboltCollection* manager::thunderbolt_collection(
 {
     return (m_thunderbolts->get_collection(id));
 }
+} // namespace editor::environment

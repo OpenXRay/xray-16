@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  xray:
+    build:
+      context: image
+      dockerfile: Dockerfile
+    container_name: xray-dev
+    cap_add:
+      - SYS_PTRACE
+    stdin_open: true
+    tty: true
+    volumes:
+      - $XRAY_MOUNT_PATH:/xray-16
+    ports:
+      - "127.0.0.1:2224:22"

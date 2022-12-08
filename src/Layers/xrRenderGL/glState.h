@@ -35,6 +35,7 @@ private:
     D3DCULL rasterizerCullMode;
     D3D_DEPTH_STENCIL_STATE m_pDepthStencilState;
     D3D_BLEND_STATE m_pBlendState;
+    float m_uiMipLODBias;
 
     GLuint m_samplerArray[CTexture::mtMaxCombinedShaderTextures];
 

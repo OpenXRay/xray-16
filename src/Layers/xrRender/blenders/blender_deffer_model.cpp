@@ -153,7 +153,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
         // deferred rendering
         // codepath is the same, only the shaders differ
 
-        bool bUseATOC = (bAref && RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+        bool bUseATOC = (bAref && RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
 
         switch (C.iElement)
         {
@@ -166,7 +166,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
                 C.r_StencilRef(0x01);
                 C.r_ColorWriteEnable(false, false, false, false);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
                 C.r_End();
             }
 
@@ -186,7 +186,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
                 C.r_StencilRef(0x01);
                 C.r_ColorWriteEnable(false, false, false, false);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
                 C.r_End();
             }
 
@@ -211,8 +211,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
             }
             //if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model","dumb",	FALSE,TRUE,TRUE,FALSE);
             //else							C.r_Pass	("shadow_direct_model","shadow_direct_base",FALSE);
-            C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE,TRUE,FALSE);
-            C.r_Sampler("s_base", C.L_textures[0]);
+            C.r_Pass("shadow_direct_model", "null", FALSE, TRUE,TRUE,FALSE);
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_End();
             break;
@@ -238,8 +237,8 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
             C.r_Pass(
                 vsname, psname, TRUE, TRUE, FALSE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
             // C.r_Sampler			("s_base",	C.L_textures[0]);
-            C.r_dx10Texture("s_base", C.L_textures[0]);
-            C.r_dx10Sampler("smp_base");
+            C.r_dx11Texture("s_base", C.L_textures[0]);
+            C.r_dx11Sampler("smp_base");
             C.r_End();
             break;
         default: break;
@@ -251,7 +250,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
         // deferred rendering
         // codepath is the same, only the shaders differ
 
-        bool bUseATOC = (bAref && (RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC));
+        bool bUseATOC = (bAref && (RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC));
 
 #if RENDER == R_R4
         C.TessMethod = oTessellation.IDselected;
@@ -268,7 +267,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
                 C.r_StencilRef(0x01);
                 C.r_ColorWriteEnable(false, false, false, false);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
                 C.r_End();
             }
 
@@ -289,7 +288,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
                 C.r_StencilRef(0x01);
                 C.r_ColorWriteEnable(false, false, false, false);
                 //	Alpha to coverage.
-                C.RS.SetRS(XRDX10RS_ALPHATOCOVERAGE, TRUE);
+                C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
                 C.r_End();
             }
 
@@ -310,9 +309,9 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
                 // C.r_Sampler		("s_base",C.L_textures[0]);
                 C.r_Pass("shadow_direct_model_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE, D3DBLEND_ZERO,
                     D3DBLEND_ONE, TRUE, 220);
-                C.r_dx10Texture("s_base", C.L_textures[0]);
-                C.r_dx10Sampler("smp_base");
-                C.r_dx10Sampler("smp_linear");
+                C.r_dx11Texture("s_base", C.L_textures[0]);
+                C.r_dx11Sampler("smp_base");
+                C.r_dx11Sampler("smp_linear");
                 C.r_ColorWriteEnable(false, false, false, false);
                 C.r_End();
                 break;
@@ -323,9 +322,9 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
                 // else							C.r_Pass	("shadow_direct_model","shadow_direct_base",FALSE);
                 C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE, TRUE, FALSE);
                 // C.r_Sampler		("s_base",C.L_textures[0]);
-                C.r_dx10Texture("s_base", C.L_textures[0]);
-                C.r_dx10Sampler("smp_base");
-                C.r_dx10Sampler("smp_linear");
+                C.r_dx11Texture("s_base", C.L_textures[0]);
+                C.r_dx11Sampler("smp_base");
+                C.r_dx11Sampler("smp_linear");
                 C.r_ColorWriteEnable(false, false, false, false);
                 C.r_End();
                 break;

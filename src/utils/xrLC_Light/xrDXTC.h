@@ -2,10 +2,14 @@
 
 #include "Common/Platform.hpp"
 
-#ifdef XRDXTC_EXPORTS
-#define DXTC_API XR_EXPORT
+#ifdef XRAY_STATIC_BUILD
+#define DXTC_API
 #else
-#define DXTC_API XR_IMPORT
+#   ifdef XRDXTC_EXPORTS
+#      define DXTC_API XR_EXPORT
+#   else
+#      define DXTC_API XR_IMPORT
+#   endif
 #endif
 
 enum eDXTC

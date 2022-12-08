@@ -163,7 +163,7 @@ void CStateBurerAttack<Object>::execute()
         {
             if (in_runaway_range)
             {
-                m_next_runaway_allowed_tick = current_time() + 5000;
+                m_next_runaway_allowed_tick = xr_current_time() + 5000;
             }
         }
         else
@@ -174,7 +174,7 @@ void CStateBurerAttack<Object>::execute()
         }
     }
 
-    if (m_lost_delta_health || (in_runaway_range && current_time() > m_next_runaway_allowed_tick))
+    if (m_lost_delta_health || (in_runaway_range && xr_current_time() > m_next_runaway_allowed_tick))
     {
         m_lost_delta_health = false;
         this->select_state(eStateBurerAttack_RunAround);

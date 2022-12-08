@@ -11,7 +11,7 @@ bool CExtraContentFilter::CheckPackKey(LPCSTR KeyName)
         return false;
 
     u32 KeyValue = 0;
-    ReadRegistry_DWValue(KeyName, KeyValue);
+    ReadRegistry_DWValue(KeyName, KeyValue); // XXX: extracontent will work only on Windows...
 
     return KeyValue == 1;
 }

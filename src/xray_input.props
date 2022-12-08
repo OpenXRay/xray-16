@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>
+        .;
+        $(ProjectDir);
+        $(SolutionDir);
+        $(xrSdkDir)include;
+        $(xrExternals);
+        $(xrExternals)luajit\src;
+        $(xrExternals)luabind;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+
+    <Link>
+      <AdditionalLibraryDirectories>
+        $(xrLibDir);
+        $(xrSdkDir)libraries;
+        $(xrSdkDir)libraries/$(PlatformShortName);
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+
+    <Lib>
+      <AdditionalLibraryDirectories>
+        $(xrLibDir);
+        $(xrSdkDir)libraries;
+        $(xrSdkDir)libraries/$(PlatformShortName);
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(xrLibDir)$(TargetName).lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+
+  <ImportGroup Label="PropertySheets">
+    <Import Project="xray_input.user.props" Condition="Exists('xray_input.user.props')"/>
+  </ImportGroup>
+</Project>

@@ -58,8 +58,9 @@ void player_account::net_Import(NET_Packet& P)
     {
         u16 award_id = P.r_u16();
         u16 acount = P.r_u16();
-        m_awards.insert(std::make_pair(
-            static_cast<gamespy_profile::enum_awards_t>(award_id), gamespy_profile::award_data(acount, time_t())));
+        m_awards.emplace(
+            static_cast<gamespy_profile::enum_awards_t>(award_id), gamespy_profile::award_data(acount, time_t())
+		);
     }
 }
 

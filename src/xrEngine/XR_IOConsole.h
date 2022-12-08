@@ -6,6 +6,7 @@
 
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/UIShader.h"
+#include "xr_level_controller.h" // XXX: only for bindtypes_count, better to remove
 
 // refs
 class ENGINE_API CGameFont;
@@ -51,7 +52,7 @@ struct TipString
 };
 
 class ENGINE_API CConsole : public pureRender, public pureFrame,
-                            public CUIResetNotifier
+                            public CUIResetNotifier, public IUserConfigHandler
 {
 public:
     struct str_pred
@@ -88,7 +89,7 @@ protected:
     bool m_disable_tips;
 
 private:
-    int lastBindedKeys[2];
+    int lastBindedKeys[bindtypes_count]{};
 
     vecHistory m_cmd_history;
     u32 m_cmd_history_max;
@@ -117,6 +118,8 @@ public:
     
     void OnUIReset() override;
     
+    pcstr GetUserConfigFileName() override { return ConfigFile; }
+
     string64 ConfigFile;
     bool bVisible;
     vecCMD Commands;
@@ -175,29 +178,29 @@ protected:
     void Register_callbacks();
 
 protected:
-    void xr_stdcall Prev_log();
-    void xr_stdcall Next_log();
-    void xr_stdcall Begin_log();
-    void xr_stdcall End_log();
+    void Prev_log();
+    void Next_log();
+    void Begin_log();
+    void End_log();
 
-    void xr_stdcall Find_cmd();
-    void xr_stdcall Find_cmd_back();
-    void xr_stdcall Prev_cmd();
-    void xr_stdcall Next_cmd();
-    void xr_stdcall Prev_tip();
-    void xr_stdcall Next_tip();
+    void Find_cmd();
+    void Find_cmd_back();
+    void Prev_cmd();
+    void Next_cmd();
+    void Prev_tip();
+    void Next_tip();
 
-    void xr_stdcall Begin_tips();
-    void xr_stdcall End_tips();
-    void xr_stdcall PageUp_tips();
-    void xr_stdcall PageDown_tips();
+    void Begin_tips();
+    void End_tips();
+    void PageUp_tips();
+    void PageDown_tips();
 
-    void xr_stdcall Execute_cmd();
-    void xr_stdcall Show_cmd();
-    void xr_stdcall Hide_cmd();
-    void xr_stdcall Hide_cmd_esc();
+    void Execute_cmd();
+    void Show_cmd();
+    void Hide_cmd();
+    void Hide_cmd_esc();
 
-    void xr_stdcall GamePause();
+    void GamePause();
 
 protected:
     void add_cmd_history(shared_str const& str);

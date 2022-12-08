@@ -84,7 +84,7 @@ public:
     virtual void RefreshList();
 
 private:
-    void xr_stdcall OnUpdate() { RefreshList(); }
+    void OnUpdate() { RefreshList(); }
 
 protected:
     bool IsValidItem(ServerInfo& item);
@@ -121,8 +121,8 @@ protected:
     CUIListBox m_list[3];
     CUIFrameWindow m_frame[3];
     CUI3tButton m_header[LST_COLUMN_COUNT];
-    CUIFrameLineWnd m_header2[4];
-    CUIFrameLineWnd m_header_frames[LST_COLUMN_COUNT];
+    std::array<CUIFrameLineWnd, 4> m_header2;
+    std::array<CUIFrameLineWnd, LST_COLUMN_COUNT> m_header_frames;
     CUIEditBox m_edit_gs_filter;
     xr_string m_playerName;
     bool m_bShowServerInfo;

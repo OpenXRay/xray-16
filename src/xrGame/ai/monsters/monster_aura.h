@@ -39,7 +39,7 @@ private:
     bool check_work_condition() const;
     void remove_pp_effector();
     float override_if_debug(pcstr var_name, float value) const;
-    float xr_stdcall get_post_process_factor() const;
+    float get_post_process_factor() const;
 };
 
 #endif // MONSTER_AURA_H_INCLUDED

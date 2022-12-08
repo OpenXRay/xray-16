@@ -1,7 +1,7 @@
 #pragma once
 #ifndef _COMPR_NORMAL_
 #define _COMPR_NORMAL_
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 
 // fwd. decl.
 template <class T> struct _vector3; typedef _vector3<float> Fvector;

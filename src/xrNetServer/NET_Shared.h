@@ -1,9 +1,19 @@
 #pragma once
 
-#include "xrCore/_types.h"
+#include "xrCore/xr_types.h"
 #include "xrCore/_flags.h"
 #include "xrCore/client_id.h"
 #include "xrCore/FTimer.h"
+
+#ifdef XRAY_STATIC_BUILD
+#   define XRNETSERVER_API
+#else
+#   ifdef XR_NETSERVER_EXPORTS
+#      define XRNETSERVER_API XR_EXPORT
+#   else
+#      define XRNETSERVER_API XR_IMPORT
+#   endif
+#endif
 
 // XXX: review and delete
 //#include "xrCore/net_utils.h"

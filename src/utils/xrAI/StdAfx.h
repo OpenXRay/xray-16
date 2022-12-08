@@ -6,6 +6,8 @@
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 
+#include "xrAICore/AISpaceBase.hpp"
+
 #include <memory>
 
 #include <d3dx9.h>
@@ -20,6 +22,9 @@ extern ILevelCompilerLogger& Logger;
 extern CThread::LogFunc ProxyMsg;
 extern CThreadManager::ReportStatusFunc ProxyStatus;
 extern CThreadManager::ReportProgressFunc ProxyProgress;
+
+// Hack to include xrServerEntities\PHNetState.h
+#define XRPHYSICS_API
 
 #ifdef AI_COMPILER
 #include "xrServerEntities/smart_cast.h"

@@ -100,8 +100,6 @@ class CBulletManager
     collide::rq_results rq_storage;
     collide::rq_results m_rq_results;
 
-    using SoundVec = xr_vector<ref_sound>;
-    using BulletVec = xr_vector<SBullet>;
     friend CLevel;
 
     enum EventType
@@ -126,18 +124,18 @@ class CBulletManager
     static void CalculateNewVelocity(Fvector& dest_new_vel, Fvector const& old_velocity, float ar, float life_time);
 
 protected:
-    SoundVec m_WhineSounds;
-    RStringVec m_ExplodeParticles;
+    xr_vector<ref_sound> m_WhineSounds;
+    xr_vector<shared_str> m_ExplodeParticles;
 
     //список пуль находящихся в данный момент на уровне
     //.	Lock		m_Lock				;
 
-    BulletVec m_Bullets; // working set, locked
-    BulletVec m_BulletsRendered; // copy for rendering
+    xr_vector<SBullet> m_Bullets; // working set, locked
+    xr_vector<SBullet> m_BulletsRendered; // copy for rendering
     xr_vector<_event> m_Events;
 
 #ifdef DEBUG
-    tid_t m_thread_id;
+    Threading::ThreadId m_thread_id;
 
     typedef xr_vector<Fvector> BulletPoints;
     BulletPoints m_bullet_points;
@@ -170,7 +168,7 @@ protected:
     void PlayWhineSound(SBullet* bullet, IGameObject* object, const Fvector& pos);
     void PlayExplodePS(const Fmatrix& xf);
     //функция обработки хитов объектов
-    static BOOL test_callback(const collide::ray_defs& rd, IGameObject* object, LPVOID params);
+    static bool test_callback(const collide::ray_defs& rd, IGameObject* object, LPVOID params);
     static bool firetrace_callback(collide::rq_result& result, LPVOID params);
 
     // Deffer event
@@ -199,7 +197,7 @@ protected:
     void add_bullet_point(Fvector const& start_position, Fvector& previous_position, Fvector const& start_velocity,
         Fvector const& gravity, float const ait_resistance, float const current_time);
     bool process_bullet(collide::rq_results& rq_storage, SBullet& bullet, float delta_time);
-    void __stdcall UpdateWorkload();
+    void UpdateWorkload();
 
 public:
     CBulletManager();

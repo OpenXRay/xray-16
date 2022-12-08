@@ -15,11 +15,6 @@
 #include "magic_box3.h"
 #include "ai_obstacle.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 #if 0
 #define MSG(...) Msg(__VA_ARGS__)
 #else

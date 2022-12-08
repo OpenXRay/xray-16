@@ -53,13 +53,6 @@ private:
     SConstantList passConstants;
     u32 dwStage;
 
-    string128 pass_vs;
-    string128 pass_ps;
-    string128 pass_gs;
-    string128 pass_hs;
-    string128 pass_ds;
-    string128 pass_cs;
-
 private:
     inline u32 BC(BOOL v) const { return v ? 1 : 0; }
     void SetupSampler(u32 stage, pcstr sampler);
@@ -99,8 +92,7 @@ public:
         PassSET_Blend(TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR, bAref, ref);
     }
     void PassSET_LightFog(BOOL bLight, BOOL bFog);
-    void PassSET_PS(LPCSTR name);
-    void PassSET_VS(LPCSTR name);
+    void PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs = "null", pcstr _hs = "null", pcstr _ds = "null");
     void PassEnd();
 
     void StageBegin();
@@ -126,24 +118,19 @@ public:
     void i_Filter_Min(u32 s, u32 f);
     void i_Filter_Mip(u32 s, u32 f);
     void i_Filter_Mag(u32 s, u32 f);
+    void i_Filter_Aniso(u32 s, u32 f);
 #if defined(USE_DX11)
-    void i_dx10FilterAnizo(u32 s, BOOL value);
+    void i_dx11FilterAnizo(u32 s, BOOL value);
 #endif
     void i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag);
     void i_BorderColor(u32 s, u32 color);
 
     // R1/R2-compiler	[programmable]		- templates
     void r_Pass(LPCSTR vs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE, BOOL bABlend = FALSE,
-        D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE, u32 aRef = 0)
-    {
-        r_Pass({ vs, nullptr }, ps, bFog, bZtest, bZwrite, bABlend, abSRC, abDST, aTest, aRef);
-    }
-
-    void r_Pass(std::pair<cpcstr, cpcstr> vs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE, BOOL bABlend = FALSE,
         D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE, u32 aRef = 0);
 
     void r_Constant(LPCSTR name, R_constant_setup* s);
-#ifndef USE_DX9
+#if defined(USE_DX11) || defined(USE_OGL)
     void r_Pass(LPCSTR vs, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE,
         BOOL bABlend = FALSE, D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE,
         u32 aRef = 0);
@@ -160,12 +147,12 @@ public:
 #endif // !USE_DX9
 
 #if defined(USE_DX11)
-    void r_dx10Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);
-    void r_dx10Texture(LPCSTR ResourceName, shared_str texture, bool recursive = false)
+    void r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);
+    void r_dx11Texture(LPCSTR ResourceName, shared_str texture, bool recursive = false)
     {
-        return r_dx10Texture(ResourceName, texture.c_str(), recursive);
+        return r_dx11Texture(ResourceName, texture.c_str(), recursive);
     };
-    u32 r_dx10Sampler(LPCSTR ResourceName);
+    u32 r_dx11Sampler(LPCSTR ResourceName);
 #endif // USE_DX11
 
     u32 r_Sampler(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3DTADDRESS_WRAP,

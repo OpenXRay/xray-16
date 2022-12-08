@@ -13,10 +13,12 @@
 #include "xrCore/Text/StringConversion.hpp"
 #include "Common/object_broker.h"
 #include "xr_input.h"
-#include "xr_input_xinput.h"
-#include "SDL.h"
 
 #include "edit_actions.h"
+
+#include <SDL.h>
+
+#include <locale>
 
 ENGINE_API float g_console_sensitive = 0.15f;
 
@@ -150,6 +152,7 @@ void line_edit_control::clear_states()
 
 void line_edit_control::on_ir_capture()
 {
+    SDL_PumpEvents();
     SDL_StartTextInput();
     SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
 }
@@ -259,7 +262,7 @@ void line_edit_control::assign_callback(int const dik, key_state state, Callback
 void line_edit_control::remove_callback(int dik)
 {
     VERIFY(dik < CInput::COUNT_KB_BUTTONS);
-    if (dik > -1 && dik < CInput::COUNT_KB_BUTTONS)
+    if (dik < CInput::COUNT_KB_BUTTONS)
         xr_delete(m_actions[dik]);
 }
 

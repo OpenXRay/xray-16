@@ -11,7 +11,7 @@
 
 ButtonListDialog::ButtonListDialog()
 {
-    Background = xr_new<CUIStatic>();
+    Background = xr_new<CUIStatic>("Background");
     Background->SetAutoDelete(true);
     AttachChild(Background);
     Header = xr_new<CUITextWnd>();
@@ -45,7 +45,7 @@ bool ButtonListDialog::OnKeyboardAction(int dik, EUIMessages keyboardAction)
     CUIDialogWnd::OnKeyboardAction(dik, keyboardAction);
     if (WINDOW_KEY_PRESSED == keyboardAction)
     {
-        if (SDL_SCANCODE_ESCAPE == dik)
+        if (IsBinded(kQUIT, dik))
         {
             OnCancel();
             return true;

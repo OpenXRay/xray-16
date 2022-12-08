@@ -1,3 +1,4 @@
+# XXX: remove add_dir macro after Externals/GameSpy cmake refactoring
 macro(add_dir DIRS)
     foreach (dir ${DIRS})
         message("adding  ${dir} to ${PROJECT_NAME}")
@@ -11,6 +12,13 @@ macro(add_dir DIRS)
     endforeach()
 endmacro()
 
+macro(group_sources SRC_FILES)
+    foreach(source IN LISTS SRC_FILES)
+        get_filename_component(source_path "${source}" PATH)
+        string(REPLACE "/" "\\" source_path_msvc "${source_path}")
+        source_group("${source_path_msvc}" FILES "${source}")
+    endforeach()
+endmacro()
 
 # ------------------------------------------
 # Detect arch type ( x86 or x64 )

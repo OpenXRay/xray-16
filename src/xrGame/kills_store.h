@@ -23,7 +23,7 @@ public:
         SPECIAL_KILL_TYPE m_spec_kill_type;
     }; // struct kill
 
-    static unsigned int const max_kills_count = 10;
+    static constexpr size_t max_kills_count = 10;
     typedef obsolete_queue<buffer_vector<kill>, max_kills_count> kills_t;
     // key: (initiator, victim)
     typedef AssociativeVector<std::pair<shared_str, shared_str>, kills_t*> kills_map_t;

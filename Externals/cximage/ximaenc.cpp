@@ -5,6 +5,13 @@
 
 #include "ximage.h"
 
+#if defined(WIN32) || defined(_WIN32_WCE)
+#include <tchar.h>
+#else
+#define _tfopen fopen
+#define _T(x) x
+#endif
+
 #if CXIMAGE_SUPPORT_JPG
 #include "ximajpg.h"
 #endif
@@ -104,11 +111,7 @@ bool CxImage::Save(const TCHAR * filename, DWORD imagetype)
 {
 	FILE* hFile;	//file handle to write the image
 
-#ifdef WIN32
 	if ((hFile=_tfopen(filename,_T("wb")))==NULL)  return false;	// For UNICODE support
-#else
-	if ((hFile=fopen(filename,"wb"))==NULL)  return false;
-#endif
 
 	bool bOK = Encode(hFile,imagetype);
 	fclose(hFile);
@@ -509,11 +512,7 @@ bool CxImage::Load(const TCHAR * filename, DWORD imagetype)
 	if ( GetTypeIndexFromId(imagetype) ){
 		FILE* hFile;	//file handle to read the image
 
-#ifdef WIN32
 		if ((hFile=_tfopen(filename,_T("rb")))==NULL)  return false;	// For UNICODE support
-#else
-		if ((hFile=fopen(filename,"rb"))==NULL)  return false;
-#endif
 
 		bOK = Decode(hFile,imagetype);
 		fclose(hFile);
@@ -526,11 +525,7 @@ bool CxImage::Load(const TCHAR * filename, DWORD imagetype)
 	// if failed, try automatic recognition of the file...
 	FILE* hFile;
 
-#ifdef WIN32
 	if ((hFile=_tfopen(filename,_T("rb")))==NULL)  return false;	// For UNICODE support
-#else
-	if ((hFile=fopen(filename,"rb"))==NULL)  return false;
-#endif
 
 	bOK = Decode(hFile,CXIMAGE_FORMAT_UNKNOWN);
 	fclose(hFile);
@@ -1006,3 +1001,8 @@ bool CxImage::CheckFormat(BYTE * buffer, DWORD size, DWORD imagetype)
 ////////////////////////////////////////////////////////////////////////////////
 #endif //CXIMAGE_SUPPORT_DECODE
 ////////////////////////////////////////////////////////////////////////////////
+
+#if !defined(WIN32) && !defined(_WIN32_WCE)
+#undef _tfopen
+#undef _T
+#endif

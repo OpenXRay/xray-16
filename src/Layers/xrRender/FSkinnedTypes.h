@@ -185,7 +185,7 @@ struct vertHW_1W
         q_P(_P[0], P.x);
         q_P(_P[1], P.y);
         q_P(_P[2], P.z);
-        _P[3] = 1.f;
+        _P[3] = TVal(1);
         _N_I = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(index));
         _T = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), 0);
         _B = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), 0);
@@ -233,7 +233,7 @@ struct vertHW_2W
         q_P(_P[0], P.x);
         q_P(_P[1], P.y);
         q_P(_P[2], P.z);
-        _P[3] = 1.f;
+        _P[3] = TVal(1);
         _N_w = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(clampr(iFloor(w * 255.f + .5f), 0, 255)));
         _T = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), 0);
         _B = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), 0);
@@ -294,7 +294,7 @@ struct vertHW_3W
         q_P(_P[0], P.x);
         q_P(_P[1], P.y);
         q_P(_P[2], P.z);
-        _P[3] = 1.f;
+        _P[3] = TVal(1);
         _N_w = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(clampr(iFloor(w0 * 255.f + .5f), 0, 255)));
         _T_w = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), u8(clampr(iFloor(w1 * 255.f + .5f), 0, 255)));
         _B_i = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), u8(index2));
@@ -378,7 +378,7 @@ struct vertHW_4W
         q_P(_P[0], P.x);
         q_P(_P[1], P.y);
         q_P(_P[2], P.z);
-        _P[3] = 1.f;
+        _P[3] = TVal(1);
         _N_w = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(clampr(iFloor(w0 * 255.f + .5f), 0, 255)));
         _T_w = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), u8(clampr(iFloor(w1 * 255.f + .5f), 0, 255)));
         _B_w = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), u8(clampr(iFloor(w2 * 255.f + .5f), 0, 255)));

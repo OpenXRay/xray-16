@@ -1,30 +1,5 @@
 #pragma once
 
-#ifndef DEBUG
-#define MASTER_GOLD
-#endif // DEBUG
-
-#include "xrCore_benchmark_macros.h"
-
-#if !defined(_CPPUNWIND)
-#error Please enable exceptions...
-#endif
-
-#ifndef _MT
-#error Please enable multi-threaded library...
-#endif
-
-#ifdef NDEBUG
-#define XRAY_EXCEPTIONS 0
-#define LUABIND_NO_EXCEPTIONS
-#else
-#define XRAY_EXCEPTIONS 1
-#endif
-
-#if !defined(DEBUG) && (defined(_DEBUG) || defined(MIXED))
-#define DEBUG
-#endif
-
 #define MACRO_TO_STRING_HELPER(a) #a
 #define MACRO_TO_STRING(a) MACRO_TO_STRING_HELPER(a)
 
@@ -32,12 +7,8 @@
 #define CONCATENIZE(a, b) CONCATENIZE_HELPER(a, b)
 
 // Warnings
-#pragma warning(disable : 4100) // unreferenced formal parameter
 #pragma warning(disable : 4127) // conditional expression is constant
-#pragma warning(disable : 4201) // nonstandard extension used : nameless struct/union
-#pragma warning(disable : 4251) // object needs DLL interface
 #pragma warning(disable : 4345)
-//#pragma warning (disable : 4530 ) // C++ exception handler used, but unwind semantics are not enabled
 
 #ifdef XR_ARCHITECTURE_X64
 #pragma warning(disable : 4512)
@@ -50,6 +21,18 @@
 #endif // frequently in release code due to large amount of VERIFY
 
 // Our headers
+#ifdef XRAY_STATIC_BUILD
+#   define XRCORE_API
+#else
+#   ifdef XRCORE_EXPORTS
+#      define XRCORE_API XR_EXPORT
+#   else
+#      define XRCORE_API XR_IMPORT
+#   endif
+#endif
+
+#include "xrCore_benchmark_macros.h"
+
 #include "xrDebug.h"
 //#include "vector.h"
 
@@ -59,6 +42,8 @@
 
 //#include "_stl_extensions.h"
 #include "_std_extensions.h"
+#include "_rect.h"
+#include "_matrix.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_set.h"
 #include "xrsharedmem.h"
@@ -83,10 +68,6 @@ struct XRCORE_API xr_rtoken
 };
 
 #include "xr_shortcut.h"
-
-using RStringVec = xr_vector<shared_str>;
-using RStringSet = xr_set<shared_str>;
-using RTokenVec = xr_vector<xr_rtoken>;
 
 #include "FS.h"
 #include "log.h"
@@ -149,12 +130,11 @@ public:
     static pcstr GetBuildCommit() { return buildCommit; }
     static pcstr GetBuildBranch() { return buildBranch; }
 
-    static constexpr pcstr GetBuildConfiguration();
-
     void CoInitializeMultithreaded() const;
 
 private:
     void CalculateBuildId();
+    void PrintBuildInfo();
 };
 
 extern XRCORE_API xrCore Core;

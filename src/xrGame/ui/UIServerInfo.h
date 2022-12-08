@@ -26,8 +26,8 @@ public:
 private:
     void InitCallbacks();
 
-    void xr_stdcall OnSpectatorBtnClick(CUIWindow* w, void* d);
-    void xr_stdcall OnNextBtnClick(CUIWindow* w, void* d);
+    void OnSpectatorBtnClick(CUIWindow* w, void* d);
+    void OnNextBtnClick(CUIWindow* w, void* d);
 
     static char const* tmp_logo_file_name;
 

@@ -15,18 +15,6 @@
 #include "xrCore/Animation/Bone.hpp"
 #include "xrEngine/GameMtlLib.h"
 
-//#pragma warning(push)
-//#pragma warning(disable:4995)
-//#pragma warning(disable:4267)
-
-//#pragma warning(pop)
-///////////////////////////////////////////////////////////////
-//#pragma warning(push)
-///#pragma warning(disable:4995)
-
-//#pragma warning(pop)
-///////////////////////////////////////////////////////////////////
-
 #include "ExtendedGeom.h"
 #include "PHElement.h"
 #include "PHShell.h"
@@ -39,7 +27,6 @@
 #include "debug_output.h"
 #endif
 
-IC bool PhOutOfBoundaries(const Fvector& v) { return v.y < phBoundaries.y1; }
 CPHShell::~CPHShell()
 {
     m_pKinematics = nullptr;
@@ -706,7 +693,7 @@ void CPHShell::AddElementRecursive(
             E->mXFORM.set(fm_position);
             u16 mtlIndex = bone_data.get_game_mtl_idx();
             if (mtlIndex == u16(-1))
-                mtlIndex = GMLibrary().GetMaterialIdx(bone_data.GetMaterialName().c_str());
+                mtlIndex = GMLib.GetMaterialIdx(bone_data.GetMaterialName().c_str());
             E->SetMaterial(mtlIndex);
             // Fvector mc;
             // fm_position.transform_tiny(mc,bone_data.center_of_mass);

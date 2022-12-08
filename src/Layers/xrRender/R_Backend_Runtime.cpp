@@ -3,9 +3,13 @@
 
 #include "xrCDB/Frustum.h"
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
-#include "Layers/xrRenderDX10/StateManager/dx10StateManager.h"
-#include "Layers/xrRenderDX10/StateManager/dx10ShaderResourceStateCache.h"
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
+#include "Layers/xrRenderDX11/StateManager/dx11ShaderResourceStateCache.h"
+#endif
+
+#if defined(USE_DX9) || defined(USE_DX11)
+#include <DirectXMath.h>
 #endif
 
 void CBackend::OnFrameEnd()
@@ -21,7 +25,6 @@ void CBackend::OnFrameEnd()
         CHK_DX(HW.pDevice->SetIndices(nullptr));
         CHK_DX(HW.pDevice->SetVertexShader(nullptr));
         CHK_DX(HW.pDevice->SetPixelShader(nullptr));
-        CHK_DX(HW.pDevice->EndScene());
 #endif
         Invalidate();
     }
@@ -33,15 +36,11 @@ void CBackend::OnFrameBegin()
     {
         PGO(Msg("PGO:*****frame[%d]*****", RDEVICE.dwFrame));
 
-#if defined(USE_DX9)
-        CHK_DX(HW.pDevice->BeginScene());
-#endif
-        // DX9 sets base rt and base zb by default
 #ifndef USE_DX9
         Invalidate();
-
-        // Getting broken HUD hands for OpenGL after calling rmNormal()
+        // DX9 sets base rt and base zb by default
 #ifndef USE_OGL
+        // XXX: Getting broken HUD hands for OpenGL after calling rmNormal()
         RImplementation.rmNormal();
 #else
         set_FB(HW.pFB);
@@ -76,7 +75,7 @@ void CBackend::Invalidate()
     state = nullptr;
     ps = 0;
     vs = 0;
-    DX10_ONLY(gs = NULL);
+    DX11_ONLY(gs = NULL);
 #ifdef USE_DX11
     hs = 0;
     ds = 0;
@@ -107,7 +106,7 @@ void CBackend::Invalidate()
     // transform setting handlers should be unmapped too.
     xforms.unmap();
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     m_pInputLayout = NULL;
     m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
     m_bChangedRTorZB = false;
@@ -135,7 +134,7 @@ void CBackend::Invalidate()
         textures_ds[ds_it++] = 0;
     for (u32 cs_it = 0; cs_it < CTexture::mtMaxComputeShaderTextures;)
         textures_cs[cs_it++] = 0;
-#endif // !USE_DX9 && !USE_OGL
+#endif // USE_DX11
 
     for (u32 ps_it = 0; ps_it < CTexture::mtMaxPixelShaderTextures;)
         textures_ps[ps_it++] = nullptr;
@@ -149,15 +148,7 @@ void CBackend::Invalidate()
 
 void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count /* =0*/)
 {
-#ifndef USE_DX9
-    // TODO: DX10: Implement in the corresponding vertex shaders
-    // Use this to set up location, were shader setup code will get data
-    // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
-    UNUSED(_enable);
-    UNUSED(_planes);
-    UNUSED(count);
-    return;
-#else // USE_DX9
+#if defined(USE_DX9)
     if (0 == HW.Caps.geometry.dwClipPlanes)
         return;
     if (!_enable)
@@ -171,22 +162,35 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
     if (count > HW.Caps.geometry.dwClipPlanes)
         count = HW.Caps.geometry.dwClipPlanes;
 
-    D3DXMATRIX worldToClipMatrixIT;
-    D3DXMatrixInverse(&worldToClipMatrixIT, nullptr, (D3DXMATRIX*)&RDEVICE.mFullTransform);
-    D3DXMatrixTranspose(&worldToClipMatrixIT, &worldToClipMatrixIT);
+    using namespace DirectX;
+
+    const XMMATRIX transform = XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&Device.mFullTransform));
+    XMMATRIX worldToClipMatrixIT = XMMatrixInverse(nullptr, transform);
+    worldToClipMatrixIT = XMMatrixTranspose(worldToClipMatrixIT);
+
     for (u32 it = 0; it < count; it++)
     {
         Fplane& P = _planes[it];
-        D3DXPLANE planeWorld(-P.n.x, -P.n.y, -P.n.z, -P.d), planeClip;
-        D3DXPlaneNormalize(&planeWorld, &planeWorld);
-        D3DXPlaneTransform(&planeClip, &planeWorld, &worldToClipMatrixIT);
-        CHK_DX(HW.pDevice->SetClipPlane(it, planeClip));
+        XMFLOAT4 planeClip;
+        XMVECTOR planeWorld = XMPlaneNormalize(XMVectorSet(-P.n.x, -P.n.y, -P.n.z, -P.d));
+        XMStoreFloat4(&planeClip, XMPlaneTransform(planeWorld, worldToClipMatrixIT));
+        CHK_DX(HW.pDevice->SetClipPlane(it, reinterpret_cast<float*>(&planeClip)));
     }
 
     // Enable them
     u32 e_mask = (1 << count) - 1;
-    CHK_DX(HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, e_mask));
-#endif // !USE_DX9
+    CHK_DX(HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, e_mask));	
+#elif defined(USE_DX11) || defined(USE_OGL)
+    // TODO: DX11: Implement in the corresponding vertex shaders
+    // Use this to set up location, were shader setup code will get data
+    // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
+    UNUSED(_enable);
+    UNUSED(_planes);
+    UNUSED(count);
+    return;
+#else
+#   error No graphics API selected or enabled!
+#endif //USE_DX9
 }
 
 #ifndef DEDICATED_SREVER
@@ -196,12 +200,14 @@ void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask
         return;
     if (!_enable)
     {
-#ifndef USE_DX9
-    // TODO: DX10: Implement in the corresponding vertex shaders
+#if defined(USE_DX9)
+        CHK_DX(HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, FALSE));
+#elif defined(USE_DX11) || defined(USE_OGL)
+    // TODO: DX11: Implement in the corresponding vertex shaders
     // Use this to set up location, were shader setup code will get data
     // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
-#else // USE_DX9
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, FALSE));
+#else
+#   error No graphics API selected or enabled!
 #endif
         return;
     }
@@ -219,12 +225,12 @@ void CBackend::set_Textures(STextureList* _T)
     // If resources weren't set at all we should clear from resource #0.
     int _last_ps = -1;
     int _last_vs = -1;
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     int _last_gs = -1;
     int _last_hs = -1;
     int _last_ds = -1;
     int _last_cs = -1;
-#endif // !USE_DX9 && !USE_OGL
+#endif
     STextureList::iterator _it = _T->begin();
     STextureList::iterator _end = _T->end();
 
@@ -232,7 +238,7 @@ void CBackend::set_Textures(STextureList* _T)
     {
         std::pair<u32, ref_texture>& loader = *_it;
         u32 load_id = loader.first;
-        CTexture* load_surf = &*loader.second;
+        CTexture* load_surf = loader.second._get();
         //if (load_id < 256) {
         if (load_id < CTexture::rstVertex)
         {
@@ -244,9 +250,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_ps[load_id] != load_surf)
             {
                 textures_ps[load_id] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -256,7 +261,7 @@ void CBackend::set_Textures(STextureList* _T)
             }
         }
         else
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
         if (load_id < CTexture::rstGeometry)
 #endif
         {
@@ -270,9 +275,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_vs[load_id_remapped] != load_surf)
             {
                 textures_vs[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -281,7 +285,7 @@ void CBackend::set_Textures(STextureList* _T)
                 }
             }
         }
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
         else if (load_id < CTexture::rstHull)
         {
             // Set up pixel shader resources
@@ -294,9 +298,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_gs[load_id_remapped] != load_surf)
             {
                 textures_gs[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -317,9 +320,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_hs[load_id_remapped] != load_surf)
             {
                 textures_hs[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -340,9 +342,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_ds[load_id_remapped] != load_surf)
             {
                 textures_ds[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -363,9 +364,8 @@ void CBackend::set_Textures(STextureList* _T)
             if (textures_cs[load_id_remapped] != load_surf)
             {
                 textures_cs[load_id_remapped] = load_surf;
-#ifdef DEBUG
                 stat.textures++;
-#endif
+
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
@@ -378,7 +378,7 @@ void CBackend::set_Textures(STextureList* _T)
         {
             VERIFY("Invalid enum");
         }
-#endif // !USE_DX9 && !USE_OGL
+#endif // USE_DX11
     }
 
     // clear remaining stages (PS)
@@ -388,20 +388,22 @@ void CBackend::set_Textures(STextureList* _T)
             continue;
 
         textures_ps[_last_ps] = nullptr;
-#if defined(USE_OGL)
-        CHK_GL(glActiveTexture(GL_TEXTURE0 + _last_ps));
-        CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
-        if (RImplementation.o.dx10_msaa)
-            CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
-        CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
-        CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
-#elif !defined(USE_DX9)
-        // TODO: DX10: Optimise: set all resources at once
+#if defined(USE_DX9)
+        CHK_DX(HW.pDevice->SetTexture(_last_ps, NULL));
+#elif defined(USE_DX11)
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         // HW.pDevice->PSSetShaderResources(_last_ps, 1, &pRes);
         SRVSManager.SetPSResource(_last_ps, pRes);
-#else // USE_DX9
-        CHK_DX(HW.pDevice->SetTexture(_last_ps, NULL));
+#elif defined(USE_OGL)
+        CHK_GL(glActiveTexture(GL_TEXTURE0 + _last_ps));
+        CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
+        if (RImplementation.o.msaa)
+            CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
+        CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
+        CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
+#else
+#   error No graphics API selected or enabled!
 #endif
     }
     // clear remaining stages (VS)
@@ -411,24 +413,26 @@ void CBackend::set_Textures(STextureList* _T)
             continue;
 
         textures_vs[_last_vs] = nullptr;
-#if defined(USE_OGL)
-        CHK_GL(glActiveTexture(GL_TEXTURE0 + CTexture::rstVertex + _last_vs));
-        CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
-        if (RImplementation.o.dx10_msaa)
-            CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
-        CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
-        CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
-#elif !defined(USE_DX9)
-        // TODO: DX10: Optimise: set all resources at once
+#if defined(USE_DX9)
+        CHK_DX(HW.pDevice->SetTexture(_last_vs + CTexture::rstVertex, NULL));
+#elif defined(USE_DX11)
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         // HW.pDevice->VSSetShaderResources(_last_vs, 1, &pRes);
         SRVSManager.SetVSResource(_last_vs, pRes);
-#else // USE_DX9
-        CHK_DX(HW.pDevice->SetTexture(_last_vs + CTexture::rstVertex, NULL));
+#elif defined(USE_OGL)
+        CHK_GL(glActiveTexture(GL_TEXTURE0 + CTexture::rstVertex + _last_vs));
+        CHK_GL(glBindTexture(GL_TEXTURE_2D, 0));
+        if (RImplementation.o.msaa)
+            CHK_GL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
+        CHK_GL(glBindTexture(GL_TEXTURE_3D, 0));
+        CHK_GL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
+#else
+#   error No graphics API selected or enabled!
 #endif
     }
 
-#if !defined(USE_DX9) && !defined(USE_OGL)
+#if defined(USE_DX11)
     // clear remaining stages (VS)
     for (++_last_gs; _last_gs < CTexture::mtMaxGeometryShaderTextures; _last_gs++)
     {
@@ -437,7 +441,7 @@ void CBackend::set_Textures(STextureList* _T)
 
         textures_gs[_last_gs] = 0;
 
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         // HW.pDevice->GSSetShaderResources(_last_gs, 1, &pRes);
         SRVSManager.SetGSResource(_last_gs, pRes);
@@ -449,7 +453,7 @@ void CBackend::set_Textures(STextureList* _T)
 
         textures_hs[_last_hs] = 0;
 
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetHSResource(_last_hs, pRes);
     }
@@ -460,7 +464,7 @@ void CBackend::set_Textures(STextureList* _T)
 
         textures_ds[_last_ds] = 0;
 
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetDSResource(_last_ds, pRes);
     }
@@ -471,28 +475,23 @@ void CBackend::set_Textures(STextureList* _T)
 
         textures_cs[_last_cs] = 0;
 
-        // TODO: DX10: Optimise: set all resources at once
+        // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         SRVSManager.SetCSResource(_last_cs, pRes);
     }
-#endif // !USE_DX9 && !USE_OGL
+#endif // USE_DX11
 }
 #else
 
 void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask /* =0xff */) {}
 void CBackend::set_Textures(STextureList* _T) {}
 
-#endif
+#endif // DEDICATED SERVER
 
 void CBackend::SetupStates()
 {
     set_CullMode(CULL_CCW);
-#if defined(USE_OGL)
-    // TODO: OGL: Implement SetupStates().
-#elif !defined(USE_DX9)
-    SSManager.SetMaxAnisotropy(ps_r__tf_Anisotropic);
-    SSManager.SetMipLODBias(ps_r__tf_Mipbias);
-#else // USE_DX9
+#if defined(USE_DX9)
     for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
     {
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, ps_r__tf_Anisotropic));
@@ -530,5 +529,12 @@ void CBackend::SetupStates()
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGTABLEMODE, D3DFOG_NONE));
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGVERTEXMODE, D3DFOG_LINEAR));
     }
-#endif // USE_OGL
+#elif defined(USE_DX11)
+    SSManager.SetMaxAnisotropy(ps_r__tf_Anisotropic);
+    SSManager.SetMipLODBias(ps_r__tf_Mipbias);
+#elif defined(USE_OGL)
+    // TODO: OGL: Implement SetupStates().
+#else
+#   error No graphics API selected or enabled!
+#endif
 }

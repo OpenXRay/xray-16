@@ -27,11 +27,6 @@
 #include "alife_simulator_base_inline.h"
 #endif
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <malloc.h>
-#pragma warning(pop)
-
 using namespace ALife;
 
 CALifeSimulatorBase::CALifeSimulatorBase(IPureServer* server, LPCSTR section)

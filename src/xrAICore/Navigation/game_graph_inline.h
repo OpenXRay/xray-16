@@ -234,7 +234,7 @@ IC void GameGraph::CHeader::load(IReader* reader)
     {
         SLevel l_tLevel;
         l_tLevel.load(reader);
-        m_levels.insert(std::make_pair(l_tLevel.id(), l_tLevel));
+        m_levels.emplace(l_tLevel.id(), l_tLevel);
     }
 }
 

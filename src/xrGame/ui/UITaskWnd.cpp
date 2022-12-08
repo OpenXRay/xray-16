@@ -15,14 +15,14 @@
 #include "map_location_defs.h"
 #include "map_manager.h"
 #include "UIInventoryUtilities.h"
-#include "string_table.h"
 #include "Level.h"
 #include "GametaskManager.h"
 #include "Actor.h"
 #include "xrUICore/Buttons/UICheckButton.h"
 
 CUITaskWnd::CUITaskWnd(UIHint* hint)
-    : m_background(nullptr), m_background2(nullptr),
+    : CUIWindow("CUITaskWnd"),
+      m_background(nullptr), m_background2(nullptr),
       m_center_background(nullptr), m_right_bottom_background(nullptr),
       m_task_split(nullptr), m_pMapWnd(nullptr),
       m_pStoryLineTaskItem(nullptr), m_pSecondaryTaskItem(nullptr),
@@ -39,6 +39,7 @@ CUITaskWnd::CUITaskWnd(UIHint* hint)
 }
 
 CUITaskWnd::~CUITaskWnd() { delete_data(m_pMapWnd); }
+
 bool CUITaskWnd::Init()
 {
     CUIXml xml;
@@ -415,7 +416,9 @@ void CUITaskWnd::OnShowQuestNpcs(CUIWindow* ui, void* d)
     ReloadTaskInfo();
 }
 // --------------------------------------------------------------------------------------------------
-CUITaskItem::CUITaskItem() : m_owner(nullptr), show_hint_can(false), show_hint(false), m_hint_wt(500) {}
+CUITaskItem::CUITaskItem()
+    : CUIWindow("CUITaskItem"),
+      m_owner(nullptr), show_hint_can(false), show_hint(false), m_hint_wt(500) {}
 
 void CUITaskItem::Init(CUIXml& uiXml, LPCSTR path)
 {

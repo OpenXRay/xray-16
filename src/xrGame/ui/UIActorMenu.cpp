@@ -18,6 +18,7 @@
 #include "GrenadeLauncher.h"
 #include "trade_parameters.h"
 #include "ActorHelmet.h"
+#include "ActorBackpack.h"
 #include "CustomOutfit.h"
 #include "CustomDetector.h"
 #include "eatable_item.h"
@@ -70,10 +71,21 @@ void CUIActorMenu::InitPartnerInfo()
 {
     if (m_pPartnerInvOwner)
     {
-        if (m_pPartnerInvOwner->use_simplified_visual())
+        CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
+        if (monster || m_pPartnerInvOwner->use_simplified_visual())
+        {
             GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
+            if (monster)
+            {
+                shared_str monster_tex_name = pSettings->r_string(monster->cNameSect(), "icon");
+                GetModeSpecificPartnerInfo(m_currMenuMode)->UIIcon().InitTexture(monster_tex_name.c_str());
+                GetModeSpecificPartnerInfo(m_currMenuMode)->UIIcon().SetStretchTexture(true);
+            }
+        }
         else
+        {
             GetModeSpecificPartnerInfo(m_currMenuMode)->InitCharacter(m_pPartnerInvOwner->object_id());
+        }
 
         SetInvBox(nullptr);
     }
@@ -244,7 +256,7 @@ void CUIActorMenu::Update()
     case mmDeadBodySearch:
     {
         // Alundaio: remove distance check when opening inventory boxes
-        //CheckDistance(); 
+        //CheckDistance();
         break;
     }
     default: R_ASSERT(0); break;
@@ -304,9 +316,13 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
     if (l == m_pLists[eInventoryBeltList])
         return iActorBelt;
 
+    if (l == m_pLists[eInventoryKnifeList] && m_pLists[eInventoryKnifeList] != nullptr)
+        return iActorSlot;
     if (l == m_pLists[eInventoryAutomaticList])
         return iActorSlot;
     if (l == m_pLists[eInventoryPistolList])
+        return iActorSlot;
+    if (l == m_pLists[eInventoryBackpackList] && m_pLists[eInventoryBackpackList] != nullptr)
         return iActorSlot;
     if (l == m_pLists[eInventoryOutfitList])
         return iActorSlot;
@@ -514,10 +530,14 @@ void CUIActorMenu::UpdateItemsPlace()
 
 void CUIActorMenu::clear_highlight_lists()
 {
+    if (m_pLists[eInventoryKnifeList])
+        m_pLists[eInventoryKnifeList]->Highlight(false);
     m_pLists[eInventoryPistolList]->Highlight(false);
     m_pLists[eInventoryAutomaticList]->Highlight(false);
     if (m_pLists[eInventoryHelmetList])
         m_pLists[eInventoryHelmetList]->Highlight(false);
+    if (m_pLists[eInventoryBackpackList])
+        m_pLists[eInventoryBackpackList]->Highlight(false);
     m_pLists[eInventoryOutfitList]->Highlight(false);
     if (m_pLists[eInventoryDetectorList])
         m_pLists[eInventoryDetectorList]->Highlight(false);
@@ -555,6 +575,7 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
 
     CWeapon* weapon = smart_cast<CWeapon*>(item);
     CHelmet* helmet = smart_cast<CHelmet*>(item);
+    CBackpack* backpack = smart_cast<CBackpack*>(item);
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(item);
     CCustomDetector* detector = smart_cast<CCustomDetector*>(item);
     CEatableItem* eatable = smart_cast<CEatableItem*>(item);
@@ -571,6 +592,12 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
     {
         if (m_pLists[eInventoryHelmetList])
             m_pLists[eInventoryHelmetList]->Highlight(true);
+        return;
+    }
+    if (backpack && slot_id == BACKPACK_SLOT)
+    {
+        if (m_pLists[eInventoryBackpackList])
+            m_pLists[eInventoryBackpackList]->Highlight(true);
         return;
     }
     if (outfit && slot_id == OUTFIT_SLOT)
@@ -851,6 +878,10 @@ void CUIActorMenu::ClearAllLists()
         m_pLists[eInventoryHelmetList]->ClearAll(true);
     if (m_pLists[eInventoryDetectorList])
         m_pLists[eInventoryDetectorList]->ClearAll(true);
+    if (m_pLists[eInventoryBackpackList])
+        m_pLists[eInventoryBackpackList]->ClearAll(true);
+    if (m_pLists[eInventoryKnifeList])
+        m_pLists[eInventoryKnifeList]->ClearAll(true);
     m_pLists[eInventoryPistolList]->ClearAll(true);
     m_pLists[eInventoryAutomaticList]->ClearAll(true);
     if (m_pQuickSlot)
@@ -930,13 +961,13 @@ bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_
         return true;
     }
 
-    if (item_slot == INV_SLOT_3 && l == m_pLists[eInventoryPistolList])
+    if (item_slot == INV_SLOT_3 && l == m_pLists[eInventoryPistolList] && CallOfPripyatMode)
     {
         ret_slot = INV_SLOT_2;
         return true;
     }
 
-    if (item_slot == INV_SLOT_2 && l == m_pLists[eInventoryAutomaticList])
+    if (item_slot == INV_SLOT_2 && l == m_pLists[eInventoryAutomaticList] && CallOfPripyatMode)
     {
         ret_slot = INV_SLOT_3;
         return true;

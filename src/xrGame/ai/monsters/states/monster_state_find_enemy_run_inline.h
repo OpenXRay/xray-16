@@ -1,8 +1,7 @@
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateMonsterFindEnemyRunAbstract CStateMonsterFindEnemyRun<_Object>
 
@@ -63,3 +62,6 @@ bool CStateMonsterFindEnemyRunAbstract::check_completion()
 
     return false;
 }
+
+#undef TEMPLATE_SPECIALIZATION
+#undef CStateMonsterFindEnemyRunAbstract

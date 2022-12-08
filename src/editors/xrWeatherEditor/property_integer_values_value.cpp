@@ -14,7 +14,7 @@ using System::Object;
 using System::Collections::IList;
 
 property_integer_values_value::property_integer_values_value(
-    integer_getter_type const& getter, integer_setter_type const& setter, LPCSTR const* values, u32 const& value_count)
+    integer_getter_type const& getter, integer_setter_type const& setter, pcstr const* values, u32 const& value_count)
     : inherited(getter, setter), m_collection(gcnew collection_type())
 {
     for (u32 i = 0; i < value_count; ++i)

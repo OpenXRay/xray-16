@@ -13,13 +13,9 @@
 #include "debug_output.h"
 #endif
 ///////////////////////////////////////////////////////////////
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#pragma warning(disable : 4267)
 #include "ode/ode/src/collision_kernel.h"
 #include "ode/ode/src/joint.h"
 #include "ode/ode/src/objects.h"
-#pragma warning(pop)
 
 extern CPHWorld* ph_world;
 ///////////////////////////////////////////////////////////////////
@@ -140,8 +136,8 @@ IC static int CollideIntoGroup(
             material_idx_1 = (u16)surface.mode;
         if (is_tri_2)
             material_idx_2 = (u16)surface.mode;
-        SGameMtl* material_1 = GMLibrary().GetMaterialByIdx(material_idx_1);
-        SGameMtl* material_2 = GMLibrary().GetMaterialByIdx(material_idx_2);
+        SGameMtl* material_1 = GMLib.GetMaterialByIdx(material_idx_1);
+        SGameMtl* material_2 = GMLib.GetMaterialByIdx(material_idx_2);
         ////////////////params can be changed in
         /// callbacks//////////////////////////////////////////////////////////////////////////
         surface.mode = dContactApprox1 | dContactSoftERP | dContactSoftCFM;
@@ -226,9 +222,9 @@ IC static int CollideIntoGroup(
         if (usr_data_2)
         {
             usr_data_2->pushing_b_neg = usr_data_2->pushing_b_neg &&
-                !GMLibrary().GetMaterialByIdx(usr_data_2->b_neg_tri->material)->Flags.test(SGameMtl::flPassable);
+                !GMLib.GetMaterialByIdx(usr_data_2->b_neg_tri->material)->Flags.test(SGameMtl::flPassable);
             usr_data_2->pushing_neg = usr_data_2->pushing_neg &&
-                !GMLibrary().GetMaterialByIdx(usr_data_2->neg_tri->material)->Flags.test(SGameMtl::flPassable);
+                !GMLib.GetMaterialByIdx(usr_data_2->neg_tri->material)->Flags.test(SGameMtl::flPassable);
             pushing_neg = usr_data_2->pushing_b_neg || usr_data_2->pushing_neg;
             if (usr_data_2->ph_object)
             {
@@ -239,9 +235,9 @@ IC static int CollideIntoGroup(
         if (usr_data_1)
         {
             usr_data_1->pushing_b_neg = usr_data_1->pushing_b_neg &&
-                !GMLibrary().GetMaterialByIdx(usr_data_1->b_neg_tri->material)->Flags.test(SGameMtl::flPassable);
+                !GMLib.GetMaterialByIdx(usr_data_1->b_neg_tri->material)->Flags.test(SGameMtl::flPassable);
             usr_data_1->pushing_neg = usr_data_1->pushing_neg &&
-                !GMLibrary().GetMaterialByIdx(usr_data_1->neg_tri->material)->Flags.test(SGameMtl::flPassable);
+                !GMLib.GetMaterialByIdx(usr_data_1->neg_tri->material)->Flags.test(SGameMtl::flPassable);
             pushing_neg = usr_data_1->pushing_b_neg || usr_data_1->pushing_neg;
             if (usr_data_1->ph_object)
             {

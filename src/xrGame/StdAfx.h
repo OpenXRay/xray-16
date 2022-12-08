@@ -6,7 +6,7 @@
 #include "Common/Common.hpp"
 
 #include "xrEngine/stdafx.h" // XXX: This seems bad. PCH's are for internal (building) use.
-#if !defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_WINDOWS)
 #include "DPlay/dplay8.h"
 #endif
 // xrEngine src file count is ~1100.
@@ -47,6 +47,7 @@
 #include "xrCore/_plane2.h" // ~450
 #include "xrAICore/AISpaceBase.hpp" // ~650
 #include "xrAICore/Navigation/game_graph.h" // ~600
+#include "xrPhysics/xrPhysics.h" // ~400
 #include "xrServerEntities/xrServer_Objects.h" // ~500
 #include "xrServerEntities/xrServer_Objects_ALife.h" // ~500
 #include "xrServerEntities/xrServer_Objects_ALife_Items.h" // ~500
@@ -56,7 +57,6 @@
 #include "xrUICore/ui_defs.h" // ~450
 #include "xrGame/entity_alive.h" // ~430
 #include "xrCore/XML/XMLDocument.hpp" // ~400
-#include "xrPhysics/xrPhysics.h" // ~400
 #include "xrEngine/Feel_Sound.h" // ~400
 #include "xrAICore/Navigation/graph_edge.h" // ~380
 #include "xrAICore/Navigation/graph_abstract.h" // ~380
@@ -147,7 +147,7 @@
 #include "xrPhysics/PHUpdateObject.h" // ~95 - includes PHItemList.h
 //#include "xrPhysics/PHItemList.h" // ~110 - template class, so better include in pch
 #include "xrGame/Weapon.h" // ~125, VERY heavy to compile
-#include "xrGame/string_table.h" // ~100, somewhat heavy to compile
+#include "xrEngine/StringTable/StringTable.h" // ~100, somewhat heavy to compile
 #include "xrGame/WeaponMagazined.h" // ~70, VERY heavy to compile
 #include "visual_memory_manager.h" // only ~40, quite heavy to compile
 #include "xrNetServer/NET_Messages.h" // only ~60, depends on dplay macros
@@ -210,7 +210,7 @@
 #include "xrGame/game_cl_mp.h" // ~60, INCREDIBLY heavy to compile
 #include "xrGame/game_events_handler.h" // ~30, INCREDIBLY heavy to compile
 #include "xrGame/steering_behaviour.h" // ~30, measurable compile time
-#include "xr_level_controller.h"
+#include "xrEngine/xr_level_controller.h"
 #include "xrGame/UIGameCustom.h" // ~85, quite heavy to compile
 #include "xrGame/UIGameMP.h"
 #include "xrGame/UIGameSP.h"

@@ -21,7 +21,7 @@ struct CChooseType
 {
 };
 
-using TPHelper = IPropHelper&(__stdcall* )();
+using TPHelper = IPropHelper&(*)();
 
 TPHelper _PHelper = nullptr;
 XRay::Module prop_helper_module;

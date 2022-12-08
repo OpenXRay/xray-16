@@ -67,11 +67,20 @@ CHARACTER_GOODWILL RELATION_REGISTRY::GetAttitude(T from, T to) const
     //влияние рангов персонажей
     CHARACTER_GOODWILL rank_goodwill = GetRankRelation(from->Rank(), to->Rank());
 
-    //отношение группировки from персонально к to
-    CHARACTER_GOODWILL community_goodwill = GetCommunityGoodwill(from->Community(), to->object_id());
-    VERIFY(community_goodwill != NO_GOODWILL);
-    //отношение группировки from к группировки to
-    CHARACTER_GOODWILL community_to_community = GetCommunityRelation(from->Community(), to->Community());
+    CHARACTER_GOODWILL community_goodwill = NEUTRAL_GOODWILL;
+    if (from->Community() != NO_COMMUNITY_INDEX)
+    {
+        //отношение группировки from персонально к to
+        community_goodwill = GetCommunityGoodwill(from->Community(), to->object_id());
+        VERIFY(community_goodwill != NO_GOODWILL);
+    }
+
+    CHARACTER_GOODWILL community_to_community = NEUTRAL_GOODWILL;
+    if (from->Community() != NO_COMMUNITY_INDEX && to->Community() != NO_COMMUNITY_INDEX)
+    {
+        //отношение группировки from к группировки to
+        community_to_community = GetCommunityRelation(from->Community(), to->Community());
+    }
 
     CHARACTER_GOODWILL attitude =
         presonal_goodwill + reputation_goodwill + rank_goodwill + community_goodwill + community_to_community;

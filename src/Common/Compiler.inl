@@ -7,7 +7,11 @@
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
 #define DEBUG_BREAK             do { __asm__ volatile ("int $3"); } while(0)
 #elif defined(XR_ARCHITECTURE_ARM)
+#if defined(__thumb__)
+#define DEBUG_BREAK             do { __asm__ volatile (".inst 0xde01"); } while(0)
+#else
 #define DEBUG_BREAK             do { __asm__ volatile (".inst 0xe7f001f0"); } while(0)
+#endif
 #elif defined(XR_ARCHITECTURE_ARM64)
 #define DEBUG_BREAK             do { __asm__ volatile (".inst 0xd4200000"); } while(0)
 #elif __has_include(<signal.h>)
@@ -54,17 +58,40 @@
 #error Provide your definitions here
 #endif
 
-#ifndef _CPPUNWIND//def NDEBUG
-#define XR_NOEXCEPT throw()
-#define XR_NOEXCEPT_OP(x)
-#else
+#ifdef __cpp_exceptions
 #define XR_NOEXCEPT noexcept
 #define XR_NOEXCEPT_OP(x) noexcept(x)
+#else
+#define XR_NOEXCEPT throw()
+#define XR_NOEXCEPT_OP(x)
+#endif
+
+#if defined(MASTER_GOLD)
+//  release master gold
+#   if defined(__cpp_exceptions) && defined(XR_PLATFORM_WINDOWS)
+#       error Please disable exceptions...
+#   endif
+#   define XRAY_EXCEPTIONS 0
+#else
+//  release, debug or mixed
+#   if !defined(__cpp_exceptions)
+#       error Please enable exceptions...
+#   endif
+#   define XRAY_EXCEPTIONS 1
+#endif
+
+#ifndef _MT
+#error Please enable multi-threaded library...
+#endif
+
+#if !defined(DEBUG) && (defined(_DEBUG) || defined(MIXED))
+#define DEBUG
 #endif
 
 // We use xr_* instead of defining e.g. strupr => _strupr, since the macro definition could
 // come before the std. header file declaring it, and thereby renaming that one too.
 #ifdef _MSC_VER
+#include <malloc.h>
 #define xr_alloca _alloca
 #define xr_strupr _strupr
 #define xr_strlwr _strlwr

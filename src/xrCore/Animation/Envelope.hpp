@@ -134,7 +134,7 @@ public:
         behavior[1] = 1;
     }
     CEnvelope(CEnvelope* source);
-    virtual ~CEnvelope();
+    ~CEnvelope();
 
     float Evaluate(float t);
 

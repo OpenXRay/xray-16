@@ -302,6 +302,6 @@ const dReal def_dumping_rate = 20.1f;
 
 IC bool ignore_material(u16 material_idx)
 {
-    SGameMtl* material = GMLibrary().GetMaterialByIdx(material_idx);
+    SGameMtl* material = GMLib.GetMaterialByIdx(material_idx);
     return !!material->Flags.test(SGameMtl::flActorObstacle);
 }

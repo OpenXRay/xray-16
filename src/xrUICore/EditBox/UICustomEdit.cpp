@@ -6,7 +6,7 @@
 
 // XXX: replace u32 and int with size_t
 
-CUICustomEdit::CUICustomEdit()
+CUICustomEdit::CUICustomEdit() : CUIStatic("CUICustomEdit")
 {
     m_editor_control = xr_new<text_editor::line_edit_control>(EDIT_BUF_SIZE);
     Init(EDIT_BUF_SIZE);
@@ -26,6 +26,7 @@ CUICustomEdit::CUICustomEdit()
 }
 
 CUICustomEdit::~CUICustomEdit() { xr_delete(m_editor_control); }
+
 text_editor::line_edit_control& CUICustomEdit::ec()
 {
     VERIFY(m_editor_control);
@@ -127,29 +128,22 @@ bool CUICustomEdit::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return false;
     }
 
-    if (keyboard_action == WINDOW_KEY_PRESSED)
+    switch (keyboard_action)
     {
+    case WINDOW_KEY_PRESSED:
         ec().on_key_press(dik);
         return true;
-    }
 
-    if (keyboard_action == WINDOW_KEY_RELEASED)
-    {
+    case WINDOW_KEY_HOLD:
+        ec().on_key_hold(dik);
+        return true;
+
+    case WINDOW_KEY_RELEASED:
         ec().on_key_release(dik);
         return true;
     }
+
     return false;
-}
-
-bool CUICustomEdit::OnKeyboardHold(int dik)
-{
-    if (!m_bInputFocus)
-    {
-        return false;
-    }
-
-    ec().on_key_hold(dik);
-    return true;
 }
 
 bool CUICustomEdit::OnTextInput(pcstr text)

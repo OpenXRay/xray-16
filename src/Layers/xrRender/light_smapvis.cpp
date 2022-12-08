@@ -85,7 +85,7 @@ void smapvis::flushoccq()
         return;
     if ((state != state_working) || (!testQ_V))
         return;
-    u64 fragments = RImplementation.occq_get(testQ_id);
+    const auto fragments = RImplementation.occq_get(testQ_id);
     if (0 == fragments)
     {
         // this is invisible shadow-caster, register it

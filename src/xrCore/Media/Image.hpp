@@ -6,14 +6,14 @@ namespace XRay
 {
 namespace Media
 {
-enum class ImageFormat : u32
+enum class ImageDataFormat : u32
 {
     Unknown = 0,
     RGB8 = 1,
     RGBA8 = 2,
 };
 
-class XRCORE_API Image
+class XRCORE_API Image final
 {
 private:
 #pragma pack(push, 1)
@@ -34,30 +34,27 @@ private:
     };
 #pragma pack(pop)
 
-    ImageFormat format;
+    ImageDataFormat format;
     int channelCount;
     u16 width, height;
     void* data;
 
 public:
-    Image()
-    {
-        format = ImageFormat::Unknown;
-        channelCount = 0;
-        width = height = 0;
-        data = nullptr;
-    }
+    Image() = default;
+    ~Image() = default;
 
-    ~Image() {}
-    Image& Create(u16 width, u16 height, void* data, ImageFormat format);
+    Image& Create(u16 width, u16 height, void* data, ImageDataFormat format);
+
     void SaveTGA(IWriter& writer, bool align);
-    void SaveTGA(IWriter& writer, ImageFormat format, bool align);
+    void SaveTGA(IWriter& writer, ImageDataFormat format, bool align);
     void SaveTGA(const char* name, bool align);
-    void SaveTGA(const char* name, ImageFormat format, bool align);
+    void SaveTGA(const char* name, ImageDataFormat format, bool align);
+
+    bool SaveJPEG(IWriter& writer, int quality, bool invert = false);
 
 private:
     template <typename TWriter>
-    void SaveTGA(TWriter& writer, ImageFormat format, bool align);
+    void SaveTGA(TWriter& writer, ImageDataFormat format, bool align);
 };
 }
 }

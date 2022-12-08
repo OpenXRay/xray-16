@@ -32,7 +32,7 @@ property_string_values_value_shared_str_getter::!property_string_values_value_sh
 
 collection_type ^ property_string_values_value_shared_str_getter::values()
 {
-    LPCSTR const* values = (*m_collection_getter)();
+    pcstr const* values = (*m_collection_getter)();
     collection_type ^ collection = gcnew collection_type();
     for (u32 i = 0, n = (*m_collection_size_getter)(); i < n; ++i)
         collection->Enqueue(to_string(values[i]));

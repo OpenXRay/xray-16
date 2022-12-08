@@ -11,7 +11,7 @@
 #include "PhraseDialog.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #else // XRGAME_EXPORTS
-#include "xrUICore/XML/xrUIXmlParser.h"
+#include "xrUIXmlParser.h"
 #endif // XRGAME_EXPORTS
 
 //////////////////////////////////////////////////////////////////////////

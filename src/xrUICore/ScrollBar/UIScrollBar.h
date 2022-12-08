@@ -63,7 +63,7 @@ public:
     virtual bool OnMouseDown(int mouse_btn);
     virtual bool OnMouseDownEx();
     virtual void OnMouseUp(int mouse_btn);
-    virtual bool OnKeyboardHold(int dik);
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
 
     virtual void Draw();
 

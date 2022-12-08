@@ -63,9 +63,20 @@ void CFrustum::_add(Fvector& P1, Fvector& P2, Fvector& P3)
 #define My 4
 #define Mz 5
 
-u32 frustum_aabb_remap[8][6] = {{Mx, My, Mz, mx, my, mz}, {Mx, My, mz, mx, my, Mz}, {Mx, my, Mz, mx, My, mz},
-    {Mx, my, mz, mx, My, Mz}, {mx, My, Mz, Mx, my, mz}, {mx, My, mz, Mx, my, Mz}, {mx, my, Mz, Mx, My, mz},
-    {mx, my, mz, Mx, My, Mz}};
+u32 frustum_aabb_remap[8][6] =
+{
+    {Mx, My, Mz, mx, my, mz}, {Mx, My, mz, mx, my, Mz},
+    {Mx, my, Mz, mx, My, mz}, {Mx, my, mz, mx, My, Mz},
+    {mx, My, Mz, Mx, my, mz}, {mx, My, mz, Mx, my, Mz},
+    {mx, my, Mz, Mx, My, mz}, {mx, my, mz, Mx, My, Mz}
+};
+
+#undef mx
+#undef my
+#undef mz
+#undef Mx
+#undef My
+#undef Mz
 
 //////////////////////////////////////////////////////////////////////
 EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
@@ -88,50 +99,12 @@ EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
     return test_mask ? fcvPartial : fcvFully;
 }
 
-BOOL CFrustum::testSphere_dirty(Fvector& c, float r) const
+bool CFrustum::testSphere_dirty(Fvector& c, float r) const
 {
-    switch (p_count)
-    {
-    case 12:
-        if (planes[11].classify(c) > r)
-            return FALSE;
-    case 11:
-        if (planes[10].classify(c) > r)
-            return FALSE;
-    case 10:
-        if (planes[9].classify(c) > r)
-            return FALSE;
-    case 9:
-        if (planes[8].classify(c) > r)
-            return FALSE;
-    case 8:
-        if (planes[7].classify(c) > r)
-            return FALSE;
-    case 7:
-        if (planes[6].classify(c) > r)
-            return FALSE;
-    case 6:
-        if (planes[5].classify(c) > r)
-            return FALSE;
-    case 5:
-        if (planes[4].classify(c) > r)
-            return FALSE;
-    case 4:
-        if (planes[3].classify(c) > r)
-            return FALSE;
-    case 3:
-        if (planes[2].classify(c) > r)
-            return FALSE;
-    case 2:
-        if (planes[1].classify(c) > r)
-            return FALSE;
-    case 1:
-        if (planes[0].classify(c) > r)
-            return FALSE;
-    case 0: break;
-    default: NODEFAULT;
-    }
-    return TRUE;
+	VERIFY(p_count <= FRUSTUM_MAXPLANES); // '<=' is not a typo, this check is correct
+    if (p_count == 0)
+        return true;
+    return planes[p_count - 1].classify(c) <= r;
 }
 
 EFC_Visible CFrustum::testAABB(const float* mM, u32& test_mask) const
@@ -187,7 +160,7 @@ EFC_Visible CFrustum::testSAABB(Fvector& c, float r, const float* mM, u32& test_
     return test_mask ? fcvPartial : fcvFully;
 }
 
-BOOL CFrustum::testPolyInside_dirty(Fvector* p, size_t count) const
+bool CFrustum::testPolyInside_dirty(Fvector* p, size_t count) const
 {
     Fvector* e = p + count;
     for (int i = 0; i < p_count; i++)
@@ -315,7 +288,7 @@ void CFrustum::CreateOccluder(Fvector* p, size_t count, Fvector& vBase, CFrustum
     VERIFY(count < FRUSTUM_SAFE);
     VERIFY(count >= 3);
 
-    BOOL edge[FRUSTUM_SAFE];
+    bool edge[FRUSTUM_SAFE];
     float cls[FRUSTUM_SAFE];
     ZeroMemory(edge, sizeof(edge));
     for (size_t i = 0; i < clip.p_count; i++)
@@ -425,7 +398,7 @@ sPoly* CFrustum::ClipPoly(sPoly& S, sPoly& D) const
     return dest;
 }
 
-BOOL CFrustum::CreateFromClipPoly(Fvector* p, size_t count, Fvector& vBase, CFrustum& clip)
+bool CFrustum::CreateFromClipPoly(Fvector* p, size_t count, Fvector& vBase, CFrustum& clip)
 {
     VERIFY(count < FRUSTUM_MAXPLANES);
     VERIFY(count >= 3);

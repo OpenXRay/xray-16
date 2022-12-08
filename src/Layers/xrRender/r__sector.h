@@ -22,8 +22,17 @@ class CPortal : public IRender_Portal
                 public pureRender
 #endif
 {
+public:
+    using Poly = svector<Fvector, 6>;
+    struct b_portal
+    {
+        u16 sector_front;
+        u16 sector_back;
+        Poly vertices;
+    };
+
 private:
-    svector<Fvector, 8> poly;
+    Poly poly;
     CSector *pFace, *pBack;
 
 public:
@@ -34,7 +43,7 @@ public:
 
     void Setup(Fvector* V, int vcnt, CSector* face, CSector* back);
 
-    svector<Fvector, 8>& getPoly() { return poly; }
+    Poly& getPoly() { return poly; }
     CSector* Back() { return pBack; }
     CSector* Front() { return pFace; }
     CSector* getSector(CSector* pFrom) { return pFrom == pFace ? pBack : pFace; }

@@ -607,7 +607,7 @@ void CGameGraphBuilder::save_graph(const float& start, const float& amount)
     level.m_section = "";
     level.m_guid = level_graph().header().guid();
 
-    header.m_levels.insert(std::make_pair(level.m_id, level));
+    header.m_levels.emplace(level.m_id, level);
 
     header.save(&writer);
 

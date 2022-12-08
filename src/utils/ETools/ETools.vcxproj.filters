@@ -7,32 +7,12 @@
     <Filter Include="VIPM">
       <UniqueIdentifier>{96a453df-ab9f-4279-8271-900670d15bbb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="OGG encoder">
-      <UniqueIdentifier>{413950ec-b718-4b0f-8572-99f144749bfe}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="ColorPicker.lib">
-      <Filter>Kernel</Filter>
-    </Library>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="CreateDX.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
     <ClCompile Include="ETools.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="ETools_cm.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="Intersect.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
     <ClCompile Include="StdAfx.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="xrXRC.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="object.cpp">
@@ -44,33 +24,12 @@
     <ClCompile Include="PropSlimTools.cpp">
       <Filter>VIPM</Filter>
     </ClCompile>
-    <ClCompile Include="audio.cpp">
-      <Filter>OGG encoder</Filter>
-    </ClCompile>
-    <ClCompile Include="encode.cpp">
-      <Filter>OGG encoder</Filter>
-    </ClCompile>
-    <ClCompile Include="ogg_enc.cpp">
-      <Filter>OGG encoder</Filter>
-    </ClCompile>
-    <ClCompile Include="platform.cpp">
-      <Filter>OGG encoder</Filter>
-    </ClCompile>
-    <ClCompile Include="resample.cpp">
-      <Filter>OGG encoder</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D3DX_Wrapper.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="ETools.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="StdAfx.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="xrXRC.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="ArbitraryList.h">
@@ -97,20 +56,11 @@
     <ClInclude Include="quad.h">
       <Filter>VIPM</Filter>
     </ClInclude>
-    <ClInclude Include="audio.h">
-      <Filter>OGG encoder</Filter>
-    </ClInclude>
-    <ClInclude Include="encode.h">
-      <Filter>OGG encoder</Filter>
-    </ClInclude>
-    <ClInclude Include="platform.h">
-      <Filter>OGG encoder</Filter>
-    </ClInclude>
-    <ClInclude Include="resample.h">
-      <Filter>OGG encoder</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

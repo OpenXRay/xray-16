@@ -9,7 +9,7 @@ class CSoundRender_Emitter : public CSound_emitter
     float starting_delay;
 
 public:
-    enum State
+    enum State : u32
     {
         stStopped = 0,
 
@@ -24,8 +24,6 @@ public:
 
         stSimulating,
         stSimulatingLooped,
-
-        stFORCEDWORD = u32(-1)
     };
 
 public:
@@ -76,13 +74,9 @@ public:
     bool is_2D() override { return b2D; }
     void switch_to_2D() override;
     void switch_to_3D() override;
-    void set_position(const Fvector& pos) override;
 
-    void set_frequency(float scale) override
-    {
-        VERIFY(_valid(scale));
-        p_source.freq = scale;
-    }
+    void set_position(const Fvector& pos) override;
+    void set_frequency(float scale) override;
 
     void set_range(float min, float max) override
     {

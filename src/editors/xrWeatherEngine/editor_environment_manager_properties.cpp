@@ -5,8 +5,8 @@ struct test_property
     int m_property;
 
     test_property() : m_property(20) {}
-    int xr_stdcall getter() { return m_property; }
-    void xr_stdcall setter(int value) { m_property = value; }
+    int getter() { return m_property; }
+    void setter(int value) { m_property = value; }
 };
 
 static test_property s_test_property;
@@ -25,8 +25,8 @@ struct test_property2
     pstr m_property;
 
     test_property2() : m_property(xr_strdup("")) {}
-    pcstr xr_stdcall getter() { return m_property; }
-    void xr_stdcall setter(pcstr value)
+    pcstr getter() { return m_property; }
+    void setter(pcstr value)
     {
         xr_free(m_property);
         m_property = xr_strdup(value);
@@ -44,8 +44,8 @@ struct test_property4
     bool m_property;
 
     test_property4() : m_property(false) {}
-    bool xr_stdcall getter() { return m_property; }
-    void xr_stdcall setter(bool value) { m_property = value; }
+    bool getter() { return m_property; }
+    void setter(bool value) { m_property = value; }
 };
 
 static test_property4 s_test_property4;
@@ -64,8 +64,8 @@ struct test_property6
         m_property.g = 0.f;
         m_property.b = 1.f;
     }
-    editor::color xr_stdcall getter() { return m_property; }
-    void xr_stdcall setter(editor::color value) { m_property = value; }
+    editor::color getter() { return m_property; }
+    void setter(editor::color value) { m_property = value; }
 };
 
 static test_property6 s_test_property6;
@@ -75,8 +75,8 @@ struct test_property7
     float m_property;
 
     test_property7() : m_property(6.f) {}
-    float xr_stdcall getter() { return m_property; }
-    void xr_stdcall setter(float value) { m_property = value; }
+    float getter() { return m_property; }
+    void setter(float value) { m_property = value; }
 };
 
 static test_property7 s_test_property7;
@@ -88,8 +88,8 @@ static test_property7 s_test_property7_values_enum;
 std::pair<float, pcstr> s_properties7_enum[] = {std::make_pair(10.1f, "float_property_0"),
     std::make_pair(20.1f, "float_property_1"), std::make_pair(30.1f, "float_property_2")};
 
-using editor::environment::manager;
-
+namespace editor::environment
+{
 manager::manager()
 {
     // testing properties
@@ -150,7 +150,7 @@ manager::manager()
         getter.bind(&s_test_property2, &test_property2::getter);
         setter.bind(&s_test_property2, &test_property2::setter);
         holder->add_property("string", "category", "description", s_test_property2.m_property, getter, setter, ".dds",
-            "Texture files (*.dds)|*.dds", "R:" DELIMITER "development" DELIMITER "priquel" DELIMITER "resources" DELIMITER "gamedata" DELIMITER "textures" DELIMITER "sky",
+            "Texture files (*.dds)|*.dds", "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
             "Select texture...");
     }
 
@@ -221,3 +221,4 @@ manager::manager()
             setter, s_properties7_enum, 3);
     }
 }
+} // namespace editor::environment

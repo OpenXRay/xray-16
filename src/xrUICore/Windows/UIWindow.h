@@ -14,7 +14,7 @@
 class XRUICORE_API CUIWindow : public CUISimpleWindow
 {
 public:
-    CUIWindow();
+    CUIWindow(pcstr window_name);
     virtual ~CUIWindow();
 
     ////////////////////////////////////
@@ -38,7 +38,6 @@ public:
     CUIWindow* GetChildMouseHandler();
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
-    virtual bool OnKeyboardHold(int dik);
     virtual bool OnTextInput(pcstr text);
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
@@ -47,6 +46,8 @@ public:
     virtual bool OnDbClick();
     virtual bool OnMouseDown(int mouse_btn);
     virtual void OnMouseUp(int mouse_btn);
+
+    virtual bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action);
 
     virtual void OnFocusReceive();
     virtual void OnFocusLost();
@@ -117,12 +118,14 @@ public:
     using WINDOW_LIST = ui_list<CUIWindow*>;
 
     WINDOW_LIST& GetChildWndList() { return m_ChildWndList; }
+
     IC bool IsAutoDelete() { return m_bAutoDelete; }
     IC void SetAutoDelete(bool auto_delete) { m_bAutoDelete = auto_delete; }
+
     // Name of the window
-    const shared_str WindowName() const { return m_windowName; }
-    void SetWindowName(LPCSTR wn) { m_windowName = wn; }
-    LPCSTR WindowName_script() { return m_windowName.c_str(); }
+    shared_str WindowName() const { return m_windowName; }
+    void SetWindowName(pcstr wn) { m_windowName = wn; }
+
     CUIWindow* FindChild(const shared_str name);
 
     IC bool CursorOverWindow() const { return m_bCursorOverWindow; }
@@ -138,6 +141,7 @@ protected:
     };
 
     shared_str m_windowName;
+
     //список дочерних окон
     WINDOW_LIST m_ChildWndList;
 

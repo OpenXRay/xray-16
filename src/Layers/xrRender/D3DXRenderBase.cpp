@@ -6,48 +6,42 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
-D3DXRenderBase::D3DXRenderBase()
-{
-    val_bRecordMP = FALSE;
-    val_feedback = nullptr;
-    val_feedback_breakp = 0;
-    val_recorder = nullptr;
-    marker = 0;
-    r_pmask(true, true);
-    b_loaded = FALSE;
-    Resources = nullptr;
-}
-
 void D3DXRenderBase::setGamma(float fGamma)
 {
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Gamma(fGamma);
-#else
+#elif defined(USE_OGL)
     UNUSED(fGamma);
+#else
+#    error No graphics API selected or in use!
 #endif
 }
 
 void D3DXRenderBase::setBrightness(float fGamma)
 {
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Brightness(fGamma);
-#else
+#elif defined(USE_OGL)
     UNUSED(fGamma);
+#else
+#    error No graphics API selected or in use!
 #endif
 }
 
 void D3DXRenderBase::setContrast(float fGamma)
 {
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Contrast(fGamma);
-#else
+#elif defined(USE_OGL)
     UNUSED(fGamma);
+#else
+#    error No graphics API selected or in use!
 #endif
 }
 
 void D3DXRenderBase::updateGamma()
 {
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Update();
 #endif
 }
@@ -75,7 +69,7 @@ void D3DXRenderBase::Destroy()
 
 void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-#if defined(DEBUG) && !defined(USE_OGL)
+#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif // DEBUG
 
@@ -101,7 +95,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     fHeight_2 = float(dwHeight / 2);
     Resources->reset_end();
 
-#if defined(DEBUG) && !defined(USE_OGL)
+#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
     _SHOW_REF("*ref +CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif
 }
@@ -116,7 +110,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 {
     // Signal everyone - device created
     RCache.OnDeviceCreate();
-#ifndef USE_OGL
+#if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Update();
 #endif
     Resources->OnDeviceCreate(shName);
@@ -196,10 +190,11 @@ bool D3DXRenderBase::GetForceGPU_REF()
 }
 u32 D3DXRenderBase::GetCacheStatPolys()
 {
-    return RCache.stat.polys;
+    return RCache.stat.render.polys;
 }
 void D3DXRenderBase::Begin()
 {
+    HW.BeginScene();
     RCache.OnFrameBegin();
     RCache.set_CullMode(CULL_CW);
     RCache.set_CullMode(CULL_CCW);
@@ -224,6 +219,7 @@ void D3DXRenderBase::End()
         overdrawEnd();
     RCache.OnFrameEnd();
     DoAsyncScreenshot();
+    HW.EndScene();
     HW.Present();
 }
 
@@ -286,14 +282,16 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 #undef PPP
     font.OutSkip();
     const auto& rcstats = RCache.stat;
-    font.OutNext("Vertices:     %d/%d", rcstats.verts, rcstats.calls ? rcstats.verts / rcstats.calls : 0);
-    font.OutNext("Polygons:     %d/%d", rcstats.polys, rcstats.calls ? rcstats.polys / rcstats.calls : 0);
-    font.OutNext("DIP/DP:       %d", rcstats.calls);
-#ifdef DEBUG
-    font.OutNext("SH/T/M/C:     %d/%d/%d/%d", rcstats.states, rcstats.textures, rcstats.matrices, rcstats.constants);
-    font.OutNext("RT/PS/VS:     %d/%d/%d", rcstats.target_rt, rcstats.ps, rcstats.vs);
+    font.OutNext("Vertices:     %d/%d", rcstats.render.verts, rcstats.render.calls ? rcstats.render.verts / rcstats.render.calls : 0);
+    font.OutNext("Polygons:     %d/%d", rcstats.render.polys, rcstats.render.calls ? rcstats.render.polys / rcstats.render.calls : 0);
+    font.OutNext("DIP/DP:       %d", rcstats.render.calls);
+    font.OutNext("Compute:      %d", rcstats.compute.calls);
+    font.OutNext("- Groups:     %d/%d/%d", rcstats.compute.groups_x, rcstats.compute.groups_y, rcstats.compute.groups_z);
+    font.OutNext("S/T/M/C:      %d/%d/%d/%d", rcstats.states, rcstats.textures, rcstats.matrices, rcstats.constants);
+    font.OutNext("RT/ZB/PP:     %d/%d/%d", rcstats.target_rt, rcstats.target_zb, rcstats.pp);
+    font.OutNext("PS/VS/GS:     %d/%d/%d", rcstats.ps, rcstats.vs, rcstats.gs);
+    font.OutNext("HS/DS/CS:     %d/%d/%d", rcstats.hs, rcstats.ds, rcstats.cs);
     font.OutNext("DECL/VB/IB:   %d/%d/%d", rcstats.decl, rcstats.vb, rcstats.ib);
-#endif
     font.OutNext("XForms:       %d", rcstats.xforms);
     font.OutNext("Static:       %3.1f/%d", rcstats.r.s_static.verts / 1024.f, rcstats.r.s_static.dips);
     font.OutNext("Flora:        %3.1f/%d", rcstats.r.s_flora.verts / 1024.f, rcstats.r.s_flora.dips);
@@ -308,10 +306,10 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     font.OutNext("Details:      %3.1f/%d", rcstats.r.s_details.verts / 1024.f, rcstats.r.s_details.dips);
     if (alert)
     {
-        if (rcstats.verts > 500000)
-            alert->Print(font, "Verts     > 500k: %d", rcstats.verts);
-        if (rcstats.calls > 1000)
-            alert->Print(font, "DIP/DP    > 1k:   %d", rcstats.calls);
+        if (rcstats.render.verts > 500000)
+            alert->Print(font, "Verts     > 500k: %d", rcstats.render.verts);
+        if (rcstats.render.calls > 1000)
+            alert->Print(font, "DIP/DP    > 1k:   %d", rcstats.render.calls);
         if (BasicStats.DetailCount > 1000)
             alert->Print(font, "DT_count  > 1000: %u", BasicStats.DetailCount);
     }

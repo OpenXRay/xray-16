@@ -96,7 +96,7 @@ IC float rayTrace(CDB::COLLIDER* DB, Fvector& P, Fvector& D, float R, RayCache& 
     }
 
     // 2. Polygon doesn't pick - real database query
-    DB->ray_query(&Level, P, D, R);
+    DB->ray_query(CDB::OPT_CULL, &Level, P, D, R);
 
     // 3. Analyze polygons and cache nearest if possible
     if (0 == DB->r_count())
@@ -293,7 +293,6 @@ public:
 
     virtual void Execute()
     {
-        DB.ray_options(CDB::OPT_CULL);
         {
             RC rc;
             rc.C[0].set(0, 0, 0);
@@ -535,7 +534,8 @@ void xrCover(bool pure_covers)
         g_cover_nodes.assign(g_nodes.size(), true);
 
     // Start threads, wait, continue --- perform all the work
-    u32 start_time = timeGetTime();
+    CTimer timer;
+    timer.Start();
     CThreadManager Threads(ProxyStatus, ProxyProgress);
     u32 stride = g_nodes.size() / NUM_THREADS;
     u32 last = g_nodes.size() - stride * (NUM_THREADS - 1);
@@ -543,7 +543,7 @@ void xrCover(bool pure_covers)
         Threads.start(
             xr_new<CoverThread>(thID, thID * stride, thID * stride + ((thID == (NUM_THREADS - 1)) ? last : stride)));
     Threads.wait();
-    Logger.clMsg("%d seconds elapsed.", (timeGetTime() - start_time) / 1000);
+    Logger.clMsg("%f seconds elapsed.", timer.GetElapsed_sec());
 
     if (!pure_covers)
     {

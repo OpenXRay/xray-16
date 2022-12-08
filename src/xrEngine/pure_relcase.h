@@ -2,7 +2,6 @@
 #ifndef pure_relcaseH
 #define pure_relcaseH
 #include "xrCore/xrDebug_macros.h"
-#include "xrCore/fastdelegate.h" // XXX: Inluding this VERY heavy file for just xr_stdcall seems suboptimal.
 #include "IGame_Level.h"
 
 class IGameObject;
@@ -14,7 +13,7 @@ private:
 
 public:
     template <typename class_type>
-    pure_relcase(void (xr_stdcall class_type::*function_to_bind)(IGameObject*))
+    pure_relcase(void (class_type::*function_to_bind)(IGameObject*))
     {
         R_ASSERT(g_pGameLevel);
         class_type* self = static_cast<class_type*>(this);

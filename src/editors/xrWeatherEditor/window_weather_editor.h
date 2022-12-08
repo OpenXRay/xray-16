@@ -671,7 +671,7 @@ public:
     void fill_weathers();
 
 private:
-    void fill_frames(LPCSTR current_weather_id);
+    void fill_frames(pcstr current_weather_id);
     void update_frame();
     void save();
     void load();

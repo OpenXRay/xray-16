@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <EnableUnitySupport Condition="'$(GITHUB_ACTIONS)'!=''">true</EnableUnitySupport>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Globals">
+    <!-- At the moment of parsing this file, we don't have many macros defined yet, so we need to check things manually -->
+    <!-- Way to detect SDK in registry was found in Microsoft.Cpp.WindowsSDK.props -->
+    <WindowsTargetPlatformVersion Condition="'$(WindowsTargetPlatformVersion)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v10.0@ProductVersion)</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(WindowsTargetPlatformVersion)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v10.0@ProductVersion)</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(WindowsTargetPlatformVersion)' != ''">$(WindowsTargetPlatformVersion).0</WindowsTargetPlatformVersion> <!-- ... a hack... -->
+    <WindowsTargetPlatformVersion Condition="'$(WindowsTargetPlatformVersion)' == ''">8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(DefaultPlatformToolset)' == 'v143' and '$(v143_Installed)' == 'true'">
+      <PropertyGroup Label="Configuration">
+        <PlatformToolset>v143</PlatformToolset>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(DefaultPlatformToolset)' == 'v142' and '$(v142_Installed)' == 'true'">
+      <PropertyGroup Label="Configuration">
+        <PlatformToolset>v142</PlatformToolset>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(DefaultPlatformToolset)' == 'v141' and '$(v141_Installed)' == 'true'">
+      <PropertyGroup Label="Configuration">
+        <PlatformToolset>v141</PlatformToolset>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup Label="Configuration">
+        <PlatformToolset>v142</PlatformToolset>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <ImportGroup Label="PropertySheets">
+    <!-- You can override settings if you want -->
+    <Import Project="xray_project_configuration.user.props" Condition="Exists('xray_project_configuration.user.props')"/>
+  </ImportGroup>
+</Project>

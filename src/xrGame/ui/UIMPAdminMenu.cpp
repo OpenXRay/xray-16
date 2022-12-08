@@ -18,7 +18,7 @@ CUIMpAdminMenu::CUIMpAdminMenu()
     m_pActiveDialog = NULL;
     m_sActiveSection = "";
 
-    m_pBack = xr_new<CUIStatic>();
+    m_pBack = xr_new<CUIStatic>("Background");
     m_pBack->SetAutoDelete(true);
     AttachChild(m_pBack);
 
@@ -101,7 +101,7 @@ void CUIMpAdminMenu::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 }
 bool CUIMpAdminMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == SDL_SCANCODE_ESCAPE && keyboard_action == WINDOW_KEY_PRESSED)
+    if (IsBinded(kQUIT, dik) && keyboard_action == WINDOW_KEY_PRESSED)
     {
         if (m_pActiveDialog == m_pServerAdm && m_pServerAdm->IsBackBtnShown())
             m_pServerAdm->OnBackBtn();

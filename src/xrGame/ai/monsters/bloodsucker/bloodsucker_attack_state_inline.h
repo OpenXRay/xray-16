@@ -39,17 +39,12 @@ void CBloodsuckerStateAttackAbstract::critical_finalize()
     object->start_invisible_predator();
 }
 
-namespace detail
-{
-namespace bloodsucker
+namespace detail::bloodsucker
 {
 const u32 encircle_time = 3000;
 const float loose_health_diff = 0.15f;
 const u32 change_behaviour_time = 1000;
-
-} // namespace bloodsucker
-
-} // namespace detail
+} // namespace detailbloodsucker
 
 TEMPLATE_SPECIALIZATION
 void CBloodsuckerStateAttackAbstract::execute()
@@ -152,7 +147,7 @@ TEMPLATE_SPECIALIZATION
 bool CBloodsuckerStateAttackAbstract::check_hiding()
 {
     const bool health_step_lost =
-        object->conditions().GetHealth() < m_last_health - detail::bloodsucker::loose_health_diff;
+        object->conditions().GetHealth() < m_last_health - ::detail::bloodsucker::loose_health_diff;
 
     if (health_step_lost)
     {
@@ -219,7 +214,7 @@ void CStateMonsterBackstubEnemy<_Object>::initialize()
     object->path().prepare_builder();
     m_last_health = object->conditions().GetHealth();
     m_encircle = data.start_with_encircle;
-    m_encircle_end_tick = Device.dwTimeGlobal + detail::bloodsucker::encircle_time;
+    m_encircle_end_tick = Device.dwTimeGlobal + ::detail::bloodsucker::encircle_time;
     m_next_change_behaviour_tick = 0;
 }
 
@@ -227,15 +222,15 @@ template <class _Object>
 void CStateMonsterBackstubEnemy<_Object>::execute()
 {
     // on hit, change behaviour
-    if (object->conditions().GetHealth() < m_last_health - detail::bloodsucker::loose_health_diff &&
+    if (object->conditions().GetHealth() < m_last_health - ::detail::bloodsucker::loose_health_diff &&
         Device.dwTimeGlobal > m_next_change_behaviour_tick)
     {
-        m_next_change_behaviour_tick = Device.dwTimeGlobal + detail::bloodsucker::change_behaviour_time;
+        m_next_change_behaviour_tick = Device.dwTimeGlobal + ::detail::bloodsucker::change_behaviour_time;
         m_last_health = object->conditions().GetHealth();
         m_encircle = !m_encircle;
         if (m_encircle)
         {
-            m_encircle_end_tick = Device.dwTimeGlobal + detail::bloodsucker::encircle_time;
+            m_encircle_end_tick = Device.dwTimeGlobal + ::detail::bloodsucker::encircle_time;
         }
     }
 

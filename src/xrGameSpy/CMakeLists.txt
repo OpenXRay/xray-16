@@ -1,35 +1,88 @@
 project(xrGameSpy)
 
-list(APPEND DIRS
-    "."
+set(KERNEL_SRC
+    "stdafx.cpp"
+    "stdafx.h"
+    "xrGameSpy.cpp"
+    "xrGameSpy.h"
+    "xrGameSpy_MainDefs.h"
+)
+
+set(WRAPPER_SRC
+    "GameSpy_ATLAS.cpp"
+    "GameSpy_ATLAS.h"
+    "GameSpy_Available.cpp"
+    "GameSpy_Available.h"
+    "GameSpy_Browser.cpp"
+    "GameSpy_Browser.h"
+    "GameSpy_BrowsersWrapper.cpp"
+    "GameSpy_BrowsersWrapper.h"
+    "GameSpy_Full.cpp"
+    "GameSpy_Full.h"
+    "GameSpy_GCD_Client.cpp"
+    "GameSpy_GCD_Client.h"
+    "GameSpy_GCD_Server.cpp"
+    "GameSpy_GCD_Server.h"
+    "GameSpy_GP.cpp"
+    "GameSpy_GP.h"
+    "GameSpy_HTTP.cpp"
+    "GameSpy_HTTP.h"
+    "GameSpy_Keys.h"
+    "GameSpy_Patching.cpp"
+    "GameSpy_Patching.h"
+    "GameSpy_QR2.cpp"
+    "GameSpy_QR2.h"
+    "GameSpy_SAKE.cpp"
+    "GameSpy_SAKE.h"
+)
+
+source_group("Kernel" FILES ${KERNEL_SRC})
+source_group("Wrapper" FILES ${WRAPPER_SRC})
+
+if (STATIC_BUILD)
+    add_library(${PROJECT_NAME} STATIC ${KERNEL_SRC} ${WRAPPER_SRC})
+else()
+    add_library(${PROJECT_NAME} SHARED ${KERNEL_SRC} ${WRAPPER_SRC})
+endif()
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/xrServerEntities
+    ${CMAKE_SOURCE_DIR}/Externals/GameSpy/src
+    ${CMAKE_SOURCE_DIR}/Externals/luabind
+    ${CMAKE_SOURCE_DIR}/Externals/ode/include
+    ${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc
+    ${SDL2_INCLUDE_DIRS}
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    xrCore
+    xrMiscMath
+    GameSpy-oxr
+    ${SDL2_LIBRARIES}
+)
+
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    -DXRGAMESPY_EXPORTS
+    -DXRAY_DISABLE_GAMESPY_WARNINGS
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PREFIX ""
+    POSITION_INDEPENDENT_CODE ON
+)
+
+target_precompile_headers(${PROJECT_NAME}
+    PRIVATE
+    "stdafx.h"
+)
+
+if (NOT STATIC_BUILD)
+    install(TARGETS ${PROJECT_NAME} LIBRARY
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
     )
-
-add_dir("${DIRS}")
-
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../xrServerEntities
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/cximage
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/GameSpy/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/luabind
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/ode/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../Externals/OpenAutomate/inc
-    ${SDL_INCLUDE_DIRS}
-    )
-
-#list(REMOVE_ITEM ${PROJECT_NAME}__SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/./atlas_stalkercs_v1.c")
-
-#list(REMOVE_ITEM ${PROJECT_NAME}__INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/./atlas_stalkercs_v1.h")
-
-add_definitions(-DXRGAMESPY_EXPORTS -DXRAY_DISABLE_GAMESPY_WARNINGS)
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}__SOURCES} ${${PROJECT_NAME}__INCLUDES})
-
-set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
-cotire(${PROJECT_NAME})
-
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PROJECT_NAME} xrCore xrMiscMath GameSpy ${SDL_LIBRARIES})
-
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PERMISSIONS OWNER_READ OWNER_WRITE 
-    GROUP_READ 
-    WORLD_READ )
+endif()

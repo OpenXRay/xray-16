@@ -19,9 +19,7 @@
 #include "xrEngine/xr_efflensflare.h"
 #include "xrEngine/thunderbolt.h"
 
-using editor::environment::weathers::time;
-using editor::environment::weathers::weather;
-
+/*
 static inline XRay::Editor::color create_color(float const& r, float const& g, float const& b)
 {
     XRay::Editor::color result;
@@ -30,12 +28,13 @@ static inline XRay::Editor::color create_color(float const& r, float const& g, f
     result.b = b;
     return (result);
 }
+*/
 
-time::time(editor::environment::manager* manager, weather const* weather, shared_str const& id)
-    : CEnvDescriptorMixer(id), m_manager(*manager), m_weather(weather), m_property_holder(0), m_ambient(""), m_sun(""),
-      m_thunderbolt_collection("")
+namespace editor::environment::weathers
 {
-}
+time::time(editor::environment::manager* manager, weather const* weather, shared_str const& id)
+    : CEnvDescriptorMixer(id), m_ambient(""), m_sun(""), m_thunderbolt_collection(""),
+      m_manager(*manager), m_weather(weather), m_property_holder(nullptr) {}
 
 time::~time()
 {
@@ -433,4 +432,4 @@ void time::lerp(CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, floa
 
     inherited::lerp(parent, A, B, f, M, m_power);
 }
-
+} // namespace editor::environment::weathers

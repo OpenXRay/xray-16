@@ -1,21 +1,27 @@
-#ifndef dxPixEventWrapper_included
-#define dxPixEventWrapper_included
 #pragma once
 
-#if !defined(MASTER_GOLD) && !defined(USE_OGL)
-
-#define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(L#Name)
+#if defined(MASTER_GOLD)
+#   define PIX_EVENT(Name) do { } while (false)
+#else
+#if defined(USE_DX9) || defined(USE_DX11)
+#   define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(L#Name)
 
 class dxPixEventWrapper
 {
 public:
-    dxPixEventWrapper(LPCWSTR wszName) { D3DPERF_BeginEvent(D3DCOLOR_RGBA(127, 0, 0, 255), wszName); }
-    ~dxPixEventWrapper() { D3DPERF_EndEvent(); }
+    dxPixEventWrapper(const wchar_t* wszName) { HW.BeginPixEvent(wszName); }
+    ~dxPixEventWrapper() { HW.EndPixEvent(); }
 };
-#else //    DEBUG
+#elif defined(USE_OGL)
+#   define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(#Name)
 
-#define PIX_EVENT(Name) { }
-
-#endif //   DEBUG
-
-#endif //   dxPixEventWrapper_included
+class dxPixEventWrapper
+{
+public:
+    dxPixEventWrapper(const char* name) { HW.BeginPixEvent(name); }
+    ~dxPixEventWrapper() { HW.EndPixEvent(); }
+};
+#else
+#   error No graphics API selected or enabled!
+#endif // USE_OGL
+#endif // MASTER_GOLD

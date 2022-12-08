@@ -59,10 +59,6 @@ class IWriter;
 #include "xrSound/Sound.h"
 #include "Include/xrRender/WallMarkArray.h"
 #include "Include/xrRender/RenderFactory.h"
-typedef xr_vector<ref_sound> SoundVec;
-typedef SoundVec::iterator SoundIt;
-typedef xr_vector<shared_str> PSVec;
-typedef PSVec::iterator PSIt;
 #endif
 
 // XXX: Place at least CGameMtlLibrary in a static lib or something? It currently gets instantiated a measurable amount of times.
@@ -225,10 +221,10 @@ public:
     PropValue* propCollideMarks;
 
     SGameMtlPair(const SGameMtlPair& src);
-    void __stdcall OnFlagChange(PropValue* sender);
-    void __stdcall OnParentClick(ButtonValue* sender, bool& bModif, bool& bSafe);
-    void __stdcall OnCommandClick(ButtonValue* sender, bool& bModif, bool& bSafe);
-    void __stdcall FillChooseMtl(ChooseItemVec& items, void* param);
+    void OnFlagChange(PropValue* sender);
+    void OnParentClick(ButtonValue* sender, bool& bModif, bool& bSafe);
+    void OnCommandClick(ButtonValue* sender, bool& bModif, bool& bSafe);
+    void FillChooseMtl(ChooseItemVec& items, void* param);
     void FillProp(PropItemVec& values);
     void TransferFromParent(SGameMtlPair* parent);
     bool SetParent(int parentId);

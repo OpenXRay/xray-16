@@ -68,8 +68,8 @@ void CUIActorMenu::RepairEffect_CurItem()
     LPCSTR item_name = item->m_section_id.c_str();
 
     luabind::functor<void> funct;
-    R_ASSERT(GEnv.ScriptEngine->functor("inventory_upgrades.effect_repair_item", funct));
-    funct(item_name, item->GetCondition());
+    if (GEnv.ScriptEngine->functor("inventory_upgrades.effect_repair_item", funct))
+        funct(item_name, item->GetCondition());
 
     item->SetCondition(1.0f);
     SeparateUpgradeItem();
