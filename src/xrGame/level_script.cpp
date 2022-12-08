@@ -897,7 +897,7 @@ IC static void CLevel_Export(lua_State* luaState)
         def("active_tutorial_name", +[](){ return g_tutorial->GetTutorName(); }),
         def("translate_string", &translate_string),
         def("reload_language", +[]() { StringTable().ReloadLanguage(); }),
-        def("log_stack_trace", &xrDebug::LogStackTrace)
+        def("log_stack_trace", &xrDebug::LogStackTrace),
         def("jump_to_level", +[](pcstr level_name)
         {
             if (!ai().game_graph().header().level_exist(level_name))
