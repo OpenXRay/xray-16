@@ -911,7 +911,7 @@ IC static void CLevel_Export(lua_State* luaState)
         def("jump_to_level", &jump_to_level),
         def("jump_to_level", +[](const Fvector& m_position, u32 m_level_vertex_id, GameGraph::_GRAPH_ID m_game_vertex_id)
         {
-            jump_to_level(m_position, m_level_vertex_id, m_game_vertex_id, {})
+            jump_to_level(m_position, m_level_vertex_id, m_game_vertex_id, {});
         })
     ];
 };
