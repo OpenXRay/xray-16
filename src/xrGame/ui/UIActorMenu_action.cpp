@@ -100,6 +100,8 @@ bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, C
 
         return funct1(GO1 ? GO1->lua_game_object() : 0, GO2 ? GO2->lua_game_object() : 0, (int)t_old, (int)t_new);
     }
+
+    return false;
 }
 
 bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
