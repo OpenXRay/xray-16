@@ -21,8 +21,12 @@ void light::gi_generate()
         switch (flags.type)
         {
         case IRender_Light::POINT: dir.random_dir(random); break;
-        case IRender_Light::SPOT: dir.random_dir(direction, cone, random); break;
-        case IRender_Light::OMNIPART: dir.random_dir(direction, cone, random); break;
+        case IRender_Light::DIRECT:
+        case IRender_Light::SPOT:
+        case IRender_Light::OMNIPART:
+            dir.random_dir(direction, cone, random);
+            break;
+        default: break;
         }
         dir.normalize();
         xrc.ray_query(CDB::OPT_CULL | CDB::OPT_ONLYNEAREST, model, position, dir, range);
@@ -57,10 +61,10 @@ void light::gi_generate()
     {
         float target_E = ps_r2_GI_refl;
         float total_E = 0;
-        for (u32 it = 0; it < indirect.size(); it++)
-            total_E += indirect[it].E;
+        for (const light_indirect& LI : indirect)
+            total_E += LI.E;
         float scale_E = target_E / total_E;
-        for (u32 it = 0; it < indirect.size(); it++)
-            indirect[it].E *= scale_E;
+        for (light_indirect& LI : indirect)
+            LI.E *= scale_E;
     }
 }
