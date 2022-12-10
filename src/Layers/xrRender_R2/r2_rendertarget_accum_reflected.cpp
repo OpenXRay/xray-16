@@ -26,32 +26,7 @@ void CRenderTarget::accum_reflected(light* L)
 
     // 2D texgen (texture adjustment matrix)
     Fmatrix m_Texgen;
-    {
-        float _w = float(Device.dwWidth);
-        float _h = float(Device.dwHeight);
-        float o_w = (.5f / _w);
-        float o_h = (.5f / _h);
-#if defined(USE_DX9) || defined(USE_DX11)
-        Fmatrix m_TexelAdjust =
-        {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
-        };
-#elif defined(USE_OGL)
-        Fmatrix m_TexelAdjust =
-        {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
-        };
-#else
-#   error No graphics API selected or enabled!
-#endif
-        m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
-    }
+    u_compute_texgen_screen(m_Texgen);
 
     // Common constants
     Fvector L_dir, L_clr, L_pos;
@@ -67,7 +42,9 @@ void CRenderTarget::accum_reflected(light* L)
         RCache.set_Shader(s_accum_reflected);
 
         // Constants
-        RCache.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, 1 / (L->range * L->range));
+        float att_R = L->range * .95f;
+        float att_factor = 1.f / (att_R * att_R);
+        RCache.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, att_factor);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("direction", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("m_texgen", m_Texgen);
