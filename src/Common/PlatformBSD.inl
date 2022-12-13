@@ -23,6 +23,9 @@
 #include <dirent.h>
 #include <utime.h>
 #include <ctime>
+#include <fenv.h>
+
+#pragma STDC FENV_ACCESS ON
 
 #define _LINUX // for GameSpy
 
