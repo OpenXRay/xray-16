@@ -10,7 +10,7 @@ class CFileStreamReader : public CStreamReader
 private:
 #if defined(XR_PLATFORM_WINDOWS)
     HANDLE m_file_handle;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
     int m_file_handle;
 #else
 #   error Select or add implementation for your platform

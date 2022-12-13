@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "string_concatenations.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE) // XXX: remove or cleanup
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) // XXX: remove or cleanup
 int _cdecl _resetstkoflw(void)
 {
     return 0;

@@ -75,7 +75,7 @@ void server_site::update_transfer()
         IClient* tmp_client = Level().Server->GetClientByID(ti->first.first); // dst
         if (!tmp_client)
         {
-            Msg("! ERROR: SV: client [%u] not found for transfering file", ti->first);
+            Msg("! ERROR: SV: client [%u] not found for transfering file", ti->first.first);
             to_stop_transfers.push_back(ti->first);
             ti->second->signal_callback(sending_rejected_by_peer);
             continue;

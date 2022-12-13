@@ -14,7 +14,7 @@
 #endif
 #endif
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) // XXX: remove
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD) // XXX: remove
 #include <math.h>
 #endif
 

@@ -4,7 +4,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Client.h"
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
 #include "xrNetServer/empty/NET_Client.h"
 #else
 #   error Select or add implementation for your platform

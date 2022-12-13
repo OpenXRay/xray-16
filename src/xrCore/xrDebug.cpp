@@ -39,7 +39,7 @@ static BOOL bException = FALSE;
 #   if __has_include(<execinfo.h>)
 #       include <execinfo.h>
 #   endif
-#elif defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
 #   include <sys/types.h>
 #   include <sys/ptrace.h>
 #   define PTRACE_TRACEME PT_TRACE_ME
@@ -182,7 +182,7 @@ Lock xrDebug::failLock;
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
 #else
 #   error Select or add implementation for your platform
