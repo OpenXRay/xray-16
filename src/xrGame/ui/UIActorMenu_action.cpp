@@ -116,11 +116,15 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
     EDDListType t_new = GetListType(new_owner);
     EDDListType t_old = GetListType(old_owner);
 
+
     if (!AllowItemDrops(t_old, t_new))
     {
         Msg("incorrect action [%d]->[%d]", t_old, t_new);
         return true;
     }
+
+    DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner);
+
     switch (t_new)
     {
     case iTrashSlot:
@@ -143,16 +147,9 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
         u16 slot_to_place;
         if (CanSetItemToList(CurrentIItem(), new_owner, slot_to_place))
             ToSlot(itm, true, slot_to_place);
-
-        DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner);
     }
     break;
-    case iActorBag:
-    {
-        DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner);
-
-        ToBag(itm, true);
-    }
+    case iActorBag: { ToBag(itm, true); }
     break;
     case iActorBelt: { ToBelt(itm, true);
     }
