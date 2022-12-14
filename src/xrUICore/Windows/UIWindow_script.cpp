@@ -8,57 +8,44 @@
 #include "Cursor/UICursor.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CFontManager& mngr() { return UI().Font(); }
-// hud font
-CGameFont* GetFontSmall() { return mngr().pFontStat; }
-CGameFont* GetFontMedium() { return mngr().pFontMedium; }
-CGameFont* GetFontDI() { return mngr().pFontDI; }
-//шрифты для интерфейса
-CGameFont* GetFontGraffiti19Russian() { return mngr().pFontGraffiti19Russian; }
-CGameFont* GetFontGraffiti22Russian() { return mngr().pFontGraffiti22Russian; }
-CGameFont* GetFontLetterica16Russian() { return mngr().pFontLetterica16Russian; }
-CGameFont* GetFontLetterica18Russian() { return mngr().pFontLetterica18Russian; }
-CGameFont* GetFontGraffiti32Russian() { return mngr().pFontGraffiti32Russian; }
-CGameFont* GetFontGraffiti50Russian() { return mngr().pFontGraffiti50Russian; }
-CGameFont* GetFontLetterica25() { return mngr().pFontLetterica25; }
-int GetARGB(u16 a, u16 r, u16 g, u16 b) { return color_argb(a, r, g, b); }
-const Fvector2 get_wnd_pos(CUIWindow* w) { return w->GetWndPos(); }
-
-Fvector2 GetCursorPosition_script() { return GetUICursor().GetCursorPosition(); }
-
-void SetCursorPosition_script(Fvector2& pos) { GetUICursor().SetUICursorPosition(pos); }
-
-using namespace luabind;
-using namespace luabind::policy;
-Frect	get_texture_rect(LPCSTR icon_name)
-{
-    return CUITextureMaster::GetTextureRect(icon_name);
-}
 // clang-format off
-SCRIPT_EXPORT(CUIWindow, (),
+SCRIPT_EXPORT(UICore, (),
 {
-    // We don't change game assets.
-    // This class allowes original game scripts to not specify the window name.
-    class CUIWindowScript : public CUIWindow
-    {
-    public:
-        CUIWindowScript() : CUIWindow("CUIWindowScript") {}
-    };
+    using namespace luabind;
+    using namespace luabind::policy;
 
     module(luaState)
     [
-        def("GetARGB", &GetARGB), def("GetFontSmall", &GetFontSmall), def("GetFontMedium", &GetFontMedium),
-        def("GetFontDI", &GetFontDI), def("GetFontGraffiti19Russian", &GetFontGraffiti19Russian),
-        def("GetFontGraffiti22Russian", &GetFontGraffiti22Russian),
-        def("GetFontLetterica16Russian", &GetFontLetterica16Russian),
-        def("GetFontLetterica18Russian", &GetFontLetterica18Russian),
-        def("GetFontGraffiti32Russian", &GetFontGraffiti32Russian),
-        def("GetFontGraffiti50Russian", &GetFontGraffiti50Russian),
-        def("GetFontLetterica25", &GetFontLetterica25),
-        def("GetCursorPosition", &GetCursorPosition_script),
-        def("SetCursorPosition", &SetCursorPosition_script),
-        def("FitInRect", &fit_in_rect),
+        def("GetARGB", +[](u16 a, u16 r, u16 g, u16 b) { return color_argb(a, r, g, b); }),
 
+        // hud font
+        def("GetFontSmall",  +[] { return UI().Font().pFontStat; }),
+        def("GetFontMedium", +[] { return UI().Font().pFontMedium; }),
+        def("GetFontDI",     +[] { return UI().Font().pFontDI; }),
+
+        //шрифты для интерфейса
+        def("GetFontGraffiti19Russian",  +[] { return UI().Font().pFontGraffiti19Russian; }),
+        def("GetFontGraffiti22Russian",  +[] { return UI().Font().pFontGraffiti22Russian; }),
+        def("GetFontLetterica16Russian", +[] { return UI().Font().pFontLetterica16Russian; }),
+        def("GetFontLetterica18Russian", +[] { return UI().Font().pFontLetterica18Russian; }),
+        def("GetFontGraffiti32Russian",  +[] { return UI().Font().pFontGraffiti32Russian; }),
+        def("GetFontGraffiti50Russian",  +[] { return UI().Font().pFontGraffiti50Russian; }),
+        def("GetFontLetterica25",        +[] { return UI().Font().pFontLetterica25; }),
+
+        def("GetCursorPosition", +[] { return GetUICursor().GetCursorPosition(); }),
+        def("SetCursorPosition", +[](Fvector2& pos) { GetUICursor().SetUICursorPosition(pos); }),
+
+        def("FitInRect", &fit_in_rect)
+    ];
+});
+
+SCRIPT_EXPORT(CUITextureMaster, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
+    module(luaState)
+    [
         class_<TEX_INFO>("TEX_INFO")
             .def("get_file_name", &TEX_INFO::get_file_name)
             .def("get_rect", &TEX_INFO::get_rect),
@@ -91,8 +78,25 @@ SCRIPT_EXPORT(CUIWindow, (),
         def("GetTextureInfo", +[](pcstr name, pcstr defaultName, TEX_INFO& outValue)
         {
             return CUITextureMaster::FindItem(name, defaultName, outValue);
-        }),
+        })
+    ];
+});
 
+SCRIPT_EXPORT(CUIWindow, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
+    // We don't change game assets.
+    // This class allowes original game scripts to not specify the window name.
+    class CUIWindowScript : public CUIWindow
+    {
+    public:
+        CUIWindowScript() : CUIWindow("CUIWindowScript") {}
+    };
+
+    module(luaState)
+    [
         class_<CUIWindow>("CUIWindowBase")
             .def(constructor<pcstr>())
             .def("AttachChild", &CUIWindow::AttachChild, adopt<2>())
@@ -120,7 +124,7 @@ SCRIPT_EXPORT(CUIWindow, (),
             
             .def("SetWndSize", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndSize_script)
 
-            .def("GetWndPos", &get_wnd_pos)
+            .def("GetWndPos", +[](CUIWindow* w) -> Fvector2 { return w->GetWndPos(); })
             .def("SetWndPos", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndPos_script)
 
             .def("SetWndPos", +[](CUIWindow* self, float x, float y)
@@ -159,6 +163,9 @@ SCRIPT_EXPORT(CUIWindow, (),
 
 SCRIPT_EXPORT(CUIFrameWindow, (CUIWindow),
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     module(luaState)
     [
         class_<CUIFrameWindow, CUIWindow>("CUIFrameWindow")
@@ -177,6 +184,9 @@ SCRIPT_EXPORT(CUIFrameWindow, (CUIWindow),
 
 SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow),
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     // We don't change game assets.
     // This class allowes original game scripts to not specify the window name.
     class CUIFrameLineWndScript : public CUIFrameLineWnd
@@ -203,7 +213,11 @@ SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow),
     ];
 });
 
-SCRIPT_EXPORT(UIHint, (CUIWindow), {
+SCRIPT_EXPORT(UIHint, (CUIWindow),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
     module(luaState)
     [
         class_<UIHint, CUIWindow>("UIHint")
@@ -217,6 +231,9 @@ SCRIPT_EXPORT(UIHint, (CUIWindow), {
 
 SCRIPT_EXPORT(CUIScrollView, (CUIWindow),
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     module(luaState)
     [
         class_<CUIScrollView, CUIWindow>("CUIScrollView")
@@ -236,6 +253,9 @@ SCRIPT_EXPORT(CUIScrollView, (CUIWindow),
 
 SCRIPT_EXPORT(EnumUIMessages, (),
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     class EnumUIMessages
     {
     };

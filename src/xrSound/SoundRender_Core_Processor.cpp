@@ -105,8 +105,8 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
             s_targets_defer[it]->fill_parameters();
     }
 
-    // update EAX
-    if (psSoundFlags.test(ss_EAX) && m_effects)
+    // Update effects
+    if (psSoundFlags.test(ss_EFX) && m_effects)
     {
         if (bListenerMoved)
         {

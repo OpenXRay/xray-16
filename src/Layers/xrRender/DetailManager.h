@@ -75,12 +75,10 @@ public:
         SlotItemVec r_items[3]; // список кустиков for render
     };
 
-    enum SlotType
+    enum SlotType : u32
     {
         stReady = 0, // Ready to use
         stPending, // Pending for decompression
-
-        stFORCEDWORD = 0xffffffff
     };
 
     struct Slot

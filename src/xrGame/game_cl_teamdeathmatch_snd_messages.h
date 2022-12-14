@@ -1,5 +1,6 @@
 #pragma once
-enum
+
+enum : u32
 {
     ID_TEAM1_WIN = 200,
     ID_TEAM2_WIN,
@@ -18,6 +19,4 @@ enum
     ID_TEAM2_RANK_2,
     ID_TEAM2_RANK_3,
     ID_TEAM2_RANK_4,
-
-    ID_TDM_forcedword = u32(-1)
 };
