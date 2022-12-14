@@ -9,8 +9,6 @@ class CInventoryOwner;
 class CInventorySlot final
 {
 public:
-    CInventorySlot();
-
     bool CanBeActivated() const { return m_bAct; }
 
     PIItem m_pIItem     = nullptr;
