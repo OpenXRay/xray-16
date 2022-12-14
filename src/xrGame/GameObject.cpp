@@ -110,7 +110,7 @@ void CGameObject::MakeMeCrow()
     u32 const object_frame_id = dwFrame_AsCrow;
 #ifdef XR_PLATFORM_WINDOWS // XXX: Just use std::atomic
     if ((u32)_InterlockedCompareExchange((long*)&dwFrame_AsCrow, device_frame_id, object_frame_id) == device_frame_id)
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
     if (__sync_val_compare_and_swap(&dwFrame_AsCrow, object_frame_id, device_frame_id) == device_frame_id)
 #else
 #   error Select or add implementation for your platform

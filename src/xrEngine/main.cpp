@@ -17,7 +17,7 @@
 #include "xrCDB/ISpatial.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Text_Console.h"
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif

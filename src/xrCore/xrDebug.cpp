@@ -182,7 +182,7 @@ Lock xrDebug::failLock;
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
 #else
 #   error Select or add implementation for your platform
