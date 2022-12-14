@@ -6,17 +6,16 @@ class CInventoryItem;
 class CHudItem;
 class CInventoryOwner;
 
-class CInventorySlot
+class CInventorySlot final
 {
 public:
     CInventorySlot();
-    virtual ~CInventorySlot();
 
-    bool CanBeActivated() const;
+    bool CanBeActivated() const { return m_bAct; }
 
-    PIItem m_pIItem;
-    bool m_bPersistent;
-    bool m_bAct;
+    PIItem m_pIItem     = nullptr;
+    bool m_bPersistent  = false;
+    bool m_bAct         = true;
 };
 
 class priority_group
