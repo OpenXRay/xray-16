@@ -46,10 +46,6 @@ void CRenderTarget::build_textures()
     }*/
     // Build material(s)
     {
-        #ifdef XR_PLATFORM_BSD
-        fedisableexcept(FE_UNDERFLOW | FE_INEXACT); // I really want to see a better solution
-        #endif
-
         // Surface
         glGenTextures(1, &t_material_surf);
         CHK_GL(glBindTexture(GL_TEXTURE_3D, t_material_surf));

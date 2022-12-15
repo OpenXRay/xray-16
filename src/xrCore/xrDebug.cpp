@@ -39,7 +39,7 @@ static BOOL bException = FALSE;
 #   if __has_include(<execinfo.h>)
 #       include <execinfo.h>
 #   endif
-#elif defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
+#elif defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #   include <sys/types.h>
 #   include <sys/ptrace.h>
 #   define PTRACE_TRACEME PT_TRACE_ME
