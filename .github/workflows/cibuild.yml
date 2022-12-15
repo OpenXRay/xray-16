@@ -231,7 +231,7 @@ jobs:
       fail-fast: false
       matrix:
         Configuration: [Debug, Release]
-        Platform: [x86_64, x86]
+        Platform: [x86_64, x86, aarch64, armv7]
 
     steps:
     - uses: actions/checkout@v3
@@ -249,8 +249,8 @@ jobs:
         branch: 'latest-stable'
         packages: build-base binutils-gold cmake sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
 
-    - name: Run CMake x64
-      if: ${{ matrix.Platform == 'x86_64' }}
+    - name: Run CMake x64/ARM/ARM64
+      if: ${{ matrix.Platform == 'x86_64' || matrix.Platform == 'aarch64' || matrix.Platform == 'armv7' }}
       shell: alpine.sh {0}
       run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
 
