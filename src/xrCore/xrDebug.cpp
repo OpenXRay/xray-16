@@ -541,6 +541,10 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
+            // calling DEBUG_BREAK with no debugger will trigger BugTrap
+            // we must hide the window
+            if (windowHandler && !DebuggerIsPresent())
+                windowHandler->OnFatalError();
             DEBUG_BREAK;
         } // switch (result)
     }
@@ -574,6 +578,9 @@ void xrDebug::DoExit(const std::string& message)
     }
     else
         ShowMessage(Core.ApplicationName, message.c_str());
+
+    if (windowHandler)
+        windowHandler->OnFatalError();
 
 #if defined(XR_PLATFORM_WINDOWS)
     TerminateProcess(GetCurrentProcess(), 1);
@@ -821,7 +828,11 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 
     // Typically, PrevFilter is BugTrap filter
     if (PrevFilter)
+    {
+        if (windowHandler)
+            windowHandler->OnFatalError();
         PrevFilter(exPtrs);
+    }
 
     if (windowHandler)
         windowHandler->OnErrorDialog(false);
