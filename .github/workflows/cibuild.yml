@@ -232,6 +232,10 @@ jobs:
       matrix:
         Configuration: [Debug, Release]
         Platform: [x86_64, x86, aarch64, armv7]
+        CC: [clang]
+        include:
+          - CC: clang
+            CXX: clang++
 
     steps:
     - uses: actions/checkout@v3
@@ -247,20 +251,29 @@ jobs:
       with:
         arch: ${{ matrix.Platform }}
         branch: 'latest-stable'
-        packages: build-base binutils-gold cmake sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
+        packages: build-base cmake clang mold sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
 
     - name: Run CMake x64/ARM/ARM64
       if: ${{ matrix.Platform == 'x86_64' || matrix.Platform == 'aarch64' || matrix.Platform == 'armv7' }}
       shell: alpine.sh {0}
-      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold
 
     - name: Run CMake x86
       if: ${{ matrix.Platform == 'x86' }}
       shell: alpine.sh {0}
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
       run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_ASM_FLAGS=-m32 -DCMAKE_UNITY_BUILD=ON
 
     - name: Run CMake Build
       shell: alpine.sh {0}
+      env:
+          CC: ${{ matrix.CC }}
+          CXX: ${{ matrix.CXX }}
       run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
 
   build-macos:
