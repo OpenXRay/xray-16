@@ -98,10 +98,10 @@ bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, C
         CGameObject* GO1 = smart_cast<CGameObject*>(CurrentIItem());
         CGameObject* GO2 = smart_cast<CGameObject*>(_iitem);
 
-        return funct1(GO1 ? GO1->lua_game_object() : 0, GO2 ? GO2->lua_game_object() : 0, (int)t_old, (int)t_new);
+        return funct1(GO1 ? GO1->lua_game_object() : nullptr, GO2 ? GO2->lua_game_object() : nullptr, (int)t_old, (int)t_new);
     }
 
-    return false;
+    return true;
 }
 
 bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
@@ -116,14 +116,17 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
     EDDListType t_new = GetListType(new_owner);
     EDDListType t_old = GetListType(old_owner);
 
-
     if (!AllowItemDrops(t_old, t_new))
     {
         Msg("incorrect action [%d]->[%d]", t_old, t_new);
         return true;
     }
 
-    DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner);
+    if (old_owner == new_owner)
+    {
+        DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner);
+        return false;
+    }
 
     switch (t_new)
     {
@@ -149,7 +152,8 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
             ToSlot(itm, true, slot_to_place);
     }
     break;
-    case iActorBag: { ToBag(itm, true); }
+    case iActorBag: { ToBag(itm, true);
+    }
     break;
     case iActorBelt: { ToBelt(itm, true);
     }
@@ -180,6 +184,9 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
     };
 
     OnItemDropped(CurrentIItem(), new_owner, old_owner);
+
+    if (!DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner))
+        return false;
 
     UpdateItemsPlace();
 
