@@ -3,7 +3,7 @@
 // CL	== client 2 server message
 // SV	== server 2 client message
 
-enum
+enum : u32
 {
     M_UPDATE = 0, // DUAL: Update state
     M_SPAWN, // DUAL: Spawning, full state
@@ -75,11 +75,9 @@ enum
     M_SECURE_MESSAGE,
     M_CREATE_PLAYER_STATE,
     M_COMPRESSED_UPDATE_OBJECTS,
-
-    MSG_FORCEDWORD = u32(-1)
 };
 
-enum
+enum : u32
 {
     GE_RESPAWN,
     GE_OWNERSHIP_TAKE, // DUAL: Client request for ownership of an item
@@ -156,11 +154,9 @@ enum
 
     GEG_PLAYER_USE_BOOSTER,
     GE_REQUEST_PLAYERS_INFO,
-
-    GE_FORCEDWORD = u32(-1)
 };
 
-enum EGameMessages
+enum EGameMessages : u32
 { // game_cl <----> game_sv messages
     GAME_EVENT_PLAYER_READY,
     GAME_EVENT_PLAYER_KILL, // player wants to die
@@ -226,10 +222,9 @@ enum EGameMessages
 
     //-----------------------------------------
     GAME_EVENT_SCRIPT_BEGINS_FROM, // don't add messages after this
-    GAME_EVENT_FORCEDWORD = u32(-1)
 };
 
-enum
+enum : u32
 {
     M_SPAWN_OBJECT_LOCAL = (1 << 0), // after spawn it becomes local (authorative)
     M_SPAWN_OBJECT_HASUPDATE = (1 << 2), // after spawn info it has update inside message
@@ -239,8 +234,6 @@ enum
     M_SPAWN_UPDATE = (1 << 6), // + update packet
     M_SPAWN_TIME = (1 << 7), // + spawn time
     M_SPAWN_DENIED = (1 << 8), // don't spawn entity with this flag
-
-    M_SPAWN_OBJECT_FORCEDWORD = u32(-1)
 };
 
 enum enum_connection_results

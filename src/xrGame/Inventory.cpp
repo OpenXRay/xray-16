@@ -48,15 +48,6 @@ bool defaultSlotActiveness[] =
     false // helmet
 };
 
-CInventorySlot::CInventorySlot()
-{
-    m_pIItem = NULL;
-    m_bAct = true;
-    m_bPersistent = false;
-}
-
-CInventorySlot::~CInventorySlot() {}
-bool CInventorySlot::CanBeActivated() const { return (m_bAct); };
 CInventory::CInventory()
 {
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");

@@ -3,7 +3,7 @@
 #include "Common/GUID.hpp"
 #include "xrCore/_fbox.h"
 
-enum fsL_Chunks
+enum fsL_Chunks : u32
 {
     fsL_HEADER = 1, //*
     fsL_SHADERS = 2, //*
@@ -15,29 +15,25 @@ enum fsL_Chunks
     fsL_VB = 9, //* - Static geometry
     fsL_IB = 10, //*
     fsL_SWIS = 11, //* - collapse info, usually for trees
-    fsL_forcedword = 0xFFFFFFFF
 };
 
-enum fsESectorChunks
+enum fsESectorChunks : u32
 {
     fsP_Portals = 1, // - portal polygons
     fsP_Root = 2, // - geometry root
-    fsP_forcedword = u32(-1)
 };
 
-enum fsSLS_Chunks
+enum fsSLS_Chunks : u32
 {
     fsSLS_Description = 1, // Name of level
     fsSLS_ServerState = 2,
-    fsSLS_forcedword = u32(-1)
 };
 
-enum EBuildQuality
+enum EBuildQuality : u16
 {
     ebqDraft = 0,
     ebqHigh = 1,
     ebqCustom = 2,
-    ebq_force_u16 = u16(-1)
 };
 
 #pragma pack(push, 8)
@@ -290,7 +286,7 @@ const u32 XRCL_PRODUCTION_VERSION = 14; // output
 const u32 CFORM_CURRENT_VERSION = 4;
 const u32 MAX_NODE_BIT_COUNT = 23;
 
-enum xrAI_Versions
+enum xrAI_Versions : u8
 {
     XRAI_VERSION_SOC = 8,
     XRAI_VERSION_CS = 9,
@@ -301,6 +297,12 @@ enum xrAI_Versions
 
     XRAI_CURRENT_VERSION = XRAI_VERSION_OPENXRAY
 };
+
+// Cross table and game spawn uses u32, but game graph header uses u8,
+// Make sure to be within u8 bounds...
+static_assert(XRAI_VERSION_ALLOWED  <= type_max<u8>);
+static_assert(XRAI_VERSION_OPENXRAY <= type_max<u8>);
+static_assert(XRAI_CURRENT_VERSION  <= type_max<u8>);
 
 #define ASSERT_XRAI_VERSION_MATCH(version, description)\
     R_ASSERT2((version) >= XRAI_VERSION_ALLOWED && (version) <= XRAI_CURRENT_VERSION, description);

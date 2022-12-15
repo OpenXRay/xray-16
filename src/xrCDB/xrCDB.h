@@ -62,12 +62,12 @@ typedef void build_callback(Fvector* V, int Vcnt, TRI* T, int Tcnt, void* params
 class XRCDB_API MODEL : Noncopyable
 {
     friend class COLLIDER;
-    enum
+
+    enum : u32
     {
         S_READY = 0,
         S_INIT = 1,
         S_BUILD = 2,
-        S_forcedword = u32(-1)
     };
 
 private:

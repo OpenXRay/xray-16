@@ -56,6 +56,7 @@ public:
     virtual ~IWindowHandler() = default;
     virtual SDL_Window* GetApplicationWindow() = 0;
     virtual void OnErrorDialog(bool beforeDialog) = 0;
+    virtual void OnFatalError() = 0;
 };
 
 class IUserConfigHandler

@@ -11,7 +11,7 @@ enum EGameIDs {
     eGameIDTeamDominationZone			= u32(1) << 6,
 };*/
 
-enum EGamePlayerFlags
+enum EGamePlayerFlags : u32
 {
     GAME_PLAYER_FLAG_LOCAL = (1 << 0),
     GAME_PLAYER_FLAG_READY = (1 << 1),
@@ -23,11 +23,9 @@ enum EGamePlayerFlags
     GAME_PLAYER_FLAG_ONBASE = (1 << 6),
     GAME_PLAYER_FLAG_SKIP = (1 << 7),
     GAME_PLAYER_HAS_ADMIN_RIGHTS = (1 << 8),
-
-    GAME_PLAYER_FLAG_FORCEDWORD = u32(-1)
 };
 
-enum EGamePhases
+enum EGamePhases : u32
 {
     GAME_PHASE_NONE = 0,
     GAME_PHASE_INPROGRESS,
@@ -40,5 +38,4 @@ enum EGamePhases
     GAME_PHASE_PLAYER_SCORES,
 
     GAME_PHASE_SCRIPT_BEGINS_FROM,
-    GAME_PHASE_FORCEDWORD = u32(-1)
 };

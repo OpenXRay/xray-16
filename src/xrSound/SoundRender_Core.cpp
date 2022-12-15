@@ -6,13 +6,21 @@
 #include "SoundRender_Source.h"
 #include "SoundRender_Emitter.h"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#define OPENAL
-#include <eax/eax.h>
+// XXX: old SDK functionality
+//#if defined(XR_PLATFORM_WINDOWS)
+//#define OPENAL
+//#include <eax/eax.h>
+//#endif
+
+XRSOUND_API Flags32 psSoundFlags =
+{
+    ss_Hardware
+#ifdef XR_PLATFORM_WINDOWS
+    | ss_EFX
 #endif
+};
 
 XRSOUND_API int psSoundTargets = 32;
-XRSOUND_API Flags32 psSoundFlags = { ss_Hardware | ss_EAX };
 XRSOUND_API float psSoundOcclusionScale = 0.5f;
 XRSOUND_API float psSoundVelocityAlpha = 0.05f;
 XRSOUND_API float psSoundTimeFactor = 1.0f;
@@ -503,6 +511,7 @@ void CSoundRender_Core::refresh_sources()
 }
 void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound_environment** dst_env)
 {
+    // XXX: old SDK functionality
     /*if (bEAX)
     {
         CSoundRender_Environment* SE = static_cast<CSoundRender_Environment*>(src_env);
@@ -524,6 +533,7 @@ void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound
 
 void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
 {
+    // XXX: old SDK functionality
     /*if (bEAX)
     {
         CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
