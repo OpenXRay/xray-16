@@ -245,6 +245,7 @@ public:
 
     SDL_Window* GetApplicationWindow() override;
     void OnErrorDialog(bool beforeDialog) override;
+    void OnFatalError() override;
 
     void time_factor(const float time_factor);
 
