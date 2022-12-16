@@ -12,7 +12,7 @@
 #include <share.h>
 #endif
 
-#if defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_BSD)
 #define _sys_errlist sys_errlist
 #endif
 
@@ -143,7 +143,7 @@ class CVirtualFileReader final : public IReader
 private:
 #if defined(XR_PLATFORM_WINDOWS)
     void *hSrcFile, *hSrcMap;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     int hSrcFile;
 #else
 #   error Select or add implementation for your platform

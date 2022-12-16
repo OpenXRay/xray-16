@@ -52,9 +52,6 @@ CInventory::CInventory()
 {
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
     m_iMaxBelt = pSettings->read_if_exists<s32>("inventory", "max_belt", 5);
-    m_iActiveSlot = NO_ACTIVE_SLOT;
-    m_iNextActiveSlot = NO_ACTIVE_SLOT;
-    m_iPrevActiveSlot = NO_ACTIVE_SLOT;
 
     u16 sz = 0;
     string256 slot_persistent;
@@ -91,15 +88,7 @@ CInventory::CInventory()
         m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
     };
 
-    m_bSlotsUseful = true;
-    m_bBeltUseful = false;
-
-    m_fTotalWeight = -1.f;
-    m_dwModifyFrame = 0;
-    m_drop_last_frame = false;
-
     InitPriorityGroupsForQSwitch();
-    m_next_item_iteration_time = 0;
 
     for (u16 i = 0; i < sz; ++i)
     {
@@ -563,7 +552,6 @@ void CInventory::Activate(u16 slot, bool bForce)
     }
 
     R_ASSERT2(slot <= LastSlot(), make_string("wrong slot number. Slot = %d, LastSlot() = %d", slot, LastSlot()).c_str());
-
 
     if (slot != NO_ACTIVE_SLOT && !m_slots[slot].CanBeActivated())
         return;

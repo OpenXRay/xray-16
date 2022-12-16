@@ -58,7 +58,7 @@ constexpr double dbl_eps = type_epsilon<double>;
 
 #if defined(XR_PLATFORM_WINDOWS)
 constexpr size_t max_path = MAX_PATH;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 constexpr size_t max_path = PATH_MAX;
 #else
 #error Define here lenght of the file paths strings for your platform
