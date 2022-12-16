@@ -214,7 +214,7 @@ jobs:
       env:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
-      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold
+      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold -DXRAY_CXX_LIB=libstdc++
 
     - name: Run CMake x86
       if: ${{ matrix.Platform == 'x86' }}
@@ -222,7 +222,7 @@ jobs:
       env:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
-      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_ASM_FLAGS=-m32 -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold
+      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_ASM_FLAGS=-m32 -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold -DXRAY_CXX_LIB=libstdc++
 
     - name: Run CMake Build
       shell: alpine.sh {0}
