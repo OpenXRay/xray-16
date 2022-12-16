@@ -65,10 +65,6 @@ CInventory::CInventory()
     m_slots.resize(sz + 1); // first is [1]
     m_iLastSlot = sz - 1;
 
-    m_iActiveSlot = NO_ACTIVE_SLOT;
-    m_iNextActiveSlot = NO_ACTIVE_SLOT;
-    m_iPrevActiveSlot = NO_ACTIVE_SLOT;
-
     string256 temp;
     for (u16 i = FirstSlot(); i <= LastSlot(); ++i)
     {
@@ -79,15 +75,7 @@ CInventory::CInventory()
         m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
     };
 
-    m_bSlotsUseful = true;
-    m_bBeltUseful = false;
-
-    m_fTotalWeight = -1.f;
-    m_dwModifyFrame = 0;
-    m_drop_last_frame = false;
-
     InitPriorityGroupsForQSwitch();
-    m_next_item_iteration_time = 0;
 
     for (u16 i = 0; i < sz; ++i)
     {
