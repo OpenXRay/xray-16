@@ -53,47 +53,48 @@ CInventory::CInventory()
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
     m_iMaxBelt = pSettings->read_if_exists<s32>("inventory", "max_belt", 5);
 
-    u16 sz = 0;
-    string256 slot_persistent;
-    string256 slot_active;
-    xr_strcpy(slot_persistent, "slot_persistent_1");
-    xr_strcpy(slot_active, "slot_active_1");
+    const u16 slotsCount = pSettings->read_if_exists<u16>("inventory", "slots_count", SLOTS_COUNT);
+    // slots_count + 1 because [0] is the inactive slot
+    m_slots.reserve(slotsCount + 1u);
+
+    // Inactive slot [0]
+    m_slots.emplace_back(CInventorySlot{});
 
     // Dynamically create as many slots as we may define in system.ltx
-    while (pSettings->line_exist("inventory", slot_persistent) && pSettings->line_exist("inventory", slot_active))
+    u16 i = 0;
+    do
     {
-        m_iLastSlot = sz;
+        ++i;
 
-        m_slots.resize(sz + 1); // slot+1 because [0] is the inactive slot
+        string256 slot_persistent;
+        string256 slot_active;
+        xr_sprintf(slot_persistent, "slot_persistent_%d", i);
+        xr_sprintf(slot_active,     "slot_active_%d",     i);
 
-        m_slots[sz].m_bPersistent = !!pSettings->r_bool("inventory", slot_persistent);
-        m_slots[sz].m_bAct = !!pSettings->r_bool("inventory", slot_active);
+        if (!pSettings->line_exist("inventory", slot_persistent))
+        {
+            --i;
+            break;
+        }
 
-        ++sz;
+        const bool isPersistent = pSettings->r_bool("inventory", slot_persistent);
+        const bool isActive = pSettings->read_if_exists<bool>("inventory", slot_active,
+            ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
 
-        xr_sprintf(slot_persistent, "%s%d", "slot_persistent_", sz);
-        xr_sprintf(slot_active, "%s%d", "slot_active_", sz);
-    }
+        m_slots.emplace_back(CInventorySlot{ nullptr, isPersistent, isActive });
+    } while (true);
 
-    m_slots.resize(sz + 1); // first is [1]
-    m_iLastSlot = sz - 1;
+    m_iLastSlot = i;
+    VERIFY2(m_iLastSlot >= slotsCount, make_string(
+        "Not critical, but check [inventory] section in your system.ltx.\n"
+        "slots_count = %u, but real slots count is less: %u", slotsCount, i).c_str()
+    );
 
-    string256 temp;
-    for (u16 i = FirstSlot(); i <= LastSlot(); ++i)
-    {
-        xr_sprintf(temp, "slot_persistent_%d", i);
-        m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
-
-        xr_sprintf(temp, "slot_active_%d", i);
-        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
-    };
+    m_blocked_slots.resize(m_slots.size());
+    // ^ no need to initialize members of array
+    // ^ resize will default initialize everything with 0
 
     InitPriorityGroupsForQSwitch();
-
-    for (u16 i = 0; i < sz; ++i)
-    {
-        m_blocked_slots[i] = 0;
-    }
 }
 
 CInventory::~CInventory() {}
