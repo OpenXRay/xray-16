@@ -19,16 +19,16 @@ SCRIPT_EXPORT(CUILines, (),
     ];
 });
 
+// We don't change game assets.
+// This class allowes original game scripts to not specify the window name.
+class CUIStaticScript : public CUIStatic
+{
+public:
+    CUIStaticScript() : CUIStatic("CUIStaticScript") {}
+};
+
 SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 {
-    // We don't change game assets.
-    // This class allowes original game scripts to not specify the window name.
-    class CUIStaticScript : public CUIStatic
-    {
-    public:
-        CUIStaticScript() : CUIStatic("CUIStaticScript") {}
-    };
-
     module(luaState)
     [
         class_<CUIStatic, CUIWindow>("CUIStaticBase")
