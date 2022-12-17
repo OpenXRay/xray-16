@@ -56,7 +56,7 @@ void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool r
     R_ASSERT(C->type == RC_dx11texture);
     u32 stage = C->samp.index;
 
-    passTextures.push_back(std::make_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
+    passTextures.emplace_back(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName)));
 }
 
 void CBlender_Compile::i_dx11FilterAnizo(u32 s, BOOL value)
