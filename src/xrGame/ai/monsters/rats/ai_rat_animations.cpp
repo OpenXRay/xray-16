@@ -100,10 +100,9 @@ void CAI_Rat::SelectAnimation(const Fvector& /**_view**/, const Fvector& /**_mov
     if (psAI_Flags.is(aiAnimation))
     {
         IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(Visual());
+        const pcstr anim_name = skeleton_animated->LL_MotionDefName_dbg(m_tpCurrentGlobalAnimation).first;
         Msg("%6d %s animation : %s (%f,%f)", Device.dwTimeGlobal, "Global",
-            // XXX: LL_MotionDefName_dbg return std::pair, consider use first, second or both, but not pair itself
-            skeleton_animated->LL_MotionDefName_dbg(m_tpCurrentGlobalAnimation), movement().m_body.current.yaw,
-            movement().m_body.target.yaw);
+            anim_name, movement().m_body.current.yaw, movement().m_body.target.yaw);
     }
 #endif
 }

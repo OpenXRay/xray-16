@@ -146,30 +146,30 @@ protected:
 
     // Активный слот и слот который станет активным после смены
     //значения совпадают в обычном состоянии (нет смены слотов)
-    u16 m_iActiveSlot;
-    u16 m_iNextActiveSlot;
-    u16 m_iPrevActiveSlot;
+    u16 m_iActiveSlot{ NO_ACTIVE_SLOT };
+    u16 m_iNextActiveSlot{ NO_ACTIVE_SLOT };
+    u16 m_iPrevActiveSlot{ NO_ACTIVE_SLOT };
     u16 m_iLastSlot;
 
     CInventoryOwner* m_pOwner;
 
     //флаг, показывающий наличие пояса в инвенторе
-    bool m_bBeltUseful;
+    bool m_bBeltUseful{ false };
     //флаг, допускающий использование слотов
-    bool m_bSlotsUseful;
+    bool m_bSlotsUseful{ true };
 
     // максимальный вес инвентаря
     float m_fMaxWeight;
     // текущий вес в инвентаре
-    float m_fTotalWeight;
+    float m_fTotalWeight{ -1.0f };
 
     // Максимальное кол-во объектов на поясе
     u32 m_iMaxBelt;
 
     //кадр на котором произошло последнее изменение в инвенторе
-    u32 m_dwModifyFrame;
+    u32 m_dwModifyFrame{};
 
-    bool m_drop_last_frame;
+    bool m_drop_last_frame{};
 
     void SendActionEvent(u16 cmd, u32 flags);
 
@@ -181,9 +181,9 @@ private:
     priority_group m_null_priority;
     typedef xr_set<PIItem> except_next_items_t;
     except_next_items_t m_next_items_exceptions;
-    u32 m_next_item_iteration_time;
+    u32 m_next_item_iteration_time{};
 
-    u8 m_blocked_slots[LAST_SLOT + 1];
+    xr_vector<u8> m_blocked_slots;
     bool IsSlotBlocked(u16 slot_id) const;
     void TryActivatePrevSlot();
     void TryDeactivateActiveSlot();

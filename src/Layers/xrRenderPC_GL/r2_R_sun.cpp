@@ -69,9 +69,7 @@ void XRMatrixOrthoOffCenterLH(Fmatrix* pout, float l, float r, float b, float t,
 void XRMatrixInverse(Fmatrix* pout, float* pdeterminant, const Fmatrix& pm)
 {
     glm::mat4 out = glm::inverse(glm::make_mat4x4(&pm.m[0][0]));
-    
     *pout = *(Fmatrix*)glm::value_ptr(out);
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////

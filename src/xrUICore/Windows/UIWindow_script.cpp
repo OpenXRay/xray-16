@@ -115,18 +115,18 @@ SCRIPT_EXPORT(CUITextureMaster, (),
     ];
 });
 
+// We don't change game assets.
+// This class allowes original game scripts to not specify the window name.
+class CUIWindowScript : public CUIWindow
+{
+public:
+    CUIWindowScript() : CUIWindow("CUIWindowScript") {}
+};
+
 SCRIPT_EXPORT(CUIWindow, (),
 {
     using namespace luabind;
     using namespace luabind::policy;
-
-    // We don't change game assets.
-    // This class allowes original game scripts to not specify the window name.
-    class CUIWindowScript : public CUIWindow
-    {
-    public:
-        CUIWindowScript() : CUIWindow("CUIWindowScript") {}
-    };
 
     module(luaState)
     [
