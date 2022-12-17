@@ -52,7 +52,7 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
     pSurface = surf;
 }
 
-ID3DBaseTexture* CTexture::surface_get()
+ID3DBaseTexture* CTexture::surface_get() const
 {
     if (pSurface)
         pSurface->AddRef();
@@ -104,7 +104,7 @@ void CTexture::apply_theora(u32 dwStage)
     }
     CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
 };
-void CTexture::apply_avi(u32 dwStage)
+void CTexture::apply_avi(u32 dwStage) const
 {
     if (pAVI->NeedUpdate())
     {
@@ -144,7 +144,11 @@ void CTexture::apply_seq(u32 dwStage)
     }
     CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
 };
-void CTexture::apply_normal(u32 dwStage) { CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface)); };
+void CTexture::apply_normal(u32 dwStage) const
+{
+    CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
+};
+
 void CTexture::Preload()
 {
     m_bumpmap = RImplementation.Resources->m_textures_description.GetBumpName(cName);
@@ -340,16 +344,19 @@ void CTexture::video_Play(BOOL looped, u32 _time)
         pTheora->Play(looped, (_time != 0xFFFFFFFF) ? (m_play_time = _time) : RDEVICE.dwTimeContinual);
 }
 
-void CTexture::video_Pause(BOOL state)
+void CTexture::video_Pause(BOOL state) const
 {
     if (pTheora)
         pTheora->Pause(state);
 }
 
-void CTexture::video_Stop()
+void CTexture::video_Stop() const
 {
     if (pTheora)
         pTheora->Stop();
 }
 
-BOOL CTexture::video_IsPlaying() { return (pTheora) ? pTheora->IsPlaying() : FALSE; }
+BOOL CTexture::video_IsPlaying() const
+{
+    return (pTheora) ? pTheora->IsPlaying() : FALSE;
+}
