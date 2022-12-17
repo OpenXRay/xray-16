@@ -26,6 +26,12 @@
 
 #include "xrCore/Threading/TaskManager.hpp"
 
+extern "C"
+{
+__declspec(dllexport) DWORD NvOptimusEnablement = 1;
+__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 // global variables
 ENGINE_API CInifile* pGameIni = nullptr;
 ENGINE_API bool g_bBenchmark = false;
