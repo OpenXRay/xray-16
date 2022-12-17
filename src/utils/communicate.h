@@ -241,7 +241,7 @@ struct b_params
 };
 #pragma pack(pop)
 
-enum EBUILD_CHUNKS
+enum EBUILD_CHUNKS : u32
 {
     EB_Version = 0, // XRCLC_CURRENT_VERSION
     EB_Parameters,
@@ -260,8 +260,6 @@ enum EBUILD_CHUNKS
     EB_MU_models,
     EB_MU_refs,
     EB_SmoothGroups,
-
-    EB_FORCE_DWORD = u32(-1)
 };
 
 #endif

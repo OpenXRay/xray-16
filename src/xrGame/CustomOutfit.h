@@ -6,8 +6,8 @@ struct SBoneProtections;
 
 class CCustomOutfit : public CInventoryItemObject
 {
-private:
-    typedef CInventoryItemObject inherited;
+    friend void CCustomOutfit_Export(lua_State* luaState);
+    using inherited = CInventoryItemObject;
 
 public:
     CCustomOutfit();

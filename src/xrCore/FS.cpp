@@ -6,7 +6,7 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
 #include <direct.h>
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <sys/mman.h>
 #endif
 #include <sys/stat.h>
@@ -103,7 +103,7 @@ static int open_internal(pcstr fn, int& handle)
 {
 #if defined(XR_PLATFORM_WINDOWS)
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     pstr conv_fn = xr_strdup(fn);
     convert_path_separators(conv_fn);
     handle = open(conv_fn, _O_RDONLY);
@@ -482,7 +482,7 @@ CPackReader::~CPackReader()
 #endif // DEBUG
 #if defined(XR_PLATFORM_WINDOWS)
     UnmapViewOfFile(base_address);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     ::munmap(base_address, Size);
 #else
 #   error Select or add implementation for your platform
@@ -518,7 +518,7 @@ CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
     pstr conv_path = xr_strdup(cFileName);
     convert_path_separators(conv_path);
     hSrcFile = ::open(conv_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
@@ -547,7 +547,7 @@ CVirtualFileRW::~CVirtualFileRW()
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
     ::munmap((void*)data, Size);
     ::close(hSrcFile);
     hSrcFile = -1;
@@ -570,7 +570,7 @@ CVirtualFileReader::CVirtualFileReader(pcstr cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
     pstr conv_path = xr_strdup(cFileName);
     convert_path_separators(conv_path);
     hSrcFile = ::open(conv_path, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
@@ -600,7 +600,7 @@ CVirtualFileReader::~CVirtualFileReader()
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
     ::munmap((void*)data, Size);
     ::close(hSrcFile);
     hSrcFile = -1;

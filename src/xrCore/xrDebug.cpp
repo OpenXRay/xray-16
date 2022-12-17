@@ -39,7 +39,7 @@ static BOOL bException = FALSE;
 #   if __has_include(<execinfo.h>)
 #       include <execinfo.h>
 #   endif
-#elif defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #   include <sys/types.h>
 #   include <sys/ptrace.h>
 #   define PTRACE_TRACEME PT_TRACE_ME
@@ -182,7 +182,7 @@ Lock xrDebug::failLock;
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
 #else
 #   error Select or add implementation for your platform
@@ -541,6 +541,10 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
+            // calling DEBUG_BREAK with no debugger will trigger BugTrap
+            // we must hide the window
+            if (windowHandler && !DebuggerIsPresent())
+                windowHandler->OnFatalError();
             DEBUG_BREAK;
         } // switch (result)
     }
@@ -574,6 +578,9 @@ void xrDebug::DoExit(const std::string& message)
     }
     else
         ShowMessage(Core.ApplicationName, message.c_str());
+
+    if (windowHandler)
+        windowHandler->OnFatalError();
 
 #if defined(XR_PLATFORM_WINDOWS)
     TerminateProcess(GetCurrentProcess(), 1);
@@ -821,7 +828,11 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 
     // Typically, PrevFilter is BugTrap filter
     if (PrevFilter)
+    {
+        if (windowHandler)
+            windowHandler->OnFatalError();
         PrevFilter(exPtrs);
+    }
 
     if (windowHandler)
         windowHandler->OnErrorDialog(false);

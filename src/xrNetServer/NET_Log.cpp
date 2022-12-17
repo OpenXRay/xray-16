@@ -42,9 +42,7 @@ string64 PacketName[] = {"M_UPDATE", // DUAL: Update state
     //-----------------------------------------------------
     "M_PLAYER_FIRE",
     //-----------------------------------------------------
-    "M_MOVE_PLAYERS", "M_MOVE_PLAYERS_RESPOND",
-
-    "MSG_FORCEDWORD"};
+    "M_MOVE_PLAYERS", "M_MOVE_PLAYERS_RESPOND"};
 //---------------------------------------------------------
 #ifdef CONFIG_PROFILE_LOCKS
 INetLog::INetLog(pcstr sFileName, u32 dwStartTime) : m_pcs(xr_new<Lock>(MUTEX_PROFILE_ID(NET_Log)))

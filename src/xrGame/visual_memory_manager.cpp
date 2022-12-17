@@ -597,6 +597,16 @@ struct CVisibleObjectPredicateEx
     }
 };
 
+void CVisualMemoryManager::remove(const MemorySpace::CVisibleObject* visible_object)
+{
+    VISIBLES::iterator I = std::find_if(m_objects->begin(), m_objects->end(), [&](const MemorySpace::CVisibleObject& object)
+    {
+        return visible_object == &object;
+    });
+    if (I != m_objects->end())
+        m_objects->erase(I);
+}
+
 void CVisualMemoryManager::remove_links(IGameObject* object)
 {
     {

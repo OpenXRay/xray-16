@@ -31,11 +31,22 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 set(CMAKE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 
+# Set the shared object search path for the installation
+set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+
+# Set the shared object search path for the build tree
+# On Linux/BSD we can use $ORIGIN to search for modules next to the executable
+if (NOT APPLE)
+    set(CMAKE_BUILD_RPATH $ORIGIN)
+else()
+    set(CMAKE_BUILD_RPATH ${COMPILE_OUTPUT_FOLDER})
+endif()
+
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "armv*")
-    set(PROJECT_PLATFORM_ARM TRUE)
-elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+if (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
     set(PROJECT_PLATFORM_ARM64 TRUE)
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "armv*")
+    set(PROJECT_PLATFORM_ARM TRUE)
 elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "e2k")
     set(PROJECT_PLATFORM_E2K TRUE)
 endif()
@@ -151,7 +162,11 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
     elseif (XRAY_CXX_LIB STREQUAL "libc++")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+        if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lcxxrt")
+        else()
+            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+        endif()
     endif()
 endif()
 
@@ -213,7 +228,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(CMAKE_SKIP_BUILD_RPATH TRUE)
     #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} ${PROJECT_NAME})
 endif()
 

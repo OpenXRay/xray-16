@@ -8,8 +8,9 @@
 #define POSTPROCESS_FILE_VERSION 0x0002
 constexpr pcstr POSTPROCESS_FILE_EXTENSION = ".ppe";
 
-typedef enum _pp_params {
-    pp_unknown = -1,
+typedef enum _pp_params : u32
+{
+    pp_unknown = u32(-1),
     pp_base_color = 0,
     pp_add_color = 1,
     pp_gray_color = 2,
@@ -22,7 +23,6 @@ typedef enum _pp_params {
     pp_noise_f = 9,
     pp_cm_influence = 10,
     pp_last = 11,
-    pp_force_dword = 0x7fffffff
 } pp_params;
 
 class XRCORE_API CPostProcessParam

@@ -110,6 +110,9 @@ Thank you for your support!
     * [GeorgeIvlev](https://github.com/GeorgeIvlev) – for work on the build system, bug fixing.
     * [Plotja](https://github.com/Plotja) – for work on portability, polishing.
     * [dimhotepus](https://github.com/dimhotepus) – for work on code quality.
+    * [Chugunov Roman](https://github.com/ChugunovRoman) – for work on extending functionality for modmakers.
+    * [Vertver](https://github.com/Vertver) – for work on macOS support.
+    * [Lnd-stoL](https://github.com/Lnd-stoL) – for work on macOS support.
 * Particular projects:
   * [Oxygen](https://github.com/xrOxygen) – for being our friends and giving tips and help with new features, optimizations, bug fixes, etc.
   * [Shoker Weapon Mod](https://github.com/ShokerStlk/xray-16-SWM) and [Shoker](https://github.com/ShokerStlk) – for contributing new features, bug fixing.
@@ -128,4 +131,4 @@ Thank you for your support!
     [![CppDepend logo](https://www.cppdepend.com/images/cppdependlogo.png)](https://www.cppdepend.com)
 
 
-If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you.
+If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you. Or send us a pull request with you added to this list ;)
