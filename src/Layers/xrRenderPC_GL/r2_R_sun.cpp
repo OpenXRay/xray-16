@@ -18,9 +18,6 @@ const float tweak_guaranteed_range = 20.f; //. ?
 // float			OLES_SUN_LIMIT_27_01_07			= 180.f		;
 float OLES_SUN_LIMIT_27_01_07 = 100.f;
 
-const float MAP_SIZE_START = 6.f;
-const float MAP_GROW_FACTOR = 4.f;
-
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
@@ -71,7 +68,6 @@ void XRMatrixInverse(Fmatrix* pout, float* pdeterminant, const Fmatrix& pm)
     glm::mat4 out = glm::inverse(glm::make_mat4x4(&pm.m[0][0]));
     
     *pout = *(Fmatrix*)glm::value_ptr(out);
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -150,7 +146,7 @@ static inline bool PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0
 
 struct Frustum
 {
-    Frustum(const glm::mat4* matrix);
+    explicit Frustum(const glm::mat4* matrix);
 
     glm::vec4 camPlanes[6];
     int nVertexLUT[6];
@@ -285,7 +281,7 @@ struct DumbClipper
         return true;
     }
 
-    glm::vec3 point(Fbox& bb, int i) const
+    static glm::vec3 point(Fbox& bb, int i)
     {
         return glm::vec3(i & 1 ? bb.vMin.x : bb.vMax.x, i & 2 ? bb.vMin.y : bb.vMax.y, i & 4 ? bb.vMin.z : bb.vMax.z);
     }
@@ -387,7 +383,7 @@ void CRender::render_sun()
             }
             for (int plane = 0; plane < 6; plane++)
             {
-                hull.polys.push_back(DumbConvexVolume<false>::_poly());
+                hull.polys.emplace_back();
                 for (int pt = 0; pt < 4; pt++)
                     hull.polys.back().points.push_back(sun::facetable[plane][pt]);
             }
@@ -700,7 +696,7 @@ void CRender::render_sun()
         for (size_t p = 0; p < view_clipper.frustum.p_count; p++)
         {
             Fplane& P = view_clipper.frustum.planes [p];
-            view_clipper.planes.push_back({P.n.x, P.n.y, P.n.z, P.d});
+            view_clipper.planes.emplace_back(P.n.x, P.n.y, P.n.z, P.d);
         }
 
         // 
@@ -866,7 +862,7 @@ void CRender::render_sun_near()
             }
             for (int plane = 0; plane < 6; plane++)
             {
-                hull.polys.push_back(t_volume::_poly());
+                hull.polys.emplace_back();
                 for (int pt = 0; pt < 4; pt++)
                     hull.polys.back().points.push_back(sun::facetable[plane][pt]);
             }
@@ -1022,7 +1018,7 @@ void CRender::render_sun_near()
     RCache.set_xform_project(Device.mProject);
 }
 
-void CRender::render_sun_filtered()
+void CRender::render_sun_filtered() const
 {
     if (!o.sunfilter)
         return;
@@ -1125,7 +1121,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
                     edge_vec.sub(near_p);
                     edge_vec.normalize();
 
-                    light_cuboid.view_frustum_rays.push_back(sun::ray(near_p, edge_vec));
+                    light_cuboid.view_frustum_rays.emplace_back(near_p, edge_vec);
                 }
             }
             else
