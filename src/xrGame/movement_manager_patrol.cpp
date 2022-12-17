@@ -42,6 +42,7 @@ void CMovementManager::process_patrol_path()
             break;
         }
 
+        m_path_state = ePathStateBuildLevelPath;
         [[fallthrough]];
     }
     case ePathStateBuildLevelPath:
@@ -62,6 +63,8 @@ void CMovementManager::process_patrol_path()
     case ePathStateContinueLevelPath:
     {
         level_path().select_intermediate_vertex();
+
+        m_path_state = ePathStateBuildDetailPath;
         [[fallthrough]];
     }
     case ePathStateBuildDetailPath:
@@ -90,7 +93,9 @@ void CMovementManager::process_patrol_path()
             //				Msg				("[%6d][%s] actuality is false 3",Device.dwFrame,*object().cName());
             m_path_state = ePathStateSelectPatrolPoint;
         }
-        else if (!level_path().actual() || !detail().actual())
+        else if (!level_path().actual())
+            m_path_state = ePathStateBuildLevelPath;
+        else if (!detail().actual())
             m_path_state = ePathStateBuildLevelPath;
         else if (detail().completed(object().Position(), !detail().state_patrol_path()))
         {
