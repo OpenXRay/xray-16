@@ -17,6 +17,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
 
 #include "Layers/xrRenderGL/CommonTypes.h"
 
