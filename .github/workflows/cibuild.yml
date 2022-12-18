@@ -20,20 +20,11 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@main
+    - uses: microsoft/setup-msbuild@main
 
-    - name: Setup NuGet.exe
-      uses: nuget/setup-nuget@main
-      with:
-        nuget-version: '5.x'
-
-    - name: Restore NuGet packages
-      run: nuget restore src\engine.sln
-
-    - name: MSBuild
+    - name: Build
       working-directory: src
-      run: msbuild /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
+      run: msbuild /restore /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
 
     - name: Prepare artifacts
       id: windows-vars
