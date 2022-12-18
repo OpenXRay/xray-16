@@ -40,9 +40,6 @@
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
-[submodule "Externals/mimalloc"]
-	path = Externals/mimalloc
-	url = https://github.com/OpenXRay/mimalloc.git
 [submodule "Externals/sse2neon"]
 	path = Externals/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git

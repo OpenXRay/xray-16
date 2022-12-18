@@ -22,11 +22,13 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)lzo\include;$(xrExternals)mimalloc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)lzo\include;$(xrSdkDir)include\mimalloc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID=$(APPVEYOR_BUILD_ID);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID=$(GITHUB_RUN_ID);GITHUB_RUN_NUMBER=$(GITHUB_RUN_NUMBER);GITHUB_REPOSITORY=$(GITHUB_REPOSITORY);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>DbgHelp.lib;FaultRep.lib;jpeg-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="!$(Configuration.Contains('Debug'))">mimalloc-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="$(Configuration.Contains('Debug'))">mimalloc-static-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>where /q git
@@ -267,9 +269,6 @@ call .GitInfo.cmd</Command>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(xrExternals)mimalloc\ide\vs2019\mimalloc.vcxproj">
-      <Project>{abb5eae7-b3e6-432e-b636-333449892ea6}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
