@@ -218,7 +218,7 @@ void CMemoryWriter::w(const void* ptr, size_t count)
 }
 
 // static const u32 mb_sz = 0x1000000;
-bool CMemoryWriter::save_to(LPCSTR fn)
+bool CMemoryWriter::save_to(LPCSTR fn) const
 {
     IWriter* F = FS.w_open(fn);
     if (F)

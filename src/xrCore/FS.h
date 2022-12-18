@@ -161,7 +161,7 @@ public:
         xr_free(data);
     }
 #pragma warning(pop)
-    bool save_to(LPCSTR fn);
+    bool save_to(LPCSTR fn) const;
     void flush() override {}
 };
 
@@ -408,7 +408,7 @@ public:
     // iterators
     IReader* open_chunk_iterator(u32& ID, IReader* previous = nullptr); // NULL=first
 
-    size_t find_chunk(u32 ID, bool* bCompressed = 0);
+    virtual size_t find_chunk(u32 ID, bool* bCompressed = 0);
 
 private:
     typedef IReaderBase<IReader> inherited;

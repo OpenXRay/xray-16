@@ -1065,7 +1065,7 @@ FileStatus CLocatorAPI::exist(pcstr fn, FSType fsType /*= FSType::Virtual*/)
 {
     if ((fsType | FSType::Virtual) == FSType::Virtual)
     {
-        files_it it = file_find_it(fn);
+        auto it = file_find_it(fn);
         if (it != m_files.end())
             return FileStatus(true, false);
     }

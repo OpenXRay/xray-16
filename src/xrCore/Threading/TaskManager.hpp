@@ -56,12 +56,12 @@ public:
 public:
     // TaskFunc is at the end for fancy in-place lambdas
     // Create a task, but don't run it yet
-    [[nodiscard]] Task& CreateTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
-    [[nodiscard]] Task& CreateTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    [[nodiscard]] static Task& CreateTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    [[nodiscard]] static Task& CreateTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
     // Create a task as child, but don't run it yet
-    [[nodiscard]] Task& CreateTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
-    [[nodiscard]] Task& CreateTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    [[nodiscard]] static Task& CreateTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    [[nodiscard]] static Task& CreateTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
     // Run task
     void PushTask(Task& task);

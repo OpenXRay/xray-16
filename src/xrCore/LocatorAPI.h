@@ -69,10 +69,7 @@ public:
     bool External; // File can be accessed only as external
 
     FileStatus(bool exists, bool external)
-    {
-        Exists = exists;
-        External = external;
-    }
+        : Exists(exists), External(external) {}
 
     operator bool() const { return Exists; }
 };
