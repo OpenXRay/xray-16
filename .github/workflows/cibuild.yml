@@ -16,15 +16,15 @@ jobs:
         Configuration: [Debug, Mixed, Release, Release Master Gold]
         Platform: [x64, x86]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@main
       with:
         submodules: recursive
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@main
 
     - name: Setup NuGet.exe
-      uses: nuget/setup-nuget@v1
+      uses: nuget/setup-nuget@main
       with:
         nuget-version: '5.x'
 
@@ -45,19 +45,19 @@ jobs:
         echo ::set-output name=Build_type::%ARTIFACT_EDITION%
 
     - name: Upload OpenXRay artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@main
       with:
         name: OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
         path: res\OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
 
     - name: Upload Symbols
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@main
       with:
         name: Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
         path: res\Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
 
     - name: Upload Utils
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@main
       with:
         name: Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
         path: res\Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
@@ -78,7 +78,7 @@ jobs:
             CXX: clang++-9
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@main
       with:
         submodules: recursive
 
@@ -102,28 +102,28 @@ jobs:
 
     - name: Install GCC x64
       if: ${{ matrix.Platform == 'x64' && matrix.CC == 'gcc-9' }}
-      uses: egor-tensin/setup-gcc@v1
+      uses: egor-tensin/setup-gcc@master
       with:
         version: 9
         platform: x64
 
     - name: Install GCC x86
       if: ${{ matrix.Platform == 'x86' && matrix.CC == 'gcc-9' }}
-      uses: egor-tensin/setup-gcc@v1
+      uses: egor-tensin/setup-gcc@master
       with:
         version: 9
         platform: x86
 
     - name: Install Clang x64
       if: ${{ matrix.Platform == 'x64' && matrix.CC == 'clang-9' }}
-      uses: egor-tensin/setup-clang@v1
+      uses: egor-tensin/setup-clang@master
       with:
         version: 9
         platform: x64
 
     - name: Install Clang x86
       if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
-      uses: egor-tensin/setup-clang@v1
+      uses: egor-tensin/setup-clang@master
       with:
         version: 9
         platform: x86
@@ -167,14 +167,14 @@ jobs:
 
     - name: Upload OpenXRay artifact
       if: ${{ matrix.Platform == 'x64' && steps.make-package.outcome == 'success' }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@main
       with:
         name: openxray_1.6.02_${{ matrix.Configuration }}_amd64.deb
         path: build/openxray_1.6.02_amd64.deb
 
     - name: Upload OpenXRay artifact
       if: ${{ matrix.Platform == 'x86' && steps.make-package.outcome == 'success' }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@main
       with:
         name: openxray_1.6.02_${{ matrix.Configuration }}_i386.deb
         path: build/openxray_1.6.02_i386.deb
@@ -189,7 +189,7 @@ jobs:
         Platform: [x86_64, x86]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@main
       with:
         submodules: recursive
 
@@ -198,7 +198,7 @@ jobs:
         git submodule deinit Externals/cryptopp
 
     - name: Install latest stable Alpine Linux
-      uses: jirutka/setup-alpine@v1
+      uses: jirutka/setup-alpine@master
       with:
         arch: ${{ matrix.Platform }}
         branch: 'latest-stable'
@@ -227,7 +227,7 @@ jobs:
         Configuration: [Debug, Release]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@main
       with:
         submodules: recursive
 
