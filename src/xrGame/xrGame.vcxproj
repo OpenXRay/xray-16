@@ -1294,6 +1294,7 @@
     <ClInclude Include="UITeamHeader.h" />
     <ClInclude Include="UITeamPanels.h" />
     <ClInclude Include="UITeamState.h" />
+    <ClInclude Include="UITimeDilator.h" />
     <ClInclude Include="UIZoneMap.h" />
     <ClInclude Include="ui\ArtefactDetectorUI.h" />
     <ClInclude Include="ui\FactionState.h" />
@@ -3200,6 +3201,7 @@
     <ClCompile Include="UITeamHeader.cpp" />
     <ClCompile Include="UITeamPanels.cpp" />
     <ClCompile Include="UITeamState.cpp" />
+    <ClCompile Include="UITimeDilator.cpp" />
     <ClCompile Include="UIZoneMap.cpp" />
     <ClCompile Include="ui\ArtefactDetectorUI.cpp" />
     <ClCompile Include="ui\FactionState.cpp" />

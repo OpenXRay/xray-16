@@ -1926,6 +1926,85 @@ public:
     }
 };
 
+class CCC_UI_Time_Dilation_Mode : public IConsole_Command
+{
+    UITimeDilator::UIMode mode;
+    bool isEnable;
+
+public:
+    CCC_UI_Time_Dilation_Mode(pcstr N, UITimeDilator::UIMode mode) : IConsole_Command(N), mode(mode) {};
+
+    virtual void Execute(pcstr args)
+    {
+        if (!g_hud)
+            return;
+
+        UITimeDilator* timeDilator = smart_cast<CUIGameSP*>(CurrentGameUI())->timeDilator;
+
+        if (EQ(args, "on") || EQ(args, "1"))
+        {
+            timeDilator->SetModeEnability(mode, true);
+            isEnable = true;
+        }
+        else if (EQ(args, "off") || EQ(args, "0"))
+        {
+            timeDilator->SetModeEnability(mode, false);
+            isEnable = false;
+        }
+        else
+            InvalidSyntax();
+    }
+
+    virtual void GetStatus(TStatus& S)
+    {    
+        xr_strcpy(S, isEnable ? "on" : "off"); 
+    }
+
+    virtual void Info(TInfo& I) { xr_strcpy(I, "'on/off' or '1/0'"); }
+
+    virtual void fill_tips(vecTips& tips, u32 /*mode*/)
+    {
+        TStatus str;
+        xr_sprintf(str, sizeof(str), "%s (current) [on/off]", isEnable ? "on" : "off");
+        tips.push_back(str);
+    }
+};
+
+class CCC_UI_Time_Factor : public IConsole_Command
+{
+    float uiTimeFactor = 1.0;
+
+public:
+    CCC_UI_Time_Factor(pcstr N) : IConsole_Command(N){};
+
+    virtual void Execute(LPCSTR args)
+    {
+        if (!g_hud)
+            return;
+
+        UITimeDilator* timeDilator = smart_cast<CUIGameSP*>(CurrentGameUI())->timeDilator;
+        float time_factor = (float)atof(args);
+        clamp(time_factor, EPS, 1.f);
+        timeDilator->SetUiTimeFactor(time_factor);
+        uiTimeFactor = time_factor;
+    }
+
+    virtual void Info(TInfo& I) { xr_strcpy(I, "[0.001 - 1.0]"); }
+
+    virtual void fill_tips(vecTips& tips, u32 mode)
+    {
+        TStatus str;
+        xr_sprintf(str, sizeof(str), "%3.3f (current) [0.001 - 1.0]", uiTimeFactor, 0.f, 1.f);
+        tips.push_back(str);
+        IConsole_Command::fill_tips(tips, mode);
+    }
+
+    void GetStatus(TStatus& S) override 
+    { 
+        xr_sprintf(S, sizeof(S), "%f", uiTimeFactor); 
+    }
+};
+
 void CCC_RegisterCommands()
 {
     // options
@@ -2384,5 +2463,9 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "dbg_load_pre_c5ef6c7_saves", &g_dbg_load_pre_c5ef6c7_saves, 0, 1); //Alundaio
 
     CMD4(CCC_Integer, "keypress_on_start", &g_keypress_on_start, 0, 1);
+    CMD1(CCC_UI_Time_Factor, "ui_time_factor");
+    CMD2(CCC_UI_Time_Dilation_Mode, "time_dilation_inventory", UITimeDilator::Inventory);
+    CMD2(CCC_UI_Time_Dilation_Mode, "time_dilation_pda", UITimeDilator::Pda);
+
     register_mp_console_commands();
 }

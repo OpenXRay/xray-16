@@ -1603,6 +1603,8 @@ set(SRC_FILES
     "UITeamPanels.h"
     "UITeamState.cpp"
     "UITeamState.h"
+    "UITimeDilator.cpp"
+    "UITimeDilator.h"
     "UIZoneMap.cpp"
     "UIZoneMap.h"
     "VersionSwitcher.cpp"

@@ -6504,6 +6504,9 @@
     <ClInclude Include="game_cl_mp_script.h">
       <Filter>Core\Server\Games\client\mp_script</Filter>
     </ClInclude>
+    <ClInclude Include="UITimeDilator.h">
+      <Filter>UI\Common\InventoryUtilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9877,6 +9880,9 @@
     </ClCompile>
     <ClCompile Include="CustomOutfit_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
+    <ClCompile Include="UITimeDilator.cpp">
+      <Filter>UI\Common\InventoryUtilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
