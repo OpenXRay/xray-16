@@ -22,9 +22,14 @@ jobs:
 
     - uses: microsoft/setup-msbuild@main
 
+    - uses: nuget/setup-nuget@main
+
+    - name: Restore NuGet packages
+      run: nuget restore src\engine.sln
+
     - name: Build
       working-directory: src
-      run: msbuild /restore /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
+      run: msbuild /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
 
     - name: Prepare artifacts
       id: windows-vars
