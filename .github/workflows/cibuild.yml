@@ -9,7 +9,7 @@ on:
 jobs:
   build-windows:
     name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (msvc)
-    runs-on: windows-2019
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
