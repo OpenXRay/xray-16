@@ -99,7 +99,7 @@ EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
     return test_mask ? fcvPartial : fcvFully;
 }
 
-bool CFrustum::testSphere_dirty(Fvector& c, float r) const
+bool CFrustum::testSphere_dirty(const Fvector& c, float r) const
 {
 	VERIFY(p_count <= FRUSTUM_MAXPLANES); // '<=' is not a typo, this check is correct
     if (p_count == 0)

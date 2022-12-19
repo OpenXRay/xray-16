@@ -76,11 +76,12 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
             {
                 ISpatial* spatial = lstRenderables[o_it];
                 spatial->spatial_updatesector();
-                CSector* sector = (CSector*)spatial->GetSpatialData().sector;
+                const auto& data = spatial->GetSpatialData();
+                const auto& [type, sphere, sector] = std::tuple(data.type, data.sphere, (CSector*)data.sector);
                 if (0 == sector)
                     continue; // disassociated from S/P structure
 
-                if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
+                if (type & STYPE_LIGHTSOURCE)
                 {
                     // lightsource
                     light* L = (light*)spatial->dcast_Light();
@@ -100,10 +101,10 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                 for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
                 {
                     CFrustum& view = sector->r_frustums[v_it];
-                    if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
+                    if (!view.testSphere_dirty(sphere.P, sphere.R))
                         continue;
 
-                    if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
+                    if (type & STYPE_RENDERABLE)
                     {
                         // renderable
                         IRenderable* renderable = spatial->dcast_Renderable();
