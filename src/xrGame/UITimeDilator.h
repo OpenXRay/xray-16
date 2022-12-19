@@ -5,9 +5,9 @@ public:
 
     enum UIMode
     {
-        None,
-        Inventory,
-        Pda
+        None = 0,
+        Inventory = 1 << 0,
+        Pda = 1 << 1
     };
 
     void SetUiTimeFactor(float timeFactor);
@@ -25,5 +25,5 @@ private:
     UIMode currMode;
 
     bool dilateTime();
-    void resetTimeDilation();
+    void resetTime();
 };  

@@ -13,13 +13,13 @@ void UITimeDilator::SetModeEnability(UIMode mode, bool status)
 {
     enabledModes.set(mode, status);
 
-    if (!status && mode == currMode)
-    {
-        resetTimeDilation();
-    }
-    else
+    if (status)
     {
         dilateTime();
+    }
+    else if (!status && mode == currMode)
+    {
+        resetTime();
     }
 }
 
@@ -34,7 +34,7 @@ bool UITimeDilator::StartTimeDilation(UIMode mode)
 void UITimeDilator::StopTimeDilation()
 {
     currMode = None;
-    resetTimeDilation();
+    resetTime();
 }
 
 bool UITimeDilator::dilateTime()
@@ -48,10 +48,7 @@ bool UITimeDilator::dilateTime()
     return false;
 }
 
-void UITimeDilator::resetTimeDilation()
+void UITimeDilator::resetTime()
 {
-    if (enabledModes.is(currMode))
-    {
-        Device.time_factor(1.0);
-    }
+    Device.time_factor(1.0);
 }
