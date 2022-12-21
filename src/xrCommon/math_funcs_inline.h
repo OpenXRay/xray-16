@@ -1,5 +1,6 @@
 #pragma once
-#include <math.h>
+#include <cmath>
+#include <algorithm>
 #include "xrCore/math_constants.h"
 #include "xrCore/_bitwise.h" // iFloor
 
@@ -27,24 +28,11 @@ constexpr double rad2deg(double val) noexcept { return val*180 / M_PI;}
 
 // clamping/snapping
 template <class T>
-constexpr void clamp(T& val, const T& _low, const T& _high)
-{
-    if (val<_low)
-        val = _low;
-    else if (val>_high)
-        val = _high;
-}
+constexpr void clamp(T& val, const T& _low, const T& _high) noexcept { val = std::clamp(val, _low, _high); }
 
 // XXX: Check usages and provide overloads for native types where arguments are NOT references.
 template <class T>
-constexpr T clampr(const T& val, const T& _low, const T& _high)
-{
-    if (val < _low)
-        return _low;
-    if (val > _high)
-        return _high;
-    return val;
-}
+constexpr T clampr(const T& val, const T& _low, const T& _high) noexcept { return std::clamp(val, _low, _high); }
 
 inline float snapto(float value, float snap)
 {
