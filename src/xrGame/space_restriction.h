@@ -34,11 +34,8 @@ private:
         CBaseRestrictionPtr m_restriction;
         bool m_enabled;
 
-        IC CFreeInRestriction(CBaseRestrictionPtr restriction, bool enabled)
-        {
-            m_restriction = restriction;
-            m_enabled = enabled;
-        }
+        CFreeInRestriction(CBaseRestrictionPtr restriction, bool enabled)
+            : m_restriction(restriction), m_enabled(enabled) {}
     };
 
 private:
