@@ -1932,7 +1932,7 @@ class CCC_UI_Time_Dilation_Mode : public IConsole_Command
     bool isEnable;
 
 public:
-    CCC_UI_Time_Dilation_Mode(pcstr N, UITimeDilator::UIMode mode) : IConsole_Command(N), mode(mode) {};
+    CCC_UI_Time_Dilation_Mode(pcstr name, UITimeDilator::UIMode mode) : IConsole_Command(name), mode(mode) {};
 
     void Execute(pcstr args) override
     {
@@ -1955,14 +1955,14 @@ public:
             InvalidSyntax();
     }
 
-    void GetStatus(TStatus& S) override
+    void GetStatus(TStatus& status) override
     {    
-        xr_strcpy(S, isEnable ? "on" : "off"); 
+        xr_strcpy(status, isEnable ? "on" : "off"); 
     }
 
-    void Info(TInfo& I) override
+    void Info(TInfo& info) override
     {
-        xr_strcpy(I, "'on/off' or '1/0'"); 
+        xr_strcpy(info, "'on/off' or '1/0'"); 
     }
 
     void fill_tips(vecTips& tips, u32 /*mode*/) override
@@ -1978,7 +1978,7 @@ class CCC_UI_Time_Factor : public IConsole_Command
     float uiTimeFactor = 1.0;
 
 public:
-    CCC_UI_Time_Factor(pcstr N) : IConsole_Command(N){};
+    CCC_UI_Time_Factor(pcstr name) : IConsole_Command(name){};
 
     void Execute(pcstr args) override
     {
@@ -1992,22 +1992,21 @@ public:
         uiTimeFactor = time_factor;
     }
 
-    void Info(TInfo& I) override
+    void Info(TInfo& info) override
     {
-        xr_strcpy(I, "[0.001 - 1.0]"); 
+        xr_strcpy(info, "[0.001 - 1.0]"); 
     }
 
     void fill_tips(vecTips& tips, u32 mode) override
     {
         TStatus str;
-        xr_sprintf(str, sizeof(str), "%3.3f (current) [0.001 - 1.0]", uiTimeFactor, 0.f, 1.f);
+        xr_sprintf(str, sizeof(str), "%3.3f (current) [0.001 - 1.0]", uiTimeFactor);
         tips.push_back(str);
-        IConsole_Command::fill_tips(tips, mode);
     }
 
-    void GetStatus(TStatus& S) override 
+    void GetStatus(TStatus& status) override 
     { 
-        xr_sprintf(S, sizeof(S), "%f", uiTimeFactor); 
+        xr_sprintf(status, sizeof(status), "%f", uiTimeFactor); 
     }
 };
 
