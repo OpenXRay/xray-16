@@ -306,7 +306,6 @@ set(CMAKE_CXX_FLAGS
     #"-pedantic"
     "-Wno-unknown-pragmas"
     "-Wno-strict-aliasing"
-    "-Wno-class-memaccess"
     "-Wno-parentheses"
     "-Wno-unused-label"
     "-Wno-switch"
@@ -319,6 +318,9 @@ set(CMAKE_CXX_FLAGS
     #"-Wno-c++14-compat-pedantic"
     #"-Wno-newline-eof"
 )
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "-Wno-class-memaccess")
+endif()
 string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(src)
