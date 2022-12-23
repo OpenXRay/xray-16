@@ -672,6 +672,7 @@ CIKLimbsController* CEntityAlive::character_ik_controller()
         return NULL;
     }
 }
+
 CPHSoundPlayer* CEntityAlive::ph_sound_player()
 {
     if (character_physics_support())
@@ -680,7 +681,7 @@ CPHSoundPlayer* CEntityAlive::ph_sound_player()
     }
     else
     {
-        return NULL;
+        return ph_sound_player();
     }
 }
 
