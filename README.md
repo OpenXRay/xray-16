@@ -30,6 +30,8 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
 You can see the detailed differences table [here](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-Differences-from-original-X‐Ray)
 
 #### Supported games
+OpenXRay is based on X-Ray 1.6.02, used in S.T.A.L.K.E.R.: Call of Pripyat, so initially it supported only this game. <br>
+Currently, we are working on support for all three games in the series.
 |Call of Pripyat|Clear Sky|Shadow of Chernobyl|
 |---|---|---|
 |Yes|Release Candidate (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| **Not supported** yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
