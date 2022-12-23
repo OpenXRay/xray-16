@@ -9,10 +9,13 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
     1. 100% compatibility and same behaviour.
     2. Compile engine into a single executable file that you can just drop into `bin` folder. (see [#210](https://github.com/OpenXRay/xray-16/issues/210))
 2. Support all three games in the series: SOC/CS/COP. (see [Supported games](https://github.com/OpenXRay/xray-16/edit/dev/README.md#supported-games) below)
-3. Introduce a solid platform for modmakers:
+3. Fix original S.T.A.L.K.E.R. series bugs.
+4. Introduce a solid platform for modmakers:
     1. Add frame/render graph for those who want to add new graphics features.
     2. Improve performance via refactoring the code, parallelizing the engine, making it multithreaded.
-4. Clean up engine code, make it easily portable to new platforms, minimize platform-specific code.
+    3. Add new scripting, development and debugging features.
+5. Clean up engine code, make it easily portable to new platforms, minimize platform-specific code.
+6. Enhance player's experience with new graphics, gameplay and other features that can be enabled optionally. (by default, we stay close to vanilla)
 
 ##### Main differences from original X-Ray are:
 - Support for 64-bit.
@@ -63,8 +66,9 @@ Join our efforts in making our beloved game better, send pull requests, particip
 It is a place to share ideas on what to implement, gather people that want to work on the engine,
 and work on the source code. However, the following things should be taken into consideration:
 
-* We want to keep the game as close as possible to the vanilla game, so instead of introducing new gameplay features,
-  consider adding non-gameplay features, fixing bugs, improving performance and code quality.
+* We want to keep the game close to the vanilla, untouched state, so if you want to introduce new gameplay features,
+  make sure it is optional, doesn't break compatibility with original game resources (i.e. everything in `gamedata` folder and `.db*`/`.xdb` archives).
+  You also may want to add non-gameplay features, fix bugs or improve engine performance and code quality.
 * Major changes should be discussed before implementation.
 * Follow the [procedures](doc/procedure).
 
