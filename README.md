@@ -19,8 +19,9 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
 
 ##### Main differences from original X-Ray are:
 - Support for 64-bit.
-- Works on Linux, macOS.
-- New OpenGL renderer.
+- Support for ARM, ARM64, E2K (Elbrus 2000).
+- Works on Linux, macOS, OSL (Elbrus OS).
+- New OpenGL renderer. (currently, requires OpenGL 4.1 minimum, lowering to at least OpenGL 3.3 is planned)
 - Improved performance, better FPS.
 - Original bugs fixes.
 - New features for modmakers.
