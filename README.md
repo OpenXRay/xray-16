@@ -8,7 +8,7 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
 1. Make it a drop-in replacement for original engine.
     1. 100% compatibility and same behaviour.
     2. Compile engine into a single executable file that you can just drop into `bin` folder. (see [#210](https://github.com/OpenXRay/xray-16/issues/210))
-2. Support all three games in the series: SOC/CS/COP. (see [Supported games](https://github.com/OpenXRay/xray-16#supported-games) below)
+2. Support all three games in the series: SOC/CS/COP. (see [Supported games](#supported-games) below)
 3. Fix original S.T.A.L.K.E.R. series bugs.
 4. Introduce a solid platform for modmakers:
     1. Add frame/render graph for those who want to add new graphics features.
