@@ -27,10 +27,12 @@ void CSquadHierarchyHolder::update_leader()
 {
     m_leader = 0;
     for (const auto& group : m_groups)
+    {
         if (group && group->leader())
         {
             leader(group->leader());
             break;
         }
+    }
 }
 #endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
