@@ -417,6 +417,11 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("remove_memory_visible_object", &CScriptGameObject::RemoveMemoryVisibleObject)
         .def("remove_memory_hit_object", &CScriptGameObject::RemoveMemoryHitObject)
 
+        //For Ammo
+        .def("ammo_get_count", &CScriptGameObject::AmmoGetCount)
+        .def("ammo_set_count", &CScriptGameObject::AmmoSetCount)
+        .def("ammo_box_size", &CScriptGameObject::AmmoBoxSize)
+
         //For Weapons
         .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
         .def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)

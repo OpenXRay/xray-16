@@ -814,6 +814,11 @@ public:
     u8 GetRestrictionType();
     void SetRestrictionType(u8 type);
 
+    //CWeaponAmmo
+    u16 AmmoGetCount();
+    void AmmoSetCount(u16 count);
+    u16 AmmoBoxSize();
+
     //Weapon
     void Weapon_AddonAttach(CScriptGameObject* item);
     void Weapon_AddonDetach(pcstr item_section);
