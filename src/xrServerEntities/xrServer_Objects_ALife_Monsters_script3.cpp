@@ -11,11 +11,10 @@
 #include "xrServer_script_macroses.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 SCRIPT_EXPORT(CSE_ALifeCreatureActor, (CSE_ALifeCreatureAbstract, CSE_ALifeTraderAbstract, CSE_PHSkeleton),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         luabind_class_creature3(CSE_ALifeCreatureActor, "cse_alife_creature_actor", CSE_ALifeCreatureAbstract,
@@ -25,6 +24,8 @@ SCRIPT_EXPORT(CSE_ALifeCreatureActor, (CSE_ALifeCreatureAbstract, CSE_ALifeTrade
 
 SCRIPT_EXPORT(CSE_ALifeTorridZone, (CSE_ALifeCustomZone, CSE_Motion),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         luabind_class_dynamic_alife2(CSE_ALifeTorridZone, "cse_torrid_zone", CSE_ALifeCustomZone, CSE_Motion)
@@ -33,6 +34,8 @@ SCRIPT_EXPORT(CSE_ALifeTorridZone, (CSE_ALifeCustomZone, CSE_Motion),
 
 SCRIPT_EXPORT(CSE_ALifeZoneVisual, (CSE_ALifeAnomalousZone, CSE_Visual),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         luabind_class_dynamic_alife2(CSE_ALifeZoneVisual, "cse_zone_visual", CSE_ALifeAnomalousZone, CSE_Visual)
@@ -41,6 +44,8 @@ SCRIPT_EXPORT(CSE_ALifeZoneVisual, (CSE_ALifeAnomalousZone, CSE_Visual),
 
 SCRIPT_EXPORT(CSE_ALifeCreaturePhantom, (CSE_ALifeCreatureAbstract),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         luabind_class_creature1(CSE_ALifeCreaturePhantom, "cse_alife_creature_phantom", CSE_ALifeCreatureAbstract)
@@ -48,8 +53,11 @@ SCRIPT_EXPORT(CSE_ALifeCreaturePhantom, (CSE_ALifeCreatureAbstract),
 });
 
 static SRotation* CSE_ALifeCreatureAbstract__o_torso(CSE_ALifeCreatureAbstract* self) { return (&self->o_torso); }
+
 SCRIPT_EXPORT(CSE_ALifeCreatureAbstract, (CSE_ALifeDynamicObjectVisual),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         luabind_class_creature1(CSE_ALifeCreatureAbstract, "cse_alife_creature_abstract", CSE_ALifeDynamicObjectVisual)
@@ -64,6 +72,9 @@ SCRIPT_EXPORT(CSE_ALifeCreatureAbstract, (CSE_ALifeDynamicObjectVisual),
 
 static void CSE_ALifeOnlineOfflineGroup_Export(lua_State* luaState)
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     module(luaState)
     [
         class_<CSE_ALifeOnlineOfflineGroup::MEMBERS::value_type>("MEMBERS__value_type")

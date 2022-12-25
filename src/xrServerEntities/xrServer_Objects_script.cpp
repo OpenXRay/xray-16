@@ -13,10 +13,8 @@
 #include "script_ini_file.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
-LPCSTR get_section_name(const CSE_Abstract* abstract) { return (abstract->name()); }
-LPCSTR get_name(const CSE_Abstract* abstract) { return (abstract->name_replace()); }
+pcstr get_section_name(const CSE_Abstract* abstract) { return (abstract->name()); }
+pcstr get_name(const CSE_Abstract* abstract) { return (abstract->name_replace()); }
 CScriptIniFile* get_spawn_ini(CSE_Abstract* abstract) { return ((CScriptIniFile*)&abstract->spawn_ini()); }
 
 template <typename T>
@@ -53,8 +51,13 @@ struct CSEAbstractWrapperBase : public T, public luabind::wrap_base
     }
 };
 
-SCRIPT_EXPORT(CPureServerObject, (), {
-    module(luaState)[class_<ISerializable>("iserializable"),
+SCRIPT_EXPORT(CPureServerObject, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<ISerializable>("iserializable"),
         class_<IPureServerObject, ISerializable>("ipure_server_object"),
         class_<CPureServerObject, IPureServerObject>("cpure_server_object")
         //			.def(		constructor<>())
@@ -63,6 +66,8 @@ SCRIPT_EXPORT(CPureServerObject, (), {
 
 SCRIPT_EXPORT(CSE_Abstract, (CPureServerObject),
 {
+    using namespace luabind;
+
     using BaseType = CSE_Abstract;
     using WrapType = CSEAbstractWrapperBase<CSE_Abstract>;
 
@@ -82,32 +87,61 @@ SCRIPT_EXPORT(CSE_Abstract, (CPureServerObject),
             .def("STATE_Write", &BaseType::STATE_Write, &WrapType::STATE_Write_static)
             .def("UPDATE_Read", &BaseType::UPDATE_Read, &WrapType::UPDATE_Read_static)
             .def("UPDATE_Write", &BaseType::UPDATE_Write, &WrapType::UPDATE_Write_static)
-        //			.def(		constructor<[LPCSTR>())
+            //			.def(		constructor<pcstr>())
     ];
 });
 
-SCRIPT_EXPORT(CSE_Shape, (), {
-    module(luaState)[class_<CSE_Shape>("cse_shape")
+SCRIPT_EXPORT(CSE_Shape, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CSE_Shape>("cse_shape")
         //			.def(		constructor<>())
     ];
 });
 
-SCRIPT_EXPORT(CSE_Visual, (), {
-    module(luaState)[class_<CSE_Visual>("cse_visual")
+SCRIPT_EXPORT(CSE_Visual, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CSE_Visual>("cse_visual")
         //			.def(		constructor<>())
-        //			.def(		constructor<LPCSTR>())
+        //			.def(		constructor<pcstr>())
     ];
 });
 
-SCRIPT_EXPORT(CSE_Motion, (), {
-    module(luaState)[class_<CSE_Motion>("cse_motion")
+SCRIPT_EXPORT(CSE_Motion, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CSE_Motion>("cse_motion")
         //			.def(		constructor<>())
-        //			.def(		constructor<LPCSTR>())
+        //			.def(		constructor<pcstr>())
     ];
 });
 
 SCRIPT_EXPORT(CSE_Spectator, (CSE_Abstract),
-    { module(luaState)[luabind_class_abstract1(CSE_Spectator, "cse_spectator", CSE_Abstract)]; });
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        luabind_class_abstract1(CSE_Spectator, "cse_spectator", CSE_Abstract)
+    ];
+});
 
 SCRIPT_EXPORT(CSE_Temporary, (CSE_Abstract),
-    { module(luaState)[luabind_class_abstract1(CSE_Temporary, "cse_temporary", CSE_Abstract)]; });
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        luabind_class_abstract1(CSE_Temporary, "cse_temporary", CSE_Abstract)
+    ];
+});
