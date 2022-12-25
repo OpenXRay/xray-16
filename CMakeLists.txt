@@ -250,7 +250,7 @@ if (NOT WIN32)
     find_package(Vorbis REQUIRED)
     find_package(Theora REQUIRED)
     find_package(LZO REQUIRED)
-    find_package(mimalloc)
+    find_package(mimalloc NAMES mimalloc2 mimalloc2.0 mimalloc)
 endif()
 
 # Memory allocator option
