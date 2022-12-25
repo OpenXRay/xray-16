@@ -20,7 +20,7 @@ SCRIPT_EXPORT(CSE_AbstractVisual, (CSE_Visual, CSE_Abstract),
     module(luaState)
     [
         luabind_class_abstract2(CSE_AbstractVisual, "CSE_AbstractVisual", CSE_Visual, CSE_Abstract)
-        .def("getStartupAnimation", &CSE_AbstractVisual::getStartupAnimation)
+            .def("getStartupAnimation", &CSE_AbstractVisual::getStartupAnimation)
     ];
 });
 
