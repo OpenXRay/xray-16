@@ -3,11 +3,11 @@
 #include "UITabButton.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 SCRIPT_EXPORT(CUITabControl, (CUIWindow),
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     module(luaState)
     [
         class_<CUITabControl, CUIWindow>("CUITabControl")
@@ -32,4 +32,12 @@ SCRIPT_EXPORT(CUITabControl, (CUIWindow),
 });
 
 SCRIPT_EXPORT(CUITabButton, (CUIButton),
-    { module(luaState)[class_<CUITabButton, CUIButton>("CUITabButton").def(constructor<>())]; });
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CUITabButton, CUIButton>("CUITabButton")
+            .def(constructor<>())
+    ];
+});

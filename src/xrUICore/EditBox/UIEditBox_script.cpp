@@ -2,9 +2,10 @@
 #include "UIEditBox.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
+SCRIPT_EXPORT(CUIEditBox, (CUIWindow),
+{
+    using namespace luabind;
 
-SCRIPT_EXPORT(CUIEditBox, (CUIWindow), {
     module(luaState)
     [
         class_<CUICustomEdit, CUIWindow>("CUICustomEdit")
