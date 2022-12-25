@@ -9,5 +9,5 @@
     "editor.formatOnSave": false
   },
   "files.trimTrailingWhitespace": false,
-  "files.insertFinalNewline": false
+  "files.insertFinalNewline": true
 }
