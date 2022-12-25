@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "options": {
     "env": {
-      "LD_LIBRARY_PATH": "${workspaceFolder}/bin/x64/Release"
+      "LD_LIBRARY_PATH": "${workspaceFolder}/bin/x64/Debug:${workspaceFolder}/bin/x64/Mixed:${workspaceFolder}/bin/x64/Release"
     }
   },
   "tasks": [
@@ -68,43 +68,6 @@
       ]
     },
     {
-      "label": "Compile Debug",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}/bin"
-      },
-      "command": "make -j${CPU_COUNT}",
-      "dependsOn": [
-        "mkdir",
-        "Configure Debug"
-      ]
-    },
-    {
-      "label": "Compile Release",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}/bin"
-      },
-      "command": "make -j${CPU_COUNT}",
-      "dependsOn": [
-        "mkdir",
-        "Configure Release"
-      ],
-      "problemMatcher": []
-    },
-    {
-      "label": "Compile Mixed",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}/bin"
-      },
-      "command": "make -j${CPU_COUNT}",
-      "dependsOn": [
-        "mkdir",
-        "Configure Mixed"
-      ]
-    },
-    {
       "label": "Compile",
       "type": "shell",
       "options": {
@@ -116,12 +79,45 @@
       ]
     },
     {
-      "label": "Run Release",
+      "label": "Run SoC Release",
       "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}/bin/x64/Release"
       },
-      "command": "./xr_3da -nointro -fsltx ${COC_LTX_FILE_PATH}",
+      "command": "./xr_3da -soc -nointro -fsltx ${SOC_LTX_FILE_PATH}",
+      "dependsOn": [
+        "mkdir",
+        "Configure Release",
+        "Configure Compile"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Run CS Release",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin/x64/Release"
+      },
+      "command": "./xr_3da -cs -nointro -fsltx ${CS_LTX_FILE_PATH}",
+      "dependsOn": [
+        "mkdir",
+        "Configure Release",
+        "Configure Compile"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Run CoP Release",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin/x64/Release"
+      },
+      "command": "./xr_3da -nointro -fsltx ${COP_LTX_FILE_PATH}",
+      "dependsOn": [
+        "mkdir",
+        "Configure Release",
+        "Configure Compile"
+      ],
       "problemMatcher": []
     },
   ]
