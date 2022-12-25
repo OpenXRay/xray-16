@@ -483,6 +483,8 @@ u32 CParticleGroup::SItem::ParticlesCount()
 CParticleGroup::CParticleGroup()
 {
     m_RT_Flags.zero();
+    m_Def = nullptr;
+    m_CurrentTime = 0.f;
     m_InitialPosition.set(0, 0, 0);
 }
 
