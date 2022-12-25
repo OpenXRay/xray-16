@@ -25,8 +25,6 @@
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 void _attach_child(CUIWindow* _child, CUIWindow* _parent)
 {
     if (!_parent)
@@ -273,6 +271,8 @@ CUIEditBox* CScriptXmlInit::InitMPPlayerName(LPCSTR path, CUIWindow* parent)
 
 SCRIPT_EXPORT(CScriptXmlInit, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CScriptXmlInit>("CScriptXmlInit")

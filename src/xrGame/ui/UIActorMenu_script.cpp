@@ -14,8 +14,6 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "eatable_item.h"
 
-using namespace luabind;
-
 void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
 {
     PIItem item = get_upgrade_item();
