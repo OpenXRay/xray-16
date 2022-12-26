@@ -35,9 +35,6 @@
 #include "PhysicObject.h"
 #include "Artefact.h"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 /*
     New luabind makes incorrect casts in this case. He makes casts only to 'true derived class'.
     For example:
@@ -56,8 +53,11 @@ TClass* ObjectCast(CScriptGameObject* scriptObj)
     return nullptr;
 }
 
-class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject>& instance)
+luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_<CScriptGameObject>& instance)
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     instance
         .def("add_sound",
             (u32(CScriptGameObject::*)(LPCSTR, u32, ESoundTypes, u32, u32, u32))(&CScriptGameObject::add_sound))

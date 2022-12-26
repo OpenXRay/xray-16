@@ -11,8 +11,6 @@
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 Fvector CALifeMonsterPatrolPathManager__target_position(CALifeMonsterPatrolPathManager* self)
 {
     THROW(self);
@@ -21,6 +19,8 @@ Fvector CALifeMonsterPatrolPathManager__target_position(CALifeMonsterPatrolPathM
 
 SCRIPT_EXPORT(CALifeMonsterPatrolPathManager, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CALifeMonsterPatrolPathManager>("CALifeMonsterPatrolPathManager")

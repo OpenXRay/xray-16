@@ -22,9 +22,6 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrNetServer/NET_Messages.h"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 typedef xr_vector<std::pair<shared_str, int>> STORY_PAIRS;
 typedef STORY_PAIRS SPAWN_STORY_PAIRS;
 LPCSTR _INVALID_STORY_ID = "INVALID_STORY_ID";
@@ -414,6 +411,9 @@ void set_start_game_vertex_id(int id)
 
 SCRIPT_EXPORT(CALifeSimulator, (),
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     module(luaState)
     [
         class_<CALifeSimulator>("alife_simulator")
@@ -474,9 +474,11 @@ SCRIPT_EXPORT(CALifeSimulator, (),
         def("set_start_position", &set_start_position),
         def("set_start_game_vertex_id", &set_start_game_vertex_id)
     ];
+
     class CALifeSimulatorExporter1
     {
     };
+
     {
         if (story_ids.empty())
             generate_story_ids(story_ids, INVALID_STORY_ID, "story_ids", "INVALID_STORY_ID",
@@ -492,9 +494,11 @@ SCRIPT_EXPORT(CALifeSimulator, (),
 
         luabind::module(luaState)[instance];
     }
+
     class CALifeSimulatorExporter2
     {
     };
+
     {
         if (spawn_story_ids.empty())
             generate_story_ids(spawn_story_ids, INVALID_SPAWN_STORY_ID, "spawn_story_ids", "INVALID_SPAWN_STORY_ID",
