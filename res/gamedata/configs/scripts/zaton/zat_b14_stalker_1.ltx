@@ -1,5 +1,5 @@
 [logic@b14_stalker_1]
-suitable = {=check_npc_name(zat_b14_stalker_1)} true
+suitable = {=check_npc_name(zat_b14_stalker_1) -zat_b14_stalkers_bandits_free} true
 prior = 200
 active = walker@go
 on_hit = hit
@@ -16,6 +16,7 @@ on_info = {=hit_by_actor =actor_has_item(af_quest_b14_twisted) =is_alive} %=play
 path_walk = zat_b14_stalker_1_walk_1
 path_look = zat_b14_stalker_1_look_1
 on_actor_dist_le_nvis = 5 | {!actor_in_zone(zat_b14_not_give_item_zone)} remark@ready
+on_info = {+zat_a2_linker_b14_quest_strange_item_done} %+zat_b14_stalkers_bandits_free +zat_b14_stalkers_go_sim%
 def_state_moving = run
 def_state_standing = wait_na
 show_spot = {!actor_enemy} false, true
