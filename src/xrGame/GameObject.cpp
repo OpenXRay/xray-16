@@ -1516,8 +1516,6 @@ void CGameObject::OnRender()
 }
 #endif // DEBUG
 
-using namespace luabind; // XXX: is it required here?
-
 bool CGameObject::use(IGameObject* obj)
 {
     VERIFY(obj);

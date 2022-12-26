@@ -32,15 +32,14 @@ void CRender::Calculate()
         // Search for default sector - assume "default" or "outdoor" sector is the largest one
         //. hack: need to know real outdoor sector
         float largest_sector_vol = 0;
-        for (u32 s = 0; s < Sectors.size(); s++)
+        for (auto& s : Sectors)
         {
-            CSector* S = (CSector*)Sectors[s];
-            dxRender_Visual* V = S->root();
+            dxRender_Visual* V = static_cast<CSector*>(s)->root();
             float vol = V->vis.box.getvolume();
             if (vol > largest_sector_vol)
             {
                 largest_sector_vol = vol;
-                m_largest_sector = S;
+                m_largest_sector = static_cast<CSector*>(s);
             }
         }
 
@@ -73,9 +72,8 @@ void CRender::Calculate()
     // Check if we touch some light even trough portal
     lstRenderables.clear();
     g_SpatialSpace->q_sphere(lstRenderables, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
-    for (u32 _it = 0; _it < lstRenderables.size(); _it++)
+    for (auto spatial : lstRenderables)
     {
-        ISpatial* spatial = lstRenderables[_it];
         spatial->spatial_updatesector();
         CSector* sector = (CSector*)spatial->GetSpatialData().sector;
         if (!sector)

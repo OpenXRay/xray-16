@@ -161,7 +161,7 @@ public:
         xr_free(data);
     }
 #pragma warning(pop)
-    bool save_to(LPCSTR fn);
+    bool save_to(LPCSTR fn) const;
     void flush() override {}
 };
 

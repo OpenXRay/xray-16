@@ -7,9 +7,8 @@
 #include "UIMapInfo.h"
 #include "UIComboBox.h"
 
-using namespace luabind;
-
 bool CUIListWnd::AddItem_script(CUIListItem* item) { return AddItem(item, -1); }
+
 struct CUIListItemWrapper : public CUIListItem, public luabind::wrap_base
 {
 };
@@ -18,11 +17,12 @@ struct CUIListItemExWrapper : public CUIListItemEx, public luabind::wrap_base
 {
 };
 
-#pragma optimize("s", on)
 void CUIListWnd::script_register(lua_State* L)
 {
-    module(L)[
+    using namespace luabind;
 
+    module(L)
+    [
         class_<CUIListWnd, CUIWindow>("CUIListWnd")
             .def(constructor<>())
             //		.def("AddText",					&CUIListWnd::AddText_script)
@@ -53,7 +53,8 @@ void CUIListWnd::script_register(lua_State* L)
             .def("GetSelectedItem", &CUIListWnd::GetSelectedItem)
             .def("ResetFocusCapture", &CUIListWnd::ResetFocusCapture),
 
-        class_<CUIListItem, CUIButton, CUIListItemWrapper>("CUIListItem").def(constructor<>()),
+        class_<CUIListItem, CUIButton, CUIListItemWrapper>("CUIListItem")
+            .def(constructor<>()),
 
         class_<CUIListItemEx, CUIListItem, CUIListItemExWrapper>("CUIListItemEx")
             .def(constructor<>())
@@ -99,10 +100,14 @@ void CUIListWnd::script_register(lua_State* L)
             .def("IsEmpty", &CUIMapList::IsEmpty),
 
         class_<enum_exporter<EGameIDs>>("GAME_TYPE")
-            .enum_("gametype")[value("GAME_UNKNOWN", int(-1)), value("eGameIDDeathmatch", int(eGameIDDeathmatch)),
+            .enum_("gametype")
+            [
+                value("GAME_UNKNOWN", int(-1)),
+                value("eGameIDDeathmatch", int(eGameIDDeathmatch)),
                 value("eGameIDTeamDeathmatch", int(eGameIDTeamDeathmatch)),
                 value("eGameIDArtefactHunt", int(eGameIDArtefactHunt)),
-                value("eGameIDCaptureTheArtefact", int(eGameIDCaptureTheArtefact))]
+                value("eGameIDCaptureTheArtefact", int(eGameIDCaptureTheArtefact))
+            ]
 
     ];
 }

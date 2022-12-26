@@ -422,7 +422,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
     xrMiscMath
     dl
-    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
+    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
     $<$<BOOL:${JPEG_FOUND}>:${JPEG_LIBRARIES}>
     ${LZO_LIBRARIES}
 )

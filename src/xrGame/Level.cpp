@@ -127,17 +127,17 @@ CLevel::~CLevel()
         xr_delete(m_ph_commander_physics_worldstep);
     }
     // destroy PSs
-    for (auto p_it = m_StaticParticles.begin(); m_StaticParticles.end() != p_it; ++p_it)
-        CParticlesObject::Destroy(*p_it);
+    for (auto& ps : m_StaticParticles)
+        CParticlesObject::Destroy(ps);
     m_StaticParticles.clear();
     // Unload sounds
     // unload prefetched sounds
     sound_registry.clear();
     // unload static sounds
-    for (u32 i = 0; i < static_Sounds.size(); ++i)
+    for (auto& sound : static_Sounds)
     {
-        static_Sounds[i]->destroy();
-        xr_delete(static_Sounds[i]);
+        sound->destroy();
+        xr_delete(sound);
     }
     static_Sounds.clear();
     xr_delete(m_level_sound_manager);

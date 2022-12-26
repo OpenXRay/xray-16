@@ -573,7 +573,7 @@ IC T1 smart_cast(T2& p)
 #ifdef SMART_CAST_STATS_ALL
     add_smart_cast_stats_all(typeid(T2*).name(), typeid(std::remove_reference_t<T1>*).name());
 #endif
-    return (*SmartDynamicCast::CHelper2<T2>::smart_cast<object_type_traits::remove_reference<T1>::type>(&p));
+    return (*SmartDynamicCast::CHelper2<T2>::smart_cast<std::remove_reference_t<T1>>(&p));
 }
 
 #ifdef XRGAME_EXPORTS

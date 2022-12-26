@@ -97,7 +97,7 @@ void cover::vertex(smart_cover::loophole const& loophole, smart_cover::loophole_
             u32 level_vertex_id = graph.vertex_id(pos);
             VERIFY2(graph.valid_vertex_id(level_vertex_id),
                 make_string("invalid vertex id: loophole [%s]", loophole.id().c_str()));
-            loophole_data.m_action_vertices.push_back(std::make_pair((*I).first, level_vertex_id));
+            loophole_data.m_action_vertices.emplace_back((*I).first, level_vertex_id);
         }
 }
 

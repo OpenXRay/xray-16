@@ -15,8 +15,6 @@
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 
-using namespace luabind;
-
 FactionState::FactionState():
 	member_count(0),
 	resource(0.0f),
@@ -58,7 +56,9 @@ void FactionState::ResetStates()
 
 SCRIPT_EXPORT(FactionState, (),
 {
-	module(luaState)
+    using namespace luabind;
+
+    module(luaState)
     [
 		class_<FactionState>("FactionState")
             .def_readwrite("member_count",   &FactionState::member_count)

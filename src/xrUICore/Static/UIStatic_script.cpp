@@ -3,10 +3,10 @@
 #include "UIAnimatedStatic.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CUILines, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUILines>("CUILines")
@@ -29,6 +29,8 @@ public:
 
 SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIStatic, CUIWindow>("CUIStaticBase")
@@ -99,6 +101,8 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 
 SCRIPT_EXPORT(CUITextWnd, (CUIWindow),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUITextWnd, CUIWindow>("CUITextWnd")

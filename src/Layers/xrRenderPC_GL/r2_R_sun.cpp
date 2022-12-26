@@ -91,17 +91,17 @@ struct BoundingBox
     explicit BoundingBox(const xr_vector<glm::vec3>* points)
         : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
-        for (unsigned int i = 0; i < points->size(); i++)
-            Merge(&(*points)[i]);
+        for (const auto& point : *points)
+            Merge(&point);
     }
 
     explicit BoundingBox(const xr_vector<BoundingBox>* boxes)
         : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
-        for (unsigned int i = 0; i < boxes->size(); i++)
+        for (const auto & box : *boxes)
         {
-            Merge(&(*boxes)[i].maxPt);
-            Merge(&(*boxes)[i].minPt);
+            Merge(&box.maxPt);
+            Merge(&box.minPt);
         }
     }
 
@@ -148,7 +148,7 @@ static inline bool PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0
 
 struct Frustum
 {
-    Frustum(const glm::mat4* matrix);
+    explicit Frustum(const glm::mat4* matrix);
 
     glm::vec4 camPlanes[6];
     int nVertexLUT[6];
@@ -255,9 +255,8 @@ struct DumbClipper
     {
         float denum;
         glm::vec3 D;
-        for (int it = 0; it < int(planes.size()); it++)
+        for (auto P : planes)
         {
-            const glm::vec4 P = planes [it];
             float cls0 = glm::dot(P, glm::vec4(p0, 1));
             float cls1 = glm::dot(P, glm::vec4(p1, 1));
             if (cls0 > 0 && cls1 > 0)
@@ -283,7 +282,7 @@ struct DumbClipper
         return true;
     }
 
-    glm::vec3 point(Fbox& bb, int i) const
+    static glm::vec3 point(Fbox& bb, int i)
     {
         return glm::vec3(i & 1 ? bb.vMin.x : bb.vMax.x, i & 2 ? bb.vMin.y : bb.vMax.y, i & 4 ? bb.vMin.z : bb.vMax.z);
     }
@@ -292,9 +291,8 @@ struct DumbClipper
     {
         Fbox3 result;
         result.invalidate();
-        for (int it = 0; it < int(src.size()); it++)
+        for (auto& bb : src)
         {
-            Fbox& bb = src[it];
             u32 mask = frustum.getMask();
             EFC_Visible res = frustum.testAABB(&bb.vMin.x, mask);
             switch (res)
@@ -337,12 +335,12 @@ glm::vec2 BuildTSMProjectionMatrix_caster_depth_bounds(glm::mat4& lightSpaceBasi
 {
     float min_z = 1e32f, max_z = -1e32f;
     glm::mat4 minmax_xform = glm::make_mat4x4(&Device.mView.m[0][0]) * lightSpaceBasis;
-    for (u32 c = 0; c < s_casters.size(); c++)
+    for (auto& s_caster : s_casters)
     {
         Fvector3 pt;
         for (int e = 0; e < 8; e++)
         {
-            s_casters[c].getpoint(e, pt);
+            s_caster.getpoint(e, pt);
             pt = wform(minmax_xform, pt);
             min_z = _min(min_z, pt.z);
             max_z = _max(max_z, pt.z);
@@ -378,16 +376,16 @@ void CRender::render_sun()
         DumbConvexVolume<false> hull;
         {
             hull.points.reserve(8);
-            for (int p = 0; p < 8; p++)
+            for (auto corner : sun::corners)
             {
-                Fvector3 xf = wform(ex_full_inverse, sun::corners[p]);
+                Fvector3 xf = wform(ex_full_inverse, corner);
                 hull.points.push_back(xf);
             }
-            for (int plane = 0; plane < 6; plane++)
+            for (auto& plane : sun::facetable)
             {
-                hull.polys.push_back(DumbConvexVolume<false>::_poly());
-                for (int pt = 0; pt < 4; pt++)
-                    hull.polys.back().points.push_back(sun::facetable[plane][pt]);
+                hull.polys.emplace_back();
+                for (int pt : plane)
+                    hull.polys.back().points.push_back(pt);
             }
         }
         hull.compute_caster_model(cull_planes, fuckingsun->direction);
@@ -397,8 +395,8 @@ void CRender::render_sun()
 
         // Create frustum for query
         cull_frustum._clear();
-        for (u32 p = 0; p < cull_planes.size(); p++)
-            cull_frustum._add(cull_planes[p]);
+        for (auto& cull_plane : cull_planes)
+            cull_frustum._add(cull_plane);
 
         // Create approximate ortho-xform
         // view: auto find 'up' and 'right' vectors
@@ -451,11 +449,9 @@ void CRender::render_sun()
     // IGNORE PORTALS
     if (ps_r2_ls_flags.test(R2FLAG_SUN_IGNORE_PORTALS))
     {
-        for (u32 s = 0; s < Sectors.size(); s++)
+        for (auto& S : Sectors)
         {
-            CSector* S = (CSector*)Sectors[s];
-            dxRender_Visual* root = S->root();
-
+            dxRender_Visual* root = static_cast<CSector*>(S)->root();
             add_Geometry(root, cull_frustum);
         }
     }
@@ -629,9 +625,9 @@ void CRender::render_sun()
         float max_slope = -1e32f;
         float min_slope = 1e32f;
 
-        for (size_t i = 0; i < POINTS_NUM; i++)
+        for (auto& pnt : frustumPnts)
         {
-            glm::vec2 tmp(frustumPnts[i].x * x_scale, frustumPnts[i].y * y_scale);
+            glm::vec2 tmp(pnt.x * x_scale, pnt.y * y_scale);
             float x_dist = tmp.x - projectionPtQ.x;
             if (!(ALMOST_ZERO(tmp.y) || ALMOST_ZERO(x_dist)))
             {
@@ -698,7 +694,7 @@ void CRender::render_sun()
         for (size_t p = 0; p < view_clipper.frustum.p_count; p++)
         {
             Fplane& P = view_clipper.frustum.planes [p];
-            view_clipper.planes.push_back({P.n.x, P.n.y, P.n.z, P.d});
+            view_clipper.planes.emplace_back(P.n.x, P.n.y, P.n.z, P.d);
         }
 
         // 
@@ -707,11 +703,11 @@ void CRender::render_sun()
 
         // casters
         b_casters.invalidate();
-        for (u32 c = 0; c < s_casters.size(); c++)
+        for (auto& s_caster : s_casters)
         {
             for (int e = 0; e < 8; e++)
             {
-                s_casters[c].getpoint(e, pt);
+                s_caster.getpoint(e, pt);
                 pt = wform(xform, pt);
                 b_casters.modify(pt);
             }
@@ -728,9 +724,9 @@ void CRender::render_sun()
             x_full.mul(x_project, Device.mView);
             XRMatrixInverse(&x_full_inverse, nullptr, x_full);
         }
-        for (int e = 0; e < 8; e++)
+        for (auto corner : sun::corners)
         {
-            pt = wform(x_full_inverse, sun::corners[e]); // world space
+            pt = wform(x_full_inverse, corner); // world space
             pt = wform(xform, pt); // trapezoid space
             b_receivers.modify(pt);
         }
@@ -857,16 +853,16 @@ void CRender::render_sun_near()
         t_volume hull;
         {
             hull.points.reserve(9);
-            for (int p = 0; p < 8; p++)
+            for (auto corner : sun::corners)
             {
-                Fvector3 xf = wform(ex_full_inverse, sun::corners[p]);
+                Fvector3 xf = wform(ex_full_inverse, corner);
                 hull.points.push_back(xf);
             }
-            for (int plane = 0; plane < 6; plane++)
+            for (auto& plane : sun::facetable)
             {
-                hull.polys.push_back(t_volume::_poly());
-                for (int pt = 0; pt < 4; pt++)
-                    hull.polys.back().points.push_back(sun::facetable[plane][pt]);
+                hull.polys.emplace_back();
+                for (int pt : plane)
+                    hull.polys.back().points.push_back(pt);
             }
         }
         hull.compute_caster_model(cull_planes, fuckingsun->direction);
@@ -880,8 +876,8 @@ void CRender::render_sun_near()
 
         // Create frustum for query
         cull_frustum._clear();
-        for (u32 p = 0; p < cull_planes.size(); p++)
-            cull_frustum._add(cull_planes[p]);
+        for (auto& cull_plane : cull_planes)
+            cull_frustum._add(cull_plane);
 
         // Create approximate ortho-xform
         // view: auto find 'up' and 'right' vectors
@@ -1020,7 +1016,7 @@ void CRender::render_sun_near()
     RCache.set_xform_project(Device.mProject);
 }
 
-void CRender::render_sun_filtered()
+void CRender::render_sun_filtered() const
 {
     if (!o.sunfilter)
         return;
@@ -1123,7 +1119,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
                     edge_vec.sub(near_p);
                     edge_vec.normalize();
 
-                    light_cuboid.view_frustum_rays.push_back(sun::ray(near_p, edge_vec));
+                    light_cuboid.view_frustum_rays.emplace_back(near_p, edge_vec);
                 }
             }
             else
@@ -1214,8 +1210,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
         // Create frustum for query
         cull_frustum._clear();
-        for (u32 p = 0; p < cull_planes.size(); p++)
-            cull_frustum._add(cull_planes[p]);
+        for (auto& cull_plane : cull_planes)
+            cull_frustum._add(cull_plane);
 
         {
             Fvector cam_proj = Device.vCameraPosition;

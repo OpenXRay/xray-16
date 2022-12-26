@@ -12,9 +12,6 @@
 #include "xrScriptEngine/DebugMacros.hpp" // for THROW // XXX: move debug macros to xrCore
 #include "AISpaceBase.hpp"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 const CGameGraph* get_game_graph() { return &GEnv.AISpace->game_graph(); }
 const CGameGraph::CHeader* get_header(const CGameGraph* self_) { return (&self_->header()); }
 bool get_accessible1(const CGameGraph* self_, const u32& vertex_id) { return (self_->accessible(vertex_id)); }
@@ -37,11 +34,17 @@ GameGraph::LEVEL_MAP const& get_levels(CGameGraph const* graph)
     return graph->header().levels();
 }
 
-SCRIPT_EXPORT(CGameGraph, (), {
+SCRIPT_EXPORT(CGameGraph, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
     typedef CGameGraph::CGameVertex CGameVertex;
-    module(luaState)[class_<GameGraph::LEVEL_MAP::value_type>("GameGraph__LEVEL_MAP__value_type")
-                         .def_readonly("id", &GameGraph::LEVEL_MAP::value_type::first)
-                         .def_readonly("level", &GameGraph::LEVEL_MAP::value_type::second),
+    module(luaState)
+    [
+        class_<GameGraph::LEVEL_MAP::value_type>("GameGraph__LEVEL_MAP__value_type")
+            .def_readonly("id", &GameGraph::LEVEL_MAP::value_type::first)
+            .def_readonly("level", &GameGraph::LEVEL_MAP::value_type::second),
 
         def("game_graph", &get_game_graph),
 
@@ -57,5 +60,6 @@ SCRIPT_EXPORT(CGameGraph, (), {
             .def("level_point", &CVertex__level_point)
             .def("game_point", &CVertex__game_point)
             .def("level_id", &CGameVertex::level_id)
-            .def("level_vertex_id", &CGameVertex::level_vertex_id)];
+            .def("level_vertex_id", &CGameVertex::level_vertex_id)
+    ];
 });

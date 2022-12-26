@@ -71,15 +71,6 @@ if (STATIC_BUILD)
     #add_definitions(-DXRAY_STATIC_BUILD)
 endif()
 
-# Memory allocator option
-set(MEMORY_ALLOCATOR "mimalloc" CACHE STRING "Use specific memory allocator (mimalloc/standard)")
-message("Using ${MEMORY_ALLOCATOR} memory allocator")
-if (MEMORY_ALLOCATOR STREQUAL "mimalloc")
-    add_definitions(-DUSE_MIMALLOC)
-else()
-    add_definitions(-DUSE_PURE_ALLOC)
-endif()
-
 function(xr_install tgt)
     if (NOT MSVC)
         install(TARGETS ${tgt} DESTINATION "."
@@ -174,7 +165,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 if (APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-undefined,error")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-undefined -fvisibility=hidden")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-undefined")
 endif()
 
 #set(SANITIZE_FLAGS "-fsanitize=address  -fsanitize=leak -fno-omit-frame-pointer -g -fsanitize=undefined -fno-sanitize=vptr")
@@ -259,7 +250,25 @@ if (NOT WIN32)
     find_package(Vorbis REQUIRED)
     find_package(Theora REQUIRED)
     find_package(LZO REQUIRED)
+    find_package(mimalloc NAMES mimalloc2 mimalloc2.0 mimalloc)
 endif()
+
+# Memory allocator option
+if (mimalloc_FOUND)
+    set(MEMORY_ALLOCATOR "mimalloc" CACHE STRING "Use specific memory allocator (mimalloc/standard)")
+else()
+    set(MEMORY_ALLOCATOR "standard" CACHE STRING "Use specific memory allocator (mimalloc/standard)")
+endif()
+if (MEMORY_ALLOCATOR STREQUAL "mimalloc")
+    add_definitions(-DUSE_MIMALLOC)
+    if (NOT mimalloc_FOUND)
+        message(FATAL_ERROR "mimalloc allocator requested but not found. Please, install mimalloc package or select standard allocator.")
+    endif()
+else()
+    add_definitions(-DUSE_PURE_ALLOC)
+endif()
+
+message("Using ${MEMORY_ALLOCATOR} memory allocator")
 
 # XXX: move to LuaJIT
 include_directories(${LUA_INCLUDE_DIR})
@@ -297,7 +306,6 @@ set(CMAKE_CXX_FLAGS
     #"-pedantic"
     "-Wno-unknown-pragmas"
     "-Wno-strict-aliasing"
-    "-Wno-class-memaccess"
     "-Wno-parentheses"
     "-Wno-unused-label"
     "-Wno-switch"
@@ -310,6 +318,9 @@ set(CMAKE_CXX_FLAGS
     #"-Wno-c++14-compat-pedantic"
     #"-Wno-newline-eof"
 )
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "-Wno-class-memaccess")
+endif()
 string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(src)
