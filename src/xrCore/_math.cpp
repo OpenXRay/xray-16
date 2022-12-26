@@ -5,7 +5,7 @@
 #   if defined(_M_FP_PRECISE)
 #       pragma fenv_access(on)
 #   endif
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 // XXX: check if these includes needed
 #include <pthread.h>
 #include <sys/time.h>
@@ -19,7 +19,7 @@
 #   else
 #       include <cfenv>
 #       pragma STDC FENV_ACCESS on
-#       if defined(XR_PLATFORM_FREEBSD)
+#       if defined(XR_PLATFORM_BSD)
 #           define USE_FPU_CONTROL_H
             typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__))); // XXX: replace with type alias
 #           define _FPU_GETCW(x) asm volatile ("fnstcw %0" : "=m" ((*&x)))

@@ -42,6 +42,9 @@ XRSOUND_API extern float psSoundVFactor;
 XRSOUND_API extern float psSoundVMusic;
 XRSOUND_API extern float psSoundRolloff;
 XRSOUND_API extern float psSoundOcclusionScale;
+XRSOUND_API extern float psSoundVelocityAlpha; // Cribbledirge: Alpha value for moving average.
+XRSOUND_API extern float psSoundTimeFactor; //--#SM+#--
+XRSOUND_API extern float psSoundLinearFadeFactor; //--#SM+#--
 XRSOUND_API extern Flags32 psSoundFlags;
 XRSOUND_API extern int psSoundTargets;
 XRSOUND_API extern int psSoundCacheSizeMB;
@@ -50,41 +53,36 @@ XRSOUND_API extern xr_token* snd_devices_token;
 XRSOUND_API extern u32 snd_device_id;
 
 // Flags
-enum
+enum : u32
 {
     ss_Hardware = 1ul << 1ul, //!< Use hardware mixing only
-    ss_EAX = 1ul << 2ul, //!< Use eax
-    ss_forcedword = u32(-1)
+    ss_EFX = 1ul << 2ul, //!< Use efx
 };
 
-enum
+enum : u32
 {
     sq_DEFAULT,
     sq_NOVIRT,
     sq_LIGHT,
     sq_HIGH,
-    sq_forcedword = u32(-1)
 };
 
-enum
+enum : u32
 {
     sg_Undefined = 0,
     sg_SourceType = u32(-1),
-    sg_forcedword = u32(-1),
 };
 
-enum
+enum : u32
 {
     sm_Looped = 1ul << 0ul, //!< Looped
     sm_2D = 1ul << 1ul, //!< 2D mode
-    sm_forcedword = u32(-1),
 };
 
-enum esound_type
+enum esound_type : u32
 {
     st_Effect = 0,
     st_Music = 1,
-    st_forcedword = u32(-1),
 };
 
 /// definition (Sound Source)
@@ -106,13 +104,48 @@ class XRSOUND_API CSound_environment
 class XRSOUND_API CSound_params
 {
 public:
-    Fvector position;
+    Fvector position{};
+    Fvector velocity{};  // Cribbledirge.  Added for doppler effect.
+    Fvector curVelocity{};  // Current velocity.
+    Fvector prevVelocity{};  // Previous velocity.
+    Fvector accVelocity{};  // Velocity accumulator (for moving average).
     float base_volume;
     float volume;
     float freq;
     float min_distance;
     float max_distance;
     float max_ai_distance;
+
+    // Functions added by Cribbledirge for doppler effect.
+    void update_position(const Fvector& newPosition)
+    {
+        // If the position has been set already, start getting a moving average of the velocity.
+        if (set)
+        {
+            prevVelocity.set(accVelocity);
+            curVelocity.sub(newPosition, position);
+            accVelocity.set(curVelocity.mul(psSoundVelocityAlpha).add(prevVelocity.mul(1.f - psSoundVelocityAlpha)));
+        }
+        else
+        {
+            set = true;
+        }
+        position.set(newPosition);
+    }
+
+    void update_velocity(const float dt)
+    {
+        velocity.set(accVelocity).div(dt);
+    }
+
+private:
+    // A variable in place to determine if the position has been set.  This is to prevent artifacts when
+    // the position jumps from its initial position of zero to something greatly different.  This is a big
+    // issue in moving average calculation.  We want the velocity to always start at zero for when the sound
+    // was initiated, or else things will sound really really weird.
+    bool set{};
+
+    // End Cribbledirge.
 };
 
 /// definition (Sound Interface)

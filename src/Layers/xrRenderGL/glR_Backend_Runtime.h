@@ -247,7 +247,16 @@ ICF void CBackend::set_Vertices(GLuint _vb, u32 _vb_stride)
 #endif
         vb = _vb;
         vb_stride = _vb_stride;
-        CHK_GL(glBindVertexBuffer(0, vb, 0, vb_stride));
+
+        if (GLEW_ARB_vertex_attrib_binding) 
+        {
+            CHK_GL(glBindVertexBuffer(0, vb, 0, vb_stride));
+        }
+        else 
+        {
+            CHK_GL(glBindBuffer(GL_ARRAY_BUFFER, vb));
+            SetGLVertexPointer(decl);
+        }
     }
 }
 
@@ -468,13 +477,8 @@ IC void CBackend::set_Constants(R_constant_table* C)
     PGO(Msg("PGO:c-table"));
 
     // process constant-loaders
-    R_constant_table::c_table::iterator it = C->table.begin();
-    R_constant_table::c_table::iterator end = C->table.end();
-    for (; it != end; ++it)
-    {
-        R_constant* Cs = &**it;
-        if (Cs->handler) Cs->handler->setup(Cs);
-    }
+    for (auto& Cs : C->table)
+        if (Cs->handler) Cs->handler->setup(&*Cs);
 }
 
 #endif	//	glR_Backend_Runtime_included

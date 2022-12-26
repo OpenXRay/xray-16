@@ -5,8 +5,9 @@
 bool operator==(const CUITabButton* btn, const shared_str& id) { return (btn->m_btn_id == id); }
 
 CUITabControl::CUITabControl()
-    : m_cGlobalTextColor(0xFFFFFFFF), m_cActiveTextColor(0xFFFFFFFF), m_cActiveButtonColor(0xFFFFFFFF),
-      m_cGlobalButtonColor(0xFFFFFFFF), m_bAcceleratorsEnable(true)
+    : CUIWindow("CUITabControl"), m_cGlobalTextColor(0xFFFFFFFF),
+      m_cGlobalButtonColor(0xFFFFFFFF), m_cActiveTextColor(0xFFFFFFFF),
+      m_cActiveButtonColor(0xFFFFFFFF), m_bAcceleratorsEnable(true)
 {
 }
 

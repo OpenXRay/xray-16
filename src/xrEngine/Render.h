@@ -163,11 +163,10 @@ enum class DeviceState
 class ENGINE_API IRender
 {
 public:
-    enum GenerationLevel
+    enum GenerationLevel : u32
     {
         GENERATION_R1 = 1,
         GENERATION_R2 = 2,
-        GENERATION_forcedword = u32(-1)
     };
 
     enum class BackendAPI : u32
@@ -178,14 +177,13 @@ public:
         OpenGL
     };
 
-    enum ScreenshotMode
+    enum ScreenshotMode : u32
     {
         SM_NORMAL = 0, // jpeg, name ignored
         SM_FOR_CUBEMAP = 1, // tga, name used as postfix
         SM_FOR_GAMESAVE = 2, // dds/dxt1,name used as full-path
         SM_FOR_LEVELMAP = 3, // tga, name used as postfix (level_name)
         SM_FOR_MPSENDING = 4,
-        SM_forcedword = u32(-1)
     };
 
     enum RenderContext

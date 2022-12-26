@@ -24,6 +24,7 @@ public:
         eSpotEnabled = (1 << 5),
         eCollidable = (1 << 6),
         eHintEnabled = (1 << 7),
+        eUserDefined = (1 << 8),
     };
 
 protected:
@@ -84,6 +85,11 @@ public:
     CComplexMapSpot* complex_spot() { return m_complex_spot; }
     const CMapSpot* LevelMapSpot() { return m_level_spot; }
     const CMiniMapSpot* MiniMapSpot() { return m_minimap_spot; }
+    Fvector2 SpotSize();
+    void InitUserSpot(const shared_str& level_name, const Fvector& pos);
+    void HighlightSpot(bool state, const Fcolor& color);
+    IC bool IsUserDefined() const { return !!m_flags.test(eUserDefined); }
+    IC void SetUserDefinedFlag(BOOL state) { m_flags.set(eUserDefined, state); }
     IC bool PointerEnabled() { return SpotEnabled() && !!m_flags.test(ePointerEnabled); };
     IC void EnablePointer() { m_flags.set(ePointerEnabled, TRUE); };
     IC void DisablePointer() { m_flags.set(ePointerEnabled, FALSE); };

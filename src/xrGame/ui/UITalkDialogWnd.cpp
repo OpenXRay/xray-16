@@ -17,7 +17,8 @@
 
 
 CUITalkDialogWnd::CUITalkDialogWnd()
-    : m_uiXml(nullptr),
+    : CUIWindow("CUITalkDialogWnd"),
+      m_uiXml(nullptr),
       m_pParent(nullptr),
       mechanic_mode(false),
       m_ClickedQuestionID(""),
@@ -34,6 +35,7 @@ CUITalkDialogWnd::CUITalkDialogWnd()
       m_uOurReplicsColor(0) {}
 
 CUITalkDialogWnd::~CUITalkDialogWnd() { xr_delete(m_uiXml); }
+
 void CUITalkDialogWnd::InitTalkDialogWnd()
 {
     constexpr pcstr TALK_XML = "talk.xml";
@@ -81,7 +83,7 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
         if (m_uiXml->NavigateToNode("frame_line_window", 1))
         {
             // XXX: Don't replace this with UI helper, until it's missing needed functionality to select the index
-            UIOurPhrasesFrame = xr_new<CUIFrameLineWnd>();
+            UIOurPhrasesFrame = xr_new<CUIFrameLineWnd>("Our phrases frame");
             UIOurPhrasesFrame->SetAutoDelete(true);
             AttachChild(UIOurPhrasesFrame);
             CUIXmlInitBase::InitFrameLine(*m_uiXml, "frame_line_window", 1, UIOurPhrasesFrame); // index for field is 1 (one) !!!
@@ -340,6 +342,7 @@ void CUITalkDialogWnd::UpdateButtonsLayout(bool b_disable_break, bool trade_enab
 
 void CUIQuestionItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 CUIQuestionItem::CUIQuestionItem(CUIXml* xml_doc, LPCSTR path)
+    : CUIWindow("CUIQuestionItem")
 {
     CUIXmlInit::InitWindow(*xml_doc, path, 0, this);
 
@@ -372,6 +375,7 @@ void CUIQuestionItem::OnTextClicked(CUIWindow* w, void*)
 }
 
 CUIAnswerItem::CUIAnswerItem(CUIXml* xml_doc, LPCSTR path)
+    : CUIWindow("CUIAnswerItem")
 {
     CUIXmlInit::InitWindow(*xml_doc, path, 0, this);
 
@@ -401,7 +405,7 @@ void CUIAnswerItem::Init(LPCSTR text, LPCSTR name)
 
 CUIAnswerItemIconed::CUIAnswerItemIconed(CUIXml* xml_doc, LPCSTR path) : CUIAnswerItem(xml_doc, path)
 {
-    m_icon = xr_new<CUIStatic>();
+    m_icon = xr_new<CUIStatic>("Icon");
     m_icon->SetAutoDelete(true);
     CUIWindow::AttachChild(m_icon);
 

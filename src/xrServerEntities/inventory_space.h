@@ -20,13 +20,8 @@ enum
     TORCH_SLOT, // torch
     ARTEFACT_SLOT, // artefact
     HELMET_SLOT,
-    CUSTOM_SLOT_1,
-    CUSTOM_SLOT_2,
-    CUSTOM_SLOT_3,
-    CUSTOM_SLOT_4,
-    CUSTOM_SLOT_5,
-    CUSTOM_SLOT_6,
-    LAST_SLOT = CUSTOM_SLOT_6
+    BACKPACK_SLOT, // backpack
+    SLOTS_COUNT
 };
 
 #define RUCK_HEIGHT 280

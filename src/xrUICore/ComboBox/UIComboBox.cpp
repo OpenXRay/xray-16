@@ -7,7 +7,7 @@
 
 #define CB_HEIGHT 20.0f
 
-CUIComboBox::CUIComboBox()
+CUIComboBox::CUIComboBox() : CUIWindow("CUIComboBox")
 {
     AttachChild(&m_frameLine);
     AttachChild(&m_text);

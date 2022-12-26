@@ -8,6 +8,9 @@
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#elif defined(XR_PLATFORM_BSD)
+#include <sys/time.h>
+#include <sys/resource.h>
 #endif
 
 // On other platforms these options are controlled by CMake
@@ -112,10 +115,12 @@ size_t xrMemory::mem_usage()
         CloseHandle(h);
     }
     return pmc.PagefileUsage;
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
     return (size_t)ru.ru_maxrss;
+#else
+#   error Select or add an implementation for your platform
 #endif
 }
 

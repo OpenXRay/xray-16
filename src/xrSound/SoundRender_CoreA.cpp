@@ -4,6 +4,8 @@
 #include "SoundRender_CoreA.h"
 #include "SoundRender_TargetA.h"
 #include "OpenALDeviceList.h"
+#include "SoundRender_EffectsA_EAX.h"
+#include "SoundRender_EffectsA_EFX.h"
 
 CSoundRender_CoreA* SoundRenderA = nullptr;
 
@@ -12,66 +14,7 @@ CSoundRender_CoreA::CSoundRender_CoreA() : CSoundRender_Core()
     pDevice = nullptr;
     pDeviceList = nullptr;
     pContext = nullptr;
-#if defined(XR_PLATFORM_WINDOWS)
-    eaxSet = nullptr;
-    eaxGet = nullptr;
-#endif
 }
-
-CSoundRender_CoreA::~CSoundRender_CoreA() {}
-
-#if defined(XR_PLATFORM_WINDOWS)
-bool CSoundRender_CoreA::EAXQuerySupport(bool isDeferred, const GUID* guid, u32 prop, void* val, u32 sz)
-{
-    if (AL_NO_ERROR != eaxGet(guid, prop, 0, val, sz))
-        return false;
-    if (AL_NO_ERROR != eaxSet(guid, (isDeferred ? DSPROPERTY_EAXLISTENER_DEFERRED : 0) | prop, 0, val, sz))
-        return false;
-    return true;
-}
-
-bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
-{
-    EAXLISTENERPROPERTIES ep;
-    if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(ep.lRoom)))
-        return false;
-    if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(ep.lRoomHF)))
-        return false;
-    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMROLLOFFFACTOR,
-                         &ep.flRoomRolloffFactor, sizeof(float)))
-        return false;
-    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_DECAYTIME,
-                         &ep.flDecayTime, sizeof(float)))
-        return false;
-    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_DECAYHFRATIO,
-                         &ep.flDecayHFRatio, sizeof(float)))
-        return false;
-    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONS,
-                         &ep.lReflections, sizeof(ep.lReflections)))
-        return false;
-    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONSDELAY,
-                         &ep.flReflectionsDelay, sizeof(float)))
-        return false;
-    if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(ep.lReverb)))
-        return false;
-    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERBDELAY,
-                         &ep.flReverbDelay, sizeof(float)))
-        return false;
-    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ENVIRONMENTDIFFUSION,
-                         &ep.flEnvironmentDiffusion, sizeof(float)))
-        return false;
-    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_AIRABSORPTIONHF,
-                         &ep.flAirAbsorptionHF, sizeof(float)))
-        return false;
-    if (!EAXQuerySupport(
-        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(u32)))
-        return false;
-    return true;
-}
-#endif
 
 void CSoundRender_CoreA::_restart() { inherited::_restart(); }
 
@@ -131,21 +74,31 @@ void CSoundRender_CoreA::_initialize()
     A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&orient[0].x));
     A_CHK(alListenerf(AL_GAIN, 1.f));
 
-#if defined(XR_PLATFORM_WINDOWS)
+    auto auxSlot = ALuint(-1);
+#if defined(XR_HAS_EAX)
     // Check for EAX extension
-    bEAX = deviceDesc.props.eax && !deviceDesc.props.eax_unwanted;
-
-    eaxSet = (EAXSet)alGetProcAddress((pcstr)"EAXSet");
-    if (eaxSet == nullptr)
-        bEAX = false;
-    eaxGet = (EAXGet)alGetProcAddress((pcstr)"EAXGet");
-    if (eaxGet == nullptr)
-        bEAX = false;
-
-    if (bEAX)
+    if (deviceDesc.props.eax && !m_effects)
     {
-        bDeferredEAX = EAXTestSupport(true);
-        bEAX = EAXTestSupport(false);
+        m_effects = xr_new<CSoundRender_EffectsA_EAX>();
+        if (!m_effects->initialized())
+        {
+            Log("SOUND: OpenAL: Failed to initialize EAX.");
+            xr_delete(m_effects);
+        }
+    }
+#endif
+#if defined(XR_HAS_EFX) // XXX: temporary, EAX has higher priority than EFX
+    // Check for EFX extension
+    if (deviceDesc.props.efx && !m_effects)
+    {
+        m_effects = xr_new<CSoundRender_EffectsA_EFX>();
+        if (m_effects->initialized())
+            auxSlot = ((CSoundRender_EffectsA_EFX*)m_effects)->get_slot();
+        else
+        {
+            Log("SOUND: OpenAL: Failed to initialize EFX.");
+            xr_delete(m_effects);
+        }
     }
 #endif
     inherited::_initialize();
@@ -154,7 +107,7 @@ void CSoundRender_CoreA::_initialize()
     CSoundRender_Target* T = nullptr;
     for (u32 tit = 0; tit < u32(psSoundTargets); tit++)
     {
-        T = xr_new<CSoundRender_TargetA>();
+        T = xr_new<CSoundRender_TargetA>(auxSlot);
         if (T->_initialize())
         {
             s_targets.push_back(T);
@@ -178,11 +131,12 @@ void CSoundRender_CoreA::set_master_volume(float f)
 void CSoundRender_CoreA::_clear()
 {
     inherited::_clear();
+    xr_delete(m_effects);
     // remove targets
     CSoundRender_Target* T = nullptr;
-    for (u32 tit = 0; tit < s_targets.size(); tit++)
+    for (auto& sr_target : s_targets)
     {
-        T = s_targets[tit];
+        T = sr_target;
         T->_destroy();
         xr_delete(T);
     }
@@ -196,13 +150,15 @@ void CSoundRender_CoreA::_clear()
     xr_delete(pDeviceList);
 }
 
-#if defined(XR_PLATFORM_WINDOWS)
-void CSoundRender_CoreA::i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz) { eaxSet(guid, prop, 0, val, sz); }
-void CSoundRender_CoreA::i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz) { eaxGet(guid, prop, 0, val, sz); }
-#endif
 void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
 {
     inherited::update_listener(P, D, N, dt);
+
+    // Use exponential moving average for a nice smooth doppler effect.
+    Listener.prevVelocity.set(Listener.accVelocity);
+    Listener.curVelocity.sub(P, Listener.position);
+    Listener.accVelocity.set(Listener.curVelocity.mul(psSoundVelocityAlpha).add(Listener.prevVelocity.mul(1.f - psSoundVelocityAlpha)));
+    Listener.prevVelocity.set(Listener.accVelocity).div(dt);
 
     if (!Listener.position.similar(P))
     {
@@ -213,6 +169,6 @@ void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, con
     Listener.orientation[1].set(N.x, N.y, -N.z);
 
     A_CHK(alListener3f(AL_POSITION, Listener.position.x, Listener.position.y, -Listener.position.z));
-    A_CHK(alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f));
+    A_CHK(alListener3f(AL_VELOCITY, Listener.prevVelocity.x, Listener.prevVelocity.y, -Listener.prevVelocity.z));
     A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&Listener.orientation[0].x));
 }

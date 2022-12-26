@@ -37,17 +37,18 @@ bool CUIActorMenu::AllowItemDrops(EDDListType from, EDDListType to)
 }
 class CUITrashIcon : public ICustomDrawDragItem
 {
-    CUIStatic m_icon;
+    CUIStatic m_icon{ "Trash icon" };
 
 public:
     CUITrashIcon()
     {
-        m_icon.SetWndSize(Fvector2().set(29.0f * UI().get_current_kx(), 36.0f));
+        m_icon.SetWndSize(Fvector2().set(29.0f * UI().get_current_kx(), 36.0f)); // XXX: unhardcode size
         m_icon.SetStretchTexture(true);
         //		m_icon.SetAlignment		(waCenter);
-        m_icon.InitTexture("ui_inGame2_inv_trash");
+        m_icon.InitTexture("ui_inGame2_inv_trash"); // XXX: unhardcode texture
     }
-    virtual void OnDraw(CUIDragItem* drag_item)
+
+    void OnDraw(CUIDragItem* drag_item) override
     {
         Fvector2 pos = drag_item->GetWndPos();
         Fvector2 icon_sz = m_icon.GetWndSize();
@@ -69,12 +70,46 @@ void CUIActorMenu::OnDragItemOnTrash(CUIDragItem* item, bool b_receive)
         item->SetCustomDraw(NULL);
 }
 
+bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, CUIDragDropListEx* old_owner, CUIDragDropListEx* new_owner)
+{
+    //Alundaio: Here we export the action of dragging one inventory item on top of another! 
+    luabind::functor<bool> funct1;
+    if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemDropped", funct1))
+    {
+        //If list only has 1 item, get it, otherwise try to get item at current drag position
+        CUICellItem* _citem = new_owner->ItemsCount() == 1 ? new_owner->GetItemIdx(0) : nullptr;
+        if (!_citem)
+        {
+            CUICellContainer* c = old_owner->GetContainer();
+            Ivector2 c_pos = c->PickCell(old_owner->GetDragItemPosition());
+            if (c->ValidCell(c_pos))
+            {
+                CUICell& ui_cell = c->GetCellAt(c_pos);
+                if (!ui_cell.Empty())
+                    _citem = ui_cell.m_item;
+            }
+        }
+
+        const PIItem _iitem = _citem ? static_cast<PIItem>(_citem->m_pData) : nullptr;
+
+        if (_iitem == nullptr)
+            return false;
+
+        CGameObject* GO1 = smart_cast<CGameObject*>(CurrentIItem());
+        CGameObject* GO2 = smart_cast<CGameObject*>(_iitem);
+
+        return funct1(GO1 ? GO1->lua_game_object() : nullptr, GO2 ? GO2->lua_game_object() : nullptr, (int)t_old, (int)t_new);
+    }
+
+    return true;
+}
+
 bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 {
     InfoCurItem(NULL);
     CUIDragDropListEx* old_owner = itm->OwnerList();
     CUIDragDropListEx* new_owner = CUIDragDropListEx::m_drag_item->BackList();
-    if (old_owner == new_owner || !old_owner || !new_owner)
+    if (!old_owner || !new_owner)
     {
         return false;
     }
@@ -86,6 +121,13 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
         Msg("incorrect action [%d]->[%d]", t_old, t_new);
         return true;
     }
+
+    if (old_owner == new_owner)
+    {
+        DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner);
+        return false;
+    }
+
     switch (t_new)
     {
     case iTrashSlot:
@@ -142,6 +184,9 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
     };
 
     OnItemDropped(CurrentIItem(), new_owner, old_owner);
+
+    if (!DropItemOnAnotherItem(t_old, t_new, old_owner, new_owner))
+        return false;
 
     UpdateItemsPlace();
 

@@ -41,7 +41,7 @@ protected:
     void FillMasterPart(CUIXml* xml, const shared_str& key_name);
 };
 
-class CUIActorStaticticHeader : public CUIWindow, public CUISelectable
+class CUIActorStaticticHeader final : public CUIWindow, public CUISelectable
 {
     CUIActorInfoWnd* m_actorInfoWnd;
 protected:
@@ -58,7 +58,7 @@ public:
     shared_str m_id;
 };
 
-class CUIActorStaticticDetail : public CUIWindow
+class CUIActorStaticticDetail final : public CUIWindow
 {
 protected:
 public:
@@ -67,5 +67,6 @@ public:
     CUIStatic* m_text2;
     CUIStatic* m_text3;
 public:
+    CUIActorStaticticDetail() : CUIWindow("CUIActorStaticticDetail") {}
     void Init(CUIXml* xml, LPCSTR path, int xml_idx);
 };

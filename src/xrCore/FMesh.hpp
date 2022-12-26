@@ -24,7 +24,7 @@ enum MT
     MT_3DFLUIDVOLUME = 12,
 };
 
-enum OGF_Chuncks
+enum OGF_Chuncks : u32
 {
     OGF_HEADER = 1,
     OGF_TEXTURE = 2,
@@ -52,7 +52,6 @@ enum OGF_Chuncks
     OGF_S_MOTION_REFS2 = 24, // * changes in format
     OGF_COLLISION_VERTICES = 25,
     OGF_COLLISION_INDICES = 26,
-    OGF_forcedword = 0xFFFFFFFF
 };
 
 enum OGF_SkeletonVertType

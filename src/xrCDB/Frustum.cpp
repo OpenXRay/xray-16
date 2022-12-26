@@ -258,10 +258,10 @@ void CFrustum::SimplifyPoly_AABB(sPoly* poly, Fplane& plane)
     Fvector2 min, max;
     min.set(flt_max, flt_max);
     max.set(flt_min, flt_min);
-    for (u32 i = 0; i < poly->size(); i++)
+    for (auto& v : *poly)
     {
         Fvector2 tmp;
-        mView.transform_tiny32(tmp, (*poly)[i]);
+        mView.transform_tiny32(tmp, v);
         min.min(tmp.x, tmp.y);
         max.max(tmp.x, tmp.y);
     }

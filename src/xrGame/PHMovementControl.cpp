@@ -1315,16 +1315,11 @@ IElevatorState* CPHMovementControl::ElevatorState()
     // m_character->SetElevator()
 }
 
-struct STraceBorderQParams
+struct STraceBorderQParams : Noncopyable
 {
     CPHMovementControl* m_movement;
     const Fvector& m_dir;
-    STraceBorderQParams(CPHMovementControl* movement, const Fvector& dir) : m_dir(dir) { m_movement = movement; }
-    STraceBorderQParams& operator=(STraceBorderQParams& p)
-    {
-        VERIFY(FALSE);
-        return p;
-    }
+    STraceBorderQParams(CPHMovementControl* movement, const Fvector& dir) : m_movement(movement), m_dir(dir) {}
 };
 
 bool CPHMovementControl::BorderTraceCallback(collide::rq_result& result, LPVOID params)
@@ -1370,7 +1365,7 @@ void CPHMovementControl::TraceBorder(const Fvector& prev_position)
     collide::ray_defs RD(from_pos, dir, mag, 0, collide::rqtStatic);
     VERIFY(!fis_zero(RD.dir.square_magnitude()));
 
-    STraceBorderQParams p(this, dir);
+    STraceBorderQParams p{ this, dir };
     storage.r_clear();
     g_pGameLevel->ObjectSpace.RayQuery(
         storage, RD, BorderTraceCallback, &p, NULL, smart_cast<IGameObject*>(m_character->PhysicsRefObject()));

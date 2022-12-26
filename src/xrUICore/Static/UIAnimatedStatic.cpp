@@ -12,9 +12,10 @@
 //////////////////////////////////////////////////////////////////////////
 
 CUIAnimatedStatic::CUIAnimatedStatic()
-    : m_uFrameCount(0), m_uAnimationDuration(0), m_uTimeElapsed(0), m_uAnimCols(0xffffffff), m_bCyclic(true),
-      m_bParamsChanged(true), m_uFrameWidth(0), m_uFrameHeight(0), m_uCurFrame(0xffffffff), m_bPlaying(false),
-      m_prevTime(0)
+    : CUIStatic("CUIAnimatedStatic"),
+      m_uFrameCount(0), m_uCurFrame(0xffffffff), m_uAnimCols(0xffffffff), m_uFrameWidth(0), m_uFrameHeight(0),
+      m_uAnimationDuration(0), m_uTimeElapsed(0), m_bParamsChanged(true), m_bPlaying(false), m_prevTime(0),
+      m_bCyclic(true)
 {
     m_pos.set(0, 0);
     //.	ClipperOn();

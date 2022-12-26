@@ -4,7 +4,7 @@
 #include "Common/object_broker.h"
 #include "Static/UIStatic.h"
 
-CUIListBoxItem::CUIListBoxItem(float height) : m_text(NULL), tag(u32(-1))
+CUIListBoxItem::CUIListBoxItem(float height) : CUIFrameLineWnd("CUIListBoxItem"), m_text(nullptr), tag(u32(-1))
 {
     SetHeight(height);
     m_text = AddTextField("---", 10.0f);
@@ -67,7 +67,7 @@ float CUIListBoxItem::FieldsLength() const
 
 CUIStatic* CUIListBoxItem::AddIconField(float width)
 {
-    CUIStatic* st = xr_new<CUIStatic>();
+    CUIStatic* st = xr_new<CUIStatic>("Icon field");
     st->SetAutoDelete(true);
     st->SetWndPos(Fvector2().set(FieldsLength(), 0.0f));
     st->SetWndSize(Fvector2().set(width, GetHeight()));

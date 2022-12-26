@@ -1041,7 +1041,7 @@ void CWeaponMagazined::InitAddons()
 
             if (!GEnv.isDedicatedServer)
             {
-                m_UIScope = xr_new<CUIWindow>();
+                m_UIScope = xr_new<CUIWindow>("Scope UI");
                 LoadScope(scope_tex_name);
             }
         }

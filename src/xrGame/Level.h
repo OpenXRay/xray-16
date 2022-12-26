@@ -4,7 +4,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Client.h"
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
 #include "xrNetServer/empty/NET_Client.h"
 #else
 #   error Select or add implementation for your platform
@@ -317,7 +317,6 @@ public:
     void IR_OnMouseRelease(int btn) override;
     void IR_OnMouseHold(int btn) override;
     void IR_OnMouseMove(int, int) override;
-    void IR_OnMouseStop(int, int) override;
     void IR_OnMouseWheel(int x, int y) override;
 
     void IR_OnControllerPress(int key, float x, float y) override;

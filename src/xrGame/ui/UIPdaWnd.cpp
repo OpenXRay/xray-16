@@ -28,12 +28,14 @@
 #include "UIActorInfo.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
+#include "UIScriptWnd.h"
 
 #define PDA_XML "pda.xml"
 
 u32 g_pda_info_state = 0;
 
 void RearrangeTabButtons(CUITabControl* pTab);
+CDialogHolder* CurrentDialogHolder();
 
 CUIPdaWnd::CUIPdaWnd()
 {
@@ -125,7 +127,7 @@ void CUIPdaWnd::Init()
     CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl);
     UITabControl->SetMessageTarget(this);
 
-    UINoice = xr_new<CUIStatic>();
+    UINoice = xr_new<CUIStatic>("Noise");
     UINoice->SetAutoDelete(true);
     if (!CUIXmlInit::InitStatic(uiXml, "noice_static", 0, UINoice, false))
         xr_delete(UINoice);
@@ -239,6 +241,17 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     else if (section == "eptLogs" && pUILogsWnd)
     {
         m_pActiveDialog = pUILogsWnd;
+    }
+
+    luabind::functor<CUIDialogWndEx*> functor;
+    if (GEnv.ScriptEngine->functor("pda.set_active_subdialog", functor))
+    {
+        CUIDialogWndEx* scriptWnd = functor(section.c_str());
+        if (scriptWnd)
+        {
+            scriptWnd->SetHolder(CurrentDialogHolder());
+            m_pActiveDialog = scriptWnd;
+        }
     }
 
     R_ASSERT(m_pActiveDialog);

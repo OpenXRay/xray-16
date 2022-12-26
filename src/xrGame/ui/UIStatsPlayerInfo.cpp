@@ -7,13 +7,14 @@
 #include "Level.h"
 
 CUIStatsPlayerInfo::CUIStatsPlayerInfo(xr_vector<PI_FIELD_INFO>* info, CGameFont* pF, u32 text_col)
+    : CUIWindow("CUIStatsPlayerInfo")
 {
     m_field_info = info;
 
     m_pF = pF;
     m_text_col = text_col;
 
-    m_pBackground = xr_new<CUIStatic>();
+    m_pBackground = xr_new<CUIStatic>("Background");
     AttachChild(m_pBackground);
 
     R_ASSERT(!info->empty());
@@ -76,7 +77,7 @@ void CUIStatsPlayerInfo::Update()
 
 void CUIStatsPlayerInfo::AddField(float len, CGameFont* pF, u32 text_col, bool icon)
 {
-    CUIStatic* wnd = icon ? xr_new<CUIStatsIcon>() : xr_new<CUIStatic>();
+    CUIStatic* wnd = icon ? xr_new<CUIStatsIcon>() : xr_new<CUIStatic>("Stats");
     wnd->SetAutoDelete(true);
 
     if (m_fields.empty())

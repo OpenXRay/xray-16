@@ -10,14 +10,13 @@
 #include "game_sv_base.h"
 #include "xrMessages.h"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 template<typename T>
 class enum_exporter {};
 
 SCRIPT_EXPORT(game_sv_GameState, (game_GameState),
 {
+    using namespace luabind;
+
     module(luaState, "game")
     [
         class_<game_sv_GameState, game_GameState>("game_sv_GameState")
@@ -44,6 +43,8 @@ SCRIPT_EXPORT(game_sv_GameState, (game_GameState),
 
 SCRIPT_EXPORT(EGameEnums, (),
 {
+    using namespace luabind;
+
     module (luaState)
     [
         class_<enum_exporter<EGamePlayerFlags>>("game_player_flags")
