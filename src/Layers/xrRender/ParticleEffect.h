@@ -72,8 +72,8 @@ public:
 
     BOOL Compile(CPEDef* def);
 
-    CPEDef* GetDefinition() { return m_Def; }
-    int GetHandleEffect() { return m_HandleEffect; }
+    CPEDef* GetDefinition() const { return m_Def; }
+    int GetHandleEffect() const { return m_HandleEffect; }
     int GetHandleActionList() { return m_HandleActionList; }
     virtual void Play();
     virtual void Stop(BOOL bDefferedStop = TRUE);
@@ -94,7 +94,7 @@ public:
 
     void SetDestroyCB(DestroyCallback destroy_cb) { m_DestroyCallback = destroy_cb; }
     void SetCollisionCB(CollisionCallback collision_cb) { m_CollisionCallback = collision_cb; }
-    void SetBirthDeadCB(PAPI::OnBirthParticleCB bc, PAPI::OnDeadParticleCB dc, void* owner, u32 p);
+    void SetBirthDeadCB(PAPI::OnBirthParticleCB bc, PAPI::OnDeadParticleCB dc, void* owner, u32 p) const;
 
     virtual u32 ParticlesCount();
 };

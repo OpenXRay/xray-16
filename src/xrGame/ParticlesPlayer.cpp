@@ -82,9 +82,8 @@ void CParticlesPlayer::LoadParticles(IKinematics* K)
     {
         bone_mask = 0;
         CInifile::Sect& data = ini->r_section("particle_bones");
-        for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
+        for (const auto& item : data.Data)
         {
-            const CInifile::Item& item = *I;
             u16 index = K->LL_BoneID(*item.first);
             R_ASSERT3(index != BI_NONE, "Particles bone not found", *item.first);
             Fvector offs;
@@ -104,13 +103,10 @@ void CParticlesPlayer::net_DestroyParticles()
 {
     VERIFY(m_self_object);
 
-    for (auto b_it = m_Bones.begin(); b_it != m_Bones.end(); ++b_it)
+    for (auto& b_info : m_Bones)
     {
-        SBoneInfo& b_info = *b_it;
-
-        for (auto p_it = b_info.particles.begin(); p_it != b_info.particles.end(); ++p_it)
+        for (auto& p_info : b_info.particles)
         {
-            SParticlesInfo& p_info = *p_it;
             CParticlesObject::Destroy(p_info.ps);
         }
         b_info.particles.clear();

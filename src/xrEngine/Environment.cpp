@@ -358,8 +358,8 @@ bool CEnvironment::StartWeatherFXFromTime(shared_str name, float time)
     if (!SetWeatherFX(name))
         return false;
 
-    for (auto it = CurrentWeather->begin(); it != CurrentWeather->end(); ++it)
-        (*it)->exec_time = NormalizeTime((*it)->exec_time - wfx_time + time);
+    for (auto& env : *CurrentWeather)
+        env->exec_time = NormalizeTime(env->exec_time - wfx_time + time);
 
     wfx_time = time;
     return true;

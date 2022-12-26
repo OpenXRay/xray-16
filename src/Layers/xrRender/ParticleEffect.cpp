@@ -246,7 +246,7 @@ BOOL CParticleEffect::Compile(CPEDef* def)
     return TRUE;
 }
 
-void CParticleEffect::SetBirthDeadCB(PAPI::OnBirthParticleCB bc, PAPI::OnDeadParticleCB dc, void* owner, u32 p)
+void CParticleEffect::SetBirthDeadCB(PAPI::OnBirthParticleCB bc, PAPI::OnDeadParticleCB dc, void* owner, u32 p) const
 {
     ParticleManager()->SetCallback(m_HandleEffect, bc, dc, owner, p);
 }
