@@ -95,16 +95,16 @@ void dxEnvDescriptorMixerRender::lerp(IEnvDescriptorRender* inA, IEnvDescriptorR
     dxEnvDescriptorRender* pB = (dxEnvDescriptorRender*)inB;
 
     sky_r_textures.clear();
-    sky_r_textures.push_back(std::make_pair(0, pA->sky_texture));
-    sky_r_textures.push_back(std::make_pair(1, pB->sky_texture));
+    sky_r_textures.emplace_back(0, pA->sky_texture);
+    sky_r_textures.emplace_back(1, pB->sky_texture);
 
     sky_r_textures_env.clear();
-    sky_r_textures_env.push_back(std::make_pair(0, pA->sky_texture_env));
-    sky_r_textures_env.push_back(std::make_pair(1, pB->sky_texture_env));
+    sky_r_textures_env.emplace_back(0, pA->sky_texture_env);
+    sky_r_textures_env.emplace_back(1, pB->sky_texture_env);
 
     clouds_r_textures.clear();
-    clouds_r_textures.push_back(std::make_pair(0, pA->clouds_texture));
-    clouds_r_textures.push_back(std::make_pair(1, pB->clouds_texture));
+    clouds_r_textures.emplace_back(0, pA->clouds_texture);
+    clouds_r_textures.emplace_back(1, pB->clouds_texture);
 }
 
 void dxEnvDescriptorRender::OnDeviceCreate(CEnvDescriptor& owner)

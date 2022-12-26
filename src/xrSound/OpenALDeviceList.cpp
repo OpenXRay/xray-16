@@ -33,13 +33,8 @@
 constexpr pcstr AL_GENERIC_HARDWARE = "Generic Hardware";
 constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";
 
-void __cdecl al_log(char* msg) { Log(msg); }
-
 ALDeviceList::ALDeviceList()
 {
-#if !defined(MASTER_GOLD) && defined(XR_PLATFORM_WINDOWS)
-    pLog = al_log;
-#endif
     snd_device_id = (u32)-1;
     Enumerate();
 }

@@ -6,13 +6,21 @@
 #include "SoundRender_Source.h"
 #include "SoundRender_Emitter.h"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#define OPENAL
-#include <eax/eax.h>
+// XXX: old SDK functionality
+//#if defined(XR_PLATFORM_WINDOWS)
+//#define OPENAL
+//#include <eax/eax.h>
+//#endif
+
+XRSOUND_API Flags32 psSoundFlags =
+{
+    ss_Hardware
+#ifdef XR_PLATFORM_WINDOWS
+    | ss_EFX
 #endif
+};
 
 XRSOUND_API int psSoundTargets = 32;
-XRSOUND_API Flags32 psSoundFlags = { ss_Hardware | ss_EAX };
 XRSOUND_API float psSoundOcclusionScale = 0.5f;
 XRSOUND_API float psSoundVelocityAlpha = 0.05f;
 XRSOUND_API float psSoundTimeFactor = 1.0f;
@@ -88,8 +96,8 @@ void CSoundRender_Core::_clear()
     s_sources.clear();
 
     // remove emitters
-    for (u32 eit = 0; eit < s_emitters.size(); eit++)
-        xr_delete(s_emitters[eit]);
+    for (auto& emit : s_emitters)
+        xr_delete(emit);
     s_emitters.clear();
 
     g_target_temp_data.clear();
@@ -97,8 +105,8 @@ void CSoundRender_Core::_clear()
 
 void CSoundRender_Core::stop_emitters()
 {
-    for (u32 eit = 0; eit < s_emitters.size(); eit++)
-        s_emitters[eit]->stop(false);
+    for (auto& emit : s_emitters)
+        emit->stop(false);
 }
 
 int CSoundRender_Core::pause_emitters(bool val)
@@ -106,8 +114,8 @@ int CSoundRender_Core::pause_emitters(bool val)
     m_iPauseCounter += val ? +1 : -1;
     VERIFY(m_iPauseCounter >= 0);
 
-    for (u32 it = 0; it < s_emitters.size(); it++)
-        ((CSoundRender_Emitter*)s_emitters[it])->pause(val, val ? m_iPauseCounter : m_iPauseCounter + 1);
+    for (auto& emit : s_emitters)
+        static_cast<CSoundRender_Emitter*>(emit)->pause(val, val ? m_iPauseCounter : m_iPauseCounter + 1);
 
     return m_iPauseCounter;
 }
@@ -457,12 +465,12 @@ void CSoundRender_Core::object_relcase(IGameObject* obj)
 {
     if (obj)
     {
-        for (u32 eit = 0; eit < s_emitters.size(); eit++)
+        for (auto& emit : s_emitters)
         {
-            if (s_emitters[eit])
-                if (s_emitters[eit]->owner_data)
-                    if (obj == s_emitters[eit]->owner_data->g_object)
-                        s_emitters[eit]->owner_data->g_object = 0;
+            if (emit)
+                if (emit->owner_data)
+                    if (obj == emit->owner_data->g_object)
+                        emit->owner_data->g_object = 0;
         }
     }
 }
@@ -492,8 +500,8 @@ void CSoundRender_Core::refresh_env_library()
 }
 void CSoundRender_Core::refresh_sources()
 {
-    for (u32 eit = 0; eit < s_emitters.size(); eit++)
-        s_emitters[eit]->stop(false);
+    for (auto& emit : s_emitters)
+        emit->stop(false);
     for (const auto& kv : s_sources)
     {
         CSoundRender_Source* s = kv.second;
@@ -503,6 +511,7 @@ void CSoundRender_Core::refresh_sources()
 }
 void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound_environment** dst_env)
 {
+    // XXX: old SDK functionality
     /*if (bEAX)
     {
         CSoundRender_Environment* SE = static_cast<CSoundRender_Environment*>(src_env);
@@ -524,6 +533,7 @@ void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound
 
 void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
 {
+    // XXX: old SDK functionality
     /*if (bEAX)
     {
         CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);

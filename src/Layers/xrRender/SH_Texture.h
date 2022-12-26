@@ -75,27 +75,30 @@ public:
 public:
     void apply_load(u32 stage);
     void apply_theora(u32 stage);
-    void apply_avi(u32 stage);
+    void apply_avi(u32 stage) const;
     void apply_seq(u32 stage);
-    void apply_normal(u32 stage);
+    void apply_normal(u32 stage) const;
 
     void Preload();
     void Load();
     void PostLoad();
-    void Unload(void);
+    void Unload();
     // void Apply(u32 dwStage);
 
 #if defined(USE_DX9) || defined(USE_DX11)
     void surface_set(ID3DBaseTexture* surf);
-    ID3DBaseTexture* surface_get();
+    [[nodiscard]] ID3DBaseTexture* surface_get() const;
 #elif defined(USE_OGL)
     void surface_set(GLenum target, GLuint surf);
-    GLuint surface_get();
+    [[nodiscard]] GLuint surface_get() const;
 #else
 #   error No graphics API selected or enabled!
 #endif
 
-    BOOL isUser() { return flags.bUser; }
+    [[nodiscard]] BOOL isUser() const
+    {
+        return flags.bUser;
+    }
 
     u32 get_Width()
     {
@@ -111,9 +114,9 @@ public:
 
     void video_Sync(u32 _time) { m_play_time = _time; }
     void video_Play(BOOL looped, u32 _time = 0xFFFFFFFF);
-    void video_Pause(BOOL state);
-    void video_Stop();
-    BOOL video_IsPlaying();
+    void video_Pause(BOOL state) const;
+    void video_Stop() const;
+    [[nodiscard]] BOOL video_IsPlaying() const;
 
     CTexture();
     virtual ~CTexture();
@@ -123,7 +126,10 @@ public:
 #endif
 
 private:
-    BOOL desc_valid() { return pSurface == desc_cache; }
+    [[nodiscard]] BOOL desc_valid() const
+    {
+        return pSurface == desc_cache;
+    }
 
     void desc_enshure()
     {
@@ -133,7 +139,7 @@ private:
 
     void desc_update();
 #if defined(USE_DX11)
-    void Apply(u32 dwStage);
+    void Apply(u32 dwStage) const;
     D3D_USAGE GetUsage();
 #endif
 

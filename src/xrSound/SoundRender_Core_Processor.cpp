@@ -105,8 +105,8 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
             s_targets_defer[it]->fill_parameters();
     }
 
-    // update EAX
-    if (psSoundFlags.test(ss_EAX) && m_effects)
+    // Update effects
+    if (psSoundFlags.test(ss_EFX) && m_effects)
     {
         if (bListenerMoved)
         {
@@ -142,11 +142,9 @@ static u32 g_saved_event_count = 0;
 void CSoundRender_Core::update_events()
 {
     g_saved_event_count = s_events.size();
-    for (u32 it = 0; it < s_events.size(); it++)
-    {
-        event& E = s_events[it];
+    for (auto& E : s_events)
         Handler(E.first, E.second);
-    }
+
     s_events.clear();
 }
 
@@ -155,9 +153,8 @@ void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
     if (dest)
     {
         dest->_rendered = 0;
-        for (u32 it = 0; it < s_targets.size(); it++)
+        for (auto T : s_targets)
         {
-            CSoundRender_Target* T = s_targets[it];
             if (T->get_emitter() && T->get_Rendering())
                 dest->_rendered++;
         }
@@ -169,9 +166,8 @@ void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
     }
     if (ext)
     {
-        for (u32 it = 0; it < s_emitters.size(); it++)
+        for (auto _E : s_emitters)
         {
-            CSoundRender_Emitter* _E = s_emitters[it];
             CSound_stats_ext::SItem _I;
             _I._3D = !_E->b2D;
             _I._rendered = !!_E->target;

@@ -592,14 +592,14 @@ void CUIGameCTA::GetPurchaseItems(BuyMenuItemsCollection& dest, s32& moneyDif)
         addon = pi->addon_state;
 
         for (u32 ic = 0; ic < pi->count; ++ic)
-            dest.push_back(std::make_pair(addon, itemId));
+            dest.emplace_back(addon, itemId);
     }
 
     if (m_game->local_player && m_game->local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
     {
         u8 KnifeSlot, KnifeIndex;
         m_pCurBuyMenu->GetWeaponIndexByName("mp_wpn_knife", KnifeSlot, KnifeIndex);
-        dest.push_back(std::make_pair(KnifeSlot, KnifeIndex));
+        dest.emplace_back(KnifeSlot, KnifeIndex);
     }
 
     moneyDif = m_pCurBuyMenu->GetPresetCost(_preset_idx_origin) - m_pCurBuyMenu->GetPresetCost(_preset_idx_last);

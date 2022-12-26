@@ -11,17 +11,19 @@
 #include "xrServer_script_macroses.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 static void CSE_SmartCover_Export(lua_State* luaState)
 {
-    module(luaState)[luabind_class_dynamic_alife1(CSE_SmartCover, "cse_smart_cover", CSE_ALifeDynamicObject)
-                         .def("description", &CSE_SmartCover::description)
+    using namespace luabind;
+
+    module(luaState)
+    [
+        luabind_class_dynamic_alife1(CSE_SmartCover, "cse_smart_cover", CSE_ALifeDynamicObject)
+            .def("description", &CSE_SmartCover::description)
 #ifndef AI_COMPILER
-                         .def("set_available_loopholes", &CSE_SmartCover::set_available_loopholes)
+            .def("set_available_loopholes", &CSE_SmartCover::set_available_loopholes)
 #endif
 #ifdef XRSE_FACTORY_EXPORTS
-                         .def("set_loopholes_table_checker", &CSE_SmartCover::set_loopholes_table_checker)
+            .def("set_loopholes_table_checker", &CSE_SmartCover::set_loopholes_table_checker)
 #endif
     ];
 }

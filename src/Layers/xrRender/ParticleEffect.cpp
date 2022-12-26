@@ -14,7 +14,7 @@
 #endif
 #endif
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) // XXX: remove
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) // XXX: remove
 #include <math.h>
 #endif
 
@@ -246,7 +246,7 @@ BOOL CParticleEffect::Compile(CPEDef* def)
     return TRUE;
 }
 
-void CParticleEffect::SetBirthDeadCB(PAPI::OnBirthParticleCB bc, PAPI::OnDeadParticleCB dc, void* owner, u32 p)
+void CParticleEffect::SetBirthDeadCB(PAPI::OnBirthParticleCB bc, PAPI::OnDeadParticleCB dc, void* owner, u32 p) const
 {
     ParticleManager()->SetCallback(m_HandleEffect, bc, dc, owner, p);
 }

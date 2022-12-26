@@ -47,11 +47,8 @@ public:
         SharedMapIt _E = container.end();
         if (force_destroy)
         {
-            for (; it != _E; ++it)
-            {
-                T* sv = it->second;
-                xr_delete(sv);
-            }
+            for (auto& [k,v] : container)
+                xr_delete(v);
             container.clear();
         }
         else

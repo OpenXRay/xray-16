@@ -4,21 +4,37 @@ OpenXRay
 ==========================
 OpenXRay is an improved version of the X-Ray Engine, the game engine used in the world-famous S.T.A.L.K.E.R. game series by GSC Game World.
 
-Main differences from original X-Ray are:
-- Support for 64-bit
-- Improved performance, better FPS
-- Original bugs fixes
-- New features for modmakers
-- Gamepad support (not yet finished, but you can try already, see [#943](https://github.com/OpenXRay/xray-16/issues/943))
-- New OpenGL renderer
-- Works on Linux, macOS support is almost finished
+##### Goals
+1. Make it a drop-in replacement for original engine.
+    1. 100% compatibility and same behaviour.
+    2. Compile engine into a single executable file that you can just drop into `bin` folder. (see [#210](https://github.com/OpenXRay/xray-16/issues/210))
+2. Support all three games in the series: SOC/CS/COP. (see [Supported games](#supported-games) below)
+3. Fix original S.T.A.L.K.E.R. series bugs.
+4. Introduce a solid platform for modmakers:
+    1. Add frame/render graph for those who want to add new graphics features.
+    2. Improve performance via refactoring the code, parallelizing the engine, making it multithreaded.
+    3. Add new scripting, development and debugging features.
+5. Clean up engine code, make it easily portable to new platforms, minimize platform-specific code.
+6. Enhance player's experience with new graphics, gameplay and other features that can be enabled optionally. (by default, we stay close to vanilla)
+
+##### Main differences from original X-Ray are:
+- Support for 64-bit.
+- Support for ARM, ARM64, E2K (Elbrus 2000).
+- Works on Linux, macOS, OSL (Elbrus OS).
+- New OpenGL renderer. (currently, requires OpenGL 4.1 minimum, lowering to at least OpenGL 3.3 is planned)
+- Improved performance, better FPS.
+- Original bugs fixes.
+- New features for modmakers.
+- Gamepad support. (not yet finished, but you can try already, see [#943](https://github.com/OpenXRay/xray-16/issues/943))
 
 You can see the detailed differences table [here](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-Differences-from-original-X‐Ray)
 
 #### Supported games
+OpenXRay is based on X-Ray 1.6.02, used in S.T.A.L.K.E.R.: Call of Pripyat, so initially it supported only this game. <br>
+Currently, we are working on support for all three games in the series.
 |Call of Pripyat|Clear Sky|Shadow of Chernobyl|
 |---|---|---|
-|Yes|Release Candidate (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| **Not supported** yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
+|Yes|Beta (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| **Not supported** yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
 
 ### Documentation:
 Make sure to visit our [wiki](https://github.com/OpenXRay/xray-16/wiki).
@@ -53,8 +69,9 @@ Join our efforts in making our beloved game better, send pull requests, particip
 It is a place to share ideas on what to implement, gather people that want to work on the engine,
 and work on the source code. However, the following things should be taken into consideration:
 
-* We want to keep the game as close as possible to the vanilla game, so instead of introducing new gameplay features,
-  consider adding non-gameplay features, fixing bugs, improving performance and code quality.
+* We want to keep the game close to the vanilla, untouched state, so if you want to introduce new gameplay features,
+  make sure it is optional, doesn't break compatibility with original game resources (i.e. everything in `gamedata` folder and `.db*`/`.xdb` archives).
+  You also may want to add non-gameplay features, fix bugs or improve engine performance and code quality.
 * Major changes should be discussed before implementation.
 * Follow the [procedures](doc/procedure).
 
@@ -110,6 +127,9 @@ Thank you for your support!
     * [GeorgeIvlev](https://github.com/GeorgeIvlev) – for work on the build system, bug fixing.
     * [Plotja](https://github.com/Plotja) – for work on portability, polishing.
     * [dimhotepus](https://github.com/dimhotepus) – for work on code quality.
+    * [Chugunov Roman](https://github.com/ChugunovRoman) – for work on extending functionality for modmakers.
+    * [Vertver](https://github.com/Vertver) – for work on macOS support.
+    * [Lnd-stoL](https://github.com/Lnd-stoL) – for work on macOS support.
 * Particular projects:
   * [Oxygen](https://github.com/xrOxygen) – for being our friends and giving tips and help with new features, optimizations, bug fixes, etc.
   * [Shoker Weapon Mod](https://github.com/ShokerStlk/xray-16-SWM) and [Shoker](https://github.com/ShokerStlk) – for contributing new features, bug fixing.
@@ -128,4 +148,4 @@ Thank you for your support!
     [![CppDepend logo](https://www.cppdepend.com/images/cppdependlogo.png)](https://www.cppdepend.com)
 
 
-If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you.
+If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you. Or send us a pull request with you added to this list ;)

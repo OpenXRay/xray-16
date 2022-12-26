@@ -814,6 +814,11 @@ public:
     u8 GetRestrictionType();
     void SetRestrictionType(u8 type);
 
+    //CWeaponAmmo
+    u16 AmmoGetCount();
+    void AmmoSetCount(u16 count);
+    u16 AmmoBoxSize();
+
     //Weapon
     void Weapon_AddonAttach(CScriptGameObject* item);
     void Weapon_AddonDetach(pcstr item_section);
@@ -860,6 +865,15 @@ public:
     void SetArtefactSatietyRestoreSpeed(float value);
     void SetArtefactPowerRestoreSpeed(float value);
     void SetArtefactBleedingRestoreSpeed(float value);
+
+    void RemoveDanger(const CDangerObject& dobject);
+
+    void RemoveMemorySoundObject(const MemorySpace::CSoundObject& memory_object);
+    void RemoveMemoryHitObject(const MemorySpace::CHitObject& memory_object);
+    void RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject& memory_object);
+
+    //CAI_Stalker
+    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
 
     //Eatable items
     void SetRemainingUses(u8 value);

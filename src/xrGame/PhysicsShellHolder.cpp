@@ -22,15 +22,22 @@
 #ifdef DEBUG
 #include "xrEngine/ObjectDump.h"
 #endif
-CPhysicsShellHolder::CPhysicsShellHolder() { init(); }
+
+CPhysicsShellHolder::CPhysicsShellHolder()
+{
+    init();
+}
+
 CPhysicsShellHolder::~CPhysicsShellHolder()
 {
     VERIFY(!m_pPhysicsShell);
     //#ifndef MASTER_GOLD
     // R_ASSERT( !m_pPhysicsShell );
     //#endif
+    xr_delete(m_phSoundPlayer);
     destroy_physics_shell(m_pPhysicsShell);
 }
+
 const IObjectPhysicsCollision* CPhysicsShellHolder::physics_collision()
 {
     CCharacterPhysicsSupport* char_support = character_physics_support();
@@ -131,8 +138,10 @@ void CPhysicsShellHolder::create_physic_shell()
 void CPhysicsShellHolder::init()
 {
     m_pPhysicsShell = NULL;
+    m_phSoundPlayer = xr_new<CPHSoundPlayer>(this);
     b_sheduled = false;
 }
+
 bool CPhysicsShellHolder::has_shell_collision_place(const CPhysicsShellHolder* obj) const
 {
     if (character_physics_support())
@@ -458,7 +467,7 @@ Fvector& CPhysicsShellHolder::ObjectPosition() { return Position(); }
 LPCSTR CPhysicsShellHolder::ObjectName() const { return cName().c_str(); }
 LPCSTR CPhysicsShellHolder::ObjectNameVisual() const { return cNameVisual().c_str(); }
 LPCSTR CPhysicsShellHolder::ObjectNameSect() const { return cNameSect().c_str(); }
-bool CPhysicsShellHolder::ObjectGetDestroy() const { return !!CGameObject::getDestroy(); }
+bool CPhysicsShellHolder::ObjectGetDestroy() const { return CGameObject::getDestroy(); }
 ICollisionHitCallback* CPhysicsShellHolder::ObjectGetCollisionHitCallback() { return get_collision_hit_callback(); }
 u16 CPhysicsShellHolder::ObjectID() const { return ID(); }
 

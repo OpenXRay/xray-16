@@ -2,10 +2,10 @@
 #include "UIProgressBar.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CUIProgressBar, (CUIWindow),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIProgressBar, CUIWindow>("CUIProgressBar")

@@ -66,8 +66,6 @@ void CObjectFactory::register_script_classes()
         ai();
 }
 
-using namespace luabind;
-
 struct CInternal
 {
 };
@@ -86,10 +84,16 @@ void CObjectFactory::register_script() const
     luabind::module(GEnv.ScriptEngine->lua())[instance];
 }
 
-SCRIPT_EXPORT(CObjectFactory, (), {
-    module(luaState)[class_<CObjectFactory>("object_factory")
-                         .def("register", (void (CObjectFactory::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))(
-                                              &CObjectFactory::register_script_class))
-                         .def("register", (void (CObjectFactory::*)(LPCSTR, LPCSTR, LPCSTR))(
-                                              &CObjectFactory::register_script_class))];
+SCRIPT_EXPORT(CObjectFactory, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CObjectFactory>("object_factory")
+        .def("register", (void (CObjectFactory::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))(
+                             &CObjectFactory::register_script_class))
+        .def("register", (void (CObjectFactory::*)(LPCSTR, LPCSTR, LPCSTR))(
+                             &CObjectFactory::register_script_class))
+    ];
 });

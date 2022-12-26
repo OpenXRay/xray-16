@@ -368,12 +368,11 @@ public:
 
     u32& IntRref(float& x) { return (u32&)x; }
 
-    enum ERP_Result
+    enum ERP_Result : u32
     {
         rpNone = 0,
         rpOriginInside = 1,
         rpOriginOutside = 2,
-        fcv_forcedword = u32(-1)
     };
 
     ERP_Result Pick2(const Fvector3& origin, const Fvector3& dir, Fvector3& coord)

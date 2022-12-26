@@ -133,13 +133,13 @@
     <ClCompile Include="xrT_Junction.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Externals\MagicFM.vcxproj">
+    <ProjectReference Include="$(xrExternals)MagicFM.vcxproj">
       <Project>{848e8ab3-9962-4c04-b813-5690399c8a3e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xrCDB\xrCDB.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">
       <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ETools\ETools.vcxproj">

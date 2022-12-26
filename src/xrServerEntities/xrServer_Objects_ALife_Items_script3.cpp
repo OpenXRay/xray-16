@@ -11,9 +11,13 @@
 #include "xrServer_script_macroses.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
+SCRIPT_EXPORT(CSE_ALifeItemWeaponMagazinedWGL, (CSE_ALifeItemWeaponMagazined),
+{
+    using namespace luabind;
 
-SCRIPT_EXPORT(CSE_ALifeItemWeaponMagazinedWGL, (CSE_ALifeItemWeaponMagazined), {
-    module(luaState)[luabind_class_item1(
-        CSE_ALifeItemWeaponMagazinedWGL, "cse_alife_item_weapon_magazined_w_gl", CSE_ALifeItemWeaponMagazined)];
+    module(luaState)
+    [
+        luabind_class_item1(
+            CSE_ALifeItemWeaponMagazinedWGL, "cse_alife_item_weapon_magazined_w_gl", CSE_ALifeItemWeaponMagazined)
+    ];
 });

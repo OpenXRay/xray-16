@@ -48,60 +48,53 @@ bool defaultSlotActiveness[] =
     false // helmet
 };
 
-CInventorySlot::CInventorySlot()
-{
-    m_pIItem = NULL;
-    m_bAct = true;
-    m_bPersistent = false;
-}
-
-CInventorySlot::~CInventorySlot() {}
-bool CInventorySlot::CanBeActivated() const { return (m_bAct); };
 CInventory::CInventory()
 {
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
     m_iMaxBelt = pSettings->read_if_exists<s32>("inventory", "max_belt", 5);
 
-    u16 sz;
-    const u16 tempSlotsCount = pSettings->read_if_exists<s16>("inventory", "slots_count", 10);
-    if (tempSlotsCount > 0 && tempSlotsCount <= LAST_SLOT)
-        sz = tempSlotsCount + 1;
-    else
+    const u16 slotsCount = pSettings->read_if_exists<u16>("inventory", "slots_count", SLOTS_COUNT);
+    // slots_count + 1 because [0] is the inactive slot
+    m_slots.reserve(slotsCount + 1u);
+
+    // Inactive slot [0]
+    m_slots.emplace_back(CInventorySlot{});
+
+    // Dynamically create as many slots as we may define in system.ltx
+    u16 i = 0;
+    do
     {
-        Log("! [inventory] slots_count is less than 1 or more than LAST_SLOT");
-        sz = 1;
-    }
-    m_slots.resize(sz + 1); // first is [1]
-    m_iLastSlot = sz - 1;
+        ++i;
 
-    m_iActiveSlot = NO_ACTIVE_SLOT;
-    m_iNextActiveSlot = NO_ACTIVE_SLOT;
-    m_iPrevActiveSlot = NO_ACTIVE_SLOT;
+        string256 slot_persistent;
+        string256 slot_active;
+        xr_sprintf(slot_persistent, "slot_persistent_%d", i);
+        xr_sprintf(slot_active,     "slot_active_%d",     i);
 
-    string256 temp;
-    for (u16 i = FirstSlot(); i <= LastSlot(); ++i)
-    {
-        xr_sprintf(temp, "slot_persistent_%d", i);
-        m_slots[i].m_bPersistent = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
+        if (!pSettings->line_exist("inventory", slot_persistent))
+        {
+            --i;
+            break;
+        }
 
-        xr_sprintf(temp, "slot_active_%d", i);
-        m_slots[i].m_bAct = !!READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
-    };
+        const bool isPersistent = pSettings->r_bool("inventory", slot_persistent);
+        const bool isActive = pSettings->read_if_exists<bool>("inventory", slot_active,
+            ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
 
-    m_bSlotsUseful = true;
-    m_bBeltUseful = false;
+        m_slots.emplace_back(CInventorySlot{ nullptr, isPersistent, isActive });
+    } while (true);
 
-    m_fTotalWeight = -1.f;
-    m_dwModifyFrame = 0;
-    m_drop_last_frame = false;
+    m_iLastSlot = i;
+    VERIFY2(m_iLastSlot >= slotsCount, make_string(
+        "Not critical, but check [inventory] section in your system.ltx.\n"
+        "slots_count = %u, but real slots count is less: %u", slotsCount, i).c_str()
+    );
+
+    m_blocked_slots.resize(m_slots.size());
+    // ^ no need to initialize members of array
+    // ^ resize will default initialize everything with 0
 
     InitPriorityGroupsForQSwitch();
-    m_next_item_iteration_time = 0;
-
-    for (u16 i = 0; i < sz; ++i)
-    {
-        m_blocked_slots[i] = 0;
-    }
 }
 
 CInventory::~CInventory() {}
@@ -559,7 +552,7 @@ void CInventory::Activate(u16 slot, bool bForce)
         return;
     }
 
-    R_ASSERT2(slot <= LastSlot(), "wrong slot number");
+    R_ASSERT2(slot <= LastSlot(), make_string("wrong slot number. Slot = %d, LastSlot() = %d", slot, LastSlot()).c_str());
 
     if (slot != NO_ACTIVE_SLOT && !m_slots[slot].CanBeActivated())
         return;
@@ -1410,7 +1403,7 @@ void CInventory::TryDeactivateActiveSlot()
 
 void CInventory::BlockSlot(u16 slot_id)
 {
-    VERIFY(slot_id <= LastSlot());
+    VERIFY2(slot_id <= LastSlot(), make_string("wrong slot number. Slot = %d, LastSlot() = %d", slot_id, LastSlot()).c_str());
 
     ++m_blocked_slots[slot_id];
 
@@ -1419,7 +1412,7 @@ void CInventory::BlockSlot(u16 slot_id)
 
 void CInventory::UnblockSlot(u16 slot_id)
 {
-    VERIFY(slot_id <= LastSlot());
+    VERIFY2(slot_id <= LastSlot(), make_string("wrong slot number. Slot = %d, LastSlot() = %d", slot_id, LastSlot()).c_str());
     VERIFY2(m_blocked_slots[slot_id] > 0, make_string("blocked slot [%d] underflow").c_str());
 
     --m_blocked_slots[slot_id];
@@ -1427,7 +1420,7 @@ void CInventory::UnblockSlot(u16 slot_id)
 
 bool CInventory::IsSlotBlocked(u16 slot_id) const
 {
-    VERIFY(slot_id <= LastSlot());
+    VERIFY2(slot_id <= LastSlot(), make_string("wrong slot number. Slot = %d, LastSlot() = %d", slot_id, LastSlot()).c_str());
     return m_blocked_slots[slot_id] > 0;
 }
 

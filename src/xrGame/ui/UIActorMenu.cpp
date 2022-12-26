@@ -18,6 +18,7 @@
 #include "GrenadeLauncher.h"
 #include "trade_parameters.h"
 #include "ActorHelmet.h"
+#include "ActorBackpack.h"
 #include "CustomOutfit.h"
 #include "CustomDetector.h"
 #include "eatable_item.h"
@@ -315,9 +316,13 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
     if (l == m_pLists[eInventoryBeltList])
         return iActorBelt;
 
+    if (l == m_pLists[eInventoryKnifeList] && m_pLists[eInventoryKnifeList] != nullptr)
+        return iActorSlot;
     if (l == m_pLists[eInventoryAutomaticList])
         return iActorSlot;
     if (l == m_pLists[eInventoryPistolList])
+        return iActorSlot;
+    if (l == m_pLists[eInventoryBackpackList] && m_pLists[eInventoryBackpackList] != nullptr)
         return iActorSlot;
     if (l == m_pLists[eInventoryOutfitList])
         return iActorSlot;
@@ -525,10 +530,14 @@ void CUIActorMenu::UpdateItemsPlace()
 
 void CUIActorMenu::clear_highlight_lists()
 {
+    if (m_pLists[eInventoryKnifeList])
+        m_pLists[eInventoryKnifeList]->Highlight(false);
     m_pLists[eInventoryPistolList]->Highlight(false);
     m_pLists[eInventoryAutomaticList]->Highlight(false);
     if (m_pLists[eInventoryHelmetList])
         m_pLists[eInventoryHelmetList]->Highlight(false);
+    if (m_pLists[eInventoryBackpackList])
+        m_pLists[eInventoryBackpackList]->Highlight(false);
     m_pLists[eInventoryOutfitList]->Highlight(false);
     if (m_pLists[eInventoryDetectorList])
         m_pLists[eInventoryDetectorList]->Highlight(false);
@@ -566,6 +575,7 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
 
     CWeapon* weapon = smart_cast<CWeapon*>(item);
     CHelmet* helmet = smart_cast<CHelmet*>(item);
+    CBackpack* backpack = smart_cast<CBackpack*>(item);
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(item);
     CCustomDetector* detector = smart_cast<CCustomDetector*>(item);
     CEatableItem* eatable = smart_cast<CEatableItem*>(item);
@@ -582,6 +592,12 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
     {
         if (m_pLists[eInventoryHelmetList])
             m_pLists[eInventoryHelmetList]->Highlight(true);
+        return;
+    }
+    if (backpack && slot_id == BACKPACK_SLOT)
+    {
+        if (m_pLists[eInventoryBackpackList])
+            m_pLists[eInventoryBackpackList]->Highlight(true);
         return;
     }
     if (outfit && slot_id == OUTFIT_SLOT)
@@ -862,6 +878,10 @@ void CUIActorMenu::ClearAllLists()
         m_pLists[eInventoryHelmetList]->ClearAll(true);
     if (m_pLists[eInventoryDetectorList])
         m_pLists[eInventoryDetectorList]->ClearAll(true);
+    if (m_pLists[eInventoryBackpackList])
+        m_pLists[eInventoryBackpackList]->ClearAll(true);
+    if (m_pLists[eInventoryKnifeList])
+        m_pLists[eInventoryKnifeList]->ClearAll(true);
     m_pLists[eInventoryPistolList]->ClearAll(true);
     m_pLists[eInventoryAutomaticList]->ClearAll(true);
     if (m_pQuickSlot)
