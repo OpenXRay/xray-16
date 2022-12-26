@@ -1,0 +1,2 @@
+# X-Ray uses own dialect of INI
+*.ltx text linguist-language=INI diff=INI
