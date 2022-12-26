@@ -84,7 +84,6 @@ void CPolterTele::update_schedule()
         m_time = time();
         m_time_next = 0;
         m_state = eFireObjects;
-        break;
     case eFireObjects:
         if (m_time + m_time_next < time())
         {
