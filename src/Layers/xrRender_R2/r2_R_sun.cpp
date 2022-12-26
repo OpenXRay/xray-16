@@ -984,7 +984,7 @@ void CRender::render_sun_near()
     RCache.set_xform_project(Device.mProject);
 }
 
-void CRender::render_sun_filtered()
+void CRender::render_sun_filtered() const
 {
     if (!o.sunfilter)
         return;

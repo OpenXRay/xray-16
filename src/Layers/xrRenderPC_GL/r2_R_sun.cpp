@@ -148,7 +148,7 @@ static inline bool PlaneIntersection(glm::vec3* intersectPt, const glm::vec4& p0
 
 struct Frustum
 {
-    Frustum(const glm::mat4* matrix);
+    explicit Frustum(const glm::mat4* matrix);
 
     glm::vec4 camPlanes[6];
     int nVertexLUT[6];
@@ -282,7 +282,7 @@ struct DumbClipper
         return true;
     }
 
-    glm::vec3 point(Fbox& bb, int i) const
+    static glm::vec3 point(Fbox& bb, int i)
     {
         return glm::vec3(i & 1 ? bb.vMin.x : bb.vMax.x, i & 2 ? bb.vMin.y : bb.vMax.y, i & 4 ? bb.vMin.z : bb.vMax.z);
     }
@@ -383,7 +383,7 @@ void CRender::render_sun()
             }
             for (auto& plane : sun::facetable)
             {
-                hull.polys.push_back(DumbConvexVolume<false>::_poly());
+                hull.polys.emplace_back();
                 for (int pt : plane)
                     hull.polys.back().points.push_back(pt);
             }
@@ -694,7 +694,7 @@ void CRender::render_sun()
         for (size_t p = 0; p < view_clipper.frustum.p_count; p++)
         {
             Fplane& P = view_clipper.frustum.planes [p];
-            view_clipper.planes.push_back({P.n.x, P.n.y, P.n.z, P.d});
+            view_clipper.planes.emplace_back(P.n.x, P.n.y, P.n.z, P.d);
         }
 
         // 
@@ -860,7 +860,7 @@ void CRender::render_sun_near()
             }
             for (auto& plane : sun::facetable)
             {
-                hull.polys.push_back(t_volume::_poly());
+                hull.polys.emplace_back();
                 for (int pt : plane)
                     hull.polys.back().points.push_back(pt);
             }
@@ -1016,7 +1016,7 @@ void CRender::render_sun_near()
     RCache.set_xform_project(Device.mProject);
 }
 
-void CRender::render_sun_filtered()
+void CRender::render_sun_filtered() const
 {
     if (!o.sunfilter)
         return;
@@ -1119,7 +1119,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
                     edge_vec.sub(near_p);
                     edge_vec.normalize();
 
-                    light_cuboid.view_frustum_rays.push_back(sun::ray(near_p, edge_vec));
+                    light_cuboid.view_frustum_rays.emplace_back(near_p, edge_vec);
                 }
             }
             else
