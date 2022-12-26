@@ -408,7 +408,7 @@ public:
     // iterators
     IReader* open_chunk_iterator(u32& ID, IReader* previous = nullptr); // NULL=first
 
-    virtual size_t find_chunk(u32 ID, bool* bCompressed = 0);
+    size_t find_chunk(u32 ID, bool* bCompressed = 0);
 
 private:
     typedef IReaderBase<IReader> inherited;

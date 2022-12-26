@@ -18,6 +18,9 @@ const float tweak_guaranteed_range = 20.f; //. ?
 // float			OLES_SUN_LIMIT_27_01_07			= 180.f		;
 float OLES_SUN_LIMIT_27_01_07 = 100.f;
 
+const float MAP_SIZE_START = 6.f;
+const float MAP_GROW_FACTOR = 4.f;
+
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
