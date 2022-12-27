@@ -2,7 +2,7 @@
 #include "UIGameCustom.h"
 #include "ui/UIDialogWnd.h"
 #include "xrAICore/Navigation/game_graph_space.h"
-#include <UITimeDilator.h>
+#include "UITimeDilator.h"
 
 class CUITradeWnd;
 class CUITalkWnd;
