@@ -37,25 +37,24 @@ jobs:
       run: |
         set CONFIGURATION=${{ matrix.Configuration }}
         set PLATFORM=${{ matrix.Platform }}
-        call xr_pack_build.cmd ARTIFACT_EDITION
-        echo ::set-output name=Build_type::%ARTIFACT_EDITION%
+        call xr_pack_build.cmd
 
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@main
       with:
-        name: OpenXRay.*.7z
+        name: OpenXRay.${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ github.sha }}).7z
         path: res\OpenXRay.*.7z
 
     - name: Upload Symbols
       uses: actions/upload-artifact@main
       with:
-        name: Symbols.*.7z
+        name: Symbols.${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ github.sha }}).7z
         path: res\Symbols.*.7z
 
     - name: Upload Utils
       uses: actions/upload-artifact@main
       with:
-        name: Utils.*.7z
+        name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ github.sha }}).7z
         path: res\Utils.*.7z
 
   build-ubuntu:
