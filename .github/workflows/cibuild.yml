@@ -43,20 +43,20 @@ jobs:
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@main
       with:
-        name: OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
-        path: res\OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
+        name: OpenXRay.*.7z
+        path: res\OpenXRay.*.7z
 
     - name: Upload Symbols
       uses: actions/upload-artifact@main
       with:
-        name: Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
-        path: res\Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
+        name: Symbols.*.7z
+        path: res\Symbols.*.7z
 
     - name: Upload Utils
       uses: actions/upload-artifact@main
       with:
-        name: Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
-        path: res\Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
+        name: Utils.*.7z
+        path: res\Utils.*.7z
 
   build-ubuntu:
     name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
