@@ -7,10 +7,10 @@
     <xrPlatform Condition="'$(xrPlatform)'==''">$(Platform)</xrPlatform>
 
     <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
-    <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
+    <xrLibRootDir>$(SolutionDir)..\build\lib\</xrLibRootDir>
     <xrBinDir>$(xrBinRootDir)$(xrPlatform)\$(Configuration)\</xrBinDir>
     <xrLibDir>$(xrLibRootDir)$(xrPlatform)\$(Configuration)\</xrLibDir>
-    <xrIntDir>$(SolutionDir)..\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
+    <xrIntDir>$(SolutionDir)..\build\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
     <xrExternals>$(SolutionDir)..\Externals\</xrExternals>
   </PropertyGroup>
