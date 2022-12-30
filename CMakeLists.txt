@@ -325,6 +325,7 @@ string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(src)
 add_subdirectory(res)
+add_subdirectory(misc)
 
 get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 
