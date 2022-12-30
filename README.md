@@ -108,7 +108,7 @@ Thank you for your support!
     * [eagleivg](https://github.com/eagleivg) – main part of the work on Linux port.
     * [q4a](https://github.com/q4a) – main part of the work on Linux port.
     * [SkyLoader](https://github.com/SkyLoaderr) – OpenGL renderer improvements and polishing, other project work.
-    * [qweasdd136963](https://github.com/qweasdd136963) – supporting the [OXR_COC](https://github.com/qweasdd136963/OXR_CoC) project, other project work on new features, refactoring and bug fixing.
+    * [qweasdd136963](https://github.com/qweasdd136963) – supporting the [OXR_COC](https://github.com/qweasdd136963/OXR_CoC) project (Call of Chernobyl port to latest OpenXRay), other project work on new features, refactoring and bug fixing.
     * JohnDoe_71Rus – our regular tester.
     * [Chip_exe](https://github.com/007exe) – work on Linux port, maintaining AUR package, our regular tester.
     * [a1batross](https://github.com/a1batross) – work on Linux port.
@@ -118,18 +118,23 @@ Thank you for your support!
     * [vTurbine](https://github.com/vTurbine) – work on renderer unification, refactoring, polishing.
     * [Zigatun](https://github.com/Zigatun) – work on ARM port.
     * [Masterkatze](https://github.com/Masterkatze) – work on the build system, bug fixing.
+    * [Chugunov Roman](https://github.com/ChugunovRoman) – work on [porting Call of Chernobyl to latest OpenXRay](https://github.com/ChugunovRoman/xray-16), extending functionality for modmakers.
   * Other contributors:
     * [NeoAnomaly](https://github.com/) – for help with debug functionality on Windows.
     * [RainbowZerg](https://github.com/RainbowZerg) – for work on the renderer features, bug fixing.
     * [FozeSt](https://github.com/FozeSt) – for help with some fixes and features.
     * [mrnotbadguy](https://github.com/mrnotbadguy) – for work on gamepads support and bug fixing.
+    * [devnexen](https://github.com/devnexen) – for work on FreeBSD support and portability.
     * [ZeeWanderer](https://github.com/ZeeWanderer) – for work on the build system.
     * [GeorgeIvlev](https://github.com/GeorgeIvlev) – for work on the build system, bug fixing.
-    * [Plotja](https://github.com/Plotja) – for work on portability, polishing.
+    * [TmLev](https://github.com/TmLev) – for work on code quality and Docker support.
+    * [Plotja](https://github.com/Plotja) – for work on new gameplay features, bug fixes, portability, polishing.
     * [dimhotepus](https://github.com/dimhotepus) – for work on code quality.
-    * [Chugunov Roman](https://github.com/ChugunovRoman) – for work on extending functionality for modmakers.
+    * [HeapRaid](https://github.com/HeapRaid) – for work on renderer cleanup, code quality, portability.
     * [Vertver](https://github.com/Vertver) – for work on macOS support.
     * [Lnd-stoL](https://github.com/Lnd-stoL) – for work on macOS support.
+    * [GermanAizek](https://github.com/GermanAizek) – for work on code quality, finding and fixing vanilla bugs.
+    * [dasehak](https://github.com/dasehak) – for work on FreeBSD support, finding and fixing vanilla bugs.
 * Particular projects:
   * [Oxygen](https://github.com/xrOxygen) – for being our friends and giving tips and help with new features, optimizations, bug fixes, etc.
   * [Shoker Weapon Mod](https://github.com/ShokerStlk/xray-16-SWM) and [Shoker](https://github.com/ShokerStlk) – for contributing new features, bug fixing.
