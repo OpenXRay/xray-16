@@ -156,18 +156,11 @@ jobs:
         file openxray_1.6.02_*.deb
 
     - name: Upload OpenXRay artifact
-      if: ${{ matrix.Platform == 'x64' && steps.make-package.outcome == 'success' }}
+      if: ${{ steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
-        name: openxray_1.6.02_${{ matrix.Configuration }}_amd64.deb
-        path: build/openxray_1.6.02_amd64.deb
-
-    - name: Upload OpenXRay artifact
-      if: ${{ matrix.Platform == 'x86' && steps.make-package.outcome == 'success' }}
-      uses: actions/upload-artifact@main
-      with:
-        name: openxray_1.6.02_${{ matrix.Configuration }}_i386.deb
-        path: build/openxray_1.6.02_i386.deb
+        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ matrix.Platform }}.deb
+        path: build/openxray_1.6.02_*.deb
 
   build-alpine:
     name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }} (gcc)
