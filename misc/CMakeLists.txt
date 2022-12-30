@@ -1,6 +1,6 @@
 project(xrResources)
 
-install(DIRECTORY bash-completion DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/)
+install(DIRECTORY linux/bash-completion DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/)
 
 install(FILES linux/openxray_cop.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 install(FILES linux/openxray_cs.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
