@@ -36,7 +36,7 @@ copy README.md res\
 
 rem Make archives
 cd res
-7z a "OpenXRay.%EDITION_NAME%.7z" * -xr!.* -xr!*.pdb -x!bin\utils
+7z a "OpenXRay.%EDITION_NAME%.7z" * -xr!.* -xr!*.pdb -x!bin\utils -x!CMakeLists.txt
 7z a "Symbols.%EDITION_NAME%.7z" bin\*.pdb -i!License.txt -i!README.md -xr!.*
 7z a "Utils.%EDITION_NAME%.7z" bin\utils\* -i!License.txt -i!README.md -xr!.*
 cd ..
