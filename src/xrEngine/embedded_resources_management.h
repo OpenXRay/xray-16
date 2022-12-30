@@ -83,7 +83,7 @@ inline xr_vector<SDL_Surface*> ExtractSplashScreen()
 {
     // XXX: that's the place, where splash frames can be added
     // Animated splash screen!
-    SDL_Surface* surface = ExtractBitmap(IDB_BITMAP1);
+    SDL_Surface* surface = ExtractBitmap(IDB_SPLASH);
 
     if (surface)
         return { surface };

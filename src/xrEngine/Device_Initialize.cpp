@@ -48,17 +48,17 @@ void CRenderDevice::Initialize()
 
         GEnv.Render->ObtainRequiredWindowFlags(flags);
 
-        int icon = IDI_COP;
+        int icon = IDI_ICON_COP;
         pcstr title = "S.T.A.L.K.E.R.: Call of Pripyat";
 
         if (ShadowOfChernobylMode)
         {
-            icon = IDI_SOC;
+            icon = IDI_ICON_SOC;
             title = "S.T.A.L.K.E.R.: Shadow of Chernobyl";
         }
         else if (ClearSkyMode)
         {
-            icon = IDI_CS;
+            icon = IDI_ICON_CS;
             title = "S.T.A.L.K.E.R.: Clear Sky";
         }
 
