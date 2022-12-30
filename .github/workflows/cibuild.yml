@@ -33,7 +33,7 @@ jobs:
 
     - name: Prepare artifacts
       shell: cmd
-      run: misc/windows/xr_pack_build.cmd ${{ matrix.Configuration }} ${{ matrix.Platform }}
+      run: misc/windows/xr_pack_build.cmd "${{ matrix.Configuration }}" "${{ matrix.Platform }}"
 
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@main

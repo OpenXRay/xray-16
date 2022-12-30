@@ -10,8 +10,8 @@ if [%2]==[] (
   EXIT /B
 )
 
-set CONFIGURATION=%1
-set PLATFORM=%2
+set CONFIGURATION=%~1
+set PLATFORM=%~2
 
 if %PLATFORM%==x86 (
     set EDITION_NAME=%CONFIGURATION% 32-bit
