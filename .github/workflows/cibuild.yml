@@ -37,19 +37,19 @@ jobs:
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@main
       with:
-        name: OpenXRay.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.job }}).7z
+        name: OpenXRay.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
         path: res\OpenXRay.*.7z
 
     - name: Upload Symbols
       uses: actions/upload-artifact@main
       with:
-        name: Symbols.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.job }}).7z
+        name: Symbols.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
         path: res\Symbols.*.7z
 
     - name: Upload Utils
       uses: actions/upload-artifact@main
       with:
-        name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.job }}).7z
+        name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
         path: res\Utils.*.7z
 
   build-ubuntu:
@@ -159,7 +159,7 @@ jobs:
       if: ${{ steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
-        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ matrix.Platform }}.deb
+        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ matrix.Platform }}_(github-${{ github.run_number }}).deb
         path: build/openxray_1.6.02_*.deb
 
   build-alpine:
