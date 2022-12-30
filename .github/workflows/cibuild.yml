@@ -32,7 +32,7 @@ jobs:
       run: msbuild /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
 
     - name: Prepare artifacts
-      run: call xr_pack_build.cmd ${{ matrix.Configuration }} ${{ matrix.Platform }}
+      run: call misc/windows/xr_pack_build.cmd ${{ matrix.Configuration }} ${{ matrix.Platform }}
 
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@main

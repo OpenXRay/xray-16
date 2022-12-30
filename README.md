@@ -1,4 +1,4 @@
-![Open for everyone](OpenXRayCover.png)
+![Open for everyone](misc/media/OpenXRayCover.png)
 
 OpenXRay
 ==========================
