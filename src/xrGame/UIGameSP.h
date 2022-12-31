@@ -14,6 +14,9 @@ class CUIMessageBox;
 class CInventoryBox;
 class CInventoryOwner;
 
+extern UITimeDilator* TimeDilator();
+extern void CloseTimeDilator();
+
 class CUIGameSP : public CUIGameCustom
 {
 private:

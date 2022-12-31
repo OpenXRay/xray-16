@@ -27,3 +27,6 @@ private:
     bool dilateTime();
     void resetTime();
 };  
+
+extern UITimeDilator* TimeDilator();
+extern void CloseTimeDilator();

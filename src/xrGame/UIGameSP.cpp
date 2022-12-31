@@ -26,14 +26,14 @@ CUIGameSP::CUIGameSP() : m_game(NULL), m_game_objective(NULL)
 {
     TalkMenu = xr_new<CUITalkWnd>();
     UIChangeLevelWnd = xr_new<CChangeLevelWnd>();
-    timeDilator = xr_new<UITimeDilator>();
+    timeDilator = TimeDilator();
 }
 
 CUIGameSP::~CUIGameSP()
 {
     delete_data(TalkMenu);
     delete_data(UIChangeLevelWnd);
-    xr_delete<UITimeDilator>(timeDilator);
+    CloseTimeDilator();
 }
 
 void CUIGameSP::HideShownDialogs()

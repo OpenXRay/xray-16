@@ -1,6 +1,28 @@
 #include "UITimeDilator.h"
 #include "StdAfx.h"
 
+UITimeDilator* time_dilator;
+bool isTimeDilatorClosed;
+
+UITimeDilator* TimeDilator()
+{ 
+    if (!time_dilator && !isTimeDilatorClosed)
+    {
+        time_dilator = xr_new<UITimeDilator>();
+    }
+
+    return time_dilator;
+}
+
+void CloseTimeDilator()
+{ 
+    if (time_dilator)
+    {
+        isTimeDilatorClosed = true;
+        xr_delete(time_dilator);
+    }
+}
+
 void UITimeDilator::SetUiTimeFactor(float timeFactor)
 {
     uiTimeFactor = timeFactor;
