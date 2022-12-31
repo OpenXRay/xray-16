@@ -120,7 +120,8 @@ Thank you for your support!
     * [Masterkatze](https://github.com/Masterkatze) – work on the build system, bug fixing.
     * [Chugunov Roman](https://github.com/ChugunovRoman) – work on [porting Call of Chernobyl to latest OpenXRay](https://github.com/ChugunovRoman/xray-16), extending functionality for modmakers.
   * Other contributors:
-    * [NeoAnomaly](https://github.com/) – help with debug functionality on Windows.
+    * [alexgdi](https://github.com/alexgdi) – work on organizing project infrastructure, external dependencies.
+    * [NeoAnomaly](https://github.com/NeoAnomaly) – help with debug functionality on Windows.
     * [RainbowZerg](https://github.com/RainbowZerg) – work on the renderer features, bug fixing.
     * [FozeSt](https://github.com/FozeSt) – help with some fixes and features.
     * [mrnotbadguy](https://github.com/mrnotbadguy) – work on gamepads support and bug fixing.
