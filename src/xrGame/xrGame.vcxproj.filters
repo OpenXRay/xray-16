@@ -2251,6 +2251,9 @@
     <Filter Include="AI\AMonsters\common\monster states\Rest\Squad\Rest">
       <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\Common\Styles">
+      <UniqueIdentifier>{66c847f1-8980-4ee3-9d7c-51cc9732bd4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6504,6 +6507,9 @@
     <ClInclude Include="game_cl_mp_script.h">
       <Filter>Core\Server\Games\client\mp_script</Filter>
     </ClInclude>
+    <ClInclude Include="ui\ui_styles.h">
+      <Filter>UI\Common\Styles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9877,6 +9883,9 @@
     </ClCompile>
     <ClCompile Include="CustomOutfit_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\ui_styles.cpp">
+      <Filter>UI\Common\Styles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

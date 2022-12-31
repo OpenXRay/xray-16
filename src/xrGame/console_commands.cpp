@@ -49,6 +49,7 @@
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
 #include "GametaskManager.h"
+#include "ui/ui_styles.h"
 
 #ifdef DEBUG
 #include "PHDebug.h"
@@ -89,6 +90,7 @@ extern BOOL g_bShowHitSectors;
 // extern	BOOL	g_bDebugDumpPhysicsStep	;
 extern ESingleGameDifficulty g_SingleGameDifficulty;
 XRUICORE_API extern BOOL g_show_wnd_rect2;
+
 //-----------------------------------------------------------
 extern float g_fTimeFactor;
 extern BOOL b_toggle_weapon_aim;
@@ -1446,12 +1448,12 @@ public:
     void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
-        UI().Styles().SetupStyle(m_id);
+        UIStyles->SetupStyle(m_id);
     }
     
     const xr_token* GetToken() noexcept override // may throw exceptions!
     {
-        return UI().Styles().GetToken().data();
+        return UIStyles->GetToken().data();
     }
 };
 
@@ -1462,7 +1464,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        UI().Styles().Reset();
+        UIStyles->Reset();
     }
 };
 

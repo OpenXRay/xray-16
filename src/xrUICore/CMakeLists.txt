@@ -6,8 +6,6 @@ set(SRC_FILES
     "ui_base.cpp"
     "ui_base.h"
     "ui_defs.h"
-    "ui_styles.cpp"
-    "ui_styles.h"
     "uiabstract.h"
     "UIMessages.h"
     "arrow/ui_arrow.cpp"
