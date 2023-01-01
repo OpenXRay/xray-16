@@ -68,7 +68,7 @@ SCRIPT_EXPORT(UIStyleManager, (),
             })
             .def("DefaultStyleIsSet", &UIStyleManager::DefaultStyleIsSet),
 
-        def("GetUIStyleManager", +[] { return UI().Styles(); })
+        def("GetUIStyleManager", +[] { return &UI().Styles(); })
     ];
 });
 
