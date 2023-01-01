@@ -208,7 +208,7 @@ UICore::UICore()
     {
         m_pUICursor = xr_new<CUICursor>();
         m_pFontManager = xr_new<CFontManager>();
-        m_pStyleManager = xr_new<UIStyleManager>();
+        m_pStyleManager = UIStyles();
     }
     else
     {
@@ -246,6 +246,7 @@ UICore::~UICore()
 {
     xr_delete(m_pFontManager);
     xr_delete(m_pUICursor);
+    CloseUIStyles();
     CUIXmlInitBase::DeleteColorDefs();
     CUITextureMaster::FreeTexInfo();
 }

@@ -1439,6 +1439,7 @@ public:
 class CCC_UIStyle : public CCC_Token
 {
     u32 m_id = 0;
+    xr_token data;
 
 public:
     CCC_UIStyle(pcstr name) : CCC_Token(name, &m_id, nullptr) { }
@@ -1446,12 +1447,24 @@ public:
     void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
+
         UI().Styles().SetupStyle(m_id);
+
+        xr_free(data.name);
+        data.id = m_id;
+        data.name = xr_strdup(UI().Styles().GetToken()[m_id].name);
     }
     
     const xr_token* GetToken() noexcept override // may throw exceptions!
     {
-        return UI().Styles().GetToken().data();
+        if (&UI().Styles() != nullptr)
+        {
+            return UI().Styles().GetToken().data();
+        }
+        else
+        {
+            return &data;
+        }
     }
 };
 

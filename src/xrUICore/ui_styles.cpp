@@ -4,6 +4,28 @@
 #include "xrCore/XML/XMLDocument.hpp"
 #include "xrEngine/IGame_Persistent.h"
 
+UIStyleManager* ui_styles;
+bool isUIStylesClosed;
+
+UIStyleManager* UIStyles()
+{
+    if (!ui_styles && !isUIStylesClosed)
+    {
+        ui_styles = xr_new<UIStyleManager>();
+    }
+
+    return ui_styles;
+}
+
+void CloseUIStyles()
+{
+    if (ui_styles)
+    {
+        isUIStylesClosed = true;
+        xr_delete(ui_styles);
+    }
+}
+
 UIStyleManager::UIStyleManager()
 {
     m_token.emplace_back("ui_style_default", 0);
