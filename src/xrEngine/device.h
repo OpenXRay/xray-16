@@ -25,7 +25,8 @@
 #include "Include/editor/interfaces.hpp"
 #include "Include/xrRender/FactoryPtr.h"
 #include "Render.h"
-#include "SDL.h"
+
+#include <SDL.h>
 
 class Task;
 class engine_impl;

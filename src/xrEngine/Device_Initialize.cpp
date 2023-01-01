@@ -1,12 +1,13 @@
 #include "stdafx.h"
 #include "embedded_resources_management.h"
-#include "SDL.h"
 
 #include "Include/editor/ide.hpp"
 #include "xr_input.h"
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
 #include "xrCore/ModuleLookup.hpp"
+
+#include <SDL.h>
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
 

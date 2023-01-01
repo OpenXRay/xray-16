@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include <SDL.h>
 #include <bitset>
 
 DECLARE_MESSAGE(KeyMapChanged);
