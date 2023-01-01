@@ -1439,32 +1439,42 @@ public:
 class CCC_UIStyle : public CCC_Token
 {
     u32 m_id = 0;
-    xr_token data;
+    xr_vector<xr_token> styleTokens;
 
 public:
-    CCC_UIStyle(pcstr name) : CCC_Token(name, &m_id, nullptr) { }
+    CCC_UIStyle(pcstr name) : CCC_Token(name, &m_id, nullptr)
+    { 
+        for (auto& token : UI().Styles().GetToken())
+        {
+            styleTokens.emplace_back(xr_strdup(token.name), token.id);
+        }      
+    }
+
+    ~CCC_UIStyle() override
+    {
+        xr_token* token = styleTokens.data();
+
+        while (token->name)
+        {
+            if (token->name)
+                xr_free(token->name);
+
+            token++;
+        }
+
+        styleTokens.clear();
+    }
 
     void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
 
         UI().Styles().SetupStyle(m_id);
-
-        xr_free(data.name);
-        data.id = m_id;
-        data.name = xr_strdup(UI().Styles().GetToken()[m_id].name);
     }
-    
+
     const xr_token* GetToken() noexcept override // may throw exceptions!
     {
-        if (&UI().Styles() != nullptr)
-        {
-            return UI().Styles().GetToken().data();
-        }
-        else
-        {
-            return &data;
-        }
+        return styleTokens.data();
     }
 };
 
