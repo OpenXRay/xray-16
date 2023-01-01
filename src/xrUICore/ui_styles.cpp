@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "pch.hpp"
 #include "ui_styles.h"
 
 #include "xrCore/XML/XMLDocument.hpp"
@@ -66,10 +66,7 @@ void UIStyleManager::SetupStyle(u32 styleID)
     for (const auto& token : m_token)
     {
         if (token.id == m_style_id)
-        {
             selectedStyle = token.name;
-            break;
-        }
     }
 
     string_path selectedStylePath;
@@ -96,5 +93,3 @@ void UIStyleManager::Reset()
     if (shouldHideMainMenu)
         g_pGamePersistent->m_pMainMenu->Activate(false);
 }
-
-UIStyleManager* UIStyles;

@@ -2289,8 +2289,6 @@ set(SRC_FILES
     "ui/UIActorStateInfo.h"
     "ui/ui_af_params.cpp"
     "ui/ui_af_params.h"
-    "ui/ui_styles.cpp"
-    "ui/ui_styles.h"
     "ui/UIArtefactPanel.cpp"
     "ui/UIArtefactPanel.h"
     "ui/UIBoosterInfo.cpp"

@@ -1,6 +1,6 @@
 #pragma once
 
-class UIStyleManager : Noncopyable
+class XRUICORE_API UIStyleManager : Noncopyable
 {
     static constexpr u32 DEFAULT_STYLE = 0;
 
@@ -33,5 +33,3 @@ private:
     xr_vector<xr_token> m_token;
     u32 m_style_id{ DEFAULT_STYLE };
 };
-
-extern UIStyleManager* UIStyles;

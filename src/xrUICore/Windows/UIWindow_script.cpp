@@ -43,6 +43,35 @@ SCRIPT_EXPORT(UICore, (),
     ];
 });
 
+SCRIPT_EXPORT(UIStyleManager, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
+    module(luaState)
+    [
+        def("GetDefaultUIPath",              +[] { return UI_PATH_DEFAULT; }),
+        def("GetDefaultUIPathWithDelimiter", +[] { return UI_PATH_DEFAULT_WITH_DELIMITER; }),
+        def("GetUIPath",                     +[] { return UI_PATH; }),
+        def("GetUIPathWithDelimiter",        +[] { return UI_PATH_WITH_DELIMITER; }),
+
+        class_<UIStyleManager>("UIStyleManager")
+            .def("GetStylesTokens", &UIStyleManager::GetToken, return_stl_iterator())
+            .def("GetCurrentStyleId", &UIStyleManager::GetCurrentStyleId)
+            .def("SetStyle",        &UIStyleManager::SetupStyle)
+            .def("SetStyle",        +[](UIStyleManager* self, u32 styleID, bool reloadUI)
+            {
+                self->SetupStyle(styleID);
+
+                if (reloadUI)
+                    self->Reset();
+            })
+            .def("DefaultStyleIsSet", &UIStyleManager::DefaultStyleIsSet),
+
+        def("GetUIStyleManager", +[] { return &UI().Styles(); })
+    ];
+});
+
 SCRIPT_EXPORT(CUITextureMaster, (),
 {
     using namespace luabind;
