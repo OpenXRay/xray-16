@@ -134,9 +134,6 @@ class ENGINE_API CRenderDevice : public CRenderDeviceData, public IWindowHandler
     void _SetupStates();
 
 public:
-#if defined(XR_PLATFORM_WINDOWS)
-    LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
-#endif
     // u32 dwFrame;
     // u32 dwPrecacheFrame;
     u32 dwPrecacheTotal;
