@@ -701,7 +701,7 @@ void CKinematics::AddWallmark(
     }
 
     // ok. allocate wallmark
-    intrusive_ptr<CSkeletonWallmark> wm = xr_new<CSkeletonWallmark>(this, parent_xform, shader, cp, RDEVICE.fTimeGlobal);
+    intrusive_ptr<CSkeletonWallmark> wm = xr_new<CSkeletonWallmark>(this, parent_xform, shader, cp, Device.fTimeGlobal);
     wm->m_LocalBounds.set(cp, size * 2.f);
     wm->XFORM()->transform_tiny(wm->m_Bounds.P, cp);
     wm->m_Bounds.R = wm->m_LocalBounds.R;
@@ -734,14 +734,14 @@ struct zero_wm_pred
 
 void CKinematics::CalculateWallmarks(bool hud)
 {
-    if (!wallmarks.empty() && (wm_frame != RDEVICE.dwFrame))
+    if (!wallmarks.empty() && (wm_frame != Device.dwFrame))
     {
-        wm_frame = RDEVICE.dwFrame;
+        wm_frame = Device.dwFrame;
         bool need_remove = false;
         for (auto it = wallmarks.begin(); it != wallmarks.end(); ++it)
         {
             intrusive_ptr<CSkeletonWallmark>& wm = *it;
-            float w = (RDEVICE.fTimeGlobal - wm->TimeStart()) / ps_r__WallmarkTTL;
+            float w = (Device.fTimeGlobal - wm->TimeStart()) / ps_r__WallmarkTTL;
             if (w < 1.f)
             {
                 // append wm to WallmarkEngine
@@ -777,7 +777,7 @@ void CKinematics::RenderWallmark(intrusive_ptr<CSkeletonWallmark> wm, FVF::LIT*&
     for (u32 f_idx = 0; f_idx < wm->m_Faces.size(); f_idx++)
     {
         CSkeletonWallmark::WMFace F = wm->m_Faces[f_idx];
-        float w = (RDEVICE.fTimeGlobal - wm->TimeStart()) / ps_r__WallmarkTTL;
+        float w = (Device.fTimeGlobal - wm->TimeStart()) / ps_r__WallmarkTTL;
         for (u32 k = 0; k < 3; k++)
         {
             Fvector P;

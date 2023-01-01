@@ -6,7 +6,7 @@
 
 void CResourceManager::OnDeviceDestroy(BOOL)
 {
-    if (RDEVICE.b_is_Ready)
+    if (Device.b_is_Ready)
         return;
     m_textures_description.UnLoad();
 
@@ -49,7 +49,7 @@ void CResourceManager::OnDeviceDestroy(BOOL)
 
 void CResourceManager::OnDeviceCreate(IReader* F)
 {
-    if (!RDEVICE.b_is_Ready)
+    if (!Device.b_is_Ready)
         return;
 
     string256 name;
