@@ -213,7 +213,7 @@ SDL_Window* CRenderDevice::GetApplicationWindow()
 void CRenderDevice::OnErrorDialog(bool beforeDialog)
 {
     const bool restore = !beforeDialog;
-    const bool needUpdateInput = pInput && pInput->IsExclusiveMode() && !editor();
+    const bool needUpdateInput = pInput && pInput->IsExclusiveMode();
 
     if (restore)
         UpdateWindowProps();

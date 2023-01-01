@@ -47,7 +47,7 @@ void CRenderDevice::CreateInternal()
     fFOV = 90.f;
     fASPECT = 1.f;
 
-    if (GEnv.isDedicatedServer || editor())
+    if (GEnv.isDedicatedServer)
         psDeviceMode.WindowStyle = rsWindowed;
 
     UpdateWindowProps();

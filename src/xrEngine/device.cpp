@@ -7,8 +7,6 @@
 #include "xrCore/FS_impl.h"
 #include "xrCore/Threading/TaskManager.hpp"
 
-#include "Include/editor/ide.hpp"
-
 #include "xrSASH.h"
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
@@ -121,9 +119,6 @@ void CRenderDevice::RenderEnd(void)
     mFullTransformSaved = mFullTransform;
     mViewSaved = mView;
     mProjectSaved = mProject;
-
-    if (load_finished && m_editor)
-        m_editor->on_load_finished();
 }
 
 #include "IGame_Level.h"
@@ -291,20 +286,8 @@ void CRenderDevice::ProcessFrame()
         Sleep(1);
 }
 
-void CRenderDevice::message_loop_weather_editor()
-{
-    m_editor->run();
-    m_editor_finalize(m_editor);
-}
-
 void CRenderDevice::message_loop()
 {
-    if (editor())
-    {
-        message_loop_weather_editor();
-        return;
-    }
-
     bool canCallActivate = false;
     bool shouldActivate = false;
 
@@ -565,7 +548,7 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 
     const bool isWndActive = fActive != WA_INACTIVE && !fMinimized;
 
-    if (!editor() && !GEnv.isDedicatedServer && isWndActive)
+    if (!GEnv.isDedicatedServer && isWndActive)
         pInput->GrabInput(true);
     else
         pInput->GrabInput(false);

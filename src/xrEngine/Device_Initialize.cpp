@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "embedded_resources_management.h"
 
-#include "Include/editor/ide.hpp"
 #include "xr_input.h"
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
@@ -11,36 +10,11 @@
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
 
-void CRenderDevice::initialize_weather_editor()
-{
-    m_editor_module = XRay::LoadModule("xrWeatherEditor");
-    if (!m_editor_module->IsLoaded())
-        return;
-
-    m_editor_initialize = (initialize_function_ptr)m_editor_module->GetProcAddress("initialize");
-    VERIFY(m_editor_initialize);
-
-    m_editor_finalize = (finalize_function_ptr)m_editor_module->GetProcAddress("finalize");
-    VERIFY(m_editor_finalize);
-#if defined(XR_PLATFORM_WINDOWS)
-    m_editor_initialize(m_editor);
-#endif
-    VERIFY(m_editor);
-
-    m_sdlWnd = SDL_CreateWindowFrom(m_editor->view_handle());
-    R_ASSERT3(m_sdlWnd, "Unable to create SDL window from editor", SDL_GetError());
-
-    GEnv.isEditor = true;
-}
-
 void CRenderDevice::Initialize()
 {
     Log("Initializing Engine...");
     TimerGlobal.Start();
     TimerMM.Start();
-
-    if (strstr(Core.Params, "-weather"))
-        initialize_weather_editor();
 
     if (!m_sdlWnd)
     {

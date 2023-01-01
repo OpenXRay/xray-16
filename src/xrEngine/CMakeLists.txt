@@ -228,7 +228,6 @@ set(RENDER_DEVICE_SRC
     "Device_Initialize.cpp"
     "Device_mode.cpp"
     "Device_overdraw.cpp"
-    #"Device_wndproc.cpp"
     "IPerformanceAlert.hpp"
     "PerformanceAlert.cpp"
     "PerformanceAlert.hpp"

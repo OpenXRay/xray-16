@@ -15,8 +15,6 @@
 #include "CustomHUD.h"
 #endif
 
-#include "Include/editor/ide.hpp"
-
 ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
 
 //ECO_RENDER add
@@ -40,10 +38,7 @@ IGame_Persistent::IGame_Persistent()
 
     m_pMainMenu = nullptr;
 
-    if (RDEVICE.editor())
-        pEnvironment = RDEVICE.editor()->environment();
-    else
-        pEnvironment = xr_new<CEnvironment>();
+    pEnvironment = xr_new<CEnvironment>();
 
     m_pGShaderConstants = xr_new<ShadersExternalData>(); //--#SM+#--
 }
