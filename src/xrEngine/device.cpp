@@ -288,11 +288,11 @@ void CRenderDevice::ProcessFrame()
 
 void CRenderDevice::message_loop()
 {
-    bool canCallActivate = false;
-    bool shouldActivate = false;
-
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
+        bool canCallActivate = false;
+        bool shouldActivate = false;
+
         SDL_Event events[MAX_WINDOW_EVENTS];
         const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
             SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
@@ -387,7 +387,6 @@ void CRenderDevice::message_loop()
         if (canCallActivate)
         {
             OnWindowActivate(shouldActivate);
-            canCallActivate = false;
         }
 
         ProcessFrame();
