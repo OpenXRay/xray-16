@@ -386,7 +386,7 @@ void CRenderDevice::message_loop()
         // Workaround for screen blinking when there's too much timeouts
         if (canCallActivate)
         {
-            OnWM_Activate(shouldActivate ? 1 : 0, 0);
+            OnWindowActivate(shouldActivate);
             canCallActivate = false;
         }
 
@@ -541,23 +541,18 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
 
 bool CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 
-void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
+void CRenderDevice::OnWindowActivate(bool activated)
 {
-    u16 fActive = LOWORD(wParam);
-    const bool fMinimized = (bool)HIWORD(wParam);
-
-    const bool isWndActive = fActive != WA_INACTIVE && !fMinimized;
-
-    if (!GEnv.isDedicatedServer && isWndActive)
+    if (!GEnv.isDedicatedServer && activated)
         pInput->GrabInput(true);
     else
         pInput->GrabInput(false);
 
-    b_is_Active = isWndActive || psDeviceFlags.test(rsAlwaysActive);
+    b_is_Active = activated || psDeviceFlags.test(rsAlwaysActive);
 
-    if (isWndActive != b_is_InFocus)
+    if (activated != b_is_InFocus)
     {
-        b_is_InFocus = isWndActive;
+        b_is_InFocus = activated;
         if (b_is_InFocus)
         {
             seqAppActivate.Process();

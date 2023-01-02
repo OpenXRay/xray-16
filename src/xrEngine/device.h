@@ -28,7 +28,6 @@
 #include <SDL.h>
 
 class Task;
-class engine_impl;
 
 #pragma pack(push, 4)
 
@@ -142,7 +141,7 @@ public:
     float fWidth_2, fHeight_2;
     // bool b_is_Ready;
     // bool b_is_Active;
-    void OnWM_Activate(WPARAM wParam, LPARAM lParam);
+    void OnWindowActivate(bool activated);
 
     // ref_shader m_WireShader;
     // ref_shader m_SelectionShader;
