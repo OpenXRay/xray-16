@@ -161,7 +161,7 @@ jobs:
       if: ${{ steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
-        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ matrix.Platform }}_(github-${{ github.run_number }}).deb
+        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ matrix.Platform }}_(github-${{ matrix.CC }}-${{ github.run_number }}).deb
         path: build/openxray_1.6.02_*.deb
 
   build-alpine:
