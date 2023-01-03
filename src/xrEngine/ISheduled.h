@@ -28,7 +28,7 @@ public:
     virtual bool shedule_Needed() = 0;
 };
 
-inline ISheduled::~ISheduled() {}
+inline ISheduled::~ISheduled() = default;
 
 class ENGINE_API ScheduledBase : public virtual ISheduled, Noncopyable
 {

@@ -109,7 +109,8 @@ public:
     virtual IRender_Light* dcast_Light() = 0;
 };
 
-ICF ISpatial::~ISpatial() {}
+inline ISpatial::~ISpatial() = default;
+
 class XRCDB_API SpatialBase : public virtual ISpatial
 {
 public:

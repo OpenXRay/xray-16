@@ -17,7 +17,7 @@ class ICollisionHitCallback
 public:
     virtual void call(
         IPhysicsShellHolder* obj, float min_cs, float max_cs, float& cs, float& hl, ICollisionDamageInfo* di) = 0;
-    virtual ~ICollisionHitCallback() {}
+    virtual ~ICollisionHitCallback() = default;
 };
 
 #ifdef DEBUG

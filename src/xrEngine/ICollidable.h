@@ -10,7 +10,8 @@ public:
     virtual ICollisionForm* GetCForm() const = 0;
 };
 
-inline ICollidable::~ICollidable() {}
+inline ICollidable::~ICollidable() = default;
+
 // XXX: merge into IGameObject
 class ENGINE_API CollidableBase : public virtual ICollidable
 {

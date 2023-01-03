@@ -32,7 +32,8 @@ public:
     virtual void renderable_HUD(bool value) = 0;
 };
 
-inline IRenderable::~IRenderable() {}
+inline IRenderable::~IRenderable() = default;
+
 class ENGINE_API RenderableBase : public virtual IRenderable
 {
 public:

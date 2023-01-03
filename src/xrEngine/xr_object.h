@@ -364,4 +364,4 @@ public:
     virtual void SetScriptBinderObject(CScriptBinderObject* obj) = 0;
 };
 
-inline IGameObject::~IGameObject() {}
+inline IGameObject::~IGameObject() = default;
