@@ -323,6 +323,7 @@ void CUITalkWnd::SwitchToTrade()
         {
             UITalkDialogWnd->Hide();
             StopSnd();
+            InitTalkDialog();
 
             pGameSP->StartTrade(m_pOurInvOwner, m_pOthersInvOwner);
         }
