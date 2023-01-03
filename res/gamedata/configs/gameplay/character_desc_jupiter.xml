@@ -2964,7 +2964,6 @@
 
 		<class>jup_b19_freedom_yar</class>
 		<community>freedom</community>]
-		<mechanic_mode>1</mechanic_mode>
 		<terrain_sect>stalker_terrain</terrain_sect>
 		<snd_config>characters_voice\human_02\freedom\</snd_config>
 
