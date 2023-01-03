@@ -2,7 +2,7 @@
 
 class ICollisionForm;
 
-class ICollidable
+class XR_NOVTABLE ICollidable
 {
 public:
     virtual ~ICollidable() = 0;
@@ -13,7 +13,7 @@ public:
 inline ICollidable::~ICollidable() = default;
 
 // XXX: merge into IGameObject
-class ENGINE_API CollidableBase : public virtual ICollidable
+class ENGINE_API XR_NOVTABLE CollidableBase : public virtual ICollidable
 {
 public:
     CollidableBase();

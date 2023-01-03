@@ -1,8 +1,7 @@
 #pragma once
 #include "xrCore/xr_types.h"
 
-// XXX: tamlin: Can we declare IDamageSource __declspec(novtable), or is its RTTI info required somewhere?
-class IDamageSource
+class XR_NOVTABLE IDamageSource
 {
 public:
     virtual ~IDamageSource() = default;

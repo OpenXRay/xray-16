@@ -191,8 +191,7 @@ namespace CDB
 }
 
 /// definition (Sound Manager Interface)
-// XXX tamlin: Tag NOVTABLE ?
-class XRSOUND_API ISoundManager
+class XRSOUND_API XR_NOVTABLE ISoundManager
 {
     virtual void _initialize_devices_list() = 0;
     virtual void _initialize() = 0;

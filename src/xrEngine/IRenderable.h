@@ -17,7 +17,7 @@ public:
     bool hud; // At the current moment, object is being rendered on HUD
 };
 
-class IRenderable
+class XR_NOVTABLE IRenderable
 {
 public:
     virtual ~IRenderable() = 0;
@@ -34,7 +34,8 @@ public:
 
 inline IRenderable::~IRenderable() = default;
 
-class ENGINE_API RenderableBase : public virtual IRenderable
+// XXX: can't be NOVTABLE because of dynamic_cast in the constructor.. Fix some day
+class ENGINE_API /*XR_NOVTABLE*/ RenderableBase : public virtual IRenderable
 {
 public:
     RenderData renderable;

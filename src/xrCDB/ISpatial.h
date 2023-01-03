@@ -92,7 +92,7 @@ public:
     ISpatial_DB* space; // allow different spaces
 };
 
-class XRCDB_API ISpatial
+class XRCDB_API XR_NOVTABLE ISpatial
 {
 public:
     virtual ~ISpatial() = 0;
@@ -111,7 +111,7 @@ public:
 
 inline ISpatial::~ISpatial() = default;
 
-class XRCDB_API SpatialBase : public virtual ISpatial
+class XRCDB_API XR_NOVTABLE SpatialBase : public virtual ISpatial
 {
 public:
     SpatialData spatial;

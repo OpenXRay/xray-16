@@ -32,7 +32,7 @@ enum EDumpType
 };
 #endif
 
-class IPhysicsShellHolder
+class XR_NOVTABLE IPhysicsShellHolder
 {
 public:
     virtual ~IPhysicsShellHolder() = 0;

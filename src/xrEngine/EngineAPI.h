@@ -12,7 +12,7 @@
 
 #include <memory>
 
-class IFactoryObject
+class XR_NOVTABLE IFactoryObject
 {
 public:
     virtual ~IFactoryObject() = 0;
@@ -23,7 +23,7 @@ public:
 inline IFactoryObject::~IFactoryObject() = default;
 inline IFactoryObject* IFactoryObject::_construct() { return this; }
 
-class ENGINE_API FactoryObjectBase : public virtual IFactoryObject
+class ENGINE_API XR_NOVTABLE FactoryObjectBase : public virtual IFactoryObject
 {
 public:
     CLASS_ID CLS_ID;
@@ -46,7 +46,7 @@ using VTPause = void __cdecl();
 using VTResume = void __cdecl();
 };
 
-class RendererModule
+class XR_NOVTABLE RendererModule
 {
 public:
     virtual ~RendererModule() = default;
