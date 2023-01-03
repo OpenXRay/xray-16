@@ -35,6 +35,7 @@ enum EDumpType
 class IPhysicsShellHolder
 {
 public:
+    virtual ~IPhysicsShellHolder() = 0;
     virtual Fmatrix& ObjectXFORM() = 0;
     virtual Fvector& ObjectPosition() = 0;
     virtual LPCSTR ObjectName() const = 0;
@@ -71,3 +72,5 @@ public:
     virtual std::string dump(EDumpType type) const = 0;
 #endif
 };
+
+inline IPhysicsShellHolder::~IPhysicsShellHolder() = default;
