@@ -25,7 +25,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)imgui;$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -70,6 +70,7 @@
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
+    <ClInclude Include="..\xrRenderDX11\imgui_impl_dx11.h" />
     <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h" />
@@ -232,6 +233,7 @@
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp" />
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp" />
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp" />
+    <ClCompile Include="..\xrRenderDX11\imgui_impl_dx11.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
@@ -455,6 +457,9 @@
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)oalib.vcxproj">
       <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\imgui\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -50,6 +50,7 @@
 #include "xrPhysics/console_vars.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrEngine/GameFont.h"
+#include "embedded_editor/embedded_editor_main.h"
 
 #ifdef DEBUG
 #include "level_debug.h"
@@ -577,6 +578,7 @@ void CLevel::OnFrame()
         pStatGraphR->AppendItem(float(m_dwRPC) * fRPC_Mult, 0xffff0000, 1);
         pStatGraphR->AppendItem(float(m_dwRPS) * fRPS_Mult, 0xff00ff00, 0);
     }
+    ShowEditor();
 }
 
 int psLUA_GCSTEP = 100; // 10
@@ -964,11 +966,33 @@ void CLevel::GetGameDateTime(u32& year, u32& month, u32& day, u32& hours, u32& m
     split_time(GetGameTime(), year, month, day, hours, mins, secs, milisecs);
 }
 
+
+float CLevel::GetEnvironmentTimeFactor() const
+{
+    if (!game)
+        return 0.0f;
+    return game->GetEnvironmentGameTimeFactor();
+}
+
+void CLevel::SetEnvironmentTimeFactor(const float fTimeFactor)
+{
+    if (!game)
+        return;
+    game->SetEnvironmentGameTimeFactor(fTimeFactor);
+}
+
 float CLevel::GetGameTimeFactor() { return (game->GetGameTimeFactor()); }
 void CLevel::SetGameTimeFactor(const float fTimeFactor) { game->SetGameTimeFactor(fTimeFactor); }
 void CLevel::SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor)
 {
     game->SetGameTimeFactor(GameTime, fTimeFactor);
+}
+
+u64 CLevel::GetEnvironmentGameTime() const
+{
+    if (!game)
+        return 0;
+    return game->GetEnvironmentGameTime();
 }
 
 void CLevel::SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor)

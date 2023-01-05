@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "dx9HW.h"
+#include <imgui.h>
+#include "../xrRenderDX9/imgui_impl_dx9.h"
 
 CHW HW;
 
@@ -236,10 +238,14 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 #endif
     const u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
+
+	ImGui_ImplDX9_Init(m_sdlWnd, pDevice);
 }
 
 void CHW::DestroyDevice()
 {
+    ImGui_ImplDX9_Shutdown();
+
 #ifdef DEBUG
     _SHOW_REF("refCount:dwDebugSB", dwDebugSB);
     _RELEASE(dwDebugSB);
@@ -255,6 +261,7 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset()
 {
+    ImGui_ImplDX9_InvalidateDeviceObjects();
 #ifdef DEBUG
     _RELEASE(dwDebugSB);
 #endif
@@ -289,6 +296,8 @@ void CHW::Reset()
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif
+
+	ImGui_ImplDX9_CreateDeviceObjects();
 }
 
 D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget) const

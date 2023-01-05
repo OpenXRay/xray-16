@@ -26,7 +26,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R2_EXPORTS;USE_DX9;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)imgui;$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -66,6 +66,7 @@
     <ClInclude Include="..\xrRenderDX9\dx9HW.h" />
     <ClInclude Include="..\xrRenderDX9\dx9R_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderDX9\dx9r_constants_cache.h" />
+    <ClInclude Include="..\xrRenderDX9\imgui_impl_dx9.h" />
     <ClInclude Include="..\xrRender\Animation.h" />
     <ClInclude Include="..\xrRender\AnimationKeyCalculate.h" />
     <ClInclude Include="..\xrRender\Blender.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="..\xrRenderDX9\dx9ResourceManager_Resources.cpp" />
     <ClCompile Include="..\xrRenderDX9\dx9r_constants_cache.cpp" />
     <ClCompile Include="..\xrRenderDX9\dx9SH_RT.cpp" />
+    <ClCompile Include="..\xrRenderDX9\imgui_impl_dx9.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\Blender.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
@@ -403,6 +405,9 @@
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)oalib.vcxproj">
       <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\imgui\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

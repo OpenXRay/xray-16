@@ -24,7 +24,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(xrExternals)ode/include;$(xrExternals)GameSpy\src;$(xrExternals)OpenAutomate\inc;$(xrExternals)CxImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)imgui;$(SolutionDir)xrServerEntities;$(xrExternals)ode/include;$(xrExternals)GameSpy\src;$(xrExternals)OpenAutomate\inc;$(xrExternals)CxImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4237;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -690,6 +690,9 @@
     <ClInclude Include="ef_storage_inline.h" />
     <ClInclude Include="ElectricBall.h" />
     <ClInclude Include="EliteDetector.h" />
+    <ClInclude Include="embedded_editor\embedded_editor_helper.h" />
+    <ClInclude Include="embedded_editor\embedded_editor_main.h" />
+    <ClInclude Include="embedded_editor\embedded_editor_weather.h" />
     <ClInclude Include="encyclopedia_article.h" />
     <ClInclude Include="encyclopedia_article_defs.h" />
     <ClInclude Include="enemy_manager.h" />
@@ -2194,6 +2197,9 @@
     </ClCompile>
     <ClCompile Include="ElectricBall.cpp" />
     <ClCompile Include="EliteDetector.cpp" />
+    <ClCompile Include="embedded_editor\embedded_editor_helper.cpp" />
+    <ClCompile Include="embedded_editor\embedded_editor_main.cpp" />
+    <ClCompile Include="embedded_editor\embedded_editor_weather.cpp" />
     <ClCompile Include="encyclopedia_article.cpp" />
     <ClCompile Include="enemy_manager.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3530,6 +3536,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrUICore\xrUICore.vcxproj">
       <Project>{37b3642c-b706-4c93-bc54-badadc8fc9b1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Externals\imgui\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
