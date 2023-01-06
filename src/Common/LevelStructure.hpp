@@ -81,7 +81,7 @@ public:
     friend struct CNodePositionConverter;
 };
 
-struct NodeCompressed
+struct NodeCompressed10
 {
 public:
     u8 data[12];
@@ -169,13 +169,13 @@ public:
 struct NodeCompressed8
 {
     u8 data[12];
-    NodeCompressed::SCover cover;
+    NodeCompressed10::SCover cover;
     u16 plane;
     NodePosition p;
 
-    operator NodeCompressed() const
+    operator NodeCompressed10() const
     {
-        NodeCompressed  node;
+        NodeCompressed10 node;
         CopyMemory      (node.data, data, sizeof(data) / sizeof(u8));
         node.high   =   cover;
         node.low    =   cover;
@@ -278,6 +278,8 @@ struct SNodePositionOld
 #ifdef _EDITOR
 typedef SNodePositionOld NodePosition;
 #endif
+
+using NodeCompressed = NodeCompressed10;
 
 constexpr cpcstr LEVEL_GRAPH_NAME = "level.ai";
 
