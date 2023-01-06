@@ -292,7 +292,7 @@ u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, 
 void CGameFont::MasterOut(bool bCheckDevice, bool bUseCoords, bool bScaleCoords, bool bUseSkip, float _x, float _y,
     float _skip, pcstr fmt, va_list p)
 {
-    if (bCheckDevice && (!RDEVICE.b_is_Active))
+    if (bCheckDevice && (!Device.b_is_Active))
         return;
 
     String rs;
@@ -439,7 +439,7 @@ float CGameFont::CurrentHeight_() { return fCurrentHeight * vInterval.y; }
 void CGameFont::SetHeightI(float S)
 {
     VERIFY(uFlags & fsDeviceIndependent);
-    fCurrentHeight = S * RDEVICE.dwHeight;
+    fCurrentHeight = S * Device.dwHeight;
 };
 
 void CGameFont::SetHeight(float S)

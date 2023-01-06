@@ -21,7 +21,6 @@
 #include "ScopeLock.hpp"
 
 #include <thread>
-#include <mutex>
 #include <SDL_events.h>
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)

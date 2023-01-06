@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD)
 #include <dlfcn.h>
 #else
 #include <SDL_loadso.h>
@@ -32,7 +32,7 @@ void* ModuleHandle::Open(pcstr moduleName)
     xr_string buf(moduleName);
 #ifdef XR_PLATFORM_WINDOWS
     buf += ".dll";
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD)
     buf += ".so";
 #elif defined(XR_PLATFORM_APPLE)
     buf += ".dylib";
@@ -41,7 +41,7 @@ void* ModuleHandle::Open(pcstr moduleName)
 #endif
 
     pcstr error = nullptr;
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD)
     // For platforms that use rpath we have to call dlopen() from our own module
     handle = dlopen(buf.c_str(), RTLD_NOW);
     if (!handle)
@@ -67,7 +67,7 @@ void ModuleHandle::Close()
     if (dontUnload)
         return;
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD)
     dlclose(handle);
 #else
     SDL_UnloadObject(handle);
@@ -88,7 +88,7 @@ void* ModuleHandle::operator()() const
 void* ModuleHandle::GetProcAddress(pcstr procName) const
 {
     pcstr error = nullptr;
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD)
     const auto proc = dlsym(handle, procName);
     if (!proc)
         error = dlerror();

@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: pixta-dev/repository-mirroring-action@v1
+      - uses: pixta-dev/repository-mirroring-action@v1.1.1
         with:
           target_repo_url: git@bitbucket.org:OpenXRay/xray-16.git
           ssh_private_key: ${{ secrets.RABOTYAGA_BITBUCKET_PRIVATE_SSH_KEY }}

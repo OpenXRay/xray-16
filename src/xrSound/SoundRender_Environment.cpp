@@ -184,8 +184,8 @@ bool SoundEnvironment_LIB::Save(pcstr name)
 }
 void SoundEnvironment_LIB::Unload()
 {
-    for (u32 chunk = 0; chunk < library.size(); chunk++)
-        xr_delete(library[chunk]);
+    for (auto& lib : library)
+        xr_delete(lib);
     library.clear();
 }
 int SoundEnvironment_LIB::GetID(pcstr name)

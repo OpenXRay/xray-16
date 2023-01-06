@@ -2,10 +2,10 @@
 #include "UIMessageBox.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CUIMessageBox, (CUIStatic),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIMessageBox, CUIStatic>("CUIMessageBox")

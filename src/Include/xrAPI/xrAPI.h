@@ -32,7 +32,6 @@ public:
     ISoundManager* Sound;
     UICore* UI;
 
-    bool isEditor;
     bool isDedicatedServer;
 };
 

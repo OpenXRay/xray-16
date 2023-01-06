@@ -39,7 +39,7 @@ static BOOL bException = FALSE;
 #   if __has_include(<execinfo.h>)
 #       include <execinfo.h>
 #   endif
-#elif defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #   include <sys/types.h>
 #   include <sys/ptrace.h>
 #   define PTRACE_TRACEME PT_TRACE_ME
@@ -59,6 +59,8 @@ static BOOL bException = FALSE;
 #       define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM
 #   elif defined(XR_ARCHITECTURE_ARM64)
 #       define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM64
+#   elif defined(XR_ARCHITECTURE_IA64)
+#       define MACHINE_TYPE IMAGE_FILE_MACHINE_IA64
 #   else
 #       error CPU architecture is not supported.
 #   endif
@@ -182,7 +184,7 @@ Lock xrDebug::failLock;
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
 #else
 #   error Select or add implementation for your platform
@@ -299,7 +301,6 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
     ScopeLock Lock(&dbgHelpLock);
 
     xr_vector<xr_string> traceResult;
-    STACKFRAME stackFrame = {};
     xr_string frameStr;
 
     if (!InitializeSymbolEngine())
@@ -310,26 +311,36 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 
     traceResult.reserve(maxFramesCount);
 
-#if defined XR_ARCHITECTURE_X64
+    STACKFRAME stackFrame{};
     stackFrame.AddrPC.Mode = AddrModeFlat;
-    stackFrame.AddrPC.Offset = threadCtx->Rip;
     stackFrame.AddrStack.Mode = AddrModeFlat;
-    stackFrame.AddrStack.Offset = threadCtx->Rsp;
     stackFrame.AddrFrame.Mode = AddrModeFlat;
-    stackFrame.AddrFrame.Offset = threadCtx->Rbp;
-#elif defined XR_ARCHITECTURE_X86
-    stackFrame.AddrPC.Mode = AddrModeFlat;
+    stackFrame.AddrBStore.Mode = AddrModeFlat;
+
+    // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/ns-dbghelp-stackframe
+    // https://github.com/reactos/reactos/blob/master/base/applications/drwtsn32/stacktrace.cpp
+#if defined XR_ARCHITECTURE_X86
     stackFrame.AddrPC.Offset = threadCtx->Eip;
-    stackFrame.AddrStack.Mode = AddrModeFlat;
     stackFrame.AddrStack.Offset = threadCtx->Esp;
-    stackFrame.AddrFrame.Mode = AddrModeFlat;
     stackFrame.AddrFrame.Offset = threadCtx->Ebp;
+#elif defined XR_ARCHITECTURE_X64
+    stackFrame.AddrPC.Offset = threadCtx->Rip;
+    stackFrame.AddrStack.Offset = threadCtx->Rsp;
+    stackFrame.AddrFrame.Offset = threadCtx->Rbp;
 #elif defined XR_ARCHITECTURE_ARM
-#error TODO
+    stackFrame.AddrPC.Offset = threadCtx->Pc;
+    stackFrame.AddrStack.Offset = threadCtx->Sp;
+    stackFrame.AddrFrame.Offset = threadCtx->R11;
 #elif defined XR_ARCHITECTURE_ARM64
-#error TODO
+    stackFrame.AddrPC.Offset = threadCtx->Pc;
+    stackFrame.AddrStack.Offset = threadCtx->Sp;
+    stackFrame.AddrFrame.Offset = threadCtx->Fp;
+#elif defined XR_ARCHITECTURE_IA64
+    stackFrame.AddrPC.Offset = threadCtx->StIIP;
+    stackFrame.AddrStack.Offset = threadCtx->IntSp;
+    stackFrame.AddrBStore.Offset = threadCtx->RsBSP;
 #else
-#error CPU architecture is not supported.
+#   error CPU architecture is not supported.
 #endif
 
     while (GetNextStackFrameString(&stackFrame, threadCtx, frameStr) && traceResult.size() <= maxFramesCount)
@@ -541,6 +552,10 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
+            // calling DEBUG_BREAK with no debugger will trigger BugTrap
+            // we must hide the window
+            if (windowHandler && !DebuggerIsPresent())
+                windowHandler->OnFatalError();
             DEBUG_BREAK;
         } // switch (result)
     }
@@ -574,6 +589,9 @@ void xrDebug::DoExit(const std::string& message)
     }
     else
         ShowMessage(Core.ApplicationName, message.c_str());
+
+    if (windowHandler)
+        windowHandler->OnFatalError();
 
 #if defined(XR_PLATFORM_WINDOWS)
     TerminateProcess(GetCurrentProcess(), 1);
@@ -821,7 +839,11 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 
     // Typically, PrevFilter is BugTrap filter
     if (PrevFilter)
+    {
+        if (windowHandler)
+            windowHandler->OnFatalError();
         PrevFilter(exPtrs);
+    }
 
     if (windowHandler)
         windowHandler->OnErrorDialog(false);

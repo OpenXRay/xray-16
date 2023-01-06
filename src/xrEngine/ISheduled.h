@@ -16,7 +16,7 @@ public:
 #endif
 };
 
-class ISheduled
+class XR_NOVTABLE ISheduled
 {
 public:
     virtual ~ISheduled() = 0;
@@ -28,9 +28,9 @@ public:
     virtual bool shedule_Needed() = 0;
 };
 
-inline ISheduled::~ISheduled() {}
+inline ISheduled::~ISheduled() = default;
 
-class ENGINE_API ScheduledBase : public virtual ISheduled, Noncopyable
+class ENGINE_API XR_NOVTABLE ScheduledBase : public virtual ISheduled, Noncopyable
 {
 public:
     SchedulerData shedule;

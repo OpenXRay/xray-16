@@ -778,8 +778,16 @@ void CScriptGameObject::SetCharacterCommunity(LPCSTR comm, int squad, int group)
             LuaMessageType::Error, "SetCharacterCommunity available only for InventoryOwner");
         return;
     }
+
     CHARACTER_COMMUNITY community;
     community.set(comm);
+    if (community.index() == NO_COMMUNITY_INDEX)
+    {
+        GEnv.ScriptEngine->script_log(
+            LuaMessageType::Error, "SetCharacterCommunity can't set %s for %s", comm, Name());
+        return;
+    }
+
     pInventoryOwner->SetCommunity(community.index());
     entity->ChangeTeam(community.team(), squad, group);
 }

@@ -83,7 +83,7 @@ inline xr_vector<SDL_Surface*> ExtractSplashScreen()
 {
     // XXX: that's the place, where splash frames can be added
     // Animated splash screen!
-    SDL_Surface* surface = ExtractBitmap(IDB_BITMAP1);
+    SDL_Surface* surface = ExtractBitmap(IDB_SPLASH);
 
     if (surface)
         return { surface };
@@ -120,13 +120,13 @@ inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
     SDL_Surface* surface = nullptr;
     switch (iconIdx)
     {
-    case IDI_COP:
+    case IDI_ICON_COP:
         surface = SDL_LoadBMP("icon_cop.bmp");
         break;
-    case IDI_CS:
+    case IDI_ICON_CS:
         surface = SDL_LoadBMP("icon_cs.bmp");
         break;
-    case IDI_SOC:
+    case IDI_ICON_SOC:
         surface = SDL_LoadBMP("icon_soc.bmp");
         break;
     }

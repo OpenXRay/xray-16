@@ -4,8 +4,6 @@
 #include "physics_joint_scripted.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 cphysics_element_scripted* cphysics_shell_scripted::get_Element(LPCSTR bone_name)
 {
     CPhysicsElement* E = physics_impl().get_Element(bone_name);
@@ -50,31 +48,36 @@ cphysics_joint_scripted* cphysics_shell_scripted::get_JointByStoreOrder(u16 idx)
     return get_script_wrapper<cphysics_joint_scripted>(*J);
 }
 
-SCRIPT_EXPORT(cphysics_shell_scripted, (), {
-    module(
-        luaState)[class_<cphysics_shell_scripted>("physics_shell")
-                      .def("apply_force", (void (cphysics_shell_scripted::*)(float, float, float))(
-                                              &cphysics_shell_scripted::applyForce))
-                      .def("get_element_by_bone_name",
-                          (cphysics_element_scripted * (cphysics_shell_scripted::*)(LPCSTR))(
-                              &cphysics_shell_scripted::get_Element))
-                      .def("get_element_by_bone_id", (cphysics_element_scripted * (cphysics_shell_scripted::*)(u16))(
-                                                         &cphysics_shell_scripted::get_Element))
-                      .def("get_element_by_order", (cphysics_element_scripted * (cphysics_shell_scripted::*)(u16))(
-                                                       &cphysics_shell_scripted::get_ElementByStoreOrder))
-                      .def("get_elements_number", &cphysics_shell_scripted::get_ElementsNumber)
-                      .def("get_joint_by_bone_name", (cphysics_joint_scripted * (cphysics_shell_scripted::*)(LPCSTR))(
-                                                         &cphysics_shell_scripted::get_Joint))
-                      .def("get_joint_by_bone_id", (cphysics_joint_scripted * (cphysics_shell_scripted::*)(u16))(
-                                                       &cphysics_shell_scripted::get_Joint))
-                      .def("get_joint_by_order", &cphysics_shell_scripted::get_JointByStoreOrder)
-                      .def("get_joints_number", &cphysics_shell_scripted::get_JointsNumber)
-                      .def("block_breaking", &cphysics_shell_scripted::BlockBreaking)
-                      .def("unblock_breaking", &cphysics_shell_scripted::UnblockBreaking)
-                      .def("is_breaking_blocked", &cphysics_shell_scripted::IsBreakingBlocked)
-                      .def("is_breakable", &cphysics_shell_scripted::isBreakable)
-                      .def("get_linear_vel", &cphysics_shell_scripted::get_LinearVel)
-                      .def("get_angular_vel", &cphysics_shell_scripted::get_AngularVel)];
+SCRIPT_EXPORT(cphysics_shell_scripted, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<cphysics_shell_scripted>("physics_shell")
+            .def("apply_force", (void (cphysics_shell_scripted::*)(float, float, float))(
+                                    &cphysics_shell_scripted::applyForce))
+            .def("get_element_by_bone_name",
+                (cphysics_element_scripted * (cphysics_shell_scripted::*)(LPCSTR))(
+                    &cphysics_shell_scripted::get_Element))
+            .def("get_element_by_bone_id", (cphysics_element_scripted * (cphysics_shell_scripted::*)(u16))(
+                                               &cphysics_shell_scripted::get_Element))
+            .def("get_element_by_order", (cphysics_element_scripted * (cphysics_shell_scripted::*)(u16))(
+                                             &cphysics_shell_scripted::get_ElementByStoreOrder))
+            .def("get_elements_number", &cphysics_shell_scripted::get_ElementsNumber)
+            .def("get_joint_by_bone_name", (cphysics_joint_scripted * (cphysics_shell_scripted::*)(LPCSTR))(
+                                               &cphysics_shell_scripted::get_Joint))
+            .def("get_joint_by_bone_id", (cphysics_joint_scripted * (cphysics_shell_scripted::*)(u16))(
+                                             &cphysics_shell_scripted::get_Joint))
+            .def("get_joint_by_order", &cphysics_shell_scripted::get_JointByStoreOrder)
+            .def("get_joints_number", &cphysics_shell_scripted::get_JointsNumber)
+            .def("block_breaking", &cphysics_shell_scripted::BlockBreaking)
+            .def("unblock_breaking", &cphysics_shell_scripted::UnblockBreaking)
+            .def("is_breaking_blocked", &cphysics_shell_scripted::IsBreakingBlocked)
+            .def("is_breakable", &cphysics_shell_scripted::isBreakable)
+            .def("get_linear_vel", &cphysics_shell_scripted::get_LinearVel)
+            .def("get_angular_vel", &cphysics_shell_scripted::get_AngularVel)
+    ];
 });
 
 /*
@@ -87,6 +90,8 @@ Fmatrix	global_transform(CPhysicsElement* E)
 
 SCRIPT_EXPORT(CPhysicsElement, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CPhysicsElement>("physics_element")
@@ -107,6 +112,8 @@ SCRIPT_EXPORT(CPhysicsElement, (),
 
 SCRIPT_EXPORT(CPhysicsJoint, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CPhysicsJoint>("physics_joint")

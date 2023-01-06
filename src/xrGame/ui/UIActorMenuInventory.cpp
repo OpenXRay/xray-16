@@ -64,6 +64,7 @@ void CUIActorMenu::DeInitInventoryMode()
     ShowIfExist(m_pInventoryWnd, false);
     ShowIfExist(m_pLists[eTrashList], false);
     ShowIfExist(m_clock_value, false);
+    clear_highlight_lists();
 }
 
 void CUIActorMenu::SendEvent_ActivateSlot(u16 slot, u16 recipient)
@@ -72,6 +73,7 @@ void CUIActorMenu::SendEvent_ActivateSlot(u16 slot, u16 recipient)
     CGameObject::u_EventGen(P, GEG_PLAYER_ACTIVATE_SLOT, recipient);
     P.w_u16(slot);
     CGameObject::u_EventSend(P);
+    clear_highlight_lists();
 }
 
 void CUIActorMenu::SendEvent_Item2Slot(PIItem pItem, u16 recipient, u16 slot_id)
@@ -86,6 +88,7 @@ void CUIActorMenu::SendEvent_Item2Slot(PIItem pItem, u16 recipient, u16 slot_id)
     CGameObject::u_EventSend(P);
 
     PlaySnd(eItemToSlot);
+    clear_highlight_lists();
 };
 
 void CUIActorMenu::SendEvent_Item2Belt(PIItem pItem, u16 recipient)
@@ -99,6 +102,7 @@ void CUIActorMenu::SendEvent_Item2Belt(PIItem pItem, u16 recipient)
     CGameObject::u_EventSend(P);
 
     PlaySnd(eItemToBelt);
+    clear_highlight_lists();
 };
 
 void CUIActorMenu::SendEvent_Item2Ruck(PIItem pItem, u16 recipient)
@@ -112,6 +116,7 @@ void CUIActorMenu::SendEvent_Item2Ruck(PIItem pItem, u16 recipient)
     CGameObject::u_EventSend(P);
 
     PlaySnd(eItemToRuck);
+    clear_highlight_lists();
 };
 
 void CUIActorMenu::SendEvent_Item_Eat(PIItem pItem, u16 recipient)
@@ -123,6 +128,7 @@ void CUIActorMenu::SendEvent_Item_Eat(PIItem pItem, u16 recipient)
     CGameObject::u_EventGen(P, GEG_PLAYER_ITEM_EAT, recipient);
     P.w_u16(pItem->object().ID());
     CGameObject::u_EventSend(P);
+    clear_highlight_lists();
 };
 
 void CUIActorMenu::SendEvent_Item_Drop(PIItem pItem, u16 recipient)
@@ -136,6 +142,7 @@ void CUIActorMenu::SendEvent_Item_Drop(PIItem pItem, u16 recipient)
     P.w_u16(pItem->object().ID());
     pItem->object().u_EventSend(P);
     PlaySnd(eDropItem);
+    clear_highlight_lists();
 }
 
 void CUIActorMenu::DropAllCurrentItem()

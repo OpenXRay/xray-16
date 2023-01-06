@@ -12,10 +12,10 @@
 #include "ListBox/UIListBoxItem.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CUIComboBox, (CUIWindow),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIComboBox, CUIWindow>("CUIComboBox")

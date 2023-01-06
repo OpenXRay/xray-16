@@ -222,7 +222,7 @@ public:
     void render_lights(light_Package& LP);
     void render_sun();
     void render_sun_near();
-    void render_sun_filtered();
+    void render_sun_filtered() const;
     void render_menu();
 #if RENDER != R_R2
     void render_rain();

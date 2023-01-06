@@ -252,7 +252,7 @@ public:
     void Delete(const Shader* S);
     void RegisterConstantSetup(LPCSTR name, R_constant_setup* s)
     {
-        v_constant_setup.push_back(std::make_pair(shared_str(name), s));
+        v_constant_setup.emplace_back(shared_str(name), s);
     }
 
     SGeometry* CreateGeom(VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib);

@@ -213,7 +213,7 @@ SDL_Window* CRenderDevice::GetApplicationWindow()
 void CRenderDevice::OnErrorDialog(bool beforeDialog)
 {
     const bool restore = !beforeDialog;
-    const bool needUpdateInput = pInput && pInput->IsExclusiveMode() && !editor();
+    const bool needUpdateInput = pInput && pInput->IsExclusiveMode();
 
     if (restore)
         UpdateWindowProps();
@@ -222,4 +222,16 @@ void CRenderDevice::OnErrorDialog(bool beforeDialog)
 
     if (needUpdateInput)
         pInput->GrabInput(restore);
+}
+
+void CRenderDevice::OnFatalError()
+{
+    // make it sure window will hide in any way
+    SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
+#if SDL_VERSION_ATLEAST(2, 0, 16)
+    SDL_SetWindowAlwaysOnTop(m_sdlWnd, SDL_FALSE);
+#endif
+    SDL_ShowWindow(m_sdlWnd);
+    SDL_MinimizeWindow(m_sdlWnd);
+    SDL_HideWindow(m_sdlWnd);
 }

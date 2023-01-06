@@ -52,7 +52,7 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
     pSurface = surf;
 }
 
-ID3DBaseTexture* CTexture::surface_get()
+ID3DBaseTexture* CTexture::surface_get() const
 {
     if (pSurface)
         pSurface->AddRef();
@@ -82,7 +82,7 @@ void CTexture::apply_load(u32 dwStage)
 
 void CTexture::apply_theora(u32 dwStage)
 {
-    if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : RDEVICE.dwTimeContinual))
+    if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual))
     {
         R_ASSERT(D3DRTYPE_TEXTURE == pSurface->GetType());
         ID3DTexture2D* T2D = (ID3DTexture2D*)pSurface;
@@ -104,7 +104,7 @@ void CTexture::apply_theora(u32 dwStage)
     }
     CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
 };
-void CTexture::apply_avi(u32 dwStage)
+void CTexture::apply_avi(u32 dwStage) const
 {
     if (pAVI->NeedUpdate())
     {
@@ -128,7 +128,7 @@ void CTexture::apply_avi(u32 dwStage)
 void CTexture::apply_seq(u32 dwStage)
 {
     // SEQ
-    u32 frame = RDEVICE.dwTimeContinual / seqMSPF; // RDEVICE.dwTimeGlobal
+    u32 frame = Device.dwTimeContinual / seqMSPF; // Device.dwTimeGlobal
     u32 frame_data = seqDATA.size();
     if (flags.seqCycles)
     {
@@ -144,7 +144,11 @@ void CTexture::apply_seq(u32 dwStage)
     }
     CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
 };
-void CTexture::apply_normal(u32 dwStage) { CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface)); };
+void CTexture::apply_normal(u32 dwStage) const
+{
+    CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
+};
+
 void CTexture::Preload()
 {
     m_bumpmap = RImplementation.Resources->m_textures_description.GetBumpName(cName);
@@ -190,7 +194,7 @@ void CTexture::Load()
             {
                 flags.MemoryUsage = pTheora->Width(true) * pTheora->Height(true) * 4;
                 BOOL bstop_at_end = (nullptr != strstr(cName.c_str(), "intro" DELIMITER)) || (nullptr != strstr(cName.c_str(), "outro" DELIMITER));
-                pTheora->Play(!bstop_at_end, RDEVICE.dwTimeContinual);
+                pTheora->Play(!bstop_at_end, Device.dwTimeContinual);
 
                 // Now create texture
                 ID3DTexture2D* pTexture = nullptr;
@@ -337,19 +341,22 @@ void CTexture::desc_update()
 void CTexture::video_Play(BOOL looped, u32 _time)
 {
     if (pTheora)
-        pTheora->Play(looped, (_time != 0xFFFFFFFF) ? (m_play_time = _time) : RDEVICE.dwTimeContinual);
+        pTheora->Play(looped, (_time != 0xFFFFFFFF) ? (m_play_time = _time) : Device.dwTimeContinual);
 }
 
-void CTexture::video_Pause(BOOL state)
+void CTexture::video_Pause(BOOL state) const
 {
     if (pTheora)
         pTheora->Pause(state);
 }
 
-void CTexture::video_Stop()
+void CTexture::video_Stop() const
 {
     if (pTheora)
         pTheora->Stop();
 }
 
-BOOL CTexture::video_IsPlaying() { return (pTheora) ? pTheora->IsPlaying() : FALSE; }
+BOOL CTexture::video_IsPlaying() const
+{
+    return (pTheora) ? pTheora->IsPlaying() : FALSE;
+}

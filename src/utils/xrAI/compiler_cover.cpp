@@ -475,7 +475,7 @@ void compute_non_covers()
 
             float weight = 1.f / i->position().distance_to(I.Pos);
             cumulative_weight += weight;
-            cover_pairs.push_back(std::make_pair(weight, i));
+            cover_pairs.emplace_back(weight, i);
         }
 
         // this is incorrect

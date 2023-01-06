@@ -50,9 +50,9 @@ light::~light()
 
 // remove from Lights_LastFrame
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    for (u32 it = 0; it < RImplementation.Lights_LastFrame.size(); it++)
-        if (this == RImplementation.Lights_LastFrame[it])
-            RImplementation.Lights_LastFrame[it] = 0;
+    for (auto& p_light : RImplementation.Lights_LastFrame)
+        if (this == p_light)
+            p_light = nullptr;
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 }
 
@@ -327,8 +327,8 @@ void light::Export(light_Package& package)
         {
             // tough: create/update 6 shadowed lights
             if (0 == omnipart[0])
-                for (int f = 0; f < 6; f++)
-                    omnipart[f] = xr_new<light>();
+                for (auto& p_light : omnipart)
+                    p_light = xr_new<light>();
             for (int f = 0; f < 6; f++)
             {
                 light* L = omnipart[f];

@@ -242,10 +242,6 @@ typedef struct tagPOINT {
 
 #define DWORD_PTR UINT_PTR
 #define WM_USER 0x0400
-#define WA_INACTIVE 0
-#define HIWORD(l)              ((WORD)((DWORD_PTR)(l) >> 16))
-#define LOWORD(l)              ((WORD)((DWORD_PTR)(l) & 0xFFFF))
-
 
 #define TRUE true
 #define FALSE false

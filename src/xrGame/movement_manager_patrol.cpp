@@ -43,6 +43,7 @@ void CMovementManager::process_patrol_path()
         }
 
         m_path_state = ePathStateBuildLevelPath;
+        [[fallthrough]];
     }
     case ePathStateBuildLevelPath:
     {
@@ -64,6 +65,7 @@ void CMovementManager::process_patrol_path()
         level_path().select_intermediate_vertex();
 
         m_path_state = ePathStateBuildDetailPath;
+        [[fallthrough]];
     }
     case ePathStateBuildDetailPath:
     {

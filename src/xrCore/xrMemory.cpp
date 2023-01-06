@@ -1,11 +1,14 @@
 #include "stdafx.h"
 
-#include "SDL.h"
+#include <SDL.h>
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>
 #elif defined(XR_PLATFORM_LINUX)
 #include <sys/sysinfo.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#elif defined(XR_PLATFORM_BSD)
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
@@ -112,7 +115,7 @@ size_t xrMemory::mem_usage()
         CloseHandle(h);
     }
     return pmc.PagefileUsage;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
     return (size_t)ru.ru_maxrss;
