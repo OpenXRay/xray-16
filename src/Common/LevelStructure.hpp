@@ -288,12 +288,17 @@ const u32 MAX_NODE_BIT_COUNT = 23;
 
 enum xrAI_Versions : u8
 {
-    XRAI_VERSION_SOC = 8,
-    XRAI_VERSION_CS = 9,
-    XRAI_VERSION_COP = 10,
+    // Release SOC: builds 2945, 2947 and further
+    XRAI_VERSION_SOC     = 8,
+
+    // PRIQUEL: early CS builds on SOC engine, e.g. build 3120
+    XRAI_VERSION_PRIQUEL = 9,
+
+    // Release CS/COP: build 3456 and further
+    XRAI_VERSION_CS_COP  = 10,
 
     XRAI_VERSION_ALLOWED = XRAI_VERSION_SOC,
-    XRAI_VERSION_OPENXRAY = XRAI_VERSION_COP,
+    XRAI_VERSION_OPENXRAY = XRAI_VERSION_CS_COP,
 
     XRAI_CURRENT_VERSION = XRAI_VERSION_OPENXRAY
 };
