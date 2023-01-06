@@ -11,9 +11,9 @@ class CLevelGraphManager
     size_t m_vertex_count;
 
 public:
-    CLevelGraphManager(IReader* stream, size_t vertex_count, xrAI_Versions version) : m_vertex_count(vertex_count)
+    CLevelGraphManager(IReader* stream, size_t vertex_count, u32 version) : m_vertex_count(vertex_count)
     {
-        switch (version)
+        switch ((xrAI_Versions)version)
         {
         case XRAI_CURRENT_VERSION:
             static_assert(XRAI_CURRENT_VERSION == XRAI_VERSION_CS_COP,
