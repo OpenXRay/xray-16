@@ -19,10 +19,10 @@ IC const Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox&
 
 struct CNodePositionConverter
 {
-    IC CNodePositionConverter(const SNodePositionOld& Psrc, hdrNODES& m_header, NodePosition& np);
+    IC CNodePositionConverter(const NodePosition3& Psrc, hdrNODES& m_header, NodePosition& np);
 };
 
-IC CNodePositionConverter::CNodePositionConverter(const SNodePositionOld& Psrc, hdrNODES& m_header, NodePosition& np)
+IC CNodePositionConverter::CNodePositionConverter(const NodePosition3& Psrc, hdrNODES& m_header, NodePosition& np)
 {
     Fvector Pdest;
     Pdest.x = float(Psrc.x) * m_header.size;
@@ -275,7 +275,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
         {
             NodeLink id;
             u16 pl;
-            SNodePositionOld _np;
+            NodePosition3 _np;
             NodePosition np;
 
             for (size_t j = 0; j < 4; ++j)

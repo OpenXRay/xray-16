@@ -51,7 +51,16 @@ struct hdrCFORM
     Fbox aabb;
 };
 
-struct hdrNODES
+struct hdrNODES2
+{
+    u32 version;
+    u32 count;
+    float size;
+    float size_y;
+    Fbox aabb;
+};
+
+struct hdrNODES8
 {
     u32 version;
     u32 count;
@@ -60,12 +69,20 @@ struct hdrNODES
     Fbox aabb;
     xrGUID guid;
 };
+
+using hdrNODES = hdrNODES8;
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-#pragma pack(1)
-#ifndef _EDITOR
-class NodePosition
+// Used by SDK
+struct NodePosition3
+{
+    s16 x;
+    u16 y;
+    s16 z;
+};
+
+class NodePosition4
 {
     u8 data[5];
 
@@ -80,6 +97,12 @@ public:
     friend struct CNodePositionCompressor;
     friend struct CNodePositionConverter;
 };
+
+#ifdef _EDITOR
+using NodePosition = NodePosition3;
+#else
+using NodePosition = NodePosition4;
+#endif
 
 struct NodeCompressed10
 {
@@ -166,7 +189,7 @@ public:
     friend class CRenumbererConverter;
 };
 
-struct NodeCompressed8
+struct NodeCompressed7
 {
     u8 data[12];
     NodeCompressed10::SCover cover;
@@ -185,101 +208,8 @@ struct NodeCompressed8
     }
 };
 
-#endif
-
-#ifdef AI_COMPILER
-struct NodeCompressed6
-{
-public:
-    u8 data[11];
-
-private:
-    ICF void link(u8 link_index, u32 value)
-    {
-        value &= 0x001fffff;
-        switch (link_index)
-        {
-        case 0:
-            value |= *(u32*)data & 0xffe00000;
-            CopyMemory(data, &value, sizeof(u32));
-            break;
-        case 1:
-            value <<= 5;
-            value |= *(u32*)(data + 2) & 0xfc00001f;
-            CopyMemory(data + 2, &value, sizeof(u32));
-            break;
-        case 2:
-            value <<= 2;
-            value |= *(u32*)(data + 5) & 0xff800003;
-            CopyMemory(data + 5, &value, sizeof(u32));
-            break;
-        case 3:
-            value <<= 7;
-            value |= *(u32*)(data + 7) & 0xf000007f;
-            CopyMemory(data + 7, &value, sizeof(u32));
-            break;
-        }
-    }
-
-    ICF void light(u8 value) { data[10] |= value << 4; }
-public:
-    u16 cover0 : 4;
-    u16 cover1 : 4;
-    u16 cover2 : 4;
-    u16 cover3 : 4;
-    u16 plane;
-    NodePosition p;
-
-    ICF u32 link(u8 index) const
-    {
-        switch (index)
-        {
-        case 0: return *(u32*)data & 0x001fffff;
-        case 1: return (*(u32*)(data + 2) >> 5) & 0x001fffff;
-        case 2: return (*(u32*)(data + 5) >> 2) & 0x001fffff;
-        case 3: return (*(u32*)(data + 7) >> 7) & 0x001fffff;
-        default: NODEFAULT;
-        }
-#ifdef DEBUG
-        return 0;
-#endif
-    }
-
-    ICF u8 light() const { return data[10] >> 4; }
-    ICF u16 cover(u8 index) const
-    {
-        switch (index)
-        {
-        case 0: return cover0;
-        case 1: return cover1;
-        case 2: return cover2;
-        case 3: return cover3;
-        default: NODEFAULT;
-        }
-#ifdef DEBUG
-        return u8(-1);
-#endif
-    }
-
-    friend class CLevelGraph;
-    friend struct CNodeCompressed;
-    friend class CNodeRenumberer;
-}; // 2+5+2+11 = 20b
-#endif
-
-struct SNodePositionOld
-{
-    s16 x;
-    u16 y;
-    s16 z;
-};
-#pragma pack(pop)
-
-#ifdef _EDITOR
-typedef SNodePositionOld NodePosition;
-#endif
-
 using NodeCompressed = NodeCompressed10;
+#pragma pack(pop)
 
 constexpr cpcstr LEVEL_GRAPH_NAME = "level.ai";
 
@@ -290,6 +220,8 @@ const u32 MAX_NODE_BIT_COUNT = 23;
 
 enum xrAI_Versions : u8
 {
+    // Apr 4, 2005
+    // https://github.com/OpenXRay/xray-soc-history/commit/2c3ae6abaf9876989f233bf20c5bc37551545968
     // Release SOC: builds 2945, 2947 and further
     XRAI_VERSION_SOC        = 8,
 
@@ -299,16 +231,13 @@ enum xrAI_Versions : u8
     // Release CS/COP: build 3456 and further
     XRAI_VERSION_CS_COP     = 10,
 
-    XRAI_VERSION_ALLOWED    = XRAI_VERSION_SOC,
-    XRAI_VERSION_OPENXRAY   = XRAI_VERSION_CS_COP,
-
-    XRAI_CURRENT_VERSION    = XRAI_VERSION_OPENXRAY
+    XRAI_VERSION_ALLOWED    = XRAI_VERSION_SOC, // can be loaded by the engine
+    XRAI_CURRENT_VERSION    = XRAI_VERSION_CS_COP
 };
 
 // Cross table and game spawn uses u32, but game graph header uses u8,
 // Make sure to be within u8 bounds...
 static_assert(XRAI_VERSION_ALLOWED  <= type_max<u8>);
-static_assert(XRAI_VERSION_OPENXRAY <= type_max<u8>);
 static_assert(XRAI_CURRENT_VERSION  <= type_max<u8>);
 
 #define ASSERT_XRAI_VERSION_MATCH(version, description)\
