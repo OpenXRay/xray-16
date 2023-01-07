@@ -4,7 +4,7 @@
 // TODO: Do we really need this?
 //Lights g_lights;
 
-IC const Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox& bb, const SAIParams& params)
+IC const Fvector vertex_position(const NodePosition4& Psrc, const Fbox& bb, const SAIParams& params)
 {
     Fvector Pdest;
     int x, z, row_length;
@@ -19,10 +19,10 @@ IC const Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox&
 
 struct CNodePositionConverter
 {
-    IC CNodePositionConverter(const NodePosition3& Psrc, hdrNODES& m_header, NodePosition& np);
+    IC CNodePositionConverter(const NodePosition3& Psrc, hdrNODES& m_header, NodePosition4& np);
 };
 
-IC CNodePositionConverter::CNodePositionConverter(const NodePosition3& Psrc, hdrNODES& m_header, NodePosition& np)
+IC CNodePositionConverter::CNodePositionConverter(const NodePosition3& Psrc, hdrNODES& m_header, NodePosition4& np)
 {
     Fvector Pdest;
     Pdest.x = float(Psrc.x) * m_header.size;
@@ -276,7 +276,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
             NodeLink id;
             u16 pl;
             NodePosition3 _np;
-            NodePosition np;
+            NodePosition4 np;
 
             for (size_t j = 0; j < 4; ++j)
             {
