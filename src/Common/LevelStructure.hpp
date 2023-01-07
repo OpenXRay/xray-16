@@ -82,6 +82,8 @@ struct NodePosition3
     s16 z;
 };
 
+static_assert(sizeof(NodePosition3) == 6);
+
 class NodePosition4
 {
     u8 data[5];
@@ -89,14 +91,22 @@ class NodePosition4
     ICF void xz(u32 value) { CopyMemory(data, &value, 3); }
     ICF void y(u16 value) { CopyMemory(data + 3, &value, 2); }
 public:
+    // xz-coordinates are packed into 3 bytes
+    static constexpr u32 MAX_XZ = (1 << 24) - 1;
+    // y-coordinate is packed into 2 bytes
+    static constexpr u32 MAX_Y = (1 << 16) - 1;
+
     ICF u32 xz() const { return ((*((u32*)data)) & 0x00ffffff); }
     ICF u32 x(u32 row) const { return (xz() / row); }
     ICF u32 z(u32 row) const { return (xz() % row); }
     ICF u32 y() const { return (*((u16*)(data + 3))); }
+
     friend class CLevelGraph;
     friend struct CNodePositionCompressor;
     friend struct CNodePositionConverter;
 };
+
+static_assert(sizeof(NodePosition4) == 5);
 
 #ifdef _EDITOR
 using NodePosition = NodePosition3;
@@ -126,34 +136,39 @@ struct NodeCover5
     }
 };
 
+static_assert(sizeof(NodeCover5) == 2);
+
 struct NodeCompressed10
 {
 public:
-    u8 data[12];
+    static constexpr u32 NODE_BIT_COUNT = 23;
+    static constexpr u32 LINK_MASK = (1 << NODE_BIT_COUNT) - 1;
+
+    u8 data[12]; // 12 bytes
 
 private:
     ICF void link(u8 link_index, u32 value)
     {
-        value &= 0x007fffff;
+        value &= LINK_MASK;
         switch (link_index)
         {
         case 0:
-            value |= *(u32*)data & 0xff800000;
+            value |= *(u32*)data & ~(LINK_MASK << 0);
             CopyMemory(data, &value, sizeof(u32));
             break;
         case 1:
             value <<= 7;
-            value |= *(u32*)(data + 2) & 0xc000007f;
+            value |= *(u32*)(data + 2) & ~(LINK_MASK << 7);
             CopyMemory(data + 2, &value, sizeof(u32));
             break;
         case 2:
             value <<= 6;
-            value |= *(u32*)(data + 5) & 0xe000003f;
+            value |= *(u32*)(data + 5) & ~(LINK_MASK << 6);
             CopyMemory(data + 5, &value, sizeof(u32));
             break;
         case 3:
             value <<= 5;
-            value |= *(u32*)(data + 8) & 0xf000001f;
+            value |= *(u32*)(data + 8) & ~(LINK_MASK << 5);
             CopyMemory(data + 8, &value, sizeof(u32));
             break;
         }
@@ -162,20 +177,20 @@ private:
     ICF void light(u8 value) { data[10] |= value << 4; }
 
 public:
-    NodeCover5 high;
-    NodeCover5 low;
-    u16 plane;
-    NodePosition p;
-    // 32 + 16 + 40 + 92 = 180 bits = 24.5 bytes => 25 bytes
+    NodeCover5 high; // 2 bytes
+    NodeCover5 low;  // 2 bytes
+    u16 plane;       // 2 bytes
+    NodePosition p;  // 5 bytes
+    // 12 + 2 + 2 + 2 + 5 = 23 bytes
 
     ICF u32 link(u8 index) const
     {
         switch (index)
         {
-        case 0: return ((*(u32*)data) & 0x007fffff);
-        case 1: return (((*(u32*)(data + 2)) >> 7) & 0x007fffff);
-        case 2: return (((*(u32*)(data + 5)) >> 6) & 0x007fffff);
-        case 3: return (((*(u32*)(data + 8)) >> 5) & 0x007fffff);
+        case 0: return ((*(u32*)data) & LINK_MASK);
+        case 1: return (((*(u32*)(data + 2)) >> 7) & LINK_MASK);
+        case 2: return (((*(u32*)(data + 5)) >> 6) & LINK_MASK);
+        case 3: return (((*(u32*)(data + 8)) >> 5) & LINK_MASK);
         default: NODEFAULT;
         }
         return 0;
@@ -187,12 +202,15 @@ public:
     friend class CRenumbererConverter;
 };
 
+static_assert(sizeof(NodeCompressed10) == 24);
+
 struct NodeCompressed7
 {
-    u8 data[12];
-    NodeCover5 cover;
-    u16 plane;
-    NodePosition p;
+    u8 data[12];      // 12 bytes
+    NodeCover5 cover; // 2 bytes
+    u16 plane;        // 2 bytes
+    NodePosition p;   // 5 bytes
+    // 12 + 2 + 2 + 5 = 21 bytes
 
     operator NodeCompressed10() const
     {
@@ -205,6 +223,7 @@ struct NodeCompressed7
         return node;
     }
 };
+static_assert(sizeof(NodeCompressed7) == 22);
 
 using NodeCompressed = NodeCompressed10;
 #pragma pack(pop)
@@ -214,7 +233,6 @@ constexpr cpcstr LEVEL_GRAPH_NAME = "level.ai";
 const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
 const u32 CFORM_CURRENT_VERSION = 4;
-const u32 MAX_NODE_BIT_COUNT = 23;
 
 enum xrAI_Versions : u8
 {

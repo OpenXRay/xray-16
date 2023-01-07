@@ -141,7 +141,7 @@ IC CNodePositionCompressor::CNodePositionCompressor(NodePosition& Pdest, Fvector
     int pxz = iFloor((Psrc.x - H.aabb.vMin.x) * sp + EPS_L + .5f) * row_length +
         iFloor((Psrc.z - H.aabb.vMin.z) * sp + EPS_L + .5f);
     int py = iFloor(65535.f * (Psrc.y - H.aabb.vMin.y) / (H.size_y) + EPS_L);
-    VERIFY(pxz < (1 << MAX_NODE_BIT_COUNT) - 1);
+    R_ASSERT(pxz < NodePosition::MAX_XZ);
     Pdest.xz(pxz);
     clamp(py, 0, 65535);
     Pdest.y(u16(py));
