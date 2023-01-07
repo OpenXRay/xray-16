@@ -180,7 +180,7 @@ public:
     NodeCover5 high; // 2 bytes
     NodeCover5 low;  // 2 bytes
     u16 plane;       // 2 bytes
-    NodePosition p;  // 5 bytes
+    NodePosition4 p; // 5 bytes
     // 12 + 2 + 2 + 2 + 5 = 23 bytes
 
     ICF u32 link(u8 index) const
@@ -209,7 +209,7 @@ struct NodeCompressed7
     u8 data[12];      // 12 bytes
     NodeCover5 cover; // 2 bytes
     u16 plane;        // 2 bytes
-    NodePosition p;   // 5 bytes
+    NodePosition4 p;  // 5 bytes
     // 12 + 2 + 2 + 5 = 21 bytes
 
     operator NodeCompressed10() const
