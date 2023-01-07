@@ -25,19 +25,17 @@ public:
         case XRAI_VERSION_SOC:
         {
             m_compatibility_mode = true;
-            m_nodes = new CLevelVertex[vertex_count + 1]; // additional one, so we don't trigger access violation
-            NodeCompressed7* oldNodes = static_cast<NodeCompressed7*>(stream->pointer());
+            auto* nodes = xr_alloc<NodeCompressed>(vertex_count + 1); // additional one, so we don't trigger access violation
+            const auto* oldNodes = static_cast<NodeCompressed7*>(stream->pointer());
 
             for (size_t i = 0; i < vertex_count; ++i)
             {
-                NodeCompressed7& oldNode = oldNodes[i];
-                NodeCompressed& newNode = m_nodes[i];
-                newNode = oldNode;
+                nodes[i] = oldNodes[i];
             }
 
             // Mark end node
             // so we can spot that in debugger, if we need
-            NodeCompressed& endNode = m_nodes[vertex_count + 1];
+            NodeCompressed& endNode = nodes[vertex_count + 1];
             endNode.data[0]  = 'A';
             endNode.data[1]  = 'I';
             endNode.data[2]  = version;
@@ -51,6 +49,10 @@ public:
             endNode.data[10] = 'N';
             endNode.data[11] = 'D';
             static_assert(sizeof(endNode.data) == 12, "If you have changed the NodeCompressed structure, please update the code above.");
+
+            static_assert(sizeof(CLevelVertex) == sizeof(NodeCompressed),
+                "If you have changed the CLevelVertex class, please update the nodes allocation code above.");
+            m_nodes = static_cast<CLevelVertex*>(nodes);
             break;
         }
 
@@ -64,7 +66,7 @@ public:
     {
         if (m_compatibility_mode)
         {
-            delete[] m_nodes;
+            xr_free(m_nodes);
         }
     }
     
