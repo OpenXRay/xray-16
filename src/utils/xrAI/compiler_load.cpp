@@ -260,7 +260,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
         R_ASSERT(F->open_chunk(E_AIMAP_CHUNK_NODES));
         size_t N = F->r_u32();
-        R_ASSERT2(N < ((size_t(1) << size_t(MAX_NODE_BIT_COUNT)) - 2), "Too many nodes!");
+        R_ASSERT2(N < (NodeCompressed::LINK_MASK - 1), "Too many nodes!");
         g_nodes.resize(N);
 
         hdrNODES H;
