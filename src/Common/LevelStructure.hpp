@@ -110,12 +110,6 @@ public:
 
 static_assert(sizeof(NodePosition4) == 5);
 
-#ifdef _EDITOR
-using NodePosition = NodePosition3;
-#else
-using NodePosition = NodePosition4;
-#endif
-
 // https://github.com/OpenXRay/xray-soc-history/commit/2a3687c08f8834db1a226b60bcf7455b3cdec40a
 struct NodeCover5
 {
@@ -227,10 +221,14 @@ struct NodeCompressed7
 };
 
 static_assert(sizeof(NodeCompressed7) == 21);
-
-using NodeCompressed = NodeCompressed10;
 #pragma pack(pop)
 
+#ifdef _EDITOR
+using NodePosition   = NodePosition3;
+#else
+using NodePosition   = NodePosition4;
+#endif
+using NodeCompressed = NodeCompressed10;
 
 const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
