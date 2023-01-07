@@ -1,25 +1,27 @@
 #pragma once
 
 #include "xrServerEntities/smart_cast.h" // get_script_wrapper() needs it
+
 class iphysics_scripted;
-class iphysics_game_scripted
+
+class XR_NOVTABLE iphysics_game_scripted
 {
 public:
-    virtual ~iphysics_game_scripted(){};
+    virtual ~iphysics_game_scripted() = default;
     virtual iphysics_scripted& iphysics_impl() = 0;
     // protected:
     //	virtual						~iphysics_game_scripted ()	=0 {}
 };
 
-class iphysics_scripted
+class XR_NOVTABLE iphysics_scripted
 {
 public:
     virtual void set(iphysics_game_scripted* g) = 0;
     virtual iphysics_game_scripted* get() = 0;
-    virtual ~iphysics_scripted(){};
+    virtual ~iphysics_scripted() = default;
 };
 
-class iphysics_scripted_class
+class XR_NOVTABLE iphysics_scripted_class
 {
 public:
     // virtual	~iphysics_scripted_class		()	= 0;
@@ -29,7 +31,7 @@ protected:
     virtual ~iphysics_scripted_class() = 0;
 };
 
-inline iphysics_scripted_class::~iphysics_scripted_class() {}
+inline iphysics_scripted_class::~iphysics_scripted_class() = default;
 
 template <class T>
 class cphysics_game_scripted : public iphysics_game_scripted, private Noncopyable
