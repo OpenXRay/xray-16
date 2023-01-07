@@ -32,7 +32,6 @@
 #define FORCE_INLINE            __forceinline
 #define ALIGN(a)                __declspec(align(a))
 #define DEBUG_BREAK             __debugbreak()
-#define __thread                __declspec(thread)
 #else
 #error Provide your definitions here
 #endif
