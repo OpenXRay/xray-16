@@ -29,7 +29,7 @@ private:
 
 public:
     CSoundRender_Source();
-    ~CSoundRender_Source();
+    virtual ~CSoundRender_Source();
 
     bool load(pcstr name, bool replaceWithNoSound = true, bool crashOnError = true);
     void unload();

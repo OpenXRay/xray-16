@@ -110,5 +110,5 @@ public:
     u32 play_time() override;
 
     CSoundRender_Emitter();
-    ~CSoundRender_Emitter();
+    virtual ~CSoundRender_Emitter();
 };
