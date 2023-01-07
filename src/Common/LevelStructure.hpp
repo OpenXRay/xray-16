@@ -202,7 +202,7 @@ public:
     friend class CRenumbererConverter;
 };
 
-static_assert(sizeof(NodeCompressed10) == 24);
+static_assert(sizeof(NodeCompressed10) == 23);
 
 struct NodeCompressed7
 {
@@ -224,7 +224,7 @@ struct NodeCompressed7
     }
 };
 
-static_assert(sizeof(NodeCompressed7) == 22);
+static_assert(sizeof(NodeCompressed7) == 21);
 
 using NodeCompressed = NodeCompressed10;
 #pragma pack(pop)
