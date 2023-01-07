@@ -3,6 +3,15 @@
 
 // TODO: Do we really need this?
 //Lights g_lights;
+struct VertexData
+{
+    using Index = u64;
+    Index _index : 8 * sizeof(Index) - 8;
+    Index _opened : 8;
+
+    Index index() const { return sizeof(VertexData); }
+    Index opened() const { return _opened; }
+};
 
 IC const Fvector vertex_position(const NodePosition4& Psrc, const Fbox& bb, const SAIParams& params)
 {
@@ -260,7 +269,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
         R_ASSERT(F->open_chunk(E_AIMAP_CHUNK_NODES));
         size_t N = F->r_u32();
-        R_ASSERT2(N < (NodeCompressed::LINK_MASK - 1), "Too many nodes!");
+        R_ASSERT2(N < (NodeCompressed10::LINK_MASK - 1), "Too many nodes!");
         g_nodes.resize(N);
 
         hdrNODES H;
