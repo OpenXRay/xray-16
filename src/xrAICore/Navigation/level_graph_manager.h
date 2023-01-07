@@ -26,11 +26,11 @@ public:
         {
             m_compatibility_mode = true;
             m_nodes = new CLevelVertex[vertex_count + 1]; // additional one, so we don't trigger access violation
-            NodeCompressed8* oldNodes = static_cast<NodeCompressed8*>(stream->pointer());
+            NodeCompressed7* oldNodes = static_cast<NodeCompressed7*>(stream->pointer());
 
             for (size_t i = 0; i < vertex_count; ++i)
             {
-                NodeCompressed8& oldNode = oldNodes[i];
+                NodeCompressed7& oldNode = oldNodes[i];
                 NodeCompressed& newNode = m_nodes[i];
                 newNode = oldNode;
             }
