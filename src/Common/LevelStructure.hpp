@@ -223,6 +223,7 @@ struct NodeCompressed7
         return node;
     }
 };
+
 static_assert(sizeof(NodeCompressed7) == 22);
 
 using NodeCompressed = NodeCompressed10;
