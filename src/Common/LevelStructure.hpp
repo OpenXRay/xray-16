@@ -3,6 +3,8 @@
 #include "Common/GUID.hpp"
 #include "xrCore/_fbox.h"
 
+constexpr cpcstr LEVEL_GRAPH_NAME = "level.ai";
+
 enum fsL_Chunks : u32
 {
     fsL_HEADER = 1, //*
@@ -229,7 +231,6 @@ static_assert(sizeof(NodeCompressed7) == 21);
 using NodeCompressed = NodeCompressed10;
 #pragma pack(pop)
 
-constexpr cpcstr LEVEL_GRAPH_NAME = "level.ai";
 
 const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
