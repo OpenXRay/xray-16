@@ -66,11 +66,6 @@ struct vertex // definition of "patch" or "node"
     Fvector tri[3]; // Cached triangle for ray-testing
 };*/
 
-struct SCover
-{
-    u8 cover[4];
-};
-
 using Nodes = xr_vector<vertex>;
 using Vectors = xr_vector<Fvector>;
 using Marks = xr_vector<u8>;

@@ -104,6 +104,28 @@ using NodePosition = NodePosition3;
 using NodePosition = NodePosition4;
 #endif
 
+// https://github.com/OpenXRay/xray-soc-history/commit/2a3687c08f8834db1a226b60bcf7455b3cdec40a
+struct NodeCover5
+{
+    u16 cover0 : 4;
+    u16 cover1 : 4;
+    u16 cover2 : 4;
+    u16 cover3 : 4;
+
+    ICF u16 cover(u8 index) const
+    {
+        switch (index)
+        {
+        case 0: return cover0;
+        case 1: return cover1;
+        case 2: return cover2;
+        case 3: return cover3;
+        default: NODEFAULT;
+        }
+        return u8(-1);
+    }
+};
+
 struct NodeCompressed10
 {
 public:
@@ -138,32 +160,10 @@ private:
     }
 
     ICF void light(u8 value) { data[10] |= value << 4; }
+
 public:
-    struct SCover
-    {
-        u16 cover0 : 4;
-        u16 cover1 : 4;
-        u16 cover2 : 4;
-        u16 cover3 : 4;
-
-        ICF u16 cover(u8 index) const
-        {
-            switch (index)
-            {
-            case 0: return cover0;
-            case 1: return cover1;
-            case 2: return cover2;
-            case 3: return cover3;
-            default: NODEFAULT;
-            }
-#ifdef DEBUG
-            return u8(-1);
-#endif
-        }
-    };
-
-    SCover high;
-    SCover low;
+    NodeCover5 high;
+    NodeCover5 low;
     u16 plane;
     NodePosition p;
     // 32 + 16 + 40 + 92 = 180 bits = 24.5 bytes => 25 bytes
@@ -178,9 +178,7 @@ public:
         case 3: return (((*(u32*)(data + 8)) >> 5) & 0x007fffff);
         default: NODEFAULT;
         }
-#ifdef DEBUG
-        return (0);
-#endif
+        return 0;
     }
 
     friend class CLevelGraph;
@@ -192,7 +190,7 @@ public:
 struct NodeCompressed7
 {
     u8 data[12];
-    NodeCompressed10::SCover cover;
+    NodeCover5 cover;
     u16 plane;
     NodePosition p;
 
