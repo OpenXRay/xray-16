@@ -11,10 +11,10 @@ inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
     const size_t pitch = source->pitch;
     const size_t size = pitch * source->h;
 
-    // XXX: get rid of alloca usage, possible stack overflow
+    // XXX: get rid of xr_alloca usage, possible stack overflow
     //auto original = new u8(size);
 
-    auto original = static_cast<u8*>(alloca(size));
+    auto original = static_cast<u8*>(xr_alloca(size));
     CopyMemory(original, source->pixels, size);
 
     auto flipped = static_cast<u8*>(source->pixels) + size;
