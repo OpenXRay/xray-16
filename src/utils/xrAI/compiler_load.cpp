@@ -3,15 +3,6 @@
 
 // TODO: Do we really need this?
 //Lights g_lights;
-struct VertexData
-{
-    using Index = u64;
-    Index _index : 8 * sizeof(Index) - 8;
-    Index _opened : 8;
-
-    Index index() const { return sizeof(VertexData); }
-    Index opened() const { return _opened; }
-};
 
 IC const Fvector vertex_position(const NodePosition4& Psrc, const Fbox& bb, const SAIParams& params)
 {
