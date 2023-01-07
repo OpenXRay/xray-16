@@ -5,9 +5,10 @@
 // fwd. decl.
 template <class T> struct _vector3;
 using Fvector = _vector3<float>;
+
 struct SGameMtl;
 
-class ICollisionDamageReceiver
+class XR_NOVTABLE ICollisionDamageReceiver
 {
 public:
     virtual void CollisionHit(u16 source_id, u16 bone_id, float power, const Fvector& dir, Fvector& pos) = 0;
