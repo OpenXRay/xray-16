@@ -26,6 +26,7 @@ public:
     static void Destroy();
 
     STRING_VALUE translate(const STRING_ID& str_id) const;
+    bool translate(const STRING_ID& str_id, shared_str& out) const;
     void rescan();
 
     void ReloadLanguage();
