@@ -5,6 +5,7 @@ on:
     branches-ignore:
       - "dependabot/*"
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build-windows:
@@ -32,31 +33,26 @@ jobs:
       run: msbuild /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
 
     - name: Prepare artifacts
-      id: windows-vars
       shell: cmd
-      run: |
-        set CONFIGURATION=${{ matrix.Configuration }}
-        set PLATFORM=${{ matrix.Platform }}
-        call xr_pack_build.cmd ARTIFACT_EDITION
-        echo ::set-output name=Build_type::%ARTIFACT_EDITION%
+      run: misc/windows/xr_pack_build.cmd "${{ matrix.Configuration }}" "${{ matrix.Platform }}"
 
     - name: Upload OpenXRay artifact
       uses: actions/upload-artifact@main
       with:
-        name: OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
-        path: res\OpenXRay.${{ steps.windows-vars.outputs.Build_type }}.7z
+        name: OpenXRay.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
+        path: res\OpenXRay.*.7z
 
     - name: Upload Symbols
       uses: actions/upload-artifact@main
       with:
-        name: Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
-        path: res\Symbols.${{ steps.windows-vars.outputs.Build_type }}.7z
+        name: Symbols.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
+        path: res\Symbols.*.7z
 
     - name: Upload Utils
       uses: actions/upload-artifact@main
       with:
-        name: Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
-        path: res\Utils.${{ steps.windows-vars.outputs.Build_type }}.7z
+        name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
+        path: res\Utils.*.7z
 
   build-ubuntu:
     name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
@@ -162,18 +158,11 @@ jobs:
         file openxray_1.6.02_*.deb
 
     - name: Upload OpenXRay artifact
-      if: ${{ matrix.Platform == 'x64' && steps.make-package.outcome == 'success' }}
+      if: ${{ steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
-        name: openxray_1.6.02_${{ matrix.Configuration }}_amd64.deb
-        path: build/openxray_1.6.02_amd64.deb
-
-    - name: Upload OpenXRay artifact
-      if: ${{ matrix.Platform == 'x86' && steps.make-package.outcome == 'success' }}
-      uses: actions/upload-artifact@main
-      with:
-        name: openxray_1.6.02_${{ matrix.Configuration }}_i386.deb
-        path: build/openxray_1.6.02_i386.deb
+        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ matrix.Platform }}_(github-${{ matrix.CC }}-${{ github.run_number }}).deb
+        path: build/openxray_1.6.02_*.deb
 
   build-alpine:
     name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }} (gcc)

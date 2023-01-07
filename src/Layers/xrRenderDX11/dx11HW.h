@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Layers/xrRender/HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
-#include "SDL.h"
-#include "SDL_syswm.h"
 
-#if !defined(_MAYA_EXPORT)
+#include "Layers/xrRender/HWCaps.h"
 #include "Layers/xrRender/stats_manager.h"
-#endif
+
+#include <SDL.h>
+#include <SDL_syswm.h>
 
 class CHW
     : public pureAppActivate,

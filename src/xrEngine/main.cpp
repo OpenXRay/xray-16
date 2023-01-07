@@ -168,7 +168,7 @@ ENGINE_API void InitConsole()
 
 ENGINE_API void InitInput()
 {
-    bool captureInput = !strstr(Core.Params, "-i") && !GEnv.isEditor;
+    bool captureInput = !strstr(Core.Params, "-i");
     pInput = xr_new<CInput>(captureInput);
 }
 

@@ -58,7 +58,7 @@ public:
     ~CAgentManager();
 #ifdef USE_SCHEDULER_IN_AGENT_MANAGER
     virtual bool shedule_Needed() { return true; };
-    virtual float shedule_Scale();
+    virtual float shedule_Scale() const;
     virtual void shedule_Update(u32 time_delta);
     virtual shared_str shedule_Name() const { return shared_str("agent_manager"); };
 #else // USE_SCHEDULER_IN_AGENT_MANAGER

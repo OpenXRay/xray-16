@@ -4,7 +4,7 @@
 #include "xrCore/Threading/Lock.hpp"
 #include "xrCore/Threading/ScopeLock.hpp"
 
-#include "SDL.h"
+#include <SDL.h>
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <xmmintrin.h>

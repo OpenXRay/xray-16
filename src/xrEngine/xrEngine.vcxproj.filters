@@ -614,9 +614,6 @@
     <ClCompile Include="Device_overdraw.cpp">
       <Filter>Render\Device</Filter>
     </ClCompile>
-    <ClCompile Include="Device_wndproc.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
     <ClCompile Include="PerformanceAlert.cpp">
       <Filter>Render\Device</Filter>
     </ClCompile>

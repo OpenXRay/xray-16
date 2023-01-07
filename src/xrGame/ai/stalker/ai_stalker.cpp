@@ -1259,7 +1259,7 @@ void CAI_Stalker::on_after_change_team()
     agent_manager().member().register_in_combat(this);
 }
 
-float CAI_Stalker::shedule_Scale()
+float CAI_Stalker::shedule_Scale() const
 {
     if (!sniper_update_rate())
         return (inherited::shedule_Scale());

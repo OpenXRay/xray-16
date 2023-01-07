@@ -18,7 +18,7 @@ const int MAX_O = 8;
 const int UP_FREQ = 5, INT_BITS = 7, PERIOD_BITS = 7, TOT_BITS = INT_BITS + PERIOD_BITS, INTERVAL = 1 << INT_BITS,
           BIN_SCALE = 1 << TOT_BITS, MAX_FREQ = 124;
 
-#pragma pack(1)
+#pragma pack(push, 1)
 static struct PPM_CONTEXT
 {
     u32 EscFreq;
@@ -40,7 +40,7 @@ static struct PPM_CONTEXT
     inline PPM_CONTEXT* createChild(STATE* pStats, STATE& FirstState);
     STATE& oneState() const { return (STATE&)Dummy; }
 } * MinContext, *MaxContext;
-#pragma pack()
+#pragma pack(pop)
 
 static u8 QTable[260]; // constants
 static PPM_CONTEXT::STATE* FoundState; // found next state transition

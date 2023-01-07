@@ -124,7 +124,6 @@
     <ClCompile Include="Device_Initialize.cpp" />
     <ClCompile Include="Device_mode.cpp" />
     <ClCompile Include="Device_overdraw.cpp" />
-    <ClCompile Include="Device_wndproc.cpp" />
     <ClCompile Include="edit_actions.cpp" />
     <ClCompile Include="Effector.cpp" />
     <ClCompile Include="EffectorPP.cpp" />

@@ -44,7 +44,7 @@ public:
     CALifeUpdateManager(IPureServer* server, LPCSTR section);
     virtual ~CALifeUpdateManager();
     virtual shared_str shedule_Name() const { return shared_str("alife_simulator"); };
-    virtual float shedule_Scale();
+    virtual float shedule_Scale() const;
     virtual void shedule_Update(u32 dt);
     virtual bool shedule_Needed() { return true; };
     void update_switch();

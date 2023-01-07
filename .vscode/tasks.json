@@ -34,38 +34,16 @@
       ]
     },
     {
-      "label": "Configure Debug",
+      "label": "Configure",
       "type": "shell",
       "options": {
         "cwd": "${workspaceFolder}/bin"
       },
-      "command": "cmake .. -DCMAKE_BUILD_TYPE=Debug",
+      "command": "cmake .. -DCMAKE_BUILD_TYPE=${input:buildType}",
       "dependsOn": [
         "mkdir"
       ],
       "problemMatcher": []
-    },
-    {
-      "label": "Configure Release",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}/bin"
-      },
-      "command": "CFLAGS='-march=native' CXXFLAGS='-march=native' cmake .. -DCMAKE_BUILD_TYPE=Release",
-      "dependsOn": [
-        "mkdir"
-      ]
-    },
-    {
-      "label": "Configure Mixed",
-      "type": "shell",
-      "options": {
-        "cwd": "${workspaceFolder}/bin"
-      },
-      "command": "cmake .. -DCMAKE_BUILD_TYPE=Mixed",
-      "dependsOn": [
-        "mkdir"
-      ]
     },
     {
       "label": "Compile",
@@ -79,46 +57,54 @@
       ]
     },
     {
-      "label": "Run SoC Release",
+      "label": "Run SoC",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/bin/x64/Release"
+        "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
       },
       "command": "./xr_3da -soc -nointro -fsltx ${SOC_LTX_FILE_PATH}",
       "dependsOn": [
-        "mkdir",
-        "Configure Release",
-        "Configure Compile"
+        "mkdir"
       ],
       "problemMatcher": []
     },
     {
-      "label": "Run CS Release",
+      "label": "Run CS",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/bin/x64/Release"
+        "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
       },
       "command": "./xr_3da -cs -nointro -fsltx ${CS_LTX_FILE_PATH}",
       "dependsOn": [
-        "mkdir",
-        "Configure Release",
-        "Configure Compile"
+        "mkdir"
       ],
       "problemMatcher": []
     },
     {
-      "label": "Run CoP Release",
+      "label": "Run CoP",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/bin/x64/Release"
+        "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
       },
       "command": "./xr_3da -nointro -fsltx ${COP_LTX_FILE_PATH}",
       "dependsOn": [
-        "mkdir",
-        "Configure Release",
-        "Configure Compile"
+        "mkdir"
       ],
       "problemMatcher": []
     },
+  ],
+  "inputs": [
+    {
+      "id": "buildType",
+      "type": "pickString",
+      "description": "choose build type:",
+      "options": [
+        "Debug",
+        "Release",
+        "MinSizeRel",
+        "RelWithDebInfo"
+      ],
+      "default": "Debug"
+    }
   ]
 }

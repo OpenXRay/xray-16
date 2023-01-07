@@ -42,8 +42,7 @@ void PrintParsedPacket(pcstr message, u16 message_type, const void* packet_data,
 */
 //==============================================================================
 
-#pragma pack(push)
-#pragma pack(1)
+#pragma pack(push, 1)
 struct MultipacketHeader
 {
     u8 tag;

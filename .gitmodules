@@ -10,9 +10,6 @@
 [submodule "Externals/AGS_SDK"]
 	path = Externals/AGS_SDK
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK.git
-[submodule "Externals/lzo"]
-	path = Externals/lzo
-	url = https://github.com/alexgdi/lzo.git
 [submodule "Externals/zlib"]
 	path = Externals/zlib
 	url = https://github.com/madler/zlib.git

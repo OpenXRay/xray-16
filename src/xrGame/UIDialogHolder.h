@@ -2,7 +2,7 @@
 #include "xrCore/_flags.h"
 #include "xrEngine/pure.h"
 #include "xrCommon/xr_vector.h"
-#include "SDL.h"
+#include <SDL.h>
 
 class CUIDialogWnd;
 class CUIWindow;

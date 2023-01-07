@@ -1,0 +1,70 @@
+class "versions_dialog" (CUIScriptWnd)
+
+function versions_dialog:__init() super()
+	 self:InitControls()
+	 self:InitCallBacks()
+end
+
+function versions_dialog:__finalize()
+end
+
+function versions_dialog:InitControls()
+	self:SetWndRect (Frect():set(0,0,1024,768))
+
+	local xml = CScriptXmlInit()
+	xml:ParseFile ("ui_mm_versions_dlg.xml")
+	xml:InitStatic ("background",self)
+
+	self.form = xml:InitStatic("form",self)
+	self.caption = xml:InitStatic ("form:caption",self.form)
+	self.description = xml:InitTextWnd ("form:description",self.form)
+	
+	self.btn_cancel = xml:Init3tButton ("form:btn_cancel", self.form)
+	self:Register (self.btn_cancel, "button_back")
+	
+	self.btn_start = xml:Init3tButton ("form:btn_start", self.form)
+	self:Register (self.btn_start, "button_start")	
+	
+	self.ver_list = xml:InitVerList ("form:ver_list", self.form)
+	self:Register (self.ver_list, "ver_list")
+
+end
+
+function versions_dialog:InitCallBacks()
+	self:AddCallback("button_back", ui_events.BUTTON_CLICKED, self.OnButton_back_clicked, self)
+	self:AddCallback("button_start", ui_events.BUTTON_CLICKED, self.OnButton_start_clicked, self)	
+	self:AddCallback("ver_list", ui_events.LIST_ITEM_CLICKED, self.OnListClicked, self)	
+	self:AddCallback("ver_list", ui_events.WINDOW_LBUTTON_DB_CLICK, self.OnListDblClicked, self)	
+end
+
+function versions_dialog:OnListClicked()
+	local descr = self.ver_list:GetCurrentVersionDescr();
+	self.description:SetText(descr)
+end
+
+function versions_dialog:OnListDblClicked()
+	self:OnButton_start_clicked();
+end
+
+function versions_dialog:OnButton_start_clicked()
+	self.ver_list:SwitchToSelectedVersion()	
+end
+
+function versions_dialog:OnButton_back_clicked()
+	self.owner:ShowDialog(true)
+	self:HideDialog()
+	self.owner:Show(true)
+end
+
+function versions_dialog:NeedToBeShown()
+	return self.ver_list:GetItemsCount() > 0
+end
+
+function versions_dialog:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	local bind = dik_to_bind(dik)
+	if bind == key_bindings.kQUIT then
+		self:OnButton_back_clicked()
+	end
+	return true
+end

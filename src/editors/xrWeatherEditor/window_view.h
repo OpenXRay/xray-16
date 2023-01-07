@@ -29,11 +29,15 @@ ref class window_view : public WeifenLuo::WinFormsUI::Docking::DockContent
 public:
     window_view(window_ide % ide)
     {
+        SuspendLayout();
+
+        m_ide = % ide;
+        m_engine = &ide.engine();
+        m_loaded = false;
+
+        ResumeLayout();
+
         InitializeComponent();
-        //
-        // TODO: Add the constructor code here
-        //
-        custom_init(ide);
     }
 
 protected:
@@ -159,9 +163,6 @@ private:
     bool pick_color_cursor();
     void pick_color_cursor(bool value);
     void check_cursor();
-
-private:
-    void custom_init(window_ide % ide);
 
 private: System::Void window_view_DoubleClick(Object ^ sender, System::EventArgs ^ e);
 private: System::Void window_view_SizeChanged(Object ^ sender, System::EventArgs ^ e);

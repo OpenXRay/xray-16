@@ -18,8 +18,8 @@
 #include "Crypto/trivial_encryptor.h"
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
-#include "SDL.h" // XXX: remove
 #include "xrstring.h" // XXX: remove
+#include <SDL.h> // XXX: remove
 #include <glob.h>
 #endif
 
