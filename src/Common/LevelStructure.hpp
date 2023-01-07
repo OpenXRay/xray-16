@@ -134,8 +134,72 @@ struct NodeCover5
 
 static_assert(sizeof(NodeCover5) == 2);
 
+struct NodeCompressed7
+{
+public:
+    u8 data[12];      // 12 bytes
+    NodeCover5 cover; // 2 bytes
+    u16 plane;        // 2 bytes
+    NodePosition4 p;  // 5 bytes
+    // 12 + 2 + 2 + 5 = 21 bytes
+
+public:
+    static constexpr u32 NODE_BIT_COUNT = 23;
+    static constexpr u32 LINK_MASK = (1 << NODE_BIT_COUNT) - 1;
+
+public:
+    ICF u32 link(u8 index) const
+    {
+        switch (index)
+        {
+        case 0: return ((*(u32*)data) & LINK_MASK);
+        case 1: return (((*(u32*)(data + 2)) >> 7) & LINK_MASK);
+        case 2: return (((*(u32*)(data + 5)) >> 6) & LINK_MASK);
+        case 3: return (((*(u32*)(data + 8)) >> 5) & LINK_MASK);
+        default: NODEFAULT;
+        }
+        return 0;
+    }
+
+    ICF u8 light() const
+    {
+        return data[11] >> 4;
+    }
+};
+
+static_assert(sizeof(NodeCompressed7) == 21);
+
 struct NodeCompressed10
 {
+public:
+    NodeCompressed10() = default;
+    explicit NodeCompressed10(const NodeCompressed7& old)
+    {
+        link(0, old.link(0));
+        link(1, old.link(1));
+        link(2, old.link(2));
+        link(3, old.link(3));
+        light(old.light());
+        high  = old.cover;
+        low   = old.cover;
+        plane = old.plane;
+        p     = old.p;
+    }
+
+    NodeCompressed10& operator=(const NodeCompressed7& old)
+    {
+        link(0, old.link(0));
+        link(1, old.link(1));
+        link(2, old.link(2));
+        link(3, old.link(3));
+        light(old.light());
+        high = old.cover;
+        low = old.cover;
+        plane = old.plane;
+        p = old.p;
+        return *this;
+    }
+
 public:
     static constexpr u32 NODE_BIT_COUNT = 23;
     static constexpr u32 LINK_MASK = (1 << NODE_BIT_COUNT) - 1;
@@ -199,28 +263,6 @@ public:
 };
 
 static_assert(sizeof(NodeCompressed10) == 23);
-
-struct NodeCompressed7
-{
-    u8 data[12];      // 12 bytes
-    NodeCover5 cover; // 2 bytes
-    u16 plane;        // 2 bytes
-    NodePosition4 p;  // 5 bytes
-    // 12 + 2 + 2 + 5 = 21 bytes
-
-    operator NodeCompressed10() const
-    {
-        NodeCompressed10 node;
-        CopyMemory      (node.data, data, sizeof(data) / sizeof(u8));
-        node.high   =   cover;
-        node.low    =   cover;
-        node.plane  =   plane;
-        node.p      =   p;
-        return node;
-    }
-};
-
-static_assert(sizeof(NodeCompressed7) == 21);
 #pragma pack(pop)
 
 #ifdef _EDITOR
