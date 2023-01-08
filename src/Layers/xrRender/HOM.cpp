@@ -84,13 +84,13 @@ void CHOM::Load()
     CL.calc_adjacency(adjacency);
 
     // Create RASTER-triangles
-    m_pTris = xr_alloc<occTri>(u32(CL.getTS()));
+    m_pTris = xr_alloc<occTri>(CL.getTS());
 
-    xr_parallel_for(TaskRange<u32>(0, CL.getTS()), [&](const TaskRange<u32>& range)
+    xr_parallel_for(TaskRange<size_t>(0, CL.getTS()), [&](const TaskRange<size_t>& range)
     {
-        for (u32 it = range.begin(); it != range.end(); ++it)
+        for (size_t it = range.begin(); it != range.end(); ++it)
         {
-            CDB::TRI& clT = CL.getT()[it];
+            const CDB::TRI& clT = CL.getT()[it];
             occTri& rT = m_pTris[it];
             Fvector& v0 = CL.getV()[clT.verts[0]];
             Fvector& v1 = CL.getV()[clT.verts[1]];
