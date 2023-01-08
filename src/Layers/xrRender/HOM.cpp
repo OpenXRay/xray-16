@@ -68,15 +68,18 @@ void CHOM::Load()
     Msg("* Loading HOM: %s", fName);
 
     IReader* fs = FS.r_open(fName);
-    IReader* S = fs->open_chunk(1);
 
     // Load tris and merge them
     CDB::Collector CL;
-    while (!S->eof())
     {
-        HOM_poly P;
-        S->r(&P, sizeof(P));
-        CL.add_face_packed_D(P.v1, P.v2, P.v3, P.flags, 0.01f);
+        IReader* S = fs->open_chunk(1);
+        const auto begin = static_cast<HOM_poly*>(S->pointer());
+        const auto end   = static_cast<HOM_poly*>(S->end());
+        for (HOM_poly* poly = begin; poly != end; ++poly)
+        {
+            CL.add_face_packed_D(poly->v1, poly->v2, poly->v3, poly->flags, 0.01f);
+        }
+        S->close();
     }
 
     // Determine adjacency
@@ -136,7 +139,6 @@ void CHOM::Load()
     }
 
     bEnabled = TRUE;
-    S->close();
     FS.r_close(fs);
 }
 
