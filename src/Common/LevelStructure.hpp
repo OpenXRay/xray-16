@@ -99,9 +99,16 @@ public:
     // y-coordinate is packed into 2 bytes
     static constexpr u32 MAX_Y = (1 << 16) - 1;
 
+    [[nodiscard]]
     ICF u32 xz() const { return ((*((u32*)data)) & 0x00ffffff); }
+
+    [[nodiscard]]
     ICF u32 x(u32 row) const { return (xz() / row); }
+
+    [[nodiscard]]
     ICF u32 z(u32 row) const { return (xz() % row); }
+
+    [[nodiscard]]
     ICF u32 y() const { return (*((u16*)(data + 3))); }
 
     friend class CLevelGraph;
@@ -137,9 +144,16 @@ public:
         return *this;
     }
 
+    [[nodiscard]]
     ICF u32 xz() const { return m_xz; }
+
+    [[nodiscard]]
     ICF u32 x(u32 row) const { return (xz() / row); }
+
+    [[nodiscard]]
     ICF u32 z(u32 row) const { return (xz() % row); }
+
+    [[nodiscard]]
     ICF u32 y() const { return m_y; }
 
     friend class CLevelGraph;
@@ -257,6 +271,7 @@ public:
     NodePosition4 p; // 5 bytes
     // 12 + 2 + 2 + 2 + 5 = 23 bytes
 
+    [[nodiscard]]
     ICF u32 link(u8 index) const
     {
         switch (index)
@@ -270,6 +285,7 @@ public:
         return 0;
     }
 
+    [[nodiscard]]
     u8 light() const { return data[11] >> 4; }
 
     friend class CLevelGraph;
@@ -293,7 +309,6 @@ public:
     u8 data[13];
 
 private:
-
     ICF void link(u8 link_index, u32 value)
     {
         value &= LINK_MASK_0;
@@ -341,6 +356,7 @@ public:
     NodePosition4 p;
     // 13 + 2 + 2 + 2 + 5 = 24 bytes
 
+    [[nodiscard]]
     ICF u32 link(u8 index) const
     {
         switch (index)
@@ -354,6 +370,7 @@ public:
         return 0;
     }
 
+    [[nodiscard]]
     u8 light() const { return data[12] >> 4; }
 
     friend class CLevelGraph;
@@ -466,6 +483,7 @@ public:
     NodePosition12 p;
     // 13 + 2 + 2 + 2 + 6 = 25 bytes
 
+    [[nodiscard]]
     ICF u32 link(u8 index) const
     {
         switch (index)
@@ -479,6 +497,7 @@ public:
         return 0;
     }
 
+    [[nodiscard]]
     u8 light() const { return data[12] >> 4; }
 
     friend class CLevelGraph;
