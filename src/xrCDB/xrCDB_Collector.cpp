@@ -75,10 +75,13 @@ void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fv
 #pragma pack(push, 1)
 struct edge
 {
-    u32 face_id : 30;
-    u32 edge_id : 2;
-    u16 vertex_id0;
-    u16 vertex_id1;
+    u32 face_id;
+    u32 edge_id;
+    u32 vertex_id0;
+    u32 vertex_id1;
+
+    static_assert(std::is_same_v<decltype(vertex_id0), std::remove_all_extents_t<decltype(TRI::verts)>>);
+    static_assert(std::is_same_v<decltype(vertex_id1), std::remove_all_extents_t<decltype(TRI::verts)>>);
 };
 #pragma pack(pop)
 
@@ -105,41 +108,38 @@ struct sort_predicate
 void Collector::calc_adjacency(xr_vector<u32>& dest) const
 {
 #if 1
-    VERIFY(faces.size() < 65536);
-    const u32 edge_count = faces.size() * 3;
-#ifdef _EDITOR
-    xr_vector<edge> _edges(edge_count);
-    edge* edges = &*_edges.begin();
-#else
-    edge* edges = (edge*)xr_alloca(edge_count * sizeof(edge));
-#endif
+    const auto edge_count = faces.size() * 3;
+
+    const small_buffer buf{ edge_count * sizeof(edge) };
+    edge* const edges = static_cast<edge*>(buf.get());
     edge* i = edges;
-    xr_vector<TRI>::const_iterator B = faces.begin(), I = B;
-    xr_vector<TRI>::const_iterator E = faces.end();
+
+    const auto  B = faces.cbegin();
+    auto I = B, E = faces.cend();
     for (; I != E; ++I)
     {
-        u32 face_id = u32(I - B);
+        const u32 face_id = u32(I - B);
 
         (*i).face_id = face_id;
         (*i).edge_id = 0;
-        (*i).vertex_id0 = (u16)(*I).verts[0];
-        (*i).vertex_id1 = (u16)(*I).verts[1];
+        (*i).vertex_id0 = (*I).verts[0];
+        (*i).vertex_id1 = (*I).verts[1];
         if ((*i).vertex_id0 > (*i).vertex_id1)
             std::swap((*i).vertex_id0, (*i).vertex_id1);
         ++i;
 
         (*i).face_id = face_id;
         (*i).edge_id = 1;
-        (*i).vertex_id0 = (u16)(*I).verts[1];
-        (*i).vertex_id1 = (u16)(*I).verts[2];
+        (*i).vertex_id0 = (*I).verts[1];
+        (*i).vertex_id1 = (*I).verts[2];
         if ((*i).vertex_id0 > (*i).vertex_id1)
             std::swap((*i).vertex_id0, (*i).vertex_id1);
         ++i;
 
         (*i).face_id = face_id;
         (*i).edge_id = 2;
-        (*i).vertex_id0 = (u16)(*I).verts[2];
-        (*i).vertex_id1 = (u16)(*I).verts[0];
+        (*i).vertex_id0 = (*I).verts[2];
+        (*i).vertex_id1 = (*I).verts[0];
         if ((*i).vertex_id0 > (*i).vertex_id1)
             std::swap((*i).vertex_id0, (*i).vertex_id1);
         ++i;
