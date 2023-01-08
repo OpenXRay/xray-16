@@ -102,7 +102,7 @@ struct sort_predicate
     }
 };
 
-void Collector::calc_adjacency(xr_vector<u32>& dest)
+void Collector::calc_adjacency(xr_vector<u32>& dest) const
 {
 #if 1
     VERIFY(faces.size() < 65536);
