@@ -53,8 +53,6 @@ public:
     CChangeLevelWnd* UIChangeLevelWnd;
 
     StaticDrawableWrapper* m_game_objective;
-
-    UITimeDilator* timeDilator;
 };
 
 class CChangeLevelWnd : public CUIDialogWnd

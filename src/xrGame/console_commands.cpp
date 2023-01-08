@@ -1936,25 +1936,14 @@ public:
 
     void Execute(pcstr args) override
     {
-        UITimeDilator* timeDilator;
-        if (g_hud)
-        {
-            timeDilator = smart_cast<CUIGameSP*>(CurrentGameUI())->timeDilator;
-        }
-        else
-        {
-            timeDilator = TimeDilator();
-        }
-        
-
         if (EQ(args, "on") || EQ(args, "1"))
         {
-            timeDilator->SetModeEnability(mode, true);
+            TimeDilator()->SetModeEnability(mode, true);
             isEnable = true;
         }
         else if (EQ(args, "off") || EQ(args, "0"))
         {
-            timeDilator->SetModeEnability(mode, false);
+            TimeDilator()->SetModeEnability(mode, false);
             isEnable = false;
         }
         else
@@ -1988,19 +1977,9 @@ public:
 
     void Execute(pcstr args) override
     {
-        UITimeDilator* timeDilator;
-        if (g_hud)
-        {
-            timeDilator = smart_cast<CUIGameSP*>(CurrentGameUI())->timeDilator;
-        }
-        else
-        {
-            timeDilator = TimeDilator();
-        }
-
         float time_factor = (float)atof(args);
         clamp(time_factor, EPS, 1.f);
-        timeDilator->SetUiTimeFactor(time_factor);
+        TimeDilator()->SetUiTimeFactor(time_factor);
         uiTimeFactor = time_factor;
     }
 
