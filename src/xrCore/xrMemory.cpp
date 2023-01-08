@@ -26,7 +26,7 @@ static_assert(xrMemory::SMALL_SIZE_MAX <= MI_SMALL_SIZE_MAX, "Please, adjust SMA
 #define xr_internal_malloc_nothrow(size, alignment) mi_malloc_aligned(size, alignment)
 #define xr_internal_realloc(ptr, size, alignment) mi_realloc_aligned(ptr, size, alignment)
 #define xr_internal_free(ptr, alignment) mi_free_aligned(ptr, alignment)
-#define xr_internal_small_malloc(size) mi_malloc_small(size)
+#define xr_internal_small_alloc(size) mi_malloc_small(size)
 #define xr_internal_small_free(ptr) mi_free(ptr)
 #elif defined(USE_XR_ALIGNED_MALLOC)
 #include "Memory/xrMemory_align.h"
@@ -34,8 +34,8 @@ static_assert(xrMemory::SMALL_SIZE_MAX <= MI_SMALL_SIZE_MAX, "Please, adjust SMA
 #define xr_internal_malloc_nothrow(size, alignment) xr_aligned_malloc(size, alignment)
 #define xr_internal_realloc(ptr, size, alignment) xr_aligned_realloc(ptr, size, alignment)
 #define xr_internal_free(ptr, alignment) xr_aligned_free(ptr)
-#define xr_internal_small_malloc(size, alignment) xr_aligned_malloc(size, alignment)
-#define xr_internal_small_free(ptr, alignment) xr_aligned_free(ptr)
+#define xr_internal_small_alloc(size) xr_aligned_malloc(size)
+#define xr_internal_small_free(ptr) xr_aligned_free(ptr)
 #elif defined(USE_PURE_ALLOC)
 // Additional bytes of memory to hide memory problems on Release
 // But for Debug we don't need this if we want to find these problems
@@ -49,8 +49,8 @@ constexpr size_t xr_reserved_tail = 0;
 #define xr_internal_malloc_nothrow(size, alignment) malloc(size + xr_reserved_tail)
 #define xr_internal_realloc(ptr, size, alignment) realloc(ptr, size + xr_reserved_tail)
 #define xr_internal_free(ptr, alignment) free(ptr)
-#define xr_internal_small_malloc(size, alignment) malloc(size + xr_reserved_tail)
-#define xr_internal_small_free(ptr, alignment) free(ptr)
+#define xr_internal_small_alloc(size) malloc(size + xr_reserved_tail)
+#define xr_internal_small_free(ptr) free(ptr)
 #else
 #error Please, define explicitly which allocator you want to use
 #endif
@@ -183,7 +183,7 @@ void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&) 
 void* xrMemory::small_alloc(size_t size) noexcept
 {
     stat_calls++;
-    return xr_internal_small_malloc(size);
+    return xr_internal_small_alloc(size);
 }
 
 void xrMemory::small_free(void* ptr) noexcept
