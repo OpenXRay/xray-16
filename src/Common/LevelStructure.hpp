@@ -262,7 +262,10 @@ private:
         }
     }
 
-    ICF void light(u8 value) { data[11] |= value << 4; }
+    ICF void light(u8 value)
+    {
+        data[11] = (data[11] & 0x0f) | (value << 4);
+    }
 
 public:
     NodeCover5 high; // 2 bytes
