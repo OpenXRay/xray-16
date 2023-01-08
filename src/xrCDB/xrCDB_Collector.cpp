@@ -13,7 +13,7 @@ u32 Collector::VPack(const Fvector& V, float eps)
         if (I->similar(V, eps))
             return u32(I - verts.begin());
 
-    verts.push_back(V);
+    verts.emplace_back(V);
     return verts.size() - 1;
 }
 
@@ -27,10 +27,10 @@ void Collector::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& 
     T.verts[2] = verts.size() + 2;
     T.dummy = dummy;
 
-    verts.push_back(v0);
-    verts.push_back(v1);
-    verts.push_back(v2);
-    faces.push_back(T);
+    verts.emplace_back(v0);
+    verts.emplace_back(v1);
+    verts.emplace_back(v2);
+    faces.emplace_back(T);
 }
 
 void Collector::add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2, u16 material, u16 sector)
@@ -42,10 +42,10 @@ void Collector::add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2
     T.material = material;
     T.sector = sector;
 
-    verts.push_back(v0);
-    verts.push_back(v1);
-    verts.push_back(v2);
-    faces.push_back(T);
+    verts.emplace_back(v0);
+    verts.emplace_back(v1);
+    verts.emplace_back(v2);
+    faces.emplace_back(T);
 }
 
 void Collector::add_face_packed(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
@@ -58,7 +58,7 @@ void Collector::add_face_packed(const Fvector& v0, const Fvector& v1, const Fvec
     T.verts[2] = VPack(v2, eps);
     T.material = material;
     T.sector = sector;
-    faces.push_back(T);
+    faces.emplace_back(T);
 }
 
 void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
@@ -69,7 +69,7 @@ void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fv
     T.verts[1] = VPack(v1, eps);
     T.verts[2] = VPack(v2, eps);
     T.dummy = dummy;
-    faces.push_back(T);
+    faces.emplace_back(std::move(T));
 }
 
 #pragma pack(push, 1)
@@ -325,8 +325,8 @@ void CollectorPacked::add_face(const Fvector& v0, const Fvector& v1, const Fvect
     T.verts[2] = VPack(v2);
     T.material = material;
     T.sector = sector;
-    flags.push_back(_flags);
-    faces.push_back(T);
+    flags.emplace_back(_flags);
+    faces.emplace_back(T);
 }
 
 void CollectorPacked::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
@@ -338,8 +338,8 @@ void CollectorPacked::add_face_D(const Fvector& v0, const Fvector& v1, const Fve
     T.verts[1] = VPack(v1);
     T.verts[2] = VPack(v2);
     T.dummy = dummy;
-    faces.push_back(T);
-    flags.push_back(_flags);
+    faces.emplace_back(T);
+    flags.emplace_back(_flags);
 }
 
 u32 CollectorPacked::VPack(const Fvector& V)
@@ -368,9 +368,9 @@ u32 CollectorPacked::VPack(const Fvector& V)
     if (0xffffffff == P)
     {
         P = verts.size();
-        verts.push_back(V);
+        verts.emplace_back(V);
 
-        VM[ix][iy][iz].push_back(P);
+        VM[ix][iy][iz].emplace_back(P);
 
         u32 ixE, iyE, izE;
         ixE = iFloor(float(V.x + VMeps.x - VMmin.x) / VMscale.x * clpMX);
@@ -383,19 +383,19 @@ u32 CollectorPacked::VPack(const Fvector& V)
         clamp(izE, (u32)0, clpMZ);
 
         if (ixE != ix)
-            VM[ixE][iy][iz].push_back(P);
+            VM[ixE][iy][iz].emplace_back(P);
         if (iyE != iy)
-            VM[ix][iyE][iz].push_back(P);
+            VM[ix][iyE][iz].emplace_back(P);
         if (izE != iz)
-            VM[ix][iy][izE].push_back(P);
+            VM[ix][iy][izE].emplace_back(P);
         if ((ixE != ix) && (iyE != iy))
-            VM[ixE][iyE][iz].push_back(P);
+            VM[ixE][iyE][iz].emplace_back(P);
         if ((ixE != ix) && (izE != iz))
-            VM[ixE][iy][izE].push_back(P);
+            VM[ixE][iy][izE].emplace_back(P);
         if ((iyE != iy) && (izE != iz))
-            VM[ix][iyE][izE].push_back(P);
+            VM[ix][iyE][izE].emplace_back(P);
         if ((ixE != ix) && (iyE != iy) && (izE != iz))
-            VM[ixE][iyE][izE].push_back(P);
+            VM[ixE][iyE][izE].emplace_back(P);
     }
     return P;
 }
