@@ -4,6 +4,7 @@
 
 #include <codecvt>
 #include <locale>
+#include <utf8.h>
 
 #define BITS1_MASK 0x80 // 10000000b
 #define BITS2_MASK 0xC0 // 11000000b
@@ -158,16 +159,23 @@ u16 mbhMulti2Wide(xr_wide_char* WideStr, xr_wide_char* WidePos, u16 WideStrSize,
     return dpos;
 }
 
-xr_string StringFromUTF8(const char* in, const std::locale& locale)
+xr_string StringFromUTF8(pcstr utf8, const std::locale& locale)
 {
-    using wcvt = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>;
-    auto wstr = wcvt{}.from_bytes(in);
-    xr_string result(wstr.size(), '\0');
-    std::use_facet<std::ctype<wchar_t>>(locale).narrow(wstr.data(), wstr.data() + wstr.size(), '?', &result[0]);
+    int len = 0;
+    auto size = utf8len(utf8);
+    xr_string result(size, '\0');
+    utf8_int32_t cp;
+    utf8 = utf8codepoint(utf8, &cp);
+    while('\0' != cp)
+    {
+        result[len] = std::use_facet<std::ctype<wchar_t>>(locale).narrow((wchar_t)cp, '?');
+        utf8 = utf8codepoint(utf8, &cp);
+    }
     return result;
 }
 
-xr_string StringToUTF8(const char* in, const std::locale& locale)
+
+xr_string StringToUTF8(pcstr in, const std::locale& locale)
 {
     using wcvt = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>;
     std::wstring wstr(xr_strlen(in), L'\0');

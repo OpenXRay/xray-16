@@ -412,6 +412,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/Externals/mimalloc/include
+    ${CMAKE_SOURCE_DIR}/sdk/include/utf8
     $<$<BOOL:${JPEG_FOUND}>:${JPEG_INCLUDE_DIRS}>
 )
 
