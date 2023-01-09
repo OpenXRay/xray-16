@@ -353,11 +353,11 @@ private:
     }
 
 public:
-    NodeCover5 high;
-    NodeCover5 low;
-    u16 plane;
-    NodePosition4 p;
-    // 13 + 2 + 2 + 2 + 5 = 24 bytes
+    NodeCover5 high;  // 2 bytes
+    NodeCover5 low;   // 2 bytes
+    u16 plane;        // 2 bytes
+    NodePosition12 p; // 6 bytes
+    // 13 + 2 + 2 + 2 + 6 = 25 bytes
 
     [[nodiscard]]
     ICF u32 link(u8 index) const
@@ -382,7 +382,7 @@ public:
     friend class CRenumbererConverter;
 };
 
-static_assert(sizeof(NodeCompressed11) == 24);
+static_assert(sizeof(NodeCompressed11) == 25);
 
 struct NodeCompressed12
 {
