@@ -40,10 +40,6 @@ constexpr size_t MAX_WINDOW_EVENTS = 32;
 bool g_bLoaded = false;
 ref_light precache_light = 0;
 
-// need for imgui
-static INT64 g_Time = 0;
-static INT64 g_TicksPerSecond = 0;
-
 bool CRenderDevice::RenderBegin()
 {
     if (GEnv.isDedicatedServer)
@@ -114,8 +110,7 @@ void CRenderDevice::RenderEnd(void)
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(fTimeGlobal);
 
-	extern BOOL g_appLoaded;
-    if (g_appLoaded)
+    if (pApp->IsLoaded())
         ImGui::Render();
 
     GEnv.Render->End();
@@ -181,44 +176,6 @@ int g_svDedicateServerUpdateReate = 100;
 
 ENGINE_API xr_list<LOADING_EVENT> g_loading_events;
 
-void ImGui_NewFrame()
-{
-    ImGuiIO& io = ImGui::GetIO();
-
-    // Setup display size (every frame to accommodate for window resizing)
-    SDL_Rect rect = Device.m_rcWindowClient;
-
-    io.DisplaySize = ImVec2((float)(rect.x - rect.w), (float)(rect.y - rect.h));
-
-    if (g_TicksPerSecond == 0)
-    {
-        QueryPerformanceFrequency((LARGE_INTEGER*)&g_TicksPerSecond);
-        QueryPerformanceCounter((LARGE_INTEGER*)&g_Time);
-    }
-    // Setup time step
-    INT64 current_time;
-    QueryPerformanceCounter((LARGE_INTEGER*)&current_time);
-    io.DeltaTime = (float)(current_time - g_Time) / g_TicksPerSecond;
-    g_Time = current_time;
-
-    // Read keyboard modifiers inputs
-    // io.KeyCtrl = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-    // io.KeyShift = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-    // io.KeyAlt =  (GetKeyState(VK_MENU) & 0x8000) != 0;
-    // io.KeySuper = false;
-    // io.KeysDown : filled by WM_KEYDOWN/WM_KEYUP events
-    // io.MousePos : filled by WM_MOUSEMOVE events
-    // io.MouseDown : filled by WM_*BUTTON* events
-    // io.MouseWheel : filled by WM_MOUSEWHEEL events
-
-    // Hide OS mouse cursor if ImGui is drawing it
-    // if (io.MouseDrawCursor)
-    //	SetCursor(NULL);
-
-    // Start the frame
-    ImGui::NewFrame();
-}
-
 bool CRenderDevice::BeforeFrame()
 {
     if (!b_is_Ready)
@@ -242,9 +199,6 @@ bool CRenderDevice::BeforeFrame()
 
     if (!dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
-
-	ImGui_NewFrame();
-    FrameMove();
 
     return true;
 }
@@ -286,13 +240,12 @@ void CRenderDevice::DoRender()
 
         CalcFrameStats();
         Statistic->Show();
+        ImGui::EndFrame();
         RenderEnd(); // Present goes here
     }
     renderTotalReal.End();
     renderTotalReal.FrameEnd();
     stats.RenderTotal.accum = renderTotalReal.accum;
-
-	ImGui::EndFrame();
 }
 
 void CRenderDevice::ProcessParallelSequence(Task&, void*)
@@ -491,6 +444,7 @@ void CRenderDevice::FrameMove()
     dwFrame++;
     Core.dwFrame = dwFrame;
     dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
+    ImGuiIO& io = ImGui::GetIO();
     if (psDeviceFlags.test(rsConstantFPS))
     {
         // 20ms = 50fps
@@ -503,6 +457,7 @@ void CRenderDevice::FrameMove()
         fTimeGlobal += 0.033f;
         dwTimeDelta = 33;
         dwTimeGlobal += 33;
+        io.DeltaTime = fTimeDelta;
     }
     else
     {
@@ -512,6 +467,7 @@ void CRenderDevice::FrameMove()
         fTimeDelta =
             0.1f * fTimeDelta + 0.9f * fPreviousFrameTime; // smooth random system activity - worst case ~7% error
         // fTimeDelta = 0.7f * fTimeDelta + 0.3f*fPreviousFrameTime; // smooth random system activity
+        io.DeltaTime = fTimeDelta;
         if (fTimeDelta > .1f)
             fTimeDelta = .1f; // limit to 15fps minimum
         if (fTimeDelta <= 0.f)
@@ -529,6 +485,7 @@ void CRenderDevice::FrameMove()
     stats.EngineTotal.Begin();
     // TODO: HACK to test loading screen.
     // if(!g_bLoaded)
+    ImGui::NewFrame();
     seqFrame.Process();
     g_bLoaded = true;
     // else

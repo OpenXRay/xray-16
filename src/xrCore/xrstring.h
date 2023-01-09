@@ -130,7 +130,6 @@ public:
     bool operator!() const { return p_ == 0; }
     char operator[](size_t id) { return p_->value[id]; }
     pcstr c_str() const { return p_ ? p_->value : 0; }
-    pcstr data() const { return p_ ? p_->value : ""; }
     // misc func
     u32 size() const
     {

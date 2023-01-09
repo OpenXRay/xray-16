@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "imgui.h"
 #include "xrCore/xr_token.h"
 #include "xr_input.h"
 
@@ -136,6 +137,10 @@ void CRenderDevice::UpdateWindowProps()
 
     UpdateWindowRects();
     SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = { static_cast<float>(psDeviceMode.Width), static_cast<float>(psDeviceMode.Height) };
+
 }
 
 void CRenderDevice::UpdateWindowRects()

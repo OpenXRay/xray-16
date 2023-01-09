@@ -239,7 +239,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     const u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
 
-	ImGui_ImplDX9_Init(m_sdlWnd, pDevice);
+	ImGui_ImplDX9_Init(P.hDeviceWindow, pDevice);
 }
 
 void CHW::DestroyDevice()

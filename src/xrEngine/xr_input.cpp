@@ -662,11 +662,3 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
     }
 #endif
 }
-
-int CInput::scancodeToChar(int scanCode, uint16_t ch[2])
-{
-    UINT vk = MapVirtualKey(scanCode, MAPVK_VSC_TO_VK);
-    if (vk == 0)
-        return 0;
-    return ToAscii(vk, scanCode, keyboardState, ch, 0);
-}

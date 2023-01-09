@@ -6,7 +6,6 @@
 #include "embedded_editor_helper.h"
 #include "embedded_editor_weather.h"
 #include <addons/imguinodegrapheditor/imguinodegrapheditor.h>
-#include <dinput.h>
 #include <imgui.h>
 
 bool bShowWindow = true;

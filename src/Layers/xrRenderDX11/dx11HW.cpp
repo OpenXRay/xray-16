@@ -235,7 +235,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
 
-	ImGui_ImplDX11_Init(sdlWnd, pDevice, pContext);
+	ImGui_ImplDX11_Init(hwnd, pDevice, pContext);
 }
 
 void CHW::CreateSwapChain(HWND hwnd)

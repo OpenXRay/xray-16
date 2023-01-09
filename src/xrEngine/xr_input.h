@@ -177,7 +177,6 @@ public:
     *  @param duration The duration of the rumble effect, in seconds
     */
     void Feedback(FeedbackType type, float s1, float s2, float duration);
-    int scancodeToChar(int scanCode, uint16_t ch[2]);
 };
 
 extern ENGINE_API CInput* pInput;
