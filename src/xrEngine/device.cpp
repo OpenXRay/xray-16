@@ -293,11 +293,11 @@ void CRenderDevice::ProcessFrame()
 
 void CRenderDevice::message_loop()
 {
-    bool canCallActivate = false;
-    bool shouldActivate = false;
-
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
+        bool canCallActivate = false;
+        bool shouldActivate = false;
+
         SDL_Event events[MAX_WINDOW_EVENTS];
         const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
             SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
@@ -391,8 +391,7 @@ void CRenderDevice::message_loop()
         // Workaround for screen blinking when there's too much timeouts
         if (canCallActivate)
         {
-            OnWM_Activate(shouldActivate ? 1 : 0, 0);
-            canCallActivate = false;
+            OnWindowActivate(shouldActivate);
         }
 
         ProcessFrame();
@@ -550,23 +549,18 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
 
 bool CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 
-void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
+void CRenderDevice::OnWindowActivate(bool activated)
 {
-    u16 fActive = LOWORD(wParam);
-    const bool fMinimized = (bool)HIWORD(wParam);
-
-    const bool isWndActive = fActive != WA_INACTIVE && !fMinimized;
-
-    if (!GEnv.isDedicatedServer && isWndActive)
+    if (!GEnv.isDedicatedServer && activated)
         pInput->GrabInput(true);
     else
         pInput->GrabInput(false);
 
-    b_is_Active = isWndActive || psDeviceFlags.test(rsAlwaysActive);
+    b_is_Active = activated || psDeviceFlags.test(rsAlwaysActive);
 
-    if (isWndActive != b_is_InFocus)
+    if (activated != b_is_InFocus)
     {
-        b_is_InFocus = isWndActive;
+        b_is_InFocus = activated;
         if (b_is_InFocus)
         {
             seqAppActivate.Process();

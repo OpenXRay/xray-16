@@ -252,7 +252,7 @@ void CParticlesObject::UpdateParent(const Fmatrix& m, const Fvector& vel)
     UpdateSpatial();
 }
 
-Fvector& CParticlesObject::Position()
+Fvector& CParticlesObject::Position() const
 {
     if (GEnv.isDedicatedServer)
     {
@@ -263,7 +263,7 @@ Fvector& CParticlesObject::Position()
     return vis.sphere.P;
 }
 
-float CParticlesObject::shedule_Scale()
+float CParticlesObject::shedule_Scale() const
 {
     if (GEnv.isDedicatedServer)
         return 5.0f;

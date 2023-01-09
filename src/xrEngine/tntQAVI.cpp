@@ -470,7 +470,7 @@ int CAviPlayerCustom::SetSpeed(int nPercent)
 u32 CAviPlayerCustom::CalcFrame()
 {
     if (0 == m_dwFirstFrameOffset)
-        m_dwFirstFrameOffset = RDEVICE.dwTimeContinual - 1;
+        m_dwFirstFrameOffset = Device.dwTimeContinual - 1;
 
-    return u32(floor((RDEVICE.dwTimeContinual - m_dwFirstFrameOffset) * m_fCurrentRate / 1000.0f)) % m_dwFrameTotal;
+    return u32(floor((Device.dwTimeContinual - m_dwFirstFrameOffset) * m_fCurrentRate / 1000.0f)) % m_dwFrameTotal;
 }

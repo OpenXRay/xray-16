@@ -16,21 +16,21 @@ public:
 #endif
 };
 
-class ISheduled
+class XR_NOVTABLE ISheduled
 {
 public:
     virtual ~ISheduled() = 0;
     virtual SchedulerData& GetSchedulerData() = 0;
-    virtual float shedule_Scale() = 0;
+    virtual float shedule_Scale() const = 0;
     virtual void shedule_Update(u32 dt) = 0;
     // XXX nitrocaster: return (const char *) to reduce string pool spoiling
     virtual shared_str shedule_Name() const = 0;
     virtual bool shedule_Needed() = 0;
 };
 
-inline ISheduled::~ISheduled() {}
+inline ISheduled::~ISheduled() = default;
 
-class ENGINE_API ScheduledBase : public virtual ISheduled, Noncopyable
+class ENGINE_API XR_NOVTABLE ScheduledBase : public virtual ISheduled, Noncopyable
 {
 public:
     SchedulerData shedule;

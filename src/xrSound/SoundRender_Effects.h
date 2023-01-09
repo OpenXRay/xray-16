@@ -2,7 +2,7 @@
 
 class CSoundRender_Environment;
 
-class CSoundRender_Effects
+class XR_NOVTABLE CSoundRender_Effects
 {
 public:
     virtual ~CSoundRender_Effects() = default;

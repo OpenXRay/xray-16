@@ -30,15 +30,12 @@ inline xr_string xr_substrreplace(const xr_string& src, const xr_string& src_sub
 }
 
 #if !defined(XR_PLATFORM_WINDOWS)
-namespace std
-{
 template<>
-struct hash<xr_string>
+struct std::hash<xr_string>
 {
     [[nodiscard]] size_t operator()(const xr_string& str) const noexcept
     {
         return std::hash<std::string_view>{}(str.c_str());
     }
 };
-}
 #endif

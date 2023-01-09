@@ -25,7 +25,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>

@@ -111,7 +111,7 @@ typedef struct tagRGBQUAD {
 	BYTE    rgbReserved;
 } RGBQUAD;
 
-#pragma pack(1)
+#pragma pack(push, 1)
 
 typedef struct tagBITMAPINFOHEADER{
 	DWORD      biSize;
@@ -149,7 +149,7 @@ typedef struct tagRGBTRIPLE {
 	BYTE    rgbtRed;
 } RGBTRIPLE;
 
-#pragma pack()
+#pragma pack(pop)
 
 #define BI_RGB        0L
 #define BI_RLE8       1L

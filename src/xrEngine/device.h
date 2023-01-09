@@ -28,7 +28,6 @@
 #include <SDL.h>
 
 class Task;
-class engine_impl;
 
 #pragma pack(push, 4)
 
@@ -134,9 +133,6 @@ class ENGINE_API CRenderDevice : public CRenderDeviceData, public IWindowHandler
     void _SetupStates();
 
 public:
-#if defined(XR_PLATFORM_WINDOWS)
-    LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
-#endif
     // u32 dwFrame;
     // u32 dwPrecacheFrame;
     u32 dwPrecacheTotal;
@@ -145,7 +141,7 @@ public:
     float fWidth_2, fHeight_2;
     // bool b_is_Ready;
     // bool b_is_Active;
-    void OnWM_Activate(WPARAM wParam, LPARAM lParam);
+    void OnWindowActivate(bool activated);
 
     // ref_shader m_WireShader;
     // ref_shader m_SelectionShader;
@@ -293,12 +289,6 @@ public:
 };
 
 extern ENGINE_API CRenderDevice Device;
-
-#ifndef _EDITOR
-#define RDEVICE Device
-#else
-#define RDEVICE EDevice
-#endif
 
 extern ENGINE_API bool g_bBenchmark;
 
