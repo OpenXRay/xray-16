@@ -86,7 +86,7 @@ enum esound_type : u32
 };
 
 /// definition (Sound Source)
-class XRSOUND_API CSound_source
+class XRSOUND_API XR_NOVTABLE CSound_source
 {
 public:
     virtual float length_sec() const = 0;
@@ -149,7 +149,7 @@ private:
 };
 
 /// definition (Sound Interface)
-class XRSOUND_API CSound_emitter
+class XRSOUND_API XR_NOVTABLE CSound_emitter
 {
 public:
     virtual bool is_2D() = 0;
@@ -191,8 +191,7 @@ namespace CDB
 }
 
 /// definition (Sound Manager Interface)
-// XXX tamlin: Tag NOVTABLE ?
-class XRSOUND_API ISoundManager
+class XRSOUND_API XR_NOVTABLE ISoundManager
 {
     virtual void _initialize_devices_list() = 0;
     virtual void _initialize() = 0;

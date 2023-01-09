@@ -19,7 +19,7 @@ class property_holder_base;
 class property_holder_collection;
 class property_holder_holder;
 
-class ide_base
+class XR_NOVTABLE ide_base
 {
 public:
     virtual ~ide_base() = default;

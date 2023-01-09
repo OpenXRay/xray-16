@@ -306,8 +306,7 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 2 * sizeof(int)>
     template <class X, class XFuncType, class GenericMemFuncType>
     inline static GenericClass* Convert(X* pthis, XFuncType function_to_bind, GenericMemFuncType& bound_func)
     {
-#pragma pack(push)
-#pragma pack(1)
+#pragma pack(push, 1)
         union
         {
             XFuncType func;

@@ -15,8 +15,10 @@ struct CVertexManagerFixed
     struct VertexData
     {
         using Index = TIndex;
-        Index _index : 8 * sizeof(Index) - Mask;
-        Index _opened : Mask;
+        //Index _index : 8 * sizeof(Index) - Mask;
+        //Index _opened : Mask;
+        Index _index;
+        bool _opened;
 
         Index index() const { return _index; }
         Index opened() const { return _opened; }

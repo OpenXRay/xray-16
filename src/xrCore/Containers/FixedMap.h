@@ -43,19 +43,15 @@ struct xr_fixed_map_node
         right = other.right;
         return *this;
     }
+    
+    friend void swap(xr_fixed_map_node& left, xr_fixed_map_node& right) noexcept
+    {
+        std::swap(left.first, right.first);
+        std::swap(left.second, right.second);
+        std::swap(left.left, right.left);
+        std::swap(left.right, right.right);
+    }
 };
-
-namespace std
-{
-template <class K, class T>
-void swap(const xr_fixed_map_node<K, T>& left, const xr_fixed_map_node<K, T>& right)
-{
-    std::swap(left.first, right.first);
-    std::swap(left.second, right.second);
-    std::swap(left.left, right.left);
-    std::swap(left.right, right.right);
-}
-} // namespace std
 
 template <class K, class T, size_t TGrowMultiplier = 2, class allocator = xr_allocator<xr_fixed_map_node<K, T>>>
 class xr_fixed_map

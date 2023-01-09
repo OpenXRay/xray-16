@@ -32,7 +32,7 @@ public:
     configs_dumper();
     virtual ~configs_dumper();
 
-    virtual float shedule_Scale() { return 1.0f; };
+    virtual float shedule_Scale() const { return 1.0f; };
     virtual void shedule_Update(u32 dt);
     virtual shared_str shedule_Name() const { return shared_str("configs_dumper"); };
     virtual bool shedule_Needed() { return true; };

@@ -50,7 +50,8 @@ public:
     };
 
 public:
-    IC u32 IDvert(u32 ID) { return verts[ID]; }
+    [[nodiscard]]
+    auto IDvert(size_t ID) const { return verts[ID]; }
 };
 
 static_assert(sizeof(TRI) == 16, "TRI always should be 16 bytes on any architecture.");
@@ -178,7 +179,7 @@ public:
         const Fvector& v0, const Fvector& v1, const Fvector& v2, u16 material, u16 sector, float eps = EPS);
     void add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, u32 dummy, float eps = EPS);
     void remove_duplicate_T();
-    void calc_adjacency(xr_vector<u32>& dest);
+    void calc_adjacency(xr_vector<u32>& dest) const;
 
     Fvector* getV() { return &*verts.begin(); }
     size_t getVS() { return verts.size(); }
