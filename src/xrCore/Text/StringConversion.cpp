@@ -159,17 +159,17 @@ u16 mbhMulti2Wide(xr_wide_char* WideStr, xr_wide_char* WidePos, u16 WideStrSize,
     return dpos;
 }
 
-xr_string StringFromUTF8(pcstr utf8, const std::locale& locale)
+xr_string StringFromUTF8(pcstr in, const std::locale& locale)
 {
     int len = 0;
-    auto size = utf8len(utf8);
+    auto size = utf8len(in);
     xr_string result(size, '\0');
     utf8_int32_t cp;
-    utf8 = utf8codepoint(utf8, &cp);
+    in = utf8codepoint(in, &cp);
     while('\0' != cp)
     {
         result[len] = std::use_facet<std::ctype<wchar_t>>(locale).narrow((wchar_t)cp, '?');
-        utf8 = utf8codepoint(utf8, &cp);
+        in = utf8codepoint(in, &cp);
     }
     return result;
 }
