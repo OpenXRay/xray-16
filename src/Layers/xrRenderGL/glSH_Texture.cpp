@@ -73,6 +73,13 @@ void CTexture::apply_load(u32 dwStage)
 
 void CTexture::apply_theora(u32 dwStage)
 {
+    GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR)
+    {
+      // Process/log the error.
+      Msg("apply_theora entry Error: 0x%x", err);
+    }
+    
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));
 
@@ -92,10 +99,17 @@ void CTexture::apply_theora(u32 dwStage)
         pTheora->DecompressFrame(pBits, 0, _pos);
         CHK_GL(glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER));
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, _w, _h, GL_BGRA, GL_UNSIGNED_BYTE, nullptr));
+        
+        err = glGetError();
+        if (err != GL_NO_ERROR)
+        {
+            Msg("apply_theora invalid glTexSubImage2D Error: 0x%x", err);
+        }
 
         // Unmap the buffer to restore normal texture functionality
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     }
+    
 };
 
 void CTexture::apply_avi(u32 dwStage) const
@@ -111,6 +125,12 @@ void CTexture::apply_avi(u32 dwStage) const
         pAVI->GetFrame(&ptr);
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, m_width, m_height,
             GL_RGBA, GL_UNSIGNED_BYTE, ptr));
+        
+        GLenum err = glGetError();
+        if (err != GL_NO_ERROR)
+        {
+            Msg("apply_avi invalid glTexSubImage2D Error: 0x%x", err);
+        }    
     }
 #endif
 };
@@ -200,10 +220,14 @@ void CTexture::Load()
             glGenTextures(1, &pTexture);
             glBindTexture(GL_TEXTURE_2D, pTexture);
             CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, _w, _h));
-
+            GLenum err = glGetError();
+            if (err != GL_NO_ERROR)
+            {
+                Msg("Load ogm Invalid glTexStorage2D: 0x%x", err);
+            }
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;
-            GLenum err = glGetError();
+            err = glGetError();
             if (err != GL_NO_ERROR)
             {
                 Msg("Invalid video stream: 0x%x", err);
@@ -237,6 +261,12 @@ void CTexture::Load()
             glGenTextures(1, &pTexture);
             glBindTexture(GL_TEXTURE_2D, pTexture);
             CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, pAVI->m_dwWidth, pAVI->m_dwHeight));
+            
+            GLenum err = glGetError();
+            if (err != GL_NO_ERROR)
+            {
+                Msg("Load avi Invalid glTexStorage2D: 0x%x", err);
+            }
 
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;

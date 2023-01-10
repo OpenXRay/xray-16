@@ -65,7 +65,7 @@ set(THEORAENC_NAMES theoraenc libtheoraenc)
 set(THEORAENC_NAMES_DEBUG theoraencd theoraenc_d theoraencD theoraenc_D)
 
 foreach(search ${_THEORA_SEARCHES})
-  find_path(THEORA_INCLUDE_DIR NAMES codec.h ${${search}} PATH_SUFFIXES theora)
+  find_path(THEORA_INCLUDE_DIR NAMES theora/theora.h ${${search}} PATH_SUFFIXES include)
 endforeach()
 
 # XXX: not sure if this is right. Check on macOS

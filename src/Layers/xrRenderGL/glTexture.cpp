@@ -121,11 +121,12 @@ _DDS:
         glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
         glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
 
-        if (gli::gl::EXTERNAL_RED != format.External) // skip for properly greyscale-alpfa fonts textures
+        if (gli::gl::EXTERNAL_RED != format.External) // skip for proper greyscale-alpha font textures
             glTexParameteriv(target, GL_TEXTURE_SWIZZLE_RGBA, &format.Swizzles[gli::SWIZZLE_RED]);
 
         glm::tvec3<GLsizei> const tex_extent(texture.extent());
 
+        /*
         switch (texture.target())
         {
         case gli::TARGET_2D:
@@ -134,14 +135,46 @@ _DDS:
                            tex_extent.x, tex_extent.y));
             break;
         case gli::TARGET_3D:
-            CHK_GL(glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
+        case gli::TARGET_CUBE_ARRAY:
+            CHK_GL(glTexStorage3D(target, static_cast<GLint>(texture.levels()),
+            format.Internal,
                            tex_extent.x, tex_extent.y, tex_extent.z));
             break;
         default:
             NODEFAULT;
             break;
         }
-
+        */
+        
+        GLenum err;
+        switch (texture.target())
+        {
+        case gli::TARGET_2D:
+        case gli::TARGET_CUBE:
+            CHK_GL(glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal,
+                           tex_extent.x, tex_extent.y));
+            err = glGetError();
+            if(err !=GL_NO_ERROR)
+            {
+                Msg("Invalid 2D texture: %s Error: 0x%x", fname, err);
+            }
+            break;
+        case gli::TARGET_3D:
+        case gli::TARGET_CUBE_ARRAY:
+            CHK_GL(glTexStorage3D(target, static_cast<GLint>(texture.levels()),
+            format.Internal,
+                           tex_extent.x, tex_extent.y, tex_extent.z));
+            err = glGetError();
+            if(err !=GL_NO_ERROR)
+            {
+                Msg("Invalid 3D texture: %s Error: 0x%x", fname, err);
+            }
+            break;
+        default:
+            NODEFAULT;
+            break;
+        }
+        
         for (size_t layer = 0; layer < texture.layers(); ++layer)
         {
             for (size_t face = 0; face < texture.faces(); ++face)
@@ -198,6 +231,12 @@ _DDS:
                     }
                 }
             }
+        }
+        
+        while((err = glGetError()) != GL_NO_ERROR)
+        {
+            // log OpenGL error.
+            Msg("Invalid texture: %s,  Error: 0x%x", fname, err);
         }
         
         FS.r_close(S);
