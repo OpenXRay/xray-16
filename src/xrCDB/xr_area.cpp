@@ -116,10 +116,11 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
     R_ASSERT(CFORM_CURRENT_VERSION == H.version);
 
     string_path fName;
-    bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
+    const bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
+    const bool skipCrc32Check = strstr(Core.Params, "-skip_cdb_cache_crc32_check");
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
     FS.update_path(fName, "$app_data_root$", fName);
-    if (bUseCache && FS.exist(fName) && Static.deserialize(fName))
+    if (bUseCache && FS.exist(fName) && Static.deserialize(fName, skipCrc32Check))
     {
 #ifndef MASTER_GOLD
         Msg("* Loaded ObjectSpace cache (%s)...", fName);

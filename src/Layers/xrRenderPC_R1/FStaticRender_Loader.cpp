@@ -345,6 +345,7 @@ void CRender::LoadSectors(IReader* fs)
     {
         bool do_rebuild = true;
         const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
+        const bool skipCrc32Check = strstr(Core.Params, "-skip_cdb_cache_crc32_check");
 
         string_path fName;
         strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
@@ -353,7 +354,7 @@ void CRender::LoadSectors(IReader* fs)
         // build portal model
         rmPortals = xr_new<CDB::MODEL>();
         rmPortals->set_version(fs->get_age());
-        if (use_cache && FS.exist(fName) && rmPortals->deserialize(fName))
+        if (use_cache && FS.exist(fName) && rmPortals->deserialize(fName, skipCrc32Check))
         {
 #ifndef MASTER_GOLD
             Msg("* Loaded portals cache (%s)...", fName);

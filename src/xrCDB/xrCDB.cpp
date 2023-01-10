@@ -197,14 +197,14 @@ bool MODEL::serialize(pcstr fileName) const
     return true;
 }
 
-bool MODEL::deserialize(pcstr fileName)
+bool MODEL::deserialize(pcstr fileName, bool checkCrc32 /*= true*/)
 {
     IReader* rstream = FS.r_open(fileName);
     if (!rstream)
         return false;
 
     const u32 crc = rstream->r_u32();
-    const u32 actualCrc = crc32(rstream->pointer(), rstream->elapsed());
+    const u32 actualCrc = checkCrc32 ? crc32(rstream->pointer(), rstream->elapsed()) : crc;
 
     if (crc != actualCrc || version != rstream->r_u32())
     {

@@ -106,7 +106,7 @@ public:
 
     void set_version(u32 value) { version = value; }
     bool serialize(pcstr fileName) const;
-    bool deserialize(pcstr fileName);
+    bool deserialize(pcstr fileName, bool checkCrc32 = true);
 
 private:
     void syncronize_impl() const;
