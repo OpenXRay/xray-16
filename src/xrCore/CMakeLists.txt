@@ -415,6 +415,20 @@ target_include_directories(${PROJECT_NAME}
     $<$<BOOL:${JPEG_FOUND}>:${JPEG_INCLUDE_DIRS}>
 )
 
+if ("${CMAKE_SYSTEM_NAME}" MATCHES "(Free|Net|Open|DragonFly)BSD")
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    pthread
+    execinfo
+    ${SDL2_LIBRARIES}
+    PRIVATE
+    xrMiscMath
+    dl
+    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
+    $<$<BOOL:${JPEG_FOUND}>:${JPEG_LIBRARIES}>
+    ${LZO_LIBRARIES}
+)
+else()
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     pthread
@@ -426,6 +440,7 @@ target_link_libraries(${PROJECT_NAME}
     $<$<BOOL:${JPEG_FOUND}>:${JPEG_LIBRARIES}>
     ${LZO_LIBRARIES}
 )
+endif()
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
