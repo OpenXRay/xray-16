@@ -214,11 +214,6 @@ public:
         }
         return 0;
     }
-
-    ICF u8 light() const
-    {
-        return data[11] >> 4;
-    }
 };
 
 static_assert(sizeof(NodeCompressed7) == 21);
@@ -262,11 +257,6 @@ private:
         }
     }
 
-    ICF void light(u8 value)
-    {
-        data[11] = (data[11] & 0x0f) | (value << 4);
-    }
-
 public:
     NodeCover5 high; // 2 bytes
     NodeCover5 low;  // 2 bytes
@@ -287,9 +277,6 @@ public:
         }
         return 0;
     }
-
-    [[nodiscard]]
-    u8 light() const { return data[11] >> 4; }
 
     friend class CLevelGraph;
     friend struct CNodeCompressed;
@@ -347,11 +334,6 @@ private:
         }
     }
 
-    ICF void light(u8 value)
-    {
-        data[12] = (data[12] & 0x0f) | (value << 4);
-    }
-
 public:
     NodeCover5 high;
     NodeCover5 low;
@@ -373,9 +355,6 @@ public:
         return 0;
     }
 
-    [[nodiscard]]
-    u8 light() const { return data[12] >> 4; }
-
     friend class CLevelGraph;
     friend struct CNodeCompressed;
     friend class CNodeRenumberer;
@@ -386,48 +365,6 @@ static_assert(sizeof(NodeCompressed11) == 24);
 
 struct NodeCompressed12
 {
-public:
-    NodeCompressed12() = default;
-    NodeCompressed12& operator=(const NodeCompressed7& old)
-    {
-        link(0, old.link(0));
-        link(1, old.link(1));
-        link(2, old.link(2));
-        link(3, old.link(3));
-        light(old.light());
-        high = old.cover;
-        low = old.cover;
-        plane = old.plane;
-        p = old.p;
-        return *this;
-    }
-    NodeCompressed12& operator=(const NodeCompressed10& old)
-    {
-        link(0, old.link(0));
-        link(1, old.link(1));
-        link(2, old.link(2));
-        link(3, old.link(3));
-        light(old.light());
-        high = old.high;
-        low = old.low;
-        plane = old.plane;
-        p = old.p;
-        return *this;
-    }
-    NodeCompressed12& operator=(const NodeCompressed11& old)
-    {
-        link(0, old.link(0));
-        link(1, old.link(1));
-        link(2, old.link(2));
-        link(3, old.link(3));
-        light(old.light());
-        high = old.high;
-        low = old.low;
-        plane = old.plane;
-        p = old.p;
-        return *this;
-    }
-
 public:
     static constexpr u32 NODE_BIT_COUNT = 25;
     static constexpr u32 LINK_MASK = (1 << NODE_BIT_COUNT) - 1;
@@ -474,11 +411,6 @@ private:
         }
     }
 
-    ICF void light(u8 value)
-    {
-        data[12] = (data[12] & 0x0f) | (value << 4);
-    }
-
 public:
     NodeCover5 high;
     NodeCover5 low;
@@ -500,9 +432,6 @@ public:
         return 0;
     }
 
-    [[nodiscard]]
-    u8 light() const { return data[12] >> 4; }
-
     friend class CLevelGraph;
     friend struct CNodeCompressed;
     friend class CNodeRenumberer;
@@ -510,6 +439,110 @@ public:
 };
 
 static_assert(sizeof(NodeCompressed12) == 25);
+
+struct NodeCompressed13
+{
+public:
+    NodeCompressed13() = default;
+    NodeCompressed13& operator=(const NodeCompressed7& old)
+    {
+        link(0, old.link(0));
+        link(1, old.link(1));
+        link(2, old.link(2));
+        link(3, old.link(3));
+        high = old.cover;
+        low = old.cover;
+        plane = old.plane;
+        p = old.p;
+        return *this;
+    }
+    template <typename Node>
+    NodeCompressed13& operator=(const Node& old)
+    {
+        link(0, old.link(0));
+        link(1, old.link(1));
+        link(2, old.link(2));
+        link(3, old.link(3));
+        high = old.high;
+        low = old.low;
+        plane = old.plane;
+        p = old.p;
+        return *this;
+    }
+
+public:
+    static constexpr u32 NODE_BIT_COUNT = 26;
+    static constexpr u32 LINK_MASK = (1 << NODE_BIT_COUNT) - 1;
+    static constexpr u32 LINK_MASK_0 = LINK_MASK;
+    static constexpr u32 LINK_MASK_1 = LINK_MASK_0 << 2;
+    static constexpr u32 LINK_MASK_2 = LINK_MASK_0 << 4;
+    static constexpr u32 LINK_MASK_3 = LINK_MASK_0 << 6;
+
+    u8 data[13];
+
+public:
+    ICF void link(u8 link_index, u32 value)
+    {
+        value &= LINK_MASK_0;
+        switch (link_index)
+        {
+        case 0:
+        {
+            value |= (*(u32*)data) & ~LINK_MASK_0;
+            CopyMemory(data, &value, sizeof(u32));
+            break;
+        }
+        case 1:
+        {
+            value <<= 2;
+            value |= (*(u32*)(data + 3)) & ~LINK_MASK_1;
+            CopyMemory(data + 3, &value, sizeof(u32));
+            break;
+        }
+        case 2:
+        {
+            value <<= 4;
+            value |= (*(u32*)(data + 6)) & ~LINK_MASK_2;
+            CopyMemory(data + 6, &value, sizeof(u32));
+            break;
+        }
+        case 3:
+        {
+            value <<= 6;
+            value |= (*(u32*)(data + 9)) & ~LINK_MASK_3;
+            CopyMemory(data + 9, &value, sizeof(u32));
+            break;
+        }
+        }
+    }
+
+public:
+    NodeCover5 high;
+    NodeCover5 low;
+    u16 plane;
+    NodePosition12 p;
+    // 13 + 2 + 2 + 2 + 6 = 25 bytes
+
+    ICF u32 link(u8 index) const
+    {
+        switch (index)
+        {
+        case 0: return ((*(u32*)data) & LINK_MASK_0);
+        case 1: return (((*(u32*)(data + 3)) >> 2) & LINK_MASK_0);
+        case 2: return (((*(u32*)(data + 6)) >> 4) & LINK_MASK_0);
+        case 3: return (((*(u32*)(data + 9)) >> 6) & LINK_MASK_0);
+        default: NODEFAULT;
+        }
+        return 0;
+    }
+
+    friend class CLevelGraph;
+    friend struct CNodeCompressed;
+    friend class CNodeRenumberer;
+    friend class CRenumbererConverter;
+};
+
+static_assert(sizeof(NodeCompressed13) == 25);
 #pragma pack(pop)
 
 #ifdef _EDITOR
@@ -517,7 +550,7 @@ using NodePosition   = NodePosition3;
 #else
 using NodePosition   = NodePosition12;
 #endif
-using NodeCompressed = NodeCompressed12;
+using NodeCompressed = NodeCompressed13;
 
 const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
@@ -536,11 +569,18 @@ enum xrAI_Versions : u8
     // Release CS/COP: build 3456 and further
     XRAI_VERSION_CS_COP     = 10,
 
+    // Extended AI nodes to 25-bit links
+    // https://github.com/abramcumner/xray15
     XRAI_VERSION_BORSHT     = 11,
+    // Further improved AI nodes with 6 bytes position
     XRAI_VERSION_BORSHT_BIG = 12,
+    // 26-bit links, removed rudimentary light data
+    XRAI_VERSION_SKYLOADER  = 13,
 
-    XRAI_VERSION_ALLOWED    = XRAI_VERSION_SOC, // lowest version that can be loaded by the engine
-    XRAI_CURRENT_VERSION    = XRAI_VERSION_BORSHT_BIG
+    // Lowest version that can be loaded by the engine
+    XRAI_VERSION_ALLOWED    = XRAI_VERSION_SOC,
+    // Main version used by the game
+    XRAI_CURRENT_VERSION    = XRAI_VERSION_SKYLOADER
 };
 
 // Cross table and game spawn uses u32, but game graph header uses u8,
