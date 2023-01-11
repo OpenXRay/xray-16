@@ -90,7 +90,6 @@ void CTexture::apply_theora(u32 dwStage)
         pTheora->DecompressFrame(pBits, 0, _pos);
         CHK_GL(glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER));
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, _w, _h, GL_BGRA, GL_UNSIGNED_BYTE, nullptr));
-
         // Unmap the buffer to restore normal texture functionality
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     }
@@ -183,6 +182,15 @@ void CTexture::Load()
         }
         else
         {
+            // We need to flush all GL errors here.
+            // If we don't do this, we can have a false positive for the invalid
+            // video stream error below, resulting in a broken video.
+            GLenum err;
+            while((err = glGetError()) != GL_NO_ERROR)
+            {
+                // Do nothing as we don't know where the error originates.
+            }
+
             flags.MemoryUsage = pTheora->Width(true) * pTheora->Height(true) * 4;
             pTheora->Play(TRUE, Device.dwTimeContinual);
 
@@ -201,8 +209,8 @@ void CTexture::Load()
             CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, _w, _h));
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;
-            GLenum err;
-            if ((err = glGetError()) != GL_NO_ERROR)
+            err = glGetError();
+            if (err != GL_NO_ERROR)
             {
                 Msg("Invalid video stream: 0x%x", err);
                 xr_delete(pTheora);
