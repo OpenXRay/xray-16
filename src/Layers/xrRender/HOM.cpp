@@ -147,28 +147,6 @@ void CHOM::Unload()
     bEnabled = FALSE;
 }
 
-class pred_fb
-{
-public:
-    occTri* m_pTris;
-    Fvector camera;
-
-public:
-    pred_fb(occTri* _t) : m_pTris(_t) {}
-    pred_fb(occTri* _t, Fvector& _c) : m_pTris(_t), camera(_c) {}
-    ICF bool operator()(const CDB::RESULT& _1, const CDB::RESULT& _2) const
-    {
-        occTri& t0 = m_pTris[_1.id];
-        occTri& t1 = m_pTris[_2.id];
-        return camera.distance_to_sqr(t0.center) < camera.distance_to_sqr(t1.center);
-    }
-    ICF bool operator()(const CDB::RESULT& _1) const
-    {
-        occTri& T = m_pTris[_1.id];
-        return T.skip > Device.dwFrame;
-    }
-};
-
 void CHOM::Render_DB(CFrustum& base)
 {
     // Update projection matrices on every frame to ensure valid HOM culling
@@ -199,8 +177,17 @@ void CHOM::Render_DB(CFrustum& base)
     auto end = xrc.r_get()->end();
 
     Fvector COP = Device.vCameraPosition;
-    end = std::remove_if(it, end, pred_fb(m_pTris));
-    std::sort(it, end, pred_fb(m_pTris, COP));
+    end = std::remove_if(it, end, [this](const auto& _1)
+    {
+        occTri& T = m_pTris[_1.id];
+        return T.skip > Device.dwFrame;
+    });
+    std::sort(it, end, [this, COP](const auto& _1, const auto& _2)
+    {
+        occTri& t0 = m_pTris[_1.id];
+        occTri& t1 = m_pTris[_2.id];
+        return COP.distance_to_sqr(t0.center) < COP.distance_to_sqr(t1.center);
+    });
 
     // Build frustum with near plane only
     CFrustum clip;

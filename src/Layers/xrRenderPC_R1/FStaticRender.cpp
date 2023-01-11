@@ -450,13 +450,6 @@ extern float r_ssaLOD_A, r_ssaLOD_B;
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 extern float r_ssaHZBvsTEX;
 
-ICF bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
-{
-    float d1 = _1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    float d2 = _2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    return d1 < d2;
-}
-
 void CRender::Calculate()
 {
 #ifdef _GPA_ENABLED
@@ -543,7 +536,12 @@ void CRender::Calculate()
                 lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)
-            std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
+            std::sort(lstRenderables.begin(), lstRenderables.end(), [](auto* s1, auto* s2)
+            {
+                float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                return d1 < d2;
+            });
 
             if (ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
                 g_hud->Render_First(); // R1 shadows

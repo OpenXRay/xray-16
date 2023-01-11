@@ -21,20 +21,25 @@ Lock UCalc_Mutex
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-bool pred_N(const std::pair<shared_str, u32>& N, LPCSTR B) { return xr_strcmp(*N.first, B) < 0; }
 u16 CKinematics::LL_BoneID(LPCSTR B)
 {
-    accel::iterator I = std::lower_bound(bone_map_N->begin(), bone_map_N->end(), B, pred_N);
+    accel::iterator I = std::lower_bound(bone_map_N->begin(), bone_map_N->end(), B, [](const auto& N, LPCSTR B)
+    {
+        return xr_strcmp(*N.first, B) < 0;
+    });
     if (I == bone_map_N->end())
         return BI_NONE;
     if (0 != xr_strcmp(*(I->first), B))
         return BI_NONE;
     return u16(I->second);
 }
-bool pred_P(const std::pair<shared_str, u32>& N, const shared_str& B) { return N.first._get() < B._get(); }
+
 u16 CKinematics::LL_BoneID(const shared_str& B)
 {
-    accel::iterator I = std::lower_bound(bone_map_P->begin(), bone_map_P->end(), B, pred_P);
+    accel::iterator I = std::lower_bound(bone_map_P->begin(), bone_map_P->end(), B, [](const auto& N, const auto& B)
+    {
+        return N.first._get() < B._get();
+    });
     if (I == bone_map_P->end())
         return BI_NONE;
     if (I->first._get() != B._get())
@@ -148,15 +153,6 @@ void CKinematics::IBoneInstances_Destroy()
     }
 }
 
-bool pred_sort_N(const std::pair<shared_str, u32>& A, const std::pair<shared_str, u32>& B)
-{
-    return xr_strcmp(A.first, B.first) < 0;
-}
-bool pred_sort_P(const std::pair<shared_str, u32>& A, const std::pair<shared_str, u32>& B)
-{
-    return A.first._get() < B.first._get();
-}
-
 CSkeletonX* CKinematics::LL_GetChild(u32 idx)
 {
     IRenderVisual* V = children[idx];
@@ -254,8 +250,14 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
         data->r(&pBone->obb, sizeof(Fobb));
         visimask.set(u64(1) << ID, TRUE);
     }
-    std::sort(bone_map_N->begin(), bone_map_N->end(), pred_sort_N);
-    std::sort(bone_map_P->begin(), bone_map_P->end(), pred_sort_P);
+    std::sort(bone_map_N->begin(), bone_map_N->end(), [](const auto& A, const auto& B)
+    {
+        return xr_strcmp(A.first, B.first) < 0;
+    });
+    std::sort(bone_map_P->begin(), bone_map_P->end(), [](const auto& A, const auto& B)
+    {
+        return A.first._get() < B.first._get();
+    });
 
     // Attach bones to their parents
     iRoot = BI_NONE;
@@ -727,11 +729,6 @@ void CKinematics::AddWallmark(
     wallmarks.push_back(wm);
 }
 
-struct zero_wm_pred
-{
-    bool operator()(const intrusive_ptr<CSkeletonWallmark> x) { return x == nullptr; }
-};
-
 void CKinematics::CalculateWallmarks(bool hud)
 {
     if (!wallmarks.empty() && (wm_frame != Device.dwFrame))
@@ -757,7 +754,10 @@ void CKinematics::CalculateWallmarks(bool hud)
         }
         if (need_remove)
         {
-            auto new_end = std::remove_if(wallmarks.begin(), wallmarks.end(), zero_wm_pred());
+            auto new_end = std::remove_if(wallmarks.begin(), wallmarks.end(), [](const auto x)
+            {
+                return x == nullptr;
+            });
             wallmarks.erase(new_end, wallmarks.end());
         }
     }
