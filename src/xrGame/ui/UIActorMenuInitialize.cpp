@@ -327,13 +327,15 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
         // { id,                   "xml_section_name",   parent }
         { eInventoryPistolList,    "dragdrop_pistol",    m_pInventoryWnd },
         { eInventoryAutomaticList, "dragdrop_automatic", m_pInventoryWnd },
-        //{ eInventoryBackpackList,  "dragdrop_backpack",  m_pInventoryWnd },
+        { eInventoryBackpackList,  "dragdrop_backpack",  m_pInventoryWnd },
         { eInventoryOutfitList,    "dragdrop_outfit",    m_pInventoryWnd },
         { eInventoryBeltList,      "dragdrop_belt",      m_pInventoryWnd },
         { eInventoryBagList,       "dragdrop_bag",       m_ActorWeightBar->m_BagWnd },
     };
     for (auto [id, section, parent] : inventory_lists)
     {
+        if (!m_pLists[id])
+            continue;
         if (id != eInventoryOutfitList)
             m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, section, parent);
         else // eInventoryOutfitList
@@ -519,7 +521,7 @@ void CUIActorMenu::InitCallbacks()
     BindDragDropListEvents(m_pLists[eInventoryPistolList]);
     BindDragDropListEvents(m_pLists[eInventoryAutomaticList]);
 
-    //BindDragDropListEvents(m_pLists[eInventoryBackpackList]);
+    BindDragDropListEvents(m_pLists[eInventoryBackpackList]);
     BindDragDropListEvents(m_pLists[eInventoryOutfitList]);
     BindDragDropListEvents(m_pLists[eInventoryHelmetList]);
 
