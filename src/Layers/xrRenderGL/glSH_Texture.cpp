@@ -65,7 +65,6 @@ void CTexture::PostLoad()
 
 void CTexture::apply_load(u32 dwStage)
 {
-    CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     if (!flags.bLoaded) Load();
     else PostLoad();
     bind(dwStage);
@@ -73,16 +72,8 @@ void CTexture::apply_load(u32 dwStage)
 
 void CTexture::apply_theora(u32 dwStage)
 {
-    GLenum err;
-    while((err = glGetError()) != GL_NO_ERROR)
-    {
-      // Process/log the error.
-      Msg("apply_theora entry Error: 0x%x", err);
-    }
-    
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));
-
     if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual))
     {
         u32* pBits;
@@ -93,18 +84,12 @@ void CTexture::apply_theora(u32 dwStage)
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pBuffer);
         CHK_GL(glBufferData(GL_PIXEL_UNPACK_BUFFER, _w * _h * 4, nullptr, GL_STREAM_DRAW)); // Invalidate buffer
         CHK_GL(pBits = (u32*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY));
-
+        
         // Write to the buffer and copy it to the texture
         int _pos = 0;
         pTheora->DecompressFrame(pBits, 0, _pos);
         CHK_GL(glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER));
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, _w, _h, GL_BGRA, GL_UNSIGNED_BYTE, nullptr));
-        
-        err = glGetError();
-        if (err != GL_NO_ERROR)
-        {
-            Msg("apply_theora invalid glTexSubImage2D Error: 0x%x", err);
-        }
 
         // Unmap the buffer to restore normal texture functionality
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
@@ -125,12 +110,6 @@ void CTexture::apply_avi(u32 dwStage) const
         pAVI->GetFrame(&ptr);
         CHK_GL(glTexSubImage2D(desc, 0, 0, 0, m_width, m_height,
             GL_RGBA, GL_UNSIGNED_BYTE, ptr));
-        
-        GLenum err = glGetError();
-        if (err != GL_NO_ERROR)
-        {
-            Msg("apply_avi invalid glTexSubImage2D Error: 0x%x", err);
-        }    
     }
 #endif
 };
@@ -196,7 +175,7 @@ void CTexture::Load()
         // AVI
         pTheora = xr_new<CTheoraSurface>();
         m_play_time = 0xFFFFFFFF;
-
+        
         if (!pTheora->Load(fn))
         {
             xr_delete(pTheora);
@@ -220,15 +199,10 @@ void CTexture::Load()
             glGenTextures(1, &pTexture);
             glBindTexture(GL_TEXTURE_2D, pTexture);
             CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, _w, _h));
-            GLenum err = glGetError();
-            if (err != GL_NO_ERROR)
-            {
-                Msg("Load ogm Invalid glTexStorage2D: 0x%x", err);
-            }
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;
-            err = glGetError();
-            if (err != GL_NO_ERROR)
+            GLenum err;
+            if ((err = glGetError()) != GL_NO_ERROR)
             {
                 Msg("Invalid video stream: 0x%x", err);
                 xr_delete(pTheora);
@@ -261,16 +235,10 @@ void CTexture::Load()
             glGenTextures(1, &pTexture);
             glBindTexture(GL_TEXTURE_2D, pTexture);
             CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, pAVI->m_dwWidth, pAVI->m_dwHeight));
-            
-            GLenum err = glGetError();
-            if (err != GL_NO_ERROR)
-            {
-                Msg("Load avi Invalid glTexStorage2D: 0x%x", err);
-            }
-
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;
-            if (glGetError() != GL_NO_ERROR)
+            GLenum err = glGetError();
+            if (err != GL_NO_ERROR)
             {
                 FATAL("Invalid video stream");
                 xr_delete(pAVI);
@@ -328,7 +296,7 @@ void CTexture::Load()
             flags.MemoryUsage = mem;
         }
     }
-
+    
     PostLoad();
 }
 
@@ -341,6 +309,8 @@ void CTexture::Unload()
 
     //.	if (flags.bLoaded)		Msg		("* Unloaded: %s",cName.c_str());
 
+
+    GLenum err;
     flags.bLoaded = FALSE;
     if (!seqDATA.empty())
     {
@@ -351,7 +321,6 @@ void CTexture::Unload()
 
     CHK_GL(glDeleteTextures(1, &pSurface));
     CHK_GL(glDeleteBuffers(1, &pBuffer));
-
     xr_delete(pAVI);
     xr_delete(pTheora);
 
