@@ -39,9 +39,17 @@ static BOOL bException = FALSE;
 #   if __has_include(<execinfo.h>)
 #       include <execinfo.h>
 #   endif
-#elif defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_APPLE)
 #   include <sys/types.h>
 #   include <sys/ptrace.h>
+#   define PTRACE_TRACEME PT_TRACE_ME
+#   define PTRACE_DETACH PT_DETACH
+#elif defined(XR_PLATFORM_BSD)
+#   include <sys/types.h>
+#   include <sys/ptrace.h>
+#   include <execinfo.h>
+#   include <cxxabi.h>
+#   include <dlfcn.h>
 #   define PTRACE_TRACEME PT_TRACE_ME
 #   define PTRACE_DETACH PT_DETACH
 #endif
@@ -441,7 +449,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
-#elif defined(XR_PLATFORM_LINUX) && __has_include(<execinfo.h>)
+#elif defined(XR_PLATFORM_LINUX) && __has_include(<execinfo.h>) || defined(XR_PLATFORM_BSD)
     void *array[20];
     int nptrs = backtrace(array, 20);     // get void*'s for all entries on the stack
     char **strings = backtrace_symbols(array, nptrs);
