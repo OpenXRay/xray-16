@@ -239,12 +239,14 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     const u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
 
-	ImGui_ImplDX9_Init(P.hDeviceWindow, pDevice);
+    if (ThisInstanceIsGlobal()) // only if we are global HW
+        ImGui_ImplDX9_Init(P.hDeviceWindow, pDevice);
 }
 
 void CHW::DestroyDevice()
 {
-    ImGui_ImplDX9_Shutdown();
+    if (ThisInstanceIsGlobal()) // only if we are global HW
+        ImGui_ImplDX9_Shutdown();
 
 #ifdef DEBUG
     _SHOW_REF("refCount:dwDebugSB", dwDebugSB);

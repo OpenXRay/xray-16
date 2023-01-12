@@ -6,13 +6,23 @@
 
 namespace xray::editor
 {
+ide::ide() : m_context(ImGui::CreateContext())
+{
+    
+}
+
+ide::~ide()
+{
+    ImGui::DestroyContext(m_context);
+}
+
 void ide::UpdateWindowProps()
 {
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = { static_cast<float>(psDeviceMode.Width), static_cast<float>(psDeviceMode.Height) };
 }
 
-ide::operator bool()
+ide::operator bool() const
 {
     return false;
 }
@@ -34,7 +44,8 @@ void ide::OnFrame()
 
     ImGui::NewFrame();
 
-
+    ImGui::ShowDemoWindow();
+    ImGui::ShowMetricsWindow();
 
     ImGui::EndFrame();
 }
@@ -46,8 +57,8 @@ void ide::OnRender()
 
 void ide::IR_Capture()
 {
-    Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
-    Device.seqRender.Add(this, REG_PRIORITY_LOW - 10000);
+    Device.seqFrame.Add(this, -10000);
+    Device.seqRender.Add(this, -10000);
     IInputReceiver::IR_Capture();
 }
 

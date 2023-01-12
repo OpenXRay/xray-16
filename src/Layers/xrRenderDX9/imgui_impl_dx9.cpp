@@ -272,11 +272,12 @@ static bool ImGui_ImplDX9_CreateFontsTexture()
     // Build texture atlas
     ImGuiIO& io = ImGui::GetIO();
 
-	ImFontConfig font_config;
-	font_config.OversampleH = 1; //or 2 is the same
-	font_config.OversampleV = 1;
-	font_config.PixelSnapH = 1;
-	io.Fonts->AddFontFromFileTTF("extras/Anonymous Pro.ttf", 13.0f, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+	//ImFontConfig font_config;
+	//font_config.OversampleH = 1; //or 2 is the same
+	//font_config.OversampleV = 1;
+	//font_config.PixelSnapH = 1;
+	//io.Fonts->AddFontFromFileTTF("extras/Anonymous Pro.ttf", 13.0f, nullptr, io.Fonts->GetGlyphRangesCyrillic());
+    io.Fonts->AddFontDefault();
 
     unsigned char* pixels;
     int width, height, bytes_per_pixel;

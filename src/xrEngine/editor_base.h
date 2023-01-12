@@ -2,6 +2,8 @@
 
 #include "IInputReceiver.h"
 
+struct ImGuiContext;
+
 namespace xray::editor
 {
 class ENGINE_API ide :
@@ -9,11 +11,14 @@ class ENGINE_API ide :
     public pureRender,
     public pureFrame
 {
+public:
+    ide();
+    ~ide();
 
 public:
     void UpdateWindowProps();
 
-    operator bool();
+    operator bool() const;
 
 public:
     // Interface implementations
@@ -22,5 +27,8 @@ public:
 
     void IR_Capture() override;
     void IR_Release() override;
+
+private:
+    ImGuiContext* m_context;
 };
 } // namespace xray::editor

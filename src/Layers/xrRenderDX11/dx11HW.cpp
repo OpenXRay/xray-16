@@ -235,7 +235,8 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
 
-	ImGui_ImplDX11_Init(hwnd, pDevice, pContext);
+    if (ThisInstanceIsGlobal()) // only if we are global HW
+        ImGui_ImplDX11_Init(hwnd, pDevice, pContext);
 }
 
 void CHW::CreateSwapChain(HWND hwnd)
@@ -380,11 +381,10 @@ void CHW::EndPixEvent() const
 
 void CHW::DestroyDevice()
 {
-    ImGui_ImplDX11_Shutdown();
-
     //  Destroy state managers
     if (ThisInstanceIsGlobal()) // only if we are global HW
     {
+        ImGui_ImplDX11_Shutdown();
         StateManager.Reset();
         RSManager.ClearStateArray();
         DSSManager.ClearStateArray();
