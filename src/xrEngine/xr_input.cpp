@@ -156,8 +156,8 @@ void CInput::MouseUpdate()
 
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
-            offs[2] += event.wheel.y;
-            offs[3] += event.wheel.x;
+            offs[2] += event.wheel.x;
+            offs[3] += event.wheel.y;
             break;
         }
     }
