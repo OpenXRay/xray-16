@@ -1,37 +1,46 @@
 # Based on https://github.com/ldionne/hana/blob/master/.travis.yml
-dist: focal
-cache: ccache
 language: cpp
+cache: ccache
 
 branches:
   except:
     - /^dependabot\/.*$/
-#  only:
-#  - linux
-#  - dev
-#  - "/^v\\d+\\./"
 
-os:
-- linux
+addons:
+  apt:
+    update: true
+    packages: &required_packages
+      - [libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev]
+
 
 matrix:
   include:
     - arch: arm64-graviton2
       virt: lxd
       group: edge
-      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+      os: linux
+      dist: focal
+      compiler: gcc
+      env: TARGET_CPU=x64 BUILD_CONFIGURATION=Release
+      addons:
+        apt:
+          packages:
+            - *required_packages
 
     - arch: arm64-graviton2
       virt: lxd
       group: edge
-      env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-
-install:
-  - export CC=${C_COMPILER}
-  - export CXX=${CXX_COMPILER}
-  - ${CXX} --version
+      os: linux
+      dist: focal
+      compiler: gcc
+      env: TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
+      addons:
+        apt:
+          packages:
+            - *required_packages
 
 before_script:
+  - ${CXX} --version
   - if [ $TRAVIS_CPU_ARCH == arm64 ]; then
       export core_count=2 && echo core_count = $core_count;
     else
@@ -40,26 +49,8 @@ before_script:
   - git submodule deinit Externals/cryptopp
   - mkdir bin && cd bin
 
-  - if [ $TARGET_CPU == x64 ]; then
-       sudo apt-get install -y libegl1-mesa-dev libgles2-mesa-dev libopenal-dev libcrypto++-dev liblua5.1-0-dev libssl-dev libogg-dev libtheora-bin libtheora-dev libvorbis-dev liblzo2-dev libjpeg-dev libncurses5-dev libsdl2-2.0-0 libsdl2-dev libgl1 libgl1-mesa-dev libgl1-mesa-dev libgl-dev;
-       
-       if [ $TRAVIS_CPU_ARCH == arm64 ]; then
-          sudo apt-get install -y snapd
-          sudo snap install cmake - --beta --classic
-          export PATH=/snap/cmake/current/bin:$PATH;
-
-          wget --no-check-certificate http://ftp.br.debian.org/debian/pool/main/g/glew/libglew2.1_2.1.0-4_arm64.deb;
-          wget --no-check-certificate http://ftp.br.debian.org/debian/pool/main/g/glew/libglew-dev_2.1.0-4_arm64.deb;
-          sudo dpkg -i *.deb;
-       else
-          sudo apt-get install -y cmake libglew2.1 libglew-dev;
-       fi
-       
-       sudo apt-get -f -y install;
-       CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION;
-    fi
-
 script:
+- CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION;
 - if [ $TRAVIS_OS_NAME == linux ]; then make -j $core_count package && file openxray_1.6.02_*.deb; fi
 
 deploy:
