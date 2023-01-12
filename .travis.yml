@@ -1,6 +1,6 @@
 # Based on https://github.com/ldionne/hana/blob/master/.travis.yml
 dist: focal
-#cache: ccache
+cache: ccache
 language: cpp
 
 branches:
@@ -18,10 +18,12 @@ matrix:
   include:
     - arch: arm64-graviton2
       virt: lxd
+      group: edge
       env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Release
 
     - arch: arm64-graviton2
       virt: lxd
+      group: edge
       env: C_COMPILER=gcc CXX_COMPILER=g++ TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
 
 install:
