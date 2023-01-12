@@ -1,14 +1,18 @@
 #include "stdafx.h"
-#include "pch_script.h"
+
 #include "embedded_editor_weather.h"
-#include "../../xrEngine/Environment.h"
-#include "../../xrEngine/IGame_Level.h"
-#include "../../xrEngine/thunderbolt.h"
-#include "../../xrEngine/xr_efflensflare.h"
-#include "../GamePersistent.h"
-#include "../Level.h"
-#include "../ai_space.h"
-#include "../xrScriptEngine/script_engine.hpp"
+
+#include "xrEngine/Environment.h"
+#include "xrEngine/IGame_Level.h"
+#include "xrEngine/thunderbolt.h"
+#include "xrEngine/xr_efflensflare.h"
+
+#include "xrScriptEngine/script_engine.hpp"
+
+#include "GamePersistent.h"
+#include "Level.h"
+#include "ai_space.h"
+
 #include <imgui.h>
 
 float editor_longitude = 0.0;
@@ -184,7 +188,7 @@ int compare_naturally(const void* a_ptr, const void* b_ptr)
 bool editTexture(const char* label, shared_str& texName)
 {
 	char tex[100];
-	strncpy(tex, texName.data(), 100);
+	strncpy(tex, texName.empty() ? "" : texName.c_str(), 100);
 	bool changed = false;
 	static shared_str prevValue;
 	ImGui::PushID(label);
@@ -245,7 +249,7 @@ bool editTexture(const char* label, shared_str& texName)
 		if (ImGui::Button("Cancel", ImVec2(120, 0))) {
 			ImGui::CloseCurrentPopup();
 			string_path newFn;
-			_splitpath(prevValue.data(), nullptr, nullptr, newFn, nullptr);
+			_splitpath(prevValue.empty() ? "" : prevValue.c_str(), nullptr, nullptr, newFn, nullptr);
 			strconcat(100, tex, dir, newFn);
 			texName = tex;
 			changed = true;
@@ -355,7 +359,7 @@ void ShowWeatherEditor(bool& show)
 	if (ImGui::SliderFloat("sky_rotation", &cur->sky_rotation, 0.0f, 6.28318f))
 		changed = true;
 	if (editTexture("sky_texture", cur->sky_texture_name)) {
-		strconcat(sizeof(buf), buf, cur->sky_texture_name.data(), "#small");
+		strconcat(sizeof(buf), buf, cur->sky_texture_name.empty() ? "" : cur->sky_texture_name.c_str(), "#small");
 		cur->sky_texture_env_name = buf;
 		cur->on_device_create();
 		changed = true;

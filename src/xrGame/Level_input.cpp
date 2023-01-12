@@ -24,7 +24,6 @@
 #include "saved_game_wrapper.h"
 #include "xrNetServer/NET_Messages.h"
 #include "Include/xrRender/DebugRender.h"
-#include "embedded_editor/embedded_editor_main.h"
 
 #ifdef DEBUG
 #include "ai/monsters/basemonster/base_monster.h"
@@ -45,9 +44,6 @@ extern float g_fTimeFactor;
 
 void CLevel::IR_OnMouseWheel(int x, int y)
 {
-    if (Editor_MouseWheel(x))
-        return;
-
     if (g_bDisableAllInput)
         return;
 
@@ -82,9 +78,6 @@ void CLevel::IR_OnMouseHold(int btn) { IR_OnKeyboardHold(btn); }
 
 void CLevel::IR_OnMouseMove(int dx, int dy)
 {
-    if (Editor_MouseMove(dx, dy))
-        return;
-
     if (g_bDisableAllInput)
         return;
 
@@ -126,9 +119,6 @@ extern float g_separate_radius;
 void CLevel::IR_OnKeyboardPress(int key)
 {
     if (Device.dwPrecacheFrame)
-        return;
-
-	if (Editor_KeyPress(key))
         return;
 
     if (Device.editor() && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT)))
@@ -522,9 +512,6 @@ void CLevel::IR_OnKeyboardPress(int key)
 
 void CLevel::IR_OnKeyboardRelease(int key)
 {
-    if (Editor_KeyRelease(key))
-        return;
-
     if (!bReady || g_bDisableAllInput)
         return;
 
@@ -557,9 +544,6 @@ void CLevel::IR_OnKeyboardRelease(int key)
 
 void CLevel::IR_OnKeyboardHold(int key)
 {
-    if (Editor_KeyHold(key))
-        return;
-
     if (g_bDisableAllInput)
         return;
 

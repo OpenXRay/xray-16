@@ -1,12 +1,18 @@
-#include "stdAfx.h"
+#include "StdAfx.h"
+
 #include "embedded_editor_main.h"
-#include "../../xrEngine/xr_input.h"
-#include "../../xrEngine/x_ray.h"
-#include "../../xrEngine/xr_level_controller.h"
+
+#include "xrEngine/xr_input.h"
+#include "xrEngine/x_ray.h"
+#include "xrEngine/xr_level_controller.h"
+
 #include "embedded_editor_helper.h"
 #include "embedded_editor_weather.h"
+
 #include <addons/imguinodegrapheditor/imguinodegrapheditor.h>
 #include <imgui.h>
+
+#include <dinput.h>
 
 bool bShowWindow = true;
 bool show_test_window = true;
@@ -125,7 +131,7 @@ bool Editor_KeyPress(int key)
 			ActivateKeyboardLayout((HKL)HKL_NEXT, 0);
 		else {
 			uint16_t ch[1];
-			int n = pInput->scancodeToChar(key, ch);
+			int n = 0;//pInput->scancodeToChar(key, ch);
 			if (n > 0) {
 				wchar_t buf;
 				MultiByteToWideChar(CP_ACP, 0, (char*)ch, n, &buf, 1);
@@ -182,33 +188,3 @@ bool Editor_KeyRelease(int key)
     }
     return active;
 }
-
-bool Editor_KeyHold(int key)
-{
-    if (!IsEditorActive())
-        return false;
-    return true;
-}
-
-bool Editor_MouseMove(int dx, int dy)
-{
-    if (!IsEditorActive())
-        return false;
-
-    ImGuiIO& io = ImGui::GetIO();
-    POINT p;
-    GetCursorPos(&p);
-    io.MousePos.x = p.x;
-    io.MousePos.y = p.y;
-    return true;
-}
-
-bool Editor_MouseWheel(int direction)
-{
-    if (!IsEditorActive())
-        return false;
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseWheel += direction > 0 ? +1.0f : -1.0f;
-    return true;
-} 

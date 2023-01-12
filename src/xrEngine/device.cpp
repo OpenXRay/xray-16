@@ -17,7 +17,6 @@
 #include <thread>
 
 #include <SDL.h>
-#include <imgui.h>
 
 // mmsystem.h
 #if defined(XR_PLATFORM_WINDOWS)
@@ -109,9 +108,6 @@ void CRenderDevice::RenderEnd(void)
     // Present goes here, so call OA Frame end.
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(fTimeGlobal);
-
-    if (pApp->IsLoaded())
-        ImGui::Render();
 
     GEnv.Render->End();
 
@@ -240,7 +236,6 @@ void CRenderDevice::DoRender()
 
         CalcFrameStats();
         Statistic->Show();
-        ImGui::EndFrame();
         RenderEnd(); // Present goes here
     }
     renderTotalReal.End();
@@ -443,7 +438,6 @@ void CRenderDevice::FrameMove()
     dwFrame++;
     Core.dwFrame = dwFrame;
     dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
-    ImGuiIO& io = ImGui::GetIO();
     if (psDeviceFlags.test(rsConstantFPS))
     {
         // 20ms = 50fps
@@ -456,7 +450,6 @@ void CRenderDevice::FrameMove()
         fTimeGlobal += 0.033f;
         dwTimeDelta = 33;
         dwTimeGlobal += 33;
-        io.DeltaTime = fTimeDelta;
     }
     else
     {
@@ -466,7 +459,6 @@ void CRenderDevice::FrameMove()
         fTimeDelta =
             0.1f * fTimeDelta + 0.9f * fPreviousFrameTime; // smooth random system activity - worst case ~7% error
         // fTimeDelta = 0.7f * fTimeDelta + 0.3f*fPreviousFrameTime; // smooth random system activity
-        io.DeltaTime = fTimeDelta;
         if (fTimeDelta > .1f)
             fTimeDelta = .1f; // limit to 15fps minimum
         if (fTimeDelta <= 0.f)
@@ -484,7 +476,6 @@ void CRenderDevice::FrameMove()
     stats.EngineTotal.Begin();
     // TODO: HACK to test loading screen.
     // if(!g_bLoaded)
-    ImGui::NewFrame();
     seqFrame.Process();
     g_bLoaded = true;
     // else

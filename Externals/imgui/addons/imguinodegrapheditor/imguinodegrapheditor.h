@@ -279,7 +279,7 @@ class Node
         bool nodeEdited = false;
         for (int i=0,isz=fields.size();i<isz;i++)   {
             FieldInfo& f = fields[i];
-            nodeEdited|=f.render(nodeWidth);
+            nodeEdited|=f.render((int)roundf(nodeWidth));
         }
         return nodeEdited;
     }
@@ -360,7 +360,7 @@ struct NodeLink
         OutputNode = output_node; OutputSlot = output_slot;
     }
 
-    friend struct NodeGraphEditor;
+    friend class NodeGraphEditor;
 };
 
 class NodeGraphEditor
@@ -693,7 +693,7 @@ class NodeGraphEditor
     // It should be better not to add/delete node/links in the callbacks... (but all is untested here)
     void setNodeCallback(NodeCallback cb) {nodeCallback=cb;}
     void setLinkCallback(LinkCallback cb) {linkCallback=cb;}
-    void setNodeEditedCallbackTimeThreshold(int seconds) {nodeEditedTimeThreshold=seconds;}
+    void setNodeEditedCallbackTimeThreshold(int seconds) {nodeEditedTimeThreshold=(float)seconds;}
 	void setLeftPaneCallback(LeftPaneCallback cb) { leftPaneCallback = cb; }
 	void setSaveCallback(SaveCallback cb) { saveCallback = cb; }
 

@@ -22,6 +22,7 @@
 
 #define DEVICE_RESET_PRECACHE_FRAME_COUNT 10
 
+#include "editor_base.h"
 #include "Include/xrRender/FactoryPtr.h"
 #include "Render.h"
 
@@ -283,9 +284,12 @@ private:
 
 private:
     void message_loop();
-    
+
+private:
+    xray::editor::ide m_editor;
+
 public:
-    bool editor() const { return false; }
+    auto& editor() { return m_editor; }
 };
 
 extern ENGINE_API CRenderDevice Device;

@@ -138,9 +138,7 @@ void CRenderDevice::UpdateWindowProps()
     UpdateWindowRects();
     SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
 
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = { static_cast<float>(psDeviceMode.Width), static_cast<float>(psDeviceMode.Height) };
-
+    editor().UpdateWindowProps();
 }
 
 void CRenderDevice::UpdateWindowRects()

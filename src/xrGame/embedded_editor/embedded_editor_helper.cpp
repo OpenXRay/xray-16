@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "pch_script.h"
+//#include "pch_script.h"
 #include "embedded_editor_helper.h"
-#include <luabind/class_info.hpp>
+//#include <luabind/class_info.hpp>
 
 /*xr_string to_string(const luabind::object& o, xr_string offset)
 {

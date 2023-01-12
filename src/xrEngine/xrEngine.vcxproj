@@ -36,6 +36,7 @@
     <ClInclude Include="CustomHUD.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="device.h" />
+    <ClInclude Include="editor_base.h" />
     <ClInclude Include="edit_actions.h" />
     <ClInclude Include="Effector.h" />
     <ClInclude Include="EffectorPP.h" />
@@ -124,6 +125,7 @@
     <ClCompile Include="Device_Initialize.cpp" />
     <ClCompile Include="Device_mode.cpp" />
     <ClCompile Include="Device_overdraw.cpp" />
+    <ClCompile Include="editor_base.cpp" />
     <ClCompile Include="edit_actions.cpp" />
     <ClCompile Include="Effector.cpp" />
     <ClCompile Include="EffectorPP.cpp" />
