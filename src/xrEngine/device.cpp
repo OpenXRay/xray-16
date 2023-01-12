@@ -421,8 +421,14 @@ void CRenderDevice::Run()
     if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
+    Device.seqFrame.Add(&m_editor, -2);
+    Device.seqRender.Add(&m_editor, -2);
+
     // Message cycle
     message_loop();
+
+    Device.seqFrame.Remove(&m_editor);
+    Device.seqRender.Remove(&m_editor);
 
     // Stop Balance-Thread
     mt_bMustExit = true;

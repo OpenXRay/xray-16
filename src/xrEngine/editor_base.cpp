@@ -16,18 +16,18 @@ ide::~ide()
     ImGui::DestroyContext(m_context);
 }
 
+ide::operator bool() const
+{
+    return false;
+}
+
 void ide::UpdateWindowProps()
 {
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = { static_cast<float>(psDeviceMode.Width), static_cast<float>(psDeviceMode.Height) };
 }
 
-ide::operator bool() const
-{
-    return false;
-}
-
-void ide::OnFrame()
+void ide::UpdateInputAsync()
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -42,10 +42,21 @@ void ide::OnFrame()
     io.MouseWheel += static_cast<float>(p.y);
     io.MouseWheelH += static_cast<float>(p.x);
 
+    io.MouseDown[0] = pInput->iGetAsyncKeyState(MOUSE_1);
+    io.MouseDown[1] = pInput->iGetAsyncKeyState(MOUSE_2);
+    io.MouseDown[2] = pInput->iGetAsyncKeyState(MOUSE_3);
+    io.MouseDown[3] = pInput->iGetAsyncKeyState(MOUSE_4);
+    io.MouseDown[4] = pInput->iGetAsyncKeyState(MOUSE_5);
+}
+
+void ide::OnFrame()
+{
+    UpdateInputAsync();
+
     ImGui::NewFrame();
 
-    ImGui::ShowDemoWindow();
-    ImGui::ShowMetricsWindow();
+    //ImGui::ShowDemoWindow();
+    //ImGui::ShowMetricsWindow();
 
     ImGui::EndFrame();
 }
@@ -55,17 +66,68 @@ void ide::OnRender()
     ImGui::Render();
 }
 
-void ide::IR_Capture()
+void ide::IR_OnMousePress(int btn)
 {
-    Device.seqFrame.Add(this, -10000);
-    Device.seqRender.Add(this, -10000);
-    IInputReceiver::IR_Capture();
+
 }
 
-void ide::IR_Release()
+void ide::IR_OnMouseRelease(int btn)
 {
-    Device.seqFrame.Remove(this);
-    Device.seqRender.Remove(this);
-    IInputReceiver::IR_Release();
+
+}
+
+void ide::IR_OnMouseHold(int btn)
+{
+
+}
+
+void ide::IR_OnMouseWheel(int x, int y)
+{
+
+}
+
+void ide::IR_OnMouseMove(int x, int y)
+{
+
+}
+
+void ide::IR_OnKeyboardPress(int btn)
+{
+
+}
+
+void ide::IR_OnKeyboardRelease(int btn)
+{
+
+}
+
+void ide::IR_OnKeyboardHold(int btn)
+{
+
+}
+
+void ide::IR_OnTextInput(pcstr text)
+{
+
+}
+
+void ide::IR_OnControllerPress(int btn, float x, float y)
+{
+
+}
+
+void ide::IR_OnControllerRelease(int btn, float x, float y)
+{
+
+}
+
+void ide::IR_OnControllerHold(int btn, float x, float y)
+{
+
+}
+
+void ide::IR_OnControllerAttitudeChange(Fvector change)
+{
+
 }
 } // namespace xray::editor
