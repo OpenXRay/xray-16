@@ -334,7 +334,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     };
     for (auto [id, section, parent] : inventory_lists)
     {
-        if (!m_pLists[id])
+        if (!uiXml.NavigateToNode(section))
             continue;
         if (id != eInventoryOutfitList)
             m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, section, parent);
