@@ -1,6 +1,6 @@
 language: cpp
 cache: ccache
- 
+
 branches:
   except:
     - /^dependabot\/.*$/
