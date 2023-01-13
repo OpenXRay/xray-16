@@ -1,7 +1,8 @@
-# Based on https://github.com/ldionne/hana/blob/master/.travis.yml
 language: cpp
 cache: ccache
-
+os: linux
+dist: focal
+      
 branches:
   except:
     - /^dependabot\/.*$/
@@ -13,13 +14,11 @@ addons:
       - [libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev]
 
 
-matrix:
+jobs:
   include:
     - arch: arm64-graviton2
       virt: lxd
       group: edge
-      os: linux
-      dist: focal
       compiler: gcc
       env: TARGET_CPU=x64 BUILD_CONFIGURATION=Release
       addons:
@@ -30,8 +29,6 @@ matrix:
     - arch: arm64-graviton2
       virt: lxd
       group: edge
-      os: linux
-      dist: focal
       compiler: gcc
       env: TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
       addons:
@@ -42,20 +39,23 @@ matrix:
 before_script:
   - ${CXX} --version
   - if [ $TRAVIS_CPU_ARCH == arm64 ]; then
-      export core_count=2 && echo core_count = $core_count;
+        export core_count=2 && echo core_count = $core_count;
     else
-      export core_count=$(nproc || echo 4) && echo core_count = $core_count;
+        export core_count=$(nproc || echo 4) && echo core_count = $core_count;
     fi
   - git submodule deinit Externals/cryptopp
-  - mkdir bin && cd bin
+  - cmake -B build -D$BUILD_CONFIGURATION -DCMAKE_UNITY_BUILD=ON;
 
 script:
-- CFLAGS="-w" CXXFLAGS="-w" cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION;
-- if [ $TRAVIS_OS_NAME == linux ]; then make -j $core_count package && file openxray_1.6.02_*.deb; fi
+- CFLAGS="-w" CXXFLAGS="-w" cmake --build build --parallel $core_count
+- if [ $TRAVIS_OS_NAME == linux ]; then
+      make -j $core_count package
+      file openxray_1.6.02_*.deb;
+  fi
 
 deploy:
   provider: releases
-  api_key:
+  token:
     secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
   file: ./*.deb
   draft: true
