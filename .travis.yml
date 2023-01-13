@@ -5,7 +5,6 @@ os: [linux, freebsd]
 dist: focal
 virt: lxd
 group: edge
-sudo: true
 
 arch: [arm64-graviton2, ppc64le, s390x]
 
