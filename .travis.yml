@@ -1,8 +1,10 @@
 language: cpp
 cache: ccache
-os: linux
+os: [linux, freebsd]
 dist: focal
-      
+compiler: gcc
+env: [Debug, Release]
+
 branches:
   except:
     - /^dependabot\/.*$/
@@ -12,43 +14,29 @@ addons:
     update: true
     packages: &required_packages
       - [libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev]
-
+  pkg:
+    - [sdl2, glew, lzo2, jpeg-turbo, openal-soft, libogg, libtheora, libvorbis]
 
 jobs:
   include:
     - arch: arm64-graviton2
       virt: lxd
       group: edge
-      compiler: gcc
-      env: TARGET_CPU=x64 BUILD_CONFIGURATION=Release
-      addons:
-        apt:
-          packages:
-            - *required_packages
-
-    - arch: arm64-graviton2
-      virt: lxd
-      group: edge
-      compiler: gcc
-      env: TARGET_CPU=x64 BUILD_CONFIGURATION=Debug
-      addons:
-        apt:
-          packages:
-            - *required_packages
 
 before_script:
   - if [ $TRAVIS_CPU_ARCH == arm64 ]; then
-        export core_count=2 && echo core_count = $core_count;
+        export core_count=2;
     else
-        export core_count=$(nproc || echo 4) && echo core_count = $core_count;
+        export core_count=$(nproc || echo 2);
     fi
+  - echo core_count = $core_count
   - git submodule deinit Externals/cryptopp
-  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_UNITY_BUILD=ON;
+  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_UNITY_BUILD=ON
 
 script:
 - cmake --build build -j $core_count
 - if [ $TRAVIS_OS_NAME == linux ]; then
-      make -j $core_count package
+      make -j $core_count package;
       file openxray_1.6.02_*.deb;
   fi
 
