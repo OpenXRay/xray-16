@@ -37,7 +37,6 @@ jobs:
             - *required_packages
 
 before_script:
-  - ${CXX} --version
   - if [ $TRAVIS_CPU_ARCH == arm64 ]; then
         export core_count=2 && echo core_count = $core_count;
     else
