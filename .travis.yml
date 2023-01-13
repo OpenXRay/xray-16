@@ -23,7 +23,7 @@ jobs:
       virt: lxd
       group: edge
       env:
-      - CMAKE_BUILD_TYPE: Release
+        CMAKE_BUILD_TYPE: Release
 
     - arch: arm64-graviton2
       compiler: clang
@@ -32,7 +32,7 @@ jobs:
       virt: lxd
       group: edge
       env:
-      - CMAKE_BUILD_TYPE: Debug
+        CMAKE_BUILD_TYPE: Debug
 
     - arch: arm64-graviton2
       compiler: clang
