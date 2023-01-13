@@ -12,8 +12,9 @@ group: edge
 
 arch:
   - arm64-graviton2
-  #- ppc64le # XXX: Not supported by LuaJIT
-  - s390x
+  # XXX: ppc64le and s390x are not supported by LuaJIT
+  #- ppc64le
+  #- s390x
 
 compiler:
   - gcc
