@@ -14,7 +14,7 @@ jobs:
       virt: lxd
       group: edge
       env:
-      - CMAKE_BUILD_TYPE: Debug
+        CMAKE_BUILD_TYPE: Debug
 
     - arch: arm64-graviton2
       compiler: gcc
@@ -41,7 +41,7 @@ jobs:
       virt: lxd
       group: edge
       env:
-      - CMAKE_BUILD_TYPE: Release
+        CMAKE_BUILD_TYPE: Release
 
 before_script:
   - if [ $TRAVIS_OS_NAME == linux ]; then
