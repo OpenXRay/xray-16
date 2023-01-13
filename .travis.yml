@@ -7,41 +7,41 @@ branches:
 
 jobs:
   include:
-    - arch: arm64-graviton2
+    - name: "ARM64 Debug GCC"
+      arch: arm64-graviton2
       compiler: gcc
       os: linux	
       dist: focal
       virt: lxd
       group: edge
-      env:
-        CMAKE_BUILD_TYPE: Debug
+      env: CMAKE_BUILD_TYPE=Debug
 
-    - arch: arm64-graviton2
+    - name: "ARM64 Release GCC"
+      arch: arm64-graviton2
       compiler: gcc
       os: linux	
       dist: focal
       virt: lxd
       group: edge
-      env:
-        CMAKE_BUILD_TYPE: Release
+      env: CMAKE_BUILD_TYPE=Release
 
-    - arch: arm64-graviton2
+    - name: "ARM64 Debug Clang"
+      arch: arm64-graviton2
       compiler: clang
       os: linux	
       dist: focal
       virt: lxd
       group: edge
-      env:
-        CMAKE_BUILD_TYPE: Debug
+      env: CMAKE_BUILD_TYPE=Debug
 
-    - arch: arm64-graviton2
+    - name: "ARM64 Release Clang"
+      arch: arm64-graviton2
       compiler: clang
       os: linux	
       dist: focal
       virt: lxd
       group: edge
-      env:
-        CMAKE_BUILD_TYPE: Release
+      env: CMAKE_BUILD_TYPE=Release
 
 before_script:
   - if [ $TRAVIS_OS_NAME == linux ]; then
