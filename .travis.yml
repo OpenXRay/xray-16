@@ -1,32 +1,53 @@
 language: cpp
 cache: ccache
-
-os: linux	
-dist: focal
-virt: lxd
-
-compiler: gcc
-env: [CMAKE_BUILD_TYPE=Debug, CMAKE_BUILD_TYPE=Release]
-    
+ 
 branches:
   except:
     - /^dependabot\/.*$/
 
-addons:
-  apt:
-    update: true
-    packages:
-      - [libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev]
-
 jobs:
   include:
     - arch: arm64-graviton2
+      compiler: gcc
+      os: linux	
+      dist: focal
+      virt: lxd
       group: edge
+      env:
+      - CMAKE_BUILD_TYPE: Debug
 
     - arch: arm64-graviton2
+      compiler: gcc
+      os: linux	
+      dist: focal
+      virt: lxd
       group: edge
-    
+      env:
+      - CMAKE_BUILD_TYPE: Release
+
+    - arch: arm64-graviton2
+      compiler: clang
+      os: linux	
+      dist: focal
+      virt: lxd
+      group: edge
+      env:
+      - CMAKE_BUILD_TYPE: Debug
+
+    - arch: arm64-graviton2
+      compiler: clang
+      os: linux	
+      dist: focal
+      virt: lxd
+      group: edge
+      env:
+      - CMAKE_BUILD_TYPE: Release
+
 before_script:
+  - if [ $TRAVIS_OS_NAME == linux ]; then
+      sudo apt-get update;
+      sudo apt-get install -yq libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev;
+  fi
   - git submodule deinit Externals/cryptopp
   - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_UNITY_BUILD=ON -DCMAKE_BUILD_PARALLEL_LEVEL=2
 
