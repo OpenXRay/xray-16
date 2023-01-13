@@ -46,7 +46,7 @@ before_script:
   - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_UNITY_BUILD=ON;
 
 script:
-- cmake --build build --parallel -j $core_count $core_count
+- cmake --build build -j $core_count
 - if [ $TRAVIS_OS_NAME == linux ]; then
       make -j $core_count package
       file openxray_1.6.02_*.deb;
