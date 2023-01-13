@@ -12,7 +12,8 @@ compiler: gcc
 env: [CMAKE_BUILD_TYPE=Debug, CMAKE_BUILD_TYPE=Release]
 jobs:
   include:
-    - env:
+    - language: cpp
+      env:
         CMAKE_UNITY_BUILD: ON
         CMAKE_BUILD_PARALLEL_LEVEL: 2
     
