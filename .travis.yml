@@ -48,6 +48,3 @@ deploy:
     secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
   file: ./*.deb
   draft: true
-
-notifications:
-  email: false
