@@ -38,7 +38,7 @@ script:
 - cmake --build build
 - if [ $TRAVIS_OS_NAME == linux ]; then
       cd build;
-      make -j $core_count package;
+      make -j 2 package;
       file openxray_1.6.02_*.deb;
   fi
 
