@@ -20,12 +20,6 @@ addons:
     update: true
     packages:
       - [libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev]
-
-jobs:
-  include:
-    - os: freebsd
-      addons:
-        pkg: [sdl2, glew, lzo2, jpeg-turbo, openal-soft, libogg, libtheora, libvorbis]
     
 before_script:
   - git submodule deinit Externals/cryptopp
