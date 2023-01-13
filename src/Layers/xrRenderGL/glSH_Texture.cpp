@@ -182,15 +182,6 @@ void CTexture::Load()
         }
         else
         {
-            // We need to flush all GL errors here.
-            // If we don't do this, we can have a false positive for the invalid
-            // video stream error below, resulting in a broken video.
-            GLenum err;
-            while((err = glGetError()) != GL_NO_ERROR)
-            {
-                // Do nothing as we don't know where the error originates.
-            }
-
             flags.MemoryUsage = pTheora->Width(true) * pTheora->Height(true) * 4;
             pTheora->Play(TRUE, Device.dwTimeContinual);
 
@@ -209,7 +200,7 @@ void CTexture::Load()
             CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, _w, _h));
             pSurface = pTexture;
             desc = GL_TEXTURE_2D;
-            err = glGetError();
+            GLenum err = glGetError();
             if (err != GL_NO_ERROR)
             {
                 Msg("Invalid video stream: 0x%x", err);
