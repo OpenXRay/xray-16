@@ -5,43 +5,23 @@ branches:
   except:
     - /^dependabot\/.*$/
 
-jobs:
-  include:
-    - name: "ARM64 Debug GCC"
-      arch: arm64-graviton2
-      compiler: gcc
-      os: linux	
-      dist: focal
-      virt: lxd
-      group: edge
-      env: CMAKE_BUILD_TYPE=Debug
+os: linux	
+dist: focal
+virt: lxd
+group: edge
 
-    - name: "ARM64 Release GCC"
-      arch: arm64-graviton2
-      compiler: gcc
-      os: linux	
-      dist: focal
-      virt: lxd
-      group: edge
-      env: CMAKE_BUILD_TYPE=Release
+arch:
+  - arm64-graviton2
+  - ppc64le
+  - s390x
 
-    - name: "ARM64 Debug Clang"
-      arch: arm64-graviton2
-      compiler: clang
-      os: linux	
-      dist: focal
-      virt: lxd
-      group: edge
-      env: CMAKE_BUILD_TYPE=Debug
-
-    - name: "ARM64 Release Clang"
-      arch: arm64-graviton2
-      compiler: clang
-      os: linux	
-      dist: focal
-      virt: lxd
-      group: edge
-      env: CMAKE_BUILD_TYPE=Release
+compiler:
+  - gcc
+  - clang
+  
+env:
+  CMAKE_BUILD_TYPE: Debug
+  CMAKE_BUILD_TYPE: Release
 
 before_script:
   - if [ $TRAVIS_OS_NAME == linux ]; then
