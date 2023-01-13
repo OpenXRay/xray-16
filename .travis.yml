@@ -6,6 +6,8 @@ dist: focal
 virt: lxd
 group: edge
 
+arch: [arm64-graviton2, ppc64le, s390x]
+
 compiler: gcc
 env: [CMAKE_BUILD_TYPE=Debug, CMAKE_BUILD_TYPE=Release]
 
@@ -16,7 +18,7 @@ branches:
 addons:
   apt:
     update: true
-    packages: &required_packages
+    packages:
       - [libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev]
   pkg:
     - [sdl2, glew, lzo2, jpeg-turbo, openal-soft, libogg, libtheora, libvorbis]
