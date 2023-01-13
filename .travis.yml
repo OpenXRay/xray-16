@@ -43,10 +43,10 @@ before_script:
         export core_count=$(nproc || echo 4) && echo core_count = $core_count;
     fi
   - git submodule deinit Externals/cryptopp
-  - cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_UNITY_BUILD=ON;
+  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build --parallel $core_count -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DCMAKE_UNITY_BUILD=ON;
 
 script:
-- CFLAGS="-w" CXXFLAGS="-w" cmake --build build --parallel $core_count
+- cmake --build build --parallel $core_count
 - if [ $TRAVIS_OS_NAME == linux ]; then
       make -j $core_count package
       file openxray_1.6.02_*.deb;
