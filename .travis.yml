@@ -21,9 +21,11 @@ compiler:
   
 env:
   - CMAKE_BUILD_TYPE: Debug
-    TESTST: ON
+    CMAKE_UNITY_BUILD: ON
+    CMAKE_BUILD_PARALLEL_LEVEL: 2
   - CMAKE_BUILD_TYPE: Release
-    TESTST: ON
+    CMAKE_UNITY_BUILD: ON
+    CMAKE_BUILD_PARALLEL_LEVEL: 2
 
 before_script:
   - if [ $TRAVIS_OS_NAME == linux ]; then
@@ -31,7 +33,7 @@ before_script:
       sudo apt-get install -yq libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev;
     fi
   - git submodule deinit Externals/cryptopp
-  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_UNITY_BUILD=ON -DCMAKE_BUILD_PARALLEL_LEVEL=2
+  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build
 
 script:
 - cmake --build build
