@@ -31,14 +31,19 @@ env:
   - CONFIGURATION: Release
 
 before_script:
+  - if [ $TRAVIS_CPU_ARCH == arm64 ]; then
+      export core_count=2 && echo core_count = $core_count;
+    else
+      export core_count=$(nproc || echo 4) && echo core_count = $core_count;
+    fi
   - git submodule deinit Externals/cryptopp
-  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_BUILD_PARALLEL_LEVEL=2
+  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_BUILD_PARALLEL_LEVEL=$core_count
 
 script:
 - cmake --build build
 - if [ $TRAVIS_OS_NAME == linux ]; then
       cd build;
-      make -j 2 package;
+      make -j $core_count package;
       file openxray_1.6.02_*.deb;
   fi
 
