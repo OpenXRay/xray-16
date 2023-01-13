@@ -10,12 +10,6 @@ arch: [arm64-graviton2, ppc64le, s390x]
 
 compiler: gcc
 env: [CMAKE_BUILD_TYPE=Debug, CMAKE_BUILD_TYPE=Release]
-jobs:
-  include:
-    - language: cpp
-      env:
-        CMAKE_UNITY_BUILD: ON
-        CMAKE_BUILD_PARALLEL_LEVEL: 2
     
 branches:
   except:
@@ -36,7 +30,7 @@ before_script:
   #- if [ $TRAVIS_OS_NAME == freebsd ]; then
   #
   #  fi
-  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build
+  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_UNITY_BUILD=ON -DCMAKE_BUILD_PARALLEL_LEVEL=2
 
 script:
 - cmake --build build
