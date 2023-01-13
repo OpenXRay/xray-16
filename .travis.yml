@@ -1,12 +1,9 @@
 language: cpp
 cache: ccache
 
-os: linux
+os: linux	
 dist: focal
 virt: lxd
-group: edge
-
-arch: [arm64-graviton2, ppc64le, s390x]
 
 compiler: gcc
 env: [CMAKE_BUILD_TYPE=Debug, CMAKE_BUILD_TYPE=Release]
@@ -20,12 +17,17 @@ addons:
     update: true
     packages:
       - [libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev]
+
+jobs:
+  include:
+    - arch: arm64-graviton2
+      group: edge
+
+    - arch: arm64-graviton2
+      group: edge
     
 before_script:
   - git submodule deinit Externals/cryptopp
-  #- if [ $TRAVIS_OS_NAME == freebsd ]; then
-  #
-  #  fi
   - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_UNITY_BUILD=ON -DCMAKE_BUILD_PARALLEL_LEVEL=2
 
 script:
@@ -35,9 +37,9 @@ script:
       file openxray_1.6.02_*.deb;
   fi
 
-#deploy:
-#  provider: releases
-#  token:
-#    secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
-#  file: ./*.deb
-#  draft: true
+deploy:
+  provider: releases
+  token:
+    secure: kGVniXDR926BfVcA97y25BzALbijvgboBsozZzY9yc8RPz15Q4YG474h7vl14/J1
+  file: ./*.deb
+  draft: true
