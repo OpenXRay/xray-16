@@ -1,7 +1,7 @@
 language: cpp
 cache: ccache
 
-os: [linux, freebsd]
+os: linux
 dist: focal
 virt: lxd
 group: edge
