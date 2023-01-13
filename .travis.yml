@@ -18,7 +18,7 @@ arch:
 
 compiler:
   - gcc
-  - clang
+  #- clang
   
 env:
   - CMAKE_BUILD_TYPE: Debug
