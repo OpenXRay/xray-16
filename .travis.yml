@@ -19,16 +19,18 @@ arch:
 compiler:
   - gcc
   #- clang
-  
+
+addons:
+  apt:
+    update: true
+    packages:
+      - [libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev]
+
 env:
   - CONFIGURATION: Debug
   - CONFIGURATION: Release
 
 before_script:
-  - if [ $TRAVIS_OS_NAME == linux ]; then
-      sudo apt-get update;
-      sudo apt-get install -yq libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev;
-    fi
   - git submodule deinit Externals/cryptopp
   - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_UNITY_BUILD=ON -DCMAKE_BUILD_PARALLEL_LEVEL=2
 
