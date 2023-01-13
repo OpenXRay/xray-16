@@ -24,9 +24,9 @@ jobs:
   include:
     - arch: arm64-graviton2
       env:
-        - [CMAKE_BUILD_TYPE=Debug, CMAKE_BUILD_TYPE=Release]
-        CMAKE_UNITY_BUILD: "ON"
-        CMAKE_BUILD_PARALLEL_LEVEL: 2 # Just make it 2, Travis always has two cores
+        #- [CMAKE_BUILD_TYPE=Debug, CMAKE_BUILD_TYPE=Release]
+        - CMAKE_UNITY_BUILD: "ON"
+        - CMAKE_BUILD_PARALLEL_LEVEL: 2 # Just make it 2, Travis always has two cores
 
 before_script:
   - git submodule deinit Externals/cryptopp
