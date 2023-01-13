@@ -32,7 +32,7 @@ env:
 
 before_script:
   - git submodule deinit Externals/cryptopp
-  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_UNITY_BUILD=ON -DCMAKE_BUILD_PARALLEL_LEVEL=2
+  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_BUILD_PARALLEL_LEVEL=2
 
 script:
 - cmake --build build
