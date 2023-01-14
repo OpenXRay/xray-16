@@ -154,8 +154,8 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{6333f8ba-25fb-43b9-a4b6-e8aaf84692e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="imgui_render">
-      <UniqueIdentifier>{b0a36b69-15a4-4577-8986-3c64528a4434}</UniqueIdentifier>
+    <Filter Include="Interface implementations\ImGuiRender">
+      <UniqueIdentifier>{84b8d63d-8ab9-454e-8af1-b51e4713fec0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -642,8 +642,11 @@
     <ClInclude Include="..\xrRender\SkeletonXSkinXW.h">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX9\imgui_impl_dx9.h">
-      <Filter>imgui_render</Filter>
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxImGuiRender.h">
+      <Filter>Interface implementations\ImGuiRender</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1148,8 +1151,8 @@
     <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX9\imgui_impl_dx9.cpp">
-      <Filter>imgui_render</Filter>
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

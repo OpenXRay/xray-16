@@ -1,15 +1,20 @@
 #pragma once
 
 #include "IInputReceiver.h"
+#include "Include/xrRender/ImGuiRender.h"
 
+#define IMGUI_DISABLE_OBSOLETE_KEYIO
+#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 struct ImGuiContext;
 
 namespace xray::editor
 {
 class ENGINE_API ide :
-    public IInputReceiver,
     public pureRender,
-    public pureFrame
+    public pureFrame,
+    public pureAppActivate,
+    public pureAppDeactivate,
+    public IInputReceiver
 {
 public:
     ide();
@@ -21,10 +26,18 @@ public:
     void UpdateWindowProps();
     void UpdateInputAsync();
 
+    void OnDeviceCreate();
+    void OnDeviceDestroy();
+    void OnDeviceResetBegin() const;
+    void OnDeviceResetEnd() const;
+
 public:
     // Interface implementations
     void OnFrame() override;
     void OnRender() override;
+
+    void OnAppActivate() override;
+    void OnAppDeactivate() override;
 
     void IR_Capture() override;
     void IR_Release() override;
@@ -47,7 +60,8 @@ public:
     void IR_OnControllerAttitudeChange(Fvector change) override;
 
 private:
-    ImGuiContext* m_context;
+    IImGuiRender* m_render{};
+    ImGuiContext* m_context{};
     bool m_shown{};
 };
 } // namespace xray::editor

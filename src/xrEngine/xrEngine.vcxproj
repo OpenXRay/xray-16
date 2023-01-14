@@ -37,6 +37,7 @@
     <ClInclude Include="defines.h" />
     <ClInclude Include="device.h" />
     <ClInclude Include="editor_base.h" />
+    <ClInclude Include="editor_helper.h" />
     <ClInclude Include="edit_actions.h" />
     <ClInclude Include="Effector.h" />
     <ClInclude Include="EffectorPP.h" />
@@ -126,6 +127,8 @@
     <ClCompile Include="Device_mode.cpp" />
     <ClCompile Include="Device_overdraw.cpp" />
     <ClCompile Include="editor_base.cpp" />
+    <ClCompile Include="editor_base_input.cpp" />
+    <ClCompile Include="editor_helper.cpp" />
     <ClCompile Include="edit_actions.cpp" />
     <ClCompile Include="Effector.cpp" />
     <ClCompile Include="EffectorPP.cpp" />

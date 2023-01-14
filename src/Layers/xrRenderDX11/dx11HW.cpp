@@ -6,9 +6,6 @@
 #include "StateManager/dx11StateCache.h"
 #include "dx11TextureUtils.h"
 
-#include <imgui.h>
-#include "imgui_impl_dx11.h"
-
 CHW HW;
 
 CHW::CHW()
@@ -234,9 +231,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
-
-    if (ThisInstanceIsGlobal()) // only if we are global HW
-        ImGui_ImplDX11_Init(hwnd, pDevice, pContext);
 }
 
 void CHW::CreateSwapChain(HWND hwnd)
@@ -384,7 +378,6 @@ void CHW::DestroyDevice()
     //  Destroy state managers
     if (ThisInstanceIsGlobal()) // only if we are global HW
     {
-        ImGui_ImplDX11_Shutdown();
         StateManager.Reset();
         RSManager.ClearStateArray();
         DSSManager.ClearStateArray();
@@ -418,8 +411,6 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset()
 {
-    ImGui_ImplDX11_InvalidateDeviceObjects();
-
     DXGI_SWAP_CHAIN_DESC& cd = m_ChainDesc;
     const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
     cd.Windowed = bWindowed;
@@ -431,8 +422,6 @@ void CHW::Reset()
     CHK_DX(m_pSwapChain->ResizeTarget(&desc));
     CHK_DX(m_pSwapChain->ResizeBuffers(
         cd.BufferCount, desc.Width, desc.Height, desc.Format, cd.Flags));
-
-	ImGui_ImplDX11_CreateDeviceObjects();
 }
 
 bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const u32 feature) const

@@ -402,6 +402,9 @@
     <ClInclude Include="editor_base.h">
       <Filter>editor</Filter>
     </ClInclude>
+    <ClInclude Include="editor_helper.h">
+      <Filter>editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -642,6 +645,12 @@
       <Filter>Game API\Level Controller\KeyBindings</Filter>
     </ClCompile>
     <ClCompile Include="editor_base.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_helper.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_base_input.cpp">
       <Filter>editor</Filter>
     </ClCompile>
   </ItemGroup>
