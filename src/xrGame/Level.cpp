@@ -964,7 +964,6 @@ void CLevel::GetGameDateTime(u32& year, u32& month, u32& day, u32& hours, u32& m
     split_time(GetGameTime(), year, month, day, hours, mins, secs, milisecs);
 }
 
-
 float CLevel::GetEnvironmentTimeFactor() const
 {
     if (!game)

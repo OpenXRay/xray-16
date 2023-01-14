@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "imgui.h"
 #include "xrCore/xr_token.h"
 #include "xr_input.h"
 

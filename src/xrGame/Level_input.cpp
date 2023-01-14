@@ -23,6 +23,7 @@
 #include "xrEngine/xr_object.h"
 #include "saved_game_wrapper.h"
 #include "xrNetServer/NET_Messages.h"
+
 #include "Include/xrRender/DebugRender.h"
 
 #ifdef DEBUG
