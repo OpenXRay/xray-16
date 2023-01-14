@@ -690,9 +690,6 @@
     <ClInclude Include="ef_storage_inline.h" />
     <ClInclude Include="ElectricBall.h" />
     <ClInclude Include="EliteDetector.h" />
-    <ClInclude Include="embedded_editor\embedded_editor_helper.h" />
-    <ClInclude Include="embedded_editor\embedded_editor_main.h" />
-    <ClInclude Include="embedded_editor\embedded_editor_weather.h" />
     <ClInclude Include="encyclopedia_article.h" />
     <ClInclude Include="encyclopedia_article_defs.h" />
     <ClInclude Include="enemy_manager.h" />
@@ -2197,9 +2194,6 @@
     </ClCompile>
     <ClCompile Include="ElectricBall.cpp" />
     <ClCompile Include="EliteDetector.cpp" />
-    <ClCompile Include="embedded_editor\embedded_editor_helper.cpp" />
-    <ClCompile Include="embedded_editor\embedded_editor_main.cpp" />
-    <ClCompile Include="embedded_editor\embedded_editor_weather.cpp" />
     <ClCompile Include="encyclopedia_article.cpp" />
     <ClCompile Include="enemy_manager.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>

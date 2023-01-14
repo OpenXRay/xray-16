@@ -289,7 +289,11 @@ private:
     xray::editor::ide m_editor;
 
 public:
+    [[nodiscard]]
     auto& editor() { return m_editor; }
+
+    [[nodiscard]]
+    auto editor_mode() const { return m_editor.is_shown(); }
 };
 
 extern ENGINE_API CRenderDevice Device;

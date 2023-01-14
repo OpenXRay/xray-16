@@ -720,6 +720,16 @@ public:
     }
 };
 
+class CCC_Editor : public IConsole_Command
+{
+public:
+    CCC_Editor(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+    void Execute(pcstr args) override
+    {
+        Device.editor().IR_Capture();
+    }
+};
+
 ENGINE_API float g_fov = 67.5f;
 ENGINE_API float psHUD_FOV = 0.45f;
 
@@ -778,6 +788,8 @@ void CCC_Register()
     // Render device states
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 4);
     CMD4(CCC_Integer, "r__wallmarks_on_skeleton", &ps_r__WallmarksOnSkeleton, 0, 1);
+
+    CMD1(CCC_Editor, "rs_editor");
 
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
     CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);

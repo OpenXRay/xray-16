@@ -503,7 +503,7 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
     {
         if (!Paused())
         {
-            if (editor())
+            if (editor_mode())
                 bShowPauseString = false;
 #ifdef DEBUG
             else if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)

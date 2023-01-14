@@ -2251,9 +2251,6 @@
     <Filter Include="AI\AMonsters\common\monster states\Rest\Squad\Rest">
       <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="imgui_editor">
-      <UniqueIdentifier>{fc6d1e36-afae-4eea-8d69-9707370d947e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6507,15 +6504,6 @@
     <ClInclude Include="game_cl_mp_script.h">
       <Filter>Core\Server\Games\client\mp_script</Filter>
     </ClInclude>
-    <ClInclude Include="embedded_editor\embedded_editor_helper.h">
-      <Filter>imgui_editor</Filter>
-    </ClInclude>
-    <ClInclude Include="embedded_editor\embedded_editor_main.h">
-      <Filter>imgui_editor</Filter>
-    </ClInclude>
-    <ClInclude Include="embedded_editor\embedded_editor_weather.h">
-      <Filter>imgui_editor</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9889,15 +9877,6 @@
     </ClCompile>
     <ClCompile Include="CustomOutfit_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClCompile>
-    <ClCompile Include="embedded_editor\embedded_editor_helper.cpp">
-      <Filter>imgui_editor</Filter>
-    </ClCompile>
-    <ClCompile Include="embedded_editor\embedded_editor_main.cpp">
-      <Filter>imgui_editor</Filter>
-    </ClCompile>
-    <ClCompile Include="embedded_editor\embedded_editor_weather.cpp">
-      <Filter>imgui_editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
