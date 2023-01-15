@@ -62,9 +62,11 @@ void ide::OnDeviceResetEnd() const
 
 void ide::OnFrame()
 {
-    ImGuiIO& io = ImGui::GetIO();
+    const float frametime = m_timer.GetElapsed_sec();
+    m_timer.Start();
 
-    io.DeltaTime = Device.fTimeDelta;
+    ImGuiIO& io = ImGui::GetIO();
+    io.DeltaTime = frametime;
 
     // When shown, input being is updated
     // through IInputReceiver interface
