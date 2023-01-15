@@ -51,7 +51,7 @@ void CLevel::IR_OnMouseWheel(int x, int y)
     /* avo: script callback */
     if (g_actor)
     {
-        g_actor->callback(GameObject::eMouseWheel)(x);
+        g_actor->callback(GameObject::eMouseWheel)(y, x);
     }
 
     if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
