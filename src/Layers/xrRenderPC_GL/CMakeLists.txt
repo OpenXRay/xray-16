@@ -56,6 +56,8 @@ set(SRC_FILES
     "../xrRender/dxEnvironmentRender.h"
     "../xrRender/dxFontRender.cpp"
     "../xrRender/dxFontRender.h"
+    "../xrRender/dxImGuiRender.cpp"
+    "../xrRender/dxImGuiRender.h"
     "../xrRender/dxLensFlareRender.cpp"
     "../xrRender/dxLensFlareRender.h"
     "../xrRender/dxObjectSpaceRender.cpp"
@@ -410,6 +412,7 @@ target_link_libraries(${PROJECT_NAME}
     xrParticles
     xrScriptEngine
     xrLuabind
+    xrImGui
     OpenGL::GL
     GLEW::GLEW
 )
