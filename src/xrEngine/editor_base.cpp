@@ -70,6 +70,13 @@ void ide::OnFrame()
     // through IInputReceiver interface
     if (!is_shown())
         UpdateInputAsync();
+    else
+    {
+        if (io.WantTextInput)
+            SDL_StartTextInput();
+        else
+            SDL_StopTextInput();
+    }
 
     m_render->Frame();
     ImGui::NewFrame();
