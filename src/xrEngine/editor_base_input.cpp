@@ -60,6 +60,7 @@ void ide::IR_Capture()
 
 void ide::IR_Release()
 {
+    SDL_StopTextInput();
     m_shown = false;
     IInputReceiver::IR_Release();
     ImGuiIO& io = ImGui::GetIO();

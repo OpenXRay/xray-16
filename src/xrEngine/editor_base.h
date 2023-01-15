@@ -60,6 +60,9 @@ public:
     void IR_OnControllerAttitudeChange(Fvector change) final;
 
 private:
+    void ShowMain();
+
+private:
     CTimer m_timer;
     IImGuiRender* m_render{};
     ImGuiContext* m_context{};

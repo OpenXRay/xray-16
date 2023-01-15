@@ -86,6 +86,7 @@ void ide::OnFrame()
     {
         ImGui::ShowDemoWindow();
         ImGui::ShowMetricsWindow();
+        ShowMain();
     }
     ImGui::EndFrame();
 }
@@ -95,4 +96,21 @@ void ide::OnRender()
     ImGui::Render();
     m_render->Render(ImGui::GetDrawData());
 }
+
+void ide::ShowMain()
+{
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("Close"))
+            {
+                IR_Release();
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+}
+
 } // namespace xray::editor
