@@ -23,7 +23,7 @@ ide::ide()
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
     io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
-    io.BackendPlatformName = "imgui_impl_xray_ide";
+    io.BackendPlatformName = "imgui_impl_xray_engine";
 }
 
 ide::~ide()
