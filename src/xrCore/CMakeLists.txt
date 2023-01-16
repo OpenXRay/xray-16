@@ -163,7 +163,6 @@ set(KERNEL
     "xr_shortcut.h"
     "xrCore.cpp"
     "xrCore.h"
-    "xrCore_benchmark_macros.h"
 )
 
 set(KERNEL_COMMON

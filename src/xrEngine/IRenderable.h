@@ -45,7 +45,6 @@ public:
     virtual ~RenderableBase();
     virtual RenderData& GetRenderData() override final { return renderable; }
     virtual IRender_ObjectSpecific* renderable_ROS() override final;
-    BENCH_SEC_SCRAMBLEVTBL2
     virtual bool renderable_ShadowGenerate() override { return false; }
     virtual bool renderable_ShadowReceive() override { return false; }
     bool renderable_Invisible() override { return renderable.invisible; }

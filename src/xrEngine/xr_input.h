@@ -99,8 +99,6 @@ public:
     };
 
 private:
-    BENCH_SEC_SCRAMBLEMEMBER1
-
     std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
     std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
