@@ -22,54 +22,6 @@ ENGINE_API CStatTimer gTestTimer1;
 ENGINE_API CStatTimer gTestTimer2;
 ENGINE_API CStatTimer gTestTimer3;
 
-class optimizer
-{
-    float average_;
-    bool enabled_;
-
-public:
-    optimizer()
-    {
-        average_ = 30.f;
-        //  enabled_ = true;
-        //  disable ();
-        // because Engine is not exist
-        enabled_ = false;
-    }
-
-    bool enabled() { return enabled_; }
-    void enable()
-    {
-        if (!enabled_)
-        {
-            Engine.External.tune_resume();
-            enabled_ = true;
-        }
-    }
-    void disable()
-    {
-        if (enabled_)
-        {
-            Engine.External.tune_pause();
-            enabled_ = false;
-        }
-    }
-    void update(float value)
-    {
-        if (value < average_ * 0.7f)
-        {
-            // 25% deviation
-            enable();
-        }
-        else
-        {
-            disable();
-        };
-        average_ = 0.99f * average_ + 0.01f * value;
-    };
-};
-static optimizer vtune;
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -158,15 +110,7 @@ void CStats::Show()
     auto engineTotal = Device.GetStats().EngineTotal.result;
     PerformanceAlert alertInstance(font.GetHeight(), {300, 300});
     auto alertPtr = g_bDisableRedText ? nullptr : &alertInstance;
-    if (vtune.enabled())
-    {
-        float sz = font.GetHeight();
-        font.SetHeightI(0.02f);
-        font.SetColor(0xFFFF0000);
-        font.OutSet(Device.dwWidth / 2.0f + (font.SizeOf_("--= tune =--") / 2.0f), Device.dwHeight / 2.0f);
-        font.OutNext("--= tune =--");
-        font.SetHeight(sz);
-    }
+
     // Show them
     if (psDeviceFlags.test(rsStatistic))
     {
