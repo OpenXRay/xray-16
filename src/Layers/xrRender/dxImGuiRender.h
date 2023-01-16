@@ -2,7 +2,7 @@
 
 #include "Include/xrRender/ImGuiRender.h"
 
-class dxImGuiRender : public IImGuiRender
+class dxImGuiRender final : public IImGuiRender
 {
     void SetState(ImDrawData* data);
 

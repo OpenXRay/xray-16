@@ -6,7 +6,7 @@ struct ImDrawData;
 class XR_NOVTABLE IImGuiRender
 {
 public:
-    virtual ~IImGuiRender() = default;
+    virtual ~IImGuiRender() = 0;
     virtual void Copy(IImGuiRender& _in) = 0;
 
     virtual void Frame() = 0;
@@ -17,3 +17,5 @@ public:
     virtual void OnDeviceResetBegin() = 0;
     virtual void OnDeviceResetEnd() = 0;
 };
+
+inline IImGuiRender::~IImGuiRender() = default;
