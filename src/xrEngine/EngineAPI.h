@@ -65,12 +65,12 @@ class ENGINE_API CEngineAPI
     xr_vector<RendererDesc> renderers;
     xr_map<shared_str, RendererModule*> renderModes;
 
-    RendererModule* selectedRenderer;
+    RendererModule* selectedRenderer{};
 
     XRay::Module hGame;
 
-    InitializeGameLibraryProc pInitializeGame;
-    FinalizeGameLibraryProc pFinalizeGame;
+    InitializeGameLibraryProc pInitializeGame{};
+    FinalizeGameLibraryProc pFinalizeGame{};
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
