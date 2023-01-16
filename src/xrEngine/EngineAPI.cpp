@@ -35,18 +35,17 @@ static bool r2_available = false;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-namespace
-{
-IFactoryObject* __cdecl dummy(CLASS_ID) { return nullptr; }
-template<typename T>
-void __cdecl dummy(T* p) { R_ASSERT2(p == nullptr, "Attempting to release an object that shouldn't be allocated"); }
-};
-
 CEngineAPI::CEngineAPI()
 {
-    hGame = nullptr;
-    pCreate = dummy;
-    pDestroy = dummy;
+    pCreate = [](CLASS_ID) -> IFactoryObject*
+    {
+        return nullptr;
+    };
+
+    pDestroy = [](IFactoryObject* p)
+    {
+        R_ASSERT2(p == nullptr, "Attempting to release an object that shouldn't be allocated");
+    };
 }
 
 CEngineAPI::~CEngineAPI()
