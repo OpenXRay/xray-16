@@ -121,21 +121,31 @@ _DDS:
         glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
         glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
 
-        if (gli::gl::EXTERNAL_RED != format.External) // skip for properly greyscale-alpfa fonts textures
+        if (gli::gl::EXTERNAL_RED != format.External) // skip for proper greyscale-alpha font textures
             glTexParameteriv(target, GL_TEXTURE_SWIZZLE_RGBA, &format.Swizzles[gli::SWIZZLE_RED]);
 
         glm::tvec3<GLsizei> const tex_extent(texture.extent());
 
+        GLenum err;
         switch (texture.target())
         {
         case gli::TARGET_2D:
         case gli::TARGET_CUBE:
             CHK_GL(glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal,
                            tex_extent.x, tex_extent.y));
+            if ((err = glGetError()) != GL_NO_ERROR)
+            {
+                Msg("Error: 0x%x: Invalid 2D texture: '%s'", err, fname);
+            }
             break;
         case gli::TARGET_3D:
+        case gli::TARGET_CUBE_ARRAY:
             CHK_GL(glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
                            tex_extent.x, tex_extent.y, tex_extent.z));
+            if ((err = glGetError()) != GL_NO_ERROR)
+            {
+                Msg("Error: 0x%x: Invalid 3D texture: '%s'", err, fname);
+            }
             break;
         default:
             NODEFAULT;
@@ -164,6 +174,10 @@ _DDS:
                                         0, 0, tex_level_extent.x, tex_level_extent.y,
                                         format.Internal, static_cast<GLsizei>(texture.size(level)),
                                         texture.data(layer, face, level)));
+                            if ((err = glGetError()) != GL_NO_ERROR)
+                            {
+                                Msg("Error: 0x%x: Invalid 2D compressed subtexture: '%s'", err, fname);
+                            }
                         }
                         else
                         {
@@ -171,10 +185,16 @@ _DDS:
                                         0, 0, tex_level_extent.x, tex_level_extent.y,
                                         format.External, format.Type,
                                         texture.data(layer, face, level)));
+                            if ((err = glGetError()) != GL_NO_ERROR)
+                            {
+                                Msg("Error: 0x%x: Invalid 2D subtexture: '%s'", err, fname);
+                            }
+
                         }
                         break;
                     }
                     case gli::TARGET_3D:
+                    case gli::TARGET_CUBE_ARRAY:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
@@ -182,6 +202,10 @@ _DDS:
                                         0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
                                         format.Internal, static_cast<GLsizei>(texture.size(level)),
                                         texture.data(layer, face, level)));
+                            if ((err = glGetError()) != GL_NO_ERROR)
+                            {
+                                Msg("Error: 0x%x: Invalid compressed 3D subtexture: '%s'", err, fname);
+                            }
                         }
                         else
                         {
@@ -189,6 +213,10 @@ _DDS:
                                         0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
                                         format.External, format.Type,
                                         texture.data(layer, face, level)));
+                            if ((err = glGetError()) != GL_NO_ERROR)
+                            {
+                                Msg("Error: 0x%x: Invalid 3D subtexture: '%s'", err, fname);
+                            }
                         }
                         break;
                     }
