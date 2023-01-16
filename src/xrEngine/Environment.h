@@ -6,7 +6,6 @@
 #include "Include/xrRender/EnvironmentRender.h"
 #include "xrCore/_vector3d.h"
 #include "xrCore/_quaternion.h"
-#include "xrCore/xrCore_benchmark_macros.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
 #include "xrSound/Sound.h"
@@ -134,8 +133,6 @@ public:
     shared_str sky_texture_env_name;
     shared_str clouds_texture_name;
 
-    BENCH_SEC_SCRAMBLEMEMBER1
-
     FactoryPtr<IEnvDescriptorRender> m_pDescriptor;
 
     Fvector4 clouds_color;
@@ -259,8 +256,8 @@ public:
     float wind_blast_strength_start_value;
     float wind_blast_strength_stop_value;
     Fquaternion wind_blast_current;
+
     // Environments
-    BENCH_SEC_SCRAMBLEMEMBER2
     CEnvDescriptorMixer* CurrentEnv;
     CEnvDescriptor* Current[2];
 

@@ -8,7 +8,6 @@
 #include "xrEngine/Engine.h"
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/clsid.h"
-#include "xrCore/xrCore_benchmark_macros.h"
 
 #include <memory>
 
@@ -73,8 +72,6 @@ class ENGINE_API CEngineAPI
     FinalizeGameLibraryProc pFinalizeGame{};
 
 public:
-    BENCH_SEC_SCRAMBLEMEMBER1
-
     Factory_Create*  pCreate;
     Factory_Destroy* pDestroy;
 
