@@ -1902,12 +1902,12 @@ public:
             return;
         if (!g_pGamePersistent)
             return;
-        if (!Device.editor())
+        if (!Device.editor_mode())
             g_pGamePersistent->Environment().SetWeather(args, true);
     }
     void fill_tips(vecTips& tips, u32 mode) override
     {
-        if (!g_pGamePersistent || Device.editor())
+        if (!g_pGamePersistent || Device.editor_mode())
             return;
         for (auto& [name, cycle] : g_pGamePersistent->Environment().WeatherCycles)
         {

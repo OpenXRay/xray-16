@@ -123,6 +123,8 @@ void CInput::MouseUpdate()
     bool mouseMoved = false;
     int offs[COUNT_MOUSE_AXIS]{};
     const auto mousePrev = mouseState;
+    mouseAxisState[2] = 0;
+    mouseAxisState[3] = 0;
 
     SDL_Event events[MAX_MOUSE_EVENTS];
     SDL_PumpEvents();
@@ -142,6 +144,8 @@ void CInput::MouseUpdate()
             mouseMoved = true;
             offs[0] += event.motion.xrel;
             offs[1] += event.motion.yrel;
+            mouseAxisState[0] = event.motion.x;
+            mouseAxisState[1] = event.motion.y;
             break;
 
         case SDL_MOUSEBUTTONDOWN:
@@ -158,6 +162,8 @@ void CInput::MouseUpdate()
             mouseMoved = true;
             offs[2] += event.wheel.x;
             offs[3] += event.wheel.y;
+            mouseAxisState[2] += event.wheel.x;
+            mouseAxisState[3] += event.wheel.y;
             break;
         }
     }
@@ -477,6 +483,11 @@ bool CInput::iGetAsyncBtnState(const int btn)
 bool CInput::iGetAsyncGpadBtnState(const int btn)
 {
     return controllerState[btn];
+}
+
+void CInput::iGetAsyncScrollPos(Ivector2& p) const
+{
+    p = { mouseAxisState[2], mouseAxisState[3] };
 }
 
 void CInput::iGetAsyncMousePos(Ivector2& p) const

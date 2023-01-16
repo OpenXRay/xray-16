@@ -25,7 +25,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -46,6 +46,7 @@
     <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h" />
     <ClInclude Include="..\..\Include\xrRender\FactoryPtr.h" />
     <ClInclude Include="..\..\Include\xrRender\FontRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h" />
     <ClInclude Include="..\..\Include\xrRender\Kinematics.h" />
     <ClInclude Include="..\..\Include\xrRender\KinematicsAnimated.h" />
     <ClInclude Include="..\..\Include\xrRender\LensFlareRender.h" />
@@ -116,6 +117,7 @@
     <ClInclude Include="..\xrRender\dxDebugRender.h" />
     <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
     <ClInclude Include="..\xrRender\dxFontRender.h" />
+    <ClInclude Include="..\xrRender\dxImGuiRender.h" />
     <ClInclude Include="..\xrRender\dxLensFlareRender.h" />
     <ClInclude Include="..\xrRender\dxObjectSpaceRender.h" />
     <ClInclude Include="..\xrRender\dxParticleCustom.h" />
@@ -284,6 +286,7 @@
     <ClCompile Include="..\xrRender\dxDebugRender.cpp" />
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
     <ClCompile Include="..\xrRender\dxFontRender.cpp" />
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
     <ClCompile Include="..\xrRender\dxLensFlareRender.cpp" />
     <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp" />
     <ClCompile Include="..\xrRender\dxParticleCustom.cpp" />
@@ -455,6 +458,9 @@
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)oalib.vcxproj">
       <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

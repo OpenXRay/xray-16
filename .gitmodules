@@ -40,3 +40,6 @@
 [submodule "Externals/sse2neon"]
 	path = Externals/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git
+[submodule "Externals/imgui"]
+	path = Externals/imgui
+	url = https://github.com/ocornut/imgui.git
