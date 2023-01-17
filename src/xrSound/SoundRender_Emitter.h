@@ -109,6 +109,9 @@ public:
 
     u32 play_time() override;
 
+    bool bIsIgnoreTimeFactor;
+    void start_ignore_time_factor() override { bIsIgnoreTimeFactor = true; };
+
     CSoundRender_Emitter();
     ~CSoundRender_Emitter();
 };

@@ -190,7 +190,12 @@ void CSoundRender_TargetA::fill_parameters()
     VERIFY2(m_pEmitter, SE->source()->file_name());
     float _pitch = m_pEmitter->p_source.freq;
     clamp(_pitch, EPS_L, 2.f);
-    if (!fsimilar(cache_pitch, _pitch * psSoundTimeFactor))
+    if (m_pEmitter->bIsIgnoreTimeFactor)
+    {
+        cache_pitch = 1.f;
+        A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
+    }
+    else if (!fsimilar(cache_pitch, _pitch * psSoundTimeFactor))
     {
         cache_pitch = _pitch * psSoundTimeFactor;
 

@@ -317,6 +317,9 @@ void CSoundRender_Core::play(ref_sound& S, IGameObject* O, u32 flags, float dela
 
     if (flags & sm_2D || S._handle()->channels_num() == 2)
         S._feedback()->switch_to_2D();
+
+    if (flags & sm_IgnoreTimeFactor)
+        S._feedback()->start_ignore_time_factor();
 }
 
 void CSoundRender_Core::play_no_feedback(
@@ -364,6 +367,9 @@ void CSoundRender_Core::play_at_pos(ref_sound& S, IGameObject* O, const Fvector&
 
     if (flags & sm_2D || S._handle()->channels_num() == 2)
         S._feedback()->switch_to_2D();
+
+    if (flags & sm_IgnoreTimeFactor)
+        S._feedback()->start_ignore_time_factor();
 }
 
 void CSoundRender_Core::destroy(ref_sound& S)
