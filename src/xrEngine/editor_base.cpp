@@ -23,7 +23,7 @@ ide::ide()
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
     io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
-    io.BackendPlatformName = "imgui_impl_xray_engine";
+    io.BackendPlatformName = "imgui_impl_xray";
 }
 
 ide::~ide()
@@ -62,12 +62,25 @@ void ide::OnDeviceResetEnd() const
 
 void ide::OnAppStart()
 {
+    ImGuiIO& io = ImGui::GetIO();
+
+    string_path fName;
+    FS.update_path(fName, "$app_data_root$", io.IniFilename);
+    io.IniFilename = xr_strdup(fName);
+
+    FS.update_path(fName, "$logs$", io.LogFilename);
+    io.LogFilename = xr_strdup(fName);
+
     Device.seqFrame.Add(this, -5);
     Device.seqRender.Add(this, -5);
 }
 
 void ide::OnAppEnd()
 {
+    ImGuiIO& io = ImGui::GetIO();
+    xr_free(io.IniFilename);
+    xr_free(io.LogFilename);
+
     Device.seqFrame.Remove(this);
     Device.seqRender.Remove(this);
 }
