@@ -62,10 +62,23 @@ public:
     CObjectSpace();
     ~CObjectSpace();
 
-    void Load(CDB::build_callback build_callback);
-    void Load(LPCSTR path, LPCSTR fname, CDB::build_callback build_callback);
-    void Load(IReader* R, CDB::build_callback build_callback);
-    void Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB::build_callback build_callback);
+    void Load  (CDB::build_callback build_callback,
+                CDB::serialize_callback serialize_callback,
+                CDB::deserialize_callback deserialize_callback);
+
+    void Load  (LPCSTR path, LPCSTR fname, CDB::build_callback build_callback,
+                CDB::serialize_callback serialize_callback,
+                CDB::deserialize_callback deserialize_callback);
+
+    void Load  (IReader* R, CDB::build_callback build_callback,
+                CDB::serialize_callback serialize_callback,
+                CDB::deserialize_callback deserialize_callback);
+
+    void Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
+                CDB::build_callback build_callback,
+                CDB::serialize_callback serialize_callback,
+                CDB::deserialize_callback deserialize_callback);
+
     // Occluded/No
     bool RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
         collide::ray_cache* cache, IGameObject* ignore_object);
