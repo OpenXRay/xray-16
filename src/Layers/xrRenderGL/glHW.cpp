@@ -187,8 +187,10 @@ void CHW::Reset()
     UpdateVSync();
 }
 
-void CHW::SetPrimaryAttributes()
+void CHW::SetPrimaryAttributes(u32& windowFlags)
 {
+    windowFlags |= SDL_WINDOW_OPENGL;
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);

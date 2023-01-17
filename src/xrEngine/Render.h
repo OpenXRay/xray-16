@@ -409,10 +409,10 @@ public:
     virtual void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) = 0;
 
     //	Init
+    virtual void ObtainRequiredWindowFlags(u32& windowFlags) = 0;
     virtual void SetupStates() = 0;
     virtual void OnDeviceCreate(pcstr shName) = 0;
     virtual void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) = 0;
-    virtual void SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) = 0;
 
     //	Overdraw
     virtual void overdrawBegin() = 0;
@@ -442,7 +442,6 @@ public:
     virtual void SetCacheXform(Fmatrix& mView, Fmatrix& mProject) = 0;
     virtual void OnAssetsChanged() = 0;
 
-    virtual void ObtainRequiredWindowFlags(u32& windowFlags) = 0;
     virtual RenderContext GetCurrentContext() const = 0;
     virtual void MakeContextCurrent(RenderContext context) = 0;
 };
