@@ -24,6 +24,8 @@ public:
 
     void Reset();
 
+    void SetPrimaryAttributes(u32& windowFlags);
+
     BOOL support(D3DFORMAT fmt, u32 type, u32 usage) const;
     static bool GivenGPUIsIntelGMA(u32 id_vendor, u32 id_device);
 

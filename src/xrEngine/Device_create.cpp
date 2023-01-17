@@ -35,10 +35,6 @@ void CRenderDevice::CreateInternal()
         return; // prevent double call
 
     Statistic = xr_new<CStats>();
-    bool gpuSW = !!strstr(Core.Params, "-gpu_sw");
-    bool gpuNonPure = !!strstr(Core.Params, "-gpu_nopure");
-    bool gpuRef = !!strstr(Core.Params, "-gpu_ref");
-    GEnv.Render->SetupGPU(gpuSW, gpuNonPure, gpuRef);
     Log("Starting RENDER device...");
 #ifdef _EDITOR
     psDeviceMode.Width = dwWidth;

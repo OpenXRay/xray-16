@@ -406,7 +406,6 @@ public:
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
 
 #ifdef USE_OGL
-    void ObtainRequiredWindowFlags(u32& windowFlags) override;
     RenderContext GetCurrentContext() const override;
     void MakeContextCurrent(RenderContext context) override;
 #endif
