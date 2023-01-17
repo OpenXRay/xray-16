@@ -5,19 +5,21 @@
 
 #include "xr_input.h"
 
-void IInputReceiver::IR_Capture(void)
+void IInputReceiver::IR_Capture()
 {
     VERIFY(pInput);
     pInput->iCapture(this);
 }
 
-void IInputReceiver::IR_Release(void)
+void IInputReceiver::IR_Release()
 {
     VERIFY(pInput);
     pInput->iRelease(this);
 }
 
-void IInputReceiver::IR_OnDeactivate(void)
+void IInputReceiver::IR_OnActivate() {}
+
+void IInputReceiver::IR_OnDeactivate()
 {
     int i;
     for (i = 0; i < CInput::COUNT_KB_BUTTONS; i++)
@@ -37,8 +39,7 @@ void IInputReceiver::IR_OnDeactivate(void)
             IR_OnControllerRelease(i, 0.0f, 0.0f);
 }
 
-void IInputReceiver::IR_OnActivate(void) {}
-bool IInputReceiver::IR_GetKeyState(int dik)
+bool IInputReceiver::IR_GetKeyState(int dik) const
 {
     VERIFY(pInput);
     return pInput->iGetAsyncKeyState(dik);
