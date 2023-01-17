@@ -3,8 +3,6 @@
 #include "editor_base.h"
 #include "editor_helper.h"
 
-#include <imgui.h>
-
 namespace xray::editor
 {
 void ide::UpdateInputAsync()

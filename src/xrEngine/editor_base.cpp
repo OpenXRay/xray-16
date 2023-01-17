@@ -2,8 +2,6 @@
 
 #include "editor_base.h"
 
-#include <imgui.h>
-
 namespace xray::editor
 {
 ide::ide()
