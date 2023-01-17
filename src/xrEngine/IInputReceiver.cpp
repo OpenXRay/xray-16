@@ -27,6 +27,14 @@ void IInputReceiver::IR_OnDeactivate(void)
     for (i = MOUSE_INVALID + 1; i < MOUSE_MAX; i++)
         if (IR_GetKeyState(i))
             IR_OnMouseRelease(i);
+
+    for (i = XR_CONTROLLER_BUTTON_INVALID + 1; i < XR_CONTROLLER_BUTTON_MAX; i++)
+        if (IR_GetKeyState(i))
+            IR_OnControllerRelease(i, 0.0f, 0.0f);
+
+    for (i = XR_CONTROLLER_AXIS_INVALID + 1; i < XR_CONTROLLER_AXIS_MAX; i++)
+        if (IR_GetKeyState(i))
+            IR_OnControllerRelease(i, 0.0f, 0.0f);
 }
 
 void IInputReceiver::IR_OnActivate(void) {}

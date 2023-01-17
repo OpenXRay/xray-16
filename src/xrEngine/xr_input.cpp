@@ -478,6 +478,21 @@ bool CInput::iGetAsyncKeyState(const int key)
         return controllerState[idx];
     }
 
+    if (key > XR_CONTROLLER_AXIS_INVALID && key < XR_CONTROLLER_AXIS_MAX)
+    {
+        switch (static_cast<EControllerAxis>(key))
+        {
+        case XR_CONTROLLER_AXIS_LEFT:
+            return controllerAxisState[SDL_CONTROLLER_AXIS_LEFTX] || controllerAxisState[SDL_CONTROLLER_AXIS_LEFTY];
+        case XR_CONTROLLER_AXIS_RIGHT:
+            return controllerAxisState[SDL_CONTROLLER_AXIS_RIGHTX] || controllerAxisState[SDL_CONTROLLER_AXIS_RIGHTY];
+        case XR_CONTROLLER_AXIS_TRIGGER_LEFT:
+            return controllerAxisState[SDL_CONTROLLER_AXIS_TRIGGERLEFT];
+        case XR_CONTROLLER_AXIS_TRIGGER_RIGHT:
+            return controllerAxisState[SDL_CONTROLLER_AXIS_TRIGGERRIGHT];
+        }
+    }
+
     // unknown key ???
     return false;
 }
