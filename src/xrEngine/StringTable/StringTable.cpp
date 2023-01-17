@@ -230,7 +230,7 @@ STRING_VALUE CStringTable::translate(const STRING_ID& str_id) const
     return str_id;
 }
 
-bool CStringTable::translate(const STRING_ID& str_id, shared_str& out) const
+bool CStringTable::translate(const STRING_ID& str_id, STRING_VALUE& out) const
 {
     if (!pData)
         return false;
@@ -241,4 +241,13 @@ bool CStringTable::translate(const STRING_ID& str_id, shared_str& out) const
         return true;
     }
     return false;
+}
+
+pcstr CStringTable::translate(const STRING_ID& str_id, pcstr default_value) const
+{
+    STRING_VALUE out;
+    if (translate(str_id, out))
+        return out.c_str();
+
+    return default_value;
 }
