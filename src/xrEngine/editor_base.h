@@ -5,7 +5,7 @@
 
 #define IMGUI_DISABLE_OBSOLETE_KEYIO
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-struct ImGuiContext;
+#include <imgui.h>
 
 namespace xray::editor
 {
