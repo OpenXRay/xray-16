@@ -128,6 +128,9 @@ void ide::ShowMain()
     {
         if (ImGui::BeginMenu("File"))
         {
+            if (ImGui::MenuItem("Stats", nullptr, psDeviceFlags.test(rsStatistic)))
+                psDeviceFlags.set(rsStatistic, !psDeviceFlags.test(rsStatistic));
+
             if (ImGui::MenuItem("Close"))
             {
                 IR_Release();
