@@ -9,11 +9,13 @@ struct ImGuiContext;
 
 namespace xray::editor
 {
-class ENGINE_API ide :
+class ENGINE_API ide final :
     public pureRender,
     public pureFrame,
     public pureAppActivate,
     public pureAppDeactivate,
+    public pureAppStart,
+    public pureAppEnd,
     public IInputReceiver
 {
 public:
@@ -38,6 +40,9 @@ public:
 
     void OnAppActivate() final;
     void OnAppDeactivate() final;
+
+    void OnAppStart() final;
+    void OnAppEnd() final;
 
     void IR_Capture() final;
     void IR_Release() final;

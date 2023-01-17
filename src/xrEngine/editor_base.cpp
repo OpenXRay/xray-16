@@ -60,6 +60,18 @@ void ide::OnDeviceResetEnd() const
     m_render->OnDeviceResetEnd();
 }
 
+void ide::OnAppStart()
+{
+    Device.seqFrame.Add(this, -5);
+    Device.seqRender.Add(this, -5);
+}
+
+void ide::OnAppEnd()
+{
+    Device.seqFrame.Remove(this);
+    Device.seqRender.Remove(this);
+}
+
 void ide::OnFrame()
 {
     const float frametime = m_timer.GetElapsed_sec();
@@ -112,5 +124,4 @@ void ide::ShowMain()
         ImGui::EndMainMenuBar();
     }
 }
-
 } // namespace xray::editor
