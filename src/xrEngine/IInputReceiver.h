@@ -20,7 +20,6 @@ public:
     virtual ~IInputReceiver() = default;
 
     bool IR_GetKeyState(int dik);
-    bool IR_GetBtnState(int btn);
 
     virtual void IR_Capture();
     virtual void IR_Release();

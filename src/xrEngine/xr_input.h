@@ -135,9 +135,7 @@ public:
     void iCapture(IInputReceiver* pc);
     void iRelease(IInputReceiver* pc);
 
-    bool iGetAsyncKeyState(const int dik);
-    bool iGetAsyncBtnState(const int btn);
-    bool iGetAsyncGpadBtnState(const int btn);
+    bool iGetAsyncKeyState(const int key);
 
     void iGetAsyncScrollPos(Ivector2& p) const;
     void iGetAsyncMousePos(Ivector2& p) const;

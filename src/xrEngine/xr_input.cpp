@@ -118,7 +118,10 @@ void CInput::MouseUpdate()
 {
     // Mouse2 is a middle button in SDL,
     // but in X-Ray this is a right button
-    constexpr int MouseButtonToKey[] = { MOUSE_1, MOUSE_3, MOUSE_2, MOUSE_4, MOUSE_5 };
+    constexpr int RemapIdx[] = { 0, 2, 1, 3, 4 };
+    constexpr int IdxToKey[] = { MOUSE_1, MOUSE_2, MOUSE_3, MOUSE_4, MOUSE_5 };
+    static_assert(std::size(RemapIdx) == COUNT_MOUSE_BUTTONS);
+    static_assert(std::size(IdxToKey) == COUNT_MOUSE_BUTTONS);
 
     bool mouseMoved = false;
     int offs[COUNT_MOUSE_AXIS]{};
@@ -149,15 +152,19 @@ void CInput::MouseUpdate()
             break;
 
         case SDL_MOUSEBUTTONDOWN:
-            mouseState[event.button.button - 1] = true;
-            cbStack.back()->IR_OnMousePress(MouseButtonToKey[event.button.button - 1]);
+        {
+            const auto idx = RemapIdx[event.button.button - 1];
+            mouseState[idx] = true;
+            cbStack.back()->IR_OnMousePress(IdxToKey[idx]);
             break;
-
+        }
         case SDL_MOUSEBUTTONUP:
-            mouseState[event.button.button - 1] = false;
-            cbStack.back()->IR_OnMouseRelease(MouseButtonToKey[event.button.button - 1]);
+        {
+            const auto idx = RemapIdx[event.button.button - 1];
+            mouseState[idx] = false;
+            cbStack.back()->IR_OnMouseRelease(IdxToKey[idx]);
             break;
-
+        }
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
             offs[2] += event.wheel.x;
@@ -171,7 +178,7 @@ void CInput::MouseUpdate()
     for (int i = 0; i < MOUSE_COUNT; ++i)
     {
         if (mouseState[i] && mousePrev[i])
-            cbStack.back()->IR_OnMouseHold(MouseButtonToKey[i]);
+            cbStack.back()->IR_OnMouseHold(IdxToKey[i]);
     }
 
     if (mouseMoved)
@@ -454,35 +461,25 @@ bool CInput::GetKeyName(const int dik, pstr dest_str, int dest_sz)
     return result;
 }
 
-bool CInput::iGetAsyncKeyState(const int dik)
+bool CInput::iGetAsyncKeyState(const int key)
 {
-    if (dik < COUNT_KB_BUTTONS)
-        return keyboardState[dik];
+    if (key < COUNT_KB_BUTTONS)
+        return keyboardState[key];
 
-    if (dik > MOUSE_INVALID && dik < MOUSE_MAX)
+    if (key > MOUSE_INVALID && key < MOUSE_MAX)
     {
-        const int mk = dik - (MOUSE_INVALID + 1);
-        return iGetAsyncBtnState(mk);
+        const int idx = key - (MOUSE_INVALID + 1);
+        return mouseState[idx];
     }
 
-    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    if (key > XR_CONTROLLER_BUTTON_INVALID && key < XR_CONTROLLER_BUTTON_MAX)
     {
-        const int mk = dik - (XR_CONTROLLER_BUTTON_INVALID + 1);
-        return iGetAsyncGpadBtnState(mk);
+        const int idx = key - (XR_CONTROLLER_BUTTON_INVALID + 1);
+        return controllerState[idx];
     }
 
     // unknown key ???
     return false;
-}
-
-bool CInput::iGetAsyncBtnState(const int btn)
-{
-    return mouseState[btn];
-}
-
-bool CInput::iGetAsyncGpadBtnState(const int btn)
-{
-    return controllerState[btn];
 }
 
 void CInput::iGetAsyncScrollPos(Ivector2& p) const
