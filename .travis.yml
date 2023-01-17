@@ -11,7 +11,7 @@ virt: lxd
 group: edge
 
 arch:
-  - arm64-graviton2
+  - arm64
   # XXX: ppc64le and s390x are not supported by LuaJIT
   #- ppc64le
   #- s390x
@@ -37,10 +37,9 @@ before_script:
       export core_count=$(nproc || echo 4) && echo core_count = $core_count;
     fi
   - git submodule deinit Externals/cryptopp
-  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$CONFIGURATION -DCMAKE_BUILD_PARALLEL_LEVEL=$core_count
+  - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$CONFIGURATION
 
 script:
-- cmake --build build
 - if [ $TRAVIS_OS_NAME == linux ]; then
       cd build;
       make -j $core_count package;
