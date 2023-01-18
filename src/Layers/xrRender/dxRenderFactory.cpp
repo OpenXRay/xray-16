@@ -4,6 +4,7 @@
 #include "dxStatGraphRender.h"
 #ifndef _EDITOR
 #include "dxLensFlareRender.h"
+#include "dxImGuiRender.h"
 #endif
 #include "dxConsoleRender.h"
 #ifndef _EDITOR
@@ -44,6 +45,7 @@ RENDER_FACTORY_IMPLEMENT(ThunderboltRender)
 RENDER_FACTORY_IMPLEMENT(ThunderboltDescRender)
 RENDER_FACTORY_IMPLEMENT(RainRender)
 RENDER_FACTORY_IMPLEMENT(LensFlareRender)
+RENDER_FACTORY_IMPLEMENT(ImGuiRender)
 RENDER_FACTORY_IMPLEMENT(EnvironmentRender)
 RENDER_FACTORY_IMPLEMENT(EnvDescriptorMixerRender)
 RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)

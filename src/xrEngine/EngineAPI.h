@@ -8,7 +8,6 @@
 #include "xrEngine/Engine.h"
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/clsid.h"
-#include "xrCore/xrCore_benchmark_macros.h"
 
 #include <memory>
 
@@ -38,13 +37,7 @@ public:
 extern "C" {
 using Factory_Create = IFactoryObject* __cdecl(CLASS_ID CLS_ID);
 using Factory_Destroy = void __cdecl(IFactoryObject* O);
-};
-
-// Tuning interface
-extern "C" {
-using VTPause = void __cdecl();
-using VTResume = void __cdecl();
-};
+}
 
 class XR_NOVTABLE RendererModule
 {
@@ -71,23 +64,16 @@ class ENGINE_API CEngineAPI
     xr_vector<RendererDesc> renderers;
     xr_map<shared_str, RendererModule*> renderModes;
 
-    RendererModule* selectedRenderer;
+    RendererModule* selectedRenderer{};
 
     XRay::Module hGame;
-    XRay::Module hTuner;
 
-    InitializeGameLibraryProc pInitializeGame;
-    FinalizeGameLibraryProc pFinalizeGame;
+    InitializeGameLibraryProc pInitializeGame{};
+    FinalizeGameLibraryProc pFinalizeGame{};
 
 public:
-    BENCH_SEC_SCRAMBLEMEMBER1
-
     Factory_Create*  pCreate;
     Factory_Destroy* pDestroy;
-
-    bool      tune_enabled;
-    VTPause*  tune_pause;
-    VTResume* tune_resume;
 
     void Initialize();
 

@@ -10,6 +10,7 @@ void CRenderDevice::Destroy()
     Log("Destroying Render...");
     b_is_Ready = false;
     Statistic->OnDeviceDestroy();
+    m_editor.OnDeviceDestroy();
     GEnv.Render->OnDeviceDestroy(false);
     Memory.mem_compact();
     GEnv.Render->Destroy();
@@ -35,8 +36,10 @@ void CRenderDevice::Reset(bool precache /*= true*/)
 
     const auto tm_start = TimerAsync();
 
+    m_editor.OnDeviceResetBegin();
     UpdateWindowProps();
     GEnv.Render->Reset(m_sdlWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
+    m_editor.OnDeviceResetEnd();
 
     // Update window props again for DX9 renderer
     if (GEnv.Render->GetBackendAPI() == IRender::BackendAPI::D3D9) // XXX: I don't remember why this hack is needed, thus, I'm not sure if it is needed at all

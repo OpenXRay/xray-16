@@ -117,12 +117,12 @@ void CHOM::Load()
     m_pModel = xr_new<CDB::MODEL>();
     m_pModel->set_version(fs->get_age());
     const bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
-    const bool skipCrc32Check = strstr(Core.Params, "-skip_cdb_cache_crc32_check");
+    const bool checkCrc32 = !strstr(Core.Params, "-skip_cdb_cache_crc32_check");
 
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
     FS.update_path(fName, "$app_data_root$", fName);
 
-    if (bUseCache && FS.exist(fName) && m_pModel->deserialize(fName, skipCrc32Check))
+    if (bUseCache && FS.exist(fName) && m_pModel->deserialize(fName, checkCrc32))
     {
 #ifndef MASTER_GOLD
         Msg("* Loaded HOM cache (%s)...", fName);

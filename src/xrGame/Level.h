@@ -291,6 +291,8 @@ public:
     void net_Update() override;
     bool Load_GameSpecific_Before() override;
     bool Load_GameSpecific_After() override;
+    void Load_GameSpecific_CFORM_Serialize(IWriter& writer) override;
+    bool Load_GameSpecific_CFORM_Deserialize(IReader& reader) override;
     void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count) override;
 
     // Events
