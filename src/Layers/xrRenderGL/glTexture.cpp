@@ -126,23 +126,25 @@ _DDS:
 
         glm::tvec3<GLsizei> const tex_extent(texture.extent());
 
-        GLenum err;
+        const auto err;
         switch (texture.target())
         {
         case gli::TARGET_2D:
         case gli::TARGET_CUBE:
-            CHK_GL(glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal,
-                           tex_extent.x, tex_extent.y));
-            if ((err = glGetError()) != GL_NO_ERROR)
+            glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal,
+                           tex_extent.x, tex_extent.y);
+            err = glGetError();
+            if (err != GL_NO_ERROR)
             {
-                Msg("Error: 0x%x: Invalid 2D texture: '%s'", err, fname);
+                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                Msg("! OpenGL: 0x%x: Invalid 2D texture: '%s'", err, fname);
             }
             break;
         case gli::TARGET_3D:
         case gli::TARGET_CUBE_ARRAY:
             glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
                            tex_extent.x, tex_extent.y, tex_extent.z);
-            const auto err = glGetError();
+            err = glGetError();
             if (err != GL_NO_ERROR)
             {
                 VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
@@ -172,24 +174,28 @@ _DDS:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
-                            CHK_GL(glCompressedTexSubImage2D(sub_target, static_cast<GLint>(level),
+                            glCompressedTexSubImage2D(sub_target, static_cast<GLint>(level),
                                         0, 0, tex_level_extent.x, tex_level_extent.y,
                                         format.Internal, static_cast<GLsizei>(texture.size(level)),
-                                        texture.data(layer, face, level)));
-                            if ((err = glGetError()) != GL_NO_ERROR)
+                                        texture.data(layer, face, level));
+                            err = glGetError();
+                            if (err != GL_NO_ERROR)
                             {
-                                Msg("Error: 0x%x: Invalid 2D compressed subtexture: '%s'", err, fname);
+                                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                                Msg("! OpenGL: 0x%x: Invalid 2D compressed subtexture: '%s'", err, fname);
                             }
                         }
                         else
                         {
-                            CHK_GL(glTexSubImage2D(sub_target, static_cast<GLint>(level),
+                            glTexSubImage2D(sub_target, static_cast<GLint>(level),
                                         0, 0, tex_level_extent.x, tex_level_extent.y,
                                         format.External, format.Type,
-                                        texture.data(layer, face, level)));
-                            if ((err = glGetError()) != GL_NO_ERROR)
+                                        texture.data(layer, face, level));
+                            err = glGetError();
+                            if (err != GL_NO_ERROR)
                             {
-                                Msg("Error: 0x%x: Invalid 2D subtexture: '%s'", err, fname);
+                                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                                Msg("! OpenGL: 0x%x: Invalid 2D subtexture: '%s'", err, fname);
                             }
 
                         }
@@ -200,24 +206,28 @@ _DDS:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
-                            CHK_GL(glCompressedTexSubImage3D(target, static_cast<GLint>(level),
+                            glCompressedTexSubImage3D(target, static_cast<GLint>(level),
                                         0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
                                         format.Internal, static_cast<GLsizei>(texture.size(level)),
-                                        texture.data(layer, face, level)));
-                            if ((err = glGetError()) != GL_NO_ERROR)
+                                        texture.data(layer, face, level));
+                            err = glGetError();
+                            if (err != GL_NO_ERROR)
                             {
-                                Msg("Error: 0x%x: Invalid compressed 3D subtexture: '%s'", err, fname);
+                                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                                Msg("! OpenGL: 0x%x: Invalid compressed 3D subtexture: '%s'", err, fname);
                             }
                         }
                         else
                         {
-                            CHK_GL(glTexSubImage3D(target, static_cast<GLint>(level),
+                            glTexSubImage3D(target, static_cast<GLint>(level),
                                         0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
                                         format.External, format.Type,
-                                        texture.data(layer, face, level)));
-                            if ((err = glGetError()) != GL_NO_ERROR)
+                                        texture.data(layer, face, level));
+                            err = glGetError();
+                            if (err != GL_NO_ERROR)
                             {
-                                Msg("Error: 0x%x: Invalid 3D subtexture: '%s'", err, fname);
+                                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                                Msg("! OpenGL: 0x%x: Invalid 3D subtexture: '%s'", err, fname);
                             }
                         }
                         break;
