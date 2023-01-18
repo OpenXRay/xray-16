@@ -264,17 +264,18 @@ void CUIGameSP::StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 { 
     inherited::StartDialog(pDialog, bDoHideIndicators);
 
-    if (pDialog == ActorMenu)
-        TimeDilator()->StartTimeDilation(UITimeDilator::UIMode::Inventory);
+    if (pDialog == ActorMenu && ActorMenu->GetMenuMode() == mmInventory)
+        TimeDilator()->StartTimeDilation(UITimeDilator::Inventory);
     else if (pDialog == PdaMenu)
-        TimeDilator()->StartTimeDilation(UITimeDilator::UIMode::Pda);
+        TimeDilator()->StartTimeDilation(UITimeDilator::Pda);
 }
 
 void CUIGameSP::StopDialog(CUIDialogWnd* pDialog)
 {
     inherited::StopDialog(pDialog);
 
-    if (pDialog == ActorMenu || pDialog == PdaMenu)
+    bool isInventoryDialog = pDialog == ActorMenu && ActorMenu->GetMenuMode() == mmInventory;
+    if (isInventoryDialog || pDialog == PdaMenu)
         TimeDilator()->StopTimeDilation();
 }
 
