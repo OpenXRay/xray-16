@@ -19,14 +19,14 @@ class ENGINE_API IInputReceiver
 public:
     virtual ~IInputReceiver() = default;
 
-    bool IR_GetKeyState(int dik);
-    bool IR_GetBtnState(int btn);
+    [[nodiscard]]
+    bool IR_GetKeyState(int dik) const;
 
     virtual void IR_Capture();
     virtual void IR_Release();
 
-    virtual void IR_OnDeactivate();
     virtual void IR_OnActivate();
+    virtual void IR_OnDeactivate();
 
     virtual void IR_OnMousePress(int /*btn*/) {}
     virtual void IR_OnMouseRelease(int /*btn*/) {}

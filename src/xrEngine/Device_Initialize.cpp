@@ -16,7 +16,6 @@ void CRenderDevice::Initialize()
     TimerGlobal.Start();
     TimerMM.Start();
 
-    if (!m_sdlWnd)
     {
         Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
             SDL_WINDOW_RESIZABLE;
@@ -48,6 +47,9 @@ void CRenderDevice::Initialize()
         xrDebug::SetWindowHandler(this);
         ExtractAndSetWindowIcon(m_sdlWnd, icon);
     }
+
+    Device.seqAppStart.Add(&m_editor);
+    Device.seqAppEnd.Add(&m_editor);
 }
 
 void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)

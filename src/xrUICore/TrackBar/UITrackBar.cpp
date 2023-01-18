@@ -41,7 +41,7 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
     {
         if (m_bCursorOverWindow && m_b_mouse_capturer)
         {
-            if (pInput->iGetAsyncBtnState(0))
+            if (pInput->iGetAsyncKeyState(MOUSE_1))
                 UpdatePosRelativeToMouse();
         }
     }
@@ -149,7 +149,7 @@ void CUITrackBar::Update()
 
     if (m_b_mouse_capturer)
     {
-        if (!pInput->iGetAsyncBtnState(0))
+        if (!pInput->iGetAsyncKeyState(MOUSE_1))
             m_b_mouse_capturer = false;
     }
 }

@@ -15,7 +15,6 @@ public:
     CEffectorPP(EEffectorPPType type, f32 lifeTime, bool free_on_remove = true);
     CEffectorPP() : bFreeOnRemove(true), fLifeTime(0.0f), bOverlap(true) {};
     virtual ~CEffectorPP();
-    BENCH_SEC_SCRAMBLEVTBL1
     virtual bool Process(SPPInfo& PPInfo);
     virtual bool Valid() { return fLifeTime > 0.0f; }
     IC EEffectorPPType Type() const { return eType; }
