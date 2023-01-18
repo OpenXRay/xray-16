@@ -140,11 +140,13 @@ _DDS:
             break;
         case gli::TARGET_3D:
         case gli::TARGET_CUBE_ARRAY:
-            CHK_GL(glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
-                           tex_extent.x, tex_extent.y, tex_extent.z));
-            if ((err = glGetError()) != GL_NO_ERROR)
+            glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
+                           tex_extent.x, tex_extent.y, tex_extent.z);
+            const auto err = glGetError();
+            if (err != GL_NO_ERROR)
             {
-                Msg("Error: 0x%x: Invalid 3D texture: '%s'", err, fname);
+                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                Msg("! OpenGL: 0x%x: Invalid 3D texture: '%s'", err, fname);
             }
             break;
         default:
