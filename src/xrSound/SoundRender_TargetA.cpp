@@ -109,6 +109,13 @@ void CSoundRender_TargetA::update()
     ALint processed, state;
     ALenum error;
 
+    // An uncaught error currently causes sound to get cut short on Linux here. Here for testing purposes as
+    // sound seems to function otherwise.
+    while ((error = alGetError() != AL_NO_ERROR))
+    {
+        // do nothing
+    }
+
     /* Get relevant source info */
     alGetSourcei(pSource, AL_SOURCE_STATE, &state);
     alGetSourcei(pSource, AL_BUFFERS_PROCESSED, &processed);

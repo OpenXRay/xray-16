@@ -14,10 +14,7 @@
 
 XRSOUND_API Flags32 psSoundFlags =
 {
-    ss_Hardware
-#ifdef XR_PLATFORM_WINDOWS
-    | ss_EFX
-#endif
+    ss_Hardware | ss_EFX
 };
 
 XRSOUND_API int psSoundTargets = 32;

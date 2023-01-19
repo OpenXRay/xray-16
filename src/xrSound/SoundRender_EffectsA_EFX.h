@@ -13,6 +13,10 @@ class CSoundRender_EffectsA_EFX : public CSoundRender_Effects
     LPALISEFFECT alIsEffect{};
     LPALEFFECTF alEffectf{};
     LPALEFFECTI alEffecti{};
+    LPALEFFECTFV alEffectfv{};
+    LPALGETEFFECTI alGetEffecti{};
+    LPALGETEFFECTF alGetEffectf{};
+    LPALGETEFFECTFV alGetEffectfv{};
     LPALGENAUXILIARYEFFECTSLOTS alGenAuxiliaryEffectSlots{};
     LPALDELETEAUXILIARYEFFECTSLOTS alDeleteAuxiliaryEffectSlots{};
     LPALAUXILIARYEFFECTSLOTI alAuxiliaryEffectSloti{};
@@ -23,18 +27,18 @@ class CSoundRender_EffectsA_EFX : public CSoundRender_Effects
 
     bool m_is_supported{}; // Boolean variable to indicate presence of EFX Extension
 
+private:
+
 public:
     CSoundRender_EffectsA_EFX();
     ~CSoundRender_EffectsA_EFX() override;
 
     bool initialized() override;
 
+    auto get_slot() const { return slot; }
     void set_listener(const CSoundRender_Environment& env) override;
     void get_listener(CSoundRender_Environment& env) override;
 
     void commit() override;
-
-public:
-    auto get_slot() const { return slot; }
 };
 #endif // #if __has_include(<openal/efx.h>)
