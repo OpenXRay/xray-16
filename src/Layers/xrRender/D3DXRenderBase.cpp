@@ -100,6 +100,11 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
 #endif
 }
 
+void D3DXRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
+{
+    HW.SetPrimaryAttributes(windowFlags);
+}
+
 void D3DXRenderBase::SetupStates()
 {
     HW.Caps.Update();
@@ -134,13 +139,6 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
     Resources = xr_new<CResourceManager>();
-}
-
-void D3DXRenderBase::SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF)
-{
-    HW.Caps.bForceGPU_SW = bForceGPU_SW;
-    HW.Caps.bForceGPU_NonPure = bForceGPU_NonPure;
-    HW.Caps.bForceGPU_REF = bForceGPU_REF;
 }
 
 void D3DXRenderBase::overdrawBegin()

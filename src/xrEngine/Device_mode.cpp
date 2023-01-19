@@ -136,6 +136,8 @@ void CRenderDevice::UpdateWindowProps()
 
     UpdateWindowRects();
     SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
+
+    editor().UpdateWindowProps();
 }
 
 void CRenderDevice::UpdateWindowRects()

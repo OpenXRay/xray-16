@@ -90,6 +90,8 @@ void CGameMtlLibrary::Load()
         return;
     }
 
+    m_file_age = fs.get_age();
+
     R_ASSERT(fs.find_chunk(GAMEMTLS_CHUNK_AUTOINC));
     material_index = fs.r_u32();
     material_pair_index = fs.r_u32();

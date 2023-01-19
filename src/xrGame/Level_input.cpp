@@ -122,7 +122,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (Device.dwPrecacheFrame)
         return;
 
-    if (Device.editor() && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT)))
+    if (Device.editor_mode() && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT)))
         return;
 
     bool b_ui_exist = !!CurrentGameUI();
@@ -137,7 +137,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     if (_curr == kPAUSE)
     {
-        if (Device.editor())
+        if (Device.editor_mode())
             return;
 
         if (!g_block_pause && (IsGameTypeSingle() || IsDemoPlay()))

@@ -31,4 +31,10 @@ void line_editor::IR_Release()
     m_control.on_ir_release();
     IInputReceiver::IR_Release();
 }
+
+void line_editor::IR_OnDeactivate()
+{
+    m_control.on_ir_release();
+    IInputReceiver::IR_OnDeactivate();
+}
 } // namespace text_editor

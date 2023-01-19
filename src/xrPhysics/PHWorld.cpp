@@ -64,7 +64,7 @@ CObjectSpace* create_object_space()
     CObjectSpace* os = xr_new<CObjectSpace>();
     g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
     g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
-    os->Load(fr, 0);
+    os->Load(fr, nullptr, nullptr, nullptr);
     // xr_delete(fr);
     return os;
 }
@@ -74,7 +74,7 @@ CObjectSpace* mesh_create_object_space(
     CObjectSpace* os = xr_new<CObjectSpace>();
     g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
     g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
-    os->Create(verts, tris, H, build_callback);
+    os->Create(verts, tris, H, build_callback, nullptr, nullptr);
     return os;
 }
 void destroy_object_space(CObjectSpace*& os) { xr_delete(os); }

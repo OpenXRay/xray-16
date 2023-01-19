@@ -35,23 +35,17 @@ static bool r2_available = false;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-namespace
-{
-void __cdecl dummy(void) {}
-IFactoryObject* __cdecl dummy(CLASS_ID) { return nullptr; }
-template<typename T>
-void __cdecl dummy(T* p) { R_ASSERT2(p == nullptr, "Attempting to release an object that shouldn't be allocated"); }
-};
-
 CEngineAPI::CEngineAPI()
 {
-    hGame = nullptr;
-    hTuner = nullptr;
-    pCreate = dummy;
-    pDestroy = dummy;
-    tune_enabled = false;
-    tune_pause = dummy;
-    tune_resume = dummy;
+    pCreate = [](CLASS_ID) -> IFactoryObject*
+    {
+        return nullptr;
+    };
+
+    pDestroy = [](IFactoryObject* p)
+    {
+        R_ASSERT2(p == nullptr, "Attempting to release an object that shouldn't be allocated");
+    };
 }
 
 CEngineAPI::~CEngineAPI()
@@ -130,26 +124,6 @@ void CEngineAPI::Initialize(void)
         pInitializeGame();
     }
 
-    //////////////////////////////////////////////////////////////////////////
-    // vTune
-    tune_enabled = false;
-    if (strstr(Core.Params, "-tune"))
-    {
-        hTuner = XRay::LoadModule("vTuneAPI");
-        tune_pause = (VTPause*)hTuner->GetProcAddress("VTPause");
-        tune_resume = (VTResume*)hTuner->GetProcAddress("VTResume");
-
-        if (!tune_pause || !tune_resume)
-        {
-            Log("Can't initialize Intel vTune");
-            tune_pause = dummy;
-            tune_resume = dummy;
-            return;
-        }
-
-        tune_enabled = true;
-    }
-
     CloseUnusedLibraries();
 }
 
@@ -164,8 +138,6 @@ void CEngineAPI::Destroy(void)
     pDestroy = nullptr;
 	
     hGame = nullptr;
-	
-    hTuner = nullptr;
 	
     renderers.clear();
     Engine.Event._destroy();
