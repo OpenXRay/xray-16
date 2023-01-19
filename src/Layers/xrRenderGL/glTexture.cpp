@@ -6,6 +6,9 @@
 
 #include <gli/gli.hpp>
 
+//#include "xrCore/xrDebug_macros.h"
+
+
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
 void fix_texture_name(pstr fn)
@@ -126,7 +129,7 @@ _DDS:
 
         glm::tvec3<GLsizei> const tex_extent(texture.extent());
 
-        const auto err;
+        GLenum err;
         switch (texture.target())
         {
         case gli::TARGET_2D:
@@ -136,7 +139,7 @@ _DDS:
             err = glGetError();
             if (err != GL_NO_ERROR)
             {
-                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                VERIFY(err == GL_NO_ERROR);
                 Msg("! OpenGL: 0x%x: Invalid 2D texture: '%s'", err, fname);
             }
             break;
@@ -147,7 +150,7 @@ _DDS:
             err = glGetError();
             if (err != GL_NO_ERROR)
             {
-                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                VERIFY(err == GL_NO_ERROR);
                 Msg("! OpenGL: 0x%x: Invalid 3D texture: '%s'", err, fname);
             }
             break;
@@ -181,7 +184,7 @@ _DDS:
                             err = glGetError();
                             if (err != GL_NO_ERROR)
                             {
-                                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                                VERIFY(err == GL_NO_ERROR);
                                 Msg("! OpenGL: 0x%x: Invalid 2D compressed subtexture: '%s'", err, fname);
                             }
                         }
@@ -194,7 +197,7 @@ _DDS:
                             err = glGetError();
                             if (err != GL_NO_ERROR)
                             {
-                                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                                VERIFY(err == GL_NO_ERROR);
                                 Msg("! OpenGL: 0x%x: Invalid 2D subtexture: '%s'", err, fname);
                             }
 
@@ -213,7 +216,7 @@ _DDS:
                             err = glGetError();
                             if (err != GL_NO_ERROR)
                             {
-                                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                                VERIFY(err == GL_NO_ERROR);
                                 Msg("! OpenGL: 0x%x: Invalid compressed 3D subtexture: '%s'", err, fname);
                             }
                         }
@@ -226,7 +229,7 @@ _DDS:
                             err = glGetError();
                             if (err != GL_NO_ERROR)
                             {
-                                VERIFY(err == GL_NO_ERROR, "Error when loading a texture");
+                                VERIFY(err == GL_NO_ERROR);
                                 Msg("! OpenGL: 0x%x: Invalid 3D subtexture: '%s'", err, fname);
                             }
                         }
