@@ -71,7 +71,6 @@ void CSoundRender_Environment::lerp(CSoundRender_Environment& A, CSoundRender_En
     Density = fi * A.Density + f * B.Density;
     HFReference = fi * A.HFReference + f * B.HFReference;
     LFReference = fi * A.LFReference + f * B.LFReference;
-    DecayHFLimit = fi * A.DecayHFLimit + f * B.DecayHFLimit;
 
     clamp();
 }
