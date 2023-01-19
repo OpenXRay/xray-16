@@ -9,7 +9,7 @@ class XRCORE_API shared_value
 {
 public:
     int m_ref_cnt;
-    virtual ~shared_value() {}
+    virtual ~shared_value() = default;
 };
 
 template <class T>

@@ -12,7 +12,7 @@ class ICollisionDamageReceiver;
 class ICollisionForm;
 class IGameObject; //--#SM+#--
 
-class ICollisionHitCallback
+class XR_NOVTABLE ICollisionHitCallback
 {
 public:
     virtual void call(

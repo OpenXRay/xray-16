@@ -623,9 +623,6 @@
     <ClInclude Include="math_constants.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="xrCore_benchmark_macros.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="xr_shortcut.h">
       <Filter>Kernel</Filter>
     </ClInclude>

@@ -218,14 +218,14 @@ void CActor::IR_OnMouseWheel(int x, int y)
 {
     if (hud_adj_mode)
     {
-        g_player_hud->tune(Ivector().set(0, 0, x));
+        g_player_hud->tune(Ivector().set(0, 0, y));
         return;
     }
 
-    if (inventory().Action((x > 0) ? (u16)kWPN_ZOOM_DEC : (u16)kWPN_ZOOM_INC, CMD_START))
+    if (inventory().Action((y > 0) ? (u16)kWPN_ZOOM_DEC : (u16)kWPN_ZOOM_INC, CMD_START))
         return;
 
-    if (x > 0)
+    if (y > 0)
         OnNextWeaponSlot();
     else
         OnPrevWeaponSlot();

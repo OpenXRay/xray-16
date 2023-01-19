@@ -10,10 +10,10 @@ typedef CGameFont::EAligment ETextAlignment;
 
 typedef enum { valTop = 0, valCenter, valBotton } EVTextAlignment;
 
-class ITextureOwner
+class XR_NOVTABLE ITextureOwner
 {
 public:
-    virtual ~ITextureOwner() {}
+    virtual ~ITextureOwner() = default;
     virtual bool InitTexture(pcstr texture, bool fatal = true) = 0;
     virtual bool InitTextureEx(pcstr texture, pcstr shader, bool fatal = true) = 0;
     virtual void SetTextureRect(const Frect& r) = 0;

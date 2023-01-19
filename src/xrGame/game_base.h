@@ -151,7 +151,7 @@ enum ETeam
 
 #pragma pack(pop)
 
-class IGameState
+class XR_NOVTABLE IGameState
 {
 public:
     virtual ~IGameState() = 0;
@@ -173,7 +173,8 @@ public:
     virtual void SetEnvironmentGameTimeFactor(ALife::_TIME_ID gameTime, const float timeFactor) = 0;
 };
 
-IC IGameState::~IGameState() {}
+inline IGameState::~IGameState() = default;
+
 class game_GameState : public FactoryObjectBase, public virtual IGameState
 {
 protected:
