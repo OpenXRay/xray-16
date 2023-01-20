@@ -6,9 +6,6 @@
 
 #include <gli/gli.hpp>
 
-//#include "xrCore/xrDebug_macros.h"
-
-
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
 void fix_texture_name(pstr fn)
@@ -144,7 +141,6 @@ _DDS:
             }
             break;
         case gli::TARGET_3D:
-        case gli::TARGET_CUBE_ARRAY:
             glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
                            tex_extent.x, tex_extent.y, tex_extent.z);
             err = glGetError();
@@ -205,7 +201,6 @@ _DDS:
                         break;
                     }
                     case gli::TARGET_3D:
-                    case gli::TARGET_CUBE_ARRAY:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
