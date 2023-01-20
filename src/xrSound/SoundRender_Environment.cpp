@@ -164,13 +164,10 @@ void CSoundRender_Environment::clamp()
 
 bool CSoundRender_Environment::load(IReader* fs)
 {
-#if define(XR_HAS_EAX)
     version = fs->r_u32();
     if (version >= 0x0003)
     {
-#endif
         fs->r_stringZ(name);
-
 
         Room = fs->r_float();
         RoomHF = fs->r_float();
