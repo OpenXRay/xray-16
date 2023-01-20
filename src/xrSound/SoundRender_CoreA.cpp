@@ -168,8 +168,6 @@ void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, con
     Listener.orientation[0].set(D.x, D.y, -D.z);
     Listener.orientation[1].set(N.x, N.y, -N.z);
 
-    ALenum error;
-
     A_CHK(alListener3f(AL_POSITION, Listener.position.x, Listener.position.y, -Listener.position.z));
     A_CHK(alListener3f(AL_VELOCITY, Listener.prevVelocity.x, Listener.prevVelocity.y, -Listener.prevVelocity.z));
     A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&Listener.orientation[0].x));
