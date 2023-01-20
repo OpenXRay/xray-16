@@ -13,7 +13,7 @@
 CUIVote::CUIVote()
 {
     m_prev_upd_time = 0;
-    bkgrnd = xr_new<CUIStatic>();
+    bkgrnd = xr_new<CUIStatic>("Background");
     bkgrnd->SetAutoDelete(true);
     AttachChild(bkgrnd);
     msg = xr_new<CUITextWnd>();

@@ -1018,7 +1018,7 @@ bool game_sv_CaptureTheArtefact::LoadAnomaliesItems(LPCSTR ini_set_id, TAnomalie
         _GetItem(anomaly_string, i, temp_str, buffer_size);
         u16 anomaly_id = GetMinUsedAnomalyID(temp_str);
         if (anomaly_id)
-            destination.push_back(std::make_pair(temp_str, anomaly_id));
+            destination.emplace_back(temp_str, anomaly_id);
     }
 
     if (!destination.size())
@@ -1042,7 +1042,7 @@ void game_sv_CaptureTheArtefact::LoadAnomalySet()
         if (!level_ini_file->line_exist(CTA_ANOMALY_SET_BASE_NAME, set_id_str))
             continue;
 
-        m_AnomalySet.push_back(std::make_pair(TAnomaliesVector(), u8(0)));
+        m_AnomalySet.emplace_back(TAnomaliesVector(), u8(0));
 
         if (!LoadAnomaliesItems(set_id_str, m_AnomalySet.back().first))
             m_AnomalySet.erase(m_AnomalySet.end() - 1);

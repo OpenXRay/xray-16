@@ -371,11 +371,11 @@ bool CDialogHolder::IR_UIOnMouseWheel(int x, int y)
 
     // Vertical scroll is in higher priority
     EUIMessages wheelMessage;
-    if (x > 0)
+    if (y > 0)
         wheelMessage = WINDOW_MOUSE_WHEEL_UP;
-    else if (x < 0)
+    else if (y < 0)
         wheelMessage = WINDOW_MOUSE_WHEEL_DOWN;
-    else if (y > 0)
+    else if (x > 0)
         wheelMessage = WINDOW_MOUSE_WHEEL_RIGHT;
     else
         wheelMessage = WINDOW_MOUSE_WHEEL_LEFT;

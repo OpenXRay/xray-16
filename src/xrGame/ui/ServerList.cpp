@@ -16,20 +16,23 @@
 LPCSTR GameTypeToStringEx(u32 gt, bool bShort);
 
 CServerList::CServerList()
+    : CUIWindow("CServerList"),
+      m_header2{ "Server properties", "Players list", "Frags", "Deaths" },
+      m_header_frames{ "Icon frame", "Server name frame", "Map frame", "Game type frame", "Players frame", "Ping frame", "Version frame" }
 {
 #ifdef XR_PLATFORM_WINDOWS
     CGameSpy_BrowsersWrapper::UpdateCallback updateCb;
     updateCb.bind(this, &CServerList::OnUpdate);
     m_subscriber_id = browser().SubscribeUpdates(updateCb);
 
-    for (int i = 0; i < LST_COLUMN_COUNT; i++)
-        AttachChild(&m_header_frames[i]);
+    for (auto& header_frame : m_header_frames)
+        AttachChild(&header_frame);
 
-    for (int i = 0; i < LST_COLUMN_COUNT; i++)
-        AttachChild(&m_header[i]);
+    for (auto& header : m_header)
+        AttachChild(&header);
 
-    for (int i = 0; i < 4; i++)
-        AttachChild(&m_header2[i]);
+    for (auto& header : m_header2)
+        AttachChild(&header);
 
     AttachChild(&m_edit_gs_filter);
 
@@ -519,8 +522,8 @@ void CServerList::UpdateVisibility()
     m_frame[LST_SRV_PROP].Show(m_bShowServerInfo ? true : m_bAnimation);
     m_frame[LST_PLAYERS].Show(m_bShowServerInfo ? true : m_bAnimation);
 
-    for (int i = 0; i < 4; i++)
-        m_header2[i].Show(m_bShowServerInfo ? true : m_bAnimation);
+    for (auto& header : m_header2)
+        header.Show(m_bShowServerInfo ? true : m_bAnimation);
 }
 
 void CServerList::SetFilters(SServerFilters& sf)

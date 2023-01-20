@@ -1,18 +1,49 @@
-![Open for everyone](OpenXRayCover.png)
+![Open for everyone](misc/media/OpenXRayCover.png)
 
 OpenXRay
 ==========================
 OpenXRay is an improved version of the X-Ray Engine, the game engine used in the world-famous S.T.A.L.K.E.R. game series by GSC Game World.
 
-### Supported games
+##### Goals
+1. Make it a drop-in replacement for original engine.
+    1. 100% compatibility and same behaviour.
+    2. Compile engine into a single executable file that you can just drop into `bin` folder. (see [#210](https://github.com/OpenXRay/xray-16/issues/210))
+2. Support all three games in the series: SOC/CS/COP. (see [Supported games](#supported-games) below)
+3. Fix original S.T.A.L.K.E.R. series bugs.
+4. Introduce a solid platform for modmakers:
+    1. Add frame/render graph for those who want to add new graphics features.
+    2. Improve performance via refactoring the code, parallelizing the engine, making it multithreaded.
+    3. Add new scripting, development and debugging features.
+5. Clean up engine code, make it easily portable to new platforms, minimize platform-specific code.
+6. Enhance player's experience with new graphics, gameplay and other features that can be enabled optionally. (by default, we stay close to vanilla)
+
+##### Main differences from original X-Ray are:
+- Support for 64-bit.
+- Support for ARM, ARM64, E2K (Elbrus 2000).
+- Works on Linux, macOS, OSL (Elbrus OS).
+- New OpenGL renderer. (currently, requires OpenGL 4.1 minimum, lowering to at least OpenGL 3.3 is planned)
+- Improved performance, better FPS.
+- Original bugs fixes.
+- New features for modmakers.
+- Gamepad support. (not yet finished, but you can try already, see [#943](https://github.com/OpenXRay/xray-16/issues/943))
+
+You can see the detailed differences table [here](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-Differences-from-original-X‐Ray)
+
+#### Supported games
+OpenXRay is based on X-Ray 1.6.02, used in S.T.A.L.K.E.R.: Call of Pripyat, so initially it supported only this game. <br>
+Currently, we are working on support for all three games in the series.
 |Call of Pripyat|Clear Sky|Shadow of Chernobyl|
 |---|---|---|
-|Yes|Release Candidate (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| **Not supported** yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
+|Yes|Beta (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| **Not supported** yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
 
+### Documentation:
+Make sure to visit our [wiki](https://github.com/OpenXRay/xray-16/wiki).
+|How to|||
+|---|---|---|
+|Build and setup|[On Windows](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Windows)|[On Linux](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Linux)|
+|Install and play|[On Windows](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-install-and-play)|-|
 
 ### Build status
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/40d84a83b38147c49b4e66705c47a16a)](https://www.codacy.com/app/OpenXRay/xray-16?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenXRay/xray-16&amp;utm_campaign=Badge_Grade)
-
 |CI|Platform|Compiler|Configurations|Platforms|Status|
 |---|---|---|---|---|---|
 |AppVeyor|Windows, Ubuntu|MSVC, GCC|Debug, Mixed, Release, Release Master Gold|x64, x86|[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/16mp39v0d7fts6yf?svg=true)](https://ci.appveyor.com/project/OpenXRay/xray-16)|
@@ -22,6 +53,14 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
 ### Contributing
 All contributions are more than welcomed. There are several ways how you can contribute:
 
+#### Community
+[![Discord](https://img.shields.io/discord/410170555619082240?label=Discord)](https://discord.gg/sjRMQwv)
+
+Play and enjoy the game, [file an Issue](https://github.com/OpenXRay/xray-16/issues/new/choose) when you encounter any bugs, or you have an enhancement request.
+
+Join us on our [Discord](https://discord.gg/sjRMQwv), subscribe to our [YouTube channel](https://www.youtube.com/OpenXRay), join our [VK group](https://vk.com/openxray), leave a comment, put a like and communicate there! <br>
+Also you can put a star on this repository :)
+
 #### Development
 [![Contributors](https://img.shields.io/github/contributors/OpenXRay/xray-16.svg?label=Contributors)](https://github.com/OpenXRay/xray-16/graphs/contributors)
 
@@ -30,8 +69,9 @@ Join our efforts in making our beloved game better, send pull requests, particip
 It is a place to share ideas on what to implement, gather people that want to work on the engine,
 and work on the source code. However, the following things should be taken into consideration:
 
-* We want to keep the game as close as possible to the vanilla game, so instead of introducing new gameplay features,
-  consider adding non-gameplay features, fixing bugs, improving performance and code quality.
+* We want to keep the game close to the vanilla, untouched state, so if you want to introduce new gameplay features,
+  make sure it is optional, doesn't break compatibility with original game resources (i.e. everything in `gamedata` folder and `.db*`/`.xdb` archives).
+  You also may want to add non-gameplay features, fix bugs or improve engine performance and code quality.
 * Major changes should be discussed before implementation.
 * Follow the [procedures](doc/procedure).
 
@@ -45,27 +85,11 @@ Be advised that this is a community project not sanctioned by GSC Game World in 
 of all the original source code and S.T.A.L.K.E.R. franchise. <br>
 However, they know about many community projects, including this, and support the S.T.A.L.K.E.R. community efforts to make the game better.
 
-#### Community
-[![Discord](https://img.shields.io/discord/410170555619082240?label=Discord)](https://discord.gg/sjRMQwv)
-
-Play and enjoy the game, [file an Issue](https://github.com/OpenXRay/xray-16/issues/new/choose) when you encounter any bugs, or you have an enhancement request.
-
-Join us on our [Discord](https://discord.gg/sjRMQwv), subscribe to our [YouTube channel](https://www.youtube.com/OpenXRay), join our [VK group](https://vk.com/openxray), leave a comment, put a like and communicate there! <br>
-Also you can put a star on this repository :)
-
 #### Funding
-[![Patreon](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5950725&query=data.attributes.patron_count&suffix=%20Patrons&color=success&label=Patreon&style=flat)](https://patreon.com/openxray) [![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg)](https://opencollective.com/openxray)
+[![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg?label=Financial%20contributors)](https://opencollective.com/openxray) [![Sponsors](https://img.shields.io/github/sponsors/openxray?color=brightgreen&label=Sponsors)](https://github.com/sponsors/OpenXRay) [![Patreon](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5950725&query=data.attributes.patron_count&suffix=%20Patrons&color=success&label=Patreon&style=flat)](https://patreon.com/openxray)
 
-You may provide financial support for this project by donating via [GitHub Sponsors](https://github.com/sponsors/OpenXRay), [Patreon](https://patreon.com/openxray) or [Open Collective](https://opencollective.com/openxray). <br>
+You may provide financial support for this project by donating via [Boosty](https://boosty.to/openxray), [GitHub Sponsors](https://github.com/sponsors/OpenXRay), [Patreon](https://patreon.com/openxray) or [Open Collective](https://opencollective.com/openxray). <br>
 Thank you for your support!
-
-### Documentation:
-|How to|||
-|---|---|---|
-|Build and setup|[On Windows](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Windows)|[On Linux](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Linux)|
-|Install and play|[On Windows](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-install-and-play)|-|
-
-[Changelist](https://github.com/OpenXRay/xray-16/wiki/Changes) and more is available in [wiki](https://github.com/OpenXRay/xray-16/wiki).
 
 ### Thanks
 * [GSC Game World](https://gsc-game.com/) – for creating S.T.A.L.K.E.R. and supporting the community;
@@ -84,7 +108,7 @@ Thank you for your support!
     * [eagleivg](https://github.com/eagleivg) – main part of the work on Linux port.
     * [q4a](https://github.com/q4a) – main part of the work on Linux port.
     * [SkyLoader](https://github.com/SkyLoaderr) – OpenGL renderer improvements and polishing, other project work.
-    * [qweasdd136963](https://github.com/qweasdd136963) – supporting the [OXR_COC](https://github.com/qweasdd136963/OXR_CoC) project, other project work on new features, refactoring and bug fixing.
+    * [qweasdd136963](https://github.com/qweasdd136963) – supporting the [OXR_COC](https://github.com/qweasdd136963/OXR_CoC) project (Call of Chernobyl port to latest OpenXRay), other project work on new features, refactoring and bug fixing.
     * JohnDoe_71Rus – our regular tester.
     * [Chip_exe](https://github.com/007exe) – work on Linux port, maintaining AUR package, our regular tester.
     * [a1batross](https://github.com/a1batross) – work on Linux port.
@@ -94,15 +118,24 @@ Thank you for your support!
     * [vTurbine](https://github.com/vTurbine) – work on renderer unification, refactoring, polishing.
     * [Zigatun](https://github.com/Zigatun) – work on ARM port.
     * [Masterkatze](https://github.com/Masterkatze) – work on the build system, bug fixing.
+    * [Chugunov Roman](https://github.com/ChugunovRoman) – work on [porting Call of Chernobyl to latest OpenXRay](https://github.com/ChugunovRoman/xray-16), extending functionality for modmakers.
   * Other contributors:
-    * [NeoAnomaly](https://github.com/) – for help with debug functionality on Windows.
-    * [RainbowZerg](https://github.com/RainbowZerg) – for work on the renderer features, bug fixing.
-    * [FozeSt](https://github.com/FozeSt) – for help with some fixes and features.
-    * [mrnotbadguy](https://github.com/mrnotbadguy) – for work on gamepads support and bug fixing.
-    * [ZeeWanderer](https://github.com/ZeeWanderer) – for work on the build system.
-    * [GeorgeIvlev](https://github.com/GeorgeIvlev) – for work on the build system, bug fixing.
-    * [Plotja](https://github.com/Plotja) – for work on portability, polishing.
-    * [dimhotepus](https://github.com/dimhotepus) – for work on code quality.
+    * [alexgdi](https://github.com/alexgdi) – work on organizing project infrastructure, external dependencies.
+    * [NeoAnomaly](https://github.com/NeoAnomaly) – help with debug functionality on Windows.
+    * [RainbowZerg](https://github.com/RainbowZerg) – work on the renderer features, bug fixing.
+    * [FozeSt](https://github.com/FozeSt) – help with some fixes and features.
+    * [mrnotbadguy](https://github.com/mrnotbadguy) – work on gamepads support and bug fixing.
+    * [devnexen](https://github.com/devnexen) – work on FreeBSD support and portability.
+    * [ZeeWanderer](https://github.com/ZeeWanderer) – work on the build system.
+    * [GeorgeIvlev](https://github.com/GeorgeIvlev) – work on the build system, bug fixing.
+    * [TmLev](https://github.com/TmLev) – work on code quality and Docker support.
+    * [Plotja](https://github.com/Plotja) – work on new gameplay features, bug fixes, portability, polishing.
+    * [dimhotepus](https://github.com/dimhotepus) – work on code quality.
+    * [HeapRaid](https://github.com/HeapRaid) – work on renderer cleanup, code quality, portability.
+    * [Vertver](https://github.com/Vertver) – work on macOS support.
+    * [Lnd-stoL](https://github.com/Lnd-stoL) – work on macOS support.
+    * [GermanAizek](https://github.com/GermanAizek) – work on code quality, finding and fixing vanilla bugs.
+    * [dasehak](https://github.com/dasehak) – work on FreeBSD support, finding and fixing vanilla bugs.
 * Particular projects:
   * [Oxygen](https://github.com/xrOxygen) – for being our friends and giving tips and help with new features, optimizations, bug fixes, etc.
   * [Shoker Weapon Mod](https://github.com/ShokerStlk/xray-16-SWM) and [Shoker](https://github.com/ShokerStlk) – for contributing new features, bug fixing.
@@ -121,4 +154,4 @@ Thank you for your support!
     [![CppDepend logo](https://www.cppdepend.com/images/cppdependlogo.png)](https://www.cppdepend.com)
 
 
-If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you.
+If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you. Or send us a pull request with you added to this list ;)

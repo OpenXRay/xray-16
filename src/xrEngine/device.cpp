@@ -7,8 +7,6 @@
 #include "xrCore/FS_impl.h"
 #include "xrCore/Threading/TaskManager.hpp"
 
-#include "Include/editor/ide.hpp"
-
 #include "xrSASH.h"
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
@@ -121,9 +119,6 @@ void CRenderDevice::RenderEnd(void)
     mFullTransformSaved = mFullTransform;
     mViewSaved = mView;
     mProjectSaved = mProject;
-
-    if (load_finished && m_editor)
-        m_editor->on_load_finished();
 }
 
 #include "IGame_Level.h"
@@ -291,25 +286,13 @@ void CRenderDevice::ProcessFrame()
         Sleep(1);
 }
 
-void CRenderDevice::message_loop_weather_editor()
-{
-    m_editor->run();
-    m_editor_finalize(m_editor);
-}
-
 void CRenderDevice::message_loop()
 {
-    if (editor())
-    {
-        message_loop_weather_editor();
-        return;
-    }
-
-    bool canCallActivate = false;
-    bool shouldActivate = false;
-
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
+        bool canCallActivate = false;
+        bool shouldActivate = false;
+
         SDL_Event events[MAX_WINDOW_EVENTS];
         const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
             SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
@@ -403,8 +386,7 @@ void CRenderDevice::message_loop()
         // Workaround for screen blinking when there's too much timeouts
         if (canCallActivate)
         {
-            OnWM_Activate(shouldActivate ? 1 : 0, 0);
-            canCallActivate = false;
+            OnWindowActivate(shouldActivate);
         }
 
         ProcessFrame();
@@ -515,7 +497,7 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
     {
         if (!Paused())
         {
-            if (editor())
+            if (editor_mode())
                 bShowPauseString = false;
 #ifdef DEBUG
             else if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
@@ -558,23 +540,18 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
 
 bool CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 
-void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
+void CRenderDevice::OnWindowActivate(bool activated)
 {
-    u16 fActive = LOWORD(wParam);
-    const bool fMinimized = (bool)HIWORD(wParam);
-
-    const bool isWndActive = fActive != WA_INACTIVE && !fMinimized;
-
-    if (!editor() && !GEnv.isDedicatedServer && isWndActive)
+    if (!GEnv.isDedicatedServer && activated)
         pInput->GrabInput(true);
     else
         pInput->GrabInput(false);
 
-    b_is_Active = isWndActive || psDeviceFlags.test(rsAlwaysActive);
+    b_is_Active = activated || psDeviceFlags.test(rsAlwaysActive);
 
-    if (isWndActive != b_is_InFocus)
+    if (activated != b_is_InFocus)
     {
-        b_is_InFocus = isWndActive;
+        b_is_InFocus = activated;
         if (b_is_InFocus)
         {
             seqAppActivate.Process();
@@ -586,6 +563,14 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
             seqAppDeactivate.Process();
         }
     }
+}
+
+void CRenderDevice::time_factor(const float time_factor)
+{
+    Timer.time_factor(time_factor);
+    TimerGlobal.time_factor(time_factor);
+    if (!strstr(Core.Params, "-sound_constant_speed"))
+        psSoundTimeFactor = time_factor; //--#SM+#--
 }
 
 void CRenderDevice::AddSeqFrame(pureFrame* f, bool mt)

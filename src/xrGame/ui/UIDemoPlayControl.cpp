@@ -16,7 +16,7 @@ CUIDemoPlayControl::CUIDemoPlayControl()
 {
     m_progress_bar = xr_new<CUIProgressBar>();
     AttachChild(m_progress_bar);
-    m_background = xr_new<CUIStatic>();
+    m_background = xr_new<CUIStatic>("Background");
     AttachChild(m_background);
     m_restart_btn = xr_new<CUI3tButton>();
     AttachChild(m_restart_btn);
@@ -81,7 +81,7 @@ void CUIDemoPlayControl::Init()
     CUIXmlInit::Init3tButton(xml_doc, "demo_play_control:btn_repeat_rewind", 0, m_repeat_rewind_btn);
     CUIXmlInit::InitProgressBar(xml_doc, "demo_play_control:progress", 0, m_progress_bar);
     CUIXmlInit::InitTextWnd(xml_doc, "demo_play_control:static_demo_status", 0, m_static_demo_status);
-    CUIWindow tmp_prop_boxes_wnd;
+    CUIWindow tmp_prop_boxes_wnd("tmp_prop_boxes_wnd");
     CUIXmlInit::InitWindow(xml_doc, "demo_play_control:rewind_property_boxes", 0, &tmp_prop_boxes_wnd);
 
     Register(m_restart_btn);

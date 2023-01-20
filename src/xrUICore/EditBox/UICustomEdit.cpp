@@ -6,7 +6,7 @@
 
 // XXX: replace u32 and int with size_t
 
-CUICustomEdit::CUICustomEdit()
+CUICustomEdit::CUICustomEdit() : CUIStatic("CUICustomEdit")
 {
     m_editor_control = xr_new<text_editor::line_edit_control>(EDIT_BUF_SIZE);
     Init(EDIT_BUF_SIZE);
@@ -26,6 +26,7 @@ CUICustomEdit::CUICustomEdit()
 }
 
 CUICustomEdit::~CUICustomEdit() { xr_delete(m_editor_control); }
+
 text_editor::line_edit_control& CUICustomEdit::ec()
 {
     VERIFY(m_editor_control);

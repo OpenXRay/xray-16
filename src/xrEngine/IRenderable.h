@@ -17,7 +17,7 @@ public:
     bool hud; // At the current moment, object is being rendered on HUD
 };
 
-class IRenderable
+class XR_NOVTABLE IRenderable
 {
 public:
     virtual ~IRenderable() = 0;
@@ -32,8 +32,10 @@ public:
     virtual void renderable_HUD(bool value) = 0;
 };
 
-inline IRenderable::~IRenderable() {}
-class ENGINE_API RenderableBase : public virtual IRenderable
+inline IRenderable::~IRenderable() = default;
+
+// XXX: can't be NOVTABLE because of dynamic_cast in the constructor.. Fix some day
+class ENGINE_API /*XR_NOVTABLE*/ RenderableBase : public virtual IRenderable
 {
 public:
     RenderData renderable;
@@ -43,7 +45,6 @@ public:
     virtual ~RenderableBase();
     virtual RenderData& GetRenderData() override final { return renderable; }
     virtual IRender_ObjectSpecific* renderable_ROS() override final;
-    BENCH_SEC_SCRAMBLEVTBL2
     virtual bool renderable_ShadowGenerate() override { return false; }
     virtual bool renderable_ShadowReceive() override { return false; }
     bool renderable_Invisible() override { return renderable.invisible; }

@@ -5,6 +5,7 @@
 #include "Weapon.h"
 #include "xrEngine/CameraBase.h"
 #include "xrMessages.h"
+#include "ActorBackpack.h"
 
 #include "Level.h"
 #include "UIGameCustom.h"
@@ -218,6 +219,10 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 
         if (CanJump() && (mstate_wf & mcJump))
         {
+            CBackpack* backpack = GetBackpack();
+            if (backpack)
+                m_fJumpSpeed *= backpack->m_fJumpSpeed;
+
             mstate_real |= mcJump;
             m_bJumpKeyPressed = TRUE;
             Jump = m_fJumpSpeed;
@@ -304,6 +309,14 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                         scale *= m_fRun_StrafeFactor;
                     else
                         scale *= m_fWalk_StrafeFactor;
+                }
+
+                CBackpack* backpack = GetBackpack();
+                if (backpack)
+                {
+                    scale *= backpack->m_fWalkAccel;
+                    if (inventory().TotalWeight() > MaxCarryWeight())
+                        scale *= backpack->m_fOverweightWalkK;
                 }
 
                 vControlAccel.mul(scale);
@@ -657,6 +670,10 @@ float CActor::get_additional_weight() const
     {
         res += outfit->m_additional_weight;
     }
+
+    CBackpack* pBackpack = GetBackpack();
+    if (pBackpack)
+        res += pBackpack->m_additional_weight;
 
     for (TIItemContainer::const_iterator it = inventory().m_belt.begin(); inventory().m_belt.end() != it; ++it)
     {

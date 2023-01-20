@@ -23,7 +23,7 @@ CUITrackBar::CUITrackBar()
     AttachChild(m_pSlider);
     m_pSlider->SetAutoDelete(true);
 
-    m_static = xr_new<CUIStatic>();
+    m_static = xr_new<CUIStatic>("Value as text");
     m_static->Enable(false);
     AttachChild(m_static);
     m_static->SetAutoDelete(true);
@@ -41,7 +41,7 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
     {
         if (m_bCursorOverWindow && m_b_mouse_capturer)
         {
-            if (pInput->iGetAsyncBtnState(0))
+            if (pInput->iGetAsyncKeyState(MOUSE_1))
                 UpdatePosRelativeToMouse();
         }
     }
@@ -149,7 +149,7 @@ void CUITrackBar::Update()
 
     if (m_b_mouse_capturer)
     {
-        if (!pInput->iGetAsyncBtnState(0))
+        if (!pInput->iGetAsyncKeyState(MOUSE_1))
             m_b_mouse_capturer = false;
     }
 }

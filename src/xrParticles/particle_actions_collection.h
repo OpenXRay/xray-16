@@ -215,12 +215,11 @@ struct PARTICLES_API PASpeedLimit : public ParticleAction
 
 struct PARTICLES_API PASource : public ParticleAction
 {
-    enum
+    enum : u32
     {
         flSingleSize = (1ul << 29ul), // True to get positionB from position.
         flSilent = (1ul << 30ul),
         flVertexB_tracks = (1ul << 31ul), // True to get positionB from position.
-        fl_FORCEDWORD = u32(-1)
     };
 
     pDomain positionL; // Choose a position in this domain. (local_space)

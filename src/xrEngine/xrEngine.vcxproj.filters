@@ -148,6 +148,9 @@
     <Filter Include="Render\Device">
       <UniqueIdentifier>{e4d34774-3a5b-468f-9400-12c702636fa1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="editor">
+      <UniqueIdentifier>{9edc9b50-4fb3-495e-b1c7-692a6947715f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.h">
@@ -396,6 +399,12 @@
     <ClInclude Include="xr_level_controller.h">
       <Filter>Game API\Level Controller</Filter>
     </ClInclude>
+    <ClInclude Include="editor_base.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_helper.h">
+      <Filter>editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -614,9 +623,6 @@
     <ClCompile Include="Device_overdraw.cpp">
       <Filter>Render\Device</Filter>
     </ClCompile>
-    <ClCompile Include="Device_wndproc.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
     <ClCompile Include="PerformanceAlert.cpp">
       <Filter>Render\Device</Filter>
     </ClCompile>
@@ -637,6 +643,15 @@
     </ClCompile>
     <ClCompile Include="key_binding_registrator_script.cpp">
       <Filter>Game API\Level Controller\KeyBindings</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_base.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_helper.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_base_input.cpp">
+      <Filter>editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

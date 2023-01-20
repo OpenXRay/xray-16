@@ -9,6 +9,8 @@ struct CGamePlayerStateWrapperBase : public T, public luabind::wrap_base
     typedef T inherited;
     typedef CGamePlayerStateWrapperBase<T> self_type;
 
+    virtual ~CGamePlayerStateWrapperBase() = default;
+
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V1(net_Export, NET_Packet)
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V1(net_Import, NET_Packet)
     DEFINE_LUA_WRAPPER_METHOD_V0(clear)

@@ -3,8 +3,6 @@
 #include "UIOptionsManagerScript.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 void CUIOptionsManagerScript::SetCurrentValues(pcstr group)
 {
     CUIOptionsItem::GetOptionsManager()->SetCurrentValues(group);
@@ -26,15 +24,21 @@ void CUIOptionsManagerScript::SendMessage2Group(pcstr group, pcstr message)
 bool CUIOptionsManagerScript::NeedSystemRestart() { return CUIOptionsItem::GetOptionsManager()->NeedSystemRestart(); }
 bool CUIOptionsManagerScript::NeedVidRestart() { return CUIOptionsItem::GetOptionsManager()->NeedVidRestart(); }
 
-SCRIPT_EXPORT(CUIOptionsManagerScript, (), {
-    module(luaState)[class_<CUIOptionsManagerScript>("COptionsManager")
-                         .def(constructor<>())
-                         .def("SaveBackupValues", &CUIOptionsManagerScript::SaveBackupValues)
-                         .def("SetCurrentValues", &CUIOptionsManagerScript::SetCurrentValues)
-                         .def("SaveValues", &CUIOptionsManagerScript::SaveValues)
-                         .def("UndoGroup", &CUIOptionsManagerScript::UndoGroup)
-                         .def("OptionsPostAccept", &CUIOptionsManagerScript::OptionsPostAccept)
-                         .def("SendMessage2Group", &CUIOptionsManagerScript::SendMessage2Group)
-                         .def("NeedSystemRestart", &CUIOptionsManagerScript::NeedSystemRestart)
-                         .def("NeedVidRestart", &CUIOptionsManagerScript::NeedVidRestart)];
+SCRIPT_EXPORT(CUIOptionsManagerScript, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CUIOptionsManagerScript>("COptionsManager")
+             .def(constructor<>())
+             .def("SaveBackupValues", &CUIOptionsManagerScript::SaveBackupValues)
+             .def("SetCurrentValues", &CUIOptionsManagerScript::SetCurrentValues)
+             .def("SaveValues", &CUIOptionsManagerScript::SaveValues)
+             .def("UndoGroup", &CUIOptionsManagerScript::UndoGroup)
+             .def("OptionsPostAccept", &CUIOptionsManagerScript::OptionsPostAccept)
+             .def("SendMessage2Group", &CUIOptionsManagerScript::SendMessage2Group)
+             .def("NeedSystemRestart", &CUIOptionsManagerScript::NeedSystemRestart)
+             .def("NeedVidRestart", &CUIOptionsManagerScript::NeedVidRestart)
+    ];
 });

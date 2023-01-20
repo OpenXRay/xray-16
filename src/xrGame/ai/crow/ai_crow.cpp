@@ -76,15 +76,15 @@ void CAI_Crow::SSound::Load(LPCSTR prefix)
 
 void CAI_Crow::SSound::SetPosition(const Fvector& pos)
 {
-    for (int i = 0; i < (int)m_Sounds.size(); ++i)
-        if (m_Sounds[i]._feedback())
-            m_Sounds[i].set_position(pos);
+    for (auto& sound : m_Sounds)
+        if (sound._feedback())
+            sound.set_position(pos);
 }
 
 void CAI_Crow::SSound::Unload()
 {
-    for (int i = 0; i < (int)m_Sounds.size(); ++i)
-        GEnv.Sound->destroy(m_Sounds[i]);
+    for (auto& sound : m_Sounds)
+        GEnv.Sound->destroy(sound);
 }
 
 void cb_OnHitEndPlaying(CBlend* B) { ((CAI_Crow*)B->CallbackParam)->OnHitEndPlaying(B); }

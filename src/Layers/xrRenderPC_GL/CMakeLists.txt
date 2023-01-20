@@ -56,6 +56,8 @@ set(SRC_FILES
     "../xrRender/dxEnvironmentRender.h"
     "../xrRender/dxFontRender.cpp"
     "../xrRender/dxFontRender.h"
+    "../xrRender/dxImGuiRender.cpp"
+    "../xrRender/dxImGuiRender.h"
     "../xrRender/dxLensFlareRender.cpp"
     "../xrRender/dxLensFlareRender.h"
     "../xrRender/dxObjectSpaceRender.cpp"
@@ -397,7 +399,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/gli
-    ${CMAKE_SOURCE_DIR}/Externals/gli/external/glm
+    ${CMAKE_SOURCE_DIR}/Externals/gli/external
     ${SDL2_INCLUDE_DIRS}
 )
 
@@ -410,6 +412,7 @@ target_link_libraries(${PROJECT_NAME}
     xrParticles
     xrScriptEngine
     xrLuabind
+    xrImGui
     OpenGL::GL
     GLEW::GLEW
 )

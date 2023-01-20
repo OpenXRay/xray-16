@@ -59,13 +59,13 @@
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Externals\libogg_static.vcxproj">
+    <ProjectReference Include="$(xrExternals)libogg_static.vcxproj">
       <Project>{15cbfeff-7965-41f5-b4e2-21e8795c9159}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Externals\libvorbisfile_static.vcxproj">
+    <ProjectReference Include="$(xrExternals)libvorbisfile_static.vcxproj">
       <Project>{cebde98b-a6aa-46e6-bc79-faaf823db9ec}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Externals\libvorbis_static.vcxproj">
+    <ProjectReference Include="$(xrExternals)libvorbis_static.vcxproj">
       <Project>{3a214e06-b95e-4d61-a291-1f8df2ec10fd}</Project>
     </ProjectReference>
     <ProjectReference Include="..\xrMiscMath\xrMiscMath.vcxproj">

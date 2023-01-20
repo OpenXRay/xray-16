@@ -85,13 +85,13 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     m_context = SDL_GL_CreateContext(m_window);
     if (m_context == nullptr)
     {
-        Msg("Could not create drawing context: %s", SDL_GetError());
+        Log("! Could not create drawing context:", SDL_GetError());
         return;
     }
 
     if (MakeContextCurrent(IRender::PrimaryContext) != 0)
     {
-        Msg("Could not make context current. %s", SDL_GetError());
+        Log("! Could not make context current:", SDL_GetError());
         return;
     }
 
@@ -113,23 +113,30 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     if (MakeContextCurrent(IRender::PrimaryContext) != 0)
     {
-        Msg("Could not make context current after creating helper context."
-            " %s", SDL_GetError());
+        Log("! Could not make context current after creating helper context:", SDL_GetError());
         return;
     }
 
     // Initialize OpenGL Extension Wrangler
-    if (glewInit() != GLEW_OK)
+#ifdef XR_PLATFORM_APPLE
+    // This is essential for complete OpenGL 4.1 load on mac
+    glewExperimental = GL_TRUE;
+#endif
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
     {
-        Msg("Could not initialize glew.");
+        Log("! Could not initialize glew:", (pcstr)glewGetErrorString(err));
         return;
     }
 
     UpdateVSync();
 
 #ifdef DEBUG
-    CHK_GL(glEnable(GL_DEBUG_OUTPUT));
-    CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
+    if (GLEW_KHR_debug)  // NOTE: this extension is only available starting with OpenGL 4.3
+    {
+        CHK_GL(glEnable(GL_DEBUG_OUTPUT));
+        CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
+    }
 #endif // DEBUG
 
     int iMaxVTFUnits, iMaxCTIUnits;
@@ -180,8 +187,10 @@ void CHW::Reset()
     UpdateVSync();
 }
 
-void CHW::SetPrimaryAttributes()
+void CHW::SetPrimaryAttributes(u32& windowFlags)
 {
+    windowFlags |= SDL_WINDOW_OPENGL;
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
@@ -280,10 +289,12 @@ bool CHW::ThisInstanceIsGlobal() const
 
 void CHW::BeginPixEvent(pcstr name) const
 {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name);
+    if (GLEW_KHR_debug)
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name);
 }
 
 void CHW::EndPixEvent() const
 {
-    glPopDebugGroup();
+    if (GLEW_KHR_debug)
+        glPopDebugGroup();
 }

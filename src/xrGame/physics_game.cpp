@@ -154,26 +154,14 @@ static void play_object(dxGeomUserData* data, SGameMtlPair* mtl_pair, const dCon
     VERIFY(mtl_pair);
     VERIFY(c);
 
-    CPHSoundPlayer* sp = NULL;
-#ifdef DEBUG
-    try
-    {
-        sp = data->ph_ref_object->ObjectPhSoundPlayer();
-    }
-    catch (...)
-    {
-        Msg("data->ph_ref_object: %p ", data->ph_ref_object);
-        Msg("data: %p ", data);
-        Msg("materials: %s ", mtl_pair->dbg_Name());
-        FlushLog();
-        FATAL("bad data->ph_ref_object");
-    }
-#else
-    sp = data->ph_ref_object->ObjectPhSoundPlayer();
-#endif
-    if (sp)
+    auto* phShell = static_cast<CPhysicsShellHolder*>(data->ph_ref_object);
+    if (!phShell->m_pPhysicsShell && !phShell->character_physics_support() || phShell->getDestroy())
+        return;
+
+    if (CPHSoundPlayer* sp = phShell->ph_sound_player())
         sp->Play(mtl_pair, *(Fvector*)c->pos);
 }
+
 template <class Pars>
 IC bool play_liquid_particle_criteria(dxGeomUserData& data, float vel_cret)
 {

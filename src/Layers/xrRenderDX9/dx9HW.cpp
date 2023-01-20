@@ -291,6 +291,13 @@ void CHW::Reset()
 #endif
 }
 
+void CHW::SetPrimaryAttributes(u32& /*windowFlags*/)
+{
+    Caps.bForceGPU_SW      = strstr(Core.Params, "-gpu_sw");
+    Caps.bForceGPU_NonPure = strstr(Core.Params, "-gpu_nopure");
+    Caps.bForceGPU_REF     = strstr(Core.Params, "-gpu_ref");
+}
+
 D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget) const
 {
     // R2 hack

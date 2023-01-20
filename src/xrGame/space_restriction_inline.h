@@ -10,11 +10,10 @@
 
 IC CSpaceRestriction::CSpaceRestriction(
     CSpaceRestrictionManager* space_restriction_manager, shared_str out_restrictions, shared_str in_restrictions)
+        : m_out_restrictions(out_restrictions), m_in_restrictions(in_restrictions)
 {
     VERIFY(space_restriction_manager);
     m_space_restriction_manager = space_restriction_manager;
-    m_out_restrictions = out_restrictions;
-    m_in_restrictions = in_restrictions;
     m_initialized = false;
     m_applied = false;
 }

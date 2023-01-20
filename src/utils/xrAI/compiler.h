@@ -66,11 +66,6 @@ struct vertex // definition of "patch" or "node"
     Fvector tri[3]; // Cached triangle for ray-testing
 };*/
 
-struct SCover
-{
-    u8 cover[4];
-};
-
 using Nodes = xr_vector<vertex>;
 using Vectors = xr_vector<Fvector>;
 using Marks = xr_vector<u8>;
@@ -136,17 +131,17 @@ const float sim_cover = 48;
 
 struct CNodePositionCompressor
 {
-    IC CNodePositionCompressor(NodePosition& Pdest, Fvector& Psrc, hdrNODES& H);
+    IC CNodePositionCompressor(NodePosition4& Pdest, Fvector& Psrc, hdrNODES& H);
 };
 
-IC CNodePositionCompressor::CNodePositionCompressor(NodePosition& Pdest, Fvector& Psrc, hdrNODES& H)
+IC CNodePositionCompressor::CNodePositionCompressor(NodePosition4& Pdest, Fvector& Psrc, hdrNODES& H)
 {
     float sp = 1 / g_params.fPatchSize;
     int row_length = iFloor((H.aabb.vMax.z - H.aabb.vMin.z) / H.size + EPS_L + 1.5f);
     int pxz = iFloor((Psrc.x - H.aabb.vMin.x) * sp + EPS_L + .5f) * row_length +
         iFloor((Psrc.z - H.aabb.vMin.z) * sp + EPS_L + .5f);
     int py = iFloor(65535.f * (Psrc.y - H.aabb.vMin.y) / (H.size_y) + EPS_L);
-    VERIFY(pxz < (1 << MAX_NODE_BIT_COUNT) - 1);
+    R_ASSERT(pxz < NodePosition4::MAX_XZ);
     Pdest.xz(pxz);
     clamp(py, 0, 65535);
     Pdest.y(u16(py));

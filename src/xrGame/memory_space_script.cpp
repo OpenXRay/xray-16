@@ -14,8 +14,6 @@
 #include "danger_object.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 CScriptGameObject* not_yet_visible_object(const MemorySpace::CNotYetVisibleObject& object)
 {
     return (object.m_object->lua_game_object());
@@ -52,9 +50,14 @@ Fvector CDangerObject__position(const CDangerObject* self)
 
 IC static void CMemoryInfo_Export(lua_State* luaState)
 {
-    module(luaState)[
+    using namespace luabind;
+
+    module(luaState)
+    [
 #if 1 // def USE_ORIENTATION
-        class_<SRotation>("rotation").def_readwrite("yaw", &SRotation::yaw).def_readwrite("pitch", &SRotation::pitch),
+        class_<SRotation>("rotation")
+            .def_readwrite("yaw", &SRotation::yaw)
+            .def_readwrite("pitch", &SRotation::pitch),
 #endif
 
         class_<MemorySpace::SObjectParams>("object_params")
@@ -121,24 +124,31 @@ IC static void CMemoryInfo_Export(lua_State* luaState)
             .def("object", &not_yet_visible_object),
 
         class_<CDangerObject>("danger_object")
-            .enum_("danger_type")[value("bullet_ricochet", CDangerObject::eDangerTypeBulletRicochet),
+            .enum_("danger_type")
+            [
+                value("bullet_ricochet", CDangerObject::eDangerTypeBulletRicochet),
                 value("attack_sound", CDangerObject::eDangerTypeAttackSound),
                 value("entity_attacked", CDangerObject::eDangerTypeEntityAttacked),
                 value("entity_death", CDangerObject::eDangerTypeEntityDeath),
                 value("entity_corpse", CDangerObject::eDangerTypeFreshEntityCorpse),
                 value("attacked", CDangerObject::eDangerTypeAttacked),
                 value("grenade", CDangerObject::eDangerTypeGrenade),
-                value("enemy_sound", CDangerObject::eDangerTypeEnemySound)]
-            .enum_("danger_perceive_type")[value("visual", CDangerObject::eDangerPerceiveTypeVisual),
+                value("enemy_sound", CDangerObject::eDangerTypeEnemySound)
+            ]
+            .enum_("danger_perceive_type")
+            [
+                value("visual", CDangerObject::eDangerPerceiveTypeVisual),
                 value("sound", CDangerObject::eDangerPerceiveTypeSound),
-                value("hit", CDangerObject::eDangerPerceiveTypeHit)]
+                value("hit", CDangerObject::eDangerPerceiveTypeHit)
+            ]
             .def(const_self == other<CDangerObject>())
             .def("position", &CDangerObject__position)
             .def("time", &CDangerObject::time)
             .def("type", &CDangerObject::type)
             .def("perceive_type", &CDangerObject::perceive_type)
             .def("object", &CDangerObject_object)
-            .def("dependent_object", &CDangerObject_dependent_object)];
+            .def("dependent_object", &CDangerObject_dependent_object)
+    ];
 }
 
 SCRIPT_EXPORT_FUNC(CMemoryInfo, (), CMemoryInfo_Export);

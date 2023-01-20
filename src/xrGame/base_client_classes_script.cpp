@@ -14,32 +14,56 @@
 #include "ai/stalker/ai_stalker.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 // clang-format off
-SCRIPT_EXPORT(IFactoryObject, (), {
-    module(luaState)[
+SCRIPT_EXPORT(IFactoryObject, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
         // 'DLL_Pure' is preserved to maintain backward compatibility with mod scripts
         class_<IFactoryObject, no_bases, default_holder, FactoryObjectWrapper>("DLL_Pure")
             .def(constructor<>())
-            .def("_construct", &IFactoryObject::_construct, &FactoryObjectWrapper::_construct_static)];
-});
-
-SCRIPT_EXPORT(ISheduled, (), {
-    module(luaState)[class_<ISheduled, no_bases, default_holder, CISheduledWrapper>("ISheduled")
+            .def("_construct", &IFactoryObject::_construct, &FactoryObjectWrapper::_construct_static)
     ];
 });
 
-SCRIPT_EXPORT(IRenderable, (), {
-    module(luaState)[class_<IRenderable, no_bases, default_holder, CIRenderableWrapper>("IRenderable")
+SCRIPT_EXPORT(ISheduled, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<ISheduled, no_bases, default_holder, CISheduledWrapper>("ISheduled")
     ];
 });
 
-SCRIPT_EXPORT(ICollidable, (), { module(luaState)[class_<ICollidable>("ICollidable")]; });
+SCRIPT_EXPORT(IRenderable, (),
+{
+    using namespace luabind;
 
-SCRIPT_EXPORT(CGameObject, (IFactoryObject, ISheduled, ICollidable, IRenderable), {
-    module(luaState)[
-        
+    module(luaState)
+    [
+        class_<IRenderable, no_bases, default_holder, CIRenderableWrapper>("IRenderable")
+    ];
+});
+
+SCRIPT_EXPORT(ICollidable, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<ICollidable>("ICollidable")
+    ];
+});
+
+SCRIPT_EXPORT(CGameObject, (IFactoryObject, ISheduled, ICollidable, IRenderable),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
         class_<CGameObject, bases<IFactoryObject, ISheduled, ICollidable, IRenderable>, default_holder,
             CGameObjectWrapper>("CGameObject")
             .def(constructor<>())
@@ -57,19 +81,37 @@ SCRIPT_EXPORT(CGameObject, (IFactoryObject, ISheduled, ICollidable, IRenderable)
     ];
 });
 
-SCRIPT_EXPORT(IRenderVisual, (), {
-    module(luaState)[class_<IRenderVisual>("IRender_Visual")
-                         .def("dcast_PKinematicsAnimated", &IRenderVisual::dcast_PKinematicsAnimated)];
+SCRIPT_EXPORT(IRenderVisual, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<IRenderVisual>("IRender_Visual")
+            .def("dcast_PKinematicsAnimated", &IRenderVisual::dcast_PKinematicsAnimated)
+    ];
 });
 
-void IKinematicsAnimated_PlayCycle(IKinematicsAnimated* sa, LPCSTR anim) { sa->PlayCycle(anim); }
-SCRIPT_EXPORT(IKinematicsAnimated, (), {
-    module(
-        luaState)[class_<IKinematicsAnimated>("IKinematicsAnimated").def("PlayCycle", &IKinematicsAnimated_PlayCycle)];
+void IKinematicsAnimated_PlayCycle(IKinematicsAnimated* sa, pcstr anim) { sa->PlayCycle(anim); }
+
+SCRIPT_EXPORT(IKinematicsAnimated, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<IKinematicsAnimated>("IKinematicsAnimated")
+            .def("PlayCycle", &IKinematicsAnimated_PlayCycle)
+    ];
 });
 
-SCRIPT_EXPORT(CBlend, (), {
-    module(luaState)[class_<CBlend>("CBlend")
+SCRIPT_EXPORT(CBlend, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CBlend>("CBlend")
     ];
 });
 // clang-format on

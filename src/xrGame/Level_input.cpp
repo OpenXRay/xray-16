@@ -51,7 +51,7 @@ void CLevel::IR_OnMouseWheel(int x, int y)
     /* avo: script callback */
     if (g_actor)
     {
-        g_actor->callback(GameObject::eMouseWheel)(x);
+        g_actor->callback(GameObject::eMouseWheel)(y, x);
     }
 
     if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
@@ -122,7 +122,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (Device.dwPrecacheFrame)
         return;
 
-    if (Device.editor() && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT)))
+    if (Device.editor_mode() && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT)))
         return;
 
     bool b_ui_exist = !!CurrentGameUI();
@@ -137,7 +137,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     if (_curr == kPAUSE)
     {
-        if (Device.editor())
+        if (Device.editor_mode())
             return;
 
         if (!g_block_pause && (IsGameTypeSingle() || IsDemoPlay()))
@@ -160,16 +160,14 @@ void CLevel::IR_OnKeyboardPress(int key)
     case kSCREENSHOT:
         GEnv.Render->Screenshot();
         return;
-        break;
 
     case kCONSOLE:
         Console->Show();
         return;
-        break;
 
     case kQUIT:
     {
-        if (b_ui_exist && CurrentGameUI()->TopInputReceiver())
+        if (b_ui_exist && CurrentGameUI()->TopInputReceiver() && !Device.Paused())
         {
             if (CurrentGameUI()->IR_UIOnKeyboardPress(key))
                 return; // special case for mp and main_menu
@@ -619,8 +617,6 @@ void CLevel::IR_OnTextInput(pcstr text)
             IR->IR_OnTextInput(text);
     }
 }
-
-void CLevel::IR_OnMouseStop(int /**axis**/, int /**value**/) {}
 
 void CLevel::IR_OnControllerPress(int key, float x, float y)
 {

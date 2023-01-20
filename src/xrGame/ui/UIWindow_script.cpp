@@ -14,11 +14,11 @@
 #include "ScriptXMLInit.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 // clang-format off
-SCRIPT_EXPORT(CDialogHolder, (CUIWindow), {
+SCRIPT_EXPORT(CDialogHolder, (CUIWindow),
+{
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CDialogHolder>("CDialogHolder")
@@ -32,7 +32,10 @@ SCRIPT_EXPORT(CDialogHolder, (CUIWindow), {
     ];
 });
 
-SCRIPT_EXPORT(CUIDialogWnd, (CDialogHolder), {
+SCRIPT_EXPORT(CUIDialogWnd, (CDialogHolder),
+{
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIDialogWnd, CUIWindow>("CUIDialogWnd")
@@ -43,7 +46,10 @@ SCRIPT_EXPORT(CUIDialogWnd, (CDialogHolder), {
     ];
 });
 
-SCRIPT_EXPORT(CUIMessageBoxEx, (CUIDialogWnd), {
+SCRIPT_EXPORT(CUIMessageBoxEx, (CUIDialogWnd),
+{
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIMessageBoxEx, CUIDialogWnd>("CUIMessageBoxEx")
@@ -56,7 +62,10 @@ SCRIPT_EXPORT(CUIMessageBoxEx, (CUIDialogWnd), {
     ];
 });
 
-SCRIPT_EXPORT(CUIMMShniaga, (CUIWindow), {
+SCRIPT_EXPORT(CUIMMShniaga, (CUIWindow),
+{
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
@@ -73,9 +82,20 @@ SCRIPT_EXPORT(CUIMMShniaga, (CUIWindow), {
 });
 
 SCRIPT_EXPORT(CUISleepStatic, (CUIStatic),
-    { module(luaState)[class_<CUISleepStatic, CUIStatic>("CUISleepStatic").def(constructor<>())]; });
+{
+    using namespace luabind;
 
-SCRIPT_EXPORT(SServerFilters, (), {
+    module(luaState)
+    [
+        class_<CUISleepStatic, CUIStatic>("CUISleepStatic")
+            .def(constructor<>())
+    ];
+});
+
+SCRIPT_EXPORT(SServerFilters, (),
+{
+    using namespace luabind;
+
     module(luaState)
     [
         class_<SServerFilters>("SServerFilters")
@@ -89,7 +109,10 @@ SCRIPT_EXPORT(SServerFilters, (), {
     ];
 });
 
-SCRIPT_EXPORT(connect_error_cb, (), {
+SCRIPT_EXPORT(connect_error_cb, (),
+{
+    using namespace luabind;
+
     module(luaState)
     [
         class_<connect_error_cb>("connect_error_cb")
@@ -100,7 +123,10 @@ SCRIPT_EXPORT(connect_error_cb, (), {
     ];
 });
 
-SCRIPT_EXPORT(CServerList, (CUIWindow), {
+SCRIPT_EXPORT(CServerList, (CUIWindow),
+{
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CServerList, CUIWindow>("CServerList")
@@ -122,48 +148,63 @@ SCRIPT_EXPORT(CServerList, (CUIWindow), {
     ];
 });
 
-SCRIPT_EXPORT(CUIMapList, (CUIWindow), {
-    module(luaState)[class_<CUIMapList, CUIWindow>("CUIMapList")
-                         .def(constructor<>())
-                         .def("SetWeatherSelector", &CUIMapList::SetWeatherSelector)
-                         .def("SetModeSelector", &CUIMapList::SetModeSelector)
-                         .def("OnModeChange", &CUIMapList::OnModeChange)
-                         .def("LoadMapList", &CUIMapList::LoadMapList)
-                         .def("SaveMapList", &CUIMapList::SaveMapList)
-                         .def("GetCommandLine", &CUIMapList::GetCommandLine)
-                         .def("SetServerParams", &CUIMapList::SetServerParams)
-                         .def("GetCurGameType", &CUIMapList::GetCurGameType)
-                         .def("StartDedicatedServer", &CUIMapList::StartDedicatedServer)
-                         .def("SetMapPic", &CUIMapList::SetMapPic)
-                         .def("SetMapInfo", &CUIMapList::SetMapInfo)
-                         .def("ClearList", &CUIMapList::ClearList)
-                         .def("IsEmpty", &CUIMapList::IsEmpty)];
+SCRIPT_EXPORT(CUIMapList, (CUIWindow),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CUIMapList, CUIWindow>("CUIMapList")
+            .def(constructor<>())
+            .def("SetWeatherSelector", &CUIMapList::SetWeatherSelector)
+            .def("SetModeSelector", &CUIMapList::SetModeSelector)
+            .def("OnModeChange", &CUIMapList::OnModeChange)
+            .def("LoadMapList", &CUIMapList::LoadMapList)
+            .def("SaveMapList", &CUIMapList::SaveMapList)
+            .def("GetCommandLine", &CUIMapList::GetCommandLine)
+            .def("SetServerParams", &CUIMapList::SetServerParams)
+            .def("GetCurGameType", &CUIMapList::GetCurGameType)
+            .def("StartDedicatedServer", &CUIMapList::StartDedicatedServer)
+            .def("SetMapPic", &CUIMapList::SetMapPic)
+            .def("SetMapInfo", &CUIMapList::SetMapInfo)
+            .def("ClearList", &CUIMapList::ClearList)
+            .def("IsEmpty", &CUIMapList::IsEmpty)
+    ];
 });
 
-SCRIPT_EXPORT(CUIVersionList, (CUIWindow), {
-    module(luaState)[class_<CUIVersionList, CUIWindow>("CUIVersionList")
-                         .def(constructor<>())
-                         .def("GetCurrentVersionName", &CUIVersionList::GetCurrentVersionName)
-                         .def("GetCurrentVersionDescr", &CUIVersionList::GetCurrentVersionDescr)
-                         .def("GetItemsCount", &CUIVersionList::GetItemsCount)
-                         .def("SwitchToSelectedVersion", &CUIVersionList::SwitchToSelectedVersion)
-];
+SCRIPT_EXPORT(CUIVersionList, (CUIWindow),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CUIVersionList, CUIWindow>("CUIVersionList")
+            .def(constructor<>())
+            .def("GetCurrentVersionName", &CUIVersionList::GetCurrentVersionName)
+            .def("GetCurrentVersionDescr", &CUIVersionList::GetCurrentVersionDescr)
+            .def("GetItemsCount", &CUIVersionList::GetItemsCount)
+            .def("SwitchToSelectedVersion", &CUIVersionList::SwitchToSelectedVersion)
+    ];
 });
 
-SCRIPT_EXPORT(EnumGameIDs, (), {
+SCRIPT_EXPORT(EnumGameIDs, (),
+{
+    using namespace luabind;
+
     class EnumGameIDs
     {
     };
+
     module(luaState)
     [
         class_<EnumGameIDs>("GAME_TYPE")
             .enum_("gametype")
             [
                 value("GAME_UNKNOWN", int(-1)),
-                             value("eGameIDDeathmatch", int(eGameIDDeathmatch)),
-                             value("eGameIDTeamDeathmatch", int(eGameIDTeamDeathmatch)),
-                             value("eGameIDArtefactHunt", int(eGameIDArtefactHunt)),
-                             value("eGameIDCaptureTheArtefact", int(eGameIDCaptureTheArtefact))
+                value("eGameIDDeathmatch", int(eGameIDDeathmatch)),
+                value("eGameIDTeamDeathmatch", int(eGameIDTeamDeathmatch)),
+                value("eGameIDArtefactHunt", int(eGameIDArtefactHunt)),
+                value("eGameIDCaptureTheArtefact", int(eGameIDCaptureTheArtefact))
             ]
     ];
 });

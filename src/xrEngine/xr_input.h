@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL.h"
+#include <SDL.h>
 #include <bitset>
 
 DECLARE_MESSAGE(KeyMapChanged);
@@ -99,13 +99,10 @@ public:
     };
 
 private:
-    BENCH_SEC_SCRAMBLEMEMBER1
-
-    u32 mouseTimeStamp[COUNT_MOUSE_AXIS];
-
     std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
     std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
+    int mouseAxisState[COUNT_MOUSE_AXIS];
     int controllerAxisState[COUNT_CONTROLLER_AXIS];
     s32 last_input_controller;
 
@@ -133,7 +130,6 @@ private:
     bool isFlushingKeyEvents;
 
 public:
-    u32 m_curTime;
     u32 m_mouseDelta;
 
     const InputStatistics& GetStats() const { return stats; }
@@ -142,10 +138,9 @@ public:
     void iCapture(IInputReceiver* pc);
     void iRelease(IInputReceiver* pc);
 
-    bool iGetAsyncKeyState(const int dik);
-    bool iGetAsyncBtnState(const int btn);
-    bool iGetAsyncGpadBtnState(const int btn);
+    bool iGetAsyncKeyState(const int key);
 
+    void iGetAsyncScrollPos(Ivector2& p) const;
     void iGetAsyncMousePos(Ivector2& p) const;
     void iSetMousePos(const Ivector2& p) const;
 

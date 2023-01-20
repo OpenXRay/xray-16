@@ -1,11 +1,10 @@
 #include "pch_script.h"
 #include "game_cl_base.h"
 
-using namespace luabind;
-
-#pragma optimize("s", on)
 SCRIPT_EXPORT(SZoneMapEntityData, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<SZoneMapEntityData>("SZoneMapEntityData")
@@ -14,8 +13,11 @@ SCRIPT_EXPORT(SZoneMapEntityData, (),
             .def_readwrite("color", &SZoneMapEntityData::color)
     ];
 });
+
 SCRIPT_EXPORT(SZoneMapEntities, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<xr_vector<SZoneMapEntityData>>("ZoneMapEntities")
@@ -26,6 +28,8 @@ SCRIPT_EXPORT(SZoneMapEntities, (),
 
 SCRIPT_EXPORT(RPoint, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<RPoint>("RPoint")

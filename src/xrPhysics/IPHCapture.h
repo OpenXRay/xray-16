@@ -1,6 +1,8 @@
 #pragma once
+
 class IPhysicsShellHolder;
-class IPHCapture
+
+class XR_NOVTABLE IPHCapture
 {
 public:
     virtual bool Failed() = 0;

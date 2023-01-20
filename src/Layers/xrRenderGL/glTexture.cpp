@@ -22,15 +22,10 @@ void fix_texture_name(pstr fn)
 int get_texture_load_lod(LPCSTR fn)
 {
     CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
-    auto it_ = sect.Data.cbegin();
-    auto it_e_ = sect.Data.cend();
 
-    auto it = it_;
-    auto it_e = it_e_;
-
-    for (; it != it_e; ++it)
+    for (const auto& item : sect.Data)
     {
-        if (strstr(fn, it->first.c_str()))
+        if (strstr(fn, item.first.c_str()))
         {
             if (psTextureLOD < 1)
                 return 0;
@@ -126,21 +121,34 @@ _DDS:
         glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
         glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
 
-        if (gli::gl::EXTERNAL_RED != format.External) // skip for properly greyscale-alpfa fonts textures
+        if (gli::gl::EXTERNAL_RED != format.External) // skip for proper greyscale-alpha font textures
             glTexParameteriv(target, GL_TEXTURE_SWIZZLE_RGBA, &format.Swizzles[gli::SWIZZLE_RED]);
 
         glm::tvec3<GLsizei> const tex_extent(texture.extent());
 
+        GLenum err;
         switch (texture.target())
         {
         case gli::TARGET_2D:
         case gli::TARGET_CUBE:
-            CHK_GL(glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal,
-                           tex_extent.x, tex_extent.y));
+            glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal,
+                           tex_extent.x, tex_extent.y);
+            err = glGetError();
+            if (err != GL_NO_ERROR)
+            {
+                VERIFY(err == GL_NO_ERROR);
+                Msg("! OpenGL: 0x%x: Invalid 2D texture: '%s'", err, fname);
+            }
             break;
         case gli::TARGET_3D:
-            CHK_GL(glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
-                           tex_extent.x, tex_extent.y, tex_extent.z));
+            glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
+                           tex_extent.x, tex_extent.y, tex_extent.z);
+            err = glGetError();
+            if (err != GL_NO_ERROR)
+            {
+                VERIFY(err == GL_NO_ERROR);
+                Msg("! OpenGL: 0x%x: Invalid 3D texture: '%s'", err, fname);
+            }
             break;
         default:
             NODEFAULT;
@@ -165,17 +173,30 @@ _DDS:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
-                            CHK_GL(glCompressedTexSubImage2D(sub_target, static_cast<GLint>(level),
+                            glCompressedTexSubImage2D(sub_target, static_cast<GLint>(level),
                                         0, 0, tex_level_extent.x, tex_level_extent.y,
                                         format.Internal, static_cast<GLsizei>(texture.size(level)),
-                                        texture.data(layer, face, level)));
+                                        texture.data(layer, face, level));
+                            err = glGetError();
+                            if (err != GL_NO_ERROR)
+                            {
+                                VERIFY(err == GL_NO_ERROR);
+                                Msg("! OpenGL: 0x%x: Invalid 2D compressed subtexture: '%s'", err, fname);
+                            }
                         }
                         else
                         {
-                            CHK_GL(glTexSubImage2D(sub_target, static_cast<GLint>(level),
+                            glTexSubImage2D(sub_target, static_cast<GLint>(level),
                                         0, 0, tex_level_extent.x, tex_level_extent.y,
                                         format.External, format.Type,
-                                        texture.data(layer, face, level)));
+                                        texture.data(layer, face, level));
+                            err = glGetError();
+                            if (err != GL_NO_ERROR)
+                            {
+                                VERIFY(err == GL_NO_ERROR);
+                                Msg("! OpenGL: 0x%x: Invalid 2D subtexture: '%s'", err, fname);
+                            }
+
                         }
                         break;
                     }
@@ -183,17 +204,29 @@ _DDS:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
-                            CHK_GL(glCompressedTexSubImage3D(target, static_cast<GLint>(level),
+                            glCompressedTexSubImage3D(target, static_cast<GLint>(level),
                                         0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
                                         format.Internal, static_cast<GLsizei>(texture.size(level)),
-                                        texture.data(layer, face, level)));
+                                        texture.data(layer, face, level));
+                            err = glGetError();
+                            if (err != GL_NO_ERROR)
+                            {
+                                VERIFY(err == GL_NO_ERROR);
+                                Msg("! OpenGL: 0x%x: Invalid compressed 3D subtexture: '%s'", err, fname);
+                            }
                         }
                         else
                         {
-                            CHK_GL(glTexSubImage3D(target, static_cast<GLint>(level),
+                            glTexSubImage3D(target, static_cast<GLint>(level),
                                         0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
                                         format.External, format.Type,
-                                        texture.data(layer, face, level)));
+                                        texture.data(layer, face, level));
+                            err = glGetError();
+                            if (err != GL_NO_ERROR)
+                            {
+                                VERIFY(err == GL_NO_ERROR);
+                                Msg("! OpenGL: 0x%x: Invalid 3D subtexture: '%s'", err, fname);
+                            }
                         }
                         break;
                     }

@@ -53,7 +53,7 @@ public:
     void OnUIReset() override;
     static bool is_widescreen();
     static float get_current_kx();
-    shared_str get_xml_name(pcstr path, pcstr fn);
+    static shared_str get_xml_name(pcstr path, pcstr fn);
 
     IUIRender::ePointType m_currentPointType;
 };

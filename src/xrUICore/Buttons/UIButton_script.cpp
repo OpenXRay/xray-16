@@ -7,10 +7,10 @@
 #include "TrackBar/UITrackBar.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIButton, CUIStatic>("CUIButton")

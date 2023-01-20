@@ -10,7 +10,12 @@
 #include "alife_human_brain.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CALifeHumanBrain, (CALifeMonsterBrain),
-    { module(luaState)[class_<CALifeHumanBrain, CALifeMonsterBrain>("CALifeHumanBrain")]; });
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CALifeHumanBrain, CALifeMonsterBrain>("CALifeHumanBrain")
+    ];
+});

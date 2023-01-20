@@ -476,7 +476,7 @@ void CAI_Stalker::debug_text()
         {
             if (agent_manager().member().member(this).cover())
             {
-                DBG_OutText("%scover         : [%s][%f][%f][%f]", indent,
+                DBG_OutText("%cover         : [%s][%f][%f][%f]", indent,
                     agent_manager().member().member(this).cover()->m_is_smart_cover ? "smart" : "generated",
                     VPUSH(agent_manager().member().member(this).cover()->position()));
             }

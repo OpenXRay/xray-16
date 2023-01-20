@@ -47,7 +47,7 @@ public:
     ISheduledWrapper() = default;
     virtual ~ISheduledWrapper() = default;
 
-    virtual float shedule_Scale()
+    virtual float shedule_Scale() const
     {
         return 1;
     }

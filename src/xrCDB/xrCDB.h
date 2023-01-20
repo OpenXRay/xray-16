@@ -50,24 +50,27 @@ public:
     };
 
 public:
-    IC u32 IDvert(u32 ID) { return verts[ID]; }
+    [[nodiscard]]
+    auto IDvert(size_t ID) const { return verts[ID]; }
 };
 
 static_assert(sizeof(TRI) == 16, "TRI always should be 16 bytes on any architecture.");
 
 // Build callback
-typedef void build_callback(Fvector* V, int Vcnt, TRI* T, int Tcnt, void* params);
+using build_callback = void(Fvector* V, int Vcnt, TRI* T, int Tcnt, void* params);
+using serialize_callback = void(IWriter& writer);
+using deserialize_callback = bool(IReader& reader);
 
 // Model definition
 class XRCDB_API MODEL : Noncopyable
 {
     friend class COLLIDER;
-    enum
+
+    enum : u32
     {
         S_READY = 0,
         S_INIT = 1,
         S_BUILD = 2,
-        S_forcedword = u32(-1)
     };
 
 private:
@@ -104,8 +107,8 @@ public:
     u32 memory();
 
     void set_version(u32 value) { version = value; }
-    bool serialize(pcstr fileName) const;
-    bool deserialize(pcstr fileName);
+    bool serialize(pcstr fileName, serialize_callback callback = nullptr) const;
+    bool deserialize(pcstr fileName, bool checkCrc32 = true, deserialize_callback callback = nullptr);
 
 private:
     void syncronize_impl() const;
@@ -178,7 +181,7 @@ public:
         const Fvector& v0, const Fvector& v1, const Fvector& v2, u16 material, u16 sector, float eps = EPS);
     void add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, u32 dummy, float eps = EPS);
     void remove_duplicate_T();
-    void calc_adjacency(xr_vector<u32>& dest);
+    void calc_adjacency(xr_vector<u32>& dest) const;
 
     Fvector* getV() { return &*verts.begin(); }
     size_t getVS() { return verts.size(); }

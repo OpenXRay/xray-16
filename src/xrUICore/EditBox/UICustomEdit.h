@@ -14,7 +14,7 @@ private:
 
 public:
     CUICustomEdit();
-    virtual ~CUICustomEdit();
+    ~CUICustomEdit() override;
 
     void Init(u32 max_char_count, bool number_only_mode = false, bool read_mode = false, bool fn_mode = false);
 

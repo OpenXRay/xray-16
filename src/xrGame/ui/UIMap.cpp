@@ -12,10 +12,9 @@ const u32 activeLocalMapColor = 0xffffffff; // 0xffc80000;
 const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
 const u32 ourLevelMapColor = 0xffffffff;
 
-CUICustomMap::CUICustomMap()
+CUICustomMap::CUICustomMap() : CUIStatic("CUICustomMap")
 {
     m_BoundRect_.set(0, 0, 0, 0);
-    SetWindowName("map");
     m_flags.zero();
     SetPointerDistance(0.0f);
 }
@@ -260,7 +259,7 @@ bool CUIGlobalMap::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     if (inherited::OnMouseAction(x, y, mouse_action))
         return true;
-    if (mouse_action == WINDOW_MOUSE_MOVE && (FALSE == pInput->iGetAsyncBtnState(0)))
+    if (mouse_action == WINDOW_MOUSE_MOVE && (FALSE == pInput->iGetAsyncKeyState(MOUSE_1)))
     {
         if (MapWnd())
         {
@@ -526,7 +525,7 @@ bool CUILevelMap::OnMouseAction(float x, float y, EUIMessages mouse_action)
     if (MapWnd()->GlobalMap()->Locked())
         return true;
 
-    if (mouse_action == WINDOW_MOUSE_MOVE && (FALSE == pInput->iGetAsyncBtnState(0)))
+    if (mouse_action == WINDOW_MOUSE_MOVE && (FALSE == pInput->iGetAsyncKeyState(MOUSE_1)))
     {
         if (MapWnd())
         {
@@ -556,6 +555,8 @@ void CUILevelMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     else if (msg == MAP_SELECT_SPOT)
         MapWnd()->SpotSelected(pWnd);
+    else if (msg == MAP_SELECT_SPOT2)
+        MapWnd()->ActivatePropertiesBox(pWnd);
 }
 
 void CUILevelMap::OnFocusLost()

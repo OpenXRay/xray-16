@@ -8,7 +8,7 @@
 #include "xrEngine/xr_level_controller.h"
 #include "xrUICore/XML/UITextureMaster.h"
 #include "ui/UIXmlInit.h"
-#include "SDL.h"
+#include <SDL.h>
 #include "xrUICore/Buttons/UIBtnHint.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"
@@ -372,8 +372,6 @@ void CMainMenu::IR_OnMouseMove(int x, int y)
         return;
     CDialogHolder::IR_UIOnMouseMove(x, y);
 };
-
-void CMainMenu::IR_OnMouseStop(int x, int y){};
 
 bool IWantMyMouseBackScreamed = false;
 void CMainMenu::IR_OnKeyboardPress(int dik)

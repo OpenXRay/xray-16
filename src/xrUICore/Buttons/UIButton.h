@@ -8,7 +8,6 @@ private:
 
 public:
     CUIButton();
-    virtual ~CUIButton(){};
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnClick();

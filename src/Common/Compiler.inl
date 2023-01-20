@@ -32,7 +32,6 @@
 #define FORCE_INLINE            __forceinline
 #define ALIGN(a)                __declspec(align(a))
 #define DEBUG_BREAK             __debugbreak()
-#define __thread                __declspec(thread)
 #else
 #error Provide your definitions here
 #endif
@@ -49,11 +48,15 @@
 
 #define XR_EXPORT __attribute__ ((visibility("default")))
 #define XR_IMPORT __attribute__ ((visibility("default")))
+
+#define XR_NOVTABLE
 #elif defined(_MSC_VER)
 #define XR_ASSUME(expr) __assume(expr)
 
 #define XR_EXPORT __declspec(dllexport)
 #define XR_IMPORT __declspec(dllimport)
+
+#define XR_NOVTABLE __declspec(novtable)
 #else
 #error Provide your definitions here
 #endif

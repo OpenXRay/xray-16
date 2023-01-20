@@ -11,13 +11,17 @@
 #include "operator_abstract.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
+SCRIPT_EXPORT(CScriptWorldProperty, (),
+{
+    using namespace luabind;
 
-SCRIPT_EXPORT(CScriptWorldProperty, (), {
-    module(luaState)[class_<CScriptWorldProperty>("world_property")
-                         .def(constructor<CScriptWorldProperty::condition_type, CScriptWorldProperty::value_type>())
-                         .def("condition", &CScriptWorldProperty::condition)
-                         .def("value", &CScriptWorldProperty::value)
-                         .def(const_self < other<CScriptWorldProperty>())
-                         .def(const_self == other<CScriptWorldProperty>())];
+    module(luaState)
+    [
+        class_<CScriptWorldProperty>("world_property")
+            .def(constructor<CScriptWorldProperty::condition_type, CScriptWorldProperty::value_type>())
+            .def("condition", &CScriptWorldProperty::condition)
+            .def("value", &CScriptWorldProperty::value)
+            .def(const_self < other<CScriptWorldProperty>())
+            .def(const_self == other<CScriptWorldProperty>())
+];
 });

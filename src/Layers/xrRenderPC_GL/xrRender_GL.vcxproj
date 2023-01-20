@@ -25,9 +25,9 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external\glm;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;NO_XR_VDECLARATOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions Condition="'$(GITHUB_ACTIONS)'!=''">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glew32s.lib;glu32.lib;oalib.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -72,6 +72,7 @@
     <ClCompile Include="..\xrRender\dxDebugRender.cpp" />
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
     <ClCompile Include="..\xrRender\dxFontRender.cpp" />
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
     <ClCompile Include="..\xrRender\dxLensFlareRender.cpp" />
     <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp" />
     <ClCompile Include="..\xrRender\dxRainRender.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h" />
     <ClInclude Include="..\..\Include\xrRender\FactoryPtr.h" />
     <ClInclude Include="..\..\Include\xrRender\FontRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h" />
     <ClInclude Include="..\..\include\xrRender\Kinematics.h" />
     <ClInclude Include="..\..\include\xrRender\KinematicsAnimated.h" />
     <ClInclude Include="..\..\Include\xrRender\LensFlareRender.h" />
@@ -261,6 +263,7 @@
     <ClInclude Include="..\xrRender\dxDebugRender.h" />
     <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
     <ClInclude Include="..\xrRender\dxFontRender.h" />
+    <ClInclude Include="..\xrRender\dxImGuiRender.h" />
     <ClInclude Include="..\xrRender\dxLensFlareRender.h" />
     <ClInclude Include="..\xrRender\dxObjectSpaceRender.h" />
     <ClInclude Include="..\xrRender\dxRainRender.h" />
@@ -378,23 +381,26 @@
     <ProjectReference Include="$(xrExternals)oalib.vcxproj">
       <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\utils\xrMiscMath\xrMiscMath.vcxproj">
+    <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xrCDB\xrCDB.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">
       <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xrEngine\xrEngine.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xrParticles\xrParticles.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrParticles\xrParticles.vcxproj">
       <Project>{94a1c366-3d19-48e6-8170-4adc2e70df97}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\xrScriptEngine\xrScriptEngine.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrScriptEngine\xrScriptEngine.vcxproj">
       <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
     <ProjectReference Include="..\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
@@ -408,14 +414,14 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets'))" />
   </Target>
 </Project>

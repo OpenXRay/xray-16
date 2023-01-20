@@ -10,8 +10,6 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "Common/object_type_traits.h"
 
-using namespace luabind;
-
 template <typename T>
 T& set(T* self, const typename T::TYPE mask, bool value)
 {
@@ -56,6 +54,8 @@ void one(T* self)
 
 SCRIPT_EXPORT(Flags8, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<Flags8>("flags8")
@@ -83,6 +83,8 @@ SCRIPT_EXPORT(Flags8, (),
 
 SCRIPT_EXPORT(Flags16, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<Flags16>("flags16")
@@ -110,6 +112,8 @@ SCRIPT_EXPORT(Flags16, (),
 
 SCRIPT_EXPORT(Flags32, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<Flags32>("flags32")

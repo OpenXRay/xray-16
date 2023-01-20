@@ -141,7 +141,7 @@ void CWeapon::UpdateXForm()
     }
 
     const CInventoryOwner* parent = smart_cast<const CInventoryOwner*>(E);
-    if (parent && parent->use_simplified_visual())
+    if (!parent || parent->use_simplified_visual())
         return;
 
     if (parent->attached(this))
@@ -406,7 +406,7 @@ void CWeapon::Load(LPCSTR section)
         misfireProbability      = pSettings->r_float(section, "misfire_probability");
         misfireConditionK       = pSettings->read_if_exists<float>(section, "misfire_condition_k", 1.0f);
 
-        // For UI indicators to work correctly
+        // For UI indicators to work correctly, rough estimate values
         misfireStartCondition   = 0.95f;
         misfireEndCondition     = 0.0f;
         misfireStartProbability = misfireProbability;
@@ -457,7 +457,7 @@ void CWeapon::Load(LPCSTR section)
         m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
         if (!GEnv.isDedicatedServer)
         {
-            m_UIScope = xr_new<CUIWindow>();
+            m_UIScope = xr_new<CUIWindow>("Scope UI");
             shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
             LoadScope(scope_tex_name);
         }

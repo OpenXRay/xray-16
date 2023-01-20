@@ -8,7 +8,7 @@
 #include "UIXmlInit.h"
 #include "UIHelper.h"
 
-CUIBoosterInfo::CUIBoosterInfo()
+CUIBoosterInfo::CUIBoosterInfo() : CUIWindow("CUIBoosterInfo")
 {
     for (u32 i = 0; i < eBoostExplImmunity; ++i)
     {
@@ -184,7 +184,7 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
 
 /// ----------------------------------------------------------------
 
-UIBoosterInfoItem::UIBoosterInfoItem()
+UIBoosterInfoItem::UIBoosterInfoItem() : CUIWindow("UIBoosterInfoItem")
 {
     m_caption = NULL;
     m_value = NULL;
@@ -196,7 +196,6 @@ UIBoosterInfoItem::UIBoosterInfoItem()
     m_texture_plus._set("");
 }
 
-UIBoosterInfoItem::~UIBoosterInfoItem() {}
 void UIBoosterInfoItem::Init(CUIXml& xml, LPCSTR section)
 {
     CUIXmlInit::InitWindow(xml, section, 0, this);

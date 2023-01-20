@@ -26,13 +26,13 @@ CGroupHierarchyHolder& CSquadHierarchyHolder::group(u32 group_id) const
 void CSquadHierarchyHolder::update_leader()
 {
     m_leader = 0;
-    GROUP_REGISTRY::const_iterator I = m_groups.begin();
-    GROUP_REGISTRY::const_iterator E = m_groups.end();
-    for (; I != E; ++I)
-        if (*I && (*I)->leader())
+    for (const auto& group : m_groups)
+    {
+        if (group && group->leader())
         {
-            leader((*I)->leader());
+            leader(group->leader());
             break;
         }
+    }
 }
 #endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER

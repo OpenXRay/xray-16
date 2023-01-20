@@ -26,10 +26,6 @@
 
 #define _LINUX // for GameSpy
 
-#if !defined(__INTEL_COMPILER)
-#define _alloca alloca
-#endif
-
 #define _MAX_PATH PATH_MAX + 1
 #define MAX_PATH PATH_MAX + 1
 
@@ -242,10 +238,6 @@ typedef struct tagPOINT {
 
 #define DWORD_PTR UINT_PTR
 #define WM_USER 0x0400
-#define WA_INACTIVE 0
-#define HIWORD(l)              ((WORD)((DWORD_PTR)(l) >> 16))
-#define LOWORD(l)              ((WORD)((DWORD_PTR)(l) & 0xFFFF))
-
 
 #define TRUE true
 #define FALSE false
@@ -409,7 +401,6 @@ inline int vsnprintf_s(char* buffer, size_t size, size_t, const char* format, va
     return vsnprintf(buffer, size, format, list);
 }
 #define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
-#define _alloca alloca
 #define _snprintf snprintf
 #define sprintf_s(buffer, buffer_size, stringbuffer, ...) sprintf(buffer, stringbuffer, ##__VA_ARGS__)
 //#define GetProcAddress(handle, name) dlsym(handle, name)
