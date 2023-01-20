@@ -199,8 +199,7 @@ bool CSoundRender_Environment::load(IReader* fs)
         HFReference = fs->r_float();
         LFReference = fs->r_float();
         Density = fs->r_float();
-
-
+#endif
         return true;
     }
     return false;
