@@ -7,9 +7,13 @@
 #define OPENAL
 #include  <eax/eax.h>
 #include "SoundRender_EffectsA_EAX.h"
-#include "SoundRender_EffectsA_EFX.h"
 #endif
-#include <openal/efx.h>
+
+#if __has_include(<openal/efx.h>)
+#   include <openal/efx.h>
+#   include "SoundRender_EffectsA_EFX.h"
+#endif
+
 
 CSoundRender_Environment::CSoundRender_Environment()
 {
