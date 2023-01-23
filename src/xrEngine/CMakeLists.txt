@@ -6,6 +6,7 @@ set(EDITOR_SRC
     "editor_base_input.cpp"
     "editor_helper.cpp"
     "editor_helper.h"
+    "editor_weather.cpp"
 )
 
 set(ENGINE_SRC

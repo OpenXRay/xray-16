@@ -52,7 +52,7 @@ void ide::OnAppDeactivate()
 
 void ide::IR_Capture()
 {
-    m_shown = true;
+    m_windows.main = true;
     IInputReceiver::IR_Capture();
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = true;
@@ -61,7 +61,7 @@ void ide::IR_Capture()
 void ide::IR_Release()
 {
     SDL_StopTextInput();
-    m_shown = false;
+    m_windows.main = false;
     IInputReceiver::IR_Release();
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = false;

@@ -107,12 +107,12 @@ void ide::OnFrame()
 
     m_render->Frame();
     ImGui::NewFrame();
-    if (is_shown())
-    {
-        ImGui::ShowDemoWindow();
-        ImGui::ShowMetricsWindow();
+
+    if (m_windows.main)
         ShowMain();
-    }
+    if (m_windows.weather)
+        ShowWeatherEditor();
+
     ImGui::EndFrame();
 }
 
@@ -128,16 +128,46 @@ void ide::ShowMain()
     {
         if (ImGui::BeginMenu("File"))
         {
+            ImGui::MenuItem("Weather Editor", nullptr, &m_windows.weather);
+
             if (ImGui::MenuItem("Stats", nullptr, psDeviceFlags.test(rsStatistic)))
                 psDeviceFlags.set(rsStatistic, !psDeviceFlags.test(rsStatistic));
 
             if (ImGui::MenuItem("Close"))
-            {
                 IR_Release();
-            }
+
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("About"))
+        {
+            ImGui::MenuItem("ImGui demo", nullptr, &m_windows.imgui_demo);
+            ImGui::MenuItem("ImGui metrics", nullptr, &m_windows.imgui_metrics);
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
+
+    if (m_windows.imgui_demo)
+        ImGui::ShowDemoWindow(&m_windows.imgui_demo);
+
+    if (m_windows.imgui_metrics)
+        ImGui::ShowMetricsWindow(&m_windows.imgui_metrics);
 }
+
+ImGuiWindowFlags ide::get_default_window_flags() const
+{
+    if (is_shown())
+        return {};
+    return ImGuiWindowFlags_NoNav
+        | ImGuiWindowFlags_NoInputs
+        | ImGuiWindowFlags_NoMove
+        | ImGuiWindowFlags_NoDecoration
+        | ImGuiWindowFlags_NoBackground;
+}
+
+bool ide::is_shown() const
+{
+    return m_windows.main;
+}
+
 } // namespace xray::editor

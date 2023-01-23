@@ -22,7 +22,8 @@ public:
     ide();
     ~ide();
 
-    bool is_shown() const { return m_shown; }
+    [[nodiscard]]
+    bool is_shown() const;
 
 public:
     void UpdateWindowProps();
@@ -65,12 +66,23 @@ public:
     void IR_OnControllerAttitudeChange(Fvector change) final;
 
 private:
+    ImGuiWindowFlags get_default_window_flags() const;
+
+private:
     void ShowMain();
+    void ShowWeatherEditor();
 
 private:
     CTimer m_timer;
     IImGuiRender* m_render{};
     ImGuiContext* m_context{};
-    bool m_shown{};
+
+    struct
+    {
+        bool main;
+        bool weather;
+        bool imgui_demo;
+        bool imgui_metrics;
+    } m_windows{};
 };
 } // namespace xray::editor

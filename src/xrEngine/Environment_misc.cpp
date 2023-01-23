@@ -467,8 +467,7 @@ void CEnvDescriptorMixer::clear()
 void CEnvDescriptorMixer::lerp(
     CEnvironment*, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& Mdf, float modifier_power)
 {
-    float modif_power = 1.f / (modifier_power + 1); // the environment itself
-    float fi = 1 - f;
+    const float fi = 1 - f;
 
     // XXX: it would be nice to lerp this too.
     old_style = A.old_style;
@@ -476,6 +475,7 @@ void CEnvDescriptorMixer::lerp(
     m_pDescriptorMixer->lerp(&*A.m_pDescriptor, &*B.m_pDescriptor);
 
     weight = f;
+    modif_power = 1.f / (modifier_power + 1); // the environment itself
 
     clouds_color.lerp(A.clouds_color, B.clouds_color, f);
 

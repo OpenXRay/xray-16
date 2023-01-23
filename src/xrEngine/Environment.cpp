@@ -443,7 +443,7 @@ void CEnvironment::SelectEnvs(float gt)
     }
 }
 
-void CEnvironment::lerp(float& current_weight)
+void CEnvironment::lerp()
 {
     if (bWFX && (wfx_time <= 0.f))
         StopWFX();
@@ -451,7 +451,6 @@ void CEnvironment::lerp(float& current_weight)
     SelectEnvs(fGameTime);
     VERIFY(Current[0] && Current[1]);
 
-    current_weight = TimeWeight(fGameTime, Current[0]->exec_time, Current[1]->exec_time);
     // modifiers
     CEnvModifier EM;
     EM.far_plane = 0;
@@ -468,6 +467,7 @@ void CEnvironment::lerp(float& current_weight)
         mpower += EM.sum(mit, view);
 
     // final lerp
+    const float current_weight = TimeWeight(fGameTime, Current[0]->exec_time, Current[1]->exec_time);
     CurrentEnv->lerp(this, *Current[0], *Current[1], current_weight, EM, mpower);
 }
 
@@ -499,25 +499,14 @@ void CEnvironment::OnFrame()
     if (!g_pGameLevel)
         return;
 #endif
-
-    // if (pInput->iGetAsyncKeyState(SDL_SCANCODE_O)) SetWeatherFX("surge_day");
-    float current_weight;
-    lerp(current_weight);
+    
+    lerp();
 
     // Igor. Dynamic sun position.
     if (!GEnv.Render->is_sun_static() && useDynamicSunDir && !CurrentEnv->old_style)
         calculate_dynamic_sun_dir();
 
 #ifndef MASTER_GOLD
-    if (CurrentEnv->sun_dir.y > 0)
-    {
-        Log("CurrentEnv->sun_dir", CurrentEnv->sun_dir);
-        // Log("current_weight", current_weight);
-        // Log("mpower", mpower);
-
-        Log("Current[0]->sun_dir", Current[0]->sun_dir);
-        Log("Current[1]->sun_dir", Current[1]->sun_dir);
-    }
     VERIFY2(CurrentEnv->sun_dir.y < 0, "Invalid sun direction settings in lerp");
 #endif // #ifndef MASTER_GOLD
 
