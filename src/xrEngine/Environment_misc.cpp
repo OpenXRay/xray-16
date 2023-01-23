@@ -557,6 +557,10 @@ void CEnvDescriptorMixer::lerp(
     R_ASSERT(_valid(sun_dir));
 
     VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while lerp");
+
+    lens_flare_id = f < 0.5f ? A.lens_flare_id : B.lens_flare_id;
+    tb_id = f < 0.5f ? A.tb_id : B.tb_id;
+    env_ambient = Random.randF() < 1.f - f ? A.env_ambient : B.env_ambient;
 }
 
 //-----------------------------------------------------------------------------
