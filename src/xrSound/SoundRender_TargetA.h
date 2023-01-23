@@ -17,6 +17,9 @@ class CSoundRender_TargetA : public CSoundRender_Target
     ALuint buf_block;
     void fill_block(ALuint BufferID);
 
+    float last_pitch_change_time;
+    float time_played;
+
 public:
     CSoundRender_TargetA(ALuint slot);
     virtual ~CSoundRender_TargetA();

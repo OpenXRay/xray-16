@@ -22,8 +22,9 @@ void CSoundRender_Emitter::set_frequency(float scale)
 {
     VERIFY(_valid(scale));
     p_source.freq = scale;
+    float sndTimeFactorKoeff = bIsIgnoreTimeFactor ? 1.f : psSoundTimeFactor; 
     if (!fis_zero(fTimeToStop) && fTimeToStop != 0xffffffff)
-        fTimeToStop = SoundRender->fTimer_Value + ((get_length_sec() - (SoundRender->fTimer_Value - fTimeStarted)) / (scale * psSoundTimeFactor));
+        fTimeToStop = SoundRender->fTimer_Value + ((get_length_sec() - (SoundRender->fTimer_Value - fTimeStarted)) / (scale * sndTimeFactorKoeff));
 }
 
 CSoundRender_Emitter::CSoundRender_Emitter()
