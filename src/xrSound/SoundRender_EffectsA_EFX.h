@@ -20,9 +20,12 @@ class CSoundRender_EffectsA_EFX : public CSoundRender_Effects
     LPALGENAUXILIARYEFFECTSLOTS alGenAuxiliaryEffectSlots{};
     LPALDELETEAUXILIARYEFFECTSLOTS alDeleteAuxiliaryEffectSlots{};
     LPALAUXILIARYEFFECTSLOTI alAuxiliaryEffectSloti{};
+    LPALAUXILIARYEFFECTSLOTF alAuxiliaryEffectSlotf{};
+    LPALAUXILIARYEFFECTSLOTFV alAuxiliaryEffectSlotfv{};
     LPALISAUXILIARYEFFECTSLOT alIsAuxiliaryEffectSlot{};
 
     ALuint effect{};
+    ALfloat effectfv{};
     ALuint slot{};
 
     bool m_is_supported{}; // Boolean variable to indicate presence of EFX Extension

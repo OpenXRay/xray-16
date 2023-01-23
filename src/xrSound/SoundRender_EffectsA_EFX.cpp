@@ -28,6 +28,8 @@ CSoundRender_EffectsA_EFX::CSoundRender_EffectsA_EFX()
     LOAD_PROC(alGenAuxiliaryEffectSlots, LPALGENAUXILIARYEFFECTSLOTS);
     LOAD_PROC(alDeleteAuxiliaryEffectSlots, LPALDELETEAUXILIARYEFFECTSLOTS);
     LOAD_PROC(alAuxiliaryEffectSloti, LPALAUXILIARYEFFECTSLOTI);
+    LOAD_PROC(alAuxiliaryEffectSlotf, LPALAUXILIARYEFFECTSLOTF);
+    LOAD_PROC(alAuxiliaryEffectSlotfv, LPALAUXILIARYEFFECTSLOTFV);
     LOAD_PROC(alIsAuxiliaryEffectSlot, LPALISAUXILIARYEFFECTSLOT);
 
     alGenEffects(1, &effect);
@@ -44,10 +46,10 @@ CSoundRender_EffectsA_EFX::CSoundRender_EffectsA_EFX()
     alEffectf(effect, AL_EAXREVERB_DECAY_LFRATIO, AL_EAXREVERB_DEFAULT_DECAY_LFRATIO);
     alEffectf(effect, AL_EAXREVERB_REFLECTIONS_GAIN, AL_EAXREVERB_DEFAULT_REFLECTIONS_GAIN);
     alEffectf(effect, AL_EAXREVERB_REFLECTIONS_DELAY, AL_EAXREVERB_DEFAULT_REFLECTIONS_DELAY);
-    alEffectfv(effect, AL_EAXREVERB_REFLECTIONS_PAN, f3);
+    alEffectfv(effectfv, AL_EAXREVERB_REFLECTIONS_PAN, f3);
     alEffectf(effect, AL_EAXREVERB_LATE_REVERB_GAIN, AL_EAXREVERB_DEFAULT_LATE_REVERB_GAIN);
     alEffectf(effect, AL_EAXREVERB_LATE_REVERB_DELAY, AL_EAXREVERB_DEFAULT_LATE_REVERB_DELAY);
-    alEffectfv(effect, AL_EAXREVERB_LATE_REVERB_PAN, f3);
+    alEffectfv(effectfv, AL_EAXREVERB_LATE_REVERB_PAN, f3);
     alEffectf(effect, AL_EAXREVERB_ECHO_TIME, AL_EAXREVERB_DEFAULT_ECHO_TIME);
     alEffectf(effect, AL_EAXREVERB_ECHO_DEPTH, AL_EAXREVERB_DEFAULT_ECHO_DEPTH);
     alEffectf(effect, AL_EAXREVERB_MODULATION_TIME, AL_EAXREVERB_DEFAULT_MODULATION_TIME);
@@ -85,6 +87,7 @@ CSoundRender_EffectsA_EFX::~CSoundRender_EffectsA_EFX()
         if (alIsAuxiliaryEffectSlot(slot))
             alDeleteAuxiliaryEffectSlots(1, &slot);
     }
+
 }
 
 bool CSoundRender_EffectsA_EFX::initialized()
@@ -105,10 +108,10 @@ void CSoundRender_EffectsA_EFX::set_listener(const CSoundRender_Environment& env
     A_CHK(alEffectf(effect, AL_EAXREVERB_DECAY_LFRATIO, env.DecayLFRatio));
     A_CHK(alEffectf(effect, AL_EAXREVERB_REFLECTIONS_GAIN, mB_to_gain(env.Reflections)));
     A_CHK(alEffectf(effect, AL_EAXREVERB_REFLECTIONS_DELAY, env.ReflectionsDelay));
-    A_CHK(alEffectfv(effect, AL_EAXREVERB_REFLECTIONS_PAN, &env.ReflectionsPan[0]));
+    A_CHK(alEffectfv(effectfv, AL_EAXREVERB_REFLECTIONS_PAN, &env.ReflectionsPan[0]));
     A_CHK(alEffectf(effect, AL_EAXREVERB_LATE_REVERB_GAIN, mB_to_gain(env.Reverb)));
     A_CHK(alEffectf(effect, AL_EAXREVERB_LATE_REVERB_DELAY, env.ReverbDelay));
-    A_CHK(alEffectfv(effect, AL_EAXREVERB_LATE_REVERB_PAN, &env.ReverbPan[0]));
+    A_CHK(alEffectfv(effectfv, AL_EAXREVERB_LATE_REVERB_PAN, &env.ReverbPan[0]));
     A_CHK(alEffectf(effect, AL_EAXREVERB_ECHO_TIME, env.EchoTime));
     A_CHK(alEffectf(effect, AL_EAXREVERB_ECHO_DEPTH, env.EchoDepth));
     A_CHK(alEffectf(effect, AL_EAXREVERB_MODULATION_TIME, env.ModulationTime));
@@ -131,10 +134,10 @@ void CSoundRender_EffectsA_EFX::get_listener(CSoundRender_Environment& env)
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_DECAY_LFRATIO, &env.DecayLFRatio));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_REFLECTIONS_GAIN, &env.Reflections));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_REFLECTIONS_DELAY, &env.ReflectionsDelay));
-    A_CHK(alGetEffectfv(effect, AL_EAXREVERB_REFLECTIONS_PAN, (float*)&env.ReflectionsPan));
+    A_CHK(alGetEffectfv(effectfv, AL_EAXREVERB_REFLECTIONS_PAN, (float*)&env.ReflectionsPan));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_LATE_REVERB_GAIN, &env.Reverb));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_LATE_REVERB_DELAY, &env.ReverbDelay));
-    A_CHK(alGetEffectfv(effect, AL_EAXREVERB_LATE_REVERB_PAN, (float*)&env.ReverbPan));
+    A_CHK(alGetEffectfv(effectfv, AL_EAXREVERB_LATE_REVERB_PAN, (float*)&env.ReverbPan));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_ECHO_TIME, &env.EchoTime));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_ECHO_DEPTH, &env.EchoDepth));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_MODULATION_TIME, &env.ModulationTime));
@@ -152,6 +155,13 @@ void CSoundRender_EffectsA_EFX::commit()
      * effectively copies the effect properties. You can modify or delete the
      * effect object afterward without affecting the effect slot.
      */
+    A_CHK(alAuxiliaryEffectSlotf(slot, AL_EFFECTSLOT_GAIN, 0.6f));
+    A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, true));
+    A_CHK(alAuxiliaryEffectSlotfv(slot, AL_EFFECTSLOT_EFFECT, &effectfv));
     A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_EFFECT, effect));
+    if (const ALenum err = alGetError(); err == AL_NO_ERROR)
+    {
+        Msg("! %s:: error, effect not loaded (0x%d)", __FUNCTION__, error);
+    }
 }
 #endif // XR_HAS_EFX
