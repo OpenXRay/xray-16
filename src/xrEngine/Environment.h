@@ -63,8 +63,6 @@ public:
         float wind_blast_out_time;
         float wind_blast_strength;
         Fvector wind_blast_direction;
-
-        virtual ~SEffect() {}
     };
     using EffectVec = xr_vector<SEffect*>;
 
@@ -74,24 +72,32 @@ public:
         Fvector2 m_sound_dist;
         Ivector4 m_sound_period;
 
-        typedef xr_vector<ref_sound> sounds_type;
-
         void load(const CInifile& config, pcstr sect, pcstr sectionToReadFrom = nullptr);
-        ref_sound& get_rnd_sound() { return sounds()[Random.randI(sounds().size())]; }
-        u32 get_rnd_sound_time()
+
+        [[nodiscard]]
+        ref_sound& get_rnd_sound() { return m_sounds[Random.randI(m_sounds.size())]; }
+
+        [[nodiscard]]
+        u32 get_rnd_sound_time() const
         {
             return (m_sound_period.z < m_sound_period.w) ? Random.randI(m_sound_period.z, m_sound_period.w) : 0;
         }
-        u32 get_rnd_sound_first_time()
+
+        [[nodiscard]]
+        u32 get_rnd_sound_first_time() const
         {
             return (m_sound_period.x < m_sound_period.y) ? Random.randI(m_sound_period.x, m_sound_period.y) : 0;
         }
-        float get_rnd_sound_dist()
+
+        [[nodiscard]]
+        float get_rnd_sound_dist() const
         {
             return (m_sound_dist.x < m_sound_dist.y) ? Random.randF(m_sound_dist.x, m_sound_dist.y) : 0;
         }
-        virtual ~SSndChannel() {}
-        virtual sounds_type& sounds() { return m_sounds; }
+
+        [[nodiscard]]
+        auto& sounds() { return m_sounds; }
+
     protected:
         xr_vector<ref_sound> m_sounds;
     };
@@ -195,6 +201,7 @@ public:
     float weight;
     float fog_near;
     float fog_far;
+    float modif_power;
 
 public:
     CEnvDescriptorMixer(shared_str const& identifier);
@@ -299,7 +306,7 @@ public:
     void mods_unload();
 
     void OnFrame();
-    void lerp(float& current_weight);
+    void lerp();
 
     void RenderSky();
     void RenderClouds();
