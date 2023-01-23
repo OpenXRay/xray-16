@@ -146,7 +146,7 @@ void CUIButton::Update()
     inherited::Update();
 
     if (CursorOverWindow() && m_hint_text.size() && !g_btnHint->Owner() &&
-        Device.dwTimeGlobal > m_dwFocusReceiveTime + 700)
+        Device.dwTimeGlobal > m_dwFocusReceiveTime + 700 * Device.time_factor())
     {
         g_btnHint->SetHintText(this, m_hint_text.c_str());
 

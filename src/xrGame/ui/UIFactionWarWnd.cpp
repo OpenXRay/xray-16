@@ -234,7 +234,7 @@ void CUIFactionWarWnd::Update()
     {
         Reset();
     }
-    if ( Device.dwTimeGlobal - m_previous_time > m_update_delay )
+    if ( Device.dwTimeGlobal - m_previous_time > m_update_delay * Device.time_factor() )
     {
         m_previous_time = Device.dwTimeGlobal;
         UpdateInfo();
