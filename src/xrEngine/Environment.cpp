@@ -524,10 +524,8 @@ void CEnvironment::OnFrame()
     PerlinNoise1D->SetFrequency(wind_gust_factor * MAX_NOISE_FREQ);
     wind_strength_factor = clampr(PerlinNoise1D->GetContinious(Device.fTimeGlobal) + 0.5f, 0.f, 1.f);
 
-    shared_str l_id = (current_weight < 0.5f) ? Current[0]->lens_flare_id : Current[1]->lens_flare_id;
-    eff_LensFlare->OnFrame(l_id);
-    shared_str t_id = (current_weight < 0.5f) ? Current[0]->tb_id : Current[1]->tb_id;
-    eff_Thunderbolt->OnFrame(t_id, CurrentEnv->bolt_period, CurrentEnv->bolt_duration);
+    eff_LensFlare->OnFrame(CurrentEnv->lens_flare_id);
+    eff_Thunderbolt->OnFrame(CurrentEnv->tb_id, CurrentEnv->bolt_period, CurrentEnv->bolt_duration);
     eff_Rain->OnFrame();
 
     // ******************** Environment params (setting)
