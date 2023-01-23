@@ -16,16 +16,15 @@ public:
     void SetModeEnability(UIMode mode, bool status);
     bool GetModeEnability(UIMode mode);
 
-    bool StartTimeDilation(UIMode mode);
-    void StopTimeDilation();
+    void SetCurrentMode(UIMode mode);
 
 private:
     float uiTimeFactor = 1.0;
     Flags32 enabledModes;
     UIMode currMode;
 
-    bool dilateTime();
-    void resetTime();
+    void startTimeDilation();
+    void stopTimeDilation();
 };  
 
 extern UITimeDilator* TimeDilator();

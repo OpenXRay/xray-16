@@ -265,18 +265,17 @@ void CUIGameSP::StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators)
     inherited::StartDialog(pDialog, bDoHideIndicators);
 
     if (pDialog == ActorMenu && ActorMenu->GetMenuMode() == mmInventory)
-        TimeDilator()->StartTimeDilation(UITimeDilator::Inventory);
+        TimeDilator()->SetCurrentMode(UITimeDilator::Inventory);
     else if (pDialog == PdaMenu)
-        TimeDilator()->StartTimeDilation(UITimeDilator::Pda);
+        TimeDilator()->SetCurrentMode(UITimeDilator::Pda);
 }
 
 void CUIGameSP::StopDialog(CUIDialogWnd* pDialog)
 {
     inherited::StopDialog(pDialog);
 
-    bool isInventoryDialog = pDialog == ActorMenu && ActorMenu->GetMenuMode() == mmInventory;
-    if (isInventoryDialog || pDialog == PdaMenu)
-        TimeDilator()->StopTimeDilation();
+    if (pDialog == ActorMenu || pDialog == PdaMenu)
+        TimeDilator()->SetCurrentMode(UITimeDilator::None);
 }
 
 CChangeLevelWnd::CChangeLevelWnd()

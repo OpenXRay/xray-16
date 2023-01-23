@@ -2,11 +2,10 @@
 #include "StdAfx.h"
 
 UITimeDilator* time_dilator;
-bool isTimeDilatorClosed;
 
 UITimeDilator* TimeDilator()
 { 
-    if (!time_dilator && !isTimeDilatorClosed)
+    if (!time_dilator)
     {
         time_dilator = xr_new<UITimeDilator>();
     }
@@ -18,7 +17,6 @@ void CloseTimeDilator()
 { 
     if (time_dilator)
     {
-        isTimeDilatorClosed = true;
         xr_delete(time_dilator);
     }
 }
@@ -26,7 +24,7 @@ void CloseTimeDilator()
 void UITimeDilator::SetUiTimeFactor(float timeFactor)
 {
     uiTimeFactor = timeFactor;
-    dilateTime();
+    startTimeDilation();
 };
 
 float UITimeDilator::GetUiTimeFactor() { return uiTimeFactor; };
@@ -37,40 +35,36 @@ void UITimeDilator::SetModeEnability(UIMode mode, bool status)
 
     if (status)
     {
-        dilateTime();
+        startTimeDilation();
     }
     else if (!status && mode == currMode)
     {
-        resetTime();
+        stopTimeDilation();
     }
 }
 
 bool UITimeDilator::GetModeEnability(UIMode mode) { return enabledModes.is(mode); }
 
-bool UITimeDilator::StartTimeDilation(UIMode mode)
+void UITimeDilator::SetCurrentMode(UIMode mode)
 {
     currMode = mode;
-    return dilateTime();
+    if (mode != None)
+    {
+        startTimeDilation();
+    }
+    else
+    {
+        stopTimeDilation();
+    }
 }
 
-void UITimeDilator::StopTimeDilation()
-{
-    currMode = None;
-    resetTime();
-}
-
-bool UITimeDilator::dilateTime()
+void UITimeDilator::startTimeDilation()
 {
     if (enabledModes.is(currMode) && currMode != None)
-    {
         Device.time_factor(uiTimeFactor);
-        return true;
-    }
-
-    return false;
 }
 
-void UITimeDilator::resetTime()
+void UITimeDilator::stopTimeDilation()
 {
     Device.time_factor(1.0);
 }
