@@ -86,7 +86,6 @@ CSoundRender_EffectsA_EFX::~CSoundRender_EffectsA_EFX()
         if (alIsAuxiliaryEffectSlot(slot))
             alDeleteAuxiliaryEffectSlots(1, &slot);
     }
-
 }
 
 bool CSoundRender_EffectsA_EFX::initialized()

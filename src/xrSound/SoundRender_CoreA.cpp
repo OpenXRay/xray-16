@@ -130,7 +130,6 @@ void CSoundRender_CoreA::set_master_volume(float f)
 
 void CSoundRender_CoreA::_clear()
 {
-
     inherited::_clear();
     xr_delete(m_effects);
     // remove targets

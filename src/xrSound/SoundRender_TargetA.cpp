@@ -35,7 +35,6 @@ bool CSoundRender_TargetA::_initialize()
         A_CHK(alSourcef(pSource, AL_MAX_GAIN, 1.f));
         A_CHK(alSourcef(pSource, AL_GAIN, cache_gain));
         A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
-
 #if __has_include(<openal/efx.h>)
         if (pAuxSlot != ALuint(-1))
             A_CHK(alSource3i(pSource, AL_AUXILIARY_SEND_FILTER, pAuxSlot, 0, AL_FILTER_NULL));
@@ -87,7 +86,6 @@ void CSoundRender_TargetA::stop()
         A_CHK(alSourceStop(pSource));
         A_CHK(alSourcei(pSource, AL_BUFFER, 0));
         A_CHK(alSourcei(pSource, AL_SOURCE_RELATIVE, TRUE));
-
     }
     inherited::stop();
 }
@@ -117,6 +115,7 @@ void CSoundRender_TargetA::update()
     if ((error = alGetError()) != AL_NO_ERROR)
     {
         Msg("! %s:: source state check failed (0x%d)", __FUNCTION__, error);
+        return;
     }
 
     while (processed > 0)
@@ -159,7 +158,6 @@ void CSoundRender_TargetA::fill_parameters()
     VERIFY(SE);
 
     inherited::fill_parameters();
-    ALenum error;
 
     // 3D params
     VERIFY2(m_pEmitter, SE->source()->file_name());
@@ -171,12 +169,16 @@ void CSoundRender_TargetA::fill_parameters()
     VERIFY2(m_pEmitter, SE->source()->file_name());
     A_CHK(alSource3f(pSource, AL_POSITION, m_pEmitter->p_source.position.x, m_pEmitter->p_source.position.y,
         -m_pEmitter->p_source.position.z));
+
     VERIFY2(m_pEmitter, SE->source()->file_name());
     A_CHK(alSource3f(pSource, AL_VELOCITY, m_pEmitter->p_source.velocity.x, m_pEmitter->p_source.velocity.y,
         -m_pEmitter->p_source.velocity.z));
+
     VERIFY2(m_pEmitter, SE->source()->file_name());
     A_CHK(alSourcei(pSource, AL_SOURCE_RELATIVE, m_pEmitter->b2D));
+
     A_CHK(alSourcef(pSource, AL_ROLLOFF_FACTOR, psSoundRolloff));
+
     VERIFY2(m_pEmitter, SE->source()->file_name());
     float _gain = m_pEmitter->smooth_volume;
     clamp(_gain, EPS_S, 1.f);
@@ -198,9 +200,7 @@ void CSoundRender_TargetA::fill_parameters()
         if (!m_pEmitter->iPaused && (m_pEmitter->m_current_state == CSoundRender_Emitter::stStarting || m_pEmitter->m_current_state == CSoundRender_Emitter::stPlaying || m_pEmitter->m_current_state == CSoundRender_Emitter::stSimulating))
             m_pEmitter->fTimeToStop = SoundRender->fTimer_Value + ((m_pEmitter->get_length_sec() - (SoundRender->fTimer_Value - m_pEmitter->fTimeStarted)) / cache_pitch);
     }
-
     VERIFY2(m_pEmitter, SE->source()->file_name());
-
 }
 
 void CSoundRender_TargetA::fill_block(ALuint BufferID)

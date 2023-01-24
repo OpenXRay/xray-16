@@ -3,7 +3,7 @@
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
 
-#if defined(X_PLATFORM_WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS)
 #define OPENAL
 #include  <eax/eax.h>
 #include "SoundRender_EffectsA_EAX.h"

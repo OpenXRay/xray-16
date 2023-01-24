@@ -49,7 +49,6 @@ CSoundRender_Core::CSoundRender_Core()
     e_target.set_identity();
     bListenerMoved = false;
     bReady = false;
-        // do nothing
     isLocked = false;
     fTimer_Value = Timer.GetElapsed_sec();
     fTimer_Delta = 0.0f;
