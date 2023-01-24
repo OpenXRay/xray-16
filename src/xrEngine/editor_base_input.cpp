@@ -105,6 +105,19 @@ void ide::IR_OnKeyboardPress(int key)
 {
     ImGuiIO& io = ImGui::GetIO();
 
+    if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+    {
+        if (IsBinded(kQUIT, key))
+        {
+            IR_Release();
+            return;
+        }
+    }
+    else if (!io.WantTextInput)
+    {
+        ImGui::SetWindowFocus(nullptr);
+    }
+
     switch (key)
     {
     case SDL_SCANCODE_LCTRL:
