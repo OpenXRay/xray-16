@@ -35,7 +35,28 @@ void display_property(CEnvDescriptor& descriptor)
     ImGui::PushID(descriptor.m_identifier.c_str());
 
     ImGui::LabelText("identifier", "%s", descriptor.m_identifier.c_str());
-    ImGui::LabelText("config style", "%s", descriptor.old_style ? "soc" : "cs/cop");
+    {
+        enum ConfigStyle : int
+        {
+            ConfigStyle_SOC,
+            ConfigStyle_CSCOP,
+            ConfigStyle_COUNT
+        };
+        constexpr pcstr styles[ConfigStyle_COUNT] =
+        {
+            "SOC",
+            "CS/COP"
+        };
+        int selected = descriptor.old_style ? ConfigStyle_SOC : ConfigStyle_CSCOP;
+        if (ImGui::SliderInt("config style", &selected, 0, ConfigStyle_COUNT - 1, styles[selected]))
+        {
+            switch ((ConfigStyle)selected)
+            {
+                case ConfigStyle_SOC:   descriptor.old_style = true; break;
+                case ConfigStyle_CSCOP: descriptor.old_style = false; break;
+            }
+        }
+    }
 
     if (ImGui::CollapsingHeader("sun##header", ImGuiTreeNodeFlags_DefaultOpen))
     {
