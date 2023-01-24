@@ -186,7 +186,6 @@ void CSoundRender_TargetA::fill_parameters()
     {
         cache_gain = _gain;
         A_CHK(alSourcef(pSource, AL_GAIN, _gain));
-        A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
     }
 
     VERIFY2(m_pEmitter, SE->source()->file_name());
@@ -199,6 +198,7 @@ void CSoundRender_TargetA::fill_parameters()
         // Only update time to stop for non-looped sounds
         if (!m_pEmitter->iPaused && (m_pEmitter->m_current_state == CSoundRender_Emitter::stStarting || m_pEmitter->m_current_state == CSoundRender_Emitter::stPlaying || m_pEmitter->m_current_state == CSoundRender_Emitter::stSimulating))
             m_pEmitter->fTimeToStop = SoundRender->fTimer_Value + ((m_pEmitter->get_length_sec() - (SoundRender->fTimer_Value - m_pEmitter->fTimeStarted)) / cache_pitch);
+        A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
     }
     VERIFY2(m_pEmitter, SE->source()->file_name());
 }
