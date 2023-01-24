@@ -156,10 +156,11 @@ void display_property(CEnvDescriptorMixer& descriptor)
     ImGui::PushID(descriptor.m_identifier.c_str());
     if (ImGui::CollapsingHeader("mixer", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::DragFloat("fog near", &descriptor.fog_near);
-        ImGui::DragFloat("fog far", &descriptor.fog_far);
+        ImGui::ColorEdit4("environment color", (float*)&descriptor.env_color);
         ImGui::DragFloat("weight", &descriptor.weight, 1.0f, 0.0f, 1.0f);
         ImGui::DragFloat("modifier power", &descriptor.modif_power);
+        ImGui::DragFloat("fog near", &descriptor.fog_near);
+        ImGui::DragFloat("fog far", &descriptor.fog_far);
     }
     ImGui::PopID();
 }

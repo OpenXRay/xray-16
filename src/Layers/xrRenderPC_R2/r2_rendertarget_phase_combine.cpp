@@ -113,28 +113,12 @@ void CRenderTarget::phase_combine()
         };
         ambclr.mul(ps_r2_sun_lumscale_amb);
 
-        Fvector4 envclr;
-        if (envdesc.old_style)
-        {
-            envclr =
-            {
-                envdesc.sky_color.x * 2 + EPS, envdesc.sky_color.y * 2 + EPS,
-                envdesc.sky_color.z * 2 + EPS, envdesc.weight
-            };
-        }
-        else
-        {
-            envclr =
-            {
-                envdesc.hemi_color.x * 2 + EPS, envdesc.hemi_color.y * 2 + EPS,
-                envdesc.hemi_color.z * 2 + EPS, envdesc.weight
-            };
-        }
-
-        Fvector4 fogclr = {envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0};
+        Fvector4 envclr = envdesc.env_color;
         envclr.x *= 2 * ps_r2_sun_lumscale_hemi;
         envclr.y *= 2 * ps_r2_sun_lumscale_hemi;
         envclr.z *= 2 * ps_r2_sun_lumscale_hemi;
+
+        Fvector4 fogclr = {envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0};
         Fvector4 sunclr, sundir;
 
         float fSSAONoise = 2.0f;
@@ -540,28 +524,12 @@ void CRenderTarget::phase_combine_volumetric()
         };
         ambclr.mul(ps_r2_sun_lumscale_amb);
 
-        Fvector4 envclr;
-        if (envdesc.old_style)
-        {
-            envclr =
-            {
-                envdesc.sky_color.x * 2 + EPS, envdesc.sky_color.y * 2 + EPS,
-                envdesc.sky_color.z * 2 + EPS, envdesc.weight
-            };
-        }
-        else
-        {
-            envclr =
-            {
-                envdesc.hemi_color.x * 2 + EPS, envdesc.hemi_color.y * 2 + EPS,
-                envdesc.hemi_color.z * 2 + EPS, envdesc.weight
-            };
-        }
-
-        Fvector4 fogclr = {envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0};
+        Fvector4 envclr = envdesc.env_color;
         envclr.x *= 2 * ps_r2_sun_lumscale_hemi;
         envclr.y *= 2 * ps_r2_sun_lumscale_hemi;
         envclr.z *= 2 * ps_r2_sun_lumscale_hemi;
+
+        Fvector4 fogclr = {envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0};
         Fvector4 sunclr, sundir;
 
         // sun-params
