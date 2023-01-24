@@ -111,6 +111,13 @@ void ide::OnFrame()
     if (m_windows.weather)
         ShowWeatherEditor();
 
+    const bool focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow);
+    const bool double_click = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
+    if (double_click && !focused)
+    {
+        IR_Release();
+    }
+
     ImGui::EndFrame();
 }
 
