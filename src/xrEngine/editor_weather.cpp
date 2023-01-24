@@ -9,6 +9,21 @@
 
 namespace xray::editor
 {
+bool TextureSelector(pcstr label, shared_str& texture_name)
+{
+    bool changed = false;
+    string_path temp;
+    xr_strcpy(temp, texture_name.empty() ? "" : texture_name.c_str());
+
+    if (ImGui::InputText(label, temp, std::size(temp)))
+    {
+        texture_name = temp;
+        changed = true;
+    }
+
+    return changed;
+}
+
 template <typename T>
 void display_property(T&) {}
 
@@ -51,7 +66,15 @@ void display_property(CEnvDescriptor& descriptor)
     }
     if (ImGui::CollapsingHeader("hemisphere", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        // XXX: texture
+        if (TextureSelector("sky texture", descriptor.sky_texture_name))
+        {
+            string_path temp;
+            strconcat(temp, descriptor.sky_texture_name.c_str(), "#small");
+            descriptor.sky_texture_env_name = temp;
+
+            descriptor.on_device_create();
+        }
+
         ImGui::ColorEdit3("sky color", (float*)&descriptor.sky_color);
         ImGui::ColorEdit4("hemi color", (float*)&descriptor.hemi_color, ImGuiColorEditFlags_AlphaBar);
 
@@ -65,7 +88,9 @@ void display_property(CEnvDescriptor& descriptor)
     }
     if (ImGui::CollapsingHeader("clouds", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        // XXX: texture
+        if (TextureSelector("clouds texture", descriptor.clouds_texture_name))
+            descriptor.on_device_create();
+
         ImGui::ColorEdit4("clouds color", (float*)&descriptor.clouds_color, ImGuiColorEditFlags_AlphaBar);
     }
     if (ImGui::CollapsingHeader("ambient##header", ImGuiTreeNodeFlags_DefaultOpen))
