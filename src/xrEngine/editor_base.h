@@ -9,6 +9,8 @@
 
 namespace xray::editor
 {
+struct ide_backend;
+
 class ENGINE_API ide final :
     public pureRender,
     public pureFrame,
@@ -69,6 +71,10 @@ private:
     ImGuiWindowFlags get_default_window_flags() const;
 
 private:
+    void InitBackend();
+    void ShutdownBackend();
+
+private:
     void ShowMain();
     void ShowWeatherEditor();
 
@@ -76,6 +82,7 @@ private:
     CTimer m_timer;
     IImGuiRender* m_render{};
     ImGuiContext* m_context{};
+    ide_backend* m_backend_data{};
 
     struct
     {
