@@ -12,6 +12,8 @@ struct ide_backend
 
 void ide::InitBackend()
 {
+    m_backend_data = xr_new<ide_backend>();
+
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
     io.BackendFlags |= ImGuiBackendFlags_HasGamepad | ImGuiBackendFlags_HasMouseCursors;
@@ -42,6 +44,8 @@ void ide::ShutdownBackend()
         SDL_free(bd.clipboard_text_data);
         bd.clipboard_text_data = nullptr;
     }
+
+    xr_delete(m_backend_data);
 }
 
 void ide::UpdateInputAsync()
