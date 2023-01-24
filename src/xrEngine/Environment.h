@@ -199,9 +199,10 @@ public:
     FactoryPtr<IEnvDescriptorMixerRender> m_pDescriptorMixer;
 
     float weight;
+    float modif_power;
     float fog_near;
     float fog_far;
-    float modif_power;
+    Fvector4 env_color;
 
 public:
     CEnvDescriptorMixer(shared_str const& identifier);

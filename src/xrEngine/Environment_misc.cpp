@@ -561,6 +561,24 @@ void CEnvDescriptorMixer::lerp(
     lens_flare_id = f < 0.5f ? A.lens_flare_id : B.lens_flare_id;
     tb_id = f < 0.5f ? A.tb_id : B.tb_id;
     env_ambient = Random.randF() < 1.f - f ? A.env_ambient : B.env_ambient;
+
+    if (old_style)
+    {
+        env_color =
+        {
+            sky_color.x * 2 + EPS, sky_color.y * 2 + EPS,
+            sky_color.z * 2 + EPS, weight
+        };
+    }
+    else
+    {
+        env_color =
+        {
+            hemi_color.x * 2 + EPS, hemi_color.y * 2 + EPS,
+            hemi_color.z * 2 + EPS, weight
+        };
+    }
+
 }
 
 //-----------------------------------------------------------------------------
