@@ -133,6 +133,8 @@ enum EGameActions : u32
 
     kKICK, // alpet: kick dynamic objects
 
+    kEDITOR,
+
     kLASTACTION,
     kNOTBINDED
 };

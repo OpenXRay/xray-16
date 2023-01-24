@@ -21,6 +21,14 @@ class ENGINE_API ide final :
     public IInputReceiver
 {
 public:
+    enum class visible_state
+    {
+        hidden, // all ide windows are hidden
+        full,   // input captured, opaque windows
+        light,  // input not captured, transparent windows
+    };
+
+public:
     ide();
     ~ide();
 
@@ -29,12 +37,14 @@ public:
 
 public:
     void UpdateWindowProps();
-    void UpdateInputAsync();
 
     void OnDeviceCreate();
     void OnDeviceDestroy();
     void OnDeviceResetBegin() const;
     void OnDeviceResetEnd() const;
+
+    void SetState(visible_state state);
+    void SwitchToNextState();
 
 public:
     // Interface implementations
@@ -84,9 +94,9 @@ private:
     ImGuiContext* m_context{};
     ide_backend* m_backend_data{};
 
+    visible_state m_state;
     struct
     {
-        bool main;
         bool weather;
         bool imgui_demo;
         bool imgui_metrics;

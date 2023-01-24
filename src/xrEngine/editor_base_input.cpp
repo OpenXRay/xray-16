@@ -48,37 +48,6 @@ void ide::ShutdownBackend()
     xr_delete(m_backend_data);
 }
 
-void ide::UpdateInputAsync()
-{
-    ImGuiIO& io = ImGui::GetIO();
-
-    Ivector2 p;
-    pInput->iGetAsyncMousePos(p);
-    io.AddMousePosEvent(static_cast<float>(p.x), static_cast<float>(p.y));
-
-    pInput->iGetAsyncScrollPos(p);
-    io.AddMouseWheelEvent(static_cast<float>(p.x), static_cast<float>(p.y));
-
-    io.AddMouseButtonEvent(0, IR_GetKeyState(MOUSE_1));
-    io.AddMouseButtonEvent(1, IR_GetKeyState(MOUSE_2));
-    io.AddMouseButtonEvent(2, IR_GetKeyState(MOUSE_3));
-    io.AddMouseButtonEvent(3, IR_GetKeyState(MOUSE_4));
-    io.AddMouseButtonEvent(4, IR_GetKeyState(MOUSE_5));
-
-    io.AddKeyEvent(ImGuiMod_Ctrl,  IR_GetKeyState(SDL_SCANCODE_LCTRL)  || IR_GetKeyState(SDL_SCANCODE_RCTRL));
-    io.AddKeyEvent(ImGuiMod_Shift, IR_GetKeyState(SDL_SCANCODE_LSHIFT) || IR_GetKeyState(SDL_SCANCODE_RSHIFT));
-    io.AddKeyEvent(ImGuiMod_Alt,   IR_GetKeyState(SDL_SCANCODE_LALT)   || IR_GetKeyState(SDL_SCANCODE_RALT));
-    io.AddKeyEvent(ImGuiMod_Super, IR_GetKeyState(SDL_SCANCODE_LGUI)   || IR_GetKeyState(SDL_SCANCODE_RGUI));
-
-    for (int i = SDL_SCANCODE_UNKNOWN; i < XR_CONTROLLER_BUTTON_MAX; i++)
-    {
-        const auto imkey = xr_key_to_imgui_key(i);
-        if (imkey == ImGuiKey_None)
-            continue;
-        io.AddKeyEvent(imkey, IR_GetKeyState(i));
-    }
-}
-
 void ide::OnAppActivate()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -93,7 +62,6 @@ void ide::OnAppDeactivate()
 
 void ide::IR_Capture()
 {
-    m_windows.main = true;
     IInputReceiver::IR_Capture();
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = true;
@@ -102,7 +70,6 @@ void ide::IR_Capture()
 void ide::IR_Release()
 {
     SDL_StopTextInput();
-    m_windows.main = false;
     IInputReceiver::IR_Release();
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = false;
@@ -148,17 +115,26 @@ void ide::IR_OnKeyboardPress(int key)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+    switch (GetBindedAction(key))
     {
-        if (IsBinded(kQUIT, key))
+    case kEDITOR:
+        SwitchToNextState();
+        return;
+
+    case kQUIT:
+        if (io.WantTextInput)
+            break; // bypass to ImGui
+
+        // First
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
         {
-            IR_Release();
+            ImGui::SetWindowFocus(nullptr);
             return;
         }
-    }
-    else if (!io.WantTextInput)
-    {
-        ImGui::SetWindowFocus(nullptr);
+
+        // Second
+        SetState(visible_state::light);
+        return;
     }
 
     switch (key)
