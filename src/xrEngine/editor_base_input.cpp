@@ -5,6 +5,45 @@
 
 namespace xray::editor
 {
+struct ide_backend
+{
+    char* clipboard_text_data;
+};
+
+void ide::InitBackend()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
+    io.BackendFlags |= ImGuiBackendFlags_HasGamepad | ImGuiBackendFlags_HasMouseCursors;
+    io.BackendPlatformName = "imgui_impl_xray";
+
+    // Clipboard functionality
+    io.SetClipboardTextFn = [](void*, const char* text)
+    {
+        SDL_SetClipboardText(text);
+    };
+    io.GetClipboardTextFn = [](void* user_data) -> const char*
+    {
+        ide_backend& bd = *(ide_backend*)user_data;
+        if (bd.clipboard_text_data)
+            SDL_free(bd.clipboard_text_data);
+        bd.clipboard_text_data = SDL_GetClipboardText();
+        return bd.clipboard_text_data;
+    };
+    io.ClipboardUserData = m_backend_data;
+}
+
+void ide::ShutdownBackend()
+{
+    ide_backend& bd = *m_backend_data;
+
+    if (bd.clipboard_text_data)
+    {
+        SDL_free(bd.clipboard_text_data);
+        bd.clipboard_text_data = nullptr;
+    }
+}
+
 void ide::UpdateInputAsync()
 {
     ImGuiIO& io = ImGui::GetIO();

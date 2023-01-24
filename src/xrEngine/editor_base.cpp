@@ -18,14 +18,12 @@ ide::ide()
     );
     m_context = ImGui::CreateContext();
 
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
-    io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
-    io.BackendPlatformName = "imgui_impl_xray";
+    InitBackend();
 }
 
 ide::~ide()
 {
+    ShutdownBackend();
     ImGui::DestroyContext(m_context);
 }
 
@@ -174,5 +172,4 @@ bool ide::is_shown() const
 {
     return m_windows.main;
 }
-
 } // namespace xray::editor
