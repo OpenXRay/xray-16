@@ -46,10 +46,10 @@ CSoundRender_EffectsA_EFX::CSoundRender_EffectsA_EFX()
     alEffectf(effect, AL_EAXREVERB_DECAY_LFRATIO, AL_EAXREVERB_DEFAULT_DECAY_LFRATIO);
     alEffectf(effect, AL_EAXREVERB_REFLECTIONS_GAIN, AL_EAXREVERB_DEFAULT_REFLECTIONS_GAIN);
     alEffectf(effect, AL_EAXREVERB_REFLECTIONS_DELAY, AL_EAXREVERB_DEFAULT_REFLECTIONS_DELAY);
-    alEffectfv(effectfv, AL_EAXREVERB_REFLECTIONS_PAN, f3);
+    alEffectfv(effect, AL_EAXREVERB_REFLECTIONS_PAN, f3);
     alEffectf(effect, AL_EAXREVERB_LATE_REVERB_GAIN, AL_EAXREVERB_DEFAULT_LATE_REVERB_GAIN);
     alEffectf(effect, AL_EAXREVERB_LATE_REVERB_DELAY, AL_EAXREVERB_DEFAULT_LATE_REVERB_DELAY);
-    alEffectfv(effectfv, AL_EAXREVERB_LATE_REVERB_PAN, f3);
+    alEffectfv(effect, AL_EAXREVERB_LATE_REVERB_PAN, f3);
     alEffectf(effect, AL_EAXREVERB_ECHO_TIME, AL_EAXREVERB_DEFAULT_ECHO_TIME);
     alEffectf(effect, AL_EAXREVERB_ECHO_DEPTH, AL_EAXREVERB_DEFAULT_ECHO_DEPTH);
     alEffectf(effect, AL_EAXREVERB_MODULATION_TIME, AL_EAXREVERB_DEFAULT_MODULATION_TIME);
@@ -155,13 +155,13 @@ void CSoundRender_EffectsA_EFX::commit()
      * effectively copies the effect properties. You can modify or delete the
      * effect object afterward without affecting the effect slot.
      */
-    A_CHK(alAuxiliaryEffectSlotf(slot, AL_EFFECTSLOT_GAIN, 0.6f));
+    A_CHK(alAuxiliaryEffectSlotf(slot, AL_EFFECTSLOT_GAIN, 0.5f));
     A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, true));
-    A_CHK(alAuxiliaryEffectSlotfv(slot, AL_EFFECTSLOT_EFFECT, &effectfv));
     A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_EFFECT, effect));
+    A_CHK(alAuxiliaryEffectSlotfv(slot, AL_EFFECTSLOT_EFFECT, &effectfv));
     if (const ALenum err = alGetError(); err == AL_NO_ERROR)
     {
-        Msg("! %s:: error, effect not loaded (0x%d)", __FUNCTION__, error);
+        Msg("! %s:: error, effect not loaded (0x%d)", __FUNCTION__, err);
     }
 }
 #endif // XR_HAS_EFX
