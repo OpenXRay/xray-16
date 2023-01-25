@@ -43,8 +43,8 @@ private:
     _GRAPH_ID m_current_level_some_vertex_id;
 
 private:
-    u32* m_cross_tables;
-    CGameLevelCrossTable* m_current_level_cross_table;
+    u32* m_cross_tables{};
+    CGameLevelCrossTable* m_current_level_cross_table{};
 
     inline void Initialize(IReader& stream, bool own);
 
