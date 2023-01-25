@@ -175,7 +175,7 @@ ImGuiWindowFlags ide::get_default_window_flags() const
 
 bool ide::is_shown() const
 {
-    return m_state == visible_state::full;
+    return m_state == visible_state::full || m_windows.weather;
 }
 
 void ide::SetState(visible_state state)
@@ -208,7 +208,10 @@ void ide::SwitchToNextState()
         break;
 
     case visible_state::full:
-        SetState(visible_state::light);
+        if (is_shown())
+            SetState(visible_state::light);
+        else
+            SetState(visible_state::hidden);
         break;
 
     case visible_state::light:
