@@ -204,10 +204,14 @@ public:
     float fog_far;
     Fvector4 env_color;
 
+    bool use_dynamic_sun_dir;
+    float dynamic_sun_dir_azimuth;
+
 public:
     CEnvDescriptorMixer(shared_str const& identifier);
-    virtual void lerp(
-        CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& M, float m_power);
+    virtual void lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
+        float f, CEnvModifier& M, float m_power);
+    void calculate_dynamic_sun_dir(float fGameTime);
     void clear();
     void destroy();
 };
@@ -235,8 +239,6 @@ private:
     float TimeWeight(float val, float min_t, float max_t);
     void SelectEnvs(EnvVec* envs, CEnvDescriptor*& e0, CEnvDescriptor*& e1, float tm);
     void SelectEnv(EnvVec* envs, CEnvDescriptor*& e, float tm);
-
-    void calculate_dynamic_sun_dir();
 
 public:
     static bool sort_env_pred(const CEnvDescriptor* x, const CEnvDescriptor* y) { return x->exec_time < y->exec_time; }
@@ -341,9 +343,6 @@ public:
 
     bool m_paused;
 #endif // #ifdef _EDITOR
-
-    bool useDynamicSunDir;
-    float sunDirAzimuth;
 
     CInifile* m_ambients_config;
     CInifile* m_sound_channels_config;
