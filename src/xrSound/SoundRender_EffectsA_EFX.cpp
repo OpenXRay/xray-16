@@ -155,9 +155,10 @@ void CSoundRender_EffectsA_EFX::commit()
      */
     A_CHK(alAuxiliaryEffectSlotf(slot, AL_EFFECTSLOT_GAIN, 0.5f));
     A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, true));
-    A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_EFFECT, effect));
+    alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_EFFECT, effect);
     if (const ALenum err = alGetError(); err == AL_NO_ERROR)
     {
+        VERIFY(err == AL_NO_ERROR);
         Msg("! %s:: error, effect not loaded (0x%d)", __FUNCTION__, err);
     }
 }
