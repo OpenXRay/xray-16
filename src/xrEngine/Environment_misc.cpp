@@ -398,6 +398,13 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
     R_ASSERT(_valid(sun_dir));
 
+    float degrees;
+    if (!config.read_if_exists(degrees, identifier, "sun_dir_azimuth"))
+        degrees = pSettingsOpenXRay->read_if_exists<float>("environment", "sun_dir_azimuth", 0.0f);
+
+    clamp(degrees, 0.0f, 360.0f);
+    sun_dir_azimuth = deg2rad(degrees);
+
     if (oldStyle)
     {
         lens_flare_id = environment.eff_LensFlare->AppendDef(environment, pSettings,
@@ -454,11 +461,6 @@ CEnvDescriptorMixer::CEnvDescriptorMixer(shared_str const& identifier)
     : CEnvDescriptor(identifier)
 {
     use_dynamic_sun_dir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
-
-    float degress = pSettingsOpenXRay->read_if_exists<float>("environment", "sun_dir_azimuth", 0.0f);
-    clamp(degress, 0.0f, 360.0f);
-
-    dynamic_sun_dir_azimuth = deg2rad(degress);
 }
 
 void CEnvDescriptorMixer::destroy()
@@ -563,7 +565,10 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
 
      // Igor. Dynamic sun position.
     if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir && !old_style)
+    {
+        sun_dir_azimuth = (fi * A.sun_dir_azimuth + f * B.sun_dir_azimuth);
         calculate_dynamic_sun_dir(parent.GetGameTime());
+    }
     else
     {
         R_ASSERT(_valid(A.sun_dir));
@@ -642,7 +647,7 @@ void CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime)
         cosAZ = (_sin(deg2rad(D)) - _sin(LatitudeR) * _cos(SZA)) / sin_SZA_X_cos_Latitude;
 
     clamp(cosAZ, -1.0f, 1.0f);
-    float AZ = acosf(cosAZ) + dynamic_sun_dir_azimuth;
+    float AZ = acosf(cosAZ) + sun_dir_azimuth;
 
     const Fvector2 minAngle = Fvector2().set(deg2rad(1.0f), deg2rad(3.0f));
 
