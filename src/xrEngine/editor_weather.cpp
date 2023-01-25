@@ -106,6 +106,14 @@ void display_property(CEnvDescriptor& descriptor)
             descriptor.sun_dir.setHP(deg2rad(y), deg2rad(x));
         }
 
+        float azimuth = rad2deg(descriptor.sun_dir_azimuth);
+        if (ImGui::DragFloat("azimuth", &azimuth, 0.5f, -360.0f, 360.f))
+            descriptor.sun_dir_azimuth = deg2rad(azimuth);
+        ImGui::SameLine();
+        ItemHelp("Dynamic sun dir azimuth correction.\n"
+                 "Name in configs: \n"
+                 "sun_dir_azimuth");
+
         ImGui::DragFloat("shafts intensity", &descriptor.m_fSunShaftsIntensity, 0.001f, 0.0f, 1.0f);
     }
     if (ImGui::CollapsingHeader("hemisphere##category", ImGuiTreeNodeFlags_DefaultOpen))
@@ -221,12 +229,6 @@ void display_property(CEnvDescriptorMixer& descriptor)
         ImGui::SameLine();
         ItemHelp("CS/COP: takes hemisphere color as the base value.\n"
                  "SOC   : takes sky color as the base value.");
-
-        float azimuth = rad2deg(descriptor.dynamic_sun_dir_azimuth);
-        if (ImGui::DragFloat("sun dir azimuth", &azimuth, 0.5f, -360.0f, 360.f))
-            descriptor.dynamic_sun_dir_azimuth = deg2rad(azimuth);
-        ImGui::SameLine();
-        ItemHelp("Dynamic sun dir azimuth correction.");
 
         ImGui::DragFloat("weight", &descriptor.weight, 0.001f, 0.0f, 1.0f);
         ImGui::DragFloat("modifier power", &descriptor.modif_power);

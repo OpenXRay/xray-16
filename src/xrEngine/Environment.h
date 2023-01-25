@@ -165,6 +165,8 @@ public:
     Fvector4 hemi_color; // w = R2 correction
     Fvector3 sun_color;
     Fvector3 sun_dir;
+    float sun_dir_azimuth; // for dynamic sun dir
+
     float m_fSunShaftsIntensity;
     float m_fWaterIntensity;
 
@@ -205,7 +207,6 @@ public:
     Fvector4 env_color;
 
     bool use_dynamic_sun_dir;
-    float dynamic_sun_dir_azimuth;
 
 public:
     CEnvDescriptorMixer(shared_str const& identifier);
