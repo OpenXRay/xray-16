@@ -327,7 +327,7 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV,
     stat.render.polys += PC;
     constants.flush();
     glDrawElementsBaseVertex(Topology, iIndexCount, GL_UNSIGNED_SHORT, (void*)(startI * sizeof(GLushort)), baseV);
-    ALenum err = glGetError();
+    GLenum err = glGetError();
     if (err != GL_NO_ERROR)
     {
         VERIFY(err == GL_NO_ERROR);
@@ -346,7 +346,7 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
     stat.render.polys += PC;
     constants.flush();
     glDrawArrays(Topology, startV, iIndexCount);
-    ALenum err = glGetError();
+    GLenum err = glGetError();
     if (err != GL_NO_ERROR)
     {
         VERIFY(err == GL_NO_ERROR);
