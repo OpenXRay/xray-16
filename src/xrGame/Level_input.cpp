@@ -122,9 +122,6 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (Device.dwPrecacheFrame)
         return;
 
-    if (Device.editor_mode() && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT)))
-        return;
-
     bool b_ui_exist = !!CurrentGameUI();
 
     EGameActions _curr = GetBindedAction(key);
@@ -149,6 +146,12 @@ void CLevel::IR_OnKeyboardPress(int key)
 #endif
             Device.Pause(!Device.Paused(), TRUE, TRUE, reason);
         }
+        return;
+    }
+
+    if (_curr == kEDITOR)
+    {
+        Device.editor().SwitchToNextState();
         return;
     }
 

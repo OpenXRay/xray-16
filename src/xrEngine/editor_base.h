@@ -5,10 +5,12 @@
 
 #define IMGUI_DISABLE_OBSOLETE_KEYIO
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-struct ImGuiContext;
+#include <imgui.h>
 
 namespace xray::editor
 {
+struct ide_backend;
+
 class ENGINE_API ide final :
     public pureRender,
     public pureFrame,
@@ -19,19 +21,30 @@ class ENGINE_API ide final :
     public IInputReceiver
 {
 public:
+    enum class visible_state
+    {
+        hidden, // all ide windows are hidden
+        full,   // input captured, opaque windows
+        light,  // input not captured, transparent windows
+    };
+
+public:
     ide();
     ~ide();
 
-    bool is_shown() const { return m_shown; }
+    [[nodiscard]]
+    bool is_shown() const;
 
 public:
     void UpdateWindowProps();
-    void UpdateInputAsync();
 
     void OnDeviceCreate();
     void OnDeviceDestroy();
     void OnDeviceResetBegin() const;
     void OnDeviceResetEnd() const;
+
+    void SetState(visible_state state);
+    void SwitchToNextState();
 
 public:
     // Interface implementations
@@ -65,12 +78,28 @@ public:
     void IR_OnControllerAttitudeChange(Fvector change) final;
 
 private:
+    ImGuiWindowFlags get_default_window_flags() const;
+
+private:
+    void InitBackend();
+    void ShutdownBackend();
+
+private:
     void ShowMain();
+    void ShowWeatherEditor();
 
 private:
     CTimer m_timer;
     IImGuiRender* m_render{};
     ImGuiContext* m_context{};
-    bool m_shown{};
+    ide_backend* m_backend_data{};
+
+    visible_state m_state;
+    struct
+    {
+        bool weather;
+        bool imgui_demo;
+        bool imgui_metrics;
+    } m_windows{};
 };
 } // namespace xray::editor

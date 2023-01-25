@@ -141,7 +141,9 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kPDA_TAB5",                  int(kPDA_TAB5)),
                 value("kPDA_TAB6",                  int(kPDA_TAB6)),
 
-                value("kKICK",                      int(kKICK))
+                value("kKICK",                      int(kKICK)),
+
+                value("kEDITOR",                    int(kEDITOR))
             ],
 
         class_<KeyBindingRegistrator>("DIK_keys")
