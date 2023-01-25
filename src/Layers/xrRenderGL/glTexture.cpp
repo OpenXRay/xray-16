@@ -202,6 +202,7 @@ _DDS:
                         break;
                     }
                     case gli::TARGET_3D:
+                    case gli::TARGET_CUBE_ARRAY:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
