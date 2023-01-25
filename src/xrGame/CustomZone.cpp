@@ -269,12 +269,13 @@ void CCustomZone::Load(LPCSTR section)
     if (m_zone_flags.test(eIdleLight))
     {
         m_fIdleLightRange = pSettings->r_float(section, "idle_light_range");
+        m_fIdleLightRangeDelta = pSettings->read_if_exists<float>(section, "idle_light_range_delta", 0.25f);
         LPCSTR light_anim = pSettings->r_string(section, "idle_light_anim");
         m_pIdleLAnim = LALib.FindItem(light_anim);
         m_fIdleLightHeight = pSettings->r_float(section, "idle_light_height");
-        m_zone_flags.set(eIdleLightVolumetric, pSettings->r_bool(section, "idle_light_volumetric"));
-        m_zone_flags.set(eIdleLightShadow, pSettings->r_bool(section, "idle_light_shadow"));
-        m_zone_flags.set(eIdleLightR1, pSettings->r_bool(section, "idle_light_r1"));
+        m_zone_flags.set(eIdleLightVolumetric, pSettings->read_if_exists<bool>(section, "idle_light_volumetric", false));
+        m_zone_flags.set(eIdleLightShadow, pSettings->read_if_exists<bool>(section, "idle_light_shadow", true));
+        m_zone_flags.set(eIdleLightR1, pSettings->read_if_exists<bool>(section, "idle_light_r1", true));
     }
 
     bool use = !!READ_IF_EXISTS(pSettings, r_bool, section, "use_secondary_hit", false);
@@ -318,7 +319,7 @@ bool CCustomZone::net_Spawn(CSE_Abstract* DC)
     if (m_zone_flags.test(eIdleLight) && render_ver_allowed)
     {
         m_pIdleLight = GEnv.Render->light_create();
-        m_pIdleLight->set_shadow(!!m_zone_flags.test(eIdleLightShadow));
+        m_pIdleLight->set_shadow(m_zone_flags.test(eIdleLightShadow));
 
         if (m_zone_flags.test(eIdleLightVolumetric))
         {
@@ -708,7 +709,7 @@ void CCustomZone::UpdateIdleLight()
     Fcolor fclr;
     fclr.set((float)color_get_B(clr) / 255.f, (float)color_get_G(clr) / 255.f, (float)color_get_R(clr) / 255.f, 1.f);
 
-    float range = m_fIdleLightRange + 0.25f * ::Random.randF(-1.f, 1.f);
+    float range = m_fIdleLightRange + m_fIdleLightRangeDelta * ::Random.randF(-1.f, 1.f);
     m_pIdleLight->set_range(range);
     m_pIdleLight->set_color(fclr);
 

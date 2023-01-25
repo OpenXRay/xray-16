@@ -2,8 +2,6 @@
 
 #include "dxImGuiRender.h"
 
-#include <imgui.h>
-
 #if defined(USE_DX9)
 #include <backends/imgui_impl_dx9.h>
 #elif defined(USE_DX11)

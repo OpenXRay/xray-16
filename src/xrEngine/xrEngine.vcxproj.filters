@@ -653,6 +653,9 @@
     <ClCompile Include="editor_base_input.cpp">
       <Filter>editor</Filter>
     </ClCompile>
+    <ClCompile Include="editor_weather.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ClientServer.txt" />

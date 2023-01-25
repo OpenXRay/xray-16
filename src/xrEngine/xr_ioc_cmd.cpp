@@ -726,7 +726,7 @@ public:
     CCC_Editor(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
     void Execute(pcstr args) override
     {
-        Device.editor().IR_Capture();
+        Device.editor().SetState(xray::editor::ide::visible_state::full);
     }
 };
 

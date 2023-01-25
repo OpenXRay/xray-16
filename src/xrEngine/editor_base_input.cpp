@@ -3,39 +3,49 @@
 #include "editor_base.h"
 #include "editor_helper.h"
 
-#include <imgui.h>
-
 namespace xray::editor
 {
-void ide::UpdateInputAsync()
+struct ide_backend
 {
+    char* clipboard_text_data;
+};
+
+void ide::InitBackend()
+{
+    m_backend_data = xr_new<ide_backend>();
+
     ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
+    io.BackendFlags |= ImGuiBackendFlags_HasGamepad | ImGuiBackendFlags_HasMouseCursors;
+    io.BackendPlatformName = "imgui_impl_xray";
 
-    Ivector2 p;
-    pInput->iGetAsyncMousePos(p);
-    io.AddMousePosEvent(static_cast<float>(p.x), static_cast<float>(p.y));
-
-    pInput->iGetAsyncScrollPos(p);
-    io.AddMouseWheelEvent(static_cast<float>(p.x), static_cast<float>(p.y));
-
-    io.AddMouseButtonEvent(0, IR_GetKeyState(MOUSE_1));
-    io.AddMouseButtonEvent(1, IR_GetKeyState(MOUSE_2));
-    io.AddMouseButtonEvent(2, IR_GetKeyState(MOUSE_3));
-    io.AddMouseButtonEvent(3, IR_GetKeyState(MOUSE_4));
-    io.AddMouseButtonEvent(4, IR_GetKeyState(MOUSE_5));
-
-    io.AddKeyEvent(ImGuiMod_Ctrl,  IR_GetKeyState(SDL_SCANCODE_LCTRL)  || IR_GetKeyState(SDL_SCANCODE_RCTRL));
-    io.AddKeyEvent(ImGuiMod_Shift, IR_GetKeyState(SDL_SCANCODE_LSHIFT) || IR_GetKeyState(SDL_SCANCODE_RSHIFT));
-    io.AddKeyEvent(ImGuiMod_Alt,   IR_GetKeyState(SDL_SCANCODE_LALT)   || IR_GetKeyState(SDL_SCANCODE_RALT));
-    io.AddKeyEvent(ImGuiMod_Super, IR_GetKeyState(SDL_SCANCODE_LGUI)   || IR_GetKeyState(SDL_SCANCODE_RGUI));
-
-    for (int i = SDL_SCANCODE_UNKNOWN; i < XR_CONTROLLER_BUTTON_MAX; i++)
+    // Clipboard functionality
+    io.SetClipboardTextFn = [](void*, const char* text)
     {
-        const auto imkey = xr_key_to_imgui_key(i);
-        if (imkey == ImGuiKey_None)
-            continue;
-        io.AddKeyEvent(imkey, IR_GetKeyState(i));
+        SDL_SetClipboardText(text);
+    };
+    io.GetClipboardTextFn = [](void* user_data) -> const char*
+    {
+        ide_backend& bd = *(ide_backend*)user_data;
+        if (bd.clipboard_text_data)
+            SDL_free(bd.clipboard_text_data);
+        bd.clipboard_text_data = SDL_GetClipboardText();
+        return bd.clipboard_text_data;
+    };
+    io.ClipboardUserData = m_backend_data;
+}
+
+void ide::ShutdownBackend()
+{
+    ide_backend& bd = *m_backend_data;
+
+    if (bd.clipboard_text_data)
+    {
+        SDL_free(bd.clipboard_text_data);
+        bd.clipboard_text_data = nullptr;
     }
+
+    xr_delete(m_backend_data);
 }
 
 void ide::OnAppActivate()
@@ -52,7 +62,6 @@ void ide::OnAppDeactivate()
 
 void ide::IR_Capture()
 {
-    m_shown = true;
     IInputReceiver::IR_Capture();
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = true;
@@ -61,7 +70,6 @@ void ide::IR_Capture()
 void ide::IR_Release()
 {
     SDL_StopTextInput();
-    m_shown = false;
     IInputReceiver::IR_Release();
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = false;
@@ -106,6 +114,28 @@ void ide::IR_OnMouseMove(int /*x*/, int /*y*/)
 void ide::IR_OnKeyboardPress(int key)
 {
     ImGuiIO& io = ImGui::GetIO();
+
+    switch (GetBindedAction(key))
+    {
+    case kEDITOR:
+        SwitchToNextState();
+        return;
+
+    case kQUIT:
+        if (io.WantTextInput)
+            break; // bypass to ImGui
+
+        // First
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+        {
+            ImGui::SetWindowFocus(nullptr);
+            return;
+        }
+
+        // Second
+        SetState(visible_state::light);
+        return;
+    }
 
     switch (key)
     {

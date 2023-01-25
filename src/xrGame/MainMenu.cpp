@@ -379,13 +379,6 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     if (!IsActive())
         return;
 
-    auto action = GetBindedAction(dik);
-    if (action == kCONSOLE)
-    {
-        Console->Show();
-        return;
-    }
-
     if ((pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT))
         && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LGUI) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RGUI)))
     {
@@ -394,9 +387,18 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
         Device.SetWindowDraggable(true);
     }
 
-    if (action == kSCREENSHOT)
+    switch (GetBindedAction(dik))
     {
+    case kSCREENSHOT:
         GEnv.Render->Screenshot();
+        return;
+
+    case kCONSOLE:
+        Console->Show();
+        return;
+
+    case kEDITOR:
+        Device.editor().SwitchToNextState();
         return;
     }
 
@@ -414,7 +416,6 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
         pInput->GrabInput(true);
         Device.SetWindowDraggable(false);
     }
-
 
     CDialogHolder::IR_UIOnKeyboardRelease(dik);
 };
