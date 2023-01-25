@@ -9,6 +9,20 @@
 
 namespace xray::editor
 {
+static void ItemHelp(const char* desc, bool use_separate_marker = true)
+{
+    if (use_separate_marker)
+        ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
+
 bool TextureSelector(pcstr label, shared_str& texture_name)
 {
     bool changed = false;
@@ -56,24 +70,19 @@ void display_property(CEnvDescriptor& descriptor)
                 case ConfigStyle_CSCOP: descriptor.old_style = false; break;
             }
         }
+        ImGui::SameLine();
+        ItemHelp("This affects how environment color will be calculated in the mixer. "
+                 "(look for details in the environment color help marker in the mixer category)");
     }
 
-    if (ImGui::CollapsingHeader("sun##header", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("sun##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::ColorEdit3("sun color", (float*)&descriptor.sun_color);
-        ImGui::DragFloat("shafts intensity", &descriptor.m_fSunShaftsIntensity, 1.0f, 0.0f, 1.0f);
-
-        bool result = false;
-        float y, x;
-        descriptor.sun_dir.getHP(y, x);
-        result  = ImGui::DragFloat("altitude", &y, 1.0f, -360.0f, 360.f);
-        result |= ImGui::DragFloat("longitude", &x, 1.0f, -360.0f, 360.f);
-        if (result)
-        {
-            descriptor.sun_dir.setHP(deg2rad(y), deg2rad(x));
-        }
-
-        if (ImGui::BeginCombo("sun##lensflareid", descriptor.lens_flare_id.c_str()))
+        const bool open = ImGui::BeginCombo("sun##lensflareid", descriptor.lens_flare_id.c_str());
+        ImGui::SameLine();
+        ItemHelp("Name in configs: \n"
+                 "CS/COP: sun\n"
+                 "   SOC: flares");
+        if (open)
         {
             if (ImGui::Selectable("##", descriptor.lens_flare_id.empty()))
                 descriptor.lens_flare_id = "";
@@ -84,8 +93,30 @@ void display_property(CEnvDescriptor& descriptor)
             }
             ImGui::EndCombo();
         }
+
+        ImGui::ColorEdit3("sun color", (float*)&descriptor.sun_color);
+
+        bool result = false;
+        float y, x;
+        descriptor.sun_dir.getHP(y, x);
+        result  = ImGui::DragFloat("altitude", &y, 0.5f, -360.0f, 360.f);
+        result |= ImGui::DragFloat("longitude", &x, 0.5f, -360.0f, 360.f);
+        if (result)
+        {
+            descriptor.sun_dir.setHP(deg2rad(y), deg2rad(x));
+        }
+
+        float azimuth = rad2deg(descriptor.sun_dir_azimuth);
+        if (ImGui::DragFloat("azimuth", &azimuth, 0.5f, -360.0f, 360.f))
+            descriptor.sun_dir_azimuth = deg2rad(azimuth);
+        ImGui::SameLine();
+        ItemHelp("Dynamic sun dir azimuth correction.\n"
+                 "Name in configs: \n"
+                 "sun_dir_azimuth");
+
+        ImGui::DragFloat("shafts intensity", &descriptor.m_fSunShaftsIntensity, 0.001f, 0.0f, 1.0f);
     }
-    if (ImGui::CollapsingHeader("hemisphere", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("hemisphere##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (TextureSelector("sky texture", descriptor.sky_texture_name))
         {
@@ -98,26 +129,33 @@ void display_property(CEnvDescriptor& descriptor)
 
         ImGui::ColorEdit3("sky color", (float*)&descriptor.sky_color);
         ImGui::ColorEdit4("hemi color", (float*)&descriptor.hemi_color, ImGuiColorEditFlags_AlphaBar);
+        ImGui::SameLine();
+        ItemHelp("Name in configs: \n"
+                 "hemisphere_color");
 
         float rotation = rad2deg(descriptor.sky_rotation);
-        if (ImGui::DragFloat("sky rotation", &rotation, 1.0f, -360.0f, 360.f))
+        if (ImGui::DragFloat("sky rotation", &rotation, 0.5f, -360.0f, 360.f))
             descriptor.sky_rotation = deg2rad(rotation);
-
-        rotation = rad2deg(descriptor.clouds_rotation);
-        if (ImGui::DragFloat("clouds rotation", &rotation, 1.0f, -360.0f, 360.f))
-            descriptor.clouds_rotation = deg2rad(rotation);
     }
-    if (ImGui::CollapsingHeader("clouds", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("clouds##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (TextureSelector("clouds texture", descriptor.clouds_texture_name))
             descriptor.on_device_create();
 
         ImGui::ColorEdit4("clouds color", (float*)&descriptor.clouds_color, ImGuiColorEditFlags_AlphaBar);
+
+        float rotation = rad2deg(descriptor.clouds_rotation);
+        if (ImGui::DragFloat("clouds rotation", &rotation, 0.5f, -360.0f, 360.f))
+            descriptor.clouds_rotation = deg2rad(rotation);
     }
-    if (ImGui::CollapsingHeader("ambient##header", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("ambient##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::ColorEdit3("ambient color", (float*)&descriptor.ambient);
-        if (ImGui::BeginCombo("ambient##env_ambient", descriptor.env_ambient ? descriptor.env_ambient->name().c_str() : "##"))
+        const bool open = ImGui::BeginCombo("ambient##env_ambient", descriptor.env_ambient ? descriptor.env_ambient->name().c_str() : "");
+        ImGui::SameLine();
+        ItemHelp("Name in configs: \n"
+                 "CS/COP: ambient\n"
+                 "   SOC: env_ambient");
+        if (open)
         {
             for (const auto& ambient : env.Ambients)
             {
@@ -127,23 +165,33 @@ void display_property(CEnvDescriptor& descriptor)
             }
             ImGui::EndCombo();
         }
+        ImGui::ColorEdit3("ambient color", (float*)&descriptor.ambient);
+        ImGui::SameLine();
+        ItemHelp("Name in configs: \n"
+                 "CS/COP: ambient_color\n"
+                 "   SOC: ambient");
     }
-    if (ImGui::CollapsingHeader("fog", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("fog##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::ColorEdit3("fog color", (float*)&descriptor.fog_color);
         ImGui::DragFloat("far plane", &descriptor.far_plane);
-        ImGui::DragFloat("distance", &descriptor.fog_distance, 1.0f, 0.0f, descriptor.far_plane);
-        ImGui::DragFloat("density", &descriptor.fog_density, 1.0f, 0.0f, 1.0f);
-        ImGui::DragFloat("water intensity", &descriptor.m_fWaterIntensity, 1.0f, 0.0f, 1.0f);
+        ImGui::ColorEdit3("fog color", (float*)&descriptor.fog_color);
+        ImGui::DragFloat("fog distance", &descriptor.fog_distance, 1.0f, 0.0f, descriptor.far_plane);
+        ImGui::DragFloat("fog density", &descriptor.fog_density, 0.001f, 0.0f, 1.0f);
+        ImGui::DragFloat("water intensity", &descriptor.m_fWaterIntensity, 0.001f, 0.0f, 1.0f);
     }
-    if (ImGui::CollapsingHeader("rain", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("rain##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::ColorEdit3("rain color", (float*)&descriptor.rain_color);
-        ImGui::DragFloat("rain density", &descriptor.rain_density, 1.0f, 0.0f, 1.0f);
+        ImGui::DragFloat("rain density", &descriptor.rain_density, 0.001f, 0.0f, 1.0f);
     }
-    if (ImGui::CollapsingHeader("thunderbolts", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("thunderbolts##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::BeginCombo("thunderbolts collection", descriptor.tb_id.c_str()))
+        const bool open = ImGui::BeginCombo("thunderbolts", descriptor.tb_id.c_str());
+        ImGui::SameLine();
+        ItemHelp("Name in configs: \n"
+                 "CS/COP: thunderbolts_collection\n"
+                 "   SOC: thunderbolt");
+        if (open)
         {
             if (ImGui::Selectable("##", descriptor.tb_id.empty()))
                 descriptor.tb_id = "";
@@ -158,10 +206,10 @@ void display_property(CEnvDescriptor& descriptor)
         ImGui::DragFloat("period", &descriptor.bolt_period);
 
     }
-    if (ImGui::CollapsingHeader("wind", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("wind##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         float direction = rad2deg(descriptor.wind_direction);
-        if (ImGui::DragFloat("wind direction", &direction, 1.0f, -360.0f, 360.f))
+        if (ImGui::DragFloat("wind direction", &direction, 0.5f, -360.0f, 360.f))
             descriptor.wind_direction = deg2rad(direction);
 
         ImGui::DragFloat("wind velocity", &descriptor.wind_velocity, 1.0f, 0.0f, 1000.0f);
@@ -175,10 +223,14 @@ void display_property(CEnvDescriptorMixer& descriptor)
     display_property<CEnvDescriptor>(descriptor);
 
     ImGui::PushID(descriptor.m_identifier.c_str());
-    if (ImGui::CollapsingHeader("mixer", ImGuiTreeNodeFlags_DefaultOpen))
+    if (ImGui::CollapsingHeader("mixer##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::ColorEdit4("environment color", (float*)&descriptor.env_color);
-        ImGui::DragFloat("weight", &descriptor.weight, 1.0f, 0.0f, 1.0f);
+        ImGui::SameLine();
+        ItemHelp("CS/COP: takes hemisphere color as the base value.\n"
+                 "SOC   : takes sky color as the base value.");
+
+        ImGui::DragFloat("weight", &descriptor.weight, 0.001f, 0.0f, 1.0f);
         ImGui::DragFloat("modifier power", &descriptor.modif_power);
         ImGui::DragFloat("fog near", &descriptor.fog_near);
         ImGui::DragFloat("fog far", &descriptor.fog_far);
@@ -192,12 +244,37 @@ void ide::ShowWeatherEditor()
     {
         auto& env = g_pGamePersistent->Environment();
 
-        if (ImGui::BeginCombo("current weather cycle", env.CurrentWeatherName.c_str()))
+        static bool force_change_weather = true;
+        ImGui::Checkbox("##", &force_change_weather);
+        const auto prev_size = ImGui::GetItemRectSize();
+        ImGui::SameLine();
+        ItemHelp("Force change weather", false);
+        ImGui::SameLine();
+
+        //ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - prev_size.x);
+        if (ImGui::BeginCombo("current weather cycle", env.CurrentCycleName.c_str()))
         {
             for (const auto& [identifier, env_descriptors] : env.WeatherCycles)
             {
+                if (ImGui::Selectable(identifier.c_str(), env.CurrentCycleName == identifier))
+                    env.SetWeather(identifier, force_change_weather);
+            }
+            ImGui::EndCombo();
+        }
+
+        if (ImGui::BeginCombo("current weather fx cycle", env.bWFX ? env.CurrentWeatherName.c_str() : ""))
+        {
+            if (ImGui::Selectable("##", !env.bWFX))
+                env.StopWFX();
+
+            for (const auto& [identifier, env_descriptors] : env.WeatherFXs)
+            {
                 if (ImGui::Selectable(identifier.c_str(), env.CurrentWeatherName == identifier))
-                    ;
+                {
+                    if (env.bWFX)
+                        env.StopWFX();
+                    env.SetWeatherFX(identifier);
+                }
             }
             ImGui::EndCombo();
         }

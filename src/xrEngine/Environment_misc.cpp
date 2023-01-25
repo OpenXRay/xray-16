@@ -398,6 +398,13 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
     R_ASSERT(_valid(sun_dir));
 
+    float degrees;
+    if (!config.read_if_exists(degrees, identifier, "sun_dir_azimuth"))
+        degrees = pSettingsOpenXRay->read_if_exists<float>("environment", "sun_dir_azimuth", 0.0f);
+
+    clamp(degrees, 0.0f, 360.0f);
+    sun_dir_azimuth = deg2rad(degrees);
+
     if (oldStyle)
     {
         lens_flare_id = environment.eff_LensFlare->AppendDef(environment, pSettings,
@@ -450,7 +457,12 @@ void CEnvDescriptor::on_device_destroy()
 //-----------------------------------------------------------------------------
 // Environment Mixer
 //-----------------------------------------------------------------------------
-CEnvDescriptorMixer::CEnvDescriptorMixer(shared_str const& identifier) : CEnvDescriptor(identifier) {}
+CEnvDescriptorMixer::CEnvDescriptorMixer(shared_str const& identifier)
+    : CEnvDescriptor(identifier)
+{
+    use_dynamic_sun_dir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
+}
+
 void CEnvDescriptorMixer::destroy()
 {
     m_pDescriptorMixer->Destroy();
@@ -464,8 +476,8 @@ void CEnvDescriptorMixer::clear()
     m_pDescriptorMixer->Clear();
 }
 
-void CEnvDescriptorMixer::lerp(
-    CEnvironment*, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& Mdf, float modifier_power)
+void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
+    float f, CEnvModifier& Mdf, float modifier_power)
 {
     const float fi = 1 - f;
 
@@ -551,11 +563,19 @@ void CEnvDescriptorMixer::lerp(
 
     sun_color.lerp(A.sun_color, B.sun_color, f);
 
-    R_ASSERT(_valid(A.sun_dir));
-    R_ASSERT(_valid(B.sun_dir));
-    sun_dir.lerp(A.sun_dir, B.sun_dir, f).normalize();
-    R_ASSERT(_valid(sun_dir));
-
+     // Igor. Dynamic sun position.
+    if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir && !old_style)
+    {
+        sun_dir_azimuth = (fi * A.sun_dir_azimuth + f * B.sun_dir_azimuth);
+        calculate_dynamic_sun_dir(parent.GetGameTime());
+    }
+    else
+    {
+        R_ASSERT(_valid(A.sun_dir));
+        R_ASSERT(_valid(B.sun_dir));
+        sun_dir.lerp(A.sun_dir, B.sun_dir, f).normalize();
+        R_ASSERT(_valid(sun_dir));
+    }
     VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while lerp");
 
     lens_flare_id = f < 0.5f ? A.lens_flare_id : B.lens_flare_id;
@@ -579,6 +599,75 @@ void CEnvDescriptorMixer::lerp(
         };
     }
 
+}
+
+void CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime)
+{
+    float g = (360.0f / 365.25f) * (180.0f + fGameTime / DAY_LENGTH);
+
+    g = deg2rad(g);
+
+    // Declination
+    float D = 0.396372f - 22.91327f * _cos(g) + 4.02543f * _sin(g) - 0.387205f * _cos(2 * g) + 0.051967f * _sin(2 * g) -
+        0.154527f * _cos(3 * g) + 0.084798f * _sin(3 * g);
+
+    // Now calculate the time correction for solar angle:
+    float TC =
+        0.004297f + 0.107029f * _cos(g) - 1.837877f * _sin(g) - 0.837378f * _cos(2 * g) - 2.340475f * _sin(2 * g);
+
+    // IN degrees
+    float Longitude = -30.4f;
+
+    float SHA = (fGameTime / (DAY_LENGTH / 24) - 12) * 15 + Longitude + TC;
+
+    // Need this to correctly determine SHA sign
+    if (SHA > 180)
+        SHA -= 360;
+    if (SHA < -180)
+        SHA += 360;
+
+    // IN degrees
+    float const Latitude = 50.27f;
+    float const LatitudeR = deg2rad(Latitude);
+
+    // Now we can calculate the Sun Zenith Angle (SZA):
+    float cosSZA = _sin(LatitudeR) * _sin(deg2rad(D)) + _cos(LatitudeR) * _cos(deg2rad(D)) * _cos(deg2rad(SHA));
+
+    clamp(cosSZA, -1.0f, 1.0f);
+
+    float SZA = acosf(cosSZA);
+    float SEA = PI / 2 - SZA;
+
+    // To finish we will calculate the Azimuth Angle (AZ):
+    float cosAZ = 0.f;
+    float const sin_SZA = _sin(SZA);
+    float const cos_Latitude = _cos(LatitudeR);
+    float const sin_SZA_X_cos_Latitude = sin_SZA * cos_Latitude;
+    if (!fis_zero(sin_SZA_X_cos_Latitude))
+        cosAZ = (_sin(deg2rad(D)) - _sin(LatitudeR) * _cos(SZA)) / sin_SZA_X_cos_Latitude;
+
+    clamp(cosAZ, -1.0f, 1.0f);
+    float AZ = acosf(cosAZ) + sun_dir_azimuth;
+
+    const Fvector2 minAngle = Fvector2().set(deg2rad(1.0f), deg2rad(3.0f));
+
+    if (SEA < minAngle.x)
+        SEA = minAngle.x;
+
+    float fSunBlend = (SEA - minAngle.x) / (minAngle.y - minAngle.x);
+    clamp(fSunBlend, 0.0f, 1.0f);
+
+    SEA = -SEA;
+
+    if (SHA < 0)
+        AZ = 2 * PI - AZ;
+
+    R_ASSERT(_valid(AZ));
+    R_ASSERT(_valid(SEA));
+    sun_dir.setHP(AZ, SEA);
+    R_ASSERT(_valid(sun_dir));
+
+    sun_color.mul(fSunBlend);
 }
 
 //-----------------------------------------------------------------------------
