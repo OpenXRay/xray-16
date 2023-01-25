@@ -326,7 +326,13 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV,
     stat.render.verts += countV;
     stat.render.polys += PC;
     constants.flush();
-    CHK_GL(glDrawElementsBaseVertex(Topology, iIndexCount, GL_UNSIGNED_SHORT, (void*)(startI * sizeof(GLushort)), baseV));
+    glDrawElementsBaseVertex(Topology, iIndexCount, GL_UNSIGNED_SHORT, (void*)(startI * sizeof(GLushort)), baseV);
+    ALenum err = glGetError();
+    if (err != GL_NO_ERROR)
+    {
+        VERIFY(err == GL_NO_ERROR);
+        Msg("! OpenGL: 0x%x: glDrawElementsBaseVertex error in function: '%s'", err, __FUNCTION__);
+    }
     PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
 }
 
@@ -339,7 +345,13 @@ ICF void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
     stat.render.verts += iIndexCount;
     stat.render.polys += PC;
     constants.flush();
-    CHK_GL(glDrawArrays(Topology, startV, iIndexCount));
+    glDrawArrays(Topology, startV, iIndexCount);
+    ALenum err = glGetError();
+    if (err != GL_NO_ERROR)
+    {
+        VERIFY(err == GL_NO_ERROR);
+        Msg("! OpenGL: 0x%x: glDrawArrays error in function: '%s'", err, __FUNCTION__);
+    }
     PGO(Msg("PGO:DIP:%dv/%df", iIndexCount, PC));
 }
 
