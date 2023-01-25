@@ -99,8 +99,8 @@ void display_property(CEnvDescriptor& descriptor)
         bool result = false;
         float y, x;
         descriptor.sun_dir.getHP(y, x);
-        result  = ImGui::DragFloat("altitude", &y, 1.0f, -360.0f, 360.f);
-        result |= ImGui::DragFloat("longitude", &x, 1.0f, -360.0f, 360.f);
+        result  = ImGui::DragFloat("altitude", &y, 0.5f, -360.0f, 360.f);
+        result |= ImGui::DragFloat("longitude", &x, 0.5f, -360.0f, 360.f);
         if (result)
         {
             descriptor.sun_dir.setHP(deg2rad(y), deg2rad(x));
@@ -126,7 +126,7 @@ void display_property(CEnvDescriptor& descriptor)
                  "hemisphere_color");
 
         float rotation = rad2deg(descriptor.sky_rotation);
-        if (ImGui::DragFloat("sky rotation", &rotation, 1.0f, -360.0f, 360.f))
+        if (ImGui::DragFloat("sky rotation", &rotation, 0.5f, -360.0f, 360.f))
             descriptor.sky_rotation = deg2rad(rotation);
     }
     if (ImGui::CollapsingHeader("clouds##category", ImGuiTreeNodeFlags_DefaultOpen))
@@ -137,7 +137,7 @@ void display_property(CEnvDescriptor& descriptor)
         ImGui::ColorEdit4("clouds color", (float*)&descriptor.clouds_color, ImGuiColorEditFlags_AlphaBar);
 
         float rotation = rad2deg(descriptor.clouds_rotation);
-        if (ImGui::DragFloat("clouds rotation", &rotation, 1.0f, -360.0f, 360.f))
+        if (ImGui::DragFloat("clouds rotation", &rotation, 0.5f, -360.0f, 360.f))
             descriptor.clouds_rotation = deg2rad(rotation);
     }
     if (ImGui::CollapsingHeader("ambient##category", ImGuiTreeNodeFlags_DefaultOpen))
@@ -201,7 +201,7 @@ void display_property(CEnvDescriptor& descriptor)
     if (ImGui::CollapsingHeader("wind##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
         float direction = rad2deg(descriptor.wind_direction);
-        if (ImGui::DragFloat("wind direction", &direction, 1.0f, -360.0f, 360.f))
+        if (ImGui::DragFloat("wind direction", &direction, 0.5f, -360.0f, 360.f))
             descriptor.wind_direction = deg2rad(direction);
 
         ImGui::DragFloat("wind velocity", &descriptor.wind_velocity, 1.0f, 0.0f, 1000.0f);
