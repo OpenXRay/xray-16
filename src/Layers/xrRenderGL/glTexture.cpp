@@ -141,6 +141,7 @@ _DDS:
             }
             break;
         case gli::TARGET_3D:
+        case gli::TARGET_CUBE_ARRAY:
             glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
                            tex_extent.x, tex_extent.y, tex_extent.z);
             err = glGetError();
@@ -201,6 +202,7 @@ _DDS:
                         break;
                     }
                     case gli::TARGET_3D:
+                    case gli::TARGET_CUBE_ARRAY:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
