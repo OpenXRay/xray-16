@@ -131,6 +131,7 @@ class ENGINE_API CEnvDescriptor
 {
 public:
     bool old_style;
+    bool dont_save; // oh
 
     float exec_time;
     float exec_time_loaded;
@@ -180,6 +181,7 @@ public:
     CEnvDescriptor(shared_str const& identifier);
 
     void load(CEnvironment& environment, const CInifile& config, pcstr section = nullptr);
+    void save(CInifile& config, bool oldStyle = false) const;
     void copy(const CEnvDescriptor& src)
     {
         float tm0 = exec_time;
@@ -305,6 +307,7 @@ public:
 
     virtual void load();
     virtual void unload();
+    void save(bool oldStyle = false) const;
 
     void mods_load();
     void mods_unload();
@@ -360,6 +363,9 @@ protected:
     void destroy_mixer();
 
     void load_level_specific_ambients();
+
+    void save_weathers(bool oldStyle = false) const;
+    void save_weather_effects(bool oldStyle = false) const;
 
 public:
     virtual SThunderboltDesc* thunderbolt_description(const CInifile& config, shared_str const& section);

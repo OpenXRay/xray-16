@@ -291,6 +291,8 @@ void ide::ShowWeatherEditor()
             }
             ImGui::EndCombo();
         }
+        if (ImGui::Button("Save"))
+            env.save(current.old_style);
 
         constexpr ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable |
             ImGuiTableFlags_Hideable | ImGuiTableFlags_BordersInner;
