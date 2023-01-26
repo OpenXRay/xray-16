@@ -175,7 +175,7 @@ ImGuiWindowFlags ide::get_default_window_flags() const
 
 bool ide::is_shown() const
 {
-    return m_state == visible_state::full || m_windows.weather;
+    return m_windows.weather;
 }
 
 void ide::SetState(visible_state state)
