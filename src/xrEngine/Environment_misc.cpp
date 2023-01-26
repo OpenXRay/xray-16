@@ -252,6 +252,7 @@ void CEnvAmbient::load(
 CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(identifier)
 {
     old_style = false;
+    dont_save = false;
 
     exec_time = 0.0f;
     exec_time_loaded = 0.0f;
@@ -443,6 +444,68 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 }
 
 #undef C_CHECK
+
+void CEnvDescriptor::save(CInifile& config, bool oldStyle /*= false*/) const
+{
+    if (dont_save)
+        return;
+
+    cpcstr ambient_name                = oldStyle ? "env_ambient"   : "ambient";
+    cpcstr ambient_color_name          = oldStyle ? "ambient"       : "ambient_color";
+    cpcstr sun_name                    = oldStyle ? "flares"        : "sun";
+    cpcstr thunderbolt_collection_name = oldStyle ? "thunderbolt"   : "thunderbolt_collection";
+    cpcstr thunderbolt_duration_name   = oldStyle ? "bolt_duration" : "thunderbolt_duration";
+    cpcstr thunderbolt_period_name     = oldStyle ? "bolt_period"   : "thunderbolt_period";
+
+    cpcstr identifier = m_identifier.c_str();
+
+    config.w_string   (identifier, ambient_name,                env_ambient ? env_ambient->name().c_str() : "");
+    config.w_fvector3 (identifier, ambient_color_name,          ambient);
+
+    config.w_fvector4 (identifier, "clouds_color",              clouds_color);
+    config.w_string   (identifier, "clouds_texture",            clouds_texture_name.c_str());
+    config.w_float    (identifier, "clouds_rotation",           rad2deg(clouds_rotation));
+
+    config.w_float    (identifier, "far_plane",                 far_plane);
+
+    config.w_fvector3 (identifier, "fog_color",                 fog_color);
+    config.w_float    (identifier, "fog_density",               fog_density);
+    config.w_float    (identifier, "fog_distance",              fog_distance);
+
+    config.w_fvector4 (identifier, "hemisphere_color",          hemi_color);
+
+    config.w_fvector3 (identifier, "rain_color",                rain_color);
+    config.w_float    (identifier, "rain_density",              rain_density);
+
+    config.w_fvector3 (identifier, "sky_color",                 sky_color);
+    config.w_float    (identifier, "sky_rotation",              rad2deg(sky_rotation));
+    config.w_string   (identifier, "sky_texture",               sky_texture_name.c_str());
+
+    config.w_string   (identifier, sun_name,                    lens_flare_id.c_str());
+    config.w_fvector3 (identifier, "sun_color",                 sun_color);
+    if (oldStyle)
+    {
+        float h, p;
+        sun_dir.getHP(h, p);
+        config.w_fvector2(identifier, "sun_dir", { rad2deg(p), rad2deg(h) });
+    }
+    else
+    {
+        config.w_float(identifier, "sun_altitude",              rad2deg(sun_dir.getH()));
+        config.w_float(identifier, "sun_longitude",             rad2deg(sun_dir.getP()));
+    }
+    config.w_float    (identifier, "sun_dir_azimuth",           sun_dir_azimuth);
+    config.w_float    (identifier, "sun_shafts_intensity",      m_fSunShaftsIntensity);
+
+    config.w_string   (identifier, thunderbolt_collection_name, tb_id.c_str());
+    config.w_float    (identifier, thunderbolt_duration_name,   bolt_duration);
+    config.w_float    (identifier, thunderbolt_period_name,     bolt_period);
+
+    config.w_float    (identifier, "water_intensity",           m_fWaterIntensity);
+
+    config.w_float    (identifier, "wind_direction",            rad2deg(wind_direction));
+    config.w_float    (identifier, "wind_velocity",             wind_velocity);
+}
 
 void CEnvDescriptor::on_device_create()
 {
@@ -869,6 +932,7 @@ void CEnvironment::load_weather_effects()
         env.reserve(sections.size() + 2);
 
         env.emplace_back(create_descriptor("00:00:00", nullptr));
+        env.back()->dont_save = true;
 
         for (const auto& section : sections)
             env.emplace_back(create_descriptor(section->Name, config));
@@ -877,6 +941,7 @@ void CEnvironment::load_weather_effects()
 
         env.emplace_back(create_descriptor("24:00:00", nullptr));
         env.back()->exec_time_loaded = DAY_LENGTH;
+        env.back()->dont_save = true;
     }
 
     // ShoC style weather effects config
@@ -968,4 +1033,54 @@ void CEnvironment::unload()
     Invalidate();
 
     m_pRender->OnUnload();
+}
+
+void CEnvironment::save(bool oldStyle /*= false*/) const
+{
+    save_weathers(oldStyle);
+    save_weather_effects(oldStyle);
+}
+
+void CEnvironment::save_weathers(bool oldStyle /*= false*/) const
+{
+    string_path weathers_path;
+    if (oldStyle)
+        FS.update_path(weathers_path, "$game_config$", "weathers");
+    else
+        FS.update_path(weathers_path, "$game_weathers$", "");
+
+    for (const auto& [name, descriptors] : WeatherCycles)
+    {
+        string_path file_name;
+        strconcat(file_name, weathers_path, name.c_str(), ".ltx");
+
+        CInifile* config = xr_new<CInifile>(file_name, false, false, true);
+
+        for (const auto& desc : descriptors)
+            desc->save(*config, oldStyle);
+
+        CInifile::Destroy(config);
+    }
+}
+
+void CEnvironment::save_weather_effects(bool oldStyle /*= false*/) const
+{
+    string_path effects_path;
+    if (oldStyle)
+        FS.update_path(effects_path, "$game_config$", "weathers");
+    else
+        FS.update_path(effects_path, "$game_weather_effects$", "");
+
+    for (const auto& [name, descriptors] : WeatherFXs)
+    {
+        string_path file_name;
+        strconcat(file_name, effects_path, name.c_str(), ".ltx");
+
+        CInifile* config = xr_new<CInifile>(file_name, false, false, true);
+
+        for (const auto& desc : descriptors)
+            desc->save(*config, oldStyle);
+
+        CInifile::Destroy(config);
+    }
 }
