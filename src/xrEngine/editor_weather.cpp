@@ -77,12 +77,7 @@ void display_property(CEnvDescriptor& descriptor)
 
     if (ImGui::CollapsingHeader("sun##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        const bool open = ImGui::BeginCombo("sun##lensflareid", descriptor.lens_flare_id.c_str());
-        ImGui::SameLine();
-        ItemHelp("Name in configs: \n"
-                 "CS/COP: sun\n"
-                 "   SOC: flares");
-        if (open)
+        if (ImGui::BeginCombo("sun##lensflareid", descriptor.lens_flare_id.c_str()))
         {
             if (ImGui::Selectable("##", descriptor.lens_flare_id.empty()))
                 descriptor.lens_flare_id = "";
@@ -93,6 +88,10 @@ void display_property(CEnvDescriptor& descriptor)
             }
             ImGui::EndCombo();
         }
+        ImGui::SameLine();
+        ItemHelp("Name in configs: \n"
+            "CS/COP: sun\n"
+            "   SOC: flares");
 
         ImGui::ColorEdit3("sun color", (float*)&descriptor.sun_color);
 
@@ -150,12 +149,7 @@ void display_property(CEnvDescriptor& descriptor)
     }
     if (ImGui::CollapsingHeader("ambient##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        const bool open = ImGui::BeginCombo("ambient##env_ambient", descriptor.env_ambient ? descriptor.env_ambient->name().c_str() : "");
-        ImGui::SameLine();
-        ItemHelp("Name in configs: \n"
-                 "CS/COP: ambient\n"
-                 "   SOC: env_ambient");
-        if (open)
+        if (ImGui::BeginCombo("ambient##env_ambient", descriptor.env_ambient ? descriptor.env_ambient->name().c_str() : ""))
         {
             for (const auto& ambient : env.Ambients)
             {
@@ -165,6 +159,11 @@ void display_property(CEnvDescriptor& descriptor)
             }
             ImGui::EndCombo();
         }
+        ImGui::SameLine();
+        ItemHelp("Name in configs: \n"
+            "CS/COP: ambient\n"
+            "   SOC: env_ambient");
+
         ImGui::ColorEdit3("ambient color", (float*)&descriptor.ambient);
         ImGui::SameLine();
         ItemHelp("Name in configs: \n"
@@ -186,12 +185,7 @@ void display_property(CEnvDescriptor& descriptor)
     }
     if (ImGui::CollapsingHeader("thunderbolts##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        const bool open = ImGui::BeginCombo("thunderbolts", descriptor.tb_id.c_str());
-        ImGui::SameLine();
-        ItemHelp("Name in configs: \n"
-                 "CS/COP: thunderbolts_collection\n"
-                 "   SOC: thunderbolt");
-        if (open)
+        if (ImGui::BeginCombo("thunderbolts", descriptor.tb_id.c_str()))
         {
             if (ImGui::Selectable("##", descriptor.tb_id.empty()))
                 descriptor.tb_id = "";
@@ -202,6 +196,11 @@ void display_property(CEnvDescriptor& descriptor)
             }
             ImGui::EndCombo();
         }
+        ImGui::SameLine();
+        ItemHelp("Name in configs: \n"
+            "CS/COP: thunderbolts_collection\n"
+            "   SOC: thunderbolt");
+
         ImGui::DragFloat("duration", &descriptor.bolt_duration);
         ImGui::DragFloat("period", &descriptor.bolt_period);
 
