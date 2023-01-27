@@ -1124,7 +1124,6 @@ void CSE_ALifeObjectPhysic::load(NET_Packet& tNetPacket)
     inherited2::load(tNetPacket);
 }
 
-__attribute__((aligned(UINTPTR_MAX_BITWIDTH)))
 xr_token po_types[] = {
 {"Box", epotBox}, {"Fixed chain", epotFixedChain}, {"Free chain", epotFreeChain}, {"Skeleton", epotSkeleton}, {nullptr, 0}};
 

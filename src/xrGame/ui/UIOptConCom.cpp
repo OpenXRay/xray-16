@@ -9,7 +9,6 @@
 #include "xrGameSpy/GameSpy_GP.h"
 #include "ui/UICDkey.h"
 
-__attribute__((aligned(UINTPTR_MAX_BITWIDTH)))
 xr_token g_GameModes[] = {{"st_deathmatch", eGameIDDeathmatch}, {"st_team_deathmatch", eGameIDTeamDeathmatch},
     {"st_artefacthunt", eGameIDArtefactHunt}, {"st_capture_the_artefact", eGameIDCaptureTheArtefact}, {0, 0}};
 
