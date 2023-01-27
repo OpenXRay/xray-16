@@ -1,11 +1,10 @@
 #pragma once
 
-struct xr_token
+struct alignas(alignof(int*)) xr_token
 {
     xr_token(): name(nullptr), id(-1) {}
     xr_token(const pcstr _name, const int _id) : name(_name), id(_id) {}
 
-    alignas(alignof(pcstr));
     pcstr name;
     int id;
 };
