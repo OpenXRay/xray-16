@@ -12,4 +12,3 @@ static_assert(sizeof(xr_token) == sizeof(pcstr) * 2, "xr_token should be aligned
 
 XRCORE_API pcstr get_token_name(const xr_token* tokens, int key);
 XRCORE_API int get_token_id(const xr_token* tokens, pcstr key);
-
