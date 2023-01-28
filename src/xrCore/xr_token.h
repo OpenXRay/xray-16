@@ -1,6 +1,6 @@
 #pragma once
 
-extern struct alignas(sizeof(pcstr)) xr_token
+struct alignas(sizeof(pcstr)) xr_token
 {
     xr_token(): name(nullptr), id(-1) {}
     xr_token(const pcstr _name, const int _id) : name(_name), id(_id) {}
