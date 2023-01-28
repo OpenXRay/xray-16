@@ -1,11 +1,11 @@
 #pragma once
 
-struct xr_token
+extern struct alignas(sizeof(pcstr)) xr_token
 {
     xr_token(): name(nullptr), id(-1) {}
     xr_token(const pcstr _name, const int _id) : name(_name), id(_id) {}
 
-    alignas(alignof(pcstr)) pcstr name;
+    pcstr name;
     int id;
 };
 static_assert((sizeof(pcstr) != 8) || (sizeof(pcstr) != 16), "pcstr is not a valid 32 or 64 bit value");
