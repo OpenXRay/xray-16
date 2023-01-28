@@ -1,6 +1,6 @@
 #pragma once
 
-struct alignas(alignof(int*)) xr_token
+struct alignas(UINTPTR_MAX_BITWIDTH) xr_token
 {
     xr_token(): name(nullptr), id(-1) {}
     xr_token(const pcstr _name, const int _id) : name(_name), id(_id) {}
