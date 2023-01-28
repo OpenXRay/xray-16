@@ -80,8 +80,3 @@
 
 #define XRAY_BUILD_CONFIGURATION _XRAY_CONFIGURATION_MARKER _XRAY_MASTER_GOLD_MARKER
 #define XRAY_BUILD_CONFIGURATION2 _XRAY_PLATFORM_MARKER " " _XRAY_ARCHITECTURE_MARKER ", " _XRAY_STATIC_BUILD_MARKER
-
-// Macro to calculate the default alignment of a pointer value based on the system architecture
-// Number of bits in inttype_MAX, or in any (1<<k)-1 where 0 <= k < 2040
-#define IMAX_BITS(m) ((m)/((m)%255+1) / 255%255*8 + 7-86/((m)%255+12))
-#define UINTPTR_MAX_BITWIDTH IMAX_BITS(UINTPTR_MAX)
