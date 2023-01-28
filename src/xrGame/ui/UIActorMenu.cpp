@@ -991,7 +991,7 @@ void CUIActorMenu::HighlightSectionInSlot(pcstr section, EDDListType type, u16 s
         if (!item)
             continue;
 
-        if (!strcmp(section, item->m_section_id.c_str()) == 0)
+        if (strcmp(section, item->m_section_id.c_str()) != 0)
             continue;
 
         ci->m_select_armament = true;
