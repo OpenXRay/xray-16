@@ -12,8 +12,6 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 #ifdef XRGAME_EXPORTS
-pcstr profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
-
 SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (),
 {
     using namespace luabind;
@@ -23,9 +21,24 @@ SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (),
         class_<CSE_ALifeTraderAbstract>("cse_alife_trader_abstract")
             //			.def(		constructor<pcstr>())
             .def("community", &CSE_ALifeTraderAbstract::CommunityName)
-            .def("profile_name", &profile_name_script)
+            .def("profile_name", +[](CSE_ALifeTraderAbstract* ta) { return ta->character_profile().c_str(); })
+            .def("set_profile_name", +[](CSE_ALifeTraderAbstract* ta, const pcstr str) { ta->set_character_profile(str); })
+            .def("character_name", +[](CSE_ALifeTraderAbstract* ta) { return ta->m_character_name.c_str(); })
+            .def("set_character_name", +[](CSE_ALifeTraderAbstract* ta, const pcstr str) { return ta->m_character_name = str; })
             .def("rank", &CSE_ALifeTraderAbstract::Rank)
+            .def("set_rank", &CSE_ALifeTraderAbstract::SetRank)
             .def("reputation", &CSE_ALifeTraderAbstract::Reputation)
+            .def("character_icon", +[](CSE_ALifeTraderAbstract* ta)
+            {
+                ta->specific_character();
+                if (ta->m_icon_name.empty())
+                {
+                    CSpecificCharacter selected_char;
+                    selected_char.Load(ta->m_SpecificCharacter);
+                    ta->m_icon_name = selected_char.IconName();
+                }
+                return *ta->m_icon_name;
+            })
     ];
 });
 #else
