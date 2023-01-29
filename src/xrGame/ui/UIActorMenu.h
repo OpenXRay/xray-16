@@ -394,6 +394,10 @@ public:
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
 
+    CScriptGameObject* GetCurrentItemAsGameObject();
+    void HighlightSectionInSlot(pcstr section, EDDListType type, u16 slot_id = 0);
+    void HighlightForEachInSlot(const luabind::functor<bool>& functor, EDDListType type, u16 slot_id);
+
     void RefreshCurrentItemCell();
     void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu
 }; // class CUIActorMenu
