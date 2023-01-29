@@ -21,7 +21,7 @@ SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (),
         class_<CSE_ALifeTraderAbstract>("cse_alife_trader_abstract")
             //			.def(		constructor<pcstr>())
             .def("community", &CSE_ALifeTraderAbstract::CommunityName)
-            .def("profile_name", +[](CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); })
+            .def("profile_name", +[](CSE_ALifeTraderAbstract* ta) { return ta->character_profile().c_str(); })
             .def("set_profile_name", +[](CSE_ALifeTraderAbstract* ta, const pcstr str) { ta->set_character_profile(str); })
             .def("character_name", +[](CSE_ALifeTraderAbstract* ta) { return ta->m_character_name.c_str(); })
             .def("set_character_name", +[](CSE_ALifeTraderAbstract* ta, const pcstr str) { return ta->m_character_name = str; })
@@ -31,7 +31,7 @@ SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (),
             .def("character_icon", +[](CSE_ALifeTraderAbstract* ta)
             {
                 ta->specific_character();
-                if (!ta->m_icon_name.size())
+                if (ta->m_icon_name.empty())
                 {
                     CSpecificCharacter selected_char;
                     selected_char.Load(ta->m_SpecificCharacter);
