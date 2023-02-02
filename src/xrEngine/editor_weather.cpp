@@ -133,6 +133,8 @@ void display_property(CEnvDescriptor& descriptor)
         ImGui::ColorEdit3("sun color", (float*)&descriptor.sun_color);
 
         ImGui::Checkbox("Dynamic sun direction", &descriptor.use_dynamic_sun_dir);
+        ItemHelp("If enabled, engine will automatically calculate sun direction (and ignore your values) on full dynamic lighting renderers.\n"
+                 "You still need to provide sun altitude and longitude for static and (not full) dynamic lighting.");
 
         float altitude  = rad2deg(descriptor.sun_dir.getH());
         float longitude = rad2deg(descriptor.sun_dir.getP());
@@ -281,8 +283,10 @@ void ide::ShowWeatherEditor()
         auto& current1 = env.Current[1] ? *env.Current[1] : *env.CurrentEnv;
         float time_factor = env.fTimeFactor;
 
+        ImGui::BeginDisabled();
         if (ImGui::Button("Reset all"))
             ;
+        ImGui::EndDisabled();
         ImGui::SameLine();
         if (ImGui::Button("Save all"))
             env.save();
