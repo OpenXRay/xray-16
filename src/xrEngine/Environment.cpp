@@ -227,6 +227,18 @@ void CEnvironment::SetGameTime(float game_time, float time_factor)
     fTimeFactor = time_factor;
 }
 
+void CEnvironment::SplitTime(float time, u32& hours, u32& minutes, u32& seconds) const
+{
+    u32 current_time_u32 = iFloor(time);
+    current_time_u32 = current_time_u32 % (24 * 60 * 60);
+
+    hours = current_time_u32 / (60 * 60);
+    current_time_u32 %= (60 * 60);
+
+    minutes = current_time_u32 / 60;
+    seconds = current_time_u32 % 60;
+}
+
 float CEnvironment::NormalizeTime(float tm)
 {
     if (tm < 0.f)
@@ -260,6 +272,7 @@ void CEnvironment::SetWeather(shared_str name, bool forced)
         {
             CurrentWeather = &it->second;
             CurrentWeatherName = it->first;
+            CurrentEnv->soc_style = CurrentWeather->soc_style;
         }
         if (forced)
         {
@@ -289,6 +302,7 @@ bool CEnvironment::SetWeatherFX(shared_str name)
         VERIFY(PrevWeather);
         CurrentWeather = &it->second;
         CurrentWeatherName = it->first;
+        CurrentEnv->soc_style = CurrentWeather->soc_style;
 
         float rewind_tm = WFX_TRANS_TIME * fTimeFactor;
         float start_tm = fGameTime + rewind_tm;
