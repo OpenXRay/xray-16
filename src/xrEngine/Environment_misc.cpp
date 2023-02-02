@@ -384,12 +384,7 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     Fvector2 sunVec{};
 
     if (config.read_if_exists(sunVec, identifier, "sun_dir"))
-    {
-        // What if someone adapted SOC configs and didn't deleted sun_dir?
-        // Try to read optional overriding values.
-        config.read_if_exists(sunVec.y, identifier, "sun_altitude");
-        config.read_if_exists(sunVec.x, identifier, "sun_longitude");
-    }
+        use_dynamic_sun_dir = false;
     else
     {
         sunVec.y = config.r_float(identifier, "sun_altitude");
@@ -626,7 +621,7 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     sun_color.lerp(A.sun_color, B.sun_color, f);
 
      // Igor. Dynamic sun position.
-    if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir && !soc_style)
+    if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir)
     {
         sun_azimuth = (fi * A.sun_azimuth + f * B.sun_azimuth);
         calculate_dynamic_sun_dir(exec_time);
