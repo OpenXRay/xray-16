@@ -141,15 +141,26 @@ void display_property(CEnvDescriptor& descriptor)
 
         if (ImGui::DragFloat("altitude", &altitude, 0.5f, -360.0f, 360.f))
             descriptor.sun_dir.setHP(deg2rad(altitude), deg2rad(longitude));
+        ItemHelp("Name in configs: \n"
+                 "CS/COP: sun_altitude\n"
+                 "   SOC: sun_dir (vector2 with longitude (x) and altitude (y)"
+                 "\n\n"
+                 "If dynamic sun direction is disabled, values will be saved like in SOC: as sun_dir");
+
         if (ImGui::DragFloat("longitude", &longitude, 0.5f, -360.0f, 360.f))
             descriptor.sun_dir.setHP(deg2rad(altitude), deg2rad(longitude));
+        ItemHelp("Name in configs: \n"
+                 "CS/COP: sun_longitude\n"
+                 "   SOC: sun_dir (vector2 with longitude (x) and altitude (y)"
+                 "\n\n"
+                 "If dynamic sun direction is disabled, values will be saved like in SOC: as sun_dir");
 
         ImGui::BeginDisabled(!descriptor.use_dynamic_sun_dir);
         float azimuth = rad2deg(descriptor.sun_azimuth);
         if (ImGui::DragFloat("azimuth", &azimuth, 0.5f, -360.0f, 360.f))
             descriptor.sun_azimuth = deg2rad(azimuth);
         ImGui::EndDisabled();
-        ItemHelp("Dynamic sun dir azimuth correction.\n"
+        ItemHelp("Dynamic sun direction correction.\n"
                  "Name in configs: \n"
                  "sun_azimuth");
 
