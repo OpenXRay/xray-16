@@ -251,7 +251,6 @@ void CEnvAmbient::load(
 //-----------------------------------------------------------------------------
 CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(identifier)
 {
-    old_style = false;
     dont_save = false;
 
     exec_time = 0.0f;
@@ -281,6 +280,7 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
     hemi_color.set(1, 1, 1, 1);
     sun_color.set(1, 1, 1);
     sun_dir.set(0, -1, 0);
+    use_dynamic_sun_dir = true;
 
     m_fSunShaftsIntensity = 0;
     m_fWaterIntensity = 1;
@@ -400,11 +400,11 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     R_ASSERT(_valid(sun_dir));
 
     float degrees;
-    if (!config.read_if_exists(degrees, identifier, "sun_dir_azimuth"))
+    if (!config.read_if_exists(degrees, identifier, "sun_azimuth"))
         degrees = pSettingsOpenXRay->read_if_exists<float>("environment", "sun_dir_azimuth", 0.0f);
 
     clamp(degrees, 0.0f, 360.0f);
-    sun_dir_azimuth = deg2rad(degrees);
+    sun_azimuth = deg2rad(degrees);
 
     if (oldStyle)
     {
@@ -493,8 +493,8 @@ void CEnvDescriptor::save(CInifile& config, bool oldStyle /*= false*/) const
     {
         config.w_float(identifier, "sun_altitude",              rad2deg(sun_dir.getH()));
         config.w_float(identifier, "sun_longitude",             rad2deg(sun_dir.getP()));
+        config.w_float(identifier, "sun_azimuth",               sun_azimuth);
     }
-    config.w_float    (identifier, "sun_dir_azimuth",           sun_dir_azimuth);
     config.w_float    (identifier, "sun_shafts_intensity",      m_fSunShaftsIntensity);
 
     config.w_string   (identifier, thunderbolt_collection_name, tb_id.c_str());
@@ -521,7 +521,7 @@ void CEnvDescriptor::on_device_destroy()
 // Environment Mixer
 //-----------------------------------------------------------------------------
 CEnvDescriptorMixer::CEnvDescriptorMixer(shared_str const& identifier)
-    : CEnvDescriptor(identifier)
+    : CEnvDescriptor(identifier), soc_style(false)
 {
     use_dynamic_sun_dir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
 }
@@ -544,8 +544,7 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
 {
     const float fi = 1 - f;
 
-    // XXX: it would be nice to lerp this too.
-    old_style = A.old_style;
+    exec_time = fi * A.exec_time + f * B.exec_time;
 
     m_pDescriptorMixer->lerp(&*A.m_pDescriptor, &*B.m_pDescriptor);
 
@@ -627,10 +626,10 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     sun_color.lerp(A.sun_color, B.sun_color, f);
 
      // Igor. Dynamic sun position.
-    if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir && !old_style)
+    if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir && !soc_style)
     {
-        sun_dir_azimuth = (fi * A.sun_dir_azimuth + f * B.sun_dir_azimuth);
-        calculate_dynamic_sun_dir(parent.GetGameTime());
+        sun_azimuth = (fi * A.sun_azimuth + f * B.sun_azimuth);
+        calculate_dynamic_sun_dir(exec_time);
     }
     else
     {
@@ -645,7 +644,7 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     tb_id = f < 0.5f ? A.tb_id : B.tb_id;
     env_ambient = Random.randF() < 1.f - f ? A.env_ambient : B.env_ambient;
 
-    if (old_style)
+    if (soc_style)
     {
         env_color =
         {
@@ -662,6 +661,9 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
         };
     }
 
+    string_path temp_name;
+    sky_texture_name = strconcat(temp_name, A.sky_texture_name.c_str(), "; ", B.sky_texture_name.c_str());
+    clouds_texture_name = strconcat(temp_name, A.clouds_texture_name.c_str(), "; ", B.clouds_texture_name.c_str());
 }
 
 void CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime)
@@ -710,7 +712,7 @@ void CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime)
         cosAZ = (_sin(deg2rad(D)) - _sin(LatitudeR) * _cos(SZA)) / sin_SZA_X_cos_Latitude;
 
     clamp(cosAZ, -1.0f, 1.0f);
-    float AZ = acosf(cosAZ) + sun_dir_azimuth;
+    float AZ = acosf(cosAZ) + sun_azimuth;
 
     const Fvector2 minAngle = Fvector2().set(deg2rad(1.0f), deg2rad(3.0f));
 
@@ -883,14 +885,14 @@ void CEnvironment::load_weathers()
 
             EnvVec& env = WeatherCycles[weatherName];
             env.reserve(envCount);
-            
+            env.soc_style = true;
+
             pcstr executionTime, envSection;
             for (u32 envIdx = 0; envIdx < envCount; ++envIdx)
             {
                 if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
                 {
                     env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
-                    env.back()->old_style = true;
                 }
             }
         }
@@ -958,6 +960,7 @@ void CEnvironment::load_weather_effects()
         if (pSettings->r_line("weather_effects", weatherIdx, &weatherName, &weatherSection))
         {
             EnvVec& env = WeatherFXs[weatherName];
+            env.soc_style = true;
             env.emplace_back(create_descriptor("00:00:00", nullptr));
 
             const u32 envCount = pSettings->line_count(weatherSection);
@@ -967,7 +970,6 @@ void CEnvironment::load_weather_effects()
                 if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
                 {
                     env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
-                    env.back()->old_style = true;
                 }
             }
 
@@ -1035,51 +1037,59 @@ void CEnvironment::unload()
     m_pRender->OnUnload();
 }
 
-void CEnvironment::save(bool oldStyle /*= false*/) const
+void CEnvironment::save() const
 {
-    save_weathers(oldStyle);
-    save_weather_effects(oldStyle);
+    save_weathers();
+    save_weather_effects();
 }
 
-void CEnvironment::save_weathers(bool oldStyle /*= false*/) const
+void CEnvironment::save_weathers() const
 {
     string_path weathers_path;
-    if (oldStyle)
-        FS.update_path(weathers_path, "$game_config$", "weathers");
-    else
-        FS.update_path(weathers_path, "$game_weathers$", "");
+    if (!FS.update_path(weathers_path, "$game_weathers$", "", false))
+        FS.update_path(weathers_path, "$game_config$", "environment\\weathers");
+
+    string_path weathers_path_soc;
+    FS.update_path(weathers_path_soc, "$game_config$", "weathers\\");
 
     for (const auto& [name, descriptors] : WeatherCycles)
     {
+        const bool soc_style = descriptors.soc_style;
+
         string_path file_name;
-        strconcat(file_name, weathers_path, name.c_str(), ".ltx");
+        strconcat(file_name, soc_style ? weathers_path_soc : weathers_path,
+            name.c_str(), ".ltx");
 
         CInifile* config = xr_new<CInifile>(file_name, false, false, true);
 
         for (const auto& desc : descriptors)
-            desc->save(*config, oldStyle);
+            desc->save(*config, soc_style);
 
         CInifile::Destroy(config);
     }
 }
 
-void CEnvironment::save_weather_effects(bool oldStyle /*= false*/) const
+void CEnvironment::save_weather_effects() const
 {
     string_path effects_path;
-    if (oldStyle)
-        FS.update_path(effects_path, "$game_config$", "weathers");
-    else
-        FS.update_path(effects_path, "$game_weather_effects$", "");
+    if (!FS.update_path(effects_path, "$game_weather_effects$", "", false))
+        FS.update_path(effects_path, "$game_config$", "environment\\weather_effects");
+
+    string_path effects_path_soc;
+    FS.update_path(effects_path_soc, "$game_config$", "weathers\\");
 
     for (const auto& [name, descriptors] : WeatherFXs)
     {
+        const bool soc_style = descriptors.soc_style;
+
         string_path file_name;
-        strconcat(file_name, effects_path, name.c_str(), ".ltx");
+        strconcat(file_name, soc_style ? effects_path_soc : effects_path,
+            name.c_str(), ".ltx");
 
         CInifile* config = xr_new<CInifile>(file_name, false, false, true);
 
         for (const auto& desc : descriptors)
-            desc->save(*config, oldStyle);
+            desc->save(*config, soc_style);
 
         CInifile::Destroy(config);
     }
