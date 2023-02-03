@@ -936,13 +936,12 @@ void CMainMenu::Show_DownloadMPMap(LPCSTR text, LPCSTR url)
 {
     m_downloaded_mp_map_url._set(url);
 
-    CUIMessageBoxEx* downloadMsg = m_pMB_ErrDlgs[DownloadMPMap];
-    if (downloadMsg)
+    if (CUIMessageBoxEx* downloadMsg = m_pMB_ErrDlgs[DownloadMPMap])
     {
-        m_pMB_ErrDlgs[DownloadMPMap]->SetText(text);
-        m_pMB_ErrDlgs[DownloadMPMap]->SetTextEditURL(url);
+        downloadMsg->SetText(text);
+        downloadMsg->SetTextEditURL(url);
 
-        m_pMB_ErrDlgs[DownloadMPMap]->ShowDialog(false);
+        downloadMsg->ShowDialog(false);
     }
     else
     {
