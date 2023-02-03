@@ -181,7 +181,7 @@ public:
     CEnvDescriptor(shared_str const& identifier);
 
     void load(CEnvironment& environment, const CInifile& config, pcstr section = nullptr);
-    void save(CInifile& config, bool oldStyle = false) const;
+    void save(CInifile& config, pcstr section = nullptr) const;
     void copy(const CEnvDescriptor& src)
     {
         float tm0 = exec_time;
@@ -373,8 +373,8 @@ protected:
 
     void load_level_specific_ambients();
 
-    void save_weathers() const;
-    void save_weather_effects() const;
+    void save_weathers(CInifile* environment_config = nullptr) const;
+    void save_weather_effects(CInifile* environment_config = nullptr) const;
 
 public:
     virtual SThunderboltDesc* thunderbolt_description(const CInifile& config, shared_str const& section);

@@ -301,13 +301,8 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
 
 void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcstr section /*= nullptr*/)
 {
-    pcstr identifier = m_identifier.c_str();
-    bool oldStyle = false;
-    if (section)
-    {
-        identifier = section;
-        oldStyle = true;
-    }
+    const bool oldStyle = section;
+    cpcstr identifier = section ? section : m_identifier.c_str();
 
     Ivector3 tm = {0, 0, 0};
     const int result = sscanf(m_identifier.c_str(), "%d:%d:%d", &tm.x, &tm.y, &tm.z);
@@ -440,19 +435,21 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
 #undef C_CHECK
 
-void CEnvDescriptor::save(CInifile& config, bool oldStyle /*= false*/) const
+void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
 {
     if (dont_save)
         return;
 
-    cpcstr ambient_name                = oldStyle ? "env_ambient"   : "ambient";
-    cpcstr ambient_color_name          = oldStyle ? "ambient"       : "ambient_color";
-    cpcstr sun_name                    = oldStyle ? "flares"        : "sun";
-    cpcstr thunderbolt_collection_name = oldStyle ? "thunderbolt"   : "thunderbolt_collection";
-    cpcstr thunderbolt_duration_name   = oldStyle ? "bolt_duration" : "thunderbolt_duration";
-    cpcstr thunderbolt_period_name     = oldStyle ? "bolt_period"   : "thunderbolt_period";
+    const bool old_style               = section;
 
-    cpcstr identifier = m_identifier.c_str();
+    cpcstr ambient_name                = old_style ? "env_ambient"   : "ambient";
+    cpcstr ambient_color_name          = old_style ? "ambient"       : "ambient_color";
+    cpcstr sun_name                    = old_style ? "flares"        : "sun";
+    cpcstr thunderbolt_collection_name = old_style ? "thunderbolt"   : "thunderbolt_collection";
+    cpcstr thunderbolt_duration_name   = old_style ? "bolt_duration" : "thunderbolt_duration";
+    cpcstr thunderbolt_period_name     = old_style ? "bolt_period"   : "thunderbolt_period";
+
+    cpcstr identifier = section ? section : m_identifier.c_str();
 
     config.w_string   (identifier, ambient_name,                env_ambient ? env_ambient->name().c_str() : "");
     config.w_fvector3 (identifier, ambient_color_name,          ambient);
@@ -478,11 +475,11 @@ void CEnvDescriptor::save(CInifile& config, bool oldStyle /*= false*/) const
 
     config.w_string   (identifier, sun_name,                    lens_flare_id.c_str());
     config.w_fvector3 (identifier, "sun_color",                 sun_color);
-    if (oldStyle)
+    if (old_style)
     {
-        float h, p;
-        sun_dir.getHP(h, p);
-        config.w_fvector2(identifier, "sun_dir", { rad2deg(p), rad2deg(h) });
+        float altutude, longitude;
+        sun_dir.getHP(altutude, longitude);
+        config.w_fvector2(identifier, "sun_dir", { rad2deg(longitude), rad2deg(altutude) });
     }
     else
     {
@@ -957,6 +954,7 @@ void CEnvironment::load_weather_effects()
             EnvVec& env = WeatherFXs[weatherName];
             env.soc_style = true;
             env.emplace_back(create_descriptor("00:00:00", nullptr));
+            env.back()->dont_save = true;
 
             const u32 envCount = pSettings->line_count(weatherSection);
             pcstr executionTime;
@@ -970,6 +968,7 @@ void CEnvironment::load_weather_effects()
 
             env.emplace_back(create_descriptor("24:00:00", nullptr));
             env.back()->exec_time_loaded = DAY_LENGTH;
+            env.back()->dont_save = true;
         }
     }
 
@@ -1034,22 +1033,37 @@ void CEnvironment::unload()
 
 void CEnvironment::save() const
 {
-    save_weathers();
-    save_weather_effects();
+    string_path environment_config_path;
+    FS.update_path(environment_config_path, "$game_config$", "weathers\\environment.ltx");
+
+    CInifile* environment_config = xr_new<CInifile>(environment_config_path, false, false, false);
+
+    save_weathers(environment_config);
+    save_weather_effects(environment_config);
+
+    CInifile::Destroy(environment_config);
 }
 
-void CEnvironment::save_weathers() const
+void CEnvironment::save_weathers(CInifile* environment_config /*= nullptr*/) const
 {
     string_path weathers_path;
     if (!FS.update_path(weathers_path, "$game_weathers$", "", false))
         FS.update_path(weathers_path, "$game_config$", "environment\\weathers");
 
     string_path weathers_path_soc;
-    FS.update_path(weathers_path_soc, "$game_config$", "weathers\\");
+    FS.update_path(weathers_path_soc, "$game_config$", "weathers\\weather_");
 
+    bool should_save_environment_config = false;
     for (const auto& [name, descriptors] : WeatherCycles)
     {
         const bool soc_style = descriptors.soc_style;
+        string_path weather_sect;
+        if (soc_style && environment_config)
+        {
+            should_save_environment_config = true;
+            strconcat(weather_sect, "sect_weather_", name.c_str());
+            environment_config->w_string("weathers", name.c_str(), weather_sect);
+        }
 
         string_path file_name;
         strconcat(file_name, soc_style ? weathers_path_soc : weathers_path,
@@ -1058,24 +1072,47 @@ void CEnvironment::save_weathers() const
         CInifile* config = xr_new<CInifile>(file_name, false, false, true);
 
         for (const auto& desc : descriptors)
-            desc->save(*config, soc_style);
+        {
+            if (desc->dont_save)
+                continue;
+
+            string_path time_sect;
+            if (soc_style)
+            {
+                strconcat(time_sect, "weather_", name.c_str(), "_", desc->m_identifier.c_str());
+                std::replace(time_sect, time_sect + xr_strlen(time_sect), ':', '_');
+                config->w_string(weather_sect, desc->m_identifier.c_str(), time_sect);
+            }
+            desc->save(*config, soc_style ? time_sect : nullptr);
+        }
 
         CInifile::Destroy(config);
     }
+
+    if (should_save_environment_config && environment_config)
+        environment_config->save_at_end(true);
 }
 
-void CEnvironment::save_weather_effects() const
+void CEnvironment::save_weather_effects(CInifile* environment_config /*= nullptr*/) const
 {
     string_path effects_path;
     if (!FS.update_path(effects_path, "$game_weather_effects$", "", false))
         FS.update_path(effects_path, "$game_config$", "environment\\weather_effects");
 
     string_path effects_path_soc;
-    FS.update_path(effects_path_soc, "$game_config$", "weathers\\");
+    FS.update_path(effects_path_soc, "$game_config$", "weathers\\weather_");
 
+    bool should_save_environment_config = false;
     for (const auto& [name, descriptors] : WeatherFXs)
     {
         const bool soc_style = descriptors.soc_style;
+        string_path weather_sect;
+        if (soc_style && environment_config)
+        {
+            should_save_environment_config = true;
+            strconcat(weather_sect, "sect_weather_", name.c_str());
+            environment_config->w_string("weather_effects", name.c_str(), weather_sect);
+        }
 
         string_path file_name;
         strconcat(file_name, soc_style ? effects_path_soc : effects_path,
@@ -1084,8 +1121,23 @@ void CEnvironment::save_weather_effects() const
         CInifile* config = xr_new<CInifile>(file_name, false, false, true);
 
         for (const auto& desc : descriptors)
-            desc->save(*config, soc_style);
+        {
+            if (desc->dont_save)
+                continue;
+
+            string_path time_sect;
+            if (soc_style)
+            {
+                strconcat(time_sect, "weather_", name.c_str(), "_", desc->m_identifier.c_str());
+                std::replace(time_sect, time_sect + xr_strlen(time_sect), ':', '_');
+                config->w_string(weather_sect, desc->m_identifier.c_str(), time_sect);
+            }
+            desc->save(*config, soc_style ? time_sect : nullptr);
+        }
 
         CInifile::Destroy(config);
     }
+
+    if (should_save_environment_config && environment_config)
+        environment_config->save_at_end(true);
 }
