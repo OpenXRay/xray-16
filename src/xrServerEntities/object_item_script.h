@@ -18,20 +18,15 @@ protected:
     typedef CObjectItemAbstract inherited;
 
 protected:
-#ifndef NO_XR_GAME
     mutable luabind::functor<ObjectFactory::ClientObjectBaseClass*, luabind::policy::adopt<0>> m_client_creator;
-#endif
     mutable luabind::functor<ObjectFactory::ServerObjectBaseClass*, luabind::policy::adopt<0>> m_server_creator;
 
 public:
-    CObjectItemScript(
-#ifndef NO_XR_GAME
-        luabind::object client_creator,
-#endif
-        luabind::object server_creator, const CLASS_ID& clsid, LPCSTR script_clsid);
-#ifndef NO_XR_GAME
+    CObjectItemScript(luabind::object client_creator,luabind::object server_creator,
+        const CLASS_ID& clsid, LPCSTR script_clsid);
+
     CObjectItemScript(luabind::object creator, const CLASS_ID& clsid, LPCSTR script_clsid);
     virtual ObjectFactory::ClientObjectBaseClass* client_object() const;
-#endif
+
     virtual ObjectFactory::ServerObjectBaseClass* server_object(LPCSTR section) const;
 };
