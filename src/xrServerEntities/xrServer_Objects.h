@@ -263,6 +263,7 @@ public:
 
 #ifndef AI_COMPILER
 extern CSE_Abstract* F_entity_Create(LPCSTR caSection);
+extern CSE_Abstract* F_entity_Create(LPCSTR caSection, bool no_assert);
 #endif
 
 #pragma warning(pop)

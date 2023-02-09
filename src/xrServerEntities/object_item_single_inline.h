@@ -16,14 +16,13 @@
 
 TEMPLATE_SPECIALIZATION
 IC CSObjectItemSingle::CObjectItemSingle(const CLASS_ID& clsid, LPCSTR script_clsid) : inherited(clsid, script_clsid) {}
-#ifndef NO_XR_GAME
+
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ClientObjectBaseClass* CSObjectItemSingle::client_object() const
 {
     FATAL("Cannot instantiate client object, because client class is not declared!");
     return (0);
 }
-#endif
 
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ServerObjectBaseClass* CSObjectItemSingle::server_object(LPCSTR section) const
@@ -31,7 +30,6 @@ ObjectFactory::ServerObjectBaseClass* CSObjectItemSingle::server_object(LPCSTR s
     return (xr_new<SERVER_TYPE>(section))->init();
 }
 
-#ifndef NO_XR_GAME
 template <typename _unknown_type>
 IC CObjectItemSingle<_unknown_type, true>::CObjectItemSingle(const CLASS_ID& clsid, LPCSTR script_clsid)
     : inherited(clsid, script_clsid)
@@ -50,7 +48,6 @@ ObjectFactory::ServerObjectBaseClass* CObjectItemSingle<_unknown_type, true>::se
     FATAL("Cannot instantiate server object, because server class is not declared!");
     return (0);
 }
-#endif
 
 #undef TEMPLATE_SPECIALIZATION
 #undef CSObjectItemSingle
