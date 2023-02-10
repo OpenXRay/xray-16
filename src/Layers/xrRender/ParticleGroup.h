@@ -72,7 +72,7 @@ public:
 
 class ECORE_API CParticleGroup : public dxParticleCustom
 {
-    CPGDef* m_Def;
+    const CPGDef* m_Def{};
     float m_CurrentTime;
     Fvector m_InitialPosition;
 
