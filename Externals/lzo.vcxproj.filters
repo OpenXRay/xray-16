@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\include">
+      <UniqueIdentifier>{527a18c5-d46a-4dab-9542-2d800e5fe533}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lzo\src\lzo_crc.c">
@@ -216,5 +219,115 @@
     <ClCompile Include="lzo\src\lzo2a_d2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lzo\src\lzo_conf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\lzo_dict.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\lzo_func.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\lzo_ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\lzo_supp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\lzo1a_de.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\lzo1b_cc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\lzo1b_de.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\lzo1c_cc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\stats1a.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\stats1b.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\stats1c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\compr1b.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\compr1c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\config1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\config1a.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\config1b.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\config1c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\config1f.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\config1x.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\config1y.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\config1z.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\src\config2a.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo_asm.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo1.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo1a.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo1b.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo1c.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo1f.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo1x.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo1y.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo1z.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzo2a.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzoconf.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzodefs.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lzo\include\lzo\lzoutil.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

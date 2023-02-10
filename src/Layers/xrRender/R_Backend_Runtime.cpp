@@ -34,7 +34,7 @@ void CBackend::OnFrameBegin()
 {
     if (!GEnv.isDedicatedServer)
     {
-        PGO(Msg("PGO:*****frame[%d]*****", RDEVICE.dwFrame));
+        PGO(Msg("PGO:*****frame[%d]*****", Device.dwFrame));
 
 #ifndef USE_DX9
         Invalidate();

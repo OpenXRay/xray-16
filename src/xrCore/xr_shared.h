@@ -9,7 +9,7 @@ class XRCORE_API shared_value
 {
 public:
     int m_ref_cnt;
-    virtual ~shared_value() {}
+    virtual ~shared_value() = default;
 };
 
 template <class T>
@@ -47,11 +47,8 @@ public:
         SharedMapIt _E = container.end();
         if (force_destroy)
         {
-            for (; it != _E; ++it)
-            {
-                T* sv = it->second;
-                xr_delete(sv);
-            }
+            for (auto& [k,v] : container)
+                xr_delete(v);
             container.clear();
         }
         else

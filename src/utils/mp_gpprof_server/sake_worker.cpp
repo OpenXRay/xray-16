@@ -17,7 +17,7 @@ sake_worker::~sake_worker() { add_task(&sake_worker::thread_stopper, NULL); }
 void sake_worker::add_task(sake_task_proc_t proc, void* arg)
 {
     m_newtask_mutex.lock();
-    m_tasks.push_back(std::make_pair(proc, arg));
+    m_tasks.emplace_back(proc, arg);
     m_newtask_cond.signal();
     m_newtask_mutex.unlock();
 }

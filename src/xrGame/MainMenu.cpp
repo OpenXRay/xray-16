@@ -8,7 +8,7 @@
 #include "xrEngine/xr_level_controller.h"
 #include "xrUICore/XML/UITextureMaster.h"
 #include "ui/UIXmlInit.h"
-#include "SDL.h"
+#include <SDL.h>
 #include "xrUICore/Buttons/UIBtnHint.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "xrGameSpy/GameSpy_Full.h"
@@ -379,13 +379,6 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     if (!IsActive())
         return;
 
-    auto action = GetBindedAction(dik);
-    if (action == kCONSOLE)
-    {
-        Console->Show();
-        return;
-    }
-
     if ((pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT))
         && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LGUI) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RGUI)))
     {
@@ -394,9 +387,18 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
         Device.SetWindowDraggable(true);
     }
 
-    if (action == kSCREENSHOT)
+    switch (GetBindedAction(dik))
     {
+    case kSCREENSHOT:
         GEnv.Render->Screenshot();
+        return;
+
+    case kCONSOLE:
+        Console->Show();
+        return;
+
+    case kEDITOR:
+        Device.editor().SwitchToNextState();
         return;
     }
 
@@ -414,7 +416,6 @@ void CMainMenu::IR_OnKeyboardRelease(int dik)
         pInput->GrabInput(true);
         Device.SetWindowDraggable(false);
     }
-
 
     CDialogHolder::IR_UIOnKeyboardRelease(dik);
 };
@@ -935,13 +936,12 @@ void CMainMenu::Show_DownloadMPMap(LPCSTR text, LPCSTR url)
 {
     m_downloaded_mp_map_url._set(url);
 
-    CUIMessageBoxEx* downloadMsg = m_pMB_ErrDlgs[DownloadMPMap];
-    if (downloadMsg)
+    if (CUIMessageBoxEx* downloadMsg = m_pMB_ErrDlgs[DownloadMPMap])
     {
-        m_pMB_ErrDlgs[DownloadMPMap]->SetText(text);
-        m_pMB_ErrDlgs[DownloadMPMap]->SetTextEditURL(url);
+        downloadMsg->SetText(text);
+        downloadMsg->SetTextEditURL(url);
 
-        m_pMB_ErrDlgs[DownloadMPMap]->ShowDialog(false);
+        downloadMsg->ShowDialog(false);
     }
     else
     {

@@ -13,9 +13,8 @@
 #ifdef XRGAME_EXPORTS
 #include "relation_registry.h"
 #endif // #ifdef XRGAME_EXPORTS
-#include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 CALifeMonsterBrain* monster_brain(CSE_ALifeMonsterAbstract* monster)
 {
@@ -69,45 +68,57 @@ void ForceSetGoodwill(CSE_ALifeMonsterAbstract* self, int goodwill, ALife::_OBJE
 
 static void CSE_ALifeMonsterAbstract_Export(lua_State* luaState)
 {
-    module(luaState)[luabind_class_monster2(
-        CSE_ALifeMonsterAbstract, "cse_alife_monster_abstract", CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable)
-                         .def("smart_terrain_id", &smart_terrain_id)
-                         .def_readonly("group_id", &CSE_ALifeMonsterAbstract::m_group_id)
-                         .def_readwrite("m_smart_terrain_id", &CSE_ALifeMonsterAbstract::m_smart_terrain_id)
-                         .def("clear_smart_terrain", &clear_smart_terrain)
-                         .def("brain", &monster_brain)
-                         .def("rank", &CSE_ALifeMonsterAbstract::Rank)
-                         .def("smart_terrain_task_activate", &smart_terrain_task_activate)
-                         .def("smart_terrain_task_deactivate", &smart_terrain_task_deactivate)
+    using namespace luabind;
+
+    module(luaState)
+    [
+        luabind_class_monster2(
+            CSE_ALifeMonsterAbstract, "cse_alife_monster_abstract", CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable)
+                .def("smart_terrain_id", &smart_terrain_id)
+                .def_readonly("group_id", &CSE_ALifeMonsterAbstract::m_group_id)
+                .def_readwrite("m_smart_terrain_id", &CSE_ALifeMonsterAbstract::m_smart_terrain_id)
+                .def("clear_smart_terrain", &clear_smart_terrain)
+                .def("brain", &monster_brain)
+                .def("rank", &CSE_ALifeMonsterAbstract::Rank)
+                .def("smart_terrain_task_activate", &smart_terrain_task_activate)
+                .def("smart_terrain_task_deactivate", &smart_terrain_task_deactivate)
 #ifdef XRGAME_EXPORTS
-                         .def("travel_speed", &travel_speed)
-                         .def("travel_speed", &travel_speed2)
-                         .def("current_level_travel_speed", &current_level_travel_speed)
-                         .def("current_level_travel_speed", &current_level_travel_speed2)
-                         .def("kill", &CSE_ALifeMonsterAbstract::kill)
-                         .def("has_detector", &CSE_ALifeMonsterAbstract::has_detector)
-                         .def("force_set_goodwill", &ForceSetGoodwill)
+                .def("travel_speed", &travel_speed)
+                .def("travel_speed", &travel_speed2)
+                .def("current_level_travel_speed", &current_level_travel_speed)
+                .def("current_level_travel_speed", &current_level_travel_speed2)
+                .def("kill", &CSE_ALifeMonsterAbstract::kill)
+                .def("has_detector", &CSE_ALifeMonsterAbstract::has_detector)
+                .def("force_set_goodwill", &ForceSetGoodwill)
 #endif
     ];
 }
-SCRIPT_EXPORT_FUNC(
-    CSE_ALifeMonsterAbstract, (CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable), CSE_ALifeMonsterAbstract_Export);
+SCRIPT_EXPORT_FUNC(CSE_ALifeMonsterAbstract, (CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable), CSE_ALifeMonsterAbstract_Export);
 
 static void CSE_ALifeHumanAbstract_Export(lua_State* luaState)
 {
-    module(luaState)[luabind_class_monster2(
-        CSE_ALifeHumanAbstract, "cse_alife_human_abstract", CSE_ALifeTraderAbstract, CSE_ALifeMonsterAbstract)
-                         .def("brain", &human_brain)
+    using namespace luabind;
+
+    module(luaState)
+    [
+        luabind_class_monster2(
+            CSE_ALifeHumanAbstract, "cse_alife_human_abstract", CSE_ALifeTraderAbstract, CSE_ALifeMonsterAbstract)
+                .def("brain", &human_brain)
 #ifdef XRGAME_EXPORTS
-                         .def("rank", &CSE_ALifeTraderAbstract::Rank)
-                         .def("set_rank", &CSE_ALifeTraderAbstract::SetRank)
+                .def("rank", &CSE_ALifeTraderAbstract::Rank)
+                .def("set_rank", &CSE_ALifeTraderAbstract::SetRank)
 #endif
     ];
 }
 
-SCRIPT_EXPORT_FUNC(
-    CSE_ALifeHumanAbstract, (CSE_ALifeTraderAbstract, CSE_ALifeMonsterAbstract), CSE_ALifeHumanAbstract_Export);
+SCRIPT_EXPORT_FUNC(CSE_ALifeHumanAbstract, (CSE_ALifeTraderAbstract, CSE_ALifeMonsterAbstract), CSE_ALifeHumanAbstract_Export);
 
-SCRIPT_EXPORT(CSE_ALifePsyDogPhantom, (CSE_ALifeMonsterBase), {
-    module(luaState)[luabind_class_monster1(CSE_ALifePsyDogPhantom, "cse_alife_psydog_phantom", CSE_ALifeMonsterBase)];
+SCRIPT_EXPORT(CSE_ALifePsyDogPhantom, (CSE_ALifeMonsterBase),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        luabind_class_monster1(CSE_ALifePsyDogPhantom, "cse_alife_psydog_phantom", CSE_ALifeMonsterBase)
+    ];
 });

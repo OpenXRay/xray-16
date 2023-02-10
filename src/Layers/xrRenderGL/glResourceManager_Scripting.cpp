@@ -10,9 +10,6 @@
 #include	"luabind/return_reference_to_policy.hpp"
 #include "xrCore/Threading/ScopeLock.hpp"
 
-using namespace luabind;
-using namespace policy;
-
 #ifdef	DEBUG
 #define MDB	Memory.dbg_check()
 #else
@@ -311,6 +308,9 @@ void CResourceManager::LS_Load()
     // clang-format off
     auto exporterFunc = [](lua_State* luaState)
     {
+        using namespace luabind;
+        using namespace luabind::policy;
+
         module(luaState)
         [
             class_<adopt_dx10options>("_dx10options")
@@ -535,6 +535,8 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
 
 ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
 {
+    using namespace luabind;
+
     ShaderElement E;
     SH = &E;
     RS.Invalidate();

@@ -10,12 +10,11 @@
 
 #pragma pack(push, 4)
 
-enum EFC_Visible
+enum EFC_Visible : u32
 {
     fcvNone = 0,
     fcvPartial,
     fcvFully,
-    fcv_forcedword = u32(-1)
 };
 
 #define FRUSTUM_MAXPLANES 12

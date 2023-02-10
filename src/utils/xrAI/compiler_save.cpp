@@ -11,17 +11,17 @@ IC u8 compress(float c, int max_value)
 
 struct CNodeCompressed
 {
-    IC void compress_node(NodeCompressed& Dest, vertex& Src);
+    IC void compress_node(NodeCompressed10& Dest, vertex& Src);
 };
 
-IC void CNodeCompressed::compress_node(NodeCompressed& Dest, vertex& Src)
+IC void CNodeCompressed::compress_node(NodeCompressed10& Dest, vertex& Src)
 {
-    Dest.light(15);
+    //Dest.light(15);
     for (u8 L = 0; L < 4; ++L)
         Dest.link(L, Src.n[L]);
 }
 
-void Compress(NodeCompressed& Dest, vertex& Src, hdrNODES& H)
+void Compress(NodeCompressed10& Dest, vertex& Src, hdrNODES& H)
 {
     // Compress plane (normal)
     Dest.plane = pvCompress(Src.Plane.n);
@@ -50,13 +50,13 @@ float CalculateHeight(Fbox& BB)
     return BB.vMax.y - BB.vMin.y + EPS_L;
 }
 
-xr_vector<NodeCompressed> compressed_nodes;
+xr_vector<NodeCompressed10> compressed_nodes;
 
 class CNodeRenumberer
 {
     struct SSortNodesPredicate
     {
-        IC bool operator()(const NodeCompressed& vertex0, const NodeCompressed& vertex1) const
+        IC bool operator()(const NodeCompressed10& vertex0, const NodeCompressed10& vertex1) const
         {
             return (vertex0.p.xz() < vertex1.p.xz());
         }
@@ -67,12 +67,12 @@ class CNodeRenumberer
         }
     };
 
-    xr_vector<NodeCompressed>& m_nodes;
+    xr_vector<NodeCompressed10>& m_nodes;
     xr_vector<u32>& m_sorted;
     xr_vector<u32>& m_renumbering;
 
 public:
-    CNodeRenumberer(xr_vector<NodeCompressed>& nodes, xr_vector<u32>& sorted, xr_vector<u32>& renumbering)
+    CNodeRenumberer(xr_vector<NodeCompressed10>& nodes, xr_vector<u32>& sorted, xr_vector<u32>& renumbering)
         : m_nodes(nodes), m_sorted(sorted), m_renumbering(renumbering)
     {
         u32 N = m_nodes.size();
@@ -127,7 +127,7 @@ void xrSaveNodes(LPCSTR name, LPCSTR out_name)
     compressed_nodes.reserve(g_nodes.size());
     for (auto &i : g_nodes)
     {
-        NodeCompressed NC;
+        NodeCompressed10 NC;
         Compress(NC, i, H);
         compressed_nodes.push_back(NC);
     }
@@ -139,7 +139,7 @@ void xrSaveNodes(LPCSTR name, LPCSTR out_name)
 
     Logger.clMsg("Saving nodes...");
     for (auto &i : compressed_nodes)
-        fs->w(&i, sizeof(NodeCompressed));
+        fs->w(&i, sizeof(NodeCompressed10));
 
     // Stats
     u32 SizeTotal = fs->tell();

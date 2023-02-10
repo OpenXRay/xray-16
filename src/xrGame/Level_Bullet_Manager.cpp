@@ -847,9 +847,9 @@ void CBulletManager::Render()
 
     GEnv.UIRender->StartPrimitive((u32)bullet_num * 12, IUIRender::ptTriList, IUIRender::pttLIT);
 
-    for (auto it = m_BulletsRendered.begin(); it != m_BulletsRendered.end(); ++it)
+    for (auto& sbullet : m_BulletsRendered)
     {
-        SBullet* bullet = &(*it);
+        SBullet* bullet = &sbullet;
         if (!bullet->flags.allow_tracer)
             continue;
 
@@ -920,9 +920,8 @@ void CBulletManager::CommitEvents() // @ the start of frame
     if (m_Events.size() > 1000)
         Msg("! too many bullets during single frame: %d", m_Events.size());
 
-    for (u32 _it = 0; _it < m_Events.size(); _it++)
+    for (auto& E : m_Events)
     {
-        _event& E = m_Events[_it];
         switch (E.Type)
         {
         case EVENT_HIT:

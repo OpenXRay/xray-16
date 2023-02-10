@@ -7,7 +7,7 @@ class CCustomObject;
 typedef u32 ObjClassID;
 
 //----------------------------------------------------
-enum
+enum : u32
 {
     OBJCLASS_DUMMY = -1,
     OBJCLASS_FIRST_CLASS = 0,
@@ -28,7 +28,6 @@ enum
     OBJCLASS_WM = 14,
     OBJCLASS_FOG_VOL = 15,
     OBJCLASS_COUNT = 16,
-    OBJCLASS_force_dword = u32(-1)
 };
 
 //----------------------------------------------------

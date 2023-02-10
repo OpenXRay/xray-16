@@ -13,16 +13,21 @@
 #include "xr_time.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 xrTime CSavedGameWrapper__game_time(const CSavedGameWrapper* self) { return (xrTime(self->game_time())); }
-SCRIPT_EXPORT(CSavedGameWrapper, (), {
-    module(luaState)[class_<CSavedGameWrapper>("CSavedGameWrapper")
-                         .def(constructor<LPCSTR>())
-                         .def("game_time", &CSavedGameWrapper__game_time)
-                         .def("level_id", &CSavedGameWrapper::level_id)
-                         .def("level_name", &CSavedGameWrapper::level_name)
-                         .def("actor_health", &CSavedGameWrapper::actor_health),
 
-        def("valid_saved_game", (bool (*)(LPCSTR))(&CSavedGameWrapper::valid_saved_game))];
+SCRIPT_EXPORT(CSavedGameWrapper, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CSavedGameWrapper>("CSavedGameWrapper")
+            .def(constructor<pcstr>())
+            .def("game_time", &CSavedGameWrapper__game_time)
+            .def("level_id", &CSavedGameWrapper::level_id)
+            .def("level_name", &CSavedGameWrapper::level_name)
+            .def("actor_health", &CSavedGameWrapper::actor_health),
+
+        def("valid_saved_game", (bool (*)(pcstr))(&CSavedGameWrapper::valid_saved_game))
+    ];
 });

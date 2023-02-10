@@ -72,10 +72,11 @@ void server_site::update_transfer()
 
     for (transfer_sessions_t::iterator ti = m_transfers.begin(), tie = m_transfers.end(); ti != tie; ++ti)
     {
-        IClient* tmp_client = Level().Server->GetClientByID(ti->first.first); // dst
-        if (!tmp_client)
+        const auto dst_client_id = ti->first.first;
+        const IClient* dst_client = Level().Server->GetClientByID(dst_client_id);
+        if (!dst_client)
         {
-            Msg("! ERROR: SV: client [%u] not found for transfering file", ti->first);
+            Msg("! ERROR: SV: client [%u] not found for transfering file", dst_client_id);
             to_stop_transfers.push_back(ti->first);
             ti->second->signal_callback(sending_rejected_by_peer);
             continue;
@@ -86,13 +87,13 @@ void server_site::update_transfer()
             continue;
         }
 
-        tmp_ftnode->calculate_chunk_size(tmp_client->stats.getPeakBPS(), tmp_client->stats.getBPS());
+        tmp_ftnode->calculate_chunk_size(dst_client->stats.getPeakBPS(), dst_client->stats.getBPS());
         NET_Packet tmp_packet;
         tmp_packet.w_begin(M_FILE_TRANSFER);
         tmp_packet.w_u8(receive_data);
         tmp_packet.w_u32(ti->first.second.value()); // src
         bool complete = tmp_ftnode->make_data_packet(tmp_packet);
-        Level().Server->SendTo(tmp_client->ID, tmp_packet, net_flags(TRUE, TRUE, TRUE));
+        Level().Server->SendTo(dst_client->ID, tmp_packet, net_flags(TRUE, TRUE, TRUE));
         if (complete)
         {
             tmp_ftnode->signal_callback(sending_complete);

@@ -49,11 +49,10 @@ using BoneMotionVec = xr_vector<st_BoneMotion>;
 class XRCORE_API CCustomMotion
 {
 protected:
-    enum EMotionType
+    enum EMotionType : u32
     {
         mtObject = 0,
         mtSkeleton,
-        ForceDWORD = u32(-1)
     };
     EMotionType mtype;
     int iFrameStart, iFrameEnd;

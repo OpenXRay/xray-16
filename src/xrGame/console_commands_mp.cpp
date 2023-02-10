@@ -1700,24 +1700,44 @@ public:
         Level().Server->GetGameState()->SetGameTimeFactor(NewTime, g_fTimeFactor);
     }
 };
+
 class CCC_SVSetWeather : public IConsole_Command
 {
 public:
-    CCC_SVSetWeather(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
-    virtual void Execute(LPCSTR weather_name)
+    CCC_SVSetWeather(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
+
+    void Execute(pcstr weather_name) override
+    {
+        if (!g_pGamePersistent || !weather_name || !weather_name[0])
+            return;
+        if (Device.editor_mode())
+        {
+            Log("~ Setting weather is disabled in editor mode");
+            return;
+        }
+
+#ifdef MASTER_GOLD
+        if (!OnServer())
+            return;
+        constexpr bool forced = false;
+#else
+        constexpr bool forced = true;
+#endif
+        g_pGamePersistent->Environment().SetWeather(weather_name, forced);
+    }
+
+    void Info(TInfo& I) override { xr_strcpy(I, "Set new weather"); }
+
+    void fill_tips(vecTips& tips, u32 mode) override
     {
         if (!g_pGamePersistent)
             return;
-        if (!OnServer())
-            return;
 
-        if (weather_name && weather_name[0])
+        for (auto& [name, cycle] : g_pGamePersistent->Environment().WeatherCycles)
         {
-            g_pGamePersistent->Environment().SetWeather(weather_name);
+            tips.emplace_back(name);
         }
-    };
-
-    virtual void Info(TInfo& I) { xr_strcpy(I, "Set new weather"); }
+    }
 };
 
 class CCC_SaveStatistic : public IConsole_Command

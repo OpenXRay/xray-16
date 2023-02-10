@@ -172,9 +172,9 @@ void CPHDestroyable::Load(CInifile* ini, LPCSTR section)
         CInifile::Sect& data = ini->r_section(section);
         if (data.Data.size() > 0)
             m_flags.set(fl_destroyable, true);
-        for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
-            if (I->first.size())
-                m_destroyed_obj_visual_names.push_back(I->first);
+        for (const auto& I : data.Data)
+            if (I.first.size())
+                m_destroyed_obj_visual_names.push_back(I.first);
     }
 }
 void CPHDestroyable::Load(LPCSTR section)

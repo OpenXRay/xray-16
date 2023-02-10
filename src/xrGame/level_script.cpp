@@ -99,13 +99,13 @@ CScriptGameObject* get_object_by_id(u16 id)
 LPCSTR get_weather() { return *g_pGamePersistent->Environment().GetWeather(); }
 void set_weather(pcstr const weather_name, const bool forced)
 {
-    if (!Device.editor())
+    if (!Device.editor_mode())
         g_pGamePersistent->Environment().SetWeather(weather_name, forced);
 }
 
 bool set_weather_fx(pcstr const weather_name)
 {
-    if (!Device.editor())
+    if (!Device.editor_mode())
         return g_pGamePersistent->Environment().SetWeatherFX(weather_name);
 
     return false;
@@ -113,7 +113,7 @@ bool set_weather_fx(pcstr const weather_name)
 
 bool start_weather_fx_from_time(pcstr const weather_name, const float time)
 {
-    if (!Device.editor())
+    if (!Device.editor_mode())
         return g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time);
 
     return false;
@@ -124,7 +124,7 @@ float get_wfx_time() { return (g_pGamePersistent->Environment().wfx_time); }
 void stop_weather_fx() { g_pGamePersistent->Environment().StopWFX(); }
 void set_time_factor(const float time_factor)
 {
-    if (!OnServer() || Device.editor())
+    if (!OnServer() || Device.editor_mode())
         return;
 
     Level().Server->GetGameState()->SetGameTimeFactor(time_factor);
@@ -657,6 +657,18 @@ bool ray_pick(const Fvector& start, const Fvector& dir, float range,
     return false;
 }
 
+// Graff46
+void jump_to_level(const Fvector& m_position, u32 m_level_vertex_id, GameGraph::_GRAPH_ID m_game_vertex_id, const Fvector& m_angles)
+{
+    NET_Packet p;
+    p.w_begin(M_CHANGE_LEVEL);
+    p.w(&m_game_vertex_id, sizeof(m_game_vertex_id));
+    p.w(&m_level_vertex_id, sizeof(m_level_vertex_id));
+    p.w_vec3(m_position);
+    p.w_vec3(m_angles);
+    Level().Send(p, net_flags(TRUE));
+}
+
 // XXX nitrocaster: one can export enum like class, without defining dummy type
 template<typename T>
 struct EnumCallbackType {};
@@ -882,12 +894,26 @@ IC static void CLevel_Export(lua_State* luaState)
         def("start_tutorial", &start_tutorial),
         def("stop_tutorial", &stop_tutorial),
         def("has_active_tutorial", &has_active_tutotial),
-	    def("active_tutorial_name", +[](){ return g_tutorial->GetTutorName(); }),
+        def("active_tutorial_name", +[](){ return g_tutorial->GetTutorName(); }),
         def("translate_string", &translate_string),
         def("reload_language", +[]() { StringTable().ReloadLanguage(); }),
-        def("log_stack_trace", &xrDebug::LogStackTrace)
+        def("log_stack_trace", &xrDebug::LogStackTrace),
+        def("jump_to_level", +[](pcstr level_name)
+        {
+            if (!ai().game_graph().header().level_exist(level_name))
+            {
+                GEnv.ScriptEngine->script_log(LuaMessageType::Error,
+                    "game.jump_to_level: cannot jump to level '%s' – it doesn't exist", level_name);
+                return;
+            }
+            ai().alife().jump_to_level(level_name);
+        }),
+        def("jump_to_level", &jump_to_level),
+        def("jump_to_level", +[](const Fvector& m_position, u32 m_level_vertex_id, GameGraph::_GRAPH_ID m_game_vertex_id)
+        {
+            jump_to_level(m_position, m_level_vertex_id, m_game_vertex_id, {});
+        })
     ];
-
 };
 
 SCRIPT_EXPORT_FUNC(CLevel, (), CLevel_Export);

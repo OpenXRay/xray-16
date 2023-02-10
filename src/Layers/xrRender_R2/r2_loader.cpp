@@ -340,6 +340,7 @@ void CRender::LoadSectors(IReader* fs)
     {
         bool do_rebuild = true;
         const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
+        const bool checkCrc32 = !strstr(Core.Params, "-skip_cdb_cache_crc32_check");
 
         string_path fName;
         strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
@@ -348,7 +349,7 @@ void CRender::LoadSectors(IReader* fs)
         // build portal model
         rmPortals = xr_new<CDB::MODEL>();
         rmPortals->set_version(fs->get_age());
-        if (use_cache && FS.exist(fName) && rmPortals->deserialize(fName))
+        if (use_cache && FS.exist(fName) && rmPortals->deserialize(fName, checkCrc32))
         {
 #ifndef MASTER_GOLD
             Msg("* Loaded portals cache (%s)...", fName);
@@ -414,11 +415,8 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
         CStreamReader* fs = base_fs->open_chunk(fsL_SWIS);
         u32 item_count = fs->r_u32();
 
-        xr_vector<FSlideWindowItem>::iterator it = SWIs.begin();
-        xr_vector<FSlideWindowItem>::iterator it_e = SWIs.end();
-
-        for (; it != it_e; ++it)
-            xr_free((*it).sw);
+        for (auto& SWI : SWIs)
+            xr_free(SWI.sw);
 
         SWIs.clear();
 

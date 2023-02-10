@@ -28,7 +28,7 @@ protected:
 protected:
     bool m_isGamepadBinds{};
 
-    CUIFrameLineWnd m_header[3];
+    std::array<CUIFrameLineWnd, 3> m_header;
     CUIFrameWindow m_frame;
     CUIScrollView* m_scroll_wnd{};
 };

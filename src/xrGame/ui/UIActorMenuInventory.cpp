@@ -45,6 +45,8 @@ void CUIActorMenu::InitInventoryMode()
     m_pLists[eInventoryOutfitList]->Show(true);
     ShowIfExist(m_pLists[eInventoryHelmetList], true);
     ShowIfExist(m_pLists[eInventoryDetectorList], true);
+    ShowIfExist(m_pLists[eInventoryBackpackList], true);
+    ShowIfExist(m_pLists[eInventoryKnifeList], true);
     m_pLists[eInventoryPistolList]->Show(true);
     m_pLists[eInventoryAutomaticList]->Show(true);
     ShowIfExist(m_pQuickSlot, true);
@@ -62,6 +64,7 @@ void CUIActorMenu::DeInitInventoryMode()
     ShowIfExist(m_pInventoryWnd, false);
     ShowIfExist(m_pLists[eTrashList], false);
     ShowIfExist(m_clock_value, false);
+    clear_highlight_lists();
 }
 
 void CUIActorMenu::SendEvent_ActivateSlot(u16 slot, u16 recipient)
@@ -70,6 +73,7 @@ void CUIActorMenu::SendEvent_ActivateSlot(u16 slot, u16 recipient)
     CGameObject::u_EventGen(P, GEG_PLAYER_ACTIVATE_SLOT, recipient);
     P.w_u16(slot);
     CGameObject::u_EventSend(P);
+    clear_highlight_lists();
 }
 
 void CUIActorMenu::SendEvent_Item2Slot(PIItem pItem, u16 recipient, u16 slot_id)
@@ -84,6 +88,7 @@ void CUIActorMenu::SendEvent_Item2Slot(PIItem pItem, u16 recipient, u16 slot_id)
     CGameObject::u_EventSend(P);
 
     PlaySnd(eItemToSlot);
+    clear_highlight_lists();
 };
 
 void CUIActorMenu::SendEvent_Item2Belt(PIItem pItem, u16 recipient)
@@ -97,6 +102,7 @@ void CUIActorMenu::SendEvent_Item2Belt(PIItem pItem, u16 recipient)
     CGameObject::u_EventSend(P);
 
     PlaySnd(eItemToBelt);
+    clear_highlight_lists();
 };
 
 void CUIActorMenu::SendEvent_Item2Ruck(PIItem pItem, u16 recipient)
@@ -110,6 +116,7 @@ void CUIActorMenu::SendEvent_Item2Ruck(PIItem pItem, u16 recipient)
     CGameObject::u_EventSend(P);
 
     PlaySnd(eItemToRuck);
+    clear_highlight_lists();
 };
 
 void CUIActorMenu::SendEvent_Item_Eat(PIItem pItem, u16 recipient)
@@ -121,6 +128,7 @@ void CUIActorMenu::SendEvent_Item_Eat(PIItem pItem, u16 recipient)
     CGameObject::u_EventGen(P, GEG_PLAYER_ITEM_EAT, recipient);
     P.w_u16(pItem->object().ID());
     CGameObject::u_EventSend(P);
+    clear_highlight_lists();
 };
 
 void CUIActorMenu::SendEvent_Item_Drop(PIItem pItem, u16 recipient)
@@ -134,6 +142,7 @@ void CUIActorMenu::SendEvent_Item_Drop(PIItem pItem, u16 recipient)
     P.w_u16(pItem->object().ID());
     pItem->object().u_EventSend(P);
     PlaySnd(eDropItem);
+    clear_highlight_lists();
 }
 
 void CUIActorMenu::DropAllCurrentItem()
@@ -235,9 +244,9 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 {
     CUIDragDropListEx* all_lists[] =
     {
-        m_pLists[eInventoryBeltList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
-        m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList], m_pLists[eInventoryBagList],
-        m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
+        m_pLists[eInventoryBeltList], m_pLists[eInventoryKnifeList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
+        m_pLists[eInventoryBackpackList], m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList],
+        m_pLists[eInventoryBagList], m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
     };
 
     switch (action_type)
@@ -446,6 +455,7 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyB
     InitCellForSlot(DETECTOR_SLOT);
     InitCellForSlot(GRENADE_SLOT);
     InitCellForSlot(HELMET_SLOT);
+    InitCellForSlot(BACKPACK_SLOT);
 
     //Alundaio
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(KNIFE_SLOT))
@@ -567,6 +577,9 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
 
         if (m_pActorInvOwner->inventory().SlotIsPersistent(slot_id) && slot_id != DETECTOR_SLOT)
             return false;
+
+        if (slot_id == KNIFE_SLOT && m_pActorInvOwner->inventory().CanPutInSlot(iitem, KNIFE_SLOT))
+            return ToSlot(itm, force_place, KNIFE_SLOT);
 
         if (slot_id == INV_SLOT_2 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_3) && CallOfPripyatMode)
             return ToSlot(itm, force_place, INV_SLOT_3);
@@ -735,9 +748,13 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     }
     switch (slot_idx)
     {
+    case KNIFE_SLOT: return m_pLists[eInventoryKnifeList]; break;
+
     case INV_SLOT_2: return m_pLists[eInventoryPistolList]; break;
 
     case INV_SLOT_3: return m_pLists[eInventoryAutomaticList]; break;
+
+    case BACKPACK_SLOT: return m_pLists[eInventoryBackpackList]; break;
 
     case OUTFIT_SLOT: return m_pLists[eInventoryOutfitList]; break;
 
@@ -749,7 +766,6 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     case TORCH_SLOT:
     case ARTEFACT_SLOT:
     case BINOCULAR_SLOT:
-    case KNIFE_SLOT:
 
     case GRENADE_SLOT: // fake
         if (m_currMenuMode == mmTrade)

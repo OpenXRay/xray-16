@@ -10,13 +10,16 @@
 #include "script_token_list.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
+SCRIPT_EXPORT(CScriptTokenList, (),
+{
+    using namespace luabind;
 
-SCRIPT_EXPORT(CScriptTokenList, (), {
-    module(luaState)[class_<xr_token>("token")
-                         .def(constructor<>())
-                         .def_readwrite("name", &xr_token::name)
-                         .def_readwrite("id", &xr_token::id),
+    module(luaState)
+    [
+        class_<xr_token>("token")
+            .def(constructor<>())
+            .def_readwrite("name", &xr_token::name)
+            .def_readwrite("id", &xr_token::id),
 
         class_<CScriptTokenList>("token_list")
             .def(constructor<>())

@@ -3,8 +3,6 @@
 #include "xrEngine/xr_ioc_cmd.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 CConsole* console() { return Console; }
 
 bool get_renderer_command_state(void)
@@ -32,8 +30,13 @@ void execute_console_command_deferred(CConsole* c, LPCSTR string_to_execute)
     Engine.Event.Defer("KERNEL:console", size_t(xr_strdup(string_to_execute)));
 }
 
-SCRIPT_EXPORT(CConsole, (), {
-    module(luaState)[def("get_console", &console),
+SCRIPT_EXPORT(CConsole, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        def("get_console", &console),
 
         class_<CConsole>("CConsole")
             .def("execute", &CConsole::Execute)

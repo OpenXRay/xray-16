@@ -84,9 +84,11 @@ protected:
 
     enum eActorMenuListType
     {
+        eInventoryKnifeList,
         eInventoryPistolList,
         eInventoryAutomaticList,
 
+        eInventoryBackpackList,
         eInventoryOutfitList,
         eInventoryHelmetList,
 
@@ -258,6 +260,7 @@ protected:
     bool AllowItemDrops(EDDListType from, EDDListType to);
 
     bool OnItemDrop(CUICellItem* itm);
+    bool DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, CUIDragDropListEx* old_owner, CUIDragDropListEx* new_owner);
     bool OnItemStartDrag(CUICellItem* itm);
     bool OnItemDbClick(CUICellItem* itm);
     bool OnItemSelected(CUICellItem* itm);
@@ -390,6 +393,10 @@ public:
     void StoreAllToInventoryBox();
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
+
+    CScriptGameObject* GetCurrentItemAsGameObject();
+    void HighlightSectionInSlot(pcstr section, EDDListType type, u16 slot_id = 0);
+    void HighlightForEachInSlot(const luabind::functor<bool>& functor, EDDListType type, u16 slot_id);
 
     void RefreshCurrentItemCell();
     void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu

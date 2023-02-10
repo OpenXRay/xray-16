@@ -151,6 +151,8 @@ game_action actions[] = {
 
     { "kick",              kKICK,              _sp },
 
+    { "editor",            kEDITOR,            _both },
+
     { nullptr,             kLASTACTION,        _both }
 };
 

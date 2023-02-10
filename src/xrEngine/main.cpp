@@ -17,7 +17,7 @@
 #include "xrCDB/ISpatial.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Text_Console.h"
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif
@@ -168,7 +168,7 @@ ENGINE_API void InitConsole()
 
 ENGINE_API void InitInput()
 {
-    bool captureInput = !strstr(Core.Params, "-i") && !GEnv.isEditor;
+    bool captureInput = !strstr(Core.Params, "-i");
     pInput = xr_new<CInput>(captureInput);
 }
 

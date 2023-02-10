@@ -727,12 +727,6 @@ void CRender::OnFrame()
 }
 
 #ifdef USE_OGL
-void CRender::ObtainRequiredWindowFlags(u32& windowFlags)
-{
-    windowFlags |= SDL_WINDOW_OPENGL;
-    HW.SetPrimaryAttributes();
-}
-
 IRender::RenderContext CRender::GetCurrentContext() const
 {
     return HW.GetCurrentContext();

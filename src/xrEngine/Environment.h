@@ -6,7 +6,6 @@
 #include "Include/xrRender/EnvironmentRender.h"
 #include "xrCore/_vector3d.h"
 #include "xrCore/_quaternion.h"
-#include "xrCore/xrCore_benchmark_macros.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
 #include "xrSound/Sound.h"
@@ -64,8 +63,6 @@ public:
         float wind_blast_out_time;
         float wind_blast_strength;
         Fvector wind_blast_direction;
-
-        virtual ~SEffect() {}
     };
     using EffectVec = xr_vector<SEffect*>;
 
@@ -75,24 +72,32 @@ public:
         Fvector2 m_sound_dist;
         Ivector4 m_sound_period;
 
-        typedef xr_vector<ref_sound> sounds_type;
-
         void load(const CInifile& config, pcstr sect, pcstr sectionToReadFrom = nullptr);
-        ref_sound& get_rnd_sound() { return sounds()[Random.randI(sounds().size())]; }
-        u32 get_rnd_sound_time()
+
+        [[nodiscard]]
+        ref_sound& get_rnd_sound() { return m_sounds[Random.randI(m_sounds.size())]; }
+
+        [[nodiscard]]
+        u32 get_rnd_sound_time() const
         {
             return (m_sound_period.z < m_sound_period.w) ? Random.randI(m_sound_period.z, m_sound_period.w) : 0;
         }
-        u32 get_rnd_sound_first_time()
+
+        [[nodiscard]]
+        u32 get_rnd_sound_first_time() const
         {
             return (m_sound_period.x < m_sound_period.y) ? Random.randI(m_sound_period.x, m_sound_period.y) : 0;
         }
-        float get_rnd_sound_dist()
+
+        [[nodiscard]]
+        float get_rnd_sound_dist() const
         {
             return (m_sound_dist.x < m_sound_dist.y) ? Random.randF(m_sound_dist.x, m_sound_dist.y) : 0;
         }
-        virtual ~SSndChannel() {}
-        virtual sounds_type& sounds() { return m_sounds; }
+
+        [[nodiscard]]
+        auto& sounds() { return m_sounds; }
+
     protected:
         xr_vector<ref_sound> m_sounds;
     };
@@ -125,7 +130,7 @@ public:
 class ENGINE_API CEnvDescriptor
 {
 public:
-    bool old_style;
+    bool dont_save; // oh
 
     float exec_time;
     float exec_time_loaded;
@@ -133,8 +138,6 @@ public:
     shared_str sky_texture_name;
     shared_str sky_texture_env_name;
     shared_str clouds_texture_name;
-
-    BENCH_SEC_SCRAMBLEMEMBER1
 
     FactoryPtr<IEnvDescriptorRender> m_pDescriptor;
 
@@ -162,6 +165,9 @@ public:
     Fvector4 hemi_color; // w = R2 correction
     Fvector3 sun_color;
     Fvector3 sun_dir;
+    float sun_azimuth; // for dynamic sun dir
+    bool use_dynamic_sun_dir;
+
     float m_fSunShaftsIntensity;
     float m_fWaterIntensity;
 
@@ -175,6 +181,7 @@ public:
     CEnvDescriptor(shared_str const& identifier);
 
     void load(CEnvironment& environment, const CInifile& config, pcstr section = nullptr);
+    void save(CInifile& config, pcstr section = nullptr) const;
     void copy(const CEnvDescriptor& src)
     {
         float tm0 = exec_time;
@@ -196,13 +203,18 @@ public:
     FactoryPtr<IEnvDescriptorMixerRender> m_pDescriptorMixer;
 
     float weight;
+    float modif_power;
     float fog_near;
     float fog_far;
+    Fvector4 env_color;
+
+    bool soc_style;
 
 public:
     CEnvDescriptorMixer(shared_str const& identifier);
-    virtual void lerp(
-        CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& M, float m_power);
+    virtual void lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
+        float f, CEnvModifier& M, float m_power);
+    void calculate_dynamic_sun_dir(float fGameTime);
     void clear();
     void destroy();
 };
@@ -216,9 +228,12 @@ class ENGINE_API CEnvironment
     };
 
 public:
-    using EnvAmbVec = xr_vector<CEnvAmbient*>;
-    using EnvVec = xr_vector<CEnvDescriptor*>;
+    struct EnvVec : xr_vector<CEnvDescriptor*>
+    {
+        bool soc_style{};
+    };
     using EnvsMap = xr_map<shared_str, EnvVec, str_pred>;
+    using EnvAmbVec = xr_vector<CEnvAmbient*>;
 
 private:
     // clouds
@@ -230,8 +245,6 @@ private:
     float TimeWeight(float val, float min_t, float max_t);
     void SelectEnvs(EnvVec* envs, CEnvDescriptor*& e0, CEnvDescriptor*& e1, float tm);
     void SelectEnv(EnvVec* envs, CEnvDescriptor*& e, float tm);
-
-    void calculate_dynamic_sun_dir();
 
 public:
     static bool sort_env_pred(const CEnvDescriptor* x, const CEnvDescriptor* y) { return x->exec_time < y->exec_time; }
@@ -259,8 +272,8 @@ public:
     float wind_blast_strength_start_value;
     float wind_blast_strength_stop_value;
     Fquaternion wind_blast_current;
+
     // Environments
-    BENCH_SEC_SCRAMBLEMEMBER2
     CEnvDescriptorMixer* CurrentEnv;
     CEnvDescriptor* Current[2];
 
@@ -297,12 +310,13 @@ public:
 
     virtual void load();
     virtual void unload();
+    void save() const;
 
     void mods_load();
     void mods_unload();
 
     void OnFrame();
-    void lerp(float& current_weight);
+    void lerp();
 
     void RenderSky();
     void RenderClouds();
@@ -336,9 +350,12 @@ public:
 
     bool m_paused;
 #endif // #ifdef _EDITOR
+    void GetGameTime(u32& hours, u32& minutes, u32& seconds) const
+    {
+        SplitTime(fGameTime, hours, minutes, seconds);
+    }
 
-    bool useDynamicSunDir;
-    float sunDirAzimuth;
+    void SplitTime(float time, u32& hours, u32& minutes, u32& seconds) const;
 
     CInifile* m_ambients_config;
     CInifile* m_sound_channels_config;
@@ -355,6 +372,9 @@ protected:
     void destroy_mixer();
 
     void load_level_specific_ambients();
+
+    void save_weathers(CInifile* environment_config = nullptr) const;
+    void save_weather_effects(CInifile* environment_config = nullptr) const;
 
 public:
     virtual SThunderboltDesc* thunderbolt_description(const CInifile& config, shared_str const& section);

@@ -682,7 +682,7 @@ public:
 void CAgentEnemyManager::wounded_processor(const CEntityAlive* object, const ALife::_OBJECT_ID& wounded_processor_id)
 {
     VERIFY(std::find_if(m_wounded.begin(), m_wounded.end(), find_wounded_predicate(object)) == m_wounded.end());
-    m_wounded.push_back(std::make_pair(object, std::make_pair(wounded_processor_id, false)));
+    m_wounded.emplace_back(object, std::make_pair(wounded_processor_id, false));
 }
 
 void CAgentEnemyManager::wounded_processed(const CEntityAlive* object, bool value)
