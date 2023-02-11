@@ -54,6 +54,16 @@ jobs:
         name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
         path: res\Utils.*.7z
 
+    - name: Publish nightly build
+      uses: softprops/action-gh-release@v0.1.15
+      with:
+        name: Latest nightly build
+        prerelease: true
+        files: |
+          res\OpenXRay.*.7z
+          res\Symbols.*.7z
+          res\Utils.*.7z
+
   build-ubuntu:
     name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
     runs-on: ubuntu-18.04
