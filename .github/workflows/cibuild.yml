@@ -60,6 +60,7 @@ jobs:
       with:
         name: Latest nightly build
         tag_name: latest-nightly
+        body: This is the latest nightly build compiled from the latest commit.
         prerelease: true
         files: |
           res/OpenXRay.*.7z
