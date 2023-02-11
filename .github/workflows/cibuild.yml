@@ -58,6 +58,7 @@ jobs:
       uses: softprops/action-gh-release@v0.1.15
       with:
         name: Latest nightly build
+        tag_name: latest-nightly
         prerelease: true
         files: |
           res\OpenXRay.*.7z
