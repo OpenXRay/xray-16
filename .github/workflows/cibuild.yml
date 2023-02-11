@@ -40,30 +40,31 @@ jobs:
       uses: actions/upload-artifact@main
       with:
         name: OpenXRay.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
-        path: res\OpenXRay.*.7z
+        path: res/OpenXRay.*.7z
 
     - name: Upload Symbols
       uses: actions/upload-artifact@main
       with:
         name: Symbols.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
-        path: res\Symbols.*.7z
+        path: res/Symbols.*.7z
 
     - name: Upload Utils
       uses: actions/upload-artifact@main
       with:
         name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
-        path: res\Utils.*.7z
+        path: res/Utils.*.7z
 
     - name: Publish nightly build
+      if: ${{ github.ref_name == 'dev' }}
       uses: softprops/action-gh-release@v0.1.15
       with:
         name: Latest nightly build
         tag_name: latest-nightly
         prerelease: true
         files: |
-          res\OpenXRay.*.7z
-          res\Symbols.*.7z
-          res\Utils.*.7z
+          res/OpenXRay.*.7z
+          res/Symbols.*.7z
+          res/Utils.*.7z
 
   build-ubuntu:
     name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
