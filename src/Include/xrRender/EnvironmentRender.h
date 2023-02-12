@@ -37,8 +37,6 @@ public:
     virtual ~IEnvironmentRender() {}
     virtual void Copy(IEnvironmentRender& _in) = 0;
     virtual void OnFrame(CEnvironment& env) = 0;
-    virtual void OnLoad() = 0;
-    virtual void OnUnload() = 0;
     virtual void RenderSky(CEnvironment& env) = 0;
     virtual void RenderClouds(CEnvironment& env) = 0;
     virtual void OnDeviceCreate() = 0;

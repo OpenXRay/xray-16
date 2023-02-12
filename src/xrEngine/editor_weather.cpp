@@ -289,18 +289,17 @@ void ide::ShowWeatherEditor()
     if (ImGui::Begin("Weather editor", &m_windows.weather, get_default_window_flags()))
     {
         auto& env = g_pGamePersistent->Environment();
+
+        if (ImGui::Button("Reset all"))
+            env.ED_Reload();
+        ImGui::SameLine();
+        if (ImGui::Button("Save all"))
+            env.save();
+
         auto& current = *env.CurrentEnv;
         auto& current0 = env.Current[0] ? *env.Current[0] : *env.CurrentEnv;
         auto& current1 = env.Current[1] ? *env.Current[1] : *env.CurrentEnv;
         float time_factor = env.fTimeFactor;
-
-        ImGui::BeginDisabled();
-        if (ImGui::Button("Reset all"))
-            ;
-        ImGui::EndDisabled();
-        ImGui::SameLine();
-        if (ImGui::Button("Save all"))
-            env.save();
 
         if (ImGui::CollapsingHeader("Environment time", ImGuiTreeNodeFlags_DefaultOpen))
         {

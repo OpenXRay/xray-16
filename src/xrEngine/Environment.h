@@ -336,20 +336,18 @@ public:
     void OnDeviceCreate();
     void OnDeviceDestroy();
 
-// editor-related
+    // editor-related
 #ifdef _EDITOR
 public:
     float ed_from_time;
     float ed_to_time;
 
 public:
-    void ED_Reload();
-    float GetGameTime() { return fGameTime; }
 #else // #ifdef _EDITOR
-    float GetGameTime() { return fGameTime; }
-
     bool m_paused;
 #endif // #ifdef _EDITOR
+    void ED_Reload();
+    float GetGameTime() { return fGameTime; }
     void GetGameTime(u32& hours, u32& minutes, u32& seconds) const
     {
         SplitTime(fGameTime, hours, minutes, seconds);
