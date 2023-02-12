@@ -351,15 +351,3 @@ void dxEnvironmentRender::OnDeviceDestroy()
     tclouds0_tstage = u32(-1);
     tclouds1_tstage = u32(-1);
 }
-
-void dxEnvironmentRender::OnDeviceReset()
-{
-    //. this is the bug-fix for the case when the sky is broken
-    //. for some unknown reason the geoms happen to be invalid sometimes
-    //. if vTune show this in profile, please add simple cache (move-to-forward last found)
-    //. to the following functions:
-    //.		CResourceManager::_CreateDecl
-    //.		CResourceManager::CreateGeom
-    OnDeviceDestroy();
-    OnDeviceCreate();
-}

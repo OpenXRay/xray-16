@@ -70,7 +70,7 @@ public:
     STextureList clouds_r_textures;
 };
 
-class dxEnvironmentRender : public IEnvironmentRender, public CDeviceResetNotifier
+class dxEnvironmentRender : public IEnvironmentRender
 {
 public:
     dxEnvironmentRender();
@@ -81,7 +81,6 @@ public:
     virtual void RenderClouds(CEnvironment& env);
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();
-    virtual void OnDeviceReset();
     virtual particles_systems::library_interface const& particles_systems_library();
 
 private:
