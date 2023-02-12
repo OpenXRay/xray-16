@@ -985,8 +985,6 @@ void CEnvironment::load()
     if (!CurrentEnv)
         create_mixer();
 
-    m_pRender->OnLoad();
-
     if (!eff_Rain)
         eff_Rain = xr_new<CEffect_Rain>();
     if (!eff_LensFlare)
@@ -1027,8 +1025,13 @@ void CEnvironment::unload()
     CurrentWeatherName = nullptr;
     CurrentEnv->clear();
     Invalidate();
+}
 
-    m_pRender->OnUnload();
+void CEnvironment::ED_Reload()
+{
+    unload();
+    load();
+    OnFrame();
 }
 
 void CEnvironment::save() const

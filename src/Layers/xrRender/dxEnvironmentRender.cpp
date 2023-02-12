@@ -178,12 +178,6 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 #endif
 }
 
-void dxEnvironmentRender::OnLoad()
-{
-    tonemap = RImplementation.Resources->_CreateTexture(r2_RT_luminance_cur); //. hack
-}
-
-void dxEnvironmentRender::OnUnload() { tonemap = nullptr; }
 void dxEnvironmentRender::RenderSky(CEnvironment& env)
 {
     GEnv.Render->rmFar();
@@ -308,6 +302,7 @@ void dxEnvironmentRender::OnDeviceCreate()
 
     if (GEnv.Render->GenerationIsR2OrHigher())
     {
+        tonemap = RImplementation.Resources->_CreateTexture(r2_RT_luminance_cur); //. hack
         tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
         tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
         R_ASSERT(tonemap_tstage_2sky != u32(-1));
@@ -348,6 +343,7 @@ void dxEnvironmentRender::OnDeviceDestroy()
     clouds_sh.destroy();
     clouds_geom.destroy();
 
+    tonemap = nullptr;
     tonemap_tstage_2sky = u32(-1);
     tonemap_tstage_clouds = u32(-1);
     tsky0_tstage = u32(-1);
