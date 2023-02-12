@@ -143,11 +143,10 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
     mixRen.sky_r_textures[1].first = tsky1_tstage;
     mixRen.clouds_r_textures[0].first = tclouds0_tstage;
     mixRen.clouds_r_textures[1].first = tclouds1_tstage;
-    if (GEnv.Render->GenerationIsR2OrHigher())
-    {
-        mixRen.sky_r_textures.emplace_back(tonemap_tstage_2sky, tonemap); //. hack
-        mixRen.clouds_r_textures.emplace_back(tonemap_tstage_clouds, tonemap); //. hack
-    }
+    if (tonemap_tstage_2sky != u32(-1))
+        mixRen.sky_r_textures.emplace_back(tonemap_tstage_2sky, tonemap);
+    if (tonemap_tstage_clouds != u32(-1))
+        mixRen.clouds_r_textures.emplace_back(tonemap_tstage_clouds, tonemap);
 
     //. Setup skybox textures, somewhat ugly
     auto e0 = mixRen.sky_r_textures[0].second->surface_get();
@@ -300,13 +299,11 @@ void dxEnvironmentRender::OnDeviceCreate()
     clouds_sh.create("clouds", "null");
     clouds_geom.create(v_clouds_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 
-    if (GEnv.Render->GenerationIsR2OrHigher())
+    tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
+    tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
+    if (tonemap_tstage_2sky != u32(-1) || tonemap_tstage_clouds != u32(-1))
     {
-        tonemap = RImplementation.Resources->_CreateTexture(r2_RT_luminance_cur); //. hack
-        tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
-        tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
-        R_ASSERT(tonemap_tstage_2sky != u32(-1));
-        R_ASSERT(tonemap_tstage_clouds != u32(-1));
+        tonemap = RImplementation.Resources->_CreateTexture(r2_RT_luminance_cur);
     }
 
     R_constant* C = sh_2sky->E[0]->passes[0]->constants->get(RImplementation.c_ssky0)._get();
