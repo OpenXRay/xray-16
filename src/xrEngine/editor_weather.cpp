@@ -290,8 +290,14 @@ void ide::ShowWeatherEditor()
     {
         auto& env = g_pGamePersistent->Environment();
 
+        const bool paused = Device.Paused();
+        if (ImGui::RadioButton("Pause", paused))
+            Device.Pause(!paused, TRUE, TRUE, "editor query");
+
+        ImGui::SameLine();
         if (ImGui::Button("Reset all"))
             env.ED_Reload();
+
         ImGui::SameLine();
         if (ImGui::Button("Save all"))
             env.save();
