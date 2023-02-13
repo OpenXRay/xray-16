@@ -101,5 +101,5 @@ void CEnvironment::OnDeviceDestroy()
             envDescriptor->on_device_destroy();
     }
 
-    CurrentEnv->destroy();
+    CurrentEnv->on_device_destroy();
 }

@@ -761,9 +761,6 @@ CRenderTarget::CRenderTarget()
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3) | D3DFVF_TEXCOORDSIZE2(4) | D3DFVF_TEXCOORDSIZE4(5) |
             D3DFVF_TEXCOORDSIZE4(6);
         g_aa_AA.create(fvf_aa_AA, RCache.Vertex.Buffer(), RCache.QuadIB);
-
-        t_envmap_0.create(r2_T_envs0);
-        t_envmap_1.create(r2_T_envs1);
     }
 
     // Build textures
@@ -822,11 +819,6 @@ CRenderTarget::~CRenderTarget()
     t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
     t_LUM_src.destroy();
     t_LUM_dest.destroy();
-
-    t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-    t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-    t_envmap_0.destroy();
-    t_envmap_1.destroy();
 
     // Jitter
     for (u32 it = 0; it < TEX_jitter_count; it++)
