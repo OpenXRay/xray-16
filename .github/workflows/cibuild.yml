@@ -64,10 +64,7 @@ jobs:
         prerelease: true
         overwrite: true
         file_glob: true
-        file: |
-          res/OpenXRay.*.7z
-          res/Symbols.*.7z
-          res/Utils.*.7z
+        file: res/+(OpenXRay|Symbols|Utils).*.7z
 
   build-ubuntu:
     name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
