@@ -29,7 +29,6 @@ class dxRenderFactory : public IRenderFactory
     RENDER_FACTORY_DECLARE(LensFlareRender)
     RENDER_FACTORY_DECLARE(ImGuiRender)
     RENDER_FACTORY_DECLARE(EnvironmentRender)
-    RENDER_FACTORY_DECLARE(EnvDescriptorMixerRender)
     RENDER_FACTORY_DECLARE(EnvDescriptorRender)
 #endif
     RENDER_FACTORY_DECLARE(FontRender)
