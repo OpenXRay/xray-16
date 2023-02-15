@@ -6,9 +6,11 @@
 #define SM_MINMAX
 #endif
 
-#if SUN_QUALITY>2
+#ifdef SUN_QUALITY
+#if	SUN_QUALITY>2
 #define ULTRA_SHADOWS_ON
-#endif //	SUN_QUALITY>2
+#	endif //	SUN_QUALITY>2
+#endif // SUN_QUALITY
 
 #ifdef ULTRA_SHADOWS_ON
 #define USE_ULTRA_SHADOWS
@@ -17,22 +19,21 @@
 #include "shadow.h"
 uniform float3	view_shadow_proj;
 
-
 #ifdef USE_SUNFILTER
-#ifdef MSAA_OPTIMIZATION
+#	ifdef MSAA_OPTIMIZATION
 float4 _main ( v2p_volume I, uint iSample  )
-#else
+#	else
 float4 _main ( v2p_volume I  )
-#endif
+#	endif
 {
 	//float4 _P = tex2D( s_position, tc );
 
 	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc, I.hpos, ISAMPLE) );
 
-#ifdef	GBUFFER_OPTIMIZATION
+#	ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
 	gbd.P += gbd.N*0.015;
-#endif	//	GBUFFER_OPTIMIZATION
+#	endif	//	GBUFFER_OPTIMIZATION
 
 	float4 _P = float4( gbd.P, 1.0);
 
@@ -73,9 +74,10 @@ float4 _main ( v2p_volume I )
   	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.0);
 	float4 	PS	= mul( m_shadow, P4 );
 	float 	s 	= sunmask( P4 );
-	#if defined	(USE_SJITTER) || SUN_QUALITY==2 // Hight quality
-	  		s 	*= shadow_high(PS); //shadowtest_sun( PS, float4(0,0,0,0) );
-	#else
+#ifdef USE_SJITTER
+#if USE_SJITTER || SUN_QUALITY==2 // High quality
+//	  		s 	*= shadow_high(PS); //shadowtest_sun( PS, float4(0,0,0,0) );
+#else
 #ifdef SM_MINMAX
 		#ifdef USE_SJITTER
 	  		s 	*= shadow_dx10_1( PS, I.tcJ, I.hpos.xy );
@@ -85,7 +87,8 @@ float4 _main ( v2p_volume I )
 #else
 			s *= shadow( PS );
 #endif
-	#endif
+#endif
+#endif
 
 	// Far edge fading code
 	float2 	tc_f	= (PS.xy/PS.w)-float2(0.5,0.5);
