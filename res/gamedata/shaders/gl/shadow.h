@@ -160,28 +160,24 @@ float shadow_extreme_quality( float3 tc )
           float  b;
 
           d4.w = textureLodOffset (s_dmap, tc.xy, 0, int2( col, row ) ).x;
-          //d4.w = textureLod(s_dmap, tc.xy + ivec2(col, row), 0 ).x;
           b = ( tc.z <= d4.w ) ? (0.0) : (1.0);
           vmask[ col + FS2 + 0 ] += ( ( tc.z <= d4.w ) ? ( uint(1) << uint( row + FS2 + 0 ) ) : uint(0) );
           blockerCount += b;
           avgBlockerDepth += d4.w * b;
     			
           d4.w = textureLodOffset (s_dmap, tc.xy, 0, int2( col+1, row ) ).x;
-          //d4.z = textureLod(s_dmap, tc.xy + ivec2( col+1, row ), 0 ).x;
           b = ( tc.z <= d4.z ) ? (0.0) : (1.0);
           vmask[ col + FS2 + 1 ] += ( ( tc.z <= d4.z ) ? ( uint(1) << uint( row + FS2 + 0 ) ) : uint(0) );
           blockerCount += b;
           avgBlockerDepth += d4.z * b;
             
           d4.x = textureLodOffset (s_dmap, tc.xy, 0, int2( col, row+1 ) ).x;
-          //d4.x = textureLod(s_dmap, tc.xy + ivec2( col, row+1 ), 0 ).x;
           vmask[ col + FS2 + 0 ] += ( ( tc.z <= d4.x ) ? ( uint(1) << uint( row + FS2 + 1 ) ) : uint(0) );
           b = ( tc.z <= d4.x ) ? (0.0) : (1.0);
           blockerCount += b;
           avgBlockerDepth += d4.x * b;
     
           d4.x = textureLodOffset (s_dmap, tc.xy, 0, int2( col+1, row+1 ) ).x;
-          //d4.y = textureLod(s_dmap, tc.xy + ivec2( col+1, row+1 ), 0 ).x;
     	  vmask[ col + FS2 + 1 ] += ( ( tc.z <= d4.y ) ? ( uint(1) << uint( row + FS2 + 1 ) ) : uint(0) );
     	  b = ( tc.z <= d4.y ) ? (0.0) : (1.0);
           blockerCount += b;
