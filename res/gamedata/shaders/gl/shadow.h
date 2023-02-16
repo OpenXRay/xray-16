@@ -45,7 +45,7 @@ float sample_hw_pcf (vec4 tc, vec4 shift)
 
 #define GS2 3
 
-float shadow_hw( vec4 tc )
+float shadow_hw( float4 tc )
 {
   	float	s0	= sample_hw_pcf( tc, float4( -1, -1, 0, 0) );
   	float	s1	= sample_hw_pcf( tc, float4( +1, -1, 0, 0) );
@@ -339,10 +339,10 @@ float shadow_extreme_quality_fused( float3 tc )
 #ifndef PS_4            
             d4 = textureGather( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col, row ) );
 #else
-			d4.w = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * vec2( col, row ), 0 ).x;
-			d4.z = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * vec2( col+1, row ) , 0 ).x;
-			d4.y = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * vec2( col+1, row+1 ), 0 ).x;
-			d4.x = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * vec2( col, row+1 ), 0 ).x;
+			d4.w = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col, row ), 0 ).x;
+			d4.z = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col+1, row ) , 0 ).x;
+			d4.y = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col+1, row+1 ), 0 ).x;
+			d4.x = textureLod( s_dmap, tc.xy + (1.0/float(SMAP_size)) * float2( col, row+1 ), 0 ).x;
 #endif
             float4 b4  = all( lessThanEqual( tc.zzzz, d4 )) ? float4(0.0) : float4(1.0);   
 
@@ -575,12 +575,12 @@ float dx10_0_hw_hq_7x7( float4 tc )
 }
 
 #ifdef SM_MINMAX
-bool cheap_reject( vec3 tc, inout bool full_light ) 
+bool cheap_reject( float3 tc, inout bool full_light )
 {
-   float4 plane0  = sm_minmax_gather( tc.xy, ivec2( -1,-1 ) );
-   float4 plane1  = sm_minmax_gather( tc.xy, ivec2(  1,-1 ) );
-   float4 plane2  = sm_minmax_gather( tc.xy, ivec2( -1, 1 ) );
-   float4 plane3  = sm_minmax_gather( tc.xy, ivec2(  1, 1 ) );
+   float4 plane0  = sm_minmax_gather( tc.xy, int2( -1,-1 ) );
+   float4 plane1  = sm_minmax_gather( tc.xy, int2(  1,-1 ) );
+   float4 plane2  = sm_minmax_gather( tc.xy, int2( -1, 1 ) );
+   float4 plane3  = sm_minmax_gather( tc.xy, int2(  1, 1 ) );
    bool plane     = all( greaterThanEqual( plane0, float4(0.0) )) && all(greaterThanEqual( plane1, float4(0.0) )) && all(greaterThanEqual( plane2, float4(0.0) )) && all(greaterThanEqual( plane3, float4(0.0) ) );
 
    if( !plane ) // if there are no proper plane equations in the support region
