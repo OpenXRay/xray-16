@@ -261,6 +261,7 @@ float shadow_extreme_quality( float3 tc )
 #endif // Sun quality
 #endif // Sun quality>=4
 
+/*
 //======================================================================================
 // This shader computes the contact hardening shadow filter
 //======================================================================================
@@ -468,8 +469,10 @@ float shadow_extreme_quality_fused( float3 tc )
 						 3.0 * fRatio*fRatio*(1.0-fRatio),
 						 fRatio*fRatio*fRatio ) )/w;
 }
+*/
 
 #endif
+
 
 #ifdef SM_4_1
 
@@ -630,11 +633,10 @@ float shadow_hw_hq( float4 tc )
 # else // SUN_QUALITY
 #   ifdef SM_4_1
   return dx10_1_hw_hq_7x7( tc.xyz / tc.w );
-#   else // SM_4_1
-  return dx10_0_hw_hq_7x7( tc ); 
 #   endif // SM_4_1
 # endif // SUN_QUALITY
 #endif // SM_MINMAX
+  return dx10_0_hw_hq_7x7( tc );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
