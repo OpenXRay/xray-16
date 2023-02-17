@@ -54,17 +54,18 @@ jobs:
         name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
         path: res/Utils.*.7z
 
-    - name: Publish nightly build
-      if: ${{ github.ref_name == 'dev' }}
-      uses: svenstaro/upload-release-action@2.4.1
+    - name: Update latest nightly tag
+      uses: EndBug/latest-tag@latest
       with:
-        release_name: Latest nightly build
-        tag: latest-nightly
-        body: This is the latest nightly build compiled from the latest commit.
-        prerelease: true
-        overwrite: true
-        file_glob: true
-        file: res/+(OpenXRay|Symbols|Utils).*.7z
+        ref: latest-nightly
+
+    - name: Publish latest nightly build
+      if: ${{ github.ref_name == 'dev' }}
+      uses: AButler/upload-release-assets@master
+      with:
+        release-tag: latest-nightly
+        repo-token: ${{ github.token }}
+        files: res/*.*.7z
 
   build-ubuntu:
     name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
