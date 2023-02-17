@@ -37,7 +37,7 @@ float modify_light( float light )
 //////////////////////////////////////////////////////////////////////////////////////////
 // hardware + PCF
 //////////////////////////////////////////////////////////////////////////////////////////
-float sample_hw_pcf (vec4 tc, vec4 shift)
+float sample_hw_pcf (float4 tc, float4 shift)
 {
 	const float 	ts = KERNEL / float(SMAP_size);
 	return tex2Dproj( s_smap, tc + tc.w * shift * ts );
@@ -47,12 +47,12 @@ float sample_hw_pcf (vec4 tc, vec4 shift)
 
 float shadow_hw( float4 tc )
 {
-  	float	s0	= sample_hw_pcf( tc, float4( -1, -1, 0, 0) );
-  	float	s1	= sample_hw_pcf( tc, float4( +1, -1, 0, 0) );
-  	float	s2	= sample_hw_pcf( tc, float4( -1, +1, 0, 0) );
-  	float	s3	= sample_hw_pcf( tc, float4( +1, +1, 0, 0) );
+  	float	s0	  = sample_hw_pcf( tc, float4( -1, -1, 0, 0) );
+  	float	s1	  = sample_hw_pcf( tc, float4( +1, -1, 0, 0) );
+  	float	s2	  = sample_hw_pcf( tc, float4( -1, +1, 0, 0) );
+  	float	s3	  = sample_hw_pcf( tc, float4( +1, +1, 0, 0) );
 
-    return (s0+s1+s2+s3) / 4.f;
+    return (s0+s1+s2+s3) / 4.0;
 }
 
 #ifdef SUN_QUALITY
@@ -70,7 +70,7 @@ float shadow_hw( float4 tc )
 
 #define SUN_WIDTH 300.0
 
-// uses gather for DX11/10.1 and visibility encoding for DX10.0
+// uses gather for DX11/10.1 and visibilty encoding for DX10.0
 float shadow_extreme_quality( float3 tc )
 {
 	float W2[11][11] = 
@@ -115,7 +115,7 @@ float shadow_extreme_quality( float3 tc )
 				       float[]( 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0 )
 				       );
 
-   float  s = 0.0;
+   float  s   = 0.0;
    float2 stc = ( float( SMAP_size ) * tc.xy ) + float2( 0.5, 0.5 );
    float2 tcs = floor( stc );
    float2 fc = float2(0.0);
@@ -182,6 +182,8 @@ float shadow_extreme_quality( float3 tc )
     	  b = ( tc.z <= d4.y ) ? (0.0) : (1.0);
           blockerCount += b;
           avgBlockerDepth += d4.y * b;
+          
+
         }
     }
    
@@ -640,7 +642,7 @@ float shadow_hw_hq( float4 tc )
 //	D24X8+PCF
 //////////////////////////////////////////////////////////////////////////////////////////
 
-float4 test(float4 tc, float2 offset)
+float4 test              (float4 tc, float2 offset)
 {
 	float4	tcx	= float4 (tc.xy + tc.w*offset, tc.zw);
 	return 	float4(tex2Dproj (s_smap,tcx));
