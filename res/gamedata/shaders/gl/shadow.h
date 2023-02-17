@@ -37,7 +37,7 @@ float modify_light( float light )
 //////////////////////////////////////////////////////////////////////////////////////////
 // hardware + PCF
 //////////////////////////////////////////////////////////////////////////////////////////
-float sample_hw_pcf (float4 tc, float4 shift)
+float sample_hw_pcf (float4 tc,float4 shift)
 {
 	const float 	ts = KERNEL / float(SMAP_size);
 	return tex2Dproj( s_smap, tc + tc.w * shift * ts );
@@ -47,12 +47,12 @@ float sample_hw_pcf (float4 tc, float4 shift)
 
 float shadow_hw( float4 tc )
 {
-  	float	s0	  = sample_hw_pcf( tc, float4( -1, -1, 0, 0) );
-  	float	s1	  = sample_hw_pcf( tc, float4( +1, -1, 0, 0) );
-  	float	s2	  = sample_hw_pcf( tc, float4( -1, +1, 0, 0) );
-  	float	s3	  = sample_hw_pcf( tc, float4( +1, +1, 0, 0) );
+  	float	s0      = sample_hw_pcf( tc, float4( -1, -1, 0, 0) );
+  	float	s1	    = sample_hw_pcf( tc, float4( +1, -1, 0, 0) );
+  	float	s2	    = sample_hw_pcf( tc, float4( -1, +1, 0, 0) );
+  	float	s3	    = sample_hw_pcf( tc, float4( +1, +1, 0, 0) );
 
-    return (s0+s1+s2+s3) / 4.0;
+    return (s0+s1+s2+s3)/4.0;
 }
 
 #ifdef SUN_QUALITY
@@ -573,7 +573,7 @@ float dx10_0_hw_hq_7x7( float4 tc )
 }
 
 #ifdef SM_MINMAX
-bool cheap_reject( float3 tc, inout bool full_light )
+bool cheap_reject( float3 tc, inout bool full_light ) 
 {
    float4 plane0  = sm_minmax_gather( tc.xy, int2( -1,-1 ) );
    float4 plane1  = sm_minmax_gather( tc.xy, int2(  1,-1 ) );
@@ -799,7 +799,6 @@ float sunmask( float4 P )
 float sunmask( float4 P ) { return 1.0; }		// 
 #endif
 //////////////////////////////////////////////////////////////////////////////////////////
-
 uniform float4x4	m_shadow;
 
 #endif
