@@ -3,7 +3,7 @@
 #ifdef SM_4_1
 #define sm_gather(tc, offset) textureGatherOffset( s_dmap, tc, offset )
 #else
-vec4 sm_gather( float2 tc, int2 offset )
+float4 sm_gather( float2 tc, int2 offset )
 {
 	const float scale = float( SMAP_size );
 	float2 fc = frac( tc * scale );
@@ -13,7 +13,7 @@ vec4 sm_gather( float2 tc, int2 offset )
 	float s0 = textureLod( s_dmap, tc + offset + int2( 0, 1 ), 0 ).x;
 	float s1 = textureLod( s_dmap, tc + offset + int2( 1, 1 ), 0 ).x;
 	float s2 = textureLod( s_dmap, tc + offset + int2( 1, 0 ), 0 ).x;
-	float s3 = textureLod( s_dmap, tc + offset + int2( 0, 0 ), 0 ).x;
+	float s3 = textureLod( s_dmap, tc +offset + int2( 0, 0 ) 0 ).x;
 	
 	return float4( s0, s1, s2, s3 );
 }

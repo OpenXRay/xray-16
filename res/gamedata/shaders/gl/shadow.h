@@ -47,16 +47,16 @@ float sample_hw_pcf (float4 tc,float4 shift)
 
 float shadow_hw( float4 tc )
 {
-  	float	s0      = sample_hw_pcf( tc, float4( -1, -1, 0, 0) );
-  	float	s1	    = sample_hw_pcf( tc, float4( +1, -1, 0, 0) );
-  	float	s2	    = sample_hw_pcf( tc, float4( -1, +1, 0, 0) );
-  	float	s3	    = sample_hw_pcf( tc, float4( +1, +1, 0, 0) );
+  	float	s0		= sample_hw_pcf( tc, float4( -1, -1, 0, 0) );
+  	float	s1		= sample_hw_pcf( tc, float4( +1, -1, 0, 0) );
+  	float	s2		= sample_hw_pcf( tc, float4( -1, +1, 0, 0) );
+  	float	s3		= sample_hw_pcf( tc, float4( +1, +1, 0, 0) );
 
-    return (s0+s1+s2+s3)/4.0;
+	return	(s0+s1+s2+s3)/4.0;
 }
 
 #ifdef SUN_QUALITY
-#if SUN_QUALITY >= 4
+#if SUN_QUALITY>=4
 #define FILTER_SIZE	11
 #define FS  FILTER_SIZE
 #define FS2 ( FILTER_SIZE / 2 )
@@ -156,36 +156,36 @@ float shadow_extreme_quality( float3 tc )
     {
         for( int col = -FS2; col <= FS2; col +=2 )
         {
-          float4 d4;
-          float  b;
+            float4 d4;
+            float  b;
 
-          d4.w = textureLodOffset (s_dmap, tc.xy, 0, int2( col, row ) ).x;
-          b = ( tc.z <= d4.w ) ? (0.0) : (1.0);
-          vmask[ col + FS2 + 0 ] += ( ( tc.z <= d4.w ) ? ( uint(1) << uint( row + FS2 + 0 ) ) : uint(0) );
-          blockerCount += b;
-          avgBlockerDepth += d4.w * b;
-    			
-          d4.z = textureLodOffset (s_dmap, tc.xy, 0, int2( col+1, row ) ).x;
-          b = ( tc.z <= d4.z ) ? (0.0) : (1.0);
-          vmask[ col + FS2 + 1 ] += ( ( tc.z <= d4.z ) ? ( uint(1) << uint( row + FS2 + 0 ) ) : uint(0) );
-          blockerCount += b;
-          avgBlockerDepth += d4.z * b;
-            
-          d4.x = textureLodOffset (s_dmap, tc.xy, 0, int2( col, row+1 ) ).x;
-          vmask[ col + FS2 + 0 ] += ( ( tc.z <= d4.x ) ? ( uint(1) << uint( row + FS2 + 1 ) ) : uint(0) );
-          b = ( tc.z <= d4.x ) ? (0.0) : (1.0);
-          blockerCount += b;
-          avgBlockerDepth += d4.x * b;
-    
-          d4.y = textureLodOffset (s_dmap, tc.xy, 0, int2( col+1, row+1 ) ).x;
-    	  vmask[ col + FS2 + 1 ] += ( ( tc.z <= d4.y ) ? ( uint(1) << uint( row + FS2 + 1 ) ) : uint(0) );
-    	  b = ( tc.z <= d4.y ) ? (0.0) : (1.0);
-          blockerCount += b;
-          avgBlockerDepth += d4.y * b;
-          
 
+			d4.w = textureLodOffset (s_dmap, tc.xy, 0, int2( col, row ) ).x;
+			b = ( tc.z <= d4.w ) ? (0.0) : (1.0); 
+			vmask[ col + FS2 + 0 ] += ( ( tc.z <= d4.w ) ? ( uint(1) << uint( row + FS2 + 0 ) ) : uint(0) );
+			blockerCount     += b;
+            avgBlockerDepth  += d4.w * b;
+			
+			d4.z = textureLodOffset (s_dmap, tc.xy, 0, int2( col+1, row ) ).x;
+			b = ( tc.z <= d4.z ) ? (0.0) : (1.0); 
+			vmask[ col + FS2 + 1 ] += ( ( tc.z <= d4.z ) ? ( uint(1) << uint( row + FS2 + 0 ) ) : uint(0) );
+			blockerCount     += b;
+            avgBlockerDepth  += d4.z * b;
+			
+			d4.x = textureLodOffset (s_dmap, tc.xy, 0, int2( col, row+1 ) ).x;
+			vmask[ col + FS2 + 0 ] += ( ( tc.z <= d4.x ) ? ( uint(1) << uint( row + FS2 + 1 ) ) : uint(0) );
+			b = ( tc.z <= d4.x ) ? (0.0) : (1.0); 
+			blockerCount     += b;
+            avgBlockerDepth  += d4.x * b;
+
+			d4.y = textureLodOffset (s_dmap, tc.xy, 0, int2( col+1, row+1 ) ).x;
+			vmask[ col + FS2 + 1 ] += ( ( tc.z <= d4.y ) ? ( uint(1) << uint( row + FS2 + 1 ) ) : uint(0) );
+			b = ( tc.z <= d4.y ) ? (0.0) : (1.0); 
+			blockerCount     += b;
+            avgBlockerDepth  += d4.y * b;
         }
     }
+#endif
    
    // compute ratio average blocker depth vs. pixel depth
    if( blockerCount > 0.0 )
@@ -468,7 +468,6 @@ float shadow_extreme_quality_fused( float3 tc )
 						 3.0 * fRatio*fRatio*(1.0-fRatio),
 						 fRatio*fRatio*fRatio ) )/w;
 }
-
 #endif // 0
 #endif // SUN_QUALITY
 #endif // SUN_QUALITY>=4
@@ -527,7 +526,7 @@ float dx10_1_hw_hq_7x7( float3 tc )
    return s*(1.0/49.0);
 }
 
-#endif // SM_4_1
+#endif
 
 float dx10_0_hw_hq_7x7( float4 tc )
 {
@@ -609,6 +608,7 @@ bool cheap_reject( float3 tc, inout bool full_light )
       return true; 
    }
 }
+
 #endif	//	SM_MINMAX
 
 float shadow_hw_hq( float4 tc )
@@ -624,6 +624,8 @@ float shadow_hw_hq( float4 tc )
       else
          return sample_hw_pcf( tc, float4(0.0) ); 
    }
+   else
+   {
 #else // SM_MINMAX
 # ifdef SUN_QUALITY
 #   if SUN_QUALITY >= 4 // extreme quality
@@ -642,13 +644,48 @@ float shadow_hw_hq( float4 tc )
 //	D24X8+PCF
 //////////////////////////////////////////////////////////////////////////////////////////
 
-float4 test              (float4 tc, float2 offset)
+
+float4 	test 		(float4 tc, float2 offset)
 {
+
 	float4	tcx	= float4 (tc.xy + tc.w*offset, tc.zw);
 	return 	float4(tex2Dproj (s_smap,tcx));
 }
 
-half shadowtest_sun(float4 tc, float4 tcJ)			// jittered sampling
+/*half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
+{
+	half4	r;
+
+	const 	float 	scale 	= (0.5/float(SMAP_size));
+
+	float  	texsize = 2.0*float(SMAP_size);
+	float2 	tc_J	= tc.xy/tc.w*texsize/8.0;
+	float2 	fr 		= frac(tc_J)*0.5;
+	
+//	half4	J0 	= tex2D	(jitter0,fr)*scale;
+//	half4	J1 	= tex2D	(jitter1,fr)*scale*2;
+	float4	J0 	= jitter0.Sample( smp_jitter, fr )*scale;
+//	float4	J1 	= jitter1.Sample( smp_jitter, fr )*scale;
+
+	float k = 0.99/float(SMAP_size);
+	r.x 	= test 	(tc,J0.xy+float2(-k,-k)).x;
+	r.y 	= test 	(tc,J0.wz+float2( k,-k)).y;
+	
+ 	r.z		= test	(tc,J0.xy+float2(-k, k)).z;
+ 	r.w		= test	(tc,J0.wz+float2( k, k)).x;
+	
+	half4	f;
+	float k1 = 1.5/float(SMAP_size);
+	f.x 	= test 	(tc,-J0.xy+float2(-k1,0)).x;
+	f.y 	= test 	(tc,-J0.wz+float2( 0,-k1)).y;
+
+	f.z		= test	(tc,-J0.xy+float2( k1, 0)).z;
+ 	f.w		= test	(tc,-J0.wz+float2( 0, k1)).x;
+
+	half res = ( r.x + r.y + r.z + r.w + f.x + f.y + f.z + f.w )*1.0/(4.0 + 4.0 );
+	return res;
+}*/
+half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
 {
 	half4	r;
 
@@ -700,20 +737,28 @@ half 	shadow_high 	(float4 tc)			// jittered sampling
 float shadow( float4 tc ) 
 {
 #ifdef USE_ULTRA_SHADOWS
-#   ifdef SM_MINMAX
-	return modify_light( shadow_hw_hq( tc ) ); 
+#	ifdef SM_MINMAX
+		return modify_light( shadow_hw_hq( tc ) ); 
 #	else
-	return shadow_hw_hq( tc ); 
-#	endif // SM_MINMAX
+		return shadow_hw_hq( tc ); 
+#	endif
 #else
-    return shadow_hw(tc);
-#endif // USE_ULTRA_SHADOWS
+#	if SUN_QUALITY>=2 // Hight quality
+		//return shadowtest_sun 	( tc, float4(0,0,0,0) );			// jittered sampling;
+		return shadow_hw		(tc);
+#	else
+		return shadow_hw		(tc);
+#	endif
+#endif
 }
 
 float shadow_volumetric( float4 tc ) 
 {
 	return sample_hw_pcf	(tc,float4(-1,-1,0,0)); 
 }
+
+
+#ifdef SM_MINMAX
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // hardware + PCF
@@ -739,6 +784,9 @@ float shadow_dx10_1_sunshafts( float4 tc, float2 pos2d )
       return shadow_hw( tc ); 
    }
 }
+
+#endif
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // testbed
