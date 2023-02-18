@@ -54,18 +54,16 @@ jobs:
         name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
         path: res/Utils.*.7z
 
-    - name: Update latest nightly tag
+    - name: Update latest-nightly tag
       uses: EndBug/latest-tag@latest
       with:
         ref: latest-nightly
 
     - name: Publish latest nightly build
       if: ${{ github.ref_name == 'dev' }}
-      uses: AButler/upload-release-assets@v2.0.x
-      with:
-        release-tag: latest-nightly
-        repo-token: ${{ github.token }}
-        files: res/*.*.7z
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh release upload latest-nightly (get-item res/*.*.7z) --clobber
 
   build-ubuntu:
     name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
