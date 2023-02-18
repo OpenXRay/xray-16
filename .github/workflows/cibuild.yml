@@ -61,7 +61,7 @@ jobs:
 
     - name: Publish latest nightly build
       if: ${{ github.ref_name == 'dev' }}
-      uses: AButler/upload-release-assets@master
+      uses: AButler/upload-release-assets@v2.0.x
       with:
         release-tag: latest-nightly
         repo-token: ${{ github.token }}
