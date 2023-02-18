@@ -34,7 +34,7 @@ copy "bin\%PLATFORM%\%CONFIGURATION%\utils\*" res\bin\utils\
 copy License.txt res\
 copy README.md res\
 rem We don't need MFC stuff which Visual Studio automatically copies
-del /q /f /s "bin\mfc*.dll"
+del /q /f /s "res\bin\mfc*.dll"
 
 rem Make archives
 cd res
