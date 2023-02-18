@@ -1,0 +1,25 @@
+pending review:
+- *.*
+
+AI:
+- src/xrAICore/*
+- src/xrGame/ai/*
+
+Documentation:
+- docs/*
+
+External (3rd party):
+- Externals/*
+
+Physics:
+- src/xrPhysics/*
+
+Renderer:
+- src/Layers/*
+
+Sound:
+- src/xrSound/*
+
+UI:
+- src/xrUICore/*
+- src/xrGame/ui/*
