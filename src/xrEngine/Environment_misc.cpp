@@ -518,27 +518,12 @@ CEnvDescriptorMixer::CEnvDescriptorMixer(shared_str const& identifier)
     use_dynamic_sun_dir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
 }
 
-void CEnvDescriptorMixer::destroy()
-{
-    m_pDescriptorMixer->Destroy();
-
-    // Reuse existing code
-    on_device_destroy();
-}
-
-void CEnvDescriptorMixer::clear()
-{
-    m_pDescriptorMixer->Clear();
-}
-
 void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
     float f, CEnvModifier& Mdf, float modifier_power)
 {
     const float fi = 1 - f;
 
     exec_time = fi * A.exec_time + f * B.exec_time;
-
-    m_pDescriptorMixer->lerp(&*A.m_pDescriptor, &*B.m_pDescriptor);
 
     weight = f;
     modif_power = 1.f / (modifier_power + 1); // the environment itself
@@ -1023,7 +1008,7 @@ void CEnvironment::unload()
     xr_delete(eff_Thunderbolt);
     CurrentWeather = nullptr;
     CurrentWeatherName = nullptr;
-    CurrentEnv->clear();
+    m_pRender->Clear();
     Invalidate();
 }
 

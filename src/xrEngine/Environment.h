@@ -200,8 +200,6 @@ public:
 class ENGINE_API CEnvDescriptorMixer : public CEnvDescriptor
 {
 public:
-    FactoryPtr<IEnvDescriptorMixerRender> m_pDescriptorMixer;
-
     float weight;
     float modif_power;
     float fog_near;
@@ -215,8 +213,6 @@ public:
     virtual void lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
         float f, CEnvModifier& M, float m_power);
     void calculate_dynamic_sun_dir(float fGameTime);
-    void clear();
-    void destroy();
 };
 
 class ENGINE_API CEnvironment
