@@ -15,8 +15,6 @@
 #include "xr_object.h"
 #endif
 
-static constexpr float MAX_DIST_FACTOR = 0.95f;
-
 SThunderboltDesc::~SThunderboltDesc()
 {
     m_pRender->DestroyModel();

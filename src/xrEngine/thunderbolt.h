@@ -104,6 +104,9 @@ private:
     float next_lightning_time;
     bool bEnabled;
 
+public:
+    static constexpr float MAX_DIST_FACTOR = 0.95f;
+
     // params
     Fvector2 p_var_alt;
     float p_var_long;
@@ -114,6 +117,7 @@ private:
     float p_sun_color;
     float p_fog_color;
 
+private:
     static bool RayPick(const Fvector& s, const Fvector& d, float& range);
     void Bolt(shared_str id, float period, float life_time);
 
