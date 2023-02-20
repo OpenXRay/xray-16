@@ -378,16 +378,6 @@ public:
         xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
     virtual CLensFlareDescriptor* add_flare(
         xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id, CInifile const* pIni);
-
-public:
-    Fvector2 p_var_alt;
-    float p_var_long;
-    float p_min_dist;
-    float p_tilt;
-    float p_second_prop;
-    float p_sky_color;
-    float p_sun_color;
-    float p_fog_color;
 };
 
 ENGINE_API extern Flags32 psEnvFlags;

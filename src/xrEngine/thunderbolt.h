@@ -105,14 +105,14 @@ private:
     bool bEnabled;
 
     // params
-    // Fvector2 p_var_alt;
-    // float p_var_long;
-    // float p_min_dist;
-    // float p_tilt;
-    // float p_second_prop;
-    // float p_sky_color;
-    // float p_sun_color;
-    // float p_fog_color;
+    Fvector2 p_var_alt;
+    float p_var_long;
+    float p_min_dist;
+    float p_tilt;
+    float p_second_prop;
+    float p_sky_color;
+    float p_sun_color;
+    float p_fog_color;
 
     static bool RayPick(const Fvector& s, const Fvector& d, float& range);
     void Bolt(shared_str id, float period, float life_time);
