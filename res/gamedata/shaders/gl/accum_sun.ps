@@ -27,7 +27,7 @@ float4 	_main	( p_aa_AA_sun I )
 	// ----- light-model
 	float 	m	= xmaterial	;
 # ifndef USE_R2_STATIC_SUN
-			m 	= _P.w		;
+			m 	= _P.w;
 # endif
 	float4	light	= plight_infinity( m, _P.xyz, _N.xyz, Ldynamic_dir.xyz );
 
