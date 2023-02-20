@@ -65,7 +65,7 @@ void	sincos(float x, out float s, out float c) { s = sin(x); c = cos(x); }
 #define NORMAL0		5
 #define NORMAL1		6
 #define BINORMAL	6
-#define FOG		    7
+#define FOG		7
 #define TEXCOORD0	8
 #define TEXCOORD1	9
 #define TEXCOORD2	10
@@ -98,7 +98,7 @@ void	sincos(float x, out float s, out float c) { s = sin(x); c = cos(x); }
 // TODO: OGL: Use constant buffers.
 //cbuffer	static_globals
 //{
-	uniform float3x4	m_V;
+	uniform float3x4		m_V;
 	uniform float4x4 	m_P;
 	uniform float4x4 	m_VP;
 
