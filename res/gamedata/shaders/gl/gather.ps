@@ -10,10 +10,10 @@ float4 sm_gather( float2 tc, int2 offset )
 	
 	tc -= fc / scale;
 	
-	float s0 = textureLodOffset( s_dmap, tc, 0, offset + int2( 0, 1 ) ).x;
-	float s1 = textureLodOffset( s_dmap, tc, 0, offset + int2( 1, 1 ) ).x;
-	float s2 = textureLodOffset( s_dmap, tc, 0, offset + int2( 1, 0 ) ).x;
-	float s3 = textureLodOffset( s_dmap, tc, 0, offset + int2( 0, 0 ) ).x;
+	float s0 = textureLod( s_dmap, tc + offset + int2( 0, 1 ), 0 ).x;
+	float s1 = textureLod( s_dmap, tc + offset + int2( 1, 1 ), 0 ).x;
+	float s2 = textureLod( s_dmap, tc + offset + int2( 1, 0 ), 0 ).x;
+	float s3 = textureLod( s_dmap, tc + offset + int2( 0, 0 ), 0 ).x;
 	
 	return float4( s0, s1, s2, s3 );
 }
@@ -29,10 +29,10 @@ float4 sm_minmax_gather( float2 tc, int2 offset )
 	
 	tc -= fc / scale;
 	
-	float s0 = textureLodOffset( s_smap_minmax, tc, 0, offset + int2( 0, 1 ) ).x;
-	float s1 = textureLodOffset( s_smap_minmax, tc, 0, offset + int2( 1, 1 ) ).x;
-	float s2 = textureLodOffset( s_smap_minmax, tc, 0, offset + int2( 1, 0 ) ).x;
-	float s3 = textureLodOffset( s_smap_minmax, tc, 0, offset + int2( 0, 0 ) ).x;
+	float s0 = textureLod( s_smap_minmax, tc + offset + int2( 0, 1 ), 0 ).x;
+	float s1 = textureLod( s_smap_minmax, tc + offset + int2( 1, 1 ), 0 ).x;
+	float s2 = textureLod( s_smap_minmax, tc + offset + int2( 1, 0 ), 0 ).x;
+	float s3 = textureLod( s_smap_minmax, tc + offset + int2( 0, 0 ), 0 ).x;
 	
 	return float4( s0, s1, s2, s3 );
 }
