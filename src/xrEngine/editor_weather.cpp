@@ -384,60 +384,63 @@ void ide::ShowWeatherEditor()
 
         ImGui::Spacing();
 
-        constexpr ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable |
-            ImGuiTableFlags_Hideable | ImGuiTableFlags_BordersInner;
-
-        if (ImGui::BeginTable("Environment lerp", 3, flags))
+        if (ImGui::CollapsingHeader("Live edit##header", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::TableNextColumn();
-            TimeFrameCombo("Time frame##current0", env.Current[0]);
+            constexpr ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable |
+                ImGuiTableFlags_Hideable | ImGuiTableFlags_BordersInner;
 
-            ImGui::TableNextColumn();
-            u32 hours, minutes, seconds;
-            env.SplitTime(current.exec_time, hours, minutes, seconds);
-
-            string128 temp;
-            xr_sprintf(temp, "%02d:%02d:%02d###frame_time", hours, minutes, seconds);
-
-            ImGui::BeginDisabled(!env.Current[0] || !env.Current[1]);
-            if (ImGui::SliderFloat(temp, &current.exec_time,
-                current0.exec_time, current1.exec_time, "", ImGuiSliderFlags_NoInput))
+            if (ImGui::BeginTable("Environment lerp", 3, flags))
             {
-                env.SetGameTime(current.exec_time, time_factor);
-                env.lerp();
+                ImGui::TableNextColumn();
+                TimeFrameCombo("Time frame##current0", env.Current[0]);
+
+                ImGui::TableNextColumn();
+                u32 hours, minutes, seconds;
+                env.SplitTime(current.exec_time, hours, minutes, seconds);
+
+                string128 temp;
+                xr_sprintf(temp, "%02d:%02d:%02d###frame_time", hours, minutes, seconds);
+
+                ImGui::BeginDisabled(!env.Current[0] || !env.Current[1]);
+                if (ImGui::SliderFloat(temp, &current.exec_time,
+                    current0.exec_time, current1.exec_time, "", ImGuiSliderFlags_NoInput))
+                {
+                    env.SetGameTime(current.exec_time, time_factor);
+                    env.lerp();
+                }
+                ImGui::EndDisabled();
+
+                ImGui::TableNextColumn();
+                TimeFrameCombo("Time frame##current1", env.Current[1]);
+
+                ImGui::EndTable();
             }
-            ImGui::EndDisabled();
 
-            ImGui::TableNextColumn();
-            TimeFrameCombo("Time frame##current1", env.Current[1]);
+            if (ImGui::BeginTable("Environment lerp", 3, flags))
+            {
+                ImGui::TableSetupColumn("current");
+                ImGui::TableSetupColumn("blend");
+                ImGui::TableSetupColumn("target");
+                ImGui::TableHeadersRow();
 
-            ImGui::EndTable();
-        }
+                ImGui::TableNextColumn();
+                if (env.Current[0])
+                    display_property(current0);
+                else
+                    ImGui::Text("Please, load a level or select time frame manually.");
 
-        if (ImGui::BeginTable("Environment lerp", 3, flags))
-        {
-            ImGui::TableSetupColumn("current");
-            ImGui::TableSetupColumn("blend");
-            ImGui::TableSetupColumn("target");
-            ImGui::TableHeadersRow();
+                ImGui::TableNextColumn();
+                display_property(current);
 
-            ImGui::TableNextColumn();
-            if (env.Current[0])
-                display_property(current0);
-            else
-                ImGui::Text("Please, load a level or select time frame manually.");
+                ImGui::TableNextColumn();
+                if (env.Current[1])
+                    display_property(current1);
+                else
+                    ImGui::Text("Please, load a level or select time frame manually.");
 
-            ImGui::TableNextColumn();
-            display_property(current);
-
-            ImGui::TableNextColumn();
-            if (env.Current[1])
-                display_property(current1);
-            else
-                ImGui::Text("Please, load a level or select time frame manually.");
-
-            ImGui::EndTable();
-        }
+                ImGui::EndTable();
+            } // if (ImGui::BeginTable("Environment lerp", 3, flags))
+        } // if (ImGui::CollapsingHeader("Live edit", ImGuiTreeNodeFlags_DefaultOpen))
     }
     ImGui::End();
 }
