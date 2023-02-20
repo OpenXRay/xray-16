@@ -298,9 +298,8 @@ CRenderTarget::CRenderTarget()
         rt_Base.resize(HW.BackBufferCount);
         for (u32 i = 0; i < HW.BackBufferCount; i++)
         {
-            string32 temp;
-            xr_sprintf(temp, "%s%d", r2_RT_base, i);
-            rt_Base[i].create(temp, w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
+            std::string temp(r2_RT_base + std::to_string(i));
+            rt_Base[i].create(temp.c_str(), w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
         }
         rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
 
@@ -707,9 +706,8 @@ CRenderTarget::CRenderTarget()
         // create pool
         for (u32 it = 0; it < HW.Caps.iGPUNum * 2; it++)
         {
-            string256 name;
-            xr_sprintf(name, "%s_%d", r2_RT_luminance_pool, it);
-            rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
+            std::string name(r2_RT_luminance_pool + std::to_string(it));
+            rt_LUM_pool[it].create(name.c_str(), 1, 1, D3DFMT_R32F);
 #ifdef USE_DX9
             u_setrt(rt_LUM_pool[it], 0, 0, 0);
 #endif

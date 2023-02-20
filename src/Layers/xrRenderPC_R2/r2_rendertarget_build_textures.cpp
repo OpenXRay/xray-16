@@ -122,9 +122,8 @@ void CRenderTarget::build_textures()
 
         for (int it1 = 0; it1 < TEX_jitter_count - 1; it1++)
         {
-            string_path name;
-            xr_sprintf(name, "%s%d", r2_jitter, it1);
-            t_noise[it1] = RImplementation.Resources->_CreateTexture(name);
+            std::string name(r2_jitter + std::to_string(it1));
+            t_noise[it1] = RImplementation.Resources->_CreateTexture(name.c_str());
 
             R_CHK(D3DXCreateTexture(
                 HW.pDevice, TEX_jitter, TEX_jitter, 1, 0, D3DFMT_Q8W8V8U8, D3DPOOL_SYSTEMMEM, &temp_noise_surf[it1]));
@@ -200,9 +199,8 @@ void CRenderTarget::build_textures()
         HW.pDevice->UpdateTexture(temp_noise_surf[it], t_noise_surf[it]);
         _RELEASE(temp_noise_surf[it]);
         
-        string_path name;
-        xr_sprintf(name, "%s%d", r2_jitter, it);
-        t_noise[it] = RImplementation.Resources->_CreateTexture(name);
+        std::string name(r2_jitter + std::to_string(it));
+        t_noise[it] = RImplementation.Resources->_CreateTexture(name.c_str());
         t_noise[it]->surface_set(t_noise_surf[it]);
         _RELEASE(t_noise_surf[it]);
     }

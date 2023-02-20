@@ -217,12 +217,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     shader_name_holder sh_name;
 
     // Don't move these variables to lower scope!
-    string32 c_smapsize;
-    string32 c_gloss;
-    string32 c_sun_shafts;
-    string32 c_ssao;
-    string32 c_sun_quality;
-    string32 c_water_reflection;
+    std::string c_smapsize;
+    std::string c_gloss;
+    std::string c_sun_shafts;
+    std::string c_ssao;
+    std::string c_sun_quality;
+    std::string c_water_reflection;
 
     // TODO: OGL: Implement these parameters.
     UNUSED(pFunctionName);
@@ -239,9 +239,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Shadow map size
     {
-        xr_itoa(m_SMAPSize, c_smapsize, 10);
-        options.add("SMAP_size", c_smapsize);
-        sh_name.append(c_smapsize);
+        c_smapsize = std::to_string(m_SMAPSize);
+        options.add("SMAP_size", c_smapsize.c_str());
+        sh_name.append(c_smapsize.c_str());
     }
 
     // FP16 Filter
@@ -282,8 +282,8 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Force gloss
     {
-        xr_sprintf(c_gloss, "%f", o.forcegloss_v);
-        appendShaderOption(o.forcegloss, "FORCE_GLOSS", c_gloss);
+        c_gloss = std::to_string(o.forcegloss_v);
+        appendShaderOption(o.forcegloss, "FORCE_GLOSS", c_gloss.c_str());
     }
 
     // Force skinw
@@ -347,8 +347,8 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     // Water reflections
     if (RImplementation.o.advancedpp && ps_r_water_reflection)
     {
-        xr_sprintf(c_water_reflection, "%d", ps_r_water_reflection);
-        options.add("SSR_QUALITY", c_water_reflection);
+        c_water_reflection = std::to_string(ps_r_water_reflection);
+        options.add("SSR_QUALITY", c_water_reflection.c_str());
         sh_name.append(ps_r_water_reflection);
         const bool sshHalfDepth = ps_r2_ls_flags_ext.test(R3FLAGEXT_SSR_HALF_DEPTH);
         appendShaderOption(sshHalfDepth, "SSR_HALF_DEPTH", "1");
@@ -375,8 +375,8 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     // Sun shafts
     if (RImplementation.o.advancedpp && ps_r_sun_shafts)
     {
-        xr_sprintf(c_sun_shafts, "%d", ps_r_sun_shafts);
-        options.add("SUN_SHAFTS_QUALITY", c_sun_shafts);
+        c_sun_shafts = std::to_string(ps_r_sun_shafts);
+        options.add("SUN_SHAFTS_QUALITY", c_sun_shafts.c_str());
         sh_name.append(ps_r_sun_shafts);
     }
     else
@@ -384,8 +384,8 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     if (RImplementation.o.advancedpp && ps_r_ssao)
     {
-        xr_sprintf(c_ssao, "%d", ps_r_ssao);
-        options.add("SSAO_QUALITY", c_ssao);
+        c_ssao = std::to_string(ps_r_ssao);
+        options.add("SSAO_QUALITY", c_ssao.c_str());
         sh_name.append(ps_r_ssao);
     }
     else
@@ -394,8 +394,8 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     // Sun quality
     if (RImplementation.o.advancedpp && ps_r_sun_quality)
     {
-        xr_sprintf(c_sun_quality, "%d", ps_r_sun_quality);
-        options.add("SUN_QUALITY", c_sun_quality);
+        c_sun_quality = std::to_string(ps_r_sun_quality);
+        options.add("SUN_QUALITY", c_sun_quality.c_str());
         sh_name.append(ps_r_sun_quality);
     }
     else

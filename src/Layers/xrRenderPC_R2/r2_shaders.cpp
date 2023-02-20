@@ -104,22 +104,22 @@ HRESULT CRender::shader_compile(
     int def_it = 0;
     
     // Don't move these variables to lower scope!
-    string32 c_smapsize;
-    string32 c_gloss;
-    string32 c_sun_shafts;
-    string32 c_ssao;
-    string32 c_sun_quality;
+    std::string c_smapsize;
+    std::string c_gloss;
+    std::string c_sun_shafts;
+    std::string c_ssao;
+    std::string c_sun_quality;
 
     char sh_name[MAX_PATH] = "";
     u32 len = 0;
     // options
     {
-        xr_sprintf(c_smapsize, "%04d", u32(m_SMAPSize));
+        c_smapsize = std::to_string(m_SMAPSize);
         defines[def_it].Name = "SMAP_size";
-        defines[def_it].Definition = c_smapsize;
+        defines[def_it].Definition = c_smapsize.c_str();
         def_it++;
-        xr_strcat(sh_name, c_smapsize);
-        len += xr_strlen(c_smapsize);
+        xr_strcat(sh_name, c_smapsize.c_str());
+        len += c_smapsize.length();
     }
 
     if (o.fp16_filter)
@@ -232,9 +232,9 @@ HRESULT CRender::shader_compile(
 
     if (o.forcegloss)
     {
-        xr_sprintf(c_gloss, "%f", o.forcegloss_v);
+        c_gloss = std::to_string(o.forcegloss_v);
         defines[def_it].Name = "FORCE_GLOSS";
-        defines[def_it].Definition = c_gloss;
+        defines[def_it].Definition = c_gloss.c_str();
         def_it++;
     }
     sh_name[len] = '0' + char(o.forcegloss);
@@ -384,9 +384,9 @@ HRESULT CRender::shader_compile(
 
     if (RImplementation.o.advancedpp && ps_r_sun_shafts)
     {
-        xr_sprintf(c_sun_shafts, "%d", ps_r_sun_shafts);
+        c_sun_shafts = std::to_string(ps_r_sun_shafts);
         defines[def_it].Name = "SUN_SHAFTS_QUALITY";
-        defines[def_it].Definition = c_sun_shafts;
+        defines[def_it].Definition = c_sun_shafts.c_str();
         def_it++;
         sh_name[len] = '0' + char(ps_r_sun_shafts);
         ++len;
@@ -399,9 +399,9 @@ HRESULT CRender::shader_compile(
 
     if (RImplementation.o.advancedpp && ps_r_ssao)
     {
-        xr_sprintf(c_ssao, "%d", ps_r_ssao);
+        c_ssao = std::to_string(ps_r_ssao);
         defines[def_it].Name = "SSAO_QUALITY";
-        defines[def_it].Definition = c_ssao;
+        defines[def_it].Definition = c_ssao.c_str();
         def_it++;
         sh_name[len] = '0' + char(ps_r_ssao);
         ++len;
@@ -414,9 +414,9 @@ HRESULT CRender::shader_compile(
 
     if (RImplementation.o.advancedpp && ps_r_sun_quality)
     {
-        xr_sprintf(c_sun_quality, "%d", ps_r_sun_quality);
+        c_sun_quality = std::to_string(ps_r_sun_quality);
         defines[def_it].Name = "SUN_QUALITY";
-        defines[def_it].Definition = c_sun_quality;
+        defines[def_it].Definition = c_sun_quality.c_str();
         def_it++;
         sh_name[len] = '0' + char(ps_r_sun_quality);
         ++len;

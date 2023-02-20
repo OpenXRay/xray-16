@@ -132,11 +132,10 @@ void CRenderTarget::build_textures()
         // Surfaces
         for (u32 it1 = 0; it1 < TEX_jitter_count - 1; it1++)
         {
-            string_path name;
-            xr_sprintf(name, "%s%d", r2_jitter, it1);
+            std::string name(r2_jitter + std::to_string(it1));
             CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it1]));
             CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TEX_jitter, TEX_jitter));
-            t_noise[it1] = RImplementation.Resources->_CreateTexture(name);
+            t_noise[it1] = RImplementation.Resources->_CreateTexture(name.c_str());
             t_noise[it1]->surface_set(GL_TEXTURE_2D, t_noise_surf[it1]);
         }
 
@@ -168,11 +167,10 @@ void CRenderTarget::build_textures()
 
         // generate HBAO jitter texture (last)
         int it = TEX_jitter_count - 1;
-        string_path name;
-        xr_sprintf(name, "%s%d", r2_jitter, it);
+        std::string name(r2_jitter + std::to_string(it));
         CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it]));
         CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, TEX_jitter, TEX_jitter));
-        t_noise[it] = RImplementation.Resources->_CreateTexture(name);
+        t_noise[it] = RImplementation.Resources->_CreateTexture(name.c_str());
         t_noise[it]->surface_set(GL_TEXTURE_2D, t_noise_surf[it]);
 
         // Fill it,
