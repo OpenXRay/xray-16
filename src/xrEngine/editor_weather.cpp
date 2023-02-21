@@ -4,11 +4,18 @@
 #include "editor_helper.h"
 
 #include "Environment.h"
+#include "thunderbolt.h"
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
 
 namespace xray::editor
 {
+static bool window_weathers = false;
+static bool window_suns = false;
+static bool window_ambients = false;
+static bool window_thunderbolts = false;
+static bool window_level_weathers = false;
+
 static void ItemHelp(const char* desc, bool use_separate_marker = true, bool call_same_line = true)
 {
     if (use_separate_marker)
@@ -117,6 +124,10 @@ void display_property(CEnvDescriptor& descriptor)
     {
         if (ImGui::BeginCombo("sun##lensflareid", descriptor.lens_flare_id.c_str()))
         {
+            if (ImGui::Selectable("<edit>", false))
+            {
+                window_suns = true;
+            }
             if (ImGui::Selectable("##", descriptor.lens_flare_id.empty()))
                 descriptor.lens_flare_id = "";
             for (const auto& section : env.m_suns_config->sections())
@@ -201,6 +212,10 @@ void display_property(CEnvDescriptor& descriptor)
     {
         if (ImGui::BeginCombo("ambient##env_ambient", descriptor.env_ambient ? descriptor.env_ambient->name().c_str() : ""))
         {
+            if (ImGui::Selectable("<edit>", false))
+            {
+                window_ambients = true;
+            }
             for (const auto& ambient : env.Ambients)
             {
                 shared_str current = descriptor.env_ambient ? descriptor.env_ambient->name() : "";
@@ -236,6 +251,10 @@ void display_property(CEnvDescriptor& descriptor)
     {
         if (ImGui::BeginCombo("thunderbolts", descriptor.tb_id.c_str()))
         {
+            if (ImGui::Selectable("<edit>", false))
+            {
+                window_thunderbolts = true;
+            }
             if (ImGui::Selectable("##", descriptor.tb_id.empty()))
                 descriptor.tb_id = "";
             for (const auto& section : env.m_thunderbolt_collections_config->sections())
@@ -284,23 +303,68 @@ void display_property(CEnvDescriptorMixer& descriptor)
     ImGui::PopID();
 }
 
+template <>
+void display_property(CEffect_Thunderbolt& bolt)
+{
+    float altitude[2] = { rad2deg(bolt.p_var_alt.x) , rad2deg(bolt.p_var_alt.y) };
+    if (ImGui::DragFloat2("altitude", altitude, 0.5f, -360.0f, 360.f))
+        bolt.p_var_alt = { rad2deg(altitude[0]) , rad2deg(altitude[1]) };
+
+    float deltalongitude = rad2deg(bolt.p_var_long);
+    if (ImGui::DragFloat("wind direction", &deltalongitude, 0.5f, -360.0f, 360.f))
+        bolt.p_var_long = deg2rad(deltalongitude);
+
+    ImGui::DragFloat("minimum distance factor", &bolt.p_min_dist, 0.001f, 0.0f, CEffect_Thunderbolt::MAX_DIST_FACTOR);
+    ItemHelp("Distance from far plane");
+
+    float tilt = rad2deg(bolt.p_tilt);
+    if (ImGui::DragFloat("tilt", &tilt, 0.01f, 15.0f, 30.f))
+        bolt.p_tilt = deg2rad(tilt);
+
+    ImGui::DragFloat("second probability", &bolt.p_second_prop, 0.001f, 0.0f, 1.0f);
+    ImGui::DragFloat("sky color", &bolt.p_sky_color, 0.001f, 0.0f, 1.0f);
+    ImGui::DragFloat("sun color", &bolt.p_sun_color, 0.001f, 0.0f, 1.0f);
+    ImGui::DragFloat("fog color", &bolt.p_fog_color, 0.001f, 0.0f, 1.0f);
+}
+
 void ide::ShowWeatherEditor()
 {
     if (ImGui::Begin("Weather editor", &m_windows.weather, get_default_window_flags()))
     {
         auto& env = g_pGamePersistent->Environment();
 
-        const bool paused = Device.Paused();
-        if (ImGui::RadioButton("Pause", paused))
-            Device.Pause(!paused, TRUE, TRUE, "editor query");
+        if (ImGui::BeginMenuBar())
+        {
+            const bool paused = Device.Paused();
+            if (ImGui::RadioButton("Pause", paused))
+                Device.Pause(!paused, TRUE, TRUE, "editor query");
 
-        ImGui::SameLine();
-        if (ImGui::Button("Reset all"))
-            env.ED_Reload();
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::Button("Reset all"))
+                    env.ED_Reload();
 
-        ImGui::SameLine();
-        if (ImGui::Button("Save all"))
-            env.save();
+                if (ImGui::Button("Save all"))
+                    env.save();
+
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Windows"))
+            {
+                if (ImGui::MenuItem("Weathers", nullptr, &window_weathers))
+                    ;
+                if (ImGui::MenuItem("Suns", nullptr, &window_suns))
+                    ;
+                if (ImGui::MenuItem("Ambients", nullptr, &window_ambients))
+                    ;
+                if (ImGui::MenuItem("Thunderbolts", nullptr, &window_thunderbolts))
+                    ;
+                if (ImGui::MenuItem("Level weathers", nullptr, &window_level_weathers))
+                    ;
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
 
         auto& current = *env.CurrentEnv;
         auto& current0 = env.Current[0] ? *env.Current[0] : *env.CurrentEnv;
@@ -345,6 +409,8 @@ void ide::ShowWeatherEditor()
 
                 if (ImGui::BeginCombo("Weather cycle", env.CurrentCycleName.c_str()))
                 {
+                    if (ImGui::Selectable("<edit>", false))
+                        ;
                     for (const auto& [identifier, env_descriptors] : env.WeatherCycles)
                     {
                         if (ImGui::Selectable(identifier.c_str(), env.CurrentCycleName == identifier))
@@ -359,6 +425,9 @@ void ide::ShowWeatherEditor()
                 ImGui::TableNextColumn();
                 if (ImGui::BeginCombo("Effect", env.IsWFXPlaying() ? env.CurrentWeatherName.c_str() : ""))
                 {
+                    if (ImGui::Selectable("<edit>", false))
+                        ;
+
                     if (ImGui::Selectable("##", !env.IsWFXPlaying()))
                         env.StopWFX();
 
@@ -384,60 +453,63 @@ void ide::ShowWeatherEditor()
 
         ImGui::Spacing();
 
-        constexpr ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable |
-            ImGuiTableFlags_Hideable | ImGuiTableFlags_BordersInner;
-
-        if (ImGui::BeginTable("Environment lerp", 3, flags))
+        if (ImGui::CollapsingHeader("Live edit##header", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::TableNextColumn();
-            TimeFrameCombo("Time frame##current0", env.Current[0]);
+            constexpr ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable |
+                ImGuiTableFlags_Hideable | ImGuiTableFlags_BordersInner;
 
-            ImGui::TableNextColumn();
-            u32 hours, minutes, seconds;
-            env.SplitTime(current.exec_time, hours, minutes, seconds);
-
-            string128 temp;
-            xr_sprintf(temp, "%02d:%02d:%02d###frame_time", hours, minutes, seconds);
-
-            ImGui::BeginDisabled(!env.Current[0] || !env.Current[1]);
-            if (ImGui::SliderFloat(temp, &current.exec_time,
-                current0.exec_time, current1.exec_time, "", ImGuiSliderFlags_NoInput))
+            if (ImGui::BeginTable("Environment lerp", 3, flags))
             {
-                env.SetGameTime(current.exec_time, time_factor);
-                env.lerp();
+                ImGui::TableNextColumn();
+                TimeFrameCombo("Time frame##current0", env.Current[0]);
+
+                ImGui::TableNextColumn();
+                u32 hours, minutes, seconds;
+                env.SplitTime(current.exec_time, hours, minutes, seconds);
+
+                string128 temp;
+                xr_sprintf(temp, "%02d:%02d:%02d###frame_time", hours, minutes, seconds);
+
+                ImGui::BeginDisabled(!env.Current[0] || !env.Current[1]);
+                if (ImGui::SliderFloat(temp, &current.exec_time,
+                    current0.exec_time, current1.exec_time, "", ImGuiSliderFlags_NoInput))
+                {
+                    env.SetGameTime(current.exec_time, time_factor);
+                    env.lerp();
+                }
+                ImGui::EndDisabled();
+
+                ImGui::TableNextColumn();
+                TimeFrameCombo("Time frame##current1", env.Current[1]);
+
+                ImGui::EndTable();
             }
-            ImGui::EndDisabled();
 
-            ImGui::TableNextColumn();
-            TimeFrameCombo("Time frame##current1", env.Current[1]);
+            if (ImGui::BeginTable("Environment lerp", 3, flags))
+            {
+                ImGui::TableSetupColumn("current");
+                ImGui::TableSetupColumn("blend");
+                ImGui::TableSetupColumn("target");
+                ImGui::TableHeadersRow();
 
-            ImGui::EndTable();
-        }
+                ImGui::TableNextColumn();
+                if (env.Current[0])
+                    display_property(current0);
+                else
+                    ImGui::Text("Please, load a level or select time frame manually.");
 
-        if (ImGui::BeginTable("Environment lerp", 3, flags))
-        {
-            ImGui::TableSetupColumn("current");
-            ImGui::TableSetupColumn("blend");
-            ImGui::TableSetupColumn("target");
-            ImGui::TableHeadersRow();
+                ImGui::TableNextColumn();
+                display_property(current);
 
-            ImGui::TableNextColumn();
-            if (env.Current[0])
-                display_property(current0);
-            else
-                ImGui::Text("Please, load a level or select time frame manually.");
+                ImGui::TableNextColumn();
+                if (env.Current[1])
+                    display_property(current1);
+                else
+                    ImGui::Text("Please, load a level or select time frame manually.");
 
-            ImGui::TableNextColumn();
-            display_property(current);
-
-            ImGui::TableNextColumn();
-            if (env.Current[1])
-                display_property(current1);
-            else
-                ImGui::Text("Please, load a level or select time frame manually.");
-
-            ImGui::EndTable();
-        }
+                ImGui::EndTable();
+            } // if (ImGui::BeginTable("Environment lerp", 3, flags))
+        } // if (ImGui::CollapsingHeader("Live edit", ImGuiTreeNodeFlags_DefaultOpen))
     }
     ImGui::End();
 }
