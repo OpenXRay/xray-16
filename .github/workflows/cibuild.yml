@@ -40,19 +40,30 @@ jobs:
       uses: actions/upload-artifact@main
       with:
         name: OpenXRay.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
-        path: res\OpenXRay.*.7z
+        path: res/OpenXRay.*.7z
 
     - name: Upload Symbols
       uses: actions/upload-artifact@main
       with:
         name: Symbols.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
-        path: res\Symbols.*.7z
+        path: res/Symbols.*.7z
 
     - name: Upload Utils
       uses: actions/upload-artifact@main
       with:
         name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
-        path: res\Utils.*.7z
+        path: res/Utils.*.7z
+
+    - name: Update latest-nightly tag
+      uses: EndBug/latest-tag@latest
+      with:
+        ref: latest-nightly
+
+    - name: Publish latest nightly build
+      if: ${{ github.ref_name == 'dev' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh release upload --clobber latest-nightly (get-item res/*.*.7z)
 
   build-ubuntu:
     name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})

@@ -11,7 +11,6 @@ class IObjectSpaceRender;
 class IFontRender;
 class IApplicationRender;
 class IEnvDescriptorRender;
-class IEnvDescriptorMixerRender;
 class IFlareRender;
 class ILensFlareRender;
 class IRainRender;
@@ -26,7 +25,6 @@ class IRainRender;
 class ILensFlareRender;
 class IImGuiRender;
 class IEnvironmentRender;
-class IEnvDescriptorMixerRender;
 class IStatGraphRender;
 class IFlareRender;
 class IConsoleRender;
@@ -57,7 +55,6 @@ public:
 
 #ifndef _EDITOR
     RENDER_FACTORY_INTERFACE(EnvironmentRender)
-    RENDER_FACTORY_INTERFACE(EnvDescriptorMixerRender)
     RENDER_FACTORY_INTERFACE(EnvDescriptorRender)
     RENDER_FACTORY_INTERFACE(RainRender)
     RENDER_FACTORY_INTERFACE(LensFlareRender)

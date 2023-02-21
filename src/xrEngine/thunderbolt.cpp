@@ -104,17 +104,40 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
     next_lightning_time = 0.f;
     bEnabled = false;
 
+    string_path filePath;
+    pcstr section;
+    CInifile const* config;
+
+    if (FS.update_path(filePath, "$game_config$", "environment\\environment.ltx"))
+    {
+        section = "environment";
+        config = xr_new<CInifile>(filePath, true, true, false);
+    }
+    else
+    {
+        section = "thunderbolt_common";
+        config = pSettings;
+    }
+
     // params
-    // p_var_alt = pSettings->r_fvector2 ( "environment","altitude" );
-    // p_var_alt.x = deg2rad(p_var_alt.x); p_var_alt.y = deg2rad(p_var_alt.y);
-    // p_var_long = deg2rad ( pSettings->r_float ( "environment","delta_longitude" ));
-    // p_min_dist = _min (.95f,pSettings->r_float ( "environment","min_dist_factor" ));
-    // p_tilt = deg2rad (pSettings->r_float ( "environment","tilt" ));
-    // p_second_prop = pSettings->r_float ( "environment","second_propability" );
-    // clamp (p_second_prop,0.f,1.f);
-    // p_sky_color = pSettings->r_float ( "environment","sky_color" );
-    // p_sun_color = pSettings->r_float ( "environment","sun_color" );
-    // p_fog_color = pSettings->r_float ( "environment","fog_color" );
+    if (!config->try_read(p_var_alt, section, "altitude"))
+    {
+        p_var_alt.x = config->r_float(section, "altitude");
+        p_var_alt.y = p_var_alt.x;
+    }
+    p_var_alt.x = deg2rad(p_var_alt.x);
+    p_var_alt.y = deg2rad(p_var_alt.y);
+    p_var_long = deg2rad(config->r_float(section, "delta_longitude"));
+    p_min_dist = std::min(MAX_DIST_FACTOR, config->r_float(section, "min_dist_factor"));
+    p_tilt = deg2rad(config->r_float(section, "tilt"));
+    p_second_prop = config->r_float(section, "second_propability");
+    clamp(p_second_prop, 0.f, 1.f);
+    p_sky_color = config->r_float(section, "sky_color");
+    p_sun_color = config->r_float(section, "sun_color");
+    p_fog_color = config->r_float(section, "fog_color");
+
+    if (config != pSettings)
+        xr_delete(config);
 }
 
 CEffect_Thunderbolt::~CEffect_Thunderbolt()
@@ -185,14 +208,14 @@ void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
     float sun_h, sun_p;
     CEnvironment& environment = g_pGamePersistent->Environment();
     environment.CurrentEnv->sun_dir.getHP(sun_h, sun_p);
-    float alt = Random.randF(environment.p_var_alt.x, environment.p_var_alt.y);
-    float lng = Random.randF(sun_h - environment.p_var_long + PI, sun_h + environment.p_var_long + PI);
-    float dist = Random.randF(FAR_DIST * environment.p_min_dist, FAR_DIST * .95f);
+    float alt = Random.randF(p_var_alt.x, p_var_alt.y);
+    float lng = Random.randF(sun_h - p_var_long + PI, sun_h + p_var_long + PI);
+    float dist = Random.randF(FAR_DIST * p_min_dist, FAR_DIST * .95f);
     current_direction.setHP(lng, alt);
     pos.mad(Device.vCameraPosition, current_direction, dist);
-    dev.x = Random.randF(-environment.p_tilt, environment.p_tilt);
+    dev.x = Random.randF(-p_tilt, p_tilt);
     dev.y = Random.randF(0, PI_MUL_2);
-    dev.z = Random.randF(-environment.p_tilt, environment.p_tilt);
+    dev.z = Random.randF(-p_tilt, p_tilt);
     XF.setXYZi(dev);
 
     Fvector light_dir = {0.f, -1.f, 0.f};
@@ -208,7 +231,7 @@ void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
 
     float next_v = Random.randF();
 
-    if (next_v < environment.p_second_prop)
+    if (next_v < p_second_prop)
     {
         next_lightning_time = Device.fTimeGlobal + lt + EPS_L;
     }
@@ -248,22 +271,22 @@ void CEffect_Thunderbolt::OnFrame(shared_str id, float period, float duration)
         lightning_phase = 1.5f * (current_time / life_time);
         clamp(lightning_phase, 0.f, 1.f);
 
-        CEnvironment& environment = g_pGamePersistent->Environment();
+        const auto& environment = g_pGamePersistent->Environment();
 
         Fvector& sky_color = environment.CurrentEnv->sky_color;
-        sky_color.mad(fClr, environment.p_sky_color);
+        sky_color.mad(fClr, p_sky_color);
         clamp(sky_color.x, 0.f, 1.f);
         clamp(sky_color.y, 0.f, 1.f);
         clamp(sky_color.z, 0.f, 1.f);
 
-        environment.CurrentEnv->sun_color.mad(fClr, environment.p_sun_color);
-        environment.CurrentEnv->fog_color.mad(fClr, environment.p_fog_color);
+        environment.CurrentEnv->sun_color.mad(fClr, p_sun_color);
+        environment.CurrentEnv->fog_color.mad(fClr, p_fog_color);
 
         if (GEnv.Render->GenerationIsR2OrHigher())
         {
             R_ASSERT(_valid(current_direction));
-            g_pGamePersistent->Environment().CurrentEnv->sun_dir = current_direction;
-            VERIFY2(g_pGamePersistent->Environment().CurrentEnv->sun_dir.y < 0,
+            environment.CurrentEnv->sun_dir = current_direction;
+            VERIFY2(environment.CurrentEnv->sun_dir.y < 0,
                 "Invalid sun direction settings while CEffect_Thunderbolt");
         }
     }

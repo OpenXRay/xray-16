@@ -203,14 +203,6 @@ void CRenderTarget::phase_combine()
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
 
-        dxEnvDescriptorMixerRender& envdescren = *(dxEnvDescriptorMixerRender*)(&*envdesc.m_pDescriptorMixer);
-
-        // Setup textures
-        GLuint e0 = _menu_pp ? 0 : envdescren.sky_r_textures_env[0].second->surface_get();
-        GLuint e1 = _menu_pp ? 0 : envdescren.sky_r_textures_env[1].second->surface_get();
-        t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
-        t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
-
         // Draw
         if (!RImplementation.o.msaa)
             RCache.set_Element(s_combine->E[0]);

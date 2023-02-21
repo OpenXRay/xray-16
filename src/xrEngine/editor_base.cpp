@@ -165,7 +165,7 @@ void ide::ShowMain()
 ImGuiWindowFlags ide::get_default_window_flags() const
 {
     if (m_state == visible_state::full)
-        return {};
+        return ImGuiWindowFlags_MenuBar;
     return ImGuiWindowFlags_NoNav
         | ImGuiWindowFlags_NoInputs
         | ImGuiWindowFlags_NoMove

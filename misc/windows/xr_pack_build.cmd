@@ -14,9 +14,9 @@ set CONFIGURATION=%~1
 set PLATFORM=%~2
 
 if %PLATFORM%==x86 (
-    set EDITION_NAME=%CONFIGURATION% 32-bit
+    set EDITION_NAME=%CONFIGURATION%.32-bit
 ) else if %PLATFORM%==x64 (
-    set EDITION_NAME=%CONFIGURATION% 64-bit
+    set EDITION_NAME=%CONFIGURATION%.64-bit
 ) else (
     set EDITION_NAME=%CONFIGURATION% %PLATFORM%
 )
@@ -33,6 +33,8 @@ copy "bin\%PLATFORM%\%CONFIGURATION%\*.pdb" res\bin\
 copy "bin\%PLATFORM%\%CONFIGURATION%\utils\*" res\bin\utils\
 copy License.txt res\
 copy README.md res\
+rem We don't need MFC stuff which Visual Studio automatically copies
+del /q /f /s "res\bin\mfc*.dll"
 
 rem Make archives
 cd res

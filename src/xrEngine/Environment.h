@@ -130,7 +130,6 @@ public:
 class ENGINE_API CEnvDescriptor
 {
 public:
-    bool old_style;
     bool dont_save; // oh
 
     float exec_time;
@@ -166,7 +165,8 @@ public:
     Fvector4 hemi_color; // w = R2 correction
     Fvector3 sun_color;
     Fvector3 sun_dir;
-    float sun_dir_azimuth; // for dynamic sun dir
+    float sun_azimuth; // for dynamic sun dir
+    bool use_dynamic_sun_dir;
 
     float m_fSunShaftsIntensity;
     float m_fWaterIntensity;
@@ -181,7 +181,7 @@ public:
     CEnvDescriptor(shared_str const& identifier);
 
     void load(CEnvironment& environment, const CInifile& config, pcstr section = nullptr);
-    void save(CInifile& config, bool oldStyle = false) const;
+    void save(CInifile& config, pcstr section = nullptr) const;
     void copy(const CEnvDescriptor& src)
     {
         float tm0 = exec_time;
@@ -200,23 +200,19 @@ public:
 class ENGINE_API CEnvDescriptorMixer : public CEnvDescriptor
 {
 public:
-    FactoryPtr<IEnvDescriptorMixerRender> m_pDescriptorMixer;
-
     float weight;
     float modif_power;
     float fog_near;
     float fog_far;
     Fvector4 env_color;
 
-    bool use_dynamic_sun_dir;
+    bool soc_style;
 
 public:
     CEnvDescriptorMixer(shared_str const& identifier);
     virtual void lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
         float f, CEnvModifier& M, float m_power);
     void calculate_dynamic_sun_dir(float fGameTime);
-    void clear();
-    void destroy();
 };
 
 class ENGINE_API CEnvironment
@@ -228,9 +224,12 @@ class ENGINE_API CEnvironment
     };
 
 public:
-    using EnvAmbVec = xr_vector<CEnvAmbient*>;
-    using EnvVec = xr_vector<CEnvDescriptor*>;
+    struct EnvVec : xr_vector<CEnvDescriptor*>
+    {
+        bool soc_style{};
+    };
     using EnvsMap = xr_map<shared_str, EnvVec, str_pred>;
+    using EnvAmbVec = xr_vector<CEnvAmbient*>;
 
 private:
     // clouds
@@ -307,7 +306,7 @@ public:
 
     virtual void load();
     virtual void unload();
-    void save(bool oldStyle = false) const;
+    void save() const;
 
     void mods_load();
     void mods_unload();
@@ -333,20 +332,24 @@ public:
     void OnDeviceCreate();
     void OnDeviceDestroy();
 
-// editor-related
+    // editor-related
 #ifdef _EDITOR
 public:
     float ed_from_time;
     float ed_to_time;
 
 public:
-    void ED_Reload();
-    float GetGameTime() { return fGameTime; }
 #else // #ifdef _EDITOR
-    float GetGameTime() { return fGameTime; }
-
     bool m_paused;
 #endif // #ifdef _EDITOR
+    void ED_Reload();
+    float GetGameTime() { return fGameTime; }
+    void GetGameTime(u32& hours, u32& minutes, u32& seconds) const
+    {
+        SplitTime(fGameTime, hours, minutes, seconds);
+    }
+
+    void SplitTime(float time, u32& hours, u32& minutes, u32& seconds) const;
 
     CInifile* m_ambients_config;
     CInifile* m_sound_channels_config;
@@ -364,8 +367,8 @@ protected:
 
     void load_level_specific_ambients();
 
-    void save_weathers(bool oldStyle = false) const;
-    void save_weather_effects(bool oldStyle = false) const;
+    void save_weathers(CInifile* environment_config = nullptr) const;
+    void save_weather_effects(CInifile* environment_config = nullptr) const;
 
 public:
     virtual SThunderboltDesc* thunderbolt_description(const CInifile& config, shared_str const& section);
@@ -375,16 +378,6 @@ public:
         xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
     virtual CLensFlareDescriptor* add_flare(
         xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id, CInifile const* pIni);
-
-public:
-    Fvector2 p_var_alt;
-    float p_var_long;
-    float p_min_dist;
-    float p_tilt;
-    float p_second_prop;
-    float p_sky_color;
-    float p_sun_color;
-    float p_fog_color;
 };
 
 ENGINE_API extern Flags32 psEnvFlags;
