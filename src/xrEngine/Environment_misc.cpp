@@ -444,6 +444,7 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
 
     cpcstr ambient_name                = old_style ? "env_ambient"   : "ambient";
     cpcstr ambient_color_name          = old_style ? "ambient"       : "ambient_color";
+    cpcstr hemisphere_color            = old_style ? "hemi_color"    : "hemisphere_color";
     cpcstr sun_name                    = old_style ? "flares"        : "sun";
     cpcstr thunderbolt_collection_name = old_style ? "thunderbolt"   : "thunderbolt_collection";
     cpcstr thunderbolt_duration_name   = old_style ? "bolt_duration" : "thunderbolt_duration";
@@ -465,7 +466,7 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
     config.w_float    (identifier, "fog_density",               fog_density);
     config.w_float    (identifier, "fog_distance",              fog_distance);
 
-    config.w_fvector4 (identifier, "hemisphere_color",          hemi_color);
+    config.w_fvector4 (identifier, hemisphere_color,            hemi_color);
 
     config.w_fvector3 (identifier, "rain_color",                rain_color);
     config.w_float    (identifier, "rain_density",              rain_density);
