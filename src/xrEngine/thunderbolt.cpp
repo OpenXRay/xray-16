@@ -26,16 +26,12 @@ SThunderboltDesc::SThunderboltDesc(const CInifile& pIni, shared_str const& sect)
     color_anim->fFPS = (float)color_anim->iFrameCount;
 
     // models
-    pcstr m_name = pIni.r_string(sect, "lightning_model");
-    string_path tmp;
-    xr_strcpy(tmp, m_name);
-    m_pRender->CreateModel(tmp);
+    m_pRender->CreateModel(pIni.r_string(sect, "lightning_model"));
 
     // sound
-    m_name = pIni.r_string(sect, "sound");
-    xr_strcpy(tmp, m_name);
-    if (m_name && m_name[0])
-        snd.create(tmp, st_Effect, sg_Undefined);
+    cpcstr sound = pIni.r_string(sect, "sound");
+    if (sound && sound[0])
+        snd.create(sound, st_Effect, sg_Undefined);
 }
 
 SThunderboltDesc::SFlare* SThunderboltDesc::create_gradient(pcstr gradient_name, const CInifile& config, shared_str const& sect)
