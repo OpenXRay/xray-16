@@ -451,7 +451,8 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
 
     cpcstr identifier = section ? section : m_identifier.c_str();
 
-    config.w_string   (identifier, ambient_name,                env_ambient ? env_ambient->name().c_str() : "");
+    if (env_ambient)
+        config.w_string(identifier, ambient_name,               env_ambient->name().c_str());
     config.w_fvector3 (identifier, ambient_color_name,          ambient);
 
     config.w_fvector4 (identifier, "clouds_color",              clouds_color);

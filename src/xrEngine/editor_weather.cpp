@@ -216,9 +216,11 @@ void display_property(CEnvDescriptor& descriptor)
             {
                 window_ambients = true;
             }
+            if (ImGui::Selectable("##", !descriptor.env_ambient))
+                descriptor.env_ambient = nullptr;
+            const shared_str current = descriptor.env_ambient ? descriptor.env_ambient->name() : nullptr;
             for (const auto& ambient : env.Ambients)
             {
-                shared_str current = descriptor.env_ambient ? descriptor.env_ambient->name() : "";
                 if (ImGui::Selectable(ambient->name().c_str(), ambient->name() == current))
                     descriptor.env_ambient = ambient;
             }
