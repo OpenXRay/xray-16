@@ -7,6 +7,7 @@
 #include "thunderbolt.h"
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
+#include "xr_efflensflare.h"
 
 namespace xray::editor
 {
@@ -122,18 +123,18 @@ void display_property(CEnvDescriptor& descriptor)
     ImGui::PushID(descriptor.m_identifier.c_str());
     if (ImGui::CollapsingHeader("sun##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::BeginCombo("sun##lensflareid", descriptor.lens_flare_id.c_str()))
+        if (ImGui::BeginCombo("sun##lensflareid", descriptor.lens_flare ? descriptor.lens_flare->section.c_str() : ""))
         {
             if (ImGui::Selectable("<edit>", false))
             {
                 window_suns = true;
             }
-            if (ImGui::Selectable("##", descriptor.lens_flare_id.empty()))
-                descriptor.lens_flare_id = "";
-            for (const auto& section : env.m_suns_config->sections())
+            if (ImGui::Selectable("##", !descriptor.lens_flare))
+                descriptor.lens_flare = nullptr;
+            for (auto& desc : env.eff_LensFlare->GetDescriptors())
             {
-                if (ImGui::Selectable(section->Name.c_str(), section->Name == descriptor.lens_flare_id))
-                    descriptor.lens_flare_id = section->Name;
+                if (ImGui::Selectable(desc.section.c_str(), &desc == descriptor.lens_flare))
+                    descriptor.lens_flare = &desc;
             }
             ImGui::EndCombo();
         }
@@ -251,18 +252,18 @@ void display_property(CEnvDescriptor& descriptor)
     }
     if (ImGui::CollapsingHeader("thunderbolts##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::BeginCombo("thunderbolts", descriptor.tb_id.c_str()))
+        if (ImGui::BeginCombo("thunderbolts", descriptor.thunderbolt ? descriptor.thunderbolt->section.c_str() : ""))
         {
             if (ImGui::Selectable("<edit>", false))
             {
                 window_thunderbolts = true;
             }
-            if (ImGui::Selectable("##", descriptor.tb_id.empty()))
-                descriptor.tb_id = "";
-            for (const auto& section : env.m_thunderbolt_collections_config->sections())
+            if (ImGui::Selectable("##", !descriptor.thunderbolt))
+                descriptor.thunderbolt = nullptr;
+            for (const auto& collection : env.eff_Thunderbolt->GetCollections())
             {
-                if (ImGui::Selectable(section->Name.c_str(), section->Name == descriptor.tb_id))
-                    descriptor.tb_id = section->Name;
+                if (ImGui::Selectable(collection->section.c_str(), collection == descriptor.thunderbolt))
+                    descriptor.thunderbolt = collection;
             }
             ImGui::EndCombo();
         }
@@ -272,7 +273,6 @@ void display_property(CEnvDescriptor& descriptor)
 
         ImGui::DragFloat("duration", &descriptor.bolt_duration);
         ImGui::DragFloat("period", &descriptor.bolt_period);
-
     }
     if (ImGui::CollapsingHeader("wind##category", ImGuiTreeNodeFlags_DefaultOpen))
     {

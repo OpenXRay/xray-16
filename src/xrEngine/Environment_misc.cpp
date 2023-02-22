@@ -285,10 +285,10 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
     m_fSunShaftsIntensity = 0;
     m_fWaterIntensity = 1;
 
-    m_fTreeAmplitudeIntensity = 0.01;
+    m_fTreeAmplitudeIntensity = 0.01f;
 
-    lens_flare_id = "";
-    tb_id = "";
+    lens_flare = nullptr;
+    thunderbolt = nullptr;
 
     env_ambient = nullptr;
 }
@@ -301,7 +301,15 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
 
 void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcstr section /*= nullptr*/)
 {
-    const bool oldStyle = section;
+    const bool old_style               = section;
+
+    cpcstr ambient_name                = old_style ? "env_ambient"   : "ambient";
+    cpcstr ambient_color_name          = old_style ? "ambient"       : "ambient_color";
+    cpcstr sun_name                    = old_style ? "flares"        : "sun";
+    cpcstr thunderbolt_collection_name = old_style ? "thunderbolt"   : "thunderbolt_collection";
+    cpcstr thunderbolt_duration_name   = old_style ? "bolt_duration" : "thunderbolt_duration";
+    cpcstr thunderbolt_period_name     = old_style ? "bolt_period"   : "thunderbolt_period";
+
     cpcstr identifier = section ? section : m_identifier.c_str();
 
     Ivector3 tm = {0, 0, 0};
@@ -328,15 +336,9 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     clouds_color.mul(.5f * multiplier);
     clouds_color.w = save;
 
-    if (oldStyle)
-    {
-        sky_color = config.r_fvector3(identifier, "sky_color");
+    sky_color = config.r_fvector3(identifier, "sky_color");
+    if (old_style)
         sky_color.mul(0.5f);
-    }
-    else
-    {
-        sky_color = config.r_fvector3(identifier, "sky_color");
-    }
 
     if (config.line_exist(identifier, "sky_rotation"))
         sky_rotation = deg2rad(config.r_float(identifier, "sky_rotation"));
@@ -362,18 +364,11 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
     sun_color = config.r_fvector3(identifier, "sun_color");
 
-    if (oldStyle)
+    ambient = config.r_fvector3(identifier, ambient_color_name);
+    if (config.line_exist(identifier, ambient_name))
     {
-        ambient = pSettings->r_fvector3(identifier, "ambient");
-
-        if (config.line_exist(identifier, "env_ambient"))
-            env_ambient = environment.AppendEnvAmb(config.r_string(identifier, "env_ambient"), pSettings);
-    }
-    else
-    {
-        ambient = config.r_fvector3(identifier, "ambient_color");
-        if (config.line_exist(identifier, "ambient"))
-            env_ambient = environment.AppendEnvAmb(config.r_string(identifier, "ambient"));
+        CInifile const* pIni = &config == pSettings ? pSettings : nullptr;
+        env_ambient = environment.AppendEnvAmb(config.r_string(identifier, ambient_name), pIni);
     }
 
     Fvector2 sunVec{};
@@ -396,27 +391,13 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     clamp(degrees, 0.0f, 360.0f);
     sun_azimuth = deg2rad(degrees);
 
-    if (oldStyle)
-    {
-        lens_flare_id = environment.eff_LensFlare->AppendDef(environment, pSettings,
-            config.r_string(section, "flares"));
-        tb_id = environment.eff_Thunderbolt->AppendDef(environment, pSettings,
-            pSettings, config.r_string(section, "thunderbolt"));
-    }
-    else
-    {
-        lens_flare_id = environment.eff_LensFlare->AppendDef(
-            environment, environment.m_suns_config, config.r_string(identifier, "sun"));
-        tb_id = environment.eff_Thunderbolt->AppendDef(environment, environment.m_thunderbolt_collections_config,
-            environment.m_thunderbolts_config, config.r_string(identifier, "thunderbolt_collection"));
-    }
+    lens_flare = environment.eff_LensFlare->AppendDef(config.r_string(identifier, sun_name));
+    thunderbolt = environment.eff_Thunderbolt->AppendDef(config.r_string(identifier, thunderbolt_collection_name));
 
-    if (tb_id.size())
+    if (thunderbolt)
     {
-        config.read_if_exists(bolt_period, identifier,
-            "thunderbolt_period", "bolt_period", true);
-        config.read_if_exists(bolt_duration, identifier,
-            "thunderbolt_duration", "bolt_duration", true);
+        bolt_period = config.r_float(m_identifier.c_str(), thunderbolt_period_name);
+        bolt_duration = config.r_float(m_identifier.c_str(), thunderbolt_duration_name);
     }
 
     m_fSunShaftsIntensity = config.read_if_exists<float>(identifier, "sun_shafts_intensity", 0.0);
@@ -475,7 +456,7 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
     config.w_float    (identifier, "sky_rotation",              rad2deg(sky_rotation));
     config.w_string   (identifier, "sky_texture",               sky_texture_name.c_str());
 
-    config.w_string   (identifier, sun_name,                    lens_flare_id.c_str());
+    config.w_string   (identifier, sun_name,                    lens_flare->section.c_str());
     config.w_fvector3 (identifier, "sun_color",                 sun_color);
     if (old_style)
     {
@@ -491,7 +472,7 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
     }
     config.w_float    (identifier, "sun_shafts_intensity",      m_fSunShaftsIntensity);
 
-    config.w_string   (identifier, thunderbolt_collection_name, tb_id.c_str());
+    config.w_string   (identifier, thunderbolt_collection_name, thunderbolt ? thunderbolt->section.c_str() : "");
     config.w_float    (identifier, thunderbolt_duration_name,   bolt_duration);
     config.w_float    (identifier, thunderbolt_period_name,     bolt_period);
 
@@ -619,8 +600,8 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     }
     VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while lerp");
 
-    lens_flare_id = f < 0.5f ? A.lens_flare_id : B.lens_flare_id;
-    tb_id = f < 0.5f ? A.tb_id : B.tb_id;
+    lens_flare = f < 0.5f ? A.lens_flare : B.lens_flare;
+    thunderbolt = f < 0.5f ? A.thunderbolt : B.thunderbolt;
     env_ambient = Random.randF() < 1.f - f ? A.env_ambient : B.env_ambient;
 
     if (soc_style)

@@ -76,7 +76,7 @@ FlareDescriptorFields SunFields =
     "sun", "sun_shader", "sun_texture", "sun_radius", "sun_ignore_color"
 };
 
-void CLensFlareDescriptor::load(CInifile const* pIni, pcstr sect)
+void CLensFlareDescriptor::load(CInifile const* pIni, shared_str sect)
 {
     section = sect;
 
@@ -183,6 +183,10 @@ CLensFlare::CLensFlare()
     }
 #endif
 
+    string_path filePath;
+    if (FS.update_path(filePath, "$game_config$", "environment\\suns.ltx", false))
+        m_suns_config = xr_new<CInifile>(filePath, true, true, false);
+
     OnDeviceCreate();
 }
 
@@ -190,6 +194,8 @@ CLensFlare::~CLensFlare()
 {
     OnDeviceDestroy();
     delete_data(m_Palette);
+    CInifile::Destroy(m_suns_config);
+    m_suns_config = nullptr;
 }
 
 #ifndef _EDITOR
@@ -273,7 +279,7 @@ static pcstr state_to_string(const CLensFlare::LFState& state)
 static Fvector2 RayDeltas[CLensFlare::MAX_RAYS] = {
     {0, 0}, {1, 0}, {-1, 0}, {0, -1}, {0, 1},
 };
-void CLensFlare::OnFrame(shared_str id)
+void CLensFlare::OnFrame(const CEnvDescriptorMixer& currentEnv, float time_factor)
 {
     if (dwFrame == Device.dwFrame)
         return;
@@ -283,51 +289,48 @@ void CLensFlare::OnFrame(shared_str id)
 #endif
     dwFrame = Device.dwFrame;
 
-    R_ASSERT(_valid(g_pGamePersistent->Environment().CurrentEnv->sun_dir));
-    vSunDir.mul(g_pGamePersistent->Environment().CurrentEnv->sun_dir, -1);
+    R_ASSERT(_valid(currentEnv.sun_dir));
+    vSunDir.mul(currentEnv.sun_dir, -1);
     R_ASSERT(_valid(vSunDir));
 
     // color
-    float tf = g_pGamePersistent->Environment().fTimeFactor;
-    Fvector& c = g_pGamePersistent->Environment().CurrentEnv->sun_color;
-    LightColor.set(c.x, c.y, c.z, 1.f);
+    {
+        const auto& [x, y, z] = currentEnv.sun_color;
+        LightColor.set(x, y, z, 1.f);
+    }
 
-    CInifile const* pIni = g_pGamePersistent->Environment().m_suns_config;
-    if (!pIni)
-        pIni = pSettings;
-
-    CLensFlareDescriptor* desc = id.size() ? g_pGamePersistent->Environment().add_flare(m_Palette, id, pIni) : nullptr;
+    auto flare = currentEnv.lens_flare;
 
     // LFState previous_state = m_State;
     switch (m_State)
     {
     case lfsNone:
         m_State = lfsShow;
-        m_Current = desc;
+        m_Current = flare;
         break;
     case lfsIdle:
-        if (desc != m_Current)
+        if (flare != m_Current)
             m_State = lfsHide;
         break;
     case lfsShow:
-        m_StateBlend = m_Current ? (m_StateBlend + m_Current->m_StateBlendUpSpeed * Device.fTimeDelta * tf) : 1.f + EPS;
+        m_StateBlend = m_Current ? (m_StateBlend + m_Current->m_StateBlendUpSpeed * Device.fTimeDelta * time_factor) : 1.f + EPS;
         if (m_StateBlend >= 1.f)
             m_State = lfsIdle;
         break;
     case lfsHide:
-        m_StateBlend = m_Current ? (m_StateBlend - m_Current->m_StateBlendDnSpeed * Device.fTimeDelta * tf) : 0.f - EPS;
+        m_StateBlend = m_Current ? (m_StateBlend - m_Current->m_StateBlendDnSpeed * Device.fTimeDelta * time_factor) : 0.f - EPS;
         if (m_StateBlend <= 0.f)
         {
             m_State = lfsShow;
-            m_Current = desc;
-            m_StateBlend = m_Current ? m_Current->m_StateBlendUpSpeed * Device.fTimeDelta * tf : 0;
+            m_Current = flare;
+            m_StateBlend = m_Current ? m_Current->m_StateBlendUpSpeed * Device.fTimeDelta * time_factor : 0;
         }
         break;
     }
     // Msg ("%6d : [%s] -> [%s]", Device.dwFrame, state_to_string(previous_state), state_to_string(m_State));
     clamp(m_StateBlend, 0.f, 1.f);
 
-    if ((m_Current == 0) || (LightColor.magnitude_rgb() == 0.f))
+    if (!m_Current || LightColor.magnitude_rgb() == 0.f)
     {
         bRender = false;
         return;
@@ -536,13 +539,18 @@ void CLensFlare::Render(bool bSun, bool bFlares, bool bGradient)
     m_pRender->Render(*this, bSun, bFlares, bGradient);
 }
 
-shared_str CLensFlare::AppendDef(CEnvironment& environment, CInifile const* pIni, pcstr sect)
+CLensFlareDescriptor* CLensFlare::AppendDef(shared_str sect)
 {
     if (!sect || (0 == sect[0]))
-        return "";
+        return nullptr;
 
-    environment.add_flare(m_Palette, sect, pIni);
-    return sect;
+    for (CLensFlareDescriptor& flare : m_Palette)
+        if (flare.section == sect)
+            return &flare;
+
+    CLensFlareDescriptor& descriptor = m_Palette.emplace_back();
+    descriptor.load(m_suns_config ? m_suns_config : pSettings, sect);
+    return &descriptor;
 }
 
 void CLensFlare::OnDeviceCreate()
@@ -551,15 +559,15 @@ void CLensFlare::OnDeviceCreate()
     m_pRender->OnDeviceCreate();
 
     // palette
-    for (const auto& descr : m_Palette)
-        descr->OnDeviceCreate();
+    for (auto& descr : m_Palette)
+        descr.OnDeviceCreate();
 }
 
 void CLensFlare::OnDeviceDestroy()
 {
     // palette
-    for (const auto& descr : m_Palette)
-        descr->OnDeviceDestroy();
+    for (auto& descr : m_Palette)
+        descr.OnDeviceDestroy();
 
     // VS
     m_pRender->OnDeviceDestroy();

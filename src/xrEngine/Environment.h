@@ -173,8 +173,8 @@ public:
 
     float m_fTreeAmplitudeIntensity;
 
-    shared_str lens_flare_id;
-    shared_str tb_id;
+    CLensFlareDescriptor* lens_flare;
+    SThunderboltCollection* thunderbolt;
 
     CEnvAmbient* env_ambient;
 
@@ -354,9 +354,6 @@ public:
     CInifile* m_ambients_config;
     CInifile* m_sound_channels_config;
     CInifile* m_effects_config;
-    CInifile* m_suns_config;
-    CInifile* m_thunderbolt_collections_config;
-    CInifile* m_thunderbolts_config;
 
 protected:
     virtual CEnvDescriptor* create_descriptor(shared_str const& identifier, CInifile const* config, pcstr section = nullptr);
@@ -369,15 +366,6 @@ protected:
 
     void save_weathers(CInifile* environment_config = nullptr) const;
     void save_weather_effects(CInifile* environment_config = nullptr) const;
-
-public:
-    virtual SThunderboltDesc* thunderbolt_description(const CInifile& config, shared_str const& section);
-    virtual SThunderboltCollection* thunderbolt_collection(
-        CInifile const* pIni, CInifile const* thunderbolts, pcstr section);
-    virtual SThunderboltCollection* thunderbolt_collection(
-        xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
-    virtual CLensFlareDescriptor* add_flare(
-        xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id, CInifile const* pIni);
 };
 
 ENGINE_API extern Flags32 psEnvFlags;
