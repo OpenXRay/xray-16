@@ -15,43 +15,10 @@
 #include "xr_object.h"
 #endif
 
-SThunderboltDesc::~SThunderboltDesc()
-{
-    m_pRender->DestroyModel();
-
-    m_GradientTop->m_pFlare->DestroyShader();
-    m_GradientCenter->m_pFlare->DestroyShader();
-
-    snd.destroy();
-
-    xr_delete(m_GradientTop);
-    xr_delete(m_GradientCenter);
-}
-
-void SThunderboltDesc::create_top_gradient(const CInifile& pIni, shared_str const& sect)
-{
-    m_GradientTop = xr_new<SFlare>();
-    m_GradientTop->shader = pIni.r_string(sect, "gradient_top_shader");
-    m_GradientTop->texture = pIni.r_string(sect, "gradient_top_texture");
-    m_GradientTop->fRadius = pIni.r_fvector2(sect, "gradient_top_radius");
-    m_GradientTop->fOpacity = pIni.r_float(sect, "gradient_top_opacity");
-    m_GradientTop->m_pFlare->CreateShader(*m_GradientTop->shader, *m_GradientTop->texture);
-}
-
-void SThunderboltDesc::create_center_gradient(const CInifile& pIni, shared_str const& sect)
-{
-    m_GradientCenter = xr_new<SFlare>();
-    m_GradientCenter->shader = pIni.r_string(sect, "gradient_center_shader");
-    m_GradientCenter->texture = pIni.r_string(sect, "gradient_center_texture");
-    m_GradientCenter->fRadius = pIni.r_fvector2(sect, "gradient_center_radius");
-    m_GradientCenter->fOpacity = pIni.r_float(sect, "gradient_center_opacity");
-    m_GradientCenter->m_pFlare->CreateShader(*m_GradientCenter->shader, *m_GradientCenter->texture);
-}
-
 SThunderboltDesc::SThunderboltDesc(const CInifile& pIni, shared_str const& sect)
 {
-    create_top_gradient(pIni, sect);
-    create_center_gradient(pIni, sect);
+    m_GradientTop    = create_gradient("gradient_top", pIni, sect);
+    m_GradientCenter = create_gradient("gradient_center", pIni, sect);
 
     name = sect;
     color_anim = LALib.FindItem(pIni.r_string(sect, "color_anim"));
@@ -69,6 +36,27 @@ SThunderboltDesc::SThunderboltDesc(const CInifile& pIni, shared_str const& sect)
     xr_strcpy(tmp, m_name);
     if (m_name && m_name[0])
         snd.create(tmp, st_Effect, sg_Undefined);
+}
+
+SThunderboltDesc::SFlare* SThunderboltDesc::create_gradient(pcstr gradient_name, const CInifile& config, shared_str const& sect)
+{
+    string64 temp;
+    return xr_new<SFlare>(
+        config.r_float(sect, strconcat(temp, gradient_name, "_opacity")),
+        config.r_fvector2(sect, strconcat(temp, gradient_name, "_radius")),
+        config.r_string(sect, strconcat(temp, gradient_name, "_shader")),
+        config.r_string(sect, strconcat(temp, gradient_name, "_texture"))
+    );
+}
+
+SThunderboltDesc::~SThunderboltDesc()
+{
+    m_pRender->DestroyModel();
+
+    snd.destroy();
+
+    xr_delete(m_GradientTop);
+    xr_delete(m_GradientCenter);
 }
 
 //----------------------------------------------------------------------------------------------

@@ -24,16 +24,22 @@ struct ENGINE_API SThunderboltDesc
     // gradient
     struct SFlare
     {
-        float fOpacity;
-        Fvector2 fRadius;
-        shared_str texture;
+        float fOpacity{};
+        Fvector2 fRadius{};
         shared_str shader;
-        // ref_shader hShader;
+        shared_str texture;
+
         FactoryPtr<IFlareRender> m_pFlare;
-        SFlare()
+
+        SFlare() = default;
+        SFlare(float opacity, Fvector2 radius, pcstr sh, pcstr tex)
+            : fOpacity(opacity), fRadius(radius), shader(sh), texture(tex)
         {
-            fOpacity = 0;
-            fRadius.set(0.f, 0.f);
+            m_pFlare->CreateShader(shader.c_str(), texture.c_str());
+        }
+        ~SFlare()
+        {
+            m_pFlare->DestroyShader();
         }
     };
     SFlare* m_GradientTop;
@@ -43,9 +49,8 @@ struct ENGINE_API SThunderboltDesc
 
 public:
     SThunderboltDesc(const CInifile& pIni, shared_str const& sect);
-    virtual ~SThunderboltDesc();
-    virtual void create_top_gradient(const CInifile& pIni, shared_str const& sect);
-    virtual void create_center_gradient(const CInifile& pIni, shared_str const& sect);
+    ~SThunderboltDesc();
+    static SFlare* create_gradient(pcstr gradient_name, const CInifile& config, shared_str const& sect);
 };
 
 struct ENGINE_API SThunderboltCollection
