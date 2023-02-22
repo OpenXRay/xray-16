@@ -190,7 +190,7 @@ float low_cover_in_direction(u32 level_vertex_id, const Fvector& direction)
     return (ai().level_graph().low_cover_in_direction(y, level_vertex_id));
 }
 
-float rain_factor() { return (g_pGamePersistent->Environment().CurrentEnv->rain_density); }
+float rain_factor() { return (g_pGamePersistent->Environment().CurrentEnv.rain_density); }
 u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distance)
 {
     direction.normalize_safe();
@@ -345,7 +345,7 @@ cphysics_world_scripted* physics_world_scripted()
     return get_script_wrapper<cphysics_world_scripted>(*physics_world());
 }
 CEnvironment* environment() { return (g_pGamePersistent->pEnvironment); }
-CEnvDescriptor* current_environment(CEnvironment* self) { return (self->CurrentEnv); }
+CEnvDescriptor* current_environment(CEnvironment* self) { return &self->CurrentEnv; }
 extern bool g_bDisableAllInput;
 void disable_input()
 {

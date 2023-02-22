@@ -102,7 +102,7 @@ void CRenderTarget::phase_combine()
     if (!_menu_pp)
     {
         // Compute params
-        CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
+        const auto& envdesc = g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
         {
@@ -503,7 +503,7 @@ void CRenderTarget::phase_combine_volumetric()
     RCache.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
     {
         // Compute params
-        CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
+        const auto& envdesc = g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
         {

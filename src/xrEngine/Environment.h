@@ -209,7 +209,7 @@ public:
     bool soc_style;
 
 public:
-    CEnvDescriptorMixer(shared_str const& identifier);
+    CEnvDescriptorMixer();
     virtual void lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
         float f, CEnvModifier& M, float m_power);
     void calculate_dynamic_sun_dir(float fGameTime);
@@ -270,7 +270,7 @@ public:
     Fquaternion wind_blast_current;
 
     // Environments
-    CEnvDescriptorMixer* CurrentEnv;
+    CEnvDescriptorMixer CurrentEnv;
     CEnvDescriptor* Current[2];
 
     bool bWFX;
@@ -359,8 +359,6 @@ protected:
     virtual CEnvDescriptor* create_descriptor(shared_str const& identifier, CInifile const* config, pcstr section = nullptr);
     virtual void load_weathers();
     virtual void load_weather_effects();
-    virtual void create_mixer();
-    void destroy_mixer();
 
     void load_level_specific_ambients();
 

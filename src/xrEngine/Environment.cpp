@@ -37,7 +37,7 @@ static const float MAX_NOISE_FREQ = 0.03f;
 
 //////////////////////////////////////////////////////////////////////////
 // environment
-CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
+CEnvironment::CEnvironment() : m_ambients_config(0)
 {
     bWFX = false;
     Current[0] = 0;
@@ -111,8 +111,6 @@ CEnvironment::~CEnvironment()
 
     CInifile::Destroy(m_effects_config);
     m_effects_config = nullptr;
-
-    destroy_mixer();
 }
 
 void CEnvironment::Invalidate()
@@ -213,7 +211,7 @@ void CEnvironment::SetWeather(shared_str name, bool forced)
         {
             CurrentWeather = &it->second;
             CurrentWeatherName = it->first;
-            CurrentEnv->soc_style = CurrentWeather->soc_style;
+            CurrentEnv.soc_style = CurrentWeather->soc_style;
         }
         if (forced)
         {
@@ -243,7 +241,7 @@ bool CEnvironment::SetWeatherFX(shared_str name)
         VERIFY(PrevWeather);
         CurrentWeather = &it->second;
         CurrentWeatherName = it->first;
-        CurrentEnv->soc_style = CurrentWeather->soc_style;
+        CurrentEnv.soc_style = CurrentWeather->soc_style;
 
         float rewind_tm = WFX_TRANS_TIME * fTimeFactor;
         float start_tm = fGameTime + rewind_tm;
@@ -417,8 +415,8 @@ void CEnvironment::lerp()
 
     // final lerp
     const float current_weight = TimeWeight(fGameTime, Current[0]->exec_time, Current[1]->exec_time);
-    CurrentEnv->lerp(*this, *Current[0], *Current[1], current_weight, EM, mpower);
-    m_pRender->lerp(*CurrentEnv, &*Current[0]->m_pDescriptor, &*Current[1]->m_pDescriptor);
+    CurrentEnv.lerp(*this, *Current[0], *Current[1], current_weight, EM, mpower);
+    m_pRender->lerp(CurrentEnv, &*Current[0]->m_pDescriptor, &*Current[1]->m_pDescriptor);
 }
 
 void CEnvironment::OnFrame()
@@ -455,15 +453,7 @@ void CEnvironment::OnFrame()
     PerlinNoise1D->SetFrequency(wind_gust_factor * MAX_NOISE_FREQ);
     wind_strength_factor = clampr(PerlinNoise1D->GetContinious(Device.fTimeGlobal) + 0.5f, 0.f, 1.f);
 
-    eff_LensFlare->OnFrame(*CurrentEnv, fTimeFactor);
-    eff_Thunderbolt->OnFrame(*CurrentEnv);
+    eff_LensFlare->OnFrame(CurrentEnv, fTimeFactor);
+    eff_Thunderbolt->OnFrame(CurrentEnv);
     eff_Rain->OnFrame();
 }
-
-void CEnvironment::create_mixer()
-{
-    VERIFY(!CurrentEnv);
-    CurrentEnv = xr_new<CEnvDescriptorMixer>("00:00:00");
-}
-
-void CEnvironment::destroy_mixer() { xr_delete(CurrentEnv); }

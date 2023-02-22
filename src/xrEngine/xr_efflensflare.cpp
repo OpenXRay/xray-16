@@ -20,7 +20,7 @@
 #include "IGame_Level.h"
 #endif
 
-#define FAR_DIST g_pGamePersistent->Environment().CurrentEnv->far_plane
+#define FAR_DIST g_pGamePersistent->Environment().CurrentEnv.far_plane
 
 //#define MAX_Flares 24
 //////////////////////////////////////////////////////////////////////////////

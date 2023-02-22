@@ -368,9 +368,9 @@ void ide::ShowWeatherEditor()
             ImGui::EndMenuBar();
         }
 
-        auto& current = *env.CurrentEnv;
-        auto& current0 = env.Current[0] ? *env.Current[0] : *env.CurrentEnv;
-        auto& current1 = env.Current[1] ? *env.Current[1] : *env.CurrentEnv;
+        auto& current = env.CurrentEnv;
+        auto& current0 = env.Current[0] ? *env.Current[0] : env.CurrentEnv;
+        auto& current1 = env.Current[1] ? *env.Current[1] : env.CurrentEnv;
         float time_factor = env.fTimeFactor;
 
         if (ImGui::CollapsingHeader("Environment time", ImGuiTreeNodeFlags_DefaultOpen))

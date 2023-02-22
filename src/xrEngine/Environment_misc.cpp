@@ -495,8 +495,8 @@ void CEnvDescriptor::on_device_destroy()
 //-----------------------------------------------------------------------------
 // Environment Mixer
 //-----------------------------------------------------------------------------
-CEnvDescriptorMixer::CEnvDescriptorMixer(shared_str const& identifier)
-    : CEnvDescriptor(identifier), soc_style(false)
+CEnvDescriptorMixer::CEnvDescriptorMixer()
+    : CEnvDescriptor("00:00:00"), soc_style(false)
 {
     use_dynamic_sun_dir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
 }
@@ -950,9 +950,6 @@ void CEnvironment::load_weather_effects()
 
 void CEnvironment::load()
 {
-    if (!CurrentEnv)
-        create_mixer();
-
     if (!eff_Rain)
         eff_Rain = xr_new<CEffect_Rain>();
     if (!eff_LensFlare)
