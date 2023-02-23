@@ -1,0 +1,20 @@
+[options]
+exclude_exts = *.sln,*.vcxproj,*.old,*.rc,*.scc,*.vssscc,*.bmp,*.smf,*.uvm,*.prj,*.tga,*.txt,*.log,*.tmp
+
+[include_folders]
+.\       = false
+configs  = true
+scripts  = true
+shaders  = true
+textures = true
+
+[exclude_folders]
+textures\ed = true
+
+[header]
+auto_load   = true
+level_name  = single
+level_ver   = 1.0
+entry_point = $fs_root$\gamedata\
+creator     = "OpenXRay"
+link        = "github.com/OpenXRay"
