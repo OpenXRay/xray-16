@@ -45,7 +45,7 @@ static int facetable[6][4] =
 //////////////////////////////////////////////////////////////////////////
 void CRender::render_rain()
 {
-    float fRainFactor = g_pGamePersistent->Environment().CurrentEnv->rain_density;
+    float fRainFactor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
     if (fRainFactor < EPS_L)
     {
         RainLight.frame_render = 0;

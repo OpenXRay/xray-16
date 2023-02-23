@@ -2,20 +2,17 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef ThunderboltH
-#define ThunderboltH
 #pragma once
-
-// refs
-class ENGINE_API IRender_DetailModel;
-class ENGINE_API CLAItem;
 
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/LensFlareRender.h"
 #include "Include/xrRender/ThunderboltDescRender.h"
 #include "Include/xrRender/ThunderboltRender.h"
 
-class CEnvironment;
+// refs
+class ENGINE_API IRender_DetailModel;
+class ENGINE_API CLAItem;
+class ENGINE_API CEnvDescriptorMixer;
 
 struct ENGINE_API SThunderboltDesc
 {
@@ -45,9 +42,8 @@ struct ENGINE_API SThunderboltDesc
     CLAItem* color_anim;
 
 public:
-    SThunderboltDesc() = default;
+    SThunderboltDesc(const CInifile& pIni, shared_str const& sect);
     virtual ~SThunderboltDesc();
-    void load(const CInifile& pIni, shared_str const& sect);
     virtual void create_top_gradient(const CInifile& pIni, shared_str const& sect);
     virtual void create_center_gradient(const CInifile& pIni, shared_str const& sect);
 };
@@ -58,9 +54,9 @@ struct ENGINE_API SThunderboltCollection
     DescVec palette;
     shared_str section;
 
-    SThunderboltCollection() = default;
+    SThunderboltCollection(shared_str sect, CInifile const* pIni, CInifile const* thunderbolts);
     ~SThunderboltCollection();
-    void load(CInifile const* pIni, CInifile const* thunderbolts, pcstr sect);
+
     SThunderboltDesc* GetRandomDesc()
     {
         VERIFY(palette.size() > 0);
@@ -75,8 +71,7 @@ class ENGINE_API CEffect_Thunderbolt
     friend class dxThunderboltRender;
 
 protected:
-    using CollectionVec = xr_vector<SThunderboltCollection*>;
-    CollectionVec collection;
+    xr_vector<SThunderboltCollection*> collections;
     SThunderboltDesc* current;
 
 private:
@@ -104,6 +99,9 @@ private:
     float next_lightning_time;
     bool bEnabled;
 
+    CInifile* m_thunderbolt_collections_config{};
+    CInifile* m_thunderbolts_config{};
+
 public:
     static constexpr float MAX_DIST_FACTOR = 0.95f;
 
@@ -119,16 +117,17 @@ public:
 
 private:
     static bool RayPick(const Fvector& s, const Fvector& d, float& range);
-    void Bolt(shared_str id, float period, float life_time);
+    void Bolt(const CEnvDescriptorMixer& currentEnv);
 
 public:
     CEffect_Thunderbolt();
     ~CEffect_Thunderbolt();
 
-    void OnFrame(shared_str id, float period, float duration);
+    void OnFrame(CEnvDescriptorMixer& currentEnv);
     void Render();
 
-    shared_str AppendDef(CEnvironment& environment, CInifile const* pIni, CInifile const* thunderbolts, pcstr sect);
-};
+    SThunderboltCollection* AppendDef(shared_str sect);
 
-#endif // ThunderboltH
+    [[nodiscard]]
+    auto& GetCollections() { return collections; }
+};

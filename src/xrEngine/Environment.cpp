@@ -37,7 +37,7 @@ static const float MAX_NOISE_FREQ = 0.03f;
 
 //////////////////////////////////////////////////////////////////////////
 // environment
-CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
+CEnvironment::CEnvironment() : m_ambients_config(0)
 {
     bWFX = false;
     Current[0] = 0;
@@ -96,9 +96,6 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
     m_ambients_config                = load_config("environment\\ambients.ltx");
     m_sound_channels_config          = load_config("environment\\sound_channels.ltx");
     m_effects_config                 = load_config("environment\\effects.ltx");
-    m_suns_config                    = load_config("environment\\suns.ltx");
-    m_thunderbolt_collections_config = load_config("environment\\thunderbolt_collections.ltx");
-    m_thunderbolts_config            = load_config("environment\\thunderbolts.ltx");
 }
 
 CEnvironment::~CEnvironment()
@@ -114,17 +111,6 @@ CEnvironment::~CEnvironment()
 
     CInifile::Destroy(m_effects_config);
     m_effects_config = nullptr;
-
-    CInifile::Destroy(m_suns_config);
-    m_suns_config = nullptr;
-
-    CInifile::Destroy(m_thunderbolt_collections_config);
-    m_thunderbolt_collections_config = nullptr;
-
-    CInifile::Destroy(m_thunderbolts_config);
-    m_thunderbolts_config = nullptr;
-
-    destroy_mixer();
 }
 
 void CEnvironment::Invalidate()
@@ -225,7 +211,7 @@ void CEnvironment::SetWeather(shared_str name, bool forced)
         {
             CurrentWeather = &it->second;
             CurrentWeatherName = it->first;
-            CurrentEnv->soc_style = CurrentWeather->soc_style;
+            CurrentEnv.soc_style = CurrentWeather->soc_style;
         }
         if (forced)
         {
@@ -255,7 +241,7 @@ bool CEnvironment::SetWeatherFX(shared_str name)
         VERIFY(PrevWeather);
         CurrentWeather = &it->second;
         CurrentWeatherName = it->first;
-        CurrentEnv->soc_style = CurrentWeather->soc_style;
+        CurrentEnv.soc_style = CurrentWeather->soc_style;
 
         float rewind_tm = WFX_TRANS_TIME * fTimeFactor;
         float start_tm = fGameTime + rewind_tm;
@@ -429,8 +415,8 @@ void CEnvironment::lerp()
 
     // final lerp
     const float current_weight = TimeWeight(fGameTime, Current[0]->exec_time, Current[1]->exec_time);
-    CurrentEnv->lerp(*this, *Current[0], *Current[1], current_weight, EM, mpower);
-    m_pRender->lerp(*CurrentEnv, &*Current[0]->m_pDescriptor, &*Current[1]->m_pDescriptor);
+    CurrentEnv.lerp(*this, *Current[0], *Current[1], current_weight, EM, mpower);
+    m_pRender->lerp(CurrentEnv, &*Current[0]->m_pDescriptor, &*Current[1]->m_pDescriptor);
 }
 
 void CEnvironment::OnFrame()
@@ -467,52 +453,7 @@ void CEnvironment::OnFrame()
     PerlinNoise1D->SetFrequency(wind_gust_factor * MAX_NOISE_FREQ);
     wind_strength_factor = clampr(PerlinNoise1D->GetContinious(Device.fTimeGlobal) + 0.5f, 0.f, 1.f);
 
-    eff_LensFlare->OnFrame(CurrentEnv->lens_flare_id);
-    eff_Thunderbolt->OnFrame(CurrentEnv->tb_id, CurrentEnv->bolt_period, CurrentEnv->bolt_duration);
+    eff_LensFlare->OnFrame(CurrentEnv, fTimeFactor);
+    eff_Thunderbolt->OnFrame(CurrentEnv);
     eff_Rain->OnFrame();
-}
-
-void CEnvironment::create_mixer()
-{
-    VERIFY(!CurrentEnv);
-    CurrentEnv = xr_new<CEnvDescriptorMixer>("00:00:00");
-}
-
-void CEnvironment::destroy_mixer() { xr_delete(CurrentEnv); }
-SThunderboltDesc* CEnvironment::thunderbolt_description(const CInifile& config, shared_str const& section)
-{
-    SThunderboltDesc* result = xr_new<SThunderboltDesc>();
-    result->load(config, section);
-    return (result);
-}
-
-SThunderboltCollection* CEnvironment::thunderbolt_collection(CInifile const* pIni, CInifile const* thunderbolts, pcstr section)
-{
-    SThunderboltCollection* result = xr_new<SThunderboltCollection>();
-    result->load(pIni, thunderbolts, section);
-    return (result);
-}
-
-SThunderboltCollection* CEnvironment::thunderbolt_collection(
-    xr_vector<SThunderboltCollection*>& collection, shared_str const& id)
-{
-    for (auto& it : collection)
-        if (it->section == id)
-            return it;
-
-    NODEFAULT;
-    return nullptr;
-}
-
-CLensFlareDescriptor* CEnvironment::add_flare(
-    xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id, CInifile const* pIni)
-{
-    for (const auto& it: collection)
-        if (it->section == id)
-            return it;
-
-    CLensFlareDescriptor* result = xr_new<CLensFlareDescriptor>();
-    result->load(pIni, id.c_str());
-    collection.push_back(result);
-    return result;
 }

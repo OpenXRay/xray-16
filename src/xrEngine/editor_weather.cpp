@@ -7,6 +7,7 @@
 #include "thunderbolt.h"
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
+#include "xr_efflensflare.h"
 
 namespace xray::editor
 {
@@ -122,18 +123,18 @@ void display_property(CEnvDescriptor& descriptor)
     ImGui::PushID(descriptor.m_identifier.c_str());
     if (ImGui::CollapsingHeader("sun##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::BeginCombo("sun##lensflareid", descriptor.lens_flare_id.c_str()))
+        if (ImGui::BeginCombo("sun##lensflareid", descriptor.lens_flare ? descriptor.lens_flare->section.c_str() : ""))
         {
             if (ImGui::Selectable("<edit>", false))
             {
                 window_suns = true;
             }
-            if (ImGui::Selectable("##", descriptor.lens_flare_id.empty()))
-                descriptor.lens_flare_id = "";
-            for (const auto& section : env.m_suns_config->sections())
+            if (ImGui::Selectable("##", !descriptor.lens_flare))
+                descriptor.lens_flare = nullptr;
+            for (auto& desc : env.eff_LensFlare->GetDescriptors())
             {
-                if (ImGui::Selectable(section->Name.c_str(), section->Name == descriptor.lens_flare_id))
-                    descriptor.lens_flare_id = section->Name;
+                if (ImGui::Selectable(desc.section.c_str(), &desc == descriptor.lens_flare))
+                    descriptor.lens_flare = &desc;
             }
             ImGui::EndCombo();
         }
@@ -216,9 +217,11 @@ void display_property(CEnvDescriptor& descriptor)
             {
                 window_ambients = true;
             }
+            if (ImGui::Selectable("##", !descriptor.env_ambient))
+                descriptor.env_ambient = nullptr;
+            const shared_str current = descriptor.env_ambient ? descriptor.env_ambient->name() : nullptr;
             for (const auto& ambient : env.Ambients)
             {
-                shared_str current = descriptor.env_ambient ? descriptor.env_ambient->name() : "";
                 if (ImGui::Selectable(ambient->name().c_str(), ambient->name() == current))
                     descriptor.env_ambient = ambient;
             }
@@ -249,18 +252,18 @@ void display_property(CEnvDescriptor& descriptor)
     }
     if (ImGui::CollapsingHeader("thunderbolts##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::BeginCombo("thunderbolts", descriptor.tb_id.c_str()))
+        if (ImGui::BeginCombo("thunderbolts", descriptor.thunderbolt ? descriptor.thunderbolt->section.c_str() : ""))
         {
             if (ImGui::Selectable("<edit>", false))
             {
                 window_thunderbolts = true;
             }
-            if (ImGui::Selectable("##", descriptor.tb_id.empty()))
-                descriptor.tb_id = "";
-            for (const auto& section : env.m_thunderbolt_collections_config->sections())
+            if (ImGui::Selectable("##", !descriptor.thunderbolt))
+                descriptor.thunderbolt = nullptr;
+            for (const auto& collection : env.eff_Thunderbolt->GetCollections())
             {
-                if (ImGui::Selectable(section->Name.c_str(), section->Name == descriptor.tb_id))
-                    descriptor.tb_id = section->Name;
+                if (ImGui::Selectable(collection->section.c_str(), collection == descriptor.thunderbolt))
+                    descriptor.thunderbolt = collection;
             }
             ImGui::EndCombo();
         }
@@ -270,7 +273,6 @@ void display_property(CEnvDescriptor& descriptor)
 
         ImGui::DragFloat("duration", &descriptor.bolt_duration);
         ImGui::DragFloat("period", &descriptor.bolt_period);
-
     }
     if (ImGui::CollapsingHeader("wind##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
@@ -366,9 +368,9 @@ void ide::ShowWeatherEditor()
             ImGui::EndMenuBar();
         }
 
-        auto& current = *env.CurrentEnv;
-        auto& current0 = env.Current[0] ? *env.Current[0] : *env.CurrentEnv;
-        auto& current1 = env.Current[1] ? *env.Current[1] : *env.CurrentEnv;
+        auto& current = env.CurrentEnv;
+        auto& current0 = env.Current[0] ? *env.Current[0] : env.CurrentEnv;
+        auto& current1 = env.Current[1] ? *env.Current[1] : env.CurrentEnv;
         float time_factor = env.fTimeFactor;
 
         if (ImGui::CollapsingHeader("Environment time", ImGuiTreeNodeFlags_DefaultOpen))

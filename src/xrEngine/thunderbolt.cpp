@@ -48,7 +48,7 @@ void SThunderboltDesc::create_center_gradient(const CInifile& pIni, shared_str c
     m_GradientCenter->m_pFlare->CreateShader(*m_GradientCenter->shader, *m_GradientCenter->texture);
 }
 
-void SThunderboltDesc::load(const CInifile& pIni, shared_str const& sect)
+SThunderboltDesc::SThunderboltDesc(const CInifile& pIni, shared_str const& sect)
 {
     create_top_gradient(pIni, sect);
     create_center_gradient(pIni, sect);
@@ -74,22 +74,23 @@ void SThunderboltDesc::load(const CInifile& pIni, shared_str const& sect)
 //----------------------------------------------------------------------------------------------
 // collection
 //----------------------------------------------------------------------------------------------
-void SThunderboltCollection::load(CInifile const* pIni, CInifile const* thunderbolts, pcstr sect)
+SThunderboltCollection::SThunderboltCollection(shared_str sect, CInifile const* pIni, CInifile const* thunderbolts)
 {
     section = sect;
-    int tb_count = pIni->line_count(sect);
+    const int tb_count = pIni->line_count(sect);
+    palette.reserve(tb_count);
     for (int tb_idx = 0; tb_idx < tb_count; tb_idx++)
     {
         pcstr N, V;
         if (pIni->r_line(sect, tb_idx, &N, &V))
-            palette.push_back(g_pGamePersistent->Environment().thunderbolt_description(*thunderbolts, N));
+            palette.emplace_back(xr_new<SThunderboltDesc>(*thunderbolts, N));
     }
 }
+
 SThunderboltCollection::~SThunderboltCollection()
 {
-    for (auto d_it = palette.begin(); d_it != palette.end(); ++d_it)
-        xr_delete(*d_it);
-
+    for (auto& desc : palette)
+        xr_delete(desc);
     palette.clear();
 }
 
@@ -105,15 +106,20 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
     bEnabled = false;
 
     string_path filePath;
-    pcstr section;
-    CInifile const* config;
-
-    if (FS.update_path(filePath, "$game_config$", "environment\\environment.ltx"))
+    const auto load_config = [&filePath](pcstr path) -> CInifile*
     {
-        section = "environment";
-        config = xr_new<CInifile>(filePath, true, true, false);
-    }
-    else
+        if (FS.update_path(filePath, "$game_config$", path, false))
+            return xr_new<CInifile>(filePath, true, true, false);
+        return nullptr;
+    };
+
+    m_thunderbolt_collections_config = load_config("environment\\thunderbolt_collections.ltx");
+    m_thunderbolts_config = load_config("environment\\thunderbolts.ltx");
+
+    pcstr section = "environment";
+    CInifile const* config = load_config("environment\\environment.ltx");
+
+    if (!config)
     {
         section = "thunderbolt_common";
         config = pSettings;
@@ -142,24 +148,30 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
 
 CEffect_Thunderbolt::~CEffect_Thunderbolt()
 {
-    for (auto d_it = collection.begin(); d_it != collection.end(); ++d_it)
-        xr_delete(*d_it);
+    collections.clear();
 
-    collection.clear();
+    CInifile::Destroy(m_thunderbolt_collections_config);
+    m_thunderbolt_collections_config = nullptr;
+
+    CInifile::Destroy(m_thunderbolts_config);
+    m_thunderbolts_config = nullptr;
 }
 
-shared_str CEffect_Thunderbolt::AppendDef(
-    CEnvironment& environment, CInifile const* pIni, CInifile const* thunderbolts, pcstr sect)
+SThunderboltCollection* CEffect_Thunderbolt::AppendDef(shared_str sect)
 {
     if (!sect || (0 == sect[0]))
-        return "";
+        return nullptr;
 
-    for (const auto item : collection)
+    for (const auto& item : collections)
         if (item->section == sect)
-            return item->section;
+            return item;
 
-    collection.push_back(environment.thunderbolt_collection(pIni, thunderbolts, sect));
-    return collection.back()->section;
+    auto* result = xr_new<SThunderboltCollection>(sect,
+        m_thunderbolt_collections_config ? m_thunderbolt_collections_config : pSettings,
+        m_thunderbolts_config ? m_thunderbolts_config : pSettings
+    );
+
+    return collections.emplace_back(result);
 }
 
 bool CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& range)
@@ -191,26 +203,28 @@ bool CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& ran
 #endif
     return bRes;
 }
-#define FAR_DIST g_pGamePersistent->Environment().CurrentEnv->far_plane
 
-void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
+void CEffect_Thunderbolt::Bolt(const CEnvDescriptorMixer& currentEnv)
 {
-    VERIFY(id.size());
+    VERIFY(currentEnv.thunderbolt);
     state = stWorking;
+    const float lt = currentEnv.bolt_duration;
     life_time = lt + Random.randF(-lt * 0.5f, lt * 0.5f);
     current_time = 0.f;
 
-    current = g_pGamePersistent->Environment().thunderbolt_collection(collection, id)->GetRandomDesc();
+    current = currentEnv.thunderbolt->GetRandomDesc();
     VERIFY(current);
+
+    float sun_h, sun_p;
+    currentEnv.sun_dir.getHP(sun_h, sun_p);
+    const auto far_dist = currentEnv.far_plane;
+    const float period = currentEnv.bolt_period;
 
     Fmatrix XF, S;
     Fvector pos, dev;
-    float sun_h, sun_p;
-    CEnvironment& environment = g_pGamePersistent->Environment();
-    environment.CurrentEnv->sun_dir.getHP(sun_h, sun_p);
     float alt = Random.randF(p_var_alt.x, p_var_alt.y);
     float lng = Random.randF(sun_h - p_var_long + PI, sun_h + p_var_long + PI);
-    float dist = Random.randF(FAR_DIST * p_min_dist, FAR_DIST * .95f);
+    float dist = Random.randF(far_dist * p_min_dist, far_dist * .95f);
     current_direction.setHP(lng, alt);
     pos.mad(Device.vCameraPosition, current_direction, dist);
     dev.x = Random.randF(-p_tilt, p_tilt);
@@ -218,9 +232,9 @@ void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
     dev.z = Random.randF(-p_tilt, p_tilt);
     XF.setXYZi(dev);
 
-    Fvector light_dir = {0.f, -1.f, 0.f};
+    Fvector light_dir = { 0.f, -1.f, 0.f };
     XF.transform_dir(light_dir);
-    lightning_size = FAR_DIST * 2.f;
+    lightning_size = far_dist * 2.f;
     RayPick(pos, light_dir, lightning_size);
 
     lightning_center.mad(pos, light_dir, lightning_size * 0.5f);
@@ -244,18 +258,19 @@ void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
     current_direction.invert(); // for env-sun
 }
 
-void CEffect_Thunderbolt::OnFrame(shared_str id, float period, float duration)
+void CEffect_Thunderbolt::OnFrame(CEnvDescriptorMixer& currentEnv)
 {
-    bool enabled = !!(id.size());
+    const bool enabled = currentEnv.thunderbolt;
     if (bEnabled != enabled)
     {
         bEnabled = enabled;
+        const float period = currentEnv.bolt_period;
         next_lightning_time = Device.fTimeGlobal + period + Random.randF(-period * 0.5f, period * 0.5f);
     }
     else if (bEnabled && (Device.fTimeGlobal > next_lightning_time))
     {
-        if (state == stIdle && !!(id.size()))
-            Bolt(id, period, duration);
+        if (state == stIdle && currentEnv.thunderbolt)
+            Bolt(currentEnv);
     }
     if (state == stWorking)
     {
@@ -271,22 +286,20 @@ void CEffect_Thunderbolt::OnFrame(shared_str id, float period, float duration)
         lightning_phase = 1.5f * (current_time / life_time);
         clamp(lightning_phase, 0.f, 1.f);
 
-        const auto& environment = g_pGamePersistent->Environment();
-
-        Fvector& sky_color = environment.CurrentEnv->sky_color;
+        Fvector& sky_color = currentEnv.sky_color;
         sky_color.mad(fClr, p_sky_color);
         clamp(sky_color.x, 0.f, 1.f);
         clamp(sky_color.y, 0.f, 1.f);
         clamp(sky_color.z, 0.f, 1.f);
 
-        environment.CurrentEnv->sun_color.mad(fClr, p_sun_color);
-        environment.CurrentEnv->fog_color.mad(fClr, p_fog_color);
+        currentEnv.sun_color.mad(fClr, p_sun_color);
+        currentEnv.fog_color.mad(fClr, p_fog_color);
 
         if (GEnv.Render->GenerationIsR2OrHigher())
         {
             R_ASSERT(_valid(current_direction));
-            environment.CurrentEnv->sun_dir = current_direction;
-            VERIFY2(environment.CurrentEnv->sun_dir.y < 0,
+            currentEnv.sun_dir = current_direction;
+            VERIFY2(currentEnv.sun_dir.y < 0,
                 "Invalid sun direction settings while CEffect_Thunderbolt");
         }
     }

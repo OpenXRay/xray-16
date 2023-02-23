@@ -922,8 +922,8 @@ bool CRenderTarget::need_to_render_sunshafts()
         return false;
 
     {
-        CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
-        float fValue = E.m_fSunShaftsIntensity;
+        const auto& env = g_pGamePersistent->Environment().CurrentEnv;
+        const float fValue = env.m_fSunShaftsIntensity;
         // TODO: add multiplication by sun color here
         if (fValue < 0.0001)
             return false;
