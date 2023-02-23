@@ -11,7 +11,7 @@
 
 namespace xray::editor
 {
-static bool window_weathers = false;
+static bool window_weather_cycle = false;
 static bool window_suns = false;
 static bool window_ambients = false;
 static bool window_thunderbolts = false;
@@ -353,7 +353,7 @@ void ide::ShowWeatherEditor()
             }
             if (ImGui::BeginMenu("Windows"))
             {
-                if (ImGui::MenuItem("Weathers", nullptr, &window_weathers))
+                if (ImGui::MenuItem("Weather cycles", nullptr, &window_weather_cycle))
                     ;
                 if (ImGui::MenuItem("Suns", nullptr, &window_suns))
                     ;
@@ -532,5 +532,4 @@ void ShowLevelWeathers()
 
     ImGui::End();
 }
-
 } // namespace xray::editor
