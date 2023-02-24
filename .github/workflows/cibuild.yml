@@ -54,6 +54,12 @@ jobs:
         name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
         path: res/Utils.*.7z
 
+    - name: Upload assets
+      uses: actions/upload-artifact@main
+      with:
+        name: assets (github-${{ github.run_number }})
+        path: openxray.xdb
+
     - name: Update latest-nightly tag
       uses: EndBug/latest-tag@latest
       with:

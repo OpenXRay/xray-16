@@ -36,6 +36,10 @@ copy README.md res\
 rem We don't need MFC stuff which Visual Studio automatically copies
 del /q /f /s "res\bin\mfc*.dll"
 
+:: Make assets archive
+res\bin\utils\xrCompress res\gamedata -ltx datapack.ltx
+move patch.pack_#0 openxray.xdb
+
 rem Make archives
 cd res
 7z a "OpenXRay.%EDITION_NAME%.7z" * -xr!.* -xr!*.pdb -x!bin\utils -x!CMakeLists.txt
