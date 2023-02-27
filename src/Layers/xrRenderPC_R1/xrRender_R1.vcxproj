@@ -39,7 +39,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\Include\xrRender\animation_blend.h" />
     <ClInclude Include="..\..\Include\xrRender\animation_motion.h" />
-    <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h" />
     <ClInclude Include="..\..\Include\xrRender\DebugRender.h" />
     <ClInclude Include="..\..\Include\xrRender\DebugShader.h" />
     <ClInclude Include="..\..\Include\xrRender\DrawUtils.h" />
@@ -93,7 +92,6 @@
     <ClInclude Include="..\xrRender\du_cylinder.h" />
     <ClInclude Include="..\xrRender\du_sphere.h" />
     <ClInclude Include="..\xrRender\du_sphere_part.h" />
-    <ClInclude Include="..\xrRender\dxConsoleRender.h" />
     <ClInclude Include="..\xrRender\dxDebugRender.h" />
     <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
     <ClInclude Include="..\xrRender\dxFontRender.h" />
@@ -223,7 +221,6 @@
     <ClCompile Include="..\xrRender\du_cylinder.cpp" />
     <ClCompile Include="..\xrRender\du_sphere.cpp" />
     <ClCompile Include="..\xrRender\du_sphere_part.cpp" />
-    <ClCompile Include="..\xrRender\dxConsoleRender.cpp" />
     <ClCompile Include="..\xrRender\dxDebugRender.cpp" />
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
     <ClCompile Include="..\xrRender\dxFontRender.cpp" />

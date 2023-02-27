@@ -267,7 +267,7 @@ void CRender::Render()
         m_project.build_projection(
             deg2rad(Device.fFOV/* *Device.fASPECT*/),
             Device.fASPECT, VIEWPORT_NEAR,
-            z_distance * g_pGamePersistent->Environment().CurrentEnv->far_plane);
+            z_distance * g_pGamePersistent->Environment().CurrentEnv.far_plane);
         m_zfill.mul(m_project, Device.mView);
         r_pmask(true, false); // enable priority "0"
         set_Recorder(nullptr);

@@ -115,9 +115,6 @@
     <Filter Include="Interface implementations\EnvironmentRender">
       <UniqueIdentifier>{ccd599e3-f117-4ddd-af5a-dc6d299fb889}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface implementations\ConsoleRender">
-      <UniqueIdentifier>{331a9ab4-feca-4f1d-8d94-1c1ca1d5639f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interface implementations\ObjectSpaceRender">
       <UniqueIdentifier>{b90449f5-b1cc-4f28-ab0a-296a6dc364bb}</UniqueIdentifier>
     </Filter>
@@ -515,12 +512,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h">
       <Filter>Interface implementations\EnvironmentRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h">
-      <Filter>Interface implementations\ConsoleRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\dxConsoleRender.h">
-      <Filter>Interface implementations\ConsoleRender</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\dxObjectSpaceRender.h">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
@@ -1009,9 +1000,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp">
       <Filter>Interface implementations\EnvironmentRender</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\dxConsoleRender.cpp">
-      <Filter>Interface implementations\ConsoleRender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>

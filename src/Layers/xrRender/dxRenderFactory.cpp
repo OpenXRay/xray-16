@@ -6,7 +6,6 @@
 #include "dxLensFlareRender.h"
 #include "dxImGuiRender.h"
 #endif
-#include "dxConsoleRender.h"
 #ifndef _EDITOR
 #include "dxThunderboltRender.h"
 #include "dxThunderboltDescRender.h"
@@ -33,7 +32,6 @@ dxRenderFactory RenderFactoryImpl;
 RENDER_FACTORY_IMPLEMENT(UISequenceVideoItem)
 RENDER_FACTORY_IMPLEMENT(UIShader)
 RENDER_FACTORY_IMPLEMENT(StatGraphRender)
-RENDER_FACTORY_IMPLEMENT(ConsoleRender)
 #ifdef DEBUG
 RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
 #endif // DEBUG
