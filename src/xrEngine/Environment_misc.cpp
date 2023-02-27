@@ -251,7 +251,6 @@ void CEnvAmbient::load(
 //-----------------------------------------------------------------------------
 CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(identifier)
 {
-    old_style = false;
     dont_save = false;
 
     exec_time = 0.0f;
@@ -281,14 +280,15 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
     hemi_color.set(1, 1, 1, 1);
     sun_color.set(1, 1, 1);
     sun_dir.set(0, -1, 0);
+    use_dynamic_sun_dir = true;
 
     m_fSunShaftsIntensity = 0;
     m_fWaterIntensity = 1;
 
-    m_fTreeAmplitudeIntensity = 0.01;
+    m_fTreeAmplitudeIntensity = 0.01f;
 
-    lens_flare_id = "";
-    tb_id = "";
+    lens_flare = nullptr;
+    thunderbolt = nullptr;
 
     env_ambient = nullptr;
 }
@@ -301,13 +301,16 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
 
 void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcstr section /*= nullptr*/)
 {
-    pcstr identifier = m_identifier.c_str();
-    bool oldStyle = false;
-    if (section)
-    {
-        identifier = section;
-        oldStyle = true;
-    }
+    const bool old_style               = section;
+
+    cpcstr ambient_name                = old_style ? "env_ambient"   : "ambient";
+    cpcstr ambient_color_name          = old_style ? "ambient"       : "ambient_color";
+    cpcstr sun_name                    = old_style ? "flares"        : "sun";
+    cpcstr thunderbolt_collection_name = old_style ? "thunderbolt"   : "thunderbolt_collection";
+    cpcstr thunderbolt_duration_name   = old_style ? "bolt_duration" : "thunderbolt_duration";
+    cpcstr thunderbolt_period_name     = old_style ? "bolt_period"   : "thunderbolt_period";
+
+    cpcstr identifier = section ? section : m_identifier.c_str();
 
     Ivector3 tm = {0, 0, 0};
     const int result = sscanf(m_identifier.c_str(), "%d:%d:%d", &tm.x, &tm.y, &tm.z);
@@ -333,15 +336,9 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     clouds_color.mul(.5f * multiplier);
     clouds_color.w = save;
 
-    if (oldStyle)
-    {
-        sky_color = config.r_fvector3(identifier, "sky_color");
+    sky_color = config.r_fvector3(identifier, "sky_color");
+    if (old_style)
         sky_color.mul(0.5f);
-    }
-    else
-    {
-        sky_color = config.r_fvector3(identifier, "sky_color");
-    }
 
     if (config.line_exist(identifier, "sky_rotation"))
         sky_rotation = deg2rad(config.r_float(identifier, "sky_rotation"));
@@ -367,29 +364,17 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
     sun_color = config.r_fvector3(identifier, "sun_color");
 
-    if (oldStyle)
+    ambient = config.r_fvector3(identifier, ambient_color_name);
+    if (config.line_exist(identifier, ambient_name))
     {
-        ambient = pSettings->r_fvector3(identifier, "ambient");
-
-        if (config.line_exist(identifier, "env_ambient"))
-            env_ambient = environment.AppendEnvAmb(config.r_string(identifier, "env_ambient"), pSettings);
-    }
-    else
-    {
-        ambient = config.r_fvector3(identifier, "ambient_color");
-        if (config.line_exist(identifier, "ambient"))
-            env_ambient = environment.AppendEnvAmb(config.r_string(identifier, "ambient"));
+        CInifile const* pIni = &config == pSettings ? pSettings : nullptr;
+        env_ambient = environment.AppendEnvAmb(config.r_string(identifier, ambient_name), pIni);
     }
 
     Fvector2 sunVec{};
 
     if (config.read_if_exists(sunVec, identifier, "sun_dir"))
-    {
-        // What if someone adapted SOC configs and didn't deleted sun_dir?
-        // Try to read optional overriding values.
-        config.read_if_exists(sunVec.y, identifier, "sun_altitude");
-        config.read_if_exists(sunVec.x, identifier, "sun_longitude");
-    }
+        use_dynamic_sun_dir = false;
     else
     {
         sunVec.y = config.r_float(identifier, "sun_altitude");
@@ -400,33 +385,19 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
     R_ASSERT(_valid(sun_dir));
 
     float degrees;
-    if (!config.read_if_exists(degrees, identifier, "sun_dir_azimuth"))
+    if (!config.read_if_exists(degrees, identifier, "sun_azimuth"))
         degrees = pSettingsOpenXRay->read_if_exists<float>("environment", "sun_dir_azimuth", 0.0f);
 
     clamp(degrees, 0.0f, 360.0f);
-    sun_dir_azimuth = deg2rad(degrees);
+    sun_azimuth = deg2rad(degrees);
 
-    if (oldStyle)
-    {
-        lens_flare_id = environment.eff_LensFlare->AppendDef(environment, pSettings,
-            config.r_string(section, "flares"));
-        tb_id = environment.eff_Thunderbolt->AppendDef(environment, pSettings,
-            pSettings, config.r_string(section, "thunderbolt"));
-    }
-    else
-    {
-        lens_flare_id = environment.eff_LensFlare->AppendDef(
-            environment, environment.m_suns_config, config.r_string(identifier, "sun"));
-        tb_id = environment.eff_Thunderbolt->AppendDef(environment, environment.m_thunderbolt_collections_config,
-            environment.m_thunderbolts_config, config.r_string(identifier, "thunderbolt_collection"));
-    }
+    lens_flare = environment.eff_LensFlare->AppendDef(config.r_string(identifier, sun_name));
+    thunderbolt = environment.eff_Thunderbolt->AppendDef(config.r_string(identifier, thunderbolt_collection_name));
 
-    if (tb_id.size())
+    if (thunderbolt)
     {
-        config.read_if_exists(bolt_period, identifier,
-            "thunderbolt_period", "bolt_period", true);
-        config.read_if_exists(bolt_duration, identifier,
-            "thunderbolt_duration", "bolt_duration", true);
+        bolt_period = config.r_float(m_identifier.c_str(), thunderbolt_period_name);
+        bolt_duration = config.r_float(m_identifier.c_str(), thunderbolt_duration_name);
     }
 
     m_fSunShaftsIntensity = config.read_if_exists<float>(identifier, "sun_shafts_intensity", 0.0);
@@ -445,21 +416,25 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
 #undef C_CHECK
 
-void CEnvDescriptor::save(CInifile& config, bool oldStyle /*= false*/) const
+void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
 {
     if (dont_save)
         return;
 
-    cpcstr ambient_name                = oldStyle ? "env_ambient"   : "ambient";
-    cpcstr ambient_color_name          = oldStyle ? "ambient"       : "ambient_color";
-    cpcstr sun_name                    = oldStyle ? "flares"        : "sun";
-    cpcstr thunderbolt_collection_name = oldStyle ? "thunderbolt"   : "thunderbolt_collection";
-    cpcstr thunderbolt_duration_name   = oldStyle ? "bolt_duration" : "thunderbolt_duration";
-    cpcstr thunderbolt_period_name     = oldStyle ? "bolt_period"   : "thunderbolt_period";
+    const bool old_style               = section;
 
-    cpcstr identifier = m_identifier.c_str();
+    cpcstr ambient_name                = old_style ? "env_ambient"   : "ambient";
+    cpcstr ambient_color_name          = old_style ? "ambient"       : "ambient_color";
+    cpcstr hemisphere_color            = old_style ? "hemi_color"    : "hemisphere_color";
+    cpcstr sun_name                    = old_style ? "flares"        : "sun";
+    cpcstr thunderbolt_collection_name = old_style ? "thunderbolt"   : "thunderbolt_collection";
+    cpcstr thunderbolt_duration_name   = old_style ? "bolt_duration" : "thunderbolt_duration";
+    cpcstr thunderbolt_period_name     = old_style ? "bolt_period"   : "thunderbolt_period";
 
-    config.w_string   (identifier, ambient_name,                env_ambient ? env_ambient->name().c_str() : "");
+    cpcstr identifier = section ? section : m_identifier.c_str();
+
+    if (env_ambient)
+        config.w_string(identifier, ambient_name,               env_ambient->name().c_str());
     config.w_fvector3 (identifier, ambient_color_name,          ambient);
 
     config.w_fvector4 (identifier, "clouds_color",              clouds_color);
@@ -472,7 +447,7 @@ void CEnvDescriptor::save(CInifile& config, bool oldStyle /*= false*/) const
     config.w_float    (identifier, "fog_density",               fog_density);
     config.w_float    (identifier, "fog_distance",              fog_distance);
 
-    config.w_fvector4 (identifier, "hemisphere_color",          hemi_color);
+    config.w_fvector4 (identifier, hemisphere_color,            hemi_color);
 
     config.w_fvector3 (identifier, "rain_color",                rain_color);
     config.w_float    (identifier, "rain_density",              rain_density);
@@ -481,23 +456,23 @@ void CEnvDescriptor::save(CInifile& config, bool oldStyle /*= false*/) const
     config.w_float    (identifier, "sky_rotation",              rad2deg(sky_rotation));
     config.w_string   (identifier, "sky_texture",               sky_texture_name.c_str());
 
-    config.w_string   (identifier, sun_name,                    lens_flare_id.c_str());
+    config.w_string   (identifier, sun_name,                    lens_flare->section.c_str());
     config.w_fvector3 (identifier, "sun_color",                 sun_color);
-    if (oldStyle)
+    if (old_style)
     {
-        float h, p;
-        sun_dir.getHP(h, p);
-        config.w_fvector2(identifier, "sun_dir", { rad2deg(p), rad2deg(h) });
+        float altutude, longitude;
+        sun_dir.getHP(altutude, longitude);
+        config.w_fvector2(identifier, "sun_dir", { rad2deg(longitude), rad2deg(altutude) });
     }
     else
     {
         config.w_float(identifier, "sun_altitude",              rad2deg(sun_dir.getH()));
         config.w_float(identifier, "sun_longitude",             rad2deg(sun_dir.getP()));
+        config.w_float(identifier, "sun_azimuth",               sun_azimuth);
     }
-    config.w_float    (identifier, "sun_dir_azimuth",           sun_dir_azimuth);
     config.w_float    (identifier, "sun_shafts_intensity",      m_fSunShaftsIntensity);
 
-    config.w_string   (identifier, thunderbolt_collection_name, tb_id.c_str());
+    config.w_string   (identifier, thunderbolt_collection_name, thunderbolt ? thunderbolt->section.c_str() : "");
     config.w_float    (identifier, thunderbolt_duration_name,   bolt_duration);
     config.w_float    (identifier, thunderbolt_period_name,     bolt_period);
 
@@ -520,23 +495,10 @@ void CEnvDescriptor::on_device_destroy()
 //-----------------------------------------------------------------------------
 // Environment Mixer
 //-----------------------------------------------------------------------------
-CEnvDescriptorMixer::CEnvDescriptorMixer(shared_str const& identifier)
-    : CEnvDescriptor(identifier)
+CEnvDescriptorMixer::CEnvDescriptorMixer()
+    : CEnvDescriptor("00:00:00"), soc_style(false)
 {
     use_dynamic_sun_dir = pSettingsOpenXRay->read_if_exists<bool>("environment", "dynamic_sun_dir", true);
-}
-
-void CEnvDescriptorMixer::destroy()
-{
-    m_pDescriptorMixer->Destroy();
-
-    // Reuse existing code
-    on_device_destroy();
-}
-
-void CEnvDescriptorMixer::clear()
-{
-    m_pDescriptorMixer->Clear();
 }
 
 void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
@@ -544,10 +506,7 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
 {
     const float fi = 1 - f;
 
-    // XXX: it would be nice to lerp this too.
-    old_style = A.old_style;
-
-    m_pDescriptorMixer->lerp(&*A.m_pDescriptor, &*B.m_pDescriptor);
+    exec_time = fi * A.exec_time + f * B.exec_time;
 
     weight = f;
     modif_power = 1.f / (modifier_power + 1); // the environment itself
@@ -627,10 +586,10 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     sun_color.lerp(A.sun_color, B.sun_color, f);
 
      // Igor. Dynamic sun position.
-    if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir && !old_style)
+    if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir)
     {
-        sun_dir_azimuth = (fi * A.sun_dir_azimuth + f * B.sun_dir_azimuth);
-        calculate_dynamic_sun_dir(parent.GetGameTime());
+        sun_azimuth = (fi * A.sun_azimuth + f * B.sun_azimuth);
+        calculate_dynamic_sun_dir(exec_time);
     }
     else
     {
@@ -641,11 +600,11 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     }
     VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while lerp");
 
-    lens_flare_id = f < 0.5f ? A.lens_flare_id : B.lens_flare_id;
-    tb_id = f < 0.5f ? A.tb_id : B.tb_id;
+    lens_flare = f < 0.5f ? A.lens_flare : B.lens_flare;
+    thunderbolt = f < 0.5f ? A.thunderbolt : B.thunderbolt;
     env_ambient = Random.randF() < 1.f - f ? A.env_ambient : B.env_ambient;
 
-    if (old_style)
+    if (soc_style)
     {
         env_color =
         {
@@ -662,6 +621,9 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
         };
     }
 
+    string_path temp_name;
+    sky_texture_name = strconcat(temp_name, A.sky_texture_name.c_str(), "; ", B.sky_texture_name.c_str());
+    clouds_texture_name = strconcat(temp_name, A.clouds_texture_name.c_str(), "; ", B.clouds_texture_name.c_str());
 }
 
 void CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime)
@@ -710,7 +672,7 @@ void CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime)
         cosAZ = (_sin(deg2rad(D)) - _sin(LatitudeR) * _cos(SZA)) / sin_SZA_X_cos_Latitude;
 
     clamp(cosAZ, -1.0f, 1.0f);
-    float AZ = acosf(cosAZ) + sun_dir_azimuth;
+    float AZ = acosf(cosAZ) + sun_azimuth;
 
     const Fvector2 minAngle = Fvector2().set(deg2rad(1.0f), deg2rad(3.0f));
 
@@ -883,14 +845,14 @@ void CEnvironment::load_weathers()
 
             EnvVec& env = WeatherCycles[weatherName];
             env.reserve(envCount);
-            
+            env.soc_style = true;
+
             pcstr executionTime, envSection;
             for (u32 envIdx = 0; envIdx < envCount; ++envIdx)
             {
                 if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
                 {
                     env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
-                    env.back()->old_style = true;
                 }
             }
         }
@@ -958,7 +920,9 @@ void CEnvironment::load_weather_effects()
         if (pSettings->r_line("weather_effects", weatherIdx, &weatherName, &weatherSection))
         {
             EnvVec& env = WeatherFXs[weatherName];
+            env.soc_style = true;
             env.emplace_back(create_descriptor("00:00:00", nullptr));
+            env.back()->dont_save = true;
 
             const u32 envCount = pSettings->line_count(weatherSection);
             pcstr executionTime;
@@ -967,12 +931,12 @@ void CEnvironment::load_weather_effects()
                 if (pSettings->r_line(weatherSection, envIdx, &executionTime, &envSection))
                 {
                     env.emplace_back(create_descriptor(executionTime, pSettings, envSection));
-                    env.back()->old_style = true;
                 }
             }
 
             env.emplace_back(create_descriptor("24:00:00", nullptr));
             env.back()->exec_time_loaded = DAY_LENGTH;
+            env.back()->dont_save = true;
         }
     }
 
@@ -986,11 +950,6 @@ void CEnvironment::load_weather_effects()
 
 void CEnvironment::load()
 {
-    if (!CurrentEnv)
-        create_mixer();
-
-    m_pRender->OnLoad();
-
     if (!eff_Rain)
         eff_Rain = xr_new<CEffect_Rain>();
     if (!eff_LensFlare)
@@ -1029,58 +988,124 @@ void CEnvironment::unload()
     xr_delete(eff_Thunderbolt);
     CurrentWeather = nullptr;
     CurrentWeatherName = nullptr;
-    CurrentEnv->clear();
+    m_pRender->Clear();
     Invalidate();
-
-    m_pRender->OnUnload();
 }
 
-void CEnvironment::save(bool oldStyle /*= false*/) const
+void CEnvironment::ED_Reload()
 {
-    save_weathers(oldStyle);
-    save_weather_effects(oldStyle);
+    unload();
+    load();
+    OnFrame();
 }
 
-void CEnvironment::save_weathers(bool oldStyle /*= false*/) const
+void CEnvironment::save() const
+{
+    string_path environment_config_path;
+    FS.update_path(environment_config_path, "$game_config$", "weathers\\environment.ltx");
+
+    CInifile* environment_config = xr_new<CInifile>(environment_config_path, false, false, false);
+
+    save_weathers(environment_config);
+    save_weather_effects(environment_config);
+
+    CInifile::Destroy(environment_config);
+}
+
+void CEnvironment::save_weathers(CInifile* environment_config /*= nullptr*/) const
 {
     string_path weathers_path;
-    if (oldStyle)
-        FS.update_path(weathers_path, "$game_config$", "weathers");
-    else
-        FS.update_path(weathers_path, "$game_weathers$", "");
+    if (!FS.update_path(weathers_path, "$game_weathers$", "", false))
+        FS.update_path(weathers_path, "$game_config$", "environment\\weathers");
 
+    string_path weathers_path_soc;
+    FS.update_path(weathers_path_soc, "$game_config$", "weathers\\weather_");
+
+    bool should_save_environment_config = false;
     for (const auto& [name, descriptors] : WeatherCycles)
     {
+        const bool soc_style = descriptors.soc_style;
+        string_path weather_sect;
+        if (soc_style && environment_config)
+        {
+            should_save_environment_config = true;
+            strconcat(weather_sect, "sect_weather_", name.c_str());
+            environment_config->w_string("weathers", name.c_str(), weather_sect);
+        }
+
         string_path file_name;
-        strconcat(file_name, weathers_path, name.c_str(), ".ltx");
+        strconcat(file_name, soc_style ? weathers_path_soc : weathers_path,
+            name.c_str(), ".ltx");
 
         CInifile* config = xr_new<CInifile>(file_name, false, false, true);
 
         for (const auto& desc : descriptors)
-            desc->save(*config, oldStyle);
+        {
+            if (desc->dont_save)
+                continue;
+
+            string_path time_sect;
+            if (soc_style)
+            {
+                strconcat(time_sect, "weather_", name.c_str(), "_", desc->m_identifier.c_str());
+                std::replace(time_sect, time_sect + xr_strlen(time_sect), ':', '_');
+                config->w_string(weather_sect, desc->m_identifier.c_str(), time_sect);
+            }
+            desc->save(*config, soc_style ? time_sect : nullptr);
+        }
 
         CInifile::Destroy(config);
     }
+
+    if (should_save_environment_config && environment_config)
+        environment_config->save_at_end(true);
 }
 
-void CEnvironment::save_weather_effects(bool oldStyle /*= false*/) const
+void CEnvironment::save_weather_effects(CInifile* environment_config /*= nullptr*/) const
 {
     string_path effects_path;
-    if (oldStyle)
-        FS.update_path(effects_path, "$game_config$", "weathers");
-    else
-        FS.update_path(effects_path, "$game_weather_effects$", "");
+    if (!FS.update_path(effects_path, "$game_weather_effects$", "", false))
+        FS.update_path(effects_path, "$game_config$", "environment\\weather_effects");
 
+    string_path effects_path_soc;
+    FS.update_path(effects_path_soc, "$game_config$", "weathers\\weather_");
+
+    bool should_save_environment_config = false;
     for (const auto& [name, descriptors] : WeatherFXs)
     {
+        const bool soc_style = descriptors.soc_style;
+        string_path weather_sect;
+        if (soc_style && environment_config)
+        {
+            should_save_environment_config = true;
+            strconcat(weather_sect, "sect_weather_", name.c_str());
+            environment_config->w_string("weather_effects", name.c_str(), weather_sect);
+        }
+
         string_path file_name;
-        strconcat(file_name, effects_path, name.c_str(), ".ltx");
+        strconcat(file_name, soc_style ? effects_path_soc : effects_path,
+            name.c_str(), ".ltx");
 
         CInifile* config = xr_new<CInifile>(file_name, false, false, true);
 
         for (const auto& desc : descriptors)
-            desc->save(*config, oldStyle);
+        {
+            if (desc->dont_save)
+                continue;
+
+            string_path time_sect;
+            if (soc_style)
+            {
+                strconcat(time_sect, "weather_", name.c_str(), "_", desc->m_identifier.c_str());
+                std::replace(time_sect, time_sect + xr_strlen(time_sect), ':', '_');
+                config->w_string(weather_sect, desc->m_identifier.c_str(), time_sect);
+            }
+            desc->save(*config, soc_style ? time_sect : nullptr);
+        }
 
         CInifile::Destroy(config);
     }
+
+    if (should_save_environment_config && environment_config)
+        environment_config->save_at_end(true);
 }

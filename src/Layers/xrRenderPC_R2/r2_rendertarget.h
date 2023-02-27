@@ -71,10 +71,6 @@ public:
     ref_texture t_LUM_src; // source
     ref_texture t_LUM_dest; // destination & usage for current frame
 
-    // env
-    ref_texture t_envmap_0; // env-0
-    ref_texture t_envmap_1; // env-1
-
     // smap
     ref_rt rt_smap_surf; // 32bit,		color
     ref_rt rt_smap_depth; // 24(32) bit,	depth

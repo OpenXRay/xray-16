@@ -17,13 +17,13 @@
 #include "xrSE_Factory_import_export.h"
 #include "script_properties_list_helper.h"
 
-extern CSE_Abstract* F_entity_Create(LPCSTR section);
+extern CSE_Abstract* F_entity_Create(LPCSTR section, bool no_assert);
 
 extern CScriptPropertiesListHelper* g_property_list_helper;
 extern XRay::Module prop_helper_module;
 
 extern "C" {
-FACTORY_API IServerEntity* create_entity(LPCSTR section) { return F_entity_Create(section); }
+FACTORY_API IServerEntity* create_entity(LPCSTR section) { return F_entity_Create(section, true); }
 FACTORY_API void destroy_entity(IServerEntity*& abstract)
 {
     auto object = smart_cast<CSE_Abstract*>(abstract);

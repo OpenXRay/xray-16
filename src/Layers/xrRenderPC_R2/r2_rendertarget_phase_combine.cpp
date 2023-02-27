@@ -102,7 +102,7 @@ void CRenderTarget::phase_combine()
     if (!_menu_pp)
     {
         // Compute params
-        CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
+        const auto& envdesc = g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
         {
@@ -171,16 +171,6 @@ void CRenderTarget::phase_combine()
         pv->set(hclip(_w + EPS, _w), hclip(EPS, _h), p1.x, p0.y, 0, scale_X, 0);
         pv++;
         RCache.Vertex.Unlock(4, g_combine_VP->vb_stride);
-
-        dxEnvDescriptorMixerRender& envdescren = *(dxEnvDescriptorMixerRender*)(&*envdesc.m_pDescriptorMixer);
-
-        // Setup textures
-        ID3DBaseTexture* e0 = _menu_pp ? 0 : envdescren.sky_r_textures_env[0].second->surface_get();
-        ID3DBaseTexture* e1 = _menu_pp ? 0 : envdescren.sky_r_textures_env[1].second->surface_get();
-        t_envmap_0->surface_set(e0);
-        _RELEASE(e0);
-        t_envmap_1->surface_set(e1);
-        _RELEASE(e1);
 
         // Draw
         RCache.set_Element(s_combine->E[0]);
@@ -513,7 +503,7 @@ void CRenderTarget::phase_combine_volumetric()
     RCache.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
     {
         // Compute params
-        CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
+        const auto& envdesc = g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
         {

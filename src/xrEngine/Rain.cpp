@@ -58,10 +58,10 @@ void CEffect_Rain::Born(Item& dest, float radius)
     Fvector axis;
     axis.set(0, -1, 0);
     float gust = g_pGamePersistent->Environment().wind_strength_factor / 10.f;
-    float k = g_pGamePersistent->Environment().CurrentEnv->wind_velocity * gust / drop_max_wind_vel;
+    float k = g_pGamePersistent->Environment().CurrentEnv.wind_velocity * gust / drop_max_wind_vel;
     clamp(k, 0.f, 1.f);
     float pitch = drop_max_angle * k - PI_DIV_2;
-    axis.setHP(g_pGamePersistent->Environment().CurrentEnv->wind_direction, pitch);
+    axis.setHP(g_pGamePersistent->Environment().CurrentEnv.wind_direction, pitch);
 
     Fvector& view = Device.vCameraPosition;
     float angle = ::Random.randF(0, PI_MUL_2);
@@ -121,7 +121,7 @@ void CEffect_Rain::OnFrame()
         return;
 
     // Parse states
-    float factor = g_pGamePersistent->Environment().CurrentEnv->rain_density;
+    float factor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
     static float hemi_factor = 0.f;
 #ifndef _EDITOR
     IGameObject* E = g_pGameLevel->CurrentViewEntity();
