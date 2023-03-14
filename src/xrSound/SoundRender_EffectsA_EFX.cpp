@@ -153,7 +153,7 @@ void CSoundRender_EffectsA_EFX::commit()
      * effectively copies the effect properties. You can modify or delete the
      * effect object afterward without affecting the effect slot.
      */
-    A_CHK(alAuxiliaryEffectSlotf(slot, AL_EFFECTSLOT_GAIN, 0.5f));
+    A_CHK(alAuxiliaryEffectSlotf(slot, AL_EFFECTSLOT_GAIN, 0.f));
     A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, true));
     alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_EFFECT, effect);
     if (const ALenum err = alGetError(); err == AL_NO_ERROR)
