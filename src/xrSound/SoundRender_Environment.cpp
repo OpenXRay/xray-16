@@ -187,7 +187,7 @@ bool CSoundRender_Environment::load(IReader* fs)
         if (version > 0x0003)
             Environment = fs->r_u32();
 #if defined(XR_HAS_EFX)
-        DecayHFLimit = fs->r_float();
+        DecayHFLimit = fs->r_u32();
         EchoTime = fs->r_float();
         EchoDepth = fs->r_float();
         ReflectionsPan = fs->r_vec3();
@@ -225,7 +225,7 @@ void CSoundRender_Environment::save(IWriter* fs)
     fs->w_float(AirAbsorptionHF);
     fs->w_u32(Environment);
 #if defined(XR_HAS_EFX)
-    fs->w_float(DecayHFLimit);
+    fs->w_u32(DecayHFLimit);
     fs->w_float(EchoTime);
     fs->w_float(EchoDepth);
     fs->w_fvector3(ReflectionsPan);
