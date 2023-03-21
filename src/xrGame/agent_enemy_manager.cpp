@@ -613,9 +613,9 @@ void CAgentEnemyManager::distribute_enemies()
 
 void CAgentEnemyManager::remove_links(IGameObject* object)
 {
+    VERIFY(object);
     m_wounded.erase(std::remove_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& wounded_enemy)
     {
-        VERIFY(object);
         return wounded_enemy.first == object || wounded_enemy.second.first == object->ID();
     }), m_wounded.end());
 }
@@ -634,24 +634,33 @@ ALife::_OBJECT_ID CAgentEnemyManager::wounded_processor(const CEntityAlive* obje
     return (ALife::_OBJECT_ID(-1));
 }
 
+class find_wounded_predicate
+{
+    const CEntityAlive* m_object;
+
+public:
+    find_wounded_predicate(const CEntityAlive* object)
+    {
+        m_object = object;
+        VERIFY(m_object);
+    }
+
+    bool operator()(const CAgentEnemyManager::WOUNDED_ENEMY& enemy) const
+    {
+        return (enemy.first == m_object);
+    }
+};
+
 void CAgentEnemyManager::wounded_processor(const CEntityAlive* object, const ALife::_OBJECT_ID& wounded_processor_id)
 {
-    VERIFY(object);
-    VERIFY(std::find_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& enemy)
-    {
-        return enemy.first == object;
-    }) == m_wounded.end());
+    VERIFY(std::find_if(m_wounded.begin(), m_wounded.end(), find_wounded_predicate(object)) == m_wounded.end());
     m_wounded.emplace_back(object, std::make_pair(wounded_processor_id, false));
 }
 
 void CAgentEnemyManager::wounded_processed(const CEntityAlive* object, bool value)
 {
     VERIFY(value);
-    VERIFY(object);
-    WOUNDED_ENEMIES::iterator I = std::find_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& enemy)
-    {
-        return enemy.first == object;
-    });
+    WOUNDED_ENEMIES::iterator I = std::find_if(m_wounded.begin(), m_wounded.end(), find_wounded_predicate(object));
     if (I == m_wounded.end())
         return;
     VERIFY((*I).second.first != ALife::_OBJECT_ID(-1));
@@ -661,11 +670,8 @@ void CAgentEnemyManager::wounded_processed(const CEntityAlive* object, bool valu
 
 bool CAgentEnemyManager::wounded_processed(const CEntityAlive* object) const
 {
-    VERIFY(object);
-    WOUNDED_ENEMIES::const_iterator I = std::find_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& enemy)
-    {
-        return enemy.first == object;
-    });
+    WOUNDED_ENEMIES::const_iterator I =
+        std::find_if(m_wounded.begin(), m_wounded.end(), find_wounded_predicate(object));
     if (I == m_wounded.end())
         return (false);
     return ((*I).second.second);
