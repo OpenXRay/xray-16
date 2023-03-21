@@ -34,7 +34,6 @@ private:
     CRandom random; // non-atomic intentionally, possible data-races can make it even more random
 
 private:
-    static void task_worker_entry(void* this_ptr);
     ICN void TaskWorkerStart();
 
     [[nodiscard]] Task* TryToSteal(TaskWorker* thief);

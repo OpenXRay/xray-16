@@ -220,7 +220,11 @@ TaskManager::TaskManager()
     workers.reserve(threads);
     for (u32 i = 0; i < threads; ++i)
     {
-        Threading::SpawnThread(task_worker_entry, "Task Worker", 0, this);
+        Threading::SpawnThread([](void* this_ptr)
+        {
+            TaskManager& self = *static_cast<TaskManager*>(this_ptr);
+            self.TaskWorkerStart();
+        }, "Task Worker", 0, this);
     }
     CalcIterations();
     while (threads != workersCount.load(std::memory_order_consume))
@@ -247,12 +251,6 @@ TaskManager::~TaskManager()
         worker->event.Set();
 
     s_main_thread_worker = nullptr;
-}
-
-void TaskManager::task_worker_entry(void* this_ptr)
-{
-    TaskManager& self = *static_cast<TaskManager*>(this_ptr);
-    self.TaskWorkerStart();
 }
 
 void TaskManager::SetThreadStatus(bool active)
