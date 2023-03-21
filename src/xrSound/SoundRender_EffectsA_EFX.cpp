@@ -33,7 +33,7 @@ CSoundRender_EffectsA_EFX::CSoundRender_EffectsA_EFX()
 
     alGenEffects(1, &effect);
 
-    ALfloat f3[3] = {0.f, 0.f, 0.f};
+    constexpr ALfloat f3[3] = { 0.f, 0.f, 0.f };
     alEffecti(effect, AL_EFFECT_TYPE, AL_EFFECT_EAXREVERB);
     alEffectf(effect, AL_EAXREVERB_DENSITY, AL_EAXREVERB_DEFAULT_DENSITY);
     alEffectf(effect, AL_EAXREVERB_DIFFUSION, AL_EAXREVERB_DEFAULT_DIFFUSION);
@@ -155,11 +155,6 @@ void CSoundRender_EffectsA_EFX::commit()
      */
     A_CHK(alAuxiliaryEffectSlotf(slot, AL_EFFECTSLOT_GAIN, 0.f));
     A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, true));
-    alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_EFFECT, effect);
-    if (const ALenum err = alGetError(); err == AL_NO_ERROR)
-    {
-        VERIFY(err == AL_NO_ERROR);
-        Msg("! %s:: error, effect not loaded (0x%d)", __FUNCTION__, err);
-    }
+    A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_EFFECT, effect));
 }
 #endif // XR_HAS_EFX

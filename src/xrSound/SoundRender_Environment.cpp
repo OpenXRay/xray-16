@@ -3,17 +3,8 @@
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#define OPENAL
-#include  <eax/eax.h>
 #include "SoundRender_EffectsA_EAX.h"
-#endif
-
-#if __has_include(<openal/efx.h>)
-#   include <openal/efx.h>
-#   include "SoundRender_EffectsA_EFX.h"
-#endif
-
+#include "SoundRender_EffectsA_EFX.h"
 
 CSoundRender_Environment::CSoundRender_Environment()
 {

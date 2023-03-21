@@ -30,8 +30,6 @@ class CSoundRender_EffectsA_EFX : public CSoundRender_Effects
 
     bool m_is_supported{}; // Boolean variable to indicate presence of EFX Extension
 
-private:
-
 public:
     CSoundRender_EffectsA_EFX();
     ~CSoundRender_EffectsA_EFX() override;
