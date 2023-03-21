@@ -82,6 +82,7 @@ public:
 public:
     [[nodiscard]] size_t GetWorkersCount() const;
     [[nodiscard]] size_t GetActiveWorkersCount() const;
+    [[nodiscard]] static size_t GetCurrentWorkerID();
     void GetStats(size_t& allocated, size_t& allocatedWithFallback, size_t& pushed, size_t& finished);
 };
 

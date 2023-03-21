@@ -163,6 +163,7 @@ public:
     std::atomic<TaskWorker*> steal_from{};
     std::atomic_bool sleeps{};
     Event event;
+    size_t id;
 } static thread_local s_tl_worker;
 
 static TaskWorker* s_main_thread_worker = nullptr;
@@ -213,6 +214,7 @@ void CalcIterations()
 TaskManager::TaskManager()
 {
     s_main_thread_worker = &s_tl_worker;
+    s_main_thread_worker->id = 0;
 
     const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
     workers.reserve(threads);
@@ -288,6 +290,7 @@ void TaskManager::TaskWorkerStart()
     {
         ScopeLock scope(&workersLock);
         workers.emplace_back(&s_tl_worker);
+        s_tl_worker.id = workers.size();
     }
     workersCount.fetch_add(1, std::memory_order_release);
     activeWorkersCount.fetch_add(1, std::memory_order_relaxed);
@@ -521,6 +524,11 @@ size_t TaskManager::GetWorkersCount() const
 size_t TaskManager::GetActiveWorkersCount() const
 {
     return activeWorkersCount.load(std::memory_order_relaxed) + OTHER_THREADS_COUNT;
+}
+
+size_t TaskManager::GetCurrentWorkerID()
+{
+    return s_tl_worker.id;
 }
 
 void TaskManager::GetStats(size_t& allocated, size_t& allocatedWithFallback, size_t& pushed, size_t& finished)
