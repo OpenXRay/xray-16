@@ -381,14 +381,14 @@ void CPHElement::PhDataUpdate(dReal step)
     if (!isActive())
         return;
 
-	if (isFixed())
-	{
-		dBodySetLinearVel(m_body,0,0,0);
-		dBodySetAngularVel(m_body,0,0,0);
-		dBodySetForce(m_body,0,0,0);
-		dBodySetTorque(m_body,0,0,0);
-		return;
-	}
+    if (isFixed())
+    {
+        dBodySetLinearVel(m_body,0,0,0);
+        dBodySetAngularVel(m_body,0,0,0);
+        dBodySetForce(m_body,0,0,0);
+        dBodySetTorque(m_body,0,0,0);
+        return;
+    }
 
 ///////////////skip for disabled elements////////////////////////////////////////////////////////////
 // b_enabled_onstep=!!dBodyIsEnabled(m_body);
@@ -1487,29 +1487,29 @@ void CPHElement::set_ApplyByGravity(bool flag)
 bool CPHElement::get_ApplyByGravity() { return (!!dBodyGetGravityMode(m_body)); }
 void CPHElement::Fix()
 {
-	if (isFixed())
-		return;
+    if (isFixed())
+        return;
 
-	dBodySetNoUpdatePosMode(m_body, 1);
-	m_flags.set(flFixed, TRUE);
+    dBodySetNoUpdatePosMode(m_body, 1);
+    m_flags.set(flFixed, TRUE);
 
-	FixBody(m_body);
+    FixBody(m_body);
 }
 
 void CPHElement::SetAnimated(bool v) { m_flags.set(flAnimated, BOOL(v)); }
 void CPHElement::ReleaseFixed()
 {
-	if (!isFixed())
-		return;
+    if (!isFixed())
+        return;
 
-	dBodySetNoUpdatePosMode(m_body, 0);
-	m_flags.set(flFixed, FALSE);
+    dBodySetNoUpdatePosMode(m_body, 0);
+    m_flags.set(flFixed, FALSE);
 
-	if (!isActive())
-		return;
+    if (!isActive())
+        return;
 
-	dBodySetMass(m_body, &m_mass);
-	dBodySetGravityMode(m_body, 1);
+    dBodySetMass(m_body, &m_mass);
+    dBodySetGravityMode(m_body, 1);
 }
 void CPHElement::applyGravityAccel(const Fvector& accel)
 {

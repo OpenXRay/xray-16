@@ -810,7 +810,6 @@ int dBodyGetNoUpdatePosMode (dBodyID b)
   return ((b->flags & dxBodyNoUpdatePos) == 0);
 }
 
-
 // body auto-disable functions
 
 dReal dBodyGetAutoDisableLinearThreshold (dBodyID b)

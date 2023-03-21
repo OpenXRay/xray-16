@@ -497,9 +497,8 @@ void dInternalStepIsland_x1 (dxWorld *world, dxBody * const *body, int nb,
 # ifdef TIMING
   dTimerNow ("update position");
 # endif
-  for (i=0; i<nb; i++)
-  {
-    if((body[i]->flags & dxBodyNoUpdatePos)==0)
+  for (i=0; i<nb; i++) {
+    if ((body[i]->flags & dxBodyNoUpdatePos)==0)
         dxStepBody (body[i],stepsize);
   }
 
