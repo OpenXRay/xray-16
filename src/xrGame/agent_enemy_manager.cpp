@@ -636,9 +636,9 @@ ALife::_OBJECT_ID CAgentEnemyManager::wounded_processor(const CEntityAlive* obje
 
 void CAgentEnemyManager::wounded_processor(const CEntityAlive* object, const ALife::_OBJECT_ID& wounded_processor_id)
 {
+    VERIFY(object);
     VERIFY(std::find_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& enemy)
     {
-        VERIFY(object);
         return enemy.first == object;
     }) == m_wounded.end());
     m_wounded.emplace_back(object, std::make_pair(wounded_processor_id, false));
@@ -647,9 +647,9 @@ void CAgentEnemyManager::wounded_processor(const CEntityAlive* object, const ALi
 void CAgentEnemyManager::wounded_processed(const CEntityAlive* object, bool value)
 {
     VERIFY(value);
+    VERIFY(object);
     WOUNDED_ENEMIES::iterator I = std::find_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& enemy)
     {
-        VERIFY(object);
         return enemy.first == object;
     });
     if (I == m_wounded.end())
@@ -661,9 +661,9 @@ void CAgentEnemyManager::wounded_processed(const CEntityAlive* object, bool valu
 
 bool CAgentEnemyManager::wounded_processed(const CEntityAlive* object) const
 {
+    VERIFY(object);
     WOUNDED_ENEMIES::const_iterator I = std::find_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& enemy)
     {
-        VERIFY(object);
         return enemy.first == object;
     });
     if (I == m_wounded.end())
