@@ -169,9 +169,13 @@ void CSoundRender_Environment::clamp()
 bool CSoundRender_Environment::load(IReader* fs)
 {
     version = fs->r_u32();
-    if (version >= 0x0003)
+    if (version < 0x0003)
+        return false;
+
+    // if (version >= 0x0003)
     {
         fs->r_stringZ(name);
+
         Room = fs->r_float();
         RoomHF = fs->r_float();
         RoomRolloffFactor = fs->r_float();
@@ -184,26 +188,28 @@ bool CSoundRender_Environment::load(IReader* fs)
         EnvironmentSize = fs->r_float();
         EnvironmentDiffusion = fs->r_float();
         AirAbsorptionHF = fs->r_float();
-        if (version > 0x0003)
-            Environment = fs->r_u32();
-#if defined(XR_HAS_EFX)
+    }
+
+    if (version >= 0x0004)
+        Environment = fs->r_u32();
+
+    if (version >= 0x0005)
+    {
         DecayHFLimit = fs->r_u32();
         EchoTime = fs->r_float();
         EchoDepth = fs->r_float();
         ReflectionsPan = fs->r_vec3();
         ReverbDelay = fs->r_float();
         ReverbPan = fs->r_vec3();
-        DecayHFRatio = fs->r_float();
         DecayLFRatio = fs->r_float();
         ModulationTime = fs->r_float();
         ModulationDepth = fs->r_float();
         HFReference = fs->r_float();
         LFReference = fs->r_float();
         Density = fs->r_float();
-#endif
-        return true;
     }
-    return false;
+
+    return true;
 }
 
 void CSoundRender_Environment::save(IWriter* fs)
@@ -215,7 +221,7 @@ void CSoundRender_Environment::save(IWriter* fs)
     fs->w_float(RoomHF);
     fs->w_float(RoomRolloffFactor);
     fs->w_float(DecayTime);
-    fs->w_float(DecayLFRatio);
+    fs->w_float(DecayHFRatio);
     fs->w_float(Reflections);
     fs->w_float(ReflectionsDelay);
     fs->w_float(Reverb);
@@ -223,22 +229,25 @@ void CSoundRender_Environment::save(IWriter* fs)
     fs->w_float(EnvironmentSize);
     fs->w_float(EnvironmentDiffusion);
     fs->w_float(AirAbsorptionHF);
-    fs->w_u32(Environment);
-#if defined(XR_HAS_EFX)
-    fs->w_u32(DecayHFLimit);
-    fs->w_float(EchoTime);
-    fs->w_float(EchoDepth);
-    fs->w_fvector3(ReflectionsPan);
-    fs->w_float(ReverbDelay);
-    fs->w_fvector3(ReverbPan);
-    fs->w_float(DecayHFRatio);
-    fs->w_float(DecayLFRatio);
-    fs->w_float(ModulationTime);
-    fs->w_float(ModulationDepth);
-    fs->w_float(HFReference);
-    fs->w_float(LFReference);
-    fs->w_float(Density);
-#endif
+
+    if (sdef_env_version >= 0x0004)
+        fs->w_u32(Environment);
+        
+    if (sdef_env_version >= 0x0005)
+    {
+        fs->w_u32(DecayHFLimit);
+        fs->w_float(EchoTime);
+        fs->w_float(EchoDepth);
+        fs->w_fvector3(ReflectionsPan);
+        fs->w_float(ReverbDelay);
+        fs->w_fvector3(ReverbPan);
+        fs->w_float(DecayLFRatio);
+        fs->w_float(ModulationTime);
+        fs->w_float(ModulationDepth);
+        fs->w_float(HFReference);
+        fs->w_float(LFReference);
+        fs->w_float(Density);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
