@@ -536,10 +536,10 @@ void CRender::Calculate()
                 lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)
-            std::sort(lstRenderables.begin(), lstRenderables.end(), [](auto* s1, auto* s2)
+            std::sort(lstRenderables.begin(), lstRenderables.end(), [](ISpatial* s1, ISpatial* s2)
             {
-                float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-                float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
                 return d1 < d2;
             });
 

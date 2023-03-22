@@ -23,7 +23,7 @@ Lock UCalc_Mutex
 //////////////////////////////////////////////////////////////////////
 u16 CKinematics::LL_BoneID(LPCSTR B)
 {
-    accel::iterator I = std::lower_bound(bone_map_N->begin(), bone_map_N->end(), B, [](const auto& N, LPCSTR B)
+    const auto I = std::lower_bound(bone_map_N->begin(), bone_map_N->end(), B, [](const auto& N, pcstr B)
     {
         return xr_strcmp(*N.first, B) < 0;
     });
@@ -36,7 +36,7 @@ u16 CKinematics::LL_BoneID(LPCSTR B)
 
 u16 CKinematics::LL_BoneID(const shared_str& B)
 {
-    accel::iterator I = std::lower_bound(bone_map_P->begin(), bone_map_P->end(), B, [](const auto& N, const auto& B)
+    const auto I = std::lower_bound(bone_map_P->begin(), bone_map_P->end(), B, [](const auto& N, const shared_str& B)
     {
         return N.first._get() < B._get();
     });
@@ -754,7 +754,7 @@ void CKinematics::CalculateWallmarks(bool hud)
         }
         if (need_remove)
         {
-            auto new_end = std::remove_if(wallmarks.begin(), wallmarks.end(), [](const auto x)
+            const auto new_end = std::remove_if(wallmarks.begin(), wallmarks.end(), [](const intrusive_ptr<CSkeletonWallmark> x)
             {
                 return x == nullptr;
             });

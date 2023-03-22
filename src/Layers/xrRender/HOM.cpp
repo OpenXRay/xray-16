@@ -177,15 +177,15 @@ void CHOM::Render_DB(CFrustum& base)
     auto end = xrc.r_get()->end();
 
     Fvector COP = Device.vCameraPosition;
-    end = std::remove_if(it, end, [this](const auto& _1)
+    end = std::remove_if(it, end, [this](const CDB::RESULT& _1)
     {
-        occTri& T = m_pTris[_1.id];
+        const occTri& T = m_pTris[_1.id];
         return T.skip > Device.dwFrame;
     });
-    std::sort(it, end, [this, COP](const auto& _1, const auto& _2)
+    std::sort(it, end, [this, &COP](const CDB::RESULT& _1, const CDB::RESULT& _2)
     {
-        occTri& t0 = m_pTris[_1.id];
-        occTri& t1 = m_pTris[_2.id];
+        const occTri& t0 = m_pTris[_1.id];
+        const occTri& t1 = m_pTris[_2.id];
         return COP.distance_to_sqr(t0.center) < COP.distance_to_sqr(t1.center);
     });
 

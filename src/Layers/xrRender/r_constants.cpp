@@ -19,8 +19,10 @@ struct search_entry
 
 R_constant_table::~R_constant_table() { RImplementation.Resources->_DeleteConstantTable(this); }
 void R_constant_table::fatal(LPCSTR S) { FATAL(S); }
-// predicate lambda
-auto p_sort = [](const auto& C1, const auto& C2) { return xr_strcmp(C1->name, C2->name) < 0; };
+
+// predicates
+IC bool p_sort(const ref_constant& C1, const ref_constant C2) { return xr_strcmp(C1->name, C2->name) < 0; }
+
 ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/)
 {
     // assumption - sorted by name

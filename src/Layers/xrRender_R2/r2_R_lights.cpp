@@ -34,10 +34,10 @@ void CRender::render_lights(light_Package& LP)
         for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
             LP_smap_pool.initialize(RImplementation.o.smapsize);
-            std::sort(source.begin(), source.end(), [](auto* l1, auto* l2)
+            std::sort(source.begin(), source.end(), [](light* l1, light* l2)
             {
-                u32 a0 = l1->X.S.size;
-                u32 a1 = l2->X.S.size;
+                const u32 a0 = l1->X.S.size;
+                const u32 a1 = l2->X.S.size;
                 return a0 > a1; // reverse -> descending
             });
             for (size_t test = 0; test < source.size(); ++test)

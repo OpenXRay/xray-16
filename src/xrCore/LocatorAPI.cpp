@@ -799,7 +799,7 @@ bool CLocatorAPI::Recurse(pcstr path)
     size_t newSize = rec_files.size();
     if (newSize > oldSize)
     {
-        std::sort(rec_files.begin() + oldSize, rec_files.end(), [](const auto& x, const auto& y)
+        std::sort(rec_files.begin() + oldSize, rec_files.end(), [](const _finddata_t& x, const _finddata_t& y)
         {
             return xr_strcmp(x.name, y.name) < 0;
         });

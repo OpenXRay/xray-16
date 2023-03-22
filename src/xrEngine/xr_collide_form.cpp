@@ -37,7 +37,7 @@ void CCF_Skeleton::SElement::center(Fvector& center) const
 
 bool CCF_Skeleton::_ElementCenter(u16 elem_id, Fvector& e_center)
 {
-    auto it = std::lower_bound(elements.begin(), elements.end(), elem_id, [](const auto& E, u16 elem)
+    const auto it = std::lower_bound(elements.begin(), elements.end(), elem_id, [](const SElement& E, u16 elem)
     {
         return E.elem_id < elem;
     });

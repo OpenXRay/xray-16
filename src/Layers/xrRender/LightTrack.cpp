@@ -541,7 +541,7 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
         }
 #endif
         // Sort lights by importance - important for R1-shadows
-        std::sort(lights.begin(), lights.end(), [](const auto& L1, const auto& L2)
+        std::sort(lights.begin(), lights.end(), [](const Light& L1, const Light& L2)
         {
             return L1.energy > L2.energy;
         });

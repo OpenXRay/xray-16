@@ -8,8 +8,8 @@
 #include "editors/ECore/Editor/ui_main.h"
 #endif
 
-auto ped_sort_pred = [](const PS::CPEDef* a, const PS::CPEDef* b) { return xr_strcmp(a->Name(), b->Name()) < 0; };
-auto pgd_sort_pred = [](const PS::CPGDef* a, const PS::CPGDef* b) { return xr_strcmp(a->m_Name, b->m_Name) < 0; };
+bool ped_sort_pred(const PS::CPEDef* a, const PS::CPEDef* b) { return xr_strcmp(a->Name(), b->Name()) < 0; }
+bool pgd_sort_pred(const PS::CPGDef* a, const PS::CPGDef* b) { return xr_strcmp(a->m_Name, b->m_Name) < 0; }
 //----------------------------------------------------
 void CPSLibrary::OnCreate()
 {
@@ -51,7 +51,7 @@ PS::PEDIt CPSLibrary::FindPEDIt(LPCSTR Name)
             return it;
     return m_PEDs.end();
 #else
-    PS::PEDIt I = std::lower_bound(m_PEDs.begin(), m_PEDs.end(), Name, [](const auto* a, LPCSTR b)
+    PS::PEDIt I = std::lower_bound(m_PEDs.begin(), m_PEDs.end(), Name, [](const PS::CPEDef* a, pcstr b)
     {
         return xr_strcmp(a->Name(), b) < 0;
     });
@@ -77,7 +77,7 @@ PS::PGDIt CPSLibrary::FindPGDIt(LPCSTR Name)
             return it;
     return m_PGDs.end();
 #else
-    PS::PGDIt I = std::lower_bound(m_PGDs.begin(), m_PGDs.end(), Name, [](const auto* a, LPCSTR b)
+    PS::PGDIt I = std::lower_bound(m_PGDs.begin(), m_PGDs.end(), Name, [](const PS::CPGDef* a, pcstr b)
     {
         return xr_strcmp(a->m_Name, b) < 0;
     });
