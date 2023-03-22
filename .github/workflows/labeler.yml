@@ -1,14 +1,34 @@
 name: "Pull Request Labeler"
+
 on:
 - pull_request_target
 
+runs-on: ubuntu-latest
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
-  triage:
-    permissions:
-      contents: read
-      pull-requests: write
-    runs-on: ubuntu-latest
+  new:
+    if: github.event.pull_request.opened == true || github.event.pull_request.reopened == true
     steps:
     - uses: actions/labeler@v4.0.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        configuration-path: .github/labeler_on_new_pr.yml
+  pr:
+    steps:
+    - uses: actions/labeler@v4.0.2
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+  approved:
+    on:
+      pull_request_review:
+        types: submitted
+    if: github.event.review.state == 'approved'
+    steps:
+    - uses: actions/labeler@v4.0.2
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        configuration-path: .github/labeler_on_pr_approved.yml
