@@ -355,8 +355,8 @@ bool CAI_Stalker::can_take(CInventoryItem const* item)
     bool new_weapon_enough_ammo = enough_ammo(new_weapon);
     u32 new_weapon_rank = get_rank(new_weapon->cNameSect());
 
-    for (const auto& item : inventory().m_all)
-        if (conflicted(item, new_weapon, new_weapon_enough_ammo, new_weapon_rank))
+    for (const auto& existing_item : inventory().m_all)
+        if (conflicted(existing_item, new_weapon, new_weapon_enough_ammo, new_weapon_rank))
             return (false);
 
     return (true);
@@ -427,8 +427,6 @@ void CAI_Stalker::on_after_take(const CGameObject* object)
     if (!new_weapon)
         return;
 
-    TIItemContainer::iterator I = inventory().m_all.begin();
-    TIItemContainer::iterator E = inventory().m_all.end();
-    for (; I != E; ++I)
-        update_conflicted(*I, new_weapon);
+    for (const auto& item : inventory().m_all)
+        update_conflicted(item, new_weapon);
 }
