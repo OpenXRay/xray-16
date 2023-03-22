@@ -201,7 +201,6 @@ public:
 
 public:
     CEnvDescriptorMixer(shared_str const& identifier);
-    virtual ~CEnvDescriptorMixer() = default;
     virtual void lerp(
         CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& M, float m_power);
     void clear();

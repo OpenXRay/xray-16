@@ -150,7 +150,7 @@ public:
     void RemoveKeyMapChangeWatcher(pureKeyMapChanged* watcher);
 
     CInput(const bool exclusive = true);
-    virtual ~CInput();
+    ~CInput();
 
     virtual void OnFrame();
     virtual void OnAppActivate();

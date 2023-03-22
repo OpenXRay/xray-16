@@ -88,7 +88,7 @@ class CPPEffectorController : public CPPEffectorCustomController<CPPEffectorCont
 {
 public:
     CPPEffectorController();
-    virtual ~CPPEffectorController();
+    ~CPPEffectorController() override;
 
     virtual void frame_update();
 

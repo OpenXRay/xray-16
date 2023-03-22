@@ -10,7 +10,7 @@ namespace award_system
 class ammunition_group
 {
 public:
-    enum enum_group_id
+    enum enum_group_id : u16
     {
         gid_knife = 0x00,
         gid_pistols,
@@ -24,7 +24,7 @@ public:
         gid_hand_grenades,
         gid_cool_weapons,
     }; // enum_group_id
-    static u16 const gid_any = u16(-1);
+    static u16 constexpr gid_any = u16(-1);
 
     ammunition_group();
     ~ammunition_group();
