@@ -155,43 +155,63 @@ bool Manager::item_upgrades_exist(shared_str const& item_id)
     return true;
 }
 
+class check_upgraded_inventory_section
+{
+    const CInifile::Sect* inv_section{};
+
+public:
+    check_upgraded_inventory_section(pcstr items_section)
+    {
+        if (pSettings->section_exist(items_section))
+            inv_section = &pSettings->r_section(items_section);
+    }
+
+    [[nodiscard]]
+    bool add_anyway(shared_str const& item_id) const
+    {
+        if (!inv_section)
+            return false;
+
+        const auto ib = inv_section->Data.begin();
+        const auto ie = inv_section->Data.end();
+
+        const auto it = std::find_if(ib, ie, [&](const CInifile::Item& item)
+        {
+            return item.first == item_id;
+        });
+
+        return it != ie;
+    }
+};
+
 void Manager::load_all_inventory()
 {
-    LPCSTR items_section = "upgraded_inventory";
-
-    if (!pSettings->section_exist(items_section) && ShadowOfChernobylMode)
-        return;
-
-    VERIFY2(pSettings->section_exist(items_section), make_string("Section [%s] does not exist !", items_section));
-    VERIFY2(pSettings->line_count(items_section), make_string("Section [%s] is empty !", items_section));
+    constexpr pcstr items_section = "upgraded_inventory";
 
     if (g_upgrades_log == 1)
     {
         Msg("# Inventory upgrade manager is loaded.");
     }
 
-    CInifile::Sect& inv_section = pSettings->r_section(items_section);
-    auto ib = inv_section.Data.begin();
-    auto ie = inv_section.Data.end();
-    for (; ib != ie; ++ib)
+    const check_upgraded_inventory_section inv_section{ items_section };
+
+    // Alundaio: No longer the need to define upgradeable sections in [upgraded_inventory]
+    // Xottab_DUTY: But still follow original COP behaviour, i.e. add section anyway if it is defined in [upgraded_inventory]
+    for (const auto& section : pSettings->sections())
     {
-        shared_str root_id((*ib).first);
-        //		if ( !item_upgrades_exist( root_id ) ) continue;
-        item_upgrades_exist(root_id);
-        add_root(root_id);
+        const auto& name = section->Name;
+
+        if (item_upgrades_exist(name) || inv_section.add_anyway(name))
+        {
+            add_root(name);
+        }
     }
+    //-Alundaio
 
     if (g_upgrades_log == 1)
     {
         Msg("# Upgrades of inventory items loaded.");
     }
-
-    /*
-    float low, high; ///? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    LPCSTR param = "cost";
-    compute_range( param, low ,high );
-    Msg( "Parameter <%s> min = %.3f, max = %.3f", param, low, high );
-    */
 }
 
 void Manager::load_all_properties()

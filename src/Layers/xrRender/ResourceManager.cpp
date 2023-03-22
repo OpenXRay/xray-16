@@ -356,7 +356,7 @@ void CResourceManager::Delete(const Shader* S)
 
 void CResourceManager::DeferredUpload()
 {
-    if (!RDEVICE.b_is_Ready)
+    if (!Device.b_is_Ready)
         return;
 
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -371,7 +371,7 @@ void CResourceManager::DeferredUpload()
 
 void CResourceManager::DeferredUnload()
 {
-    if (!RDEVICE.b_is_Ready)
+    if (!Device.b_is_Ready)
         return;
 
 #if defined(USE_DX9) || defined(USE_DX11)

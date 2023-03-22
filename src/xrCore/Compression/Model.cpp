@@ -37,7 +37,7 @@ inline TMP_TYPE CLAMP(const TMP_TYPE& X, const TMP_TYPE& LoX, const TMP_TYPE& Hi
 //==============================================================================
 // SEE-contexts for PPM-contexts with masked symbols
 
-#pragma pack(1)
+#pragma pack(push, 1)
 struct SEE2_CONTEXT
 {
     u16 Summ;
@@ -97,7 +97,7 @@ struct PPM_CONTEXT
     void read(_PPMD_FILE* fp, u32 PrevSym);
 };
 PPM_CONTEXT _PACK_ATTR* MaxContext;
-#pragma pack()
+#pragma pack(pop)
 
 static u8 NS2BSIndx[256], QTable[260]; // constants
 static PPM_CONTEXT::STATE* FoundState; // found next state transition

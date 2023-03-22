@@ -9,14 +9,17 @@
 #include "pch_script.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 void get_matrix_hpb(Fmatrix* self, float* h, float* p, float* b) { self->getHPB(*h, *p, *b); }
 void matrix_transform(Fmatrix* self, Fvector* v) { self->transform(*v); }
-SCRIPT_EXPORT(Fmatrix, (), {
+
+SCRIPT_EXPORT(Fmatrix, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
     module(luaState)
-        [class_<Fmatrix>("matrix")
+    [
+        class_<Fmatrix>("matrix")
                 .def_readwrite("i", &Fmatrix::i)
                 .def_readwrite("_14_", &Fmatrix::_14_)
                 .def_readwrite("j", &Fmatrix::j)

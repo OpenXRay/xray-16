@@ -18,17 +18,6 @@ using System::Windows::Forms::GridItem;
 using Flobbster::Windows::Forms::PropertyBag;
 typedef PropertyBag::PropertySpecDescriptor PropertySpecDescriptor;
 
-void window_view::custom_init(window_ide % ide)
-{
-    SuspendLayout();
-
-    m_ide = % ide;
-    m_engine = &ide.engine();
-    m_loaded = false;
-
-    ResumeLayout();
-}
-
 void window_view::on_load_finished()
 {
     if (m_loaded)

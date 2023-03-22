@@ -39,12 +39,13 @@ IC const xr_vector<u32>& CSpaceRestrictionAbstract::accessible_neighbour_border(
 template <typename T>
 IC bool CSpaceRestrictionAbstract::accessible_neighbours(T& restriction, u32 level_vertex_id, bool out_restriction)
 {
+    const auto& levelGraph = ai().level_graph();
     CLevelGraph::const_iterator I, E;
-    ai().level_graph().begin(level_vertex_id, I, E);
+    levelGraph.begin(level_vertex_id, I, E);
     for (; I != E; ++I)
     {
-        u32 current = ai().level_graph().value(level_vertex_id, I);
-        if (!ai().level_graph().valid_vertex_id(current))
+        u32 current = levelGraph.value(level_vertex_id, I);
+        if (!levelGraph.valid_vertex_id(current))
             continue;
 
         if (restriction->inside(current, !out_restriction) != out_restriction)

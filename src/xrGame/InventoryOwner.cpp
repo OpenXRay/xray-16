@@ -464,6 +464,11 @@ CCustomOutfit* CInventoryOwner::GetOutfit() const
     return smart_cast<CCustomOutfit*>(inventory().ItemFromSlot(OUTFIT_SLOT));
 }
 
+CBackpack* CInventoryOwner::GetBackpack() const
+{
+    return smart_cast<CBackpack*>(inventory().ItemFromSlot(BACKPACK_SLOT));
+}
+
 void CInventoryOwner::on_weapon_shot_start(CWeapon* weapon) {}
 void CInventoryOwner::on_weapon_shot_update() {}
 void CInventoryOwner::on_weapon_shot_stop() {}

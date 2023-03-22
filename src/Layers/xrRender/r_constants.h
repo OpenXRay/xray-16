@@ -172,7 +172,7 @@ struct ECORE_API R_constant : public xr_resource
 typedef resptr_core<R_constant, resptr_base<R_constant>> ref_constant;
 
 // Automatic constant setup
-class ECORE_API R_constant_setup
+class ECORE_API XR_NOVTABLE R_constant_setup
 {
 public:
     R_constant_setup() = default;

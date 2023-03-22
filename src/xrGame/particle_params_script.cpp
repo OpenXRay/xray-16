@@ -10,12 +10,16 @@
 #include "particle_params.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
+SCRIPT_EXPORT(CParticleParams, (),
+{
+    using namespace luabind;
 
-SCRIPT_EXPORT(CParticleParams, (), {
-    module(luaState)[class_<CParticleParams>("particle_params")
-                         .def(constructor<>())
-                         .def(constructor<const Fvector&>())
-                         .def(constructor<const Fvector&, const Fvector&>())
-                         .def(constructor<const Fvector&, const Fvector&, const Fvector&>())];
+    module(luaState)
+    [
+        class_<CParticleParams>("particle_params")
+            .def(constructor<>())
+            .def(constructor<const Fvector&>())
+            .def(constructor<const Fvector&, const Fvector&>())
+            .def(constructor<const Fvector&, const Fvector&, const Fvector&>())
+    ];
 });

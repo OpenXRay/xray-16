@@ -299,7 +299,7 @@ void CDetailManager::UpdateVisibleM()
                 }
 #endif
                 // Add to visibility structures
-                if (RDEVICE.dwFrame > S.frame)
+                if (Device.dwFrame > S.frame)
                 {
                     // Calc fade factor (per slot)
                     float dist_sq = EYE.distance_to_sqr(S.vis.sphere.P);
@@ -309,7 +309,7 @@ void CDetailManager::UpdateVisibleM()
                     float alpha_i = 1.f - alpha;
                     float dist_sq_rcp = 1.f / dist_sq;
 
-                    S.frame = RDEVICE.dwFrame + Random.randI(15, 30);
+                    S.frame = Device.dwFrame + Random.randI(15, 30);
                     for (int sp_id = 0; sp_id < dm_obj_in_slot; sp_id++)
                     {
                         SlotPart& sp = S.G[sp_id];
@@ -397,7 +397,7 @@ void CDetailManager::Render()
 
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
     RImplementation.BasicStats.DetailRender.End();
-    m_frame_rendered = RDEVICE.dwFrame;
+    m_frame_rendered = Device.dwFrame;
 }
 
 void CDetailManager::MT_CALC()
@@ -414,8 +414,8 @@ void CDetailManager::MT_CALC()
     EYE = Device.vCameraPosition;
 
     MT.Enter();
-    if (m_frame_calc != RDEVICE.dwFrame)
-        if ((m_frame_rendered + 1) == RDEVICE.dwFrame) // already rendered
+    if (m_frame_calc != Device.dwFrame)
+        if ((m_frame_rendered + 1) == Device.dwFrame) // already rendered
         {
             int s_x = iFloor(EYE.x / dm_slot_size + .5f);
             int s_z = iFloor(EYE.z / dm_slot_size + .5f);
@@ -425,7 +425,7 @@ void CDetailManager::MT_CALC()
             RImplementation.BasicStats.DetailCache.End();
 
             UpdateVisibleM();
-            m_frame_calc = RDEVICE.dwFrame;
+            m_frame_calc = Device.dwFrame;
         }
     MT.Leave();
 }

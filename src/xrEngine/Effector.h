@@ -1,6 +1,6 @@
 #pragma once
+
 #include "CameraDefs.h"
-#include "xrCore/xrCore_benchmark_macros.h"
 #include "device.h"
 
 class ENGINE_API CEffectorCam : public SBaseEffector
@@ -31,7 +31,6 @@ public:
     bool GetHudAffect() { return bHudAffect; }
     IC ECamEffectorType GetType() { return eType; }
     virtual bool Valid() { return fLifeTime > 0.0f; }
-    BENCH_SEC_SCRAMBLEVTBL1
 
     virtual bool ProcessCam(SCamEffectorInfo& info)
     {

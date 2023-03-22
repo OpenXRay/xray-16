@@ -764,13 +764,13 @@ void CAI_Stalker::update_object_handler()
             CObjectHandler::update();
         }
 #ifdef DEBUG
-        catch (luabind::cast_failed& message)
+        catch (const luabind::cast_failed& message)
         {
             Msg("! Expression \"%s\" from luabind::object to %s", message.what(), message.info().name());
             throw;
         }
 #endif
-        catch (std::exception& message)
+        catch (const std::exception& message)
         {
             Msg("! Expression \"%s\"", message.what());
             throw;
@@ -1075,13 +1075,13 @@ void CAI_Stalker::Think()
     brain().update(update_delta);
 //		}
 #ifdef DEBUG
-//		catch (luabind::cast_failed &message) {
+//		catch (const luabind::cast_failed &message) {
 //			Msg						("! Expression \"%s\" from luabind::object to
 //%s",message.what(),message.info().name());
 // throw;
 //		}
 #endif
-//		catch (std::exception &message) {
+//		catch (const std::exception &message) {
 //			Msg						("! Expression \"%s\"",message.what());
 //			throw;
 //		}
@@ -1107,13 +1107,13 @@ void CAI_Stalker::Think()
     movement().update(update_delta);
 //	}
 #if 0 // def DEBUG
-	catch (luabind::cast_failed &message) {
+	catch (const luabind::cast_failed& message) {
 		Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info().name());
 		movement().initialize	();
 		movement().update		(update_delta);
 		throw;
 	}
-	catch (std::exception &message) {
+	catch (const std::exception& message) {
 		Msg						("! Expression \"%s\"",message.what());
 		movement().initialize	();
 		movement().update		(update_delta);
@@ -1259,7 +1259,7 @@ void CAI_Stalker::on_after_change_team()
     agent_manager().member().register_in_combat(this);
 }
 
-float CAI_Stalker::shedule_Scale()
+float CAI_Stalker::shedule_Scale() const
 {
     if (!sniper_update_rate())
         return (inherited::shedule_Scale());
@@ -1332,3 +1332,23 @@ bool CAI_Stalker::can_fire_right_now()
 }
 
 bool CAI_Stalker::unlimited_ammo() { return infinite_ammo() && CObjectHandler::planner().object().g_Alive(); }
+
+void CAI_Stalker::ResetBoneProtections(pcstr imm_sect, pcstr bone_sect)
+{
+    IKinematics* pKinematics = smart_cast<IKinematics*>(Visual());
+    CInifile* ini = pKinematics->LL_UserData();
+    if (ini)
+    {
+        if (imm_sect || ini->section_exist("immunities"))
+        {
+            imm_sect = imm_sect ? imm_sect : ini->r_string("immunities", "immunities_sect");
+            conditions().LoadImmunities(imm_sect, pSettings);
+        }
+
+        if (bone_sect || ini->line_exist("bone_protection", "bones_protection_sect"))
+        {
+            bone_sect = ini->r_string("bone_protection", "bones_protection_sect");
+            m_boneHitProtection->reload(bone_sect, pKinematics);
+        }
+    }
+}

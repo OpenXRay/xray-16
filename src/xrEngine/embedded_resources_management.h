@@ -11,10 +11,10 @@ inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
     const size_t pitch = source->pitch;
     const size_t size = pitch * source->h;
 
-    // XXX: get rid of alloca usage, possible stack overflow
+    // XXX: get rid of xr_alloca usage, possible stack overflow
     //auto original = new u8(size);
 
-    auto original = static_cast<u8*>(alloca(size));
+    auto original = static_cast<u8*>(xr_alloca(size));
     CopyMemory(original, source->pixels, size);
 
     auto flipped = static_cast<u8*>(source->pixels) + size;
@@ -83,7 +83,7 @@ inline xr_vector<SDL_Surface*> ExtractSplashScreen()
 {
     // XXX: that's the place, where splash frames can be added
     // Animated splash screen!
-    SDL_Surface* surface = ExtractBitmap(IDB_BITMAP1);
+    SDL_Surface* surface = ExtractBitmap(IDB_SPLASH);
 
     if (surface)
         return { surface };
@@ -120,13 +120,13 @@ inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
     SDL_Surface* surface = nullptr;
     switch (iconIdx)
     {
-    case IDI_COP:
+    case IDI_ICON_COP:
         surface = SDL_LoadBMP("icon_cop.bmp");
         break;
-    case IDI_CS:
+    case IDI_ICON_CS:
         surface = SDL_LoadBMP("icon_cs.bmp");
         break;
-    case IDI_SOC:
+    case IDI_ICON_SOC:
         surface = SDL_LoadBMP("icon_soc.bmp");
         break;
     }

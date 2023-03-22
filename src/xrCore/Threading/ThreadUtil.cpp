@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ThreadUtil.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <pthread.h>
 #endif
 
@@ -98,7 +98,7 @@ void CloseThreadHandle(ThreadHandle& threadHandle)
         threadHandle = nullptr;
     }
 }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 ThreadId GetCurrThreadId() { return pthread_self(); }
 
 ThreadHandle GetCurrentThreadHandle() { return pthread_self(); }

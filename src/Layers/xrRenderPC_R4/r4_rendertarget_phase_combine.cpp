@@ -126,7 +126,7 @@ void CRenderTarget::phase_combine()
     {
         PIX_EVENT(combine_1);
         // Compute params
-        CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
+        CEnvDescriptorMixer& envdesc = g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
         {
@@ -137,28 +137,12 @@ void CRenderTarget::phase_combine()
         };
         ambclr.mul(ps_r2_sun_lumscale_amb);
 
-        Fvector4 envclr;
-        if (envdesc.old_style)
-        {
-            envclr =
-            {
-                envdesc.sky_color.x * 2 + EPS, envdesc.sky_color.y * 2 + EPS,
-                envdesc.sky_color.z * 2 + EPS, envdesc.weight
-            };
-        }
-        else
-        {
-            envclr =
-            {
-                envdesc.hemi_color.x * 2 + EPS, envdesc.hemi_color.y * 2 + EPS,
-                envdesc.hemi_color.z * 2 + EPS, envdesc.weight
-            };
-        }
-
-        Fvector4 fogclr = {envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0};
+        Fvector4 envclr = envdesc.env_color;
         envclr.x *= 2 * ps_r2_sun_lumscale_hemi;
         envclr.y *= 2 * ps_r2_sun_lumscale_hemi;
         envclr.z *= 2 * ps_r2_sun_lumscale_hemi;
+
+        Fvector4 fogclr = {envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0};
         Fvector4 sunclr, sundir;
 
         float fSSAONoise = 2.0f;
@@ -220,16 +204,6 @@ void CRenderTarget::phase_combine()
         pv->set(1, -1, 1, 0, 0, scale_X, 0);
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
-
-        dxEnvDescriptorMixerRender& envdescren = *(dxEnvDescriptorMixerRender*)(&*envdesc.m_pDescriptorMixer);
-
-        // Setup textures
-        ID3DBaseTexture* e0 = _menu_pp ? 0 : envdescren.sky_r_textures_env[0].second->surface_get();
-        ID3DBaseTexture* e1 = _menu_pp ? 0 : envdescren.sky_r_textures_env[1].second->surface_get();
-        t_envmap_0->surface_set(e0);
-        _RELEASE(e0);
-        t_envmap_1->surface_set(e1);
-        _RELEASE(e1);
 
         // Draw
         RCache.set_Element(s_combine->E[0]);

@@ -2,7 +2,7 @@
 
 class ICollisionForm;
 
-class ICollidable
+class XR_NOVTABLE ICollidable
 {
 public:
     virtual ~ICollidable() = 0;
@@ -10,9 +10,11 @@ public:
     virtual ICollisionForm* GetCForm() const = 0;
 };
 
-inline ICollidable::~ICollidable() {}
+inline ICollidable::~ICollidable() = default;
+
 // XXX: merge into IGameObject
-class ENGINE_API CollidableBase : public virtual ICollidable
+// XXX: can't be NOVTABLE because of dynamic_cast in the constructor.. Fix some day
+class ENGINE_API /*XR_NOVTABLE*/ CollidableBase : public virtual ICollidable
 {
 public:
     CollidableBase();

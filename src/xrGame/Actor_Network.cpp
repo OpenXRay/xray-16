@@ -821,7 +821,7 @@ bool CActor::net_Relevant() // relevant for export to server
 {
     if (OnServer())
     {
-        return getSVU() | getLocal();
+        return getSVU() || getLocal();
     }
     else
     {

@@ -6,8 +6,8 @@ struct SBoneProtections;
 
 class CHelmet : public CInventoryItemObject
 {
-private:
-    typedef CInventoryItemObject inherited;
+    friend void CHelmet_Export(lua_State* luaState);
+    using inherited = CInventoryItemObject;
 
 public:
     CHelmet();

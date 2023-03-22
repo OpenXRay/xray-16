@@ -69,7 +69,6 @@ void CROS_impl::add(light* source)
     L.energy = 0.f;
 }
 
-IC bool pred_energy(const CROS_impl::Light& L1, const CROS_impl::Light& L2) { return L1.energy > L2.energy; }
 //////////////////////////////////////////////////////////////////////////
 #pragma warning(push)
 #pragma warning(disable : 4305)
@@ -197,7 +196,7 @@ void CROS_impl::update(IRenderable* O)
 
     // Process ambient lighting and approximate average lighting
     // Process our lights to find average luminescences
-    CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
+    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
     Fvector accum = {desc.ambient.x, desc.ambient.y, desc.ambient.z};
     Fvector hemi = {desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z};
     Fvector sun_ = {desc.sun_color.x, desc.sun_color.y, desc.sun_color.z};
@@ -542,6 +541,9 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
         }
 #endif
         // Sort lights by importance - important for R1-shadows
-        std::sort(lights.begin(), lights.end(), pred_energy);
+        std::sort(lights.begin(), lights.end(), [](const Light& L1, const Light& L2)
+        {
+            return L1.energy > L2.energy;
+        });
     }
 }

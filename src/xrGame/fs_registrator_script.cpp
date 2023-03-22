@@ -2,8 +2,6 @@
 #include "xrCore/LocatorAPI.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm);
 CLocatorAPI* getFS() { return &FS; }
 LPCSTR update_path_script(CLocatorAPI* fs, LPCSTR initial, LPCSTR src)
@@ -177,20 +175,18 @@ LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm)
     return asctime(newtime);
 }
 
-static const CLocatorAPI::file* ExistS(CLocatorAPI* fs, const char* path, const char* name)
+SCRIPT_EXPORT(fs_registrator, (),
 {
-    string_path temp;
-    fs->update_path(temp, path, name);
-    return fs->GetFileDesc(temp);
-}
+    using namespace luabind;
 
-SCRIPT_EXPORT(fs_registrator, (), {
-    module(luaState)[class_<FS_item>("FS_item")
-                         .def("NameFull", &FS_item::NameFull)
-                         .def("NameShort", &FS_item::NameShort)
-                         .def("Size", &FS_item::Size)
-                         .def("ModifDigitOnly", &FS_item::ModifDigitOnly)
-                         .def("Modif", &FS_item::Modif),
+    module(luaState)
+    [
+        class_<FS_item>("FS_item")
+            .def("NameFull", &FS_item::NameFull)
+            .def("NameShort", &FS_item::NameShort)
+            .def("Size", &FS_item::Size)
+            .def("ModifDigitOnly", &FS_item::ModifDigitOnly)
+            .def("Modif", &FS_item::Modif),
 
         class_<FS_file_list_ex>("FS_file_list_ex")
             .def("Size", &FS_file_list_ex::Size)
@@ -223,16 +219,28 @@ SCRIPT_EXPORT(fs_registrator, (), {
             .def_readonly("External", &FileStatus::External),
 
         class_<CLocatorAPI>("FS")
-            .enum_("FS_sort_mode")[value("FS_sort_by_name_up", int(FS_file_list_ex::eSortByNameUp)),
+            .enum_("FS_sort_mode")
+            [
+                value("FS_sort_by_name_up", int(FS_file_list_ex::eSortByNameUp)),
                 value("FS_sort_by_name_down", int(FS_file_list_ex::eSortByNameDown)),
                 value("FS_sort_by_size_up", int(FS_file_list_ex::eSortBySizeUp)),
                 value("FS_sort_by_size_down", int(FS_file_list_ex::eSortBySizeDown)),
                 value("FS_sort_by_modif_up", int(FS_file_list_ex::eSortByModifUp)),
-                value("FS_sort_by_modif_down", int(FS_file_list_ex::eSortByModifDown))]
-            .enum_("FS_List")[value("FS_ListFiles", int(FS_ListFiles)), value("FS_ListFolders", int(FS_ListFolders)),
-                value("FS_ClampExt", int(FS_ClampExt)), value("FS_RootOnly", int(FS_RootOnly))]
-            .enum_("FSType")[value("FSType_Virtual", int(FSType::Virtual)),
-                value("FSType_External", int(FSType::External)), value("FSType_Any", int(FSType::Any))]
+                value("FS_sort_by_modif_down", int(FS_file_list_ex::eSortByModifDown))
+            ]
+            .enum_("FS_List")
+            [
+                value("FS_ListFiles", int(FS_ListFiles)),
+                value("FS_ListFolders", int(FS_ListFolders)),
+                value("FS_ClampExt", int(FS_ClampExt)),
+                value("FS_RootOnly", int(FS_RootOnly))
+            ]
+            .enum_("FSType")
+            [
+                value("FSType_Virtual", int(FSType::Virtual)),
+                value("FSType_External", int(FSType::External)),
+                value("FSType_Any", int(FSType::Any))
+            ]
             .def("path_exist", &CLocatorAPI::path_exist)
             .def("update_path", &update_path_script)
             .def("get_path", static_cast<FS_Path*(CLocatorAPI::*)(pcstr)>(&CLocatorAPI::get_path))
@@ -250,7 +258,13 @@ SCRIPT_EXPORT(fs_registrator, (), {
             .def("file_length", &CLocatorAPI::file_length)
             .def("file_copy", &CLocatorAPI::file_copy)
 
-            .def("exist", &ExistS)
+            .def("exist", &CLocatorAPI::GetFileDesc)
+            .def("exist", +[](CLocatorAPI* fs, pcstr path, pcstr name)
+            {
+                string_path temp;
+                fs->update_path(temp, path, name);
+                return fs->GetFileDesc(temp);
+            })
             .def("exist", (FileStatus(CLocatorAPI::*)(LPCSTR, FSType))(&CLocatorAPI::exist))
             .def("exist", (FileStatus(CLocatorAPI::*)(LPCSTR, LPCSTR, FSType))(&CLocatorAPI::exist))
 

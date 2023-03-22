@@ -256,6 +256,7 @@ public:
     bool ready_to_detour();
     void update_best_item_info();
     void update_best_item_info_impl();
+    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
     virtual float GetWeaponAccuracy() const;
     virtual bool unlimited_ammo();
     virtual void spawn_supplies();
@@ -754,7 +755,7 @@ public:
     bool too_far_to_kill_enemy(const Fvector& position);
 
 public:
-    virtual float shedule_Scale();
+    virtual float shedule_Scale() const;
 
 private:
     bool m_sniper_update_rate;

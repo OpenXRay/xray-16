@@ -222,7 +222,7 @@ public:
     void render_lights(light_Package& LP);
     void render_sun();
     void render_sun_near();
-    void render_sun_filtered();
+    void render_sun_filtered() const;
     void render_menu();
 #if RENDER != R_R2
     void render_rain();
@@ -406,7 +406,6 @@ public:
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
 
 #ifdef USE_OGL
-    void ObtainRequiredWindowFlags(u32& windowFlags) override;
     RenderContext GetCurrentContext() const override;
     void MakeContextCurrent(RenderContext context) override;
 #endif

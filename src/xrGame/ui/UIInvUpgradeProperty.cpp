@@ -47,6 +47,7 @@ bool UIProperty::init_property(shared_str const& property_id)
         return false;
     }
     m_ui_icon->InitTexture(get_property()->icon_name());
+    m_ui_icon->SetTextureColor(get_property()->icon_color());
     return true;
 }
 

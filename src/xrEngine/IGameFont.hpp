@@ -4,7 +4,7 @@
 #include "xrCore/_vector2.h"
 #include "xrCore/Text/StringConversion.hpp"
 
-class IGameFont
+class XR_NOVTABLE IGameFont
 {
     friend class dxFontRender;
 
@@ -15,13 +15,12 @@ public:
         alRight,
         alCenter
     };
-    enum
+    enum : u32
     {
         fsGradient = (1 << 0),
         fsDeviceIndependent = (1 << 1),
         fsValid = (1 << 2),
         fsMultibyte = (1 << 3),
-        fsForceDWORD = u32(-1)
     };
 
 public:
@@ -59,4 +58,4 @@ public:
     virtual void Clear() = 0;
 };
 
-inline IGameFont::~IGameFont() {}
+inline IGameFont::~IGameFont() = default;

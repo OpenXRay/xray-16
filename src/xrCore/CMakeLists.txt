@@ -163,7 +163,6 @@ set(KERNEL
     "xr_shortcut.h"
     "xrCore.cpp"
     "xrCore.h"
-    "xrCore_benchmark_macros.h"
 )
 
 set(KERNEL_COMMON
@@ -418,11 +417,12 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     pthread
+    $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
     ${SDL2_LIBRARIES}
     PRIVATE
     xrMiscMath
     dl
-    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc-static>
+    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
     $<$<BOOL:${JPEG_FOUND}>:${JPEG_LIBRARIES}>
     ${LZO_LIBRARIES}
 )

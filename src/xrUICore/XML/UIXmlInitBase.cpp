@@ -527,7 +527,11 @@ bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CU
         pWnd->m_minColor = GetColor(xml_doc, buf, index, 0xff);
 
         strconcat(sizeof(buf), buf, path, ":middle_color");
-        pWnd->m_middleColor = GetColor(xml_doc, buf, index, 0xff);
+        if (xml_doc.NavigateToNode(buf, 0))
+        {
+            pWnd->m_middleColor = GetColor(xml_doc, buf, index, 0xff);
+            pWnd->m_bUseMiddleColor = true;
+        }
 
         strconcat(sizeof(buf), buf, path, ":max_color");
         pWnd->m_maxColor = GetColor(xml_doc, buf, index, 0xff);
@@ -597,6 +601,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
             xr_sprintf(buff, "auto_static_%d", cnt_static);
             CUIStatic* pUIStatic = xr_new<CUIStatic>(buff);
             InitStatic(xml_doc, "auto_static", cnt_static, pUIStatic);
+            pUIStatic->SetWindowName(buff);
             pUIStatic->SetAutoDelete(true);
             pParentWnd->AttachChild(pUIStatic);
 
@@ -607,6 +612,7 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
             xr_sprintf(buff, "auto_frameline_%d", cnt_frameline);
             CUIFrameLineWnd* pUIFrameline = xr_new<CUIFrameLineWnd>(buff);
             InitFrameLine(xml_doc, "auto_frameline", cnt_frameline, pUIFrameline);
+            pUIFrameline->SetWindowName(buff);
             pUIFrameline->SetAutoDelete(true);
             pParentWnd->AttachChild(pUIFrameline);
 

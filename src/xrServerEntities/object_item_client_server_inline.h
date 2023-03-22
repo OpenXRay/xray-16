@@ -20,13 +20,11 @@ IC CSObjectItemClientServer::CObjectItemClientServer(const CLASS_ID& clsid, LPCS
 {
 }
 
-#ifndef NO_XR_GAME
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ClientObjectBaseClass* CSObjectItemClientServer::client_object() const
 {
     return (xr_new<CLIENT_TYPE>())->_construct();
 }
-#endif
 
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServer::server_object(LPCSTR section) const
@@ -39,7 +37,6 @@ ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServer::server_object(LP
 #undef TEMPLATE_SPECIALIZATION
 #undef CSObjectItemClientServer
 
-#ifndef NO_XR_GAME
 #define TEMPLATE_SPECIALIZATION                                                                     \
     template <typename _client_type_single, typename _client_type_mp, typename _server_type_single, \
         typename _server_type_mp>
@@ -74,7 +71,5 @@ ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServerSingleMp::server_o
 
 #undef TEMPLATE_SPECIALIZATION
 #undef CSObjectItemClientServerSingleMp
-
-#endif // NO_XR_GAME
 
 #endif

@@ -12,10 +12,24 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CScriptZone, (IFactoryObject),
-    { module(luaState)[class_<CScriptZone, IFactoryObject>("ce_script_zone").def(constructor<>())]; });
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CScriptZone, IFactoryObject>("ce_script_zone")
+            .def(constructor<>())
+    ];
+});
 
 SCRIPT_EXPORT(CSmartZone, (IFactoryObject),
-    { module(luaState)[class_<CSmartZone, IFactoryObject>("ce_smart_zone").def(constructor<>())]; });
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CSmartZone, IFactoryObject>("ce_smart_zone")
+            .def(constructor<>())
+    ];
+});

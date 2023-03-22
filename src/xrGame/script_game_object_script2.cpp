@@ -30,30 +30,43 @@
 #include "smart_cover_object.h"
 #include "xrScriptEngine/Functor.hpp"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 extern CScriptActionPlanner* script_action_planner(CScriptGameObject* obj);
 
-class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject>& instance)
+luabind::class_<CScriptGameObject>& script_register_game_object1(luabind::class_<CScriptGameObject>& instance)
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     instance
-        .enum_("relation")[value("friend", int(ALife::eRelationTypeFriend)),
-            value("neutral", int(ALife::eRelationTypeNeutral)), value("enemy", int(ALife::eRelationTypeEnemy)),
-            value("dummy", int(ALife::eRelationTypeDummy))]
-        .enum_("action_types")[value("movement", int(ScriptEntity::eActionTypeMovement)),
-            value("watch", int(ScriptEntity::eActionTypeWatch)),
+        .enum_("relation")
+        [
+            value("friend",  int(ALife::eRelationTypeFriend)),
+            value("neutral", int(ALife::eRelationTypeNeutral)),
+            value("enemy",   int(ALife::eRelationTypeEnemy)),
+            value("dummy",   int(ALife::eRelationTypeDummy))
+        ]
+        .enum_("action_types")
+        [
+            value("movement",  int(ScriptEntity::eActionTypeMovement)),
+            value("watch",     int(ScriptEntity::eActionTypeWatch)),
             value("animation", int(ScriptEntity::eActionTypeAnimation)),
-            value("sound", int(ScriptEntity::eActionTypeSound)),
-            value("particle", int(ScriptEntity::eActionTypeParticle)),
-            value("object", int(ScriptEntity::eActionTypeObject)),
-            value("action_type_count", int(ScriptEntity::eActionTypeCount))]
-        .enum_("EPathType")[value("game_path", int(MovementManager::ePathTypeGamePath)),
-            value("level_path", int(MovementManager::ePathTypeLevelPath)),
+            value("sound",     int(ScriptEntity::eActionTypeSound)),
+            value("particle",  int(ScriptEntity::eActionTypeParticle)),
+            value("object",    int(ScriptEntity::eActionTypeObject)),
+            value("action_type_count", int(ScriptEntity::eActionTypeCount))
+        ]
+        .enum_("EPathType")
+        [
+            value("game_path",   int(MovementManager::ePathTypeGamePath)),
+            value("level_path",  int(MovementManager::ePathTypeLevelPath)),
             value("patrol_path", int(MovementManager::ePathTypePatrolPath)),
-            value("no_path", int(MovementManager::ePathTypeNoPath))]
-        .enum_("ESelectionType")[value("alifeMovementTypeMask", int(eSelectionTypeMask)),
-            value("alifeMovementTypeRandom", int(eSelectionTypeRandomBranching))]
+            value("no_path",     int(MovementManager::ePathTypeNoPath))
+        ]
+        .enum_("ESelectionType")
+        [
+            value("alifeMovementTypeMask",   int(eSelectionTypeMask)),
+            value("alifeMovementTypeRandom", int(eSelectionTypeRandomBranching))
+        ]
 
         //		.property("visible",				&CScriptGameObject::getVisible,
         //&CScriptGameObject::setVisible)

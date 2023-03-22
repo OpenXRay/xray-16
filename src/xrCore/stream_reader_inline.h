@@ -1,12 +1,12 @@
 #ifndef STREAM_READER_INLINE_H
 #define STREAM_READER_INLINE_H
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <sys/mman.h>
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
 IC const HANDLE& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 IC const int& CStreamReader::file_mapping_handle() const { return (m_file_mapping_handle); }
 #else
 #   error Select or add implementation for your platform
@@ -14,7 +14,7 @@ IC const int& CStreamReader::file_mapping_handle() const { return (m_file_mappin
 
 #if defined(XR_PLATFORM_WINDOWS)
 IC void CStreamReader::unmap() { UnmapViewOfFile(m_current_map_view_of_file); }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 IC void CStreamReader::unmap() { ::munmap(const_cast<u8*>(m_current_map_view_of_file), m_current_window_size); }
 #else
 #   error Select or add implementation for your platform

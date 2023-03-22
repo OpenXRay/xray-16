@@ -8,10 +8,10 @@
 ////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-class ILoadingScreen
+class XR_NOVTABLE ILoadingScreen
 {
 public:
-    virtual ~ILoadingScreen() = default;
+    virtual ~ILoadingScreen() = 0;
 
     virtual void Initialize() = 0;
 
@@ -25,3 +25,5 @@ public:
     virtual void SetStageTitle(const char* title) = 0;
     virtual void SetStageTip(const char* header, const char* tipNumber, const char* tip) = 0;
 };
+
+inline ILoadingScreen::~ILoadingScreen() = default;

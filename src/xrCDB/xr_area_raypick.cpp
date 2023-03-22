@@ -4,9 +4,6 @@
 #include "xrEngine/xr_collide_form.h"
 #include "xrEngine/xr_object.h"
 #include "Intersect.hpp"
-#if defined(XR_PLATFORM_WINDOWS)
-#include "d3d9types.h"
-#endif
 
 #ifdef DEBUG
 static bool _cdb_bDebug = false;
@@ -41,9 +38,8 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
         // traverse object database
         g_SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
         // Determine visibility for dynamic part of scene
-        for (u32 o_it = 0; o_it < r_spatial.size(); o_it++)
+        for (auto spatial : r_spatial)
         {
-            ISpatial* spatial = r_spatial[o_it];
             IGameObject* collidable = spatial->dcast_GameObject();
             if (collidable && (collidable != ignore_object))
             {
@@ -138,9 +134,8 @@ bool CObjectSpace::_RayPick(
             STYPE_COLLIDEABLE | ((tgt & rqtObstacle) ? STYPE_OBSTACLE : 0) | ((tgt & rqtShape) ? STYPE_SHAPE : 0);
         g_SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
         // Determine visibility for dynamic part of scene
-        for (u32 o_it = 0; o_it < r_spatial.size(); o_it++)
+        for (auto spatial : r_spatial)
         {
-            ISpatial* spatial = r_spatial[o_it];
             IGameObject* collidable = spatial->dcast_GameObject();
             if (0 == collidable)
                 continue;
@@ -208,9 +203,9 @@ bool CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_de
     {
         // Traverse object database
         g_SpatialSpace->q_ray(r_spatial, 0, d_flags, R.start, R.dir, R.range);
-        for (u32 o_it = 0; o_it < r_spatial.size(); o_it++)
+        for (auto& p_spatial : r_spatial)
         {
-            IGameObject* collidable = r_spatial[o_it]->dcast_GameObject();
+            IGameObject* collidable = p_spatial->dcast_GameObject();
             if (0 == collidable)
                 continue;
             if (collidable == ignore_object)
@@ -288,9 +283,9 @@ bool CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_de
         {
             // Traverse object database
             g_SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
-            for (u32 o_it = 0; o_it < r_spatial.size(); o_it++)
+            for (auto& p_spatial : r_spatial)
             {
-                IGameObject* collidable = r_spatial[o_it]->dcast_GameObject();
+                IGameObject* collidable = p_spatial->dcast_GameObject();
                 if (0 == collidable)
                     continue;
                 if (collidable == ignore_object)
@@ -395,9 +390,9 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
                 // Traverse object database
                 g_SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
                 // Determine visibility for dynamic part of scene
-                for (u32 o_it = 0; o_it < r_spatial.size(); o_it++)
+                for (auto& p_spatial : r_spatial)
                 {
-                    IGameObject* collidable = r_spatial[o_it]->dcast_GameObject();
+                    IGameObject* collidable = p_spatial->dcast_GameObject();
                     if (0 == collidable)
                         continue;
                     if (collidable == ignore_object)

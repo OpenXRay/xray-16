@@ -281,7 +281,7 @@ bool CUIScrollView::OnMouseAction(float x, float y, EUIMessages mouse_action)
         res = true;
         break;
     case WINDOW_MOUSE_MOVE:
-        if (pInput->iGetAsyncBtnState(0))
+        if (pInput->iGetAsyncKeyState(MOUSE_1))
         {
             Fvector2 curr_pad_pos = m_pad->GetWndPos();
             curr_pad_pos.y += GetUICursor().GetCursorPositionDelta().y;

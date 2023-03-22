@@ -19,7 +19,7 @@ void ammunition_group::init_ammunition_group(
         if (itm_index != u32(-1))
         {
             VERIFY((itm_index & 0xffff0000) == 0);
-            m_wpn_groups.push_back(std::make_pair(static_cast<u16>(itm_index), gid));
+            m_wpn_groups.emplace_back(static_cast<u16>(itm_index), gid);
         }
     };
 }

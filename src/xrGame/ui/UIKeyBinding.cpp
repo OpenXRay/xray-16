@@ -10,8 +10,8 @@ CUIKeyBinding::CUIKeyBinding()
     : CUIWindow("CUIKeyBinding"),
       m_header{ "Header 1", "Header 2", "Header 3" }
 {
-    for (u8 i = 0; i < 3; ++i)
-        AttachChild(&m_header[i]);
+    for (auto& header : m_header)
+        AttachChild(&header);
 
     AttachChild(&m_frame);
 

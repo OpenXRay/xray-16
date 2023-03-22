@@ -5,16 +5,14 @@
 
 CStalkerOutfit::CStalkerOutfit() {}
 CStalkerOutfit::~CStalkerOutfit() {}
-using namespace luabind;
 
 SCRIPT_EXPORT(CStalkerOutfit, (CGameObject),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CStalkerOutfit, CGameObject>("CStalkerOutfit")
-            .def(constructor<>()),
-
-        class_<CHelmet, CGameObject>("CHelmet")
             .def(constructor<>())
     ];
 });

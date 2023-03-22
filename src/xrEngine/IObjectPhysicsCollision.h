@@ -2,7 +2,8 @@
 
 class IPhysicsShell;
 class IPhysicsElement;
-class IObjectPhysicsCollision
+
+class XR_NOVTABLE IObjectPhysicsCollision
 {
 public:
     virtual ~IObjectPhysicsCollision() = default;

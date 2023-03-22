@@ -75,9 +75,20 @@ void _sound_event(const ref_sound_data_ptr& S, float range)
     if (g_pGameLevel && S && S->feedback)
         g_pGameLevel->SoundEvent_Register(S, range);
 }
+
 static void build_callback(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt, void* params)
 {
     g_pGameLevel->Load_GameSpecific_CFORM(T, Tcnt);
+}
+
+static void serialize_callback(IWriter& writer)
+{
+    g_pGameLevel->Load_GameSpecific_CFORM_Serialize(writer);
+}
+
+static bool deserialize_callback(IReader& reader)
+{
+    return g_pGameLevel->Load_GameSpecific_CFORM_Deserialize(reader);
 }
 
 bool IGame_Level::Load(u32 dwNum)
@@ -103,7 +114,7 @@ bool IGame_Level::Load(u32 dwNum)
     // CForms
     g_pGamePersistent->SetLoadStageTitle("st_loading_cform");
     g_pGamePersistent->LoadTitle();
-    ObjectSpace.Load(build_callback);
+    ObjectSpace.Load(build_callback, serialize_callback, deserialize_callback);
     // GEnv.Sound->set_geometry_occ ( &Static );
     GEnv.Sound->set_geometry_occ(ObjectSpace.GetStaticModel());
     GEnv.Sound->set_handler(_sound_event);

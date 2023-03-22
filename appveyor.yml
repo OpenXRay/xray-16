@@ -47,7 +47,7 @@ for:
     parallel: true
     verbosity: minimal
   after_build:
-    - cmd: xr_pack_build.cmd
+    - cmd: misc/windows/xr_pack_build.cmd "%CONFIGURATION%" "%PLATFORM%"
   artifacts:
     - path: res/OpenXRay.*.7z
       name: OpenXRay.*.7z

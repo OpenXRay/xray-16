@@ -20,8 +20,8 @@ CObjectAnimator::CObjectAnimator()
 CObjectAnimator::~CObjectAnimator() { Clear(); }
 void CObjectAnimator::Clear()
 {
-    for (auto m_it = m_Motions.begin(); m_it != m_Motions.end(); ++m_it)
-        xr_delete(*m_it);
+    for (auto& m_Motion : m_Motions)
+        xr_delete(m_Motion);
     m_Motions.clear();
     SetActiveMotion(nullptr);
 }

@@ -7,7 +7,7 @@
 
 #include "AnselManager.h"
 #include "holder_custom.h"
-#include "SDL.h"
+#include <SDL.h>
 
 #ifdef XR_PLATFORM_WINDOWS
 #   include "SDL_syswm.h"

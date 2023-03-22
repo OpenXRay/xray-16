@@ -720,6 +720,16 @@ public:
     }
 };
 
+class CCC_Editor : public IConsole_Command
+{
+public:
+    CCC_Editor(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+    void Execute(pcstr args) override
+    {
+        Device.editor().SetState(xray::editor::ide::visible_state::full);
+    }
+};
+
 ENGINE_API float g_fov = 67.5f;
 ENGINE_API float psHUD_FOV = 0.45f;
 
@@ -779,6 +789,8 @@ void CCC_Register()
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 4);
     CMD4(CCC_Integer, "r__wallmarks_on_skeleton", &ps_r__WallmarksOnSkeleton, 0, 1);
 
+    CMD1(CCC_Editor, "rs_editor");
+
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
     CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
@@ -821,7 +833,7 @@ void CCC_Register()
     CMD2(CCC_Float, "snd_volume_music", &psSoundVMusic);
     CMD1(CCC_SND_Restart, "snd_restart");
     CMD3(CCC_Mask, "snd_acceleration", &psSoundFlags, ss_Hardware);
-    CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EAX);
+    CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EFX);
     CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 4, 256);
     CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 4, 64);
     CMD3(CCC_Token, "snd_precache_all", &psSoundPrecacheAll, snd_precache_all_token);

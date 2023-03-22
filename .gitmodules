@@ -10,9 +10,6 @@
 [submodule "Externals/AGS_SDK"]
 	path = Externals/AGS_SDK
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK.git
-[submodule "Externals/lzo"]
-	path = Externals/lzo
-	url = https://github.com/alexgdi/lzo.git
 [submodule "Externals/zlib"]
 	path = Externals/zlib
 	url = https://github.com/madler/zlib.git
@@ -40,9 +37,9 @@
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
-[submodule "Externals/mimalloc"]
-	path = Externals/mimalloc
-	url = https://github.com/OpenXRay/mimalloc.git
 [submodule "Externals/sse2neon"]
 	path = Externals/sse2neon
 	url = https://github.com/DLTcollab/sse2neon.git
+[submodule "Externals/imgui"]
+	path = Externals/imgui
+	url = https://github.com/ocornut/imgui.git

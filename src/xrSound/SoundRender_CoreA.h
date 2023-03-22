@@ -5,11 +5,6 @@
 #include "openal/al.h"
 #include "openal/alc.h"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#define OPENAL
-#include <eax/eax.h>
-#endif
-
 #ifdef DEBUG
 #define A_CHK(expr)                                             \
     do                                                          \
