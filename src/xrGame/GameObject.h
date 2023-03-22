@@ -57,8 +57,6 @@ class CGameObject : public IGameObject,
                     public RenderableBase,
                     public CollidableBase
 {
-    BENCH_SEC_SCRAMBLEMEMBER1
-    BENCH_SEC_SCRAMBLEVTBL2
     // Some property variables
     GameObjectProperties Props;
     shared_str NameObject;

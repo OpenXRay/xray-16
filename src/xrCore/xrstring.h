@@ -99,7 +99,9 @@ public:
     // void _set (shared_str const &rhs) { str_value* v = g_pStringContainer->dock(rhs.c_str()); if (0!=v)
     // v->dwReference++; _dec(); p_ = v; }
 
+    [[nodiscard]]
     const str_value* _get() const { return p_; }
+
 public:
     // construction
     shared_str() { p_ = 0; }
@@ -126,11 +128,22 @@ public:
         return (shared_str&)*this;
     }
     // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use 
+    [[nodiscard]]
     pcstr operator*() const { return p_ ? p_->value : 0; }
+
+    [[nodiscard]]
     bool operator!() const { return p_ == 0; }
+
+    [[nodiscard]]
     char operator[](size_t id) { return p_->value[id]; }
+    [[nodiscard]]
+    char operator[](size_t id) const { return p_->value[id]; }
+
+    [[nodiscard]]
     pcstr c_str() const { return p_ ? p_->value : 0; }
+
     // misc func
+    [[nodiscard]]
     u32 size() const
     {
         if (0 == p_)
@@ -138,13 +151,23 @@ public:
         else
             return p_->dwLength;
     }
+
+    [[nodiscard]]
+    bool empty() const
+    {
+        return size() == 0;
+    }
+
     void swap(shared_str& rhs)
     {
         str_value* tmp = p_;
         p_ = rhs.p_;
         rhs.p_ = tmp;
     }
+
+    [[nodiscard]]
     bool equal(const shared_str& rhs) const { return (p_ == rhs.p_); }
+
     shared_str& __cdecl printf(const char* format, ...)
     {
         string4096 buf;

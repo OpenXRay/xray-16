@@ -35,10 +35,6 @@ void CRenderDevice::CreateInternal()
         return; // prevent double call
 
     Statistic = xr_new<CStats>();
-    bool gpuSW = !!strstr(Core.Params, "-gpu_sw");
-    bool gpuNonPure = !!strstr(Core.Params, "-gpu_nopure");
-    bool gpuRef = !!strstr(Core.Params, "-gpu_ref");
-    GEnv.Render->SetupGPU(gpuSW, gpuNonPure, gpuRef);
     Log("Starting RENDER device...");
 #ifdef _EDITOR
     psDeviceMode.Width = dwWidth;
@@ -60,6 +56,7 @@ void CRenderDevice::CreateInternal()
     string_path fname;
     FS.update_path(fname, "$game_data$", "shaders.xr");
     GEnv.Render->OnDeviceCreate(fname);
+    m_editor.OnDeviceCreate();
     Statistic->OnDeviceCreate();
     dwFrame = 0;
     PreCache(0, false, false);

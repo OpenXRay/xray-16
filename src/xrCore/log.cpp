@@ -82,11 +82,7 @@ void Log(const char* s)
     int i, j;
 
     u32 length = xr_strlen(s);
-#ifndef _EDITOR
     PSTR split = (PSTR)xr_alloca((length + 1) * sizeof(char));
-#else
-    PSTR split = (PSTR)alloca((length + 1) * sizeof(char));
-#endif
     for (i = 0, j = 0; s[i] != 0; i++)
     {
         if (s[i] == '\n')

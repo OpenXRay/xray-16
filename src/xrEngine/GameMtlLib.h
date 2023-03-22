@@ -1,6 +1,7 @@
 #pragma once
+
 #include <algorithm>
-#include "xrCore/xrCore_benchmark_macros.h"
+
 #include "xrCore/xrstring.h"
 #include "xrCore/_flags.h"
 #include "xrCommon/xr_vector.h"
@@ -239,10 +240,12 @@ class MTL_EXPORT_API CGameMtlLibrary
 private:
     int material_index;
     int material_pair_index;
-    BENCH_SEC_SCRAMBLEMEMBER1
+
     GameMtlVec materials;
     GameMtlPairVec material_pairs;
     GameMtlPairVec material_pairs_rt;
+
+    u32 m_file_age{};
 
 public:
     CGameMtlLibrary();
@@ -342,6 +345,9 @@ public:
     // IO routines
     void Load();
     bool Save();
+
+    [[nodiscard]]
+    auto GetFileAge() const { return m_file_age; }
 };
 
 extern MTL_EXPORT_API CGameMtlLibrary GMLib;

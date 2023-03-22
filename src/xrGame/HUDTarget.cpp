@@ -98,7 +98,7 @@ void CHUDTarget::CursorOnFrame()
     if (Level().CurrentEntity())
     {
         PP.RQ.O = 0;
-        PP.RQ.range = g_pGamePersistent->Environment().CurrentEnv->far_plane * 0.99f;
+        PP.RQ.range = g_pGamePersistent->Environment().CurrentEnv.far_plane * 0.99f;
         PP.RQ.element = -1;
 
         collide::ray_defs RD(p1, dir, PP.RQ.range, CDB::OPT_CULL, collide::rqtBoth);

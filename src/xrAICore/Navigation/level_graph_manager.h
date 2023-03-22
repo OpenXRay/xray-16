@@ -52,9 +52,13 @@ public:
         switch ((xrAI_Versions)version)
         {
         case XRAI_CURRENT_VERSION:
-            static_assert(XRAI_CURRENT_VERSION == XRAI_VERSION_BORSHT_BIG,
+            static_assert(XRAI_CURRENT_VERSION == XRAI_VERSION_SKYLOADER,
                 "If you have changed the xrAI version, don't forget to add back compatibility older versions.");
             m_nodes = static_cast<CLevelVertex*>(stream->pointer());
+            break;
+
+        case XRAI_VERSION_BORSHT_BIG:
+            m_nodes = convert_nodes<NodeCompressed12>(stream, vertex_count, (xrAI_Versions)version);
             break;
 
         case XRAI_VERSION_BORSHT:

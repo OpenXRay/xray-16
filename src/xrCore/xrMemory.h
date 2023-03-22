@@ -17,6 +17,10 @@ public:
     size_t mem_usage();
     void   mem_compact();
 
+public:
+    static constexpr size_t SMALL_SIZE_MAX = 128 * sizeof(void*);
+
+public:
     void* mem_alloc(size_t size);
     void* mem_alloc(size_t size, size_t alignment);
     void* mem_alloc(size_t size, const std::nothrow_t&) noexcept;
@@ -25,9 +29,42 @@ public:
     void* mem_realloc(void* ptr, size_t size, size_t alignment);
     void mem_free(void* ptr);
     void mem_free(void* ptr, size_t alignment);
+
+    void* small_alloc(size_t size) noexcept;
+    void  small_free (void* ptr) noexcept;
 };
 
 extern XRCORE_API xrMemory Memory;
+
+class small_buffer final
+{
+    void* m_ptr;
+    bool m_small;
+    
+public:
+    small_buffer(size_t size)
+        : m_ptr(size <= xrMemory::SMALL_SIZE_MAX ? Memory.small_alloc(size) : Memory.mem_alloc(size)),
+          m_small(size <= xrMemory::SMALL_SIZE_MAX) {}
+
+    ~small_buffer()
+    {
+        if (m_small)
+            Memory.small_free(m_ptr);
+        else
+            Memory.mem_free(m_ptr);
+    }
+
+    // Movable
+    small_buffer(small_buffer&&) = default;
+    small_buffer& operator=(small_buffer&&) = default;
+
+    // Noncopyable
+    small_buffer(const small_buffer&) = delete;
+    small_buffer& operator=(const small_buffer&) = delete;
+
+    [[nodiscard]]
+    void* get() const { return m_ptr; }
+};
 
 #undef ZeroMemory
 #undef CopyMemory

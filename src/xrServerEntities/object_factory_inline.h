@@ -63,7 +63,7 @@ IC bool CObjectFactory::CObjectItemPredicateScript::operator()(const CObjectItem
 }
 
 IC const CObjectFactory::OBJECT_ITEM_STORAGE& CObjectFactory::clsids() const { return (m_clsids); }
-#ifndef NO_XR_GAME
+
 IC const CObjectItemAbstract& CObjectFactory::item(const CLASS_ID& clsid) const
 {
     actualize();
@@ -75,7 +75,7 @@ IC const CObjectItemAbstract& CObjectFactory::item(const CLASS_ID& clsid) const
 #endif
     return (**I);
 }
-#else
+
 IC const CObjectItemAbstract* CObjectFactory::item(const CLASS_ID& clsid, bool no_assert) const
 {
     actualize();
@@ -87,7 +87,6 @@ IC const CObjectItemAbstract* CObjectFactory::item(const CLASS_ID& clsid, bool n
     }
     return (*I);
 }
-#endif
 
 IC void CObjectFactory::add(CObjectItemAbstract* item)
 {
@@ -122,21 +121,20 @@ IC int CObjectFactory::script_clsid(const CLASS_ID& clsid) const
     return (int(I - clsids().begin()));
 }
 
-#ifndef NO_XR_GAME
 inline CObjectFactory::ClientObjectBaseClass* CObjectFactory::client_object(const CLASS_ID& clsid) const
 {
     return (item(clsid).client_object());
 }
-#endif
 
 inline CObjectFactory::ServerObjectBaseClass* CObjectFactory::server_object(const CLASS_ID& clsid, LPCSTR section) const
 {
-#ifndef NO_XR_GAME
-    return (item(clsid).server_object(section));
-#else
-    const CObjectItemAbstract* object = item(clsid, true);
-    return (object ? object->server_object(section) : 0);
-#endif
+    return item(clsid).server_object(section);
+}
+
+inline CObjectFactory::ServerObjectBaseClass* CObjectFactory::server_object(const CLASS_ID& clsid, LPCSTR section, bool no_assert) const
+{
+    const CObjectItemAbstract* object = item(clsid, no_assert);
+    return object ? object->server_object(section) : nullptr;
 }
 
 IC void CObjectFactory::actualize() const

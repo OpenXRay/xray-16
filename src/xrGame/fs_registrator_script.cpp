@@ -175,13 +175,6 @@ LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm)
     return asctime(newtime);
 }
 
-static const CLocatorAPI::file* ExistS(CLocatorAPI* fs, const char* path, const char* name)
-{
-    string_path temp;
-    fs->update_path(temp, path, name);
-    return fs->GetFileDesc(temp);
-}
-
 SCRIPT_EXPORT(fs_registrator, (),
 {
     using namespace luabind;
@@ -265,7 +258,13 @@ SCRIPT_EXPORT(fs_registrator, (),
             .def("file_length", &CLocatorAPI::file_length)
             .def("file_copy", &CLocatorAPI::file_copy)
 
-            .def("exist", &ExistS)
+            .def("exist", &CLocatorAPI::GetFileDesc)
+            .def("exist", +[](CLocatorAPI* fs, pcstr path, pcstr name)
+            {
+                string_path temp;
+                fs->update_path(temp, path, name);
+                return fs->GetFileDesc(temp);
+            })
             .def("exist", (FileStatus(CLocatorAPI::*)(LPCSTR, FSType))(&CLocatorAPI::exist))
             .def("exist", (FileStatus(CLocatorAPI::*)(LPCSTR, LPCSTR, FSType))(&CLocatorAPI::exist))
 

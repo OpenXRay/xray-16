@@ -259,7 +259,7 @@ bool CUIGlobalMap::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     if (inherited::OnMouseAction(x, y, mouse_action))
         return true;
-    if (mouse_action == WINDOW_MOUSE_MOVE && (FALSE == pInput->iGetAsyncBtnState(0)))
+    if (mouse_action == WINDOW_MOUSE_MOVE && (FALSE == pInput->iGetAsyncKeyState(MOUSE_1)))
     {
         if (MapWnd())
         {
@@ -525,7 +525,7 @@ bool CUILevelMap::OnMouseAction(float x, float y, EUIMessages mouse_action)
     if (MapWnd()->GlobalMap()->Locked())
         return true;
 
-    if (mouse_action == WINDOW_MOUSE_MOVE && (FALSE == pInput->iGetAsyncBtnState(0)))
+    if (mouse_action == WINDOW_MOUSE_MOVE && (FALSE == pInput->iGetAsyncKeyState(MOUSE_1)))
     {
         if (MapWnd())
         {

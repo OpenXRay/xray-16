@@ -99,11 +99,10 @@ public:
     };
 
 private:
-    BENCH_SEC_SCRAMBLEMEMBER1
-
     std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
     std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
+    int mouseAxisState[COUNT_MOUSE_AXIS];
     int controllerAxisState[COUNT_CONTROLLER_AXIS];
     s32 last_input_controller;
 
@@ -136,10 +135,9 @@ public:
     void iCapture(IInputReceiver* pc);
     void iRelease(IInputReceiver* pc);
 
-    bool iGetAsyncKeyState(const int dik);
-    bool iGetAsyncBtnState(const int btn);
-    bool iGetAsyncGpadBtnState(const int btn);
+    bool iGetAsyncKeyState(const int key);
 
+    void iGetAsyncScrollPos(Ivector2& p) const;
     void iGetAsyncMousePos(Ivector2& p) const;
     void iSetMousePos(const Ivector2& p) const;
 

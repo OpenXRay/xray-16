@@ -48,14 +48,14 @@ set(SRC_FILES
     "../xrRender/du_sphere.h"
     "../xrRender/du_sphere_part.cpp"
     "../xrRender/du_sphere_part.h"
-    "../xrRender/dxConsoleRender.cpp"
-    "../xrRender/dxConsoleRender.h"
     "../xrRender/dxDebugRender.cpp"
     "../xrRender/dxDebugRender.h"
     "../xrRender/dxEnvironmentRender.cpp"
     "../xrRender/dxEnvironmentRender.h"
     "../xrRender/dxFontRender.cpp"
     "../xrRender/dxFontRender.h"
+    "../xrRender/dxImGuiRender.cpp"
+    "../xrRender/dxImGuiRender.h"
     "../xrRender/dxLensFlareRender.cpp"
     "../xrRender/dxLensFlareRender.h"
     "../xrRender/dxObjectSpaceRender.cpp"
@@ -358,7 +358,6 @@ set(SRC_FILES
     "../xrRenderGL/glTextureUtils.h"
     "../../Include/xrRender/animation_blend.h"
     "../../Include/xrRender/animation_motion.h"
-    "../../Include/xrRender/ConsoleRender.h"
     "../../Include/xrRender/DebugRender.h"
     "../../Include/xrRender/DebugShader.h"
     "../../Include/xrRender/DrawUtils.h"
@@ -410,6 +409,7 @@ target_link_libraries(${PROJECT_NAME}
     xrParticles
     xrScriptEngine
     xrLuabind
+    xrImGui
     OpenGL::GL
     GLEW::GLEW
 )

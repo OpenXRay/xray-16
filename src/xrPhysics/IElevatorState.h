@@ -11,8 +11,10 @@ enum Estate
     clbNoLadder,
     clbNoState
 };
+
 class IPhysicsShellHolder;
-class IElevatorState
+
+class XR_NOVTABLE IElevatorState
 {
 public:
     virtual Estate State() = 0;

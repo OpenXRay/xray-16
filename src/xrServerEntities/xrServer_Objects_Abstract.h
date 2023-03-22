@@ -29,14 +29,15 @@ class CDUInterface;
 #pragma warning(push)
 #pragma warning(disable : 4005)
 
-class IServerEntityShape
+class XR_NOVTABLE IServerEntityShape
 {
 public:
     virtual ~IServerEntityShape() = 0;
     virtual void assign_shapes(CShapeData::shape_def* shapes, u32 cnt) = 0;
 };
 
-IC IServerEntityShape::~IServerEntityShape() {}
+inline IServerEntityShape::~IServerEntityShape() = default;
+
 class CSE_Visual
 {
 public:
@@ -92,14 +93,15 @@ public:
     virtual CSE_Motion* motion() = 0;
 };
 
-class IServerEntityLEOwner
+class XR_NOVTABLE IServerEntityLEOwner
 {
 public:
     virtual ~IServerEntityLEOwner() = 0;
     virtual void get_bone_xform(LPCSTR name, Fmatrix& xform) = 0;
 };
 
-IC IServerEntityLEOwner::~IServerEntityLEOwner() {}
+inline IServerEntityLEOwner::~IServerEntityLEOwner() = default;
+
 #pragma pack(push, 1)
 class visual_data
 {
@@ -109,7 +111,7 @@ public:
 };
 #pragma pack(pop)
 
-class IServerEntity
+class XR_NOVTABLE IServerEntity
 {
 public:
     enum
@@ -149,7 +151,7 @@ public:
     virtual bool validate() = 0;
 };
 
-IC IServerEntity::~IServerEntity() {}
+inline IServerEntity::~IServerEntity() = default;
 #pragma warning(pop)
 
 #pragma pack(pop)

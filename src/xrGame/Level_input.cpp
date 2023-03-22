@@ -51,7 +51,7 @@ void CLevel::IR_OnMouseWheel(int x, int y)
     /* avo: script callback */
     if (g_actor)
     {
-        g_actor->callback(GameObject::eMouseWheel)(x);
+        g_actor->callback(GameObject::eMouseWheel)(y, x);
     }
 
     if (CurrentGameUI()->IR_UIOnMouseWheel(x, y))
@@ -122,9 +122,6 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (Device.dwPrecacheFrame)
         return;
 
-    if (Device.editor() && (pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT) || pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT)))
-        return;
-
     bool b_ui_exist = !!CurrentGameUI();
 
     EGameActions _curr = GetBindedAction(key);
@@ -137,7 +134,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     if (_curr == kPAUSE)
     {
-        if (Device.editor())
+        if (Device.editor_mode())
             return;
 
         if (!g_block_pause && (IsGameTypeSingle() || IsDemoPlay()))
@@ -149,6 +146,12 @@ void CLevel::IR_OnKeyboardPress(int key)
 #endif
             Device.Pause(!Device.Paused(), TRUE, TRUE, reason);
         }
+        return;
+    }
+
+    if (_curr == kEDITOR)
+    {
+        Device.editor().SwitchToNextState();
         return;
     }
 

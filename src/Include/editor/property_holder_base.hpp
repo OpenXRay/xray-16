@@ -29,18 +29,16 @@ struct vec3f
 
 class property_holder_base;
 
-class property_holder_holder
+class XR_NOVTABLE property_holder_holder
 {
 public:
     virtual property_holder_base* object() = 0;
-#if defined(WINDOWS)
-    virtual ~property_holder_holder() = 0 {}
-#elif defined(LINUX)
-    virtual ~property_holder_holder() {}
-#endif
+    virtual ~property_holder_holder() = 0;
 };
 
-class property_holder_collection
+inline property_holder_holder::~property_holder_holder() = default;
+
+class XR_NOVTABLE property_holder_collection
 {
 public:
     virtual void clear() = 0;
@@ -56,7 +54,7 @@ public:
 
 class property_value;
 
-class property_holder_base
+class XR_NOVTABLE property_holder_base
 {
 public:
     typedef fastdelegate::FastDelegate0<bool> boolean_getter_type;
