@@ -1,11 +1,11 @@
 name: "Pull Request Labeler"
 
+runs-on: ubuntu-latest
+
 on:
   pull_request_target:
   pull_request_review:
     types: submitted
-
-runs-on: ubuntu-latest
 
 permissions:
   contents: read
