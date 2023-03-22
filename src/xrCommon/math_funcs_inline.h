@@ -37,7 +37,14 @@ constexpr void clamp(T& val, const T& _low, const T& _high) noexcept
 
 // XXX: Check usages and provide overloads for native types where arguments are NOT references.
 template <class T>
-constexpr T clampr(const T& val, const T& _low, const T& _high) noexcept { return std::clamp(val, _low, _high); }
+constexpr T clampr(const T& val, const T& _low, const T& _high) noexcept
+{
+    if (val < _low)
+        return _low;
+    if (val > _high)
+        return _high;
+    return val;
+}
 
 inline float snapto(float value, float snap)
 {
