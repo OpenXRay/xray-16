@@ -27,4 +27,4 @@
 #define dFabs(x) ((float)_abs(x)) /* absolute value */
 #endif
 
-#endif // XRGAME_EXPORTS
+#endif // XRPHYSICS_EXPORTS

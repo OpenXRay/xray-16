@@ -14,12 +14,15 @@ set CONFIGURATION=%~1
 set PLATFORM=%~2
 
 if %PLATFORM%==x86 (
-    set EDITION_NAME=%CONFIGURATION%.32-bit
+    set EDITION_NAME=%CONFIGURATION% 32-bit
 ) else if %PLATFORM%==x64 (
-    set EDITION_NAME=%CONFIGURATION%.64-bit
+    set EDITION_NAME=%CONFIGURATION% 64-bit
 ) else (
     set EDITION_NAME=%CONFIGURATION% %PLATFORM%
 )
+
+rem Replace spaces with dots to avoid possible problems (e.g. with GitHub nighly builds uploading)
+set EDITION_NAME=%EDITION_NAME: =.%
 
 @echo on
 

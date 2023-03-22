@@ -797,6 +797,18 @@ int dBodyGetGravityMode (dBodyID b)
   return ((b->flags & dxBodyNoGravity) == 0);
 }
 
+void dBodySetNoUpdatePosMode (dBodyID b, int enabled)
+{
+  dAASSERT (b);
+  if (enabled) b->flags |= dxBodyNoUpdatePos;
+  else b->flags &= ~dxBodyNoUpdatePos;
+}
+
+int dBodyGetNoUpdatePosMode (dBodyID b)
+{
+  dAASSERT (b);
+  return ((b->flags & dxBodyNoUpdatePos) == 0);
+}
 
 // body auto-disable functions
 
