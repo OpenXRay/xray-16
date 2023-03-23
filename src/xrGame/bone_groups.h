@@ -10,13 +10,13 @@ namespace award_system
 class bone_group
 {
 public:
-    enum enum_group_id
+    enum enum_group_id : u16
     {
         gid_head = 0x00,
         gid_eyes,
         gid_spine,
     }; // enum enum_group_id
-    static u16 const gid_any = u16(-1);
+    static u16 constexpr gid_any = u16(-1);
 
     bone_group();
     ~bone_group();

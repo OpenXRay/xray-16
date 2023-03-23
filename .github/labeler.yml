@@ -1,6 +1,3 @@
-pending review:
-- '**/*'
-
 AI:
 - src/xrAICore/*
 - src/xrGame/ai/*
