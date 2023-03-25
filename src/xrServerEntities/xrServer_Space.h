@@ -10,11 +10,11 @@
 #ifndef xrServer_SpaceH
 #define xrServer_SpaceH
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 #define SERVER_ENTITY_EDITOR_METHODS virtual void FillProps(LPCSTR pref, PropItemVec& values);
-#else // #ifdef XRGAME_EXPORTS
+#else
 #define SERVER_ENTITY_EDITOR_METHODS
-#endif // #ifndef XRGAME_EXPORTS
+#endif
 
 enum EPOType
 {

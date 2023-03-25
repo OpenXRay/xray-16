@@ -587,13 +587,13 @@ void CSE_ALifeTrader::UPDATE_Read(NET_Packet& tNetPacket)
 };
 
 bool CSE_ALifeTrader::interactive() const /* noexcept */ { return false; }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeTrader::FillProps(LPCSTR _pref, PropItemVec& items)
 {
     inherited1::FillProps(_pref, items);
     inherited2::FillProps(_pref, items);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeCustomZone
@@ -656,7 +656,7 @@ void CSE_ALifeCustomZone::STATE_Write(NET_Packet& tNetPacket)
 
 void CSE_ALifeCustomZone::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
 void CSE_ALifeCustomZone::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeCustomZone::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
@@ -667,7 +667,7 @@ void CSE_ALifeCustomZone::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateU32(
         items, PrepareKey(pref, *s_name, "on/off mode" DELIMITER "Disabled time (sec)"), &m_disabled_time, 0, 100000);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeAnomalousZone
@@ -752,7 +752,7 @@ void CSE_ALifeAnomalousZone::STATE_Write(NET_Packet& tNetPacket)
 
 void CSE_ALifeAnomalousZone::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
 void CSE_ALifeAnomalousZone::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeAnomalousZone::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
@@ -762,7 +762,7 @@ void CSE_ALifeAnomalousZone::FillProps(LPCSTR pref, PropItemVec& items)
         items, PrepareKey(pref, *s_name, "ALife" DELIMITER "Artefact spawn places count"), &m_artefact_spawn_count, 32, 256);
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife" DELIMITER "Visible for AI"), &m_flags, flVisibleForAI);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 //////////////////////////////////////////////////////////////////////////
 // SE_ALifeTorridZone
@@ -785,13 +785,13 @@ void CSE_ALifeTorridZone::STATE_Write(NET_Packet& tNetPacket)
 
 void CSE_ALifeTorridZone::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
 void CSE_ALifeTorridZone::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeTorridZone::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited1::FillProps(pref, values);
     inherited2::FillProps(pref, values);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeZoneVisual
@@ -824,7 +824,7 @@ void CSE_ALifeZoneVisual::STATE_Write(NET_Packet& tNetPacket)
 
 void CSE_ALifeZoneVisual::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
 void CSE_ALifeZoneVisual::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeZoneVisual::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited1::FillProps(pref, values);
@@ -834,7 +834,7 @@ void CSE_ALifeZoneVisual::FillProps(LPCSTR pref, PropItemVec& values)
     PHelper().CreateChoose(values, PrepareKey(pref, abstract->name(), "Attack animation"), &attack_animation,
         smSkeletonAnims, nullptr, (void*)*visual_name);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 //-------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeCreatureAbstract
@@ -970,7 +970,7 @@ void CSE_ALifeCreatureAbstract::UPDATE_Read(NET_Packet& tNetPacket)
 u8 CSE_ALifeCreatureAbstract::g_team() { return s_team; }
 u8 CSE_ALifeCreatureAbstract::g_squad() { return s_squad; }
 u8 CSE_ALifeCreatureAbstract::g_group() { return s_group; }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeCreatureAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
@@ -979,7 +979,7 @@ void CSE_ALifeCreatureAbstract::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateU8(items, PrepareKey(pref, *s_name, "Group"), &s_group, 0, 64, 1);
     PHelper().CreateFloat(items, PrepareKey(pref, *s_name, "Personal", "Health"), &fHealth, 0, 2, 5);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 bool CSE_ALifeCreatureAbstract::used_ai_locations() const /* noexcept */ { return true; }
 bool CSE_ALifeCreatureAbstract::can_switch_online() const /* noexcept */ { return inherited::can_switch_online(); }
@@ -1143,7 +1143,7 @@ void CSE_ALifeMonsterAbstract::UPDATE_Read(NET_Packet& tNetPacket)
     tNetPacket.r_float(m_fDistanceToPoint);
 };
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeMonsterAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited1::FillProps(pref, items);
@@ -1160,7 +1160,7 @@ void CSE_ALifeMonsterAbstract::FillProps(LPCSTR pref, PropItemVec& items)
             smSpawnItem, nullptr, (void*)gcs, 16);
     }
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 bool CSE_ALifeMonsterAbstract::need_update(CSE_ALifeDynamicObject* object)
 {
@@ -1353,13 +1353,13 @@ void CSE_ALifeCreatureActor::UPDATE_Write(NET_Packet& tNetPacket)
     }
 }
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeCreatureActor::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited1::FillProps(pref, items);
     inherited2::FillProps(pref, items);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 #ifdef XRGAME_EXPORTS
 void CSE_ALifeCreatureActor::spawn_supplies()
@@ -1394,9 +1394,9 @@ void CSE_ALifeCreatureCrow::STATE_Read(NET_Packet& tNetPacket, u16 size)
 void CSE_ALifeCreatureCrow::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
 void CSE_ALifeCreatureCrow::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
 void CSE_ALifeCreatureCrow::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeCreatureCrow::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
-#endif // #ifndef XRGAME_EXPORTS
+#endif
 
 bool CSE_ALifeCreatureCrow::used_ai_locations() const /* noexcept */ { return false; }
 ////////////////////////////////////////////////////////////////////////////
@@ -1415,9 +1415,9 @@ void CSE_ALifeCreaturePhantom::STATE_Read(NET_Packet& tNetPacket, u16 size) { in
 void CSE_ALifeCreaturePhantom::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
 void CSE_ALifeCreaturePhantom::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
 void CSE_ALifeCreaturePhantom::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeCreaturePhantom::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
-#endif // #ifndef XRGAME_EXPORTS
+#endif
 
 bool CSE_ALifeCreaturePhantom::used_ai_locations() const /* noexcept */ { return false; }
 ////////////////////////////////////////////////////////////////////////////
@@ -1535,7 +1535,7 @@ CSE_Abstract* CSE_ALifeMonsterRat::init()
 
 CSE_Abstract* CSE_ALifeMonsterRat::base() { return (inherited1::base()); }
 const CSE_Abstract* CSE_ALifeMonsterRat::base() const { return (inherited1::base()); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeMonsterRat::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited1::FillProps(pref, items);
@@ -1570,7 +1570,7 @@ void CSE_ALifeMonsterRat::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateFloat(
         items, PrepareKey(pref, *s_name, "Attack", "Success probability"), &fAttackSuccessProbability, 0, 100, 1);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 bool CSE_ALifeMonsterRat::bfUseful() { return (!smart_cast<CSE_ALifeGroupAbstract*>(this) && (get_health() <= EPS_L)); }
 ////////////////////////////////////////////////////////////////////////////
@@ -1640,7 +1640,7 @@ void CSE_ALifeMonsterZombie::STATE_Write(NET_Packet& tNetPacket)
 
 void CSE_ALifeMonsterZombie::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
 void CSE_ALifeMonsterZombie::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeMonsterZombie::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
@@ -1659,7 +1659,7 @@ void CSE_ALifeMonsterZombie::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateFloat(items, PrepareKey(pref, *s_name, "Attack", "Distance"), &fAttackDistance, 0, 300, 10);
     PHelper().CreateFloat(items, PrepareKey(pref, *s_name, "Attack", "Maximum angle"), &fAttackAngle, 0, 100, 1);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeMonsterBase
@@ -1708,13 +1708,13 @@ void CSE_ALifeMonsterBase::load(NET_Packet& tNetPacket)
     inherited2::load(tNetPacket);
 }
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeMonsterBase::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited1::FillProps(pref, values);
     inherited2::FillProps(pref, values);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifePsyDogPhantom
@@ -1725,9 +1725,9 @@ void CSE_ALifePsyDogPhantom::STATE_Read(NET_Packet& tNetPacket, u16 size) { inhe
 void CSE_ALifePsyDogPhantom::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
 void CSE_ALifePsyDogPhantom::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
 void CSE_ALifePsyDogPhantom::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifePsyDogPhantom::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
-#endif // #ifndef XRGAME_EXPORTS
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeHumanAbstract
@@ -1789,14 +1789,14 @@ void CSE_ALifeHumanAbstract::UPDATE_Read(NET_Packet& tNetPacket)
     }
 };
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeHumanAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited1::FillProps(pref, items);
     inherited2::FillProps(pref, items);
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "Group behaviour"), &m_flags, flGroupBehaviour);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeHumanStalker
@@ -1846,13 +1846,13 @@ void CSE_ALifeHumanStalker::load(NET_Packet& tNetPacket)
     inherited2::load(tNetPacket);
 }
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeHumanStalker::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited1::FillProps(pref, values);
     inherited2::FillProps(pref, values);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeOnlineOfflineGroup
@@ -1930,6 +1930,6 @@ void CSE_ALifeOnlineOfflineGroup::STATE_Read(NET_Packet& tNetPacket, u16 size)
 
 void CSE_ALifeOnlineOfflineGroup::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }
 void CSE_ALifeOnlineOfflineGroup::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_ALifeOnlineOfflineGroup::FillProps(LPCSTR pref, PropItemVec& values) { inherited1::FillProps(pref, values); }
-#endif // #ifndef XRGAME_EXPORTS
+#endif

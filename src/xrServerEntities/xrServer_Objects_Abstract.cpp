@@ -72,7 +72,7 @@ void CSE_Visual::OnChangeAnim(PropValue* sender)
     abstract->set_editor_flag(IServerEntity::flVisualAnimationChange);
 }
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_Visual::FillProps(LPCSTR pref, PropItemVec& items)
 {
     IServerEntity* abstract = smart_cast<IServerEntity*>(this);
@@ -85,7 +85,7 @@ void CSE_Visual::FillProps(LPCSTR pref, PropItemVec& items)
     V->OnChangeEvent.bind(this, &CSE_Visual::OnChangeAnim);
     PHelper().CreateFlag8(items, PrepareKey(pref, abstract->name(), "Model" DELIMITER "Obstacle"), &flags, flObstacle);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_Animated
@@ -102,7 +102,7 @@ void CSE_Motion::OnChangeMotion(PropValue* sender)
     abstract->set_editor_flag(IServerEntity::flMotionChange);
 }
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_Motion::FillProps(LPCSTR pref, PropItemVec& items)
 {
     IServerEntity* abstract = smart_cast<IServerEntity*>(this);
@@ -111,6 +111,6 @@ void CSE_Motion::FillProps(LPCSTR pref, PropItemVec& items)
         PHelper().CreateChoose(items, PrepareKey(pref, abstract->name(), "Motion"), &motion_name, smGameAnim);
     V->OnChangeEvent.bind(this, &CSE_Motion::OnChangeMotion);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 #pragma pack(pop)
