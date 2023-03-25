@@ -2143,6 +2143,9 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5A32302-94F5-41B8-9606-017BB6BA69A6}
 	EndGlobalSection
+	GlobalSection(CppDepend) = preSolution
+		Project = ".\engine.cdproj"
+	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
 	EndGlobalSection
