@@ -6,12 +6,7 @@
 
 namespace award_system
 {
-faster_than_bullets_time::faster_than_bullets_time(game_state_accumulator* owner) : inherited(owner)
-{
-    m_no_demag_time = u32(-1);
-}
-
-u32 const faster_than_bullets_time::get_u32_param() { return m_no_demag_time; }
+u32 faster_than_bullets_time::get_u32_param() { return m_no_demag_time; }
 void faster_than_bullets_time::reset_game() { m_no_demag_time = u32(-1); }
 struct last_hits_fetcher
 {

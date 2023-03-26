@@ -54,7 +54,7 @@ void CPhraseDialogManager::InitDialog(CPhraseDialogManager* dialog_partner, DIAL
 
 void CPhraseDialogManager::AddDialog(DIALOG_SHARED_PTR& phrase_dialog)
 {
-    auto it = std::find(m_ActiveDialogs.begin(), m_ActiveDialogs.end(), phrase_dialog);
+    [[maybe_unused]] auto it = std::find(m_ActiveDialogs.begin(), m_ActiveDialogs.end(), phrase_dialog);
     THROW(m_ActiveDialogs.end() == it);
     m_ActiveDialogs.push_back(phrase_dialog);
 }

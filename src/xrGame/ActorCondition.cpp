@@ -15,6 +15,7 @@
 #include "xrScriptEngine/script_callback_ex.h"
 #include "Common/object_broker.h"
 #include "Weapon.h"
+#include "Wound.h"
 
 #include "PDA.h"
 #include "ai/monsters/basemonster/base_monster.h"
@@ -360,7 +361,7 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
     {
         m_f_time_affected += one;
 
-        for (int i = 0; i < sizeof(hits) / sizeof(hits[0]); ++i)
+        for (size_t i = 0; i < sizeof(hits) / sizeof(hits[0]); ++i)
         {
             float damage = hits[i].value;
             ALife::EHitType type = hits[i].type;
@@ -643,24 +644,18 @@ void CActorCondition::DisableBoostParameters(const SBooster& B)
 }
 void CActorCondition::WoundForEach(const luabind::functor<bool>& funct)
 {
-    auto const& cur_wounds = wounds();
-    CEntityCondition::WOUND_VECTOR::const_iterator it = wounds().begin();
-    CEntityCondition::WOUND_VECTOR::const_iterator it_e = wounds().end();
-    for (; it != it_e; ++it)
+    for (const auto& wound : wounds())
     {
-        if (funct(it) == true)
+        if (funct(wound))
             break;
     }
 }
 
 void CActorCondition::BoosterForEach(const luabind::functor<bool>& funct)
 {
-    const auto& cur_booster_influences = GetCurBoosterInfluences();
-    CEntityCondition::BOOSTER_MAP::const_iterator it = cur_booster_influences.begin();
-    CEntityCondition::BOOSTER_MAP::const_iterator it_e = cur_booster_influences.end();
-    for (; it != it_e; ++it)
+    for (const auto& influence : GetCurBoosterInfluences())
     {
-        if (funct((*it).first, (*it).second.fBoostTime, (*it).second.fBoostValue) == true)
+        if (funct((influence).first, influence.second.fBoostTime, influence.second.fBoostValue))
             break;
     }
 }

@@ -83,7 +83,7 @@ void CUIMpChangeMapAdm::OnBtnOk()
 {
     u32 idx = lst->GetSelectedIDX();
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
-    if (idx >= 0 && idx < M.m_map_names.size())
+    if (idx != u32(-1) && idx < M.m_map_names.size())
     {
         const shared_str& name = M.m_map_names[idx].map_name;
         const shared_str& ver = M.m_map_names[idx].map_ver;

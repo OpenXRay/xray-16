@@ -113,7 +113,6 @@ void CStateGroupRestAbstract::execute()
                         this->object->set_current_animation(7);
                         this->object->saved_state = u32(-1);
                         break;
-                    default: break;
                     }
                     if (this->object->b_state_check)
                     {

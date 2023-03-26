@@ -183,7 +183,7 @@ bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
             process_if_exists(section, "control_inertion_factor", &CInifile::r_float, m_fControlInertionFactor, test);
     }
 
-    pcstr str;
+    pcstr str = nullptr;
     result2 = process_if_exists_set(section, "immunities_sect", &CInifile::r_string, str, test);
     if (result2 && !test)
         CHitImmunity::LoadImmunities(str, pSettings);

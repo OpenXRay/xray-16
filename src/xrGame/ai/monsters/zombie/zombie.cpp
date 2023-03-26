@@ -102,7 +102,7 @@ void CZombie::BoneCallback(CBoneInstance* B)
 
     START_PROFILE("Zombie/Bones Update");
     this_class->Bones.Update(B, Device.dwTimeGlobal);
-    STOP_PROFILE("AI/Zombie/Bones Update");
+    STOP_PROFILE
 }
 
 void CZombie::vfAssignBones()

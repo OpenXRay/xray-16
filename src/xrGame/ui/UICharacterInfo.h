@@ -23,9 +23,9 @@ protected:
     void UpdateRelation();
     bool hasOwner() { return (m_ownerID != u16(-1)); }
     // Biography
-    CUIScrollView* pUIBio;
-    bool m_bForceUpdate;
-    u16 m_ownerID;
+    CUIScrollView* pUIBio{};
+    bool m_bForceUpdate{};
+    u16 m_ownerID{ u16(-1) };
 
     enum UIItemType
     {

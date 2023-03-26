@@ -56,6 +56,17 @@ public:
         }
     }
 
+    mixed_delegate& operator=(const mixed_delegate& other)
+    {
+        if (this == &other)
+            return *this;
+
+        m_cpp_delegate = other.m_cpp_delegate;
+        m_lua_delegate = other.m_lua_delegate;
+
+        return *this;
+    }
+
     R operator()(Param1 arg1, Param2 arg2)
     {
         if (m_cpp_delegate)

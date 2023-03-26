@@ -10,15 +10,15 @@ class next_weapon_searcher
 public:
     typedef xr_set<PIItem> exception_items_t;
     next_weapon_searcher(priority_group& pg, PIItem& best_fit, exception_items_t& except_set, bool ignore_ammo)
-        : m_prior_group(pg), m_best_fit(best_fit), m_best_fit_cost(0), m_best_fit_ammo_elapsed(0),
-          m_except_set(except_set), m_ignore_ammo(ignore_ammo)
+        : m_prior_group(pg),  m_except_set(except_set), m_best_fit(best_fit), m_ignore_ammo(ignore_ammo)
     {
-        m_best_fit = NULL;
+        // XXX: Why??
+        m_best_fit = nullptr;
     };
 
     next_weapon_searcher(next_weapon_searcher const& copy)
-        : m_prior_group(copy.m_prior_group), m_best_fit(copy.m_best_fit), m_best_fit_cost(copy.m_best_fit_cost),
-          m_best_fit_ammo_elapsed(copy.m_best_fit_ammo_elapsed), m_except_set(copy.m_except_set),
+        : m_prior_group(copy.m_prior_group), m_except_set(copy.m_except_set), m_best_fit(copy.m_best_fit),
+          m_best_fit_cost(copy.m_best_fit_cost), m_best_fit_ammo_elapsed(copy.m_best_fit_ammo_elapsed),
           m_ignore_ammo(copy.m_ignore_ammo){};
 
     void operator()(PIItem const& item)
@@ -69,8 +69,8 @@ private:
     priority_group& m_prior_group;
     exception_items_t& m_except_set;
     PIItem& m_best_fit;
-    u32 m_best_fit_cost;
-    u32 m_best_fit_ammo_elapsed;
+    u32 m_best_fit_cost{};
+    u32 m_best_fit_ammo_elapsed{};
     bool m_ignore_ammo;
 }; // class next_weapon_searcher
 

@@ -739,8 +739,8 @@ void game_cl_mp::OnSwitchPhase(u32 old_phase, u32 new_phase)
             CurrentGameUI()->ShowGameIndicators(true);
             CurrentGameUI()->m_pMessagesWnd->PendingMode(false);
         }
+        break;
     }
-    break;
     case GAME_PHASE_PENDING:
     {
         m_bJustRestarted = true;
@@ -753,23 +753,25 @@ void game_cl_mp::OnSwitchPhase(u32 old_phase, u32 new_phase)
                 CurrentGameUI()->m_pMessagesWnd->PendingMode(true);
             }
         }
-    };
-
+        [[fallthrough]];
+    }
     case GAME_PHASE_TEAM1_SCORES:
     case GAME_PHASE_TEAM2_SCORES:
     case GAME_PHASE_TEAM1_ELIMINATED:
     case GAME_PHASE_TEAM2_ELIMINATED:
     case GAME_PHASE_TEAMS_IN_A_DRAW:
-    case GAME_PHASE_PLAYER_SCORES: { HideMessageMenus();
+    case GAME_PHASE_PLAYER_SCORES:
+    {
+        HideMessageMenus();
+        break;
     }
-    break;
     default:
     {
         if (g_hud && CurrentGameUI())
             CurrentGameUI()->ShowGameIndicators(false);
         HideMessageMenus();
+        break;
     }
-    break;
     }
 }
 
@@ -935,8 +937,8 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
                     PlaySndMessage(ID_BUTCHER);
                 }
             };
+            break;
         }
-        break;
         case SKT_HEADSHOT: // Head Shot
         {
             auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "headshot");
@@ -954,8 +956,8 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
 
             if (pOKiller && pOKiller == Level().CurrentViewEntity())
                 PlaySndMessage(ID_HEADSHOT);
-        }
-        break;
+            break;
+        };
         case SKT_EYESHOT:
         {
             auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "eyeshot");
@@ -973,8 +975,8 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
 
             if (pOKiller && pOKiller == Level().CurrentViewEntity())
                 PlaySndMessage(ID_ASSASSIN);
+            break;
         }
-        break;
         case SKT_BACKSTAB: // BackStab
         {
             auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "backstab");
@@ -991,8 +993,8 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
             xr_sprintf(sSpecial, *StringTable().translate("mp_with_backstab"));
             if (pOKiller && pOKiller == Level().CurrentViewEntity())
                 PlaySndMessage(ID_ASSASSIN);
+            break;
         }
-        break;
         }
         // suicide
         if (KilledID == KillerID)
@@ -1066,7 +1068,6 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         Msg("%s killed by radiation", *KMS.m_victim.m_name);
     }
     break;
-    default: break;
     }
     if (CurrentGameUI() && CurrentGameUI()->m_pMessagesWnd)
         CurrentGameUI()->m_pMessagesWnd->AddLogMessage(KMS);
@@ -1237,21 +1238,31 @@ void game_cl_mp::OnEventMoneyChanged(NET_Packet& P)
         shared_str BName = "";
         switch (BonusReason)
         {
-        case SKT_HEADSHOT: { BName = "headshot";
+        case SKT_HEADSHOT:
+        {
+            BName = "headshot";
+            break;
         }
-        break;
-        case SKT_BACKSTAB: { BName = "backstab";
+        case SKT_BACKSTAB:
+        {
+            BName = "backstab";
+            break;
         }
-        break;
-        case SKT_KNIFEKILL: { BName = "knife_kill";
+        case SKT_KNIFEKILL:
+        {
+            BName = "knife_kill";
+            break;
         }
-        break;
-        case SKT_EYESHOT: { BName = "eyeshot";
+        case SKT_EYESHOT:
+        {
+            BName = "eyeshot";
+            break;
         }
-        break;
-        case SKT_PDA: { BName = "pda_taken";
+        case SKT_PDA:
+        {
+            BName = "pda_taken";
+            break;
         }
-        break;
         case SKT_KIR:
         {
             BName.printf("%d_kill_in_row", BonusKills);
@@ -1259,16 +1270,16 @@ void game_cl_mp::OnEventMoneyChanged(NET_Packet& P)
             xr_sprintf(MoneyStr, sizeof(MoneyStr), "%d", BonusKills);
             BMS.m_killer.m_name = MoneyStr;
             BMS.m_killer.m_color = 0xffff0000;
+            break;
         }
-        break;
         case SKT_NEWRANK:
         {
             BName = "new_rank";
             s16 player_team = ModifyTeam(local_player->team);
             R_ASSERT((player_team == 0) || (player_team == 1));
             RectID = ((local_player->rank) * 2) + player_team;
+            break;
         }
-        break;
         };
         auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), BName.c_str());
         if (it != m_pBonusList.end() && (*it == BName.c_str()))

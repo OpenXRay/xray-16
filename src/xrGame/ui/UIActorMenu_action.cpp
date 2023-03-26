@@ -142,45 +142,55 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
         }
         SendEvent_Item_Drop(CurrentIItem(), m_pActorInvOwner->object_id());
         SetCurrentItem(NULL);
+        break;
     }
-    break;
     case iActorSlot:
     {
-        //.			if(GetSlotList(CurrentIItem()->GetSlot())==new_owner)
+        //if(GetSlotList(CurrentIItem()->GetSlot())==new_owner)
         u16 slot_to_place;
         if (CanSetItemToList(CurrentIItem(), new_owner, slot_to_place))
             ToSlot(itm, true, slot_to_place);
+        break;
     }
-    break;
-    case iActorBag: { ToBag(itm, true);
+    case iActorBag:
+    {
+        ToBag(itm, true);
+        break;
     }
-    break;
-    case iActorBelt: { ToBelt(itm, true);
+    case iActorBelt:
+    {
+        ToBelt(itm, true);
+        break;
     }
-    break;
-    case iActorTrade: { ToActorTrade(itm, true);
+    case iActorTrade:
+    {
+        ToActorTrade(itm, true);
+        break;
     }
-    break;
     case iPartnerTrade:
     {
         if (t_old != iPartnerTradeBag)
             return false;
         ToPartnerTrade(itm, true);
+        break;
     }
-    break;
     case iPartnerTradeBag:
     {
         if (t_old != iPartnerTrade)
             return false;
         ToPartnerTradeBag(itm, true);
+        break;
     }
+    case iDeadBodyBag:
+    {
+        ToDeadBodyBag(itm, true);
     break;
-    case iDeadBodyBag: { ToDeadBodyBag(itm, true);
     }
-    break;
-    case iQuickSlot: { ToQuickSlot(itm);
+    case iQuickSlot:
+    {
+        ToQuickSlot(itm);
+        break;
     }
-    break;
     };
 
     OnItemDropped(CurrentIItem(), new_owner, old_owner);
@@ -272,10 +282,11 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
         ToBag(itm, false);
         break;
     }
-    case iQuickSlot: { ToQuickSlot(itm);
+    case iQuickSlot:
+    {
+        ToQuickSlot(itm);
+        break;
     }
-    break;
-
     }; // switch
 
     UpdateItemsPlace();

@@ -191,7 +191,9 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
 
         if (!weight)
         {
-            if (CWeaponAmmo* ammo = dynamic_cast<CWeaponAmmo*>(pInvItem))
+            // XXX: check why 'ammo'
+            // if (CWeaponAmmo* ammo = dynamic_cast<CWeaponAmmo*>(pInvItem))
+            if (dynamic_cast<CWeaponAmmo*>(pInvItem))
             {
                 // its helper item, m_boxCur is zero, so recalculate via CInventoryItem::Weight()
                 weight = pInvItem->CInventoryItem::Weight();

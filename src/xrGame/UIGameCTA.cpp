@@ -42,11 +42,8 @@
 
 #define TEAM_PANELS_XML_NAME "ui_team_panels_cta.xml"
 
-CUIGameCTA::CUIGameCTA()
-    : teamPanels(NULL), m_pFragLimitIndicator(NULL), m_team1_score(NULL), m_team2_score(NULL), m_pCurBuyMenu(NULL),
-      m_pCurSkinMenu(NULL), m_pBuySpawnMsgBox(NULL), m_game(NULL), m_voteStatusWnd(NULL), m_team_panels_shown(false)
+CUIGameCTA::CUIGameCTA() : m_pUITeamSelectWnd{xr_new<CUISpawnWnd>()}
 {
-    m_pUITeamSelectWnd = xr_new<CUISpawnWnd>();
 }
 
 void CUIGameCTA::Init(int stage)
@@ -779,20 +776,13 @@ bool CUIGameCTA::IR_UIOnKeyboardPress(int dik)
     if (inherited::IR_UIOnKeyboardPress(dik))
         return true;
 
-    switch (dik)
+    if (dik == SDL_SCANCODE_CAPSLOCK && m_game)
     {
-    case SDL_SCANCODE_CAPSLOCK:
-    {
-        if (m_game)
-        {
-            if (m_game->Get_ShowPlayerNamesEnabled())
-                m_game->Set_ShowPlayerNames(!m_game->Get_ShowPlayerNames());
-            else
-                m_game->Set_ShowPlayerNames(true);
-            return true;
-        };
-    }
-    break;
+        if (m_game->Get_ShowPlayerNamesEnabled())
+            m_game->Set_ShowPlayerNames(!m_game->Get_ShowPlayerNames());
+        else
+            m_game->Set_ShowPlayerNames(true);
+        return true;
     }
 
     EGameActions cmd = GetBindedAction(dik);
@@ -802,11 +792,9 @@ bool CUIGameCTA::IR_UIOnKeyboardPress(int dik)
     case kBUY:
     case kSKIN:
     case kTEAM:
-
     case kSPEECH_MENU_0:
-    case kSPEECH_MENU_1: { return Game().OnKeyboardPress(cmd);
-    }
-    break;
+    case kSPEECH_MENU_1:
+        return Game().OnKeyboardPress(cmd);
     }
 
     return false;

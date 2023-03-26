@@ -74,22 +74,28 @@ float CAI_Stalker::GetWeaponAccuracy() const
     if (!movement().path_completed())
     {
         if (movement().movement_type() == eMovementTypeWalk)
+        {
             if (movement().body_state() == eBodyStateStand)
                 return (base * m_disp_walk_stand);
             else
                 return (base * m_disp_walk_crouch);
+        }
         else if (movement().movement_type() == eMovementTypeRun)
+        {
             if (movement().body_state() == eBodyStateStand)
                 return (base * m_disp_run_stand);
             else
                 return (base * m_disp_run_crouch);
+        }
     }
 
     if (movement().body_state() == eBodyStateStand)
+    {
         if (zoom_state())
             return (base * m_disp_stand_stand);
         else
             return (base * m_disp_stand_stand_zoom);
+    }
     else if (zoom_state())
         return (base * m_disp_stand_crouch);
     else
@@ -300,9 +306,9 @@ void CAI_Stalker::Hit(SHit* pHDS)
             //				sound().play		(eStalkerSoundInjuringByFriend);
         }
 
-        int weapon_type = -1;
-        if (best_weapon())
-            weapon_type = best_weapon()->object().ef_weapon_type();
+//        int weapon_type = -1;
+//        if (best_weapon())
+//            weapon_type = best_weapon()->object().ef_weapon_type();
 
         if (!wounded() && !already_critically_wounded)
         {
@@ -318,8 +324,8 @@ void CAI_Stalker::Hit(SHit* pHDS)
                 clamp(power_factor, 0.f, 1.f);
 
                 // IKinematicsAnimated		*tpKinematics = smart_cast<IKinematicsAnimated*>(Visual());
-                IKinematics* tpKinematics = smart_cast<IKinematics*>(Visual());
 #ifdef DEBUG
+                IKinematics* tpKinematics = smart_cast<IKinematics*>(Visual());
                 tpKinematics->LL_GetBoneInstance(HDS.bone());
                 if (HDS.bone() >= tpKinematics->LL_BoneCount())
                 {

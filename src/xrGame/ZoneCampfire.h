@@ -6,11 +6,11 @@ class CZoneCampfire : public CMosquitoBald
     typedef CMosquitoBald inherited;
 
 protected:
-    CParticlesObject* m_pEnablingParticles;
-    CParticlesObject* m_pDisabledParticles;
+    CParticlesObject* m_pEnablingParticles{};
+    CParticlesObject* m_pDisabledParticles{};
     ref_sound m_disabled_sound;
-    bool m_turned_on;
-    u32 m_turn_time;
+    bool m_turned_on{ true };
+    u32 m_turn_time{};
 
     virtual void PlayIdleParticles(bool bIdleLight = true);
     virtual void StopIdleParticles(bool bIdleLight = true);

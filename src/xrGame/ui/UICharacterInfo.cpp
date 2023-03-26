@@ -35,11 +35,9 @@ CSE_ALifeTraderAbstract* ch_info_get_from_id(u16 id)
     }
 }
 
-CUICharacterInfo::CUICharacterInfo() : CUIWindow("CUICharacterInfo"), pUIBio(nullptr), m_ownerID(u16(-1))
+CUICharacterInfo::CUICharacterInfo() : CUIWindow("CUICharacterInfo")
 {
     ZeroMemory(m_icons, sizeof(m_icons));
-    m_bForceUpdate = false;
-    m_texture_name = NULL;
 }
 
 CUICharacterInfo::~CUICharacterInfo() {}

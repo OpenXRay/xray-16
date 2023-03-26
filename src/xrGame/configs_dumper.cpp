@@ -249,8 +249,8 @@ void configs_dumper::compress_configs()
 
 void configs_dumper::dumper_thread(void* my_ptr)
 {
-    configs_dumper* this_ptr = static_cast<configs_dumper*>(my_ptr);
 #ifdef XR_PLATFORM_WINDOWS // XXX: use Event class, enable on other platforms
+    configs_dumper* this_ptr = static_cast<configs_dumper*>(my_ptr);
     u32 wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {

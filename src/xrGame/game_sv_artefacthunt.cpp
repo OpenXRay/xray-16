@@ -67,14 +67,12 @@ void game_sv_ArtefactHunt::Create(shared_str& options)
             for (int id = 0; O->find_chunk(id); ++id)
             {
                 RPoint R;
-                u8 team;
-                u16 type;
 
                 O->r_fvector3(R.P);
                 O->r_fvector3(R.A);
-                team = O->r_u8();
+                [[maybe_unused]] u8 team = O->r_u8();
                 VERIFY(team >= 0 && team < 4);
-                type = O->r_u8();
+                u16 type = O->r_u8();
                 u16 GameType = O->r_u16();
                 switch (type)
                 {
@@ -150,9 +148,6 @@ KILL_RES game_sv_ArtefactHunt::GetKillResult(game_PlayerState* pKiller, game_Pla
     {
         if (pVictim->GameID == artefactBearerID)
             Res = KR_RIVAL_CRITICAL;
-    }
-    break;
-    default: {
     }
     break;
     };
@@ -1450,7 +1445,6 @@ void game_sv_ArtefactHunt::ReadOptions(shared_str& options)
     //----------------------------------------------------------------------------
 }
 
-static bool g_bConsoleCommandsCreated_AHUNT = false;
 void game_sv_ArtefactHunt::ConsoleCommands_Create(){};
 
 void game_sv_ArtefactHunt::ConsoleCommands_Clear(){};

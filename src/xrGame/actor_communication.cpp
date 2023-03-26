@@ -250,7 +250,7 @@ void CActor::StartTalk(CInventoryOwner* talk_partner)
         det->HideDetector(true);
     }
 
-    CGameObject* GO = smart_cast<CGameObject*>(talk_partner);
+    [[maybe_unused]] auto GO = smart_cast<CGameObject*>(talk_partner);
     VERIFY(GO);
     CInventoryOwner::StartTalk(talk_partner);
 }
@@ -273,7 +273,7 @@ void CActor::LostPdaContact(CInventoryOwner* pInvOwner)
     CGameObject* GO = smart_cast<CGameObject*>(pInvOwner);
     if (GO)
     {
-        for (int t = ALife::eRelationTypeFriend; t < ALife::eRelationTypeLast; ++t)
+        for (int t = static_cast<int>(ALife::eRelationTypeFriend); t < static_cast<int>(ALife::eRelationTypeLast); ++t)
         {
             ALife::ERelationType tt = (ALife::ERelationType)t;
             Level().MapManager().RemoveMapLocation(RELATION_REGISTRY().GetSpotName(tt), GO->ID());

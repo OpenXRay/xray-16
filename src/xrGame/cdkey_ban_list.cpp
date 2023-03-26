@@ -173,9 +173,6 @@ pcstr print_time(time_t const& src_time, string64& dest_time)
 
 void cdkey_ban_list::print_ban_list(char const* filter_string)
 {
-    char const* to_filter = NULL;
-    if (filter_string && xr_strlen(filter_string))
-        to_filter = filter_string;
     Msg("- ----banned players list begin-------");
     string512 tmp_string;
     u32 index = 0;

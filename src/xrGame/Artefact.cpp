@@ -405,7 +405,6 @@ bool CArtefact::Action(u16 cmd, u32 flags)
         }
     }
     break;
-    default: break;
     }
     return inherited::Action(cmd, flags);
 }
@@ -496,8 +495,7 @@ void CArtefact::CreateArtefactActivation()
     m_activationObj = xr_new<SArtefactActivation>(this, H_Parent()->ID());
 }
 
-SArtefactDetectorsSupport::SArtefactDetectorsSupport(CArtefact* A)
-    : m_parent(A), m_currPatrolPath(NULL), m_currPatrolVertex(NULL), m_switchVisTime(0)
+SArtefactDetectorsSupport::SArtefactDetectorsSupport(CArtefact* A) : m_parent(A)
 {
 }
 

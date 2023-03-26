@@ -88,7 +88,7 @@ CGameSpy_BrowsersWrapper::~CGameSpy_BrowsersWrapper()
 CGameSpy_BrowsersWrapper::SubscriberIdx CGameSpy_BrowsersWrapper::SubscribeUpdates(UpdateCallback updateCb)
 {
     ScopeLock sl(&updates_subscriptions_lock);
-    for (auto i = 0; i < updates_subscriptions.size(); ++i)
+    for (size_t i = 0; i < updates_subscriptions.size(); ++i)
     {
         if (updates_subscriptions[i].empty())
         {
@@ -128,11 +128,11 @@ void CGameSpy_BrowsersWrapper::UpdateCb(CGameSpy_Browser* gs_browser)
         R_ASSERT(bro_info);
 
         auto cur_count = gs_browser->GetServersCount();
-        R_ASSERT(cur_count >= bro_info->servers_count);
+        R_ASSERT(cur_count >= static_cast<int>(bro_info->servers_count));
 
         // Such mechanism of addition to list (with intermediate vector) prevents possible problems with re-ordering
         // servers after investigating the new ones. I'm sure that changing indices will be unexpected in client's code.
-        while (cur_count > bro_info->servers_count)
+        while (cur_count > static_cast<int>(bro_info->servers_count))
         {
             servers.push_back({gs_browser, bro_info->servers_count, nullptr});
             ++bro_info->servers_count;
@@ -140,7 +140,7 @@ void CGameSpy_BrowsersWrapper::UpdateCb(CGameSpy_Browser* gs_browser)
     }
     {
         ScopeLock sl2(&updates_subscriptions_lock);
-        for (auto i = 0; i < updates_subscriptions.size(); ++i)
+        for (size_t i = 0; i < updates_subscriptions.size(); ++i)
         {
             if (!updates_subscriptions[i].empty())
                 updates_subscriptions[i]();
@@ -183,21 +183,21 @@ GSUpdateStatus CGameSpy_BrowsersWrapper::RefreshList_Full(bool Local, const char
 void CGameSpy_BrowsersWrapper::RefreshQuick(int server_id)
 {
     ScopeLock sl(&servers_lock);
-    R_ASSERT(server_id < servers.size());
+    R_ASSERT(server_id < static_cast<int>(servers.size()));
     servers[server_id].browser->RefreshQuick(servers[server_id].idx);
 }
 
 bool CGameSpy_BrowsersWrapper::HasAllKeys(int server_id)
 {
     ScopeLock sl(&servers_lock);
-    R_ASSERT(server_id < servers.size());
+    R_ASSERT(server_id < static_cast<int>(servers.size()));
     return servers[server_id].browser->HasAllKeys(servers[server_id].idx);
 }
 
 bool CGameSpy_BrowsersWrapper::CheckDirectConnection(int server_id)
 {
     ScopeLock sl(&servers_lock);
-    R_ASSERT(server_id < servers.size());
+    R_ASSERT(server_id < static_cast<int>(servers.size()));
     return servers[server_id].browser->CheckDirectConnection(servers[server_id].idx);
 }
 
@@ -210,7 +210,7 @@ int CGameSpy_BrowsersWrapper::GetServersCount()
 void CGameSpy_BrowsersWrapper::GetServerInfoByIndex(ServerInfo* pServerInfo, int server_id)
 {
     ScopeLock sl(&servers_lock);
-    R_ASSERT(server_id < servers.size());
+    R_ASSERT(server_id < static_cast<int>(servers.size()));
     servers[server_id].browser->GetServerInfoByIndex(pServerInfo, servers[server_id].idx);
 
     // Correct server ID from 'local' (from the actual browser) to 'global' (from the unified proxy)
@@ -220,7 +220,7 @@ void CGameSpy_BrowsersWrapper::GetServerInfoByIndex(ServerInfo* pServerInfo, int
 void* CGameSpy_BrowsersWrapper::GetServerByIndex(int server_id)
 {
     ScopeLock sl(&servers_lock);
-    R_ASSERT(server_id < servers.size());
+    R_ASSERT(server_id < static_cast<int>(servers.size()));
     servers[server_id].gs_data = servers[server_id].browser->GetServerByIndex(servers[server_id].idx);
 
     // Returning "raw" gs_data is not the best solution - it forces us to iterate over all servers in the vector (when

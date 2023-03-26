@@ -14,9 +14,9 @@ struct ARTICLE_DATA : public ISerializable
         eInfoArticle
     };
 
-    ARTICLE_DATA() : article_id(NULL), receive_time(0), readed(false), article_type(eEncyclopediaArticle) {}
+    ARTICLE_DATA() = default;
     ARTICLE_DATA(shared_str id, ALife::_TIME_ID time, EArticleType articleType)
-        : article_id(id), receive_time(time), readed(false), article_type(articleType)
+        : receive_time(time), article_id(id), article_type(articleType)
     {
     }
 
@@ -25,9 +25,8 @@ struct ARTICLE_DATA : public ISerializable
 
     ALife::_TIME_ID receive_time;
     shared_str article_id;
-    bool readed;
-
-    EArticleType article_type;
+    bool readed{};
+    EArticleType article_type{ eEncyclopediaArticle };
 };
 
 using ARTICLE_ID_VECTOR = xr_vector<shared_str>;

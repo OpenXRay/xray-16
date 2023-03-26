@@ -101,7 +101,7 @@ void CEntity::Hit(SHit* pHDS)
     // *** process hit calculations
     // Calc impulse
     Fvector vLocalDir;
-    float m = pHDS->dir.magnitude();
+    [[maybe_unused]] float m = pHDS->dir.magnitude();
     VERIFY(m > EPS);
 
     // convert impulse into local coordinate system

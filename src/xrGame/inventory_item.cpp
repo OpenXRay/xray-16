@@ -104,7 +104,7 @@ void CInventoryItem::Load(LPCSTR section)
 
     m_cost = pSettings->r_u32(section, "cost");
     u32 sl = pSettings->read_if_exists<u32>(section, "slot", NO_ACTIVE_SLOT);
-    m_ItemCurrPlace.base_slot_id = (sl == -1) ? 0 : (sl + 1);
+    m_ItemCurrPlace.base_slot_id = (sl == u32(-1)) ? 0 : (sl + 1);
 
     // Description
     if (pSettings->line_exist(section, "description"))

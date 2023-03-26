@@ -6,7 +6,6 @@
 
 namespace award_system
 {
-player_team_win_score::player_team_win_score(game_state_accumulator* owner) : inherited(owner) { m_win_score = 0; };
 void player_team_win_score::reset_game() { m_win_score = 0; }
 void player_team_win_score::OnRoundStart() { reset_game(); }
 void player_team_win_score::OnRoundEnd() { save_round_scores(); }
@@ -28,8 +27,8 @@ void player_team_win_score::save_round_scores()
         m_green_team_score = tmp_game->GetGreenTeamScore();
         m_blue_team_score = tmp_game->GetBlueTeamScore();
         m_player_team = tmp_local_player->team;
+        break;
     }
-    break;
     case eGameIDArtefactHunt:
     case eGameIDTeamDeathmatch:
     {
@@ -40,8 +39,8 @@ void player_team_win_score::save_round_scores()
         {
             m_player_team = static_cast<u8>(tmp_game->ModifyTeam(tmp_local_player->team));
         }
+        break;
     }
-    break;
     case eGameIDDeathmatch:
     {
         game_cl_Deathmatch* tmp_game = smart_cast<game_cl_Deathmatch*>(Level().game);
@@ -50,8 +49,8 @@ void player_team_win_score::save_round_scores()
             m_win_score = tmp_local_player->m_iRivalKills;
             return;
         }
+        break;
     }
-    break;
     }; // switch (Game().Type())
     if (static_cast<ETeam>(m_player_team) == etGreenTeam)
     {
@@ -61,11 +60,6 @@ void player_team_win_score::save_round_scores()
     {
         m_win_score = (m_blue_team_score > m_green_team_score) ? m_blue_team_score : 0;
     }
-}
-
-player_enemy_team_score::player_enemy_team_score(game_state_accumulator* owner) : inherited(owner)
-{
-    m_enemy_team_score = 0;
 }
 
 void player_enemy_team_score::reset_game()
@@ -88,8 +82,7 @@ void player_enemy_team_score::save_round_scores()
     }
 }
 
-player_runtime_win_score::player_runtime_win_score(game_state_accumulator* owner) : inherited(owner) {}
-u32 const player_runtime_win_score::get_u32_param()
+u32 player_runtime_win_score::get_u32_param()
 {
     u32 ret_score = 0;
     if (static_cast<ETeam>(m_player_team) == etGreenTeam)
@@ -104,6 +97,5 @@ u32 const player_runtime_win_score::get_u32_param()
 }
 
 void player_runtime_win_score::OnPlayerBringArtefact(game_PlayerState const* ps) { save_round_scores(); }
-player_runtime_enemy_team_score::player_runtime_enemy_team_score(game_state_accumulator* owner) : inherited(owner) {}
 void player_runtime_enemy_team_score::OnPlayerBringArtefact(game_PlayerState const* ps) { save_round_scores(); }
 } // namespace award_system

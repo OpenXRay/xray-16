@@ -87,11 +87,6 @@ extern int g_first_person_death;
 string32 ACTOR_DEFS::g_quick_use_slots[4] = {};
 // skeleton
 
-static Fbox bbStandBox;
-static Fbox bbCrouchBox;
-static Fvector vFootCenter;
-static Fvector vFootExt;
-
 Flags32 psActorFlags =
 {
     AF_GODMODE_RT |
@@ -1605,8 +1600,9 @@ void CActor::RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& 
 };
 
 static float mid_size = 0.097f;
-static float fontsize = 15.0f;
+//static float fontsize = 15.0f;
 static float upsize = 0.33f;
+
 void CActor::RenderText(LPCSTR Text, Fvector dpos, float* pdup, u32 color)
 {
     if (!g_Alive())

@@ -37,14 +37,8 @@ CUIHudStatesWnd::CUIHudStatesWnd()
     m_zone_hit_type[ALife::infl_psi] = ALife::eHitTypeTelepatic;
     m_zone_hit_type[ALife::infl_electra] = ALife::eHitTypeShock;
 
-    m_zone_feel_radius_max = 0.0f;
-
     m_health_blink = pSettings->read_if_exists<float>("actor_condition", "hud_health_blink", 0.f);
     clamp(m_health_blink, 0.0f, 1.0f);
-
-    m_fake_indicators_update = false;
-    m_arrow = nullptr;
-    m_arrow_shadow = nullptr;
     //-	Load_section();
 }
 

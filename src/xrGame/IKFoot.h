@@ -6,8 +6,8 @@
 struct local_vector
 {
     Fvector v;
-    u16 bone;
-    local_vector() : bone(u16(-1)), v(Fvector().set(0, 0, 0)) {}
+    u16 bone{ u16(-1) };
+    local_vector() : v(Fvector().set(0, 0, 0)) {}
 };
 
 class IKinematics;

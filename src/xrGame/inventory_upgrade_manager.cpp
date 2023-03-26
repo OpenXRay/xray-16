@@ -316,7 +316,7 @@ void Manager::test_all_upgrades(CInventoryItem& item)
 
 Upgrade* Manager::upgrade_verify(shared_str const& item_section, shared_str const& upgrade_id)
 {
-    Root* root_p = get_root(item_section);
+    [[maybe_unused]] auto root_p = get_root(item_section);
     VERIFY2(root_p, make_string("Upgrades of item <%s> don`t exist!", item_section.c_str()));
 
     Upgrade* upgrade_p = get_upgrade(upgrade_id);
@@ -326,7 +326,7 @@ Upgrade* Manager::upgrade_verify(shared_str const& item_section, shared_str cons
     VERIFY2(root_p->contain_upgrade(upgrade_id),
         make_string("Inventory item <%s> not contain upgrade <%s> !", item_section.c_str(), upgrade_id.c_str()));
 
-    return (upgrade_p);
+    return upgrade_p;
 }
 
 bool Manager::make_known_upgrade(CInventoryItem& item, shared_str const& upgrade_id)

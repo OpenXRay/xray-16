@@ -33,8 +33,8 @@ private:
     IKinematicsAnimated* m_skeleton_animated;
     shared_str m_animation;
     float m_previous_time;
-    bool m_first_time;
-    bool m_callback_called;
+    bool m_first_time{ true };
+    bool m_callback_called{};
 
 private:
     action_base* current_operator() const;

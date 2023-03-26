@@ -7,7 +7,6 @@
 
 namespace award_system
 {
-player_state_avenger::player_state_avenger(game_state_accumulator* owner) : inherited(owner) { m_aveng_count = 0; };
 void player_state_avenger::reset_game()
 {
     m_player_spawns.clear();

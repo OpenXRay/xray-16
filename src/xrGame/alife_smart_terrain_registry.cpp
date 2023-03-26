@@ -17,7 +17,7 @@ void CALifeSmartTerrainRegistry::add(CSE_ALifeDynamicObject* object)
     if (!zone)
         return;
 
-    OBJECTS::const_iterator I = objects().find(object->ID);
+    [[maybe_unused]] auto I = objects().find(object->ID);
     VERIFY(I == objects().end());
     m_objects.insert(std::make_pair(object->ID, zone));
 }

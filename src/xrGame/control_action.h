@@ -13,7 +13,7 @@ class CAI_Stalker;
 class CControlAction
 {
 protected:
-    CAI_Stalker* m_object;
+    CAI_Stalker* m_object{};
 
 public:
     IC CControlAction();
