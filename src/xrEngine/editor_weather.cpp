@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#ifndef MASTER_GOLD
 #include "editor_base.h"
 #include "editor_helper.h"
 
@@ -533,3 +534,6 @@ void ShowLevelWeathers()
     ImGui::End();
 }
 } // namespace xray::editor
+#else
+void ide::ShowWeatherEditor() {}
+#endif // !MASTER_GOLD
