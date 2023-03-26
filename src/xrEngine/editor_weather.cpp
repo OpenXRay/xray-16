@@ -535,5 +535,8 @@ void ShowLevelWeathers()
 }
 } // namespace xray::editor
 #else
+namespace xray::editor
+{
 void ide::ShowWeatherEditor() {}
+} // namespace xray::editor
 #endif // !MASTER_GOLD
