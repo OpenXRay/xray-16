@@ -76,7 +76,7 @@ FlareDescriptorFields SunFields =
     "sun", "sun_shader", "sun_texture", "sun_radius", "sun_ignore_color"
 };
 
-void CLensFlareDescriptor::load(CInifile const* pIni, shared_str sect)
+CLensFlareDescriptor::CLensFlareDescriptor(shared_str sect, CInifile const* pIni)
 {
     section = sect;
 
@@ -548,8 +548,9 @@ CLensFlareDescriptor* CLensFlare::AppendDef(shared_str sect)
         if (flare->section == sect)
             return flare;
 
-    const auto descriptor = xr_new<CLensFlareDescriptor>();
-    descriptor->load(m_suns_config ? m_suns_config : pSettings, sect);
+    const auto descriptor = xr_new<CLensFlareDescriptor>(sect,
+        m_suns_config ? m_suns_config : pSettings
+    );
     return m_Palette.emplace_back(descriptor);
 }
 

@@ -37,7 +37,7 @@ public:
         flSource = (1 << 1),
         flGradient = (1 << 2)
     };
-    Flags32 m_Flags;
+    Flags32 m_Flags{};
 
     // source
     SSource m_Source;
@@ -56,13 +56,7 @@ public:
     shared_str section;
 
 public:
-    CLensFlareDescriptor()
-    {
-        m_Flags.zero();
-        section = 0;
-        m_StateBlendUpSpeed = m_StateBlendDnSpeed = 0.1f;
-    }
-    void load(CInifile const* pIni, shared_str section);
+    CLensFlareDescriptor(shared_str section, CInifile const* pIni);
     void OnDeviceCreate();
     void OnDeviceDestroy();
 };
