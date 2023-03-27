@@ -132,10 +132,10 @@ void display_property(CEnvDescriptor& descriptor)
             }
             if (ImGui::Selectable("##", !descriptor.lens_flare))
                 descriptor.lens_flare = nullptr;
-            for (auto& desc : env.eff_LensFlare->GetDescriptors())
+            for (CLensFlareDescriptor* desc : env.eff_LensFlare->GetDescriptors())
             {
-                if (ImGui::Selectable(desc.section.c_str(), &desc == descriptor.lens_flare))
-                    descriptor.lens_flare = &desc;
+                if (ImGui::Selectable(desc->section.c_str(), desc == descriptor.lens_flare))
+                    descriptor.lens_flare = desc;
             }
             ImGui::EndCombo();
         }

@@ -544,13 +544,13 @@ CLensFlareDescriptor* CLensFlare::AppendDef(shared_str sect)
     if (!sect || (0 == sect[0]))
         return nullptr;
 
-    for (CLensFlareDescriptor& flare : m_Palette)
-        if (flare.section == sect)
-            return &flare;
+    for (CLensFlareDescriptor* flare : m_Palette)
+        if (flare->section == sect)
+            return flare;
 
-    CLensFlareDescriptor& descriptor = m_Palette.emplace_back();
-    descriptor.load(m_suns_config ? m_suns_config : pSettings, sect);
-    return &descriptor;
+    const auto descriptor = xr_new<CLensFlareDescriptor>();
+    descriptor->load(m_suns_config ? m_suns_config : pSettings, sect);
+    return m_Palette.emplace_back(descriptor);
 }
 
 void CLensFlare::OnDeviceCreate()
@@ -560,14 +560,14 @@ void CLensFlare::OnDeviceCreate()
 
     // palette
     for (auto& descr : m_Palette)
-        descr.OnDeviceCreate();
+        descr->OnDeviceCreate();
 }
 
 void CLensFlare::OnDeviceDestroy()
 {
     // palette
     for (auto& descr : m_Palette)
-        descr.OnDeviceDestroy();
+        descr->OnDeviceDestroy();
 
     // VS
     m_pRender->OnDeviceDestroy();

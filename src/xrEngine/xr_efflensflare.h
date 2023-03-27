@@ -98,7 +98,7 @@ protected:
 
     FactoryPtr<ILensFlareRender> m_pRender;
 
-    xr_vector<CLensFlareDescriptor> m_Palette;
+    xr_vector<CLensFlareDescriptor*> m_Palette;
     CLensFlareDescriptor* m_Current;
     CInifile* m_suns_config{};
 
