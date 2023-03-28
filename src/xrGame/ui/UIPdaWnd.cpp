@@ -376,7 +376,7 @@ void CUIPdaWnd::Reset()
         pUILogsWnd->ResetAll();
 }
 
-void CUIPdaWnd::SetCaption(LPCSTR text) { m_caption->SetText(text); }
+void CUIPdaWnd::SetCaption(pcstr text) { m_caption->SetText(text); }
 void RearrangeTabButtons(CUITabControl* pTab)
 {
     const auto& buttons = *pTab->GetButtonsVector();

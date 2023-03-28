@@ -2,8 +2,6 @@
 
 #include "editor_base.h"
 
-#include <imgui.h>
-
 namespace xray::editor
 {
 ide::ide()
@@ -20,14 +18,12 @@ ide::ide()
     );
     m_context = ImGui::CreateContext();
 
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
-    io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
-    io.BackendPlatformName = "imgui_impl_xray";
+    InitBackend();
 }
 
 ide::~ide()
 {
+    ShutdownBackend();
     ImGui::DestroyContext(m_context);
 }
 
@@ -95,9 +91,7 @@ void ide::OnFrame()
 
     // When shown, input being is updated
     // through IInputReceiver interface
-    if (!is_shown())
-        UpdateInputAsync();
-    else
+    if (m_state == visible_state::full)
     {
         if (io.WantTextInput)
             SDL_StartTextInput();
@@ -107,12 +101,26 @@ void ide::OnFrame()
 
     m_render->Frame();
     ImGui::NewFrame();
-    if (is_shown())
+
+    switch (m_state)
     {
-        ImGui::ShowDemoWindow();
-        ImGui::ShowMetricsWindow();
+    case visible_state::full:
         ShowMain();
+        [[fallthrough]];
+
+    case visible_state::light:
+        if (m_windows.weather)
+            ShowWeatherEditor();
+        break;
     }
+
+    const bool focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow);
+    const bool double_click = ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
+    if (double_click && !focused)
+    {
+        SwitchToNextState();
+    }
+
     ImGui::EndFrame();
 }
 
@@ -128,13 +136,93 @@ void ide::ShowMain()
     {
         if (ImGui::BeginMenu("File"))
         {
+#ifndef MASTER_GOLD
+            ImGui::MenuItem("Weather Editor", nullptr, &m_windows.weather);
+#endif
+
+            if (ImGui::MenuItem("Stats", nullptr, psDeviceFlags.test(rsStatistic)))
+                psDeviceFlags.set(rsStatistic, !psDeviceFlags.test(rsStatistic));
+
             if (ImGui::MenuItem("Close"))
-            {
                 IR_Release();
-            }
+
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("About"))
+        {
+#ifndef MASTER_GOLD
+            ImGui::MenuItem("ImGui demo", nullptr, &m_windows.imgui_demo);
+            ImGui::MenuItem("ImGui metrics", nullptr, &m_windows.imgui_metrics);
+#endif
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
+    }
+
+    if (m_windows.imgui_demo)
+        ImGui::ShowDemoWindow(&m_windows.imgui_demo);
+
+    if (m_windows.imgui_metrics)
+        ImGui::ShowMetricsWindow(&m_windows.imgui_metrics);
+}
+
+ImGuiWindowFlags ide::get_default_window_flags() const
+{
+    if (m_state == visible_state::full)
+        return ImGuiWindowFlags_MenuBar;
+    return ImGuiWindowFlags_NoNav
+        | ImGuiWindowFlags_NoInputs
+        | ImGuiWindowFlags_NoMove
+        | ImGuiWindowFlags_NoDecoration
+        | ImGuiWindowFlags_NoBackground;
+}
+
+bool ide::is_shown() const
+{
+    return m_windows.weather;
+}
+
+void ide::SetState(visible_state state)
+{
+    if (m_state == state)
+        return;
+    m_state = state;
+
+    switch (m_state)
+    {
+    case visible_state::hidden:
+    case visible_state::light:
+        IR_Release();
+        break;
+
+    case visible_state::full:
+        IR_Capture();
+        break;
+
+    default: NODEFAULT;
+    }
+}
+
+void ide::SwitchToNextState()
+{
+    switch (m_state)
+    {
+    case visible_state::hidden:
+        SetState(visible_state::full);
+        break;
+
+    case visible_state::full:
+        if (is_shown())
+            SetState(visible_state::light);
+        else
+            SetState(visible_state::hidden);
+        break;
+
+    case visible_state::light:
+        SetState(visible_state::hidden);
+        break;
+
+    default: NODEFAULT;
     }
 }
 } // namespace xray::editor

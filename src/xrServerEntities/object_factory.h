@@ -14,9 +14,7 @@
 class CObjectFactory
 {
 public:
-#ifndef NO_XR_GAME
     using ClientObjectBaseClass = ObjectFactory::ClientObjectBaseClass;
-#endif
     using ServerObjectBaseClass = ObjectFactory::ServerObjectBaseClass;
 
 protected:
@@ -56,25 +54,24 @@ protected:
     IC void add(CObjectItemAbstract* item);
     IC const OBJECT_ITEM_STORAGE& clsids() const;
     IC void actualize() const;
+
     template <typename _unknown_type>
     IC void add(const CLASS_ID& clsid, LPCSTR script_clsid);
 
-#ifndef NO_XR_GAME
     template <typename _client_type, typename _server_type>
     IC void add(const CLASS_ID& clsid, LPCSTR script_clsid);
+
     IC const CObjectItemAbstract& item(const CLASS_ID& clsid) const;
-#else
     IC const CObjectItemAbstract* item(const CLASS_ID& clsid, bool no_assert) const;
-#endif
 
 public:
     CObjectFactory();
     virtual ~CObjectFactory();
     void init();
-#ifndef NO_XR_GAME
+
     inline ClientObjectBaseClass* client_object(const CLASS_ID& clsid) const;
-#endif
     inline ServerObjectBaseClass* server_object(const CLASS_ID& clsid, LPCSTR section) const;
+    inline ServerObjectBaseClass* server_object(const CLASS_ID& clsid, LPCSTR section, bool no_assert) const;
 
     IC int script_clsid(const CLASS_ID& clsid) const;
     void register_script() const;

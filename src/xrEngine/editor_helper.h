@@ -1,7 +1,5 @@
 #pragma once
 
-#include <imgui.h>
-
 namespace xray::editor
 {
 inline ImGuiKey xr_key_to_imgui_key(int key)

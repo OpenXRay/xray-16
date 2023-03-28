@@ -53,7 +53,9 @@ CInventory::CInventory()
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
     m_iMaxBelt = pSettings->read_if_exists<s32>("inventory", "max_belt", 5);
 
-    const u16 slotsCount = pSettings->read_if_exists<u16>("inventory", "slots_count", SLOTS_COUNT);
+    u16 slotsCount = SLOTS_COUNT;
+    pSettings->read_if_exists<u16>(slotsCount, "inventory", "slots_count", "slots"); // slots_count in CS/COP, slots in SOC
+
     // slots_count + 1 because [0] is the inactive slot
     m_slots.reserve(slotsCount + 1u);
 

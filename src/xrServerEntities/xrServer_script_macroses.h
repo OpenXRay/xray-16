@@ -39,20 +39,20 @@ class CALifeSmartTerrainTask;
 //	DEFINE_LUA_WRAPPER_METHOD_R2P1_V1	(load,			IReader)
 //#endif
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 #define INHERIT_ABSTRACT                                              \
     INHERIT_PURE                                                      \
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V1(STATE_Write, NET_Packet)        \
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V2(STATE_Read, NET_Packet, u16)    \
     DEFINE_LUA_WRAPPER_METHOD_R2P2_V2(FillProps, LPCSTR, PropItemVec) \
     DEFINE_LUA_WRAPPER_METHOD_0(init, CSE_Abstract*)
-#else // #ifndef XRGAME_EXPORTS
+#else
 #define INHERIT_ABSTRACT                                           \
     INHERIT_PURE                                                   \
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V1(STATE_Write, NET_Packet)     \
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V2(STATE_Read, NET_Packet, u16) \
     DEFINE_LUA_WRAPPER_METHOD_0(init, CSE_Abstract*)
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 #define INHERIT_ALIFE                                           \
     INHERIT_ABSTRACT                                            \
@@ -225,18 +225,18 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
 //		DEFINE_LUABIND_VIRTUAL_FUNCTION_EXPLICIT_1(a,b,load,void,IReader&,IReader*)
 //#endif
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 #define luabind_virtual_abstract(a, b)                 \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, FillProps)   \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, STATE_Write) \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, STATE_Read)  \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, init)
-#else // #ifndef XRGAME_EXPORTS
+#else
 #define luabind_virtual_abstract(a, b)                 \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, STATE_Write) \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, STATE_Read)  \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, init)
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 #define luabind_virtual_alife(a, b)                                                  \
     DEFINE_LUABIND_VIRTUAL_FUNCTION_EXPLICIT_CONST_0(a, b, can_switch_online, bool)  \

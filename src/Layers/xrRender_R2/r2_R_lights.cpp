@@ -1,12 +1,5 @@
 #include "stdafx.h"
 
-IC bool pred_area(light* _1, light* _2)
-{
-    u32 a0 = _1->X.S.size;
-    u32 a1 = _2->X.S.size;
-    return a0 > a1; // reverse -> descending
-}
-
 void CRender::render_lights(light_Package& LP)
 {
     //////////////////////////////////////////////////////////////////////////
@@ -41,7 +34,12 @@ void CRender::render_lights(light_Package& LP)
         for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
             LP_smap_pool.initialize(RImplementation.o.smapsize);
-            std::sort(source.begin(), source.end(), pred_area);
+            std::sort(source.begin(), source.end(), [](light* l1, light* l2)
+            {
+                const u32 a0 = l1->X.S.size;
+                const u32 a1 = l2->X.S.size;
+                return a0 > a1; // reverse -> descending
+            });
             for (size_t test = 0; test < source.size(); ++test)
             {
                 light* L = source[test];

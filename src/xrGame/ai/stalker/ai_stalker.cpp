@@ -764,13 +764,13 @@ void CAI_Stalker::update_object_handler()
             CObjectHandler::update();
         }
 #ifdef DEBUG
-        catch (luabind::cast_failed& message)
+        catch (const luabind::cast_failed& message)
         {
             Msg("! Expression \"%s\" from luabind::object to %s", message.what(), message.info().name());
             throw;
         }
 #endif
-        catch (std::exception& message)
+        catch (const std::exception& message)
         {
             Msg("! Expression \"%s\"", message.what());
             throw;
@@ -1075,13 +1075,13 @@ void CAI_Stalker::Think()
     brain().update(update_delta);
 //		}
 #ifdef DEBUG
-//		catch (luabind::cast_failed &message) {
+//		catch (const luabind::cast_failed &message) {
 //			Msg						("! Expression \"%s\" from luabind::object to
 //%s",message.what(),message.info().name());
 // throw;
 //		}
 #endif
-//		catch (std::exception &message) {
+//		catch (const std::exception &message) {
 //			Msg						("! Expression \"%s\"",message.what());
 //			throw;
 //		}
@@ -1107,13 +1107,13 @@ void CAI_Stalker::Think()
     movement().update(update_delta);
 //	}
 #if 0 // def DEBUG
-	catch (luabind::cast_failed &message) {
+	catch (const luabind::cast_failed& message) {
 		Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info().name());
 		movement().initialize	();
 		movement().update		(update_delta);
 		throw;
 	}
-	catch (std::exception &message) {
+	catch (const std::exception& message) {
 		Msg						("! Expression \"%s\"",message.what());
 		movement().initialize	();
 		movement().update		(update_delta);

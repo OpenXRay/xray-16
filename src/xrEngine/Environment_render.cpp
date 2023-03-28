@@ -34,7 +34,7 @@ void CEnvironment::RenderClouds()
         return;
 #endif
     // draw clouds
-    if (fis_zero(CurrentEnv->clouds_color.w, EPS_L))
+    if (fis_zero(CurrentEnv.clouds_color.w, EPS_L))
         return;
 
     m_pRender->RenderClouds(*this);
@@ -101,13 +101,5 @@ void CEnvironment::OnDeviceDestroy()
             envDescriptor->on_device_destroy();
     }
 
-    CurrentEnv->destroy();
+    CurrentEnv.on_device_destroy();
 }
-
-#ifdef _EDITOR
-void CEnvironment::ED_Reload()
-{
-    OnDeviceDestroy();
-    OnDeviceCreate();
-}
-#endif

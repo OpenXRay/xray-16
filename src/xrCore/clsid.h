@@ -1,10 +1,10 @@
 #pragma once
-#ifndef _CLSID_H
-#define _CLSID_H
+
 #include "xr_types.h"
 
 //***** CLASS ID type
-typedef u64 CLASS_ID;
+using CLASS_ID = u64;
+
 #define MK_CLSID(a, b, c, d, e, f, g, h)                                                                     \
     CLASS_ID((CLASS_ID(a) << CLASS_ID(56)) | (CLASS_ID(b) << CLASS_ID(48)) | (CLASS_ID(c) << CLASS_ID(40)) | \
         (CLASS_ID(d) << CLASS_ID(32)) | (CLASS_ID(e) << CLASS_ID(24)) | (CLASS_ID(f) << CLASS_ID(16)) |      \
@@ -14,5 +14,3 @@ typedef u64 CLASS_ID;
 
 extern XRCORE_API void CLSID2TEXT(CLASS_ID id, pstr text);
 extern XRCORE_API CLASS_ID TEXT2CLSID(LPCSTR text);
-
-#endif

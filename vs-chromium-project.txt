@@ -4,6 +4,7 @@
 bin/
 intermediate/
 lib/
+src/_CppDependOut
 
 [SearchableFiles.include]
 *.cpp
