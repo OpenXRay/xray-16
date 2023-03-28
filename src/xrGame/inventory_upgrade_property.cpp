@@ -27,6 +27,7 @@ void Property::construct(shared_str const& property_id, Manager& manager_r)
 
     m_name = StringTable().translate(pSettings->r_string(id(), "name"));
     m_icon._set(pSettings->r_string(id(), "icon"));
+    m_color = READ_IF_EXISTS(pSettings, r_color, id(), "color", color_rgba(255, 255, 255, 255));
 
     // functor
     LPCSTR functor_str = pSettings->r_string(id(), "functor");

@@ -64,12 +64,6 @@ void CPortalTraverser::destroy()
     f_geom.destroy();
     f_shader.destroy();
 }
-ICF bool psort_pred(const std::pair<CPortal*, float>& _1, const std::pair<CPortal*, float>& _2)
-{
-    float d1 = PortalTraverser.i_vBase.distance_to_sqr(_1.first->S.P);
-    float d2 = PortalTraverser.i_vBase.distance_to_sqr(_2.first->S.P);
-    return d2 > d1; // descending, back to front
-}
 extern float r_ssaDISCARD;
 extern float r_ssaLOD_A, r_ssaLOD_B;
 void CPortalTraverser::fade_render()
@@ -78,7 +72,12 @@ void CPortalTraverser::fade_render()
         return;
 
     // re-sort, back to front
-    std::sort(f_portals.begin(), f_portals.end(), psort_pred);
+    std::sort(f_portals.begin(), f_portals.end(), [](const auto& p1, const auto& p2)
+    {
+        const float d1 = PortalTraverser.i_vBase.distance_to_sqr(p1.first->S.P);
+        const float d2 = PortalTraverser.i_vBase.distance_to_sqr(p2.first->S.P);
+        return d2 > d1; // descending, back to front
+    });
 
     // calc poly-count
     u32 _pcount = 0;
@@ -89,7 +88,7 @@ void CPortalTraverser::fade_render()
     u32 _offset = 0;
     FVF::L* _v = (FVF::L*)RCache.Vertex.Lock(_pcount * 3, f_geom.stride(), _offset);
     float ssaRange = r_ssaLOD_A - r_ssaLOD_B;
-    Fvector _ambient_f = g_pGamePersistent->Environment().CurrentEnv->ambient;
+    Fvector _ambient_f = g_pGamePersistent->Environment().CurrentEnv.ambient;
     u32 _ambient = color_rgba_f(_ambient_f.x, _ambient_f.y, _ambient_f.z, 0);
     for (u32 _it = 0; _it < f_portals.size(); _it++)
     {

@@ -99,8 +99,8 @@ struct FTreeVisual_setup
         wind.normalize();
 
 #if RENDER!=R_R1
-        CEnvDescriptor& env = *g_pGamePersistent->Environment().CurrentEnv;
-        float fValue = env.m_fTreeAmplitudeIntensity;
+        const auto& env = g_pGamePersistent->Environment().CurrentEnv;
+        const float fValue = env.m_fTreeAmplitudeIntensity;
         wind.mul(fValue); // dir1*amplitude
 #else
         wind.mul(ps_r__Tree_w_amp); // dir1*amplitude
@@ -136,7 +136,7 @@ void FTreeVisual::Render(float /*LOD*/)
     RCache.tree.set_c_scale(s * c_scale.rgb.x, s * c_scale.rgb.y, s * c_scale.rgb.z, s * c_scale.hemi); // scale
     RCache.tree.set_c_bias(s * c_bias.rgb.x, s * c_bias.rgb.y, s * c_bias.rgb.z, s * c_bias.hemi); // bias
 #else
-    CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
+    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
     RCache.tree.set_c_scale(s * c_scale.rgb.x, s * c_scale.rgb.y, s * c_scale.rgb.z, s * c_scale.hemi); // scale
     RCache.tree.set_c_bias(s * c_bias.rgb.x + desc.ambient.x, s * c_bias.rgb.y + desc.ambient.y,
         s * c_bias.rgb.z + desc.ambient.z, s * c_bias.hemi); // bias

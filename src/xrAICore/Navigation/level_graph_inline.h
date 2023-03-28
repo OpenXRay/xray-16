@@ -257,7 +257,7 @@ ICF bool CLevelGraph::CLevelVertex::operator==(const CLevelGraph::CLevelVertex& 
     return (position().xz() == vertex.position().xz());
 }
 
-IC const GameGraph::_LEVEL_ID& CLevelGraph::level_id() const { return (m_level_id); }
+IC GameGraph::_LEVEL_ID CLevelGraph::level_id() const { return (m_level_id); }
 IC void CLevelGraph::level_id(const GameGraph::_LEVEL_ID& level_id) { m_level_id = level_id; }
 IC void CLevelGraph::begin(const CLevelVertex& /*vertex*/, const_iterator& begin, const_iterator& end) const
 {

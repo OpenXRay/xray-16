@@ -16,7 +16,7 @@ struct CNodeCompressed
 
 IC void CNodeCompressed::compress_node(NodeCompressed10& Dest, vertex& Src)
 {
-    Dest.light(15);
+    //Dest.light(15);
     for (u8 L = 0; L < 4; ++L)
         Dest.link(L, Src.n[L]);
 }
@@ -54,19 +54,6 @@ xr_vector<NodeCompressed10> compressed_nodes;
 
 class CNodeRenumberer
 {
-    struct SSortNodesPredicate
-    {
-        IC bool operator()(const NodeCompressed10& vertex0, const NodeCompressed10& vertex1) const
-        {
-            return (vertex0.p.xz() < vertex1.p.xz());
-        }
-
-        IC bool operator()(const u32 vertex_id0, const u32 vertex_id1) const
-        {
-            return (compressed_nodes[vertex_id0].p.xz() < compressed_nodes[vertex_id1].p.xz());
-        }
-    };
-
     xr_vector<NodeCompressed10>& m_nodes;
     xr_vector<u32>& m_sorted;
     xr_vector<u32>& m_renumbering;
@@ -82,7 +69,10 @@ public:
         for (u32 i = 0; i < N; ++i)
             m_sorted[i] = i;
 
-        std::stable_sort(m_sorted.begin(), m_sorted.end(), SSortNodesPredicate());
+        std::stable_sort(m_sorted.begin(), m_sorted.end(), [](const u32 vertex_id0, const u32 vertex_id1)
+        {
+            return compressed_nodes[vertex_id0].p.xz() < compressed_nodes[vertex_id1].p.xz();
+        });
 
         for (u32 i = 0; i < N; ++i)
             m_renumbering[m_sorted[i]] = i;
@@ -98,7 +88,10 @@ public:
             }
         }
 
-        std::stable_sort(m_nodes.begin(), m_nodes.end(), SSortNodesPredicate());
+        std::stable_sort(m_nodes.begin(), m_nodes.end(), [](const NodeCompressed10& vertex0, const NodeCompressed10& vertex1)
+        {
+            return vertex0.p.xz() < vertex1.p.xz();
+        });
     }
 };
 

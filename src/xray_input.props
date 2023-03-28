@@ -10,6 +10,7 @@
         $(xrExternals);
         $(xrExternals)luajit\src;
         $(xrExternals)luabind;
+        $(xrExternals)imgui;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>

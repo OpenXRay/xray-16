@@ -1882,31 +1882,6 @@ public:
     }
 };
 
-// Change weather immediately
-class CCC_SetWeather : public IConsole_Command
-{
-public:
-    CCC_SetWeather(LPCSTR N) : IConsole_Command(N){};
-    virtual void Execute(LPCSTR args)
-    {
-        if (!xr_strlen(args))
-            return;
-        if (!g_pGamePersistent)
-            return;
-        if (!Device.editor())
-            g_pGamePersistent->Environment().SetWeather(args, true);
-    }
-    void fill_tips(vecTips& tips, u32 mode) override
-    {
-        if (!g_pGamePersistent || Device.editor())
-            return;
-        for (auto& [name, cycle] : g_pGamePersistent->Environment().WeatherCycles)
-        {
-            tips.push_back(name);
-        }
-    }
-};
-
 class CCC_CleanupTasks : public IConsole_Command
 {
 public:
@@ -2104,7 +2079,6 @@ void CCC_RegisterCommands()
     CMD1(CCC_Script, "run_script");
     CMD1(CCC_ScriptCommand, "run_string");
     CMD1(CCC_TimeFactor, "time_factor");
-    CMD1(CCC_SetWeather, "set_weather");
 #endif // MASTER_GOLD
 
     CMD3(CCC_Mask, "g_autopickup", &psActorFlags, AF_AUTOPICKUP);

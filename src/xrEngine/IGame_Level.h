@@ -108,6 +108,8 @@ public:
     virtual bool Load(u32 dwNum);
     virtual bool Load_GameSpecific_Before() { return true; }; // before object loading
     virtual bool Load_GameSpecific_After() { return true; }; // after object loading
+    virtual void Load_GameSpecific_CFORM_Serialize(IWriter& writer) = 0;
+    virtual bool Load_GameSpecific_CFORM_Deserialize(IReader& reader) = 0;
     virtual void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count) = 0;
 
     virtual void OnFrame(void);
@@ -133,7 +135,18 @@ public:
     // Loader interface
     // ref_shader LL_CreateShader (int S, int T, int M, int C);
     void LL_CheckTextures();
-    virtual void SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor) = 0;
+
+    [[nodiscard]]
+    virtual u64   GetEnvironmentGameTime() const = 0;
+
+    [[nodiscard]]
+    virtual float GetEnvironmentTimeFactor() const = 0;
+    virtual void  SetEnvironmentTimeFactor(float fTimeFactor) = 0;
+
+    virtual void  SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor) = 0;
+
+    [[nodiscard]]
+    virtual float GetEnvironmentGameDayTimeSec() const = 0;
 };
 
 //-----------------------------------------------------------------------------------------------------------

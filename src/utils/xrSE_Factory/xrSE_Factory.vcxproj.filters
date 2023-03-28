@@ -246,9 +246,6 @@
     <ClInclude Include="..\..\xrServerEntities\script_ini_file.h">
       <Filter>Scripts\ScriptClasses\ScriptIniFile</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_ini_file_inline.h">
-      <Filter>Scripts\ScriptClasses\ScriptIniFile</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\script_token_list.h">
       <Filter>Scripts\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
     </ClInclude>

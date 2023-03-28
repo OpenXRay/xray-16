@@ -54,7 +54,7 @@ void* sake_worker::worker_thread()
             m_newtask_mutex.unlock();
         }
     }
-    catch (std::exception const& e)
+    catch (const std::exception& e)
     {
         m_thread_initialized = 1;
         m_initialization_success = 0;

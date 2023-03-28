@@ -11,7 +11,6 @@ class IObjectSpaceRender;
 class IFontRender;
 class IApplicationRender;
 class IEnvDescriptorRender;
-class IEnvDescriptorMixerRender;
 class IFlareRender;
 class ILensFlareRender;
 class IRainRender;
@@ -24,11 +23,10 @@ class IThunderboltRender;
 class IThunderboltDescRender;
 class IRainRender;
 class ILensFlareRender;
+class IImGuiRender;
 class IEnvironmentRender;
-class IEnvDescriptorMixerRender;
 class IStatGraphRender;
 class IFlareRender;
-class IConsoleRender;
 class IUIShader;
 class IUISequenceVideoItem;
 
@@ -47,7 +45,6 @@ public:
     RENDER_FACTORY_INTERFACE(UISequenceVideoItem)
     RENDER_FACTORY_INTERFACE(UIShader)
     RENDER_FACTORY_INTERFACE(StatGraphRender)
-    RENDER_FACTORY_INTERFACE(ConsoleRender)
 #ifdef DEBUG
     RENDER_FACTORY_INTERFACE(ObjectSpaceRender)
 #endif // DEBUG
@@ -56,10 +53,10 @@ public:
 
 #ifndef _EDITOR
     RENDER_FACTORY_INTERFACE(EnvironmentRender)
-    RENDER_FACTORY_INTERFACE(EnvDescriptorMixerRender)
     RENDER_FACTORY_INTERFACE(EnvDescriptorRender)
     RENDER_FACTORY_INTERFACE(RainRender)
     RENDER_FACTORY_INTERFACE(LensFlareRender)
+    RENDER_FACTORY_INTERFACE(ImGuiRender)
     RENDER_FACTORY_INTERFACE(ThunderboltRender)
     RENDER_FACTORY_INTERFACE(ThunderboltDescRender)
     RENDER_FACTORY_INTERFACE(FlareRender)

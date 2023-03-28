@@ -14,7 +14,7 @@ class CtaArtefactActivation : public SArtefactActivation
 {
 public:
     CtaArtefactActivation(CArtefact* af, u32 owner_id);
-    virtual ~CtaArtefactActivation();
+    ~CtaArtefactActivation() override;
 
     virtual void UpdateActivation();
     virtual void Load();

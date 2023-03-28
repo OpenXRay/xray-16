@@ -52,7 +52,7 @@ void GameTypeChooser::SaveStream(IWriter& F) { F.w_u16(m_GameType.get()); }
 void GameTypeChooser::SaveLTX(CInifile& ini, LPCSTR sect_name) { ini.w_u16(sect_name, "game_type", m_GameType.get()); }
 #endif
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void GameTypeChooser::FillProp(LPCSTR pref, PropItemVec& items)
 {
     PHelper().CreateGameType(items, PrepareKey(pref, "Game Type"), this);
@@ -73,4 +73,4 @@ void GameTypeChooser::FillProp(LPCSTR pref, PropItemVec& items)
        eGameIDTeamDominationZone);
     */
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD

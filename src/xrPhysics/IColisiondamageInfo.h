@@ -2,7 +2,8 @@
 
 // struct SCollisionHitCallback;
 class ICollisionHitCallback;
-class ICollisionDamageInfo
+
+class XR_NOVTABLE ICollisionDamageInfo
 {
 public:
     virtual float ContactVelocity() const = 0;
