@@ -75,12 +75,12 @@ jobs:
       matrix:
         Configuration: [Debug, Release]
         Platform: [x64, x86]
-        CC: [gcc-9, clang-9]
+        CC: [gcc-12, clang-12]
         include:
-          - CC: gcc-9
-            CXX: g++-9
-          - CC: clang-9
-            CXX: clang++-9
+          - CC: gcc-12
+            CXX: g++-12
+          - CC: clang-12
+            CXX: clang++-12
 
     steps:
     - uses: actions/checkout@main
@@ -106,36 +106,36 @@ jobs:
           sudo apt-get install -qq -y libopenal-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386
 
     - name: Install GCC x64
-      if: ${{ matrix.Platform == 'x64' && matrix.CC == 'gcc-9' }}
+      if: ${{ matrix.Platform == 'x64' && matrix.CC == 'gcc-12' }}
       uses: egor-tensin/setup-gcc@master
       with:
-        version: 9
+        version: 12
         platform: x64
 
     - name: Install GCC x86
-      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'gcc-9' }}
+      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'gcc-12' }}
       uses: egor-tensin/setup-gcc@master
       with:
-        version: 9
+        version: 12
         platform: x86
 
     - name: Install Clang x64
-      if: ${{ matrix.Platform == 'x64' && matrix.CC == 'clang-9' }}
+      if: ${{ matrix.Platform == 'x64' && matrix.CC == 'clang-12' }}
       uses: egor-tensin/setup-clang@master
       with:
-        version: 9
+        version: 12
         platform: x64
 
     - name: Install Clang x86
-      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
+      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-12' }}
       uses: egor-tensin/setup-clang@master
       with:
-        version: 9
+        version: 12
         platform: x86
         
     - name: Install libc++ for Clang x86
-      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-9' }}
-      run: sudo apt-get install -qq -y libc++-9-dev:i386 libc++abi-9-dev:i386
+      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang-12' }}
+      run: sudo apt-get install -qq -y libc++-12-dev:i386 libc++abi-12-dev:i386
 
     - name: Run CMake x64
       if: ${{ matrix.Platform == 'x64' }}
