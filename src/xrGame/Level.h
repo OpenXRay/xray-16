@@ -99,10 +99,6 @@ public:
 #include "Level_network_Demo.h"
     void ClearAllObjects();
 
-private:
-#ifdef DEBUG
-    bool m_bSynchronization = false;
-#endif
 protected:
     typedef IGame_Level inherited;
     CLevelSoundManager* m_level_sound_manager = nullptr;
