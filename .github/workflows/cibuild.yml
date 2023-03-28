@@ -96,10 +96,6 @@ jobs:
           sudo apt-get install -qq -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev &&
           sudo apt-get install -qq -y libopenal-dev libogg-dev libtheora-dev libvorbis-dev
 
-    - name: Install GCC
-      if: ${{ matrix.CC == 'gcc' }}
-      uses: egor-tensin/setup-gcc@master
-
     - name: Install Clang
       if: ${{ matrix.CC == 'clang' }}
       uses: egor-tensin/setup-clang@master
