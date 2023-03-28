@@ -68,7 +68,7 @@ int main(int argc, char** argv)
         cout.rdbuf(cout_streambuf);
         cerr.rdbuf(cerr_streambuf);*/
     }
-    catch (std::exception const& e)
+    catch (const std::exception& e)
     {
         cerr << "Caught exception: " << e.what() << endl << "Type: " << typeid(e).name() << endl;
         return EXIT_FAILURE;

@@ -136,18 +136,6 @@ void CGameSpy_Browser::Clear()
     m_inited = false;
 };
 
-struct RefreshData
-{
-    CGameSpy_Browser* pGSBrowser;
-    string4096 FilterStr;
-};
-void RefreshInternetList(void* inData)
-{
-    RefreshData* pRData = (RefreshData*)inData;
-    pRData->pGSBrowser->RefreshListInternet(pRData->FilterStr);
-    xr_delete(pRData);
-};
-
 void CGameSpy_Browser::RefreshListInternet(const char* FilterStr)
 {
     m_refresh_lock.Enter();
@@ -160,18 +148,30 @@ void CGameSpy_Browser::RefreshListInternet(const char* FilterStr)
     m_bTryingToConnectToMasterServer = false;
 
     m_refresh_lock.Leave();
+}
+
+struct RefreshData
+{
+    CGameSpy_Browser* pGSBrowser;
+    string4096 FilterStr;
+
+    RefreshData(CGameSpy_Browser* browser, pcstr filter) : pGSBrowser(browser) 
+    {
+        xr_strcpy(FilterStr, filter);
+    }
 };
 
 GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* FilterStr)
 {
     if (!m_pGSBrowser)
         return GSUpdateStatus::Success;
-    SBState state = ServerBrowserState(m_pGSBrowser);
+
+    const SBState state = ServerBrowserState(m_pGSBrowser);
     if ((state != sb_connected) && (state != sb_disconnected))
     {
         ServerBrowserHalt(m_pGSBrowser);
         Msg("xrGSB Refresh Stopped\n");
-    };
+    }
     ServerBrowserClear(m_pGSBrowser);
 
     // do an update
@@ -179,11 +179,17 @@ GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* Filter
     {
         m_refresh_lock.Enter();
         m_refresh_lock.Leave();
-        RefreshData* pRData = xr_new<RefreshData>();
-        xr_strcpy(pRData->FilterStr, FilterStr);
-        pRData->pGSBrowser = this;
+
+        RefreshData* pRData = xr_new<RefreshData>(this, FilterStr);
         m_bTryingToConnectToMasterServer = true;
-        Threading::SpawnThread(RefreshInternetList, "GS Internet Refresh", 0, pRData);
+
+        Threading::SpawnThread([](void* inData)
+        {
+            RefreshData* pRData = (RefreshData*)inData;
+            pRData->pGSBrowser->RefreshListInternet(pRData->FilterStr);
+            xr_delete(pRData);
+        }, "GS Internet Refresh", 0, pRData);
+
         return GSUpdateStatus::ConnectingToMaster;
     }
     SBError error = ServerBrowserLANUpdate(m_pGSBrowser, onUpdate ? SBTrue : SBFalse, START_PORT_LAN, END_PORT_LAN);

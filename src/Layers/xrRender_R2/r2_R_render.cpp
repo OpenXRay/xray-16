@@ -8,13 +8,6 @@
 
 #include "Layers/xrRender/FBasicVisual.h"
 
-IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
-{
-    float d1 = _1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    float d2 = _2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    return d1 < d2;
-}
-
 void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 {
     PIX_EVENT(render_main);
@@ -52,7 +45,12 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                 lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)
-            std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
+            std::sort(lstRenderables.begin(), lstRenderables.end(), [](ISpatial* s1, ISpatial* s2)
+            {
+                const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                return d1 < d2;
+            });
 
             // Determine visibility for dynamic part of scene
             u32 uID_LTRACK = 0xffffffff;

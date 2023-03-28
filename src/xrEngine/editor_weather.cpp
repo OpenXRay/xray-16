@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#ifndef MASTER_GOLD
 #include "editor_base.h"
 #include "editor_helper.h"
 
@@ -131,10 +132,10 @@ void display_property(CEnvDescriptor& descriptor)
             }
             if (ImGui::Selectable("##", !descriptor.lens_flare))
                 descriptor.lens_flare = nullptr;
-            for (auto& desc : env.eff_LensFlare->GetDescriptors())
+            for (CLensFlareDescriptor* desc : env.eff_LensFlare->GetDescriptors())
             {
-                if (ImGui::Selectable(desc.section.c_str(), &desc == descriptor.lens_flare))
-                    descriptor.lens_flare = &desc;
+                if (ImGui::Selectable(desc->section.c_str(), desc == descriptor.lens_flare))
+                    descriptor.lens_flare = desc;
             }
             ImGui::EndCombo();
         }
@@ -533,3 +534,9 @@ void ShowLevelWeathers()
     ImGui::End();
 }
 } // namespace xray::editor
+#else
+namespace xray::editor
+{
+void ide::ShowWeatherEditor() {}
+} // namespace xray::editor
+#endif // !MASTER_GOLD

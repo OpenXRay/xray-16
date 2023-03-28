@@ -135,7 +135,8 @@ void CSE_SmartCover::STATE_Write(NET_Packet& tNetPacket)
 
 void CSE_SmartCover::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
 void CSE_SmartCover::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+
+#ifndef MASTER_GOLD
 void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
 {
 #ifdef XRSE_FACTORY_EXPORTS
@@ -156,7 +157,7 @@ void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
     }
 #endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 #ifdef XRSE_FACTORY_EXPORTS
 void CSE_SmartCover::set_loopholes_table_checker(BOOLValue* value)

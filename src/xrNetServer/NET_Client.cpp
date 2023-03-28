@@ -1070,18 +1070,16 @@ void IPureClient::Sync_Average()
     //	Msg("* CLIENT: d(%d), dc(%d), s(%d)",net_TimeDelta,net_TimeDelta_Calculated,size);
 }
 
-void sync_thread(void* P)
-{
-    SetThreadPriority(Threading::GetCurrentThreadHandle(), THREAD_PRIORITY_TIME_CRITICAL);
-    IPureClient* C = (IPureClient*)P;
-    C->Sync_Thread();
-}
-
 void IPureClient::net_Syncronize()
 {
     net_Syncronised = false;
     net_DeltaArray.clear();
-    Threading::SpawnThread(sync_thread, "network-time-sync", 0, this);
+    Threading::SpawnThread([](void* P)
+    {
+        SetThreadPriority(Threading::GetCurrentThreadHandle(), THREAD_PRIORITY_TIME_CRITICAL);
+        IPureClient* C = static_cast<IPureClient*>(P);
+        C->Sync_Thread();
+    }, "network-time-sync", 0, this);
 }
 
 void IPureClient::ClearStatistic()

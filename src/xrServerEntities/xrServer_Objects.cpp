@@ -87,9 +87,9 @@ void CSE_Spectator::STATE_Read(NET_Packet& tNetPacket, u16 size) {}
 void CSE_Spectator::STATE_Write(NET_Packet& tNetPacket) {}
 void CSE_Spectator::UPDATE_Read(NET_Packet& tNetPacket) {}
 void CSE_Spectator::UPDATE_Write(NET_Packet& tNetPacket) {}
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_Spectator::FillProps(LPCSTR pref, PropItemVec& items) { inherited::FillProps(pref, items); }
-#endif // #ifndef XRGAME_EXPORTS
+#endif
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_Temporary
@@ -102,9 +102,9 @@ void CSE_Temporary::UPDATE_Read(NET_Packet& tNetPacket){};
 
 void CSE_Temporary::UPDATE_Write(NET_Packet& tNetPacket){};
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_Temporary::FillProps(LPCSTR pref, PropItemVec& values){};
-#endif // #ifndef XRGAME_EXPORTS
+#endif
 
 /**
 ////////////////////////////////////////////////////////////////////////////
@@ -152,14 +152,14 @@ void CSE_SpawnGroup::UPDATE_Write			(NET_Packet	&tNetPacket)
 {
 }
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_SpawnGroup::FillProps				(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps		(pref,values);
     PHelper().CreateFlag32		(values,PrepareKey(pref,*s_name,"Spawn" DELIMITER "spawn single item only"),	&m_spawn_flags,
 flSpawnSingleItemOnly);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 **/
 
 ////////////////////////////////////////////////////////////////////////////
@@ -222,9 +222,9 @@ void CSE_PHSkeleton::load(NET_Packet& tNetPacket)
 }
 void CSE_PHSkeleton::UPDATE_Write(NET_Packet& tNetPacket) {}
 void CSE_PHSkeleton::UPDATE_Read(NET_Packet& tNetPacket) {}
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_PHSkeleton::FillProps(LPCSTR pref, PropItemVec& values) {}
-#endif // #ifndef XRGAME_EXPORTS
+#endif
 
 CSE_AbstractVisual::CSE_AbstractVisual(LPCSTR section) : inherited1(section), inherited2(section) {}
 CSE_AbstractVisual::~CSE_AbstractVisual() {}
@@ -240,13 +240,13 @@ void CSE_AbstractVisual::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_stringZ(startup_animation);
 }
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_AbstractVisual::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited1::FillProps(pref, values);
     inherited2::FillProps(pref, values);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 void CSE_AbstractVisual::UPDATE_Read(NET_Packet& tNetPacket) {}
 void CSE_AbstractVisual::UPDATE_Write(NET_Packet& tNetPacket) {}
