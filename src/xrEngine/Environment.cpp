@@ -112,6 +112,10 @@ void CEnvironment::Invalidate()
     Current[1] = 0;
     if (eff_LensFlare)
         eff_LensFlare->Invalidate();
+
+    CurrentEnv.env_ambient = nullptr; // hack
+    CurrentEnv.lens_flare  = nullptr; // hack
+    CurrentEnv.thunderbolt = nullptr; // hack
 }
 
 float CEnvironment::TimeDiff(float prev, float cur)
