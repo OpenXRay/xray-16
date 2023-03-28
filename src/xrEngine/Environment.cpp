@@ -53,10 +53,6 @@ CEnvironment::CEnvironment() : m_ambients_config(0)
     ed_to_time = DAY_LENGTH;
 #endif
 
-#ifndef _EDITOR
-    m_paused = false;
-#endif
-
     fGameTime = 0.f;
     fTimeFactor = 12.f;
 
@@ -150,16 +146,14 @@ float CEnvironment::TimeWeight(float val, float min_t, float max_t)
     }
     return weight;
 }
-void CEnvironment::ChangeGameTime(float game_time) { fGameTime = NormalizeTime(fGameTime + game_time); };
+
+void CEnvironment::ChangeGameTime(float game_time)
+{
+    fGameTime = NormalizeTime(fGameTime + game_time);
+}
+
 void CEnvironment::SetGameTime(float game_time, float time_factor)
 {
-#ifndef _EDITOR
-    if (m_paused) // BUG nitrocaster: g_pGameLevel may be null (game not started) -> crash
-    {
-        g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(fGameTime * 1000.f), fTimeFactor);
-        return;
-    }
-#endif
     if (bWFX)
         wfx_time -= TimeDiff(fGameTime, game_time);
     fGameTime = game_time;

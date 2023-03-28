@@ -339,8 +339,6 @@ public:
     float ed_to_time;
 
 public:
-#else // #ifdef _EDITOR
-    bool m_paused;
 #endif // #ifdef _EDITOR
     void ED_Reload();
     float GetGameTime() { return fGameTime; }

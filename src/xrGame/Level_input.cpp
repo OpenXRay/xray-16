@@ -251,51 +251,6 @@ void CLevel::IR_OnKeyboardPress(int key)
         Send(net_packet, net_flags(TRUE));
         return;
     }
-    case SDL_SCANCODE_KP_DIVIDE:
-    {
-        if (!Server)
-            break;
-
-        SetGameTimeFactor(g_fTimeFactor);
-
-#ifdef DEBUG
-        if (!m_bEnvPaused)
-            SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), g_fTimeFactor);
-#else // DEBUG
-        SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), g_fTimeFactor);
-#endif // DEBUG
-
-        break;
-    }
-    case SDL_SCANCODE_KP_MULTIPLY:
-    {
-        if (!Server)
-            break;
-
-        SetGameTimeFactor(1000.f);
-#ifdef DEBUG
-        if (!m_bEnvPaused)
-            SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), 1000.f);
-#else // DEBUG
-        SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), 1000.f);
-#endif // DEBUG
-
-        break;
-    }
-#ifdef DEBUG
-    case SDL_SCANCODE_KP_MINUS:
-    {
-        if (!Server)
-            break;
-        if (m_bEnvPaused)
-            SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), g_fTimeFactor);
-        else
-            SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), 0.00001f);
-
-        m_bEnvPaused = !m_bEnvPaused;
-        break;
-    }
-#endif // DEBUG
     case SDL_SCANCODE_KP_5:
     {
         if (GameID() != eGameIDSingle)

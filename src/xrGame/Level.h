@@ -102,7 +102,6 @@ public:
 private:
 #ifdef DEBUG
     bool m_bSynchronization = false;
-    bool m_bEnvPaused = false;
 #endif
 protected:
     typedef IGame_Level inherited;

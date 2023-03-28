@@ -537,9 +537,6 @@ void CLevel::OnFrame()
             xr_delete(pStatGraphR);
 #endif
     }
-#ifdef DEBUG
-    g_pGamePersistent->Environment().m_paused = m_bEnvPaused;
-#endif
     g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
     if (!GEnv.isDedicatedServer)
         GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
