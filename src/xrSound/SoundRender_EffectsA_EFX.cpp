@@ -154,7 +154,5 @@ void CSoundRender_EffectsA_EFX::commit()
     A_CHK(alAuxiliaryEffectSlotf(slot, AL_EFFECTSLOT_GAIN, 1.f));
     A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, true));
     A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_EFFECT, effect));
-    if(ALenum err = alGetError(); err != AL_NO_ERROR)
-        Msg("Still error");
 }
 #endif // XR_HAS_EFX
