@@ -456,7 +456,7 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
     config.w_float    (identifier, "sky_rotation",              rad2deg(sky_rotation));
     config.w_string   (identifier, "sky_texture",               sky_texture_name.c_str());
 
-    config.w_string   (identifier, sun_name,                    lens_flare->section.c_str());
+    config.w_string   (identifier, sun_name,                    lens_flare ? lens_flare->section.c_str() : "");
     config.w_fvector3 (identifier, "sun_color",                 sun_color);
     if (old_style)
     {
