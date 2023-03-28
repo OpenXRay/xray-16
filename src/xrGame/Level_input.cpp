@@ -251,51 +251,6 @@ void CLevel::IR_OnKeyboardPress(int key)
         Send(net_packet, net_flags(TRUE));
         return;
     }
-    case SDL_SCANCODE_KP_DIVIDE:
-    {
-        if (!Server)
-            break;
-
-        SetGameTimeFactor(g_fTimeFactor);
-
-#ifdef DEBUG
-        if (!m_bEnvPaused)
-            SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), g_fTimeFactor);
-#else // DEBUG
-        SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), g_fTimeFactor);
-#endif // DEBUG
-
-        break;
-    }
-    case SDL_SCANCODE_KP_MULTIPLY:
-    {
-        if (!Server)
-            break;
-
-        SetGameTimeFactor(1000.f);
-#ifdef DEBUG
-        if (!m_bEnvPaused)
-            SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), 1000.f);
-#else // DEBUG
-        SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), 1000.f);
-#endif // DEBUG
-
-        break;
-    }
-#ifdef DEBUG
-    case SDL_SCANCODE_KP_MINUS:
-    {
-        if (!Server)
-            break;
-        if (m_bEnvPaused)
-            SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), g_fTimeFactor);
-        else
-            SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), 0.00001f);
-
-        m_bEnvPaused = !m_bEnvPaused;
-        break;
-    }
-#endif // DEBUG
     case SDL_SCANCODE_KP_5:
     {
         if (GameID() != eGameIDSingle)
@@ -454,43 +409,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     }
 
 #endif
-#ifdef DEBUG
-    case SDL_SCANCODE_F9:
-    {
-        //		if (!ai().get_alife())
-        //			break;
-        //		const_cast<CALifeSimulatorHeader&>(ai().alife().header()).set_state(ALife::eZoneStateSurge);
-        break;
-    }
-        return;
-//	case SDL_SCANCODE_F10:{
-//		ai().level_graph().set_dest_point();
-//		ai().level_graph().build_detail_path();
-//		if (!Objects.FindObjectByName("m_stalker_e0000") || !Objects.FindObjectByName("localhost/dima"))
-//			return;
-//		if (!m_bSynchronization) {
-//			m_bSynchronization	= true;
-//			ai().level_graph().set_start_point();
-//			m_bSynchronization	= false;
-//		}
-//		luabind::functor<void>	functor;
-//		GEnv.ScriptEngine->functor("alife_test.set_switch_online",functor);
-//		functor(0,false);
-//	}
-//		return;
-//	case SDL_SCANCODE_F11:
-//		ai().level_graph().build_detail_path();
-//		if (!Objects.FindObjectByName("m_stalker_e0000") || !Objects.FindObjectByName("localhost/dima"))
-//			return;
-//		if (!m_bSynchronization) {
-//			m_bSynchronization	= true;
-//			ai().level_graph().set_dest_point();
-//			ai().level_graph().select_cover_point();
-//			m_bSynchronization	= false;
-//		}
-//		return;
-#endif // DEBUG
-    }
+    } // switch (key)
 #endif // MASTER_GOLD
 
     if (g_consoleBindCmds.execute(key))

@@ -370,13 +370,11 @@ void ide::ShowWeatherEditor()
         }
 
         auto& current = env.CurrentEnv;
-        auto& current0 = env.Current[0] ? *env.Current[0] : env.CurrentEnv;
-        auto& current1 = env.Current[1] ? *env.Current[1] : env.CurrentEnv;
-        float time_factor = env.fTimeFactor;
+        float time_factor = g_pGameLevel ? g_pGameLevel->GetEnvironmentTimeFactor() : env.fTimeFactor;
 
         if (ImGui::CollapsingHeader("Environment time", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            float time = env.GetGameTime();
+            float time = g_pGameLevel ? g_pGameLevel->GetEnvironmentGameDayTimeSec() : env.GetGameTime();
 
             u32 hours, minutes, seconds;
             env.SplitTime(time, hours, minutes, seconds);
@@ -386,12 +384,16 @@ void ide::ShowWeatherEditor()
 
             if (ImGui::SliderFloat(temp, &time, 0, DAY_LENGTH, "", ImGuiSliderFlags_NoInput))
             {
-                env.SetGameTime(time, time_factor);
                 env.Invalidate();
+                if (g_pGameLevel)
+                    g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(time * 1000.f), time_factor);
+                env.SetGameTime(time, time_factor);
                 env.lerp();
             }
             if (ImGui::DragFloat("Time factor", &time_factor, 1.f, 1.f, 1000.f))
             {
+                if (g_pGameLevel)
+                    g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(time * 1000.f), time_factor);
                 env.SetGameTime(time, time_factor);
             }
         }
@@ -473,10 +475,16 @@ void ide::ShowWeatherEditor()
                 string128 temp;
                 xr_sprintf(temp, "%02d:%02d:%02d###frame_time", hours, minutes, seconds);
 
+                const float current0_time = env.Current[0] ? env.Current[0]->exec_time : current.exec_time;
+                const float current1_time = env.Current[1] ? env.Current[1]->exec_time : current.exec_time;
+
                 ImGui::BeginDisabled(!env.Current[0] || !env.Current[1]);
                 if (ImGui::SliderFloat(temp, &current.exec_time,
-                    current0.exec_time, current1.exec_time, "", ImGuiSliderFlags_NoInput))
+                    current0_time, current1_time, "", ImGuiSliderFlags_NoInput))
                 {
+                    //env.Invalidate();
+                    if (g_pGameLevel)
+                        g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(current.exec_time * 1000.f), time_factor);
                     env.SetGameTime(current.exec_time, time_factor);
                     env.lerp();
                 }
@@ -497,7 +505,7 @@ void ide::ShowWeatherEditor()
 
                 ImGui::TableNextColumn();
                 if (env.Current[0])
-                    display_property(current0);
+                    display_property(*env.Current[0]);
                 else
                     ImGui::Text("Please, load a level or select time frame manually.");
 
@@ -506,7 +514,7 @@ void ide::ShowWeatherEditor()
 
                 ImGui::TableNextColumn();
                 if (env.Current[1])
-                    display_property(current1);
+                    display_property(*env.Current[1]);
                 else
                     ImGui::Text("Please, load a level or select time frame manually.");
 
