@@ -74,7 +74,7 @@ jobs:
       fail-fast: false
       matrix:
         Configuration: [Debug, Release]
-        Platform: [x64, x86]
+        Platform: [x64]
         CC: [gcc, clang]
         include:
           - CC: gcc
@@ -90,62 +90,25 @@ jobs:
     - name: Deinit Crypto++
       run: git submodule deinit Externals/cryptopp
 
-    - name: Install x64 packages
-      if: ${{ matrix.Platform == 'x64' }}
+    - name: Install packages
       run: |
           sudo apt-get update -qq
           sudo apt-get install -qq -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev &&
           sudo apt-get install -qq -y libopenal-dev libogg-dev libtheora-dev libvorbis-dev
 
-    - name: Install x86 packages
-      if: ${{ matrix.Platform == 'x86' }}
-      run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update -qq
-          sudo apt-get install -qq -y libsdl2-dev:i386 libglew-dev:i386 liblzo2-dev:i386 libjpeg-dev:i386 &&
-          sudo apt-get install -qq -y libopenal-dev:i386 libogg-dev:i386 libtheora-dev:i386 libvorbis-dev:i386
-
-    - name: Install GCC x64
-      if: ${{ matrix.Platform == 'x64' && matrix.CC == 'gcc' }}
+    - name: Install GCC
+      if: ${{ matrix.CC == 'gcc' }}
       uses: egor-tensin/setup-gcc@master
-      with:
-        platform: x64
 
-    - name: Install GCC x86
-      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'gcc' }}
-      uses: egor-tensin/setup-gcc@master
-      with:
-        platform: x86
-
-    - name: Install Clang x64
-      if: ${{ matrix.Platform == 'x64' && matrix.CC == 'clang' }}
+    - name: Install Clang
+      if: ${{ matrix.CC == 'clang' }}
       uses: egor-tensin/setup-clang@master
-      with:
-        platform: x64
 
-    - name: Install Clang x86
-      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang' }}
-      uses: egor-tensin/setup-clang@master
-      with:
-        platform: x86
-        
-    - name: Install libc++ for Clang x86
-      if: ${{ matrix.Platform == 'x86' && matrix.CC == 'clang' }}
-      run: sudo apt-get install -qq -y libc++-dev:i386 libc++abi-dev:i386
-
-    - name: Run CMake x64
-      if: ${{ matrix.Platform == 'x64' }}
+    - name: Run CMake
       env:
           CC: ${{ matrix.CC }}
           CXX: ${{ matrix.CXX }}
       run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
-
-    - name: Run CMake x86
-      if: ${{ matrix.Platform == 'x86' }}
-      env:
-          CC: ${{ matrix.CC }}
-          CXX: ${{ matrix.CXX }}
-      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCMAKE_ASM_FLAGS=-m32
 
     - name: Run CMake Build
       id: cmake-build
