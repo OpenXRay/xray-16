@@ -24,6 +24,8 @@ public:
 
     void Reset();
 
+    void SetPrimaryAttributes(u32& windowFlags);
+
     std::pair<u32, u32> GetSurfaceSize() const;
 
     bool CheckFormatSupport(DXGI_FORMAT format, u32 feature) const;

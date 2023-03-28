@@ -29,10 +29,11 @@ public:
     virtual void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
 
     //	Init
+    virtual void ObtainRequiredWindowFlags(u32& /*windowFlags*/) override;
     virtual void SetupStates() override;
     virtual void OnDeviceCreate(const char* shName) override;
     virtual void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override;
-    virtual void SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) override;
+
     //	Overdraw
     virtual void overdrawBegin() override;
     virtual void overdrawEnd() override;
@@ -58,7 +59,6 @@ public:
     virtual void OnAssetsChanged() override;
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
-    void ObtainRequiredWindowFlags(u32& /*windowFlags*/) override {}
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 

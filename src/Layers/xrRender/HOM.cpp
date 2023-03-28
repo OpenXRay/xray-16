@@ -68,15 +68,18 @@ void CHOM::Load()
     Msg("* Loading HOM: %s", fName);
 
     IReader* fs = FS.r_open(fName);
-    IReader* S = fs->open_chunk(1);
 
     // Load tris and merge them
     CDB::Collector CL;
-    while (!S->eof())
     {
-        HOM_poly P;
-        S->r(&P, sizeof(P));
-        CL.add_face_packed_D(P.v1, P.v2, P.v3, P.flags, 0.01f);
+        IReader* S = fs->open_chunk(1);
+        const auto begin = static_cast<HOM_poly*>(S->pointer());
+        const auto end   = static_cast<HOM_poly*>(S->end());
+        for (HOM_poly* poly = begin; poly != end; ++poly)
+        {
+            CL.add_face_packed_D(poly->v1, poly->v2, poly->v3, poly->flags, 0.01f);
+        }
+        S->close();
     }
 
     // Determine adjacency
@@ -84,13 +87,13 @@ void CHOM::Load()
     CL.calc_adjacency(adjacency);
 
     // Create RASTER-triangles
-    m_pTris = xr_alloc<occTri>(u32(CL.getTS()));
+    m_pTris = xr_alloc<occTri>(CL.getTS());
 
-    xr_parallel_for(TaskRange<u32>(0, CL.getTS()), [&](const TaskRange<u32>& range)
+    xr_parallel_for(TaskRange<size_t>(0, CL.getTS()), [&](const TaskRange<size_t>& range)
     {
-        for (u32 it = range.begin(); it != range.end(); ++it)
+        for (size_t it = range.begin(); it != range.end(); ++it)
         {
-            CDB::TRI& clT = CL.getT()[it];
+            const CDB::TRI& clT = CL.getT()[it];
             occTri& rT = m_pTris[it];
             Fvector& v0 = CL.getV()[clT.verts[0]];
             Fvector& v1 = CL.getV()[clT.verts[1]];
@@ -113,12 +116,13 @@ void CHOM::Load()
     // Create AABB-tree
     m_pModel = xr_new<CDB::MODEL>();
     m_pModel->set_version(fs->get_age());
-    bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
+    const bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
+    const bool checkCrc32 = !strstr(Core.Params, "-skip_cdb_cache_crc32_check");
 
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
     FS.update_path(fName, "$app_data_root$", fName);
 
-    if (bUseCache && FS.exist(fName) && m_pModel->deserialize(fName))
+    if (bUseCache && FS.exist(fName) && m_pModel->deserialize(fName, checkCrc32))
     {
 #ifndef MASTER_GOLD
         Msg("* Loaded HOM cache (%s)...", fName);
@@ -136,7 +140,6 @@ void CHOM::Load()
     }
 
     bEnabled = TRUE;
-    S->close();
     FS.r_close(fs);
 }
 
@@ -146,28 +149,6 @@ void CHOM::Unload()
     xr_free(m_pTris);
     bEnabled = FALSE;
 }
-
-class pred_fb
-{
-public:
-    occTri* m_pTris;
-    Fvector camera;
-
-public:
-    pred_fb(occTri* _t) : m_pTris(_t) {}
-    pred_fb(occTri* _t, Fvector& _c) : m_pTris(_t), camera(_c) {}
-    ICF bool operator()(const CDB::RESULT& _1, const CDB::RESULT& _2) const
-    {
-        occTri& t0 = m_pTris[_1.id];
-        occTri& t1 = m_pTris[_2.id];
-        return camera.distance_to_sqr(t0.center) < camera.distance_to_sqr(t1.center);
-    }
-    ICF bool operator()(const CDB::RESULT& _1) const
-    {
-        occTri& T = m_pTris[_1.id];
-        return T.skip > Device.dwFrame;
-    }
-};
 
 void CHOM::Render_DB(CFrustum& base)
 {
@@ -199,8 +180,17 @@ void CHOM::Render_DB(CFrustum& base)
     auto end = xrc.r_get()->end();
 
     Fvector COP = Device.vCameraPosition;
-    end = std::remove_if(it, end, pred_fb(m_pTris));
-    std::sort(it, end, pred_fb(m_pTris, COP));
+    end = std::remove_if(it, end, [this](const CDB::RESULT& _1)
+    {
+        const occTri& T = m_pTris[_1.id];
+        return T.skip > Device.dwFrame;
+    });
+    std::sort(it, end, [this, &COP](const CDB::RESULT& _1, const CDB::RESULT& _2)
+    {
+        const occTri& t0 = m_pTris[_1.id];
+        const occTri& t1 = m_pTris[_2.id];
+        return COP.distance_to_sqr(t0.center) < COP.distance_to_sqr(t1.center);
+    });
 
     // Build frustum with near plane only
     CFrustum clip;

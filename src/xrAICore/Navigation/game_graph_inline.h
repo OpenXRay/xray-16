@@ -18,17 +18,13 @@ inline void CGameGraph::Initialize(IReader& stream, bool own)
     m_current_level_some_vertex_id = _GRAPH_ID(-1);
     m_enabled.assign(header().vertex_count(), true);
 
-    if (header().version() <= XRAI_VERSION_SOC)
+    if (header().version() >= XRAI_VERSION_PRIQUEL)
     {
-        m_cross_tables = nullptr;
+        u8* temp = (u8*)(m_nodes + header().vertex_count());
+        temp += header().edge_count() * sizeof(CGameGraph::CEdge);
+        m_cross_tables = (u32*)(((CLevelPoint*)temp) + header().death_point_count());
         m_current_level_cross_table = nullptr;
-        return;
     }
-
-    u8* temp = (u8*)(m_nodes + header().vertex_count());
-    temp += header().edge_count() * sizeof(CGameGraph::CEdge);
-    m_cross_tables = (u32*)(((CLevelPoint*)temp) + header().death_point_count());
-    m_current_level_cross_table = nullptr;
 }
 
 IC CGameGraph::CGameGraph(LPCSTR file_name, u32 current_version)
@@ -258,7 +254,7 @@ IC void GameGraph::CHeader::save(IWriter* writer)
 IC void CGameGraph::set_current_level(u32 const level_id)
 {
     xr_delete(m_current_level_cross_table);
-    if (m_cross_tables)
+    if (header().version() >= XRAI_VERSION_PRIQUEL)
     {
         u32* current_cross_table = m_cross_tables;
         GameGraph::LEVEL_MAP::const_iterator I = header().levels().begin();
@@ -275,7 +271,7 @@ IC void CGameGraph::set_current_level(u32 const level_id)
             break;
         }
     }
-    else
+    else // XRAI_VERSION_SOC and below
     {
         string_path fName;
         FS.update_path(fName, "$level$", CROSS_TABLE_NAME);

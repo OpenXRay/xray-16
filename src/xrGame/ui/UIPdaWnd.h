@@ -76,11 +76,14 @@ public:
     void DrawHint();
 
     void SetActiveCaption();
-    void SetCaption(LPCSTR text);
+    void SetCaption(pcstr text);
     void Show_SecondTaskWnd(bool status);
     void Show_MapLegendWnd(bool status);
+    pcstr GetActiveSection() { return m_sActiveSection.c_str(); };
+    CUITabControl* GetTabControl() const { return UITabControl; };
 
     void SetActiveSubdialog(const shared_str& section);
+    void SetActiveSubdialog_script(pcstr section) { SetActiveSubdialog(section); };
     virtual bool StopAnyMove() { return false; }
     void UpdatePda();
     void UpdateRankingWnd();

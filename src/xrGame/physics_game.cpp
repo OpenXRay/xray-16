@@ -155,7 +155,7 @@ static void play_object(dxGeomUserData* data, SGameMtlPair* mtl_pair, const dCon
     VERIFY(c);
 
     auto* phShell = static_cast<CPhysicsShellHolder*>(data->ph_ref_object);
-    if (!phShell->m_pPhysicsShell || phShell->getDestroy())
+    if (!phShell->m_pPhysicsShell && !phShell->character_physics_support() || phShell->getDestroy())
         return;
 
     if (CPHSoundPlayer* sp = phShell->ph_sound_player())

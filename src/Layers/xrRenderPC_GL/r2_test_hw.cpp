@@ -8,8 +8,9 @@ class sdl_window_test_helper
 public:
     sdl_window_test_helper()
     {
-        HW.SetPrimaryAttributes();
-        m_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+        u32 flags{};
+        HW.SetPrimaryAttributes(flags);
+        m_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | flags);
         if (!m_window)
         {
             Log("~ Cannot create helper window for OpenGL:", SDL_GetError());

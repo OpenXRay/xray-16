@@ -537,9 +537,6 @@ void CLevel::OnFrame()
             xr_delete(pStatGraphR);
 #endif
     }
-#ifdef DEBUG
-    g_pGamePersistent->Environment().m_paused = m_bEnvPaused;
-#endif
     g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
     if (!GEnv.isDedicatedServer)
         GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
@@ -942,8 +939,16 @@ void CLevel::SetNumCrSteps(u32 NumSteps)
 }
 
 ALife::_TIME_ID CLevel::GetStartGameTime() { return (game->GetStartGameTime()); }
+
 ALife::_TIME_ID CLevel::GetGameTime() { return (game->GetGameTime()); }
-ALife::_TIME_ID CLevel::GetEnvironmentGameTime() { return (game->GetEnvironmentGameTime()); }
+
+ALife::_TIME_ID CLevel::GetEnvironmentGameTime() const
+{
+    if (!game)
+        return 0;
+    return (game->GetEnvironmentGameTime());
+}
+
 u8 CLevel::GetDayTime()
 {
     u32 dummy32, hours;
@@ -953,8 +958,10 @@ u8 CLevel::GetDayTime()
 }
 
 float CLevel::GetGameDayTimeSec() { return (float(s64(GetGameTime() % (24 * 60 * 60 * 1000))) / 1000.f); }
+
 u32 CLevel::GetGameDayTimeMS() { return (u32(s64(GetGameTime() % (24 * 60 * 60 * 1000)))); }
-float CLevel::GetEnvironmentGameDayTimeSec()
+
+float CLevel::GetEnvironmentGameDayTimeSec() const
 {
     return (float(s64(GetEnvironmentGameTime() % (24 * 60 * 60 * 1000))) / 1000.f);
 }
@@ -964,11 +971,33 @@ void CLevel::GetGameDateTime(u32& year, u32& month, u32& day, u32& hours, u32& m
     split_time(GetGameTime(), year, month, day, hours, mins, secs, milisecs);
 }
 
-float CLevel::GetGameTimeFactor() { return (game->GetGameTimeFactor()); }
-void CLevel::SetGameTimeFactor(const float fTimeFactor) { game->SetGameTimeFactor(fTimeFactor); }
+float CLevel::GetGameTimeFactor()
+{
+    return game->GetGameTimeFactor();
+}
+
+void CLevel::SetGameTimeFactor(const float fTimeFactor)
+{
+    game->SetGameTimeFactor(fTimeFactor);
+}
+
 void CLevel::SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor)
 {
     game->SetGameTimeFactor(GameTime, fTimeFactor);
+}
+
+float CLevel::GetEnvironmentTimeFactor() const
+{
+    if (!game)
+        return 0.0f;
+    return game->GetEnvironmentGameTimeFactor();
+}
+
+void CLevel::SetEnvironmentTimeFactor(const float fTimeFactor)
+{
+    if (!game)
+        return;
+    game->SetEnvironmentGameTimeFactor(fTimeFactor);
 }
 
 void CLevel::SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor)

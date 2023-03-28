@@ -1,5 +1,4 @@
-#ifndef xr_efflensflareH
-#define xr_efflensflareH
+#pragma once
 
 #include "xrCDB/xr_collide_defs.h"
 
@@ -7,6 +6,7 @@
 #include "Include/xrRender/LensFlareRender.h"
 
 class ENGINE_API CInifile;
+class ENGINE_API CEnvDescriptorMixer;
 class ENGINE_API CEnvironment;
 
 class ENGINE_API CLensFlareDescriptor
@@ -37,7 +37,7 @@ public:
         flSource = (1 << 1),
         flGradient = (1 << 2)
     };
-    Flags32 m_Flags;
+    Flags32 m_Flags{};
 
     // source
     SSource m_Source;
@@ -56,17 +56,10 @@ public:
     shared_str section;
 
 public:
-    CLensFlareDescriptor()
-    {
-        m_Flags.zero();
-        section = 0;
-        m_StateBlendUpSpeed = m_StateBlendDnSpeed = 0.1f;
-    }
-    void load(CInifile const* pIni, pcstr section);
+    CLensFlareDescriptor(shared_str section, CInifile const* pIni);
     void OnDeviceCreate();
     void OnDeviceDestroy();
 };
-DEFINE_VECTOR(CLensFlareDescriptor*, LensFlareDescVec, LensFlareDescIt);
 
 class ENGINE_API CLensFlare
 {
@@ -99,8 +92,9 @@ protected:
 
     FactoryPtr<ILensFlareRender> m_pRender;
 
-    LensFlareDescVec m_Palette;
+    xr_vector<CLensFlareDescriptor*> m_Palette;
     CLensFlareDescriptor* m_Current;
+    CInifile* m_suns_config{};
 
 public:
     enum LFState
@@ -119,14 +113,15 @@ public:
     CLensFlare();
     virtual ~CLensFlare();
 
-    void OnFrame(shared_str id);
+    void OnFrame(const CEnvDescriptorMixer& currentEnv, float time_factor);
     void __fastcall Render(bool bSun, bool bFlares, bool bGradient);
     void OnDeviceCreate();
     void OnDeviceDestroy();
 
-    shared_str AppendDef(CEnvironment& environment, CInifile const* pIni, pcstr sect);
+    CLensFlareDescriptor* AppendDef(shared_str sect);
 
     void Invalidate() { m_State = lfsNone; }
-};
 
-#endif // xr_efflensflareH
+    [[nodiscard]]
+    auto& GetDescriptors() { return m_Palette; }
+};

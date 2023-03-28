@@ -16,7 +16,7 @@ inline void SWAP(TMP_TYPE& t1, TMP_TYPE& t2)
 const u32 N1 = 4, N2 = 4, N3 = 4, N4 = (128 + 3 - 1 * N1 - 2 * N2 - 3 * N3) / 4;
 const u32 UNIT_SIZE = 20, N_INDEXES = N1 + N2 + N3 + N4;
 
-#pragma pack(1)
+#pragma pack(push, 1)
 struct MEM_BLK
 {
     u32 Stamp, NU;
@@ -33,7 +33,7 @@ struct MEM_BLK
         next->prev = prev;
     }
 } _PACK_ATTR;
-#pragma pack()
+#pragma pack(pop)
 static long SubAllocatorSize = 0;
 static u8 Indx2Units[N_INDEXES], Units2Indx[128], GlueCount;
 static u8 *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;

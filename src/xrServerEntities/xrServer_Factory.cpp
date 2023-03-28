@@ -11,5 +11,10 @@
 
 CSE_Abstract* F_entity_Create(LPCSTR section)
 {
-    return (object_factory().server_object(pSettings->r_clsid(section, "class"), section));
+    return object_factory().server_object(pSettings->r_clsid(section, "class"), section);
+}
+
+CSE_Abstract* F_entity_Create(LPCSTR section, bool no_assert)
+{
+    return object_factory().server_object(pSettings->r_clsid(section, "class"), section, no_assert);
 }

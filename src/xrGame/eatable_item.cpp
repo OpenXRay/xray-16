@@ -145,7 +145,7 @@ bool CEatableItem::UseBy(CEntityAlive* entity_alive)
     }
 
     // If uses 255, then skip the decrement for infinite usages
-    if (m_iRemainingUses != -1)
+    if (m_iRemainingUses != u8(-1))
     {
         if (m_iRemainingUses > 0)
             --m_iRemainingUses;

@@ -16,7 +16,7 @@ public:
 
     void Reset();
 
-    void SetPrimaryAttributes();
+    void SetPrimaryAttributes(u32& windowFlags);
 
     IRender::RenderContext GetCurrentContext() const;
     int  MakeContextCurrent(IRender::RenderContext context) const;

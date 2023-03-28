@@ -107,7 +107,7 @@ void CAgentManager::shedule_Update(u32 time_delta)
     STOP_PROFILE
 }
 
-float CAgentManager::shedule_Scale() { return (.5f); }
+float CAgentManager::shedule_Scale() const { return (.5f); }
 #else // USE_SCHEDULER_IN_AGENT_MANAGER
 
 void CAgentManager::update()

@@ -17,8 +17,6 @@ class CSE_Abstract;
 
 namespace ObjectFactory
 {
-#ifndef NO_XR_GAME
 using ClientObjectBaseClass = IFactoryObject;
-#endif
 using ServerObjectBaseClass = CSE_Abstract;
 };

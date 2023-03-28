@@ -236,9 +236,8 @@ void engine_impl::track_weather(float const& time)
 
     environment.m_paused = paused;
 
-    float weight;
     environment.Invalidate();
-    environment.lerp(weight);
+    environment.lerp();
 }
 
 float engine_impl::track_weather() { return (g_pGamePersistent->Environment().GetGameTime() / (24 * 60 * 60)); }
@@ -347,9 +346,8 @@ void engine_impl::weather_current_time(char const* time)
         float(hours * 60 * 60 + minutes * 60 + seconds), environment.fTimeFactor);
     environment.m_paused = paused;
 
-    float weight;
     environment.Invalidate();
-    environment.lerp(weight);
+    environment.lerp();
 }
 
 void engine_impl::reload_current_time_frame()

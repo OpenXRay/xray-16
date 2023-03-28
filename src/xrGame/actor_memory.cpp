@@ -30,5 +30,5 @@ void CActorMemory::camera(Fvector& position, Fvector& direction, Fvector& normal
     field_of_view = deg2rad(camera.f_fov);
     aspect_ratio = camera.f_aspect;
     near_plane = .1f;
-    far_plane = g_pGamePersistent->Environment().CurrentEnv->far_plane;
+    far_plane = g_pGamePersistent->Environment().CurrentEnv.far_plane;
 }

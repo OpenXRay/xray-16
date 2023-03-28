@@ -344,12 +344,7 @@ void CGamePersistent::WeathersUpdate()
         if (actor)
             bIndoor = actor->renderable_ROS()->get_luminocity_hemi() < 0.05f;
 
-        const size_t data_set = (Random.randF() < (1.f - Environment().CurrentEnv->weight)) ? 0 : 1;
-
-        CEnvDescriptor* const _env = Environment().Current[data_set];
-        VERIFY(_env);
-
-        if (CEnvAmbient* env_amb = _env->env_ambient; env_amb)
+        if (CEnvAmbient* env_amb = Environment().CurrentEnv.env_ambient)
         {
             CEnvAmbient::SSndChannelVec& vec = env_amb->get_snd_channels();
 

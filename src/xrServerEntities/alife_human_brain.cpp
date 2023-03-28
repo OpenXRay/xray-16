@@ -84,7 +84,7 @@ void CALifeHumanBrain::on_state_read(NET_Packet& packet)
     if (object().m_wVersion < 110)
     {
         {
-            DWORD_VECTOR temp;
+            xr_vector<u32> temp;
             load_data(temp, packet);
         }
         {

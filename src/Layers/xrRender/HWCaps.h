@@ -37,9 +37,9 @@ public:
 
 public:
     // force flags
-    BOOL bForceGPU_REF;
-    BOOL bForceGPU_SW;
-    BOOL bForceGPU_NonPure;
+    bool bForceGPU_REF;
+    bool bForceGPU_SW;
+    bool bForceGPU_NonPure;
     BOOL SceneMode;
 
     u32 iGPUNum;
