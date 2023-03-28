@@ -371,20 +371,26 @@ public:
     ALife::_TIME_ID GetGameTime();
 
     // возвращает время для энвайронмента в милисекундах относительно начала игры
-    ALife::_TIME_ID GetEnvironmentGameTime();
+    ALife::_TIME_ID GetEnvironmentGameTime() const override;
+    static_assert(std::is_same_v<ALife::_TIME_ID, u64>,
+        "Please, change return type of GetEnvironmentGameTime in IGame_Level and CGameLevel accordingly");
 
     // игровое время в отформатированном виде
     void GetGameDateTime(u32& year, u32& month, u32& day, u32& hours, u32& mins, u32& secs, u32& milisecs);
+
     float GetGameTimeFactor();
     void SetGameTimeFactor(const float fTimeFactor);
     void SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor);
+
+    float GetEnvironmentTimeFactor() const override;
+    void SetEnvironmentTimeFactor(const float fTimeFactor) override;
     void SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor) override;
 
     // gets current daytime [0..23]
     u8 GetDayTime();
     u32 GetGameDayTimeMS();
     float GetGameDayTimeSec();
-    float GetEnvironmentGameDayTimeSec();
+    float GetEnvironmentGameDayTimeSec() const override;
 
 protected:
     // CFogOfWarMngr* m_pFogOfWarMngr;
