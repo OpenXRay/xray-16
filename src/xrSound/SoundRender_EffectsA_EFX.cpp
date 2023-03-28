@@ -95,19 +95,17 @@ bool CSoundRender_EffectsA_EFX::initialized()
 
 void CSoundRender_EffectsA_EFX::set_listener(const CSoundRender_Environment& env)
 {
-    auto mB_to_gain = [](float mb) -> float { return powf(10.0f, mb / 2000.0f); };
-
     A_CHK(alEffectf(effect, AL_EAXREVERB_DENSITY, env.Density));
     A_CHK(alEffectf(effect, AL_EAXREVERB_DIFFUSION, env.EnvironmentDiffusion));
-    A_CHK(alEffectf(effect, AL_EAXREVERB_GAIN, mB_to_gain(env.Room)));
-    A_CHK(alEffectf(effect, AL_EAXREVERB_GAINHF, mB_to_gain(env.RoomHF)));
+    A_CHK(alEffectf(effect, AL_EAXREVERB_GAIN, env.Room));
+    A_CHK(alEffectf(effect, AL_EAXREVERB_GAINHF, env.RoomHF));
     A_CHK(alEffectf(effect, AL_EAXREVERB_DECAY_TIME, env.DecayTime));
     A_CHK(alEffectf(effect, AL_EAXREVERB_DECAY_HFRATIO, env.DecayHFRatio));
     A_CHK(alEffectf(effect, AL_EAXREVERB_DECAY_LFRATIO, env.DecayLFRatio));
-    A_CHK(alEffectf(effect, AL_EAXREVERB_REFLECTIONS_GAIN, mB_to_gain(env.Reflections)));
+    A_CHK(alEffectf(effect, AL_EAXREVERB_REFLECTIONS_GAIN, env.Reflections));
     A_CHK(alEffectf(effect, AL_EAXREVERB_REFLECTIONS_DELAY, env.ReflectionsDelay));
     A_CHK(alEffectfv(effect, AL_EAXREVERB_REFLECTIONS_PAN, &env.ReflectionsPan[0]));
-    A_CHK(alEffectf(effect, AL_EAXREVERB_LATE_REVERB_GAIN, mB_to_gain(env.Reverb)));
+    A_CHK(alEffectf(effect, AL_EAXREVERB_LATE_REVERB_GAIN, env.Reverb));
     A_CHK(alEffectf(effect, AL_EAXREVERB_LATE_REVERB_DELAY, env.ReverbDelay));
     A_CHK(alEffectfv(effect, AL_EAXREVERB_LATE_REVERB_PAN, &env.ReverbPan[0]));
     A_CHK(alEffectf(effect, AL_EAXREVERB_ECHO_TIME, env.EchoTime));
