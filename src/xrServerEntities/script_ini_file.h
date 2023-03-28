@@ -13,18 +13,14 @@
 class CScriptIniFile : public CInifile
 {
 protected:
-    typedef CInifile inherited;
+    using inherited = CInifile;
 
 public:
     CScriptIniFile(IReader* F, LPCSTR path = nullptr);
     CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly = TRUE, BOOL bLoadAtStart = TRUE, BOOL SaveAtEnd = TRUE);
-    virtual ~CScriptIniFile();
-    bool line_exist(LPCSTR S, LPCSTR L);
-    bool section_exist(LPCSTR S);
+
     int r_clsid(LPCSTR S, LPCSTR L);
-    bool r_bool(LPCSTR S, LPCSTR L);
     int r_token(LPCSTR S, LPCSTR L, const CScriptTokenList& token_list);
-    LPCSTR r_string_wb(LPCSTR S, LPCSTR L);
     LPCSTR update(LPCSTR file_name);
     u32 line_count(LPCSTR S);
     LPCSTR r_string(LPCSTR S, LPCSTR L);
@@ -54,7 +50,4 @@ public:
     void save_at_end(bool b);
     void remove_line(pcstr S, pcstr L);
     void set_override_names(bool b);
-    u32 section_count();
 };
-
-#include "script_ini_file_inline.h"
