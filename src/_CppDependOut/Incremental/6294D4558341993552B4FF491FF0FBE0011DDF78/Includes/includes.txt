@@ -1,0 +1,4 @@
+c:\openxray\externals\libogg\include\ogg\ogg.h
+c:\openxray\externals\libogg\include\ogg\os_types.h
+c:\openxray\externals\libogg\src\bitwise.c
+c:\openxray\externals\libogg\src\framing.c
