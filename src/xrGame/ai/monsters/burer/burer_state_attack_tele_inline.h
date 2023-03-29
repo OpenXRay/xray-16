@@ -234,6 +234,7 @@ void CStateBurerAttackTele<Object>::FindObjects()
     FindFreeObjects(m_nearest, pos);
 
     // оставить уникальные объекты
+    std::sort(tele_objects.begin(), tele_objects.end());
     tele_objects.erase(std::unique(tele_objects.begin(), tele_objects.end()), tele_objects.end());
 }
 
@@ -409,6 +410,10 @@ public:
 template <typename Object>
 void CStateBurerAttackTele<Object>::SelectObjects()
 {
+    const size_t max = std::min(tele_objects.size(), (size_t)this->object->m_tele_max_handled_objects);
+    if (this->object->CTelekinesis::get_objects_count() > max)
+        return;
+
     std::sort(tele_objects.begin(), tele_objects.end(),
         ::detail::burer_attack_tele::best_object_predicate2(
             this->object->Position(),
@@ -417,7 +422,7 @@ void CStateBurerAttackTele<Object>::SelectObjects()
     );
 
     // выбрать объект
-    for (u32 i = 0; i < tele_objects.size(); ++i)
+    for (u32 i = 0; i < max; ++i)
     {
         CPhysicsShellHolder* obj = tele_objects[i];
 
@@ -438,16 +443,9 @@ void CStateBurerAttackTele<Object>::SelectObjects()
         tele_obj->set_sound(this->object->sound_tele_hold, this->object->sound_tele_throw);
 
         this->object->StartTeleObjectParticle(obj);
-
-        // удалить из списка
-        tele_objects[i] = tele_objects[tele_objects.size() - 1];
-        tele_objects.pop_back();
-
-        if (this->object->CTelekinesis::get_objects_count() >= this->object->m_tele_max_handled_objects)
-        {
-            break;
-        }
     }
+
+    tele_objects.erase(tele_objects.begin(), tele_objects.begin() + max);
 }
 
 template <typename Object>
