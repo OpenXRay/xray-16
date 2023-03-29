@@ -252,29 +252,22 @@ void CStateBurerAttackTele<Object>::FireAllToEnemy()
 
     Fvector enemy_pos = get_head_position(const_cast<CEntityAlive*>(this->object->EnemyMan.get_enemy()));
 
-    for (u32 i = 0; i <this->object->CTelekinesis::get_objects_count(); ++i)
+    for (u32 i = 0; i < this->object->CTelekinesis::get_objects_total_count(); ++i)
     {
-        u32 const prev_num_objects = this->object->CTelekinesis::get_objects_count();
+        CTelekineticObject tele_object = this->object->CTelekinesis::get_object_by_index(i);
 
-        CPhysicsShellHolder* const cur_object = this->object->CTelekinesis::get_object_by_index(i).object;
-        if (!cur_object)
-        {
+        if (tele_object.get_state() != TS_Raise && tele_object.get_state() != TS_Keep)
             continue;
-        }
+
+        CPhysicsShellHolder* const cur_object = tele_object.get_object();
+        if (!cur_object)
+            continue;
+
         float const dist_to_enemy = cur_object->Position().distance_to(enemy_pos);
         float const fire_time = dist_to_enemy / this->object->m_tele_fly_velocity;
 
         this->object->CTelekinesis::fire_t(cur_object, enemy_pos, fire_time);
-
-        u32 const new_num_objects = this->object->CTelekinesis::get_objects_count();
-        if (new_num_objects < prev_num_objects)
-        {
-            VERIFY(new_num_objects == prev_num_objects - 1);
-            --i;
-        }
     }
-
-    // object->CTelekinesis::fire_all(enemy_pos);
 
     this->object->sound().play(CBurer::eMonsterSoundTeleAttack);
 }
@@ -292,8 +285,7 @@ void CStateBurerAttackTele<Object>::ExecuteTeleContinue()
     bool object_found = false;
     CTelekineticObject tele_object;
 
-    u32 i = 0;
-    while (i <this->object->CTelekinesis::get_objects_count())
+    for (u32 i = 0; i < this->object->CTelekinesis::get_objects_total_count(); ++i)
     {
         tele_object = this->object->CTelekinesis::get_object_by_index(i);
 
@@ -302,8 +294,6 @@ void CStateBurerAttackTele<Object>::ExecuteTeleContinue()
             object_found = true;
             break;
         }
-        else
-            i++;
     }
 
     if (object_found)
