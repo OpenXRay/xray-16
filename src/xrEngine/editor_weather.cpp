@@ -149,6 +149,19 @@ void display_property(CEnvDescriptor& descriptor)
         ItemHelp("If enabled, engine will automatically calculate sun direction (and ignore your values) on full dynamic lighting renderers.\n"
                  "You still need to provide sun altitude and longitude for static and (not full) dynamic lighting.");
 
+        float azimuth = rad2deg(descriptor.sun_azimuth);
+        if (ImGui::DragFloat("azimuth", &azimuth, 0.5f, -360.0f, 360.f))
+            descriptor.sun_azimuth = deg2rad(azimuth);
+        ItemHelp("Dynamic sun direction correction.\n"
+            "Name in configs: \n"
+            "sun_azimuth");
+
+        if (ImGui::Button("Calculate sun direction"))
+        {
+            std::tie(descriptor.sun_dir, std::ignore) = env.CurrentEnv.calculate_dynamic_sun_dir(descriptor.exec_time);
+        }
+        ItemHelp("Calculates realistic sun direction, uses sun azimuth");
+
         float altitude  = rad2deg(descriptor.sun_dir.getH());
         float longitude = rad2deg(descriptor.sun_dir.getP());
 
@@ -167,15 +180,6 @@ void display_property(CEnvDescriptor& descriptor)
                  "   SOC: sun_dir (vector2 with longitude (x) and altitude (y)"
                  "\n\n"
                  "If dynamic sun direction is disabled, values will be saved like in SOC: as sun_dir");
-
-        ImGui::BeginDisabled(!descriptor.use_dynamic_sun_dir);
-        float azimuth = rad2deg(descriptor.sun_azimuth);
-        if (ImGui::DragFloat("azimuth", &azimuth, 0.5f, -360.0f, 360.f))
-            descriptor.sun_azimuth = deg2rad(azimuth);
-        ImGui::EndDisabled();
-        ItemHelp("Dynamic sun direction correction.\n"
-                 "Name in configs: \n"
-                 "sun_azimuth");
 
         ImGui::DragFloat("shafts intensity", &descriptor.m_fSunShaftsIntensity, 0.001f, 0.0f, 1.0f);
     }

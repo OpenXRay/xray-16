@@ -210,9 +210,11 @@ public:
 
 public:
     CEnvDescriptorMixer();
+
     virtual void lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
         float f, CEnvModifier& M, float m_power);
-    void calculate_dynamic_sun_dir(float fGameTime);
+
+    std::pair<Fvector3, float> calculate_dynamic_sun_dir(float fGameTime) const;
 };
 
 class ENGINE_API CEnvironment
