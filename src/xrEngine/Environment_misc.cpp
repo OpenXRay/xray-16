@@ -458,7 +458,7 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
 
     config.w_string   (identifier, sun_name,                    lens_flare ? lens_flare->section.c_str() : "");
     config.w_fvector3 (identifier, "sun_color",                 sun_color);
-    if (old_style)
+    if (use_dynamic_sun_dir)
     {
         float altutude, longitude;
         sun_dir.getHP(altutude, longitude);
@@ -468,8 +468,8 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
     {
         config.w_float(identifier, "sun_altitude",              rad2deg(sun_dir.getH()));
         config.w_float(identifier, "sun_longitude",             rad2deg(sun_dir.getP()));
-        config.w_float(identifier, "sun_azimuth",               sun_azimuth);
     }
+    config.w_float    (identifier, "sun_azimuth",               sun_azimuth);
     config.w_float    (identifier, "sun_shafts_intensity",      m_fSunShaftsIntensity);
 
     config.w_string   (identifier, thunderbolt_collection_name, thunderbolt ? thunderbolt->section.c_str() : "");
