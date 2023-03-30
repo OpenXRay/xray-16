@@ -1,11 +1,12 @@
 #include "stdafx.h"
-#pragma hdrstop
+
+#include "SH_Matrix.h"
 
 void CMatrix::Calculate()
 {
-    if (dwFrame == RDEVICE.dwFrame)
+    if (dwFrame == Device.dwFrame)
         return;
-    dwFrame = RDEVICE.dwFrame;
+    dwFrame = Device.dwFrame;
 
     // Switch on mode
     switch (dwMode)
@@ -15,7 +16,7 @@ void CMatrix::Calculate()
     case modeTCM:
     {
         Fmatrix T;
-        float sU = 1, sV = 1, t = RDEVICE.fTimeGlobal;
+        float sU = 1, sV = 1, t = Device.fTimeGlobal;
         tc_trans(xform, .5f, .5f);
         if (tcm & tcmRotate)
         {
@@ -44,8 +45,8 @@ void CMatrix::Calculate()
         return;
     case modeS_refl:
     {
-        float Ux = .5f * RDEVICE.mView._11, Uy = .5f * RDEVICE.mView._21, Uz = .5f * RDEVICE.mView._31, Uw = .5f;
-        float Vx = -.5f * RDEVICE.mView._12, Vy = -.5f * RDEVICE.mView._22, Vz = -.5f * RDEVICE.mView._32, Vw = .5f;
+        float Ux = .5f * Device.mView._11, Uy = .5f * Device.mView._21, Uz = .5f * Device.mView._31, Uw = .5f;
+        float Vx = -.5f * Device.mView._12, Vy = -.5f * Device.mView._22, Vz = -.5f * Device.mView._32, Vw = .5f;
 
         xform._11 = Ux;
         xform._12 = Vx;
@@ -67,7 +68,7 @@ void CMatrix::Calculate()
         return;
     case modeC_refl:
     {
-        Fmatrix M = RDEVICE.mView;
+        Fmatrix M = Device.mView;
         M._41 = 0.f;
         M._42 = 0.f;
         M._43 = 0.f;

@@ -9,8 +9,10 @@
 #include "game_sv_item_respawner.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Server.h"
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
 #include "xrNetServer/empty/NET_Server.h"
+#else
+#   error Select of add implementation for your platform
 #endif
 
 #define MAX_PLAYERS_COUNT 32
@@ -35,10 +37,10 @@ class xrServer;
 // XXX: define type aliases (PlayerId, EntityId)
 class GameEventQueue;
 
-class IServerGameState : public virtual IGameState
+class XR_NOVTABLE IServerGameState : public virtual IGameState
 {
 public:
-    virtual ~IServerGameState() = 0;
+    virtual ~IServerGameState() override = 0;
     virtual void SaveMapList() = 0;
     virtual bool HasMapRotation() = 0;
     virtual void OnPlayerConnect(ClientID id) = 0;
@@ -115,7 +117,8 @@ public:
     virtual void DumpOnlineStatistic() = 0;
 };
 
-IC IServerGameState::~IServerGameState() {}
+inline IServerGameState::~IServerGameState() = default;
+
 class game_sv_GameState : public game_GameState, public IServerGameState
 {
     typedef game_GameState inherited;

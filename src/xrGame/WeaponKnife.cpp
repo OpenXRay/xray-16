@@ -282,6 +282,12 @@ void CWeaponKnife::MakeShot(Fvector const& pos, Fvector const& dir, float const 
     bool SendHit = SendHitAllowed(H_Parent());
 
     PlaySound("sndShot", pos);
+    if (ParentIsActor())
+    {
+        const bool left = (IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_LEFT) || IsBinded(kWPN_ZOOM, XR_CONTROLLER_AXIS_TRIGGER_LEFT)) && !g_player_hud->attached_item(1);
+        const bool right = IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_LEFT) || IsBinded(kWPN_ZOOM, XR_CONTROLLER_AXIS_TRIGGER_LEFT);
+        pInput->Feedback(CInput::FeedbackTriggers, left ? k_hit : 0.0f, right ? k_hit : 0.0f, 0.1f);
+    }
 
     Level().BulletManager().AddBullet(pos, dir, m_fStartBulletSpeed, fCurrentHit, fHitImpulse_cur, H_Parent()->ID(),
         ID(), m_eHitType, fireDistance, cartridge, 1.f, SendHit);
@@ -429,8 +435,9 @@ bool CWeaponKnife::Action(u16 cmd, u32 flags)
     {
     case kWPN_ZOOM:
         if (flags & CMD_START)
+        {
             Fire2Start();
-
+        }
         return true;
     }
     return false;

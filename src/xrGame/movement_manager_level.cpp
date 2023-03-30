@@ -42,12 +42,15 @@ void CMovementManager::process_level_path()
 
         if (!m_build_at_once)
             break;
+
+        [[fallthrough]];
     }
     case ePathStateContinueLevelPath:
     {
         level_path().select_intermediate_vertex();
 
         m_path_state = ePathStateBuildDetailPath;
+        [[fallthrough]];
     }
     case ePathStateBuildDetailPath:
     {

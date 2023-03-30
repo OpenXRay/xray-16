@@ -1,0 +1,13 @@
+{
+  "[cpp]": {
+    "editor.formatOnSave": false
+  },
+  "[c]": {
+    "editor.formatOnSave": false
+  },
+  "[xml]": {
+    "editor.formatOnSave": false
+  },
+  "files.trimTrailingWhitespace": false,
+  "files.insertFinalNewline": true
+}

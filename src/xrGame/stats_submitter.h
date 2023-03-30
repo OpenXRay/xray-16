@@ -37,7 +37,7 @@ public:
     virtual void shedule_Update(u32 dt);
     virtual shared_str shedule_Name() const { return shared_str("gamespy_atlas_updator"); };
     virtual bool shedule_Needed() { return true; };
-    virtual float shedule_Scale() { return 1.0f; };
+    virtual float shedule_Scale() const { return 1.0f; };
     static u8 const p_number[crypto::xr_dsa::public_key_length];
     static u8 const q_number[crypto::xr_dsa::private_key_length];
     static u8 const g_number[crypto::xr_dsa::public_key_length];
@@ -79,7 +79,7 @@ private:
 
     void save_file(gamespy_gp::profile const* profile);
 
-    void __stdcall onlylog_operation(bool const result, char const* err_descr);
+    void onlylog_operation(bool const result, char const* err_descr);
 
     static void fill_private_key(crypto::xr_dsa::private_key_t& priv_key_dest);
 

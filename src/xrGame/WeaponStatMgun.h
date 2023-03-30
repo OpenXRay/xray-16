@@ -75,17 +75,25 @@ protected:
     void RemoveShotEffector();
     void SetDesiredDir(float h, float p);
     virtual bool IsHudModeNow() { return false; };
-    // HolderCustom
+
 public:
+    // HolderCustom
     virtual bool Use(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos) { return !Owner(); };
+
     void OnAxisMove(float x, float y, float scale, bool invert);
+
     virtual void OnMouseMove(int x, int y);
+
     virtual void OnKeyboardPress(int dik);
     virtual void OnKeyboardRelease(int dik);
     virtual void OnKeyboardHold(int dik);
+
     void OnControllerPress(int cmd, float x, float y) override;
     void OnControllerHold(int cmd, float x, float y) override;
     void OnControllerRelease(int cmd, float x, float y) override;
+
+    void OnControllerAttitudeChange(Fvector change) override;
+
     virtual CInventory* GetInventory() { return NULL; };
     virtual void cam_Update(float dt, float fov = 90.0f);
 

@@ -14,7 +14,7 @@
 bool g_using_smooth_groups = true;
 bool g_smooth_groups_by_faces = false;
 
-xrLC_GlobalData* data = 0;
+xrLC_GlobalData* g_lc_global_data = 0;
 
 tread_lightmaps* read_lightmaps = 0;
 twrite_lightmaps* write_lightmaps = 0;
@@ -31,18 +31,18 @@ twrite_models* write_models = 0;
 tread_mu_refs* read_mu_refs = 0;
 twrite_mu_refs* write_mu_refs = 0;
 
-xrLC_GlobalData* lc_global_data() { return data; }
+xrLC_GlobalData* lc_global_data() { return g_lc_global_data; }
 void create_global_data()
 {
     VERIFY(!inlc_global_data());
-    data = xr_new<xrLC_GlobalData>();
+    g_lc_global_data = xr_new<xrLC_GlobalData>();
 }
 void destroy_global_data()
 {
     VERIFY(inlc_global_data());
-    if (data)
-        data->clear();
-    xr_delete(data);
+    if (g_lc_global_data)
+        g_lc_global_data->clear();
+    xr_delete(g_lc_global_data);
 }
 
 xrLC_GlobalData::xrLC_GlobalData() : _b_nosun(false), _gl_linear(false), b_vert_not_register(false)

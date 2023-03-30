@@ -3,7 +3,7 @@
 #include "xrCore/xrDebug_macros.h"
 
 // deprecated, use xr_array instead
-template <class T, std::size_t dim>
+template <class T, size_t dim>
 class svector
 {
 public:

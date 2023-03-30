@@ -14,7 +14,7 @@
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <stdint.h>
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
@@ -69,10 +69,7 @@ public:
     bool External; // File can be accessed only as external
 
     FileStatus(bool exists, bool external)
-    {
-        Exists = exists;
-        External = external;
-    }
+        : Exists(exists), External(external) {}
 
     operator bool() const { return Exists; }
 };
@@ -105,8 +102,10 @@ public:
 #if defined(XR_PLATFORM_WINDOWS)
         void *hSrcFile = nullptr;
         void *hSrcMap = nullptr;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
         int hSrcFile = 0;
+#else
+#   error Select or add implementation for your platform
 #endif
         CInifile* header = nullptr;
         
@@ -148,10 +147,10 @@ private:
     void check_pathes();
 
     files_set m_files;
-    bool bNoRecurse;
+    bool bNoRecurse{ true };
 
     Lock* m_auth_lock;
-    u64 m_auth_code;
+    u64 m_auth_code{};
 
     const file* RegisterExternal(pcstr name);
     const file* Register(pcstr name, size_t vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif);

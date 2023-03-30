@@ -41,7 +41,7 @@ public:
   dMatrixComparison();
   ~dMatrixComparison();
 
-  dReal nextMatrix (dReal *A, int n, int m, int lower_tri, char *name, ...);
+  dReal nextMatrix (dReal *A, int n, int m, int lower_tri, const char *name, ...);
   // add a new n*m matrix A to the sequence. the name of the matrix is given
   // by the printf-style arguments (name,...). if this is the first sequence
   // then this object will simply record the matrices and return 0.

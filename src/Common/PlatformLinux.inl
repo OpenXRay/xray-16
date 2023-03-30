@@ -26,10 +26,6 @@
 
 #define _LINUX // for GameSpy
 
-#if !defined(__INTEL_COMPILER)
-#define _alloca alloca
-#endif
-
 #define _MAX_PATH PATH_MAX + 1
 #define MAX_PATH PATH_MAX + 1
 
@@ -38,7 +34,6 @@
 #define _copysign copysign
 
 #define _cdecl //__attribute__((cdecl))
-#define _stdcall //__attribute__((stdcall))
 #define _fastcall //__attribute__((fastcall))
 
 #define __cdecl
@@ -64,16 +59,9 @@ inline char* _strupr_l(char* str, locale_t loc)
 }
 */
 
-#define VOID void
-#define HKL void*
-#define ActivateKeyboardLayout(x, y) {}
-#define ScreenToClient(hwnd, p) {}
-
 #define __except(X) catch(X)
 
-#define tid_t pthread_t
 #define GetCurrentProcessId getpid
-#define GetCurrentThreadId pthread_self
 
 inline void Sleep(int ms)
 {
@@ -159,7 +147,6 @@ inline int xr_unlink(const char *path)
 
 #include <inttypes.h>
 typedef int32_t BOOL;
-typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 typedef int32_t LONG;
@@ -173,18 +160,9 @@ typedef char* PSTR;
 typedef char* LPTSTR;
 typedef const char* LPCSTR;
 typedef const char* LPCTSTR;
-typedef unsigned char* LPBYTE;
 typedef unsigned int UINT;
-typedef int INT;
-typedef unsigned long ULONG;
-typedef unsigned long* ULONG_PTR;
 typedef long long int LARGE_INTEGER;
 typedef unsigned long long int ULARGE_INTEGER;
-
-typedef unsigned short* LPWORD;
-typedef unsigned long* LPDWORD;
-typedef const void* LPCVOID;
-typedef long long int* PLARGE_INTEGER;
 
 typedef wchar_t WCHAR;
 
@@ -243,11 +221,8 @@ typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 typedef long HRESULT;
 typedef long LRESULT;
-typedef long _W64;
 typedef void* HWND;
 typedef void* HDC;
-typedef float FLOAT;
-typedef unsigned char UINT8;
 
 typedef struct _RECT {
     long left;
@@ -263,10 +238,6 @@ typedef struct tagPOINT {
 
 #define DWORD_PTR UINT_PTR
 #define WM_USER 0x0400
-#define WA_INACTIVE 0
-#define HIWORD(l)              ((WORD)((DWORD_PTR)(l) >> 16))
-#define LOWORD(l)              ((WORD)((DWORD_PTR)(l) & 0xFFFF))
-
 
 #define TRUE true
 #define FALSE false
@@ -286,8 +257,14 @@ typedef dirent DirEntryType;
 #define O_SEQUENTIAL 0
 #define SH_DENYWR 0
 
+#if __has_include(<SDL_stdinc.h>)
+#include <SDL_stdinc.h>
 #define itoa SDL_itoa
 #define _itoa_s SDL_itoa
+#else
+#define itoa(...) do { static_assert(false, "SDL_stdinc.h is missing"); } while (false)
+#define _itoa_s(...) do { static_assert(false, "SDL_stdinc.h is missing"); } while (false)
+#endif
 
 #define _stricmp stricmp
 #define strcmpi stricmp
@@ -322,7 +299,7 @@ inline int strcpy_s(char *dest, size_t num, const char *source)
     return ERANGE;
 }
 
-template <std::size_t num>
+template <size_t num>
 inline int strcpy_s(char (&dest)[num], const char *source) { return strcpy_s(dest, num, source); }
 
 inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t num)
@@ -362,7 +339,7 @@ inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t n
     return EINVAL;
 }
 
-template <std::size_t dst_sz>
+template <size_t dst_sz>
 inline int strncpy_s(char (&dest)[dst_sz], const char * source, size_t num) { return strncpy_s(dest, dst_sz, source, num); }
 
 inline int strcat_s(char * dest, size_t num, const char * source)
@@ -424,7 +401,6 @@ inline int vsnprintf_s(char* buffer, size_t size, size_t, const char* format, va
     return vsnprintf(buffer, size, format, list);
 }
 #define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
-#define _alloca alloca
 #define _snprintf snprintf
 #define sprintf_s(buffer, buffer_size, stringbuffer, ...) sprintf(buffer, stringbuffer, ##__VA_ARGS__)
 //#define GetProcAddress(handle, name) dlsym(handle, name)
@@ -480,7 +456,7 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 #define ZeroMemory(p, sz) memset((p), 0, (sz))
 #define CopyMemory(d, s, n) memcpy(d, s, n)
 
-#define RGB(r,g,b) ( ((DWORD)(BYTE)r)|((DWORD)((BYTE)g)<<8)|((DWORD)((BYTE)b)<<16) )
+#define RGB(r,g,b) ( ((DWORD)(uint8_t)r)|((DWORD)((uint8_t)g)<<8)|((DWORD)((uint8_t)b)<<16) )
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 #define S_OK 0x00000000
@@ -492,13 +468,10 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 #define _MAX_FNAME	256
 #define _MAX_EXT	256
 
-#define SEM_FAILCRITICALERRORS 1
-#define SetErrorMode(x) {}
-
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3)  \
-    ((DWORD)(BYTE)(ch0) | ((DWORD)(BYTE)(ch1) << 8) |  \
-    ((DWORD)(BYTE)(ch2) << 16) | ((DWORD)(BYTE)(ch3) << 24 ))
+    ((DWORD)(uint8_t)(ch0) | ((DWORD)(uint8_t)(ch1) << 8) |  \
+    ((DWORD)(uint8_t)(ch2) << 16) | ((DWORD)(uint8_t)(ch3) << 24 ))
 #endif
 
 typedef enum _D3DFORMAT {
@@ -645,10 +618,10 @@ typedef enum _D3DBLENDOP {
 typedef struct _D3DVERTEXELEMENT9 {
   WORD    Stream;
   WORD    Offset;
-  BYTE    Type;
-  BYTE    Method;
-  BYTE    Usage;
-  BYTE    UsageIndex;
+  uint8_t Type;
+  uint8_t Method;
+  uint8_t Usage;
+  uint8_t UsageIndex;
 } D3DVERTEXELEMENT9, *LPD3DVERTEXELEMENT9;
 
 #define MAXD3DDECLLENGTH         64 /* +end marker */
@@ -1109,7 +1082,13 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 
-#define xr_fs_strlwr(str) str
+template <typename T>
+decltype(auto) do_nothing(const T& obj)
+{
+    return obj;
+}
+
+#define xr_fs_strlwr(str) do_nothing(str)
 #define xr_fs_nostrlwr(str) xr_strlwr(str)
 
 /** For backward compability of FS, for real filesystem delimiter set to back

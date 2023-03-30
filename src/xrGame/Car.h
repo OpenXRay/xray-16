@@ -58,7 +58,7 @@ private:
     CFunctionGraph m_dbg_torque_rpm;
     CStatGraph* m_dbg_dynamic_plot;
     bool b_plots;
-    float _stdcall TorqueRpmFun(float rpm) { return Parabola(rpm) / rpm; }
+    float TorqueRpmFun(float rpm) { return Parabola(rpm) / rpm; }
     void InitDebug();
     void DbgSheduleUpdate();
     void DbgUbdateCl();
@@ -440,7 +440,7 @@ private:
 
  public:
     void InitParabola();
-    float _stdcall Parabola(float rpm);
+    float Parabola(float rpm);
     // float GetSteerAngle();
     void LimitWheels();
     void Drive();
@@ -586,15 +586,22 @@ public:
     virtual bool net_Relevant() { return getLocal(); }; // relevant for export to server
     virtual bool UsedAI_Locations();
     virtual void net_Relcase(IGameObject* O);
+
     // Input
     void OnAxisMove(float x, float y, float scale, bool invert);
+
     virtual void OnMouseMove(int x, int y);
+
     virtual void OnKeyboardPress(int dik);
     virtual void OnKeyboardRelease(int dik);
     virtual void OnKeyboardHold(int dik);
+
     void OnControllerPress(int cmd, float x, float y) override;
     void OnControllerHold(int cmd, float x, float y) override;
     void OnControllerRelease(int cmd, float x, float y) override;
+
+    void OnControllerAttitudeChange(Fvector change) override;
+
     virtual void vfProcessInputKey(int iCommand, bool bPressed);
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void OnAfterExplosion();

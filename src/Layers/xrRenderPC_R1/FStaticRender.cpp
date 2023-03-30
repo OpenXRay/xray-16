@@ -93,7 +93,13 @@ void CRender::create()
     o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
     o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
     o.no_detail_textures = !ps_r2_ls_flags.test(R1FLAG_DETAIL_TEXTURES);
+
     c_ldynamic_props = "L_dynamic_props";
+    c_sbase = "s_base";
+    c_ssky0 = "s_sky0";
+    c_ssky1 = "s_sky1";
+    c_sclouds0 = "s_clouds0";
+    c_sclouds1 = "s_clouds1";
 
     o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
     if (o.no_ram_textures)
@@ -158,7 +164,7 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
-void CRender::BeforeFrame()
+void CRender::BeforeRender()
 {
     if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
         return;
@@ -444,13 +450,6 @@ extern float r_ssaLOD_A, r_ssaLOD_B;
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 extern float r_ssaHZBvsTEX;
 
-ICF bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
-{
-    float d1 = _1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    float d2 = _2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    return d1 < d2;
-}
-
 void CRender::Calculate()
 {
 #ifdef _GPA_ENABLED
@@ -495,8 +494,7 @@ void CRender::Calculate()
     {
         Fvector box_radius;
         box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
-        Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
-        Sectors_xrc.box_query(rmPortals, Device.vCameraPosition, box_radius);
+        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
         for (int K = 0; K < Sectors_xrc.r_count(); K++)
         {
             CPortal* pPortal = (CPortal*)Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
@@ -538,7 +536,12 @@ void CRender::Calculate()
                 lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)
-            std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
+            std::sort(lstRenderables.begin(), lstRenderables.end(), [](ISpatial* s1, ISpatial* s2)
+            {
+                const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                return d1 < d2;
+            });
 
             if (ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
                 g_hud->Render_First(); // R1 shadows

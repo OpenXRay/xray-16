@@ -9,8 +9,6 @@
 #pragma once
 
 typedef unsigned int u32;
-typedef char const* LPCSTR;
-typedef char* LPSTR;
 
 #pragma managed(push, off)
 #include <malloc.h>
@@ -72,4 +70,4 @@ inline LPSTR to_string(System::String ^ string)
     return (result);
 }
 
-inline System::String ^ to_string(LPCSTR string) { return (gcnew System::String(string)); }
+inline System::String ^ to_string(pcstr string) { return (gcnew System::String(string)); }

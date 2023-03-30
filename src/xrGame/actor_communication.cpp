@@ -94,6 +94,24 @@ void CActor::AddEncyclopediaArticle(const CInfoPortion* info_portion) const
 
 }
 
+void CActor::AddGameTask(const CInfoPortion* info_portion) const
+{
+    VERIFY2(info_portion, "info_portion is nullptr");
+    if (!info_portion)
+    {
+        Msg("! [%s] info_portion is nullptr!", __FUNCTION__);
+        return;
+    }
+    const TASK_ID_VECTOR& tasks = info_portion->GameTasks();
+    if (tasks.empty())
+        return;
+
+    for (const TASK_ID& taskId : tasks)
+    {
+        Level().GameTaskManager().GiveGameTaskToActor(taskId, 0);
+    }
+}
+
 void CActor::AddGameNews(GAME_NEWS_DATA& news_data)
 {
     GAME_NEWS_VECTOR& news_vector = game_news_registry->registry().objects();
@@ -122,6 +140,7 @@ bool CActor::OnReceiveInfo(shared_str info_id) const
     info_portion.Load(info_id);
 
     AddEncyclopediaArticle(&info_portion);
+    AddGameTask(&info_portion);
 
     callback(GameObject::eInventoryInfo)(lua_game_object(), *info_id);
 
@@ -241,8 +260,10 @@ void CActor::NewPdaContact(CInventoryOwner* pInvOwner)
     if (!IsGameTypeSingle())
         return;
 
-    bool b_alive = !!(smart_cast<CEntityAlive*>(pInvOwner))->g_Alive();
-    CurrentGameUI()->UIMainIngameWnd->AnimateContacts(b_alive);
+    auto entityAlive = smart_cast<CEntityAlive*>(pInvOwner);
+    const bool isAlive = !!entityAlive->g_Alive();
+    const bool isMonster = entityAlive->cast_base_monster(); // no sound for monsters
+    CurrentGameUI()->UIMainIngameWnd->AnimateContacts(isAlive && !isMonster);
 
     Level().MapManager().AddRelationLocation(pInvOwner);
 }

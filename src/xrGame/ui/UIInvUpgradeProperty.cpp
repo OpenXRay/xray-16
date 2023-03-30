@@ -22,6 +22,7 @@
 #include "UIHelper.h"
 
 UIProperty::UIProperty()
+    : CUIWindow("UIInvUpgradeProperty")
 {
     m_text[0] = 0;
     m_ui_icon = NULL;
@@ -46,6 +47,7 @@ bool UIProperty::init_property(shared_str const& property_id)
         return false;
     }
     m_ui_icon->InitTexture(get_property()->icon_name());
+    m_ui_icon->SetTextureColor(get_property()->icon_color());
     return true;
 }
 
@@ -130,6 +132,7 @@ bool UIProperty::show_result(LPCSTR values)
 // =================== UIPropertiesWnd =====================================================
 
 UIInvUpgPropertiesWnd::UIInvUpgPropertiesWnd()
+    : CUIWindow("UIInvUpgPropertiesWnd")
 {
     m_properties_ui.reserve(15);
     m_temp_upgrade_vector.reserve(1);
@@ -137,6 +140,7 @@ UIInvUpgPropertiesWnd::UIInvUpgPropertiesWnd()
 }
 
 UIInvUpgPropertiesWnd::~UIInvUpgPropertiesWnd() { delete_data(m_properties_ui); }
+
 bool UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
 {
     CUIXml ui_xml;

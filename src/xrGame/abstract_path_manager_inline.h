@@ -12,15 +12,13 @@
 #include "xrAICore/Navigation/graph_engine.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Graph, typename _VertexEvaluator, typename _vertex_id_type, typename _index_type\
->
+    template <typename _Graph, typename _VertexEvaluator, typename _vertex_id_type, typename _index_type>
 
 #define CPathManagerTemplate CAbstractPathManager<_Graph, _VertexEvaluator, _vertex_id_type, _index_type>
 
 TEMPLATE_SPECIALIZATION
-IC CPathManagerTemplate::CAbstractPathManager(CRestrictedObject* object) { m_object = object; }
-TEMPLATE_SPECIALIZATION
-IC CPathManagerTemplate::~CAbstractPathManager() {}
+IC CPathManagerTemplate::CAbstractPathManager(CRestrictedObject* object) : m_object(object) {}
+
 TEMPLATE_SPECIALIZATION
 IC void CPathManagerTemplate::reinit(const _Graph* graph)
 {

@@ -161,7 +161,7 @@ public:
         xr_free(data);
     }
 #pragma warning(pop)
-    bool save_to(LPCSTR fn);
+    bool save_to(LPCSTR fn) const;
     void flush() override {}
 };
 
@@ -380,6 +380,8 @@ public:
     }
     IC size_t length() const { return Size; }
     IC void* pointer() const { return &(data[Pos]); }
+    IC void* begin() const { return data; }
+    IC void* end() const { return data + Size; }
     IC void advance(size_t cnt)
     {
         Pos += cnt;
@@ -419,8 +421,10 @@ class XRCORE_API CVirtualFileRW final : public IReader
 private:
 #if defined(XR_PLATFORM_WINDOWS)
     void *hSrcFile, *hSrcMap;
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
     int hSrcFile;
+#else
+#   error Select or add implementation for your platform
 #endif
 
 public:

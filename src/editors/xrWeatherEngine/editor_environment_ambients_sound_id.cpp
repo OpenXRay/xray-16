@@ -12,10 +12,11 @@
 #include "ide.hpp"
 #include "editor_environment_sound_channels_manager.hpp"
 
-using editor::environment::ambients::sound_id;
-using editor::environment::sound_channels::manager;
+namespace editor::environment::ambients
+{
+sound_id::sound_id(sound_channels::manager const& manager, shared_str const& id)
+    : m_property_holder(nullptr), m_manager(manager), m_id(id) {}
 
-sound_id::sound_id(manager const& manager, shared_str const& id) : m_manager(manager), m_id(id), m_property_holder(0) {}
 sound_id::~sound_id()
 {
     if (!Device.editor())
@@ -45,3 +46,4 @@ void sound_id::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 sound_id::property_holder_type* sound_id::object() { return (m_property_holder); }
+}

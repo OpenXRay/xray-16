@@ -260,8 +260,8 @@ bool moving_objects::fill_collisions(moving_object* object, const Fvector& objec
                 VERIFY(action == possible_action_1_can_wait_2);
         }
 
-        m_collisions.push_back(std::make_pair(time_to_check,
-            std::make_pair(action, std::make_pair(priority ? object : (*I), !priority ? object : (*I)))));
+        m_collisions.emplace_back(time_to_check,
+            std::make_pair(action, std::make_pair(priority ? object : (*I), !priority ? object : (*I))));
 
         if (break_cycle)
             return (false);
@@ -296,9 +296,9 @@ bool moving_objects::fill_collisions(moving_object* object, const Fvector& objec
                     continue;
             }
 
-            m_collisions.push_back(std::make_pair(
+            m_collisions.emplace_back(
                 time_to_check, std::make_pair(priority ? possible_action_2_can_wait_1 : possible_action_1_can_wait_2,
-                                   std::make_pair(priority ? object : test, !priority ? object : test))));
+                                   std::make_pair(priority ? object : test, !priority ? object : test)));
         }
 
         VERIFY(m_collisions.size() >= collision_count);

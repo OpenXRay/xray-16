@@ -1,0 +1,110 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "options": {
+    "env": {
+      "LD_LIBRARY_PATH": "${workspaceFolder}/bin/x64/Debug:${workspaceFolder}/bin/x64/Mixed:${workspaceFolder}/bin/x64/Release"
+    }
+  },
+  "tasks": [
+    {
+      "label": "clear",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "command": "rm",
+      "args": [
+        "-rf",
+        "bin"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "mkdir",
+      "type": "shell",
+      "command": "mkdir",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "args": [
+        "-p",
+        "bin"
+      ]
+    },
+    {
+      "label": "Configure",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin"
+      },
+      "command": "cmake .. -DCMAKE_BUILD_TYPE=${input:buildType}",
+      "dependsOn": [
+        "mkdir"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Compile",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin"
+      },
+      "command": "make -j${CPU_COUNT}",
+      "dependsOn": [
+        "mkdir"
+      ]
+    },
+    {
+      "label": "Run SoC",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
+      },
+      "command": "./xr_3da -soc -nointro -fsltx ${SOC_LTX_FILE_PATH}",
+      "dependsOn": [
+        "mkdir"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Run CS",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
+      },
+      "command": "./xr_3da -cs -nointro -fsltx ${CS_LTX_FILE_PATH}",
+      "dependsOn": [
+        "mkdir"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Run CoP",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
+      },
+      "command": "./xr_3da -nointro -fsltx ${COP_LTX_FILE_PATH}",
+      "dependsOn": [
+        "mkdir"
+      ],
+      "problemMatcher": []
+    },
+  ],
+  "inputs": [
+    {
+      "id": "buildType",
+      "type": "pickString",
+      "description": "choose build type:",
+      "options": [
+        "Debug",
+        "Release",
+        "MinSizeRel",
+        "RelWithDebInfo"
+      ],
+      "default": "Debug"
+    }
+  ]
+}

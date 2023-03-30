@@ -115,9 +115,6 @@
     <Filter Include="Interface implementations\EnvironmentRender">
       <UniqueIdentifier>{ccd599e3-f117-4ddd-af5a-dc6d299fb889}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface implementations\ConsoleRender">
-      <UniqueIdentifier>{331a9ab4-feca-4f1d-8d94-1c1ca1d5639f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interface implementations\ObjectSpaceRender">
       <UniqueIdentifier>{b90449f5-b1cc-4f28-ab0a-296a6dc364bb}</UniqueIdentifier>
     </Filter>
@@ -154,6 +151,9 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{6333f8ba-25fb-43b9-a4b6-e8aaf84692e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interface implementations\ImGuiRender">
+      <UniqueIdentifier>{84b8d63d-8ab9-454e-8af1-b51e4713fec0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -166,9 +166,6 @@
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\PSLibrary.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="r2.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\r__dsgraph_types.h">
@@ -516,12 +513,6 @@
     <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h">
       <Filter>Interface implementations\EnvironmentRender</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h">
-      <Filter>Interface implementations\ConsoleRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\dxConsoleRender.h">
-      <Filter>Interface implementations\ConsoleRender</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\dxObjectSpaceRender.h">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
     </ClInclude>
@@ -635,6 +626,18 @@
     </ClInclude>
     <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender_R2\r2.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxImGuiRender.h">
+      <Filter>Interface implementations\ImGuiRender</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -998,9 +1001,6 @@
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp">
       <Filter>Interface implementations\EnvironmentRender</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\dxConsoleRender.cpp">
-      <Filter>Interface implementations\ConsoleRender</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
     </ClCompile>
@@ -1132,6 +1132,15 @@
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\r2_R_sun.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -9,9 +9,9 @@ static void generate_jitter(u32* dest, u32 elem_count)
         Ivector2 test;
         test.set(Random.randI(0, 256), Random.randI(0, 256));
         BOOL valid = TRUE;
-        for (u32 t = 0; t < samples.size(); t++)
+        for (auto& sample : samples)
         {
-            int dist = _abs(test.x - samples[t].x) + _abs(test.y - samples[t].y);
+            int dist = _abs(test.x - sample.x) + _abs(test.y - sample.y);
             if (dist < 32)
             {
                 valid = FALSE;
@@ -130,7 +130,7 @@ void CRenderTarget::build_textures()
         u32 tempData[TEX_jitter_count][TEX_jitter * TEX_jitter];
 
         // Surfaces
-        for (int it1 = 0; it1 < TEX_jitter_count - 1; it1++)
+        for (u32 it1 = 0; it1 < TEX_jitter_count - 1; it1++)
         {
             string_path name;
             xr_sprintf(name, "%s%d", r2_jitter, it1);
@@ -155,7 +155,7 @@ void CRenderTarget::build_textures()
                 }
             }
         }
-        int it3 = 0;
+        u32 it3 = 0;
         while (it3 < TEX_jitter_count - 1)
         {
             CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it3]));
@@ -215,10 +215,8 @@ void CRenderTarget::build_textures()
             t_noise_mipped->surface_set(GL_TEXTURE_2D, t_noise_surf_mipped);
 
             //	Update texture. Generate mips.
-            CHK_GL(glCopyImageSubData(t_noise_surf[0], GL_TEXTURE_2D, 0, 0, 0, 0, t_noise_surf_mipped, GL_TEXTURE_2D
-                , 0, 0, 0, 0, TEX_jitter, TEX_jitter, 1));
-
             glBindTexture(GL_TEXTURE_2D, t_noise_surf_mipped);
+            CHK_GL(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TEX_jitter, TEX_jitter, GL_RGBA, GL_UNSIGNED_BYTE, tempData[0]));
             CHK_GL(glGenerateMipmap(GL_TEXTURE_2D));
         }
     }

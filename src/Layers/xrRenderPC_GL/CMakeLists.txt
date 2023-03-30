@@ -1,30 +1,14 @@
 project(xrRender_GL)
 
 set(SRC_FILES
-    "glr_constants.cpp"
     "gl_rendertarget_accum_direct.cpp"
-    "gl_rendertarget_accum_point.cpp"
-    "gl_rendertarget_accum_spot.cpp"
     "gl_rendertarget_build_textures.cpp"
-    "gl_rendertarget_create_minmaxSM.cpp"
-    "gl_rendertarget_draw_rain.cpp"
     "gl_rendertarget.h"
-    "gl_rendertarget_mark_msaa_edges.cpp"
     "gl_rendertarget_phase_combine.cpp"
     "gl_rendertarget_phase_flip.cpp"
-    "gl_rendertarget_phase_occq.cpp"
-    "gl_rendertarget_phase_rain.cpp"
-    "gl_rendertarget_phase_scene.cpp"
-    "gl_rendertarget_phase_smap_D.cpp"
-    "gl_rendertarget_phase_ssao.cpp"
     "gl_rendertarget_u_set_rt.cpp"
-    "glResourceManager_Resources.cpp"
-    "glResourceManager_Scripting.cpp"
-    "glTexture.cpp"
     "r2_R_sun.cpp"
     "r2_test_hw.cpp"
-    "r3_R_rain.cpp"
-    "rgl.h"
     "rgl_shaders.cpp"
     "stdafx.cpp"
     "stdafx.h"
@@ -64,14 +48,14 @@ set(SRC_FILES
     "../xrRender/du_sphere.h"
     "../xrRender/du_sphere_part.cpp"
     "../xrRender/du_sphere_part.h"
-    "../xrRender/dxConsoleRender.cpp"
-    "../xrRender/dxConsoleRender.h"
     "../xrRender/dxDebugRender.cpp"
     "../xrRender/dxDebugRender.h"
     "../xrRender/dxEnvironmentRender.cpp"
     "../xrRender/dxEnvironmentRender.h"
     "../xrRender/dxFontRender.cpp"
     "../xrRender/dxFontRender.h"
+    "../xrRender/dxImGuiRender.cpp"
+    "../xrRender/dxImGuiRender.h"
     "../xrRender/dxLensFlareRender.cpp"
     "../xrRender/dxLensFlareRender.h"
     "../xrRender/dxObjectSpaceRender.cpp"
@@ -211,6 +195,9 @@ set(SRC_FILES
     "../xrRender/SkeletonRigid.cpp"
     "../xrRender/SkeletonX.cpp"
     "../xrRender/SkeletonX.h"
+    "../xrRender/SkeletonXSkinXW.h"
+    "../xrRender/SkeletonXSkinXW_CPP.cpp"
+    "../xrRender/SkeletonXSkinXW_SSE.cpp"
     "../xrRender/SkeletonXVertRender.h"
     #"../xrRender/stats_manager.cpp"
     #"../xrRender/stats_manager.h"
@@ -299,36 +286,34 @@ set(SRC_FILES
     #"../xrRender/blenders/Blender_Vertex_aref.h"
     #"../xrRender/blenders/Blender_Vertex.cpp"
     #"../xrRender/blenders/Blender_Vertex.h"
-    #"../xrRender/blenders/dx10MinMaxSMBlender.cpp"
-    #"../xrRender/blenders/dx10MinMaxSMBlender.h"
-    #"../xrRender/blenders/dx10MSAABlender.cpp"
-    #"../xrRender/blenders/dx10MSAABlender.h"
-    #"../xrRender/blenders/dx10RainBlender.cpp"
-    #"../xrRender/blenders/dx10RainBlender.h"
+    #"../xrRender/blenders/dx11MinMaxSMBlender.cpp"
+    "../xrRender/blenders/dx11MinMaxSMBlender.h"
+    #"../xrRender/blenders/dx11MSAABlender.cpp"
+    "../xrRender/blenders/dx11MSAABlender.h"
+    #"../xrRender/blenders/dx11RainBlender.cpp"
+    "../xrRender/blenders/dx11RainBlender.h"
     #"../xrRender/blenders/dx11HDAOCSBlender.cpp"
     #"../xrRender/blenders/dx11HDAOCSBlender.h"
     #"../xrRender/blenders/dx11MinMaxSMBlender.cpp"
     #"../xrRender/blenders/dx11MinMaxSMBlender.h"
     "../xrRender/blenders/glMinMaxSMBlender.cpp"
-    "../xrRender/blenders/glMinMaxSMBlender.h"
     "../xrRender/blenders/glMSAABlender.cpp"
-    "../xrRender/blenders/glMSAABlender.h"
     "../xrRender/blenders/glRainBlender.cpp"
-    "../xrRender/blenders/glRainBlender.h"
     "../xrRender/blenders/uber_deffer.cpp"
     "../xrRender/blenders/uber_deffer.h"
     "../xrRender_R2/r2.cpp"
+    "../xrRender_R2/r2.h"
     "../xrRender_R2/r2_blenders.cpp"
     "../xrRender_R2/r2_loader.cpp"
     "../xrRender_R2/r2_R_calculate.cpp"
     "../xrRender_R2/r2_R_lights.cpp"
     "../xrRender_R2/r2_R_render.cpp"
     "../xrRender_R2/r2_R_sun_support.h"
+    "../xrRender_R2/r2_rendertarget.cpp"
     "../xrRender_R2/r2_rendertarget_accum_omnipart_geom.cpp"
     "../xrRender_R2/r2_rendertarget_accum_point_geom.cpp"
     "../xrRender_R2/r2_rendertarget_accum_reflected.cpp"
     "../xrRender_R2/r2_rendertarget_accum_spot_geom.cpp"
-    "../xrRender_R2/r2_rendertarget.cpp"
     "../xrRender_R2/r2_rendertarget_draw_volume.cpp"
     "../xrRender_R2/r2_rendertarget_enable_scissor.cpp"
     "../xrRender_R2/r2_rendertarget_phase_accumulator.cpp"
@@ -338,6 +323,17 @@ set(SRC_FILES
     "../xrRender_R2/r2_rendertarget_phase_smap_S.cpp"
     "../xrRender_R2/r2_rendertarget_wallmarks.h"
     "../xrRender_R2/r2_types.h"
+    "../xrRender_R2/r3_R_rain.cpp"
+    "../xrRender_R2/r3_rendertarget_accum_point.cpp"
+    "../xrRender_R2/r3_rendertarget_accum_spot.cpp"
+    "../xrRender_R2/r3_rendertarget_create_minmaxSM.cpp"
+    "../xrRender_R2/r3_rendertarget_draw_rain.cpp"
+    "../xrRender_R2/r3_rendertarget_mark_msaa_edges.cpp"
+    "../xrRender_R2/r3_rendertarget_phase_ssao.cpp"
+    "../xrRender_R2/r3_rendertarget_phase_smap_D.cpp"
+    "../xrRender_R2/r3_rendertarget_phase_rain.cpp"
+    "../xrRender_R2/r3_rendertarget_phase_occq.cpp"
+    "../xrRender_R2/r3_rendertarget_phase_scene.cpp"
     "../xrRender_R2/SMAP_Allocator.h"
     "../xrRenderGL/Blender_Recorder_GL.cpp"
     "../xrRenderGL/CommonTypes.h"
@@ -347,18 +343,21 @@ set(SRC_FILES
     "../xrRenderGL/glHW.cpp"
     "../xrRenderGL/glHW.h"
     "../xrRenderGL/glR_Backend_Runtime.h"
+    "../xrRenderGL/glr_constants.cpp"
     "../xrRenderGL/glr_constants_cache.h"
+    "../xrRenderGL/glResourceManager_Resources.cpp"
+    "../xrRenderGL/glResourceManager_Scripting.cpp"
     "../xrRenderGL/glSH_RT.cpp"
     "../xrRenderGL/glSH_Texture.cpp"
     "../xrRenderGL/glState.cpp"
     "../xrRenderGL/glState.h"
     "../xrRenderGL/glStateUtils.cpp"
     "../xrRenderGL/glStateUtils.h"
+    "../xrRenderGL/glTexture.cpp"
     "../xrRenderGL/glTextureUtils.cpp"
     "../xrRenderGL/glTextureUtils.h"
     "../../Include/xrRender/animation_blend.h"
     "../../Include/xrRender/animation_motion.h"
-    "../../Include/xrRender/ConsoleRender.h"
     "../../Include/xrRender/DebugRender.h"
     "../../Include/xrRender/DebugShader.h"
     "../../Include/xrRender/DrawUtils.h"
@@ -397,21 +396,22 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/gli
-    ${CMAKE_SOURCE_DIR}/Externals/gli/external/glm
-    ${SDL_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/Externals/gli/external
+    ${SDL2_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    xrCore
+    xrAPI
     xrCDB
+    xrCore
     xrEngine
     xrParticles
     xrScriptEngine
-    xrAPI
-    GL
-    GLEW
     xrLuabind
+    xrImGui
+    OpenGL::GL
+    GLEW::GLEW
 )
 
 target_compile_definitions(${PROJECT_NAME}

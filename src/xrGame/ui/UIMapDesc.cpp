@@ -14,12 +14,12 @@
 
 CUIMapDesc::CUIMapDesc()
 {
-    m_pBackground = xr_new<CUIStatic>();
+    m_pBackground = xr_new<CUIStatic>("Background");
     AttachChild(m_pBackground);
-    m_pCaption = xr_new<CUIStatic>();
+    m_pCaption = xr_new<CUIStatic>("Caption");
     AttachChild(m_pCaption);
 
-    m_pImage = xr_new<CUIStatic>();
+    m_pImage = xr_new<CUIStatic>("Image");
     AttachChild(m_pImage);
     m_pTextDesc = xr_new<CUIScrollView>();
     AttachChild(m_pTextDesc);
@@ -31,7 +31,7 @@ CUIMapDesc::CUIMapDesc()
 
     for (int i = 0; i < 3; i++)
     {
-        m_pFrame[i] = xr_new<CUIStatic>();
+        m_pFrame[i] = xr_new<CUIStatic>("Frame");
         AttachChild(m_pFrame[i]);
     }
 

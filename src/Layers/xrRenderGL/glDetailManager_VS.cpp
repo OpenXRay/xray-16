@@ -4,23 +4,11 @@
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"
 
-const int quant = 16384;
-const int c_hdr = 10;
-const int c_size = 4;
-
-#pragma pack(push,1)
-struct vertHW
+namespace detail_manager
 {
-    float x, y, z;
-    short u, v, t, mid;
-};
-#pragma pack(pop)
-
-short QC(float v);
-//{
-//	int t=iFloor(v*float(quant)); clamp(t,-32768,32767);
-//	return short(t&0xffff);
-//}
+extern const int quant;
+//extern const int c_hdr;
+}
 
 void CDetailManager::hw_Load_Shaders()
 {
@@ -40,6 +28,8 @@ void CDetailManager::hw_Load_Shaders()
 
 void CDetailManager::hw_Render()
 {
+    using namespace detail_manager;
+
     // Render-prepare
     //	Update timer
     //	Can't use Device.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!
@@ -110,7 +100,7 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 
     vis_list& list = m_visibles [var_id];
 
-    CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
+    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
     Fvector c_sun, c_ambient, c_hemi;
     c_sun.set(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z);
     c_sun.mul(.5f);
@@ -157,29 +147,23 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
 
                 u32 dwBatch = 0;
 
-                xr_vector<SlotItemVec*>::iterator _vI = vis.begin();
-                xr_vector<SlotItemVec*>::iterator _vE = vis.end();
-                for (; _vI != _vE; ++_vI)
+                for (auto items : vis)
                 {
-                    SlotItemVec* items = *_vI;
-                    auto _iI = items->begin();
-                    auto _iE = items->end();
-                    for (; _iI != _iE; ++_iI)
+                    for (auto& instance : *items)
                     {
-                        SlotItem& Instance = **_iI;
                         u32 base = dwBatch * 4;
 
                         // Build matrix ( 3x4 matrix, last row - color )
-                        float scale = Instance.scale_calculated;
-                        Fmatrix& M = Instance.mRotY;
+                        float scale = instance->scale_calculated;
+                        Fmatrix& M = instance->mRotY;
                         RCache.set_ca(&*constArray, base + 0, M._11 * scale, M._21 * scale, M._31 * scale, M._41);
                         RCache.set_ca(&*constArray, base + 1, M._12 * scale, M._22 * scale, M._32 * scale, M._42);
                         RCache.set_ca(&*constArray, base + 2, M._13 * scale, M._23 * scale, M._33 * scale, M._43);
 
                         // Build color
                         // R2 only needs hemisphere
-                        float h = Instance.c_hemi;
-                        float s = Instance.c_sun;
+                        float h = instance->c_hemi;
+                        float s = instance->c_sun;
                         RCache.set_ca(&*constArray, base + 3, s, s, s, h);
                         dwBatch ++;
                         if (dwBatch == hw_BatchSize)

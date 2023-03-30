@@ -22,13 +22,13 @@
 
 #define DEVICE_RESET_PRECACHE_FRAME_COUNT 10
 
-#include "Include/editor/interfaces.hpp"
+#include "editor_base.h"
 #include "Include/xrRender/FactoryPtr.h"
 #include "Render.h"
-#include "SDL.h"
+
+#include <SDL.h>
 
 class Task;
-class engine_impl;
 
 #pragma pack(push, 4)
 
@@ -73,8 +73,10 @@ public:
     Fvector vCameraRight;
 
     Fmatrix mView;
+    Fmatrix mInvView;
     Fmatrix mProject;
     Fmatrix mFullTransform;
+    Fmatrix mInvFullTransform;
 
     // Copies of corresponding members. Used for synchronization.
     Fvector vCameraPositionSaved;
@@ -132,9 +134,6 @@ class ENGINE_API CRenderDevice : public CRenderDeviceData, public IWindowHandler
     void _SetupStates();
 
 public:
-#if defined(XR_PLATFORM_WINDOWS)
-    LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
-#endif
     // u32 dwFrame;
     // u32 dwPrecacheFrame;
     u32 dwPrecacheTotal;
@@ -143,7 +142,7 @@ public:
     float fWidth_2, fHeight_2;
     // bool b_is_Ready;
     // bool b_is_Active;
-    void OnWM_Activate(WPARAM wParam, LPARAM lParam);
+    void OnWindowActivate(bool activated);
 
     // ref_shader m_WireShader;
     // ref_shader m_SelectionShader;
@@ -172,13 +171,9 @@ public:
     MessageRegistry<pureUIReset> seqUIReset;
     xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
 
-    Fmatrix mInvFullTransform;
-
     CRenderDevice()
         : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
-          mt_bMustExit(false),
-          m_editor_module(nullptr), m_editor_initialize(nullptr),
-          m_editor_finalize(nullptr), m_editor(nullptr)
+          mt_bMustExit(false)
     {
         m_sdlWnd = NULL;
         b_is_Active = false;
@@ -191,11 +186,11 @@ public:
     bool Paused();
 
 private:
-    void xr_stdcall ProcessParallelSequence(Task&, void*);
+    void ProcessParallelSequence(Task&, void*);
 
 public:
     // Scene control
-    void xr_stdcall ProcessFrame();
+    void ProcessFrame();
 
     void PreCache(u32 amount, bool draw_loadscreen, bool wait_user_input);
 
@@ -245,12 +240,9 @@ public:
 
     SDL_Window* GetApplicationWindow() override;
     void OnErrorDialog(bool beforeDialog) override;
+    void OnFatalError() override;
 
-    void time_factor(const float& time_factor)
-    {
-        Timer.time_factor(time_factor);
-        TimerGlobal.time_factor(time_factor);
-    }
+    void time_factor(const float time_factor);
 
     IC const float time_factor() const
     {
@@ -290,38 +282,21 @@ public:
 private:
     void CalcFrameStats();
 
-public:
-#if !defined(XR_PLATFORM_LINUX)
-    bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
-#endif
-
 private:
     void message_loop();
 
-public:
-    XRay::Editor::ide_base* editor() const { return m_editor; }
-
 private:
-    void initialize_weather_editor();
-    void message_loop_weather_editor();
+    xray::editor::ide m_editor;
 
-    using initialize_function_ptr = XRay::Editor::initialize_function_ptr;
-    using finalize_function_ptr = XRay::Editor::finalize_function_ptr;
+public:
+    [[nodiscard]]
+    auto& editor() { return m_editor; }
 
-    XRay::Module m_editor_module;
-
-    initialize_function_ptr m_editor_initialize;
-    finalize_function_ptr m_editor_finalize;
-    XRay::Editor::ide_base* m_editor;
+    [[nodiscard]]
+    auto editor_mode() const { return m_editor.is_shown(); }
 };
 
 extern ENGINE_API CRenderDevice Device;
-
-#ifndef _EDITOR
-#define RDEVICE Device
-#else
-#define RDEVICE EDevice
-#endif
 
 extern ENGINE_API bool g_bBenchmark;
 

@@ -14,7 +14,7 @@
 #endif
 #endif
 
-#if defined(XR_PLATFORM_LINUX)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) // XXX: remove
 #include <math.h>
 #endif
 
@@ -33,8 +33,8 @@ static void ApplyTexgen(const Fmatrix& mVP)
     Fmatrix mTexgen;
 
 #if defined(USE_DX9)
-    float _w = float(RDEVICE.dwWidth);
-    float _h = float(RDEVICE.dwHeight);
+    float _w = float(Device.dwWidth);
+    float _h = float(Device.dwHeight);
     float o_w = (.5f / _w);
     float o_h = (.5f / _h);
     Fmatrix mTexelAdjust =
@@ -154,7 +154,7 @@ void CParticleEffect::OnFrame(u32 frame_dt)
         m_MemDT += frame_dt;
 
         int StepCount = 0;
-        if (m_MemDT >= uDT_STEP)
+        if (m_MemDT >= static_cast<s32>(uDT_STEP))
         {
             // allow maximum of three steps (99ms) to avoid slowdown after loading
             // it will really skip updates at less than 10fps, which is unplayable
@@ -246,7 +246,7 @@ BOOL CParticleEffect::Compile(CPEDef* def)
     return TRUE;
 }
 
-void CParticleEffect::SetBirthDeadCB(PAPI::OnBirthParticleCB bc, PAPI::OnDeadParticleCB dc, void* owner, u32 p)
+void CParticleEffect::SetBirthDeadCB(PAPI::OnBirthParticleCB bc, PAPI::OnDeadParticleCB dc, void* owner, u32 p) const
 {
     ParticleManager()->SetCallback(m_HandleEffect, bc, dc, owner, p);
 }
@@ -318,7 +318,7 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, co
     const Fvector& T = dir;
 
     Fvector R;
-    R.crossproduct(T, RDEVICE.vCameraDirection).normalize_safe();
+    R.crossproduct(T, Device.vCameraDirection).normalize_safe();
 
     Fvector Vr, Vt;
 
@@ -423,7 +423,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
     const Fvector& T = dir;
     Fvector R;
 
-    // R.crossproduct(T,RDEVICE.vCameraDirection).normalize_safe();
+    // R.crossproduct(T,Device.vCameraDirection).normalize_safe();
 
     __m128 _t, _t1, _t2, _r, _r1, _r2;
 
@@ -432,8 +432,8 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
     _t = _mm_load_ss((float*)&T.x);
     _t = _mm_loadh_pi(_t, (__m64*)&T.y);
 
-    _r = _mm_load_ss((float*)&RDEVICE.vCameraDirection.x);
-    _r = _mm_loadh_pi(_r, (__m64*)&RDEVICE.vCameraDirection.y);
+    _r = _mm_load_ss((float*)&Device.vCameraDirection.x);
+    _r = _mm_loadh_pi(_r, (__m64*)&Device.vCameraDirection.y);
 
     _t1 = _mm_shuffle_ps(_t, _t, _MM_SHUFFLE(0, 3, 1, 2));
     _t2 = _mm_shuffle_ps(_t, _t, _MM_SHUFFLE(2, 0, 1, 3));
@@ -623,11 +623,11 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
                 {
                     Fvector p;
                     m_XFORM.transform_tiny(p, m.pos);
-                    FillSprite(pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, p, lt, rb, r_x, r_y, m.color, sina, cosa);
+                    FillSprite(pv, Device.vCameraTop, Device.vCameraRight, p, lt, rb, r_x, r_y, m.color, sina, cosa);
                 }
                 else
                 {
-                    FillSprite(pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
+                    FillSprite(pv, Device.vCameraTop, Device.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
                 }
             }
         }
@@ -650,7 +650,7 @@ void CParticleEffect::Render(float)
 
 #ifdef USE_OGL
     // Due to the big impact on performance
-    const float distSQ = RDEVICE.vCameraPosition.distance_to_sqr(m_InitialPosition) + EPS;
+    const float distSQ = Device.vCameraPosition.distance_to_sqr(m_InitialPosition) + EPS;
     if (distSQ > _sqr(100.f*psVisDistance))
         return;
 #endif
@@ -679,8 +679,8 @@ void CParticleEffect::Render(float)
                 Fmatrix FTold = Device.mFullTransform;
                 if (GetHudMode())
                 {
-                    RDEVICE.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, VIEWPORT_NEAR,
-                        g_pGamePersistent->Environment().CurrentEnv->far_plane);
+                    Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, VIEWPORT_NEAR,
+                        g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
                     Device.mFullTransform.mul(Device.mProject, Device.mView);
                     RCache.set_xform_project(Device.mProject);
@@ -829,12 +829,12 @@ void CParticleEffect::Render(float)
                     {
                         Fvector p;
                         m_XFORM.transform_tiny(p, m.pos);
-                        FillSprite(pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, p, lt, rb, r_x, r_y, m.color, m.rot.x);
+                        FillSprite(pv, Device.vCameraTop, Device.vCameraRight, p, lt, rb, r_x, r_y, m.color, m.rot.x);
                     }
                     else
                     {
                         FillSprite(
-                            pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, m.rot.x);
+                            pv, Device.vCameraTop, Device.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, m.rot.x);
                     }
                 }
             }
@@ -847,8 +847,8 @@ void CParticleEffect::Render(float)
                 Fmatrix FTold = Device.mFullTransform;
                 if (GetHudMode())
                 {
-                    RDEVICE.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, VIEWPORT_NEAR,
-                        g_pGamePersistent->Environment().CurrentEnv->far_plane);
+                    Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, VIEWPORT_NEAR,
+                        g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
                     Device.mFullTransform.mul(Device.mProject, Device.mView);
                     RCache.set_xform_project(Device.mProject);

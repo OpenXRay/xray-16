@@ -32,10 +32,6 @@
 #endif
 #endif
 
-#define MAX_ITEM_FOOD_COUNT 3
-#define MAX_ITEM_MEDIKIT_COUNT 3
-#define MAX_AMMO_ATTACH_COUNT 1
-
 CALifeHumanBrain::CALifeHumanBrain(object_type* object) : inherited(object)
 {
     VERIFY(object);
@@ -88,7 +84,7 @@ void CALifeHumanBrain::on_state_read(NET_Packet& packet)
     if (object().m_wVersion < 110)
     {
         {
-            DWORD_VECTOR temp;
+            xr_vector<u32> temp;
             load_data(temp, packet);
         }
         {

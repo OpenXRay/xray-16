@@ -43,10 +43,14 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
         {
             // If level=<lname> then only spawn items if object on that level
             if (strstr(V, "level=") != nullptr)
+            {
                 if (strstr(V, lname) != nullptr)
                     OnlyOne.push_back(k);
+            }
             else
+            {
                 OnlyOne.push_back(k);
+            }
         }
 
         if (!OnlyOne.empty())

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ThreadUtil.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <pthread.h>
 #endif
 
@@ -11,6 +11,8 @@ namespace Threading
 ThreadId GetCurrThreadId() { return GetCurrentThreadId(); }
 
 ThreadHandle GetCurrentThreadHandle() { return GetCurrentThread(); }
+
+bool ThreadIdsAreEqual(ThreadId left, ThreadId right) { return left == right; }
 
 void SetThreadNameImpl(DWORD threadId, pcstr name)
 {
@@ -43,12 +45,6 @@ void SetThreadNameImpl(DWORD threadId, pcstr name)
     __except (EXCEPTION_CONTINUE_EXECUTION)
     {
     }
-}
-
-void SetThreadName(ThreadHandle threadHandle, pcstr name)
-{
-    DWORD threadId = GetThreadId(threadHandle);
-    SetThreadNameImpl(threadId, name);
 }
 
 void SetCurrentThreadName(pcstr name)
@@ -102,18 +98,12 @@ void CloseThreadHandle(ThreadHandle& threadHandle)
         threadHandle = nullptr;
     }
 }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 ThreadId GetCurrThreadId() { return pthread_self(); }
 
 ThreadHandle GetCurrentThreadHandle() { return pthread_self(); }
 
-void SetThreadName(ThreadHandle threadHandle, pcstr name)
-{
-    if (auto error = pthread_setname_np(threadHandle, name) != 0)
-    {
-        Msg("SetThreadName: failed to set thread name to '%s'. Errno: '%d'", name, error);
-    }
-}
+bool ThreadIdsAreEqual(ThreadId left, ThreadId right) { return !!pthread_equal(left, right); }
 
 void SetCurrentThreadName(pcstr name)
 {
@@ -168,5 +158,7 @@ bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
 void WaitThread(ThreadHandle& threadHandle) { pthread_join(threadHandle, NULL); }
 
 void CloseThreadHandle(ThreadHandle& threadHandle) { pthread_detach(threadHandle); }
+#else
+#   error Add threading code for your platform
 #endif
 } // namespace Threading

@@ -114,7 +114,7 @@ HRESULT CRender::shader_compile(
     u32 len = 0;
     // options
     {
-        xr_sprintf(c_smapsize, "%04d", u32(o.smapsize));
+        xr_sprintf(c_smapsize, "%04d", u32(m_SMAPSize));
         defines[def_it].Name = "SMAP_size";
         defines[def_it].Definition = c_smapsize;
         def_it++;
@@ -583,28 +583,24 @@ static inline bool match_shader_id(
 #ifdef DEBUG
     LPCSTR temp = "";
     bool found = false;
-    FS_FileSet::const_iterator i = file_set.begin();
-    FS_FileSet::const_iterator const e = file_set.end();
-    for (; i != e; ++i)
+    for (const auto& file : file_set)
     {
-        if (match_shader(debug_shader_id, full_shader_id, (*i).name.c_str(), (*i).name.size()))
+        if (match_shader(debug_shader_id, full_shader_id, file.name.c_str(), file.name.size()))
         {
             VERIFY(!found);
             found = true;
-            temp = (*i).name.c_str();
+            temp = file.name.c_str();
         }
     }
 
     xr_strcpy(result, temp);
     return found;
 #else // #ifdef DEBUG
-    FS_FileSet::const_iterator i = file_set.begin();
-    FS_FileSet::const_iterator const e = file_set.end();
-    for (; i != e; ++i)
+    for (const auto& file : file_set)
     {
-        if (match_shader(debug_shader_id, full_shader_id, (*i).name.c_str(), (*i).name.size()))
+        if (match_shader(debug_shader_id, full_shader_id, file.name.c_str(), file.name.size()))
         {
-            xr_strcpy(result, (*i).name.c_str());
+            xr_strcpy(result, file.name.c_str());
             return true;
         }
     }

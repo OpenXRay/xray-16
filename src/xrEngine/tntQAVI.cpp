@@ -3,6 +3,8 @@
 
 #include "tntQAVI.h"
 
+#pragma comment(lib, "winmm.lib")
+
 CAviPlayerCustom::CAviPlayerCustom()
 {
     alpha = NULL;
@@ -461,14 +463,14 @@ int CAviPlayerCustom::SetSpeed(int nPercent)
 {
     int res = int(m_fCurrentRate / m_fRate * 100);
 
-    m_fCurrentRate = m_fRate * FLOAT(nPercent / 100.0f);
+    m_fCurrentRate = m_fRate * float(nPercent / 100.0f);
 
     return res;
 }
 u32 CAviPlayerCustom::CalcFrame()
 {
     if (0 == m_dwFirstFrameOffset)
-        m_dwFirstFrameOffset = RDEVICE.dwTimeContinual - 1;
+        m_dwFirstFrameOffset = Device.dwTimeContinual - 1;
 
-    return u32(floor((RDEVICE.dwTimeContinual - m_dwFirstFrameOffset) * m_fCurrentRate / 1000.0f)) % m_dwFrameTotal;
+    return u32(floor((Device.dwTimeContinual - m_dwFirstFrameOffset) * m_fCurrentRate / 1000.0f)) % m_dwFrameTotal;
 }

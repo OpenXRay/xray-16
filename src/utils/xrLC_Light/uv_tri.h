@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include "xrfacedefs.h"
 #include "tcf.h"

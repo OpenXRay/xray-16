@@ -1,0 +1,17 @@
+#include "common.h"
+
+half4 main_ps_1_1(vf_point I):COLOR
+{
+	half4 t_base		= tex2D(s_base,I.tc0);
+	half4 t_att1 		= tex2D(s_lmap,I.tc1);	// point-att
+	half4 t_att2 		= tex2D(s_att, I.tc2);	// point-att
+	half4 t_att 		= t_att1*t_att2;
+	
+	half4 final 		= t_base*t_att*I.color*2;
+#ifdef DL_DETAILS
+	half3 t_dt 			= tex2D(s_detail,I.tcd).rgb;
+		  final.rgb    *= t_dt*2;
+#endif
+	
+	return final;
+}

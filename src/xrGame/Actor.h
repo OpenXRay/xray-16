@@ -124,6 +124,7 @@ public:
 
 protected:
     virtual void AddEncyclopediaArticle(const CInfoPortion* info_portion) const;
+    virtual void AddGameTask(const CInfoPortion* info_portion) const;
 
     struct SDefNewsMsg
     {
@@ -449,6 +450,8 @@ public:
     void IR_OnControllerRelease(int dik, float x, float y) override;
     void IR_OnControllerHold(int dik, float x, float y) override;
 
+    void IR_OnControllerAttitudeChange(Fvector change) override;
+
     virtual float GetLookFactor();
 
 private:
@@ -528,7 +531,7 @@ public:
     virtual void net_Destroy();
     virtual bool net_Relevant(); //	{ return getSVU() | getLocal(); };		// relevant for export to server
     virtual void net_Relcase(IGameObject* O); //
-    virtual void xr_stdcall on_requested_spawn(IGameObject* object);
+    virtual void on_requested_spawn(IGameObject* object);
     // object serialization
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
@@ -810,6 +813,8 @@ IC CActorCondition& CActor::conditions() const
     return (*m_entity_condition);
 }
 
+extern Fvector g_start_position;
+extern int g_start_game_vertex_id;
 extern CActor* g_actor;
 CActor* Actor();
 extern const float s_fFallTime;

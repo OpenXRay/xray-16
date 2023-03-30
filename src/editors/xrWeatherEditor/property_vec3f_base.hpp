@@ -20,14 +20,14 @@ class vec3f_components
 public:
     vec3f_components(property_vec3f_base ^ holder);
 
-    float xr_stdcall x_getter();
-    void xr_stdcall x_setter(float);
+    float x_getter();
+    void x_setter(float);
 
-    float xr_stdcall y_getter();
-    void xr_stdcall y_setter(float);
+    float y_getter();
+    void y_setter(float);
 
-    float xr_stdcall z_getter();
-    void xr_stdcall z_setter(float);
+    float z_getter();
+    void z_setter(float);
 
 private:
     gcroot<property_vec3f_base ^> m_holder;

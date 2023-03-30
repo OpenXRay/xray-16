@@ -21,7 +21,7 @@
 #include "ScopeLock.hpp"
 
 #include <thread>
-#include <mutex>
+#include <SDL_events.h>
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <immintrin.h>
@@ -163,6 +163,7 @@ public:
     std::atomic<TaskWorker*> steal_from{};
     std::atomic_bool sleeps{};
     Event event;
+    size_t id;
 } static thread_local s_tl_worker;
 
 static TaskWorker* s_main_thread_worker = nullptr;
@@ -193,7 +194,7 @@ public:
 // Get fast spin-loop timings
 void CalcIterations()
 {
-    ThreadPriorityHelper priority;
+    [[maybe_unused]] ThreadPriorityHelper priority;
 
     volatile bool dummy = false;
     const u64 frequency = CPU::qpc_freq;
@@ -213,12 +214,17 @@ void CalcIterations()
 TaskManager::TaskManager()
 {
     s_main_thread_worker = &s_tl_worker;
+    s_main_thread_worker->id = 0;
 
-    const u32 threads = CPU::ID.n_threads - OTHER_THREADS_COUNT;
+    const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
     workers.reserve(threads);
     for (u32 i = 0; i < threads; ++i)
     {
-        Threading::SpawnThread(task_worker_entry, "Task Worker", 0, this);
+        Threading::SpawnThread([](void* this_ptr)
+        {
+            TaskManager& self = *static_cast<TaskManager*>(this_ptr);
+            self.TaskWorkerStart();
+        }, "Task Worker", 0, this);
     }
     CalcIterations();
     while (threads != workersCount.load(std::memory_order_consume))
@@ -245,12 +251,6 @@ TaskManager::~TaskManager()
         worker->event.Set();
 
     s_main_thread_worker = nullptr;
-}
-
-void TaskManager::task_worker_entry(void* this_ptr)
-{
-    TaskManager& self = *static_cast<TaskManager*>(this_ptr);
-    self.TaskWorkerStart();
 }
 
 void TaskManager::SetThreadStatus(bool active)
@@ -288,6 +288,7 @@ void TaskManager::TaskWorkerStart()
     {
         ScopeLock scope(&workersLock);
         workers.emplace_back(&s_tl_worker);
+        s_tl_worker.id = workers.size();
     }
     workersCount.fetch_add(1, std::memory_order_release);
     activeWorkersCount.fetch_add(1, std::memory_order_relaxed);
@@ -296,7 +297,7 @@ void TaskManager::TaskWorkerStart()
 
     const u32 fastIterations = ttapi_dwFastIter;
 
-    int iteration = 0;
+    u32 iteration = 0;
     Task* task;
     while (true)
     {
@@ -432,6 +433,8 @@ void TaskManager::Wait(const Task& task)
     while (!task.IsFinished())
     {
         ExecuteOneTask();
+        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+            SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
 
@@ -440,6 +443,8 @@ void TaskManager::WaitForChildren(const Task& task)
     while (!task.HasChildren())
     {
         ExecuteOneTask();
+        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+            SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
 
@@ -517,6 +522,11 @@ size_t TaskManager::GetWorkersCount() const
 size_t TaskManager::GetActiveWorkersCount() const
 {
     return activeWorkersCount.load(std::memory_order_relaxed) + OTHER_THREADS_COUNT;
+}
+
+size_t TaskManager::GetCurrentWorkerID()
+{
+    return s_tl_worker.id;
 }
 
 void TaskManager::GetStats(size_t& allocated, size_t& allocatedWithFallback, size_t& pushed, size_t& finished)

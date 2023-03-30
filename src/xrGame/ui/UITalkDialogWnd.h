@@ -11,14 +11,14 @@ class CUIScrollView;
 class CUIXml;
 class CUITalkWnd;
 
-class CUITalkDialogWnd : public CUIWindow, public CUIWndCallback
+class CUITalkDialogWnd final : public CUIWindow, public CUIWndCallback
 {
     using inherited = CUIWindow;
     CUIXml* m_uiXml;
 
 public:
     CUITalkDialogWnd();
-    virtual ~CUITalkDialogWnd();
+    ~CUITalkDialogWnd() override;
 
     void InitTalkDialogWnd();
 
@@ -78,13 +78,13 @@ private:
     // Text colour of our replics
     u32 m_uOurReplicsColor;
 
-    void __stdcall OnTradeClicked(CUIWindow* w, void*);
-    void __stdcall OnUpgradeClicked(CUIWindow* w, void*);
-    void __stdcall OnQuestionClicked(CUIWindow* w, void*);
-    void __stdcall OnExitClicked(CUIWindow* w, void*);
+    void OnTradeClicked(CUIWindow* w, void*);
+    void OnUpgradeClicked(CUIWindow* w, void*);
+    void OnQuestionClicked(CUIWindow* w, void*);
+    void OnExitClicked(CUIWindow* w, void*);
 };
 
-class CUIQuestionItem : public CUIWindow, public CUIWndCallback
+class CUIQuestionItem final : public CUIWindow, public CUIWndCallback
 {
     typedef CUIWindow inherited;
     float m_min_height;
@@ -97,7 +97,7 @@ public:
     void Init(LPCSTR val, LPCSTR text);
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
-    void __stdcall OnTextClicked(CUIWindow* w, void*);
+    void OnTextClicked(CUIWindow* w, void*);
 };
 
 class CUIAnswerItem : public CUIWindow
@@ -114,7 +114,7 @@ public:
     void Init(LPCSTR text, LPCSTR name);
 };
 
-class CUIAnswerItemIconed : public CUIAnswerItem
+class CUIAnswerItemIconed final : public CUIAnswerItem
 {
     typedef CUIAnswerItem inherited;
     CUIStatic* m_icon;

@@ -1,6 +1,7 @@
 #pragma once
+
 #include <algorithm>
-#include "xrCore/xrCore_benchmark_macros.h"
+
 #include "xrCore/xrstring.h"
 #include "xrCore/_flags.h"
 #include "xrCommon/xr_vector.h"
@@ -59,10 +60,6 @@ class IWriter;
 #include "xrSound/Sound.h"
 #include "Include/xrRender/WallMarkArray.h"
 #include "Include/xrRender/RenderFactory.h"
-typedef xr_vector<ref_sound> SoundVec;
-typedef SoundVec::iterator SoundIt;
-typedef xr_vector<shared_str> PSVec;
-typedef PSVec::iterator PSIt;
 #endif
 
 // XXX: Place at least CGameMtlLibrary in a static lib or something? It currently gets instantiated a measurable amount of times.
@@ -225,10 +222,10 @@ public:
     PropValue* propCollideMarks;
 
     SGameMtlPair(const SGameMtlPair& src);
-    void __stdcall OnFlagChange(PropValue* sender);
-    void __stdcall OnParentClick(ButtonValue* sender, bool& bModif, bool& bSafe);
-    void __stdcall OnCommandClick(ButtonValue* sender, bool& bModif, bool& bSafe);
-    void __stdcall FillChooseMtl(ChooseItemVec& items, void* param);
+    void OnFlagChange(PropValue* sender);
+    void OnParentClick(ButtonValue* sender, bool& bModif, bool& bSafe);
+    void OnCommandClick(ButtonValue* sender, bool& bModif, bool& bSafe);
+    void FillChooseMtl(ChooseItemVec& items, void* param);
     void FillProp(PropItemVec& values);
     void TransferFromParent(SGameMtlPair* parent);
     bool SetParent(int parentId);
@@ -243,10 +240,12 @@ class MTL_EXPORT_API CGameMtlLibrary
 private:
     int material_index;
     int material_pair_index;
-    BENCH_SEC_SCRAMBLEMEMBER1
+
     GameMtlVec materials;
     GameMtlPairVec material_pairs;
     GameMtlPairVec material_pairs_rt;
+
+    u32 m_file_age{};
 
 public:
     CGameMtlLibrary();
@@ -346,6 +345,9 @@ public:
     // IO routines
     void Load();
     bool Save();
+
+    [[nodiscard]]
+    auto GetFileAge() const { return m_file_age; }
 };
 
 extern MTL_EXPORT_API CGameMtlLibrary GMLib;

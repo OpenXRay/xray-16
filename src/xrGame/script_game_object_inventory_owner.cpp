@@ -51,6 +51,7 @@
 #include "inventory_upgrade_root.h"
 #include "inventory_item.h"
 #include "CustomOutfit.h"
+#include "ActorBackpack.h"
 #include "inventory_item_impl.h"
 #include "Inventory.h"
 #include "xrServer_Objects_ALife_Items.h"
@@ -777,8 +778,16 @@ void CScriptGameObject::SetCharacterCommunity(LPCSTR comm, int squad, int group)
             LuaMessageType::Error, "SetCharacterCommunity available only for InventoryOwner");
         return;
     }
+
     CHARACTER_COMMUNITY community;
     community.set(comm);
+    if (community.index() == NO_COMMUNITY_INDEX)
+    {
+        GEnv.ScriptEngine->script_log(
+            LuaMessageType::Error, "SetCharacterCommunity can't set %s for %s", comm, Name());
+        return;
+    }
+
     pInventoryOwner->SetCommunity(community.index());
     entity->ChangeTeam(community.team(), squad, group);
 }
@@ -796,21 +805,25 @@ LPCSTR CScriptGameObject::sound_voice_prefix() const
 }
 
 #include "GametaskManager.h"
-ETaskState CScriptGameObject::GetGameTaskState(LPCSTR task_id)
+ETaskState CScriptGameObject::GetGameTaskState(LPCSTR task_id, TASK_OBJECTIVE_ID objective_id)
 {
     shared_str shared_name = task_id;
     CGameTask* t = Level().GameTaskManager().HasGameTask(shared_name, true);
 
     if (NULL == t)
         return eTaskStateDummy;
-
-    return t->GetTaskState();
+    if (objective_id >= t->GetObjectivesCount())
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "wrong objective num", task_id);
+        return eTaskStateDummy;
+    }
+    return t->ObjectiveState(objective_id);
 }
 
-void CScriptGameObject::SetGameTaskState(ETaskState state, LPCSTR task_id)
+void CScriptGameObject::SetGameTaskState(ETaskState state, LPCSTR task_id, TASK_OBJECTIVE_ID objective_id)
 {
     shared_str shared_name = task_id;
-    Level().GameTaskManager().SetTaskState(shared_name, state);
+    Level().GameTaskManager().SetTaskState(shared_name, state, objective_id);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1933,49 +1946,71 @@ void CScriptGameObject::SetActorMaxWalkWeight(float max_walk_weight)
 float CScriptGameObject::GetAdditionalMaxWeight() const
 {
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-    if (!outfit)
+    CBackpack* backpack = smart_cast<CBackpack*>(&object());
+    if (!outfit && !backpack)
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                                         "CCustomOutfit : cannot access class member GetAdditionalMaxWeight!");
         return false;
     }
-    return outfit->m_additional_weight2;
+
+    if (outfit)
+        return outfit->m_additional_weight2;
+
+    return backpack->m_additional_weight2;
 }
 
 float CScriptGameObject::GetAdditionalMaxWalkWeight() const
 {
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-    if (!outfit)
+    CBackpack* backpack = smart_cast<CBackpack*>(&object());
+    if (!outfit && !backpack)
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                                         "CCustomOutfit : cannot access class member GetAdditionalMaxWalkWeight!");
         return false;
     }
-    return outfit->m_additional_weight;
+
+    if (outfit)
+        return outfit->m_additional_weight2;
+
+    return backpack->m_additional_weight2;
 }
 
 void CScriptGameObject::SetAdditionalMaxWeight(float add_max_weight)
 {
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-    if (!outfit)
+    CBackpack* backpack = smart_cast<CBackpack*>(&object());
+    if (!outfit && !backpack)
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                                         "CCustomOutfit : cannot access class member SetAdditionalMaxWeight!");
         return;
     }
-    outfit->m_additional_weight2 = add_max_weight;
+
+    if (outfit)
+        outfit->m_additional_weight2 = add_max_weight;
+
+    if (backpack)
+        backpack->m_additional_weight2 = add_max_weight;
 }
 
 void CScriptGameObject::SetAdditionalMaxWalkWeight(float add_max_walk_weight)
 {
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-    if (!outfit)
+    CBackpack* backpack = smart_cast<CBackpack*>(&object());
+    if (!outfit && !backpack)
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                                         "CCustomOutfit : cannot access class member SetAdditionalMaxWalkWeight!");
         return;
     }
-    outfit->m_additional_weight = add_max_walk_weight;
+
+    if (outfit)
+        outfit->m_additional_weight = add_max_walk_weight;
+
+    if (backpack)
+        backpack->m_additional_weight = add_max_walk_weight;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

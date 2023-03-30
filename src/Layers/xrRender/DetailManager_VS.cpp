@@ -10,13 +10,18 @@
 #endif
 #include "Layers/xrRender/BufferUtils.h"
 
-const int quant = 16384;
-const int c_hdr = 10;
+namespace detail_manager
+{
+extern const int quant = 16384;
+/*extern*/ const int c_hdr = 10;
 const int c_size = 4;
 
-static VertexElement dwDecl[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
+static VertexElement dwDecl[] =
+{
+    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
     {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
-    D3DDECL_END()};
+    D3DDECL_END()
+};
 
 #pragma pack(push, 1)
 struct vertHW
@@ -32,6 +37,7 @@ short QC(float v)
     clamp(t, -32768, 32767);
     return short(t & 0xffff);
 }
+} // namespace detail_manager
 
 void CDetailManager::hw_Load()
 {
@@ -41,6 +47,8 @@ void CDetailManager::hw_Load()
 
 void CDetailManager::hw_Load_Geom()
 {
+    using namespace detail_manager;
+
     // Analyze batch-size
     hw_BatchSize = (u32(HW.Caps.geometry.dwRegisters) - c_hdr) / c_size;
     clamp<size_t>(hw_BatchSize, 0, 64);
@@ -135,20 +143,22 @@ void CDetailManager::hw_Load_Shaders()
 
 void CDetailManager::hw_Render()
 {
+    using namespace detail_manager;
+
     // Render-prepare
     //	Update timer
-    //	Can't use RDEVICE.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!
-    float fDelta = RDEVICE.fTimeGlobal - m_global_time_old;
+    //	Can't use Device.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!
+    float fDelta = Device.fTimeGlobal - m_global_time_old;
     if ((fDelta < 0) || (fDelta > 1))
         fDelta = 0.03f;
-    m_global_time_old = RDEVICE.fTimeGlobal;
+    m_global_time_old = Device.fTimeGlobal;
 
     m_time_rot_1 += (PI_MUL_2 * fDelta / swing_current.rot1);
     m_time_rot_2 += (PI_MUL_2 * fDelta / swing_current.rot2);
     m_time_pos += fDelta * swing_current.speed;
 
-    // float		tm_rot1		= (PI_MUL_2*RDEVICE.fTimeGlobal/swing_current.rot1);
-    // float		tm_rot2		= (PI_MUL_2*RDEVICE.fTimeGlobal/swing_current.rot2);
+    // float		tm_rot1		= (PI_MUL_2*Device.fTimeGlobal/swing_current.rot1);
+    // float		tm_rot2		= (PI_MUL_2*Device.fTimeGlobal/swing_current.rot2);
     float tm_rot1 = m_time_rot_1;
     float tm_rot2 = m_time_rot_2;
 
@@ -162,7 +172,7 @@ void CDetailManager::hw_Render()
     // Wave0
     float scale = 1.f / float(quant);
     Fvector4 wave;
-    // wave.set				(1.f/5.f,		1.f/7.f,	1.f/3.f,	RDEVICE.fTimeGlobal*swing_current.speed);
+    // wave.set				(1.f/5.f,		1.f/7.f,	1.f/3.f,	Device.fTimeGlobal*swing_current.speed);
     wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
     RCache.set_c(&*hwc_consts, scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient); // consts
     RCache.set_c(&*hwc_wave, wave.div(PI_MUL_2)); // wave
@@ -170,7 +180,7 @@ void CDetailManager::hw_Render()
     hw_Render_dump(&*hwc_array, 1, 0, c_hdr);
 
     // Wave1
-    // wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	RDEVICE.fTimeGlobal*swing_current.speed);
+    // wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	Device.fTimeGlobal*swing_current.speed);
     wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos);
     RCache.set_c(&*hwc_wave, wave.div(PI_MUL_2)); // wave
     RCache.set_c(&*hwc_wind, dir2); // wind-dir
@@ -178,7 +188,7 @@ void CDetailManager::hw_Render()
 
     // Still
     RCache.set_c(&*hwc_s_consts, scale, scale, scale, 1.f);
-    RCache.set_c(&*hwc_s_xform, RDEVICE.mFullTransform);
+    RCache.set_c(&*hwc_s_xform, Device.mFullTransform);
     hw_Render_dump(&*hwc_s_array, 0, 1, c_hdr);
 }
 
@@ -194,7 +204,7 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
 
     Fvector c_sun, c_ambient, c_hemi;
 #ifndef _EDITOR
-    CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
+    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
     c_sun.set(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z);
     c_sun.mul(.5f);
     c_ambient.set(desc.ambient.x, desc.ambient.y, desc.ambient.z);

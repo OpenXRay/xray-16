@@ -19,16 +19,20 @@ struct search_entry
 
 R_constant_table::~R_constant_table() { RImplementation.Resources->_DeleteConstantTable(this); }
 void R_constant_table::fatal(LPCSTR S) { FATAL(S); }
+
 // predicates
-IC bool p_search(const ref_constant& C, cpcstr S) { return xr_strcmp(*C->name, S) < 0; }
 IC bool p_sort(const ref_constant& C1, const ref_constant C2) { return xr_strcmp(C1->name, C2->name) < 0; }
+
 ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/)
 {
     // assumption - sorted by name
     c_table::iterator it;
     if (type == u16(-1))
     {
-        it = std::lower_bound(table.begin(), table.end(), S, p_search);
+        it = std::lower_bound(table.begin(), table.end(), S, [](const ref_constant& C, cpcstr S)
+        {
+            return xr_strcmp(*C->name, S) < 0;
+        });
     }
     else
     {
@@ -145,7 +149,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                     C->destination = RC_dest_sampler;
                     C->type = RC_sampler;
                     R_constant_load& L = C->samp;
-                    L.index = u16(r_index + ((destination & 1) ? 0 : D3DVERTEXTEXTURESAMPLER0));
+                    L.index = u16(r_index + ((destination & RC_dest_pixel) ? 0 : D3DVERTEXTEXTURESAMPLER0));
                     L.cls = RC_sampler;
                 }
                 else
@@ -176,7 +180,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
             C->name = name;
             C->destination = destination;
             C->type = type;
-            R_constant_load& L = (destination & 1) ? C->ps : C->vs;
+            R_constant_load& L = (destination & RC_dest_pixel) ? C->ps : C->vs;
             L.index = r_index;
             L.cls = r_type;
         }
@@ -184,7 +188,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
         {
             C->destination |= destination;
             VERIFY(C->type == type);
-            R_constant_load& L = (destination & 1) ? C->ps : C->vs;
+            R_constant_load& L = (destination & RC_dest_pixel) ? C->ps : C->vs;
             L.index = r_index;
             L.cls = r_type;
         }
@@ -226,6 +230,9 @@ void R_constant_table::merge(R_constant_table* T)
             C->cs = src->cs;
 #   endif
 #endif
+#ifdef USE_OGL
+            C->pp = src->pp;
+#endif
             C->samp = src->samp;
             C->handler = src->handler;
             table_tmp.push_back(C);
@@ -255,7 +262,7 @@ void R_constant_table::merge(R_constant_table* T)
     }
 
 #if defined(USE_DX11)
-    //	TODO:	DX10:	Implement merge with validity check
+    //	TODO:	DX11:	Implement merge with validity check
     m_CBTable.reserve(m_CBTable.size() + T->m_CBTable.size());
     for (u32 i = 0; i < T->m_CBTable.size(); ++i)
         m_CBTable.push_back(T->m_CBTable[i]);
@@ -277,10 +284,10 @@ BOOL R_constant_table::equal(R_constant_table& C)
 {
     if (table.size() != C.table.size())
         return FALSE;
-    u32 size = table.size();
-    for (u32 it = 0; it < size; it++)
+    const size_t size = table.size();
+    for (size_t it = 0; it < size; it++)
     {
-        if (!table[it]->equal(&*C.table[it]))
+        if (!table[it]->equal(*C.table[it]))
             return FALSE;
     }
 

@@ -9,9 +9,7 @@
 #include "pch_script.h"
 #include "script_ini_file.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-
-using namespace luabind;
-using namespace luabind::policy;
+#include "xrScriptEngine/Functor.hpp"
 
 CScriptIniFile* get_system_ini() { return ((CScriptIniFile*)pSettings); }
 bool r_line(CScriptIniFile* self, LPCSTR S, int L, luabind::string& N, luabind::string& V)
@@ -75,10 +73,13 @@ CScriptIniFile* get_game_ini() { return (CScriptIniFile*)pGameIni; }
 
 static void CScriptIniFile_Export(lua_State* luaState)
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     module(luaState)
     [
         class_<CScriptIniFile>("ini_file")
-            .def(constructor<LPCSTR>())
+            .def(constructor<pcstr>())
             //Alundaio: Extend script ini file
             .def("w_bool", &CScriptIniFile::w_bool)
             .def("w_color", &CScriptIniFile::w_color)
@@ -101,13 +102,32 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("remove_line", &CScriptIniFile::remove_line)
             .def("set_override_names", &CScriptIniFile::set_override_names)
             .def("section_count", &CScriptIniFile::section_count)
+            .def("section_for_each", +[](CScriptIniFile* self, const luabind::functor<void>& functor)
+            {
+                using sections_type = CInifile::Root;
+                const sections_type& sections = self->sections();
+
+                for (auto& section : sections)
+                {
+                    functor(section->Name.c_str());
+                }
+            })
+            .def("set_readonly", &CScriptIniFile::set_readonly)
             //Alundaio: END
-            .def("section_exist", &CScriptIniFile::section_exist)
-            .def("line_exist", (bool (CScriptIniFile::*)(LPCSTR, LPCSTR) const)&CScriptIniFile::line_exist)
+            .def("fname", &CScriptIniFile::fname)
+            .def("section_exist", (bool (CScriptIniFile::*)(pcstr) const)&CScriptIniFile::section_exist)
+            .def("line_exist", (bool (CScriptIniFile::*)(pcstr, pcstr) const)&CScriptIniFile::line_exist)
             .def("r_clsid", &CScriptIniFile::r_clsid)
-            .def("r_bool", &CScriptIniFile::r_bool)
+            .def("r_bool", (bool (CScriptIniFile::*)(pcstr, pcstr) const)&CScriptIniFile::r_bool)
             .def("r_token", &CScriptIniFile::r_token)
-            .def("r_string_wq", &CScriptIniFile::r_string_wb)
+            .def("r_string_wq", +[](CScriptIniFile* self, pcstr S, pcstr L)
+            {
+                return self->r_string_wb(S, L).c_str();
+            })
+            .def("r_string_wb", +[](CScriptIniFile* self, pcstr S, pcstr L)
+            {
+                return self->r_string_wb(S, L).c_str();
+            })
             .def("line_count", &CScriptIniFile::line_count)
             .def("r_string", &CScriptIniFile::r_string)
             .def("r_u32", &CScriptIniFile::r_u32)

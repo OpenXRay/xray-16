@@ -27,7 +27,8 @@
 #define PDA_RANKING_XML "pda_ranking.xml"
 
 CUIRankingWnd::CUIRankingWnd()
-    : m_background(nullptr), m_background2(nullptr),
+    : CUIWindow("CUIRankingWnd"),
+      m_background(nullptr), m_background2(nullptr),
       m_center_background(nullptr), m_down_background(nullptr),
       m_icon_overlay(nullptr), m_money_caption(nullptr),
       m_money_value(nullptr), m_center_caption(nullptr),
@@ -379,7 +380,7 @@ void CUIRankingWnd::get_favorite_weapon()
     }
 }
 
-bool xr_stdcall CUIRankingWnd::SortingLessFunction(CUIWindow* left, CUIWindow* right)
+bool CUIRankingWnd::SortingLessFunction(CUIWindow* left, CUIWindow* right)
 {
     CUIRankFaction* lpi = smart_cast<CUIRankFaction*>(left);
     CUIRankFaction* rpi = smart_cast<CUIRankFaction*>(right);

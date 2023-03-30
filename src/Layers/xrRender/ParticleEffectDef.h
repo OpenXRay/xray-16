@@ -39,7 +39,7 @@ struct SFrame
         m_fSpeed = 24.f;
     }
 
-    void CalculateTC(int frame, Fvector2& lt, Fvector2& rb)
+    void CalculateTC(int frame, Fvector2& lt, Fvector2& rb) const
     {
         lt.x = frame % m_iFrameDimX * m_fTexSize.x;
         lt.y = frame / m_iFrameDimX * m_fTexSize.y;

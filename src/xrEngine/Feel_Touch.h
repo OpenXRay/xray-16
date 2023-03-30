@@ -29,7 +29,7 @@ public:
     xr_vector<IGameObject*> q_nearest;
 
 public:
-    void __stdcall feel_touch_relcase(IGameObject* O);
+    void feel_touch_relcase(IGameObject* O);
 
 public:
     Touch();

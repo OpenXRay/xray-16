@@ -58,7 +58,7 @@ IC void CSSetupManager::add_action(const _action_id_type& action_id, _action_typ
     action->set_object(m_object);
     if (actions().empty())
         m_current_action_id = action_id;
-    actions().push_back(std::make_pair(action_id, action));
+    actions().emplace_back(action_id, action);
 }
 
 TEMPLATE_SPECIALIZATION

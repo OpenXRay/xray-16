@@ -11,7 +11,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="..\xray_project_configuration.props" />
   </ImportGroup>
-  <PropertyGroup Condition="$(Configuration.Contains('Release'))" Label="Configuration">
+  <PropertyGroup Label="Configuration">
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -27,6 +27,10 @@
       <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(xrExternals)ode/include;$(xrExternals)GameSpy\src;$(xrExternals)OpenAutomate\inc;$(xrExternals)CxImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4237;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Condition="'$(EnableUnitySupport)'=='true'">
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <MaxFilesInUnityFile Condition="$(Configuration.Contains('Release'))">50</MaxFilesInUnityFile>
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
@@ -63,7 +67,6 @@
     <ClInclude Include="..\xrServerEntities\object_item_single.h" />
     <ClInclude Include="..\xrServerEntities\object_item_single_inline.h" />
     <ClInclude Include="..\xrServerEntities\pch_script.h" />
-    <ClInclude Include="..\xrServerEntities\PHNetState.h" />
     <ClInclude Include="..\xrServerEntities\PropertiesListTypes.h" />
     <ClInclude Include="..\xrServerEntities\restriction_space.h" />
     <ClInclude Include="..\xrServerEntities\script_ini_file.h" />
@@ -120,6 +123,7 @@
     <ClInclude Include="ActorCondition.h" />
     <ClInclude Include="ActorEffector.h" />
     <ClInclude Include="ActorHelmet.h" />
+    <ClInclude Include="ActorBackpack.h" />
     <ClInclude Include="actor_anim_defs.h" />
     <ClInclude Include="actor_defs.h" />
     <ClInclude Include="Actor_Flags.h" />
@@ -1480,9 +1484,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="..\xrServerEntities\PHNetState.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_fcolor_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -1623,6 +1624,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ActorHelmet.cpp" />
+    <ClCompile Include="ActorBackpack.cpp" />
     <ClCompile Include="ActorInput.cpp" />
     <ClCompile Include="ActorMountedWeapon.cpp" />
     <ClCompile Include="ActorVehicle.cpp" />
@@ -2130,6 +2132,10 @@
     </ClCompile>
     <ClCompile Include="CustomMonster_VCPU.cpp" />
     <ClCompile Include="CustomOutfit.cpp" />
+    <ClCompile Include="CustomOutfit_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
     <ClCompile Include="CustomRocket.cpp" />
     <ClCompile Include="CustomZone.cpp" />
     <ClCompile Include="DamagableItem.cpp" />
@@ -2195,6 +2201,10 @@
     </ClCompile>
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityCondition.cpp" />
+    <ClCompile Include="EntityCondition_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
     <ClCompile Include="entity_alive.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -2444,10 +2454,6 @@
     </ClCompile>
     <ClCompile Include="invincible_fury.cpp" />
     <ClCompile Include="item_manager.cpp" />
-    <ClCompile Include="key_binding_registrator_script.cpp">
-      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
-    </ClCompile>
     <ClCompile Include="killer_victim_velocity_angle.cpp" />
     <ClCompile Include="kills_store.cpp" />
     <ClCompile Include="Level.cpp">
@@ -2498,6 +2504,10 @@
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="map_location.cpp" />
     <ClCompile Include="map_manager.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="map_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
@@ -3518,7 +3528,7 @@
     <ProjectReference Include="$(xrExternals)luabind.vcxproj">
       <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\xrUICore\xrUICore.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrUICore\xrUICore.vcxproj">
       <Project>{37b3642c-b706-4c93-bc54-badadc8fc9b1}</Project>
     </ProjectReference>
   </ItemGroup>
@@ -3530,14 +3540,14 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.0.14\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.0.14\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets'))" />
   </Target>
 </Project>

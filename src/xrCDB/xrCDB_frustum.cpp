@@ -86,7 +86,7 @@ public:
     }
 };
 
-void COLLIDER::frustum_query(const MODEL* m_def, const CFrustum& F)
+void COLLIDER::frustum_query(u32 frustum_mode, const MODEL* m_def, const CFrustum& F)
 {
     m_def->syncronize();
 

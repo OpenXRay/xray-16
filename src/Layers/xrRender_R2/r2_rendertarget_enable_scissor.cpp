@@ -62,7 +62,7 @@ void CRenderTarget::u_DBT_disable()
     if (RImplementation.o.nvdbt && ps_r2_ls_flags.test(R2FLAG_USE_NVDBT))
         HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X, 0);
 }
-#else // TODO: DX10: Check if DX10 supports this feature
+#else // TODO: DX11: Check if DX11 supports this feature
 bool CRenderTarget::u_DBT_enable(float /*zMin*/, float /*zMax*/) { return false; }
 void CRenderTarget::u_DBT_disable() { }
 #endif // USE_DX9
@@ -93,7 +93,7 @@ bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
     {
         Fsphere S;
         S.set(L->spatial.sphere.P, L->spatial.sphere.R);
-        dbg_spheres.push_back(std::make_pair(S, L->color));
+        dbg_spheres.emplace_back(S, L->color);
     }
 #endif
 

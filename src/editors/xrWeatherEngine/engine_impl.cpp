@@ -26,12 +26,12 @@ engine_impl::~engine_impl()
     capture_input(false);
     xr_delete(m_input_receiver);
 }
-#if !defined(LINUX)
+
 bool engine_impl::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 {
     return (Device.on_message(hWnd, uMsg, wParam, lParam, result));
 }
-#endif
+
 void engine_impl::on_idle()
 {
     SDL_PumpEvents();
@@ -71,15 +71,15 @@ bool engine_impl::quit_requested() const
     return SDL_QuitRequested();
 }
 
-void engine_impl::value(LPCSTR value, shared_str& result) { result = value; }
-LPCSTR engine_impl::value(shared_str const& value) { return (value.c_str()); }
+void engine_impl::value(pcstr value, shared_str& result) { result = value; }
+pcstr engine_impl::value(shared_str const& value) { return (value.c_str()); }
 
 CEnvironment* engine_impl::environment()
 {
     return xr_new<editor::environment::manager>();
 }
 
-void engine_impl::weather(LPCSTR value)
+void engine_impl::weather(pcstr value)
 {
     if (!g_pGamePersistent)
         return;
@@ -101,7 +101,7 @@ void engine_impl::weather(LPCSTR value)
     g_pGamePersistent->Environment().SelectEnvs(game_time);
 }
 
-LPCSTR engine_impl::weather()
+pcstr engine_impl::weather()
 {
     if (!g_pGamePersistent)
         return ("");
@@ -109,7 +109,7 @@ LPCSTR engine_impl::weather()
     return (g_pGamePersistent->Environment().GetWeather().c_str());
 }
 
-void engine_impl::current_weather_frame(LPCSTR frame_id)
+void engine_impl::current_weather_frame(pcstr frame_id)
 {
     if (!g_pGamePersistent)
         return;
@@ -148,7 +148,7 @@ void engine_impl::current_weather_frame(LPCSTR frame_id)
         }
 }
 
-LPCSTR engine_impl::current_weather_frame()
+pcstr engine_impl::current_weather_frame()
 {
     if (!g_pGamePersistent)
         return ("");
@@ -236,9 +236,8 @@ void engine_impl::track_weather(float const& time)
 
     environment.m_paused = paused;
 
-    float weight;
     environment.Invalidate();
-    environment.lerp(weight);
+    environment.lerp();
 }
 
 float engine_impl::track_weather() { return (g_pGamePersistent->Environment().GetGameTime() / (24 * 60 * 60)); }
@@ -347,9 +346,8 @@ void engine_impl::weather_current_time(char const* time)
         float(hours * 60 * 60 + minutes * 60 + seconds), environment.fTimeFactor);
     environment.m_paused = paused;
 
-    float weight;
     environment.Invalidate();
-    environment.lerp(weight);
+    environment.lerp();
 }
 
 void engine_impl::reload_current_time_frame()

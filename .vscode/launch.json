@@ -1,0 +1,90 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "(gdb) SoC",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/x64/${input:buildType}/xr_3da",
+      "args": [
+        "-soc",
+        "-nointro",
+        "-fsltx",
+        "${SOC_LTX_FILE_PATH}",
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin",
+      "environment": [
+        {
+          "name": "LD_LIBRARY_PATH",
+          "value": "${workspaceFolder}/bin/x64/${input:buildType}"
+        }
+      ],
+      "preLaunchTask": "Compile",
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
+      "name": "(gdb) CS",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/x64/${input:buildType}/xr_3da",
+      "args": [
+        "-cs",
+        "-nointro",
+        "-fsltx",
+        "${CS_LTX_FILE_PATH}",
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin",
+      "environment": [
+        {
+          "name": "LD_LIBRARY_PATH",
+          "value": "${workspaceFolder}/bin/x64/${input:buildType}"
+        }
+      ],
+      "preLaunchTask": "Compile",
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
+      "name": "(gdb) CoP",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/x64/${input:buildType}/xr_3da",
+      "args": [
+        "-nointro",
+        "-fsltx",
+        "${COP_LTX_FILE_PATH}",
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin",
+      "environment": [
+        {
+          "name": "LD_LIBRARY_PATH",
+          "value": "${workspaceFolder}/bin/x64/${input:buildType}"
+        }
+      ],
+      "preLaunchTask": "Compile",
+      "externalConsole": false,
+      "MIMode": "gdb"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "buildType",
+      "type": "pickString",
+      "description": "choose build type:",
+      "options": [
+        "Debug",
+        "Release",
+        "MinSizeRel",
+        "RelWithDebInfo"
+      ],
+      "default": "Debug"
+    }
+  ]
+}

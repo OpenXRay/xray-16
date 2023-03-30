@@ -246,9 +246,6 @@
     <ClInclude Include="..\..\xrServerEntities\script_ini_file.h">
       <Filter>Scripts\ScriptClasses\ScriptIniFile</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_ini_file_inline.h">
-      <Filter>Scripts\ScriptClasses\ScriptIniFile</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\script_token_list.h">
       <Filter>Scripts\ScriptClasses\ScriptIniFile\ScriptTokenList</Filter>
     </ClInclude>
@@ -480,9 +477,6 @@
       <Filter>ServerStuff\Common\ALifeStuff\monster_brain</Filter>
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\PHNetState.cpp">
-      <Filter>ServerStuff\Common\PhysicsStuff</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\PHSynchronize.cpp">
       <Filter>ServerStuff\Common\PhysicsStuff</Filter>
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\character_info.cpp">

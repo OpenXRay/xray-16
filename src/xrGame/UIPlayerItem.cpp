@@ -9,8 +9,10 @@
 #include "game_cl_capture_the_artefact.h"
 #include "game_cl_artefacthunt.h"
 
-UIPlayerItem::UIPlayerItem() {}
+UIPlayerItem::UIPlayerItem() : CUIWindow("UIPlayerItem") {}
+
 UIPlayerItem::UIPlayerItem(ETeam team, ClientID const& clientId, UITeamState* tstate, UITeamPanels* tpanels)
+    : CUIWindow("UIPlayerItem")
 {
     VERIFY(tstate);
     m_teamState = tstate;

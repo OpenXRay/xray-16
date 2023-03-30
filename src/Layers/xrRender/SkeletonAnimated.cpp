@@ -81,7 +81,7 @@ static LPCSTR name_bool(BOOL v)
 static LPCSTR name_blend_type(CBlend::ECurvature blend)
 {
     static const xr_token token_blend[] = {{"eFREE_SLOT", CBlend::eFREE_SLOT}, {"eAccrue", CBlend::eAccrue},
-        {"eFalloff", CBlend::eFalloff}, {"eFORCEDWORD", CBlend::eFORCEDWORD}};
+        {"eFalloff", CBlend::eFalloff}};
     return get_token_name(token_blend, blend);
 }
 
@@ -521,9 +521,9 @@ void CKinematicsAnimated::LL_UpdateTracks(float dt, bool b_force, bool leave_ble
         for (; I != E; I++)
         {
             CBlend& B = *(*I);
-            if (!b_force && B.dwFrame == RDEVICE.dwFrame)
+            if (!b_force && B.dwFrame == Device.dwFrame)
                 continue;
-            B.dwFrame = RDEVICE.dwFrame;
+            B.dwFrame = Device.dwFrame;
             if (B.update(dt, B.Callback) && !leave_blends)
             {
                 DestroyCycle(B);
@@ -596,20 +596,20 @@ void CKinematicsAnimated::LL_UpdateFxTracks(float dt)
 void CKinematicsAnimated::UpdateTracks()
 {
     _DBG_SINGLE_USE_MARKER;
-    if (Update_LastTime == RDEVICE.dwTimeGlobal)
+    if (Update_LastTime == Device.dwTimeGlobal)
         return;
-    u32 DT = RDEVICE.dwTimeGlobal - Update_LastTime;
+    u32 DT = Device.dwTimeGlobal - Update_LastTime;
     if (DT > 66)
         DT = 66;
     float dt = float(DT) / 1000.f;
 
     if (GetUpdateTracksCalback())
     {
-        if ((*GetUpdateTracksCalback())(float(RDEVICE.dwTimeGlobal - Update_LastTime) / 1000.f, *this))
-            Update_LastTime = RDEVICE.dwTimeGlobal;
+        if ((*GetUpdateTracksCalback())(float(Device.dwTimeGlobal - Update_LastTime) / 1000.f, *this))
+            Update_LastTime = Device.dwTimeGlobal;
         return;
     }
-    Update_LastTime = RDEVICE.dwTimeGlobal;
+    Update_LastTime = Device.dwTimeGlobal;
     LL_UpdateTracks(dt, false, false);
 }
 
@@ -632,11 +632,6 @@ void CKinematicsAnimated::Release()
 }
 
 CKinematicsAnimated::~CKinematicsAnimated() { IBoneInstances_Destroy(); }
-CKinematicsAnimated::CKinematicsAnimated()
-    : CKinematics(), IKinematicsAnimated(), blend_instances(nullptr), m_Partition(nullptr), m_blend_destroy_callback(nullptr),
-      m_update_tracks_callback(nullptr), Update_LastTime(0)
-{
-}
 
 void CKinematicsAnimated::IBoneInstances_Create()
 {

@@ -41,8 +41,8 @@
 // BOOL		g_bDebugDumpPhysicsStep				= 0;
 CPHWorld* ph_world = 0;
 
-IPHWorld* __stdcall physics_world() { return ph_world; }
-void __stdcall create_physics_world(
+IPHWorld* physics_world() { return ph_world; }
+void create_physics_world(
     bool mt, CObjectSpace* os, CObjectList* lo) // IPHWorldUpdateCallbck &commander,
 {
     ph_world = xr_new<CPHWorld>(); //&commander
@@ -51,33 +51,33 @@ void __stdcall create_physics_world(
     ph_world->Create(mt, os, lo);
 }
 
-void __stdcall destroy_physics_world()
+void destroy_physics_world()
 {
     ph_world->Destroy();
     xr_delete(ph_world);
 }
 
-CObjectSpace* __stdcall create_object_space()
+CObjectSpace* create_object_space()
 {
     // CFileReader* fr =	new CFileReader("D:/STALKER/resources/gamedata/levels/stohe_selo/level.cform");
     CFileReader* fr = xr_new<CFileReader>("ActorEditorLevel.cform");
     CObjectSpace* os = xr_new<CObjectSpace>();
     g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
     g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
-    os->Load(fr, 0);
+    os->Load(fr, nullptr, nullptr, nullptr);
     // xr_delete(fr);
     return os;
 }
-CObjectSpace* __stdcall mesh_create_object_space(
+CObjectSpace* mesh_create_object_space(
     Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB::build_callback build_callback)
 {
     CObjectSpace* os = xr_new<CObjectSpace>();
     g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
     g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
-    os->Create(verts, tris, H, build_callback);
+    os->Create(verts, tris, H, build_callback, nullptr, nullptr);
     return os;
 }
-void __stdcall destroy_object_space(CObjectSpace*& os) { xr_delete(os); }
+void destroy_object_space(CObjectSpace*& os) { xr_delete(os); }
 void CPHMesh::Create(dSpaceID space, dWorldID world)
 {
     Geom = dCreateTriList(space, 0, 0);

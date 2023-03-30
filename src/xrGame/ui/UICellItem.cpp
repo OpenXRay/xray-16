@@ -18,6 +18,7 @@
 CUICellItem* CUICellItem::m_mouse_selected_item = NULL;
 
 CUICellItem::CUICellItem()
+    : CUIStatic("CUICellItem")
 {
     m_pParentList = NULL;
     m_pData = NULL;
@@ -51,19 +52,19 @@ void CUICellItem::init()
     if (!uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu_item.xml", false))
         return;
 
-    m_text = xr_new<CUIStatic>();
+    m_text = xr_new<CUIStatic>("Text");
     m_text->SetAutoDelete(true);
     AttachChild(m_text);
     CUIXmlInit::InitStatic(uiXml, "cell_item_text", 0, m_text);
     m_text->Show(false);
 
-    /*	m_mark					= new CUIStatic();
+    /*	m_mark					= new CUIStatic("Mark");
         m_mark->SetAutoDelete	( true );
         AttachChild				( m_mark );
         CUIXmlInit::InitStatic	( uiXml, "cell_item_mark", 0, m_mark );
         m_mark->Show			( false );*/
 
-    m_upgrade = xr_new<CUIStatic>();
+    m_upgrade = xr_new<CUIStatic>("Upgrade");
     m_upgrade->SetAutoDelete(true);
     AttachChild(m_upgrade);
     CUIXmlInit::InitStatic(uiXml, "cell_item_upgrade", 0, m_upgrade);
@@ -144,7 +145,7 @@ bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
     }
     else if (mouse_action == WINDOW_MOUSE_MOVE)
     {
-        if (pInput->iGetAsyncBtnState(0) && m_mouse_selected_item && m_mouse_selected_item == this)
+        if (pInput->iGetAsyncKeyState(MOUSE_1) && m_mouse_selected_item && m_mouse_selected_item == this)
         {
             GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_DRAG, NULL);
             return true;
@@ -332,9 +333,8 @@ void CUICellItem::SetCustomDraw(ICustomDrawCellItem* c)
 // -------------------------------------------------------------------------------------------------
 
 CUIDragItem::CUIDragItem(CUICellItem* parent)
+    : CUIWindow("CUIDragItem"), m_static("Static")
 {
-    m_custom_draw = NULL;
-    m_back_list = NULL;
     m_pParent = parent;
     AttachChild(&m_static);
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 5000);

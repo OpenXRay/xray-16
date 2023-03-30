@@ -11,11 +11,19 @@ extern float psSoundVEffects;
 void CSoundRender_Emitter::set_position(const Fvector& pos)
 {
     if (source()->channels_num() == 1)
-        p_source.position = pos;
+        p_source.update_position(pos);
     else
-        p_source.position.set(0, 0, 0);
+        p_source.update_position({});
 
     bMoved = true;
+}
+
+void CSoundRender_Emitter::set_frequency(float scale)
+{
+    VERIFY(_valid(scale));
+    p_source.freq = scale;
+    if (!fis_zero(fTimeToStop) && fTimeToStop != 0xffffffff)
+        fTimeToStop = SoundRender->fTimer_Value + ((get_length_sec() - (SoundRender->fTimer_Value - fTimeStarted)) / (scale * psSoundTimeFactor));
 }
 
 CSoundRender_Emitter::CSoundRender_Emitter()
@@ -109,7 +117,7 @@ u32 CSoundRender_Emitter::play_time()
     return 0;
 }
 
-#include "SoundRender_Source.h"
+#include "SoundRender_Source.h" // XXX: remove maybe
 void CSoundRender_Emitter::set_cursor(u32 p)
 {
     m_stream_cursor = p;

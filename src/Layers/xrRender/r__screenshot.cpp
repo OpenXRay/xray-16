@@ -223,7 +223,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         strconcat(sizeof(buf), buf, name, ".tga");
         IWriter* fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
-        // TODO: DX10: This is totally incorrect but mimics
+        // TODO: DX11: This is totally incorrect but mimics
         // original behavior. Fix later.
         hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
         if (hr != D3D_OK)
@@ -274,7 +274,6 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         desc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
 
-        //D3DX10_TEXTURE_LOAD_INFO* pLoadInfo
         CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
 
         // save (logical & physical)
@@ -311,7 +310,6 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
 
-        //D3DX10_TEXTURE_LOAD_INFO* pLoadInfo
         CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
 
         // save (logical & physical)

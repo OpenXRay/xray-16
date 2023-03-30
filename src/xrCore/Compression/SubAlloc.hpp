@@ -15,7 +15,7 @@ enum
     N_INDEXES = N1 + N2 + N3 + N4
 };
 
-#pragma pack(1)
+#pragma pack(push, 1)
 struct BLK_NODE
 {
     u32 Stamp;
@@ -46,7 +46,7 @@ struct MEM_BLK : public BLK_NODE
 {
     u32 NU;
 } _PACK_ATTR;
-#pragma pack()
+#pragma pack(pop)
 
 static u8 Indx2Units[N_INDEXES], Units2Indx[128]; // constants
 static u32 GlueCount, SubAllocatorSize = 0;
@@ -55,15 +55,15 @@ static u8 *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
 inline void PrefetchData(void* Addr)
 {
 #if defined(_USE_PREFETCHING)
-    u8 PrefetchByte = *(volatile u8*)Addr;
-#endif /* defined(_USE_PREFETCHING) */
+    [[maybe_unused]] u8 PrefetchByte = *(volatile u8*)Addr;
+#endif
 }
 
 inline void BLK_NODE::insert(void* pv, int NU)
 {
     MEM_BLK* p = (MEM_BLK*)pv;
     link(p);
-    p->Stamp = ~0UL;
+    p->Stamp = ~(u32{});
     p->NU = NU;
     Stamp++;
 }
@@ -142,7 +142,7 @@ static void GlueFreeBlocks()
             if (!p->NU)
                 continue;
 
-            while ((p1 = p + p->NU)->Stamp == ~0UL)
+            while ((p1 = p + p->NU)->Stamp == ~(u32{0}))
             {
                 p->NU += p1->NU;
                 p1->NU = 0;
@@ -287,7 +287,7 @@ inline void SpecialFreeUnit(void* ptr)
         BList->insert(ptr, 1);
     else
     {
-        *(u32*)ptr = ~0UL;
+        *(u32*)ptr = ~(u32{});
         UnitsStart += UNIT_SIZE;
     }
 }
@@ -313,7 +313,7 @@ static void ExpandTextArea()
     u32 Count[N_INDEXES];
     memset(Count, 0, sizeof Count);
 
-    while ((p = (BLK_NODE*)UnitsStart)->Stamp == ~0UL)
+    while ((p = (BLK_NODE*)UnitsStart)->Stamp == ~(u32{0}))
     {
         MEM_BLK* pm = (MEM_BLK*)p;
         UnitsStart = (u8*)(pm + pm->NU);

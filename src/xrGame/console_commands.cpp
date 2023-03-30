@@ -1190,23 +1190,29 @@ public:
 };
 #endif // DEBUG
 
-class CCC_PHFps : public IConsole_Command
+class CCC_PHFps : public CCC_Float
 {
-public:
-    CCC_PHFps(LPCSTR N) : IConsole_Command(N){};
-    virtual void Execute(LPCSTR args)
-    {
-        float step_count = (float)atof(args);
 #ifndef DEBUG
-        clamp(step_count, 50.f, 200.f);
+    static constexpr float MIN_FPS = 50;
+    static constexpr float MAX_FPS = 200;
+#else
+    static constexpr float MIN_FPS = 1;
+    static constexpr float MAX_FPS = 1000;
 #endif
-        // IPHWorld::SetStep(1.f/step_count);
-        ph_console::ph_step_time = 1.f / step_count;
-        // physics_world()->SetStep(1.f/step_count);
+
+    float m_dummy = 1.f / ph_console::ph_step_time;
+
+public:
+    CCC_PHFps(pcstr name) : CCC_Float(name, &m_dummy, MIN_FPS, MAX_FPS) { }
+
+    void Execute(pcstr args) override
+    {
+        CCC_Float::Execute(args);
+
+        ph_console::ph_step_time = 1.f / m_dummy;
         if (physics_world())
             physics_world()->SetStep(ph_console::ph_step_time);
     }
-    void GetStatus(TStatus& S) override { xr_sprintf(S, "%3.5f", 1.f / ph_console::ph_step_time); }
 };
 
 #ifdef DEBUG
@@ -1222,6 +1228,10 @@ struct CCC_ClearSmartCastStats : public IConsole_Command
     CCC_ClearSmartCastStats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR args) { clear_smart_cast_stats(); }
 };
+
+#endif
+
+#ifndef MASTER_GOLD
 /*
 struct CCC_NoClip : public CCC_Mask
 {
@@ -1241,9 +1251,28 @@ public:
     };
 };
 */
-#endif
 
-#ifndef MASTER_GOLD
+struct CCC_ToggleNoClip : public IConsole_Command
+{
+    CCC_ToggleNoClip(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; };
+
+    void Execute(pcstr /*args*/) override
+    {
+        psActorFlags.invert(AF_NO_CLIP);
+
+        if (!g_pGameLevel)
+            return;
+
+        CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+        if (!actor)
+            return;
+
+        // Workaround for actor has no physics at all until first move
+        Fvector accel{};
+        Actor()->g_Physics(accel, 0.0f, 0.0f);
+    }
+};
+
 #include "xrAICore/Navigation/game_graph.h"
 struct CCC_JumpToLevel : public IConsole_Command
 {
@@ -1565,7 +1594,7 @@ struct CCC_DbgBullets : public CCC_Integer
 
     virtual void Execute(LPCSTR args)
     {
-        extern FvectorVec g_hit[];
+        extern xr_vector<Fvector> g_hit[];
         g_hit[0].clear();
         g_hit[1].clear();
         g_hit[2].clear();
@@ -1770,7 +1799,7 @@ private:
     std::atomic<bool> m_checkInProgress = false;
     bool m_informNoPatch = true;
 
-    void xr_stdcall ResultCallback(bool success, pcstr VersionName, pcstr URL)
+    void ResultCallback(bool success, pcstr VersionName, pcstr URL)
     {
         auto mm = MainMenu();
         if ((success || m_informNoPatch) && mm != nullptr)
@@ -1858,31 +1887,6 @@ public:
             float f;
             sscanf(arguments, "%s %f", name, &f);
             ai_dbg::set_var(name, f);
-        }
-    }
-};
-
-// Change weather immediately
-class CCC_SetWeather : public IConsole_Command
-{
-public:
-    CCC_SetWeather(LPCSTR N) : IConsole_Command(N){};
-    virtual void Execute(LPCSTR args)
-    {
-        if (!xr_strlen(args))
-            return;
-        if (!g_pGamePersistent)
-            return;
-        if (!Device.editor())
-            g_pGamePersistent->Environment().SetWeather(args, true);
-    }
-    void fill_tips(vecTips& tips, u32 mode) override
-    {
-        if (!g_pGamePersistent || Device.editor())
-            return;
-        for (auto& [name, cycle] : g_pGamePersistent->Environment().WeatherCycles)
-        {
-            tips.push_back(name);
         }
     }
 };
@@ -2078,19 +2082,19 @@ void CCC_RegisterCommands()
 #ifndef MASTER_GOLD
     CMD1(CCC_JumpToLevel, "jump_to_level");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
-    CMD3(CCC_Mask, "g_no_clip", &psActorFlags, AF_NO_CLIP);
+    CMD1(CCC_ToggleNoClip, "g_no_clip");
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
     CMD1(CCC_Spawn, "g_spawn");
     CMD1(CCC_Script, "run_script");
     CMD1(CCC_ScriptCommand, "run_string");
     CMD1(CCC_TimeFactor, "time_factor");
-    CMD1(CCC_SetWeather, "set_weather");
 #endif // MASTER_GOLD
 
     CMD3(CCC_Mask, "g_autopickup", &psActorFlags, AF_AUTOPICKUP);
     CMD3(CCC_Mask, "g_dynamic_music", &psActorFlags, AF_DYNAMIC_MUSIC);
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
     CMD3(CCC_Mask, "g_loading_stages", &psActorFlags, AF_LOADING_STAGES);
+    CMD3(CCC_Mask, "g_always_use_attitude_sensors", &psActorFlags, AF_ALWAYS_USE_ATTITUDE_SENSORS);
 
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
@@ -2349,6 +2353,9 @@ void CCC_RegisterCommands()
     CMD3(CCC_String, "slot_1", g_quick_use_slots[1], 32);
     CMD3(CCC_String, "slot_2", g_quick_use_slots[2], 32);
     CMD3(CCC_String, "slot_3", g_quick_use_slots[3], 32);
+
+    extern int g_dbg_load_pre_c5ef6c7_saves;
+    CMD4(CCC_Integer, "dbg_load_pre_c5ef6c7_saves", &g_dbg_load_pre_c5ef6c7_saves, 0, 1); //Alundaio
 
     CMD4(CCC_Integer, "keypress_on_start", &g_keypress_on_start, 0, 1);
     register_mp_console_commands();

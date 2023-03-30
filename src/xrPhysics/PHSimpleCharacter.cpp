@@ -28,11 +28,6 @@
 #include "xrEngine/xr_object.h"
 #include "ph_valid_ode.h"
 
-IC bool PhOutOfBoundaries(const Fvector& v) { return v.y < phBoundaries.y1; }
-//#ifdef DEBUG
-
-//#endif
-
 const float LOSE_CONTROL_DISTANCE = 0.5f; // fly distance to lose control
 const float CLAMB_DISTANCE = 0.5f;
 const float CLIMB_GETUP_HEIGHT = 0.3f;
@@ -759,7 +754,7 @@ void CPHSimpleCharacter::PhTune(dReal step)
     if (b_jumping)
     {
         float air_factor = 1.f;
-        if (b_lose_control && CastActorCharacter()) //
+        if (b_lose_control && CastActorCharacter())
             air_factor = 10.f * m_air_control_factor;
 
         dReal proj = m_acceleration.x * chVel[0] + m_acceleration.z * chVel[2];
@@ -769,19 +764,23 @@ void CPHSimpleCharacter::PhTune(dReal step)
             current_pos[2] - m_jump_depart_position[2]};
         dReal amag = _sqrt(m_acceleration.x * m_acceleration.x + m_acceleration.z * m_acceleration.z);
         if (amag > 0.f)
+        {
             if (dif[0] * m_acceleration.x / amag + dif[2] * m_acceleration.z / amag < 0.3f)
             {
-                Fvector jump_fv = m_acceleration; //{ m_acceleration.x/amag*1000.f,0,m_acceleration.z/amag*1000.f }
+                Fvector jump_fv = m_acceleration;
                 jump_fv.mul(1000.f / amag * air_factor);
                 dBodyAddForce(m_body, jump_fv.x, 0, jump_fv.z);
             }
-        if (proj < 0.f)
-        {
-            dReal vmag = chVel[0] * chVel[0] + chVel[2] * chVel[2];
-
-            Fvector jump_fv = cast_fv(chVel);
-            jump_fv.mul(3000.f * air_factor / vmag / amag * proj);
-            dBodyAddForce(m_body, jump_fv.x, 0, jump_fv.z);
+            if (proj < 0.f)
+            {
+                dReal vmag = chVel[0] * chVel[0] + chVel[2] * chVel[2];
+                if (vmag > 0.f)
+                {
+                    Fvector jump_fv = cast_fv(chVel);
+                    jump_fv.mul(3000.f * air_factor / vmag / amag * proj);
+                    dBodyAddForce(m_body, jump_fv.x, 0, jump_fv.z);
+                }
+            }
         }
     }
     // else
@@ -902,8 +901,7 @@ bool CPHSimpleCharacter::ValidateWalkOnMesh()
     query.merge(tmp);
     query.get_CD(q_c, q_d);
 
-    XRC.box_options(0);
-    XRC.box_query(inl_ph_world().ObjectSpace().GetStaticModel(), q_c, q_d);
+    XRC.box_query(0, inl_ph_world().ObjectSpace().GetStaticModel(), q_c, q_d);
     // Fvector fv_dir;fv_dir.mul(accel,1.f/mag);
     Fvector sd_dir;
     sd_dir.set(-accel.z, 0, accel.x);

@@ -33,7 +33,7 @@ public:
     virtual void shedule_Update(u32 dt);
     virtual shared_str shedule_Name() const { return shared_str("gamespy_sake_updator"); };
     virtual bool shedule_Needed() { return true; };
-    virtual float shedule_Scale() { return 1.0f; };
+    virtual float shedule_Scale() const { return 1.0f; };
     all_awards_t const& get_awards();
     all_best_scores_t const& get_best_scores();
 
@@ -72,10 +72,10 @@ private:
     void load_profile_fields();
 
     void loaded_fields(bool const result, char const* err_descr);
-    void __stdcall loaded_best_scores(bool const result, char const* err_descr);
+    void loaded_best_scores(bool const result, char const* err_descr);
 
-    void __stdcall onlylog_operation(bool const result, char const* err_descr);
-    void __stdcall onlylog_completion(bool const result, char const* err_descr);
+    void onlylog_operation(bool const result, char const* err_descr);
+    void onlylog_completion(bool const result, char const* err_descr);
 
     static void __cdecl get_my_fields_cb(
         SAKE sake, SAKERequest request, SAKERequestResult result, void* inputData, void* outputData, void* userData);

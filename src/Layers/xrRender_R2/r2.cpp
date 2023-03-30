@@ -17,8 +17,7 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
-#include "D3DX10Core.h"
+#include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
 #endif
 
 CRender RImplementation;
@@ -109,8 +108,8 @@ static class cl_water_intensity : public R_constant_setup
 {
     virtual void setup(R_constant* C)
     {
-        CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
-        float fValue = E.m_fWaterIntensity;
+        const auto& env = g_pGamePersistent->Environment().CurrentEnv;
+        const float fValue = env.m_fWaterIntensity;
         RCache.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_water_intensity;
@@ -119,8 +118,8 @@ static class cl_tree_amplitude_intensity : public R_constant_setup
 {
     void setup(R_constant* C) override
     {
-        CEnvDescriptor& env = *g_pGamePersistent->Environment().CurrentEnv;
-        float fValue = env.m_fTreeAmplitudeIntensity;
+        const auto& env = g_pGamePersistent->Environment().CurrentEnv;
+        const float fValue = env.m_fTreeAmplitudeIntensity;
         RCache.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_tree_amplitude_intensity;
@@ -130,8 +129,8 @@ static class cl_sun_shafts_intensity : public R_constant_setup
 {
     virtual void setup(R_constant* C)
     {
-        CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
-        float fValue = E.m_fSunShaftsIntensity;
+        const auto& env = g_pGamePersistent->Environment().CurrentEnv;
+        const float fValue = env.m_fSunShaftsIntensity;
         RCache.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_sun_shafts_intensity;
@@ -202,7 +201,7 @@ static bool must_enable_old_cascades()
 }
 
 // Returns true if compute shaders for HDAO Ultra exist
-static bool ssao_hdao_cs_shaders_exist()
+[[maybe_unused]] static bool ssao_hdao_cs_shaders_exist()
 {
     IReader* hdao_cs      = open_shader("ssao_hdao.cs");
     IReader* hdao_cs_msaa = open_shader("ssao_hdao_msaa.cs");
@@ -225,9 +224,11 @@ void CRender::create()
 #ifndef USE_DX9
     m_MSAASample = -1;
 #endif
+    m_SMAPSize = ps_r2_smapsize;
 
     // hardware
     o.smapsize = ps_r2_smapsize;
+    o.rain_smapsize = ps_r3_dyn_wet_surf_sm_res;
     o.mrt = (HW.Caps.raster.dwMRT_count >= 3);
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
@@ -315,7 +316,7 @@ void CRender::create()
     if (o.HW_smap)
     {
 #if defined(USE_DX11)
-        //	For ATI it's much faster on DX10 to use D32F format
+        //	For ATI it's much faster on DX11 to use D32F format
         if (HW.Caps.id_vendor == 0x1002)
             o.HW_smap_FORMAT = D3DFMT_D32F_LOCKABLE;
         else
@@ -493,83 +494,83 @@ void CRender::create()
 
 #if defined(USE_DX11) || defined(USE_OGL)
 #   if defined(USE_DX11)
-    o.dx10_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
-    o.dx10_sm4_1 = o.dx10_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+    o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
+    o.dx11_sm4_1 = o.dx11_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
 #   elif defined(USE_OGL)
-    o.dx10_sm4_1 = true;
+    o.dx11_sm4_1 = true;
 #else
 #   error No graphics API selected or enabled!
 #   endif
 
     //	MSAA option dependencies
 #   if defined(USE_DX11)
-    o.dx10_msaa = !!ps_r3_msaa;
-    o.dx10_msaa_samples = (1 << ps_r3_msaa);
+    o.msaa = !!ps_r3_msaa;
+    o.msaa_samples = (1 << ps_r3_msaa);
 
-    o.dx10_msaa_opt = ps_r2_ls_flags.test(R3FLAG_MSAA_OPT);
-    o.dx10_msaa_opt = o.dx10_msaa_opt && o.dx10_msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1) ||
-        o.dx10_msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0);
+    o.msaa_opt = ps_r2_ls_flags.test(R3FLAG_MSAA_OPT);
+    o.msaa_opt = o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1) ||
+        o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0);
 
-    // o.dx10_msaa_hybrid	= ps_r2_ls_flags.test(R3FLAG_MSAA_HYBRID);
-    o.dx10_msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
-    o.dx10_msaa_hybrid &= !o.dx10_msaa_opt && o.dx10_msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
+    // o.msaa_hybrid	= ps_r2_ls_flags.test(R3FLAG_MSAA_HYBRID);
+    o.msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
+    o.msaa_hybrid &= !o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
 #   elif defined(USE_OGL)
     // TODO: OGL: temporary disabled, need to fix it
-    o.dx10_msaa = false;
-    o.dx10_msaa_samples = 0;
-    o.dx10_msaa_opt = o.dx10_msaa;
-    o.dx10_msaa_hybrid = false;
+    o.msaa = false;
+    o.msaa_samples = 0;
+    o.msaa_opt = o.msaa;
+    o.msaa_hybrid = false;
 #else
 #   error No graphics API selected or enabled!
 #   endif
     //	Allow alpha test MSAA for DX10.0
 
-    // o.dx10_msaa_alphatest= ps_r2_ls_flags.test((u32)R3FLAG_MSAA_ALPHATEST);
-    // o.dx10_msaa_alphatest= o.dx10_msaa_alphatest && o.dx10_msaa;
+    // o.msaa_alphatest= ps_r2_ls_flags.test((u32)R3FLAG_MSAA_ALPHATEST);
+    // o.msaa_alphatest= o.msaa_alphatest && o.msaa;
 
-    // o.dx10_msaa_alphatest_atoc= (o.dx10_msaa_alphatest && !o.dx10_msaa_opt && !o.dx10_msaa_hybrid);
+    // o.msaa_alphatest_atoc= (o.msaa_alphatest && !o.msaa_opt && !o.msaa_hybrid);
 
-    o.dx10_msaa_alphatest = 0;
-    if (o.dx10_msaa)
+    o.msaa_alphatest = 0;
+    if (o.msaa)
     {
-        if (o.dx10_msaa_opt || o.dx10_msaa_hybrid)
+        if (o.msaa_opt || o.msaa_hybrid)
         {
             if (ps_r3_msaa_atest == 1)
-                o.dx10_msaa_alphatest = MSAA_ATEST_DX10_1_ATOC;
+                o.msaa_alphatest = MSAA_ATEST_DX10_1_ATOC;
             else if (ps_r3_msaa_atest == 2)
-                o.dx10_msaa_alphatest = MSAA_ATEST_DX10_1_NATIVE;
+                o.msaa_alphatest = MSAA_ATEST_DX10_1_NATIVE;
         }
         else
         {
             if (ps_r3_msaa_atest)
-                o.dx10_msaa_alphatest = MSAA_ATEST_DX10_0_ATOC;
+                o.msaa_alphatest = MSAA_ATEST_DX10_0_ATOC;
         }
     }
 
-    o.dx10_gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
+    o.gbuffer_opt = ps_r2_ls_flags.test(R3FLAG_GBUFFER_OPT);
 
-    o.dx10_minmax_sm = ps_r3_minmax_sm;
-    o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
+    o.minmax_sm = ps_r3_minmax_sm;
+    o.minmax_sm_screenarea_threshold = 1600 * 1200;
 
 #if defined(USE_DX11)
-    o.dx11_enable_tessellation =
+    o.tessellation =
         HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
 #endif
 
-    if (o.dx10_minmax_sm == MMSM_AUTODETECT)
+    if (o.minmax_sm == MMSM_AUTODETECT)
     {
-        o.dx10_minmax_sm = MMSM_OFF;
+        o.minmax_sm = MMSM_OFF;
 
         //	AMD device
         if (HW.Caps.id_vendor == 0x1002)
         {
             if (ps_r_sun_quality >= 3)
-                o.dx10_minmax_sm = MMSM_AUTO;
+                o.minmax_sm = MMSM_AUTO;
             else if (ps_r_sun_shafts >= 2)
             {
-                o.dx10_minmax_sm = MMSM_AUTODETECT;
+                o.minmax_sm = MMSM_AUTODETECT;
                 //	Check resolution in runtime in use_minmax_sm_this_frame
-                o.dx10_minmax_sm_screenarea_threshold = 1600 * 1200;
+                o.minmax_sm_screenarea_threshold = 1600 * 1200;
             }
         }
 
@@ -578,9 +579,9 @@ void CRender::create()
         {
             if (ps_r_sun_shafts >= 2)
             {
-                o.dx10_minmax_sm = MMSM_AUTODETECT;
+                o.minmax_sm = MMSM_AUTODETECT;
                 //	Check resolution in runtime in use_minmax_sm_this_frame
-                o.dx10_minmax_sm_screenarea_threshold = 1280 * 1024;
+                o.minmax_sm_screenarea_threshold = 1280 * 1024;
             }
         }
     }
@@ -601,6 +602,11 @@ void CRender::create()
 
     c_lmaterial = "L_material";
     c_sbase = "s_base";
+    c_snoise = "s_noise";
+    c_ssky0 = "s_sky0";
+    c_ssky1 = "s_sky1";
+    c_sclouds0 = "s_clouds0";
+    c_sclouds1 = "s_clouds1";
 
     m_bMakeAsyncSS = false;
 
@@ -699,7 +705,7 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
-void CRender::BeforeFrame()
+void CRender::BeforeRender()
 {
     if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
         return;
@@ -721,12 +727,6 @@ void CRender::OnFrame()
 }
 
 #ifdef USE_OGL
-void CRender::ObtainRequiredWindowFlags(u32& windowFlags)
-{
-    windowFlags |= SDL_WINDOW_OPENGL;
-    HW.SetPrimaryAttributes();
-}
-
 IRender::RenderContext CRender::GetCurrentContext() const
 {
     return HW.GetCurrentContext();
@@ -929,7 +929,7 @@ void CRender::rmNormal()
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CRender::CRender() : m_bFirstFrameAfterReset(false), Sectors_xrc("render")
+CRender::CRender() : Sectors_xrc("render")
 {
     init_cacades();
 }

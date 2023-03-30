@@ -16,6 +16,7 @@
   <PropertyGroup Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -98,6 +99,44 @@
     <ClCompile Include="lzo\src\lzo_ptr.c" />
     <ClCompile Include="lzo\src\lzo_str.c" />
     <ClCompile Include="lzo\src\lzo_util.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lzo\include\lzo\lzo1.h" />
+    <ClInclude Include="lzo\include\lzo\lzo1a.h" />
+    <ClInclude Include="lzo\include\lzo\lzo1b.h" />
+    <ClInclude Include="lzo\include\lzo\lzo1c.h" />
+    <ClInclude Include="lzo\include\lzo\lzo1f.h" />
+    <ClInclude Include="lzo\include\lzo\lzo1x.h" />
+    <ClInclude Include="lzo\include\lzo\lzo1y.h" />
+    <ClInclude Include="lzo\include\lzo\lzo1z.h" />
+    <ClInclude Include="lzo\include\lzo\lzo2a.h" />
+    <ClInclude Include="lzo\include\lzo\lzoconf.h" />
+    <ClInclude Include="lzo\include\lzo\lzodefs.h" />
+    <ClInclude Include="lzo\include\lzo\lzoutil.h" />
+    <ClInclude Include="lzo\include\lzo\lzo_asm.h" />
+    <ClInclude Include="lzo\src\compr1b.h" />
+    <ClInclude Include="lzo\src\compr1c.h" />
+    <ClInclude Include="lzo\src\config1.h" />
+    <ClInclude Include="lzo\src\config1a.h" />
+    <ClInclude Include="lzo\src\config1b.h" />
+    <ClInclude Include="lzo\src\config1c.h" />
+    <ClInclude Include="lzo\src\config1f.h" />
+    <ClInclude Include="lzo\src\config1x.h" />
+    <ClInclude Include="lzo\src\config1y.h" />
+    <ClInclude Include="lzo\src\config1z.h" />
+    <ClInclude Include="lzo\src\config2a.h" />
+    <ClInclude Include="lzo\src\lzo1a_de.h" />
+    <ClInclude Include="lzo\src\lzo1b_cc.h" />
+    <ClInclude Include="lzo\src\lzo1b_de.h" />
+    <ClInclude Include="lzo\src\lzo1c_cc.h" />
+    <ClInclude Include="lzo\src\lzo_conf.h" />
+    <ClInclude Include="lzo\src\lzo_dict.h" />
+    <ClInclude Include="lzo\src\lzo_func.h" />
+    <ClInclude Include="lzo\src\lzo_ptr.h" />
+    <ClInclude Include="lzo\src\lzo_supp.h" />
+    <ClInclude Include="lzo\src\stats1a.h" />
+    <ClInclude Include="lzo\src\stats1b.h" />
+    <ClInclude Include="lzo\src\stats1c.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

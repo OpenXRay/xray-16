@@ -33,6 +33,7 @@ protected:
 
 public:
     bool m_bUseColor;
+    bool m_bUseMiddleColor; // Hrust: optional middle color for CS/SoC compatibility, without middle color it doesn't looks correctly
     bool m_bUseGradient; //Alundaio: if false then use only solid color with m_maxColor
     Fcolor m_minColor;
     Fcolor m_middleColor;

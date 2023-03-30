@@ -10,7 +10,7 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRender/FHierrarhyVisual.h"
-#include "Layers/xrRenderDX10/3DFluid/dx103DFluidVolume.h"
+#include "Layers/xrRenderDX11/3DFluid/dx113DFluidVolume.h"
 #endif
 
 void CRender::level_Load(IReader* fs)
@@ -131,7 +131,7 @@ void CRender::level_Unload()
     // 1.
     xr_delete(rmPortals);
     pLastSector = nullptr;
-    vLastCameraPos.set(0, 0, 0);
+    Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
     for (IRender_Sector* sector : Sectors)
@@ -241,7 +241,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 #endif
 
             // Create and fill
-            //  TODO: DX10: Check fragmentation.
+            //  TODO: DX11: Check fragmentation.
             //  Check if buffer is less then 2048 kb
             _VB[i].Create(vCount * vSize);
             u8* pData = static_cast<u8*>(_VB[i].Map());
@@ -268,7 +268,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 #endif
 
             // Create and fill
-            //  TODO: DX10: Check fragmentation.
+            //  TODO: DX11: Check fragmentation.
             //  Check if buffer is less then 2048 kb
             _IB[i].Create(iCount * 2);
             u8* pData = static_cast<u8*>(_IB[i].Map());
@@ -340,6 +340,7 @@ void CRender::LoadSectors(IReader* fs)
     {
         bool do_rebuild = true;
         const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
+        const bool checkCrc32 = !strstr(Core.Params, "-skip_cdb_cache_crc32_check");
 
         string_path fName;
         strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
@@ -348,7 +349,7 @@ void CRender::LoadSectors(IReader* fs)
         // build portal model
         rmPortals = xr_new<CDB::MODEL>();
         rmPortals->set_version(fs->get_age());
-        if (use_cache && FS.exist(fName) && rmPortals->deserialize(fName))
+        if (use_cache && FS.exist(fName) && rmPortals->deserialize(fName, checkCrc32))
         {
 #ifndef MASTER_GOLD
             Msg("* Loaded portals cache (%s)...", fName);
@@ -414,11 +415,8 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
         CStreamReader* fs = base_fs->open_chunk(fsL_SWIS);
         u32 item_count = fs->r_u32();
 
-        xr_vector<FSlideWindowItem>::iterator it = SWIs.begin();
-        xr_vector<FSlideWindowItem>::iterator it_e = SWIs.end();
-
-        for (; it != it_e; ++it)
-            xr_free((*it).sw);
+        for (auto& SWI : SWIs)
+            xr_free(SWI.sw);
 
         SWIs.clear();
 
@@ -457,7 +455,7 @@ void CRender::Load3DFluid()
             u32 cnt = F->r_u32();
             for (u32 i = 0; i < cnt; ++i)
             {
-                dx103DFluidVolume* pVolume = xr_new<dx103DFluidVolume>();
+                dx113DFluidVolume* pVolume = xr_new<dx113DFluidVolume>();
                 pVolume->Load("", F, 0);
 
                 //	Attach to sector's static geometry

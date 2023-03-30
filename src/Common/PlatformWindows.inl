@@ -7,8 +7,6 @@
 #define _WIN32_WINNT _WIN32_WINNT_WIN7
 #endif
 
-#include <sys/utime.h>
-
 #define NOGDICAPMASKS
 //#define NOSYSMETRICS
 #define NOMENUS
@@ -31,7 +29,6 @@
 #define _WIN32_DCOM
 
 #include <windows.h>
-#include <windowsx.h>
 #include <ctime>
 
 #define xr_fs_strlwr(str) xr_strlwr(str)
@@ -41,7 +38,5 @@ inline void convert_path_separators(char* /*path*/) {}
 inline void restore_path_separators(char* /*path*/) {}
 
 inline tm* localtime_safe(const time_t *time, struct tm* result){ return localtime_s(result, time) == 0 ? result : NULL; }
-
-#define tid_t DWORD
 
 #define xr_strerror(errno, buffer, bufferSize) strerror_s(buffer, sizeof(buffer), errno)

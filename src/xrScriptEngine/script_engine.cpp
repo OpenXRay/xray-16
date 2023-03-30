@@ -675,6 +675,7 @@ static void log_callback(void* context, const char* message)
 
 void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine)
 {
+#ifdef XR_PLATFORM_WINDOWS
     engine = 0;
     world = 0;
     u32 const old_error_mode = SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -702,10 +703,14 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
     s_old_log_callback = SetLogCB(LogCallback(log_callback, this));
     RunJITCommand(state, "off()");
     world->add(state);
+#else
+    VERIFY(!"Not implemented");
+#endif
 }
 
 void CScriptEngine::finalize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine)
 {
+#ifdef XR_PLATFORM_WINDOWS
     world->remove(state);
     VERIFY(world);
     s_destroy_world(world);
@@ -713,6 +718,9 @@ void CScriptEngine::finalize_lua_studio(lua_State* state, cs::lua_studio::world*
     VERIFY(engine);
     xr_delete(engine);
     SetLogCB(s_old_log_callback);
+#else
+    VERIFY(!"Not implemented");
+#endif
 }
 
 void CScriptEngine::try_connect_to_debugger()

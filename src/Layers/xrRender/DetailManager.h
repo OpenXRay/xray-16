@@ -75,12 +75,10 @@ public:
         SlotItemVec r_items[3]; // список кустиков for render
     };
 
-    enum SlotType
+    enum SlotType : u32
     {
         stReady = 0, // Ready to use
         stPending, // Pending for decompression
-
-        stFORCEDWORD = 0xffffffff
     };
 
     struct Slot
@@ -163,6 +161,8 @@ public:
 
     PSS poolSI; // pool из которого выделяются SlotItem
 
+    Fvector EYE;
+
     void UpdateVisibleM();
     void UpdateVisibleS();
 
@@ -221,10 +221,10 @@ public:
     volatile u32 m_frame_calc;
     volatile u32 m_frame_rendered;
 
-    void __stdcall MT_CALC();
+    void MT_CALC();
     ICF void MT_SYNC()
     {
-        if (m_frame_calc == RDEVICE.dwFrame)
+        if (m_frame_calc == Device.dwFrame)
             return;
 
         MT_CALC();

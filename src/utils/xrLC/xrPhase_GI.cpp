@@ -92,7 +92,6 @@ public:
     virtual void Execute()
     {
         CDB::COLLIDER xrc;
-        xrc.ray_options(CDB::OPT_CULL | CDB::OPT_ONLYNEAREST);
         CDB::MODEL* model = lc_global_data()->RCAST_Model();
         CDB::TRI* tris = lc_global_data()->RCAST_Model()->get_tris();
         Fvector* verts = lc_global_data()->RCAST_Model()->get_verts();
@@ -155,7 +154,7 @@ public:
                 default:
                     continue; // continue loop
                 }
-                xrc.ray_query(model, src.position, dir, src.range);
+                xrc.ray_query(CDB::OPT_CULL | CDB::OPT_ONLYNEAREST, model, src.position, dir, src.range);
                 if (!xrc.r_count())
                     continue;
                 CDB::RESULT* R = xrc.r_begin();

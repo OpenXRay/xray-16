@@ -6,7 +6,6 @@
   <PropertyGroup Label="Globals">
     <ProjectName>CxImage</ProjectName>
     <ProjectGuid>{880CD250-BA77-4DAF-A8D4-552F12DD3AE4}</ProjectGuid>
-    <Keyword>MFCProj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <ImportGroup Label="PropertySheets">
@@ -48,6 +47,7 @@
     <ClCompile Include="ximapal.cpp" />
     <ClCompile Include="ximasel.cpp" />
     <ClCompile Include="ximath.cpp" />
+    <ClCompile Include="xiofile.cpp" />
     <ClCompile Include="xmemfile.cpp" />
   </ItemGroup>
   <ItemGroup>

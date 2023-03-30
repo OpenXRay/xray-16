@@ -256,6 +256,7 @@ public:
     bool ready_to_detour();
     void update_best_item_info();
     void update_best_item_info_impl();
+    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
     virtual float GetWeaponAccuracy() const;
     virtual bool unlimited_ammo();
     virtual void spawn_supplies();
@@ -382,7 +383,7 @@ private:
 public:
     IC bool group_behaviour() const;
     virtual void update_range_fov(float& new_range, float& new_fov, float start_range, float start_fov);
-    void __stdcall update_object_handler();
+    void update_object_handler();
     bool mt_object_handler_update_allowed() const;
     bool zoom_state() const;
     void react_on_grenades();
@@ -730,7 +731,7 @@ private:
     void on_enemy_wounded_or_killed(const CAI_Stalker* wounded_or_killed);
     void notify_on_wounded_or_killed(IGameObject* object);
     void notify_on_wounded_or_killed();
-    void xr_stdcall remove_critical_hit();
+    void remove_critical_hit();
     //////////////////////////////////////////////////////////////////////////
 private:
     bool m_registered_in_combat_on_migration;
@@ -754,7 +755,7 @@ public:
     bool too_far_to_kill_enemy(const Fvector& position);
 
 public:
-    virtual float shedule_Scale();
+    virtual float shedule_Scale() const;
 
 private:
     bool m_sniper_update_rate;

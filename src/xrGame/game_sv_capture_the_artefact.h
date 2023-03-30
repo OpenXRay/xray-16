@@ -125,7 +125,7 @@ private:
     void MoveLifeActors();
     void RespawnDeadPlayers();
     void RespawnClient(xrClientData const* pclient);
-    void __stdcall PrepareClientForNewRound(IClient* client);
+    void PrepareClientForNewRound(IClient* client);
     void BalanceTeams();
     void ClearReadyFlagFromAll();
 

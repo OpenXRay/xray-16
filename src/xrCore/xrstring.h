@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdio>
-#include <locale>
 
 #include "xr_types.h"
 #include "xrMemory.h"
@@ -100,7 +99,9 @@ public:
     // void _set (shared_str const &rhs) { str_value* v = g_pStringContainer->dock(rhs.c_str()); if (0!=v)
     // v->dwReference++; _dec(); p_ = v; }
 
+    [[nodiscard]]
     const str_value* _get() const { return p_; }
+
 public:
     // construction
     shared_str() { p_ = 0; }
@@ -127,11 +128,22 @@ public:
         return (shared_str&)*this;
     }
     // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use 
+    [[nodiscard]]
     pcstr operator*() const { return p_ ? p_->value : 0; }
+
+    [[nodiscard]]
     bool operator!() const { return p_ == 0; }
+
+    [[nodiscard]]
     char operator[](size_t id) { return p_->value[id]; }
+    [[nodiscard]]
+    char operator[](size_t id) const { return p_->value[id]; }
+
+    [[nodiscard]]
     pcstr c_str() const { return p_ ? p_->value : 0; }
+
     // misc func
+    [[nodiscard]]
     u32 size() const
     {
         if (0 == p_)
@@ -139,13 +151,23 @@ public:
         else
             return p_->dwLength;
     }
+
+    [[nodiscard]]
+    bool empty() const
+    {
+        return size() == 0;
+    }
+
     void swap(shared_str& rhs)
     {
         str_value* tmp = p_;
         p_ = rhs.p_;
         rhs.p_ = tmp;
     }
+
+    [[nodiscard]]
     bool equal(const shared_str& rhs) const { return (p_ == rhs.p_); }
+
     shared_str& __cdecl printf(const char* format, ...)
     {
         string4096 buf;
@@ -169,10 +191,8 @@ inline int xr_strcmp(const char* S1, const char* S2)
 }
 #endif
 
-namespace std
-{
 template<>
-struct hash<shared_str>
+struct std::hash<shared_str>
 {
     // XXX: enable C++17 for all projects to be able to use nodiscard attribute
     /*[[nodiscard]]*/ size_t operator()(const shared_str& str) const noexcept
@@ -180,7 +200,6 @@ struct hash<shared_str>
         return std::hash<pcstr>{}(str._get()->value);
     }
 };
-}
 
 // res_ptr == res_ptr
 // res_ptr != res_ptr
@@ -207,35 +226,26 @@ IC int xr_strcmp(const shared_str& a, const shared_str& b) noexcept
         return xr_strcmp(*a, *b);
 }
 
+IC char* xr_strlwr(char* src)
+{
+    size_t i = 0;
+    while (src[i])
+    {
+        src[i] = (char)tolower(src[i]);// TODO rewrite locale-independent toupper_l()
+        i++;
+    }
+    return src;
+}
+
 IC void xr_strlwr(shared_str& src)
 {
     if (*src)
     {
-        char* lp = xr_strdup(*src);
-#if defined(XR_PLATFORM_WINDOWS)
+        char* lp = xr_strdup(src.c_str());
         xr_strlwr(lp);
-#elif defined(XR_PLATFORM_LINUX)
-        size_t i = 0;
-        while(lp[i])
-        {
-            lp[i] = (char) std::tolower(lp[i], std::locale());
-            i++;
-        }
-#endif
         src = lp;
         xr_free(lp);
     }
-}
-
-IC char * xr_strlwr(char * src)
-{
-    size_t i = 0;
-    while(src[i])
-    {
-    	src[i] = (char) tolower(src[i]);// TODO rewrite locale-independent toupper_l()
-    	i++;
-    }
-    return src;
 }
 
 #pragma pack(pop)

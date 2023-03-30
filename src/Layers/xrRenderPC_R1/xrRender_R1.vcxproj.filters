@@ -58,9 +58,6 @@
     <Filter Include="Interface implementations\EnvironmentRender">
       <UniqueIdentifier>{3bd0be1c-3d2a-4d1c-b6ba-edb4ac3ad03f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface implementations\ConsoleRender">
-      <UniqueIdentifier>{ee175dd1-7446-4350-a884-6b9f28ea53ef}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interface implementations\ObjectSpaceRender">
       <UniqueIdentifier>{ccd303ff-7af1-40dc-9900-5695143286c6}</UniqueIdentifier>
     </Filter>
@@ -147,6 +144,9 @@
     </Filter>
     <Filter Include="Debug">
       <UniqueIdentifier>{8b1f96de-4574-4866-a5c0-371b1d2d7a17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\ImGuiRender">
+      <UniqueIdentifier>{7d69ca51-2287-4521-a2e2-24e530c955ba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -311,12 +311,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h">
       <Filter>Interface implementations\EnvironmentRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h">
-      <Filter>Interface implementations\ConsoleRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\dxConsoleRender.h">
-      <Filter>Interface implementations\ConsoleRender</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\dxObjectSpaceRender.h">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
@@ -594,6 +588,15 @@
     <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h">
       <Filter>Debug</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxImGuiRender.h">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -775,9 +778,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp">
       <Filter>Interface implementations\EnvironmentRender</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\dxConsoleRender.cpp">
-      <Filter>Interface implementations\ConsoleRender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
@@ -982,6 +982,15 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\r__sector_detect.cpp">
       <Filter>Visibility\Sector/Portal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

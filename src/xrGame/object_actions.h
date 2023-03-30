@@ -191,7 +191,7 @@ private:
     bool m_callback_removed;
 
 private:
-    void xr_stdcall on_animation_end();
+    void on_animation_end();
 
 public:
     CObjectActionStrapping(
@@ -215,7 +215,7 @@ private:
     bool m_callback_removed;
 
 private:
-    void xr_stdcall on_animation_end();
+    void on_animation_end();
 
 public:
     CObjectActionStrappingToIdle(
@@ -239,7 +239,7 @@ private:
     bool m_callback_removed;
 
 private:
-    void xr_stdcall on_animation_end();
+    void on_animation_end();
 
 public:
     CObjectActionUnstrapping(
@@ -263,7 +263,7 @@ private:
     bool m_callback_removed;
 
 private:
-    void xr_stdcall on_animation_end();
+    void on_animation_end();
 
 public:
     CObjectActionUnstrappingToIdle(

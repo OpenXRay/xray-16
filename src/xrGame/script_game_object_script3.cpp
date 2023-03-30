@@ -35,9 +35,6 @@
 #include "PhysicObject.h"
 #include "Artefact.h"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 /*
     New luabind makes incorrect casts in this case. He makes casts only to 'true derived class'.
     For example:
@@ -56,8 +53,11 @@ TClass* ObjectCast(CScriptGameObject* scriptObj)
     return nullptr;
 }
 
-class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject>& instance)
+luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_<CScriptGameObject>& instance)
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     instance
         .def("add_sound",
             (u32(CScriptGameObject::*)(LPCSTR, u32, ESoundTypes, u32, u32, u32))(&CScriptGameObject::add_sound))
@@ -185,8 +185,20 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("get_info_time", &CScriptGameObject::GetInfoTime)
 
         .def("get_task_state", &CScriptGameObject::GetGameTaskState)
+        .def("get_task_state", +[](CScriptGameObject* self, pcstr task_id)
+        {
+            return self->GetGameTaskState(task_id, ROOT_TASK_OBJECTIVE);
+        })
         .def("set_task_state", &CScriptGameObject::SetGameTaskState)
+        .def("set_task_state", +[](CScriptGameObject* self, ETaskState state, pcstr task_id)
+        {
+            self->SetGameTaskState(state, task_id, ROOT_TASK_OBJECTIVE);
+        })
         .def("give_task", &CScriptGameObject::GiveTaskToActor, adopt<2>())
+        .def("give_task", +[](CScriptGameObject* self, CGameTask* t, u32 dt, bool bCheckExisting)
+        {
+            self->GiveTaskToActor(t, dt, bCheckExisting, 0);
+        }, adopt<2>())
         .def("set_active_task", &CScriptGameObject::SetActiveTask)
         .def("is_active_task", &CScriptGameObject::IsActiveTask)
         .def("get_task", &CScriptGameObject::GetTask)
@@ -390,6 +402,7 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("get_attached_vehicle", &CScriptGameObject::GetAttachedVehicle)
 
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
+        .def("reset_bone_protections", &CScriptGameObject::ResetBoneProtections)
         .def("iterate_feel_touch", &CScriptGameObject::IterateFeelTouch)
         .def("get_luminocity_hemi", &CScriptGameObject::GetLuminocityHemi)
         .def("get_luminocity", &CScriptGameObject::GetLuminocity)
@@ -399,6 +412,15 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("force_set_position", &CScriptGameObject::ForceSetPosition)
         .def("set_spatial_type", &CScriptGameObject::SetSpatialType)
         .def("get_spatial_type", &CScriptGameObject::GetSpatialType)
+        .def("remove_danger", &CScriptGameObject::RemoveDanger)
+        .def("remove_memory_sound_object", &CScriptGameObject::RemoveMemorySoundObject)
+        .def("remove_memory_visible_object", &CScriptGameObject::RemoveMemoryVisibleObject)
+        .def("remove_memory_hit_object", &CScriptGameObject::RemoveMemoryHitObject)
+
+        //For Ammo
+        .def("ammo_get_count", &CScriptGameObject::AmmoGetCount)
+        .def("ammo_set_count", &CScriptGameObject::AmmoSetCount)
+        .def("ammo_box_size", &CScriptGameObject::AmmoBoxSize)
 
         //For Weapons
         .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)

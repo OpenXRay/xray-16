@@ -511,8 +511,8 @@ void CGameGraphBuilder::create_tripples(const float& /*start*/, const float& /*a
 
             const graph_type::CEdge* edge = graph().vertex(j.vertex_id())->edge(i.first);
 
-            m_tripples.push_back(std::make_pair(std::min(j.weight(), edge ? edge->weight() : j.weight()),
-                std::make_pair(i.first, j.vertex_id())));
+            m_tripples.emplace_back(std::min(j.weight(), edge ? edge->weight() : j.weight()),
+                std::make_pair(i.first, j.vertex_id()));
         }
     }
 

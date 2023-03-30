@@ -53,16 +53,16 @@ void CBlender_SSAO_noMSAA::Compile(CBlender_Compile& C)
 
         jitter(C);
 #else
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_tonemap", r2_RT_luminance_cur);
-        C.r_dx10Texture("s_half_depth", r2_RT_half_depth);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_tonemap", r2_RT_luminance_cur);
+        C.r_dx11Texture("s_half_depth", r2_RT_half_depth);
 
         jitter(C);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_material");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_material");
+        C.r_dx11Sampler("smp_rtlinear");
 #endif
         C.r_End();
         break;
@@ -77,21 +77,19 @@ void CBlender_SSAO_noMSAA::Compile(CBlender_Compile& C)
         C.r_Sampler_rtf("s_normal", r2_RT_N);
         C.r_Sampler_rtf("s_tonemap", r2_RT_luminance_cur);
 #else
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
-        C.r_dx10Texture("s_tonemap", r2_RT_luminance_cur);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_tonemap", r2_RT_luminance_cur);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_material");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_material");
+        C.r_dx11Sampler("smp_rtlinear");
 #endif
         C.r_End();
         break;
     }
 }
 
-CBlender_SSAO_MSAA::CBlender_SSAO_MSAA() { description.CLS = 0; }
-CBlender_SSAO_MSAA::~CBlender_SSAO_MSAA() {}
 void CBlender_SSAO_MSAA::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
@@ -115,14 +113,14 @@ void CBlender_SSAO_MSAA::Compile(CBlender_Compile& C)
 
         jitter(C);
 #else
-        C.r_dx10Texture("s_position", r2_RT_P);
-        C.r_dx10Texture("s_normal", r2_RT_N);
+        C.r_dx11Texture("s_position", r2_RT_P);
+        C.r_dx11Texture("s_normal", r2_RT_N);
 
         jitter(C);
 
-        C.r_dx10Sampler("smp_nofilter");
-        C.r_dx10Sampler("smp_material");
-        C.r_dx10Sampler("smp_rtlinear");
+        C.r_dx11Sampler("smp_nofilter");
+        C.r_dx11Sampler("smp_material");
+        C.r_dx11Sampler("smp_rtlinear");
 #endif
         C.r_End();
         break;

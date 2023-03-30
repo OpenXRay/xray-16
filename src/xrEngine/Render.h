@@ -18,7 +18,7 @@ class IRenderVisual;
 class IKinematics;
 class IGameFont;
 class IPerformanceAlert;
-template <class T> class _box2; typedef _box2<float> Fbox2;
+struct Fbox2;
 struct Fcolor;
 class IReader;
 class CMemoryWriter;
@@ -163,11 +163,10 @@ enum class DeviceState
 class ENGINE_API IRender
 {
 public:
-    enum GenerationLevel
+    enum GenerationLevel : u32
     {
         GENERATION_R1 = 1,
         GENERATION_R2 = 2,
-        GENERATION_forcedword = u32(-1)
     };
 
     enum class BackendAPI : u32
@@ -178,14 +177,13 @@ public:
         OpenGL
     };
 
-    enum ScreenshotMode
+    enum ScreenshotMode : u32
     {
         SM_NORMAL = 0, // jpeg, name ignored
         SM_FOR_CUBEMAP = 1, // tga, name used as postfix
         SM_FOR_GAMESAVE = 2, // dds/dxt1,name used as full-path
         SM_FOR_LEVELMAP = 3, // tga, name used as postfix (level_name)
         SM_FOR_MPSENDING = 4,
-        SM_forcedword = u32(-1)
     };
 
     enum RenderContext
@@ -284,8 +282,7 @@ public:
     bool m_hq_skinning;
     s32 m_skinning;
     s32 m_MSAASample;
-
-    BENCH_SEC_SCRAMBLEMEMBER1
+    u32 m_SMAPSize;
 
     // data
     CFrustum ViewBase;
@@ -307,9 +304,6 @@ public:
     virtual void destroy() = 0;
     virtual void reset_begin() = 0;
     virtual void reset_end() = 0;
-
-    BENCH_SEC_SCRAMBLEVTBL1
-    BENCH_SEC_SCRAMBLEVTBL3
 
     virtual void level_Load(IReader* fs) = 0;
     virtual void level_Unload() = 0;
@@ -415,10 +409,10 @@ public:
     virtual void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) = 0;
 
     //	Init
+    virtual void ObtainRequiredWindowFlags(u32& windowFlags) = 0;
     virtual void SetupStates() = 0;
     virtual void OnDeviceCreate(pcstr shName) = 0;
     virtual void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) = 0;
-    virtual void SetupGPU(bool bForceGPU_SW, bool bForceGPU_NonPure, bool bForceGPU_REF) = 0;
 
     //	Overdraw
     virtual void overdrawBegin() = 0;
@@ -440,7 +434,7 @@ public:
     virtual DeviceState GetDeviceState() = 0;
     virtual bool GetForceGPU_REF() = 0;
     virtual u32 GetCacheStatPolys() = 0;
-    virtual void BeforeFrame() = 0;
+    virtual void BeforeRender() = 0;
     virtual void Begin() = 0;
     virtual void Clear() = 0;
     virtual void End() = 0;
@@ -448,7 +442,6 @@ public:
     virtual void SetCacheXform(Fmatrix& mView, Fmatrix& mProject) = 0;
     virtual void OnAssetsChanged() = 0;
 
-    virtual void ObtainRequiredWindowFlags(u32& windowFlags) = 0;
     virtual RenderContext GetCurrentContext() const = 0;
     virtual void MakeContextCurrent(RenderContext context) = 0;
 };

@@ -50,7 +50,7 @@ void CTexture::surface_set(GLenum target, GLuint surf)
     pSurface = surf;
 }
 
-GLuint CTexture::surface_get()
+GLuint CTexture::surface_get() const
 {
     return pSurface;
 }
@@ -98,7 +98,7 @@ void CTexture::apply_theora(u32 dwStage)
     }
 };
 
-void CTexture::apply_avi(u32 dwStage)
+void CTexture::apply_avi(u32 dwStage) const
 {
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));
@@ -136,7 +136,7 @@ void CTexture::apply_seq(u32 dwStage)
     CHK_GL(glBindTexture(desc, pSurface));
 };
 
-void CTexture::apply_normal(u32 dwStage)
+void CTexture::apply_normal(u32 dwStage) const
 {
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));
@@ -168,8 +168,6 @@ void CTexture::Load()
     }
 
     Preload();
-
-    bool bCreateView = true;
 
     // Check for OGM
     string_path fn;
@@ -346,17 +344,17 @@ void CTexture::video_Play(BOOL looped, u32 _time)
     if (pTheora) pTheora->Play(looped, _time != 0xFFFFFFFF ? (m_play_time = _time) : Device.dwTimeContinual);
 }
 
-void CTexture::video_Pause(BOOL state)
+void CTexture::video_Pause(BOOL state) const
 {
     if (pTheora) pTheora->Pause(state);
 }
 
-void CTexture::video_Stop()
+void CTexture::video_Stop() const
 {
     if (pTheora) pTheora->Stop();
 }
 
-BOOL CTexture::video_IsPlaying()
+BOOL CTexture::video_IsPlaying() const
 {
     return pTheora ? pTheora->IsPlaying() : FALSE;
 }

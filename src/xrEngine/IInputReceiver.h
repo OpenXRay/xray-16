@@ -19,37 +19,43 @@ class ENGINE_API IInputReceiver
 public:
     virtual ~IInputReceiver() = default;
 
-    bool IR_GetKeyState(int dik);
-    bool IR_GetBtnState(int btn);
+    [[nodiscard]]
+    bool IR_GetKeyState(int dik) const;
 
-    virtual void IR_Capture(void);
-    virtual void IR_Release(void);
+    virtual void IR_Capture();
+    virtual void IR_Release();
 
-    virtual void IR_OnDeactivate(void);
-    virtual void IR_OnActivate(void);
+    virtual void IR_OnActivate();
+    virtual void IR_OnDeactivate();
 
     virtual void IR_OnMousePress(int /*btn*/) {}
     virtual void IR_OnMouseRelease(int /*btn*/) {}
     virtual void IR_OnMouseHold(int /*btn*/) {}
     virtual void IR_OnMouseWheel(int /*x*/, int /*y*/) {}
     virtual void IR_OnMouseMove(int /*x*/, int /*y*/) {}
-    virtual void IR_OnMouseStop(int /*x*/, int /*y*/) {}
 
     virtual void IR_OnKeyboardPress(int /*dik*/) {}
     virtual void IR_OnKeyboardRelease(int /*dik*/) {}
     virtual void IR_OnKeyboardHold(int /*dik*/) {}
-    virtual void IR_OnTextInput(pcstr text) {}
+    virtual void IR_OnTextInput(pcstr /*text*/) {}
 
     virtual void IR_OnControllerPress(int /*dik*/, float /*x*/, float /*y*/) {}
     virtual void IR_OnControllerRelease(int /*dik*/, float /*x*/, float /*y*/) {}
     virtual void IR_OnControllerHold(int /*dik*/, float /*x*/, float /*y*/) {}
+
+    virtual void IR_OnControllerAttitudeChange(Fvector /*change*/) {}
 };
 
 ENGINE_API extern float psMouseSens;
 ENGINE_API extern float psMouseSensScale;
 ENGINE_API extern Flags32 psMouseInvert;
 
-ENGINE_API extern float psControllerSens;
-ENGINE_API extern float psControllerDeadZoneSens;
+ENGINE_API extern float psControllerStickSens;
+ENGINE_API extern float psControllerStickSensScale;
+ENGINE_API extern float psControllerStickDeadZone;
+ENGINE_API extern float psControllerSensorSens;
+ENGINE_API extern float psControllerSensorDeadZone;
+ENGINE_API extern Flags32 psControllerInvertY;
+ENGINE_API extern Flags32 psControllerEnableSensors;
 
 #endif

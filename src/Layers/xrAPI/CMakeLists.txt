@@ -1,14 +1,14 @@
 project(xrAPI)
 
-set(SRC_FILES
-    "xrAPI.cpp"
+set(KERNEL_SRC
     "stdafx.h"
     "stdafx.cpp"
+    "xrAPI.cpp"
 )
 
-group_sources(SRC_FILES)
+source_group("Kernel" FILES ${KERNEL_SRC})
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+add_library(${PROJECT_NAME} SHARED ${KERNEL_SRC})
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE

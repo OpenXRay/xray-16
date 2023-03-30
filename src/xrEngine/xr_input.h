@@ -1,7 +1,9 @@
 #pragma once
 
-#include "SDL.h"
+#include <SDL.h>
 #include <bitset>
+
+DECLARE_MESSAGE(KeyMapChanged);
 
 enum EMouseButton
 {
@@ -69,6 +71,12 @@ public:
         FeedbackTriggers,
     };
 
+    enum InputType
+    {
+        KeyboardMouse,
+        Controller,
+    };
+
     enum
     {
         COUNT_MOUSE_AXIS = 4,
@@ -91,19 +99,20 @@ public:
     };
 
 private:
-    BENCH_SEC_SCRAMBLEMEMBER1
-
-    u32 mouseTimeStamp[COUNT_MOUSE_AXIS];
-
     std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
     std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
+    int mouseAxisState[COUNT_MOUSE_AXIS];
     int controllerAxisState[COUNT_CONTROLLER_AXIS];
     s32 last_input_controller;
 
     xr_vector<IInputReceiver*> cbStack;
 
     xr_vector<SDL_GameController*> controllers;
+
+    InputType currentInputType{ KeyboardMouse };
+
+    void SetCurrentInputType(InputType type);
 
     void MouseUpdate();
     void KeyUpdate();
@@ -115,8 +124,9 @@ private:
     bool exclusiveInput;
     bool inputGrabbed;
 
+    MessageRegistry<pureKeyMapChanged> seqKeyMapChanged;
+
 public:
-    u32 m_curTime;
     u32 m_mouseDelta;
 
     const InputStatistics& GetStats() const { return stats; }
@@ -125,15 +135,17 @@ public:
     void iCapture(IInputReceiver* pc);
     void iRelease(IInputReceiver* pc);
 
-    bool iGetAsyncKeyState(const int dik);
-    bool iGetAsyncBtnState(const int btn);
-    bool iGetAsyncGpadBtnState(const int btn);
+    bool iGetAsyncKeyState(const int key);
 
+    void iGetAsyncScrollPos(Ivector2& p) const;
     void iGetAsyncMousePos(Ivector2& p) const;
     void iSetMousePos(const Ivector2& p) const;
 
     void GrabInput(const bool grab);
     bool InputIsGrabbed() const;
+
+    void RegisterKeyMapChangeWatcher(pureKeyMapChanged* watcher, int priority = REG_PRIORITY_NORMAL);
+    void RemoveKeyMapChangeWatcher(pureKeyMapChanged* watcher);
 
     CInput(const bool exclusive = true);
     ~CInput();
@@ -145,7 +157,9 @@ public:
     IInputReceiver* CurrentIR();
 
     bool IsControllerAvailable() const { return !controllers.empty(); }
+    void EnableControllerSensors(bool enable);
 
+    auto GetCurrentInputType() { return currentInputType; }
 public:
     void ExclusiveMode(const bool exclusive);
     bool IsExclusiveMode() const;

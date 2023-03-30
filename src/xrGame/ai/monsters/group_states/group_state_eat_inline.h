@@ -12,12 +12,9 @@
 #include "group_state_eat_eat.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateGroupEatAbstract CStateGroupEat<_Object>
-
-#define TIME_NOT_HUNGRY 20000
 
 TEMPLATE_SPECIALIZATION
 CStateGroupEatAbstract::CStateGroupEat(_Object* obj) : inherited(obj)

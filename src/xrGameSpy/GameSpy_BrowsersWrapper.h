@@ -77,7 +77,7 @@ protected:
     // Lock it before accessing 'updates_subscriptions' member
     Lock updates_subscriptions_lock;
 
-    void xr_stdcall UpdateCb(CGameSpy_Browser* gs_browser);
+    void UpdateCb(CGameSpy_Browser* gs_browser);
     void ForgetAllServers();
 
 public:

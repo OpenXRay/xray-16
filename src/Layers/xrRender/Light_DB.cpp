@@ -23,7 +23,7 @@ void CLight_DB::Load(IReader* fs)
         for (size_t i = 0; i < count; ++i)
         {
             Flight Ldata;
-            u32 controller = F->r_u32();
+            F->advance(sizeof(u32)); // u32 controller = F->r_u32();
             F->r(&Ldata, sizeof(Flight));
 
             light* L = Create();
@@ -161,7 +161,7 @@ void CLight_DB::Update()
     if (sun)
     {
         light* _sun = (light*)sun._get();
-        CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
+        const auto& E = g_pGamePersistent->Environment().CurrentEnv;
         VERIFY(_valid(E.sun_dir));
 #ifdef DEBUG
         if (E.sun_dir.y >= 0)

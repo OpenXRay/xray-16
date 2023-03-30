@@ -8,19 +8,21 @@
 
 #include "pch_script.h"
 #include "Actor.h"
+#include "ActorCondition.h"
 #include "level_changer.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 IC static void CActor_Export(lua_State* luaState)
 {
-    module(luaState)[class_<CActor, CGameObject>("CActor").def(constructor<>())
+    using namespace luabind;
 
-#ifndef BENCHMARK_BUILD
-                         ,
-        class_<CLevelChanger, CGameObject>("CLevelChanger").def(constructor<>())
-#endif
+    module(luaState)
+    [
+        class_<CActor, CGameObject>("CActor")
+            .def(constructor<>())
+            .def("conditions", &CActor::conditions),
+        class_<CLevelChanger, CGameObject>("CLevelChanger")
+            .def(constructor<>())
     ];
 };
 

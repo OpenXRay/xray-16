@@ -34,10 +34,13 @@ void CCF_Skeleton::SElement::center(Fvector& center) const
     default: NODEFAULT;
     }
 }
-bool pred_find_elem(const CCF_Skeleton::SElement& E, u16 elem) { return E.elem_id < elem; }
+
 bool CCF_Skeleton::_ElementCenter(u16 elem_id, Fvector& e_center)
 {
-    auto it = std::lower_bound(elements.begin(), elements.end(), elem_id, pred_find_elem);
+    const auto it = std::lower_bound(elements.begin(), elements.end(), elem_id, [](const SElement& E, u16 elem)
+    {
+        return E.elem_id < elem;
+    });
     if (it->elem_id == elem_id)
     {
         it->center(e_center);

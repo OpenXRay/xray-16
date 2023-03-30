@@ -26,23 +26,11 @@
 #include "OpenALDeviceList.h"
 #include "xrCore/xr_token.h"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <objbase.h>
-#pragma warning(pop)
-#endif
+constexpr pcstr AL_GENERIC_HARDWARE = "Generic Hardware";
+constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";
 
-#ifdef _EDITOR
-log_fn_ptr_type* pLog = nullptr;
-#endif
-
-void __cdecl al_log(char* msg) { Log(msg); }
 ALDeviceList::ALDeviceList()
 {
-#if !defined(MASTER_GOLD) && defined(XR_PLATFORM_WINDOWS)
-    pLog = al_log;
-#endif
     snd_device_id = (u32)-1;
     Enumerate();
 }
@@ -59,12 +47,61 @@ ALDeviceList::~ALDeviceList()
     snd_devices_token = nullptr;
 }
 
+void ALDeviceList::IterateAndAddDevicesString(pcstr devices)
+{
+    // go through device list (each device terminated with a single NULL, list terminated with double NULL)
+    while (*devices != '\0')
+    {
+        if (ALCdevice* device = alcOpenDevice(devices))
+        {
+            if (ALCcontext* context = alcCreateContext(device, nullptr))
+            {
+                alcMakeContextCurrent(context);
+                // if new actual device name isn't already in the list, then add it...
+                pcstr actualDeviceName = alcGetString(device, ALC_DEVICE_SPECIFIER);
+
+                if (actualDeviceName != nullptr && xr_strlen(actualDeviceName) > 0)
+                {
+                    int major, minor;
+                    alcGetIntegerv(device, ALC_MAJOR_VERSION, sizeof(int), &major);
+                    alcGetIntegerv(device, ALC_MINOR_VERSION, sizeof(int), &minor);
+
+                    auto& addedDevice = m_devices.emplace_back(actualDeviceName, minor, major);
+                    addedDevice.props.eax = 0;
+                    if (alIsExtensionPresent("EAX2.0"))
+                        addedDevice.props.eax = 2;
+                    if (alIsExtensionPresent("EAX3.0"))
+                        addedDevice.props.eax = 3;
+                    if (alIsExtensionPresent("EAX4.0"))
+                        addedDevice.props.eax = 4;
+                    if (alIsExtensionPresent("EAX5.0"))
+                        addedDevice.props.eax = 5;
+
+                    addedDevice.props.efx = alcIsExtensionPresent(device, "ALC_EXT_EFX") == AL_TRUE;
+                    addedDevice.props.xram = alIsExtensionPresent("EAX-RAM") == AL_TRUE;
+                }
+                alcDestroyContext(context);
+            }
+            else
+            {
+#ifndef MASTER_GOLD
+                Log("~ SOUND: OpenAL: cant create context for", devices);
+#endif
+            }
+            alcCloseDevice(device);
+        }
+        else
+        {
+#ifndef MASTER_GOLD
+            Log("~ SOUND: OpenAL: can't open device", devices);
+#endif
+        }
+        devices += xr_strlen(devices) + 1;
+    }
+}
+
 void ALDeviceList::Enumerate()
 {
-    pstr devices;
-    int major, minor, index;
-    pcstr actualDeviceName;
-
 #ifndef MASTER_GOLD
     Msg("SOUND: OpenAL: enumerate devices...");
 #endif
@@ -72,24 +109,22 @@ void ALDeviceList::Enumerate()
     // -- empty all the lists and reserve space for 10 devices
     m_devices.clear();
 
-#if defined(XR_PLATFORM_WINDOWS)
-    CoUninitialize();
-#endif
     // grab function pointers for 1.0-API functions, and if successful proceed to enumerate all devices
-    if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT"))
-        Msg("~ SOUND: OpenAL: EnumerationExtension NOT Present");
-    else
+    if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT"))
     {
 #ifndef MASTER_GOLD
         Msg("SOUND: OpenAL: EnumerationExtension Present");
 #endif
 
-        devices = (pstr)alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
-#ifdef DEBUG
-        Msg("devices %s", devices);
-#endif
-        xr_strcpy(m_defaultDeviceName, (pstr)alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
-        Msg("SOUND: OpenAL: system default sound device name is %s", m_defaultDeviceName);
+        pcstr devices = (pstr)alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
+
+        xr_strcpy(m_defaultDeviceName, alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
+        Log("SOUND: OpenAL: system default sound device name is", m_defaultDeviceName);
+
+#if defined(XR_PLATFORM_WINDOWS)
+        // Xottab_DUTY
+        // The problem from 2000s described below should not be relevant for Linux,
+        // but still the case on Windows in 2022. And it probably won't be ever fixed...
 
         // ManowaR
         // "Generic Hardware" device on software AC'97 codecs introduce
@@ -100,62 +135,18 @@ void ALDeviceList::Enumerate()
         // Also we assume that if "Generic Hardware" exists, than "Generic Software" is also exists
         // Maybe wrong
 
-#if defined(XR_PLATFORM_WINDOWS) //Maybe in Linux this not?
         if (0 == xr_stricmp(m_defaultDeviceName, AL_GENERIC_HARDWARE))
         {
             xr_strcpy(m_defaultDeviceName, AL_GENERIC_SOFTWARE);
-            Msg("SOUND: OpenAL: default sound device name set to %s", m_defaultDeviceName);
+            Log("SOUND: OpenAL: default sound device name set to", m_defaultDeviceName);
         }
 #endif
 
-        index = 0;
-        // go through device list (each device terminated with a single NULL, list terminated with double NULL)
-        while (*devices != '\0')
-        {
-            ALCdevice* device = alcOpenDevice(devices);
-            if (device)
-            {
-                ALCcontext* context = alcCreateContext(device, nullptr);
-                if (context)
-                {
-                    alcMakeContextCurrent(context);
-                    // if new actual device name isn't already in the list, then add it...
-                    actualDeviceName = alcGetString(device, ALC_DEVICE_SPECIFIER);
-
-                    if (actualDeviceName != nullptr && xr_strlen(actualDeviceName) > 0)
-                    {
-                        alcGetIntegerv(device, ALC_MAJOR_VERSION, sizeof(int), &major);
-                        alcGetIntegerv(device, ALC_MINOR_VERSION, sizeof(int), &minor);
-                        m_devices.emplace_back(actualDeviceName, minor, major);
-                        m_devices.back().props.eax = 0;
-                        if (alIsExtensionPresent("EAX2.0"))
-                            m_devices.back().props.eax = 2;
-                        if (alIsExtensionPresent("EAX3.0"))
-                            m_devices.back().props.eax = 3;
-                        if (alIsExtensionPresent("EAX4.0"))
-                            m_devices.back().props.eax = 4;
-                        if (alIsExtensionPresent("EAX5.0"))
-                            m_devices.back().props.eax = 5;
-
-                        m_devices.back().props.efx = alcIsExtensionPresent(device, "ALC_EXT_EFX") == AL_TRUE;
-                        m_devices.back().props.xram = alIsExtensionPresent("EAX_RAM") == AL_TRUE;
-
-                        m_devices.back().props.eax_unwanted =
-                                0 == xr_strcmp(actualDeviceName, AL_GENERIC_HARDWARE) ||
-                                0 == xr_strcmp(actualDeviceName, AL_GENERIC_SOFTWARE);
-                        ++index;
-                    }
-                    alcDestroyContext(context);
-                }
-                else
-                    Msg("~ SOUND: OpenAL: cant create context for %s", device);
-                alcCloseDevice(device);
-            }
-            else
-                Msg("~ SOUND: OpenAL: cant open device %s", devices);
-
-            devices += xr_strlen(devices) + 1;
-        }
+        IterateAndAddDevicesString(devices);
+    }
+    else
+    {
+        Msg("~ SOUND: OpenAL: EnumerationExtension NOT Present");
     }
 
     // make token
@@ -193,8 +184,6 @@ void ALDeviceList::Enumerate()
             GetDeviceDesc(j).props.xram ? "yes" : "no");
     }
 #endif
-
-    Core.CoInitializeMultithreaded();
 }
 
 pcstr ALDeviceList::GetDeviceName(u32 index) const { return snd_devices_token[index].name; }

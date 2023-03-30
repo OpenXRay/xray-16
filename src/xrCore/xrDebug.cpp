@@ -1,50 +1,58 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "SDL.h"
-#include "SDL_syswm.h"
-
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "log.h"
-#if defined(XR_PLATFORM_WINDOWS)
-#include "Debug/dxerr.h"
-#endif
 #include "Threading/ScopeLock.hpp"
 
-#pragma warning(push)
-#pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
 #if defined(XR_PLATFORM_WINDOWS)
+#include "Debug/dxerr.h"
 #include "Debug/MiniDump.h"
-#pragma warning(pop)
-#include <direct.h>
 #endif
 
-#if defined(XR_PLATFORM_WINDOWS)
-#define USE_BUG_TRAP
+#include <SDL.h>
+
+#ifdef XR_PLATFORM_WINDOWS
+#   define USE_BUG_TRAP
 static BOOL bException = FALSE;
 #endif
 
-#ifndef USE_BUG_TRAP
-#include <exception>
+#ifdef USE_BUG_TRAP
+#   include <BugTrap/source/Client/BugTrap.h>
+#else
+#   include <exception>
 #endif
 
-#ifdef USE_BUG_TRAP
-#include <BugTrap/source/Client/BugTrap.h>
-#endif
+#include <csignal>
 
 #if defined(XR_PLATFORM_WINDOWS)
-#include <new.h> // for _set_new_mode
-#include <signal.h> // for signals
-#include <errorrep.h> // ReportFault
+#   include <SDL_syswm.h>
+#   include <direct.h>
+#   include <new.h> // for _set_new_mode
+#   include <errorrep.h> // ReportFault
 #elif defined(XR_PLATFORM_LINUX)
-#include <sys/user.h>
-#include <sys/ptrace.h>
-#include <cxxabi.h>
-#include <dlfcn.h>
-#include <execinfo.h>
+#   include <sys/user.h>
+#   include <sys/ptrace.h>
+#   include <cxxabi.h>
+#   include <dlfcn.h>
+#   if __has_include(<execinfo.h>)
+#       include <execinfo.h>
+#   endif
+#elif defined(XR_PLATFORM_APPLE)
+#   include <sys/types.h>
+#   include <sys/ptrace.h>
+#   define PTRACE_TRACEME PT_TRACE_ME
+#   define PTRACE_DETACH PT_DETACH
+#elif defined(XR_PLATFORM_BSD)
+#   include <sys/types.h>
+#   include <sys/ptrace.h>
+#   include <execinfo.h>
+#   include <cxxabi.h>
+#   include <dlfcn.h>
+#   define PTRACE_TRACEME PT_TRACE_ME
+#   define PTRACE_DETACH PT_DETACH
 #endif
-#pragma comment(lib, "FaultRep.lib")
 
 #ifdef DEBUG
 #define USE_OWN_ERROR_MESSAGE_WINDOW
@@ -59,6 +67,8 @@ static BOOL bException = FALSE;
 #       define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM
 #   elif defined(XR_ARCHITECTURE_ARM64)
 #       define MACHINE_TYPE IMAGE_FILE_MACHINE_ARM64
+#   elif defined(XR_ARCHITECTURE_IA64)
+#       define MACHINE_TYPE IMAGE_FILE_MACHINE_IA64
 #   else
 #       error CPU architecture is not supported.
 #   endif
@@ -174,11 +184,18 @@ bool xrDebug::ShowErrorMessage = false;
 
 bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
+#ifdef PROFILE_CRITICAL_SECTIONS
+Lock xrDebug::failLock(MUTEX_PROFILE_ID(xrDebug::Backend));
+#else
+Lock xrDebug::failLock;
+#endif
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
+#else
+#   error Select or add implementation for your platform
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
@@ -291,8 +308,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 {
     ScopeLock Lock(&dbgHelpLock);
 
-    SStringVec traceResult;
-    STACKFRAME stackFrame = {};
+    xr_vector<xr_string> traceResult;
     xr_string frameStr;
 
     if (!InitializeSymbolEngine())
@@ -303,26 +319,36 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 
     traceResult.reserve(maxFramesCount);
 
-#if defined XR_ARCHITECTURE_X64
+    STACKFRAME stackFrame{};
     stackFrame.AddrPC.Mode = AddrModeFlat;
-    stackFrame.AddrPC.Offset = threadCtx->Rip;
     stackFrame.AddrStack.Mode = AddrModeFlat;
-    stackFrame.AddrStack.Offset = threadCtx->Rsp;
     stackFrame.AddrFrame.Mode = AddrModeFlat;
-    stackFrame.AddrFrame.Offset = threadCtx->Rbp;
-#elif defined XR_ARCHITECTURE_X86
-    stackFrame.AddrPC.Mode = AddrModeFlat;
+    stackFrame.AddrBStore.Mode = AddrModeFlat;
+
+    // https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/ns-dbghelp-stackframe
+    // https://github.com/reactos/reactos/blob/master/base/applications/drwtsn32/stacktrace.cpp
+#if defined XR_ARCHITECTURE_X86
     stackFrame.AddrPC.Offset = threadCtx->Eip;
-    stackFrame.AddrStack.Mode = AddrModeFlat;
     stackFrame.AddrStack.Offset = threadCtx->Esp;
-    stackFrame.AddrFrame.Mode = AddrModeFlat;
     stackFrame.AddrFrame.Offset = threadCtx->Ebp;
+#elif defined XR_ARCHITECTURE_X64
+    stackFrame.AddrPC.Offset = threadCtx->Rip;
+    stackFrame.AddrStack.Offset = threadCtx->Rsp;
+    stackFrame.AddrFrame.Offset = threadCtx->Rbp;
 #elif defined XR_ARCHITECTURE_ARM
-#error TODO
+    stackFrame.AddrPC.Offset = threadCtx->Pc;
+    stackFrame.AddrStack.Offset = threadCtx->Sp;
+    stackFrame.AddrFrame.Offset = threadCtx->R11;
 #elif defined XR_ARCHITECTURE_ARM64
-#error TODO
+    stackFrame.AddrPC.Offset = threadCtx->Pc;
+    stackFrame.AddrStack.Offset = threadCtx->Sp;
+    stackFrame.AddrFrame.Offset = threadCtx->Fp;
+#elif defined XR_ARCHITECTURE_IA64
+    stackFrame.AddrPC.Offset = threadCtx->StIIP;
+    stackFrame.AddrStack.Offset = threadCtx->IntSp;
+    stackFrame.AddrBStore.Offset = threadCtx->RsBSP;
 #else
-#error CPU architecture is not supported.
+#   error CPU architecture is not supported.
 #endif
 
     while (GetNextStackFrameString(&stackFrame, threadCtx, frameStr) && traceResult.size() <= maxFramesCount)
@@ -336,7 +362,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 }
 #endif // defined(XR_PLATFORM_WINDOWS)
 
-SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
+xr_vector<xr_string> xrDebug::BuildStackTrace(u16 maxFramesCount)
 {
 #if defined(XR_PLATFORM_WINDOWS)
     CONTEXT currentThreadCtx = {};
@@ -353,7 +379,7 @@ SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
 
 void xrDebug::LogStackTrace(const char* header)
 {
-    SStringVec stackTrace = BuildStackTrace();
+    xr_vector<xr_string> stackTrace = BuildStackTrace();
     Msg("%s", header);
     for (const auto& frame : stackTrace)
     {
@@ -423,7 +449,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) && __has_include(<execinfo.h>) || defined(XR_PLATFORM_BSD)
     void *array[20];
     int nptrs = backtrace(array, 20);     // get void*'s for all entries on the stack
     char **strings = backtrace_symbols(array, nptrs);
@@ -432,7 +458,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
     {
         size_t demangledBufSize = 0;
         char* demangledName = nullptr;
-        for (size_t i = 0; i < nptrs; i++)
+        for (int i = 0; i < nptrs; i++)
         {
             char* functionName = strings[i];
 
@@ -451,9 +477,9 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
                 }
             }
             Log(functionName);
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
+#   ifdef USE_OWN_ERROR_MESSAGE_WINDOW
             buffer += xr_sprintf(buffer, bufferSize, "%s\n", functionName);
-#endif // USE_OWN_ERROR_MESSAGE_WINDOW
+#   endif // USE_OWN_ERROR_MESSAGE_WINDOW
         }
         ::free(demangledName);
     }
@@ -482,12 +508,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
                    const char* arg2)
 {
-#ifdef PROFILE_CRITICAL_SECTIONS
-    static Lock lock(MUTEX_PROFILE_ID(xrDebug::Backend));
-#else
-    static Lock lock;
-#endif
-    lock.Enter();
+    ScopeLock lock(&failLock);
 
     if (windowHandler)
         windowHandler->OnErrorDialog(true); // Call it only after locking so that multiple threads won't call this function simultaneously.
@@ -539,6 +560,10 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
 #endif
+            // calling DEBUG_BREAK with no debugger will trigger BugTrap
+            // we must hide the window
+            if (windowHandler && !DebuggerIsPresent())
+                windowHandler->OnFatalError();
             DEBUG_BREAK;
         } // switch (result)
     }
@@ -546,7 +571,6 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
     if (resetFullscreen)
         windowHandler->OnErrorDialog(false); // Call it only before unlocking so that multiple threads won't call this function simultaneously.
 
-    lock.Leave();
     return result;
 }
 
@@ -558,6 +582,8 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
 
 void xrDebug::DoExit(const std::string& message)
 {
+    ScopeLock lock(&failLock);
+
     if (windowHandler)
         windowHandler->OnErrorDialog(true);
 
@@ -572,6 +598,9 @@ void xrDebug::DoExit(const std::string& message)
     else
         ShowMessage(Core.ApplicationName, message.c_str());
 
+    if (windowHandler)
+        windowHandler->OnFatalError();
+
 #if defined(XR_PLATFORM_WINDOWS)
     TerminateProcess(GetCurrentProcess(), 1);
 #else
@@ -585,8 +614,8 @@ void xrDebug::DoExit(const std::string& message)
 LPCSTR xrDebug::ErrorToString(long code)
 {
     const char* result = nullptr;
-    static string1024 descStorage;
 #if defined(XR_PLATFORM_WINDOWS)
+    static string1024 descStorage;
     DXGetErrorDescription(code, descStorage, sizeof(descStorage));
     if (!result)
     {
@@ -752,6 +781,8 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 {
 #if defined(XR_PLATFORM_WINDOWS)
+    ScopeLock lock(&failLock);
+
     string256 errMsg;
     FormatLastError(errMsg, sizeof(errMsg));
     if (!ErrorAfterDialog && !strstr(GetCommandLine(), "-no_call_stack_assert"))
@@ -816,7 +847,11 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 
     // Typically, PrevFilter is BugTrap filter
     if (PrevFilter)
+    {
+        if (windowHandler)
+            windowHandler->OnFatalError();
         PrevFilter(exPtrs);
+    }
 
     if (windowHandler)
         windowHandler->OnErrorDialog(false);
@@ -834,6 +869,8 @@ void _terminate()
     if (strstr(GetCommandLine(), "-silent_error_mode"))
         exit(-1);
 #endif
+    //ScopeLock lock(&failLock);
+
     string4096 assertionInfo;
     xrDebug::GatherInfo(assertionInfo,sizeof(assertionInfo), DEBUG_INFO, nullptr, "Unexpected application termination");
     xr_strcat(assertionInfo, "Press OK to abort execution\r\n");
@@ -848,10 +885,10 @@ static void handler_base(const char* reason)
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }
 
+#if defined(XR_PLATFORM_WINDOWS)
 static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* function, const wchar_t* file,
                                       unsigned int line, uintptr_t reserved)
 {
-#if defined(XR_PLATFORM_WINDOWS)
     bool ignoreAlways = false;
     string4096 mbExpression;
     string4096 mbFunction;
@@ -873,10 +910,13 @@ static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* 
         xr_strcpy(mbFile, __FILE__);
     }
     xrDebug::Fail(ignoreAlways, {mbFile, int(line), mbFunction}, mbExpression, "invalid parameter");
-#endif
 }
+#endif
 
+#if defined(XR_PLATFORM_WINDOWS)
 static void pure_call_handler() { handler_base("pure virtual function call"); }
+#endif
+
 #ifdef XRAY_USE_EXCEPTIONS
 static void unexpected_handler() { handler_base("unexpected program termination"); }
 #endif
@@ -896,12 +936,12 @@ void xrDebug::OnThreadSpawn()
     // std::set_terminate(_terminate);
 #endif
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
-    signal(SIGABRT, abort_handler);
-    signal(SIGABRT_COMPAT, abort_handler);
-    signal(SIGFPE, floating_point_handler);
-    signal(SIGILL, illegal_instruction_handler);
-    signal(SIGINT, 0);
-    signal(SIGTERM, termination_handler);
+    std::signal(SIGABRT, abort_handler);
+    std::signal(SIGABRT_COMPAT, abort_handler);
+    std::signal(SIGFPE, floating_point_handler);
+    std::signal(SIGILL, illegal_instruction_handler);
+    std::signal(SIGINT, 0);
+    std::signal(SIGTERM, termination_handler);
     _set_invalid_parameter_handler(&invalid_parameter_handler);
     _set_new_mode(1);
     _set_new_handler(&out_of_memory_handler);
@@ -910,12 +950,12 @@ void xrDebug::OnThreadSpawn()
     std::set_unexpected(_terminate);
 #endif
 #else //XR_PLATFORM_WINDOWS
-    signal(SIGABRT, abort_handler);
-    signal(SIGFPE, floating_point_handler);
-    signal(SIGILL, illegal_instruction_handler);
-    signal(SIGINT, 0);
-    signal(SIGTERM, termination_handler);
-    signal(SIGSEGV, segmentation_fault_handler);
+    std::signal(SIGABRT, abort_handler);
+    std::signal(SIGFPE, floating_point_handler);
+    std::signal(SIGILL, illegal_instruction_handler);
+    std::signal(SIGINT, 0);
+    std::signal(SIGTERM, termination_handler);
+    std::signal(SIGSEGV, segmentation_fault_handler);
 #endif
 }
 

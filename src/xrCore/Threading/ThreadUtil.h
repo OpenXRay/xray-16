@@ -24,10 +24,9 @@ struct SThreadStartupInfo
 //////////////////////////////////////////////////////////////
 
 XRCORE_API ThreadId GetCurrThreadId();
-
 XRCORE_API ThreadHandle GetCurrentThreadHandle();
 
-XRCORE_API void SetThreadName(ThreadHandle threadHandle, pcstr name);
+XRCORE_API bool ThreadIdsAreEqual(ThreadId left, ThreadId right);
 
 XRCORE_API void SetCurrentThreadName(pcstr name);
 

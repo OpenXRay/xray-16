@@ -15,7 +15,7 @@
 #include "GametaskManager.h"
 #include "GameTask.h"
 
-CMapSpot::CMapSpot(CMapLocation* ml) : m_map_location(ml), m_mark_focused(false)
+CMapSpot::CMapSpot(CMapLocation* ml) : CUIStatic("CMapSpot"), m_map_location(ml), m_mark_focused(false)
 {
     m_bScale = false;
     m_location_level = 0;
@@ -23,7 +23,6 @@ CMapSpot::CMapSpot(CMapLocation* ml) : m_map_location(ml), m_mark_focused(false)
     m_scale_bounds.set(-1.0f, -1.0f);
 }
 
-CMapSpot::~CMapSpot() {}
 void CMapSpot::Load(CUIXml* xml, LPCSTR path)
 {
     CUIXmlInit::InitStatic(*xml, path, 0, this);
@@ -76,7 +75,9 @@ void CMapSpot::Update()
 
 bool CMapSpot::OnMouseDown(int mouse_btn)
 {
-    if (mouse_btn == MOUSE_1)
+    switch (mouse_btn)
+    {
+    case MOUSE_1:
     {
         CGameTask* t = Level().GameTaskManager().HasGameTask(m_map_location, true);
         if (t)
@@ -86,8 +87,12 @@ bool CMapSpot::OnMouseDown(int mouse_btn)
         }
         return false;
     }
-    else
+    case MOUSE_2:
     {
+        GetMessageTarget()->SendMessage(this, MAP_SELECT_SPOT2);
+        return true;
+    }
+    default:
         return false;
     }
 }

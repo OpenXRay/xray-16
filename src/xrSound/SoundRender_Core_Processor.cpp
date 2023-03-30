@@ -105,8 +105,8 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
             s_targets_defer[it]->fill_parameters();
     }
 
-    // update EAX
-    if (psSoundFlags.test(ss_EAX) && bEAX)
+    // Update effects
+    if (psSoundFlags.test(ss_EFX) && m_effects)
     {
         if (bListenerMoved)
         {
@@ -115,10 +115,9 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         }
 
         e_current.lerp(e_current, e_target, dt_sec);
-#if defined(XR_PLATFORM_WINDOWS)
-        i_eax_listener_set(&e_current);
-        i_eax_commit_setting();
-#endif
+
+        m_effects->set_listener(e_current);
+        m_effects->commit();
     }
 
     // update listener
@@ -143,11 +142,9 @@ static u32 g_saved_event_count = 0;
 void CSoundRender_Core::update_events()
 {
     g_saved_event_count = s_events.size();
-    for (u32 it = 0; it < s_events.size(); it++)
-    {
-        event& E = s_events[it];
+    for (auto& E : s_events)
         Handler(E.first, E.second);
-    }
+
     s_events.clear();
 }
 
@@ -156,9 +153,8 @@ void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
     if (dest)
     {
         dest->_rendered = 0;
-        for (u32 it = 0; it < s_targets.size(); it++)
+        for (auto T : s_targets)
         {
-            CSoundRender_Target* T = s_targets[it];
             if (T->get_emitter() && T->get_Rendering())
                 dest->_rendered++;
         }
@@ -170,9 +166,8 @@ void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
     }
     if (ext)
     {
-        for (u32 it = 0; it < s_emitters.size(); it++)
+        for (auto _E : s_emitters)
         {
-            CSoundRender_Emitter* _E = s_emitters[it];
             CSound_stats_ext::SItem _I;
             _I._3D = !_E->b2D;
             _I._rendered = !!_E->target;
@@ -224,8 +219,7 @@ float CSoundRender_Core::get_occlusion_to(const Fvector& hear_pt, const Fvector&
         float range = dir.magnitude();
         dir.div(range);
 
-        geom_DB.ray_options(CDB::OPT_CULL);
-        geom_DB.ray_query(geom_SOM, hear_pt, dir, range);
+        geom_DB.ray_query(CDB::OPT_CULL, geom_SOM, hear_pt, dir, range);
         u32 r_cnt = geom_DB.r_count();
         CDB::RESULT* _B = geom_DB.r_begin();
         if (0 != r_cnt)
@@ -269,8 +263,7 @@ float CSoundRender_Core::get_occlusion(Fvector& P, float R, Fvector* occ)
         // 2. Polygon doesn't picked up - real database query
         if (bNeedFullTest)
         {
-            geom_DB.ray_options(CDB::OPT_ONLYNEAREST);
-            geom_DB.ray_query(geom_MODEL, base, dir, range);
+            geom_DB.ray_query(CDB::OPT_ONLYNEAREST, geom_MODEL, base, dir, range);
             if (0 != geom_DB.r_count())
             {
                 // cache polygon
@@ -286,8 +279,7 @@ float CSoundRender_Core::get_occlusion(Fvector& P, float R, Fvector* occ)
     }
     if (nullptr != geom_SOM)
     {
-        geom_DB.ray_options(CDB::OPT_CULL);
-        geom_DB.ray_query(geom_SOM, base, dir, range);
+        geom_DB.ray_query(CDB::OPT_CULL, geom_SOM, base, dir, range);
         u32 r_cnt = geom_DB.r_count();
         CDB::RESULT* _B = geom_DB.r_begin();
         if (0 != r_cnt)

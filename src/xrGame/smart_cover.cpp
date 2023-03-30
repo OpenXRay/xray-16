@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
+
 #include "smart_cover.h"
 #include "smart_cover_storage.h"
 #include "smart_cover_object.h"
@@ -15,24 +16,9 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrAICore/Navigation/graph_engine.h"
 
-namespace hash_fixed_vertex_manager
-{
-IC u32 to_u32(shared_str const& string)
-{
-    const str_value* get = string._get();
-    return (*(u32 const*)&get);
-}
-
-} // namespace hash_fixed_vertex_manager
-
 namespace smart_cover
 {
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
-} // namespace smart_cover
-
-using smart_cover::cover;
-using smart_cover::description;
-using smart_cover::transform_vertex;
 
 cover::cover(smart_cover::object const& object, DescriptionPtr description, bool const is_combat_cover,
     bool const can_fire, luabind::object const& loopholes_availability)
@@ -111,7 +97,7 @@ void cover::vertex(smart_cover::loophole const& loophole, smart_cover::loophole_
             u32 level_vertex_id = graph.vertex_id(pos);
             VERIFY2(graph.valid_vertex_id(level_vertex_id),
                 make_string("invalid vertex id: loophole [%s]", loophole.id().c_str()));
-            loophole_data.m_action_vertices.push_back(std::make_pair((*I).first, level_vertex_id));
+            loophole_data.m_action_vertices.emplace_back((*I).first, level_vertex_id);
         }
 }
 
@@ -313,3 +299,4 @@ bool cover::in_min_acceptable_range(
 
     return (true);
 }
+} // namespace smart_cover

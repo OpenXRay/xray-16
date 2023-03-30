@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "xrEngine/CustomHUD.h"
+#include "Layers/xrRender/FVisual.h"
 
 float g_fSCREEN;
 
@@ -27,8 +27,22 @@ void CRender::Calculate()
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
 
     // Detect camera-sector
-    if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
+    if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
     {
+        // Search for default sector - assume "default" or "outdoor" sector is the largest one
+        //. hack: need to know real outdoor sector
+        float largest_sector_vol = 0;
+        for (auto& s : Sectors)
+        {
+            dxRender_Visual* V = static_cast<CSector*>(s)->root();
+            float vol = V->vis.box.getvolume();
+            if (vol > largest_sector_vol)
+            {
+                largest_sector_vol = vol;
+                m_largest_sector = static_cast<CSector*>(s);
+            }
+        }
+
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
         if (pSector && (pSector != pLastSector))
             g_pGamePersistent->OnSectorChanged(translateSector(pSector));
@@ -36,7 +50,6 @@ void CRender::Calculate()
         if (!pSector)
             pSector = pLastSector;
         pLastSector = pSector;
-        vLastCameraPos.set(Device.vCameraPosition);
     }
 
     // Check if camera is too near to some portal - if so force DualRender
@@ -45,8 +58,7 @@ void CRender::Calculate()
         float eps = VIEWPORT_NEAR + EPS_L;
         Fvector box_radius;
         box_radius.set(eps, eps, eps);
-        Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
-        Sectors_xrc.box_query(rmPortals, Device.vCameraPosition, box_radius);
+        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
         for (int K = 0; K < Sectors_xrc.r_count(); K++)
         {
             CPortal* pPortal = (CPortal*)Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
@@ -60,9 +72,8 @@ void CRender::Calculate()
     // Check if we touch some light even trough portal
     lstRenderables.clear();
     g_SpatialSpace->q_sphere(lstRenderables, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
-    for (u32 _it = 0; _it < lstRenderables.size(); _it++)
+    for (auto spatial : lstRenderables)
     {
-        ISpatial* spatial = lstRenderables[_it];
         spatial->spatial_updatesector();
         CSector* sector = (CSector*)spatial->GetSpatialData().sector;
         if (!sector)

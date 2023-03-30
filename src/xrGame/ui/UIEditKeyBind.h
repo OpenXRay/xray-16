@@ -7,7 +7,7 @@ struct game_action;
 struct keyboard_key;
 class CUIColorAnimatorWrapper;
 
-class CUIEditKeyBind : public CUIStatic, public CUIOptionsItem
+class CUIEditKeyBind final : public CUIStatic, public CUIOptionsItem
 {
     bool m_primary;
     bool m_isGamepadBinds;
@@ -17,7 +17,7 @@ class CUIEditKeyBind : public CUIStatic, public CUIOptionsItem
 
 public:
     CUIEditKeyBind(bool primary, bool isGamepadBinds = false);
-    virtual ~CUIEditKeyBind();
+
     // options item
     virtual void AssignProps(const shared_str& entry, const shared_str& group);
 

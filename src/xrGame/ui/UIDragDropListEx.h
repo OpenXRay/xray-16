@@ -65,16 +65,16 @@ protected:
     CUIStatic* m_blocker{};
     CUIProgressBar* m_condition_indicator{};
 
-    virtual void __stdcall OnScrollV(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemStartDragging(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemDrop(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemSelected(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemLButtonClick(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemRButtonClick(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemDBClick(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemFocusReceived(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemFocusLost(CUIWindow* w, void* pData);
-    virtual void __stdcall OnItemFocusedUpdate(CUIWindow* w, void* pData);
+    virtual void OnScrollV(CUIWindow* w, void* pData);
+    virtual void OnItemStartDragging(CUIWindow* w, void* pData);
+    virtual void OnItemDrop(CUIWindow* w, void* pData);
+    virtual void OnItemSelected(CUIWindow* w, void* pData);
+    virtual void OnItemLButtonClick(CUIWindow* w, void* pData);
+    virtual void OnItemRButtonClick(CUIWindow* w, void* pData);
+    virtual void OnItemDBClick(CUIWindow* w, void* pData);
+    virtual void OnItemFocusReceived(CUIWindow* w, void* pData);
+    virtual void OnItemFocusLost(CUIWindow* w, void* pData);
+    virtual void OnItemFocusedUpdate(CUIWindow* w, void* pData);
 
 public:
     static CUIDragItem* m_drag_item;
@@ -232,6 +232,10 @@ public:
     CUICellContainer(CUIDragDropListEx* parent);
     virtual ~CUICellContainer();
 
+    Ivector2 PickCell(const Fvector2& abs_pos); //Alundaio made public
+    bool ValidCell(const Ivector2& pos) const; //Alundaio made public
+    CUICell& GetCellAt(const Ivector2& pos); //Alundaio made public
+
 protected:
     virtual void Draw();
     void DrawBlocker() const;
@@ -244,8 +248,6 @@ protected:
     void SetCellsSpacing(const Ivector2& new_sz);
     Ivector2 TopVisibleCell();
     CUICell& GetCellIdx(size_t idx);
-    CUICell& GetCellAt(const Ivector2& pos);
-    Ivector2 PickCell(const Fvector2& abs_pos);
     Ivector2 GetItemPos(CUICellItem* itm);
     Ivector2 FindFreeCell(const Ivector2& size);
     bool HasFreeSpace(const Ivector2& size);
@@ -256,7 +258,6 @@ protected:
 
     void PlaceItemAtPos(CUICellItem* itm, Ivector2& cell_pos);
     CUICellItem* RemoveItem(CUICellItem* itm, bool force_root);
-    bool ValidCell(const Ivector2& pos) const;
 
     void Grow();
     void Shrink();

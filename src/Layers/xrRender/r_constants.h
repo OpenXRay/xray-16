@@ -5,7 +5,7 @@
 #include "xrCore/xr_resource.h"
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX10/dx10ConstantBuffer.h"
+#include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #endif
 
 class ECORE_API R_constant_setup;
@@ -16,7 +16,7 @@ enum
     RC_int = 1,
     RC_bool = 2,
     RC_sampler = 99, // DX9 shares index for sampler and texture
-    RC_dx10texture = 100, // For DX10 sampler and texture are different resources
+    RC_dx11texture = 100, // For DX11 sampler and texture are different resources
     RC_dx11UAV = 101
 };
 enum
@@ -37,11 +37,12 @@ enum
     //  Don't change this since some code relies on magic numbers
     RC_dest_pixel = (1 << 0),
     RC_dest_vertex = (1 << 1),
-    RC_dest_sampler = (1 << 2), //  For DX10 it's either sampler or texture
-    RC_dest_geometry = (1 << 3), // DX10 only
+    RC_dest_sampler = (1 << 2), //  For DX11 it's either sampler or texture
+    RC_dest_geometry = (1 << 3), // DX11 only
     RC_dest_hull = (1 << 4), // DX11 only
     RC_dest_domain = (1 << 5), //   DX11 only
     RC_dest_compute = (1 << 6), //  DX11 only
+    RC_dest_all = (1 << 7), // OpenGL only
     RC_dest_compute_cb_index_mask = 0xF0000000, // Buffer index == 0..14
     RC_dest_compute_cb_index_shift = 28,
     RC_dest_domain_cb_index_mask = 0x0F000000, // Buffer index == 0..14
@@ -113,6 +114,9 @@ struct ECORE_API R_constant : public xr_resource
     R_constant_load cs;
 #   endif
 #endif
+#ifdef USE_OGL
+    R_constant_load pp;
+#endif
 
     R_constant_load samp;
     R_constant_setup* handler;
@@ -135,6 +139,9 @@ struct ECORE_API R_constant : public xr_resource
         case RC_dest_compute: return cs;
 #   endif
 #endif
+#ifdef USE_OGL
+        case RC_dest_all: return pp;
+#endif
         default: FATAL("invalid enumeration for shader");
         }
         return fake;
@@ -142,16 +149,30 @@ struct ECORE_API R_constant : public xr_resource
 
     BOOL equal(R_constant& C)
     {
-        return (!xr_strcmp(name, C.name)) && (type == C.type) && (destination == C.destination) && ps.equal(C.ps) &&
-            vs.equal(C.vs) && samp.equal(C.samp) && handler == C.handler;
+        return !xr_strcmp(name, C.name)
+            && type == C.type
+            && destination == C.destination
+            && ps.equal(C.ps)
+            && vs.equal(C.vs)
+#if defined(USE_DX11) || defined(USE_OGL)
+            && gs.equal(C.gs)
+#   if defined(USE_DX11)
+            && hs.equal(C.hs)
+            && ds.equal(C.ds)
+            && cs.equal(C.cs)
+#   endif
+#   if defined(USE_OGL)
+            && pp.equal(C.pp)
+#   endif
+#endif
+            && samp.equal(C.samp)
+            && handler == C.handler;
     }
-
-    BOOL equal(R_constant* C) { return equal(*C); }
 };
 typedef resptr_core<R_constant, resptr_base<R_constant>> ref_constant;
 
 // Automatic constant setup
-class ECORE_API R_constant_setup
+class ECORE_API XR_NOVTABLE R_constant_setup
 {
 public:
     R_constant_setup() = default;
@@ -199,7 +220,7 @@ private:
 typedef resptr_core<R_constant_table, resptr_base<R_constant_table>> ref_ctable;
 
 #if defined(USE_DX11)
-#include "../xrRenderDX10/dx10ConstantBuffer_impl.h"
+#include "../xrRenderDX11/dx11ConstantBuffer_impl.h"
 #endif
 
 #endif

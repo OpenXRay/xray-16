@@ -28,6 +28,12 @@
     <Filter Include="Cache">
       <UniqueIdentifier>{9143e5b9-296c-4d3e-8424-83f75457dfa9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Effects">
+      <UniqueIdentifier>{cc264c98-2f74-4a25-8885-d8a019b936dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Effects\OpenAL">
+      <UniqueIdentifier>{d66ed9a4-3e7a-471f-9b63-7596368b6f66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sound.h">
@@ -65,6 +71,15 @@
     </ClInclude>
     <ClInclude Include="SoundRender_Cache.h">
       <Filter>Cache</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundRender_Effects.h">
+      <Filter>Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundRender_EffectsA_EAX.h">
+      <Filter>Effects\OpenAL</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundRender_EffectsA_EFX.h">
+      <Filter>Effects\OpenAL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,8 +140,17 @@
     <ClCompile Include="SoundRender_Cache.cpp">
       <Filter>Cache</Filter>
     </ClCompile>
+    <ClCompile Include="SoundRender_EffectsA_EAX.cpp">
+      <Filter>Effects\OpenAL</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundRender_EffectsA_EFX.cpp">
+      <Filter>Effects\OpenAL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\soft_oal.dll" />
   </ItemGroup>
 </Project>

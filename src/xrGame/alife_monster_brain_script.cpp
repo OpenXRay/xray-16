@@ -11,11 +11,12 @@
 #include "alife_monster_movement_manager.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 CALifeMonsterMovementManager* get_movement(const CALifeMonsterBrain* brain) { return (&brain->movement()); }
+
 SCRIPT_EXPORT(CALifeMonsterBrain, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CALifeMonsterBrain>("CALifeMonsterBrain")

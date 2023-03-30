@@ -556,11 +556,11 @@
     <ClCompile Include="xrLightDoNet.cpp">
       <Filter>do_light</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp">
-      <Filter>do_light</Filter>
-    </ClCompile>
     <ClCompile Include="$(xrSdkDir)include\hxgrid\Interface\hxGridInterface.cpp">
       <Filter>kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrLoadSurface.cpp">
+      <Filter>do_light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

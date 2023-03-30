@@ -8,13 +8,6 @@
 
 #include "Layers/xrRender/FBasicVisual.h"
 
-IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
-{
-    float d1 = _1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    float d2 = _2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    return d1 < d2;
-}
-
 void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 {
     PIX_EVENT(render_main);
@@ -33,13 +26,13 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
         // Determine visibility for static geometry hierrarhy
         if (psDeviceFlags.test(rsDrawStatic))
         {
-            for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+            for (auto& s : PortalTraverser.r_sectors)
             {
-                CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+                CSector* sector = static_cast<CSector*>(s);
                 dxRender_Visual* root = sector->root();
-                for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+                for (auto& r_frustum : sector->r_frustums)
                 {
-                    add_Geometry(root, sector->r_frustums[v_it]);
+                    add_Geometry(root, r_frustum);
                 }
             }
         }
@@ -52,14 +45,19 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                 lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)
-            std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
+            std::sort(lstRenderables.begin(), lstRenderables.end(), [](ISpatial* s1, ISpatial* s2)
+            {
+                const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                return d1 < d2;
+            });
 
             // Determine visibility for dynamic part of scene
             u32 uID_LTRACK = 0xffffffff;
             if (phase == PHASE_NORMAL)
             {
                 uLastLTRACK++;
-                if (lstRenderables.size())
+                if (!lstRenderables.empty())
                     uID_LTRACK = uLastLTRACK % lstRenderables.size();
 
                 // update light-vis for current entity / actor
@@ -76,11 +74,12 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
             {
                 ISpatial* spatial = lstRenderables[o_it];
                 spatial->spatial_updatesector();
-                CSector* sector = (CSector*)spatial->GetSpatialData().sector;
+                const auto& data = spatial->GetSpatialData();
+                const auto& [type, sphere, sector] = std::tuple(data.type, data.sphere, (CSector*)data.sector);
                 if (0 == sector)
                     continue; // disassociated from S/P structure
 
-                if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
+                if (type & STYPE_LIGHTSOURCE)
                 {
                     // lightsource
                     light* L = (light*)spatial->dcast_Light();
@@ -97,13 +96,12 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 
                 if (PortalTraverser.i_marker != sector->r_marker)
                     continue; // inactive (untouched) sector
-                for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+                for (auto& view : sector->r_frustums)
                 {
-                    CFrustum& view = sector->r_frustums[v_it];
-                    if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
+                    if (!view.testSphere_dirty(sphere.P, sphere.R))
                         continue;
 
-                    if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
+                    if (type & STYPE_RENDERABLE)
                     {
                         // renderable
                         IRenderable* renderable = spatial->dcast_Renderable();
@@ -157,12 +155,12 @@ void CRender::render_menu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->get_base_zb()); // LDR RT
+        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->rt_Base_Depth); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
     // Distort
     {
-        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->get_base_zb()); // Now RT is a distortion mask
+        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->rt_Base_Depth); // Now RT is a distortion mask
         RCache.ClearRT(Target->rt_Generic_1, color_rgba(127, 127, 0, 127));
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
@@ -214,7 +212,7 @@ void CRender::Render()
     PIX_EVENT(CRender_Render);
 
     g_r = 1;
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
 
 #if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
@@ -267,7 +265,7 @@ void CRender::Render()
         m_project.build_projection(
             deg2rad(Device.fFOV/* *Device.fASPECT*/),
             Device.fASPECT, VIEWPORT_NEAR,
-            z_distance * g_pGamePersistent->Environment().CurrentEnv->far_plane);
+            z_distance * g_pGamePersistent->Environment().CurrentEnv.far_plane);
         m_zfill.mul(m_project, Device.mView);
         r_pmask(true, false); // enable priority "0"
         set_Recorder(nullptr);
@@ -352,15 +350,13 @@ void CRender::Render()
     LP_normal.clear();
     LP_pending.clear();
 #if defined(USE_DX11) || defined(USE_OGL)
-    if (o.dx10_msaa)
+    if (o.msaa)
     {
         RCache.set_ZB(Target->rt_MSAADepth->pZRT);
     }
 #endif
     {
         PIX_EVENT(DEFER_TEST_LIGHT_VIS);
-        // perform tests
-        auto count = 0;
         light_Package& LP = Lights.package;
 
         // stats
@@ -369,10 +365,11 @@ void CRender::Render()
         Stats.l_total = Stats.l_shadowed + Stats.l_unshadowed;
 
         // perform tests
+        size_t count = 0;
         count = _max(count, LP.v_point.size());
         count = _max(count, LP.v_spot.size());
         count = _max(count, LP.v_shadowed.size());
-        for (auto it = 0; it < count; it++)
+        for (size_t it = 0; it < count; it++)
         {
             if (it < LP.v_point.size())
             {
@@ -470,13 +467,13 @@ void CRender::Render()
 
 #if defined(USE_DX11) || defined(USE_OGL)
     // full screen pass to mark msaa-edge pixels in highest stencil bit
-    if (o.dx10_msaa)
+    if (o.msaa)
     {
         PIX_EVENT(MARK_MSAA_EDGES);
         Target->mark_msaa_edges();
     }
 
-    //	TODO: DX10: Implement DX10 rain.
+    //	TODO: DX11: Implement DX11 rain.
     if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
     {
         PIX_EVENT(DEFER_RAIN);
@@ -511,7 +508,7 @@ void CRender::Render()
         RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
 #elif defined(USE_DX11) || defined(USE_OGL)
-        if (!o.dx10_msaa)
+        if (!o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -547,12 +544,12 @@ void CRender::Render()
         Target->phase_combine();
     }
 
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
 }
 
 void CRender::render_forward()
 {
-    VERIFY(0 == mapDistort.size());
+    VERIFY(mapDistort.empty());
     o.distortion = o.distortion_enabled; // enable distorion
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)

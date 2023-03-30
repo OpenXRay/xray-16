@@ -82,16 +82,16 @@ public:
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
 
     IC void UpdateNews() { m_need_reload = true; }
-    void xr_stdcall PerformWork();
+    void PerformWork();
 
 protected:
     void ReLoadNews();
     void AddNewsItem(GAME_NEWS_DATA& news_data);
     ALife::_TIME_ID GetShiftPeriod(ALife::_TIME_ID datetime, int shift_day);
 
-    void xr_stdcall UpdateChecks(CUIWindow* w, void* d);
-    void xr_stdcall PrevPeriod(CUIWindow* w, void* d);
-    void xr_stdcall NextPeriod(CUIWindow* w, void* d);
+    void UpdateChecks(CUIWindow* w, void* d);
+    void PrevPeriod(CUIWindow* w, void* d);
+    void NextPeriod(CUIWindow* w, void* d);
 
     void on_scroll_keys(int dik);
 
@@ -99,7 +99,7 @@ protected:
     protected:
         void		add_faction			( CUIXml& xml, shared_str const& faction_id );
         void		clear_all_factions		();
-        bool	__stdcall	SortingLessFunction		( CUIWindow* left, CUIWindow* right );
+        bool		SortingLessFunction		( CUIWindow* left, CUIWindow* right );
     */
 }; // class CUILogsWnd
 

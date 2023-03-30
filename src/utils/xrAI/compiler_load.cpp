@@ -4,7 +4,7 @@
 // TODO: Do we really need this?
 //Lights g_lights;
 
-IC const Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox& bb, const SAIParams& params)
+IC const Fvector vertex_position(const NodePosition4& Psrc, const Fbox& bb, const SAIParams& params)
 {
     Fvector Pdest;
     int x, z, row_length;
@@ -19,10 +19,10 @@ IC const Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox&
 
 struct CNodePositionConverter
 {
-    IC CNodePositionConverter(const SNodePositionOld& Psrc, hdrNODES& m_header, NodePosition& np);
+    IC CNodePositionConverter(const NodePosition3& Psrc, hdrNODES& m_header, NodePosition4& np);
 };
 
-IC CNodePositionConverter::CNodePositionConverter(const SNodePositionOld& Psrc, hdrNODES& m_header, NodePosition& np)
+IC CNodePositionConverter::CNodePositionConverter(const NodePosition3& Psrc, hdrNODES& m_header, NodePosition4& np)
 {
     Fvector Pdest;
     Pdest.x = float(Psrc.x) * m_header.size;
@@ -260,7 +260,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
         R_ASSERT(F->open_chunk(E_AIMAP_CHUNK_NODES));
         size_t N = F->r_u32();
-        R_ASSERT2(N < ((size_t(1) << size_t(MAX_NODE_BIT_COUNT)) - 2), "Too many nodes!");
+        R_ASSERT2(N < (NodeCompressed10::LINK_MASK - 1), "Too many nodes!");
         g_nodes.resize(N);
 
         hdrNODES H;
@@ -275,13 +275,13 @@ void xrLoad(LPCSTR name, bool draft_mode)
         {
             NodeLink id;
             u16 pl;
-            SNodePositionOld _np;
-            NodePosition np;
+            NodePosition3 _np;
+            NodePosition4 np;
 
             for (size_t j = 0; j < 4; ++j)
             {
                 F->r(&id, 3);
-                g_nodes[i].n[j] = (*LPDWORD(&id)) & 0x00ffffff;
+                g_nodes[i].n[j] = (*reinterpret_cast<u32*>(&id)) & 0x00ffffff;
             }
 
             pl = F->r_u16();

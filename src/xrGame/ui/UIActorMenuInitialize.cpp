@@ -26,6 +26,8 @@
 #include "xrUICore/ui_base.h"
 #include "UIOutfitSlot.h"
 
+namespace detail::actor_menu
+{
 constexpr cpcstr ACTOR_MENU_XML      = "actor_menu.xml";
 constexpr cpcstr ACTOR_MENU_ITEM_XML = "actor_menu_item.xml";
 
@@ -33,11 +35,12 @@ constexpr cpcstr INVENTORY_XML       = "inventory_new.xml";
 constexpr cpcstr INVENTORY_ITEM_XML  = "inventory_item.xml";
 
 constexpr cpcstr TRADE_XML           = "trade.xml";
-constexpr cpcstr TRADE_CHARACTER_XML = "trade_character.xml";
 constexpr cpcstr TRADE_ITEM_XML      = "trade_item.xml";
+constexpr cpcstr TRADE_CHARACTER_XML = "trade_character.xml";
 
 constexpr cpcstr CAR_BODY_XML        = "carbody_new.xml";
 constexpr cpcstr CARBODY_ITEM_XML    = "carbody_item.xml";
+}
 
 CUIActorMenu::CUIActorMenu()
     : m_currMenuMode(mmUndefined), m_last_time(u32(-1)),
@@ -60,6 +63,8 @@ CUIActorMenu::~CUIActorMenu()
 
 void CUIActorMenu::Construct()
 {
+    using namespace ::detail::actor_menu;
+
     m_UIPropertiesBox = xr_new<CUIPropertiesBox>();
     m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));
     m_UIPropertiesBox->SetWindowName("property_box");
@@ -143,6 +148,8 @@ void CUIActorMenu::Construct()
 
 void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 {
+    using namespace ::detail::actor_menu;
+
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
@@ -187,7 +194,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
     constexpr std::tuple<eActorMenuListType, cpcstr, cpcstr, cpcstr, cpcstr, bool> inventory_lists[] =
     {
-        // { id,                   "xml_section_name",         "condition_indicator,  "highlighter",             "blocker", is_it_critical_and_required }
+        // { id,                   "xml_section_name",         "condition_indicator,  "highlighter",             "blocker",          required }
+        { eInventoryKnifeList,     "dragdrop_knife",           "progess_bar_knife",   "inv_slot1_highlight",     nullptr,            false },
         { eInventoryPistolList,    "dragdrop_pistol",          "progess_bar_weapon1", "inv_slot2_highlight",     nullptr,            true },
         { eInventoryAutomaticList, "dragdrop_automatic",       "progess_bar_weapon2", "inv_slot3_highlight",     nullptr,            true },
 
@@ -209,17 +217,19 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
         { eSearchLootActorBagList, nullptr,                    nullptr,               nullptr,                   nullptr,            false },
 
         { eTrashList,              "dragdrop_trash",           nullptr,               nullptr,                   nullptr,            false },
+
+        { eInventoryBackpackList,  "dragdrop_backpack",        nullptr,               "backpack_slot_highlight", nullptr,            false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
 
-    for (auto [id, section, conditionIndicator, highlight, block, critical] : inventory_lists)
+    for (auto [id, section, conditionIndicator, highlight, block, required] : inventory_lists)
     {
         if (!section)
             continue;
         CUIDragDropListEx*& list = m_pLists[id];
 
-        list = UIHelper::CreateDragDropListEx(uiXml, section, this, critical);
+        list = UIHelper::CreateDragDropListEx(uiXml, section, this, required);
         if (!list)
             continue;
 
@@ -281,6 +291,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
 
 void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
 {
+    using namespace ::detail::actor_menu;
+
     AttachChild(m_ActorWeightBar);   // should be attached to 'this' to work correct
     AttachChild(m_PartnerWeightBar); // do not attach to m_pInventoryWnd or any other window than 'this'
 
@@ -310,21 +322,24 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     outfitInfo->SetAutoDelete(true);
     m_pInventoryWnd->AttachChild(outfitInfo);
 
-    std::tuple<eActorMenuListType, cpcstr, CUIWindow*> inventory_lists[] =
+    std::tuple<eActorMenuListType, cpcstr, CUIWindow*, bool> inventory_lists[] =
     {
         // { id,                   "xml_section_name",   parent }
-        { eInventoryPistolList,    "dragdrop_pistol",    m_pInventoryWnd },
-        { eInventoryAutomaticList, "dragdrop_automatic", m_pInventoryWnd },
-        { eInventoryOutfitList,    "dragdrop_outfit",    m_pInventoryWnd },
-        { eInventoryBeltList,      "dragdrop_belt",      m_pInventoryWnd },
-        { eInventoryBagList,       "dragdrop_bag",       m_ActorWeightBar->m_BagWnd },
+        { eInventoryPistolList,    "dragdrop_pistol",    m_pInventoryWnd,            true },
+        { eInventoryAutomaticList, "dragdrop_automatic", m_pInventoryWnd,            true },
+        { eInventoryBackpackList,  "dragdrop_backpack",  m_pInventoryWnd,            false },
+        { eInventoryOutfitList,    "dragdrop_outfit",    m_pInventoryWnd,            true },
+        { eInventoryBeltList,      "dragdrop_belt",      m_pInventoryWnd,            true },
+        { eInventoryBagList,       "dragdrop_bag",       m_ActorWeightBar->m_BagWnd, true },
     };
-    for (auto [id, section, parent] : inventory_lists)
+    for (auto [id, section, parent, required] : inventory_lists)
     {
         if (id != eInventoryOutfitList)
-            m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, section, parent);
+            m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, section, parent, required);
         else // eInventoryOutfitList
         {
+            if (!required && !uiXml.NavigateToNode(section))	
+                continue;
             CUIOutfitDragDropList* list = xr_new<CUIOutfitDragDropList>();
             list->SetAutoDelete(true);
             parent->AttachChild(list);
@@ -341,6 +356,8 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
 
 void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
 {
+    using namespace ::detail::actor_menu;
+
     m_pTradeWnd = UIHelper::CreateNormalWindow(uiXml, "main", this);
 
     UIHelper::CreateStatic(uiXml, "top_background", m_pTradeWnd);
@@ -400,6 +417,8 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
 
 void CUIActorMenu::InitializeSearchLootMode(CUIXml& uiXml)
 {
+    using namespace ::detail::actor_menu;
+
     m_pSearchLootWnd = UIHelper::CreateNormalWindow(uiXml, "main", this);
 
     UIHelper::CreateStatic(uiXml, "top_background", m_pSearchLootWnd);
@@ -498,9 +517,11 @@ void CUIActorMenu::InitCallbacks()
     RegisterCallback(m_pUpgradeWnd ? m_pUpgradeWnd->m_btn_repair : nullptr, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIActorMenu::TryRepairItem));
 
+    BindDragDropListEvents(m_pLists[eInventoryKnifeList]);
     BindDragDropListEvents(m_pLists[eInventoryPistolList]);
     BindDragDropListEvents(m_pLists[eInventoryAutomaticList]);
 
+    BindDragDropListEvents(m_pLists[eInventoryBackpackList]);
     BindDragDropListEvents(m_pLists[eInventoryOutfitList]);
     BindDragDropListEvents(m_pLists[eInventoryHelmetList]);
 

@@ -14,6 +14,7 @@ enum
     AF_CROUCH_TOGGLE = (1 << 10),
     AF_MULTI_ITEM_PICKUP = (1 << 11),
     AF_LOADING_STAGES = (1 << 12),
+    AF_ALWAYS_USE_ATTITUDE_SENSORS = (1 << 13), // or only when zooming if false
 };
 
 extern Flags32 psActorFlags;

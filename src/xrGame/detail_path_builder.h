@@ -58,7 +58,7 @@ public:
             m_object->m_path_state = CMovementManager::ePathStatePathVerification;
     }
 
-    void __stdcall process() { process_impl(); }
+    void process() { process_impl(); }
     IC void remove()
     {
         if (m_object->m_wait_for_distributed_computation)

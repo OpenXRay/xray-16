@@ -39,14 +39,24 @@ CUIGameCustom::CUIGameCustom()
     m_pMessagesWnd = nullptr;
     ShowGameIndicators(true);
     ShowCrosshair(true);
+
+    InventoryUtilities::CreateShaders();
 }
 
 bool g_b_ClearGameCaptions = false;
 
 CUIGameCustom::~CUIGameCustom()
 {
+    InventoryUtilities::DestroyShaders();
+
     delete_data(CustomStatics);
     g_b_ClearGameCaptions = false;
+}
+
+void CUIGameCustom::OnUIReset()
+{
+    InventoryUtilities::DestroyShaders();
+    InventoryUtilities::CreateShaders();
 }
 
 void CUIGameCustom::OnFrame()
@@ -106,14 +116,14 @@ StaticDrawableWrapper* CUIGameCustom::AddCustomStatic(const char* id, bool singl
 {
     if (singleInstance)
     {
-        auto it = std::find_if(CustomStatics.begin(), CustomStatics.end(), predicate_find_stat(id));
+        const auto it = std::find_if(CustomStatics.begin(), CustomStatics.end(), predicate_find_stat(id));
         if (it != CustomStatics.end())
             return *it;
     }
 
     CustomStatics.push_back(xr_new<StaticDrawableWrapper>());
     StaticDrawableWrapper* sss = CustomStatics.back();
-    sss->m_static = xr_new<CUIStatic>();
+    sss->m_static = xr_new<CUIStatic>(id);
     sss->m_name = id;
     CUIXmlInit::InitStatic(*MsgConfig, id, 0, sss->m_static);
     float ttl = MsgConfig->ReadAttribFlt(id, 0, "ttl", ttlDefault);
@@ -252,7 +262,7 @@ void CUIGameCustom::Load()
     R_ASSERT(!PdaMenu);
     PdaMenu = xr_new<CUIPdaWnd>();
     R_ASSERT(!Window);
-    Window = xr_new<CUIWindow>();
+    Window = xr_new<CUIWindow>("Window");
     R_ASSERT(!UIMainIngameWnd);
     UIMainIngameWnd = xr_new<CUIMainIngameWnd>();
     UIMainIngameWnd->Init();

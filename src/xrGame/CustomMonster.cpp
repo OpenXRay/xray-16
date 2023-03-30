@@ -75,7 +75,7 @@ void CCustomMonster::SAnimState::Create(IKinematicsAnimated* K, LPCSTR base)
     rs = K->ID_Cycle_Safe(strconcat(sizeof(buf), buf, base, "_rs"));
 }
 
-// void __stdcall CCustomMonster::TorsoSpinCallback(CBoneInstance* B)
+// void CCustomMonster::TorsoSpinCallback(CBoneInstance* B)
 //{
 //	CCustomMonster*		M = static_cast<CCustomMonster*> (B->Callback_Param);
 //
@@ -618,9 +618,9 @@ void CCustomMonster::update_range_fov(float& new_range, float& new_fov, float st
 {
     const float standard_far_plane = eye_range;
 
-    float current_fog_density = GamePersistent().Environment().CurrentEnv->fog_density;
+    float current_fog_density = GamePersistent().Environment().CurrentEnv.fog_density;
     // 0=no_fog, 1=full_fog, >1 = super-fog
-    float current_far_plane = GamePersistent().Environment().CurrentEnv->far_plane;
+    float current_far_plane = GamePersistent().Environment().CurrentEnv.far_plane;
     // 300=standart, 50=super-fog
 
     new_fov = start_fov;

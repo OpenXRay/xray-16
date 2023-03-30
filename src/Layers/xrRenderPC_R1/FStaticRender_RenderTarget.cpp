@@ -1,6 +1,5 @@
 #include "stdafx.h"
-#include "fstaticrender_rendertarget.h"
-#include "FStaticRender_Types.h"
+#include "FStaticRender_RenderTarget.h"
 #include "xrEngine/IGame_Persistent.h"
 
 CRenderTarget::CRenderTarget()

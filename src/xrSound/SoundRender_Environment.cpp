@@ -2,12 +2,9 @@
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
-#if defined(XR_PLATFORM_WINDOWS)
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <eax/eax.h>
-#pragma warning(pop)
-#endif
+
+#include "SoundRender_EffectsA_EAX.h"
+#include "SoundRender_EffectsA_EFX.h"
 
 CSoundRender_Environment::CSoundRender_Environment()
 {
@@ -18,7 +15,7 @@ CSoundRender_Environment::CSoundRender_Environment()
 CSoundRender_Environment::~CSoundRender_Environment() {}
 void CSoundRender_Environment::set_default()
 {
-#if defined(XR_PLATFORM_WINDOWS)
+#if defined(XR_HAS_EAX)
     Environment = EAX_ENVIRONMENT_GENERIC;
     Room = EAXLISTENER_DEFAULTROOM;
     RoomHF = EAXLISTENER_DEFAULTROOMHF;
@@ -32,14 +29,40 @@ void CSoundRender_Environment::set_default()
     EnvironmentSize = EAXLISTENER_DEFAULTENVIRONMENTSIZE;
     EnvironmentDiffusion = EAXLISTENER_DEFAULTENVIRONMENTDIFFUSION;
     AirAbsorptionHF = EAXLISTENER_DEFAULTAIRABSORPTIONHF;
+#else
+    Room = AL_EAXREVERB_DEFAULT_GAIN;
+    RoomHF = AL_EAXREVERB_DEFAULT_GAINHF;
+    RoomRolloffFactor = AL_EAXREVERB_DEFAULT_ROOM_ROLLOFF_FACTOR;
+    DecayTime = AL_EAXREVERB_DEFAULT_DECAY_TIME;
+    DecayHFRatio = AL_EAXREVERB_DEFAULT_DECAY_HFRATIO;
+    DecayLFRatio = AL_EAXREVERB_DEFAULT_DECAY_LFRATIO;
+    Reflections = AL_EAXREVERB_DEFAULT_REFLECTIONS_GAIN;
+    ReflectionsDelay = AL_EAXREVERB_DEFAULT_REFLECTIONS_DELAY;
+    Reverb =  AL_EAXREVERB_DEFAULT_LATE_REVERB_GAIN;
+    ReverbDelay = AL_EAXREVERB_DEFAULT_LATE_REVERB_DELAY;
+    EnvironmentSize = AL_DEFAULT_METERS_PER_UNIT;
+    EnvironmentDiffusion = AL_EAXREVERB_DEFAULT_DIFFUSION;
+    AirAbsorptionHF = AL_EAXREVERB_DEFAULT_AIR_ABSORPTION_GAINHF;
+    DecayHFLimit = AL_EAXREVERB_DEFAULT_DECAY_HFLIMIT;
+    ReflectionsPan = {0.f, 0.f, 0.f};
+    EchoTime = AL_EAXREVERB_DEFAULT_ECHO_TIME;
+    EchoDepth = AL_EAXREVERB_DEFAULT_ECHO_DEPTH;
+    ReverbPan = {0.f, 0.f, 0.f};
+    ModulationTime = AL_EAXREVERB_DEFAULT_MODULATION_TIME;
+    ModulationDepth = AL_EAXREVERB_DEFAULT_MODULATION_DEPTH;
+    Density = AL_EAXREVERB_DEFAULT_DENSITY;
+    HFReference = AL_EAXREVERB_DEFAULT_HFREFERENCE;
+    LFReference = AL_EAXREVERB_DEFAULT_LFREFERENCE;
 #endif
 }
 
 void CSoundRender_Environment::set_identity()
 {
     set_default();
-#if defined(XR_PLATFORM_WINDOWS)
+#if defined(XR_HAS_EAX)
     Room = EAXLISTENER_MINROOM;
+#else
+    Room = AL_EAXREVERB_DEFAULT_GAIN;
 #endif
     clamp();
 }
@@ -60,6 +83,16 @@ void CSoundRender_Environment::lerp(CSoundRender_Environment& A, CSoundRender_En
     EnvironmentSize = fi * A.EnvironmentSize + f * B.EnvironmentSize;
     EnvironmentDiffusion = fi * A.EnvironmentDiffusion + f * B.EnvironmentDiffusion;
     AirAbsorptionHF = fi * A.AirAbsorptionHF + f * B.AirAbsorptionHF;
+#if defined(XR_HAS_EFX)
+    DecayLFRatio = fi * A.DecayLFRatio + f * B.DecayLFRatio;
+    ModulationTime = fi * A.ModulationTime + f * B.ModulationTime;
+    ModulationDepth = fi * A.ModulationDepth + f * B.ModulationDepth;
+    Density = fi * A.Density + f * B.Density;
+    HFReference = fi * A.HFReference + f * B.HFReference;
+    LFReference = fi * A.LFReference + f * B.LFReference;
+    EchoTime = fi * A.EchoTime + f * B.EchoTime;
+    EchoDepth = fi * A.EchoDepth + f * B.EchoDepth;
+#endif
 
     clamp();
 }
@@ -87,7 +120,7 @@ initial reflection
 */
 void CSoundRender_Environment::clamp()
 {
-#if defined(XR_PLATFORM_WINDOWS)
+#if defined(XR_HAS_EAX)
     ::clamp(Room, (float)EAXLISTENER_MINROOM, (float)EAXLISTENER_MAXROOM);
     ::clamp(RoomHF, (float)EAXLISTENER_MINROOMHF, (float)EAXLISTENER_MAXROOMHF);
     ::clamp(RoomRolloffFactor, EAXLISTENER_MINROOMROLLOFFFACTOR, EAXLISTENER_MAXROOMROLLOFFFACTOR);
@@ -100,14 +133,37 @@ void CSoundRender_Environment::clamp()
     ::clamp(EnvironmentSize, EAXLISTENER_MINENVIRONMENTSIZE, EAXLISTENER_MAXENVIRONMENTSIZE);
     ::clamp(EnvironmentDiffusion, EAXLISTENER_MINENVIRONMENTDIFFUSION, EAXLISTENER_MAXENVIRONMENTDIFFUSION);
     ::clamp(AirAbsorptionHF, EAXLISTENER_MINAIRABSORPTIONHF, EAXLISTENER_MAXAIRABSORPTIONHF);
+#else
+    ::clamp(Room, (float)AL_EAXREVERB_MIN_GAIN, (float)AL_EAXREVERB_MAX_GAIN);
+    ::clamp(RoomHF, (float)AL_EAXREVERB_MIN_GAINHF, (float)AL_EAXREVERB_MAX_GAINHF);
+    ::clamp(RoomRolloffFactor,AL_EAXREVERB_MIN_ROOM_ROLLOFF_FACTOR, AL_EAXREVERB_MAX_ROOM_ROLLOFF_FACTOR);
+    ::clamp(DecayTime, AL_EAXREVERB_MIN_DECAY_TIME, AL_EAXREVERB_MAX_DECAY_TIME);
+    ::clamp(DecayHFRatio, AL_EAXREVERB_MIN_DECAY_HFRATIO, AL_EAXREVERB_MAX_DECAY_HFRATIO);
+    ::clamp(DecayLFRatio, AL_EAXREVERB_MIN_DECAY_LFRATIO, AL_EAXREVERB_MAX_DECAY_LFRATIO);
+    ::clamp(Reflections, (float)AL_EAXREVERB_MIN_REFLECTIONS_GAIN, (float)AL_EAXREVERB_MAX_REFLECTIONS_GAIN);
+    ::clamp(ReflectionsDelay, AL_EAXREVERB_MIN_REFLECTIONS_DELAY, (float)AL_EAXREVERB_MAX_REFLECTIONS_DELAY);
+    ::clamp(EchoTime, AL_EAXREVERB_MIN_ECHO_TIME, AL_EAXREVERB_MAX_ECHO_TIME);
+    ::clamp(EchoTime, AL_EAXREVERB_MIN_ECHO_DEPTH, AL_EAXREVERB_MAX_ECHO_DEPTH);
+    ::clamp(Reverb, (float)AL_EAXREVERB_MIN_LATE_REVERB_GAIN, (float)AL_EAXREVERB_MAX_LATE_REVERB_GAIN);
+    ::clamp(ReverbDelay, AL_EAXREVERB_MIN_LATE_REVERB_DELAY, AL_EAXREVERB_MAX_LATE_REVERB_DELAY);
+    ::clamp(EnvironmentDiffusion, AL_EAXREVERB_MIN_DIFFUSION, AL_EAXREVERB_MAX_DIFFUSION);
+    ::clamp(AirAbsorptionHF, AL_EAXREVERB_MIN_AIR_ABSORPTION_GAINHF, AL_EAXREVERB_MAX_AIR_ABSORPTION_GAINHF);
+    ::clamp(ModulationTime, AL_EAXREVERB_MIN_MODULATION_TIME, AL_EAXREVERB_MAX_MODULATION_TIME);
+    ::clamp(ModulationDepth, AL_EAXREVERB_MIN_MODULATION_DEPTH, AL_EAXREVERB_MAX_MODULATION_DEPTH);
+    ::clamp(Density, AL_EAXREVERB_MIN_DENSITY, AL_EAXREVERB_MAX_DENSITY);
+    ::clamp(HFReference, AL_EAXREVERB_MIN_HFREFERENCE, AL_EAXREVERB_MAX_HFREFERENCE);
+    ::clamp(LFReference, AL_EAXREVERB_MIN_LFREFERENCE, AL_EAXREVERB_MAX_LFREFERENCE);
+    ::clamp(DecayHFLimit, AL_EAXREVERB_MIN_DECAY_HFLIMIT, AL_EAXREVERB_MAX_DECAY_HFLIMIT);
 #endif
 }
 
 bool CSoundRender_Environment::load(IReader* fs)
 {
     version = fs->r_u32();
+    if (version < 0x0003)
+        return false;
 
-    if (version >= 0x0003)
+    // if (version >= 0x0003)
     {
         fs->r_stringZ(name);
 
@@ -123,11 +179,28 @@ bool CSoundRender_Environment::load(IReader* fs)
         EnvironmentSize = fs->r_float();
         EnvironmentDiffusion = fs->r_float();
         AirAbsorptionHF = fs->r_float();
-        if (version > 0x0003)
-            Environment = fs->r_u32();
-        return true;
     }
-    return false;
+
+    if (version >= 0x0004)
+        Environment = fs->r_u32();
+
+    if (version >= 0x0005)
+    {
+        DecayHFLimit = fs->r_u32();
+        EchoTime = fs->r_float();
+        EchoDepth = fs->r_float();
+        ReflectionsPan = fs->r_vec3();
+        ReverbDelay = fs->r_float();
+        ReverbPan = fs->r_vec3();
+        DecayLFRatio = fs->r_float();
+        ModulationTime = fs->r_float();
+        ModulationDepth = fs->r_float();
+        HFReference = fs->r_float();
+        LFReference = fs->r_float();
+        Density = fs->r_float();
+    }
+
+    return true;
 }
 
 void CSoundRender_Environment::save(IWriter* fs)
@@ -148,7 +221,24 @@ void CSoundRender_Environment::save(IWriter* fs)
     fs->w_float(EnvironmentDiffusion);
     fs->w_float(AirAbsorptionHF);
 
-    fs->w_u32(Environment);
+    if (sdef_env_version >= 0x0004)
+        fs->w_u32(Environment);
+        
+    if (sdef_env_version >= 0x0005)
+    {
+        fs->w_u32(DecayHFLimit);
+        fs->w_float(EchoTime);
+        fs->w_float(EchoDepth);
+        fs->w_fvector3(ReflectionsPan);
+        fs->w_float(ReverbDelay);
+        fs->w_fvector3(ReverbPan);
+        fs->w_float(DecayLFRatio);
+        fs->w_float(ModulationTime);
+        fs->w_float(ModulationDepth);
+        fs->w_float(HFReference);
+        fs->w_float(LFReference);
+        fs->w_float(Density);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -185,8 +275,8 @@ bool SoundEnvironment_LIB::Save(pcstr name)
 }
 void SoundEnvironment_LIB::Unload()
 {
-    for (u32 chunk = 0; chunk < library.size(); chunk++)
-        xr_delete(library[chunk]);
+    for (auto& lib : library)
+        xr_delete(lib);
     library.clear();
 }
 int SoundEnvironment_LIB::GetID(pcstr name)

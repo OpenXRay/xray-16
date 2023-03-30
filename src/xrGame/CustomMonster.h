@@ -123,7 +123,7 @@ public:
     // stream executors
     virtual void Exec_Action(float dt);
     virtual void Exec_Look(float dt);
-    void __stdcall Exec_Visibility();
+    void Exec_Visibility();
     virtual void eye_pp_s0();
     void eye_pp_s1();
     void eye_pp_s2();
@@ -246,7 +246,7 @@ public:
     virtual void update_range_fov(float& new_range, float& new_fov, float start_range, float start_fov);
 
 public:
-    void __stdcall update_sound_player();
+    void update_sound_player();
     virtual void on_restrictions_change();
 
     virtual bool should_wait_to_use_corspe_visual() { return true; }

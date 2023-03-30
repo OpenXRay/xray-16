@@ -3,8 +3,7 @@
 #pragma once
 
 #ifdef SDL_OUTPUT
-#include "SDL.h"
-#pragma comment(lib, "SDL.lib")
+#include <SDL.h>
 #endif
 
 // refs

@@ -5,7 +5,7 @@
 
 #include "../Artefact.h"
 
-CUIArtefactPanel::CUIArtefactPanel()
+CUIArtefactPanel::CUIArtefactPanel() : CUIWindow("CUIArtefactPanel")
 {
     m_cell_size.set(50.0f, 50.0f);
     m_fScale = 0.5f;
@@ -21,7 +21,9 @@ void CUIArtefactPanel::InitFromXML(CUIXml& xml, pcstr path, int index)
 
     m_cell_size.x = xml.ReadAttribFlt(path, index, "cell_width", 50.0f);
     m_cell_size.y = xml.ReadAttribFlt(path, index, "cell_height", 50.0f);
-    m_fScale = xml.ReadAttribFlt(path, index, "scale", 0.5f);
+    m_fScale      = xml.ReadAttribFlt(path, index, "scale", 0.5f);
+    m_bVert       = xml.ReadAttribInt(path, index, "vert") == 1;
+    m_iIndent     = xml.ReadAttribInt(path, index, "indent", 1);
 }
 
 void CUIArtefactPanel::InitIcons(const xr_vector<const CArtefact*>& artefacts)
@@ -44,7 +46,6 @@ void CUIArtefactPanel::InitIcons(const xr_vector<const CArtefact*>& artefacts)
 
 void CUIArtefactPanel::Draw()
 {
-    const float iIndent = 1.0f;
     float x = 0.0f;
     float y = 0.0f;
 
@@ -64,7 +65,10 @@ void CUIArtefactPanel::Draw()
         m_StaticItem.SetTextureRect(r);
         m_StaticItem.SetSize(size);
         m_StaticItem.SetPos(x, y);
-        x = x + iIndent + size.x;
+        if (!m_bVert)
+            x = x + m_iIndent + size.x;
+        else
+            y = y + m_iIndent + size.y;
 
         m_StaticItem.Render();
     }

@@ -75,6 +75,8 @@ public:
     void IR_OnControllerHold(int key, float x, float y) override;
     void IR_OnControllerRelease(int key, float x, float y) override;
 
+    void IR_OnControllerAttitudeChange(Fvector change) override;
+
     virtual bool ProcessCam(SCamEffectorInfo& info);
     static void SetGlobalPosition(const Fvector& p) { g_position.p.set(p), g_position.set_position = true; }
     static void GetGlobalPosition(Fvector& p) { p.set(g_position.p); }

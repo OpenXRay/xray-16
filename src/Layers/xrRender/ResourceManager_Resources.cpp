@@ -25,22 +25,6 @@ void simplify_texture(string_path& fn)
     }
 }
 
-template <class T>
-BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
-{
-    auto it = vec.begin();
-    auto end = vec.end();
-    for (; it != end; ++it)
-    {
-        if (*it == ptr)
-        {
-            vec.erase(it);
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
 SState* CResourceManager::_CreateState(SimulatorStates& state_code)
 {
     // Search equal state-code 
@@ -124,7 +108,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sam
         CRT* RT = xr_new<CRT>();
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_rtargets.emplace(RT->set_name(Name), RT);
-        if (RDEVICE.b_is_Ready)
+        if (Device.b_is_Ready)
             RT->create(Name, w, h, f, sampleCount, flags);
         return RT;
     }
@@ -230,7 +214,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     T->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     m_textures.emplace(T->set_name(Name), T);
     T->Preload();
-    if (RDEVICE.b_is_Ready && !bDeferredLoad)
+    if (Device.b_is_Ready && !bDeferredLoad)
         T->Load();
     return T;
 }

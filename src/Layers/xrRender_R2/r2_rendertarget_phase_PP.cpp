@@ -2,8 +2,19 @@
 
 void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 {
-    CTexture* T = RCache.get_ActiveTexture(2);
-    VERIFY2(T, "Texture #3 in noise shader should be setted up");
+    R_constant* C = RCache.get_c(RImplementation.c_snoise)._get(); // get texture
+    VERIFY2(C, "s_noise texture in noise shader should be set");
+    VERIFY(RC_dest_sampler == C->destination);
+#if defined(USE_DX9) || defined(USE_OGL)
+    VERIFY(RC_sampler == C->type);
+#elif defined(USE_DX11)
+    VERIFY(RC_dx11texture == C->type);
+#else
+#   error Select correct check for your graphics API
+#endif
+
+    CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index));
+    VERIFY2(T, "s_noise texture in noise shader should be set");
     u32 tw = iCeil(float(T->get_Width()) * param_noise_scale + EPS_S);
     u32 th = iCeil(float(T->get_Height()) * param_noise_scale + EPS_S);
     VERIFY2(tw && th, "Noise scale can't be zero in any way");

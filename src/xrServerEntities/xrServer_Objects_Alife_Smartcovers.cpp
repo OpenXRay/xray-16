@@ -16,11 +16,9 @@
 #ifdef XRSE_FACTORY_EXPORTS
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
-#pragma warning(push)
-#pragma warning(disable : 4995)
+
 #include <luabind/luabind.hpp>
 #include <shlwapi.h>
-#pragma warning(pop)
 
 #pragma comment(lib, "shlwapi.lib")
 static SFillPropData fp_data;
@@ -137,7 +135,8 @@ void CSE_SmartCover::STATE_Write(NET_Packet& tNetPacket)
 
 void CSE_SmartCover::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
 void CSE_SmartCover::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }
-#ifndef XRGAME_EXPORTS
+
+#ifndef MASTER_GOLD
 void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
 {
 #ifdef XRSE_FACTORY_EXPORTS
@@ -158,7 +157,7 @@ void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
     }
 #endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 #ifdef XRSE_FACTORY_EXPORTS
 void CSE_SmartCover::set_loopholes_table_checker(BOOLValue* value)
@@ -288,7 +287,7 @@ void CSE_SmartCover::check_enterable_loopholes(shared_str const& description)
 class CSE_SmartVisual : public CSE_Visual
 {
 public:
-    virtual CSE_Visual* __stdcall visual() { return (this); }
+    virtual CSE_Visual* visual() { return (this); }
 }; // class CSE_SmartVisual
 
 void CSE_SmartCover::fill_visuals()

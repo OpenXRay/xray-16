@@ -35,7 +35,7 @@ public:
     inline bool is_active() const { return m_state != eUploadNotActive; };
     void start_upload_info(IReader const* svlogo, IReader const* svrules, ClientID const& toclient,
         svinfo_upload_complete_cb const& complete_cb);
-    void __stdcall upload_server_info_callback(file_transfer::sending_status_t status, u32 uploaded, u32 total);
+    void upload_server_info_callback(file_transfer::sending_status_t status, u32 uploaded, u32 total);
 }; // class server_info_uploader
 
 #endif //#ifndef SERVER_INFO_UPLOADER

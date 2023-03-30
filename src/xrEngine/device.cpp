@@ -1,38 +1,32 @@
 #include "stdafx.h"
 #include "xrCDB/Frustum.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-// mmsystem.h
-#define MMNOSOUND
-#define MMNOMIDI
-#define MMNOAUX
-#define MMNOMIXER
-#define MMNOJOY
-#if defined(XR_PLATFORM_WINDOWS)
-#include <mmsystem.h>
-#endif
-#include "SDL.h"
-#pragma warning(pop)
-
-#include <thread>
-
 #include "x_ray.h"
 #include "Render.h"
 
 #include "xrCore/FS_impl.h"
 #include "xrCore/Threading/TaskManager.hpp"
 
-#include "Include/editor/ide.hpp"
-
-#if !defined(XR_PLATFORM_LINUX)
 #include "xrSASH.h"
-#endif
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "splash.h"
+
+#include <thread>
+
+#include <SDL.h>
+
+// mmsystem.h
+#if defined(XR_PLATFORM_WINDOWS)
+#define MMNOSOUND
+#define MMNOMIDI
+#define MMNOAUX
+#define MMNOMIXER
+#define MMNOJOY
+#include <mmsystem.h>
+#endif
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -112,14 +106,19 @@ void CRenderDevice::RenderEnd(void)
     g_bRendering = false;
     // end scene
     // Present goes here, so call OA Frame end.
-#if !defined(XR_PLATFORM_LINUX)
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(fTimeGlobal);
-#endif
+
     GEnv.Render->End();
 
-    if (load_finished && m_editor)
-        m_editor->on_load_finished();
+    vCameraPositionSaved = vCameraPosition;
+    vCameraDirectionSaved = vCameraDirection;
+    vCameraTopSaved = vCameraTop;
+    vCameraRightSaved = vCameraRight;
+
+    mFullTransformSaved = mFullTransform;
+    mViewSaved = mView;
+    mProjectSaved = mProject;
 }
 
 #include "IGame_Level.h"
@@ -194,10 +193,8 @@ bool CRenderDevice::BeforeFrame()
         return false;
     }
 
-#if !defined(XR_PLATFORM_LINUX)
     if (!dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
-#endif
 
     return true;
 }
@@ -217,18 +214,11 @@ void CRenderDevice::BeforeRender()
     }
 
     // Matrices
+    mInvView.invert(mView);
     mFullTransform.mul(mProject, mView);
-    GEnv.Render->SetCacheXform(mView, mProject);
     mInvFullTransform.invert_44(mFullTransform);
-
-    vCameraPositionSaved = vCameraPosition;
-    vCameraDirectionSaved = vCameraDirection;
-    vCameraTopSaved = vCameraTop;
-    vCameraRightSaved = vCameraRight;
-
-    mFullTransformSaved = mFullTransform;
-    mViewSaved = mView;
-    mProjectSaved = mProject;
+    GEnv.Render->BeforeRender();
+    GEnv.Render->SetCacheXform(mView, mProject);
 }
 
 void CRenderDevice::DoRender()
@@ -268,7 +258,6 @@ void CRenderDevice::ProcessFrame()
 
     const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
 
-    GEnv.Render->BeforeFrame();
     FrameMove();
 
     BeforeRender();
@@ -297,25 +286,13 @@ void CRenderDevice::ProcessFrame()
         Sleep(1);
 }
 
-void CRenderDevice::message_loop_weather_editor()
-{
-    m_editor->run();
-    m_editor_finalize(m_editor);
-}
-
 void CRenderDevice::message_loop()
 {
-    if (editor())
-    {
-        message_loop_weather_editor();
-        return;
-    }
-
-    bool canCallActivate = false;
-    bool shouldActivate = false;
-
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
+        bool canCallActivate = false;
+        bool shouldActivate = false;
+
         SDL_Event events[MAX_WINDOW_EVENTS];
         const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
             SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
@@ -347,7 +324,8 @@ void CRenderDevice::message_loop()
                     else
                         UpdateWindowProps();
                     break;
-                }
+                } // switch (event.display.type)
+                break;
             }
 #endif
             case SDL_WINDOWEVENT:
@@ -402,15 +380,16 @@ void CRenderDevice::message_loop()
                 case SDL_WINDOWEVENT_CLOSE:
                     Engine.Event.Defer("KERNEL:disconnect");
                     Engine.Event.Defer("KERNEL:quit");
-                }
+                } // switch (event.window.event)
+                break;
             }
-            }
-        }
+            } // switch (event.type)
+        } // for (int i = 0; i < count; ++i)
+
         // Workaround for screen blinking when there's too much timeouts
         if (canCallActivate)
         {
-            OnWM_Activate(shouldActivate ? 1 : 0, 0);
-            canCallActivate = false;
+            OnWindowActivate(shouldActivate);
         }
 
         ProcessFrame();
@@ -521,7 +500,7 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
     {
         if (!Paused())
         {
-            if (editor())
+            if (editor_mode())
                 bShowPauseString = false;
 #ifdef DEBUG
             else if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
@@ -564,23 +543,18 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
 
 bool CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 
-void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
+void CRenderDevice::OnWindowActivate(bool activated)
 {
-    u16 fActive = LOWORD(wParam);
-    const bool fMinimized = (bool)HIWORD(wParam);
-
-    const bool isWndActive = fActive != WA_INACTIVE && !fMinimized;
-
-    if (!editor() && !GEnv.isDedicatedServer && isWndActive)
+    if (!GEnv.isDedicatedServer && activated)
         pInput->GrabInput(true);
     else
         pInput->GrabInput(false);
 
-    b_is_Active = isWndActive || psDeviceFlags.test(rsAlwaysActive);
+    b_is_Active = activated || psDeviceFlags.test(rsAlwaysActive);
 
-    if (isWndActive != b_is_InFocus)
+    if (activated != b_is_InFocus)
     {
-        b_is_InFocus = isWndActive;
+        b_is_InFocus = activated;
         if (b_is_InFocus)
         {
             seqAppActivate.Process();
@@ -592,6 +566,14 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
             seqAppDeactivate.Process();
         }
     }
+}
+
+void CRenderDevice::time_factor(const float time_factor)
+{
+    Timer.time_factor(time_factor);
+    TimerGlobal.time_factor(time_factor);
+    if (!strstr(Core.Params, "-sound_constant_speed"))
+        psSoundTimeFactor = time_factor; //--#SM+#--
 }
 
 void CRenderDevice::AddSeqFrame(pureFrame* f, bool mt)

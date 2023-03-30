@@ -26,8 +26,11 @@
 #include <ode/error.h>
 #include <math.h>
 
-#ifdef XR_PLATFORM_LINUX
-#include <alloca.h>
+#if __has_include(<alloca.h>)
+#include <alloca.h> // for alloca under Linux
+#endif
+#if __has_include(<malloc.h>)
+#include <malloc.h> // for alloca under Windows
 #endif
 
 #ifdef __cplusplus

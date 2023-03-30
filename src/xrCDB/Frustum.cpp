@@ -63,9 +63,20 @@ void CFrustum::_add(Fvector& P1, Fvector& P2, Fvector& P3)
 #define My 4
 #define Mz 5
 
-u32 frustum_aabb_remap[8][6] = {{Mx, My, Mz, mx, my, mz}, {Mx, My, mz, mx, my, Mz}, {Mx, my, Mz, mx, My, mz},
-    {Mx, my, mz, mx, My, Mz}, {mx, My, Mz, Mx, my, mz}, {mx, My, mz, Mx, my, Mz}, {mx, my, Mz, Mx, My, mz},
-    {mx, my, mz, Mx, My, Mz}};
+u32 frustum_aabb_remap[8][6] =
+{
+    {Mx, My, Mz, mx, my, mz}, {Mx, My, mz, mx, my, Mz},
+    {Mx, my, Mz, mx, My, mz}, {Mx, my, mz, mx, My, Mz},
+    {mx, My, Mz, Mx, my, mz}, {mx, My, mz, Mx, my, Mz},
+    {mx, my, Mz, Mx, My, mz}, {mx, my, mz, Mx, My, Mz}
+};
+
+#undef mx
+#undef my
+#undef mz
+#undef Mx
+#undef My
+#undef Mz
 
 //////////////////////////////////////////////////////////////////////
 EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
@@ -88,7 +99,7 @@ EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
     return test_mask ? fcvPartial : fcvFully;
 }
 
-bool CFrustum::testSphere_dirty(Fvector& c, float r) const
+bool CFrustum::testSphere_dirty(const Fvector& c, float r) const
 {
 	VERIFY(p_count <= FRUSTUM_MAXPLANES); // '<=' is not a typo, this check is correct
     if (p_count == 0)
@@ -247,10 +258,10 @@ void CFrustum::SimplifyPoly_AABB(sPoly* poly, Fplane& plane)
     Fvector2 min, max;
     min.set(flt_max, flt_max);
     max.set(flt_min, flt_min);
-    for (u32 i = 0; i < poly->size(); i++)
+    for (auto& v : *poly)
     {
         Fvector2 tmp;
-        mView.transform_tiny32(tmp, (*poly)[i]);
+        mView.transform_tiny32(tmp, v);
         min.min(tmp.x, tmp.y);
         max.max(tmp.x, tmp.y);
     }

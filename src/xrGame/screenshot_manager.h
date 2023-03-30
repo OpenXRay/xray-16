@@ -19,13 +19,13 @@ public:
     screenshot_manager();
     virtual ~screenshot_manager();
 
-    virtual float shedule_Scale() { return 1.0f; };
+    virtual float shedule_Scale() const { return 1.0f; };
     virtual void shedule_Update(u32 dt);
     virtual shared_str shedule_Name() const { return shared_str("screenshot_manager"); };
     virtual bool shedule_Needed() { return true; };
     void make_screenshot(complete_callback_t cb);
     void set_draw_downloads(bool draw);
-    void __stdcall jpeg_compress_cb(long progress);
+    void jpeg_compress_cb(long progress);
 
 private:
     CMemoryWriter m_result_writer;

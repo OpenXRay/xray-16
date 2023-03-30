@@ -28,12 +28,14 @@
 #include "UIActorInfo.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
+#include "UIScriptWnd.h"
 
 #define PDA_XML "pda.xml"
 
 u32 g_pda_info_state = 0;
 
 void RearrangeTabButtons(CUITabControl* pTab);
+CDialogHolder* CurrentDialogHolder();
 
 CUIPdaWnd::CUIPdaWnd()
 {
@@ -62,7 +64,8 @@ CUIPdaWnd::~CUIPdaWnd()
     if (pUILogsWnd)
         delete_data(pUILogsWnd);
     delete_data(m_hint_wnd);
-    delete_data(UINoice);
+    if (UINoice)
+        delete_data(UINoice);
 }
 
 void CUIPdaWnd::Init()
@@ -124,9 +127,10 @@ void CUIPdaWnd::Init()
     CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl);
     UITabControl->SetMessageTarget(this);
 
-    UINoice = xr_new<CUIStatic>();
+    UINoice = xr_new<CUIStatic>("Noise");
     UINoice->SetAutoDelete(true);
-    CUIXmlInit::InitStatic(uiXml, "noice_static", 0, UINoice);
+    if (!CUIXmlInit::InitStatic(uiXml, "noice_static", 0, UINoice, false))
+        xr_delete(UINoice);
 
     // XXX: dynamically determine if we need to rearrange the tabs
     if (ClearSkyMode)
@@ -239,6 +243,17 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         m_pActiveDialog = pUILogsWnd;
     }
 
+    luabind::functor<CUIDialogWndEx*> functor;
+    if (GEnv.ScriptEngine->functor("pda.set_active_subdialog", functor))
+    {
+        CUIDialogWndEx* scriptWnd = functor(section.c_str());
+        if (scriptWnd)
+        {
+            scriptWnd->SetHolder(CurrentDialogHolder());
+            m_pActiveDialog = scriptWnd;
+        }
+    }
+
     R_ASSERT(m_pActiveDialog);
     UIMainPdaFrame->AttachChild(m_pActiveDialog);
     m_pActiveDialog->Show(true);
@@ -298,7 +313,8 @@ void CUIPdaWnd::Draw()
     inherited::Draw();
     //.	DrawUpdatedSections();
     DrawHint();
-    UINoice->Draw(); // over all
+    if (UINoice)
+        UINoice->Draw(); // over all
 }
 
 void CUIPdaWnd::DrawHint()
@@ -360,7 +376,7 @@ void CUIPdaWnd::Reset()
         pUILogsWnd->ResetAll();
 }
 
-void CUIPdaWnd::SetCaption(LPCSTR text) { m_caption->SetText(text); }
+void CUIPdaWnd::SetCaption(pcstr text) { m_caption->SetText(text); }
 void RearrangeTabButtons(CUITabControl* pTab)
 {
     const auto& buttons = *pTab->GetButtonsVector();

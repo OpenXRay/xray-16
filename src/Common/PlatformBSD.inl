@@ -14,23 +14,20 @@
 #include <sched.h>
 
 #include <algorithm> // for min max
+#include <stddef.h>
 
 #include <string>
-#include <pthread_np.h>
-#define pthread_setname_np pthread_set_name_np
-#define cpu_set_t cpuset_t
 #include <pthread.h>
 #include <fcntl.h>
 #include <sys/mman.h> // for mmap / munmap
 #include <dirent.h>
 #include <utime.h>
 #include <ctime>
+#include <fenv.h>
+
+#pragma STDC FENV_ACCESS ON
 
 #define _LINUX // for GameSpy
-
-#if !defined(__INTEL_COMPILER)
-#define _alloca alloca
-#endif
 
 #define _MAX_PATH PATH_MAX + 1
 #define MAX_PATH PATH_MAX + 1
@@ -53,17 +50,7 @@
 #define CALLBACK
 #define TEXT(x) strdup(x)
 
-/*
-inline char* _strlwr_l(char* str, locale_t loc)
-{
-//TODO
-}
 
-inline char* _strupr_l(char* str, locale_t loc)
-{
-//TODO
-}
-*/
 
 #define VOID void
 #define HKL void*
@@ -72,7 +59,6 @@ inline char* _strupr_l(char* str, locale_t loc)
 
 #define __except(X) catch(X)
 
-#define tid_t pthread_t
 #define GetCurrentProcessId getpid
 #define GetCurrentThreadId pthread_self
 
@@ -214,7 +200,7 @@ typedef struct tagTOGGLEKEYS
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
 
-#ifdef XR_ARCHITECTURE_X64
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64)
 typedef int64_t INT_PTR;
 typedef uint64_t UINT_PTR;
 typedef int64_t LONG_PTR;
@@ -252,10 +238,6 @@ typedef struct tagPOINT {
 
 #define DWORD_PTR UINT_PTR
 #define WM_USER 0x0400
-#define WA_INACTIVE 0
-#define HIWORD(l)              ((WORD)((DWORD_PTR)(l) >> 16))
-#define LOWORD(l)              ((WORD)((DWORD_PTR)(l) & 0xFFFF))
-
 
 #define TRUE true
 #define FALSE false
@@ -275,8 +257,14 @@ typedef dirent DirEntryType;
 #define O_SEQUENTIAL 0
 #define SH_DENYWR 0
 
+#if __has_include(<SDL_stdinc.h>)
+#include <SDL_stdinc.h>
 #define itoa SDL_itoa
 #define _itoa_s SDL_itoa
+#else
+#define itoa(...) do { static_assert(false, "SDL_stdinc.h is missing"); } while (false)
+#define _itoa_s(...) do { static_assert(false, "SDL_stdinc.h is missing"); } while (false)
+#endif
 
 #define _stricmp stricmp
 #define strcmpi stricmp
@@ -413,7 +401,6 @@ inline int vsnprintf_s(char* buffer, size_t size, size_t, const char* format, va
     return vsnprintf(buffer, size, format, list);
 }
 #define vsprintf_s(dest, size, format, args) vsprintf(dest, format, args)
-#define _alloca alloca
 #define _snprintf snprintf
 #define sprintf_s(buffer, buffer_size, stringbuffer, ...) sprintf(buffer, stringbuffer, ##__VA_ARGS__)
 //#define GetProcAddress(handle, name) dlsym(handle, name)
@@ -1110,3 +1097,5 @@ inline void restore_path_separators(char * path)
 }
 
 inline tm* localtime_safe(const time_t *time, struct tm* result){ return localtime_r(time, result); }
+
+#define xr_strerror(errno, buffer, bufferSize) strerror_r(errno, buffer, sizeof(buffer))

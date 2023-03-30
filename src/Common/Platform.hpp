@@ -7,8 +7,11 @@
 #   define XR_PLATFORM_LINUX
 #   define _XRAY_PLATFORM_MARKER "Linux"
 #elif defined(__FreeBSD__)
-#   define XR_PLATFORM_FREEBSD
-#   define _XRAY_PLATFORM_MARKER "FreeBSD"
+#   define XR_PLATFORM_BSD
+#   define _XRAY_PLATFORM_MARKER "BSD"
+#elif defined(__APPLE__)
+#   define XR_PLATFORM_APPLE
+#   define _XRAY_PLATFORM_MARKER "Apple"
 #else
 #   error Unsupported platform
 #endif
@@ -45,8 +48,10 @@
 #include "Common/PlatformWindows.inl"
 #elif defined(XR_PLATFORM_LINUX)
 #include "Common/PlatformLinux.inl"
-#elif defined(XR_PLATFORM_FREEBSD)
+#elif defined(XR_PLATFORM_BSD)
 #include "Common/PlatformBSD.inl"
+#elif defined(XR_PLATFORM_APPLE)
+#include "Common/PlatformApple.inl"
 #else
 #error Provide Platform.inl file for your platform
 #endif

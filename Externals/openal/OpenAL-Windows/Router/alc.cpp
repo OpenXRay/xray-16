@@ -55,21 +55,6 @@
 
 #include "OpenAL32.h"
 
-log_fn_ptr_type*	pLog = NULL;
-void AlLog(LPCSTR format, ...)
-{
-	if(pLog)
-	{
-		va_list		mark;
-		char	buf	[2048];
-		va_start	(mark, format );
-		int sz		= _vsnprintf(buf, sizeof(buf)-1, format, mark ); buf[sizeof(buf)-1]=0;
-		va_end		(mark);
-		if (sz)		
-			(*pLog)(buf);
-	}
-}
-
 //*****************************************************************************
 //*****************************************************************************
 //
@@ -355,21 +340,17 @@ ALvoid BuildDeviceSpecifierList()
 		{
             ++numDirs;
         }
-		AlLog("dir[0]=%s",dir[0]);
 
 		dirSize = GetCurrentDirectory(MAX_PATH, dir[1]);
 		strcat_s(dir[1], _T("\\"));
 		++numDirs;
-		AlLog("dir[1]=%s",dir[1]);
 
 		GetLoadedModuleDirectory(NULL, dir[2], MAX_PATH);
 		++numDirs;
-		AlLog("dir[2]=%s",dir[2]);
 
 		dirSize = GetSystemDirectory(dir[3], MAX_PATH);
 		strcat_s(dir[3], _T("\\"));
 		++numDirs;
-		AlLog("dir[3]=%s",dir[3]);
 
 		//
 		// Begin searching for additional OpenAL implementations.
@@ -541,7 +522,6 @@ ALvoid BuildDeviceSpecifierList()
 //
 ALvoid CleanDeviceSpecifierList()
 {
-	AlLog("CleanDeviceSpecifierList");
     char* list				= (char *)alcDeviceSpecifierList;
 	char* origListPtr		= list;
 	char* newList			= (char *)malloc(MAX_PATH);
@@ -566,7 +546,6 @@ ALvoid CleanDeviceSpecifierList()
 	}
 	copyList = origCopyListPtr;
 
-	AlLog("CleanDeviceSpecifierList %s", list);
 	// create new list
 	while (strlen(list) > 0) 
 	{

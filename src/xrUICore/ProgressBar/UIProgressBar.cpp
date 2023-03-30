@@ -1,7 +1,8 @@
 #include "pch.hpp"
 #include "UIProgressBar.h"
 
-CUIProgressBar::CUIProgressBar(void)
+CUIProgressBar::CUIProgressBar()
+    : CUIWindow("CUIProgressBar"), m_UIProgressItem("Progress"), m_UIBackgroundItem("Background")
 {
     m_MinPos = 1.0f;
     m_MaxPos = 1.0f + EPS;
@@ -10,6 +11,7 @@ CUIProgressBar::CUIProgressBar(void)
 
     m_bBackgroundPresent = false;
     m_bUseColor = false;
+    m_bUseMiddleColor = false;
     m_bUseGradient = true;
 
     AttachChild(&m_UIBackgroundItem);
@@ -60,7 +62,10 @@ void CUIProgressBar::UpdateProgressBar()
         if ( m_bUseGradient )
         {
             Fcolor curr;
-            curr.lerp(m_minColor, m_middleColor, m_maxColor, fCurrentLength);
+            if (m_bUseMiddleColor)
+                curr.lerp(m_minColor, m_middleColor, m_maxColor, fCurrentLength);
+            else
+                curr.lerp(m_minColor, m_maxColor, fCurrentLength);
             m_UIProgressItem.SetTextureColor(curr.get());
         }
         else

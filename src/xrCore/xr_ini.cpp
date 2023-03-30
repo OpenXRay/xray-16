@@ -7,7 +7,7 @@ XRCORE_API CInifile const* pSettings = nullptr;
 XRCORE_API CInifile const* pSettingsAuth = nullptr;
 XRCORE_API CInifile const* pSettingsOpenXRay = nullptr;
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <stdint.h>
 #define MSVCRT_EINVAL	22
 #define MSVCRT_ERANGE	34
@@ -122,7 +122,7 @@ int _cdecl _ui64toa_s(uint64_t value, char *str, size_t size, int radix)
             *--pos = 'a' + digit - 10;
     } while (value != 0);
 
-    if (buffer - pos + 65 > size)
+    if (static_cast<size_t>(buffer - pos + 65) > size)
     {
         return MSVCRT_EINVAL;
     }
@@ -414,7 +414,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
         pstr comm = strchr(str, ';');
         pstr comm_1 = strchr(str, '/');
 
-        if (comm_1 && *(comm_1 + 1) == '/' && (!comm || comm && comm_1 < comm))
+        if (comm_1 && *(comm_1 + 1) == '/' && (!comm || (comm && comm_1 < comm)))
         {
             comm = comm_1;
         }
@@ -456,7 +456,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
                 if (!allow_include_func || allow_include_func(fn))
                 {
                     IReader* I = FS.r_open(fn);
-#ifdef XR_PLATFORM_LINUX
+#ifndef XR_PLATFORM_WINDOWS // XXX: replace with runtime check for case-sensitivity
                     if (I == nullptr)
                     {
                         xr_fs_nostrlwr(inc_name);
@@ -694,10 +694,9 @@ bool CInifile::line_exist(pcstr S, pcstr L) const
 u32 CInifile::line_count(pcstr Sname) const
 {
     Sect& S = r_section(Sname);
-    auto I = S.Data.cbegin();
     u32 C = 0;
-    for (; I != S.Data.cend(); ++I)
-        if (*I->first)
+    for (const auto& item : S.Data)
+        if (*item.first)
             C++;
     return C;
 }
@@ -1117,6 +1116,11 @@ void CInifile::remove_line(pcstr S, pcstr L)
         R_ASSERT(A != data.Data.end() && xr_strcmp(*A->first, L) == 0);
         data.Data.erase(A);
     }
+}
+
+void CInifile::set_readonly(bool b)
+{
+    m_flags.set(eReadOnly, b);
 }
 
 template<>

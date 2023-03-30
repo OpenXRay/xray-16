@@ -52,23 +52,27 @@ public:
 
     void BoostParameters(const SBooster& B);
     void DisableBoostParameters(const SBooster& B);
-    IC void BoostMaxWeight(const float value);
-    IC void BoostHpRestore(const float value);
-    IC void BoostPowerRestore(const float value);
-    IC void BoostRadiationRestore(const float value);
-    IC void BoostBleedingRestore(const float value);
-    IC void BoostBurnImmunity(const float value);
-    IC void BoostShockImmunity(const float value);
-    IC void BoostRadiationImmunity(const float value);
-    IC void BoostTelepaticImmunity(const float value);
-    IC void BoostChemicalBurnImmunity(const float value);
-    IC void BoostExplImmunity(const float value);
-    IC void BoostStrikeImmunity(const float value);
-    IC void BoostFireWoundImmunity(const float value);
-    IC void BoostWoundImmunity(const float value);
-    IC void BoostRadiationProtection(const float value);
-    IC void BoostTelepaticProtection(const float value);
-    IC void BoostChemicalBurnProtection(const float value);
+    void WoundForEach(const luabind::functor<bool>& funct);
+    void BoosterForEach(const luabind::functor<bool>& funct);
+    bool ApplyBooster_script(const SBooster& B, LPCSTR sect);
+    void ClearAllBoosters();
+    void BoostMaxWeight(const float value);
+    void BoostHpRestore(const float value);
+    void BoostPowerRestore(const float value);
+    void BoostRadiationRestore(const float value);
+    void BoostBleedingRestore(const float value);
+    void BoostBurnImmunity(const float value);
+    void BoostShockImmunity(const float value);
+    void BoostRadiationImmunity(const float value);
+    void BoostTelepaticImmunity(const float value);
+    void BoostChemicalBurnImmunity(const float value);
+    void BoostExplImmunity(const float value);
+    void BoostStrikeImmunity(const float value);
+    void BoostFireWoundImmunity(const float value);
+    void BoostWoundImmunity(const float value);
+    void BoostRadiationProtection(const float value);
+    void BoostTelepaticProtection(const float value);
+    void BoostChemicalBurnProtection(const float value);
     const auto& GetCurBoosterInfluences() const { return m_booster_influences; }
     // хромание при потере сил и здоровья
     virtual bool IsLimping() const;
@@ -82,8 +86,8 @@ public:
     void ConditionWalk(float weight, bool accel, bool sprint);
     void ConditionStand(float weight);
     IC float MaxWalkWeight() const { return m_MaxWalkWeight; }
-    float xr_stdcall GetAlcohol() { return m_fAlcohol; }
-    float xr_stdcall GetPsy() { return 1.0f - GetPsyHealth(); }
+    float GetAlcohol() { return m_fAlcohol; }
+    float GetPsy() { return 1.0f - GetPsyHealth(); }
     float GetSatiety() { return m_fSatiety; }
     IC float GetSatietyPower() const { return m_fV_SatietyPower * m_fSatiety; };
     void AffectDamage_InjuriousMaterialAndMonstersInfluence();
@@ -178,7 +182,7 @@ class CActorDeathEffector
     ref_sound m_death_sound;
     bool m_b_actual;
     float m_start_health;
-    void xr_stdcall OnPPEffectorReleased();
+    void OnPPEffectorReleased();
 
 public:
     CActorDeathEffector(CActorCondition* parent, LPCSTR sect); // -((

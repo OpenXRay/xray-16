@@ -54,7 +54,7 @@ private:
     UITeamPanels* m_teamPanels;
 
     UITeamState();
-    bool __stdcall SortingLessFunction(CUIWindow* left, CUIWindow* right);
+    bool SortingLessFunction(CUIWindow* left, CUIWindow* right);
     int InitScrollPanels();
 
     int m_last_panel;

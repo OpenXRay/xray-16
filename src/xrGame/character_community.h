@@ -33,7 +33,7 @@ public:
     CHARACTER_COMMUNITY();
     ~CHARACTER_COMMUNITY();
 
-    void set(CHARACTER_COMMUNITY_ID);
+    void set(CHARACTER_COMMUNITY_ID, bool = false);
     void set(CHARACTER_COMMUNITY_INDEX index) { m_current_index = index; };
     CHARACTER_COMMUNITY_ID id() const;
     CHARACTER_COMMUNITY_INDEX index() const { return m_current_index; };

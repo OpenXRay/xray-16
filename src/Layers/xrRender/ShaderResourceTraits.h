@@ -3,63 +3,162 @@
 #include "ResourceManager.h"
 
 #ifdef USE_OGL
-template<GLenum type>
-inline std::pair<GLuint, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr name)
+static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
 {
-    GLint status{};
+    GLint length;
+    GLchar *errors = nullptr, *sources = nullptr;
 
-    GLuint shader = glCreateShader(type);
+    if (program)
+    {
+        CHK_GL(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
+        errors = xr_alloc<GLchar>(length);
+        CHK_GL(glGetProgramInfoLog(program, length, nullptr, errors));
+    }
+    else if (shader)
+    {
+        CHK_GL(glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length));
+        errors = xr_alloc<GLchar>(length);
+        CHK_GL(glGetShaderInfoLog(shader, length, nullptr, errors));
+
+        CHK_GL(glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length));
+        sources = xr_alloc<GLchar>(length);
+        CHK_GL(glGetShaderSource(shader, length, nullptr, sources));
+    }
+
+    Log("! shader compilation failed:", filename);
+    if (errors)
+        Log("! error: ", errors);
+
+    if (sources)
+    {
+        Log("Shader source:");
+        Log(sources);
+        Log("Shader source end.");
+    }
+    xr_free(errors);
+    xr_free(sources);
+}
+
+template<GLenum type>
+inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr name)
+{
+    const GLuint shader = glCreateShader(type);
     R_ASSERT(shader);
-    glShaderSource(shader, size, buffer, nullptr);
-    glCompileShader(shader);
+    CHK_GL(glShaderSource(shader, size, buffer, nullptr));
+    CHK_GL(glCompileShader(shader));
 
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+    GLint status{};
+    CHK_GL(glGetShaderiv(shader, GL_COMPILE_STATUS, &status));
     if (GLboolean(status) == GL_FALSE)
-        return { shader, -1 };
+    {
+        show_compile_errors(name, 0, shader);
+        CHK_GL(glDeleteShader(shader));
+        return { 's', 0 }; // 's' means "shader", 0 means error
+    }
 
-    GLuint program = glCreateProgram();
+    if (!HW.SeparateShaderObjectsSupported)
+        return { 's', shader };
+
+    const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    if (GLEW_VERSION_4_3) 
+        CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
     if (HW.ShaderBinarySupported)
         CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
 
-    glAttachShader(program, shader);
-    glBindFragDataLocation(program, 0, "SV_Target");
-    glBindFragDataLocation(program, 0, "SV_Target0");
-    glBindFragDataLocation(program, 1, "SV_Target1");
-    glBindFragDataLocation(program, 2, "SV_Target2");
-    glLinkProgram(program);
-    glDetachShader(program, shader);
-    glDeleteShader(shader);
+    CHK_GL(glAttachShader(program, shader));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
+    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+    CHK_GL(glLinkProgram(program));
+    CHK_GL(glDetachShader(program, shader));
+    CHK_GL(glDeleteShader(shader));
 
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
+    CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
     if (GLboolean(status) == GL_FALSE)
-        return { -1, program };
+    {
+        show_compile_errors(name, program, 0);
+        CHK_GL(glDeleteProgram(program));
+        return { 'p', 0 }; // 'p' means "program", 0 means error
+    }
 
-    return { 0, program };
+    return { 'p', program };
 }
 
-inline std::pair<GLuint, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLenum* format, pcstr name)
+inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLenum* format, pcstr name)
 {
     GLint status{};
 
-    GLuint program = glCreateProgram();
+    const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    if (GLEW_VERSION_4_3)
+        CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
 
-    glBindFragDataLocation(program, 0, "SV_Target");
-    glBindFragDataLocation(program, 0, "SV_Target0");
-    glBindFragDataLocation(program, 1, "SV_Target1");
-    glBindFragDataLocation(program, 2, "SV_Target2");
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
+    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
 
-    glProgramBinary(program, *format, buffer, size);
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
-    if ((GLboolean)status == GL_FALSE)
-        return { -1, program };
+    CHK_GL(glProgramBinary(program, *format, buffer, size));
+    CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
+    if (GLboolean(status) == GL_FALSE)
+    {
+        show_compile_errors(name, program, 0);
+        CHK_GL(glDeleteProgram(program));
+        return { 'p', 0 }; // 'p' means "program", 0 means error
+    }
 
-    return { 0, program };
+    return { 'p', program };
+}
+
+static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint gs)
+{
+    const GLuint program = glCreateProgram();
+    R_ASSERT(program);
+    if (GLEW_VERSION_4_3)
+        CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
+    // XXX: support caching for monolithic programs
+    //if (HW.ShaderBinarySupported)
+    //    CHK_GL(glProgramParameteri(program, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, (GLint)GL_TRUE));
+
+    CHK_GL(glAttachShader(program, ps));
+    CHK_GL(glAttachShader(program, vs));
+    if (gs)
+        CHK_GL(glAttachShader(program, gs));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target"));
+    CHK_GL(glBindFragDataLocation(program, 0, "SV_Target0"));
+    CHK_GL(glBindFragDataLocation(program, 1, "SV_Target1"));
+    CHK_GL(glBindFragDataLocation(program, 2, "SV_Target2"));
+    CHK_GL(glLinkProgram(program));
+    CHK_GL(glDetachShader(program, ps));
+    CHK_GL(glDetachShader(program, vs));
+    if (gs)
+        CHK_GL(glDetachShader(program, gs));
+
+    GLint status{};
+    CHK_GL(glGetProgramiv(program, GL_LINK_STATUS, &status));
+    if (GLboolean(status) == GL_FALSE)
+    {
+        show_compile_errors(name, program, 0);
+        CHK_GL(glDeleteProgram(program));
+        return 0; // 0 means error
+    }
+    return program;
+}
+
+static GLuint GLGeneratePipeline(pcstr name, GLuint ps, GLuint vs, GLuint gs)
+{
+    GLuint pp;
+    CHK_GL(glGenProgramPipelines(1, &pp));
+    R_ASSERT(pp);
+    CHK_GL(glUseProgramStages(pp, GL_FRAGMENT_SHADER_BIT, ps));
+    CHK_GL(glUseProgramStages(pp, GL_VERTEX_SHADER_BIT,   vs));
+    CHK_GL(glUseProgramStages(pp, GL_GEOMETRY_SHADER_BIT, gs));
+    CHK_GL(glValidateProgramPipeline(pp));
+    return pp;
 }
 #endif
 
@@ -75,7 +174,7 @@ struct ShaderTypeTraits<SVS>
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
+    using ResultType = std::pair<char, GLuint>;
 #else
 #if defined(USE_DX9)
     using LinkageType = void*;
@@ -91,26 +190,7 @@ struct ShaderTypeTraits<SVS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX9
         return HW.Caps.geometry_profile;
-#elif defined(USE_DX11)
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_10_0:
-            return "vs_4_0";
-        case D3D_FEATURE_LEVEL_10_1:
-            return "vs_4_1";
-        case D3D_FEATURE_LEVEL_11_0:
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-        case D3D_FEATURE_LEVEL_12_0:
-        case D3D_FEATURE_LEVEL_12_1:
-#endif
-            return "vs_5_0";
-        }
-#endif
-        NODEFAULT;
-        return nullptr;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -170,7 +250,7 @@ struct ShaderTypeTraits<SPS>
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
+    using ResultType = std::pair<char, GLuint>;
 #else
 #if defined(USE_DX9)
     using LinkageType = void*;
@@ -186,26 +266,7 @@ struct ShaderTypeTraits<SPS>
 
     static inline const char* GetCompilationTarget()
     {
-#ifdef USE_DX9
         return HW.Caps.raster_profile;
-#elif defined(USE_DX11)
-        switch (HW.FeatureLevel)
-        {
-        case D3D_FEATURE_LEVEL_10_0:
-            return "ps_4_0";
-        case D3D_FEATURE_LEVEL_10_1:
-            return "ps_4_1";
-        case D3D_FEATURE_LEVEL_11_0:
-        case D3D_FEATURE_LEVEL_11_1:
-#ifdef HAS_DX11_3
-        case D3D_FEATURE_LEVEL_12_0:
-        case D3D_FEATURE_LEVEL_12_1:
-#endif
-            return "ps_5_0";
-        }
-#endif
-        NODEFAULT;
-        return nullptr;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -285,7 +346,7 @@ struct ShaderTypeTraits<SGS>
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
+    using ResultType = std::pair<char, GLuint>;
 #   else
 #       error No graphics API selected or enabled!
 #   endif
@@ -357,7 +418,7 @@ struct ShaderTypeTraits<SHS>
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
+    using ResultType = std::pair<char, GLuint>;
 #   else
 #       error No graphics API selected or enabled!
 #   endif
@@ -412,7 +473,7 @@ struct ShaderTypeTraits<SDS>
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
+    using ResultType = std::pair<char, GLuint>;
 #   else
 #       error No graphics API selected or enabled!
 #endif
@@ -467,7 +528,7 @@ struct ShaderTypeTraits<SCS>
     using LinkageType = const GLenum*;
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
-    using ResultType = std::pair<GLuint, GLuint>;
+    using ResultType = std::pair<char, GLuint>;
 #   else
 #       error No graphics API selected or enabled!
 #   endif

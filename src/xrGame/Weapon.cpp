@@ -20,6 +20,7 @@
 #include "debug_renderer.h"
 #include "static_cast_checked.hpp"
 #include "clsid_game.h"
+#include "WeaponKnife.h"
 #include "WeaponBinocularsVision.h"
 #include "xrUICore/Windows/UIWindow.h"
 #include "ui/UIXmlInit.h"
@@ -140,7 +141,7 @@ void CWeapon::UpdateXForm()
     }
 
     const CInventoryOwner* parent = smart_cast<const CInventoryOwner*>(E);
-    if (parent && parent->use_simplified_visual())
+    if (!parent || parent->use_simplified_visual())
         return;
 
     if (parent->attached(this))
@@ -388,17 +389,29 @@ void CWeapon::Load(LPCSTR section)
     fireDispersionConditionFactor = pSettings->r_float(section, "fire_dispersion_condition_factor");
 
     // modified by Peacemaker [17.10.08]
-    const float misfireProbability = pSettings->read_if_exists<float>(section, "misfire_probability", 0.001f);
-    const float misfireConditionK = pSettings->read_if_exists<float>(section, "misfire_condition_k", 1.0f);
+    if (pSettings->line_exist(section, "misfire_start_condition") ||
+        pSettings->line_exist(section, "misfire_end_condition") ||
+        pSettings->line_exist(section, "misfire_start_prob") ||
+        pSettings->line_exist(section, "misfire_end_prob"))
+    {
+        misfireStartCondition   = pSettings->r_float(section, "misfire_start_condition");
+        misfireEndCondition     = pSettings->r_float(section, "misfire_end_condition");
+        misfireStartProbability = pSettings->r_float(section, "misfire_start_prob");
+        misfireEndProbability   = pSettings->r_float(section, "misfire_end_prob");
+    }
+    else
+    {
+        misfireUseOldFormula    = true;
 
-    misfireStartCondition = pSettings->read_if_exists<float>(section, "misfire_start_condition", 0.95f);
-    misfireEndCondition = pSettings->read_if_exists<float>(section, "misfire_end_condition", 0.f);
+        misfireProbability      = pSettings->r_float(section, "misfire_probability");
+        misfireConditionK       = pSettings->read_if_exists<float>(section, "misfire_condition_k", 1.0f);
 
-    misfireStartProbability = pSettings->read_if_exists<float>(section, "misfire_start_prob",
-        misfireProbability + powf(1.f - misfireStartCondition, 3.f) * misfireConditionK);
-    misfireEndProbability = pSettings->read_if_exists<float>(section, "misfire_end_prob",
-        misfireProbability + powf(1.f - misfireEndCondition, 3.f) * misfireConditionK);
-
+        // For UI indicators to work correctly, rough estimate values
+        misfireStartCondition   = 0.95f;
+        misfireEndCondition     = 0.0f;
+        misfireStartProbability = misfireProbability;
+        misfireEndProbability   = (misfireProbability + misfireConditionK) * 0.25f;
+    }
     conditionDecreasePerShot = pSettings->r_float(section, "condition_shot_dec");
     conditionDecreasePerQueueShot = pSettings->read_if_exists<float>(section, "condition_queue_shot_dec", conditionDecreasePerShot);
 
@@ -444,7 +457,7 @@ void CWeapon::Load(LPCSTR section)
         m_zoom_params.m_fScopeZoomFactor = pSettings->r_float(cNameSect(), "scope_zoom_factor");
         if (!GEnv.isDedicatedServer)
         {
-            m_UIScope = xr_new<CUIWindow>();
+            m_UIScope = xr_new<CUIWindow>("Scope UI");
             shared_str scope_tex_name = pSettings->r_string(cNameSect(), "scope_texture");
             LoadScope(scope_tex_name);
         }
@@ -958,9 +971,19 @@ bool CWeapon::Action(u16 cmd, u32 flags)
                 return false;
 
             if (flags & CMD_START)
+            {
+                if (ParentIsActor() && !smart_cast<CWeaponKnife*>(this)) // for knife it is handled differently
+                {
+                    const bool left = IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_LEFT);
+                    const bool right = IsBinded(kWPN_FIRE, XR_CONTROLLER_AXIS_TRIGGER_RIGHT);
+                    pInput->Feedback(CInput::FeedbackTriggers, left ? 0.5f : 0.0f, right ? 0.5f : 0.0f, 0.1f);
+                }
                 FireStart();
+            }
             else
+            {
                 FireEnd();
+            }
         };
     }
         return true;
@@ -1178,20 +1201,26 @@ int CWeapon::GetAmmoCount_forType(shared_str const& ammo_type) const
 
 float CWeapon::GetConditionMisfireProbability() const
 {
-    // modified by Peacemaker [17.10.08]
-    //	if(GetCondition() > 0.95f)
-    //		return 0.0f;
-    if (GetCondition() > misfireStartCondition)
-        return 0.0f;
-    if (GetCondition() < misfireEndCondition)
-        return misfireEndProbability;
-    //	float mis = misfireProbability+powf(1.f-GetCondition(), 3.f)*misfireConditionK;
-    float mis = misfireStartProbability +
-        ((misfireStartCondition - GetCondition()) * // condition goes from 1.f to 0.f
-            (misfireEndProbability - misfireStartProbability) / // probability goes from 0.f to 1.f
-            ((misfireStartCondition == misfireEndCondition) ? // !!!say "No" to devision by zero
+    float mis;
+    if (misfireUseOldFormula)
+    {
+        if (GetCondition() > 0.95f)
+            return 0.0f;
+        mis = misfireProbability + powf(1.f - GetCondition(), 3.f) * misfireConditionK;
+    }
+    else // modified by Peacemaker [17.10.08]
+    {
+        if (GetCondition() > misfireStartCondition)
+            return 0.0f;
+        if (GetCondition() < misfireEndCondition)
+            return misfireEndProbability;
+        mis = misfireStartProbability +
+            ((misfireStartCondition - GetCondition()) * // condition goes from 1.f to 0.f
+                (misfireEndProbability - misfireStartProbability) / // probability goes from 0.f to 1.f
+                ((misfireStartCondition == misfireEndCondition) ? // !!!say "No" to devision by zero
                     misfireStartCondition :
                     (misfireStartCondition - misfireEndCondition)));
+    }
     clamp(mis, 0.0f, 0.99f);
     return mis;
 }

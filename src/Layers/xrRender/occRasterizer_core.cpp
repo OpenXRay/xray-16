@@ -7,7 +7,7 @@ static float currentA[3], currentB[3], currentC[3];
 
 const int BOTTOM = 0, TOP = 1;
 
-void i_order(float* A, float* B, float* C)
+static void i_order(float* A, float* B, float* C)
 {
     float *min, *max, *mid;
     if (A[1] <= B[1])
@@ -67,14 +67,15 @@ void i_order(float* A, float* B, float* C)
 }
 
 // Find the closest min/max pixels of a point
-IC void Vclamp(int& v, int a, int b)
+static void Vclamp(int& v, int a, int b)
 {
     if (v < a)
         v = a;
     else if (v >= b)
         v = b - 1;
 }
-IC BOOL shared(occTri* T1, occTri* T2)
+
+BOOL shared(occTri* T1, occTri* T2)
 {
     if (T1 == T2)
         return TRUE;
@@ -85,12 +86,6 @@ IC BOOL shared(occTri* T1, occTri* T2)
     if (T1->adjacent[2] == T2)
         return TRUE;
     return FALSE;
-}
-IC BOOL lesser(float& a, float& b)
-{
-    u32* A = (u32*)(&a);
-    u32* B = (u32*)(&b);
-    return *A < *B;
 }
 
 const float one_div_3 = 1.f / 3.f;

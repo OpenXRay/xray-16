@@ -24,6 +24,7 @@ public:
 
     void IR_Capture() final;
     void IR_Release() final;
+    void IR_OnDeactivate() final;
 
 protected:
     void IR_OnKeyboardPress(int dik) final;

@@ -97,7 +97,7 @@ public:
         inherited::process_impl(false);
     }
 
-    void __stdcall process()
+    void process()
     {
         if (Device.dwTimeGlobal < m_last_fail_time + time_to_wait_after_fail)
             return;

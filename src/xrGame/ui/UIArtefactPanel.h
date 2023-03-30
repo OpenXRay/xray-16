@@ -9,6 +9,8 @@ class CUIStaticItem;
 class CUIArtefactPanel : public CUIWindow
 {
 protected:
+    bool m_bVert;
+    int m_iIndent;
     float m_fScale;
     Fvector2 m_cell_size;
     xr_vector<Frect> m_vRects;

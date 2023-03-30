@@ -42,20 +42,18 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
     {
         switch (it->style)
         {
-        case CStatGraph::stBar: { TriElem += it->elements.size() * 4;
-        }
-        break;
-        case CStatGraph::stCurve: { LineElem += it->elements.size() * 2;
-        }
-        break;
-        case CStatGraph::stBarLine: { LineElem += it->elements.size() * 4;
-        }
-        break;
+        case CStatGraph::stBar:
+            TriElem += it->elements.size() * 4;
+            break;
+        case CStatGraph::stCurve:
+            LineElem += it->elements.size() * 2;
+            break;
+        case CStatGraph::stBarLine:
+            LineElem += it->elements.size() * 4;
+            break;
         case CStatGraph::stPoint:
-        {
-            //              TriElem += it->elements.size()*4;
-        }
-        break;
+            // TriElem += it->elements.size() * 4;
+            break;
         };
     };
 
@@ -75,7 +73,9 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
         {
             switch (it->style)
             {
-            case CStatGraph::stBar: RenderBars(owner, &pv_Tri, it->elements); break;
+            case CStatGraph::stBar:
+                RenderBars(owner, &pv_Tri, it->elements);
+                break;
             };
         };
         dwCount = u32(pv_Tri - pv_Tri_start);
@@ -93,8 +93,12 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
         {
             switch (it->style)
             {
-            case CStatGraph::stCurve: RenderLines(owner, &pv_Line, it->elements); break;
-            case CStatGraph::stBarLine: RenderBarLines(owner, &pv_Line, it->elements); break;
+            case CStatGraph::stCurve:
+                RenderLines(owner, &pv_Line, it->elements);
+                break;
+            case CStatGraph::stBarLine:
+                RenderBarLines(owner, &pv_Line, it->elements);
+                break;
             };
         };
 
@@ -328,8 +332,8 @@ void dxStatGraphRender::RenderMarkers(CStatGraph& owner, FVF::L** ppv, CStatGrap
             X1 = X0;
             Y0 = float(owner.lt.y);
             Y1 = float(owner.rb.y);
+            break;
         }
-        break;
         case CStatGraph::stHor:
         {
             X0 = float(owner.lt.x);
@@ -337,8 +341,8 @@ void dxStatGraphRender::RenderMarkers(CStatGraph& owner, FVF::L** ppv, CStatGrap
             Y0 = base_y - CurMarker.m_fPos * elem_factor;
             clamp(Y0, float(owner.lt.y), float(owner.rb.y));
             Y1 = Y0;
+            break;
         }
-        break;
         }
         (*ppv)->set(X0, Y0, CurMarker.m_dwColor);
         (*ppv)++;

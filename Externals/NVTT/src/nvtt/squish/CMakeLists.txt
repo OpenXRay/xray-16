@@ -30,5 +30,5 @@ target_include_directories(${PROJECT_NAME}
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
-    $<$<BOOL:CMAKE_COMPILER_IS_GNUCXX>:-fPIC>
+    $<$<BOOL:${CMAKE_COMPILER_IS_GNUCXX}>:-fPIC>
 )

@@ -379,6 +379,7 @@ void CInventoryOwner::SetCommunity(CHARACTER_COMMUNITY_INDEX new_community)
         EA->ChangeTeam(CharacterInfo().Community().team(), EA->g_Squad(), EA->g_Group());
     }
 
+    // XXX: special case for trader, investigate if we can get rid of it
     CSE_ALifeTraderAbstract* trader = smart_cast<CSE_ALifeTraderAbstract*>(e_entity);
     if (!trader)
         return;
@@ -461,6 +462,11 @@ void CInventoryOwner::OnItemSlot(CInventoryItem* inventory_item, const SInvItemP
 CCustomOutfit* CInventoryOwner::GetOutfit() const
 {
     return smart_cast<CCustomOutfit*>(inventory().ItemFromSlot(OUTFIT_SLOT));
+}
+
+CBackpack* CInventoryOwner::GetBackpack() const
+{
+    return smart_cast<CBackpack*>(inventory().ItemFromSlot(BACKPACK_SLOT));
 }
 
 void CInventoryOwner::on_weapon_shot_start(CWeapon* weapon) {}

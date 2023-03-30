@@ -15,6 +15,7 @@
 #include "character_info_defs.h"
 #include "xrAICore/Navigation/game_graph_space.h"
 #include "game_location_selector.h"
+#include "GameTaskDefs.h"
 
 // fwd. decl.
 namespace ALife
@@ -336,8 +337,8 @@ public:
     xrTime GetInfoTime(LPCSTR info_id);
 
     //работа с заданиями
-    ETaskState GetGameTaskState(LPCSTR task_id);
-    void SetGameTaskState(ETaskState state, LPCSTR task_id);
+    ETaskState GetGameTaskState(pcstr task_id, TASK_OBJECTIVE_ID objective_id);
+    void SetGameTaskState(ETaskState state, pcstr task_id, TASK_OBJECTIVE_ID objective_id);
     void GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting, u32 t_timer);
     void SetActiveTask(CGameTask* t);
     bool IsActiveTask(CGameTask* t);
@@ -434,6 +435,7 @@ public:
     void SetCallback(
         GameObject::ECallbackType type, const luabind::functor<void>& functor, const luabind::adl::object& object);
     void SetCallback(GameObject::ECallbackType type);
+    void ClearCallbacks();
 
     void set_patrol_extrapolate_callback(const luabind::functor<bool>& functor);
     void set_patrol_extrapolate_callback(const luabind::functor<bool>& functor, const luabind::adl::object& object);
@@ -795,8 +797,11 @@ public:
     bool is_weapon_going_to_be_strapped(CScriptGameObject const* object) const;
     
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
+    // Alundaio
+    void inactualize_level_path();
+    void inactualize_game_path();
+
     void SetHealthEx(float hp); //AVO
-    //Alundaio
     float GetLuminocityHemi();
     float GetLuminocity();
     bool Use(CScriptGameObject* obj);
@@ -808,6 +813,11 @@ public:
     void SetSpatialType(u32 sptype);
     u8 GetRestrictionType();
     void SetRestrictionType(u8 type);
+
+    //CWeaponAmmo
+    u16 AmmoGetCount();
+    void AmmoSetCount(u16 count);
+    u16 AmmoBoxSize();
 
     //Weapon
     void Weapon_AddonAttach(CScriptGameObject* item);
@@ -855,6 +865,15 @@ public:
     void SetArtefactSatietyRestoreSpeed(float value);
     void SetArtefactPowerRestoreSpeed(float value);
     void SetArtefactBleedingRestoreSpeed(float value);
+
+    void RemoveDanger(const CDangerObject& dobject);
+
+    void RemoveMemorySoundObject(const MemorySpace::CSoundObject& memory_object);
+    void RemoveMemoryHitObject(const MemorySpace::CHitObject& memory_object);
+    void RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject& memory_object);
+
+    //CAI_Stalker
+    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
 
     //Eatable items
     void SetRemainingUses(u8 value);

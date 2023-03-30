@@ -21,9 +21,8 @@ void CPHCollisionDamageReceiver::Init()
     if (ini->section_exist("collision_damage"))
     {
         CInifile::Sect& data = ini->r_section("collision_damage");
-        for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
+        for (const auto& item : data.Data)
         {
-            const CInifile::Item& item = *I;
             u16 index = K->LL_BoneID(*item.first);
             R_ASSERT3(index != BI_NONE, "Wrong bone name", *item.first);
             BoneInsert(index, float(atof(*item.second)));

@@ -83,8 +83,7 @@ void CDetailManager::cache_Decompress(Slot* S)
     Fvector bC, bD;
     D.vis.box.get_CD(bC, bD);
 
-    xrc.box_options(CDB::OPT_FULL_TEST);
-    xrc.box_query(g_pGameLevel->ObjectSpace.GetStaticModel(), bC, bD);
+    xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bC, bD);
     u32 triCount = xrc.r_count();
     CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();

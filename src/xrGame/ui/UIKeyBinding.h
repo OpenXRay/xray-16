@@ -8,11 +8,17 @@
 class CUIXml;
 class CUIScrollView;
 
-class CUIKeyBinding : public CUIWindow
+class CUIKeyBinding : public CUIWindow, public pureKeyMapChanged
 {
 public:
     CUIKeyBinding();
+    ~CUIKeyBinding() override;
     void InitFromXml(CUIXml& xml_doc, LPCSTR path);
+
+protected:
+    void FillUpList(CUIXml& xml_doc, LPCSTR path);
+
+    void OnKeyMapChanged() override;
 
 #ifdef DEBUG
     void CheckStructure(CUIXml& xml_doc);
@@ -20,11 +26,9 @@ public:
 #endif
 
 protected:
-    void FillUpList(CUIXml& xml_doc, LPCSTR path);
+    bool m_isGamepadBinds{};
 
-    bool m_isGamepadBinds;
-
-    CUIFrameLineWnd m_header[3];
+    std::array<CUIFrameLineWnd, 3> m_header;
     CUIFrameWindow m_frame;
-    CUIScrollView* m_scroll_wnd;
+    CUIScrollView* m_scroll_wnd{};
 };

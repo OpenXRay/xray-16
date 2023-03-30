@@ -17,14 +17,18 @@
 BOOL dbg_imotion_draw_skeleton = FALSE;
 BOOL dbg_imotion_draw_velocity = FALSE;
 BOOL dbg_imotion_collide_debug = FALSE;
-float dbg_imotion_draw_velocity_scale = 0.01;
-
+float dbg_imotion_draw_velocity_scale = 0.01f;
 #endif
 
-static const float max_collide_timedelta = 0.02f; // 0.005f;
-static const float end_delta = 0.5f * max_collide_timedelta;
-static const float collide_adwance_delta = 2.f * max_collide_timedelta;
-static const float depth_resolve = 0.01f;
+namespace detail::imotion_position
+{
+static constexpr float max_collide_timedelta = 0.02f; // 0.005f;
+static constexpr float end_delta = 0.5f * max_collide_timedelta;
+static constexpr float collide_adwance_delta = 2.f * max_collide_timedelta;
+static constexpr float depth_resolve = 0.01f;
+
+static float depth = 0;
+}
 
 imotion_position::imotion_position()
     : interactive_motion(), time_to_end(0.f), saved_visual_callback(0), blend(0), shell_motion_has_history(false){
@@ -62,9 +66,10 @@ void imotion_position::interactive_motion_diagnostic(LPCSTR message)
 CPhysicsShellHolder* collide_obj = 0;
 #endif
 
-static float depth = 0;
 static void get_depth(bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
 {
+    using namespace ::detail::imotion_position;
+
     save_max(depth, c.geom.depth);
 #ifdef DEBUG
     if (depth != c.geom.depth)
@@ -251,7 +256,8 @@ void imotion_position::state_end()
     shell->setForce(Fvector().set(0.f, 0.f, 0.f));
     shell->setTorque(Fvector().set(0.f, 0.f, 0.f));
 
-    shell->AnimToVelocityState(end_delta, default_l_limit * 10, default_w_limit * 10);
+    shell->AnimToVelocityState(::detail::imotion_position::end_delta,
+        default_l_limit * 10, default_w_limit * 10);
 #ifdef DEBUG
     dbg_draw_state_end(shell);
 #endif
@@ -387,6 +393,8 @@ void collide_anim_dbg_draw(CPhysicsShell* shell, float dt)
 
 float imotion_position::collide_animation(float dt, IKinematicsAnimated& k)
 {
+    using namespace ::detail::imotion_position;
+
     advance_animation(dt, k);
 #ifdef DEBUG
     collide_anim_dbg_draw(shell, dt);
@@ -475,6 +483,8 @@ static void restore_blends(buffer_vector<sblend_save>& buffer)
 
 void imotion_position::collide_not_move(IKinematicsAnimated& KA)
 {
+    using namespace ::detail::imotion_position;
+
     u32 sv_blends_num = blends_num(KA);
     buffer_vector<sblend_save> saved_blends(xr_alloca(sv_blends_num * sizeof(sblend_save)), sv_blends_num);
     save_blends(saved_blends, KA);
@@ -483,6 +493,8 @@ void imotion_position::collide_not_move(IKinematicsAnimated& KA)
 }
 float imotion_position::move(float dt, IKinematicsAnimated& KA)
 {
+    using namespace ::detail::imotion_position;
+
     VERIFY(shell);
     // float ret = 0;
     float advance_time = 0.f;
@@ -538,6 +550,8 @@ float imotion_position::move(float dt, IKinematicsAnimated& KA)
 
 float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
 {
+    using namespace ::detail::imotion_position;
+
     VERIFY(shell);
 
     float advance_time = collide_animation(dt, KA);

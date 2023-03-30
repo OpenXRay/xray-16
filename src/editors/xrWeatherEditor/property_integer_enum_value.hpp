@@ -23,7 +23,7 @@ private:
     typedef property_integer inherited;
     typedef System::Collections::ArrayList collection_type;
     typedef System::Object Object;
-    typedef std::pair<int, LPCSTR> pair;
+    typedef std::pair<int, pcstr> pair;
 
 public:
     property_integer_enum_value(

@@ -67,7 +67,6 @@
 
 #if defined(WIN32) || defined(_WIN32_WCE)
 #include <windows.h>
-#include <tchar.h>
 #endif
 
 #include <stdio.h>
@@ -94,29 +93,15 @@ typedef struct tagcomplex {
 #include <string.h>
 #include <ctype.h>
 
+typedef uint8_t        BYTE;
 typedef DWORD          COLORREF;
 typedef void*          HRGN;
 typedef void*          HDC;
 
 typedef int boolean;
 
-#define _tfopen fopen
-
-#ifndef BOOL
-#define	BOOL bool
-#endif
-
-#ifndef TRUE
-#define	TRUE true
-#endif
-
-#ifndef FALSE
-#define	FALSE false
-#endif
-
 #ifndef TCHAR
 #define TCHAR char
-#define _T
 #endif
 
 typedef struct tagRGBQUAD {
@@ -126,7 +111,7 @@ typedef struct tagRGBQUAD {
 	BYTE    rgbReserved;
 } RGBQUAD;
 
-#pragma pack(1)
+#pragma pack(push, 1)
 
 typedef struct tagBITMAPINFOHEADER{
 	DWORD      biSize;
@@ -164,7 +149,7 @@ typedef struct tagRGBTRIPLE {
 	BYTE    rgbtRed;
 } RGBTRIPLE;
 
-#pragma pack()
+#pragma pack(pop)
 
 #define BI_RGB        0L
 #define BI_RLE8       1L

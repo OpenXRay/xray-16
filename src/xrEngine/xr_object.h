@@ -86,14 +86,15 @@ union GameObjectProperties
     u32 storage;
 };
 
-class IGameObject : public virtual IFactoryObject,
-                    public virtual ISpatial,
-                    public virtual ISheduled,
-                    public virtual IRenderable,
-                    public virtual ICollidable
+class XR_NOVTABLE IGameObject
+    : public virtual IFactoryObject,
+      public virtual ISpatial,
+      public virtual ISheduled,
+      public virtual IRenderable,
+      public virtual ICollidable
 {
 public:
-    using visual_callback = void(__stdcall*)(IKinematics*);
+    using visual_callback = void(*)(IKinematics*);
     using CALLBACK_VECTOR = svector<visual_callback, 6>;
     using CALLBACK_VECTOR_IT = CALLBACK_VECTOR::iterator;
     using CScriptCallbackExVoid = CScriptCallbackEx<void>;
@@ -364,4 +365,4 @@ public:
     virtual void SetScriptBinderObject(CScriptBinderObject* obj) = 0;
 };
 
-inline IGameObject::~IGameObject() {}
+inline IGameObject::~IGameObject() = default;

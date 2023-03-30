@@ -12,7 +12,7 @@
 
 constexpr cpcstr DEMO_RECORD_HELP_FONT = "ui_font_letterica18_russian"; // "ui_font_graffiti19_russian";
 
-extern bool g_bDisableRedText;
+ENGINE_API extern bool g_bDisableRedText;
 static Flags32 s_hud_flag = {0};
 static Flags32 s_dev_flags = {0};
 static u32     s_window_mode = {0};
@@ -735,8 +735,8 @@ void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
     case kLOOK_AROUND:
     {
         m_angle_speed = speed;
-        const float scale = .05f; // psControllerSens;
-        OnAxisMove(x, y, scale, false); // XXX: controller axes invert
+        const float scale = .05f; // psControllerStickSens;
+        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
         break;
     }
 
@@ -808,6 +808,18 @@ void CDemoRecord::IR_OnControllerRelease(int key, float x, float y)
         IR_OnKeyboardRelease(key);
         break;
     }
+}
+
+void CDemoRecord::IR_OnControllerAttitudeChange(Fvector change)
+{
+    if (m_b_redirect_input_to_level)
+    {
+        g_pGameLevel->IR_OnControllerAttitudeChange(change);
+        return;
+    }
+    
+    const float scale = 5.f; // psControllerSensorSens;
+    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
 }
 
 void CDemoRecord::RecordKey()

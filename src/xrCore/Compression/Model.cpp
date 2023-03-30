@@ -37,7 +37,7 @@ inline TMP_TYPE CLAMP(const TMP_TYPE& X, const TMP_TYPE& LoX, const TMP_TYPE& Hi
 //==============================================================================
 // SEE-contexts for PPM-contexts with masked symbols
 
-#pragma pack(1)
+#pragma pack(push, 1)
 struct SEE2_CONTEXT
 {
     u16 Summ;
@@ -97,7 +97,7 @@ struct PPM_CONTEXT
     void read(_PPMD_FILE* fp, u32 PrevSym);
 };
 PPM_CONTEXT _PACK_ATTR* MaxContext;
-#pragma pack()
+#pragma pack(pop)
 
 static u8 NS2BSIndx[256], QTable[260]; // constants
 static PPM_CONTEXT::STATE* FoundState; // found next state transition
@@ -874,7 +874,7 @@ inline void PPM_CONTEXT::encodeSymbol1(int symbol)
     u32 LoCnt, i = Stats->Symbol;
     STATE* p = Stats;
     SubRange.scale = SummFreq;
-    if (i == symbol)
+    if (static_cast<int>(i) == symbol)
     {
         PrevSuccess = (2 * (SubRange.high = p->Freq) >= SubRange.scale);
         (FoundState = p)->Freq += 4;
@@ -998,7 +998,7 @@ inline void PPM_CONTEXT::encodeSymbol2(int symbol)
             p++;
         } while (CharMask[Sym] == EscCount);
         CharMask[Sym] = EscCount;
-        if (Sym == symbol)
+        if (static_cast<int>(Sym) == symbol)
             goto SYMBOL_FOUND;
         LoCnt += p->Freq;
     } while (--i);
@@ -1250,7 +1250,7 @@ static void _STDCALL StartModelRare(int MaxOrder, MR_METHOD MRMethod)
     }
     else
     {
-        u32 i, k, m;
+        ///        u32 i, k, m;
 
         memset(CharMask, 0, sizeof(CharMask));
         EscCount = PrintCount = 1;

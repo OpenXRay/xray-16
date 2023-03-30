@@ -171,7 +171,7 @@ u32 MODEL::memory()
     return tree->GetUsedBytes() + V + T + sizeof(*this) + sizeof(*tree);
 }
 
-bool MODEL::serialize(pcstr fileName) const
+bool MODEL::serialize(pcstr fileName, serialize_callback callback /*= nullptr*/) const
 {
     IWriter* wstream = FS.w_open(fileName);
     if (!wstream)
@@ -181,6 +181,9 @@ bool MODEL::serialize(pcstr fileName) const
 
     // Write to buffer, to be able to calculate crc
     memory.w_u32(version);
+    if (callback)
+        callback(memory);
+
     memory.w_u32(verts_count);
     memory.w(verts, sizeof(Fvector) * verts_count);
     memory.w_u32(tris_count);
@@ -197,16 +200,22 @@ bool MODEL::serialize(pcstr fileName) const
     return true;
 }
 
-bool MODEL::deserialize(pcstr fileName)
+bool MODEL::deserialize(pcstr fileName, bool checkCrc32 /*= true*/, deserialize_callback callback /*= nullptr*/)
 {
     IReader* rstream = FS.r_open(fileName);
     if (!rstream)
         return false;
 
     const u32 crc = rstream->r_u32();
-    const u32 actualCrc = crc32(rstream->pointer(), rstream->elapsed());
+    const u32 actualCrc = checkCrc32 ? crc32(rstream->pointer(), rstream->elapsed()) : crc;
 
     if (crc != actualCrc || version != rstream->r_u32())
+    {
+        FS.r_close(rstream);
+        return false;
+    }
+
+    if (callback && !callback(*rstream))
     {
         FS.r_close(rstream);
         return false;
@@ -234,15 +243,6 @@ bool MODEL::deserialize(pcstr fileName)
 
     FS.r_close(rstream);
     return true;
-}
-
-// This is the constructor of a class that has been exported.
-// see xrCDB.h for the class definition
-COLLIDER::COLLIDER()
-{
-    ray_mode = 0;
-    box_mode = 0;
-    frustum_mode = 0;
 }
 
 COLLIDER::~COLLIDER() { r_free(); }

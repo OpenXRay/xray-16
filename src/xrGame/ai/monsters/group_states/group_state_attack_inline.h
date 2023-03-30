@@ -14,8 +14,7 @@
 #include "Actor.h"
 
 #define TEMPLATE_SPECIALIZATION \
-    template <typename _Object\
->
+    template <typename _Object>
 
 #define CStateGroupAttackAbstract CStateGroupAttack<_Object>
 

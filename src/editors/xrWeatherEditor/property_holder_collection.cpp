@@ -15,7 +15,7 @@
 using Flobbster::Windows::Forms::PropertySpec;
 using XRay::Editor::property_holder_collection;
 
-XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(pcstr identifier, pcstr category, pcstr description,
     property_holder_collection* collection, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
     refresh_grid_on_change_enum const& refresh_grid)
@@ -27,7 +27,7 @@ XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, L
     return (nullptr);
 }
 
-XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(pcstr identifier, pcstr category, pcstr description,
     collection_getter_type const& collection_getter, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
     refresh_grid_on_change_enum const& refresh_grid)

@@ -82,8 +82,8 @@ void CUIGameCTA::Init(int stage)
         m_pReinforcementInidcator->SetAutoDelete(true);
         CUIXmlInit::InitTextWnd(uiXml, "reinforcement", 0, m_pReinforcementInidcator);
 
-        m_team1_icon = xr_new<CUIStatic>();
-        m_team2_icon = xr_new<CUIStatic>();
+        m_team1_icon = xr_new<CUIStatic>("Team 1 icon");
+        m_team2_icon = xr_new<CUIStatic>("Team 2 icon");
         CUIXmlInit::InitStatic(uiXml, "team1_icon", 0, m_team1_icon);
         CUIXmlInit::InitStatic(uiXml, "team2_icon", 0, m_team2_icon);
 
@@ -592,14 +592,14 @@ void CUIGameCTA::GetPurchaseItems(BuyMenuItemsCollection& dest, s32& moneyDif)
         addon = pi->addon_state;
 
         for (u32 ic = 0; ic < pi->count; ++ic)
-            dest.push_back(std::make_pair(addon, itemId));
+            dest.emplace_back(addon, itemId);
     }
 
     if (m_game->local_player && m_game->local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
     {
         u8 KnifeSlot, KnifeIndex;
         m_pCurBuyMenu->GetWeaponIndexByName("mp_wpn_knife", KnifeSlot, KnifeIndex);
-        dest.push_back(std::make_pair(KnifeSlot, KnifeIndex));
+        dest.emplace_back(KnifeSlot, KnifeIndex);
     }
 
     moneyDif = m_pCurBuyMenu->GetPresetCost(_preset_idx_origin) - m_pCurBuyMenu->GetPresetCost(_preset_idx_last);

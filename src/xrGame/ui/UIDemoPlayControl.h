@@ -29,20 +29,20 @@ public:
     virtual bool WorkInPause() const { return true; }
     virtual void Update();
     Fvector2 const& GetLastCursorPos() const { return m_last_curr_pos; };
-    void xr_stdcall OnRestart(CUIWindow* w, void* d);
-    void xr_stdcall OnDecresaseSpeed(CUIWindow* w, void* d);
-    void xr_stdcall OnPlayPause(CUIWindow* w, void* d);
-    void xr_stdcall OnIncreaseSpeed(CUIWindow* w, void* d);
-    void xr_stdcall OnRewindUntil(CUIWindow* w, void* d);
-    void xr_stdcall OnRepeatRewind(CUIWindow* w, void* d);
+    void OnRestart(CUIWindow* w, void* d);
+    void OnDecresaseSpeed(CUIWindow* w, void* d);
+    void OnPlayPause(CUIWindow* w, void* d);
+    void OnIncreaseSpeed(CUIWindow* w, void* d);
+    void OnRewindUntil(CUIWindow* w, void* d);
+    void OnRepeatRewind(CUIWindow* w, void* d);
 
-    void xr_stdcall OnRewindTypeSelected(CUIWindow* w, void* d);
-    void xr_stdcall OnRewindPlayerSelected(CUIWindow* w, void* d);
+    void OnRewindTypeSelected(CUIWindow* w, void* d);
+    void OnRewindPlayerSelected(CUIWindow* w, void* d);
 
 private:
     void StopRewind();
     void UIStartRewind();
-    void xr_stdcall UIStopRewindCb();
+    void UIStopRewindCb();
 
     enum ERewindTypeTags
     {
