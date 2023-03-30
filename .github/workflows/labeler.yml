@@ -1,7 +1,5 @@
 name: "Pull Request Labeler"
 
-runs-on: ubuntu-latest
-
 on:
   pull_request_target:
   pull_request_review:
@@ -14,18 +12,21 @@ permissions:
 jobs:
   new:
     if: github.event.pull_request.opened == true || github.event.pull_request.reopened == true
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/labeler@v4.0.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/labeler_on_new_pr.yml
   pr:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/labeler@v4.0.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
   approved:
     if: ${{ github.event_name == 'pull_request_review' && github.event.review.state == 'approved' }}
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/labeler@v4.0.2
       with:
