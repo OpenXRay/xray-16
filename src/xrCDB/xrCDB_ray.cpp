@@ -233,7 +233,7 @@ public:
         ray.fwd_dir.set(D);
         rRange = R;
         rRange2 = R * R;
-        if (!bUseSSE)
+        if constexpr (!bUseSSE)
         {
             // for FPU - zero out inf
             if (_abs(D.x) > flt_eps)
@@ -296,7 +296,7 @@ public:
         // if determinant is near zero, ray lies in plane of triangle
         pvec.crossproduct(ray.fwd_dir, edge2);
         det = edge1.dotproduct(pvec);
-        if (bCull)
+        if constexpr (bCull)
         {
             if (det < EPS)
                 return false;
@@ -340,7 +340,7 @@ public:
         if (r <= 0 || r > rRange)
             return;
 
-        if (bNearest)
+        if constexpr (bNearest)
         {
             if (dest->r_count())
             {
@@ -393,7 +393,7 @@ public:
         _mm_prefetch((char*)node->GetNeg(), _MM_HINT_NTA);
 
         // Actual ray/aabb test
-        if (bUseSSE)
+        if constexpr (bUseSSE)
         {
             // use SSE
             float d;
@@ -419,8 +419,11 @@ public:
             _stab(node->GetPos());
 
         // Early exit for "only first"
-        if (bFirst && dest->r_count())
-            return;
+        if constexpr (bFirst)
+        {
+            if (dest->r_count())
+                return;
+        }
 
         // 2nd chield
         if (node->HasLeaf2())

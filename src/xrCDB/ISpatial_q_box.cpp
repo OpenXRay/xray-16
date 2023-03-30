@@ -50,7 +50,7 @@ public:
                 continue;
 
             space->q_result->push_back(S);
-            if (b_first)
+            if constexpr (b_first)
                 return;
         }
 
@@ -63,8 +63,11 @@ public:
             Fvector c_C;
             c_C.mad(n_C, c_spatial_offset[octant], c_R);
             walk(N->children[octant], c_C, c_R);
-            if (b_first && !space->q_result->empty())
-                return;
+            if constexpr (b_first)
+            {
+                if (!space->q_result->empty())
+                    return;
+            }
         }
     }
 };

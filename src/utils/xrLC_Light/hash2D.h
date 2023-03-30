@@ -35,7 +35,7 @@ public:
         bounds.set(R);
         size.set(R.max.x - R.min.x, R.max.y - R.min.y);
 
-        u32 size = s_Y * s_X;
+        constexpr u32 size = s_Y * s_X;
         u32 apx = faces / size;
 
         for (u32 y = 0; y < s_Y; y++)
