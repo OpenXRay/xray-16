@@ -456,9 +456,9 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
     config.w_float    (identifier, "sky_rotation",              rad2deg(sky_rotation));
     config.w_string   (identifier, "sky_texture",               sky_texture_name.c_str());
 
-    config.w_string   (identifier, sun_name,                    lens_flare->section.c_str());
+    config.w_string   (identifier, sun_name,                    lens_flare ? lens_flare->section.c_str() : "");
     config.w_fvector3 (identifier, "sun_color",                 sun_color);
-    if (old_style)
+    if (use_dynamic_sun_dir)
     {
         float altutude, longitude;
         sun_dir.getHP(altutude, longitude);
@@ -468,8 +468,8 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
     {
         config.w_float(identifier, "sun_altitude",              rad2deg(sun_dir.getH()));
         config.w_float(identifier, "sun_longitude",             rad2deg(sun_dir.getP()));
-        config.w_float(identifier, "sun_azimuth",               sun_azimuth);
     }
+    config.w_float    (identifier, "sun_azimuth",               sun_azimuth);
     config.w_float    (identifier, "sun_shafts_intensity",      m_fSunShaftsIntensity);
 
     config.w_string   (identifier, thunderbolt_collection_name, thunderbolt ? thunderbolt->section.c_str() : "");
@@ -589,7 +589,9 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir)
     {
         sun_azimuth = (fi * A.sun_azimuth + f * B.sun_azimuth);
-        calculate_dynamic_sun_dir(exec_time);
+        auto [dir, blend] = calculate_dynamic_sun_dir(exec_time);
+        sun_dir = dir;
+        sun_color.mul(blend);
     }
     else
     {
@@ -626,7 +628,7 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     clouds_texture_name = strconcat(temp_name, A.clouds_texture_name.c_str(), "; ", B.clouds_texture_name.c_str());
 }
 
-void CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime)
+std::pair<Fvector3, float> CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime) const
 {
     float g = (360.0f / 365.25f) * (180.0f + fGameTime / DAY_LENGTH);
 
@@ -689,10 +691,16 @@ void CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime)
 
     R_ASSERT(_valid(AZ));
     R_ASSERT(_valid(SEA));
-    sun_dir.setHP(AZ, SEA);
-    R_ASSERT(_valid(sun_dir));
 
-    sun_color.mul(fSunBlend);
+    Fvector3 result;
+    result.setHP(AZ, SEA);
+    R_ASSERT(_valid(result));
+    
+    return
+    {
+        result,
+        fSunBlend
+    };
 }
 
 //-----------------------------------------------------------------------------

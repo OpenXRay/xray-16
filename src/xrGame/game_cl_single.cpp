@@ -83,6 +83,14 @@ void game_cl_Single::SetEnvironmentGameTimeFactor(const float fTimeFactor)
         inherited::SetEnvironmentGameTimeFactor(fTimeFactor);
 }
 
+void game_cl_Single::SetEnvironmentGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor)
+{
+    if (ai().get_alife() && ai().alife().initialized())
+        Level().Server->GetGameState()->SetGameTimeFactor(GameTime, fTimeFactor);
+    else
+        inherited::SetEnvironmentGameTimeFactor(fTimeFactor);
+}
+
 SCRIPT_EXPORT(CScriptGameDifficulty, (),
 {
     using namespace luabind;
