@@ -1,4 +1,4 @@
-﻿////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 //  Module      : vertex_manager_hash_fixed.h
 //  Created     : 21.03.2002
 //  Modified    : 05.03.2004
@@ -52,8 +52,9 @@ struct CVertexManagerHashFixed
         IndexVertex* m_vertices;
         IndexVertex** m_hash;
         u32 m_vertex_count;
-        static constexpr auto hashSizeOf = HashSize * sizeof(IndexVertex*);
-        static constexpr auto fixSizeOf = FixSize * sizeof(IndexVertex);
+
+        static constexpr auto IndexVertexHashSize = HashSize * sizeof(IndexVertex*);
+        static constexpr auto IndexVertexFixSize = FixSize * sizeof(IndexVertex);
 
     public:
         inline CDataStorage(const u32 vertex_count);

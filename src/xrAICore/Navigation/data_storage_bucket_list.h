@@ -34,7 +34,8 @@ struct CDataStorageBucketList
         typename TManagerDataStorage::Vertex::Distance m_max_bucket_value;
         typename TManagerDataStorage::Vertex* m_buckets[BucketCount];
         u32 m_min_bucket_id;
-        static constexpr auto bucketSize = BucketCount * sizeof(typename TManagerDataStorage::Vertex*);
+
+        static constexpr auto BucketSize = BucketCount * sizeof(typename TManagerDataStorage::Vertex*);
 
     public:
         inline CDataStorage(const u32 vertex_count);

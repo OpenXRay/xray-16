@@ -6,23 +6,25 @@ class poolSS
 {
     T* list;
     xr_vector<T*> blocks;
-    static constexpr size_t total = granularity - 1;
 
     T** access(T* P) { return (T**)LPVOID(P); }
+
     void block_create()
     {
+        constexpr size_t count = granularity - 1; // minus one. Correct. See partition logic below.
+
         // Allocate
         VERIFY(nullptr == list);
         list = xr_alloc<T>(granularity);
         blocks.push_back(list);
 
         // Partition
-        for (size_t it = 0; it < total; it++)
+        for (size_t it = 0; it < count; it++)
         {
             T* E = list + it;
             *access(E) = E + 1;
         }
-        *access(list + total) = nullptr;
+        *access(list + count) = nullptr;
     }
 
 public:
