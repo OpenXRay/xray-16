@@ -62,9 +62,10 @@ public:
 
     void set_visual(LPCSTR name, bool load = true);
     LPCSTR get_visual() const { return *visual_name; }
-#ifndef XRGAME_EXPORTS
+
+#ifndef MASTER_GOLD
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
-#endif // #ifndef XRGAME_EXPORTS
+#endif
 
     virtual CSE_Visual* visual() = 0;
 };
@@ -86,9 +87,10 @@ public:
 
     void set_motion(LPCSTR name);
     LPCSTR get_motion() const { return *motion_name; }
-#ifndef XRGAME_EXPORTS
+
+#ifndef MASTER_GOLD
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
-#endif // #ifndef XRGAME_EXPORTS
+#endif
 
     virtual CSE_Motion* motion() = 0;
 };
@@ -130,14 +132,16 @@ public:
 public:
     virtual void Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal) = 0;
     virtual BOOL Spawn_Read(NET_Packet& tNetPacket) = 0;
-#ifndef XRGAME_EXPORTS
+
+#ifndef MASTER_GOLD
     virtual void FillProp(LPCSTR pref, PropItemVec& items) = 0;
     virtual void on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F) = 0;
     virtual visual_data* visual_collection() const = 0;
     virtual u32 visual_collection_size() const = 0;
     virtual void set_additional_info(void* info) = 0;
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
+
     virtual LPCSTR name() const = 0;
     virtual void set_name(LPCSTR) = 0;
     virtual LPCSTR name_replace() const = 0;

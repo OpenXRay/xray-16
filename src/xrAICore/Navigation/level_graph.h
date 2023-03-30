@@ -112,7 +112,7 @@ public:
     IC u32 value(const u32 vertex_id, const_iterator i) const;
     IC const CHeader& header() const;
     ICF bool valid_vertex_id(u32 vertex_id) const;
-    IC const GameGraph::_LEVEL_ID& level_id() const;
+    IC GameGraph::_LEVEL_ID level_id() const;
     IC void unpack_xz(const CLevelGraph::CPosition& vertex_position, u32& x, u32& z) const;
     IC void unpack_xz(const CLevelGraph::CPosition& vertex_position, int& x, int& z) const;
     IC void unpack_xz(const CLevelGraph::CPosition& vertex_position, float& x, float& z) const;

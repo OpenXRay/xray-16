@@ -21,7 +21,7 @@ protected:
 public:
     IC CScriptValue(luabind::object object, LPCSTR name);
     virtual void assign() = 0;
-    IC shared_str name();
+    IC shared_str name() const;
 };
 
 #include "script_value_inline.h"

@@ -1,0 +1,2 @@
+c:\openxray\externals\libvorbis\include\vorbis\vorbisfile.h
+c:\openxray\externals\libvorbis\lib\vorbisfile.c

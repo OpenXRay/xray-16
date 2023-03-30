@@ -2556,7 +2556,6 @@ set(SRC_FILES
     "../xrServerEntities/script_fvector_script.cpp"
     "../xrServerEntities/script_ini_file.cpp"
     "../xrServerEntities/script_ini_file.h"
-    "../xrServerEntities/script_ini_file_inline.h"
     "../xrServerEntities/script_ini_file_script.cpp"
     "../xrServerEntities/script_net_packet_script.cpp"
     "../xrServerEntities/script_reader_script.cpp"
