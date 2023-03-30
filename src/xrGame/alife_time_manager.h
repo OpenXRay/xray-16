@@ -34,6 +34,7 @@ public:
     IC float time_factor() const;
     IC float normal_time_factor() const;
     IC void change_game_time(u32 value);
+    IC void set_game_time_factor(ALife::_TIME_ID gameTime, const float timeFactor);
 };
 
 #include "alife_time_manager_inline.h"
