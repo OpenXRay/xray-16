@@ -115,12 +115,19 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("set_readonly", &CScriptIniFile::set_readonly)
             //Alundaio: END
             .def("fname", &CScriptIniFile::fname)
-            .def("section_exist", &CScriptIniFile::section_exist)
+            .def("section_exist", (bool (CScriptIniFile::*)(pcstr) const)&CScriptIniFile::section_exist)
             .def("line_exist", (bool (CScriptIniFile::*)(pcstr, pcstr) const)&CScriptIniFile::line_exist)
             .def("r_clsid", &CScriptIniFile::r_clsid)
-            .def("r_bool", &CScriptIniFile::r_bool)
+            .def("r_bool", (bool (CScriptIniFile::*)(pcstr, pcstr) const)&CScriptIniFile::r_bool)
             .def("r_token", &CScriptIniFile::r_token)
-            .def("r_string_wq", &CScriptIniFile::r_string_wb)
+            .def("r_string_wq", +[](CScriptIniFile* self, pcstr S, pcstr L)
+            {
+                return self->r_string_wb(S, L).c_str();
+            })
+            .def("r_string_wb", +[](CScriptIniFile* self, pcstr S, pcstr L)
+            {
+                return self->r_string_wb(S, L).c_str();
+            })
             .def("line_count", &CScriptIniFile::line_count)
             .def("r_string", &CScriptIniFile::r_string)
             .def("r_u32", &CScriptIniFile::r_u32)

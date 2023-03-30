@@ -86,11 +86,12 @@ union GameObjectProperties
     u32 storage;
 };
 
-class IGameObject : public virtual IFactoryObject,
-                    public virtual ISpatial,
-                    public virtual ISheduled,
-                    public virtual IRenderable,
-                    public virtual ICollidable
+class XR_NOVTABLE IGameObject
+    : public virtual IFactoryObject,
+      public virtual ISpatial,
+      public virtual ISheduled,
+      public virtual IRenderable,
+      public virtual ICollidable
 {
 public:
     using visual_callback = void(*)(IKinematics*);

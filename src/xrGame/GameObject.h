@@ -57,8 +57,6 @@ class CGameObject : public IGameObject,
                     public RenderableBase,
                     public CollidableBase
 {
-    BENCH_SEC_SCRAMBLEMEMBER1
-    BENCH_SEC_SCRAMBLEVTBL2
     // Some property variables
     GameObjectProperties Props;
     shared_str NameObject;
@@ -130,7 +128,7 @@ public:
     virtual void setID(u16 _ID) override { Props.net_ID = _ID; }
     virtual bool GetTmpPreDestroy() const override { return Props.bPreDestroy; }
     virtual void SetTmpPreDestroy(bool b) override { Props.bPreDestroy = b; }
-    virtual float shedule_Scale() override { return Device.vCameraPosition.distance_to(Position()) / 200.f; }
+    virtual float shedule_Scale() const override { return Device.vCameraPosition.distance_to(Position()) / 200.f; }
     virtual bool shedule_Needed() override;
     virtual void shedule_Update(u32 dt) override;
     // Parentness

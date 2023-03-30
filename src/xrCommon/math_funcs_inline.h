@@ -27,7 +27,7 @@ constexpr double rad2deg(double val) noexcept { return val*180 / M_PI;}
 
 // clamping/snapping
 template <class T>
-constexpr void clamp(T& val, const T& _low, const T& _high)
+constexpr void clamp(T& val, const T& _low, const T& _high) noexcept
 {
     if (val<_low)
         val = _low;
@@ -37,7 +37,7 @@ constexpr void clamp(T& val, const T& _low, const T& _high)
 
 // XXX: Check usages and provide overloads for native types where arguments are NOT references.
 template <class T>
-constexpr T clampr(const T& val, const T& _low, const T& _high)
+constexpr T clampr(const T& val, const T& _low, const T& _high) noexcept
 {
     if (val < _low)
         return _low;

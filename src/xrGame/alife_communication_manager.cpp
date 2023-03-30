@@ -173,7 +173,7 @@ void CALifeCommunicationManager::vfRunFunctionByIndex(CSE_ALifeHumanAbstract *tp
 
 void CALifeCommunicationManager::vfAssignItemParents(CSE_ALifeHumanAbstract *tpALifeHumanAbstract, int iItemCount)
 {
-    ALife::_OBJECT_ID		*temp_children = (ALife::_OBJECT_ID*)alloca(sizeof(ALife::_OBJECT_ID)*iItemCount);
+    ALife::_OBJECT_ID		*temp_children = (ALife::_OBJECT_ID*)xr_alloca(sizeof(ALife::_OBJECT_ID)*iItemCount);
     std::copy				(tpALifeHumanAbstract->children.begin() + tpALifeHumanAbstract->children.size() -
 iItemCount,tpALifeHumanAbstract->children.end(),temp_children);
     tpALifeHumanAbstract->children.resize(tpALifeHumanAbstract->children.size() - iItemCount);

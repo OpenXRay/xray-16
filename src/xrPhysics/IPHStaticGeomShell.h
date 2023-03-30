@@ -1,7 +1,7 @@
 #pragma once
 #include "PhysicsExternalCommon.h"
 
-class IPHStaticGeomShell
+class XR_NOVTABLE IPHStaticGeomShell
 {
 protected:
     virtual ~IPHStaticGeomShell() = 0;

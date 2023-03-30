@@ -20,7 +20,7 @@ class CALifeInteractionManager : public CALifeCombatManager, public CALifeCommun
         u32								m_inventory_slot_count;
 
     public:
-        BOOL_VECTOR						m_temp_marks;
+        xr_vector<bool>					m_temp_marks;
         ALife::WEAPON_P_VECTOR			m_temp_weapons;
 
     **/

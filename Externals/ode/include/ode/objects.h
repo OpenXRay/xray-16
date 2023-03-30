@@ -887,7 +887,21 @@ ODE_API void dBodySetGravityMode (dBodyID b, int mode);
  */
 ODE_API int dBodyGetGravityMode (dBodyID b);
 
+/**
+ * @brief Set whether the body will change its location after contact with something or not.
+ * @ingroup bodies
+ * @param mode when nonzero the body does not change its location after contact with something.
+ * @remarks
+ * Newly created bodies change their location after contact with something.
+ */
+ODE_API void dBodySetNoUpdatePosMode (dBodyID b, int mode);
 
+/**
+ * @brief Get if the body changes its location after contact with something.
+ * @ingroup bodies
+ * @return nonzero value means that the body does not change its position after contact with something.
+ */
+ODE_API int dBodyGetNoUpdatePosMode (dBodyID b);
 
 /**
  * @defgroup joints Joints

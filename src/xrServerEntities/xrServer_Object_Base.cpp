@@ -380,12 +380,10 @@ const xr_token game_types[] = {{"any_game", eGameIDNoGame}, {"single", eGameIDSi
     // eGameIDTeamDominationZone
     {nullptr, 0}};
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_Abstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
-#ifdef XRSE_FACTORY_EXPORTS
     m_gameType.FillProp(pref, items);
-#endif // #ifdef XRSE_FACTORY_EXPORTS
     /*
     #ifdef XRGAME_EXPORTS
     #	ifdef DEBUG
@@ -401,7 +399,7 @@ void CSE_Abstract::FillProp(LPCSTR pref, PropItemVec& items)
     CScriptValueContainer::clear();
     FillProps(pref, items);
 }
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
 bool CSE_Abstract::validate() { return (true); }
 /**

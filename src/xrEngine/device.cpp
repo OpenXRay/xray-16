@@ -324,7 +324,8 @@ void CRenderDevice::message_loop()
                     else
                         UpdateWindowProps();
                     break;
-                }
+                } // switch (event.display.type)
+                break;
             }
 #endif
             case SDL_WINDOWEVENT:
@@ -379,10 +380,12 @@ void CRenderDevice::message_loop()
                 case SDL_WINDOWEVENT_CLOSE:
                     Engine.Event.Defer("KERNEL:disconnect");
                     Engine.Event.Defer("KERNEL:quit");
-                }
+                } // switch (event.window.event)
+                break;
             }
-            }
-        }
+            } // switch (event.type)
+        } // for (int i = 0; i < count; ++i)
+
         // Workaround for screen blinking when there's too much timeouts
         if (canCallActivate)
         {
@@ -497,7 +500,7 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, pcstr reason)
     {
         if (!Paused())
         {
-            if (editor())
+            if (editor_mode())
                 bShowPauseString = false;
 #ifdef DEBUG
             else if (xr_strcmp(reason, "li_pause_key_no_clip") == 0)
