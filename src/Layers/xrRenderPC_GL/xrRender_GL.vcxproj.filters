@@ -124,9 +124,6 @@
     <Filter Include="Interface implementations\EnvironmentRender">
       <UniqueIdentifier>{01a1d6b3-0ba8-4ae8-a34c-a30dacbe41d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface implementations\ConsoleRender">
-      <UniqueIdentifier>{8ac2634b-748b-434a-95fd-fec0f0cea30f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interface implementations\ObjectSpaceRender">
       <UniqueIdentifier>{951b65e2-6ff3-47c2-b296-11fdedddf026}</UniqueIdentifier>
     </Filter>
@@ -168,6 +165,9 @@
     </Filter>
     <Filter Include="Shading templates\GL MSAA">
       <UniqueIdentifier>{b5644c37-6f04-44e4-8343-56fec645ad53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface implementations\ImGuiRender">
+      <UniqueIdentifier>{24b98c00-6a2d-4e26-bdc2-316324ee4025}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -480,9 +480,6 @@
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp">
       <Filter>Interface implementations\EnvironmentRender</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\dxConsoleRender.cpp">
-      <Filter>Interface implementations\ConsoleRender</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
     </ClCompile>
@@ -692,6 +689,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1013,12 +1013,6 @@
     <ClInclude Include="..\xrRender\dxEnvironmentRender.h">
       <Filter>Interface implementations\EnvironmentRender</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h">
-      <Filter>Interface implementations\ConsoleRender</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\dxConsoleRender.h">
-      <Filter>Interface implementations\ConsoleRender</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\xrRender\ObjectSpaceRender.h">
       <Filter>Interface implementations\ObjectSpaceRender</Filter>
     </ClInclude>
@@ -1150,6 +1144,12 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\SkeletonXSkinXW.h">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\dxImGuiRender.h">
+      <Filter>Interface implementations\ImGuiRender</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

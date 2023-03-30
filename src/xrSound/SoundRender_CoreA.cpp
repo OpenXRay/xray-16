@@ -134,9 +134,9 @@ void CSoundRender_CoreA::_clear()
     xr_delete(m_effects);
     // remove targets
     CSoundRender_Target* T = nullptr;
-    for (u32 tit = 0; tit < s_targets.size(); tit++)
+    for (auto& sr_target : s_targets)
     {
-        T = s_targets[tit];
+        T = sr_target;
         T->_destroy();
         xr_delete(T);
     }

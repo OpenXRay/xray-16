@@ -755,7 +755,7 @@ public:
     bool too_far_to_kill_enemy(const Fvector& position);
 
 public:
-    virtual float shedule_Scale();
+    virtual float shedule_Scale() const;
 
 private:
     bool m_sniper_update_rate;

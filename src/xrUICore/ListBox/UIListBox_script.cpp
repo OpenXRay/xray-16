@@ -6,9 +6,6 @@
 #include "ComboBox/UIComboBox.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 struct CUIListBoxItemWrapper : public CUIListBoxItem, public luabind::wrap_base
 {
     CUIListBoxItemWrapper(float h) : CUIListBoxItem(h) {}
@@ -20,7 +17,11 @@ struct CUIListBoxItemMsgChainWrapper : public CUIListBoxItemMsgChain, public lua
 };
 
 // clang-format off
-SCRIPT_EXPORT(CUIListBox, (CUIScrollView), {
+SCRIPT_EXPORT(CUIListBox, (CUIScrollView),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
     module(luaState)
     [
         class_<CUIListBox, CUIScrollView>("CUIListBox")
@@ -41,7 +42,10 @@ SCRIPT_EXPORT(CUIListBox, (CUIScrollView), {
     ];
 });
 
-SCRIPT_EXPORT(CUIListBoxItem, (CUIFrameLineWnd), {
+SCRIPT_EXPORT(CUIListBoxItem, (CUIFrameLineWnd),
+{
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIListBoxItem, CUIFrameLineWnd, default_holder, CUIListBoxItemWrapper>("CUIListBoxItem")
@@ -53,7 +57,10 @@ SCRIPT_EXPORT(CUIListBoxItem, (CUIFrameLineWnd), {
     ];
 });
 
-SCRIPT_EXPORT(CUIListBoxItemMsgChain, (CUIListBoxItem), {
+SCRIPT_EXPORT(CUIListBoxItemMsgChain, (CUIListBoxItem),
+{
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUIListBoxItemMsgChain, CUIListBoxItem, default_holder, CUIListBoxItemMsgChainWrapper>("CUIListBoxItemMsgChain")

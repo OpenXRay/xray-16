@@ -694,10 +694,9 @@ bool CInifile::line_exist(pcstr S, pcstr L) const
 u32 CInifile::line_count(pcstr Sname) const
 {
     Sect& S = r_section(Sname);
-    auto I = S.Data.cbegin();
     u32 C = 0;
-    for (; I != S.Data.cend(); ++I)
-        if (*I->first)
+    for (const auto& item : S.Data)
+        if (*item.first)
             C++;
     return C;
 }

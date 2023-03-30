@@ -2,20 +2,17 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef ThunderboltH
-#define ThunderboltH
 #pragma once
-
-// refs
-class ENGINE_API IRender_DetailModel;
-class ENGINE_API CLAItem;
 
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/LensFlareRender.h"
 #include "Include/xrRender/ThunderboltDescRender.h"
 #include "Include/xrRender/ThunderboltRender.h"
 
-class CEnvironment;
+// refs
+class ENGINE_API IRender_DetailModel;
+class ENGINE_API CLAItem;
+class ENGINE_API CEnvDescriptorMixer;
 
 struct ENGINE_API SThunderboltDesc
 {
@@ -27,16 +24,22 @@ struct ENGINE_API SThunderboltDesc
     // gradient
     struct SFlare
     {
-        float fOpacity;
-        Fvector2 fRadius;
-        shared_str texture;
+        float fOpacity{};
+        Fvector2 fRadius{};
         shared_str shader;
-        // ref_shader hShader;
+        shared_str texture;
+
         FactoryPtr<IFlareRender> m_pFlare;
-        SFlare()
+
+        SFlare() = default;
+        SFlare(float opacity, Fvector2 radius, pcstr sh, pcstr tex)
+            : fOpacity(opacity), fRadius(radius), shader(sh), texture(tex)
         {
-            fOpacity = 0;
-            fRadius.set(0.f, 0.f);
+            m_pFlare->CreateShader(shader.c_str(), texture.c_str());
+        }
+        ~SFlare()
+        {
+            m_pFlare->DestroyShader();
         }
     };
     SFlare* m_GradientTop;
@@ -45,11 +48,9 @@ struct ENGINE_API SThunderboltDesc
     CLAItem* color_anim;
 
 public:
-    SThunderboltDesc() = default;
-    virtual ~SThunderboltDesc();
-    void load(const CInifile& pIni, shared_str const& sect);
-    virtual void create_top_gradient(const CInifile& pIni, shared_str const& sect);
-    virtual void create_center_gradient(const CInifile& pIni, shared_str const& sect);
+    SThunderboltDesc(const CInifile& pIni, shared_str const& sect);
+    ~SThunderboltDesc();
+    static SFlare* create_gradient(pcstr gradient_name, const CInifile& config, shared_str const& sect);
 };
 
 struct ENGINE_API SThunderboltCollection
@@ -58,9 +59,9 @@ struct ENGINE_API SThunderboltCollection
     DescVec palette;
     shared_str section;
 
-    SThunderboltCollection() = default;
+    SThunderboltCollection(shared_str sect, CInifile const* pIni, CInifile const* thunderbolts);
     ~SThunderboltCollection();
-    void load(CInifile const* pIni, CInifile const* thunderbolts, pcstr sect);
+
     SThunderboltDesc* GetRandomDesc()
     {
         VERIFY(palette.size() > 0);
@@ -75,8 +76,7 @@ class ENGINE_API CEffect_Thunderbolt
     friend class dxThunderboltRender;
 
 protected:
-    using CollectionVec = xr_vector<SThunderboltCollection*>;
-    CollectionVec collection;
+    xr_vector<SThunderboltCollection*> collections;
     SThunderboltDesc* current;
 
 private:
@@ -104,27 +104,35 @@ private:
     float next_lightning_time;
     bool bEnabled;
 
-    // params
-    // Fvector2 p_var_alt;
-    // float p_var_long;
-    // float p_min_dist;
-    // float p_tilt;
-    // float p_second_prop;
-    // float p_sky_color;
-    // float p_sun_color;
-    // float p_fog_color;
+    CInifile* m_thunderbolt_collections_config{};
+    CInifile* m_thunderbolts_config{};
 
+public:
+    static constexpr float MAX_DIST_FACTOR = 0.95f;
+
+    // params
+    Fvector2 p_var_alt;
+    float p_var_long;
+    float p_min_dist;
+    float p_tilt;
+    float p_second_prop;
+    float p_sky_color;
+    float p_sun_color;
+    float p_fog_color;
+
+private:
     static bool RayPick(const Fvector& s, const Fvector& d, float& range);
-    void Bolt(shared_str id, float period, float life_time);
+    void Bolt(const CEnvDescriptorMixer& currentEnv);
 
 public:
     CEffect_Thunderbolt();
     ~CEffect_Thunderbolt();
 
-    void OnFrame(shared_str id, float period, float duration);
+    void OnFrame(CEnvDescriptorMixer& currentEnv);
     void Render();
 
-    shared_str AppendDef(CEnvironment& environment, CInifile const* pIni, CInifile const* thunderbolts, pcstr sect);
-};
+    SThunderboltCollection* AppendDef(shared_str sect);
 
-#endif // ThunderboltH
+    [[nodiscard]]
+    auto& GetCollections() { return collections; }
+};

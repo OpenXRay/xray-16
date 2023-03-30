@@ -37,7 +37,7 @@ public:
     };
 
     SArtefactActivation(CArtefact* af, u32 owner_id);
-    ~SArtefactActivation();
+    virtual ~SArtefactActivation();
     CArtefact* m_af;
     svector<SStateDef, eMax> m_activation_states;
     EActivationStates m_cur_activation_state;

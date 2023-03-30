@@ -21,15 +21,13 @@
 
 #ifdef XRGAME_EXPORTS
 class CALifeSimulator;
-#endif
+class CALifeSmartTerrainTask;
+#endif //#ifdef XRGAME_EXPORTS
+class CALifeMonsterAbstract;
 
 class CSE_ALifeItemWeapon;
 class CSE_ALifeDynamicObject;
 class CSE_ALifeObject;
-#ifdef XRGAME_EXPORTS
-class CALifeSmartTerrainTask;
-#endif //#ifdef XRGAME_EXPORTS
-class CALifeMonsterAbstract;
 class CSE_ALifeInventoryItem;
 
 struct SFillPropData
@@ -100,7 +98,7 @@ public:
     CSE_ALifeGraphPoint(LPCSTR caSection);
     virtual ~CSE_ALifeGraphPoint();
     virtual bool match_configuration() const /* noexcept */ { return false; }
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
     virtual void on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
 #endif
@@ -260,13 +258,14 @@ public:
 
     virtual CSE_Abstract* base() { return (inherited1::base()); }
     virtual const CSE_Abstract* base() const { return (inherited1::base()); }
-#ifndef XRGAME_EXPORTS
+
+#ifndef MASTER_GOLD
     virtual void FillProps(LPCSTR pref, PropItemVec& items)
     {
         inherited1::FillProps(pref, items);
         inherited2::FillProps(pref, items);
     };
-#endif // #ifndef XRGAME_EXPORTS
+#endif // #ifndef MASTER_GOLD
 
     virtual CSE_Abstract* cast_abstract() { return (this); }
     virtual CSE_ALifeGroupAbstract* cast_group_abstract() { return (this); }
@@ -553,7 +552,7 @@ public:
     virtual bool used_ai_locations() const /* noexcept */;
     virtual bool match_configuration() const /* noexcept */;
     virtual bool validate();
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
     virtual void on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
 #endif // #ifndef XRGAME_EXPORTS
@@ -672,7 +671,7 @@ public:
     virtual bool can_switch_offline() const /* noexcept */;
     virtual IServerEntityShape* shape();
 
-#ifndef XRGAME_EXPORTS
+#ifndef MASTER_GOLD
     virtual void set_additional_info(void* info);
 #endif
     virtual void UPDATE_Read(NET_Packet& P);

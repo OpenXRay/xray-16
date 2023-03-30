@@ -11,19 +11,23 @@
 #include "script_effector_wrapper.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 void SPPInfo_assign(SPPInfo* self, SPPInfo* obj) { *self = *obj; }
 void add_effector(CScriptEffector* self) { self->Add(); }
 void remove_effector(CScriptEffector* self) { self->Remove(); }
-SCRIPT_EXPORT(CScriptEffector, (), {
-    module(luaState)[class_<SPPInfo::SDuality>("duality")
-                         .def_readwrite("h", &SPPInfo::SDuality::h)
-                         .def_readwrite("v", &SPPInfo::SDuality::v)
-                         .def(constructor<>())
-                         .def(constructor<float, float>())
-                         .def("set", &SPPInfo::SDuality::set),
+
+SCRIPT_EXPORT(CScriptEffector, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
+    module(luaState)
+    [
+        class_<SPPInfo::SDuality>("duality")
+            .def_readwrite("h", &SPPInfo::SDuality::h)
+            .def_readwrite("v", &SPPInfo::SDuality::v)
+            .def(constructor<>())
+            .def(constructor<float, float>())
+            .def("set", &SPPInfo::SDuality::set),
 
         class_<SPPInfo::SColor>("color")
             .def_readwrite("r", &SPPInfo::SColor::r)
@@ -56,5 +60,6 @@ SCRIPT_EXPORT(CScriptEffector, (), {
             .def(constructor<int, float>())
             .def("start", &add_effector, adopt<1>())
             .def("finish", &remove_effector, adopt<1>())
-            .def("process", &CScriptEffector::process, &CScriptEffectorWrapper::process_static)];
+            .def("process", &CScriptEffector::process, &CScriptEffectorWrapper::process_static)
+    ];
 });

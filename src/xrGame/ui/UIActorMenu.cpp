@@ -975,3 +975,63 @@ bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_
 
     return false;
 }
+
+void CUIActorMenu::HighlightSectionInSlot(pcstr section, EDDListType type, u16 slot_id /*= 0*/)
+{
+    CUIDragDropListEx* slot_list = GetListByType(type);
+
+    if (!slot_list)
+        slot_list = m_pLists[eInventoryBagList];
+
+    u32 const cnt = slot_list->ItemsCount();
+    for (u32 i = 0; i < cnt; ++i)
+    {
+        CUICellItem* ci = slot_list->GetItemIdx(i);
+        const PIItem item = static_cast<PIItem>(ci->m_pData);
+        if (!item)
+            continue;
+
+        if (strcmp(section, item->m_section_id.c_str()) != 0)
+            continue;
+
+        ci->m_select_armament = true;
+    }
+
+    m_highlight_clear = false;
+}
+
+void CUIActorMenu::HighlightForEachInSlot(const luabind::functor<bool>& functor, EDDListType type, u16 slot_id)
+{
+    if (!functor)
+        return;
+
+    CUIDragDropListEx* slot_list = GetListByType(type);
+
+    if (!slot_list)
+        slot_list = m_pLists[eInventoryBagList];
+
+    u32 const cnt = slot_list->ItemsCount();
+    for (u32 i = 0; i < cnt; ++i)
+    {
+        CUICellItem* ci = slot_list->GetItemIdx(i);
+        PIItem item = (PIItem)ci->m_pData;
+        if (!item)
+            continue;
+
+        if (functor(item->object().cast_game_object()->lua_game_object()) == false)
+            continue;
+
+        ci->m_select_armament = true;
+    }
+
+    m_highlight_clear = false;
+}
+
+CScriptGameObject* CUIActorMenu::GetCurrentItemAsGameObject()
+{
+    CGameObject* GO = smart_cast<CGameObject*>(CurrentIItem());
+    if (GO)
+        return GO->lua_game_object();
+
+    return nullptr;
+}

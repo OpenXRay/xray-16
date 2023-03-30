@@ -14,10 +14,7 @@
 
 XRSOUND_API Flags32 psSoundFlags =
 {
-    ss_Hardware
-#ifdef XR_PLATFORM_WINDOWS
-    | ss_EFX
-#endif
+    ss_Hardware | ss_EFX
 };
 
 XRSOUND_API int psSoundTargets = 32;
@@ -96,8 +93,8 @@ void CSoundRender_Core::_clear()
     s_sources.clear();
 
     // remove emitters
-    for (u32 eit = 0; eit < s_emitters.size(); eit++)
-        xr_delete(s_emitters[eit]);
+    for (auto& emit : s_emitters)
+        xr_delete(emit);
     s_emitters.clear();
 
     g_target_temp_data.clear();
@@ -105,8 +102,8 @@ void CSoundRender_Core::_clear()
 
 void CSoundRender_Core::stop_emitters()
 {
-    for (u32 eit = 0; eit < s_emitters.size(); eit++)
-        s_emitters[eit]->stop(false);
+    for (auto& emit : s_emitters)
+        emit->stop(false);
 }
 
 int CSoundRender_Core::pause_emitters(bool val)
@@ -114,8 +111,8 @@ int CSoundRender_Core::pause_emitters(bool val)
     m_iPauseCounter += val ? +1 : -1;
     VERIFY(m_iPauseCounter >= 0);
 
-    for (u32 it = 0; it < s_emitters.size(); it++)
-        ((CSoundRender_Emitter*)s_emitters[it])->pause(val, val ? m_iPauseCounter : m_iPauseCounter + 1);
+    for (auto& emit : s_emitters)
+        static_cast<CSoundRender_Emitter*>(emit)->pause(val, val ? m_iPauseCounter : m_iPauseCounter + 1);
 
     return m_iPauseCounter;
 }
@@ -166,11 +163,6 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
     u32 version = I->r_u32();
     VERIFY2(version == 0, "Invalid SOM version");
 
-    // load geometry
-    IReader* geom = I->open_chunk(1);
-    VERIFY2(geom, "Corrupted SOM file");
-
-    // Load tris and merge them
     struct SOM_poly
     {
         Fvector3 v1;
@@ -180,20 +172,29 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
         float occ;
     };
 
-    // Create AABB-tree
     CDB::Collector CL;
-    while (!geom->eof())
     {
-        SOM_poly P;
-        geom->r(&P, sizeof(P));
-        CL.add_face_packed_D(P.v1, P.v2, P.v3, *(u32*)&P.occ, 0.01f);
-        if (P.b2sided)
-            CL.add_face_packed_D(P.v3, P.v2, P.v1, *(u32*)&P.occ, 0.01f);
+        // load geometry
+        IReader* geom = I->open_chunk(1);
+        VERIFY2(geom, "Corrupted SOM file");
+        if (!geom)
+            return;
+
+        // Load tris and merge them
+        const auto begin = static_cast<SOM_poly*>(geom->pointer());
+        const auto end = static_cast<SOM_poly*>(geom->end());
+        for (SOM_poly* poly = begin; poly != end; ++poly)
+        {
+            CL.add_face_packed_D(poly->v1, poly->v2, poly->v3, *(u32*)&poly->occ, 0.01f);
+            if (poly->b2sided)
+                CL.add_face_packed_D(poly->v3, poly->v2, poly->v1, *(u32*)&poly->occ, 0.01f);
+        }
+        geom->close();
     }
+
+    // Create AABB-tree
     geom_SOM = xr_new<CDB::MODEL>();
     geom_SOM->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
-
-    geom->close();
 }
 
 void CSoundRender_Core::set_geometry_env(IReader* I)
@@ -471,12 +472,12 @@ void CSoundRender_Core::object_relcase(IGameObject* obj)
 {
     if (obj)
     {
-        for (u32 eit = 0; eit < s_emitters.size(); eit++)
+        for (auto& emit : s_emitters)
         {
-            if (s_emitters[eit])
-                if (s_emitters[eit]->owner_data)
-                    if (obj == s_emitters[eit]->owner_data->g_object)
-                        s_emitters[eit]->owner_data->g_object = 0;
+            if (emit)
+                if (emit->owner_data)
+                    if (obj == emit->owner_data->g_object)
+                        emit->owner_data->g_object = 0;
         }
     }
 }
@@ -506,8 +507,8 @@ void CSoundRender_Core::refresh_env_library()
 }
 void CSoundRender_Core::refresh_sources()
 {
-    for (u32 eit = 0; eit < s_emitters.size(); eit++)
-        s_emitters[eit]->stop(false);
+    for (auto& emit : s_emitters)
+        emit->stop(false);
     for (const auto& kv : s_sources)
     {
         CSoundRender_Source* s = kv.second;

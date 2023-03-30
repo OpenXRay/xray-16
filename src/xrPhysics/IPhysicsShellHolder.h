@@ -12,12 +12,12 @@ class ICollisionDamageReceiver;
 class ICollisionForm;
 class IGameObject; //--#SM+#--
 
-class ICollisionHitCallback
+class XR_NOVTABLE ICollisionHitCallback
 {
 public:
     virtual void call(
         IPhysicsShellHolder* obj, float min_cs, float max_cs, float& cs, float& hl, ICollisionDamageInfo* di) = 0;
-    virtual ~ICollisionHitCallback() {}
+    virtual ~ICollisionHitCallback() = default;
 };
 
 #ifdef DEBUG
@@ -32,9 +32,10 @@ enum EDumpType
 };
 #endif
 
-class IPhysicsShellHolder
+class XR_NOVTABLE IPhysicsShellHolder
 {
 public:
+    virtual ~IPhysicsShellHolder() = 0;
     virtual Fmatrix& ObjectXFORM() = 0;
     virtual Fvector& ObjectPosition() = 0;
     virtual LPCSTR ObjectName() const = 0;
@@ -71,3 +72,5 @@ public:
     virtual std::string dump(EDumpType type) const = 0;
 #endif
 };
+
+inline IPhysicsShellHolder::~IPhysicsShellHolder() = default;

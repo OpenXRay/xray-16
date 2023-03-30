@@ -176,7 +176,7 @@ void CUIButton::OnFocusLost()
 {
     inherited::OnFocusLost();
 
-    if (m_eButtonState == BUTTON_PUSHED && pInput->iGetAsyncBtnState(0) && !m_bIsSwitch)
+    if (m_eButtonState == BUTTON_PUSHED && pInput->iGetAsyncKeyState(MOUSE_1) && !m_bIsSwitch)
         SetButtonState(BUTTON_NORMAL); //???
 
     if (g_btnHint->Owner() == this)

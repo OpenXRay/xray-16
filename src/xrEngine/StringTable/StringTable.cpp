@@ -222,9 +222,32 @@ STRING_VALUE CStringTable::ParseLine(pcstr str)
 
 STRING_VALUE CStringTable::translate(const STRING_ID& str_id) const
 {
-    VERIFY(pData);
+    if (!pData)
+        return str_id;
 
     if (pData->m_StringTable.find(str_id) != pData->m_StringTable.end())
         return pData->m_StringTable[str_id];
     return str_id;
+}
+
+bool CStringTable::translate(const STRING_ID& str_id, STRING_VALUE& out) const
+{
+    if (!pData)
+        return false;
+
+    if (pData->m_StringTable.find(str_id) != pData->m_StringTable.end())
+    {
+        out = pData->m_StringTable[str_id];
+        return true;
+    }
+    return false;
+}
+
+pcstr CStringTable::translate(const STRING_ID& str_id, pcstr default_value) const
+{
+    STRING_VALUE out;
+    if (translate(str_id, out))
+        return out.c_str();
+
+    return default_value;
 }

@@ -18,8 +18,8 @@
 #include "Crypto/trivial_encryptor.h"
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
-#include "SDL.h" // XXX: remove
 #include "xrstring.h" // XXX: remove
+#include <SDL.h> // XXX: remove
 #include <glob.h>
 #endif
 
@@ -595,7 +595,6 @@ bool CLocatorAPI::load_all_unloaded_archives()
     return res;
 }
 
-IC bool pred_str_ff(const _finddata_t& x, const _finddata_t& y) { return xr_strcmp(x.name, y.name) < 0; }
 bool ignore_name(const char* _name)
 {
     if (!strcmp(_name, "Thumbs.db"))
@@ -800,7 +799,10 @@ bool CLocatorAPI::Recurse(pcstr path)
     size_t newSize = rec_files.size();
     if (newSize > oldSize)
     {
-        std::sort(rec_files.begin() + oldSize, rec_files.end(), pred_str_ff);
+        std::sort(rec_files.begin() + oldSize, rec_files.end(), [](const _finddata_t& x, const _finddata_t& y)
+        {
+            return xr_strcmp(x.name, y.name) < 0;
+        });
         for (size_t i = oldSize; i < newSize; i++) // Don't replace this with range-based for!
             ProcessOne(path, rec_files[i]); // only index-based for can work correctly here
         rec_files.erase(rec_files.begin() + oldSize, rec_files.end());
@@ -1088,7 +1090,7 @@ FileStatus CLocatorAPI::exist(pcstr fn, FSType fsType /*= FSType::Virtual*/)
 {
     if ((fsType | FSType::Virtual) == FSType::Virtual)
     {
-        files_it it = file_find_it(fn);
+        auto it = file_find_it(fn);
         if (it != m_files.end())
             return FileStatus(true, false);
     }

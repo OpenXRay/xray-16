@@ -9,9 +9,8 @@ int xrSimulate(xr_vector<u16>& indices, int iCacheSize)
     VertexCache C(iCacheSize);
 
     int count = 0;
-    for (u32 i = 0; i < indices.size(); i++)
+    for (int id : indices)
     {
-        int id = indices[i];
         if (C.InCache(id))
             continue;
         count++;

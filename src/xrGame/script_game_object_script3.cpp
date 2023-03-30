@@ -35,9 +35,6 @@
 #include "PhysicObject.h"
 #include "Artefact.h"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 /*
     New luabind makes incorrect casts in this case. He makes casts only to 'true derived class'.
     For example:
@@ -56,8 +53,11 @@ TClass* ObjectCast(CScriptGameObject* scriptObj)
     return nullptr;
 }
 
-class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject>& instance)
+luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_<CScriptGameObject>& instance)
 {
+    using namespace luabind;
+    using namespace luabind::policy;
+
     instance
         .def("add_sound",
             (u32(CScriptGameObject::*)(LPCSTR, u32, ESoundTypes, u32, u32, u32))(&CScriptGameObject::add_sound))
@@ -416,6 +416,11 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("remove_memory_sound_object", &CScriptGameObject::RemoveMemorySoundObject)
         .def("remove_memory_visible_object", &CScriptGameObject::RemoveMemoryVisibleObject)
         .def("remove_memory_hit_object", &CScriptGameObject::RemoveMemoryHitObject)
+
+        //For Ammo
+        .def("ammo_get_count", &CScriptGameObject::AmmoGetCount)
+        .def("ammo_set_count", &CScriptGameObject::AmmoSetCount)
+        .def("ammo_box_size", &CScriptGameObject::AmmoBoxSize)
 
         //For Weapons
         .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)

@@ -39,7 +39,7 @@ CAutosaveManager::CAutosaveManager()
 }
 
 CAutosaveManager::~CAutosaveManager() { shedule_unregister(); }
-float CAutosaveManager::shedule_Scale() { return (.5f); }
+float CAutosaveManager::shedule_Scale() const { return (.5f); }
 void CAutosaveManager::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);

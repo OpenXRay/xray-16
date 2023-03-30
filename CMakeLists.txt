@@ -165,7 +165,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 if (APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-undefined,error")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-undefined -fvisibility=hidden")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-undefined")
 endif()
 
 #set(SANITIZE_FLAGS "-fsanitize=address  -fsanitize=leak -fno-omit-frame-pointer -g -fsanitize=undefined -fno-sanitize=vptr")
@@ -250,7 +250,7 @@ if (NOT WIN32)
     find_package(Vorbis REQUIRED)
     find_package(Theora REQUIRED)
     find_package(LZO REQUIRED)
-    find_package(mimalloc)
+    find_package(mimalloc NAMES mimalloc2 mimalloc2.0 mimalloc)
 endif()
 
 # Memory allocator option
@@ -294,6 +294,7 @@ message("git branch: " ${GIT_BRANCH})
 include_directories(
     ${CMAKE_SOURCE_DIR}/Externals
     ${CMAKE_SOURCE_DIR}/Externals/luabind
+    ${CMAKE_SOURCE_DIR}/Externals/imgui
 )
 
 add_subdirectory(Externals)
@@ -306,7 +307,6 @@ set(CMAKE_CXX_FLAGS
     #"-pedantic"
     "-Wno-unknown-pragmas"
     "-Wno-strict-aliasing"
-    "-Wno-class-memaccess"
     "-Wno-parentheses"
     "-Wno-unused-label"
     "-Wno-switch"
@@ -319,10 +319,14 @@ set(CMAKE_CXX_FLAGS
     #"-Wno-c++14-compat-pedantic"
     #"-Wno-newline-eof"
 )
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "-Wno-class-memaccess")
+endif()
 string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(src)
 add_subdirectory(res)
+add_subdirectory(misc)
 
 get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 

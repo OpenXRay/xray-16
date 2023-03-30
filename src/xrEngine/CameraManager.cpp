@@ -79,16 +79,14 @@ CEffectorCam* CCameraManager::AddCamEffector(CEffectorCam* ef)
 
 void CCameraManager::UpdateDeffered()
 {
-    auto it = m_EffectorsCam_added_deffered.begin();
-    auto it_e = m_EffectorsCam_added_deffered.end();
-    for (; it != it_e; ++it)
+    for (auto& effector : m_EffectorsCam_added_deffered)
     {
-        RemoveCamEffector((*it)->eType);
+        RemoveCamEffector(effector->eType);
 
-        if ((*it)->AbsolutePositioning())
-            m_EffectorsCam.push_front(*it);
+        if (effector->AbsolutePositioning())
+            m_EffectorsCam.push_front(effector);
         else
-            m_EffectorsCam.push_back(*it);
+            m_EffectorsCam.push_back(effector);
     }
 
     m_EffectorsCam_added_deffered.clear();
@@ -107,10 +105,10 @@ void CCameraManager::RemoveCamEffector(ECamEffectorType type)
 
 CEffectorPP* CCameraManager::GetPPEffector(EEffectorPPType type)
 {
-    for (auto it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); ++it)
-        if ((*it)->Type() == type)
-            return *it;
-    return 0;
+    for (auto& effector : m_EffectorsPP)
+        if (effector->Type() == type)
+            return effector;
+    return nullptr;
 }
 
 ECamEffectorType CCameraManager::RequestCamEffectorId()
@@ -166,7 +164,7 @@ void CCameraManager::OnEffectorReleased(SBaseEffector* e)
 void CCameraManager::UpdateFromCamera(const CCameraBase* C)
 {
     Update(C->vPosition, C->vDirection, C->vNormal, C->f_fov, C->f_aspect,
-        g_pGamePersistent->Environment().CurrentEnv->far_plane, C->m_Flags.flags);
+        g_pGamePersistent->Environment().CurrentEnv.far_plane, C->m_Flags.flags);
 }
 
 void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest,

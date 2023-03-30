@@ -8,13 +8,6 @@
 
 #include "Layers/xrRender/FBasicVisual.h"
 
-IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
-{
-    float d1 = _1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    float d2 = _2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-    return d1 < d2;
-}
-
 void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 {
     PIX_EVENT(render_main);
@@ -33,13 +26,13 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
         // Determine visibility for static geometry hierrarhy
         if (psDeviceFlags.test(rsDrawStatic))
         {
-            for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+            for (auto& s : PortalTraverser.r_sectors)
             {
-                CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+                CSector* sector = static_cast<CSector*>(s);
                 dxRender_Visual* root = sector->root();
-                for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+                for (auto& r_frustum : sector->r_frustums)
                 {
-                    add_Geometry(root, sector->r_frustums[v_it]);
+                    add_Geometry(root, r_frustum);
                 }
             }
         }
@@ -52,7 +45,12 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                 lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)
-            std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
+            std::sort(lstRenderables.begin(), lstRenderables.end(), [](ISpatial* s1, ISpatial* s2)
+            {
+                const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
+                return d1 < d2;
+            });
 
             // Determine visibility for dynamic part of scene
             u32 uID_LTRACK = 0xffffffff;
@@ -76,11 +74,12 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
             {
                 ISpatial* spatial = lstRenderables[o_it];
                 spatial->spatial_updatesector();
-                CSector* sector = (CSector*)spatial->GetSpatialData().sector;
+                const auto& data = spatial->GetSpatialData();
+                const auto& [type, sphere, sector] = std::tuple(data.type, data.sphere, (CSector*)data.sector);
                 if (0 == sector)
                     continue; // disassociated from S/P structure
 
-                if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE)
+                if (type & STYPE_LIGHTSOURCE)
                 {
                     // lightsource
                     light* L = (light*)spatial->dcast_Light();
@@ -97,13 +96,12 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
 
                 if (PortalTraverser.i_marker != sector->r_marker)
                     continue; // inactive (untouched) sector
-                for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+                for (auto& view : sector->r_frustums)
                 {
-                    CFrustum& view = sector->r_frustums[v_it];
-                    if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
+                    if (!view.testSphere_dirty(sphere.P, sphere.R))
                         continue;
 
-                    if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
+                    if (type & STYPE_RENDERABLE)
                     {
                         // renderable
                         IRenderable* renderable = spatial->dcast_Renderable();
@@ -267,7 +265,7 @@ void CRender::Render()
         m_project.build_projection(
             deg2rad(Device.fFOV/* *Device.fASPECT*/),
             Device.fASPECT, VIEWPORT_NEAR,
-            z_distance * g_pGamePersistent->Environment().CurrentEnv->far_plane);
+            z_distance * g_pGamePersistent->Environment().CurrentEnv.far_plane);
         m_zfill.mul(m_project, Device.mView);
         r_pmask(true, false); // enable priority "0"
         set_Recorder(nullptr);

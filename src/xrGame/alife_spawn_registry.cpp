@@ -135,8 +135,9 @@ void CALifeSpawnRegistry::load(IReader& file_stream, xrGUID* save_guid)
     chunk->close();
 
     VERIFY(!m_chunk);
-    m_chunk = file_stream.open_chunk(4);
-    if (!m_chunk) // Shadow of Chernobyl
+    if (header().version() >= XRAI_VERSION_PRIQUEL)
+        m_chunk = file_stream.open_chunk(4);
+    else // XRAI_VERSION_SOC and below
     {
         string_path file_name;
         FS.update_path(file_name, "$game_data$", GRAPH_NAME);

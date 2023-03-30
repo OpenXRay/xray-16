@@ -99,7 +99,7 @@ EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
     return test_mask ? fcvPartial : fcvFully;
 }
 
-bool CFrustum::testSphere_dirty(Fvector& c, float r) const
+bool CFrustum::testSphere_dirty(const Fvector& c, float r) const
 {
 	VERIFY(p_count <= FRUSTUM_MAXPLANES); // '<=' is not a typo, this check is correct
     if (p_count == 0)
@@ -258,10 +258,10 @@ void CFrustum::SimplifyPoly_AABB(sPoly* poly, Fplane& plane)
     Fvector2 min, max;
     min.set(flt_max, flt_max);
     max.set(flt_min, flt_min);
-    for (u32 i = 0; i < poly->size(); i++)
+    for (auto& v : *poly)
     {
         Fvector2 tmp;
-        mView.transform_tiny32(tmp, (*poly)[i]);
+        mView.transform_tiny32(tmp, v);
         min.min(tmp.x, tmp.y);
         max.max(tmp.x, tmp.y);
     }

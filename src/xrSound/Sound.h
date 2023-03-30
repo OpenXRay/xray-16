@@ -87,15 +87,18 @@ enum esound_type : u32
 };
 
 /// definition (Sound Source)
-class XRSOUND_API CSound_source
+class XRSOUND_API XR_NOVTABLE CSound_source
 {
 public:
-    virtual float length_sec() const = 0;
-    virtual u32 game_type() const = 0;
-    virtual pcstr file_name() const = 0;
-    virtual u16 channels_num() const = 0;
-    virtual u32 bytes_total() const = 0;
+    virtual ~CSound_source() = 0;
+    [[nodiscard]] virtual float length_sec() const = 0;
+    [[nodiscard]] virtual u32 game_type() const = 0;
+    [[nodiscard]] virtual pcstr file_name() const = 0;
+    [[nodiscard]] virtual u16 channels_num() const = 0;
+    [[nodiscard]] virtual u32 bytes_total() const = 0;
 };
+
+inline CSound_source::~CSound_source() = default;
 
 /// definition (Sound Source)
 class XRSOUND_API CSound_environment
@@ -150,9 +153,11 @@ private:
 };
 
 /// definition (Sound Interface)
-class XRSOUND_API CSound_emitter
+class XRSOUND_API XR_NOVTABLE CSound_emitter
 {
 public:
+    virtual ~CSound_emitter() = 0;
+
     virtual bool is_2D() = 0;
     virtual void switch_to_2D() = 0;
     virtual void switch_to_3D() = 0;
@@ -166,6 +171,8 @@ public:
     virtual u32 play_time() = 0;
     virtual void start_ignore_time_factor() = 0;
 };
+
+inline CSound_emitter::~CSound_emitter() = default;
 
 /// definition (Sound Stream Interface)
 class XRSOUND_API CSound_stream_interface
@@ -193,8 +200,7 @@ namespace CDB
 }
 
 /// definition (Sound Manager Interface)
-// XXX tamlin: Tag NOVTABLE ?
-class XRSOUND_API ISoundManager
+class XRSOUND_API XR_NOVTABLE ISoundManager
 {
     virtual void _initialize_devices_list() = 0;
     virtual void _initialize() = 0;

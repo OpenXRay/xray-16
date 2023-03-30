@@ -136,6 +136,8 @@ void CRenderDevice::UpdateWindowProps()
 
     UpdateWindowRects();
     SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
+
+    editor().UpdateWindowProps();
 }
 
 void CRenderDevice::UpdateWindowRects()
@@ -213,7 +215,7 @@ SDL_Window* CRenderDevice::GetApplicationWindow()
 void CRenderDevice::OnErrorDialog(bool beforeDialog)
 {
     const bool restore = !beforeDialog;
-    const bool needUpdateInput = pInput && pInput->IsExclusiveMode() && !editor();
+    const bool needUpdateInput = pInput && pInput->IsExclusiveMode();
 
     if (restore)
         UpdateWindowProps();

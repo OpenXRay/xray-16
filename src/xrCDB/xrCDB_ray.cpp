@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #pragma hdrstop // ???
+
 #include "xrCore/_fbox.h"
+#include "xrCDB.h"
+
+#include <SDL.h>
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <xmmintrin.h>
@@ -9,9 +13,6 @@
 #else
 #error Add your platform here
 #endif
-
-#include "xrCDB.h"
-#include "SDL.h"
 
 namespace CDB
 {
@@ -28,6 +29,7 @@ struct alignas(16) aabb_t
     vec_t min;
     vec_t max;
 };
+
 struct alignas(16) ray_t
 {
     vec_t pos;

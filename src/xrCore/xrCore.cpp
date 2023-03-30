@@ -17,7 +17,7 @@
 #include "xrCore/_std_extensions.h"
 #include "Threading/TaskManager.hpp"
 
-#include "SDL.h"
+#include <SDL.h>
 
 #if __has_include(".GitInfo.hpp")
 #include ".GitInfo.hpp"

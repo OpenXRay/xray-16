@@ -2,7 +2,13 @@
 #include "tushkano.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
+SCRIPT_EXPORT(CTushkano, (CGameObject),
+{
+    using namespace luabind;
 
-SCRIPT_EXPORT(
-    CTushkano, (CGameObject), { module(luaState)[class_<CTushkano, CGameObject>("CTushkano").def(constructor<>())]; });
+    module(luaState)
+    [
+        class_<CTushkano, CGameObject>("CTushkano")
+            .def(constructor<>())
+    ];
+});

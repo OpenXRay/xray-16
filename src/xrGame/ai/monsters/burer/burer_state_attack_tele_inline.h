@@ -234,6 +234,7 @@ void CStateBurerAttackTele<Object>::FindObjects()
     FindFreeObjects(m_nearest, pos);
 
     // оставить уникальные объекты
+    std::sort(tele_objects.begin(), tele_objects.end());
     tele_objects.erase(std::unique(tele_objects.begin(), tele_objects.end()), tele_objects.end());
 }
 
@@ -252,29 +253,22 @@ void CStateBurerAttackTele<Object>::FireAllToEnemy()
 
     Fvector enemy_pos = get_head_position(const_cast<CEntityAlive*>(this->object->EnemyMan.get_enemy()));
 
-    for (u32 i = 0; i <this->object->CTelekinesis::get_objects_count(); ++i)
+    for (u32 i = 0; i < this->object->CTelekinesis::get_objects_total_count(); ++i)
     {
-        u32 const prev_num_objects = this->object->CTelekinesis::get_objects_count();
+        CTelekineticObject tele_object = this->object->CTelekinesis::get_object_by_index(i);
 
-        CPhysicsShellHolder* const cur_object = this->object->CTelekinesis::get_object_by_index(i).object;
-        if (!cur_object)
-        {
+        if (tele_object.get_state() != TS_Raise && tele_object.get_state() != TS_Keep)
             continue;
-        }
+
+        CPhysicsShellHolder* const cur_object = tele_object.get_object();
+        if (!cur_object)
+            continue;
+
         float const dist_to_enemy = cur_object->Position().distance_to(enemy_pos);
         float const fire_time = dist_to_enemy / this->object->m_tele_fly_velocity;
 
         this->object->CTelekinesis::fire_t(cur_object, enemy_pos, fire_time);
-
-        u32 const new_num_objects = this->object->CTelekinesis::get_objects_count();
-        if (new_num_objects < prev_num_objects)
-        {
-            VERIFY(new_num_objects == prev_num_objects - 1);
-            --i;
-        }
     }
-
-    // object->CTelekinesis::fire_all(enemy_pos);
 
     this->object->sound().play(CBurer::eMonsterSoundTeleAttack);
 }
@@ -292,8 +286,7 @@ void CStateBurerAttackTele<Object>::ExecuteTeleContinue()
     bool object_found = false;
     CTelekineticObject tele_object;
 
-    u32 i = 0;
-    while (i <this->object->CTelekinesis::get_objects_count())
+    for (u32 i = 0; i < this->object->CTelekinesis::get_objects_total_count(); ++i)
     {
         tele_object = this->object->CTelekinesis::get_object_by_index(i);
 
@@ -302,8 +295,6 @@ void CStateBurerAttackTele<Object>::ExecuteTeleContinue()
             object_found = true;
             break;
         }
-        else
-            i++;
     }
 
     if (object_found)
@@ -419,6 +410,10 @@ public:
 template <typename Object>
 void CStateBurerAttackTele<Object>::SelectObjects()
 {
+    const size_t max = std::min(tele_objects.size(), (size_t)this->object->m_tele_max_handled_objects);
+    if (this->object->CTelekinesis::get_objects_count() > max)
+        return;
+
     std::sort(tele_objects.begin(), tele_objects.end(),
         ::detail::burer_attack_tele::best_object_predicate2(
             this->object->Position(),
@@ -427,7 +422,7 @@ void CStateBurerAttackTele<Object>::SelectObjects()
     );
 
     // выбрать объект
-    for (u32 i = 0; i < tele_objects.size(); ++i)
+    for (u32 i = 0; i < max; ++i)
     {
         CPhysicsShellHolder* obj = tele_objects[i];
 
@@ -448,16 +443,9 @@ void CStateBurerAttackTele<Object>::SelectObjects()
         tele_obj->set_sound(this->object->sound_tele_hold, this->object->sound_tele_throw);
 
         this->object->StartTeleObjectParticle(obj);
-
-        // удалить из списка
-        tele_objects[i] = tele_objects[tele_objects.size() - 1];
-        tele_objects.pop_back();
-
-        if (this->object->CTelekinesis::get_objects_count() >= this->object->m_tele_max_handled_objects)
-        {
-            break;
-        }
     }
+
+    tele_objects.erase(tele_objects.begin(), tele_objects.begin() + max);
 }
 
 template <typename Object>

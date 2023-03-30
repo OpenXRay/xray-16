@@ -4,13 +4,17 @@
 #include "xrUICore/Static/UIStatic.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
+SCRIPT_EXPORT(CUIGameCustom, (CDialogHolder),
+{
+    using namespace luabind;
 
-CUIGameCustom* get_hud() { return CurrentGameUI(); }
-SCRIPT_EXPORT(CUIGameCustom, (CDialogHolder), {
-    module(luaState)[class_<StaticDrawableWrapper>("StaticDrawableWrapper")
-                         .def_readwrite("m_endTime", &StaticDrawableWrapper::m_endTime)
-                         .def("wnd", &StaticDrawableWrapper::wnd),
+    module(luaState)
+    [
+        def("get_hud", +[]() -> CUIGameCustom* { return CurrentGameUI(); }),
+
+        class_<StaticDrawableWrapper>("StaticDrawableWrapper")
+            .def_readwrite("m_endTime", &StaticDrawableWrapper::m_endTime)
+            .def("wnd", &StaticDrawableWrapper::wnd),
 
         class_<CUIGameCustom, CDialogHolder>("CUIGameCustom")
             .def("AddDialogToRender", &CUIGameCustom::AddDialogToRender)
@@ -32,6 +36,6 @@ SCRIPT_EXPORT(CUIGameCustom, (CDialogHolder), {
             .def("hide_messages", &CUIGameCustom::HideMessagesWindow)
             .def("GetCustomStatic", &CUIGameCustom::GetCustomStatic)
             .def("update_fake_indicators", &CUIGameCustom::update_fake_indicators)
-            .def("enable_fake_indicators", &CUIGameCustom::enable_fake_indicators),
-        def("get_hud", &get_hud)];
+            .def("enable_fake_indicators", &CUIGameCustom::enable_fake_indicators)
+    ];
 });

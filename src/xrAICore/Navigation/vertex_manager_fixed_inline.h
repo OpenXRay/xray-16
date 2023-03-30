@@ -74,9 +74,9 @@ inline TCompoundVertex& CFixedVertexManager::create_vertex(TCompoundVertex& vert
 }
 
 TEMPLATE_SPECIALIZATION
-inline void CFixedVertexManager::add_opened(TCompoundVertex& vertex) { vertex._opened = 1; }
+inline void CFixedVertexManager::add_opened(TCompoundVertex& vertex) { vertex._opened = true; }
 TEMPLATE_SPECIALIZATION
-inline void CFixedVertexManager::add_closed(TCompoundVertex& vertex) { vertex._opened = 0; }
+inline void CFixedVertexManager::add_closed(TCompoundVertex& vertex) { vertex._opened = false; }
 TEMPLATE_SPECIALIZATION
 inline TPathId CFixedVertexManager::current_path_id() const { return m_current_path_id; }
 #undef TEMPLATE_SPECIALIZATION

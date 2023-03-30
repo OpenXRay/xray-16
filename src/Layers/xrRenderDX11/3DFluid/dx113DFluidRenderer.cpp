@@ -451,11 +451,11 @@ void dx113DFluidRenderer::CalculateLighting(const dx113DFluidData& FluidData, Fo
 
     const dx113DFluidData::Settings& VolumeSettings = FluidData.GetSettings();
 
-    Fvector4 hemi_color = g_pGamePersistent->Environment().CurrentEnv->hemi_color;
+    Fvector4 hemi_color = g_pGamePersistent->Environment().CurrentEnv.hemi_color;
     // hemi_color.mul(0.2f);
     hemi_color.mul(VolumeSettings.m_fHemi);
     LightData.m_vLightIntencity.set(hemi_color.x, hemi_color.y, hemi_color.z);
-    LightData.m_vLightIntencity.add(g_pGamePersistent->Environment().CurrentEnv->ambient);
+    LightData.m_vLightIntencity.add(g_pGamePersistent->Environment().CurrentEnv.ambient);
 
     const Fmatrix& Transform = FluidData.GetTransform();
 
@@ -517,7 +517,7 @@ void dx113DFluidRenderer::PrepareCBuffer(const dx113DFluidData &FluidData, u32 R
 
     // The near and far planes are used to unproject the scene's z-buffer values
     RCache.set_c(strZNear, VIEWPORT_NEAR);
-    RCache.set_c(strZFar, g_pGamePersistent->Environment().CurrentEnv->far_plane);
+    RCache.set_c(strZFar, g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
     const XMMATRIX gridWorld = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&transform));
     const XMMATRIX View      = XMLoadFloat4x4(reinterpret_cast<const XMFLOAT4X4*>(&RCache.xforms.m_v));

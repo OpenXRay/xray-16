@@ -34,7 +34,7 @@
 #endif
 
 #include <thread>
-#include "SDL.h"
+#include <SDL.h>
 
 #if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)) && !defined(XR_COMPILER_MSVC)
 #define _FPU_EXTENDED 0

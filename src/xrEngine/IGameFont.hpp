@@ -4,7 +4,7 @@
 #include "xrCore/_vector2.h"
 #include "xrCore/Text/StringConversion.hpp"
 
-class IGameFont
+class XR_NOVTABLE IGameFont
 {
     friend class dxFontRender;
 
@@ -58,4 +58,4 @@ public:
     virtual void Clear() = 0;
 };
 
-inline IGameFont::~IGameFont() {}
+inline IGameFont::~IGameFont() = default;
