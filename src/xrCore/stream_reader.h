@@ -6,7 +6,7 @@ class XRCORE_API CStreamReader : public IReaderBase<CStreamReader>, Noncopyable
 private:
 #if defined(XR_PLATFORM_WINDOWS)
     HANDLE m_file_mapping_handle;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     int m_file_mapping_handle;
 #else
 #   error Select or add implementation for your platform
@@ -34,7 +34,7 @@ public:
 #if defined(XR_PLATFORM_WINDOWS)
     virtual void construct(const HANDLE& file_mapping_handle, const size_t& start_offset, const size_t& file_size,
         const size_t& archive_size, const size_t& window_size);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     virtual void construct(int file_mapping_handle, const size_t& start_offset, const size_t& file_size,
         const size_t& archive_size, const size_t& window_size);
 #else
@@ -45,7 +45,7 @@ public:
 public:
 #if defined(XR_PLATFORM_WINDOWS)
     IC const HANDLE& file_mapping_handle() const;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     IC const int& file_mapping_handle() const;
 #else
 #   error Select or add implementation for your platform

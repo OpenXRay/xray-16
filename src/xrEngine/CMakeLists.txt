@@ -1,5 +1,14 @@
 project(xrEngine)
 
+set(EDITOR_SRC
+    "editor_base.cpp"
+    "editor_base.h"
+    "editor_base_input.cpp"
+    "editor_helper.cpp"
+    "editor_helper.h"
+    "editor_weather.cpp"
+)
+
 set(ENGINE_SRC
     "Properties.h"
     "pure.cpp"
@@ -228,7 +237,6 @@ set(RENDER_DEVICE_SRC
     "Device_Initialize.cpp"
     "Device_mode.cpp"
     "Device_overdraw.cpp"
-    #"Device_wndproc.cpp"
     "IPerformanceAlert.hpp"
     "PerformanceAlert.cpp"
     "PerformanceAlert.hpp"
@@ -285,6 +293,7 @@ set(RENDER_VISUALS_SKELETON_SRC
     "EnnumerateVertices.h"
 )
 
+source_group("editor" FILES ${EDITOR_SRC})
 source_group("Engine" FILES ${ENGINE_SRC})
 source_group("Engine\\Console" FILES ${ENGINE_CONSOLE_SRC})
 source_group("Engine\\Console\\commands" FILES ${ENGINE_CONSOLE_COMMANDS_SRC})
@@ -330,6 +339,7 @@ source_group("Render\\Visibility" FILES ${RENDER_VISIBILITY_SRC})
 source_group("Render\\Visuals\\Skeleton" FILES ${RENDER_VISUALS_SKELETON_SRC})
 
 add_library(${PROJECT_NAME} SHARED
+    ${EDITOR_SRC}
     ${ENGINE_SRC}
     ${ENGINE_CONSOLE_SRC}
     ${ENGINE_CONSOLE_COMMANDS_SRC}
@@ -398,6 +408,7 @@ target_link_libraries(${PROJECT_NAME}
     xrSound
     xrScriptEngine
     xrNetServer
+    xrImGui
     ${LUA_LIBRARIES}
     ${SDL2_LIBRARIES}
     ${OPENAL_LIBRARY}

@@ -3,10 +3,10 @@
 #include "UIAnimatedStatic.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CUILines, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUILines>("CUILines")
@@ -19,15 +19,17 @@ SCRIPT_EXPORT(CUILines, (),
     ];
 });
 
+// We don't change game assets.
+// This class allowes original game scripts to not specify the window name.
+class CUIStaticScript : public CUIStatic
+{
+public:
+    CUIStaticScript() : CUIStatic("CUIStaticScript") {}
+};
+
 SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 {
-    // We don't change game assets.
-    // This class allowes original game scripts to not specify the window name.
-    class CUIStaticScript : public CUIStatic
-    {
-    public:
-        CUIStaticScript() : CUIStatic("CUIStaticScript") {}
-    };
+    using namespace luabind;
 
     module(luaState)
     [
@@ -99,6 +101,8 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 
 SCRIPT_EXPORT(CUITextWnd, (CUIWindow),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CUITextWnd, CUIWindow>("CUITextWnd")

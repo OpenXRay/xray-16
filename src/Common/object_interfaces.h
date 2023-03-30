@@ -13,7 +13,7 @@ class NET_Packet;
 class IReader;
 class IWriter;
 
-class IPureDestroyableObject
+class XR_NOVTABLE IPureDestroyableObject
 {
 public:
     virtual ~IPureDestroyableObject() = 0;
@@ -23,7 +23,7 @@ public:
 
 inline IPureDestroyableObject::~IPureDestroyableObject() = default;
 
-class ISerializable
+class XR_NOVTABLE ISerializable
 {
 public:
     virtual ~ISerializable() = 0;
@@ -33,7 +33,7 @@ public:
 
 inline ISerializable::~ISerializable() = default;
 
-class IPureServerObject : public ISerializable
+class XR_NOVTABLE IPureServerObject : public ISerializable
 {
 public:
     virtual void STATE_Write(NET_Packet& tNetPacket) = 0;
@@ -42,7 +42,7 @@ public:
     virtual void UPDATE_Read(NET_Packet& tNetPacket) = 0;
 };
 
-class IPureSchedulableObject
+class XR_NOVTABLE IPureSchedulableObject
 {
 public:
     virtual ~IPureSchedulableObject() = 0;

@@ -9,12 +9,12 @@
 #include "profile_store.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 CMainMenu* MainMenu();
 
 ICF static void UIRegistratorScriptExport(lua_State* luaState)
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CGameFont>("CGameFont")
@@ -43,9 +43,11 @@ ICF static void UIRegistratorScriptExport(lua_State* luaState)
             .def("GetAccountMngr", &CMainMenu::GetAccountMngr)
             .def("GetProfileStore", &CMainMenu::GetProfileStore)
     ];
+
     module(luaState, "main_menu")
     [
         def("get_main_menu", &MainMenu)
     ];
 }
+
 SCRIPT_EXPORT_FUNC(UIRegistrator, (CDialogHolder), UIRegistratorScriptExport)

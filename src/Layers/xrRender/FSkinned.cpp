@@ -598,10 +598,10 @@ void fill_vertices_hw(CKinematics* parent, const Fmatrix& view, CSkeletonWallmar
     VERIFY(V->vStride == sizeof(T));
     T* vertices = static_cast<T*>(V->p_rm_Vertices->Map(V->vBase, V->vCount * V->vStride, true));
 
-    for (auto it = faces.begin(); it != faces.end(); ++it)
+    for (u16 face : faces)
     {
         Fvector p[3];
-        u32 idx = *it * 3;
+        u32 idx = face * 3;
         CSkeletonWallmark::WMFace F;
 
         for (u32 k = 0; k < 3; k++)
@@ -706,9 +706,9 @@ template <typename vertex_buffer_type>
 void TEnumBoneVertices(
     vertex_buffer_type vertices, u16* indices, CBoneData::FacesVec& faces, SEnumVerticesCallback& C)
 {
-    for (auto it = faces.begin(); it != faces.end(); ++it)
+    for (u16 face : faces)
     {
-        u32 idx = (*it) * 3;
+        u32 idx = face * 3;
         for (u32 k = 0; k < 3; k++)
         {
             Fvector P;

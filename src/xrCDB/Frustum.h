@@ -10,12 +10,11 @@
 
 #pragma pack(push, 4)
 
-enum EFC_Visible
+enum EFC_Visible : u32
 {
     fcvNone = 0,
     fcvPartial,
     fcvFully,
-    fcv_forcedword = u32(-1)
 };
 
 #define FRUSTUM_MAXPLANES 12
@@ -82,7 +81,7 @@ public:
 
     u32 getMask() const { return (1 << p_count) - 1; }
     EFC_Visible testSphere(Fvector& c, float r, u32& test_mask) const;
-    bool testSphere_dirty(Fvector& c, float r) const;
+    bool testSphere_dirty(const Fvector& c, float r) const;
     EFC_Visible testAABB(const float* mM, u32& test_mask) const;
     EFC_Visible testSAABB(Fvector& c, float r, const float* mM, u32& test_mask) const;
     bool testPolyInside_dirty(Fvector* p, size_t count) const;

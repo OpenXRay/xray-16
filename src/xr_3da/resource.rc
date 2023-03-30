@@ -25,7 +25,7 @@ LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
 // Bitmap
 //
 
-IDB_BITMAP1             BITMAP                  "splash_xrcs_pl.bmp"
+IDB_SPLASH              BITMAP                  "splash_xrcs_pl.bmp"
 
 #endif    // Polish (Poland) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -44,9 +44,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "stalker_cop.ico"
-IDI_ICON2               ICON                    "stalker_cs.ico"
-IDI_ICON3               ICON                    "stalker_soc.ico"
+IDI_ICON_COP            ICON                    "stalker_cop.ico"
+
+IDI_ICON_CS             ICON                    "stalker_cs.ico"
+
+IDI_ICON_SOC            ICON                    "stalker_soc.ico"
 
 #endif    // Neutral (Default) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -63,7 +65,7 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 // Bitmap
 //
 
-IDB_BITMAP1             BITMAP                  "splash_xrcs_ru.bmp"
+IDB_SPLASH              BITMAP                  "splash_xrcs_ru.bmp"
 
 #endif    // Russian (Russia) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -115,7 +117,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 // Bitmap
 //
 
-IDB_BITMAP1             BITMAP                  "splash_xrcs_en.bmp"
+IDB_SPLASH              BITMAP                  "splash_xrcs_en.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////

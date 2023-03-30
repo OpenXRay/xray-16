@@ -25,7 +25,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R1_EXPORTS;USE_DX9;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -39,13 +39,13 @@
   <ItemGroup>
     <ClInclude Include="..\..\Include\xrRender\animation_blend.h" />
     <ClInclude Include="..\..\Include\xrRender\animation_motion.h" />
-    <ClInclude Include="..\..\Include\xrRender\ConsoleRender.h" />
     <ClInclude Include="..\..\Include\xrRender\DebugRender.h" />
     <ClInclude Include="..\..\Include\xrRender\DebugShader.h" />
     <ClInclude Include="..\..\Include\xrRender\DrawUtils.h" />
     <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h" />
     <ClInclude Include="..\..\Include\xrRender\FactoryPtr.h" />
     <ClInclude Include="..\..\Include\xrRender\FontRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h" />
     <ClInclude Include="..\..\Include\xrRender\Kinematics.h" />
     <ClInclude Include="..\..\Include\xrRender\KinematicsAnimated.h" />
     <ClInclude Include="..\..\Include\xrRender\LensFlareRender.h" />
@@ -92,10 +92,10 @@
     <ClInclude Include="..\xrRender\du_cylinder.h" />
     <ClInclude Include="..\xrRender\du_sphere.h" />
     <ClInclude Include="..\xrRender\du_sphere_part.h" />
-    <ClInclude Include="..\xrRender\dxConsoleRender.h" />
     <ClInclude Include="..\xrRender\dxDebugRender.h" />
     <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
     <ClInclude Include="..\xrRender\dxFontRender.h" />
+    <ClInclude Include="..\xrRender\dxImGuiRender.h" />
     <ClInclude Include="..\xrRender\dxLensFlareRender.h" />
     <ClInclude Include="..\xrRender\dxObjectSpaceRender.h" />
     <ClInclude Include="..\xrRender\dxParticleCustom.h" />
@@ -221,10 +221,10 @@
     <ClCompile Include="..\xrRender\du_cylinder.cpp" />
     <ClCompile Include="..\xrRender\du_sphere.cpp" />
     <ClCompile Include="..\xrRender\du_sphere_part.cpp" />
-    <ClCompile Include="..\xrRender\dxConsoleRender.cpp" />
     <ClCompile Include="..\xrRender\dxDebugRender.cpp" />
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
     <ClCompile Include="..\xrRender\dxFontRender.cpp" />
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
     <ClCompile Include="..\xrRender\dxLensFlareRender.cpp" />
     <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp" />
     <ClCompile Include="..\xrRender\dxParticleCustom.cpp" />
@@ -356,6 +356,9 @@
     <ProjectReference Include="$(xrExternals)oalib.vcxproj">
       <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -366,17 +369,17 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets" Condition="Exists('..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" />
-    <Import Project="..\..\packages\directxmath.2021.1.11.2\build\native\directxmath.targets" Condition="Exists('..\..\packages\directxmath.2021.1.11.2\build\native\directxmath.targets')" />
-    <Import Project="..\..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\..\packages\directxmath.2022.12.12.1\build\native\directxmath.targets" Condition="Exists('..\..\packages\directxmath.2022.12.12.1\build\native\directxmath.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets'))" />
-    <Error Condition="!Exists('..\..\packages\directxmath.2021.1.11.2\build\native\directxmath.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\directxmath.2021.1.11.2\build\native\directxmath.targets'))" />
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.0.20\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.0.20\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\..\packages\directxmath.2022.12.12.1\build\native\directxmath.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\directxmath.2022.12.12.1\build\native\directxmath.targets'))" />
   </Target>
 </Project>

@@ -148,7 +148,7 @@ public:
         //     customFOV = psHUD_FOV * Device.fFOV;
         //
         // Device.mProject.build_projection(deg2rad(customFOV), Device.fASPECT,
-        //    VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
+        //    VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
         //
         // Look at the function:
         // void __fastcall sorted_L1_HUD(mapSorted_Node* N)
@@ -156,7 +156,7 @@ public:
         // https://github.com/ShokerStlk/xray-16-SWM/commit/869de0b6e74ac05990f541e006894b6fe78bd2a5#diff-4199ef700b18ce4da0e2b45dee1924d0R83
 
         Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
-            VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
+            VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
         Device.mFullTransform.mul(Device.mProject, Device.mView);
         RCache.set_xform_project(Device.mProject);

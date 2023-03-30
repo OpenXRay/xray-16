@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_FREEBSD) || defined(XR_PLATFORM_APPLE)
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 // XXX: remove or cleanup
 #define EXCEPTION_STACK_OVERFLOW ((u32) 0xC00000FD)
 #define EXCEPTION_EXECUTE_HANDLER 1

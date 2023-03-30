@@ -10,24 +10,28 @@
 #include "xrEngine/LightAnimLibrary.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 struct lanim_wrapper
 {
     CLAItem* item;
 
 public:
-    lanim_wrapper(LPCSTR name) { load(name); }
-    void load(LPCSTR name)
+    lanim_wrapper(pcstr name)
+    {
+        load(name);
+    }
+
+    void load(pcstr name)
     {
         item = LALib.FindItem(name);
         R_ASSERT3(item, "Can't find color anim:", name);
     }
+
     u32 length()
     {
         VERIFY(item);
         return item->Length_ms();
     }
+
     Fcolor calculate(float T)
     {
         int frame;
@@ -36,10 +40,16 @@ public:
     }
 };
 
-SCRIPT_EXPORT(lanim_wrapper, (), {
-    module(luaState)[class_<lanim_wrapper>("color_animator")
-                         .def(constructor<LPCSTR>())
-                         .def("load", &lanim_wrapper::load)
-                         .def("calculate", &lanim_wrapper::calculate)
-                         .def("length", &lanim_wrapper::length)];
+SCRIPT_EXPORT(lanim_wrapper, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<lanim_wrapper>("color_animator")
+            .def(constructor<pcstr>())
+            .def("load", &lanim_wrapper::load)
+            .def("calculate", &lanim_wrapper::calculate)
+            .def("length", &lanim_wrapper::length)
+    ];
 });

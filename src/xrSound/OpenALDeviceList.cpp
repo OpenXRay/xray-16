@@ -26,20 +26,11 @@
 #include "OpenALDeviceList.h"
 #include "xrCore/xr_token.h"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#include <objbase.h>
-#endif
-
 constexpr pcstr AL_GENERIC_HARDWARE = "Generic Hardware";
 constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";
 
-void __cdecl al_log(char* msg) { Log(msg); }
-
 ALDeviceList::ALDeviceList()
 {
-#if !defined(MASTER_GOLD) && defined(XR_PLATFORM_WINDOWS)
-    pLog = al_log;
-#endif
     snd_device_id = (u32)-1;
     Enumerate();
 }
@@ -118,9 +109,6 @@ void ALDeviceList::Enumerate()
     // -- empty all the lists and reserve space for 10 devices
     m_devices.clear();
 
-#if defined(XR_PLATFORM_WINDOWS)
-    CoUninitialize();
-#endif
     // grab function pointers for 1.0-API functions, and if successful proceed to enumerate all devices
     if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT"))
     {
@@ -196,8 +184,6 @@ void ALDeviceList::Enumerate()
             GetDeviceDesc(j).props.xram ? "yes" : "no");
     }
 #endif
-
-    Core.CoInitializeMultithreaded();
 }
 
 pcstr ALDeviceList::GetDeviceName(u32 index) const { return snd_devices_token[index].name; }

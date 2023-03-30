@@ -69,21 +69,6 @@ struct CEnemyFiller
     }
 };
 
-struct remove_wounded_predicate
-{
-    IC bool operator()(const CMemberEnemy& enemy) const
-    {
-        const CAI_Stalker* stalker = smart_cast<const CAI_Stalker*>(enemy.m_object);
-        if (!stalker)
-            return (false);
-
-        if (!stalker->wounded())
-            return (false);
-
-        return (true);
-    }
-};
-
 void CAgentEnemyManager::fill_enemies()
 {
     m_enemies.clear();
@@ -149,8 +134,11 @@ void CAgentEnemyManager::fill_enemies()
 
     if (!m_only_wounded_left && m_is_any_wounded)
     {
-        enemies().erase(
-            std::remove_if(enemies().begin(), enemies().end(), remove_wounded_predicate()), enemies().end());
+        enemies().erase(std::remove_if(enemies().begin(), enemies().end(), [](const CMemberEnemy& enemy)
+        {
+            const CAI_Stalker* stalker = smart_cast<const CAI_Stalker*>(enemy.m_object);
+            return stalker && stalker->wounded();
+        }), enemies().end());
     }
 
     VERIFY(!m_enemies.empty());
@@ -623,31 +611,13 @@ void CAgentEnemyManager::distribute_enemies()
     assign_enemy_masks();
 }
 
-struct wounded_predicate
-{
-    IGameObject* m_object;
-
-    IC wounded_predicate(IGameObject* object)
-    {
-        VERIFY(object);
-        m_object = object;
-    }
-
-    IC bool operator()(const CAgentEnemyManager::WOUNDED_ENEMY& wounded_enemy) const
-    {
-        if (wounded_enemy.first == m_object)
-            return (true);
-
-        if (wounded_enemy.second.first == m_object->ID())
-            return (true);
-
-        return (false);
-    }
-};
-
 void CAgentEnemyManager::remove_links(IGameObject* object)
 {
-    m_wounded.erase(std::remove_if(m_wounded.begin(), m_wounded.end(), wounded_predicate(object)), m_wounded.end());
+    VERIFY(object);
+    m_wounded.erase(std::remove_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& wounded_enemy)
+    {
+        return wounded_enemy.first == object || wounded_enemy.second.first == object->ID();
+    }), m_wounded.end());
 }
 
 void CAgentEnemyManager::update() {}
@@ -666,23 +636,25 @@ ALife::_OBJECT_ID CAgentEnemyManager::wounded_processor(const CEntityAlive* obje
 
 class find_wounded_predicate
 {
-private:
     const CEntityAlive* m_object;
 
 public:
-    IC find_wounded_predicate(const CEntityAlive* object)
+    find_wounded_predicate(const CEntityAlive* object)
     {
         m_object = object;
         VERIFY(m_object);
     }
 
-    IC bool operator()(const CAgentEnemyManager::WOUNDED_ENEMY& enemy) const { return (enemy.first == m_object); }
+    bool operator()(const CAgentEnemyManager::WOUNDED_ENEMY& enemy) const
+    {
+        return (enemy.first == m_object);
+    }
 };
 
 void CAgentEnemyManager::wounded_processor(const CEntityAlive* object, const ALife::_OBJECT_ID& wounded_processor_id)
 {
     VERIFY(std::find_if(m_wounded.begin(), m_wounded.end(), find_wounded_predicate(object)) == m_wounded.end());
-    m_wounded.push_back(std::make_pair(object, std::make_pair(wounded_processor_id, false)));
+    m_wounded.emplace_back(object, std::make_pair(wounded_processor_id, false));
 }
 
 void CAgentEnemyManager::wounded_processed(const CEntityAlive* object, bool value)

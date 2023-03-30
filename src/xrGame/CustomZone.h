@@ -240,6 +240,7 @@ protected:
     ref_light m_pIdleLight;
     Fcolor m_IdleLightColor;
     float m_fIdleLightRange;
+    float m_fIdleLightRangeDelta;
     float m_fIdleLightHeight;
     CLAItem* m_pIdleLAnim;
 

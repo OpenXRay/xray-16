@@ -49,6 +49,7 @@ public:
 
     //переключение в режим подствольника
     virtual bool SwitchMode();
+    bool CanSwitchToGL();
     void PerformSwitchGL();
     void OnAnimationEnd(u32 state);
     virtual void OnMagazineEmpty();

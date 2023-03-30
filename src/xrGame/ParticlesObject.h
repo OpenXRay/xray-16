@@ -26,13 +26,13 @@ public:
     CParticlesObject(LPCSTR p_name, BOOL bAutoRemove, bool destroy_on_game_load);
 
     virtual bool shedule_Needed() { return true; };
-    virtual float shedule_Scale();
+    virtual float shedule_Scale() const;
     virtual void shedule_Update(u32 dt);
     void renderable_Render(IRenderable* root) override;
     void PerformAllTheWork(u32 dt);
     void PerformAllTheWork_mt();
 
-    Fvector& Position();
+    Fvector& Position() const;
     void SetXFORM(const Fmatrix& m);
     IC Fmatrix& XFORM() { return renderable.xform; }
     void UpdateParent(const Fmatrix& m, const Fvector& vel);

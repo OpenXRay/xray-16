@@ -228,8 +228,8 @@ CActor::~CActor()
     Device.seqRender.Remove(this);
 #endif
     // xr_delete(Weapons);
-    for (int i = 0; i < eacMaxCam; ++i)
-        xr_delete(cameras[i]);
+    for (auto& camera : cameras)
+        xr_delete(camera);
 
     m_HeavyBreathSnd.destroy();
     m_BloodSnd.destroy();

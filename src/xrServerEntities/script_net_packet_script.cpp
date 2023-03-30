@@ -10,11 +10,8 @@
 #include "xrServer_Object_Base.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-using namespace luabind::policy;
-
 bool r_eof(NET_Packet* self) { return (!!self->r_eof()); }
-LPCSTR r_stringZ(NET_Packet* self)
+pcstr r_stringZ(NET_Packet* self)
 {
     shared_str temp;
     self->r_stringZ(temp);
@@ -23,6 +20,7 @@ LPCSTR r_stringZ(NET_Packet* self)
 
 void w_bool(NET_Packet* self, bool value) { self->w_u8(value ? 1 : 0); }
 bool r_bool(NET_Packet* self) { return (!!self->r_u8()); }
+
 ClientID r_clientID(NET_Packet* self)
 {
     ClientID clientID;
@@ -32,16 +30,28 @@ ClientID r_clientID(NET_Packet* self)
 
 //extern u16 script_server_object_version();
 
-SCRIPT_EXPORT(ClientID, (), {
-    module(luaState)[class_<ClientID>("ClientID")
-                         .def(constructor<>())
-                         .def("value", &ClientID::value)
-                         .def("set", &ClientID::set)
-                         .def(self == other<ClientID>())];
+SCRIPT_EXPORT(ClientID, (),
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<ClientID>("ClientID")
+            .def(constructor<>())
+            .def("value", &ClientID::value)
+            .def("set", &ClientID::set)
+            .def(self == other<ClientID>())
+    ];
 });
 
-SCRIPT_EXPORT(NET_Packet, (), {
-    module(luaState)[def("script_server_object_version", &script_server_object_version),
+SCRIPT_EXPORT(NET_Packet, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
+    module(luaState)
+    [
+        def("script_server_object_version", &script_server_object_version),
         class_<NET_Packet>("net_packet")
             .def(constructor<>())
             .def("w_begin", &NET_Packet::w_begin)
@@ -65,7 +75,7 @@ SCRIPT_EXPORT(NET_Packet, (), {
             .def("w_angle8", &NET_Packet::w_angle8)
             .def("w_dir", &NET_Packet::w_dir)
             .def("w_sdir", &NET_Packet::w_sdir)
-            .def("w_stringZ", (void (NET_Packet::*)(LPCSTR))(&NET_Packet::w_stringZ))
+            .def("w_stringZ", (void (NET_Packet::*)(pcstr))(&NET_Packet::w_stringZ))
             .def("w_matrix", &NET_Packet::w_matrix)
             .def("w_clientID", &NET_Packet::w_clientID)
             .def("w_chunk_open8", &NET_Packet::w_chunk_open8, out_value<2>())
@@ -98,5 +108,6 @@ SCRIPT_EXPORT(NET_Packet, (), {
             .def("r_clientID", &r_clientID)
             .def("r_elapsed", &NET_Packet::r_elapsed)
             .def("r_advance", &NET_Packet::r_advance)
-            .def("r_eof", &r_eof)];
+            .def("r_eof", &r_eof)
+    ];
 });

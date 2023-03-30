@@ -21,4 +21,7 @@
 #define r2_T_sky0 "$user$sky0"
 #define r2_T_sky1 "$user$sky1"
 
+#define r2_T_envs0 "$user$env_s0"
+#define r2_T_envs1 "$user$env_s1"
+
 #define r2_RT_luminance_cur "$user$tonemap" // --- result

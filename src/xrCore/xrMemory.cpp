@@ -1,11 +1,14 @@
 #include "stdafx.h"
 
-#include "SDL.h"
+#include <SDL.h>
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>
 #elif defined(XR_PLATFORM_LINUX)
 #include <sys/sysinfo.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#elif defined(XR_PLATFORM_BSD)
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
@@ -18,16 +21,21 @@
 
 #if defined(USE_MIMALLOC)
 #include "mimalloc.h"
-#define xr_internal_malloc(size, alignment) mi_malloc_aligned(size, alignment);
-#define xr_internal_malloc_nothrow(size, alignment) mi_malloc_aligned(size, alignment);
-#define xr_internal_realloc(ptr, size, alignment) mi_realloc_aligned(ptr, size, alignment);
-#define xr_internal_free(ptr, alignment) mi_free_aligned(ptr, alignment);
+static_assert(xrMemory::SMALL_SIZE_MAX <= MI_SMALL_SIZE_MAX, "Please, adjust SMALL_SIZE_ALLOC_MAX");
+#define xr_internal_malloc(size, alignment) mi_malloc_aligned(size, alignment)
+#define xr_internal_malloc_nothrow(size, alignment) mi_malloc_aligned(size, alignment)
+#define xr_internal_realloc(ptr, size, alignment) mi_realloc_aligned(ptr, size, alignment)
+#define xr_internal_free(ptr, alignment) mi_free_aligned(ptr, alignment)
+#define xr_internal_small_alloc(size) mi_malloc_small(size)
+#define xr_internal_small_free(ptr) mi_free(ptr)
 #elif defined(USE_XR_ALIGNED_MALLOC)
 #include "Memory/xrMemory_align.h"
 #define xr_internal_malloc(size, alignment) xr_aligned_malloc(size, alignment)
 #define xr_internal_malloc_nothrow(size, alignment) xr_aligned_malloc(size, alignment)
 #define xr_internal_realloc(ptr, size, alignment) xr_aligned_realloc(ptr, size, alignment)
 #define xr_internal_free(ptr, alignment) xr_aligned_free(ptr)
+#define xr_internal_small_alloc(size) xr_aligned_malloc(size)
+#define xr_internal_small_free(ptr) xr_aligned_free(ptr)
 #elif defined(USE_PURE_ALLOC)
 // Additional bytes of memory to hide memory problems on Release
 // But for Debug we don't need this if we want to find these problems
@@ -41,6 +49,8 @@ constexpr size_t xr_reserved_tail = 0;
 #define xr_internal_malloc_nothrow(size, alignment) malloc(size + xr_reserved_tail)
 #define xr_internal_realloc(ptr, size, alignment) realloc(ptr, size + xr_reserved_tail)
 #define xr_internal_free(ptr, alignment) free(ptr)
+#define xr_internal_small_alloc(size) malloc(size + xr_reserved_tail)
+#define xr_internal_small_free(ptr) free(ptr)
 #else
 #error Please, define explicitly which allocator you want to use
 #endif
@@ -112,7 +122,7 @@ size_t xrMemory::mem_usage()
         CloseHandle(h);
     }
     return pmc.PagefileUsage;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
     return (size_t)ru.ru_maxrss;
@@ -168,6 +178,18 @@ void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&) 
 {
     stat_calls++;
     return xr_internal_malloc_nothrow(size, alignment);
+}
+
+void* xrMemory::small_alloc(size_t size) noexcept
+{
+    stat_calls++;
+    return xr_internal_small_alloc(size);
+}
+
+void xrMemory::small_free(void* ptr) noexcept
+{
+    stat_calls++;
+    xr_internal_small_free(ptr);
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size)

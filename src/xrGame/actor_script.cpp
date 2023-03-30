@@ -20,12 +20,9 @@ IC static void CActor_Export(lua_State* luaState)
     [
         class_<CActor, CGameObject>("CActor")
             .def(constructor<>())
-            .def("conditions", &CActor::conditions)
-
-#ifndef BENCHMARK_BUILD
-                         ,
-        class_<CLevelChanger, CGameObject>("CLevelChanger").def(constructor<>())
-#endif
+            .def("conditions", &CActor::conditions),
+        class_<CLevelChanger, CGameObject>("CLevelChanger")
+            .def(constructor<>())
     ];
 };
 

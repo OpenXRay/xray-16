@@ -15,8 +15,6 @@ extern float r_ssaLOD_B;
 template <class T> IC bool cmp_first_l(const T &lhs, const T &rhs) { return (lhs.first < rhs.first); }
 template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs.first > rhs.first); }
 
-ICF bool pred_dot(const std::pair<float, u32>& _1, const std::pair<float, u32>& _2) { return _1.first < _2.first; }
-
 void R_dsgraph_structure::r_dsgraph_render_lods(bool _setup_zb, bool _clear)
 {
     if (mapLOD.empty())
@@ -83,7 +81,10 @@ void R_dsgraph_structure::r_dsgraph_render_lods(bool _setup_zb, bool _clear)
             svector<std::pair<float, u32>, 8> selector;
             for (u32 s = 0; s < 8; s++)
                 selector.push_back(std::make_pair(Ldir.dotproduct(facets[s].N), s));
-            std::sort(selector.begin(), selector.end(), pred_dot);
+            std::sort(selector.begin(), selector.end(), [](const auto& v1, const auto& v2)
+            {
+                return v1.first < v2.first;
+            });
 
             float dot_best = selector[selector.size() - 1].first;
             float dot_next = selector[selector.size() - 2].first;

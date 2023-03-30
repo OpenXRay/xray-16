@@ -1,12 +1,5 @@
 #include "stdafx.h"
 
-IC bool pred_area(light* _1, light* _2)
-{
-    u32 a0 = _1->X.S.size;
-    u32 a1 = _2->X.S.size;
-    return a0 > a1; // reverse -> descending
-}
-
 void CRender::render_lights(light_Package& LP)
 {
     //////////////////////////////////////////////////////////////////////////
@@ -41,7 +34,12 @@ void CRender::render_lights(light_Package& LP)
         for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
             LP_smap_pool.initialize(RImplementation.o.smapsize);
-            std::sort(source.begin(), source.end(), pred_area);
+            std::sort(source.begin(), source.end(), [](light* l1, light* l2)
+            {
+                const u32 a0 = l1->X.S.size;
+                const u32 a1 = l2->X.S.size;
+                return a0 > a1; // reverse -> descending
+            });
             for (size_t test = 0; test < source.size(); ++test)
             {
                 light* L = source[test];
@@ -185,16 +183,16 @@ void CRender::render_lights(light_Package& LP)
         if (!L_spot_s.empty())
         {
             PIX_EVENT(ACCUM_SPOT);
-            for (u32 it = 0; it < L_spot_s.size(); it++)
+            for (auto& p_light : L_spot_s)
             {
-                Target->accum_spot(L_spot_s[it]);
-                render_indirect(L_spot_s[it]);
+                Target->accum_spot(p_light);
+                render_indirect(p_light);
             }
 
             PIX_EVENT(ACCUM_VOLUMETRIC);
             if (RImplementation.o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
-                for (u32 it = 0; it < L_spot_s.size(); it++)
-                    Target->accum_volumetric(L_spot_s[it]);
+                for (auto& p_light : L_spot_s)
+                    Target->accum_volumetric(p_light);
 
             L_spot_s.clear();
         }
@@ -205,13 +203,13 @@ void CRender::render_lights(light_Package& LP)
     if (!LP.v_point.empty())
     {
         xr_vector<light*>& Lvec = LP.v_point;
-        for (u32 pid = 0; pid < Lvec.size(); pid++)
+        for (auto & p_light : Lvec)
         {
-            Lvec[pid]->vis_update();
-            if (Lvec[pid]->vis.visible)
+            p_light->vis_update();
+            if (p_light->vis.visible)
             {
-                render_indirect(Lvec[pid]);
-                Target->accum_point(Lvec[pid]);
+                render_indirect(p_light);
+                Target->accum_point(p_light);
             }
         }
         Lvec.clear();
@@ -222,14 +220,14 @@ void CRender::render_lights(light_Package& LP)
     if (!LP.v_spot.empty())
     {
         xr_vector<light*>& Lvec = LP.v_spot;
-        for (u32 pid = 0; pid < Lvec.size(); pid++)
+        for (auto& p_light : Lvec)
         {
-            Lvec[pid]->vis_update();
-            if (Lvec[pid]->vis.visible)
+            p_light->vis_update();
+            if (p_light->vis.visible)
             {
-                LR.compute_xf_spot(Lvec[pid]);
-                render_indirect(Lvec[pid]);
-                Target->accum_spot(Lvec[pid]);
+                LR.compute_xf_spot(p_light);
+                render_indirect(p_light);
+                Target->accum_spot(p_light);
             }
         }
         Lvec.clear();
@@ -250,10 +248,8 @@ void CRender::render_indirect(light* L)
     if (Lvec.empty())
         return;
     float LE = L->color.intensity();
-    for (u32 it = 0; it < Lvec.size(); it++)
+    for (auto& LI : Lvec)
     {
-        light_indirect& LI = Lvec[it];
-
         // energy and color
         float LIE = LE * LI.E;
         if (LIE < ps_r2_GI_clip)

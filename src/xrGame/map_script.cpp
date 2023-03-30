@@ -3,10 +3,10 @@
 #include "map_manager.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-using namespace luabind;
-
 SCRIPT_EXPORT(CMapManager, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CMapManager>("CMapManager")
@@ -19,6 +19,8 @@ SCRIPT_EXPORT(CMapManager, (),
 
 SCRIPT_EXPORT(CMapLocation, (),
 {
+    using namespace luabind;
+
     module(luaState)
     [
         class_<CMapLocation>("CMapLocation")

@@ -15,8 +15,6 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrServerEntities/script_token_list.h"
 
-using namespace luabind;
-
 struct CChooseType
 {
 };
@@ -68,8 +66,10 @@ CScriptPropertiesListHelper* properties_helper()
     return (g_property_list_helper);
 }
 
-SCRIPT_EXPORT(
-    CScriptPropertiesListHelper, (), {
+SCRIPT_EXPORT(CScriptPropertiesListHelper, (),
+{
+    using namespace luabind;
+
         module(luaState)[class_<PropValue>("prop_value"), class_<PropItemVec>("prop_item_vec"),
             class_<CaptionValue>("caption_value"), class_<CanvasValue>("canvas_value"),
             class_<ButtonValue>("button_value"), class_<ChooseValue>("choose_value"), class_<S8Value>("s8_value"),

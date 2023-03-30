@@ -124,7 +124,7 @@ void CRenderTarget::phase_combine()
     {
         PIX_EVENT(combine_1);
         // Compute params
-        CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
+        const auto& envdesc = g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
         {
@@ -135,28 +135,12 @@ void CRenderTarget::phase_combine()
         };
         ambclr.mul(ps_r2_sun_lumscale_amb);
 
-        Fvector4 envclr;
-        if (envdesc.old_style)
-        {
-            envclr =
-            {
-                envdesc.sky_color.x * 2 + EPS, envdesc.sky_color.y * 2 + EPS,
-                envdesc.sky_color.z * 2 + EPS, envdesc.weight
-            };
-        }
-        else
-        {
-            envclr =
-            {
-                envdesc.hemi_color.x * 2 + EPS, envdesc.hemi_color.y * 2 + EPS,
-                envdesc.hemi_color.z * 2 + EPS, envdesc.weight
-            };
-        }
-
-        Fvector4 fogclr = {envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0};
+        Fvector4 envclr = envdesc.env_color;
         envclr.x *= 2 * ps_r2_sun_lumscale_hemi;
         envclr.y *= 2 * ps_r2_sun_lumscale_hemi;
         envclr.z *= 2 * ps_r2_sun_lumscale_hemi;
+
+        Fvector4 fogclr = {envdesc.fog_color.x, envdesc.fog_color.y, envdesc.fog_color.z, 0};
         Fvector4 sunclr, sundir;
 
         float fSSAONoise = 2.0f;
@@ -218,14 +202,6 @@ void CRenderTarget::phase_combine()
         pv->set(1, -1, 1, 0, 0, scale_X, 0);
         pv++;
         RCache.Vertex.Unlock(4, g_combine->vb_stride);
-
-        dxEnvDescriptorMixerRender& envdescren = *(dxEnvDescriptorMixerRender*)(&*envdesc.m_pDescriptorMixer);
-
-        // Setup textures
-        GLuint e0 = _menu_pp ? 0 : envdescren.sky_r_textures_env[0].second->surface_get();
-        GLuint e1 = _menu_pp ? 0 : envdescren.sky_r_textures_env[1].second->surface_get();
-        t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
-        t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
 
         // Draw
         if (!RImplementation.o.msaa)
@@ -321,7 +297,7 @@ void CRenderTarget::phase_combine()
 
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
-    BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
+    BOOL PP_Complex = u_need_PP() || (BOOL)RImplementation.m_bMakeAsyncSS;
     if (_menu_pp)
         PP_Complex = FALSE;
 

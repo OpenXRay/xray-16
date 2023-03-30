@@ -19,7 +19,7 @@ DeviceMode psDeviceMode =
 // release version always has "mt_*" enabled
 Flags32 psDeviceFlags =
 {
-   rsDrawStatic | rsDrawDynamic | rsDrawDetails | rsDrawParticles | mtPhysics | mtSound | mtNetwork
+   rsDrawStatic | rsDrawDynamic | rsDrawDetails | rsDrawParticles | mtSound | mtNetwork
 };
 
 // textures

@@ -27,11 +27,8 @@ public:
     CCustomHUD();
     virtual ~CCustomHUD();
 
-    BENCH_SEC_SCRAMBLEVTBL2
-
     virtual void Render_First() {}
     virtual void Render_Last() {}
-    BENCH_SEC_SCRAMBLEVTBL1
 
     virtual void OnFrame() { ; }
     virtual void OnEvent(EVENT /*E*/, u64 /*P1*/, u64 /*P2*/) { ; }

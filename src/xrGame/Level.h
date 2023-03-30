@@ -4,7 +4,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Client.h"
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
 #include "xrNetServer/empty/NET_Client.h"
 #else
 #   error Select or add implementation for your platform
@@ -99,11 +99,6 @@ public:
 #include "Level_network_Demo.h"
     void ClearAllObjects();
 
-private:
-#ifdef DEBUG
-    bool m_bSynchronization = false;
-    bool m_bEnvPaused = false;
-#endif
 protected:
     typedef IGame_Level inherited;
     CLevelSoundManager* m_level_sound_manager = nullptr;
@@ -291,6 +286,8 @@ public:
     void net_Update() override;
     bool Load_GameSpecific_Before() override;
     bool Load_GameSpecific_After() override;
+    void Load_GameSpecific_CFORM_Serialize(IWriter& writer) override;
+    bool Load_GameSpecific_CFORM_Deserialize(IReader& reader) override;
     void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count) override;
 
     // Events
@@ -370,20 +367,26 @@ public:
     ALife::_TIME_ID GetGameTime();
 
     // возвращает время для энвайронмента в милисекундах относительно начала игры
-    ALife::_TIME_ID GetEnvironmentGameTime();
+    ALife::_TIME_ID GetEnvironmentGameTime() const override;
+    static_assert(std::is_same_v<ALife::_TIME_ID, u64>,
+        "Please, change return type of GetEnvironmentGameTime in IGame_Level and CGameLevel accordingly");
 
     // игровое время в отформатированном виде
     void GetGameDateTime(u32& year, u32& month, u32& day, u32& hours, u32& mins, u32& secs, u32& milisecs);
+
     float GetGameTimeFactor();
     void SetGameTimeFactor(const float fTimeFactor);
     void SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor);
+
+    float GetEnvironmentTimeFactor() const override;
+    void SetEnvironmentTimeFactor(const float fTimeFactor) override;
     void SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor) override;
 
     // gets current daytime [0..23]
     u8 GetDayTime();
     u32 GetGameDayTimeMS();
     float GetGameDayTimeSec();
-    float GetEnvironmentGameDayTimeSec();
+    float GetEnvironmentGameDayTimeSec() const override;
 
 protected:
     // CFogOfWarMngr* m_pFogOfWarMngr;

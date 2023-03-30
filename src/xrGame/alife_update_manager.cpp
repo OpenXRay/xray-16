@@ -71,7 +71,7 @@ CALifeUpdateManager::~CALifeUpdateManager()
     Device.remove_from_seq_parallel(fastdelegate::FastDelegate0<>(this, &CALifeUpdateManager::update));
 }
 
-float CALifeUpdateManager::shedule_Scale()
+float CALifeUpdateManager::shedule_Scale() const
 {
     return (.5f); // (schedule_min + schedule_max)*0.5f
 }

@@ -4,12 +4,12 @@
 #include "SoundRender_Environment.h"
 #include "xrCore/_std_extensions.h"
 
-class CSoundRender_Emitter : public CSound_emitter
+class CSoundRender_Emitter final : public CSound_emitter
 {
     float starting_delay;
 
 public:
-    enum State
+    enum State : u32
     {
         stStopped = 0,
 
@@ -24,8 +24,6 @@ public:
 
         stSimulating,
         stSimulatingLooped,
-
-        stFORCEDWORD = u32(-1)
     };
 
 public:
@@ -34,10 +32,14 @@ public:
 #endif
 
     CSoundRender_Target* target;
-    CSoundRender_Source* source() { return (CSoundRender_Source*)owner_data->handle; };
     ref_sound_data_ptr owner_data;
 
+    [[nodiscard]]
+    CSoundRender_Source* source() const { return (CSoundRender_Source*)owner_data->handle; }
+
+    [[nodiscard]]
     u32 get_bytes_total() const;
+    [[nodiscard]]
     float get_length_sec() const;
 
     float priority_scale;
@@ -65,8 +67,9 @@ public:
     u32 marker;
     void i_stop();
 
+    [[nodiscard]]
+    u32  get_cursor(bool b_absolute) const;
     void set_cursor(u32 p);
-    u32 get_cursor(bool b_absolute) const;
     void move_cursor(int offset);
 
 public:
@@ -112,5 +115,5 @@ public:
     u32 play_time() override;
 
     CSoundRender_Emitter();
-    ~CSoundRender_Emitter();
+    ~CSoundRender_Emitter() override;
 };

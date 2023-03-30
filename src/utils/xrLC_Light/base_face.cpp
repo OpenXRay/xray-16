@@ -11,10 +11,7 @@ base_Face::base_Face()
     basis_binormal[0].set(0, 0, 0);
     basis_binormal[1].set(0, 0, 0);
     basis_binormal[2].set(0, 0, 0);
-}
-base_Face::~base_Face(){};
-
-base_Vertex::~base_Vertex(){};
+};
 
 /*
 

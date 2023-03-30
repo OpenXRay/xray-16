@@ -13,7 +13,7 @@ $Id: MxPropSlim.cxx,v 1.9 2000/11/20 20:36:38 garland Exp $
 #include "MxPropSlim.h"
 #include "MxGeom3D.h"
 
-MxPropSlim::MxPropSlim(MxStdModel* m0) : MxStdSlim(m0), __quadrics(m0->vert_count()), edge_links(m0->vert_count())
+MxPropSlim::MxPropSlim(MxStdModel* m0) : MxStdSlim(m0), edge_links(m0->vert_count()), __quadrics(m0->vert_count())
 {
     consider_color();
     consider_texture();
@@ -687,7 +687,7 @@ void MxPropSlim::update_pre_contract(const MxPairContraction& conx)
         if (u == v1 || varray_find(star, u))
         {
             // This is a useless link --- kill it
-            bool found = varray_find(edge_links(u), e, &j);
+            [[maybe_unused]] bool found = varray_find(edge_links(u), e, &j);
             VERIFY(found);
             edge_links(u).remove(j);
             heap.remove(e);

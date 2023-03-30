@@ -67,7 +67,7 @@ void vision_client::eye_pp_s2()
     Level().AIStats.VisRayTests.End();
 }
 
-float vision_client::shedule_Scale() { return (0.f); }
+float vision_client::shedule_Scale() const { return (0.f); }
 void vision_client::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);

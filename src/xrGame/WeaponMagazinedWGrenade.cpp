@@ -138,16 +138,18 @@ void CWeaponMagazinedWGrenade::OnShot()
         inherited::OnShot();
 }
 
-bool CWeaponMagazinedWGrenade::SwitchMode()
+bool CWeaponMagazinedWGrenade::CanSwitchToGL()
 {
     bool bUsefulStateToSwitch =
         ((eIdle == GetState()) || (eHidden == GetState()) || (eMisfire == GetState()) || (eMagEmpty == GetState())) &&
         (!IsPending());
 
-    if (!bUsefulStateToSwitch)
-        return false;
+    return bUsefulStateToSwitch && IsGrenadeLauncherAttached();
+}
 
-    if (!IsGrenadeLauncherAttached())
+bool CWeaponMagazinedWGrenade::SwitchMode()
+{
+    if (!CanSwitchToGL())
         return false;
 
     OnZoomOut();
@@ -208,7 +210,7 @@ bool CWeaponMagazinedWGrenade::Action(u16 cmd, u32 flags)
     {
     case kWPN_FUNC:
     {
-        if (flags & CMD_START && !IsPending())
+        if (flags & CMD_START && !IsPending() && CanSwitchToGL())
             SwitchState(eSwitch);
         return true;
     }

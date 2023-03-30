@@ -29,6 +29,7 @@ dBodyGetFiniteRotationAxis
 dBodyGetFiniteRotationMode
 dBodyGetForce
 dBodyGetGravityMode
+dBodyGetNoUpdatePosMode
 dBodyGetJoint
 dBodyGetLinearVel
 dBodyGetMass
@@ -54,6 +55,7 @@ dBodySetFiniteRotationAxis
 dBodySetFiniteRotationMode
 dBodySetForce
 dBodySetGravityMode
+dBodySetNoUpdatePosMode
 dBodySetLinearVel
 dBodySetMass
 dBodySetPosition

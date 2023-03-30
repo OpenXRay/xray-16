@@ -87,7 +87,7 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
 
 bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _item, int width, int height)
 {
-    bool* ruck_room = (bool*)alloca(width * height);
+    bool* ruck_room = (bool*)xr_alloca(width * height);
 
     int i, j, k, m;
     int place_row = 0, place_col = 0;

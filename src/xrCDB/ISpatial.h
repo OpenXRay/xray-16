@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Common/Noncopyable.hpp"
+
 #include "xrCore/xrPool.h"
 //#include "xr_collide_defs.h"
-#include "xrCore/xrCore_benchmark_macros.h"
 #include "xrCore/xr_types.h"
 #include "xrCore/_vector3d.h"
 #include "xrCore/_sphere.h"
 #include "xrCore/FTimer.h"
+
 #include "xrCDB.h"
 
 #pragma pack(push, 4)
@@ -92,7 +93,7 @@ public:
     ISpatial_DB* space; // allow different spaces
 };
 
-class XRCDB_API ISpatial
+class XRCDB_API XR_NOVTABLE ISpatial
 {
 public:
     virtual ~ISpatial() = 0;
@@ -109,8 +110,9 @@ public:
     virtual IRender_Light* dcast_Light() = 0;
 };
 
-ICF ISpatial::~ISpatial() {}
-class XRCDB_API SpatialBase : public virtual ISpatial
+inline ISpatial::~ISpatial() = default;
+
+class XRCDB_API XR_NOVTABLE SpatialBase : public virtual ISpatial
 {
 public:
     SpatialData spatial;
@@ -123,7 +125,6 @@ public:
     virtual bool spatial_inside() override final;
     virtual void spatial_register() override;
     virtual void spatial_unregister() override;
-    BENCH_SEC_SCRAMBLEVTBL2
     virtual void spatial_move() override;
     virtual Fvector spatial_sector_point() override { return spatial.sphere.P; }
     virtual void spatial_updatesector() override final
