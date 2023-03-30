@@ -136,7 +136,9 @@ void ide::ShowMain()
     {
         if (ImGui::BeginMenu("File"))
         {
+#ifndef MASTER_GOLD
             ImGui::MenuItem("Weather Editor", nullptr, &m_windows.weather);
+#endif
 
             if (ImGui::MenuItem("Stats", nullptr, psDeviceFlags.test(rsStatistic)))
                 psDeviceFlags.set(rsStatistic, !psDeviceFlags.test(rsStatistic));
@@ -148,8 +150,10 @@ void ide::ShowMain()
         }
         if (ImGui::BeginMenu("About"))
         {
+#ifndef MASTER_GOLD
             ImGui::MenuItem("ImGui demo", nullptr, &m_windows.imgui_demo);
             ImGui::MenuItem("ImGui metrics", nullptr, &m_windows.imgui_metrics);
+#endif
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();

@@ -86,7 +86,6 @@
     <ClInclude Include="..\..\xrServerEntities\PropertiesListTypes.h" />
     <ClInclude Include="..\..\xrServerEntities\restriction_space.h" />
     <ClInclude Include="..\..\xrServerEntities\script_ini_file.h" />
-    <ClInclude Include="..\..\xrServerEntities\script_ini_file_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\script_rtoken_list.h" />
     <ClInclude Include="..\..\xrServerEntities\script_rtoken_list_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\script_token_list.h" />

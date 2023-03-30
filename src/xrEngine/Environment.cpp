@@ -48,14 +48,6 @@ CEnvironment::CEnvironment() : m_ambients_config(0)
     eff_LensFlare = 0;
     eff_Thunderbolt = 0;
     OnDeviceCreate();
-#ifdef _EDITOR
-    ed_from_time = 0.f;
-    ed_to_time = DAY_LENGTH;
-#endif
-
-#ifndef _EDITOR
-    m_paused = false;
-#endif
 
     fGameTime = 0.f;
     fTimeFactor = 12.f;
@@ -120,6 +112,10 @@ void CEnvironment::Invalidate()
     Current[1] = 0;
     if (eff_LensFlare)
         eff_LensFlare->Invalidate();
+
+    CurrentEnv.env_ambient = nullptr; // hack
+    CurrentEnv.lens_flare  = nullptr; // hack
+    CurrentEnv.thunderbolt = nullptr; // hack
 }
 
 float CEnvironment::TimeDiff(float prev, float cur)
@@ -150,16 +146,14 @@ float CEnvironment::TimeWeight(float val, float min_t, float max_t)
     }
     return weight;
 }
-void CEnvironment::ChangeGameTime(float game_time) { fGameTime = NormalizeTime(fGameTime + game_time); };
+
+void CEnvironment::ChangeGameTime(float game_time)
+{
+    fGameTime = NormalizeTime(fGameTime + game_time);
+}
+
 void CEnvironment::SetGameTime(float game_time, float time_factor)
 {
-#ifndef _EDITOR
-    if (m_paused) // BUG nitrocaster: g_pGameLevel may be null (game not started) -> crash
-    {
-        g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(fGameTime * 1000.f), fTimeFactor);
-        return;
-    }
-#endif
     if (bWFX)
         wfx_time -= TimeDiff(fGameTime, game_time);
     fGameTime = game_time;
@@ -421,32 +415,8 @@ void CEnvironment::lerp()
 
 void CEnvironment::OnFrame()
 {
-#ifdef _EDITOR
-    SetGameTime(fGameTime + Device.fTimeDelta * fTimeFactor, fTimeFactor);
-    if (fsimilar(ed_to_time, DAY_LENGTH) && fsimilar(ed_from_time, 0.f))
-    {
-        if (fGameTime > DAY_LENGTH)
-            fGameTime -= DAY_LENGTH;
-    }
-    else
-    {
-        if (fGameTime > ed_to_time)
-        {
-            fGameTime = fGameTime - ed_to_time + ed_from_time;
-            Current[0] = Current[1] = 0;
-        }
-        if (fGameTime < ed_from_time)
-        {
-            fGameTime = ed_from_time;
-            Current[0] = Current[1] = 0;
-        }
-    }
-    if (!psDeviceFlags.is(rsEnvironment))
-        return;
-#else
     if (!g_pGameLevel)
         return;
-#endif
     
     lerp();
 

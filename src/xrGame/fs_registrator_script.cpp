@@ -275,7 +275,7 @@ SCRIPT_EXPORT(fs_registrator, (),
             .def("r_close", (void (CLocatorAPI::*)(IReader*&))(&CLocatorAPI::r_close))
 
             .def("w_open", (IWriter * (CLocatorAPI::*)(LPCSTR, LPCSTR))(&CLocatorAPI::w_open))
-            .def("w_open", (IWriter * (CLocatorAPI::*)(LPCSTR))(&CLocatorAPI::w_close))
+            .def("w_open", (IWriter * (CLocatorAPI::*)(LPCSTR))(&CLocatorAPI::w_open))
             .def("w_close", &CLocatorAPI::w_close)
 
             .def("file_list_open", &file_list_open_script)

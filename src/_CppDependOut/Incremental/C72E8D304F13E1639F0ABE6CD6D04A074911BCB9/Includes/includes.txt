@@ -1,0 +1,3 @@
+c:\openxray\externals\openautomate\inc\openautomate.h
+c:\openxray\externals\openautomate\inc\openautomate_internal.h
+c:\openxray\externals\openautomate\src\openautomate.c

@@ -72,6 +72,7 @@ public:
 #ifndef AI_COMPILER
     void set_available_loopholes(luabind::object table);
 #endif // #ifndef AI_COMPILER
+
 #ifdef XRSE_FACTORY_EXPORTS
     virtual void on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);

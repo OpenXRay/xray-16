@@ -116,7 +116,8 @@ public:
     CSE_Abstract(LPCSTR caSection);
     virtual ~CSE_Abstract();
     virtual void OnEvent(NET_Packet& /*tNetPacket*/, u16 /*type*/, u32 /*time*/, ClientID /*sender*/){}
-#ifndef XRGAME_EXPORTS
+
+#ifndef MASTER_GOLD
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
     virtual void FillProp(LPCSTR pref, PropItemVec& items);
     virtual void on_render(CDUInterface* /*du*/, IServerEntityLEOwner* /*owner*/, bool /*bSelected*/,
@@ -125,8 +126,9 @@ public:
     }
     virtual visual_data* visual_collection() const { return nullptr; }
     virtual u32 visual_collection_size() const { return 0; }
-    virtual void set_additional_info(void* /*info*/) {};
-#endif // #ifndef XRGAME_EXPORTS
+    virtual void set_additional_info(void* /*info*/) {}
+#endif // #ifndef MASTER_GOLD
+
     virtual BOOL Net_Relevant() { return FALSE; } // !!!! WARNING!!!
     //
     virtual void Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal);

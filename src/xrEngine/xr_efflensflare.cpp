@@ -76,7 +76,7 @@ FlareDescriptorFields SunFields =
     "sun", "sun_shader", "sun_texture", "sun_radius", "sun_ignore_color"
 };
 
-void CLensFlareDescriptor::load(CInifile const* pIni, shared_str sect)
+CLensFlareDescriptor::CLensFlareDescriptor(shared_str sect, CInifile const* pIni)
 {
     section = sect;
 
@@ -544,13 +544,14 @@ CLensFlareDescriptor* CLensFlare::AppendDef(shared_str sect)
     if (!sect || (0 == sect[0]))
         return nullptr;
 
-    for (CLensFlareDescriptor& flare : m_Palette)
-        if (flare.section == sect)
-            return &flare;
+    for (CLensFlareDescriptor* flare : m_Palette)
+        if (flare->section == sect)
+            return flare;
 
-    CLensFlareDescriptor& descriptor = m_Palette.emplace_back();
-    descriptor.load(m_suns_config ? m_suns_config : pSettings, sect);
-    return &descriptor;
+    const auto descriptor = xr_new<CLensFlareDescriptor>(sect,
+        m_suns_config ? m_suns_config : pSettings
+    );
+    return m_Palette.emplace_back(descriptor);
 }
 
 void CLensFlare::OnDeviceCreate()
@@ -560,14 +561,14 @@ void CLensFlare::OnDeviceCreate()
 
     // palette
     for (auto& descr : m_Palette)
-        descr.OnDeviceCreate();
+        descr->OnDeviceCreate();
 }
 
 void CLensFlare::OnDeviceDestroy()
 {
     // palette
     for (auto& descr : m_Palette)
-        descr.OnDeviceDestroy();
+        descr->OnDeviceDestroy();
 
     // VS
     m_pRender->OnDeviceDestroy();
