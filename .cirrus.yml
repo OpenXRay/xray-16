@@ -2,12 +2,12 @@ task:
   name: FreeBSD Debug x64 (clang)
   freebsd_instance:
     image_family: freebsd-13-1
-  install_script: pkg install -y cmake llvm-devel gmake git libtheora openal-soft lzo2 sdl2
+  install_script: pkg install -y cmake llvm-devel gmake git libtheora openal-soft lzo2 sdl2 glew
   script: git submodule update --init --recursive && mkdir bin && cmake -DCMAKE_BUILD_TYPE=Debug -B bin && cmake --build bin 
 
 task:
   name: FreeBSD Release x64 (clang)
   freebsd_instance:
     image_family: freebsd-13-1
-  install_script: pkg install -y cmake llvm-devel gmake git libtheora openal-soft lzo2 sdl2
+  install_script: pkg install -y cmake llvm-devel gmake git libtheora openal-soft lzo2 sdl2 glew
   script: git submodule update --init --recursive && mkdir bin && cmake -DCMAKE_BUILD_TYPE=Release -B bin && cmake --build bin
