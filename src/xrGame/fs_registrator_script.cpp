@@ -67,21 +67,21 @@ struct FS_item
 template <bool b>
 bool sizeSorter(const FS_item& itm1, const FS_item& itm2)
 {
-    if (b)
+    if constexpr (b)
         return (itm1.size < itm2.size);
     return (itm2.size < itm1.size);
 }
 template <bool b>
 bool modifSorter(const FS_item& itm1, const FS_item& itm2)
 {
-    if (b)
+    if constexpr (b)
         return (itm1.modif < itm2.modif);
     return (itm2.modif < itm1.modif);
 }
 template <bool b>
 bool nameSorter(const FS_item& itm1, const FS_item& itm2)
 {
-    if (b)
+    if constexpr (b)
         return (xr_strcmp(itm1.name, itm2.name) < 0);
     return (xr_strcmp(itm2.name, itm1.name) < 0);
 }

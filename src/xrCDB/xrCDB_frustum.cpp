@@ -33,7 +33,7 @@ public:
     }
     void _prim(u32 prim)
     {
-        if (bClass3)
+        if constexpr (bClass3)
         {
             sPoly src, dst;
             src.resize(3);
@@ -75,8 +75,11 @@ public:
             _stab(node->GetPos(), mask);
 
         // Early exit for "only first"
-        if (bFirst && dest->r_count())
-            return;
+        if constexpr (bFirst)
+        {
+            if (dest->r_count())
+                return;
+        }
 
         // 2nd chield
         if (node->HasLeaf2())
