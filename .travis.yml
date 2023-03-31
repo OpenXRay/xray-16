@@ -51,7 +51,7 @@ script:
       file openxray_1.6.02_*.deb;
   fi
 - if [ $TRAVIS_OS_NAME == freebsd ]; then
-      cd build
+      cd build 
       cmake --build . --parallel
   fi
 
