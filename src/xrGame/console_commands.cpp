@@ -32,6 +32,7 @@
 #include "UIGameSP.h"
 #include "ui/UIActorMenu.h"
 #include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/ui_styles.h"
 #include "zone_effector.h"
 #include "GameTask.h"
 #include "MainMenu.h"
@@ -92,9 +93,6 @@ XRUICORE_API extern BOOL g_show_wnd_rect2;
 //-----------------------------------------------------------
 extern float g_fTimeFactor;
 extern BOOL b_toggle_weapon_aim;
-
-extern u32 UIStyleID;
-extern xr_vector<xr_token> UIStyleToken;
 
 extern float g_smart_cover_factor;
 extern int g_upgrades_log;
@@ -1439,16 +1437,22 @@ public:
     }
 };
 
-extern void SetupUIStyle();
 class CCC_UIStyle : public CCC_Token
 {
-public:
-    CCC_UIStyle(pcstr name) : CCC_Token(name, &UIStyleID, UIStyleToken.data()) {}
+    u32 m_id = 0;
 
-    void Execute(pcstr args)
+public:
+    CCC_UIStyle(pcstr name) : CCC_Token(name, &m_id, nullptr) { }
+
+    void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
-        SetupUIStyle();
+        UIStyles->SetupStyle(m_id);
+    }
+    
+    const xr_token* GetToken() noexcept override // may throw exceptions!
+    {
+        return UIStyles->GetToken().data();
     }
 };
 
@@ -1459,19 +1463,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        // Hack: activate main menu to prevent crash
-        // I don't know why it crashes while in the game
-        bool shouldHideMainMenu = false;
-        if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu)
-        {
-            shouldHideMainMenu = !g_pGamePersistent->m_pMainMenu->IsActive();
-            g_pGamePersistent->m_pMainMenu->Activate(true);
-        }
-
-        Device.seqUIReset.Process();
-
-        if (shouldHideMainMenu)
-            g_pGamePersistent->m_pMainMenu->Activate(false);
+        UIStyles->Reset();
     }
 };
 
