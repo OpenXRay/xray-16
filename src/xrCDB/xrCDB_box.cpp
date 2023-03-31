@@ -210,7 +210,7 @@ public:
             return false;
 
         // 3) "Class III" tests
-        if (bClass3)
+        if constexpr (bClass3)
         {
             float rad;
             float min, max;
@@ -281,8 +281,11 @@ public:
             _stab(node->GetPos());
 
         // Early exit for "only first"
-        if (bFirst && dest->r_count())
-            return;
+        if constexpr (bFirst)
+        {
+            if (dest->r_count())
+                return;
+        }
 
         // 2nd chield
         if (node->HasLeaf2())

@@ -53,6 +53,9 @@ struct CVertexManagerHashFixed
         IndexVertex** m_hash;
         u32 m_vertex_count;
 
+        static constexpr auto IndexVertexHashSize = HashSize * sizeof(IndexVertex*);
+        static constexpr auto IndexVertexFixSize = FixSize * sizeof(IndexVertex);
+
     public:
         inline CDataStorage(const u32 vertex_count);
         inline virtual ~CDataStorage();

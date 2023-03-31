@@ -36,9 +36,9 @@ inline CHashFixedVertexManager::CDataStorage(const u32 vertex_count)
     : CDataStorageBase(vertex_count), CDataStorageAllocator(), m_current_path_id(PathId(0))
 {
     m_hash = xr_alloc<IndexVertex*>(HashSize);
-    ZeroMemory(m_hash, HashSize * sizeof(IndexVertex*));
+    ZeroMemory(m_hash, IndexVertexHashSize);
     m_vertices = xr_alloc<IndexVertex>(FixSize);
-    ZeroMemory(m_vertices, FixSize * sizeof(IndexVertex));
+    ZeroMemory(m_vertices, IndexVertexFixSize);
 }
 
 TEMPLATE_SPECIALIZATION
@@ -58,8 +58,8 @@ inline void CHashFixedVertexManager::init()
     if (!m_current_path_id)
     {
         ++m_current_path_id;
-        ZeroMemory(m_hash, HashSize * sizeof(IndexVertex*));
-        ZeroMemory(m_vertices, FixSize * sizeof(IndexVertex));
+        ZeroMemory(m_hash, IndexVertexHashSize);
+        ZeroMemory(m_vertices, IndexVertexFixSize);
     }
 }
 
