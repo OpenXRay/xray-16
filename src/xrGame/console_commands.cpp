@@ -2114,7 +2114,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_ToggleNoClip, "g_no_clip");
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
     CMD1(CCC_Spawn, "g_spawn");
-    CMD1(CCC_Spawn_to_inv, "g_spawn_to_inventory");
+    CMD1(CCC_SpawnToInventory, "g_spawn_to_inventory");
     CMD1(CCC_Script, "run_script");
     CMD1(CCC_ScriptCommand, "run_string");
     CMD1(CCC_TimeFactor, "time_factor");
