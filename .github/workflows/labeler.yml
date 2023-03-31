@@ -1,7 +1,5 @@
 name: "Pull Request Labeler"
 
-runs-on: ubuntu-latest
-
 on:
   pull_request_target:
   pull_request_review:
@@ -12,22 +10,25 @@ permissions:
   pull-requests: write
 
 jobs:
-  new:
-    if: github.event.pull_request.opened == true || github.event.pull_request.reopened == true
+  labeler:
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/labeler@v4.0.2
+    - name: on new pull request
+      if: ${{ github.event.pull_request.opened == true || github.event.pull_request.reopened == true }}
+      uses: actions/labeler@v4.0.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/labeler_on_new_pr.yml
-  pr:
-    steps:
-    - uses: actions/labeler@v4.0.2
+
+    - name: on any pull request
+      if: ${{ github.event_name == 'pull_request_target' }}
+      uses: actions/labeler@v4.0.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
-  approved:
-    if: ${{ github.event_name == 'pull_request_review' && github.event.review.state == 'approved' }}
-    steps:
-    - uses: actions/labeler@v4.0.2
+
+    - name: on pull request approval
+      if: ${{ github.event_name == 'pull_request_review' && github.event.review.state == 'approved' }}
+      uses: actions/labeler@v4.0.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/labeler_on_pr_approved.yml

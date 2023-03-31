@@ -32,7 +32,7 @@ void _MinimizeND::GetMinimum(
     m_kMinimizer.UserData() = this;
 
     // initial guess
-    int iQuantity = m_iDimensions * sizeof(float);
+    constexpr int iQuantity = m_iDimensions * sizeof(float);
     m_fFCurr = m_oF(afTInitial, m_pvUserData);
     memcpy(m_afTSave, afTInitial, iQuantity);
     memcpy(m_afTCurr, afTInitial, iQuantity);
