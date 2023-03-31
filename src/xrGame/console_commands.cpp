@@ -180,34 +180,6 @@ public:
     virtual void Execute(LPCSTR args) { full_memory_stats(); }
 };
 
-// console commands
-class CCC_Spawn_to_inv : public IConsole_Command
-{
-public:
-    CCC_Spawn_to_inv(LPCSTR N) : IConsole_Command(N){};
-    virtual void Execute(LPCSTR args)
-    {
-        if (!g_pGameLevel)
-        {
-            Log("Error: No game level!");
-            return;
-        }
-
-        if (!pSettings->section_exist(args))
-        {
-            Msg("! Section [%s] isn`t exist...", args);
-            return;
-        }
-
-        char Name[128];
-        Name[0] = 0;
-        sscanf(args, "%s", Name);
-
-        Level().spawn_item(Name, Actor()->Position(), false, Actor()->ID());
-    }
-    virtual void Info(TInfo& I) { strcpy(I, "name,team,squad,group"); }
-};
-
 class CCC_GameDifficulty : public CCC_Token
 {
 public:
@@ -550,7 +522,7 @@ public:
 
         if (!pSettings->section_exist(args))
         {
-            InvalidSyntax();
+            Msg("! Section [%s] doesn't exist...", args);
             return;
         }
 
@@ -560,10 +532,40 @@ public:
 
     void Info(TInfo& I) override
     {
-        xr_strcpy(I, "valid name of entity or item that can be spawned");
+        xr_strcpy(I, "valid name of an entity or item that can be spawned");
     }
 };
 
+class CCC_SpawnToInventory : public IConsole_Command
+{
+public:
+    CCC_SpawnToInventory(pcstr name) : IConsole_Command(name) {}
+    
+    void Execute(pcstr args) override
+    {
+        if (!g_pGameLevel)
+            return;
+
+        if (!IsGameTypeSingle())
+        {
+            Log("Spawn command is available only in singleplayer mode.");
+            return;
+        }
+
+        if (!pSettings->section_exist(args))
+        {
+            Msg("! Section [%s] doesn't exist...", args);
+            return;
+        }
+
+        Level().spawn_item(args, Actor()->Position(), false, Actor()->ID());
+    }
+    
+    void Info(TInfo& I) override
+    {
+        xr_strcpy(I, "valid name of an item that can be spawned");
+    }
+};
 // helper functions --------------------------------------------
 
 bool valid_saved_game_name(LPCSTR file_name)
