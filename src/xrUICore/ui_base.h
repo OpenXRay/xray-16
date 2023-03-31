@@ -1,10 +1,13 @@
 #pragma once
+
 #include "ui_defs.h"
+#include "FontManager/FontManager.h"
+
 #include "xrEngine/pure.h"
 #include "xrEngine/device.h"
+
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_stack.h"
-#include "xrUICore/FontManager/FontManager.h"
 
 class CUICursor;
 class CUIGameCustom;

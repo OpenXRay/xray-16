@@ -214,7 +214,7 @@ public:
     virtual void lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDescriptor& B,
         float f, CEnvModifier& M, float m_power);
 
-    std::pair<Fvector3, float> calculate_dynamic_sun_dir(float fGameTime) const;
+    static std::pair<Fvector3, float> calculate_dynamic_sun_dir(float fGameTime, float azimuth);
 };
 
 class ENGINE_API CEnvironment

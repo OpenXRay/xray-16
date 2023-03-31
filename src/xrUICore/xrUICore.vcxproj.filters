@@ -274,6 +274,7 @@
     <ClCompile Include="Windows\UITextFrameLineWnd.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
+    <ClCompile Include="ui_styles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arrow\ui_arrow.h">
@@ -454,6 +455,7 @@
     <ClInclude Include="Windows\UITextFrameLineWnd.h">
       <Filter>Windows</Filter>
     </ClInclude>
+    <ClInclude Include="ui_styles.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />

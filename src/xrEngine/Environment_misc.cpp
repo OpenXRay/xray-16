@@ -585,11 +585,12 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
 
     sun_color.lerp(A.sun_color, B.sun_color, f);
 
+    sun_azimuth = (fi * A.sun_azimuth + f * B.sun_azimuth);
+
      // Igor. Dynamic sun position.
     if (!GEnv.Render->is_sun_static() && use_dynamic_sun_dir)
     {
-        sun_azimuth = (fi * A.sun_azimuth + f * B.sun_azimuth);
-        auto [dir, blend] = calculate_dynamic_sun_dir(exec_time);
+        auto [dir, blend] = calculate_dynamic_sun_dir(exec_time, sun_azimuth);
         sun_dir = dir;
         sun_color.mul(blend);
     }
@@ -628,7 +629,7 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     clouds_texture_name = strconcat(temp_name, A.clouds_texture_name.c_str(), "; ", B.clouds_texture_name.c_str());
 }
 
-std::pair<Fvector3, float> CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime) const
+std::pair<Fvector3, float> CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime, float azimuth)
 {
     float g = (360.0f / 365.25f) * (180.0f + fGameTime / DAY_LENGTH);
 
@@ -674,7 +675,7 @@ std::pair<Fvector3, float> CEnvDescriptorMixer::calculate_dynamic_sun_dir(float 
         cosAZ = (_sin(deg2rad(D)) - _sin(LatitudeR) * _cos(SZA)) / sin_SZA_X_cos_Latitude;
 
     clamp(cosAZ, -1.0f, 1.0f);
-    float AZ = acosf(cosAZ) + sun_azimuth;
+    float AZ = acosf(cosAZ) + azimuth;
 
     const Fvector2 minAngle = Fvector2().set(deg2rad(1.0f), deg2rad(3.0f));
 

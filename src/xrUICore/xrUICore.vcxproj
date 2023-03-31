@@ -103,6 +103,7 @@
     <ClInclude Include="TrackBar\UITrackBar.h" />
     <ClInclude Include="uiabstract.h" />
     <ClInclude Include="UIMessages.h" />
+    <ClInclude Include="ui_styles.h" />
     <ClInclude Include="ui_base.h" />
     <ClInclude Include="ui_defs.h" />
     <ClInclude Include="Windows\UIFrameLineWnd.h" />
@@ -173,6 +174,7 @@
     <ClCompile Include="TabControl\UITabControl.cpp" />
     <ClCompile Include="TabControl\UITabControl_script.cpp" />
     <ClCompile Include="TrackBar\UITrackBar.cpp" />
+    <ClCompile Include="ui_styles.cpp" />
     <ClCompile Include="ui_base.cpp" />
     <ClCompile Include="Windows\UIFrameLineWnd.cpp" />
     <ClCompile Include="Windows\UIFrameWindow.cpp" />

@@ -30,7 +30,7 @@ public:
                 light_cuboid_points[P.points[0]], light_cuboid_points[P.points[2]], light_cuboid_points[P.points[1]]);
 
             // verify
-            if (_debug)
+            if constexpr (_debug)
             {
                 Fvector& p0 = light_cuboid_points[P.points[0]];
                 Fvector& p1 = light_cuboid_points[P.points[1]];
@@ -346,7 +346,7 @@ public:
             P.planeD = -P.planeN.dotproduct(points[P.points[0]]);
 
             // verify
-            if (_debug)
+            if constexpr (_debug)
             {
                 Fvector& p0 = points[P.points[0]];
                 Fvector& p1 = points[P.points[1]];
@@ -409,7 +409,7 @@ public:
                 if (!found)
                 {
                     edges.push_back(E);
-                    if (_debug)
+                    if constexpr (_debug)
                         T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 0, 0, 255));
                 }
             }
@@ -428,7 +428,7 @@ public:
             if (edges[e].counter != 0)
                 continue;
             _edge& E = edges[e];
-            if (_debug)
+            if constexpr (_debug)
                 T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 255, 255, 255));
             Fvector3 point;
             points.push_back(point.sub(points[E.p0], direction));
@@ -440,10 +440,11 @@ public:
             P.points.push_back(E.p1);
             P.points.push_back(pend - 1); // p1 mod
             P.points.push_back(pend - 2); // p0 mod
-            if (_debug)
+            if constexpr (_debug)
+            {
                 T.dbg_addline(points[E.p0], point.mad(points[E.p0], direction, -1000), color_rgba(0, 255, 0, 255));
-            if (_debug)
                 T.dbg_addline(points[E.p1], point.mad(points[E.p1], direction, -1000), color_rgba(0, 255, 0, 255));
+            }
         }
 
         // Reorient planes (try to write more inefficient code :)
