@@ -292,7 +292,7 @@ struct CRestrictionPredicate
 
     IC void operator()(CRestrictedObject* object, ALife::_OBJECT_ID id) const
     {
-        if (add)
+        if constexpr (add)
             object->add_object_restriction(id, m_restrictor_type);
         else
             object->remove_object_restriction(id, m_restrictor_type);

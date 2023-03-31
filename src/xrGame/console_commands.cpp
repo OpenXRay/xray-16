@@ -32,6 +32,7 @@
 #include "UIGameSP.h"
 #include "ui/UIActorMenu.h"
 #include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/ui_styles.h"
 #include "zone_effector.h"
 #include "GameTask.h"
 #include "MainMenu.h"
@@ -92,9 +93,6 @@ XRUICORE_API extern BOOL g_show_wnd_rect2;
 //-----------------------------------------------------------
 extern float g_fTimeFactor;
 extern BOOL b_toggle_weapon_aim;
-
-extern u32 UIStyleID;
-extern xr_vector<xr_token> UIStyleToken;
 
 extern float g_smart_cover_factor;
 extern int g_upgrades_log;
@@ -180,7 +178,6 @@ public:
     virtual void Execute(LPCSTR args) { full_memory_stats(); }
 };
 
-// console commands
 class CCC_GameDifficulty : public CCC_Token
 {
 public:
@@ -523,7 +520,7 @@ public:
 
         if (!pSettings->section_exist(args))
         {
-            InvalidSyntax();
+            Msg("! Section [%s] doesn't exist...", args);
             return;
         }
 
@@ -533,10 +530,40 @@ public:
 
     void Info(TInfo& I) override
     {
-        xr_strcpy(I, "valid name of entity or item that can be spawned");
+        xr_strcpy(I, "valid name of an entity or item that can be spawned");
     }
 };
 
+class CCC_SpawnToInventory : public IConsole_Command
+{
+public:
+    CCC_SpawnToInventory(pcstr name) : IConsole_Command(name) {}
+    
+    void Execute(pcstr args) override
+    {
+        if (!g_pGameLevel)
+            return;
+
+        if (!IsGameTypeSingle())
+        {
+            Log("Spawn command is available only in singleplayer mode.");
+            return;
+        }
+
+        if (!pSettings->section_exist(args))
+        {
+            Msg("! Section [%s] doesn't exist...", args);
+            return;
+        }
+
+        Level().spawn_item(args, Actor()->Position(), false, Actor()->ID());
+    }
+    
+    void Info(TInfo& I) override
+    {
+        xr_strcpy(I, "valid name of an item that can be spawned");
+    }
+};
 // helper functions --------------------------------------------
 
 bool valid_saved_game_name(LPCSTR file_name)
@@ -1439,16 +1466,22 @@ public:
     }
 };
 
-extern void SetupUIStyle();
 class CCC_UIStyle : public CCC_Token
 {
-public:
-    CCC_UIStyle(pcstr name) : CCC_Token(name, &UIStyleID, UIStyleToken.data()) {}
+    u32 m_id = 0;
 
-    void Execute(pcstr args)
+public:
+    CCC_UIStyle(pcstr name) : CCC_Token(name, &m_id, nullptr) { }
+
+    void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
-        SetupUIStyle();
+        UIStyles->SetupStyle(m_id);
+    }
+    
+    const xr_token* GetToken() noexcept override // may throw exceptions!
+    {
+        return UIStyles->GetToken().data();
     }
 };
 
@@ -1459,19 +1492,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        // Hack: activate main menu to prevent crash
-        // I don't know why it crashes while in the game
-        bool shouldHideMainMenu = false;
-        if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu)
-        {
-            shouldHideMainMenu = !g_pGamePersistent->m_pMainMenu->IsActive();
-            g_pGamePersistent->m_pMainMenu->Activate(true);
-        }
-
-        Device.seqUIReset.Process();
-
-        if (shouldHideMainMenu)
-            g_pGamePersistent->m_pMainMenu->Activate(false);
+        UIStyles->Reset();
     }
 };
 
@@ -2160,6 +2181,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_ToggleNoClip, "g_no_clip");
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
     CMD1(CCC_Spawn, "g_spawn");
+    CMD1(CCC_SpawnToInventory, "g_spawn_to_inventory");
     CMD1(CCC_Script, "run_script");
     CMD1(CCC_ScriptCommand, "run_string");
     CMD1(CCC_TimeFactor, "time_factor");

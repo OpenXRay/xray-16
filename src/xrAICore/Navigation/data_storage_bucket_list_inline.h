@@ -21,7 +21,7 @@ inline CBucketList::CDataStorage(const u32 vertex_count) : TManagerDataStorage(v
     m_max_distance = typename TManagerDataStorage::Vertex::Distance(-1);
     m_min_bucket_value = typename TManagerDataStorage::Vertex::Distance(0);
     m_max_bucket_value = typename TManagerDataStorage::Vertex::Distance(1000);
-    ZeroMemory(m_buckets, BucketCount * sizeof(typename TManagerDataStorage::Vertex*));
+    ZeroMemory(m_buckets, BucketSize);
     m_min_bucket_id = 0;
 }
 
@@ -38,8 +38,8 @@ inline void CBucketList::init()
     m_list_tail->f() = m_max_distance;
     m_list_tail->prev() = m_list_head;
     m_min_bucket_id = BucketCount;
-    if (ClearBuckets)
-        ZeroMemory(m_buckets, BucketCount * sizeof(typename TManagerDataStorage::Vertex*));
+    if constexpr (ClearBuckets)
+        ZeroMemory(m_buckets, BucketSize);
 }
 
 TEMPLATE_SPECIALIZATION
@@ -57,7 +57,7 @@ inline bool CBucketList::is_opened_empty()
     if (!m_buckets[m_min_bucket_id])
     {
         m_min_bucket_id++;
-        if (!ClearBuckets)
+        if constexpr (!ClearBuckets)
         {
             while (m_min_bucket_id < BucketCount)
             {
