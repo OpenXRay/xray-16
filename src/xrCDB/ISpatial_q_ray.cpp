@@ -227,7 +227,7 @@ public:
         ray.pos.set(_start);
         ray.inv_dir.set(1.f, 1.f, 1.f).div(_dir);
         ray.fwd_dir.set(_dir);
-        if (!b_use_sse)
+        if constexpr (!b_use_sse)
         {
             // for FPU - zero out inf
             if (_abs(_dir.x) > flt_eps)
@@ -282,7 +282,7 @@ public:
     void walk(ISpatial_NODE* N, Fvector& n_C, float n_R)
     {
         // Actual ray/aabb test
-        if (b_use_sse)
+        if constexpr (b_use_sse)
         {
             // use SSE
             float d;
@@ -314,7 +314,7 @@ public:
 
             if (result == Fsphere::rpOriginInside || ((result == Fsphere::rpOriginOutside) && (afT[0] < range)))
             {
-                if (b_nearest)
+                if constexpr (b_nearest)
                 {
                     switch (result)
                     {
@@ -324,7 +324,7 @@ public:
                     range2 = range * range;
                 }
                 space->q_result->push_back(S);
-                if (b_first)
+                if constexpr (b_first)
                     return;
             }
         }
@@ -338,8 +338,11 @@ public:
             Fvector c_C;
             c_C.mad(n_C, c_spatial_offset[octant], c_R);
             walk(N->children[octant], c_C, c_R);
-            if (b_first && !space->q_result->empty())
-                return;
+            if constexpr (b_first)
+            {
+                if (!space->q_result->empty())
+                    return;
+            }
         }
     }
 };
