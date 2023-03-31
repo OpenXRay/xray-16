@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
-static void generate_jitter(u32* dest, u32 elem_count)
+template <u32 elem_count>
+static void generate_jitter(u32* dest)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
@@ -176,7 +177,7 @@ void CRenderTarget::build_textures()
             for (u32 x = 0; x < TEX_jitter; x++)
             {
                 u32 data[TEX_jitter_count - 1];
-                generate_jitter(data, TEX_jitter_count - 1);
+                generate_jitter<TEX_jitter_count - 1>(data);
                 for (u32 it = 0; it < TEX_jitter_count - 1; it++)
                 {
                     u32* p = (u32*)((u8*)(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4);

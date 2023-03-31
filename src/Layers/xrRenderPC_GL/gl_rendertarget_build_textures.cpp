@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
-static void generate_jitter(u32* dest, u32 elem_count)
+template <u32 elem_count>
+static void generate_jitter(u32* dest)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
@@ -55,9 +56,10 @@ void CRenderTarget::build_textures()
         t_material->surface_set(GL_TEXTURE_3D, t_material_surf);
 
         // Fill it (addr: x=dot(L,N),y=dot(L,H))
-        static const u32 RowPitch = TEX_material_LdotN * 2;
-        static const u32 SlicePitch = TEX_material_LdotH * RowPitch;
-        u16 pBits[TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count];
+        static constexpr u32 RowPitch = TEX_material_LdotN * 2;
+        static constexpr u32 SlicePitch = TEX_material_LdotH * RowPitch;
+        constexpr size_t count = TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count;
+        u16 pBits[count];
         for (u32 slice = 0; slice < TEX_material_Count; slice++)
         {
             for (u32 y = 0; y < TEX_material_LdotH; y++)
@@ -147,7 +149,7 @@ void CRenderTarget::build_textures()
             for (u32 x = 0; x < TEX_jitter; x++)
             {
                 u32 data[TEX_jitter_count - 1];
-                generate_jitter(data, TEX_jitter_count - 1);
+                generate_jitter<TEX_jitter_count - 1>(data);
                 for (u32 it2 = 0; it2 < TEX_jitter_count - 1; it2++)
                 {
                     u32* p = (u32*)((u8*)(tempData[it2]) + y * Pitch + x * 4);
