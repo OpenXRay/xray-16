@@ -37,6 +37,11 @@ before_script:
       export core_count=$(nproc || echo 4) && echo core_count = $core_count;
     fi
   - git submodule deinit Externals/cryptopp
+  - if [ $TRAVIS_OS_NAME == freebsd ]; then
+      echo 'FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/FreeBSD:13:amd64/latest" }' > /usr/local/etc/pkg/repos/FreeBSD.conf # Костыль для установки более нового cmake
+      pkg update -y
+      pkg install -y cmake
+  - fi
   - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$CONFIGURATION
 
 script:
@@ -45,6 +50,16 @@ script:
       make -j $core_count package;
       file openxray_1.6.02_*.deb;
   fi
+- if [ $TRAVIS_OS_NAME == freebsd ]; then
+      cd build
+      cmake --build . --parallel
+  fi
+
+jobs:
+  include:
+    - os: freebsd
+      addons:
+        pkg: [sdl2, glew, lzo2, jpeg-turbo, openal-soft, gmake, libogg, libtheora, libvorbis]
 
 deploy:
   provider: releases
