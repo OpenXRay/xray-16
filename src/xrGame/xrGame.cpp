@@ -7,10 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
+
 #include "object_factory.h"
-#include "xrUICore/XML/xrUIXmlParser.h"
+
 #include "xrEngine/xr_level_controller.h"
 #include "xrEngine/profiler.h"
+
+#include "xrUICore/XML/xrUIXmlParser.h"
+#include "xrUICore/ui_styles.h"
 
 void CCC_RegisterCommands();
 
@@ -36,6 +40,8 @@ extern "C"
     {
         g_fTimeFactor = pSettings->r_float("alife", "time_factor"); // XXX: find a better place
 
+        // Fill ui style token
+        UIStyles = xr_new<UIStyleManager>();
         // register console commands
         CCC_RegisterCommands();
         // register localization
@@ -49,6 +55,7 @@ extern "C"
 
     XR_EXPORT void finalize_library()
     {
+        xr_delete(UIStyles);
         StringTable().Destroy();
         CCC_DeregisterInput(); // XXX: Remove if possible
  }

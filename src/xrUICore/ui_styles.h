@@ -2,7 +2,7 @@
 
 class XRUICORE_API UIStyleManager : Noncopyable
 {
-    static constexpr u32 DEFAULT_STYLE = 0;
+    static constexpr u32 DEFAULT_STYLE_ID = 0;
 
 public:
     UIStyleManager();
@@ -20,7 +20,7 @@ public:
     [[nodiscard]]
     bool DefaultStyleIsSet() const
     {
-        return m_style_id == DEFAULT_STYLE;
+        return m_style_id == DEFAULT_STYLE_ID;
     }
 
     [[nodiscard]]
@@ -31,5 +31,7 @@ public:
 
 private:
     xr_vector<xr_token> m_token;
-    u32 m_style_id{ DEFAULT_STYLE };
+    u32 m_style_id{ DEFAULT_STYLE_ID };
 };
+
+XRUICORE_API extern UIStyleManager* UIStyles;

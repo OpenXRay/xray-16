@@ -4,9 +4,13 @@
 #include "xrCore/XML/XMLDocument.hpp"
 #include "xrEngine/IGame_Persistent.h"
 
+static constexpr cpcstr DEFAULT_UI_STYLE_NAME = "ui_style_default";
+
+UIStyleManager* UIStyles = nullptr;
+
 UIStyleManager::UIStyleManager()
 {
-    m_token.emplace_back("ui_style_default", 0);
+    m_token.emplace_back(DEFAULT_UI_STYLE_NAME, DEFAULT_STYLE_ID);
 
     string_path path;
     strconcat(sizeof(path), path, UI_PATH, DELIMITER "styles" DELIMITER);
@@ -31,7 +35,7 @@ UIStyleManager::~UIStyleManager()
 {
     for (auto& token : m_token)
     {
-        if (token.name && token.id != 0)
+        if (token.name && token.id != DEFAULT_STYLE_ID)
             xr_free(token.name);
     }
     m_token.clear();
@@ -47,7 +51,7 @@ void UIStyleManager::SetupStyle(u32 styleID)
     if (m_style_id == styleID)
         return;
 
-    if (styleID == DEFAULT_STYLE)
+    if (styleID == DEFAULT_STYLE_ID)
     {
         if (!DefaultStyleIsSet())
         {

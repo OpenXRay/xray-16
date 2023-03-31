@@ -9,6 +9,7 @@
 #include "ScrollView/UIScrollView.h"
 #include "Hint/UIHint.h"
 #include "Cursor/UICursor.h"
+#include "ui_styles.h"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
@@ -56,8 +57,10 @@ SCRIPT_EXPORT(UIStyleManager, (),
         def("GetUIPathWithDelimiter",        +[] { return UI_PATH_WITH_DELIMITER; }),
 
         class_<UIStyleManager>("UIStyleManager")
-            .def("GetStylesTokens", &UIStyleManager::GetToken, return_stl_iterator())
+            .def("GetAllStyles", &UIStyleManager::GetToken, return_stl_iterator())
+            .def("DefaultStyleIsSet", &UIStyleManager::DefaultStyleIsSet)
             .def("GetCurrentStyleId", &UIStyleManager::GetCurrentStyleId)
+
             .def("SetStyle",        &UIStyleManager::SetupStyle)
             .def("SetStyle",        +[](UIStyleManager* self, u32 styleID, bool reloadUI)
             {
@@ -65,10 +68,9 @@ SCRIPT_EXPORT(UIStyleManager, (),
 
                 if (reloadUI)
                     self->Reset();
-            })
-            .def("DefaultStyleIsSet", &UIStyleManager::DefaultStyleIsSet),
+            }),
 
-        def("GetUIStyleManager", +[] { return &UI().Styles(); })
+        def("GetUIStyleManager", +[] { return UIStyles; })
     ];
 });
 

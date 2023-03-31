@@ -32,6 +32,7 @@
 #include "UIGameSP.h"
 #include "ui/UIActorMenu.h"
 #include "xrUICore/Static/UIStatic.h"
+#include "xrUICore/ui_styles.h"
 #include "zone_effector.h"
 #include "GameTask.h"
 #include "MainMenu.h"
@@ -1446,12 +1447,12 @@ public:
     void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
-        UI().Styles().SetupStyle(m_id);
+        UIStyles->SetupStyle(m_id);
     }
     
     const xr_token* GetToken() noexcept override // may throw exceptions!
     {
-        return UI().Styles().GetToken().data();
+        return UIStyles->GetToken().data();
     }
 };
 
@@ -1462,7 +1463,7 @@ public:
 
     void Execute(pcstr /*args*/) override
     {
-        UI().Styles().Reset();
+        UIStyles->Reset();
     }
 };
 
