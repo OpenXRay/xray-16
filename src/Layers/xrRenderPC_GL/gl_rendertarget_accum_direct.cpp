@@ -539,7 +539,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
             // corners
 
-            u32 ver_count = sizeof(accum_direct::corners) / sizeof(Fvector3);
+            constexpr u32 ver_count = sizeof(accum_direct::corners) / sizeof(Fvector3);
             Fvector4* pv = (Fvector4*)RCache.Vertex.Lock(ver_count, g_combine_cuboid.stride(), Offset);
 
             Fmatrix inv_XDcombine;

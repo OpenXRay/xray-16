@@ -55,8 +55,8 @@ void CRenderTarget::build_textures()
         t_material->surface_set(GL_TEXTURE_3D, t_material_surf);
 
         // Fill it (addr: x=dot(L,N),y=dot(L,H))
-        static const u32 RowPitch = TEX_material_LdotN * 2;
-        static const u32 SlicePitch = TEX_material_LdotH * RowPitch;
+        static constexpr u32 RowPitch = TEX_material_LdotN * 2;
+        static constexpr u32 SlicePitch = TEX_material_LdotH * RowPitch;
         u16 pBits[TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count];
         for (u32 slice = 0; slice < TEX_material_Count; slice++)
         {
