@@ -2071,7 +2071,23 @@ BOOL game_sv_Deathmatch::OnPreCreate(CSE_Abstract* E)
     return TRUE;
 };
 
-void game_sv_Deathmatch::OnCreate(u16 eid_who) { inherited::OnCreate(eid_who); };
+void game_sv_Deathmatch::OnCreate(u16 eid_who)
+{
+    inherited::OnCreate(eid_who);
+
+    CSE_Abstract* pEntity = get_entity_from_eid(eid_who);
+    if (!pEntity)
+        return;
+    CSE_ALifeCustomZone* pCustomZone = smart_cast<CSE_ALifeCustomZone*> (pEntity);
+    if (!pCustomZone)
+        return;
+
+    if (pSettings->line_exist(pCustomZone->s_name, "max_start_power"))
+    {
+        pCustomZone->m_maxPower = pSettings->r_float(pCustomZone->s_name, "max_start_power");
+    }
+}
+
 void game_sv_Deathmatch::OnPostCreate(u16 eid_who)
 {
     inherited::OnPostCreate(eid_who);
