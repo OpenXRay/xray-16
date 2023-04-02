@@ -23,5 +23,5 @@ protected:
     bool BlowoutState() override;
     void SwitchZoneState(EZoneState new_state) override;
     void Load(LPCSTR section) override;
-    virtual float distance_to_center(CGameObject* O);
+    float distance_to_center(CGameObject* O);
 };
