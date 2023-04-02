@@ -5,6 +5,7 @@
 
 class CActor;
 class CLAItem;
+class CArtefact;
 class CParticlesObject;
 class CZoneEffector;
 
@@ -108,6 +109,7 @@ protected:
         eBoltEntranceParticles = (1 << 16),
         eUseSecondaryHit = (1 << 17),
         eVisibleByDetector = (1 << 18),
+        eSpawnBlowoutArtefacts = (1 << 19),
     };
 
     u32 m_owner_id;
@@ -293,6 +295,42 @@ protected:
     virtual void OnMove();
     Fvector m_vPrevPos;
     u32 m_dwLastTimeMoved;
+
+    //////////////////////////////////////////////////////////////////////////
+    // список артефактов
+protected:
+    //рождение артефакта в зоне, во время ее срабатывания
+    //и присоединение его к зоне
+    void BornArtefact();
+    //выброс артефактов из зоны
+    void ThrowOutArtefact(CArtefact* pArtefact);
+
+    void PrefetchArtefacts() const;
+    void SpawnArtefact() const;
+
+protected:
+    xr_vector<CArtefact*> m_SpawnedArtefacts;
+
+    //вероятность того, что артефакт засповниться при единичном 
+    //срабатывании аномалии
+    float m_fArtefactSpawnProbability;
+    //величина импульса выкидывания артефакта из зоны
+    float m_fThrowOutPower;
+    //высота над центром зоны, где будет появляться артефакт
+    float m_fArtefactSpawnHeight;
+
+    //имя партиклов, которые проигрываются во время и на месте рождения артефакта
+    shared_str m_sArtefactSpawnParticles;
+    //звук рождения артефакта
+    ref_sound m_ArtefactBornSound;
+
+    struct ARTEFACT_SPAWN
+    {
+        shared_str section;
+        float      probability;
+    };
+    
+    xr_vector<ARTEFACT_SPAWN> m_ArtefactSpawn;
 
     //расстояние от зоны до текущего актера
     float m_fDistanceToCurEntity;

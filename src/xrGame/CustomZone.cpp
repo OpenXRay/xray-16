@@ -18,6 +18,8 @@
 #include "BreakableObject.h"
 #include "GamePersistent.h"
 
+//////////////////////////////////////////////////////////////////////////
+#define PREFETCHED_ARTEFACTS_NUM 1	//количество предварительно проспавненых артефактов
 #define WIND_RADIUS (4 * Radius()) //расстояние до актера, когда появляется ветер
 #define FASTMODE_DISTANCE (50.f) // distance to camera from sphere, when zone switches to fast update sequence
 
@@ -40,6 +42,9 @@ CCustomZone::CCustomZone(void)
         m_StateTime[i] = 0;
 
     m_dwAffectFrameNum = 0;
+    m_fArtefactSpawnProbability = 0.f;
+    m_fThrowOutPower = 0.f;
+    m_fArtefactSpawnHeight = 0.f;
     m_fBlowoutWindPowerMax = m_fStoreWindPower = 0.f;
     m_fDistanceToCurEntity = flt_max;
     m_ef_weapon_type = u32(-1);
@@ -61,6 +66,8 @@ CCustomZone::~CCustomZone(void)
     m_blowout_sound.destroy();
     m_hit_sound.destroy();
     m_entrance_sound.destroy();
+    m_ArtefactBornSound.destroy();
+
     xr_delete(m_actor_effector);
 }
 
@@ -278,6 +285,52 @@ void CCustomZone::Load(LPCSTR section)
         m_zone_flags.set(eIdleLightR1, pSettings->read_if_exists<bool>(section, "idle_light_r1", true));
     }
 
+    //загрузить параметры для разбрасывания артефактов
+    m_zone_flags.set(eSpawnBlowoutArtefacts, pSettings->read_if_exists<bool>(section, "spawn_blowout_artefacts", false));
+    if (m_zone_flags.test(eSpawnBlowoutArtefacts))
+    {
+        m_fArtefactSpawnProbability = pSettings->r_float(section, "artefact_spawn_probability");
+        if (pSettings->line_exist(section, "artefact_spawn_particles"))
+            m_sArtefactSpawnParticles = pSettings->r_string(section, "artefact_spawn_particles");
+        else
+            m_sArtefactSpawnParticles = nullptr;
+
+        if (pSettings->line_exist(section, "artefact_born_sound"))
+        {
+            sound_str = pSettings->r_string(section, "artefact_born_sound");
+            m_ArtefactBornSound.create(sound_str, st_Effect, sg_SourceType);
+        }
+
+        m_fThrowOutPower = pSettings->r_float(section, "throw_out_power");
+        m_fArtefactSpawnHeight = pSettings->r_float(section, "artefact_spawn_height");
+
+        cpcstr l_caParameters = pSettings->r_string(section, "artefacts");
+        u32 m_wItemCount = (u32)_GetItemCount(l_caParameters);
+        R_ASSERT2(!(m_wItemCount & 1), "Invalid number of parameters in string 'artefacts' in the 'system.ltx'!");
+        m_wItemCount /= 1;
+
+        m_ArtefactSpawn.clear();
+        string512 l_caBuffer;
+
+        float total_probability = 0.f;
+
+        m_ArtefactSpawn.resize(m_wItemCount);
+        for (u32 i = 0; i < m_wItemCount; ++i)
+        {
+            ARTEFACT_SPAWN& artefact_spawn = m_ArtefactSpawn[i];
+            artefact_spawn.section = _GetItem(l_caParameters, i << 1, l_caBuffer);
+            artefact_spawn.probability = (float)atof(_GetItem(l_caParameters, (i << 1) | 1, l_caBuffer));
+            total_probability += artefact_spawn.probability;
+        }
+
+        R_ASSERT3(!fis_zero(total_probability), "The probability of artefact spawn is zero!", cName().c_str());
+        //нормализировать вероятности
+        for (auto& i : m_ArtefactSpawn)
+        {
+            i.probability = i.probability / total_probability;
+        }
+    }
+
     bool use = !!READ_IF_EXISTS(pSettings, r_bool, section, "use_secondary_hit", false);
     m_zone_flags.set(eUseSecondaryHit, use);
     if (use)
@@ -298,13 +351,16 @@ bool CCustomZone::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeCustomZone* Z = smart_cast<CSE_ALifeCustomZone*>(e);
     VERIFY(Z);
 
-    m_fMaxPower = pSettings->r_float(cNameSect(), "max_start_power");
+    m_fMaxPower = pSettings->read_if_exists<float>(cNameSect(), "max_start_power", Z->m_maxPower);
     m_fAttenuation = pSettings->r_float(cNameSect(), "attenuation");
     m_owner_id = Z->m_owner_id;
     if (m_owner_id != u32(-1))
         m_ttl = Device.dwTimeGlobal + 40000; // 40 sec
     else
         m_ttl = u32(-1);
+
+    if (!IsGameTypeSingle())
+        m_zone_flags.set(eSpawnBlowoutArtefacts, false);
 
     m_TimeToDisable = Z->m_disabled_time * 1000;
     m_TimeToEnable = Z->m_enabled_time * 1000;
@@ -1041,7 +1097,10 @@ void CCustomZone::UpdateBlowout()
     UpdateWind();
 
     if (m_dwBlowoutExplosionTime >= (u32)m_iPreviousStateTime && m_dwBlowoutExplosionTime < (u32)m_iStateTime)
+    {
         AffectObjects();
+        BornArtefact();
+    }
 }
 
 void CCustomZone::OnMove()
@@ -1088,7 +1147,46 @@ void CCustomZone::OnEvent(NET_Packet& P, u16 type)
         OnStateSwitch(EZoneState(S));
         break;
     }
+    case GE_OWNERSHIP_TAKE:
+    {
+        u16 id;
+        P.r_u16(id);
+        CArtefact* artefact = smart_cast<CArtefact*>(Level().Objects.net_Find(id));
+        VERIFY(artefact);
+        if (!artefact)
+        {
+#ifndef MASTER_GOLD
+            if (CGameObject* GO = smart_cast<CGameObject*>(Level().Objects.net_Find(id)))
+            {
+                Msg("! %s failed! zone_name[%s] object_name[%s]", __FUNCTION__,
+                    cName().c_str(), GO->cName().c_str());
+            }
+#endif
+            break;
+        }
+
+        artefact->H_SetParent(this);
+        artefact->setVisible(false);
+        artefact->setEnabled(false);
+
+        m_SpawnedArtefacts.emplace_back(artefact);
+        break;
     }
+    case GE_OWNERSHIP_REJECT:
+    {
+        u16 id;
+        P.r_u16(id);
+        CArtefact* artefact = smart_cast<CArtefact*>(Level().Objects.net_Find(id));
+        if (artefact)
+        {
+            const bool just_before_destroy = !P.r_eof() && P.r_u8();
+            artefact->H_SetParent(nullptr, just_before_destroy);
+            if (!just_before_destroy)
+                ThrowOutArtefact(artefact);
+        }
+        break;
+    }
+    } // switch (type)
     inherited::OnEvent(P, type);
 };
 
@@ -1165,6 +1263,82 @@ bool CCustomZone::Disable()
 
 void CCustomZone::ZoneEnable() { SwitchZoneState(eZoneStateIdle); };
 void CCustomZone::ZoneDisable() { SwitchZoneState(eZoneStateDisabled); };
+
+void CCustomZone::BornArtefact()
+{
+    if (!m_zone_flags.test(eSpawnBlowoutArtefacts) || m_SpawnedArtefacts.empty())
+        return;
+
+    if (::Random.randF(0.f, 1.f) > m_fArtefactSpawnProbability)
+        return;
+
+    PrefetchArtefacts();
+    CArtefact* pArtefact = m_SpawnedArtefacts.back();
+    VERIFY(pArtefact);
+    m_SpawnedArtefacts.pop_back();
+
+    if (Local())
+    {
+        if (pArtefact->H_Parent() && pArtefact->H_Parent()->ID() == this->ID()) //. todo: need to remove on actual message parsing
+        {
+            NET_Packet P;
+            u_EventGen(P, GE_OWNERSHIP_REJECT, ID());
+            P.w_u16(pArtefact->ID());
+            u_EventSend(P);
+        }
+    }
+}
+
+void CCustomZone::ThrowOutArtefact(CArtefact* pArtefact)
+{
+    pArtefact->XFORM().c.set(Position());
+    pArtefact->XFORM().c.y += m_fArtefactSpawnHeight;
+
+    if (*m_sArtefactSpawnParticles)
+    {
+        CParticlesObject* pParticles = CParticlesObject::Create(*m_sArtefactSpawnParticles, TRUE);
+        pParticles->UpdateParent(pArtefact->XFORM(), zero_vel);
+        pParticles->Play(false);
+    }
+
+    m_ArtefactBornSound.play_at_pos(nullptr, pArtefact->Position());
+
+    Fvector dir;
+    dir.random_dir();
+    pArtefact->m_pPhysicsShell->applyImpulse(dir, m_fThrowOutPower);
+}
+
+void CCustomZone::PrefetchArtefacts() const
+{
+    if (!m_zone_flags.test(eSpawnBlowoutArtefacts) || m_ArtefactSpawn.empty())
+        return;
+
+    for (size_t i = m_SpawnedArtefacts.size(); i < PREFETCHED_ARTEFACTS_NUM; ++i)
+        SpawnArtefact();
+}
+
+void CCustomZone::SpawnArtefact() const
+{
+    //вычислить согласно распределению вероятностей
+    //какой артефакт из списка ставить
+    const float rnd = ::Random.randF(.0f, 1.f - EPS_L);
+    float prob_threshold = 0.f;
+
+    std::size_t i = 0;
+    for (; i < m_ArtefactSpawn.size(); i++)
+    {
+        prob_threshold += m_ArtefactSpawn[i].probability;
+        if (rnd < prob_threshold)
+            break;
+    }
+    R_ASSERT(i < m_ArtefactSpawn.size());
+
+    Fvector pos;
+    Center(pos);
+    Level().spawn_item(m_ArtefactSpawn[i].section.c_str(), pos,
+        GEnv.isDedicatedServer ? u32(-1) : ai_location().level_vertex_id(), ID());
+}
+
 void CCustomZone::StartWind()
 {
     if (m_fDistanceToCurEntity > WIND_RADIUS)
