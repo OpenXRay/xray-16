@@ -57,8 +57,7 @@ void CRenderTarget::build_textures()
         // Fill it (addr: x=dot(L,N),y=dot(L,H))
         static constexpr u32 RowPitch = TEX_material_LdotN * 2;
         static constexpr u32 SlicePitch = TEX_material_LdotH * RowPitch;
-        constexpr size_t count = TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count;
-        u16 pBits[count];
+        u16 pBits[TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count];
         for (u32 slice = 0; slice < TEX_material_Count; slice++)
         {
             for (u32 y = 0; y < TEX_material_LdotH; y++)
