@@ -75,7 +75,8 @@ public:
 
     virtual CCustomZone* cast_custom_zone() { return this; }
     //различные состояния в которых может находиться зона
-    typedef enum {
+    typedef enum
+    {
         eZoneStateIdle = 0, //состояние зоны, когда внутри нее нет активных объектов
         eZoneStateAwaking, //пробуждение зоны (объект попал в зону)
         eZoneStateBlowout, //выброс
@@ -128,6 +129,7 @@ protected:
 
     //тип наносимого хита
     ALife::EHitType m_eHitTypeBlowout;
+
     EZoneState m_eZoneState;
 
     //текущее время пребывания зоны в определенном состоянии
@@ -167,6 +169,7 @@ public:
     void ZoneEnable();
     void ZoneDisable();
     EZoneState ZoneState() { return m_eZoneState; }
+
 protected:
     //воздействие зоной на объект
     virtual void Affect(SZoneObjectInfo* O) {}
@@ -285,6 +288,7 @@ protected:
     void StopObjectIdleParticles(CGameObject* pObject);
 
     virtual bool IsVisibleForZones() { return false; }
+
     //обновление, если зона передвигается
     virtual void OnMove();
     Fvector m_vPrevPos;
@@ -308,7 +312,7 @@ public:
     void o_switch_2_fast();
     void o_switch_2_slow();
 
-    // Lain: adde
+    // Lain: added
 private:
     virtual bool light_in_slow_mode() { return true; }
 };
