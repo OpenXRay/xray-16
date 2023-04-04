@@ -18,6 +18,7 @@
 #include <stdarg.h>
 #include "Common/Noncopyable.hpp"
 #include "xrCore/ModuleLookup.hpp"
+#include "xrLuaFix/xrLuaFix.h"
 #include "luabind/class_info.hpp"
 
 Flags32 g_LuaDebug;
@@ -976,6 +977,8 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #ifndef MASTER_GOLD
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif
+
+    luaopen_xrluafix(lua());
 
     // Game scripts doesn't call randomize but use random
     // So, we should randomize in the engine.
