@@ -271,7 +271,7 @@ void item_respawn_manager::add_new_rpoint(shared_str profile_sect, RPoint const&
 
 void item_respawn_manager::check_to_delete(u16 item_id)
 {
-    auto temp_iter = std::find_if(m_respawns.begin(), m_respawns.end(), [&item_id](const spawn_item& respawn_item)
+    auto temp_iter = std::find_if(m_respawns.begin(), m_respawns.end(), [item_id](const spawn_item& respawn_item)
     {
         return respawn_item.last_game_id == item_id;
     });
