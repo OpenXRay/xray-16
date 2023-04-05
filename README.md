@@ -152,6 +152,6 @@ Thank you for your support!
 * Companies:
   * [CoderGears](https://www.cppdepend.com) – thanks for providing a [free Pro Licence for CppDepend](https://www.cppdepend.com/cppdependfoross), an amazing and powerful tool for C and C++. <br>
     [![CppDepend logo](https://www.cppdepend.com/images/cppdependlogo.png)](https://www.cppdepend.com)
-
+  * [PVS-Studio LLC](https://pvs-studio.com/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) – thanks for proving us a [free licence](https://pvs-studio.ru/ru/order/open-source-license/?utm_source=website&utm_medium=github&utm_campaign=open_source) for PVS-Studio, a static analyzer for C, C++, C#, and Java code.
 
 If your work is being used in our project and you are not mentioned here or in the [contributors page](https://github.com/OpenXRay/xray-16/graphs/contributors), please, write to us and we will add you. Or send us a pull request with you added to this list ;)
