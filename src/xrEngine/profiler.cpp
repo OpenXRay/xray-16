@@ -35,13 +35,6 @@ CProfiler	*g_profiler			= nullptr;
 pcstr		indent				= "  ";
 char		white_character		= '.';
 
-struct CProfilePortionPredicate {
-	IC		bool operator()			(const CProfileResultPortion &_1, const CProfileResultPortion &_2) const
-	{
-		return					(xr_strcmp(_1.m_timer_id,_2.m_timer_id) < 0);
-	}
-};
-
 CProfiler::CProfiler				()
 #ifdef CONFIG_PROFILE_LOCKS
 	:m_section("")
@@ -174,7 +167,10 @@ void CProfiler::show_stats			(IGameFont &font, bool show)
 	m_section.Enter				();
 
 	if (!m_portions.empty()) {
-		std::sort				(m_portions.begin(),m_portions.end(),CProfilePortionPredicate());
+		std::sort(m_portions.begin(), m_portions.end(), [](const CProfileResultPortion& first, const CProfileResultPortion& second)
+        {
+            return xr_strcmp(first.m_timer_id, second.m_timer_id) < 0;
+        });
 		u64						timer_time = 0;
 		u32						call_count = 0;
 

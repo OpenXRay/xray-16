@@ -85,26 +85,6 @@ struct edge
 };
 #pragma pack(pop)
 
-struct sort_predicate
-{
-    IC bool operator()(const edge& edge0, const edge& edge1) const
-    {
-        if (edge0.vertex_id0 < edge1.vertex_id0)
-            return (true);
-
-        if (edge1.vertex_id0 < edge0.vertex_id0)
-            return (false);
-
-        if (edge0.vertex_id1 < edge1.vertex_id1)
-            return (true);
-
-        if (edge1.vertex_id1 < edge0.vertex_id1)
-            return (false);
-
-        return (edge0.face_id < edge1.face_id);
-    }
-};
-
 void Collector::calc_adjacency(xr_vector<u32>& dest) const
 {
 #if 1
@@ -145,7 +125,22 @@ void Collector::calc_adjacency(xr_vector<u32>& dest) const
         ++i;
     }
 
-    std::sort(edges, edges + edge_count, sort_predicate());
+    std::sort(edges, edges + edge_count, [](const edge& edge0, const edge& edge1)
+    {
+        if (edge0.vertex_id0 < edge1.vertex_id0)
+            return (true);
+
+        if (edge1.vertex_id0 < edge0.vertex_id0)
+            return (false);
+
+        if (edge0.vertex_id1 < edge1.vertex_id1)
+            return (true);
+
+        if (edge1.vertex_id1 < edge0.vertex_id1)
+            return (false);
+
+        return (edge0.face_id < edge1.face_id);
+    });
 
     dest.assign(edge_count, u32(-1));
 
