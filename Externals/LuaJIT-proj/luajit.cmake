@@ -6,9 +6,6 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-# Minimum MacOS deployment version.
-set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
-
 project(xrLuajit C CXX ASM)
 
 # Version
@@ -18,6 +15,7 @@ set(RELVER 5)
 set(ABIVER 5.1)
 set(NODOTABIVER 51)
 
+set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
 set(LUAJIT_DIR ${CMAKE_SOURCE_DIR}/Externals/LuaJIT/src CACHE PATH "Location of luajit sources")
 
 option(BUILD_STATIC_LIB "Build static library" OFF)
@@ -195,6 +193,9 @@ if (WIN32)
 
 	set(LJVM_MODE peobj)
 elseif (APPLE)
+	if (CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
+		message(FATAL_ERROR "Missing export MACOSX_DEPLOYMENT_TARGET=XX.YY")
+	endif()
 	
 	#string(APPEND TARGET_STRIP "-x")
 	# XXX: doesn't compile with Apple Clang
