@@ -173,10 +173,10 @@ void CRender::render_menu()
     Fvector2 p0, p1;
     u32 Offset;
     u32 C = color_rgba(255, 255, 255, 255);
-    float _w = float(Device.dwWidth);
-    float _h = float(Device.dwHeight);
-    float d_Z = EPS_S;
-    float d_W = 1.f;
+    const float _w = float(Device.dwWidth);
+    const float _h = float(Device.dwHeight);
+    const float d_Z = EPS_S;
+    const float d_W = 1.f;
     p0.set(.5f / _w, .5f / _h);
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
@@ -225,8 +225,8 @@ void CRender::Render()
         return;
     }
 
-    IMainMenu* pMainMenu = g_pGamePersistent ? g_pGamePersistent->m_pMainMenu : 0;
-    bool bMenu = pMainMenu ? pMainMenu->CanSkipSceneRendering() : false;
+    IMainMenu* pMainMenu = g_pGamePersistent ? g_pGamePersistent->m_pMainMenu : nullptr;
+    bool bMenu = pMainMenu != nullptr && pMainMenu->CanSkipSceneRendering();
 
     if (!(g_pGameLevel && g_hud) || bMenu)
     {
@@ -267,12 +267,12 @@ void CRender::Render()
             Device.fASPECT, VIEWPORT_NEAR,
             z_distance * g_pGamePersistent->Environment().CurrentEnv.far_plane);
         m_zfill.mul(m_project, Device.mView);
-        r_pmask(true, false); // enable priority "0"
+        r_pmask<true, false>(); // enable priority "0"
         set_Recorder(nullptr);
         phase = PHASE_SMAP;
         TaskScheduler->Wait(*ProcessHOMTask);
         render_main(m_zfill, false);
-        r_pmask(true, false); // disable priority "1"
+        r_pmask<true, false>(); // disable priority "1"
         BasicStats.Culling.End();
 
         // flush
@@ -298,7 +298,7 @@ void CRender::Render()
     //******* Main calc - DEFERRER RENDERER
     // Main calc
     BasicStats.Culling.Begin();
-    r_pmask(true, false, true); // enable priority "0",+ capture wmarks
+    r_pmask<true, false, true>(); // enable priority "0",+ capture wmarks
     if (bSUN)
         set_Recorder(&main_coarse_structure);
     else
@@ -308,7 +308,7 @@ void CRender::Render()
         TaskScheduler->Wait(*ProcessHOMTask);
     render_main(Device.mFullTransform, true);
     set_Recorder(nullptr);
-    r_pmask(true, false); // disable priority "1"
+    r_pmask<true, false>(); // disable priority "1"
     BasicStats.Culling.End();
 
     BOOL split_the_scene_to_minimize_wait = FALSE;
@@ -556,7 +556,7 @@ void CRender::render_forward()
     //.todo: should be done inside "combine" with estimation of of luminance, tone-mapping, etc.
     {
         // level
-        r_pmask(false, true); // enable priority "1"
+        r_pmask<false, true>(); // enable priority "1"
         phase = PHASE_NORMAL;
         render_main(Device.mFullTransform, false); //
         //	Igor: we don't want to render old lods on next frame.

@@ -264,7 +264,7 @@ void CRender::render_rain()
             VERIFY2(mapNormalPasses[1][0].empty() && mapMatrixPasses[1][0].empty() && mapSorted.empty(), "Special should be empty at this stage, but it's not empty...");
             HOM.Disable();
             phase = PHASE_SMAP;
-            r_pmask(true, false);
+            r_pmask<true, false>();
         }
 
         // Fill the database
@@ -295,7 +295,7 @@ void CRender::render_rain()
     // End SMAP-render
     {
         //		fuckingsun->svis.end					();
-        r_pmask(true, false);
+        r_pmask<true, false>();
     }
 
     // Restore XForms

@@ -32,13 +32,14 @@ void _MinimizeND::GetMinimum(
     m_kMinimizer.UserData() = this;
 
     // initial guess
-    constexpr int iQuantity = m_iDimensions * sizeof(float);
+    constexpr size_t iQuantity = m_iDimensions * sizeof(float);
+    constexpr size_t count = iQuantity * (m_iDimensions + 1);
     m_fFCurr = m_oF(afTInitial, m_pvUserData);
     memcpy(m_afTSave, afTInitial, iQuantity);
     memcpy(m_afTCurr, afTInitial, iQuantity);
 
     // initialize direction set to the standard Euclidean basis
-    ZeroMemory(m_afDirectionStorage, iQuantity * (m_iDimensions + 1));
+    ZeroMemory(m_afDirectionStorage, count);
     int i;
     for (i = 0; i < m_iDimensions; i++)
         m_aafDirection[i][i] = 1.0f;
@@ -73,7 +74,7 @@ void _MinimizeND::GetMinimum(
             break;
         }
 
-        float fInvLength = 1.0f / fLength;
+        const float fInvLength = 1.0f / fLength;
         for (i = 0; i < m_iDimensions; i++)
             m_afDConj[i] *= fInvLength;
 

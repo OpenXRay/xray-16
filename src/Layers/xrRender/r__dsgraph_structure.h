@@ -72,7 +72,7 @@ public:
 public:
     R_dsgraph_structure()
     {
-        r_pmask(true, true);
+        r_pmask<true, true>();
     };
 
     void r_dsgraph_destroy()
@@ -106,7 +106,8 @@ public:
 #endif
     }
 
-    void r_pmask(bool _1, bool _2, bool _wm = false)
+    template <bool _1, bool _2, bool _wm = false>
+    void r_pmask()
     {
         pmask[0] = _1;
         pmask[1] = _2;

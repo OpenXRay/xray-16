@@ -102,9 +102,9 @@ void CRender::render_lights(light_Package& LP)
             // render
             phase = PHASE_SMAP;
             if (RImplementation.o.Tshadows)
-                r_pmask(true, true);
+                r_pmask<true, true>();
             else
-                r_pmask(true, false);
+                r_pmask<true, false>();
             L->svis.begin();
             PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
             r_dsgraph_render_subspace(L->spatial.sector, L->X.S.combine, L->position, TRUE);
@@ -137,7 +137,7 @@ void CRender::render_lights(light_Package& LP)
                 Stats.s_finalclip++;
             }
             L->svis.end();
-            r_pmask(true, false);
+            r_pmask<true, false>();
         }
 
         PIX_EVENT(UNSHADOWED_LIGHTS);

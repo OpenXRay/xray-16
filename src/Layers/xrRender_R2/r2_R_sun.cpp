@@ -1258,9 +1258,9 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         HOM.Disable();
         phase = PHASE_SMAP;
         if (o.Tshadows)
-            r_pmask(true, true);
+            r_pmask<true, true>();
         else
-            r_pmask(true, false);
+            r_pmask<true, false>();
         //		fuckingsun->svis.begin					();
     }
 
@@ -1298,7 +1298,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     // End SMAP-render
     {
         //		fuckingsun->svis.end					();
-        r_pmask(true, false);
+        r_pmask<true, false>();
     }
 
     // Accumulate
