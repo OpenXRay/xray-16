@@ -7,7 +7,6 @@
 cmake_minimum_required(VERSION 3.13)
 
 # Minimum MacOS deployment version.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS deployment version")
 set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
 
 project(xrLuajit C CXX ASM)
@@ -60,10 +59,10 @@ set(LUA_CPATH "LUA_CPATH" CACHE STRING "Environment variable to use as package.c
 set(LUA_INIT "LUA_INIT" CACHE STRING "Environment variable for initial script")
 
 # Clean unnecessary files in LuaJIT source directory
-#execute_process(
-#	COMMAND ${CMAKE_MAKE_PROGRAM} clean
-#	WORKING_DIRECTORY ${LUAJIT_DIR}
-#)
+execute_process(
+	COMMAND ${CMAKE_MAKE_PROGRAM} clean
+	WORKING_DIRECTORY ${LUAJIT_DIR}
+)
 
 # Compiler options
 if (PROJECT_PLATFORM_E2K) # E2K: O3 on mcst-lcc approximately equal to O2 at gcc X86/ARM
@@ -196,11 +195,7 @@ if (WIN32)
 
 	set(LJVM_MODE peobj)
 elseif (APPLE)
-	if (CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-		#message(FATAL_ERROR "Missing export MACOSX_DEPLOYMENT_TARGET=XX.YY")
-		set(ENV{MACOSX_DEPLOYMENT_TARGET}, ${CMAKE_OSX_DEPLOYMENT_TARGET})	
-	endif()
-
+	
 	#string(APPEND TARGET_STRIP "-x")
 	# XXX: doesn't compile with Apple Clang
 	#string(APPEND TARGET_XSHLDFLAGS " -dynamiclib -single_module -undefined dynamic_lookup -fPIC")
