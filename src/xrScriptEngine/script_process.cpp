@@ -41,7 +41,7 @@ void CScriptProcess::run_scripts()
         CScriptThread* script = scriptEngine->CreateScriptThread(S, do_string, reload);
         xr_free(S);
 
-        if (script->active())
+        if (script && script->active())
             m_scripts.push_back(script);
         else
             xr_delete(script);
