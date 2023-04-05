@@ -19,7 +19,10 @@ class dx11ConstantBuffer;
 class ECORE_API CResourceManager
 {
 private:
-    const std::function<bool(LPCSTR, LPCSTR)> str_pred = [](LPCSTR x, LPCSTR y) { return xr_strcmp(x, y) < 0; };
+    struct str_pred
+    {
+        bool operator()(LPCSTR x, LPCSTR y) const { return xr_strcmp(x, y) < 0; }
+    };
     struct texture_detail
     {
         const char* T;
@@ -27,29 +30,29 @@ private:
     };
 
 public:
-    using map_Blender = xr_map<const char*, IBlender*, decltype(str_pred)>;
-    using map_Texture = xr_map<const char*, CTexture*, decltype(str_pred)>;
-    using map_Matrix = xr_map<const char*, CMatrix*, decltype(str_pred)>;
-    using map_Constant = xr_map<const char*, CConstant*, decltype(str_pred)>;
-    using map_RT = xr_map<const char*, CRT*, decltype(str_pred)>;
+    using map_Blender = xr_map<const char*, IBlender*, str_pred>;
+    using map_Texture = xr_map<const char*, CTexture*, str_pred>;
+    using map_Matrix = xr_map<const char*, CMatrix*, str_pred>;
+    using map_Constant = xr_map<const char*, CConstant*, str_pred>;
+    using map_RT = xr_map<const char*, CRT*, str_pred>;
     //	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
-    using map_VS = xr_map<const char*, SVS*, decltype(str_pred)>;
+    using map_VS = xr_map<const char*, SVS*, str_pred>;
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    using map_GS = xr_map<const char*, SGS*, decltype(str_pred)>;
+    using map_GS = xr_map<const char*, SGS*, str_pred>;
 #endif
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    using map_HS = xr_map<const char*, SHS*, decltype(str_pred)>;
-    using map_DS = xr_map<const char*, SDS*, decltype(str_pred)>;
-    using map_CS = xr_map<const char*, SCS*, decltype(str_pred)>;
+    using map_HS = xr_map<const char*, SHS*, str_pred>;
+    using map_DS = xr_map<const char*, SDS*, str_pred>;
+    using map_CS = xr_map<const char*, SCS*, str_pred>;
 #endif
 #if defined(USE_OGL)
-    using map_PP = xr_map<const char*, SPP*, decltype(str_pred)>;
+    using map_PP = xr_map<const char*, SPP*, str_pred>;
 #endif
 
-    using map_PS = xr_map<const char*, SPS*, decltype(str_pred)>;
-    using map_TD = xr_map<const char*, texture_detail, decltype(str_pred)>;
+    using map_PS = xr_map<const char*, SPS*, str_pred>;
+    using map_TD = xr_map<const char*, texture_detail, str_pred>;
 
 private:
     // data
