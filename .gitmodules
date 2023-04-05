@@ -43,3 +43,6 @@
 [submodule "Externals/imgui"]
 	path = Externals/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "Externals/xrLuaFix"]
+	path = Externals/xrLuaFix
+	url = https://github.com/OpenXRay/xrLuaFix.git
