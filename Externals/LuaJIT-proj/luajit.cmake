@@ -196,6 +196,7 @@ elseif (APPLE)
 	if (CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
 		message(FATAL_ERROR "Missing export MACOSX_DEPLOYMENT_TARGET=XX.YY")
 	endif()
+
 	#string(APPEND TARGET_STRIP "-x")
 	# XXX: doesn't compile with Apple Clang
 	#string(APPEND TARGET_XSHLDFLAGS " -dynamiclib -single_module -undefined dynamic_lookup -fPIC")
