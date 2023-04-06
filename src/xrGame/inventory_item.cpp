@@ -87,6 +87,8 @@ CInventoryItem::~CInventoryItem()
 #endif // #ifndef MASTER_GOLD
 }
 
+extern int g_normalize_mouse_sens;
+
 void CInventoryItem::Load(LPCSTR section)
 {
     CHitImmunity::LoadImmunities(pSettings->r_string(section, "immunities_sect"), pSettings);
@@ -125,7 +127,7 @@ void CInventoryItem::Load(LPCSTR section)
     {
         m_flags.set(FRuckDefault, pSettings->read_if_exists<bool>(section, "default_to_ruck", true));
         m_flags.set(FAllowSprint, pSettings->read_if_exists<bool>(section, "sprint_allowed", true));
-        m_fControlInertionFactor = pSettings->read_if_exists<float>(section, "control_inertion_factor", 1.0f);
+        m_fControlInertionFactor = g_normalize_mouse_sens ? 1.0f : pSettings->read_if_exists<float>(section, "control_inertion_factor", 1.0f);
     }
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
 }
