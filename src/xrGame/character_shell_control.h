@@ -30,7 +30,7 @@ private:
     // ;
     ///////////////////////////////////////////////////////////////////////////
     float m_shot_up_factor{};
-    float m_after_death_velocity_factor{1.0f};
+    float m_after_death_velocity_factor{ 1.0f };
 
     // gray_wolf>Переменные для поддержки изменяющегося трения у персонажей во время смерти
     float skeleton_skin_ddelay;

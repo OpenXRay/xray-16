@@ -121,7 +121,7 @@ int net_cl_inputupdaterate = 50;
 Flags32 g_mt_config = {mtLevelPath | mtDetailPath | mtObjectHandler | mtSoundPlayer | mtAiVision | mtBullets |
     mtLUA_GC | mtLevelSounds | mtALife | mtMap};
 #ifdef DEBUG
-Flags32 dbg_net_Draw_Flags = {};
+Flags32 dbg_net_Draw_Flags{};
 #endif
 
 #ifdef DEBUG

@@ -6,11 +6,9 @@ class ik_pick_query
 {
 public:
     ik_pick_query()
-        : _pos(Fvector().set(-FLT_MAX, -FLT_MAX, -FLT_MAX)),
-          _dir(Fvector().set(-FLT_MAX, -FLT_MAX, -FLT_MAX)),
-          _range(-FLT_MAX), _point(ik_foot_geom::none)
-    {
-    }
+        : _pos({ -FLT_MAX, -FLT_MAX, -FLT_MAX }),
+          _dir({ -FLT_MAX, -FLT_MAX, -FLT_MAX }),
+          _range(-FLT_MAX), _point(ik_foot_geom::none) {}
 
     ik_pick_query(ik_foot_geom::e_collide_point point, const Fvector& pos, const Fvector& dir, float range)
         : _pos(pos), _dir(dir), _range(range), _point(point)

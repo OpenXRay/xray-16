@@ -70,10 +70,13 @@ void game_sv_ArtefactHunt::Create(shared_str& options)
 
                 O->r_fvector3(R.P);
                 O->r_fvector3(R.A);
-                [[maybe_unused]] u8 team = O->r_u8();
+
+                [[maybe_unused]]
+                const u8 team = O->r_u8();
                 VERIFY(team >= 0 && team < 4);
-                u16 type = O->r_u8();
-                u16 GameType = O->r_u16();
+
+                const u16 type = O->r_u8();
+                const u16 GameType = O->r_u16();
                 switch (type)
                 {
                 case rptArtefactSpawn:

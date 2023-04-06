@@ -2121,9 +2121,8 @@ void game_sv_CaptureTheArtefact::ActorDeliverArtefactOnBase(CSE_ActorMP* actor, 
     game_PlayerState* ps = xrCData->ps;
     VERIFY2(xrCData, "client data for actor sv object not found");
     VERIFY2(ps, "player state of client is NULL");
-    [[maybe_unused]] TeamsMap::iterator te = teams.end();
-    TeamsMap::iterator artefactOfTeam = teams.find(teamOfArtefact);
-    VERIFY2(artefactOfTeam != te, make_string("artefact owner team (%d) not found", teamOfArtefact));
+    auto artefactOfTeam = teams.find(teamOfArtefact);
+    VERIFY2(artefactOfTeam != teams.end(), make_string("artefact owner team (%d) not found", teamOfArtefact));
     VERIFY(artefactOfTeam->second.artefact);
 
     DropArtefact(actor, artefactOfTeam->second.artefact, &artefactOfTeam->second.artefactRPoint.P);

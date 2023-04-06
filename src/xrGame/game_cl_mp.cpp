@@ -772,7 +772,7 @@ void game_cl_mp::OnSwitchPhase(u32 old_phase, u32 new_phase)
         HideMessageMenus();
         break;
     }
-    }
+    } // switch (new_phase)
 }
 
 const ui_shader& game_cl_mp::GetEquipmentIconsShader()

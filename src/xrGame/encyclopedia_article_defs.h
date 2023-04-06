@@ -23,7 +23,7 @@ struct ARTICLE_DATA : public ISerializable
     virtual void load(IReader& stream);
     virtual void save(IWriter&);
 
-    ALife::_TIME_ID receive_time;
+    ALife::_TIME_ID receive_time{};
     shared_str article_id;
     bool readed{};
     EArticleType article_type{ eEncyclopediaArticle };

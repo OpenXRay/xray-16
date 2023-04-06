@@ -533,11 +533,10 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
 
         if (res)
         {
-            // XXX: wtf?
             //xr_vector<u32>::reverse_iterator it = map_point_path.rbegin();
             //xr_vector<u32>::reverse_iterator it_e = map_point_path.rend();
 
-            xr_vector<CLevelChanger*>::iterator lit = g_lchangers.begin();
+            //xr_vector<CLevelChanger*>::iterator lit = g_lchangers.begin();
             // xr_vector<CLevelChanger*>::iterator lit_e = g_lchangers.end();
             bool bDone = false;
             // for(; (it!=it_e)&&(!bDone) ;++it){

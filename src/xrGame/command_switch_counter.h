@@ -11,8 +11,8 @@ class command_switch_counter : public player_state_param
     typedef player_state_param inherited;
 
 public:
-    command_switch_counter(game_state_accumulator* owner) : inherited(owner) {};
-    virtual ~command_switch_counter(){};
+    command_switch_counter(game_state_accumulator* owner) : inherited(owner) {}
+    virtual ~command_switch_counter(){}
 
     virtual void update(){};
     virtual u32 get_u32_param() { return m_counter; };
