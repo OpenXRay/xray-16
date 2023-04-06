@@ -156,6 +156,7 @@ void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades) //
 bool CInventoryItem::install_upgrade(LPCSTR section) { return install_upgrade_impl(section, false); }
 bool CInventoryItem::verify_upgrade(LPCSTR section) { return install_upgrade_impl(section, true); }
 
+extern int g_normalize_mouse_sens;
 extern int g_normalize_upgrade_mouse_sens;
 bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
 {
@@ -184,6 +185,23 @@ bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
         if (!g_normalize_upgrade_mouse_sens)
             result |=
                 process_if_exists(section, "control_inertion_factor", &CInifile::r_float, m_fControlInertionFactor, test);
+
+        bool needsNormalizedUpgradeSens = g_normalize_mouse_sens && !g_normalize_upgrade_mouse_sens;
+        if (needsNormalizedUpgradeSens)
+        {
+            if (m_fControlInertionFactor < 0.f)
+            {
+                float upgr_factor = pSettings->read_if_exists<float>(section, "control_inertion_factor", 1.0f);
+                if (abs(upgr_factor) > 1)
+                    upgr_factor /= 4;
+                else if (abs(upgr_factor) >= 0.5)
+                    upgr_factor /= 3;
+                else if (abs(upgr_factor) > 0.1)
+                    upgr_factor /= 2;
+
+                m_fControlInertionFactor = 1.f + upgr_factor;
+            }
+        }
     }
 
     pcstr str;
