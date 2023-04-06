@@ -200,6 +200,7 @@ bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
                     upgr_factor /= 2;
 
                 m_fControlInertionFactor = 1.f + upgr_factor;
+                clamp(m_fControlInertionFactor, 0.1f, 1.f);
             }
         }
     }
