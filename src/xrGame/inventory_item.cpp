@@ -31,6 +31,7 @@
 constexpr pcstr INV_NAME_KEY = "inv_name";
 constexpr pcstr INV_NAME_SHORT_KEY = "inv_name_short";
 constexpr pcstr DESCRIPTION_KEY = "description";
+extern int g_normalize_mouse_sens;
 
 net_updateInvData* CInventoryItem::NetSync()
 {
@@ -86,8 +87,6 @@ CInventoryItem::~CInventoryItem()
     }
 #endif // #ifndef MASTER_GOLD
 }
-
-extern int g_normalize_mouse_sens;
 
 void CInventoryItem::Load(LPCSTR section)
 {

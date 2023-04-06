@@ -20,6 +20,9 @@
 #include "Level.h"
 #include "WeaponMagazinedWGrenade.h"
 
+extern int g_normalize_mouse_sens;
+extern int g_normalize_upgrade_mouse_sens;
+
 bool CInventoryItem::has_upgrade_group(const shared_str& upgrade_group_id)
 {
     auto it = m_upgrades.cbegin();
@@ -156,8 +159,6 @@ void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades) //
 bool CInventoryItem::install_upgrade(LPCSTR section) { return install_upgrade_impl(section, false); }
 bool CInventoryItem::verify_upgrade(LPCSTR section) { return install_upgrade_impl(section, true); }
 
-extern int g_normalize_mouse_sens;
-extern int g_normalize_upgrade_mouse_sens;
 bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
 {
     bool result = process_if_exists(section, "cost", &CInifile::r_u32, m_cost, test);
@@ -183,10 +184,11 @@ bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
         result |= result2;
 
         if (!g_normalize_upgrade_mouse_sens)
-            result |=
-                process_if_exists(section, "control_inertion_factor", &CInifile::r_float, m_fControlInertionFactor, test);
+        {
+            result |= process_if_exists(section, "control_inertion_factor", &CInifile::r_float, m_fControlInertionFactor, test);
+        }
 
-        bool needsNormalizedUpgradeSens = g_normalize_mouse_sens && !g_normalize_upgrade_mouse_sens;
+        const bool needsNormalizedUpgradeSens = g_normalize_mouse_sens && !g_normalize_upgrade_mouse_sens;
         if (needsNormalizedUpgradeSens)
         {
             if (m_fControlInertionFactor < 0.f)
