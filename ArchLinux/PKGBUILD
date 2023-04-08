@@ -27,9 +27,11 @@ build() {
 #  rm -f -R bin
    mkdir -p bin
    cd bin
-   cmake .. -DCMAKE_BUILD_TYPE=Release \
+   cmake .. \
+   -DCMAKE_BUILD_TYPE=Release \
    -DCMAKE_INSTALL_PREFIX=/usr \
-   -DCMAKE_INSTALL_LIBDIR=lib
+   -DCMAKE_INSTALL_LIBDIR=lib \
+   -DMEMORY_ALLOCATOR=standard
    make
 }
 
