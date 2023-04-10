@@ -14,6 +14,7 @@ OpenXRay is an improved version of the X-Ray Engine, the game engine used in the
     1. Add frame/render graph for those who want to add new graphics features.
     2. Improve performance via refactoring the code, parallelizing the engine, making it multithreaded.
     3. Add new scripting, development and debugging features.
+    4. New game SDK with new features.
 5. Clean up engine code, make it easily portable to new platforms, minimize platform-specific code.
 6. Enhance player's experience with new graphics, gameplay and other features that can be enabled optionally. (by default, we stay close to vanilla)
 
