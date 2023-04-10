@@ -88,15 +88,15 @@ IC const CLevelGraph::CPosition& CLevelGraph::vertex_position(CPosition& dest_po
 
     VERIFY(iFloor((source_position.z - box_z) / cell_size + .5f) < (int)m_row_length);
 
-    const int pxz = iFloor((source_position.x - box_x) / cell_size + .5f) * m_row_length +
-        iFloor((source_position.z - box_z) / cell_size + .5f);
-    VERIFY(pxz < NodePosition::MAX_XZ);
+    const int packed_xz = iFloor((source_position.x - box_x) / cell_size + .5f)
+                        * m_row_length + iFloor((source_position.z - box_z) / cell_size + .5f);
+    VERIFY(packed_xz < NodePosition::MAX_XZ);
 
-    int py = iFloor(65535.f * (source_position.y - box_y) / header().factor_y() + EPS_S);
-    clamp(py, 0, 65535);
+    int packed_y = iFloor(65535.f * (source_position.y - box_y) / header().factor_y() + EPS_S);
+    clamp(packed_y, 0, 65535);
 
-    dest_position.xz(u32(pxz));
-    dest_position.y(u16(py));
+    dest_position.xz(u32(packed_xz));
+    dest_position.y(u16(packed_y));
     return dest_position;
 }
 
@@ -195,11 +195,15 @@ IC bool CLevelGraph::inside(const u32 vertex_id, const Fvector& position, const 
 
 IC bool CLevelGraph::inside(const u32 vertex_id, const Fvector2& position) const
 {
-    int pxz = iFloor(((position.x - header().box().vMin.x) / header().cell_size() + .5f)) * m_row_length +
-        iFloor((position.y - header().box().vMin.z) / header().cell_size() + .5f);
-    VERIFY(pxz < NodePosition::MAX_XZ);
-    bool b = vertex(vertex_id)->position().xz() == u32(pxz);
-    return (b);
+    [[maybe_unused]]
+    const auto [box_x, box_y, box_z] = header().box().vMin;
+    const auto cell_size = header().cell_size();
+
+    const int packed_xz = iFloor((position.x - box_x) / cell_size + .5f) * m_row_length +
+        iFloor((position.y - box_z) / cell_size + .5f);
+    VERIFY(packed_xz < NodePosition::MAX_XZ);
+    const bool b = vertex(vertex_id)->position().xz() == u32(packed_xz);
+    return b;
 }
 
 IC float CLevelGraph::vertex_plane_y(const CLevelGraph::CLevelVertex& vertex, const float X, const float Z) const
