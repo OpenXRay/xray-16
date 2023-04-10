@@ -77,10 +77,19 @@ void CSE_ALifeAnomalousZone::spawn_artefacts()
     typedef buffer_vector<Weight> Weights;
     Weights weights(xr_alloca(n * sizeof(Weight)), n);
 
+    u32 missing_artefacts = 0;
     for (u32 i = 0; i < n; ++i)
     {
         string256 temp0, temp1;
         _GetItem(artefacts, 2 * i + 0, temp0);
+        if (!pSettings->section_exist(temp0))
+        {
+#ifndef MASTER_GOLD
+            Msg("! [%s] wants to spawn artefact [%s] with missing INI section.", name(), temp0);
+#endif
+            ++missing_artefacts;
+            continue;
+        }
         _GetItem(artefacts, 2 * i + 1, temp1);
         weights.push_back(
             std::make_pair(
@@ -89,6 +98,7 @@ void CSE_ALifeAnomalousZone::spawn_artefacts()
                 )
             );
     }
+    n -= missing_artefacts;
 
     for (u32 i = 0; i < artefact_count; ++i)
     {
