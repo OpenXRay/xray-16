@@ -308,16 +308,16 @@ void CClimableObject::ObjectContactCallback(
     dxGeomUserData* usr_data_lad = NULL;
     CClimableObject* this_object = NULL;
     CPHCharacter* ch = nullptr;
-//    float norm_sign = 0.f;
+    //float norm_sign = 0.f;
     if (bo1)
     {
         usr_data_ch = usr_data_2;
         usr_data_lad = usr_data_1;
-//        norm_sign = -1.f;
+        //norm_sign = -1.f;
     }
     else
     {
-//        norm_sign = 1.f;
+        //norm_sign = 1.f;
         usr_data_ch = usr_data_1;
         usr_data_lad = usr_data_2;
     }

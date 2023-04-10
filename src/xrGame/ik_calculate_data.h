@@ -12,16 +12,13 @@ struct SCalculateData
     bool do_collide{};
 
     calculate_state state{};
-    Fvector cl_shift;
+    Fvector cl_shift{ 0, 0, 0 };
     bool apply{};
     float l{};
     float a{};
 
 public:
-    SCalculateData() : cl_shift(Fvector().set(0, 0, 0))
-    {
-    }
-
+    SCalculateData() = default;
     SCalculateData(CIKLimb& l, const Fmatrix& o);
 
 public:

@@ -80,7 +80,7 @@ private:
 
     bool m_fake_indicators_update{};
     std::bitset<it_max> m_cur_state_LA;
-    bool m_b_force_update{ true };
+    bool m_b_force_update;
 
 public:
     CUIHudStatesWnd();

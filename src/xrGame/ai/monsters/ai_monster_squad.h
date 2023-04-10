@@ -190,7 +190,7 @@ public:
 private:
     // danger mode is turns on when monsters hear dangerous sound or get a hit
     // danger mode turns off after m_danger_mode_time miliseconds
-    u32 m_home_danger_mode_time{8000};
+    u32 m_home_danger_mode_time{ 8000 };
     u32 m_home_danger_end_tick{};
 
     void assign_monsters_target_dirs(ENTITY_VEC& members, const CEntity* enemy);

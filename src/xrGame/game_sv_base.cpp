@@ -984,13 +984,20 @@ void game_sv_GameState::OnRoundStart()
     m_bMapNeedRotation = false;
     m_bFastRestart = false;
 
-    for (int t = 0; t < TEAM_COUNT; t++)
+    for (auto& team_rpoints : rpoints)
     {
-        for (u32 i = 0; i < rpoints[t].size(); i++)
+        for (auto& rpoint : team_rpoints)
         {
-            rpoints[t][i].bBlocked = false;
+            // XXX: examine the problem in the original code and fix
+#if 1
+            RPoint rp = rpoint; // XXX: creates a copy
+            rp.bBlocked = false; // XXX: changes a copy with no effect
+#else
+            rpoint.bBlocked = false; // XXX: correct code
+#endif
         }
-    };
+    }
+
     rpointsBlocked.clear();
 } // старт раунда
 
@@ -1081,7 +1088,9 @@ extern Flags32 dbg_net_Draw_Flags;
 void game_sv_GameState::OnRender()
 {
 #ifndef DEBUG
-    /*Fmatrix T; T.identity();
+    /*
+    Fmatrix T;
+    T.identity();
     Fvector V0, V1;
     u32 TeamColors[TEAM_COUNT] = {color_xrgb(255, 0, 0), color_xrgb(0, 255, 0), color_xrgb(0, 0, 255), color_xrgb(255, 255, 0)};
     // u32 TeamColorsDist[TEAM_COUNT] = {color_argb(128, 255, 0, 0), color_argb(128, 0, 255, 0), color_argb(128, 0, 0, 255), color_argb(128, 255, 255, 0)};
@@ -1103,10 +1112,13 @@ void game_sv_GameState::OnRender()
                 for (u32 p_it=0; p_it<get_players_count(); ++p_it)
                 {
                     game_PlayerState* PS = get_it(p_it);
-                    if (!PS) continue;
-                    if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) continue;
+                    if (!PS)
+                        continue;
+                    if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+                        continue;
                     IGameObject* pPlayer = Level().Objects.net_Find(PS->GameID);
-                    if (!pPlayer) continue;
+                    if (!pPlayer)
+                        continue;
 
                     if (rp.P.distance_to(pPlayer->Position())<=0.4f)
                     {
@@ -1114,7 +1126,8 @@ void game_sv_GameState::OnRender()
                         break;
                     }
                 };
-                if (rp.bBlocked) continue;
+                if (rp.bBlocked)
+                    continue;
 
                 float r = .3f;
                 T.identity();
@@ -1122,17 +1135,17 @@ void game_sv_GameState::OnRender()
                 T.translate_add(rp.P);
                 Level().debug_renderer().draw_ellipse(T, TeamColors[t]);
 
-//                r = rpoints_MinDist[t];
-//                T.identity();
-//                T.scale(r, r, r);
-//                T.translate_add(rp.P);
-//                Level().debug_renderer().draw_ellipse(T, TeamColorsDist[t]);
+                //r = rpoints_MinDist[t];
+                //T.identity();
+                //T.scale(r, r, r);
+                //T.translate_add(rp.P);
+                //Level().debug_renderer().draw_ellipse(T, TeamColorsDist[t]);
 
-//                r = rpoints_Dist[t];
-//                T.identity();
-//                T.scale(r, r, r);
-//                T.translate_add(rp.P);
-//                Level().debug_renderer().draw_ellipse(T, TeamColorsDist[t]);
+                //r = rpoints_Dist[t];
+                //T.identity();
+                //T.scale(r, r, r);
+                //T.translate_add(rp.P);
+                //Level().debug_renderer().draw_ellipse(T, TeamColorsDist[t]);
             }
         }
     }
@@ -1142,10 +1155,14 @@ void game_sv_GameState::OnRender()
         for (u32 p_it=0; p_it<get_players_count(); ++p_it)
         {
             game_PlayerState* PS = get_it(p_it);
-            if (!PS) continue;
-            if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) continue;
+            if (!PS)
+                continue;
+            if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+                continue;
+
             IGameObject* pPlayer = Level().Objects.net_Find(PS->GameID);
-            if (!pPlayer) continue;
+            if (!pPlayer)
+                continue;
 
             float r = .4f;
             T.identity();

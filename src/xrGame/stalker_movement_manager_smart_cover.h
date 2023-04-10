@@ -175,10 +175,10 @@ private:
     transition_action const* m_current_transition{};
     animation_action const* m_current_transition_animation{};
     CPropertyStorage* m_property_storage{};
-    float m_apply_loophole_direction_distance{4.0f};
+    float m_apply_loophole_direction_distance{ 4.0f };
     MotionID m_enter_animation;
-    shared_str m_enter_cover_id{""};
-    shared_str m_enter_loophole_id{""};
+    shared_str m_enter_cover_id{ "" };
+    shared_str m_enter_loophole_id{ "" };
     mutable collide::rq_results m_ray_query_storage;
     bool m_entering_smart_cover_with_animation{};
     bool m_non_animated_loophole_change{};

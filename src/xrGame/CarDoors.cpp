@@ -227,21 +227,18 @@ void CCar::SDoor::Close()
     switch (state)
     {
     case opened:
-    {
         PlaceInUpdate();
         [[fallthrough]];
-    }
+
     case opening:
-    {
         state = closing;
         ApplyCloseTorque();
         [[fallthrough]];
-    }
+
     case closed:
     case closing:
-    {
         break;
-    }
+
     default: NODEFAULT;
     }
 }
@@ -481,12 +478,15 @@ bool CCar::SDoor::IsInArea(const Fvector& pos, const Fvector& dir)
     door_norm.crossproduct(door_axis, door_dir);
     anchor_to_pos.sub(pos, closed_door_form.c);
 
-    float a, b, c;
-    a = anchor_to_pos.dotproduct(closed_door_dir) * signum;
-    b = anchor_to_pos.dotproduct(door_dir) * signum;
-    c = anchor_to_pos.dotproduct(closed_door_norm) * anchor_to_pos.dotproduct(door_norm);
+    const float a = anchor_to_pos.dotproduct(closed_door_dir) * signum;
+    const float b = anchor_to_pos.dotproduct(door_dir) * signum;
+    const float c = anchor_to_pos.dotproduct(closed_door_norm) * anchor_to_pos.dotproduct(door_norm);
 
-    return a < (signum > 0.f ? hie : -loe) && a > 0.f && b < (signum > 0.f ? hie : -loe) && b > 0.f && c < 0.f;
+    return a < (signum > 0.f ? hie : -loe)
+        && a > 0.f
+        && b < (signum > 0.f ? hie : -loe)
+        && b > 0.f
+        && c < 0.f;
 }
 
 bool CCar::SDoor::CanExit(const Fvector& pos, const Fvector& dir)
@@ -664,26 +664,22 @@ void CCar::SDoor::Break()
     switch (state)
     {
     case closed:
-    {
         ClosedToOpening();
         break;
-    }
+
     case opened:
     case closing:
-    {
         RemoveFromUpdate();
         [[fallthrough]];
-    }
+
     case opening:
-    {
         ApplyTorque(torque / 10.f, 0.f);
         [[fallthrough]];
-    }
+
     case broken:
-    {
         break;
-    }
-    }
+    } // switch (state)
+
     if (joint)
     {
         // dVector3 v;

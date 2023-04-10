@@ -15,10 +15,10 @@ public:
 
 private:
     e_collide_state cl_state{ cl_undefined };
-    Fmatrix m;
+    Fmatrix m{ Fidentity };
 
 public:
-    ik_goal_matrix() : m(Fidentity) {}
+    ik_goal_matrix() = default;
     IC const Fmatrix& get() const { return m; }
     IC void set(const Fmatrix& m_, e_collide_state cl)
     {

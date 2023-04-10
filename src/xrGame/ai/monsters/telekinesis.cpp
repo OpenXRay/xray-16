@@ -180,12 +180,8 @@ void CTelekinesis::PhDataUpdate(float step)
     {
         switch (objects[i]->get_state())
         {
-        case TS_Raise:
-            objects[i]->raise(step);
-            break;
-        case TS_Keep:
-            objects[i]->keep();
-            break;
+        case TS_Raise: objects[i]->raise(step); break;
+        case TS_Keep: objects[i]->keep(); break;
         case TS_Fire: break;
         case TS_None: break;
         }

@@ -458,11 +458,13 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
     case ewiAll:
         bMagicFlag = false;
         [[fallthrough]];
+
     case ewiWeaponJammed:
         SetWarningIconColorUI(UIWeaponJammedIcon, cl);
         if (bMagicFlag)
             break;
         [[fallthrough]];
+
     /*	case ewiRadiation:
             SetWarningIconColorUI	(&UIRadiaitionIcon, cl);
             if (bMagicFlag) break;

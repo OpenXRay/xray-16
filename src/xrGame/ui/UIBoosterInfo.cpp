@@ -141,7 +141,8 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
             case eBoostChemicalBurnProtection:
                 max_val = actor->conditions().GetZoneMaxPower(ALife::infl_acid);
                 break;
-            }
+            } // switch (type)
+
             val /= max_val;
             m_booster_items[i]->SetValue(val);
 

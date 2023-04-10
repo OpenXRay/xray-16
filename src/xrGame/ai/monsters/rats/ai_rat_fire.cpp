@@ -69,6 +69,7 @@ void CAI_Rat::Exec_Action(float /**dt**/)
         m_bActionStarted = false;
         break;
     }
+    default: break;
     }
 }
 

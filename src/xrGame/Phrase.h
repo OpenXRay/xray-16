@@ -30,7 +30,7 @@ public:
     void SetGoodwillLevel(int v) { m_iGoodwillLevel = v; }
 protected:
     //уникальный индекс в списке фраз диалога
-    shared_str m_ID;
+    shared_str m_ID{ "" };
     //текстовое представление фразы
     xr_string m_text;
     xr_string m_script_text_id;

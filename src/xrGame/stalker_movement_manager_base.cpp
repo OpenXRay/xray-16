@@ -57,8 +57,8 @@ public:
 }; // struct sight_manager_enable_guard
 
 stalker_movement_manager_base::stalker_movement_manager_base(CAI_Stalker* object)
-    : inherited(object), m_last_query_position(Fvector().set(flt_max, flt_max, flt_max)),
-      m_last_query_object_position(Fvector().set(flt_max, flt_max, flt_max)), m_last_query_distance(flt_max)
+    : inherited(object), m_last_query_position({ flt_max, flt_max, flt_max }),
+      m_last_query_object_position({ flt_max, flt_max, flt_max }), m_last_query_distance(flt_max)
 {
     VERIFY(object);
     m_object = object;

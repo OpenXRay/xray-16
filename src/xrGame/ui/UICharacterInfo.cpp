@@ -35,12 +35,6 @@ CSE_ALifeTraderAbstract* ch_info_get_from_id(u16 id)
     }
 }
 
-CUICharacterInfo::CUICharacterInfo() : CUIWindow("CUICharacterInfo")
-{
-    ZeroMemory(m_icons, sizeof(m_icons));
-}
-
-CUICharacterInfo::~CUICharacterInfo() {}
 void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xml_doc)
 {
     inherited::SetWndPos(pos);

@@ -479,6 +479,7 @@ bool CUIMapWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
         case WINDOW_RBUTTON_UP:
             ActivatePropertiesBox(NULL);
             break;
+
         case WINDOW_MOUSE_MOVE:
             if (pInput->iGetAsyncKeyState(MOUSE_1))
             {
@@ -488,14 +489,16 @@ bool CUIMapWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
                 return true;
             }
             break;
+
         case WINDOW_MOUSE_WHEEL_DOWN:
             UpdateZoom(true);
             return true;
+
         case WINDOW_MOUSE_WHEEL_UP:
             UpdateZoom(false);
             return true;
-        } // switch
-    };
+        } // switch (mouse_action)
+    }
 
     return false;
 }

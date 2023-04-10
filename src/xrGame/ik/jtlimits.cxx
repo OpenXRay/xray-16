@@ -473,6 +473,7 @@ int ComplexJtLimit::Singularities(float psi[2]) const
     {
     case 1: psi[m++] = u[0]; break;
     case 2: psi[m++] = (u[0] + u[1]) / 2.0f; break;
+    default: break;
     }
 
     // Sort if necessary

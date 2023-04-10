@@ -96,10 +96,10 @@ void CControlRunAttack::on_event(ControlCom::EEventType type, ControlCom::IEvent
     case ControlCom::eventAnimationStart: // handle blend params
     {
         // set animation speed
-        [[maybe_unused]] auto ctrl_data_anim = static_cast<SControlAnimationData*>(m_man->data(this, ControlCom::eControlAnimation));
+        [[maybe_unused]] const auto ctrl_data_anim = static_cast<SControlAnimationData*>(m_man->data(this, ControlCom::eControlAnimation));
         VERIFY(ctrl_data_anim);
 
-        [[maybe_unused]] auto blend = m_man->animation().current_blend();
+        const auto blend = m_man->animation().current_blend();
         VERIFY(blend);
 
         // animation time

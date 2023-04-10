@@ -161,15 +161,13 @@ void CLevel::IR_OnKeyboardPress(int key)
     switch (_curr)
     {
     case kSCREENSHOT:
-    {
         GEnv.Render->Screenshot();
         return;
-    }
+
     case kCONSOLE:
-    {
         Console->Show();
         return;
-    }
+
     case kQUIT:
     {
         if (b_ui_exist && CurrentGameUI()->TopInputReceiver() && !Device.Paused())
@@ -197,7 +195,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 #endif
         break;
     }
-    };
+    } // switch (_curr)
 
     if (!bReady || !b_ui_exist)
         return;

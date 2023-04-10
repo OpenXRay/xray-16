@@ -832,7 +832,7 @@ void CIKLimb::ToeTimeDiff(Fvector& v, const SCalculateData& cd) const
     }
     VERIFY(Device.fTimeDelta > 0.f);
     VERIFY(state_valide(sv_state));
-    Fvector p0, p1, l_toe{};
+    Fvector p0, p1, l_toe;
     m_foot.ToePosition(l_toe);
     Fmatrix mtr;
     sv_state.anim_pos(mtr).transform_tiny(p0, l_toe);

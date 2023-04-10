@@ -1354,7 +1354,7 @@ void CActor::make_Interpolation()
 /*
 void		CActor::UpdatePosStack	( u32 Time0, u32 Time1 )
 {
-        // Storing Last Position in stack
+    // Storing Last Position in stack
     CPHSynchronize* pSyncObj = NULL;
     pSyncObj = PHGetSyncItem(0);
     if (!pSyncObj) return;

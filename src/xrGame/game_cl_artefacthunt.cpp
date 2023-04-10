@@ -436,23 +436,19 @@ void game_cl_ArtefactHunt::shedule_Update(u32 dt)
                 }
                 else
                 {
+                    // XXX: fix this function and fix this dangling else
                     if (!m_bTeamSelected)
-                    {
                         if (m_game_ui)
                             m_game_ui->SetPressJumpMsgCaption("mp_press_jump2select_team");
                         else if (!m_bSkinSelected)
                             if (m_game_ui)
                                 m_game_ui->SetPressJumpMsgCaption("mp_press_jump2select_skin");
-                    }
                 }
             };
         }
 
         if (local_player)
         {
-//            game_TeamState team0 = teams[0];
-//            game_TeamState team1 = teams[1];
-
             if (dReinforcementTime > 0 && Level().CurrentViewEntity() && m_cl_dwWarmUp_Time == 0)
             {
                 u32 CurTime = Level().timeServer();
@@ -471,8 +467,8 @@ void game_cl_ArtefactHunt::shedule_Update(u32 dt)
             s16 lt = local_player->team;
             if (lt >= 0)
             {
-//                if(m_game_ui)
-//                    m_game_ui->SetScoreCaption(teams[0].score, teams[1].score);
+                //if (m_game_ui)
+                //    m_game_ui->SetScoreCaption(teams[0].score, teams[1].score);
             };
         };
         SetScore();

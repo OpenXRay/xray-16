@@ -99,20 +99,20 @@ public:
     EDetailPathType m_detail_path_type{ DetailPathManager::eDetailPathTypeSmooth };
 
 private:
-    Fvector m_desired_position_impl{ Fvector().set(flt_max, flt_max, flt_max) };
+    Fvector m_desired_position_impl{ flt_max, flt_max, flt_max };
     Fvector const* m_desired_position{};
-    Fvector m_desired_direction_impl{ Fvector().set(flt_max, flt_max, flt_max) };
+    Fvector m_desired_direction_impl{ flt_max, flt_max, flt_max };
     Fvector const* m_desired_direction{};
 
 private:
-    shared_str m_cover_id{""};
+    shared_str m_cover_id{ "" };
     cover_type const* m_cover{};
 
-    shared_str m_cover_loophole_id{""};
+    shared_str m_cover_loophole_id{ "" };
     loophole_type const* m_cover_loophole{};
 
     CGameObject const* m_cover_fire_object{};
-    Fvector m_cover_fire_position_impl{ Fvector().set(flt_max, flt_max, flt_max) };
+    Fvector m_cover_fire_position_impl{ flt_max, flt_max, flt_max };
     Fvector const* m_cover_fire_position{};
 
 private:

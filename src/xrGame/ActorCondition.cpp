@@ -655,7 +655,7 @@ void CActorCondition::BoosterForEach(const luabind::functor<bool>& funct)
 {
     for (const auto& influence : GetCurBoosterInfluences())
     {
-        if (funct((influence).first, influence.second.fBoostTime, influence.second.fBoostValue))
+        if (funct(influence.first, influence.second.fBoostTime, influence.second.fBoostValue))
             break;
     }
 }

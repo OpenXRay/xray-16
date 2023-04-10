@@ -199,22 +199,10 @@ void CUIMMShniaga::SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_pat
     xr_vector<CUITextWnd*>* lst = NULL;
     switch (page_id)
     {
-    case epi_main:
-    {
-        lst = &m_buttons;
-        break;
+    case epi_main:             lst = &m_buttons;             break;
+    case epi_new_game:         lst = &m_buttons_new;         break;
+    case epi_new_network_game: lst = &m_buttons_new_network; break;
     }
-    case epi_new_game:
-    {
-        lst = &m_buttons_new;
-        break;
-    }
-    case epi_new_network_game:
-    {
-        lst = &m_buttons_new_network;
-        break;
-    }
-    }; // switch (page_id)
     delete_data(*lst);
 
     CUIXml tmp_xml;
@@ -241,7 +229,7 @@ void CUIMMShniaga::ShowPage(enum_page_id page_id)
         ShowNetworkGame();
         break;
     }
-    };
+    }
 }
 
 void CUIMMShniaga::ShowMain()

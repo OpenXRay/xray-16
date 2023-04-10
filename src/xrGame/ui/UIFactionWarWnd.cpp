@@ -68,7 +68,6 @@ bool CUIFactionWarWnd::Init()
     {
         m_background2 = UIHelper::CreateFrameLine(xml, "background", this, false);
     }
-
     if (!m_center_background)
     {
         m_center_background2 = UIHelper::CreateStatic(xml, "center_background", this, false);

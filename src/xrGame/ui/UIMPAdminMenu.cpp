@@ -153,7 +153,7 @@ void CUIMpAdminMenu::ShowMessageBox(CUIMessageBox::E_MESSAGEBOX_STYLE style, LPC
         m_pMessageBoxOk->ShowDialog(true);
         break;
     }
-    }
+    } // switch (style)
 }
 
 void CUIMpAdminMenu::RemoteAdminLogin(CUIWindow*, void*)

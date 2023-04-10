@@ -274,31 +274,21 @@ void CUIMpTradeWnd::SellItemAddons(SBuyItemInfo* sell_itm, item_addon_type addon
 
 bool CUIMpTradeWnd::IsAddonAttached(SBuyItemInfo* itm, item_addon_type at)
 {
-    bool b_res = false;
     CInventoryItem* item_ = (CInventoryItem*)itm->m_cell_item->m_pData;
     CWeapon* w = smart_cast<CWeapon*>(item_);
 
     if (!w)
-        return b_res;
+        return false;
     switch (at)
     {
     case at_scope:
-    {
-        b_res = (w->ScopeAttachable() && w->IsScopeAttached());
-        break;
-    }
+        return w->ScopeAttachable() && w->IsScopeAttached();
     case at_silencer:
-    {
-        b_res = (w->SilencerAttachable() && w->IsSilencerAttached());
-        break;
-    }
+        return w->SilencerAttachable() && w->IsSilencerAttached();
     case at_glauncher:
-    {
-        b_res = (w->GrenadeLauncherAttachable() && w->IsGrenadeLauncherAttached());
-        break;
-    }
+        return w->GrenadeLauncherAttachable() && w->IsGrenadeLauncherAttached();
     };
-    return b_res;
+    return false;
 }
 
 bool CUIMpTradeWnd::CanAttachAddon(SBuyItemInfo* itm, item_addon_type at)
