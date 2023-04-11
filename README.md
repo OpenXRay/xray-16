@@ -43,7 +43,7 @@ OpenXRay is based on X-Ray 1.6.02, used in S.T.A.L.K.E.R.: Call of Pripyat, so i
 Currently, we are working on support for all three games in the series.
 |Call of Pripyat|Clear Sky|Shadow of Chernobyl|
 |---|---|---|
-|Yes|Beta (see [#382](https://github.com/OpenXRay/xray-16/issues/382))| **Not supported** yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
+|Yes|Release candidate (see [#382](https://github.com/OpenXRay/xray-16/issues/382)).<br>Minor bugs possible, but game is stable finishable.| **Not supported** yet (see [#392](https://github.com/OpenXRay/xray-16/issues/392))|
 
 ## Documentation:
 Make sure to visit our [wiki](https://github.com/OpenXRay/xray-16/wiki).
