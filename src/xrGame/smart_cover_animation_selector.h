@@ -32,7 +32,7 @@ private:
     animation_planner* m_planner;
     IKinematicsAnimated* m_skeleton_animated;
     shared_str m_animation;
-    float m_previous_time;
+    float m_previous_time{ flt_max };
     bool m_first_time{ true };
     bool m_callback_called{};
 

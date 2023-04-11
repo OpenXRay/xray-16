@@ -30,11 +30,11 @@ private:
 private:
     CWorldState m_target;
     u32 m_time_object_hit{};
-    u32 m_loophole_value{1000};
+    u32 m_loophole_value{ 1000 };
     u32 m_last_transition_time{};
     u32 m_default_idle_interval{};
     u32 m_default_lookout_interval{};
-    float m_head_speed{flt_max};
+    float m_head_speed{ flt_max };
     CRandom m_random;
     float m_idle_min_time{};
     float m_idle_max_time{};

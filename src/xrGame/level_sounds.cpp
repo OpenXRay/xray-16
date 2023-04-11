@@ -28,8 +28,8 @@ void SStaticSound::Load(IReader& F)
 
 void SStaticSound::Update(u32 game_time, u32 global_time)
 {
-    if ((0 == m_ActiveTime.x && 0 == m_ActiveTime.y) ||
-        ((int(game_time) >= m_ActiveTime.x && int(game_time) < m_ActiveTime.y)))
+    if (0 == m_ActiveTime.x && 0 == m_ActiveTime.y ||
+        ((int(game_time) >= m_ActiveTime.x) && (int(game_time) < m_ActiveTime.y)))
     {
         if (0 == m_Source._feedback())
         {
@@ -49,7 +49,7 @@ void SStaticSound::Update(u32 game_time, u32 global_time)
                 if (global_time >= m_NextTime)
                 {
                     bool bFullPlay = (0 == m_PlayTime.x) && (0 == m_PlayTime.y);
-                    m_Source.play_at_pos(0, m_Position, bFullPlay ? 0 : static_cast<u32>(sm_Looped));
+                    m_Source.play_at_pos(0, m_Position, bFullPlay ? 0 : sm_Looped);
                     m_Source.set_volume(vol);
                     m_Source.set_frequency(m_Freq);
                     if (bFullPlay)

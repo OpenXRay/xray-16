@@ -170,7 +170,7 @@ bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
         }
         break;
     }
-    }
+    } // switch (GetBindedAction(dik))
 
     return false;
 }

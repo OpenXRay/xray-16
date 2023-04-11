@@ -182,9 +182,8 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
     //	u32 CurID					= Level().CurrentControlEntity()->ID();
     //	u32 OwnerID					= sender_id;
-    m_Bullets.emplace_back(position, direction, starting_speed, power, /*power_critical,*/ impulse, sender_id,
+    SBullet& bullet = m_Bullets.emplace_back(position, direction, starting_speed, power, /*power_critical,*/ impulse, sender_id,
         sendersweapon_id, e_hit_type, maximum_distance, cartridge, air_resistance_factor, SendHit);
-    SBullet& bullet = m_Bullets.back();
     //	bullet.frame_num			= Device.dwFrame;
     bullet.flags.aim_bullet = AimBullet;
     if (!IsGameTypeSingle())
@@ -946,9 +945,7 @@ void CBulletManager::RegisterEvent(
     }
 #endif // #ifdef DEBUG
 
-    m_Events.emplace_back(bullet);
-    _event& E = m_Events.back();
-    E.Type = Type;
+    _event& E = m_Events.emplace_back(Type, *bullet);
 
     switch (Type)
     {

@@ -118,9 +118,7 @@ class CBulletManager
         collide::rq_result R;
         u16 tgt_material;
 
-        _event(SBullet* bullet) : bullet(*bullet)
-        {
-        }
+        _event(EventType t, const SBullet& b) : Type(t), bullet(b) {}
     };
     static void CalculateNewVelocity(Fvector& dest_new_vel, Fvector const& old_velocity, float ar, float life_time);
 

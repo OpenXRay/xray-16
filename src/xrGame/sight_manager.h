@@ -68,7 +68,7 @@ private:
     parameters m_current;
     parameters_base m_target;
     shared_str m_animation_id;
-    aiming_type m_aiming_type{aiming_none};
+    aiming_type m_aiming_type{ aiming_none };
     animation_frame_type m_animation_frame;
 
 private:

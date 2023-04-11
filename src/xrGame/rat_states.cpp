@@ -116,7 +116,7 @@ void rat_state_attack_range::execute()
         object().m_state_manager->pop_state();
         return;
     }
-    if ((!object().m_attack_rebuild && !object().can_stand_in_position()) || object().switch_if_position() ||
+    if (!object().m_attack_rebuild && !object().can_stand_in_position() || object().switch_if_position() ||
         object().switch_if_diff())
     {
         object().m_state_manager->push_state(CAI_Rat::aiRatNoWay);
@@ -411,7 +411,7 @@ void rat_state_eat_corpse::execute()
         return;
     }
 
-    if ((object().switch_if_enemy() && object().switch_if_porsuit()) || !object().switch_if_home())
+    if (object().switch_if_enemy() && object().switch_if_porsuit() || !object().switch_if_home())
     {
         object().m_state_manager->pop_state();
         return;

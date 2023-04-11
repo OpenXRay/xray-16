@@ -82,7 +82,7 @@ void HUD_SOUND_ITEM::PlaySound(
     hud_snd.m_activeSnd = nullptr;
     StopSound(hud_snd);
 
-    u32 flags = b_hud_mode ? static_cast<u32>(sm_2D) : 0;
+    u32 flags = b_hud_mode ? sm_2D : 0;
     if (looped)
         flags |= sm_Looped;
     //Alundaio: Sanity, don't allow PlaySound of index greater then the size, just play last index

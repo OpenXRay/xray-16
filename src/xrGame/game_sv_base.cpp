@@ -1081,13 +1081,13 @@ void game_sv_GameState::on_death(CSE_Abstract* e_dest, CSE_Abstract* e_src)
 }
 
 //  [7/5/2005]
-#ifndef DEBUG
+#ifdef DEBUG
 extern Flags32 dbg_net_Draw_Flags;
 #endif
 
 void game_sv_GameState::OnRender()
 {
-#ifndef DEBUG
+#ifdef DEBUG
     /*
     Fmatrix T;
     T.identity();

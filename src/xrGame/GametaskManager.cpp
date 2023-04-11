@@ -332,7 +332,7 @@ CGameTask* CGameTaskManager::HasGameTask(const CMapLocation* ml, bool only_inpro
 CGameTask* CGameTaskManager::IterateGet(CGameTask* t, ETaskState state, ETaskType type, bool bForward)
 {
     vGameTasks& v = GetGameTasks();
-    s32 cnt = v.size();
+    const ptrdiff_t cnt = v.size();
     for (s32 i = 0; i < cnt; ++i)
     {
         CGameTask* gt = v[i].game_task;

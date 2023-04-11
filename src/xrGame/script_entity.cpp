@@ -387,7 +387,7 @@ bool CScriptEntity::bfAssignSound(CScriptEntityAction* tpEntityAction)
 #endif
                 const Fmatrix& l_tMatrix = GetUpdatedMatrix(
                     l_tSoundAction.m_caBoneName, l_tSoundAction.m_tSoundPosition, l_tSoundAction.m_tSoundAngles);
-                m_current_sound->play_at_pos(m_object, l_tMatrix.c, l_tSoundAction.m_bLooped ? static_cast<u32>(sm_Looped) : 0);
+                m_current_sound->play_at_pos(m_object, l_tMatrix.c, l_tSoundAction.m_bLooped ? sm_Looped : 0);
                 l_tSoundAction.m_bStartedToPlay = true;
             }
             else

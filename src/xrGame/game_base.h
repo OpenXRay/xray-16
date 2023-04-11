@@ -120,8 +120,6 @@ struct game_TeamState
 {
     int score{};
     u16 num_targets{};
-
-    game_TeamState() = default;
 };
 
 // [15.11.07] Alexander Maniluk: added next enumeratuion to solve problem with team identifiers

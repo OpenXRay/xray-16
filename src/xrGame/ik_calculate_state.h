@@ -34,9 +34,9 @@ struct calculate_state
     u32 unstuck_time{ u32(-1) };
     ik_goal_matrix goal;
     ik_goal_matrix blend_to;
-    Fmatrix anim_pos;
+    Fmatrix anim_pos{ Fidentity };
     ik_goal_matrix collide_pos;
-    Fmatrix b2tob3;
+    Fmatrix b2tob3{ Fidentity };
     Fvector pick{ 0, -1, 0 };
     float speed_blend_l{};
     float speed_blend_a{};
@@ -47,7 +47,5 @@ struct calculate_state
 #ifdef DEBUG
     int count{ -1 };
 #endif
-    calculate_state() : anim_pos(Fidentity), b2tob3(Fidentity)
-    {
-    }
+    calculate_state() = default;
 };

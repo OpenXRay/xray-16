@@ -42,7 +42,7 @@
 
 #define TEAM_PANELS_XML_NAME "ui_team_panels_cta.xml"
 
-CUIGameCTA::CUIGameCTA() : m_pUITeamSelectWnd{xr_new<CUISpawnWnd>()}
+CUIGameCTA::CUIGameCTA() : m_pUITeamSelectWnd(xr_new<CUISpawnWnd>())
 {
 }
 
