@@ -14,6 +14,7 @@
 #include "xrUICore/TabControl/UITabControl.h"
 #include "UIMapWnd.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
+#include "xrUICore/Windows/UITextFrameLineWnd.h"
 #include "Common/object_broker.h"
 #include "UIMessagesWindow.h"
 #include "UIMainIngameWnd.h"
@@ -79,9 +80,21 @@ void CUIPdaWnd::Init()
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
 
     UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this);
-    m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this);
-    m_caption_const = (m_caption->GetText());
-    m_clock = UIHelper::CreateStatic(uiXml, "clock_wnd", this, false);
+    m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this, false);
+    m_caption_const = m_caption ? m_caption->GetText() : "";
+
+    // Main buttons background
+    [[maybe_unused]] auto mainButtonsBackground =
+        UIHelper::CreateTextFrameLine(uiXml, "mbbackground_frame_line", this, false);
+
+    // Timer background
+    auto timerBackground = UIHelper::CreateTextFrameLine(uiXml, "timer_frame_line", this, false);
+    if (timerBackground)
+        m_clock = timerBackground->GetTitleStatic();
+    else
+    {
+        m_clock = UIHelper::CreateStatic(uiXml, "clock_wnd", this, false);
+    }
 
     if (uiXml.NavigateToNode("anim_static")) // XXX: Replace with UIHelper
     {
@@ -91,8 +104,8 @@ void CUIPdaWnd::Init()
         CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, anim_static);
     }
 
-    m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
-    m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
+    m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this, false);
+    m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd", false);
 
     if (IsGameTypeSingle())
     {
@@ -181,7 +194,7 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     case BUTTON_CLICKED:
     {
-        if (pWnd == m_btn_close)
+        if (m_btn_close && pWnd == m_btn_close)
         {
             HideDialog();
         }
@@ -295,6 +308,8 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 
 void CUIPdaWnd::SetActiveCaption()
 {
+    if (!m_caption)
+        return;
     TABS_VECTOR* btn_vec = UITabControl->GetButtonsVector();
     TABS_VECTOR::iterator it_b = btn_vec->begin();
     TABS_VECTOR::iterator it_e = btn_vec->end();
@@ -365,7 +380,10 @@ void CUIPdaWnd::DrawHint()
     else if (m_pActiveDialog == pUILogsWnd && pUILogsWnd)
     {
     }
-    m_hint_wnd->Draw();
+    if (m_hint_wnd)
+    {
+        m_hint_wnd->Draw();
+    }
 }
 
 void CUIPdaWnd::UpdatePda()
@@ -403,7 +421,12 @@ void CUIPdaWnd::Reset()
         pUILogsWnd->ResetAll();
 }
 
-void CUIPdaWnd::SetCaption(pcstr text) { m_caption->SetText(text); }
+void CUIPdaWnd::SetCaption(LPCSTR text)
+{
+    if (m_caption)
+        m_caption->SetText(text);
+}
+
 void RearrangeTabButtons(CUITabControl* pTab)
 {
     const auto& buttons = *pTab->GetButtonsVector();

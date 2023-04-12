@@ -101,7 +101,11 @@ void CAI_Dog::Load(LPCSTR section)
     // anim().AddAnim(eAnimJumpGlide,   	"jump_glide_",			-1, &velocity_none,		PS_STAND);
     anim().AddAnim(eAnimJumpGlide, "stand_jump_left_", 0, &velocity_none, PS_STAND);
 
-    anim().AddAnim2(eAnimSteal, { "stand_walk_fwd_", "stand_steal_" }, -1, &velocity_steal, PS_STAND);
+    if (ShadowOfChernobylMode)
+        anim().AddAnim(eAnimSteal, "stand_steal_", -1, &velocity_steal, PS_STAND);
+    else
+        anim().AddAnim(eAnimSteal, "stand_walk_fwd_", -1, &velocity_steal, PS_STAND);
+
     anim().AddAnim(eAnimThreaten, "stand_threaten_", -1, &velocity_none, PS_STAND);
 
     anim().AddAnim(eAnimSitLieDown, "sit_lie_down_", -1, &velocity_none, PS_SIT);
@@ -115,8 +119,8 @@ void CAI_Dog::Load(LPCSTR section)
 
     /////////////mob home
 
-    anim().AddAnim(eAnimHomeWalkSmelling, { "stand_walk_smelling_", true }, -1, &velocity_walk_smell, PS_STAND);
-    anim().AddAnim(eAnimHomeWalkGrowl, { "stand_growl_walk_", true }, -1, &velocity_walk_growl, PS_STAND);
+    anim().AddAnim(eAnimHomeWalkSmelling, "stand_walk_fwd_", -1, &velocity_walk_smell, PS_STAND);
+    anim().AddAnim(eAnimHomeWalkGrowl, "stand_walk_fwd_", -1, &velocity_walk_growl, PS_STAND);
 
     /////////////end mob home
 
@@ -306,27 +310,27 @@ LPCSTR CAI_Dog::get_current_animation()
     switch (current_anim)
     {
     case 1:
-        return "stand_idle_smelling_up_0"; //Нюхает вверх
+        return "stand_check_corpse_0"; //Нюхает вверх
     case 2:
-        return "stand_idle_smelling_down_0"; //Нюхает вниз
+        return "stand_check_corpse_0"; //Нюхает вниз
     case 3:
-        return "stand_idle_smelling_look_around_0"; //Нюхает по кругу
+        return "stand_check_corpse_0"; //Нюхает по кругу
     case 4:
-        return "stand_idle_dig_ground_0"; //Обнюховает и роет землю
+        return "stand_check_corpse_0"; //Обнюховает и роет землю
     case 5:
-        return "stand_idle_howl_0"; //Воет
+        return "stand_threaten_0"; //Воет
     case 6:
-        return "stand_growl_idle_0"; //Рычит стоя
+        return "stand_threaten_0"; //Рычит стоя
     case 7:
-        return "stand_idle_shake_0"; //Отряхивается !!!!!
+        return "stand_idle_1"; //Отряхивается !!!!!
     case 8:
         return "stand_sit_down_0"; //Садиться
     case 9:
         return "sit_idle_0"; // Cидит
     case 10:
-        return "sit_idle_1"; //Чухается сидя
+        return "sit_idle_0"; //Чухается сидя
     case 11:
-        return "sit_idle_2"; //Оглядывается сидя
+        return "sit_idle_0"; //Оглядывается сидя
     case 12:
         return "sit_stand_up_0"; //Встает
     case 13:

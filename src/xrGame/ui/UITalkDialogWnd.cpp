@@ -436,7 +436,8 @@ void CUIAnswerItemIconed::Init(LPCSTR text, LPCSTR name, LPCSTR texture_name)
 void CUIAnswerItemIconed::Init(pcstr text, pcstr texture_name, Frect texture_rect)
 {
     inherited::Init(text, "");
-    m_icon->InitTexture(texture_name);
+    if (texture_name && texture_name[0])
+        m_icon->InitTexture(texture_name);
     m_icon->SetTextureRect(texture_rect);
     m_icon->TextureOn();
     m_icon->SetStretchTexture(true);
