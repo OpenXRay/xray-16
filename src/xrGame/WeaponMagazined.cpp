@@ -87,7 +87,7 @@ void CWeaponMagazined::Load(LPCSTR section)
         m_sounds.LoadSound(section, "snd_reload_misfire", "sndReloadMisfire", true, m_eSoundReloadMisfire);
 
     //звуки и партиклы глушителя, если такой есть
-    if (m_eSilencerStatus == ALife::eAddonAttachable || m_eSilencerStatus == ALife::eAddonPermanent)
+    if (m_eSilencerStatus == ALife::eAddonAttachable || (m_eSilencerStatus == ALife::eAddonPermanent && !ShadowOfChernobylMode))
     {
         if (pSettings->line_exist(section, "silencer_flame_particles"))
             m_sSilencerFlameParticles = pSettings->r_string(section, "silencer_flame_particles");

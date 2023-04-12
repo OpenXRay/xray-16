@@ -902,6 +902,8 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
 
     FS_Path* path = xr_new<FS_Path>(full_current_directory, "", "", "", 0);
     m_paths.emplace(xr_strdup("$fs_root$"), path);
+    //if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+        Recurse(path->m_Path);
 
     Msg("$fs_root$ = %s", full_current_directory);
 }
