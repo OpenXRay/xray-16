@@ -11,12 +11,12 @@ class player_state_cherub : public player_state_param
     typedef player_state_param inherited;
 
 public:
-    player_state_cherub(game_state_accumulator* owner);
+    player_state_cherub(game_state_accumulator* owner) : inherited(owner) {};
     virtual ~player_state_cherub(){};
 
     virtual void update(){};
-    virtual u32 const get_u32_param() { return m_kill_count; };
-    virtual float const get_float_param() { return -1.0f; };
+    virtual u32 get_u32_param() { return m_kill_count; };
+    virtual float get_float_param() { return -1.0f; };
     virtual void reset_game();
 
     virtual void OnPlayerTakeArtefact(game_PlayerState const* ps);
@@ -28,9 +28,9 @@ public:
     virtual void OnPlayerSpawned(game_PlayerState const* ps);
 
 protected:
-    u32 m_kill_count;
-    u32 m_art_take_time;
-    u16 m_bearer_id;
+    u32 m_kill_count{};
+    u32 m_art_take_time{};
+    u16 m_bearer_id{ u16(-1) };
     shared_str m_bearer_name;
 }; // class player_state_cherub
 

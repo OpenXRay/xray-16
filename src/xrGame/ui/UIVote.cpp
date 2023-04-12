@@ -74,7 +74,6 @@ void CUIVote::Update()
 {
     CUIDialogWnd::Update();
 
-    static string512 teaminfo;
     if (m_prev_upd_time > Device.dwTimeContinual - 1000)
         return;
     m_prev_upd_time = Device.dwTimeContinual;

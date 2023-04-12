@@ -19,23 +19,6 @@
 
 static const u32 time_before_selection = 2000;
 
-stalker_movement_params::stalker_movement_params()
-    : m_manager(0), m_body_state(MonsterSpace::eBodyStateStand), m_movement_type(MonsterSpace::eMovementTypeStand),
-      m_mental_state(MonsterSpace::eMentalStateDanger), m_path_type(MovementManager::ePathTypeNoPath),
-      m_detail_path_type(DetailPathManager::eDetailPathTypeSmooth),
-
-      m_desired_position_impl(Fvector().set(flt_max, flt_max, flt_max)), m_desired_position(0),
-
-      m_desired_direction_impl(Fvector().set(flt_max, flt_max, flt_max)), m_desired_direction(0),
-
-      m_cover_id(""), m_cover(0), m_cover_loophole_id(""), m_cover_loophole(0), m_cover_fire_object(0),
-
-      m_cover_fire_position_impl(Fvector().set(flt_max, flt_max, flt_max)), m_cover_fire_position(0),
-
-      m_selected_loophole_actual(false), m_last_selection_time(0), m_cover_selected_loophole(0)
-{
-}
-
 stalker_movement_params& stalker_movement_params::operator=(stalker_movement_params const& rhs)
 {
     m_body_state = rhs.m_body_state;

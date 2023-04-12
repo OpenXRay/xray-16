@@ -11,7 +11,7 @@ CWound::CWound(u16 bone_num)
     m_bToBeDestroy = false;
 
     m_Wounds.resize(ALife::eHitTypeMax);
-    for (int i = 0; i < ALife::eHitTypeMax; i++)
+    for (u32 i = 0; i < ALife::eHitTypeMax; i++)
     {
         m_Wounds[i] = 0.f;
     }
@@ -29,13 +29,13 @@ CWound::~CWound(void) {}
 void CWound::save(NET_Packet& output_packet)
 {
     output_packet.w_u8((u8)m_iBoneNum);
-    for (int i = 0; i < ALife::eHitTypeMax; i++)
+    for (u32 i = 0; i < ALife::eHitTypeMax; i++)
         output_packet.w_float_q8(m_Wounds[i], 0.f, WOUND_MAX);
 }
 void CWound::load(IReader& input_packet)
 {
     m_iBoneNum = (u8)input_packet.r_u8();
-    for (int i = 0; i < ALife::eHitTypeMax; i++)
+    for (u32 i = 0; i < ALife::eHitTypeMax; i++)
     {
         m_Wounds[i] = input_packet.r_float_q8(0.f, WOUND_MAX);
         VERIFY(m_Wounds[i] >= 0.0f && m_Wounds[i] <= WOUND_MAX);
@@ -45,7 +45,7 @@ void CWound::load(IReader& input_packet)
 float CWound::TotalSize()
 {
     float total_size = 0.f;
-    for (int i = 0; i < ALife::eHitTypeMax; i++)
+    for (u32 i = 0; i < ALife::eHitTypeMax; i++)
     {
         VERIFY(_valid(m_Wounds[i]));
         total_size += m_Wounds[i];
@@ -69,13 +69,13 @@ void CWound::Incarnation(float percent, float min_wound_size)
 
     if (fis_zero(total_size))
     {
-        for (int i = 0; i < ALife::eHitTypeMax; i++)
+        for (u32 i = 0; i < ALife::eHitTypeMax; i++)
             m_Wounds[i] = 0.f;
         return;
     }
 
     //заживить все раны пропорционально их размеру
-    for (int i = 0; i < ALife::eHitTypeMax; i++)
+    for (u32 i = 0; i < ALife::eHitTypeMax; i++)
     {
         m_Wounds[i] -= percent /* *m_Wounds[i]*/;
         if (m_Wounds[i] < min_wound_size)

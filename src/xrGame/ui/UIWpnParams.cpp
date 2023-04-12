@@ -25,7 +25,7 @@ static SLuaWpnParams* g_lua_wpn_params = nullptr;
 
 SLuaWpnParams::SLuaWpnParams()
 {
-    bool functor_exists;
+    [[maybe_unused]] bool functor_exists;
     functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetRPM", m_functorRPM);
     VERIFY(functor_exists);
     functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetDamage", m_functorDamage);

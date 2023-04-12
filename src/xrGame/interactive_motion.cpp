@@ -72,9 +72,7 @@ void interactive_motion::setup(const MotionID& m, CPhysicsShell* s, float _angle
 
 void interactive_motion::shell_setup()
 {
-    VERIFY(shell);
-    IKinematics* K = shell->PKinematics();
-    VERIFY(K);
+    VERIFY(shell && shell->PKinematics());
 }
 
 void interactive_motion::anim_callback(CBlend* B)
@@ -109,9 +107,7 @@ void interactive_motion::state_end()
 
 void interactive_motion::update()
 {
-    VERIFY(shell);
-    IKinematics* K = shell->PKinematics();
-    VERIFY(K);
+    VERIFY(shell && shell->PKinematics());
 
     collide();
     if (!flags.test(fl_switch_dm_toragdoll))

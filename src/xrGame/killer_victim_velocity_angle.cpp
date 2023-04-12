@@ -11,13 +11,8 @@
 
 namespace award_system
 {
-killer_victim_angle::killer_victim_angle(game_state_accumulator* owner)
-    : inherited(owner), m_killer_victim_angle_cos(1.f)
-{
-}
-
 void killer_victim_angle::reset_game() { m_killer_victim_angle_cos = 1.f; }
-u32 const killer_victim_angle::get_u32_param() { return u32(acosf(m_killer_victim_angle_cos) * (180.f / PI)); }
+u32 killer_victim_angle::get_u32_param() { return u32(acosf(m_killer_victim_angle_cos) * (180.f / PI)); }
 void killer_victim_angle::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)
 {

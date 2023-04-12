@@ -76,7 +76,7 @@ void WeaponUsageStatistic::SaveData()
     case eGameIDTeamDeathmatch: xr_sprintf(GameType, "tdm"); break;
     case eGameIDArtefactHunt: xr_sprintf(GameType, "ah"); break;
     case eGameIDCaptureTheArtefact: xr_sprintf(GameType, "cta"); break;
-    default: return; break;
+    default: return;
     };
 #ifdef XR_PLATFORM_WINDOWS
     SYSTEMTIME Time;

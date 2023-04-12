@@ -29,7 +29,7 @@ monster_aura::monster_aura(CBaseMonster* const object, pcstr const name)
 }
 
 monster_aura::~monster_aura() { remove_pp_effector(); }
-float monster_aura::override_if_debug(pcstr var_name, float const value) const
+float monster_aura::override_if_debug([[maybe_unused]] pcstr var_name, float const value) const
 {
 #ifdef DEBUG
     char* full_var_name;
@@ -37,7 +37,6 @@ float monster_aura::override_if_debug(pcstr var_name, float const value) const
 
     return m_object->override_if_debug(full_var_name, value);
 #else // DEBUG
-    var_name; // prevent warning
     return value;
 #endif // DEBUG
 }
@@ -142,7 +141,7 @@ void monster_aura::remove_pp_effector()
 float monster_aura::get_post_process_factor() const
 {
     using namespace ::detail::monster_aura;
-    float pp_highest_at = override_if_debug(s_pp_highest_at_string, m_pp_highest_at);
+    [[maybe_unused]] float pp_highest_at = override_if_debug(s_pp_highest_at_string, m_pp_highest_at);
     VERIFY(pp_highest_at != 0.f);
 
     float factor = calculate() / m_pp_highest_at;

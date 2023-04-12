@@ -28,7 +28,7 @@ void SStaticSound::Load(IReader& F)
 
 void SStaticSound::Update(u32 game_time, u32 global_time)
 {
-    if ((0 == m_ActiveTime.x) && (0 == m_ActiveTime.y) ||
+    if (0 == m_ActiveTime.x && 0 == m_ActiveTime.y ||
         ((int(game_time) >= m_ActiveTime.x) && (int(game_time) < m_ActiveTime.y)))
     {
         if (0 == m_Source._feedback())
@@ -96,7 +96,7 @@ void SMusicTrack::Load(LPCSTR fn, LPCSTR params)
     m_SourceStereo.create(fn, st_Music, sg_Undefined, !left && !right);
 
     // parse params
-    int cnt = _GetItemCount(params);
+    [[maybe_unused]] auto cnt = _GetItemCount(params);
     VERIFY(cnt == 5);
     m_ActiveTime.set(0, 0);
     m_PauseTime.set(0, 0);

@@ -119,8 +119,6 @@ CGameSpy_Browser::~CGameSpy_Browser()
     }
 };
 
-static bool services_checked = false;
-
 bool CGameSpy_Browser::Init(UpdateCallback updateCb)
 {
     if (m_inited)

@@ -30,7 +30,7 @@ public:
     void add_hit(shared_str const& hitter, shared_str const& victim, u16 weapon_id, u16 bone_id, float bullet_fly_dist);
 
     template <typename Predicate>
-    u32 const fetch_hits(Predicate& predicate, buffer_vector<bullet_hit>& dest_hits) const;
+    u32 fetch_hits(Predicate& predicate, buffer_vector<bullet_hit>& dest_hits) const;
 
 private:
     bullet_hits_map_t m_bullet_hits;

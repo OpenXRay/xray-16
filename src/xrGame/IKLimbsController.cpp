@@ -65,7 +65,7 @@ void CIKLimbsController::LimbCalculate(SCalculateData& cd)
 
 void CIKLimbsController::LimbUpdate(CIKLimb& L)
 {
-    IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
+    [[maybe_unused]] auto skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
     VERIFY(skeleton_animated);
     L.Update(m_object, m_legs_blend, _pose_extrapolation);
 }
@@ -131,8 +131,10 @@ float CIKLimbsController::StaticObjectShift(const SCalculateData cd[max_size])
     _object_shift.set_taget(shift, _abs(current_shift - shift) / static_shift_object_speed);
     return shift;
 }
+
 static float doun_shift_to_correct = 0.3f;
-static float doun_shift_correct = 0.1f;
+//static float doun_shift_correct = 0.1f;
+
 bool CIKLimbsController::PredictObjectShift(const SCalculateData cd[max_size])
 {
     float predict_time_shift_down = FLT_MAX;
@@ -199,7 +201,7 @@ void CIKLimbsController::ObjectShift(float static_shift, const SCalculateData cd
         if (cd[j].m_limb->foot_step())
             ++cnt_in_step;
 
-    CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(m_object);
+    [[maybe_unused]] auto sh = smart_cast<CPhysicsShellHolder*>(m_object);
     VERIFY(sh);
     // CCharacterPhysicsSupport *ch = sh->character_physics_support();
     _object_shift.freeze(!!Device.Paused()); // ch->is_interactive_motion() ||

@@ -344,9 +344,6 @@ void game_cl_GameState::shedule_Update(u32 dt)
             m_WeaponUsageStatistic->Update();
     }
     break;
-    default: {
-    }
-    break;
     };
 };
 
@@ -386,24 +383,9 @@ void game_cl_GameState::u_EventGen(NET_Packet& P, u16 type, u16 dest)
 void game_cl_GameState::u_EventSend(NET_Packet& P) { Level().Send(P, net_flags(TRUE, TRUE)); }
 void game_cl_GameState::OnSwitchPhase(u32 old_phase, u32 new_phase)
 {
-    switch (old_phase)
+    if (new_phase == GAME_PHASE_INPROGRESS)
     {
-    case GAME_PHASE_INPROGRESS: {
-    }
-    break;
-    default: {
-    }
-    break;
-    };
-
-    switch (new_phase)
-    {
-    case GAME_PHASE_INPROGRESS: { m_WeaponUsageStatistic->Clear();
-    }
-    break;
-    default: {
-    }
-    break;
+        m_WeaponUsageStatistic->Clear();
     }
 }
 

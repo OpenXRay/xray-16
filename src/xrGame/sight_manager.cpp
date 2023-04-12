@@ -25,8 +25,7 @@ static float const s_factor_lerp_speed = 1.f;
 
 //#define SIGHT_DEBUG
 
-CSightManager::CSightManager(CAI_Stalker* object)
-    : inherited(object), m_enabled(true), m_turning_in_place(false), m_aiming_type(aiming_none)
+CSightManager::CSightManager(CAI_Stalker* object) : inherited(object)
 {
 }
 

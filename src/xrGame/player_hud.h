@@ -73,10 +73,10 @@ struct hud_item_measures
 struct attachable_hud_item
 {
     player_hud* m_parent;
-    CHudItem* m_parent_hud_item;
+    CHudItem* m_parent_hud_item{};
     shared_str m_sect_name;
-    IKinematics* m_model;
-    u16 m_attach_place_idx;
+    IKinematics* m_model{};
+    u16 m_attach_place_idx{};
     hud_item_measures m_measures;
 
     // runtime positioning
@@ -85,9 +85,7 @@ struct attachable_hud_item
 
     player_hud_motion_container m_hand_motions;
 
-    attachable_hud_item(player_hud* pparent) : m_parent(pparent), m_upd_firedeps_frame(u32(-1)),
-                                               m_parent_hud_item(nullptr), m_model(nullptr),
-                                               m_attach_place_idx(0) {}
+    attachable_hud_item(player_hud* pparent) : m_parent(pparent) {}
 
     ~attachable_hud_item();
     void load(const shared_str& sect_name);
@@ -110,7 +108,7 @@ struct attachable_hud_item
     Fvector& hands_offset_rot();
 
     // props
-    u32 m_upd_firedeps_frame;
+    u32 m_upd_firedeps_frame{ u32(-1) };
     void tune(Ivector values);
     u32 anim_play(const shared_str& anim_name, BOOL bMixIn, const CMotionDef*& md, u8& rnd);
 };

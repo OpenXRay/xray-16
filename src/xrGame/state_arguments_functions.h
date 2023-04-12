@@ -41,14 +41,12 @@ public:
     {
         switch (ftype)
         {
-        case tt_greater_equal: { return &s_ge_function;
-        }
-        break;
-        case tt_less_equal: { return &s_le_function;
-        }
-        break;
+        case tt_greater_equal:
+            return &s_ge_function;
+        case tt_less_equal:
+            return &s_le_function;
         }; // switch (ftype)
-        return NULL;
+        return nullptr;
     }
 
 private:

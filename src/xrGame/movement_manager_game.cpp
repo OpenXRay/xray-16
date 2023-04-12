@@ -75,6 +75,7 @@ void CMovementManager::process_game_path()
             break;
 
         m_path_state = ePathStateBuildGamePath;
+        [[fallthrough]];
     }
     case ePathStateBuildGamePath:
     {
@@ -87,6 +88,7 @@ void CMovementManager::process_game_path()
         }
 
         m_path_state = ePathStateContinueGamePath;
+        [[fallthrough]];
     }
     case ePathStateContinueGamePath:
     {
@@ -103,6 +105,7 @@ void CMovementManager::process_game_path()
         }
 
         m_path_state = ePathStateBuildLevelPath;
+        [[fallthrough]];
     }
     case ePathStateBuildLevelPath:
     {
@@ -139,6 +142,7 @@ void CMovementManager::process_game_path()
         level_path().select_intermediate_vertex();
 
         m_path_state = ePathStateBuildDetailPath;
+        [[fallthrough]];
     }
     case ePathStateBuildDetailPath:
     {

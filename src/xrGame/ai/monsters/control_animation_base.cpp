@@ -74,42 +74,35 @@ void CControlAnimationBase::reinit()
 
 void CControlAnimationBase::on_start_control(ControlCom::EControlType type)
 {
-    switch (type)
+    if (type == ControlCom::eControlAnimation)
     {
-    case ControlCom::eControlAnimation:
         m_man->subscribe(this, ControlCom::eventAnimationEnd);
         m_state_attack = false;
         select_animation();
-        break;
     }
 }
 
 void CControlAnimationBase::on_stop_control(ControlCom::EControlType type)
 {
-    switch (type)
+    if (type == ControlCom::eControlAnimation)
     {
-    case ControlCom::eControlAnimation:
         m_man->unsubscribe(this, ControlCom::eventAnimationEnd);
         m_state_attack = false;
-        break;
     }
 }
 
 void CControlAnimationBase::on_event(ControlCom::EEventType type, ControlCom::IEventData* data)
 {
-    switch (type)
+    if (type == ControlCom::eventAnimationEnd)
     {
-    case ControlCom::eventAnimationEnd:
         select_animation(true);
         m_state_attack = false;
-        break;
-    case ControlCom::eventAnimationSignal:
+    }
+    else if (type == ControlCom::eventAnimationSignal)
     {
-        SAnimationSignalEventData* event_data = (SAnimationSignalEventData*)data;
+        auto event_data = (SAnimationSignalEventData*)data;
         if (event_data->event_id == CControlAnimation::eAnimationHit)
             check_hit(event_data->motion, event_data->time_perc);
-        break;
-    }
     }
 }
 

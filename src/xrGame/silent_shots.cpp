@@ -7,12 +7,6 @@
 
 namespace award_system
 {
-silent_shots::silent_shots(game_state_accumulator* owner) : inherited(owner)
-{
-    m_thunder_count = 0;
-    m_last_shoot_weapon = 0;
-}
-
 void silent_shots::reset_game()
 {
     m_thunder_count = 0;

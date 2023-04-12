@@ -760,13 +760,13 @@ public:
     void set_smart_cover_target_fire_no_lookout();
     void set_smart_cover_target_default(bool value);
 
-    float const idle_min_time() const;
+    float idle_min_time() const;
     void idle_min_time(float value);
-    float const idle_max_time() const;
+    float idle_max_time() const;
     void idle_max_time(float value);
-    float const lookout_min_time() const;
+    float lookout_min_time() const;
     void lookout_min_time(float value);
-    float const lookout_max_time() const;
+    float lookout_max_time() const;
     void lookout_max_time(float value);
 
     bool in_loophole_fov(LPCSTR cover_id, LPCSTR loophole_id, Fvector object_position) const;

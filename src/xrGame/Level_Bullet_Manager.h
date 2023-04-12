@@ -35,7 +35,7 @@ struct SBullet
             u16 magnetic_beam : 1; //магнитный луч (нет отклонения после пробивания, не падает скорость после
                                    //пробивания)
         };
-        u16 _storage;
+        u16 _storage{};
     } flags;
     u16 bullet_material_idx;
 
@@ -46,13 +46,13 @@ struct SBullet
     u16 parent_id; // ID персонажа который иницировал действие
     u16 weapon_id; // ID оружия из которого была выпущены пуля
 
-    float fly_dist; //дистанция которую пуля пролетела
+    float fly_dist{}; //дистанция которую пуля пролетела
     Fvector tracer_start_position;
 
     Fvector start_position;
     Fvector start_velocity;
     u32 born_time;
-    float life_time;
+    float life_time{};
     u32 change_rajectory_count;
 
     //коэфициенты и параметры патрона
@@ -74,21 +74,18 @@ struct SBullet
     ref_sound m_whine_snd;
     ref_sound m_mtl_snd;
     //---------------------------------
-    u16 targetID;
+    u16 targetID{};
     //---------------------------------
-    bool density_mode;
+    bool density_mode{};
     float density;
     Fvector begin_density;
     bool operator==(u32 ID) { return ID == m_dwID; }
 public:
-    SBullet();
-    ~SBullet();
+    SBullet(const Fvector& position, const Fvector& direction, float start_speed, float power,
+        /*float power_critical,*/ float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type,
+        float maximum_distance, const CCartridge& cartridge, float const air_resistance_factor, bool SendHit);
 
     bool CanBeRenderedNow() const { return (Device.dwFrame > init_frame_num); }
-    void Init(const Fvector& position, const Fvector& direction, float start_speed, float power,
-        //.										float	power_critical,
-        float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type, float maximum_distance,
-        const CCartridge& cartridge, float const air_resistance_factor, bool SendHit);
 };
 
 class CLevel;
@@ -120,6 +117,8 @@ class CBulletManager
         Fvector point;
         collide::rq_result R;
         u16 tgt_material;
+
+        _event(EventType t, const SBullet& b) : Type(t), bullet(b) {}
     };
     static void CalculateNewVelocity(Fvector& dest_new_vel, Fvector const& old_velocity, float ar, float life_time);
 

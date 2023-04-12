@@ -57,10 +57,9 @@ IC Fmatrix& SCalculateData::goal(Fmatrix& g) const
 
 CIKLimb::CIKLimb() { Invalidate(); }
 CIKLimb::CIKLimb(const CIKLimb& l)
-    : m_limb(l.m_limb), m_K(l.m_K), m_foot(l.m_foot),
-
-      m_id(l.m_id), m_collide(l.m_collide), collide_data(l.collide_data), anim_state(l.anim_state),
-      collider(l.collider), state_predict(l.state_predict)
+    : m_limb(l.m_limb), m_K(l.m_K), m_foot(l.m_foot), collider(l.collider),
+      m_id(l.m_id), m_collide(l.m_collide), collide_data(l.collide_data),
+      anim_state(l.anim_state), state_predict(l.state_predict)
 {
     m_bones[0] = l.m_bones[0];
     m_bones[1] = l.m_bones[1];
@@ -962,8 +961,8 @@ float CIKLimb::get_time_to_step_begin(const CBlend& B) const
 struct ssaved_callback : private Noncopyable
 {
     ssaved_callback(CBoneInstance& bi)
-        : _bi(bi), callback(bi.callback()), callback_param(bi.callback_param()),
-          callback_overwrite(bi.callback_overwrite()), callback_type(bi.callback_type())
+        : callback(bi.callback()), callback_param(bi.callback_param()),
+          callback_overwrite(bi.callback_overwrite()), callback_type(bi.callback_type()), _bi(bi)
     {
     }
     void restore() { _bi.set_callback(callback_type, callback, callback_param, callback_overwrite); }
