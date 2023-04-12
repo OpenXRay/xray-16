@@ -2179,9 +2179,9 @@ void game_sv_Deathmatch::ReadOptions(shared_str& options)
     g_sv_dm_bPDAHunt = (get_option_i(*options, "pdahunt", (g_sv_dm_bPDAHunt ? 1 : 0)) != 0);
 };
 
-[[maybe_unused]] void game_sv_Deathmatch::ConsoleCommands_Create() {};
+[[maybe_unused]] void game_sv_Deathmatch::ConsoleCommands_Create() {}
 
-[[maybe_unused]] void game_sv_Deathmatch::ConsoleCommands_Clear() {};
+[[maybe_unused]] void game_sv_Deathmatch::ConsoleCommands_Clear() {}
 
 void game_sv_Deathmatch::OnPlayerFire(ClientID id_who, NET_Packet& P)
 {

@@ -130,7 +130,7 @@ void CSpectator::UpdateCL()
             //-------------------------------------
             int idx = 0;
             game_PlayerState* P = Game().local_player;
-            if (P && (P->team < Level().seniority_holder().teams().size()))
+            if (P && P->team < Level().seniority_holder().teams().size())
             {
                 const CTeamHierarchyHolder& T = Level().seniority_holder().team(P->team);
                 for (u32 i = 0; i < T.squads().size(); ++i)

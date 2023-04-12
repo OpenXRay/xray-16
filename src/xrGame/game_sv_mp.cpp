@@ -807,9 +807,11 @@ void game_sv_mp::ChargeGrenades(
         make_string("weapon [%s] has greater than 4 types of grenade [%s]", weapon->s_name.c_str(), grenade_string)
             .c_str());
     weapon->a_elapsed_grenades.unpack_from_byte(0);
-    string512 temp_ammo_class;
+
     for (int i = 0; i < grenades_count; ++i)
     {
+        string512 temp_ammo_class;
+
         _GetItem(grenade_string, i, temp_ammo_class);
         u32 const ammo_id = static_cast<u16>(m_strWeaponsData->GetItemIdx(shared_str(temp_ammo_class)));
 
@@ -977,11 +979,17 @@ struct _votecommands
     u16 flag;
 };
 
-_votecommands votecommands[] = {{"restart", "g_restart", flVoteRestart},
-    {"restart_fast", "g_restart_fast", flVoteRestartFast}, {"kick", "sv_kick", flVoteKick},
-    {"ban", "sv_banplayer", flVoteBan}, {"changemap", "sv_changelevel", flVoteMap},
-    {"changeweather", "sv_setenvtime", flVoteWeather}, {"changegametype", "sv_changegametype", flVoteGameType},
-    {NULL, NULL, 0}};
+_votecommands votecommands[] =
+{
+    { "restart",        "g_restart",         flVoteRestart },
+    { "restart_fast",   "g_restart_fast",    flVoteRestartFast },
+    { "kick",           "sv_kick",           flVoteKick },
+    { "ban",            "sv_banplayer",      flVoteBan },
+    { "changemap",      "sv_changelevel",    flVoteMap },
+    { "changeweather",  "sv_setenvtime",     flVoteWeather },
+    { "changegametype", "sv_changegametype", flVoteGameType },
+    { nullptr, nullptr, 0 }
+};
 
 s32 game_sv_mp::ExcludeBanTimeFromVoteStr(char const* vote_string, char* new_vote_str, u32 new_vote_str_size)
 {

@@ -505,9 +505,9 @@ void CWeapon::Load(LPCSTR section)
     m_u8TracerColorID = READ_IF_EXISTS(pSettings, r_u8, section, "tracers_color_ID", u8(-1));
 
     string256 temp;
-    for (int i = egdNovice; i < static_cast<int>(egdCount); ++i)
+    for (u32 i = egdNovice; i < egdCount; ++i)
     {
-        strconcat(sizeof(temp), temp, "hit_probability_", get_token_name(difficulty_type_token, i));
+        strconcat(temp, "hit_probability_", get_token_name(difficulty_type_token, static_cast<int>(i)));
         m_hit_probability[i] = READ_IF_EXISTS(pSettings, r_float, section, temp, 1.f);
     }
 

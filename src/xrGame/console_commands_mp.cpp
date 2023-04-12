@@ -948,19 +948,18 @@ public:
         if ((len == 0) || (len >= 256))
             return;
 
-        // XXX: %s is not suitable for char array, use ip_address.to_string here?
-//        char hex_digest[64];
-//        s32 ban_time = 0;
-//        if (sscanf(args_, "%s %i", &hex_digest, &ban_time) != 2)
-//        {
-//            Msg("! ERROR: bad command parameters.");
-//            Msg("Ban player. Format: \"sv_banplayer_by_digest <hex digest> <ban_time_in_sec>\". To get player hex "
-//                "digest "
-//                "you can enter: sv_listplayers_banned");
-//            return;
-//        }
+        char hex_digest[64];
+        s32 ban_time = 0;
+        if (sscanf(args_, "%63s %i", hex_digest, &ban_time) != 2)
+        {
+            Msg("! ERROR: bad command parameters.");
+            Msg("Ban player. Format: \"sv_banplayer_by_digest <hex digest> <ban_time_in_sec>\". To get player hex "
+                "digest "
+                "you can enter: sv_listplayers_banned");
+            return;
+        }
 
-//        tmp_sv_game->BanPlayerDirectly(hex_digest, ban_time, exclude_command_initiator(args_));
+        tmp_sv_game->BanPlayerDirectly(hex_digest, ban_time, exclude_command_initiator(args_));
     }
     virtual void Info(TInfo& I)
     {

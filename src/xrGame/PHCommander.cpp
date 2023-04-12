@@ -2,8 +2,6 @@
 #include "PHCommander.h"
 #include "PHSimpleCalls.h"
 
-#include <string>
-
 #ifdef DEBUG
 #include "xrPhysics/IPHWorld.h"
 #endif

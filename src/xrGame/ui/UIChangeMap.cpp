@@ -128,7 +128,7 @@ void CUIChangeMap::OnItemSelect()
 
 void CUIChangeMap::OnBtnOk()
 {
-    u32 idx = lst->GetSelectedIDX();
+    const u32 idx = lst->GetSelectedIDX();
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
     if (idx < M.m_map_names.size())
     {
