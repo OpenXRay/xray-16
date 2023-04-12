@@ -140,7 +140,7 @@ class CSE_ALifeCustomZone : public CSE_ALifeSpaceRestrictor
     using inherited = CSE_ALifeSpaceRestrictor;
 
 public:
-    //. f32                             m_maxPower;
+    f32 m_maxPower;
     ALife::EHitType m_tHitType;
     u32 m_owner_id;
     u32 m_enabled_time;
@@ -177,6 +177,7 @@ public:
     virtual u32 ef_weapon_type() const;
     virtual u32 ef_creature_type() const;
 #ifdef XRGAME_EXPORTS
+    void spawn_artefacts();
     virtual void on_spawn();
     virtual CSE_ALifeItemWeapon* tpfGetBestWeapon(ALife::EHitType& tHitType, float& fHitPower);
     virtual ALife::EMeetActionType tfGetActionType(

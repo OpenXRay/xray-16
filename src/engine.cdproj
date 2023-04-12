@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<NDepend IsCProject="false" IsPhysical="false" AppName="engine" Platform="DotNet" FileWrittenByProductVersion="2022.1.0.27">
+<NDepend IsCProject="false" IsPhysical="false" AppName="engine" Platform="DotNet" FileWrittenByProductVersion="2023.1.0.27">
   <OutputDir KeepXmlFiles="False">.\_CppDependOut</OutputDir>
   <Projects>
     <Name>.\engine.sln??Mixed|x64</Name>
@@ -7,7 +7,7 @@
   <FrameworkProjects />
   <Dirs />
   <Excludes />
-  <ZipSourceFiles>True</ZipSourceFiles>
+  <ZipSourceFiles>False</ZipSourceFiles>
   <Report Kind="0" SectionsEnabled="131071" XslPath="" Flags="261120" />
   <BuildComparisonSetting ProjectMode="DontCompare" BuildMode="NDaysAgoAnalysisResult" ProjectFileToCompareWith="" BuildFileToCompareWith="" NDaysAgo="30" />
   <BaselineInUISetting ProjectMode="DontCompare" BuildMode="NDaysAgoAnalysisResult" ProjectFileToCompareWith="" BuildFileToCompareWith="" NDaysAgo="30" />
@@ -66,11 +66,11 @@
       <DebtDefault>0</DebtDefault>
       <AnnualInterestDefault>0</AnnualInterestDefault>
       <DebtStringFormat>$ManDay$</DebtStringFormat>
-      <MoneyPerManHour>50</MoneyPerManHour>
-      <Currency>USD</Currency>
+      <MoneyPerManHour>750</MoneyPerManHour>
+      <Currency>RUB</Currency>
       <CurrencyLocation>After</CurrencyLocation>
       <EstimatedNumberOfManDayToDevelop1000LogicalLinesOfCode>18</EstimatedNumberOfManDayToDevelop1000LogicalLinesOfCode>
-      <NumberOfWorkDayPerYear>240</NumberOfWorkDayPerYear>
+      <NumberOfWorkDayPerYear>230</NumberOfWorkDayPerYear>
       <NumberOfWorkHourPerDay>8</NumberOfWorkHourPerDay>
       <A2B_RatingThreshold>5</A2B_RatingThreshold>
       <B2C_RatingThreshold>10</B2C_RatingThreshold>
@@ -81,7 +81,8 @@
       <Major2Critical_SeverityThreshold>72000000000</Major2Critical_SeverityThreshold>
       <Critical2Blocker_SeverityThreshold>360000000000</Critical2Blocker_SeverityThreshold>
     </DebtSettings>
-  </ProjectDebtSettings><Queries>
+  </ProjectDebtSettings>
+  <Queries>
     <Group Name="Quality Gates" Active="True" ShownInReport="True">
       <Query Active="True" DisplayList="True" DisplayStat="True" DisplaySelectionView="False" IsCriticalRule="False"><![CDATA[// <Name>Quality Gates Evolution</Name>
 from qg in QualityGates
@@ -2131,7 +2132,7 @@ select new { issue, issue.FilePath, Line = issue.BeginLine ,
     }
                 ]]></Query>
     </Group>
-    <Group Name="UML Design Validation" Active="True" ShownInReport="False">
+    <Group Name="UML Design Validation" Active="False" ShownInReport="False">
       <Query Active="True" DisplayList="True" DisplayStat="True" DisplaySelectionView="False" IsCriticalRule="False"><![CDATA[//<Name>Missing Types In Code</Name>
 warnif count > 0 from issue in ImportedIssues 
 where issue.ToolName=="UML Validation" && issue.Type=="MissingTypesInCode" 
@@ -3234,7 +3235,7 @@ select new { issue, issue.FilePath, Line = issue.BeginLine ,
     }
                 ]]></Query>
     </Group>
-    <Group Name="Vera++ Rules" Active="True" ShownInReport="False">
+    <Group Name="Vera++ Rules" Active="False" ShownInReport="False">
       <Query Active="True" DisplayList="True" DisplayStat="True" DisplaySelectionView="False" IsCriticalRule="False"><![CDATA[// <Name>Source files should not use the '\r' (CR) character</Name>
 warnif count > 0 from issue in ImportedIssues where issue.ToolName=="Vera++" && issue.Type=="F001" 
 select new { issue, issue.FilePath, Line = issue.BeginLine ,
@@ -5653,4 +5654,5 @@ select new {
 // **notmycode**.
 //</Description>]]></Query>
     </Group>
-  </Queries></NDepend>
+  </Queries>
+</NDepend>

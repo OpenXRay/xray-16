@@ -1,4 +1,7 @@
 #include "pch.hpp"
+
+#include "xrCore/XML/XMLDocument.hpp"
+
 #include "UIWindow.h"
 #include "UIFrameWindow.h"
 #include "UIFrameLineWnd.h"
@@ -6,6 +9,8 @@
 #include "ScrollView/UIScrollView.h"
 #include "Hint/UIHint.h"
 #include "Cursor/UICursor.h"
+#include "ui_styles.h"
+
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 // clang-format off
@@ -36,6 +41,36 @@ SCRIPT_EXPORT(UICore, (),
         def("SetCursorPosition", +[](Fvector2& pos) { GetUICursor().SetUICursorPosition(pos); }),
 
         def("FitInRect", &fit_in_rect)
+    ];
+});
+
+SCRIPT_EXPORT(UIStyleManager, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
+    module(luaState)
+    [
+        def("GetDefaultUIPath",              +[] { return UI_PATH_DEFAULT; }),
+        def("GetDefaultUIPathWithDelimiter", +[] { return UI_PATH_DEFAULT_WITH_DELIMITER; }),
+        def("GetUIPath",                     +[] { return UI_PATH; }),
+        def("GetUIPathWithDelimiter",        +[] { return UI_PATH_WITH_DELIMITER; }),
+
+        class_<UIStyleManager>("UIStyleManager")
+            .def("GetAllStyles", &UIStyleManager::GetToken, return_stl_iterator())
+            .def("DefaultStyleIsSet", &UIStyleManager::DefaultStyleIsSet)
+            .def("GetCurrentStyleId", &UIStyleManager::GetCurrentStyleId)
+
+            .def("SetStyle",        &UIStyleManager::SetupStyle)
+            .def("SetStyle",        +[](UIStyleManager* self, u32 styleID, bool reloadUI)
+            {
+                self->SetupStyle(styleID);
+
+                if (reloadUI)
+                    self->Reset();
+            }),
+
+        def("GetUIStyleManager", +[] { return UIStyles; })
     ];
 });
 

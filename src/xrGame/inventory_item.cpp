@@ -31,6 +31,7 @@
 constexpr pcstr INV_NAME_KEY = "inv_name";
 constexpr pcstr INV_NAME_SHORT_KEY = "inv_name_short";
 constexpr pcstr DESCRIPTION_KEY = "description";
+extern int g_normalize_mouse_sens;
 
 net_updateInvData* CInventoryItem::NetSync()
 {
@@ -125,7 +126,7 @@ void CInventoryItem::Load(LPCSTR section)
     {
         m_flags.set(FRuckDefault, pSettings->read_if_exists<bool>(section, "default_to_ruck", true));
         m_flags.set(FAllowSprint, pSettings->read_if_exists<bool>(section, "sprint_allowed", true));
-        m_fControlInertionFactor = pSettings->read_if_exists<float>(section, "control_inertion_factor", 1.0f);
+        m_fControlInertionFactor = g_normalize_mouse_sens ? 1.0f : pSettings->read_if_exists<float>(section, "control_inertion_factor", 1.0f);
     }
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
 }

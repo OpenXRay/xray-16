@@ -601,7 +601,7 @@ void CSE_ALifeTrader::FillProps(LPCSTR _pref, PropItemVec& items)
 CSE_ALifeCustomZone::CSE_ALifeCustomZone(LPCSTR caSection) : CSE_ALifeSpaceRestrictor(caSection)
 {
     m_owner_id = u32(-1);
-    //  m_maxPower                  = pSettings->r_float(caSection,"min_start_power");
+    m_maxPower = pSettings->read_if_exists<float>(caSection, "min_start_power", 1.0f);
     if (pSettings->line_exist(caSection, "hit_type"))
         m_tHitType = ALife::g_tfString2HitType(pSettings->r_string(caSection, "hit_type"));
     else
@@ -615,9 +615,8 @@ CSE_ALifeCustomZone::~CSE_ALifeCustomZone() {}
 void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
-
-    float tmp;
-    tNetPacket.r_float(tmp /*m_maxPower*/);
+    
+    tNetPacket.r_float(m_maxPower);
 
     if (m_wVersion < 113)
     {
@@ -647,7 +646,7 @@ void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
 void CSE_ALifeCustomZone::STATE_Write(NET_Packet& tNetPacket)
 {
     inherited::STATE_Write(tNetPacket);
-    tNetPacket.w_float(0.0 /*m_maxPower*/);
+    tNetPacket.w_float(m_maxPower);
     tNetPacket.w_u32(m_owner_id);
     tNetPacket.w_u32(m_enabled_time);
     tNetPacket.w_u32(m_disabled_time);

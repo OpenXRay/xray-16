@@ -36,11 +36,6 @@ private:
     typedef AssociativeVector<shared_str, section_items*> respawn_sections_map;
     typedef respawn_sections_map::iterator respawn_section_iter;
 
-    struct search_by_id_predicate
-    {
-        bool operator()(spawn_item const& left, u16 right) const;
-    };
-
     NET_Packet spawn_packet_store;
     xrServer* m_server;
     respawn_collection m_respawns;

@@ -31,6 +31,7 @@ public:
     virtual ALife::_TIME_ID GetGameTime();
     virtual float GetGameTimeFactor();
     virtual void SetGameTimeFactor(const float fTimeFactor);
+    virtual void SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor) override;
 
     virtual ALife::_TIME_ID GetEnvironmentGameTime();
     virtual float GetEnvironmentGameTimeFactor();

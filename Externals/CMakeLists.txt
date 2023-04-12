@@ -1,4 +1,5 @@
 add_subdirectory(LuaJIT-proj)
+add_subdirectory(xrLuaFix)
 add_subdirectory(luabind)
 if (USE_CXIMAGE)
     add_subdirectory(cximage)
