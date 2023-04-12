@@ -2,9 +2,6 @@
 
 struct MotionID
 {
-private:
-    typedef const MotionID* (MotionID::*unspecified_bool_type)() const;
-
 public:
     union
     {
@@ -14,30 +11,61 @@ public:
             u16 slot : 16; // 2
         };
         //.		u16			val;
-        u32 val;
+        u32 val{ u32(-1) };
     };
 
 public:
-    MotionID() { invalidate(); }
-    MotionID(u16 motion_slot, u16 motion_idx) { set(motion_slot, motion_idx); }
-    ICF bool operator==(const MotionID& tgt) const { return tgt.val == val; }
-    ICF bool operator!=(const MotionID& tgt) const { return tgt.val != val; }
-    ICF bool operator<(const MotionID& tgt) const { return val < tgt.val; }
-    ICF bool operator!() const { return !valid(); }
+    ICF MotionID() = default;
+
+    ICF MotionID(MotionID&& other) noexcept : val(other.val)
+    {
+        other.invalidate();
+    }
+
+    ICF MotionID(const MotionID& other) noexcept : val(other.val) {}
+
+    ICF MotionID(u16 motion_slot, u16 motion_idx) noexcept
+        : idx(motion_idx), slot(motion_slot) {}
+
+    ICF MotionID& operator=(MotionID&& other) noexcept
+    {
+        val = other.val;
+        other.invalidate();
+        return *this;
+    }
+
+    ICF MotionID& operator=(const MotionID& other) noexcept
+    {
+        val = other.val;
+        return *this;
+    }
+
+    [[nodiscard]]
+    ICF bool operator==(const MotionID& tgt) const noexcept { return tgt.val == val; }
+
+    [[nodiscard]]
+    ICF bool operator!=(const MotionID& tgt) const noexcept { return tgt.val != val; }
+
+    [[nodiscard]]
+    ICF bool operator<(const MotionID& tgt) const noexcept { return val < tgt.val; }
+
+    [[nodiscard]]
+    ICF bool operator!() const noexcept { return !valid(); }
+
     ICF void set(u16 motion_slot, u16 motion_idx)
     {
         slot = motion_slot;
         idx = motion_idx;
     }
-    ICF void invalidate() { val = u16(-1); }
-    ICF bool valid() const { return val != u16(-1); }
-    const MotionID* get() const { return this; };
-    ICF operator unspecified_bool_type() const
-    {
-        if (valid())
-            return &MotionID::get;
-        else
-            return nullptr;
-        //		return(!valid()?0:&MotionID::get);
-    }
+
+    ICF void invalidate() noexcept { val = u32(-1); }
+
+    [[nodiscard]]
+    ICF bool valid() const noexcept { return val != u32(-1); }
+
+    [[nodiscard]]
+    ICF const MotionID* get() const noexcept { return this; };
+
+    [[nodiscard]]
+    ICF explicit operator bool() const noexcept { return valid(); }
 };
