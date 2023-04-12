@@ -8,13 +8,8 @@
 
 #pragma once
 
-IC CScriptEntityAction::CScriptEntityAction()
-{
-    m_user_data = 0;
-    m_started = false;
-}
-
 IC CScriptEntityAction::CScriptEntityAction(const CScriptEntityAction* entity_action) { *this = *entity_action; }
+
 template <typename T>
 IC void CScriptEntityAction::SetAction(const T& t, T& tt)
 {

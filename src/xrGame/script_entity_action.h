@@ -17,7 +17,7 @@
 #include "script_action_condition.h"
 #include "script_monster_action.h"
 
-class CScriptEntityAction
+class CScriptEntityAction final
 {
 public:
     CScriptMovementAction m_tMovementAction;
@@ -28,13 +28,13 @@ public:
     CScriptObjectAction m_tObjectAction;
     CScriptActionCondition m_tActionCondition;
     CScriptMonsterAction m_tMonsterAction;
-    void* m_user_data;
-    bool m_started;
+    void* m_user_data{};
+    bool m_started{};
 
 public:
-    IC CScriptEntityAction();
+    IC CScriptEntityAction() = default;
     IC CScriptEntityAction(const CScriptEntityAction* entity_action);
-    virtual ~CScriptEntityAction();
+    ~CScriptEntityAction() = default;
     template <typename T>
     IC void SetAction(const T& t, T& tt);
     IC void SetAction(CScriptMovementAction& tMovementAction);
