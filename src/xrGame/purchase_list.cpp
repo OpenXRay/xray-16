@@ -56,6 +56,6 @@ void CPurchaseList::process(
         Level().spawn_item(*name, position, level_vertex_id, id, false);
     }
 
-    VERIFY3(m_deficits.find(name) == m_deficits.cend(), "Duplicate section in the purchase list", name.c_cstr());
+    VERIFY3(m_deficits.find(name) == m_deficits.end(), "Duplicate section in the purchase list", name.c_str());
     m_deficits.emplace(name, (float)count * probability / _max((float)j, min_deficit_factor));
 }

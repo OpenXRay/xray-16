@@ -327,7 +327,8 @@ void imotion_position::disable_update(bool v)
 
 void imotion_position::move_update()
 {
-    VERIFY(shell && shell->PKinematics());
+    VERIFY(shell);
+    IKinematics* K = shell->PKinematics();
     VERIFY(K);
 
     disable_update(false);
