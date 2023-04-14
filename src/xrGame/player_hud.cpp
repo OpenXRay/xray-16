@@ -631,16 +631,6 @@ u32 player_hud::motion_length(const shared_str& anim_name, const shared_str& hud
     attachable_hud_item* pi = create_hud_item(hud_name);
     const player_hud_motion* pm = pi->m_hand_motions.find_motion(anim_name);
 
-    // Shadow of Chernobyl workaround
-    if (!pm && 0 == strncmp(anim_name.c_str(), "anm_", sizeof("anm_") - 1))
-    {
-        string256 anm_full;
-        cpcstr anm = anim_name.c_str() + sizeof("anm_") - 1;
-
-        xr_sprintf(anm_full, "anim_%s", anm);
-        pm = pi->m_hand_motions.find_motion(anm_full);
-    }
-
     if (!pm)
         return 100; // ms TEMPORARY
     R_ASSERT2(pm,
