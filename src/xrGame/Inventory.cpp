@@ -87,10 +87,13 @@ CInventory::CInventory()
     } while (true);
 
     m_iLastSlot = i;
-    VERIFY2(m_iLastSlot >= slotsCount, make_string(
-        "Not critical, but check [inventory] section in your system.ltx.\n"
-        "slots_count = %u, but real slots count is less: %u", slotsCount, i).c_str()
-    );
+#ifndef MASTER_GOLD
+    if (m_iLastSlot != slotsCount)
+    {
+        Log("~ Not critical, but check [inventory] section in your system.ltx.");
+        Msg("~ slots_count = %u, but real slots count is %u", slotsCount, m_iLastSlot);
+    }
+#endif
 
     m_blocked_slots.resize(m_slots.size());
     // ^ no need to initialize members of array
