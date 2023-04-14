@@ -667,7 +667,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                 if (act_state == 0)
                     PlayHUDMotion("anm_idle_w_gl", "anim_idle_gl", /*FALSE*/TRUE, NULL, GetState()); //AVO: fix fast anim switch
                 else if (act_state == 1)
-                    PlayHUDMotion("anm_idle_sprint_w_gl", "anim_idle_gl", TRUE, NULL, GetState());
+                    PlayHUDMotion("anm_idle_sprint_w_gl", "anim_idle_sprint", TRUE, NULL, GetState());
                 else if (act_state == 2)
                     PlayHUDMotion("anm_idle_moving_w_gl", "anim_idle_gl", TRUE, NULL, GetState());
                 else if (act_state == 3)
