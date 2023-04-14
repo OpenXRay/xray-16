@@ -388,8 +388,12 @@ void CActor::Load(LPCSTR section)
             LPCSTR hit_name = ALife::g_cafHitType2String((ALife::EHitType)hit_type);
             LPCSTR hit_snds = READ_IF_EXISTS(pSettings, r_string, hit_snd_sect, hit_name, "");
             int cnt = _GetItemCount(hit_snds);
-            if (hit_type != (int)ALife::eHitTypePhysicStrike)
-                VERIFY(cnt != 0);
+#ifndef MASTER_GOLD
+            if (cnt == 0)
+            {
+                Msg("~ [%s] is missing sounds for type [%s]", hit_snd_sect, hit_name);
+            }
+#endif
             for (int i = 0; i < cnt; ++i)
             {
                 sndHit[hit_type].push_back(ref_sound());
