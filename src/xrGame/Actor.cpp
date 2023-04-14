@@ -189,7 +189,7 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
     m_anims = xr_new<SActorMotions>();
     //Alundaio: Needed for car
     m_vehicle_anims = xr_new<SActorVehicleAnims>();
-	//-Alundaio
+    //-Alundaio
     m_entity_condition = NULL;
     m_iLastHitterID = u16(-1);
     m_iLastHittingWeaponID = u16(-1);
@@ -235,9 +235,9 @@ CActor::~CActor()
     xr_delete(m_pPhysics_support);
 
     xr_delete(m_anims);
-	//Alundaio: For car
+    //Alundaio: For car
     xr_delete(m_vehicle_anims);
-	//-Alundaio
+    //-Alundaio
 }
 
 void CActor::reinit()
