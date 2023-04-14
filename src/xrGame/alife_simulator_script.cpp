@@ -36,6 +36,17 @@ CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, ALife::_OBJECT
     return (self->objects().object(object_id, true));
 }
 
+CSE_ALifeDynamicObject* alife_object_awful(const CALifeSimulator* self, u32 object_id)
+{
+    if (object_id == u32(-1))
+        object_id = 0;
+    else if (object_id > ALife::_OBJECT_ID(-1))
+        object_id = ALife::_OBJECT_ID(-1);
+
+    VERIFY(self);
+    return (self->objects().object(ALife::_OBJECT_ID(object_id), true));
+}
+
 bool valid_object_id(const CALifeSimulator* self, ALife::_OBJECT_ID object_id)
 {
     VERIFY(self);
@@ -418,8 +429,7 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             .def("valid_object_id", &valid_object_id)
             .def("level_id", &get_level_id)
             .def("level_name", &get_level_name)
-            .def("object",
-                (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
+            .def("object", &alife_object_awful)
             .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(
                                alife_object))
             .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, pcstr))(alife_object))
