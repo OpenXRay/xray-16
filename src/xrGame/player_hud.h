@@ -17,7 +17,6 @@ struct motion_descr
 
 struct player_hud_motion
 {
-    shared_str m_alias_name;
     shared_str m_base_name;
     shared_str m_additional_name;
     xr_vector<motion_descr> m_animations;
@@ -25,8 +24,11 @@ struct player_hud_motion
 
 struct player_hud_motion_container
 {
-    xr_vector<player_hud_motion> m_anims;
-    player_hud_motion* find_motion(const shared_str& name);
+    xr_unordered_map<shared_str, player_hud_motion> m_anims;
+
+    [[nodiscard]]
+    const player_hud_motion* find_motion(const shared_str& name) const;
+
     void load(IKinematicsAnimated* model, const shared_str& sect);
 };
 
@@ -54,8 +56,10 @@ struct hud_item_measures
 
     Fvector m_hands_attach[2]; // pos,rot
 
-    void load(const shared_str& sect_name, IKinematics* K);
-	
+    Fmatrix load(const shared_str& sect_name, IKinematics* K);
+    Fmatrix load_monolithic(const shared_str& sect_name, IKinematics* K, CHudItem* owner);
+    void load_inertion_params(const shared_str& sect_name);
+
     struct inertion_params
     {
         float m_pitch_offset_r;
@@ -75,6 +79,7 @@ struct attachable_hud_item
     player_hud* m_parent;
     CHudItem* m_parent_hud_item{};
     shared_str m_sect_name;
+    shared_str m_visual_name;
     IKinematics* m_model{};
     u16 m_attach_place_idx{};
     hud_item_measures m_measures;
@@ -85,17 +90,22 @@ struct attachable_hud_item
 
     player_hud_motion_container m_hand_motions;
 
-    attachable_hud_item(player_hud* pparent) : m_parent(pparent) {}
+    bool m_monolithic;
 
+    attachable_hud_item(player_hud* parent, const shared_str& sect_name, IKinematicsAnimated* model);
     ~attachable_hud_item();
-    void load(const shared_str& sect_name);
+
+    void reload_measures();
+
     void update(bool bForce);
-    void update_hud_additional(Fmatrix& trans);
+    void update_hud_additional(Fmatrix& trans) const;
+
     void setup_firedeps(firedeps& fd);
+
     void render(IRenderable* root);
-    void render_item_ui();
-    bool render_item_ui_query();
-    bool need_renderable();
+    void render_item_ui() const;
+    bool render_item_ui_query() const;
+    bool need_renderable() const;
     void set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent = FALSE);
     void debug_draw_firedeps();
 
@@ -116,20 +126,20 @@ struct attachable_hud_item
 class player_hud
 {
 public:
-    player_hud();
+    player_hud() = default;
     ~player_hud();
     void load(const shared_str& model_name);
     void load_default() { load("actor_hud_05"); };
     void update(const Fmatrix& trans);
     void render_hud(IRenderable* root);
-    void render_item_ui();
-    bool render_item_ui_query();
-    u32 anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed);
+    void render_item_ui() const;
+    bool render_item_ui_query() const;
+    u32 anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel);
     const shared_str& section_name() const { return m_sect_name; }
     attachable_hud_item* create_hud_item(const shared_str& sect);
 
     void attach_item(CHudItem* item);
-    bool allow_activation(CHudItem* item);
+    bool allow_activation(CHudItem* item) const;
     attachable_hud_item* attached_item(u16 item_idx) { return m_attached_items[item_idx]; };
     void detach_item_idx(u16 idx);
     void detach_item(CHudItem* item);
@@ -139,27 +149,28 @@ public:
         m_attached_items[1] = NULL;
     };
 
-    void calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result);
+    void calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result) const;
     void tune(Ivector values);
-    u32 motion_length(const MotionID& M, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel);
+    u32 motion_length(const MotionID& M, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel) const;
     u32 motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md);
-    void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd);
+    void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd) const;
 
 private:
-    void update_inertion(Fmatrix& trans);
-    void update_additional(Fmatrix& trans);
-    bool inertion_allowed();
+    void load_ancors();
+    void update_inertion(Fmatrix& trans) const;
+    void update_additional(Fmatrix& trans) const;
+    bool inertion_allowed() const;
 
 private:
     shared_str m_sect_name;
 
-    Fmatrix m_attach_offset;
+    Fmatrix m_attach_offset{};
 
-    Fmatrix m_transform;
-    IKinematicsAnimated* m_model;
+    Fmatrix m_transform{ Fidentity };
+    IKinematicsAnimated* m_model{};
     xr_vector<u16> m_ancors;
-    attachable_hud_item* m_attached_items[2];
-    xr_vector<attachable_hud_item*> m_pool;
+    attachable_hud_item* m_attached_items[2]{};
+    xr_unordered_map<shared_str, attachable_hud_item*> m_pool;
 };
 
 extern player_hud* g_player_hud;

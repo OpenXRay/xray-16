@@ -240,7 +240,12 @@ void CCustomOutfit::ApplySkinModel(CActor* pActor, bool bDress, bool bHUDOnly)
         }
 
         if (pActor == Level().CurrentViewEntity())
-            g_player_hud->load(pSettings->r_string(cNameSect(), "player_hud_section"));
+        {
+            if (pSettings->line_exist(cNameSect(), "player_hud_section"))
+                g_player_hud->load(pSettings->r_string(cNameSect(), "player_hud_section"));
+            else
+                g_player_hud->load_default();
+        }
     }
     else
     {

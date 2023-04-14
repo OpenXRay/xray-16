@@ -1122,20 +1122,19 @@ void CWeaponMagazined::PlayAnimHide()
 
 void CWeaponMagazined::PlayAnimReload()
 {
-    auto state = GetState();
+    const auto state = GetState();
     VERIFY(state == eReload);
     if (bMisfire)
-        if (isHUDAnimationExist("anm_reload_misfire"))
-            PlayHUDMotion("anm_reload_misfire", true, this, state);
+    {
+        if (cpcstr anim_name = WhichHUDAnimationExist("anm_reload_misfire", "anim_reload_misfire"))
+            PlayHUDMotion(anim_name, true, this, state);
         else
             PlayHUDMotion("anm_reload", "anim_reload", true, this, state);
+    }
     else
     {
-        if (iAmmoElapsed == 0)
-            if (isHUDAnimationExist("anm_reload_empty"))
-                PlayHUDMotion("anm_reload_empty", true, this, state);
-            else
-                PlayHUDMotion("anm_reload", "anim_reload", true, this, state);
+        if (cpcstr anim_name = iAmmoElapsed == 0 ? WhichHUDAnimationExist("anm_reload_empty", "anim_reload_empty") : nullptr)
+            PlayHUDMotion(anim_name, true, this, state);
         else
             PlayHUDMotion("anm_reload", "anim_reload", true, this, state);
     }
