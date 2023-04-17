@@ -340,7 +340,7 @@ void R_dsgraph_structure::r_dsgraph_render_subspace(IRender_Sector* _sector, CFr
 {
     VERIFY(_sector);
     PIX_EVENT(r_dsgraph_render_subspace);
-    RImplementation.marker++; // !!! critical here
+    RImplementation.dsgraph.marker++; // !!! critical here
 
     if (_precise_portals && RImplementation.rmPortals)
     {

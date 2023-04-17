@@ -414,8 +414,6 @@ public:
     void rmFar() override;
     void rmNormal() override;
 
-    u32 active_phase() override { return phase; }
-
     // Constructor/destructor/loader
     CRender();
     ~CRender() override;

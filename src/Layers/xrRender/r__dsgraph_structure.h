@@ -7,19 +7,17 @@ public:
     virtual void rfeedback_static(dxRender_Visual* V) = 0;
 };
 
-class R_dsgraph_structure
+struct R_dsgraph_structure
 {
     R_feedback* val_feedback{}; // feedback for geometry being rendered
     u32 val_feedback_breakp{}; // breakpoint
     xr_vector<Fbox3>* val_recorder; // coarse structure recorder
 
-public:
     u32 phase{};
     u32 marker{};
     bool pmask[2];
     bool pmask_wmark;
 
-public:
     // Dynamic scene graph
     // R_dsgraph::mapNormal_T										mapNormal	[2]		;	// 2==(priority/2)
     R_dsgraph::mapNormalPasses_T mapNormalPasses[2]; // 2==(priority/2)
@@ -48,9 +46,7 @@ public:
 
     u32 counter_S{};
     u32 counter_D{};
-    BOOL b_loaded{};
 
-public:
     void set_Feedback(R_feedback* V, u32 id)
     {
         val_feedback_breakp = id;
@@ -69,7 +65,6 @@ public:
     }
     void clear_Counters() { counter_S = counter_D = 0; }
 
-public:
     R_dsgraph_structure()
     {
         r_pmask(true, true);
@@ -113,12 +108,10 @@ public:
         pmask_wmark = _wm;
     }
 
-protected:
     void add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
     void add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility
     void add_leafs_Static(dxRender_Visual* pVisual); // if detected node's full visibility
 
-public:
     void r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center);
     void r_dsgraph_insert_static(dxRender_Visual* pVisual);
 

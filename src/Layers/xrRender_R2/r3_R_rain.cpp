@@ -261,15 +261,17 @@ void CRender::render_rain()
 
         // Begin SMAP-render
         {
-            VERIFY2(mapNormalPasses[1][0].empty() && mapMatrixPasses[1][0].empty() && mapSorted.empty(), "Special should be empty at this stage, but it's not empty...");
+            VERIFY2(dsgraph.mapNormalPasses[1][0].empty() && dsgraph.mapMatrixPasses[1][0].empty() &&
+                    dsgraph.mapSorted.empty(),
+                "Special should be empty at this stage, but it's not empty...");
             HOM.Disable();
-            phase = PHASE_SMAP;
-            r_pmask(true, false);
+            dsgraph.phase = PHASE_SMAP;
+            dsgraph.r_pmask(true, false);
         }
 
         // Fill the database
         // r_dsgraph_render_subspace				(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
-        r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, FALSE);
+        dsgraph.r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, FALSE);
 
         // Finalize & Cleanup
         RainLight.X.D.combine = cull_xform;
@@ -277,15 +279,16 @@ void CRender::render_rain()
         // Render shadow-map
         //. !!! We should clip based on shrinked frustum (again)
         {
-            bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
-            bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
+            bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+            bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+                !dsgraph.mapSorted.empty();
             if (bNormal || bSpecial)
             {
                 Target->phase_smap_direct(&RainLight, SE_SUN_RAIN_SMAP);
                 RCache.set_xform_world(Fidentity);
                 RCache.set_xform_view(Fidentity);
                 RCache.set_xform_project(RainLight.X.D.combine);
-                r_dsgraph_render_graph(0);
+                dsgraph.r_dsgraph_render_graph(0);
                 // if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))
                 //	Details->Render					()	;
             }
@@ -295,7 +298,7 @@ void CRender::render_rain()
     // End SMAP-render
     {
         //		fuckingsun->svis.end					();
-        r_pmask(true, false);
+        dsgraph.r_pmask(true, false);
     }
 
     // Restore XForms

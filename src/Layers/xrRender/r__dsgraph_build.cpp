@@ -36,9 +36,9 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_V
 {
     CRender& RI = RImplementation;
 
-    if (pVisual->vis.marker == RI.marker)
+    if (pVisual->vis.marker == marker)
         return;
-    pVisual->vis.marker = RI.marker;
+    pVisual->vis.marker = marker;
 
 #if RENDER == R_R1
     if (RI.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))
@@ -147,9 +147,9 @@ void R_dsgraph_structure::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 {
     CRender& RI = RImplementation;
 
-    if (pVisual->vis.marker == RI.marker)
+    if (pVisual->vis.marker == marker)
         return;
-    pVisual->vis.marker = RI.marker;
+    pVisual->vis.marker = marker;
 
 #if RENDER == R_R1
     if (RI.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))

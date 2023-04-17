@@ -432,19 +432,20 @@ void CRender::render_sun()
     // Begin SMAP-render
     {
         HOM.Disable();
-        phase = PHASE_SMAP;
+        dsgraph.phase = PHASE_SMAP;
         if (o.Tshadows)
-            r_pmask(true, true);
+            dsgraph.r_pmask(true, true);
         else
-            r_pmask(true, false);
+            dsgraph.r_pmask(true, false);
         //		fuckingsun->svis.begin					();
     }
 
     // Fill the database
     xr_vector<Fbox3>& s_receivers = main_coarse_structure;
     s_casters.reserve(s_receivers.size());
-    set_Recorder(&s_casters);
-    r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
+    dsgraph.set_Recorder(&s_casters);
+    dsgraph.r_dsgraph_render_subspace(
+        m_largest_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
 
     // IGNORE PORTALS
     if (ps_r2_ls_flags.test(R2FLAG_SUN_IGNORE_PORTALS))
@@ -455,7 +456,7 @@ void CRender::render_sun()
             add_Geometry(root, cull_frustum);
         }
     }
-    set_Recorder(nullptr);
+    dsgraph.set_Recorder(nullptr);
 
     //	Prepare to interact with D3DX code
     const glm::mat4 m_View = glm::make_mat4x4(&Device.mView.m[0][0]);
@@ -781,22 +782,23 @@ void CRender::render_sun()
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
-        bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
-        bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
+        bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+        bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+            !dsgraph.mapSorted.empty();
         if (bNormal || bSpecial)
         {
             Target->phase_smap_direct(fuckingsun, SE_SUN_FAR);
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(fuckingsun->X.D.combine);
-            r_dsgraph_render_graph(0);
+            dsgraph.r_dsgraph_render_graph(0);
             fuckingsun->X.D.transluent = FALSE;
             if (bSpecial)
             {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_FAR);
-                r_dsgraph_render_graph(1); // normal level, secondary priority
-                r_dsgraph_render_sorted(); // strict-sorted geoms
+                dsgraph.r_dsgraph_render_graph(1); // normal level, secondary priority
+                dsgraph.r_dsgraph_render_sorted(); // strict-sorted geoms
             }
         }
     }
@@ -804,7 +806,7 @@ void CRender::render_sun()
     // End SMAP-render
     {
         //		fuckingsun->svis.end					();
-        r_pmask(true, false);
+        dsgraph.r_pmask(true, false);
     }
 
     // Accumulate
@@ -951,18 +953,21 @@ void CRender::render_sun_near()
 
     // Begin SMAP-render
     {
-        VERIFY2(mapNormalPasses[1][0].empty() && mapMatrixPasses[1][0].empty() && mapSorted.empty(), "Special should be empty at this stage, but it's not empty...");
+        VERIFY2(
+            dsgraph.mapNormalPasses[1][0].empty() && dsgraph.mapMatrixPasses[1][0].empty() && dsgraph.mapSorted.empty(),
+            "Special should be empty at this stage, but it's not empty...");
         HOM.Disable();
-        phase = PHASE_SMAP;
+        dsgraph.phase = PHASE_SMAP;
         if (o.Tshadows)
-            r_pmask(true, true);
+            dsgraph.r_pmask(true, true);
         else
-            r_pmask(true, false);
+            dsgraph.r_pmask(true, false);
         //		fuckingsun->svis.begin					();
     }
 
     // Fill the database
-    r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
+    dsgraph.r_dsgraph_render_subspace(
+        m_largest_sector, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = *(Fmatrix*)glm::value_ptr(cull_xform);
@@ -970,15 +975,16 @@ void CRender::render_sun_near()
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
-        bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
-        bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
+        bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+        bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+            !dsgraph.mapSorted.empty();
         if (bNormal || bSpecial)
         {
             Target->phase_smap_direct(fuckingsun, SE_SUN_NEAR);
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(fuckingsun->X.D.combine);
-            r_dsgraph_render_graph(0);
+            dsgraph.r_dsgraph_render_graph(0);
             if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
                 Details->Render();
             fuckingsun->X.D.transluent = FALSE;
@@ -986,8 +992,8 @@ void CRender::render_sun_near()
             {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_NEAR);
-                r_dsgraph_render_graph(1); // normal level, secondary priority
-                r_dsgraph_render_sorted(); // strict-sorted geoms
+                dsgraph.r_dsgraph_render_graph(1); // normal level, secondary priority
+                dsgraph.r_dsgraph_render_sorted(); // strict-sorted geoms
             }
         }
     }
@@ -995,7 +1001,7 @@ void CRender::render_sun_near()
     // End SMAP-render
     {
         //		fuckingsun->svis.end					();
-        r_pmask(true, false);
+        dsgraph.r_pmask(true, false);
     }
 
     // Accumulate
@@ -1263,18 +1269,20 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
     // Begin SMAP-render
     {
-        VERIFY2(mapNormalPasses[1][0].empty() && mapMatrixPasses[1][0].empty() && mapSorted.empty(), "Special should be empty at this stage, but it's not empty...");
+        VERIFY2(
+            dsgraph.mapNormalPasses[1][0].empty() && dsgraph.mapMatrixPasses[1][0].empty() && dsgraph.mapSorted.empty(),
+            "Special should be empty at this stage, but it's not empty...");
         HOM.Disable();
-        phase = PHASE_SMAP;
+        dsgraph.phase = PHASE_SMAP;
         if (o.Tshadows)
-            r_pmask(true, true);
+            dsgraph.r_pmask(true, true);
         else
-            r_pmask(true, false);
+            dsgraph.r_pmask(true, false);
         //		fuckingsun->svis.begin					();
     }
 
     // Fill the database
-    r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
+    dsgraph.r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = cull_xform;
@@ -1282,15 +1290,16 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
-        bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
-        bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
+        bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+        bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+            !dsgraph.mapSorted.empty();
         if (bNormal || bSpecial)
         {
             Target->phase_smap_direct(fuckingsun, SE_SUN_FAR);
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(fuckingsun->X.D.combine);
-            r_dsgraph_render_graph(0);
+            dsgraph.r_dsgraph_render_graph(0);
             if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
                 Details->Render();
             fuckingsun->X.D.transluent = FALSE;
@@ -1298,8 +1307,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
             {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_FAR);
-                r_dsgraph_render_graph(1); // normal level, secondary priority
-                r_dsgraph_render_sorted(); // strict-sorted geoms
+                dsgraph.r_dsgraph_render_graph(1); // normal level, secondary priority
+                dsgraph.r_dsgraph_render_sorted(); // strict-sorted geoms
             }
         }
     }
@@ -1307,7 +1316,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     // End SMAP-render
     {
         //		fuckingsun->svis.end					();
-        r_pmask(true, false);
+        dsgraph.r_pmask(true, false);
     }
 
     // Accumulate
