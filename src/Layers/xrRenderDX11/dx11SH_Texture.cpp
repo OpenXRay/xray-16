@@ -471,7 +471,7 @@ void CTexture::Load()
         }
     }
 
-#if DEBUG
+#ifdef DEBUG
     if (pSurface)
     {
         pSurface->SetPrivateData(WKPDID_D3DDebugObjectName, cName.size(), cName.c_str());

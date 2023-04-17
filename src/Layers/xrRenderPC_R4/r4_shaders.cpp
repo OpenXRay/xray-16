@@ -21,7 +21,7 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
         return E_FAIL;
     }
 
-#if DEBUG
+#ifdef DEBUG
     if (result->sh)
     {
         result->sh->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(file_name), file_name);
