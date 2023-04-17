@@ -1,7 +1,9 @@
 #include "StdAfx.h"
+
 #include "UIPdaMsgListItem.h"
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
+#include "UIHelper.h"
 
 void CUIPdaMsgListItem::SetFont(CGameFont* pFont)
 {
@@ -19,12 +21,17 @@ void CUIPdaMsgListItem::InitPdaMsgListItem(const Fvector2& size)
     AttachChild(&UIIcon);
     CUIXmlInit::InitStatic(uiXml, "icon_static", 0, &UIIcon);
 
-    AttachChild(&UITimeText);
-    CUIXmlInit::InitTextWnd(uiXml, "time_static", 0, &UITimeText);
+    if (CUIXmlInit::InitTextWnd(uiXml, "time_static", 0, &UITimeText, false))
+        AttachChild(&UITimeText);
 
-    AttachChild(&UICaptionText);
-    CUIXmlInit::InitTextWnd(uiXml, "caption_static", 0, &UICaptionText);
+    if (CUIXmlInit::InitTextWnd(uiXml, "caption_static", 0, &UICaptionText, false))
+        AttachChild(&UICaptionText);
 
-    AttachChild(&UIMsgText);
-    CUIXmlInit::InitTextWnd(uiXml, "msg_static", 0, &UIMsgText);
+    if (CUIXmlInit::InitTextWnd(uiXml, "msg_static", 0, &UIMsgText, false) ||
+        CUIXmlInit::InitTextWnd(uiXml, "text_static", 0, &UIMsgText, false))
+    {
+        AttachChild(&UIMsgText);
+    }
+
+    UIHelper::CreateStatic(uiXml, "name_static", this, false);
 }
