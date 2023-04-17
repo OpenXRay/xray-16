@@ -171,7 +171,7 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
 
         .def("clear_game_news", &CScriptGameObject::ClearGameNews)
 
-        .def("give_talk_message", (void (CScriptGameObject::*)(cpcstr, cpcstr, Frect, cpcstr))
+        .def("give_talk_message", (void (CScriptGameObject::*)(pcstr, pcstr, Frect, pcstr))
             (&CScriptGameObject::AddIconedTalkMessage))
 
         .def("give_talk_message", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR))

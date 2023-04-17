@@ -329,7 +329,7 @@ public:
 
     void AddIconedTalkMessage_old(LPCSTR text, LPCSTR texture_name, LPCSTR templ_name){}
     void AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
-    void AddIconedTalkMessage(cpcstr text, cpcstr texture_name, Frect tex_rect, cpcstr templ_name);
+    void AddIconedTalkMessage(pcstr text, pcstr texture_name, Frect tex_rect, pcstr templ_name);
 
     //предикаты наличия/отсутствия порции информации у персонажа
     bool HasInfo(LPCSTR info_id);

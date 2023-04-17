@@ -76,7 +76,7 @@ bool CScriptGameObject::DisableInfoPortion(LPCSTR info_id)
     return true;
 }
 
-void _AddIconedTalkMessage(cpcstr text, cpcstr texture_name, const Frect& tex_rect, cpcstr templ_name)
+void _AddIconedTalkMessage(pcstr text, pcstr texture_name, const Frect& tex_rect, pcstr templ_name)
 {
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
     if (!pGameSP)
@@ -102,7 +102,7 @@ void _AddIconedTalkMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPC
     }
 }
 
-void CScriptGameObject::AddIconedTalkMessage(cpcstr text, cpcstr texture_name, Frect tex_rect, cpcstr templ_name)
+void CScriptGameObject::AddIconedTalkMessage(pcstr text, pcstr texture_name, Frect tex_rect, pcstr templ_name)
 {
     _AddIconedTalkMessage(text, texture_name, tex_rect, templ_name);
 }
