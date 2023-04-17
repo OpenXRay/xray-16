@@ -10,7 +10,6 @@ public:
     u32 Environment; // source environment
     float Room; // room effect level at low frequencies
     float RoomHF; // room effect high-frequency level re. low frequency level
-    float RoomLF;
     float RoomRolloffFactor; // like DS3D flRolloffFactor but for room effect
     float DecayTime; // reverberation decay time at low frequencies
     float DecayHFRatio; // high-frequency to low-frequency decay time ratio

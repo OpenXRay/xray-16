@@ -36,9 +36,8 @@ void CSoundRender_Environment::set_default()
         EFX_REVERB_PRESET_GENERIC
     };
 
-    Room = AL_EAXREVERB_MIN_GAIN; // reverbs->flGain;
+    Room = reverbs->flGain;
     RoomHF = reverbs->flGainHF;
-    RoomLF = reverbs->flGainLF;
     Density = reverbs->flDensity;
     RoomRolloffFactor = reverbs->flRoomRolloffFactor;
     DecayTime = reverbs->flDecayTime;
@@ -77,7 +76,6 @@ void CSoundRender_Environment::lerp(CSoundRender_Environment& A, CSoundRender_En
 
     Room = fi * A.Room + f * B.Room;
     RoomHF = fi * A.RoomHF + f * B.RoomHF;
-    RoomLF = fi * A.RoomLF + f * B.RoomLF;
     RoomRolloffFactor = fi * A.RoomRolloffFactor + f * B.RoomRolloffFactor;
     DecayTime = fi * A.DecayTime + f * B.DecayTime;
     DecayHFRatio = fi * A.DecayHFRatio + f * B.DecayHFRatio;
@@ -175,7 +173,6 @@ bool CSoundRender_Environment::load(IReader* fs)
 
         Room = fs->r_float();
         RoomHF = fs->r_float();
-        RoomLF = fs->r_float();
         RoomRolloffFactor = fs->r_float();
         DecayTime = fs->r_float();
         DecayHFRatio = fs->r_float();
@@ -196,9 +193,7 @@ bool CSoundRender_Environment::load(IReader* fs)
         DecayHFLimit = fs->r_u32();
         EchoTime = fs->r_float();
         EchoDepth = fs->r_float();
-        //ReflectionsPan = fs->r_vec3();
         ReverbDelay = fs->r_float();
-        //ReverbPan = fs->r_vec3();
         DecayLFRatio = fs->r_float();
         ModulationTime = fs->r_float();
         ModulationDepth = fs->r_float();
