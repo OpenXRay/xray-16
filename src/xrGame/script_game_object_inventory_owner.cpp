@@ -116,7 +116,7 @@ void _give_news(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int
 
 void CScriptGameObject::GiveGameNews(LPCSTR caption, LPCSTR news, LPCSTR texture_name, int delay, int show_time)
 {
-    GiveGameNews(caption, news, texture_name, delay, show_time, 0);
+    GiveGameNews(caption, news, texture_name, delay, show_time, GAME_NEWS_DATA::eNews);
 }
 
 void CScriptGameObject::GiveGameNews(
