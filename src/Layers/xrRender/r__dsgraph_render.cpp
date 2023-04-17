@@ -31,7 +31,7 @@ bool cmp_pass(const T& left, const T& right)
     return left->second.ssa >= right->second.ssa;
 }
 
-void R_dsgraph_structure::r_dsgraph_render_graph(u32 _priority)
+void R_dsgraph_structure::render_graph(u32 _priority)
 {
     PIX_EVENT(r_dsgraph_render_graph);
     RImplementation.BasicStats.Primitives.Begin(); // XXX: Refactor a bit later
@@ -228,7 +228,7 @@ ICF void sort_back_to_front_render_and_clean(T& vec)
 
 //////////////////////////////////////////////////////////////////////////
 // HUD render
-void R_dsgraph_structure::r_dsgraph_render_hud()
+void R_dsgraph_structure::render_hud()
 {
     PIX_EVENT(r_dsgraph_render_hud);
 
@@ -240,11 +240,11 @@ void R_dsgraph_structure::r_dsgraph_render_hud()
 
 #if RENDER == R_R1
     if (g_hud && g_hud->RenderActiveItemUIQuery())
-        r_dsgraph_render_hud_ui(); // hud ui
+        render_hud_ui(); // hud ui
 #endif
 }
 
-void R_dsgraph_structure::r_dsgraph_render_hud_ui()
+void R_dsgraph_structure::render_hud_ui()
 {
     VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
 
@@ -274,7 +274,7 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void R_dsgraph_structure::r_dsgraph_render_sorted()
+void R_dsgraph_structure::render_sorted()
 {
     PIX_EVENT(r_dsgraph_render_sorted);
 
@@ -289,7 +289,7 @@ void R_dsgraph_structure::r_dsgraph_render_sorted()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void R_dsgraph_structure::r_dsgraph_render_emissive()
+void R_dsgraph_structure::render_emissive()
 {
 #if RENDER != R_R1
     PIX_EVENT(r_dsgraph_render_emissive);
@@ -306,7 +306,7 @@ void R_dsgraph_structure::r_dsgraph_render_emissive()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void R_dsgraph_structure::r_dsgraph_render_wmarks()
+void R_dsgraph_structure::render_wmarks()
 {
 #if RENDER != R_R1
     PIX_EVENT(r_dsgraph_render_wmarks);
@@ -317,7 +317,7 @@ void R_dsgraph_structure::r_dsgraph_render_wmarks()
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
-void R_dsgraph_structure::r_dsgraph_render_distort()
+void R_dsgraph_structure::render_distort()
 {
     PIX_EVENT(r_dsgraph_render_distort);
 
@@ -326,16 +326,16 @@ void R_dsgraph_structure::r_dsgraph_render_distort()
 
 //////////////////////////////////////////////////////////////////////////
 // sub-space rendering - shortcut to render with frustum extracted from matrix
-void R_dsgraph_structure::r_dsgraph_render_subspace(
+void R_dsgraph_structure::render_subspace(
     IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     CFrustum temp;
     temp.CreateFromMatrix(mCombined, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
-    r_dsgraph_render_subspace(_sector, &temp, mCombined, _cop, _dynamic, _precise_portals);
+    render_subspace(_sector, &temp, mCombined, _cop, _dynamic, _precise_portals);
 }
 
 // sub-space rendering - main procedure
-void R_dsgraph_structure::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined,
+void R_dsgraph_structure::render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined,
     Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     VERIFY(_sector);
@@ -370,7 +370,7 @@ void R_dsgraph_structure::r_dsgraph_render_subspace(IRender_Sector* _sector, CFr
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
                 const auto& view = sector->r_frustums[v_it];
-                add_Static(root, view, view.getMask());
+                add_static(root, view, view.getMask());
             }
         }
     }
@@ -436,7 +436,7 @@ void R_dsgraph_structure::r_dsgraph_render_subspace(IRender_Sector* _sector, CFr
 #include "SkeletonCustom.h"
 #include "FLOD.h"
 
-void R_dsgraph_structure::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
+void R_dsgraph_structure::render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
 {
     PIX_EVENT(r_dsgraph_render_R1_box);
 

@@ -130,7 +130,7 @@ void CRender::destroy()
     //*** Components
     xr_delete(Target);
     Device.seqFrame.Remove(this);
-    dsgraph.r_dsgraph_destroy();
+    dsgraph.destroy();
 }
 
 void CRender::reset_begin()
@@ -317,11 +317,11 @@ bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     set_Object(root);
-    dsgraph.add_leafs_Dynamic(root, (dxRender_Visual*)V, m);
+    dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
 }
 void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
 {
-    dsgraph.add_Static((dxRender_Visual*)V, view, view.getMask());
+    dsgraph.add_static((dxRender_Visual*)V, view, view.getMask());
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
@@ -684,11 +684,11 @@ void CRender::Render()
     Target->Begin();
     o.vis_intersect = FALSE;
     dsgraph.phase = PHASE_NORMAL;
-    dsgraph.r_dsgraph_render_hud(); // hud
-    dsgraph.r_dsgraph_render_graph(0); // normal level
+    dsgraph.render_hud(); // hud
+    dsgraph.render_graph(0); // normal level
     if (Details)
         Details->Render(); // grass / details
-    dsgraph.r_dsgraph_render_lods(true, false); // lods - FB
+    dsgraph.render_lods(true, false); // lods - FB
 
     g_pGamePersistent->Environment().RenderSky(); // sky / sun
     g_pGamePersistent->Environment().RenderClouds(); // clouds
@@ -710,11 +710,11 @@ void CRender::Render()
     if (L_Shadows)
         L_Shadows->render(); // ... and shadows
     BasicStats.ShadowsRender.End();
-    dsgraph.r_dsgraph_render_lods(false, true); // lods - FB
-    dsgraph.r_dsgraph_render_graph(1); // normal level, secondary priority
+    dsgraph.render_lods(false, true); // lods - FB
+    dsgraph.render_graph(1); // normal level, secondary priority
     L_Dynamic->render(1); // additional light sources, secondary priority
     PortalTraverser.fade_render(); // faded-portals
-    dsgraph.r_dsgraph_render_sorted(); // strict-sorted geoms
+    dsgraph.render_sorted(); // strict-sorted geoms
     BasicStats.Glows.Begin();
     if (L_Glows)
         L_Glows->Render(); // glows

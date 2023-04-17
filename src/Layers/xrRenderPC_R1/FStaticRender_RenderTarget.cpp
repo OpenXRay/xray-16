@@ -410,7 +410,7 @@ void CRenderTarget::phase_distortion()
     RCache.ClearRT(rt_distort, color_rgba(127, 127, 127, 127));
 
     if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->OnRenderPPUI_query())
-        RImplementation.dsgraph.r_dsgraph_render_distort();
+        RImplementation.dsgraph.render_distort();
     else
         RImplementation.dsgraph.mapDistort.clear();
 

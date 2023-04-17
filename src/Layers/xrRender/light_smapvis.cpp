@@ -66,8 +66,8 @@ void smapvis::end()
         {
             RImplementation.occq_begin(testQ_id);
             RImplementation.dsgraph.marker += 1;
-            RImplementation.dsgraph.r_dsgraph_insert_static(testQ_V);
-            RImplementation.dsgraph.r_dsgraph_render_graph(0);
+            RImplementation.dsgraph.insert_static(testQ_V);
+            RImplementation.dsgraph.render_graph(0);
             RImplementation.occq_end(testQ_id);
             testQ_frame = Device.dwFrame + 1; // get result on next frame
         }

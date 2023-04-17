@@ -403,7 +403,7 @@ void CRender::render_sun()
     xr_vector<Fbox3>& s_receivers = main_coarse_structure;
     s_casters.reserve(s_receivers.size());
     dsgraph.set_Recorder(&s_casters);
-    dsgraph.r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
+    dsgraph.render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // IGNORE PORTALS
     if (ps_r2_ls_flags.test(R2FLAG_SUN_IGNORE_PORTALS))
@@ -716,14 +716,14 @@ void CRender::render_sun()
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(fuckingsun->X.D.combine);
-            dsgraph.r_dsgraph_render_graph(0);
+            dsgraph.render_graph(0);
             fuckingsun->X.D.transluent = FALSE;
             if (bSpecial)
             {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_FAR);
-                dsgraph.r_dsgraph_render_graph(1); // normal level, secondary priority
-                dsgraph.r_dsgraph_render_sorted(); // strict-sorted geoms
+                dsgraph.render_graph(1); // normal level, secondary priority
+                dsgraph.render_sorted(); // strict-sorted geoms
             }
         }
     }
@@ -932,7 +932,7 @@ void CRender::render_sun_near()
     }
 
     // Fill the database
-    dsgraph.r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
+    dsgraph.render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = cull_xform;
@@ -949,7 +949,7 @@ void CRender::render_sun_near()
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(fuckingsun->X.D.combine);
-            dsgraph.r_dsgraph_render_graph(0);
+            dsgraph.render_graph(0);
             if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
                 Details->Render();
             fuckingsun->X.D.transluent = FALSE;
@@ -957,8 +957,8 @@ void CRender::render_sun_near()
             {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_NEAR);
-                dsgraph.r_dsgraph_render_graph(1); // normal level, secondary priority
-                dsgraph.r_dsgraph_render_sorted(); // strict-sorted geoms
+                dsgraph.render_graph(1); // normal level, secondary priority
+                dsgraph.render_sorted(); // strict-sorted geoms
             }
         }
     }
@@ -1269,7 +1269,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     }
 
     // Fill the database
-    dsgraph.r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
+    dsgraph.render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = cull_xform;
@@ -1286,7 +1286,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(fuckingsun->X.D.combine);
-            dsgraph.r_dsgraph_render_graph(0);
+            dsgraph.render_graph(0);
             if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
                 Details->Render();
             fuckingsun->X.D.transluent = FALSE;
@@ -1294,8 +1294,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
             {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_FAR);
-                dsgraph.r_dsgraph_render_graph(1); // normal level, secondary priority
-                dsgraph.r_dsgraph_render_sorted(); // strict-sorted geoms
+                dsgraph.render_graph(1); // normal level, secondary priority
+                dsgraph.render_sorted(); // strict-sorted geoms
             }
         }
     }

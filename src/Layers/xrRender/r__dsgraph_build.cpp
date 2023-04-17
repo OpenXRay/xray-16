@@ -32,7 +32,7 @@ ICF float CalcSSA(float& distSQ, Fvector& C, float R)
     return R / distSQ;
 }
 
-void R_dsgraph_structure::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center)
+void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center)
 {
     CRender& RI = RImplementation;
 
@@ -143,7 +143,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_V
 #endif
 }
 
-void R_dsgraph_structure::r_dsgraph_insert_static(dxRender_Visual* pVisual)
+void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
 {
     CRender& RI = RImplementation;
 
@@ -236,7 +236,7 @@ void R_dsgraph_structure::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void R_dsgraph_structure::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform)
+void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform)
 {
     if (nullptr == pVisual)
         return;
@@ -252,11 +252,11 @@ void R_dsgraph_structure::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* 
         {
             PS::CParticleGroup::SItem& I = it;
             if (I._effect)
-                add_leafs_Dynamic(root, I._effect, xform);
+                add_leafs_dynamic(root, I._effect, xform);
             for (auto& pit : I._children_related)
-                add_leafs_Dynamic(root, pit, xform);
+                add_leafs_dynamic(root, pit, xform);
             for (auto& pit : I._children_free)
-                add_leafs_Dynamic(root, pit, xform);
+                add_leafs_dynamic(root, pit, xform);
         }
     }
         return;
@@ -269,7 +269,7 @@ void R_dsgraph_structure::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* 
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                          // [use shader data from parent model, rather than it childrens]
 
-            add_leafs_Dynamic(root, i, xform);
+            add_leafs_dynamic(root, i, xform);
         }
     }
         return;
@@ -290,7 +290,7 @@ void R_dsgraph_structure::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* 
         }
         if (_use_lod)
         {
-            add_leafs_Dynamic(root, pV->m_lod, xform);
+            add_leafs_dynamic(root, pV->m_lod, xform);
         }
         else
         {
@@ -300,7 +300,7 @@ void R_dsgraph_structure::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* 
             {
                 i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                              // [use shader data from parent model, rather than it childrens]
-                add_leafs_Dynamic(root, i, xform);
+                add_leafs_dynamic(root, i, xform);
             }
         }
     }
@@ -311,13 +311,13 @@ void R_dsgraph_structure::add_leafs_Dynamic(IRenderable* root, dxRender_Visual* 
         // Calculate distance to it's center
         Fvector Tpos;
         xform.transform_tiny(Tpos, pVisual->vis.sphere.P);
-        r_dsgraph_insert_dynamic(root, pVisual, xform, Tpos);
+        insert_dynamic(root, pVisual, xform, Tpos);
     }
         return;
     }
 }
 
-void R_dsgraph_structure::add_leafs_Static(dxRender_Visual* pVisual)
+void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
 {
     if (!RImplementation.HOM.visible(pVisual->vis))
         return;
@@ -354,7 +354,7 @@ void R_dsgraph_structure::add_leafs_Static(dxRender_Visual* pVisual)
         {
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                          // [use shader data from parent model, rather than it childrens]
-            add_leafs_Static(i);
+            add_leafs_static(i);
         }
     }
     return;
@@ -368,7 +368,7 @@ void R_dsgraph_structure::add_leafs_Static(dxRender_Visual* pVisual)
         {
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                          // [use shader data from parent model, rather than it childrens]
-            add_leafs_Static(i);
+            add_leafs_static(i);
         }
     }
     return;
@@ -395,7 +395,7 @@ void R_dsgraph_structure::add_leafs_Static(dxRender_Visual* pVisual)
             {
                 i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                              // [use shader data from parent model, rather than it childrens]
-                add_leafs_Static(i);
+                add_leafs_static(i);
             }
         }
     }
@@ -404,13 +404,13 @@ void R_dsgraph_structure::add_leafs_Static(dxRender_Visual* pVisual)
     case MT_TREE_ST:
     {
         // General type of visual
-        r_dsgraph_insert_static(pVisual);
+        insert_static(pVisual);
     }
     return;
     default:
     {
         // General type of visual
-        r_dsgraph_insert_static(pVisual);
+        insert_static(pVisual);
     }
     return;
     }
@@ -518,7 +518,7 @@ BOOL R_dsgraph_structure::add_Dynamic(dxRender_Visual* pVisual, u32 planes) // n
     return TRUE;
 }*/
 
-void R_dsgraph_structure::add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes)
+void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes)
 {
     vis_data& vis = pVisual->vis;
 
@@ -573,12 +573,12 @@ void R_dsgraph_structure::add_Static(dxRender_Visual* pVisual, const CFrustum& v
         if (fcvPartial == VIS)
         {
             for (auto& i : pV->children)
-                add_Static(i, view, planes);
+                add_static(i, view, planes);
         }
         else
         {
             for (auto& i : pV->children)
-                add_leafs_Static(i);
+                add_leafs_static(i);
         }
     }
     break;
@@ -591,12 +591,12 @@ void R_dsgraph_structure::add_Static(dxRender_Visual* pVisual, const CFrustum& v
         if (fcvPartial == VIS)
         {
             for (auto& i : pV->children)
-                add_Static(i, view, planes);
+                add_static(i, view, planes);
         }
         else
         {
             for (auto& i : pV->children)
-                add_leafs_Static(i);
+                add_leafs_static(i);
         }
     }
     break;
@@ -620,7 +620,7 @@ void R_dsgraph_structure::add_Static(dxRender_Visual* pVisual, const CFrustum& v
         {
             // Add all children, perform tests
             for (auto& i : pV->children)
-                add_leafs_Static(i);
+                add_leafs_static(i);
         }
     }
     break;
@@ -628,13 +628,13 @@ void R_dsgraph_structure::add_Static(dxRender_Visual* pVisual, const CFrustum& v
     case MT_TREE_PM:
     {
         // General type of visual
-        r_dsgraph_insert_static(pVisual);
+        insert_static(pVisual);
     }
         return;
     default:
     {
         // General type of visual
-        r_dsgraph_insert_static(pVisual);
+        insert_static(pVisual);
     }
     break;
     }

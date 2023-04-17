@@ -196,7 +196,7 @@ void CLightR_Manager::render_point(u32 _priority)
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.r_dsgraph_render_subspace(L->spatial.sector, L_combine, L_pos, true, true);
+        RImplementation.dsgraph.render_subspace(L->spatial.sector, L_combine, L_pos, true, true);
 
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(true, true);
@@ -211,9 +211,9 @@ void CLightR_Manager::render_point(u32 _priority)
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
             g_hud->Render_Last();
-        RImplementation.dsgraph.r_dsgraph_render_graph(_priority);
+        RImplementation.dsgraph.render_graph(_priority);
         if (bHUD && _priority == 0)
-            RImplementation.dsgraph.r_dsgraph_render_hud();
+            RImplementation.dsgraph.render_hud();
     }
     // ??? grass ???
 }
@@ -272,7 +272,7 @@ void CLightR_Manager::render_spot(u32 _priority)
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.r_dsgraph_render_subspace(L->spatial.sector, L_combine, L_pos, TRUE,
+        RImplementation.dsgraph.render_subspace(L->spatial.sector, L_combine, L_pos, TRUE,
             TRUE // precise portals
             );
 
@@ -291,9 +291,9 @@ void CLightR_Manager::render_spot(u32 _priority)
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
             g_hud->Render_Last();
-        RImplementation.dsgraph.r_dsgraph_render_graph(_priority);
+        RImplementation.dsgraph.render_graph(_priority);
         if (bHUD && _priority == 0)
-            RImplementation.dsgraph.r_dsgraph_render_hud();
+            RImplementation.dsgraph.render_hud();
         //RCache.set_ClipPlanes(false, &L_combine);
     }
     // ??? grass ???l

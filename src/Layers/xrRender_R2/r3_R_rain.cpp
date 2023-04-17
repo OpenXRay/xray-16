@@ -271,7 +271,7 @@ void CRender::render_rain()
 
         // Fill the database
         // r_dsgraph_render_subspace				(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
-        dsgraph.r_dsgraph_render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, FALSE);
+        dsgraph.render_subspace(m_largest_sector, &cull_frustum, cull_xform, cull_COP, FALSE);
 
         // Finalize & Cleanup
         RainLight.X.D.combine = cull_xform;
@@ -288,7 +288,7 @@ void CRender::render_rain()
                 RCache.set_xform_world(Fidentity);
                 RCache.set_xform_view(Fidentity);
                 RCache.set_xform_project(RainLight.X.D.combine);
-                dsgraph.r_dsgraph_render_graph(0);
+                dsgraph.render_graph(0);
                 // if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))
                 //	Details->Render					()	;
             }

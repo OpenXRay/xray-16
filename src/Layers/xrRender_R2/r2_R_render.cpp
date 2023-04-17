@@ -279,7 +279,7 @@ void CRender::Render()
         // flush
         Target->phase_scene_prepare();
         RCache.set_ColorWriteEnable(FALSE);
-        dsgraph.r_dsgraph_render_graph(0);
+        dsgraph.render_graph(0);
         RCache.set_ColorWriteEnable();
     }
     else
@@ -326,9 +326,9 @@ void CRender::Render()
         PIX_EVENT(DEFER_PART0_NO_SPLIT);
         // level, DO NOT SPLIT
         Target->phase_scene_begin();
-        dsgraph.r_dsgraph_render_hud();
-        dsgraph.r_dsgraph_render_graph(0);
-        dsgraph.r_dsgraph_render_lods(true, true);
+        dsgraph.render_hud();
+        dsgraph.render_graph(0);
+        dsgraph.render_lods(true, true);
         if (Details)
             Details->Render();
         Target->phase_scene_end();
@@ -338,7 +338,7 @@ void CRender::Render()
         PIX_EVENT(DEFER_PART0_SPLIT);
         // level, SPLIT
         Target->phase_scene_begin();
-        dsgraph.r_dsgraph_render_graph(0);
+        dsgraph.render_graph(0);
         Target->disable_aniso();
     }
 #ifdef USE_OGL
@@ -424,8 +424,8 @@ void CRender::Render()
 
         // level
         Target->phase_scene_begin();
-        dsgraph.r_dsgraph_render_hud();
-        dsgraph.r_dsgraph_render_lods(true, true);
+        dsgraph.render_hud();
+        dsgraph.render_lods(true, true);
         if (Details)
             Details->Render();
         Target->phase_scene_end();
@@ -434,7 +434,7 @@ void CRender::Render()
     if (g_hud && g_hud->RenderActiveItemUIQuery())
     {
         Target->phase_wallmarks();
-        dsgraph.r_dsgraph_render_hud_ui();
+        dsgraph.render_hud_ui();
     }
 
     // Wall marks
@@ -522,7 +522,7 @@ void CRender::Render()
 #endif // USE_DX9
         RCache.set_CullMode(CULL_CCW);
         RCache.set_ColorWriteEnable();
-        dsgraph.r_dsgraph_render_emissive();
+        dsgraph.render_emissive();
     }
 
     // Lighting, non dependant on OCCQ
@@ -562,9 +562,9 @@ void CRender::render_forward()
         render_main(Device.mFullTransform, false); //
         //	Igor: we don't want to render old lods on next frame.
         dsgraph.mapLOD.clear();
-        dsgraph.r_dsgraph_render_graph(1); // normal level, secondary priority
+        dsgraph.render_graph(1); // normal level, secondary priority
         PortalTraverser.fade_render(); // faded-portals
-        dsgraph.r_dsgraph_render_sorted(); // strict-sorted geoms
+        dsgraph.render_sorted(); // strict-sorted geoms
         g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
     }
 

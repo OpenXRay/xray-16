@@ -488,7 +488,7 @@ void CWallmarksEngine::Render()
     lock.Leave(); // Physics may add wallmarks in parallel with rendering
 
     // Level-wmarks
-    RImplementation.dsgraph.r_dsgraph_render_wmarks();
+    RImplementation.dsgraph.render_wmarks();
     RImplementation.BasicStats.Wallmarks.End();
 
     // Projection

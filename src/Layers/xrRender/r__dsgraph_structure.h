@@ -70,7 +70,7 @@ struct R_dsgraph_structure
         r_pmask(true, true);
     };
 
-    void r_dsgraph_destroy()
+    void destroy()
     {
         nrmPasses.clear();
         matPasses.clear();
@@ -108,25 +108,25 @@ struct R_dsgraph_structure
         pmask_wmark = _wm;
     }
 
-    void add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
-    void add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility
-    void add_leafs_Static(dxRender_Visual* pVisual); // if detected node's full visibility
+    void add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
+    void add_leafs_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility
+    void add_leafs_static(dxRender_Visual* pVisual); // if detected node's full visibility
 
-    void r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center);
-    void r_dsgraph_insert_static(dxRender_Visual* pVisual);
+    void insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center);
+    void insert_static(dxRender_Visual* pVisual);
 
     // render primitives
-    void r_dsgraph_render_graph(u32 _priority);
-    void r_dsgraph_render_hud();
-    void r_dsgraph_render_hud_ui();
-    void r_dsgraph_render_lods(bool _setup_zb, bool _clear);
-    void r_dsgraph_render_sorted();
-    void r_dsgraph_render_emissive();
-    void r_dsgraph_render_wmarks();
-    void r_dsgraph_render_distort();
-    void r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
+    void render_graph(u32 _priority);
+    void render_hud();
+    void render_hud_ui();
+    void render_lods(bool _setup_zb, bool _clear);
+    void render_sorted();
+    void render_emissive();
+    void render_wmarks();
+    void render_distort();
+    void render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
         BOOL _dynamic, BOOL _precise_portals = FALSE);
-    void r_dsgraph_render_subspace(
+    void render_subspace(
         IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
-    void r_dsgraph_render_R1_box(IRender_Sector* _sector, Fbox& _bb, int _element);
+    void render_R1_box(IRender_Sector* _sector, Fbox& _bb, int _element);
 };
