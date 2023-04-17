@@ -239,6 +239,10 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("switch_to_upgrade", &CScriptGameObject::SwitchToUpgrade)
         .def("switch_to_talk", &CScriptGameObject::SwitchToTalk)
         .def("run_talk_dialog", &CScriptGameObject::RunTalkDialog)
+        .def("run_talk_dialog", +[](CScriptGameObject* self, CScriptGameObject* pToWho)
+        {
+            self->RunTalkDialog(pToWho, false);
+        })
         .def("allow_break_talk_dialog", &CScriptGameObject::AllowBreakTalkDialog)
 
         .def("hide_weapon", &CScriptGameObject::HideWeapon)
