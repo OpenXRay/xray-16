@@ -21,6 +21,13 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
         return E_FAIL;
     }
 
+#if DEBUG
+    if (result->sh)
+    {
+        result->sh->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(file_name), file_name);
+    }
+#endif
+
     ID3DShaderReflection* pReflection = 0;
     _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 

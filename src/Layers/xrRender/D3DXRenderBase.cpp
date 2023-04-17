@@ -6,6 +6,11 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
+#if DEBUG
+#include <renderdoc/renderdoc_app.h>
+RENDERDOC_API_1_0_0* g_renderdoc_api;
+#endif
+
 void D3DXRenderBase::setGamma(float fGamma)
 {
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -132,6 +137,45 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 
 void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
+#if DEBUG && defined(USE_DX11)
+    if (!g_renderdoc_api)
+    {
+        HMODULE hModule = GetModuleHandleA("renderdoc.dll");
+        if (hModule == 0)
+        {
+            hModule = LoadLibraryA("renderdoc.dll");
+        }
+
+        if (hModule)
+        {
+            auto const RENDERDOC_GetAPI =
+                reinterpret_cast<pRENDERDOC_GetAPI>(GetProcAddress(hModule, "RENDERDOC_GetAPI"));
+            auto const Result =
+                RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_0_0, reinterpret_cast<void**>(&g_renderdoc_api));
+            if (Result == 1)
+            {
+                g_renderdoc_api->UnloadCrashHandler();
+
+                string_path FolderName;
+                FS.update_path(FolderName, "$app_data_root$", "captures\\openxray");
+                g_renderdoc_api->SetCaptureFilePathTemplate(FolderName);
+
+                RENDERDOC_InputButton CaptureButton[] = {eRENDERDOC_Key_PrtScrn};
+                g_renderdoc_api->SetCaptureKeys(CaptureButton, ARRAYSIZE(CaptureButton));
+
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_AllowVSync, 0);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_DebugOutputMute, 0);
+
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_RefAllResources, 1);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_CaptureCallstacks, 1);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_VerifyBufferAccess, 1);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_APIValidation, 1);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_CaptureAllCmdLists, 1);
+            }
+        }
+    }
+#endif
+
     HW.CreateDevice(hWnd);
 
     std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();

@@ -175,6 +175,13 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     }
     HW.stats_manager.increment_stats_rtarget(pSurface);
 
+#if DEBUG
+    if (pSurface)
+    {
+        pSurface->SetPrivateData(WKPDID_D3DDebugObjectName, cName.size(), cName.c_str());
+    }
+#endif
+
     // OK
     if (useAsDepth)
     {

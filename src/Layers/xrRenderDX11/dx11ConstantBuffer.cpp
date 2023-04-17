@@ -47,6 +47,13 @@ dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
     VERIFY(m_pBuffer);
     m_pBufferData = xr_malloc(Desc.Size);
     VERIFY(m_pBufferData);
+
+#if DEBUG
+    if (m_pBuffer)
+    {
+        m_pBuffer->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(Desc.Name), Desc.Name);
+    }
+#endif
 }
 
 bool dx11ConstantBuffer::Similar(dx11ConstantBuffer& _in)
