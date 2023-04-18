@@ -16,7 +16,7 @@ using doors::door;
 using doors::actor;
 using doors::door_state;
 
-static bool valid(door_state const state)
+[[maybe_unused]] static bool valid(door_state const state)
 {
     return (state == doors::door_state_open) || (state == doors::door_state_closed);
 }

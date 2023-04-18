@@ -5,13 +5,7 @@
 
 namespace award_system
 {
-stalker_flair::stalker_flair(game_state_accumulator* owner) : inherited(owner)
-{
-    m_art_spawn_time = 0;
-    m_art_take_time = 0;
-}
-
-u32 const stalker_flair::get_u32_param()
+u32 stalker_flair::get_u32_param()
 {
     if (!m_art_spawn_time || !m_art_take_time)
         return u32(-1);

@@ -18,10 +18,10 @@ class configs_verifyer
 public:
     configs_verifyer();
     ~configs_verifyer();
-    bool const verify(u8* data, u32 data_size, string256& diff);
+    bool verify(u8* data, u32 data_size, string256& diff);
 
 private:
-    bool const verify_dsign(u8* data, u32 data_size, crypto::xr_sha1::hash_t& sha_checksum);
+    bool verify_dsign(u8* data, u32 data_size, crypto::xr_sha1::hash_t& sha_checksum);
     LPCSTR get_diff(CInifile& received, CInifile& active_params, string256& dst_diff);
     LPCSTR get_section_diff(CInifile::Sect* sect_ptr, CInifile& active_params, string256& dst_diff);
     CMemoryWriter m_orig_config_body;

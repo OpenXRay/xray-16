@@ -65,9 +65,9 @@ xrGameSpyServer::EConnect xrGameSpyServer::Connect(shared_str& session_name, Gam
 
     if (0 == *(game->get_option_s(*session_name, "hname", NULL)))
     {
+#ifdef XR_PLATFORM_WINDOWS // XXX: add Linux implementation
         string1024 CompName;
         DWORD CompNameSize = 1024;
-#ifdef XR_PLATFORM_WINDOWS // XXX: add Linux implementation
         if (GetComputerName(CompName, &CompNameSize))
             HostName = CompName;
 #endif

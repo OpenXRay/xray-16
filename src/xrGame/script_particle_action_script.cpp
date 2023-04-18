@@ -28,6 +28,6 @@ SCRIPT_EXPORT(CScriptParticleAction, (),
             .def("set_position", &CScriptParticleAction::SetPosition)
             .def("set_angles", &CScriptParticleAction::SetAngles)
             .def("set_velocity", &CScriptParticleAction::SetVelocity)
-            .def("completed", (bool (CScriptParticleAction::*)())(&CScriptParticleAction::completed))
+            .def("completed", &CScriptAbstractAction::completed)
     ];
 });

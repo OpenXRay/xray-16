@@ -364,7 +364,7 @@ bool CScriptGameObject::in_current_loophole_range(Fvector object_position) const
     return (stalker->movement().in_current_loophole_range(object_position));
 }
 
-float const CScriptGameObject::idle_min_time() const
+float CScriptGameObject::idle_min_time() const
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -390,7 +390,7 @@ void CScriptGameObject::idle_min_time(float value)
     stalker->movement().idle_min_time(value);
 }
 
-float const CScriptGameObject::idle_max_time() const
+float CScriptGameObject::idle_max_time() const
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -416,7 +416,7 @@ void CScriptGameObject::idle_max_time(float value)
     stalker->movement().idle_max_time(value);
 }
 
-float const CScriptGameObject::lookout_min_time() const
+float CScriptGameObject::lookout_min_time() const
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
@@ -442,7 +442,7 @@ void CScriptGameObject::lookout_min_time(float value)
     stalker->movement().lookout_min_time(value);
 }
 
-float const CScriptGameObject::lookout_max_time() const
+float CScriptGameObject::lookout_max_time() const
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)

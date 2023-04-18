@@ -184,7 +184,7 @@ CLensFlare::CLensFlare()
 #endif
 
     string_path filePath;
-    if (FS.update_path(filePath, "$game_config$", "environment\\suns.ltx", false))
+    if (FS.exist(filePath, "$game_config$", "environment\\suns.ltx"))
         m_suns_config = xr_new<CInifile>(filePath, true, true, false);
 
     OnDeviceCreate();

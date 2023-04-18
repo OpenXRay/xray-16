@@ -10,7 +10,7 @@
 
 #include "alife_space.h"
 
-class CScriptActionCondition
+class CScriptActionCondition final
 {
 public:
     enum EActionFlags
@@ -26,14 +26,13 @@ public:
     };
 
 public:
-    u32 m_dwFlags;
-    ALife::_TIME_ID m_tLifeTime;
-    ALife::_TIME_ID m_tStartTime;
+    u32 m_dwFlags{};
+    ALife::_TIME_ID m_tLifeTime{ ALife::_TIME_ID(-1) };
+    ALife::_TIME_ID m_tStartTime{ ALife::_TIME_ID(-1) };
 
 public:
-    IC CScriptActionCondition();
+    IC CScriptActionCondition() = default;
     IC CScriptActionCondition(u32 dwFlags, double dTime = -1);
-    virtual ~CScriptActionCondition();
     IC void initialize();
 };
 

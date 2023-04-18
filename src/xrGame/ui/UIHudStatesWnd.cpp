@@ -21,9 +21,7 @@
 #include "xrUICore/XML/UITextureMaster.h"
 
 CUIHudStatesWnd::CUIHudStatesWnd()
-    : CUIWindow("CUIHudStatesWnd"),
-      m_last_health(0.0f), m_radia_self(0.0f), m_radia_hit(0.0f),
-      m_timer_1sec(0), m_b_force_update(true)
+    : CUIWindow("CUIHudStatesWnd"), m_b_force_update(true)
 {
     for (int i = 0; i < ALife::infl_max_count; ++i)
     {
@@ -37,14 +35,8 @@ CUIHudStatesWnd::CUIHudStatesWnd()
     m_zone_hit_type[ALife::infl_psi] = ALife::eHitTypeTelepatic;
     m_zone_hit_type[ALife::infl_electra] = ALife::eHitTypeShock;
 
-    m_zone_feel_radius_max = 0.0f;
-
     m_health_blink = pSettings->read_if_exists<float>("actor_condition", "hud_health_blink", 0.f);
     clamp(m_health_blink, 0.0f, 1.0f);
-
-    m_fake_indicators_update = false;
-    m_arrow = nullptr;
-    m_arrow_shadow = nullptr;
     //-	Load_section();
 }
 

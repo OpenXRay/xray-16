@@ -8,13 +8,6 @@
 
 #pragma once
 
-IC CScriptObjectAction::CScriptObjectAction() : m_dwQueueSize(0)
-{
-    m_tpObject = 0;
-    m_tGoalType = MonsterSpace::eObjectActionIdle;
-    m_bCompleted = true;
-}
-
 IC CScriptObjectAction::CScriptObjectAction(
     CScriptGameObject* tpLuaGameObject, MonsterSpace::EObjectAction tObjectActionType, u32 dwQueueSize)
 {

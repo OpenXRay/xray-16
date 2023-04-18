@@ -21,20 +21,19 @@ class CScriptGameObject;
 class CScriptWatchAction : public CScriptAbstractAction
 {
 public:
-    enum EGoalType
+    enum EGoalType : u32
     {
         eGoalTypeObject = u32(0),
         eGoalTypeWatchType,
         eGoalTypeDirection,
         eGoalTypeCurrent,
-        eGoalTypeDummy = u32(-1),
     };
 
 public:
-    IGameObject* m_tpObjectToWatch;
-    SightManager::ESightType m_tWatchType;
-    EGoalType m_tGoalType;
-    Fvector m_tWatchVector;
+    IGameObject* m_tpObjectToWatch{};
+    SightManager::ESightType m_tWatchType{ SightManager::eSightTypeCurrentDirection };
+    EGoalType m_tGoalType{ eGoalTypeCurrent };
+    Fvector m_tWatchVector{};
     shared_str m_bone_to_watch;
 
     // Searchlight
@@ -43,7 +42,7 @@ public:
     float vel_bone_y;
 
 public:
-    CScriptWatchAction();
+    CScriptWatchAction() = default;
     IC CScriptWatchAction(SightManager::ESightType tWatchType);
     IC CScriptWatchAction(SightManager::ESightType tWatchType, const Fvector& tDirection);
     IC CScriptWatchAction(
@@ -52,7 +51,6 @@ public:
     CScriptWatchAction(const Fvector& tTarget, float vel1, float vel2);
     IC CScriptWatchAction(CScriptGameObject* tpObjectToWatch, float vel1, float vel2);
     ///////////////////////////////////////////////////////////////////
-    virtual ~CScriptWatchAction();
     void SetWatchObject(CScriptGameObject* tpObjectToWatch);
     IC void SetWatchType(SightManager::ESightType tWatchType);
     IC void SetWatchDirection(const Fvector& tDirection);

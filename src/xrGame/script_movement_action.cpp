@@ -40,23 +40,6 @@ CScriptMovementAction::CScriptMovementAction(MonsterSpace::EBodyState tBodyState
     SetSpeed(fSpeed);
 }
 
-CScriptMovementAction::CScriptMovementAction()
-{
-    SetInputKeys(eInputKeyNone);
-    SetBodyState(MonsterSpace::eBodyStateStand);
-    SetMovementType(MonsterSpace::eMovementTypeStand);
-    SetPathType(DetailPathManager::eDetailPathTypeSmooth);
-    SetPatrolPath(0, "");
-    SetPatrolStart(ePatrolStartTypeNearest);
-    SetPatrolStop(ePatrolRouteTypeContinue);
-    SetPatrolRandom(true);
-    SetSpeed(0);
-    SetObjectToGo(0);
-    SetPosition(Fvector().set(0, 0, 0));
-    m_tGoalType = eGoalTypeDummy;
-    m_bCompleted = true;
-}
-
 CScriptMovementAction::CScriptMovementAction(Fvector* tPosition, float fSpeed)
 {
     SetBodyState(MonsterSpace::eBodyStateStand);
@@ -122,7 +105,6 @@ CScriptMovementAction::CScriptMovementAction(
     m_fDistToEnd = dist_to_end;
 }
 
-CScriptMovementAction::~CScriptMovementAction() {}
 void CScriptMovementAction::SetObjectToGo(CScriptGameObject* tpObjectToGo)
 {
     if (tpObjectToGo)

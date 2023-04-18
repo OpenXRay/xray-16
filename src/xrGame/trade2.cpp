@@ -157,12 +157,12 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool bFree)
 
     // computing condition factor
     // for "dead" weapon we use 10% from base cost, for "good" weapon we use full base cost
-    float condition_factor = powf(pItem->GetCondition() * 0.9f + .1f, 0.75f);
+    const float condition_factor = powf(pItem->GetCondition() * 0.9f + .1f, 0.75f);
 
     // computing relation factor
     float relation_factor;
 
-    CHARACTER_GOODWILL attitude = RELATION_REGISTRY().GetAttitude(pThis.inv_owner, pPartner.inv_owner);
+    const CHARACTER_GOODWILL attitude = RELATION_REGISTRY().GetAttitude(pThis.inv_owner, pPartner.inv_owner);
 
     if (NO_GOODWILL == attitude)
         relation_factor = 0.f;
@@ -171,21 +171,21 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool bFree)
 
     clamp(relation_factor, 0.f, 1.f);
 
-    const SInventoryOwner* _partner = 0;
+    //const SInventoryOwner* _partner = nullptr;
     bool buying = true;
-    bool is_actor = (pThis.type == TT_ACTOR) || (pPartner.type == TT_ACTOR);
+    bool is_actor = pThis.type == TT_ACTOR || pPartner.type == TT_ACTOR;
     if (is_actor)
     {
-        //.		buying				= (pPartner.type == TT_ACTOR);
+        // buying = (pPartner.type == TT_ACTOR);
         buying = b_buying;
-        _partner = &(buying ? pThis : pPartner);
+        // _partner = buying ? &pThis : &pPartner;
     }
     else
     {
         // rare case
-        _partner = &pPartner;
+        // _partner = &pPartner;
     }
-    //.	const SInventoryOwner	&partner = *_partner;
+    // const SInventoryOwner &partner = *_partner;
 
     // computing action factor
     const CTradeFactors* p_trade_factors;
@@ -217,12 +217,9 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool bFree)
     clamp(action_factor, _min(trade_factors.enemy_factor(), trade_factors.friend_factor()),
         _max(trade_factors.enemy_factor(), trade_factors.friend_factor()));
 
-// computing deficit_factor
-#if 0
-	float					deficit_factor = partner.inv_owner->deficit_factor(pItem->object().cNameSect());
-#else
-    float deficit_factor = 1.f;
-#endif
+    // computing deficit_factor
+    // float deficit_factor = partner.inv_owner->deficit_factor(pItem->object().cNameSect());
+    constexpr float deficit_factor = 1.f;
 
     // total price calculation
     u32 result = iFloor(base_cost * condition_factor * action_factor * deficit_factor);

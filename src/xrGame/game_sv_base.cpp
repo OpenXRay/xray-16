@@ -199,7 +199,7 @@ float game_sv_GameState::get_option_f(LPCSTR lst, LPCSTR name, float def)
     if (found)
     {
         float val;
-        int cnt = sscanf(found + xr_strlen(op), "%f", &val);
+        [[maybe_unused]] int cnt = sscanf(found + xr_strlen(op), "%f", &val);
         VERIFY(cnt == 1);
         return val;
         //.		return atoi	(strstr(lst,op)+xr_strlen(op));
@@ -476,7 +476,7 @@ void game_sv_GameState::ReadOptions(shared_str& options)
     }
 };
 //-----------------------------------------------------------
-static bool g_bConsoleCommandsCreated_SV_Base = false;
+
 void game_sv_GameState::ConsoleCommands_Create(){};
 
 void game_sv_GameState::ConsoleCommands_Clear(){};
@@ -984,14 +984,20 @@ void game_sv_GameState::OnRoundStart()
     m_bMapNeedRotation = false;
     m_bFastRestart = false;
 
-    for (int t = 0; t < TEAM_COUNT; t++)
+    for (auto& team_rpoints : rpoints)
     {
-        for (u32 i = 0; i < rpoints[t].size(); i++)
+        for (auto& rpoint : team_rpoints)
         {
-            RPoint rp = rpoints[t][i];
-            rp.bBlocked = false;
+            // XXX: examine the problem in the original code and fix
+#if 1
+            RPoint rp = rpoint; // XXX: creates a copy
+            rp.bBlocked = false; // XXX: changes a copy with no effect
+#else
+            rpoint.bBlocked = false; // XXX: correct code
+#endif
         }
-    };
+    }
+
     rpointsBlocked.clear();
 } // старт раунда
 
@@ -1079,85 +1085,92 @@ void game_sv_GameState::on_death(CSE_Abstract* e_dest, CSE_Abstract* e_src)
 extern Flags32 dbg_net_Draw_Flags;
 #endif
 
-void game_sv_GameState::OnRender(){
-#ifdef DEBUG
-/*Fmatrix T; T.identity();
-Fvector V0, V1;
-u32 TeamColors[TEAM_COUNT] = {color_xrgb(255, 0, 0), color_xrgb(0, 255, 0), color_xrgb(0, 0, 255), color_xrgb(255, 255,
-0)};
-//	u32 TeamColorsDist[TEAM_COUNT] = {color_argb(128, 255, 0, 0), color_argb(128, 0, 255, 0), color_argb(128, 0, 0,
-255), color_argb(128, 255, 255, 0)};
-
-if (dbg_net_Draw_Flags.test(dbg_draw_rp))
+void game_sv_GameState::OnRender()
 {
-    for (int t=0; t<TEAM_COUNT; t++)
+#ifdef DEBUG
+    /*
+    Fmatrix T;
+    T.identity();
+    Fvector V0, V1;
+    u32 TeamColors[TEAM_COUNT] = {color_xrgb(255, 0, 0), color_xrgb(0, 255, 0), color_xrgb(0, 0, 255), color_xrgb(255, 255, 0)};
+    // u32 TeamColorsDist[TEAM_COUNT] = {color_argb(128, 255, 0, 0), color_argb(128, 0, 255, 0), color_argb(128, 0, 0, 255), color_argb(128, 255, 255, 0)};
+
+    if (dbg_net_Draw_Flags.test(dbg_draw_rp))
     {
-        for (u32 i=0; i<rpoints[t].size(); i++)
+        for (int t=0; t<TEAM_COUNT; t++)
         {
-            RPoint rp = rpoints[t][i];
-            V1 = V0 = rp.P;
-            V1.y +=1.0f;
-
-            T.identity();
-            Level().debug_renderer().draw_line(Fidentity, V0, V1, TeamColors[t]);
-
-            bool Blocked = false;
-            for (u32 p_it=0; p_it<get_players_count(); ++p_it)
+            for (u32 i=0; i<rpoints[t].size(); i++)
             {
-                game_PlayerState* PS		=	get_it			(p_it);
-                if (!PS) continue;
-                if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) continue;
-                IGameObject* pPlayer = Level().Objects.net_Find(PS->GameID);
-                if (!pPlayer) continue;
+                RPoint rp = rpoints[t][i];
+                V1 = V0 = rp.P;
+                V1.y +=1.0f;
 
-                if (rp.P.distance_to(pPlayer->Position())<=0.4f)
+                T.identity();
+                Level().debug_renderer().draw_line(Fidentity, V0, V1, TeamColors[t]);
+
+                bool Blocked = false;
+                for (u32 p_it=0; p_it<get_players_count(); ++p_it)
                 {
-                    Blocked = true;
-                    break;
-                }
-            };
-            if (rp.bBlocked) continue;
+                    game_PlayerState* PS = get_it(p_it);
+                    if (!PS)
+                        continue;
+                    if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+                        continue;
+                    IGameObject* pPlayer = Level().Objects.net_Find(PS->GameID);
+                    if (!pPlayer)
+                        continue;
 
-            float r = .3f;
-            T.identity();
-            T.scale(r, r, r);
-            T.translate_add(rp.P);
-            Level().debug_renderer().draw_ellipse(T, TeamColors[t]);
-/*
-            r = rpoints_MinDist[t];
-            T.identity();
-            T.scale(r, r, r);
-            T.translate_add(rp.P);
-            Level().debug_renderer().draw_ellipse(T, TeamColorsDist[t]);
+                    if (rp.P.distance_to(pPlayer->Position())<=0.4f)
+                    {
+                        Blocked = true;
+                        break;
+                    }
+                };
+                if (rp.bBlocked)
+                    continue;
 
-            r = rpoints_Dist[t];
-            T.identity();
-            T.scale(r, r, r);
-            T.translate_add(rp.P);
-            Level().debug_renderer().draw_ellipse(T, TeamColorsDist[t]);
-/*-/
+                float r = .3f;
+                T.identity();
+                T.scale(r, r, r);
+                T.translate_add(rp.P);
+                Level().debug_renderer().draw_ellipse(T, TeamColors[t]);
+
+                //r = rpoints_MinDist[t];
+                //T.identity();
+                //T.scale(r, r, r);
+                //T.translate_add(rp.P);
+                //Level().debug_renderer().draw_ellipse(T, TeamColorsDist[t]);
+
+                //r = rpoints_Dist[t];
+                //T.identity();
+                //T.scale(r, r, r);
+                //T.translate_add(rp.P);
+                //Level().debug_renderer().draw_ellipse(T, TeamColorsDist[t]);
+            }
         }
     }
-};
 
-if (dbg_net_Draw_Flags.test(dbg_draw_actor_alive))
-{
-    for (u32 p_it=0; p_it<get_players_count(); ++p_it)
+    if (dbg_net_Draw_Flags.test(dbg_draw_actor_alive))
     {
-        game_PlayerState* PS		=	get_it			(p_it);
-        if (!PS) continue;
-        if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) continue;
-        IGameObject* pPlayer = Level().Objects.net_Find(PS->GameID);
-        if (!pPlayer) continue;
+        for (u32 p_it=0; p_it<get_players_count(); ++p_it)
+        {
+            game_PlayerState* PS = get_it(p_it);
+            if (!PS)
+                continue;
+            if (PS->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+                continue;
 
-        float r = .4f;
-        T.identity();
-        T.scale(r, r, r);
-        T.translate_add(pPlayer->Position());
-        Level().debug_renderer().draw_ellipse(T, TeamColors[PS->team]);
-    };
+            IGameObject* pPlayer = Level().Objects.net_Find(PS->GameID);
+            if (!pPlayer)
+                continue;
 
-}*/
+            float r = .4f;
+            T.identity();
+            T.scale(r, r, r);
+            T.translate_add(pPlayer->Position());
+            Level().debug_renderer().draw_ellipse(T, TeamColors[PS->team]);
+        };
+    }*/
 #endif
 };
 

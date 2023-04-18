@@ -36,7 +36,7 @@ static char* search_info_section(u8* buffer, u32 buffer_size)
     return nullptr;
 }
 
-bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, crypto::xr_sha1::hash_t& sha_checksum)
+bool configs_verifyer::verify_dsign(u8* data, u32 data_size, crypto::xr_sha1::hash_t& sha_checksum)
 {
     char* tmp_info_sect = search_info_section(data, data_size);
     if (!tmp_info_sect)
@@ -150,7 +150,7 @@ LPCSTR configs_verifyer::get_diff(CInifile& received, CInifile& active_params, s
     return dst_diff;
 }
 
-bool const configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
+bool configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
 {
     static char const check_substr[] = "[config_dump_info]";
     static char const* end_checksubstr = check_substr + strlen(check_substr);

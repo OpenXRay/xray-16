@@ -155,8 +155,8 @@ void CGameTask::Load(const TASK_ID& id)
         //*
         objective.m_def_location_enabled = !g_gameTaskXml->ReadInt(l_root, "map_location_hidden", 0, 0);
 
-        const bool b1 = (0 == objective.m_map_location.size());
-        const bool b2 = (nullptr == object_story_id);
+        [[maybe_unused]] const bool b1 = (0 == objective.m_map_location.size());
+        [[maybe_unused]] const bool b2 = (nullptr == object_story_id);
         VERIFY3(b1 == b2, "check [map_location_type] and [object_story_id] fields in objective definition for: ",
             objective.m_Description.c_str());
 
@@ -221,7 +221,7 @@ void CGameTask::Load(const TASK_ID& id)
             for (int j = 0; j < info_num; ++j)
             {
                 cpcstr str = g_gameTaskXml->Read(l_root, "function_complete", j, nullptr);
-                const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_complete_lua_functions[j]);
+                [[maybe_unused]] const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_complete_lua_functions[j]);
                 THROW3(functor_exists, "Cannot find script function described in task objective  ", str);
             }
         }
@@ -233,7 +233,7 @@ void CGameTask::Load(const TASK_ID& id)
             for (int j = 0; j < info_num; ++j)
             {
                 cpcstr str = g_gameTaskXml->Read(l_root, "function_fail", j, nullptr);
-                const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_fail_lua_functions[j]);
+                [[maybe_unused]] const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_fail_lua_functions[j]);
                 THROW3(functor_exists, "Cannot find script function described in task objective  ", str);
             }
         }
@@ -245,7 +245,7 @@ void CGameTask::Load(const TASK_ID& id)
             for (int i = 0; i < info_num; ++i)
             {
                 cpcstr str = g_gameTaskXml->Read(l_root, "function_call_complete", i, nullptr);
-                const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_lua_functions_on_complete[i]);
+                [[maybe_unused]] const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_lua_functions_on_complete[i]);
                 THROW3(functor_exists, "Cannot find script function described in task objective  ", str);
             }
         }
@@ -257,7 +257,7 @@ void CGameTask::Load(const TASK_ID& id)
             for (int j = 0; j < info_num; ++j)
             {
                 cpcstr str = g_gameTaskXml->Read(l_root, "function_call_fail", j, nullptr);
-                const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_lua_functions_on_fail[j]);
+                [[maybe_unused]] const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_lua_functions_on_fail[j]);
                 THROW3(functor_exists, "Cannot find script function described in task objective  ", str);
             }
         }

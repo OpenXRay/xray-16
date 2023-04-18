@@ -6,8 +6,7 @@
 
 namespace award_system
 {
-player_death_counter::player_death_counter(game_state_accumulator* owner) : inherited(owner) {}
-u32 const player_death_counter::get_u32_param()
+u32 player_death_counter::get_u32_param()
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
     u32 death_count = tmp_local_player ? static_cast<u32>(tmp_local_player->m_iDeaths) : u32(-1);
@@ -16,8 +15,7 @@ u32 const player_death_counter::get_u32_param()
 
 // player_artdeliver_counter
 
-player_artdeliver_counter::player_artdeliver_counter(game_state_accumulator* owner) : inherited(owner) {}
-u32 const player_artdeliver_counter::get_u32_param()
+u32 player_artdeliver_counter::get_u32_param()
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
     u32 arts_count = tmp_local_player ? static_cast<u32>(tmp_local_player->af_count) : 0;
@@ -26,8 +24,7 @@ u32 const player_artdeliver_counter::get_u32_param()
 
 // player_rawkill_counter
 
-player_rawkill_counter::player_rawkill_counter(game_state_accumulator* owner) : inherited(owner) { m_raw_kills = 0; }
-u32 const player_rawkill_counter::get_u32_param()
+u32 player_rawkill_counter::get_u32_param()
 {
     // u32 rawkill_count = m_local_player ? m_local_player->m_iKillsInRowCurr : 0;
     return m_raw_kills;
@@ -59,8 +56,7 @@ void player_rawkill_counter::OnPlayerKilled(
     }
 }
 
-player_state_move::player_state_move(game_state_accumulator* owner) : inherited(owner) {}
-u32 const player_state_move::get_u32_param()
+u32 player_state_move::get_u32_param()
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
     if (!tmp_local_player)
@@ -76,8 +72,7 @@ u32 const player_state_move::get_u32_param()
     return state.bCrouch | (state.bSprint << 1) | (state.bJump << 2) | (state.bFall << 3);
 }
 
-player_state_velocity::player_state_velocity(game_state_accumulator* owner) : inherited(owner) {}
-float const player_state_velocity::get_float_param()
+float player_state_velocity::get_float_param()
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
     if (!tmp_local_player)
@@ -93,8 +88,7 @@ float const player_state_velocity::get_float_param()
     return state.fVelocity;
 }
 
-player_state_ang_velocity::player_state_ang_velocity(game_state_accumulator* owner) : inherited(owner) {}
-float const player_state_ang_velocity::get_float_param()
+float player_state_ang_velocity::get_float_param()
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
     if (!tmp_local_player)

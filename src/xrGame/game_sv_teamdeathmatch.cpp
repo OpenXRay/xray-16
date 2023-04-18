@@ -431,18 +431,12 @@ void game_sv_TeamDeathmatch::UpdateTeamScore(game_PlayerState* ps_killer, s16 Ol
 KILL_RES game_sv_TeamDeathmatch::GetKillResult(game_PlayerState* pKiller, game_PlayerState* pVictim)
 {
     KILL_RES Res = inherited::GetKillResult(pKiller, pVictim);
-    switch (Res)
+
+    if (Res == KR_RIVAL && pKiller->team == pVictim->team)
     {
-    case KR_RIVAL:
-    {
-        if (pKiller->team == pVictim->team)
-            Res = KR_TEAMMATE;
+        Res = KR_TEAMMATE;
     }
-    break;
-    default: {
-    }
-    break;
-    };
+
     return Res;
 };
 
@@ -576,7 +570,6 @@ void game_sv_TeamDeathmatch::ReadOptions(shared_str& options)
     g_sv_tdm_fFriendlyFireModifier = fFF;
 }
 
-static bool g_bConsoleCommandsCreated_TDM = false;
 void game_sv_TeamDeathmatch::ConsoleCommands_Create(){};
 
 void game_sv_TeamDeathmatch::ConsoleCommands_Clear() { inherited::ConsoleCommands_Clear(); };

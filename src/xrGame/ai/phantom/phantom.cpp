@@ -164,16 +164,17 @@ void CPhantom::SwitchToState_internal(EState new_state)
                 // hit enemy
                 PsyHit(m_enemy, fContactHit);
             }
+            break;
         }
-        break;
         case stShoot:
         {
             SStateData& sdata = m_state_data[m_CurState];
             PlayParticles(sdata.particles.c_str(), FALSE, xform);
+            break;
         }
-        break;
         case stIdle: break;
         }
+
         // before event
         switch (new_state)
         {
@@ -183,8 +184,8 @@ void CPhantom::SwitchToState_internal(EState new_state)
             PlayParticles(sdata.particles.c_str(), TRUE, xform);
             sdata.sound.play_at_pos(0, xform.c);
             K->PlayCycle(sdata.motion, TRUE, animation_end_callback, this);
+            break;
         }
-        break;
         case stFly:
         {
             UpdateEvent.bind(this, &CPhantom::OnFlyState);
@@ -192,16 +193,16 @@ void CPhantom::SwitchToState_internal(EState new_state)
             m_fly_particles = PlayParticles(sdata.particles.c_str(), FALSE, xform);
             sdata.sound.play_at_pos(0, xform.c, sm_Looped);
             K->PlayCycle(sdata.motion);
+            break;
         }
-        break;
         case stContact:
         {
             UpdateEvent.bind(this, &CPhantom::OnDeadState);
             SStateData& sdata = m_state_data[new_state];
             sdata.sound.play_at_pos(0, xform.c);
             K->PlayCycle(sdata.motion, TRUE, animation_end_callback, this);
+            break;
         }
-        break;
         case stShoot:
         {
             UpdateEvent.bind(this, &CPhantom::OnDeadState);
@@ -209,16 +210,16 @@ void CPhantom::SwitchToState_internal(EState new_state)
             PlayParticles(sdata.particles.c_str(), TRUE, xform);
             sdata.sound.play_at_pos(0, xform.c);
             K->PlayCycle(sdata.motion, TRUE, animation_end_callback, this);
-        }
         break;
+        }
         case stIdle:
         {
             UpdateEvent.bind(this, &CPhantom::OnIdleState);
             SStateData& sdata = m_state_data[m_CurState];
             sdata.sound.stop();
             CParticlesObject::Destroy(m_fly_particles);
+            break;
         }
-        break;
         }
         m_CurState = new_state;
     }

@@ -268,7 +268,7 @@ private:
     dd_list_type GetListType(CUIDragDropListEx* l);
     CUIDragDropListEx* GetMatchedListForItem(const shared_str& sect_name);
     void UpdateCorrespondingItemsForList(CUIDragDropListEx* _list);
-    const u32 GetRank() const;
+    u32 GetRank() const;
     void SetInfoString(LPCSTR str);
     void SetMoneyChangeString(int diff);
     void CleanUserItems();

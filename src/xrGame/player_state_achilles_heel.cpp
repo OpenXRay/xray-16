@@ -7,12 +7,7 @@
 
 namespace award_system
 {
-achilles_heel_kill::achilles_heel_kill(game_state_accumulator* owner) : inherited(owner)
-{
-    m_achilles_kill_was = false;
-}
-
-u32 const achilles_heel_kill::get_u32_param() { return m_achilles_kill_was ? 1 : 0; }
+u32 achilles_heel_kill::get_u32_param() { return m_achilles_kill_was ? 1 : 0; }
 void achilles_heel_kill::reset_game() { m_achilles_kill_was = false; }
 void achilles_heel_kill::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)

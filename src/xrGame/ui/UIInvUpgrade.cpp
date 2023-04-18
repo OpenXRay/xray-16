@@ -94,7 +94,7 @@ void UIUpgrade::load_from_xml(CUIXml& ui_xml, int i_column, int i_cell, Frect co
     CUIXmlInit::InitWindow(ui_xml, "cell", i_cell, this);
 
     Fvector2 f2, color;
-    Frect border;
+    Frect border{};
     if (t_cell_border)
         border = *t_cell_border;
 

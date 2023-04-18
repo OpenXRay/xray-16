@@ -54,7 +54,7 @@ void Root::add_upgrade(Upgrade* upgr)
         }
     }
 
-    Ivector2 scheme_index = upgr->get_scheme_index();
+    [[maybe_unused]] auto scheme_index = upgr->get_scheme_index();
     VERIFY2(verify_scheme_index(scheme_index),
         make_string("in upgrade <%s> for item <%s> scheme index [%d, %d] is duplicated !", upgr->id_str(), id_str(),
             scheme_index.x, scheme_index.y));

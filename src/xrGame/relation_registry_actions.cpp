@@ -166,20 +166,20 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             {
                 delta_goodwill = st->enemy_attack_goodwill;
                 delta_reputation = st->enemy_attack_reputation;
+                break;
             }
-            break;
             case ALife::eRelationTypeNeutral:
             {
                 delta_goodwill = st->neutral_attack_goodwill;
                 delta_reputation = st->neutral_attack_reputation;
+                break;
             }
-            break;
             case ALife::eRelationTypeFriend:
             {
                 delta_goodwill = st->friend_attack_goodwill;
                 delta_reputation = st->friend_attack_reputation;
+                break;
             }
-            break;
             };
 
             //сталкер при нападении на членов своей же группировки отношения не меняют
@@ -195,7 +195,7 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                                                    .team(stalker->g_Team())
                                                    .squad(stalker->g_Squad())
                                                    .group(stalker->g_Group());
-                for (std::size_t i = 0; i < group.members().size(); i++)
+                for (size_t i = 0; i < group.members().size(); i++)
                 {
                     ChangeGoodwill(group.members()[i]->ID(), from->ID(), delta_goodwill);
                 }
@@ -213,8 +213,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                 inv_owner_from->ChangeReputation(delta_reputation);
             }
         }
+        break;
     }
-    break;
     case KILL:
     {
         if (stalker)
@@ -238,20 +238,20 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             {
                 delta_goodwill = enemy_kill_goodwill;
                 delta_reputation = enemy_kill_reputation;
+                break;
             }
-            break;
             case ALife::eRelationTypeNeutral:
             {
                 delta_goodwill = neutral_kill_goodwill;
                 delta_reputation = neutral_kill_reputation;
+                break;
             }
-            break;
             case ALife::eRelationTypeFriend:
             {
                 delta_goodwill = friend_kill_goodwill;
                 delta_reputation = friend_kill_reputation;
+                break;
             }
-            break;
             };
 
             //сталкер при нападении на членов своей же группировки отношения не меняют
@@ -267,7 +267,7 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                                                    .team(stalker->g_Team())
                                                    .squad(stalker->g_Squad())
                                                    .group(stalker->g_Group());
-                for (std::size_t i = 0; i < group.members().size(); i++)
+                for (size_t i = 0; i < group.members().size(); i++)
                 {
                     if (stalker->ID() != group.members()[i]->ID())
                     {
@@ -294,8 +294,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             if (delta_rank)
                 inv_owner_from->ChangeRank(delta_rank);
         }
+        break;
     }
-    break;
     case FIGHT_HELP_HUMAN:
     case FIGHT_HELP_MONSTER:
     {
@@ -310,20 +310,20 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             {
                 delta_goodwill = enemy_fight_help_goodwill;
                 delta_reputation = enemy_fight_help_reputation;
+                break;
             }
-            break;
             case ALife::eRelationTypeNeutral:
             {
                 delta_goodwill = neutral_fight_help_goodwill;
                 delta_reputation = neutral_fight_help_reputation;
+                break;
             }
-            break;
             case ALife::eRelationTypeFriend:
             {
                 delta_goodwill = friend_fight_help_goodwill;
                 delta_reputation = friend_fight_help_reputation;
+                break;
             }
-            break;
             };
 
             if (delta_goodwill)
@@ -335,7 +335,7 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                                                    .team(stalker->g_Team())
                                                    .squad(stalker->g_Squad())
                                                    .group(stalker->g_Group());
-                for (std::size_t i = 0; i < group.members().size(); i++)
+                for (size_t i = 0; i < group.members().size(); i++)
                 {
                     ChangeGoodwill(group.members()[i]->ID(), from->ID(), delta_goodwill);
                 }
@@ -355,7 +355,7 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                 inv_owner_from->ChangeReputation(delta_reputation);
             }
         }
+        break;
     }
-    break;
     }
 }

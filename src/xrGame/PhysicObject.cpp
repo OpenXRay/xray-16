@@ -438,10 +438,6 @@ void CPhysicObject::CreateBody(CSE_ALifeObjectPhysic* po)
         CreateSkeleton(po);
     }
     break;
-
-    default: {
-    }
-    break;
     }
 
     m_pPhysicsShell->mXFORM.set(XFORM());

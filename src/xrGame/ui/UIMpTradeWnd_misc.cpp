@@ -208,7 +208,7 @@ bool CUIMpTradeWnd::OnItemDrop(CUICellItem* itm)
     if (_new_owner_type == dd_shop)
     {
         SBuyItemInfo* tmp_iinfo = NULL;
-        bool res = TryToSellItem(iinfo, true, tmp_iinfo);
+        [[maybe_unused]] bool res = TryToSellItem(iinfo, true, tmp_iinfo);
         VERIFY(res);
         return true;
     }
@@ -380,7 +380,7 @@ CUIDragDropListEx* CUIMpTradeWnd::GetMatchedListForItem(const shared_str& sect_n
     return res;
 }
 
-const u32 CUIMpTradeWnd::GetRank() const { return g_mp_restrictions.GetRank(); }
+u32 CUIMpTradeWnd::GetRank() const { return g_mp_restrictions.GetRank(); }
 shared_str _fake;
 const shared_str& CUIMpTradeWnd::GetWeaponNameByIndex(u8 grpNum, u8 idx)
 {

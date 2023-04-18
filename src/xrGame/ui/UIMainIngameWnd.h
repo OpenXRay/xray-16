@@ -26,32 +26,32 @@ public:
     virtual void Update();
 
 protected:
-    CUIStatic* UIStaticDiskIO;
-    CUITextWnd* UIStaticQuickHelp;
-    CUIMotionIcon* UIMotionIcon;
-    CUIZoneMap* UIZoneMap;
+    CUIStatic* UIStaticDiskIO{};
+    CUITextWnd* UIStaticQuickHelp{};
+    CUIMotionIcon* UIMotionIcon{};
+    CUIZoneMap* UIZoneMap{};
 
-    CUIHudStatesWnd* m_ui_hud_states;
+    CUIHudStatesWnd* m_ui_hud_states{};
 
-    CUIStatic* m_ind_bleeding;
-    CUIStatic* m_ind_radiation;
-    CUIStatic* m_ind_starvation;
-    CUIStatic* m_ind_weapon_broken;
-    CUIStatic* m_ind_helmet_broken;
-    CUIStatic* m_ind_outfit_broken;
-    CUIStatic* m_ind_overweight;
+    CUIStatic* m_ind_bleeding{};
+    CUIStatic* m_ind_radiation{};
+    CUIStatic* m_ind_starvation{};
+    CUIStatic* m_ind_weapon_broken{};
+    CUIStatic* m_ind_helmet_broken{};
+    CUIStatic* m_ind_outfit_broken{};
+    CUIStatic* m_ind_overweight{};
 
 public:
-    CUIStatic* m_ind_boost_psy;
-    CUIStatic* m_ind_boost_radia;
-    CUIStatic* m_ind_boost_chem;
-    CUIStatic* m_ind_boost_wound;
-    CUIStatic* m_ind_boost_weight;
-    CUIStatic* m_ind_boost_health;
-    CUIStatic* m_ind_boost_power;
-    CUIStatic* m_ind_boost_rad;
+    CUIStatic* m_ind_boost_psy{};
+    CUIStatic* m_ind_boost_radia{};
+    CUIStatic* m_ind_boost_chem{};
+    CUIStatic* m_ind_boost_wound{};
+    CUIStatic* m_ind_boost_weight{};
+    CUIStatic* m_ind_boost_health{};
+    CUIStatic* m_ind_boost_power{};
+    CUIStatic* m_ind_boost_rad{};
 
-    CUIArtefactPanel* UIArtefactPanel;
+    CUIArtefactPanel* UIArtefactPanel{};
 
     void ShowZoneMap(bool status);
     void DrawZoneMap();
@@ -72,18 +72,18 @@ protected:
     // - ранения
     // - голода
     // - усталости
-    CUIStatic* UIWeaponJammedIcon;
+    CUIStatic* UIWeaponJammedIcon{};
     //	CUIStatic			UIRadiaitionIcon;
     //	CUIStatic			UIWoundIcon;
     //	CUIStatic			UIStarvationIcon;
     //	CUIStatic			UIPsyHealthIcon;
-    CUIStatic* UIInvincibleIcon;
+    CUIStatic* UIInvincibleIcon{};
     //	CUIStatic			UISleepIcon;
-    CUIStatic* UIArtefactIcon;
+    CUIStatic* UIArtefactIcon{};
 
-    CUIScrollView* m_UIIcons;
-    CUIWindow* m_pMPChatWnd;
-    CUIWindow* m_pMPLogWnd;
+    CUIScrollView* m_UIIcons{};
+    CUIWindow* m_pMPChatWnd{};
+    CUIWindow* m_pMPLogWnd{};
 
 public:
     // Енумы соответсвующие предупреждающим иконкам

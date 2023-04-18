@@ -7,8 +7,7 @@
 
 namespace award_system
 {
-player_state_toughy::player_state_toughy(game_state_accumulator* owner) : inherited(owner) { m_kills_count = 0; }
-u32 const player_state_toughy::get_u32_param() { return m_kills_count; }
+u32 player_state_toughy::get_u32_param() { return m_kills_count; }
 void player_state_toughy::reset_game() { m_kills_count = 0; }
 void player_state_toughy::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)

@@ -101,29 +101,31 @@ bool CControlAnimationBase::accel_chain_get(
 
 bool CControlAnimationBase::accel_chain_test()
 {
-    string256 error_msg;
+#ifdef DEBUG
+    string256 error_msg{};
+#endif
 
     // пройти по всем Chain-векторам
     for (auto I = m_accel.chain.begin(); I != m_accel.chain.end(); ++I)
     {
+#ifdef DEBUG
         VERIFY2(I->size() >= 2, error_msg);
-
-        SAnimItem* anim_from = m_anim_storage[*(I->begin())];
-        SAnimItem* anim_to;
+#endif
+        const SAnimItem* anim_from = m_anim_storage[*(I->begin())];
         VERIFY(anim_from);
 
         // Пройти по текущему вектору
         for (auto IT = I->begin() + 1; IT != I->end(); ++IT)
         {
-            anim_to = m_anim_storage[*IT];
-
-            float from = anim_from->velocity.velocity.linear * anim_from->velocity.max_factor;
-            float to = anim_to->velocity.velocity.linear * anim_to->velocity.min_factor;
+            const SAnimItem* anim_to = m_anim_storage[*IT];
+#ifdef DEBUG
+            const float from = anim_from->velocity.velocity.linear * anim_from->velocity.max_factor;
+            const float to = anim_to->velocity.velocity.linear * anim_to->velocity.min_factor;
 
             xr_sprintf(error_msg, "Incompatible speed ranges. Monster[%s] From animation  [%s] To animation [%s]",
                 *m_object->cName(), *anim_from->target_name, *anim_to->target_name);
             VERIFY2(to < from, error_msg);
-
+#endif
             anim_from = anim_to;
         }
     }

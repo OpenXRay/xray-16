@@ -7,14 +7,9 @@
 
 namespace award_system
 {
-player_multichampion::player_multichampion(game_state_accumulator* owner) : inherited(owner)
-{
-    m_can_be_multichampion = false;
-}
-
 void player_multichampion::reset_game() { m_can_be_multichampion = false; }
 void player_multichampion::OnRoundEnd() { m_can_be_multichampion = true; }
-u32 const player_multichampion::get_u32_param()
+u32 player_multichampion::get_u32_param()
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
     if (!tmp_local_player)
