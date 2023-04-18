@@ -17,8 +17,8 @@ using namespace ALife;
 
 **/
 CALifeInteractionManager::CALifeInteractionManager(IPureServer* server, LPCSTR section)
-    : CALifeCombatManager(server, section), CALifeCommunicationManager(server, section),
-      CALifeSimulatorBase(server, section)
+    : CALifeSimulatorBase(server, section), CALifeCombatManager(server, section),
+      CALifeCommunicationManager(server, section)
 {
     /**
         m_inventory_slot_count		= pSettings->r_u32("inventory","slots");

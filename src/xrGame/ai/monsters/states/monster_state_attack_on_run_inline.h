@@ -514,6 +514,8 @@ void ATTACK_ON_RUN_STATE::update_attack()
             float attack_animation_length = 0;
             MotionID motion;
             EMotionAnim const anim = m_attack_side == left ? eAnimAttackOnRunLeft : eAnimAttackOnRunRight;
+
+            [[maybe_unused]]
             bool const got_animation_info = this->object->anim().get_animation_info(
                 anim, m_animation_index[m_attack_side], motion, attack_animation_length);
 

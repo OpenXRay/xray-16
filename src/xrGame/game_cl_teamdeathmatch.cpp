@@ -470,9 +470,6 @@ void game_cl_TeamDeathmatch::shedule_Update(u32 dt)
         };
     }
     break;
-    default: {
-    }
-    break;
     };
 }
 
@@ -721,9 +718,6 @@ void game_cl_TeamDeathmatch::OnSwitchPhase(u32 old_phase, u32 new_phase)
     {
         if (Level().CurrentViewEntity())
             PlaySndMessage(ID_TEAM2_WIN);
-    }
-    break;
-    default: {
     }
     break;
     };

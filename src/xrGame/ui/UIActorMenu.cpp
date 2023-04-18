@@ -497,8 +497,10 @@ CUICharacterInfo* CUIActorMenu::GetModeSpecificPartnerInfo(EMenuMode fallback) c
     case mmTrade:          return m_TradePartnerCharacterInfo;
     case mmDeadBodySearch: return m_SearchLootPartnerCharacterInfo;
     }
+
     if (m_PartnerCharacterInfo)
         return m_PartnerCharacterInfo;
+
     switch (fallback)
     {
     case mmTrade:          return m_TradePartnerCharacterInfo;

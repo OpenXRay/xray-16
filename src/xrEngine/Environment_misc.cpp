@@ -396,8 +396,8 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
     if (thunderbolt)
     {
-        bolt_period = config.r_float(m_identifier.c_str(), thunderbolt_period_name);
-        bolt_duration = config.r_float(m_identifier.c_str(), thunderbolt_duration_name);
+        bolt_period = config.r_float(identifier, thunderbolt_period_name);
+        bolt_duration = config.r_float(identifier, thunderbolt_duration_name);
     }
 
     m_fSunShaftsIntensity = config.read_if_exists<float>(identifier, "sun_shafts_intensity", 0.0);

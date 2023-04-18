@@ -306,7 +306,7 @@ void CWallmarksEngine::AddStaticWallmark(
 void CWallmarksEngine::AddSkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
 {
-    if (::RImplementation.phase != CRender::PHASE_NORMAL)
+    if (::RImplementation.active_phase() != CRender::PHASE_NORMAL)
         return;
 
     // optimization cheat: don't allow wallmarks more than 50 m from viewer/actor
@@ -322,7 +322,7 @@ void CWallmarksEngine::AddSkeletonWallmark(
 
 void CWallmarksEngine::AddSkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm)
 {
-    if (::RImplementation.phase != CRender::PHASE_NORMAL)
+    if (::RImplementation.active_phase() != CRender::PHASE_NORMAL)
         return;
 
     lock.Enter();
@@ -488,7 +488,7 @@ void CWallmarksEngine::Render()
     lock.Leave(); // Physics may add wallmarks in parallel with rendering
 
     // Level-wmarks
-    RImplementation.r_dsgraph_render_wmarks();
+    RImplementation.dsgraph.render_wmarks();
     RImplementation.BasicStats.Wallmarks.End();
 
     // Projection

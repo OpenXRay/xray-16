@@ -6,12 +6,7 @@
 
 namespace award_system
 {
-player_state_invincible_fury::player_state_invincible_fury(game_state_accumulator* owner) : inherited(owner)
-{
-    m_last_kills = 0;
-}
-
-u32 const player_state_invincible_fury::get_u32_param() { return m_last_kills; }
+u32 player_state_invincible_fury::get_u32_param() { return m_last_kills; }
 void player_state_invincible_fury::reset_game() { m_last_kills = 0; }
 struct fury_killer
 {

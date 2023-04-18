@@ -324,7 +324,6 @@ public:
     virtual IRender_Target* getTarget() = 0;
 
     // Main
-    virtual void flush() = 0;
     virtual void add_Occluder(Fbox2& bb_screenspace) = 0; // mask screen region as oclluded (-1..1, -1..1)
     virtual void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
     virtual void add_Geometry(IRenderVisual* V, const CFrustum& view) = 0; // add visual(s) (all culling performed)
@@ -388,7 +387,7 @@ public:
     virtual void rmNear() = 0;
     virtual void rmFar() = 0;
     virtual void rmNormal() = 0;
-    virtual u32 active_phase () = 0;
+    virtual u32 active_phase() const = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}

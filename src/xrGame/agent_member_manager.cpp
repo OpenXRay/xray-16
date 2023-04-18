@@ -38,7 +38,7 @@ void CAgentMemberManager::add(CEntity* member)
         make_string("too many stalkers in group ([team:%d][squad:%d][group:%d]!", m_members.front()->object().g_Team(),
             m_members.front()->object().g_Squad(), m_members.front()->object().g_Group()));
 
-    iterator I = std::find_if(m_members.begin(), m_members.end(), CMemberPredicate(stalker));
+    [[maybe_unused]] const auto I = std::find_if(m_members.begin(), m_members.end(), CMemberPredicate(stalker));
     VERIFY(I == m_members.end());
     m_members.push_back(xr_new<CMemberOrder>(stalker));
 }

@@ -172,7 +172,7 @@ bool CUICustomMap::GetPointerTo(const Fvector2& src, float item_radius, Fvector2
     f_src.set(src.x, src.y);
     f_dir.sub(f_center, f_src);
     f_dir.normalize_safe();
-    Fvector2 f_intersect_point;
+    Fvector2 f_intersect_point{};
     res = f_clip_rect_local.Pick2(f_src, f_dir, f_intersect_point);
     if (!res)
         return false;

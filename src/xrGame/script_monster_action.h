@@ -16,14 +16,13 @@ class CScriptGameObject;
 class CScriptMonsterAction : public CScriptAbstractAction
 {
 public:
-    MonsterSpace::EScriptMonsterGlobalAction m_tAction;
-    IGameObject* m_tObject;
+    MonsterSpace::EScriptMonsterGlobalAction m_tAction{ MonsterSpace::eGA_None };
+    IGameObject* m_tObject{};
 
 public:
-    IC CScriptMonsterAction();
+    IC CScriptMonsterAction() = default;
     IC CScriptMonsterAction(MonsterSpace::EScriptMonsterGlobalAction action);
     IC CScriptMonsterAction(MonsterSpace::EScriptMonsterGlobalAction action, CScriptGameObject* tObj);
-    virtual ~CScriptMonsterAction();
     void SetObject(CScriptGameObject* tObj);
 };
 

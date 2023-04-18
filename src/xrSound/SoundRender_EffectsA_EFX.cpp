@@ -104,10 +104,10 @@ void CSoundRender_EffectsA_EFX::set_listener(const CSoundRender_Environment& env
     A_CHK(alEffectf(effect, AL_EAXREVERB_DECAY_LFRATIO, env.DecayLFRatio));
     A_CHK(alEffectf(effect, AL_EAXREVERB_REFLECTIONS_GAIN, env.Reflections));
     A_CHK(alEffectf(effect, AL_EAXREVERB_REFLECTIONS_DELAY, env.ReflectionsDelay));
-    A_CHK(alEffectfv(effect, AL_EAXREVERB_REFLECTIONS_PAN, &env.ReflectionsPan[0]));
+    //A_CHK(alEffectfv(effect, AL_EAXREVERB_REFLECTIONS_PAN, &env.ReflectionsPan[0]));
     A_CHK(alEffectf(effect, AL_EAXREVERB_LATE_REVERB_GAIN, env.Reverb));
     A_CHK(alEffectf(effect, AL_EAXREVERB_LATE_REVERB_DELAY, env.ReverbDelay));
-    A_CHK(alEffectfv(effect, AL_EAXREVERB_LATE_REVERB_PAN, &env.ReverbPan[0]));
+    //A_CHK(alEffectfv(effect, AL_EAXREVERB_LATE_REVERB_PAN, &env.ReverbPan[0]));
     A_CHK(alEffectf(effect, AL_EAXREVERB_ECHO_TIME, env.EchoTime));
     A_CHK(alEffectf(effect, AL_EAXREVERB_ECHO_DEPTH, env.EchoDepth));
     A_CHK(alEffectf(effect, AL_EAXREVERB_MODULATION_TIME, env.ModulationTime));
@@ -130,10 +130,10 @@ void CSoundRender_EffectsA_EFX::get_listener(CSoundRender_Environment& env)
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_DECAY_LFRATIO, &env.DecayLFRatio));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_REFLECTIONS_GAIN, &env.Reflections));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_REFLECTIONS_DELAY, &env.ReflectionsDelay));
-    A_CHK(alGetEffectfv(effect, AL_EAXREVERB_REFLECTIONS_PAN, (float*)&env.ReflectionsPan));
+    //A_CHK(alGetEffectfv(effect, AL_EAXREVERB_REFLECTIONS_PAN, (float*)&env.ReflectionsPan));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_LATE_REVERB_GAIN, &env.Reverb));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_LATE_REVERB_DELAY, &env.ReverbDelay));
-    A_CHK(alGetEffectfv(effect, AL_EAXREVERB_LATE_REVERB_PAN, (float*)&env.ReverbPan));
+    //A_CHK(alGetEffectfv(effect, AL_EAXREVERB_LATE_REVERB_PAN, (float*)&env.ReverbPan));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_ECHO_TIME, &env.EchoTime));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_ECHO_DEPTH, &env.EchoDepth));
     A_CHK(alGetEffectf(effect, AL_EAXREVERB_MODULATION_TIME, &env.ModulationTime));
@@ -152,7 +152,7 @@ void CSoundRender_EffectsA_EFX::commit()
      * effect object afterward without affecting the effect slot.
      */
     A_CHK(alAuxiliaryEffectSlotf(slot, AL_EFFECTSLOT_GAIN, 1.f));
-    A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, true));
+    A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_AUXILIARY_SEND_AUTO, false));
     A_CHK(alAuxiliaryEffectSloti(slot, AL_EFFECTSLOT_EFFECT, effect));
 }
 #endif // XR_HAS_EFX

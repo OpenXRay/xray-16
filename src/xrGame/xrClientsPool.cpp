@@ -15,7 +15,7 @@ void xrClientsPool::Clear()
     m_dclients.clear();
 }
 
-bool const xrClientsPool::expired_client_deleter::operator()(dclient& right) const
+bool xrClientsPool::expired_client_deleter::operator()(dclient& right) const
 {
     if ((m_current_time - right.m_dtime) > m_expire_time)
     {
@@ -50,7 +50,7 @@ void xrClientsPool::Add(xrClientData* new_dclient)
     m_dclients.push_back(tmp_dclient);
 }
 
-bool const xrClientsPool::pooled_client_finder::operator()(dclient const& right) const
+bool xrClientsPool::pooled_client_finder::operator()(dclient const& right) const
 {
     if (!right.m_client->ps || !m_new_client->ps)
         return false;

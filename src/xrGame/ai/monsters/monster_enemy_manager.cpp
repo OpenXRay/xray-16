@@ -243,27 +243,25 @@ bool CMonsterEnemyManager::is_faced(const CEntityAlive* object0, const CEntityAl
         return false;
     }
 
-    float yaw1, pitch1, yaw2, pitch2, fYawFov, fPitchFov, fRange;
+
     Fvector tPosition = object0->Position();
 
-    yaw1 = object0->Orientation().yaw;
-    pitch1 = object0->Orientation().pitch;
-    fYawFov = angle_normalize_signed(object0->ffGetFov() * PI / 180.f);
-    fRange = object0->ffGetRange();
-
-    fYawFov =
-        angle_normalize_signed((_abs(fYawFov) + _abs(atanf(1.f / tPosition.distance_to(object1->Position())))) / 2.f);
-    fPitchFov = angle_normalize_signed(fYawFov * 1.f);
+    float yaw1 = object0->Orientation().yaw;
+    float pitch1 = object0->Orientation().pitch;
+    float fYawFov = angle_normalize_signed(object0->ffGetFov() * PI / 180.f);
+    // float fRange = object0->ffGetRange();
+    fYawFov = angle_normalize_signed((_abs(fYawFov) + _abs(atanf(1.f / tPosition.distance_to(object1->Position())))) / 2.f);
+    float fPitchFov = angle_normalize_signed(fYawFov * 1.f);
     tPosition.sub(object1->Position());
     tPosition.mul(-1);
+    float yaw2, pitch2;
     tPosition.getHP(yaw2, pitch2);
     yaw1 = angle_normalize_signed(yaw1);
     pitch1 = angle_normalize_signed(pitch1);
     yaw2 = angle_normalize_signed(yaw2);
     pitch2 = angle_normalize_signed(pitch2);
-    if ((angle_difference(yaw1, yaw2) <= fYawFov) && (angle_difference(pitch1, pitch2) <= fPitchFov))
-        return (true);
-    return (false);
+
+    return angle_difference(yaw1, yaw2) <= fYawFov && angle_difference(pitch1, pitch2) <= fPitchFov;
 }
 
 bool CMonsterEnemyManager::is_enemy(const CEntityAlive* obj)

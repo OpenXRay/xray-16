@@ -14,11 +14,11 @@ public:
     };
 
 private:
-    e_collide_state cl_state;
-    Fmatrix m;
+    e_collide_state cl_state{ cl_undefined };
+    Fmatrix m{ Fidentity };
 
 public:
-    ik_goal_matrix() : m(Fidentity), cl_state(cl_undefined) {}
+    ik_goal_matrix() = default;
     IC const Fmatrix& get() const { return m; }
     IC void set(const Fmatrix& m_, e_collide_state cl)
     {
@@ -30,30 +30,22 @@ public:
 
 struct calculate_state
 {
-    u32 calc_time;
-    u32 unstuck_time;
+    u32 calc_time{};
+    u32 unstuck_time{ u32(-1) };
     ik_goal_matrix goal;
     ik_goal_matrix blend_to;
-    Fmatrix anim_pos;
+    Fmatrix anim_pos{ Fidentity };
     ik_goal_matrix collide_pos;
-    Fmatrix b2tob3;
-    Fvector pick;
-    float speed_blend_l;
-    float speed_blend_a;
-    bool foot_step;
-    bool idle;
-    bool blending;
-    u16 ref_bone;
+    Fmatrix b2tob3{ Fidentity };
+    Fvector pick{ 0, -1, 0 };
+    float speed_blend_l{};
+    float speed_blend_a{};
+    bool foot_step{};
+    bool idle{};
+    bool blending{};
+    u16 ref_bone{ u16(-1) };
 #ifdef DEBUG
-    int count;
+    int count{ -1 };
 #endif
-    calculate_state()
-        : ref_bone(u16(-1)), calc_time(0), unstuck_time(u32(-1)), foot_step(false), idle(false), blending(false),
-          anim_pos(Fidentity), b2tob3(Fidentity), speed_blend_l(0), speed_blend_a(0), pick(Fvector().set(0, -1, 0))
-#ifdef DEBUG
-          ,
-          count(-1)
-#endif
-    {
-    }
+    calculate_state() = default;
 };

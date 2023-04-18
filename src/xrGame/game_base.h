@@ -15,40 +15,24 @@ class NET_Packet;
 
 struct RPoint
 {
-    Fvector P;
-    Fvector A;
-    u32 TimeToUnfreeze;
-    bool bBlocked;
-    u16 BlockedByID;
-    u32 BlockTime;
-    RPoint() : BlockedByID(0), BlockTime(0)
-    {
-        P.set(.0f, 0.f, .0f);
-        A.set(.0f, 0.f, .0f);
-        TimeToUnfreeze = 0;
-        bBlocked = false;
-    }
+    Fvector P{};
+    Fvector A{};
+    u32 TimeToUnfreeze{};
+    bool bBlocked{};
+    u16 BlockedByID{};
+    u32 BlockTime{};
 
+    RPoint() = default;
     bool operator==(const u16& ID) const { return (bBlocked && BlockedByID == ID); }
 };
 
 struct Bonus_Money_Struct
 {
-    s32 Money;
-    u8 Reason;
-    u8 Kills;
-    Bonus_Money_Struct(s32 M, u8 R, u8 K)
-    {
-        Money = M;
-        Reason = R;
-        Kills = K;
-    }
-    Bonus_Money_Struct()
-    {
-        Money = 0;
-        Reason = 0;
-        Kills = 0;
-    }
+    s32 Money{};
+    u8 Reason{};
+    u8 Kills{};
+    Bonus_Money_Struct() = default;
+    Bonus_Money_Struct(s32 M, u8 R, u8 K) : Money(M), Reason(R), Kills(K) {}
 };
 
 struct game_PlayerState
@@ -134,10 +118,8 @@ struct game_PlayerState
 
 struct game_TeamState
 {
-    int score;
-    u16 num_targets;
-
-    game_TeamState();
+    int score{};
+    u16 num_targets{};
 };
 
 // [15.11.07] Alexander Maniluk: added next enumeratuion to solve problem with team identifiers

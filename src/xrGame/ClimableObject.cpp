@@ -25,7 +25,8 @@ IC void OrientToNorm(const Fvector& normal, Fmatrix& form, Fobb& box)
     float* s_pointer = (float*)&(box.m_halfsize);
     float max_dot = abs(ax_pointer[0].dotproduct(normal));
     float min_size = box.m_halfsize.x;
-    int max_ax_i = 0, min_size_i = 0;
+    int max_ax_i = 0;
+    [[maybe_unused]] int min_size_i = 0;
     for (int i = 1; 3 > i; ++i)
     {
         float dot_pr = abs(ax_pointer[i].dotproduct(normal));
@@ -306,17 +307,17 @@ void CClimableObject::ObjectContactCallback(
     dxGeomUserData* usr_data_ch = NULL;
     dxGeomUserData* usr_data_lad = NULL;
     CClimableObject* this_object = NULL;
-    CPHCharacter* ch = NULL;
-    float norm_sign = 0.f;
+    CPHCharacter* ch = nullptr;
+    //float norm_sign = 0.f;
     if (bo1)
     {
         usr_data_ch = usr_data_2;
         usr_data_lad = usr_data_1;
-        norm_sign = -1.f;
+        //norm_sign = -1.f;
     }
     else
     {
-        norm_sign = 1.f;
+        //norm_sign = 1.f;
         usr_data_ch = usr_data_1;
         usr_data_lad = usr_data_2;
     }
@@ -332,6 +333,7 @@ void CClimableObject::ObjectContactCallback(
     VERIFY(usr_data_lad);
     this_object = static_cast<CClimableObject*>(usr_data_lad->ph_ref_object);
     VERIFY(this_object);
+    // XXX: negative tolerance?
     if (!this_object->BeforeLadder(ch, -0.1f))
         do_colide = false;
 }

@@ -206,7 +206,7 @@ void CUISequenceSimpleItem::Update()
             s.Stop();
     }
 
-    if (g_pGameLevel && (!m_pda_section || 0 == xr_strlen(m_pda_section)))
+    if (g_pGameLevel && 0 == xr_strlen(m_pda_section))
     {
         CUIGameSP* ui_game_sp = smart_cast<CUIGameSP*>(CurrentGameUI());
 
@@ -358,7 +358,7 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
         if (b)
         {
             luabind::functor<void> functor_to_call;
-            bool functor_exists = GEnv.ScriptEngine->functor(itm.m_functor.c_str(), functor_to_call);
+            [[maybe_unused]] bool functor_exists = GEnv.ScriptEngine->functor(itm.m_functor.c_str(), functor_to_call);
             THROW3(functor_exists, "Cannot find script function described in tutorial item ", itm.m_functor.c_str());
             functor_to_call();
 

@@ -57,9 +57,8 @@ public:
 }; // struct sight_manager_enable_guard
 
 stalker_movement_manager_base::stalker_movement_manager_base(CAI_Stalker* object)
-    : inherited(object), m_last_query_object(0), m_last_query_position(Fvector().set(flt_max, flt_max, flt_max)),
-      m_last_query_object_position(Fvector().set(flt_max, flt_max, flt_max)), m_last_query_result(false),
-      m_last_query_distance(flt_max), m_force_update(false)
+    : inherited(object), m_last_query_position({ flt_max, flt_max, flt_max }),
+      m_last_query_object_position({ flt_max, flt_max, flt_max }), m_last_query_distance(flt_max)
 {
     VERIFY(object);
     m_object = object;
@@ -273,7 +272,7 @@ void stalker_movement_manager_base::setup_movement_params(stalker_movement_param
             }
             else
             {
-                u32 vertex_id = level_path().dest_vertex_id();
+                [[maybe_unused]] u32 vertex_id = level_path().dest_vertex_id();
                 Fvector vertex_position = ai().level_graph().vertex_position(level_path().dest_vertex_id());
                 VERIFY2(restrictions().accessible(vertex_position) || show_restrictions(&restrictions()),
                     make_string("vertex_id[%d],position[%f][%f][%f],object[%s]", vertex_id, VPUSH(vertex_position),

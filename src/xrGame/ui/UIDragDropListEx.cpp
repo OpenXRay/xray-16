@@ -501,15 +501,12 @@ bool CUIDragDropListEx::OnMouseAction(float x, float y, EUIMessages mouse_action
                 m_vScrollBar->TryScrollInc();
             }
             return true;
-            break;
-
         case WINDOW_MOUSE_WHEEL_UP:
             for (u8 i = 0; i < 4; ++i)
             {
                 m_vScrollBar->TryScrollDec();
             }
             return true;
-            break;
         }
     }
     return b;

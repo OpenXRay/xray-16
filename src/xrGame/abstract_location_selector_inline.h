@@ -101,7 +101,7 @@ IC void CSelectorTemplate::perform_search(const _vertex_id_type vertex_id)
 
     after_search();
 
-    STOP_PROFILE;
+    STOP_PROFILE
 }
 
 TEMPLATE_SPECIALIZATION

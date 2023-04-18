@@ -44,21 +44,21 @@ void CItemMgr::Load(const shared_str& sect_cost)
     }
 }
 
-const u32 CItemMgr::GetItemCost(const shared_str& sect_name, u32 rank) const
+u32 CItemMgr::GetItemCost(const shared_str& sect_name, u32 rank) const
 {
     COST_MAP_CIT it = m_items.find(sect_name);
     VERIFY(it != m_items.end());
     return it->second.cost[rank];
 }
 
-const u8 CItemMgr::GetItemSlotIdx(const shared_str& sect_name) const
+u8 CItemMgr::GetItemSlotIdx(const shared_str& sect_name) const
 {
     COST_MAP_CIT it = m_items.find(sect_name);
     VERIFY(it != m_items.end());
     return it->second.slot_idx;
 }
 
-const u32 CItemMgr::GetItemIdx(const shared_str& sect_name) const
+u32 CItemMgr::GetItemIdx(const shared_str& sect_name) const
 {
     COST_MAP_CIT it = m_items.find(sect_name);
 
@@ -91,7 +91,7 @@ void CItemMgr::Dump() const
 #endif // #ifndef MASTER_GOLD
 }
 
-const u32 CItemMgr::GetItemsCount() const { return m_items.size(); }
+u32 CItemMgr::GetItemsCount() const { return m_items.size(); }
 const shared_str& CItemMgr::GetItemName(u32 Idx) const
 {
     R_ASSERT(Idx < m_items.size());

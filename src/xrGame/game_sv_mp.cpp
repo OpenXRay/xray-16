@@ -807,9 +807,11 @@ void game_sv_mp::ChargeGrenades(
         make_string("weapon [%s] has greater than 4 types of grenade [%s]", weapon->s_name.c_str(), grenade_string)
             .c_str());
     weapon->a_elapsed_grenades.unpack_from_byte(0);
-    string512 temp_ammo_class;
+
     for (int i = 0; i < grenades_count; ++i)
     {
+        string512 temp_ammo_class;
+
         _GetItem(grenade_string, i, temp_ammo_class);
         u32 const ammo_id = static_cast<u16>(m_strWeaponsData->GetItemIdx(shared_str(temp_ammo_class)));
 
@@ -977,11 +979,17 @@ struct _votecommands
     u16 flag;
 };
 
-_votecommands votecommands[] = {{"restart", "g_restart", flVoteRestart},
-    {"restart_fast", "g_restart_fast", flVoteRestartFast}, {"kick", "sv_kick", flVoteKick},
-    {"ban", "sv_banplayer", flVoteBan}, {"changemap", "sv_changelevel", flVoteMap},
-    {"changeweather", "sv_setenvtime", flVoteWeather}, {"changegametype", "sv_changegametype", flVoteGameType},
-    {NULL, NULL}};
+_votecommands votecommands[] =
+{
+    { "restart",        "g_restart",         flVoteRestart },
+    { "restart_fast",   "g_restart_fast",    flVoteRestartFast },
+    { "kick",           "sv_kick",           flVoteKick },
+    { "ban",            "sv_banplayer",      flVoteBan },
+    { "changemap",      "sv_changelevel",    flVoteMap },
+    { "changeweather",  "sv_setenvtime",     flVoteWeather },
+    { "changegametype", "sv_changegametype", flVoteGameType },
+    { nullptr, nullptr, 0 }
+};
 
 s32 game_sv_mp::ExcludeBanTimeFromVoteStr(char const* vote_string, char* new_vote_str, u32 new_vote_str_size)
 {
@@ -1308,8 +1316,6 @@ void game_sv_mp::ClearPlayerItems(game_PlayerState* ps)
 void game_sv_mp::SetPlayersDefItems(game_PlayerState* ps)
 {
     ClearPlayerItems(ps);
-    if (ps->team < 0)
-        return;
     //-------------------------------------------
     // fill player with default items
     if (ps->team < s16(TeamList.size()))
@@ -1421,13 +1427,13 @@ void game_sv_mp::OnPlayerKilled(NET_Packet P)
 
     if (!ps_killed)
     {
+#ifndef MASTER_GOLD
         CEntity* entity = smart_cast<CEntity*>(Level().Objects.net_Find(KilledID));
 
-#ifndef MASTER_GOLD
         Msg("! ERROR:  killed entity is null ! (entitty [%d][%s]), killer id [%d][%s], Frame [%d]", KilledID,
             entity ? entity->cName().c_str() : "unknown", KillerID, ps_killer ? ps_killer->getName() : "unknown",
             Device.dwFrame);
-#endif // #ifndef MASTER_GOLD
+#endif
         return;
     }
 #ifdef MP_LOGGING
@@ -1785,7 +1791,6 @@ void game_sv_mp::ReadOptions(shared_str& options)
     SetGameTimeFactor(StartEnvGameTime, g_fTimeFactor);
 };
 
-static bool g_bConsoleCommandsCreated_MP = false;
 void game_sv_mp::ConsoleCommands_Create(){};
 
 void game_sv_mp::ConsoleCommands_Clear(){};

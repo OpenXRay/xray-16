@@ -95,7 +95,7 @@ public:
 
     void update();
     void update_threadsafety();
-    
+
     void clear();
 
 private:

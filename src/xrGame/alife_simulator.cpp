@@ -25,8 +25,8 @@ LPCSTR alife_section = "alife";
 
 
 CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
-    : CALifeUpdateManager(server, alife_section), CALifeInteractionManager(server, alife_section),
-      CALifeSimulatorBase(server, alife_section)
+    : CALifeSimulatorBase(server, alife_section), CALifeUpdateManager(server, alife_section),
+      CALifeInteractionManager(server, alife_section)
 {
     // XXX: why do we need to reinitialize script engine?
     if (!strstr(Core.Params, "-keep_lua"))

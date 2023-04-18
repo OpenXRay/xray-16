@@ -107,8 +107,8 @@ void CRender::level_Load(IReader* fs)
     pApp->LoadEnd();
 
     // sanity-clear
-    lstLODgroups.clear();
-    mapLOD.clear();
+    dsgraph.lstLODgroups.clear();
+    dsgraph.mapLOD.clear();
 
     // signal loaded
     b_loaded = TRUE;

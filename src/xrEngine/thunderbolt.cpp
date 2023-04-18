@@ -89,10 +89,10 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
     next_lightning_time = 0.f;
     bEnabled = false;
 
-    string_path filePath;
-    const auto load_config = [&filePath](pcstr path) -> CInifile*
+    const auto load_config = [](pcstr path) -> CInifile*
     {
-        if (FS.update_path(filePath, "$game_config$", path, false))
+        string_path filePath;
+        if (FS.exist(filePath, "$game_config$", path))
             return xr_new<CInifile>(filePath, true, true, false);
         return nullptr;
     };

@@ -171,7 +171,8 @@ void Fvisual::Render(float)
 #if RENDER == R_R1
     if (m_fast && ps_r1_force_geomx)
 #else
-    if (m_fast && (ps_r1_force_geomx || RImplementation.phase == CRender::PHASE_SMAP && !RCache.is_TessEnabled()))
+    if (m_fast &&
+        (ps_r1_force_geomx || RImplementation.active_phase() == CRender::PHASE_SMAP && !RCache.is_TessEnabled()))
 #endif
     {
         RCache.set_Geometry(m_fast->rm_geom);

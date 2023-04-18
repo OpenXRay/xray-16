@@ -133,7 +133,6 @@ bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
             ShowPdaMenu();
         break;
     }
-
     case kINVENTORY:
     {
         if (!pActor->inventory_disabled())
@@ -141,8 +140,8 @@ bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
 
         break;
     }
-
     case kSCORES:
+    {
         if (!pActor->inventory_disabled())
         {
             m_game_objective = AddCustomStatic("main_task", true);
@@ -172,6 +171,7 @@ bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
         }
         break;
     }
+    } // switch (GetBindedAction(dik))
 
     return false;
 }

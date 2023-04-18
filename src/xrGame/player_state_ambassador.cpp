@@ -5,14 +5,7 @@
 
 namespace award_system
 {
-player_state_ambassador::player_state_ambassador(game_state_accumulator* owner) : inherited(owner)
-{
-    m_shots_count = u32(-1);
-    m_art_drop_count = 0;
-    m_delivered = false;
-}
-
-u32 const player_state_ambassador::get_u32_param()
+u32 player_state_ambassador::get_u32_param()
 {
     if (m_delivered && (m_shots_count == 0) && (m_art_drop_count == 0))
         return 1;

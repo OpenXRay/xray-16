@@ -15,7 +15,6 @@ void turn_zone()
 }
 */
 CZoneCampfire::CZoneCampfire()
-    : m_pDisabledParticles(NULL), m_pEnablingParticles(NULL), m_turned_on(true), m_turn_time(0)
 {
     //.	g_zone = this;
 }

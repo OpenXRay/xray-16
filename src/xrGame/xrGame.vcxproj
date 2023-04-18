@@ -931,7 +931,6 @@
     <ClInclude Include="ParticlesObject.h" />
     <ClInclude Include="ParticlesPlayer.h" />
     <ClInclude Include="particle_params.h" />
-    <ClInclude Include="particle_params_inline.h" />
     <ClInclude Include="patrol_path_manager.h" />
     <ClInclude Include="patrol_path_manager_inline.h" />
     <ClInclude Include="PDA.h" />
@@ -1045,7 +1044,6 @@
     <ClInclude Include="screenshot_server.h" />
     <ClInclude Include="ScriptXMLInit.h" />
     <ClInclude Include="script_abstract_action.h" />
-    <ClInclude Include="script_abstract_action_inline.h" />
     <ClInclude Include="script_action_condition.h" />
     <ClInclude Include="script_action_condition_inline.h" />
     <ClInclude Include="script_action_planner_action_wrapper.h" />
@@ -2573,7 +2571,6 @@
     <ClCompile Include="obstacles_query.cpp" />
     <ClCompile Include="ParticlesObject.cpp" />
     <ClCompile Include="ParticlesPlayer.cpp" />
-    <ClCompile Include="particle_params.cpp" />
     <ClCompile Include="particle_params_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -2730,8 +2727,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="script_abstract_action.cpp" />
-    <ClCompile Include="script_action_condition.cpp" />
     <ClCompile Include="script_action_condition_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -2748,7 +2743,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="script_animation_action.cpp" />
     <ClCompile Include="script_animation_action_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>

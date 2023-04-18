@@ -157,16 +157,13 @@ bool CUIMpTradeWnd::TryToBuyItem(SBuyItemInfo* buy_itm, u32 buy_flags, SBuyItemI
         iinfo->SetState(SBuyItemInfo::e_bought);
 
     CUICellItem* cell_itm = NULL;
-    bool b_alone = true;
     if (iinfo->m_cell_item->OwnerList()) // just from shop
     {
         cell_itm = iinfo->m_cell_item->OwnerList()->RemoveItem(iinfo->m_cell_item, false);
-        b_alone = false;
     }
     else // new created
     {
         cell_itm = iinfo->m_cell_item;
-        b_alone = true;
     }
 
     R_ASSERT(cell_itm->OwnerList() == NULL);

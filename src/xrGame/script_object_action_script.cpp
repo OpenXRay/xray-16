@@ -51,6 +51,6 @@ SCRIPT_EXPORT(CScriptObjectAction, (),
             .def("object", (void (CScriptObjectAction::*)(pcstr))(&CScriptObjectAction::SetObject))
             .def("object",
                 (void (CScriptObjectAction::*)(CScriptGameObject*))(&CScriptObjectAction::SetObject))
-            .def("completed", (bool (CScriptObjectAction::*)())(&CScriptObjectAction::completed))
+            .def("completed", &CScriptAbstractAction::completed)
     ];
 });

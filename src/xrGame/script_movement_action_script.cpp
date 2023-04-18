@@ -111,6 +111,6 @@ SCRIPT_EXPORT(CScriptMovementAction, (),
             .def("patrol", &CScriptMovementAction::SetPatrolPath)
             .def("position", &CScriptMovementAction::SetPosition)
             .def("input", &CScriptMovementAction::SetInputKeys)
-            .def("completed", (bool (CScriptMovementAction::*)())(&CScriptMovementAction::completed))
+            .def("completed", &CScriptAbstractAction::completed)
     ];
 });

@@ -52,7 +52,7 @@ private:
     stalker_movement_params(stalker_movement_params const& params);
 
 public:
-    stalker_movement_params();
+    stalker_movement_params() = default;
     stalker_movement_params& operator=(stalker_movement_params const& params);
     IC void construct(stalker_movement_manager_smart_cover* manager);
 
@@ -92,34 +92,34 @@ private:
     u32 m_vertex_id;
 
 public:
-    EBodyState m_body_state;
-    EMovementType m_movement_type;
-    EMentalState m_mental_state;
-    EPathType m_path_type;
-    EDetailPathType m_detail_path_type;
+    EBodyState m_body_state{ MonsterSpace::eBodyStateStand };
+    EMovementType m_movement_type{ MonsterSpace::eMovementTypeStand };
+    EMentalState m_mental_state{ MonsterSpace::eMentalStateDanger };
+    EPathType m_path_type{ MovementManager::ePathTypeNoPath };
+    EDetailPathType m_detail_path_type{ DetailPathManager::eDetailPathTypeSmooth };
 
 private:
-    Fvector m_desired_position_impl;
-    Fvector const* m_desired_position;
-    Fvector m_desired_direction_impl;
-    Fvector const* m_desired_direction;
+    Fvector m_desired_position_impl{ flt_max, flt_max, flt_max };
+    Fvector const* m_desired_position{};
+    Fvector m_desired_direction_impl{ flt_max, flt_max, flt_max };
+    Fvector const* m_desired_direction{};
 
 private:
-    shared_str m_cover_id;
-    cover_type const* m_cover;
+    shared_str m_cover_id{ "" };
+    cover_type const* m_cover{};
 
-    shared_str m_cover_loophole_id;
-    loophole_type const* m_cover_loophole;
+    shared_str m_cover_loophole_id{ "" };
+    loophole_type const* m_cover_loophole{};
 
-    CGameObject const* m_cover_fire_object;
-    Fvector m_cover_fire_position_impl;
-    Fvector const* m_cover_fire_position;
+    CGameObject const* m_cover_fire_object{};
+    Fvector m_cover_fire_position_impl{ flt_max, flt_max, flt_max };
+    Fvector const* m_cover_fire_position{};
 
 private:
-    stalker_movement_manager_smart_cover* m_manager;
-    mutable loophole_type const* m_cover_selected_loophole;
-    mutable u32 m_last_selection_time;
-    mutable bool m_selected_loophole_actual;
+    stalker_movement_manager_smart_cover* m_manager{};
+    mutable loophole_type const* m_cover_selected_loophole{};
+    mutable u32 m_last_selection_time{};
+    mutable bool m_selected_loophole_actual{};
 }; // class stalker_movement_params
 
 #include "stalker_movement_params_inline.h"

@@ -31,10 +31,10 @@ class CItemMgr
 
 public:
     void Load(const shared_str& sect);
-    const u32 GetItemCost(const shared_str& sect_name, u32 rank) const;
-    const u8 GetItemSlotIdx(const shared_str& sect_name) const;
-    const u32 GetItemIdx(const shared_str& sect_name) const;
+    u32 GetItemCost(const shared_str& sect_name, u32 rank) const;
+    u8 GetItemSlotIdx(const shared_str& sect_name) const;
+    u32 GetItemIdx(const shared_str& sect_name) const;
     void Dump() const;
-    const u32 GetItemsCount() const;
+    u32 GetItemsCount() const;
     const shared_str& GetItemName(u32 Idx) const;
 };

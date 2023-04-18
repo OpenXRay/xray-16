@@ -73,7 +73,11 @@ void CControlThreaten::on_event(ControlCom::EEventType type, ControlCom::IEventD
 {
     switch (type)
     {
-    case ControlCom::eventAnimationEnd: m_man->notify(ControlCom::eventThreatenEnd, 0); break;
+    case ControlCom::eventAnimationEnd:
+    {
+        m_man->notify(ControlCom::eventThreatenEnd, 0);
+        break;
+    }
     case ControlCom::eventAnimationSignal:
     {
         SAnimationSignalEventData* event_data = (SAnimationSignalEventData*)dat;
