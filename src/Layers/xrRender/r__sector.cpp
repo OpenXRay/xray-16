@@ -87,8 +87,13 @@ void CPortal::OnRender()
 }
 #endif
 //
-void CPortal::Setup(Fvector* V, int vcnt, CSector* face, CSector* back)
+void CPortal::setup(const level_portal_data_t& data)
 {
+    const auto* V = data.vertices.cbegin();
+    const auto vcnt = data.vertices.size();
+    CSector* face = static_cast<CSector*>(RImplementation.getSector(data.sector_front));
+    CSector* back = static_cast<CSector*>(RImplementation.getSector(data.sector_back));
+
     // calc sphere
     Fbox BB;
     BB.invalidate();
@@ -301,19 +306,15 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
     }
 }
 
-void CSector::load(IReader& fs)
+void CSector::setup(const level_sector_data_t& data)
 {
     // Assign portal polygons
-    u32 size = fs.find_chunk(fsP_Portals);
-    R_ASSERT(0 == (size & 1));
-    u32 count = size / 2;
-    m_portals.reserve(count);
-    while (count)
+    const auto num_portals = data.portals_id.size();
+    m_portals.resize(num_portals);
+    for (int idx = 0; idx < num_portals; ++idx)
     {
-        u16 ID = fs.r_u16();
-        CPortal* P = (CPortal*)RImplementation.getPortal(ID);
-        m_portals.push_back(P);
-        count--;
+        const auto ID = data.portals_id[idx];
+        m_portals[idx] = static_cast<CPortal*>(RImplementation.getPortal(ID));
     }
 
     if (GEnv.isDedicatedServer)
@@ -321,8 +322,6 @@ void CSector::load(IReader& fs)
     else
     {
         // Assign visual
-        size = fs.find_chunk(fsP_Root);
-        R_ASSERT(size == 4);
-        m_root = (dxRender_Visual*)RImplementation.getVisual(fs.r_u32());
+        m_root = static_cast<dxRender_Visual*>(RImplementation.getVisual(data.root_id));
     }
 }

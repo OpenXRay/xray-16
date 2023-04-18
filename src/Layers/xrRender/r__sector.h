@@ -24,7 +24,7 @@ class CPortal : public IRender_Portal
 {
 public:
     using Poly = svector<Fvector, 6>;
-    struct b_portal
+    struct level_portal_data_t
     {
         u16 sector_front;
         u16 sector_back;
@@ -41,7 +41,7 @@ public:
     u32 marker;
     BOOL bDualRender;
 
-    void Setup(Fvector* V, int vcnt, CSector* face, CSector* back);
+    void setup(const level_portal_data_t& data);
 
     Poly& getPoly() { return poly; }
     CSector* Back() { return pBack; }
@@ -75,6 +75,13 @@ class dxRender_Visual;
 // Main 'Sector' class
 class CSector : public IRender_Sector
 {
+public:
+    struct level_sector_data_t
+    {
+        xr_vector<u32> portals_id;
+        u32 root_id;
+    };
+
 protected:
     dxRender_Visual* m_root; // whole geometry of that sector
     xr_vector<CPortal*> m_portals;
@@ -89,7 +96,7 @@ public:
     // Main interface
     dxRender_Visual* root() { return m_root; }
     void traverse(CFrustum& F, _scissor& R);
-    void load(IReader& fs);
+    void setup(const level_sector_data_t& data);
 
     CSector() { m_root = nullptr; }
     virtual ~CSector();
