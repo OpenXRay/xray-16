@@ -350,9 +350,7 @@ void R_dsgraph_structure::render_subspace(IRender_Sector* _sector, CFrustum* _fr
         RImplementation.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, RImplementation.rmPortals, _cop, box_radius);
         for (int K = 0; K < RImplementation.Sectors_xrc.r_count(); K++)
         {
-            CPortal* pPortal =
-                (CPortal*)RImplementation
-                    .Portals[RImplementation.rmPortals->get_tris()[RImplementation.Sectors_xrc.r_begin()[K].id].dummy];
+            CPortal* pPortal = Portals[RImplementation.rmPortals->get_tris()[RImplementation.Sectors_xrc.r_begin()[K].id].dummy];
             pPortal->bDualRender = TRUE;
         }
     }

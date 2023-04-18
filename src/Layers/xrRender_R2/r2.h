@@ -153,8 +153,6 @@ public:
 
     CSector* pLastSector;
     u32 uLastLTRACK;
-    xr_vector<IRender_Portal*> Portals;
-    xr_vector<IRender_Sector*> Sectors;
     xrXRC Sectors_xrc;
     CDB::MODEL* rmPortals;
     CHOM HOM;
@@ -444,7 +442,7 @@ protected:
 
 private:
     FS_FileSet m_file_set;
-    CSector* m_largest_sector{};
+    u32 m_largest_sector_id{0};
 };
 
 extern CRender RImplementation;

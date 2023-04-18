@@ -639,3 +639,45 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     break;
     }
 }
+
+void R_dsgraph_structure::load()
+{
+    const auto& RI = RImplementation;
+
+    const auto portals_count = RI.portals_data.size();
+    const auto sectors_count = RI.sectors_data.size();
+
+    Sectors.resize(sectors_count);
+    Portals.resize(portals_count);
+
+    for (int idx = 0; idx < portals_count; ++idx)
+    {
+        Portals[idx] = xr_new<CPortal>();
+    }
+
+    for (int idx = 0; idx < sectors_count; ++idx)
+    {
+        auto* sector = xr_new<CSector>();
+
+        sector->setup(RI.sectors_data[idx]);
+        Sectors[idx] = sector;
+    }
+
+    for (int idx = 0; idx < portals_count; ++idx)
+    {
+        auto* portal = static_cast<CPortal*>(Portals[idx]);
+
+        portal->setup(RI.portals_data[idx]);
+    }
+}
+
+void R_dsgraph_structure::unload()
+{
+    for (IRender_Sector* sector : Sectors)
+        xr_delete(sector);
+    Sectors.clear();
+
+    for (IRender_Portal* portal : Portals)
+        xr_delete(portal);
+    Portals.clear();
+}

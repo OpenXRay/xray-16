@@ -134,14 +134,10 @@ void CRender::level_Unload()
     Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
-    for (IRender_Sector* sector : Sectors)
-        xr_delete(sector);
-    Sectors.clear();
+    sectors_data.clear();
+    portals_data.clear();
 
-    // 3.
-    for (IRender_Portal* portal : Portals)
-        xr_delete(portal);
-    Portals.clear();
+    dsgraph.unload();
 
     //*** Lights
     // Glows.Unload			();
@@ -317,6 +313,7 @@ void CRender::LoadSectors(IReader* fs)
     portals_data.resize(portals_count);
 
     // load sectors
+    float largest_sector_vol = 0.0f;
     IReader* S = fs->open_chunk(fsL_SECTORS);
     for (u32 i = 0;; i++)
     {
@@ -341,6 +338,15 @@ void CRender::LoadSectors(IReader* fs)
             size = P->find_chunk(fsP_Root);
             R_ASSERT(size == 4);
             sector_data.root_id = P->r_u32();
+
+            // Find the larget sector
+            auto* V = static_cast<dxRender_Visual*>(RImplementation.getVisual(sector_data.root_id));
+            float vol = V->vis.box.getvolume();
+            if (vol > largest_sector_vol)
+            {
+                largest_sector_vol = vol;
+                m_largest_sector_id = i;
+            }
         }
         P->close();
     }
@@ -409,30 +415,7 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    const auto sectors_count = sectors_data.size();
-
-    Sectors.resize(sectors_count);
-    Portals.resize(portals_count);
-
-    for (int idx = 0; idx < portals_count; ++idx)
-    {
-        Portals[idx] = xr_new<CPortal>();
-    }
-
-    for (int idx = 0; idx < sectors_count; ++idx)
-    {
-        auto *sector = xr_new<CSector>();
-        
-        sector->setup(sectors_data[idx]);
-        Sectors[idx] = sector;
-    }
-
-    for (int idx = 0; idx < portals_count; ++idx)
-    {
-        auto* portal = static_cast<CPortal*>(Portals[idx]);
-        
-        portal->setup(portals_data[idx]);
-    }
+    dsgraph.load();
 
     pLastSector = nullptr;
 }

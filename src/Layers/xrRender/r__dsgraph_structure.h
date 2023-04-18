@@ -1,5 +1,7 @@
 #pragma once
 
+#include "r__sector.h"
+
 // feedback	for receiving visuals
 class R_feedback
 {
@@ -34,6 +36,9 @@ struct R_dsgraph_structure
     R_dsgraph::mapSorted_T mapEmissive;
     R_dsgraph::mapSorted_T mapHUDEmissive;
 #endif
+
+    xr_vector<CSector*> Sectors;
+    xr_vector<CPortal*> Portals;
 
     // Runtime structures
     xr_vector<R_dsgraph::mapNormal_T::value_type*> nrmPasses;
@@ -107,6 +112,9 @@ struct R_dsgraph_structure
         pmask[1] = _2;
         pmask_wmark = _wm;
     }
+
+    void load();
+    void unload();
 
     void add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
     void add_leafs_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility

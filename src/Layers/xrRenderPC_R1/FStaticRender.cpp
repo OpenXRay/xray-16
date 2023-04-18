@@ -250,13 +250,13 @@ ref_shader CRender::getShader(int id)
 }
 IRender_Portal* CRender::getPortal(int id)
 {
-    VERIFY(id < int(Portals.size()));
-    return Portals[id];
+    VERIFY(id < int(dsgraph.Portals.size()));
+    return dsgraph.Portals[id];
 }
 IRender_Sector* CRender::getSector(int id)
 {
-    VERIFY(id < int(Sectors.size()));
-    return Sectors[id];
+    VERIFY(id < int(dsgraph.Sectors.size()));
+    return dsgraph.Sectors[id];
 }
 IRender_Sector* CRender::getSectorActive() { return pLastSector; }
 IRenderVisual* CRender::getVisual(int id)
@@ -500,7 +500,7 @@ void CRender::Calculate()
         Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
         for (int K = 0; K < Sectors_xrc.r_count(); K++)
         {
-            CPortal* pPortal = (CPortal*)Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
+            CPortal* pPortal = dsgraph.Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
             pPortal->bDualRender = TRUE;
         }
     }

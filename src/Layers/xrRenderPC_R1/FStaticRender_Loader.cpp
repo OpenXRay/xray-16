@@ -128,13 +128,10 @@ void CRender::level_Unload()
     uLastLTRACK = 0;
 
     // 2.
-    for (I = 0; I < Sectors.size(); I++)
-        xr_delete(Sectors[I]);
-    Sectors.clear();
-    // 3.
-    for (I = 0; I < Portals.size(); I++)
-        xr_delete(Portals[I]);
-    Portals.clear();
+    sectors_data.clear();
+    portals_data.clear();
+
+    dsgraph.unload();
 
     //*** Lights
     L_Glows->Unload();
@@ -417,28 +414,7 @@ void CRender::LoadSectors(IReader* fs)
 
     const auto sectors_count = sectors_data.size();
 
-    Sectors.resize(sectors_count);
-    Portals.resize(portals_count);
-
-    for (int idx = 0; idx < portals_count; ++idx)
-    {
-        Portals[idx] = xr_new<CPortal>();
-    }
-
-    for (int idx = 0; idx < sectors_count; ++idx)
-    {
-        auto* sector = xr_new<CSector>();
-
-        sector->setup(sectors_data[idx]);
-        Sectors[idx] = sector;
-    }
-
-    for (int idx = 0; idx < portals_count; ++idx)
-    {
-        auto* portal = static_cast<CPortal*>(Portals[idx]);
-
-        portal->setup(portals_data[idx]);
-    }
+    dsgraph.load();
 
     pLastSector = nullptr;
 }
