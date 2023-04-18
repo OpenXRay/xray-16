@@ -31,26 +31,26 @@ class CUIGameCTA : public UIGameMP
     CUISpawnWnd* m_pUITeamSelectWnd;
     CUIStatic* m_team1_icon;
     CUIStatic* m_team2_icon;
-    CUITextWnd* m_team1_score;
-    CUITextWnd* m_team2_score;
-    CUITextWnd* m_pFragLimitIndicator;
-    game_cl_CaptureTheArtefact* m_game;
+    CUITextWnd* m_team1_score{};
+    CUITextWnd* m_team2_score{};
+    CUITextWnd* m_pFragLimitIndicator{};
+    game_cl_CaptureTheArtefact* m_game{};
 
     CUIMoneyIndicator* m_pMoneyIndicator;
     CUIRankIndicator* m_pRankIndicator;
     CUITextWnd* m_pReinforcementInidcator;
-    CUIMessageBoxEx* m_pBuySpawnMsgBox;
-    UIVoteStatusWnd* m_voteStatusWnd;
+    CUIMessageBoxEx* m_pBuySpawnMsgBox{};
+    UIVoteStatusWnd* m_voteStatusWnd{};
 
     shared_str m_teamSectionForBuyMenu;
-    IBuyWnd* m_pCurBuyMenu;
+    IBuyWnd* m_pCurBuyMenu{};
     shared_str m_teamSectionForSkinMenu;
-    CUISkinSelectorWnd* m_pCurSkinMenu;
+    CUISkinSelectorWnd* m_pCurSkinMenu{};
     shared_str m_costSection;
 
     /// This window shows the player lists.
-    UITeamPanels* teamPanels;
-    bool m_team_panels_shown;
+    UITeamPanels* teamPanels{};
+    bool m_team_panels_shown{};
 
     CUITextWnd* m_spectator_caption;
     CUITextWnd* m_pressjump_caption;

@@ -138,7 +138,6 @@ public:
     virtual IRender_Target* getTarget() override;
 
     // Main
-    virtual void flush() override;
     void set_Object(IRenderable* O);
     virtual void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
     void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf (no culling performed at all)
@@ -205,8 +204,6 @@ public:
     virtual void rmNear() override;
     virtual void rmFar() override;
     virtual void rmNormal() override;
-
-    u32 active_phase() override { return phase; }
 
     // Constructor/destructor/loader
     CRender();

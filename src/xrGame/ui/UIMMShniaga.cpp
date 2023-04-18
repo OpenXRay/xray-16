@@ -199,16 +199,10 @@ void CUIMMShniaga::SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_pat
     xr_vector<CUITextWnd*>* lst = NULL;
     switch (page_id)
     {
-    case epi_main: { lst = &m_buttons;
+    case epi_main:             lst = &m_buttons;             break;
+    case epi_new_game:         lst = &m_buttons_new;         break;
+    case epi_new_network_game: lst = &m_buttons_new_network; break;
     }
-    break;
-    case epi_new_game: { lst = &m_buttons_new;
-    }
-    break;
-    case epi_new_network_game: { lst = &m_buttons_new_network;
-    }
-    break;
-    }; // switch (page_id)
     delete_data(*lst);
 
     CUIXml tmp_xml;
@@ -220,16 +214,22 @@ void CUIMMShniaga::ShowPage(enum_page_id page_id)
 {
     switch (page_id)
     {
-    case epi_main: { ShowMain();
+    case epi_main:
+    {
+        ShowMain();
+        break;
     }
-    break;
-    case epi_new_game: { ShowNewGame();
+    case epi_new_game:
+    {
+        ShowNewGame();
+        break;
     }
-    break;
-    case epi_new_network_game: { ShowNetworkGame();
+    case epi_new_network_game:
+    {
+        ShowNetworkGame();
+        break;
     }
-    break;
-    }; // switch (page_id)
+    }
 }
 
 void CUIMMShniaga::ShowMain()
@@ -512,10 +512,8 @@ float CUIMMShniaga::pos(float x1, float x2, u32 t)
 {
     float x = 0;
 
-    if (t >= 0 && t <= m_run_time)
+    if (t <= m_run_time)
         x = log(1 + (t * 10.0f) / m_run_time) / log(11.0f);
-    else if (t <= 0)
-        x = 0;
     else if (t > m_run_time)
         x = 1;
 

@@ -193,9 +193,9 @@ void CLevel::IR_OnKeyboardPress(int key)
             Log("! failed to get sim_combat.start_attack functor");
         }
 #endif
+        break;
     }
-    break;
-    };
+    } // switch (_curr)
 
     if (!bReady || !b_ui_exist)
         return;
@@ -679,8 +679,8 @@ void CLevel::IR_OnActivate()
 {
     if (!pInput)
         return;
-    int i;
-    for (i = 0; i < CInput::COUNT_KB_BUTTONS; i++)
+
+    for (int i = 0; i < CInput::COUNT_KB_BUTTONS; i++)
     {
         if (IR_GetKeyState(i))
         {
@@ -700,10 +700,8 @@ void CLevel::IR_OnActivate()
             case kL_LOOKOUT:
             case kR_LOOKOUT:
             case kWPN_FIRE:
-            {
                 IR_OnKeyboardPress(i);
-            }
-            break;
+                break;
             };
         };
     }

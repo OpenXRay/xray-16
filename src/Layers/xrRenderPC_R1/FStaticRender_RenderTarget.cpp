@@ -320,7 +320,7 @@ void CRenderTarget::End()
     BOOL bDistort = RImplementation.o.distortion;
     BOOL bCMap = NeedColorMapping();
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
-    if ((0 == RImplementation.mapDistort.size()) && !_menu_pp)
+    if ((0 == RImplementation.dsgraph.mapDistort.size()) && !_menu_pp)
         bDistort = FALSE;
     if (bDistort)
         phase_distortion();
@@ -410,9 +410,9 @@ void CRenderTarget::phase_distortion()
     RCache.ClearRT(rt_distort, color_rgba(127, 127, 127, 127));
 
     if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->OnRenderPPUI_query())
-        RImplementation.r_dsgraph_render_distort();
+        RImplementation.dsgraph.render_distort();
     else
-        RImplementation.mapDistort.clear();
+        RImplementation.dsgraph.mapDistort.clear();
 
     if (g_pGamePersistent)
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI

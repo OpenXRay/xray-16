@@ -21,7 +21,7 @@ void smapvis::invalidate()
 }
 void smapvis::begin()
 {
-    RImplementation.clear_Counters();
+    RImplementation.dsgraph.clear_Counters();
     switch (state)
     {
     case state_counting:
@@ -32,7 +32,7 @@ void smapvis::begin()
         testQ_V = 0;
         testQ_id = 0;
         mark();
-        RImplementation.set_Feedback(this, test_current);
+        RImplementation.dsgraph.set_Feedback(this, test_current);
         break;
     case state_usingTC:
         // just mark
@@ -44,9 +44,9 @@ void smapvis::end()
 {
     // Gather stats
     u32 ts, td;
-    RImplementation.get_Counters(ts, td);
+    RImplementation.dsgraph.get_Counters(ts, td);
     RImplementation.Stats.ic_total += ts;
-    RImplementation.set_Feedback(0, 0);
+    RImplementation.dsgraph.set_Feedback(0, 0);
 
     switch (state)
     {
@@ -65,9 +65,9 @@ void smapvis::end()
         if (testQ_V)
         {
             RImplementation.occq_begin(testQ_id);
-            RImplementation.marker += 1;
-            RImplementation.r_dsgraph_insert_static(testQ_V);
-            RImplementation.r_dsgraph_render_graph(0);
+            RImplementation.dsgraph.marker += 1;
+            RImplementation.dsgraph.insert_static(testQ_V);
+            RImplementation.dsgraph.render_graph(0);
             RImplementation.occq_end(testQ_id);
             testQ_frame = Device.dwFrame + 1; // get result on next frame
         }
@@ -118,7 +118,7 @@ void smapvis::resetoccq()
 void smapvis::mark()
 {
     RImplementation.Stats.ic_culled += invisible.size();
-    u32 marker = RImplementation.marker + 1; // we are called befor marker increment
+    u32 marker = RImplementation.dsgraph.marker + 1; // we are called befor marker increment
     for (u32 it = 0; it < invisible.size(); it++)
         invisible[it]->vis.marker = marker; // this effectively disables processing
 }
@@ -126,5 +126,5 @@ void smapvis::mark()
 void smapvis::rfeedback_static(dxRender_Visual* V)
 {
     testQ_V = V;
-    RImplementation.set_Feedback(0, 0);
+    RImplementation.dsgraph.set_Feedback(0, 0);
 }

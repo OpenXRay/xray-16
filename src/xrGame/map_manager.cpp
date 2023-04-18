@@ -120,8 +120,8 @@ CMapLocation* CMapManager::AddRelationLocation(CInventoryOwner* pInvOwner)
 
     if (CMapLocation* location = GetMapLocation(sname, pInvOwner->object_id()); location)
     {
-        const bool isCorrect = smart_cast<CRelationMapLocation*>(location);
 #ifdef DEBUG
+        const bool isCorrect = smart_cast<CRelationMapLocation*>(location);
         Msg("~ CMapManager: Someone has already added relation location%s. [%s of %s]",
             (isCorrect ? "" : " as map location"), sname.c_str(), pInvOwner->Name());
 #endif

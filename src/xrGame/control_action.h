@@ -13,10 +13,10 @@ class CAI_Stalker;
 class CControlAction
 {
 protected:
-    CAI_Stalker* m_object;
+    CAI_Stalker* m_object{};
 
 public:
-    IC CControlAction();
+    IC CControlAction() = default;
     IC void set_object(CAI_Stalker* object);
     IC bool applicable() const;
     IC bool completed() const;

@@ -17,7 +17,7 @@
 class CScriptSoundAction : public CScriptAbstractAction
 {
 public:
-    enum EGoalType
+    enum EGoalType : u32
     {
         eGoalTypeSoundAttached = u32(0),
         eGoalTypeSoundPosition,
@@ -25,20 +25,20 @@ public:
     };
 
 public:
-    shared_str m_caSoundToPlay;
-    shared_str m_caBoneName;
-    EGoalType m_tGoalType;
-    bool m_bLooped;
-    bool m_bStartedToPlay;
-    Fvector m_tSoundPosition;
-    Fvector m_tSoundAngles;
-    ESoundTypes m_sound_type;
-    MonsterSound::EType m_monster_sound;
-    int m_monster_sound_delay;
-    MonsterSpace::EMonsterHeadAnimType m_tHeadAnimType;
+    shared_str m_caSoundToPlay{ "" };
+    shared_str m_caBoneName{ "" };
+    EGoalType m_tGoalType{ eGoalTypeDummy };
+    bool m_bLooped{};
+    bool m_bStartedToPlay{};
+    Fvector m_tSoundPosition{};
+    Fvector m_tSoundAngles{};
+    ESoundTypes m_sound_type{};
+    MonsterSound::EType m_monster_sound{ MonsterSound::eMonsterSoundDummy };
+    int m_monster_sound_delay{};
+    MonsterSpace::EMonsterHeadAnimType m_tHeadAnimType{ MonsterSpace::eHeadAnimNone };
 
 public:
-    IC CScriptSoundAction();
+    IC CScriptSoundAction() = default;
     IC CScriptSoundAction(LPCSTR caSoundToPlay, LPCSTR caBoneName,
         const Fvector& tPositionOffset = Fvector().set(0, 0, 0), const Fvector& tAngleOffset = Fvector().set(0, 0, 0),
         bool bLooped = false, ESoundTypes sound_type = SOUND_TYPE_NO_SOUND);

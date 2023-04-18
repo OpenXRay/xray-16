@@ -45,7 +45,7 @@ float r_dtex_range = 50.f;
 ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq)
 {
     int id = SE_R2_SHADOW;
-    if (CRender::PHASE_NORMAL == RImplementation.phase)
+    if (CRender::PHASE_NORMAL == RImplementation.active_phase())
     {
         id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < r_dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
     }
@@ -55,7 +55,7 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float c
 ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq)
 {
     int id = SE_R2_SHADOW;
-    if (CRender::PHASE_NORMAL == RImplementation.phase)
+    if (CRender::PHASE_NORMAL == RImplementation.active_phase())
     {
         id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < r_dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
     }
@@ -619,7 +619,7 @@ void CRender::create()
 #if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
 #endif
-    marker = 0;
+    dsgraph.marker = 0;
     q_sync_point.Create();
 
     PortalTraverser.initialize();
@@ -644,7 +644,7 @@ void CRender::destroy()
     xr_delete(Target);
     PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
-    r_dsgraph_destroy();
+    dsgraph.destroy();
 }
 
 void CRender::reset_begin()
@@ -670,7 +670,9 @@ void CRender::reset_begin()
     }
 
     //AVO: let's reload details while changed details options on vid_restart
-    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    if (b_loaded && (dm_current_size != dm_size ||
+        !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
+        !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
     {
         Details->Unload();
         xr_delete(Details);
@@ -690,7 +692,9 @@ void CRender::reset_end()
     Target = xr_new<CRenderTarget>();
 
     //AVO: let's reload details while changed details options on vid_restart
-    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    if (b_loaded && (dm_current_size != dm_size ||
+        !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
+        !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
     {
         Details = xr_new<CDetailManager>();
         Details->Load();
@@ -853,17 +857,16 @@ FSlideWindowItem* CRender::getSWI(int id)
 IRender_Target* CRender::getTarget() { return Target; }
 IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
-void CRender::flush() { r_dsgraph_render_graph(0); }
 bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
-    add_leafs_Dynamic(root, (dxRender_Visual*)V, m);
+    dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
 }
 void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
 {
-    add_Static((dxRender_Visual*)V, view, view.getMask());
+    dsgraph.add_static((dxRender_Visual*)V, view, view.getMask());
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {

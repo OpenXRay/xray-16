@@ -41,7 +41,7 @@ private:
     handlers_store_t m_events_store;
     event_action_delegate_t m_reward_action;
     game_state_accumulator* m_player_state_accum;
-    reward_event_handler* m_null_hanlder;
+    reward_event_handler* m_null_hanlder{};
 }; // class rewarding_event_handlers
 
 } // namespace award_system

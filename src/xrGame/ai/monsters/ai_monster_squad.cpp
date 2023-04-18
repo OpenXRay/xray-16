@@ -5,7 +5,7 @@
 #include "memory_manager.h"
 #include "basemonster/base_monster.h"
 
-CMonsterSquad::CMonsterSquad() : leader(0), m_home_danger_end_tick(0), m_home_danger_mode_time(8000)
+CMonsterSquad::CMonsterSquad()
 {
     m_locked_covers.reserve(20);
     m_locked_corpses.reserve(10);
@@ -237,8 +237,7 @@ void CMonsterSquad::unlock_corpse(const CEntityAlive* corpse)
 
 squad_grouping_behaviour::squad_grouping_behaviour(
     CEntity* self, Fvector cohesion_factor, Fvector separate_factor, float max_separate_range)
-    : self(self), squad(NULL),
-      steering_behaviour::grouping::params(cohesion_factor, separate_factor, max_separate_range)
+    : steering_behaviour::grouping::params(cohesion_factor, separate_factor, max_separate_range), self(self)
 {
     VERIFY(self);
 }

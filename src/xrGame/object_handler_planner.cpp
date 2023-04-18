@@ -79,7 +79,7 @@ void CObjectHandlerPlanner::set_goal(MonsterSpace::EObjectAction object_action, 
     condition.add_condition(CWorldProperty(condition_id, true));
     set_target_state(condition);
 
-    if (!game_object || (min_queue_size < 0))
+    if (!game_object)
         return;
 
     CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(game_object);

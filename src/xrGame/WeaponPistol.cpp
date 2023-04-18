@@ -110,7 +110,7 @@ void CWeaponPistol::PlayAnimShoot()
     }
     else
     {
-        PlayHUDMotion("anm_shot_l", "anim_shoot_last", FALSE, this, GetState());
+        PlayHUDMotion("anm_shot_l", "anim_shot_last", FALSE, this, GetState());
     }
 }
 

@@ -55,7 +55,7 @@
 #pragma warning(push)
 
 CBaseMonster::CBaseMonster()
-    : m_psy_aura(this, "psy"), m_fire_aura(this, "fire"), m_radiation_aura(this, "radiation"), m_base_aura(this, "base")
+    : m_psy_aura(this, "psy"), m_radiation_aura(this, "radiation"), m_fire_aura(this, "fire"), m_base_aura(this, "base")
 {
     m_pPhysics_support = xr_new<CCharacterPhysicsSupport>(CCharacterPhysicsSupport::etBitting, this);
 

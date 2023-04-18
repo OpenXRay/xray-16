@@ -319,6 +319,9 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
 
 void dxEnvironmentRender::OnDeviceCreate()
 {
+    if (GEnv.isDedicatedServer)
+        return;
+
     CBlender_skybox b_skybox;
     sh_2sky.create(&b_skybox, "skybox_2t");
     sh_2geom.create(v_skybox_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());

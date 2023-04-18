@@ -567,7 +567,7 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                 CSpectator* pSpectator = smart_cast<CSpectator*>(Level().CurrentControlEntity());
                 if (pSpectator)
                 {
-                    string1024 SpectatorStr = "";
+                    string1024 SpectatorStr;
                     pSpectator->GetSpectatorString(SpectatorStr);
                     m_game_ui->SetSpectatorMsgCaption(SpectatorStr);
                 }
@@ -834,7 +834,7 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
         else if (!xr_strcmp(CmdName, "kick"))
         {
             xr_sprintf(NewCmd, "%s %s", *st.translate("mp_kick"), CmdParams[0]);
-            for (int i = 1; i < MAX_VOTE_PARAMS; i++)
+            for (size_t i = 1; i < MAX_VOTE_PARAMS; i++)
             {
                 if (xr_strlen(CmdParams[i]))
                 {
@@ -846,7 +846,7 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
         else if (!xr_strcmp(CmdName, "ban"))
         {
             xr_sprintf(NewCmd, "%s %s", *st.translate("mp_ban"), CmdParams[0]);
-            for (int i = 1; i < MAX_VOTE_PARAMS; i++)
+            for (size_t i = 1; i < MAX_VOTE_PARAMS; i++)
             {
                 if (xr_strlen(CmdParams[i]))
                 {
@@ -1065,9 +1065,6 @@ void game_cl_Deathmatch::OnSwitchPhase(u32 old_phase, u32 new_phase)
                 PlaySndMessage(ID_YOU_WON);
             }
         }
-    }
-    break;
-    default: {
     }
     break;
     };

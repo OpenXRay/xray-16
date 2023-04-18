@@ -950,7 +950,7 @@ public:
 
         char hex_digest[64];
         s32 ban_time = 0;
-        if (sscanf(args_, "%s %i", &hex_digest, &ban_time) != 2)
+        if (sscanf(args_, "%63s %i", hex_digest, &ban_time) != 2)
         {
             Msg("! ERROR: bad command parameters.");
             Msg("Ban player. Format: \"sv_banplayer_by_digest <hex digest> <ban_time_in_sec>\". To get player hex "

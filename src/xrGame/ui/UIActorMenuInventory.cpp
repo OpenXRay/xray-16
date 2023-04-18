@@ -546,7 +546,7 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
             }
         }
 
-        bool result = (!b_own_item) || m_pActorInvOwner->inventory().Slot(slot_id, iitem);
+        [[maybe_unused]] bool result = !b_own_item || m_pActorInvOwner->inventory().Slot(slot_id, iitem);
         VERIFY(result);
 
         CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
@@ -596,7 +596,7 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         CUIDragDropListEx* invlist = GetListByType(iActorBag);
         if (invlist != slot_list)
         {
-            if (!slot_list->ItemsCount() == 1)
+            if (slot_list->ItemsCount() != 1)
                 return false;
 
             CUICellItem* slot_cell = slot_list->GetItemIdx(0);
@@ -658,7 +658,7 @@ bool CUIActorMenu::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
 
     if (m_pActorInvOwner->inventory().CanPutInRuck(iitem) || (b_already && (new_owner != old_owner)))
     {
-        bool result = b_already || (!b_own_item || m_pActorInvOwner->inventory().Ruck(iitem));
+        [[maybe_unused]] bool result = b_already || !b_own_item || m_pActorInvOwner->inventory().Ruck(iitem);
         VERIFY(result);
         CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
         if (!i)
@@ -698,7 +698,7 @@ bool CUIActorMenu::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner = m_pLists[eInventoryBeltList];
 
-        bool result = (!b_own_item) || m_pActorInvOwner->inventory().Belt(iitem);
+        [[maybe_unused]] bool result = !b_own_item || m_pActorInvOwner->inventory().Belt(iitem);
         VERIFY(result);
         CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
 

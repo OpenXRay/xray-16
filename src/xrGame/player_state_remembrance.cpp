@@ -8,12 +8,7 @@
 
 namespace award_system
 {
-player_state_remembrance::player_state_remembrance(game_state_accumulator* owner) : inherited(owner)
-{
-    m_is_remembrance = false;
-}
-
-u32 const player_state_remembrance::get_u32_param() { return m_is_remembrance ? 1 : 0; }
+u32 player_state_remembrance::get_u32_param() { return m_is_remembrance ? 1 : 0; }
 void player_state_remembrance::reset_game() { m_is_remembrance = false; }
 void player_state_remembrance::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)

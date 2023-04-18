@@ -68,7 +68,7 @@ bool is_bone_head(IKinematics& K, u16 bone)
 {
     const u16 head_bone = K.LL_BoneID("bip01_head");
     const u16 neck_bone = K.LL_BoneID("bip01_neck");
-    return (bone != BI_NONE) && neck_bone == bone || find_in_parents(head_bone, bone, K);
+    return (bone != BI_NONE && neck_bone == bone) || find_in_parents(head_bone, bone, K);
 }
 
 void type_motion_diagnostic(

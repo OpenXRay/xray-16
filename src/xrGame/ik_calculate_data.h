@@ -5,25 +5,20 @@
 class CIKLimb;
 struct SCalculateData
 {
-    float const* m_angles;
-    CIKLimb* m_limb;
-    Fmatrix const* m_obj;
+    float const* m_angles{};
+    CIKLimb* m_limb{};
+    Fmatrix const* m_obj{};
 
-    bool do_collide;
+    bool do_collide{};
 
-    calculate_state state;
-    Fvector cl_shift;
-    bool apply;
-    float l;
-    float a;
+    calculate_state state{};
+    Fvector cl_shift{ 0, 0, 0 };
+    bool apply{};
+    float l{};
+    float a{};
 
 public:
-    SCalculateData()
-        : state(), m_limb(0), m_obj(0), cl_shift(Fvector().set(0, 0, 0)), m_angles(0), apply(false), do_collide(false),
-          l(0.f), a(0.f)
-    {
-    }
-
+    SCalculateData() = default;
     SCalculateData(CIKLimb& l, const Fmatrix& o);
 
 public:

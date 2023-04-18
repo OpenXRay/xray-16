@@ -425,7 +425,7 @@ void CUITalkWnd::AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_na
     UITalkDialogWnd->AddIconedAnswer(caption, text, texture_name, templ_name);
 }
 
-void CUITalkWnd::AddIconedMessage(cpcstr text, cpcstr texture_name, Frect texture_rect, cpcstr templ_name)
+void CUITalkWnd::AddIconedMessage(pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name)
 {
     UITalkDialogWnd->AddIconedAnswer(text, texture_name, texture_rect, templ_name);
 }

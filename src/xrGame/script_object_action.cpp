@@ -10,7 +10,6 @@
 #include "script_object_action.h"
 #include "script_game_object.h"
 
-CScriptObjectAction::~CScriptObjectAction() {}
 void CScriptObjectAction::SetObject(CScriptGameObject* tpLuaGameObject)
 {
     m_tpObject = tpLuaGameObject->operator IGameObject*();

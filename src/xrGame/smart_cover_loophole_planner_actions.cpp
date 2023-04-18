@@ -125,7 +125,7 @@ void loophole_action_base::process_fire_object(bool const& change_sight)
 
 void loophole_action_base::process_default(bool const& change_sight)
 {
-    stalker_movement_manager_smart_cover& movement = object().movement();
+    [[maybe_unused]] stalker_movement_manager_smart_cover& movement = object().movement();
 
     VERIFY(movement.current_params().cover());
     VERIFY(movement.current_params().cover_loophole());

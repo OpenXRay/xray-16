@@ -326,11 +326,11 @@ void CActor::g_SetAnimation(u32 mstate_rl)
     {
         if (m_current_legs || m_current_torso)
         {
-            SActorState* ST = 0;
-            if (mstate_rl & mcCrouch)
-                ST = &m_anims->m_crouch;
-            else
-                ST = &m_anims->m_normal;
+//            SActorState* ST = 0;
+//            if (mstate_rl & mcCrouch)
+//                ST = &m_anims->m_crouch;
+//            else
+//                ST = &m_anims->m_normal;
             mstate_real = 0;
             m_current_legs.invalidate();
             m_current_torso.invalidate();
@@ -561,7 +561,9 @@ void CActor::g_SetAnimation(u32 mstate_rl)
             }
         }
     }
-    MotionID mid = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("norm_idle_0");
+
+    // XXX: check why 'mid' was unused
+    //MotionID mid = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("norm_idle_0");
 
     if (!M_legs)
     {

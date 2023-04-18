@@ -12,8 +12,7 @@ IC CTradeFactorParameters::CTradeFactorParameters() {}
 IC void CTradeFactorParameters::clear() { m_factors.clear(); }
 IC void CTradeFactorParameters::enable(const shared_str& section, const CTradeFactors& factors)
 {
-    FACTORS::const_iterator I = m_factors.find(section);
-    VERIFY(I == m_factors.end());
+    VERIFY(m_factors.find(section) == m_factors.end());
     m_factors.emplace(section, factors);
 }
 

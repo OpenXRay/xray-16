@@ -385,9 +385,6 @@ void CGameObject::OnEvent(NET_Packet& P, u16 type)
                 Game().m_WeaponUsageStatistic->OnBullet_Check_Request(&HDS);
         }
         break;
-        default: {
-        }
-        break;
         }
         SetHitInfo(Hitter, Weapon, HDS.bone(), HDS.p_in_bone_space, HDS.dir);
         Hit(&HDS);
@@ -1112,7 +1109,7 @@ bool CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(F
 void CGameObject::add_visual_callback(visual_callback callback)
 {
     VERIFY(smart_cast<IKinematics*>(Visual()));
-    CALLBACK_VECTOR_IT I = std::find(visual_callbacks().begin(), visual_callbacks().end(), callback);
+    [[maybe_unused]] auto I = std::find(visual_callbacks().begin(), visual_callbacks().end(), callback);
     VERIFY(I == visual_callbacks().end());
 
     if (m_visual_callback.empty())

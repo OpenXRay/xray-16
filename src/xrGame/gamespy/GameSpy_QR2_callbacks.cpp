@@ -345,8 +345,8 @@ void __cdecl callback_keylist(qr2_key_type keytype, qr2_keybuffer_t keybuffer, v
         pQR2->KeyBufferAdd(keybuffer, G_SHIELDED_BASES_KEY);
         pQR2->KeyBufferAdd(keybuffer, G_RETURN_PLAYERS_KEY);
         pQR2->KeyBufferAdd(keybuffer, G_BEARER_CANT_SPRINT_KEY);
+        break;
     }
-    break;
     case key_player:
     {
         //			pQR2->KeyBufferAdd(keybuffer, P_NAME__KEY);
@@ -361,11 +361,13 @@ void __cdecl callback_keylist(qr2_key_type keytype, qr2_keybuffer_t keybuffer, v
         pQR2->KeyBufferAdd(keybuffer, TEAM__KEY);
         pQR2->KeyBufferAdd(keybuffer, P_SPECTATOR__KEY);
         pQR2->KeyBufferAdd(keybuffer, P_ARTEFACTS__KEY);
+        break;
     }
-    break;
-    case key_team: { pQR2->KeyBufferAdd(keybuffer, T_SCORE_T_KEY);
+    case key_team:
+    {
+        pQR2->KeyBufferAdd(keybuffer, T_SCORE_T_KEY);
+        break;
     }
-    break;
     };
 
     // GSI_UNUSED(userdata);

@@ -212,11 +212,13 @@ void CDetailPathManager::assign_angle(float& angle, const float start_yaw, const
     else
         angle = dest_yaw - start_yaw - PI_MUL_2;
 
-    if (!start && ((direction_type == eDirectionTypePP) || (direction_type == eDirectionTypeNN)))
+    if (!start && (direction_type == eDirectionTypePP || direction_type == eDirectionTypeNN))
+    {
         if (angle <= 0.f)
             angle = angle + PI_MUL_2;
         else
             angle = angle - PI_MUL_2;
+    }
 
     VERIFY(_valid(angle));
 }

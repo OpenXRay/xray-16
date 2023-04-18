@@ -151,7 +151,7 @@ stalker_movement_manager_smart_cover::transition_action const& stalker_movement_
 {
     typedef smart_cover::description::TransitionGraph::CEdge edge_type;
     typedef smart_cover::description::ActionsList ActionsList;
-    typedef smart_cover::transitions::action action;
+    // typedef smart_cover::transitions::action action;
 
     edge_type const* edge = cover.get_description()->transitions().edge(loophole_id0, loophole_id1);
     VERIFY(edge);
