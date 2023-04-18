@@ -50,7 +50,7 @@ void CRender::level_Load(IReader* fs)
     rmFar();
     rmNormal();
 
-    marker = 0;
+    dsgraph.marker = 0;
 
     if (!GEnv.isDedicatedServer)
     {

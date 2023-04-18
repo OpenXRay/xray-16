@@ -68,7 +68,7 @@ void FProgressive::Load(const char* N, IReader* data, u32 dwFlags)
 void FProgressive::Render(float LOD)
 {
 #if RENDER != R_R1
-    if (m_fast && RImplementation.phase == CRender::PHASE_SMAP)
+    if (m_fast && RImplementation.active_phase() == CRender::PHASE_SMAP)
     {
         int lod_id = iFloor((1.f - clampr(LOD, 0.f, 1.f)) * float(xSWI->count - 1) + 0.5f);
         VERIFY(lod_id >= 0 && lod_id < int(xSWI->count));

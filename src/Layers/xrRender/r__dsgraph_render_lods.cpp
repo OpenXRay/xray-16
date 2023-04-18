@@ -15,7 +15,7 @@ extern float r_ssaLOD_B;
 template <class T> IC bool cmp_first_l(const T &lhs, const T &rhs) { return (lhs.first < rhs.first); }
 template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs.first > rhs.first); }
 
-void R_dsgraph_structure::r_dsgraph_render_lods(bool _setup_zb, bool _clear)
+void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
 {
     if (mapLOD.empty())
         return;

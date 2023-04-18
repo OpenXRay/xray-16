@@ -9,7 +9,7 @@
 
 
 // Common part of interface implementation for all D3D renderers
-class D3DXRenderBase : public IRender, public R_dsgraph_structure, public pureFrame
+class D3DXRenderBase : public IRender, public pureFrame
 {
 public:
     //friend class CSkeletonX; // Stats.Skinning
@@ -62,7 +62,10 @@ public:
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 
+    u32 active_phase() const override { return dsgraph.phase; }
+
 public:
+    R_dsgraph_structure dsgraph;
     CResourceManager* Resources{};
     ref_shader m_WireShader;
     ref_shader m_SelectionShader;
@@ -71,4 +74,7 @@ private:
 #if defined(USE_DX9) || defined(USE_DX11)
     CGammaControl m_Gamma;
 #endif
+
+protected:
+    bool b_loaded{};
 };
