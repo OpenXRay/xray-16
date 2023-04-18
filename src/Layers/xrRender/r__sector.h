@@ -84,9 +84,9 @@ public:
 
 protected:
     dxRender_Visual* m_root; // whole geometry of that sector
-    xr_vector<CPortal*> m_portals;
 
 public:
+    xr_vector<CPortal*> m_portals;
     xr_vector<CFrustum> r_frustums;
     xr_vector<_scissor> r_scissors;
     _scissor r_scissor_merged;
@@ -95,11 +95,10 @@ public:
 public:
     // Main interface
     dxRender_Visual* root() { return m_root; }
-    void traverse(CFrustum& F, _scissor& R);
     void setup(const level_sector_data_t& data);
 
     CSector() { m_root = nullptr; }
-    virtual ~CSector();
+    virtual ~CSector() = default;
 };
 
 class CPortalTraverser
@@ -122,21 +121,16 @@ public:
     CSector* i_start; // input:	starting point
     xr_vector<IRender_Sector*> r_sectors; // result
     xr_vector<std::pair<CPortal*, float>> f_portals; //
-    ref_shader f_shader;
-    ref_geom f_geom;
 
 public:
     CPortalTraverser();
-    void initialize();
-    void destroy();
     void traverse(IRender_Sector* start, CFrustum& F, Fvector& vBase, Fmatrix& mXFORM, u32 options);
+    void traverse_sector(CSector *sector, CFrustum& F, _scissor& R);
     void fade_portal(CPortal* _p, float ssa);
     void fade_render();
 #ifdef DEBUG
     void dbg_draw();
 #endif
 };
-
-extern CPortalTraverser PortalTraverser;
 
 #endif // !defined(AFX_PORTAL_H__1FC2D371_4A19_49EA_BD1E_2D0F8DEBBF15__INCLUDED_)

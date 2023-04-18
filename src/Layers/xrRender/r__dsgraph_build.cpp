@@ -673,11 +673,11 @@ void R_dsgraph_structure::load()
 
 void R_dsgraph_structure::unload()
 {
-    for (IRender_Sector* sector : Sectors)
+    for (auto* sector : Sectors)
         xr_delete(sector);
     Sectors.clear();
 
-    for (IRender_Portal* portal : Portals)
+    for (auto* portal : Portals)
         xr_delete(portal);
     Portals.clear();
 }

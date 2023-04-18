@@ -18,7 +18,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
     if (pLastSector)
     {
         // Traverse sector/portal structure
-        PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, m_ViewProjection,
+        dsgraph.PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, m_ViewProjection,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE
             //. disabled scissoring (HW.Caps.bScissor?CPortalTraverser::VQ_SCISSOR:0)	// generate scissoring info
             );
@@ -26,7 +26,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
         // Determine visibility for static geometry hierrarhy
         if (psDeviceFlags.test(rsDrawStatic))
         {
-            for (auto& s : PortalTraverser.r_sectors)
+            for (auto& s : dsgraph.PortalTraverser.r_sectors)
             {
                 CSector* sector = static_cast<CSector*>(s);
                 dxRender_Visual* root = sector->root();
@@ -95,7 +95,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                     continue;
                 }
 
-                if (PortalTraverser.i_marker != sector->r_marker)
+                if (dsgraph.PortalTraverser.i_marker != sector->r_marker)
                     continue; // inactive (untouched) sector
                 for (auto& view : sector->r_frustums)
                 {
@@ -563,7 +563,7 @@ void CRender::render_forward()
         //	Igor: we don't want to render old lods on next frame.
         dsgraph.mapLOD.clear();
         dsgraph.render_graph(1); // normal level, secondary priority
-        PortalTraverser.fade_render(); // faded-portals
+        dsgraph.PortalTraverser.fade_render(); // faded-portals
         dsgraph.render_sorted(); // strict-sorted geoms
         g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
     }

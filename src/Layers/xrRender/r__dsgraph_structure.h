@@ -39,6 +39,7 @@ struct R_dsgraph_structure
 
     xr_vector<CSector*> Sectors;
     xr_vector<CPortal*> Portals;
+    CPortalTraverser PortalTraverser;
 
     // Runtime structures
     xr_vector<R_dsgraph::mapNormal_T::value_type*> nrmPasses;

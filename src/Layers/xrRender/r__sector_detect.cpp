@@ -76,7 +76,7 @@ IRender_Sector* CRender::detectSector(const Fvector& P, Fvector& dir)
     {
         // Take sector, facing to our point from portal
         CDB::TRI* pTri = rmPortals->get_tris() + ID;
-        CPortal* pPortal = (CPortal*)dsgraph.Portals[pTri->dummy];
+        CPortal* pPortal = dsgraph.Portals[pTri->dummy];
         return pPortal->getSectorFacing(P);
     }
     // Take triangle at ID and use it's Sector

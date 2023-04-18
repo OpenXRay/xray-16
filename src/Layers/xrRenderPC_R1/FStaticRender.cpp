@@ -113,14 +113,11 @@ void CRender::create()
     L_Dynamic = xr_new<CLightR_Manager>();
     PSLibrary.OnCreate();
     //.	HWOCC.occq_create			(occq_size);
-
-    ::PortalTraverser.initialize();
 }
 
 void CRender::destroy()
 {
     m_bMakeAsyncSS = false;
-    ::PortalTraverser.destroy();
     //.	HWOCC.occq_destroy			();
     PSLibrary.OnDestroy();
 
@@ -515,15 +512,15 @@ void CRender::Calculate()
     if (pLastSector)
     {
         // Traverse sector/portal structure
-        PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
+        dsgraph.PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
         // Determine visibility for static geometry hierarchy
         if (psDeviceFlags.test(rsDrawStatic))
         {
-            for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+            for (u32 s_it = 0; s_it < dsgraph.PortalTraverser.r_sectors.size(); s_it++)
             {
-                CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+                CSector* sector = (CSector*)dsgraph.PortalTraverser.r_sectors[s_it];
                 dxRender_Visual* root = sector->root();
                 for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
                 {
@@ -577,7 +574,7 @@ void CRender::Calculate()
                     continue; // disassociated from S/P structure
 
                 // Filter only not light spatial
-                if (PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE))
+                if (dsgraph.PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE))
                     continue; // inactive (untouched) sector
 
                 if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
@@ -713,7 +710,7 @@ void CRender::Render()
     dsgraph.render_lods(false, true); // lods - FB
     dsgraph.render_graph(1); // normal level, secondary priority
     L_Dynamic->render(1); // additional light sources, secondary priority
-    PortalTraverser.fade_render(); // faded-portals
+    dsgraph.PortalTraverser.fade_render(); // faded-portals
     dsgraph.render_sorted(); // strict-sorted geoms
     BasicStats.Glows.Begin();
     if (L_Glows)
