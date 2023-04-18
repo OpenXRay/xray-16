@@ -25,9 +25,9 @@ mp_config_sections::mp_config_sections() : m_tmp_dumper(NULL, FALSE, FALSE, FALS
             m_mp_sections.push_back(_GetItem(line, j, tmp_single_item));
         }
     }
-    for (int i = 0; i < (sizeof(important_sections) / sizeof(char*)); ++i)
+    for (cpcstr important_section : important_sections)
     {
-        m_mp_sections.push_back(shared_str(important_sections[i]));
+        m_mp_sections.emplace_back(important_section);
     }
     m_current_dump_sect = m_mp_sections.end();
 }

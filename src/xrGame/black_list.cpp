@@ -6,8 +6,7 @@
 
 namespace award_system
 {
-black_list::black_list(game_state_accumulator* owner) : inherited(owner) {}
-u32 const black_list::get_u32_param() { return m_victims.size(); }
+u32 black_list::get_u32_param() { return m_victims.size(); }
 void black_list::reset_game() { m_victims.clear(); }
 void black_list::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)

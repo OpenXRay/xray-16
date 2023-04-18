@@ -214,27 +214,12 @@ void CEngineAPI::CreateRendererList()
             }
         }
     };
-    
-    if (GEnv.isDedicatedServer)
+
+    for (RendererDesc& desc : renderers)
     {
-#if defined(XR_PLATFORM_WINDOWS)
-        static cpcstr renderForDedicated = r1_library;
-#else
-        static cpcstr renderForDedicated = gl_library;
-#endif
-        const auto it = std::find_if(renderers.begin(), renderers.end(), [](RendererDesc& desc)
-        {
-            return desc.libraryName == renderForDedicated;
-        });
-        obtainModes(it->module);
+        obtainModes(desc.module);
     }
-    else
-    {
-        for (RendererDesc& desc : renderers)
-        {
-            obtainModes(desc.module);
-        }
-    }
+
     auto& modes = VidQualityToken;
     Msg("Available render modes[%d]:", modes.size());
     for (const auto& mode : modes)

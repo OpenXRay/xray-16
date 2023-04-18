@@ -1088,7 +1088,6 @@ void xrServer::GetServerInfo(CServerInfo* si)
         xr_strcat(tmp256, " [");
         xr_strcat(tmp256, xr_itoa(g_sv_ah_dwArtefactsNum, tmp, 10));
         xr_strcat(tmp256, "] ");
-        g_sv_ah_iReinforcementTime;
     }
 
     // if ( g_sv_dm_dwTimeLimit > 0 )
@@ -1139,10 +1138,10 @@ void xrServer::KickCheaters()
         IClient* tmp_client = GetClientByID(i->cheater_id);
         if (!tmp_client)
         {
-            Msg("! ERROR: KickCheaters: client [%u] not found", i->cheater_id);
+            Msg("! ERROR: KickCheaters: client [%u] not found", i->cheater_id.value());
             continue;
         }
-        ClientID tmp_client_id = tmp_client->ID;
+        const ClientID tmp_client_id = tmp_client->ID;
         DisconnectClient(tmp_client, i->reason.c_str());
 
         NET_Packet P;
@@ -1160,12 +1159,12 @@ void xrServer::MakeScreenshot(ClientID const& admin_id, ClientID const& cheater_
     {
         return;
     }
-    for (int i = 0; i < sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*); ++i)
+    for (const auto& screenshot_proxy : m_screenshot_proxies)
     {
-        if (!m_screenshot_proxies[i]->is_active())
+        if (!screenshot_proxy->is_active())
         {
-            m_screenshot_proxies[i]->make_screenshot(admin_id, cheater_id);
-            Msg("* admin [%d] is making screeshot of client [%d]", admin_id, cheater_id);
+            screenshot_proxy->make_screenshot(admin_id, cheater_id);
+            Msg("* admin [%d] is making screeshot of client [%d]", admin_id.value(), cheater_id.value());
             return;
         }
     }
@@ -1177,12 +1176,12 @@ void xrServer::MakeConfigDump(ClientID const& admin_id, ClientID const& cheater_
     {
         return;
     }
-    for (int i = 0; i < sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*); ++i)
+    for (const auto& screenshot_proxy : m_screenshot_proxies)
     {
-        if (!m_screenshot_proxies[i]->is_active())
+        if (!screenshot_proxy->is_active())
         {
-            m_screenshot_proxies[i]->make_config_dump(admin_id, cheater_id);
-            Msg("* admin [%d] is making config dump of client [%d]", admin_id, cheater_id);
+            screenshot_proxy->make_config_dump(admin_id, cheater_id);
+            Msg("* admin [%d] is making config dump of client [%d]", admin_id.value(), cheater_id.value());
             return;
         }
     }
@@ -1191,16 +1190,17 @@ void xrServer::MakeConfigDump(ClientID const& admin_id, ClientID const& cheater_
 
 void xrServer::initialize_screenshot_proxies()
 {
-    for (int i = 0; i < sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*); ++i)
+    for (auto& screenshot_proxy : m_screenshot_proxies)
     {
-        m_screenshot_proxies[i] = xr_new<clientdata_proxy>(m_file_transfers);
+        screenshot_proxy = xr_new<clientdata_proxy>(m_file_transfers);
     }
 }
+
 void xrServer::deinitialize_screenshot_proxies()
 {
-    for (int i = 0; i < sizeof(m_screenshot_proxies) / sizeof(clientdata_proxy*); ++i)
+    for (auto& screenshot_proxy : m_screenshot_proxies)
     {
-        xr_delete(m_screenshot_proxies[i]);
+        xr_delete(screenshot_proxy);
     }
 }
 

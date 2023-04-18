@@ -5,13 +5,7 @@
 
 namespace award_system
 {
-player_state_skewer::player_state_skewer(game_state_accumulator* owner) : inherited(owner)
-{
-    m_shot = 1;
-    m_kills_count = 0;
-}
-
-u32 const player_state_skewer::get_u32_param() { return m_kills_count; }
+u32 player_state_skewer::get_u32_param() { return m_kills_count; }
 void player_state_skewer::reset_game()
 {
     m_shot = 1;

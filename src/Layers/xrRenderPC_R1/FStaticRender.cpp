@@ -23,7 +23,7 @@ CRender RImplementation;
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /*cdist_sq*/)
 {
-    switch (phase)
+    switch (active_phase())
     {
     case PHASE_NORMAL:
         return (RImplementation.L_Projector->shadowing() ?
@@ -39,7 +39,7 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq)
 {
-    switch (phase)
+    switch (active_phase())
     {
     case PHASE_NORMAL:
         return (((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < 44) ? pVisual->shader->E[SE_R1_NORMAL_HQ] :
@@ -130,13 +130,15 @@ void CRender::destroy()
     //*** Components
     xr_delete(Target);
     Device.seqFrame.Remove(this);
-    r_dsgraph_destroy();
+    dsgraph.destroy();
 }
 
 void CRender::reset_begin()
 {
     //AVO: let's reload details while changed details options on vid_restart
-    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    if (b_loaded && (dm_current_size != dm_size ||
+        !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
+        !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
     {
         Details->Unload();
         xr_delete(Details);
@@ -153,7 +155,9 @@ void CRender::reset_end()
         L_Projector->invalidate();
 
     // let's reload details while changed details options on vid_restart
-    if (b_loaded && (dm_current_size != dm_size || ps_r__Detail_density != ps_current_detail_density))
+    if (b_loaded && (dm_current_size != dm_size ||
+        !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
+        !fsimilar(ps_r__Detail_height, ps_current_detail_height)))
     {
         Details = xr_new<CDetailManager>();
         Details->Load();
@@ -307,18 +311,17 @@ FSlideWindowItem* CRender::getSWI(int id)
 IRender_Target* CRender::getTarget() { return Target; }
 IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
-void CRender::flush() { r_dsgraph_render_graph(0); }
 bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     set_Object(root);
-    add_leafs_Dynamic(root, (dxRender_Visual*)V, m);
+    dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
 }
 void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
 {
-    add_Static((dxRender_Visual*)V, view, view.getMask());
+    dsgraph.add_static((dxRender_Visual*)V, view, view.getMask());
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
@@ -370,7 +373,7 @@ void CRender::set_Object(IRenderable* O)
             VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
         }
     }
-    if (PHASE_NORMAL == phase)
+    if (PHASE_NORMAL == active_phase())
     {
         if (L_Shadows)
             L_Shadows->set_object(O);
@@ -474,7 +477,7 @@ void CRender::Calculate()
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     gm_SetNearer(FALSE);
-    phase = PHASE_NORMAL;
+    dsgraph.phase = PHASE_NORMAL;
 
     // Detect camera-sector
     if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
@@ -506,7 +509,7 @@ void CRender::Calculate()
     Lights.Update();
 
     // Main process
-    marker++;
+    dsgraph.marker++;
     set_Object(nullptr);
     TaskScheduler->Wait(*ProcessHOMTask);
     if (pLastSector)
@@ -533,10 +536,10 @@ void CRender::Calculate()
         if (psDeviceFlags.test(rsDrawDynamic))
         {
             g_SpatialSpace->q_frustum(
-                lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
+                dsgraph.lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)
-            std::sort(lstRenderables.begin(), lstRenderables.end(), [](ISpatial* s1, ISpatial* s2)
+            std::sort(dsgraph.lstRenderables.begin(), dsgraph.lstRenderables.end(), [](ISpatial* s1, ISpatial* s2)
             {
                 const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
                 const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
@@ -550,11 +553,11 @@ void CRender::Calculate()
 
             // Determine visibility for dynamic part of scene
             u32 uID_LTRACK = 0xffffffff;
-            if (phase == PHASE_NORMAL)
+            if (active_phase() == PHASE_NORMAL)
             {
                 uLastLTRACK++;
-                if (lstRenderables.size())
-                    uID_LTRACK = uLastLTRACK % lstRenderables.size();
+                if (dsgraph.lstRenderables.size())
+                    uID_LTRACK = uLastLTRACK % dsgraph.lstRenderables.size();
 
                 // update light-vis for current entity / actor
                 IGameObject* O = g_pGameLevel->CurrentViewEntity();
@@ -565,9 +568,9 @@ void CRender::Calculate()
                         R->update(O);
                 }
             }
-            for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
+            for (u32 o_it = 0; o_it < dsgraph.lstRenderables.size(); o_it++)
             {
-                ISpatial* spatial = lstRenderables[o_it];
+                ISpatial* spatial = dsgraph.lstRenderables[o_it];
                 spatial->spatial_updatesector();
                 CSector* sector = (CSector*)spatial->GetSpatialData().sector;
                 if (nullptr == sector)
@@ -680,17 +683,17 @@ void CRender::Render()
     // Begin
     Target->Begin();
     o.vis_intersect = FALSE;
-    phase = PHASE_NORMAL;
-    r_dsgraph_render_hud(); // hud
-    r_dsgraph_render_graph(0); // normal level
+    dsgraph.phase = PHASE_NORMAL;
+    dsgraph.render_hud(); // hud
+    dsgraph.render_graph(0); // normal level
     if (Details)
         Details->Render(); // grass / details
-    r_dsgraph_render_lods(true, false); // lods - FB
+    dsgraph.render_lods(true, false); // lods - FB
 
     g_pGamePersistent->Environment().RenderSky(); // sky / sun
     g_pGamePersistent->Environment().RenderClouds(); // clouds
 
-    r_pmask(true, false); // disable priority "1"
+    dsgraph.r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
     HOM.Disable();
     L_Dynamic->render(0); // additional light sources
@@ -701,17 +704,17 @@ void CRender::Render()
     }
     HOM.Enable();
     o.vis_intersect = FALSE;
-    phase = PHASE_NORMAL;
-    r_pmask(true, true); // enable priority "0" and "1"
+    dsgraph.phase = PHASE_NORMAL;
+    dsgraph.r_pmask(true, true); // enable priority "0" and "1"
     BasicStats.ShadowsRender.Begin();
     if (L_Shadows)
         L_Shadows->render(); // ... and shadows
     BasicStats.ShadowsRender.End();
-    r_dsgraph_render_lods(false, true); // lods - FB
-    r_dsgraph_render_graph(1); // normal level, secondary priority
+    dsgraph.render_lods(false, true); // lods - FB
+    dsgraph.render_graph(1); // normal level, secondary priority
     L_Dynamic->render(1); // additional light sources, secondary priority
     PortalTraverser.fade_render(); // faded-portals
-    r_dsgraph_render_sorted(); // strict-sorted geoms
+    dsgraph.render_sorted(); // strict-sorted geoms
     BasicStats.Glows.Begin();
     if (L_Glows)
         L_Glows->Render(); // glows
@@ -724,8 +727,8 @@ void CRender::Render()
     {
         for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
         {
-            R_ASSERT(mapNormalPasses[_priority][iPass].size() == 0);
-            R_ASSERT(mapMatrixPasses[_priority][iPass].size() == 0);
+            R_ASSERT(dsgraph.mapNormalPasses[_priority][iPass].size() == 0);
+            R_ASSERT(dsgraph.mapMatrixPasses[_priority][iPass].size() == 0);
         }
     }
 

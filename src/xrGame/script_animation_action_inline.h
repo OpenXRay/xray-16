@@ -8,15 +8,6 @@
 
 #pragma once
 
-IC CScriptAnimationAction::CScriptAnimationAction() : anim_index(0)
-{
-    m_tMentalState = MonsterSpace::eMentalStateDanger;
-    m_tGoalType = eGoalTypeMental;
-    m_tAnimAction = MonsterSpace::eAA_NoAction;
-    m_bCompleted = true;
-    m_use_animation_movement_controller = false;
-}
-
 IC CScriptAnimationAction::CScriptAnimationAction(LPCSTR caAnimationToPlay, bool use_animation_movement_controller)
 {
     SetAnimation(caAnimationToPlay);

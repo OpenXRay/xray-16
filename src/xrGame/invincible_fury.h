@@ -12,12 +12,12 @@ class player_state_invincible_fury : public player_state_param
     typedef player_state_param inherited;
 
 public:
-    player_state_invincible_fury(game_state_accumulator* owner);
+    player_state_invincible_fury(game_state_accumulator* owner) : inherited(owner) {}
     virtual ~player_state_invincible_fury(){};
 
     virtual void update(){};
-    virtual u32 const get_u32_param();
-    virtual float const get_float_param() { return 0.0f; };
+    virtual u32 get_u32_param();
+    virtual float get_float_param() { return 0.0f; };
     virtual void reset_game();
 
     virtual void OnPlayerKilled(
@@ -25,7 +25,7 @@ public:
 
 private:
     static u32 const max_fury_time = 6000;
-    u32 m_last_kills;
+    u32 m_last_kills{};
 }; // class player_state_invincible_fury
 
 } // namespace award_system

@@ -247,6 +247,8 @@ bool ChimeraAttackState<Object>::select_target_for_jump(enum_action const action
 
     Fvector const self_pos = this->object->Position();
     Fvector const self2enemy = enemy_pos - self_pos;
+
+    [[maybe_unused]]
     float const self2enemy_mag = magnitude(self2enemy);
 
     m_attack_jump = false;

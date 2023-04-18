@@ -198,7 +198,7 @@ bool CAI_Rat::calc_node(Fvector const& next_position)
 {
     u32 dwNewNode = ai_location().level_vertex_id();
     const CLevelGraph::CLevelVertex* tpNewNode = ai_location().level_vertex();
-    CLevelGraph::CPosition QueryPos;
+    CLevelGraph::CPosition QueryPos{};
     bool a = !ai().level_graph().valid_vertex_id(dwNewNode) || !ai().level_graph().valid_vertex_position(next_position);
     if (!a)
     {
@@ -222,7 +222,7 @@ bool CAI_Rat::calc_node(Fvector const& next_position)
 Fvector CAI_Rat::calc_position()
 {
     Fvector tSavedPosition = Position();
-    SRotation tSavedTorsoTarget = movement().m_body.target;
+    // SRotation tSavedTorsoTarget = movement().m_body.target;
 
     // Update position and orientation of the planes
     float fAT = m_fASpeed * m_fTimeUpdateDelta;

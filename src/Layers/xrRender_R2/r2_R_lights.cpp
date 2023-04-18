@@ -100,16 +100,17 @@ void CRender::render_lights(light_Package& LP)
             Lights_LastFrame.push_back(L);
 
             // render
-            phase = PHASE_SMAP;
+            dsgraph.phase = PHASE_SMAP;
             if (RImplementation.o.Tshadows)
-                r_pmask(true, true);
+                dsgraph.r_pmask(true, true);
             else
-                r_pmask(true, false);
+                dsgraph.r_pmask(true, false);
             L->svis.begin();
             PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
-            r_dsgraph_render_subspace(L->spatial.sector, L->X.S.combine, L->position, TRUE);
-            bool bNormal = !mapNormalPasses[0][0].empty() || !mapMatrixPasses[0][0].empty();
-            bool bSpecial = !mapNormalPasses[1][0].empty() || !mapMatrixPasses[1][0].empty() || !mapSorted.empty();
+            dsgraph.render_subspace(L->spatial.sector, L->X.S.combine, L->position, TRUE);
+            bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+            bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+                !dsgraph.mapSorted.empty();
             if (bNormal || bSpecial)
             {
                 Stats.s_merged++;
@@ -118,7 +119,7 @@ void CRender::render_lights(light_Package& LP)
                 RCache.set_xform_world(Fidentity);
                 RCache.set_xform_view(L->X.S.view);
                 RCache.set_xform_project(L->X.S.project);
-                r_dsgraph_render_graph(0);
+                dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
                     Details->Render();
                 L->X.S.transluent = FALSE;
@@ -127,9 +128,9 @@ void CRender::render_lights(light_Package& LP)
                     L->X.S.transluent = TRUE;
                     Target->phase_smap_spot_tsh(L);
                     PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
-                    r_dsgraph_render_graph(1); // normal level, secondary priority
+                    dsgraph.render_graph(1); // normal level, secondary priority
                     PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
-                    r_dsgraph_render_sorted(); // strict-sorted geoms
+                    dsgraph.render_sorted(); // strict-sorted geoms
                 }
             }
             else
@@ -137,7 +138,7 @@ void CRender::render_lights(light_Package& LP)
                 Stats.s_finalclip++;
             }
             L->svis.end();
-            r_pmask(true, false);
+            dsgraph.r_pmask(true, false);
         }
 
         PIX_EVENT(UNSHADOWED_LIGHTS);

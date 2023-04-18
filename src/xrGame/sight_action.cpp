@@ -23,8 +23,6 @@ void CSightAction::initialize()
 
     m_start_time = Device.dwTimeGlobal;
     m_state_fire_switch_time = Device.dwTimeGlobal;
-    m_already_switched = false;
-    m_internal_state = u32(-1);
 
     if (SightManager::eSightTypeCoverLookOver == m_sight_type)
         initialize_cover_look_over();

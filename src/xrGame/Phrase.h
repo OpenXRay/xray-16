@@ -11,8 +11,8 @@ private:
     friend CPhraseDialog;
 
 public:
-    CPhrase();
-    virtual ~CPhrase();
+    CPhrase() = default;
+    virtual ~CPhrase() = default;
 
     void SetText(LPCSTR text) { m_text = text; }
     LPCSTR GetText() const;
@@ -30,15 +30,15 @@ public:
     void SetGoodwillLevel(int v) { m_iGoodwillLevel = v; }
 protected:
     //уникальный индекс в списке фраз диалога
-    shared_str m_ID;
+    shared_str m_ID{ "" };
     //текстовое представление фразы
     xr_string m_text;
     xr_string m_script_text_id;
     xr_string m_script_text_val;
     //минимальный уровень благосклоггости, необходимый для того
     //чтоб фразу можно было сказать
-    int m_iGoodwillLevel;
-    bool m_b_finalizer;
+    int m_iGoodwillLevel{};
+    bool m_b_finalizer{};
     //для вызова скриптовых функций
     CDialogScriptHelper m_ScriptHelper;
 };

@@ -12,18 +12,15 @@ server_info_uploader& xrServer::GetServerInfoUploader()
 {
     VERIFY(m_server_logo && m_server_rules);
 
-    struct free_info_searcher
+    auto it = std::find_if(m_info_uploaders.begin(), m_info_uploaders.end(), [](server_info_uploader const* uplinfo)
     {
-        bool operator()(server_info_uploader const* uplinfo) { return !uplinfo->is_active(); };
-    }; // struct free_info_searcher
-
-    info_uploaders_t::iterator tmp_iter =
-        std::find_if(m_info_uploaders.begin(), m_info_uploaders.end(), free_info_searcher());
+        return !uplinfo->is_active();
+    });
 
     server_info_uploader* result = NULL;
-    if (tmp_iter != m_info_uploaders.end())
+    if (it != m_info_uploaders.end())
     {
-        result = *tmp_iter;
+        result = *it;
     }
     else
     {

@@ -27,13 +27,13 @@ private:
         // copy constructor is valid
         u32 m_expire_time;
         u32 m_current_time;
-        bool const operator()(dclient& right) const;
+        bool operator()(dclient& right) const;
     }; // struct expired_client_deleter
     struct pooled_client_finder
     {
         // copy constructor is valid
         xrClientData* m_new_client;
-        bool const operator()(dclient const& right) const;
+        bool operator()(dclient const& right) const;
     }; // struct pooled_client_finder
 
     typedef xr_vector<dclient> dclients_t;

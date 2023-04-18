@@ -65,7 +65,7 @@ struct envc : private Noncopyable, public SEnumVerticesCallback
     const Fmatrix& i_bind_transform;
     const Fvector& ax;
     envc(const Fmatrix& _i_bind_transform, const Fvector& _ax, Fvector& _pos)
-        : SEnumVerticesCallback(), i_bind_transform(_i_bind_transform), ax(_ax), pos(_pos)
+        : SEnumVerticesCallback(), pos(_pos), i_bind_transform(_i_bind_transform), ax(_ax)
     {
         start_pos.set(0, 0, 0);
     }

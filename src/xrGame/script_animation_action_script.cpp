@@ -47,6 +47,6 @@ SCRIPT_EXPORT(CScriptAnimationAction, (),
             
             .def("anim", &CScriptAnimationAction::SetAnimation)
             .def("type", &CScriptAnimationAction::SetMentalState)
-            .def("completed", (bool (CScriptAnimationAction::*)())(&CScriptAnimationAction::completed))
+            .def("completed", &CScriptAbstractAction::completed)
     ];
 });

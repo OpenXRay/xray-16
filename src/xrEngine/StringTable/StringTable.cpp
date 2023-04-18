@@ -157,8 +157,10 @@ void CStringTable::Load(LPCSTR xml_file_full)
     {
         LPCSTR string_name = uiXml.ReadAttrib(uiXml.GetRoot(), "string", i, "id", NULL);
 
-        VERIFY3(pData->m_StringTable.find(string_name) == pData->m_StringTable.end(), "duplicate string table id",
-            string_name);
+#ifndef MASTER_GOLD
+        if (pData->m_StringTable.find(string_name) != pData->m_StringTable.end())
+            Msg("~ duplicate string table id [%s]", string_name);
+#endif
 
         LPCSTR string_text = uiXml.Read(uiXml.GetRoot(), "string:text", i, NULL);
 

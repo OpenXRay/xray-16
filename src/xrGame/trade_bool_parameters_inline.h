@@ -12,13 +12,12 @@ IC CTradeBoolParameters::CTradeBoolParameters() {}
 IC void CTradeBoolParameters::clear() { m_sections.clear(); }
 IC void CTradeBoolParameters::disable(const shared_str& section)
 {
-    SECTIONS::iterator I = std::find(m_sections.begin(), m_sections.end(), section);
-    VERIFY(I == m_sections.end());
+    VERIFY(std::find(m_sections.cbegin(), m_sections.cend(), section) == m_sections.cend());
     m_sections.push_back(section);
 }
 
 IC bool CTradeBoolParameters::disabled(const shared_str& section) const
 {
-    SECTIONS::const_iterator I = std::find(m_sections.begin(), m_sections.end(), section);
-    return (I != m_sections.end());
+    const auto I = std::find(m_sections.cbegin(), m_sections.cend(), section);
+    return (I != m_sections.cend());
 }

@@ -16,7 +16,7 @@ class CParticlesObject;
 class CScriptParticleAction : public CScriptAbstractAction
 {
 public:
-    enum EGoalType
+    enum EGoalType : u32
     {
         eGoalTypeParticleAttached = u32(0),
         eGoalTypeParticlePosition,
@@ -24,18 +24,18 @@ public:
     };
 
 public:
-    shared_str m_caParticleToRun;
-    shared_str m_caBoneName;
-    EGoalType m_tGoalType;
-    CParticlesObject* m_tpParticleSystem;
-    bool m_bStartedToPlay;
-    Fvector m_tParticlePosition;
-    Fvector m_tParticleAngles;
-    Fvector m_tParticleVelocity;
-    bool m_bAutoRemove;
+    shared_str m_caParticleToRun{ "" };
+    shared_str m_caBoneName{ "" };
+    EGoalType m_tGoalType{ eGoalTypeDummy };
+    CParticlesObject* m_tpParticleSystem{};
+    bool m_bStartedToPlay{};
+    Fvector m_tParticlePosition{};
+    Fvector m_tParticleAngles{};
+    Fvector m_tParticleVelocity{};
+    bool m_bAutoRemove{ true };
 
 public:
-    IC CScriptParticleAction();
+    IC CScriptParticleAction() = default;
     IC CScriptParticleAction(LPCSTR caPartcileToRun, LPCSTR caBoneName,
         const CParticleParams& tParticleParams = CParticleParams(), bool bAutoRemove = false);
     IC CScriptParticleAction(

@@ -56,7 +56,8 @@ void CRenderDevice::CreateInternal()
     string_path fname;
     FS.update_path(fname, "$game_data$", "shaders.xr");
     GEnv.Render->OnDeviceCreate(fname);
-    m_editor.OnDeviceCreate();
+    if (!GEnv.isDedicatedServer)
+        m_editor.OnDeviceCreate();
     Statistic->OnDeviceCreate();
     dwFrame = 0;
     PreCache(0, false, false);

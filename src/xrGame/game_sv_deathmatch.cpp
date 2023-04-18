@@ -299,9 +299,6 @@ bool game_sv_Deathmatch::OnKillResult(KILL_RES KillResult, game_PlayerState* pKi
         res = true;
     }
     break;
-    default: {
-    }
-    break;
     }
     return res;
 }
@@ -360,9 +357,6 @@ void game_sv_Deathmatch::OnGiveBonus(KILL_RES KillResult, game_PlayerState* pKil
             };
         }
         break;
-        default: {
-        }
-        break;
         };
 
         if (pKiller->m_iKillsInRowCurr)
@@ -372,9 +366,6 @@ void game_sv_Deathmatch::OnGiveBonus(KILL_RES KillResult, game_PlayerState* pKil
             Player_AddBonusMoney(pKiller, READ_IF_EXISTS(pSettings, r_s32, "mp_bonus_money", tmpStr, 0), SKT_KIR,
                 u8(pKiller->m_iKillsInRowCurr & 0xff));
         };
-    }
-    break;
-    default: {
     }
     break;
     }
@@ -623,8 +614,6 @@ void game_sv_Deathmatch::SM_SwitchOnNextActivePlayer()
     };
     SM_SwitchOnPlayer(pNewObject);
 };
-
-#include "WeaponHUD.h"
 
 void game_sv_Deathmatch::net_Relcase(IGameObject* O)
 {
@@ -1348,8 +1337,6 @@ void game_sv_Deathmatch::Money_SetStart(ClientID id_who)
     if (!ps_who)
         return;
     ps_who->money_for_round = 0;
-    if (ps_who->team < 0)
-        return;
     TeamStruct* pTeamData = GetTeamData(u8(ps_who->team));
     if (!pTeamData)
         return;
@@ -2071,7 +2058,23 @@ BOOL game_sv_Deathmatch::OnPreCreate(CSE_Abstract* E)
     return TRUE;
 };
 
-void game_sv_Deathmatch::OnCreate(u16 eid_who) { inherited::OnCreate(eid_who); };
+void game_sv_Deathmatch::OnCreate(u16 eid_who)
+{
+    inherited::OnCreate(eid_who);
+
+    CSE_Abstract* pEntity = get_entity_from_eid(eid_who);
+    if (!pEntity)
+        return;
+    CSE_ALifeCustomZone* pCustomZone = smart_cast<CSE_ALifeCustomZone*> (pEntity);
+    if (!pCustomZone)
+        return;
+
+    if (pSettings->line_exist(pCustomZone->s_name, "max_start_power"))
+    {
+        pCustomZone->m_maxPower = pSettings->r_float(pCustomZone->s_name, "max_start_power");
+    }
+}
+
 void game_sv_Deathmatch::OnPostCreate(u16 eid_who)
 {
     inherited::OnPostCreate(eid_who);
@@ -2190,10 +2193,9 @@ void game_sv_Deathmatch::ReadOptions(shared_str& options)
     g_sv_dm_bPDAHunt = (get_option_i(*options, "pdahunt", (g_sv_dm_bPDAHunt ? 1 : 0)) != 0);
 };
 
-static bool g_bConsoleCommandsCreated_DM = false;
-void game_sv_Deathmatch::ConsoleCommands_Create(){};
+[[maybe_unused]] void game_sv_Deathmatch::ConsoleCommands_Create() {}
 
-void game_sv_Deathmatch::ConsoleCommands_Clear(){};
+[[maybe_unused]] void game_sv_Deathmatch::ConsoleCommands_Clear() {}
 
 void game_sv_Deathmatch::OnPlayerFire(ClientID id_who, NET_Packet& P)
 {

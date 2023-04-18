@@ -8,13 +8,8 @@
 
 namespace award_system
 {
-spritnter_stopper::spritnter_stopper(game_state_accumulator* owner) : inherited(owner)
-{
-    m_sprinter_victim_velocity = 0.0f;
-}
-
 void spritnter_stopper::reset_game() { m_sprinter_victim_velocity = 0.0f; }
-float const spritnter_stopper::get_float_param() { return m_sprinter_victim_velocity; }
+float spritnter_stopper::get_float_param() { return m_sprinter_victim_velocity; }
 void spritnter_stopper::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)
 {

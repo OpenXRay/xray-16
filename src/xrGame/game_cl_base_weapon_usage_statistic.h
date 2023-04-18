@@ -15,10 +15,10 @@ struct BulletData
     shared_str FirerName;
     shared_str WeaponName;
 
-    u16 HitRefCount;
-    u16 HitResponds;
+    u16 HitRefCount{};
+    u16 HitResponds{};
 
-    bool Removed;
+    bool Removed{};
 
     SBullet Bullet;
     bool operator==(u32 BulletID) { return BulletID == Bullet.m_dwID; };

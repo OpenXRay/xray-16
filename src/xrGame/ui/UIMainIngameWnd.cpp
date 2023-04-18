@@ -455,11 +455,15 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
     // Задаем цвет требуемой иконки
     switch (icon)
     {
-    case ewiAll: bMagicFlag = false;
+    case ewiAll:
+        bMagicFlag = false;
+        [[fallthrough]];
+
     case ewiWeaponJammed:
         SetWarningIconColorUI(UIWeaponJammedIcon, cl);
         if (bMagicFlag)
             break;
+        [[fallthrough]];
 
     /*	case ewiRadiation:
             SetWarningIconColorUI	(&UIRadiaitionIcon, cl);
@@ -963,110 +967,109 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
     flags |= LA_ONLYALPHA;
     flags |= LA_TEXTURECOLOR;
 
-    xr_map<EBoostParams, SBooster>::const_iterator b = influences.begin(), e = influences.end();
-    for (; b != e; ++b)
+    for(const auto& [_, booster] : influences)
     {
-        switch (b->second.m_type)
+        switch (booster.m_type)
         {
         case eBoostHpRestore:
         {
             if (m_ind_boost_health)
             {
                 m_ind_boost_health->Show(true);
-                if (b->second.fBoostTime <= 3.0f)
+                if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_health->SetColorAnimation(str_flag, flags);
                 else
                     m_ind_boost_health->ResetColorAnimation();
             }
+            break;
         }
-        break;
         case eBoostPowerRestore:
         {
             if (m_ind_boost_power)
             {
                 m_ind_boost_power->Show(true);
-                if (b->second.fBoostTime <= 3.0f)
+                if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_power->SetColorAnimation(str_flag, flags);
                 else
                     m_ind_boost_power->ResetColorAnimation();
             }
+            break;
         }
-        break;
         case eBoostRadiationRestore:
         {
             if (m_ind_boost_rad)
             {
                 m_ind_boost_rad->Show(true);
-                if (b->second.fBoostTime <= 3.0f)
+                if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_rad->SetColorAnimation(str_flag, flags);
                 else
                     m_ind_boost_rad->ResetColorAnimation();
             }
+            break;
         }
-        break;
         case eBoostBleedingRestore:
         {
             if (m_ind_boost_wound)
             {
                 m_ind_boost_wound->Show(true);
-                if (b->second.fBoostTime <= 3.0f)
+                if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_wound->SetColorAnimation(str_flag, flags);
                 else
                     m_ind_boost_wound->ResetColorAnimation();
             }
+            break;
         }
-        break;
         case eBoostMaxWeight:
         {
             if (m_ind_boost_weight)
             {
                 m_ind_boost_weight->Show(true);
-                if (b->second.fBoostTime <= 3.0f)
+                if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_weight->SetColorAnimation(str_flag, flags);
                 else
                     m_ind_boost_weight->ResetColorAnimation();
             }
+            break;
         }
-        break;
         case eBoostRadiationImmunity:
         case eBoostRadiationProtection:
         {
             if (m_ind_boost_radia)
             {
                 m_ind_boost_radia->Show(true);
-                if (b->second.fBoostTime <= 3.0f)
+                if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_radia->SetColorAnimation(str_flag, flags);
                 else
                     m_ind_boost_radia->ResetColorAnimation();
             }
+            break;
         }
-        break;
         case eBoostTelepaticImmunity:
         case eBoostTelepaticProtection:
         {
             if (m_ind_boost_psy)
             {
                 m_ind_boost_psy->Show(true);
-                if (b->second.fBoostTime <= 3.0f)
+                if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_psy->SetColorAnimation(str_flag, flags);
                 else
                     m_ind_boost_psy->ResetColorAnimation();
             }
+            break;
         }
-        break;
         case eBoostChemicalBurnImmunity:
         case eBoostChemicalBurnProtection:
         {
             if (m_ind_boost_chem)
             {
                 m_ind_boost_chem->Show(true);
-                if (b->second.fBoostTime <= 3.0f)
+                if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_chem->SetColorAnimation(str_flag, flags);
                 else
                     m_ind_boost_chem->ResetColorAnimation();
             }
+            break;
         }
-        break;
         }
     }
 }

@@ -11,12 +11,12 @@ class harvest_time : public player_state_param
     typedef player_state_param inherited;
 
 public:
-    harvest_time(game_state_accumulator* owner);
+    harvest_time(game_state_accumulator* owner) : inherited(owner) {}
     ~harvest_time(){};
 
     virtual void update(){};
-    virtual u32 const get_u32_param();
-    virtual float const get_float_param() { return 0.0f; };
+    virtual u32 get_u32_param();
+    virtual float get_float_param() { return 0.0f; };
     virtual void reset_game();
 
     virtual void OnPlayerKilled(
@@ -24,8 +24,8 @@ public:
     virtual void OnPlayerSpawned(game_PlayerState const* ps);
 
 protected:
-    u32 m_harvest_count;
-    u32 m_spawn_time;
+    u32 m_harvest_count{};
+    u32 m_spawn_time{};
 }; // class harvest_time
 
 } // namespace award_system

@@ -182,6 +182,7 @@ void CTelekinesis::PhDataUpdate(float step)
         {
         case TS_Raise: objects[i]->raise(step); break;
         case TS_Keep: objects[i]->keep(); break;
+        case TS_Fire: break;
         case TS_None: break;
         }
     }
@@ -208,7 +209,10 @@ void CTelekinesis::PhTune(float step)
         switch (objects[i]->get_state())
         {
         case TS_Raise:
-        case TS_Keep: objects[i]->enable();
+        case TS_Keep:
+            objects[i]->enable();
+            break;
+        case TS_Fire: break;
         case TS_None: break;
         }
     }

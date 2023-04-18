@@ -30,7 +30,7 @@ bool CSleepEffectorPP::Process(SPPInfo& pp)
 
     // amount of time passed in percents
     float time_past_perc = (m_total - fLifeTime) / m_total;
-    float factor;
+    float factor = 1.0f;
 
     if (time_past_perc < m_attack)
     {

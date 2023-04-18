@@ -8,20 +8,6 @@
 
 #pragma once
 
-IC CScriptSoundAction::CScriptSoundAction() : m_monster_sound_delay(0)
-{
-    m_caSoundToPlay = "";
-    m_caBoneName = "";
-    m_tGoalType = eGoalTypeDummy;
-    m_bStartedToPlay = false;
-    m_bLooped = false;
-    m_tSoundPosition.set(0, 0, 0);
-    m_tSoundAngles.set(0, 0, 0);
-    m_bCompleted = true;
-    m_monster_sound = MonsterSound::eMonsterSoundDummy;
-    m_tHeadAnimType = MonsterSpace::eHeadAnimNone;
-}
-
 IC CScriptSoundAction::CScriptSoundAction(LPCSTR caSoundToPlay, LPCSTR caBoneName, const Fvector& tPositionOffset,
     const Fvector& tAngleOffset, bool bLooped, ESoundTypes sound_type)
 {
@@ -31,8 +17,6 @@ IC CScriptSoundAction::CScriptSoundAction(LPCSTR caSoundToPlay, LPCSTR caBoneNam
     SetAngles(tAngleOffset);
     SetSound(caSoundToPlay);
     SetSoundType(sound_type);
-    m_monster_sound = MonsterSound::eMonsterSoundDummy;
-    m_tHeadAnimType = MonsterSpace::eHeadAnimNone;
 }
 
 IC CScriptSoundAction::CScriptSoundAction(
@@ -43,8 +27,6 @@ IC CScriptSoundAction::CScriptSoundAction(
     SetPosition(*tPosition);
     SetAngles(tAngleOffset);
     SetSoundType(sound_type);
-    m_monster_sound = MonsterSound::eMonsterSoundDummy;
-    m_tHeadAnimType = MonsterSpace::eHeadAnimNone;
 }
 
 IC CScriptSoundAction::CScriptSoundAction(CScriptSound* sound, LPCSTR caBoneName, Fvector const& tPositionOffset,
@@ -56,8 +38,6 @@ IC CScriptSoundAction::CScriptSoundAction(CScriptSound* sound, LPCSTR caBoneName
     SetAngles(tAngleOffset);
     SetSound(*sound);
     SetSoundType(sound_type);
-    m_monster_sound = MonsterSound::eMonsterSoundDummy;
-    m_tHeadAnimType = MonsterSpace::eHeadAnimNone;
 }
 
 IC CScriptSoundAction::CScriptSoundAction(
@@ -68,8 +48,6 @@ IC CScriptSoundAction::CScriptSoundAction(
     SetPosition(*tPosition);
     SetAngles(tAngleOffset);
     SetSoundType(sound_type);
-    m_monster_sound = MonsterSound::eMonsterSoundDummy;
-    m_tHeadAnimType = MonsterSpace::eHeadAnimNone;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -99,12 +77,8 @@ IC CScriptSoundAction::CScriptSoundAction(
 {
     SetBone(caBoneName);
     SetSound(caSoundToPlay);
-    m_tSoundPosition.set(0, 0, 0);
-    m_tSoundAngles.set(0, 0, 0);
     m_bCompleted = false;
-    m_bLooped = false;
     m_tHeadAnimType = head_anim_type;
-    m_monster_sound = MonsterSound::eMonsterSoundDummy;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

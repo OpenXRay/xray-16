@@ -145,14 +145,12 @@ bool CUIMapDesc::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         HideDialog();
         dm->OnSpectatorSelect();
         return true;
-        break;
 
     case kENTER:
     case kJUMP:
         HideDialog();
         dm->OnMapInfoAccept();
         return true;
-        break;
     }
 
     return false;

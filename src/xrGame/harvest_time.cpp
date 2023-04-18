@@ -7,13 +7,7 @@
 
 namespace award_system
 {
-harvest_time::harvest_time(game_state_accumulator* owner) : inherited(owner)
-{
-    m_harvest_count = 0;
-    m_spawn_time = 0;
-}
-
-u32 const harvest_time::get_u32_param() { return m_harvest_count; }
+u32 harvest_time::get_u32_param() { return m_harvest_count; }
 void harvest_time::reset_game()
 {
     m_harvest_count = 0;

@@ -14,11 +14,6 @@ class CMonsterEventManager
         event_struc(typeEvent e) : delegate(e) { need_remove = false; }
     };
 
-    struct pred_remove
-    {
-        bool operator()(const event_struc& param) { return param.need_remove; }
-    };
-
     using EVENT_VECTOR = xr_vector<event_struc>;
     using EVENT_MAP = xr_map<EEventType, EVENT_VECTOR>;
 

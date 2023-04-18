@@ -5,6 +5,7 @@
 
 class CActor;
 class CLAItem;
+class CArtefact;
 class CParticlesObject;
 class CZoneEffector;
 
@@ -13,20 +14,18 @@ class CZoneEffector;
 //информация о объекте, находящемся в зоне
 struct SZoneObjectInfo
 {
-    SZoneObjectInfo()
-        : object(NULL), zone_ignore(false), dw_time_in_zone(0), f_time_affected(Device.fTimeGlobal),
-          small_object(false), nonalive_object(false)
+    SZoneObjectInfo() : f_time_affected(Device.fTimeGlobal)
     {
     }
-    CGameObject* object;
-    bool small_object;
-    bool nonalive_object;
+    CGameObject* object{};
+    bool small_object{};
+    bool nonalive_object{};
     //игнорирование объекта в зоне
-    bool zone_ignore;
+    bool zone_ignore{};
     //присоединенные партиклы
     xr_vector<CParticlesObject*> particles_vector;
     //время прибывания в зоне
-    u32 dw_time_in_zone;
+    u32 dw_time_in_zone{};
     float f_time_affected;
 
     bool operator==(const CGameObject* O) const { return object == O; }
@@ -75,7 +74,8 @@ public:
 
     virtual CCustomZone* cast_custom_zone() { return this; }
     //различные состояния в которых может находиться зона
-    typedef enum {
+    typedef enum
+    {
         eZoneStateIdle = 0, //состояние зоны, когда внутри нее нет активных объектов
         eZoneStateAwaking, //пробуждение зоны (объект попал в зону)
         eZoneStateBlowout, //выброс
@@ -107,6 +107,7 @@ protected:
         eBoltEntranceParticles = (1 << 16),
         eUseSecondaryHit = (1 << 17),
         eVisibleByDetector = (1 << 18),
+        eSpawnBlowoutArtefacts = (1 << 19),
     };
 
     u32 m_owner_id;
@@ -128,6 +129,7 @@ protected:
 
     //тип наносимого хита
     ALife::EHitType m_eHitTypeBlowout;
+
     EZoneState m_eZoneState;
 
     //текущее время пребывания зоны в определенном состоянии
@@ -167,6 +169,7 @@ public:
     void ZoneEnable();
     void ZoneDisable();
     EZoneState ZoneState() { return m_eZoneState; }
+
 protected:
     //воздействие зоной на объект
     virtual void Affect(SZoneObjectInfo* O) {}
@@ -285,10 +288,47 @@ protected:
     void StopObjectIdleParticles(CGameObject* pObject);
 
     virtual bool IsVisibleForZones() { return false; }
+
     //обновление, если зона передвигается
     virtual void OnMove();
     Fvector m_vPrevPos;
     u32 m_dwLastTimeMoved;
+
+    //////////////////////////////////////////////////////////////////////////
+    // список артефактов
+protected:
+    //рождение артефакта в зоне, во время ее срабатывания
+    //и присоединение его к зоне
+    void BornArtefact();
+    //выброс артефактов из зоны
+    void ThrowOutArtefact(CArtefact* pArtefact);
+
+    void PrefetchArtefacts() const;
+    void SpawnArtefact() const;
+
+protected:
+    xr_vector<CArtefact*> m_SpawnedArtefacts;
+
+    //вероятность того, что артефакт засповниться при единичном 
+    //срабатывании аномалии
+    float m_fArtefactSpawnProbability;
+    //величина импульса выкидывания артефакта из зоны
+    float m_fThrowOutPower;
+    //высота над центром зоны, где будет появляться артефакт
+    float m_fArtefactSpawnHeight;
+
+    //имя партиклов, которые проигрываются во время и на месте рождения артефакта
+    shared_str m_sArtefactSpawnParticles;
+    //звук рождения артефакта
+    ref_sound m_ArtefactBornSound;
+
+    struct ARTEFACT_SPAWN
+    {
+        shared_str section;
+        float      probability;
+    };
+    
+    xr_vector<ARTEFACT_SPAWN> m_ArtefactSpawn;
 
     //расстояние от зоны до текущего актера
     float m_fDistanceToCurEntity;
@@ -308,7 +348,7 @@ public:
     void o_switch_2_fast();
     void o_switch_2_slow();
 
-    // Lain: adde
+    // Lain: added
 private:
     virtual bool light_in_slow_mode() { return true; }
 };

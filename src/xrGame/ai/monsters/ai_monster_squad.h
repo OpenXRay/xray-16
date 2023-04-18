@@ -69,7 +69,7 @@ public:
     using MEMBER_COMMAND_MAP_IT = MEMBER_COMMAND_MAP::iterator;
 
 private:
-    CEntity* leader;
+    CEntity* leader{};
     using MEMBER_GOAL_MAP = xr_map<CEntity*, SMemberGoal>;
 
     // карта целей членов группы (обновляется со стороны объекта)
@@ -190,8 +190,8 @@ public:
 private:
     // danger mode is turns on when monsters hear dangerous sound or get a hit
     // danger mode turns off after m_danger_mode_time miliseconds
-    u32 m_home_danger_mode_time;
-    u32 m_home_danger_end_tick;
+    u32 m_home_danger_mode_time{ 8000 };
+    u32 m_home_danger_end_tick{};
 
     void assign_monsters_target_dirs(ENTITY_VEC& members, const CEntity* enemy);
     Fvector calc_monster_target_dir(CBaseMonster* monster, const CEntity* enemy);
@@ -210,7 +210,7 @@ public:
     virtual bool update();
 
 private:
-    CMonsterSquad* squad;
+    CMonsterSquad* squad{};
     CMonsterSquad::MEMBER_COMMAND_MAP_IT it_cur;
     CEntity* self;
 };

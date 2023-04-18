@@ -201,6 +201,11 @@ SCRIPT_EXPORT(EnumGameIDs, (),
             .enum_("gametype")
             [
                 value("GAME_UNKNOWN", int(-1)),
+                // SOC IDs
+                value("GAME_DEATHMATCH", int(eGameIDDeathmatch)),
+                value("GAME_TEAMDEATHMATCH", int(eGameIDTeamDeathmatch)),
+                value("GAME_ARTEFACTHUNT", int(eGameIDArtefactHunt)),
+                // CS/COP ids
                 value("eGameIDDeathmatch", int(eGameIDDeathmatch)),
                 value("eGameIDTeamDeathmatch", int(eGameIDTeamDeathmatch)),
                 value("eGameIDArtefactHunt", int(eGameIDArtefactHunt)),

@@ -57,6 +57,6 @@ SCRIPT_EXPORT(CScriptSoundAction, (),
             .def("set_bone", &CScriptSoundAction::SetBone)
             .def("set_position", &CScriptSoundAction::SetPosition)
             .def("set_angles", &CScriptSoundAction::SetAngles)
-            .def("completed", (bool (CScriptSoundAction::*)())(&CScriptSoundAction::completed))
+            .def("completed", &CScriptAbstractAction::completed)
     ];
 });

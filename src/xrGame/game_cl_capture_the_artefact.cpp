@@ -225,9 +225,6 @@ void game_cl_CaptureTheArtefact::shedule_Update(u32 dt)
         }
     }
     break;
-    default: {
-    }
-    break;
     };
     m_captions_manager.ShowCaptions();
 }

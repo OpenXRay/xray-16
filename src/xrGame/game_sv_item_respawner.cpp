@@ -29,14 +29,6 @@ item_respawn_manager::spawn_item::spawn_item(spawn_item const& clone)
     last_spawn_time = clone.last_spawn_time;
 }
 
-bool item_respawn_manager::search_by_id_predicate::operator()(spawn_item const& left, u16 right) const
-{
-    if (left.last_game_id == right)
-        return true;
-
-    return false;
-}
-
 item_respawn_manager::item_respawn_manager()
 {
     clear_respawns();
@@ -279,8 +271,10 @@ void item_respawn_manager::add_new_rpoint(shared_str profile_sect, RPoint const&
 
 void item_respawn_manager::check_to_delete(u16 item_id)
 {
-    respawn_iter temp_iter =
-        std::find_if(m_respawns.begin(), m_respawns.end(), std::bind(search_by_id_predicate(), std::placeholders::_1, item_id));
+    auto temp_iter = std::find_if(m_respawns.begin(), m_respawns.end(), [item_id](const spawn_item& respawn_item)
+    {
+        return respawn_item.last_game_id == item_id;
+    });
 
     if (temp_iter != m_respawns.end())
     {
