@@ -150,7 +150,7 @@ void CPortalTraverser::dbg_draw()
 
 void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R_scissor)
 {
-    // Register traversal processsector
+    // Register traversal process sector
     if (sector->r_marker != i_marker)
     {
         sector->r_marker = i_marker;

@@ -148,5 +148,5 @@ struct R_dsgraph_structure
         BOOL _dynamic, BOOL _precise_portals = FALSE);
     void render_subspace(IRender_Sector::sector_id_t sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic,
         BOOL _precise_portals = FALSE);
-    void render_R1_box(u32 sector_id, Fbox& _bb, int _element);
+    void render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& _bb, int _element);
 };

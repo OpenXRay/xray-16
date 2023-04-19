@@ -437,7 +437,7 @@ void R_dsgraph_structure::render_subspace(IRender_Sector::sector_id_t sector_id,
 #include "SkeletonCustom.h"
 #include "FLOD.h"
 
-void R_dsgraph_structure::render_R1_box(u32 sector_id, Fbox& BB, int sh)
+void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& BB, int sh)
 {
     VERIFY(sector_id != IRender_Sector::INVALID_SECTOR_ID);
     auto* S = Sectors[sector_id];

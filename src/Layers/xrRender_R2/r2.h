@@ -432,8 +432,7 @@ protected:
     void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
 
 private:
-    FS_FileSet m_file_set;
-    int m_largest_sector_id{-1};
+    IRender_Sector::sector_id_t m_largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
 };
 
 extern CRender RImplementation;

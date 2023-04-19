@@ -338,13 +338,14 @@ void CRender::LoadSectors(IReader* fs)
             R_ASSERT(size == 4);
             sector_data.root_id = P->r_u32();
 
-            // Find the larget sector
+            // Search for default sector - assume "default" or "outdoor" sector is the largest one
+            // XXX: hack: need to know real outdoor sector
             auto* V = static_cast<dxRender_Visual*>(RImplementation.getVisual(sector_data.root_id));
             float vol = V->vis.box.getvolume();
             if (vol > largest_sector_vol)
             {
                 largest_sector_vol = vol;
-                m_largest_sector_id = i;
+                m_largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
             }
         }
         P->close();
