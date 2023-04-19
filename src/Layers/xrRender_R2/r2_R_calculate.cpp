@@ -31,7 +31,7 @@ void CRender::Calculate()
     {
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
         if (pSector && (pSector != pLastSector))
-            g_pGamePersistent->OnSectorChanged(translateSector(pSector));
+            g_pGamePersistent->OnSectorChanged(pSector->unique_id);
 
         if (!pSector)
             pSector = pLastSector;
@@ -61,8 +61,8 @@ void CRender::Calculate()
     for (auto spatial : dsgraph.lstRenderables)
     {
         spatial->spatial_updatesector();
-        CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-        if (!sector)
+        const auto sector_id = spatial->GetSpatialData().sector_id;
+        if (sector_id < 0)
             continue; // disassociated from S/P structure
 
         VERIFY(spatial->GetSpatialData().type & STYPE_LIGHTSOURCE);

@@ -1,24 +1,5 @@
 #include "stdafx.h"
 
-int CRender::translateSector(IRender_Sector* pSector)
-{
-    if (!pSector)
-        return -1;
-
-    for (u32 i = 0; i < dsgraph.Sectors.size(); ++i)
-    {
-        if (dsgraph.Sectors[i] == pSector)
-            return i;
-    }
-
-    FATAL("Sector was not found!");
-    NODEFAULT;
-
-#ifdef DEBUG
-    return (-1);
-#endif // #ifdef DEBUG
-}
-
 IRender_Sector* CRender::detectSector(const Fvector& P)
 {
     Fvector dir{ 0, -1, 0 };
@@ -81,5 +62,5 @@ IRender_Sector* CRender::detectSector(const Fvector& P, Fvector& dir)
     }
     // Take triangle at ID and use it's Sector
     CDB::TRI* pTri = g_pGameLevel->ObjectSpace.GetStaticTris() + ID;
-    return getSector(pTri->sector);
+    return dsgraph.get_sector(pTri->sector);
 }

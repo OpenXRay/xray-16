@@ -797,16 +797,6 @@ ref_shader CRender::getShader(int id)
     VERIFY(id < int(Shaders.size()));
     return Shaders[id];
 }
-IRender_Portal* CRender::getPortal(int id)
-{
-    VERIFY(id < int(dsgraph.Portals.size()));
-    return dsgraph.Portals[id];
-}
-IRender_Sector* CRender::getSector(int id)
-{
-    VERIFY(id < int(dsgraph.Sectors.size()));
-    return dsgraph.Sectors[id];
-}
 IRender_Sector* CRender::getSectorActive() { return pLastSector; }
 IRenderVisual* CRender::getVisual(int id)
 {

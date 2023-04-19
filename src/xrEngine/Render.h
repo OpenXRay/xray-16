@@ -119,6 +119,7 @@ class ENGINE_API IRender_Portal
 {
 public:
     virtual ~IRender_Portal(){};
+    u32 unique_id{0};
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -127,6 +128,7 @@ class ENGINE_API IRender_Sector
 {
 public:
     virtual ~IRender_Sector(){};
+    u32 unique_id{0};
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -318,7 +320,6 @@ public:
 
     virtual pcstr getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
-    virtual IRender_Sector* getSector(int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
     virtual IRender_Sector* detectSector(const Fvector& P) = 0;
     virtual IRender_Target* getTarget() = 0;

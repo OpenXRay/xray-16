@@ -245,16 +245,6 @@ ref_shader CRender::getShader(int id)
     VERIFY(id < int(Shaders.size()));
     return Shaders[id];
 }
-IRender_Portal* CRender::getPortal(int id)
-{
-    VERIFY(id < int(dsgraph.Portals.size()));
-    return dsgraph.Portals[id];
-}
-IRender_Sector* CRender::getSector(int id)
-{
-    VERIFY(id < int(dsgraph.Sectors.size()));
-    return dsgraph.Sectors[id];
-}
 IRender_Sector* CRender::getSectorActive() { return pLastSector; }
 IRenderVisual* CRender::getVisual(int id)
 {
@@ -481,7 +471,7 @@ void CRender::Calculate()
     {
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
         if (pSector && (pSector != pLastSector))
-            g_pGamePersistent->OnSectorChanged(translateSector(pSector));
+            g_pGamePersistent->OnSectorChanged(pSector->unique_id);
 
         if (nullptr == pSector)
             pSector = pLastSector;
@@ -569,9 +559,10 @@ void CRender::Calculate()
             {
                 ISpatial* spatial = dsgraph.lstRenderables[o_it];
                 spatial->spatial_updatesector();
-                CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-                if (nullptr == sector)
+                const auto sector_id = spatial->GetSpatialData().sector_id;
+                if (sector_id < 0)
                     continue; // disassociated from S/P structure
+                CSector* sector = dsgraph.Sectors[sector_id];
 
                 // Filter only not light spatial
                 if (dsgraph.PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE))
@@ -638,7 +629,7 @@ void CRender::Calculate()
                         // lightsource
                         light* L = (light*)spatial->dcast_Light();
                         VERIFY(L);
-                        if (L->spatial.sector)
+                        if (L->spatial.sector_id >= 0)
                         {
                             vis_data& vis = L->get_homdata();
                             if (HOM.visible(vis))

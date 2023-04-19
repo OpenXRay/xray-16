@@ -41,7 +41,7 @@ public:
     u32 marker;
     BOOL bDualRender;
 
-    void setup(const level_portal_data_t& data);
+    void setup(const level_portal_data_t& data, const xr_vector<CSector*> &portals);
 
     Poly& getPoly() { return poly; }
     CSector* Back() { return pBack; }
@@ -95,7 +95,7 @@ public:
 public:
     // Main interface
     dxRender_Visual* root() { return m_root; }
-    void setup(const level_sector_data_t& data);
+    void setup(const level_sector_data_t& data, const xr_vector<CPortal*> &portals);
 
     CSector() { m_root = nullptr; }
     virtual ~CSector() = default;

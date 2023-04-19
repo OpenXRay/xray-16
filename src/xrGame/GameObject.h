@@ -157,7 +157,7 @@ public:
     virtual const Fvector& Position() const override { return renderable.xform.c; }
     virtual float Radius() const override;
     virtual const Fbox& BoundingBox() const override;
-    virtual IRender_Sector* Sector() override { return H_Root()->GetSpatialData().sector; }
+    virtual int Sector() override { return H_Root()->GetSpatialData().sector_id; }
     virtual IRender_ObjectSpecific* ROS() override { return RenderableBase::renderable_ROS(); }
     virtual bool renderable_ShadowGenerate() override { return TRUE; }
     virtual bool renderable_ShadowReceive() override { return TRUE; }

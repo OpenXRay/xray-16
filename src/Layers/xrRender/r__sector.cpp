@@ -87,12 +87,12 @@ void CPortal::OnRender()
 }
 #endif
 //
-void CPortal::setup(const level_portal_data_t& data)
+void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& sectors)
 {
     const auto* V = data.vertices.cbegin();
     const auto vcnt = data.vertices.size();
-    CSector* face = static_cast<CSector*>(RImplementation.getSector(data.sector_front));
-    CSector* back = static_cast<CSector*>(RImplementation.getSector(data.sector_back));
+    CSector* face = sectors[data.sector_front];
+    CSector* back = sectors[data.sector_back];
 
     // calc sphere
     Fbox BB;
@@ -133,7 +133,7 @@ void CPortal::setup(const level_portal_data_t& data)
     */
 }
 
-void CSector::setup(const level_sector_data_t& data)
+void CSector::setup(const level_sector_data_t& data, const xr_vector<CPortal*> &portals)
 {
     // Assign portal polygons
     const auto num_portals = data.portals_id.size();
@@ -141,7 +141,7 @@ void CSector::setup(const level_sector_data_t& data)
     for (int idx = 0; idx < num_portals; ++idx)
     {
         const auto ID = data.portals_id[idx];
-        m_portals[idx] = static_cast<CPortal*>(RImplementation.getPortal(ID));
+        m_portals[idx] = portals[ID];
     }
 
     if (GEnv.isDedicatedServer)

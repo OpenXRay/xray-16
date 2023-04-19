@@ -83,7 +83,7 @@ void CLightProjector::set_object(IRenderable* O)
             else
             {
                 spatial->spatial_updatesector();
-                if (nullptr == spatial->GetSpatialData().sector)
+                if (spatial->GetSpatialData().sector_id < 0)
                 {
                     IGameObject* obj = dynamic_cast<IGameObject*>(O);
                     if (obj)
@@ -320,8 +320,8 @@ void CLightProjector::calculate()
         if (spatial)
         {
             spatial->spatial_updatesector();
-            if (spatial->GetSpatialData().sector)
-                RImplementation.dsgraph.render_R1_box(spatial->GetSpatialData().sector, BB, SE_R1_LMODELS);
+            if (spatial->GetSpatialData().sector_id >= 0)
+                RImplementation.dsgraph.render_R1_box(spatial->GetSpatialData().sector_id, BB, SE_R1_LMODELS);
         }
         // if (spatial)      RImplementation.r_dsgraph_render_subspace   (spatial->spatial.sector,mCombine,v_C,FALSE);
     }

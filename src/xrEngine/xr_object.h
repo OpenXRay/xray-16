@@ -181,7 +181,7 @@ public:
     virtual const Fvector& Position() const = 0;
     virtual float Radius() const = 0;
     virtual const Fbox& BoundingBox() const = 0;
-    virtual IRender_Sector* Sector() = 0;
+    virtual int Sector() = 0;
     virtual IRender_ObjectSpecific* ROS() = 0;
     // Accessors and converters
     virtual IRenderVisual* Visual() const = 0;

@@ -234,11 +234,9 @@ public:
     VertexStagingBuffer* getVB(int id, bool alternative = false);
     IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
-    IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();
     IRenderVisual* model_CreatePE(LPCSTR name);
     IRender_Sector* detectSector(const Fvector& P, Fvector& D);
-    int translateSector(IRender_Sector* pSector);
 
     // HW-occlusion culling
     u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
@@ -335,7 +333,6 @@ public:
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
     ref_shader getShader(int id);
-    IRender_Sector* getSector(int id) override;
     IRenderVisual* getVisual(int id) override;
     IRender_Sector* detectSector(const Fvector& P) override;
     IRender_Target* getTarget() override;
@@ -436,7 +433,7 @@ protected:
 
 private:
     FS_FileSet m_file_set;
-    u32 m_largest_sector_id{0};
+    int m_largest_sector_id{-1};
 };
 
 extern CRender RImplementation;

@@ -151,7 +151,7 @@ void CLightR_Manager::render_point(u32 _priority)
     for (xr_vector<light*>::iterator it = selected_point.begin(); it != selected_point.end(); ++it)
     {
         light* L = *it;
-        VERIFY(L->spatial.sector && _valid(L->range));
+        VERIFY(L->spatial.sector_id >= 0 && _valid(L->range));
 
         // 0. Dimm & Clip
         float lc_dist = lc_COP.distance_to(L->spatial.sphere.P) - L->spatial.sphere.R;
@@ -192,11 +192,11 @@ void CLightR_Manager::render_point(u32 _priority)
         RImplementation.r1_dlight_tcgen = L_texgen;
 
         // 3. Calculate visibility for light + build soring tree
-        VERIFY(L->spatial.sector);
+        VERIFY(L->spatial.sector_id >= 0);
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.render_subspace(L->spatial.sector, L_combine, L_pos, true, true);
+        RImplementation.dsgraph.render_subspace(L->spatial.sector_id, L_combine, L_pos, true, true);
 
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(true, true);
@@ -267,12 +267,12 @@ void CLightR_Manager::render_spot(u32 _priority)
         RImplementation.r1_dlight_tcgen = L_texgen;
 
         // 3. Calculate visibility for light + build soring tree
-        VERIFY(L->spatial.sector);
+        VERIFY(L->spatial.sector_id >= 0);
         // RImplementation.marker                   ++;
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.render_subspace(L->spatial.sector, L_combine, L_pos, TRUE,
+        RImplementation.dsgraph.render_subspace(L->spatial.sector_id, L_combine, L_pos, TRUE,
             TRUE // precise portals
             );
 
@@ -323,7 +323,7 @@ void CLightR_Manager::add(light* L)
 {
     if (L->range < 0.1f)
         return;
-    if (nullptr == L->spatial.sector)
+    if (L->spatial.sector_id < 0)
         return;
     if (IRender_Light::POINT == L->flags.type)
     {
@@ -335,7 +335,7 @@ void CLightR_Manager::add(light* L)
         // spot/flash
         selected_spot.push_back(L);
     }
-    VERIFY(L->spatial.sector);
+    VERIFY(L->spatial.sector_id >= 0);
 }
 // XXX stats: add to statistics
 CLightR_Manager::CLightR_Manager() : xrc("LightR_Manager") {}

@@ -89,7 +89,7 @@ public:
     Fvector node_center; // Cached node center for TBV optimization
     float node_radius; // Cached node bounds for TBV optimization
     ISpatial_NODE* node_ptr; // Cached parent node for "empty-members" optimization
-    IRender_Sector* sector;
+    int sector_id;
     ISpatial_DB* space; // allow different spaces
 };
 

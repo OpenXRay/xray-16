@@ -76,9 +76,10 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                 ISpatial* spatial = dsgraph.lstRenderables[o_it];
                 spatial->spatial_updatesector();
                 const auto& data = spatial->GetSpatialData();
-                const auto& [type, sphere, sector] = std::tuple(data.type, data.sphere, (CSector*)data.sector);
-                if (0 == sector)
+                const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
+                if (sector_id < 0)
                     continue; // disassociated from S/P structure
+                auto* sector = dsgraph.Sectors[sector_id];
 
                 if (type & STYPE_LIGHTSOURCE)
                 {

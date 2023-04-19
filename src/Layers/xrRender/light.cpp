@@ -342,7 +342,7 @@ void light::Export(light_Package& package)
                 L->set_range(range);
                 L->set_virtual_size(virtual_size);
                 L->set_color(color);
-                L->spatial.sector = spatial.sector; //. dangerous?
+                L->spatial.sector_id = spatial.sector_id; //. dangerous?
                 L->s_spot = s_spot;
                 L->s_point = s_point;
 
