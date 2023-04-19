@@ -6,7 +6,3 @@
 #include "xrCore/xrCore.h"
 
 #include "lzo/lzo1x.h"
-
-#include <mmsystem.h>
-
-#pragma comment(lib, "winmm")

@@ -7,10 +7,10 @@ extern int ProcessDifference();
 
 int __cdecl main(int argc, char* argv[])
 {
-    LPCSTR params = GetCommandLine();
+    cpcstr params = GetCommandLine();
 
     xrDebug::Initialize(params);
-    Core.Initialize("xrCompress", 0, FALSE);
+    Core.Initialize("xrCompress", nullptr, nullptr);
     printf("\n\n");
 
 
@@ -48,17 +48,17 @@ int __cdecl main(int argc, char* argv[])
         printf("\nCompressing files (%s)...\n\n", folder);
 
         FS._initialize(CLocatorAPI::flTargetFolderOnly, folder);
-        FS.append_path("$working_folder$", "", 0, false);
+        FS.append_path("$working_folder$", "", nullptr, false);
 
         xrCompressor C;
 
-        C.SetStoreFiles(NULL != strstr(params, "-store"));
-        C.SetFastMode(NULL != strstr(params, "-fast"));
+        C.SetStoreFiles(nullptr != strstr(params, "-store"));
+        C.SetFastMode(nullptr != strstr(params, "-fast"));
         C.SetTargetName(argv[1]);
 
-        LPCSTR p = strstr(params, "-ltx");
+        cpcstr p = strstr(params, "-ltx");
 
-        if (0 != p)
+        if (nullptr != p)
         {
             string64 ltx_name;
             sscanf(strstr(params, "-ltx ") + 5, "%[^ ] ", ltx_name);

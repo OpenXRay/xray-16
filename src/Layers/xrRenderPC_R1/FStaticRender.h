@@ -207,9 +207,6 @@ public:
 
 protected:
     virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
-
-private:
-    FS_FileSet m_file_set;
 };
 
 extern CRender RImplementation;
