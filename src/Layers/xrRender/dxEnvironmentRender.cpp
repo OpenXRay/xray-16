@@ -344,10 +344,9 @@ void dxEnvironmentRender::OnDeviceCreate()
     R_ASSERT(C);
     tclouds1_tstage = C->samp.index;
 
-#if RENDER != R_R1
-    tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
-    tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur);
-#endif
+    const bool r2 = GEnv.Render->GenerationIsR2OrHigher();
+    tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
+    tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
 }
 
 void dxEnvironmentRender::OnDeviceDestroy()

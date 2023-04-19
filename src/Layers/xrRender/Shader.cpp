@@ -138,7 +138,7 @@ void STextureList::clear()
     erase(begin(), end());
 }
 
-u32 STextureList::find_texture_stage(const shared_str& TexName) const
+u32 STextureList::find_texture_stage(const shared_str& TexName, bool warnIfMissing /*= true*/) const
 {
     for (const auto& [stage, texture] : *this)
     {
@@ -148,7 +148,7 @@ u32 STextureList::find_texture_stage(const shared_str& TexName) const
             return stage;
     }
 
-    VERIFY3(false, "Couldn't find texture stage", TexName.c_str());
+    VERIFY3(!warnIfMissing, "Couldn't find texture stage", TexName.c_str());
     return 0;
 }
 
