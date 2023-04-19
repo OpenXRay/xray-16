@@ -640,12 +640,11 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     }
 }
 
-void R_dsgraph_structure::load()
+void R_dsgraph_structure::load(const xr_vector<CSector::level_sector_data_t>& sectors_data,
+    const xr_vector<CPortal::level_portal_data_t>& portals_data)
 {
-    const auto& RI = RImplementation;
-
-    const auto portals_count = RI.portals_data.size();
-    const auto sectors_count = RI.sectors_data.size();
+    const auto portals_count = portals_data.size();
+    const auto sectors_count = sectors_data.size();
 
     Sectors.resize(sectors_count);
     Portals.resize(portals_count);
@@ -659,7 +658,7 @@ void R_dsgraph_structure::load()
     {
         auto* sector = xr_new<CSector>();
 
-        sector->setup(RI.sectors_data[idx]);
+        sector->setup(sectors_data[idx]);
         Sectors[idx] = sector;
     }
 
@@ -667,7 +666,7 @@ void R_dsgraph_structure::load()
     {
         auto* portal = static_cast<CPortal*>(Portals[idx]);
 
-        portal->setup(RI.portals_data[idx]);
+        portal->setup(portals_data[idx]);
     }
 }
 

@@ -134,9 +134,6 @@ void CRender::level_Unload()
     Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
-    sectors_data.clear();
-    portals_data.clear();
-
     dsgraph.unload();
 
     //*** Lights
@@ -310,9 +307,11 @@ void CRender::LoadSectors(IReader* fs)
     R_ASSERT(0 == size % sizeof(CPortal::level_portal_data_t));
 
     const u32 portals_count = size / sizeof(CPortal::level_portal_data_t);
-    portals_data.resize(portals_count);
+    xr_vector<CPortal::level_portal_data_t> portals_data{portals_count};
 
     // load sectors
+    xr_vector<CSector::level_sector_data_t> sectors_data;
+    
     float largest_sector_vol = 0.0f;
     IReader* S = fs->open_chunk(fsL_SECTORS);
     for (u32 i = 0;; i++)
@@ -415,7 +414,7 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    dsgraph.load();
+    dsgraph.load(sectors_data, portals_data);
 
     pLastSector = nullptr;
 }

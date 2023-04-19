@@ -114,7 +114,7 @@ struct R_dsgraph_structure
         pmask_wmark = _wm;
     }
 
-    void load();
+    void load(const xr_vector<CSector::level_sector_data_t> &sectors, const xr_vector<CPortal::level_portal_data_t> &portals);
     void unload();
 
     void add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);

@@ -148,9 +148,6 @@ public:
 public:
     RenderR2Statistics Stats;
     // Sector detection and visibility
-    xr_vector<CSector::level_sector_data_t> sectors_data;
-    xr_vector<CPortal::level_portal_data_t> portals_data;
-
     CSector* pLastSector;
     u32 uLastLTRACK;
     xrXRC Sectors_xrc;
