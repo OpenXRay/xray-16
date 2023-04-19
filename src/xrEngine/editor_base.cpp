@@ -62,6 +62,7 @@ void ide::OnAppStart()
 
     string_path fName;
     FS.update_path(fName, "$app_data_root$", io.IniFilename);
+    convert_path_separators(fName);
     io.IniFilename = xr_strdup(fName);
 
     FS.update_path(fName, "$logs$", io.LogFilename);
