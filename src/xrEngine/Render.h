@@ -2,6 +2,7 @@
 
 #include "xrEngine/Engine.h"
 #include "xrCDB/Frustum.h"
+#include "xrCDB/ISpatial.h"
 #include "vis_common.h"
 #include "Include/xrRender/FactoryPtr.h"
 #include "xrCore/xr_resource.h"
@@ -111,24 +112,6 @@ public:
     virtual float* get_luminocity_hemi_cube() = 0;
 
     virtual ~IRender_ObjectSpecific(){};
-};
-
-//////////////////////////////////////////////////////////////////////////
-// definition (Portal)
-class ENGINE_API IRender_Portal
-{
-public:
-    virtual ~IRender_Portal(){};
-    u32 unique_id{0};
-};
-
-//////////////////////////////////////////////////////////////////////////
-// definition (Sector)
-class ENGINE_API IRender_Sector
-{
-public:
-    virtual ~IRender_Sector(){};
-    u32 unique_id{0};
 };
 
 //////////////////////////////////////////////////////////////////////////

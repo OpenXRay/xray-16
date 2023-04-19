@@ -560,7 +560,7 @@ void CRender::Calculate()
                 ISpatial* spatial = dsgraph.lstRenderables[o_it];
                 spatial->spatial_updatesector();
                 const auto sector_id = spatial->GetSpatialData().sector_id;
-                if (sector_id < 0)
+                if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                     continue; // disassociated from S/P structure
                 CSector* sector = dsgraph.Sectors[sector_id];
 
@@ -629,7 +629,7 @@ void CRender::Calculate()
                         // lightsource
                         light* L = (light*)spatial->dcast_Light();
                         VERIFY(L);
-                        if (L->spatial.sector_id >= 0)
+                        if (L->spatial.sector_id != IRender_Sector::INVALID_SECTOR_ID)
                         {
                             vis_data& vis = L->get_homdata();
                             if (HOM.visible(vis))

@@ -326,7 +326,7 @@ void R_dsgraph_structure::render_distort()
 
 //////////////////////////////////////////////////////////////////////////
 // sub-space rendering - shortcut to render with frustum extracted from matrix
-void R_dsgraph_structure::render_subspace(u32 sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
+void R_dsgraph_structure::render_subspace(IRender_Sector::sector_id_t sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     CFrustum temp;
     temp.CreateFromMatrix(mCombined, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
@@ -334,10 +334,10 @@ void R_dsgraph_structure::render_subspace(u32 sector_id, Fmatrix& mCombined, Fve
 }
 
 // sub-space rendering - main procedure
-void R_dsgraph_structure::render_subspace(u32 sector_id, CFrustum* _frustum, Fmatrix& mCombined,
+void R_dsgraph_structure::render_subspace(IRender_Sector::sector_id_t sector_id, CFrustum* _frustum, Fmatrix& mCombined,
     Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
-    VERIFY(sector_id >= 0);
+    VERIFY(sector_id != IRender_Sector::INVALID_SECTOR_ID);
     auto* _sector = Sectors[sector_id];
 
     PIX_EVENT(r_dsgraph_render_subspace);
@@ -384,7 +384,7 @@ void R_dsgraph_structure::render_subspace(u32 sector_id, CFrustum* _frustum, Fma
         {
             ISpatial* spatial = lstRenderables[o_it];
             const auto sector_id = spatial->GetSpatialData().sector_id;
-            if (sector_id < 0)
+            if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                 continue; // disassociated from S/P structure
             auto* sector = Sectors[sector_id];
             if (PortalTraverser.i_marker != sector->r_marker)
@@ -415,7 +415,7 @@ void R_dsgraph_structure::render_subspace(u32 sector_id, CFrustum* _frustum, Fma
                     break;
                 viewEntity->spatial_updatesector();
                 const auto sector_id = viewEntity->GetSpatialData().sector_id;
-                if (sector_id < 0)
+                if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                     break; // disassociated from S/P structure
                 CSector* sector = Sectors[sector_id];
                 if (PortalTraverser.i_marker != sector->r_marker)
@@ -439,7 +439,7 @@ void R_dsgraph_structure::render_subspace(u32 sector_id, CFrustum* _frustum, Fma
 
 void R_dsgraph_structure::render_R1_box(u32 sector_id, Fbox& BB, int sh)
 {
-    VERIFY(sector_id >= 0);
+    VERIFY(sector_id != IRender_Sector::INVALID_SECTOR_ID);
     auto* S = Sectors[sector_id];
 
     PIX_EVENT(r_dsgraph_render_R1_box);

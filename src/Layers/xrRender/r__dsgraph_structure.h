@@ -144,8 +144,9 @@ struct R_dsgraph_structure
     void render_emissive();
     void render_wmarks();
     void render_distort();
-    void render_subspace(u32 sector_id, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
+    void render_subspace(IRender_Sector::sector_id_t sector_id, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
         BOOL _dynamic, BOOL _precise_portals = FALSE);
-    void render_subspace(u32 sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
+    void render_subspace(IRender_Sector::sector_id_t sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic,
+        BOOL _precise_portals = FALSE);
     void render_R1_box(u32 sector_id, Fbox& _bb, int _element);
 };

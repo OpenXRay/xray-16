@@ -13,6 +13,26 @@
 
 #pragma pack(push, 4)
 
+//////////////////////////////////////////////////////////////////////////
+// definition (Portal)
+class IRender_Portal
+{
+public:
+    virtual ~IRender_Portal() = default;
+};
+
+//////////////////////////////////////////////////////////////////////////
+// definition (Sector)
+class IRender_Sector
+{
+public:
+    using sector_id_t = size_t;
+    static auto constexpr INVALID_SECTOR_ID = static_cast<sector_id_t>(-1);
+
+    virtual ~IRender_Sector() = default;
+    sector_id_t unique_id{INVALID_SECTOR_ID};
+};
+
 /*
 Requirements:
 0. Generic
@@ -71,7 +91,6 @@ enum
 
 //////////////////////////////////////////////////////////////////////////
 class ISpatial_NODE;
-class IRender_Sector;
 class ISpatial_DB;
 class IGameObject;
 namespace Feel
@@ -89,7 +108,7 @@ public:
     Fvector node_center; // Cached node center for TBV optimization
     float node_radius; // Cached node bounds for TBV optimization
     ISpatial_NODE* node_ptr; // Cached parent node for "empty-members" optimization
-    int sector_id;
+    IRender_Sector::sector_id_t sector_id;
     ISpatial_DB* space; // allow different spaces
 };
 

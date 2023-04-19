@@ -77,7 +77,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                 spatial->spatial_updatesector();
                 const auto& data = spatial->GetSpatialData();
                 const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
-                if (sector_id < 0)
+                if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                     continue; // disassociated from S/P structure
                 auto* sector = dsgraph.Sectors[sector_id];
 

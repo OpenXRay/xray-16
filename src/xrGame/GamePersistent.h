@@ -100,7 +100,7 @@ public:
 
     virtual void GetCurrentDof(Fvector3& dof);
     virtual void SetBaseDof(const Fvector3& dof);
-    virtual void OnSectorChanged(int sector);
+    virtual void OnSectorChanged(IRender_Sector::sector_id_t sector);
     virtual void OnAssetsChanged();
 };
 

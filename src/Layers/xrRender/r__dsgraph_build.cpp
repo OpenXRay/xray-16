@@ -652,8 +652,6 @@ void R_dsgraph_structure::load(const xr_vector<CSector::level_sector_data_t>& se
     for (int idx = 0; idx < portals_count; ++idx)
     {
         auto* portal = xr_new<CPortal>();
-
-        portal->unique_id = idx;
         Portals[idx] = portal;
     }
 
@@ -661,7 +659,7 @@ void R_dsgraph_structure::load(const xr_vector<CSector::level_sector_data_t>& se
     {
         auto* sector = xr_new<CSector>();
 
-        sector->unique_id = idx;
+        sector->unique_id = static_cast<IRender_Sector::sector_id_t>(idx);
         sector->setup(sectors_data[idx], Portals);
         Sectors[idx] = sector;
     }
