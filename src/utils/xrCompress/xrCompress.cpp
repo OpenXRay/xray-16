@@ -132,37 +132,6 @@ xrCompressor::ALIAS* xrCompressor::testALIAS(IReader* base, u32 crc, u32& a_test
     return NULL;
 }
 
-void xrCompressor::write_file_header(
-    LPCSTR file_name, const u32& crc, const u32& ptr, const u32& size_real, const u32& size_compressed)
-{
-    const size_t file_name_size = (xr_strlen(file_name) + 0) * sizeof(char);
-    const size_t buffer_size = file_name_size + 4 * sizeof(u32);
-    VERIFY(buffer_size <= 65535);
-
-    const size_t full_buffer_size = buffer_size + sizeof(u16);
-    u8* buffer = (u8*)xr_alloca(full_buffer_size);
-    const u8* buffer_start = buffer;
-
-    *(u16*)buffer = (u16)buffer_size;
-    buffer += sizeof(u16);
-
-    *(u32*)buffer = size_real;
-    buffer += sizeof(u32);
-
-    *(u32*)buffer = size_compressed;
-    buffer += sizeof(u32);
-
-    *(u32*)buffer = crc;
-    buffer += sizeof(u32);
-
-    memcpy(buffer, file_name, file_name_size);
-    buffer += file_name_size;
-
-    *(u32*)buffer = ptr;
-
-    fs_desc.w(buffer_start, full_buffer_size);
-}
-
 void xrCompressor::CompressOne(LPCSTR path)
 {
     filesTOTAL++;
@@ -294,7 +263,7 @@ void xrCompressor::CompressOne(LPCSTR path)
     } //(A)
 
     // Write description
-    write_file_header(path, c_crc32, c_ptr, c_size_real, c_size_compressed);
+    CLocatorAPI::archive_file_header{ fs_desc, path, c_size_real, c_size_compressed, c_crc32, c_ptr };
 
     if (!A)
     {
@@ -420,7 +389,9 @@ void xrCompressor::PerformWork()
     OpenPack(target_name.c_str(), pack_num++);
 
     for (const auto& it : *folders_list)
-        write_file_header(it, 0, 0, 0, 0);
+    {
+        CLocatorAPI::archive_file_header{ fs_desc, it, 0, 0, 0, 0 };
+    }
 
     if (!bStoreFiles)
         c_heap = xr_alloc<u8>(LZO1X_999_MEM_COMPRESS);

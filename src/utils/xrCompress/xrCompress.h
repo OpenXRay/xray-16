@@ -33,8 +33,6 @@ class xrCompressor
 
     void GatherFiles(LPCSTR folder) const;
 
-    void write_file_header(
-        LPCSTR file_name, const u32& crc, const u32& ptr, const u32& size_real, const u32& size_compressed);
     void ClosePack();
     void OpenPack(LPCSTR tgt_folder, int num);
 
