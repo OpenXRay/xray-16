@@ -170,7 +170,8 @@ public:
     virtual ObjectList* GetSnapList() = 0;
 #endif
 
-    bool UseVS() { return HW.Caps.geometry_major >= 1; }
+    bool UseVS() const;
+
     // Software processor
     ref_geom soft_Geom;
     void soft_Load();

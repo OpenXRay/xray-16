@@ -5,9 +5,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#ifdef _EDITOR
-#include "Include/xrAPI/xrAPI.h"
-#endif
 #include "SkeletonX.h"
 #include "SkeletonXSkinXW.h"
 #include "xrCore/FMesh.hpp"
@@ -166,14 +163,11 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
     u16 hw_bones_cnt = u16((HW.Caps.geometry.dwRegisters - 22 - 3) / 3);
 
 #if RENDER == R_R1
-    if (ps_r1_SoftwareSkinning == 1)
+    if (ps_r1_SoftwareSkinning == 1 || RImplementation.o.ffp)
         hw_bones_cnt = 0;
 #endif // RENDER == R_R1
 
     u16 sw_bones_cnt = 0;
-#ifdef _EDITOR
-    hw_bones_cnt = 0;
-#endif
 
     u32 dwVertType, size, it, crc;
     dwVertType = data->r_u32();
@@ -200,12 +194,10 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
             sw_bones_cnt = _max(sw_bones_cnt, mid);
         }
-#ifdef _EDITOR
-        // software
-        crc = crc32(data->pointer(), size);
-        Vertices1W.create(crc, dwVertCount, (vertBoned1W*)data->pointer());
-#else
-        if (1 == bids.size())
+
+        // Still allow HW skinning for single bone case
+        // go full SW skinning only if FFP is forced
+        if (1 == bids.size() && !RImplementation.o.ffp)
         {
             // HW- single bone
             RenderMode = RImplementation.m_hq_skinning ? RM_SINGLE_HQ : RM_SINGLE;
@@ -226,7 +218,6 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
             Vertices1W.create(crc, dwVertCount, (vertBoned1W*)data->pointer());
             GEnv.Render->shader_option_skinning(-1);
         }
-#endif
     }
     break;
     case OGF_VERTEXFORMAT_FVF_2L: // 2-Link
@@ -331,11 +322,11 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
     break;
     default: xrDebug::Fatal(DEBUG_INFO, "Invalid vertex type in skinned model '%s'", N); break;
     }
-#ifdef _EDITOR
-    if (bids.size() > 0)
-#else
-    if (bids.size() > 1)
-#endif
+
+    // Look at single bone case in the switch above
+    const size_t count = RImplementation.o.ffp ? 0 : 1;
+
+    if (bids.size() > count)
     {
         crc = crc32(&*bids.begin(), bids.size() * sizeof(u16));
         BonesUsed.create(crc, bids.size(), &*bids.begin());

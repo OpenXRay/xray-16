@@ -374,6 +374,11 @@ void CDetailManager::UpdateVisibleM()
     RImplementation.BasicStats.DetailVisibility.End();
 }
 
+bool CDetailManager::UseVS() const
+{
+    return HW.Caps.geometry_major >= 1 && !RImplementation.o.ffp;
+}
+
 void CDetailManager::Render()
 {
 #ifndef _EDITOR
