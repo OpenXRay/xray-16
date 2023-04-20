@@ -107,7 +107,7 @@ void CRender::render_lights(light_Package& LP)
                 dsgraph.r_pmask(true, false);
             L->svis.begin();
             PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
-            dsgraph.render_subspace(L->spatial.sector, L->X.S.combine, L->position, TRUE);
+            dsgraph.render_subspace(L->spatial.sector_id, L->X.S.combine, L->position, TRUE);
             bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
             bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
                 !dsgraph.mapSorted.empty();
@@ -265,7 +265,7 @@ void CRender::render_indirect(light* L)
         if (_abs(L_up.dotproduct(LI.D)) > .99f)
             L_up.set(0, 0, 1);
         L_right.crossproduct(L_up, LI.D).normalize();
-        LIGEN.spatial.sector = LI.S;
+        LIGEN.spatial.sector_id = LI.S;
         LIGEN.set_position(LI.P);
         LIGEN.set_rotation(LI.D, L_right);
 

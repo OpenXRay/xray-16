@@ -326,19 +326,20 @@ void R_dsgraph_structure::render_distort()
 
 //////////////////////////////////////////////////////////////////////////
 // sub-space rendering - shortcut to render with frustum extracted from matrix
-void R_dsgraph_structure::render_subspace(
-    IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
+void R_dsgraph_structure::render_subspace(IRender_Sector::sector_id_t sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     CFrustum temp;
     temp.CreateFromMatrix(mCombined, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
-    render_subspace(_sector, &temp, mCombined, _cop, _dynamic, _precise_portals);
+    render_subspace(sector_id, &temp, mCombined, _cop, _dynamic, _precise_portals);
 }
 
 // sub-space rendering - main procedure
-void R_dsgraph_structure::render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined,
+void R_dsgraph_structure::render_subspace(IRender_Sector::sector_id_t sector_id, CFrustum* _frustum, Fmatrix& mCombined,
     Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
-    VERIFY(_sector);
+    VERIFY(sector_id != IRender_Sector::INVALID_SECTOR_ID);
+    auto* _sector = Sectors[sector_id];
+
     PIX_EVENT(r_dsgraph_render_subspace);
     RImplementation.dsgraph.marker++; // !!! critical here
 
@@ -350,9 +351,7 @@ void R_dsgraph_structure::render_subspace(IRender_Sector* _sector, CFrustum* _fr
         RImplementation.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, RImplementation.rmPortals, _cop, box_radius);
         for (int K = 0; K < RImplementation.Sectors_xrc.r_count(); K++)
         {
-            CPortal* pPortal =
-                (CPortal*)RImplementation
-                    .Portals[RImplementation.rmPortals->get_tris()[RImplementation.Sectors_xrc.r_begin()[K].id].dummy];
+            CPortal* pPortal = Portals[RImplementation.rmPortals->get_tris()[RImplementation.Sectors_xrc.r_begin()[K].id].dummy];
             pPortal->bDualRender = TRUE;
         }
     }
@@ -384,9 +383,10 @@ void R_dsgraph_structure::render_subspace(IRender_Sector* _sector, CFrustum* _fr
         for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
         {
             ISpatial* spatial = lstRenderables[o_it];
-            CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-            if (nullptr == sector)
+            const auto sector_id = spatial->GetSpatialData().sector_id;
+            if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                 continue; // disassociated from S/P structure
+            auto* sector = Sectors[sector_id];
             if (PortalTraverser.i_marker != sector->r_marker)
                 continue; // inactive (untouched) sector
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
@@ -414,9 +414,10 @@ void R_dsgraph_structure::render_subspace(IRender_Sector* _sector, CFrustum* _fr
                 if (viewEntity == nullptr)
                     break;
                 viewEntity->spatial_updatesector();
-                CSector* sector = (CSector*)viewEntity->GetSpatialData().sector;
-                if (nullptr == sector)
+                const auto sector_id = viewEntity->GetSpatialData().sector_id;
+                if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                     break; // disassociated from S/P structure
+                CSector* sector = Sectors[sector_id];
                 if (PortalTraverser.i_marker != sector->r_marker)
                     break; // inactive (untouched) sector
                 for (const CFrustum& view : sector->r_frustums)
@@ -436,8 +437,11 @@ void R_dsgraph_structure::render_subspace(IRender_Sector* _sector, CFrustum* _fr
 #include "SkeletonCustom.h"
 #include "FLOD.h"
 
-void R_dsgraph_structure::render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
+void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& BB, int sh)
 {
+    VERIFY(sector_id != IRender_Sector::INVALID_SECTOR_ID);
+    auto* S = Sectors[sector_id];
+
     PIX_EVENT(r_dsgraph_render_R1_box);
 
     lstVisuals.clear();

@@ -622,7 +622,6 @@ void CRender::create()
     dsgraph.marker = 0;
     q_sync_point.Create();
 
-    PortalTraverser.initialize();
     //	TODO: OGL: Implement FluidManager.
 #if defined(USE_DX11)
     FluidManager.Initialize(70, 70, 70);
@@ -637,7 +636,6 @@ void CRender::destroy()
 #if defined(USE_DX11)
     FluidManager.Destroy();
 #endif
-    PortalTraverser.destroy();
     q_sync_point.Destroy();
     HWOCC.occq_destroy();
     xr_delete(Models);
@@ -798,16 +796,6 @@ ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));
     return Shaders[id];
-}
-IRender_Portal* CRender::getPortal(int id)
-{
-    VERIFY(id < int(Portals.size()));
-    return Portals[id];
-}
-IRender_Sector* CRender::getSector(int id)
-{
-    VERIFY(id < int(Sectors.size()));
-    return Sectors[id];
 }
 IRender_Sector* CRender::getSectorActive() { return pLastSector; }
 IRenderVisual* CRender::getVisual(int id)

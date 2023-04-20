@@ -150,8 +150,6 @@ public:
     // Sector detection and visibility
     CSector* pLastSector;
     u32 uLastLTRACK;
-    xr_vector<IRender_Portal*> Portals;
-    xr_vector<IRender_Sector*> Sectors;
     xrXRC Sectors_xrc;
     CDB::MODEL* rmPortals;
     CHOM HOM;
@@ -206,7 +204,6 @@ private:
     void LoadBuffers(CStreamReader* fs, bool alternative);
     void LoadVisuals(IReader* fs);
     void LoadLights(IReader* fs);
-    void LoadPortals(IReader* fs);
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);
 #if RENDER != R_R2
@@ -214,10 +211,8 @@ private:
 #endif
 
 public:
-    IRender_Sector* rimp_detectSector(Fvector& P, Fvector& D);
     void render_main(Fmatrix& mCombined, bool _fportals);
     void render_forward();
-    void render_smap_direct(Fmatrix& mCombined);
     void render_indirect(light* L);
     void render_lights(light_Package& LP);
     void render_sun();
@@ -239,11 +234,9 @@ public:
     VertexStagingBuffer* getVB(int id, bool alternative = false);
     IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
-    IRender_Portal* getPortal(int id);
     IRender_Sector* getSectorActive();
     IRenderVisual* model_CreatePE(LPCSTR name);
     IRender_Sector* detectSector(const Fvector& P, Fvector& D);
-    int translateSector(IRender_Sector* pSector);
 
     // HW-occlusion culling
     u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
@@ -340,7 +333,6 @@ public:
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
     ref_shader getShader(int id);
-    IRender_Sector* getSector(int id) override;
     IRenderVisual* getVisual(int id) override;
     IRender_Sector* detectSector(const Fvector& P) override;
     IRender_Target* getTarget() override;
@@ -440,7 +432,7 @@ protected:
     void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
 
 private:
-    CSector* m_largest_sector{};
+    IRender_Sector::sector_id_t m_largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
 };
 
 extern CRender RImplementation;

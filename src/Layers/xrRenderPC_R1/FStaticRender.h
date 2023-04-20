@@ -42,8 +42,6 @@ public:
     CSector* pLastSector;
     Fvector vLastCameraPos;
     u32 uLastLTRACK;
-    xr_vector<IRender_Portal*> Portals;
-    xr_vector<IRender_Sector*> Sectors;
     xrXRC Sectors_xrc;
     CDB::MODEL* rmPortals;
     Task* ProcessHOMTask;
@@ -130,11 +128,9 @@ public:
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
     virtual LPCSTR getShaderPath() override { return "r1" DELIMITER ""; }
     virtual ref_shader getShader(int id);
-    virtual IRender_Sector* getSector(int id) override;
     virtual IRenderVisual* getVisual(int id) override;
     virtual IRender_Sector* detectSector(const Fvector& P) override;
     IRender_Sector* detectSector(const Fvector& P, Fvector& D);
-    int translateSector(IRender_Sector* pSector);
     virtual IRender_Target* getTarget() override;
 
     // Main

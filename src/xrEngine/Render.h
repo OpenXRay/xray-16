@@ -2,6 +2,7 @@
 
 #include "xrEngine/Engine.h"
 #include "xrCDB/Frustum.h"
+#include "xrCDB/ISpatial.h"
 #include "vis_common.h"
 #include "Include/xrRender/FactoryPtr.h"
 #include "xrCore/xr_resource.h"
@@ -111,22 +112,6 @@ public:
     virtual float* get_luminocity_hemi_cube() = 0;
 
     virtual ~IRender_ObjectSpecific(){};
-};
-
-//////////////////////////////////////////////////////////////////////////
-// definition (Portal)
-class ENGINE_API IRender_Portal
-{
-public:
-    virtual ~IRender_Portal(){};
-};
-
-//////////////////////////////////////////////////////////////////////////
-// definition (Sector)
-class ENGINE_API IRender_Sector
-{
-public:
-    virtual ~IRender_Sector(){};
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -318,7 +303,6 @@ public:
 
     virtual pcstr getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
-    virtual IRender_Sector* getSector(int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
     virtual IRender_Sector* detectSector(const Fvector& P) = 0;
     virtual IRender_Target* getTarget() = 0;

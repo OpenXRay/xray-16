@@ -128,13 +128,7 @@ void CRender::level_Unload()
     uLastLTRACK = 0;
 
     // 2.
-    for (I = 0; I < Sectors.size(); I++)
-        xr_delete(Sectors[I]);
-    Sectors.clear();
-    // 3.
-    for (I = 0; I < Portals.size(); I++)
-        xr_delete(Portals[I]);
-    Portals.clear();
+    dsgraph.unload();
 
     //*** Lights
     L_Glows->Unload();
@@ -318,30 +312,43 @@ void CRender::LoadSectors(IReader* fs)
 {
     // allocate memory for portals
     u32 size = fs->find_chunk(fsL_PORTALS);
-    R_ASSERT(0 == size % sizeof(CPortal::b_portal));
-    u32 count = size / sizeof(CPortal::b_portal);
-    Portals.resize(count);
-    for (u32 c = 0; c < count; c++)
-        Portals[c] = xr_new<CPortal>();
+    R_ASSERT(0 == size % sizeof(CPortal::level_portal_data_t));
+    const u32 portals_count = size / sizeof(CPortal::level_portal_data_t);
+    xr_vector<CPortal::level_portal_data_t> portals_data{portals_count};
 
     // load sectors
+    xr_vector<CSector::level_sector_data_t> sectors_data;
     IReader* S = fs->open_chunk(fsL_SECTORS);
     for (u32 i = 0;; i++)
     {
         IReader* P = S->open_chunk(i);
-        if (nullptr == P)
+        if (!P)
             break;
 
-        CSector* __S = xr_new<CSector>();
-        __S->load(*P);
-        Sectors.push_back(__S);
+        auto& sector_data = sectors_data.emplace_back();
+        {
+            u32 size = P->find_chunk(fsP_Portals);
+            R_ASSERT(0 == (size & 1));
+            u32 portals_in_sector = size / sizeof(u16);
 
+            sector_data.portals_id.reserve(portals_in_sector);
+            while (portals_in_sector)
+            {
+                const u16 ID = P->r_u16();
+                sector_data.portals_id.emplace_back(ID);
+                --portals_in_sector;
+            }
+
+            size = P->find_chunk(fsP_Root);
+            R_ASSERT(size == 4);
+            sector_data.root_id = P->r_u32();
+        }
         P->close();
     }
     S->close();
 
     // load portals
-    if (count)
+    if (portals_count)
     {
         bool do_rebuild = true;
         const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
@@ -371,13 +378,11 @@ void CRender::LoadSectors(IReader* fs)
 
         CDB::Collector CL;
         fs->find_chunk(fsL_PORTALS);
-        for (u32 i = 0; i < count; i++)
+        for (u32 i = 0; i < portals_count; i++)
         {
-            CPortal::b_portal P;
+            auto& P = portals_data[i];
             fs->r(&P, sizeof(P));
-            CPortal* __P = (CPortal*)Portals[i];
-            __P->Setup(P.vertices.begin(), P.vertices.size(), (CSector*)getSector(P.sector_front),
-                (CSector*)getSector(P.sector_back));
+
             if (do_rebuild)
             {
                 for (u32 j = 2; j < P.vertices.size(); j++)
@@ -405,9 +410,9 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    // debug
-    //	for (int d=0; d<Sectors.size(); d++)
-    //		Sectors[d]->DebugDump	();
+    const auto sectors_count = sectors_data.size();
+
+    dsgraph.load(sectors_data, portals_data);
 
     pLastSector = nullptr;
 }

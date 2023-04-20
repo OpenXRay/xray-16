@@ -113,14 +113,11 @@ void CRender::create()
     L_Dynamic = xr_new<CLightR_Manager>();
     PSLibrary.OnCreate();
     //.	HWOCC.occq_create			(occq_size);
-
-    ::PortalTraverser.initialize();
 }
 
 void CRender::destroy()
 {
     m_bMakeAsyncSS = false;
-    ::PortalTraverser.destroy();
     //.	HWOCC.occq_destroy			();
     PSLibrary.OnDestroy();
 
@@ -247,16 +244,6 @@ ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));
     return Shaders[id];
-}
-IRender_Portal* CRender::getPortal(int id)
-{
-    VERIFY(id < int(Portals.size()));
-    return Portals[id];
-}
-IRender_Sector* CRender::getSector(int id)
-{
-    VERIFY(id < int(Sectors.size()));
-    return Sectors[id];
 }
 IRender_Sector* CRender::getSectorActive() { return pLastSector; }
 IRenderVisual* CRender::getVisual(int id)
@@ -484,27 +471,27 @@ void CRender::Calculate()
     {
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
         if (pSector && (pSector != pLastSector))
-            g_pGamePersistent->OnSectorChanged(translateSector(pSector));
+            g_pGamePersistent->OnSectorChanged(pSector->unique_id);
 
         if (nullptr == pSector)
             pSector = pLastSector;
         pLastSector = pSector;
         vLastCameraPos.set(Device.vCameraPosition);
-    }
 
-    // Check if camera is too near to some portal - if so force DualRender
-    if (rmPortals)
-    {
-        Fvector box_radius;
-        box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
-        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
-        for (int K = 0; K < Sectors_xrc.r_count(); K++)
+        // Check if camera is too near to some portal - if so force DualRender
+        if (rmPortals)
         {
-            CPortal* pPortal = (CPortal*)Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
-            pPortal->bDualRender = TRUE;
+            Fvector box_radius;
+            box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
+            Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
+            for (int K = 0; K < Sectors_xrc.r_count(); K++)
+            {
+                CPortal* pPortal = dsgraph.Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
+                pPortal->bDualRender = TRUE;
+            }
         }
     }
-    
+
     //
     Lights.Update();
 
@@ -515,15 +502,15 @@ void CRender::Calculate()
     if (pLastSector)
     {
         // Traverse sector/portal structure
-        PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
+        dsgraph.PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
         // Determine visibility for static geometry hierarchy
         if (psDeviceFlags.test(rsDrawStatic))
         {
-            for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+            for (u32 s_it = 0; s_it < dsgraph.PortalTraverser.r_sectors.size(); s_it++)
             {
-                CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+                CSector* sector = (CSector*)dsgraph.PortalTraverser.r_sectors[s_it];
                 dxRender_Visual* root = sector->root();
                 for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
                 {
@@ -572,12 +559,13 @@ void CRender::Calculate()
             {
                 ISpatial* spatial = dsgraph.lstRenderables[o_it];
                 spatial->spatial_updatesector();
-                CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-                if (nullptr == sector)
+                const auto sector_id = spatial->GetSpatialData().sector_id;
+                if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                     continue; // disassociated from S/P structure
+                CSector* sector = dsgraph.Sectors[sector_id];
 
                 // Filter only not light spatial
-                if (PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE))
+                if (dsgraph.PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE))
                     continue; // inactive (untouched) sector
 
                 if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
@@ -641,7 +629,7 @@ void CRender::Calculate()
                         // lightsource
                         light* L = (light*)spatial->dcast_Light();
                         VERIFY(L);
-                        if (L->spatial.sector)
+                        if (L->spatial.sector_id != IRender_Sector::INVALID_SECTOR_ID)
                         {
                             vis_data& vis = L->get_homdata();
                             if (HOM.visible(vis))
@@ -713,7 +701,7 @@ void CRender::Render()
     dsgraph.render_lods(false, true); // lods - FB
     dsgraph.render_graph(1); // normal level, secondary priority
     L_Dynamic->render(1); // additional light sources, secondary priority
-    PortalTraverser.fade_render(); // faded-portals
+    dsgraph.PortalTraverser.fade_render(); // faded-portals
     dsgraph.render_sorted(); // strict-sorted geoms
     BasicStats.Glows.Begin();
     if (L_Glows)

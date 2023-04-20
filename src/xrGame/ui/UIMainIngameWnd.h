@@ -60,7 +60,7 @@ public:
     void DrawMainIndicatorsForInventory();
 
     CUIHudStatesWnd* get_hud_states() { return m_ui_hud_states; } // temp
-    void OnSectorChanged(int sector);
+    void OnSectorChanged(IRender_Sector::sector_id_t sector);
 
     xr_vector<CUIStatic*> m_quick_slots_icons;
     xr_vector<CUITextWnd*> m_quick_slots_texts;

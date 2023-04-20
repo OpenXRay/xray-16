@@ -29,40 +29,26 @@ void CRender::Calculate()
     // Detect camera-sector
     if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
     {
-        // Search for default sector - assume "default" or "outdoor" sector is the largest one
-        //. hack: need to know real outdoor sector
-        float largest_sector_vol = 0;
-        for (auto& s : Sectors)
-        {
-            dxRender_Visual* V = static_cast<CSector*>(s)->root();
-            float vol = V->vis.box.getvolume();
-            if (vol > largest_sector_vol)
-            {
-                largest_sector_vol = vol;
-                m_largest_sector = static_cast<CSector*>(s);
-            }
-        }
-
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
         if (pSector && (pSector != pLastSector))
-            g_pGamePersistent->OnSectorChanged(translateSector(pSector));
+            g_pGamePersistent->OnSectorChanged(pSector->unique_id);
 
         if (!pSector)
             pSector = pLastSector;
         pLastSector = pSector;
-    }
 
-    // Check if camera is too near to some portal - if so force DualRender
-    if (rmPortals)
-    {
-        float eps = VIEWPORT_NEAR + EPS_L;
-        Fvector box_radius;
-        box_radius.set(eps, eps, eps);
-        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
-        for (int K = 0; K < Sectors_xrc.r_count(); K++)
+        // Check if camera is too near to some portal - if so force DualRender
+        if (rmPortals)
         {
-            CPortal* pPortal = (CPortal*)Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
-            pPortal->bDualRender = TRUE;
+            float eps = VIEWPORT_NEAR + EPS_L;
+            Fvector box_radius;
+            box_radius.set(eps, eps, eps);
+            Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
+            for (int K = 0; K < Sectors_xrc.r_count(); K++)
+            {
+                CPortal* pPortal = (CPortal*)dsgraph.Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
+                pPortal->bDualRender = TRUE;
+            }
         }
     }
 
@@ -75,8 +61,8 @@ void CRender::Calculate()
     for (auto spatial : dsgraph.lstRenderables)
     {
         spatial->spatial_updatesector();
-        CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-        if (!sector)
+        const auto sector_id = spatial->GetSpatialData().sector_id;
+        if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
             continue; // disassociated from S/P structure
 
         VERIFY(spatial->GetSpatialData().type & STYPE_LIGHTSOURCE);
