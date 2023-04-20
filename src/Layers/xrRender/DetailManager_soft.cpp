@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "detailmanager.h"
+#include "DetailManager.h"
 
 const u32 vs_size = 3000;
 
