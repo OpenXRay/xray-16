@@ -101,7 +101,6 @@ public:
     IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
-    IRender_Sector* getSectorActive();
     IRenderVisual* model_CreatePE(LPCSTR name);
     void ApplyBlur4(FVF::TL4uv* dest, u32 w, u32 h, float k);
     void apply_object(IRenderable* O);
