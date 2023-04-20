@@ -123,7 +123,7 @@ void CRender::level_Unload()
     //*** Sectors
     // 1.
     xr_delete(rmPortals);
-    pLastSector = nullptr;
+    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     vLastCameraPos.set(flt_max, flt_max, flt_max);
     uLastLTRACK = 0;
 
@@ -414,7 +414,7 @@ void CRender::LoadSectors(IReader* fs)
 
     dsgraph.load(sectors_data, portals_data);
 
-    pLastSector = nullptr;
+    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
 
 void CRender::LoadSWIs(CStreamReader* base_fs)

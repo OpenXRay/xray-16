@@ -471,13 +471,14 @@ void CRender::Calculate()
     // Detect camera-sector
     if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
     {
-        CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
-        if (pSector && (pSector != pLastSector))
-            g_pGamePersistent->OnSectorChanged(pSector->unique_id);
-
-        if (nullptr == pSector)
-            pSector = pLastSector;
-        pLastSector = pSector;
+        const auto sector_id = detectSector(Device.vCameraPosition);
+        if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
+        {
+            if (sector_id != last_sector_id)
+                g_pGamePersistent->OnSectorChanged(sector_id);
+        
+            last_sector_id = sector_id;
+        }
         vLastCameraPos.set(Device.vCameraPosition);
 
         // Check if camera is too near to some portal - if so force DualRender
@@ -501,10 +502,11 @@ void CRender::Calculate()
     dsgraph.marker++;
     set_Object(nullptr);
     TaskScheduler->Wait(*ProcessHOMTask);
-    if (pLastSector)
+    if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
     {
         // Traverse sector/portal structure
-        dsgraph.PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
+        dsgraph.PortalTraverser.traverse(dsgraph.Sectors[last_sector_id], ViewBase, Device.vCameraPosition,
+            Device.mFullTransform,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
         // Determine visibility for static geometry hierarchy

@@ -15,10 +15,11 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
     dsgraph.marker++;
 
     // Calculate sector(s) and their objects
-    if (pLastSector)
+    if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
     {
         // Traverse sector/portal structure
-        dsgraph.PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, m_ViewProjection,
+        dsgraph.PortalTraverser.traverse(dsgraph.Sectors[last_sector_id], ViewBase, Device.vCameraPosition,
+            m_ViewProjection,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE
             //. disabled scissoring (HW.Caps.bScissor?CPortalTraverser::VQ_SCISSOR:0)	// generate scissoring info
             );

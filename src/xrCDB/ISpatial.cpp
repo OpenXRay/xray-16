@@ -119,10 +119,10 @@ void SpatialBase::spatial_move()
 
 void SpatialBase::spatial_updatesector_internal()
 {
-    IRender_Sector* S = GEnv.Render->detectSector(spatial_sector_point());
+    const auto sector_id = GEnv.Render->detectSector(spatial_sector_point());
     spatial.type &= ~STYPEFLAG_INVALIDSECTOR;
-    if (S)
-        spatial.sector_id = S->unique_id;
+    if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
+        spatial.sector_id = sector_id;
 }
 
 //////////////////////////////////////////////////////////////////////////

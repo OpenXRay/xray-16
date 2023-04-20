@@ -29,13 +29,14 @@ void CRender::Calculate()
     // Detect camera-sector
     if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
     {
-        CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
-        if (pSector && (pSector != pLastSector))
-            g_pGamePersistent->OnSectorChanged(pSector->unique_id);
+        const auto sector_id = detectSector(Device.vCameraPosition);
+        if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
+        {
+            if (sector_id != last_sector_id)
+                g_pGamePersistent->OnSectorChanged(sector_id);
 
-        if (!pSector)
-            pSector = pLastSector;
-        pLastSector = pSector;
+            last_sector_id = sector_id;
+        }
 
         // Check if camera is too near to some portal - if so force DualRender
         if (rmPortals)
