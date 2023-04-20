@@ -152,7 +152,8 @@ Shader* CResourceManager::_cpp_Create(
 
     // Access to template
     C.BT = B;
-    C.bEditor = FALSE;
+    C.bFFP = false;
+    C.bEditor = false;
     C.bDetail = FALSE;
 #ifdef _EDITOR
     if (!C.BT)
@@ -160,7 +161,8 @@ Shader* CResourceManager::_cpp_Create(
         ELog.Msg(mtError, "Can't find shader '%s'", s_shader);
         return 0;
     }
-    C.bEditor = TRUE;
+    C.bFFP = true;
+    C.bEditor = true;
 #else
     UNUSED(s_shader);
 #endif

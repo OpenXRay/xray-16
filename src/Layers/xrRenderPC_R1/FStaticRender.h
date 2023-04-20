@@ -35,6 +35,7 @@ public:
         u32 forceskinw : 1; // config
         u32 no_detail_textures : 1; // config
         u32 no_ram_textures : 1; // don't keep textures in RAM
+        u32 ffp : 1; // don't use shaders, only fixed-function pipeline or software processing
     } o;
 
 public:

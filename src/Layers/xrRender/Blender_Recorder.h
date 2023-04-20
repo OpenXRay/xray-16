@@ -22,6 +22,7 @@ public:
     LPCSTR detail_texture;
     R_constant_setup* detail_scaler;
 
+    bool bFFP;
     bool bEditor;
     bool bDetail;
     bool bDetail_Diffuse;

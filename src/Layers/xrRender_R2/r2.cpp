@@ -405,6 +405,8 @@ void CRender::create()
         Msg("* Managed textures disabled");
 #endif
 
+    o.ffp = false;
+
     // options (smap-pool-size)
     if (strstr(Core.Params, "-smap1024"))
         o.smapsize = 1024;
