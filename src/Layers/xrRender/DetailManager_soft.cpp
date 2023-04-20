@@ -119,9 +119,9 @@ void CDetailManager::soft_Render()
                     {
                         u32 item = (iOffset << 16) | iOffset;
                         u32 count = Object.number_indices / 2;
-                        LPDWORD sit = LPDWORD(Object.indices);
-                        LPDWORD send = sit + count;
-                        LPDWORD dit = LPDWORD(iDest);
+                        u32* sit = reinterpret_cast<u32*>(Object.indices);
+                        u32* send = sit + count;
+                        u32* dit = reinterpret_cast<u32*>(iDest);
                         for (; sit != send; dit++, sit++)
                             *dit = *sit + item;
                         if (Object.number_indices & 1)
