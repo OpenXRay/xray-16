@@ -160,7 +160,7 @@ void CBlender_LaEmB::Compile(CBlender_Compile& C)
             else
                 compile_3(C);
             break;
-        }
+        } // switch (HW.Caps.raster.dwStages)
     }
 }
 //

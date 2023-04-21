@@ -55,37 +55,95 @@ void CBlender_default_aref::Load(IReader& fs, u16 version)
     }
 }
 
-void CBlender_default_aref::CompileForEditor(CBlender_Compile& C)
-{
-    C.PassBegin();
-    {
-        const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
-        const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;
-
-        C.PassSET_Blend(true, blend_src, blend_dst, true, oAREF.value);
-        C.PassSET_LightFog(true, true);
-
-        // Stage0 - Base texture
-        C.StageBegin();
-        C.StageSET_Address(D3DTADDRESS_WRAP);
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
-        C.StageEnd();
-    }
-    C.PassEnd();
-}
-
 void CBlender_default_aref::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
+    if (C.bFFP)
+        CompileFFP(C);
+    else
+        CompileProgrammable(C);
+}
+
+void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
+{
     if (C.bEditor)
     {
-        CompileForEditor(C);
-        return;
-    }
+        C.PassBegin();
+        {
+            const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
+            const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;
 
+            C.PassSET_Blend(true, blend_src, blend_dst, true, oAREF.value);
+            C.PassSET_LightFog(true, true);
+
+            // Stage0 - Base texture
+            C.StageBegin();
+            C.StageSET_Address(D3DTADDRESS_WRAP);
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+            C.StageEnd();
+        }
+        C.PassEnd();
+    }
+    else
+    {
+        switch (C.iElement)
+        {
+        case SE_R1_NORMAL_HQ:
+        case SE_R1_NORMAL_LQ:
+        {
+            // Level view
+            C.PassBegin();
+            {
+                C.PassSET_ZB(true, true);
+                if (oBlend.value)
+                    C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
+                else
+                    C.PassSET_Blend(TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, oAREF.value);
+                C.PassSET_LightFog(false, true);
+
+                // Stage0 - Lightmap
+                C.StageBegin();
+                C.StageTemplate_LMAP0();
+                C.StageEnd();
+
+                // Stage1 - Base texture
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+                C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+                C.StageEnd();
+            }
+            C.PassEnd();
+        }
+        case SE_R1_LMODELS:
+        {
+            // Lighting only
+            C.PassBegin();
+            {
+                C.PassSET_ZB(true, true);
+                C.PassSET_Blend_SET();
+                C.PassSET_LightFog(false, false);
+
+                // Stage0 - Lightmap
+                C.StageBegin();
+                C.StageTemplate_LMAP0();
+                C.StageEnd();
+            }
+            C.PassEnd();
+            break;
+        }
+
+        default:
+            break;
+        } // switch (C.iElement)
+    }
+}
+
+void CBlender_default_aref::CompileProgrammable(CBlender_Compile& C) const
+{
     R_ASSERT2(C.L_textures.size() >= 2, "Not enough textures for shader");
 
     const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
@@ -193,5 +251,5 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
         }
         C.PassEnd();
         break;
-    }
+    } // switch (C.iElement)
 }

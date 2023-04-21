@@ -6,7 +6,8 @@ class CBlender_default_aref : public IBlender
     xrP_BOOL oBlend;
 
 private:
-    void CompileForEditor(CBlender_Compile& C);
+    void CompileFFP(CBlender_Compile& C) const;
+    void CompileProgrammable(CBlender_Compile& C) const;
 
 public:
     CBlender_default_aref();
