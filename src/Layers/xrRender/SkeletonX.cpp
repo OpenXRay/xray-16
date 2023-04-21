@@ -197,19 +197,22 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
         // Still allow HW skinning for single bone case
         // go full SW skinning only if FFP is forced
-        if (1 == bids.size() && !RImplementation.o.ffp)
+        if (!RImplementation.o.ffp)
         {
-            // HW- single bone
-            RenderMode = RImplementation.m_hq_skinning ? RM_SINGLE_HQ : RM_SINGLE;
-            RMS_boneid = *bids.begin();
-            GEnv.Render->shader_option_skinning(0);
-        }
-        else if (sw_bones_cnt <= hw_bones_cnt)
-        {
-            // HW- one weight
-            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_1B_HQ : RM_SKINNING_1B;
-            RMS_bonecount = sw_bones_cnt + 1;
-            GEnv.Render->shader_option_skinning(1);
+            if (1 == bids.size())
+            {
+                // HW- single bone
+                RenderMode = RImplementation.m_hq_skinning ? RM_SINGLE_HQ : RM_SINGLE;
+                RMS_boneid = *bids.begin();
+                GEnv.Render->shader_option_skinning(0);
+            }
+            else if (sw_bones_cnt <= hw_bones_cnt)
+            {
+                // HW- one weight
+                RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_1B_HQ : RM_SKINNING_1B;
+                RMS_bonecount = sw_bones_cnt + 1;
+                GEnv.Render->shader_option_skinning(1);
+            }
         }
         else
         {
