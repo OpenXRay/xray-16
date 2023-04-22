@@ -46,7 +46,6 @@ private:
 
     struct bone_parameters : bone_parameters_base
     {
-        Fmatrix m_rotation;
         float m_factor;
     }; // struct bone_parameters
 
