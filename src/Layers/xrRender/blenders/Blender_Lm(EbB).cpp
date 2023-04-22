@@ -44,7 +44,43 @@ BOOL CBlender_LmEbB::canBeLMAPped()
     return TRUE;
 }
 
-void CBlender_LmEbB::CompileForEditor(CBlender_Compile& C)
+void CBlender_LmEbB::Compile(CBlender_Compile& C)
+{
+    IBlender::Compile(C);
+
+    if (C.bFFP)
+        CompileFFP(C);
+    else
+        CompileProgrammable(C);
+}
+
+void CBlender_LmEbB::CompileFFP(CBlender_Compile& C) const
+{
+    if (C.bEditor)
+        compile_ED(C);
+    else
+    {
+        if (2 == C.iElement)
+        {
+            compile_L(C);
+        }
+        else
+        {
+            switch (HW.Caps.raster.dwStages)
+            {
+            case 2: // Geforce1/2/MX
+                compile_2(C);
+                break;
+            case 3: // Kyro, Radeon, Radeon2, Geforce3/4
+            default:
+                compile_3(C);
+                break;
+            }
+        } // switch (HW.Caps.raster.dwStages)
+    }
+}
+
+void CBlender_LmEbB::compile_ED(CBlender_Compile& C) const
 {
     C.PassBegin();
     {
@@ -79,16 +115,100 @@ void CBlender_LmEbB::CompileForEditor(CBlender_Compile& C)
     C.PassEnd();
 }
 
-void CBlender_LmEbB::Compile(CBlender_Compile& C)
+void CBlender_LmEbB::compile_2(CBlender_Compile& C) const
 {
-    IBlender::Compile(C);
- 
-    if (C.bEditor)
+    // Pass1 - Lighting
+    C.PassBegin();
     {
-        CompileForEditor(C);
-        return;
-    }
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(FALSE, TRUE);
 
+        // Stage0 - Detail
+        C.StageBegin();
+        C.StageTemplate_LMAP0();
+        C.StageEnd();
+    }
+    C.PassEnd();
+
+    // Pass2 - (env^base)
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, FALSE);
+        C.PassSET_Blend_MUL2X();
+        C.PassSET_LightFog(FALSE, TRUE);
+
+        // Stage0 - Environment map
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+        C.StageEnd();
+
+        // Stage1 - Base map
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_BLENDTEXTUREALPHA, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
+void CBlender_LmEbB::compile_3(CBlender_Compile& C) const
+{
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(FALSE, TRUE);
+
+        // Stage0 - Environment map
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+        C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+        C.StageEnd();
+
+        // Stage1 - [^] Base map
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_BLENDTEXTUREALPHA, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+        C.StageEnd();
+
+        // Stage2 - [*] Lightmap
+        C.StageBegin();
+        C.StageSET_Address(D3DTADDRESS_CLAMP);
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
+        C.Stage_Texture("$base1");
+        C.Stage_Matrix("$null", 1);
+        C.Stage_Constant("$null");
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
+void CBlender_LmEbB::compile_L(CBlender_Compile& C) const
+{
+    // Pass1 - Lighting
+    C.PassBegin();
+    {
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
+        C.PassSET_LightFog(FALSE, FALSE);
+
+        // Stage0 - Detail
+        C.StageBegin();
+        C.StageTemplate_LMAP0();
+        C.StageEnd();
+    }
+    C.PassEnd();
+}
+
+void CBlender_LmEbB::CompileProgrammable(CBlender_Compile& C) const
+{
     R_ASSERT3(C.L_textures.size() >= 2, "Not enought textures for shader, base tex: %s", *C.L_textures[0]);
 
     switch (C.iElement)

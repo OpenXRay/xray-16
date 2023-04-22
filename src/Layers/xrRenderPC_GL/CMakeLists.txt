@@ -34,6 +34,7 @@ set(SRC_FILES
     "../xrRender/DetailManager_CACHE.cpp"
     "../xrRender/DetailManager.cpp"
     "../xrRender/DetailManager_Decompress.cpp"
+    "../xrRender/DetailManager_soft.cpp"
     "../xrRender/DetailManager.h"
     "../xrRender/DetailManager_VS.cpp"
     "../xrRender/DetailModel.cpp"

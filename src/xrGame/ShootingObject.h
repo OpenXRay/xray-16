@@ -103,12 +103,6 @@ public:
     SilencerKoeffs cur_silencer_koef;
 
 protected:
-    //для сталкеров, чтоб они знали эффективные границы использования
-    //оружия
-    float m_fMinRadius;
-    float m_fMaxRadius;
-
-protected:
     Fcolor light_base_color;
     float light_base_range;
     Fcolor light_build_color;

@@ -454,24 +454,11 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
     while (!hdr->eof())
     {
-        string_path name, full;
-        archive_header header;
+        archive_file_header header{ *hdr };
 
-        u16 buffer_size = hdr->r_u16(); // Read the total length of all crap
-        VERIFY(buffer_size < sizeof(name) + sizeof(archive_header) + sizeof(u32));
-
-        hdr->r(&header, sizeof(archive_header)); // Read header
-
-        const size_t name_length = buffer_size - sizeof(archive_header) - sizeof(u32);
-        VERIFY(name_length > 0);
-        hdr->r(&name, name_length); // Read file name
-        name[name_length] = 0;
-
-        u32 ptr = 0;
-        hdr->r(&ptr, sizeof(ptr)); // Obtain internal pointer to the file in archive
-
-        strconcat(sizeof full, full, fs_entry_point, name);
-        Register(full, A.vfs_idx, header.crc, ptr, header.size_real, header.size_compr, A.modif);
+        string_path full;
+        strconcat(full, fs_entry_point, header.name);
+        Register(full, A.vfs_idx, header.crc, header.ptr, header.size_real, header.size_compr, A.modif);
     }
     hdr->close();
 } //-V773
@@ -2017,4 +2004,44 @@ bool CLocatorAPI::can_modify_file(pcstr path, pcstr name)
     string_path temp;
     update_path(temp, path, name);
     return can_modify_file(temp);
+}
+
+CLocatorAPI::archive_file_header::archive_file_header(IReader& reader)
+{
+    size = reader.r_u16();
+    size_real = reader.r_u32();
+    size_compr = reader.r_u32();
+    crc = reader.r_u32();
+
+    const size_t name_length = size - ELEMENTS_SIZE;
+    VERIFY(name_length < sizeof(name));
+
+    reader.r(&name, name_length);
+    name[name_length] = 0;
+
+    ptr = reader.r_u32();
+}
+
+CLocatorAPI::archive_file_header::archive_file_header(IWriter& writer,
+    pcstr file_name, u32 real_size, u32 compressed_size, u32 crc_sum, u32 pointer
+)
+    : size_real(real_size),
+      size_compr(compressed_size),
+      crc(crc_sum),
+      ptr(pointer)
+{
+    const size_t file_name_size = (xr_strlen(file_name) + 0) * sizeof(char);
+    const size_t buffer_size = file_name_size + ELEMENTS_SIZE;
+    VERIFY(buffer_size <= size_t(u16(-1)));
+    size = u16(buffer_size);
+
+    writer.w_u16(size);
+    writer.w_u32(size_real);
+    writer.w_u32(size_compr);
+    writer.w_u32(crc);
+
+    writer.w(file_name, file_name_size);
+    xr_strcpy(name, file_name);
+
+    writer.w_u32(ptr);
 }

@@ -13,10 +13,10 @@ const Fvector zero_vel = {0.f, 0.f, 0.f};
 CParticlesObject::CParticlesObject(LPCSTR p_name, BOOL bAutoRemove, bool destroy_on_game_load)
     : inherited(destroy_on_game_load)
 {
-    Init(p_name, 0, bAutoRemove);
+    Init(p_name, IRender_Sector::INVALID_SECTOR_ID, bAutoRemove);
 }
 
-void CParticlesObject::Init(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove)
+void CParticlesObject::Init(LPCSTR p_name, IRender_Sector::sector_id_t sector_id, BOOL bAutoRemove)
 {
     m_bLooped = false;
     m_bStopping = false;
@@ -56,7 +56,7 @@ void CParticlesObject::Init(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove)
 
     // spatial
     spatial.type = 0;
-    spatial.sector = S;
+    spatial.sector_id = sector_id;
 
     // sheduled
     shedule.t_min = 20;

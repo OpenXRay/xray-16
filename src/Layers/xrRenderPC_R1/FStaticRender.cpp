@@ -89,6 +89,9 @@ void CRender::create()
 
     m_skinning = -1;
 
+    // Fixed-function pipeline
+    o.ffp = !!strstr(Core.Params, "-force_ffp") || ps_r1_flags.test(R1FLAG_FFP);
+
     // disasm
     o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
     o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
@@ -113,14 +116,11 @@ void CRender::create()
     L_Dynamic = xr_new<CLightR_Manager>();
     PSLibrary.OnCreate();
     //.	HWOCC.occq_create			(occq_size);
-
-    ::PortalTraverser.initialize();
 }
 
 void CRender::destroy()
 {
     m_bMakeAsyncSS = false;
-    ::PortalTraverser.destroy();
     //.	HWOCC.occq_destroy			();
     PSLibrary.OnDestroy();
 
@@ -248,17 +248,6 @@ ref_shader CRender::getShader(int id)
     VERIFY(id < int(Shaders.size()));
     return Shaders[id];
 }
-IRender_Portal* CRender::getPortal(int id)
-{
-    VERIFY(id < int(Portals.size()));
-    return Portals[id];
-}
-IRender_Sector* CRender::getSector(int id)
-{
-    VERIFY(id < int(Sectors.size()));
-    return Sectors[id];
-}
-IRender_Sector* CRender::getSectorActive() { return pLastSector; }
 IRenderVisual* CRender::getVisual(int id)
 {
     VERIFY(id < int(Visuals.size()));
@@ -360,7 +349,6 @@ void CRender::add_SkeletonWallmark(
     if (pShader)
         add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
-void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace); }
 
 #include "xrEngine/PS_instance.h"
 void CRender::set_Object(IRenderable* O)
@@ -477,34 +465,36 @@ void CRender::Calculate()
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     gm_SetNearer(FALSE);
+    dsgraph.use_hom = true;
     dsgraph.phase = PHASE_NORMAL;
 
     // Detect camera-sector
     if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
     {
-        CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
-        if (pSector && (pSector != pLastSector))
-            g_pGamePersistent->OnSectorChanged(translateSector(pSector));
-
-        if (nullptr == pSector)
-            pSector = pLastSector;
-        pLastSector = pSector;
-        vLastCameraPos.set(Device.vCameraPosition);
-    }
-
-    // Check if camera is too near to some portal - if so force DualRender
-    if (rmPortals)
-    {
-        Fvector box_radius;
-        box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
-        Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
-        for (int K = 0; K < Sectors_xrc.r_count(); K++)
+        const auto sector_id = detectSector(Device.vCameraPosition);
+        if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
-            CPortal* pPortal = (CPortal*)Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
-            pPortal->bDualRender = TRUE;
+            if (sector_id != last_sector_id)
+                g_pGamePersistent->OnSectorChanged(sector_id);
+        
+            last_sector_id = sector_id;
+        }
+        vLastCameraPos.set(Device.vCameraPosition);
+
+        // Check if camera is too near to some portal - if so force DualRender
+        if (rmPortals)
+        {
+            Fvector box_radius;
+            box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
+            dsgraph.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
+            for (int K = 0; K < dsgraph.Sectors_xrc.r_count(); K++)
+            {
+                CPortal* pPortal = dsgraph.Portals[rmPortals->get_tris()[dsgraph.Sectors_xrc.r_begin()[K].id].dummy];
+                pPortal->bDualRender = TRUE;
+            }
         }
     }
-    
+
     //
     Lights.Update();
 
@@ -512,18 +502,19 @@ void CRender::Calculate()
     dsgraph.marker++;
     set_Object(nullptr);
     TaskScheduler->Wait(*ProcessHOMTask);
-    if (pLastSector)
+    if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
     {
         // Traverse sector/portal structure
-        PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
+        dsgraph.PortalTraverser.traverse(dsgraph.Sectors[last_sector_id], ViewBase, Device.vCameraPosition,
+            Device.mFullTransform,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
         // Determine visibility for static geometry hierarchy
         if (psDeviceFlags.test(rsDrawStatic))
         {
-            for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
+            for (u32 s_it = 0; s_it < dsgraph.PortalTraverser.r_sectors.size(); s_it++)
             {
-                CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+                CSector* sector = (CSector*)dsgraph.PortalTraverser.r_sectors[s_it];
                 dxRender_Visual* root = sector->root();
                 for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
                 {
@@ -572,12 +563,13 @@ void CRender::Calculate()
             {
                 ISpatial* spatial = dsgraph.lstRenderables[o_it];
                 spatial->spatial_updatesector();
-                CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-                if (nullptr == sector)
+                const auto sector_id = spatial->GetSpatialData().sector_id;
+                if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                     continue; // disassociated from S/P structure
+                CSector* sector = dsgraph.Sectors[sector_id];
 
                 // Filter only not light spatial
-                if (PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE))
+                if (dsgraph.PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE))
                     continue; // inactive (untouched) sector
 
                 if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
@@ -641,7 +633,7 @@ void CRender::Calculate()
                         // lightsource
                         light* L = (light*)spatial->dcast_Light();
                         VERIFY(L);
-                        if (L->spatial.sector)
+                        if (L->spatial.sector_id != IRender_Sector::INVALID_SECTOR_ID)
                         {
                             vis_data& vis = L->get_homdata();
                             if (HOM.visible(vis))
@@ -695,14 +687,14 @@ void CRender::Render()
 
     dsgraph.r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
-    HOM.Disable();
+    dsgraph.use_hom = false;
     L_Dynamic->render(0); // additional light sources
     if (Wallmarks)
     {
         g_r = 0;
         Wallmarks->Render(); // wallmarks has priority as normal geometry
     }
-    HOM.Enable();
+    dsgraph.use_hom = true;
     o.vis_intersect = FALSE;
     dsgraph.phase = PHASE_NORMAL;
     dsgraph.r_pmask(true, true); // enable priority "0" and "1"
@@ -713,7 +705,7 @@ void CRender::Render()
     dsgraph.render_lods(false, true); // lods - FB
     dsgraph.render_graph(1); // normal level, secondary priority
     L_Dynamic->render(1); // additional light sources, secondary priority
-    PortalTraverser.fade_render(); // faded-portals
+    dsgraph.PortalTraverser.fade_render(); // faded-portals
     dsgraph.render_sorted(); // strict-sorted geoms
     BasicStats.Glows.Begin();
     if (L_Glows)
@@ -742,7 +734,46 @@ void CRender::Render()
     BasicStats.Primitives.End();
 }
 
-void CRender::ApplyBlur4(FVF::TL4uv* pv, u32 w, u32 h, float k)
+void CRender::ApplyBlur2(FVF::TL2uv* pv, u32 size) const
+{
+    const float dim = float(size);
+    Fvector2 shift, p0, p1, a0, a1, b0, b1, c0, c1, d0, d1;
+    p0.set(.5f / dim, .5f / dim);
+    p1.set((dim + .5f) / dim, (dim + .5f) / dim);
+    shift.set(.5f / dim, .5f / dim);
+    a0.add(p0, shift);
+    a1.add(p1, shift);
+    b0.sub(p0, shift);
+    b1.sub(p1, shift);
+    shift.set(.5f / dim, -.5f / dim);
+    c0.add(p0, shift);
+    c1.add(p1, shift);
+    d0.sub(p0, shift);
+    d1.sub(p1, shift);
+
+    constexpr u32 C = 0xffffffff;
+
+    // Fill VB
+    pv->set(0.f, dim, C, a0.x, a1.y, b0.x, b1.y);
+    pv++;
+    pv->set(0.f, 0.f, C, a0.x, a0.y, b0.x, b0.y);
+    pv++;
+    pv->set(dim, dim, C, a1.x, a1.y, b1.x, b1.y);
+    pv++;
+    pv->set(dim, 0.f, C, a1.x, a0.y, b1.x, b0.y);
+    pv++;
+
+    pv->set(0.f, dim, C, c0.x, c1.y, d0.x, d1.y);
+    pv++;
+    pv->set(0.f, 0.f, C, c0.x, c0.y, d0.x, d0.y);
+    pv++;
+    pv->set(dim, dim, C, c1.x, c1.y, d1.x, d1.y);
+    pv++;
+    pv->set(dim, 0.f, C, c1.x, c0.y, d1.x, d0.y);
+    pv++;
+}
+
+void CRender::ApplyBlur4(FVF::TL4uv* pv, u32 w, u32 h, float k) const
 {
     float _w = float(w);
     float _h = float(h);

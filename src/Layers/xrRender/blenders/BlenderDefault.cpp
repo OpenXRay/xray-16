@@ -61,32 +61,89 @@ void CBlender_default::Load(IReader& fs, u16 version)
     }
 }
 
-void CBlender_default::CompileForEditor(CBlender_Compile& C)
-{
-    C.PassBegin();
-    {
-        C.PassSET_LightFog(true, true);
-
-        // Stage1 - Base texture
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
-        C.StageEnd();
-    }
-    C.PassEnd();
-}
-
 void CBlender_default::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
+    if (C.bFFP)
+        CompileFFP(C);
+    else
+        CompileProgrammable(C);
+}
+
+void CBlender_default::CompileFFP(CBlender_Compile& C) const
+{
     if (C.bEditor)
     {
-        CompileForEditor(C);
-        return;
-    }
+        C.PassBegin();
+        {
+            C.PassSET_LightFog(true, true);
 
+            // Stage1 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+            C.StageEnd();
+        }
+        C.PassEnd();
+    }
+    else
+    {
+        switch (C.iElement)
+        {
+        case SE_R1_NORMAL_HQ:
+        case SE_R1_NORMAL_LQ:
+        {
+            // Level view
+            C.PassBegin();
+            {
+                C.PassSET_ZB(true, true);
+                C.PassSET_Blend_SET();
+                C.PassSET_LightFog(false, true);
+
+                // Stage0 - Lightmap
+                C.StageBegin();
+                C.StageTemplate_LMAP0();
+                C.StageEnd();
+
+                // Stage1 - Base texture
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+                C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+                C.StageEnd();
+            }
+            C.PassEnd();
+            break;
+        }
+
+        case SE_R1_LMODELS:
+        {
+            // Lighting only
+            C.PassBegin();
+            {
+                C.PassSET_ZB(true, true);
+                C.PassSET_Blend_SET();
+                C.PassSET_LightFog(false, false);
+
+                // Stage0 - Lightmap
+                C.StageBegin();
+                C.StageTemplate_LMAP0();
+                C.StageEnd();
+            }
+            C.PassEnd();
+            break;
+        }
+
+        default:
+            break;
+        } // switch (C.iElement)
+    }
+}
+
+void CBlender_default::CompileProgrammable(CBlender_Compile& C) const
+{
     R_ASSERT2(C.L_textures.size() >= 3, "Not enought textures for shader");
 
     switch (C.iElement)
@@ -183,5 +240,5 @@ void CBlender_default::Compile(CBlender_Compile& C)
 
     default:
         break;
-    }
+    } // switch (C.iElement)
 }
