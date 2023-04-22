@@ -733,7 +733,46 @@ void CRender::Render()
     BasicStats.Primitives.End();
 }
 
-void CRender::ApplyBlur4(FVF::TL4uv* pv, u32 w, u32 h, float k)
+void CRender::ApplyBlur2(FVF::TL2uv* pv, u32 size) const
+{
+    const float dim = float(size);
+    Fvector2 shift, p0, p1, a0, a1, b0, b1, c0, c1, d0, d1;
+    p0.set(.5f / dim, .5f / dim);
+    p1.set((dim + .5f) / dim, (dim + .5f) / dim);
+    shift.set(.5f / dim, .5f / dim);
+    a0.add(p0, shift);
+    a1.add(p1, shift);
+    b0.sub(p0, shift);
+    b1.sub(p1, shift);
+    shift.set(.5f / dim, -.5f / dim);
+    c0.add(p0, shift);
+    c1.add(p1, shift);
+    d0.sub(p0, shift);
+    d1.sub(p1, shift);
+
+    constexpr u32 C = 0xffffffff;
+
+    // Fill VB
+    pv->set(0.f, dim, C, a0.x, a1.y, b0.x, b1.y);
+    pv++;
+    pv->set(0.f, 0.f, C, a0.x, a0.y, b0.x, b0.y);
+    pv++;
+    pv->set(dim, dim, C, a1.x, a1.y, b1.x, b1.y);
+    pv++;
+    pv->set(dim, 0.f, C, a1.x, a0.y, b1.x, b0.y);
+    pv++;
+
+    pv->set(0.f, dim, C, c0.x, c1.y, d0.x, d1.y);
+    pv++;
+    pv->set(0.f, 0.f, C, c0.x, c0.y, d0.x, d0.y);
+    pv++;
+    pv->set(dim, dim, C, c1.x, c1.y, d1.x, d1.y);
+    pv++;
+    pv->set(dim, 0.f, C, c1.x, c0.y, d1.x, d0.y);
+    pv++;
+}
+
+void CRender::ApplyBlur4(FVF::TL4uv* pv, u32 w, u32 h, float k) const
 {
     float _w = float(w);
     float _h = float(h);
