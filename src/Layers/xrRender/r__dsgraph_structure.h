@@ -19,6 +19,7 @@ struct R_dsgraph_structure
     u32 marker{};
     bool pmask[2];
     bool pmask_wmark;
+    bool use_hom{false};
 
     // Dynamic scene graph
     // R_dsgraph::mapNormal_T										mapNormal	[2]		;	// 2==(priority/2)

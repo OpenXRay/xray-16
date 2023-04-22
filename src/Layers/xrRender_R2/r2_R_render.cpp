@@ -17,6 +17,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
     // Calculate sector(s) and their objects
     if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
     {
+        dsgraph.use_hom = true;
         // Traverse sector/portal structure
         dsgraph.PortalTraverser.traverse(dsgraph.Sectors[last_sector_id], ViewBase, Device.vCameraPosition,
             m_ViewProjection,
@@ -531,7 +532,6 @@ void CRender::Render()
     {
         PIX_EVENT(DEFER_LIGHT_NO_OCCQ);
         Target->phase_accumulator();
-        HOM.Disable();
         render_lights(LP_normal);
     }
 

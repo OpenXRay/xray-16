@@ -390,7 +390,7 @@ void CRender::render_sun()
 
     // Begin SMAP-render
     {
-        HOM.Disable();
+        dsgraph.use_hom = false;
         dsgraph.phase = PHASE_SMAP;
         if (o.Tshadows)
             dsgraph.r_pmask(true, true);
@@ -922,12 +922,9 @@ void CRender::render_sun_near()
         [[maybe_unused]] bool bSpecialFull = !dsgraph.mapNormalPasses[1][0].empty() ||
             !dsgraph.mapMatrixPasses[1][0].empty() || !dsgraph.mapSorted.empty();
         VERIFY(!bSpecialFull);
-        HOM.Disable();
+        dsgraph.use_hom = false;
         dsgraph.phase = PHASE_SMAP;
-        if (o.Tshadows)
-            dsgraph.r_pmask(true, true);
-        else
-            dsgraph.r_pmask(true, false);
+        dsgraph.r_pmask(true, o.Tshadows);
         //		fuckingsun->svis.begin					();
     }
 
@@ -1259,12 +1256,9 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         [[maybe_unused]] bool bSpecialFull = !dsgraph.mapNormalPasses[1][0].empty() ||
             !dsgraph.mapMatrixPasses[1][0].empty() || !dsgraph.mapSorted.empty();
         VERIFY(!bSpecialFull);
-        HOM.Disable();
+        dsgraph.use_hom = false;
         dsgraph.phase = PHASE_SMAP;
-        if (o.Tshadows)
-            dsgraph.r_pmask(true, true);
-        else
-            dsgraph.r_pmask(true, false);
+        dsgraph.r_pmask(true, o.Tshadows);
         //		fuckingsun->svis.begin					();
     }
 

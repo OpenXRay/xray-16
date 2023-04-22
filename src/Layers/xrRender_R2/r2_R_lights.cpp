@@ -77,7 +77,6 @@ void CRender::render_lights(light_Package& LP)
     //	}
     //	if (left_some_lights_that_doesn't cast shadows)
     //		accumulate them
-    HOM.Disable();
     while (!LP.v_shadowed.empty())
     {
         // if (has_spot_shadowed)
@@ -100,11 +99,9 @@ void CRender::render_lights(light_Package& LP)
             Lights_LastFrame.push_back(L);
 
             // render
+            dsgraph.use_hom = false;
             dsgraph.phase = PHASE_SMAP;
-            if (RImplementation.o.Tshadows)
-                dsgraph.r_pmask(true, true);
-            else
-                dsgraph.r_pmask(true, false);
+            dsgraph.r_pmask(true, o.Tshadows);
             L->svis.begin();
             PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
             dsgraph.render_subspace(L->spatial.sector_id, L->X.S.combine, L->position, TRUE);
@@ -145,7 +142,6 @@ void CRender::render_lights(light_Package& LP)
 
         //		switch-to-accumulator
         Target->phase_accumulator();
-        HOM.Disable();
 
         PIX_EVENT(POINT_LIGHTS);
 

@@ -319,7 +319,7 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
 
 void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
 {
-    if (!RImplementation.HOM.visible(pVisual->vis))
+    if (use_hom && !RImplementation.HOM.visible(pVisual->vis))
         return;
 
     // Visual is 100% visible - simply add it
@@ -527,7 +527,7 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     if (fcvNone == VIS)
         return;
 
-    if (!RImplementation.HOM.visible(vis))
+    if (use_hom && !RImplementation.HOM.visible(vis))
         return;
 
     // If we get here visual is visible or partially visible

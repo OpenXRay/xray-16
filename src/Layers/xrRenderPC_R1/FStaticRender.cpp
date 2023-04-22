@@ -465,6 +465,7 @@ void CRender::Calculate()
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     gm_SetNearer(FALSE);
+    dsgraph.use_hom = true;
     dsgraph.phase = PHASE_NORMAL;
 
     // Detect camera-sector
@@ -686,14 +687,14 @@ void CRender::Render()
 
     dsgraph.r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
-    HOM.Disable();
+    dsgraph.use_hom = false;
     L_Dynamic->render(0); // additional light sources
     if (Wallmarks)
     {
         g_r = 0;
         Wallmarks->Render(); // wallmarks has priority as normal geometry
     }
-    HOM.Enable();
+    dsgraph.use_hom = true;
     o.vis_intersect = FALSE;
     dsgraph.phase = PHASE_NORMAL;
     dsgraph.r_pmask(true, true); // enable priority "0" and "1"

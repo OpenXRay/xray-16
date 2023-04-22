@@ -431,12 +431,9 @@ void CRender::render_sun()
 
     // Begin SMAP-render
     {
-        HOM.Disable();
+        dsgraph.use_hom = false;
         dsgraph.phase = PHASE_SMAP;
-        if (o.Tshadows)
-            dsgraph.r_pmask(true, true);
-        else
-            dsgraph.r_pmask(true, false);
+        dsgraph.r_pmask(true, o.Tshadows);
         //		fuckingsun->svis.begin					();
     }
 
@@ -955,7 +952,7 @@ void CRender::render_sun_near()
         VERIFY2(
             dsgraph.mapNormalPasses[1][0].empty() && dsgraph.mapMatrixPasses[1][0].empty() && dsgraph.mapSorted.empty(),
             "Special should be empty at this stage, but it's not empty...");
-        HOM.Disable();
+        dsgraph.use_hom = false;
         dsgraph.phase = PHASE_SMAP;
         if (o.Tshadows)
             dsgraph.r_pmask(true, true);
@@ -1270,7 +1267,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         VERIFY2(
             dsgraph.mapNormalPasses[1][0].empty() && dsgraph.mapMatrixPasses[1][0].empty() && dsgraph.mapSorted.empty(),
             "Special should be empty at this stage, but it's not empty...");
-        HOM.Disable();
+        dsgraph.use_hom = false;
         dsgraph.phase = PHASE_SMAP;
         if (o.Tshadows)
             dsgraph.r_pmask(true, true);

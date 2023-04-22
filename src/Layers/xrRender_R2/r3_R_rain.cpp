@@ -264,7 +264,7 @@ void CRender::render_rain()
             VERIFY2(dsgraph.mapNormalPasses[1][0].empty() && dsgraph.mapMatrixPasses[1][0].empty() &&
                     dsgraph.mapSorted.empty(),
                 "Special should be empty at this stage, but it's not empty...");
-            HOM.Disable();
+            dsgraph.use_hom = false;
             dsgraph.phase = PHASE_SMAP;
             dsgraph.r_pmask(true, false);
         }

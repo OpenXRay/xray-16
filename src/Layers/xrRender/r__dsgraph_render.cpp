@@ -341,7 +341,7 @@ void R_dsgraph_structure::render_subspace(IRender_Sector::sector_id_t sector_id,
     auto* _sector = Sectors[sector_id];
 
     PIX_EVENT(r_dsgraph_render_subspace);
-    RImplementation.dsgraph.marker++; // !!! critical here
+    marker++; // !!! critical here
 
     if (_precise_portals && RImplementation.rmPortals)
     {
