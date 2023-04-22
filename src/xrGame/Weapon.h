@@ -391,11 +391,6 @@ protected:
     //для отдачи оружия
     Fvector m_vRecoilDeltaAngle;
 
-    //для сталкеров, чтоб они знали эффективные границы использования
-    //оружия
-    float m_fMinRadius;
-    float m_fMaxRadius;
-
 protected:
     //для второго ствола
     void StartFlameParticles2();
