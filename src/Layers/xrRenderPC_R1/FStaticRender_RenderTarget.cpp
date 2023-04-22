@@ -209,10 +209,6 @@ BOOL CRenderTarget::NeedPostProcess()
     }
     bool _cadd = false;
     {
-        // int      _r  = color_get_R(param_color_add)  ;
-        // int      _g  = color_get_G(param_color_add)  ;
-        // int      _b  = color_get_B(param_color_add)  ;
-        // if (_r>2 || _g>2 || _b>2)    _cadd   = true  ;
         int _r = _abs((int)(param_color_add.x * 255));
         int _g = _abs((int)(param_color_add.y * 255));
         int _b = _abs((int)(param_color_add.z * 255));
@@ -228,28 +224,8 @@ BOOL CRenderTarget::Perform()
                               (frame_distort == (Device.dwFrame - 1)));
 }
 
-#define SHOW(a) Log(#a, a);
-#define SHOWX(a) Msg("%s %x", #a, a);
 void CRenderTarget::Begin()
 {
-    /*
-    if (g_pGameLevel->IR_GetKeyState(SDL_SCANCODE_LSHIFT))
-    {
-        Msg                 ("[%5d]------------------------",Device.dwFrame);
-        SHOW                (param_blur)
-        SHOW                (param_gray)
-        SHOW                (param_duality_h)
-        SHOW                (param_duality_v)
-        SHOW                (param_noise)
-        SHOW                (param_noise_scale)
-        SHOW                (param_noise_fps)
-
-        SHOWX               (param_color_base)
-        SHOWX               (param_color_gray)
-        SHOWX               (param_color_add)
-    }
-    */
-
     if (!Perform())
     {
         // Base RT
@@ -339,12 +315,6 @@ void CRenderTarget::End()
     u32 p_color = subst_alpha(param_color_base, nblend);
     u32 p_gray = subst_alpha(param_color_gray, gblend);
     Fvector p_brightness = param_color_add;
-    // Msg              ("param_gray:%f(%d),param_noise:%f(%d)",param_gray,gblend,param_noise,nblend);
-    // Msg              ("base: %d,%d,%d",  color_get_R(p_color),       color_get_G(p_color),
-    // color_get_B(p_color));
-    // Msg              ("gray: %d,%d,%d",  color_get_R(p_gray),        color_get_G(p_gray), color_get_B(p_gray));
-    // Msg              ("add:  %d,%d,%d",  color_get_R(p_brightness),  color_get_G(p_brightness),
-    // color_get_B(p_brightness));
 
     // Draw full-screen quad textured with our scene image
     u32 Offset;
