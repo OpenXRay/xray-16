@@ -321,7 +321,7 @@ void CLightProjector::calculate()
         {
             spatial->spatial_updatesector();
             if (spatial->GetSpatialData().sector_id != IRender_Sector::INVALID_SECTOR_ID)
-                RImplementation.dsgraph.build_R1_box(spatial->GetSpatialData().sector_id, BB, SE_R1_LMODELS);
+                RImplementation.dsgraph.render_R1_box(spatial->GetSpatialData().sector_id, BB, SE_R1_LMODELS);
         }
         // if (spatial)      RImplementation.r_dsgraph_render_subspace   (spatial->spatial.sector,mCombine,v_C,FALSE);
     }
