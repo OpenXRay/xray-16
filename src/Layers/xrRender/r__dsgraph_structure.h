@@ -41,6 +41,7 @@ struct R_dsgraph_structure
     xr_vector<CSector*> Sectors;
     xr_vector<CPortal*> Portals;
     CPortalTraverser PortalTraverser;
+    xrXRC Sectors_xrc;
 
     // Runtime structures
     xr_vector<R_dsgraph::mapNormal_T::value_type*> nrmPasses;
@@ -72,7 +73,7 @@ struct R_dsgraph_structure
     }
     void clear_Counters() { counter_S = counter_D = 0; }
 
-    R_dsgraph_structure()
+    R_dsgraph_structure() : Sectors_xrc("dsgraph")
     {
         r_pmask(true, true);
     };

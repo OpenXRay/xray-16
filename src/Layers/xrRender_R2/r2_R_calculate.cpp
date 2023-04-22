@@ -44,10 +44,10 @@ void CRender::Calculate()
             float eps = VIEWPORT_NEAR + EPS_L;
             Fvector box_radius;
             box_radius.set(eps, eps, eps);
-            Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
-            for (int K = 0; K < Sectors_xrc.r_count(); K++)
+            dsgraph.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
+            for (int K = 0; K < dsgraph.Sectors_xrc.r_count(); K++)
             {
-                CPortal* pPortal = (CPortal*)dsgraph.Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
+                CPortal* pPortal = (CPortal*)dsgraph.Portals[rmPortals->get_tris()[dsgraph.Sectors_xrc.r_begin()[K].id].dummy];
                 pPortal->bDualRender = TRUE;
             }
         }

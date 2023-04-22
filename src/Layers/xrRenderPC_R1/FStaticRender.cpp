@@ -486,10 +486,10 @@ void CRender::Calculate()
         {
             Fvector box_radius;
             box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
-            Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
-            for (int K = 0; K < Sectors_xrc.r_count(); K++)
+            dsgraph.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
+            for (int K = 0; K < dsgraph.Sectors_xrc.r_count(); K++)
             {
-                CPortal* pPortal = dsgraph.Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
+                CPortal* pPortal = dsgraph.Portals[rmPortals->get_tris()[dsgraph.Sectors_xrc.r_begin()[K].id].dummy];
                 pPortal->bDualRender = TRUE;
             }
         }
