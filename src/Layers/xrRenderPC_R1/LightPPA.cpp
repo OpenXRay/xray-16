@@ -196,7 +196,13 @@ void CLightR_Manager::render_point(u32 _priority)
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.build_subspace(L->spatial.sector_id, L_combine, L_pos, true, true);
+        RImplementation.dsgraph.o.sector_id = L->spatial.sector_id;
+        RImplementation.dsgraph.o.view_pos = L_pos;
+        RImplementation.dsgraph.o.xform = L_combine;
+        RImplementation.dsgraph.o.view_frustum.CreateFromMatrix(L_combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+        RImplementation.dsgraph.o.precise_portals = true;
+
+        RImplementation.dsgraph.build_subspace();
 
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(true, true);
@@ -268,13 +274,16 @@ void CLightR_Manager::render_spot(u32 _priority)
 
         // 3. Calculate visibility for light + build soring tree
         VERIFY(L->spatial.sector_id != IRender_Sector::INVALID_SECTOR_ID);
-        // RImplementation.marker                   ++;
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.build_subspace(L->spatial.sector_id, L_combine, L_pos, TRUE,
-            TRUE // precise portals
-            );
+        RImplementation.dsgraph.o.sector_id = L->spatial.sector_id;
+        RImplementation.dsgraph.o.view_pos = L_pos;
+        RImplementation.dsgraph.o.xform = L_combine;
+        RImplementation.dsgraph.o.view_frustum.CreateFromMatrix(L_combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+        RImplementation.dsgraph.o.precise_portals = true;
+
+        RImplementation.dsgraph.build_subspace();
 
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(true, true);
@@ -303,7 +312,7 @@ void CLightR_Manager::render(u32 _priority)
 {
     if (selected_spot.size())
     {
-        RImplementation.dsgraph.phase = CRender::PHASE_SPOT;
+        RImplementation.dsgraph.o.phase = CRender::PHASE_SPOT;
         render_spot(_priority);
 
         if (_priority == 1)
@@ -311,7 +320,7 @@ void CLightR_Manager::render(u32 _priority)
     }
     if (selected_point.size())
     {
-        RImplementation.dsgraph.phase = CRender::PHASE_POINT;
+        RImplementation.dsgraph.o.phase = CRender::PHASE_POINT;
         render_point(_priority);
 
         if (_priority == 1)

@@ -644,7 +644,6 @@ void CRender::destroy()
     xr_delete(Target);
     PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
-    dsgraph.destroy();
 }
 
 void CRender::reset_begin()
@@ -852,10 +851,6 @@ bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
     dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
-}
-void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
-{
-    dsgraph.add_static((dxRender_Visual*)V, view, view.getMask());
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {

@@ -345,7 +345,7 @@ void CRender::LoadSectors(IReader* fs)
             if (vol > largest_sector_vol)
             {
                 largest_sector_vol = vol;
-                m_largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
+                largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
             }
         }
         P->close();

@@ -37,29 +37,15 @@ void CRender::Calculate()
 
             last_sector_id = sector_id;
         }
-
-        // Check if camera is too near to some portal - if so force DualRender
-        if (rmPortals)
-        {
-            float eps = VIEWPORT_NEAR + EPS_L;
-            Fvector box_radius;
-            box_radius.set(eps, eps, eps);
-            dsgraph.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
-            for (int K = 0; K < dsgraph.Sectors_xrc.r_count(); K++)
-            {
-                CPortal* pPortal = (CPortal*)dsgraph.Portals[rmPortals->get_tris()[dsgraph.Sectors_xrc.r_begin()[K].id].dummy];
-                pPortal->bDualRender = TRUE;
-            }
-        }
     }
 
     //
     Lights.Update();
 
     // Check if we touch some light even trough portal
-    dsgraph.lstRenderables.clear();
-    g_SpatialSpace->q_sphere(dsgraph.lstRenderables, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
-    for (auto spatial : dsgraph.lstRenderables)
+    static xr_vector<ISpatial*> spatial_lights;
+    g_SpatialSpace->q_sphere(spatial_lights, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
+    for (auto spatial : spatial_lights)
     {
         spatial->spatial_updatesector();
         const auto sector_id = spatial->GetSpatialData().sector_id;
@@ -72,4 +58,6 @@ void CRender::Calculate()
         VERIFY(L);
         Lights.add_light(L);
     }
+
+    // TODO: dsgraph setup goes here
 }
