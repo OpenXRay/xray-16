@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "light.h"
 
-static const float SQRT2 = 1.4142135623730950488016887242097f;
-static const float RSQRTDIV2 = 0.70710678118654752440084436210485f;
+static constexpr float RSQRTDIV2 = 0.70710678118654752440084436210485f;
 
-light::light(void) : SpatialBase(g_SpatialSpace)
+light::light() : SpatialBase(g_SpatialSpace)
 {
     spatial.type = STYPE_LIGHTSOURCE;
     flags.type = POINT;
@@ -30,8 +29,8 @@ light::light(void) : SpatialBase(g_SpatialSpace)
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     ZeroMemory(omnipart, sizeof(omnipart));
-    s_spot = NULL;
-    s_point = NULL;
+    s_spot = nullptr;
+    s_point = nullptr;
     vis.frame2test = 0; // xffffffff;
     vis.query_id = 0;
     vis.query_order = 0;
@@ -43,8 +42,8 @@ light::light(void) : SpatialBase(g_SpatialSpace)
 light::~light()
 {
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    for (int f = 0; f < 6; f++)
-        xr_delete(omnipart[f]);
+    for (auto& f : omnipart)
+        xr_delete(f);
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
     set_active(false);
 
@@ -59,7 +58,7 @@ light::~light()
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
 void light::set_texture(LPCSTR name)
 {
-    if ((0 == name) || (0 == name[0]))
+    if ((nullptr == name) || (0 == name[0]))
     {
         // default shaders
         s_spot.destroy();
@@ -113,7 +112,7 @@ void light::set_active(bool a)
 //Msg("!!! L-register: %X", u32(this));
 
 #ifdef DEBUG
-        Fvector zero = {0, -1000, 0};
+        const Fvector zero = {0, -1000, 0};
         if (position.similar(zero))
         {
             Msg("- Uninitialized light position.");
@@ -159,7 +158,7 @@ void light::set_cone(float angle)
 }
 void light::set_rotation(const Fvector& D, const Fvector& R)
 {
-    Fvector old_D = direction;
+    const Fvector old_D = direction;
     direction.normalize(D);
     right.normalize(R);
     if (!fsimilar(1.f, old_D.dotproduct(D)))
@@ -326,7 +325,7 @@ void light::Export(light_Package& package)
         case IRender_Light::POINT:
         {
             // tough: create/update 6 shadowed lights
-            if (0 == omnipart[0])
+            if (nullptr == omnipart[0])
                 for (auto& p_light : omnipart)
                     p_light = xr_new<light>();
             for (int f = 0; f < 6; f++)
@@ -399,12 +398,12 @@ void light::set_attenuation_params(float a0, float a1, float a2, float fo)
 
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 extern float ps_r2_slight_fade;
-float light::get_LOD()
+float light::get_LOD() const
 {
     if (!flags.bShadow)
         return 1;
-    float distSQ = Device.vCameraPosition.distance_to_sqr(spatial.sphere.P) + EPS;
-    float ssa = ps_r2_slight_fade * spatial.sphere.R / distSQ;
-    float lod = _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.f, 1.f));
+    const float distSQ = Device.vCameraPosition.distance_to_sqr(spatial.sphere.P) + EPS;
+    const float ssa = ps_r2_slight_fade * spatial.sphere.R / distSQ;
+    const float lod = _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.f, 1.f));
     return lod;
 }

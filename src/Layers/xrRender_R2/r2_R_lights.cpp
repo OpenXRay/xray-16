@@ -87,7 +87,7 @@ void CRender::render_lights(light_Package& LP)
         Target->phase_smap_spot_clear();
         xr_vector<light*>& source = LP.v_shadowed;
         light* L = source.back();
-        u16 sid = L->vis.smap_ID;
+        const u16 sid = L->vis.smap_ID;
         while (true)
         {
             if (source.empty())
@@ -105,8 +105,8 @@ void CRender::render_lights(light_Package& LP)
             L->svis.begin();
             PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
             dsgraph.build_subspace(L->spatial.sector_id, L->X.S.combine, L->position, TRUE);
-            bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
-            bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+            const bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+            const bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
                 !dsgraph.mapSorted.empty();
             if (bNormal || bSpecial)
             {
@@ -180,7 +180,7 @@ void CRender::render_lights(light_Package& LP)
         if (!L_spot_s.empty())
         {
             PIX_EVENT(ACCUM_SPOT);
-            for (auto& p_light : L_spot_s)
+            for (light* p_light : L_spot_s)
             {
                 Target->accum_spot(p_light);
                 render_indirect(p_light);
@@ -188,7 +188,7 @@ void CRender::render_lights(light_Package& LP)
 
             PIX_EVENT(ACCUM_VOLUMETRIC);
             if (RImplementation.o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
-                for (auto& p_light : L_spot_s)
+                for (light* p_light : L_spot_s)
                     Target->accum_volumetric(p_light);
 
             L_spot_s.clear();
@@ -200,7 +200,7 @@ void CRender::render_lights(light_Package& LP)
     if (!LP.v_point.empty())
     {
         xr_vector<light*>& Lvec = LP.v_point;
-        for (auto & p_light : Lvec)
+        for (light* p_light : Lvec)
         {
             p_light->vis_update();
             if (p_light->vis.visible)
@@ -217,7 +217,7 @@ void CRender::render_lights(light_Package& LP)
     if (!LP.v_spot.empty())
     {
         xr_vector<light*>& Lvec = LP.v_spot;
-        for (auto& p_light : Lvec)
+        for (light* p_light : Lvec)
         {
             p_light->vis_update();
             if (p_light->vis.visible)
@@ -231,7 +231,7 @@ void CRender::render_lights(light_Package& LP)
     }
 }
 
-void CRender::render_indirect(light* L)
+void CRender::render_indirect(light* L) const
 {
     if (!ps_r2_ls_flags.test(R2FLAG_GI))
         return;
@@ -241,25 +241,26 @@ void CRender::render_indirect(light* L)
     LIGEN.set_shadow(false);
     LIGEN.set_cone(PI_DIV_2 * 2.f);
 
-    xr_vector<light_indirect>& Lvec = L->indirect;
+    const xr_vector<light_indirect>& Lvec = L->indirect;
     if (Lvec.empty())
         return;
-    float LE = L->color.intensity();
+    const float LE = L->color.intensity();
     for (auto& LI : Lvec)
     {
         // energy and color
-        float LIE = LE * LI.E;
+        const float LIE = LE * LI.E;
         if (LIE < ps_r2_GI_clip)
             continue;
-        Fvector T;
-        T.set(L->color.r, L->color.g, L->color.b).mul(LI.E);
+
+        Fvector T{ L->color.r, L->color.g, L->color.b };
+        T.mul(LI.E);
         LIGEN.set_color(T.x, T.y, T.z);
 
         // geometric
-        Fvector L_up, L_right;
-        L_up.set(0, 1, 0);
+        Fvector L_up{ 0, 1, 0 }, L_right;
         if (_abs(L_up.dotproduct(LI.D)) > .99f)
-            L_up.set(0, 0, 1);
+            L_up = { 0, 0, 1 };
+
         L_right.crossproduct(L_up, LI.D).normalize();
         LIGEN.spatial.sector_id = LI.S;
         LIGEN.set_position(LI.P);
@@ -268,9 +269,9 @@ void CRender::render_indirect(light* L)
         // range
         // dist^2 / range^2 = A - has infinity number of solutions
         // approximate energy by linear fallof Emax / (1 + x) = Emin
-        float Emax = LIE;
-        float Emin = 1.f / 255.f;
-        float x = (Emax - Emin) / Emin;
+        const float Emax = LIE;
+        const float Emin = 1.f / 255.f;
+        const float x = (Emax - Emin) / Emin;
         if (x < 0.1f)
             continue;
         LIGEN.set_range(x);
