@@ -152,7 +152,7 @@ Shader* CResourceManager::_cpp_Create(
 
     // Access to template
     C.BT = B;
-    C.bFFP = false;
+    C.bFFP = RImplementation.o.ffp;
     C.bEditor = false;
     C.bDetail = FALSE;
 #ifdef _EDITOR
