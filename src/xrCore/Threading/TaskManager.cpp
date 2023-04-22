@@ -428,6 +428,11 @@ void TaskManager::PushTask(Task& task)
     ++s_tl_worker.pushedTasks;
 }
 
+void TaskManager::RunTask(Task& task)
+{
+    ExecuteTask(task);
+}
+
 void TaskManager::Wait(const Task& task)
 {
     while (!task.IsFinished())
