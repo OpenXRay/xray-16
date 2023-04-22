@@ -125,7 +125,7 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
             {
                 C.PassSET_ZB(true, true);
                 C.PassSET_Blend_SET();
-                C.PassSET_LightFog(false, false);
+                C.PassSET_LightFog(false, true);
 
                 // Stage0 - Lightmap
                 C.StageBegin();
