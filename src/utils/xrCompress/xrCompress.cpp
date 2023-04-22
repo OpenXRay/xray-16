@@ -268,13 +268,15 @@ void xrCompressor::CompressOne(LPCSTR path)
     if (!A)
     {
         // Register for future aliasing
-        ALIAS R;
-        R.path = xr_strdup(fn);
-        R.crc = c_crc32;
-        R.c_ptr = c_ptr;
-        R.c_size_real = c_size_real;
-        R.c_size_compressed = c_size_compressed;
-        aliases.insert(std::make_pair(R.c_size_real, R));
+        ALIAS R
+        {
+            /*.path =*/ xr_strdup(fn),
+            /*.crc =*/ c_crc32,
+            /*.c_ptr =*/ c_ptr,
+            /*.c_size_real =*/ c_size_real,
+            /*.c_size_compressed =*/ c_size_compressed
+        };
+        aliases.emplace(c_size_real, R);
     }
 
     FS.r_close(src);
