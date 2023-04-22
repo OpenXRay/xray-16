@@ -130,8 +130,6 @@ inline int GetExceptionCode()
     return 0;
 }
 
-#define xr_unlink unlink
-
 #include <inttypes.h>
 typedef int32_t BOOL;
 typedef uint8_t BYTE;
@@ -1082,19 +1080,18 @@ inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 #define xr_fs_strlwr(str) str
 #define xr_fs_nostrlwr(str) xr_strlwr(str)
 
+/// For backward compability of FS, for real filesystem delimiter set to back
+inline void restore_path_separators(char * path)
+{
+    while (char* sep = strchr(path, '/')) *sep = '\\'; //
+}
+
 inline void convert_path_separators(char * path)
 {
     while (char* sep = strchr(path, '\\')) *sep = '/';
 }
 
-/** For backward compability of FS, for real filesystem delimiter set to back
- * @brief restore_path_separators
- * @param path
- */
-inline void restore_path_separators(char * path)
-{
-    while (char* sep = strchr(path, '/')) *sep = '\\'; //
-}
+#define xr_unlink unlink
 
 inline tm* localtime_safe(const time_t *time, struct tm* result){ return localtime_r(time, result); }
 

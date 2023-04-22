@@ -38,37 +38,99 @@ BOOL CBlender_Tree::canBeDetailed()
     return TRUE;
 }
 
-void CBlender_Tree::CompileForEditor(CBlender_Compile& C)
-{
-    C.PassBegin();
-    {
-        C.PassSET_ZB(TRUE, TRUE);
-        if (oBlend.value)
-            C.PassSET_Blend_BLEND(TRUE, 200);
-        else
-            C.PassSET_Blend_SET(TRUE, 200);
-        C.PassSET_LightFog(TRUE, TRUE);
-
-        // Stage1 - Base texture
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_TMC(oT_Name, "$null", "$null", 0);
-        C.StageEnd();
-    }
-    C.PassEnd();
-}
-
 void CBlender_Tree::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
+    if (C.bFFP)
+        CompileFFP(C);
+    else
+        CompileProgrammable(C);
+}
+
+void CBlender_Tree::CompileFFP(CBlender_Compile& C) const
+{
     if (C.bEditor)
     {
-        CompileForEditor(C);
-        return;
-    }
+        C.PassBegin();
+        {
+            C.PassSET_ZB(TRUE, TRUE);
+            if (oBlend.value)
+                C.PassSET_Blend_BLEND(TRUE, 200);
+            else
+                C.PassSET_Blend_SET(TRUE, 200);
+            C.PassSET_LightFog(TRUE, TRUE);
 
+            // Stage1 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+            C.StageEnd();
+        }
+        C.PassEnd();
+    }
+    else
+    {
+        switch (C.iElement)
+        {
+        case SE_R1_NORMAL_HQ:
+        case SE_R1_NORMAL_LQ:
+        {
+            C.PassBegin();
+            {
+                C.PassSET_ZB(TRUE, TRUE);
+                if (oBlend.value)
+                    C.PassSET_Blend_BLEND(TRUE, 200);
+                else
+                    C.PassSET_Blend_SET(TRUE, 200);
+                C.PassSET_LightFog(FALSE, TRUE);
+                C.PassSET_Shaders("tree_wave", "null");
+
+                // Stage1 - Base texture
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+                C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+                C.StageEnd();
+            }
+            C.PassEnd();
+            break;
+        }
+
+        case SE_R1_LMODELS:
+        {
+            // Lighting only
+            C.PassBegin();
+            {
+                C.PassSET_ZB(TRUE, TRUE);
+                if (oBlend.value)
+                    C.PassSET_Blend_BLEND(TRUE, 200);
+                else
+                    
+                    C.PassSET_Blend_SET(TRUE, 200);
+                C.PassSET_LightFog(FALSE, FALSE);
+                C.PassSET_Shaders("tree_wave", "null");
+
+                // Stage1 - Base texture
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_DIFFUSE);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+                C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+                C.StageEnd();
+            }
+            C.PassEnd();
+            break;
+        }
+
+        default:
+            break;
+        } // switch (C.iElement)
+    }
+}
+
+void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
+{
     u32 tree_aref = 200;
     if (oNotAnTree.value)
         tree_aref = 0;
@@ -157,5 +219,5 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         C.r_End			();
         */
         break;
-    }
+    } // switch (C.iElement)
 }

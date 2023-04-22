@@ -611,7 +611,7 @@ void CUIMainIngameWnd::OnConnected()
     }
 }
 
-void CUIMainIngameWnd::OnSectorChanged(int sector) { UIZoneMap->OnSectorChanged(sector); }
+void CUIMainIngameWnd::OnSectorChanged(IRender_Sector::sector_id_t sector) { UIZoneMap->OnSectorChanged(sector); }
 void CUIMainIngameWnd::reset_ui()
 {
     m_pPickUpItem = NULL;

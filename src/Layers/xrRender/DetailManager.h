@@ -170,6 +170,14 @@ public:
     virtual ObjectList* GetSnapList() = 0;
 #endif
 
+    bool UseVS() const;
+
+    // Software processor
+    ref_geom soft_Geom;
+    void soft_Load();
+    void soft_Unload();
+    void soft_Render();
+
     // Hardware processor
     ref_geom hw_Geom;
     size_t hw_BatchSize;

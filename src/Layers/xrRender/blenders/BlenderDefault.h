@@ -6,7 +6,8 @@ class CBlender_default : public IBlender
     xrP_TOKEN oTessellation;
 
 private:
-    void CompileForEditor(CBlender_Compile& C);
+    void CompileFFP(CBlender_Compile& C) const;
+    void CompileProgrammable(CBlender_Compile& C) const;
 
 public:
     CBlender_default();

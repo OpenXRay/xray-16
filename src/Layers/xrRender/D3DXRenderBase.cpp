@@ -57,6 +57,8 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
     {
         UIRenderImpl.DestroyUIGeom();
         DUImpl.OnDeviceDestroy();
+        m_PortalFadeGeom.destroy();
+        m_PortalFadeShader.destroy();
         m_SelectionShader.destroy();
         m_WireShader.destroy();
     }
@@ -130,6 +132,8 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     {
         m_WireShader.create("editor" DELIMITER "wire");
         m_SelectionShader.create("editor" DELIMITER "selection");
+        m_PortalFadeShader.create("portal");
+        m_PortalFadeGeom.create(FVF::F_L, RCache.Vertex.Buffer(), 0);        
         DUImpl.OnDeviceCreate();
         UIRenderImpl.CreateUIGeom();
     }

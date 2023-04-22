@@ -3,6 +3,7 @@
 #include "Layers/xrRender/LightTrack.h"
 #include "xrEngine/xr_object.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/blenders/Blender_Blur.h"
 #include "xrEngine/CustomHUD.h"
 
 const float S_distance = 144;
@@ -50,9 +51,26 @@ CLightShadows::CLightShadows() : xrc("LightShadows")
     sh_World.create("effects" DELIMITER "shadow_world", r1_RT_shadow);
     geom_World.create(FVF::F_LIT, RCache.Vertex.Buffer(), nullptr);
 
-    sh_BlurTR.create("blur4", TWO_TEMP_TEXTURES);
-    sh_BlurRT.create("blur4", TWO_SHADOW_TEXTURES);
-    geom_Blur.create(FVF::F_TL4uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+    if (RImplementation.o.ffp)
+    {
+        CBlender_Blur blender;
+
+        sh_BlurTR.create("effects\\blur", TWO_TEMP_TEXTURES);
+        if (!sh_BlurTR)
+            sh_BlurTR.create(&blender, "effects\\blur", TWO_TEMP_TEXTURES);
+
+        sh_BlurRT.create("effects\\blur", TWO_SHADOW_TEXTURES);
+        if (!sh_BlurRT)
+            sh_BlurRT.create(&blender, "effects\\blur", TWO_SHADOW_TEXTURES);
+
+        geom_Blur.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+    }
+    else
+    {
+        sh_BlurTR.create("blur4", TWO_TEMP_TEXTURES);
+        sh_BlurRT.create("blur4", TWO_SHADOW_TEXTURES);
+        geom_Blur.create(FVF::F_TL4uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+    }
 
     // Debug
     sh_Screen.create("effects" DELIMITER "screen_set", r1_RT_shadow);
@@ -327,9 +345,18 @@ void CLightShadows::calculate()
     {
         // Fill VB
         u32 Offset;
-        FVF::TL4uv* pv = (FVF::TL4uv*)RCache.Vertex.Lock(4, geom_Blur.stride(), Offset);
-        RImplementation.ApplyBlur4(pv, rt_size, rt_size, S_blur_kernel);
-        RCache.Vertex.Unlock(4, geom_Blur.stride());
+        if (RImplementation.o.ffp)
+        {
+            FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(8, geom_Blur.stride(), Offset);
+            RImplementation.ApplyBlur2(pv, rt_size);
+            RCache.Vertex.Unlock(8, geom_Blur.stride());
+        }
+        else
+        {
+            FVF::TL4uv* pv = (FVF::TL4uv*)RCache.Vertex.Lock(4, geom_Blur.stride(), Offset);
+            RImplementation.ApplyBlur4(pv, rt_size, rt_size, S_blur_kernel);
+            RCache.Vertex.Unlock(4, geom_Blur.stride());
+        }
 
         // Actual rendering (pass0, temp2real)
         RCache.set_RT(rt_shadow->pRT);

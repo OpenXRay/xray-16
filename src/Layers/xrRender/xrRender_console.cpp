@@ -801,6 +801,8 @@ void xrRender_initconsole()
     // 2 - forced hardware skinning (renderer can not override)
     CMD4(CCC_Integer, "r1_software_skinning", &ps_r1_SoftwareSkinning, 0, 2);
 
+    CMD3(CCC_Mask, "r1_ffp", &ps_r1_flags, R1FLAG_FFP);
+
     // R2
     CMD4(CCC_Float, "r2_ssa_lod_a", &ps_r2_ssaLOD_A, 16, 96);
     CMD4(CCC_Float, "r2_ssa_lod_b", &ps_r2_ssaLOD_B, 32, 64);

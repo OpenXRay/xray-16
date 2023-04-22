@@ -38,7 +38,7 @@ public:
     CUIStatic& Background() { return m_background; };
     CUIWindow& MapFrame() { return m_clipFrame; };
     void SetupCurrentMap();
-    void OnSectorChanged(int sector);
+    void OnSectorChanged(IRender_Sector::sector_id_t sector);
     void Counter_ResetClrAnimation();
 
 private:

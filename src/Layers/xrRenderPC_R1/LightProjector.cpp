@@ -83,7 +83,7 @@ void CLightProjector::set_object(IRenderable* O)
             else
             {
                 spatial->spatial_updatesector();
-                if (nullptr == spatial->GetSpatialData().sector)
+                if (spatial->GetSpatialData().sector_id == IRender_Sector::INVALID_SECTOR_ID)
                 {
                     IGameObject* obj = dynamic_cast<IGameObject*>(O);
                     if (obj)
@@ -320,8 +320,8 @@ void CLightProjector::calculate()
         if (spatial)
         {
             spatial->spatial_updatesector();
-            if (spatial->GetSpatialData().sector)
-                RImplementation.dsgraph.render_R1_box(spatial->GetSpatialData().sector, BB, SE_R1_LMODELS);
+            if (spatial->GetSpatialData().sector_id != IRender_Sector::INVALID_SECTOR_ID)
+                RImplementation.dsgraph.render_R1_box(spatial->GetSpatialData().sector_id, BB, SE_R1_LMODELS);
         }
         // if (spatial)      RImplementation.r_dsgraph_render_subspace   (spatial->spatial.sector,mCombine,v_C,FALSE);
     }
@@ -331,9 +331,15 @@ void CLightProjector::calculate()
     {
         // Fill vertex buffer
         u32                         Offset;
+        if (RImplementation.o.ffp)  {
+        FVF::TL2uv* pv              = (FVF::TL2uv*) RCache.Vertex.Lock  (8,geom_Blur.stride(),Offset);
+        RImplementation.ApplyBlur2  (pv, rt_size);
+        RCache.Vertex.Unlock        (8,geom_Blur.stride());
+        } else {
         FVF::TL4uv* pv              = (FVF::TL4uv*) RCache.Vertex.Lock  (4,geom_Blur.stride(),Offset);
         RImplementation.ApplyBlur4  (pv,P_rt_size,P_rt_size,P_blur_kernel);
         RCache.Vertex.Unlock        (4,geom_Blur.stride());
+        }
 
         // Actual rendering (pass0, temp2real)
         RCache.set_RT               (RT->pRT);
