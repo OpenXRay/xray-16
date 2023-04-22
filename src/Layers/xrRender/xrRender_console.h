@@ -84,6 +84,7 @@ extern ECORE_API int ps_r1_SoftwareSkinning; // r1-only
 enum
 {
     R1FLAG_DLIGHTS = (1 << 0),
+    R1FLAG_FFP = (1 << 1), // don't use shaders, only fixed-function pipeline or software processing
 };
 
 // R2

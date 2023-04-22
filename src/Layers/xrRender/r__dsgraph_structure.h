@@ -1,5 +1,7 @@
 #pragma once
 
+#include "r__sector.h"
+
 // feedback	for receiving visuals
 class R_feedback
 {
@@ -17,6 +19,7 @@ struct R_dsgraph_structure
     u32 marker{};
     bool pmask[2];
     bool pmask_wmark;
+    bool use_hom{false};
 
     // Dynamic scene graph
     // R_dsgraph::mapNormal_T										mapNormal	[2]		;	// 2==(priority/2)
@@ -34,6 +37,11 @@ struct R_dsgraph_structure
     R_dsgraph::mapSorted_T mapEmissive;
     R_dsgraph::mapSorted_T mapHUDEmissive;
 #endif
+
+    xr_vector<CSector*> Sectors;
+    xr_vector<CPortal*> Portals;
+    CPortalTraverser PortalTraverser;
+    xrXRC Sectors_xrc;
 
     // Runtime structures
     xr_vector<R_dsgraph::mapNormal_T::value_type*> nrmPasses;
@@ -65,7 +73,7 @@ struct R_dsgraph_structure
     }
     void clear_Counters() { counter_S = counter_D = 0; }
 
-    R_dsgraph_structure()
+    R_dsgraph_structure() : Sectors_xrc("dsgraph")
     {
         r_pmask(true, true);
     };
@@ -108,6 +116,20 @@ struct R_dsgraph_structure
         pmask_wmark = _wm;
     }
 
+    void load(const xr_vector<CSector::level_sector_data_t> &sectors, const xr_vector<CPortal::level_portal_data_t> &portals);
+    void unload();
+
+    ICF IRender_Portal* get_portal(size_t id) const
+    {
+        VERIFY(id < Portals.size());
+        return Portals[id];
+    }
+    ICF IRender_Sector* get_sector(size_t id) const
+    {
+        VERIFY(id < Sectors.size());
+        return Sectors[id];
+    }
+
     void add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
     void add_leafs_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility
     void add_leafs_static(dxRender_Visual* pVisual); // if detected node's full visibility
@@ -124,9 +146,10 @@ struct R_dsgraph_structure
     void render_emissive();
     void render_wmarks();
     void render_distort();
-    void render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
+    void render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& _bb, int _element);
+
+    void build_subspace(IRender_Sector::sector_id_t sector_id, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
         BOOL _dynamic, BOOL _precise_portals = FALSE);
-    void render_subspace(
-        IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
-    void render_R1_box(IRender_Sector* _sector, Fbox& _bb, int _element);
+    void build_subspace(IRender_Sector::sector_id_t sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic,
+        BOOL _precise_portals = FALSE);
 };

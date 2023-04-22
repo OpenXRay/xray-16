@@ -35,15 +35,14 @@ public:
         u32 forceskinw : 1; // config
         u32 no_detail_textures : 1; // config
         u32 no_ram_textures : 1; // don't keep textures in RAM
+        u32 ffp : 1; // don't use shaders, only fixed-function pipeline or software processing
     } o;
 
 public:
     // Sector detection and visibility
-    CSector* pLastSector;
+    IRender_Sector::sector_id_t last_sector_id{IRender_Sector::INVALID_SECTOR_ID};
     Fvector vLastCameraPos;
     u32 uLastLTRACK;
-    xr_vector<IRender_Portal*> Portals;
-    xr_vector<IRender_Sector*> Sectors;
     xrXRC Sectors_xrc;
     CDB::MODEL* rmPortals;
     Task* ProcessHOMTask;
@@ -102,9 +101,9 @@ public:
     IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
-    IRender_Sector* getSectorActive();
     IRenderVisual* model_CreatePE(LPCSTR name);
-    void ApplyBlur4(FVF::TL4uv* dest, u32 w, u32 h, float k);
+    void ApplyBlur2(FVF::TL2uv* dest, u32 size) const;
+    void ApplyBlur4(FVF::TL4uv* dest, u32 w, u32 h, float k) const;
     void apply_object(IRenderable* O);
     void apply_lmaterial(){};
 
@@ -130,16 +129,13 @@ public:
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
     virtual LPCSTR getShaderPath() override { return "r1" DELIMITER ""; }
     virtual ref_shader getShader(int id);
-    virtual IRender_Sector* getSector(int id) override;
     virtual IRenderVisual* getVisual(int id) override;
-    virtual IRender_Sector* detectSector(const Fvector& P) override;
-    IRender_Sector* detectSector(const Fvector& P, Fvector& D);
-    int translateSector(IRender_Sector* pSector);
+    virtual IRender_Sector::sector_id_t detectSector(const Fvector& P) override;
+    IRender_Sector::sector_id_t detectSector(const Fvector& P, Fvector& D);
     virtual IRender_Target* getTarget() override;
 
     // Main
     void set_Object(IRenderable* O);
-    virtual void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
     void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf (no culling performed at all)
     void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
 
@@ -211,9 +207,6 @@ public:
 
 protected:
     virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
-
-private:
-    FS_FileSet m_file_set;
 };
 
 extern CRender RImplementation;

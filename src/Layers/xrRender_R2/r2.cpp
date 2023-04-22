@@ -405,6 +405,8 @@ void CRender::create()
         Msg("* Managed textures disabled");
 #endif
 
+    o.ffp = false;
+
     // options (smap-pool-size)
     if (strstr(Core.Params, "-smap1024"))
         o.smapsize = 1024;
@@ -622,7 +624,6 @@ void CRender::create()
     dsgraph.marker = 0;
     q_sync_point.Create();
 
-    PortalTraverser.initialize();
     //	TODO: OGL: Implement FluidManager.
 #if defined(USE_DX11)
     FluidManager.Initialize(70, 70, 70);
@@ -637,7 +638,6 @@ void CRender::destroy()
 #if defined(USE_DX11)
     FluidManager.Destroy();
 #endif
-    PortalTraverser.destroy();
     q_sync_point.Destroy();
     HWOCC.occq_destroy();
     xr_delete(Models);
@@ -799,17 +799,6 @@ ref_shader CRender::getShader(int id)
     VERIFY(id < int(Shaders.size()));
     return Shaders[id];
 }
-IRender_Portal* CRender::getPortal(int id)
-{
-    VERIFY(id < int(Portals.size()));
-    return Portals[id];
-}
-IRender_Sector* CRender::getSector(int id)
-{
-    VERIFY(id < int(Sectors.size()));
-    return Sectors[id];
-}
-IRender_Sector* CRender::getSectorActive() { return pLastSector; }
 IRenderVisual* CRender::getVisual(int id)
 {
     VERIFY(id < int(Visuals.size()));
@@ -906,7 +895,6 @@ void CRender::add_SkeletonWallmark(
     if (pShader)
         add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
-void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace); }
 
 void CRender::rmNear()
 {

@@ -83,6 +83,7 @@ public:
 
         u32 nullrt : 1;
         u32 no_ram_textures : 1; // don't keep textures in RAM
+        u32 ffp : 1; // don't use shaders, only fixed-function pipeline or software processing
 
         u32 distortion : 1;
         u32 distortion_enabled : 1;
@@ -148,10 +149,8 @@ public:
 public:
     RenderR2Statistics Stats;
     // Sector detection and visibility
-    CSector* pLastSector;
+    IRender_Sector::sector_id_t last_sector_id{IRender_Sector::INVALID_SECTOR_ID};
     u32 uLastLTRACK;
-    xr_vector<IRender_Portal*> Portals;
-    xr_vector<IRender_Sector*> Sectors;
     xrXRC Sectors_xrc;
     CDB::MODEL* rmPortals;
     CHOM HOM;
@@ -206,7 +205,6 @@ private:
     void LoadBuffers(CStreamReader* fs, bool alternative);
     void LoadVisuals(IReader* fs);
     void LoadLights(IReader* fs);
-    void LoadPortals(IReader* fs);
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);
 #if RENDER != R_R2
@@ -214,11 +212,9 @@ private:
 #endif
 
 public:
-    IRender_Sector* rimp_detectSector(Fvector& P, Fvector& D);
     void render_main(Fmatrix& mCombined, bool _fportals);
     void render_forward();
-    void render_smap_direct(Fmatrix& mCombined);
-    void render_indirect(light* L);
+    void render_indirect(light* L) const;
     void render_lights(light_Package& LP);
     void render_sun();
     void render_sun_near();
@@ -239,11 +235,8 @@ public:
     VertexStagingBuffer* getVB(int id, bool alternative = false);
     IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
-    IRender_Portal* getPortal(int id);
-    IRender_Sector* getSectorActive();
     IRenderVisual* model_CreatePE(LPCSTR name);
-    IRender_Sector* detectSector(const Fvector& P, Fvector& D);
-    int translateSector(IRender_Sector* pSector);
+    IRender_Sector::sector_id_t detectSector(const Fvector& P, Fvector& D);
 
     // HW-occlusion culling
     u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
@@ -340,13 +333,11 @@ public:
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
     ref_shader getShader(int id);
-    IRender_Sector* getSector(int id) override;
     IRenderVisual* getVisual(int id) override;
-    IRender_Sector* detectSector(const Fvector& P) override;
+    IRender_Sector::sector_id_t detectSector(const Fvector& P) override;
     IRender_Target* getTarget() override;
 
     // Main
-    void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
     void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
     void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
 
@@ -440,8 +431,7 @@ protected:
     void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
 
 private:
-    FS_FileSet m_file_set;
-    CSector* m_largest_sector{};
+    IRender_Sector::sector_id_t m_largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
 };
 
 extern CRender RImplementation;
