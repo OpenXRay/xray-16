@@ -212,7 +212,6 @@ private:
 #endif
 
 public:
-    void render_main(Fmatrix& mCombined, bool _fportals);
     void render_forward();
     void render_indirect(light* L) const;
     void render_lights(light_Package& LP);
@@ -339,8 +338,6 @@ public:
 
     // Main
     void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
-    void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
-
     // wallmarks
     void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);
     void add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override;
@@ -431,7 +428,7 @@ protected:
     void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
 
 private:
-    IRender_Sector::sector_id_t m_largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
+    IRender_Sector::sector_id_t largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
 };
 
 extern CRender RImplementation;

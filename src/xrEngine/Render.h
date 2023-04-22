@@ -309,7 +309,6 @@ public:
 
     // Main
     virtual void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
-    virtual void add_Geometry(IRenderVisual* V, const CFrustum& view) = 0; // add visual(s) (all culling performed)
     // virtual void add_StaticWallmark (ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)=0;
     virtual void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) = 0;
     // Prefer this function when possible

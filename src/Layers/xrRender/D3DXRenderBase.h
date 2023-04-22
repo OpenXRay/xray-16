@@ -62,7 +62,7 @@ public:
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 
-    u32 active_phase() const override { return dsgraph.phase; }
+    u32 active_phase() const override { return dsgraph.o.phase; }
 
 public:
     R_dsgraph_structure dsgraph;

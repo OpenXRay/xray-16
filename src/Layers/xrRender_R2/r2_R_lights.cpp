@@ -98,13 +98,23 @@ void CRender::render_lights(light_Package& LP)
             source.pop_back();
             Lights_LastFrame.push_back(L);
 
+            // calculate
+            dsgraph.reset();
+            {
+                L->svis.begin();
+
+                dsgraph.o.phase = PHASE_SMAP;
+                dsgraph.r_pmask(true, o.Tshadows);
+                dsgraph.o.sector_id = L->spatial.sector_id;
+                dsgraph.o.view_pos = L->position;
+                dsgraph.o.xform = L->X.S.combine;
+                dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+
+                dsgraph.build_subspace();
+            }
+
             // render
-            dsgraph.use_hom = false;
-            dsgraph.phase = PHASE_SMAP;
-            dsgraph.r_pmask(true, o.Tshadows);
-            L->svis.begin();
             PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
-            dsgraph.build_subspace(L->spatial.sector_id, L->X.S.combine, L->position, TRUE);
             const bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
             const bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
                 !dsgraph.mapSorted.empty();

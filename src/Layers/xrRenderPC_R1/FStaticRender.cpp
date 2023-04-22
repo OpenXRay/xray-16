@@ -130,7 +130,6 @@ void CRender::destroy()
     //*** Components
     xr_delete(Target);
     Device.seqFrame.Remove(this);
-    dsgraph.destroy();
 }
 
 void CRender::reset_begin()
@@ -308,10 +307,6 @@ void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
     set_Object(root);
     dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
 }
-void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
-{
-    dsgraph.add_static((dxRender_Visual*)V, view, view.getMask());
-}
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
     if (T->suppress_wm)
@@ -465,8 +460,8 @@ void CRender::Calculate()
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     gm_SetNearer(FALSE);
-    dsgraph.use_hom = true;
-    dsgraph.phase = PHASE_NORMAL;
+    dsgraph.o.use_hom = true;
+    dsgraph.o.phase = PHASE_NORMAL;
 
     // Detect camera-sector
     if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
@@ -518,7 +513,7 @@ void CRender::Calculate()
                 dxRender_Visual* root = sector->root();
                 for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
                 {
-                    add_Geometry(root, sector->r_frustums[v_it]);
+                    dsgraph.add_static(root, sector->r_frustums[v_it], sector->r_frustums[v_it].getMask());
                 }
             }
         }
@@ -675,7 +670,7 @@ void CRender::Render()
     // Begin
     Target->Begin();
     o.vis_intersect = FALSE;
-    dsgraph.phase = PHASE_NORMAL;
+    dsgraph.o.phase = PHASE_NORMAL;
     dsgraph.render_hud(); // hud
     dsgraph.render_graph(0); // normal level
     if (Details)
@@ -687,16 +682,16 @@ void CRender::Render()
 
     dsgraph.r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
-    dsgraph.use_hom = false;
+    dsgraph.o.use_hom = false;
     L_Dynamic->render(0); // additional light sources
     if (Wallmarks)
     {
         g_r = 0;
         Wallmarks->Render(); // wallmarks has priority as normal geometry
     }
-    dsgraph.use_hom = true;
+    dsgraph.o.use_hom = true;
     o.vis_intersect = FALSE;
-    dsgraph.phase = PHASE_NORMAL;
+    dsgraph.o.phase = PHASE_NORMAL;
     dsgraph.r_pmask(true, true); // enable priority "0" and "1"
     BasicStats.ShadowsRender.Begin();
     if (L_Shadows)

@@ -430,29 +430,34 @@ void CRender::render_sun()
     }
 
     // Begin SMAP-render
-    {
-        dsgraph.use_hom = false;
-        dsgraph.phase = PHASE_SMAP;
-        dsgraph.r_pmask(true, o.Tshadows);
-        //		fuckingsun->svis.begin					();
-    }
-
-    // Fill the database
     xr_vector<Fbox3>& s_receivers = main_coarse_structure;
     s_casters.reserve(s_receivers.size());
-    dsgraph.set_Recorder(&s_casters);
-    dsgraph.build_subspace(m_largest_sector_id, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
 
-    // IGNORE PORTALS
-    if (ps_r2_ls_flags.test(R2FLAG_SUN_IGNORE_PORTALS))
+    dsgraph.reset();
     {
-        for (auto& S : dsgraph.Sectors)
+        //		fuckingsun->svis.begin					();
+        dsgraph.o.phase = PHASE_SMAP;
+        dsgraph.r_pmask(true, o.Tshadows);
+        dsgraph.o.sector_id = largest_sector_id;
+        dsgraph.o.xform = *(Fmatrix*)glm::value_ptr(cull_xform);
+        dsgraph.o.view_pos = cull_COP;
+        dsgraph.o.view_frustum = cull_frustum;
+        dsgraph.set_Recorder(&s_casters);
+
+        // Fill the database
+        dsgraph.build_subspace();
+
+        // IGNORE PORTALS
+        if (ps_r2_ls_flags.test(R2FLAG_SUN_IGNORE_PORTALS))
         {
-            dxRender_Visual* root = static_cast<CSector*>(S)->root();
-            add_Geometry(root, cull_frustum);
+            for (auto& S : dsgraph.Sectors)
+            {
+                dxRender_Visual* root = static_cast<CSector*>(S)->root();
+                dsgraph.add_static(root, cull_frustum, cull_frustum.getMask());
+            }
         }
+        dsgraph.set_Recorder(nullptr);
     }
-    dsgraph.set_Recorder(nullptr);
 
     //	Prepare to interact with D3DX code
     const glm::mat4 m_View = glm::make_mat4x4(&Device.mView.m[0][0]);
@@ -948,21 +953,19 @@ void CRender::render_sun_near()
     }
 
     // Begin SMAP-render
+    dsgraph.reset();
     {
-        VERIFY2(
-            dsgraph.mapNormalPasses[1][0].empty() && dsgraph.mapMatrixPasses[1][0].empty() && dsgraph.mapSorted.empty(),
-            "Special should be empty at this stage, but it's not empty...");
-        dsgraph.use_hom = false;
-        dsgraph.phase = PHASE_SMAP;
-        if (o.Tshadows)
-            dsgraph.r_pmask(true, true);
-        else
-            dsgraph.r_pmask(true, false);
         //		fuckingsun->svis.begin					();
-    }
+        dsgraph.o.phase = PHASE_SMAP;
+        dsgraph.r_pmask(true, o.Tshadows);
+        dsgraph.o.sector_id = largest_sector_id;
+        dsgraph.o.xform = *(Fmatrix*)glm::value_ptr(cull_xform);
+        dsgraph.o.view_pos = cull_COP;
+        dsgraph.o.view_frustum = cull_frustum;
 
-    // Fill the database
-    dsgraph.build_subspace(m_largest_sector_id, &cull_frustum, *(Fmatrix*)glm::value_ptr(cull_xform), cull_COP, TRUE);
+        // Fill the database
+        dsgraph.build_subspace();
+    }
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = *(Fmatrix*)glm::value_ptr(cull_xform);
@@ -1263,21 +1266,19 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     }
 
     // Begin SMAP-render
+    dsgraph.reset();
     {
-        VERIFY2(
-            dsgraph.mapNormalPasses[1][0].empty() && dsgraph.mapMatrixPasses[1][0].empty() && dsgraph.mapSorted.empty(),
-            "Special should be empty at this stage, but it's not empty...");
-        dsgraph.use_hom = false;
-        dsgraph.phase = PHASE_SMAP;
-        if (o.Tshadows)
-            dsgraph.r_pmask(true, true);
-        else
-            dsgraph.r_pmask(true, false);
         //		fuckingsun->svis.begin					();
-    }
+        dsgraph.o.phase = PHASE_SMAP;
+        dsgraph.r_pmask(true, o.Tshadows);
+        dsgraph.o.sector_id = largest_sector_id;
+        dsgraph.o.xform = cull_xform;
+        dsgraph.o.view_frustum = cull_frustum;
+        dsgraph.o.view_pos = cull_COP;
 
-    // Fill the database
-    dsgraph.build_subspace(m_largest_sector_id, &cull_frustum, cull_xform, cull_COP, TRUE);
+        // Fill the database
+        dsgraph.build_subspace();
+    }
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = cull_xform;
