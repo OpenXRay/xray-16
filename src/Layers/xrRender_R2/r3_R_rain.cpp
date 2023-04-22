@@ -264,14 +264,14 @@ void CRender::render_rain()
             VERIFY2(dsgraph.mapNormalPasses[1][0].empty() && dsgraph.mapMatrixPasses[1][0].empty() &&
                     dsgraph.mapSorted.empty(),
                 "Special should be empty at this stage, but it's not empty...");
-            HOM.Disable();
+            dsgraph.use_hom = false;
             dsgraph.phase = PHASE_SMAP;
             dsgraph.r_pmask(true, false);
         }
 
         // Fill the database
         // r_dsgraph_render_subspace				(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
-        dsgraph.render_subspace(m_largest_sector_id, &cull_frustum, cull_xform, cull_COP, FALSE);
+        dsgraph.build_subspace(m_largest_sector_id, &cull_frustum, cull_xform, cull_COP, FALSE);
 
         // Finalize & Cleanup
         RainLight.X.D.combine = cull_xform;

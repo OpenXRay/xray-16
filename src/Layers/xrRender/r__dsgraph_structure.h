@@ -19,6 +19,7 @@ struct R_dsgraph_structure
     u32 marker{};
     bool pmask[2];
     bool pmask_wmark;
+    bool use_hom{false};
 
     // Dynamic scene graph
     // R_dsgraph::mapNormal_T										mapNormal	[2]		;	// 2==(priority/2)
@@ -40,6 +41,7 @@ struct R_dsgraph_structure
     xr_vector<CSector*> Sectors;
     xr_vector<CPortal*> Portals;
     CPortalTraverser PortalTraverser;
+    xrXRC Sectors_xrc;
 
     // Runtime structures
     xr_vector<R_dsgraph::mapNormal_T::value_type*> nrmPasses;
@@ -71,7 +73,7 @@ struct R_dsgraph_structure
     }
     void clear_Counters() { counter_S = counter_D = 0; }
 
-    R_dsgraph_structure()
+    R_dsgraph_structure() : Sectors_xrc("dsgraph")
     {
         r_pmask(true, true);
     };
@@ -144,9 +146,10 @@ struct R_dsgraph_structure
     void render_emissive();
     void render_wmarks();
     void render_distort();
-    void render_subspace(IRender_Sector::sector_id_t sector_id, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
-        BOOL _dynamic, BOOL _precise_portals = FALSE);
-    void render_subspace(IRender_Sector::sector_id_t sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic,
-        BOOL _precise_portals = FALSE);
     void render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& _bb, int _element);
+
+    void build_subspace(IRender_Sector::sector_id_t sector_id, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
+        BOOL _dynamic, BOOL _precise_portals = FALSE);
+    void build_subspace(IRender_Sector::sector_id_t sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic,
+        BOOL _precise_portals = FALSE);
 };

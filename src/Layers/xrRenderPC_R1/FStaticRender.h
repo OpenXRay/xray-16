@@ -40,7 +40,7 @@ public:
 
 public:
     // Sector detection and visibility
-    CSector* pLastSector;
+    IRender_Sector::sector_id_t last_sector_id{IRender_Sector::INVALID_SECTOR_ID};
     Fvector vLastCameraPos;
     u32 uLastLTRACK;
     xrXRC Sectors_xrc;
@@ -101,7 +101,6 @@ public:
     IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
     IRender_Portal* getPortal(int id);
-    IRender_Sector* getSectorActive();
     IRenderVisual* model_CreatePE(LPCSTR name);
     void ApplyBlur2(FVF::TL2uv* dest, u32 size) const;
     void ApplyBlur4(FVF::TL4uv* dest, u32 w, u32 h, float k) const;
@@ -131,13 +130,12 @@ public:
     virtual LPCSTR getShaderPath() override { return "r1" DELIMITER ""; }
     virtual ref_shader getShader(int id);
     virtual IRenderVisual* getVisual(int id) override;
-    virtual IRender_Sector* detectSector(const Fvector& P) override;
-    IRender_Sector* detectSector(const Fvector& P, Fvector& D);
+    virtual IRender_Sector::sector_id_t detectSector(const Fvector& P) override;
+    IRender_Sector::sector_id_t detectSector(const Fvector& P, Fvector& D);
     virtual IRender_Target* getTarget() override;
 
     // Main
     void set_Object(IRenderable* O);
-    virtual void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
     void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf (no culling performed at all)
     void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
 

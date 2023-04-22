@@ -130,7 +130,7 @@ void CRender::level_Unload()
     //*** Sectors
     // 1.
     xr_delete(rmPortals);
-    pLastSector = nullptr;
+    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
@@ -417,7 +417,7 @@ void CRender::LoadSectors(IReader* fs)
 
     dsgraph.load(sectors_data, portals_data);
 
-    pLastSector = nullptr;
+    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
 
 void CRender::LoadSWIs(CStreamReader* base_fs)

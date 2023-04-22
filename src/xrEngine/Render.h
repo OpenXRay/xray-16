@@ -304,11 +304,10 @@ public:
     virtual pcstr getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
-    virtual IRender_Sector* detectSector(const Fvector& P) = 0;
+    virtual IRender_Sector::sector_id_t detectSector(const Fvector& P) = 0;
     virtual IRender_Target* getTarget() = 0;
 
     // Main
-    virtual void add_Occluder(Fbox2& bb_screenspace) = 0; // mask screen region as oclluded (-1..1, -1..1)
     virtual void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
     virtual void add_Geometry(IRenderVisual* V, const CFrustum& view) = 0; // add visual(s) (all culling performed)
     // virtual void add_StaticWallmark (ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)=0;

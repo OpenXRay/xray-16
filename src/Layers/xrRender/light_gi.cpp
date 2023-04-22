@@ -28,7 +28,7 @@ void light::gi_generate()
         xrc.ray_query(CDB::OPT_CULL | CDB::OPT_ONLYNEAREST, model, position, dir, range);
         if (!xrc.r_count())
             continue;
-        CDB::RESULT* R = RImplementation.Sectors_xrc.r_begin();
+        CDB::RESULT* R = xrc.r_begin();
         CDB::TRI& T = tris[R->id];
         Fvector Tv[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
         Fvector TN;

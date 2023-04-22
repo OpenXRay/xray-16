@@ -149,7 +149,7 @@ public:
 public:
     RenderR2Statistics Stats;
     // Sector detection and visibility
-    CSector* pLastSector;
+    IRender_Sector::sector_id_t last_sector_id{IRender_Sector::INVALID_SECTOR_ID};
     u32 uLastLTRACK;
     xrXRC Sectors_xrc;
     CDB::MODEL* rmPortals;
@@ -235,9 +235,8 @@ public:
     VertexStagingBuffer* getVB(int id, bool alternative = false);
     IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
-    IRender_Sector* getSectorActive();
     IRenderVisual* model_CreatePE(LPCSTR name);
-    IRender_Sector* detectSector(const Fvector& P, Fvector& D);
+    IRender_Sector::sector_id_t detectSector(const Fvector& P, Fvector& D);
 
     // HW-occlusion culling
     u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
@@ -335,11 +334,10 @@ public:
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
     ref_shader getShader(int id);
     IRenderVisual* getVisual(int id) override;
-    IRender_Sector* detectSector(const Fvector& P) override;
+    IRender_Sector::sector_id_t detectSector(const Fvector& P) override;
     IRender_Target* getTarget() override;
 
     // Main
-    void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
     void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
     void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
 

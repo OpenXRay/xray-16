@@ -248,7 +248,6 @@ ref_shader CRender::getShader(int id)
     VERIFY(id < int(Shaders.size()));
     return Shaders[id];
 }
-IRender_Sector* CRender::getSectorActive() { return pLastSector; }
 IRenderVisual* CRender::getVisual(int id)
 {
     VERIFY(id < int(Visuals.size()));
@@ -350,7 +349,6 @@ void CRender::add_SkeletonWallmark(
     if (pShader)
         add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
-void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace); }
 
 #include "xrEngine/PS_instance.h"
 void CRender::set_Object(IRenderable* O)
@@ -467,18 +465,20 @@ void CRender::Calculate()
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     gm_SetNearer(FALSE);
+    dsgraph.use_hom = true;
     dsgraph.phase = PHASE_NORMAL;
 
     // Detect camera-sector
     if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
     {
-        CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
-        if (pSector && (pSector != pLastSector))
-            g_pGamePersistent->OnSectorChanged(pSector->unique_id);
-
-        if (nullptr == pSector)
-            pSector = pLastSector;
-        pLastSector = pSector;
+        const auto sector_id = detectSector(Device.vCameraPosition);
+        if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
+        {
+            if (sector_id != last_sector_id)
+                g_pGamePersistent->OnSectorChanged(sector_id);
+        
+            last_sector_id = sector_id;
+        }
         vLastCameraPos.set(Device.vCameraPosition);
 
         // Check if camera is too near to some portal - if so force DualRender
@@ -486,10 +486,10 @@ void CRender::Calculate()
         {
             Fvector box_radius;
             box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
-            Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
-            for (int K = 0; K < Sectors_xrc.r_count(); K++)
+            dsgraph.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
+            for (int K = 0; K < dsgraph.Sectors_xrc.r_count(); K++)
             {
-                CPortal* pPortal = dsgraph.Portals[rmPortals->get_tris()[Sectors_xrc.r_begin()[K].id].dummy];
+                CPortal* pPortal = dsgraph.Portals[rmPortals->get_tris()[dsgraph.Sectors_xrc.r_begin()[K].id].dummy];
                 pPortal->bDualRender = TRUE;
             }
         }
@@ -502,10 +502,11 @@ void CRender::Calculate()
     dsgraph.marker++;
     set_Object(nullptr);
     TaskScheduler->Wait(*ProcessHOMTask);
-    if (pLastSector)
+    if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
     {
         // Traverse sector/portal structure
-        dsgraph.PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
+        dsgraph.PortalTraverser.traverse(dsgraph.Sectors[last_sector_id], ViewBase, Device.vCameraPosition,
+            Device.mFullTransform,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
         // Determine visibility for static geometry hierarchy
@@ -686,14 +687,14 @@ void CRender::Render()
 
     dsgraph.r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
-    HOM.Disable();
+    dsgraph.use_hom = false;
     L_Dynamic->render(0); // additional light sources
     if (Wallmarks)
     {
         g_r = 0;
         Wallmarks->Render(); // wallmarks has priority as normal geometry
     }
-    HOM.Enable();
+    dsgraph.use_hom = true;
     o.vis_intersect = FALSE;
     dsgraph.phase = PHASE_NORMAL;
     dsgraph.r_pmask(true, true); // enable priority "0" and "1"
