@@ -403,7 +403,7 @@ void CRender::render_sun()
     xr_vector<Fbox3>& s_receivers = main_coarse_structure;
     s_casters.reserve(s_receivers.size());
     dsgraph.set_Recorder(&s_casters);
-    dsgraph.render_subspace(m_largest_sector_id, &cull_frustum, cull_xform, cull_COP, TRUE);
+    dsgraph.build_subspace(m_largest_sector_id, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // IGNORE PORTALS
     if (ps_r2_ls_flags.test(R2FLAG_SUN_IGNORE_PORTALS))
@@ -929,7 +929,7 @@ void CRender::render_sun_near()
     }
 
     // Fill the database
-    dsgraph.render_subspace(m_largest_sector_id, &cull_frustum, cull_xform, cull_COP, TRUE);
+    dsgraph.build_subspace(m_largest_sector_id, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = cull_xform;
@@ -1263,7 +1263,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     }
 
     // Fill the database
-    dsgraph.render_subspace(m_largest_sector_id, &cull_frustum, cull_xform, cull_COP, TRUE);
+    dsgraph.build_subspace(m_largest_sector_id, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
     fuckingsun->X.D.combine = cull_xform;

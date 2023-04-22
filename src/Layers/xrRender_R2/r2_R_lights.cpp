@@ -104,7 +104,7 @@ void CRender::render_lights(light_Package& LP)
             dsgraph.r_pmask(true, o.Tshadows);
             L->svis.begin();
             PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
-            dsgraph.render_subspace(L->spatial.sector_id, L->X.S.combine, L->position, TRUE);
+            dsgraph.build_subspace(L->spatial.sector_id, L->X.S.combine, L->position, TRUE);
             bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
             bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
                 !dsgraph.mapSorted.empty();

@@ -196,7 +196,7 @@ void CLightR_Manager::render_point(u32 _priority)
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.render_subspace(L->spatial.sector_id, L_combine, L_pos, true, true);
+        RImplementation.dsgraph.build_subspace(L->spatial.sector_id, L_combine, L_pos, true, true);
 
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(true, true);
@@ -272,7 +272,7 @@ void CLightR_Manager::render_spot(u32 _priority)
         if (_priority == 1)
             RImplementation.dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.render_subspace(L->spatial.sector_id, L_combine, L_pos, TRUE,
+        RImplementation.dsgraph.build_subspace(L->spatial.sector_id, L_combine, L_pos, TRUE,
             TRUE // precise portals
             );
 
