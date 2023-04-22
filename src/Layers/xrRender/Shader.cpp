@@ -148,7 +148,9 @@ u32 STextureList::find_texture_stage(const shared_str& TexName, bool warnIfMissi
             return stage;
     }
 
-    VERIFY3(!warnIfMissing, "Couldn't find texture stage", TexName.c_str());
+    if (!warnIfMissing)
+        return u32(-1);
+    VERIFY3(false, "Couldn't find texture stage", TexName.c_str());
     return 0;
 }
 
