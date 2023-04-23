@@ -65,7 +65,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
                 // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
                 // RCache.hemi.c_update(item.pVisual);
 
-                item.pVisual->Render(LOD);
+                item.pVisual->Render(LOD, o.phase == CRender::PHASE_SMAP);
             }
             items.clear();
 
@@ -105,7 +105,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
                 // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
                 // RCache.hemi.c_update(item.pVisual);
 
-                item.pVisual->Render(LOD);
+                item.pVisual->Render(LOD, o.phase == CRender::PHASE_SMAP);
             }
             items.clear();
         }
@@ -208,7 +208,7 @@ void __fastcall render_item(const T& item)
     hud_transform_helper::apply_custom_state();
     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
     //RCache.hemi.c_update(V);
-    V->Render(calcLOD(item.first, V->vis.sphere.R));
+    V->Render(calcLOD(item.first, V->vis.sphere.R), RImplementation.active_phase() == CRender::PHASE_SMAP);
 }
 
 template<class T>
@@ -389,7 +389,7 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
                 for (u32 pass = 0; pass < E2->passes.size(); pass++)
                 {
                     RCache.set_Element(E2, pass);
-                    V->Render(-1.f);
+                    V->Render(-1.f, o.phase == CRender::PHASE_SMAP);
                 }
             }
         }

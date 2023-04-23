@@ -22,7 +22,8 @@ public:
     enum
     {
         PHASE_NORMAL,
-        PHASE_POINT,
+        PHASE_SMAP,
+        PHASE_POINT = PHASE_SMAP,
         PHASE_SPOT
     };
 

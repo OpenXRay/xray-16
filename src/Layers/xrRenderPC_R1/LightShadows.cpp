@@ -317,7 +317,7 @@ void CLightShadows::calculate()
                 dxRender_Visual* V = N.pVisual;
                 RCache.set_Element(V->shader->E[SE_R1_LMODELS]);
                 RCache.set_xform_world(N.Matrix);
-                V->Render(-1.0f);
+                V->Render(-1.0f, RImplementation.active_phase() == CRender::PHASE_SMAP);
             }
 
             // register shadow and increment slot
