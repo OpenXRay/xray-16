@@ -26,6 +26,8 @@ void CRender::Calculate()
     r_ssaHZBvsTEX = _sqr(ps_r__ssaHZBvsTEX / 3) / g_fSCREEN;
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
 
+    auto& dsgraph = RImplementation.alloc_context(eRDSG_MAIN);
+
     // Detect camera-sector
     if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
     {

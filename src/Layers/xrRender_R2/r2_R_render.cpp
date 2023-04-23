@@ -75,7 +75,6 @@ void CRender::Render()
     PIX_EVENT(CRender_Render);
 
     g_r = 1;
-    VERIFY(dsgraph.mapDistort.empty());
 
 #if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
@@ -85,6 +84,7 @@ void CRender::Render()
     if (_menu_pp)
     {
         render_menu();
+        cleanup_contexts();
         return;
     }
 
@@ -106,6 +106,7 @@ void CRender::Render()
     }
 
     //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
+    auto& dsgraph = get_context(eRDSG_MAIN);
 
     // Configure
     o.distortion = FALSE; // disable distorion
@@ -130,7 +131,6 @@ void CRender::Render()
         m_zfill.mul(m_project, Device.mView);
         TaskScheduler->Wait(*ProcessHOMTask);
 
-        dsgraph.reset();
         if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
             dsgraph.o.phase = PHASE_SMAP;
@@ -178,7 +178,6 @@ void CRender::Render()
     if (!ps_r2_ls_flags.test(R2FLAG_ZFILL))
         TaskScheduler->Wait(*ProcessHOMTask);
 
-    dsgraph.reset();
     if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
     {
         dsgraph.o.phase = PHASE_NORMAL;
@@ -205,7 +204,7 @@ void CRender::Render()
     else
     {
         if (g_pGameLevel)
-            g_hud->Render_Last();
+            g_hud->Render_Last(dsgraph.context_id);
     }
 
     dsgraph.set_Recorder(nullptr);
@@ -343,7 +342,7 @@ void CRender::Render()
         PIX_EVENT(DEFER_WALLMARKS);
         Target->phase_wallmarks();
         g_r = 0;
-        Wallmarks->Render(); // wallmarks has priority as normal geometry
+        Wallmarks->Render(eRDSG_MAIN); // wallmarks has priority as normal geometry
     }
 
     // Update incremental shadowmap-visibility solver
@@ -445,10 +444,15 @@ void CRender::Render()
     }
 
     VERIFY(dsgraph.mapDistort.empty());
+
+    // we're done with rendering
+    cleanup_contexts();
 }
 
 void CRender::render_forward()
 {
+    auto& dsgraph = get_context(eRDSG_MAIN);
+
     VERIFY(dsgraph.mapDistort.empty());
     o.distortion = o.distortion_enabled; // enable distorion
 
@@ -456,7 +460,6 @@ void CRender::render_forward()
     //.todo: should be done inside "combine" with estimation of of luminance, tone-mapping, etc.
     {
         // level
-        dsgraph.reset();
         if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
             // Configure scene traversing
@@ -480,7 +483,7 @@ void CRender::render_forward()
         else
         {
             if (g_pGameLevel)
-                g_hud->Render_Last();
+                g_hud->Render_Last(dsgraph.context_id);
         }
 
         //	Igor: we don't want to render old lods on next frame.

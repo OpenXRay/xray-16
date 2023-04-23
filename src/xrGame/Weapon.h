@@ -49,7 +49,7 @@ public:
     virtual void UpdateCL();
     virtual void shedule_Update(u32 dt);
 
-    void renderable_Render(IRenderable* root) override;
+    void renderable_Render(u32 context_id, IRenderable* root) override;
     void render_hud_mode() override;
     bool need_renderable() override;
 

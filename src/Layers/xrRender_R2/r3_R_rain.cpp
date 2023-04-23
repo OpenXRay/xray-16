@@ -260,7 +260,8 @@ void CRender::render_rain()
         }
 
         // Begin SMAP-render
-        dsgraph.reset();
+        auto& dsgraph = get_context(eRDSG_MAIN);
+        dsgraph.reset(); // tmp
         {
             dsgraph.o.phase = PHASE_SMAP;
             dsgraph.r_pmask(true, false);
@@ -293,10 +294,7 @@ void CRender::render_rain()
                 //	Details->Render					()	;
             }
         }
-    }
-
-    // End SMAP-render
-    {
+        // End SMAP-render
         //		fuckingsun->svis.end					();
         dsgraph.r_pmask(true, false);
     }

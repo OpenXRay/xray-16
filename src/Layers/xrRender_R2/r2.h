@@ -228,8 +228,8 @@ public:
     void render_sun_cascades();
 
 public:
-    ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
-    ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
+    ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
+    ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     VertexElement* getVB_Format(int id, bool alternative = false);
     VertexStagingBuffer* getVB(int id, bool alternative = false);
     IndexStagingBuffer* getIB(int id, bool alternative = false);
@@ -335,7 +335,7 @@ public:
     IRender_Target* getTarget() override;
 
     // Main
-    void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
+    void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
     // wallmarks
     void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);
     void add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override;

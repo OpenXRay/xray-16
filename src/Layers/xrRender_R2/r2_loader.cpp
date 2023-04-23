@@ -106,10 +106,6 @@ void CRender::level_Load(IReader* fs)
     // End
     pApp->LoadEnd();
 
-    // sanity-clear
-    dsgraph.lstLODgroups.clear();
-    dsgraph.mapLOD.clear();
-
     // signal loaded
     b_loaded = TRUE;
 }
@@ -134,7 +130,12 @@ void CRender::level_Unload()
     Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
-    dsgraph.unload();
+    for (auto& [dsgraph, is_used] : dsgraph_pool)
+    {
+        dsgraph.reset();
+        dsgraph.unload();
+        is_used = false;
+    }
 
     //*** Lights
     // Glows.Unload			();
@@ -415,7 +416,12 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    dsgraph.load(sectors_data, portals_data);
+    for (auto& [dsgraph, is_used] : dsgraph_pool)
+    {
+        dsgraph.reset();
+        dsgraph.load(sectors_data, portals_data);
+        is_used = false;
+    }
 
     last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
@@ -470,6 +476,9 @@ void CRender::Load3DFluid()
             {
                 dx113DFluidVolume* pVolume = xr_new<dx113DFluidVolume>();
                 pVolume->Load("", F, 0);
+
+                // we don't have an aquired context yet so take any from the pool, it should be initialized already
+                auto& dsgraph = dsgraph_pool[0].first;
 
                 //	Attach to sector's static geometry
                 const auto sector_id = dsgraph.detect_sector(pVolume->getVisData().sphere.P);

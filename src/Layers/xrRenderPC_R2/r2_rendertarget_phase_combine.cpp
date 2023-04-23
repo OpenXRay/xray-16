@@ -214,7 +214,8 @@ void CRenderTarget::phase_combine()
     // Distortion filter
     BOOL bDistort = RImplementation.o.distortion_enabled; // This can be modified
     {
-        if ((0 == RImplementation.dsgraph.mapDistort.size()) && !_menu_pp)
+        auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+        if ((0 == dsgraph.mapDistort.size()) && !_menu_pp)
             bDistort = FALSE;
         if (bDistort)
         {
@@ -224,7 +225,7 @@ void CRenderTarget::phase_combine()
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
-            RImplementation.dsgraph.render_distort();
+            dsgraph.render_distort();
             if (g_pGamePersistent)
                 g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
         }

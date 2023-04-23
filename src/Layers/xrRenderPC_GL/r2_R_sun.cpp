@@ -433,7 +433,8 @@ void CRender::render_sun()
     xr_vector<Fbox3>& s_receivers = main_coarse_structure;
     s_casters.reserve(s_receivers.size());
 
-    dsgraph.reset();
+    auto& dsgraph = get_context(eRDSG_MAIN);
+    dsgraph.reset(); // tmp
     {
         //		fuckingsun->svis.begin					();
         dsgraph.o.phase = PHASE_SMAP;
@@ -953,7 +954,8 @@ void CRender::render_sun_near()
     }
 
     // Begin SMAP-render
-    dsgraph.reset();
+    auto& dsgraph = get_context(eRDSG_MAIN);
+    dsgraph.reset(); // tmp
     {
         //		fuckingsun->svis.begin					();
         dsgraph.o.phase = PHASE_SMAP;
@@ -1266,7 +1268,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     }
 
     // Begin SMAP-render
-    dsgraph.reset();
+    auto& dsgraph = get_context(eRDSG_MAIN);
+    dsgraph.reset(); // tmp
     {
         //		fuckingsun->svis.begin					();
         dsgraph.o.phase = PHASE_SMAP;

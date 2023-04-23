@@ -65,7 +65,7 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
     }
 
     // Select shader
-    ShaderElement* sh = RImplementation.rimp_select_sh_dynamic(pVisual, distSQ);
+    ShaderElement* sh = RImplementation.rimp_select_sh_dynamic(pVisual, distSQ, o.phase);
     if (nullptr == sh)
         return;
     if (!o.pmask[sh->flags.iPriority / 2])
@@ -176,7 +176,7 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
     }
 
     // Select shader
-    ShaderElement* sh = RImplementation.rimp_select_sh_static(pVisual, distSQ);
+    ShaderElement* sh = RImplementation.rimp_select_sh_static(pVisual, distSQ, o.phase);
     if (nullptr == sh)
         return;
     if (!o.pmask[sh->flags.iPriority / 2])
@@ -209,7 +209,7 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
 #endif
 
     if (val_feedback && counter_S == val_feedback_breakp)
-        val_feedback->rfeedback_static(pVisual);
+        val_feedback->rfeedback_static(context_id, pVisual);
 
     counter_S++;
 
@@ -298,7 +298,10 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
         else
         {
             pV->CalculateBones(TRUE);
-            pV->CalculateWallmarks(root ? root->renderable_HUD() : false); //. bug?
+            if (o.phase == CRender::PHASE_NORMAL)
+            {
+                pV->CalculateWallmarks(root ? root->renderable_HUD() : false); //. bug?
+            }
             for (auto& i : pV->children)
             {
                 i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
@@ -749,7 +752,7 @@ void R_dsgraph_structure::build_subspace()
     u32 uID_LTRACK = 0xffffffff;
     if (o.is_main_pass) // temporary
     {
-        if (RImplementation.active_phase() == CRender::PHASE_NORMAL)
+        if (o.phase == CRender::PHASE_NORMAL)
         {
             RImplementation.uLastLTRACK++;
             if (!lstRenderables.empty())
@@ -838,7 +841,7 @@ void R_dsgraph_structure::build_subspace()
                     }
 
                     // Rendering
-                    renderable->renderable_Render(renderable);
+                    renderable->renderable_Render(context_id, renderable);
                 }
                 break; // exit loop on frustums
             }
@@ -849,13 +852,13 @@ void R_dsgraph_structure::build_subspace()
                 if (nullptr == renderable)
                     continue; // unknown, but renderable object (r1_glow???)
 
-                renderable->renderable_Render(nullptr);
+                renderable->renderable_Render(context_id, nullptr);
             }
         }
     }
 
     if (o.is_main_pass && g_pGameLevel)
-        g_hud->Render_Last();
+        g_hud->Render_Last(context_id);
 
 #if RENDER != R_R1
     // Actor Shadow (Sun + Light)
@@ -881,7 +884,7 @@ void R_dsgraph_structure::build_subspace()
                     continue;
 
                 // renderable
-                g_hud->Render_First();
+                g_hud->Render_First(context_id);
             }
         } while (0);
     }

@@ -1068,12 +1068,12 @@ Fvector CGameObject::get_last_local_point_on_mesh(Fvector const& local_point, u1
     return result;
 }
 
-void CGameObject::renderable_Render(IRenderable* root)
+void CGameObject::renderable_Render(u32 context_id, IRenderable* root)
 {
     //
     MakeMeCrow();
     // ~
-    GEnv.Render->add_Visual(root, Visual(), XFORM());
+    GEnv.Render->add_Visual(context_id, root, Visual(), XFORM());
     Visual()->getVisData().hom_frame = Device.dwFrame;
 }
 

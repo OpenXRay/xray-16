@@ -62,16 +62,65 @@ public:
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 
-    u32 active_phase() const override { return dsgraph.o.phase; }
+    enum
+    {
+        eRDSG_MAIN, // shadred with forward
+#if 0//RENDER != R_R1
+        eRDSG_RAIN,
+        eRDSG_SHADOW_0, // cascade#0 or shadowed light use
+        eRDSG_SHADOW_1, // cascade#1 or shadowed light use
+        eRDSG_SHADOW_2, // cascade#2 or shadowed light use
+        //eRDSG_AUX_0..N if not engough
+#endif
+        eRDSG_NUM_CONTEXTS
+    };
+
+    // Lifetime tracking helpers
+    ICF R_dsgraph_structure& alloc_context(u32 context_id)
+    {
+        VERIFY(context_id < eRDSG_NUM_CONTEXTS);
+        VERIFY(dsgraph_pool[context_id].second == false);
+        VERIFY(dsgraph_pool[context_id].first.context_id == R_dsgraph_structure::INVALID_CONTEXT_ID);
+        dsgraph_pool[context_id].first.context_id = context_id;
+        dsgraph_pool[context_id].second = true;
+        return dsgraph_pool[context_id].first;
+    }
+    
+    ICF void release_context(u32 context_id)
+    {
+        VERIFY(context_id < eRDSG_NUM_CONTEXTS);
+        VERIFY(dsgraph_pool[context_id].second == true);
+        VERIFY(dsgraph_pool[context_id].first.context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
+        dsgraph_pool[context_id].first.reset();
+        dsgraph_pool[context_id].second = false;
+    }
+
+    ICF void cleanup_contexts()
+    {
+        for (int context_id = 0; context_id < eRDSG_NUM_CONTEXTS; ++context_id)
+        {
+            dsgraph_pool[context_id].first.reset();
+            dsgraph_pool[context_id].second = false;
+            dsgraph_pool[context_id].first.context_id = R_dsgraph_structure::INVALID_CONTEXT_ID; // tmp
+        }
+    }
+
+    ICF R_dsgraph_structure& get_context(u32 context_id)
+    {
+        VERIFY(context_id < eRDSG_NUM_CONTEXTS);
+        VERIFY(dsgraph_pool[context_id].second == true);
+        return dsgraph_pool[context_id].first;
+    }
 
 public:
-    R_dsgraph_structure dsgraph;
     CResourceManager* Resources{};
     ref_shader m_WireShader;
     ref_shader m_SelectionShader;
     ref_shader m_PortalFadeShader;
     ref_geom   m_PortalFadeGeom;
 
+protected:
+    std::pair<R_dsgraph_structure, bool> dsgraph_pool[eRDSG_NUM_CONTEXTS];
 private:
 #if defined(USE_DX9) || defined(USE_DX11)
     CGammaControl m_Gamma;

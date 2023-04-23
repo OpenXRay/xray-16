@@ -21,9 +21,9 @@
 CRender RImplementation;
 
 //////////////////////////////////////////////////////////////////////////
-ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /*cdist_sq*/)
+ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /*cdist_sq*/, u32 phase)
 {
-    switch (active_phase())
+    switch (phase)
     {
     case PHASE_NORMAL:
         return (RImplementation.L_Projector->shadowing() ?
@@ -37,9 +37,9 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /
 #endif
 }
 //////////////////////////////////////////////////////////////////////////
-ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq)
+ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase)
 {
-    switch (active_phase())
+    switch (phase)
     {
     case PHASE_NORMAL:
         return (((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < 44) ? pVisual->shader->E[SE_R1_NORMAL_HQ] :
@@ -302,9 +302,11 @@ IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
 bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
-void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
+void CRender::add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
-    set_Object(root);
+    // TODO: this whole function should be replaced by a list of renderables+xforms returned from `renderable_Render` call
+    auto& dsgraph = get_context(context_id);
+    set_Object(root, dsgraph.o.phase);
     dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
@@ -346,7 +348,7 @@ void CRender::add_SkeletonWallmark(
 }
 
 #include "xrEngine/PS_instance.h"
-void CRender::set_Object(IRenderable* O)
+void CRender::set_Object(IRenderable* O, u32 phase)
 {
     if (O)
     {
@@ -356,7 +358,7 @@ void CRender::set_Object(IRenderable* O)
             VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
         }
     }
-    if (PHASE_NORMAL == active_phase())
+    if (PHASE_NORMAL == phase)
     {
         if (L_Shadows)
             L_Shadows->set_object(O);
@@ -442,6 +444,8 @@ void CRender::Calculate()
     TAL_SCOPED_TASK_NAMED("CRender::Calculate()");
 #endif // _GPA_ENABLED
 
+    auto& dsgraph = alloc_context(eRDSG_MAIN);
+
     BasicStats.Culling.Begin();
 
     // Transfer to global space to avoid deep pointer access
@@ -495,7 +499,7 @@ void CRender::Calculate()
 
     // Main process
     dsgraph.marker++;
-    set_Object(nullptr);
+    set_Object(nullptr, dsgraph.o.phase);
     TaskScheduler->Wait(*ProcessHOMTask);
     if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
     {
@@ -533,13 +537,13 @@ void CRender::Calculate()
             });
 
             if (ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
-                g_hud->Render_First(); // R1 shadows
+                g_hud->Render_First(dsgraph.context_id); // R1 shadows
 
-            g_hud->Render_Last();
+            g_hud->Render_Last(dsgraph.context_id);
 
             // Determine visibility for dynamic part of scene
             u32 uID_LTRACK = 0xffffffff;
-            if (active_phase() == PHASE_NORMAL)
+            if (dsgraph.o.phase == PHASE_NORMAL)
             {
                 uLastLTRACK++;
                 if (dsgraph.lstRenderables.size())
@@ -615,7 +619,7 @@ void CRender::Calculate()
                             }
 
                             // Rendering
-                            renderable->renderable_Render(renderable);
+                            renderable->renderable_Render(dsgraph.context_id, renderable);
                         }
                         break; // exit loop on frustums
                     }
@@ -666,11 +670,18 @@ void CRender::Render()
         return;
     }
 
+    // This is an ugly workaround to prevent the context used without allocation in menus.
+    if (!dsgraph_pool[0].second)
+    {
+        alloc_context(eRDSG_MAIN);
+    }
+
     g_r = 1;
     BasicStats.Primitives.Begin();
     // Begin
     Target->Begin();
     o.vis_intersect = FALSE;
+    auto& dsgraph = get_context(eRDSG_MAIN);
     dsgraph.o.phase = PHASE_NORMAL;
     dsgraph.render_hud(); // hud
     dsgraph.render_graph(0); // normal level
@@ -688,7 +699,7 @@ void CRender::Render()
     if (Wallmarks)
     {
         g_r = 0;
-        Wallmarks->Render(); // wallmarks has priority as normal geometry
+        Wallmarks->Render(dsgraph.context_id); // wallmarks has priority as normal geometry
     }
     dsgraph.o.use_hom = true;
     o.vis_intersect = FALSE;
@@ -728,6 +739,8 @@ void CRender::Render()
 
     // HUD
     BasicStats.Primitives.End();
+
+    cleanup_contexts();
 }
 
 void CRender::ApplyBlur2(FVF::TL2uv* pv, u32 size) const

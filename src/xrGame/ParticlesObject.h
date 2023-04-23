@@ -28,7 +28,7 @@ public:
     virtual bool shedule_Needed() { return true; };
     virtual float shedule_Scale() const;
     virtual void shedule_Update(u32 dt);
-    void renderable_Render(IRenderable* root) override;
+    void renderable_Render(u32 context_id, IRenderable* root) override;
     void PerformAllTheWork(u32 dt);
     void PerformAllTheWork_mt();
 

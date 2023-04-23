@@ -99,9 +99,10 @@ void CRender::render_lights(light_Package& LP)
             Lights_LastFrame.push_back(L);
 
             // calculate
-            dsgraph.reset();
+            auto& dsgraph = get_context(eRDSG_MAIN);
+            dsgraph.reset(); // tmp
             {
-                L->svis.begin();
+                L->svis.begin(dsgraph.context_id);
 
                 dsgraph.o.phase = PHASE_SMAP;
                 dsgraph.r_pmask(true, o.Tshadows);
@@ -144,7 +145,7 @@ void CRender::render_lights(light_Package& LP)
             {
                 Stats.s_finalclip++;
             }
-            L->svis.end();
+            L->svis.end(dsgraph.context_id); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
             dsgraph.r_pmask(true, false);
         }
 

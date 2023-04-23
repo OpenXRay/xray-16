@@ -247,11 +247,11 @@ public:
     virtual void ForceTransform(const Fmatrix& m) override {}
     void ForceTransformAndDirection(const Fmatrix& m) override { ForceTransform(m); }
 
-    void OnHUDDraw(CCustomHUD* /*hud*/, IRenderable* /*root*/) override {}
+    void OnHUDDraw(u32 context_id, CCustomHUD* /*hud*/, IRenderable* /*root*/) override {}
     void OnRenderHUD(IGameObject* pCurViewEntity) override {} //--#SM+#--
     void OnOwnedCameraMove(CCameraBase* pCam, float fOldYaw, float fOldPitch) override  {} //--#SM+#--
     virtual bool Ready() override { return getReady(); } // update only if active and fully initialized by/for network
-    void renderable_Render(IRenderable* root) override;
+    void renderable_Render(u32 context_id, IRenderable* root) override;
     virtual void OnEvent(NET_Packet& P, u16 type) override;
     virtual void Hit(SHit* pHDS) override {}
     virtual void SetHitInfo(IGameObject* who, IGameObject* weapon, s16 element, Fvector Pos, Fvector Dir) override {}

@@ -48,7 +48,7 @@ void CHUDManager::OnFrame()
 }
 //--------------------------------------------------------------------
 
-void CHUDManager::Render_First()
+void CHUDManager::Render_First(u32 context_id)
 {
     if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))
         return;
@@ -65,7 +65,7 @@ void CHUDManager::Render_First()
     // On R2+ render everything
     O->renderable_Invisible(GEnv.Render->GenerationIsR1());
 
-    O->renderable_Render(O->H_Root());
+    O->renderable_Render(context_id, O->H_Root());
 
     O->renderable_Invisible(false);
 }
@@ -89,7 +89,7 @@ bool need_render_hud()
     return true;
 }
 
-void CHUDManager::Render_Last()
+void CHUDManager::Render_Last(u32 context_id)
 {
     if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))
         return;
@@ -102,7 +102,7 @@ void CHUDManager::Render_Last()
     IGameObject* O = g_pGameLevel->CurrentViewEntity();
     // hud itself
     O->renderable_HUD(true);
-    O->OnHUDDraw(this, O->H_Root());
+    O->OnHUDDraw(context_id, this, O->H_Root());
     O->renderable_HUD(false);
 }
 

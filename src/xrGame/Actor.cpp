@@ -1493,11 +1493,11 @@ void CActor::shedule_Update(u32 DT)
     Check_for_AutoPickUp();
 };
 #include "debug_renderer.h"
-void CActor::renderable_Render(IRenderable* root)
+void CActor::renderable_Render(u32 context_id, IRenderable* root)
 {
     VERIFY(_valid(XFORM()));
-    inherited::renderable_Render(root);
-    CInventoryOwner::renderable_Render(root);
+    inherited::renderable_Render(context_id, root);
+    CInventoryOwner::renderable_Render(context_id, root);
 }
 
 bool CActor::renderable_ShadowGenerate()
@@ -1537,11 +1537,11 @@ bool CActor::use_default_throw_force()
 float CActor::missile_throw_force() { return 0.f; }
 
 // HUD
-void CActor::OnHUDDraw(CCustomHUD* hud, IRenderable* root)
+void CActor::OnHUDDraw(u32 context_id, CCustomHUD* hud, IRenderable* root)
 {
     R_ASSERT(IsFocused());
     if (!((mstate_real & mcLookout) && !IsGameTypeSingle()))
-        g_player_hud->render_hud(root);
+        g_player_hud->render_hud(context_id, root);
 }
 
 void CActor::RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& IndShader)

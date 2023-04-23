@@ -95,13 +95,12 @@ private:
     void LoadSWIs(CStreamReader* fs);
 
 public:
-    ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
-    ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
+    ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
+    ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     VertexElement* getVB_Format(int id, bool alternative = false);
     VertexStagingBuffer* getVB(int id, bool alternative = false);
     IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
-    IRender_Portal* getPortal(int id);
     IRenderVisual* model_CreatePE(LPCSTR name);
     void ApplyBlur2(FVF::TL2uv* dest, u32 size) const;
     void ApplyBlur4(FVF::TL4uv* dest, u32 w, u32 h, float k) const;
@@ -134,8 +133,8 @@ public:
     virtual IRender_Target* getTarget() override;
 
     // Main
-    void set_Object(IRenderable* O);
-    void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf (no culling performed at all)
+    void set_Object(IRenderable* O, u32 phase);
+    void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf (no culling performed at all)
 
     // wallmarks
     virtual void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);

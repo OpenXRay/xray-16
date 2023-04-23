@@ -197,8 +197,10 @@ u32 hud_transform_helper::cullMode = CULL_NONE;
 bool hud_transform_helper::isActive = false;
 
 template<class T>
-void __fastcall render_item(const T& item)
+void __fastcall render_item(u32 context_id, const T& item)
 {
+    auto& dsgraph = RImplementation.get_context(context_id);
+
     dxRender_Visual* V = item.second.pVisual;
     VERIFY(V && V->shader._get());
     RCache.set_Element(item.second.se);
@@ -208,20 +210,20 @@ void __fastcall render_item(const T& item)
     hud_transform_helper::apply_custom_state();
     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
     //RCache.hemi.c_update(V);
-    V->Render(calcLOD(item.first, V->vis.sphere.R), RImplementation.active_phase() == CRender::PHASE_SMAP);
+    V->Render(calcLOD(item.first, V->vis.sphere.R), dsgraph.o.phase == CRender::PHASE_SMAP);
 }
 
 template<class T>
-ICF void sort_front_to_back_render_and_clean(T& vec)
+ICF void sort_front_to_back_render_and_clean(u32 context_id, T& vec)
 {
-    vec.traverse_left_right(render_item);
+    vec.traverse_left_right(context_id, render_item);
     vec.clear();
 }
 
 template<class T>
-ICF void sort_back_to_front_render_and_clean(T& vec)
+ICF void sort_back_to_front_render_and_clean(u32 context_id, T& vec)
 {
-    vec.traverse_right_left(render_item);
+    vec.traverse_right_left(context_id, render_item);
     vec.clear();
 }
 
@@ -234,7 +236,7 @@ void R_dsgraph_structure::render_hud()
     if (!mapHUD.empty())
     {
         hud_transform_helper helper;
-        sort_front_to_back_render_and_clean(mapHUD);
+        sort_front_to_back_render_and_clean(context_id, mapHUD);
     }
 
 #if RENDER == R_R1
@@ -277,12 +279,12 @@ void R_dsgraph_structure::render_sorted()
 {
     PIX_EVENT(r_dsgraph_render_sorted);
 
-    sort_back_to_front_render_and_clean(mapSorted);
+    sort_back_to_front_render_and_clean(context_id, mapSorted);
 
     if (!mapHUDSorted.empty())
     {
         hud_transform_helper helper;
-        sort_back_to_front_render_and_clean(mapHUDSorted);
+        sort_back_to_front_render_and_clean(context_id, mapHUDSorted);
     }
 }
 
@@ -293,12 +295,12 @@ void R_dsgraph_structure::render_emissive()
 #if RENDER != R_R1
     PIX_EVENT(r_dsgraph_render_emissive);
 
-    sort_front_to_back_render_and_clean(mapEmissive);
+    sort_front_to_back_render_and_clean(context_id, mapEmissive);
 
     if (!mapHUDEmissive.empty())
     {
         hud_transform_helper helper;
-        sort_front_to_back_render_and_clean(mapHUDEmissive);
+        sort_front_to_back_render_and_clean(context_id, mapHUDEmissive);
     }
 #endif
 }
@@ -310,7 +312,7 @@ void R_dsgraph_structure::render_wmarks()
 #if RENDER != R_R1
     PIX_EVENT(r_dsgraph_render_wmarks);
 
-    sort_front_to_back_render_and_clean(mapWmark);
+    sort_front_to_back_render_and_clean(context_id, mapWmark);
 #endif
 }
 
@@ -320,7 +322,7 @@ void R_dsgraph_structure::render_distort()
 {
     PIX_EVENT(r_dsgraph_render_distort);
 
-    sort_back_to_front_render_and_clean(mapDistort);
+    sort_back_to_front_render_and_clean(context_id, mapDistort);
 }
 
 #include "SkeletonCustom.h"

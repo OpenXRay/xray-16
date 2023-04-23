@@ -307,7 +307,7 @@ public:
     virtual IRender_Target* getTarget() = 0;
 
     // Main
-    virtual void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
+    virtual void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
     // virtual void add_StaticWallmark (ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)=0;
     virtual void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) = 0;
     // Prefer this function when possible
@@ -368,7 +368,6 @@ public:
     virtual void rmNear() = 0;
     virtual void rmFar() = 0;
     virtual void rmNormal() = 0;
-    virtual u32 active_phase() const = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}

@@ -19,9 +19,10 @@ void smapvis::invalidate()
     frame_sleep = Device.dwFrame + ps_r__LightSleepFrames;
     invisible.clear();
 }
-void smapvis::begin()
+void smapvis::begin(u32 context_id)
 {
-    RImplementation.dsgraph.clear_Counters();
+    auto& dsgraph = RImplementation.get_context(context_id);
+    dsgraph.clear_Counters();
     switch (state)
     {
     case state_counting:
@@ -31,22 +32,24 @@ void smapvis::begin()
         // mark already known to be invisible visuals, set breakpoint
         testQ_V = 0;
         testQ_id = 0;
-        mark();
-        RImplementation.dsgraph.set_Feedback(this, test_current);
+        mark(context_id);
+        dsgraph.set_Feedback(this, test_current);
         break;
     case state_usingTC:
         // just mark
-        mark();
+        mark(context_id);
         break;
     }
 }
-void smapvis::end()
+void smapvis::end(u32 context_id)
 {
+    auto& dsgraph = RImplementation.get_context(context_id);
+
     // Gather stats
     u32 ts, td;
-    RImplementation.dsgraph.get_Counters(ts, td);
+    dsgraph.get_Counters(ts, td);
     RImplementation.Stats.ic_total += ts;
-    RImplementation.dsgraph.set_Feedback(0, 0);
+    dsgraph.set_Feedback(0, 0);
 
     switch (state)
     {
@@ -65,9 +68,9 @@ void smapvis::end()
         if (testQ_V)
         {
             RImplementation.occq_begin(testQ_id);
-            RImplementation.dsgraph.marker += 1;
-            RImplementation.dsgraph.insert_static(testQ_V);
-            RImplementation.dsgraph.render_graph(0);
+            dsgraph.marker += 1;
+            dsgraph.insert_static(testQ_V);
+            dsgraph.render_graph(0);
             RImplementation.occq_end(testQ_id);
             testQ_frame = Device.dwFrame + 1; // get result on next frame
         }
@@ -115,16 +118,18 @@ void smapvis::resetoccq()
     flushoccq();
 }
 
-void smapvis::mark()
+void smapvis::mark(u32 context_id)
 {
+    auto& dsgraph = RImplementation.get_context(context_id);
     RImplementation.Stats.ic_culled += invisible.size();
-    u32 marker = RImplementation.dsgraph.marker + 1; // we are called befor marker increment
+    u32 marker = dsgraph.marker + 1; // we are called befor marker increment
     for (u32 it = 0; it < invisible.size(); it++)
         invisible[it]->vis.marker = marker; // this effectively disables processing
 }
 
-void smapvis::rfeedback_static(dxRender_Visual* V)
+void smapvis::rfeedback_static(u32 context_id, dxRender_Visual* V)
 {
     testQ_V = V;
-    RImplementation.dsgraph.set_Feedback(0, 0);
+    auto& dsgraph = RImplementation.get_context(context_id);
+    dsgraph.set_Feedback(0, 0);
 }
