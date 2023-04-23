@@ -25,6 +25,26 @@
 class CRenderTarget;
 class dxRender_Visual;
 
+// TODO: move it into separate file.
+struct i_render_phase
+{
+    virtual void init() = 0;
+    virtual void calculate() = 0;
+    virtual void render() = 0;
+};
+
+struct render_rain : public i_render_phase
+{
+    void init() override;
+    void calculate() override;
+    void render() override;
+
+    bool should_render() const;
+
+    light RainLight;
+};
+//----
+
 // definition
 class CRender final : public D3DXRenderBase
 {
@@ -179,7 +199,6 @@ public:
     SMAP_Allocator LP_smap_pool;
     light_Package LP_normal;
     light_Package LP_pending;
-    light RainLight;
 
     xr_vector<Fbox3> main_coarse_structure;
 
@@ -220,7 +239,7 @@ public:
     void render_sun_filtered() const;
     void render_menu();
 #if RENDER != R_R2
-    void render_rain();
+    render_rain r_rain;
 #endif
 
     void render_sun_cascade(u32 cascade_ind);
@@ -228,6 +247,7 @@ public:
     void render_sun_cascades();
 
 public:
+    auto get_largest_sector() const { return largest_sector_id; }
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     VertexElement* getVB_Format(int id, bool alternative = false);

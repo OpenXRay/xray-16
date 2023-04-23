@@ -100,7 +100,6 @@ void CRender::render_lights(light_Package& LP)
 
             // calculate
             auto& dsgraph = get_context(eRDSG_SHADOW_0); // TODO: batch by 3 smaps
-            dsgraph.reset(); // tmp
             {
                 L->svis.begin(dsgraph.context_id);
 
