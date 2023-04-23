@@ -121,7 +121,7 @@ public:
     virtual void level_Load(IReader* fs) override;
     virtual void level_Unload() override;
 
-    virtual ID3DBaseTexture* texture_load(LPCSTR fname, u32& msize);
+    ID3DBaseTexture* texture_load(LPCSTR fname, u32& msize);
     virtual HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags,
         void*& result) override;
 
