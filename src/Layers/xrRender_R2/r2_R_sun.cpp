@@ -392,8 +392,7 @@ void CRender::render_sun()
     xr_vector<Fbox3>& s_receivers = main_coarse_structure;
     s_casters.reserve(s_receivers.size());
 
-    auto& dsgraph = get_context(eRDSG_MAIN);
-    dsgraph.reset(); // tmp
+    auto& dsgraph = get_context(eRDSG_SHADOW_1);
     {
         //		fuckingsun->svis.begin					();
         dsgraph.o.phase = PHASE_SMAP;
@@ -920,8 +919,7 @@ void CRender::render_sun_near()
     }
 
     // Begin SMAP-render
-    auto& dsgraph = get_context(eRDSG_MAIN);
-    dsgraph.reset(); // tmp
+    auto& dsgraph = get_context(eRDSG_SHADOW_0);
     {
         //		fuckingsun->svis.begin					();
         dsgraph.o.use_hom = false;
@@ -1257,11 +1255,9 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     }
 
     // Begin SMAP-render
-    auto& dsgraph = get_context(eRDSG_MAIN);
-    dsgraph.reset(); // tmp
+    auto& dsgraph = get_context(eRDSG_SHADOW_0 + cascade_ind);
     {
         //		fuckingsun->svis.begin					();
-
         dsgraph.o.phase = PHASE_SMAP;
         dsgraph.r_pmask(true, o.Tshadows);
         dsgraph.o.sector_id = largest_sector_id;

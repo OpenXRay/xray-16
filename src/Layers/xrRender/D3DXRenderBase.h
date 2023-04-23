@@ -65,7 +65,7 @@ public:
     enum
     {
         eRDSG_MAIN, // shadred with forward
-#if 0//RENDER != R_R1
+#if RENDER != R_R1
         eRDSG_RAIN,
         eRDSG_SHADOW_0, // cascade#0 or shadowed light use
         eRDSG_SHADOW_1, // cascade#1 or shadowed light use

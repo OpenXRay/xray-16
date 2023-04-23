@@ -26,12 +26,12 @@ void CRender::Calculate()
     r_ssaHZBvsTEX = _sqr(ps_r__ssaHZBvsTEX / 3) / g_fSCREEN;
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
 
-    auto& dsgraph = RImplementation.alloc_context(eRDSG_MAIN);
+    auto& dsgraph_main = RImplementation.alloc_context(eRDSG_MAIN);
 
     // Detect camera-sector
     if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
     {
-        const auto sector_id = dsgraph.detect_sector(Device.vCameraPosition);
+        const auto sector_id = dsgraph_main.detect_sector(Device.vCameraPosition);
         if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
             if (sector_id != last_sector_id)
@@ -50,7 +50,7 @@ void CRender::Calculate()
     for (auto spatial : spatial_lights)
     {
         const auto& entity_pos = spatial->spatial_sector_point();
-        spatial->spatial_updatesector(dsgraph.detect_sector(entity_pos));
+        spatial->spatial_updatesector(dsgraph_main.detect_sector(entity_pos));
         const auto sector_id = spatial->GetSpatialData().sector_id;
         if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
             continue; // disassociated from S/P structure
@@ -62,5 +62,8 @@ void CRender::Calculate()
         Lights.add_light(L);
     }
 
-    // TODO: dsgraph setup goes here
+    auto& dsgraph_rain = alloc_context(eRDSG_RAIN);
+    auto& dsgraph_shadow0 = alloc_context(eRDSG_SHADOW_0);
+    auto& dsgraph_shadow1 = alloc_context(eRDSG_SHADOW_1);
+    auto& dsgraph_shadow2 = alloc_context(eRDSG_SHADOW_2);
 }

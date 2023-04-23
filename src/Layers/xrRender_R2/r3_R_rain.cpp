@@ -260,8 +260,7 @@ void CRender::render_rain()
         }
 
         // Begin SMAP-render
-        auto& dsgraph = get_context(eRDSG_MAIN);
-        dsgraph.reset(); // tmp
+        auto& dsgraph = get_context(eRDSG_RAIN);
         {
             dsgraph.o.phase = PHASE_SMAP;
             dsgraph.r_pmask(true, false);
