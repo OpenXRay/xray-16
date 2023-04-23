@@ -33,7 +33,7 @@ set(CMAKE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 
 # Set the shared object search path for the installation
-set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
 
 # Set the shared object search path for the build tree
 # On Linux/BSD we can use $ORIGIN to search for modules next to the executable
