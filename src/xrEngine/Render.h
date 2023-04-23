@@ -304,7 +304,6 @@ public:
     virtual pcstr getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
-    virtual IRender_Sector::sector_id_t detectSector(const Fvector& P) = 0;
     virtual IRender_Target* getTarget() = 0;
 
     // Main

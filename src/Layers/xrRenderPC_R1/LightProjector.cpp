@@ -82,7 +82,8 @@ void CLightProjector::set_object(IRenderable* O)
                 current = nullptr;
             else
             {
-                spatial->spatial_updatesector();
+                const auto& entity_pos = spatial->spatial_sector_point();
+                spatial->spatial_updatesector(RImplementation.dsgraph.detect_sector(entity_pos));
                 if (spatial->GetSpatialData().sector_id == IRender_Sector::INVALID_SECTOR_ID)
                 {
                     IGameObject* obj = dynamic_cast<IGameObject*>(O);
@@ -319,7 +320,9 @@ void CLightProjector::calculate()
         ISpatial* spatial = dynamic_cast<ISpatial*>(O);
         if (spatial)
         {
-            spatial->spatial_updatesector();
+            const auto& entity_pos = spatial->spatial_sector_point();
+            const auto sector_id = RImplementation.dsgraph.detect_sector(entity_pos);
+            spatial->spatial_updatesector(sector_id);
             if (spatial->GetSpatialData().sector_id != IRender_Sector::INVALID_SECTOR_ID)
                 RImplementation.dsgraph.render_R1_box(spatial->GetSpatialData().sector_id, BB, SE_R1_LMODELS);
         }

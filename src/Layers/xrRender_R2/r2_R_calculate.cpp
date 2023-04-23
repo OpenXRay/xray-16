@@ -29,7 +29,7 @@ void CRender::Calculate()
     // Detect camera-sector
     if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
     {
-        const auto sector_id = detectSector(Device.vCameraPosition);
+        const auto sector_id = dsgraph.detect_sector(Device.vCameraPosition);
         if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
             if (sector_id != last_sector_id)
@@ -47,7 +47,8 @@ void CRender::Calculate()
     g_SpatialSpace->q_sphere(spatial_lights, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
     for (auto spatial : spatial_lights)
     {
-        spatial->spatial_updatesector();
+        const auto& entity_pos = spatial->spatial_sector_point();
+        spatial->spatial_updatesector(dsgraph.detect_sector(entity_pos));
         const auto sector_id = spatial->GetSpatialData().sector_id;
         if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
             continue; // disassociated from S/P structure
