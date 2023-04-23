@@ -774,7 +774,9 @@ void R_dsgraph_structure::build_subspace()
         ISpatial* spatial = lstRenderables[o_it];
         if (o.is_main_pass)
         {
-            spatial->spatial_updatesector();
+            const auto& entity_pos = spatial->spatial_sector_point();
+            const auto sector_id = detect_sector(entity_pos);
+            spatial->spatial_updatesector(sector_id);
         }
         const auto& data = spatial->GetSpatialData();
         const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
@@ -864,7 +866,8 @@ void R_dsgraph_structure::build_subspace()
             IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
             if (viewEntity == nullptr)
                 break;
-            viewEntity->spatial_updatesector();
+            const auto& entity_pos = viewEntity->spatial_sector_point();
+            viewEntity->spatial_updatesector(detect_sector(entity_pos));
             const auto sector_id = viewEntity->GetSpatialData().sector_id;
             if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                 break; // disassociated from S/P structure

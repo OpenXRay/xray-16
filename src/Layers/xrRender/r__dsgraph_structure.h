@@ -153,6 +153,8 @@ struct R_dsgraph_structure
         VERIFY(id < Sectors.size());
         return Sectors[id];
     }
+    IRender_Sector::sector_id_t detect_sector(const Fvector& P);
+    IRender_Sector::sector_id_t detect_sector(const Fvector& P, Fvector& D);
 
     void add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
     void add_leafs_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility

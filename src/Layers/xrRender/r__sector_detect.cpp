@@ -1,25 +1,25 @@
 #include "stdafx.h"
 
-IRender_Sector::sector_id_t CRender::detectSector(const Fvector& P)
+IRender_Sector::sector_id_t R_dsgraph_structure::detect_sector(const Fvector& P)
 {
     Fvector dir{ 0, -1, 0 };
-    auto sector = detectSector(P, dir);
+    auto sector = detect_sector(P, dir);
     if (sector == IRender_Sector::INVALID_SECTOR_ID)
     {
         dir = { 0, 1, 0 };
-        sector = detectSector(P, dir);
+        sector = detect_sector(P, dir);
     }
     return sector;
 }
 
-IRender_Sector::sector_id_t CRender::detectSector(const Fvector& P, Fvector& dir)
+IRender_Sector::sector_id_t R_dsgraph_structure::detect_sector(const Fvector& P, Fvector& dir)
 {
     // Portals model
     int id1 = -1;
     float range1 = 500.f;
-    if (rmPortals)
+    if (RImplementation.rmPortals)
     {
-        Sectors_xrc.ray_query(CDB::OPT_ONLYNEAREST, rmPortals, P, dir, range1);
+        Sectors_xrc.ray_query(CDB::OPT_ONLYNEAREST, RImplementation.rmPortals, P, dir, range1);
         if (Sectors_xrc.r_count())
         {
             CDB::RESULT* RP1 = Sectors_xrc.r_begin();
@@ -56,8 +56,8 @@ IRender_Sector::sector_id_t CRender::detectSector(const Fvector& P, Fvector& dir
     if (ID == id1)
     {
         // Take sector, facing to our point from portal
-        CDB::TRI* pTri = rmPortals->get_tris() + ID;
-        CPortal* pPortal = dsgraph.Portals[pTri->dummy];
+        CDB::TRI* pTri = RImplementation.rmPortals->get_tris() + ID;
+        CPortal* pPortal = Portals[pTri->dummy];
         return pPortal->getSectorFacing(P)->unique_id;
     }
     // Take triangle at ID and use it's Sector

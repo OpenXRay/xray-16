@@ -472,7 +472,8 @@ void CRender::Load3DFluid()
                 pVolume->Load("", F, 0);
 
                 //	Attach to sector's static geometry
-                CSector* pSector = (CSector*)detectSector(pVolume->getVisData().sphere.P);
+                const auto sector_id = dsgraph.detect_sector(pVolume->getVisData().sphere.P);
+                auto* pSector = static_cast<CSector*>(dsgraph.get_sector(sector_id));
                 //	3DFluid volume must be in render sector
                 VERIFY(pSector);
 

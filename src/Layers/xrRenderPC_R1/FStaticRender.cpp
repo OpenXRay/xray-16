@@ -466,7 +466,7 @@ void CRender::Calculate()
     // Detect camera-sector
     if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
     {
-        const auto sector_id = detectSector(Device.vCameraPosition);
+        const auto sector_id = dsgraph.detect_sector(Device.vCameraPosition);
         if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
             if (sector_id != last_sector_id)
@@ -557,7 +557,8 @@ void CRender::Calculate()
             for (u32 o_it = 0; o_it < dsgraph.lstRenderables.size(); o_it++)
             {
                 ISpatial* spatial = dsgraph.lstRenderables[o_it];
-                spatial->spatial_updatesector();
+                const auto& entity_pos = spatial->spatial_sector_point();
+                spatial->spatial_updatesector(dsgraph.detect_sector(entity_pos));
                 const auto sector_id = spatial->GetSpatialData().sector_id;
                 if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
                     continue; // disassociated from S/P structure

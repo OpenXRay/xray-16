@@ -130,8 +130,6 @@ public:
     virtual LPCSTR getShaderPath() override { return "r1" DELIMITER ""; }
     virtual ref_shader getShader(int id);
     virtual IRenderVisual* getVisual(int id) override;
-    virtual IRender_Sector::sector_id_t detectSector(const Fvector& P) override;
-    IRender_Sector::sector_id_t detectSector(const Fvector& P, Fvector& D);
     virtual IRender_Target* getTarget() override;
 
     // Main
