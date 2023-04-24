@@ -918,7 +918,6 @@ void CRender::rmNormal()
 //////////////////////////////////////////////////////////////////////
 CRender::CRender() : Sectors_xrc("render")
 {
-    init_cacades();
 }
 
 CRender::~CRender() {}

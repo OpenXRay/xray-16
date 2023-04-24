@@ -46,6 +46,11 @@ void CRender::Calculate()
     //
     Lights.Update();
 
+    r_sun.init();
+#if RENDER != R_R2
+    r_rain.init();
+#endif
+
     // Check if we touch some light even trough portal
     static xr_vector<ISpatial*> spatial_lights;
     g_SpatialSpace->q_sphere(spatial_lights, 0, STYPE_LIGHTSOURCE, Device.vCameraPosition, EPS_L);
@@ -66,10 +71,6 @@ void CRender::Calculate()
 
     // Configure
     o.distortion = FALSE; // disable distorion
-    Fcolor sun_color = ((light*)Lights.sun._get())->color;
-    bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
-    if (o.sunstatic)
-        bSUN = false;
 
     // Frustum
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
@@ -83,7 +84,7 @@ void CRender::Calculate()
     {
         dsgraph_main.o.phase = PHASE_NORMAL;
         dsgraph_main.r_pmask(true, false, true); // enable priority "0",+ capture wmarks
-        if (bSUN && o.oldshadowcascades)
+        if (r_sun.should_render() && o.oldshadowcascades)
             dsgraph_main.set_Recorder(&main_coarse_structure); // this is a show stopper. Can't be paralleled with sun
         else
             dsgraph_main.set_Recorder(nullptr);
@@ -124,4 +125,7 @@ void CRender::Calculate()
     auto& dsgraph_shadow0 = alloc_context(eRDSG_SHADOW_0);
     auto& dsgraph_shadow1 = alloc_context(eRDSG_SHADOW_1);
     auto& dsgraph_shadow2 = alloc_context(eRDSG_SHADOW_2);
+    {
+        r_sun.calculate();
+    }
 }

@@ -43,6 +43,43 @@ struct render_rain : public i_render_phase
 
     light RainLight;
 };
+
+struct render_sun : public i_render_phase
+{
+    void init() override;
+    void calculate() override;
+    void render() override;
+
+    bool should_render() const { return is_enabled; };
+
+    void calculate_cascade(int cascade_id);
+
+    xr_vector<sun::cascade> m_sun_cascades;
+    light* sun{ nullptr };
+    bool is_enabled{ false };
+};
+
+struct render_sun_old : public i_render_phase
+{
+    void init() override { /* the same as render_sun */ };
+    void calculate() override { /* the same as render_sun */ }
+    void render() override
+    {
+        render_sun_near();
+        render_sun();
+        render_sun_filtered();
+    }
+
+    bool should_render() const { return is_enabled; };
+
+    void render_sun();
+    void render_sun_near();
+    void render_sun_filtered() const;
+
+    xr_vector<sun::cascade> m_sun_cascades;
+    light* sun{ nullptr };
+    bool is_enabled{ false };
+};
 //----
 
 // definition
@@ -217,8 +254,6 @@ public:
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset{}; // Determines weather the frame is the first after resetting device.
 
-    xr_vector<sun::cascade> m_sun_cascades;
-
 private:
     // Loading / Unloading
     void LoadBuffers(CStreamReader* fs, bool alternative);
@@ -234,18 +269,13 @@ public:
     void render_forward();
     void render_indirect(light* L) const;
     void render_lights(light_Package& LP);
-    void render_sun();
-    void render_sun_near();
-    void render_sun_filtered() const;
     void render_menu();
 #if RENDER != R_R2
     render_rain r_rain;
 #endif
 
-    void render_sun_cascade(u32 cascade_ind);
-    void init_cacades();
-    void render_sun_cascades();
-    bool bSUN{ false };
+    render_sun r_sun;
+    render_sun_old r_sun_old;
 
 public:
     auto get_largest_sector() const { return largest_sector_id; }

@@ -332,18 +332,14 @@ void CRender::Render()
 #endif // !USE_DX9
 
     // Directional light - fucking sun
-    if (bSUN)
+    if (r_sun.should_render())
     {
         PIX_EVENT(DEFER_SUN);
         Stats.l_visible++;
         if (!RImplementation.o.oldshadowcascades)
-            render_sun_cascades();
+            r_sun.render();
         else
-        {
-            render_sun_near();
-            render_sun();
-            render_sun_filtered();
-        }
+            r_sun_old.render();
         Target->accum_direct_blend();
     }
 

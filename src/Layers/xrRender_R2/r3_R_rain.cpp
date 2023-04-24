@@ -261,10 +261,10 @@ void render_rain::calculate()
         adjust.translate(diff);
         cull_xform.mulA_44(adjust);
 
-        RainLight.X.D.minX = 0;
-        RainLight.X.D.maxX = limit;
-        RainLight.X.D.minY = 0;
-        RainLight.X.D.maxY = limit;
+        RainLight.X.D[0].minX = 0;
+        RainLight.X.D[0].maxX = limit;
+        RainLight.X.D[0].minY = 0;
+        RainLight.X.D[0].maxY = limit;
 
         // full-xform
         FPU::m24r();
@@ -285,7 +285,7 @@ void render_rain::calculate()
     }
 
     // Finalize & Cleanup
-    RainLight.X.D.combine = cull_xform;
+    RainLight.X.D[0].combine = cull_xform;
 }
 
 void render_rain::render()
@@ -307,7 +307,7 @@ void render_rain::render()
                 RImplementation.Target->phase_smap_direct(&RainLight, SE_SUN_RAIN_SMAP);
                 RCache.set_xform_world(Fidentity);
                 RCache.set_xform_view(Fidentity);
-                RCache.set_xform_project(RainLight.X.D.combine);
+                RCache.set_xform_project(RainLight.X.D[0].combine);
                 dsgraph.render_graph(0);
                 // if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))
                 //	Details->Render					()	;
