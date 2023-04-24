@@ -278,6 +278,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 void dxEnvironmentRender::RenderClouds(CEnvironment& env)
 {
+    return;
     GEnv.Render->rmFar();
 
     Fmatrix mXFORM, mScale;
@@ -328,25 +329,30 @@ void dxEnvironmentRender::OnDeviceCreate()
     clouds_sh.create("clouds", "null");
     clouds_geom.create(v_clouds_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 
-    R_constant* C = sh_2sky->E[0]->passes[0]->constants->get(RImplementation.c_ssky0)._get();
-    R_ASSERT(C);
-    tsky0_tstage = C->samp.index;
+    auto& sh_2sky_pass0 = sh_2sky->E[0]->passes[0];
+    auto& clouds_sh_pass0 = clouds_sh->E[0]->passes[0];
 
-    C = sh_2sky->E[0]->passes[0]->constants->get(RImplementation.c_ssky1)._get();
-    R_ASSERT(C);
-    tsky1_tstage = C->samp.index;
+    const R_constant* C;
+    if (sh_2sky_pass0->constants)
+    {
+        C = sh_2sky_pass0->constants->get(RImplementation.c_ssky0)._get();
+        tsky0_tstage = C ? C->samp.index : 0;
 
-    C = clouds_sh->E[0]->passes[0]->constants->get(RImplementation.c_sclouds0)._get();
-    R_ASSERT(C);
-    tclouds0_tstage = C->samp.index;
+        C = sh_2sky_pass0->constants->get(RImplementation.c_ssky1)._get();
+        tsky1_tstage = C ? C->samp.index : 1;
+    }
+    if (clouds_sh_pass0->constants)
+    {
+        C = clouds_sh_pass0->constants->get(RImplementation.c_sclouds0)._get();
+        tclouds0_tstage = C ? C->samp.index : 0;
 
-    C = clouds_sh->E[0]->passes[0]->constants->get(RImplementation.c_sclouds1)._get();
-    R_ASSERT(C);
-    tclouds1_tstage = C->samp.index;
+        C = clouds_sh_pass0->constants->get(RImplementation.c_sclouds1)._get();
+        tclouds1_tstage = C ? C->samp.index : 1;
+    }
 
     const bool r2 = GEnv.Render->GenerationIsR2OrHigher();
-    tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
-    tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
+    tonemap_tstage_2sky = sh_2sky_pass0->T->find_texture_stage(r2_RT_luminance_cur, r2);
+    tonemap_tstage_clouds = clouds_sh_pass0->T->find_texture_stage(r2_RT_luminance_cur, r2);
 }
 
 void dxEnvironmentRender::OnDeviceDestroy()
