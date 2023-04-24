@@ -84,7 +84,7 @@ void CRender::Calculate()
     {
         dsgraph_main.o.phase = PHASE_NORMAL;
         dsgraph_main.r_pmask(true, false, true); // enable priority "0",+ capture wmarks
-        if (r_sun.should_render() && o.oldshadowcascades)
+        if (r_sun.o.active && o.oldshadowcascades)
             dsgraph_main.set_Recorder(&main_coarse_structure); // this is a show stopper. Can't be paralleled with sun
         else
             dsgraph_main.set_Recorder(nullptr);

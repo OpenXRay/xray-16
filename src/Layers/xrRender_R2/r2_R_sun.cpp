@@ -1019,14 +1019,14 @@ void render_sun::init()
     sun = (light*)RImplementation.Lights.sun._get();
 
     const Fcolor sun_color = sun->color;
-    is_enabled = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
+    o.active = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
     if (RImplementation.o.sunstatic)
-        is_enabled = false;
+        o.active = false;
 }
 
-void render_sun::calculate()
+void render_sun::calculate_task(Task&, void*)
 {
-    if (!should_render())
+    if (!o.active)
     {
         return;
     }
@@ -1281,6 +1281,8 @@ void render_sun::calculate_cascade(int cascade_ind)
 
 void render_sun::render()
 {
+    wait();
+
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     for (int cascade_ind = 0; cascade_ind < 3; ++cascade_ind) // TODO: proper max cascades

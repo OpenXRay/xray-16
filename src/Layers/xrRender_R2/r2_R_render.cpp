@@ -332,12 +332,14 @@ void CRender::Render()
 #endif // !USE_DX9
 
     // Directional light - fucking sun
-    if (r_sun.should_render())
+    if (r_sun.o.active)
     {
         PIX_EVENT(DEFER_SUN);
         Stats.l_visible++;
         if (!RImplementation.o.oldshadowcascades)
+        {
             r_sun.render();
+        }
         else
             r_sun_old.render();
         Target->accum_direct_blend();

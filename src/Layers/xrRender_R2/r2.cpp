@@ -916,7 +916,13 @@ void CRender::rmNormal()
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CRender::CRender() : Sectors_xrc("render")
+CRender::CRender()
+    : Sectors_xrc("render")
+    , r_sun("sun_render")
+    , r_sun_old("sun_render_old")
+#if RENDER != R_R2
+    , r_rain("rain_render")
+#endif
 {
 }
 

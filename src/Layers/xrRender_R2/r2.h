@@ -20,6 +20,7 @@
 #include "Layers/xrRender/r_sun_cascades.h"
 
 #include "xrEngine/IRenderable.h"
+#include "xrCore/Threading/TaskManager.hpp"
 #include "xrCore/FMesh.hpp"
 
 class CRenderTarget;
@@ -28,41 +29,81 @@ class dxRender_Visual;
 // TODO: move it into separate file.
 struct i_render_phase
 {
+    explicit i_render_phase(const xr_string& name_in)
+        : name(name_in)
+    {
+        o.active = false;
+        o.mt_enabled = false;
+    }
+
+    ICF void calculate()
+    {
+        if (!o.active)
+            return;
+
+        main_task = &TaskScheduler->CreateTask(name.c_str(), { this, &i_render_phase::calculate_task });
+
+        if (o.mt_enabled)
+        {
+            TaskScheduler->PushTask(*main_task);
+        }
+        else
+        {
+            TaskScheduler->RunTask(*main_task);
+        }
+    }
+
+    ICF void wait()
+    {
+        if (main_task)
+            TaskScheduler->Wait(*main_task);
+        main_task = nullptr;
+    }
+
     virtual void init() = 0;
-    virtual void calculate() = 0;
+    virtual void calculate_task(Task&, void*) = 0;
     virtual void render() = 0;
+
+    struct options_t
+    {
+        u32 active : 1;
+        u32 mt_enabled : 1;
+    } o;
+    Task* main_task{ nullptr };
+    xr_string name{ "" };
 };
 
 struct render_rain : public i_render_phase
 {
-    void init() override;
-    void calculate() override;
-    void render() override;
+    explicit render_rain(const xr_string& name_in) : i_render_phase(name) {}
 
-    bool should_render() const;
+    void init() override;
+    void calculate_task(Task&, void*) override;
+    void render() override;
 
     light RainLight;
 };
 
 struct render_sun : public i_render_phase
 {
-    void init() override;
-    void calculate() override;
-    void render() override;
+    explicit render_sun(const xr_string& name_in) : i_render_phase(name) {}
 
-    bool should_render() const { return is_enabled; };
+    void init() override;
+    void calculate_task(Task&, void*) override;
+    void render() override;
 
     void calculate_cascade(int cascade_id);
 
     xr_vector<sun::cascade> m_sun_cascades;
     light* sun{ nullptr };
-    bool is_enabled{ false };
 };
 
 struct render_sun_old : public i_render_phase
 {
+    explicit render_sun_old(const xr_string& name_in) : i_render_phase(name) {}
+
     void init() override { /* the same as render_sun */ };
-    void calculate() override { /* the same as render_sun */ }
+    void calculate_task(Task&, void*) override { /* the same as render_sun */ }
     void render() override
     {
         render_sun_near();
@@ -70,15 +111,12 @@ struct render_sun_old : public i_render_phase
         render_sun_filtered();
     }
 
-    bool should_render() const { return is_enabled; };
-
     void render_sun();
     void render_sun_near();
     void render_sun_filtered() const;
 
     xr_vector<sun::cascade> m_sun_cascades;
     light* sun{ nullptr };
-    bool is_enabled{ false };
 };
 //----
 

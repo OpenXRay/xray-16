@@ -1051,7 +1051,7 @@ void render_sun::init()
     /// 	m_sun_cascades[m_sun_cascades.size()-1].size = 80;
 }
 
-void render_sun::calculate()
+void render_sun::calculate_task(Task&, void*)
 {
     bool b_need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
     bool last_cascade_chain_mode = m_sun_cascades.back().reset_chain;

@@ -44,18 +44,13 @@ static int facetable[6][4] =
 
 void render_rain::init()
 {
-    // TODO: move Target stuff here
-}
-
-bool render_rain::should_render() const
-{
-    return (!Device.vCameraPositionSaved.similar(Device.vCameraPosition, EPS_L) ||
+    o.active = (!Device.vCameraPositionSaved.similar(Device.vCameraPosition, EPS_L) ||
         !Device.vCameraDirectionSaved.similar(Device.vCameraDirection, EPS_L) ||
         RainLight.frame_render == 0);
 }
 
 //////////////////////////////////////////////////////////////////////////
-void render_rain::calculate()
+void render_rain::calculate_task(Task&, void*)
 {
     float fRainFactor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
     if (fRainFactor < EPS_L)
@@ -64,7 +59,7 @@ void render_rain::calculate()
         return;
     }
 
-    if (!should_render())
+    if (!o.active)
     {
         return;
     }
@@ -290,7 +285,9 @@ void render_rain::calculate()
 
 void render_rain::render()
 {
-    if (should_render())
+    wait();
+
+    if (o.active)
     {
         PIX_EVENT(RAIN);
 
