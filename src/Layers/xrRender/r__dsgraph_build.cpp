@@ -693,7 +693,6 @@ void R_dsgraph_structure::unload()
 // sub-space rendering - main procedure
 void R_dsgraph_structure::build_subspace()
 {
-    PIX_EVENT(r_dsgraph_render_subspace);
     marker++; // !!! critical here
 
     VERIFY(o.sector_id != IRender_Sector::INVALID_SECTOR_ID);

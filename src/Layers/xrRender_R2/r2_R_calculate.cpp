@@ -13,6 +13,9 @@ extern float r_ssaLOD_B;
 extern float r_ssaHZBvsTEX;
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 
+extern int ps_r2_mt_calculate;
+extern int ps_r2_mt_render;
+
 void CRender::Calculate()
 {
     // Transfer to global space to avoid deep pointer access
@@ -27,6 +30,9 @@ void CRender::Calculate()
     r_ssaGLOD_end = _sqr(ps_r__GLOD_ssa_end / 3) / g_fSCREEN;
     r_ssaHZBvsTEX = _sqr(ps_r__ssaHZBvsTEX / 3) / g_fSCREEN;
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
+
+    o.mt_calculate  = ps_r2_mt_calculate > 0;
+    o.mt_render     = ps_r2_mt_render > 0;
 
     auto& dsgraph_main = RImplementation.alloc_context(eRDSG_MAIN);
 

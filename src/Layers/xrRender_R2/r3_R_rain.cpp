@@ -47,6 +47,8 @@ void render_rain::init()
     o.active = (!Device.vCameraPositionSaved.similar(Device.vCameraPosition, EPS_L) ||
         !Device.vCameraDirectionSaved.similar(Device.vCameraDirection, EPS_L) ||
         RainLight.frame_render == 0);
+    
+    o.mt_enabled = RImplementation.o.mt_calculate;
 }
 
 //////////////////////////////////////////////////////////////////////////

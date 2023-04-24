@@ -1022,6 +1022,8 @@ void render_sun::init()
     o.active = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
     if (RImplementation.o.sunstatic)
         o.active = false;
+
+    o.mt_enabled = RImplementation.o.mt_calculate;
 }
 
 void render_sun::calculate_task(Task&, void*)

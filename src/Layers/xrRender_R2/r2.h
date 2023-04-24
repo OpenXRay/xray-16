@@ -209,6 +209,10 @@ public:
 
         u32 forcegloss : 1;
         u32 forceskinw : 1;
+
+        u32 mt_calculate : 1;
+        u32 mt_render : 1;
+
         float forcegloss_v;
     } o;
 
