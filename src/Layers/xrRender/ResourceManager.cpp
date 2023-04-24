@@ -313,14 +313,8 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
     if (!GEnv.isDedicatedServer)
     {
 #if defined(USE_DX9)
-#   ifndef _EDITOR
-        if (_lua_HasShader(s_shader))
-            return _lua_Create(s_shader, s_textures);
-        else
-#   endif
-        {
-            return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
-        }
+        auto blender = _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
+        return blender ? blender : _lua_HasShader(s_shader) ? _lua_Create(s_shader, s_textures) : nullptr;
 #else // TODO: DX11: When all shaders are ready switch to common path
         if (_lua_HasShader(s_shader))
             return _lua_Create(s_shader, s_textures);
