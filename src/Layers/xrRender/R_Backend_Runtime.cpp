@@ -140,10 +140,8 @@ void CBackend::Invalidate()
         textures_ps[ps_it++] = nullptr;
     for (u32 vs_it = 0; vs_it < CTexture::mtMaxVertexShaderTextures;)
         textures_vs[vs_it++] = nullptr;
-#ifdef _EDITOR
-    for (u32 m_it = 0; m_it < 8;)
-        matrices[m_it++] = 0;
-#endif
+    for (auto& matrix : matrices)
+        matrix = nullptr;
 }
 
 void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count /* =0*/)

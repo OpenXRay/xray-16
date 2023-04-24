@@ -220,8 +220,6 @@ void CBlender_Compile::r_End()
     dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
     dest.C = nullptr;
-#ifdef _EDITOR
-    dest.M = 0;
-#endif
+    dest.M = nullptr;
     SH->passes.push_back(RImplementation.Resources->_CreatePass(dest));
 }

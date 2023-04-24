@@ -192,9 +192,7 @@ private:
 #   error No graphics API selected or enabled!
 #endif
 
-#ifdef _EDITOR
-    CMatrix* matrices[8]; // matrices are supported only for FFP
-#endif
+    CMatrix* matrices[8]{}; // matrices are supported only for FFP
 
     void Invalidate();
 
@@ -342,10 +340,8 @@ public:
     void set_Textures(STextureList* T);
     void set_Textures(ref_texture_list& T) { set_Textures(&*T); }
 
-#ifdef _EDITOR
-    IC	void						set_Matrices(SMatrixList* M);
-    IC	void						set_Matrices(ref_matrix_list& M) { set_Matrices(&*M); }
-#endif
+    IC void set_Matrices(SMatrixList* M);
+    IC void set_Matrices(ref_matrix_list& M) { set_Matrices(&*M); }
 
     IC void set_Pass(SPass* P);
     void set_Pass(ref_pass& P) { set_Pass(&*P); }
