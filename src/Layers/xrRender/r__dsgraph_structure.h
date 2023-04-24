@@ -97,7 +97,7 @@ struct R_dsgraph_structure
     void reset()
     {
         //marker = 0;
-        //context_id = INVALID_CONTEXT_ID;
+        context_id = INVALID_CONTEXT_ID;
 
         o.query_box_side = EPS_L * 20;
         o.use_hom = false;

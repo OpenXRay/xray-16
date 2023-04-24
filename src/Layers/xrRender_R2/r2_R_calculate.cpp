@@ -1,5 +1,7 @@
 #include "stdafx.h"
-#include "Layers/xrRender/FVisual.h"
+
+#include "xrEngine/CustomHUD.h"
+#include "xrCore/Threading/TaskManager.hpp"
 
 float g_fSCREEN;
 
@@ -62,6 +64,55 @@ void CRender::Calculate()
         Lights.add_light(L);
     }
 
+    // Configure
+    o.distortion = FALSE; // disable distorion
+    Fcolor sun_color = ((light*)Lights.sun._get())->color;
+    bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
+    if (o.sunstatic)
+        bSUN = false;
+
+    // Frustum
+    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+
+    TaskScheduler->Wait(*ProcessHOMTask);
+        
+    //******* Main calc - DEFERRER RENDERER
+    // Main calc
+    BasicStats.Culling.Begin();
+    if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
+    {
+        dsgraph_main.o.phase = PHASE_NORMAL;
+        dsgraph_main.r_pmask(true, false, true); // enable priority "0",+ capture wmarks
+        if (bSUN && o.oldshadowcascades)
+            dsgraph_main.set_Recorder(&main_coarse_structure); // this is a show stopper. Can't be paralleled with sun
+        else
+            dsgraph_main.set_Recorder(nullptr);
+        dsgraph_main.o.use_hom = true;
+        dsgraph_main.o.is_main_pass = true;
+        dsgraph_main.o.sector_id = last_sector_id;
+        dsgraph_main.o.portal_traverse_flags =
+            CPortalTraverser::VQ_HOM | CPortalTraverser::VQ_SSA | CPortalTraverser::VQ_FADE;
+        dsgraph_main.o.spatial_traverse_flags = ISpatial_DB::O_ORDERED;
+        dsgraph_main.o.spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
+        dsgraph_main.o.view_pos = Device.vCameraPosition;
+        dsgraph_main.o.xform = Device.mFullTransform;
+        dsgraph_main.o.view_frustum = ViewBase;
+        dsgraph_main.o.query_box_side = VIEWPORT_NEAR + EPS_L;
+        dsgraph_main.o.precise_portals = true;
+
+        dsgraph_main.build_subspace();
+    }
+    else
+    {
+        if (g_pGameLevel)
+            g_hud->Render_Last(dsgraph_main.context_id);
+    }
+
+    dsgraph_main.set_Recorder(nullptr);
+    dsgraph_main.r_pmask(true, false); // disable priority "1"
+    BasicStats.Culling.End();
+
+    // Rain calc
 #if RENDER != R_R2
     auto& dsgraph_rain = alloc_context(eRDSG_RAIN);
     {
@@ -69,6 +120,7 @@ void CRender::Calculate()
     }
 #endif
 
+    // Sun calc
     auto& dsgraph_shadow0 = alloc_context(eRDSG_SHADOW_0);
     auto& dsgraph_shadow1 = alloc_context(eRDSG_SHADOW_1);
     auto& dsgraph_shadow2 = alloc_context(eRDSG_SHADOW_2);

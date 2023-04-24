@@ -245,6 +245,7 @@ public:
     void render_sun_cascade(u32 cascade_ind);
     void init_cacades();
     void render_sun_cascades();
+    bool bSUN{ false };
 
 public:
     auto get_largest_sector() const { return largest_sector_id; }

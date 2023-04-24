@@ -126,12 +126,7 @@ void CRender::level_Unload()
     uLastLTRACK = 0;
 
     // 2.
-    for (auto& [dsgraph, is_used] : dsgraph_pool)
-    {
-        dsgraph.reset();
-        dsgraph.unload();
-        is_used = false;
-    }
+    cleanup_contexts();
 
     //*** Lights
     L_Glows->Unload();
@@ -413,8 +408,9 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    for (auto& [dsgraph, is_used] : dsgraph_pool)
+    for (int id = 0; id < eRDSG_NUM_CONTEXTS; ++id)
     {
+        auto& [dsgraph, is_used] = dsgraph_pool[id];
         dsgraph.reset();
         dsgraph.load(sectors_data, portals_data);
         is_used = false;

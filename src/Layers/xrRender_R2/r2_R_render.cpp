@@ -108,17 +108,6 @@ void CRender::Render()
     //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
     auto& dsgraph = get_context(eRDSG_MAIN);
 
-    // Configure
-    o.distortion = FALSE; // disable distorion
-    Fcolor sun_color = ((light*)Lights.sun._get())->color;
-    bool bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
-    if (o.sunstatic)
-        bSUN = false;
-    // Msg						("sstatic: %s, sun: %s",o.sunstatic?;"true":"false", bSUN?"true":"false");
-
-    // Frustum
-    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-
     //******* Z-prefill calc - DEFERRER RENDERER
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
     {
@@ -129,7 +118,6 @@ void CRender::Render()
         m_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR,
             z_distance * g_pGamePersistent->Environment().CurrentEnv.far_plane);
         m_zfill.mul(m_project, Device.mView);
-        TaskScheduler->Wait(*ProcessHOMTask);
 
         if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
         {
@@ -151,16 +139,6 @@ void CRender::Render()
             dsgraph.build_subspace();
         }
         BasicStats.Culling.End();
-
-        // flush
-        Target->phase_scene_prepare();
-        RCache.set_ColorWriteEnable(FALSE);
-        dsgraph.render_graph(0);
-        RCache.set_ColorWriteEnable();
-    }
-    else
-    {
-        Target->phase_scene_prepare();
     }
 
     //*******
@@ -172,44 +150,18 @@ void CRender::Render()
     BasicStats.WaitS.End();
     q_sync_point.End();
 
-    //******* Main calc - DEFERRER RENDERER
-    // Main calc
-    BasicStats.Culling.Begin();
-    if (!ps_r2_ls_flags.test(R2FLAG_ZFILL))
-        TaskScheduler->Wait(*ProcessHOMTask);
-
-    if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
+    if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
     {
-        dsgraph.o.phase = PHASE_NORMAL;
-        dsgraph.r_pmask(true, false, true); // enable priority "0",+ capture wmarks
-        if (bSUN)
-            dsgraph.set_Recorder(&main_coarse_structure);
-        else
-            dsgraph.set_Recorder(nullptr);
-        dsgraph.o.use_hom = true;
-        dsgraph.o.is_main_pass = true;
-        dsgraph.o.sector_id = last_sector_id;
-        dsgraph.o.portal_traverse_flags =
-            CPortalTraverser::VQ_HOM | CPortalTraverser::VQ_SSA | CPortalTraverser::VQ_FADE;
-        dsgraph.o.spatial_traverse_flags = ISpatial_DB::O_ORDERED;
-        dsgraph.o.spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
-        dsgraph.o.view_pos = Device.vCameraPosition;
-        dsgraph.o.xform = Device.mFullTransform;
-        dsgraph.o.view_frustum = ViewBase;
-        dsgraph.o.query_box_side = VIEWPORT_NEAR + EPS_L;
-        dsgraph.o.precise_portals = true;
-
-        dsgraph.build_subspace();
+        // flush
+        Target->phase_scene_prepare();
+        RCache.set_ColorWriteEnable(FALSE);
+        dsgraph.render_graph(0);
+        RCache.set_ColorWriteEnable();
     }
     else
     {
-        if (g_pGameLevel)
-            g_hud->Render_Last(dsgraph.context_id);
+        Target->phase_scene_prepare();
     }
-
-    dsgraph.set_Recorder(nullptr);
-    dsgraph.r_pmask(true, false); // disable priority "1"
-    BasicStats.Culling.End();
 
     BOOL split_the_scene_to_minimize_wait = FALSE;
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE))

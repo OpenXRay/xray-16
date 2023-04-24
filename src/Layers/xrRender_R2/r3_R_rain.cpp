@@ -321,8 +321,9 @@ void render_rain::render()
     RCache.set_xform_project(Device.mProject);
 
     // Accumulate
-    RImplementation.Target->phase_rain();
+    RImplementation.Target->phase_rain(); // TODO: move into this class as well
     RImplementation.Target->draw_rain(RainLight);
+    RImplementation.release_context(CRender::eRDSG_RAIN);
 
     RainLight.frame_render = Device.dwFrame;
 }
