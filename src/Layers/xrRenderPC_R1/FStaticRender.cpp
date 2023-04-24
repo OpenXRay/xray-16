@@ -375,6 +375,17 @@ void CRender::set_Object(IRenderable* O, u32 phase)
             L_Projector->set_object(nullptr);
     }
 }
+
+static u32 gm_Ambient = 0;
+IC void gm_SetAmbient(u32 C)
+{
+    if (C != gm_Ambient)
+    {
+        gm_Ambient = C;
+        CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, color_xrgb(C, C, C)));
+    }
+}
+
 void CRender::apply_object(IRenderable* O)
 {
     if (nullptr == O)
@@ -389,7 +400,36 @@ void CRender::apply_object(IRenderable* O)
         RCache.set_c(c_ldynamic_props, o_sun, o_sun, o_sun, o_hemi);
         // shadowing
         if ((LT.shadow_recv_frame == Device.dwFrame) && O->renderable_ShadowReceive())
+        {
+            gm_SetAmbient(0);
             RImplementation.L_Projector->setup(LT.shadow_recv_slot);
+        }
+        else
+        {
+            //gm_SetAmbient(iFloor(LT.ambient) / 2);
+        }
+
+        // ambience
+        //gm_SetAmbient(iFloor(LT.ambient) / 2);
+
+        // set up to 8 lights to device
+        const int max = _min(int(LT.lights.size()), HW.Caps.max_ffp_lights);
+        for (int L = 0; L < max; L++)
+        {
+            CHK_DX(HW.pDevice->SetLight(L, (D3DLIGHT9*)&LT.lights[L].source->ldata));
+        }
+
+        // enable them, disable others
+        static int gm_Lcount = 0;
+        for (int L = gm_Lcount; L < max; L++)
+        {
+            CHK_DX(HW.pDevice->LightEnable(L, TRUE));
+        }
+        for (int L = max; L < gm_Lcount; L++)
+        {
+            CHK_DX(HW.pDevice->LightEnable(L, FALSE));
+        }
+        gm_Lcount = max;
     }
 }
 
@@ -447,6 +487,15 @@ void CRender::Calculate()
 
     // Frustum
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+
+    // Build L_DB visibility & perform basic initialization
+    gm_Ambient = 0xFFFFFFFF;
+    gm_SetAmbient(0);
+
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
+        HW.pDevice->SetRenderState(D3DRS_AMBIENT, 0xFFFFFFFF);
+    else
+        HW.pDevice->SetRenderState(D3DRS_AMBIENT, 0x00000000);
 
     rmNormal();
     auto& dsgraph = get_imm_context();
