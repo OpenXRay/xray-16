@@ -46,6 +46,7 @@ void render_main::calculate_task(Task&, void*)
     dsgraph_main.o.view_frustum = RImplementation.ViewBase;
     dsgraph_main.o.query_box_side = VIEWPORT_NEAR + EPS_L;
     dsgraph_main.o.precise_portals = true;
+    dsgraph_main.o.mt_calculate = o.mt_enabled;
 
     dsgraph_main.build_subspace();
 

@@ -276,6 +276,7 @@ void render_rain::calculate_task(Task&, void*)
         dsgraph.o.xform = cull_xform;
         dsgraph.o.view_frustum = cull_frustum;
         dsgraph.o.view_pos = cull_COP;
+        dsgraph.o.mt_calculate = o.mt_enabled;
 
         // Fill the database
         dsgraph.build_subspace();

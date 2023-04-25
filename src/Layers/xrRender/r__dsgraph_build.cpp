@@ -2,7 +2,7 @@
 
 #include "FHierrarhyVisual.h"
 #include "SkeletonCustom.h"
-#include "xrCore/FMesh.hpp"
+#include "xrCore/Threading/ParallelFor.hpp"
 #include "xrEngine/CustomHUD.h"
 #include "xrEngine/IRenderable.h"
 #include "xrEngine/xr_object.h"
@@ -719,181 +719,209 @@ void R_dsgraph_structure::build_subspace()
     PortalTraverser.traverse(Sectors[o.sector_id], o.view_frustum, o.view_pos, o.xform, o.portal_traverse_flags);
 
     // Determine visibility for static geometry hierrarhy
+    static xr_vector<Task*> static_geo_tasks;
+    static_geo_tasks.resize(PortalTraverser.r_sectors.size());
+
     if (psDeviceFlags.test(rsDrawStatic))
     {
         for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
         {
-            CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
+            CSector* sector = PortalTraverser.r_sectors[s_it];
             dxRender_Visual* root = sector->root();
+            VERIFY(root->getType() == MT_HIERRARHY);
+
+            const auto &children = static_cast<FHierrarhyVisual*>(root)->children;
+
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
-                const auto& view = sector->r_frustums[v_it];
-                add_static(root, view, view.getMask());
+                const auto traverse_children = [&, this](const TaskRange<size_t>& range)
+                {
+                    for (size_t id = range.cbegin(); id != range.cend(); ++id)
+                    {
+                        const auto& view = sector->r_frustums[v_it];
+                        add_static(children[id], view, view.getMask());
+                    }
+                };
+
+                if (0 && o.mt_calculate) // NOTE: this code doesn't work until visuals maps are separated by worker ID.
+                {
+                    static_geo_tasks[s_it] = &xr_parallel_for(TaskRange<size_t>(0, children.size()), false, traverse_children);
+                }
+                else
+                {
+                    traverse_children(TaskRange<size_t>(0, children.size()));
+                }
             }
         }
     }
 
     const bool collect_dynamic_any = (o.spatial_types != 0) && psDeviceFlags.test(rsDrawDynamic);
-    if (!collect_dynamic_any)
-    {
-        return;
-    }
 
-    // Traverse object database
-    g_SpatialSpace->q_frustum(lstRenderables, o.spatial_traverse_flags, o.spatial_types, o.view_frustum);
-
-    if (o.spatial_traverse_flags & ISpatial_DB::O_ORDERED) // this should be inside of query functions
+    if (collect_dynamic_any)
     {
-        // Exact sorting order (front-to-back)
-        std::sort(lstRenderables.begin(), lstRenderables.end(), [&](ISpatial* s1, ISpatial* s2)
+        // Traverse object database
+        g_SpatialSpace->q_frustum(lstRenderables, o.spatial_traverse_flags, o.spatial_types, o.view_frustum);
+
+        if (o.spatial_traverse_flags & ISpatial_DB::O_ORDERED) // this should be inside of query functions
         {
-            const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(o.view_pos);
-            const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(o.view_pos);
-            return d1 < d2;
-        });
-    }
+            // Exact sorting order (front-to-back)
+            std::sort(lstRenderables.begin(), lstRenderables.end(), [&](ISpatial* s1, ISpatial* s2)
+                {
+                    const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(o.view_pos);
+                    const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(o.view_pos);
+                    return d1 < d2;
+                });
+        }
 
-    u32 uID_LTRACK = 0xffffffff;
-    if (o.is_main_pass) // temporary
-    {
-        if (o.phase == CRender::PHASE_NORMAL)
+        u32 uID_LTRACK = 0xffffffff;
+        if (o.is_main_pass) // temporary
         {
-            RImplementation.uLastLTRACK++;
-            if (!lstRenderables.empty())
-                uID_LTRACK = RImplementation.uLastLTRACK % lstRenderables.size();
-
-            // update light-vis for current entity / actor
-            IGameObject* O = g_pGameLevel->CurrentViewEntity();
-            if (O)
+            if (o.phase == CRender::PHASE_NORMAL)
             {
-                CROS_impl* R = (CROS_impl*)O->ROS();
-                if (R)
-                    R->update(O);
+                RImplementation.uLastLTRACK++;
+                if (!lstRenderables.empty())
+                    uID_LTRACK = RImplementation.uLastLTRACK % lstRenderables.size();
+
+                // update light-vis for current entity / actor
+                IGameObject* O = g_pGameLevel->CurrentViewEntity();
+                if (O)
+                {
+                    CROS_impl* R = (CROS_impl*)O->ROS();
+                    if (R)
+                        R->update(O);
+                }
             }
         }
-    }
 
-    const bool collect_lights = o.spatial_types & STYPE_LIGHTSOURCE;
+        const bool collect_lights = o.spatial_types & STYPE_LIGHTSOURCE;
 
-    // Determine visibility for dynamic part of scene
-    for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
-    {
-        ISpatial* spatial = lstRenderables[o_it];
-        if (o.is_main_pass)
+        // Determine visibility for dynamic part of scene
+        for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
         {
-            const auto& entity_pos = spatial->spatial_sector_point();
-            const auto sector_id = detect_sector(entity_pos);
-            spatial->spatial_updatesector(sector_id);
-        }
-        const auto& data = spatial->GetSpatialData();
-        const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
-        if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
-            continue; // disassociated from S/P structure
-        auto* sector = Sectors[sector_id];
-
-        if (collect_lights && (type & STYPE_LIGHTSOURCE))
-        {
-            // lightsource
-            light* L = (light*)spatial->dcast_Light();
-            VERIFY(L);
-            float lod = L->get_LOD();
-            if (lod > EPS_L)
-            {
-                // TODO: check for HOM flag
-                vis_data& vis = L->get_homdata();
-                if (RImplementation.HOM.visible(vis))
-                    RImplementation.Lights.add_light(L);
-            }
-            continue;
-        }
-
-        if (PortalTraverser.i_marker != sector->r_marker)
-            continue; // inactive (untouched) sector
-        for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
-        {
-            const CFrustum& view = sector->r_frustums[v_it];
-            if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
-                continue;
-
+            ISpatial* spatial = lstRenderables[o_it];
             if (o.is_main_pass)
             {
-                if (type & STYPE_RENDERABLE)
+                const auto& entity_pos = spatial->spatial_sector_point();
+                const auto sector_id = detect_sector(entity_pos);
+                spatial->spatial_updatesector(sector_id);
+            }
+            const auto& data = spatial->GetSpatialData();
+            const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
+            if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
+                continue; // disassociated from S/P structure
+            auto* sector = Sectors[sector_id];
+
+            if (collect_lights && (type & STYPE_LIGHTSOURCE))
+            {
+                // lightsource
+                light* L = (light*)spatial->dcast_Light();
+                VERIFY(L);
+                float lod = L->get_LOD();
+                if (lod > EPS_L)
+                {
+                    // TODO: check for HOM flag
+                    vis_data& vis = L->get_homdata();
+                    if (RImplementation.HOM.visible(vis))
+                        RImplementation.Lights.add_light(L);
+                }
+                continue;
+            }
+
+            if (PortalTraverser.i_marker != sector->r_marker)
+                continue; // inactive (untouched) sector
+            for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
+            {
+                const CFrustum& view = sector->r_frustums[v_it];
+                if (!view.testSphere_dirty(spatial->GetSpatialData().sphere.P, spatial->GetSpatialData().sphere.R))
+                    continue;
+
+                if (o.is_main_pass)
+                {
+                    if (type & STYPE_RENDERABLE)
+                    {
+                        // renderable
+                        IRenderable* renderable = spatial->dcast_Renderable();
+                        VERIFY(renderable);
+
+                        // Occlusion
+                        //	casting is faster then using getVis method
+                        vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
+                        vis_data v_copy = v_orig;
+                        v_copy.box.xform(renderable->GetRenderData().xform);
+                        BOOL bVisible = RImplementation.HOM.visible(v_copy);
+                        memcpy(v_orig.marker, v_copy.marker, sizeof(v_copy.marker));
+                        v_orig.accept_frame = v_copy.accept_frame;
+                        v_orig.hom_frame = v_copy.hom_frame;
+                        v_orig.hom_tested = v_copy.hom_tested;
+                        if (!bVisible)
+                            break; // exit loop on frustums
+
+                        // update light-vis for selected entity
+                        if (o_it == uID_LTRACK && renderable->renderable_ROS())
+                        {
+                            // track lighting environment
+                            CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
+                            T->update(renderable);
+                        }
+
+                        // Rendering
+                        renderable->renderable_Render(context_id, renderable);
+                    }
+                    break; // exit loop on frustums
+                }
+                else
                 {
                     // renderable
                     IRenderable* renderable = spatial->dcast_Renderable();
-                    VERIFY(renderable);
+                    if (nullptr == renderable)
+                        continue; // unknown, but renderable object (r1_glow???)
 
-                    // Occlusion
-                    //	casting is faster then using getVis method
-                    vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
-                    vis_data v_copy = v_orig;
-                    v_copy.box.xform(renderable->GetRenderData().xform);
-                    BOOL bVisible = RImplementation.HOM.visible(v_copy);
-                    memcpy(v_orig.marker, v_copy.marker, sizeof(v_copy.marker));
-                    v_orig.accept_frame = v_copy.accept_frame;
-                    v_orig.hom_frame = v_copy.hom_frame;
-                    v_orig.hom_tested = v_copy.hom_tested;
-                    if (!bVisible)
-                        break; // exit loop on frustums
-
-                    // update light-vis for selected entity
-                    if (o_it == uID_LTRACK && renderable->renderable_ROS())
-                    {
-                        // track lighting environment
-                        CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
-                        T->update(renderable);
-                    }
-
-                    // Rendering
-                    renderable->renderable_Render(context_id, renderable);
+                    renderable->renderable_Render(context_id, nullptr);
                 }
-                break; // exit loop on frustums
             }
-            else
-            {
-                // renderable
-                IRenderable* renderable = spatial->dcast_Renderable();
-                if (nullptr == renderable)
-                    continue; // unknown, but renderable object (r1_glow???)
+        }
 
-                renderable->renderable_Render(context_id, nullptr);
+        if (g_pGameLevel)
+        {
+#if RENDER != R_R1
+            // Actor Shadow (Sun + Light)
+            if (o.phase == CRender::PHASE_SMAP && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
+            {
+                do
+                {
+                    IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
+                    if (viewEntity == nullptr)
+                        break;
+                    const auto& entity_pos = viewEntity->spatial_sector_point();
+                    viewEntity->spatial_updatesector(detect_sector(entity_pos));
+                    const auto sector_id = viewEntity->GetSpatialData().sector_id;
+                    if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
+                        break; // disassociated from S/P structure
+                    CSector* sector = Sectors[sector_id];
+                    if (PortalTraverser.i_marker != sector->r_marker)
+                        break; // inactive (untouched) sector
+                    for (const CFrustum& view : sector->r_frustums)
+                    {
+                        if (!view.testSphere_dirty(
+                            viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
+                            continue;
+
+                        // renderable
+                        g_hud->Render_First(context_id);
+                    }
+                } while (0);
             }
+#endif
+
+            if (o.is_main_pass)
+                g_hud->Render_Last(context_id);
         }
     }
 
-    if (g_pGameLevel)
+    // wait for static geo collecting to be done.
+    for (auto* task : static_geo_tasks)
     {
-#if RENDER != R_R1
-        // Actor Shadow (Sun + Light)
-        if (o.phase == CRender::PHASE_SMAP && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
-        {
-            do
-            {
-                IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
-                if (viewEntity == nullptr)
-                    break;
-                const auto& entity_pos = viewEntity->spatial_sector_point();
-                viewEntity->spatial_updatesector(detect_sector(entity_pos));
-                const auto sector_id = viewEntity->GetSpatialData().sector_id;
-                if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
-                    break; // disassociated from S/P structure
-                CSector* sector = Sectors[sector_id];
-                if (PortalTraverser.i_marker != sector->r_marker)
-                    break; // inactive (untouched) sector
-                for (const CFrustum& view : sector->r_frustums)
-                {
-                    if (!view.testSphere_dirty(
-                        viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
-                        continue;
-
-                    // renderable
-                    g_hud->Render_First(context_id);
-                }
-            } while (0);
-        }
-#endif
-
-        if (o.is_main_pass)
-            g_hud->Render_Last(context_id);
+        if (task)
+            TaskScheduler->Wait(*task);
     }
 }

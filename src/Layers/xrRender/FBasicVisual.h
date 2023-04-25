@@ -77,7 +77,7 @@ public:
     //	virtual IParticleCustom*	dcast_ParticleCustom		()				{ return 0;	}
 
     virtual vis_data& getVisData() { return vis; }
-    virtual u32 getType() { return Type; }
+    u32 getType() const override { return Type; }
     dxRender_Visual();
     virtual ~dxRender_Visual();
 };

@@ -35,6 +35,7 @@ struct R_dsgraph_structure
         bool use_hom{ false };
         bool precise_portals{ false };
         bool is_main_pass{ false };
+        bool mt_calculate{ false };
     } o;
 
     // Dynamic scene graph

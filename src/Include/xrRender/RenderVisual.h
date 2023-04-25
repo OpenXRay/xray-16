@@ -12,7 +12,7 @@ class IRenderVisual
 public:
     virtual ~IRenderVisual() { ; }
     virtual vis_data& getVisData() = 0;
-    virtual u32 getType() = 0;
+    virtual u32 getType() const = 0;
 
 #ifdef DEBUG
     virtual shared_str getDebugName() = 0;
