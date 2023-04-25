@@ -6,6 +6,7 @@
 #include "xrEngine/IRenderable.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCommon/math_funcs_inline.h"
+#include "xrCore/Threading/ParallelFor.hpp"
 
 #include <DirectXMath.h>
 
@@ -1033,23 +1034,12 @@ void render_sun::calculate_task(Task&, void*)
         return;
     }
 
-    bool b_need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
-    bool last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
-    if (b_need_to_render_sunshafts)
+    need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
+    last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
+    if (need_to_render_sunshafts)
         m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
 
-    for (u32 i = 0; i < m_sun_cascades.size(); ++i)
-    {
-        calculate_cascade(i);
-    }
-
-    if (b_need_to_render_sunshafts)
-        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
-}
-
-void render_sun::calculate_cascade(int cascade_ind)
-{
-    // calculate view-frustum bounds in world space
+        // calculate view-frustum bounds in world space
     Fmatrix ex_project, ex_full;
     XMMATRIX ex_full_inverse;
     {
@@ -1058,17 +1048,24 @@ void render_sun::calculate_cascade(int cascade_ind)
         ex_full_inverse = XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&ex_full));
     }
 
+    // Lets begin from base frustum
+    Fmatrix fullxform_inv;
+    XMStoreFloat4x4((XMFLOAT4X4*)&fullxform_inv, ex_full_inverse);
+
     // Compute volume(s) - something like a frustum for infinite directional light
     // Also compute virtual light position and sector it is inside
-    CFrustum cull_frustum;
     xr_vector<Fplane> cull_planes;
-    Fvector3 cull_COP;
-    Fmatrix cull_xform;
+
+    CFrustum cull_frustum[3];
+    Fvector3 cull_COP[3];
+    Fmatrix cull_xform[3];
+
+    for (int cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind)
     {
+        cull_planes.clear();
+
         FPU::m64r();
-        // Lets begin from base frustum
-        Fmatrix fullxform_inv;
-        XMStoreFloat4x4((XMFLOAT4X4*)&fullxform_inv, ex_full_inverse);
+
 #ifdef _DEBUG
         typedef DumbConvexVolume<true> t_volume;
 #else
@@ -1077,7 +1074,7 @@ void render_sun::calculate_cascade(int cascade_ind)
 
         //******************************* Need to be placed after cuboid built **************************
         // COP - 100 km away
-        cull_COP.mad(Device.vCameraPosition, sun->direction, -tweak_COP_initial_offs);
+        cull_COP[cascade_ind].mad(Device.vCameraPosition, sun->direction, -tweak_COP_initial_offs);
 
         // Create approximate ortho-xform
         // view: auto find 'up' and 'right' vectors
@@ -1157,9 +1154,9 @@ void render_sun::calculate_cascade(int cascade_ind)
             XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&m_viewport)));
 
         // snap view-position to pixel
-        cull_xform.mul(mdir_Project, mdir_View);
+        cull_xform[cascade_ind].mul(mdir_Project, mdir_View);
         Fmatrix cull_xform_inv;
-        cull_xform_inv.invert(cull_xform);
+        cull_xform_inv.invert(cull_xform[cascade_ind]);
 
         //		light_cuboid.light_cuboid_points.reserve		(9);
         for (int p = 0; p < 8; p++)
@@ -1207,14 +1204,14 @@ void render_sun::calculate_cascade(int cascade_ind)
         // rebuild the view transform with the shift.
         mdir_View.identity();
         mdir_View.build_camera_dir(cam_shifted, L_dir, L_up);
-        cull_xform.identity();
-        cull_xform.mul(mdir_Project, mdir_View);
-        cull_xform_inv.invert(cull_xform);
+        cull_xform[cascade_ind].identity();
+        cull_xform[cascade_ind].mul(mdir_Project, mdir_View);
+        cull_xform_inv.invert(cull_xform[cascade_ind]);
 
         // Create frustum for query
-        cull_frustum._clear();
+        cull_frustum[cascade_ind]._clear();
         for (u32 p = 0; p < cull_planes.size(); p++)
-            cull_frustum._add(cull_planes[p]);
+            cull_frustum[cascade_ind]._add(cull_planes[p]);
 
         {
             Fvector cam_proj = Device.vCameraPosition;
@@ -1223,10 +1220,10 @@ void render_sun::calculate_cascade(int cascade_ind)
                 floorf(cam_proj.y / align_aim_step_coef) + align_aim_step_coef / 2,
                 floorf(cam_proj.z / align_aim_step_coef) + align_aim_step_coef / 2);
             cam_proj.mul(align_aim_step_coef);
-            Fvector cam_pixel = wform(cull_xform, cam_proj);
+            Fvector cam_pixel = wform(cull_xform[cascade_ind], cam_proj);
             cam_pixel = wform(m_viewport, cam_pixel);
             Fvector shift_proj = lightXZshift;
-            cull_xform.transform_dir(shift_proj);
+            cull_xform[cascade_ind].transform_dir(shift_proj);
             m_viewport.transform_dir(shift_proj);
 
             const float align_granularity = 4.f;
@@ -1249,41 +1246,64 @@ void render_sun::calculate_cascade(int cascade_ind)
             diff.mul(sign_test);
             Fmatrix adjust;
             adjust.translate(diff);
-            cull_xform.mulB_44(adjust);
+            cull_xform[cascade_ind].mulB_44(adjust);
         }
 
-        m_sun_cascades[cascade_ind].xform = cull_xform;
+        m_sun_cascades[cascade_ind].xform = cull_xform[cascade_ind];
 
         s32 limit = RImplementation.o.smapsize - 1; // TODO: move into the class
         sun->X.D[cascade_ind].minX = 0;
         sun->X.D[cascade_ind].maxX = limit;
         sun->X.D[cascade_ind].minY = 0;
         sun->X.D[cascade_ind].maxY = limit;
-        sun->X.D[cascade_ind].combine = cull_xform;
+        sun->X.D[cascade_ind].combine = cull_xform[cascade_ind];
 
         // full-xform
         FPU::m24r();
     }
 
-    // Begin SMAP-render
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + cascade_ind);
+    const auto process_cascade = [&, this](const TaskRange<u32>& range)
     {
-        //		sun->svis.begin					();
-        dsgraph.o.phase = CRender::PHASE_SMAP;
-        dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-        dsgraph.o.sector_id = RImplementation.get_largest_sector();
-        dsgraph.o.xform = cull_xform;
-        dsgraph.o.view_frustum = cull_frustum;
-        dsgraph.o.view_pos = cull_COP;
+        for (u32 cascade_ind = range.begin(); cascade_ind != range.end(); ++cascade_ind)
+        {
+            // Begin SMAP-render
+            auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + cascade_ind);
+            {
+                //		sun->svis.begin					();
+                dsgraph.o.phase = CRender::PHASE_SMAP;
+                dsgraph.r_pmask(true, RImplementation.o.Tshadows);
+                dsgraph.o.sector_id = RImplementation.get_largest_sector();
+                dsgraph.o.xform = cull_xform[cascade_ind];
+                dsgraph.o.view_frustum = cull_frustum[cascade_ind];
+                dsgraph.o.view_pos = cull_COP[cascade_ind];
 
-        // Fill the database
-        dsgraph.build_subspace();
+                // Fill the database
+                dsgraph.build_subspace();
+            }
+        }
+    };
+    
+    if (o.mt_enabled)
+    {
+        &xr_parallel_for(TaskRange<u32>(0, m_sun_cascades.size()), process_cascade);
     }
+    else
+    {
+        process_cascade(TaskRange<u32>(0, m_sun_cascades.size()));
+    }
+}
+
+void render_sun::calculate_cascade(int cascade_ind)
+{
+
 }
 
 void render_sun::render()
 {
     wait();
+
+    if (need_to_render_sunshafts)
+        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
