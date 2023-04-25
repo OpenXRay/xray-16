@@ -12,6 +12,7 @@ class CHUDManager : public CCustomHUD
     friend class CUI;
 
 private:
+    Lock render_lock{}; // TODO: I believe this can be avoided, need to think more about it
     //.	CUI*					pUI;
     CUIGameCustom* pUIGame;
     CHitMarker HitMarker;

@@ -63,11 +63,12 @@ void CHUDManager::Render_First(u32 context_id)
 
     // On R1 render only shadow
     // On R2+ render everything
-    O->renderable_Invisible(GEnv.Render->GenerationIsR1());
-
-    O->renderable_Render(context_id, O->H_Root());
-
-    O->renderable_Invisible(false);
+    {
+        ScopeLock lock{ &render_lock };
+        O->renderable_Invisible(GEnv.Render->GenerationIsR1());
+        O->renderable_Render(context_id, O->H_Root());
+        O->renderable_Invisible(false);
+    }
 }
 
 bool need_render_hud()
@@ -101,9 +102,12 @@ void CHUDManager::Render_Last(u32 context_id)
 
     IGameObject* O = g_pGameLevel->CurrentViewEntity();
     // hud itself
-    O->renderable_HUD(true);
-    O->OnHUDDraw(context_id, this, O->H_Root());
-    O->renderable_HUD(false);
+    {
+        ScopeLock lock{ &render_lock };
+        O->renderable_HUD(true);
+        O->OnHUDDraw(context_id, this, O->H_Root());
+        O->renderable_HUD(false);
+    }
 }
 
 #include "player_hud.h"

@@ -102,6 +102,8 @@ CGameObject::~CGameObject()
 
 void CGameObject::MakeMeCrow()
 {
+    ScopeLock lock{ &render_lock };
+
     if (Props.crow)
         return;
     if (!processing_enabled())

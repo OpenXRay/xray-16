@@ -8,6 +8,7 @@ class CParticlesObject : public CPS_Instance
 {
     using inherited = CPS_Instance;
 
+    Lock render_lock{};
     u32 dwLastTime;
     void Init(LPCSTR p_name, IRender_Sector::sector_id_t sector_id, BOOL bAutoRemove);
     void UpdateSpatial();

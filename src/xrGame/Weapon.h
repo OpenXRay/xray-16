@@ -521,6 +521,8 @@ private:
 
     bool m_bRememberActorNVisnStatus;
 
+    Lock render_lock{};
+
 public:
     virtual void SetActivationSpeedOverride(Fvector const& speed);
     bool GetRememberActorNVisnStatus() { return m_bRememberActorNVisnStatus; };

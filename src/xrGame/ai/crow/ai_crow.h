@@ -54,6 +54,8 @@ class CAI_Crow : public CEntity
         void Unload();
     };
 
+    Lock render_lock{}; // TODO: this can be avoided as well.
+
 public:
     void OnHitEndPlaying(CBlend* B);
 

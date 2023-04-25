@@ -913,6 +913,8 @@ void CWeapon::EnableActorNVisnAfterZoom()
 bool CWeapon::need_renderable() { return !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom()); }
 void CWeapon::renderable_Render(u32 context_id, IRenderable* root)
 {
+    ScopeLock lock{ &render_lock };
+
     UpdateXForm();
 
     //нарисовать подсветку
