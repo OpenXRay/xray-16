@@ -29,7 +29,7 @@ void render_main::calculate_task(Task&, void*)
     auto& dsgraph_main = RImplementation.get_context(CRender::eRDSG_MAIN);
 
     dsgraph_main.o.phase = CRender::PHASE_NORMAL;
-    dsgraph_main.r_pmask(true, false, true); // enable priority "0",+ capture wmarks
+    dsgraph_main.r_pmask(true, true, true); // enable priority "0,1",+ capture wmarks
     if (RImplementation.r_sun.o.active && RImplementation.o.oldshadowcascades)
         dsgraph_main.set_Recorder(&RImplementation.main_coarse_structure); // this is a show-stopper. Can't be paralleled with sun
     else
@@ -49,9 +49,6 @@ void render_main::calculate_task(Task&, void*)
     dsgraph_main.o.mt_calculate = o.mt_enabled;
 
     dsgraph_main.build_subspace();
-
-    dsgraph_main.set_Recorder(nullptr);
-    dsgraph_main.r_pmask(true, false); // disable priority "1"
 }
 
 void render_main::render()
@@ -76,6 +73,9 @@ void CRender::Calculate()
     r_ssaHZBvsTEX = _sqr(ps_r__ssaHZBvsTEX / 3) / g_fSCREEN;
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
 
+    
+    // Configure
+    o.distortion    = o.distortion_enabled;
     o.mt_calculate  = ps_r2_mt_calculate > 0;
     o.mt_render     = ps_r2_mt_render > 0;
 
@@ -120,9 +120,6 @@ void CRender::Calculate()
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
     TaskScheduler->Wait(*ProcessHOMTask);
-
-    // Configure
-    o.distortion = FALSE; // disable distorion
 
     r_main.init();
     r_sun.init();

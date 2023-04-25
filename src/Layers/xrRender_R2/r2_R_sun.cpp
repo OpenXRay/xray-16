@@ -1286,7 +1286,7 @@ void render_sun::calculate_task(Task&, void*)
     
     if (o.mt_enabled)
     {
-        &xr_parallel_for(TaskRange<u32>(0, m_sun_cascades.size()), process_cascade);
+        xr_parallel_for(TaskRange<u32>(0, m_sun_cascades.size()), process_cascade);
     }
     else
     {
