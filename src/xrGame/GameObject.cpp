@@ -120,8 +120,8 @@ void CGameObject::MakeMeCrow()
         return;
 
     VERIFY(dwFrame_AsCrow == device_frame_id);
-    Props.crow = 1;
     g_pGameLevel->Objects.o_crow(this);
+    Props.crow = 1;
 }
 
 void CGameObject::cName_set(shared_str N) { NameObject = N; }

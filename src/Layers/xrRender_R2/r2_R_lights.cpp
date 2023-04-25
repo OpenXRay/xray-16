@@ -77,10 +77,91 @@ void CRender::render_lights(light_Package& LP)
     //	}
     //	if (left_some_lights_that_doesn't cast shadows)
     //		accumulate them
+    static xr_vector<light*> L_spot_s;
+
+    struct task_data_t
+    {
+        light* L;
+        Task* task;
+        u32 batch_id;
+    };
+    int batch_id = 0;
+    static xr_vector<task_data_t> lights_queue{};
+    lights_queue.reserve(3);  // TODO: max cascades
+
+    const auto &calc_lights = [](Task &, void* data)
+    {
+        const auto* task_data = static_cast<task_data_t*>(data);
+        auto& dsgraph = RImplementation.alloc_context(eRDSG_SHADOW_0 + task_data->batch_id);
+        {
+            auto* L = task_data->L;
+            
+            L->svis.begin(dsgraph.context_id);
+
+            dsgraph.o.phase = PHASE_SMAP;
+            dsgraph.r_pmask(true, RImplementation.o.Tshadows);
+            dsgraph.o.sector_id = L->spatial.sector_id;
+            dsgraph.o.view_pos = L->position;
+            dsgraph.o.xform = L->X.S.combine;
+            dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+
+            dsgraph.build_subspace();
+        }
+    };
+
+    const auto& flush_lights = [&]()
+    {
+        for (const auto& [L, task, batch_id] : lights_queue)
+        {
+            VERIFY(task);
+            TaskScheduler->Wait(*task);
+
+            PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
+
+            auto& dsgraph = get_context(eRDSG_SHADOW_0 + batch_id);
+
+            const bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+            const bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+                !dsgraph.mapSorted.empty();
+
+            Target->phase_smap_spot(L);
+            RCache.set_xform_world(Fidentity);
+            RCache.set_xform_view(L->X.S.view);
+            RCache.set_xform_project(L->X.S.project);
+            dsgraph.render_graph(0);
+            if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+                Details->Render();
+            L->X.S.transluent = FALSE;
+            if (bSpecial)
+            {
+                L->X.S.transluent = TRUE;
+                Target->phase_smap_spot_tsh(L);
+                PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
+                dsgraph.render_graph(1); // normal level, secondary priority
+                PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
+                dsgraph.render_sorted(); // strict-sorted geoms
+            }
+
+            if (bNormal || bSpecial)
+            {
+                Stats.s_merged++;
+                L_spot_s.push_back(L);
+            }
+            else
+            {
+                Stats.s_finalclip++;
+            }
+
+            L->svis.end(CRender::eRDSG_MAIN); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
+            RImplementation.release_context(dsgraph.context_id);
+        }
+
+        lights_queue.clear();
+    };
+
     while (!LP.v_shadowed.empty())
     {
         // if (has_spot_shadowed)
-        xr_vector<light*> L_spot_s;
         Stats.s_used++;
 
         // generate spot shadowmap
@@ -99,54 +180,30 @@ void CRender::render_lights(light_Package& LP)
             Lights_LastFrame.push_back(L);
 
             // calculate
-            auto& dsgraph = get_context(eRDSG_SHADOW_0); // TODO: batch by 3 smaps
+            task_data_t data; // TODO: simplify?
+            data.batch_id = batch_id;
+            data.L = L;
+            data.task = &TaskScheduler->CreateTask("slight_calc", calc_lights, sizeof(data), (void*)&data);
+            if (o.mt_calculate)
             {
-                L->svis.begin(dsgraph.context_id);
-
-                dsgraph.o.phase = PHASE_SMAP;
-                dsgraph.r_pmask(true, o.Tshadows);
-                dsgraph.o.sector_id = L->spatial.sector_id;
-                dsgraph.o.view_pos = L->position;
-                dsgraph.o.xform = L->X.S.combine;
-                dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
-
-                dsgraph.build_subspace();
-            }
-
-            // render
-            PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
-            const bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
-            const bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
-                !dsgraph.mapSorted.empty();
-            if (bNormal || bSpecial)
-            {
-                Stats.s_merged++;
-                L_spot_s.push_back(L);
-                Target->phase_smap_spot(L);
-                RCache.set_xform_world(Fidentity);
-                RCache.set_xform_view(L->X.S.view);
-                RCache.set_xform_project(L->X.S.project);
-                dsgraph.render_graph(0);
-                if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                    Details->Render();
-                L->X.S.transluent = FALSE;
-                if (bSpecial)
-                {
-                    L->X.S.transluent = TRUE;
-                    Target->phase_smap_spot_tsh(L);
-                    PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
-                    dsgraph.render_graph(1); // normal level, secondary priority
-                    PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
-                    dsgraph.render_sorted(); // strict-sorted geoms
-                }
+                TaskScheduler->PushTask(*data.task);
             }
             else
             {
-                Stats.s_finalclip++;
+                TaskScheduler->RunTask(*data.task);
             }
-            L->svis.end(dsgraph.context_id); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
-            dsgraph.r_pmask(true, false);
+
+            lights_queue.emplace_back(data);
+            ++batch_id;
+
+            if (batch_id == 3)
+            {
+                flush_lights();
+
+                batch_id = 0;
+            }
         }
+        flush_lights(); // in case if something left
 
         PIX_EVENT(UNSHADOWED_LIGHTS);
 

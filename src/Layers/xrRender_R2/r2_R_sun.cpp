@@ -1333,6 +1333,7 @@ void render_sun::render()
                 dsgraph.render_sorted(); // strict-sorted geoms
             }
         }
+        RImplementation.release_context(dsgraph.context_id);
 
         // Accumulate
         RImplementation.Target->phase_accumulator();
