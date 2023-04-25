@@ -150,6 +150,8 @@ void CRender::Render()
     BasicStats.WaitS.End();
     q_sync_point.End();
 
+    r_main.wait();
+
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
     {
         // flush

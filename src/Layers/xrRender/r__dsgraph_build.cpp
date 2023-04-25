@@ -695,8 +695,6 @@ void R_dsgraph_structure::build_subspace()
 {
     marker++; // !!! critical here
 
-    VERIFY(o.sector_id != IRender_Sector::INVALID_SECTOR_ID);
-
     if (o.precise_portals && RImplementation.rmPortals)
     {
         // Check if camera is too near to some portal - if so force DualRender

@@ -73,6 +73,15 @@ struct i_render_phase
     xr_string name{ "" };
 };
 
+struct render_main : public i_render_phase
+{
+    explicit render_main(const xr_string& name_in) : i_render_phase(name) {}
+
+    void init() override;
+    void calculate_task(Task&, void*) override;
+    void render() override;
+};
+
 struct render_rain : public i_render_phase
 {
     explicit render_rain(const xr_string& name_in) : i_render_phase(name) {}
@@ -96,6 +105,8 @@ struct render_sun : public i_render_phase
 
     xr_vector<sun::cascade> m_sun_cascades;
     light* sun{ nullptr };
+    bool need_to_render_sunshafts{ false };
+    bool last_cascade_chain_mode{ false };
 };
 
 struct render_sun_old : public i_render_phase
@@ -312,6 +323,8 @@ public:
     void render_indirect(light* L) const;
     void render_lights(light_Package& LP);
     void render_menu();
+
+    render_main r_main;
 #if RENDER != R_R2
     render_rain r_rain;
 #endif

@@ -918,6 +918,7 @@ void CRender::rmNormal()
 //////////////////////////////////////////////////////////////////////
 CRender::CRender()
     : Sectors_xrc("render")
+    , r_main("main_render")
     , r_sun("sun_render")
     , r_sun_old("sun_render_old")
 #if RENDER != R_R2

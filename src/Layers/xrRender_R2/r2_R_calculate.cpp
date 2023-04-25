@@ -16,6 +16,50 @@ extern float r_ssaGLOD_start, r_ssaGLOD_end;
 extern int ps_r2_mt_calculate;
 extern int ps_r2_mt_render;
 
+
+//-----
+void render_main::init()
+{
+    o.mt_enabled = RImplementation.o.mt_calculate && !RImplementation.o.oldshadowcascades && !ps_r2_ls_flags.test(R2FLAG_ZFILL);
+    o.active = true; // always active
+}
+
+void render_main::calculate_task(Task&, void*)
+{    
+    auto& dsgraph_main = RImplementation.get_context(CRender::eRDSG_MAIN);
+
+    dsgraph_main.o.phase = CRender::PHASE_NORMAL;
+    dsgraph_main.r_pmask(true, false, true); // enable priority "0",+ capture wmarks
+    if (RImplementation.r_sun.o.active && RImplementation.o.oldshadowcascades)
+        dsgraph_main.set_Recorder(&RImplementation.main_coarse_structure); // this is a show-stopper. Can't be paralleled with sun
+    else
+        dsgraph_main.set_Recorder(nullptr);
+    dsgraph_main.o.use_hom = true;
+    dsgraph_main.o.is_main_pass = true;
+    dsgraph_main.o.sector_id = RImplementation.last_sector_id;
+    dsgraph_main.o.portal_traverse_flags =
+        CPortalTraverser::VQ_HOM | CPortalTraverser::VQ_SSA | CPortalTraverser::VQ_FADE;
+    dsgraph_main.o.spatial_traverse_flags = ISpatial_DB::O_ORDERED;
+    dsgraph_main.o.spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
+    dsgraph_main.o.view_pos = Device.vCameraPosition;
+    dsgraph_main.o.xform = Device.mFullTransform;
+    dsgraph_main.o.view_frustum = RImplementation.ViewBase;
+    dsgraph_main.o.query_box_side = VIEWPORT_NEAR + EPS_L;
+    dsgraph_main.o.precise_portals = true;
+
+    dsgraph_main.build_subspace();
+
+    dsgraph_main.set_Recorder(nullptr);
+    dsgraph_main.r_pmask(true, false); // disable priority "1"
+}
+
+void render_main::render()
+{
+    // TODO
+}
+
+//-----
+
 void CRender::Calculate()
 {
     // Transfer to global space to avoid deep pointer access
@@ -34,7 +78,7 @@ void CRender::Calculate()
     o.mt_calculate  = ps_r2_mt_calculate > 0;
     o.mt_render     = ps_r2_mt_render > 0;
 
-    auto& dsgraph_main = RImplementation.alloc_context(eRDSG_MAIN);
+    auto& dsgraph_main = alloc_context(eRDSG_MAIN);
 
     // Detect camera-sector
     if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
@@ -51,11 +95,6 @@ void CRender::Calculate()
 
     //
     Lights.Update();
-
-    r_sun.init();
-#if RENDER != R_R2
-    r_rain.init();
-#endif
 
     // Check if we touch some light even trough portal
     static xr_vector<ISpatial*> spatial_lights;
@@ -75,48 +114,25 @@ void CRender::Calculate()
         Lights.add_light(L);
     }
 
-    // Configure
-    o.distortion = FALSE; // disable distorion
 
     // Frustum
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
     TaskScheduler->Wait(*ProcessHOMTask);
-        
+
+    // Configure
+    o.distortion = FALSE; // disable distorion
+
+    r_main.init();
+    r_sun.init();
+#if RENDER != R_R2
+    r_rain.init();
+#endif
+
     //******* Main calc - DEFERRER RENDERER
     // Main calc
     BasicStats.Culling.Begin();
-    if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
-    {
-        dsgraph_main.o.phase = PHASE_NORMAL;
-        dsgraph_main.r_pmask(true, false, true); // enable priority "0",+ capture wmarks
-        if (r_sun.o.active && o.oldshadowcascades)
-            dsgraph_main.set_Recorder(&main_coarse_structure); // this is a show stopper. Can't be paralleled with sun
-        else
-            dsgraph_main.set_Recorder(nullptr);
-        dsgraph_main.o.use_hom = true;
-        dsgraph_main.o.is_main_pass = true;
-        dsgraph_main.o.sector_id = last_sector_id;
-        dsgraph_main.o.portal_traverse_flags =
-            CPortalTraverser::VQ_HOM | CPortalTraverser::VQ_SSA | CPortalTraverser::VQ_FADE;
-        dsgraph_main.o.spatial_traverse_flags = ISpatial_DB::O_ORDERED;
-        dsgraph_main.o.spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
-        dsgraph_main.o.view_pos = Device.vCameraPosition;
-        dsgraph_main.o.xform = Device.mFullTransform;
-        dsgraph_main.o.view_frustum = ViewBase;
-        dsgraph_main.o.query_box_side = VIEWPORT_NEAR + EPS_L;
-        dsgraph_main.o.precise_portals = true;
-
-        dsgraph_main.build_subspace();
-    }
-    else
-    {
-        if (g_pGameLevel)
-            g_hud->Render_Last(dsgraph_main.context_id);
-    }
-
-    dsgraph_main.set_Recorder(nullptr);
-    dsgraph_main.r_pmask(true, false); // disable priority "1"
+    r_main.calculate();
     BasicStats.Culling.End();
 
     // Rain calc
