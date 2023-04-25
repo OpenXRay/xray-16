@@ -604,7 +604,7 @@ void CRender::Calculate()
                             v_copy.box.xform(renderable->GetRenderData().xform);
                             BOOL bVisible = HOM.visible(v_copy);
                             v_orig.accept_frame = v_copy.accept_frame;
-                            v_orig.marker = v_copy.marker;
+                            memcpy(v_orig.marker, v_copy.marker, sizeof(v_copy.marker));
                             v_orig.hom_frame = v_copy.hom_frame;
                             v_orig.hom_tested = v_copy.hom_tested;
                             if (!bVisible)

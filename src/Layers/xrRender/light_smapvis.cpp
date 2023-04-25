@@ -124,7 +124,7 @@ void smapvis::mark(u32 context_id)
     RImplementation.Stats.ic_culled += invisible.size();
     u32 marker = dsgraph.marker + 1; // we are called befor marker increment
     for (u32 it = 0; it < invisible.size(); it++)
-        invisible[it]->vis.marker = marker; // this effectively disables processing
+        invisible[it]->vis.marker[context_id] = marker; // this effectively disables processing
 }
 
 void smapvis::rfeedback_static(u32 context_id, dxRender_Visual* V)

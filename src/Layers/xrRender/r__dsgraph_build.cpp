@@ -39,9 +39,9 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
 {
     CRender& RI = RImplementation;
 
-    if (pVisual->vis.marker == marker)
+    if (pVisual->vis.marker[context_id] == marker)
         return;
-    pVisual->vis.marker = marker;
+    pVisual->vis.marker[context_id] = marker;
 
 #if RENDER == R_R1
     if (RI.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))
@@ -150,9 +150,9 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
 {
     CRender& RI = RImplementation;
 
-    if (pVisual->vis.marker == marker)
+    if (pVisual->vis.marker[context_id] == marker)
         return;
-    pVisual->vis.marker = marker;
+    pVisual->vis.marker[context_id] = marker;
 
 #if RENDER == R_R1
     if (RI.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))
@@ -269,7 +269,7 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
         for (auto& i : pV->children)
         {
-            i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+            //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                          // [use shader data from parent model, rather than it childrens]
 
             add_leafs_dynamic(root, i, xform);
@@ -304,7 +304,7 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
             }
             for (auto& i : pV->children)
             {
-                i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+                //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                              // [use shader data from parent model, rather than it childrens]
                 add_leafs_dynamic(root, i, xform);
             }
@@ -358,7 +358,7 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
         for (auto& i : pV->children)
         {
-            i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+            //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                          // [use shader data from parent model, rather than it childrens]
             add_leafs_static(i);
         }
@@ -372,7 +372,7 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
         pV->CalculateBones(TRUE);
         for (auto& i : pV->children)
         {
-            i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+            //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                          // [use shader data from parent model, rather than it childrens]
             add_leafs_static(i);
         }
@@ -399,7 +399,7 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
             // Add all children, doesn't perform any tests
             for (auto& i : pV->children)
             {
-                i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+                //i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
                                                              // [use shader data from parent model, rather than it childrens]
                 add_leafs_static(i);
             }
@@ -710,6 +710,13 @@ void R_dsgraph_structure::build_subspace()
         }
     }
 
+    if (o.is_main_pass && (o.sector_id == IRender_Sector::INVALID_SECTOR_ID))
+    {
+        if (g_pGameLevel)
+            g_hud->Render_Last(context_id);
+        return;
+    }
+
     // Traverse sector/portal structure
     PortalTraverser.traverse(Sectors[o.sector_id], o.view_frustum, o.view_pos, o.xform, o.portal_traverse_flags);
 
@@ -824,7 +831,7 @@ void R_dsgraph_structure::build_subspace()
                     vis_data v_copy = v_orig;
                     v_copy.box.xform(renderable->GetRenderData().xform);
                     BOOL bVisible = RImplementation.HOM.visible(v_copy);
-                    v_orig.marker = v_copy.marker;
+                    memcpy(v_orig.marker, v_copy.marker, sizeof(v_copy.marker));
                     v_orig.accept_frame = v_copy.accept_frame;
                     v_orig.hom_frame = v_copy.hom_frame;
                     v_orig.hom_tested = v_copy.hom_tested;
@@ -856,36 +863,39 @@ void R_dsgraph_structure::build_subspace()
         }
     }
 
-    if (o.is_main_pass && g_pGameLevel)
-        g_hud->Render_Last(context_id);
-
-#if RENDER != R_R1
-    // Actor Shadow (Sun + Light)
-    if (g_pGameLevel && o.phase == RImplementation.PHASE_SMAP && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
+    if (g_pGameLevel)
     {
-        do
+#if RENDER != R_R1
+        // Actor Shadow (Sun + Light)
+        if (o.phase == CRender::PHASE_SMAP && ps_r__common_flags.test(RFLAG_ACTOR_SHADOW))
         {
-            IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
-            if (viewEntity == nullptr)
-                break;
-            const auto& entity_pos = viewEntity->spatial_sector_point();
-            viewEntity->spatial_updatesector(detect_sector(entity_pos));
-            const auto sector_id = viewEntity->GetSpatialData().sector_id;
-            if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
-                break; // disassociated from S/P structure
-            CSector* sector = Sectors[sector_id];
-            if (PortalTraverser.i_marker != sector->r_marker)
-                break; // inactive (untouched) sector
-            for (const CFrustum& view : sector->r_frustums)
+            do
             {
-                if (!view.testSphere_dirty(
+                IGameObject* viewEntity = g_pGameLevel->CurrentViewEntity();
+                if (viewEntity == nullptr)
+                    break;
+                const auto& entity_pos = viewEntity->spatial_sector_point();
+                viewEntity->spatial_updatesector(detect_sector(entity_pos));
+                const auto sector_id = viewEntity->GetSpatialData().sector_id;
+                if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
+                    break; // disassociated from S/P structure
+                CSector* sector = Sectors[sector_id];
+                if (PortalTraverser.i_marker != sector->r_marker)
+                    break; // inactive (untouched) sector
+                for (const CFrustum& view : sector->r_frustums)
+                {
+                    if (!view.testSphere_dirty(
                         viewEntity->GetSpatialData().sphere.P, viewEntity->GetSpatialData().sphere.R))
-                    continue;
+                        continue;
 
-                // renderable
-                g_hud->Render_First(context_id);
-            }
-        } while (0);
-    }
+                    // renderable
+                    g_hud->Render_First(context_id);
+                }
+            } while (0);
+        }
 #endif
+
+        if (o.is_main_pass)
+            g_hud->Render_Last(context_id);
+    }
 }
