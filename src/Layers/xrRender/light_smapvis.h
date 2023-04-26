@@ -17,19 +17,20 @@ public:
     dxRender_Visual* testQ_V;
     u32 testQ_id;
     u32 testQ_frame;
+    int id{-1};
 
 public:
     smapvis();
     ~smapvis();
 
     void invalidate();
-    void begin(u32 context_id); // should be called before 'marker++' and before graph-build
-    void end(u32 context_id);
-    void mark(u32 context_id);
+    void begin(); // should be called before 'marker++' and before graph-build
+    void end();
+    void mark();
     void flushoccq(); // should be called when no rendering of light is supposed
 
     void resetoccq();
 
     IC bool sleep() { return Device.dwFrame > frame_sleep; }
-    virtual void rfeedback_static(u32 context_id, dxRender_Visual* V) override;
+    virtual void rfeedback_static(dxRender_Visual* V) override;
 };

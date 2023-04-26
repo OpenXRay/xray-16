@@ -6,7 +6,7 @@
 class R_feedback
 {
 public:
-    virtual void rfeedback_static(u32 context_id, dxRender_Visual* V) = 0;
+    virtual void rfeedback_static(dxRender_Visual* V) = 0;
 };
 
 struct R_dsgraph_structure

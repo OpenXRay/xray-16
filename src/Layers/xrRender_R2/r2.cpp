@@ -657,7 +657,8 @@ void CRender::reset_begin()
                 continue;
             try
             {
-                Lights_LastFrame[it]->svis.resetoccq();
+                for (int id = 0; id < 3; ++id)
+                    Lights_LastFrame[it]->svis[id].resetoccq();
             }
             catch (...)
             {

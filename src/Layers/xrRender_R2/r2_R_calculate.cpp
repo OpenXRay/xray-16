@@ -127,25 +127,32 @@ void CRender::Calculate()
     r_rain.init();
 #endif
 
-    //******* Main calc - DEFERRER RENDERER
     // Main calc
     BasicStats.Culling.Begin();
-    r_main.calculate();
+    {
+        r_main.calculate();
+    }
     BasicStats.Culling.End();
 
     // Rain calc
 #if RENDER != R_R2
-    auto& dsgraph_rain = alloc_context(eRDSG_RAIN);
+    if (r_rain.o.active)
     {
-        r_rain.calculate();
+        auto& dsgraph_rain = alloc_context(eRDSG_RAIN);
+        {
+            r_rain.calculate();
+        }
     }
 #endif
 
     // Sun calc
-    auto& dsgraph_shadow0 = alloc_context(eRDSG_SHADOW_0);
-    auto& dsgraph_shadow1 = alloc_context(eRDSG_SHADOW_1);
-    auto& dsgraph_shadow2 = alloc_context(eRDSG_SHADOW_2);
+    if (r_sun.o.active)
     {
-        r_sun.calculate();
+        auto& dsgraph_shadow0 = alloc_context(eRDSG_SHADOW_0);
+        auto& dsgraph_shadow1 = alloc_context(eRDSG_SHADOW_1);
+        auto& dsgraph_shadow2 = alloc_context(eRDSG_SHADOW_2);
+        {
+            r_sun.calculate();
+        }
     }
 }

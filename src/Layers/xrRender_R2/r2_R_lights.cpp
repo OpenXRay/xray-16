@@ -85,7 +85,6 @@ void CRender::render_lights(light_Package& LP)
         Task* task;
         u32 batch_id;
     };
-    int batch_id = 0;
     static xr_vector<task_data_t> lights_queue{};
     lights_queue.reserve(3);  // TODO: max cascades
 
@@ -96,7 +95,7 @@ void CRender::render_lights(light_Package& LP)
         {
             auto* L = task_data->L;
             
-            L->svis.begin(dsgraph.context_id);
+            L->svis[dsgraph.context_id - CRender::eRDSG_SHADOW_0].begin();
 
             dsgraph.o.phase = PHASE_SMAP;
             dsgraph.r_pmask(true, RImplementation.o.Tshadows);
@@ -123,36 +122,34 @@ void CRender::render_lights(light_Package& LP)
             const bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
             const bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
                 !dsgraph.mapSorted.empty();
-
-            Target->phase_smap_spot(L);
-            RCache.set_xform_world(Fidentity);
-            RCache.set_xform_view(L->X.S.view);
-            RCache.set_xform_project(L->X.S.project);
-            dsgraph.render_graph(0);
-            if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                Details->Render();
-            L->X.S.transluent = FALSE;
-            if (bSpecial)
-            {
-                L->X.S.transluent = TRUE;
-                Target->phase_smap_spot_tsh(L);
-                PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
-                dsgraph.render_graph(1); // normal level, secondary priority
-                PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
-                dsgraph.render_sorted(); // strict-sorted geoms
-            }
-
             if (bNormal || bSpecial)
             {
                 Stats.s_merged++;
                 L_spot_s.push_back(L);
+                Target->phase_smap_spot(L);
+                RCache.set_xform_world(Fidentity);
+                RCache.set_xform_view(L->X.S.view);
+                RCache.set_xform_project(L->X.S.project);
+                dsgraph.render_graph(0);
+                if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+                    Details->Render();
+                L->X.S.transluent = FALSE;
+                if (bSpecial)
+                {
+                    L->X.S.transluent = TRUE;
+                    Target->phase_smap_spot_tsh(L);
+                    PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
+                    dsgraph.render_graph(1); // normal level, secondary priority
+                    PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
+                    dsgraph.render_sorted(); // strict-sorted geoms
+                }
             }
             else
             {
                 Stats.s_finalclip++;
             }
 
-            L->svis.end(CRender::eRDSG_MAIN); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
+            L->svis[dsgraph.context_id - CRender::eRDSG_SHADOW_0].end(); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
             RImplementation.release_context(dsgraph.context_id);
         }
 
@@ -169,6 +166,7 @@ void CRender::render_lights(light_Package& LP)
         xr_vector<light*>& source = LP.v_shadowed;
         light* L = source.back();
         const u16 sid = L->vis.smap_ID;
+        int batch_id = 0;
         while (true)
         {
             if (source.empty())

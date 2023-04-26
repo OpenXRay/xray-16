@@ -19,9 +19,9 @@ void smapvis::invalidate()
     frame_sleep = Device.dwFrame + ps_r__LightSleepFrames;
     invisible.clear();
 }
-void smapvis::begin(u32 context_id)
+void smapvis::begin()
 {
-    auto& dsgraph = RImplementation.get_context(context_id);
+    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + id);
     dsgraph.clear_Counters();
     switch (state)
     {
@@ -32,18 +32,18 @@ void smapvis::begin(u32 context_id)
         // mark already known to be invisible visuals, set breakpoint
         testQ_V = 0;
         testQ_id = 0;
-        mark(context_id);
+        mark();
         dsgraph.set_Feedback(this, test_current);
         break;
     case state_usingTC:
         // just mark
-        mark(context_id);
+        mark();
         break;
     }
 }
-void smapvis::end(u32 context_id)
+void smapvis::end()
 {
-    auto& dsgraph = RImplementation.get_context(context_id);
+    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + id);
 
     // Gather stats
     u32 ts, td;
@@ -118,8 +118,9 @@ void smapvis::resetoccq()
     flushoccq();
 }
 
-void smapvis::mark(u32 context_id)
+void smapvis::mark()
 {
+    const auto context_id = CRender::eRDSG_SHADOW_0 + id;
     auto& dsgraph = RImplementation.get_context(context_id);
     RImplementation.Stats.ic_culled += invisible.size();
     u32 marker = dsgraph.marker + 1; // we are called befor marker increment
@@ -127,9 +128,9 @@ void smapvis::mark(u32 context_id)
         invisible[it]->vis.marker[context_id] = marker; // this effectively disables processing
 }
 
-void smapvis::rfeedback_static(u32 context_id, dxRender_Visual* V)
+void smapvis::rfeedback_static(dxRender_Visual* V)
 {
     testQ_V = V;
-    auto& dsgraph = RImplementation.get_context(context_id);
+    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + id);
     dsgraph.set_Feedback(0, 0);
 }

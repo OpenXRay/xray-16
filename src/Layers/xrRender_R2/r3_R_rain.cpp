@@ -313,6 +313,7 @@ void render_rain::render()
                 //	Details->Render					()	;
             }
         }
+        RImplementation.release_context(CRender::eRDSG_RAIN);
     }
 
     // Restore XForms
@@ -323,7 +324,6 @@ void render_rain::render()
     // Accumulate
     RImplementation.Target->phase_rain(); // TODO: move into this class as well
     RImplementation.Target->draw_rain(RainLight);
-    RImplementation.release_context(CRender::eRDSG_RAIN);
 
     RainLight.frame_render = Device.dwFrame;
 }

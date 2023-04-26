@@ -79,9 +79,9 @@ public:
 
     void unlock()
     {
-        pa_lock.Leave();
         R_ASSERT(m_bLocked);
         m_bLocked = false;
+        pa_lock.Leave();
     }
 };
 } // namespace PAPI

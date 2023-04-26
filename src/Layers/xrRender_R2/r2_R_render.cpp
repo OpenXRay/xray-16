@@ -80,14 +80,6 @@ void CRender::Render()
     rmNormal();
 #endif
 
-    bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
-    if (_menu_pp)
-    {
-        render_menu();
-        cleanup_contexts();
-        return;
-    }
-
     IMainMenu* pMainMenu = g_pGamePersistent ? g_pGamePersistent->m_pMainMenu : 0;
     bool bMenu = pMainMenu ? pMainMenu->CanSkipSceneRendering() : false;
 
@@ -102,6 +94,7 @@ void CRender::Render()
     if (m_bFirstFrameAfterReset)
     {
         m_bFirstFrameAfterReset = false;
+        cleanup_contexts();
         return;
     }
 
@@ -309,7 +302,8 @@ void CRender::Render()
                 continue;
             try
             {
-                Lights_LastFrame[it]->svis.flushoccq();
+                for (int id = 0; id < 3; ++id)
+                    Lights_LastFrame[it]->svis[id].flushoccq();
             }
             catch (...)
             {
@@ -339,9 +333,7 @@ void CRender::Render()
         PIX_EVENT(DEFER_SUN);
         Stats.l_visible++;
         if (!RImplementation.o.oldshadowcascades)
-        {
             r_sun.render();
-        }
         else
             r_sun_old.render();
         Target->accum_direct_blend();
@@ -403,39 +395,9 @@ void CRender::render_forward()
 {
     auto& dsgraph = get_context(eRDSG_MAIN);
 
-    VERIFY(dsgraph.mapDistort.empty());
-    o.distortion = o.distortion_enabled; // enable distorion
-
     //******* Main render - second order geometry (the one, that doesn't support deffering)
     //.todo: should be done inside "combine" with estimation of of luminance, tone-mapping, etc.
     {
-        // level
-        if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
-        {
-            // Configure scene traversing
-            dsgraph.o.phase = PHASE_NORMAL;
-            dsgraph.r_pmask(false, true); // enable priority "1"
-            dsgraph.o.use_hom = true;
-            dsgraph.o.is_main_pass = true;
-            dsgraph.o.sector_id = last_sector_id;
-            dsgraph.o.portal_traverse_flags =
-                CPortalTraverser::VQ_HOM | CPortalTraverser::VQ_SSA | CPortalTraverser::VQ_FADE;
-            dsgraph.o.spatial_traverse_flags = ISpatial_DB::O_ORDERED;
-            dsgraph.o.spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
-            dsgraph.o.view_pos = Device.vCameraPosition;
-            dsgraph.o.xform = Device.mFullTransform;
-            dsgraph.o.view_frustum = ViewBase;
-            dsgraph.o.query_box_side = VIEWPORT_NEAR + EPS_L;
-            dsgraph.o.precise_portals = true;
-
-            dsgraph.build_subspace();
-        }
-        else
-        {
-            if (g_pGameLevel)
-                g_hud->Render_Last(dsgraph.context_id);
-        }
-
         //	Igor: we don't want to render old lods on next frame.
         dsgraph.mapLOD.clear();
         dsgraph.render_graph(1); // normal level, secondary priority
@@ -443,8 +405,6 @@ void CRender::render_forward()
         dsgraph.render_sorted(); // strict-sorted geoms
         g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
     }
-
-    o.distortion = FALSE; // disable distorion
 }
 
 // Перед началом рендера мира --#SM+#--

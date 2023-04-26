@@ -209,7 +209,7 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
 #endif
 
     if (val_feedback && counter_S == val_feedback_breakp)
-        val_feedback->rfeedback_static(context_id, pVisual);
+        val_feedback->rfeedback_static(pVisual);
 
     counter_S++;
 
