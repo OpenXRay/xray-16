@@ -182,8 +182,10 @@ public:
     // Main
     void BeforeRender() override;
 
-    virtual void Calculate() override;
-    virtual void Render() override;
+    void Calculate() override;
+    void Render() override;
+    void RenderMenu() override;
+
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;
     virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) override;
     virtual void ScreenshotAsyncBegin() override;

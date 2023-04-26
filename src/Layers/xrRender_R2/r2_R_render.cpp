@@ -8,7 +8,7 @@
 
 #include "Layers/xrRender/FBasicVisual.h"
 
-void CRender::render_menu()
+void CRender::RenderMenu()
 {
     PIX_EVENT(render_menu);
     //	Globals

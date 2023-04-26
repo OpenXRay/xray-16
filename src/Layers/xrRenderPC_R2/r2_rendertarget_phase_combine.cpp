@@ -226,8 +226,6 @@ void CRenderTarget::phase_combine()
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
             dsgraph.render_distort();
-            if (g_pGamePersistent)
-                g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
         }
     }
 

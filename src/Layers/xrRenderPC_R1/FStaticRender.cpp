@@ -657,6 +657,28 @@ void CRender::Calculate()
     BasicStats.Culling.End();
 }
 
+void CRender::RenderMenu()
+{
+    Target->Begin();
+
+    if (g_pGamePersistent)
+        g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
+
+    // find if distortion is needed at all
+    const bool bPerform = Target->Perform();
+    const bool _menu_pp = o.distortion && (g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false);
+    if (bPerform || _menu_pp)
+    {
+        Target->phase_distortion();
+
+        if (g_pGamePersistent)
+            g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
+    
+        // combination/postprocess
+        Target->phase_combine(_menu_pp, false);
+    }
+}
+
 extern u32 g_r;
 void CRender::Render()
 {
@@ -668,12 +690,6 @@ void CRender::Render()
     {
         m_bFirstFrameAfterReset = false;
         return;
-    }
-
-    // This is an ugly workaround to prevent the context used without allocation in menus.
-    if (!dsgraph_pool[0].second)
-    {
-        alloc_context(eRDSG_MAIN);
     }
 
     g_r = 1;

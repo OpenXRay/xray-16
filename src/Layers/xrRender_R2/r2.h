@@ -487,6 +487,8 @@ public:
 
     void Calculate() override;
     void Render() override;
+    void RenderMenu() override;
+
     void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;
     void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) override;
     void ScreenshotAsyncBegin() override;
