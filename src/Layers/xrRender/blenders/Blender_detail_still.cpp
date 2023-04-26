@@ -63,6 +63,7 @@ void CBlender_Detail_Still::CompileFFP(CBlender_Compile& C) const
         switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:
+        case SE_R1_NORMAL_LQ:
         {
             C.PassBegin();
             {
@@ -75,8 +76,8 @@ void CBlender_Detail_Still::CompileFFP(CBlender_Compile& C) const
 
                 switch (C.iElement)
                 {
-                case 0: C.PassSET_Shaders("detail_wave", "null"); break;
-                case 1: C.PassSET_Shaders("detail_still", "null"); break;
+                case SE_R1_NORMAL_HQ: C.PassSET_Shaders("detail_wave", "null"); break;
+                case SE_R1_NORMAL_LQ: C.PassSET_Shaders("detail_still", "null"); break;
                 }
 
                 // Stage1 - Base texture
@@ -109,10 +110,8 @@ void CBlender_Detail_Still::CompileFFP(CBlender_Compile& C) const
                 C.StageEnd();
             }
             C.PassEnd();
-        }
-
-        default:
             break;
+        }
         } // switch (C.iElement)
     }
 }
