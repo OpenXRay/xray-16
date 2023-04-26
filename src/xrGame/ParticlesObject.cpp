@@ -277,17 +277,13 @@ void CParticlesObject::renderable_Render(u32 context_id, IRenderable* root)
         return;
 
     VERIFY(renderable.visual);
+    const auto dt = Device.dwTimeGlobal - dwLastTime;
+    if (dt)
     {
-        ScopeLock lock{ &render_lock };
-
-        const auto dt = Device.dwTimeGlobal - dwLastTime;
-        if (dt)
-        {
-            IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
-            VERIFY(V);
-            V->OnFrame(dt);
-            dwLastTime = Device.dwTimeGlobal;
-        }
+        IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
+        VERIFY(V);
+        V->OnFrame(dt);
+        dwLastTime = Device.dwTimeGlobal;
     }
 
     GEnv.Render->add_Visual(context_id, root, renderable.visual, renderable.xform);
