@@ -137,6 +137,15 @@ int ps_r1_GlowsPerFrame = 16; // r1-only
 float ps_r1_fog_luminance = 1.1f; // r1-only
 int ps_r1_SoftwareSkinning = 0; // r1-only
 
+u32 ps_r1_ffp_lighting_mode = R1_FFP_LIGHTING_LIGHTMAP; // r1-only
+const xr_token qffp_lighting_token[] =
+{
+    { "st_opt_ffp_constant", R1_FFP_LIGHTING_CONSTANT },
+    { "st_opt_ffp_lightmap", R1_FFP_LIGHTING_LIGHTMAP },
+    { "st_opt_ffp_dynamic", R1_FFP_LIGHTING_LIGHTS },
+    { nullptr, -1 }
+};
+
 // R2
 bool ps_r2_sun_static = false;
 bool ps_r2_advanced_pp = true; // advanced post process and effects
@@ -802,6 +811,7 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r1_software_skinning", &ps_r1_SoftwareSkinning, 0, 2);
 
     CMD3(CCC_Mask, "r1_ffp", &ps_r1_flags, R1FLAG_FFP);
+    CMD3(CCC_Token, "r1_ffp_lighting", &ps_r1_ffp_lighting_mode, qffp_lighting_token);
 
     // R2
     CMD4(CCC_Float, "r2_ssa_lod_a", &ps_r2_ssaLOD_A, 16, 96);

@@ -127,7 +127,7 @@ void CBlender_LaEmB::Compile(CBlender_Compile& C)
 
     const bool bConstant = (0 != xr_stricmp(oT2_const, "$null"));
 
-    if (C.bEditor)
+    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
     {
         if (bConstant)
             compile_EDc(C);
