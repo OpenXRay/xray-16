@@ -29,15 +29,6 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-static BOOL dcl_equal(VertexElement* a, VertexElement* b)
-{
-    // check sizes
-    u32 a_size = GetDeclLength(a);
-    u32 b_size = GetDeclLength(b);
-    if (a_size != b_size)
-        return FALSE;
-    return 0 == memcmp(a, b, a_size * sizeof(VertexElement));
-}
 
 SDeclaration* CResourceManager::_CreateDecl(VertexElement* dcl)
 {
