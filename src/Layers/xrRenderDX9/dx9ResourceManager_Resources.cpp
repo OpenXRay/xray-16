@@ -20,7 +20,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
     P->vs = proto.vs;
     P->constants = proto.constants;
     P->T = proto.T;
-#ifdef _EDITOR
+#if defined(USE_DX9) && RENDER == R_R1
     P->M = proto.M;
 #endif
     P->C = proto.C;
