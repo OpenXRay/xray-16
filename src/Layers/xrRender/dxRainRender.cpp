@@ -79,7 +79,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
     FVF::LIT* verts = (FVF::LIT*)RCache.Vertex.Lock(desired_items * 4, hGeom_Rain->vb_stride, vOffset);
     FVF::LIT* start = verts;
     const Fvector& vEye = Device.vCameraPosition;
-    for (u32 I = 0; I < owner.items.size(); I++)
+    for (u32 I = 0; I < desired_items; I++)
     {
         // physics and time control
         CEffect_Rain::Item& one = owner.items[I];
