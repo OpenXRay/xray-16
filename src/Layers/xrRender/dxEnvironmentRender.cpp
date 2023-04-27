@@ -322,8 +322,18 @@ void dxEnvironmentRender::OnDeviceCreate()
     if (GEnv.isDedicatedServer)
         return;
 
-    CBlender_skybox b_skybox;
-    sh_2sky.create(&b_skybox, "skybox_2t");
+    if (RImplementation.o.ffp)
+    {
+        // XXX: We need better blender with multitexturing
+        // to properly blend two textures.
+        // Currently, it just suddenly changes.
+        sh_2sky.create("sky\\skydome", "skybox_2t");
+    }
+    else
+    {
+        CBlender_skybox b_skybox;
+        sh_2sky.create(&b_skybox, "skybox_2t");
+    }
     sh_2geom.create(v_skybox_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
     clouds_sh.create("clouds", "null");
     clouds_geom.create(v_clouds_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
