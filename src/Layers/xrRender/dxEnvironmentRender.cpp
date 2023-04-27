@@ -275,6 +275,9 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 void dxEnvironmentRender::RenderClouds(CEnvironment& env)
 {
+    if (!clouds_sh)
+        return;
+
     GEnv.Render->rmFar();
 
     Fmatrix mXFORM, mScale;
