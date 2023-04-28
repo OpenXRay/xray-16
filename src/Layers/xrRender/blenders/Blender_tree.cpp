@@ -58,7 +58,7 @@ void CBlender_Tree::CompileFFP(CBlender_Compile& C) const
     else
         C.PassSET_Blend_SET(TRUE, 200);
 
-    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
+    /*if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
     {
         C.PassSET_LightFog(TRUE, TRUE);
 
@@ -69,9 +69,12 @@ void CBlender_Tree::CompileFFP(CBlender_Compile& C) const
         C.StageSET_TMC(oT_Name, "$null", "$null", 0);
         C.StageEnd();
     }
-    else
+    else*/
     {
-        C.PassSET_Shaders("tree_wave", "null");
+        if (oNotAnTree.value)
+            C.PassSET_Shaders("tree_s", "null");
+        else
+            C.PassSET_Shaders("tree_wave", "null");
 
         switch (C.iElement)
         {
