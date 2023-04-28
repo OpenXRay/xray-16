@@ -477,7 +477,6 @@ void CRender::Load3DFluid()
                 dx113DFluidVolume* pVolume = xr_new<dx113DFluidVolume>();
                 pVolume->Load("", F, 0);
 
-                // we don't have an aquired context yet so take any from the pool, it should be initialized already
                 auto& dsgraph = get_imm_context();
 
                 //	Attach to sector's static geometry

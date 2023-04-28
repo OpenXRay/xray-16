@@ -140,7 +140,7 @@ void render_rain::calculate_task(Task&, void*)
         hull.compute_caster_model(cull_planes, RainLight.direction);
 #ifdef _DEBUG
         for (u32 it = 0; it < cull_planes.size(); it++)
-            Target->dbg_addplane(cull_planes[it], 0xffffffff);
+            RImplementation.Target->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
 
         // COP - 100 km away

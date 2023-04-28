@@ -212,7 +212,7 @@ void light::spatial_move()
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     if (flags.bActive)
         gi_generate();
-    for (int id = 0; id < ARRAYSIZE(svis); ++id)
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
         svis[id].invalidate();
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER == R_GL)
 }

@@ -80,7 +80,7 @@ public:
             s32 minX, maxX;
             s32 minY, maxY;
             BOOL transluent;
-        } D[3]; // TODO: proper cascades max
+        } D[R__NUM_SUN_CASCADES];
         struct _P
         {
             Fmatrix world;

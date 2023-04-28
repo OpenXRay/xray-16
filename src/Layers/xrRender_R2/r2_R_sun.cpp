@@ -1101,9 +1101,9 @@ void render_sun::calculate_task(Task&, void*)
     // Also compute virtual light position and sector it is inside
     xr_vector<Fplane> cull_planes;
 
-    CFrustum cull_frustum[3];
-    Fvector3 cull_COP[3];
-    Fmatrix cull_xform[3];
+    CFrustum cull_frustum[R__NUM_SUN_CASCADES];
+    Fvector3 cull_COP[R__NUM_SUN_CASCADES];
+    Fmatrix cull_xform[R__NUM_SUN_CASCADES];
 
     for (int cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind)
     {

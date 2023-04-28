@@ -904,7 +904,7 @@ void render_sun_old::render_sun_near()
         hull.compute_caster_model(cull_planes, sun->direction);
 #ifdef _DEBUG
         for (u32 it = 0; it < cull_planes.size(); it++)
-            Target->dbg_addplane(cull_planes[it], 0xffffffff);
+            RImplementation.Target->dbg_addplane(cull_planes[it], 0xffffffff);
 #endif
 
         // COP - 100 km away
@@ -1119,9 +1119,9 @@ void render_sun::calculate_task(Task&, void*)
     // Also compute virtual light position and sector it is inside
     xr_vector<Fplane> cull_planes;
 
-    CFrustum cull_frustum[3];
-    Fvector3 cull_COP[3];
-    Fmatrix cull_xform[3];
+    CFrustum cull_frustum[R__NUM_SUN_CASCADES];
+    Fvector3 cull_COP[R__NUM_SUN_CASCADES];
+    Fmatrix cull_xform[R__NUM_SUN_CASCADES];
     for (u32 cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind)
     {
         FPU::m64r();
