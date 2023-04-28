@@ -6,8 +6,15 @@
 #ifndef NO_XR_LIGHT
 struct Flight
 {
+    enum class Type : u32
+    {
+        Point       = 1,
+        Spot        = 2,
+        Directional = 3,
+    };
+
 public:
-    u32 type; /* Type of light source */
+    Type type; /* Type of light source */
     Fcolor diffuse; /* Diffuse color of light */
     Fcolor specular; /* Specular color of light */
     Fcolor ambient; /* Ambient color of light */
@@ -21,7 +28,7 @@ public:
     float theta; /* Inner angle of spotlight cone */
     float phi; /* Outer angle of spotlight cone */
 
-    IC void set(u32 ltType, float x, float y, float z)
+    IC void set(Type ltType, float x, float y, float z)
     {
         ZeroMemory(this, sizeof(Flight));
         type = ltType;
@@ -38,6 +45,8 @@ public:
         ambient.mul_rgb(brightness);
         specular.mul_rgb(brightness);
     }
+
+    static_assert(sizeof(Type) == sizeof(D3DLIGHTTYPE));
 };
 
 static_assert(sizeof(Flight) == sizeof(D3DLIGHT9));
