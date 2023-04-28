@@ -3,7 +3,7 @@
 
 CBackend RCache;
 
-void CBackend::CreateQuadIB()
+void D3DXRenderBase::CreateQuadIB()
 {
     constexpr auto triCount = 4 * 1024;
     constexpr auto idxCount = triCount * 2 * 3;
@@ -34,8 +34,6 @@ void CBackend::CreateQuadIB()
 // Device dependance
 void CBackend::OnDeviceCreate()
 {
-    CreateQuadIB();
-
     // streams
     Vertex.Create();
     Index.Create();
@@ -52,9 +50,6 @@ void CBackend::OnDeviceDestroy()
     // streams
     Index.Destroy();
     Vertex.Destroy();
-
-    // Quad
-    QuadIB.Release();
 
     // Debug Draw
     DestroyDebugDraw();

@@ -262,7 +262,7 @@ void CParticleEffect::OnDeviceCreate()
     {
         if (m_Def->m_Flags.is(CPEDef::dfSprite))
         {
-            geom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
+            geom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RImplementation.QuadIB);
             if (m_Def)
                 shader = m_Def->m_CachedShader;
         }

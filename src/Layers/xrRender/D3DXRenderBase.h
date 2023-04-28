@@ -137,12 +137,17 @@ public:
     }
 #endif // RENDER != R_R1
 
+    void CreateQuadIB();
+
 public:
     CResourceManager* Resources{};
     ref_shader m_WireShader;
     ref_shader m_SelectionShader;
     ref_shader m_PortalFadeShader;
     ref_geom   m_PortalFadeGeom;
+
+    IndexStagingBuffer QuadIB;
+    IndexBufferHandle old_QuadIB;
 
 protected:
 #if RENDER == R_R1

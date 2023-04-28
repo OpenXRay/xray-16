@@ -69,9 +69,6 @@ public:
     _VertexStream Vertex;
     _IndexStream Index;
 
-    IndexStagingBuffer QuadIB;
-    IndexBufferHandle old_QuadIB;
-
     R_xforms xforms;
     R_hemi hemi;
     R_tree tree;
@@ -520,7 +517,6 @@ public:
 #endif
 
     // Device create / destroy / frame signaling
-    void CreateQuadIB();
     void OnFrameBegin();
     void OnFrameEnd();
     void OnDeviceCreate();

@@ -24,8 +24,8 @@ void CResourceManager::reset_begin()
     //  DX10 cut        rtc_it->second->reset_begin();
 
     // destroy DStreams
-    RCache.old_QuadIB = RCache.QuadIB;
-    RCache.QuadIB.Release();
+    RImplementation.old_QuadIB = RImplementation.QuadIB;
+    RImplementation.QuadIB.Release();
 
     RCache.Index.reset_begin();
     RCache.Vertex.reset_begin();
@@ -40,7 +40,7 @@ void CResourceManager::reset_end()
     RCache.Vertex.reset_end();
     RCache.Index.reset_end();
     Evict();
-    RCache.CreateQuadIB();
+    RImplementation.CreateQuadIB();
 
     // remark geom's which point to dynamic VB/IB
     {
@@ -57,9 +57,9 @@ void CResourceManager::reset_end()
             {
                 _G->ib = RCache.Index.Buffer();
             }
-            else if (_G->ib == RCache.old_QuadIB)
+            else if (_G->ib == RImplementation.old_QuadIB)
             {
-                _G->ib = RCache.QuadIB;
+                _G->ib = RImplementation.QuadIB;
             }
         }
     }

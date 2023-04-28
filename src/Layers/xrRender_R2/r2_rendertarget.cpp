@@ -593,8 +593,8 @@ CRenderTarget::CRenderTarget()
             D3DFVF_TEXCOORDSIZE4(6) | D3DFVF_TEXCOORDSIZE4(7);
         rt_Bloom_1.create(r2_RT_bloom1, w, h, fmt);
         rt_Bloom_2.create(r2_RT_bloom2, w, h, fmt);
-        g_bloom_build.create(fvf_build, RCache.Vertex.Buffer(), RCache.QuadIB);
-        g_bloom_filter.create(fvf_filter, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_bloom_build.create(fvf_build, RCache.Vertex.Buffer(), RImplementation.QuadIB);
+        g_bloom_filter.create(fvf_filter, RCache.Vertex.Buffer(), RImplementation.QuadIB);
         s_bloom_dbg_1.create("effects" DELIMITER "screen_set", r2_RT_bloom1);
         s_bloom_dbg_2.create("effects" DELIMITER "screen_set", r2_RT_bloom2);
 
@@ -743,9 +743,9 @@ CRenderTarget::CRenderTarget()
         s_combine_dbg_0.create("effects" DELIMITER "screen_set", r2_RT_smap_surf);
         s_combine_dbg_1.create("effects" DELIMITER "screen_set", r2_RT_luminance_t8);
         s_combine_dbg_Accumulator.create("effects" DELIMITER "screen_set", r2_RT_accum);
-        g_combine_VP.create(dwDecl, RCache.Vertex.Buffer(), RCache.QuadIB);
-        g_combine.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
-        g_combine_2UV.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_combine_VP.create(dwDecl, RCache.Vertex.Buffer(), RImplementation.QuadIB);
+        g_combine.create(FVF::F_TL, RCache.Vertex.Buffer(), RImplementation.QuadIB);
+        g_combine_2UV.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 #ifdef USE_DX9
         g_combine_cuboid.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 #elif defined(USE_DX11) || defined(USE_OGL)
@@ -755,12 +755,12 @@ CRenderTarget::CRenderTarget()
 #endif
         constexpr u32 fvf_aa_blur = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);
-        g_aa_blur.create(fvf_aa_blur, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_aa_blur.create(fvf_aa_blur, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 
         constexpr u32 fvf_aa_AA = D3DFVF_XYZRHW | D3DFVF_TEX7 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3) | D3DFVF_TEXCOORDSIZE2(4) | D3DFVF_TEXCOORDSIZE4(5) |
             D3DFVF_TEXCOORDSIZE4(6);
-        g_aa_AA.create(fvf_aa_AA, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_aa_AA.create(fvf_aa_AA, RCache.Vertex.Buffer(), RImplementation.QuadIB);
     }
 
     // Build textures
@@ -769,7 +769,7 @@ CRenderTarget::CRenderTarget()
     // PP
     s_postprocess.create("postprocess");
     g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3,
-        RCache.Vertex.Buffer(), RCache.QuadIB);
+        RCache.Vertex.Buffer(), RImplementation.QuadIB);
     if (!options.msaa)
         s_postprocess_msaa = s_postprocess;
     else
@@ -786,14 +786,14 @@ CRenderTarget::CRenderTarget()
 
     // Menu
     s_menu.create("distort");
-    g_menu.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    g_menu.create(FVF::F_TL, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 
 #if 0 // OpenGL: kept for historical reasons
     // Flip
     t_base = RImplementation.Resources->_CreateTexture(r2_base);
     t_base->surface_set(GL_TEXTURE_2D, get_base_rt());
     s_flip.create("effects" DELIMITER "screen_set", r2_base);
-    g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 #endif
 
     //

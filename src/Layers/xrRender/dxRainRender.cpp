@@ -31,7 +31,7 @@ dxRainRender::dxRainRender()
 
     //
     SH_Rain.create("effects" DELIMITER "rain", "fx" DELIMITER "fx_rain");
-    hGeom_Rain.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
+    hGeom_Rain.create(FVF::F_LIT, RCache.Vertex.Buffer(), RImplementation.QuadIB);
     hGeom_Drops.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 
     FS.r_close(F);

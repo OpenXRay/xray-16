@@ -9,7 +9,7 @@ dxThunderboltRender::dxThunderboltRender()
 {
     // geom
     hGeom_model.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RCache.Vertex.Buffer(), RCache.Index.Buffer());
-    hGeom_gradient.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
+    hGeom_gradient.create(FVF::F_LIT, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 }
 
 dxThunderboltRender::~dxThunderboltRender()

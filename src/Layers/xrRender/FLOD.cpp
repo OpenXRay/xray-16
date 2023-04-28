@@ -59,7 +59,7 @@ void FLOD::Load(LPCSTR name, IReader* data, u32 dwFlags)
     }
 
     // VS
-    geom.create(flod::dwDecl, RCache.Vertex.Buffer(), RCache.QuadIB);
+    geom.create(flod::dwDecl, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 
     // lod correction
     Fvector3 S;

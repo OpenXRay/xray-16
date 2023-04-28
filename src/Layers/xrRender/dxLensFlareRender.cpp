@@ -132,5 +132,5 @@ void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
     }
 }
 
-void dxLensFlareRender::OnDeviceCreate() { hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB); }
+void dxLensFlareRender::OnDeviceCreate() { hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RImplementation.QuadIB); }
 void dxLensFlareRender::OnDeviceDestroy() { hGeom.destroy(); }

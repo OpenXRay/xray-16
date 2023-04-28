@@ -66,6 +66,9 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 
     Resources->OnDeviceDestroy(bKeepTextures);
     RCache.OnDeviceDestroy();
+
+    // Quad
+    QuadIB.Release();
 }
 
 void D3DXRenderBase::Destroy()
@@ -121,6 +124,8 @@ void D3DXRenderBase::SetupStates()
 void D3DXRenderBase::OnDeviceCreate(const char* shName)
 {
     // Signal everyone - device created
+    CreateQuadIB();
+
     RCache.OnDeviceCreate();
 #if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Update();

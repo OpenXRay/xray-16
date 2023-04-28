@@ -5,7 +5,7 @@ void dxStatGraphRender::Copy(IStatGraphRender& _in) { *this = *((dxStatGraphRend
 void dxStatGraphRender::OnDeviceCreate()
 {
     hGeomLine.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.Index.Buffer());
-    hGeomTri.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.QuadIB);
+    hGeomTri.create(FVF::F_L, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 }
 
 void dxStatGraphRender::OnDeviceDestroy()

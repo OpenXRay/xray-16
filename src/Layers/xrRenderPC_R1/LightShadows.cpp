@@ -63,18 +63,18 @@ CLightShadows::CLightShadows() : xrc("LightShadows")
         if (!sh_BlurRT)
             sh_BlurRT.create(&blender, "effects\\blur", TWO_SHADOW_TEXTURES);
 
-        geom_Blur.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+        geom_Blur.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RImplementation.QuadIB);
     }
     else
     {
         sh_BlurTR.create("blur4", TWO_TEMP_TEXTURES);
         sh_BlurRT.create("blur4", TWO_SHADOW_TEXTURES);
-        geom_Blur.create(FVF::F_TL4uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+        geom_Blur.create(FVF::F_TL4uv, RCache.Vertex.Buffer(), RImplementation.QuadIB);
     }
 
     // Debug
     sh_Screen.create("effects" DELIMITER "screen_set", r1_RT_shadow);
-    geom_Screen.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    geom_Screen.create(FVF::F_TL, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 }
 
 CLightShadows::~CLightShadows()

@@ -78,7 +78,7 @@ CRenderTarget::CRenderTarget()
         }
     }
     g_postprocess.create(
-        D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
+        D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 
 
     bAvailable = rt_Generic->valid() && rt_distort->valid();

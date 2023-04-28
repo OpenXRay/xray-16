@@ -15,7 +15,7 @@ void dx113DFluidVolume::Load(LPCSTR /*N*/, IReader* data, u32 /*dwFlags*/)
     shader.create("fluid3d_stub", "water\\water_ryaska1");
 
     //	Create debug geom
-    m_Geom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
+    m_Geom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 
     Type = MT_3DFLUIDVOLUME;
 

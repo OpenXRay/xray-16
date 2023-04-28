@@ -115,7 +115,7 @@ void CGlowManager::Load(IReader* fs)
     }
     dwTestID = 0;
 
-    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
+    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 }
 
 void CGlowManager::Unload()

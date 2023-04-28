@@ -14,7 +14,7 @@ dxFontRender::~dxFontRender()
 void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
 {
     pShader.create(cShader, cTexture);
-    pGeom.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    pGeom.create(FVF::F_TL, RCache.Vertex.Buffer(), RImplementation.QuadIB);
 }
 
 extern ENGINE_API bool g_bRendering;
