@@ -510,6 +510,17 @@ void CBackend::SetupStates()
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, D3DMCS_COLOR1));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE));
+
+    Fmaterial mat
+    {
+        /*.diffuse  =*/ { 1, 1, 1, 1 },
+        /*.ambient  =*/ { 1, 1, 1, 1 },
+        /*.emissive =*/ { 0, 0, 0, 0 },
+        /*.specular =*/ { 1, 1, 1, 1 },
+        /*.power    =*/ 15.f
+    };
+    CHK_DX(HW.pDevice->SetMaterial(reinterpret_cast<D3DMATERIAL9*>(&mat)));
+
     if (psDeviceFlags.test(rsWireframe))
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME));
     else
