@@ -47,13 +47,14 @@ public:
     }
 };
 
-#ifdef _d3d9TYPES_H_
+#   ifdef _d3d9TYPES_H_
 static_assert(sizeof(Flight::Type) == sizeof(D3DLIGHTTYPE));
 static_assert(sizeof(Flight) == sizeof(D3DLIGHT9));
-#else
+#   else
 static_assert(sizeof(Flight::Type) == 4);
 static_assert(sizeof(Flight) == 104);
-#endif
+#   endif
+#endif // !NO_XR_LIGHT
 
 #ifndef NO_XR_MATERIAL
 struct Fmaterial
@@ -94,13 +95,12 @@ public:
     }
 };
 
-#ifdef _d3d9TYPES_H_
+#   ifdef _d3d9TYPES_H_
 static_assert(sizeof(Fmaterial) == sizeof(D3DMATERIAL9));
-#else
+#   else
 static_assert(sizeof(Fmaterial) == 68);
-#endif
-
-#endif
+#   endif
+#endif // !NO_XR_MATERIAL
 
 #ifndef NO_XR_VDECLARATOR
 struct VDeclarator : public svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1>
