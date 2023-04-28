@@ -45,12 +45,14 @@ public:
         ambient.mul_rgb(brightness);
         specular.mul_rgb(brightness);
     }
-
-    static_assert(sizeof(Type) == sizeof(D3DLIGHTTYPE));
 };
 
+#ifdef _d3d9TYPES_H_
+static_assert(sizeof(Flight::Type) == sizeof(D3DLIGHTTYPE));
 static_assert(sizeof(Flight) == sizeof(D3DLIGHT9));
-
+#else
+static_assert(sizeof(Flight::Type) == 4);
+static_assert(sizeof(Flight) == 104);
 #endif
 
 #ifndef NO_XR_MATERIAL
@@ -92,7 +94,11 @@ public:
     }
 };
 
+#ifdef _d3d9TYPES_H_
 static_assert(sizeof(Fmaterial) == sizeof(D3DMATERIAL9));
+#else
+static_assert(sizeof(Fmaterial) == 68);
+#endif
 
 #endif
 
