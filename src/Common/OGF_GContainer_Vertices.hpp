@@ -54,6 +54,15 @@ D3DVERTEXELEMENT9 r1_decl_lmap[] = // 12+4+4+4+4+4 = 32
     D3DDECL_END()
 };
 
+D3DVERTEXELEMENT9 r1_decl_lmap_unpacked[] = // 12+4+8+8 = 32
+{
+    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
+    { 0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+    { 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1 },
+    D3DDECL_END()
+};
+
 D3DVERTEXELEMENT9 r1_decl_vert[] = // 12+4+4+4+4+4 = 32
 {
     { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
@@ -62,6 +71,15 @@ D3DVERTEXELEMENT9 r1_decl_vert[] = // 12+4+4+4+4+4 = 32
     { 0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0 },
     { 0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
     { 0, 28, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+    D3DDECL_END()
+};
+
+D3DVERTEXELEMENT9 r1_decl_vert_unpacked[] = // 12+4+4+8 = 28
+{
+    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
+    { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
+    { 0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
     D3DDECL_END()
 };
 
@@ -107,6 +125,31 @@ struct r1v_lmap
 #endif // LEVEL_COMPILER
 };
 
+struct r1v_lmap_unpacked
+{
+    Fvector3 P;
+    u32 N;
+    float tc0x, tc0y;
+    float tc1x, tc1y;
+
+    r1v_lmap_unpacked& operator=(const r1v_lmap& packed)
+    {
+        P = packed.P;
+        N = Fcolor(packed.N).get();
+
+        Fcolor T(packed.T);
+        Fcolor B(packed.B);
+        
+        tc0x = (packed.tc0x + T.a) * (32.f / 32768.f);
+        tc0y = (packed.tc0y + B.a) * (32.f / 32768.f);
+        tc1x = tc0x;
+        tc1y = tc0y;
+        
+        return *this;
+    }
+
+};
+
 struct r1v_vert
 {
     Fvector3 P;
@@ -133,5 +176,27 @@ struct r1v_vert
         tc0y = tc_v.first;
     }
 #endif // XRLC_LIGHT_EXPORTS
+};
+
+struct r1v_vert_unpacked
+{
+    Fvector3 P;
+    u32 N;
+    u32 C;
+    float tc0x, tc0y;
+
+    r1v_vert_unpacked& operator=(const r1v_vert& packed)
+    {
+        P = packed.P;
+        N = Fcolor(packed.N).get();
+        C = packed.C;
+
+        Fcolor T(packed.T);
+        Fcolor B(packed.B);
+
+        tc0x = (packed.tc0x + T.a) * (32.f / 32768.f);
+        tc0y = (packed.tc0y + B.a) * (32.f / 32768.f);
+        return *this;
+    }
 };
 #pragma pack(pop)

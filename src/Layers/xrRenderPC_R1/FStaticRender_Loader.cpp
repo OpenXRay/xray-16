@@ -2,6 +2,7 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
 #include "Common/LevelStructure.hpp"
+#include "Common/OGF_GContainer_Vertices.hpp"
 #include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
@@ -224,23 +225,64 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             _DC[i].resize(dcl_len);
             fs->r(_DC[i].begin(), dcl_len * sizeof(VertexElement));
-            //.????????? remove T&B from _DC[]
 
             // count, size
-            u32 vCount = fs->r_u32();
+            const u32 vCount = fs->r_u32();
             u32 vSize = GetDeclVertexSize(dcl, 0);
 #ifndef MASTER_GOLD
             Msg("* [Loading VB] %d verts, %d Kb", vCount, (vCount * vSize) / 1024);
 #endif
 
-            // Create and fill
-            _VB[i].Create(vCount * vSize);
-            u8* pData = static_cast<u8*>(_VB[i].Map());
-            fs->r(pData, vCount * vSize);
-            //			CopyMemory			(pData,fs->pointer(),vCount*vSize);	//.???? copy while skip T&B
-            _VB[i].Unmap(true); // upload vertex data
+            if (o.ffp)
+            {
+                // Replace packed data with unpacked
+                xr_vector<u8> temp;
+                temp.resize(vCount * vSize);
+                fs->r(temp.data(), vCount * vSize);
 
-            //			fs->advance			(vCount*vSize);
+                if (dcl_equal(dcl, r1_decl_lmap))
+                {
+                    dcl_len = std::size(r1_decl_lmap_unpacked);
+                    _DC[i].resize(dcl_len);
+                    CopyMemory(_DC[i].begin(), r1_decl_lmap_unpacked, dcl_len * sizeof(VertexElement));
+                    
+                    vSize = GetDeclVertexSize(r1_decl_lmap_unpacked, 0);
+                    _VB[i].Create(vCount * vSize);
+                    auto* data = static_cast<r1v_lmap_unpacked*>(_VB[i].Map());
+                    const auto* packedData = (r1v_lmap*)temp.data();
+                    for (size_t i = 0; i < vCount; ++i)
+                        data[i] = packedData[i];
+                }
+                else if (dcl_equal(dcl, r1_decl_vert))
+                {
+                    dcl_len = std::size(r1_decl_vert_unpacked);
+                    _DC[i].resize(dcl_len);
+                    CopyMemory(_DC[i].begin(), r1_decl_vert_unpacked, dcl_len * sizeof(VertexElement));
+
+                    vSize = GetDeclVertexSize(r1_decl_vert_unpacked, 0);
+                    _VB[i].Create(vCount * vSize);
+                    auto* data = static_cast<r1v_vert_unpacked*>(_VB[i].Map());
+                    const auto* packedData = (r1v_vert*)temp.data();
+                    for (size_t i = 0; i < vCount; ++i)
+                        data[i] = packedData[i];
+                }
+                else
+                {
+                    _VB[i].Create(vCount * vSize);
+                    u8* pData = static_cast<u8*>(_VB[i].Map());
+                    CopyMemory(pData, temp.data(), vCount * vSize);
+                }
+
+                _VB[i].Unmap(true); // upload vertex data
+            }
+            else
+            {
+                // Create and fill
+                _VB[i].Create(vCount * vSize);
+                u8* pData = static_cast<u8*>(_VB[i].Map());
+                fs->r(pData, vCount * vSize);
+                _VB[i].Unmap(true); // upload vertex data
+            }
         }
         fs->close();
     }
