@@ -40,11 +40,7 @@ public:
     }
 };
 
-/*
-#if sizeof(Flight)!=sizeof(D3DLIGHT9)
-#error Different structure size
-#endif
-*/
+static_assert(sizeof(Flight) == sizeof(D3DLIGHT9));
 
 #endif
 
@@ -87,11 +83,7 @@ public:
     }
 };
 
-/*
-#if sizeof(Fmaterial)!=sizeof(D3DMATERIAL9)
-#error Different structure size
-#endif
-*/
+static_assert(sizeof(Fmaterial) == sizeof(D3DMATERIAL9));
 
 #endif
 
