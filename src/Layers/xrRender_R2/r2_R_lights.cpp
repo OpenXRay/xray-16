@@ -166,7 +166,6 @@ void CRender::render_lights(light_Package& LP)
         xr_vector<light*>& source = LP.v_shadowed;
         light* L = source.back();
         const u16 sid = L->vis.smap_ID;
-        int batch_id = 0;
         while (true)
         {
             if (source.empty())
@@ -174,12 +173,20 @@ void CRender::render_lights(light_Package& LP)
             L = source.back();
             if (L->vis.smap_ID != sid)
                 break;
+
+            const auto batch_id = alloc_context();
+            if (batch_id == R_dsgraph_structure::INVALID_CONTEXT_ID)
+            {
+                flush_lights();
+                continue;
+            }
+
             source.pop_back();
             Lights_LastFrame.push_back(L);
 
             // calculate
-            task_data_t data; // TODO: simplify?
-            data.batch_id = alloc_context();
+            task_data_t data;
+            data.batch_id = batch_id;
             data.L = L;
             data.task = &TaskScheduler->CreateTask("slight_calc", calc_lights, sizeof(data), (void*)&data);
             if (o.mt_calculate)
@@ -190,16 +197,7 @@ void CRender::render_lights(light_Package& LP)
             {
                 TaskScheduler->RunTask(*data.task);
             }
-
             lights_queue.emplace_back(data);
-            ++batch_id;
-
-            if (batch_id == 3)
-            {
-                flush_lights();
-
-                batch_id = 0;
-            }
         }
         flush_lights(); // in case if something left
 
