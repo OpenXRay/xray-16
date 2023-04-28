@@ -99,7 +99,7 @@ void CRender::Render()
     }
 
     //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
-    auto& dsgraph = get_context(eRDSG_MAIN);
+    auto& dsgraph = get_imm_context();
 
     //******* Z-prefill calc - DEFERRER RENDERER
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
@@ -289,7 +289,7 @@ void CRender::Render()
         PIX_EVENT(DEFER_WALLMARKS);
         Target->phase_wallmarks();
         g_r = 0;
-        Wallmarks->Render(eRDSG_MAIN); // wallmarks has priority as normal geometry
+        Wallmarks->Render(); // wallmarks has priority as normal geometry
     }
 
     // Update incremental shadowmap-visibility solver
@@ -393,7 +393,7 @@ void CRender::Render()
 
 void CRender::render_forward()
 {
-    auto& dsgraph = get_context(eRDSG_MAIN);
+    auto& dsgraph = get_imm_context();
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)
     //.todo: should be done inside "combine" with estimation of of luminance, tone-mapping, etc.

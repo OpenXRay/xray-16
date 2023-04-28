@@ -411,13 +411,17 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    for (int id = 0; id < eRDSG_NUM_CONTEXTS; ++id)
+    for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
     {
-        auto& [dsgraph, is_used] = dsgraph_pool[id];
+        auto& dsgraph = contexts_pool[id];
         dsgraph.reset();
         dsgraph.load(sectors_data, portals_data);
-        is_used = false;
+        contexts_used.set(id, false);
     }
+
+    auto& dsgraph = get_imm_context();
+    dsgraph.reset();
+    dsgraph.load(sectors_data, portals_data);
 
     last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
@@ -474,7 +478,7 @@ void CRender::Load3DFluid()
                 pVolume->Load("", F, 0);
 
                 // we don't have an aquired context yet so take any from the pool, it should be initialized already
-                auto& dsgraph = dsgraph_pool[0].first;
+                auto& dsgraph = get_imm_context();
 
                 //	Attach to sector's static geometry
                 const auto sector_id = dsgraph.detect_sector(pVolume->getVisData().sphere.P);

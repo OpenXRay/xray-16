@@ -21,7 +21,7 @@ void smapvis::invalidate()
 }
 void smapvis::begin()
 {
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + id);
+    auto& dsgraph = RImplementation.get_context(id);
     dsgraph.clear_Counters();
     switch (state)
     {
@@ -43,7 +43,7 @@ void smapvis::begin()
 }
 void smapvis::end()
 {
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + id);
+    auto& dsgraph = RImplementation.get_context(id);
 
     // Gather stats
     u32 ts, td;
@@ -120,17 +120,16 @@ void smapvis::resetoccq()
 
 void smapvis::mark()
 {
-    const auto context_id = CRender::eRDSG_SHADOW_0 + id;
-    auto& dsgraph = RImplementation.get_context(context_id);
+    auto& dsgraph = RImplementation.get_context(id);
     RImplementation.Stats.ic_culled += invisible.size();
     u32 marker = dsgraph.marker + 1; // we are called befor marker increment
     for (u32 it = 0; it < invisible.size(); it++)
-        invisible[it]->vis.marker[context_id] = marker; // this effectively disables processing
+        invisible[it]->vis.marker[id] = marker; // this effectively disables processing
 }
 
 void smapvis::rfeedback_static(dxRender_Visual* V)
 {
     testQ_V = V;
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + id);
+    auto& dsgraph = RImplementation.get_context(id);
     dsgraph.set_Feedback(0, 0);
 }

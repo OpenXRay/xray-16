@@ -253,7 +253,7 @@ void CRenderTarget::DoAsyncScreenshot() const
 
 void CRenderTarget::End()
 {
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+    auto& dsgraph = RImplementation.get_imm_context();
 
     // find if distortion is needed at all
     const bool bPerform = Perform();

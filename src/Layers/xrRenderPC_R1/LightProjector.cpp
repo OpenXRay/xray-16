@@ -82,7 +82,7 @@ void CLightProjector::set_object(IRenderable* O)
                 current = nullptr;
             else
             {
-                auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+                auto& dsgraph = RImplementation.get_imm_context();
                 const auto& entity_pos = spatial->spatial_sector_point();
                 spatial->spatial_updatesector(dsgraph.detect_sector(entity_pos));
                 if (spatial->GetSpatialData().sector_id == IRender_Sector::INVALID_SECTOR_ID)
@@ -187,7 +187,7 @@ void CLightProjector::calculate()
     RCache.ClearZB(RImplementation.Target->rt_temp_zb, 1.f, 0);
     RCache.set_xform_world(Fidentity);
 
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+    auto& dsgraph = RImplementation.get_imm_context();
 
     // reallocate/reassociate structures + perform all the work
     for (u32 c_it = 0; c_it < cache.size(); c_it++)

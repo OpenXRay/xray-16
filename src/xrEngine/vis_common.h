@@ -13,7 +13,7 @@ private:
 public:
     Fsphere sphere; //
     Fbox box; //
-    u32 marker[8]; // for different sub-renders
+    u32 marker[R__NUM_CONTEXTS]; // for different sub-renders
     u32 accept_frame; // when it was requisted accepted for main render
     u32 hom_frame; // when to perform test - shedule
     u32 hom_tested; // when it was last time tested

@@ -358,7 +358,7 @@ ICF u32 FlushStream(
     return w_count / 3;
 }
 
-void CWallmarksEngine::Render(u32 context_id)
+void CWallmarksEngine::Render()
 {
     //	if (marks.empty())			return;
     // Projection and xform
@@ -482,7 +482,7 @@ void CWallmarksEngine::Render(u32 context_id)
     lock.Leave(); // Physics may add wallmarks in parallel with rendering
 
     // Level-wmarks
-    auto& dsgraph = RImplementation.get_context(context_id);
+    auto& dsgraph = RImplementation.get_imm_context();
     dsgraph.render_wmarks();
     RImplementation.BasicStats.Wallmarks.End();
 

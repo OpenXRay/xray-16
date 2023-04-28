@@ -91,6 +91,7 @@ struct render_rain : public i_render_phase
     void render() override;
 
     light RainLight;
+    u32 context_id{ R_dsgraph_structure::INVALID_CONTEXT_ID };
 };
 
 struct render_sun : public i_render_phase
@@ -101,19 +102,19 @@ struct render_sun : public i_render_phase
     void calculate_task(Task&, void*) override;
     void render() override;
 
-    void calculate_cascade(int cascade_id);
-
     xr_vector<sun::cascade> m_sun_cascades;
     light* sun{ nullptr };
     bool need_to_render_sunshafts{ false };
     bool last_cascade_chain_mode{ false };
+
+    u32 contexts_ids[R__NUM_SUN_CASCADES];
 };
 
 struct render_sun_old : public i_render_phase
 {
     explicit render_sun_old(const xr_string& name_in) : i_render_phase(name) {}
 
-    void init() override { /* the same as render_sun */ };
+    void init() override;
     void calculate_task(Task&, void*) override { /* the same as render_sun */ }
     void render() override
     {
@@ -128,6 +129,7 @@ struct render_sun_old : public i_render_phase
 
     xr_vector<sun::cascade> m_sun_cascades;
     light* sun{ nullptr };
+    u32 context_id{ R_dsgraph_structure::INVALID_CONTEXT_ID };
 };
 //----
 

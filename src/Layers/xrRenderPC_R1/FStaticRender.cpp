@@ -444,8 +444,6 @@ void CRender::Calculate()
     TAL_SCOPED_TASK_NAMED("CRender::Calculate()");
 #endif // _GPA_ENABLED
 
-    auto& dsgraph = alloc_context(eRDSG_MAIN);
-
     BasicStats.Culling.Begin();
 
     // Transfer to global space to avoid deep pointer access
@@ -464,6 +462,7 @@ void CRender::Calculate()
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     gm_SetNearer(FALSE);
+    auto& dsgraph = get_imm_context();
     dsgraph.o.use_hom = true;
     dsgraph.o.phase = PHASE_NORMAL;
 
@@ -697,7 +696,7 @@ void CRender::Render()
     // Begin
     Target->Begin();
     o.vis_intersect = FALSE;
-    auto& dsgraph = get_context(eRDSG_MAIN);
+    auto& dsgraph = get_imm_context();
     dsgraph.o.phase = PHASE_NORMAL;
     dsgraph.render_hud(); // hud
     dsgraph.render_graph(0); // normal level
@@ -715,7 +714,7 @@ void CRender::Render()
     if (Wallmarks)
     {
         g_r = 0;
-        Wallmarks->Render(dsgraph.context_id); // wallmarks has priority as normal geometry
+        Wallmarks->Render(); // wallmarks has priority as normal geometry
     }
     dsgraph.o.use_hom = true;
     o.vis_intersect = FALSE;

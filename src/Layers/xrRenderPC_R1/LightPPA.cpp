@@ -21,7 +21,7 @@ void cl_light_PR::setup(R_constant* C)
 {
     // NOTE: an actual context id is required here. However, we have only main context
     // in R1 so it is safe to go with `eRDSG_MAIN`.
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+    auto& dsgraph = RImplementation.get_imm_context();
 
     Fvector& P = RImplementation.r1_dlight_light->position;
     float R = RImplementation.r1_dlight_light->range;
@@ -149,7 +149,7 @@ void CLightR_Manager::render_point  ()
 
 void CLightR_Manager::render_point(u32 _priority)
 {
-    auto &dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+    auto &dsgraph = RImplementation.get_imm_context();
 
     // for each light
     Fvector lc_COP = Device.vCameraPosition;
@@ -232,7 +232,7 @@ void CLightR_Manager::render_point(u32 _priority)
 
 void CLightR_Manager::render_spot(u32 _priority)
 {
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+    auto& dsgraph = RImplementation.get_imm_context();
 
     // for each light
     //  Msg ("l=%d",selected_spot.size());
@@ -318,7 +318,7 @@ void CLightR_Manager::render_spot(u32 _priority)
 
 void CLightR_Manager::render(u32 _priority)
 {
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+    auto& dsgraph = RImplementation.get_imm_context();
 
     if (selected_spot.size())
     {

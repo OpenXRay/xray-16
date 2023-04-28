@@ -49,6 +49,10 @@ void render_rain::init()
         RainLight.frame_render == 0);
     
     o.mt_enabled = RImplementation.o.mt_calculate;
+
+    // pre-allocate context
+    context_id = RImplementation.alloc_context();
+    VERIFY(context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -268,7 +272,7 @@ void render_rain::calculate_task(Task&, void*)
     }
 
     // Begin SMAP-render
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_RAIN);
+    auto& dsgraph = RImplementation.get_context(context_id);
     {
         dsgraph.o.phase = CRender::PHASE_SMAP;
         dsgraph.r_pmask(true, false);
@@ -294,7 +298,7 @@ void render_rain::render()
     {
         PIX_EVENT(RAIN);
 
-        auto& dsgraph = RImplementation.get_context(CRender::eRDSG_RAIN);
+        auto& dsgraph = RImplementation.get_context(context_id);
 
         // Render shadow-map
         //. !!! We should clip based on shrinked frustum (again)
@@ -313,7 +317,7 @@ void render_rain::render()
                 //	Details->Render					()	;
             }
         }
-        RImplementation.release_context(CRender::eRDSG_RAIN);
+        RImplementation.release_context(context_id);
     }
 
     // Restore XForms

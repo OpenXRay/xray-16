@@ -214,7 +214,7 @@ void CRenderTarget::phase_combine()
     // Distortion filter
     BOOL bDistort = RImplementation.o.distortion_enabled; // This can be modified
     {
-        auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+        auto& dsgraph = RImplementation.get_imm_context();
         if ((0 == dsgraph.mapDistort.size()) && !_menu_pp)
             bDistort = FALSE;
         if (bDistort)

@@ -304,6 +304,43 @@ XMFLOAT2 BuildTSMProjectionMatrix_caster_depth_bounds(FXMMATRIX lightSpaceBasis)
     return XMFLOAT2(min_z, max_z);
 }
 
+void render_sun_old::init()
+{
+    u32 cascade_count = R__NUM_SUN_CASCADES;
+    m_sun_cascades.resize(cascade_count);
+
+    float fBias = -0.0000025f;
+    //	float size = MAP_SIZE_START;
+    m_sun_cascades[0].reset_chain = true;
+    m_sun_cascades[0].size = 20;
+    m_sun_cascades[0].bias = m_sun_cascades[0].size * fBias;
+
+    m_sun_cascades[1].size = 40;
+    m_sun_cascades[1].bias = m_sun_cascades[1].size * fBias;
+
+    m_sun_cascades[2].size = 160;
+    m_sun_cascades[2].bias = m_sun_cascades[2].size * fBias;
+
+    // 	for( u32 i = 0; i < cascade_count; ++i )
+    // 	{
+    // 		m_sun_cascades[i].size = size;
+    // 		size *= MAP_GROW_FACTOR;
+    // 	}
+    /// 	m_sun_cascades[m_sun_cascades.size()-1].size = 80;
+    sun = (light*)RImplementation.Lights.sun._get();
+
+    const Fcolor sun_color = sun->color;
+    o.active = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
+    if (RImplementation.o.sunstatic)
+        o.active = false;
+
+    o.mt_enabled = RImplementation.o.mt_calculate;
+
+    // pre-allocate context
+    context_id = RImplementation.alloc_context();
+    VERIFY(context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
+}
+
 void render_sun_old::render_sun()
 {
     PIX_EVENT(render_sun);
@@ -392,7 +429,7 @@ void render_sun_old::render_sun()
     xr_vector<Fbox3>& s_receivers = RImplementation.main_coarse_structure;
     s_casters.reserve(s_receivers.size());
 
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_1);
+    auto& dsgraph = RImplementation.get_context(context_id);
     {
         //		sun->svis.begin					();
         dsgraph.o.phase = CRender::PHASE_SMAP;
@@ -917,7 +954,7 @@ void render_sun_old::render_sun_near()
     }
 
     // Begin SMAP-render
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0);
+    auto& dsgraph = RImplementation.get_context(context_id);
     {
         //		sun->svis.begin					();
         dsgraph.o.use_hom = false;
@@ -997,7 +1034,7 @@ void render_sun_old::render_sun_filtered() const
 
 void render_sun::init()
 {
-    u32 cascade_count = 3;
+    u32 cascade_count = R__NUM_SUN_CASCADES;
     m_sun_cascades.resize(cascade_count);
 
     float fBias = -0.0000025f;
@@ -1026,6 +1063,13 @@ void render_sun::init()
         o.active = false;
 
     o.mt_enabled = RImplementation.o.mt_calculate;
+
+    // pre-allocate contexts
+    for (int i = 0; i < R__NUM_SUN_CASCADES; ++i)
+    {
+        contexts_ids[i] = RImplementation.alloc_context();
+        VERIFY(contexts_ids[i] != R_dsgraph_structure::INVALID_CONTEXT_ID);
+    }
 }
 
 void render_sun::calculate_task(Task&, void*)
@@ -1040,7 +1084,7 @@ void render_sun::calculate_task(Task&, void*)
     if (need_to_render_sunshafts)
         m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
 
-        // calculate view-frustum bounds in world space
+    // calculate view-frustum bounds in world space
     Fmatrix ex_project, ex_full;
     XMMATRIX ex_full_inverse;
     {
@@ -1268,7 +1312,7 @@ void render_sun::calculate_task(Task&, void*)
         for (u32 cascade_ind = range.begin(); cascade_ind != range.end(); ++cascade_ind)
         {
             // Begin SMAP-render
-            auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + cascade_ind);
+            auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
             {
                 //		sun->svis.begin					();
                 dsgraph.o.phase = CRender::PHASE_SMAP;
@@ -1294,11 +1338,6 @@ void render_sun::calculate_task(Task&, void*)
     }
 }
 
-void render_sun::calculate_cascade(int cascade_ind)
-{
-
-}
-
 void render_sun::render()
 {
     wait();
@@ -1308,9 +1347,9 @@ void render_sun::render()
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
-    for (int cascade_ind = 0; cascade_ind < 3; ++cascade_ind) // TODO: proper max cascades
+    for (int cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind) // TODO: proper max cascades
     {
-        auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + cascade_ind);
+        auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
 
         bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
         bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||

@@ -62,55 +62,80 @@ public:
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 
-    enum
-    {
-        eRDSG_MAIN, // shadred with forward
 #if RENDER != R_R1
-        eRDSG_RAIN,
-        eRDSG_SHADOW_0, // cascade#0 or shadowed light use
-        eRDSG_SHADOW_1, // cascade#1 or shadowed light use
-        eRDSG_SHADOW_2, // cascade#2 or shadowed light use
-        //eRDSG_AUX_0..N if not engough
-#endif
-        eRDSG_NUM_CONTEXTS
-    };
-
-    // Lifetime tracking helpers
-    ICF R_dsgraph_structure& alloc_context(u32 context_id)
+    ICF u32 alloc_context()
     {
-        VERIFY(context_id < eRDSG_NUM_CONTEXTS);
-        VERIFY(dsgraph_pool[context_id].second == false);
-        VERIFY(dsgraph_pool[context_id].first.context_id == R_dsgraph_structure::INVALID_CONTEXT_ID);
-        dsgraph_pool[context_id].first.context_id = context_id;
-        dsgraph_pool[context_id].second = true;
-        return dsgraph_pool[context_id].first;
+        if (contexts_used.all())
+            return R_dsgraph_structure::INVALID_CONTEXT_ID;
+        const auto raw = ~contexts_used.to_ulong();
+        int id = 0;
+        for (; id < R__NUM_PARALLEL_CONTEXTS; ++id) // TODO: ffs intrinsic
+        {
+            if (raw & (1u << id))
+                break;
+        }
+        contexts_used.set(id, true);
+        contexts_pool[id].context_id = id;
+        return id;
     }
-    
+
+    ICF R_dsgraph_structure& get_context(u32 id)
+    {
+        VERIFY(id < R__NUM_CONTEXTS);
+        if (id == R_dsgraph_structure::IMM_CTX_ID)
+        {
+            return get_imm_context();
+        }
+        VERIFY(contexts_used.test(id));
+        VERIFY(contexts_pool[id].context_id == id);
+        return contexts_pool[id];
+    }
+
     ICF void release_context(u32 context_id)
     {
-        VERIFY(context_id < eRDSG_NUM_CONTEXTS);
-        VERIFY(dsgraph_pool[context_id].second == true);
-        VERIFY(dsgraph_pool[context_id].first.context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
-        dsgraph_pool[context_id].first.reset();
-        dsgraph_pool[context_id].second = false;
+        VERIFY(context_id != R_dsgraph_structure::IMM_CTX_ID); // never release immediate context
+        VERIFY(context_id < R__NUM_PARALLEL_CONTEXTS);
+        VERIFY(contexts_used.test(context_id));
+        VERIFY(contexts_pool[context_id].context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
+        contexts_pool[context_id].reset();
+        contexts_used.set(context_id, false);
+    }
+
+    ICF R_dsgraph_structure& get_imm_context()
+    {
+        auto& ctx = contexts_pool[R_dsgraph_structure::IMM_CTX_ID];
+        ctx.context_id = R_dsgraph_structure::IMM_CTX_ID;
+        contexts_used.set(ctx.context_id, true);
+        return ctx;
     }
 
     ICF void cleanup_contexts()
     {
-        for (int context_id = 0; context_id < eRDSG_NUM_CONTEXTS; ++context_id)
+        for (int id = 0; id < R__NUM_CONTEXTS; ++id)
         {
-            dsgraph_pool[context_id].first.reset();
-            dsgraph_pool[context_id].second = false;
-            dsgraph_pool[context_id].first.context_id = R_dsgraph_structure::INVALID_CONTEXT_ID; // tmp
+            contexts_pool[id].reset();
+            contexts_used.set(id, false);
         }
     }
+#else
 
-    ICF R_dsgraph_structure& get_context(u32 context_id)
+    ICF R_dsgraph_structure& get_imm_context()
     {
-        VERIFY(context_id < eRDSG_NUM_CONTEXTS);
-        VERIFY(dsgraph_pool[context_id].second == true);
-        return dsgraph_pool[context_id].first;
+        context_imm.context_id = R_dsgraph_structure::IMM_CTX_ID;
+        return context_imm;
     }
+
+    ICF R_dsgraph_structure& get_context(u32 id)
+    {
+        VERIFY(id == R_dsgraph_structure::IMM_CTX_ID); // be sure R1 doesn't go crazy
+        return get_imm_context();
+    }
+
+    ICF void cleanup_contexts()
+    {
+        context_imm.reset();
+    }
+#endif // RENDER != R_R1
 
 public:
     CResourceManager* Resources{};
@@ -120,7 +145,12 @@ public:
     ref_geom   m_PortalFadeGeom;
 
 protected:
-    std::pair<R_dsgraph_structure, bool> dsgraph_pool[eRDSG_NUM_CONTEXTS];
+#if RENDER == R_R1
+    R_dsgraph_structure context_imm;
+#else
+    R_dsgraph_structure contexts_pool[R__NUM_CONTEXTS];
+    std::bitset<R__NUM_CONTEXTS> contexts_used{};
+#endif
 private:
 #if defined(USE_DX9) || defined(USE_DX11)
     CGammaControl m_Gamma;

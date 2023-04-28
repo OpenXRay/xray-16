@@ -408,13 +408,9 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    for (int id = 0; id < eRDSG_NUM_CONTEXTS; ++id)
-    {
-        auto& [dsgraph, is_used] = dsgraph_pool[id];
-        dsgraph.reset();
-        dsgraph.load(sectors_data, portals_data);
-        is_used = false;
-    }
+    auto& dsgraph = get_imm_context();
+    dsgraph.reset();
+    dsgraph.load(sectors_data, portals_data);
 
     last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }

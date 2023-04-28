@@ -12,6 +12,11 @@ public:
 struct R_dsgraph_structure
 {
     static constexpr auto INVALID_CONTEXT_ID = static_cast<u32>(-1);
+#if RENDER == R_R1
+    static constexpr auto IMM_CTX_ID = 0; // TODO: to remove this ugly #ifdef we need to introduce per-render configuration
+#else
+    static constexpr auto IMM_CTX_ID = R__NUM_PARALLEL_CONTEXTS; // the next after pooled
+#endif
 
     R_feedback* val_feedback{}; // feedback for geometry being rendered
     u32 val_feedback_breakp{}; // breakpoint

@@ -176,7 +176,7 @@ void CLightShadows::calculate()
     if (casters.empty())
         return;
 
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+    auto& dsgraph = RImplementation.get_imm_context();
 
     BOOL bRTS = FALSE;
     RCache.set_Z(false);

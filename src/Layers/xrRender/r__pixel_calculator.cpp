@@ -49,7 +49,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
     r_aabb_ssa result = {0};
     float area = float(_sqr(rt_dimensions));
 
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_MAIN);
+    auto& dsgraph = RImplementation.get_imm_context();
 
     //
     u32 id[6];

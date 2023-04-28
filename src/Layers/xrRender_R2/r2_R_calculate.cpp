@@ -25,8 +25,8 @@ void render_main::init()
 }
 
 void render_main::calculate_task(Task&, void*)
-{    
-    auto& dsgraph_main = RImplementation.get_context(CRender::eRDSG_MAIN);
+{
+    auto& dsgraph_main = RImplementation.get_imm_context();
 
     dsgraph_main.o.phase = CRender::PHASE_NORMAL;
     dsgraph_main.r_pmask(true, true, true); // enable priority "0,1",+ capture wmarks
@@ -79,7 +79,7 @@ void CRender::Calculate()
     o.mt_calculate  = ps_r2_mt_calculate > 0;
     o.mt_render     = ps_r2_mt_render > 0;
 
-    auto& dsgraph_main = alloc_context(eRDSG_MAIN);
+    auto& dsgraph_main = get_imm_context();
 
     // Detect camera-sector
     if (!Device.vCameraDirectionSaved.similar(Device.vCameraPosition, EPS_L))
@@ -122,7 +122,10 @@ void CRender::Calculate()
     TaskScheduler->Wait(*ProcessHOMTask);
 
     r_main.init();
-    r_sun.init();
+    if (o.oldshadowcascades)
+        r_sun_old.init();
+    else
+        r_sun.init();
 #if RENDER != R_R2
     r_rain.init();
 #endif
@@ -138,7 +141,6 @@ void CRender::Calculate()
 #if RENDER != R_R2
     if (r_rain.o.active)
     {
-        auto& dsgraph_rain = alloc_context(eRDSG_RAIN);
         {
             r_rain.calculate();
         }
@@ -148,9 +150,6 @@ void CRender::Calculate()
     // Sun calc
     if (r_sun.o.active)
     {
-        auto& dsgraph_shadow0 = alloc_context(eRDSG_SHADOW_0);
-        auto& dsgraph_shadow1 = alloc_context(eRDSG_SHADOW_1);
-        auto& dsgraph_shadow2 = alloc_context(eRDSG_SHADOW_2);
         {
             r_sun.calculate();
         }

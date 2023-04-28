@@ -349,6 +349,42 @@ glm::vec2 BuildTSMProjectionMatrix_caster_depth_bounds(glm::mat4& lightSpaceBasi
     return glm::vec2(min_z, max_z);
 }
 
+void render_sun_old::init()
+{
+        u32 cascade_count = R__NUM_SUN_CASCADES;
+    m_sun_cascades.resize(cascade_count);
+
+    float fBias = -0.0000025f;
+    //	float size = MAP_SIZE_START;
+    m_sun_cascades[0].reset_chain = true;
+    m_sun_cascades[0].size = 20;
+    m_sun_cascades[0].bias = m_sun_cascades[0].size * fBias;
+
+    m_sun_cascades[1].size = 40;
+    m_sun_cascades[1].bias = m_sun_cascades[1].size * fBias;
+
+    m_sun_cascades[2].size = 160;
+    m_sun_cascades[2].bias = m_sun_cascades[2].size * fBias;
+
+    // 	for( u32 i = 0; i < cascade_count; ++i )
+    // 	{
+    // 		m_sun_cascades[i].size = size;
+    // 		size *= MAP_GROW_FACTOR;
+    // 	}
+    /// 	m_sun_cascades[m_sun_cascades.size()-1].size = 80;
+
+    const Fcolor sun_color = sun->color;
+    o.active = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
+    if (RImplementation.o.sunstatic)
+        o.active = false;
+
+    o.mt_enabled = RImplementation.o.mt_calculate;
+
+    // pre-allocate context
+    context_id = RImplementation.alloc_context();
+    VERIFY(context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
+}
+
 void render_sun_old::render_sun()
 {
     PIX_EVENT(render_sun);
@@ -432,7 +468,7 @@ void render_sun_old::render_sun()
     xr_vector<Fbox3>& s_receivers = RImplementation.main_coarse_structure;
     s_casters.reserve(s_receivers.size());
 
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0);
+    auto& dsgraph = RImplementation.get_context(context_id);
     {
         //		sun->svis.begin					();
         dsgraph.o.phase = CRender::PHASE_SMAP;
@@ -950,7 +986,7 @@ void render_sun_old::render_sun_near()
     }
 
     // Begin SMAP-render
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0);
+    auto& dsgraph = RImplementation.get_context(context_id);
     {
         //		sun->svis.begin					();
         dsgraph.o.phase = CRender::PHASE_SMAP;
@@ -1028,7 +1064,7 @@ void render_sun_old::render_sun_filtered() const
 
 void render_sun::init()
 {
-    u32 cascade_count = 3;
+    u32 cascade_count = R__NUM_SUN_CASCADES;
     m_sun_cascades.resize(cascade_count);
 
     float fBias = -0.0000025f;
@@ -1049,32 +1085,44 @@ void render_sun::init()
     // 		size *= MAP_GROW_FACTOR;
     // 	}
     /// 	m_sun_cascades[m_sun_cascades.size()-1].size = 80;
+
+    const Fcolor sun_color = sun->color;
+    o.active = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
+    if (RImplementation.o.sunstatic)
+        o.active = false;
+
+    o.mt_enabled = RImplementation.o.mt_calculate;
+
+    // pre-allocate contexts
+    for (int i = 0; i < R__NUM_SUN_CASCADES; ++i)
+    {
+        contexts_ids[i] = RImplementation.alloc_context();
+        VERIFY(contexts_ids[i] != R_dsgraph_structure::INVALID_CONTEXT_ID);
+    }
 }
 
 void render_sun::calculate_task(Task&, void*)
 {
-    bool b_need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
-    bool last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
-    if (b_need_to_render_sunshafts)
+    if (!o.active)
+    {
+        return;
+    }
+
+    need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
+    last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
+    if (need_to_render_sunshafts)
         m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
 
-    for (u32 i = 0; i < m_sun_cascades.size(); ++i)
-        calculate_cascade(i);
-
-    if (b_need_to_render_sunshafts)
-        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
-}
-
-void render_sun::calculate_cascade(int cascade_ind)
-{
     // calculate view-frustum bounds in world space
 
     // Compute volume(s) - something like a frustum for infinite directional light
     // Also compute virtual light position and sector it is inside
-    CFrustum cull_frustum;
     xr_vector<Fplane> cull_planes;
-    Fvector3 cull_COP;
-    Fmatrix cull_xform;
+
+    CFrustum cull_frustum[3];
+    Fvector3 cull_COP[3];
+    Fmatrix cull_xform[3];
+    for (u32 cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind)
     {
         FPU::m64r();
         // Lets begin from base frustum
@@ -1082,7 +1130,7 @@ void render_sun::calculate_cascade(int cascade_ind)
 
         //******************************* Need to be placed after cuboid built **************************
         // COP - 100 km away
-        cull_COP.mad(Device.vCameraPosition, sun->direction, -tweak_COP_initial_offs);
+        cull_COP[cascade_ind].mad(Device.vCameraPosition, sun->direction, -tweak_COP_initial_offs);
 
         // Create approximate ortho-xform
         // view: auto find 'up' and 'right' vectors
@@ -1153,9 +1201,9 @@ void render_sun::calculate_cascade(int cascade_ind)
         XRMatrixInverse(&m_viewport_inv, nullptr, m_viewport);
 
         // snap view-position to pixel
-        cull_xform.mul(mdir_Project, mdir_View);
+        cull_xform[cascade_ind].mul(mdir_Project, mdir_View);
         Fmatrix cull_xform_inv;
-        cull_xform_inv.invert(cull_xform);
+        cull_xform_inv.invert(cull_xform[cascade_ind]);
 
         //		light_cuboid.light_cuboid_points.reserve		(9);
         for (int p = 0; p < 8; p++)
@@ -1203,14 +1251,14 @@ void render_sun::calculate_cascade(int cascade_ind)
         // rebuild the view transform with the shift.
         mdir_View.identity();
         mdir_View.build_camera_dir(cam_shifted, L_dir, L_up);
-        cull_xform.identity();
-        cull_xform.mul(mdir_Project, mdir_View);
-        cull_xform_inv.invert(cull_xform);
+        cull_xform[cascade_ind].identity();
+        cull_xform[cascade_ind].mul(mdir_Project, mdir_View);
+        cull_xform_inv.invert(cull_xform[cascade_ind]);
 
         // Create frustum for query
-        cull_frustum._clear();
+        cull_frustum[cascade_ind]._clear();
         for (auto& cull_plane : cull_planes)
-            cull_frustum._add(cull_plane);
+            cull_frustum[cascade_ind]._add(cull_plane);
 
         {
             Fvector cam_proj = Device.vCameraPosition;
@@ -1219,10 +1267,10 @@ void render_sun::calculate_cascade(int cascade_ind)
                          floorf(cam_proj.y / align_aim_step_coef) + align_aim_step_coef / 2,
                          floorf(cam_proj.z / align_aim_step_coef) + align_aim_step_coef / 2);
             cam_proj.mul(align_aim_step_coef);
-            Fvector cam_pixel = wform(cull_xform, cam_proj);
+            Fvector cam_pixel = wform(cull_xform[cascade_ind], cam_proj);
             cam_pixel = wform(m_viewport, cam_pixel);
             Fvector shift_proj = lightXZshift;
-            cull_xform.transform_dir(shift_proj);
+            cull_xform[cascade_ind].transform_dir(shift_proj);
             m_viewport.transform_dir(shift_proj);
 
             const float align_granularity = 4.f;
@@ -1245,46 +1293,49 @@ void render_sun::calculate_cascade(int cascade_ind)
             diff.mul(sign_test);
             Fmatrix adjust;
             adjust.translate(diff);
-            cull_xform.mulB_44(adjust);
+            cull_xform[cascade_ind].mulB_44(adjust);
         }
 
-        m_sun_cascades[cascade_ind].xform = cull_xform;
+        m_sun_cascades[cascade_ind].xform = cull_xform[cascade_ind];
 
         s32 limit = RImplementation.o.smapsize - 1;
         sun->X.D[cascade_ind].minX = 0;
         sun->X.D[cascade_ind].maxX = limit;
         sun->X.D[cascade_ind].minY = 0;
         sun->X.D[cascade_ind].maxY = limit;
-        sun->X.D[cascade_ind].combine = cull_xform;
+        sun->X.D[cascade_ind].combine = cull_xform[cascade_ind];
 
         // full-xform
         FPU::m24r();
+
+        // Begin SMAP-render
+        auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
+        dsgraph.reset(); // tmp
+        {
+            //		sun->svis.begin					();
+            dsgraph.o.phase = CRender::PHASE_SMAP;
+            dsgraph.r_pmask(true, RImplementation.o.Tshadows);
+            dsgraph.o.sector_id = RImplementation.get_largest_sector();
+            dsgraph.o.xform = cull_xform[cascade_ind];
+            dsgraph.o.view_frustum = cull_frustum[cascade_ind];
+            dsgraph.o.view_pos = cull_COP[cascade_ind];
+
+            // Fill the database
+            dsgraph.build_subspace();
+        }
     }
 
-    // Begin SMAP-render
-    auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + cascade_ind);
-    dsgraph.reset(); // tmp
-    {
-        //		sun->svis.begin					();
-        dsgraph.o.phase = CRender::PHASE_SMAP;
-        dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-        dsgraph.o.sector_id = RImplementation.get_largest_sector();
-        dsgraph.o.xform = cull_xform;
-        dsgraph.o.view_frustum = cull_frustum;
-        dsgraph.o.view_pos = cull_COP;
-
-        // Fill the database
-        dsgraph.build_subspace();
-    }
+    if (need_to_render_sunshafts)
+        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
 }
 
 void render_sun::render()
 {
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
-    for (int cascade_ind = 0; cascade_ind < 3; ++cascade_ind) // TODO: proper max cascades
+    for (int cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind) // TODO: proper max cascades
     {
-        auto& dsgraph = RImplementation.get_context(CRender::eRDSG_SHADOW_0 + cascade_ind);
+        auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
 
         bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
         bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
