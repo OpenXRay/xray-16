@@ -46,12 +46,12 @@ void CAttachmentOwner::net_Destroy()
     R_ASSERT(attached_objects().empty());
 }
 
-void CAttachmentOwner::renderable_Render(IRenderable* root)
+void CAttachmentOwner::renderable_Render(u32 context_id, IRenderable* root)
 {
     xr_vector<CAttachableItem*>::iterator I = m_attached_objects.begin();
     xr_vector<CAttachableItem*>::iterator E = m_attached_objects.end();
     for (; I != E; ++I)
-        (*I)->renderable_Render(root);
+        (*I)->renderable_Render(context_id, root);
 }
 
 void AttachmentCallback(IKinematics* tpKinematics)

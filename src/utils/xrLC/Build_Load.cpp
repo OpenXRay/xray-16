@@ -219,7 +219,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
                 Flight L = temp.data;
 
                 // type
-                if (L.type == D3DLIGHT_DIRECTIONAL)
+                if (L.type == Flight::Type::Directional)
                     RL.type = LT_DIRECT;
                 else
                     RL.type = LT_POINT;

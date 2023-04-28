@@ -59,9 +59,9 @@ void CAttachableItem::OnH_A_Chield()
         object().setVisible(true);
 }
 
-void CAttachableItem::renderable_Render(IRenderable* root)
+void CAttachableItem::renderable_Render(u32 context_id, IRenderable* root)
 {
-    GEnv.Render->add_Visual(root, object().Visual(), object().XFORM());
+    GEnv.Render->add_Visual(context_id, root, object().Visual(), object().XFORM());
 }
 
 void CAttachableItem::OnH_A_Independent() { enable(false); }

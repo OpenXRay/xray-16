@@ -69,12 +69,8 @@ private:
     [[nodiscard]]
     bool Available() const { return bAvailable; }
 
-    [[nodiscard]]
-    bool Perform() const;
-
     void calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
-    void phase_distortion();
 
 public:
     CRenderTarget();
@@ -83,6 +79,8 @@ public:
     void End();
 
     void DoAsyncScreenshot() const;
+    [[nodiscard]]
+    bool Perform() const;
 
     [[nodiscard]]
     ID3DRenderTargetView* get_base_rt() const { return rt_Base[HW.CurrentBackBuffer]->pRT; }
@@ -111,4 +109,7 @@ public:
     u32 get_height() override { return curHeight; }
     u32 get_rtwidth() const { return rtWidth; }
     u32 get_rtheight() const { return rtHeight; }
+
+    void phase_distortion();
+    void phase_combine(bool bDistort, bool bCMap);
 };

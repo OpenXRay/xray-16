@@ -57,7 +57,7 @@ void CBlender_Editor_Selection::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (C.bEditor)
+    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
     {
         CompileForEditor(C);
         return;

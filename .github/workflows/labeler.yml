@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: on new pull request
-      if: ${{ github.event.pull_request.opened == true || github.event.pull_request.reopened == true }}
+      if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.opened == true || github.event.pull_request.reopened == true }}
       uses: actions/labeler@v4.0.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
@@ -25,6 +25,7 @@ jobs:
       uses: actions/labeler@v4.0.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        configuration-path: .github/labeler.yml
 
     - name: on pull request approval
       if: ${{ github.event_name == 'pull_request_review' && github.event.review.state == 'approved' }}
@@ -32,3 +33,10 @@ jobs:
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/labeler_on_pr_approved.yml
+
+    - name: on pull request merged
+      if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.merged == true }}
+      uses: actions/labeler@v4.0.2
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        configuration-path: .github/labeler_on_pr_merged.yml

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "dxRainRender.h"
 
+#include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Rain.h"
 
 //	Warning: duplicated in rain.cpp
@@ -38,7 +39,6 @@ dxRainRender::dxRainRender()
 
 dxRainRender::~dxRainRender() { ::RImplementation.model_Delete(DM_Drop); }
 void dxRainRender::Copy(IRainRender& _in) { *this = *(dxRainRender*)&_in; }
-#include "xrEngine/IGame_Persistent.h"
 
 void dxRainRender::Render(CEffect_Rain& owner)
 {
@@ -46,17 +46,12 @@ void dxRainRender::Render(CEffect_Rain& owner)
     if (factor < EPS_L)
         return;
 
-    u32 desired_items = iFloor(0.5f * (1.f + factor) * float(max_desired_items));
-    // visual
-    float factor_visual = factor / 2.f + .5f;
-    Fvector3 f_rain_color = g_pGamePersistent->Environment().CurrentEnv.rain_color;
-    u32 u_rain_color = color_rgba_f(f_rain_color.x, f_rain_color.y, f_rain_color.z, factor_visual);
+    const u32 desired_items = iFloor(0.5f * (1.f + factor) * float(max_desired_items));
 
     // born _new_ if needed
-    float b_radius_wrap_sqr = _sqr((source_radius + .5f));
     if (owner.items.size() < desired_items)
     {
-        // owner.items.reserve		(desired_items);
+        owner.items.reserve(desired_items);
         while (owner.items.size() < desired_items)
         {
             CEffect_Rain::Item one;
@@ -64,6 +59,13 @@ void dxRainRender::Render(CEffect_Rain& owner)
             owner.items.push_back(one);
         }
     }
+
+    // visual
+    const float factor_visual = factor / 2.f + .5f;
+    const Fvector3 f_rain_color = g_pGamePersistent->Environment().CurrentEnv.rain_color;
+    const u32 u_rain_color = color_rgba_f(f_rain_color.x, f_rain_color.y, f_rain_color.z, factor_visual);
+
+    const float b_radius_wrap_sqr = _sqr((source_radius + .5f));
 
     // build source plane
     Fplane src_plane;
@@ -77,7 +79,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
     FVF::LIT* verts = (FVF::LIT*)RCache.Vertex.Lock(desired_items * 4, hGeom_Rain->vb_stride, vOffset);
     FVF::LIT* start = verts;
     const Fvector& vEye = Device.vCameraPosition;
-    for (u32 I = 0; I < owner.items.size(); I++)
+    for (u32 I = 0; I < desired_items; I++)
     {
         // physics and time control
         CEffect_Rain::Item& one = owner.items[I];

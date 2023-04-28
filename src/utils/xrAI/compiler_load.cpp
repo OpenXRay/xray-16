@@ -215,7 +215,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
                 }
 
                 // type
-                if (L.type == D3DLIGHT_DIRECTIONAL)
+                if (L.type == Flight::Type::Directional)
                     RL.type = LT_DIRECT;
                 else
                     RL.type = LT_POINT;

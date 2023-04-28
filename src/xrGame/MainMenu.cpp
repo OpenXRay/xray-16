@@ -493,10 +493,7 @@ void CMainMenu::OnRender()
     if (m_Flags.test(flGameSaveScreenshot))
         return;
 
-    if (g_pGameLevel)
-        GEnv.Render->Calculate();
-
-    GEnv.Render->Render();
+    GEnv.Render->RenderMenu();
     if (!OnRenderPPUI_query())
     {
         DoRenderDialogs();

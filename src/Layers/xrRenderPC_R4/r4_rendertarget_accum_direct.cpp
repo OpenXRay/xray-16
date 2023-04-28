@@ -188,7 +188,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
+            xf_project.mul(m_TexelAdjust, RImplementation.r_sun.sun->X.D[0].combine); // TODO: move into render_sun
             m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
@@ -505,7 +505,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
+            xf_project.mul(m_TexelAdjust, fuckingsun->X.D[sub_phase].combine);
             m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
@@ -954,7 +954,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         {
             FPU::m64r();
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
+            xf_project.mul(m_TexelAdjust, fuckingsun->X.D[0].combine);
             m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias

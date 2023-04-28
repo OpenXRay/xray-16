@@ -8,148 +8,7 @@
 
 #include "Layers/xrRender/FBasicVisual.h"
 
-void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
-{
-    PIX_EVENT(render_main);
-    //	Msg						("---begin");
-    dsgraph.marker++;
-
-    // Calculate sector(s) and their objects
-    if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
-    {
-        dsgraph.use_hom = true;
-        // Traverse sector/portal structure
-        dsgraph.PortalTraverser.traverse(dsgraph.Sectors[last_sector_id], ViewBase, Device.vCameraPosition,
-            m_ViewProjection,
-            CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE
-            //. disabled scissoring (HW.Caps.bScissor?CPortalTraverser::VQ_SCISSOR:0)	// generate scissoring info
-            );
-
-        // Determine visibility for static geometry hierrarhy
-        if (psDeviceFlags.test(rsDrawStatic))
-        {
-            for (auto& s : dsgraph.PortalTraverser.r_sectors)
-            {
-                CSector* sector = static_cast<CSector*>(s);
-                dxRender_Visual* root = sector->root();
-                for (auto& r_frustum : sector->r_frustums)
-                {
-                    add_Geometry(root, r_frustum);
-                }
-            }
-        }
-
-        // Traverse frustums
-        if (psDeviceFlags.test(rsDrawDynamic))
-        {
-            // Traverse object database
-            g_SpatialSpace->q_frustum(
-                dsgraph.lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
-
-            // Exact sorting order (front-to-back)
-            std::sort(
-                dsgraph.lstRenderables.begin(), dsgraph.lstRenderables.end(), [](ISpatial* s1, ISpatial* s2)
-            {
-                const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-                const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
-                return d1 < d2;
-            });
-
-            // Determine visibility for dynamic part of scene
-            u32 uID_LTRACK = 0xffffffff;
-            if (active_phase() == PHASE_NORMAL)
-            {
-                uLastLTRACK++;
-                if (!dsgraph.lstRenderables.empty())
-                    uID_LTRACK = uLastLTRACK % dsgraph.lstRenderables.size();
-
-                // update light-vis for current entity / actor
-                IGameObject* O = g_pGameLevel->CurrentViewEntity();
-                if (O)
-                {
-                    CROS_impl* R = (CROS_impl*)O->ROS();
-                    if (R)
-                        R->update(O);
-                }
-            }
-
-            for (u32 o_it = 0; o_it < dsgraph.lstRenderables.size(); o_it++)
-            {
-                ISpatial* spatial = dsgraph.lstRenderables[o_it];
-                spatial->spatial_updatesector();
-                const auto& data = spatial->GetSpatialData();
-                const auto& [type, sphere, sector_id] = std::tuple(data.type, data.sphere, data.sector_id);
-                if (sector_id == IRender_Sector::INVALID_SECTOR_ID)
-                    continue; // disassociated from S/P structure
-                auto* sector = dsgraph.Sectors[sector_id];
-
-                if (type & STYPE_LIGHTSOURCE)
-                {
-                    // lightsource
-                    light* L = (light*)spatial->dcast_Light();
-                    VERIFY(L);
-                    float lod = L->get_LOD();
-                    if (lod > EPS_L)
-                    {
-                        vis_data& vis = L->get_homdata();
-                        if (HOM.visible(vis))
-                            Lights.add_light(L);
-                    }
-                    continue;
-                }
-
-                if (dsgraph.PortalTraverser.i_marker != sector->r_marker)
-                    continue; // inactive (untouched) sector
-                for (auto& view : sector->r_frustums)
-                {
-                    if (!view.testSphere_dirty(sphere.P, sphere.R))
-                        continue;
-
-                    if (type & STYPE_RENDERABLE)
-                    {
-                        // renderable
-                        IRenderable* renderable = spatial->dcast_Renderable();
-                        VERIFY(renderable);
-
-                        // Occlusion
-                        //	casting is faster then using getVis method
-                        vis_data& v_orig = ((dxRender_Visual*)renderable->GetRenderData().visual)->vis;
-                        vis_data v_copy = v_orig;
-                        v_copy.box.xform(renderable->GetRenderData().xform);
-                        BOOL bVisible = HOM.visible(v_copy);
-                        v_orig.marker = v_copy.marker;
-                        v_orig.accept_frame = v_copy.accept_frame;
-                        v_orig.hom_frame = v_copy.hom_frame;
-                        v_orig.hom_tested = v_copy.hom_tested;
-                        if (!bVisible)
-                            break; // exit loop on frustums
-
-                        // update light-vis for selected entity
-                        if (o_it == uID_LTRACK && renderable->renderable_ROS())
-                        {
-                            // track lighting environment
-                            CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
-                            T->update(renderable);
-                        }
-
-                        // Rendering
-                        renderable->renderable_Render(renderable);
-                    }
-                    break; // exit loop on frustums
-                }
-            }
-            if (g_pGameLevel && (active_phase() == PHASE_NORMAL))
-                g_hud->Render_Last(); // HUD
-        }
-    }
-    else
-    {
-        if (g_pGameLevel && (active_phase() == PHASE_NORMAL))
-            g_hud->Render_Last(); // HUD
-    }
-}
-
-void CRender::render_menu()
+void CRender::RenderMenu()
 {
     PIX_EVENT(render_menu);
     //	Globals
@@ -216,18 +75,10 @@ void CRender::Render()
     PIX_EVENT(CRender_Render);
 
     g_r = 1;
-    VERIFY(dsgraph.mapDistort.empty());
 
 #if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
 #endif
-
-    bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
-    if (_menu_pp)
-    {
-        render_menu();
-        return;
-    }
 
     IMainMenu* pMainMenu = g_pGamePersistent ? g_pGamePersistent->m_pMainMenu : 0;
     bool bMenu = pMainMenu ? pMainMenu->CanSkipSceneRendering() : false;
@@ -243,21 +94,12 @@ void CRender::Render()
     if (m_bFirstFrameAfterReset)
     {
         m_bFirstFrameAfterReset = false;
+        cleanup_contexts();
         return;
     }
 
     //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
-
-    // Configure
-    o.distortion = FALSE; // disable distorion
-    Fcolor sun_color = ((light*)Lights.sun._get())->color;
-    bool bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
-    if (o.sunstatic)
-        bSUN = false;
-    // Msg						("sstatic: %s, sun: %s",o.sunstatic?;"true":"false", bSUN?"true":"false");
-
-    // Frustum
-    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+    auto& dsgraph = get_imm_context();
 
     //******* Z-prefill calc - DEFERRER RENDERER
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
@@ -266,28 +108,30 @@ void CRender::Render()
         BasicStats.Culling.Begin();
         float z_distance = ps_r2_zfill;
         Fmatrix m_zfill, m_project;
-        m_project.build_projection(
-            deg2rad(Device.fFOV/* *Device.fASPECT*/),
-            Device.fASPECT, VIEWPORT_NEAR,
+        m_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR,
             z_distance * g_pGamePersistent->Environment().CurrentEnv.far_plane);
         m_zfill.mul(m_project, Device.mView);
-        dsgraph.r_pmask(true, false); // enable priority "0"
-        dsgraph.set_Recorder(nullptr);
-        dsgraph.phase = PHASE_SMAP;
-        TaskScheduler->Wait(*ProcessHOMTask);
-        render_main(m_zfill, false);
-        dsgraph.r_pmask(true, false); // disable priority "1"
-        BasicStats.Culling.End();
 
-        // flush
-        Target->phase_scene_prepare();
-        RCache.set_ColorWriteEnable(FALSE);
-        dsgraph.render_graph(0);
-        RCache.set_ColorWriteEnable();
-    }
-    else
-    {
-        Target->phase_scene_prepare();
+        if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
+        {
+            dsgraph.o.phase = PHASE_SMAP;
+            dsgraph.r_pmask(true, false); // enable priority "0"
+            dsgraph.set_Recorder(nullptr);
+            dsgraph.o.use_hom = true;
+            dsgraph.o.is_main_pass = true;
+            dsgraph.o.sector_id = last_sector_id;
+            dsgraph.o.portal_traverse_flags = CPortalTraverser::VQ_HOM | CPortalTraverser::VQ_SSA | CPortalTraverser::VQ_FADE;
+            dsgraph.o.spatial_traverse_flags = ISpatial_DB::O_ORDERED;
+            dsgraph.o.spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
+            dsgraph.o.view_pos = Device.vCameraPosition;
+            dsgraph.o.xform = m_zfill;
+            dsgraph.o.view_frustum = ViewBase;
+            dsgraph.o.query_box_side = VIEWPORT_NEAR + EPS_L;
+            dsgraph.o.precise_portals = true;
+
+            dsgraph.build_subspace();
+        }
+        BasicStats.Culling.End();
     }
 
     //*******
@@ -299,21 +143,20 @@ void CRender::Render()
     BasicStats.WaitS.End();
     q_sync_point.End();
 
-    //******* Main calc - DEFERRER RENDERER
-    // Main calc
-    BasicStats.Culling.Begin();
-    dsgraph.r_pmask(true, false, true); // enable priority "0",+ capture wmarks
-    if (bSUN)
-        dsgraph.set_Recorder(&main_coarse_structure);
+    r_main.wait();
+
+    if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
+    {
+        // flush
+        Target->phase_scene_prepare();
+        RCache.set_ColorWriteEnable(FALSE);
+        dsgraph.render_graph(0);
+        RCache.set_ColorWriteEnable();
+    }
     else
-        dsgraph.set_Recorder(nullptr);
-    dsgraph.phase = PHASE_NORMAL;
-    if (!ps_r2_ls_flags.test(R2FLAG_ZFILL))
-        TaskScheduler->Wait(*ProcessHOMTask);
-    render_main(Device.mFullTransform, true);
-    dsgraph.set_Recorder(nullptr);
-    dsgraph.r_pmask(true, false); // disable priority "1"
-    BasicStats.Culling.End();
+    {
+        Target->phase_scene_prepare();
+    }
 
     BOOL split_the_scene_to_minimize_wait = FALSE;
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE))
@@ -459,7 +302,8 @@ void CRender::Render()
                 continue;
             try
             {
-                Lights_LastFrame[it]->svis.flushoccq();
+                for (int id = 0; id < 3; ++id)
+                    Lights_LastFrame[it]->svis[id].flushoccq();
             }
             catch (...)
             {
@@ -477,27 +321,21 @@ void CRender::Render()
         Target->mark_msaa_edges();
     }
 
-    //	TODO: DX11: Implement DX11 rain.
     if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
     {
-        PIX_EVENT(DEFER_RAIN);
-        render_rain();
+        r_rain.render();
     }
 #endif // !USE_DX9
 
     // Directional light - fucking sun
-    if (bSUN)
+    if (r_sun.o.active)
     {
         PIX_EVENT(DEFER_SUN);
         Stats.l_visible++;
         if (!RImplementation.o.oldshadowcascades)
-            render_sun_cascades();
+            r_sun.render();
         else
-        {
-            render_sun_near();
-            render_sun();
-            render_sun_filtered();
-        }
+            r_sun_old.render();
         Target->accum_direct_blend();
     }
 
@@ -548,20 +386,18 @@ void CRender::Render()
     }
 
     VERIFY(dsgraph.mapDistort.empty());
+
+    // we're done with rendering
+    cleanup_contexts();
 }
 
 void CRender::render_forward()
 {
-    VERIFY(dsgraph.mapDistort.empty());
-    o.distortion = o.distortion_enabled; // enable distorion
+    auto& dsgraph = get_imm_context();
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)
     //.todo: should be done inside "combine" with estimation of of luminance, tone-mapping, etc.
     {
-        // level
-        dsgraph.r_pmask(false, true); // enable priority "1"
-        dsgraph.phase = PHASE_NORMAL;
-        render_main(Device.mFullTransform, false); //
         //	Igor: we don't want to render old lods on next frame.
         dsgraph.mapLOD.clear();
         dsgraph.render_graph(1); // normal level, secondary priority
@@ -569,8 +405,6 @@ void CRender::render_forward()
         dsgraph.render_sorted(); // strict-sorted geoms
         g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
     }
-
-    o.distortion = FALSE; // disable distorion
 }
 
 // Перед началом рендера мира --#SM+#--

@@ -81,6 +81,15 @@ extern ECORE_API Flags32 ps_r1_flags; // r1-only
 extern ECORE_API float ps_r1_fog_luminance; // 1.f r1-only
 extern ECORE_API int ps_r1_SoftwareSkinning; // r1-only
 
+extern ECORE_API u32 ps_r1_ffp_lighting_mode;
+
+enum R1_FFP_LIGHTING_MODE
+{
+    R1_FFP_LIGHTING_CONSTANT, // SDK lighting – just constant lighting, not even lightmaps
+    R1_FFP_LIGHTING_LIGHTMAP,
+    R1_FFP_LIGHTING_LIGHTS,
+};
+
 enum
 {
     R1FLAG_DLIGHTS = (1 << 0),

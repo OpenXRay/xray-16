@@ -253,18 +253,22 @@ void CRenderTarget::DoAsyncScreenshot() const
 
 void CRenderTarget::End()
 {
-    if (g_pGamePersistent)
-        g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
+    auto& dsgraph = RImplementation.get_imm_context();
 
     // find if distortion is needed at all
     const bool bPerform = Perform();
     bool bDistort = RImplementation.o.distortion;
     const bool bCMap = NeedColorMapping();
-    const bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
-    if (RImplementation.dsgraph.mapDistort.empty() && !_menu_pp)
+
+    if (dsgraph.mapDistort.empty())
         bDistort = FALSE;
     if (bDistort)
+    {
         phase_distortion();
+
+        dsgraph.render_distort();
+        dsgraph.mapDistort.clear();
+    }
 
     // combination/postprocess
     RCache.set_RT(get_base_rt());
@@ -274,6 +278,16 @@ void CRenderTarget::End()
 
     if (!bPerform)
         return;
+
+    phase_combine(bDistort, bCMap);
+}
+
+void CRenderTarget::phase_combine(bool bDistort, bool bCMap)
+{
+    RCache.set_RT(get_base_rt());
+    RCache.set_ZB(get_base_zb());
+    curWidth = Device.dwWidth;
+    curHeight = Device.dwHeight;
 
     const int gblend = clampr(iFloor((1 - param_gray) * 255.f), 0, 255);
     const int nblend = clampr(iFloor((1 - param_noise) * 255.f), 0, 255);
@@ -343,12 +357,4 @@ void CRenderTarget::phase_distortion()
     RCache.set_CullMode(CULL_CCW);
     RCache.set_ColorWriteEnable();
     RCache.ClearRT(rt_distort, color_rgba(127, 127, 127, 127));
-
-    if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->OnRenderPPUI_query())
-        RImplementation.dsgraph.render_distort();
-    else
-        RImplementation.dsgraph.mapDistort.clear();
-
-    if (g_pGamePersistent)
-        g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
 }

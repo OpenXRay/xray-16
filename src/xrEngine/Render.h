@@ -292,8 +292,7 @@ public:
 
     virtual void level_Load(IReader* fs) = 0;
     virtual void level_Unload() = 0;
-
-    // virtual IDirect3DBaseTexture9* texture_load (pcstr fname, u32& msize) = 0;
+    
     void shader_option_skinning(s32 mode) { m_skinning = mode; }
     virtual HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags,
         void*& result) = 0;
@@ -304,12 +303,10 @@ public:
     virtual pcstr getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
-    virtual IRender_Sector::sector_id_t detectSector(const Fvector& P) = 0;
     virtual IRender_Target* getTarget() = 0;
 
     // Main
-    virtual void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
-    virtual void add_Geometry(IRenderVisual* V, const CFrustum& view) = 0; // add visual(s) (all culling performed)
+    virtual void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
     // virtual void add_StaticWallmark (ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)=0;
     virtual void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) = 0;
     // Prefer this function when possible
@@ -357,6 +354,7 @@ public:
     // Main
     virtual void Calculate() = 0;
     virtual void Render() = 0;
+    virtual void RenderMenu() = 0;
 
     virtual void BeforeWorldRender() = 0; //--#SM+#-- Перед рендерингом мира
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
@@ -370,7 +368,6 @@ public:
     virtual void rmNear() = 0;
     virtual void rmFar() = 0;
     virtual void rmNormal() = 0;
-    virtual u32 active_phase() const = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}

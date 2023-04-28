@@ -140,10 +140,8 @@ void CBackend::Invalidate()
         textures_ps[ps_it++] = nullptr;
     for (u32 vs_it = 0; vs_it < CTexture::mtMaxVertexShaderTextures;)
         textures_vs[vs_it++] = nullptr;
-#ifdef _EDITOR
-    for (u32 m_it = 0; m_it < 8;)
-        matrices[m_it++] = 0;
-#endif
+    for (auto& matrix : matrices)
+        matrix = nullptr;
 }
 
 void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count /* =0*/)
@@ -512,6 +510,17 @@ void CBackend::SetupStates()
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, D3DMCS_COLOR1));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE));
+
+    Fmaterial mat
+    {
+        /*.diffuse  =*/ { 1, 1, 1, 1 },
+        /*.ambient  =*/ { 1, 1, 1, 1 },
+        /*.emissive =*/ { 0, 0, 0, 0 },
+        /*.specular =*/ { 1, 1, 1, 1 },
+        /*.power    =*/ 15.f
+    };
+    CHK_DX(HW.pDevice->SetMaterial(reinterpret_cast<D3DMATERIAL9*>(&mat)));
+
     if (psDeviceFlags.test(rsWireframe))
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME));
     else

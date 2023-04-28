@@ -45,7 +45,7 @@ public:
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
     virtual bool net_SaveRelevant() { return TRUE; }
-    void renderable_Render(IRenderable* root) override;
+    void renderable_Render(u32 context_id, IRenderable* root) override;
     virtual void reload(LPCSTR section);
     virtual void reinit();
     virtual void activate_physic_shell();
