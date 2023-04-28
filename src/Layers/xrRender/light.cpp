@@ -36,6 +36,8 @@ light::light() : SpatialBase(g_SpatialSpace)
     vis.query_order = 0;
     vis.visible = true;
     vis.pending = false;
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+        svis[id].id = id;
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 }
 
@@ -210,7 +212,8 @@ void light::spatial_move()
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     if (flags.bActive)
         gi_generate();
-    svis.invalidate();
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+        svis[id].invalidate();
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER == R_GL)
 }
 

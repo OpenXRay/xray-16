@@ -245,6 +245,9 @@ float dm_current_fade = 47.5; //float(2*dm_current_size)-.5f;
 float ps_current_detail_density = 0.6f;
 float ps_current_detail_height = 1.f;
 
+int ps_r2_mt_calculate = 0;
+int ps_r2_mt_render = 0;
+
 xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
     {"qt_high", 3}, {"qt_extreme", 4}, {nullptr, 0}};
 //-AVO
@@ -984,6 +987,9 @@ void xrRender_initconsole()
     CMD1(CCC_memory_stats, "render_memory_stats");
 
     //CMD3(CCC_Mask, "r2_sun_ignore_portals", &ps_r2_ls_flags, R2FLAG_SUN_IGNORE_PORTALS);
+
+    CMD4(CCC_Integer, "r2_mt_calculate",    &ps_r2_mt_calculate, 0, 1);
+    CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
 }
 
 #endif

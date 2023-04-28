@@ -323,14 +323,17 @@ void CAI_Crow::UpdateCL()
         XFORM().set(m_pPhysicsShell->mXFORM);
     }
 }
-void CAI_Crow::renderable_Render(IRenderable* root)
+void CAI_Crow::renderable_Render(u32 context_id, IRenderable* root)
 {
+    ScopeLock lock{ &render_lock };
     UpdateWorkload(Device.fTimeDelta * (Device.dwFrame - o_workload_frame));
-    inherited::renderable_Render(root);
+    inherited::renderable_Render(context_id, root);
     o_workload_rframe = Device.dwFrame;
 }
 void CAI_Crow::shedule_Update(u32 DT)
 {
+    ScopeLock lock{ &render_lock };
+
     float fDT = float(DT) / 1000.F;
     spatial.type &= ~STYPE_VISIBLEFORAI;
 

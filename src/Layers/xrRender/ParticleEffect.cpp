@@ -642,7 +642,7 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
     }
 }
 
-void CParticleEffect::Render(float)
+void CParticleEffect::Render(float, bool use_fast_geo)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CParticleEffect::Render()");
@@ -728,7 +728,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
 }
 
 extern ENGINE_API float psHUD_FOV;
-void CParticleEffect::Render(float)
+void CParticleEffect::Render(float, bool)
 {
     u32 dwOffset, dwCount;
     // Get a pointer to the particles in gp memory

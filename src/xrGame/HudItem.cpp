@@ -62,7 +62,7 @@ void CHudItem::PlaySound(pcstr alias, const Fvector& position, u8 index)
 }
 //-Alundaio
 
-void CHudItem::renderable_Render(IRenderable* root)
+void CHudItem::renderable_Render(u32 context_id, IRenderable* root)
 {
     UpdateXForm();
     const bool _hud_render = root && root->renderable_HUD() && GetHUDmode();
@@ -74,7 +74,7 @@ void CHudItem::renderable_Render(IRenderable* root)
     {
         if (!object().H_Parent() || (!_hud_render && !IsHidden()))
         {
-            on_renderable_Render(root);
+            on_renderable_Render(context_id, root);
             debug_draw_firedeps();
         }
         else if (object().H_Parent())
@@ -83,7 +83,7 @@ void CHudItem::renderable_Render(IRenderable* root)
             VERIFY(owner);
             CInventoryItem* self = smart_cast<CInventoryItem*>(this);
             if (owner->attached(self))
-                on_renderable_Render(root);
+                on_renderable_Render(context_id, root);
         }
     }
 }

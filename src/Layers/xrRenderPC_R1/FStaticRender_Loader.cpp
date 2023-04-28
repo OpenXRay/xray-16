@@ -51,8 +51,6 @@ void CRender::level_Load(IReader* fs)
     rmFar();
     rmNormal();
 
-    dsgraph.marker = 0;
-
     if (!GEnv.isDedicatedServer)
     {
         // VB,IB,SWI
@@ -129,7 +127,7 @@ void CRender::level_Unload()
     uLastLTRACK = 0;
 
     // 2.
-    dsgraph.unload();
+    cleanup_contexts();
 
     //*** Lights
     L_Glows->Unload();
@@ -452,8 +450,8 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    const auto sectors_count = sectors_data.size();
-
+    auto& dsgraph = get_imm_context();
+    dsgraph.reset();
     dsgraph.load(sectors_data, portals_data);
 
     last_sector_id = IRender_Sector::INVALID_SECTOR_ID;

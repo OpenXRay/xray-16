@@ -47,7 +47,7 @@ public:
     xr_vector<light_indirect> indirect;
     u32 indirect_photons;
 
-    smapvis svis; // used for 6-cubemap faces
+    smapvis svis[R__NUM_CONTEXTS]; // used for 6-cubemap faces
 
     ref_shader s_spot;
     ref_shader s_point;
@@ -80,7 +80,7 @@ public:
             s32 minX, maxX;
             s32 minY, maxY;
             BOOL transluent;
-        } D;
+        } D[R__NUM_SUN_CASCADES];
         struct _P
         {
             Fmatrix world;

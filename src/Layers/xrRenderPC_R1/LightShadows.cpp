@@ -176,6 +176,8 @@ void CLightShadows::calculate()
     if (casters.empty())
         return;
 
+    auto& dsgraph = RImplementation.get_imm_context();
+
     BOOL bRTS = FALSE;
     RCache.set_Z(false);
 
@@ -317,7 +319,7 @@ void CLightShadows::calculate()
                 dxRender_Visual* V = N.pVisual;
                 RCache.set_Element(V->shader->E[SE_R1_LMODELS]);
                 RCache.set_xform_world(N.Matrix);
-                V->Render(-1.0f);
+                V->Render(-1.0f, dsgraph.o.phase == CRender::PHASE_SMAP);
             }
 
             // register shadow and increment slot

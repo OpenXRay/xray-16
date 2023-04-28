@@ -49,7 +49,7 @@ public:
     virtual void UpdateCL();
     virtual void shedule_Update(u32 dt);
 
-    void renderable_Render(IRenderable* root) override;
+    void renderable_Render(u32 context_id, IRenderable* root) override;
     void render_hud_mode() override;
     bool need_renderable() override;
 
@@ -520,6 +520,8 @@ private:
     virtual bool ActivationSpeedOverriden(Fvector& dest, bool clear_override);
 
     bool m_bRememberActorNVisnStatus;
+
+    Lock render_lock{};
 
 public:
     virtual void SetActivationSpeedOverride(Fvector const& speed);

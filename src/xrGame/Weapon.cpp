@@ -911,8 +911,10 @@ void CWeapon::EnableActorNVisnAfterZoom()
 }
 
 bool CWeapon::need_renderable() { return !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom()); }
-void CWeapon::renderable_Render(IRenderable* root)
+void CWeapon::renderable_Render(u32 context_id, IRenderable* root)
 {
+    ScopeLock lock{ &render_lock };
+
     UpdateXForm();
 
     //нарисовать подсветку
@@ -925,7 +927,7 @@ void CWeapon::renderable_Render(IRenderable* root)
     else
         RenderHud(TRUE);
 
-    inherited::renderable_Render(root);
+    inherited::renderable_Render(context_id, root);
 }
 
 void CWeapon::signal_HideComplete()

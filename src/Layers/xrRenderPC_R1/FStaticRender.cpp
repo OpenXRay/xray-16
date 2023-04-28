@@ -21,9 +21,9 @@
 CRender RImplementation;
 
 //////////////////////////////////////////////////////////////////////////
-ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /*cdist_sq*/)
+ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /*cdist_sq*/, u32 phase)
 {
-    switch (active_phase())
+    switch (phase)
     {
     case PHASE_NORMAL:
         return (RImplementation.L_Projector->shadowing() ?
@@ -37,9 +37,9 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /
 #endif
 }
 //////////////////////////////////////////////////////////////////////////
-ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq)
+ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase)
 {
-    switch (active_phase())
+    switch (phase)
     {
     case PHASE_NORMAL:
         return (((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < 44) ? pVisual->shader->E[SE_R1_NORMAL_HQ] :
@@ -302,9 +302,11 @@ IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
 bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
-void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
+void CRender::add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
-    set_Object(root);
+    // TODO: this whole function should be replaced by a list of renderables+xforms returned from `renderable_Render` call
+    auto& dsgraph = get_context(context_id);
+    set_Object(root, dsgraph.o.phase);
     dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
@@ -346,7 +348,7 @@ void CRender::add_SkeletonWallmark(
 }
 
 #include "xrEngine/PS_instance.h"
-void CRender::set_Object(IRenderable* O)
+void CRender::set_Object(IRenderable* O, u32 phase)
 {
     if (O)
     {
@@ -356,7 +358,7 @@ void CRender::set_Object(IRenderable* O)
             VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
         }
     }
-    if (PHASE_NORMAL == active_phase())
+    if (PHASE_NORMAL == phase)
     {
         if (L_Shadows)
             L_Shadows->set_object(O);
@@ -460,6 +462,7 @@ void CRender::Calculate()
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     gm_SetNearer(FALSE);
+    auto& dsgraph = get_imm_context();
     dsgraph.o.use_hom = true;
     dsgraph.o.phase = PHASE_NORMAL;
 
@@ -495,7 +498,7 @@ void CRender::Calculate()
 
     // Main process
     dsgraph.marker++;
-    set_Object(nullptr);
+    set_Object(nullptr, dsgraph.o.phase);
     TaskScheduler->Wait(*ProcessHOMTask);
     if (last_sector_id != IRender_Sector::INVALID_SECTOR_ID)
     {
@@ -533,13 +536,13 @@ void CRender::Calculate()
             });
 
             if (ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
-                g_hud->Render_First(); // R1 shadows
+                g_hud->Render_First(dsgraph.context_id); // R1 shadows
 
-            g_hud->Render_Last();
+            g_hud->Render_Last(dsgraph.context_id);
 
             // Determine visibility for dynamic part of scene
             u32 uID_LTRACK = 0xffffffff;
-            if (active_phase() == PHASE_NORMAL)
+            if (dsgraph.o.phase == PHASE_NORMAL)
             {
                 uLastLTRACK++;
                 if (dsgraph.lstRenderables.size())
@@ -600,7 +603,7 @@ void CRender::Calculate()
                             v_copy.box.xform(renderable->GetRenderData().xform);
                             BOOL bVisible = HOM.visible(v_copy);
                             v_orig.accept_frame = v_copy.accept_frame;
-                            v_orig.marker = v_copy.marker;
+                            memcpy(v_orig.marker, v_copy.marker, sizeof(v_copy.marker));
                             v_orig.hom_frame = v_copy.hom_frame;
                             v_orig.hom_tested = v_copy.hom_tested;
                             if (!bVisible)
@@ -615,7 +618,7 @@ void CRender::Calculate()
                             }
 
                             // Rendering
-                            renderable->renderable_Render(renderable);
+                            renderable->renderable_Render(dsgraph.context_id, renderable);
                         }
                         break; // exit loop on frustums
                     }
@@ -653,6 +656,28 @@ void CRender::Calculate()
     BasicStats.Culling.End();
 }
 
+void CRender::RenderMenu()
+{
+    Target->Begin();
+
+    if (g_pGamePersistent)
+        g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
+
+    // find if distortion is needed at all
+    const bool bPerform = Target->Perform();
+    const bool _menu_pp = o.distortion && (g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false);
+    if (bPerform || _menu_pp)
+    {
+        Target->phase_distortion();
+
+        if (g_pGamePersistent)
+            g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
+    
+        // combination/postprocess
+        Target->phase_combine(_menu_pp, false);
+    }
+}
+
 extern u32 g_r;
 void CRender::Render()
 {
@@ -671,6 +696,7 @@ void CRender::Render()
     // Begin
     Target->Begin();
     o.vis_intersect = FALSE;
+    auto& dsgraph = get_imm_context();
     dsgraph.o.phase = PHASE_NORMAL;
     dsgraph.render_hud(); // hud
     dsgraph.render_graph(0); // normal level
@@ -728,6 +754,8 @@ void CRender::Render()
 
     // HUD
     BasicStats.Primitives.End();
+
+    cleanup_contexts();
 }
 
 void CRender::ApplyBlur2(FVF::TL2uv* pv, u32 size) const
