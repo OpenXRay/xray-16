@@ -142,6 +142,7 @@
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_smap_D.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_ssao.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp" />
+    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp" />
     <ClCompile Include="gl_rendertarget_accum_direct.cpp" />
     <ClCompile Include="gl_rendertarget_build_textures.cpp" />
     <ClCompile Include="gl_rendertarget_phase_combine.cpp" />

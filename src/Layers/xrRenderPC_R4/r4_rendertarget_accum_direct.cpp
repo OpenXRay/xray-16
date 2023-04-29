@@ -51,7 +51,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
     //	TODO: DX11: Remove half pixe offset
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = RImplementation.r_sun_old.sun;
 
     // Common calc for quad-rendering
     u32 Offset;

@@ -143,5 +143,8 @@ void CRender::Calculate()
 #endif
 
     // Sun calc
-    r_sun.calculate();
+    if (o.oldshadowcascades)
+        r_sun_old.calculate();
+    else
+        r_sun.calculate();
 }
