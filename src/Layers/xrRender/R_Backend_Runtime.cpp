@@ -50,8 +50,6 @@ void CBackend::OnFrameBegin()
 #endif
 
         ZeroMemory(&stat, sizeof(stat));
-        Vertex.Flush();
-        Index.Flush();
         set_Stencil(FALSE);
     }
 }

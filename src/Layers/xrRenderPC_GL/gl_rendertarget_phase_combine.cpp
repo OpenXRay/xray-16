@@ -175,7 +175,7 @@ void CRenderTarget::phase_combine()
         //p1.set						((_w+.5f)/_w, (_h+.5f)/_h );
 
         // Fill vertex buffer
-        Fvector4* pv				= (Fvector4*)	RCache.Vertex.Lock	(4,g_combine_VP->vb_stride,Offset);
+        Fvector4* pv				= (Fvector4*)	RImplementation.Vertex.Lock	(4,g_combine_VP->vb_stride,Offset);
         //pv->set						(hclip(EPS,		_w),	hclip(_h+EPS,	_h),	p0.x, p1.y);	pv++;
         //pv->set						(hclip(EPS,		_w),	hclip(EPS,		_h),	p0.x, p0.y);	pv++;
         //pv->set						(hclip(_w+EPS,	_w),	hclip(_h+EPS,	_h),	p1.x, p1.y);	pv++;
@@ -184,7 +184,7 @@ void CRenderTarget::phase_combine()
         pv->set						(-1,	-1,	0, 0);	pv++;
         pv->set						(1,		1,	1, 1);	pv++;
         pv->set						(1,		-1,	1, 0);	pv++;
-        RCache.Vertex.Unlock		(4,g_combine_VP->vb_stride);
+        RImplementation.Vertex.Unlock		(4,g_combine_VP->vb_stride);
         */
 
         // Fill VB
@@ -192,7 +192,7 @@ void CRenderTarget::phase_combine()
         float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
 
         // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
         pv++;
         pv->set(-1, -1, 0, 0, 0, 0, 0);
@@ -201,7 +201,7 @@ void CRenderTarget::phase_combine()
         pv++;
         pv->set(1, -1, 1, 0, 0, scale_X, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 
         // Draw
         if (!RImplementation.o.msaa)
@@ -346,7 +346,7 @@ void CRenderTarget::phase_combine()
         p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
         // Fill vertex buffer
-        v_aa* pv = (v_aa*)RCache.Vertex.Lock(4, g_aa_AA->vb_stride, Offset);
+        v_aa* pv = (v_aa*)RImplementation.Vertex.Lock(4, g_aa_AA->vb_stride, Offset);
         pv->p.set(EPS, EPS, EPS, 1.f);
         pv->uv0.set(p0.x, p0.y);
         pv->uv1.set(p0.x - ddw, p0.y - ddh);
@@ -383,7 +383,7 @@ void CRenderTarget::phase_combine()
         pv->uv5.set(p1.x - ddw, p1.y, p1.y, p1.x + ddw);
         pv->uv6.set(p1.x, p1.y - ddh, p1.y + ddh, p1.x);
         pv++;
-        RCache.Vertex.Unlock(4, g_aa_AA->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_aa_AA->vb_stride);
 
         //	Set up variable
         Fvector2 vDofKernel;
@@ -509,12 +509,12 @@ void CRenderTarget::phase_combine()
             p1.set						((_w+.5f)/_w, (_h+.5f)/_h );
 
             // Fill vertex buffer
-            FVF::TL* pv					= (FVF::TL*) RCache.Vertex.Lock	(4,g_combine->vb_stride,Offset);
+            FVF::TL* pv					= (FVF::TL*) RImplementation.Vertex.Lock	(4,g_combine->vb_stride,Offset);
             pv->set						((IX+0)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p0.x, p0.y);	pv++;
             pv->set						((IX+0)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p0.x, p1.y);	pv++;
             pv->set						((IX+1)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p1.x, p0.y);	pv++;
             pv->set						((IX+1)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p1.x, p1.y);	pv++;
-            RCache.Vertex.Unlock		(4,g_combine->vb_stride);
+            RImplementation.Vertex.Unlock		(4,g_combine->vb_stride);
 
             // Draw COLOR
             RCache.set_Shader			(s_combine_dbg_0);
@@ -530,12 +530,12 @@ void CRenderTarget::phase_combine()
             p1.set						((_w+.5f)/_w, (_h+.5f)/_h );
 
             // Fill vertex buffer
-            FVF::TL* pv					= (FVF::TL*) RCache.Vertex.Lock	(4,g_combine->vb_stride,Offset);
+            FVF::TL* pv					= (FVF::TL*) RImplementation.Vertex.Lock	(4,g_combine->vb_stride,Offset);
             pv->set						((IX+0)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p0.x, p0.y);	pv++;
             pv->set						((IX+0)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p0.x, p1.y);	pv++;
             pv->set						((IX+1)*_w+EPS,	(IY+1)*_h+EPS,	EPS,	1.f, C, p1.x, p0.y);	pv++;
             pv->set						((IX+1)*_w+EPS,	(IY+0)*_h+EPS,	EPS,	1.f, C, p1.x, p1.y);	pv++;
-            RCache.Vertex.Unlock		(4,g_combine->vb_stride);
+            RImplementation.Vertex.Unlock		(4,g_combine->vb_stride);
 
             // Draw COLOR
             RCache.set_Shader			(s_combine_dbg_1);
@@ -579,7 +579,7 @@ void CRenderTarget::phase_combine_volumetric()
         float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
 
         // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
         pv++;
         pv->set(-1, -1, 0, 0, 0, 0, 0);
@@ -588,7 +588,7 @@ void CRenderTarget::phase_combine_volumetric()
         pv++;
         pv->set(1, -1, 1, 0, 0, scale_X, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 
         // Draw
         RCache.set_Element(s_combine_volumetric->E[0]);

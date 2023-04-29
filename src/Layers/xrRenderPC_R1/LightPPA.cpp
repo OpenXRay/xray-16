@@ -98,7 +98,7 @@ void CLightR_Manager::render_point  ()
             RCache.set_Geometry     (hGeom);
             u32 triLock             = _min(256u,triCount);
             u32 vOffset;
-            CLightR_Vertex* VB      = (CLightR_Vertex*)RCache.Vertex.Lock(triLock*3,hGeom->vb_stride,vOffset);
+            CLightR_Vertex* VB      = (CLightR_Vertex*)RImplementation.Vertex.Lock(triLock*3,hGeom->vb_stride,vOffset);
 
             // Cull and triangulate polygons
             Fvector cam     = Device.vCameraPosition;
@@ -125,17 +125,17 @@ void CLightR_Manager::render_point  ()
 
                 if (actual>=triLock)
                 {
-                    RCache.Vertex.Unlock        (actual*3,hGeom->vb_stride);
+                    RImplementation.Vertex.Unlock        (actual*3,hGeom->vb_stride);
                     if (actual) RCache.Render   (D3DPT_TRIANGLELIST,vOffset,actual);
                     actual                      = 0;
                     triLock                     = _min(256u,triCount-t);
                     VB                          =
-(CLightR_Vertex*)RCache.Vertex.Lock(triLock*3,hGeom->vb_stride,vOffset);
+(CLightR_Vertex*)RImplementation.Vertex.Lock(triLock*3,hGeom->vb_stride,vOffset);
                 }
             }
 
             // Unlock and render
-            RCache.Vertex.Unlock        (actual*3,hGeom->vb_stride);
+            RImplementation.Vertex.Unlock        (actual*3,hGeom->vb_stride);
             if (actual) RCache.Render   (D3DPT_TRIANGLELIST,vOffset,actual);
         }
         Device.Statistic->RenderDUMP_Lights.End ();

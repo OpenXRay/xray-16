@@ -34,10 +34,6 @@ void D3DXRenderBase::CreateQuadIB()
 // Device dependance
 void CBackend::OnDeviceCreate()
 {
-    // streams
-    Vertex.Create();
-    Index.Create();
-
     // Debug Draw
     InitializeDebugDraw();
 
@@ -47,10 +43,6 @@ void CBackend::OnDeviceCreate()
 
 void CBackend::OnDeviceDestroy()
 {
-    // streams
-    Index.Destroy();
-    Vertex.Destroy();
-
     // Debug Draw
     DestroyDebugDraw();
 }

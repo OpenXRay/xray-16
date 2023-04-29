@@ -146,6 +146,10 @@ public:
     ref_shader m_PortalFadeShader;
     ref_geom   m_PortalFadeGeom;
 
+    // Dynamic geometry streams
+    _VertexStream Vertex;
+    _IndexStream Index;
+
     IndexStagingBuffer QuadIB;
     IndexBufferHandle old_QuadIB;
 

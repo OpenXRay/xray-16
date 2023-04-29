@@ -61,7 +61,7 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
         p0.set(.5f / _w, .5f / _h);
         p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
 #if defined(USE_DX9) || defined(USE_DX11)
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
         pv++;
@@ -83,7 +83,7 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
 #else
 #   error No graphics API selected or enabled!
 #endif // USE_DX9 || USE_DX11
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
 
         // draw

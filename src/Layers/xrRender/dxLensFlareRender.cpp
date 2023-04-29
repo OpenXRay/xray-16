@@ -26,7 +26,7 @@ void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
     svector<ref_shader, MAX_Flares> _2render;
 
     u32 VS_Offset;
-    FVF::LIT* pv = (FVF::LIT*)RCache.Vertex.Lock(MAX_Flares * 4, hGeom.stride(), VS_Offset);
+    FVF::LIT* pv = (FVF::LIT*)RImplementation.Vertex.Lock(MAX_Flares * 4, hGeom.stride(), VS_Offset);
 
     float fDistance = FAR_DIST * 0.75f;
 
@@ -117,7 +117,7 @@ void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
             }
         }
     }
-    RCache.Vertex.Unlock(_2render.size() * 4, hGeom.stride());
+    RImplementation.Vertex.Unlock(_2render.size() * 4, hGeom.stride());
 
     RCache.set_xform_world(Fidentity);
     RCache.set_Geometry(hGeom);
@@ -132,5 +132,5 @@ void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL 
     }
 }
 
-void dxLensFlareRender::OnDeviceCreate() { hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RImplementation.QuadIB); }
+void dxLensFlareRender::OnDeviceCreate() { hGeom.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB); }
 void dxLensFlareRender::OnDeviceDestroy() { hGeom.destroy(); }

@@ -78,7 +78,7 @@ CRenderTarget::CRenderTarget()
         }
     }
     g_postprocess.create(
-        D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RImplementation.QuadIB);
+        D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 
 
     bAvailable = rt_Generic->valid() && rt_distort->valid();
@@ -306,7 +306,7 @@ void CRenderTarget::phase_combine(bool bDistort, bool bCMap)
 
     // Fill vertex buffer
     const float du = ps_r1_pps_u, dv = ps_r1_pps_v;
-    TL_2c3uv* pv = (TL_2c3uv*)RCache.Vertex.Lock(4, g_postprocess.stride(), Offset);
+    TL_2c3uv* pv = (TL_2c3uv*)RImplementation.Vertex.Lock(4, g_postprocess.stride(), Offset);
     pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
     pv++;
     pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
@@ -315,7 +315,7 @@ void CRenderTarget::phase_combine(bool bDistort, bool bCMap)
     pv++;
     pv->set(du + float(_w), dv + 0, p_color, p_gray, r1.x, r0.y, l1.x, l0.y, n1.x, n0.y);
     pv++;
-    RCache.Vertex.Unlock(4, g_postprocess.stride());
+    RImplementation.Vertex.Unlock(4, g_postprocess.stride());
 
     static shared_str s_colormap = "c_colormap";
     if (bCMap)

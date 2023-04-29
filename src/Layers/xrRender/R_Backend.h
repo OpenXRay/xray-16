@@ -65,10 +65,6 @@ public:
     };
 
 public:
-    // Dynamic geometry streams
-    _VertexStream Vertex;
-    _IndexStream Index;
-
     R_xforms xforms;
     R_hemi hemi;
     R_tree tree;

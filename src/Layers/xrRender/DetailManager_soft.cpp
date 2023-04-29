@@ -7,10 +7,10 @@ const u32 vs_size = 3000;
 
 void CDetailManager::soft_Load()
 {
-    R_ASSERT(RCache.Vertex.Buffer());
-    R_ASSERT(RCache.Index.Buffer());
+    R_ASSERT(RImplementation.Vertex.Buffer());
+    R_ASSERT(RImplementation.Index.Buffer());
     // Vertex Stream
-    soft_Geom.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+    soft_Geom.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 }
 
 void CDetailManager::soft_Unload() { soft_Geom.destroy(); }
@@ -22,8 +22,8 @@ void CDetailManager::soft_Render()
     // float    fPhaseZ     = _sin(RDEVICE.fTimeGlobal*0.11f)*fPhaseRange;
 
     // Get index-stream
-    _IndexStream& _IS = RCache.Index;
-    _VertexStream& _VS = RCache.Vertex;
+    _IndexStream& _IS = RImplementation.Index;
+    _VertexStream& _VS = RImplementation.Vertex;
     for (u32 O = 0; O < objects.size(); O++)
     {
         CDetail& Object = *objects[O];

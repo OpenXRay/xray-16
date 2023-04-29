@@ -161,7 +161,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         j1.set(scale_X, scale_X).add(offset);
 
         // Fill vertex buffer
-        FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(3, g_combine_2UV->vb_stride, Offset);
+        FVF::TL2uv* pv = (FVF::TL2uv*)RImplementation.Vertex.Lock(3, g_combine_2UV->vb_stride, Offset);
 #if defined(USE_DX11)
         pv->set(-1, -1, d_Z, d_W, C, 0, 1, 0, scale_X);
         pv++;
@@ -179,7 +179,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
 #else
 #   error No graphics API selected or enabled!
 #endif
-        RCache.Vertex.Unlock(3, g_combine_2UV->vb_stride);
+        RImplementation.Vertex.Unlock(3, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
 
         // setup

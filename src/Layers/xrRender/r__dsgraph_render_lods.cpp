@@ -37,7 +37,7 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
         ssaRange = EPS_S;
 
     const u32 uiVertexPerImposter = 4;
-    const u32 uiImpostersFit = RCache.Vertex.GetSize() / (firstV->geom->vb_stride * uiVertexPerImposter);
+    const u32 uiImpostersFit = RImplementation.Vertex.GetSize() / (firstV->geom->vb_stride * uiVertexPerImposter);
 
     //Msg("dbg_lods: shid[%d],firstV[%X]",shid,u32((void*)firstV));
     //Msg("dbg_lods: shader[%X]",u32((void*)firstV->shader._get()));
@@ -49,7 +49,7 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
         int cur_count = 0;
         u32 vOffset;
         FLOD::_hw* V =
-            (FLOD::_hw*)RCache.Vertex.Lock(iBatchSize * uiVertexPerImposter, firstV->geom->vb_stride, vOffset);
+            (FLOD::_hw*)RImplementation.Vertex.Lock(iBatchSize * uiVertexPerImposter, firstV->geom->vb_stride, vOffset);
 
         for (u32 j = 0; j < iBatchSize; ++j, ++i)
         {
@@ -118,7 +118,7 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
             }
         }
         lstLODgroups.push_back(cur_count);
-        RCache.Vertex.Unlock(iBatchSize * uiVertexPerImposter, firstV->geom->vb_stride);
+        RImplementation.Vertex.Unlock(iBatchSize * uiVertexPerImposter, firstV->geom->vb_stride);
 
         // *** Render
         RCache.set_xform_world(Fidentity);
