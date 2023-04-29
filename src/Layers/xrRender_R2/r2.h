@@ -118,6 +118,11 @@ struct render_sun_old : public i_render_phase
     void calculate_task(Task&, void*) override { /* the same as render_sun */ }
     void render() override
     {
+        wait();
+
+        if (!o.active)
+            return;
+
         render_sun_near();
         render_sun();
         render_sun_filtered();

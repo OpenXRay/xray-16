@@ -334,6 +334,9 @@ void render_sun_old::init()
     if (RImplementation.o.sunstatic)
         o.active = false;
 
+    if (!o.active)
+        return;
+
     o.mt_enabled = RImplementation.o.mt_calculate;
 
     // pre-allocate context
@@ -1062,7 +1065,8 @@ void render_sun::init()
     if (RImplementation.o.sunstatic)
         o.active = false;
 
-    o.mt_enabled = RImplementation.o.mt_calculate;
+    if (!o.active)
+        return;
 
     // pre-allocate contexts
     for (int i = 0; i < R__NUM_SUN_CASCADES; ++i)
@@ -1070,15 +1074,12 @@ void render_sun::init()
         contexts_ids[i] = RImplementation.alloc_context();
         VERIFY(contexts_ids[i] != R_dsgraph_structure::INVALID_CONTEXT_ID);
     }
+
+    o.mt_enabled = RImplementation.o.mt_calculate;
 }
 
 void render_sun::calculate_task(Task&, void*)
 {
-    if (!o.active)
-    {
-        return;
-    }
-
     need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
     last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
     if (need_to_render_sunshafts)
@@ -1341,6 +1342,9 @@ void render_sun::calculate_task(Task&, void*)
 void render_sun::render()
 {
     wait();
+
+    if (!o.active)
+        return;
 
     if (need_to_render_sunshafts)
         m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;

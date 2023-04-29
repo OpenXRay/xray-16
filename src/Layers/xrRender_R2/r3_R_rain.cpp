@@ -44,10 +44,14 @@ static int facetable[6][4] =
 
 void render_rain::init()
 {
-    o.active = (!Device.vCameraPositionSaved.similar(Device.vCameraPosition, EPS_L) ||
+    o.active = ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF);
+    o.active &= (!Device.vCameraPositionSaved.similar(Device.vCameraPosition, EPS_L) ||
         !Device.vCameraDirectionSaved.similar(Device.vCameraDirection, EPS_L) ||
         RainLight.frame_render == 0);
-    
+
+    if (!o.active)
+        return;
+
     o.mt_enabled = RImplementation.o.mt_calculate;
 
     // pre-allocate context
@@ -62,11 +66,6 @@ void render_rain::calculate_task(Task&, void*)
     if (fRainFactor < EPS_L)
     {
         RainLight.frame_render = 0;
-        return;
-    }
-
-    if (!o.active)
-    {
         return;
     }
 
@@ -294,31 +293,31 @@ void render_rain::render()
 {
     wait();
 
-    if (o.active)
+    if (!o.active)
+        return;
+
+    PIX_EVENT(RAIN);
+
+    auto& dsgraph = RImplementation.get_context(context_id);
+
+    // Render shadow-map
+    //. !!! We should clip based on shrinked frustum (again)
     {
-        PIX_EVENT(RAIN);
-
-        auto& dsgraph = RImplementation.get_context(context_id);
-
-        // Render shadow-map
-        //. !!! We should clip based on shrinked frustum (again)
+        bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+        bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+            !dsgraph.mapSorted.empty();
+        if (bNormal || bSpecial)
         {
-            bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
-            bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
-                !dsgraph.mapSorted.empty();
-            if (bNormal || bSpecial)
-            {
-                RImplementation.Target->phase_smap_direct(&RainLight, SE_SUN_RAIN_SMAP);
-                RCache.set_xform_world(Fidentity);
-                RCache.set_xform_view(Fidentity);
-                RCache.set_xform_project(RainLight.X.D[0].combine);
-                dsgraph.render_graph(0);
-                // if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))
-                //	Details->Render					()	;
-            }
+            RImplementation.Target->phase_smap_direct(&RainLight, SE_SUN_RAIN_SMAP);
+            RCache.set_xform_world(Fidentity);
+            RCache.set_xform_view(Fidentity);
+            RCache.set_xform_project(RainLight.X.D[0].combine);
+            dsgraph.render_graph(0);
+            // if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))
+            //	Details->Render					()	;
         }
-        RImplementation.release_context(context_id);
     }
+    RImplementation.release_context(context_id);
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
