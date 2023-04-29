@@ -75,6 +75,7 @@ class ECORE_API CParticleGroup : public dxParticleCustom
     const CPGDef* m_Def{};
     float m_CurrentTime{};
     Fvector m_InitialPosition{};
+    Lock render_lock{};
 
 public:
     using VisualVec = xr_vector<dxRender_Visual*>;

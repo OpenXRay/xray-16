@@ -177,6 +177,7 @@ void CRender::render_lights(light_Package& LP)
             const auto batch_id = alloc_context();
             if (batch_id == R_dsgraph_structure::INVALID_CONTEXT_ID)
             {
+                VERIFY(!lights_queue.empty());
                 flush_lights();
                 continue;
             }
