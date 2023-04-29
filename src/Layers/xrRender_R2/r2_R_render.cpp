@@ -321,14 +321,10 @@ void CRender::Render()
         Target->mark_msaa_edges();
     }
 
-    if (ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF))
-    {
-        r_rain.render();
-    }
+    r_rain.render();
 #endif // !USE_DX9
 
     // Directional light - fucking sun
-    if (r_sun.o.active)
     {
         PIX_EVENT(DEFER_SUN);
         Stats.l_visible++;

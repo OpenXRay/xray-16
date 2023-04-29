@@ -378,6 +378,9 @@ void render_sun_old::init()
     if (RImplementation.o.sunstatic)
         o.active = false;
 
+    if (!o.active)
+        return;
+
     o.mt_enabled = RImplementation.o.mt_calculate;
 
     // pre-allocate context
@@ -1091,6 +1094,9 @@ void render_sun::init()
     if (RImplementation.o.sunstatic)
         o.active = false;
 
+    if (!o.active)
+        return;
+
     o.mt_enabled = RImplementation.o.mt_calculate;
 
     // pre-allocate contexts
@@ -1103,11 +1109,6 @@ void render_sun::init()
 
 void render_sun::calculate_task(Task&, void*)
 {
-    if (!o.active)
-    {
-        return;
-    }
-
     need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
     last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
     if (need_to_render_sunshafts)
@@ -1331,6 +1332,11 @@ void render_sun::calculate_task(Task&, void*)
 
 void render_sun::render()
 {
+    wait();
+
+    if (!o.active)
+        return;
+
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     for (int cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind) // TODO: proper max cascades

@@ -114,8 +114,8 @@ public:
         for (int id = 0; id < R__NUM_CONTEXTS; ++id)
         {
             contexts_pool[id].reset();
-            contexts_used.set(id, false);
         }
+        contexts_used.reset();
     }
 #else
 

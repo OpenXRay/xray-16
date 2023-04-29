@@ -139,19 +139,9 @@ void CRender::Calculate()
 
     // Rain calc
 #if RENDER != R_R2
-    if (r_rain.o.active)
-    {
-        {
-            r_rain.calculate();
-        }
-    }
+    r_rain.calculate();
 #endif
 
     // Sun calc
-    if (r_sun.o.active)
-    {
-        {
-            r_sun.calculate();
-        }
-    }
+    r_sun.calculate();
 }
