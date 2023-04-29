@@ -352,7 +352,7 @@ glm::vec2 BuildTSMProjectionMatrix_caster_depth_bounds(glm::mat4& lightSpaceBasi
 
 void render_sun_old::init()
 {
-        u32 cascade_count = R__NUM_SUN_CASCADES;
+    u32 cascade_count = R__NUM_SUN_CASCADES;
     m_sun_cascades.resize(cascade_count);
 
     float fBias = -0.0000025f;
@@ -373,6 +373,7 @@ void render_sun_old::init()
     // 		size *= MAP_GROW_FACTOR;
     // 	}
     /// 	m_sun_cascades[m_sun_cascades.size()-1].size = 80;
+    sun = (light*)RImplementation.Lights.sun._get();
 
     const Fcolor sun_color = sun->color;
     o.active = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
@@ -993,12 +994,14 @@ void render_sun_old::render_sun_near()
     auto& dsgraph = RImplementation.get_context(context_id);
     {
         //		sun->svis.begin					();
+        dsgraph.o.use_hom = false;
         dsgraph.o.phase = CRender::PHASE_SMAP;
         dsgraph.r_pmask(true, RImplementation.o.Tshadows);
         dsgraph.o.sector_id = RImplementation.get_largest_sector();
         dsgraph.o.xform = *(Fmatrix*)glm::value_ptr(cull_xform);
-        dsgraph.o.view_pos = cull_COP;
         dsgraph.o.view_frustum = cull_frustum;
+        dsgraph.o.view_pos = cull_COP;
+        dsgraph.o.mt_calculate = o.mt_enabled;
 
         // Fill the database
         dsgraph.build_subspace();
@@ -1099,14 +1102,14 @@ void render_sun::init()
     if (!o.active)
         return;
 
-    o.mt_enabled = RImplementation.o.mt_calculate;
-
     // pre-allocate contexts
     for (int i = 0; i < R__NUM_SUN_CASCADES; ++i)
     {
         contexts_ids[i] = RImplementation.alloc_context();
         VERIFY(contexts_ids[i] != R_dsgraph_structure::INVALID_CONTEXT_ID);
     }
+
+    o.mt_enabled = RImplementation.o.mt_calculate;
 }
 
 void render_sun::calculate_task(Task&, void*)
