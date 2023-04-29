@@ -58,7 +58,7 @@ void COMotion::Clear()
         xr_delete(envs[ch]);
 }
 
-void COMotion::_Evaluate(float t, Fvector& T, Fvector& R)
+void COMotion::_Evaluate(float t, Fvector& T, Fvector& R) const
 {
     T.x = envs[ctPositionX]->Evaluate(t);
     T.y = envs[ctPositionY]->Evaluate(t);
@@ -137,7 +137,7 @@ bool COMotion::Load(IReader& F)
     return true;
 }
 
-void COMotion::CreateKey(float t, const Fvector& P, const Fvector& R)
+void COMotion::CreateKey(float t, const Fvector& P, const Fvector& R) const
 {
     envs[ctPositionX]->InsertKey(t, P.x);
     envs[ctPositionY]->InsertKey(t, P.y);
@@ -146,7 +146,7 @@ void COMotion::CreateKey(float t, const Fvector& P, const Fvector& R)
     envs[ctRotationP]->InsertKey(t, R.x);
     envs[ctRotationB]->InsertKey(t, R.z);
 }
-void COMotion::DeleteKey(float t)
+void COMotion::DeleteKey(float t) const
 {
     envs[ctPositionX]->DeleteKey(t);
     envs[ctPositionY]->DeleteKey(t);
@@ -155,8 +155,10 @@ void COMotion::DeleteKey(float t)
     envs[ctRotationP]->DeleteKey(t);
     envs[ctRotationB]->DeleteKey(t);
 }
-int COMotion::KeyCount() { return envs[ctPositionX]->keys.size(); }
-void COMotion::FindNearestKey(float t, float& mn, float& mx, float eps)
+
+int COMotion::KeyCount() const { return envs[ctPositionX]->keys.size(); }
+
+void COMotion::FindNearestKey(float t, float& mn, float& mx, float eps) const
 {
     KeyIt min_k;
     KeyIt max_k;
@@ -164,7 +166,7 @@ void COMotion::FindNearestKey(float t, float& mn, float& mx, float eps)
     mn = (min_k != envs[ctPositionX]->keys.end()) ? (*min_k)->time : t;
     mx = (max_k != envs[ctPositionX]->keys.end()) ? (*max_k)->time : t;
 }
-float COMotion::GetLength(float* mn, float* mx)
+float COMotion::GetLength(float* mn, float* mx) const
 {
     float ln, len = 0.f;
     for (size_t ch = 0; ch < ctMaxChannel; ch++)
@@ -172,7 +174,7 @@ float COMotion::GetLength(float* mn, float* mx)
             len = ln;
     return len;
 }
-BOOL COMotion::ScaleKeys(float from_time, float to_time, float scale_factor)
+BOOL COMotion::ScaleKeys(float from_time, float to_time, float scale_factor) const
 {
     BOOL bRes = TRUE;
     for (size_t ch = 0; ch < ctMaxChannel; ch++)
@@ -608,7 +610,7 @@ bool CClip::Load(IReader& F)
 }
 //------------------------------------------------------------------------------
 
-bool CClip::Equal(CClip* c)
+bool CClip::Equal(CClip* c) const
 {
     if (!name.equal(c->name))
         return false;

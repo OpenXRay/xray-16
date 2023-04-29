@@ -4,7 +4,7 @@
 
 using namespace std;
 
-XRCORE_API smem_container* g_pSharedMemoryContainer = NULL;
+XRCORE_API smem_container* g_pSharedMemoryContainer = nullptr;
 
 smem_container::smem_container()
 #ifdef CONFIG_PROFILE_LOCKS
@@ -23,7 +23,7 @@ smem_value* smem_container::dock(u32 dwCRC, u32 dwLength, void* ptr)
     VERIFY(dwCRC && dwLength && ptr);
 
     ScopeLock scope(&lock);
-    smem_value* result = 0;
+    smem_value* result = nullptr;
 
     // search a place to insert
     u8 storage[4 * sizeof(u32)];
@@ -31,8 +31,8 @@ smem_value* smem_container::dock(u32 dwCRC, u32 dwLength, void* ptr)
     value->dwReference = 0;
     value->dwCRC = dwCRC;
     value->dwLength = dwLength;
-    cdb::iterator it = std::lower_bound(container.begin(), container.end(), value, smem_search);
-    cdb::iterator saved_place = it;
+    auto it = std::lower_bound(container.begin(), container.end(), value, smem_search);
+    const auto saved_place = it;
     if (container.end() != it)
     {
         // supposedly found
@@ -54,7 +54,7 @@ smem_value* smem_container::dock(u32 dwCRC, u32 dwLength, void* ptr)
     }
 
     // if not found - create new entry
-    if (0 == result)
+    if (nullptr == result)
     {
         result = (smem_value*)xr_malloc(4 * sizeof(u32) + dwLength);
         result->dwReference = 0;
@@ -74,7 +74,7 @@ void smem_container::clean()
     for (auto& v : container)
         if (0 == v->dwReference)
             xr_free(v);
-    container.erase(remove(container.begin(), container.end(), (smem_value*)0), container.end());
+    container.erase(remove(container.begin(), container.end(), (smem_value*)nullptr), container.end());
     if (container.empty())
         container.clear();
 }

@@ -23,7 +23,10 @@ void CStringTable::Destroy()
     pData.reset(nullptr);
 
     for (auto& token : languagesToken)
-        xr_free(token.name);
+    {
+        auto tokenName = const_cast<char*>(token.name);
+        xr_free(tokenName);
+    }
 
     languagesToken.clear();
 }

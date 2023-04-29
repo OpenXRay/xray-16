@@ -17,6 +17,7 @@ public:
     dxRender_Visual* testQ_V;
     u32 testQ_id;
     u32 testQ_frame;
+    int id{-1};
 
 public:
     smapvis();
@@ -31,5 +32,5 @@ public:
     void resetoccq();
 
     IC bool sleep() { return Device.dwFrame > frame_sleep; }
-    virtual void rfeedback_static(dxRender_Visual* V);
+    virtual void rfeedback_static(dxRender_Visual* V) override;
 };

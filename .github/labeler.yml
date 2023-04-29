@@ -1,22 +1,22 @@
 AI:
-- src/xrAICore/*
-- src/xrGame/ai/*
+- src/xrAICore/**/*
+- src/xrGame/ai/**/*
 
 Documentation:
-- docs/*
+- docs/**/*
 
 External (3rd party):
-- Externals/*
+- Externals/**/*
 
 Physics:
-- src/xrPhysics/*
+- src/xrPhysics/**/*
 
 Renderer:
-- src/Layers/*
+- src/Layers/**/*
 
 Sound:
-- src/xrSound/*
+- src/xrSound/**/*
 
 UI:
-- src/xrUICore/*
-- src/xrGame/ui/*
+- src/xrUICore/**/*
+- src/xrGame/ui/**/*

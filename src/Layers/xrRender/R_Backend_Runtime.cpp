@@ -12,6 +12,11 @@
 #include <DirectXMath.h>
 #endif
 
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/StateManager/dx11StateCacheImpl.h"
+#include "Layers/xrRenderDX11/StateManager/dx11StateCache.cpp"
+#endif
+
 void CBackend::OnFrameEnd()
 {
     if (!GEnv.isDedicatedServer)
@@ -50,8 +55,6 @@ void CBackend::OnFrameBegin()
 #endif
 
         ZeroMemory(&stat, sizeof(stat));
-        Vertex.Flush();
-        Index.Flush();
         set_Stencil(FALSE);
     }
 }
@@ -140,10 +143,8 @@ void CBackend::Invalidate()
         textures_ps[ps_it++] = nullptr;
     for (u32 vs_it = 0; vs_it < CTexture::mtMaxVertexShaderTextures;)
         textures_vs[vs_it++] = nullptr;
-#ifdef _EDITOR
-    for (u32 m_it = 0; m_it < 8;)
-        matrices[m_it++] = 0;
-#endif
+    for (auto& matrix : matrices)
+        matrix = nullptr;
 }
 
 void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count /* =0*/)
@@ -512,6 +513,17 @@ void CBackend::SetupStates()
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, D3DMCS_COLOR1));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE));
+
+    Fmaterial mat
+    {
+        /*.diffuse  =*/ { 1, 1, 1, 1 },
+        /*.ambient  =*/ { 1, 1, 1, 1 },
+        /*.emissive =*/ { 0, 0, 0, 0 },
+        /*.specular =*/ { 1, 1, 1, 1 },
+        /*.power    =*/ 15.f
+    };
+    CHK_DX(HW.pDevice->SetMaterial(reinterpret_cast<D3DMATERIAL9*>(&mat)));
+
     if (psDeviceFlags.test(rsWireframe))
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME));
     else
@@ -538,3 +550,31 @@ void CBackend::SetupStates()
 #   error No graphics API selected or enabled!
 #endif
 }
+
+
+// Device dependance
+void CBackend::OnDeviceCreate()
+{
+    // Debug Draw
+    InitializeDebugDraw();
+
+    // invalidate caching
+    Invalidate();
+}
+
+void CBackend::OnDeviceDestroy()
+{
+    // Debug Draw
+    DestroyDebugDraw();
+
+#if defined(USE_DX11)
+    //  Destroy state managers
+    StateManager.Reset();
+    RSManager.ClearStateArray();
+    DSSManager.ClearStateArray();
+    BSManager.ClearStateArray();
+    SSManager.ClearStateArray();
+#endif
+}
+
+CBackend RCache;

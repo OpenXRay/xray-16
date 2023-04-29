@@ -122,7 +122,7 @@ public:
     virtual void spatial_unregister() = 0;
     virtual void spatial_move() = 0;
     virtual Fvector spatial_sector_point() = 0;
-    virtual void spatial_updatesector() = 0;
+    virtual void spatial_updatesector(IRender_Sector::sector_id_t sector_id) = 0;
     virtual IGameObject* dcast_GameObject() = 0;
     virtual Feel::Sound* dcast_FeelSound() = 0;
     virtual IRenderable* dcast_Renderable() = 0;
@@ -137,7 +137,7 @@ public:
     SpatialData spatial;
 
 private:
-    void spatial_updatesector_internal();
+    void spatial_updatesector_internal(IRender_Sector::sector_id_t sector_id);
 
 public:
     virtual SpatialData& GetSpatialData() override final { return spatial; }
@@ -146,11 +146,11 @@ public:
     virtual void spatial_unregister() override;
     virtual void spatial_move() override;
     virtual Fvector spatial_sector_point() override { return spatial.sphere.P; }
-    virtual void spatial_updatesector() override final
+    virtual void spatial_updatesector(IRender_Sector::sector_id_t sector_id) override final
     {
         if (0 == (spatial.type & STYPEFLAG_INVALIDSECTOR))
             return;
-        spatial_updatesector_internal();
+        spatial_updatesector_internal(sector_id);
     }
 
     virtual IGameObject* dcast_GameObject() override { return nullptr; }

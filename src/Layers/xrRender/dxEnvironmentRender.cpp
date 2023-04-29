@@ -121,9 +121,6 @@ void dxEnvDescriptorRender::OnDeviceDestroy()
 }
 
 dxEnvironmentRender::dxEnvironmentRender()
-    : tonemap_tstage_2sky(u32(-1)), tonemap_tstage_clouds(u32(-1)),
-      tsky0_tstage(u32(-1)), tsky1_tstage(u32(-1)),
-      tclouds0_tstage(u32(-1)), tclouds1_tstage(u32(-1))
 {
     tsky0.create(r2_T_sky0);
     tsky1.create(r2_T_sky1);
@@ -219,15 +216,15 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
         iFloor(env.CurrentEnv.sky_color.z * 255.f), iFloor(env.CurrentEnv.weight * 255.f));
 
     // Fill index buffer
-    u16* pib = RCache.Index.Lock(20 * 3, i_offset);
+    u16* pib = RImplementation.Index.Lock(20 * 3, i_offset);
     CopyMemory(pib, hbox_faces, 20 * 3 * 2);
-    RCache.Index.Unlock(20 * 3);
+    RImplementation.Index.Unlock(20 * 3);
 
     // Fill vertex buffer
-    v_skybox* pv = (v_skybox*)RCache.Vertex.Lock(12, sh_2geom.stride(), v_offset);
+    v_skybox* pv = (v_skybox*)RImplementation.Vertex.Lock(12, sh_2geom.stride(), v_offset);
     for (u32 v = 0; v < 12; v++)
         pv[v].set(hbox_verts[v * 2], C, hbox_verts[v * 2 + 1]);
-    RCache.Vertex.Unlock(12, sh_2geom.stride());
+    RImplementation.Vertex.Unlock(12, sh_2geom.stride());
 
     // Render
     RCache.set_xform_world(mSky);
@@ -278,6 +275,9 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 
 void dxEnvironmentRender::RenderClouds(CEnvironment& env)
 {
+    if (!clouds_sh)
+        return;
+
     GEnv.Render->rmFar();
 
     Fmatrix mXFORM, mScale;
@@ -297,15 +297,15 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
         iFloor(env.CurrentEnv.clouds_color.z * 255.f), iFloor(env.CurrentEnv.clouds_color.w * 255.f));
 
     // Fill index buffer
-    u16* pib = RCache.Index.Lock(env.CloudsIndices.size(), i_offset);
+    u16* pib = RImplementation.Index.Lock(env.CloudsIndices.size(), i_offset);
     CopyMemory(pib, &env.CloudsIndices.front(), env.CloudsIndices.size() * sizeof(u16));
-    RCache.Index.Unlock(env.CloudsIndices.size());
+    RImplementation.Index.Unlock(env.CloudsIndices.size());
 
     // Fill vertex buffer
-    v_clouds* pv = (v_clouds*)RCache.Vertex.Lock(env.CloudsVerts.size(), clouds_geom.stride(), v_offset);
+    v_clouds* pv = (v_clouds*)RImplementation.Vertex.Lock(env.CloudsVerts.size(), clouds_geom.stride(), v_offset);
     for (auto it = env.CloudsVerts.begin(); it != env.CloudsVerts.end(); ++it, pv++)
         pv->set(*it, C0, C1);
-    RCache.Vertex.Unlock(env.CloudsVerts.size(), clouds_geom.stride());
+    RImplementation.Vertex.Unlock(env.CloudsVerts.size(), clouds_geom.stride());
 
     // Render
     RCache.set_xform_world(mXFORM);
@@ -322,27 +322,42 @@ void dxEnvironmentRender::OnDeviceCreate()
     if (GEnv.isDedicatedServer)
         return;
 
-    CBlender_skybox b_skybox;
-    sh_2sky.create(&b_skybox, "skybox_2t");
-    sh_2geom.create(v_skybox_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+    if (RImplementation.o.ffp)
+    {
+        // XXX: We need better blender with multitexturing
+        // to properly blend two textures.
+        // Currently, it just suddenly changes.
+        sh_2sky.create("sky\\skydome", "skybox_2t");
+    }
+    else
+    {
+        CBlender_skybox b_skybox;
+        sh_2sky.create(&b_skybox, "skybox_2t");
+    }
+    sh_2geom.create(v_skybox_fvf, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
     clouds_sh.create("clouds", "null");
-    clouds_geom.create(v_clouds_fvf, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+    clouds_geom.create(v_clouds_fvf, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 
-    R_constant* C = sh_2sky->E[0]->passes[0]->constants->get(RImplementation.c_ssky0)._get();
-    R_ASSERT(C);
-    tsky0_tstage = C->samp.index;
+    const auto& sky2_constants = sh_2sky->E[0]->passes[0]->constants;
+    const auto& clouds_constants = clouds_sh->E[0]->passes[0]->constants;
 
-    C = sh_2sky->E[0]->passes[0]->constants->get(RImplementation.c_ssky1)._get();
-    R_ASSERT(C);
-    tsky1_tstage = C->samp.index;
+    // Just let texture stages be 0 if constants are missing
+    if (sky2_constants)
+    {
+        if (const auto C = sky2_constants->get(RImplementation.c_ssky0)._get())
+            tsky0_tstage = C->samp.index;
 
-    C = clouds_sh->E[0]->passes[0]->constants->get(RImplementation.c_sclouds0)._get();
-    R_ASSERT(C);
-    tclouds0_tstage = C->samp.index;
+        if (const auto C = sky2_constants->get(RImplementation.c_ssky1)._get())
+            tsky1_tstage = C->samp.index;
+    }
+    if (clouds_constants)
+    {
+        if (const auto C = clouds_constants->get(RImplementation.c_sclouds0)._get())
+            tclouds0_tstage = C->samp.index;
 
-    C = clouds_sh->E[0]->passes[0]->constants->get(RImplementation.c_sclouds1)._get();
-    R_ASSERT(C);
-    tclouds1_tstage = C->samp.index;
+        if (const auto C = clouds_constants->get(RImplementation.c_sclouds1)._get())
+            tclouds1_tstage = C->samp.index;
+    }
 
     const bool r2 = GEnv.Render->GenerationIsR2OrHigher();
     tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
@@ -375,10 +390,10 @@ void dxEnvironmentRender::OnDeviceDestroy()
     clouds_sh.destroy();
     clouds_geom.destroy();
 
-    tsky0_tstage = u32(-1);
-    tsky1_tstage = u32(-1);
-    tclouds0_tstage = u32(-1);
-    tclouds1_tstage = u32(-1);
+    tsky0_tstage = 0;
+    tsky1_tstage = 0;
+    tclouds0_tstage = 0;
+    tclouds1_tstage = 0;
     tonemap_tstage_2sky = u32(-1);
     tonemap_tstage_clouds = u32(-1);
 }

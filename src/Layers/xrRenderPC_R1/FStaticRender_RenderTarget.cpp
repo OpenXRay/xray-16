@@ -78,7 +78,7 @@ CRenderTarget::CRenderTarget()
         }
     }
     g_postprocess.create(
-        D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
+        D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 
 
     bAvailable = rt_Generic->valid() && rt_distort->valid();
@@ -253,18 +253,22 @@ void CRenderTarget::DoAsyncScreenshot() const
 
 void CRenderTarget::End()
 {
-    if (g_pGamePersistent)
-        g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
+    auto& dsgraph = RImplementation.get_imm_context();
 
     // find if distortion is needed at all
     const bool bPerform = Perform();
     bool bDistort = RImplementation.o.distortion;
     const bool bCMap = NeedColorMapping();
-    const bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
-    if (RImplementation.dsgraph.mapDistort.empty() && !_menu_pp)
+
+    if (dsgraph.mapDistort.empty())
         bDistort = FALSE;
     if (bDistort)
+    {
         phase_distortion();
+
+        dsgraph.render_distort();
+        dsgraph.mapDistort.clear();
+    }
 
     // combination/postprocess
     RCache.set_RT(get_base_rt());
@@ -274,6 +278,16 @@ void CRenderTarget::End()
 
     if (!bPerform)
         return;
+
+    phase_combine(bDistort, bCMap);
+}
+
+void CRenderTarget::phase_combine(bool bDistort, bool bCMap)
+{
+    RCache.set_RT(get_base_rt());
+    RCache.set_ZB(get_base_zb());
+    curWidth = Device.dwWidth;
+    curHeight = Device.dwHeight;
 
     const int gblend = clampr(iFloor((1 - param_gray) * 255.f), 0, 255);
     const int nblend = clampr(iFloor((1 - param_noise) * 255.f), 0, 255);
@@ -292,7 +306,7 @@ void CRenderTarget::End()
 
     // Fill vertex buffer
     const float du = ps_r1_pps_u, dv = ps_r1_pps_v;
-    TL_2c3uv* pv = (TL_2c3uv*)RCache.Vertex.Lock(4, g_postprocess.stride(), Offset);
+    TL_2c3uv* pv = (TL_2c3uv*)RImplementation.Vertex.Lock(4, g_postprocess.stride(), Offset);
     pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
     pv++;
     pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
@@ -301,7 +315,7 @@ void CRenderTarget::End()
     pv++;
     pv->set(du + float(_w), dv + 0, p_color, p_gray, r1.x, r0.y, l1.x, l0.y, n1.x, n0.y);
     pv++;
-    RCache.Vertex.Unlock(4, g_postprocess.stride());
+    RImplementation.Vertex.Unlock(4, g_postprocess.stride());
 
     static shared_str s_colormap = "c_colormap";
     if (bCMap)
@@ -343,12 +357,4 @@ void CRenderTarget::phase_distortion()
     RCache.set_CullMode(CULL_CCW);
     RCache.set_ColorWriteEnable();
     RCache.ClearRT(rt_distort, color_rgba(127, 127, 127, 127));
-
-    if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->OnRenderPPUI_query())
-        RImplementation.dsgraph.render_distort();
-    else
-        RImplementation.dsgraph.mapDistort.clear();
-
-    if (g_pGamePersistent)
-        g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
 }

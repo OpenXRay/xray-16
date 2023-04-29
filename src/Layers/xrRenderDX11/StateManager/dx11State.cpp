@@ -21,9 +21,9 @@ dx11State* dx11State::Create(SimulatorStates& state_code)
 
     state_code.UpdateState(*pState);
 
-    pState->m_pRasterizerState = RSManager.GetState(state_code);
-    pState->m_pDepthStencilState = DSSManager.GetState(state_code);
-    pState->m_pBlendState = BSManager.GetState(state_code);
+    pState->m_pRasterizerState = RCache.RSManager.GetState(state_code);
+    pState->m_pDepthStencilState = RCache.DSSManager.GetState(state_code);
+    pState->m_pBlendState = RCache.BSManager.GetState(state_code);
     // ID3DxxDevice::CreateSamplerState
 
     //	Create samplers here
@@ -44,22 +44,22 @@ dx11State* dx11State::Create(SimulatorStates& state_code)
 HRESULT dx11State::Apply()
 {
     VERIFY(m_pRasterizerState);
-    StateManager.SetRasterizerState(m_pRasterizerState);
+    RCache.StateManager.SetRasterizerState(m_pRasterizerState);
     VERIFY(m_pDepthStencilState);
-    StateManager.SetDepthStencilState(m_pDepthStencilState);
+    RCache.StateManager.SetDepthStencilState(m_pDepthStencilState);
     if (m_uiStencilRef != -1)
-        StateManager.SetStencilRef(m_uiStencilRef);
+        RCache.StateManager.SetStencilRef(m_uiStencilRef);
     VERIFY(m_pBlendState);
-    StateManager.SetBlendState(m_pBlendState);
-    StateManager.SetAlphaRef(m_uiAlphaRef);
+    RCache.StateManager.SetBlendState(m_pBlendState);
+    RCache.StateManager.SetAlphaRef(m_uiAlphaRef);
 
-    SSManager.GSApplySamplers(m_GSSamplers);
-    SSManager.VSApplySamplers(m_VSSamplers);
-    SSManager.PSApplySamplers(m_PSSamplers);
+    RCache.SSManager.GSApplySamplers(m_GSSamplers);
+    RCache.SSManager.VSApplySamplers(m_VSSamplers);
+    RCache.SSManager.PSApplySamplers(m_PSSamplers);
 #ifdef USE_DX11
-    SSManager.HSApplySamplers(m_HSSamplers);
-    SSManager.DSApplySamplers(m_DSSamplers);
-    SSManager.CSApplySamplers(m_CSSamplers);
+    RCache.SSManager.HSApplySamplers(m_HSSamplers);
+    RCache.SSManager.DSApplySamplers(m_DSSamplers);
+    RCache.SSManager.CSApplySamplers(m_CSSamplers);
 #endif
 
     //	static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
@@ -107,7 +107,7 @@ void dx11State::InitSamplers(tSamplerHArray& SamplerArray, SimulatorStates& stat
         for (int i = 0; i <= iMaxSampler; ++i)
         {
             if (SamplerUsed[i])
-                SamplerArray.push_back(SSManager.GetState(descArray[i]));
+                SamplerArray.push_back(RCache.SSManager.GetState(descArray[i]));
             else
                 SamplerArray.push_back(u32(dx11SamplerStateCache::hInvalidHandle));
         }

@@ -68,7 +68,7 @@ void CBlender_Vertex::Compile(CBlender_Compile& C)
 
 void CBlender_Vertex::CompileFFP(CBlender_Compile& C) const
 {
-    if (C.bEditor)
+    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
     {
         C.PassBegin();
         {
@@ -97,7 +97,7 @@ void CBlender_Vertex::CompileFFP(CBlender_Compile& C) const
             {
                 C.PassSET_ZB(TRUE, TRUE);
                 C.PassSET_Blend(FALSE, D3DBLEND_ONE, D3DBLEND_ZERO, FALSE, 0);
-                C.PassSET_LightFog(C.bEditor, TRUE);
+                C.PassSET_LightFog(ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT, TRUE);
 
                 // Stage0 - Base texture
                 C.StageBegin();

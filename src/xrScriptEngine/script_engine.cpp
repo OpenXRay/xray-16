@@ -47,7 +47,7 @@ static void* lua_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
 {
     (void)ud;
     (void)osize;
-    if (!nsize)
+    if (nsize == 0)
     {
         xr_free(ptr);
         return nullptr;
@@ -1254,12 +1254,12 @@ void CScriptEngine::on_error(lua_State* state)
 
 CScriptProcess* CScriptEngine::CreateScriptProcess(shared_str name, shared_str scripts)
 {
-    return new CScriptProcess(this, name, scripts);
+    return xr_new<CScriptProcess>(this, name, scripts);
 }
 
 CScriptThread* CScriptEngine::CreateScriptThread(LPCSTR caNamespaceName, bool do_string, bool reload)
 {
-    auto thread = new CScriptThread(this, caNamespaceName, do_string, reload);
+    auto thread = xr_new<CScriptThread>(this, caNamespaceName, do_string, reload);
     lua_State* threadLua = thread->lua();
     if (threadLua)
         RegisterState(threadLua, this);

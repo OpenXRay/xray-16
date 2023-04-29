@@ -148,13 +148,13 @@ int main(int argc, char *argv[])
                 strcat(commandLine, argv[i]);
                 strcat(commandLine, " ");
             }
+
+            result = entry_point(commandLine);
+
+            xr_free(commandLine);
         }
         else
-            commandLine = strdup("");
-
-        result = entry_point(commandLine);
-
-        xr_free(commandLine);
+            result = entry_point("");
     }
     catch (const std::overflow_error& e)
     {

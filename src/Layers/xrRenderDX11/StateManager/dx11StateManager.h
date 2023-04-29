@@ -91,6 +91,4 @@ private:
     u32 m_uiSampleMask;
 };
 
-extern dx11StateManager StateManager;
-
 #endif //	dx11StateManager_included

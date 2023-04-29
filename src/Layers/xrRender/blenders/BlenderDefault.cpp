@@ -73,7 +73,7 @@ void CBlender_default::Compile(CBlender_Compile& C)
 
 void CBlender_default::CompileFFP(CBlender_Compile& C) const
 {
-    if (C.bEditor)
+    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
     {
         C.PassBegin();
         {

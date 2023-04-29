@@ -109,7 +109,7 @@ void CRenderTarget::phase_bloom()
         Fvector2 b_3 = {1 + a_3.x, 1 + a_3.y};
 
         // Fill vertex buffer
-        v_build* pv = (v_build*)RCache.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
+        v_build* pv = (v_build*)RImplementation.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
 #if defined(USE_DX9) || defined(USE_DX11)
         pv->p.set(EPS, float(th + EPS), EPS, 1.f);
         pv->uv0.set(a_0.x, b_0.y);
@@ -163,7 +163,7 @@ void CRenderTarget::phase_bloom()
 #else
 #   error No graphics API selected or enabled!
 #endif // USE_DX9/11
-        RCache.Vertex.Unlock(4, g_bloom_build->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_bloom_build->vb_stride);
 
         // Perform combine (all scalers must account for 4 samples + final diffuse multiply);
         float s = ps_r2_ls_bloom_threshold; // scale
@@ -189,7 +189,7 @@ void CRenderTarget::phase_bloom()
         Fvector2 p1;
         p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
-        v_build* pv = (v_build*)RCache.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
+        v_build* pv = (v_build*)RImplementation.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
 #if defined(USE_DX9) || defined(USE_DX11)
         pv->p.set(EPS, float(_h + EPS), EPS, 1.f);
         pv->uv0.set(p0.x - ddw, p1.y - ddh);
@@ -243,7 +243,7 @@ void CRenderTarget::phase_bloom()
 #else
 #   error No graphics API selected or enabled!
 #endif // USE_OGL
-        RCache.Vertex.Unlock(4, g_bloom_build->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_bloom_build->vb_stride);
         RCache.set_Geometry(g_bloom_build);
 
         // P0
@@ -276,7 +276,7 @@ void CRenderTarget::phase_bloom()
             Fvector4 a_7 = {a_6.x - two.x, half.y, half.y, a_6.w + two.x}; // -7,+7i
 
             // Fill vertex buffer
-            v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
+            v_filter* pv = (v_filter*)RImplementation.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
 
 #if defined(USE_DX9) || defined(USE_DX11)
             // 0 - LB
@@ -377,7 +377,7 @@ void CRenderTarget::phase_bloom()
 #else
 #   error No graphics API selected or enabled!
 #endif // !USE_OGL
-            RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
+            RImplementation.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 
             // Perform filtering
             Fvector4 w0, w1;
@@ -408,7 +408,7 @@ void CRenderTarget::phase_bloom()
             Fvector4 a_7 = {half.x, a_6.y - two.y, two.y + a_6.z, half.x}; // -7,+7i
 
             // Fill vertex buffer
-            v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
+            v_filter* pv = (v_filter*)RImplementation.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
 
 #if defined(USE_DX9) || defined(USE_DX11)
             // 0 - LB
@@ -509,7 +509,7 @@ void CRenderTarget::phase_bloom()
 #else
 #   error No graphics API selected or enabled!
 #endif // !USE_OGL
-            RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
+            RImplementation.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 
             // Perform filtering
             Fvector4 w0, w1;

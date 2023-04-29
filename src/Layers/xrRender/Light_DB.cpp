@@ -29,7 +29,7 @@ void CLight_DB::Load(IReader* fs)
             light* L = Create();
             L->flags.bStatic = true;
 
-            if (Ldata.type == D3DLIGHT_DIRECTIONAL)
+            if (Ldata.type == Flight::Type::Directional)
             {
                 Fvector tmp_R;
                 tmp_R.set(1, 0, 0);

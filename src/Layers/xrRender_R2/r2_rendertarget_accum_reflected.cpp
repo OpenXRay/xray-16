@@ -109,10 +109,10 @@ void CRenderTarget::accum_reflected(light* L)
                         RCache.set_CullMode(CULL_CW); // back
                     else
                         RCache.set_CullMode(CULL_CCW); // front
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     draw_volume(L);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #   elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #   endif // USE_DX11
@@ -155,10 +155,10 @@ void CRenderTarget::accum_reflected(light* L)
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     draw_volume(L);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #   elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #   endif // USE_DX11

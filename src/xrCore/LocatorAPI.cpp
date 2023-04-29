@@ -184,7 +184,7 @@ CLocatorAPI::~CLocatorAPI()
 {
     VERIFY(0 == m_iLockRescan);
     _dump_open_files(1);
-    delete m_auth_lock;
+    xr_delete(m_auth_lock);
 }
 
 const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
@@ -853,24 +853,45 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
 
             /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
-             * I propose adding shaders from /usr/share/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
+             * I propose adding shaders from <CMAKE_INSTALL_FULL_DATAROOTDIR>/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
              * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
             chdir(pref_path);
-            string_path tmp;
+            constexpr pcstr install_dir = MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR);
+            string_path tmp, tmp_link;
             xr_sprintf(tmp, "%sfsgame.ltx", pref_path);
             struct stat statbuf;
             ZeroMemory(&statbuf, sizeof(statbuf));
-            int res = lstat(tmp, &statbuf);
-            if (-1 == res || !S_ISLNK(statbuf.st_mode))
-                symlink("/usr/share/openxray/fsgame.ltx", tmp);
+            /* First check if following symlinks returns success.
+             * If it doesn't, additionally check if not following symlinks is successful (catches symlink itself being broken),
+             * -> delete the symlink if it is broken.
+             * Then, make a new symlink to our resources.
+             * TODO This doesn't account for other stat errors (EACCES, ENAMETOOLONG, ENOENT caused by missing path component) */
+            int res = stat(tmp, &statbuf);
+            if (res != 0)
+            {
+                ZeroMemory(&statbuf, sizeof(statbuf));
+                res = lstat(tmp, &statbuf);
+                if (res == 0)
+                    xr_unlink(tmp);
+                xr_sprintf(tmp_link, "%s/openxray/fsgame.ltx", install_dir);
+                symlink(tmp_link, tmp);
+            }
             xr_sprintf(tmp, "%sgamedata/shaders/gl", pref_path);
             ZeroMemory(&statbuf, sizeof(statbuf));
-            res = lstat(tmp, &statbuf);
-            if (-1 == res || !S_ISLNK(statbuf.st_mode))
+            res = stat(tmp, &statbuf);
+            if (res != 0)
             {
-                mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);
+                ZeroMemory(&statbuf, sizeof(statbuf));
+                res = lstat(tmp, &statbuf);
+                if (res == 0)
+                    xr_unlink(tmp);
+                else
+                {
+                    mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                    mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                }
+                xr_sprintf(tmp_link, "%s/openxray/gamedata/shaders/gl", install_dir);
+                symlink(tmp_link, tmp);
             }
 
             SDL_strlcpy(full_current_directory, pref_path, sizeof full_current_directory);

@@ -166,7 +166,9 @@ CMainMenu::~CMainMenu()
 
     xr_delete(g_btnHint);
     xr_delete(g_statHint);
+
     xr_delete(m_startDialog);
+
     g_pGamePersistent->m_pMainMenu = nullptr;
 
 #ifdef XR_PLATFORM_WINDOWS
@@ -331,6 +333,7 @@ bool CMainMenu::ReloadUI()
         return false;
     }
     xr_delete(m_startDialog);
+
     m_startDialog = smart_cast<CUIDialogWnd*>(dlg);
     VERIFY(m_startDialog);
     m_startDialog->m_bWorkInPause = true;
@@ -490,10 +493,7 @@ void CMainMenu::OnRender()
     if (m_Flags.test(flGameSaveScreenshot))
         return;
 
-    if (g_pGameLevel)
-        GEnv.Render->Calculate();
-
-    GEnv.Render->Render();
+    GEnv.Render->RenderMenu();
     if (!OnRenderPPUI_query())
     {
         DoRenderDialogs();
@@ -531,11 +531,9 @@ void CMainMenu::OnRenderPPUI_PP()
 
     UI().pp_start();
 
-    xr_vector<CUIWindow*>::iterator it = m_pp_draw_wnds.begin();
-    for (; it != m_pp_draw_wnds.end(); ++it)
-    {
-        (*it)->Draw();
-    }
+    for (auto& window : m_pp_draw_wnds)
+        window->Draw();
+
     UI().pp_stop();
 }
 /*

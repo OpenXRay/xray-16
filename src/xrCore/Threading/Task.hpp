@@ -63,7 +63,7 @@ private:
 
 private:
     // Used by TaskAllocator as Task initial state
-    Task();
+    Task() = default;
 
     // Will just execute
     Task(pcstr name, const TaskFunc& task, void* data, size_t dataSize, Task* parent = nullptr);

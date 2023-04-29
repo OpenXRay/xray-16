@@ -96,7 +96,6 @@ ICF void CBackend::set_States(SState* _state)
     }
 }
 
-#ifdef _EDITOR
 IC void CBackend::set_Matrices(SMatrixList* _M)
 {
     if (M != _M)
@@ -118,7 +117,6 @@ IC void CBackend::set_Matrices(SMatrixList* _M)
         }
     }
 }
-#endif
 
 IC void CBackend::set_Pass(SPass* P)
 {
@@ -140,9 +138,7 @@ IC void CBackend::set_Pass(SPass* P)
     }
     set_Constants(P->constants);
     set_Textures(P->T);
-#ifdef _EDITOR
     set_Matrices(P->M);
-#endif
 }
 
 ICF void CBackend::set_Element(ShaderElement* S, u32 pass) { set_Pass(S->passes[pass]); }

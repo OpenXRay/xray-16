@@ -193,9 +193,7 @@ void CBlender_Compile::PassEnd()
     dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
-#ifdef _EDITOR
     dest.M = RImplementation.Resources->_CreateMatrixList(passMatrices);
-#endif
     dest.C = RImplementation.Resources->_CreateConstantList(passConstants);
 
     ref_pass _pass_ = RImplementation.Resources->_CreatePass(dest);

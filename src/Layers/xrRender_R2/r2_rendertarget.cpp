@@ -43,7 +43,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     float _w = float(Device.dwWidth);
     float _h = float(Device.dwHeight);
     u32 C = color_rgba(255, 255, 255, 255);
-    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
 #   ifdef USE_DX9
     float eps = EPS_S;
     pv->set(eps, float(_h + eps), eps, 1.f, C, 0, 0);
@@ -67,7 +67,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
     pv++;
 #   endif
-    RCache.Vertex.Unlock(4, g_combine->vb_stride);
+    RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 #   ifdef USE_DX9
     RCache.set_CullMode(CULL_NONE);
     if (common_stencil)
@@ -78,8 +78,8 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 #   if defined(USE_DX11)
     switch (eSOM)
     {
-    case SO_Light: StateManager.SetStencilRef(dwLightMarkerID); break;
-    case SO_Combine: StateManager.SetStencilRef(0x01); break;
+    case SO_Light: RCache.StateManager.SetStencilRef(dwLightMarkerID); break;
+    case SO_Combine: RCache.StateManager.SetStencilRef(0x01); break;
     default: VERIFY(!"CRenderTarget::u_stencil_optimize. switch no default!");
     }
 #   endif
@@ -593,8 +593,8 @@ CRenderTarget::CRenderTarget()
             D3DFVF_TEXCOORDSIZE4(6) | D3DFVF_TEXCOORDSIZE4(7);
         rt_Bloom_1.create(r2_RT_bloom1, w, h, fmt);
         rt_Bloom_2.create(r2_RT_bloom2, w, h, fmt);
-        g_bloom_build.create(fvf_build, RCache.Vertex.Buffer(), RCache.QuadIB);
-        g_bloom_filter.create(fvf_filter, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_bloom_build.create(fvf_build, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+        g_bloom_filter.create(fvf_filter, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
         s_bloom_dbg_1.create("effects" DELIMITER "screen_set", r2_RT_bloom1);
         s_bloom_dbg_2.create("effects" DELIMITER "screen_set", r2_RT_bloom2);
 
@@ -743,24 +743,24 @@ CRenderTarget::CRenderTarget()
         s_combine_dbg_0.create("effects" DELIMITER "screen_set", r2_RT_smap_surf);
         s_combine_dbg_1.create("effects" DELIMITER "screen_set", r2_RT_luminance_t8);
         s_combine_dbg_Accumulator.create("effects" DELIMITER "screen_set", r2_RT_accum);
-        g_combine_VP.create(dwDecl, RCache.Vertex.Buffer(), RCache.QuadIB);
-        g_combine.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
-        g_combine_2UV.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_combine_VP.create(dwDecl, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+        g_combine.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+        g_combine_2UV.create(FVF::F_TL2uv, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 #ifdef USE_DX9
-        g_combine_cuboid.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+        g_combine_cuboid.create(FVF::F_L, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 #elif defined(USE_DX11) || defined(USE_OGL)
-        g_combine_cuboid.create(dwDecl, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+        g_combine_cuboid.create(dwDecl, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 #else
 #   error No graphics API selected or enabled!
 #endif
         constexpr u32 fvf_aa_blur = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);
-        g_aa_blur.create(fvf_aa_blur, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_aa_blur.create(fvf_aa_blur, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 
         constexpr u32 fvf_aa_AA = D3DFVF_XYZRHW | D3DFVF_TEX7 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3) | D3DFVF_TEXCOORDSIZE2(4) | D3DFVF_TEXCOORDSIZE4(5) |
             D3DFVF_TEXCOORDSIZE4(6);
-        g_aa_AA.create(fvf_aa_AA, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_aa_AA.create(fvf_aa_AA, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
     }
 
     // Build textures
@@ -769,7 +769,7 @@ CRenderTarget::CRenderTarget()
     // PP
     s_postprocess.create("postprocess");
     g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3,
-        RCache.Vertex.Buffer(), RCache.QuadIB);
+        RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
     if (!options.msaa)
         s_postprocess_msaa = s_postprocess;
     else
@@ -786,14 +786,14 @@ CRenderTarget::CRenderTarget()
 
     // Menu
     s_menu.create("distort");
-    g_menu.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    g_menu.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 
 #if 0 // OpenGL: kept for historical reasons
     // Flip
     t_base = RImplementation.Resources->_CreateTexture(r2_base);
     t_base->surface_set(GL_TEXTURE_2D, get_base_rt());
     s_flip.create("effects" DELIMITER "screen_set", r2_base);
-    g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    g_flip.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 #endif
 
     //
@@ -868,7 +868,7 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         u32 C = color_rgba(255, 255, 255, 255);
 #ifdef USE_DX9
         float eps = EPS_S;
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(eps, float(_h + eps), eps, 1.f, C, 0, 0);
         pv++;
         pv->set(eps, eps, eps, 1.f, C, 0, 0);
@@ -877,7 +877,7 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         pv++;
         pv->set(float(_w + eps), eps, eps, 1.f, C, 0, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_CullMode(CULL_NONE);
         //  Clear everything except last bit
         RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, dwLightMarkerID, 0x00, 0xFE,
@@ -887,7 +887,7 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         float eps = 0;
         float _dw = 0.5f;
         float _dh = 0.5f;
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(-_dw, _h - _dh, eps, 1.f, C, 0, 0);
         pv++;
         pv->set(-_dw, -_dh, eps, 1.f, C, 0, 0);
@@ -896,7 +896,7 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         pv++;
         pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Element(s_occq->E[2]);
 #else
 #   error No graphics API selected or enabled!

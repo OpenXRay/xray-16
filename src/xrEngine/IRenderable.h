@@ -22,7 +22,7 @@ class XR_NOVTABLE IRenderable
 public:
     virtual ~IRenderable() = 0;
     virtual RenderData& GetRenderData() = 0;
-    virtual void renderable_Render(IRenderable* root) = 0;
+    virtual void renderable_Render(u32 context_id, IRenderable* root) = 0;
     virtual IRender_ObjectSpecific* renderable_ROS() = 0;
     virtual bool renderable_ShadowGenerate() = 0;
     virtual bool renderable_ShadowReceive() = 0;

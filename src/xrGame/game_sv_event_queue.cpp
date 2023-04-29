@@ -22,7 +22,7 @@ GameEventQueue::~GameEventQueue()
     for (it = 0; it < ready.size(); it++)
         xr_delete(ready[it]);
     pcs->Leave();
-    delete pcs;
+    xr_delete(pcs);
 }
 
 static u32 LastTimeCreate = 0;

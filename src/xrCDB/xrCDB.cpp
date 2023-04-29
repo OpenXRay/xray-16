@@ -38,7 +38,7 @@ MODEL::~MODEL()
     tris_count = 0;
     xr_free(verts);
     verts_count = 0;
-    delete pcs;
+    xr_delete(pcs);
 }
 
 void MODEL::syncronize_impl() const

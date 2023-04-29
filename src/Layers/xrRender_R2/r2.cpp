@@ -42,20 +42,20 @@ public:
 
 float r_dtex_range = 50.f;
 //////////////////////////////////////////////////////////////////////////
-ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq)
+ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, u32 phase)
 {
     int id = SE_R2_SHADOW;
-    if (CRender::PHASE_NORMAL == RImplementation.active_phase())
+    if (CRender::PHASE_NORMAL == phase)
     {
         id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < r_dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
     }
     return pVisual->shader->E[id]._get();
 }
 //////////////////////////////////////////////////////////////////////////
-ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq)
+ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase)
 {
     int id = SE_R2_SHADOW;
-    if (CRender::PHASE_NORMAL == RImplementation.active_phase())
+    if (CRender::PHASE_NORMAL == phase)
     {
         id = ((_sqrt(cdist_sq) - pVisual->vis.sphere.R) < r_dtex_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
     }
@@ -142,7 +142,7 @@ static class cl_alpha_ref : public R_constant_setup
     {
         // TODO: OGL: Implement AlphaRef.
 #   if defined(USE_DX11)
-        StateManager.BindAlphaRef(C);
+        RCache.StateManager.BindAlphaRef(C);
 #   endif
     }
 } binder_alpha_ref;
@@ -621,7 +621,6 @@ void CRender::create()
 #if defined(USE_DX11) || defined(USE_OGL)
     rmNormal();
 #endif
-    dsgraph.marker = 0;
     q_sync_point.Create();
 
     //	TODO: OGL: Implement FluidManager.
@@ -644,7 +643,6 @@ void CRender::destroy()
     xr_delete(Target);
     PSLibrary.OnDestroy();
     Device.seqFrame.Remove(this);
-    dsgraph.destroy();
 }
 
 void CRender::reset_begin()
@@ -659,7 +657,8 @@ void CRender::reset_begin()
                 continue;
             try
             {
-                Lights_LastFrame[it]->svis.resetoccq();
+                for (int id = 0; id < 3; ++id)
+                    Lights_LastFrame[it]->svis[id].resetoccq();
             }
             catch (...)
             {
@@ -849,13 +848,11 @@ IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
 bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
-void CRender::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m)
+void CRender::add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
+    // TODO: this whole function should be replaced by a list of renderables+xforms returned from `renderable_Render` call
+    auto& dsgraph = get_context(context_id);
     dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
-}
-void CRender::add_Geometry(IRenderVisual* V, const CFrustum& view)
-{
-    dsgraph.add_static((dxRender_Visual*)V, view, view.getMask());
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
@@ -920,9 +917,15 @@ void CRender::rmNormal()
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CRender::CRender() : Sectors_xrc("render")
+CRender::CRender()
+    : Sectors_xrc("render")
+    , r_main("main_render")
+    , r_sun("sun_render")
+    , r_sun_old("sun_render_old")
+#if RENDER != R_R2
+    , r_rain("rain_render")
+#endif
 {
-    init_cacades();
 }
 
 CRender::~CRender() {}

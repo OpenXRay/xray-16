@@ -271,13 +271,13 @@ float CParticlesObject::shedule_Scale() const
     return Device.vCameraPosition.distance_to(Position()) / 200.f;
 }
 
-void CParticlesObject::renderable_Render(IRenderable* root)
+void CParticlesObject::renderable_Render(u32 context_id, IRenderable* root)
 {
     if (!psDeviceFlags.test(rsDrawParticles))
         return;
 
     VERIFY(renderable.visual);
-    u32 dt = Device.dwTimeGlobal - dwLastTime;
+    const auto dt = Device.dwTimeGlobal - dwLastTime;
     if (dt)
     {
         IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
@@ -286,7 +286,7 @@ void CParticlesObject::renderable_Render(IRenderable* root)
         dwLastTime = Device.dwTimeGlobal;
     }
 
-    GEnv.Render->add_Visual(root, renderable.visual, renderable.xform);
+    GEnv.Render->add_Visual(context_id, root, renderable.visual, renderable.xform);
 }
 
 bool CParticlesObject::IsAutoRemove()

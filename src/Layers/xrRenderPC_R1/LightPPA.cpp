@@ -19,9 +19,13 @@ const float SSM_tex_size = 32.f;
 //////////////////////////////////////////////////////////////////////////
 void cl_light_PR::setup(R_constant* C)
 {
+    // NOTE: an actual context id is required here. However, we have only main context
+    // in R1 so it is safe to go with `eRDSG_MAIN`.
+    auto& dsgraph = RImplementation.get_imm_context();
+
     Fvector& P = RImplementation.r1_dlight_light->position;
     float R = RImplementation.r1_dlight_light->range;
-    if (RImplementation.active_phase() == CRender::PHASE_POINT)
+    if (dsgraph.o.phase == CRender::PHASE_POINT)
         RCache.set_c(C, P.x, P.y, P.z, .5f / R);
     else
         RCache.set_c(C, P.x, P.y, P.z, 1.f / R);
@@ -94,7 +98,7 @@ void CLightR_Manager::render_point  ()
             RCache.set_Geometry     (hGeom);
             u32 triLock             = _min(256u,triCount);
             u32 vOffset;
-            CLightR_Vertex* VB      = (CLightR_Vertex*)RCache.Vertex.Lock(triLock*3,hGeom->vb_stride,vOffset);
+            CLightR_Vertex* VB      = (CLightR_Vertex*)RImplementation.Vertex.Lock(triLock*3,hGeom->vb_stride,vOffset);
 
             // Cull and triangulate polygons
             Fvector cam     = Device.vCameraPosition;
@@ -121,17 +125,17 @@ void CLightR_Manager::render_point  ()
 
                 if (actual>=triLock)
                 {
-                    RCache.Vertex.Unlock        (actual*3,hGeom->vb_stride);
+                    RImplementation.Vertex.Unlock        (actual*3,hGeom->vb_stride);
                     if (actual) RCache.Render   (D3DPT_TRIANGLELIST,vOffset,actual);
                     actual                      = 0;
                     triLock                     = _min(256u,triCount-t);
                     VB                          =
-(CLightR_Vertex*)RCache.Vertex.Lock(triLock*3,hGeom->vb_stride,vOffset);
+(CLightR_Vertex*)RImplementation.Vertex.Lock(triLock*3,hGeom->vb_stride,vOffset);
                 }
             }
 
             // Unlock and render
-            RCache.Vertex.Unlock        (actual*3,hGeom->vb_stride);
+            RImplementation.Vertex.Unlock        (actual*3,hGeom->vb_stride);
             if (actual) RCache.Render   (D3DPT_TRIANGLELIST,vOffset,actual);
         }
         Device.Statistic->RenderDUMP_Lights.End ();
@@ -145,6 +149,8 @@ void CLightR_Manager::render_point  ()
 
 void CLightR_Manager::render_point(u32 _priority)
 {
+    auto &dsgraph = RImplementation.get_imm_context();
+
     // for each light
     Fvector lc_COP = Device.vCameraPosition;
     float lc_limit = ps_r1_dlights_clip;
@@ -194,12 +200,18 @@ void CLightR_Manager::render_point(u32 _priority)
         // 3. Calculate visibility for light + build soring tree
         VERIFY(L->spatial.sector_id != IRender_Sector::INVALID_SECTOR_ID);
         if (_priority == 1)
-            RImplementation.dsgraph.r_pmask(false, true);
+            dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.build_subspace(L->spatial.sector_id, L_combine, L_pos, true, true);
+        dsgraph.o.sector_id = L->spatial.sector_id;
+        dsgraph.o.view_pos = L_pos;
+        dsgraph.o.xform = L_combine;
+        dsgraph.o.view_frustum.CreateFromMatrix(L_combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+        dsgraph.o.precise_portals = true;
+
+        dsgraph.build_subspace();
 
         if (_priority == 1)
-            RImplementation.dsgraph.r_pmask(true, true);
+            dsgraph.r_pmask(true, true);
 
         // 4. Analyze if HUD intersects light volume
         BOOL bHUD = FALSE;
@@ -210,16 +222,18 @@ void CLightR_Manager::render_point(u32 _priority)
         // 5. Dump sorting tree
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
-            g_hud->Render_Last();
-        RImplementation.dsgraph.render_graph(_priority);
+            g_hud->Render_Last(dsgraph.context_id);
+        dsgraph.render_graph(_priority);
         if (bHUD && _priority == 0)
-            RImplementation.dsgraph.render_hud();
+            dsgraph.render_hud();
     }
     // ??? grass ???
 }
 
 void CLightR_Manager::render_spot(u32 _priority)
 {
+    auto& dsgraph = RImplementation.get_imm_context();
+
     // for each light
     //  Msg ("l=%d",selected_spot.size());
     Fvector lc_COP = Device.vCameraPosition;
@@ -268,16 +282,19 @@ void CLightR_Manager::render_spot(u32 _priority)
 
         // 3. Calculate visibility for light + build soring tree
         VERIFY(L->spatial.sector_id != IRender_Sector::INVALID_SECTOR_ID);
-        // RImplementation.marker                   ++;
         if (_priority == 1)
-            RImplementation.dsgraph.r_pmask(false, true);
+            dsgraph.r_pmask(false, true);
 
-        RImplementation.dsgraph.build_subspace(L->spatial.sector_id, L_combine, L_pos, TRUE,
-            TRUE // precise portals
-            );
+        dsgraph.o.sector_id = L->spatial.sector_id;
+        dsgraph.o.view_pos = L_pos;
+        dsgraph.o.xform = L_combine;
+        dsgraph.o.view_frustum.CreateFromMatrix(L_combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+        dsgraph.o.precise_portals = true;
+
+        dsgraph.build_subspace();
 
         if (_priority == 1)
-            RImplementation.dsgraph.r_pmask(true, true);
+            dsgraph.r_pmask(true, true);
 
         // 4. Analyze if HUD intersects light volume
         BOOL bHUD = FALSE;
@@ -290,10 +307,10 @@ void CLightR_Manager::render_spot(u32 _priority)
         //RCache.set_ClipPlanes(true,  &L_combine);
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
-            g_hud->Render_Last();
-        RImplementation.dsgraph.render_graph(_priority);
+            g_hud->Render_Last(dsgraph.context_id);
+        dsgraph.render_graph(_priority);
         if (bHUD && _priority == 0)
-            RImplementation.dsgraph.render_hud();
+            dsgraph.render_hud();
         //RCache.set_ClipPlanes(false, &L_combine);
     }
     // ??? grass ???l
@@ -301,9 +318,11 @@ void CLightR_Manager::render_spot(u32 _priority)
 
 void CLightR_Manager::render(u32 _priority)
 {
+    auto& dsgraph = RImplementation.get_imm_context();
+
     if (selected_spot.size())
     {
-        RImplementation.dsgraph.phase = CRender::PHASE_SPOT;
+        dsgraph.o.phase = CRender::PHASE_SPOT;
         render_spot(_priority);
 
         if (_priority == 1)
@@ -311,7 +330,7 @@ void CLightR_Manager::render(u32 _priority)
     }
     if (selected_point.size())
     {
-        RImplementation.dsgraph.phase = CRender::PHASE_POINT;
+        dsgraph.o.phase = CRender::PHASE_POINT;
         render_point(_priority);
 
         if (_priority == 1)

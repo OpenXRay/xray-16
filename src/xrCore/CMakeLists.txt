@@ -22,6 +22,7 @@ set(COMMON
     "../Common/LevelGameDef.h"
     "../Common/Noncopyable.hpp"
     "../Common/Platform.hpp"
+    "../Common/OGF_GContainer_Vertices.hpp"
 )
 
 set(COMMON_OBJECT

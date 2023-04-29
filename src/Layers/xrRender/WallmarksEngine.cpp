@@ -58,7 +58,7 @@ CWallmarksEngine::CWallmarksEngine()
 {
     static_pool.reserve(256);
     marks.reserve(256);
-    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), 0);
+    hGeom.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), 0);
 }
 
 CWallmarksEngine::~CWallmarksEngine()
@@ -306,9 +306,6 @@ void CWallmarksEngine::AddStaticWallmark(
 void CWallmarksEngine::AddSkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
 {
-    if (::RImplementation.active_phase() != CRender::PHASE_NORMAL)
-        return;
-
     // optimization cheat: don't allow wallmarks more than 50 m from viewer/actor
     // XXX: Make console command for this
     if (xf->c.distance_to_sqr(Device.vCameraPosition) > _sqr(50.f))
@@ -322,9 +319,6 @@ void CWallmarksEngine::AddSkeletonWallmark(
 
 void CWallmarksEngine::AddSkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm)
 {
-    if (::RImplementation.active_phase() != CRender::PHASE_NORMAL)
-        return;
-
     lock.Enter();
     // search if similar wallmark exists
     wm_slot* slot = FindSlot(wm->Shader());
@@ -342,7 +336,7 @@ extern float r_ssaDISCARD;
 ICF void BeginStream(const ref_geom& hGeom, u32& w_offset, FVF::LIT*& w_verts, FVF::LIT*& w_start)
 {
     w_offset = 0;
-    w_verts = (FVF::LIT*)RCache.Vertex.Lock(MAX_TRIS * 3, hGeom->vb_stride, w_offset);
+    w_verts = (FVF::LIT*)RImplementation.Vertex.Lock(MAX_TRIS * 3, hGeom->vb_stride, w_offset);
     w_start = w_verts;
 }
 
@@ -350,7 +344,7 @@ ICF u32 FlushStream(
     ref_geom hGeom, ref_shader shader, u32& w_offset, FVF::LIT*& w_verts, FVF::LIT*& w_start, BOOL bSuppressCull)
 {
     u32 w_count = u32(w_verts - w_start);
-    RCache.Vertex.Unlock(w_count, hGeom->vb_stride);
+    RImplementation.Vertex.Unlock(w_count, hGeom->vb_stride);
     if (w_count)
     {
         RCache.set_Shader(shader);
@@ -488,7 +482,8 @@ void CWallmarksEngine::Render()
     lock.Leave(); // Physics may add wallmarks in parallel with rendering
 
     // Level-wmarks
-    RImplementation.dsgraph.render_wmarks();
+    auto& dsgraph = RImplementation.get_imm_context();
+    dsgraph.render_wmarks();
     RImplementation.BasicStats.Wallmarks.End();
 
     // Projection

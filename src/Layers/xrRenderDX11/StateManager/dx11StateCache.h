@@ -38,10 +38,6 @@ private:
     xr_vector<StateRecord> m_StateArray;
 };
 
-extern dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
-extern dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
-extern dx11StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
-
 #include "dx11StateCacheImpl.h"
 
 #endif //	dx11StateCache_included

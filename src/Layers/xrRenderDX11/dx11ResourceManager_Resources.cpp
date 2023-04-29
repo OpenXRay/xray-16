@@ -135,15 +135,6 @@ void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 #endif
 
 //--------------------------------------------------------------------------------------------------------------
-static BOOL dcl_equal(D3DVERTEXELEMENT9* a, D3DVERTEXELEMENT9* b)
-{
-    // check sizes
-    u32 a_size = GetDeclLength(a);
-    u32 b_size = GetDeclLength(b);
-    if (a_size != b_size)
-        return FALSE;
-    return 0 == memcmp(a, b, a_size * sizeof(D3DVERTEXELEMENT9));
-}
 
 SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
 {

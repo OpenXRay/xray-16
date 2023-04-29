@@ -49,7 +49,7 @@ CLightShadows::CLightShadows() : xrc("LightShadows")
     recreate_rt();
 
     sh_World.create("effects" DELIMITER "shadow_world", r1_RT_shadow);
-    geom_World.create(FVF::F_LIT, RCache.Vertex.Buffer(), nullptr);
+    geom_World.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), nullptr);
 
     if (RImplementation.o.ffp)
     {
@@ -63,18 +63,18 @@ CLightShadows::CLightShadows() : xrc("LightShadows")
         if (!sh_BlurRT)
             sh_BlurRT.create(&blender, "effects\\blur", TWO_SHADOW_TEXTURES);
 
-        geom_Blur.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+        geom_Blur.create(FVF::F_TL2uv, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
     }
     else
     {
         sh_BlurTR.create("blur4", TWO_TEMP_TEXTURES);
         sh_BlurRT.create("blur4", TWO_SHADOW_TEXTURES);
-        geom_Blur.create(FVF::F_TL4uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+        geom_Blur.create(FVF::F_TL4uv, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
     }
 
     // Debug
     sh_Screen.create("effects" DELIMITER "screen_set", r1_RT_shadow);
-    geom_Screen.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    geom_Screen.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 }
 
 CLightShadows::~CLightShadows()
@@ -175,6 +175,8 @@ void CLightShadows::calculate()
 
     if (casters.empty())
         return;
+
+    auto& dsgraph = RImplementation.get_imm_context();
 
     BOOL bRTS = FALSE;
     RCache.set_Z(false);
@@ -317,7 +319,7 @@ void CLightShadows::calculate()
                 dxRender_Visual* V = N.pVisual;
                 RCache.set_Element(V->shader->E[SE_R1_LMODELS]);
                 RCache.set_xform_world(N.Matrix);
-                V->Render(-1.0f);
+                V->Render(-1.0f, dsgraph.o.phase == CRender::PHASE_SMAP);
             }
 
             // register shadow and increment slot
@@ -347,15 +349,15 @@ void CLightShadows::calculate()
         u32 Offset;
         if (RImplementation.o.ffp)
         {
-            FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(8, geom_Blur.stride(), Offset);
+            FVF::TL2uv* pv = (FVF::TL2uv*)RImplementation.Vertex.Lock(8, geom_Blur.stride(), Offset);
             RImplementation.ApplyBlur2(pv, rt_size);
-            RCache.Vertex.Unlock(8, geom_Blur.stride());
+            RImplementation.Vertex.Unlock(8, geom_Blur.stride());
         }
         else
         {
-            FVF::TL4uv* pv = (FVF::TL4uv*)RCache.Vertex.Lock(4, geom_Blur.stride(), Offset);
+            FVF::TL4uv* pv = (FVF::TL4uv*)RImplementation.Vertex.Lock(4, geom_Blur.stride(), Offset);
             RImplementation.ApplyBlur4(pv, rt_size, rt_size, S_blur_kernel);
-            RCache.Vertex.Unlock(4, geom_Blur.stride());
+            RImplementation.Vertex.Unlock(4, geom_Blur.stride());
         }
 
         // Actual rendering (pass0, temp2real)
@@ -473,7 +475,7 @@ void CLightShadows::render()
     RCache.set_Geometry(geom_World);
     int batch = 0;
     u32 Offset = 0;
-    FVF::LIT* pv = (FVF::LIT*)RCache.Vertex.Lock(batch_size * 3, geom_World->vb_stride, Offset);
+    FVF::LIT* pv = (FVF::LIT*)RImplementation.Vertex.Lock(batch_size * 3, geom_World->vb_stride, Offset);
     for (u32 s_it = 0; s_it < shadows.size(); s_it++)
     {
         shadow& S = shadows[s_it];
@@ -632,17 +634,17 @@ void CLightShadows::render()
             if (batch == batch_size)
             {
                 // Flush
-                RCache.Vertex.Unlock(batch * 3, geom_World->vb_stride);
+                RImplementation.Vertex.Unlock(batch * 3, geom_World->vb_stride);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, batch);
 
-                pv = (FVF::LIT*)RCache.Vertex.Lock(batch_size * 3, geom_World->vb_stride, Offset);
+                pv = (FVF::LIT*)RImplementation.Vertex.Lock(batch_size * 3, geom_World->vb_stride, Offset);
                 batch = 0;
             }
         }
     }
 
     // Flush if nessesary
-    RCache.Vertex.Unlock(batch * 3, geom_World->vb_stride);
+    RImplementation.Vertex.Unlock(batch * 3, geom_World->vb_stride);
     if (batch)
     {
         RCache.Render(D3DPT_TRIANGLELIST, Offset, batch);

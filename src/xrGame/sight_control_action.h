@@ -19,7 +19,6 @@ public:
 protected:
     float m_weight;
     u32 m_inertia_time;
-    u32 m_start_time;
 
 public:
     IC CSightControlAction(float weight, u32 inertia_time, const CSightAction& sight_action);

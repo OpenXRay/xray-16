@@ -1163,9 +1163,6 @@
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp">
-      <Filter>StateManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateManager.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
@@ -1283,9 +1280,6 @@
     <ClCompile Include="..\xrRender\r__sector_detect.cpp">
       <Filter>Visibility\Sector/Portal</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r2_R_sun.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_ssao.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -1327,6 +1321,12 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

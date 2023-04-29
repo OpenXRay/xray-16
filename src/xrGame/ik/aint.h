@@ -222,7 +222,7 @@ public:
         {
             AngleIntListNode* temp = head;
             head = head->next;
-            delete temp;
+            xr_delete(temp);
         }
         head = tail = 0;
     }

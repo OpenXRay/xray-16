@@ -9,7 +9,7 @@
 
 __declspec(thread) HEAP_ALLOC(rtc9_wrkmem, LZO1X_999_MEM_COMPRESS);
 
-static u8* _LZO_Dictionary = NULL;
+static u8* _LZO_Dictionary = nullptr;
 static u32 _LZO_DictionarySize = 0;
 
 //------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ void rtc9_uninitialize()
     {
         xr_free(_LZO_Dictionary);
 
-        _LZO_Dictionary = NULL;
+        _LZO_Dictionary = nullptr;
         _LZO_DictionarySize = 0;
     }
 }

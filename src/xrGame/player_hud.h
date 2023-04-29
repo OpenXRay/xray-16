@@ -102,7 +102,7 @@ struct attachable_hud_item
 
     void setup_firedeps(firedeps& fd);
 
-    void render(IRenderable* root);
+    void render(u32 context_id, IRenderable* root);
     void render_item_ui() const;
     bool render_item_ui_query() const;
     bool need_renderable() const;
@@ -131,7 +131,7 @@ public:
     void load(const shared_str& model_name);
     void load_default() { load("actor_hud_05"); };
     void update(const Fmatrix& trans);
-    void render_hud(IRenderable* root);
+    void render_hud(u32 context_id, IRenderable* root);
     void render_item_ui() const;
     bool render_item_ui_query() const;
     u32 anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel);

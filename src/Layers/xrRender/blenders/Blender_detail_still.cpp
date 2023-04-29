@@ -38,83 +38,64 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
 
 void CBlender_Detail_Still::CompileFFP(CBlender_Compile& C) const
 {
-    if (C.bEditor)
-    {
-        C.PassBegin();
-        {
-            C.PassSET_ZB(TRUE, TRUE);
-            if (oBlend.value)
-                C.PassSET_Blend_BLEND(TRUE, 200);
-            else
-                C.PassSET_Blend_SET(TRUE, 200);
-            C.PassSET_LightFog(TRUE, TRUE);
+    C.PassBegin();
 
-            // Stage1 - Base texture
-            C.StageBegin();
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-            C.StageSET_TMC(oT_Name, "$null", "$null", 0);
-            C.StageEnd();
-        }
-        C.PassEnd();
+    C.PassSET_ZB(TRUE, TRUE);
+    if (oBlend.value)
+        C.PassSET_Blend_BLEND(TRUE, 200);
+    else
+        C.PassSET_Blend_SET(TRUE, 200);
+
+    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
+    {
+        C.PassSET_LightFog(TRUE, TRUE);
+
+        // Stage1 - Base texture
+        C.StageBegin();
+        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+        C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+        C.StageEnd();
     }
     else
     {
+        C.PassSET_LightFog(FALSE, FALSE);
+
         switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:
+        case SE_R1_NORMAL_LQ:
         {
-            C.PassBegin();
+            switch (C.iElement)
             {
-                C.PassSET_ZB(TRUE, TRUE);
-                if (oBlend.value)
-                    C.PassSET_Blend_BLEND(TRUE, 200);
-                else
-                    C.PassSET_Blend_SET(TRUE, 200);
-                C.PassSET_LightFog(FALSE, FALSE);
-
-                switch (C.iElement)
-                {
-                case 0: C.PassSET_Shaders("detail_wave", "null"); break;
-                case 1: C.PassSET_Shaders("detail_still", "null"); break;
-                }
-
-                // Stage1 - Base texture
-                C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
-                C.StageSET_TMC(oT_Name, "$null", "$null", 0);
-                C.StageEnd();
+            case SE_R1_NORMAL_HQ: C.PassSET_Shaders("detail_wave", "null"); break;
+            case SE_R1_NORMAL_LQ: C.PassSET_Shaders("detail_still", "null"); break;
             }
-            C.PassEnd();
+
+            // Stage1 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+            C.StageEnd();
             break;
         }
         case SE_R1_LMODELS:
         {
-            C.PassBegin();
-            {
-                C.PassSET_ZB(TRUE, TRUE);
-                if (oBlend.value)
-                    C.PassSET_Blend_BLEND(TRUE, 200);
-                else
-                    C.PassSET_Blend_SET(TRUE, 200);
-                C.PassSET_LightFog(FALSE, FALSE);
-                C.PassSET_Shaders("detail_still", "null");
+            C.PassSET_Shaders("detail_still", "null");
 
-                // Stage1 - Base texture
-                C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_DIFFUSE);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-                C.StageSET_TMC(oT_Name, "$null", "$null", 0);
-                C.StageEnd();
-            }
-            C.PassEnd();
-        }
-
-        default:
+            // Stage1 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+            C.StageEnd();
             break;
+        }
         } // switch (C.iElement)
     }
+
+    C.PassEnd();
 }
 
 void CBlender_Detail_Still::CompileProgrammable(CBlender_Compile& C) const

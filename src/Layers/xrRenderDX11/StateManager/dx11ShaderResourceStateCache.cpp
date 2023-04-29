@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "dx11ShaderResourceStateCache.h"
 
-dx11ShaderResourceStateCache SRVSManager;
-
 dx11ShaderResourceStateCache::dx11ShaderResourceStateCache() { ResetDeviceState(); }
 void dx11ShaderResourceStateCache::ResetDeviceState()
 {

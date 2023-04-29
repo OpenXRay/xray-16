@@ -353,7 +353,8 @@
     <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_render.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_R_sun.cpp" />
+    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp" />
+    <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp" />
     <ClCompile Include="r2_rendertarget_accum_direct.cpp" />
     <ClCompile Include="r2_rendertarget_accum_point.cpp" />
     <ClCompile Include="r2_rendertarget_accum_spot.cpp" />

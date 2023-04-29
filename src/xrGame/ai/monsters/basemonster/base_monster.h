@@ -76,7 +76,7 @@ public:
     virtual CInventoryOwner* cast_inventory_owner() override { return CallOfPripyatMode ? nullptr : this; }
 
 public:
-    virtual void renderable_Render(IRenderable* root) override { return inherited::renderable_Render(root); }
+    virtual void renderable_Render(u32 context_id, IRenderable* root) override { return inherited::renderable_Render(context_id, root); }
     virtual bool renderable_ShadowReceive() { return TRUE; }
     virtual void Die(IGameObject* who);
     virtual void HitSignal(float amount, Fvector& vLocalDir, IGameObject* who, s16 element);
@@ -121,7 +121,7 @@ public:
     virtual float evaluate(const CItemManager* manager, const CGameObject* object) const;
 
     virtual void OnEvent(NET_Packet& P, u16 type);
-    void OnHUDDraw(CCustomHUD* hud, IRenderable* root) override { return inherited::OnHUDDraw(hud, root); }
+    void OnHUDDraw(u32 context_id, CCustomHUD* hud, IRenderable* root) override { return inherited::OnHUDDraw(context_id, hud, root); }
     virtual u16 PHGetSyncItemsNumber() { return inherited::PHGetSyncItemsNumber(); }
     virtual CPHSynchronize* PHGetSyncItem(u16 item) { return inherited::PHGetSyncItem(item); }
     virtual void PHUnFreeze() { return inherited::PHUnFreeze(); }

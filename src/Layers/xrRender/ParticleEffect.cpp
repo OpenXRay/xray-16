@@ -262,7 +262,7 @@ void CParticleEffect::OnDeviceCreate()
     {
         if (m_Def->m_Flags.is(CPEDef::dfSprite))
         {
-            geom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
+            geom.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
             if (m_Def)
                 shader = m_Def->m_CachedShader;
         }
@@ -642,7 +642,7 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
     }
 }
 
-void CParticleEffect::Render(float)
+void CParticleEffect::Render(float, bool use_fast_geo)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CParticleEffect::Render()");
@@ -665,13 +665,13 @@ void CParticleEffect::Render(float)
     {
         if (m_Def && m_Def->m_Flags.is(CPEDef::dfSprite))
         {
-            FVF::LIT* pv_start = (FVF::LIT*)RCache.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
+            FVF::LIT* pv_start = (FVF::LIT*)RImplementation.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
 
             ParticleRenderStream(pv_start, p_cnt, particles);
 
             dwCount = p_cnt << 2;
 
-            RCache.Vertex.Unlock(dwCount, geom->vb_stride);
+            RImplementation.Vertex.Unlock(dwCount, geom->vb_stride);
             if (dwCount)
             {
 #ifndef _EDITOR
@@ -728,7 +728,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
 }
 
 extern ENGINE_API float psHUD_FOV;
-void CParticleEffect::Render(float)
+void CParticleEffect::Render(float, bool)
 {
     u32 dwOffset, dwCount;
     // Get a pointer to the particles in gp memory
@@ -740,7 +740,7 @@ void CParticleEffect::Render(float)
     {
         if (m_Def && m_Def->m_Flags.is(CPEDef::dfSprite))
         {
-            FVF::LIT* pv_start = (FVF::LIT*)RCache.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
+            FVF::LIT* pv_start = (FVF::LIT*)RImplementation.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
             FVF::LIT* pv = pv_start;
 
             for (u32 i = 0; i < p_cnt; i++)
@@ -839,7 +839,7 @@ void CParticleEffect::Render(float)
                 }
             }
             dwCount = u32(pv - pv_start);
-            RCache.Vertex.Unlock(dwCount, geom->vb_stride);
+            RImplementation.Vertex.Unlock(dwCount, geom->vb_stride);
             if (dwCount)
             {
 #ifndef _EDITOR
