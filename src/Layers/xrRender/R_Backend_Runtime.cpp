@@ -12,6 +12,11 @@
 #include <DirectXMath.h>
 #endif
 
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/StateManager/dx11StateCacheImpl.h"
+#include "Layers/xrRenderDX11/StateManager/dx11StateCache.cpp"
+#endif
+
 void CBackend::OnFrameEnd()
 {
     if (!GEnv.isDedicatedServer)
@@ -545,3 +550,31 @@ void CBackend::SetupStates()
 #   error No graphics API selected or enabled!
 #endif
 }
+
+
+// Device dependance
+void CBackend::OnDeviceCreate()
+{
+    // Debug Draw
+    InitializeDebugDraw();
+
+    // invalidate caching
+    Invalidate();
+}
+
+void CBackend::OnDeviceDestroy()
+{
+    // Debug Draw
+    DestroyDebugDraw();
+
+#if defined(USE_DX11)
+    //  Destroy state managers
+    StateManager.Reset();
+    RSManager.ClearStateArray();
+    DSSManager.ClearStateArray();
+    BSManager.ClearStateArray();
+    SSManager.ClearStateArray();
+#endif
+}
+
+CBackend RCache;

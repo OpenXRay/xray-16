@@ -1163,9 +1163,6 @@
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp">
-      <Filter>StateManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateManager.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>

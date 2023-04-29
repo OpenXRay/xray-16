@@ -21,9 +21,9 @@ dx11State* dx11State::Create(SimulatorStates& state_code)
 
     state_code.UpdateState(*pState);
 
-    pState->m_pRasterizerState = RSManager.GetState(state_code);
-    pState->m_pDepthStencilState = DSSManager.GetState(state_code);
-    pState->m_pBlendState = BSManager.GetState(state_code);
+    pState->m_pRasterizerState = RCache.RSManager.GetState(state_code);
+    pState->m_pDepthStencilState = RCache.DSSManager.GetState(state_code);
+    pState->m_pBlendState = RCache.BSManager.GetState(state_code);
     // ID3DxxDevice::CreateSamplerState
 
     //	Create samplers here

@@ -163,7 +163,7 @@ void dx11StateManager::Apply()
     {
         if (m_bRSChanged)
         {
-            m_pRState = RSManager.GetState(m_RDesc);
+            m_pRState = RCache.RSManager.GetState(m_RDesc);
             m_bRSChanged = false;
         }
 
@@ -176,7 +176,7 @@ void dx11StateManager::Apply()
     {
         if (m_bDSSChanged)
         {
-            m_pDepthStencilState = DSSManager.GetState(m_DSDesc);
+            m_pDepthStencilState = RCache.DSSManager.GetState(m_DSDesc);
             m_bDSSChanged = false;
         }
 
@@ -189,7 +189,7 @@ void dx11StateManager::Apply()
     {
         if (m_bBSChanged)
         {
-            m_pBlendState = BSManager.GetState(m_BDesc);
+            m_pBlendState = RCache.BSManager.GetState(m_BDesc);
             m_bBSChanged = false;
         }
 

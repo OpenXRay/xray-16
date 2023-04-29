@@ -256,7 +256,6 @@
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp" />
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateManager.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\Blender.cpp" />
