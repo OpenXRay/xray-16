@@ -1119,7 +1119,38 @@ void render_sun::calculate_task(Task&, void*)
     if (need_to_render_sunshafts)
         m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
 
-    // calculate view-frustum bounds in world space
+    // Lets begin from base frustum
+    Fmatrix fullxform_inv = Device.mInvFullTransform;
+
+    // Create approximate ortho-xform
+    // view: auto find 'up' and 'right' vectors
+    Fmatrix mdir_View, mdir_Project;
+    Fvector L_dir, L_up, L_right, L_pos;
+    L_pos.set(sun->position);
+    L_dir.set(sun->direction).normalize();
+    L_right.set(1, 0, 0);
+    if (_abs(L_right.dotproduct(L_dir)) > .99f)
+        L_right.set(0, 0, 1);
+    L_up.crossproduct(L_dir, L_right).normalize();
+    L_right.crossproduct(L_up, L_dir).normalize();
+    mdir_View.build_camera_dir(L_pos, L_dir, L_up);
+
+    // THIS NEED TO BE A CONSTATNT
+    Fplane light_top_plane;
+    light_top_plane.build_unit_normal(L_pos, L_dir);
+    float dist = light_top_plane.classify(Device.vCameraPosition);
+
+    // build viewport xform
+    float view_dim = float(RImplementation.o.smapsize);
+    Fmatrix m_viewport =
+    {
+        view_dim / 2.f, 0.0f, 0.0f, 0.0f,
+        0.0f, -view_dim / 2.f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f
+    };
+    Fmatrix m_viewport_inv;
+    XRMatrixInverse(&m_viewport_inv, nullptr, m_viewport);
 
     // Compute volume(s) - something like a frustum for infinite directional light
     // Also compute virtual light position and sector it is inside
@@ -1128,30 +1159,16 @@ void render_sun::calculate_task(Task&, void*)
     CFrustum cull_frustum[R__NUM_SUN_CASCADES];
     Fvector3 cull_COP[R__NUM_SUN_CASCADES];
     Fmatrix cull_xform[R__NUM_SUN_CASCADES];
+
     for (u32 cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind)
     {
         cull_planes.clear();
 
         FPU::m64r();
-        // Lets begin from base frustum
-        Fmatrix fullxform_inv = Device.mInvFullTransform;
 
         //******************************* Need to be placed after cuboid built **************************
         // COP - 100 km away
         cull_COP[cascade_ind].mad(Device.vCameraPosition, sun->direction, -tweak_COP_initial_offs);
-
-        // Create approximate ortho-xform
-        // view: auto find 'up' and 'right' vectors
-        Fmatrix mdir_View, mdir_Project;
-        Fvector L_dir, L_up, L_right, L_pos;
-        L_pos.set(sun->position);
-        L_dir.set(sun->direction).normalize();
-        L_right.set(1, 0, 0);
-        if (_abs(L_right.dotproduct(L_dir)) > .99f)
-            L_right.set(0, 0, 1);
-        L_up.crossproduct(L_dir, L_right).normalize();
-        L_right.crossproduct(L_up, L_dir).normalize();
-        mdir_View.build_camera_dir(L_pos, L_dir, L_up);
 
 //////////////////////////////////////////////////////////////////////////
 #ifdef _DEBUG
@@ -1186,28 +1203,11 @@ void render_sun::calculate_task(Task&, void*)
             light_cuboid.light_ray.D = L_dir;
         }
 
-        // THIS NEED TO BE A CONSTATNT
-        Fplane light_top_plane;
-        light_top_plane.build_unit_normal(L_pos, L_dir);
-        float dist = light_top_plane.classify(Device.vCameraPosition);
-
         float map_size = m_sun_cascades[cascade_ind].size;
         XRMatrixOrthoOffCenterLH(&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
                                    map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/1.41421f * map_size);
 
         //////////////////////////////////////////////////////////////////////////
-        // build viewport xform
-        float view_dim = float(RImplementation.o.smapsize);
-        Fmatrix m_viewport =
-        {
-            view_dim / 2.f, 0.0f, 0.0f, 0.0f,
-            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f
-        };
-        Fmatrix m_viewport_inv;
-        XRMatrixInverse(&m_viewport_inv, nullptr, m_viewport);
-
         // snap view-position to pixel
         cull_xform[cascade_ind].mul(mdir_Project, mdir_View);
         Fmatrix cull_xform_inv;
@@ -1236,11 +1236,6 @@ void render_sun::calculate_task(Task&, void*)
             m_sun_cascades[cascade_ind].size,
             m_sun_cascades[cascade_ind].reset_chain
         );
-
-        Fvector proj_view = Device.vCameraDirection;
-        proj_view.y = 0;
-        proj_view.normalize();
-        //			lightXZshift.mad(proj_view, 20);
 
         // Initialize rays for the next cascade
         if (cascade_ind < m_sun_cascades.size() - 1)

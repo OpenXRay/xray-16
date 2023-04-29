@@ -1085,18 +1085,39 @@ void render_sun::calculate_task(Task&, void*)
     if (need_to_render_sunshafts)
         m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
 
-    // calculate view-frustum bounds in world space
-    Fmatrix ex_project, ex_full;
-    XMMATRIX ex_full_inverse;
-    {
-        ex_project = Device.mProject;
-        ex_full.mul(ex_project, Device.mView);
-        ex_full_inverse = XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&ex_full));
-    }
-
     // Lets begin from base frustum
-    Fmatrix fullxform_inv;
-    XMStoreFloat4x4((XMFLOAT4X4*)&fullxform_inv, ex_full_inverse);
+    Fmatrix fullxform_inv = Device.mInvFullTransform;
+
+    // Create approximate ortho-xform
+    // view: auto find 'up' and 'right' vectors
+    Fmatrix mdir_View, mdir_Project;
+    Fvector L_dir, L_up, L_right, L_pos;
+    L_pos.set(sun->position);
+    L_dir.set(sun->direction).normalize();
+    L_right.set(1, 0, 0);
+    if (_abs(L_right.dotproduct(L_dir)) > .99f)
+        L_right.set(0, 0, 1);
+    L_up.crossproduct(L_dir, L_right).normalize();
+    L_right.crossproduct(L_up, L_dir).normalize();
+    mdir_View.build_camera_dir(L_pos, L_dir, L_up);
+
+    // THIS NEED TO BE A CONSTATNT
+    Fplane light_top_plane;
+    light_top_plane.build_unit_normal(L_pos, L_dir);
+    float dist = light_top_plane.classify(Device.vCameraPosition);
+
+    // build viewport xform
+    float view_dim = float(RImplementation.o.smapsize); // TODO: move into the class
+    Fmatrix m_viewport =
+    {
+        view_dim / 2.f, 0.0f, 0.0f, 0.0f,
+        0.0f, -view_dim / 2.f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f
+    };
+    Fmatrix m_viewport_inv;
+    XMStoreFloat4x4((XMFLOAT4X4*)&m_viewport_inv,
+        XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&m_viewport)));
 
     // Compute volume(s) - something like a frustum for infinite directional light
     // Also compute virtual light position and sector it is inside
@@ -1121,19 +1142,6 @@ void render_sun::calculate_task(Task&, void*)
         //******************************* Need to be placed after cuboid built **************************
         // COP - 100 km away
         cull_COP[cascade_ind].mad(Device.vCameraPosition, sun->direction, -tweak_COP_initial_offs);
-
-        // Create approximate ortho-xform
-        // view: auto find 'up' and 'right' vectors
-        Fmatrix mdir_View, mdir_Project;
-        Fvector L_dir, L_up, L_right, L_pos;
-        L_pos.set(sun->position);
-        L_dir.set(sun->direction).normalize();
-        L_right.set(1, 0, 0);
-        if (_abs(L_right.dotproduct(L_dir)) > .99f)
-            L_right.set(0, 0, 1);
-        L_up.crossproduct(L_dir, L_right).normalize();
-        L_right.crossproduct(L_up, L_dir).normalize();
-        mdir_View.build_camera_dir(L_pos, L_dir, L_up);
 
         //////////////////////////////////////////////////////////////////////////
 #ifdef _DEBUG
@@ -1168,12 +1176,8 @@ void render_sun::calculate_task(Task&, void*)
             light_cuboid.light_ray.D = L_dir;
         }
 
-        // THIS NEED TO BE A CONSTATNT
-        Fplane light_top_plane;
-        light_top_plane.build_unit_normal(L_pos, L_dir);
-        float dist = light_top_plane.classify(Device.vCameraPosition);
-
         float map_size = m_sun_cascades[cascade_ind].size;
+
 #ifdef USE_DX9
         XMStoreFloat4x4((XMFLOAT4X4*)&mdir_Project, XMMatrixOrthographicOffCenterLH(
             -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
@@ -1186,19 +1190,6 @@ void render_sun::calculate_task(Task&, void*)
         );
 #endif
         //////////////////////////////////////////////////////////////////////////
-        // build viewport xform
-        float view_dim = float(RImplementation.o.smapsize); // TODO: move into the class
-        Fmatrix m_viewport =
-        {
-            view_dim / 2.f, 0.0f, 0.0f, 0.0f,
-            0.0f, -view_dim / 2.f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            view_dim / 2.f, view_dim / 2.f, 0.0f, 1.0f
-        };
-        Fmatrix m_viewport_inv;
-        XMStoreFloat4x4((XMFLOAT4X4*)&m_viewport_inv,
-            XMMatrixInverse(nullptr, XMLoadFloat4x4((XMFLOAT4X4*)&m_viewport)));
-
         // snap view-position to pixel
         cull_xform[cascade_ind].mul(mdir_Project, mdir_View);
         Fmatrix cull_xform_inv;
@@ -1227,11 +1218,6 @@ void render_sun::calculate_task(Task&, void*)
             m_sun_cascades[cascade_ind].size,
             m_sun_cascades[cascade_ind].reset_chain
         );
-
-        Fvector proj_view = Device.vCameraDirection;
-        proj_view.y = 0;
-        proj_view.normalize();
-        //			lightXZshift.mad(proj_view, 20);
 
         // Initialize rays for the next cascade
         if (cascade_ind < m_sun_cascades.size() - 1)
