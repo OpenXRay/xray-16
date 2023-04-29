@@ -577,6 +577,7 @@ private:
 
 public:
     dx11StateManager StateManager;
+    dx11SamplerStateCache SSManager;
 #endif // USE_DX11
 };
 #pragma warning(pop)

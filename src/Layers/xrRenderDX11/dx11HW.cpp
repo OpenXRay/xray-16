@@ -382,7 +382,7 @@ void CHW::DestroyDevice()
         RSManager.ClearStateArray();
         DSSManager.ClearStateArray();
         BSManager.ClearStateArray();
-        SSManager.ClearStateArray();
+        RCache.SSManager.ClearStateArray();
     }
     //  Must switch to windowed mode to release swap chain
     if (!m_ChainDesc.Windowed)

@@ -53,13 +53,13 @@ HRESULT dx11State::Apply()
     RCache.StateManager.SetBlendState(m_pBlendState);
     RCache.StateManager.SetAlphaRef(m_uiAlphaRef);
 
-    SSManager.GSApplySamplers(m_GSSamplers);
-    SSManager.VSApplySamplers(m_VSSamplers);
-    SSManager.PSApplySamplers(m_PSSamplers);
+    RCache.SSManager.GSApplySamplers(m_GSSamplers);
+    RCache.SSManager.VSApplySamplers(m_VSSamplers);
+    RCache.SSManager.PSApplySamplers(m_PSSamplers);
 #ifdef USE_DX11
-    SSManager.HSApplySamplers(m_HSSamplers);
-    SSManager.DSApplySamplers(m_DSSamplers);
-    SSManager.CSApplySamplers(m_CSSamplers);
+    RCache.SSManager.HSApplySamplers(m_HSSamplers);
+    RCache.SSManager.DSApplySamplers(m_DSSamplers);
+    RCache.SSManager.CSApplySamplers(m_CSSamplers);
 #endif
 
     //	static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
@@ -107,7 +107,7 @@ void dx11State::InitSamplers(tSamplerHArray& SamplerArray, SimulatorStates& stat
         for (int i = 0; i <= iMaxSampler; ++i)
         {
             if (SamplerUsed[i])
-                SamplerArray.push_back(SSManager.GetState(descArray[i]));
+                SamplerArray.push_back(RCache.SSManager.GetState(descArray[i]));
             else
                 SamplerArray.push_back(u32(dx11SamplerStateCache::hInvalidHandle));
         }
