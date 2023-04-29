@@ -16,7 +16,7 @@ Lock logCS(MUTEX_PROFILE_ID(log));
 Lock logCS;
 #endif // CONFIG_PROFILE_LOCKS
 xr_vector<xr_string> LogFile;
-LogCallback LogCB = 0;
+LogCallback LogCB = nullptr;
 
 bool ForceFlushLog = false;
 IWriter* LogWriter = nullptr;
@@ -81,8 +81,8 @@ void Log(const char* s)
 {
     int i, j;
 
-    u32 length = xr_strlen(s);
-    PSTR split = (PSTR)xr_alloca((length + 1) * sizeof(char));
+    const u32 length = xr_strlen(s);
+    pstr split = static_cast<pstr>(xr_alloca((length + 1) * sizeof(char)));
     for (i = 0, j = 0; s[i] != 0; i++)
     {
         if (s[i] == '\n')
@@ -110,7 +110,7 @@ void __cdecl Msg(const char* format, ...)
     va_list mark;
     string2048 buf;
     va_start(mark, format);
-    int sz = std::vsnprintf(buf, sizeof(buf) - 1, format, mark);
+    const int sz = std::vsnprintf(buf, sizeof(buf) - 1, format, mark);
     buf[sizeof(buf) - 1] = 0;
     va_end(mark);
     if (sz)
@@ -125,16 +125,16 @@ void Log(const char* msg, const char* dop)
         return;
     }
 
-    u32 buffer_size = (xr_strlen(msg) + 1 + xr_strlen(dop) + 1) * sizeof(char);
-    PSTR buf = (PSTR)xr_alloca(buffer_size);
+    const u32 buffer_size = (xr_strlen(msg) + 1 + xr_strlen(dop) + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
     strconcat(buffer_size, buf, msg, " ", dop);
     Log(buf);
 }
 
 void Log(const char* msg, u32 dop)
 {
-    u32 buffer_size = (xr_strlen(msg) + 1 + 10 + 1) * sizeof(char);
-    PSTR buf = (PSTR)xr_alloca(buffer_size);
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 10 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
 
     xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
     Log(buf);
@@ -142,8 +142,8 @@ void Log(const char* msg, u32 dop)
 
 void Log(const char* msg, u64 dop)
 {
-    u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
-    PSTR buf = (PSTR)xr_alloca(buffer_size);
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
 
     xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
     Log(buf);
@@ -151,8 +151,8 @@ void Log(const char* msg, u64 dop)
 
 void Log(const char* msg, int dop)
 {
-    u32 buffer_size = (xr_strlen(msg) + 1 + 11 + 1) * sizeof(char);
-    PSTR buf = (PSTR)xr_alloca(buffer_size);
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 11 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
 
     xr_sprintf(buf, buffer_size, "%s %i", msg, dop);
     Log(buf);
@@ -162,8 +162,8 @@ void Log(const char* msg, float dop)
 {
     // actually, float string representation should be no more, than 40 characters,
     // but we will count with slight overhead
-    u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
-    PSTR buf = (PSTR)xr_alloca(buffer_size);
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
 
     xr_sprintf(buf, buffer_size, "%s %f", msg, dop);
     Log(buf);
@@ -171,8 +171,8 @@ void Log(const char* msg, float dop)
 
 void Log(const char* msg, const Fvector& dop)
 {
-    u32 buffer_size = (xr_strlen(msg) + 2 + 3 * (64 + 1) + 1) * sizeof(char);
-    PSTR buf = (PSTR)xr_alloca(buffer_size);
+    const u32 buffer_size = (xr_strlen(msg) + 2 + 3 * (64 + 1) + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
 
     xr_sprintf(buf, buffer_size, "%s (%f,%f,%f)", msg, VPUSH(dop));
     Log(buf);
@@ -180,8 +180,8 @@ void Log(const char* msg, const Fvector& dop)
 
 void Log(const char* msg, const Fmatrix& dop)
 {
-    u32 buffer_size = (xr_strlen(msg) + 2 + 4 * (4 * (64 + 1) + 1) + 1) * sizeof(char);
-    PSTR buf = (PSTR)xr_alloca(buffer_size);
+    const u32 buffer_size = (xr_strlen(msg) + 2 + 4 * (4 * (64 + 1) + 1) + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
 
     xr_sprintf(buf, buffer_size, "%s:\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n", msg, dop.i.x, dop.i.y,
         dop.i.z, dop._14_, dop.j.x, dop.j.y, dop.j.z, dop._24_, dop.k.x, dop.k.y, dop.k.z, dop._34_, dop.c.x, dop.c.y,
@@ -192,7 +192,7 @@ void Log(const char* msg, const Fmatrix& dop)
 void LogWinErr(const char* msg, long err_code) { Msg("%s: %s", msg, xrDebug::ErrorToString(err_code)); }
 LogCallback SetLogCB(const LogCallback& cb)
 {
-    LogCallback result = LogCB;
+    const LogCallback result = LogCB;
     LogCB = cb;
     return (result);
 }
@@ -210,7 +210,7 @@ void CreateLog(BOOL nl)
     if (!no_log)
     {
         // Alun: Backup existing log
-        xr_string backup_logFName = EFS.ChangeFileExt(logFName, ".bkp");
+        const xr_string backup_logFName = EFS.ChangeFileExt(logFName, ".bkp");
         FS.file_rename(logFName, backup_logFName.c_str(), true);
         //-Alun
 
@@ -218,13 +218,13 @@ void CreateLog(BOOL nl)
         if (LogWriter == nullptr)
         {
 #if defined(XR_PLATFORM_WINDOWS)
-            MessageBox(NULL, "Can't create log file.", "Error", MB_ICONERROR);
+            MessageBox(nullptr, "Can't create log file.", "Error", MB_ICONERROR);
 #endif
             abort();
         }
         
 #ifdef USE_LOG_TIMING
-        time_t t = time(NULL);
+        time_t t = time(nullptr);
         tm* ti = localtime(&t);
         char buf[64];
         strftime(buf, 64, "[%x %X]\t", ti);

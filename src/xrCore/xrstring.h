@@ -51,12 +51,12 @@ public:
     str_container();
     ~str_container();
 
-    str_value* dock(pcstr value);
-    void clean();
-    void dump();
-    void dump(IWriter* W);
-    void verify();
-    u32 stat_economy();
+    str_value* dock(pcstr value) const;
+    void clean() const;
+    void dump() const;
+    void dump(IWriter* W) const;
+    void verify() const;
+    u32 stat_economy() const;
 
 private:
     str_container_impl* impl;
@@ -146,10 +146,10 @@ public:
     [[nodiscard]]
     u32 size() const
     {
-        if (0 == p_)
+        if (nullptr == p_)
             return 0;
-        else
-            return p_->dwLength;
+
+        return p_->dwLength;
     }
 
     [[nodiscard]]
