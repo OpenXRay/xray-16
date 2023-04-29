@@ -19,6 +19,9 @@
 
 #ifdef USE_DX11
 #include "Layers/xrRenderPC_R4/r_backend_lod.h"
+#include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
+#include "Layers/xrRenderDX11/StateManager/dx11ShaderResourceStateCache.h"
+#include "Layers/xrRenderDX11/StateManager/dx11StateCache.h"
 #endif
 
 #include "FVF.h"
@@ -65,13 +68,6 @@ public:
     };
 
 public:
-    // Dynamic geometry streams
-    _VertexStream Vertex;
-    _IndexStream Index;
-
-    IndexStagingBuffer QuadIB;
-    IndexBufferHandle old_QuadIB;
-
     R_xforms xforms;
     R_hemi hemi;
     R_tree tree;
@@ -520,7 +516,6 @@ public:
 #endif
 
     // Device create / destroy / frame signaling
-    void CreateQuadIB();
     void OnFrameBegin();
     void OnFrameEnd();
     void OnDeviceCreate();
@@ -581,6 +576,15 @@ private:
     ID3DBlob* m_pInputSignature;
 
     bool m_bChangedRTorZB;
+
+public:
+    dx11StateManager StateManager;
+    dx11SamplerStateCache SSManager;
+    dx11ShaderResourceStateCache SRVSManager;
+
+    dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
+    dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
+    dx11StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
 #endif // USE_DX11
 };
 #pragma warning(pop)

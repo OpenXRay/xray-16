@@ -161,7 +161,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
         j1.set(scale_X, scale_X).add(offset);
 
         // Fill vertex buffer
-        FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(3, g_combine_2UV->vb_stride, Offset);
+        FVF::TL2uv* pv = (FVF::TL2uv*)RImplementation.Vertex.Lock(3, g_combine_2UV->vb_stride, Offset);
 #if defined(USE_DX11)
         pv->set(-1, -1, d_Z, d_W, C, 0, 1, 0, scale_X);
         pv++;
@@ -179,7 +179,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
 #else
 #   error No graphics API selected or enabled!
 #endif
-        RCache.Vertex.Unlock(3, g_combine_2UV->vb_stride);
+        RImplementation.Vertex.Unlock(3, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
 
         // setup
@@ -286,12 +286,12 @@ void CRenderTarget::draw_rain(light& RainSetup)
                     RCache.set_c("m_sunmask", m_clouds_shadow);
                     RCache.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
                     RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.set_CullMode(CULL_NONE);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else
@@ -343,12 +343,12 @@ void CRenderTarget::draw_rain(light& RainSetup)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     RCache.set_Element(s_rain_msaa[i]->E[1]);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                     RCache.set_CullMode(CULL_NONE);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else
@@ -392,10 +392,10 @@ void CRenderTarget::draw_rain(light& RainSetup)
                 {
                     RCache.set_Element(s_rain_msaa[i]->E[2]);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else

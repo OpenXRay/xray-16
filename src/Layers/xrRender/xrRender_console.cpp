@@ -308,7 +308,7 @@ public:
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
 #elif defined(USE_DX11)
-        SSManager.SetMaxAnisotropy(val);
+        RCache.SSManager.SetMaxAnisotropy(val);
 #elif defined(USE_OGL)
         // OGL: don't set aniso here because it will be updated after vid restart
 #else
@@ -341,7 +341,7 @@ public:
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
 #elif defined(USE_DX11)
-        SSManager.SetMipLODBias(*value);
+        RCache.SSManager.SetMipLODBias(*value);
 #endif
     }
 

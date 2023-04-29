@@ -15,7 +15,7 @@ void dx113DFluidVolume::Load(LPCSTR /*N*/, IReader* data, u32 /*dwFlags*/)
     shader.create("fluid3d_stub", "water\\water_ryaska1");
 
     //	Create debug geom
-    m_Geom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
+    m_Geom.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 
     Type = MT_3DFLUIDVOLUME;
 
@@ -94,7 +94,7 @@ void dx113DFluidVolume::Render(float /*LOD*/, bool use_fast_geo) // LOD - Level 
 
     u32 dwOffset, dwCount;
 
-    FVF::LIT* pv_start = (FVF::LIT*)RCache.Vertex.Lock(6 * 3 * 2, m_Geom->vb_stride, dwOffset);
+    FVF::LIT* pv_start = (FVF::LIT*)RImplementation.Vertex.Lock(6 * 3 * 2, m_Geom->vb_stride, dwOffset);
     FVF::LIT* pv = pv_start;
 
     u32 clr = 0xFFFFFFFF;
@@ -171,7 +171,7 @@ void dx113DFluidVolume::Render(float /*LOD*/, bool use_fast_geo) // LOD - Level 
     RCache.set_xform_world(m_FluidData.GetTransform());
 
     dwCount = u32(pv - pv_start);
-    RCache.Vertex.Unlock(dwCount, m_Geom->vb_stride);
+    RImplementation.Vertex.Unlock(dwCount, m_Geom->vb_stride);
     RCache.set_Geometry(m_Geom);
 
     // RCache.Render(D3DPT_TRIANGLELIST,dwOffset,0,dwCount,0,dwCount/2);

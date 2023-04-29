@@ -338,13 +338,13 @@ void CLightProjector::calculate()
         // Fill vertex buffer
         u32                         Offset;
         if (RImplementation.o.ffp)  {
-        FVF::TL2uv* pv              = (FVF::TL2uv*) RCache.Vertex.Lock  (8,geom_Blur.stride(),Offset);
+        FVF::TL2uv* pv              = (FVF::TL2uv*) RImplementation.Vertex.Lock  (8,geom_Blur.stride(),Offset);
         RImplementation.ApplyBlur2  (pv, rt_size);
-        RCache.Vertex.Unlock        (8,geom_Blur.stride());
+        RImplementation.Vertex.Unlock        (8,geom_Blur.stride());
         } else {
-        FVF::TL4uv* pv              = (FVF::TL4uv*) RCache.Vertex.Lock  (4,geom_Blur.stride(),Offset);
+        FVF::TL4uv* pv              = (FVF::TL4uv*) RImplementation.Vertex.Lock  (4,geom_Blur.stride(),Offset);
         RImplementation.ApplyBlur4  (pv,P_rt_size,P_rt_size,P_blur_kernel);
-        RCache.Vertex.Unlock        (4,geom_Blur.stride());
+        RImplementation.Vertex.Unlock        (4,geom_Blur.stride());
         }
 
         // Actual rendering (pass0, temp2real)

@@ -49,7 +49,7 @@ void CRenderTarget::phase_ssao()
         float scale_X = _w / float(TEX_jitter);
         float scale_Y = _h / float(TEX_jitter);
 
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine_VP->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine_VP->vb_stride, Offset);
         pv->set(hclip(EPS, _w), hclip(_h + EPS, _h), p0.x, p1.y, 0, 0, scale_Y);
         pv++;
         pv->set(hclip(EPS, _w), hclip(EPS, _h), p0.x, p0.y, 0, 0, 0);
@@ -58,7 +58,7 @@ void CRenderTarget::phase_ssao()
         pv++;
         pv->set(hclip(_w + EPS, _w), hclip(EPS, _h), p1.x, p0.y, 0, scale_X, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine_VP->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine_VP->vb_stride);
 
         RCache.set_Element(s_ssao->E[0]);
         RCache.set_Geometry(g_combine_VP);
@@ -107,7 +107,7 @@ void CRenderTarget::phase_downsamp()
         float scale_X = _w / float(TEX_jitter);
         float scale_Y = _h / float(TEX_jitter);
 
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine_VP->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine_VP->vb_stride, Offset);
         pv->set(hclip(EPS, _w), hclip(_h + EPS, _h), p0.x, p1.y, 0, 0, scale_Y);
         pv++;
         pv->set(hclip(EPS, _w), hclip(EPS, _h), p0.x, p0.y, 0, 0, 0);
@@ -116,7 +116,7 @@ void CRenderTarget::phase_downsamp()
         pv++;
         pv->set(hclip(_w + EPS, _w), hclip(EPS, _h), p1.x, p0.y, 0, scale_X, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine_VP->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine_VP->vb_stride);
 
         RCache.set_Element(s_ssao->E[1]);
         RCache.set_Geometry(g_combine_VP);

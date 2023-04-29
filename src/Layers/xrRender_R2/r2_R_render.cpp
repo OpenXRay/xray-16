@@ -43,7 +43,7 @@ void CRender::RenderMenu()
     p0.set(.5f / _w, .5f / _h);
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
-    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
+    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
 #if defined(USE_DX9) || defined(USE_DX11)
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
     pv++;
@@ -65,7 +65,7 @@ void CRender::RenderMenu()
 #else
 #   error No graphics API selected or enabled!
 #endif
-    RCache.Vertex.Unlock(4, Target->g_menu->vb_stride);
+    RImplementation.Vertex.Unlock(4, Target->g_menu->vb_stride);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }
 

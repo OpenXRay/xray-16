@@ -37,7 +37,7 @@ void CRenderTarget::phase_ssao()
     RCache.SetViewport({ 0.f, 0.f, _w, _h, 0.f, 1.f });
 
     // Fill vertex buffer
-    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
     pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
     pv++;
     pv->set(-1, -1, 0, 0, 0, 0, 0);
@@ -46,7 +46,7 @@ void CRenderTarget::phase_ssao()
     pv++;
     pv->set(1, -1, 1, 0, 0, scale_X, 0);
     pv++;
-    RCache.Vertex.Unlock(4, g_combine->vb_stride);
+    RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 
     // Draw
     RCache.set_Element(s_ssao->E[0]);
@@ -120,7 +120,7 @@ void CRenderTarget::phase_downsamp()
         float scale_Y = float(h) / float(TEX_jitter);
 
         // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
         pv++;
         pv->set(-1, -1, 0, 0, 0, 0, 0);
@@ -129,7 +129,7 @@ void CRenderTarget::phase_downsamp()
         pv++;
         pv->set(1, -1, 1, 0, 0, scale_X, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 
         // Draw
         RCache.set_Element(s_ssao->E[1]);

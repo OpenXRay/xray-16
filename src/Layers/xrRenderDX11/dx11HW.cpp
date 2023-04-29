@@ -375,15 +375,6 @@ void CHW::EndPixEvent() const
 
 void CHW::DestroyDevice()
 {
-    //  Destroy state managers
-    if (ThisInstanceIsGlobal()) // only if we are global HW
-    {
-        StateManager.Reset();
-        RSManager.ClearStateArray();
-        DSSManager.ClearStateArray();
-        BSManager.ClearStateArray();
-        SSManager.ClearStateArray();
-    }
     //  Must switch to windowed mode to release swap chain
     if (!m_ChainDesc.Windowed)
         m_pSwapChain->SetFullscreenState(FALSE, NULL);

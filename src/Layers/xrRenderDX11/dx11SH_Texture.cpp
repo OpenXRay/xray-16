@@ -159,30 +159,30 @@ void CTexture::Apply(u32 dwStage) const
     if (dwStage < rstVertex) //	Pixel shader stage resources
     {
         // HW.pDevice->PSSetShaderResources(dwStage, 1, &m_pSRView);
-        SRVSManager.SetPSResource(dwStage, m_pSRView);
+        RCache.SRVSManager.SetPSResource(dwStage, m_pSRView);
     }
     else if (dwStage < rstGeometry) //	Vertex shader stage resources
     {
         // HW.pDevice->VSSetShaderResources(dwStage-rstVertex, 1, &m_pSRView);
-        SRVSManager.SetVSResource(dwStage - rstVertex, m_pSRView);
+        RCache.SRVSManager.SetVSResource(dwStage - rstVertex, m_pSRView);
     }
     else if (dwStage < rstHull) //	Geometry shader stage resources
     {
         // HW.pDevice->GSSetShaderResources(dwStage-rstGeometry, 1, &m_pSRView);
-        SRVSManager.SetGSResource(dwStage - rstGeometry, m_pSRView);
+        RCache.SRVSManager.SetGSResource(dwStage - rstGeometry, m_pSRView);
     }
 #ifdef USE_DX11
     else if (dwStage < rstDomain) //	Geometry shader stage resources
     {
-        SRVSManager.SetHSResource(dwStage - rstHull, m_pSRView);
+        RCache.SRVSManager.SetHSResource(dwStage - rstHull, m_pSRView);
     }
     else if (dwStage < rstCompute) //	Geometry shader stage resources
     {
-        SRVSManager.SetDSResource(dwStage - rstDomain, m_pSRView);
+        RCache.SRVSManager.SetDSResource(dwStage - rstDomain, m_pSRView);
     }
     else if (dwStage < rstInvalid) //	Geometry shader stage resources
     {
-        SRVSManager.SetCSResource(dwStage - rstCompute, m_pSRView);
+        RCache.SRVSManager.SetCSResource(dwStage - rstCompute, m_pSRView);
     }
 #endif
     else

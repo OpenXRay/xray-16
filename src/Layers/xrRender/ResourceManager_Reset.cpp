@@ -24,11 +24,11 @@ void CResourceManager::reset_begin()
     //  DX10 cut        rtc_it->second->reset_begin();
 
     // destroy DStreams
-    RCache.old_QuadIB = RCache.QuadIB;
-    RCache.QuadIB.Release();
+    RImplementation.old_QuadIB = RImplementation.QuadIB;
+    RImplementation.QuadIB.Release();
 
-    RCache.Index.reset_begin();
-    RCache.Vertex.reset_begin();
+    RImplementation.Index.reset_begin();
+    RImplementation.Vertex.reset_begin();
 }
 
 bool cmp_rt(const CRT* A, const CRT* B) { return A->_order < B->_order; }
@@ -37,29 +37,29 @@ bool cmp_rt(const CRT* A, const CRT* B) { return A->_order < B->_order; }
 void CResourceManager::reset_end()
 {
     // create RDStreams
-    RCache.Vertex.reset_end();
-    RCache.Index.reset_end();
+    RImplementation.Vertex.reset_end();
+    RImplementation.Index.reset_end();
     Evict();
-    RCache.CreateQuadIB();
+    RImplementation.CreateQuadIB();
 
     // remark geom's which point to dynamic VB/IB
     {
         for (u32 _it = 0; _it < v_geoms.size(); _it++)
         {
             SGeometry* _G = v_geoms[_it];
-            if (_G->vb == RCache.Vertex.old_pVB)
-                _G->vb = RCache.Vertex.Buffer();
+            if (_G->vb == RImplementation.Vertex.old_pVB)
+                _G->vb = RImplementation.Vertex.Buffer();
 
             // Here we may recover the buffer using one of
             // RCache's index buffers.
             // Do not remove else.
-            if (_G->ib == RCache.Index.old_pIB)
+            if (_G->ib == RImplementation.Index.old_pIB)
             {
-                _G->ib = RCache.Index.Buffer();
+                _G->ib = RImplementation.Index.Buffer();
             }
-            else if (_G->ib == RCache.old_QuadIB)
+            else if (_G->ib == RImplementation.old_QuadIB)
             {
-                _G->ib = RCache.QuadIB;
+                _G->ib = RImplementation.QuadIB;
             }
         }
     }
