@@ -20,6 +20,7 @@
 #ifdef USE_DX11
 #include "Layers/xrRenderPC_R4/r_backend_lod.h"
 #include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
+#include "Layers/xrRenderDX11/StateManager/dx11ShaderResourceStateCache.h"
 #endif
 
 #include "FVF.h"
@@ -578,6 +579,7 @@ private:
 public:
     dx11StateManager StateManager;
     dx11SamplerStateCache SSManager;
+    dx11ShaderResourceStateCache SRVSManager;
 #endif // USE_DX11
 };
 #pragma warning(pop)
