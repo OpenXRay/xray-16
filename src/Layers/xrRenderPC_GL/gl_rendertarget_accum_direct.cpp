@@ -179,7 +179,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, RImplementation.r_sun.sun->X.D[0].combine);
+            xf_project.mul(m_TexelAdjust, RImplementation.r_sun_old.sun->X.D[0].combine);
             m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
@@ -475,7 +475,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, fuckingsun->X.D[0].combine);
+            xf_project.mul(m_TexelAdjust, fuckingsun->X.D[sub_phase].combine);
             m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias

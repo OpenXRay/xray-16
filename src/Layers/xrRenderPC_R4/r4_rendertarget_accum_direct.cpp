@@ -51,7 +51,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
     //	TODO: DX11: Remove half pixe offset
     // *** assume accumulator setted up ***
-    light* fuckingsun = (light*)RImplementation.Lights.sun._get();
+    light* fuckingsun = RImplementation.r_sun_old.sun;
 
     // Common calc for quad-rendering
     u32 Offset;
@@ -188,7 +188,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, RImplementation.r_sun.sun->X.D[0].combine); // TODO: move into render_sun
+            xf_project.mul(m_TexelAdjust, RImplementation.r_sun_old.sun->X.D[0].combine); // TODO: move into render_sun
             m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
