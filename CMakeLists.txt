@@ -169,10 +169,28 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-undefined")
 endif()
 
-#set(SANITIZE_FLAGS "-fsanitize=address  -fsanitize=leak -fno-omit-frame-pointer -g -fsanitize=undefined -fno-sanitize=vptr")
-#if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-#    set(SANITIZE_FLAGS "-shared-libasan ${SANITIZE_FLAGS}")
-#endif()
+option(USE_ADDRESS_SANITIZER "Use AddressSanitizer" OFF)
+if (USE_ADDRESS_SANITIZER)
+    set(SANITIZE_FLAGS
+        "-fsanitize=address"
+        "-fsanitize=leak"
+        "-fno-omit-frame-pointer"
+        "-fno-optimize-sibling-calls"
+        "-fsanitize=undefined"
+        "-fno-sanitize=vptr"
+    )
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        list(APPEND SANITIZE_FLAGS "-g")
+    endif()
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        add_link_options("-shared-libasan")
+    endif()
+endif()
+string(REPLACE ";" " " SANITIZE_FLAGS "${SANITIZE_FLAGS}")
+
+message(STATUS "USE_ADDRESS_SANITIZER: ${USE_ADDRESS_SANITIZER}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZE_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SANITIZE_FLAGS}")
@@ -219,10 +237,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(LUA_LIBRARIES xrLuajit-debug)
 endif()
 
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} ${PROJECT_NAME})
-endif()
-
 set(LUA_FOUND true)
 
 message("CMake build ${CMAKE_BUILD_TYPE}, CFLAGS=${CMAKE_C_FLAGS}, CXXFLAGS=${CMAKE_CXX_FLAGS}")
@@ -260,6 +274,8 @@ if (mimalloc_FOUND)
 else()
     set(MEMORY_ALLOCATOR "standard" CACHE STRING "Use specific memory allocator (mimalloc/standard)")
 endif()
+set_property(CACHE MEMORY_ALLOCATOR PROPERTY STRINGS "mimalloc" "standard")
+
 if (MEMORY_ALLOCATOR STREQUAL "mimalloc")
     add_definitions(-DUSE_MIMALLOC)
     if (NOT mimalloc_FOUND)
@@ -312,7 +328,6 @@ set(CMAKE_CXX_FLAGS
     "-Wno-unused-label"
     "-Wno-unused-parameter"
     "-Wno-switch"
-    "-Wno-interference-size"
     #"-Wno-padded"
     #"-Wno-c++98-compat"
     #"-Wno-c++98-compat-pedantic"
@@ -323,7 +338,11 @@ set(CMAKE_CXX_FLAGS
     #"-Wno-newline-eof"
 )
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" "-Wno-class-memaccess")
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS}"
+        "-Wno-class-memaccess"
+        "-Wno-interference-size"
+    )
 endif()
 string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 

@@ -187,12 +187,13 @@ void CUIWindow::DetachAll()
 
 void CUIWindow::GetAbsoluteRect(Frect& r)
 {
-    if (GetParent() == NULL)
+    auto parent = GetParent();
+    if (parent == nullptr)
     {
         GetWndRect(r);
         return;
     }
-    GetParent()->GetAbsoluteRect(r);
+    parent->GetAbsoluteRect(r);
 
     Frect rr;
     GetWndRect(rr);
