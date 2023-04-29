@@ -195,6 +195,7 @@ void CShootingObject::Light_Start()
 
 void CShootingObject::Light_Render(const Fvector& P)
 {
+    ScopeLock lock{ &render_lock };
     float light_scale = light_time / light_lifetime;
     R_ASSERT(light_render);
 

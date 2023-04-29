@@ -20,10 +20,123 @@
 #include "Layers/xrRender/r_sun_cascades.h"
 
 #include "xrEngine/IRenderable.h"
+#include "xrCore/Threading/TaskManager.hpp"
 #include "xrCore/FMesh.hpp"
 
 class CRenderTarget;
 class dxRender_Visual;
+
+// TODO: move it into separate file.
+struct i_render_phase
+{
+    explicit i_render_phase(const xr_string& name_in)
+        : name(name_in)
+    {
+        o.active = false;
+        o.mt_enabled = false;
+    }
+
+    ICF void calculate()
+    {
+        if (!o.active)
+            return;
+
+        main_task = &TaskScheduler->CreateTask(name.c_str(), { this, &i_render_phase::calculate_task });
+
+        if (o.mt_enabled)
+        {
+            TaskScheduler->PushTask(*main_task);
+        }
+        else
+        {
+            TaskScheduler->RunTask(*main_task);
+        }
+    }
+
+    ICF void wait()
+    {
+        if (main_task)
+            TaskScheduler->Wait(*main_task);
+        main_task = nullptr;
+    }
+
+    virtual void init() = 0;
+    virtual void calculate_task(Task&, void*) = 0;
+    virtual void render() = 0;
+
+    struct options_t
+    {
+        u32 active : 1;
+        u32 mt_enabled : 1;
+    } o;
+    Task* main_task{ nullptr };
+    xr_string name{ "" };
+};
+
+struct render_main : public i_render_phase
+{
+    explicit render_main(const xr_string& name_in) : i_render_phase(name) {}
+
+    void init() override;
+    void calculate_task(Task&, void*) override;
+    void render() override;
+};
+
+struct render_rain : public i_render_phase
+{
+    explicit render_rain(const xr_string& name_in) : i_render_phase(name) {}
+
+    void init() override;
+    void calculate_task(Task&, void*) override;
+    void render() override;
+
+    light RainLight;
+    u32 context_id{ R_dsgraph_structure::INVALID_CONTEXT_ID };
+};
+
+struct render_sun : public i_render_phase
+{
+    explicit render_sun(const xr_string& name_in) : i_render_phase(name) {}
+
+    void init() override;
+    void calculate_task(Task&, void*) override;
+    void render() override;
+
+    xr_vector<sun::cascade> m_sun_cascades;
+    light* sun{ nullptr };
+    bool need_to_render_sunshafts{ false };
+    bool last_cascade_chain_mode{ false };
+
+    u32 contexts_ids[R__NUM_SUN_CASCADES];
+};
+
+struct render_sun_old : public i_render_phase
+{
+    explicit render_sun_old(const xr_string& name_in) : i_render_phase(name) {}
+
+    void init() override;
+    void calculate_task(Task&, void*) override { /* the same as render_sun */ }
+    void render() override
+    {
+        wait();
+
+        if (!o.active)
+            return;
+
+        render_sun_near();
+        render_sun();
+        render_sun_filtered();
+    }
+
+    void render_sun();
+    void render_sun_near();
+    void render_sun_filtered() const;
+
+    xr_vector<sun::cascade> m_sun_cascades;
+    light* sun{ nullptr };
+    u32 context_id{ R_dsgraph_structure::INVALID_CONTEXT_ID };
+};
+//----
 
 // definition
 class CRender final : public D3DXRenderBase
@@ -114,6 +227,10 @@ public:
 
         u32 forcegloss : 1;
         u32 forceskinw : 1;
+
+        u32 mt_calculate : 1;
+        u32 mt_render : 1;
+
         float forcegloss_v;
     } o;
 
@@ -179,7 +296,6 @@ public:
     SMAP_Allocator LP_smap_pool;
     light_Package LP_normal;
     light_Package LP_pending;
-    light RainLight;
 
     xr_vector<Fbox3> main_coarse_structure;
 
@@ -198,8 +314,6 @@ public:
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset{}; // Determines weather the frame is the first after resetting device.
 
-    xr_vector<sun::cascade> m_sun_cascades;
-
 private:
     // Loading / Unloading
     void LoadBuffers(CStreamReader* fs, bool alternative);
@@ -212,31 +326,27 @@ private:
 #endif
 
 public:
-    void render_main(Fmatrix& mCombined, bool _fportals);
     void render_forward();
     void render_indirect(light* L) const;
     void render_lights(light_Package& LP);
-    void render_sun();
-    void render_sun_near();
-    void render_sun_filtered() const;
-    void render_menu();
+
+    render_main r_main;
 #if RENDER != R_R2
-    void render_rain();
+    render_rain r_rain;
 #endif
 
-    void render_sun_cascade(u32 cascade_ind);
-    void init_cacades();
-    void render_sun_cascades();
+    render_sun r_sun;
+    render_sun_old r_sun_old;
 
 public:
-    ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
-    ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
+    auto get_largest_sector() const { return largest_sector_id; }
+    ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
+    ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, u32 phase);
     VertexElement* getVB_Format(int id, bool alternative = false);
     VertexStagingBuffer* getVB(int id, bool alternative = false);
     IndexStagingBuffer* getIB(int id, bool alternative = false);
     FSlideWindowItem* getSWI(int id);
     IRenderVisual* model_CreatePE(LPCSTR name);
-    IRender_Sector::sector_id_t detectSector(const Fvector& P, Fvector& D);
 
     // HW-occlusion culling
     u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
@@ -334,13 +444,10 @@ public:
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
     ref_shader getShader(int id);
     IRenderVisual* getVisual(int id) override;
-    IRender_Sector::sector_id_t detectSector(const Fvector& P) override;
     IRender_Target* getTarget() override;
 
     // Main
-    void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
-    void add_Geometry(IRenderVisual* V, const CFrustum& view) override; // add visual(s)	(all culling performed)
-
+    void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
     // wallmarks
     void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);
     void add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override;
@@ -386,6 +493,8 @@ public:
 
     void Calculate() override;
     void Render() override;
+    void RenderMenu() override;
+
     void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;
     void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) override;
     void ScreenshotAsyncBegin() override;
@@ -431,7 +540,7 @@ protected:
     void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
 
 private:
-    IRender_Sector::sector_id_t m_largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
+    IRender_Sector::sector_id_t largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
 };
 
 extern CRender RImplementation;

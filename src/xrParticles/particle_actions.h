@@ -32,6 +32,8 @@ class ParticleActions
     bool m_bLocked;
 
 public:
+    Lock pa_lock;
+
     ParticleActions()
     {
         actions.reserve(4);
@@ -42,6 +44,7 @@ public:
 
     void clear()
     {
+        ScopeLock lock{ &pa_lock };
         R_ASSERT(!m_bLocked);
         for (auto& it : actions)
             xr_delete(it);
@@ -50,6 +53,7 @@ public:
 
     void append(ParticleAction* pa)
     {
+        ScopeLock lock{ &pa_lock };
         R_ASSERT(!m_bLocked);
         actions.push_back(pa);
     }
@@ -61,14 +65,14 @@ public:
 
     void resize(int cnt)
     {
+        ScopeLock lock{ &pa_lock };
         R_ASSERT(!m_bLocked);
         actions.resize(cnt);
     }
 
-    void copy(ParticleActions* src);
-
     void lock()
     {
+        pa_lock.Enter();
         R_ASSERT(!m_bLocked);
         m_bLocked = true;
     }
@@ -77,6 +81,7 @@ public:
     {
         R_ASSERT(m_bLocked);
         m_bLocked = false;
+        pa_lock.Leave();
     }
 };
 } // namespace PAPI

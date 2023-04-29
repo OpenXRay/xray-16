@@ -100,7 +100,7 @@ public:
     virtual void OnEvent(NET_Packet& P, u16 type);
 
     // Render
-    void renderable_Render(IRenderable* root) override;
+    void renderable_Render(u32 context_id, IRenderable* root) override;
     virtual bool renderable_ShadowGenerate();
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
         const Fvector& position, float power) override;
@@ -306,7 +306,7 @@ public:
     void g_SetSprintAnimation(u32 mstate_rl, MotionID& head, MotionID& torso, MotionID& legs);
 
 public:
-    void OnHUDDraw(CCustomHUD* hud, IRenderable* root) override;
+    void OnHUDDraw(u32 context_id, CCustomHUD* hud, IRenderable* root) override;
     BOOL HUDview() const;
 
     // visiblity

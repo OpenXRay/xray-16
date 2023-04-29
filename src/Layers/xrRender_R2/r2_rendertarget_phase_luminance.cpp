@@ -55,7 +55,7 @@ void CRenderTarget::phase_luminance()
         Fvector2 b_3 = {1 + a_3.x, 1 + a_3.y};
 
         // Fill vertex buffer
-        v_build* pv = (v_build*)RCache.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
+        v_build* pv = (v_build*)RImplementation.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
 
 #if defined(USE_DX9) || defined(USE_DX11)
         pv->p.set(eps, float(ts + eps), eps, 1.f);
@@ -110,7 +110,7 @@ void CRenderTarget::phase_luminance()
 #else
 #   error No graphics API selected or enabled!
 #endif // USE_OGL
-        RCache.Vertex.Unlock(4, g_bloom_build->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_bloom_build->vb_stride);
         RCache.set_Element(s_luminance->E[0]);
         RCache.set_Geometry(g_bloom_build);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -132,7 +132,7 @@ void CRenderTarget::phase_luminance()
         }
 
         // Fill vertex buffer
-        v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
+        v_filter* pv = (v_filter*)RImplementation.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
 #if defined(USE_DX9) || defined(USE_DX11)
         pv->p.set(eps, float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
@@ -170,7 +170,7 @@ void CRenderTarget::phase_luminance()
 #else
 #   error No graphics API selected or enabled!
 #endif // !USE_OGL
-        RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_bloom_filter->vb_stride);
         RCache.set_Element(s_luminance->E[1]);
         RCache.set_Geometry(g_bloom_filter);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -193,7 +193,7 @@ void CRenderTarget::phase_luminance()
         }
 
         // Fill vertex buffer
-        v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
+        v_filter* pv = (v_filter*)RImplementation.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
 #if defined(USE_DX9) || defined(USE_DX11)
         pv->p.set(eps, float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
@@ -231,7 +231,7 @@ void CRenderTarget::phase_luminance()
 #else
 #   error No graphics API selected or enabled!
 #endif // !USE_OGL
-        RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 
         f_luminance_adapt = .9f * f_luminance_adapt + .1f * Device.fTimeDelta * ps_r2_tonemap_adaptation;
         float amount = ps_r2_ls_flags.test(R2FLAG_TONEMAP) ? ps_r2_tonemap_amount : 0;

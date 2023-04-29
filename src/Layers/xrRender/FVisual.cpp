@@ -166,13 +166,13 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         rm_geom.create(vFormat, *p_rm_Vertices, *p_rm_Indices);
 }
 
-void Fvisual::Render(float)
+void Fvisual::Render(float, bool use_fast_geo)
 {
 #if RENDER == R_R1
     if (m_fast && ps_r1_force_geomx)
 #else
     if (m_fast &&
-        (ps_r1_force_geomx || RImplementation.active_phase() == CRender::PHASE_SMAP && !RCache.is_TessEnabled()))
+        (ps_r1_force_geomx || use_fast_geo && !RCache.is_TessEnabled()))
 #endif
     {
         RCache.set_Geometry(m_fast->rm_geom);

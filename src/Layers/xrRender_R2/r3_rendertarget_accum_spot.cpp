@@ -237,12 +237,12 @@ void CRenderTarget::accum_spot(light* L)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     RCache.set_Element(shader_msaa[i]->E[_id]);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
                     RCache.set_CullMode(D3DCULL_CW);
                     draw_volume(L);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else
@@ -291,11 +291,11 @@ void CRenderTarget::accum_spot(light* L)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
                     draw_volume(L);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else

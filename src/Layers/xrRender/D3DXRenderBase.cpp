@@ -66,6 +66,13 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 
     Resources->OnDeviceDestroy(bKeepTextures);
     RCache.OnDeviceDestroy();
+
+    // Quad
+    QuadIB.Release();
+
+    // streams
+    Index.Destroy();
+    Vertex.Destroy();
 }
 
 void D3DXRenderBase::Destroy()
@@ -121,6 +128,13 @@ void D3DXRenderBase::SetupStates()
 void D3DXRenderBase::OnDeviceCreate(const char* shName)
 {
     // Signal everyone - device created
+
+    // streams
+    Vertex.Create();
+    Index.Create();
+
+    CreateQuadIB();
+
     RCache.OnDeviceCreate();
 #if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Update();
@@ -133,7 +147,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
         m_WireShader.create("editor" DELIMITER "wire");
         m_SelectionShader.create("editor" DELIMITER "selection");
         m_PortalFadeShader.create("portal");
-        m_PortalFadeGeom.create(FVF::F_L, RCache.Vertex.Buffer(), 0);        
+        m_PortalFadeGeom.create(FVF::F_L, RImplementation.Vertex.Buffer(), 0);        
         DUImpl.OnDeviceCreate();
         UIRenderImpl.CreateUIGeom();
     }
@@ -242,6 +256,8 @@ void D3DXRenderBase::Begin()
 {
     HW.BeginScene();
     RCache.OnFrameBegin();
+    Vertex.Flush();
+    Index.Flush();
     RCache.set_CullMode(CULL_CW);
     RCache.set_CullMode(CULL_CCW);
     if (HW.Caps.SceneMode)

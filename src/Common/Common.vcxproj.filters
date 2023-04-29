@@ -91,6 +91,7 @@
     <ClInclude Include="..\..\Externals\submodule_check.hpp">
       <Filter>Externals</Filter>
     </ClInclude>
+    <ClInclude Include="OGF_GContainer_Vertices.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">

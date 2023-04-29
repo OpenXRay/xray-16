@@ -51,12 +51,13 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
 
 void CBlender_Model_EbB::CompileFFP(CBlender_Compile& C) const
 {
-    const size_t element = C.bEditor ? SE_R1_NORMAL_LQ : C.iElement;
-    const auto modulate = C.bEditor ? D3DTOP_MODULATE : D3DTOP_MODULATE2X;
+    const bool constant_lighting = ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT;
+    const size_t element = constant_lighting ? SE_R1_NORMAL_LQ : C.iElement;
+    const auto modulate = constant_lighting ? D3DTOP_MODULATE : D3DTOP_MODULATE2X;
 
     C.PassBegin();
     {
-        if (C.bEditor && oBlend.value)
+        if (constant_lighting && oBlend.value)
         {
             C.PassSET_ZB(TRUE, FALSE);
             C.PassSET_Blend_BLEND();

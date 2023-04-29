@@ -8,9 +8,9 @@
 #endif
 #include "xrEngine/xrTheora_Surface.h"
 
-#define		PRIORITY_HIGH	12
-#define		PRIORITY_NORMAL	8
-#define		PRIORITY_LOW	4
+#define PRIORITY_HIGH   12
+#define PRIORITY_NORMAL 8
+#define PRIORITY_LOW    4
 
 void resptrcode_texture::create(LPCSTR _name)
 {
@@ -322,7 +322,9 @@ void CTexture::Unload()
     CHK_GL(glDeleteTextures(1, &pSurface));
     CHK_GL(glDeleteBuffers(1, &pBuffer));
 
+#ifdef XR_PLATFORM_WINDOWS
     xr_delete(pAVI);
+#endif
     xr_delete(pTheora);
 
     bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_load);

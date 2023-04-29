@@ -23,8 +23,6 @@ Task::Data::Data(pcstr name, const TaskFunc& task, Task* parent)
 Task::Data::Data(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent)
     : task_func(task), on_finish_callback(onFinishCallback), name(name), parent(parent), jobs(1) {}
 
-Task::Task() : m_user_data() {}
-
 Task::Task(pcstr name, const TaskFunc& task, void* data, size_t dataSize, Task* parent /*= nullptr*/)
     : m_data(name, task, parent)
 {

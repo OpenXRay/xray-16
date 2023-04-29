@@ -11,15 +11,37 @@ public:
 
 struct R_dsgraph_structure
 {
+    static constexpr auto INVALID_CONTEXT_ID = static_cast<u32>(-1);
+#if RENDER == R_R1
+    static constexpr auto IMM_CTX_ID = 0; // TODO: to remove this ugly #ifdef we need to introduce per-render configuration
+#else
+    static constexpr auto IMM_CTX_ID = R__NUM_PARALLEL_CONTEXTS; // the next after pooled
+#endif
+
     R_feedback* val_feedback{}; // feedback for geometry being rendered
     u32 val_feedback_breakp{}; // breakpoint
     xr_vector<Fbox3>* val_recorder; // coarse structure recorder
-
-    u32 phase{};
     u32 marker{};
-    bool pmask[2];
-    bool pmask_wmark;
-    bool use_hom{false};
+    u32 context_id{ INVALID_CONTEXT_ID };
+
+    struct options_t
+    {
+        u32 phase{};
+        u32 portal_traverse_flags{};
+        u32 spatial_traverse_flags{};
+        u32 spatial_types{ STYPE_RENDERABLE };
+        float query_box_side{ EPS_L * 20.0f };
+        Fvector view_pos{};
+        Fmatrix xform{};
+        CFrustum view_frustum{};
+        IRender_Sector::sector_id_t sector_id;
+        bool pmask[2];
+        bool pmask_wmark;
+        bool use_hom{ false };
+        bool precise_portals{ false };
+        bool is_main_pass{ false };
+        bool mt_calculate{ false };
+    } o;
 
     // Dynamic scene graph
     // R_dsgraph::mapNormal_T										mapNormal	[2]		;	// 2==(priority/2)
@@ -78,8 +100,22 @@ struct R_dsgraph_structure
         r_pmask(true, true);
     };
 
-    void destroy()
+    void reset()
     {
+        //marker = 0;
+        context_id = INVALID_CONTEXT_ID;
+
+        o.query_box_side = EPS_L * 20;
+        o.use_hom = false;
+        o.precise_portals = false;
+        o.is_main_pass = false;
+        o.spatial_traverse_flags = 0;
+        o.portal_traverse_flags = 0;
+        o.spatial_types = STYPE_RENDERABLE;
+
+        val_recorder = nullptr;
+        val_feedback = nullptr;
+
         nrmPasses.clear();
         matPasses.clear();
 
@@ -111,9 +147,9 @@ struct R_dsgraph_structure
 
     void r_pmask(bool _1, bool _2, bool _wm = false)
     {
-        pmask[0] = _1;
-        pmask[1] = _2;
-        pmask_wmark = _wm;
+        o.pmask[0] = _1;
+        o.pmask[1] = _2;
+        o.pmask_wmark = _wm;
     }
 
     void load(const xr_vector<CSector::level_sector_data_t> &sectors, const xr_vector<CPortal::level_portal_data_t> &portals);
@@ -129,6 +165,8 @@ struct R_dsgraph_structure
         VERIFY(id < Sectors.size());
         return Sectors[id];
     }
+    IRender_Sector::sector_id_t detect_sector(const Fvector& P);
+    IRender_Sector::sector_id_t detect_sector(const Fvector& P, Fvector& D);
 
     void add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
     void add_leafs_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility
@@ -148,8 +186,5 @@ struct R_dsgraph_structure
     void render_distort();
     void render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& _bb, int _element);
 
-    void build_subspace(IRender_Sector::sector_id_t sector_id, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
-        BOOL _dynamic, BOOL _precise_portals = FALSE);
-    void build_subspace(IRender_Sector::sector_id_t sector_id, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic,
-        BOOL _precise_portals = FALSE);
+    void build_subspace();
 };

@@ -66,7 +66,11 @@ public:
     Fvector _sizeT;
 
 public:
-    void set_flags(u8 val) { _flags = val; }
+    void set_flags(u8 val)
+    {
+        _flags = val;
+    }
+
     void set_flag(u8 mask, u8 val)
     {
         if (val)
@@ -74,15 +78,20 @@ public:
         else
             _flags &= ~mask;
     }
-    BOOL test_flag(u8 mask) const { return BOOL(_flags & mask); }
+
+    [[nodiscard]] BOOL test_flag(u8 mask) const { return BOOL(_flags & mask); }
+
     void set_count(u32 cnt)
     {
         VERIFY(cnt);
         _count = cnt;
     }
+
     ICF u32 get_count() const { return (u32(_count) & 0x00FFFFFF); }
-    float GetLength() { return float(_count) * SAMPLE_SPF; }
-    u32 mem_usage()
+
+    [[nodiscard]] float GetLength() const { return float(_count) * SAMPLE_SPF; }
+
+    [[nodiscard]] u32 mem_usage()
     {
         u32 sz = sizeof(*this);
         if (_keysR.size())
@@ -114,10 +123,10 @@ public:
     shared_str name;
     void Load(IReader*);
     void Save(IWriter*);
-    bool is_empty() const { return intervals.empty(); }
-    const interval* pick_mark(float const& t) const;
-    bool is_mark_between(float const& t0, float const& t1) const;
-    float time_to_next_mark(float time) const;
+    [[nodiscard]] bool is_empty() const { return intervals.empty(); }
+    [[nodiscard]] const interval* pick_mark(float const& t) const;
+    [[nodiscard]] bool is_mark_between(float const& t0, float const& t1) const;
+    [[nodiscard]] float time_to_next_mark(float time) const;
 };
 
 const float fQuantizerRangeExt = 1.5f;
@@ -142,11 +151,11 @@ public:
     }
 
     void Load(IReader* MP, u32 fl, u16 vers);
-    u32 mem_usage() { return sizeof(*this); }
-    ICF float Accrue() { return fQuantizerRangeExt * Dequantize(accrue); }
-    ICF float Falloff() { return fQuantizerRangeExt * Dequantize(falloff); }
-    ICF float Speed() { return Dequantize(speed); }
-    ICF float Power() { return Dequantize(power); }
+    [[nodiscard]] u32 mem_usage() const { return sizeof(*this); }
+    ICF float Accrue() const { return fQuantizerRangeExt * Dequantize(accrue); }
+    ICF float Falloff() const { return fQuantizerRangeExt * Dequantize(falloff); }
+    ICF float Speed() const { return Dequantize(speed); }
+    ICF float Power() const { return Dequantize(power); }
     bool StopAtEnd();
 };
 struct accel_str_pred
@@ -168,7 +177,8 @@ public:
     xr_vector<u32> bones;
     CPartDef() : Name(0){};
 
-    u32 mem_usage() { return sizeof(*this) + bones.size() * sizeof(u32) + sizeof(Name); }
+    [[nodiscard]]
+    u32 mem_usage() const { return sizeof(*this) + bones.size() * sizeof(u32) + sizeof(Name); }
 };
 class XRCORE_API CPartition
 {
@@ -177,10 +187,11 @@ class XRCORE_API CPartition
 public:
     IC CPartDef& operator[](u16 id) { return P[id]; }
     IC const CPartDef& part(u16 id) const { return P[id]; }
-    u16 part_id(const shared_str& name) const;
-    u32 mem_usage() { return P[0].mem_usage() * MAX_PARTS; }
+    [[nodiscard]] u16 part_id(const shared_str& name) const;
+    [[nodiscard]] u32 mem_usage() const { return P[0].mem_usage() * MAX_PARTS; }
     void load(IKinematics* V, LPCSTR model_name);
-    u8 count() const
+
+    [[nodiscard]] u8 count() const
     {
         u8 ret = 0;
         for (u8 i = 0; i < MAX_PARTS; ++i)
@@ -264,6 +275,7 @@ public:
         create(rhs);
     }
     ~shared_motions() { destroy(); }
+
     // assignment & accessors
     shared_motions& operator=(shared_motions const& rhs)
     {
@@ -271,44 +283,51 @@ public:
         return *this;
     }
     bool operator==(shared_motions const& rhs) const { return (p_ == rhs.p_); }
+
     // misc func
-    MotionVec* bone_motions(shared_str bone_name)
+    [[nodiscard]] MotionVec* bone_motions(shared_str bone_name) const
     {
         VERIFY(p_);
         return p_->bone_motions(bone_name);
     }
-    accel_map* motion_map()
+
+    [[nodiscard]] accel_map* motion_map() const
     {
         VERIFY(p_);
         return &p_->m_motion_map;
     }
-    accel_map* cycle()
+
+    [[nodiscard]] accel_map* cycle() const
     {
         VERIFY(p_);
         return &p_->m_cycle;
     }
-    accel_map* fx()
+
+    [[nodiscard]] accel_map* fx() const
     {
         VERIFY(p_);
         return &p_->m_fx;
     }
-    CPartition* partition()
+
+    [[nodiscard]] CPartition* partition() const
     {
         VERIFY(p_);
         return &p_->m_partition;
     }
-    MotionDefVec* motion_defs()
+
+    [[nodiscard]] MotionDefVec* motion_defs() const
     {
         VERIFY(p_);
         return &p_->m_mdefs;
     }
-    CMotionDef* motion_def(u16 idx)
+
+    [[nodiscard]] CMotionDef* motion_def(u16 idx) const
     {
         VERIFY(p_);
         return &p_->m_mdefs[idx];
     }
 
-    const shared_str& id() const
+    [[nodiscard]] const shared_str& id() const
     {
         VERIFY(p_);
         return p_->m_id;

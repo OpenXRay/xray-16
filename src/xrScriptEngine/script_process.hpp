@@ -56,10 +56,8 @@ protected:
 protected:
     void run_scripts();
 
-private:
-    CScriptProcess(CScriptEngine* scriptEngine, shared_str name, shared_str scripts);
-
 public:
+    CScriptProcess(CScriptEngine* scriptEngine, shared_str name, shared_str scripts);
     virtual ~CScriptProcess();
     void update();
     void add_script(LPCSTR script_name, bool string, bool reload);

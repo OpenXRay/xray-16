@@ -77,34 +77,48 @@ void CRender::render_lights(light_Package& LP)
     //	}
     //	if (left_some_lights_that_doesn't cast shadows)
     //		accumulate them
-    while (!LP.v_shadowed.empty())
+    static xr_vector<light*> L_spot_s;
+
+    struct task_data_t
     {
-        // if (has_spot_shadowed)
-        xr_vector<light*> L_spot_s;
-        Stats.s_used++;
+        light* L;
+        Task* task;
+        u32 batch_id;
+    };
+    static xr_vector<task_data_t> lights_queue{};
+    lights_queue.reserve(3);  // TODO: max cascades
 
-        // generate spot shadowmap
-        Target->phase_smap_spot_clear();
-        xr_vector<light*>& source = LP.v_shadowed;
-        light* L = source.back();
-        const u16 sid = L->vis.smap_ID;
-        while (true)
+    const auto &calc_lights = [](Task &, void* data)
+    {
+        const auto* task_data = static_cast<task_data_t*>(data);
+        auto& dsgraph = RImplementation.get_context(task_data->batch_id);
         {
-            if (source.empty())
-                break;
-            L = source.back();
-            if (L->vis.smap_ID != sid)
-                break;
-            source.pop_back();
-            Lights_LastFrame.push_back(L);
+            auto* L = task_data->L;
+            
+            L->svis[task_data->batch_id].begin();
 
-            // render
-            dsgraph.use_hom = false;
-            dsgraph.phase = PHASE_SMAP;
-            dsgraph.r_pmask(true, o.Tshadows);
-            L->svis.begin();
+            dsgraph.o.phase = PHASE_SMAP;
+            dsgraph.r_pmask(true, RImplementation.o.Tshadows);
+            dsgraph.o.sector_id = L->spatial.sector_id;
+            dsgraph.o.view_pos = L->position;
+            dsgraph.o.xform = L->X.S.combine;
+            dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+
+            dsgraph.build_subspace();
+        }
+    };
+
+    const auto& flush_lights = [&]()
+    {
+        for (const auto& [L, task, batch_id] : lights_queue)
+        {
+            VERIFY(task);
+            TaskScheduler->Wait(*task);
+
             PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
-            dsgraph.build_subspace(L->spatial.sector_id, L->X.S.combine, L->position, TRUE);
+
+            auto& dsgraph = get_context(batch_id);
+
             const bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
             const bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
                 !dsgraph.mapSorted.empty();
@@ -134,9 +148,59 @@ void CRender::render_lights(light_Package& LP)
             {
                 Stats.s_finalclip++;
             }
-            L->svis.end();
-            dsgraph.r_pmask(true, false);
+
+            L->svis[batch_id].end(); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
+            RImplementation.release_context(batch_id);
         }
+
+        lights_queue.clear();
+    };
+
+    while (!LP.v_shadowed.empty())
+    {
+        // if (has_spot_shadowed)
+        Stats.s_used++;
+
+        // generate spot shadowmap
+        Target->phase_smap_spot_clear();
+        xr_vector<light*>& source = LP.v_shadowed;
+        light* L = source.back();
+        const u16 sid = L->vis.smap_ID;
+        while (true)
+        {
+            if (source.empty())
+                break;
+            L = source.back();
+            if (L->vis.smap_ID != sid)
+                break;
+
+            const auto batch_id = alloc_context();
+            if (batch_id == R_dsgraph_structure::INVALID_CONTEXT_ID)
+            {
+                VERIFY(!lights_queue.empty());
+                flush_lights();
+                continue;
+            }
+
+            source.pop_back();
+            Lights_LastFrame.push_back(L);
+
+            // calculate
+            task_data_t data;
+            data.batch_id = batch_id;
+            data.L = L;
+            data.task = &TaskScheduler->CreateTask("slight_calc", calc_lights, sizeof(data), (void*)&data);
+            if (o.mt_calculate)
+            {
+                TaskScheduler->PushTask(*data.task);
+            }
+            else
+            {
+                TaskScheduler->RunTask(*data.task);
+            }
+            lights_queue.emplace_back(data);
+        }
+        flush_lights(); // in case if something left
 
         PIX_EVENT(UNSHADOWED_LIGHTS);
 

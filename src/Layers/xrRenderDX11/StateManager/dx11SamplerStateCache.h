@@ -59,6 +59,4 @@ private:
     float m_uiMipLODBias;
 };
 
-extern dx11SamplerStateCache SSManager;
-
 #endif //	dx11SamplerStateCache_included

@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-CBackend RCache;
-
-void CBackend::CreateQuadIB()
+void D3DXRenderBase::CreateQuadIB()
 {
     constexpr auto triCount = 4 * 1024;
     constexpr auto idxCount = triCount * 2 * 3;
@@ -29,33 +27,4 @@ void CBackend::CreateQuadIB()
         }
     }
     QuadIB.Unmap(true); // upload index data
-}
-
-// Device dependance
-void CBackend::OnDeviceCreate()
-{
-    CreateQuadIB();
-
-    // streams
-    Vertex.Create();
-    Index.Create();
-
-    // Debug Draw
-    InitializeDebugDraw();
-
-    // invalidate caching
-    Invalidate();
-}
-
-void CBackend::OnDeviceDestroy()
-{
-    // streams
-    Index.Destroy();
-    Vertex.Destroy();
-
-    // Quad
-    QuadIB.Release();
-
-    // Debug Draw
-    DestroyDebugDraw();
 }

@@ -89,7 +89,7 @@ void CRenderTarget::phase_scene_end()
     float d_Z = EPS_S, d_W = 1.f;
 
     // Fill vertex buffer
-    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
     pv++;
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -98,7 +98,7 @@ void CRenderTarget::phase_scene_end()
     pv++;
     pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
     pv++;
-    RCache.Vertex.Unlock(4, g_combine->vb_stride);
+    RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 
     // if (stencil>=1 && aref_pass) stencil = light_id
     RCache.set_Element(s_accum_mask->E[SE_MASK_ALBEDO]); // masker

@@ -8,6 +8,7 @@ class CParticlesObject : public CPS_Instance
 {
     using inherited = CPS_Instance;
 
+    Lock render_lock{};
     u32 dwLastTime;
     void Init(LPCSTR p_name, IRender_Sector::sector_id_t sector_id, BOOL bAutoRemove);
     void UpdateSpatial();
@@ -28,7 +29,7 @@ public:
     virtual bool shedule_Needed() { return true; };
     virtual float shedule_Scale() const;
     virtual void shedule_Update(u32 dt);
-    void renderable_Render(IRenderable* root) override;
+    void renderable_Render(u32 context_id, IRenderable* root) override;
     void PerformAllTheWork(u32 dt);
     void PerformAllTheWork_mt();
 

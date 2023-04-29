@@ -634,9 +634,9 @@ int out_of_memory_handler(size_t size)
     else
     {
         Memory.mem_compact();
-        size_t processHeap = Memory.mem_usage();
-        size_t ecoStrings = g_pStringContainer->stat_economy();
-        size_t ecoSmem = g_pSharedMemoryContainer->stat_economy();
+        const size_t processHeap = Memory.mem_usage();
+        const size_t ecoStrings = g_pStringContainer->stat_economy();
+        const size_t ecoSmem = g_pSharedMemoryContainer->stat_economy();
         Msg("* [x-ray]: process heap[%zu K]", processHeap / 1024);
         Msg("* [x-ray]: economy: strings[%zu K], smem[%zu K]", ecoStrings / 1024, ecoSmem);
     }

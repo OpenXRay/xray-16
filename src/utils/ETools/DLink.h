@@ -248,7 +248,7 @@
         while (pCur != NULL)\
         {\
             classname* pNext = pCur->linkname##DelScan();\
-            delete (pCur);\
+            xr_delete(pCur);\
             pCur = pNext;\
         }\
     }

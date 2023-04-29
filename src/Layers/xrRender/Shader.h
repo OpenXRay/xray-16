@@ -105,9 +105,7 @@ struct ECORE_API SPass : public xr_resource_flagged
 
     ref_texture_list T;
     ref_constant_list C;
-#ifdef _EDITOR
     ref_matrix_list M;
-#endif
 
     SPass() = default;
     ~SPass();

@@ -71,7 +71,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
     if (SE_SUN_NEAR == sub_phase) //.
     {
         // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
         pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -80,7 +80,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         pv++;
         pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
 
         // setup
@@ -131,7 +131,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
+            xf_project.mul(m_TexelAdjust, fuckingsun->X.D[0].combine);
             m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
@@ -179,7 +179,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         j1.set(scale_X, scale_X).add(offset);
 
         // Fill vertex buffer
-        FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(4, g_combine_2UV->vb_stride, Offset);
+        FVF::TL2uv* pv = (FVF::TL2uv*)RImplementation.Vertex.Lock(4, g_combine_2UV->vb_stride, Offset);
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y, j0.x, j1.y);
         pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y, j0.x, j0.y);
@@ -188,7 +188,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         pv++;
         pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y, j1.x, j0.y);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
 
         // setup
@@ -293,7 +293,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
     if (SE_SUN_NEAR == sub_phase) //.
     {
         // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
         pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -302,7 +302,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         pv++;
         pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
 
         // setup
@@ -354,7 +354,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
+            xf_project.mul(m_TexelAdjust, fuckingsun->X.D[sub_phase].combine);
             m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
@@ -412,12 +412,12 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         // Fill vertex buffer
         u32 i_offset;
         {
-            u16* pib = RCache.Index.Lock(sizeof(accum_direct::facetable) / sizeof(u16), i_offset);
+            u16* pib = RImplementation.Index.Lock(sizeof(accum_direct::facetable) / sizeof(u16), i_offset);
             CopyMemory(pib, &accum_direct::facetable, sizeof(accum_direct::facetable));
-            RCache.Index.Unlock(sizeof(accum_direct::facetable) / sizeof(u16));
+            RImplementation.Index.Unlock(sizeof(accum_direct::facetable) / sizeof(u16));
             // corners
             u32 ver_count = sizeof(accum_direct::corners) / sizeof(Fvector3);
-            FVF::L* pv = (FVF::L*)RCache.Vertex.Lock(ver_count, g_combine_cuboid.stride(), Offset);
+            FVF::L* pv = (FVF::L*)RImplementation.Vertex.Lock(ver_count, g_combine_cuboid.stride(), Offset);
 
             Fmatrix inv_XDcombine;
             if (/*ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_ZCULLING) &&*/ sub_phase == SE_SUN_FAR)
@@ -432,7 +432,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
                 pv->set(tmp_vec, C);
                 pv++;
             }
-            RCache.Vertex.Unlock(ver_count, g_combine_cuboid.stride());
+            RImplementation.Vertex.Unlock(ver_count, g_combine_cuboid.stride());
         }
 
         RCache.set_Geometry(g_combine_cuboid);
@@ -551,7 +551,7 @@ void CRenderTarget::accum_direct_blend()
         float d_Z = EPS_S, d_W = 1.f;
 
         // Fill vertex buffer
-        FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(4, g_combine_2UV->vb_stride, Offset);
+        FVF::TL2uv* pv = (FVF::TL2uv*)RImplementation.Vertex.Lock(4, g_combine_2UV->vb_stride, Offset);
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y, p0.x, p1.y);
         pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y, p0.x, p0.y);
@@ -560,7 +560,7 @@ void CRenderTarget::accum_direct_blend()
         pv++;
         pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y, p1.x, p0.y);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_2D]);
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
@@ -611,7 +611,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         RCache.ClearRT(rt_Generic_0, {});
 
         // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
         pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -620,7 +620,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         pv++;
         pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
         RCache.set_Geometry(g_combine);
 
         // setup
@@ -667,7 +667,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
             Fmatrix xf_invview;
             xf_invview.invert(Device.mView);
             Fmatrix xf_project;
-            xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
+            xf_project.mul(m_TexelAdjust, fuckingsun->X.D[0].combine);
             m_shadow.mul(xf_project, xf_invview);
 
             // tsm-bias
@@ -691,7 +691,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         j1.set(scale_X, scale_X).add(offset);
 
         // Fill vertex buffer
-        FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(4, g_combine_2UV->vb_stride, Offset);
+        FVF::TL2uv* pv = (FVF::TL2uv*)RImplementation.Vertex.Lock(4, g_combine_2UV->vb_stride, Offset);
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y, j0.x, j1.y);
         pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y, j0.x, j0.y);
@@ -700,7 +700,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         pv++;
         pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y, j1.x, j0.y);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine_2UV->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
 
         // setup
@@ -785,7 +785,7 @@ void CRenderTarget::accum_direct_lum()
 
     // Fill vertex buffer
     VERIFY(sizeof(v_aa) == g_aa_AA->vb_stride);
-    v_aa* pv = (v_aa*)RCache.Vertex.Lock(4, g_aa_AA->vb_stride, Offset);
+    v_aa* pv = (v_aa*)RImplementation.Vertex.Lock(4, g_aa_AA->vb_stride, Offset);
     pv->p.set(EPS, float(_h + EPS), EPS, 1.f);
     pv->uv0.set(p0.x, p1.y);
     pv->uvJ.set(j0.x, j1.y);
@@ -822,7 +822,7 @@ void CRenderTarget::accum_direct_lum()
     pv->uv4.set(p1.x - ddw, p0.y + ddh, 0, 0);
     pv->uv5.set(0, 0, 0, 0);
     pv++;
-    RCache.Vertex.Unlock(4, g_aa_AA->vb_stride);
+    RImplementation.Vertex.Unlock(4, g_aa_AA->vb_stride);
     RCache.set_Geometry(g_aa_AA);
 
     // setup

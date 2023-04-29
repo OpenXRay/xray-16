@@ -60,6 +60,4 @@ private:
 #endif
 };
 
-extern dx11ShaderResourceStateCache SRVSManager;
-
 #endif //	dx11ShaderResourceStateCache_included

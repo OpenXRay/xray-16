@@ -4,8 +4,6 @@
 
 using dx11StateUtils::operator==;
 
-dx11SamplerStateCache SSManager;
-
 dx11SamplerStateCache::dx11SamplerStateCache() : m_uiMaxAnisotropy(1), m_uiMipLODBias(0.0f)
 {
     static const int iMaxRSStates = 10;

@@ -335,6 +335,7 @@ set(SRC_FILES
     "../xrRender_R2/r3_rendertarget_phase_rain.cpp"
     "../xrRender_R2/r3_rendertarget_phase_occq.cpp"
     "../xrRender_R2/r3_rendertarget_phase_scene.cpp"
+    "../xrRender_R2/render_phase_sun.cpp"
     "../xrRender_R2/SMAP_Allocator.h"
     "../xrRenderGL/Blender_Recorder_GL.cpp"
     "../xrRenderGL/CommonTypes.h"

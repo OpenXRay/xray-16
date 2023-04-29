@@ -27,7 +27,7 @@ public:
     virtual void reinit();
     virtual void reload(LPCSTR section);
     virtual void net_Destroy();
-    virtual void renderable_Render(IRenderable* root);
+    virtual void renderable_Render(u32 context_id, IRenderable* root);
     virtual void attach(CInventoryItem* inventory_item);
     virtual void detach(CInventoryItem* inventory_item);
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
