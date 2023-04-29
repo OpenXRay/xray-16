@@ -3,8 +3,6 @@
 #include "Layers/xrRenderDX11/dx11StateUtils.h"
 #include "dx11StateCache.h"
 
-dx11StateManager StateManager;
-
 //  DX11: TODO: Implement alpha referense control
 
 dx11StateManager::dx11StateManager()

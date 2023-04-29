@@ -142,7 +142,7 @@ static class cl_alpha_ref : public R_constant_setup
     {
         // TODO: OGL: Implement AlphaRef.
 #   if defined(USE_DX11)
-        StateManager.BindAlphaRef(C);
+        RCache.StateManager.BindAlphaRef(C);
 #   endif
     }
 } binder_alpha_ref;

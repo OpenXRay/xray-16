@@ -130,10 +130,10 @@ void CRenderTarget::accum_direct(u32 sub_phase)
                     RCache.set_CullMode(CULL_NONE);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0x81, 0x7f, D3DSTENCILOP_KEEP,
                         D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
             }
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -325,10 +325,10 @@ void CRenderTarget::accum_direct(u32 sub_phase)
                     RCache.set_Element(s_accum_direct_msaa[i]->E[uiElementIndex]);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
                     RCache.set_CullMode(CULL_NONE);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
             }
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
         }
@@ -447,10 +447,10 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
                     RCache.set_CullMode(CULL_NONE);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0x81, 0x7f, D3DSTENCILOP_KEEP,
                         D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
             }
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff,
                     D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -714,10 +714,10 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, st_mask, D3DSTENCILOP_KEEP,
                         st_pass, D3DSTENCILOP_KEEP);
                     RCache.set_CullMode(CULL_NONE);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
             }
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
         }
@@ -804,10 +804,10 @@ void CRenderTarget::accum_direct_blend()
                 {
                     RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_2D]);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
             }
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
         }
@@ -909,10 +909,10 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
                     RCache.set_Stencil(TRUE, D3DCMP_LESS, dwLightMarkerID, 0x81, 0x7f, D3DSTENCILOP_KEEP,
                         D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
                     RCache.set_CullMode(CULL_NONE);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
             }
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -1031,10 +1031,10 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
                     RCache.set_Element(s_accum_direct_msaa[i]->E[sub_phase]);
                     RCache.set_CullMode(CULL_NONE);
                     RCache.set_Stencil(TRUE, D3DCMP_LESS, dwLightMarkerID | 0x80, 0xff, 0x00);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
             }
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
         }
@@ -1175,12 +1175,12 @@ void CRenderTarget::accum_direct_lum()
             for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
             {
                 RCache.set_Element(s_accum_direct_msaa[i]->E[SE_SUN_LUMINANCE]);
-                StateManager.SetSampleMask(u32(1) << i);
+                RCache.StateManager.SetSampleMask(u32(1) << i);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
                 RCache.set_CullMode(CULL_NONE);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
             }
-            StateManager.SetSampleMask(0xffffffff);
+            RCache.StateManager.SetSampleMask(0xffffffff);
         }
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
     }

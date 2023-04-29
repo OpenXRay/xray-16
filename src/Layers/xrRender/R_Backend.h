@@ -19,6 +19,7 @@
 
 #ifdef USE_DX11
 #include "Layers/xrRenderPC_R4/r_backend_lod.h"
+#include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
 #endif
 
 #include "FVF.h"
@@ -573,6 +574,9 @@ private:
     ID3DBlob* m_pInputSignature;
 
     bool m_bChangedRTorZB;
+
+public:
+    dx11StateManager StateManager;
 #endif // USE_DX11
 };
 #pragma warning(pop)

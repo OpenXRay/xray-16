@@ -44,14 +44,14 @@ dx11State* dx11State::Create(SimulatorStates& state_code)
 HRESULT dx11State::Apply()
 {
     VERIFY(m_pRasterizerState);
-    StateManager.SetRasterizerState(m_pRasterizerState);
+    RCache.StateManager.SetRasterizerState(m_pRasterizerState);
     VERIFY(m_pDepthStencilState);
-    StateManager.SetDepthStencilState(m_pDepthStencilState);
+    RCache.StateManager.SetDepthStencilState(m_pDepthStencilState);
     if (m_uiStencilRef != -1)
-        StateManager.SetStencilRef(m_uiStencilRef);
+        RCache.StateManager.SetStencilRef(m_uiStencilRef);
     VERIFY(m_pBlendState);
-    StateManager.SetBlendState(m_pBlendState);
-    StateManager.SetAlphaRef(m_uiAlphaRef);
+    RCache.StateManager.SetBlendState(m_pBlendState);
+    RCache.StateManager.SetAlphaRef(m_uiAlphaRef);
 
     SSManager.GSApplySamplers(m_GSSamplers);
     SSManager.VSApplySamplers(m_VSSamplers);

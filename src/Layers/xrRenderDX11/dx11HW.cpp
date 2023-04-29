@@ -378,7 +378,7 @@ void CHW::DestroyDevice()
     //  Destroy state managers
     if (ThisInstanceIsGlobal()) // only if we are global HW
     {
-        StateManager.Reset();
+        RCache.StateManager.Reset();
         RSManager.ClearStateArray();
         DSSManager.ClearStateArray();
         BSManager.ClearStateArray();

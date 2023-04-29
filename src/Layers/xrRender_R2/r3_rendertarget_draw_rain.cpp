@@ -286,12 +286,12 @@ void CRenderTarget::draw_rain(light& RainSetup)
                     RCache.set_c("m_sunmask", m_clouds_shadow);
                     RCache.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
                     RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.set_CullMode(CULL_NONE);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else
@@ -343,12 +343,12 @@ void CRenderTarget::draw_rain(light& RainSetup)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     RCache.set_Element(s_rain_msaa[i]->E[1]);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                     RCache.set_CullMode(CULL_NONE);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else
@@ -392,10 +392,10 @@ void CRenderTarget::draw_rain(light& RainSetup)
                 {
                     RCache.set_Element(s_rain_msaa[i]->E[2]);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else

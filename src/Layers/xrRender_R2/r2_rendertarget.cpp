@@ -78,8 +78,8 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 #   if defined(USE_DX11)
     switch (eSOM)
     {
-    case SO_Light: StateManager.SetStencilRef(dwLightMarkerID); break;
-    case SO_Combine: StateManager.SetStencilRef(0x01); break;
+    case SO_Light: RCache.StateManager.SetStencilRef(dwLightMarkerID); break;
+    case SO_Combine: RCache.StateManager.SetStencilRef(0x01); break;
     default: VERIFY(!"CRenderTarget::u_stencil_optimize. switch no default!");
     }
 #   endif

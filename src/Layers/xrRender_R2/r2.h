@@ -324,7 +324,6 @@ public:
     void render_forward();
     void render_indirect(light* L) const;
     void render_lights(light_Package& LP);
-    void render_menu();
 
     render_main r_main;
 #if RENDER != R_R2

@@ -239,11 +239,11 @@ void CRenderTarget::phase_combine()
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     RCache.set_Element(s_combine_msaa[i]->E[0]);
-                    StateManager.SetSampleMask(u32(1) << i);
+                    RCache.StateManager.SetSampleMask(u32(1) << i);
                     RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                RCache.StateManager.SetSampleMask(0xffffffff);
             }
             RCache.set_Stencil(FALSE, D3DCMP_EQUAL, 0x01, 0xff, 0);
         }
