@@ -5,6 +5,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/IRenderable.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "xrCore/Threading/ParallelFor.hpp"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -1088,6 +1089,7 @@ void render_sun::init()
     // 		size *= MAP_GROW_FACTOR;
     // 	}
     /// 	m_sun_cascades[m_sun_cascades.size()-1].size = 80;
+    sun = (light*)RImplementation.Lights.sun._get();
 
     const Fcolor sun_color = sun->color;
     o.active = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
@@ -1125,6 +1127,8 @@ void render_sun::calculate_task(Task&, void*)
     Fmatrix cull_xform[R__NUM_SUN_CASCADES];
     for (u32 cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind)
     {
+        cull_planes.clear();
+
         FPU::m64r();
         // Lets begin from base frustum
         Fmatrix fullxform_inv = Device.mInvFullTransform;
@@ -1308,26 +1312,37 @@ void render_sun::calculate_task(Task&, void*)
 
         // full-xform
         FPU::m24r();
-
-        // Begin SMAP-render
-        auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
-        dsgraph.reset(); // tmp
-        {
-            //		sun->svis.begin					();
-            dsgraph.o.phase = CRender::PHASE_SMAP;
-            dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-            dsgraph.o.sector_id = RImplementation.get_largest_sector();
-            dsgraph.o.xform = cull_xform[cascade_ind];
-            dsgraph.o.view_frustum = cull_frustum[cascade_ind];
-            dsgraph.o.view_pos = cull_COP[cascade_ind];
-
-            // Fill the database
-            dsgraph.build_subspace();
-        }
     }
 
-    if (need_to_render_sunshafts)
-        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
+    const auto process_cascade = [&, this](const TaskRange<u32>& range)
+    {
+        for (u32 cascade_ind = range.begin(); cascade_ind != range.end(); ++cascade_ind)
+        {
+            // Begin SMAP-render
+            auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
+            {
+                //		sun->svis.begin					();
+                dsgraph.o.phase = CRender::PHASE_SMAP;
+                dsgraph.r_pmask(true, RImplementation.o.Tshadows);
+                dsgraph.o.sector_id = RImplementation.get_largest_sector();
+                dsgraph.o.xform = cull_xform[cascade_ind];
+                dsgraph.o.view_frustum = cull_frustum[cascade_ind];
+                dsgraph.o.view_pos = cull_COP[cascade_ind];
+
+                // Fill the database
+                dsgraph.build_subspace();
+            }
+        }
+    };
+    
+    if (o.mt_enabled)
+    {
+        xr_parallel_for(TaskRange<u32>(0, m_sun_cascades.size()), process_cascade);
+    }
+    else
+    {
+        process_cascade(TaskRange<u32>(0, m_sun_cascades.size()));
+    }
 }
 
 void render_sun::render()
@@ -1336,6 +1351,9 @@ void render_sun::render()
 
     if (!o.active)
         return;
+
+    if (need_to_render_sunshafts)
+        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
@@ -1364,6 +1382,7 @@ void render_sun::render()
                 dsgraph.render_sorted(); // strict-sorted geoms
             }
         }
+        RImplementation.release_context(dsgraph.context_id);
 
         // Accumulate
         RImplementation.Target->phase_accumulator();
