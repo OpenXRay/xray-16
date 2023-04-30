@@ -152,7 +152,7 @@ void ALDeviceList::Enumerate()
     }
 
     // make token
-    u32 _cnt = GetNumDevices();
+    const auto _cnt = GetNumDevices();
     snd_devices_token = xr_alloc<xr_token>(_cnt + 1);
     snd_devices_token[_cnt].id = -1;
     snd_devices_token[_cnt].name = nullptr;
@@ -188,7 +188,11 @@ void ALDeviceList::Enumerate()
 #endif
 }
 
-pcstr ALDeviceList::GetDeviceName(u32 index) const { return snd_devices_token[index].name; }
+pcstr ALDeviceList::GetDeviceName(size_t index) const
+{
+    return snd_devices_token[index].name;
+}
+
 void ALDeviceList::SelectBestDevice()
 {
     int best_majorVersion = -1;
@@ -230,7 +234,7 @@ void ALDeviceList::SelectBestDevice()
 /*
  * Returns the major and minor version numbers for a device at a specified index in the complete list
  */
-void ALDeviceList::GetDeviceVersion(u32 index, int* major, int* minor)
+void ALDeviceList::GetDeviceVersion(size_t index, int* major, int* minor)
 {
     *major = m_devices[index].major_ver;
     *minor = m_devices[index].minor_ver;
