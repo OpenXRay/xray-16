@@ -197,7 +197,7 @@ void CHOM::Render_DB(CFrustum& base)
     clip.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_NEAR);
     sPoly src, dst;
     u32 _frame = Device.dwFrame;
-    stats.FrustumTriangleCount = xrc.r_count();
+    stats.FrustumTriangleCount = static_cast<u32>(xrc.r_count());
     stats.VisibleTriangleCount = 0;
 
     // Perfrom selection, sorting, culling

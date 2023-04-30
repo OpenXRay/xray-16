@@ -95,7 +95,7 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
         else
         {
             xrc.ray_query(CDB::OPT_ONLYFIRST, &Static, start, dir, range);
-            return xrc.r_count();
+            return !!xrc.r_count();
         }
     }
     return FALSE;

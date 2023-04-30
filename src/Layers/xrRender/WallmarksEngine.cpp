@@ -210,14 +210,14 @@ void CWallmarksEngine::AddWallmark_internal(
         bb_query.grow(sz * 2.5f);
         bb_query.get_CD(bbc, bbd);
         xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bbc, bbd);
-        u32 triCount = xrc.r_count();
+        const auto triCount = xrc.r_count();
         if (0 == triCount)
             return;
 
         CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
         sml_collector.clear();
         sml_collector.add_face_packed_D(pVerts[pTri->verts[0]], pVerts[pTri->verts[1]], pVerts[pTri->verts[2]], 0);
-        for (u32 t = 0; t < triCount; t++)
+        for (size_t t = 0; t < triCount; t++)
         {
             CDB::TRI* T = tris + xrc.r_begin()[t].id;
             if (T == pTri)
