@@ -356,7 +356,8 @@ void CUIScrollView::SetDownIndention(float val)
     m_flags.set(eNeedRecalc, TRUE);
 }
 
-u32 CUIScrollView::GetSize() { return m_pad->GetChildNum(); }
+u32 CUIScrollView::GetSize() const { return m_pad->GetChildNum(); }
+
 CUIWindow* CUIScrollView::GetItem(u32 idx)
 {
     if (m_pad->GetChildWndList().size() <= idx)
