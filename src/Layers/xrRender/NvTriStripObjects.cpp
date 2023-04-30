@@ -659,8 +659,8 @@ void NvStripifier::RemoveSmallStrips(NvStripInfoVec& allStrips, NvStripInfoVec& 
         {
             // strip is too small, add faces to faceList
             tempFaceList.reserve(lenList);
-            for (const auto& m_face : strip->m_faces)
-                tempFaceList.push_back(m_face);
+            for (const auto& face : strip->m_faces)
+                tempFaceList.push_back(face);
 
             // and xr_free memory
             xr_delete(strip);
