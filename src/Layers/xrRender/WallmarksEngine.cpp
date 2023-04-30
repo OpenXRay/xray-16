@@ -254,8 +254,8 @@ void CWallmarksEngine::AddWallmark_internal(
         Fbox bb;
         bb.invalidate();
 
-        for (auto &i : W->verts)
-            bb.modify(i.p);
+        for (const auto& lit : W->verts)
+            bb.modify(lit.p);
         bb.getsphere(W->bounds.P, W->bounds.R);
     }
 

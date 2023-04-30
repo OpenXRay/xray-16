@@ -386,6 +386,7 @@ void CRender::LoadSectors(IReader* fs)
 
             if (do_rebuild)
             {
+                CL.reserve_faces(P.vertices.size() - 2);
                 for (u32 j = 2; j < P.vertices.size(); j++)
                     CL.add_face_packed_D(P.vertices[0], P.vertices[j - 1], P.vertices[j], u32(i));
             }

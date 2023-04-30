@@ -75,6 +75,7 @@ void CHOM::Load()
         IReader* S = fs->open_chunk(1);
         const auto begin = static_cast<HOM_poly*>(S->pointer());
         const auto end   = static_cast<HOM_poly*>(S->end());
+        CL.reserve_faces(S->length());
         for (HOM_poly* poly = begin; poly != end; ++poly)
         {
             CL.add_face_packed_D(poly->v1, poly->v2, poly->v3, poly->flags, 0.01f);

@@ -182,6 +182,7 @@ public:
     void add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, u32 dummy, float eps = EPS);
     void remove_duplicate_T();
     void calc_adjacency(xr_vector<u32>& dest) const;
+    void reserve_faces(size_t count) { faces.reserve(count); }
 
     Fvector* getV() { return &*verts.begin(); }
     size_t getVS() { return verts.size(); }

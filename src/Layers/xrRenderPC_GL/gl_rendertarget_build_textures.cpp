@@ -4,17 +4,21 @@ static void generate_jitter(u32* dest, u32 elem_count)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
-    while (samples.size() < elem_count * 2)
+
+    const size_t count = elem_count * 2;
+    samples.reserve(count);
+
+    while (samples.size() < count)
     {
         Ivector2 test;
         test.set(Random.randI(0, 256), Random.randI(0, 256));
-        BOOL valid = TRUE;
-        for (auto& sample : samples)
+        bool valid = true;
+        for (const auto& sample : samples)
         {
-            int dist = _abs(test.x - sample.x) + _abs(test.y - sample.y);
+            const u32 dist = _abs(test.x - sample.x) + _abs(test.y - sample.y);
             if (dist < 32)
             {
-                valid = FALSE;
+                valid = false;
                 break;
             }
         }
@@ -24,6 +28,7 @@ static void generate_jitter(u32* dest, u32 elem_count)
     for (u32 it = 0; it < elem_count; it++, dest++)
         *dest = color_rgba(samples[2 * it].x, samples[2 * it].y, samples[2 * it + 1].y, samples[2 * it + 1].x);
 }
+
 void CRenderTarget::build_textures()
 {
     // Texture for async sreenshots

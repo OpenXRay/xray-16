@@ -4,17 +4,21 @@ static void generate_jitter(u32* dest, u32 elem_count)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
-    while (samples.size() < elem_count * 2)
+
+    const size_t count = elem_count * 2;
+    samples.reserve(count);
+
+    while (samples.size() < count)
     {
         Ivector2 test;
-        test.set(::Random.randI(0, 256), ::Random.randI(0, 256));
-        BOOL valid = TRUE;
-        for (u32 t = 0; t < samples.size(); t++)
+        test.set(Random.randI(0, 256), Random.randI(0, 256));
+        bool valid = true;
+        for (const auto& sample : samples)
         {
-            int dist = _abs(test.x - samples[t].x) + _abs(test.y - samples[t].y);
+            const u32 dist = _abs(test.x - sample.x) + _abs(test.y - sample.y);
             if (dist < 32)
             {
-                valid = FALSE;
+                valid = false;
                 break;
             }
         }
