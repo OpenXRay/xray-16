@@ -1,6 +1,6 @@
 #pragma once
 
-const u32 occq_size = 2 * 768; // 256	;	// queue for occlusion queries
+constexpr u32 occq_size = 2 * 768 * R__NUM_PARALLEL_CONTEXTS; // // queue for occlusion queries
 
 // must conform to following order of allocation/free
 // a(A), a(B), a(C), a(D), ....
