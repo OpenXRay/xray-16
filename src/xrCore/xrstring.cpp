@@ -15,7 +15,7 @@ XRCORE_API str_container* g_pStringContainer = nullptr;
 struct str_container_impl
 {
     Lock cs;
-    static constexpr u32 buffer_size = 1024 * 256;
+    static constexpr size_t buffer_size = 1024u * 256u;
     str_value* buffer[buffer_size];
     int num_docs;
 
@@ -51,7 +51,7 @@ struct str_container_impl
 
     void clean()
     {
-        for (u32 i = 0; i < buffer_size; ++i)
+        for (size_t i = 0; i < buffer_size; ++i)
         {
             str_value** current = &buffer[i];
 
@@ -74,12 +74,12 @@ struct str_container_impl
     void verify() const
     {
         Msg("strings verify started");
-        for (u32 i = 0; i < buffer_size; ++i)
+        for (size_t i = 0; i < buffer_size; ++i)
         {
             const str_value* value = buffer[i];
             while (value)
             {
-                const u32 crc = crc32(value->value, value->dwLength);
+                const auto crc = crc32(value->value, value->dwLength);
                 string32 crc_str;
                 R_ASSERT3(crc == value->dwCRC, "CorePanic: read-only memory corruption (shared_strings)",
                     xr_itoa(value->dwCRC, crc_str, 16));
@@ -93,7 +93,7 @@ struct str_container_impl
 
     void dump(FILE* f) const
     {
-        for (u32 i = 0; i < buffer_size; ++i)
+        for (size_t i = 0; i < buffer_size; ++i)
         {
             str_value* value = buffer[i];
             while (value)
@@ -107,7 +107,7 @@ struct str_container_impl
 
     void dump(IWriter* f) const
     {
-        for (u32 i = 0; i < buffer_size; ++i)
+        for (size_t i = 0; i < buffer_size; ++i)
         {
             str_value* value = buffer[i];
             string4096 temp;
@@ -121,10 +121,10 @@ struct str_container_impl
         }
     }
 
-    int stat_economy() const
+    ptrdiff_t stat_economy() const
     {
-        int counter = 0;
-        for (u32 i = 0; i < buffer_size; ++i)
+        ptrdiff_t counter = 0;
+        for (size_t i = 0; i < buffer_size; ++i)
         {
             const str_value* value = buffer[i];
             while (value)
@@ -156,15 +156,15 @@ str_value* str_container::dock(pcstr value) const
     str_value* result = nullptr;
 
     // calc len
-    const u32 s_len = xr_strlen(value);
-    const u32 s_len_with_zero = static_cast<u32>(s_len) + 1;
+    const auto s_len = xr_strlen(value);
+    const auto s_len_with_zero = s_len + 1;
     VERIFY(sizeof(str_value) + s_len_with_zero < 4096);
 
     // setup find structure
     char header[sizeof(str_value)];
     str_value* sv = (str_value*)header;
     sv->dwReference = 0;
-    sv->dwLength = s_len;
+    sv->dwLength = static_cast<u32>(s_len);
     sv->dwCRC = crc32(value, s_len);
 
     // search
@@ -234,14 +234,14 @@ void str_container::dump(IWriter* W) const
     impl->cs.Leave();
 }
 
-u32 str_container::stat_economy() const
+size_t str_container::stat_economy() const
 {
     impl->cs.Enter();
-    int counter = 0;
+    ptrdiff_t counter = 0;
     counter -= sizeof(*this);
     counter += impl->stat_economy();
     impl->cs.Leave();
-    return u32(counter);
+    return size_t(counter);
 }
 
 str_container::~str_container()
