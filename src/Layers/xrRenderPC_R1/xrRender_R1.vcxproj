@@ -69,6 +69,7 @@
     <ClInclude Include="..\xrRender\Animation.h" />
     <ClInclude Include="..\xrRender\AnimationKeyCalculate.h" />
     <ClInclude Include="..\xrRender\Blender.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_light.h" />
     <ClInclude Include="..\xrRender\Blender_CLSID.h" />
     <ClInclude Include="..\xrRender\Blender_Recorder.h" />
     <ClInclude Include="..\xrRender\blenders\Blender_BmmD.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="..\xrRenderDX9\dx9SH_RT.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\Blender.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_light.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still.cpp" />

@@ -22,12 +22,19 @@ void CLight_DB::Load(IReader* fs)
         v_static.reserve(count);
         for (size_t i = 0; i < count; ++i)
         {
+            light* L = Create();
+            L->flags.bStatic = true;
+
+#if RENDER == R_R1
+            Flight& Ldata = L->ldata;
+#else
             Flight Ldata;
+#endif
             F->advance(sizeof(u32)); // u32 controller = F->r_u32();
             F->r(&Ldata, sizeof(Flight));
 
-            light* L = Create();
-            L->flags.bStatic = true;
+            Ldata.specular.set(Ldata.diffuse);
+            Ldata.specular.mul_rgb(0.2f);
 
             if (Ldata.type == Flight::Type::Directional)
             {

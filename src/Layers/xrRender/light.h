@@ -37,7 +37,9 @@ public:
     float m_volumetric_intensity;
     float m_volumetric_distance;
 
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
+#if RENDER == R_R1
+    Flight ldata;
+#else
     float falloff; // precalc to make light equal to zero at light range
     float attenuation0; // Constant attenuation
     float attenuation1; // Linear attenuation

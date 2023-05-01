@@ -597,6 +597,9 @@
     <ClInclude Include="..\xrRender\dxImGuiRender.h">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\blender_light.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -994,6 +997,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\blender_light.cpp">
+      <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -22,6 +22,10 @@ class CLightR_Manager
     xr_vector<light*> selected_point;
     xr_vector<light*> selected_spot;
 
+    // For FFP
+    ref_shader hShader;
+    ref_geom hGeom;
+
 public:
     CLightR_Manager();
     virtual ~CLightR_Manager();
@@ -30,6 +34,10 @@ public:
     void render(u32 _priority);
     void render_point(u32 _priority);
     void render_spot(u32 _priority);
+    void render_ffp();
+
+private:
+    void render_ffp_light(const light& L);
 };
 
 //////////////////////////////////////////////////////////////////////////
