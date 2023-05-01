@@ -438,6 +438,12 @@ void CLightR_Manager::render(u32 _priority)
     {
         if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_DYNAMIC)
             render_ffp();
+
+        if (_priority == 1)
+        {
+            selected_spot.clear();
+            selected_point.clear();
+        }
         return;
     }
 
