@@ -56,7 +56,7 @@ void CBlender_LmEbB::Compile(CBlender_Compile& C)
 
 void CBlender_LmEbB::CompileFFP(CBlender_Compile& C) const
 {
-    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
         compile_ED(C);
     else
     {
@@ -125,9 +125,12 @@ void CBlender_LmEbB::compile_2(CBlender_Compile& C) const
         C.PassSET_LightFog(FALSE, TRUE);
 
         // Stage0 - Detail
-        C.StageBegin();
-        C.StageTemplate_LMAP0();
-        C.StageEnd();
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageTemplate_LMAP0();
+            C.StageEnd();
+        }
     }
     C.PassEnd();
 
@@ -178,14 +181,17 @@ void CBlender_LmEbB::compile_3(CBlender_Compile& C) const
         C.StageEnd();
 
         // Stage2 - [*] Lightmap
-        C.StageBegin();
-        C.StageSET_Address(D3DTADDRESS_CLAMP);
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
-        C.Stage_Texture("$base1");
-        C.Stage_Matrix("$null", 1);
-        C.Stage_Constant("$null");
-        C.StageEnd();
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageSET_Address(D3DTADDRESS_CLAMP);
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
+            C.Stage_Texture("$base1");
+            C.Stage_Matrix("$null", 1);
+            C.Stage_Constant("$null");
+            C.StageEnd();
+        }
     }
     C.PassEnd();
 }
@@ -200,9 +206,12 @@ void CBlender_LmEbB::compile_L(CBlender_Compile& C) const
         C.PassSET_LightFog(FALSE, FALSE);
 
         // Stage0 - Detail
-        C.StageBegin();
-        C.StageTemplate_LMAP0();
-        C.StageEnd();
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageTemplate_LMAP0();
+            C.StageEnd();
+        }
     }
     C.PassEnd();
 }

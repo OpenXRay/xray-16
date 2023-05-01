@@ -127,7 +127,7 @@ void CBlender_LaEmB::Compile(CBlender_Compile& C)
 
     const bool bConstant = (0 != xr_stricmp(oT2_const, "$null"));
 
-    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
     {
         if (bConstant)
             compile_EDc(C);
@@ -174,9 +174,12 @@ void CBlender_LaEmB::compile_2(CBlender_Compile& C)
         C.PassSET_LightFog(FALSE, TRUE);
 
         // Stage0 - Lightmap
-        C.StageBegin();
-        C.StageTemplate_LMAP0();
-        C.StageEnd();
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageTemplate_LMAP0();
+            C.StageEnd();
+        }
 
         // Stage1 - Environment map
         C.StageBegin();
@@ -220,11 +223,14 @@ void CBlender_LaEmB::compile_2c(CBlender_Compile& C)
         C.StageEnd();
 
         // Stage1 - [+] Lightmap
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
-        C.StageSET_TMC("$base1", "$null", "$null", 1);
-        C.StageEnd();
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_TMC("$base1", "$null", "$null", 1);
+            C.StageEnd();
+        }
     }
     C.PassEnd();
 
@@ -255,9 +261,12 @@ void CBlender_LaEmB::compile_3(CBlender_Compile& C)
         C.PassSET_LightFog(FALSE, TRUE);
 
         // Stage0 - [=] Lightmap
-        C.StageBegin();
-        C.StageTemplate_LMAP0();
-        C.StageEnd();
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageTemplate_LMAP0();
+            C.StageEnd();
+        }
 
         // Stage1 - [+] Env-map
         C.StageBegin();
@@ -293,11 +302,14 @@ void CBlender_LaEmB::compile_3c(CBlender_Compile& C)
         C.StageEnd();
 
         // Stage0 - [+] Lightmap
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
-        C.StageSET_TMC("$base1", "$null", "$null", 1);
-        C.StageEnd();
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_TMC("$base1", "$null", "$null", 1);
+            C.StageEnd();
+        }
 
         // Stage2 - [*] Base
         C.StageBegin();
@@ -320,9 +332,12 @@ void CBlender_LaEmB::compile_L(CBlender_Compile& C)
         C.PassSET_LightFog(FALSE, FALSE);
 
         // Stage0 - Lightmap
-        C.StageBegin();
-        C.StageTemplate_LMAP0();
-        C.StageEnd();
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageTemplate_LMAP0();
+            C.StageEnd();
+        }
 
         // Stage1 - Environment map
         C.StageBegin();
@@ -350,11 +365,14 @@ void CBlender_LaEmB::compile_Lc(CBlender_Compile& C)
         C.StageEnd();
 
         // Stage1 - [+] Lightmap
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
-        C.StageSET_TMC("$base1", "$null", "$null", 1);
-        C.StageEnd();
+        if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+        {
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+            C.StageSET_TMC("$base1", "$null", "$null", 1);
+            C.StageEnd();
+        }
     }
     C.PassEnd();
 }

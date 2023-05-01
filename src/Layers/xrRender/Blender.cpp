@@ -78,7 +78,7 @@ void IBlender::Compile(CBlender_Compile& C)
     // and set to true in 'else' path
     // but it was ignored anyway in the SetParams ¯\_(ツ)_/¯.
     // Need to research commits from 2003 in xray-soc-history more
-    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
         C.SetParams(oPriority.value, oStrictSorting.value ? true : false);
     else
         C.SetParams(oPriority.value, oStrictSorting.value ? true : false);

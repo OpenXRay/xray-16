@@ -436,7 +436,7 @@ void CLightR_Manager::render(u32 _priority)
 {
     if (RImplementation.o.ffp)
     {
-        if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_DYNAMIC)
+        if (ps_r1_flags.test(R1FLAG_DLIGHTS))
             render_ffp();
 
         if (_priority == 1)
