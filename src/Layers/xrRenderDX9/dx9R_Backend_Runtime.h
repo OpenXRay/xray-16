@@ -283,6 +283,16 @@ ICF void CBackend::set_FillMode(u32 _mode)
     }
 }
 
+IC void CBackend::SetTextureFactor(u32 factor) const
+{
+    CHK_DX(HW.pDevice->SetRenderState(D3DRS_TEXTUREFACTOR, factor));
+}
+
+IC void CBackend::SetAmbient(u32 factor) const
+{
+    CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, factor));
+}
+
 ICF void CBackend::set_VS(ref_vs& _vs) { set_VS(_vs->sh, _vs->cName.c_str()); }
 IC void CBackend::set_Constants(R_constant_table* C)
 {

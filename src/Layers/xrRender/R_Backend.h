@@ -433,6 +433,9 @@ public:
     IC void set_Scissor(Irect* rect = nullptr);
     IC void SetViewport(const D3D_VIEWPORT& viewport) const;
 
+    IC void SetTextureFactor(u32 factor) const;
+    IC void SetAmbient(u32 ambient) const;
+
     // constants
     ICF ref_constant get_c(LPCSTR n)
     {

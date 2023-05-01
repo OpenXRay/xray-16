@@ -459,6 +459,16 @@ ICF void CBackend::set_FillMode(u32 _mode)
     }
 }
 
+ICF void CBackend::SetTextureFactor(u32 /*factor*/) const
+{
+    // Not supported
+}
+
+ICF void CBackend::SetAmbient(u32 /*factor*/) const
+{
+    // Not supported
+}
+
 ICF void CBackend::set_VS(ref_vs& _vs)
 {
     set_VS(_vs->sh, _vs->cName.c_str());

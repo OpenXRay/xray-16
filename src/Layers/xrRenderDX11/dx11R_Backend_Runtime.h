@@ -504,6 +504,16 @@ ICF void CBackend::set_FillMode(u32 _mode)
     StateManager.SetFillMode(_mode);
 }
 
+ICF void CBackend::SetTextureFactor(u32 /*factor*/) const
+{
+    // Not supported
+}
+
+ICF void CBackend::SetAmbient(u32 /*factor*/) const
+{
+    // Not supported
+}
+
 IC void CBackend::ApplyVertexLayout()
 {
     VERIFY(vs);
