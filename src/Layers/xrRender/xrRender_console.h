@@ -87,7 +87,7 @@ enum R1_FFP_LIGHTING_MODE
 {
     R1_FFP_LIGHTING_CONSTANT, // SDK lighting – just constant lighting, not even lightmaps
     R1_FFP_LIGHTING_LIGHTMAP,
-    R1_FFP_LIGHTING_LIGHTS,
+    R1_FFP_LIGHTING_DYNAMIC,
 };
 
 enum

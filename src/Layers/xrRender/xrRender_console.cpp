@@ -142,7 +142,7 @@ const xr_token qffp_lighting_token[] =
 {
     { "st_opt_ffp_constant", R1_FFP_LIGHTING_CONSTANT },
     { "st_opt_ffp_lightmap", R1_FFP_LIGHTING_LIGHTMAP },
-    { "st_opt_ffp_dynamic", R1_FFP_LIGHTING_LIGHTS },
+    { "st_opt_ffp_dynamic",  R1_FFP_LIGHTING_DYNAMIC },
     { nullptr, -1 }
 };
 
