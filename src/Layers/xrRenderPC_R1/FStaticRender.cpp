@@ -395,19 +395,6 @@ void CRender::apply_object(IRenderable* O)
 
 // Misc
 float g_fSCREEN;
-static BOOL gm_Nearer = 0;
-
-IC void gm_SetNearer(BOOL bNearer)
-{
-    if (bNearer != gm_Nearer)
-    {
-        gm_Nearer = bNearer;
-        if (gm_Nearer)
-            RImplementation.rmNear();
-        else
-            RImplementation.rmNormal();
-    }
-}
 
 void CRender::rmNear()
 {
@@ -461,7 +448,7 @@ void CRender::Calculate()
     // Frustum
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    gm_SetNearer(FALSE);
+    rmNormal();
     auto& dsgraph = get_imm_context();
     dsgraph.o.use_hom = true;
     dsgraph.o.phase = PHASE_NORMAL;
