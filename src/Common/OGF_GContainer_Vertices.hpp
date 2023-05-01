@@ -142,8 +142,8 @@ struct r1v_lmap_unpacked
         
         tc0x = (packed.tc0x + T.a) * (32.f / 32768.f);
         tc0y = (packed.tc0y + B.a) * (32.f / 32768.f);
-        tc1x = tc0x;
-        tc1y = tc0y;
+        tc1x = packed.tc1x * (1.f / 32768.f);
+        tc1y = packed.tc1y * (1.f / 32768.f);
         
         return *this;
     }
