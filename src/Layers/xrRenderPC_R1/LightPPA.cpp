@@ -318,6 +318,11 @@ void CLightR_Manager::render_spot(u32 _priority)
 
 void CLightR_Manager::render(u32 _priority)
 {
+    if (RImplementation.o.ffp)
+    {
+        return;    
+    }
+
     auto& dsgraph = RImplementation.get_imm_context();
 
     if (selected_spot.size())
