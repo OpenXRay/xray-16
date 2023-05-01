@@ -320,7 +320,7 @@ void CLightR_Manager::render(u32 _priority)
 {
     if (RImplementation.o.ffp)
     {
-        return;    
+        return;
     }
 
     auto& dsgraph = RImplementation.get_imm_context();
