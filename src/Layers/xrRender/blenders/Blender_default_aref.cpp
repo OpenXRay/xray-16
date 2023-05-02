@@ -142,9 +142,6 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
             C.PassEnd();
             break;
         }
-
-        default:
-            break;
         } // switch (C.iElement)
     }
 }
