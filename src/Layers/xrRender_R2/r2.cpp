@@ -1,23 +1,17 @@
 #include "stdafx.h"
 
-#include "xrCore/Threading/TaskManager.hpp"
-
-#include "xrEngine/xr_object.h"
-#include "xrEngine/CustomHUD.h"
 #include "xrEngine/IGame_Persistent.h"
-#include "xrEngine/Environment.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/SkeletonCustom.h"
-#include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
-#include "Layers/xrRender/ShaderResourceTraits.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
+#include "Layers/xrRenderDX11/StateManager/dx11StateCache.cpp"
 #endif
 
 CRender RImplementation;
@@ -63,23 +57,23 @@ ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cd
 }
 static class cl_parallax : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend &cmd_list, R_constant* C) override
     {
         float h = ps_r2_df_parallax_h;
-        RCache.set_c(C, h, -h / 2.f, 1.f / r_dtex_range, 1.f / r_dtex_range);
+        cmd_list.set_c(C, h, -h / 2.f, 1.f / r_dtex_range, 1.f / r_dtex_range);
     }
 } binder_parallax;
 
 #if defined(USE_DX11)
 static class cl_LOD : public R_constant_setup
 {
-    virtual void setup(R_constant* C) { RCache.LOD.set_LOD(C); }
+    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.LOD.set_LOD(C); }
 } binder_LOD;
 #endif
 
 static class cl_pos_decompress_params : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend &cmd_list, R_constant* C) override
     {
 #if defined(USE_DX9) || defined(USE_DX11)
         const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
@@ -90,59 +84,59 @@ static class cl_pos_decompress_params : public R_constant_setup
 #else
 #   error No graphics API selected or enabled!
 #endif
-        RCache.set_c(
+        cmd_list.set_c(
             C, HorzTan, VertTan, (2.0f * HorzTan) / (float)Device.dwWidth, (2.0f * VertTan) / (float)Device.dwHeight);
     }
 } binder_pos_decompress_params;
 
 static class cl_pos_decompress_params2 : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend &cmd_list, R_constant* C) override
     {
-        RCache.set_c(C, (float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth,
+        cmd_list.set_c(C, (float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth,
             1.0f / (float)Device.dwHeight);
     }
 } binder_pos_decompress_params2;
 
 static class cl_water_intensity : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend &cmd_list, R_constant* C) override
     {
         const auto& env = g_pGamePersistent->Environment().CurrentEnv;
         const float fValue = env.m_fWaterIntensity;
-        RCache.set_c(C, fValue, fValue, fValue, 0.f);
+        cmd_list.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_water_intensity;
 
 static class cl_tree_amplitude_intensity : public R_constant_setup
 {
-    void setup(R_constant* C) override
+    void setup(CBackend &cmd_list, R_constant* C) override
     {
         const auto& env = g_pGamePersistent->Environment().CurrentEnv;
         const float fValue = env.m_fTreeAmplitudeIntensity;
-        RCache.set_c(C, fValue, fValue, fValue, 0.f);
+        cmd_list.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_tree_amplitude_intensity;
 // XXX: do we need to register this binder?
 
 static class cl_sun_shafts_intensity : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend &cmd_list, R_constant* C) override
     {
         const auto& env = g_pGamePersistent->Environment().CurrentEnv;
         const float fValue = env.m_fSunShaftsIntensity;
-        RCache.set_c(C, fValue, fValue, fValue, 0.f);
+        cmd_list.set_c(C, fValue, fValue, fValue, 0.f);
     }
 } binder_sun_shafts_intensity;
 
 #if defined(USE_DX11) || defined(USE_OGL)
 static class cl_alpha_ref : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend &cmd_list, R_constant* C) override
     {
         // TODO: OGL: Implement AlphaRef.
 #   if defined(USE_DX11)
-        RCache.StateManager.BindAlphaRef(C);
+        cmd_list.StateManager.BindAlphaRef(C);
 #   endif
     }
 } binder_alpha_ref;
@@ -602,14 +596,6 @@ void CRender::create()
 #   endif
 #endif
 
-    c_lmaterial = "L_material";
-    c_sbase = "s_base";
-    c_snoise = "s_noise";
-    c_ssky0 = "s_sky0";
-    c_ssky1 = "s_sky1";
-    c_sclouds0 = "s_clouds0";
-    c_sclouds1 = "s_clouds1";
-
     m_bMakeAsyncSS = false;
 
     Target = xr_new<CRenderTarget>(); // Main target
@@ -619,7 +605,7 @@ void CRender::create()
     HWOCC.occq_create(occq_size);
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    rmNormal();
+    rmNormal(RCache);
 #endif
     q_sync_point.Create();
 
@@ -893,25 +879,25 @@ void CRender::add_SkeletonWallmark(
         add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
 
-void CRender::rmNear()
+void CRender::rmNear(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
     const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.f, 0.02f };
-    RCache.SetViewport(viewport);
+    cmd_list.SetViewport(viewport);
 }
 
-void CRender::rmFar()
+void CRender::rmFar(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
     const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f };
-    RCache.SetViewport(viewport);
+    cmd_list.SetViewport(viewport);
 }
 
-void CRender::rmNormal()
+void CRender::rmNormal(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
     const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.f, 1.f };
-    RCache.SetViewport(viewport);
+    cmd_list.SetViewport(viewport);
 }
 
 //////////////////////////////////////////////////////////////////////

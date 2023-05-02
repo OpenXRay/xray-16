@@ -8,6 +8,7 @@
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #endif
 
+class CBackend;
 class ECORE_API R_constant_setup;
 
 enum
@@ -176,7 +177,7 @@ class ECORE_API XR_NOVTABLE R_constant_setup
 {
 public:
     R_constant_setup() = default;
-    virtual void setup(R_constant* C) = 0;
+    virtual void setup(CBackend &cmd_list, R_constant* C) = 0;
     virtual ~R_constant_setup() = default;
 };
 

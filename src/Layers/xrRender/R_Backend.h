@@ -254,6 +254,12 @@ public:
         return nullptr;
     }
 
+    float o_hemi;
+    float o_hemi_cube[/*CROS_impl::NUM_FACES*/6];
+    float o_sun;
+
+    void apply_lmaterial();
+
 #if defined(USE_DX9)
     R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
     R_constant_array& get_ConstantCache_Pixel() { return constants.a_pixel; }
@@ -552,7 +558,11 @@ public:
     void dbg_OverdrawBegin();
     void dbg_OverdrawEnd();
 
-    CBackend() { Invalidate(); }
+    CBackend()
+        : xforms(*this)
+    {
+        Invalidate();
+    }
 
 private:
     // Debug Draw
@@ -592,6 +602,6 @@ public:
 };
 #pragma warning(pop)
 
-extern ECORE_API CBackend RCache;
+#define RCache RImplementation.get_imm_context().cmd_list
 
 #endif

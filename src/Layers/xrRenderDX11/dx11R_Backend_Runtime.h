@@ -2,7 +2,6 @@
 #define dx11R_Backend_Runtime_included
 #pragma once
 
-#include "StateManager/dx11StateManager.h"
 #include "StateManager/dx11ShaderResourceStateCache.h"
 
 IC void CBackend::set_xform(u32 ID, const Fmatrix& M)
@@ -798,7 +797,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
         R_constant* Cs = &**it;
         VERIFY(Cs);
         if (Cs && Cs->handler)
-            Cs->handler->setup(Cs);
+            Cs->handler->setup(*this, Cs);
     }
 }
 

@@ -341,7 +341,7 @@ void dx113DFluidManager::Update(dx113DFluidData& FluidData, float timestep)
     CRenderTarget* pTarget = RImplementation.Target;
     pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
     // RImplementation.Target->phase_scene_begin();
 }
 
@@ -716,7 +716,7 @@ void dx113DFluidManager::RenderFluid(dx113DFluidData& FluidData)
     CRenderTarget* pTarget = RImplementation.Target;
     pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
 }
 
 void dx113DFluidManager::UpdateObstacles(const dx113DFluidData& FluidData, float timestep)

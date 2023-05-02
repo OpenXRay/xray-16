@@ -97,13 +97,6 @@ void CRender::create()
     o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
     o.no_detail_textures = !ps_r2_ls_flags.test(R1FLAG_DETAIL_TEXTURES);
 
-    c_ldynamic_props = "L_dynamic_props";
-    c_sbase = "s_base";
-    c_ssky0 = "s_sky0";
-    c_ssky1 = "s_sky1";
-    c_sclouds0 = "s_clouds0";
-    c_sclouds1 = "s_clouds1";
-
     o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
     if (o.no_ram_textures)
         Msg("* Managed textures disabled");
@@ -375,7 +368,7 @@ void CRender::set_Object(IRenderable* O, u32 phase)
             L_Projector->set_object(nullptr);
     }
 }
-void CRender::apply_object(IRenderable* O)
+void CRender::apply_object(CBackend &cmd_list, IRenderable* O)
 {
     if (nullptr == O)
         return;
@@ -386,7 +379,7 @@ void CRender::apply_object(IRenderable* O)
         VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
         float o_hemi = 0.5f * LT.get_hemi();
         float o_sun = 0.5f * LT.get_sun();
-        RCache.set_c(c_ldynamic_props, o_sun, o_sun, o_sun, o_hemi);
+        cmd_list.set_c(c_ldynamic_props, o_sun, o_sun, o_sun, o_hemi);
         // shadowing
         if ((LT.shadow_recv_frame == Device.dwFrame) && O->renderable_ShadowReceive())
             RImplementation.L_Projector->setup(LT.shadow_recv_slot);
@@ -396,22 +389,22 @@ void CRender::apply_object(IRenderable* O)
 // Misc
 float g_fSCREEN;
 
-void CRender::rmNear()
+void CRender::rmNear(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
-    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 0.02f });
+    cmd_list.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 0.02f });
 }
 
-void CRender::rmFar()
+void CRender::rmFar(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
-    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f });
+    cmd_list.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f });
 }
 
-void CRender::rmNormal()
+void CRender::rmNormal(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
-    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 1.f });
+    cmd_list.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 1.f });
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -448,7 +441,7 @@ void CRender::Calculate()
     // Frustum
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    rmNormal();
+    rmNormal(RCache);
     auto& dsgraph = get_imm_context();
     dsgraph.o.use_hom = true;
     dsgraph.o.phase = PHASE_NORMAL;

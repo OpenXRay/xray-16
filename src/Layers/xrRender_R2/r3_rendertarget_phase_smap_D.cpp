@@ -12,7 +12,7 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
     {
         u_setrt(nullptr, nullptr, nullptr, rt_smap_depth);
         RCache.ClearZB(rt_smap_depth, 1.0f);
-        RImplementation.rmNormal();
+        RImplementation.rmNormal(RCache);
     }
 
     // Stencil	- disable
@@ -24,6 +24,6 @@ void CRenderTarget::phase_smap_direct_tsh(light* L, u32 sub_phase)
     VERIFY(RImplementation.o.Tshadows);
     RCache.set_ColorWriteEnable();
     //	Prepare viewport for shadow map rendering
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
     RCache.ClearRT(RCache.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f }); // color_rgba(127, 127, 12, 12);
 }

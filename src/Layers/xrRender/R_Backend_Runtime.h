@@ -11,7 +11,6 @@
 #include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
 #elif defined(USE_DX11)
 #include "Layers/xrRenderDX11/dx11R_Backend_Runtime.h"
-#include "Layers/xrRenderDX11/StateManager/dx11State.h"
 #elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glR_Backend_Runtime.h"
 #include "Layers/xrRenderGL/glState.h"
@@ -20,7 +19,7 @@
 IC void R_xforms::set_c_w(R_constant* C)
 {
     c_w = C;
-    RCache.set_c(C, m_w);
+    cmd_list.set_c(C, m_w);
 };
 IC void R_xforms::set_c_invw(R_constant* C)
 {
@@ -30,27 +29,27 @@ IC void R_xforms::set_c_invw(R_constant* C)
 IC void R_xforms::set_c_v(R_constant* C)
 {
     c_v = C;
-    RCache.set_c(C, m_v);
+    cmd_list.set_c(C, m_v);
 };
 IC void R_xforms::set_c_p(R_constant* C)
 {
     c_p = C;
-    RCache.set_c(C, m_p);
+    cmd_list.set_c(C, m_p);
 };
 IC void R_xforms::set_c_wv(R_constant* C)
 {
     c_wv = C;
-    RCache.set_c(C, m_wv);
+    cmd_list.set_c(C, m_wv);
 };
 IC void R_xforms::set_c_vp(R_constant* C)
 {
     c_vp = C;
-    RCache.set_c(C, m_vp);
+    cmd_list.set_c(C, m_vp);
 };
 IC void R_xforms::set_c_wvp(R_constant* C)
 {
     c_wvp = C;
-    RCache.set_c(C, m_wvp);
+    cmd_list.set_c(C, m_wvp);
 };
 
 IC void CBackend::set_xform_world(const Fmatrix& M) { xforms.set_W(M); }

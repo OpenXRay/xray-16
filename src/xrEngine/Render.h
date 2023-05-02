@@ -145,6 +145,8 @@ enum class DeviceState
     NeedReset
 };
 
+class CBackend; // TODO: the real command list interface should be defined here
+
 class ENGINE_API IRender
 {
 public:
@@ -365,9 +367,9 @@ public:
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
 
     // Render mode
-    virtual void rmNear() = 0;
-    virtual void rmFar() = 0;
-    virtual void rmNormal() = 0;
+    virtual void rmNear(CBackend &cmd_list) = 0;
+    virtual void rmFar(CBackend &cmd_list) = 0;
+    virtual void rmNormal(CBackend &cmd_list) = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}

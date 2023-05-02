@@ -351,7 +351,7 @@ void dx113DFluidRenderer::Draw(const dx113DFluidData& FluidData)
 
     pTarget->u_setrt(RT[RRT_RayCastTex], nullptr, nullptr, nullptr); // LDR RT
 
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
 
     if (bRenderFire)
         RCache.set_Element(m_RendererTechnique[RS_QuadRaycastFire]);
@@ -371,7 +371,7 @@ void dx113DFluidRenderer::Draw(const dx113DFluidData& FluidData)
     else
         RCache.set_Element(m_RendererTechnique[RS_QuadRaycastCopyFog]);
 
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
 
     PrepareCBuffer(FluidData, Device.dwWidth, Device.dwHeight);
     RCache.set_c(strDiffuseLight, LightData.m_vLightIntencity.x, LightData.m_vLightIntencity.y,
@@ -389,7 +389,7 @@ void dx113DFluidRenderer::ComputeRayData(const dx113DFluidData &FluidData)
     pTarget->u_setrt(RT[RRT_RayDataTex], nullptr, nullptr, nullptr); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_CompRayData_Back]);
 
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
 
     PrepareCBuffer(FluidData, Device.dwWidth, Device.dwHeight);
 
@@ -415,7 +415,7 @@ void dx113DFluidRenderer::ComputeEdgeTexture(const dx113DFluidData &FluidData)
     RCache.set_Element(m_RendererTechnique[RS_QuadDownSampleRayDataTexture]);
 
     // First setup viewport to match the size of the destination low-res texture
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
 
     PrepareCBuffer(FluidData, m_iRenderTextureWidth, m_iRenderTextureHeight);
 

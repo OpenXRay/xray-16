@@ -488,7 +488,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
 
     // process constant-loaders
     for (auto& Cs : C->table)
-        if (Cs->handler) Cs->handler->setup(&*Cs);
+        if (Cs->handler) Cs->handler->setup(*this, &*Cs);
 }
 
 #endif	//	glR_Backend_Runtime_included

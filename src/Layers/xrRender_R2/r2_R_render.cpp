@@ -77,7 +77,7 @@ void CRender::Render()
     g_r = 1;
 
 #if defined(USE_DX11) || defined(USE_OGL)
-    rmNormal();
+    rmNormal(RCache);
 #endif
 
     IMainMenu* pMainMenu = g_pGamePersistent ? g_pGamePersistent->m_pMainMenu : 0;

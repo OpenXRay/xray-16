@@ -22,7 +22,7 @@ void CRenderTarget::accum_point(light* L)
 
         Device.mFullTransform.mul(Device.mProject, Device.mView);
         RCache.set_xform_project(Device.mProject);
-        RImplementation.rmNear();
+        RImplementation.rmNear(RCache);
     }
 
     // Common
@@ -147,7 +147,7 @@ void CRenderTarget::accum_point(light* L)
 
     if (L->flags.bHudMode)
     {
-        RImplementation.rmNormal();
+        RImplementation.rmNormal(RCache);
         // Restore projection
         Device.mProject = Pold;
         Device.mFullTransform = FTold;

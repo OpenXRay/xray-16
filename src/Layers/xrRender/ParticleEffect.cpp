@@ -684,7 +684,7 @@ void CParticleEffect::Render(float, bool use_fast_geo)
 
                     Device.mFullTransform.mul(Device.mProject, Device.mView);
                     RCache.set_xform_project(Device.mProject);
-                    RImplementation.rmNear();
+                    RImplementation.rmNear(RCache);
                     ApplyTexgen(Device.mFullTransform);
                 }
 #endif
@@ -700,7 +700,7 @@ void CParticleEffect::Render(float, bool use_fast_geo)
 #ifndef _EDITOR
                 if (GetHudMode())
                 {
-                    RImplementation.rmNormal();
+                    RImplementation.rmNormal(RCache);
                     Device.mProject = Pold;
                     Device.mFullTransform = FTold;
                     RCache.set_xform_project(Device.mProject);

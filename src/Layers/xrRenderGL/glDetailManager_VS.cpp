@@ -119,7 +119,7 @@ void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave
                 // Setup matrices + colors (and flush it as necessary)
                 //RCache.set_Element				(Object.shader->E[lod_id]);
                 RCache.set_Element(Object.shader->E[lod_id], iPass);
-                RImplementation.apply_lmaterial();
+                RCache.apply_lmaterial();
 
                 //	This could be cached in the corresponding consatant buffer
                 //	as it is done for DX9

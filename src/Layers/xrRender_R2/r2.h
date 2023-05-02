@@ -299,16 +299,6 @@ public:
 
     xr_vector<Fbox3> main_coarse_structure;
 
-    shared_str c_sbase;
-    shared_str c_snoise;
-    shared_str c_lmaterial;
-    shared_str c_ssky0;
-    shared_str c_ssky1;
-    shared_str c_sclouds0;
-    shared_str c_sclouds1;
-    float o_hemi;
-    float o_hemi_cube[CROS_impl::NUM_FACES];
-    float o_sun;
     R_sync_point q_sync_point;
 
     bool m_bMakeAsyncSS;
@@ -353,50 +343,17 @@ public:
     void occq_end(u32& ID) { HWOCC.occq_end(ID); }
     auto occq_get(u32& ID) { return HWOCC.occq_get(ID); }
 
-    ICF void apply_object(IRenderable* O)
+    ICF void apply_object(CBackend &cmd_list, IRenderable* O)
     {
         if (!O || !O->renderable_ROS())
             return;
 
         CROS_impl& LT = *(CROS_impl*)O->renderable_ROS();
         LT.update_smooth(O);
-        o_hemi = 0.75f * LT.get_hemi();
+        cmd_list.o_hemi = 0.75f * LT.get_hemi();
         // o_hemi						= 0.5f*LT.get_hemi			()	;
-        o_sun = 0.75f * LT.get_sun();
-        CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
-    }
-
-    void apply_lmaterial()
-    {
-        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
-        if (!C)
-            return;
-
-        VERIFY(RC_dest_sampler == C->destination);
-#if defined(USE_DX9)
-        VERIFY(RC_sampler == C->type);
-#elif defined(USE_DX11)
-        VERIFY(RC_dx11texture == C->type);
-#elif defined(USE_OGL)
-        VERIFY(RC_sampler == C->type);
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-        CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index));
-        VERIFY(T);
-        float mtl = T->m_material;
-#ifdef DEBUG
-        if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL))
-            mtl = ps_r2_gmaterial;
-#endif
-        RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
-        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
-                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
-                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
-        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X],
-                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
-                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
+        cmd_list.o_sun = 0.75f * LT.get_sun();
+        CopyMemory(cmd_list.o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
     }
 
 public:
@@ -510,9 +467,9 @@ public:
 #endif
 
     // Render mode
-    void rmNear() override;
-    void rmFar() override;
-    void rmNormal() override;
+    void rmNear(CBackend &cmd_list) override;
+    void rmFar(CBackend &cmd_list) override;
+    void rmNormal(CBackend &cmd_list) override;
 
     // Constructor/destructor/loader
     CRender();

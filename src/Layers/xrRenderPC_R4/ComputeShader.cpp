@@ -44,7 +44,7 @@ ComputeShader& ComputeShader::set_c(shared_str name, float x, float y, float z, 
     return set_c(name, vec);
 }
 
-void ComputeShader::Dispatch(u32 dimx, u32 dimy, u32 dimz)
+void ComputeShader::Dispatch(CBackend &cmd_list, u32 dimx, u32 dimy, u32 dimz)
 {
     u32 count = m_ctable->m_CBTable.size();
 
@@ -67,7 +67,7 @@ void ComputeShader::Dispatch(u32 dimx, u32 dimy, u32 dimz)
     {
         R_constant* Cs = &**it;
         if (Cs->handler)
-            Cs->handler->setup(Cs);
+            Cs->handler->setup(cmd_list, Cs);
     }
 
     HW.pContext->CSSetConstantBuffers(0, count, tempBuffer);

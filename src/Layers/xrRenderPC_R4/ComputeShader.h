@@ -17,7 +17,7 @@ public:
     ComputeShader& set_c(shared_str name, const Fvector4& value);
     ComputeShader& set_c(shared_str name, float x, float y, float z, float w);
 
-    void Dispatch(u32 dimx, u32 dimy, u32 dimz);
+    void Dispatch(CBackend &cmd_list, u32 dimx, u32 dimy, u32 dimz);
 
 private:
     void Construct(ID3D11ComputeShader* cs, const ref_ctable& ctable, xr_vector<ID3D11SamplerState*>& Samplers,

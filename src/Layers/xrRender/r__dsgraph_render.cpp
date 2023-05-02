@@ -50,7 +50,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
         for (const auto& it : nrmPasses)
         {
             RCache.set_Pass(it->first);
-            RImplementation.apply_lmaterial();
+            RCache.apply_lmaterial();
 
             mapNormalItems& items = it->second;
             items.ssa = 0;
@@ -95,8 +95,8 @@ void R_dsgraph_structure::render_graph(u32 _priority)
             for (auto& item : items)
             {
                 RCache.set_xform_world(item.Matrix);
-                RImplementation.apply_object(item.pObject);
-                RImplementation.apply_lmaterial();
+                RImplementation.apply_object(RCache, item.pObject);
+                RCache.apply_lmaterial();
 
                 const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
 #ifdef USE_DX11
@@ -160,7 +160,7 @@ public:
         Device.mFullTransform.mul(Device.mProject, Device.mView);
         RCache.set_xform_project(Device.mProject);
 
-        RImplementation.rmNear();
+        RImplementation.rmNear(RCache);
 
         // preserve culling mode
         cullMode = RCache.get_CullMode();
@@ -169,7 +169,7 @@ public:
 
     ~hud_transform_helper()
     {
-        RImplementation.rmNormal();
+        RImplementation.rmNormal(RCache);
 
         // Restore projection
         Device.mProject = Pold;
@@ -203,10 +203,10 @@ void __fastcall render_item(u32 context_id, const T& item)
 
     dxRender_Visual* V = item.second.pVisual;
     VERIFY(V && V->shader._get());
-    RCache.set_Element(item.second.se);
-    RCache.set_xform_world(item.second.Matrix);
-    RImplementation.apply_object(item.second.pObject);
-    RImplementation.apply_lmaterial();
+    dsgraph.cmd_list.set_Element(item.second.se);
+    dsgraph.cmd_list.set_xform_world(item.second.Matrix);
+    RImplementation.apply_object(dsgraph.cmd_list, item.second.pObject);
+    dsgraph.cmd_list.apply_lmaterial();
     hud_transform_helper::apply_custom_state();
     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
     //RCache.hemi.c_update(V);

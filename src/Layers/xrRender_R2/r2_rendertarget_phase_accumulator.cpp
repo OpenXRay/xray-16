@@ -51,7 +51,7 @@ void CRenderTarget::phase_accumulator()
 
 #if defined(USE_DX11) || defined(USE_OGL)
     //	Restore viewport after shadow map rendering
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
 #endif
 }
 

@@ -76,13 +76,6 @@ public:
     cl_light_C r1_dlight_binder_color;
     cl_light_XFORM r1_dlight_binder_xform;
 
-    shared_str c_ldynamic_props;
-    shared_str c_sbase;
-    shared_str c_ssky0;
-    shared_str c_ssky1;
-    shared_str c_sclouds0;
-    shared_str c_sclouds1;
-
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
 
@@ -104,8 +97,7 @@ public:
     IRenderVisual* model_CreatePE(LPCSTR name);
     void ApplyBlur2(FVF::TL2uv* dest, u32 size) const;
     void ApplyBlur4(FVF::TL4uv* dest, u32 w, u32 h, float k) const;
-    void apply_object(IRenderable* O);
-    void apply_lmaterial(){};
+    void apply_object(CBackend &cmd_list, IRenderable* O);
 
 public:
     // feature level
@@ -196,9 +188,9 @@ public:
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
 
     // Render mode
-    virtual void rmNear() override;
-    virtual void rmFar() override;
-    virtual void rmNormal() override;
+    void rmNear(CBackend &cmd_list) override;
+    void rmFar(CBackend &cmd_list) override;
+    void rmNormal(CBackend &cmd_list) override;
 
     // Constructor/destructor/loader
     CRender();

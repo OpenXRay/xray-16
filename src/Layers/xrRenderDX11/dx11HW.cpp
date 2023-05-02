@@ -3,7 +3,6 @@
 #include "dx11HW.h"
 
 #include "StateManager/dx11SamplerStateCache.h"
-#include "StateManager/dx11StateCache.h"
 #include "dx11TextureUtils.h"
 
 CHW HW;

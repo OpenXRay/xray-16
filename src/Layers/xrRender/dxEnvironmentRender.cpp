@@ -204,7 +204,7 @@ void dxEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRe
 
 void dxEnvironmentRender::RenderSky(CEnvironment& env)
 {
-    GEnv.Render->rmFar();
+    GEnv.Render->rmFar(RCache);
 
     // draw sky box
     Fmatrix mSky;
@@ -249,7 +249,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 #endif // USE_OGL
 
     // Sun
-    GEnv.Render->rmNormal();
+    GEnv.Render->rmNormal(RCache);
 #if RENDER != R_R1
     //
     // This hack is done to make sure that the state is set for sure:
@@ -278,7 +278,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     if (!clouds_sh)
         return;
 
-    GEnv.Render->rmFar();
+    GEnv.Render->rmFar(RCache);
 
     Fmatrix mXFORM, mScale;
     mScale.scale(10, 0.4f, 10);
@@ -314,7 +314,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     RCache.set_Textures(&clouds_r_textures);
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, env.CloudsVerts.size(), i_offset, env.CloudsIndices.size() / 3);
 
-    GEnv.Render->rmNormal();
+    RImplementation.rmNormal(RCache);
 }
 
 void dxEnvironmentRender::OnDeviceCreate()
@@ -344,18 +344,18 @@ void dxEnvironmentRender::OnDeviceCreate()
     // Just let texture stages be 0 if constants are missing
     if (sky2_constants)
     {
-        if (const auto C = sky2_constants->get(RImplementation.c_ssky0)._get())
+        if (const auto C = sky2_constants->get(c_ssky0)._get())
             tsky0_tstage = C->samp.index;
 
-        if (const auto C = sky2_constants->get(RImplementation.c_ssky1)._get())
+        if (const auto C = sky2_constants->get(c_ssky1)._get())
             tsky1_tstage = C->samp.index;
     }
     if (clouds_constants)
     {
-        if (const auto C = clouds_constants->get(RImplementation.c_sclouds0)._get())
+        if (const auto C = clouds_constants->get(c_sclouds0)._get())
             tclouds0_tstage = C->samp.index;
 
-        if (const auto C = clouds_constants->get(RImplementation.c_sclouds1)._get())
+        if (const auto C = clouds_constants->get(c_sclouds1)._get())
             tclouds1_tstage = C->samp.index;
     }
 

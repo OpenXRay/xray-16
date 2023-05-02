@@ -74,6 +74,8 @@ struct R_dsgraph_structure
     xr_vector<ISpatial*> lstSpatial;
     xr_vector<dxRender_Visual*> lstVisuals;
 
+    CBackend cmd_list{};
+
     u32 counter_S{};
     u32 counter_D{};
 

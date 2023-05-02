@@ -48,8 +48,8 @@ void CRender::level_Load(IReader* fs)
     Wallmarks = xr_new<CWallmarksEngine>();
     Details = xr_new<CDetailManager>();
 
-    rmFar();
-    rmNormal();
+    rmFar(RCache);
+    rmNormal(RCache);
 
     if (!GEnv.isDedicatedServer)
     {
