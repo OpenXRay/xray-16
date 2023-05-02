@@ -11,7 +11,7 @@ public:
     //	Set all states to default
     void Reset();
     //	Sends states to DX11 runtime, creates new state objects if nesessary
-    void Apply();
+    void Apply(u32 context_id);
 
     //	Unmaps all constant bindings.
     void UnmapConstants();

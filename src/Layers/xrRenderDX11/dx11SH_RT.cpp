@@ -272,12 +272,12 @@ void CRT::destroy()
 void CRT::reset_begin() { destroy(); }
 void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dwFlags }); }
 
-void CRT::resolve_into(CRT& destination) const
+void CRT::resolve_into(CRT& destination) const // TODO: this should be moved into backend
 {
     VERIFY(fmt == destination.fmt); // only RTs with same format supported
     auto srcSurf = pTexture->surface_get();
     auto destSurf = destination.pTexture->surface_get();
-    HW.pContext->ResolveSubresource(destSurf, 0,
+    HW.get_context(CHW::IMM_CTX_ID)->ResolveSubresource(destSurf, 0,
         srcSurf, 0, dx11TextureUtils::ConvertTextureFormat(fmt));
     _RELEASE(srcSurf);
     _RELEASE(destSurf);

@@ -124,6 +124,8 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         D3D_FEATURE_LEVEL_10_0
     };
 
+    auto& pContext = d3d_contexts_pool[CHW::IMM_CTX_ID];
+
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
         static const auto d3d11CreateDevice = static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
@@ -194,6 +196,13 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     }
 
     _SHOW_REF("* CREATE: DeviceREF:", pDevice);
+
+    // Create deferred contexts
+    for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
+    {
+        R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
+        VERIFY(SUCCEEDED(R));
+    }
 
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
@@ -385,8 +394,11 @@ void CHW::DestroyDevice()
 
     _RELEASE(pAnnotation);
     _RELEASE(pContext1);
-    _SHOW_REF("refCount:pContext", pContext);
-    _RELEASE(pContext);
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        _SHOW_REF("refCount:pContext", d3d_contexts_pool[id]);
+        _RELEASE(d3d_contexts_pool[id]);
+    }
 
 #ifdef HAS_DX11_3
     _RELEASE(pDevice3);

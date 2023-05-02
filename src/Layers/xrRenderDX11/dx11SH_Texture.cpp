@@ -208,7 +208,7 @@ void CTexture::apply_theora(u32 dwStage)
 
 // R_CHK				(T2D->LockRect(0,&R,&rect,0));
 #ifdef USE_DX11
-        R_CHK(HW.pContext->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
+        R_CHK(HW.get_context(CHW::IMM_CTX_ID)->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #else
         R_CHK(T2D->Map(0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #endif
@@ -219,7 +219,7 @@ void CTexture::apply_theora(u32 dwStage)
         VERIFY(u32(_pos) == rect.bottom * _w);
 // R_CHK				(T2D->UnlockRect(0));
 #ifdef USE_DX11
-        HW.pContext->Unmap(T2D, 0);
+        HW.get_context(CHW::IMM_CTX_ID)->Unmap(T2D, 0);
 #else
         T2D->Unmap(0);
 #endif
@@ -240,7 +240,7 @@ void CTexture::apply_avi(u32 dwStage) const
 // AVI
 // R_CHK	(T2D->LockRect(0,&R,NULL,0));
 #ifdef USE_DX11
-        R_CHK(HW.pContext->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
+        R_CHK(HW.get_context(CHW::IMM_CTX_ID)->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #else
         R_CHK(T2D->Map(0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #endif
@@ -250,7 +250,7 @@ void CTexture::apply_avi(u32 dwStage) const
         CopyMemory(mapData.pData, ptr, pAVI->m_dwWidth * pAVI->m_dwHeight * 4);
 // R_CHK	(T2D->UnlockRect(0));
 #ifdef USE_DX11
-        HW.pContext->Unmap(T2D, 0);
+        HW.get_context(CHW::IMM_CTX_ID)->Unmap(T2D, 0);
 #else
         T2D->Unmap(0);
 #endif

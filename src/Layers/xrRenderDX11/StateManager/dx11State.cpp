@@ -41,7 +41,7 @@ dx11State* dx11State::Create(SimulatorStates& state_code)
     return pState;
 }
 
-HRESULT dx11State::Apply()
+HRESULT dx11State::Apply(u32 context_id)
 {
     VERIFY(m_pRasterizerState);
     RCache.StateManager.SetRasterizerState(m_pRasterizerState);
@@ -53,13 +53,13 @@ HRESULT dx11State::Apply()
     RCache.StateManager.SetBlendState(m_pBlendState);
     RCache.StateManager.SetAlphaRef(m_uiAlphaRef);
 
-    RCache.SSManager.GSApplySamplers(m_GSSamplers);
-    RCache.SSManager.VSApplySamplers(m_VSSamplers);
-    RCache.SSManager.PSApplySamplers(m_PSSamplers);
+    RCache.SSManager.GSApplySamplers(context_id, m_GSSamplers);
+    RCache.SSManager.VSApplySamplers(context_id, m_VSSamplers);
+    RCache.SSManager.PSApplySamplers(context_id, m_PSSamplers);
 #ifdef USE_DX11
-    RCache.SSManager.HSApplySamplers(m_HSSamplers);
-    RCache.SSManager.DSApplySamplers(m_DSSamplers);
-    RCache.SSManager.CSApplySamplers(m_CSSamplers);
+    RCache.SSManager.HSApplySamplers(context_id, m_HSSamplers);
+    RCache.SSManager.DSApplySamplers(context_id, m_DSSamplers);
+    RCache.SSManager.CSApplySamplers(context_id, m_CSSamplers);
 #endif
 
     //	static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};

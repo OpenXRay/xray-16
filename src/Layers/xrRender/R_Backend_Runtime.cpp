@@ -10,7 +10,7 @@ void CBackend::OnFrameEnd()
     if (!GEnv.isDedicatedServer)
     {
 #if !defined(USE_DX9) && !defined(USE_OGL)
-        HW.pContext->ClearState();
+        HW.get_context(CHW::IMM_CTX_ID)->ClearState();
 #elif defined(USE_DX9)
         for (u32 stage = 0; stage < HW.Caps.raster.dwStages; stage++)
             CHK_DX(HW.pDevice->SetTexture(0, nullptr));

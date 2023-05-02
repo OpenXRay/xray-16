@@ -22,14 +22,12 @@ public:
 
     SHandle GetState(D3D_SAMPLER_DESC& desc);
 
-    void VSApplySamplers(HArray& samplers);
-    void PSApplySamplers(HArray& samplers);
-    void GSApplySamplers(HArray& samplers);
-#ifdef USE_DX11
-    void HSApplySamplers(HArray& samplers);
-    void DSApplySamplers(HArray& samplers);
-    void CSApplySamplers(HArray& samplers);
-#endif
+    void VSApplySamplers(u32 context_id, HArray& samplers);
+    void PSApplySamplers(u32 context_id, HArray& samplers);
+    void GSApplySamplers(u32 context_id, HArray& samplers);
+    void HSApplySamplers(u32 context_id, HArray& samplers);
+    void DSApplySamplers(u32 context_id, HArray& samplers);
+    void CSApplySamplers(u32 context_id, HArray& samplers);
 
     void SetMaxAnisotropy(u32 uiMaxAniso);
     void SetMipLODBias(float uiMipLODBias);

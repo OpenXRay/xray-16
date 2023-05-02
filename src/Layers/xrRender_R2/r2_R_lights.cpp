@@ -86,7 +86,7 @@ void CRender::render_lights(light_Package& LP)
         u32 batch_id;
     };
     static xr_vector<task_data_t> lights_queue{};
-    lights_queue.reserve(3);  // TODO: max cascades
+    lights_queue.reserve(R__NUM_SUN_CASCADES);
 
     const auto &calc_lights = [](Task &, void* data)
     {

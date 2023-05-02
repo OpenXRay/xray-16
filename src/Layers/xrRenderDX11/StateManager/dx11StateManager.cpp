@@ -156,7 +156,7 @@ void dx11StateManager::ValidateBDesc()
 }
 
 //  Sends states to DX11 runtime, creates new state objects if nessessary
-void dx11StateManager::Apply()
+void dx11StateManager::Apply(u32 context_id)
 {
     //  Apply rasterizer state
     if (m_bRSNeedApply || m_bRSChanged)
@@ -167,7 +167,7 @@ void dx11StateManager::Apply()
             m_bRSChanged = false;
         }
 
-        HW.pContext->RSSetState(m_pRState);
+        HW.get_context(context_id)->RSSetState(m_pRState);
         m_bRSNeedApply = false;
     }
 
@@ -180,7 +180,7 @@ void dx11StateManager::Apply()
             m_bDSSChanged = false;
         }
 
-        HW.pContext->OMSetDepthStencilState(m_pDepthStencilState, m_uiStencilRef);
+        HW.get_context(context_id)->OMSetDepthStencilState(m_pDepthStencilState, m_uiStencilRef);
         m_bDSSNeedApply = false;
     }
 
@@ -195,7 +195,7 @@ void dx11StateManager::Apply()
 
         static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
 
-        HW.pContext->OMSetBlendState(m_pBlendState, BlendFactor, m_uiSampleMask);
+        HW.get_context(context_id)->OMSetBlendState(m_pBlendState, BlendFactor, m_uiSampleMask);
         m_bBSNeedApply = false;
     }
 }

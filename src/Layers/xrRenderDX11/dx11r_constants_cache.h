@@ -16,7 +16,7 @@ public:
     //	ALIGN(16)	R_constant_array	a_pixel;
     //	ALIGN(16)	R_constant_array	a_vertex;
 
-    void flush_cache();
+    void flush_cache(u32 context_id);
 
 public:
     // fp, non-array versions
@@ -100,10 +100,10 @@ public:
     }
 
     //
-    ICF void flush()
+    ICF void flush(u32 context_id)
     {
         // if (a_pixel.b_dirty || a_vertex.b_dirty)	flush_cache();
-        flush_cache();
+        flush_cache(context_id);
     }
 
     ICF void access_direct(R_constant* C, size_t DataSize, void** ppVData, void** ppGData, void** ppPData)

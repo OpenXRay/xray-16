@@ -26,7 +26,7 @@ void CRenderTarget::phase_accumulator()
         //	Need for MSAA to work correctly.
         if (RImplementation.o.msaa)
         {
-            HW.pContext->OMSetRenderTargets(1, &(rt_Accumulator->pRT), 0);
+            HW.get_context(CHW::IMM_CTX_ID)->OMSetRenderTargets(1, &(rt_Accumulator->pRT), 0); // TODO: id
         }
 #endif // USE_DX11
         RCache.ClearRT(rt_Accumulator, {}); // black

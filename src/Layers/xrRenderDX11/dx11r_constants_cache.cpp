@@ -69,28 +69,28 @@ dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_DomainBuffer>(R_cons
     return *RCache.m_aDomainConstants[iBufferIndex];
 }
 
-void R_constants::flush_cache()
+void R_constants::flush_cache(u32 context_id)
 {
     for (int i = 0; i < CBackend::MaxCBuffers; ++i)
     {
         if (RCache.m_aVertexConstants[i])
-            RCache.m_aVertexConstants[i]->Flush();
+            RCache.m_aVertexConstants[i]->Flush(context_id);
 
         if (RCache.m_aPixelConstants[i])
-            RCache.m_aPixelConstants[i]->Flush();
+            RCache.m_aPixelConstants[i]->Flush(context_id);
 
         if (RCache.m_aGeometryConstants[i])
-            RCache.m_aGeometryConstants[i]->Flush();
+            RCache.m_aGeometryConstants[i]->Flush(context_id);
 
 #ifdef USE_DX11
         if (RCache.m_aHullConstants[i])
-            RCache.m_aHullConstants[i]->Flush();
+            RCache.m_aHullConstants[i]->Flush(context_id);
 
         if (RCache.m_aDomainConstants[i])
-            RCache.m_aDomainConstants[i]->Flush();
+            RCache.m_aDomainConstants[i]->Flush(context_id);
 
         if (RCache.m_aComputeConstants[i])
-            RCache.m_aComputeConstants[i]->Flush();
+            RCache.m_aComputeConstants[i]->Flush(context_id);
 #endif
     }
 }

@@ -91,7 +91,11 @@ ICF void CBackend::set_States(SState* _state)
         PGO(Msg("PGO:state_block"));
         stat.states++;
         state = _state->state;
+#if defined(USE_DX11)
+        state->Apply(context_id);
+#else
         state->Apply();
+#endif
     }
 }
 

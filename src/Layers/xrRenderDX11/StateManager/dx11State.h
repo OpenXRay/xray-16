@@ -16,7 +16,7 @@ public:
     static dx11State* Create(SimulatorStates& state_code);
 
     //	DX9 unified interface
-    HRESULT Apply();
+    HRESULT Apply(u32 context_id);
     void Release();
 
     //	DX11 specific
@@ -38,11 +38,9 @@ private:
     tSamplerHArray m_VSSamplers;
     tSamplerHArray m_PSSamplers;
     tSamplerHArray m_GSSamplers;
-#ifdef USE_DX11
     tSamplerHArray m_CSSamplers;
     tSamplerHArray m_HSSamplers;
     tSamplerHArray m_DSSamplers;
-#endif
 
     u32 m_uiStencilRef;
     u32 m_uiAlphaRef;

@@ -598,6 +598,8 @@ public:
     dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
     dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
     dx11StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
+
+    u32 context_id{ CHW::IMM_CTX_ID };
 #endif // USE_DX11
 };
 #pragma warning(pop)
