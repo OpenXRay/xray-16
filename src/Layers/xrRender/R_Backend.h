@@ -190,8 +190,6 @@ private:
 
     CMatrix* matrices[8]{}; // matrices are supported only for FFP
 
-    void Invalidate();
-
 public:
     struct _stats
     {
@@ -266,6 +264,8 @@ public:
 #elif defined(USE_DX11)
     IC void get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData);
 #endif
+
+    void Invalidate();
 
     // API
     IC void set_xform(u32 ID, const Fmatrix& M);

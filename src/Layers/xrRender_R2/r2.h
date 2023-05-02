@@ -33,17 +33,18 @@ struct i_render_phase
         : name(name_in)
     {
         o.active = false;
-        o.mt_enabled = false;
+        o.mt_calc_enabled = false;
+        o.mt_draw_enabled = false;
     }
 
-    ICF void calculate()
+    ICF void run()
     {
         if (!o.active)
             return;
 
-        main_task = &TaskScheduler->CreateTask(name.c_str(), { this, &i_render_phase::calculate_task });
+        main_task = &TaskScheduler->CreateTask(xr_string{ name + "_calculate" }.c_str(), { this, &i_render_phase::calculate_task });
 
-        if (o.mt_enabled)
+        if (o.mt_calc_enabled)
         {
             TaskScheduler->PushTask(*main_task);
         }
@@ -53,24 +54,55 @@ struct i_render_phase
         }
     }
 
-    ICF void wait()
+    ICF void sync()
     {
         if (main_task)
             TaskScheduler->Wait(*main_task);
         main_task = nullptr;
+
+        if (o.mt_draw_enabled)
+        {
+            // draw task should be finished as sub task of main
+            VERIFY(draw_task->IsFinished());
+            draw_task = nullptr;
+        }
+        else
+        {
+            render();
+        }
+
+        flush();
+    }
+
+    void calculate_task(Task&, void*)
+    {
+        calculate();
+
+        if (o.mt_draw_enabled)
+        {
+            draw_task = &TaskScheduler->AddTask(*main_task, xr_string{ name + "_render" }.c_str(), { this, &i_render_phase::render_task });
+        }
+    }
+
+    void render_task(Task&, void*)
+    {
+        render();
     }
 
     virtual void init() = 0;
-    virtual void calculate_task(Task&, void*) = 0;
+    virtual void calculate() = 0;
     virtual void render() = 0;
+    virtual void flush() {};
 
     struct options_t
     {
         u32 active : 1;
-        u32 mt_enabled : 1;
+        u32 mt_calc_enabled : 1;
+        u32 mt_draw_enabled : 1;
     } o;
     Task* main_task{ nullptr };
-    xr_string name{ "" };
+    Task* draw_task{ nullptr };
+    xr_string name{ "<UNKNOWN>" };
 };
 
 struct render_main : public i_render_phase
@@ -78,7 +110,7 @@ struct render_main : public i_render_phase
     explicit render_main(const xr_string& name_in) : i_render_phase(name) {}
 
     void init() override;
-    void calculate_task(Task&, void*) override;
+    void calculate() override;
     void render() override;
 };
 
@@ -87,7 +119,7 @@ struct render_rain : public i_render_phase
     explicit render_rain(const xr_string& name_in) : i_render_phase(name) {}
 
     void init() override;
-    void calculate_task(Task&, void*) override;
+    void calculate() override;
     void render() override;
 
     light RainLight;
@@ -99,7 +131,7 @@ struct render_sun : public i_render_phase
     explicit render_sun(const xr_string& name_in) : i_render_phase(name) {}
 
     void init() override;
-    void calculate_task(Task&, void*) override;
+    void calculate() override;
     void render() override;
 
     xr_vector<sun::cascade> m_sun_cascades;
@@ -115,11 +147,9 @@ struct render_sun_old : public i_render_phase
     explicit render_sun_old(const xr_string& name_in) : i_render_phase(name) {}
 
     void init() override;
-    void calculate_task(Task&, void*) override { /* the same as render_sun */ }
+    void calculate() override {}
     void render() override
     {
-        wait();
-
         if (!o.active)
             return;
 

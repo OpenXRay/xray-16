@@ -143,7 +143,7 @@ void CRender::Render()
     BasicStats.WaitS.End();
     q_sync_point.End();
 
-    r_main.wait();
+    r_main.sync();
 
     if (ps_r2_ls_flags.test(R2FLAG_ZFILL))
     {
@@ -321,7 +321,7 @@ void CRender::Render()
         Target->mark_msaa_edges();
     }
 
-    r_rain.render();
+    r_rain.sync();
 #endif // !USE_DX9
 
     // Directional light - fucking sun
@@ -329,9 +329,9 @@ void CRender::Render()
         PIX_EVENT(DEFER_SUN);
         Stats.l_visible++;
         if (!RImplementation.o.oldshadowcascades)
-            r_sun.render();
+            r_sun.sync();
         else
-            r_sun_old.render();
+            r_sun_old.sync();
         Target->accum_direct_blend();
     }
 

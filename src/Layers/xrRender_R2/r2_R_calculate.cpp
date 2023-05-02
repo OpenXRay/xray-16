@@ -20,11 +20,11 @@ extern int ps_r2_mt_render;
 //-----
 void render_main::init()
 {
-    o.mt_enabled = RImplementation.o.mt_calculate && !RImplementation.o.oldshadowcascades && !ps_r2_ls_flags.test(R2FLAG_ZFILL);
+    o.mt_calc_enabled = RImplementation.o.mt_calculate && !RImplementation.o.oldshadowcascades && !ps_r2_ls_flags.test(R2FLAG_ZFILL);
     o.active = true; // always active
 }
 
-void render_main::calculate_task(Task&, void*)
+void render_main::calculate()
 {
     auto& dsgraph_main = RImplementation.get_imm_context();
 
@@ -46,7 +46,7 @@ void render_main::calculate_task(Task&, void*)
     dsgraph_main.o.view_frustum = RImplementation.ViewBase;
     dsgraph_main.o.query_box_side = VIEWPORT_NEAR + EPS_L;
     dsgraph_main.o.precise_portals = true;
-    dsgraph_main.o.mt_calculate = o.mt_enabled;
+    dsgraph_main.o.mt_calculate = o.mt_calc_enabled;
 
     dsgraph_main.build_subspace();
 }
@@ -133,18 +133,18 @@ void CRender::Calculate()
     // Main calc
     BasicStats.Culling.Begin();
     {
-        r_main.calculate();
+        r_main.run();
     }
     BasicStats.Culling.End();
 
     // Rain calc
 #if RENDER != R_R2
-    r_rain.calculate();
+    r_rain.run();
 #endif
 
     // Sun calc
     if (o.oldshadowcascades)
-        r_sun_old.calculate();
+        r_sun_old.run();
     else
-        r_sun.calculate();
+        r_sun.run();
 }

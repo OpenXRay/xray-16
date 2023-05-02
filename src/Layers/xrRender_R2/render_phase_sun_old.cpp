@@ -285,7 +285,7 @@ void render_sun_old::init()
     if (!o.active)
         return;
 
-    o.mt_enabled = RImplementation.o.mt_calculate;
+    o.mt_calc_enabled = RImplementation.o.mt_calculate;
 
     // pre-allocate context
     context_id = RImplementation.alloc_context();
@@ -917,7 +917,7 @@ void render_sun_old::render_sun_near()
         dsgraph.o.xform = cull_xform;
         dsgraph.o.view_frustum = cull_frustum;
         dsgraph.o.view_pos = cull_COP;
-        dsgraph.o.mt_calculate = o.mt_enabled;
+        dsgraph.o.mt_calculate = o.mt_calc_enabled;
 
         // Fill the database
         dsgraph.build_subspace();

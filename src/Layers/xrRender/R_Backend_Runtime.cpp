@@ -125,6 +125,8 @@ void CBackend::Invalidate()
         textures_ds[ds_it++] = 0;
     for (u32 cs_it = 0; cs_it < CTexture::mtMaxComputeShaderTextures;)
         textures_cs[cs_it++] = 0;
+
+    context_id = CHW::IMM_CTX_ID;
 #endif // USE_DX11
 
     for (u32 ps_it = 0; ps_it < CTexture::mtMaxPixelShaderTextures;)

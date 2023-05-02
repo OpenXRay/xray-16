@@ -718,7 +718,7 @@ void R_dsgraph_structure::build_subspace()
     // Traverse sector/portal structure
     PortalTraverser.traverse(Sectors[o.sector_id], o.view_frustum, o.view_pos, o.xform, o.portal_traverse_flags);
 
-    // Determine visibility for static geometry hierrarhy
+    // Determine visibility for static geometry hierarchy
     static xr_vector<Task*> static_geo_tasks;
     static_geo_tasks.resize(PortalTraverser.r_sectors.size());
 

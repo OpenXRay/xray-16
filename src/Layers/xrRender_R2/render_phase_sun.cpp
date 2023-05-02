@@ -43,10 +43,11 @@ void render_sun::init()
         VERIFY(contexts_ids[i] != R_dsgraph_structure::INVALID_CONTEXT_ID);
     }
 
-    o.mt_enabled = RImplementation.o.mt_calculate;
+    o.mt_calc_enabled = RImplementation.o.mt_calculate;
+    o.mt_draw_enabled = RImplementation.o.mt_render;
 }
 
-void render_sun::calculate_task(Task&, void*)
+void render_sun::calculate()
 {
     need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
     last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
@@ -284,7 +285,7 @@ void render_sun::calculate_task(Task&, void*)
         }
     };
     
-    if (o.mt_enabled)
+    if (o.mt_calc_enabled)
     {
         xr_parallel_for(TaskRange<u32>(0, m_sun_cascades.size()), process_cascade);
     }
@@ -296,8 +297,6 @@ void render_sun::calculate_task(Task&, void*)
 
 void render_sun::render()
 {
-    wait();
-
     if (!o.active)
         return;
 
