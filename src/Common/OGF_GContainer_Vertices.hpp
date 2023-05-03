@@ -135,7 +135,11 @@ struct r1v_lmap_unpacked
     r1v_lmap_unpacked& operator=(const r1v_lmap& packed)
     {
         P = packed.P;
-        N = Fcolor(packed.N).get();
+
+        Fcolor unpackedN(packed.N);
+        unpackedN.mul_rgb(2);
+        unpackedN.sub_rgb(1);
+        N = unpackedN.get();
 
         Fcolor T(packed.T);
         Fcolor B(packed.B);
@@ -188,7 +192,12 @@ struct r1v_vert_unpacked
     r1v_vert_unpacked& operator=(const r1v_vert& packed)
     {
         P = packed.P;
-        N = Fcolor(packed.N).get();
+
+        Fcolor unpackedN(packed.N);
+        unpackedN.mul_rgb(2);
+        unpackedN.sub_rgb(1);
+        N = unpackedN.get();
+
         C = packed.C;
 
         Fcolor T(packed.T);
