@@ -325,6 +325,13 @@ void CBlender_Compile::StageTemplate_LMAP0()
     StageSET_TMC("$base1", "$null", "$null", 1);
 }
 
+void CBlender_Compile::StageTemplate_HEMI()
+{
+    StageSET_Address(D3DTADDRESS_CLAMP);
+    StageSET_Color(D3DTA_DIFFUSE, D3DTOP_BLENDCURRENTALPHA, D3DTA_CURRENT);
+    StageSET_TMC("$base2", "$null", "$null", 2);
+}
+
 void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 fmag)
 {
     sh_list& lst = L_textures;
