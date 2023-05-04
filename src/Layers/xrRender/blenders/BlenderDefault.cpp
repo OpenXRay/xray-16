@@ -102,15 +102,17 @@ void CBlender_default::CompileFFP(CBlender_Compile& C) const
                 C.PassSET_Blend_SET();
                 C.PassSET_LightFog(false, true);
 
-                // Stage0 - Lightmap
-                if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
-                {
-                    C.StageBegin();
-                    C.StageTemplate_LMAP0();
-                    C.StageEnd();
-                }
+                // Stage 0 - Lightmap
+                C.StageBegin();
+                C.StageTemplate_LMAP0();
+                C.StageEnd();
 
-                // Stage1 - Base texture
+                // Stage 1 - Hemi
+                C.StageBegin();
+                C.StageTemplate_HEMI();
+                C.StageEnd();
+
+                // Stage 2 - Base texture
                 C.StageBegin();
                 C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
                 C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
@@ -135,6 +137,10 @@ void CBlender_default::CompileFFP(CBlender_Compile& C) const
                 {
                     C.StageBegin();
                     C.StageTemplate_LMAP0();
+                    C.StageEnd();
+
+                    C.StageBegin();
+                    C.StageTemplate_HEMI();
                     C.StageEnd();
                 }
             }
