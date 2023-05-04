@@ -106,6 +106,7 @@ public:
     void Stage_Texture(LPCSTR name, u32 address = D3DTADDRESS_WRAP, u32 fmin = D3DTEXF_LINEAR,
         u32 fmip = D3DTEXF_LINEAR, u32 fmag = D3DTEXF_LINEAR);
     void StageTemplate_LMAP0();
+    void StageTemplate_HEMI();
     void Stage_Matrix(LPCSTR name, int UVW_channel);
     void Stage_Constant(LPCSTR name);
     void StageEnd();
