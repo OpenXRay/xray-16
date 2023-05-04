@@ -8,7 +8,7 @@ const u32 delay_large_min = 10;
 const u32 delay_large_max = 20;
 const u32 cullfragments = 4;
 
-void light::vis_prepare()
+void light::vis_prepare(CBackend &cmd_list)
 {
     if (int(indirect_photons) != ps_r2_GI_photons)
         gi_generate();
@@ -51,16 +51,16 @@ void light::vis_prepare()
     // testing
     vis.pending = true;
     xform_calc();
-    RCache.set_xform_world(m_xform);
+    cmd_list.set_xform_world(m_xform);
     vis.query_order = RImplementation.occq_begin(vis.query_id);
     //	Hack: Igor. Light is visible if it's frutum is visible. (Only for volumetric)
     //	Hope it won't slow down too much since there's not too much volumetric lights
     //	TODO: sort for performance improvement if this technique hurts
     if ((flags.type == IRender_Light::SPOT) && flags.bShadow && flags.bVolumetric)
-        RCache.set_Stencil(FALSE);
+        cmd_list.set_Stencil(FALSE);
     else
-        RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
-    RImplementation.Target->draw_volume(this);
+        cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
+    RImplementation.Target->draw_volume(cmd_list, this);
     RImplementation.occq_end(vis.query_id);
 }
 

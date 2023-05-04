@@ -4,6 +4,8 @@
 
 using dx11StateUtils::operator==;
 
+dx11SamplerStateCache SSManager;
+
 dx11SamplerStateCache::dx11SamplerStateCache() : m_uiMaxAnisotropy(1), m_uiMipLODBias(0.0f)
 {
     static const int iMaxRSStates = 10;
@@ -86,6 +88,7 @@ void dx11SamplerStateCache::ClearStateArray()
 void dx11SamplerStateCache::PrepareSamplerStates(HArray& samplers,
     ID3DSamplerState* pSS[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT]) const
 {
+    VERIFY(samplers.size() <= D3D_COMMONSHADER_SAMPLER_SLOT_COUNT);
     for (u32 i = 0; i < samplers.size(); ++i)
     {
         if (samplers[i] != hInvalidHandle)

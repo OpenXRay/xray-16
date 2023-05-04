@@ -141,7 +141,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_array = T1.get("array");
 }
 
-void CDetailManager::hw_Render()
+void CDetailManager::hw_Render(CBackend &cmd_list)
 {
     using namespace detail_manager;
 
@@ -167,32 +167,32 @@ void CDetailManager::hw_Render()
     dir2.set(_sin(tm_rot2), 0, _cos(tm_rot2), 0).normalize().mul(swing_current.amp2);
 
     // Setup geometry and DMA
-    RCache.set_Geometry(hw_Geom);
+    cmd_list.set_Geometry(hw_Geom);
 
     // Wave0
     float scale = 1.f / float(quant);
     Fvector4 wave;
     // wave.set				(1.f/5.f,		1.f/7.f,	1.f/3.f,	Device.fTimeGlobal*swing_current.speed);
     wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
-    RCache.set_c(&*hwc_consts, scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient); // consts
-    RCache.set_c(&*hwc_wave, wave.div(PI_MUL_2)); // wave
-    RCache.set_c(&*hwc_wind, dir1); // wind-dir
-    hw_Render_dump(&*hwc_array, 1, 0, c_hdr);
+    cmd_list.set_c(&*hwc_consts, scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient); // consts
+    cmd_list.set_c(&*hwc_wave, wave.div(PI_MUL_2)); // wave
+    cmd_list.set_c(&*hwc_wind, dir1); // wind-dir
+    hw_Render_dump(cmd_list, &*hwc_array, 1, 0, c_hdr);
 
     // Wave1
     // wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	Device.fTimeGlobal*swing_current.speed);
     wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos);
-    RCache.set_c(&*hwc_wave, wave.div(PI_MUL_2)); // wave
-    RCache.set_c(&*hwc_wind, dir2); // wind-dir
-    hw_Render_dump(&*hwc_array, 2, 0, c_hdr);
+    cmd_list.set_c(&*hwc_wave, wave.div(PI_MUL_2)); // wave
+    cmd_list.set_c(&*hwc_wind, dir2); // wind-dir
+    hw_Render_dump(cmd_list, &*hwc_array, 2, 0, c_hdr);
 
     // Still
-    RCache.set_c(&*hwc_s_consts, scale, scale, scale, 1.f);
-    RCache.set_c(&*hwc_s_xform, Device.mFullTransform);
-    hw_Render_dump(&*hwc_s_array, 0, 1, c_hdr);
+    cmd_list.set_c(&*hwc_s_consts, scale, scale, scale, 1.f);
+    cmd_list.set_c(&*hwc_s_xform, Device.mFullTransform);
+    hw_Render_dump(cmd_list, &*hwc_s_array, 0, 1, c_hdr);
 }
 
-void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id, u32 /*c_offset*/)
+void CDetailManager::hw_Render_dump(CBackend &cmd_list, ref_constant x_array, u32 var_id, u32 lod_id, u32 /*c_offset*/)
 {
     RImplementation.BasicStats.DetailCount = 0;
 
@@ -226,10 +226,10 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
         if (!vis.empty())
         {
             // Setup matrices + colors (and flush it as nesessary)
-            RCache.set_Element(Object.shader->E[lod_id]);
-            RCache.apply_lmaterial();
+            cmd_list.set_Element(Object.shader->E[lod_id]);
+            cmd_list.apply_lmaterial();
             u32 c_base = x_array->vs.index;
-            Fvector4* c_storage = RCache.get_ConstantCache_Vertex().get_array_f().access(c_base);
+            Fvector4* c_storage = cmd_list.get_ConstantCache_Vertex().get_array_f().access(c_base);
 
             u32 dwBatch = 0;
 
@@ -273,10 +273,10 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
                         RImplementation.BasicStats.DetailCount += dwBatch;
                         u32 dwCNT_verts = dwBatch * Object.number_vertices;
                         u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
-                        RCache.get_ConstantCache_Vertex().b_dirty = TRUE;
-                        RCache.get_ConstantCache_Vertex().get_array_f().dirty(c_base, c_base + dwBatch * 4);
-                        RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
-                        RCache.stat.r.s_details.add(dwCNT_verts);
+                        cmd_list.get_ConstantCache_Vertex().b_dirty = TRUE;
+                        cmd_list.get_ConstantCache_Vertex().get_array_f().dirty(c_base, c_base + dwBatch * 4);
+                        cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
+                        cmd_list.stat.r.s_details.add(dwCNT_verts);
 
                         // restart
                         dwBatch = 0;
@@ -289,10 +289,10 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
                 RImplementation.BasicStats.DetailCount += dwBatch;
                 u32 dwCNT_verts = dwBatch * Object.number_vertices;
                 u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
-                RCache.get_ConstantCache_Vertex().b_dirty = TRUE;
-                RCache.get_ConstantCache_Vertex().get_array_f().dirty(c_base, c_base + dwBatch * 4);
-                RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
-                RCache.stat.r.s_details.add(dwCNT_verts);
+                cmd_list.get_ConstantCache_Vertex().b_dirty = TRUE;
+                cmd_list.get_ConstantCache_Vertex().get_array_f().dirty(c_base, c_base + dwBatch * 4);
+                cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
+                cmd_list.stat.r.s_details.add(dwCNT_verts);
             }
         }
         vOffset += hw_BatchSize * Object.number_vertices;

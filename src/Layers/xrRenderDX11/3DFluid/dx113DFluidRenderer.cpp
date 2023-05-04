@@ -349,7 +349,7 @@ void dx113DFluidRenderer::Draw(const dx113DFluidData& FluidData)
     //  raycasting is done at the smaller resolution, using a fullscreen quad
     RCache.ClearRT(RT[RRT_RayCastTex], {}); // black
 
-    pTarget->u_setrt(RT[RRT_RayCastTex], nullptr, nullptr, nullptr); // LDR RT
+    pTarget->u_setrt(RCache, RT[RRT_RayCastTex], nullptr, nullptr, nullptr); // LDR RT
 
     RImplementation.rmNormal(RCache);
 
@@ -364,7 +364,7 @@ void dx113DFluidRenderer::Draw(const dx113DFluidData& FluidData)
     // Render to the back buffer sampling from the raycast texture that we just created
     //  If and edge was detected at the current pixel we will raycast again to avoid
     //  smoke aliasing artifacts at scene edges
-    pTarget->u_setrt(pTarget->rt_Generic_0_r, nullptr, nullptr, pTarget->rt_MSAADepth->pZRT); // LDR RT
+    pTarget->u_setrt(RCache, pTarget->rt_Generic_0_r, nullptr, nullptr, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
     if (bRenderFire)
         RCache.set_Element(m_RendererTechnique[RS_QuadRaycastCopyFire]);
@@ -386,7 +386,7 @@ void dx113DFluidRenderer::ComputeRayData(const dx113DFluidData &FluidData)
     RCache.ClearRT(RT[RRT_RayDataTex], {});
 
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(RT[RRT_RayDataTex], nullptr, nullptr, nullptr); // LDR RT
+    pTarget->u_setrt(RCache, RT[RRT_RayDataTex], nullptr, nullptr, nullptr); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_CompRayData_Back]);
 
     RImplementation.rmNormal(RCache);
@@ -400,7 +400,7 @@ void dx113DFluidRenderer::ComputeRayData(const dx113DFluidData &FluidData)
     // Render volume front faces using subtractive blending
     // We output xyz="position in grid space" and w=boxDepth,
     //  unless the pixel is occluded by the scene, in which case we output xyzw=(1,0,0,0)
-    pTarget->u_setrt(RT[RRT_RayDataTex], nullptr, nullptr, nullptr); // LDR RT
+    pTarget->u_setrt(RCache, RT[RRT_RayDataTex], nullptr, nullptr, nullptr); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_CompRayData_Front]);
     PrepareCBuffer(FluidData, Device.dwWidth, Device.dwHeight);
 
@@ -411,7 +411,7 @@ void dx113DFluidRenderer::ComputeRayData(const dx113DFluidData &FluidData)
 void dx113DFluidRenderer::ComputeEdgeTexture(const dx113DFluidData &FluidData)
 {
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(RT[RRT_RayDataTexSmall], nullptr, nullptr, nullptr); // LDR RT
+    pTarget->u_setrt(RCache, RT[RRT_RayDataTexSmall], nullptr, nullptr, nullptr); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_QuadDownSampleRayDataTexture]);
 
     // First setup viewport to match the size of the destination low-res texture
@@ -423,7 +423,7 @@ void dx113DFluidRenderer::ComputeEdgeTexture(const dx113DFluidData &FluidData)
     DrawScreenQuad();
 
     // Create an edge texture, performing edge detection on 'rayDataTexSmall'
-    pTarget->u_setrt(RT[RRT_EdgeTex], nullptr, nullptr, nullptr); // LDR RT
+    pTarget->u_setrt(RCache, RT[RRT_EdgeTex], nullptr, nullptr, nullptr); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_QuadEdgeDetect]);
     PrepareCBuffer(FluidData, m_iRenderTextureWidth, m_iRenderTextureHeight);
 

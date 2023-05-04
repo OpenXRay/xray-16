@@ -91,14 +91,14 @@ public:
         return contexts_pool[id];
     }
 
-    ICF void release_context(u32 context_id)
+    ICF void release_context(u32 id)
     {
-        VERIFY(context_id != R_dsgraph_structure::IMM_CTX_ID); // never release immediate context
-        VERIFY(context_id < R__NUM_PARALLEL_CONTEXTS);
-        VERIFY(contexts_used.test(context_id));
-        VERIFY(contexts_pool[context_id].context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
-        contexts_pool[context_id].reset();
-        contexts_used.set(context_id, false);
+        VERIFY(id != R_dsgraph_structure::IMM_CTX_ID); // never release immediate context
+        VERIFY(id < R__NUM_PARALLEL_CONTEXTS);
+        VERIFY(contexts_used.test(id));
+        VERIFY(contexts_pool[id].context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
+        contexts_pool[id].reset();
+        contexts_used.set(id, false);
     }
 
     ICF R_dsgraph_structure& get_imm_context()
@@ -118,6 +118,10 @@ public:
         contexts_used.reset();
     }
 #else
+    ICF u32 alloc_context()
+    {
+        return R_dsgraph_structure::IMM_CTX_ID;
+    }
 
     ICF R_dsgraph_structure& get_imm_context()
     {
@@ -131,11 +135,16 @@ public:
         return get_imm_context();
     }
 
+    ICF void release_context(u32 id)
+    {
+        // do nothing
+    }
+
     ICF void cleanup_contexts()
     {
         context_imm.reset();
     }
-#endif // RENDER != R_R1
+#endif
 
     void CreateQuadIB();
 

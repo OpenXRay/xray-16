@@ -18,18 +18,18 @@ void CRender::RenderMenu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, nullptr, nullptr, Target->rt_Base_Depth); // LDR RT
+        Target->u_setrt(RCache, Target->rt_Generic_0, nullptr, nullptr, Target->rt_Base_Depth); // LDR RT
         g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
     // Distort
     {
-        Target->u_setrt(Target->rt_Generic_1, nullptr, nullptr, Target->rt_Base_Depth); // Now RT is a distortion mask
+        Target->u_setrt(RCache, Target->rt_Generic_1, nullptr, nullptr, Target->rt_Base_Depth); // Now RT is a distortion mask
         RCache.ClearRT(Target->rt_Generic_1, color_rgba(127, 127, 0, 127));
         g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
 
     // Actual Display
-    Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
+    Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
     RCache.set_Shader(Target->s_menu);
     RCache.set_Geometry(Target->g_menu);
 
@@ -86,7 +86,7 @@ void CRender::Render()
     if (!(g_pGameLevel && g_hud) || bMenu)
     {
 #if defined(USE_DX11) || defined(USE_OGL) // XXX: probably we can just enable this on DX9 too
-        Target->u_setrt(Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
+        Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
 #endif
         return;
     }
@@ -149,9 +149,9 @@ void CRender::Render()
     {
         // flush
         Target->phase_scene_prepare();
-        RCache.set_ColorWriteEnable(FALSE);
+        dsgraph.cmd_list.set_ColorWriteEnable(FALSE);
         dsgraph.render_graph(0);
-        RCache.set_ColorWriteEnable();
+        dsgraph.cmd_list.set_ColorWriteEnable();
     }
     else
     {
@@ -176,7 +176,7 @@ void CRender::Render()
         dsgraph.render_graph(0);
         dsgraph.render_lods(true, true);
         if (Details)
-            Details->Render();
+            Details->Render(dsgraph.cmd_list);
         Target->phase_scene_end();
     }
     else
@@ -199,7 +199,7 @@ void CRender::Render()
 #if defined(USE_DX11) || defined(USE_OGL)
     if (o.msaa)
     {
-        RCache.set_ZB(Target->rt_MSAADepth->pZRT);
+        dsgraph.cmd_list.set_ZB(Target->rt_MSAADepth->pZRT);
     }
 #endif
     {
@@ -221,7 +221,7 @@ void CRender::Render()
             if (it < LP.v_point.size())
             {
                 light* L = LP.v_point[it];
-                L->vis_prepare();
+                L->vis_prepare(dsgraph.cmd_list);
                 if (L->vis.pending)
                     LP_pending.v_point.push_back(L);
                 else
@@ -230,7 +230,7 @@ void CRender::Render()
             if (it < LP.v_spot.size())
             {
                 light* L = LP.v_spot[it];
-                L->vis_prepare();
+                L->vis_prepare(dsgraph.cmd_list);
                 if (L->vis.pending)
                     LP_pending.v_spot.push_back(L);
                 else
@@ -239,7 +239,7 @@ void CRender::Render()
             if (it < LP.v_shadowed.size())
             {
                 light* L = LP.v_shadowed[it];
-                L->vis_prepare();
+                L->vis_prepare(dsgraph.cmd_list);
                 if (L->vis.pending)
                     LP_pending.v_shadowed.push_back(L);
                 else
@@ -257,15 +257,15 @@ void CRender::Render()
         // skybox can be drawn here
         if (false)
         {
-            Target->u_setrt(Target->rt_Generic_0_r, Target->rt_Generic_1_r, nullptr, Target->rt_MSAADepth);
-            RCache.set_CullMode(CULL_NONE);
-            RCache.set_Stencil(FALSE);
+            Target->u_setrt(dsgraph.cmd_list, Target->rt_Generic_0_r, Target->rt_Generic_1_r, nullptr, Target->rt_MSAADepth);
+            dsgraph.cmd_list.set_CullMode(CULL_NONE);
+            dsgraph.cmd_list.set_Stencil(FALSE);
 
             // draw skybox
-            RCache.set_ColorWriteEnable();
-            RCache.set_Z(false);
+            dsgraph.cmd_list.set_ColorWriteEnable();
+            dsgraph.cmd_list.set_Z(false);
             g_pGamePersistent->Environment().RenderSky();
-            RCache.set_Z(true);
+            dsgraph.cmd_list.set_Z(true);
         }
 
         // level
@@ -273,7 +273,7 @@ void CRender::Render()
         dsgraph.render_hud();
         dsgraph.render_lods(true, true);
         if (Details)
-            Details->Render();
+            Details->Render(dsgraph.cmd_list);
         Target->phase_scene_end();
     }
 
@@ -332,15 +332,15 @@ void CRender::Render()
             r_sun.sync();
         else
             r_sun_old.sync();
-        Target->accum_direct_blend();
+        Target->accum_direct_blend(dsgraph.cmd_list);
     }
 
     {
         PIX_EVENT(DEFER_SELF_ILLUM);
-        Target->phase_accumulator();
+        Target->phase_accumulator(dsgraph.cmd_list);
         // Render emissive geometry, stencil - write 0x0 at pixel pos
-        RCache.set_xform_project(Device.mProject);
-        RCache.set_xform_view(Device.mView);
+        dsgraph.cmd_list.set_xform_project(Device.mProject);
+        dsgraph.cmd_list.set_xform_view(Device.mView);
         // Stencil - write 0x1 at pixel pos -
 #if defined(USE_DX9)
         RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
@@ -348,24 +348,23 @@ void CRender::Render()
 #elif defined(USE_DX11) || defined(USE_OGL)
         if (!o.msaa)
         {
-            RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
+            dsgraph.cmd_list.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         }
         else
         {
-            RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0x7f,
+            dsgraph.cmd_list.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0x7f,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         }
 #endif // USE_DX9
-        RCache.set_CullMode(CULL_CCW);
-        RCache.set_ColorWriteEnable();
+        dsgraph.cmd_list.set_CullMode(CULL_CCW);
+        dsgraph.cmd_list.set_ColorWriteEnable();
         dsgraph.render_emissive();
     }
 
     // Lighting, non dependant on OCCQ
     {
         PIX_EVENT(DEFER_LIGHT_NO_OCCQ);
-        Target->phase_accumulator();
         render_lights(LP_normal);
     }
 

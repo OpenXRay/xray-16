@@ -681,7 +681,7 @@ void CRender::Render()
     dsgraph.render_hud(); // hud
     dsgraph.render_graph(0); // normal level
     if (Details)
-        Details->Render(); // grass / details
+        Details->Render(dsgraph.cmd_list); // grass / details
     dsgraph.render_lods(true, false); // lods - FB
 
     g_pGamePersistent->Environment().RenderSky(); // sky / sun

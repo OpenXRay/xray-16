@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::draw_rain(light& RainSetup)
+void CRenderTarget::draw_rain(CBackend &cmd_list, light& RainSetup)
 {
     float fRainFactor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
 
@@ -236,62 +236,62 @@ void CRenderTarget::draw_rain(light& RainSetup)
 
         //	Use for intermediate results
         //	Patch normal
-        u_setrt(rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+        u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
 
         // u_setrt	(rt_Normal,NULL,NULL,get_base_zb());
-        RCache.set_Element(s_rain->E[1]);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
-        RCache.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
-        RCache.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
-        RCache.set_c("m_shadow", m_shadow);
-        RCache.set_c("m_sunmask", m_clouds_shadow);
-        RCache.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
-        RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
+        cmd_list.set_Element(s_rain->E[1]);
+        cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+        cmd_list.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
+        cmd_list.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
+        cmd_list.set_c("m_shadow", m_shadow);
+        cmd_list.set_c("m_sunmask", m_clouds_shadow);
+        cmd_list.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
+        cmd_list.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
         if (!RImplementation.o.msaa)
         {
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
         }
         else
         {
             // per pixel execution
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
 
             // per sample
             if (RImplementation.o.msaa_opt)
             {
-                RCache.set_Element(s_rain_msaa[0]->E[0]);
-                RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
-                RCache.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
-                RCache.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
-                RCache.set_c("m_shadow", m_shadow);
-                RCache.set_c("m_sunmask", m_clouds_shadow);
-                RCache.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
-                RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
-                RCache.set_CullMode(CULL_NONE);
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
-                RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+                cmd_list.set_Element(s_rain_msaa[0]->E[0]);
+                cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+                cmd_list.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
+                cmd_list.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
+                cmd_list.set_c("m_shadow", m_shadow);
+                cmd_list.set_c("m_sunmask", m_clouds_shadow);
+                cmd_list.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
+                cmd_list.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
+                cmd_list.set_CullMode(CULL_NONE);
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
             }
             else
             {
 #if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
-                    RCache.set_Element(s_rain_msaa[i]->E[0]);
-                    RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
-                    RCache.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
-                    RCache.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
-                    RCache.set_c("m_shadow", m_shadow);
-                    RCache.set_c("m_sunmask", m_clouds_shadow);
-                    RCache.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
-                    RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
-                    RCache.StateManager.SetSampleMask(u32(1) << i);
-                    RCache.set_CullMode(CULL_NONE);
-                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
-                    RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+                    cmd_list.set_Element(s_rain_msaa[i]->E[0]);
+                    cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+                    cmd_list.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
+                    cmd_list.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
+                    cmd_list.set_c("m_shadow", m_shadow);
+                    cmd_list.set_c("m_sunmask", m_clouds_shadow);
+                    cmd_list.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
+                    cmd_list.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
+                    cmd_list.StateManager.SetSampleMask(u32(1) << i);
+                    cmd_list.set_CullMode(CULL_NONE);
+                    cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                    cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
-                RCache.StateManager.SetSampleMask(0xffffffff);
+                cmd_list.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else
@@ -301,54 +301,54 @@ void CRenderTarget::draw_rain(light& RainSetup)
         }
 
         //	Apply normal
-        RCache.set_Element(s_rain->E[2]);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
-        RCache.set_c("m_shadow", m_shadow);
-        RCache.set_c("m_sunmask", m_clouds_shadow);
+        cmd_list.set_Element(s_rain->E[2]);
+        cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+        cmd_list.set_c("m_shadow", m_shadow);
+        cmd_list.set_c("m_sunmask", m_clouds_shadow);
 
         if (!RImplementation.o.gbuffer_opt)
         {
             //	Do this in blender!
             // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_RED | D3D_COLOR_WRITE_ENABLE_GREEN | D3D_COLOR_WRITE_ENABLE_BLUE );
-            u_setrt(rt_Normal, nullptr, nullptr, rt_MSAADepth);
+            u_setrt(cmd_list, rt_Normal, nullptr, nullptr, rt_MSAADepth);
         }
         else
         {
             // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_RED | D3D_COLOR_WRITE_ENABLE_GREEN );
-            u_setrt(rt_Position, nullptr, nullptr, rt_MSAADepth);
+            u_setrt(cmd_list, rt_Position, nullptr, nullptr, rt_MSAADepth);
         }
 
         if (!RImplementation.o.msaa)
         {
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
         }
         else
         {
             // per pixel execution
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
 
             // per sample
             if (RImplementation.o.msaa_opt)
             {
-                RCache.set_Element(s_rain_msaa[0]->E[1]);
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
-                RCache.set_CullMode(CULL_NONE);
-                RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+                cmd_list.set_Element(s_rain_msaa[0]->E[1]);
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                cmd_list.set_CullMode(CULL_NONE);
+                cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
             }
             else
             {
 #if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
-                    RCache.set_Element(s_rain_msaa[i]->E[1]);
-                    RCache.StateManager.SetSampleMask(u32(1) << i);
-                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
-                    RCache.set_CullMode(CULL_NONE);
-                    RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+                    cmd_list.set_Element(s_rain_msaa[i]->E[1]);
+                    cmd_list.StateManager.SetSampleMask(u32(1) << i);
+                    cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                    cmd_list.set_CullMode(CULL_NONE);
+                    cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
-                RCache.StateManager.SetSampleMask(0xffffffff);
+                cmd_list.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else
@@ -358,44 +358,44 @@ void CRenderTarget::draw_rain(light& RainSetup)
         }
 
         //	Apply gloss
-        RCache.set_Element(s_rain->E[3]);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
-        RCache.set_c("m_shadow", m_shadow);
-        RCache.set_c("m_sunmask", m_clouds_shadow);
+        cmd_list.set_Element(s_rain->E[3]);
+        cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+        cmd_list.set_c("m_shadow", m_shadow);
+        cmd_list.set_c("m_sunmask", m_clouds_shadow);
 
         //	It is restored automatically by a set_Element call
         // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_ALL );
-        u_setrt(rt_Color, nullptr, nullptr, rt_MSAADepth);
+        u_setrt(cmd_list, rt_Color, nullptr, nullptr, rt_MSAADepth);
 
         if (!RImplementation.o.msaa)
         {
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
         }
         else
         {
             // per pixel execution
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
 
             // per sample
             if (RImplementation.o.msaa_opt)
             {
-                RCache.set_Element(s_rain_msaa[0]->E[2]);
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
-                RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+                cmd_list.set_Element(s_rain_msaa[0]->E[2]);
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
             }
             else
             {
 #if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
-                    RCache.set_Element(s_rain_msaa[i]->E[2]);
-                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
-                    RCache.StateManager.SetSampleMask(u32(1) << i);
-                    RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
+                    cmd_list.set_Element(s_rain_msaa[i]->E[2]);
+                    cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                    cmd_list.StateManager.SetSampleMask(u32(1) << i);
+                    cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
-                RCache.StateManager.SetSampleMask(0xffffffff);
+                cmd_list.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else

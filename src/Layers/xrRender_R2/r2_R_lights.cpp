@@ -62,6 +62,8 @@ void CRender::render_lights(light_Package& LP)
         LP.v_shadowed = std::move(refactored);
     }
 
+    auto& cmd_list = RImplementation.get_imm_context().cmd_list;
+
     PIX_EVENT(SHADOWED_LIGHTS);
 
     //////////////////////////////////////////////////////////////////////////
@@ -126,18 +128,18 @@ void CRender::render_lights(light_Package& LP)
             {
                 Stats.s_merged++;
                 L_spot_s.push_back(L);
-                Target->phase_smap_spot(L);
-                RCache.set_xform_world(Fidentity);
-                RCache.set_xform_view(L->X.S.view);
-                RCache.set_xform_project(L->X.S.project);
+                Target->phase_smap_spot(dsgraph.cmd_list, L);
+                dsgraph.cmd_list.set_xform_world(Fidentity);
+                dsgraph.cmd_list.set_xform_view(L->X.S.view);
+                dsgraph.cmd_list.set_xform_project(L->X.S.project);
                 dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                    Details->Render();
+                    Details->Render(dsgraph.cmd_list);
                 L->X.S.transluent = FALSE;
                 if (bSpecial)
                 {
                     L->X.S.transluent = TRUE;
-                    Target->phase_smap_spot_tsh(L);
+                    Target->phase_smap_spot_tsh(dsgraph.cmd_list, L);
                     PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
                     dsgraph.render_graph(1); // normal level, secondary priority
                     PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
@@ -162,7 +164,7 @@ void CRender::render_lights(light_Package& LP)
         Stats.s_used++;
 
         // generate spot shadowmap
-        Target->phase_smap_spot_clear();
+        Target->phase_smap_spot_clear(cmd_list);
         xr_vector<light*>& source = LP.v_shadowed;
         light* L = source.back();
         const u16 sid = L->vis.smap_ID;
@@ -181,6 +183,11 @@ void CRender::render_lights(light_Package& LP)
                 flush_lights();
                 continue;
             }
+
+            // tmp until deferred ctxs
+            RImplementation.get_context(batch_id).cmd_list.Invalidate();
+            HW.get_context(RImplementation.get_context(batch_id).cmd_list.context_id)->ClearState();
+            //
 
             source.pop_back();
             Lights_LastFrame.push_back(L);
@@ -202,10 +209,15 @@ void CRender::render_lights(light_Package& LP)
         }
         flush_lights(); // in case if something left
 
+#if RENDER == R_R4
+        cmd_list.Invalidate(); // tmp until deferred ctxs
+        HW.get_context(cmd_list.context_id)->ClearState();
+#endif
+
         PIX_EVENT(UNSHADOWED_LIGHTS);
 
         //		switch-to-accumulator
-        Target->phase_accumulator();
+        Target->phase_accumulator(cmd_list);
 
         PIX_EVENT(POINT_LIGHTS);
 
@@ -217,7 +229,7 @@ void CRender::render_lights(light_Package& LP)
             L2->vis_update();
             if (L2->vis.visible)
             {
-                Target->accum_point(L2);
+                Target->accum_point(cmd_list, L2);
                 render_indirect(L2);
             }
         }
@@ -233,7 +245,7 @@ void CRender::render_lights(light_Package& LP)
             if (L2->vis.visible)
             {
                 LR.compute_xf_spot(L2);
-                Target->accum_spot(L2);
+                Target->accum_spot(cmd_list, L2);
                 render_indirect(L2);
             }
         }
@@ -246,14 +258,14 @@ void CRender::render_lights(light_Package& LP)
             PIX_EVENT(ACCUM_SPOT);
             for (light* p_light : L_spot_s)
             {
-                Target->accum_spot(p_light);
+                Target->accum_spot(cmd_list, p_light);
                 render_indirect(p_light);
             }
 
             PIX_EVENT(ACCUM_VOLUMETRIC);
             if (RImplementation.o.advancedpp && ps_r2_ls_flags.is(R2FLAG_VOLUMETRIC_LIGHTS))
                 for (light* p_light : L_spot_s)
-                    Target->accum_volumetric(p_light);
+                    Target->accum_volumetric(cmd_list, p_light);
 
             L_spot_s.clear();
         }
@@ -270,7 +282,7 @@ void CRender::render_lights(light_Package& LP)
             if (p_light->vis.visible)
             {
                 render_indirect(p_light);
-                Target->accum_point(p_light);
+                Target->accum_point(cmd_list, p_light);
             }
         }
         Lvec.clear();
@@ -288,7 +300,7 @@ void CRender::render_lights(light_Package& LP)
             {
                 LR.compute_xf_spot(p_light);
                 render_indirect(p_light);
-                Target->accum_spot(p_light);
+                Target->accum_spot(cmd_list, p_light);
             }
         }
         Lvec.clear();
@@ -299,6 +311,8 @@ void CRender::render_indirect(light* L) const
 {
     if (!ps_r2_ls_flags.test(R2FLAG_GI))
         return;
+
+    auto& cmd_list = RImplementation.get_imm_context().cmd_list;
 
     light LIGEN;
     LIGEN.set_type(IRender_Light::REFLECTED);
@@ -340,6 +354,6 @@ void CRender::render_indirect(light* L) const
             continue;
         LIGEN.set_range(x);
 
-        Target->accum_reflected(&LIGEN);
+        Target->accum_reflected(cmd_list, &LIGEN);
     }
 }

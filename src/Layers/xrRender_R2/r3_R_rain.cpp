@@ -305,10 +305,10 @@ void render_rain::render()
                 !dsgraph.mapSorted.empty();
             if (bNormal || bSpecial)
             {
-                RImplementation.Target->phase_smap_direct(&RainLight, SE_SUN_RAIN_SMAP);
-                RCache.set_xform_world(Fidentity);
-                RCache.set_xform_view(Fidentity);
-                RCache.set_xform_project(RainLight.X.D[0].combine);
+                RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, &RainLight, SE_SUN_RAIN_SMAP);
+                dsgraph.cmd_list.set_xform_world(Fidentity);
+                dsgraph.cmd_list.set_xform_view(Fidentity);
+                dsgraph.cmd_list.set_xform_project(RainLight.X.D[0].combine);
                 dsgraph.render_graph(0);
                 // if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))
                 //	Details->Render					()	;
@@ -316,15 +316,22 @@ void render_rain::render()
         }
         RImplementation.release_context(context_id);
     }
+}
+
+void render_rain::flush()
+{
+    //-- cmd list submission should go here --
+
+    auto& cmd_list = RImplementation.get_imm_context().cmd_list;
 
     // Restore XForms
-    RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    cmd_list.set_xform_world(Fidentity);
+    cmd_list.set_xform_view(Device.mView);
+    cmd_list.set_xform_project(Device.mProject);
 
     // Accumulate
-    RImplementation.Target->phase_rain(); // TODO: move into this class as well
-    RImplementation.Target->draw_rain(RainLight);
+    RImplementation.Target->phase_rain(cmd_list); // TODO: move into this class as well
+    RImplementation.Target->draw_rain(cmd_list, RainLight);
 
     RainLight.frame_render = Device.dwFrame;
 }

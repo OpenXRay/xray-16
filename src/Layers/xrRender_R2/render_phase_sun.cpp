@@ -309,60 +309,69 @@ void render_sun::render()
     {
         auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
 
+        dsgraph.cmd_list.Invalidate(); // tmp until deferred ctxs
+        HW.get_context(dsgraph.cmd_list.context_id)->ClearState();
+
         bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
         bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
             !dsgraph.mapSorted.empty();
         if (bNormal || bSpecial)
         {
-            RImplementation.Target->phase_smap_direct(sun, SE_SUN_FAR);
-            RCache.set_xform_world(Fidentity);
-            RCache.set_xform_view(Fidentity);
-            RCache.set_xform_project(sun->X.D[cascade_ind].combine);
+            RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, sun, SE_SUN_FAR);
+            dsgraph.cmd_list.set_xform_world(Fidentity);
+            dsgraph.cmd_list.set_xform_view(Fidentity);
+            dsgraph.cmd_list.set_xform_project(sun->X.D[cascade_ind].combine);
             dsgraph.render_graph(0);
             if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                RImplementation.Details->Render();
+                RImplementation.Details->Render(dsgraph.cmd_list);
             sun->X.D[cascade_ind].transluent = FALSE;
             if (bSpecial)
             {
                 sun->X.D[cascade_ind].transluent = TRUE;
-                RImplementation.Target->phase_smap_direct_tsh(sun, SE_SUN_FAR);
+                RImplementation.Target->phase_smap_direct_tsh(dsgraph.cmd_list, sun, SE_SUN_FAR);
                 dsgraph.render_graph(1); // normal level, secondary priority
                 dsgraph.render_sorted(); // strict-sorted geoms
             }
         }
-        RImplementation.release_context(dsgraph.context_id);
-
-        // Accumulate
-        RImplementation.Target->phase_accumulator();
 
         if (RImplementation.Target->use_minmax_sm_this_frame())
         {
             PIX_EVENT(SE_SUN_NEAR_MINMAX_GENERATE);
-            RImplementation.Target->create_minmax_SM();
+            RImplementation.Target->create_minmax_SM(dsgraph.cmd_list);
         }
 
+        // Accumulate
         if (cascade_ind == 0)
         {
             PIX_EVENT(SE_SUN_NEAR);
-            RImplementation.Target->accum_direct_cascade(SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind].xform,
-                m_sun_cascades[cascade_ind].bias);
+            RImplementation.Target->accum_direct_cascade(dsgraph.cmd_list, SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform,
+                m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind].bias);
         }
         else if (cascade_ind < m_sun_cascades.size() - 1)
         {
             PIX_EVENT(SE_SUN_MIDDLE);
-            RImplementation.Target->accum_direct_cascade(SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
+            RImplementation.Target->accum_direct_cascade(dsgraph.cmd_list,SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
                 m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
         }
         else
         {
             PIX_EVENT(SE_SUN_FAR);
-            RImplementation.Target->accum_direct_cascade(SE_SUN_FAR, m_sun_cascades[cascade_ind].xform,
+            RImplementation.Target->accum_direct_cascade(dsgraph.cmd_list, SE_SUN_FAR, m_sun_cascades[cascade_ind].xform,
                 m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
         }
+
+        RImplementation.release_context(dsgraph.context_id);
     }
+}
+
+void render_sun::flush()
+{
+    auto &cmd_list = RImplementation.get_imm_context().cmd_list;
+
+    cmd_list.Invalidate(); // tmp
 
     // Restore XForms
-    RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    cmd_list.set_xform_world(Fidentity);
+    cmd_list.set_xform_view(Device.mView);
+    cmd_list.set_xform_project(Device.mProject);
 }

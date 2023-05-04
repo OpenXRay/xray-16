@@ -37,7 +37,7 @@ void CSkeletonX_ST::Copy(dxRender_Visual* P)
     _Copy((CSkeletonX*)X);
 }
 //////////////////////////////////////////////////////////////////////
-void CSkeletonX_PM::Render(float LOD, bool use_fast_geo)
+void CSkeletonX_PM::Render(CBackend &cmd_list, float LOD, bool use_fast_geo)
 {
     int lod_id = inherited1::last_lod;
     if (LOD >= 0.f)
@@ -48,9 +48,9 @@ void CSkeletonX_PM::Render(float LOD, bool use_fast_geo)
     }
     VERIFY(lod_id >= 0 && lod_id < int(nSWI.count));
     FSlideWindow& SW = nSWI.sw[lod_id];
-    _Render(rm_geom, SW.num_verts, SW.offset, SW.num_tris);
+    _Render(cmd_list, rm_geom, SW.num_verts, SW.offset, SW.num_tris);
 }
-void CSkeletonX_ST::Render(float /*LOD*/, bool use_fast_geo) { _Render(rm_geom, vCount, 0, dwPrimitives); }
+void CSkeletonX_ST::Render(CBackend &cmd_list, float /*LOD*/, bool use_fast_geo) { _Render(cmd_list, rm_geom, vCount, 0, dwPrimitives); }
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX_PM::Release() { inherited1::Release(); }
 void CSkeletonX_ST::Release() { inherited1::Release(); }

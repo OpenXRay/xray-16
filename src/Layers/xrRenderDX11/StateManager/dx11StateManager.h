@@ -5,13 +5,13 @@
 class dx11StateManager
 {
 public:
-    dx11StateManager();
+    explicit dx11StateManager(CBackend &cmd_list_in);
     ~dx11StateManager();
 
     //	Set all states to default
     void Reset();
     //	Sends states to DX11 runtime, creates new state objects if nesessary
-    void Apply(u32 context_id);
+    void Apply();
 
     //	Unmaps all constant bindings.
     void UnmapConstants();
@@ -89,6 +89,8 @@ private:
     bool m_bOverrideScissoring;
     BOOL m_bOverrideScissoringValue;
     u32 m_uiSampleMask;
+
+    CBackend& cmd_list;
 };
 
 #endif //	dx11StateManager_included

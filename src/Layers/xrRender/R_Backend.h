@@ -560,6 +560,12 @@ public:
 
     CBackend()
         : xforms(*this)
+        , tree(*this)
+        , hemi(*this)
+#if defined(USE_DX11)
+        , constants(*this)
+        , StateManager(*this)
+#endif
     {
         Invalidate();
     }
@@ -586,18 +592,13 @@ private:
     bool CBuffersNeedUpdate(ref_cbuffer buf1[MaxCBuffers], ref_cbuffer buf2[MaxCBuffers], u32& uiMin, u32& uiMax);
 
 private:
-    ID3DBlob* m_pInputSignature;
+    ID3DBlob* m_pInputSignature{ nullptr };
 
     bool m_bChangedRTorZB;
 
 public:
     dx11StateManager StateManager;
-    dx11SamplerStateCache SSManager;
     dx11ShaderResourceStateCache SRVSManager;
-
-    dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
-    dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
-    dx11StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
 
     u32 context_id{ CHW::IMM_CTX_ID };
 #endif // USE_DX11

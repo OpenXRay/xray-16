@@ -92,7 +92,7 @@ ICF void CBackend::set_States(SState* _state)
         stat.states++;
         state = _state->state;
 #if defined(USE_DX11)
-        state->Apply(context_id);
+        state->Apply(*this);
 #else
         state->Apply();
 #endif

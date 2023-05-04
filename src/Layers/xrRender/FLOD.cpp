@@ -80,7 +80,7 @@ void FLOD::Copy(dxRender_Visual* pFrom)
     lod_factor = F->lod_factor;
     CopyMemory(facets, F->facets, sizeof(facets));
 }
-void FLOD::Render(float /*LOD*/, bool use_fast_geo)
+void FLOD::Render(CBackend &cmd_list, float /*LOD*/, bool use_fast_geo)
 {
     /*
     Fvector				Ldir;

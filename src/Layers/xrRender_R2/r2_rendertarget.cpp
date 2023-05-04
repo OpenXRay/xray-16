@@ -26,18 +26,20 @@
 #endif
 
 #if defined(USE_DX9)
-void CRenderTarget::u_stencil_optimize(BOOL common_stencil)
+void CRenderTarget::u_stencil_optimize(CBackend &cmd_list, BOOL common_stencil)
 #elif defined(USE_DX11) || defined(USE_OGL)
-void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
+void CRenderTarget::u_stencil_optimize(CBackend &cmd_list, eStencilOptimizeMode eSOM)
 #else
 #   error No graphics API selected or enabled!
 #endif
 {
+    PIX_EVENT(stencil_optimize);
+
 #if defined(USE_DX9) || defined(USE_DX11)
     // TODO: DX11: remove half pixel offset?
     VERIFY(RImplementation.o.nvstencil);
 #   ifdef USE_DX9
-    RCache.set_ColorWriteEnable(false);
+    cmd_list.set_ColorWriteEnable(false);
 #   endif
     u32 Offset;
     float _w = float(Device.dwWidth);
@@ -69,23 +71,23 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 #   endif
     RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 #   ifdef USE_DX9
-    RCache.set_CullMode(CULL_NONE);
+    cmd_list.set_CullMode(CULL_NONE);
     if (common_stencil)
-        RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00); // keep/keep/keep
+        cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00); // keep/keep/keep
 #   endif
-    RCache.set_Element(s_occq->E[1]);
+    cmd_list.set_Element(s_occq->E[1]);
 
 #   if defined(USE_DX11)
     switch (eSOM)
     {
-    case SO_Light: RCache.StateManager.SetStencilRef(dwLightMarkerID); break;
-    case SO_Combine: RCache.StateManager.SetStencilRef(0x01); break;
+    case SO_Light: cmd_list.StateManager.SetStencilRef(dwLightMarkerID); break;
+    case SO_Combine: cmd_list.StateManager.SetStencilRef(0x01); break;
     default: VERIFY(!"CRenderTarget::u_stencil_optimize. switch no default!");
     }
 #   endif
 
-    RCache.set_Geometry(g_combine);
-    RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+    cmd_list.set_Geometry(g_combine);
+    cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 #elif defined(USE_OGL)
     //	TODO: OGL: should we implement stencil optimization?
     VERIFY(RImplementation.o.nvstencil);
@@ -97,7 +99,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 }
 
 // 2D texgen (texture adjustment matrix)
-void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
+void CRenderTarget::u_compute_texgen_screen(CBackend &cmd_list, Fmatrix& m_Texgen)
 {
 #if defined(USE_DX9)
     float _w = float(Device.dwWidth);
@@ -131,11 +133,11 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 #   error No graphics API selected or enabled!
 #endif
 
-    m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
+    m_Texgen.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
 }
 
 // 2D texgen for jitter (texture adjustment matrix)
-void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
+void CRenderTarget::u_compute_texgen_jitter(CBackend &cmd_list, Fmatrix& m_Texgen_J)
 {
     // place into 0..1 space
     Fmatrix m_TexelAdjust =
@@ -151,7 +153,7 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
     };
-    m_Texgen_J.mul(m_TexelAdjust, RCache.xforms.m_wvp);
+    m_Texgen_J.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
 
     // rescale - tile it
     float scale_X = float(Device.dwWidth) / float(TEX_jitter);
@@ -711,11 +713,11 @@ CRenderTarget::CRenderTarget()
             xr_sprintf(name, "%s_%d", r2_RT_luminance_pool, it);
             rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
 #ifdef USE_DX9
-            u_setrt(rt_LUM_pool[it], 0, 0, 0);
+            u_setrt(RCache, rt_LUM_pool[it], 0, 0, 0);
 #endif
             RCache.ClearRT(rt_LUM_pool[it], 0x7f7f7f7f);
         }
-        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
+        u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
     }
 
     // COMBINE
@@ -854,13 +856,13 @@ CRenderTarget::~CRenderTarget()
 #endif
 }
 
-void CRenderTarget::reset_light_marker(bool bResetStencil)
+void CRenderTarget::reset_light_marker(CBackend &cmd_list, bool bResetStencil)
 {
     dwLightMarkerID = 5;
     if (bResetStencil)
     {
 #ifdef USE_DX9
-        RCache.set_ColorWriteEnable(FALSE);
+        cmd_list.set_ColorWriteEnable(FALSE);
 #endif
         u32 Offset;
         float _w = float(Device.dwWidth);
@@ -878,11 +880,11 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         pv->set(float(_w + eps), eps, eps, 1.f, C, 0, 0);
         pv++;
         RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
-        RCache.set_CullMode(CULL_NONE);
+        cmd_list.set_CullMode(CULL_NONE);
         //  Clear everything except last bit
-        RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, dwLightMarkerID, 0x00, 0xFE,
+        cmd_list.set_Stencil(TRUE, D3DCMP_ALWAYS, dwLightMarkerID, 0x00, 0xFE,
             D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
-        RCache.set_Element(s_occq->E[1]);
+        cmd_list.set_Element(s_occq->E[1]);
 #elif defined(USE_DX11) || defined(USE_OGL)
         float eps = 0;
         float _dw = 0.5f;
@@ -897,23 +899,23 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
         pv++;
         RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
-        RCache.set_Element(s_occq->E[2]);
+        cmd_list.set_Element(s_occq->E[2]);
 #else
 #   error No graphics API selected or enabled!
 #endif
-        RCache.set_Geometry(g_combine);
-        RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+        cmd_list.set_Geometry(g_combine);
+        cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
 }
 
-void CRenderTarget::increment_light_marker()
+void CRenderTarget::increment_light_marker(CBackend &cmd_list)
 {
     dwLightMarkerID += 2;
 
     const u32 iMaxMarkerValue = RImplementation.o.msaa ? 127 : 255;
 
     if (dwLightMarkerID > iMaxMarkerValue)
-        reset_light_marker(true);
+        reset_light_marker(cmd_list, true);
 }
 
 bool CRenderTarget::need_to_render_sunshafts()

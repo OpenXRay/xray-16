@@ -34,7 +34,7 @@ void CBackend::OnFrameBegin()
         // DX9 sets base rt and base zb by default
 #ifndef USE_OGL
         // XXX: Getting broken HUD hands for OpenGL after calling rmNormal()
-        RImplementation.rmNormal(RCache);
+        RImplementation.rmNormal(*this);
 #else
         set_FB(HW.pFB);
 #endif
@@ -246,7 +246,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
                 }
             }
@@ -271,7 +271,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
                 }
             }
@@ -294,7 +294,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
                 }
             }
@@ -316,7 +316,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
                 }
             }
@@ -338,7 +338,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
                 }
             }
@@ -360,7 +360,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Applyload_id);
                 }
             }
@@ -560,10 +560,6 @@ void CBackend::OnDeviceDestroy()
 #if defined(USE_DX11)
     //  Destroy state managers
     StateManager.Reset();
-    RSManager.ClearStateArray();
-    DSSManager.ClearStateArray();
-    BSManager.ClearStateArray();
-    SSManager.ClearStateArray();
 #endif
 }
 

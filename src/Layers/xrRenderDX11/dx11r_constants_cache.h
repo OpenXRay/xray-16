@@ -16,7 +16,8 @@ public:
     //	ALIGN(16)	R_constant_array	a_pixel;
     //	ALIGN(16)	R_constant_array	a_vertex;
 
-    void flush_cache(u32 context_id);
+    explicit R_constants(CBackend& cmd_list_in) : cmd_list(cmd_list_in) {}
+    void flush_cache();
 
 public:
     // fp, non-array versions
@@ -100,10 +101,10 @@ public:
     }
 
     //
-    ICF void flush(u32 context_id)
+    ICF void flush()
     {
         // if (a_pixel.b_dirty || a_vertex.b_dirty)	flush_cache();
-        flush_cache(context_id);
+        flush_cache();
     }
 
     ICF void access_direct(R_constant* C, size_t DataSize, void** ppVData, void** ppGData, void** ppPData)
@@ -163,6 +164,8 @@ private:
 
     template<BufferType BType>
     dx11ConstantBuffer& GetCBuffer(R_constant* C) const = delete; // no implicit specialization
+
+    CBackend& cmd_list;
 };
 
 template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_PixelBuffer>(R_constant* C) const;

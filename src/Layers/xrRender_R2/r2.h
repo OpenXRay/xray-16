@@ -121,6 +121,7 @@ struct render_rain : public i_render_phase
     void init() override;
     void calculate() override;
     void render() override;
+    void flush() override;
 
     light RainLight;
     u32 context_id{ R_dsgraph_structure::INVALID_CONTEXT_ID };
@@ -133,6 +134,7 @@ struct render_sun : public i_render_phase
     void init() override;
     void calculate() override;
     void render() override;
+    void flush() override;
 
     xr_vector<sun::cascade> m_sun_cascades;
     light* sun{ nullptr };

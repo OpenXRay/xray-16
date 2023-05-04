@@ -302,9 +302,9 @@ IC void CBackend::Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 Thre
     stat.compute.groups_z = ThreadGroupCountZ;
 
     SRVSManager.Apply(context_id);
-    StateManager.Apply(context_id);
+    StateManager.Apply();
     //  State manager may alter constants
-    constants.flush(context_id);
+    constants.flush();
     HW.get_context(context_id)->Dispatch(ThreadGroupCountX, ThreadGroupCountY, ThreadGroupCountZ);
 }
 #endif
@@ -347,9 +347,9 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, 
     SRVSManager.Apply(context_id);
     ApplyRTandZB();
     ApplyVertexLayout();
-    StateManager.Apply(context_id);
+    StateManager.Apply();
     //  State manager may alter constants
-    constants.flush(context_id);
+    constants.flush();
     //  Msg("DrawIndexed: Start");
     //  Msg("iIndexCount=%d, startI=%d, baseV=%d", iIndexCount, startI, baseV);
     HW.get_context(context_id)->DrawIndexed(iIndexCount, startI, baseV);
@@ -378,9 +378,9 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC)
     SRVSManager.Apply(context_id);
     ApplyRTandZB();
     ApplyVertexLayout();
-    StateManager.Apply(context_id);
+    StateManager.Apply();
     //  State manager may alter constants
-    constants.flush(context_id);
+    constants.flush();
     //  Msg("Draw: Start");
     //  Msg("iVertexCount=%d, startV=%d", iVertexCount, startV);
     // CHK_DX               (HW.pDevice->DrawPrimitive(T, startV, PC));

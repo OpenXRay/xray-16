@@ -73,11 +73,11 @@ public:
 #endif
 
 public:
-    void apply_load(u32 stage);
-    void apply_theora(u32 stage);
-    void apply_avi(u32 stage) const;
-    void apply_seq(u32 stage);
-    void apply_normal(u32 stage) const;
+    void apply_load(CBackend &cmd_list, u32 stage);
+    void apply_theora(CBackend &cmd_list, u32 stage);
+    void apply_avi(CBackend &cmd_list, u32 stage) const;
+    void apply_seq(CBackend &cmd_list, u32 stage);
+    void apply_normal(CBackend &cmd_list, u32 stage) const;
 
     void Preload();
     void Load();
@@ -139,7 +139,7 @@ private:
 
     void desc_update();
 #if defined(USE_DX11)
-    void Apply(u32 dwStage) const;
+    void Apply(CBackend &cmd_list, u32 dwStage) const;
     D3D_USAGE GetUsage();
 #endif
 
@@ -153,7 +153,7 @@ public: //	Public class members (must be encapsulated further)
         u32 MemoryUsage : 28;
     } flags;
 
-    fastdelegate::FastDelegate1<u32> bind;
+    fastdelegate::FastDelegate2<CBackend&,u32> bind;
 
     CAviPlayerCustom* pAVI;
     CTheoraSurface* pTheora;

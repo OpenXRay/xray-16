@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb)
+void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb)
 {
     VERIFY(_1 || zb);
     if (_1)
@@ -32,22 +32,22 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     }
 
     if (_1)
-        RCache.set_RT(_1->pRT, 0);
+        cmd_list.set_RT(_1->pRT, 0);
     else
-        RCache.set_RT(NULL, 0);
+        cmd_list.set_RT(NULL, 0);
     if (_2)
-        RCache.set_RT(_2->pRT, 1);
+        cmd_list.set_RT(_2->pRT, 1);
     else
-        RCache.set_RT(NULL, 1);
+        cmd_list.set_RT(NULL, 1);
     if (_3)
-        RCache.set_RT(_3->pRT, 2);
+        cmd_list.set_RT(_3->pRT, 2);
     else
-        RCache.set_RT(NULL, 2);
-    RCache.set_ZB(zb);
+        cmd_list.set_RT(NULL, 2);
+    cmd_list.set_ZB(zb);
     //	RImplementation.rmNormal				();
 }
 
-void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb)
+void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb)
 {
     VERIFY(_1 || zb);
     if (_1)
@@ -78,27 +78,27 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
     }
 
     if (_1)
-        RCache.set_RT(_1->pRT, 0);
+        cmd_list.set_RT(_1->pRT, 0);
     else
-        RCache.set_RT(NULL, 0);
+        cmd_list.set_RT(NULL, 0);
     if (_2)
-        RCache.set_RT(_2->pRT, 1);
+        cmd_list.set_RT(_2->pRT, 1);
     else
-        RCache.set_RT(NULL, 1);
-    RCache.set_ZB(zb);
+        cmd_list.set_RT(NULL, 1);
+    cmd_list.set_ZB(zb);
     //	RImplementation.rmNormal				();
 }
 
-void CRenderTarget::u_setrt(u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
+void CRenderTarget::u_setrt(CBackend &cmd_list, u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
     ID3DDepthStencilView* zb)
 {
     // VERIFY									(_1);
     dwWidth = W;
     dwHeight = H;
     // VERIFY									(_1);
-    RCache.set_RT(_1, 0);
-    RCache.set_RT(_2, 1);
-    RCache.set_RT(_3, 2);
-    RCache.set_ZB(zb);
+    cmd_list.set_RT(_1, 0);
+    cmd_list.set_RT(_2, 1);
+    cmd_list.set_RT(_3, 2);
+    cmd_list.set_ZB(zb);
     //	RImplementation.rmNormal				();
 }

@@ -11,7 +11,6 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
-#include "Layers/xrRenderDX11/StateManager/dx11StateCache.cpp"
 #endif
 
 CRender RImplementation;

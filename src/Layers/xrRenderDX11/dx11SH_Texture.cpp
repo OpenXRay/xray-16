@@ -28,7 +28,7 @@ CTexture::CTexture()
     flags.bUser = false;
     flags.seqCycles = FALSE;
     m_material = 1.0f;
-    bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_load);
+    bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_load);
 }
 
 CTexture::~CTexture()
@@ -128,25 +128,25 @@ ID3DBaseTexture* CTexture::surface_get() const
 void CTexture::PostLoad()
 {
     if (pTheora)
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_theora);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_theora);
     else if (pAVI)
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_avi);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_avi);
     else if (!seqDATA.empty())
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_seq);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_seq);
     else
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_normal);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_normal);
 }
 
-void CTexture::apply_load(u32 dwStage)
+void CTexture::apply_load(CBackend &cmd_list, u32 dwStage)
 {
     if (!flags.bLoaded)
         Load();
     else
         PostLoad();
-    bind(dwStage);
+    bind(cmd_list, dwStage);
 };
 
-void CTexture::Apply(u32 dwStage) const
+void CTexture::Apply(CBackend &cmd_list, u32 dwStage) const
 {
     // if( !RImplementation.o.msaa )
     //   VERIFY( !((!pSurface)^(!m_pSRView)) );	//	Both present or both missing
@@ -159,37 +159,35 @@ void CTexture::Apply(u32 dwStage) const
     if (dwStage < rstVertex) //	Pixel shader stage resources
     {
         // HW.pDevice->PSSetShaderResources(dwStage, 1, &m_pSRView);
-        RCache.SRVSManager.SetPSResource(dwStage, m_pSRView);
+        cmd_list.SRVSManager.SetPSResource(dwStage, m_pSRView);
     }
     else if (dwStage < rstGeometry) //	Vertex shader stage resources
     {
         // HW.pDevice->VSSetShaderResources(dwStage-rstVertex, 1, &m_pSRView);
-        RCache.SRVSManager.SetVSResource(dwStage - rstVertex, m_pSRView);
+        cmd_list.SRVSManager.SetVSResource(dwStage - rstVertex, m_pSRView);
     }
     else if (dwStage < rstHull) //	Geometry shader stage resources
     {
         // HW.pDevice->GSSetShaderResources(dwStage-rstGeometry, 1, &m_pSRView);
-        RCache.SRVSManager.SetGSResource(dwStage - rstGeometry, m_pSRView);
+        cmd_list.SRVSManager.SetGSResource(dwStage - rstGeometry, m_pSRView);
     }
-#ifdef USE_DX11
     else if (dwStage < rstDomain) //	Geometry shader stage resources
     {
-        RCache.SRVSManager.SetHSResource(dwStage - rstHull, m_pSRView);
+        cmd_list.SRVSManager.SetHSResource(dwStage - rstHull, m_pSRView);
     }
     else if (dwStage < rstCompute) //	Geometry shader stage resources
     {
-        RCache.SRVSManager.SetDSResource(dwStage - rstDomain, m_pSRView);
+        cmd_list.SRVSManager.SetDSResource(dwStage - rstDomain, m_pSRView);
     }
     else if (dwStage < rstInvalid) //	Geometry shader stage resources
     {
-        RCache.SRVSManager.SetCSResource(dwStage - rstCompute, m_pSRView);
+        cmd_list.SRVSManager.SetCSResource(dwStage - rstCompute, m_pSRView);
     }
-#endif
     else
         VERIFY("Invalid stage");
 }
 
-void CTexture::apply_theora(u32 dwStage)
+void CTexture::apply_theora(CBackend &cmd_list, u32 dwStage)
 {
     if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual))
     {
@@ -208,7 +206,7 @@ void CTexture::apply_theora(u32 dwStage)
 
 // R_CHK				(T2D->LockRect(0,&R,&rect,0));
 #ifdef USE_DX11
-        R_CHK(HW.get_context(CHW::IMM_CTX_ID)->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
+        R_CHK(HW.get_context(cmd_list.context_id)->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #else
         R_CHK(T2D->Map(0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #endif
@@ -219,15 +217,15 @@ void CTexture::apply_theora(u32 dwStage)
         VERIFY(u32(_pos) == rect.bottom * _w);
 // R_CHK				(T2D->UnlockRect(0));
 #ifdef USE_DX11
-        HW.get_context(CHW::IMM_CTX_ID)->Unmap(T2D, 0);
+        HW.get_context(cmd_list.context_id)->Unmap(T2D, 0);
 #else
         T2D->Unmap(0);
 #endif
     }
-    Apply(dwStage);
+    Apply(cmd_list, dwStage);
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
 };
-void CTexture::apply_avi(u32 dwStage) const
+void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage) const
 {
     if (pAVI->NeedUpdate())
     {
@@ -256,9 +254,9 @@ void CTexture::apply_avi(u32 dwStage) const
 #endif
     }
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
-    Apply(dwStage);
+    Apply(cmd_list, dwStage);
 };
-void CTexture::apply_seq(u32 dwStage)
+void CTexture::apply_seq(CBackend &cmd_list, u32 dwStage)
 {
     // SEQ
     u32 frame = Device.dwTimeContinual / seqMSPF; // Device.dwTimeGlobal
@@ -278,12 +276,12 @@ void CTexture::apply_seq(u32 dwStage)
         m_pSRView = m_seqSRView[frame_id];
     }
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
-    Apply(dwStage);
+    Apply(cmd_list, dwStage);
 };
-void CTexture::apply_normal(u32 dwStage) const
+void CTexture::apply_normal(CBackend &cmd_list, u32 dwStage) const
 {
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
-    Apply(dwStage);
+    Apply(cmd_list, dwStage);
 };
 
 void CTexture::Preload()
@@ -511,7 +509,7 @@ void CTexture::Unload()
     xr_delete(pAVI);
     xr_delete(pTheora);
 
-    bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_load);
+    bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_load);
 }
 
 void CTexture::desc_update()

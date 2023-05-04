@@ -1328,6 +1328,9 @@
     <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp">
+      <Filter>StateManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
