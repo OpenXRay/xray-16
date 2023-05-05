@@ -102,20 +102,20 @@ void CBlender_default::CompileFFP(CBlender_Compile& C) const
                 C.PassSET_Blend_SET();
                 C.PassSET_LightFog(false, true);
 
-                // Stage 0 - Lightmap
+                // Stage0 - Lightmap
                 C.StageBegin();
                 C.StageTemplate_LMAP0();
                 C.StageEnd();
 
-                // Stage 1 - Hemi
+                // Stage1 - Hemi
                 C.StageBegin();
                 C.StageTemplate_HEMI();
                 C.StageEnd();
 
-                // Stage 2 - Base texture
+                // Stage2 - Base texture
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
                 C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
                 C.StageEnd();
             }
