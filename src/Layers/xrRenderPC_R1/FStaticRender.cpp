@@ -379,7 +379,7 @@ void CRender::apply_object(CBackend &cmd_list, IRenderable* O)
         VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
         float o_hemi = 0.5f * LT.get_hemi();
         float o_sun = 0.5f * LT.get_sun();
-        cmd_list.set_c(c_ldynamic_props, o_sun, o_sun, o_sun, o_hemi);
+        RCache.set_c(c_ldynamic_props, o_sun, o_sun, o_sun, o_hemi);
         // shadowing
         if ((LT.shadow_recv_frame == Device.dwFrame) && O->renderable_ShadowReceive())
             RImplementation.L_Projector->setup(LT.shadow_recv_slot);
@@ -392,19 +392,19 @@ float g_fSCREEN;
 void CRender::rmNear(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
-    cmd_list.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 0.02f });
+    RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0, 0.02f });
 }
 
 void CRender::rmFar(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
-    cmd_list.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f });
+    RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0.99999f, 1.f });
 }
 
 void CRender::rmNormal(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
-    cmd_list.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 1.f });
+    RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0, 1.f });
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -429,7 +429,7 @@ void CRender::Calculate()
     // Transfer to global space to avoid deep pointer access
     IRender_Target* T = getTarget();
     float fov_factor = _sqr(90.f / Device.fFOV);
-    g_fSCREEN = float(T->get_width() * T->get_height()) * fov_factor * (EPS_S + ps_r__LOD);
+    g_fSCREEN = float(T->get_width(RCache) * T->get_height(RCache)) * fov_factor * (EPS_S + ps_r__LOD);
     r_ssaDISCARD = _sqr(ps_r__ssaDISCARD) / g_fSCREEN;
     r_ssaDONTSORT = _sqr(ps_r__ssaDONTSORT / 3) / g_fSCREEN;
     r_ssaLOD_A = _sqr(ps_r1_ssaLOD_A / 3) / g_fSCREEN;
@@ -681,7 +681,7 @@ void CRender::Render()
     dsgraph.render_hud(); // hud
     dsgraph.render_graph(0); // normal level
     if (Details)
-        Details->Render(dsgraph.cmd_list); // grass / details
+        Details->Render(RCache); // grass / details
     dsgraph.render_lods(true, false); // lods - FB
 
     g_pGamePersistent->Environment().RenderSky(); // sky / sun

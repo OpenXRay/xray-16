@@ -320,4 +320,14 @@ IC void CBackend::set_Constants(R_constant_table* C)
     }
 }
 
+ICF void CBackend::gpu_mark_begin(const wchar_t* name)
+{
+    HW.BeginPixEvent(name);
+}
+
+ICF void CBackend::gpu_mark_end()
+{
+    HW.EndPixEvent();
+}
+
 #endif //	dx9R_Backend_Runtime_included

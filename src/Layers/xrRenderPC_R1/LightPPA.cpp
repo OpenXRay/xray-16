@@ -27,17 +27,17 @@ void cl_light_PR::setup(CBackend &cmd_list, R_constant* C)
     Fvector& P = RImplementation.r1_dlight_light->position;
     float R = RImplementation.r1_dlight_light->range;
     if (dsgraph.o.phase == CRender::PHASE_POINT)
-        cmd_list.set_c(C, P.x, P.y, P.z, .5f / R);
+        RCache.set_c(C, P.x, P.y, P.z, .5f / R);
     else
-        cmd_list.set_c(C, P.x, P.y, P.z, 1.f / R);
+        RCache.set_c(C, P.x, P.y, P.z, 1.f / R);
 }
 void cl_light_C::setup(CBackend &cmd_list, R_constant* C)
 {
     Fcolor _C = RImplementation.r1_dlight_light->color;
     _C.mul_rgb(RImplementation.r1_dlight_scale);
-    cmd_list.set_c(C, _C.r, _C.g, _C.b, 1.f);
+    RCache.set_c(C, _C.r, _C.g, _C.b, 1.f);
 }
-void cl_light_XFORM::setup(CBackend &cmd_list, R_constant* C) { cmd_list.set_c(C, RImplementation.r1_dlight_tcgen); }
+void cl_light_XFORM::setup(CBackend &cmd_list, R_constant* C) { RCache.set_c(C, RImplementation.r1_dlight_tcgen); }
 //////////////////////////////////////////////////////////////////////////
 /*
 IC void mk_vertex                   (CLightR_Vertex& D, Fvector& P, Fvector& N, Fvector& C, float r2)
@@ -221,7 +221,7 @@ void CLightR_Manager::render_point(u32 _priority)
         bHUD = F.testSphere_dirty(Device.vCameraPosition, 2.f);
 
         // 5. Dump sorting tree
-        dsgraph.cmd_list.set_Constants((R_constant_table*)nullptr);
+        RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
             g_hud->Render_Last(dsgraph.context_id);
         dsgraph.render_graph(_priority);
@@ -305,14 +305,14 @@ void CLightR_Manager::render_spot(u32 _priority)
         // if (bHUD) Msg ("HUD");
 
         // 4. Dump sorting tree
-        //cmd_list.set_ClipPlanes(true,  &L_combine);
-        dsgraph.cmd_list.set_Constants((R_constant_table*)nullptr);
+        //RCache.set_ClipPlanes(true,  &L_combine);
+        RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
             g_hud->Render_Last(dsgraph.context_id);
         dsgraph.render_graph(_priority);
         if (bHUD && _priority == 0)
             dsgraph.render_hud();
-        //cmd_list.set_ClipPlanes(false, &L_combine);
+        //RCache.set_ClipPlanes(false, &L_combine);
     }
     // ??? grass ???l
 }

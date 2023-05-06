@@ -227,6 +227,8 @@ public:
         R_statistics r;
     } stat;
 
+    u32 context_id{ CHW::IMM_CTX_ID };
+
 public:
     CTexture* get_ActiveTexture(u32 stage)
     {
@@ -531,18 +533,11 @@ public:
         HW.get_context(CHW::IMM_CTX_ID)->ExecuteCommandList(pCommandList, false);
     }
 
-    ICF void gpu_mark_begin(const wchar_t* name)
-    {
-        pAnnotation->BeginEvent(name);
-    }
-
-    ICF void gpu_mark_end()
-    {
-        pAnnotation->EndEvent();
-    }
-
     ID3DUserDefinedAnnotation* pAnnotation{ nullptr };
 #endif
+
+    void gpu_mark_begin(const wchar_t* name);
+    void gpu_mark_end();
 
     // Device create / destroy / frame signaling
     void OnFrameBegin();
@@ -619,8 +614,6 @@ private:
 public:
     dx11StateManager StateManager;
     dx11ShaderResourceStateCache SRVSManager;
-
-    u32 context_id{ CHW::IMM_CTX_ID };
 #endif // USE_DX11
 };
 #pragma warning(pop)
