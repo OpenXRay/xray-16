@@ -32,7 +32,7 @@ bool cmp_pass(const T& left, const T& right)
 
 void R_dsgraph_structure::render_graph(u32 _priority)
 {
-    PIX_EVENT(r_dsgraph_render_graph);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_graph);
     RImplementation.BasicStats.Primitives.Begin(); // XXX: Refactor a bit later
 
     cmd_list.set_xform_world(Fidentity);
@@ -41,76 +41,84 @@ void R_dsgraph_structure::render_graph(u32 _priority)
     // Perform sorting based on ScreenSpaceArea
     // Sorting by SSA and changes minimizations
     // Render several passes
-    for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
     {
-        auto& map = mapNormalPasses[_priority][iPass];
+        PIX_EVENT_CTX(cmd_list, dsgraph_render_static);
 
-        map.get_any_p(nrmPasses);
-        std::sort(nrmPasses.begin(), nrmPasses.end(), cmp_pass<mapNormal_T::value_type*>);
-        for (const auto& it : nrmPasses)
+        for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
         {
-            cmd_list.set_Pass(it->first);
-            cmd_list.apply_lmaterial();
+            auto& map = mapNormalPasses[_priority][iPass];
 
-            mapNormalItems& items = it->second;
-            items.ssa = 0;
-
-            std::sort(items.begin(), items.end(), cmp_ssa<_NormalItem>);
-            for (const auto& item : items)
+            map.get_any_p(nrmPasses);
+            std::sort(nrmPasses.begin(), nrmPasses.end(), cmp_pass<mapNormal_T::value_type*>);
+            for (const auto& it : nrmPasses)
             {
-                const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
+                cmd_list.set_Pass(it->first);
+                cmd_list.apply_lmaterial();
+
+                mapNormalItems& items = it->second;
+                items.ssa = 0;
+
+                std::sort(items.begin(), items.end(), cmp_ssa<_NormalItem>);
+                for (const auto& item : items)
+                {
+                    const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
 #ifdef USE_DX11
-                cmd_list.LOD.set_LOD(LOD);
+                    cmd_list.LOD.set_LOD(LOD);
 #endif
-                // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-                // RCache.hemi.c_update(item.pVisual);
+                    // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
+                    // RCache.hemi.c_update(item.pVisual);
 
-                item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
+                    item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
+                }
+                items.clear();
+
             }
-            items.clear();
-
+            nrmPasses.clear();
+            map.clear();
         }
-        nrmPasses.clear();
-        map.clear();
     }
 
     // **************************************************** MATRIX
     // Perform sorting based on ScreenSpaceArea
     // Sorting by SSA and changes minimizations
     // Render several passes
-    for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
     {
-        auto& map = mapMatrixPasses[_priority][iPass];
+        PIX_EVENT_CTX(cmd_list, dsgraph_render_dynamic);
 
-        map.get_any_p(matPasses);
-        std::sort(matPasses.begin(), matPasses.end(), cmp_pass<mapMatrix_T::value_type*>);
-        for (const auto& it : matPasses)
+        for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
         {
-            cmd_list.set_Pass(it->first);
+            auto& map = mapMatrixPasses[_priority][iPass];
 
-            mapMatrixItems& items = it->second;
-            items.ssa = 0;
-
-            std::sort(items.begin(), items.end(), cmp_ssa<_MatrixItem>);
-            for (auto& item : items)
+            map.get_any_p(matPasses);
+            std::sort(matPasses.begin(), matPasses.end(), cmp_pass<mapMatrix_T::value_type*>);
+            for (const auto& it : matPasses)
             {
-                cmd_list.set_xform_world(item.Matrix);
-                RImplementation.apply_object(cmd_list, item.pObject);
-                cmd_list.apply_lmaterial();
+                cmd_list.set_Pass(it->first);
 
-                const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
+                mapMatrixItems& items = it->second;
+                items.ssa = 0;
+
+                std::sort(items.begin(), items.end(), cmp_ssa<_MatrixItem>);
+                for (auto& item : items)
+                {
+                    cmd_list.set_xform_world(item.Matrix);
+                    RImplementation.apply_object(cmd_list, item.pObject);
+                    cmd_list.apply_lmaterial();
+
+                    const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
 #ifdef USE_DX11
-                cmd_list.LOD.set_LOD(LOD);
+                    cmd_list.LOD.set_LOD(LOD);
 #endif
-                // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-                // RCache.hemi.c_update(item.pVisual);
+                    // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
+                    // RCache.hemi.c_update(item.pVisual);
 
-                item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
+                    item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
+                }
+                items.clear();
             }
-            items.clear();
+            matPasses.clear();
+            map.clear();
         }
-        matPasses.clear();
-        map.clear();
     }
 
     RImplementation.BasicStats.Primitives.End(); // XXX: Refactor a bit later
@@ -234,7 +242,7 @@ ICF void sort_back_to_front_render_and_clean(u32 context_id, T& vec)
 // HUD render
 void R_dsgraph_structure::render_hud()
 {
-    PIX_EVENT(r_dsgraph_render_hud);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_hud);
 
     if (!mapHUD.empty())
     {
@@ -252,7 +260,7 @@ void R_dsgraph_structure::render_hud_ui()
 {
     VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
 
-    PIX_EVENT(r_dsgraph_render_hud_ui);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_hud_ui);
 
     hud_transform_helper helper{ cmd_list };
 
@@ -280,7 +288,7 @@ void R_dsgraph_structure::render_hud_ui()
 // strict-sorted render
 void R_dsgraph_structure::render_sorted()
 {
-    PIX_EVENT(r_dsgraph_render_sorted);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_sorted);
 
     sort_back_to_front_render_and_clean(context_id, mapSorted);
 
@@ -296,7 +304,7 @@ void R_dsgraph_structure::render_sorted()
 void R_dsgraph_structure::render_emissive()
 {
 #if RENDER != R_R1
-    PIX_EVENT(r_dsgraph_render_emissive);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_emissive);
 
     sort_front_to_back_render_and_clean(context_id, mapEmissive);
 
@@ -313,7 +321,7 @@ void R_dsgraph_structure::render_emissive()
 void R_dsgraph_structure::render_wmarks()
 {
 #if RENDER != R_R1
-    PIX_EVENT(r_dsgraph_render_wmarks);
+    PIX_EVENT(dsgraph_render_wmarks);
 
     sort_front_to_back_render_and_clean(context_id, mapWmark);
 #endif
@@ -323,7 +331,7 @@ void R_dsgraph_structure::render_wmarks()
 // strict-sorted render
 void R_dsgraph_structure::render_distort()
 {
-    PIX_EVENT(r_dsgraph_render_distort);
+    PIX_EVENT(dsgraph_render_distort);
 
     sort_back_to_front_render_and_clean(context_id, mapDistort);
 }
@@ -336,7 +344,7 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
     VERIFY(sector_id != IRender_Sector::INVALID_SECTOR_ID);
     auto* S = Sectors[sector_id];
 
-    PIX_EVENT(r_dsgraph_render_R1_box);
+    PIX_EVENT(dsgraph_render_R1_box);
 
     lstVisuals.clear();
     lstVisuals.push_back(((CSector*)S)->root());
