@@ -42,7 +42,8 @@ ALDeviceList::~ALDeviceList()
 {
     for (int i = 0; snd_devices_token[i].name; i++)
     {
-        xr_free(snd_devices_token[i].name);
+        pstr tokenName = const_cast<pstr>(snd_devices_token[i].name);
+        xr_free(tokenName);
     }
 
     xr_free(snd_devices_token);
