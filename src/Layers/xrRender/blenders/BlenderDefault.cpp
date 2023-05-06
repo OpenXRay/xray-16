@@ -102,20 +102,24 @@ void CBlender_default::CompileFFP(CBlender_Compile& C) const
                 C.PassSET_Blend_SET();
                 C.PassSET_LightFog(false, true);
 
-                // Stage0 - Lightmap
+                // Stage0 - Compute lighting, add set initial texture to lightmap
                 C.StageBegin();
-                C.StageTemplate_LMAP0();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+                C.StageSET_TMC("$base1", "$null", "$null", 1);
                 C.StageEnd();
 
-                // Stage1 - Hemi
+                // Stage1 - Compute final lighting, add Hemi ontop of lightmap (output of last stage). I don't think this is applied properly yet.
                 C.StageBegin();
-                C.StageTemplate_HEMI();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+                C.StageSET_TMC("$base2", "$null", "$null", 2);
                 C.StageEnd();
 
-                // Stage2 - Base texture
+                // Stage2 - Apply final lighting to base texture
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
                 C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
                 C.StageEnd();
             }
