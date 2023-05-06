@@ -102,42 +102,29 @@ void CBlender_default::CompileFFP(CBlender_Compile& C) const
                 C.PassSET_Blend_SET();
                 C.PassSET_LightFog(false, true);
 
-                // Setup colors to use. Question is, how!?
-                const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
-                D3DCOLOR hemi_color = D3DCOLOR_RGBA((int)desc.hemi_color.x, (int)desc.hemi_color.y, (int)desc.hemi_color.z, (int)desc.hemi_color.w);
-                D3DCOLOR ambient_color = D3DCOLOR_RGBA((int)desc.ambient.x, (int)desc.ambient.y, (int)desc.ambient.z, (int)desc.weight);
-                D3DCOLOR sun_color = D3DCOLOR_RGBA((int)desc.sun_color.x, (int)desc.sun_color.y, (int)desc.sun_color.z, (int)desc.weight);
+                // target output: base_texture * (lmap_texture + (hemi_color * (hemi_texture).a)) * 2
 
-                
+                // input: null
+                // output: lmap_texture (t_lmap in shader)
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEMP, D3DTOP_ADD, hemi_color);
-                C.StageSET_Alpha(D3DTA_TEMP, D3DTOP_ADD, hemi_color);
-                C.StageEnd();
-
-                // Stage0 - Set initial texture to lightmap texture
-                C.StageBegin();
+                C.StageSET_TMC("$base1", "$null", "$null", 1);
                 C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
                 C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
-                C.StageSET_TMC("$base1", "$null", "$null", 1);
                 C.StageEnd();
 
-                // Stage1 - Add hemi ontop of lmap texture.
+                // input: lmap_texture
+                // currently outputs: lmap_texture + hemi_texture.a
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT); // idk if this is doing anything.
                 C.StageSET_TMC("$base2", "$null", "$null", 2);
+                C.StageSET_Color(D3DTA_TEXTURE | D3DTA_ALPHAREPLICATE, D3DTOP_ADD, D3DTA_CURRENT);
                 C.StageEnd();
 
-                // Stage2 - Apply final lighting to base texture. Multiply base texture with lighting (output of previous stage). Brighten the output 2x.
+                // input: lmap_texture + hemi_texture.a
+                // output: base_texture * (lmap_texture + hemi_texture.a) * 2
                 C.StageBegin();
                 C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
                 C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
                 C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
-                C.StageEnd();
-
-                C.StageBegin();
-                C.StageSET_Color(D3DTA_TEMP, D3DTOP_SELECTARG1, hemi_color);
-                C.StageSET_Alpha(D3DTA_TEMP, D3DTOP_SELECTARG1, hemi_color);
                 C.StageEnd();
             }
             C.PassEnd();
