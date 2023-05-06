@@ -26,7 +26,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_array = T1.get("array");
 }
 
-void CDetailManager::hw_Render()
+void CDetailManager::hw_Render(CBackend &cmd_list)
 {
     using namespace detail_manager;
 
@@ -65,7 +65,7 @@ void CDetailManager::hw_Render()
     //RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
     //RCache.set_c			(&*hwc_wind,	dir1);																					// wind-dir
     //hw_Render_dump			(&*hwc_array,	1, 0, c_hdr );
-    hw_Render_dump(consts, wave.div(PI_MUL_2), dir1, 1, 0);
+    hw_Render_dump(RCache, consts, wave.div(PI_MUL_2), dir1, 1, 0);
 
     // Wave1
     //wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	Device.fTimeGlobal*swing_current.speed);
@@ -73,17 +73,17 @@ void CDetailManager::hw_Render()
     //RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
     //RCache.set_c			(&*hwc_wind,	dir2);																					// wind-dir
     //hw_Render_dump			(&*hwc_array,	2, 0, c_hdr );
-    hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, 2, 0);
+    hw_Render_dump(RCache, consts, wave.div(PI_MUL_2), dir2, 2, 0);
 
     // Still
     consts.set(scale, scale, scale, 1.f);
     //RCache.set_c			(&*hwc_s_consts,scale,		scale,		scale,				1.f);
     //RCache.set_c			(&*hwc_s_xform,	Device.mFullTransform);
     //hw_Render_dump			(&*hwc_s_array,	0, 1, c_hdr );
-    hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, 0, 1);
+    hw_Render_dump(RCache, consts, wave.div(PI_MUL_2), dir2, 0, 1);
 }
 
-void CDetailManager::hw_Render_dump(const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id,
+void CDetailManager::hw_Render_dump(CBackend &cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id,
                                     u32 lod_id)
 {
     static shared_str strConsts("consts");

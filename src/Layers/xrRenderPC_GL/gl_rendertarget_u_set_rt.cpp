@@ -1,16 +1,16 @@
 #include "stdafx.h"
 
-void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
+void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
 {
-    dwWidth  = 0;
-    dwHeight = 0;
+    dwWidth[cmd_list.context_id] = 0;
+    dwHeight[cmd_list.context_id] = 0;
 
     GLenum buffers[3] = {GL_NONE, GL_NONE, GL_NONE};
 
     if (_1)
     {
-        dwWidth  = _1->dwWidth;
-        dwHeight = _1->dwHeight;
+        dwWidth[cmd_list.context_id]  = _1->dwWidth;
+        dwHeight[cmd_list.context_id] = _1->dwHeight;
 
         buffers[0] = GL_COLOR_ATTACHMENT0;
         RCache.set_RT(_1->pRT, 0);
@@ -24,13 +24,13 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     {
         if (dwWidth && dwHeight)
         {
-            VERIFY(_2->dwWidth  == dwWidth);
-            VERIFY(_2->dwHeight == dwHeight);
+            VERIFY(_2->dwWidth  == dwWidth[cmd_list.context_id]);
+            VERIFY(_2->dwHeight == dwHeight[cmd_list.context_id]);
         }
         else
         {
-            dwWidth  = _2->dwWidth;
-            dwHeight = _2->dwHeight;
+            dwWidth[cmd_list.context_id]  = _2->dwWidth;
+            dwHeight[cmd_list.context_id] = _2->dwHeight;
         }
 
         buffers[1] = GL_COLOR_ATTACHMENT1;
@@ -45,13 +45,13 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     {
         if (dwWidth && dwHeight)
         {
-            VERIFY(_2->dwWidth  == dwWidth);
-            VERIFY(_2->dwHeight == dwHeight);
+            VERIFY(_2->dwWidth  == dwWidth[cmd_list.context_id]);
+            VERIFY(_2->dwHeight == dwHeight[cmd_list.context_id]);
         }
         else
         {
-            dwWidth  = _3->dwWidth;
-            dwHeight = _3->dwHeight;
+            dwWidth[cmd_list.context_id]  = _3->dwWidth;
+            dwHeight[cmd_list.context_id] = _3->dwHeight;
         }
 
         buffers[2] = GL_COLOR_ATTACHMENT2;
@@ -66,13 +66,13 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     {
         if (dwWidth && dwHeight)
         {
-            VERIFY(_zb->dwWidth  == dwWidth);
-            VERIFY(_zb->dwHeight == dwHeight);
+            VERIFY(_zb->dwWidth  == dwWidth[cmd_list.context_id]);
+            VERIFY(_zb->dwHeight == dwHeight[cmd_list.context_id]);
         }
         else
         {
-            dwWidth  = _zb->dwWidth;
-            dwHeight = _zb->dwHeight;
+            dwWidth[cmd_list.context_id]  = _zb->dwWidth;
+            dwHeight[cmd_list.context_id] = _zb->dwHeight;
         }
 
         RCache.set_ZB(_zb->pZRT);
@@ -90,17 +90,17 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     CHK_GL(glDrawBuffers(3, buffers));
 }
 
-void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb)
+void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb)
 {
-    dwWidth  = 0;
-    dwHeight = 0;
+    dwWidth[cmd_list.context_id]  = 0;
+    dwHeight[cmd_list.context_id] = 0;
 
     GLenum buffers[3] = {GL_NONE, GL_NONE, GL_NONE};
 
     if (_1)
     {
-        dwWidth  = _1->dwWidth;
-        dwHeight = _1->dwHeight;
+        dwWidth[cmd_list.context_id]  = _1->dwWidth;
+        dwHeight[cmd_list.context_id] = _1->dwHeight;
 
         buffers[0] = GL_COLOR_ATTACHMENT0;
         RCache.set_RT(_1->pRT, 0);
@@ -114,13 +114,13 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _z
     {
         if (dwWidth && dwHeight)
         {
-            VERIFY(_2->dwWidth  == dwWidth);
-            VERIFY(_2->dwHeight == dwHeight);
+            VERIFY(_2->dwWidth  == dwWidth[cmd_list.context_id]);
+            VERIFY(_2->dwHeight == dwHeight[cmd_list.context_id]);
         }
         else
         {
-            dwWidth  = _2->dwWidth;
-            dwHeight = _2->dwHeight;
+            dwWidth[cmd_list.context_id]  = _2->dwWidth;
+            dwHeight[cmd_list.context_id] = _2->dwHeight;
         }
 
         buffers[1] = GL_COLOR_ATTACHMENT1;
@@ -135,13 +135,13 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _z
     {
         if (dwWidth && dwHeight)
         {
-            VERIFY(_zb->dwWidth  == dwWidth);
-            VERIFY(_zb->dwHeight == dwHeight);
+            VERIFY(_zb->dwWidth  == dwWidth[cmd_list.context_id]);
+            VERIFY(_zb->dwHeight == dwHeight[cmd_list.context_id]);
         }
         else
         {
-            dwWidth  = _zb->dwWidth;
-            dwHeight = _zb->dwHeight;
+            dwWidth[cmd_list.context_id]  = _zb->dwWidth;
+            dwHeight[cmd_list.context_id] = _zb->dwHeight;
         }
 
         RCache.set_ZB(_zb->pZRT);
@@ -151,21 +151,21 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _z
         RCache.set_ZB(GL_NONE);
     }
 
-    VERIFY(dwWidth  != 0);
-    VERIFY(dwHeight != 0);
+    VERIFY(dwWidth[cmd_list.context_id]  != 0);
+    VERIFY(dwHeight[cmd_list.context_id] != 0);
 
     [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(2, buffers));
 }
 
-void CRenderTarget::u_setrt(u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb)
+void CRenderTarget::u_setrt(CBackend &cmd_list, u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb)
 {
     VERIFY(W != 0);
     VERIFY(H != 0);
 
-    dwWidth  = W;
-    dwHeight = H;
+    dwWidth[cmd_list.context_id]  = W;
+    dwHeight[cmd_list.context_id] = H;
 
     const GLenum buffers[3] = {
         (GLenum)(_1 ? GL_COLOR_ATTACHMENT0 : GL_NONE),

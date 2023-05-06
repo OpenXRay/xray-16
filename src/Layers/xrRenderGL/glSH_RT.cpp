@@ -38,7 +38,10 @@ bool CRT::used_as_depth() const
     return false;
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 /*flags = {}*/)
+void CRT::set_slice_read(int slice) {}
+void CRT::set_slice_write(int slice) {}
+
+void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 /*flags = {}*/)
 {
     if (pRT) return;
 
@@ -123,7 +126,7 @@ void CRT::resolve_into(CRT& destination) const
         GL_COLOR_BUFFER_BIT, GL_NEAREST));
 }
 
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
+void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
 {
-    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
+    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, 1, flags));
 }

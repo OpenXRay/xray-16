@@ -20,6 +20,7 @@ public:
 };
 #elif defined(USE_OGL)
 #   define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(#Name)
+#   define PIX_EVENT_CTX(C,Name) dxPixEventWrapper pixEvent##Name(#Name)
 
 class dxPixEventWrapper
 {
