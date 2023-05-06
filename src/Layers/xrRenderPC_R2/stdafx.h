@@ -19,7 +19,6 @@
 #include "Layers/xrRenderDX9/CommonTypes.h"
 
 #include "Layers/xrRenderDX9/dx9HW.h"
-#include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 #include "Layers/xrRender/Shader.h"
 

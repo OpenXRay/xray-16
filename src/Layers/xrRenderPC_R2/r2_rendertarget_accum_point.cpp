@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-void CRenderTarget::accum_point(light* L)
+void CRenderTarget::accum_point(CBackend &cmd_list, light* L)
 {
-    phase_accumulator();
+    phase_accumulator(RCache);
     RImplementation.Stats.l_visible++;
 
     ref_shader shader = L->s_point;
@@ -54,17 +54,17 @@ void CRenderTarget::accum_point(light* L)
     RCache.set_CullMode(CULL_CW);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP,
         D3DSTENCILOP_REPLACE);
-    draw_volume(L);
+    draw_volume(RCache, L);
 
     // frontfaces: if (stencil>=light_id && zfail)	stencil = 0x1
     RCache.set_CullMode(CULL_CCW);
     RCache.set_Stencil(
         TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
-    draw_volume(L);
+    draw_volume(RCache, L);
 
     // nv-stencil recompression
     if (RImplementation.o.nvstencil)
-        u_stencil_optimize();
+        u_stencil_optimize(RCache);
 
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
@@ -77,9 +77,9 @@ void CRenderTarget::accum_point(light* L)
 
     // 2D texgens
     Fmatrix m_Texgen;
-    u_compute_texgen_screen(m_Texgen);
+    u_compute_texgen_screen(RCache, m_Texgen);
     Fmatrix m_Texgen_J;
-    u_compute_texgen_jitter(m_Texgen_J);
+    u_compute_texgen_jitter(RCache, m_Texgen_J);
 
     // Draw volume with projective texgen
     {
@@ -118,7 +118,7 @@ void CRenderTarget::accum_point(light* L)
         // Render if (stencil >= light_id && z-pass)
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP,
             D3DSTENCILOP_KEEP);
-        draw_volume(L);
+        draw_volume(RCache, L);
 
         // Fetch4 : disable
         if (RImplementation.o.HW_smap_FETCH4)
@@ -132,16 +132,16 @@ void CRenderTarget::accum_point(light* L)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
+        u_setrt(RCache, rt_Accumulator, NULL, NULL, get_base_zb());
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);
-        draw_volume(L);
+        draw_volume(RCache, L);
     }
 
     RCache.set_Scissor(0);
 
     // dwLightMarkerID					+=	2;	// keep lowest bit always setted up
-    increment_light_marker();
+    increment_light_marker(RCache);
 
     u_DBT_disable();
 

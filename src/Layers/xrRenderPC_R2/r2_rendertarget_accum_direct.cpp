@@ -34,13 +34,13 @@ static u16 facetable[16][3] =
 };
 } // namespace accum_direct
 
-void CRenderTarget::accum_direct(u32 sub_phase)
+void CRenderTarget::accum_direct(CBackend &cmd_list, u32 sub_phase)
 {
     // Choose normal code-path or filtered
-    phase_accumulator();
+    phase_accumulator(RCache);
     if (RImplementation.o.sunfilter)
     {
-        accum_direct_f(sub_phase);
+        accum_direct_f(RCache, sub_phase);
         return;
     }
 
@@ -105,13 +105,13 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
     // nv-stencil recompression
     if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
-        u_stencil_optimize(); //. driver bug?
+        u_stencil_optimize(RCache); //. driver bug?
 
     PIX_EVENT(Perform_lighting);
 
     // Perform lighting
     {
-        phase_accumulator();
+        phase_accumulator(RCache);
         RCache.set_CullMode(CULL_NONE);
         RCache.set_ColorWriteEnable();
 
@@ -252,17 +252,17 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         // Igor: draw volumetric here
         // if (ps_r2_ls_flags.test(R2FLAG_SUN_SHAFTS))
         if (RImplementation.o.advancedpp && (ps_r_sun_shafts > 0))
-            accum_direct_volumetric(sub_phase, Offset, m_shadow);
+            accum_direct_volumetric(RCache, sub_phase, Offset, m_shadow);
     }
 }
 
-void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias)
+void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias)
 {
     // Choose normal code-path or filtered
-    phase_accumulator();
+    phase_accumulator(RCache);
     if (RImplementation.o.sunfilter)
     {
-        accum_direct_f(sub_phase);
+        accum_direct_f(RCache, sub_phase);
         return;
     }
 
@@ -327,14 +327,14 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
     // nv-stencil recompression
     if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
-        u_stencil_optimize(); //. driver bug?
+        u_stencil_optimize(RCache); //. driver bug?
 
     PIX_EVENT(Perform_lighting);
 
     // Perform lighting
     // if( sub_phase == SE_SUN_FAR ) //******************************************************************
     {
-        phase_accumulator();
+        phase_accumulator(RCache);
         RCache.set_CullMode(CULL_CCW); //******************************************************************
         RCache.set_ColorWriteEnable();
 
@@ -399,7 +399,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         RCache.xforms.set_W(m_Texgen);
         RCache.xforms.set_V(Device.mView);
         RCache.xforms.set_P(Device.mProject);
-        u_compute_texgen_screen(m_Texgen);
+        u_compute_texgen_screen(RCache, m_Texgen);
 
         // Make jitter texture
         Fvector2 j0, j1;
@@ -528,17 +528,17 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         // Igor: draw volumetric here
         // if (ps_r2_ls_flags.test(R2FLAG_SUN_SHAFTS))
         if (RImplementation.o.advancedpp && (ps_r_sun_shafts > 0) && sub_phase == SE_SUN_FAR)
-            accum_direct_volumetric(sub_phase, Offset, m_shadow);
+            accum_direct_volumetric(RCache, sub_phase, Offset, m_shadow);
     }
 }
 
-void CRenderTarget::accum_direct_blend()
+void CRenderTarget::accum_direct_blend(CBackend &cmd_list)
 {
     PIX_EVENT(accum_direct_blend);
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
+        u_setrt(RCache, rt_Accumulator, NULL, NULL, get_base_zb());
 
         // Common calc for quad-rendering
         u32 Offset;
@@ -567,20 +567,20 @@ void CRenderTarget::accum_direct_blend()
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
     //dwLightMarkerID += 2;
-    increment_light_marker();
+    increment_light_marker(RCache);
 }
 
-void CRenderTarget::accum_direct_f(u32 sub_phase)
+void CRenderTarget::accum_direct_f(CBackend &cmd_list, u32 sub_phase)
 {
     PIX_EVENT(accum_direct_f);
     // Select target
     if (SE_SUN_LUMINANCE == sub_phase)
     {
-        accum_direct_lum();
+        accum_direct_lum(RCache);
         return;
     }
-    phase_accumulator();
-    u_setrt(rt_Generic_0, NULL, NULL, get_base_zb());
+    phase_accumulator(RCache);
+    u_setrt(RCache, rt_Generic_0, NULL, NULL, get_base_zb());
 
     // *** assume accumulator setted up ***
     light* fuckingsun = (light*)RImplementation.Lights.sun._get();
@@ -645,11 +645,11 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
 
     // nv-stencil recompression
     if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
-        u_stencil_optimize(); //. driver bug?
+        u_stencil_optimize(RCache); //. driver bug?
 
     // Perform lighting
     {
-        u_setrt(rt_Generic_0, NULL, NULL, get_base_zb()); // ensure RT is set
+        u_setrt(RCache, rt_Generic_0, NULL, NULL, get_base_zb()); // ensure RT is set
         RCache.set_CullMode(CULL_NONE);
         RCache.set_ColorWriteEnable();
 
@@ -718,11 +718,11 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     }
 }
 
-void CRenderTarget::accum_direct_lum()
+void CRenderTarget::accum_direct_lum(CBackend &cmd_list)
 {
     PIX_EVENT(accum_direct_lum);
     // Select target
-    phase_accumulator();
+    phase_accumulator(RCache);
 
     // *** assume accumulator setted up ***
     light* fuckingsun = (light*)RImplementation.Lights.sun._get();
@@ -835,7 +835,7 @@ void CRenderTarget::accum_direct_lum()
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }
 
-void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, const Fmatrix& mShadow)
+void CRenderTarget::accum_direct_volumetric(CBackend &cmd_list, u32 sub_phase, const u32 Offset, const Fmatrix& mShadow)
 {
     PIX_EVENT(accum_direct_volumetric);
 
@@ -857,7 +857,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
     //  if (sub_phase!=SE_SUN_N/EAR) return;
     //  if (sub_phase!=SE_SUN_FAR) return;
 
-    phase_vol_accumulator();
+    phase_vol_accumulator(RCache);
 
     RCache.set_ColorWriteEnable();
 
@@ -892,7 +892,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         RCache.xforms.set_W(m_Texgen);
         RCache.xforms.set_V(Device.mView);
         RCache.xforms.set_P(Device.mProject);
-        u_compute_texgen_screen(m_Texgen);
+        u_compute_texgen_screen(RCache, m_Texgen);
 
         RCache.set_c("m_texgen", m_Texgen);
         //      RCache.set_c                ("m_sunmask",           m_clouds_shadow);

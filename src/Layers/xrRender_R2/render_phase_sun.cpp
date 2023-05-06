@@ -396,11 +396,15 @@ void render_sun::begin_smap_pass(u32 cascade_ind, bool translucent_shadows)
     }
     else
     {
+#if defined(USE_DX9) // TODO: refactor
+        RImplementation.Target->phase_smap_direct(RCache, sun, cascade_ind);
+#else
         RImplementation.Target->rt_smap_depth->set_slice_write(cascade_ind);
         RImplementation.Target->u_setrt(cmd_list, nullptr, nullptr, nullptr, RImplementation.Target->rt_smap_depth);
         cmd_list.ClearZB(RImplementation.Target->rt_smap_depth, 1.0f);
         RImplementation.rmNormal(cmd_list);
         cmd_list.set_Stencil(false);
+#endif
     }
 }
 

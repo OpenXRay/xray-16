@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
-void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
+void CRenderTarget::phase_smap_direct(CBackend &cmd_list, light* L, u32 sub_phase)
 {
     // Targets
-    u_setrt(rt_smap_surf, NULL, NULL, rt_smap_depth->pRT);
+    u_setrt(RCache, rt_smap_surf, NULL, NULL, rt_smap_depth->pRT);
 
     // Clear
     if (SE_SUN_NEAR == sub_phase)
@@ -41,7 +41,7 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
         RCache.set_ColorWriteEnable();
 }
 
-void CRenderTarget::phase_smap_direct_tsh(light* /*L*/, u32 /*sub_phase*/)
+void CRenderTarget::phase_smap_direct_tsh(CBackend &cmd_list, light* /*L*/, u32 /*sub_phase*/)
 {
     VERIFY(RImplementation.o.Tshadows);
     RCache.set_ColorWriteEnable();

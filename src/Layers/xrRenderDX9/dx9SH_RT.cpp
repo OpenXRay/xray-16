@@ -37,6 +37,9 @@ bool CRT::used_as_depth() const
     }
 }
 
+void CRT::set_slice_read(int slice) {}
+void CRT::set_slice_write(int slice) {}
+
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
 {
     if (pSurface)

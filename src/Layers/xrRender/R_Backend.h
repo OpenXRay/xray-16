@@ -409,6 +409,7 @@ public:
 #if defined(USE_DX11)
     ICF void set_CS(ID3D11ComputeShader* _cs, LPCSTR _n = nullptr);
     ICF void set_CS(ref_cs& _cs) { set_CS(_cs->sh, _cs->cName.c_str()); }
+    ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
 #endif
 
 public:
@@ -522,19 +523,15 @@ public:
     ICF void Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
     ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
 
-#ifdef USE_DX11
-    ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
-
     ICF void submit()
     {
+#ifdef USE_DX11
         VERIFY(context_id != CHW::IMM_CTX_ID);
         ID3D11CommandList* pCommandList{ nullptr };
         CHK_DX(HW.get_context(context_id)->FinishCommandList(false, &pCommandList));
         HW.get_context(CHW::IMM_CTX_ID)->ExecuteCommandList(pCommandList, false);
-    }
-
-    ID3DUserDefinedAnnotation* pAnnotation{ nullptr };
 #endif
+    }
 
     void gpu_mark_begin(const wchar_t* name);
     void gpu_mark_end();
@@ -608,6 +605,7 @@ private:
 
 private:
     ID3DBlob* m_pInputSignature{ nullptr };
+    ID3DUserDefinedAnnotation* pAnnotation{ nullptr };
 
     bool m_bChangedRTorZB;
 
