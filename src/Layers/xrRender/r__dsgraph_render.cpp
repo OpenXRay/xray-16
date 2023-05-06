@@ -133,7 +133,6 @@ void R_dsgraph_structure::render_graph(u32 _priority)
 class hud_transform_helper
 {
     Fmatrix Pold;
-    Fmatrix FTold;
     static u32 cullMode;
     static bool isActive;
 
@@ -147,7 +146,6 @@ public:
 
         // Change projection
         Pold  = Device.mProject;
-        FTold = Device.mFullTransform;
 
         // XXX: Xottab_DUTY: custom FOV. Implement it someday
         // It should be something like this:
@@ -165,11 +163,10 @@ public:
         // In the commit:
         // https://github.com/ShokerStlk/xray-16-SWM/commit/869de0b6e74ac05990f541e006894b6fe78bd2a5#diff-4199ef700b18ce4da0e2b45dee1924d0R83
 
-        Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
+        Fmatrix prj_new;
+        prj_new.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
             VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
-
-        Device.mFullTransform.mul(Device.mProject, Device.mView);
-        cmd_list.set_xform_project(Device.mProject);
+        cmd_list.set_xform_project(prj_new);
 
         RImplementation.rmNear(cmd_list);
 
@@ -183,9 +180,7 @@ public:
         RImplementation.rmNormal(cmd_list);
 
         // Restore projection
-        Device.mProject = Pold;
-        Device.mFullTransform = FTold;
-        cmd_list.set_xform_project(Device.mProject);
+        cmd_list.set_xform_project(Pold);
         // restore culling mode
         cmd_list.set_CullMode(cullMode);
         isActive = false;

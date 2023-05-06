@@ -522,6 +522,26 @@ public:
 
 #ifdef USE_DX11
     ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
+
+    ICF void submit()
+    {
+        VERIFY(context_id != CHW::IMM_CTX_ID);
+        ID3D11CommandList* pCommandList{ nullptr };
+        CHK_DX(HW.get_context(context_id)->FinishCommandList(false, &pCommandList));
+        HW.get_context(CHW::IMM_CTX_ID)->ExecuteCommandList(pCommandList, false);
+    }
+
+    ICF void gpu_mark_begin(const wchar_t* name)
+    {
+        pAnnotation->BeginEvent(name);
+    }
+
+    ICF void gpu_mark_end()
+    {
+        pAnnotation->EndEvent();
+    }
+
+    ID3DUserDefinedAnnotation* pAnnotation{ nullptr };
 #endif
 
     // Device create / destroy / frame signaling

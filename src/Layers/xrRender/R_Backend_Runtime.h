@@ -7,6 +7,8 @@
 #include "SH_Constant.h"
 #include "SH_RT.h"
 
+#include "Layers/xrRender/Debug/dxPixEventWrapper.h"
+
 #if defined(USE_DX9)
 #include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
 #elif defined(USE_DX11)

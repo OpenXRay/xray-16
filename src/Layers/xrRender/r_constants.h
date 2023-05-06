@@ -192,7 +192,7 @@ public:
 #if defined(USE_DX11)
     typedef std::pair<u32, ref_cbuffer> cb_table_record;
     typedef xr_vector<cb_table_record> cb_table;
-    cb_table m_CBTable;
+    cb_table m_CBTable[R__NUM_CONTEXTS];
 #endif
 
 private:

@@ -146,7 +146,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     if (SUCCEEDED(R))
     {
         pContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&pContext1));
-        pContext->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), reinterpret_cast<void**>(&pAnnotation));
 #ifdef HAS_DX11_3
         pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
 #endif
@@ -369,18 +368,6 @@ bool CHW::ThisInstanceIsGlobal() const
     return this == &HW;
 }
 
-void CHW::BeginPixEvent(LPCWSTR wszName) const
-{
-    if (pAnnotation)
-        pAnnotation->BeginEvent(wszName);
-}
-
-void CHW::EndPixEvent() const
-{
-    if (pAnnotation)
-        pAnnotation->EndEvent();
-}
-
 void CHW::DestroyDevice()
 {
     if (ThisInstanceIsGlobal()) // only if we are global HW
@@ -399,7 +386,6 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
     _RELEASE(m_pSwapChain);
 
-    _RELEASE(pAnnotation);
     _RELEASE(pContext1);
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {

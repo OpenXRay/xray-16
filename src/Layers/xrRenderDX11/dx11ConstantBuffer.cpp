@@ -5,7 +5,10 @@
 
 dx11ConstantBuffer::~dx11ConstantBuffer()
 {
-    RImplementation.Resources->_DeleteConstantBuffer(this);
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        RImplementation.Resources->_DeleteConstantBuffer(id, this);
+    }
     //	Flush();
     _RELEASE(m_pBuffer);
     xr_free(m_pBufferData);

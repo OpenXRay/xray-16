@@ -62,8 +62,13 @@ public:
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 
+    CBackend& get_imm_command_list() override
+    {
+        return get_imm_context().cmd_list;
+    }
+
 #if RENDER != R_R1
-    ICF u32 alloc_context()
+    ICF u32 alloc_context(bool alloc_cmd_list = true)
     {
         if (contexts_used.all())
             return R_dsgraph_structure::INVALID_CONTEXT_ID;
@@ -75,7 +80,9 @@ public:
                 break;
         }
         contexts_used.set(id, true);
+        contexts_pool[id].reset();
         contexts_pool[id].context_id = id;
+        contexts_pool[id].cmd_list.context_id = alloc_cmd_list ? id : CHW::IMM_CTX_ID;
         return id;
     }
 
@@ -97,7 +104,6 @@ public:
         VERIFY(id < R__NUM_PARALLEL_CONTEXTS);
         VERIFY(contexts_used.test(id));
         VERIFY(contexts_pool[id].context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
-        contexts_pool[id].reset();
         contexts_used.set(id, false);
     }
 

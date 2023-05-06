@@ -390,7 +390,7 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
 
     // Perform masking (only once - on the first/near phase)
     cmd_list.set_CullMode(CULL_NONE);
-    PIX_EVENT(SE_SUN_NEAR_sub_phase);
+    PIX_EVENT_CTX(cmd_list, SE_SUN_NEAR_sub_phase);
     if (SE_SUN_NEAR == sub_phase) //.
     // if( 0 )
     {
@@ -467,7 +467,7 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
     if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
         u_stencil_optimize(cmd_list); //. driver bug?
 
-    PIX_EVENT(Perform_lighting);
+    PIX_EVENT_CTX(cmd_list, Perform_lighting);
 
     // Perform lighting
     {
@@ -742,7 +742,7 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
 
 void CRenderTarget::accum_direct_blend(CBackend &cmd_list)
 {
-    PIX_EVENT(accum_direct_blend);
+    PIX_EVENT_CTX(cmd_list, accum_direct_blend);
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {

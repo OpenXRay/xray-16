@@ -547,6 +547,10 @@ void CBackend::SetupStates()
 // Device dependance
 void CBackend::OnDeviceCreate()
 {
+#if defined(USE_DX11)
+    HW.get_context(context_id)->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), reinterpret_cast<void**>(&pAnnotation));
+#endif
+
     // Debug Draw
     InitializeDebugDraw();
 
@@ -562,6 +566,10 @@ void CBackend::OnDeviceDestroy()
 #if defined(USE_DX11)
     //  Destroy state managers
     StateManager.Reset();
+#endif
+
+#if defined(USE_DX11)
+    _RELEASE(pAnnotation);
 #endif
 }
 

@@ -305,11 +305,13 @@ void CRT::destroy()
 
 void CRT::set_slice_read(int slice)
 {
+    VERIFY(slice <= n_slices || slice == -1);
     pTexture->set_slice(slice);
 }
 
 void CRT::set_slice_write(int slice)
 { 
+    VERIFY(slice <= n_slices || slice == -1);
     pZRT = (slice < 0) ? dsv_all : dsv_per_slice[slice];
 }
 

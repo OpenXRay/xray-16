@@ -14,8 +14,8 @@ class ComputeShader
 public:
     ~ComputeShader();
 
-    ComputeShader& set_c(shared_str name, const Fvector4& value);
-    ComputeShader& set_c(shared_str name, float x, float y, float z, float w);
+    ComputeShader& set_c(CBackend &cmd_list, shared_str name, const Fvector4& value);
+    ComputeShader& set_c(CBackend &cmd_list, shared_str name, float x, float y, float z, float w);
 
     void Dispatch(CBackend &cmd_list, u32 dimx, u32 dimy, u32 dimz);
 

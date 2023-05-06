@@ -5,8 +5,8 @@ void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& 
     VERIFY(_1 || zb);
     if (_1)
     {
-        dwWidth = _1->dwWidth;
-        dwHeight = _1->dwHeight;
+        dwWidth[cmd_list.context_id] = _1->dwWidth;
+        dwHeight[cmd_list.context_id] = _1->dwHeight;
     }
     else
     {
@@ -14,7 +14,7 @@ void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& 
         zb->GetDesc(&desc);
 
         if (!RImplementation.o.msaa)
-            VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
+            VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D || desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2DARRAY);
 
         ID3DResource* pRes;
 
@@ -26,8 +26,8 @@ void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& 
 
         pTex->GetDesc(&TexDesc);
 
-        dwWidth = TexDesc.Width;
-        dwHeight = TexDesc.Height;
+        dwWidth[cmd_list.context_id] = TexDesc.Width;
+        dwHeight[cmd_list.context_id] = TexDesc.Height;
         _RELEASE(pRes);
     }
 
@@ -52,15 +52,15 @@ void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& 
     VERIFY(_1 || zb);
     if (_1)
     {
-        dwWidth = _1->dwWidth;
-        dwHeight = _1->dwHeight;
+        dwWidth[cmd_list.context_id] = _1->dwWidth;
+        dwHeight[cmd_list.context_id] = _1->dwHeight;
     }
     else
     {
         D3D_DEPTH_STENCIL_VIEW_DESC desc;
         zb->GetDesc(&desc);
         if (!RImplementation.o.msaa)
-            VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
+            VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D || desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2DARRAY);
 
         ID3DResource* pRes;
 
@@ -72,8 +72,8 @@ void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& 
 
         pTex->GetDesc(&TexDesc);
 
-        dwWidth = TexDesc.Width;
-        dwHeight = TexDesc.Height;
+        dwWidth[cmd_list.context_id] = TexDesc.Width;
+        dwHeight[cmd_list.context_id] = TexDesc.Height;
         _RELEASE(pRes);
     }
 
@@ -93,8 +93,8 @@ void CRenderTarget::u_setrt(CBackend &cmd_list, u32 W, u32 H, ID3DRenderTargetVi
     ID3DDepthStencilView* zb)
 {
     // VERIFY									(_1);
-    dwWidth = W;
-    dwHeight = H;
+    dwWidth[cmd_list.context_id] = W;
+    dwHeight[cmd_list.context_id] = H;
     // VERIFY									(_1);
     cmd_list.set_RT(_1, 0);
     cmd_list.set_RT(_2, 1);

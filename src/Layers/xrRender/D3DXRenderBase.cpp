@@ -152,6 +152,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 #if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
+        contexts_pool[id].cmd_list.context_id = id;
         contexts_pool[id].cmd_list.OnDeviceCreate();
     }
 #else

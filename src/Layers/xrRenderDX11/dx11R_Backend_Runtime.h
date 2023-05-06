@@ -625,8 +625,8 @@ IC void CBackend::set_Constants(R_constant_table* C)
             m_aComputeConstants[i] = 0;
 #endif
         }
-        R_constant_table::cb_table::iterator it = C->m_CBTable.begin();
-        R_constant_table::cb_table::iterator end = C->m_CBTable.end();
+        R_constant_table::cb_table::iterator it = C->m_CBTable[context_id].begin();
+        R_constant_table::cb_table::iterator end = C->m_CBTable[context_id].end();
         for (; it != end; ++it)
         {
             // ID3DxxBuffer*    pBuffer = (it->second)->GetBuffer();
@@ -716,7 +716,6 @@ IC void CBackend::set_Constants(R_constant_table* C)
             HW.get_context(context_id)->GSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
         }
 
-#ifdef USE_DX11
         if (CBuffersNeedUpdate(m_aHullConstants, aHullConstants, uiMin, uiMax))
         {
             ++uiMax;
@@ -758,7 +757,6 @@ IC void CBackend::set_Constants(R_constant_table* C)
             }
             HW.get_context(context_id)->CSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
         }
-#endif
         /*
         for (int i=0; i<MaxCBuffers; ++i)
         {
@@ -825,6 +823,16 @@ IC void CBackend::get_ConstantDirect(const shared_str& n, size_t DataSize, void*
         if (pPData)
             *pPData = 0;
     }
+}
+
+ICF void CBackend::gpu_mark_begin(const wchar_t* name)
+{
+    pAnnotation->BeginEvent(name);
+}
+
+ICF void CBackend::gpu_mark_end()
+{
+    pAnnotation->EndEvent();
 }
 
 #endif //   dx11R_Backend_Runtime_included

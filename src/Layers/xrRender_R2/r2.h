@@ -60,7 +60,7 @@ struct i_render_phase
             TaskScheduler->Wait(*main_task);
         main_task = nullptr;
 
-        if (o.mt_draw_enabled)
+        if (o.mt_draw_enabled && draw_task)
         {
             // draw task should be finished as sub task of main
             VERIFY(draw_task->IsFinished());
@@ -135,6 +135,9 @@ struct render_sun : public i_render_phase
     void calculate() override;
     void render() override;
     void flush() override;
+
+    void begin_smap_pass(u32 cascade_ind, bool translucent_shadows);
+    void end_smap_pass();
 
     xr_vector<sun::cascade> m_sun_cascades;
     light* sun{ nullptr };

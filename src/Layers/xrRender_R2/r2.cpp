@@ -881,21 +881,21 @@ void CRender::add_SkeletonWallmark(
 void CRender::rmNear(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.f, 0.02f };
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(cmd_list), T->get_height(cmd_list), 0.f, 0.02f };
     cmd_list.SetViewport(viewport);
 }
 
 void CRender::rmFar(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(cmd_list), T->get_height(cmd_list), 0.99999f, 1.f };
     cmd_list.SetViewport(viewport);
 }
 
 void CRender::rmNormal(CBackend &cmd_list)
 {
     IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(), T->get_height(), 0.f, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(cmd_list), T->get_height(cmd_list), 0.f, 1.f };
     cmd_list.SetViewport(viewport);
 }
 

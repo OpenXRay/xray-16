@@ -62,7 +62,10 @@ void CRender::render_lights(light_Package& LP)
         LP.v_shadowed = std::move(refactored);
     }
 
-    auto& cmd_list = RImplementation.get_imm_context().cmd_list;
+    auto& cmd_list = get_imm_context().cmd_list;
+    Target->rt_smap_depth->set_slice_read(0);
+    Target->rt_smap_depth->set_slice_write(0);  // TODO: it is possible to increase lights batch size
+                                                // by rendering into different smap array slices in parallel
 
     PIX_EVENT(SHADOWED_LIGHTS);
 
@@ -117,8 +120,6 @@ void CRender::render_lights(light_Package& LP)
             VERIFY(task);
             TaskScheduler->Wait(*task);
 
-            PIX_EVENT(SHADOWED_LIGHTS_RENDER_SUBSPACE);
-
             auto& dsgraph = get_context(batch_id);
 
             const bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
@@ -126,6 +127,8 @@ void CRender::render_lights(light_Package& LP)
                 !dsgraph.mapSorted.empty();
             if (bNormal || bSpecial)
             {
+                PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHT);
+
                 Stats.s_merged++;
                 L_spot_s.push_back(L);
                 Target->phase_smap_spot(dsgraph.cmd_list, L);
@@ -140,9 +143,9 @@ void CRender::render_lights(light_Package& LP)
                 {
                     L->X.S.transluent = TRUE;
                     Target->phase_smap_spot_tsh(dsgraph.cmd_list, L);
-                    PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
+                    PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHTS_RENDER_GRAPH);
                     dsgraph.render_graph(1); // normal level, secondary priority
-                    PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
+                    PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHTS_RENDER_SORTED);
                     dsgraph.render_sorted(); // strict-sorted geoms
                 }
             }
@@ -176,18 +179,13 @@ void CRender::render_lights(light_Package& LP)
             if (L->vis.smap_ID != sid)
                 break;
 
-            const auto batch_id = alloc_context();
+            const auto batch_id = alloc_context(false);
             if (batch_id == R_dsgraph_structure::INVALID_CONTEXT_ID)
             {
                 VERIFY(!lights_queue.empty());
                 flush_lights();
                 continue;
             }
-
-            // tmp until deferred ctxs
-            RImplementation.get_context(batch_id).cmd_list.Invalidate();
-            HW.get_context(RImplementation.get_context(batch_id).cmd_list.context_id)->ClearState();
-            //
 
             source.pop_back();
             Lights_LastFrame.push_back(L);
@@ -209,10 +207,7 @@ void CRender::render_lights(light_Package& LP)
         }
         flush_lights(); // in case if something left
 
-#if RENDER == R_R4
-        cmd_list.Invalidate(); // tmp until deferred ctxs
-        HW.get_context(cmd_list.context_id)->ClearState();
-#endif
+        cmd_list.Invalidate();
 
         PIX_EVENT(UNSHADOWED_LIGHTS);
 

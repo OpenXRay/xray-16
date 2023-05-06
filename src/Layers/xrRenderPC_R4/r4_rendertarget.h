@@ -13,8 +13,8 @@ class light;
 
 class CRenderTarget : public IRender_Target
 {
-    u32 dwWidth;
-    u32 dwHeight;
+    u32 dwWidth[R__NUM_CONTEXTS];
+    u32 dwHeight[R__NUM_CONTEXTS];
     u32 dwAccumulatorClearMark;
 
 public:
@@ -298,8 +298,8 @@ public:
     void phase_flip();
 #endif
 
-    u32 get_width() override { return dwWidth; }
-    u32 get_height() override { return dwHeight; }
+    u32 get_width(CBackend &cmd_list) override { return dwWidth[cmd_list.context_id]; }
+    u32 get_height(CBackend &cmd_list) override { return dwHeight[cmd_list.context_id]; }
 
     void set_blur(float f) override { param_blur = f; }
     void set_gray(float f) override { param_gray = f; }

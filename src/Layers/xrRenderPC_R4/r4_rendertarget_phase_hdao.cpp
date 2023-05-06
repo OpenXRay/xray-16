@@ -27,8 +27,8 @@ void CRenderTarget::phase_hdao()
         // HW.pContext->CSSetShaderResources( 0, 2, new_srv );
         HW.get_context(CHW::IMM_CTX_ID)->CSSetUnorderedAccessViews(0, 1, &rt_ssao_temp->pUAView, &UAVInitialCounts); // TODO: id
 
-        int iGroupsX = (int)ceil((float)dwWidth / (float)g_uGroupTexelDimensionAfterOverlap);
-        int iGroupsY = (int)ceil((float)dwHeight / (float)g_uGroupTexelDimensionAfterOverlap);
+        int iGroupsX = (int)ceil((float)dwWidth[RCache.context_id] / (float)g_uGroupTexelDimensionAfterOverlap);
+        int iGroupsY = (int)ceil((float)dwHeight[RCache.context_id] / (float)g_uGroupTexelDimensionAfterOverlap);
         RCache.Compute(iGroupsX, iGroupsY, 1);
 
         HW.get_context(CHW::IMM_CTX_ID)->CSSetUnorderedAccessViews(0, 1, uav, &UAVInitialCounts);
