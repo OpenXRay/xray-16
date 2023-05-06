@@ -319,7 +319,6 @@ void CBlender_Compile::StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channe
 
 void CBlender_Compile::StageTemplate_LMAP0()
 {
-    StageSET_Address(D3DTADDRESS_CLAMP);
     StageSET_TMC("$base1", "$null", "$null", 1);
     StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
     StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
@@ -327,7 +326,6 @@ void CBlender_Compile::StageTemplate_LMAP0()
 
 void CBlender_Compile::StageTemplate_HEMI()
 {
-    StageSET_Address(D3DTADDRESS_CLAMP);
     StageSET_TMC("$base2", "$null", "$null", 2);
     StageSET_Color(D3DTA_TEXTURE | D3DTA_ALPHAREPLICATE, D3DTOP_ADD, D3DTA_CURRENT);
 }
