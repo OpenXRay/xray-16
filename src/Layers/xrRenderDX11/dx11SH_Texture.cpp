@@ -50,7 +50,6 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
     if (surf)
         surf->AddRef();
     _RELEASE(pSurface);
-    _RELEASE(m_pSRView);
 
     pSurface = surf;
 
@@ -522,7 +521,6 @@ void CTexture::Unload()
         seqDATA.clear();
         m_seqSRView.clear();
         pSurface = 0;
-        m_pSRView = 0;
     }
     
     _RELEASE(pSurface);
