@@ -16,12 +16,15 @@ public:
 
     CRT();
     ~CRT();
-    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {});
+    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
     void destroy();
     void reset_begin();
     void reset_end();
     BOOL valid() { return !!pTexture; }
     bool used_as_depth() const;
+
+    void set_slice_read(int slice);
+    void set_slice_write(int slice);
 
     void resolve_into(CRT& destination) const; // only RTs with same format supported
 
@@ -30,7 +33,9 @@ public:
     ID3DTexture2D* pSurface;
     ID3DRenderTargetView* pRT;
 #   if defined(USE_DX11)
-    ID3DDepthStencilView* pZRT;
+    ID3DDepthStencilView* pZRT{ nullptr };
+    ID3DDepthStencilView* dsv_all{ nullptr };
+    xr_vector<ID3DDepthStencilView*> dsv_per_slice;
     ID3D11UnorderedAccessView* pUAView;
 #   endif
 #elif defined(USE_OGL)
@@ -47,13 +52,18 @@ public:
     u32 dwHeight;
     D3DFORMAT fmt;
     u32 sampleCount;
+    u32 n_slices{};
 
     u64 _order;
 };
 
 struct resptrcode_crt : public resptr_base<CRT>
 {
-    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {});
+    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {})
+    {
+        create(Name, w, h, f, SampleCount, 1, flags);
+    }
+    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, u32 slices_num, Flags32 flags);
     void destroy() { _set(nullptr); }
 };
 typedef resptr_core<CRT, resptrcode_crt> ref_rt;

@@ -210,8 +210,9 @@ void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask
 
 void CBackend::set_Textures(STextureList* _T)
 {
-    if (T == _T)
-        return;
+    // TODO: expose T invalidation method
+    //if (T == _T) // disabled due to cases when the set of resources the same, but different srv is need to be bind
+    //    return;
     T = _T;
     // If resources weren't set at all we should clear from resource #0.
     int _last_ps = -1;
@@ -238,7 +239,7 @@ void CBackend::set_Textures(STextureList* _T)
             // ordinary pixel surface
             if ((int)load_id > _last_ps)
                 _last_ps = load_id;
-            if (textures_ps[load_id] != load_surf)
+            if (textures_ps[load_id] != load_surf || (load_surf && (load_surf->last_slice != load_surf->curr_slice)))
             {
                 textures_ps[load_id] = load_surf;
                 stat.textures++;
@@ -248,6 +249,7 @@ void CBackend::set_Textures(STextureList* _T)
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
                     load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
+                    load_surf->last_slice = load_surf->curr_slice;
                 }
             }
         }

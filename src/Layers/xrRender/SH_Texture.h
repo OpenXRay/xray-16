@@ -79,6 +79,8 @@ public:
     void apply_seq(CBackend &cmd_list, u32 stage);
     void apply_normal(CBackend &cmd_list, u32 stage) const;
 
+    void set_slice(int slice);
+
     void Preload();
     void Load();
     void PostLoad();
@@ -166,6 +168,9 @@ public: //	Public class members (must be encapsulated further)
         u32 seqMSPF; // Sequence data milliseconds per frame
     };
 
+    int curr_slice{ -1 };
+    int last_slice{ -1 };
+
 private:
 #if defined(USE_DX9) || defined(USE_DX11)
     ID3DBaseTexture* pSurface;
@@ -192,7 +197,9 @@ private:
 #endif
 
 #if defined(USE_DX11)
-    ID3DShaderResourceView* m_pSRView;
+    ID3DShaderResourceView* m_pSRView{ nullptr };
+    ID3DShaderResourceView* srv_all{ nullptr };
+    xr_vector<ID3DShaderResourceView*> srv_per_slice;
     // Sequence view data
     xr_vector<ID3DShaderResourceView*> m_seqSRView;
 #endif
