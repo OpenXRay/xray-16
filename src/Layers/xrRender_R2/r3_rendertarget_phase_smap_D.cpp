@@ -10,7 +10,8 @@ void CRenderTarget::phase_smap_direct(CBackend &cmd_list, light *L, u32 sub_phas
     }
     else
     {
-        u_setrt(cmd_list, nullptr, nullptr, nullptr, rt_smap_depth);
+        RImplementation.Target->rt_smap_depth->set_slice_write(sub_phase); // TODO: a lock may be needed because of concurrent slice set
+        u_setrt(cmd_list, rt_smap_surf, nullptr, nullptr, rt_smap_depth);
         cmd_list.ClearZB(rt_smap_depth, 1.0f);
         RImplementation.rmNormal(cmd_list);
     }

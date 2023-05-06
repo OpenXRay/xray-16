@@ -409,7 +409,8 @@ CRenderTarget::CRenderTarget()
 
         // Create D3DFMT_D24X8 depth-stencil surface if HW smap is not supported,
         // otherwise - create texture with specified HW_smap_FORMAT
-        rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, R__NUM_SUN_CASCADES, flags);
+        const auto num_slices = RImplementation.o.support_rt_arrays ? R__NUM_SUN_CASCADES : 1;
+        rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, num_slices, flags);
 #if defined(USE_DX11) || defined(USE_OGL)
         rt_smap_rain.create(r2_RT_smap_rain, options.rain_smapsize, options.rain_smapsize, depth_format);
         if (options.minmax_sm)

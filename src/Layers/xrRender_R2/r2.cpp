@@ -550,6 +550,9 @@ void CRender::create()
 #if defined(USE_DX11)
     o.tessellation =
         HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
+    o.support_rt_arrays = true;
+#else
+    o.support_rt_arrays = false;
 #endif
 
     if (o.minmax_sm == MMSM_AUTODETECT)

@@ -3,7 +3,7 @@
 void CRenderTarget::phase_smap_direct(CBackend &cmd_list, light* L, u32 sub_phase)
 {
     // Targets
-    u_setrt(RCache, rt_smap_surf, NULL, NULL, rt_smap_depth->pRT);
+    u_setrt(cmd_list, rt_smap_surf, NULL, NULL, rt_smap_depth->pRT);
 
     // Clear
     if (SE_SUN_NEAR == sub_phase)
@@ -14,16 +14,16 @@ void CRenderTarget::phase_smap_direct(CBackend &cmd_list, light* L, u32 sub_phas
             L->X.D[0].minX, L->X.D[0].minY,
             L->X.D[0].maxX, L->X.D[0].maxY
         };
-        RCache.ClearZBRect(rt_smap_depth, 1.0f, 1, &rect);
+        cmd_list.ClearZBRect(rt_smap_depth, 1.0f, 1, &rect);
     }
     else
     {
         // full-clear
-        RCache.ClearZB(rt_smap_depth, 1.0f);
+        cmd_list.ClearZB(rt_smap_depth, 1.0f);
     }
 
     // Stencil	- disable
-    RCache.set_Stencil(FALSE);
+    cmd_list.set_Stencil(FALSE);
 
     // Misc		- draw only front/back-faces
     /*
@@ -34,16 +34,16 @@ void CRenderTarget::phase_smap_direct(CBackend &cmd_list, light* L, u32 sub_phas
     }
     */
     //	Cull always CCW. If you want to revert to previouse solution, please, revert bias setup/
-    RCache.set_CullMode(CULL_CCW); // near
+    cmd_list.set_CullMode(CULL_CCW); // near
     if (RImplementation.o.HW_smap)
-        RCache.set_ColorWriteEnable(FALSE);
+        cmd_list.set_ColorWriteEnable(FALSE);
     else
-        RCache.set_ColorWriteEnable();
+        cmd_list.set_ColorWriteEnable();
 }
 
 void CRenderTarget::phase_smap_direct_tsh(CBackend &cmd_list, light* /*L*/, u32 /*sub_phase*/)
 {
     VERIFY(RImplementation.o.Tshadows);
-    RCache.set_ColorWriteEnable();
-    RCache.ClearRT(RCache.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f }); // color_rgba(127, 127, 12, 12);
+    cmd_list.set_ColorWriteEnable();
+    cmd_list.ClearRT(cmd_list.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f }); // color_rgba(127, 127, 12, 12);
 }

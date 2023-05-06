@@ -5,11 +5,8 @@
 
 void render_sun::init()
 {
-    u32 cascade_count = R__NUM_SUN_CASCADES;
-    m_sun_cascades.resize(cascade_count);
-
     float fBias = -0.0000025f;
-    //	float size = MAP_SIZE_START;
+
     m_sun_cascades[0].reset_chain = true;
     m_sun_cascades[0].size = 20;
     m_sun_cascades[0].bias = m_sun_cascades[0].size * fBias;
@@ -50,9 +47,9 @@ void render_sun::init()
 void render_sun::calculate()
 {
     need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
-    last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
+    last_cascade_chain_mode = m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain;
     if (need_to_render_sunshafts)
-        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
+        m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain = true;
 
     // Lets begin from base frustum
     Fmatrix fullxform_inv = Device.mInvFullTransform;
@@ -100,7 +97,7 @@ void render_sun::calculate()
     Fvector3 cull_COP[R__NUM_SUN_CASCADES];
     Fmatrix cull_xform[R__NUM_SUN_CASCADES];
 
-    for (int cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind)
+    for (int cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
     {
         cull_planes.clear();
 
@@ -190,7 +187,7 @@ void render_sun::calculate()
         );
 
         // Initialize rays for the next cascade
-        if (cascade_ind < m_sun_cascades.size() - 1)
+        if (cascade_ind < R__NUM_SUN_CASCADES - 1)
             m_sun_cascades[cascade_ind + 1].rays = light_cuboid.view_frustum_rays;
 
 #ifdef DEBUG
@@ -287,11 +284,11 @@ void render_sun::calculate()
     
     if (o.mt_calc_enabled)
     {
-        xr_parallel_for(TaskRange<u32>(0, m_sun_cascades.size()), process_cascade);
+        xr_parallel_for(TaskRange<u32>(0, R__NUM_SUN_CASCADES), process_cascade);
     }
     else
     {
-        process_cascade(TaskRange<u32>(0, m_sun_cascades.size()));
+        process_cascade(TaskRange<u32>(0, R__NUM_SUN_CASCADES));
     }
 }
 
@@ -301,11 +298,10 @@ void render_sun::render()
         return;
 
     if (need_to_render_sunshafts)
-        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
+        m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain = last_cascade_chain_mode;
 
     // Render shadow-map
-    //. !!! We should clip based on shrinked frustum (again)
-    for (int cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind) // TODO: proper max cascades
+    for (int cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
     {
         auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
 
@@ -314,7 +310,7 @@ void render_sun::render()
             !dsgraph.mapSorted.empty();
         if (bNormal || bSpecial)
         {
-            begin_smap_pass(cascade_ind, false);
+            RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, sun, cascade_ind);
             dsgraph.cmd_list.set_xform_world(Fidentity);
             dsgraph.cmd_list.set_xform_view(Fidentity);
             dsgraph.cmd_list.set_xform_project(sun->X.D[cascade_ind].combine);
@@ -326,10 +322,15 @@ void render_sun::render()
             {
                 VERIFY(RImplementation.o.Tshadows);
                 sun->X.D[cascade_ind].transluent = TRUE;
-                begin_smap_pass(cascade_ind, true);
+                RImplementation.Target->phase_smap_direct_tsh(dsgraph.cmd_list, sun, cascade_ind);
                 dsgraph.render_graph(1); // normal level, secondary priority
                 dsgraph.render_sorted(); // strict-sorted geoms
             }
+        }
+
+        if (!RImplementation.o.support_rt_arrays)
+        {
+            accumulate_cascade(cascade_ind);
         }
     }
 }
@@ -339,15 +340,36 @@ void render_sun::flush()
     if (!o.active)
         return;
 
+    if (RImplementation.o.support_rt_arrays)
+    {
+        for (int cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
+        {
+            accumulate_cascade(cascade_ind);
+        }
+    }
+
     auto &cmd_list_imm = RImplementation.get_imm_context().cmd_list;
 
-    if (RImplementation.Target->use_minmax_sm_this_frame())
+    RImplementation.Target->rt_smap_depth->set_slice_read(-1);
+    RImplementation.Target->rt_smap_depth->set_slice_write(-1);
+
+    // Restore XForms
+    cmd_list_imm.set_xform_world(Fidentity);
+    cmd_list_imm.set_xform_view(Device.mView);
+    cmd_list_imm.set_xform_project(Device.mProject);
+}
+
+void render_sun::accumulate_cascade(u32 cascade_ind)
+{
+    auto &cmd_list_imm = RImplementation.get_imm_context().cmd_list;
+
+    if ((cascade_ind == SE_SUN_NEAR) && RImplementation.Target->use_minmax_sm_this_frame())
     {
         PIX_EVENT_CTX(cmd_list_imm, SE_SUN_NEAR_MINMAX_GENERATE);
         RImplementation.Target->create_minmax_SM(cmd_list_imm);
     }
 
-    for (int cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
+    // Accumulate
     {
         auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
 
@@ -363,7 +385,7 @@ void render_sun::flush()
             RImplementation.Target->accum_direct_cascade(cmd_list_imm, SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform,
                 m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind].bias);
         }
-        else if (cascade_ind < m_sun_cascades.size() - 1)
+        else if (cascade_ind < R__NUM_SUN_CASCADES - 1)
         {
             PIX_EVENT_CTX(cmd_list_imm, SE_SUN_MIDDLE);
             RImplementation.Target->accum_direct_cascade(cmd_list_imm, SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
@@ -376,40 +398,4 @@ void render_sun::flush()
                 m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
         }
     }
-    end_smap_pass();
-
-    // Restore XForms
-    cmd_list_imm.set_xform_world(Fidentity);
-    cmd_list_imm.set_xform_view(Device.mView);
-    cmd_list_imm.set_xform_project(Device.mProject);
-}
-
-void render_sun::begin_smap_pass(u32 cascade_ind, bool translucent_shadows)
-{
-    auto& cmd_list = RImplementation.get_context(contexts_ids[cascade_ind]).cmd_list;
-
-    if (translucent_shadows)
-    {
-        cmd_list.set_ColorWriteEnable();
-        RImplementation.rmNormal(cmd_list);
-        cmd_list.ClearRT(cmd_list.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f }); // color_rgba(127, 127, 12, 12);
-    }
-    else
-    {
-#if defined(USE_DX9) // TODO: refactor
-        RImplementation.Target->phase_smap_direct(RCache, sun, cascade_ind);
-#else
-        RImplementation.Target->rt_smap_depth->set_slice_write(cascade_ind);
-        RImplementation.Target->u_setrt(cmd_list, nullptr, nullptr, nullptr, RImplementation.Target->rt_smap_depth);
-        cmd_list.ClearZB(RImplementation.Target->rt_smap_depth, 1.0f);
-        RImplementation.rmNormal(cmd_list);
-        cmd_list.set_Stencil(false);
-#endif
-    }
-}
-
-void render_sun::end_smap_pass()
-{
-    RImplementation.Target->rt_smap_depth->set_slice_read(-1);
-    RImplementation.Target->rt_smap_depth->set_slice_write(-1);
 }
