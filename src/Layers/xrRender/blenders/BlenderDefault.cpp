@@ -107,16 +107,13 @@ void CBlender_default::CompileFFP(CBlender_Compile& C) const
                 // input: null
                 // output: lmap_texture (t_lmap in shader)
                 C.StageBegin();
-                C.StageSET_TMC("$base1", "$null", "$null", 1);
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+                C.StageTemplate_LMAP0();
                 C.StageEnd();
 
                 // input: lmap_texture
                 // currently outputs: lmap_texture + hemi_texture.a
                 C.StageBegin();
-                C.StageSET_TMC("$base2", "$null", "$null", 2);
-                C.StageSET_Color(D3DTA_TEXTURE | D3DTA_ALPHAREPLICATE, D3DTOP_ADD, D3DTA_CURRENT);
+                C.StageTemplate_HEMI();
                 C.StageEnd();
 
                 // input: lmap_texture + hemi_texture.a
@@ -143,18 +140,12 @@ void CBlender_default::CompileFFP(CBlender_Compile& C) const
                 // Stage0 - Lightmap
                 if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
                 {
-                    // Stage0 - Set initial texture to lightmap texture
                     C.StageBegin();
-                    C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
-                    C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
-                    C.StageSET_TMC("$base1", "$null", "$null", 1);
+                    C.StageTemplate_LMAP0();
                     C.StageEnd();
 
-                    // Stage1 - Add hemi ontop of lmap texture.
                     C.StageBegin();
-                    C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
-                    C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT); // idk if this is doing anything.
-                    C.StageSET_TMC("$base2", "$null", "$null", 2);
+                    C.StageTemplate_HEMI();
                     C.StageEnd();
                 }
             }
