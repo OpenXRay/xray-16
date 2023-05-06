@@ -6,6 +6,9 @@ void CRenderTarget::phase_smap_spot_clear(CBackend &cmd_list)
     u_setrt(cmd_list, rt_smap_surf, nullptr, nullptr, rt_smap_depth);
 #endif
 #if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11)
+    HW.get_context(CHW::IMM_CTX_ID)->ClearState();
+#endif
     cmd_list.ClearZB(rt_smap_depth, 1.0f);
 #endif
 }
