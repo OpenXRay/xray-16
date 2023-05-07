@@ -11,8 +11,8 @@ void CRenderTarget::phase_smap_direct(CBackend &cmd_list, light* L, u32 sub_phas
         // optimized clear
         const Irect rect =
         {
-            L->X.D[0].minX, L->X.D[0].minY,
-            L->X.D[0].maxX, L->X.D[0].maxY
+            L->X.D[sub_phase].minX, L->X.D[sub_phase].minY,
+            L->X.D[sub_phase].maxX, L->X.D[sub_phase].maxY
         };
         cmd_list.ClearZBRect(rt_smap_depth, 1.0f, 1, &rect);
     }

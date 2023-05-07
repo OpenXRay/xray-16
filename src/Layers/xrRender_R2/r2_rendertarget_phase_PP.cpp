@@ -50,7 +50,7 @@ void CRenderTarget::u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l
     // Calculate ordinaty TCs from blur and SS
     float tw = float(dwWidth[RCache.context_id]);
     float th = float(dwHeight[RCache.context_id]);
-    if (dwHeight[4] != Device.dwHeight)
+    if (dwHeight[RCache.context_id] != Device.dwHeight)
         param_blur = 1.f;
     Fvector2 shift, p0, p1;
     shift.set(.5f / tw, .5f / th);
