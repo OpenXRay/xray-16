@@ -320,14 +320,15 @@ void CBlender_Compile::StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channe
 void CBlender_Compile::StageTemplate_LMAP0()
 {
     StageSET_TMC("$base1", "$null", "$null", 1);
-    StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
-    StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+    StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT); // select color of lmap texture, output to next stage.
+    StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT); // use current alpha, ignore lmap texture alpha
 }
 
 void CBlender_Compile::StageTemplate_HEMI()
 {
-    StageSET_TMC("$base2", "$null", "$null", 2);
-    StageSET_Color(D3DTA_TEXTURE | D3DTA_ALPHAREPLICATE, D3DTOP_ADD, D3DTA_CURRENT);
+    StageSET_TMC("$base2", "$null", "$null", 1);
+    StageSET_Color(D3DTA_TEXTURE | D3DTA_ALPHAREPLICATE, D3DTOP_ADD, D3DTA_CURRENT); // select alpha of hemi texture as RGB, output to next stage.
+    StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT); // use current alpha, ignore hemi texture alpha.
 }
 
 void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 fmag)
