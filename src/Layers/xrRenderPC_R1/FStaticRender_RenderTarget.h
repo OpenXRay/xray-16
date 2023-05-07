@@ -12,6 +12,18 @@ private:
     u32 curWidth;
     u32 curHeight;
 
+    // FFP
+    ref_shader			pShaderSet;
+    ref_shader			pShaderGray;
+    ref_shader			pShaderBlend;
+    ref_shader			pShaderDuality;
+    ref_shader			pShaderNoise;
+    ref_geom			pGeom;
+    ref_geom			pGeom2;
+    void				e_render_noise();
+    void				e_render_duality();
+    u32					param_noise_color;
+
 public:
     // Base targets
     xr_vector<ref_rt> rt_Base;
@@ -74,6 +86,7 @@ private:
 
 public:
     CRenderTarget();
+    ~CRenderTarget();
 
     void Begin();
     void End();
