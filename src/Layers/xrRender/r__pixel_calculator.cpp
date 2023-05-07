@@ -16,7 +16,7 @@ void r_pixel_calculator::begin()
 
     RCache.set_RT(rt->pRT);
 #ifdef USE_DX11
-    RCache.set_ZB(zb->pZRT);
+    RCache.set_ZB(zb->pZRT[RCache.context_id]);
 #elif defined(USE_DX9) || defined(USE_OGL)
     RCache.set_ZB(zb->pRT);
 #endif

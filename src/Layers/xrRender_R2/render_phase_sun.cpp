@@ -301,37 +301,49 @@ void render_sun::render()
         m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain = last_cascade_chain_mode;
 
     // Render shadow-map
-    for (int cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
+    const auto render_cascade = [&, this](const TaskRange<u32>& range)
     {
-        auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
-
-        bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
-        bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
-            !dsgraph.mapSorted.empty();
-        if (bNormal || bSpecial)
+        for (u32 cascade_ind = range.begin(); cascade_ind != range.end(); ++cascade_ind)
         {
-            RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, sun, cascade_ind);
-            dsgraph.cmd_list.set_xform_world(Fidentity);
-            dsgraph.cmd_list.set_xform_view(Fidentity);
-            dsgraph.cmd_list.set_xform_project(sun->X.D[cascade_ind].combine);
-            dsgraph.render_graph(0);
-            if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                RImplementation.Details->Render(dsgraph.cmd_list);
-            sun->X.D[cascade_ind].transluent = FALSE;
-            if (bSpecial)
+            auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
+
+            bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+            bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+                !dsgraph.mapSorted.empty();
+            if (bNormal || bSpecial)
             {
-                VERIFY(RImplementation.o.Tshadows);
-                sun->X.D[cascade_ind].transluent = TRUE;
-                RImplementation.Target->phase_smap_direct_tsh(dsgraph.cmd_list, sun, cascade_ind);
-                dsgraph.render_graph(1); // normal level, secondary priority
-                dsgraph.render_sorted(); // strict-sorted geoms
+                RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, sun, cascade_ind);
+                dsgraph.cmd_list.set_xform_world(Fidentity);
+                dsgraph.cmd_list.set_xform_view(Fidentity);
+                dsgraph.cmd_list.set_xform_project(sun->X.D[cascade_ind].combine);
+                dsgraph.render_graph(0);
+                if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+                    RImplementation.Details->Render(dsgraph.cmd_list);
+                sun->X.D[cascade_ind].transluent = FALSE;
+                if (bSpecial)
+                {
+                    VERIFY(RImplementation.o.Tshadows);
+                    sun->X.D[cascade_ind].transluent = TRUE;
+                    RImplementation.Target->phase_smap_direct_tsh(dsgraph.cmd_list, sun, cascade_ind);
+                    dsgraph.render_graph(1); // normal level, secondary priority
+                    dsgraph.render_sorted(); // strict-sorted geoms
+                }
+            }
+
+            if (!RImplementation.o.support_rt_arrays)
+            {
+                accumulate_cascade(cascade_ind);
             }
         }
+    };
 
-        if (!RImplementation.o.support_rt_arrays)
-        {
-            accumulate_cascade(cascade_ind);
-        }
+    if (o.mt_draw_enabled)
+    {
+        xr_parallel_for(TaskRange<u32>(0, R__NUM_SUN_CASCADES), render_cascade);
+    }
+    else
+    {
+        render_cascade(TaskRange<u32>(0, R__NUM_SUN_CASCADES));
     }
 }
 
@@ -349,9 +361,6 @@ void render_sun::flush()
     }
 
     auto &cmd_list_imm = RImplementation.get_imm_context().cmd_list;
-
-    RImplementation.Target->rt_smap_depth->set_slice_read(-1);
-    RImplementation.Target->rt_smap_depth->set_slice_write(-1);
 
     // Restore XForms
     cmd_list_imm.set_xform_world(Fidentity);

@@ -227,6 +227,10 @@ public:
     void u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb);
     void u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb);
     void u_setrt(CBackend &cmd_list, u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb);
+    void u_setrt(CBackend &cmd_list, u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, const ref_rt& _zb)
+    {
+        u_setrt(cmd_list, W, H, _1, _2, _3, _zb ? _zb->pZRT : 0);
+    }
 
     void u_stencil_optimize(CBackend &cmd_list, eStencilOptimizeMode eSOM = SO_Light);
     void u_compute_texgen_screen(CBackend &cmd_list, Fmatrix& dest);

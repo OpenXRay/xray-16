@@ -64,8 +64,6 @@ void CRender::render_lights(light_Package& LP)
 
     auto& cmd_list = get_imm_context().cmd_list;
     Target->rt_smap_depth->set_slice_read(0);
-    Target->rt_smap_depth->set_slice_write(0);  // TODO: it is possible to increase lights batch size
-                                                // by rendering into different smap array slices in parallel
 
     PIX_EVENT(SHADOWED_LIGHTS);
 

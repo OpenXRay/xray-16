@@ -15,6 +15,9 @@ void CRenderTarget::phase_smap_spot_clear(CBackend &cmd_list)
 
 void CRenderTarget::phase_smap_spot(CBackend &cmd_list, light* L)
 {
+    rt_smap_depth->set_slice_write(cmd_list.context_id, 0); // TODO: it is possible to increase lights batch size
+                                                            // by rendering into different smap array slices in parallel
+
     // Targets + viewport
     u_setrt(cmd_list, rt_smap_surf, nullptr, nullptr, rt_smap_depth);
     const D3D_VIEWPORT viewport = { L->X.S.posX, L->X.S.posY, L->X.S.size, L->X.S.size, 0.f, 1.f };

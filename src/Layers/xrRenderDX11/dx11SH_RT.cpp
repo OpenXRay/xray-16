@@ -8,7 +8,7 @@ CRT::CRT()
 {
     pSurface = NULL;
     pRT = NULL;
-    pZRT = NULL;
+    ZeroMemory(pZRT, sizeof(pZRT));
 #ifdef USE_DX11
     pUAView = NULL;
 #endif
@@ -253,7 +253,10 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
             }
 #endif
         }
-        set_slice_write(-1);
+        for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+        {
+            set_slice_write(id, -1);
+        }
     }
     else
         CHK_DX(HW.pDevice->CreateRenderTargetView(pSurface, 0, &pRT));
@@ -309,10 +312,10 @@ void CRT::set_slice_read(int slice)
     pTexture->set_slice(slice);
 }
 
-void CRT::set_slice_write(int slice)
+void CRT::set_slice_write(u32 context_id, int slice)
 { 
     VERIFY(slice <= n_slices || slice == -1);
-    pZRT = (slice < 0) ? dsv_all : dsv_per_slice[slice];
+    pZRT[context_id] = (slice < 0) ? dsv_all : dsv_per_slice[slice];
 }
 
 

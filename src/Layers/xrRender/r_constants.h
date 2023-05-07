@@ -204,7 +204,9 @@ private:
 #endif
 
 public:
-    R_constant_table() = default;
+    Lock *render_lock{nullptr}; // TODO: this lock can be avoided if cmd_list will have own copy of ctable
+
+    R_constant_table() { render_lock = xr_new<Lock>(); };
     ~R_constant_table();
 
     void clear();

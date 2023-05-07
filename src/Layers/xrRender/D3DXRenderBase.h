@@ -124,11 +124,6 @@ public:
         contexts_used.reset();
     }
 #else
-    ICF u32 alloc_context()
-    {
-        return R_dsgraph_structure::IMM_CTX_ID;
-    }
-
     ICF R_dsgraph_structure& get_imm_context()
     {
         context_imm.context_id = R_dsgraph_structure::IMM_CTX_ID;
@@ -139,11 +134,6 @@ public:
     {
         VERIFY(id == R_dsgraph_structure::IMM_CTX_ID); // be sure R1 doesn't go crazy
         return get_imm_context();
-    }
-
-    ICF void release_context(u32 id)
-    {
-        // do nothing
     }
 
     ICF void cleanup_contexts()

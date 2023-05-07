@@ -734,8 +734,6 @@ void CRender::Render()
 
     // HUD
     BasicStats.Primitives.End();
-
-    cleanup_contexts();
 }
 
 void CRender::ApplyBlur2(FVF::TL2uv* pv, u32 size) const

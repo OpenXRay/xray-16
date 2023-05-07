@@ -24,7 +24,7 @@ public:
     bool used_as_depth() const;
 
     void set_slice_read(int slice);
-    void set_slice_write(int slice);
+    void set_slice_write(u32 context_id, int slice);
 
     void resolve_into(CRT& destination) const; // only RTs with same format supported
 
@@ -33,7 +33,7 @@ public:
     ID3DTexture2D* pSurface;
     ID3DRenderTargetView* pRT;
 #   if defined(USE_DX11)
-    ID3DDepthStencilView* pZRT{ nullptr };
+    ID3DDepthStencilView* pZRT[R__NUM_CONTEXTS];
     ID3DDepthStencilView* dsv_all{ nullptr };
     xr_vector<ID3DDepthStencilView*> dsv_per_slice;
     ID3D11UnorderedAccessView* pUAView;

@@ -328,11 +328,11 @@ public:
         return ClearZBRect(zb->pRT, depth, numRects, rects);
     }
 #elif defined(USE_DX11)
-    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT, depth);}
-    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT, depth, stencil);}
+    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT[context_id], depth); }
+    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT[context_id], depth, stencil); }
     ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
     {
-        return ClearZBRect(zb->pZRT, depth, numRects, rects);
+        return ClearZBRect(zb->pZRT[context_id], depth, numRects, rects);
     }
 #else
 #   error No graphics API selected or enabled!

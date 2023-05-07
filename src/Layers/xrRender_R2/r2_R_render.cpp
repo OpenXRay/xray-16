@@ -196,12 +196,14 @@ void CRender::Render()
     Target->phase_occq();
     LP_normal.clear();
     LP_pending.clear();
-#if defined(USE_DX11) || defined(USE_OGL)
     if (o.msaa)
     {
+#if defined(USE_DX11)
+        dsgraph.cmd_list.set_ZB(Target->rt_MSAADepth->pZRT[dsgraph.cmd_list.context_id]);
+#elif defined(USE_OGL)
         dsgraph.cmd_list.set_ZB(Target->rt_MSAADepth->pZRT);
-    }
 #endif
+    }
     {
         PIX_EVENT(DEFER_TEST_LIGHT_VIS);
         light_Package& LP = Lights.package;
@@ -381,9 +383,6 @@ void CRender::Render()
     }
 
     VERIFY(dsgraph.mapDistort.empty());
-
-    // we're done with rendering
-    cleanup_contexts();
 }
 
 void CRender::render_forward()

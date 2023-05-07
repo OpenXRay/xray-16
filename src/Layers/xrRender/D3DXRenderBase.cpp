@@ -319,6 +319,10 @@ void D3DXRenderBase::End()
     RCache.OnFrameEnd();
 #endif
     DoAsyncScreenshot();
+
+    // we're done with rendering
+    cleanup_contexts();
+
     HW.EndScene();
     HW.Present();
 }

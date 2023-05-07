@@ -218,20 +218,25 @@ public:
     void accum_volumetric_geom_destroy();
 
     ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
-    ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pZRT; }
+    ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pZRT[CHW::IMM_CTX_ID]; }
 
     void u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb);
     void u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb)
     {
-        u_setrt(cmd_list, _1, _2, _3, _zb ? _zb->pZRT : nullptr);
+        u_setrt(cmd_list, _1, _2, _3, _zb ? _zb->pZRT[cmd_list.context_id] : nullptr);
     }
     void u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb);
     void u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb)
     {
-        u_setrt(cmd_list, _1, _2, _zb ? _zb->pZRT : nullptr);
+        u_setrt(cmd_list, _1, _2, _zb ? _zb->pZRT[cmd_list.context_id] : nullptr);
     }
     void u_setrt(CBackend &cmd_list, u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
         ID3DDepthStencilView* zb);
+    void u_setrt(CBackend& cmd_list, u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
+        const ref_rt& _zb)
+    {
+        u_setrt(cmd_list, W, H, _1, _2, _3, _zb ? _zb->pZRT[cmd_list.context_id] : nullptr);
+    }
 
     void u_stencil_optimize(CBackend &cmd_list, eStencilOptimizeMode eSOM = SO_Light);
     void u_compute_texgen_screen(CBackend &cmd_list, Fmatrix& dest);
