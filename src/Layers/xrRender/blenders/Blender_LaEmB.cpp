@@ -185,6 +185,10 @@ void CBlender_LaEmB::compile_2(CBlender_Compile& C)
             C.StageBegin();
             C.StageTemplate_LMAP0();
             C.StageEnd();
+
+            C.StageBegin();
+            C.StageTemplate_HEMI();
+            C.StageEnd();
         }
 
         // Stage1 - Environment map
@@ -272,6 +276,10 @@ void CBlender_LaEmB::compile_3(CBlender_Compile& C)
             C.StageBegin();
             C.StageTemplate_LMAP0();
             C.StageEnd();
+
+            C.StageBegin();
+            C.StageTemplate_HEMI();
+            C.StageEnd();
         }
 
         // Stage1 - [+] Env-map
@@ -342,6 +350,10 @@ void CBlender_LaEmB::compile_L(CBlender_Compile& C)
         {
             C.StageBegin();
             C.StageTemplate_LMAP0();
+            C.StageEnd();
+
+            C.StageBegin();
+            C.StageTemplate_HEMI();
             C.StageEnd();
         }
 
