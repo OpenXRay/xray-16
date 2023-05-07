@@ -110,6 +110,10 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
                     C.StageBegin();
                     C.StageTemplate_LMAP0();
                     C.StageEnd();
+
+                    C.StageBegin();
+                    C.StageTemplate_HEMI();
+                    C.StageEnd();
                 }
 
                 // Stage1 - Base texture
@@ -136,6 +140,10 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
                 {
                     C.StageBegin();
                     C.StageTemplate_LMAP0();
+                    C.StageEnd();
+
+                    C.StageBegin();
+                    C.StageTemplate_HEMI();
                     C.StageEnd();
                 }
             }

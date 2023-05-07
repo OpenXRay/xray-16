@@ -136,6 +136,10 @@ void CBlender_LmEbB::compile_2(CBlender_Compile& C) const
             C.StageBegin();
             C.StageTemplate_LMAP0();
             C.StageEnd();
+
+            C.StageBegin();
+            C.StageTemplate_HEMI();
+            C.StageEnd();
         }
     }
     C.PassEnd();
@@ -216,6 +220,10 @@ void CBlender_LmEbB::compile_L(CBlender_Compile& C) const
         {
             C.StageBegin();
             C.StageTemplate_LMAP0();
+            C.StageEnd();
+
+            C.StageBegin();
+            C.StageTemplate_HEMI();
             C.StageEnd();
         }
     }
