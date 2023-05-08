@@ -361,6 +361,7 @@ void render_sun::flush()
     }
 
     auto &cmd_list_imm = RImplementation.get_imm_context().cmd_list;
+    cmd_list_imm.Invalidate();
 
     // Restore XForms
     cmd_list_imm.set_xform_world(Fidentity);
@@ -370,41 +371,38 @@ void render_sun::flush()
 
 void render_sun::accumulate_cascade(u32 cascade_ind)
 {
-    auto &cmd_list_imm = RImplementation.get_imm_context().cmd_list;
+    auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
 
     if ((cascade_ind == SE_SUN_NEAR) && RImplementation.Target->use_minmax_sm_this_frame())
     {
-        PIX_EVENT_CTX(cmd_list_imm, SE_SUN_NEAR_MINMAX_GENERATE);
-        RImplementation.Target->create_minmax_SM(cmd_list_imm);
+        PIX_EVENT_CTX(dsgraph.cmd_list, SE_SUN_NEAR_MINMAX_GENERATE);
+        RImplementation.Target->create_minmax_SM(dsgraph.cmd_list);
     }
 
     // Accumulate
     {
-        auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
-
-        dsgraph.cmd_list.submit(); // TODO: move into release (rename to submit?)
-        cmd_list_imm.Invalidate();
-        RImplementation.release_context(dsgraph.context_id);
-
         // Accumulate
         RImplementation.Target->rt_smap_depth->set_slice_read(cascade_ind);
         if (cascade_ind == 0)
         {
-            PIX_EVENT_CTX(cmd_list_imm, SE_SUN_NEAR);
-            RImplementation.Target->accum_direct_cascade(cmd_list_imm, SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform,
+            PIX_EVENT_CTX(dsgraph.cmd_list, SE_SUN_NEAR);
+            RImplementation.Target->accum_direct_cascade(dsgraph.cmd_list, SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform,
                 m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind].bias);
         }
         else if (cascade_ind < R__NUM_SUN_CASCADES - 1)
         {
-            PIX_EVENT_CTX(cmd_list_imm, SE_SUN_MIDDLE);
-            RImplementation.Target->accum_direct_cascade(cmd_list_imm, SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
+            PIX_EVENT_CTX(dsgraph.cmd_list, SE_SUN_MIDDLE);
+            RImplementation.Target->accum_direct_cascade(dsgraph.cmd_list, SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
                 m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
         }
         else
         {
-            PIX_EVENT_CTX(cmd_list_imm, SE_SUN_FAR);
-            RImplementation.Target->accum_direct_cascade(cmd_list_imm, SE_SUN_FAR, m_sun_cascades[cascade_ind].xform,
+            PIX_EVENT_CTX(dsgraph.cmd_list, SE_SUN_FAR);
+            RImplementation.Target->accum_direct_cascade(dsgraph.cmd_list, SE_SUN_FAR, m_sun_cascades[cascade_ind].xform,
                 m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
         }
     }
+
+    dsgraph.cmd_list.submit(); // TODO: move into release (rename to submit?)
+    RImplementation.release_context(dsgraph.context_id);
 }

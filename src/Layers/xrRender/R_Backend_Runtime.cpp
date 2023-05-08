@@ -56,6 +56,7 @@ void CBackend::Invalidate()
     pZB = 0;
 #if defined(USE_OGL)
     pFB = 0;
+    pp = 0;
 #endif
 
     decl = nullptr;

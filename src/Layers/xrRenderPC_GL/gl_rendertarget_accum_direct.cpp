@@ -333,10 +333,10 @@ void CRenderTarget::accum_direct(CBackend &cmd_list, u32 sub_phase)
 void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias)
 {
     // Choose normal code-path or filtered
-    phase_accumulator(RCache);
+    phase_accumulator(cmd_list);
     if (RImplementation.o.sunfilter)
     {
-        accum_direct_f(RCache, sub_phase);
+        accum_direct_f(cmd_list, sub_phase);
         return;
     }
 
@@ -368,8 +368,8 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
     L_dir.normalize();
 
     // Perform masking (only once - on the first/near phase)
-    RCache.set_CullMode(CULL_NONE);
-    PIX_EVENT(SE_SUN_NEAR_sub_phase);
+    cmd_list.set_CullMode(CULL_NONE);
+    PIX_EVENT_CTX(cmd_list, SE_SUN_NEAR_sub_phase);
     if (SE_SUN_NEAR == sub_phase) //.
     // if( 0 )
     {
@@ -384,45 +384,45 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
         pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p1.y);
         pv++;
         RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
-        RCache.set_Geometry(g_combine);
+        cmd_list.set_Geometry(g_combine);
 
         // setup
         float intensity = 0.3f * fuckingsun->color.r + 0.48f * fuckingsun->color.g + 0.22f * fuckingsun->color.b;
         Fvector dir = L_dir;
         dir.normalize().mul(-_sqrt(intensity + EPS));
-        RCache.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
-        RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0.f);
+        cmd_list.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
+        cmd_list.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0.f);
 
         // if (stencil>=1 && aref_pass)	stencil = light_id
         //	Done in blender!
         // RCache.set_ColorWriteEnable	(FALSE		);
         if (!RImplementation.o.msaa)
         {
-            RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff,
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
         }
         else
         {
             // per pixel rendering // checked Holger
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0x81, 0x7f,
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0x81, 0x7f,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample rendering
             if (RImplementation.o.msaa_opt)
             {
-                RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]); // masker
-                RCache.set_CullMode(CULL_NONE);
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0x81, 0x7f,
+                cmd_list.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]); // masker
+                cmd_list.set_CullMode(CULL_NONE);
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0x81, 0x7f,
                     D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-                RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+                cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
             }
             else
             {
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
             }
-            RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff,
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff,
                     D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         }
     }
@@ -435,15 +435,15 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
 
     // nv-stencil recompression
     if (RImplementation.o.nvstencil && (SE_SUN_NEAR == sub_phase))
-        u_stencil_optimize(RCache); //. driver bug?
+        u_stencil_optimize(cmd_list); //. driver bug?
 
-    PIX_EVENT(Perform_lighting);
+    PIX_EVENT_CTX(cmd_list, Perform_lighting);
 
     // Perform lighting
     {
-        phase_accumulator(RCache);
-        RCache.set_CullMode(CULL_CCW); //******************************************************************
-        RCache.set_ColorWriteEnable();
+        phase_accumulator(cmd_list);
+        cmd_list.set_CullMode(CULL_CCW); //******************************************************************
+        cmd_list.set_ColorWriteEnable();
 
         // texture adjustment matrix
         // float			fTexelOffs			= (.5f / float(RImplementation.o.smapsize));
@@ -517,10 +517,10 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
         // Compute textgen texture for pixel shader, for possitions texture.
         Fmatrix m_Texgen;
         m_Texgen.identity();
-        RCache.xforms.set_W(m_Texgen);
-        RCache.xforms.set_V(Device.mView);
-        RCache.xforms.set_P(Device.mProject);
-        u_compute_texgen_screen(RCache, m_Texgen);
+        cmd_list.xforms.set_W(m_Texgen);
+        cmd_list.xforms.set_V(Device.mView);
+        cmd_list.xforms.set_P(Device.mProject);
+        u_compute_texgen_screen(cmd_list, m_Texgen);
 
         // Make jitter texture
         Fvector2 j0, j1;
@@ -558,15 +558,15 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
             RImplementation.Vertex.Unlock(ver_count, g_combine_cuboid.stride());
         }
 
-        RCache.set_Geometry(g_combine_cuboid);
+        cmd_list.set_Geometry(g_combine_cuboid);
 
         // setup
-        RCache.set_Element(s_accum_direct->E[uiElementIndex]);
-        RCache.set_c("m_texgen", m_Texgen);
-        RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
-        RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
-        RCache.set_c("m_shadow", m_shadow);
-        RCache.set_c("m_sunmask", m_clouds_shadow);
+        cmd_list.set_Element(s_accum_direct->E[uiElementIndex]);
+        cmd_list.set_c("m_texgen", m_Texgen);
+        cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
+        cmd_list.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
+        cmd_list.set_c("m_shadow", m_shadow);
+        cmd_list.set_c("m_sunmask", m_clouds_shadow);
 
         // Pass view vector projected in shadow space to far pixel shader
         // Needed for shadow fading.
@@ -580,7 +580,7 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
             view_projlightspace.set(view_viewspace.x, view_viewspace.y, 0, 0);
             view_projlightspace.normalize();
 
-            RCache.set_c("view_shadow_proj", view_projlightspace);
+            cmd_list.set_c("view_shadow_proj", view_projlightspace);
         }
 
         // nv-DBT
@@ -620,11 +620,11 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
 
         // Enable Z function only for near and middle cascades, the far one is restricted by only stencil.
         if ((SE_SUN_NEAR == sub_phase || SE_SUN_MIDDLE == sub_phase))
-            RCache.set_ZFunc(D3DCMP_GREATEREQUAL);
+            cmd_list.set_ZFunc(D3DCMP_GREATEREQUAL);
         else if (!ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_ZCULLING))
-            RCache.set_ZFunc(D3DCMP_ALWAYS);
+            cmd_list.set_ZFunc(D3DCMP_ALWAYS);
         else
-            RCache.set_ZFunc(D3DCMP_LESS);
+            cmd_list.set_ZFunc(D3DCMP_LESS);
 
         u32 st_mask = 0xFE;
         _D3DSTENCILOP st_pass = D3DSTENCILOP_ZERO;
@@ -639,40 +639,40 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
         if (!RImplementation.o.msaa)
         {
             // RCache.set_Stencil	(TRUE,D3DCMP_LESSEQUAL,dwLightMarkerID,0xff,0x00);
-            RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, st_mask,
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, st_mask,
                 D3DSTENCILOP_KEEP, st_pass, D3DSTENCILOP_KEEP);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
         }
         else
         {
             // per pixel
             // RCache.set_Stencil	(TRUE,D3DCMP_EQUAL,dwLightMarkerID,0xff,0x00);
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, st_mask,
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, st_mask,
                 D3DSTENCILOP_KEEP, st_pass, D3DSTENCILOP_KEEP);
-            RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
 
             // per sample
             if (RImplementation.o.msaa_opt)
             {
-                RCache.set_Element(s_accum_direct_msaa[0]->E[uiElementIndex]);
+                cmd_list.set_Element(s_accum_direct_msaa[0]->E[uiElementIndex]);
 
                 if ((SE_SUN_NEAR == sub_phase || SE_SUN_MIDDLE == sub_phase))
-                    RCache.set_ZFunc(D3DCMP_GREATEREQUAL);
+                    cmd_list.set_ZFunc(D3DCMP_GREATEREQUAL);
                 else if (!ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_ZCULLING))
-                    RCache.set_ZFunc(D3DCMP_ALWAYS);
+                    cmd_list.set_ZFunc(D3DCMP_ALWAYS);
                 else
-                    RCache.set_ZFunc(D3DCMP_LESS);
+                    cmd_list.set_ZFunc(D3DCMP_LESS);
 
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, st_mask,
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, st_mask,
                     D3DSTENCILOP_KEEP, st_pass, D3DSTENCILOP_KEEP);
-                RCache.set_CullMode(CULL_NONE);
-                RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
+                cmd_list.set_CullMode(CULL_NONE);
+                cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 8, 0, 16);
             }
             else
             {
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
             }
-            RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
         }
 
         // Fetch4 : disable
