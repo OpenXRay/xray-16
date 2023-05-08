@@ -4,6 +4,6 @@ function normal(shader, t_base, t_second, t_detail)
 --        : blend                (true,blend.srcalpha,blend.invsrcalpha)
 --        : blend                (true,blend.one,blend.one)
         : blend                (true,blend.srcalpha,blend.one)
-		: zb                (false,false)
+		: zb                (true,false)
 	shader:sampler        ("s_base")       :texture  (t_base)
 end
