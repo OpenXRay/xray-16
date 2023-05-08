@@ -491,4 +491,37 @@ IC void CBackend::set_Constants(R_constant_table* C)
         if (Cs->handler) Cs->handler->setup(*this, &*Cs);
 }
 
+void CBackend::set_pass_targets(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& zb)
+{
+    if (_1)
+    {
+        curr_rt_width  = _1->dwWidth;
+        curr_rt_height = _1->dwHeight;
+    }
+    else
+    {
+        VERIFY(zb);
+        curr_rt_width  = zb->dwWidth;
+        curr_rt_height = zb->dwHeight;
+    }
+
+    const GLenum buffers[3] = {
+        (GLenum)(_1 ? GL_COLOR_ATTACHMENT0 : GL_NONE),
+        (GLenum)(_2 ? GL_COLOR_ATTACHMENT1 : GL_NONE),
+        (GLenum)(_3 ? GL_COLOR_ATTACHMENT2 : GL_NONE)
+    };
+
+    set_RT(_1 ? _1->pRT : 0, 0);
+    set_RT(_2 ? _2->pRT : 0, 1);
+    set_RT(_3 ? _3->pRT : 0, 2);
+    set_ZB(zb ? zb->pZRT : 0);
+
+    [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
+    CHK_GL(glDrawBuffers(3, buffers));
+
+    const D3D_VIEWPORT viewport = { 0, 0, curr_rt_width, curr_rt_height, 0.f, 1.f };
+    SetViewport(viewport);
+}
+
 #endif	//	glR_Backend_Runtime_included

@@ -330,4 +330,29 @@ ICF void CBackend::gpu_mark_end()
     HW.EndPixEvent();
 }
 
+IC void CBackend::set_pass_targets(const ref_rt &_1, const ref_rt &_2, const ref_rt &_3, const ref_rt &zb)
+{
+    VERIFY(_1);
+
+    if (_1)
+    {
+        curr_rt_width  = _1->dwWidth;
+        curr_rt_height = _1->dwHeight;
+    }
+    else
+    {
+        VERIFY(zb);
+        curr_rt_width  = zb->dwWidth;
+        curr_rt_height = zb->dwHeight;
+    }
+
+    set_RT(_1 ? _1->pRT : nullptr, 0);
+    set_RT(_2 ? _2->pRT : nullptr, 1);
+    set_RT(_3 ? _3->pRT : nullptr, 2);
+    set_ZB(zb ? zb->pRT : nullptr);
+
+    const D3D_VIEWPORT viewport = { 0, 0, curr_rt_width, curr_rt_height, 0.f, 1.f };
+    SetViewport(viewport);
+}
+
 #endif //	dx9R_Backend_Runtime_included

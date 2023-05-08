@@ -10,10 +10,14 @@ void CRenderTarget::phase_smap_direct(CBackend &cmd_list, light *L, u32 sub_phas
     }
     else
     {
-        RImplementation.Target->rt_smap_depth->set_slice_write(cmd_list.context_id, sub_phase);
-        u_setrt(cmd_list, rt_smap_surf, nullptr, nullptr, rt_smap_depth);
+        rt_smap_depth->set_slice_write(cmd_list.context_id, sub_phase);
+        cmd_list.set_pass_targets(
+            rt_smap_surf,
+            nullptr,
+            nullptr,
+            rt_smap_depth
+        );
         cmd_list.ClearZB(rt_smap_depth, 1.0f);
-        RImplementation.rmNormal(cmd_list);
     }
 
     // Stencil	- disable

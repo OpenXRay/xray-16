@@ -278,6 +278,11 @@ public:
     IC const Fmatrix& get_xform_view();
     IC const Fmatrix& get_xform_project();
 
+    u32 curr_rt_width{};
+    u32 curr_rt_height{};
+
+    IC void set_pass_targets(const ref_rt& mrt0, const ref_rt& mrt1, const ref_rt& mrt2, const ref_rt& zb);
+
 #if defined(USE_DX9) || defined(USE_DX11)
     IC void set_RT(ID3DRenderTargetView* RT, u32 ID = 0);
     IC void set_ZB(ID3DDepthStencilView* ZB);

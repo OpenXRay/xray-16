@@ -2,14 +2,17 @@
 
 void CRenderTarget::phase_smap_spot_clear(CBackend &cmd_list)
 {
-#ifdef USE_OGL
-    u_setrt(cmd_list, rt_smap_surf, nullptr, nullptr, rt_smap_depth);
-#endif
-#if defined(USE_DX11) || defined(USE_OGL)
+    rt_smap_depth->set_slice_write(cmd_list.context_id, 0);
+    cmd_list.set_pass_targets(
+        rt_smap_surf,
+        nullptr,
+        nullptr,
+        rt_smap_depth
+    );
+    cmd_list.ClearZB(rt_smap_depth, 1.0f);
+
 #if defined(USE_DX11)
     HW.get_context(CHW::IMM_CTX_ID)->ClearState();
-#endif
-    cmd_list.ClearZB(rt_smap_depth, 1.0f);
 #endif
 }
 
@@ -17,9 +20,12 @@ void CRenderTarget::phase_smap_spot(CBackend &cmd_list, light* L)
 {
     rt_smap_depth->set_slice_write(cmd_list.context_id, 0); // TODO: it is possible to increase lights batch size
                                                             // by rendering into different smap array slices in parallel
-
-    // Targets + viewport
-    u_setrt(cmd_list, rt_smap_surf, nullptr, nullptr, rt_smap_depth);
+    cmd_list.set_pass_targets(
+        rt_smap_surf,
+        nullptr,
+        nullptr,
+        rt_smap_depth
+    );
     const D3D_VIEWPORT viewport = { L->X.S.posX, L->X.S.posY, L->X.S.size, L->X.S.size, 0.f, 1.f };
     cmd_list.SetViewport(viewport);
 
