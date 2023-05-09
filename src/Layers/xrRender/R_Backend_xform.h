@@ -25,7 +25,7 @@ private:
     bool m_bInvWValid;
 
 public:
-    explicit R_xforms(CBackend &cmd_list_in);
+    explicit R_xforms(CBackend& cmd_list_in);
     void unmap();
     void set_W(const Fmatrix& m);
     void set_V(const Fmatrix& m);

@@ -28,7 +28,7 @@ const float PS::fDT_STEP = float(uDT_STEP) / 1000.f;
 #pragma warning(disable : 4701) // " potentially uninitialized local variable" (magnitude_sse does initialize it)
 #endif
 
-static void ApplyTexgen(CBackend &cmd_list, const Fmatrix& mVP)
+static void ApplyTexgen(CBackend& cmd_list, const Fmatrix& mVP)
 {
     Fmatrix mTexgen;
 
@@ -642,7 +642,7 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
     }
 }
 
-void CParticleEffect::Render(CBackend &cmd_list, float, bool use_fast_geo)
+void CParticleEffect::Render(CBackend& cmd_list, float, bool use_fast_geo)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CParticleEffect::Render()");

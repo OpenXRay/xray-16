@@ -5,7 +5,7 @@
 
 //  DX11: TODO: Implement alpha referense control
 
-dx11StateManager::dx11StateManager(CBackend &cmd_list_in)
+dx11StateManager::dx11StateManager(CBackend& cmd_list_in)
     : cmd_list(cmd_list_in)
 {
     //  If dx11StateManager would ever own any object

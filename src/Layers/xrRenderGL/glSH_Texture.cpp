@@ -71,7 +71,7 @@ void CTexture::apply_load(CBackend& cmd_list, u32 dwStage)
     bind(cmd_list, dwStage);
 };
 
-void CTexture::apply_theora(CBackend &cmd_list, u32 dwStage)
+void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
 {
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));
@@ -98,7 +98,7 @@ void CTexture::apply_theora(CBackend &cmd_list, u32 dwStage)
     }
 };
 
-void CTexture::apply_avi(CBackend &cmd_list, u32 dwStage) const
+void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage) const
 {
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));
@@ -115,7 +115,7 @@ void CTexture::apply_avi(CBackend &cmd_list, u32 dwStage) const
 #endif
 };
 
-void CTexture::apply_seq(CBackend &cmd_list, u32 dwStage)
+void CTexture::apply_seq(CBackend& cmd_list, u32 dwStage)
 {
     // SEQ
     u32 frame = Device.dwTimeContinual / seqMSPF; //Device.dwTimeGlobal
@@ -136,7 +136,7 @@ void CTexture::apply_seq(CBackend &cmd_list, u32 dwStage)
     CHK_GL(glBindTexture(desc, pSurface));
 };
 
-void CTexture::apply_normal(CBackend &cmd_list, u32 dwStage) const
+void CTexture::apply_normal(CBackend& cmd_list, u32 dwStage) const
 {
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
     CHK_GL(glBindTexture(desc, pSurface));

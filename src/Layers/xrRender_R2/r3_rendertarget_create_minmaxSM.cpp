@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::create_minmax_SM(CBackend &cmd_list)
+void CRenderTarget::create_minmax_SM(CBackend& cmd_list)
 {
     u32 Offset;
     float d_Z = EPS_S, d_W = 1.f;

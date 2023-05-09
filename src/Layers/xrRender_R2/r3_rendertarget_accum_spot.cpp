@@ -3,7 +3,7 @@
 
 // extern Fvector du_cone_vertices[DU_CONE_NUMVERTEX];
 
-void CRenderTarget::accum_spot(CBackend &cmd_list, light* L)
+void CRenderTarget::accum_spot(CBackend& cmd_list, light* L)
 {
     phase_accumulator(cmd_list);
     RImplementation.Stats.l_visible++;
@@ -313,7 +313,7 @@ void CRenderTarget::accum_spot(CBackend &cmd_list, light* L)
     u_DBT_disable();
 }
 
-void CRenderTarget::accum_volumetric(CBackend &cmd_list, light* L)
+void CRenderTarget::accum_volumetric(CBackend& cmd_list, light* L)
 {
     // if (L->flags.type != IRender_Light::SPOT) return;
     if (!L->flags.bVolumetric)

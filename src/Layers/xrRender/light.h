@@ -130,7 +130,7 @@ public:
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     void gi_generate();
     void xform_calc();
-    void vis_prepare(CBackend &cmd_list);
+    void vis_prepare(CBackend& cmd_list);
     void vis_update();
     void Export(light_Package& dest);
     void set_attenuation_params(float a0, float a1, float a2, float fo);

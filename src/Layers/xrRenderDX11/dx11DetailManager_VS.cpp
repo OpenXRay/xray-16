@@ -26,7 +26,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_array = T1.get("array");
 }
 
-void CDetailManager::hw_Render(CBackend &cmd_list)
+void CDetailManager::hw_Render(CBackend& cmd_list)
 {
     using namespace detail_manager;
 
@@ -87,7 +87,7 @@ void CDetailManager::hw_Render(CBackend &cmd_list)
     hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 0, 1);
 }
 
-void CDetailManager::hw_Render_dump(CBackend &cmd_list,
+void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id)
 {
     static shared_str strConsts("consts");

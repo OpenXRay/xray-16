@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::phase_smap_spot_clear(CBackend &cmd_list)
+void CRenderTarget::phase_smap_spot_clear(CBackend& cmd_list)
 {
     rt_smap_depth->set_slice_write(cmd_list.context_id, 0);
     cmd_list.set_pass_targets(
@@ -16,7 +16,7 @@ void CRenderTarget::phase_smap_spot_clear(CBackend &cmd_list)
 #endif
 }
 
-void CRenderTarget::phase_smap_spot(CBackend &cmd_list, light* L)
+void CRenderTarget::phase_smap_spot(CBackend& cmd_list, light* L)
 {
     rt_smap_depth->set_slice_write(cmd_list.context_id, 0); // TODO: it is possible to increase lights batch size
                                                             // by rendering into different smap array slices in parallel
@@ -43,7 +43,7 @@ void CRenderTarget::phase_smap_spot(CBackend &cmd_list, light* L)
 #endif
 }
 
-void CRenderTarget::phase_smap_spot_tsh(CBackend &cmd_list, light* L)
+void CRenderTarget::phase_smap_spot_tsh(CBackend& cmd_list, light* L)
 {
     VERIFY(!"Implement clear of the buffer for tsh!");
     VERIFY(RImplementation.o.Tshadows);

@@ -65,7 +65,7 @@ void FProgressive::Load(const char* N, IReader* data, u32 dwFlags)
 #endif
 }
 
-void FProgressive::Render(CBackend &cmd_list, float LOD, bool use_fast_geo)
+void FProgressive::Render(CBackend& cmd_list, float LOD, bool use_fast_geo)
 {
 #if RENDER != R_R1
     if (m_fast && use_fast_geo)

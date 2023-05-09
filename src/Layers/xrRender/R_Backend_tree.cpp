@@ -3,7 +3,7 @@
 
 #include "R_Backend_tree.h"
 
-R_tree::R_tree(CBackend &cmd_list_in) : cmd_list(cmd_list_in) { unmap(); }
+R_tree::R_tree(CBackend& cmd_list_in) : cmd_list(cmd_list_in) { unmap(); }
 void R_tree::unmap()
 {
     c_m_xform_v = nullptr;

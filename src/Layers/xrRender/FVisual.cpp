@@ -166,7 +166,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         rm_geom.create(vFormat, *p_rm_Vertices, *p_rm_Indices);
 }
 
-void Fvisual::Render(CBackend &cmd_list, float, bool use_fast_geo)
+void Fvisual::Render(CBackend& cmd_list, float, bool use_fast_geo)
 {
 #if RENDER == R_R1
     if (m_fast && ps_r1_force_geomx)

@@ -379,7 +379,7 @@ public:
     void occq_end(u32& ID) { HWOCC.occq_end(ID); }
     auto occq_get(u32& ID) { return HWOCC.occq_get(ID); }
 
-    ICF void apply_object(CBackend &cmd_list, IRenderable* O)
+    ICF void apply_object(CBackend& cmd_list, IRenderable* O)
     {
         if (!O || !O->renderable_ROS())
             return;
@@ -503,9 +503,9 @@ public:
 #endif
 
     // Render mode
-    void rmNear(CBackend &cmd_list) override;
-    void rmFar(CBackend &cmd_list) override;
-    void rmNormal(CBackend &cmd_list) override;
+    void rmNear(CBackend& cmd_list) override;
+    void rmFar(CBackend& cmd_list) override;
+    void rmNormal(CBackend& cmd_list) override;
 
     // Constructor/destructor/loader
     CRender();

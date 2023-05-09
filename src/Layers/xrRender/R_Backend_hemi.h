@@ -15,7 +15,7 @@ public:
     R_constant* c_entity_data; //--#SM+#--
 
 public:
-    explicit R_hemi(CBackend &cmd_list_in);
+    explicit R_hemi(CBackend& cmd_list_in);
     void unmap();
 
     void set_c_pos_faces(R_constant* C) { c_pos_faces = C; }

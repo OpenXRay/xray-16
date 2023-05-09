@@ -73,7 +73,7 @@ void R_xforms::unmap()
     c_vp = nullptr;
     c_wvp = nullptr;
 }
-R_xforms::R_xforms(CBackend &cmd_list_in)
+R_xforms::R_xforms(CBackend& cmd_list_in)
     : cmd_list(cmd_list_in)
 {
     unmap();

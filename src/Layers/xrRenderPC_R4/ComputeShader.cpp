@@ -30,21 +30,21 @@ ComputeShader::~ComputeShader()
 }
 
 u32 GetCB(const ref_constant& C) { return (C->destination & RC_dest_pixel_cb_index_mask) >> RC_dest_pixel_cb_index_shift; }
-ComputeShader& ComputeShader::set_c(CBackend &cmd_list, shared_str name, const Fvector4& value)
+ComputeShader& ComputeShader::set_c(CBackend& cmd_list, shared_str name, const Fvector4& value)
 {
     ref_constant c = m_ctable->get(name);
     (m_ctable->m_CBTable[cmd_list.context_id])[GetCB(c)].second->set(&*c, c->ps, value);
     return *this;
 }
 
-ComputeShader& ComputeShader::set_c(CBackend &cmd_list, shared_str name, float x, float y, float z, float w)
+ComputeShader& ComputeShader::set_c(CBackend& cmd_list, shared_str name, float x, float y, float z, float w)
 {
     Fvector4 vec;
     vec.set(x, y, z, w);
     return set_c(cmd_list, name, vec);
 }
 
-void ComputeShader::Dispatch(CBackend &cmd_list, u32 dimx, u32 dimy, u32 dimz)
+void ComputeShader::Dispatch(CBackend& cmd_list, u32 dimx, u32 dimy, u32 dimz)
 {
     const auto context_id = cmd_list.context_id;
 

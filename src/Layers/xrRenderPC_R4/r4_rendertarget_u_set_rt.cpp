@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb)
+void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb)
 {
     VERIFY(_1 || zb);
     if (_1)
@@ -47,7 +47,7 @@ void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& 
     //	RImplementation.rmNormal				();
 }
 
-void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb)
+void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, ID3DDepthStencilView* zb)
 {
     VERIFY(_1 || zb);
     if (_1)
@@ -89,7 +89,7 @@ void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& 
     //	RImplementation.rmNormal				();
 }
 
-void CRenderTarget::u_setrt(CBackend &cmd_list, u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
+void CRenderTarget::u_setrt(CBackend& cmd_list, u32 W, u32 H, ID3DRenderTargetView* _1, ID3DRenderTargetView* _2, ID3DRenderTargetView* _3,
     ID3DDepthStencilView* zb)
 {
     // VERIFY									(_1);

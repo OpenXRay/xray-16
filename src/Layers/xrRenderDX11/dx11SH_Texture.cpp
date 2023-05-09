@@ -152,7 +152,7 @@ void CTexture::PostLoad()
         bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_normal);
 }
 
-void CTexture::apply_load(CBackend &cmd_list, u32 dwStage)
+void CTexture::apply_load(CBackend& cmd_list, u32 dwStage)
 {
     if (!flags.bLoaded)
         Load();
@@ -161,7 +161,7 @@ void CTexture::apply_load(CBackend &cmd_list, u32 dwStage)
     bind(cmd_list, dwStage);
 };
 
-void CTexture::Apply(CBackend &cmd_list, u32 dwStage) const
+void CTexture::Apply(CBackend& cmd_list, u32 dwStage) const
 {
     // if( !RImplementation.o.msaa )
     //   VERIFY( !((!pSurface)^(!m_pSRView)) );	//	Both present or both missing
@@ -202,7 +202,7 @@ void CTexture::Apply(CBackend &cmd_list, u32 dwStage) const
         VERIFY("Invalid stage");
 }
 
-void CTexture::apply_theora(CBackend &cmd_list, u32 dwStage)
+void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
 {
     if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual))
     {
@@ -271,7 +271,7 @@ void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage) const
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
     Apply(cmd_list, dwStage);
 };
-void CTexture::apply_seq(CBackend &cmd_list, u32 dwStage)
+void CTexture::apply_seq(CBackend& cmd_list, u32 dwStage)
 {
     // SEQ
     u32 frame = Device.dwTimeContinual / seqMSPF; // Device.dwTimeGlobal
@@ -293,7 +293,7 @@ void CTexture::apply_seq(CBackend &cmd_list, u32 dwStage)
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
     Apply(cmd_list, dwStage);
 };
-void CTexture::apply_normal(CBackend &cmd_list, u32 dwStage) const
+void CTexture::apply_normal(CBackend& cmd_list, u32 dwStage) const
 {
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
     Apply(cmd_list, dwStage);

@@ -5,7 +5,7 @@
 class dx11StateManager
 {
 public:
-    explicit dx11StateManager(CBackend &cmd_list_in);
+    explicit dx11StateManager(CBackend& cmd_list_in);
     ~dx11StateManager();
 
     //	Set all states to default

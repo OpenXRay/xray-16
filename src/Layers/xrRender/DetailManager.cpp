@@ -379,7 +379,7 @@ bool CDetailManager::UseVS() const
     return HW.Caps.geometry_major >= 1 && !RImplementation.o.ffp;
 }
 
-void CDetailManager::Render(CBackend &cmd_list)
+void CDetailManager::Render(CBackend& cmd_list)
 {
 #ifndef _EDITOR
     if (nullptr == dtFS)

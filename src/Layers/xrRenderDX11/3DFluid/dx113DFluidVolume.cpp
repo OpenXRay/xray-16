@@ -85,7 +85,7 @@ void dx113DFluidVolume::Load(LPCSTR /*N*/, IReader* data, u32 /*dwFlags*/)
     */
 }
 
-void dx113DFluidVolume::Render(CBackend &cmd_list, float /*LOD*/, bool use_fast_geo) // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored ?
+void dx113DFluidVolume::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo) // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored ?
 {
     //	Render debug box
     //	Do it BEFORE update since update resets shaders and other pipeline settings

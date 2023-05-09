@@ -8,7 +8,7 @@ const u32 delay_large_min = 10;
 const u32 delay_large_max = 20;
 const u32 cullfragments = 4;
 
-void light::vis_prepare(CBackend &cmd_list)
+void light::vis_prepare(CBackend& cmd_list)
 {
     if (int(indirect_photons) != ps_r2_GI_photons)
         gi_generate();

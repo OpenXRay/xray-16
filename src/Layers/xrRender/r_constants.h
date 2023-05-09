@@ -177,7 +177,7 @@ class ECORE_API XR_NOVTABLE R_constant_setup
 {
 public:
     R_constant_setup() = default;
-    virtual void setup(CBackend &cmd_list, R_constant* C) = 0;
+    virtual void setup(CBackend& cmd_list, R_constant* C) = 0;
     virtual ~R_constant_setup() = default;
 };
 

@@ -26,9 +26,9 @@
 #endif
 
 #if defined(USE_DX9)
-void CRenderTarget::u_stencil_optimize(CBackend &cmd_list, BOOL common_stencil)
+void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, BOOL common_stencil)
 #elif defined(USE_DX11) || defined(USE_OGL)
-void CRenderTarget::u_stencil_optimize(CBackend &cmd_list, eStencilOptimizeMode eSOM)
+void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -99,7 +99,7 @@ void CRenderTarget::u_stencil_optimize(CBackend &cmd_list, eStencilOptimizeMode 
 }
 
 // 2D texgen (texture adjustment matrix)
-void CRenderTarget::u_compute_texgen_screen(CBackend &cmd_list, Fmatrix& m_Texgen)
+void CRenderTarget::u_compute_texgen_screen(CBackend& cmd_list, Fmatrix& m_Texgen)
 {
 #if defined(USE_DX9)
     float _w = float(Device.dwWidth);
@@ -137,7 +137,7 @@ void CRenderTarget::u_compute_texgen_screen(CBackend &cmd_list, Fmatrix& m_Texge
 }
 
 // 2D texgen for jitter (texture adjustment matrix)
-void CRenderTarget::u_compute_texgen_jitter(CBackend &cmd_list, Fmatrix& m_Texgen_J)
+void CRenderTarget::u_compute_texgen_jitter(CBackend& cmd_list, Fmatrix& m_Texgen_J)
 {
     // place into 0..1 space
     Fmatrix m_TexelAdjust =
@@ -857,7 +857,7 @@ CRenderTarget::~CRenderTarget()
 #endif
 }
 
-void CRenderTarget::reset_light_marker(CBackend &cmd_list, bool bResetStencil)
+void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)
 {
     dwLightMarkerID = 5;
     if (bResetStencil)
@@ -909,7 +909,7 @@ void CRenderTarget::reset_light_marker(CBackend &cmd_list, bool bResetStencil)
     }
 }
 
-void CRenderTarget::increment_light_marker(CBackend &cmd_list)
+void CRenderTarget::increment_light_marker(CBackend& cmd_list)
 {
     dwLightMarkerID += 2;
 

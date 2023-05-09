@@ -16,7 +16,7 @@ public:
     static dx11State* Create(SimulatorStates& state_code);
 
     //	DX9 unified interface
-    HRESULT Apply(CBackend &cmd_list);
+    HRESULT Apply(CBackend& cmd_list);
     void Release();
 
     //	DX11 specific

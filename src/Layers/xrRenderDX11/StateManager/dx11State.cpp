@@ -39,7 +39,7 @@ dx11State* dx11State::Create(SimulatorStates& state_code)
     return pState;
 }
 
-HRESULT dx11State::Apply(CBackend &cmd_list)
+HRESULT dx11State::Apply(CBackend& cmd_list)
 {
     const auto context_id = cmd_list.context_id;
 

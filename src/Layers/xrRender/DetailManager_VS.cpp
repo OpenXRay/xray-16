@@ -141,7 +141,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_array = T1.get("array");
 }
 
-void CDetailManager::hw_Render(CBackend &cmd_list)
+void CDetailManager::hw_Render(CBackend& cmd_list)
 {
     using namespace detail_manager;
 
@@ -192,7 +192,7 @@ void CDetailManager::hw_Render(CBackend &cmd_list)
     hw_Render_dump(cmd_list, &*hwc_s_array, 0, 1, c_hdr);
 }
 
-void CDetailManager::hw_Render_dump(CBackend &cmd_list, ref_constant x_array, u32 var_id, u32 lod_id, u32 /*c_offset*/)
+void CDetailManager::hw_Render_dump(CBackend& cmd_list, ref_constant x_array, u32 var_id, u32 lod_id, u32 /*c_offset*/)
 {
     RImplementation.BasicStats.DetailCount = 0;
 

@@ -38,7 +38,7 @@ void CSkeletonX::_Copy(CSkeletonX* B)
     RMS_bonecount = B->RMS_bonecount;
 }
 //////////////////////////////////////////////////////////////////////
-void CSkeletonX::_Render(CBackend &cmd_list, ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
+void CSkeletonX::_Render(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 {
     cmd_list.stat.r.s_dynamic.add(vCount);
     switch (RenderMode)
@@ -94,7 +94,7 @@ void CSkeletonX::_Render(CBackend &cmd_list, ref_geom& hGeom, u32 vCount, u32 iO
     break;
     }
 }
-void CSkeletonX::_Render_soft(CBackend &cmd_list, ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
+void CSkeletonX::_Render_soft(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 {
     u32 vOffset = cache_vOffset;
 

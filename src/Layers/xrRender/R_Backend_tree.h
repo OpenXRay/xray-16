@@ -15,7 +15,7 @@ public:
     R_constant* c_c_sun;
 
 public:
-    explicit R_tree(CBackend &cmd_list_in);
+    explicit R_tree(CBackend& cmd_list_in);
     void unmap();
 
     void set_c_m_xform_v(R_constant* C) { c_m_xform_v = C; }

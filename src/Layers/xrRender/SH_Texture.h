@@ -73,11 +73,11 @@ public:
 #endif
 
 public:
-    void apply_load(CBackend &cmd_list, u32 stage);
-    void apply_theora(CBackend &cmd_list, u32 stage);
-    void apply_avi(CBackend &cmd_list, u32 stage) const;
-    void apply_seq(CBackend &cmd_list, u32 stage);
-    void apply_normal(CBackend &cmd_list, u32 stage) const;
+    void apply_load(CBackend& cmd_list, u32 stage);
+    void apply_theora(CBackend& cmd_list, u32 stage);
+    void apply_avi(CBackend& cmd_list, u32 stage) const;
+    void apply_seq(CBackend& cmd_list, u32 stage);
+    void apply_normal(CBackend& cmd_list, u32 stage) const;
 
     void set_slice(int slice);
 
@@ -141,7 +141,7 @@ private:
 
     void desc_update();
 #if defined(USE_DX11)
-    void Apply(CBackend &cmd_list, u32 dwStage) const;
+    void Apply(CBackend& cmd_list, u32 dwStage) const;
     D3D_USAGE GetUsage();
 #endif
 

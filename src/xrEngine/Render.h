@@ -132,8 +132,8 @@ public:
     virtual void set_color_gray(u32 f) = 0;
     // virtual void set_color_add (u32 f) = 0;
     virtual void set_color_add(const Fvector& f) = 0;
-    virtual u32 get_width(CBackend &cmd_list) = 0;
-    virtual u32 get_height(CBackend &cmd_list) = 0;
+    virtual u32 get_width(CBackend& cmd_list) = 0; // TODO: use equivalent from cmd_list
+    virtual u32 get_height(CBackend& cmd_list) = 0;
     virtual void set_cm_imfluence(float f) = 0;
     virtual void set_cm_interpolate(float f) = 0;
     virtual void set_cm_textures(const shared_str& tex0, const shared_str& tex1) = 0;
@@ -368,9 +368,9 @@ public:
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
 
     // Render mode
-    virtual void rmNear(CBackend &cmd_list) = 0;
-    virtual void rmFar(CBackend &cmd_list) = 0;
-    virtual void rmNormal(CBackend &cmd_list) = 0;
+    virtual void rmNear(CBackend& cmd_list) = 0;
+    virtual void rmFar(CBackend& cmd_list) = 0;
+    virtual void rmNormal(CBackend& cmd_list) = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}

@@ -45,15 +45,15 @@ private:
 //////////////////////////////////////////////////////////////////////////
 class cl_light_PR : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override;
+    void setup(CBackend& cmd_list, R_constant* C) override;
 };
 class cl_light_C : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override;
+    void setup(CBackend& cmd_list, R_constant* C) override;
 };
 class cl_light_XFORM : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override;
+    void setup(CBackend& cmd_list, R_constant* C) override;
 };
 
 #endif // !defined(AFX_LIGHTPPA_H__E5B97AC9_84A6_4773_9FEF_3BC5D1CEF8B6__INCLUDED_)

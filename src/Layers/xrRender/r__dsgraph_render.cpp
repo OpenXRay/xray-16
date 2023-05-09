@@ -139,7 +139,7 @@ class hud_transform_helper
     CBackend& cmd_list;
 
 public:
-    explicit hud_transform_helper(CBackend &cmd_list_in)
+    explicit hud_transform_helper(CBackend& cmd_list_in)
         : cmd_list(cmd_list_in)
     {
         extern ENGINE_API float psHUD_FOV;
@@ -186,7 +186,7 @@ public:
         isActive = false;
     }
 
-    static void apply_custom_state(CBackend &cmd_list)
+    static void apply_custom_state(CBackend& cmd_list)
     {
         if (!isActive || !psHUD_Flags.test(HUD_LEFT_HANDED))
             return;

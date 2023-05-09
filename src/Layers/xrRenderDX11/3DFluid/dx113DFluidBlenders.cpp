@@ -9,7 +9,7 @@ namespace
 // Volume texture width
 class cl_textureWidth : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tW = (float)FluidManager.GetTextureWidth();
         cmd_list.set_c(C, tW);
@@ -20,7 +20,7 @@ static cl_textureWidth binder_textureWidth;
 // Volume texture height
 class cl_textureHeight : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tH = (float)FluidManager.GetTextureHeight();
         cmd_list.set_c(C, tH);
@@ -31,7 +31,7 @@ static cl_textureHeight binder_textureHeight;
 // Volume texture depth
 class cl_textureDepth : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tD = (float)FluidManager.GetTextureDepth();
         cmd_list.set_c(C, tD);
@@ -41,7 +41,7 @@ static cl_textureDepth binder_textureDepth;
 
 class cl_gridDim : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tW = (float)FluidManager.GetTextureWidth();
         float tH = (float)FluidManager.GetTextureHeight();
@@ -53,7 +53,7 @@ static cl_gridDim binder_gridDim;
 
 class cl_recGridDim : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tW = (float)FluidManager.GetTextureWidth();
         float tH = (float)FluidManager.GetTextureHeight();
@@ -65,7 +65,7 @@ static cl_recGridDim binder_recGridDim;
 
 class cl_maxDim : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         int tW = FluidManager.GetTextureWidth();
         int tH = FluidManager.GetTextureHeight();
@@ -80,7 +80,7 @@ static cl_maxDim binder_maxDim;
 //  decay simulation option
 class cl_decay		: public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float fDecay = FluidManager.GetDecay();
         cmd_list.set_c( C, fDecay );
@@ -91,7 +91,7 @@ static cl_decay		binder_decay;
 //  decay simulation ImpulseSize
 class cl_impulseSize		: public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float fIS = FluidManager.GetImpulseSize();
         cmd_list.set_c( C, fIS );

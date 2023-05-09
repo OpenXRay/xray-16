@@ -12,7 +12,7 @@ class dxPixEventWrapper
 {
     CBackend& cmd_list;
 public:
-    dxPixEventWrapper(CBackend &cmd_list_in, const wchar_t* wszName)
+    dxPixEventWrapper(CBackend& cmd_list_in, const wchar_t* wszName)
     : cmd_list(cmd_list_in)
     {
         cmd_list.gpu_mark_begin(wszName);

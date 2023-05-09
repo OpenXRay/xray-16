@@ -18,7 +18,7 @@ const float SSM_tex_size = 32.f;
 //////////////////////////////////////////////////////////////////////////
 // binders for lighting
 //////////////////////////////////////////////////////////////////////////
-void cl_light_PR::setup(CBackend &cmd_list, R_constant* C)
+void cl_light_PR::setup(CBackend& cmd_list, R_constant* C)
 {
     // NOTE: an actual context id is required here. However, we have only main context
     // in R1 so it is safe to go with `eRDSG_MAIN`.
@@ -31,13 +31,13 @@ void cl_light_PR::setup(CBackend &cmd_list, R_constant* C)
     else
         RCache.set_c(C, P.x, P.y, P.z, 1.f / R);
 }
-void cl_light_C::setup(CBackend &cmd_list, R_constant* C)
+void cl_light_C::setup(CBackend& cmd_list, R_constant* C)
 {
     Fcolor _C = RImplementation.r1_dlight_light->color;
     _C.mul_rgb(RImplementation.r1_dlight_scale);
     RCache.set_c(C, _C.r, _C.g, _C.b, 1.f);
 }
-void cl_light_XFORM::setup(CBackend &cmd_list, R_constant* C) { RCache.set_c(C, RImplementation.r1_dlight_tcgen); }
+void cl_light_XFORM::setup(CBackend& cmd_list, R_constant* C) { RCache.set_c(C, RImplementation.r1_dlight_tcgen); }
 //////////////////////////////////////////////////////////////////////////
 /*
 IC void mk_vertex                   (CLightR_Vertex& D, Fvector& P, Fvector& N, Fvector& C, float r2)

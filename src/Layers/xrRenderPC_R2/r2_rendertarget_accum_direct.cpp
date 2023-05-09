@@ -34,7 +34,7 @@ static u16 facetable[16][3] =
 };
 } // namespace accum_direct
 
-void CRenderTarget::accum_direct(CBackend &cmd_list, u32 sub_phase)
+void CRenderTarget::accum_direct(CBackend& cmd_list, u32 sub_phase)
 {
     // Choose normal code-path or filtered
     phase_accumulator(cmd_list);
@@ -256,7 +256,7 @@ void CRenderTarget::accum_direct(CBackend &cmd_list, u32 sub_phase)
     }
 }
 
-void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias)
+void CRenderTarget::accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias)
 {
     // Choose normal code-path or filtered
     phase_accumulator(cmd_list);
@@ -532,7 +532,7 @@ void CRenderTarget::accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmat
     }
 }
 
-void CRenderTarget::accum_direct_blend(CBackend &cmd_list)
+void CRenderTarget::accum_direct_blend(CBackend& cmd_list)
 {
     PIX_EVENT(accum_direct_blend);
     // blend-copy
@@ -570,7 +570,7 @@ void CRenderTarget::accum_direct_blend(CBackend &cmd_list)
     increment_light_marker(cmd_list);
 }
 
-void CRenderTarget::accum_direct_f(CBackend &cmd_list, u32 sub_phase)
+void CRenderTarget::accum_direct_f(CBackend& cmd_list, u32 sub_phase)
 {
     PIX_EVENT(accum_direct_f);
     // Select target
@@ -718,7 +718,7 @@ void CRenderTarget::accum_direct_f(CBackend &cmd_list, u32 sub_phase)
     }
 }
 
-void CRenderTarget::accum_direct_lum(CBackend &cmd_list)
+void CRenderTarget::accum_direct_lum(CBackend& cmd_list)
 {
     PIX_EVENT(accum_direct_lum);
     // Select target
@@ -835,7 +835,7 @@ void CRenderTarget::accum_direct_lum(CBackend &cmd_list)
     cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }
 
-void CRenderTarget::accum_direct_volumetric(CBackend &cmd_list, u32 sub_phase, const u32 Offset, const Fmatrix& mShadow)
+void CRenderTarget::accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase, const u32 Offset, const Fmatrix& mShadow)
 {
     PIX_EVENT(accum_direct_volumetric);
 

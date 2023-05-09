@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::phase_smap_direct(CBackend &cmd_list, light *L, u32 sub_phase)
+void CRenderTarget::phase_smap_direct(CBackend& cmd_list, light *L, u32 sub_phase)
 {
     if (sub_phase == SE_SUN_RAIN_SMAP)
     {
@@ -24,7 +24,7 @@ void CRenderTarget::phase_smap_direct(CBackend &cmd_list, light *L, u32 sub_phas
     cmd_list.set_Stencil(FALSE);
 }
 
-void CRenderTarget::phase_smap_direct_tsh(CBackend &cmd_list, light *L, u32 sub_phase)
+void CRenderTarget::phase_smap_direct_tsh(CBackend& cmd_list, light *L, u32 sub_phase)
 {
     VERIFY(RImplementation.o.Tshadows);
     cmd_list.set_ColorWriteEnable();

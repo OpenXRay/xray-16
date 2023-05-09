@@ -115,7 +115,7 @@ struct FTreeVisual_setup
     }
 };
 
-void FTreeVisual::Render(CBackend &cmd_list, float /*LOD*/, bool use_fast_geo)
+void FTreeVisual::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
 {
     static FTreeVisual_setup tvs;
     if (tvs.dwFrame != Device.dwFrame)
@@ -177,7 +177,7 @@ FTreeVisual_ST::FTreeVisual_ST(void) {}
 FTreeVisual_ST::~FTreeVisual_ST(void) {}
 void FTreeVisual_ST::Release() { inherited::Release(); }
 void FTreeVisual_ST::Load(const char* N, IReader* data, u32 dwFlags) { inherited::Load(N, data, dwFlags); }
-void FTreeVisual_ST::Render(CBackend &cmd_list, float LOD, bool use_fast_geo)
+void FTreeVisual_ST::Render(CBackend& cmd_list, float LOD, bool use_fast_geo)
 {
     inherited::Render(cmd_list, LOD, use_fast_geo);
     cmd_list.set_Geometry(rm_geom);
@@ -204,7 +204,7 @@ void FTreeVisual_PM::Load(const char* N, IReader* data, u32 dwFlags)
         pSWI = RImplementation.getSWI(ID);
     }
 }
-void FTreeVisual_PM::Render(CBackend &cmd_list, float LOD, bool use_fast_geo)
+void FTreeVisual_PM::Render(CBackend& cmd_list, float LOD, bool use_fast_geo)
 {
     inherited::Render(cmd_list, LOD, use_fast_geo);
     int lod_id = last_lod;

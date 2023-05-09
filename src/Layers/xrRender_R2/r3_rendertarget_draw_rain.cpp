@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::draw_rain(CBackend &cmd_list, light& RainSetup)
+void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
 {
     float fRainFactor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
 

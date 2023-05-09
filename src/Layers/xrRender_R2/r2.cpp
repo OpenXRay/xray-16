@@ -56,7 +56,7 @@ ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cd
 }
 static class cl_parallax : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float h = ps_r2_df_parallax_h;
         cmd_list.set_c(C, h, -h / 2.f, 1.f / r_dtex_range, 1.f / r_dtex_range);
@@ -66,13 +66,13 @@ static class cl_parallax : public R_constant_setup
 #if defined(USE_DX11)
 static class cl_LOD : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.LOD.set_LOD(C); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.LOD.set_LOD(C); }
 } binder_LOD;
 #endif
 
 static class cl_pos_decompress_params : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
 #if defined(USE_DX9) || defined(USE_DX11)
         const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
@@ -90,7 +90,7 @@ static class cl_pos_decompress_params : public R_constant_setup
 
 static class cl_pos_decompress_params2 : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         cmd_list.set_c(C, (float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth,
             1.0f / (float)Device.dwHeight);
@@ -99,7 +99,7 @@ static class cl_pos_decompress_params2 : public R_constant_setup
 
 static class cl_water_intensity : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         const auto& env = g_pGamePersistent->Environment().CurrentEnv;
         const float fValue = env.m_fWaterIntensity;
@@ -109,7 +109,7 @@ static class cl_water_intensity : public R_constant_setup
 
 static class cl_tree_amplitude_intensity : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         const auto& env = g_pGamePersistent->Environment().CurrentEnv;
         const float fValue = env.m_fTreeAmplitudeIntensity;
@@ -120,7 +120,7 @@ static class cl_tree_amplitude_intensity : public R_constant_setup
 
 static class cl_sun_shafts_intensity : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         const auto& env = g_pGamePersistent->Environment().CurrentEnv;
         const float fValue = env.m_fSunShaftsIntensity;
@@ -131,7 +131,7 @@ static class cl_sun_shafts_intensity : public R_constant_setup
 #if defined(USE_DX11) || defined(USE_OGL)
 static class cl_alpha_ref : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         // TODO: OGL: Implement AlphaRef.
 #   if defined(USE_DX11)
@@ -881,21 +881,21 @@ void CRender::add_SkeletonWallmark(
         add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
 
-void CRender::rmNear(CBackend &cmd_list)
+void CRender::rmNear(CBackend& cmd_list)
 {
     IRender_Target* T = getTarget();
     const D3D_VIEWPORT viewport = { 0, 0, T->get_width(cmd_list), T->get_height(cmd_list), 0.f, 0.02f };
     cmd_list.SetViewport(viewport);
 }
 
-void CRender::rmFar(CBackend &cmd_list)
+void CRender::rmFar(CBackend& cmd_list)
 {
     IRender_Target* T = getTarget();
     const D3D_VIEWPORT viewport = { 0, 0, T->get_width(cmd_list), T->get_height(cmd_list), 0.99999f, 1.f };
     cmd_list.SetViewport(viewport);
 }
 
-void CRender::rmNormal(CBackend &cmd_list)
+void CRender::rmNormal(CBackend& cmd_list)
 {
     IRender_Target* T = getTarget();
     const D3D_VIEWPORT viewport = { 0, 0, T->get_width(cmd_list), T->get_height(cmd_list), 0.f, 1.f };

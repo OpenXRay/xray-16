@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::phase_accumulator(CBackend &cmd_list)
+void CRenderTarget::phase_accumulator(CBackend& cmd_list)
 {
     // Targets
     if (dwAccumulatorClearMark == Device.dwFrame)
@@ -55,7 +55,7 @@ void CRenderTarget::phase_accumulator(CBackend &cmd_list)
 #endif
 }
 
-void CRenderTarget::phase_vol_accumulator(CBackend &cmd_list)
+void CRenderTarget::phase_vol_accumulator(CBackend& cmd_list)
 {
     u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, rt_MSAADepth);
 

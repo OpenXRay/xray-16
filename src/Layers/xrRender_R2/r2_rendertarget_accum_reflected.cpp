@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::accum_reflected(CBackend &cmd_list, light* L)
+void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
 {
     phase_accumulator(cmd_list);
     RImplementation.Stats.l_visible++;

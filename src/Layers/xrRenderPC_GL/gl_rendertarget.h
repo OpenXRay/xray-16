@@ -224,17 +224,17 @@ public:
     GLuint get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
     GLuint get_base_zb() { return rt_Base_Depth->pZRT; }
 
-    void u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb);
-    void u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb);
-    void u_setrt(CBackend &cmd_list, u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb);
-    void u_setrt(CBackend &cmd_list, u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, const ref_rt& _zb)
+    void u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb);
+    void u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb);
+    void u_setrt(CBackend& cmd_list, u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb);
+    void u_setrt(CBackend& cmd_list, u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, const ref_rt& _zb)
     {
         u_setrt(cmd_list, W, H, _1, _2, _3, _zb ? _zb->pZRT : 0);
     }
 
-    void u_stencil_optimize(CBackend &cmd_list, eStencilOptimizeMode eSOM = SO_Light);
-    void u_compute_texgen_screen(CBackend &cmd_list, Fmatrix& dest);
-    void u_compute_texgen_jitter(CBackend &cmd_list, Fmatrix& dest);
+    void u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM = SO_Light);
+    void u_compute_texgen_screen(CBackend& cmd_list, Fmatrix& dest);
+    void u_compute_texgen_jitter(CBackend& cmd_list, Fmatrix& dest);
     void u_calc_tc_noise(Fvector2& p0, Fvector2& p1);
     void u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
     bool u_need_PP();
@@ -249,20 +249,20 @@ public:
     void phase_ssao();
     void phase_downsamp();
     void phase_wallmarks();
-    void phase_smap_direct(CBackend &cmd_list, light* L, u32 sub_phase);
-    void phase_smap_direct_tsh(CBackend &cmd_list, light* L, u32 sub_phase);
-    void phase_smap_spot_clear(CBackend &cmd_list);
-    void phase_smap_spot(CBackend &cmd_list, light* L);
-    void phase_smap_spot_tsh(CBackend &cmd_list, light* L);
-    void phase_accumulator(CBackend &cmd_list);
-    void phase_vol_accumulator(CBackend &cmd_list);
-    void shadow_direct(CBackend &cmd_list, light* L, u32 dls_phase);
+    void phase_smap_direct(CBackend& cmd_list, light* L, u32 sub_phase);
+    void phase_smap_direct_tsh(CBackend& cmd_list, light* L, u32 sub_phase);
+    void phase_smap_spot_clear(CBackend& cmd_list);
+    void phase_smap_spot(CBackend& cmd_list, light* L);
+    void phase_smap_spot_tsh(CBackend& cmd_list, light* L);
+    void phase_accumulator(CBackend& cmd_list);
+    void phase_vol_accumulator(CBackend& cmd_list);
+    void shadow_direct(CBackend& cmd_list, light* L, u32 dls_phase);
 
     //	Generates min/max sm
-    void create_minmax_SM(CBackend &cmd_list);
+    void create_minmax_SM(CBackend& cmd_list);
 
-    void phase_rain(CBackend &cmd_list);
-    void draw_rain(CBackend &cmd_list, light& RainSetup);
+    void phase_rain(CBackend& cmd_list);
+    void draw_rain(CBackend& cmd_list, light& RainSetup);
 
     void mark_msaa_edges();
 
@@ -274,18 +274,18 @@ public:
 
     void disable_aniso();
 
-    void draw_volume(CBackend &cmd_list, light* L);
-    void accum_direct(CBackend &cmd_list, u32 sub_phase);
-    void accum_direct_cascade(CBackend &cmd_list, u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias);
-    void accum_direct_f(CBackend &cmd_list, u32 sub_phase);
-    void accum_direct_lum(CBackend &cmd_list);
-    void accum_direct_blend(CBackend &cmd_list);
+    void draw_volume(CBackend& cmd_list, light* L);
+    void accum_direct(CBackend& cmd_list, u32 sub_phase);
+    void accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias);
+    void accum_direct_f(CBackend& cmd_list, u32 sub_phase);
+    void accum_direct_lum(CBackend& cmd_list);
+    void accum_direct_blend(CBackend& cmd_list);
     void accum_direct_volumetric(u32 sub_phase, const u32 Offset, const Fmatrix& mShadow);
-    void accum_point(CBackend &cmd_list, light* L);
-    void accum_spot(CBackend &cmd_list, light* L);
-    void accum_reflected(CBackend &cmd_list, light* L);
+    void accum_point(CBackend& cmd_list, light* L);
+    void accum_spot(CBackend& cmd_list, light* L);
+    void accum_reflected(CBackend& cmd_list, light* L);
     //	Igor: for volumetric lights
-    void accum_volumetric(CBackend &cmd_list, light* L);
+    void accum_volumetric(CBackend& cmd_list, light* L);
 
     void phase_bloom();
     void phase_luminance();
@@ -296,8 +296,8 @@ public:
     void phase_flip();
 #endif
 
-    u32 get_width(CBackend &cmd_list) override { return dwWidth[cmd_list.context_id]; }
-    u32 get_height(CBackend &cmd_list) override { return dwHeight[cmd_list.context_id]; }
+    u32 get_width(CBackend& cmd_list) override { return dwWidth[cmd_list.context_id]; }
+    u32 get_height(CBackend& cmd_list) override { return dwHeight[cmd_list.context_id]; }
 
     void set_blur(float f) override { param_blur = f; }
     void set_gray(float f) override { param_gray = f; }
@@ -318,8 +318,8 @@ public:
 
     //	Need to reset stencil only when marker overflows.
     //	Don't clear when render for the first time
-    void reset_light_marker(CBackend &cmd_list, bool bResetStencil = false);
-    void increment_light_marker(CBackend &cmd_list);
+    void reset_light_marker(CBackend& cmd_list, bool bResetStencil = false);
+    void increment_light_marker(CBackend& cmd_list);
 
     void DoAsyncScreenshot();
 

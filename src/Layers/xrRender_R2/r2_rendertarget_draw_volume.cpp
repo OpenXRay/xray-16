@@ -3,7 +3,7 @@
 #include "Layers/xrRender/du_cone.h"
 #include "Layers/xrRender/du_sphere.h"
 
-void CRenderTarget::draw_volume(CBackend &cmd_list, light* L)
+void CRenderTarget::draw_volume(CBackend& cmd_list, light* L)
 {
     switch (L->flags.type)
     {

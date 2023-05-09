@@ -12,7 +12,7 @@
 #define BIND_DECLARE(xf)\
     class cl_xform_##xf : public R_constant_setup\
     {\
-        void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.xforms.set_c_##xf(C); }\
+        void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.xforms.set_c_##xf(C); }\
     };\
     static cl_xform_##xf binder_##xf
 BIND_DECLARE(w);
@@ -26,7 +26,7 @@ BIND_DECLARE(wvp);
 #define DECLARE_TREE_BIND(c)\
     class cl_tree_##c : public R_constant_setup\
     {\
-        void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.tree.set_c_##c(C); }\
+        void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.tree.set_c_##c(C); }\
     };\
     static cl_tree_##c tree_binder_##c
 
@@ -41,28 +41,28 @@ DECLARE_TREE_BIND(c_sun);
 
 class cl_hemi_cube_pos_faces : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.hemi.set_c_pos_faces(C); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.set_c_pos_faces(C); }
 };
 
 static cl_hemi_cube_pos_faces binder_hemi_cube_pos_faces;
 
 class cl_hemi_cube_neg_faces : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.hemi.set_c_neg_faces(C); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.set_c_neg_faces(C); }
 };
 
 static cl_hemi_cube_neg_faces binder_hemi_cube_neg_faces;
 
 class cl_material : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.hemi.set_c_material(C); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.set_c_material(C); }
 };
 
 static cl_material binder_material;
 
 class cl_texgen : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fmatrix mTexgen;
 
@@ -106,7 +106,7 @@ static cl_texgen binder_texgen;
 
 class cl_VPtexgen : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fmatrix mTexgen;
 
@@ -154,7 +154,7 @@ class cl_fog_plane : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -183,7 +183,7 @@ class cl_fog_params : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -203,7 +203,7 @@ class cl_fog_color : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -219,7 +219,7 @@ static cl_fog_color binder_fog_color;
 // times
 class cl_times : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float t = Device.fTimeGlobal;
         cmd_list.set_c(C, t, t * 10, t / 10, _sin(t));
@@ -230,7 +230,7 @@ static cl_times binder_times;
 // eye-params
 class cl_eye_P : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fvector& V = Device.vCameraPosition;
         cmd_list.set_c(C, V.x, V.y, V.z, 1.f);
@@ -241,7 +241,7 @@ static cl_eye_P binder_eye_P;
 // eye-params
 class cl_eye_D : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fvector& V = Device.vCameraDirection;
         cmd_list.set_c(C, V.x, V.y, V.z, 0.f);
@@ -252,7 +252,7 @@ static cl_eye_D binder_eye_D;
 // eye-params
 class cl_eye_N : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fvector& V = Device.vCameraTop;
         cmd_list.set_c(C, V.x, V.y, V.z, 0.f);
@@ -266,7 +266,7 @@ class cl_sun0_color : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -281,7 +281,7 @@ class cl_sun0_dir_w : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -296,7 +296,7 @@ class cl_sun0_dir_e : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -316,7 +316,7 @@ class cl_amb_color : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -331,7 +331,7 @@ class cl_hemi_color : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -346,7 +346,7 @@ static cl_hemi_color binder_hemi_color;
 
 static class cl_screen_res : public R_constant_setup
 {
-    void setup(CBackend &cmd_list, R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         cmd_list.set_c(C, (float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth,
             1.0f / (float)Device.dwHeight);
@@ -356,34 +356,34 @@ static class cl_screen_res : public R_constant_setup
 // SM_TODO: cmd_list.hemi заменить на более "логичное" место
 static class cl_hud_params : public R_constant_setup //--#SM+#--
 {
-    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->hud_params); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->hud_params); }
 } binder_hud_params;
 
 static class cl_script_params : public R_constant_setup //--#SM+#--
 {
-    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->m_script_params); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->m_script_params); }
 } binder_script_params;
 
 static class cl_blend_mode : public R_constant_setup //--#SM+#--
 {
-    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->m_blender_mode); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->m_blender_mode); }
 } binder_blend_mode;
 
 class cl_camo_data : public R_constant_setup //--#SM+#--
 {
-    void setup(CBackend &cmd_list, R_constant* C) override  { cmd_list.hemi.c_camo_data = C; }
+    void setup(CBackend& cmd_list, R_constant* C) override  { cmd_list.hemi.c_camo_data = C; }
 };
 static cl_camo_data binder_camo_data;
 
 class cl_custom_data : public R_constant_setup //--#SM+#--
 {
-    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.hemi.c_custom_data = C; }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.c_custom_data = C; }
 };
 static cl_custom_data binder_custom_data;
 
 class cl_entity_data : public R_constant_setup //--#SM+#--
 {
-    void setup(CBackend &cmd_list, R_constant* C) override { cmd_list.hemi.c_entity_data = C; }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.c_entity_data = C; }
 };
 static cl_entity_data binder_entity_data;
 

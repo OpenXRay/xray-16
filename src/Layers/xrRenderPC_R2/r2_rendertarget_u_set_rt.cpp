@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, IDirect3DSurface9* zb)
+void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, IDirect3DSurface9* zb)
 {
     VERIFY(_1);
     dwWidth[cmd_list.context_id] = _1->dwWidth;
@@ -21,7 +21,7 @@ void CRenderTarget::u_setrt(CBackend &cmd_list, const ref_rt& _1, const ref_rt& 
     //RImplementation.rmNormal();
 }
 
-void CRenderTarget::u_setrt(CBackend &cmd_list,
+void CRenderTarget::u_setrt(CBackend& cmd_list,
     u32 W, u32 H, IDirect3DSurface9* _1, IDirect3DSurface9* _2, IDirect3DSurface9* _3, IDirect3DSurface9* zb)
 {
     VERIFY(_1);

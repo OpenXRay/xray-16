@@ -368,7 +368,7 @@ void CRender::set_Object(IRenderable* O, u32 phase)
             L_Projector->set_object(nullptr);
     }
 }
-void CRender::apply_object(CBackend &cmd_list, IRenderable* O)
+void CRender::apply_object(CBackend& cmd_list, IRenderable* O)
 {
     if (nullptr == O)
         return;
@@ -389,19 +389,19 @@ void CRender::apply_object(CBackend &cmd_list, IRenderable* O)
 // Misc
 float g_fSCREEN;
 
-void CRender::rmNear(CBackend &cmd_list)
+void CRender::rmNear(CBackend& cmd_list)
 {
     IRender_Target* T = getTarget();
     RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0, 0.02f });
 }
 
-void CRender::rmFar(CBackend &cmd_list)
+void CRender::rmFar(CBackend& cmd_list)
 {
     IRender_Target* T = getTarget();
     RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0.99999f, 1.f });
 }
 
-void CRender::rmNormal(CBackend &cmd_list)
+void CRender::rmNormal(CBackend& cmd_list)
 {
     IRender_Target* T = getTarget();
     RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0, 1.f });
