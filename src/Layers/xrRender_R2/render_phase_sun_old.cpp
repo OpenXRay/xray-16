@@ -285,7 +285,7 @@ void render_sun_old::init()
     if (!o.active)
         return;
 
-    o.mt_calc_enabled = RImplementation.o.mt_calculate;
+    o.mt_calc_enabled = false;
 
     // pre-allocate context
     context_id = RImplementation.alloc_context();
@@ -689,7 +689,7 @@ void render_sun_old::render_sun()
     }
 
     // Finalize & Cleanup
-    XMStoreFloat4x4((XMFLOAT4X4*)&sun->X.D[0].combine, m_LightViewProj);
+    XMStoreFloat4x4((XMFLOAT4X4*)&sun->X.D[SE_SUN_FAR].combine, m_LightViewProj);
     s_receivers.clear();
     s_casters.clear();
 
@@ -704,44 +704,35 @@ void render_sun_old::render_sun()
             RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, sun, SE_SUN_FAR);
             dsgraph.cmd_list.set_xform_world(Fidentity);
             dsgraph.cmd_list.set_xform_view(Fidentity);
-            dsgraph.cmd_list.set_xform_project(sun->X.D[0].combine);
+            dsgraph.cmd_list.set_xform_project(sun->X.D[SE_SUN_FAR].combine);
             dsgraph.render_graph(0);
-            sun->X.D[0].transluent = FALSE;
+            sun->X.D[SE_SUN_FAR].transluent = FALSE;
             if (bSpecial)
             {
-                sun->X.D[0].transluent = TRUE;
+                sun->X.D[SE_SUN_FAR].transluent = TRUE;
                 RImplementation.Target->phase_smap_direct_tsh(dsgraph.cmd_list, sun, SE_SUN_FAR);
                 dsgraph.render_graph(1); // normal level, secondary priority
                 dsgraph.render_sorted(); // strict-sorted geoms
             }
         }
     }
-    RImplementation.release_context(dsgraph.context_id);
-
-    // End SMAP-render
-    {
-        //		sun->svis.end					();
-        dsgraph.r_pmask(true, false);
-    }
-
-    auto& cmd_list = RImplementation.get_imm_context().cmd_list;
 
     // Accumulate
-    RImplementation.Target->phase_accumulator(cmd_list);
+    RImplementation.Target->phase_accumulator(dsgraph.cmd_list);
 
     if (RImplementation.Target->use_minmax_sm_this_frame())
     {
         PIX_EVENT(SE_SUN_FAR_MINMAX_GENERATE);
-        RImplementation.Target->create_minmax_SM(cmd_list);
+        RImplementation.Target->create_minmax_SM(dsgraph.cmd_list);
     }
 
     PIX_EVENT(SE_SUN_FAR);
-    RImplementation.Target->accum_direct(cmd_list, SE_SUN_FAR);
+    RImplementation.Target->accum_direct(dsgraph.cmd_list, SE_SUN_FAR);
 
     // Restore XForms
-    cmd_list.set_xform_world(Fidentity);
-    cmd_list.set_xform_view(Device.mView);
-    cmd_list.set_xform_project(Device.mProject);
+    dsgraph.cmd_list.set_xform_world(Fidentity);
+    dsgraph.cmd_list.set_xform_view(Device.mView);
+    dsgraph.cmd_list.set_xform_project(Device.mProject);
 }
 
 void render_sun_old::render_sun_near()
@@ -971,11 +962,16 @@ void render_sun_old::render_sun_near()
 
 void render_sun_old::render_sun_filtered() const
 {
-    auto& cmd_list = RImplementation.get_context(context_id).cmd_list;
 
-    if (!RImplementation.o.sunfilter)
-        return;
-    RImplementation.Target->phase_accumulator(cmd_list);
-    PIX_EVENT(SE_SUN_LUMINANCE);
-    RImplementation.Target->accum_direct(cmd_list, SE_SUN_LUMINANCE);
+    if (RImplementation.o.sunfilter)
+    {
+        auto& dsgraph = RImplementation.get_context(context_id);
+        auto& cmd_list_imm = RImplementation.get_imm_command_list();
+        RImplementation.Target->phase_accumulator(cmd_list_imm);
+        PIX_EVENT(SE_SUN_LUMINANCE);
+        RImplementation.Target->accum_direct(cmd_list_imm, SE_SUN_LUMINANCE);
+    }
+
+    RImplementation.release_context(context_id);
+    RImplementation.get_imm_command_list().Invalidate();
 }
