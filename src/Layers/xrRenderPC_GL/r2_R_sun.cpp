@@ -328,7 +328,7 @@ void render_sun_old::init()
     VERIFY(context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
 }
 
-void render_sun_old::render_sun()
+void render_sun_old::render_sun() const
 {
     PIX_EVENT(render_sun);
     glm::mat4 m_LightViewProj;
@@ -359,9 +359,11 @@ void render_sun_old::render_sun()
                 Fvector3 xf = wform(ex_full_inverse, corner);
                 hull.points.push_back(xf);
             }
+            hull.polys.reserve(6);
             for (auto& plane : sun::facetable)
             {
                 hull.polys.emplace_back();
+                hull.polys.back().points.reserve(4);
                 for (int pt : plane)
                     hull.polys.back().points.push_back(pt);
             }
@@ -671,6 +673,7 @@ void render_sun_old::render_sun()
         DumbClipper view_clipper;
         glm::mat4 xform = m_LightViewProj;
         view_clipper.frustum.CreateFromMatrix(*(Fmatrix*)glm::value_ptr(ex_full), FRUSTUM_P_ALL);
+        view_clipper.planes.reserve(view_clipper.frustum.p_count);
         for (size_t p = 0; p < view_clipper.frustum.p_count; p++)
         {
             Fplane& P = view_clipper.frustum.planes [p];
@@ -831,15 +834,17 @@ void render_sun_old::render_sun_near()
 #endif
         t_volume hull;
         {
-            hull.points.reserve(9);
+            hull.points.reserve(8);
             for (auto corner : sun::corners)
             {
                 Fvector3 xf = wform(ex_full_inverse, corner);
                 hull.points.push_back(xf);
             }
+            hull.polys.reserve(6);
             for (auto& plane : sun::facetable)
             {
                 hull.polys.emplace_back();
+                hull.polys.back().points.reserve(4);
                 for (int pt : plane)
                     hull.polys.back().points.push_back(pt);
             }

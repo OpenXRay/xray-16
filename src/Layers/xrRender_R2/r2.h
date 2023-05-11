@@ -128,7 +128,7 @@ struct render_sun_old : public i_render_phase
         render_sun_filtered();
     }
 
-    void render_sun();
+    void render_sun() const;
     void render_sun_near();
     void render_sun_filtered() const;
 

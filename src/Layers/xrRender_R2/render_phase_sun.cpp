@@ -121,6 +121,7 @@ void render_sun::calculate_task(Task&, void*)
             if (cascade_ind == 0 || m_sun_cascades[cascade_ind].reset_chain)
             {
                 Fvector3 near_p, edge_vec;
+                light_cuboid.view_frustum_rays.reserve(4);
                 for (int p = 0; p < 4; p++)
                 {
                     near_p = wform(fullxform_inv, sun::corners[sun::facetable[4][p]]);
