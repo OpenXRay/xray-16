@@ -7,7 +7,7 @@
 struct xr_resource
 {
     xr_resource() = default;
-    /* virtual */ ~xr_resource() = default; // TODO: resolve the issue with crash on `dynamic_cast` in memory deallocation
+    virtual ~xr_resource() = default;
 
     xr_resource(xr_resource const& other)
     {
