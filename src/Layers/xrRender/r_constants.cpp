@@ -23,10 +23,8 @@ void R_constant_table::fatal(LPCSTR S) { FATAL(S); }
 // predicates
 IC bool p_sort(const ref_constant& C1, const ref_constant C2) { return xr_strcmp(C1->name, C2->name) < 0; }
 
-ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/)
+ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/) const
 {
-    ScopeLock lock{ render_lock };
-
     // assumption - sorted by name
     c_table::const_iterator it;
     if (type == u16(-1))
@@ -48,10 +46,8 @@ ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/)
         return nullptr;
     return *it;
 }
-ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/)
+ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/) const
 {
-    ScopeLock lock{ render_lock };
-
     // linear search, but only ptr-compare
     if (type == u16(-1))
     {
@@ -205,8 +201,6 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
 /// !!!!!!!!FIX THIS FOR DX11!!!!!!!!!
 void R_constant_table::merge(R_constant_table* T)
 {
-    ScopeLock lock{ render_lock };
-
     if (nullptr == T)
         return;
 
@@ -280,8 +274,6 @@ void R_constant_table::merge(R_constant_table* T)
 
 void R_constant_table::clear()
 {
-    ScopeLock lock{ render_lock };
-
     //.
     for (u32 it = 0; it < table.size(); it++)
         table[it] = 0; //.g_constant_allocator.destroy(table[it]);
@@ -296,8 +288,6 @@ void R_constant_table::clear()
 
 BOOL R_constant_table::equal(R_constant_table& C)
 {
-    ScopeLock lock{ render_lock };
-
     if (table.size() != C.table.size())
         return FALSE;
     const size_t size = table.size();

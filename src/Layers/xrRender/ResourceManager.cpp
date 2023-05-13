@@ -441,7 +441,7 @@ void CResourceManager::_DumpMemoryUsage()
         {
             u32 m = I->second->flags.MemoryUsage;
             shared_str n = I->second->cName;
-            mtex.insert(std::make_pair(m, std::make_pair(I->second->dwReference, n)));
+            mtex.insert(std::make_pair(m, std::make_pair(I->second->ref_count.load(), n)));
         }
     }
 

@@ -204,16 +204,14 @@ private:
 #endif
 
 public:
-    Lock *render_lock{nullptr}; // TODO: this lock can be avoided if cmd_list will have own copy of ctable
-
-    R_constant_table() { render_lock = xr_new<Lock>(); };
+    R_constant_table() = default;
     ~R_constant_table();
 
     void clear();
     BOOL parse(void* desc, u32 destination);
     void merge(R_constant_table* C);
-    ref_constant get(pcstr name, u16 type = u16(-1)); // slow search
-    ref_constant get(const shared_str& name, u16 type = u16(-1)); // fast search
+    ref_constant get(pcstr name, u16 type = u16(-1)) const; // slow search
+    ref_constant get(const shared_str& name, u16 type = u16(-1)) const; // fast search
 
     BOOL equal(R_constant_table& C);
     BOOL equal(R_constant_table* C) { return equal(*C); }
