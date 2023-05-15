@@ -106,26 +106,40 @@ void CBlender_Model::CompileFFP(CBlender_Compile& C) const
                 C.PassSET_ZB(TRUE, TRUE);
                 C.PassSET_Blend_SET();
                 C.PassSET_LightFog(TRUE, TRUE);
-#if 1
+
+                //float3 norm_w = normalize(mul(m_W,v.norm)); 
+                //float3	calc_model_lq_lighting	(float3 norm_w) 
+                //{     
+                //     return calc_model_hemi(norm_w) + L_ambient + L_dynamic_props.xyz*calc_sun(norm_w); 	
+                //}
+                //
+                //expands to:
+                //
+                //float3	calc_model_lq_lighting	(float3 norm_w) 
+                //{ 
+                //     auto calculated_hemi = (norm_w.y*0.5+0.5) * L_dynamic_props.w*L_hemi_color);
+                //     auto calculated_sun = L_sun_color * max(dot((norm_w),-L_sun_dir_w), 0);
+                //     return (calculated_hemi + L_ambient + L_dynamic_props.xyz * calculated_sun); 
+                //}
+                //
+                //I.c0 = calc_sun(norm_w); //expands to: L_sun_color * max(dot((norm_w),-L_sun_dir_w), 0)
+                //I.c1 = float4(calc_model_lq_lighting(norm_w), m_plmap_clamp[0].w); // lq-color
+                // 
+                // target output: lerp(l_base + l_sun, I.c1, I.c1.w) * t_base * 2
+                // 
+                // output: l_base
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-                C.StageSET_TMC("$user$projector", "$user$projector", "$null", 0);
-                C.StageEnd();
-#else
-                // https://github.com/OpenXRay/xray-soc-history/commit/de357fa58d7a6aaf14fe1626cf00d48850ced36f
-                C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_DIFFUSE);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
                 C.StageSET_TMC("$user$projector", "$user$projector", "$null", 0);
                 C.StageEnd();
 
+                // output: l_base * t_base * 2 
                 C.StageBegin();
                 C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
                 C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
-                C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+                C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
                 C.StageEnd();
-#endif
             }
             C.PassEnd();
             break;
@@ -139,14 +153,52 @@ void CBlender_Model::CompileFFP(CBlender_Compile& C) const
                 C.PassSET_LightFog(TRUE, TRUE);
 
                 C.StageBegin();
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-                C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+                C.StageSET_TMC("$user$projector", "$user$projector", "$null", 0);
+                C.StageEnd();
+
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_BLENDTEXTUREALPHA, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
+                C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
                 C.StageEnd();
             }
             C.PassEnd();
             break;
         }
+        case SE_R1_LSPOT:
+            auto lighttex = "internal" DELIMITER "internal_light_att";
+            auto lighttex2 = TEX_SPOT_ATT;
+
+            C.PassBegin();
+            {
+                C.PassSET_ZB(TRUE, TRUE);
+                C.PassSET_Blend_SET();
+                C.PassSET_LightFog(TRUE, TRUE);
+
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+                C.StageSET_TMC(lighttex, "$null", "$null", 0);
+                C.StageEnd();
+
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_CURRENT);
+                C.StageSET_TMC(lighttex2, "$null", "$null", 0);
+                C.StageEnd();
+
+
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_BLENDTEXTUREALPHA, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
+                C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+                C.StageEnd();
+            }
+            C.PassEnd();
+
+            break;
         } // switch (C.iElement)
     }
 }
