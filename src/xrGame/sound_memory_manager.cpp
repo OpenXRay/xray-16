@@ -96,11 +96,10 @@ IC void CSoundMemoryManager::update_sound_threshold()
 IC u32 CSoundMemoryManager::priority(const MemorySpace::CSoundObject& sound) const
 {
     u32 priority = u32(-1);
-    xr_map<ESoundTypes, u32>::const_iterator I = m_priorities.begin();
-    xr_map<ESoundTypes, u32>::const_iterator E = m_priorities.end();
-    for (; I != E; ++I)
-        if (((*I).second < priority) && ((*I).first & sound.m_sound_type) == (*I).first)
-            priority = (*I).second;
+    for (auto p : m_priorities)
+        if ((p.second < priority) && (p.first & sound.m_sound_type) == p.first)
+            priority = p.second;
+
     return (priority);
 }
 
