@@ -1060,10 +1060,29 @@ void CUIXmlInitBase::ApplyAlign(float& x, float& y, u32 align)
 
 bool CUIXmlInitBase::InitAlignment(CUIXml& xml_doc, const char* path, int index, float& x, float& y, CUIWindow* pWnd)
 {
+    // Alignment: top: "t", right: "r", bottom: "b", left: "l", center: "c"
     xr_string wnd_alignment = xml_doc.ReadAttrib(path, index, "alignment", "");
 
+    if (strchr(wnd_alignment.c_str(), 'r'))
+    {
+        pWnd->SetAlignment(waRight);
+    }
+    if (strchr(wnd_alignment.c_str(), 'l'))
+    {
+        pWnd->SetAlignment(waLeft);
+    }
+    if (strchr(wnd_alignment.c_str(), 't'))
+    {
+        pWnd->SetAlignment(waTop);
+    }
+    if (strchr(wnd_alignment.c_str(), 'b'))
+    {
+        pWnd->SetAlignment(waBottom);
+    }
     if (strchr(wnd_alignment.c_str(), 'c'))
+    {
         pWnd->SetAlignment(waCenter);
+    }
 
     // Alignment: right: "r", bottom: "b". Top, left - useless
     shared_str alignStr = xml_doc.ReadAttrib(path, index, "align", "");
