@@ -57,19 +57,11 @@ void CBlender_Model_EbB::CompileFFP(CBlender_Compile& C) const
 
     C.PassBegin();
     {
-        if (constant_lighting && oBlend.value)
-        {
-            C.PassSET_ZB(TRUE, FALSE);
-            C.PassSET_Blend_BLEND();
-        }
-        else
-        {
-            C.PassSET_ZB(TRUE, TRUE);
-            C.PassSET_Blend_SET();
-        }
+        C.PassSET_ZB(TRUE, TRUE);
+        C.PassSET_Blend_SET();
         C.PassSET_LightFog(TRUE, TRUE);
 
-        switch (element)
+        switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:
         {
@@ -94,7 +86,7 @@ void CBlender_Model_EbB::CompileFFP(CBlender_Compile& C) const
 
             //// Stage3 - Base texture
             C.StageBegin();
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
             C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
             C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
             C.StageEnd();
@@ -120,7 +112,7 @@ void CBlender_Model_EbB::CompileFFP(CBlender_Compile& C) const
 
             //// Stage3 - Base texture
             C.StageBegin();
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_CURRENT);
             C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
             C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
             C.StageEnd();

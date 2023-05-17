@@ -135,11 +135,11 @@ void CBlender_Model::CompileFFP(CBlender_Compile& C) const
                 C.StageEnd();
 
                 // output: l_base * t_base * 2 
-                C.StageBegin();
+                /*C.StageBegin();
                 C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
                 C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
                 C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
-                C.StageEnd();
+                C.StageEnd();*/
             }
             C.PassEnd();
             break;
