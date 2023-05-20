@@ -241,7 +241,6 @@ void CLightProjector::calculate()
         // validate
         Fvector v;
         v.sub(v_Cs, v_C);
-        ;
 #ifdef DEBUG
         if ((v.x * v.x + v.y * v.y + v.z * v.z) <= flt_zero)
         {
@@ -292,9 +291,80 @@ void CLightProjector::calculate()
         const D3D_VIEWPORT viewport = { s_x * P_o_size, s_y * P_o_size, P_o_size, P_o_size, 0.f, 1.f };
         RCache.SetViewport(viewport);
 
+        // Relevant shader logic:
+        // 
+        // m_W = result of Fmatrix& CBackend::get_xform_world()
+        // float3 norm_w = normalize(mul(m_W,v.norm));
+        // 
+        // float3	calc_sun		(float3 norm_w)	{ return L_sun_color * max(dot((norm_w), -L_sun_dir_w), 0); 		}
+        // float3 	calc_model_hemi 	(float3 norm_w)	{ return (norm_w.y * 0.5+0.5) * L_dynamic_props.w * L_hemi_color; 		}
+        // float3	calc_model_lq_lighting(float3 norm_w) { return calc_model_hemi(norm_w) + L_ambient + L_dynamic_props.xyz * calc_sun(norm_w); }
+        // 
+        // I.c0 = calc_sun(norm_w); 
+        // expands to: 
+        // I.c0 = L_sun_color * max(dot((norm_w), -L_sun_dir_w), 0);
+        // 
+        // m_plmap_clamp[0] = UVclamp_min
+        // I.c1 = float4(calc_model_lq_lighting(norm_w), m_plmap_clamp[0].w); // lq-color
+        // 
+        // current output: t_lmap.rgba (cap.xyzw)
+        // target output: lerp(t_lmap.rgb + (I.c0*t_lmap.a), I.c1, I.c1.w)
+
         // Clear color to ambience
         Fvector& cap = LT->get_approximate();
-        RCache.ClearRT(RT, color_rgba_f(cap.x, cap.y, cap.z, (cap.x + cap.y + cap.z) / 4.f));
+        // RCache.ClearRT(RT, color_rgba_f(cap.x, cap.y, cap.z, (cap.x + cap.y + cap.z) / 4.f)); // original logic
+
+        // Ported color logic from shaders
+        const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
+        Fvector4 t_lmap = { cap.x, cap.y, cap.z, (cap.x + cap.y + cap.z) / 4.f };
+        Fvector4 L_sun_color = { desc.sun_color.x, desc.sun_color.y, desc.sun_color.z, 0.f }; // logic pulled form binder_sun0_color
+        Fvector L_sun_dir_w = { desc.sun_dir.x, desc.sun_dir.y, desc.sun_dir.z }; // logic pulled form binder_sun0_dir_w, ignored alpha so we can multiply/invert later.
+        Fvector4 L_hemi_color = { desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z, desc.hemi_color.w }; // logic pulled from binder_hemi_color
+
+        // TODO: this is doing some logic to replicate c_ldynamic_props shader constant. Can we grab that directly instead? 
+        R_constant* c_ldynamic_props = RCache.get_c("L_dynamic_props")._get(); // doesn't work
+        float o_hemi = 0.5f * LT->get_hemi();
+        float o_sun = 0.5f * LT->get_sun();
+        Fvector4 L_dynamic_props = { o_sun, o_sun, o_sun, o_hemi };
+        Fvector4 L_dynamic_props_rgb = { L_dynamic_props.x, L_dynamic_props.y, L_dynamic_props.z, 1}; // since this is used to multiply later, but we don't want alpha to effect the result we can just set alpha to 1.
+
+        // get m_W (needed to calculate norm_w)
+        const Fmatrix &m_W = RCache.xforms.get_W(); // not sure if this is right
+        R_constant* temp_m_W = RCache.get_c("m_W")._get(); // doesn't work
+
+        // TODO: how to actually access v.norm here?
+        // should be equal to: norm_w = normalize(mul(m_W, v.norm));
+        Fvector norm_w;
+        m_W.transform_tiny(norm_w, v);
+        
+        // float dotprod = dot((norm_w), -L_sun_dir_w);
+        // should be equal to: L_sun_color * max(dotprod, 0)
+        // TODO: double check math here, is max and dotproduct correct?
+        Fvector4 c0 = L_sun_color.mul( std::max( norm_w.dotproduct(L_sun_dir_w.invert()), 0.f ) ); 
+
+        // should be equal to: (norm_w.y*0.5+0.5) * L_dynamic_props.w * L_hemi_color
+        auto calculated_model_hemi = L_hemi_color.mul(L_dynamic_props.w * (norm_w.y * 0.5 + 0.5));
+
+        // should be equal to: calc_model_hemi(norm_w) + L_ambient + L_dynamic_props.xyz * calc_sun(norm_w)
+        auto calculated_model_lq_lighting = calculated_model_hemi.add(t_lmap).add(L_dynamic_props_rgb.mul(c0)); 
+
+        // TODO: replicated c++ logic, need to replace. Can we access c_clamp[0] values? c_clamp[0].w is calculated separately from UVclamp_min :(
+        float Rd = R.O->GetRenderData().visual->getVisData().sphere.R;
+        float dist = R.C.distance_to(Device.vCameraPosition) + Rd;
+        float factor = _sqr(dist / clipD(Rd)) * (1 - ps_r1_lmodel_lerp) + ps_r1_lmodel_lerp;
+        // should be equal to: float4(calc_model_lq_lighting(norm_w), m_plmap_clamp[0].w)
+        Fvector4 c1 = { calculated_model_lq_lighting.x, calculated_model_lq_lighting.y, calculated_model_lq_lighting.z, factor }; 
+        
+        // should be equal to: lerp(t_lmap.rgb + (I.c0*t_lmap.a), I.c1, I.c1.w)
+        Fvector4 result;
+        Fvector4 modified_t_lmap;
+        modified_t_lmap.set(t_lmap);
+        modified_t_lmap.add(c0.mul(t_lmap.w));
+        result.lerp(modified_t_lmap, c1, c1.w);
+
+        RCache.ClearRT(RT, color_rgba_f(result.x, result.y, result.z, result.w));
+        Msg("Yohji debug - original %f %f %f %f", t_lmap.x, t_lmap.y, t_lmap.z, t_lmap.w);
+        Msg("Yohji debug - modified %f %f %f %f", result.x, result.y, result.z, result.w);
 
         // calculate uv-gen matrix and clamper
         Fmatrix mCombine;
@@ -326,8 +396,8 @@ void CLightProjector::calculate()
             const auto& entity_pos = spatial->spatial_sector_point();
             const auto sector_id = dsgraph.detect_sector(entity_pos);
             spatial->spatial_updatesector(sector_id);
-            if (spatial->GetSpatialData().sector_id != IRender_Sector::INVALID_SECTOR_ID)
-                dsgraph.render_R1_box(spatial->GetSpatialData().sector_id, BB, SE_R1_LMODELS);
+            //if (spatial->GetSpatialData().sector_id != IRender_Sector::INVALID_SECTOR_ID)
+            //    dsgraph.render_R1_box(spatial->GetSpatialData().sector_id, BB, SE_R1_LMODELS);
         }
         /*if (spatial)
         {
