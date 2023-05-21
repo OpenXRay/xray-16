@@ -69,6 +69,7 @@ void CResourceManager::reset_end()
         // RT
         const size_t buffer_size = m_rtargets.size() * sizeof(CRT*);
         buffer_vector<CRT*> sorted_rts(xr_alloca(buffer_size), m_rtargets.size());
+        sorted_rts.reserve(m_rtargets.size());
         for (auto& rt_pair : m_rtargets)
             sorted_rts.push_back(rt_pair.second);
 

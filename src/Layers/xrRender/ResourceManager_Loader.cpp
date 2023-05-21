@@ -149,12 +149,10 @@ void CResourceManager::StoreNecessaryTextures()
     if (!m_necessary.empty())
         return;
 
-    auto it = m_textures.begin();
-    auto it_e = m_textures.end();
-
-    for (; it != it_e; ++it)
+    m_necessary.reserve(m_textures.size());
+    for (auto& mtex : m_textures)
     {
-        LPCSTR texture_name = it->first;
+        LPCSTR texture_name = mtex.first;
         if (strstr(texture_name, DELIMITER "levels" DELIMITER))
             continue;
         if (!strchr(texture_name, _DELIMITER))

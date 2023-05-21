@@ -43,6 +43,7 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
     //Msg("dbg_lods: shader[%X]",u32((void*)firstV->shader._get()));
     //Msg("dbg_lods: shader_E[%X]",u32((void*)cur_S._get()));
 
+    lstLODgroups.reserve(lstLODs.size());
     for (u32 i = 0; i < lstLODs.size(); i++)
     {
         const u32 iBatchSize = std::min(lstLODs.size() - i, (size_t)uiImpostersFit);
