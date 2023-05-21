@@ -418,6 +418,31 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
 
     switch (mode)
     {
+    case SM_FOR_GAMESAVE:
+    {
+        pcstr extension = "jpg";
+        auto filename = const_cast<pstr>(name);
+        filename[strlen(filename)-4] = '\0';
+        string_path buf;
+        xr_sprintf(buf, sizeof(buf), "%s.%s", filename, extension);
+
+        IWriter* fs = FS.w_open(buf);
+        R_ASSERT(fs);
+
+        xr_vector<u8> pixels;
+        pixels.resize(Device.dwWidth * Device.dwHeight * 3);
+
+        glReadPixels(0, 0, Device.dwWidth, Device.dwHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+
+        Image img;
+        img.Create(u16(Device.dwWidth), u16(Device.dwHeight), pixels.data(), ImageDataFormat::RGB8);
+        if (!img.SaveJPEG(*fs, 100, true))
+            Log("! Failed to make a screenshot SM_FOR_GAMESAVE");
+
+        FS.w_close(fs);
+        break;
+    }
+
     case SM_NORMAL:
     {
         pcstr extension = "jpg";
@@ -438,15 +463,24 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         Image img;
         img.Create(u16(Device.dwWidth), u16(Device.dwHeight), pixels.data(), ImageDataFormat::RGB8);
         if (!img.SaveJPEG(*fs, 100, true))
-            Log("! Failed to make a screenshot.");
+            Log("! Failed to make a screenshot SM_NORMAL");
 
         FS.w_close(fs);
         break;
     }
 
-    case SM_FOR_GAMESAVE:
-        // XXX: Implement
+    case IRender::SM_FOR_MPSENDING:
+    {
+        // XXX: ScreenshotImpl case IRender::SM_FOR_MPSENDING no implemented
         break;
+    }
+
+    case IRender::SM_FOR_LEVELMAP:
+    case IRender::SM_FOR_CUBEMAP:
+    {
+        // XXX: ScreenshotImpl case IRender::SM_FOR_LEVELMAP and IRender::SM_FOR_CUBEMAP no implemented
+        break;
+    }
 
     default:
         VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
