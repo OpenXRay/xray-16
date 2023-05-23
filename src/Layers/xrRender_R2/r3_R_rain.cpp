@@ -52,7 +52,8 @@ void render_rain::init()
     if (!o.active)
         return;
 
-    o.mt_enabled = RImplementation.o.mt_calculate;
+    o.mt_calc_enabled = RImplementation.o.mt_calculate;
+    o.mt_draw_enabled = RImplementation.o.mt_render;
 
     // pre-allocate context
     context_id = RImplementation.alloc_context();
@@ -60,7 +61,7 @@ void render_rain::init()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void render_rain::calculate_task(Task&, void*)
+void render_rain::calculate()
 {
     float fRainFactor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
     if (fRainFactor < EPS_L)
@@ -279,7 +280,7 @@ void render_rain::calculate_task(Task&, void*)
         dsgraph.o.xform = cull_xform;
         dsgraph.o.view_frustum = cull_frustum;
         dsgraph.o.view_pos = cull_COP;
-        dsgraph.o.mt_calculate = o.mt_enabled;
+        dsgraph.o.mt_calculate = o.mt_calc_enabled;
 
         // Fill the database
         dsgraph.build_subspace();
@@ -291,42 +292,48 @@ void render_rain::calculate_task(Task&, void*)
 
 void render_rain::render()
 {
-    wait();
-
     if (o.active)
     {
-        PIX_EVENT(RAIN);
-
         auto& dsgraph = RImplementation.get_context(context_id);
 
         // Render shadow-map
-        //. !!! We should clip based on shrinked frustum (again)
         {
             bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
-            bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
-                !dsgraph.mapSorted.empty();
-            if (bNormal || bSpecial)
+            if (bNormal)
             {
-                RImplementation.Target->phase_smap_direct(&RainLight, SE_SUN_RAIN_SMAP);
-                RCache.set_xform_world(Fidentity);
-                RCache.set_xform_view(Fidentity);
-                RCache.set_xform_project(RainLight.X.D[0].combine);
+                PIX_EVENT_CTX(dsgraph.cmd_list, RAIN);
+
+                RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, &RainLight, SE_SUN_RAIN_SMAP);
+                dsgraph.cmd_list.set_xform_world(Fidentity);
+                dsgraph.cmd_list.set_xform_view(Fidentity);
+                dsgraph.cmd_list.set_xform_project(RainLight.X.D[0].combine);
                 dsgraph.render_graph(0);
-                // if (ps_r2_ls_flags.test(R2FLAG_DETAIL_SHADOW))
-                //	Details->Render					()	;
             }
         }
+    }
+}
+
+void render_rain::flush()
+{
+    if (o.active)
+    {
+        auto& dsgraph = RImplementation.get_context(context_id);
+    
+        dsgraph.cmd_list.submit();
         RImplementation.release_context(context_id);
     }
 
+    auto& cmd_list_imm = RImplementation.get_imm_context().cmd_list;
+    cmd_list_imm.Invalidate();
+
     // Restore XForms
-    RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    cmd_list_imm.set_xform_world(Fidentity);
+    cmd_list_imm.set_xform_view(Device.mView);
+    cmd_list_imm.set_xform_project(Device.mProject);
 
     // Accumulate
-    RImplementation.Target->phase_rain(); // TODO: move into this class as well
-    RImplementation.Target->draw_rain(RainLight);
+    RImplementation.Target->phase_rain(cmd_list_imm); // TODO: move into this class as well
+    RImplementation.Target->draw_rain(cmd_list_imm, RainLight);
 
     RainLight.frame_render = Device.dwFrame;
 }

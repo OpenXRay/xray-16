@@ -3,9 +3,9 @@
 
 // extern Fvector du_cone_vertices[DU_CONE_NUMVERTEX];
 
-void CRenderTarget::accum_spot(light* L)
+void CRenderTarget::accum_spot(CBackend& cmd_list, light* L)
 {
-    phase_accumulator();
+    phase_accumulator(RCache);
     RImplementation.Stats.l_visible++;
 
     // *** assume accumulator setted up ***
@@ -44,18 +44,18 @@ void CRenderTarget::accum_spot(light* L)
         RCache.set_CullMode(CULL_CW);
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP,
             D3DSTENCILOP_REPLACE);
-        draw_volume(L);
+        draw_volume(RCache, L);
 
         // frontfaces: if (stencil>=light_id && zfail)	stencil = 0x1
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(
             TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
-        draw_volume(L);
+        draw_volume(RCache, L);
     }
 
     // nv-stencil recompression
     if (RImplementation.o.nvstencil)
-        u_stencil_optimize();
+        u_stencil_optimize(RCache);
 
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
@@ -64,9 +64,9 @@ void CRenderTarget::accum_spot(light* L)
 
     // 2D texgens
     Fmatrix m_Texgen;
-    u_compute_texgen_screen(m_Texgen);
+    u_compute_texgen_screen(RCache, m_Texgen);
     Fmatrix m_Texgen_J;
-    u_compute_texgen_jitter(m_Texgen_J);
+    u_compute_texgen_jitter(RCache, m_Texgen_J);
 
     // Shadow xform (+texture adjustment matrix)
     Fmatrix m_Shadow, m_Lmap;
@@ -152,7 +152,7 @@ void CRenderTarget::accum_spot(light* L)
         }
 
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
-        draw_volume(L);
+        draw_volume(RCache, L);
 
         // Fetch4 : disable
         if (RImplementation.o.HW_smap_FETCH4)
@@ -166,26 +166,26 @@ void CRenderTarget::accum_spot(light* L)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        u_setrt(rt_Accumulator, NULL, NULL, get_base_zb());
+        u_setrt(RCache, rt_Accumulator, NULL, NULL, get_base_zb());
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);
         RCache.set_c("m_texgen_J", m_Texgen_J);
-        draw_volume(L);
+        draw_volume(RCache, L);
     }
     RCache.set_Scissor(0);
     // dwLightMarkerID					+=	2;	// keep lowest bit always setted up
-    increment_light_marker();
+    increment_light_marker(RCache);
 
     u_DBT_disable();
 }
 
-void CRenderTarget::accum_volumetric(light* L)
+void CRenderTarget::accum_volumetric(CBackend& cmd_list, light* L)
 {
     // if (L->flags.type != IRender_Light::SPOT) return;
     if (!L->flags.bVolumetric)
         return;
 
-    phase_vol_accumulator();
+    phase_vol_accumulator(RCache);
 
     ref_shader shader;
     shader = L->s_volumetric;
@@ -211,9 +211,9 @@ void CRenderTarget::accum_volumetric(light* L)
 
     // 2D texgens
     Fmatrix m_Texgen;
-    u_compute_texgen_screen(m_Texgen);
+    u_compute_texgen_screen(RCache, m_Texgen);
     Fmatrix m_Texgen_J;
-    u_compute_texgen_jitter(m_Texgen_J);
+    u_compute_texgen_jitter(RCache, m_Texgen_J);
 
     // Shadow xform (+texture adjustment matrix)
     Fmatrix m_Shadow, m_Lmap;

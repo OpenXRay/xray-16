@@ -16,7 +16,7 @@ public:
     static dx11State* Create(SimulatorStates& state_code);
 
     //	DX9 unified interface
-    HRESULT Apply();
+    HRESULT Apply(CBackend& cmd_list);
     void Release();
 
     //	DX11 specific
@@ -31,21 +31,19 @@ private:
 
 private:
     //	All states are supposed to live along all application lifetime
-    ID3DRasterizerState* m_pRasterizerState; //	Weak link
-    ID3DDepthStencilState* m_pDepthStencilState; //	Weak link
-    ID3DBlendState* m_pBlendState; //	Weak link
+    ID3DRasterizerState* m_pRasterizerState{ nullptr }; //	Weak link
+    ID3DDepthStencilState* m_pDepthStencilState{ nullptr }; //	Weak link
+    ID3DBlendState* m_pBlendState{ nullptr }; //	Weak link
 
     tSamplerHArray m_VSSamplers;
     tSamplerHArray m_PSSamplers;
     tSamplerHArray m_GSSamplers;
-#ifdef USE_DX11
     tSamplerHArray m_CSSamplers;
     tSamplerHArray m_HSSamplers;
     tSamplerHArray m_DSSamplers;
-#endif
 
-    u32 m_uiStencilRef;
-    u32 m_uiAlphaRef;
+    u32 m_uiStencilRef{ u32(-1) };
+    u32 m_uiAlphaRef{ 0 };
 
     //	Private data
 private:

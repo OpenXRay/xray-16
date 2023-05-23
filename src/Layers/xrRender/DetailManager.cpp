@@ -379,7 +379,7 @@ bool CDetailManager::UseVS() const
     return HW.Caps.geometry_major >= 1 && !RImplementation.o.ffp;
 }
 
-void CDetailManager::Render()
+void CDetailManager::Render(CBackend& cmd_list)
 {
 #ifndef _EDITOR
     if (nullptr == dtFS)
@@ -401,13 +401,13 @@ void CDetailManager::Render()
 #endif
     swing_current.lerp(swing_desc[0], swing_desc[1], factor);
 
-    RCache.set_CullMode(CULL_NONE);
-    RCache.set_xform_world(Fidentity);
+    cmd_list.set_CullMode(CULL_NONE);
+    cmd_list.set_xform_world(Fidentity);
     if (UseVS())
-        hw_Render();
+        hw_Render(cmd_list);
     else
         soft_Render();
-    RCache.set_CullMode(CULL_CCW);
+    cmd_list.set_CullMode(CULL_CCW);
 
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
     RImplementation.BasicStats.DetailRender.End();

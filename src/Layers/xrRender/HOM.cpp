@@ -446,7 +446,7 @@ void CHOM::OnRender()
             // draw wire
             if (bDebug)
             {
-                RImplementation.rmNear();
+                RImplementation.rmNear(RCache);
             }
             else
             {
@@ -459,7 +459,7 @@ void CHOM::OnRender()
             RCache.dbg_Draw(D3DPT_LINELIST, &*line.begin(), line.size() / 2);
             if (bDebug)
             {
-                RImplementation.rmNormal();
+                RImplementation.rmNormal(RCache);
             }
             else
             {
