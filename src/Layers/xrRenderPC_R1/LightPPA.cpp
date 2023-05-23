@@ -493,8 +493,8 @@ CLightR_Manager::CLightR_Manager() : xrc("LightR_Manager")
     {
         hGeom.create(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX2, RImplementation.Vertex.Buffer(), nullptr);
 
-        constexpr pcstr shader = "effects\\light";
-        constexpr pcstr textures = "effects\\light,effects\\light";
+        static constexpr pcstr shader = "effects\\light";
+        static constexpr pcstr textures = "effects\\light,effects\\light";
 
         hShader.create(shader, textures);
         if (!hShader)

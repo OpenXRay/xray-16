@@ -32,9 +32,9 @@ AnselManager::AnselManager() : anselModule(nullptr), camera(this, 0), timeDelta(
 bool AnselManager::Load()
 {
 #ifdef XR_ARCHITECTURE_X64
-    constexpr pcstr anselName = "AnselSDK64";
+    static constexpr pcstr anselName = "AnselSDK64";
 #else
-    constexpr pcstr anselName = "AnselSDK32";
+    static constexpr pcstr anselName = "AnselSDK32";
 #endif
     anselModule = XRay::LoadModule(anselName);
 

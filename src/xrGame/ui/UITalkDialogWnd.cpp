@@ -38,9 +38,9 @@ CUITalkDialogWnd::~CUITalkDialogWnd() { xr_delete(m_uiXml); }
 
 void CUITalkDialogWnd::InitTalkDialogWnd()
 {
-    constexpr pcstr TALK_XML = "talk.xml";
-    constexpr pcstr TALK_CHARACTER_XML = "talk_character.xml";
-    constexpr cpcstr TRADE_CHARACTER_XML = "trade_character.xml";
+    static constexpr pcstr TALK_XML = "talk.xml";
+    static constexpr pcstr TALK_CHARACTER_XML = "talk_character.xml";
+    static constexpr cpcstr TRADE_CHARACTER_XML = "trade_character.xml";
 
     m_uiXml = xr_new<CUIXml>();
     m_uiXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, TALK_XML);
