@@ -535,6 +535,7 @@ public:
         ID3D11CommandList* pCommandList{ nullptr };
         CHK_DX(HW.get_context(context_id)->FinishCommandList(false, &pCommandList));
         HW.get_context(CHW::IMM_CTX_ID)->ExecuteCommandList(pCommandList, false);
+        _RELEASE(pCommandList);
 #endif
     }
 

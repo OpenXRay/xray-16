@@ -115,13 +115,18 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
             // this would be supported by DX10.1 but is not needed for stalker // XXX: why?
             // if( ViewDesc.Format != DXGI_FORMAT_R24_UNORM_X8_TYPELESS )
             if ((desc.SampleDesc.Count <= 1) || (ViewDesc.Format != DXGI_FORMAT_R24_UNORM_X8_TYPELESS))
+            {
+                _RELEASE(srv_all);
                 CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_all));
+            }
             else
                 srv_all = 0;
 
             srv_per_slice.resize(desc.ArraySize);
             for (int id = 0; id < desc.ArraySize; ++id)
             {
+                _RELEASE(srv_per_slice[id]);
+
                 ViewDesc.Texture2DArray.ArraySize = 1;
                 ViewDesc.Texture2DArray.FirstArraySlice = id;
                 CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_per_slice[id]));
@@ -129,7 +134,10 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
             set_slice(-1);
         }
         else
+        {
+            _RELEASE(m_pSRView);
             CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
+        }
     }
 }
 
