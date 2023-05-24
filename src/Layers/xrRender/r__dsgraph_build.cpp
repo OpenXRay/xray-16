@@ -718,9 +718,11 @@ void R_dsgraph_structure::build_subspace()
     // Traverse sector/portal structure
     PortalTraverser.traverse(Sectors[o.sector_id], o.view_frustum, o.view_pos, o.xform, o.portal_traverse_flags);
 
-    // Determine visibility for static geometry hierrarhy
+    // Determine visibility for static geometry hierarchy
+#if 0
     static xr_vector<Task*> static_geo_tasks;
     static_geo_tasks.resize(PortalTraverser.r_sectors.size());
+#endif
 
     if (psDeviceFlags.test(rsDrawStatic))
     {
@@ -744,11 +746,13 @@ void R_dsgraph_structure::build_subspace()
                     }
                 };
 
-                if (0 && o.mt_calculate) // NOTE: this code doesn't work until visuals maps are separated by worker ID.
+#if 0
+                if (o.mt_calculate) // NOTE: this code doesn't work until visuals maps are separated by worker ID.
                 {
                     static_geo_tasks[s_it] = &xr_parallel_for(TaskRange<size_t>(0, children.size()), false, traverse_children);
                 }
                 else
+#endif
                 {
                     traverse_children(TaskRange<size_t>(0, children.size()));
                 }
@@ -919,10 +923,12 @@ void R_dsgraph_structure::build_subspace()
         }
     }
 
+#if 0
     // wait for static geo collecting to be done.
     for (auto* task : static_geo_tasks)
     {
         if (task)
             TaskScheduler->Wait(*task);
     }
+#endif
 }

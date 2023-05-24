@@ -86,7 +86,7 @@ private:
     xr_vector<R_constant_table*> v_constant_tables;
 
 #if defined(USE_DX11)
-    xr_vector<dx11ConstantBuffer*> v_constant_buffer;
+    xr_vector<dx11ConstantBuffer*> v_constant_buffer[R__NUM_CONTEXTS];
     xr_vector<SInputSignature*> v_input_signature;
 #endif
 
@@ -152,14 +152,14 @@ public:
     void _DeleteConstantTable(const R_constant_table* C);
 
 #if defined(USE_DX11)
-    dx11ConstantBuffer* _CreateConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
-    void _DeleteConstantBuffer(const dx11ConstantBuffer* pBuffer);
+    dx11ConstantBuffer* _CreateConstantBuffer(u32 context_id, ID3DShaderReflectionConstantBuffer* pTable);
+    void _DeleteConstantBuffer(u32 context_id, const dx11ConstantBuffer* pBuffer);
 
     SInputSignature* _CreateInputSignature(ID3DBlob* pBlob);
     void _DeleteInputSignature(const SInputSignature* pSignature);
 #endif
 
-    CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {});
+    CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
     void _DeleteRT(const CRT* RT);
 
 //	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);

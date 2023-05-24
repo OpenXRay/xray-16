@@ -3,7 +3,6 @@
 #include "dx11HW.h"
 
 #include "StateManager/dx11SamplerStateCache.h"
-#include "StateManager/dx11StateCache.h"
 #include "dx11TextureUtils.h"
 
 CHW HW;
@@ -125,6 +124,8 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         D3D_FEATURE_LEVEL_10_0
     };
 
+    auto& pContext = d3d_contexts_pool[CHW::IMM_CTX_ID];
+
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
         static const auto d3d11CreateDevice = static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
@@ -145,7 +146,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     if (SUCCEEDED(R))
     {
         pContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&pContext1));
-        pContext->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), reinterpret_cast<void**>(&pAnnotation));
 #ifdef HAS_DX11_3
         pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
 #endif
@@ -195,6 +195,13 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     }
 
     _SHOW_REF("* CREATE: DeviceREF:", pDevice);
+
+    // Create deferred contexts
+    for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
+    {
+        R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
+        VERIFY(SUCCEEDED(R));
+    }
 
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
@@ -361,20 +368,15 @@ bool CHW::ThisInstanceIsGlobal() const
     return this == &HW;
 }
 
-void CHW::BeginPixEvent(LPCWSTR wszName) const
-{
-    if (pAnnotation)
-        pAnnotation->BeginEvent(wszName);
-}
-
-void CHW::EndPixEvent() const
-{
-    if (pAnnotation)
-        pAnnotation->EndEvent();
-}
-
 void CHW::DestroyDevice()
 {
+    if (ThisInstanceIsGlobal()) // only if we are global HW
+    {
+        RSManager.ClearStateArray();
+        DSSManager.ClearStateArray();
+        BSManager.ClearStateArray();
+        SSManager.ClearStateArray();
+    }
     //  Must switch to windowed mode to release swap chain
     if (!m_ChainDesc.Windowed)
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
@@ -384,10 +386,12 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
     _RELEASE(m_pSwapChain);
 
-    _RELEASE(pAnnotation);
     _RELEASE(pContext1);
-    _SHOW_REF("refCount:pContext", pContext);
-    _RELEASE(pContext);
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        _SHOW_REF("refCount:pContext", d3d_contexts_pool[id]);
+        _RELEASE(d3d_contexts_pool[id]);
+    }
 
 #ifdef HAS_DX11_3
     _RELEASE(pDevice3);

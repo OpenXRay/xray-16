@@ -105,8 +105,8 @@ public:
         color_map_manager.SetTextures(tex0, tex1);
     }
 
-    u32 get_width() override { return curWidth; }
-    u32 get_height() override { return curHeight; }
+    u32 get_width(CBackend& cmd_list) override { return curWidth; }
+    u32 get_height(CBackend& cmd_list) override { return curHeight; }
     u32 get_rtwidth() const { return rtWidth; }
     u32 get_rtheight() const { return rtHeight; }
 

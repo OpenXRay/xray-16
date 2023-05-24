@@ -33,17 +33,18 @@ struct i_render_phase
         : name(name_in)
     {
         o.active = false;
-        o.mt_enabled = false;
+        o.mt_calc_enabled = false;
+        o.mt_draw_enabled = false;
     }
 
-    ICF void calculate()
+    ICF void run()
     {
         if (!o.active)
             return;
 
-        main_task = &TaskScheduler->CreateTask(name.c_str(), { this, &i_render_phase::calculate_task });
+        main_task = &TaskScheduler->CreateTask(xr_string{ name + "_calculate" }.c_str(), { this, &i_render_phase::calculate_task });
 
-        if (o.mt_enabled)
+        if (o.mt_calc_enabled)
         {
             TaskScheduler->PushTask(*main_task);
         }
@@ -53,24 +54,55 @@ struct i_render_phase
         }
     }
 
-    ICF void wait()
+    ICF void sync()
     {
         if (main_task)
             TaskScheduler->Wait(*main_task);
         main_task = nullptr;
+
+        if (o.mt_draw_enabled && draw_task)
+        {
+            // draw task should be finished as sub task of main
+            VERIFY(draw_task->IsFinished());
+            draw_task = nullptr;
+        }
+        else
+        {
+            render();
+        }
+
+        flush();
+    }
+
+    void calculate_task(Task&, void*)
+    {
+        calculate();
+
+        if (o.mt_draw_enabled)
+        {
+            draw_task = &TaskScheduler->AddTask(*main_task, xr_string{ name + "_render" }.c_str(), { this, &i_render_phase::render_task });
+        }
+    }
+
+    void render_task(Task&, void*)
+    {
+        render();
     }
 
     virtual void init() = 0;
-    virtual void calculate_task(Task&, void*) = 0;
+    virtual void calculate() = 0;
     virtual void render() = 0;
+    virtual void flush() {};
 
     struct options_t
     {
         u32 active : 1;
-        u32 mt_enabled : 1;
+        u32 mt_calc_enabled : 1;
+        u32 mt_draw_enabled : 1;
     } o;
     Task* main_task{ nullptr };
-    xr_string name{ "" };
+    Task* draw_task{ nullptr };
+    xr_string name{ "<UNKNOWN>" };
 };
 
 struct render_main : public i_render_phase
@@ -78,7 +110,7 @@ struct render_main : public i_render_phase
     explicit render_main(const xr_string& name_in) : i_render_phase(name) {}
 
     void init() override;
-    void calculate_task(Task&, void*) override;
+    void calculate() override;
     void render() override;
 };
 
@@ -87,8 +119,9 @@ struct render_rain : public i_render_phase
     explicit render_rain(const xr_string& name_in) : i_render_phase(name) {}
 
     void init() override;
-    void calculate_task(Task&, void*) override;
+    void calculate() override;
     void render() override;
+    void flush() override;
 
     light RainLight;
     u32 context_id{ R_dsgraph_structure::INVALID_CONTEXT_ID };
@@ -99,10 +132,13 @@ struct render_sun : public i_render_phase
     explicit render_sun(const xr_string& name_in) : i_render_phase(name) {}
 
     void init() override;
-    void calculate_task(Task&, void*) override;
+    void calculate() override;
     void render() override;
+    void flush() override;
 
-    xr_vector<sun::cascade> m_sun_cascades;
+    void accumulate_cascade(u32 cascade_ind);
+
+    sun::cascade m_sun_cascades[R__NUM_SUN_CASCADES];
     light* sun{ nullptr };
     bool need_to_render_sunshafts{ false };
     bool last_cascade_chain_mode{ false };
@@ -115,11 +151,9 @@ struct render_sun_old : public i_render_phase
     explicit render_sun_old(const xr_string& name_in) : i_render_phase(name) {}
 
     void init() override;
-    void calculate_task(Task&, void*) override { /* the same as render_sun */ }
+    void calculate() override {}
     void render() override
     {
-        wait();
-
         if (!o.active)
             return;
 
@@ -231,6 +265,8 @@ public:
         u32 mt_calculate : 1;
         u32 mt_render : 1;
 
+        u32 support_rt_arrays : 1;
+
         float forcegloss_v;
     } o;
 
@@ -299,16 +335,6 @@ public:
 
     xr_vector<Fbox3> main_coarse_structure;
 
-    shared_str c_sbase;
-    shared_str c_snoise;
-    shared_str c_lmaterial;
-    shared_str c_ssky0;
-    shared_str c_ssky1;
-    shared_str c_sclouds0;
-    shared_str c_sclouds1;
-    float o_hemi;
-    float o_hemi_cube[CROS_impl::NUM_FACES];
-    float o_sun;
     R_sync_point q_sync_point;
 
     bool m_bMakeAsyncSS;
@@ -353,50 +379,17 @@ public:
     void occq_end(u32& ID) { HWOCC.occq_end(ID); }
     auto occq_get(u32& ID) { return HWOCC.occq_get(ID); }
 
-    ICF void apply_object(IRenderable* O)
+    ICF void apply_object(CBackend& cmd_list, IRenderable* O)
     {
         if (!O || !O->renderable_ROS())
             return;
 
         CROS_impl& LT = *(CROS_impl*)O->renderable_ROS();
         LT.update_smooth(O);
-        o_hemi = 0.75f * LT.get_hemi();
+        cmd_list.o_hemi = 0.75f * LT.get_hemi();
         // o_hemi						= 0.5f*LT.get_hemi			()	;
-        o_sun = 0.75f * LT.get_sun();
-        CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
-    }
-
-    void apply_lmaterial()
-    {
-        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
-        if (!C)
-            return;
-
-        VERIFY(RC_dest_sampler == C->destination);
-#if defined(USE_DX9)
-        VERIFY(RC_sampler == C->type);
-#elif defined(USE_DX11)
-        VERIFY(RC_dx11texture == C->type);
-#elif defined(USE_OGL)
-        VERIFY(RC_sampler == C->type);
-#else
-#   error No graphics API selected or enabled!
-#endif
-
-        CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index));
-        VERIFY(T);
-        float mtl = T->m_material;
-#ifdef DEBUG
-        if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL))
-            mtl = ps_r2_gmaterial;
-#endif
-        RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
-        RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
-                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
-                                  o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
-        RCache.hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X],
-                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
-                                  o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
+        cmd_list.o_sun = 0.75f * LT.get_sun();
+        CopyMemory(cmd_list.o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
     }
 
 public:
@@ -510,9 +503,9 @@ public:
 #endif
 
     // Render mode
-    void rmNear() override;
-    void rmFar() override;
-    void rmNormal() override;
+    void rmNear(CBackend& cmd_list) override;
+    void rmFar(CBackend& cmd_list) override;
+    void rmNormal(CBackend& cmd_list) override;
 
     // Constructor/destructor/loader
     CRender();

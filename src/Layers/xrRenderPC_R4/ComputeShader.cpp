@@ -30,34 +30,36 @@ ComputeShader::~ComputeShader()
 }
 
 u32 GetCB(const ref_constant& C) { return (C->destination & RC_dest_pixel_cb_index_mask) >> RC_dest_pixel_cb_index_shift; }
-ComputeShader& ComputeShader::set_c(shared_str name, const Fvector4& value)
+ComputeShader& ComputeShader::set_c(CBackend& cmd_list, shared_str name, const Fvector4& value)
 {
     ref_constant c = m_ctable->get(name);
-    m_ctable->m_CBTable[GetCB(c)].second->set(&*c, c->ps, value);
+    (m_ctable->m_CBTable[cmd_list.context_id])[GetCB(c)].second->set(&*c, c->ps, value);
     return *this;
 }
 
-ComputeShader& ComputeShader::set_c(shared_str name, float x, float y, float z, float w)
+ComputeShader& ComputeShader::set_c(CBackend& cmd_list, shared_str name, float x, float y, float z, float w)
 {
     Fvector4 vec;
     vec.set(x, y, z, w);
-    return set_c(name, vec);
+    return set_c(cmd_list, name, vec);
 }
 
-void ComputeShader::Dispatch(u32 dimx, u32 dimy, u32 dimz)
+void ComputeShader::Dispatch(CBackend& cmd_list, u32 dimx, u32 dimy, u32 dimz)
 {
-    u32 count = m_ctable->m_CBTable.size();
+    const auto context_id = cmd_list.context_id;
+
+    u32 count = m_ctable->m_CBTable[cmd_list.context_id].size();
 
     for (u32 i = 0; i < count; ++i)
     {
-        m_ctable->m_CBTable[i].second->Flush();
+        (m_ctable->m_CBTable[cmd_list.context_id])[i].second->Flush(context_id);
     }
 
     ID3DBuffer* tempBuffer[CBackend::MaxCBuffers];
 
     for (u32 i = 0; i < count; ++i)
     {
-        tempBuffer[i] = m_ctable->m_CBTable[i].second->GetBuffer();
+        tempBuffer[i] = (m_ctable->m_CBTable[cmd_list.context_id])[i].second->GetBuffer();
     }
 
     // process constant-loaders
@@ -67,22 +69,22 @@ void ComputeShader::Dispatch(u32 dimx, u32 dimy, u32 dimz)
     {
         R_constant* Cs = &**it;
         if (Cs->handler)
-            Cs->handler->setup(Cs);
+            Cs->handler->setup(cmd_list, Cs);
     }
 
-    HW.pContext->CSSetConstantBuffers(0, count, tempBuffer);
+    HW.get_context(context_id)->CSSetConstantBuffers(0, count, tempBuffer);
 
     if (!m_Textures.empty())
-        HW.pContext->CSSetShaderResources(0, m_Textures.size(), &m_Textures[0]);
+        HW.get_context(context_id)->CSSetShaderResources(0, m_Textures.size(), &m_Textures[0]);
 
     if (!m_Samplers.empty())
-        HW.pContext->CSSetSamplers(0, m_Samplers.size(), &m_Samplers[0]);
+        HW.get_context(context_id)->CSSetSamplers(0, m_Samplers.size(), &m_Samplers[0]);
 
     if (!m_Outputs.empty())
     {
         u32 num = 0;
-        HW.pContext->CSSetUnorderedAccessViews(0, m_Outputs.size(), &m_Outputs[0], &num);
+        HW.get_context(context_id)->CSSetUnorderedAccessViews(0, m_Outputs.size(), &m_Outputs[0], &num);
     }
 
-    HW.pContext->Dispatch(dimx, dimy, dimz);
+    HW.get_context(context_id)->Dispatch(dimx, dimy, dimz);
 }

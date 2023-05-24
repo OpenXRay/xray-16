@@ -57,7 +57,7 @@ public:
     void OnFrame(u32 dt);
 
     u32 RenderTO();
-    virtual void Render(float LOD, bool use_fast_geo) override;
+    virtual void Render(CBackend& cmd_list, float LOD, bool use_fast_geo) override;
 
 private:
     void ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Particle* particles);

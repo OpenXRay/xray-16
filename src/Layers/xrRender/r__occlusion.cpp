@@ -39,6 +39,8 @@ void R_occlusion::occq_destroy()
 
 u32 R_occlusion::occq_begin(u32& ID)
 {
+    ScopeLock lock{ &render_lock };
+
     if (!enabled)
         return 0;
 
@@ -75,6 +77,8 @@ u32 R_occlusion::occq_begin(u32& ID)
 }
 void R_occlusion::occq_end(u32& ID)
 {
+    ScopeLock lock{ &render_lock };
+
     if (!enabled)
         return;
 
@@ -88,6 +92,8 @@ void R_occlusion::occq_end(u32& ID)
 }
 R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
 {
+    ScopeLock lock{ &render_lock };
+
     if (!enabled)
         return 0xffffffff;
 

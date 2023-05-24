@@ -5,11 +5,8 @@
 
 void render_sun::init()
 {
-    u32 cascade_count = R__NUM_SUN_CASCADES;
-    m_sun_cascades.resize(cascade_count);
-
     float fBias = -0.0000025f;
-    //	float size = MAP_SIZE_START;
+
     m_sun_cascades[0].reset_chain = true;
     m_sun_cascades[0].size = 20;
     m_sun_cascades[0].bias = m_sun_cascades[0].size * fBias;
@@ -43,15 +40,16 @@ void render_sun::init()
         VERIFY(contexts_ids[i] != R_dsgraph_structure::INVALID_CONTEXT_ID);
     }
 
-    o.mt_enabled = RImplementation.o.mt_calculate;
+    o.mt_calc_enabled = RImplementation.o.mt_calculate;
+    o.mt_draw_enabled = RImplementation.o.mt_render;
 }
 
-void render_sun::calculate_task(Task&, void*)
+void render_sun::calculate()
 {
     need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
-    last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
+    last_cascade_chain_mode = m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain;
     if (need_to_render_sunshafts)
-        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
+        m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain = true;
 
     // Lets begin from base frustum
     Fmatrix fullxform_inv = Device.mInvFullTransform;
@@ -99,7 +97,7 @@ void render_sun::calculate_task(Task&, void*)
     Fvector3 cull_COP[R__NUM_SUN_CASCADES];
     Fmatrix cull_xform[R__NUM_SUN_CASCADES];
 
-    for (int cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind)
+    for (int cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
     {
         cull_planes.clear();
 
@@ -189,7 +187,7 @@ void render_sun::calculate_task(Task&, void*)
         );
 
         // Initialize rays for the next cascade
-        if (cascade_ind < m_sun_cascades.size() - 1)
+        if (cascade_ind < R__NUM_SUN_CASCADES - 1)
             m_sun_cascades[cascade_ind + 1].rays = light_cuboid.view_frustum_rays;
 
 #ifdef DEBUG
@@ -284,86 +282,127 @@ void render_sun::calculate_task(Task&, void*)
         }
     };
     
-    if (o.mt_enabled)
+    if (o.mt_calc_enabled)
     {
-        xr_parallel_for(TaskRange<u32>(0, m_sun_cascades.size()), process_cascade);
+        xr_parallel_for(TaskRange<u32>(0, R__NUM_SUN_CASCADES), process_cascade);
     }
     else
     {
-        process_cascade(TaskRange<u32>(0, m_sun_cascades.size()));
+        process_cascade(TaskRange<u32>(0, R__NUM_SUN_CASCADES));
     }
 }
 
 void render_sun::render()
 {
-    wait();
-
     if (!o.active)
         return;
 
     if (need_to_render_sunshafts)
-        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
+        m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain = last_cascade_chain_mode;
 
     // Render shadow-map
-    //. !!! We should clip based on shrinked frustum (again)
-    for (int cascade_ind = 0; cascade_ind < m_sun_cascades.size(); ++cascade_ind) // TODO: proper max cascades
+    const auto render_cascade = [&, this](const TaskRange<u32>& range)
     {
-        auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
-
-        bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
-        bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
-            !dsgraph.mapSorted.empty();
-        if (bNormal || bSpecial)
+        for (u32 cascade_ind = range.begin(); cascade_ind != range.end(); ++cascade_ind)
         {
-            RImplementation.Target->phase_smap_direct(sun, SE_SUN_FAR);
-            RCache.set_xform_world(Fidentity);
-            RCache.set_xform_view(Fidentity);
-            RCache.set_xform_project(sun->X.D[cascade_ind].combine);
-            dsgraph.render_graph(0);
-            if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                RImplementation.Details->Render();
-            sun->X.D[cascade_ind].transluent = FALSE;
-            if (bSpecial)
+            auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
+
+            bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
+            bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
+                !dsgraph.mapSorted.empty();
+            if (bNormal || bSpecial)
             {
-                sun->X.D[cascade_ind].transluent = TRUE;
-                RImplementation.Target->phase_smap_direct_tsh(sun, SE_SUN_FAR);
-                dsgraph.render_graph(1); // normal level, secondary priority
-                dsgraph.render_sorted(); // strict-sorted geoms
+                RImplementation.Target->phase_smap_direct(dsgraph.cmd_list, sun, cascade_ind);
+                dsgraph.cmd_list.set_xform_world(Fidentity);
+                dsgraph.cmd_list.set_xform_view(Fidentity);
+                dsgraph.cmd_list.set_xform_project(sun->X.D[cascade_ind].combine);
+                dsgraph.render_graph(0);
+                if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+                    RImplementation.Details->Render(dsgraph.cmd_list);
+                sun->X.D[cascade_ind].transluent = FALSE;
+                if (bSpecial)
+                {
+                    VERIFY(RImplementation.o.Tshadows);
+                    sun->X.D[cascade_ind].transluent = TRUE;
+                    RImplementation.Target->phase_smap_direct_tsh(dsgraph.cmd_list, sun, cascade_ind);
+                    dsgraph.render_graph(1); // normal level, secondary priority
+                    dsgraph.render_sorted(); // strict-sorted geoms
+                }
+            }
+
+            if (!RImplementation.o.support_rt_arrays)
+            {
+                accumulate_cascade(cascade_ind);
             }
         }
-        RImplementation.release_context(dsgraph.context_id);
+    };
 
-        // Accumulate
-        RImplementation.Target->phase_accumulator();
+    if (o.mt_draw_enabled)
+    {
+        xr_parallel_for(TaskRange<u32>(0, R__NUM_SUN_CASCADES), render_cascade);
+    }
+    else
+    {
+        render_cascade(TaskRange<u32>(0, R__NUM_SUN_CASCADES));
+    }
+}
 
-        if (RImplementation.Target->use_minmax_sm_this_frame())
+void render_sun::flush()
+{
+    if (!o.active)
+        return;
+
+    if (RImplementation.o.support_rt_arrays)
+    {
+        for (int cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
         {
-            PIX_EVENT(SE_SUN_NEAR_MINMAX_GENERATE);
-            RImplementation.Target->create_minmax_SM();
+            accumulate_cascade(cascade_ind);
         }
+    }
 
+    auto &cmd_list_imm = RImplementation.get_imm_context().cmd_list;
+    cmd_list_imm.Invalidate();
+
+    // Restore XForms
+    cmd_list_imm.set_xform_world(Fidentity);
+    cmd_list_imm.set_xform_view(Device.mView);
+    cmd_list_imm.set_xform_project(Device.mProject);
+}
+
+void render_sun::accumulate_cascade(u32 cascade_ind)
+{
+    auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
+
+    if ((cascade_ind == SE_SUN_NEAR) && RImplementation.Target->use_minmax_sm_this_frame())
+    {
+        PIX_EVENT_CTX(dsgraph.cmd_list, SE_SUN_NEAR_MINMAX_GENERATE);
+        RImplementation.Target->create_minmax_SM(dsgraph.cmd_list);
+    }
+
+    // Accumulate
+    {
+        // Accumulate
+        RImplementation.Target->rt_smap_depth->set_slice_read(cascade_ind);
         if (cascade_ind == 0)
         {
-            PIX_EVENT(SE_SUN_NEAR);
-            RImplementation.Target->accum_direct_cascade(SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind].xform,
-                m_sun_cascades[cascade_ind].bias);
+            PIX_EVENT_CTX(dsgraph.cmd_list, SE_SUN_NEAR);
+            RImplementation.Target->accum_direct_cascade(dsgraph.cmd_list, SE_SUN_NEAR, m_sun_cascades[cascade_ind].xform,
+                m_sun_cascades[cascade_ind].xform, m_sun_cascades[cascade_ind].bias);
         }
-        else if (cascade_ind < m_sun_cascades.size() - 1)
+        else if (cascade_ind < R__NUM_SUN_CASCADES - 1)
         {
-            PIX_EVENT(SE_SUN_MIDDLE);
-            RImplementation.Target->accum_direct_cascade(SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
+            PIX_EVENT_CTX(dsgraph.cmd_list, SE_SUN_MIDDLE);
+            RImplementation.Target->accum_direct_cascade(dsgraph.cmd_list, SE_SUN_MIDDLE, m_sun_cascades[cascade_ind].xform,
                 m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
         }
         else
         {
-            PIX_EVENT(SE_SUN_FAR);
-            RImplementation.Target->accum_direct_cascade(SE_SUN_FAR, m_sun_cascades[cascade_ind].xform,
+            PIX_EVENT_CTX(dsgraph.cmd_list, SE_SUN_FAR);
+            RImplementation.Target->accum_direct_cascade(dsgraph.cmd_list, SE_SUN_FAR, m_sun_cascades[cascade_ind].xform,
                 m_sun_cascades[cascade_ind - 1].xform, m_sun_cascades[cascade_ind].bias);
         }
     }
 
-    // Restore XForms
-    RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    dsgraph.cmd_list.submit(); // TODO: move into release (rename to submit?)
+    RImplementation.release_context(dsgraph.context_id);
 }

@@ -32,85 +32,93 @@ bool cmp_pass(const T& left, const T& right)
 
 void R_dsgraph_structure::render_graph(u32 _priority)
 {
-    PIX_EVENT(r_dsgraph_render_graph);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_graph);
     RImplementation.BasicStats.Primitives.Begin(); // XXX: Refactor a bit later
 
-    RCache.set_xform_world(Fidentity);
+    cmd_list.set_xform_world(Fidentity);
 
     // **************************************************** NORMAL
     // Perform sorting based on ScreenSpaceArea
     // Sorting by SSA and changes minimizations
     // Render several passes
-    for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
     {
-        auto& map = mapNormalPasses[_priority][iPass];
+        PIX_EVENT_CTX(cmd_list, dsgraph_render_static);
 
-        map.get_any_p(nrmPasses);
-        std::sort(nrmPasses.begin(), nrmPasses.end(), cmp_pass<mapNormal_T::value_type*>);
-        for (const auto& it : nrmPasses)
+        for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
         {
-            RCache.set_Pass(it->first);
-            RImplementation.apply_lmaterial();
+            auto& map = mapNormalPasses[_priority][iPass];
 
-            mapNormalItems& items = it->second;
-            items.ssa = 0;
-
-            std::sort(items.begin(), items.end(), cmp_ssa<_NormalItem>);
-            for (const auto& item : items)
+            map.get_any_p(nrmPasses);
+            std::sort(nrmPasses.begin(), nrmPasses.end(), cmp_pass<mapNormal_T::value_type*>);
+            for (const auto& it : nrmPasses)
             {
-                const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
+                cmd_list.set_Pass(it->first);
+                cmd_list.apply_lmaterial();
+
+                mapNormalItems& items = it->second;
+                items.ssa = 0;
+
+                std::sort(items.begin(), items.end(), cmp_ssa<_NormalItem>);
+                for (const auto& item : items)
+                {
+                    const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
 #ifdef USE_DX11
-                RCache.LOD.set_LOD(LOD);
+                    cmd_list.LOD.set_LOD(LOD);
 #endif
-                // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-                // RCache.hemi.c_update(item.pVisual);
+                    // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
+                    // RCache.hemi.c_update(item.pVisual);
 
-                item.pVisual->Render(LOD, o.phase == CRender::PHASE_SMAP);
+                    item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
+                }
+                items.clear();
+
             }
-            items.clear();
-
+            nrmPasses.clear();
+            map.clear();
         }
-        nrmPasses.clear();
-        map.clear();
     }
 
     // **************************************************** MATRIX
     // Perform sorting based on ScreenSpaceArea
     // Sorting by SSA and changes minimizations
     // Render several passes
-    for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
     {
-        auto& map = mapMatrixPasses[_priority][iPass];
+        PIX_EVENT_CTX(cmd_list, dsgraph_render_dynamic);
 
-        map.get_any_p(matPasses);
-        std::sort(matPasses.begin(), matPasses.end(), cmp_pass<mapMatrix_T::value_type*>);
-        for (const auto& it : matPasses)
+        for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
         {
-            RCache.set_Pass(it->first);
+            auto& map = mapMatrixPasses[_priority][iPass];
 
-            mapMatrixItems& items = it->second;
-            items.ssa = 0;
-
-            std::sort(items.begin(), items.end(), cmp_ssa<_MatrixItem>);
-            for (auto& item : items)
+            map.get_any_p(matPasses);
+            std::sort(matPasses.begin(), matPasses.end(), cmp_pass<mapMatrix_T::value_type*>);
+            for (const auto& it : matPasses)
             {
-                RCache.set_xform_world(item.Matrix);
-                RImplementation.apply_object(item.pObject);
-                RImplementation.apply_lmaterial();
+                cmd_list.set_Pass(it->first);
 
-                const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
+                mapMatrixItems& items = it->second;
+                items.ssa = 0;
+
+                std::sort(items.begin(), items.end(), cmp_ssa<_MatrixItem>);
+                for (auto& item : items)
+                {
+                    cmd_list.set_xform_world(item.Matrix);
+                    RImplementation.apply_object(cmd_list, item.pObject);
+                    cmd_list.apply_lmaterial();
+
+                    const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
 #ifdef USE_DX11
-                RCache.LOD.set_LOD(LOD);
+                    cmd_list.LOD.set_LOD(LOD);
 #endif
-                // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
-                // RCache.hemi.c_update(item.pVisual);
+                    // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
+                    // RCache.hemi.c_update(item.pVisual);
 
-                item.pVisual->Render(LOD, o.phase == CRender::PHASE_SMAP);
+                    item.pVisual->Render(cmd_list, LOD, o.phase == CRender::PHASE_SMAP);
+                }
+                items.clear();
             }
-            items.clear();
+            matPasses.clear();
+            map.clear();
         }
-        matPasses.clear();
-        map.clear();
     }
 
     RImplementation.BasicStats.Primitives.End(); // XXX: Refactor a bit later
@@ -125,18 +133,19 @@ void R_dsgraph_structure::render_graph(u32 _priority)
 class hud_transform_helper
 {
     Fmatrix Pold;
-    Fmatrix FTold;
     static u32 cullMode;
     static bool isActive;
 
+    CBackend& cmd_list;
+
 public:
-    hud_transform_helper()
+    explicit hud_transform_helper(CBackend& cmd_list_in)
+        : cmd_list(cmd_list_in)
     {
         extern ENGINE_API float psHUD_FOV;
 
         // Change projection
         Pold  = Device.mProject;
-        FTold = Device.mFullTransform;
 
         // XXX: Xottab_DUTY: custom FOV. Implement it someday
         // It should be something like this:
@@ -154,33 +163,30 @@ public:
         // In the commit:
         // https://github.com/ShokerStlk/xray-16-SWM/commit/869de0b6e74ac05990f541e006894b6fe78bd2a5#diff-4199ef700b18ce4da0e2b45dee1924d0R83
 
-        Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
+        Fmatrix prj_new;
+        prj_new.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
             VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
+        cmd_list.set_xform_project(prj_new);
 
-        Device.mFullTransform.mul(Device.mProject, Device.mView);
-        RCache.set_xform_project(Device.mProject);
-
-        RImplementation.rmNear();
+        RImplementation.rmNear(cmd_list);
 
         // preserve culling mode
-        cullMode = RCache.get_CullMode();
+        cullMode = cmd_list.get_CullMode();
         isActive = true;
     }
 
     ~hud_transform_helper()
     {
-        RImplementation.rmNormal();
+        RImplementation.rmNormal(cmd_list);
 
         // Restore projection
-        Device.mProject = Pold;
-        Device.mFullTransform = FTold;
-        RCache.set_xform_project(Device.mProject);
+        cmd_list.set_xform_project(Pold);
         // restore culling mode
-        RCache.set_CullMode(cullMode);
+        cmd_list.set_CullMode(cullMode);
         isActive = false;
     }
 
-    static void apply_custom_state()
+    static void apply_custom_state(CBackend& cmd_list)
     {
         if (!isActive || !psHUD_Flags.test(HUD_LEFT_HANDED))
             return;
@@ -188,7 +194,7 @@ public:
         // Change culling mode if HUD meshes were flipped
         if (cullMode != CULL_NONE)
         {
-            RCache.set_CullMode(cullMode == CULL_CW ? CULL_CCW : CULL_CW);
+            cmd_list.set_CullMode(cullMode == CULL_CW ? CULL_CCW : CULL_CW);
         }
     }
 };
@@ -203,14 +209,14 @@ void __fastcall render_item(u32 context_id, const T& item)
 
     dxRender_Visual* V = item.second.pVisual;
     VERIFY(V && V->shader._get());
-    RCache.set_Element(item.second.se);
-    RCache.set_xform_world(item.second.Matrix);
-    RImplementation.apply_object(item.second.pObject);
-    RImplementation.apply_lmaterial();
-    hud_transform_helper::apply_custom_state();
+    dsgraph.cmd_list.set_Element(item.second.se);
+    dsgraph.cmd_list.set_xform_world(item.second.Matrix);
+    RImplementation.apply_object(dsgraph.cmd_list, item.second.pObject);
+    dsgraph.cmd_list.apply_lmaterial();
+    hud_transform_helper::apply_custom_state(dsgraph.cmd_list);
     //--#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
     //RCache.hemi.c_update(V);
-    V->Render(calcLOD(item.first, V->vis.sphere.R), dsgraph.o.phase == CRender::PHASE_SMAP);
+    V->Render(dsgraph.cmd_list, calcLOD(item.first, V->vis.sphere.R), dsgraph.o.phase == CRender::PHASE_SMAP);
 }
 
 template<class T>
@@ -231,11 +237,11 @@ ICF void sort_back_to_front_render_and_clean(u32 context_id, T& vec)
 // HUD render
 void R_dsgraph_structure::render_hud()
 {
-    PIX_EVENT(r_dsgraph_render_hud);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_hud);
 
     if (!mapHUD.empty())
     {
-        hud_transform_helper helper;
+        hud_transform_helper helper{ cmd_list };
         sort_front_to_back_render_and_clean(context_id, mapHUD);
     }
 
@@ -249,15 +255,15 @@ void R_dsgraph_structure::render_hud_ui()
 {
     VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
 
-    PIX_EVENT(r_dsgraph_render_hud_ui);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_hud_ui);
 
-    hud_transform_helper helper;
+    hud_transform_helper helper{ cmd_list };
 
 #if RENDER != R_R1
     // Targets, use accumulator for temporary storage
     const ref_rt rt_null;
-    RCache.set_RT(0, 1);
-    RCache.set_RT(0, 2);
+    cmd_list.set_RT(0, 1);
+    cmd_list.set_RT(0, 2);
     auto zb = RImplementation.Target->rt_Base_Depth;
 
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
@@ -265,7 +271,7 @@ void R_dsgraph_structure::render_hud_ui()
         zb = RImplementation.Target->rt_MSAADepth;
 #endif
 
-    RImplementation.Target->u_setrt(
+    RImplementation.Target->u_setrt(cmd_list,
         RImplementation.o.albedo_wo ? RImplementation.Target->rt_Accumulator : RImplementation.Target->rt_Color,
         rt_null, rt_null, zb);
 #endif // RENDER!=R_R1
@@ -277,13 +283,13 @@ void R_dsgraph_structure::render_hud_ui()
 // strict-sorted render
 void R_dsgraph_structure::render_sorted()
 {
-    PIX_EVENT(r_dsgraph_render_sorted);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_sorted);
 
     sort_back_to_front_render_and_clean(context_id, mapSorted);
 
     if (!mapHUDSorted.empty())
     {
-        hud_transform_helper helper;
+        hud_transform_helper helper{ cmd_list };
         sort_back_to_front_render_and_clean(context_id, mapHUDSorted);
     }
 }
@@ -293,13 +299,13 @@ void R_dsgraph_structure::render_sorted()
 void R_dsgraph_structure::render_emissive()
 {
 #if RENDER != R_R1
-    PIX_EVENT(r_dsgraph_render_emissive);
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_emissive);
 
     sort_front_to_back_render_and_clean(context_id, mapEmissive);
 
     if (!mapHUDEmissive.empty())
     {
-        hud_transform_helper helper;
+        hud_transform_helper helper{ cmd_list };
         sort_front_to_back_render_and_clean(context_id, mapHUDEmissive);
     }
 #endif
@@ -310,7 +316,7 @@ void R_dsgraph_structure::render_emissive()
 void R_dsgraph_structure::render_wmarks()
 {
 #if RENDER != R_R1
-    PIX_EVENT(r_dsgraph_render_wmarks);
+    PIX_EVENT(dsgraph_render_wmarks);
 
     sort_front_to_back_render_and_clean(context_id, mapWmark);
 #endif
@@ -320,7 +326,7 @@ void R_dsgraph_structure::render_wmarks()
 // strict-sorted render
 void R_dsgraph_structure::render_distort()
 {
-    PIX_EVENT(r_dsgraph_render_distort);
+    PIX_EVENT(dsgraph_render_distort);
 
     sort_back_to_front_render_and_clean(context_id, mapDistort);
 }
@@ -333,7 +339,7 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
     VERIFY(sector_id != IRender_Sector::INVALID_SECTOR_ID);
     auto* S = Sectors[sector_id];
 
-    PIX_EVENT(r_dsgraph_render_R1_box);
+    PIX_EVENT(dsgraph_render_R1_box);
 
     lstVisuals.clear();
     lstVisuals.push_back(((CSector*)S)->root());
@@ -390,8 +396,8 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
             {
                 for (u32 pass = 0; pass < E2->passes.size(); pass++)
                 {
-                    RCache.set_Element(E2, pass);
-                    V->Render(-1.f, o.phase == CRender::PHASE_SMAP);
+                    cmd_list.set_Element(E2, pass);
+                    V->Render(cmd_list, -1.f, o.phase == CRender::PHASE_SMAP);
                 }
             }
         }

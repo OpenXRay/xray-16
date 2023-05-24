@@ -74,6 +74,8 @@ struct R_dsgraph_structure
     xr_vector<ISpatial*> lstSpatial;
     xr_vector<dxRender_Visual*> lstVisuals;
 
+    CBackend cmd_list{};
+
     u32 counter_S{};
     u32 counter_D{};
 
@@ -143,6 +145,7 @@ struct R_dsgraph_structure
         mapEmissive.clear();
         mapHUDEmissive.clear();
 #endif
+        cmd_list.Invalidate();
     }
 
     void r_pmask(bool _1, bool _2, bool _wm = false)

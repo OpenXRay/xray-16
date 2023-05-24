@@ -17,7 +17,7 @@ void CRenderTarget::phase_ssao()
     u32 Offset = 0;
 
     // Targets
-    u_setrt(rt_ssao_temp, NULL, NULL, NULL); // No need for ZBuffer at all
+    u_setrt(RCache, rt_ssao_temp, NULL, NULL, NULL); // No need for ZBuffer at all
     RCache.ClearRT(rt_ssao_temp, {}); // black
 
     RCache.set_Z(false);
@@ -25,7 +25,7 @@ void CRenderTarget::phase_ssao()
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     if (RImplementation.o.nvstencil)
     {
-        u_stencil_optimize(FALSE);
+        u_stencil_optimize(RCache, FALSE);
         RCache.set_ColorWriteEnable();
     }
 
@@ -90,7 +90,7 @@ void CRenderTarget::phase_downsamp()
     u32 Offset = 0;
 
     // Targets
-    u_setrt(rt_half_depth, NULL, NULL, NULL); // No need for ZBuffer at all
+    u_setrt(RCache, rt_half_depth, NULL, NULL, NULL); // No need for ZBuffer at all
     RCache.ClearRT(rt_half_depth, {}); // black
 
     RCache.set_Z(false);

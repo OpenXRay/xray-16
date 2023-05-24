@@ -85,7 +85,7 @@ void dx113DFluidVolume::Load(LPCSTR /*N*/, IReader* data, u32 /*dwFlags*/)
     */
 }
 
-void dx113DFluidVolume::Render(float /*LOD*/, bool use_fast_geo) // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored ?
+void dx113DFluidVolume::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo) // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored ?
 {
     //	Render debug box
     //	Do it BEFORE update since update resets shaders and other pipeline settings
@@ -168,18 +168,18 @@ void dx113DFluidVolume::Render(float /*LOD*/, bool use_fast_geo) // LOD - Level 
         pv++;
     }
 
-    RCache.set_xform_world(m_FluidData.GetTransform());
+    cmd_list.set_xform_world(m_FluidData.GetTransform());
 
     dwCount = u32(pv - pv_start);
     RImplementation.Vertex.Unlock(dwCount, m_Geom->vb_stride);
-    RCache.set_Geometry(m_Geom);
+    cmd_list.set_Geometry(m_Geom);
 
     // RCache.Render(D3DPT_TRIANGLELIST,dwOffset,0,dwCount,0,dwCount/2);
 
     //	Render obstacles
     for (const Fmatrix& obstacle : m_FluidData.GetObstaclesList())
     {
-        RCache.set_xform_world(obstacle);
+        cmd_list.set_xform_world(obstacle);
         // RCache.Render(D3DPT_TRIANGLELIST,dwOffset,0,dwCount,0,dwCount/2);
     }
 

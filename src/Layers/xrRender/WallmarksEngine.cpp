@@ -360,18 +360,21 @@ ICF u32 FlushStream(
 
 void CWallmarksEngine::Render()
 {
+    auto& dsgraph = RImplementation.get_imm_context();
+    auto& cmd_list = dsgraph.cmd_list;
+
     //	if (marks.empty())			return;
     // Projection and xform
-    float _43 = Device.mProject._43;
-    Device.mProject._43 -= ps_r__WallmarkSHIFT;
-    RCache.set_xform_world(Fidentity);
-    RCache.set_xform_project(Device.mProject);
+    Fmatrix proj = Device.mProject;
+    proj._43 -= ps_r__WallmarkSHIFT;
+    cmd_list.set_xform_world(Fidentity);
+    cmd_list.set_xform_project(proj);
 
-    Fmatrix mSavedView = Device.mView;
     Fvector mViewPos;
     mViewPos.mad(Device.vCameraPosition, Device.vCameraDirection, ps_r__WallmarkSHIFT_V);
-    Device.mView.build_camera_dir(mViewPos, Device.vCameraDirection, Device.vCameraTop);
-    RCache.set_xform_view(Device.mView);
+    Fmatrix view;
+    view.build_camera_dir(mViewPos, Device.vCameraDirection, Device.vCameraTop);
+    cmd_list.set_xform_view(view);
 
     RImplementation.BasicStats.Wallmarks.Begin();
     RImplementation.BasicStats.StaticWMCount = 0;
@@ -482,13 +485,9 @@ void CWallmarksEngine::Render()
     lock.Leave(); // Physics may add wallmarks in parallel with rendering
 
     // Level-wmarks
-    auto& dsgraph = RImplementation.get_imm_context();
     dsgraph.render_wmarks();
     RImplementation.BasicStats.Wallmarks.End();
 
-    // Projection
-    Device.mView = mSavedView;
-    Device.mProject._43 = _43;
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    cmd_list.set_xform_view(Device.mView);
+    cmd_list.set_xform_project(Device.mProject);
 }
