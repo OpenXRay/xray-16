@@ -22,14 +22,13 @@ void CCustomOutfit_Export(lua_State* luaState)
             .def_readonly("bIsHelmetAvaliable", &CCustomOutfit::bIsHelmetAvaliable)
             .def("BonePassBullet", &CCustomOutfit::BonePassBullet)
             .def("get_artefact_count", &CCustomOutfit::get_artefact_count)
-            .def("GetDefHitTypeProtection", +[](CCustomOutfit* self, int hit_type)
+            .def("GetDefHitTypeProtection", +[](CCustomOutfit* self, int hit_type) constexpr
             {
                 return self->GetDefHitTypeProtection(ALife::EHitType(hit_type));
             })
-            .def("GetHitTypeProtection", +[](CCustomOutfit* self, int hit_type, pcstr element)
+            .def("GetHitTypeProtection", +[](CCustomOutfit* self, int hit_type, pcstr element) constexpr
             {
-                const u16 elem = u16(size_t(element));
-                return self->GetHitTypeProtection(ALife::EHitType(hit_type), elem);
+                return self->GetHitTypeProtection(ALife::EHitType(hit_type), u16(size_t(element)));
             })
             .def("GetBoneArmor", &CCustomOutfit::GetBoneArmor)
     ];
@@ -51,14 +50,13 @@ void CHelmet_Export(lua_State* luaState)
             .def_readwrite("m_fSatietyRestoreSpeed", &CHelmet::m_fSatietyRestoreSpeed)
             .def_readwrite("m_fPowerRestoreSpeed", &CHelmet::m_fPowerRestoreSpeed)
             .def_readwrite("m_fBleedingRestoreSpeed", &CHelmet::m_fBleedingRestoreSpeed)
-            .def("GetDefHitTypeProtection", +[](CHelmet* self, int hit_type)
+            .def("GetDefHitTypeProtection", +[](CHelmet* self, int hit_type) constexpr
             {
                 return self->GetDefHitTypeProtection(ALife::EHitType(hit_type));
             })
-            .def("GetHitTypeProtection", +[](CHelmet* self, int hit_type, pcstr element)
+            .def("GetHitTypeProtection", +[](CHelmet* self, int hit_type, pcstr element) constexpr
             {
-                const u16 elem = u16(size_t(element));
-                return self->GetHitTypeProtection(ALife::EHitType(hit_type), elem);
+                return self->GetHitTypeProtection(ALife::EHitType(hit_type), u16(size_t(element)));
             })
             .def("GetBoneArmor", &CHelmet::GetBoneArmor)
     ];

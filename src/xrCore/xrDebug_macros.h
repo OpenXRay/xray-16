@@ -39,6 +39,28 @@
             xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
     } while (false)
 
+#define R_ASSERT2_NOSTATIC(expr, desc)\
+    do\
+    {\
+        bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc);\
+    } while (false)
+#define R_ASSERT3_NOSTATIC(expr, desc, arg1)\
+    do\
+    {\
+        bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1);\
+    } while (false)
+#define R_ASSERT4_NOSTATIC(expr, desc, arg1, arg2)\
+    do\
+    {\
+        bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
+    } while (false)
+
 #define R_ASSERT1_CURE(expr, can_be_cured, cure)\
     do\
     {\

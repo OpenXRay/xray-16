@@ -229,7 +229,7 @@ public:
 void CResourceManager::LS_Load()
 {
     // clang-format off
-    auto exporterFunc = [](lua_State* luaState)
+    auto exporterFunc = [](lua_State* luaState) constexpr
     {
         using namespace luabind;
         using namespace luabind::policy;

@@ -303,7 +303,7 @@ void CSoundMemoryManager::update()
     clear_delayed_objects();
 
     VERIFY(m_sounds);
-    const auto it = std::remove_if(m_sounds->begin(), m_sounds->end(), [](const CSoundObject& object)
+    const auto it = std::remove_if(m_sounds->begin(), m_sounds->end(), [](const CSoundObject& object) constexpr
     {
         if (!object.m_object)
             return false;
@@ -333,7 +333,7 @@ void CSoundMemoryManager::update()
 
 void CSoundMemoryManager::remove(const MemorySpace::CSoundObject* sound_object)
 {
-    SOUNDS::iterator I = std::find_if(m_sounds->begin(), m_sounds->end(), [&](const MemorySpace::CSoundObject& object)
+    auto I = std::find_if(m_sounds->begin(), m_sounds->end(), [&](const MemorySpace::CSoundObject& object) constexpr
     {
         return sound_object == &object;
     });

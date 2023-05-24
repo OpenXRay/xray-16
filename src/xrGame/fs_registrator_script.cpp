@@ -259,9 +259,9 @@ SCRIPT_EXPORT(fs_registrator, (),
             .def("file_copy", &CLocatorAPI::file_copy)
 
             .def("exist", &CLocatorAPI::GetFileDesc)
-            .def("exist", +[](CLocatorAPI* fs, pcstr path, pcstr name)
+            .def("exist", +[](CLocatorAPI* fs, pcstr path, pcstr name) constexpr
             {
-                string_path temp;
+                string_path temp = {};
                 fs->update_path(temp, path, name);
                 return fs->GetFileDesc(temp);
             })

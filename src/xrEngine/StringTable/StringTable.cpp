@@ -133,7 +133,7 @@ void CStringTable::SetLanguage()
     else
     {
         pData->m_sLanguage = pSettings->r_string("string_table", "language");
-        auto it = std::find_if(languagesToken.begin(), languagesToken.end(), [](const xr_token& token) {
+        auto it = std::find_if(languagesToken.begin(), languagesToken.end(), [](const xr_token& token) constexpr {
             return token.name && token.name == pData->m_sLanguage;
         });
 
@@ -196,7 +196,7 @@ STRING_VALUE CStringTable::ParseLine(pcstr str)
     constexpr size_t ACTION_STR_END_LEN = std::size(ACTION_STR_END) - 1;
 
     xr_string string{ str };
-    string.erase(std::remove_if(string.begin(), string.end(), [](char ch)
+    string.erase(std::remove_if(string.begin(), string.end(), [](char ch) constexpr
     {
         VERIFY2(ch != GAME_ACTION_MARK,"Using of escape symbol is not allowed in localization.");
         return ch == GAME_ACTION_MARK;

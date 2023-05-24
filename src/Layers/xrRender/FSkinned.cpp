@@ -133,7 +133,7 @@ void load_hw(Fvisual& V, const TSrc* src)
     if (V.vCount > PARALLEL_BONE_VERTICES_PROCESSING_MIN_VERTICES)
     {
         using range_value_type = decltype(Fvisual::vCount);
-        auto setVertices = [dst, src](TaskRange<range_value_type> range)
+        const auto setVertices = [dst, src](TaskRange<range_value_type> range) constexpr
         {
             const TSrc* src2 = &src[range.begin()];
             TDst* dst2 = &dst[range.begin()];

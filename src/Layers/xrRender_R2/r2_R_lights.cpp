@@ -34,7 +34,7 @@ void CRender::render_lights(light_Package& LP)
         for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
             LP_smap_pool.initialize(RImplementation.o.smapsize);
-            std::sort(source.begin(), source.end(), [](light* l1, light* l2)
+            std::sort(source.begin(), source.end(), [](light* l1, light* l2) constexpr
             {
                 const u32 a0 = l1->X.S.size;
                 const u32 a1 = l2->X.S.size;
@@ -88,7 +88,7 @@ void CRender::render_lights(light_Package& LP)
     static xr_vector<task_data_t> lights_queue{};
     lights_queue.reserve(3);  // TODO: max cascades
 
-    const auto &calc_lights = [](Task &, void* data)
+    const auto &calc_lights = [](Task &, void* data) constexpr
     {
         const auto* task_data = static_cast<task_data_t*>(data);
         auto& dsgraph = RImplementation.get_context(task_data->batch_id);

@@ -515,7 +515,8 @@ void CRender::Calculate()
                 dsgraph.lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)
-            std::sort(dsgraph.lstRenderables.begin(), dsgraph.lstRenderables.end(), [](ISpatial* s1, ISpatial* s2)
+            std::sort(dsgraph.lstRenderables.begin(), dsgraph.lstRenderables.end(),
+                      [](ISpatial* s1, ISpatial* s2) constexpr
             {
                 const float d1 = s1->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);
                 const float d2 = s2->GetSpatialData().sphere.P.distance_to_sqr(Device.vCameraPosition);

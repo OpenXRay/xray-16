@@ -263,7 +263,7 @@ void render_sun::calculate_task(Task&, void*)
         FPU::m24r();
     }
 
-    const auto process_cascade = [&, this](const TaskRange<u32>& range)
+    const auto process_cascade = [&, this](const TaskRange<u32>& range) constexpr
     {
         for (u32 cascade_ind = range.begin(); cascade_ind != range.end(); ++cascade_ind)
         {

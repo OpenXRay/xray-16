@@ -89,7 +89,7 @@ void CHOM::Load()
     // Create RASTER-triangles
     m_pTris = xr_alloc<occTri>(CL.getTS());
 
-    xr_parallel_for(TaskRange<size_t>(0, CL.getTS()), [&](const TaskRange<size_t>& range)
+    xr_parallel_for(TaskRange<size_t>(0, CL.getTS()), [&](const TaskRange<size_t>& range) constexpr
     {
         for (size_t it = range.begin(); it != range.end(); ++it)
         {

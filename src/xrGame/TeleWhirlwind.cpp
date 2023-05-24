@@ -60,7 +60,7 @@ void CTeleWhirlwind::draw_out_impact(Fvector& dir, float& val)
 void CTeleWhirlwind::clear_notrelevant()
 {
     //убрать все объеты со старыми параметрами
-    const auto it = std::remove_if(objects.begin(), objects.end(), [](CTelekineticObject* tele_object)
+    const auto it = std::remove_if(objects.begin(), objects.end(), [](CTelekineticObject* tele_object) constexpr
     {
         return (!tele_object->get_object() || tele_object->get_object()->getDestroy());
     });

@@ -11,7 +11,7 @@ void light_Package::clear()
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)  || (RENDER == R_GL)
 void light_Package::sort()
 {
-    const auto pred_light_cmp = [](const light* l1, const light* l2)
+    const auto pred_light_cmp = [](const light* l1, const light* l2) constexpr
     {
         if (l1->vis.pending)
         {

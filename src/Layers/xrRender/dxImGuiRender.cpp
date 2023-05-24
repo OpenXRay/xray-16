@@ -67,7 +67,7 @@ void dxImGuiRender::Render(ImDrawData* data)
 void dxImGuiRender::OnDeviceCreate(ImGuiContext* context)
 {
     ImGui::SetAllocatorFunctions(
-        [](size_t size, void* /*user_data*/)
+        [](size_t size, void* /*user_data*/) constexpr
         {
             return xr_malloc(size);
         },

@@ -63,7 +63,7 @@ void CPHCommander::clear()
         delete_call(it);
     m_calls.clear();
 
-    std::for_each(m_callsUpdateDeferred.begin(), m_callsUpdateDeferred.end(), [](std::pair<CPHCall*, bool> pair)
+    std::for_each(m_callsUpdateDeferred.begin(), m_callsUpdateDeferred.end(), [](std::pair<CPHCall*, bool> pair) constexpr
     {
         if (pair.second)
             delete_call(pair.first);

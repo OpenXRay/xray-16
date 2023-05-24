@@ -30,9 +30,9 @@ void CUIMapLocationHint::Init(CUIXml& uiXml, LPCSTR path)
         return;
     }
 
-    const auto init = [&](pcstr name)
+    const auto init = [&](pcstr name) constexpr
     {
-        string512 buff;
+        string512 buff = {};
         strconcat(sizeof(buff), buff, path, ":", name);
         m_info[name] = UIHelper::CreateStatic(uiXml, buff, this);
     };
@@ -50,7 +50,7 @@ void CUIMapLocationHint::Init(CUIXml& uiXml, LPCSTR path)
 
 void CUIMapLocationHint::SetInfoMode(u8 mode)
 {
-    const auto showIf = [&](pcstr name, bool condition)
+    const auto showIf = [&](pcstr name, bool condition) constexpr
     {
         if (m_info[name])
             m_info[name]->Show(condition);

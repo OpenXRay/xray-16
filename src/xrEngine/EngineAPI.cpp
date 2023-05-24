@@ -198,7 +198,7 @@ void CEngineAPI::CreateRendererList()
             const auto& modes = module->ObtainSupportedModes();
             for (pcstr mode : modes)
             {
-                const auto it = std::find_if(renderModes.begin(), renderModes.end(), [&](auto& pair)
+                const auto it = std::find_if(renderModes.begin(), renderModes.end(), [&](auto& pair) constexpr
                 {
                     return 0 == xr_strcmp(mode, pair.first.c_str());
                 });

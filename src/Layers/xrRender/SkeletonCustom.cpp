@@ -23,7 +23,7 @@ Lock UCalc_Mutex
 //////////////////////////////////////////////////////////////////////
 u16 CKinematics::LL_BoneID(LPCSTR B)
 {
-    const auto I = std::lower_bound(bone_map_N->begin(), bone_map_N->end(), B, [](const auto& N, pcstr B)
+    const auto I = std::lower_bound(bone_map_N->begin(), bone_map_N->end(), B, [](const auto& N, pcstr B) constexpr
     {
         return xr_strcmp(*N.first, B) < 0;
     });
@@ -36,7 +36,8 @@ u16 CKinematics::LL_BoneID(LPCSTR B)
 
 u16 CKinematics::LL_BoneID(const shared_str& B)
 {
-    const auto I = std::lower_bound(bone_map_P->begin(), bone_map_P->end(), B, [](const auto& N, const shared_str& B)
+    const auto I =
+            std::lower_bound(bone_map_P->begin(), bone_map_P->end(), B, [](const auto& N, const shared_str& B) constexpr
     {
         return N.first._get() < B._get();
     });
@@ -250,11 +251,11 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
         data->r(&pBone->obb, sizeof(Fobb));
         visimask.set(u64(1) << ID, TRUE);
     }
-    std::sort(bone_map_N->begin(), bone_map_N->end(), [](const auto& A, const auto& B)
+    std::sort(bone_map_N->begin(), bone_map_N->end(), [](const auto& A, const auto& B) constexpr
     {
         return xr_strcmp(A.first, B.first) < 0;
     });
-    std::sort(bone_map_P->begin(), bone_map_P->end(), [](const auto& A, const auto& B)
+    std::sort(bone_map_P->begin(), bone_map_P->end(), [](const auto& A, const auto& B) constexpr
     {
         return A.first._get() < B.first._get();
     });

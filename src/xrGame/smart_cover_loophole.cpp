@@ -111,7 +111,7 @@ void loophole::add_action(LPCSTR type, luabind::object const& table)
 
     shared_str id = shared_str(type);
     VERIFY(m_actions.end() == std::find_if(m_actions.begin(), m_actions.end(),
-       [=](std::pair<shared_str, smart_cover::action*> const& other) {
+       [=](std::pair<shared_str, smart_cover::action*> const& other) constexpr {
            return id._get() == other.first._get();
        }));
     m_actions.emplace(type, action);

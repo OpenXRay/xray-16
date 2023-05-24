@@ -135,7 +135,7 @@ void stalker_movement_params::cover_loophole_id(shared_str const& loophole_id)
 
     VERIFY(m_cover);
 
-    const auto predicate = [loophole_id](const smart_cover::loophole* loophole)
+    const auto predicate = [loophole_id](const smart_cover::loophole* loophole) constexpr
     {
         return (loophole->id()._get() == loophole_id._get());
     };

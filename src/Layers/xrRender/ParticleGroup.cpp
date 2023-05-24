@@ -443,7 +443,8 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
         // remove if stopped
         if (rem_cnt)
         {
-            const auto new_end = std::remove_if(_children_free.begin(), _children_free.end(), [](const dxRender_Visual* x)
+            const auto new_end =
+                    std::remove_if(_children_free.begin(), _children_free.end(), [](const dxRender_Visual* x) constexpr
             {
                 return x == nullptr;
             });

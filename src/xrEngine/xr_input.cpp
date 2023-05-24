@@ -396,9 +396,9 @@ void CInput::ControllerUpdate()
             cbStack.back()->IR_OnControllerHold(ControllerButtonToKey[i], 1.f, 0.f);
     }
 
-    const auto checkAxis = [this](int axis, int rawX, int rawY, int prevRawX, int prevRawY)
+    const auto checkAxis = [this](int axis, int rawX, int rawY, int prevRawX, int prevRawY) constexpr
     {
-        const auto quantize = [](int value)
+        const auto quantize = [](int value) constexpr
         {
             return value / (SDL_JOYSTICK_AXIS_MAX / 100.f);
         };

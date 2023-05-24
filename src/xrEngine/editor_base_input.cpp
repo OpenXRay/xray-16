@@ -170,7 +170,7 @@ void ide::IR_OnKeyboardRelease(int key)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    const auto check = [&, this](ImGuiKey mod, int xr_key)
+    const auto check = [&, this](ImGuiKey mod, int xr_key) constexpr
     {
         if (!IR_GetKeyState(xr_key))
             io.AddKeyEvent(mod, false);

@@ -87,9 +87,9 @@ void CWeaponKnife::Load(LPCSTR section)
         { "splash_hit_divide_factor", nullptr, FieldTypes::t_float, &m_NextHitDivideFactor },
     }};
 
-    const auto assertField = [&](pcstr name, pcstr /*fallback*/, FieldTypes /*type*/, void* outPtr)
+    const auto assertField = [&](pcstr name, pcstr /*fallback*/, FieldTypes /*type*/, void* outPtr) constexpr
     {
-        R_ASSERT2(name && outPtr, "Some fields are missing or malformed");
+        R_ASSERT2_NOSTATIC(name && outPtr, "Some fields are missing or malformed");
     };
 
     for (const auto& field : fields)

@@ -12,7 +12,8 @@ server_info_uploader& xrServer::GetServerInfoUploader()
 {
     VERIFY(m_server_logo && m_server_rules);
 
-    auto it = std::find_if(m_info_uploaders.begin(), m_info_uploaders.end(), [](server_info_uploader const* uplinfo)
+    auto it = std::find_if(m_info_uploaders.begin(), m_info_uploaders.end(),
+                           [](server_info_uploader const* uplinfo) constexpr
     {
         return !uplinfo->is_active();
     });

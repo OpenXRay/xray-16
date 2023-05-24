@@ -50,7 +50,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
         m_texture_details.reserve(m_texture_details.size() + data.Data.size());
         m_detail_scalers.reserve(m_detail_scalers.size() + data.Data.size());
 
-        const auto processAssociation = [&](const CInifile::Item& item)
+        const auto processAssociation = [&](const CInifile::Item& item) constexpr
         {
             if (listTHM)
                 Msg("\t\t%s = %s", item.first.c_str(), item.second.c_str());
@@ -65,11 +65,11 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 
             desc.m_assoc = xr_new<texture_assoc>();
 
-            string_path T;
-            float s;
+            string_path T = {};
+            float s = {};
 
             const int res = sscanf(*item.second, "%[^,],%f", T, &s);
-            R_ASSERT4(res == 2, "Bad texture association", item.first.c_str(), fname);
+            R_ASSERT4_NOSTATIC(res == 2, "Bad texture association", item.first.c_str(), fname);
             desc.m_assoc->detail_name = T;
             if (dts)
                 dts->scale = s;
@@ -94,7 +94,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 #endif
         m_texture_details.reserve(m_texture_details.size() + data.Data.size());
 
-        const auto processSpecification = [&](const CInifile::Item& item)
+        const auto processSpecification = [&](const CInifile::Item& item) constexpr
         {
             if (listTHM)
                 Msg("\t\t%s = %s", item.first.c_str(), item.second.c_str());
@@ -108,10 +108,10 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 
             desc.m_spec = xr_new<texture_spec>();
 
-            string_path bmode;
+            string_path bmode = {};
             const int res =
                     sscanf(item.second.c_str(), "bump_mode[%[^]]], material[%f]", bmode, &desc.m_spec->m_material);
-            R_ASSERT4(res == 2, "Bad texture specification", item.first.c_str(), fname);
+            R_ASSERT4_NOSTATIC(res == 2, "Bad texture specification", item.first.c_str(), fname);
             if ((bmode[0] == 'u') && (bmode[1] == 's') && (bmode[2] == 'e') && (bmode[3] == ':'))
             {
                 // bump-map specified

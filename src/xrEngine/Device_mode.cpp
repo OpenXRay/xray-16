@@ -182,7 +182,7 @@ void CRenderDevice::SelectResolution(const bool windowed)
         xr_sprintf(buf, "%ux%u (%dHz)", psDeviceMode.Width, psDeviceMode.Height, psDeviceMode.RefreshRate);
 
         auto modes = vid_mode_token[psDeviceMode.Monitor];
-        const auto it = std::find_if(modes.begin(), modes.end(), [&buf](const xr_token& token)
+        const auto it = std::find_if(modes.begin(), modes.end(), [&buf](const xr_token& token) constexpr
         {
             return token.name && xr_strcmp(token.name, buf) == 0;
         });

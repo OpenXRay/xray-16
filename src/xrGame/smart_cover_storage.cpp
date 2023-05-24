@@ -19,7 +19,7 @@ storage::DescriptionPtr storage::description(shared_str const& table_id)
     collect_garbage();
 
     Descriptions::iterator found = std::find_if(m_descriptions.begin(), m_descriptions.end(),
-        [=](smart_cover::description* const& ptr) { return (table_id._get() == ptr->table_id()._get()); });
+        [=](smart_cover::description* const& ptr) constexpr { return (table_id._get() == ptr->table_id()._get()); });
 
     if (found != m_descriptions.end())
         return (*found);

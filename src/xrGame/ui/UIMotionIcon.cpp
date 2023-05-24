@@ -87,7 +87,7 @@ bool CUIMotionIcon::Init(Frect const& zonemap_rect)
         }
     }
 
-    const auto create_static = [&uiXml, this](pcstr ui_path, EState state)
+    const auto create_static = [&uiXml, this](pcstr ui_path, EState state) constexpr
     {
         auto ui_static = UIHelper::CreateStatic(uiXml, ui_path, this, false);
         if (ui_static)

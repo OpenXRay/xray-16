@@ -237,7 +237,7 @@ luabind::class_<CScriptGameObject>& script_register_game_object1(luabind::class_
         .def("skip_transfer_enemy", &CScriptGameObject::skip_transfer_enemy)
         .def("set_home", (void (CScriptGameObject::*)(LPCSTR, float, float, bool, float))(&CScriptGameObject::set_home))
         .def("set_home", (void (CScriptGameObject::*)(u32, float, float, bool, float))(&CScriptGameObject::set_home))
-        .def("set_home", +[](CScriptGameObject* self, pcstr name, float r_min, float r_max, bool aggressive)
+        .def("set_home", +[](CScriptGameObject* self, pcstr name, float r_min, float r_max, bool aggressive) constexpr
         {
             const float r_middle = (r_min + r_max) / 2;
             self->set_home(name, r_min, r_max, aggressive, r_middle);

@@ -709,8 +709,8 @@ IC static void CLevel_Export(lua_State* luaState)
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),
-        def("get_start_time", +[]() { return xrTime(Level().GetStartGameTime()); }),
-        def("valid_vertex", +[](u32 level_vertex_id)
+        def("get_start_time", +[]() constexpr { return xrTime(Level().GetStartGameTime()); }),
+        def("valid_vertex", +[](u32 level_vertex_id) constexpr
         {
             return ai().level_graph().valid_vertex_id(level_vertex_id);
         }),
@@ -739,7 +739,7 @@ IC static void CLevel_Export(lua_State* luaState)
         def("high_cover_in_direction", high_cover_in_direction), def("low_cover_in_direction", low_cover_in_direction),
         def("vertex_in_direction", vertex_in_direction), def("rain_factor", rain_factor),
         def("patrol_path_exists", patrol_path_exists), def("vertex_position", vertex_position),
-        def("name", +[]() { return Level().name().c_str(); }),
+        def("name", +[]() constexpr { return Level().name().c_str(); }),
         def("prefetch_sound", prefetch_sound),
 
         def("client_spawn_manager", get_client_spawn_manager),
@@ -782,7 +782,7 @@ IC static void CLevel_Export(lua_State* luaState)
 
         def("add_cam_effector", &add_cam_effector),
         def("add_cam_effector2", &add_cam_effector2),
-        def("add_cam_effector2", +[](pcstr fn, int id, bool cyclic, pcstr cb_func)
+        def("add_cam_effector2", +[](pcstr fn, int id, bool cyclic, pcstr cb_func) constexpr
         {
             add_cam_effector2(fn, id, cyclic, cb_func, 0.0f);
         }),
@@ -920,7 +920,7 @@ IC static void CLevel_Export(lua_State* luaState)
         def("start_tutorial", &start_tutorial),
         def("stop_tutorial", &stop_tutorial),
         def("has_active_tutorial", &has_active_tutotial),
-        def("active_tutorial_name", +[](){ return g_tutorial->GetTutorName(); }),
+        def("active_tutorial_name", +[]() { return g_tutorial->GetTutorName(); }),
         def("translate_string", &translate_string),
         def("reload_language", +[]() { StringTable().ReloadLanguage(); }),
         def("log_stack_trace", &xrDebug::LogStackTrace),
@@ -935,7 +935,8 @@ IC static void CLevel_Export(lua_State* luaState)
             ai().alife().jump_to_level(level_name);
         }),
         def("jump_to_level", &jump_to_level),
-        def("jump_to_level", +[](const Fvector& m_position, u32 m_level_vertex_id, GameGraph::_GRAPH_ID m_game_vertex_id)
+        def("jump_to_level", +[](const Fvector& m_position, u32 m_level_vertex_id,
+                                GameGraph::_GRAPH_ID m_game_vertex_id) constexpr
         {
             jump_to_level(m_position, m_level_vertex_id, m_game_vertex_id, {});
         })

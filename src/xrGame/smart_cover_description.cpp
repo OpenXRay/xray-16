@@ -127,7 +127,7 @@ void description::load_loopholes(shared_str const& table_id)
 
         auto* loophole = xr_new<smart_cover::loophole>(table);
         VERIFY(m_loopholes.end() == std::find_if(m_loopholes.begin(), m_loopholes.end(),
-            [=](smart_cover::loophole* const lh) { return loophole->id()._get() == lh->id()._get(); }));
+            [=](smart_cover::loophole* const lh) constexpr { return loophole->id()._get() == lh->id()._get(); }));
 
         m_loopholes.push_back(loophole);
     }

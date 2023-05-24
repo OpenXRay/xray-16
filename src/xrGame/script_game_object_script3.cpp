@@ -165,7 +165,7 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("disable_info_portion", &CScriptGameObject::DisableInfoPortion)
 
         .def("give_game_news", +[](CScriptGameObject* self,
-            pcstr news, pcstr texture_name, Frect /*tex_rect*/, int delay, int show_time)
+            pcstr news, pcstr texture_name, Frect /*tex_rect*/, int delay, int show_time) constexpr
         {
             // SOC give_game_news style
             // tex_rect is ignored, we could add support for it back, if really needed.
@@ -194,17 +194,17 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("get_info_time", &CScriptGameObject::GetInfoTime)
 
         .def("get_task_state", &CScriptGameObject::GetGameTaskState)
-        .def("get_task_state", +[](CScriptGameObject* self, pcstr task_id)
+        .def("get_task_state", +[](CScriptGameObject* self, pcstr task_id) constexpr
         {
             return self->GetGameTaskState(task_id, ROOT_TASK_OBJECTIVE);
         })
         .def("set_task_state", &CScriptGameObject::SetGameTaskState)
-        .def("set_task_state", +[](CScriptGameObject* self, ETaskState state, pcstr task_id)
+        .def("set_task_state", +[](CScriptGameObject* self, ETaskState state, pcstr task_id) constexpr
         {
             self->SetGameTaskState(state, task_id, ROOT_TASK_OBJECTIVE);
         })
         .def("give_task", &CScriptGameObject::GiveTaskToActor, adopt<2>())
-        .def("give_task", +[](CScriptGameObject* self, CGameTask* t, u32 dt, bool bCheckExisting)
+        .def("give_task", +[](CScriptGameObject* self, CGameTask* t, u32 dt, bool bCheckExisting) constexpr
         {
             self->GiveTaskToActor(t, dt, bCheckExisting, 0);
         }, adopt<2>())
@@ -239,7 +239,7 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("switch_to_upgrade", &CScriptGameObject::SwitchToUpgrade)
         .def("switch_to_talk", &CScriptGameObject::SwitchToTalk)
         .def("run_talk_dialog", &CScriptGameObject::RunTalkDialog)
-        .def("run_talk_dialog", +[](CScriptGameObject* self, CScriptGameObject* pToWho)
+        .def("run_talk_dialog", +[](CScriptGameObject* self, CScriptGameObject* pToWho) constexpr
         {
             self->RunTalkDialog(pToWho, false);
         })

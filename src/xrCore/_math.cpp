@@ -209,7 +209,7 @@ void _initialize_cpu()
     // General CPU identification
     string256 features{};
 
-    const auto listFeature = [&](pcstr featureName, bool hasFeature)
+    const auto listFeature = [&](pcstr featureName, bool hasFeature) constexpr
     {
         if (hasFeature)
         {

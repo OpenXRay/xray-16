@@ -29,14 +29,14 @@ ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/)
     c_table::iterator it;
     if (type == u16(-1))
     {
-        it = std::lower_bound(table.begin(), table.end(), S, [](const ref_constant& C, cpcstr S)
+        it = std::lower_bound(table.begin(), table.end(), S, [](const ref_constant& C, cpcstr S) constexpr
         {
             return xr_strcmp(*C->name, S) < 0;
         });
     }
     else
     {
-        it = std::find_if(table.begin(), table.end(), [&](const ref_constant& constant)
+        it = std::find_if(table.begin(), table.end(), [&](const ref_constant& constant) constexpr
         {
             return 0 == xr_strcmp(constant->name.c_str(), S) && constant->type == type;
         });

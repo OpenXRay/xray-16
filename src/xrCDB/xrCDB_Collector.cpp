@@ -125,7 +125,7 @@ void Collector::calc_adjacency(xr_vector<u32>& dest) const
         ++i;
     }
 
-    std::sort(edges, edges + edge_count, [](const edge& edge0, const edge& edge1)
+    std::sort(edges, edges + edge_count, [](const edge& edge0, const edge& edge1) constexpr
     {
         if (edge0.vertex_id0 < edge1.vertex_id0)
             return (true);

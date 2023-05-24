@@ -516,14 +516,13 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
     // But it must be 0xFFFFFFFF or otherwise some particles won't play
     float angle = float(0xFFFFFFFF); // XXX: check if we can replace with flt_max
 
-    const auto renderParticles = [&, this](const TaskRange<u32>& range)
+    const auto renderParticles = [&, this](const TaskRange<u32>& range) constexpr
     {
         for (u32 i = range.begin(); i != range.end(); ++i)
         {
             PAPI::Particle& m = particles[i];
-            Fvector2 lt, rb;
-            lt.set(0.f, 0.f);
-            rb.set(1.f, 1.f);
+            Fvector2 lt = {0.f, 0.f};
+            Fvector2 rb = {1.f, 1.f};
 
             _mm_prefetch((char*)&particles[i + 1], _MM_HINT_NTA);
 
@@ -559,11 +558,11 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
 
                 if ((speed < EPS_S) && m_Def->m_Flags.is(CPEDef::dfWorldAlign))
                 {
-                    Fmatrix M;
+                    Fmatrix M = {};
                     M.setXYZ(m_Def->m_APDefaultRotation);
                     if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
                     {
-                        Fvector p;
+                        Fvector p = {};
                         m_XFORM.transform_tiny(p, m.pos);
                         M.mulA_43(m_XFORM);
                         FillSprite(pv, M.k, M.i, p, lt, rb, r_x, r_y, m.color, sina, cosa);
@@ -575,7 +574,7 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
                 }
                 else if ((speed >= EPS_S) && m_Def->m_Flags.is(CPEDef::dfFaceAlign))
                 {
-                    Fmatrix M;
+                    Fmatrix M = {};
                     M.identity();
                     M.k.div(m.vel, speed);
                     M.j.set(0, 1, 0);
@@ -587,7 +586,7 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
                     M.j.normalize();
                     if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
                     {
-                        Fvector p;
+                        Fvector p = {};
                         m_XFORM.transform_tiny(p, m.pos);
                         M.mulA_43(m_XFORM);
                         FillSprite(pv, M.j, M.i, p, lt, rb, r_x, r_y, m.color, sina, cosa);
@@ -599,14 +598,14 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
                 }
                 else
                 {
-                    Fvector dir;
+                    Fvector dir = {};
                     if (speed >= EPS_S)
                         dir.div(m.vel, speed);
                     else
                         dir.setHP(-m_Def->m_APDefaultRotation.y, -m_Def->m_APDefaultRotation.x);
                     if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
                     {
-                        Fvector p, d;
+                        Fvector p = {}, d = {};
                         m_XFORM.transform_tiny(p, m.pos);
                         m_XFORM.transform_dir(d, dir);
                         FillSprite(pv, p, d, lt, rb, r_x, r_y, m.color, sina, cosa);
@@ -621,7 +620,7 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
             {
                 if (m_RT_Flags.is(CParticleEffect::flRT_XFORM))
                 {
-                    Fvector p;
+                    Fvector p = {};
                     m_XFORM.transform_tiny(p, m.pos);
                     FillSprite(pv, Device.vCameraTop, Device.vCameraRight, p, lt, rb, r_x, r_y, m.color, sina, cosa);
                 }

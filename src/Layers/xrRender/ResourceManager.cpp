@@ -267,7 +267,7 @@ void CResourceManager::CompatibilityCheck()
 
         bool hq_skinning = true;
         // search for (12.f / 32768.f)
-        const auto check = [&](cpcstr searchBegin, cpcstr searchEnd) -> bool
+        const auto check = [&](cpcstr searchBegin, cpcstr searchEnd) constexpr -> bool
         {
             cpcstr begin = strstr(str.c_str(), searchBegin);
             if (!begin)
@@ -360,7 +360,7 @@ void CResourceManager::DeferredUpload()
         return;
 
 #if defined(USE_DX9) || defined(USE_DX11)
-    xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
+    xr_parallel_for_each(m_textures, [&](auto m_tex) constexpr { m_tex.second->Load(); });
 #elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
         texture.second->Load();
@@ -375,7 +375,7 @@ void CResourceManager::DeferredUnload()
         return;
 
 #if defined(USE_DX9) || defined(USE_DX11)
-    xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
+    xr_parallel_for_each(m_textures, [&](auto m_tex) constexpr { m_tex.second->Unload(); });
 #elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
         texture.second->Unload();

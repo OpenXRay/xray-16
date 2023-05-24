@@ -80,7 +80,7 @@ CLensFlareDescriptor::CLensFlareDescriptor(shared_str sect, CInifile const* pIni
 {
     section = sect;
 
-    const auto read = [&](FlareDescriptorFields f)
+    const auto read = [&](FlareDescriptorFields f) constexpr
     {
         m_Flags.set(flSource, pIni->r_bool(sect, f.line));
         if (m_Flags.is(flSource))

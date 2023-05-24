@@ -51,7 +51,7 @@ PS::PEDIt CPSLibrary::FindPEDIt(LPCSTR Name)
             return it;
     return m_PEDs.end();
 #else
-    PS::PEDIt I = std::lower_bound(m_PEDs.begin(), m_PEDs.end(), Name, [](const PS::CPEDef* a, pcstr b)
+    PS::PEDIt I = std::lower_bound(m_PEDs.begin(), m_PEDs.end(), Name, [](const PS::CPEDef* a, pcstr b) constexpr
     {
         return xr_strcmp(a->Name(), b) < 0;
     });
@@ -77,7 +77,7 @@ PS::PGDIt CPSLibrary::FindPGDIt(LPCSTR Name)
             return it;
     return m_PGDs.end();
 #else
-    PS::PGDIt I = std::lower_bound(m_PGDs.begin(), m_PGDs.end(), Name, [](const PS::CPGDef* a, pcstr b)
+    auto I = std::lower_bound(m_PGDs.begin(), m_PGDs.end(), Name, [](const PS::CPGDef* a, pcstr b) constexpr
     {
         return xr_strcmp(a->m_Name, b) < 0;
     });

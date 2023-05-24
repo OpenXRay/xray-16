@@ -599,7 +599,7 @@ struct CVisibleObjectPredicateEx
 
 void CVisualMemoryManager::remove(const MemorySpace::CVisibleObject* visible_object)
 {
-    VISIBLES::iterator I = std::find_if(m_objects->begin(), m_objects->end(), [&](const MemorySpace::CVisibleObject& object)
+    auto I = std::find_if(m_objects->begin(), m_objects->end(), [&](const MemorySpace::CVisibleObject& object) constexpr
     {
         return visible_object == &object;
     });

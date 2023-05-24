@@ -660,9 +660,9 @@ void LevelGraphDebugRender::DrawNodes()
             pvDecompress(vNorm, it->plane());
             PL.build(vertexPos, vNorm);
             // create vertices
-            auto createVertex = [&](Fplane& pl, const Fvector& v) {
+            auto createVertex = [&](Fplane& pl, const Fvector& v) constexpr {
                 const Fvector up = {0, 1, 0};
-                Fvector result;
+                Fvector result = {};
                 pl.intersectRayPoint(v, up, result);
                 result.mad(result, pl.n, tt);
                 return result;

@@ -56,7 +56,7 @@ void light::gi_generate()
     }
 
     // sort & clip
-    std::sort(indirect.begin(), indirect.end(), [](const light_indirect& A, const light_indirect& B)
+    std::sort(indirect.begin(), indirect.end(), [](const light_indirect& A, const light_indirect& B) constexpr
     {
         return A.E > B.E;
     });

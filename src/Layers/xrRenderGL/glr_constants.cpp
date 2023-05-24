@@ -171,7 +171,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
             L.program = program;
         }
     }
-    sort(table.begin(), table.end(), [](const ref_constant& C1, const ref_constant& C2)
+    sort(table.begin(), table.end(), [](const ref_constant& C1, const ref_constant& C2) constexpr
     {
         return xr_strcmp(C1->name, C2->name) < 0;
     });

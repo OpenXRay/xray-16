@@ -60,7 +60,7 @@ void CPortalTraverser::fade_render()
         return;
 
     // re-sort, back to front
-    std::sort(f_portals.begin(), f_portals.end(), [this](const auto& p1, const auto& p2)
+    std::sort(f_portals.begin(), f_portals.end(), [this](const auto& p1, const auto& p2) constexpr
     {
         const float d1 = i_vBase.distance_to_sqr(p1.first->S.P);
         const float d2 = i_vBase.distance_to_sqr(p2.first->S.P);

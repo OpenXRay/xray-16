@@ -425,9 +425,9 @@ void CUITaskItem::Init(CUIXml& uiXml, LPCSTR path)
     CUIXmlInit::InitWindow(uiXml, path, 0, this);
     m_hint_wt = uiXml.ReadAttribInt(path, 0, "hint_wt", 500);
 
-    const auto init = [&](pcstr name, bool critical = true)
+    const auto init = [&](pcstr name, bool critical = true) constexpr
     {
-        string256 buff;
+        string256 buff = {};
         strconcat(sizeof(buff), buff, path, ":", name);
         m_info[name] = UIHelper::CreateStatic(uiXml, buff, this, critical);
     };

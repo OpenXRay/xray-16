@@ -228,7 +228,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     char c_msaa_current_sample[2];
 
     // options:
-    const auto appendShaderOption = [&](u32 option, cpcstr macro, cpcstr value)
+    const auto appendShaderOption = [&](u32 option, cpcstr macro, cpcstr value) constexpr
     {
         if (option)
             options.add(macro, value);

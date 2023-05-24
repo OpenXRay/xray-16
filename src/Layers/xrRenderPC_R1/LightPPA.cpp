@@ -369,7 +369,8 @@ void CLightR_Manager::render_ffp_light(const light& L)
     const CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     const Fvector* VERTS = DB->get_verts();
 
-    const auto mk_vertex = [](CLightR_Vertex& D, const Fvector& P, const Fvector& /*N*/, const Fvector& C, const float r2)
+    const auto mk_vertex = [](CLightR_Vertex& D, const Fvector& P, const Fvector& /*N*/,
+            const Fvector& C, const float r2) constexpr
     {
         D.P.set(P);
         D.N.set(P); // P use instead of N. Why?

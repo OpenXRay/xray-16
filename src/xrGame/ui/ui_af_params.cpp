@@ -145,7 +145,7 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
     if (m_Prop_line)
         h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
 
-    const auto setValue = [&](UIArtefactParamItem* item)
+    const auto setValue = [&](UIArtefactParamItem* item) constexpr
     {
         item->SetValue(val);
 

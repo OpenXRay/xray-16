@@ -79,7 +79,7 @@ bool AnselManager::Init() const
 
         static auto mutable_this = const_cast<AnselManager*>(this);
 
-        config.startSessionCallback = [](ansel::SessionConfiguration& conf, void* /*context*/)
+        config.startSessionCallback = [](ansel::SessionConfiguration& conf, void* /*context*/) constexpr
         {
             if (!g_pGameLevel)
                 return ansel::kDisallowed;
@@ -129,7 +129,7 @@ bool AnselManager::Init() const
             return ansel::kAllowed;
         };
 
-        config.stopSessionCallback = [](void* /*context*/)
+        config.stopSessionCallback = [](void* /*context*/) constexpr
         {
             bShowPauseString = TRUE;
 

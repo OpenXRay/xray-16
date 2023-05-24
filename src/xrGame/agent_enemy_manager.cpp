@@ -614,7 +614,8 @@ void CAgentEnemyManager::distribute_enemies()
 void CAgentEnemyManager::remove_links(IGameObject* object)
 {
     VERIFY(object);
-    m_wounded.erase(std::remove_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& wounded_enemy)
+    m_wounded.erase(
+            std::remove_if(m_wounded.begin(), m_wounded.end(), [object](const WOUNDED_ENEMY& wounded_enemy) constexpr
     {
         return wounded_enemy.first == object || wounded_enemy.second.first == object->ID();
     }), m_wounded.end());

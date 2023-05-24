@@ -81,7 +81,7 @@ void CCoverManager::compute_static_cover()
     const CLevelGraph& graph = ai().level_graph();
     const u32 levelVertexCount = ai().level_graph().header().vertex_count();
 
-    xr_parallel_for(TaskRange<u32>(0, levelVertexCount), [&](const TaskRange<u32>& range)
+    xr_parallel_for(TaskRange<u32>(0, levelVertexCount), [&](const TaskRange<u32>& range) constexpr
     {
         for (u32 i = range.begin(); i != range.end(); ++i)
         {
