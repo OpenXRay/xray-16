@@ -32,6 +32,7 @@ ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
 ENGINE_API bool g_bRendering = false;
+ENGINE_API int g_menu_fps_limit = 60;
 
 const u32 CRenderDeviceData::MaximalWaitTime = 16;
 constexpr size_t MAX_WINDOW_EVENTS = 32;
@@ -275,7 +276,7 @@ void CRenderDevice::ProcessFrame()
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
 
     else if (Paused())
-        updateDelta = 16; // 16 ms, ~60 FPS max while paused
+        updateDelta = (1000 / g_menu_fps_limit);
 
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);

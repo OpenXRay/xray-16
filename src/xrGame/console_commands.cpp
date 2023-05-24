@@ -112,6 +112,7 @@ int g_inv_highlight_equipped = 0;
 int g_first_person_death = 0;
 int g_normalize_mouse_sens = 0;
 int g_normalize_upgrade_mouse_sens = 0;
+extern int ENGINE_API g_menu_fps_limit;
 
 void register_mp_console_commands();
 //-----------------------------------------------------------
@@ -2125,6 +2126,7 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "g_unload_ammo_after_pick_up", &g_auto_ammo_unload, 0, 1);
     CMD4(CCC_Integer, "g_normalize_mouse_sens", &g_normalize_mouse_sens, 0, 1);
     CMD4(CCC_Integer, "g_normalize_upgrade_mouse_sens", &g_normalize_upgrade_mouse_sens, 0, 1);
+    CMD4(CCC_Integer, "g_menu_fps_limit", &g_menu_fps_limit, 60, 300);
 
     CMD1(CCC_CleanupTasks, "dbg_cleanup_tasks");
 
