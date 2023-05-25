@@ -1,4 +1,4 @@
-﻿//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
 #include "stdafx.h"
 #pragma hdrstop
@@ -1258,8 +1258,7 @@ void CActorTools::CreatePhysicsWorld()
     VERIFY(!physics_world());
     set_mtl_lib(&GMLib);
     os = create_object_space();
-    CRenderDeviceBase *rd = &EDevice;
-    create_physics_world(false, os, 0, rd);
+    create_physics_world(false, os, 0);
 }
 
 void CActorTools::DestroyPhysicsWorld()

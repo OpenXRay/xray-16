@@ -1,7 +1,7 @@
 #ifndef EThumbnailH
 #define EThumbnailH
 
-#include "..\..\..\XrRender\Private\ETextureParams.h"
+#include "Layers/xrRender/ETextureParams.h"
 
 //------------------------------------------------------------------------------
 // Custom class

@@ -5,11 +5,11 @@
 #ifndef EStatsH
 #define EStatsH
 #pragma once
-#include "../../../xrengine/stats.h"
+//#include "../../../xrengine/stats.h"
 // refs
 class CGameFont;
 
-class ENGINE_API CEStats : public CStatsPhysics
+class ENGINE_API CEStats
 {
 public:
 	float fFPS, fRFPS, fTPS;		   // FPS, RenderFPS, TPS

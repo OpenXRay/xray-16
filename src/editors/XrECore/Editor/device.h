@@ -1,24 +1,20 @@
-#ifndef DeviceH
-#define DeviceH
+#pragma once
 
-#include "../../../xrengine/device.h"
 #include "ui_camera.h"
-#include "../../../xrRender/Private/hw.h"
 #include "../../../xrEngine/pure.h"
-#include "../../../xrCore/ftimer.h"
-#include "estats.h"
-#include "../../../xrEngine/shader_xrlc.h"
-#include "../../../xrRender/Private/shader.h"
-#include "../../../xrRender/Private/R_Backend.h"
+#include "Layers/xrRenderDX9/dx9HW.h"
 
-//---------------------------------------------------------------------------
+#include "estats.h"
+#include "Utils\shader_xrlc.h"
+#include "..\..\Layers\xrRender\Shader.h"
+
 // refs
 class CGameFont;
 class CInifile;
 class CResourceManager;
 #undef CreateWindow
-//------------------------------------------------------------------------------
-class ECORE_API CEditorRenderDevice : public CRenderDeviceBase
+
+class ECORE_API CEditorRenderDevice
 {
 	friend class CUI_Camera;
 	friend class TUI;
@@ -121,7 +117,7 @@ public:
 	void ShutDown(void);
 	void Reset(IReader *F, BOOL bKeepTextures);
 
-	IC CTimer *GetTimerGlobal() { return &TimerGlobal; }
+	//IC CTimer *GetTimerGlobal() { return &TimerGlobal; }
 
 	IC float GetRenderArea() { return m_RenderArea; }
 	// Sprite rendering
@@ -189,9 +185,8 @@ public:
 	Shader_xrLC_LIB ShaderXRLC;
 
 private:
-	virtual CStatsPhysics *_BCL StatPhysics();
-	virtual void _BCL AddSeqFrame(pureFrame *f, bool mt);
-	virtual void _BCL RemoveSeqFrame(pureFrame *f);
+	virtual void AddSeqFrame(pureFrame *f, bool mt);
+	virtual void RemoveSeqFrame(pureFrame *f);
 
 private:
 	WNDCLASSEX m_WC;
@@ -199,6 +194,11 @@ private:
 public:
 	void CreateWindow();
 	void DestryWindow();
+
+protected:
+    u32 Timer_MM_Delta;
+    CTimer_paused Timer;
+    CTimer_paused TimerGlobal;
 };
 
 extern ECORE_API CEditorRenderDevice EDevice;
@@ -227,9 +227,9 @@ enum
 	if (EDevice.bReady) \
 		return;
 
-#include "../../../xrCPU_Pipe/xrCPU_Pipe.h"
-ENGINE_API extern xrDispatchTable PSGP;
+//#include "../../../xrCPU_Pipe/xrCPU_Pipe.h"
+//ENGINE_API extern xrDispatchTable PSGP;
 
-#include "../../../xrRender/Private/R_Backend_Runtime.h"
-
-#endif
+#include "xrCore/_plane.h"
+#include "Layers/xrRender/R_Backend.h"
+#include "Layers/xrRender/R_Backend_Runtime.h"

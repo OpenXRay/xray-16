@@ -30,8 +30,8 @@ public:
     ~CImageManager() { ; }
     // texture routines
     void RemoveTexture(LPCSTR fname, EItemType type);
-    BOOL CheckCompliance(LPCSTR fname, int & compl );
-    void CheckCompliance(FS_FileSet &files, FS_FileSet & compl );
+    BOOL CheckCompliance(LPCSTR fname, int & completed);
+    void CheckCompliance(FS_FileSet &files, FS_FileSet & completed);
     int GetTextures(FS_FileSet &files, BOOL bFolder = FALSE);
     int GetTexturesRaw(FS_FileSet &files, BOOL bFolder = FALSE);
     //	int			GetServerModifiedTextures(CLocatorAPI::files_query& files);

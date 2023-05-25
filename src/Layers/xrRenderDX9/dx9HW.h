@@ -30,7 +30,10 @@ public:
     static bool GivenGPUIsIntelGMA(u32 id_vendor, u32 id_device);
 
     std::pair<u32, u32> GetSurfaceSize() const;
+
+#ifndef _EDITOR
     DeviceState GetDeviceState() const;
+#endif
 
 public:
     void BeginScene();
