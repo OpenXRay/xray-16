@@ -372,6 +372,14 @@
             <options_item entry="always_active" group="mm_opt_video_adv" is_integer="1"/>
         </check_always_active>
 
+        <cap_menu_fps_limit x="20" y="3" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_fps_limit</text>
+        </cap_menu_fps_limit>
+
+        <track_menu_fps_limit x="180" y="6" width="235" height="16" step="1" is_integer="1">
+            <options_item entry="g_menu_fps_limit" group="mm_opt_video" depend="runtime"/>
+        </track_menu_fps_limit>
+
         <cap_sun_shafts x="20" y="3" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_sun_shafts</text>
         </cap_sun_shafts>
