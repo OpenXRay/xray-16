@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Tree">
+      <UniqueIdentifier>{1ed51885-0799-4071-ae4b-df1eae541f8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tree\Base">
+      <UniqueIdentifier>{46ad08be-8860-4e32-ab21-23d51c8ccb56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tree\Properties">
+      <UniqueIdentifier>{195fe88c-3b69-456c-b129-41385cf1459e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tree\Choose">
+      <UniqueIdentifier>{ed887730-9b8c-4e31-8094-8b984aedcfbd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="UITextForm.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="UINumericVectorForm.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesListHelper.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesListTypes.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemListHelper.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="UIItemListForm.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="FolderLib.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="UIKeyPressForm.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree\Base\UITreeItem.cpp">
+      <Filter>Tree\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree\Properties\UiPropertiesItem.cpp">
+      <Filter>Tree\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree\Properties\UIPropertiesForm.cpp">
+      <Filter>Tree\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree\Properties\UIPropertiesItem_DrawProp.cpp">
+      <Filter>Tree\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree\Properties\UIPropertiesItem_Mixed.cpp">
+      <Filter>Tree\Properties</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree\Choose\UIChooseFormItem.cpp">
+      <Filter>Tree\Choose</Filter>
+    </ClCompile>
+    <ClCompile Include="Tree\Choose\UIChooseForm.cpp">
+      <Filter>Tree\Choose</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="UITextForm.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="UINumericVectorForm.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemListHelper.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="UIItemListForm.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="FolderLib.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="UIKeyPressForm.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree\Base\UITreeItem.h">
+      <Filter>Tree\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree\Properties\UiPropertiesItem.h">
+      <Filter>Tree\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree\Properties\UIPropertiesForm.h">
+      <Filter>Tree\Properties</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree\Choose\UIChooseFormItem.h">
+      <Filter>Tree\Choose</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree\Choose\UIChooseForm.h">
+      <Filter>Tree\Choose</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

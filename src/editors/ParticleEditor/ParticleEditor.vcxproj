@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Development|Win32">
+      <Configuration>Development</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Development|x64">
+      <Configuration>Development</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\XrEngine\ObjectAnimator.cpp" />
+    <ClCompile Include="..\XrECore\Editor\pDomain.cpp" />
+    <ClCompile Include="noise.cpp" />
+    <ClCompile Include="ParticleEditor.cpp" />
+    <ClCompile Include="ParticleEffectActionsImpl.cpp" />
+    <ClCompile Include="ParticleEffectEditor.cpp" />
+    <ClCompile Include="ParticleGroupEditor.cpp" />
+    <ClCompile Include="PSLibraryEditor.cpp" />
+    <ClCompile Include="StatGraph.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="UILeftBarForm.cpp" />
+    <ClCompile Include="UIMainForm.cpp" />
+    <ClCompile Include="UIMainMenuForm.cpp" />
+    <ClCompile Include="UIRightBarForm.cpp" />
+    <ClCompile Include="UITopBarForm.cpp" />
+    <ClCompile Include="UI_ParticleMain.cpp" />
+    <ClCompile Include="UI_ParticleTools.cpp" />
+    <ClCompile Include="UI_ParticleToolsProps.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="noise.h" />
+    <ClInclude Include="resources\resource.h" />
+    <ClInclude Include="StatGraph.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="UILeftBarForm.h" />
+    <ClInclude Include="UIMainForm.h" />
+    <ClInclude Include="UIMainMenuForm.h" />
+    <ClInclude Include="UIRightBarForm.h" />
+    <ClInclude Include="UITopBarForm.h" />
+    <ClInclude Include="UITopBarForm_ButtonList.h" />
+    <ClInclude Include="UI_ParticleMain.h" />
+    <ClInclude Include="UI_ParticleTools.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\XrCore\XrCore.vcxproj">
+      <Project>{da642d7c-4fff-43dc-98f8-3f96caf1e4ba}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\XrParticles\XrParticles.vcxproj">
+      <Project>{c50a948d-9175-4388-ae07-0cdab7fb69c8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\XrSound\XrSound.vcxproj">
+      <Project>{57601b62-902a-4ec8-bcc7-b6a2e30b0676}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\XrECore\XrECore.vcxproj">
+      <Project>{9187be98-531a-4276-b78e-dba3c8ab8447}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\XrEProps\XrEProps.vcxproj">
+      <Project>{6d47afc7-0557-4bbf-8902-b248f3621419}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\XrEUI\XrEUI.vcxproj">
+      <Project>{7e28883c-db86-4ee8-813a-991ba20c68c9}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\pe.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\ParticleEditor.rc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{19DC7E82-12AF-4110-93CA-E7C30500A3F5}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ParticleEditor</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PreprocessorDefinitions>_EDITOR;_PARTICLE_EDITOR;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\..\XrEngine\;..\..\XrRender\Public;..\..\XrRender\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PreprocessorDefinitions>_EDITOR;_PARTICLE_EDITOR;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\..\XrEngine\;..\..\XrRender\Public;..\..\XrRender\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <OmitFramePointers>false</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <PreprocessorDefinitions>_EDITOR;_PARTICLE_EDITOR;DEBUG;_WINDOWS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\..\XrEngine\;..\..\XrRender\Public;..\..\XrRender\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_EDITOR;_PARTICLE_EDITOR;NDEBUG;_WINDOWS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\..\XrEngine\;..\..\XrRender\Public;..\..\XrRender\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <PreprocessorDefinitions>_EDITOR;_PARTICLE_EDITOR;DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\..\XrEngine\;..\..\XrRender\Public;..\..\XrRender\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <Optimization>Disabled</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <OmitFramePointers>false</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_EDITOR;_PARTICLE_EDITOR;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\..\XrEngine\;..\..\XrRender\Public;..\..\XrRender\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <OmitFramePointers>false</OmitFramePointers>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

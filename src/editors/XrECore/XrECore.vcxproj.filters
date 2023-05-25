@@ -1,0 +1,839 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="WildMagic">
+      <UniqueIdentifier>{9c2f17dd-6257-4111-a7ba-e30888749500}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor">
+      <UniqueIdentifier>{2c3b3e17-20d1-4169-a616-a45ffb634a4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{c54c47ef-21d4-49ba-93fe-8107eaf5eef4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{593c3986-0d03-46a3-af38-f8fdcf08f115}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WildMagic\WmlMath.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlMatrix2.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlMatrix3.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlMatrix4.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlMinimize1.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlMinimizeN.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlQuaternion.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlSystem.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlVector2.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlVector3.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlVector4.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlWinSystem.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\RAPIDMinBox.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlApprGaussPointsFit3.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlBox3.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlContBox3.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlContMinBox3.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="WildMagic\WmlEigen.cpp">
+      <Filter>WildMagic</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="guid.cpp" />
+    <ClCompile Include="Editor\UI_MainMail.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\UI_MainCommand.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ui_main.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\UI_Camera.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\TLSPRITE.CPP">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\SoundManager.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\render.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\PhysicsShellHolderEditorBase.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\pDomain.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ParticleEffectActions.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Library.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ImageManagerLOD.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ImageManagerDO.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ImageManager.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\GeometryCollector.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ExportSkeletonCalculateTB.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ExportSkeleton.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ExportObjectOGFCalculateTB.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ExportObjectOGF.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EThumbnailTexture.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EThumbnailSound.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EThumbnailObject.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EThumbnailGroup.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EThumbnail.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EStats.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Engine.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ELog.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditorPreferences.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditObjectSkin.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditObjectProps.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditObjectMotions.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditObjectIO.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditObjectImport.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditObjectEditor.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditObject.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditMeshRender.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditMeshPick.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditMeshModify.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditMeshIO.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EditMesh.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\EDetailModel.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\du_sphere_part.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\du_sphere.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\du_cylinder.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\du_cone.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\du_box.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\DeviceScreenshot.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\device.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\D3DUtils.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\ColorPicker.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\c_dinput.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\BoneEditor.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\bone.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\xrLoadSurface.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\UI_ToolsCustom.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\cl_collector.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\guid_generator.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Image.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\nv_algebra.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\NVMeshMender.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\ai_sounds.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\bone.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\defines.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\Envelope.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\fmesh.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\GameFont.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\IGame_Persistent.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\IInputReceiver.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\interp.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\motion.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\pure.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\Xr_input.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\xrImage_Resampler.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\SkeletonMotions.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\tntQAVI.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\perlin.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\xrTheora_Surface.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\xrTheora_Stream.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\LightAnimLibrary.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\xrHemisphere.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\FBasicVisual.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\FHierrarhyVisual.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\SkeletonAnimated.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\SkeletonCustom.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\SkeletonRigid.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\SkeletonX.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\ResourceManager_Reset.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_Editor_Selection.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_Screen_SET.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_Editor_Wire.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_Lm(EbB).cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_Model_EbB.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_detail_still.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_tree.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_BmmD.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\tga.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\DetailModel.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\ModelPool.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\ParticleEffect.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\ParticleGroup.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\PSLibrary.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Texture.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\xrRender_console.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\FVisual.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\ParticleEffectDef.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\FProgressive.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\FSkinned.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Animation.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\HWCaps.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\HW.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\dxRenderFactory.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\dxFontRender.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\R_Backend_hemi.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\R_Backend_tree.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\R_Backend_xform.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\R_Backend_Runtime.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\R_Backend_DBG.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\DX9\dx9r_constants_cache.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\r_constants.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\R_DStreams.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\ResourceManager_Loader.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\ResourceManager_Resources.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\ResourceManager.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\SH_Matrix.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\SH_Texture.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\SH_Atomic.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\SH_RT.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\SH_Constant.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Shader.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\tss_def.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_Recorder_StandartBinding.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\blenders\Blender.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\blenders\Blender_Palette.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\blenders\Blender_Recorder.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\TextureDescrManager.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\ETextureParams.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_Recorder_R2.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\stats_manager.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\R1_PC\BlenderDefault.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\R1_PC\Blender_default_aref.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\R1_PC\Blender_Vertex.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\R1_PC\Blender_Vertex_aref.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\R1_PC\Blender_Screen_GRAY.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\R1_PC\Blender_Blur.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\R1_PC\Blender_LaEmB.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\R1_PC\Blender_Model.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\R1_PC\Blender_Shadow_World.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\R_Backend.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrRender\Private\Blender_Particle.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrCPU_Pipe\xrSkin2W.cpp" />
+    <ClCompile Include="Editor\UIRenderForm.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\UISoundEditorForm.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="StbImage.cpp" />
+    <ClCompile Include="Editor\UIImageEditorForm.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\UIMinimapEditorForm.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\UILogForm.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\XrEngine\GameMtlLib.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\UIEditLightAnim.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="WildMagic\WmlMath.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlMatrix.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlMatrix2.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlMatrix3.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlMatrix4.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlMinimize1.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlMinimizeN.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlQuaternion.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlSystem.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlVector.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlVector2.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlVector3.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlVector4.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlWinSystem.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlApprGaussPointsFit3.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlBox3.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlContBox3.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlContMinBox3.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlEigen.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlGMatrix.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="WildMagic\WmlGVector.h">
+      <Filter>WildMagic</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Editor\UI_MainCommand.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ui_main.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\UI_Camera.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\TLSPRITE.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\SoundManager.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\SkeletonVert.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\SkeletonFace.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\render.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\PropSlimTools.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\pick_defs.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\PhysicsShellHolderEditorBase.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ParticleEffectActions.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\lwo2.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\LW_ShaderDef.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Library.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\itterate_adjacents_dynamic.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ImageManager.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\GeometryCollector.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ExportSkeleton.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ExportObjectOGF.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\EThumbnail.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\EStats.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\engine.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ELog.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\EditorPreferences.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\EditObject.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\EditMesh.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\EDetailModel.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\du_sphere_part.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\du_sphere.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\du_cylinder.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\du_cone.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\du_box.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\device.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\D3DX_Wrapper.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\D3DUtils.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ColorPicker.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\ArbitraryList.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\UI_ToolsCustom.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\cl_collector.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\cl_intersect.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\guid_generator.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Image.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\nv_algebra.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\nv_math.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\nv_mathdecl.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\NVMeshMender.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Texture.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\ai_sounds.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\itterate_adjacents.h" />
+    <ClInclude Include="Editor\UIRenderForm.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\EditorChooseEvents.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\UISoundEditorForm.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\UIImageEditorForm.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\UIMinimapEditorForm.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\UILogForm.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\UIEditLightAnim.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="WildMagic\WmlMath.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlMatrix.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlMatrix2.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlMatrix3.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlMatrix4.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlQuaternion.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlSystem.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlSystem.mcr">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlVector.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlVector2.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlVector3.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlVector4.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlGMatrix.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="WildMagic\WmlGVector.inl">
+      <Filter>WildMagic</Filter>
+    </None>
+    <None Include="Editor\MinimapEditor.dfm">
+      <Filter>Editor</Filter>
+    </None>
+    <None Include="Editor\MinimapEditor.ddp">
+      <Filter>Editor</Filter>
+    </None>
+    <None Include="Editor\LogForm.dfm">
+      <Filter>Editor</Filter>
+    </None>
+    <None Include="Editor\ImageEditor.dfm">
+      <Filter>Editor</Filter>
+    </None>
+    <None Include="Editor\ImageEditor.ddp">
+      <Filter>Editor</Filter>
+    </None>
+  </ItemGroup>
+</Project>

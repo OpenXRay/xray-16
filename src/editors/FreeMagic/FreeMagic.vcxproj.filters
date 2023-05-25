@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MgcCont3DBox.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcCont3DCylinder.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcCont3DMinBox.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcCont3DMinSphere.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcConvexHull2D.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcDist3DVecLin.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcEigen.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcLinearSystem.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcMath.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcMatrix3.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcMinimize1D.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcMinimizeND.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcQuaternion.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcTriangleMesh.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcVector2.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcVector3.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcAppr3DGaussPointsFit.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcAppr3DLineFit.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcAppr3DPlaneFit.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="MgcBox3.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MgcCont3DBox.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcCont3DCylinder.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcCont3DMinBox.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcCont3DMinSphere.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcConvexHull2D.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcConvexHull3D.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcCylinder.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcDist3DVecLin.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcEigen.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcLine3.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcLinearSystem.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcMath.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcMatrix3.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcMinimize1D.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcMinimizeND.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcQuaternion.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcRay3.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcRTLib.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcSegment3.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcSmallSet.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcSphere.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcTriangleMesh.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcVector2.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcVector3.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MagicFMLibType.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcAppr3DGaussPointsFit.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcAppr3DLineFit.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcAppr3DPlaneFit.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="MgcBox3.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MgcConvexHull2D.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcConvexHull3D.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcCylinder.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcEigen.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcLine3.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcLinearSystem.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcMath.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcMatrix3.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcMinimize1D.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcMinimizeND.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcRay3.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcSegment3.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcSmallSet.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcSphere.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcTriangleMesh.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcVector2.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcVector3.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+    <None Include="MgcBox3.inl">
+      <Filter>Файлы заголовков</Filter>
+    </None>
+  </ItemGroup>
+</Project>
