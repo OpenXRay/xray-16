@@ -376,8 +376,11 @@
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_fps_limit</text>
         </cap_menu_fps_limit>
 
-        <track_menu_fps_limit x="180" y="6" width="235" height="16" step="1" is_integer="1">
+        <track_menu_fps_limit x="180" y="5" width="205" height="20" min="60" max="300" step="1" is_integer="1">
             <options_item entry="g_menu_fps_limit" group="mm_opt_video" depend="runtime"/>
+            <output_wnd x="215" y="0" width="20" height="20">
+                <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">60</text>
+            </output_wnd>
         </track_menu_fps_limit>
 
         <cap_sun_shafts x="20" y="3" width="135" height="24">
