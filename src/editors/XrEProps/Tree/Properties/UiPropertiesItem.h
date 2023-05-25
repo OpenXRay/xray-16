@@ -1,5 +1,7 @@
 #pragma once
 
+class UIPropertiesForm;
+
 class XREPROPS_API UIPropertiesItem : public UITreeItem
 {
 public:

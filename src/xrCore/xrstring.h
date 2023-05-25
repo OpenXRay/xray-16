@@ -182,6 +182,9 @@ public:
     }
 };
 
+DEFINE_VECTOR(shared_str, RStringVec, RStringVecIt);
+DEFINE_SET(shared_str, RStringSet, RStringSetIt);
+
 #ifdef BREAK_AT_STRCMP
 XRCORE_API int xr_strcmp(const char* S1, const char* S2);
 #else

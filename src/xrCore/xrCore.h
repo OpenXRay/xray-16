@@ -65,6 +65,8 @@ struct XRCORE_API xr_rtoken
     bool equal(pcstr _nm) const { return (0 == xr_strcmp(*name, _nm)); }
 };
 
+DEFINE_VECTOR(xr_rtoken, RTokenVec, RTokenVecIt);
+
 #include "xr_shortcut.h"
 
 #include "FS.h"

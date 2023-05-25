@@ -76,7 +76,7 @@ inline void Style()
     style.WindowBorderSize = 1;
     style.ChildBorderSize = 1;
     style.PopupBorderSize = 1;
-    style.FrameBorderSize = is3D;
+    style.FrameBorderSize = static_cast<float>(is3D);
 
     style.WindowRounding = 3;
     style.ChildRounding = 3;
@@ -85,7 +85,7 @@ inline void Style()
     style.GrabRounding = 3;
 
 #ifdef IMGUI_HAS_DOCK 
-    style.TabBorderSize = is3D;
+    style.TabBorderSize = static_cast<float>(is3D);
     style.TabRounding = 3;
 
     colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);

@@ -19,7 +19,7 @@ int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpDa
     return 0;
 }
 
-bool EFS_Utils::GetOpenName(LPCSTR initial, xr_string& buffer, bool bMulti, LPCSTR offset, int start_flt_ext)
+bool EFS_Utils::GetOpenName(HWND hWnd, LPCSTR initial, xr_string& buffer, bool bMulti, LPCSTR offset, int start_flt_ext)
 {
     char buf[255 * 255]; // max files to select
     xr_strcpy(buf, buffer.c_str());
@@ -42,7 +42,7 @@ bool EFS_Utils::GetOpenName(LPCSTR initial, xr_string& buffer, bool bMulti, LPCS
      }
      */
     // bool bRes = false;
-    bool bRes = GetOpenNameInternal(initial, buf, sizeof(buf), bMulti, offset, start_flt_ext);
+    bool bRes = GetOpenNameInternal(hWnd, initial, buf, sizeof(buf), bMulti, offset, start_flt_ext);
 
     if (bRes)
         buffer = (char*)buf;

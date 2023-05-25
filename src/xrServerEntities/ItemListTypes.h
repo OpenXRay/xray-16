@@ -7,7 +7,7 @@
 class ListItem
 {
     friend class CListHelper;
-    friend class TItemList;
+    friend class UIItemListForm;
     shared_str key;
     int type;
     void* item;
@@ -17,13 +17,16 @@ public:
     typedef fastdelegate::FastDelegate1<ListItem*> TOnClick;
     TOnClick OnClickEvent;
     TOnListItemFocused OnItemFocused;
-    TOnDrawThumbnail OnDrawThumbnail;
 
 public:
+#ifdef XR_PLATFORM_WINDOWS
+    UIItemListForm* Parent;
+#endif
     int tag;
     LPVOID m_Object;
     int icon_index;
     u32 prop_color;
+    bool selected;
 
 public:
     enum
@@ -39,8 +42,8 @@ public:
 
 public:
     ListItem(int _type)
-        : type(_type), prop_color(0), item(nullptr), key(nullptr), tag(0), icon_index(-1), OnDrawThumbnail(nullptr), OnItemFocused(nullptr),
-          m_Object(nullptr)
+        : type(_type), prop_color(0), item(nullptr), key(nullptr), tag(0), icon_index(-1), OnItemFocused(nullptr),
+          m_Object(nullptr), selected(false)
     {
         m_Flags.zero();
     }
@@ -54,6 +57,6 @@ public:
     IC void SetIcon(int index) { icon_index = index; }
 };
 
-using ListItemsVec = xr_vector<ListItem*>;
+DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 //---------------------------------------------------------------------------
 #endif

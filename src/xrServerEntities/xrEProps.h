@@ -1,4 +1,3 @@
-#pragma once
 #ifndef xrEPropsH
 #define xrEPropsH
 
@@ -20,21 +19,17 @@ enum EItemType
     TYPE_OBJECT = 1
 };
 
+typedef fastdelegate::FastDelegate2<LPCSTR, LPCSTR> TOnItemClone;
+typedef fastdelegate::FastDelegate1<LPCSTR> TOnItemCreate;
+
 typedef fastdelegate::FastDelegate1<ListItemsVec&> TOnILItemsFocused;
 typedef fastdelegate::FastDelegate0<> TOnILCloseEvent;
 typedef fastdelegate::FastDelegate3<LPCSTR, LPCSTR, EItemType> TOnItemRename;
-typedef fastdelegate::FastDelegate3<LPCSTR, EItemType, bool&> TOnItemRemove;
+typedef fastdelegate::FastDelegate2<LPCSTR, EItemType> TOnItemRemove;
 typedef fastdelegate::FastDelegate0<> TOnItemAfterRemove;
 typedef fastdelegate::FastDelegate0<> TOnCloseEvent;
 typedef fastdelegate::FastDelegate0<> TOnModifiedEvent;
-
-#ifdef __BORLANDC__
-#include "mxPlacemnt.hpp"
-typedef fastdelegate::FastDelegate1<TElTreeItem*> TOnILItemFocused;
-//---------------------------------------------------------------------------
-void XR_EPROPS_API CheckWindowPos(TForm* form);
-//---------------------------------------------------------------------------
-#endif
+typedef fastdelegate::FastDelegate1<ListItem*> TOnILItemFocused;
 
 //------------------------------------------------------------------------------
 // Prepare Key
@@ -117,7 +112,7 @@ public:
         PropItemVec& items, shared_str key, Flags16* val, u16 mask, LPCSTR c0 = nullptr, LPCSTR c1 = nullptr, u32 flags = 0) = 0;
     virtual Flag32Value* CreateFlag32(
         PropItemVec& items, shared_str key, Flags32* val, u32 mask, LPCSTR c0 = nullptr, LPCSTR c1 = nullptr, u32 flags = 0) = 0;
-    virtual Token8Value* CreateToken8(PropItemVec& items, shared_str key, u8* val, const xr_token* token) = 0;
+    virtual Token8Value* CreateToken8(PropItemVec& items, shared_str key, u8* val, xr_token* token) = 0;
     virtual Token16Value* CreateToken16(PropItemVec& items, shared_str key, u16* val, xr_token* token) = 0;
     virtual Token32Value* CreateToken32(PropItemVec& items, shared_str key, u32* val, xr_token* token) = 0;
     virtual RToken8Value* CreateRToken8(
@@ -158,11 +153,7 @@ public:
     virtual CTextValue* CreateTexture(PropItemVec& items, shared_str key, pstr val, u32 sz) = 0;
 };
 //---------------------------------------------------------------------------
-#ifdef __BORLANDC__
-extern "C" XR_EPROPS_API IPropHelper& PHelper();
-#else
 extern IPropHelper& PHelper();
-#endif
 //---------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -179,8 +170,6 @@ public:
         ListItemsVec& items, LPCSTR key, int type, u32 item_flags = 0, void* object = nullptr) = 0;
 };
 
-#ifdef __BORLANDC__
-extern "C" XR_EPROPS_API IListHelper& LHelper();
-#endif
+IListHelper& LHelper();
 
 #endif

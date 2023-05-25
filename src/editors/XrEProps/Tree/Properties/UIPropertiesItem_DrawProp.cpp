@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #define TSTRING_COUNT 10
-const LPSTR TEXTUREString[TSTRING_COUNT] = {"Custom...", "$null", "$base0", "$base1", "$base2", "$base3", "$base4", "$base5", "$base6", "$base7"};
+const LPCSTR TEXTUREString[TSTRING_COUNT] = {"Custom...", "$null", "$base0", "$base1", "$base2", "$base3", "$base4", "$base5", "$base6", "$base7"};
 
 template <typename T>
 inline bool DrawNumeric(PropItem *item, bool &change, bool read_only)
@@ -391,7 +391,7 @@ void UIPropertiesItem::DrawProp()
 			UIChooseForm::SelectItem(V->m_ChooseID, V->subitem, edit_val.c_str(), 0, V->m_FillParam, 0, items.size() ? &items : 0, V->m_ChooseFlags);
 			PropertiesFrom->m_EditChooseValue = prop;
 
-#pragma TODO("TSMP: не надо ли тут тоже Modified() ?")
+#pragma TODO("TSMP: РЅРµ РЅР°РґРѕ Р»Рё С‚СѓС‚ С‚РѕР¶Рµ Modified() ?")
 		}
 	}
 	break;

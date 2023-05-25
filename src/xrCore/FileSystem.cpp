@@ -120,7 +120,7 @@ UINT_PTR CALLBACK OFNHookProcOldStyle(HWND, UINT, WPARAM, LPARAM)
 }
 #endif
 
-bool EFS_Utils::GetOpenNameInternal(
+bool EFS_Utils::GetOpenNameInternal(HWND hWnd,
     LPCSTR initial, pstr buffer, size_t sz_buf, bool bMulti /*= false*/, LPCSTR offset /*= 0*/, int start_flt_ext /*= -1*/)
 {
     VERIFY(buffer && (sz_buf > 0));
@@ -148,7 +148,7 @@ bool EFS_Utils::GetOpenNameInternal(
         }
     }
     ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = GetForegroundWindow();
+    ofn.hwndOwner = hWnd;
     ofn.lpstrDefExt = P.m_DefExt;
     ofn.lpstrFile = buffer;
     ofn.nMaxFile = sz_buf;

@@ -7,6 +7,8 @@
 #endif
 
 #include <limits>
+#include "Common/FSMacros.hpp"
+#include "Common/Platform.hpp"
 #include "..\..\XrCore\xrCore.h"
 #ifdef XREPROPS_EXPORTS
 inline void not_implemented()

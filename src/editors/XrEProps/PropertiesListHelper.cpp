@@ -152,7 +152,7 @@ ColorValue *CPropHelper::CreateFColor(PropItemVec &items, shared_str key, Fcolor
 }
 VectorValue *CPropHelper::CreateVColor(PropItemVec &items, shared_str key, Fvector *val)
 {
-    return (VectorValue *)AppendValue(items, key, xr_new<VectorValue>(val, 0.f, 1.f, 0, 0), PROP_VCOLOR);
+    return (VectorValue *)AppendValue(items, key, xr_new<VectorValue>(val, 0.f, 1.f, 0.f, 0), PROP_VCOLOR);
 }
 RTextValue *CPropHelper::CreateRText(PropItemVec &items, shared_str key, shared_str *val)
 {
@@ -168,7 +168,7 @@ WaveValue *CPropHelper::CreateWave(PropItemVec &items, shared_str key, WaveForm 
 }
 FloatValue *CPropHelper::CreateTime(PropItemVec &items, shared_str key, float *val, float mn, float mx)
 {
-    return (FloatValue *)AppendValue(items, key, xr_new<FloatValue>(val, mn, mx, 0, 0), PROP_TIME);
+    return (FloatValue *)AppendValue(items, key, xr_new<FloatValue>(val, mn, mx, 0.f, 0), PROP_TIME);
 }
 ShortcutValue *CPropHelper::CreateShortcut(PropItemVec &items, shared_str key, xr_shortcut *val)
 {

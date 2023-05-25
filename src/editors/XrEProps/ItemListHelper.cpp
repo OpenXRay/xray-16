@@ -10,7 +10,7 @@ IListHelper &LHelper() { return LHelper_impl; }
 
 ListItem *CListHelper::FindItem(ListItemsVec &items, LPCSTR key)
 {
-    for (ListItemsIt it = items.begin(); it != items.end(); it++)
+    for (auto it = items.begin(); it != items.end(); it++)
         if ((*it)->key == key)
             return *it;
     return 0;
@@ -55,7 +55,7 @@ bool CListHelper::NameAfterEdit(ListItem *sender, LPCSTR value, shared_str &N)
             name++;
         if ((item != sender) && (N == name))
         {
-            // елемент с таким именем уже существует
+            // РµР»РµРјРµРЅС‚ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚
             N = value;
             return false;
         }

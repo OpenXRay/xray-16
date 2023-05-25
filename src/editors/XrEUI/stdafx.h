@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/Platform.hpp"
 #include "..\..\XrCore\xrCore.h"
 #ifdef XREUI_EXPORTS
 #define XREUI_API __declspec(dllexport)

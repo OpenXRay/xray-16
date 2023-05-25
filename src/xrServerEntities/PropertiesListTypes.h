@@ -55,7 +55,7 @@ enum EPropType
 struct xr_token;
 class PropValue;
 class PropItem;
-using PropItemVec = xr_vector<PropItem*>;
+DEFINE_VECTOR(PropItem *, PropItemVec, PropItemIt);
 
 //------------------------------------------------------------------------------
 #include "xrCore/ChooseTypes.H"
@@ -73,7 +73,7 @@ protected:
     PropItem* m_Owner;
 
 public:
-    u32 tag;
+    size_t tag;
 
     // base events
     typedef fastdelegate::FastDelegate1<PropValue*> TOnChange;
@@ -128,7 +128,7 @@ public:
     virtual const T& GetValue() { return *value; }
 
     virtual void ResetValue() { set_value(*value, init_value); }
-
+    
     bool ApplyValue(const T& val)
     {
         if (!(*value == val))
@@ -143,18 +143,18 @@ public:
 class PropItem
 {
     friend class CPropHelper;
-    friend class TProperties;
+    friend class UIPropertiesForm;
     shared_str key;
     EPropType type;
     void* item;
 
 public:
-    using PropValueVec = xr_vector<PropValue*>;
+    DEFINE_VECTOR(PropValue *, PropValueVec, PropValueIt);
 
 private:
     PropValueVec values;
 #ifdef XR_PLATFORM_WINDOWS
-    TProperties* m_Owner;
+    UIPropertiesForm* m_Owner;
 #endif
     // events
 public:
@@ -177,6 +177,7 @@ public:
         flMixed = (1 << 3),
         flDrawThumbnail = (1 << 4),
         flSorted = (1 << 5),
+        flIgnoreMixed = (1 << 6),
     };
     Flags32 m_Flags;
 
@@ -193,7 +194,7 @@ public:
             xr_delete(*it);
     }
 #ifdef XR_PLATFORM_WINDOWS
-    TProperties* Owner() { return m_Owner; }
+    IC UIPropertiesForm* Owner() { return m_Owner; }
 #endif
     void SetName(const shared_str& name) { key = name; }
 
@@ -214,7 +215,7 @@ public:
     xr_string GetDrawText()
     {
         VERIFY(!values.empty());
-        return m_Flags.is(flMixed) ? xr_string("(mixed)") : values.front()->GetDrawText(OnDrawTextEvent);
+        return (m_Flags.is(flMixed) && !m_Flags.is(flIgnoreMixed)) ? xr_string("(mixed)") : values.front()->GetDrawText(OnDrawTextEvent);
     }
 
     void CheckMixed()
@@ -269,26 +270,27 @@ public:
                     CV->OnChangeEvent(*it);
             }
             if (!CV->Equal(values.front()))
+            {
                 m_Flags.set(flMixed, true);
+                m_Flags.set(flIgnoreMixed, false);
+            }
         }
         return bChanged;
     }
 
     PropValueVec& Values() { return values; }
-
+    
     PropValue* GetFrontValue()
     {
         VERIFY(!values.empty());
         return values.front();
     };
     EPropType Type() { return type; }
-#ifdef __BORLANDC__
-    IC TElTreeItem* Item() { return (TElTreeItem*)item; }
-#endif
+
     LPCSTR Key() { return key.c_str(); }
     void Enable(BOOL val) { m_Flags.set(flDisabled, !val); }
     BOOL Enabled() { return !m_Flags.is(flDisabled); }
-
+    
     void OnChange()
     {
         for (auto it = values.begin(); values.end() != it; ++it)
@@ -332,7 +334,7 @@ class CanvasValue : public PropValue
 
 public:
     typedef fastdelegate::FastDelegate3<CanvasValue*, CanvasValue*, bool&> TOnTestEqual;
-    typedef fastdelegate::FastDelegate3<CanvasValue*, void* /* TCanvas* */, const Irect&> TOnDrawCanvasEvent;
+    typedef fastdelegate::FastDelegate1<CanvasValue*> TOnDrawCanvasEvent;
 
     int height;
     TOnTestEqual OnTestEqual;
@@ -504,7 +506,7 @@ public:
     ChooseItemVec* m_Items;
     typedef fastdelegate::FastDelegate1<ChooseValue*> TOnChooseValueFill;
     TOnChooseValueFill OnChooseFillEvent;
-    TOnDrawThumbnail OnDrawThumbnailEvent;
+
     void* m_FillParam;
     // utils
     void AppendChooseItem(LPCSTR name, LPCSTR hint)
@@ -513,9 +515,9 @@ public:
         m_Items->push_back(SChooseItem(name, hint));
     }
 
-    ChooseValue(shared_str* val, u32 cid, LPCSTR path, void* param, u32 sub_item_count, u32 choose_flags)
+        ChooseValue(shared_str* val, u32 cid, LPCSTR path, void* param, u32 sub_item_count, u32 choose_flags)
         : RTextValue(val), m_ChooseID(cid), m_StartPath(path), subitem(sub_item_count), m_Items(nullptr), m_FillParam(param),
-          OnChooseFillEvent(nullptr), OnDrawThumbnailEvent(nullptr), m_ChooseFlags(choose_flags)
+          OnChooseFillEvent(nullptr), m_ChooseFlags(choose_flags)
     {}
 };
 
@@ -673,7 +675,7 @@ public:
 
     FLAG_TYPE mask;
 
-    FlagValue(T* val, FLAG_TYPE _mask, LPCSTR c0, LPCSTR c1, u32 flags)
+       FlagValue(T* val, FLAG_TYPE _mask, LPCSTR c0, LPCSTR c1, u32 flags)
         : CustomValue<T>(val), FlagValueCustom(flags, c0, c1), mask(_mask)
     {}
 
