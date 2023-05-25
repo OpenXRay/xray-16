@@ -92,5 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="imgui.natvis" />
+    <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
 </Project>
