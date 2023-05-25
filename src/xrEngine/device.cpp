@@ -276,7 +276,7 @@ void CRenderDevice::ProcessFrame()
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
 
     else if (Paused())
-        updateDelta = (1000 / g_menu_fps_limit);
+        updateDelta = 1000 / g_menu_fps_limit;
 
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);
