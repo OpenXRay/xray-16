@@ -10,9 +10,6 @@
 
 void CResourceManager::reset_begin()
 {
-    // destroy everything, renderer may use
-    GEnv.Render->reset_begin();
-
     // destroy state-blocks
     for (SState* sstate : v_states)
         _RELEASE(sstate->state);

@@ -94,7 +94,6 @@ void CRender::Render()
     if (m_bFirstFrameAfterReset)
     {
         m_bFirstFrameAfterReset = false;
-        cleanup_contexts();
         return;
     }
 

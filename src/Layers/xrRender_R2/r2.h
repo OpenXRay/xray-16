@@ -72,6 +72,8 @@ struct i_render_phase
         }
 
         flush();
+
+        o.active = false;
     }
 
     void calculate_task(Task&, void*)
