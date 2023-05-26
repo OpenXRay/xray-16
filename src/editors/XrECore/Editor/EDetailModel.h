@@ -1,8 +1,6 @@
-#ifndef EDetailModelH
-#define EDetailModelH
 #pragma once
 
-#include "DetailModel.h"
+#include "Layers/xrRender/DetailModel.h"
 
 // refs
 class CEditableObject;
@@ -109,5 +107,3 @@ public:
     void DefferedLoad();
 };
 DEFINE_VECTOR(EDetail *, DOVec, DOIt);
-
-#endif //_INCDEF_DetailModel_H_

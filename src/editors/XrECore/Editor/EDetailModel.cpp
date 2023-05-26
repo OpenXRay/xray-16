@@ -174,7 +174,7 @@ bool EDetail::Update(LPCSTR name)
     }
     number_indices = inds.size();
     indices = (u16 *)xr_malloc(number_indices * sizeof(u16));
-    Memory.mem_copy(indices, inds.data(), number_indices * sizeof(u16));
+    memcpy(indices, inds.data(), number_indices * sizeof(u16));
 
     bv_bb.getsphere(bv_sphere.P, bv_sphere.R);
 

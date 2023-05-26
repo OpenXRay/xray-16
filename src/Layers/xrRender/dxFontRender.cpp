@@ -5,6 +5,10 @@
 #include "xrEngine/GameFont.h"
 #include "xrCore/Text/StringConversion.hpp"
 
+#ifdef _EDITOR
+#include "xrEngine/xr_level_controller.h"
+#endif
+
 dxFontRender::~dxFontRender()
 {
     pShader.destroy();

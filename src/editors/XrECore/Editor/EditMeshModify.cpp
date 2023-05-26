@@ -90,7 +90,7 @@ void CEditableMesh::RebuildVMaps()
 						int vm_idx = FindVMapByName(nVMaps, vmap->name.c_str(), vmap->type, false);
 						if (-1 == vm_idx)
 						{
-							nVMaps.push_back(xr_new<st_VMap>(vmap->name.c_str(), vmap->type, false));
+							nVMaps.push_back(xr_new<st_VMap>(vmap->name.c_str(), static_cast<u8>(vmap->type), false));
 							vm_idx = nVMaps.size() - 1;
 						}
 						st_VMap *nVMap = nVMaps[vm_idx];
@@ -112,7 +112,7 @@ void CEditableMesh::RebuildVMaps()
 						int vm_idx = FindVMapByName(nVMaps, vmap->name.c_str(), vmap->type, true);
 						if (-1 == vm_idx)
 						{
-							nVMaps.push_back(xr_new<st_VMap>(vmap->name.c_str(), vmap->type, true));
+							nVMaps.push_back(xr_new<st_VMap>(vmap->name.c_str(), static_cast<u8>(vmap->type), true));
 							vm_idx = nVMaps.size() - 1;
 						}
 						st_VMap *nVMapPM = nVMaps[vm_idx];
@@ -139,7 +139,7 @@ void CEditableMesh::RebuildVMaps()
 					int vm_idx = FindVMapByName(nVMaps, vmap->name.c_str(), vmap->type, false);
 					if (-1 == vm_idx)
 					{
-						nVMaps.push_back(xr_new<st_VMap>(vmap->name.c_str(), vmap->type, false));
+						nVMaps.push_back(xr_new<st_VMap>(vmap->name.c_str(), static_cast<u8>(vmap->type), false));
 						vm_idx = nVMaps.size() - 1;
 					}
 					st_VMap *nWMap = nVMaps[vm_idx];
@@ -265,8 +265,8 @@ void CEditableMesh::OptimizeMesh(BOOL NoOpt)
 			for (int y = 0; y < MY + 1; y++)
 				for (int z = 0; z < MZ + 1; z++)
 					VM[x][y][z].clear();
-		VMscale.set(m_Box.max.x - m_Box.min.x + EPS_S, m_Box.max.y - m_Box.min.y + EPS_S, m_Box.max.z - m_Box.min.z + EPS_S);
-		VMmin.set(m_Box.min.x, m_Box.min.y, m_Box.min.z);
+		VMscale.set(m_Box.vMax.x - m_Box.vMin.x + EPS_S, m_Box.vMax.y - m_Box.vMin.y + EPS_S, m_Box.vMax.z - m_Box.vMin.z + EPS_S);
+		VMmin.set(m_Box.vMin.x, m_Box.vMin.y, m_Box.vMin.z);
 
 		VMeps.set(VMscale.x / MX / 2, VMscale.y / MY / 2, VMscale.z / MZ / 2);
 		VMeps.x = (VMeps.x < EPS_L) ? VMeps.x : EPS_L;
@@ -296,7 +296,7 @@ void CEditableMesh::OptimizeMesh(BOOL NoOpt)
 		m_VertCount = m_NewPoints.size();
 		xr_free(m_Vertices);
 		m_Vertices = xr_alloc<Fvector>(m_VertCount);
-		Memory.mem_copy(m_Vertices, &*m_NewPoints.begin(), m_NewPoints.size() * sizeof(Fvector));
+		memcpy(m_Vertices, &*m_NewPoints.begin(), m_NewPoints.size() * sizeof(Fvector));
 
 		if (i_del_face)
 		{

@@ -20,6 +20,7 @@ public:
     void DestroyD3D();
 
     void CreateDevice(SDL_Window* sdlWnd);
+    void CreateDevice(HWND hWnd);
     void DestroyDevice();
 
     void Reset();
@@ -53,6 +54,7 @@ private:
     u32 selectGPU() const;
     D3DFORMAT selectDepthStencil(D3DFORMAT) const;
     bool ThisInstanceIsGlobal() const;
+    void CreateDeviceInternal();
 
 public:
     CHWCaps Caps;
@@ -78,6 +80,11 @@ public:
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;
 #endif
+
+    u32 GetBackBufferWidth() { return DevPP.BackBufferWidth; }
+    u32 GetBackBufferHeight() { return DevPP.BackBufferHeight; }
+    u32 SetBackBufferWidth(u32 val) { DevPP.BackBufferWidth = val; }
+    u32 SetBackBufferHeight(u32 val) { DevPP.BackBufferHeight = val; }
 
 private:
     D3DPRESENT_PARAMETERS DevPP;

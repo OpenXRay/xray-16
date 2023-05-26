@@ -1,13 +1,12 @@
-//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
-#include "gamefont.h"
+#include "xrEngine/GameFont.h"
 #include <sal.h>
 #include "ui_main.h"
 #include "render.h"
-#include "GameMtlLib.h"
-#include "ResourceManager.h"
-#pragma package(smart_init)
+#include "xrEngine/GameMtlLib.h"
+#include "Layers/xrRender/ResourceManager.h"
+
+//#pragma package(smart_init)
 
 CEditorRenderDevice EDevice;
 
@@ -16,8 +15,8 @@ extern int rsDIB_Size;
 
 ENGINE_API BOOL g_bRendering = FALSE;
 
-void _BCL CEditorRenderDevice::AddSeqFrame(pureFrame *f, bool mt) { seqFrame.Add(f, REG_PRIORITY_LOW); }
-void _BCL CEditorRenderDevice::RemoveSeqFrame(pureFrame *f) { seqFrame.Remove(f); }
+void CEditorRenderDevice::AddSeqFrame(pureFrame *f, bool mt) { seqFrame.Add(f, REG_PRIORITY_LOW); }
+void CEditorRenderDevice::RemoveSeqFrame(pureFrame *f) { seqFrame.Remove(f); }
 
 //---------------------------------------------------------------------------
 CEditorRenderDevice::CEditorRenderDevice()
@@ -63,9 +62,70 @@ CEditorRenderDevice::~CEditorRenderDevice()
 	VERIFY(!b_is_Ready);
 }
 
+void UpdateWindowProps(HWND m_hWnd)
+{
+    //	BOOL	bWindowed				= strstr(Core.Params,"-dedicated") ? TRUE : !psDeviceFlags.is	(rsFullscreen);
+    // #ifndef DEDICATED_SERVER
+    //	BOOL	bWindowed				= !psDeviceFlags.is	(rsFullscreen);
+    // #else
+    //	BOOL	bWindowed				= TRUE;
+    // #endif
+
+    BOOL bWindowed = TRUE;
+#ifndef _EDITOR
+    if (!g_dedicated_server)
+        bWindowed = !psDeviceFlags.is(rsFullscreen);
+#endif
+
+    u32 dwWindowStyle = 0;
+    // Set window properties depending on what mode were in.
+
+    if (strstr(Core.Params, "-no_dialog_header"))
+        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = (WS_BORDER | WS_VISIBLE));
+    else
+        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = (WS_OVERLAPPEDWINDOW));
+    // When moving from fullscreen to windowed mode, it is important to
+    // adjust the window size after recreating the device rather than
+    // beforehand to ensure that you get the window size you want.  For
+    // example, when switching from 640x480 fullscreen to windowed with
+    // a 1000x600 window on a 1024x768 desktop, it is impossible to set
+    // the window size to 1000x600 until after the display mode has
+    // changed to 1024x768, because windows cannot be larger than the
+    // desktop.
+
+    RECT m_rcWindowBounds;
+    BOOL bCenter = TRUE;
+    if (strstr(Core.Params, "-center_screen"))
+        bCenter = TRUE;
+
+    if (bCenter)
+    {
+        RECT DesktopRect;
+
+        GetClientRect(GetDesktopWindow(), &DesktopRect);
+
+        SetRect(&m_rcWindowBounds, (DesktopRect.right - HW.GetBackBufferWidth()) / 2,
+            (DesktopRect.bottom - HW.GetBackBufferHeight()) / 2, (DesktopRect.right + HW.GetBackBufferWidth()) / 2,
+            (DesktopRect.bottom + HW.GetBackBufferHeight()) / 2);
+    }
+    else
+    {
+        SetRect(&m_rcWindowBounds, 0, 0, HW.GetBackBufferWidth(), HW.GetBackBufferHeight());
+    }
+
+    AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
+
+    SetWindowPos(m_hWnd, HWND_NOTOPMOST, m_rcWindowBounds.left, m_rcWindowBounds.top,
+        (m_rcWindowBounds.right - m_rcWindowBounds.left), (m_rcWindowBounds.bottom - m_rcWindowBounds.top),
+        SWP_SHOWWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
+}
+
+extern IRenderFactory* RenderFactory;
+extern CRender* Render;
+
 // extern void Surface_Init();
-#include "../../../xrAPI/xrAPI.h"
-#include "../../../xrRender/Private/dxRenderFactory.h"
+#include "Include/xrAPI/xrAPI.h"
+#include "Layers/xrRender/dxRenderFactory.h"
 void CEditorRenderDevice::Initialize()
 {
 	//	m_Camera.Reset();
@@ -98,7 +158,7 @@ void CEditorRenderDevice::Initialize()
 	::Render->Initialize();
 
 	Resize(EPrefs->start_w, EPrefs->start_h, EPrefs->start_maximized);
-	HW.updateWindowProps(m_hWnd);
+	UpdateWindowProps(m_hWnd);
 
 	::ShowWindow(m_hWnd, EPrefs->start_maximized ? SW_SHOWMAXIMIZED : SW_SHOWDEFAULT);
 }
@@ -149,7 +209,7 @@ bool CEditorRenderDevice::Create()
 	Statistic = xr_new<CEStats>();
 	ELog.Msg(mtInformation, "Starting RENDER device...");
 
-	HW.CreateDevice(m_hWnd, true);
+	HW.CreateDevice(m_hWnd);
 	if (UI)
 	{
 		string_path ini_path;
@@ -192,8 +252,6 @@ void CEditorRenderDevice::Destroy()
 		return;
 
 	ELog.Msg(mtInformation, "Destroying Direct3D...");
-
-	HW.Validate();
 
 	// before destroy
 	_Destroy(FALSE);
@@ -282,7 +340,7 @@ void CEditorRenderDevice::Resize(int w, int h, bool maximized)
 {
 	if (dwWidth == w && dwHeight == h && dwMaximized == maximized)
 		return;
-	m_RenderArea = w * h;
+	m_RenderArea = static_cast<float>(w * h);
 
 	dwWidth = w;
 	dwHeight = h;
@@ -298,13 +356,12 @@ void CEditorRenderDevice::Reset()
 	Resources->reset_begin();
 	UI->ResetBegin();
 	Memory.mem_compact();
-	HW.DevPP.BackBufferWidth = dwWidth;
-	HW.DevPP.BackBufferHeight = dwHeight;
-	HW.Reset(m_hWnd);
-	dwWidth = HW.DevPP.BackBufferWidth;
-	dwHeight = HW.DevPP.BackBufferHeight;
-	//		fWidth_2			= float(dwWidth/2);
-	//		fHeight_2			= float(dwHeight/2);
+    HW.SetBackBufferWidth(dwWidth);
+	HW.SetBackBufferHeight(dwHeight);
+	HW.Reset();
+    dwWidth = HW.GetBackBufferWidth();    
+	dwHeight = HW.GetBackBufferHeight();
+
 	Resources->reset_end();
 	UI->ResetEnd();
 	_SetupStates();
@@ -319,7 +376,7 @@ BOOL CEditorRenderDevice::Begin()
 	mProject_saved = mProject;
 	mView = mView_saved;
 	vCameraPosition_saved = vCameraPosition;
-	HW.Validate();
+
 	HRESULT _hr = HW.pDevice->TestCooperativeLevel();
 	if (FAILED(_hr))
 	{
@@ -396,7 +453,7 @@ void CEditorRenderDevice::FrameMove()
 	m_Camera.Update(fTimeDelta);
 
 	// process objects
-	seqFrame.Process(rp_Frame);
+	seqFrame.Process();
 }
 
 void CEditorRenderDevice::DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc)

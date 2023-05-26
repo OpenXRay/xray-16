@@ -5,14 +5,14 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "..\..\..\xrEngine\fmesh.h"
+#include "xrCore/FMesh.hpp"
 
 #include "EditObject.h"
 #include "EditMesh.h"
 
 #ifdef _EDITOR
-#include "motion.h"
-#include "bone.h"
+#include "xrCore/Animation/Motion.hpp"
+#include "xrCore/Animation/Bone.hpp"
 #include "ImageManager.h"
 #endif
 

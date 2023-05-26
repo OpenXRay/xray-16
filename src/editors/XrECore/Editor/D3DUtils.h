@@ -5,7 +5,7 @@
 #ifndef D3DUtilsH_included
 #define D3DUtilsH_included
 
-#include "..\..\..\xrRender\Public\DrawUtils.h"
+#include "Include/xrRender/DrawUtils.h"
 //----------------------------------------------------
 
 #ifdef _EDITOR
@@ -27,8 +27,8 @@ struct SPrimitiveBuffer
     u32 p_cnt;
     typedef fastdelegate::FastDelegate0<> TOnRender;
     TOnRender OnRender;
-    void xr_stdcall RenderDIP() { DU_DRAW_DIP(p_type, pGeom, 0, 0, v_cnt, 0, p_cnt); }
-    void xr_stdcall RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
+    void RenderDIP() { DU_DRAW_DIP(p_type, pGeom, 0, 0, v_cnt, 0, p_cnt); }
+    void RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
 
 public:
     SPrimitiveBuffer() : OnRender(0), pGeom(0) { ; }

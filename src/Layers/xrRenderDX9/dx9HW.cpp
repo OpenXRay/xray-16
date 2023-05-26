@@ -1,5 +1,5 @@
 #include "stdafx.h"
-
+#include "Common/RDevice.h"
 #include "dx9HW.h"
 
 CHW HW;
@@ -67,9 +67,35 @@ void CHW::DestroyD3D()
 
 void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 {
+    HWND deviceWindow = nullptr;
+
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
+    {
+        switch (info.subsystem)
+        {
+        case SDL_SYSWM_WINDOWS:
+            deviceWindow = info.info.win.window;
+            break;
+        default: break;
+        }
+    }
+    else
+        Log("! Couldn't get window information: ", SDL_GetError());
+
+    CreateDevice(deviceWindow);
+}
+
+void CHW::CreateDevice(HWND hWnd)
+{
     CreateD3D();
 
+#ifdef _EDITOR
+    const bool bWindowed = true;
+#else
     const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
+#endif
 
     m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
@@ -150,13 +176,8 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     D3DPRESENT_PARAMETERS& P = DevPP;
     ZeroMemory(&P, sizeof(P));
 
-#ifdef _EDITOR
-    P.BackBufferWidth = EDevice.m_RenderWidth;
-    P.BackBufferHeight = EDevice.m_RenderHeight;
-#else
-    P.BackBufferWidth = Device.dwWidth;
-    P.BackBufferHeight = Device.dwHeight;
-#endif
+    P.BackBufferWidth = RDEVICE.dwWidth;
+    P.BackBufferHeight = RDEVICE.dwHeight;
 
     // Back buffer
     BackBufferCount = 1;
@@ -169,22 +190,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
     // Windoze
     P.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
-
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
-    {
-        switch (info.subsystem)
-        {
-        case SDL_SYSWM_WINDOWS:
-            P.hDeviceWindow = info.info.win.window;
-            break;
-        default: break;
-        }
-    }
-    else
-        Log("! Couldn't get window information: ", SDL_GetError());
-
+    P.hDeviceWindow = hWnd;
     P.Windowed = bWindowed;
 
     // Depth/stencil

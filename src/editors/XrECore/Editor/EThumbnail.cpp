@@ -49,7 +49,7 @@ void DrawThumbnail(TCanvas* pCanvas, TRect& r, U32Vec& data, bool bDrawWithAlpha
         for (int y = 0; y < pBitmap->Height; y++)
         {
             u32* ptr 		= (u32*)pBitmap->ScanLine[y];
-            Memory.mem_copy	(ptr,&data[(_h-1-y)*_w],_w*4);
+            memcpy	(ptr,&data[(_h-1-y)*_w],_w*4);
         }
     }
     pCanvas->StretchDraw(r,pBitmap);

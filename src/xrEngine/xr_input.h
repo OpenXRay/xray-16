@@ -139,9 +139,12 @@ public:
 
     void iGetAsyncScrollPos(Ivector2& p) const;
     void iGetAsyncMousePos(Ivector2& p) const;
-    void iSetMousePos(const Ivector2& p) const;
 
+#ifndef _EDITOR
+    void iSetMousePos(const Ivector2& p) const;
     void GrabInput(const bool grab);
+#endif
+
     bool InputIsGrabbed() const;
 
     void RegisterKeyMapChangeWatcher(pureKeyMapChanged* watcher, int priority = REG_PRIORITY_NORMAL);
@@ -161,8 +164,12 @@ public:
 
     auto GetCurrentInputType() { return currentInputType; }
 public:
+
+#ifndef _EDITOR
     void ExclusiveMode(const bool exclusive);
     bool IsExclusiveMode() const;
+#endif
+
     bool GetKeyName(const int dik, pstr dest, int dest_sz);
 
     /**

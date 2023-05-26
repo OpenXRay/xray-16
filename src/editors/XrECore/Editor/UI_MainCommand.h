@@ -45,7 +45,7 @@ enum
 
     COMMAND_MUTE_SOUND,
 
-    // имеют разную реализацию
+    // РёРјРµСЋС‚ СЂР°Р·РЅСѓСЋ СЂРµР°Р»РёР·Р°С†РёСЋ
     COMMAND_CLEAR,
     COMMAND_LOAD,
     COMMAND_SAVE,
@@ -106,7 +106,7 @@ public:
 
 typedef fastdelegate::FastDelegate2<CCommandVar, CCommandVar, CCommandVar> TECommandEvent;
 
-class SECommand;
+struct SECommand;
 
 struct ECORE_API SESubCommand
 {

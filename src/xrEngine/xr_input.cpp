@@ -65,7 +65,9 @@ CInput::CInput(const bool exclusive)
 
 CInput::~CInput()
 {
+#ifndef _EDITOR
     GrabInput(false);
+#endif
 
     for (auto& controller : controllers)
         SDL_GameControllerClose(controller);
@@ -216,6 +218,7 @@ void CInput::KeyUpdate()
         }
     }
 
+#ifndef _EDITOR
     if (keyboardState[SDL_SCANCODE_F4] && (keyboardState[SDL_SCANCODE_LALT] || keyboardState[SDL_SCANCODE_RALT]))
     {
         AltF4Pressed = true;
@@ -223,6 +226,7 @@ void CInput::KeyUpdate()
         Engine.Event.Defer("KERNEL:quit");
         return;
     }
+#endif
 
     if (count)
         SetCurrentInputType(KeyboardMouse);
@@ -508,6 +512,7 @@ void CInput::iGetAsyncMousePos(Ivector2& p) const
     SDL_GetMouseState(&p.x, &p.y);
 }
 
+#ifndef _EDITOR
 void CInput::iSetMousePos(const Ivector2& p) const
 {
     SDL_WarpMouseInWindow(Device.m_sdlWnd, p.x, p.y);
@@ -529,6 +534,7 @@ void CInput::GrabInput(const bool grab)
     // We're done here.
     inputGrabbed = grab;
 }
+#endif
 
 bool CInput::InputIsGrabbed() const
 {
@@ -614,7 +620,9 @@ void CInput::OnFrame(void)
     stats.FrameStart();
     stats.FrameTime.Begin();
 
+#ifndef _EDITOR
     if (Device.dwPrecacheFrame == 0 && !Device.IsAnselActive)
+#endif
     {
         ControllerUpdate();
         KeyUpdate();
@@ -633,6 +641,7 @@ IInputReceiver* CInput::CurrentIR()
     return nullptr;
 }
 
+#ifndef _EDITOR
 void CInput::ExclusiveMode(const bool exclusive)
 {
     GrabInput(false);
@@ -650,6 +659,7 @@ bool CInput::IsExclusiveMode() const
 {
     return exclusiveInput;
 }
+#endif
 
 void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
 {

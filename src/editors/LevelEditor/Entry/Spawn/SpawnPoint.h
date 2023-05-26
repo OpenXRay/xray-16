@@ -179,7 +179,7 @@ public:
     void UseSimulatePose();
 
 public:
-    virtual IKinematics *_BCL ObjectKinematics()
+    virtual IKinematics *ObjectKinematics()
     {
         if (!m_SpawnData.m_Visual || !m_SpawnData.m_Visual->visual)
             return 0;

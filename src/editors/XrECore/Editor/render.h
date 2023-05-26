@@ -51,6 +51,7 @@ public:
 	// Data
 	CFrustum ViewBase;
 	CPSLibrary PSLibrary;
+    bool m_hq_skinning = false;
 
 	CModelPool *Models;
     IRender::RenderStatistics BasicStats;

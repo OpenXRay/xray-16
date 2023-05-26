@@ -32,12 +32,9 @@
     <ClCompile Include="..\..\XrEngine\GameMtlLib.cpp" />
     <ClCompile Include="..\..\XrEngine\IGame_Persistent.cpp" />
     <ClCompile Include="..\..\XrEngine\IInputReceiver.cpp" />
-    <ClCompile Include="..\..\XrCore\Animation\interp.cpp" />
     <ClCompile Include="..\..\XrEngine\LightAnimLibrary.cpp" />
-    <ClCompile Include="..\..\XrCore\Animation\motion.cpp" />
     <ClCompile Include="..\..\XrEngine\perlin.cpp" />
     <ClCompile Include="..\..\XrEngine\pure.cpp" />
-    <ClCompile Include="..\..\XrCore\Animation\SkeletonMotions.cpp" />
     <ClCompile Include="..\..\XrEngine\tntQAVI.cpp" />
     <ClCompile Include="..\..\XrEngine\xrHemisphere.cpp" />
     <ClCompile Include="..\..\XrEngine\xrImage_Resampler.cpp" />

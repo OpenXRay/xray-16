@@ -41,7 +41,9 @@ IGame_Persistent::IGame_Persistent()
 
     m_pMainMenu = nullptr;
 
+#ifndef _EDITOR
     pEnvironment = xr_new<CEnvironment>();
+#endif
 
     m_pGShaderConstants = xr_new<ShadersExternalData>(); //--#SM+#--
 }

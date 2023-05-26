@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "xrCDB/Frustum.h"
+#include "Common/RDevice.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
@@ -34,7 +35,7 @@ void CBackend::OnFrameBegin()
 {
     if (!GEnv.isDedicatedServer)
     {
-        PGO(Msg("PGO:*****frame[%d]*****", Device.dwFrame));
+        PGO(Msg("PGO:*****frame[%d]*****", RDEVICE.dwFrame));
 
 #ifndef USE_DX9
         Invalidate();
@@ -164,7 +165,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
 
     using namespace DirectX;
 
-    const XMMATRIX transform = XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&Device.mFullTransform));
+    const XMMATRIX transform = XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&RDEVICE.mFullTransform));
     XMMATRIX worldToClipMatrixIT = XMMatrixInverse(nullptr, transform);
     worldToClipMatrixIT = XMMatrixTranspose(worldToClipMatrixIT);
 

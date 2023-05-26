@@ -1,16 +1,12 @@
-//---------------------------------------------------------------------------
-#ifndef UI_MainH
-#define UI_MainH
-
+#pragma once
 #include "UI_MainCommand.h"
-#include "IInputReceiver.h"
+#include "xrEngine/IInputReceiver.h"
 
 // refs
 class CCustomObject;
 class TUI_Tools;
 class TUI_Tools;
 class C3DCursor;
-//------------------------------------------------------------------------------
 
 enum EEditorState
 {
@@ -313,5 +309,3 @@ void ECORE_API ResetActionToSelect();
         ExecCommand(cmd, p0); \
         bExec = true;         \
     }
-//---------------------------------------------------------------------------
-#endif

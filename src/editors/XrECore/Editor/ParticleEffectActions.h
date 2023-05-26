@@ -85,7 +85,7 @@ public:
     u32 clr;
 
 protected:
-    void PDomain::OnTypeChange(PropValue *sender);
+    void OnTypeChange(PropValue *sender);
 
 public:
     PDomain() {}
@@ -395,6 +395,13 @@ public:
 
     virtual void Compile(IWriter &F);
     virtual void Render(const Fmatrix &parent);
+};
+
+struct XRCORE_API xr_token2
+{
+    LPCSTR name;
+    LPCSTR info;
+    int id;
 };
 
 extern xr_token2 actions_token[];

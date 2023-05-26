@@ -278,6 +278,7 @@ public:
 // refs
 class CBone;
 using BoneVec = xr_vector<CBone*>;
+using BoneIt = BoneVec::iterator;
 
 class XRCORE_API CBone final : public CBoneInstance, public IBoneData
 {

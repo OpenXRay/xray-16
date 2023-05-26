@@ -3,9 +3,10 @@
 #include "PSLibrary.h"
 #include "ParticleEffect.h"
 #include "ParticleGroup.h"
+
 #ifdef _EDITOR
-#include "ParticleEffectActions.h"
-#include "editors/ECore/Editor/ui_main.h"
+#include "Editor/ParticleEffectActions.h"
+#include "Editor/ui_main.h"
 #endif
 
 bool ped_sort_pred(const PS::CPEDef* a, const PS::CPEDef* b) { return xr_strcmp(a->Name(), b->Name()) < 0; }
@@ -136,7 +137,7 @@ bool CPSLibrary::Load2()
 #ifdef _EDITOR
     SPBItem* pb = nullptr;
     if (UI->m_bReady)
-        pb = UI->ProgressStart(files.size(), "Loading particles...");
+        pb = UI->ProgressStart(static_cast<float>(files.size()), "Loading particles...");
 #endif
     FS_FileSet::iterator it = files.begin();
     FS_FileSet::iterator it_e = files.end();

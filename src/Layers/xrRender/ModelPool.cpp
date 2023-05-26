@@ -10,12 +10,12 @@
 #include "FVisual.h"
 #include "FProgressive.h"
 #include "FSkinned.h"
+#include "ParticleGroup.h"
+#include "ParticleEffect.h"
 
 #ifndef _EDITOR
 #include "FLOD.h"
 #include "FTreeVisual.h"
-#include "ParticleGroup.h"
-#include "ParticleEffect.h"
 #endif
 
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
