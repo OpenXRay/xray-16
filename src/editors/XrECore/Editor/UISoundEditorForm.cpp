@@ -212,8 +212,8 @@ void UISoundEditorForm::InitItemList()
     ListItemsVec items;
 
     // fill items
-    FS_FileSetIt it = sound_map.begin();
-    FS_FileSetIt _E = sound_map.end();
+    auto it = sound_map.begin();
+    auto _E = sound_map.end();
     for (; it != _E; it++)
         LHelper().CreateItem(items, it->name.c_str(), 0);
 

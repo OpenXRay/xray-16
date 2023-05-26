@@ -5,13 +5,9 @@
 #ifndef XR_EPROPS_EXPORTS
 #include "ImageManager.h"
 #endif
-#pragma package(smart_init)
 
-//------------------------------------------------------------------------------
 #define THM_TEXTURE_VERSION 0x0012
-//------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
 ETextureThumbnail::ETextureThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbnail(src_name, ETTexture)
 {
     if (!strchr(src_name, '\\'))

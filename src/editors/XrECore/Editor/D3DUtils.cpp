@@ -360,8 +360,8 @@ void CDrawUtilities::DrawDirectionalLight(const Fvector &p, const Fvector &d, fl
     DU_DRAW_DP(D3DPT_LINELIST, vs_L, vBase, 3);
 
     Fbox b;
-    b.min.set(-r, -r, -r);
-    b.max.set(r, r, r);
+    b.vMin.set(-r, -r, -r);
+    b.vMax.set(r, r, r);
 
     DrawLineSphere(p, radius, c, true);
 }

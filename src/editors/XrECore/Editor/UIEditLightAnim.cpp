@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "UIEditLightAnim.h"
-#include "LightAnimLibrary.h"
+#include "xrEngine/LightAnimLibrary.h"
+
 #define POINTER_HEIGHT 35
+
 UIEditLightAnim *UIEditLightAnim::Form = nullptr;
 UIEditLightAnim::UIEditLightAnim()
 {
@@ -96,15 +98,15 @@ void UIEditLightAnim::Draw()
 
                 if (m_PointerWeight != floorf(width))
                 {
-                    m_PointerWeight = floorf(width);
+                    m_PointerWeight = iFloor(width);
                     m_PointerResize = true;
                 }
                 if (m_CurrentItem)
                 {
                     ImVec2 canvas_pos = ImGui::GetCursorScreenPos();
                     ImVec2 canvas_size = ImGui::GetContentRegionAvail();
-                    if (canvas_size.x > m_PointerWeight - 2)
-                        canvas_size.x = m_PointerWeight - 2;
+                    if (canvas_size.x > static_cast<float>(m_PointerWeight - 2))
+                        canvas_size.x = static_cast<float>(m_PointerWeight) - 2;
                     if (canvas_size.y > POINTER_HEIGHT)
                         canvas_size.y = POINTER_HEIGHT;
                     if ((ImGui::GetIO().MousePos.x >= canvas_pos.x && ImGui::GetIO().MousePos.y >= canvas_pos.y) &&
@@ -123,7 +125,7 @@ void UIEditLightAnim::Draw()
                     }
                 }
                 RenderPointer();
-                ImGui::Image(m_PointerTexture, ImVec2(m_PointerWeight, POINTER_HEIGHT));
+                ImGui::Image(m_PointerTexture, ImVec2(static_cast<float>(m_PointerWeight), POINTER_HEIGHT));
             }
             m_Props->Draw();
         }
@@ -316,7 +318,7 @@ void UIEditLightAnim::InitializeItems()
 {
     ListItemsVec items;
     for (LAItemIt it = LALib.Items.begin(); it != LALib.Items.end(); it++)
-        LHelper().CreateItem(items, *(*it)->cName, 0, 0, 0);
+        LHelper().CreateItem(items, (*it)->cName.c_str(), 0, 0, 0);
     m_Items->AssignItems(items);
 }
 
@@ -457,8 +459,8 @@ void UIEditLightAnim::RenderPointer()
             CLAItem::KeyMap &Keys = m_CurrentItem->Keys;
             int last = m_CurrentItem->iFrameCount;
             Keys[last] = Keys.rbegin()->second;
-            CLAItem::KeyPairIt prev_key = Keys.begin();
-            CLAItem::KeyPairIt it = prev_key;
+            auto prev_key = Keys.begin();
+            auto it = prev_key;
             it++;
             float x_prev = (float(prev_key->first) / float(m_CurrentItem->iFrameCount)) * (m_PointerWeight - 2);
             ImVec4 cb;
@@ -467,7 +469,7 @@ void UIEditLightAnim::RenderPointer()
             for (; it != Keys.end(); it++)
             {
                 float x = (it->first / float(m_CurrentItem->iFrameCount)) * (m_PointerWeight - 2);
-                float g_cnt = it->first - prev_key->first;
+                float g_cnt = static_cast<float>(it->first - prev_key->first);
                 for (int k = 0; k < g_cnt; k++)
                 {
                     cb.x = floorf(x_prev + k * segment + 1);
@@ -491,8 +493,8 @@ void UIEditLightAnim::RenderPointer()
             for (auto it = m_CurrentItem->Keys.begin(); it != m_CurrentItem->Keys.end(); it++)
             {
                 int t = iFloor((it->first / float(m_CurrentItem->iFrameCount)) * (m_PointerWeight));
-                cb.x = t - 1 + half_segment;
-                cb.z = t + 2 + half_segment;
+                cb.x = static_cast<float>(t - 1 + half_segment);
+                cb.z = static_cast<float>(t + 2 + half_segment);
                 FillRectPointer(cb, Color);
             }
         }
@@ -501,18 +503,18 @@ void UIEditLightAnim::RenderPointer()
             u32 Color = 0xFF00FF00;
             int t = iFloor((float(m_PointerValue) / float(m_CurrentItem->iFrameCount)) * (m_PointerWeight)) + half_segment;
             ImVec4 rp;
-            rp.x = t;
-            rp.w = 1 + (POINTER_HEIGHT - 2);
-            rp.z = t + 1;
-            rp.y = 1 + (POINTER_HEIGHT - 2) * 0.75f;
+            rp.x = static_cast<float>(t);
+            rp.w = static_cast<float>(1 + (POINTER_HEIGHT - 2));
+            rp.z = static_cast<float>(t + 1);
+            rp.y = static_cast<float>(1 + (POINTER_HEIGHT - 2) * 0.75f);
             FillRectPointer(rp, 0xFF00FF00);
             /* if ((iMoveKey >= 0) && (iTgtMoveKey != iMoveKey))
                  t = iFloor((iTgtMoveKey / float(m_CurrentItem->iFrameCount)) * R.Width()) + half_segment;*/
 
-            rp.x = t - 2;
-            rp.y = 1 + 1;
-            rp.z = t + 3;
-            rp.w = (POINTER_HEIGHT - 2) - (POINTER_HEIGHT - 2) * 0.3f - 1;
+            rp.x = static_cast<float>(t - 2);
+            rp.y = static_cast<float>(1 + 1);
+            rp.z = static_cast<float>(t + 3);
+            rp.w = static_cast<float>((POINTER_HEIGHT - 2) - (POINTER_HEIGHT - 2) * 0.3f - 1);
             FrameRectPointer(rp, 0xFFAAAAAA);
             rp.x -= 1;
             rp.z += 1;

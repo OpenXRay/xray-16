@@ -1,34 +1,25 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "EThumbnail.h"
-//#include "ImageManager.h"
-#pragma package(smart_init)
 
-//------------------------------------------------------------------------------
 #define THM_GROUP_VERSION 0x0001
-//------------------------------------------------------------------------------
 #define THM_CHUNK_GROUPPARAM 0x0001
-//------------------------------------------------------------------------------
+
 EGroupThumbnail::EGroupThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbnail(src_name, ETObject)
 {
     if (bLoad)
         Load();
 }
-//------------------------------------------------------------------------------
 
 EGroupThumbnail::~EGroupThumbnail()
 {
     m_Pixels.clear();
 }
-//------------------------------------------------------------------------------
 
 void EGroupThumbnail::CreateFromData(u32 *p, u32 w, u32 h, const SStringVec &lst)
 {
     EImageThumbnail::CreatePixels(p, w, h);
     objects = lst;
 }
-//------------------------------------------------------------------------------
 
 bool EGroupThumbnail::Load(LPCSTR src_name, LPCSTR path)
 {
@@ -114,9 +105,9 @@ void EGroupThumbnail::Save(int age, LPCSTR path)
 
 void EGroupThumbnail::FillProp(PropItemVec &items)
 {
-    PHelper().CreateCaption(items, "Objects\\Count", xr_string(objects.size()).c_str());
+    PHelper().CreateCaption(items, "Objects\\Count", std::to_string(objects.size()).c_str());
     for (SStringVecIt it = objects.begin(); it != objects.end(); it++)
-        PHelper().CreateCaption(items, xr_string().sprintf("Objects\\#%d", it - objects.begin()).c_str(), it->c_str());
+        PHelper().CreateCaption(items, make_string("Objects\\#%d", it - objects.begin()).c_str(), it->c_str());
 }
 //------------------------------------------------------------------------------
 

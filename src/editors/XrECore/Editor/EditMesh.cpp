@@ -1,21 +1,17 @@
-//----------------------------------------------------
-// file: StaticMesh.cpp
-//----------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "EditMesh.h"
 #include "EditObject.h"
-#include "Bone.h"
+#include "xrCore/Animation/Bone.hpp"
 
 #include "face_smoth_flags.h"
 #include "itterate_adjacents.h"
 #include "itterate_adjacents_dynamic.h"
+
 #ifdef _EDITOR
 #include "UI_ToolsCustom.h"
 #endif
-#include "..\XrETools\ETools.h"
+
+#include "utils/ETools/ETools.h"
 
 CEditableMesh::~CEditableMesh()
 {

@@ -184,7 +184,7 @@ void UIImageEditorForm::RegisterModifiedTHM()
     {
         for (THMIt t_it = m_THM_Current.begin(); t_it != m_THM_Current.end(); ++t_it)
         {
-            FS_FileSetIt it = texture_map.find(FS_File((*t_it)->SrcName()));
+            auto it = texture_map.find(FS_File((*t_it)->SrcName()));
             R_ASSERT(it != texture_map.end());
             modif_map.insert(*it);
         }
@@ -227,8 +227,8 @@ void UIImageEditorForm::InitItemList()
 
     ListItemsVec items;
     // fill
-    FS_FileSetIt it = texture_map.begin();
-    FS_FileSetIt _E = texture_map.end();
+    auto it = texture_map.begin();
+    auto _E = texture_map.end();
     for (; it != _E; it++)
     {
         ListItem *I = LHelper().CreateItem(items, it->name.c_str(), 0);
@@ -257,8 +257,8 @@ void UIImageEditorForm::UpdateLib()
         FS_FileSet files = texture_map;
         texture_map.clear();
         xr_string fn;
-        FS_FileSetIt it = files.begin();
-        FS_FileSetIt _E = files.end();
+        auto it = files.begin();
+        auto _E = files.end();
 
         for (; it != _E; it++)
         {

@@ -53,7 +53,7 @@ EScene::EScene()
     m_Locked = 0;
 
     for (int i = 0; i < OBJCLASS_COUNT; i++)
-        m_SceneTools.insert(mk_pair((ObjClassID)i, (ESceneToolBase *)NULL));
+        m_SceneTools.insert(make_pair((ObjClassID)i, (ESceneToolBase *)NULL));
 
     // first init scene graph for objects
     // mapRenderObjects.init(MAX_VISUALS);
@@ -249,7 +249,7 @@ void EScene::Clear(BOOL bEditableToolsOnly)
     m_RTFlags.set(flRT_Unsaved | flRT_Modified, FALSE);
 
     m_GUID = generate_guid();
-    m_OwnerName = xr_string().sprintf("\\\\%s\\%s", Core.CompName, Core.UserName).c_str();
+    m_OwnerName = make_string("\\\\%s\\%s", Core.CompName, Core.UserName).c_str();
     m_CreateTime = time(NULL);
 
     m_SaveCache.free();

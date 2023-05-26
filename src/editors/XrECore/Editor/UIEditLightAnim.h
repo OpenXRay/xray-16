@@ -42,7 +42,7 @@ private:
 	void RenderPointer();
 	void FillRectPointer(const ImVec4 &rect, u32 color, bool plus_one = false);
 	void FrameRectPointer(const ImVec4 &rect, u32 color);
-	float m_PointerWeight;
+	u32 m_PointerWeight;
 	bool m_PointerResize;
 	ID3DTexture2D *m_PointerTexture;
 	u32 *m_PointerRawImage;

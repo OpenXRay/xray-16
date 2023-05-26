@@ -372,7 +372,7 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec &items, ::ListItem *owner)
     for (EPAVecIt s_it = m_EActionList.begin(); s_it != m_EActionList.end(); s_it++)
     {
         u32 clr = (*s_it)->flags.is(EParticleAction::flEnabled) ? 0xFF000000 : 0xFFC0C0C0;
-        shared_str a_pref = PrepareKey(pref, "Actions", xr_string().sprintf("%s (%s)", *(*s_it)->actionType, *(*s_it)->actionName).c_str());
+        shared_str a_pref = PrepareKey(pref, "Actions", make_string("%s (%s)", *(*s_it)->actionType, *(*s_it)->actionName).c_str());
 
         ButtonValue *B = PHelper().CreateButton(items, a_pref, "Up,Down,Remove", ButtonValue::flFirstOnly);
         B->tag = (s_it - m_EActionList.begin());

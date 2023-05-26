@@ -94,11 +94,11 @@ public:
         IWriter *F = FS.w_open(txt_name.c_str());
         if (F)
         {
-            F->w_string(xr_string().sprintf("Map size X x Z:            [%d x %d]", bb_sx, bb_sz).c_str());
-            F->w_string(xr_string().sprintf("Max static vertex per m^2: %d", max_svert).c_str());
-            F->w_string(xr_string().sprintf("Total static vertices:     %d", total_svert).c_str());
-            F->w_string(xr_string().sprintf("Max mu vertex per m^2:     %d", max_muvert).c_str());
-            F->w_string(xr_string().sprintf("Total mu vertices:         %d", total_muvert).c_str());
+            F->w_string(make_string("Map size X x Z:            [%d x %d]", bb_sx, bb_sz).c_str());
+            F->w_string(make_string("Max static vertex per m^2: %d", max_svert).c_str());
+            F->w_string(make_string("Total static vertices:     %d", total_svert).c_str());
+            F->w_string(make_string("Max mu vertex per m^2:     %d", max_muvert).c_str());
+            F->w_string(make_string("Total mu vertices:         %d", total_muvert).c_str());
             FS.w_close(F);
             return true;
         }

@@ -132,7 +132,7 @@ public:
 	IC void insert(u32 iFirstItem, T *p, u32 iNumItems)
 	{
 		for (u32 i = 0; i < iNumItems; i++)
-			*(Item(i + iFirstItem)) = p[i];
+			*(item(i + iFirstItem)) = p[i];
 	}
 	// A copy from another arbitrary list of the same type.
 	IC void insert(u32 iFirstItem, ArbitraryList<T> &other, u32 iFirstOtherItem, u32 iNumItems)

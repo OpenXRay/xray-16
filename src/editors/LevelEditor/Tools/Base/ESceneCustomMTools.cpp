@@ -73,7 +73,7 @@ bool ESceneToolBase::LoadStream(IReader &F)
 void ESceneToolBase::SaveStream(IWriter &F)
 {
     /*
-        xr_string mn	= xr_string().sprintf("\\\\%s\\%s",Core.CompName,Core.UserName).c_str();
+        xr_string mn	= make_string("\\\\%s\\%s",Core.CompName,Core.UserName).c_str();
         time_t mt		= time(NULL);
 
         F.open_chunk	(CHUNK_TOOLS_TAG);

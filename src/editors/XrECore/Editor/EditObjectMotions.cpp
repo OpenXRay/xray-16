@@ -10,13 +10,13 @@
 #include "ui_main.h"
 #endif
 
-#include "motion.h"
-#include "bone.h"
+#include "xrCore/Animation/Motion.hpp"
+#include "xrCore/Animation/Bone.hpp"
 #include "EditMesh.h"
 
 #ifdef _EDITOR
-#include "SkeletonAnimated.h"
-#include "AnimationKeyCalculate.h"
+#include "Layers/xrRender/SkeletonAnimated.h"
+#include "Layers/xrRender/AnimationKeyCalculate.h"
 #endif
 
 #ifndef _EDITOR

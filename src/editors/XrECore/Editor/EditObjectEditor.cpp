@@ -1,14 +1,12 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "motion.h"
-#include "bone.h"
+#include "xrCore/Animation/Motion.hpp"
+#include "xrCore/Animation/Bone.hpp"
 #include "d3dutils.h"
 #include "ui_main.h"
 #include "render.h"
-#include "ResourceManager.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "ImageManager.h"
 
 const float tex_w = LOD_SAMPLE_COUNT * LOD_IMAGE_SIZE;
@@ -308,7 +306,7 @@ void CEditableObject::DefferedLoadRP()
         vs_SkeletonGeom.create(FVF_SV, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 
     //*/
-    // ñîçäàòü LOD shader
+    // ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒ LOD shader
     xr_string l_name = GetLODTextureName();
     xr_string fname = xr_string(l_name) + xr_string(".dds");
     m_LODShader.destroy();
@@ -323,11 +321,11 @@ void CEditableObject::DefferedUnloadRP()
         return;
     // skeleton
     vs_SkeletonGeom.destroy();
-    // óäàëèòü áóôåðà
+    // ÑƒÐ´Ð°Ð»Ð¸Ñ‚ÑŒ Ð±ÑƒÑ„ÐµÑ€Ð°
     for (EditMeshIt _M = m_Meshes.begin(); _M != m_Meshes.end(); _M++)
         if (*_M)
             (*_M)->GenerateRenderBuffers();
-    // óäàëèòü shaders
+    // ÑƒÐ´Ð°Ð»Ð¸Ñ‚ÑŒ shaders
     for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
         (*s_it)->OnDeviceDestroy();
     // LOD

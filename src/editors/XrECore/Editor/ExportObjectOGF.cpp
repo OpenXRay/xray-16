@@ -1,20 +1,15 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "ExportObjectOGF.h"
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "fmesh.h"
-#include "motion.h"
-
-#ifdef _EDITOR
-#endif
+#include "xrCore/FMesh.hpp"
+#include "xrCore/Animation/Motion.hpp"
 
 CObjectOGFCollectorPacked::CObjectOGFCollectorPacked(const Fbox &bb, int apx_vertices, int apx_faces)
 {
     // Params
-    m_VMscale.set(bb.max.x - bb.min.x + EPS, bb.max.y - bb.min.y + EPS, bb.max.z - bb.min.z + EPS);
-    m_VMmin.set(bb.min).sub(EPS);
+    m_VMscale.set(bb.vMax.x - bb.vMin.x + EPS, bb.vMax.y - bb.vMin.y + EPS, bb.vMax.z - bb.vMin.z + EPS);
+    m_VMmin.set(bb.vMin).sub(EPS);
     m_VMeps.set(m_VMscale.x / clpOGFMX / 2, m_VMscale.y / clpOGFMY / 2, m_VMscale.z / clpOGFMZ / 2);
     m_VMeps.x = (m_VMeps.x < EPS_L) ? m_VMeps.x : EPS_L;
     m_VMeps.y = (m_VMeps.y < EPS_L) ? m_VMeps.y : EPS_L;

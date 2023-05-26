@@ -205,8 +205,8 @@ void UIObjectTool::RefreshListInternal()
 
     if (Lib.GetObjects(lst))
     {
-        FS_FileSetIt it = lst.begin();
-        FS_FileSetIt _E = lst.end();
+        auto it = lst.begin();
+        auto _E = lst.end();
         for (; it != _E; it++)
         {
             xr_string fn;

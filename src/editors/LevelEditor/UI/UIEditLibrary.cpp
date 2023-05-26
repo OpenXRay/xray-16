@@ -66,8 +66,8 @@ void UIEditLibrary::InitObjects()
 
 	if (Lib.GetObjects(lst))
 	{
-		FS_FileSetIt it = lst.begin();
-		FS_FileSetIt _E = lst.end();
+		auto it = lst.begin();
+		auto _E = lst.end();
 		for (; it != _E; it++)
 		{
 			xr_string fn;
@@ -83,8 +83,8 @@ void UIEditLibrary::InitObjects()
  //   //ListItemsVec items;
  //   FS_FileSet lst;
  //   Lib.GetObjects(lst);
- //   FS_FileSetIt it = lst.begin();
- //   FS_FileSetIt _E = lst.end();
+ //   auto it = lst.begin();
+ //   auto _E = lst.end();
  //   for (; it != _E; it++)
  //       LHelper().CreateItem(m_Items, it->name.c_str(), 0, 0, 0);
  //   //m_Items->AssignItems(items, false, true);

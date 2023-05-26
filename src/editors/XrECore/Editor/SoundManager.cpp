@@ -153,8 +153,8 @@ void CSoundManager::SafeCopyLocalToServer(FS_FileSet& files)
     FS.update_path	  	(p_import,_import_,"");
     FS.update_path	  	(p_sounds,_sounds_,"");
 
-    FS_FileSetIt it	= files.begin();
-    FS_FileSetIt _E 	= files.end();
+    auto it	= files.begin();
+    auto _E 	= files.end();
     for (; it!=_E; it++){
         // copy thm
         xr_string fn 	= EFS.ChangeFileExt(it->first,".thm");
@@ -252,8 +252,8 @@ void CSoundManager::SynchronizeSounds(bool sync_thm, bool sync_game, bool bForce
     if (bProgress)
         pb = UI->ProgressStart(M_BASE.size(), "Synchronize sounds...");
 
-    FS_FileSetIt it = M_BASE.begin();
-    FS_FileSetIt it_e = M_BASE.end();
+    auto it = M_BASE.begin();
+    auto it_e = M_BASE.end();
     for (; it != it_e; ++it)
     {
         BOOL bUpdated = FALSE;
@@ -264,9 +264,9 @@ void CSoundManager::SynchronizeSounds(bool sync_thm, bool sync_game, bool bForce
         if (!FS.exist(fn))
             continue;
 
-        FS_FileSetIt th = M_THUM.find(base_name);
+        auto th = M_THUM.find(base_name);
         bool bThm = ((th == M_THUM.end()) || ((th != M_THUM.end()) && (th->time_write != it->time_write)));
-        FS_FileSetIt gm = M_GAME.find(base_name);
+        auto gm = M_GAME.find(base_name);
         bool bGame = bThm || ((gm == M_GAME.end()) || ((gm != M_GAME.end()) && (gm->time_write != it->time_write)));
 
         ESoundThumbnail *THM = 0;
@@ -339,8 +339,8 @@ void CSoundManager::CleanupSounds()
     FS.file_list(M_THUM, _sounds_, FS_ListFiles | FS_ClampExt, "*.thm");
     FS.file_list(M_GAME, _game_sounds_, FS_ListFiles | FS_ClampExt, "*.ogg");
 
-    FS_FileSetIt it;
-    FS_FileSetIt it_e;
+    auto it;
+    auto it_e;
 
     // check source exist
     it = M_GAME.begin();
@@ -350,7 +350,7 @@ void CSoundManager::CleanupSounds()
     {
         xr_string base_name = EFS.ChangeFileExt(it->name, "");
         xr_strlwr(base_name);
-        FS_FileSetIt bs = M_BASE.find(base_name);
+        auto bs = M_BASE.find(base_name);
 
         if (bs == M_BASE.end())
             M_GAME_DEL.insert(*it);
@@ -362,7 +362,7 @@ void CSoundManager::CleanupSounds()
     {
         xr_string base_name = EFS.ChangeFileExt(it->name, "");
         xr_strlwr(base_name);
-        FS_FileSetIt bs = M_BASE.find(base_name);
+        auto bs = M_BASE.find(base_name);
         if (bs == M_BASE.end())
             M_THM_DEL.insert(*it);
     }
@@ -407,8 +407,8 @@ void CSoundManager::ChangeFileAgeTo(FS_FileSet* tgt_map, int age)
     // change
     SPBItem* pb=0;
     if (M_BASE->size()>1) pb	= UI->ProgressStart(M_BASE->size(),"Change sounds age...");
-    FS_FileSetIt it			= M_BASE->begin();
-    FS_FileSetIt _E 			= M_BASE->end();
+    auto it			= M_BASE->begin();
+    auto _E 			= M_BASE->end();
     for (; it!=_E; it++){
         xr_string base_name	= EFS.ChangeFileExt(it->first,""); xr_strlwr(base_name);
         xr_string	wav_fn,thm_fn,ogg_fn;

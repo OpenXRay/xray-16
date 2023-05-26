@@ -47,8 +47,8 @@ namespace ChoseEvents
         FS_FileSet lst;
         if (SndLib->GetGameSounds(lst))
         {
-            FS_FileSetIt it = lst.begin();
-            FS_FileSetIt _E = lst.end();
+            auto it = lst.begin();
+            auto _E = lst.end();
             for (; it != _E; it++)
                 items.push_back(SChooseItem(it->name.c_str(), ""));
         }
@@ -71,8 +71,8 @@ namespace ChoseEvents
         FS_FileSet lst;
         if (Lib.GetObjects(lst))
         {
-            FS_FileSetIt it = lst.begin();
-            FS_FileSetIt _E = lst.end();
+            auto it = lst.begin();
+            auto _E = lst.end();
             for (; it != _E; it++)
                 items.push_back(SChooseItem(it->name.c_str(), ""));
         }
@@ -104,8 +104,8 @@ namespace ChoseEvents
         FS_FileSet lst;
         if (FS.file_list(lst, _groups_, FS_ListFiles | FS_ClampExt, "*.group"))
         {
-            FS_FileSetIt it = lst.begin();
-            FS_FileSetIt _E = lst.end();
+            auto it = lst.begin();
+            auto _E = lst.end();
             for (; it != _E; it++)
                 items.push_back(SChooseItem(it->name.c_str(), ""));
         }
@@ -137,8 +137,8 @@ namespace ChoseEvents
         FS_FileSet lst;
         if (FS.file_list(lst, _game_meshes_, FS_ListFiles | FS_ClampExt, "*.ogf"))
         {
-            FS_FileSetIt it = lst.begin();
-            FS_FileSetIt _E = lst.end();
+            auto it = lst.begin();
+            auto _E = lst.end();
             for (; it != _E; it++)
                 items.push_back(SChooseItem(it->name.c_str(), ""));
         }
@@ -167,8 +167,8 @@ namespace ChoseEvents
         FS_FileSet lst;
         if (FS.file_list(lst, _game_meshes_, FS_ListFiles | FS_ClampExt, "*.omf"))
         {
-            FS_FileSetIt it = lst.begin();
-            FS_FileSetIt _E = lst.end();
+            auto it = lst.begin();
+            auto _E = lst.end();
             for (; it != _E; it++)
                 items.push_back(SChooseItem(it->name.c_str(), ""));
         }
@@ -182,8 +182,8 @@ namespace ChoseEvents
         FS_FileSet lst;
         if (FS.file_list(lst, "$game_anims$", FS_ListFiles, "*.anm,*.anms"))
         {
-            FS_FileSetIt it = lst.begin();
-            FS_FileSetIt _E = lst.end();
+            auto it = lst.begin();
+            auto _E = lst.end();
             for (; it != _E; it++)
                 items.push_back(SChooseItem(it->name.c_str(), ""));
         }
@@ -314,8 +314,8 @@ namespace ChoseEvents
         FS_FileSet lst;
         if (ImageLib.GetTextures(lst))
         {
-            FS_FileSetIt it = lst.begin();
-            FS_FileSetIt _E = lst.end();
+            auto it = lst.begin();
+            auto _E = lst.end();
             for (; it != _E; it++)
                 items.push_back(SChooseItem(it->name.c_str(), ""));
         }
@@ -338,8 +338,8 @@ namespace ChoseEvents
         FS_FileSet lst;
         if (ImageLib.GetTexturesRaw(lst))
         {
-            FS_FileSetIt it = lst.begin();
-            FS_FileSetIt _E = lst.end();
+            auto it = lst.begin();
+            auto _E = lst.end();
             for (; it != _E; it++)
                 items.push_back(SChooseItem(it->name.c_str(), ""));
         }

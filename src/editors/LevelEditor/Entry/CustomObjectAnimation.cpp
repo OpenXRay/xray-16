@@ -89,7 +89,7 @@ void CCustomObject::AnimationDrawPath()
             if (EDevice.m_Camera.GetPosition().distance_to_sqr(T) < 50.f * 50.f)
             {
                 DU_impl.DrawCross(T, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, clr, false);
-                DU_impl.OutText(T, xr_string().sprintf("K: %3.3f", (*k_it)->time).c_str(), 0xffffffff, 0x00000000);
+                DU_impl.OutText(T, make_string("K: %3.3f", (*k_it)->time).c_str(), 0xffffffff, 0x00000000);
             }
         }
     }

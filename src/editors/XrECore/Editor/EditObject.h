@@ -578,6 +578,9 @@ private:
         return 0;
     }
 
+    virtual void LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset) { R_ASSERT(false); }
+    virtual void LL_ClearAdditionalTransform(u16 bone_id) { R_ASSERT(false); }
+
     // debug
 #ifdef DEBUG
     virtual void DebugRender(Fmatrix &XFORM)

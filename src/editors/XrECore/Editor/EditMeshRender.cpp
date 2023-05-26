@@ -93,7 +93,7 @@ void CEditableMesh::GenerateRenderBuffers()
         }
 #endif
         if (num_verts > 0)
-            m_RenderBuffers->insert(mk_pair(_S, rb_vec));
+            m_RenderBuffers->insert(make_pair(_S, rb_vec));
     }
     UnloadVNormals();
 }

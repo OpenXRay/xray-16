@@ -341,7 +341,7 @@ Fmatrix &CEditableObject::LL_GetTransform_R(u16 bone_id)
 {
     //	VERIFY(false);
     // static Fmatrix dummy_matrix;
-    return GetBone(bone_id)->_RenderTransform();
+    return GetBone(bone_id)->RenderTransform();
 }
 Fobb &CEditableObject::LL_GetBox(u16 bone_id)
 {

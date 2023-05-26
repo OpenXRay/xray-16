@@ -38,8 +38,8 @@ LPCSTR CEngine::LastWindowsError()
 	return err;
 }
 
-extern void xrSkin1W_x86(vertRender *D, vertBoned1W *S, u32 vCount, CBoneInstance *Bones);
-extern void xrSkin2W_x86(vertRender *D, vertBoned2W *S, u32 vCount, CBoneInstance *Bones);
+//extern void xrSkin1W_x86(vertRender *D, vertBoned1W *S, u32 vCount, CBoneInstance *Bones);
+//extern void xrSkin2W_x86(vertRender *D, vertBoned2W *S, u32 vCount, CBoneInstance *Bones);
 
 void CEngine::Initialize(void)
 {

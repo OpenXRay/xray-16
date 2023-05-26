@@ -1,12 +1,8 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "EThumbnail.h"
-#include "xrImage_Resampler.h"
-#pragma package(smart_init)
-//------------------------------------------------------------------------------
+#include "xrEngine/xrImage_Resampler.h"
+
 // Custom Thumbnail
-//------------------------------------------------------------------------------
 ECustomThumbnail::ECustomThumbnail(LPCSTR src_name, THMType type)
 {
     m_Type = type;
@@ -14,7 +10,6 @@ ECustomThumbnail::ECustomThumbnail(LPCSTR src_name, THMType type)
     m_Name = ChangeFileExt(xr_string(src_name), ".thm");
     m_Age = 0;
 }
-//------------------------------------------------------------------------------
 
 ECustomThumbnail::~ECustomThumbnail()
 {
@@ -93,7 +88,7 @@ void EImageThumbnail::Update(ImTextureID &Texture)
     {
         if (Texture)
             Texture->Release();
-        Texture == nullptr;
+        Texture = nullptr;
         return;
     }
     ID3DTexture2D *pTexture = nullptr;

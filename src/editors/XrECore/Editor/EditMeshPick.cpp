@@ -1,40 +1,14 @@
-//----------------------------------------------------
-// file: StaticMesh.cpp
-//----------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "EditMesh.h"
 #include "EditObject.h"
-//#include "cl_collector.h"
 #include "pick_defs.h"
-#include "../XrETools/ETools.h"
-
-/*
-void CEditableMesh::CHullPickFaces(PlaneVec& pl, Fmatrix& parent, U32Vec& fl){
-	u32 i=0;
-	Fvector p;
-	vector<bool> inside(m_Points.size(),true);
-	for(FvectorIt v_it=m_Points.begin();v_it!=m_Points.end();v_it++){
-		parent.transform_tiny(p,*v_it);
-		for(PlaneIt p_it=pl.begin(); p_it!=pl.end(); p_it++)
-			if (p_it->classify(p)>EPS_L) { inside[v_it-m_Points.begin()]=false; break; }
-	}
-	for(FaceIt f_it=m_Faces.begin();f_it!=m_Faces.end();f_it++,i++)
-		if (inside[f_it->pv[0].pindex]&&inside[f_it->pv[1].pindex]&&inside[f_it->pv[2].pindex]) fl.push_back(i);
-}
-*/
-//----------------------------------------------------
+#include "utils/ETools/ETools.h"
 
 static IntVec sml_processed;
 static Fvector sml_normal;
 static float m_fSoftAngle;
-//----------------------------------------------------
 
-//----------------------------------------------------
-// номер face должен соответствовать списку
-//----------------------------------------------------
+// РЅРѕРјРµСЂ face РґРѕР»Р¶РµРЅ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ СЃРїРёСЃРєСѓ
 void CEditableMesh::GenerateCFModel()
 {
 	UnloadCForm();
@@ -103,7 +77,7 @@ bool CEditableMesh::RayPick(float &distance, const Fvector &start, const Fvector
 
 	if (!m_CFModel)
 		GenerateCFModel();
-	//.	float m_r 		= pinf?pinf->inf.range+EPS_L:UI->ZFar();// (bugs: не всегда выбирает) //S ????
+	//.	float m_r 		= pinf?pinf->inf.range+EPS_L:UI->ZFar();// (bugs: РЅРµ РІСЃРµРіРґР° РІС‹Р±РёСЂР°РµС‚) //S ????
 
 	ETOOLS::ray_options(CDB::OPT_ONLYNEAREST | CDB::OPT_CULL);
 	ETOOLS::ray_query_m(inv_parent, m_CFModel, start, direction, _sqrt_flt_max);

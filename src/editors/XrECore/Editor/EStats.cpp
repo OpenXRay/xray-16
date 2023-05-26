@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "EStats.h"
-#include "gamefont.h"
+#include "xrEngine/GameFont.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -58,7 +58,7 @@ void CEStats::Show(CGameFont *font)
 
 		if (RenderTOTAL.result > EPS_S)
 		{
-			fTPS = fInv * fTPS + fOne * float(DPS.polys) / (RenderTOTAL.result * 1000.f);
+			fTPS = fInv * fTPS + fOne * float(DPS.render.polys) / (RenderTOTAL.result * 1000.f);
 			fRFPS = fInv * fRFPS + fOne * 1000.f / RenderTOTAL.result;
 		}
 	}
@@ -71,9 +71,9 @@ void CEStats::Show(CGameFont *font)
 		F.OutSet(5, 5);
 		F.OutNext("FPS/RFPS:     %3.1f/%3.1f", fFPS, fRFPS);
 		F.OutNext("TPS:          %2.2f M", fTPS);
-		F.OutNext("VERT:         %d", DPS.verts);
-		F.OutNext("POLY:         %d", DPS.polys);
-		F.OutNext("DIP/DP:       %d", DPS.calls);
+		F.OutNext("VERT:         %d", DPS.render.verts);
+		F.OutNext("POLY:         %d", DPS.render.polys);
+		F.OutNext("DIP/DP:       %d", DPS.render.calls);
 		F.OutNext("SH/T/M/C:     %d/%d/%d/%d", dwShader_Codes, dwShader_Textures, dwShader_Matrices, dwShader_Constants);
 		F.OutNext("LIGHT S/T:    %d/%d", dwLightInScene, dwTotalLight);
 		F.OutNext("Skeletons:    %2.2fms, %d", Animation.result, Animation.count);
@@ -127,9 +127,9 @@ void CEStats::Show(CGameFont *font)
 	dwSND_Played = dwSND_Allocated = 0;
 	dwTotalLight = dwLightInScene = 0;
 
-	DPS.polys = 0;
-	DPS.verts = 0;
-	DPS.calls = 0;
+	DPS.render.polys = 0;
+	DPS.render.verts = 0;
+	DPS.render.calls = 0;
 	DPS.vs = 0;
 	//	DPS.vb		= 0;
 	//	DPS.ib		= 0;

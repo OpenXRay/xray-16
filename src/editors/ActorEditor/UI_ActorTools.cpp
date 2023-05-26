@@ -136,8 +136,8 @@ void _SynchronizeTextures()
     FS_FileSet M_THUM;
     FS.file_list(M_THUM,_textures_,FS_ListFiles|FS_ClampExt,"*.thm");
 
-    FS_FileSetIt it		= M_THUM.begin();
-    FS_FileSetIt _E 	= M_THUM.end();
+    auto it		= M_THUM.begin();
+    auto _E 	= M_THUM.end();
     for (; it!=_E; it++){
         ETextureThumbnail* THM=0;
         THM = xr_new<ETextureThumbnail>(it->name.c_str());

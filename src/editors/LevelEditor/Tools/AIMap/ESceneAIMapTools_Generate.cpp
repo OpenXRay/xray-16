@@ -740,7 +740,7 @@ bool ESceneAIMapTool::GenerateMap(bool bFromSelectedOnly)
                 EditMeshVec &_meshes = E->Meshes();
                 for (EditMeshIt m_it = _meshes.begin(); m_it != _meshes.end(); m_it++)
                 {
-                    pb->Inc(xr_string().sprintf("%s [%s]", S->GetName(), (*m_it)->Name().c_str()).c_str());
+                    pb->Inc(make_string("%s [%s]", S->GetName(), (*m_it)->Name().c_str()).c_str());
                     const SurfFaces &_sfaces = (*m_it)->GetSurfFaces();
                     for (SurfFaces::const_iterator sp_it = _sfaces.begin(); sp_it != _sfaces.end(); sp_it++)
                     {

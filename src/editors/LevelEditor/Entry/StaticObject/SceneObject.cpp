@@ -418,7 +418,7 @@ void CSceneObject::OnShowHint(AStringVec &dest)
             {
                 SGameMtl *mtl = GMLib.GetMaterialByID(gm_id);
                 if (mtl)
-                    dest.push_back(xr_string().sprintf("Occlusion Factor: %3.2f", mtl->fSndOcclusionFactor));
+                    dest.push_back(make_string("Occlusion Factor: %3.2f", mtl->fSndOcclusionFactor));
             }
         }
         else if (pinf.e_obj->m_objectFlags.is(CEditableObject::eoHOM))

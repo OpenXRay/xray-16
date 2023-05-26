@@ -1,15 +1,8 @@
-//----------------------------------------------------
-// file: CEditableObject.cpp
-//----------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "bone.h"
-#include "motion.h"
-
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
 #include "exportobjectOGF.h"
 
 #ifdef _EDITOR

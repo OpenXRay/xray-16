@@ -1,15 +1,9 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "EThumbnail.h"
-//#include "ImageManager.h"
-#pragma package(smart_init)
 
-//------------------------------------------------------------------------------
 #define THM_OBJECT_VERSION 0x0012
-//------------------------------------------------------------------------------
 #define THM_CHUNK_OBJECTPARAM 0x0816
-//------------------------------------------------------------------------------
+
 EObjectThumbnail::EObjectThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbnail(src_name, ETObject)
 {
     face_count = 0;
@@ -17,13 +11,11 @@ EObjectThumbnail::EObjectThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbnai
     if (bLoad)
         Load();
 }
-//------------------------------------------------------------------------------
 
 EObjectThumbnail::~EObjectThumbnail()
 {
     m_Pixels.clear();
 }
-//------------------------------------------------------------------------------
 
 void EObjectThumbnail::CreateFromData(u32 *p, u32 w, u32 h, int fc, int vc)
 {
@@ -115,13 +107,13 @@ void EObjectThumbnail::Save(int age, LPCSTR path)
 
 void EObjectThumbnail::FillProp(PropItemVec &items)
 {
-    PHelper().CreateCaption(items, "Face Count", xr_string(face_count).c_str());
-    PHelper().CreateCaption(items, "Vertex Count", xr_string(vertex_count).c_str());
+    PHelper().CreateCaption(items, "Face Count", std::to_string(face_count).c_str());
+    PHelper().CreateCaption(items, "Vertex Count", std::to_string(vertex_count).c_str());
 }
 //------------------------------------------------------------------------------
 
 void EObjectThumbnail::FillInfo(PropItemVec &items)
 {
-    PHelper().CreateCaption(items, "Face Count", face_count ? xr_string(face_count).c_str() : "?");
-    PHelper().CreateCaption(items, "Vertex Count", vertex_count ? xr_string(vertex_count).c_str() : "?");
+    PHelper().CreateCaption(items, "Face Count", face_count ? std::to_string(face_count).c_str() : "?");
+    PHelper().CreateCaption(items, "Vertex Count", vertex_count ? std::to_string(vertex_count).c_str() : "?");
 }

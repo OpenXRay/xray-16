@@ -1,15 +1,19 @@
 #include "stdafx.h"
 #include "ELog.h"
 #include "UILogForm.h"
-#include "..\XrCore\os_clipboard.h"
+#include "xrCore/os_clipboard.h"
+
 #define MSG_ERROR 0x00C4C4FF
 #define MSG_INFO 0x00E6FFE7
 #define MSG_CONF 0x00FFE6E7
 #define MSG_DEF 0x00E8E8E8
+
 bool UILogForm::bAutoScroll = true;
 bool UILogForm::bOnlyError = false;
 xr_vector<xr_string> *UILogForm::List = nullptr;
+
 extern bool bAllowLogCommands;
+
 void UILogForm::AddMessage(TMsgDlgType mt, const xr_string &msg)
 {
 	xr_string M;

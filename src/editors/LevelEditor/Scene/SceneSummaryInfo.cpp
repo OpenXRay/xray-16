@@ -156,7 +156,7 @@ void SSceneSummary::STextureInfo::FillProp(PropItemVec &items, LPCSTR main_pref,
         //. убрал из-за кол-ва > 4096
                 xr_string tmp 		= "on demand";
                 for (objinf_map_it o_it=objects.begin(); o_it!=objects.end(); o_it++){
-                    tmp += xr_string().sprintf("%s%s[%d*%3.2f]",tmp.Length()?"; ":"",o_it->first.c_str(),o_it->second.ref_count,o_it->second.area);
+                    tmp += make_string("%s%s[%d*%3.2f]",tmp.Length()?"; ":"",o_it->first.c_str(),o_it->second.ref_count,o_it->second.area);
                 }
                 PHelper().CreateCaption(items,PrepareKey(pref.c_str(),"Objects"), tmp.c_str());
         */
@@ -214,7 +214,7 @@ void SSceneSummary::STextureInfo::Export(IWriter *F, u32 &mem_use)
     xr_string tmp2;
     for (objinf_map_it o_it = objects.begin(); o_it != objects.end(); o_it++)
     {
-        tmp2 += xr_string().sprintf("%s%s[%d*%3.2f]", tmp2.size() ? "; " : "", o_it->first.c_str(), o_it->second.ref_count, o_it->second.area);
+        tmp2 += make_string("%s%s[%d*%3.2f]", tmp2.size() ? "; " : "", o_it->first.c_str(), o_it->second.ref_count, o_it->second.area);
     }
     int tex_mem = info.MemoryUsage(*file_name);
     mem_use += tex_mem;

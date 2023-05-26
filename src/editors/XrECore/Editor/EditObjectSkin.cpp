@@ -134,7 +134,7 @@ void CEditableObject::RenderBones(const Fmatrix &parent)
         {
             EDevice.SetShader(EDevice.m_WireShader);
             RCache.set_xform_world(parent);
-            Fmatrix &M = (*b_it)->_LTransform();
+            Fmatrix &M = (*b_it)->LTransform();
             Fvector p1 = M.c;
             u32 c_joint = (*b_it)->flags.is(CBone::flSelected) ? color_bone_sel_color : color_bone_norm_color;
             if (EPrefs->object_flags.is(epoDrawJoints))
@@ -165,7 +165,7 @@ void CEditableObject::RenderBones(const Fmatrix &parent)
             if ((*b_it)->Parent())
             {
                 EDevice.SetShader(EDevice.m_SelectionShader);
-                Fvector &p2 = (*b_it)->Parent()->_LTransform().c;
+                Fvector &p2 = (*b_it)->Parent()->LTransform().c;
                 DU_impl.DrawLine(p1, p2, color_bone_link_color);
             }
             if (EPrefs->object_flags.is(epoDrawBoneAxis))
@@ -242,10 +242,9 @@ int CEditableObject::GetSelectedBones(BoneVec &sel_bones)
     return sel_bones.size();
 }
 
-//----------------------------------------------------
-
-#include "MgcCont3DMinSphere.h"
+#include "editors/FreeMagic/MgcCont3DMinSphere.h"
 #include "ExportSkeleton.h"
+
 BOOL f_valid(float f)
 {
     return _finite(f) && !_isnan(f);
