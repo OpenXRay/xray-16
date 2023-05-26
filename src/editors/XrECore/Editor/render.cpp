@@ -1,9 +1,7 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "render.h"
-#include "ResourceManager.h"
-//---------------------------------------------------------------------------
+#include "Layers/xrRender/ResourceManager.h"
+
 float ssaDISCARD = 4.f;
 float ssaDONTSORT = 32.f;
 
@@ -13,9 +11,7 @@ ECORE_API float g_fSCREEN;
 CRender RImplementation;
 ECORE_API CRender *Render = &RImplementation;
 
-//---------------------
 IRenderFactory *RenderFactory = NULL;
-//---------------------------------------------------------------------------
 
 CRender::CRender()
 {
@@ -29,6 +25,10 @@ CRender::~CRender()
 
 void CRender::Initialize()
 {
+    c_ssky0 = "s_sky0";
+    c_ssky1 = "s_sky1";
+    c_sclouds0 = "s_clouds0";
+    c_sclouds1 = "s_clouds1";
 	PSLibrary.OnCreate();
 }
 void CRender::ShutDown()

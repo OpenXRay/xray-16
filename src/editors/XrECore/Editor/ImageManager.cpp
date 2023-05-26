@@ -417,7 +417,7 @@ void CImageManager::SynchronizeTextures(bool sync_thm, bool sync_game, bool bFor
     // sync assoc
     SPBItem *pb = 0;
     if (bProgress)
-        pb = UI->ProgressStart(M_BASE.size(), "Synchronize textures...");
+        pb = UI->ProgressStart(static_cast<float>(M_BASE.size()), "Synchronize textures...");
     auto it = M_BASE.begin();
     auto _E = M_BASE.end();
     for (; it != _E; it++)
@@ -587,9 +587,9 @@ int CImageManager::GetLocalNewTextures(FS_FileSet &files)
 // output: 	соответствие
 //------------------------------------------------------------------------------
 #define SQR(a) ((a) * (a))
-BOOL CImageManager::CheckCompliance(LPCSTR fname, int & compl )
+BOOL CImageManager::CheckCompliance(LPCSTR fname, int & completed )
 {
-    compl = 0;
+    completed = 0;
     U32Vec data;
     u32 w, h, a;
     if (!Stbi_Load(fname, data, w, h, a))
@@ -634,20 +634,20 @@ BOOL CImageManager::CheckCompliance(LPCSTR fname, int & compl )
     difference = difference / (a ? 2.f : sqrtf(3.f));
     difference = difference * 100.f;
     clamp(difference, 0.f, 100.f);
-    compl = iFloor(difference) * 1000;
+    completed = iFloor(difference) * 1000;
     maximal = maximal / (a ? 2.f : sqrtf(3.f));
     maximal = maximal * 100.f;
     clamp(maximal, 0.f, 100.f);
-    compl += iFloor(maximal);
+    completed += iFloor(maximal);
 
     // free
     xr_free(pScaled);
     xr_free(pRestored);
     return TRUE;
 }
-void CImageManager::CheckCompliance(FS_FileSet &files, FS_FileSet & compl )
+void CImageManager::CheckCompliance(FS_FileSet &files, FS_FileSet & completed )
 {
-    SPBItem *pb = UI->ProgressStart(files.size(), "Check texture compliance: ");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(files.size()), "Check texture compliance: ");
     auto it = files.begin();
     auto _E = files.end();
     for (; it != _E; it++)
@@ -659,7 +659,7 @@ void CImageManager::CheckCompliance(FS_FileSet &files, FS_FileSet & compl )
             ELog.Msg(mtError, "Bad texture: '%s'", it->name.c_str());
         FS_File F(*it);
         F.attrib = val;
-        compl .insert(F);
+        completed .insert(F);
         pb->Inc();
         if (UI->NeedAbort())
             break;

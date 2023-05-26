@@ -380,7 +380,7 @@ void CEditableMesh::RenderSkeleton(const Fmatrix &, CSurface *S)
             pv->uv.set(SV.uv);
             float total = SV.bones[0].w;
 
-            const Fmatrix &M = m_Parent->m_Bones[SV.bones[0].id]->_RenderTransform();
+            const Fmatrix &M = m_Parent->m_Bones[SV.bones[0].id]->RenderTransform();
             M.transform_tiny(pv->P, SV.offs);
             M.transform_dir(pv->N, SV.norm);
 
@@ -389,7 +389,7 @@ void CEditableMesh::RenderSkeleton(const Fmatrix &, CSurface *S)
             for (u8 cnt = 1; cnt < (u8)SV.bones.size(); cnt++)
             {
                 total += SV.bones[cnt].w;
-                const Fmatrix &M = m_Parent->m_Bones[SV.bones[cnt].id]->_RenderTransform();
+                const Fmatrix &M = m_Parent->m_Bones[SV.bones[cnt].id]->RenderTransform();
                 M.transform_tiny(P, SV.offs);
                 M.transform_dir(N, SV.norm);
                 pv->P.lerp(pv->P, P, SV.bones[cnt].w / total);

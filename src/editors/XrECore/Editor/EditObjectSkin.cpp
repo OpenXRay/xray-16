@@ -1,13 +1,9 @@
-//----------------------------------------------------
-// file: EditObject.cpp
-//----------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "EditObject.h"
 #include "EditMesh.h"
 #include "d3dutils.h"
+
+#include "editors/FreeMagic/MgcCont3DCylinder.h"
 
 const u32 color_bone_sel_color = 0xFFFFFFFF;
 const u32 color_bone_norm_color = 0xFFFFFF00;
@@ -263,6 +259,7 @@ BOOL SphereValid(FvectorVec &geom, Fsphere &test)
             return FALSE;
     return TRUE;
 }
+
 void ComputeSphere(Fsphere &B, FvectorVec &V)
 {
     if (V.size() < 3)
@@ -327,9 +324,7 @@ void ComputeSphere(Fsphere &B, FvectorVec &V)
         }
     }
 }
-//----------------------------------------------------
 
-#include "MgcCont3DCylinder.h"
 void ComputeCylinder(Fcylinder &C, Fobb &B, FvectorVec &V)
 {
     if (V.size() < 3)
@@ -459,7 +454,7 @@ bool CEditableObject::GenerateBoneShape(bool bSelOnly)
                 FvectorVec &P = bone_points[b_id];
                 bool bFound = false;
                 Fvector p;
-                m_Bones[b_id]->_RITransform().transform_tiny(p, sv.offs);
+                m_Bones[b_id]->RITransform().transform_tiny(p, sv.offs);
                 for (FvectorIt p_it = P.begin(); p_it != P.end(); p_it++)
                     if (p_it->similar(p))
                     {

@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef _EDITOR
 #include "xrServerEntities/smart_cast.h" // get_script_wrapper() needs it
+#endif
 
 class iphysics_scripted;
 
@@ -49,6 +51,7 @@ public:
     typedef T type_impl;
 };
 
+#ifndef _EDITOR
 template <class wrap>
 wrap* get_script_wrapper(typename wrap::type_impl& E)
 {
@@ -63,3 +66,4 @@ wrap* get_script_wrapper(typename wrap::type_impl& E)
 
     return e;
 }
+#endif

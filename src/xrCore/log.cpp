@@ -246,7 +246,7 @@ void CreateLog(BOOL nl)
         ForceFlushLog = true;
 }
 
-void CloseLog(void)
+void XRCORE_API CloseLog(void)
 {
     FlushLog();
     if (LogWriter)

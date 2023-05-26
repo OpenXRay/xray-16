@@ -1,17 +1,15 @@
 #include "stdafx.h"
 #include "dxRenderFactory.h"
-
 #include "dxStatGraphRender.h"
+
 #ifndef _EDITOR
 #include "dxLensFlareRender.h"
 #include "dxImGuiRender.h"
-#endif
-#ifndef _EDITOR
+#include "dxEnvironmentRender.h"
 #include "dxThunderboltRender.h"
 #include "dxThunderboltDescRender.h"
 #include "dxRainRender.h"
 #include "dxLensFlareRender.h"
-#include "dxEnvironmentRender.h"
 #include "dxObjectSpaceRender.h"
 #endif // _EDITOR
 
@@ -31,7 +29,6 @@ dxRenderFactory RenderFactoryImpl;
 #ifndef _EDITOR
 RENDER_FACTORY_IMPLEMENT(UISequenceVideoItem)
 RENDER_FACTORY_IMPLEMENT(UIShader)
-RENDER_FACTORY_IMPLEMENT(StatGraphRender)
 #ifdef DEBUG
 RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
 #endif // DEBUG
@@ -44,8 +41,9 @@ RENDER_FACTORY_IMPLEMENT(ThunderboltDescRender)
 RENDER_FACTORY_IMPLEMENT(RainRender)
 RENDER_FACTORY_IMPLEMENT(LensFlareRender)
 RENDER_FACTORY_IMPLEMENT(ImGuiRender)
+RENDER_FACTORY_IMPLEMENT(FlareRender)
 RENDER_FACTORY_IMPLEMENT(EnvironmentRender)
 RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)
-RENDER_FACTORY_IMPLEMENT(FlareRender)
 #endif
 RENDER_FACTORY_IMPLEMENT(FontRender)
+RENDER_FACTORY_IMPLEMENT(StatGraphRender)

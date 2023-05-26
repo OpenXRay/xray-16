@@ -8,7 +8,8 @@
 // and may not be copied or disclosed except in accordance with the terms of
 // that agreement.
 
-//----------------------------------------------------------------------------
+const float PI = 3.1415926535897932384626433832795f;
+
 template <class Real>
 Real Math<Real>::ACos(Real fValue)
 {

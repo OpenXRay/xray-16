@@ -65,7 +65,7 @@ void UIRenderForm::Draw()
 
 			if ((ImGui::IsMouseDown(ImGuiMouseButton_Left) || ImGui::IsMouseDown(ImGuiMouseButton_Right)) && !m_mouse_down && cursor_in_zone)
 			{
-				UI->MousePress(TShiftState(ShiftState), mouse_pos.x - canvas_pos.x, mouse_pos.y - canvas_pos.y);
+                UI->MousePress(TShiftState(ShiftState), static_cast<int>(mouse_pos.x - canvas_pos.x), static_cast<int>(mouse_pos.y - canvas_pos.y));
 				m_mouse_down = true;
 			}
 
@@ -73,7 +73,7 @@ void UIRenderForm::Draw()
 			{
 				if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::IsMouseDown(ImGuiMouseButton_Right))
 				{
-					UI->MouseRelease(TShiftState(ShiftState), mouse_pos.x - canvas_pos.x, mouse_pos.y - canvas_pos.y);
+                    UI->MouseRelease(TShiftState(ShiftState), static_cast<int>(mouse_pos.x - canvas_pos.x), static_cast<int>(mouse_pos.y - canvas_pos.y));
 					m_mouse_down = false;
 					m_mouse_move = false;
 					m_shiftstate_down = false;
@@ -81,7 +81,8 @@ void UIRenderForm::Draw()
 			}
 			else if (m_mouse_down)
 			{
-				UI->MouseMove(TShiftState(ShiftState), mouse_pos.x - canvas_pos.x, mouse_pos.y - canvas_pos.y);
+                UI->MouseMove(TShiftState(ShiftState), static_cast<int>(mouse_pos.x - canvas_pos.x),
+                    static_cast<int>(mouse_pos.y - canvas_pos.y));
 				m_mouse_move = true;
 				m_shiftstate_down = m_shiftstate_down || (ShiftState & (ssShift | ssCtrl | ssAlt));
 			}
@@ -90,7 +91,7 @@ void UIRenderForm::Draw()
 		{
 			if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::IsMouseDown(ImGuiMouseButton_Right))
 			{
-				UI->MouseRelease(TShiftState(ShiftState), mouse_pos.x - canvas_pos.x, mouse_pos.y - canvas_pos.y);
+                UI->MouseRelease(TShiftState(ShiftState), static_cast<int>(mouse_pos.x - canvas_pos.x), static_cast<int>(mouse_pos.y - canvas_pos.y));
 				m_mouse_down = false;
 				m_mouse_move = false;
 				m_shiftstate_down = false;

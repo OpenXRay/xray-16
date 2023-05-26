@@ -4,11 +4,6 @@
 #pragma once
 
 #define smart_cast dynamic_cast
-
-#ifndef O_SEQUENTIAL
-#define O_SEQUENTIAL 0
-#endif
-
 #define DIRECTINPUT_VERSION 0x0800
 
 #define R_R1 1
@@ -82,6 +77,7 @@ DEFINE_VECTOR(xr_string *, LPAStringVec, LPAStringIt);
 
 #define USE_DX9 1
 #include "Layers/XrRender/FVF.h"
+#include "ELocatorAPI.h"
 
 struct str_pred
 {

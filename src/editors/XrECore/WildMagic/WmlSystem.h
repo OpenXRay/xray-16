@@ -11,7 +11,9 @@
 #ifndef WMLSYSTEMH
 #define WMLSYSTEMH
 
+#ifndef WIN32
 #define WIN32
+#endif
 
 // Microsoft Windows
 #if defined(WIN32)

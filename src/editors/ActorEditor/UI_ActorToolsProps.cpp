@@ -579,8 +579,8 @@ void GetBindAbsolutePosition(CBone *B, Fmatrix &dest)
 
     {
         Fmatrix M;
-        M.setXYZi(B->_RestRotate());
-        M.c.set(B->_RestOffset());
+        M.setXYZi(B->RestRotate());
+        M.c.set(B->RestOffset());
         M.mulA_43(dest);
         dest.set(M);
     }
@@ -800,9 +800,9 @@ void CActorTools::FillBoneProperties(PropItemVec &items, LPCSTR pref, ListItem *
         PHelper().CreateChoose(items, PrepareKey(pref, "Bone\\Game Material"), &BONE->game_mtl, smGameMaterial);
         PHelper().CreateFloat(items, PrepareKey(pref, "Bone\\Mass"), &BONE->mass, 0.f, 10000.f);
         PHelper().CreateVector(items, PrepareKey(pref, "Bone\\Center Of Mass"), &BONE->center_of_mass, -10000.f, 10000.f);
-        V = PHelper().CreateVector(items, PrepareKey(pref, "Bone\\Bind Position"), &BONE->_RestOffset(), -10000.f, 10000.f);
+        V = PHelper().CreateVector(items, PrepareKey(pref, "Bone\\Bind Position"), &BONE->RestOffset(), -10000.f, 10000.f);
         V->OnChangeEvent.bind(this, &CActorTools::OnBindTransformChange);
-        V = PHelper().CreateAngle3(items, PrepareKey(pref, "Bone\\Bind Rotation"), &BONE->_RestRotate());
+        V = PHelper().CreateAngle3(items, PrepareKey(pref, "Bone\\Bind Rotation"), &BONE->RestRotate());
         V->OnChangeEvent.bind(this, &CActorTools::OnBindTransformChange);
         PHelper().CreateFlag16(items, PrepareKey(pref, "Bone\\Shape\\Flags\\No Pickable"), &BONE->shape.flags, SBoneShape::sfNoPickable);
         PHelper().CreateFlag16(items, PrepareKey(pref, "Bone\\Shape\\Flags\\No Physics"), &BONE->shape.flags, SBoneShape::sfNoPhysics);
@@ -836,7 +836,7 @@ void CActorTools::FillBoneProperties(PropItemVec &items, LPCSTR pref, ListItem *
 
         Fvector lim_rot;
         Fmatrix mLocal, mBind, mBindI;
-        mBind.setXYZi(BONE->_RestRotate().x, BONE->_RestRotate().y, BONE->_RestRotate().z);
+        mBind.setXYZi(BONE->RestRotate().x, BONE->RestRotate().y, BONE->RestRotate().z);
         mBindI.invert(mBind);
         mLocal.setXYZi(BONE->_Rotate().x, BONE->_Rotate().y, BONE->_Rotate().z);
         mLocal.mulA_43(mBindI);

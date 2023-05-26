@@ -299,6 +299,10 @@ public:
     IC int SurfaceCount() { return m_Surfaces.size(); }
     IC int Version() { return m_ObjectVersion; }
 
+    IGameObject* IObject() { R_ASSERT(false); return nullptr; }
+    virtual bool IsCollideWithBullets() { R_ASSERT(false); return false; }
+    virtual bool IsCollideWithActorCamera() { R_ASSERT(false); return false; }
+
     // LOD
     xr_string GetLODTextureName();
     LPCSTR GetLODShaderName() { return LOD_SHADER_NAME; }

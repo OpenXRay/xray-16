@@ -1,9 +1,6 @@
-//---------------------------------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
-
-#include "xr_input.h"
+#include "xrCore/_fbox2.h"
+#include "xrEngine/xr_input.h"
 #include "UI_ToolsCustom.h"
 
 #include "UI_Main.h"
@@ -14,10 +11,13 @@
 #include "UIImageEditorForm.h"
 #include "UISoundEditorForm.h"
 #include "UIMinimapEditorForm.h"
-#include "..\XrETools\ETools.h"
+#include "utils/ETools/ETools.h"
 #include "UILogForm.h"
-#include "gamefont.h"
+#include "xrEngine/GameFont.h"
+
 TUI *UI = 0;
+
+extern void IR_GetMousePosScreen(Ivector2& p);
 
 TUI::TUI()
 {
@@ -44,7 +44,7 @@ TUI::TUI()
     m_LastHint = "";
     m_Size.set(1280, 800);
 }
-//---------------------------------------------------------------------------
+
 TUI::~TUI()
 {
     VERIFY(m_ProgressItems.size() == 0);
@@ -107,7 +107,6 @@ bool TUI::KeyPress(WORD Key, TShiftState Shift)
         return false;
     return Tools->KeyPress(Key, Shift);
 }
-//----------------------------------------------------
 
 void TUI::MousePress(TShiftState Shift, int X, int Y)
 {
@@ -242,7 +241,7 @@ void TUI::OnAppActivate()
     {
         m_ShiftState = ssNone;
         pInput->OnAppActivate();
-        EDevice.seqAppActivate.Process(rp_AppActivate);
+        EDevice.seqAppActivate.Process();
     }
 }
 //---------------------------------------------------------------------------
@@ -256,7 +255,7 @@ void TUI::OnAppDeactivate()
     {
         pInput->OnAppDeactivate();
         m_ShiftState = ssNone;
-        EDevice.seqAppDeactivate.Process(rp_AppDeactivate);
+        EDevice.seqAppDeactivate.Process();
     }
     HideHint();
 }
@@ -396,7 +395,9 @@ void TUI::PrepareRedraw()
 
     RCache.set_xform_world(Fidentity);
 }
-extern ENGINE_API BOOL g_bRendering;
+
+extern ENGINE_API bool g_bRendering;
+
 void TUI::Redraw()
 {
     PrepareRedraw();
@@ -405,12 +406,12 @@ void TUI::Redraw()
 
         if (u32(RTSize.x * EDevice.m_ScreenQuality) != RT->dwWidth || u32(RTSize.y * EDevice.m_ScreenQuality) != RT->dwHeight || !RT->pSurface)
         {
-            GetRenderWidth() = RTSize.x * EDevice.m_ScreenQuality;
-            GetRenderHeight() = RTSize.y * EDevice.m_ScreenQuality;
+            GetRenderWidth() = static_cast<u32>(RTSize.x * EDevice.m_ScreenQuality);
+            GetRenderHeight() = static_cast<u32>(RTSize.y * EDevice.m_ScreenQuality);
             RT.destroy();
             ZB.destroy();
-            RT.create("rt_color", RTSize.x * EDevice.m_ScreenQuality, RTSize.y * EDevice.m_ScreenQuality, HW.Caps.fTarget);
-            ZB.create("rt_depth", RTSize.x * EDevice.m_ScreenQuality, RTSize.y * EDevice.m_ScreenQuality, D3DFORMAT::D3DFMT_D24X8);
+            RT.create("rt_color", static_cast<u32>(RTSize.x * EDevice.m_ScreenQuality), static_cast<u32>(RTSize.y * EDevice.m_ScreenQuality), HW.Caps.fTarget);
+            ZB.create("rt_depth", static_cast<u32>(RTSize.x * EDevice.m_ScreenQuality), static_cast<u32>(RTSize.y * EDevice.m_ScreenQuality), D3DFORMAT::D3DFMT_D24X8);
             m_Flags.set(flRedraw, TRUE);
             EDevice.fASPECT = ((float)RTSize.y) / ((float)RTSize.x);
             EDevice.mProject.build_projection(deg2rad(EDevice.fFOV), EDevice.fASPECT, EDevice.m_Camera.m_Znear, EDevice.m_Camera.m_Zfar);
@@ -484,7 +485,7 @@ void TUI::Redraw()
                 EDevice.SetRS(D3DRS_FILLMODE, D3DFILL_SOLID);
                 EDevice.pSystemFont->OnRender();
                 EDevice.SetRS(D3DRS_FILLMODE, EDevice.dwFillMode);
-                EDevice.seqRender.Process(rp_Render);
+                EDevice.seqRender.Process();
                 RCache.set_RT(HW.pBaseRT);
                 RCache.set_ZB(HW.pBaseZB);
             }
@@ -608,7 +609,7 @@ bool TUI::OnCreate()
     // Creation
     ETOOLS::ray_options(CDB::OPT_ONLYNEAREST | CDB::OPT_CULL);
 
-    pInput = xr_new<CInput>(FALSE, mouse_device_key);
+    pInput = xr_new<CInput>(FALSE);
     UI->IR_Capture();
 
     m_bReady = true;
@@ -633,15 +634,15 @@ bool TUI::OnCreate()
     BeginEState(esEditScene);
     GetRenderWidth() = 128;
     GetRenderHeight() = 128;
-    RTSize.set(GetRenderWidth(), GetRenderHeight());
+    RTSize.set(static_cast<int>(GetRenderWidth()), static_cast<int>(GetRenderHeight()));
     EDevice.fASPECT = (float)RTSize.x / (float)RTSize.y;
     EDevice.mProject.build_projection(deg2rad(EDevice.fFOV), EDevice.fASPECT, EDevice.m_Camera.m_Znear, EDevice.m_Camera.m_Zfar);
     EDevice.m_fNearer = EDevice.mProject._43;
 
     RCache.set_xform_project(EDevice.mProject);
     RCache.set_xform_world(Fidentity);
-    RT.create("rt_color", RTSize.x * EDevice.m_ScreenQuality, RTSize.y * EDevice.m_ScreenQuality, HW.Caps.fTarget);
-    ZB.create("rt_depth", RTSize.x * EDevice.m_ScreenQuality, RTSize.y * EDevice.m_ScreenQuality, D3DFORMAT::D3DFMT_D24X8);
+    RT.create("rt_color", static_cast<u32>(RTSize.x * EDevice.m_ScreenQuality), static_cast<u32>(RTSize.y * EDevice.m_ScreenQuality), HW.Caps.fTarget);
+    ZB.create("rt_depth", static_cast<u32>(RTSize.x * EDevice.m_ScreenQuality), static_cast<u32>(RTSize.y * EDevice.m_ScreenQuality), D3DFORMAT::D3DFMT_D24X8);
 
     return true;
 }
@@ -717,7 +718,7 @@ void TUI::OnDrawUI()
     UISoundEditorForm::Update();
     UIMinimapEditorForm::Update();
     UILogForm::Update();
-    EDevice.seqDrawUI.Process(rp_DrawUI);
+    EDevice.seqDrawUI.Process();
 }
 
 void TUI::RealResetUI()
@@ -742,9 +743,9 @@ void TUI::RealResetUI()
 void SPBItem::GetInfo(xr_string &txt, float &p, float &m)
 {
     if (info.size())
-        txt.sprintf("%s (%s)", text.c_str(), info.c_str());
+        txt = make_string("%s (%s)", text.c_str(), info.c_str());
     else
-        txt.sprintf("%s", text.c_str());
+        txt = make_string("%s", text.c_str());
     p = progress;
     m = max;
 }

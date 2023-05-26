@@ -549,7 +549,7 @@ void CEditableObject::RenameBone(CBone *bone, LPCSTR new_name)
     for (SMotionIt s_it = m_SMotions.begin(); s_it != m_SMotions.end(); ++s_it)
     {
         CSMotion *M = *s_it;
-        for (BoneMotionIt bm_it = M->BoneMotions().begin(); bm_it != M->BoneMotions().end(); ++bm_it)
+        for (auto bm_it = M->BoneMotions().begin(); bm_it != M->BoneMotions().end(); ++bm_it)
         {
             if (bm_it->name == bone->Name())
                 bm_it->name = new_name;

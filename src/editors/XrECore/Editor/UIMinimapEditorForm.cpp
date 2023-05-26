@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "xrCore/_fbox2.h"
 #include "UIMinimapEditorForm.h"
 
 UIMinimapEditorForm *UIMinimapEditorForm::Form = nullptr;

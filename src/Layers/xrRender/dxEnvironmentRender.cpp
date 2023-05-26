@@ -7,6 +7,11 @@
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"
+#include "Common/RDevice.h"
+
+#ifdef _EDITOR
+#include "Layers/xrRender_R2/r2_types.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // half box def
@@ -176,9 +181,16 @@ void dxEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRe
     _RELEASE(e1);
 #endif // USE_OGL
 
+#ifndef _EDITOR
     const bool menu_pp = g_pGamePersistent->OnRenderPPUI_query();
     e0 = menu_pp ? 0 : pA->sky_texture_env->surface_get();
     e1 = menu_pp ? 0 : pB->sky_texture_env->surface_get();
+#else
+    e0 = 0;
+    e1 = 0;
+#endif
+
+
 #   ifdef USE_OGL
     t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
     t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
@@ -212,7 +224,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     // draw sky box
     Fmatrix mSky;
     mSky.rotateY(env.CurrentEnv.sky_rotation);
-    mSky.translate_over(Device.vCameraPosition);
+    mSky.translate_over(RDEVICE.vCameraPosition);
 
     u32 i_offset, v_offset;
     u32 C = color_rgba(iFloor(env.CurrentEnv.sky_color.x * 255.f), iFloor(env.CurrentEnv.sky_color.y * 255.f),
@@ -284,7 +296,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     mScale.scale(10, 0.4f, 10);
     mXFORM.rotateY(env.CurrentEnv.clouds_rotation);
     mXFORM.mulB_43(mScale);
-    mXFORM.translate_over(Device.vCameraPosition);
+    mXFORM.translate_over(RDEVICE.vCameraPosition);
 
     Fvector wd0, wd1;
     Fvector4 wind_dir;

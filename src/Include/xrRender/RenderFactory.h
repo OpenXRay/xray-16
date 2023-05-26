@@ -44,7 +44,6 @@ public:
     */
     RENDER_FACTORY_INTERFACE(UISequenceVideoItem)
     RENDER_FACTORY_INTERFACE(UIShader)
-    RENDER_FACTORY_INTERFACE(StatGraphRender)
 #ifdef DEBUG
     RENDER_FACTORY_INTERFACE(ObjectSpaceRender)
 #endif // DEBUG
@@ -62,6 +61,7 @@ public:
     RENDER_FACTORY_INTERFACE(FlareRender)
 #endif // _EDITOR
     RENDER_FACTORY_INTERFACE(FontRender)
+    RENDER_FACTORY_INTERFACE(StatGraphRender)
 protected:
     // virtual IEnvDescriptorRender *CreateEnvDescriptorRender() = 0;
     // virtual void DestroyEnvDescriptorRender(IEnvDescriptorRender *pObject) = 0;

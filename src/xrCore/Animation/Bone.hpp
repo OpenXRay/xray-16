@@ -284,6 +284,7 @@ class XRCORE_API CBone final : public CBoneInstance, public IBoneData
 {
 public:
     friend class LWBoneParser;
+    friend bool BoneExportOGF(CBone* bone, IWriter& F);
 
 private:
     shared_str name;
@@ -405,8 +406,6 @@ public:
     void Select(BOOL flag) { flags.set(flSelected, flag); }
     [[nodiscard]] bool Selected() const { return flags.is(flSelected); }
     void ClampByLimits();
-
-    bool ExportOGF(IWriter& F); // XXX: implementation is missing. Probably it is in the SDK code?
 
 private:
     [[nodiscard]] IBoneData& GetChild(u16 id) override { return *children[id]; }

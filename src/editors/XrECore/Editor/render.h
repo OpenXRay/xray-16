@@ -53,6 +53,11 @@ public:
 	CPSLibrary PSLibrary;
     bool m_hq_skinning = false;
 
+    shared_str c_ssky0;
+    shared_str c_ssky1;
+    shared_str c_sclouds0;
+    shared_str c_sclouds1;
+
 	CModelPool *Models;
     IRender::RenderStatistics BasicStats;
     // TODO: hack
@@ -154,9 +159,7 @@ public:
 		void *ppConstantTable);
 
 	virtual IDirect3DBaseTexture9 *texture_load(LPCSTR fname, u32 &mem_size);
-#ifdef _EDITOR
-	virtual IDirect3DBaseTexture9 *texture_load_software(LPCSTR fname, u32 &mem_size);
-#endif
+
 	virtual HRESULT shader_compile(
 		LPCSTR name,
 		LPCSTR pSrcData,
@@ -176,7 +179,9 @@ IC float CalcSSA(Fvector &C, float R)
 	float distSQ = EDevice.m_Camera.GetPosition().distance_to_sqr(C);
 	return R * R / distSQ;
 }
+
 extern ECORE_API CRender RImplementation;
+extern ECORE_API CRender* Render;
 //.extern ECORE_API CRender*	Render;
 
 #endif

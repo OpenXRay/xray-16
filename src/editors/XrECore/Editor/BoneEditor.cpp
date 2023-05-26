@@ -55,7 +55,7 @@
 //    case SBoneShape::stBox:
 //    {
 //        Fvector amount = _amount;
-//        //		Fmatrix _IT;_IT.invert(_LTransform());
+//        //		Fmatrix _IT;_IT.invert(LTransform());
 //        //		_IT.transform_dir(amount,_amount);
 //        //		if (Tools->GetSettings(etfCSParent)) _IT.transform_dir(amount);
 //        shape.box.m_halfsize.add(amount);
@@ -87,7 +87,7 @@
 //{
 //    Fvector amount = _amount;
 //    Fmatrix _IT;
-//    _IT.invert(_LTransform());
+//    _IT.invert(LTransform());
 //    if (Tools->GetSettings(etfCSParent))
 //        _IT.transform_dir(amount);
 //    switch (shape.type)
@@ -115,7 +115,7 @@
 //{
 //    Fvector amount = _amount;
 //    Fmatrix _IT;
-//    _IT.invert(_LTransform());
+//    _IT.invert(LTransform());
 //    if (Tools->GetSettings(etfCSParent))
 //        _IT.transform_dir(amount);
 //    switch (shape.type)
@@ -148,7 +148,7 @@
 //{
 //    Fvector start, dir;
 //    Fmatrix M;
-//    M.mul_43(parent, _LTransform());
+//    M.mul_43(parent, LTransform());
 //    M.invert();
 //    M.transform_tiny(start, S);
 //    M.transform_dir(dir, D);
@@ -209,11 +209,11 @@
 //            mBindI.invert(mBind);
 //
 //            Fvector axis;
-//            _MTransform().transform_dir(axis, _axis);
+//            MTransform().transform_dir(axis, _axis);
 //
 //            // rotation
 //            mRotate.rotation(axis, angle);
-//            mLocal.mul(mRotate, _MTransform());
+//            mLocal.mul(mRotate, MTransform());
 //            mLocal.getXYZi(mot_rotate);
 //
 //            // local clamp

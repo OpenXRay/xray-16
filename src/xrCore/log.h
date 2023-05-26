@@ -48,7 +48,7 @@ struct LogCallback
 LogCallback XRCORE_API SetLogCB(const LogCallback& cb);
 void XRCORE_API CreateLog(BOOL no_log = FALSE);
 void InitLog();
-void CloseLog();
+void XRCORE_API CloseLog();
 void XRCORE_API FlushLog();
 
 extern XRCORE_API xr_vector<xr_string> LogFile;

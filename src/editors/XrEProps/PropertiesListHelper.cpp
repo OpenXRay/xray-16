@@ -7,7 +7,7 @@
 
 //---------------------------------------------------------------------------
 CPropHelper PHelper_impl;
-IPropHelper &PHelper() { return PHelper_impl; }
+XREPROPS_API IPropHelper& PHelper() { return PHelper_impl; }
 //---------------------------------------------------------------------------
 PropItem *CPropHelper::CreateItem(PropItemVec &items, const shared_str &key, EPropType type, u32 item_flags)
 {

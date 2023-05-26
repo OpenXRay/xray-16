@@ -13,7 +13,7 @@ CEditorRenderDevice EDevice;
 extern int rsDVB_Size;
 extern int rsDIB_Size;
 
-ENGINE_API BOOL g_bRendering = FALSE;
+ENGINE_API bool g_bRendering = FALSE;
 
 void CEditorRenderDevice::AddSeqFrame(pureFrame *f, bool mt) { seqFrame.Add(f, REG_PRIORITY_LOW); }
 void CEditorRenderDevice::RemoveSeqFrame(pureFrame *f) { seqFrame.Remove(f); }
@@ -121,7 +121,6 @@ void UpdateWindowProps(HWND m_hWnd)
 }
 
 extern IRenderFactory* RenderFactory;
-extern CRender* Render;
 
 // extern void Surface_Init();
 #include "Include/xrAPI/xrAPI.h"

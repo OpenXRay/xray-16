@@ -318,9 +318,6 @@
     <ClCompile Include="Editor\UIEditLightAnim.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\XrCore\Animation\interp.cpp" />
-    <ClCompile Include="..\..\XrCore\Animation\motion.cpp" />
-    <ClCompile Include="..\..\XrCore\Animation\SkeletonMotions.cpp" />
     <ClCompile Include="..\..\Layers\XrRenderDX9\dx9r_constants_cache.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\Animation.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\Blender.cpp" />
@@ -390,6 +387,11 @@
     <ClCompile Include="..\..\Layers\xrRender\blenders\Blender_Shadow_World.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\blenders\Blender_Vertex.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\blenders\Blender_Vertex_aref.cpp" />
+    <ClCompile Include="ELocatorAPI.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\SkeletonXSkinXW_CPP.cpp" />
+    <ClCompile Include="..\..\Layers\xrRenderDX9\BufferUtils.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\dxStatGraphRender.cpp" />
+    <ClCompile Include="..\..\Layers\xrRenderDX9\dx9ResourceManager_Resources.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WildMagic\WmlMath.h">
@@ -625,6 +627,7 @@
     <ClInclude Include="Editor\UIEditLightAnim.h">
       <Filter>Editor</Filter>
     </ClInclude>
+    <ClInclude Include="ELocatorAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WildMagic\WmlMath.inl">

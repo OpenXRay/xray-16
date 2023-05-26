@@ -13,13 +13,14 @@
 #ifdef WINVER
 #include <rpcdce.h>
 #include <rpc.h>
+#pragma comment(lib, "rpcrt4.lib")
 #endif
 
 xrGUID generate_guid()
 {
 	xrGUID result;
 #ifdef WINVER
-	STATIC_CHECK(sizeof(xrGUID) == sizeof(GUID), Different_GUID_types);
+    static_assert(sizeof(xrGUID) == sizeof(GUID), "Different_GUID_types");
 	GUID _result;
 	RPC_STATUS gen_result = UuidCreate(&_result);
 	memcpy(&result, &_result, sizeof(_result));
@@ -34,9 +35,9 @@ xrGUID generate_guid()
 		break;
 	}
 #endif
-	STATIC_CHECK(sizeof(result) >= sizeof(u64), GUID_must_have_size_greater_or_equal_to_the_long_long);
+    static_assert(sizeof(result) >= sizeof(u64), "GUID_must_have_size_greater_or_equal_to_the_long_long");
 	ZeroMemory(&result, sizeof(result));
-	u64 temp = CPU::GetCLK();
+    u64 temp = __rdtsc();
 	memcpy(&result, &temp, sizeof(temp));
 	return (result);
 }

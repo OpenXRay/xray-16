@@ -1,5 +1,4 @@
-#ifndef _ITTERATE_ADJACENTS_DYNAMIC_H_
-#define _ITTERATE_ADJACENTS_DYNAMIC_H_
+#pragma once
 
 template <typename typeVertex>
 struct itterate_adjacents_params_dynamic
@@ -54,14 +53,14 @@ private:
 			type_vertex v1_a, v1_b;
 			F1->EdgeVerts(e, v1_a, v1_b);
 			if (v1_a.gt(v1_b))
-				swap(v1_a, v1_b);
+				std::swap(v1_a, v1_b);
 
 			for (int r = 0; r < 3; ++r)
 			{
 				type_vertex v2_a, v2_b;
 				F2->EdgeVerts(r, v2_a, v2_b);
 				if (v2_a.gt(v2_b))
-					swap(v2_a, v2_b);
+					std::swap(v2_a, v2_b);
 
 				if ((v1_a.eq(v2_a)) && (v1_b.eq(v2_b)))
 				{
@@ -140,5 +139,3 @@ public:
 		return false;
 	}
 };
-
-#endif

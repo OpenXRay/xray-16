@@ -447,7 +447,7 @@ void CActorTools::ZoomObject(BOOL bSelOnly)
                         C = (*b_it)->shape.cylinder.m_center;
                         break;
                     }
-                    (*b_it)->_LTransform().transform_tiny(C);
+                    (*b_it)->LTransform().transform_tiny(C);
                     m_AVTransform.transform_tiny(C);
                     Fbox bb;
                     bb.set(C, C);

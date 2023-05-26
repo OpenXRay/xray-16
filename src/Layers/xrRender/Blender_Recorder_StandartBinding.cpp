@@ -6,7 +6,10 @@
 #include "Blender.h"
 
 #include "xrEngine/IGame_Persistent.h"
+
+#ifndef _EDITOR
 #include "xrEngine/Environment.h"
+#endif
 
 #include "Common/RDevice.h"
 

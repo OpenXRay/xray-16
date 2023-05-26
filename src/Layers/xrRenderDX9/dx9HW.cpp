@@ -249,6 +249,12 @@ void CHW::CreateDevice(HWND hWnd)
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif
+
+#ifdef _EDITOR
+    R_CHK(pDevice->GetRenderTarget(0, &pBaseRT));
+    R_CHK(pDevice->GetDepthStencilSurface(&pBaseZB));
+#endif
+
     const u32 memory = pDevice->GetAvailableTextureMem();
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
 }

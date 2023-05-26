@@ -153,7 +153,7 @@ public:
     virtual CTextValue* CreateTexture(PropItemVec& items, shared_str key, pstr val, u32 sz) = 0;
 };
 //---------------------------------------------------------------------------
-extern IPropHelper& PHelper();
+extern XREPROPS_API IPropHelper& PHelper();
 //---------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -170,6 +170,6 @@ public:
         ListItemsVec& items, LPCSTR key, int type, u32 item_flags = 0, void* object = nullptr) = 0;
 };
 
-IListHelper& LHelper();
+XREPROPS_API IListHelper& LHelper();
 
 #endif

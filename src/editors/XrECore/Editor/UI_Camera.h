@@ -32,8 +32,11 @@ protected:
     float m_SR, m_SM;
 
     void Pan(float X, float Z);
+    void Pan(int X, int Y) { Pan(static_cast<float>(X), static_cast<float>(Y)); }
     void Scale(float Y);
+    void Scale(int Y) { Scale(static_cast<float>(Y)); }
     void Rotate(float X, float Y);
+    void Rotate(int X, int Y) { Rotate(static_cast<float>(X), static_cast<float>(Y)); }
     void ArcBall(TShiftState Shift, float X, float Y);
 
 public:

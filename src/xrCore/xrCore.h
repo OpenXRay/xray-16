@@ -120,6 +120,7 @@ public:
     char* Params;
     u32 dwFrame;
     bool PluginMode;
+    bool SocSdk;
 
     void Initialize(
         pcstr ApplicationName, pcstr commandLine = nullptr, LogCallback cb = nullptr, bool init_fs = true, pcstr fs_fname = nullptr, bool plugin = false);

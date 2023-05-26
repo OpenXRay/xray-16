@@ -1,5 +1,10 @@
 #include "stdafx.h"
 #include "dxStatGraphRender.h"
+#include "Common/RDevice.h"
+
+#ifdef _EDITOR
+#include "Debug/dxPixEventWrapper.h"
+#endif
 
 void dxStatGraphRender::Copy(IStatGraphRender& _in) { *this = *((dxStatGraphRender*)&_in); }
 void dxStatGraphRender::OnDeviceCreate()
@@ -20,8 +25,8 @@ void dxStatGraphRender::OnRender(CStatGraph& owner)
 
     Fmatrix ViewM;
     ViewM.identity();
-    ViewM._11 =  1.f / Device.dwWidth;
-    ViewM._22 = -1.f / Device.dwHeight;
+    ViewM._11 =  1.f / RDEVICE.dwWidth;
+    ViewM._22 = -1.f / RDEVICE.dwHeight;
 
     RCache.set_xform_world(Fidentity);
     RCache.set_xform_view(ViewM);

@@ -61,7 +61,6 @@ private:
 #ifndef _EDITOR
 FACTORY_PTR_INSTANCIATE(UISequenceVideoItem)
 FACTORY_PTR_INSTANCIATE(UIShader)
-FACTORY_PTR_INSTANCIATE(StatGraphRender)
 #ifdef DEBUG
 FACTORY_PTR_INSTANCIATE(ObjectSpaceRender)
 #endif // DEBUG
@@ -79,6 +78,8 @@ FACTORY_PTR_INSTANCIATE(EnvironmentRender)
 FACTORY_PTR_INSTANCIATE(EnvDescriptorRender)
 #endif // _EDITOR
 FACTORY_PTR_INSTANCIATE(FontRender)
+FACTORY_PTR_INSTANCIATE(StatGraphRender)
+
 /*
 void FactoryPtr<IStatsRender>::CreateObject(void)
 {

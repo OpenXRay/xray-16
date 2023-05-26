@@ -124,7 +124,7 @@ SGeometry* CResourceManager::CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBuf
     return g;
 }
 
-#ifdef _EDITOR
+#if 0 //def _EDITOR
 //--------------------------------------------------------------------------------------------------------------
 class includer : public ID3DXInclude
 {

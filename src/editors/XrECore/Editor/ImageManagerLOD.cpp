@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "ImageManager.h"
 #include "editobject.h"
 #include "editmesh.h"
 #include "ui_main.h"
-#include "xrHemisphere.h"
-#include "xrImage_Resampler.h"
+
+#include "xrEngine/xrHemisphere.h"
+#include "xrEngine/xrImage_Resampler.h"
 #include "..\Engine\Image.h"
+
 /*
 IC void SetCamera(float angle, const Fvector& C, float height, float radius, float dist)
 {
@@ -222,7 +222,7 @@ void CreateLODSamples(const Fbox &bbox, U32Vec &tgt_data, u32 tgt_w, u32 tgt_h)
         mV.build_camera_dir(vP, vD, vN);
         bb.xform(mV);
         // build project matrix
-        mP.build_projection_ortho(R, bb.max.y - bb.min.y, bb.min.z, bb.max.z);
+        mP.build_projection_ortho(R, bb.vMax.y - bb.vMin.y, bb.vMin.z, bb.vMax.z);
         RCache.set_xform_project(mP);
         RCache.set_xform_view(mV);
         EDevice.mFullTransform.mul(mP, mV);
@@ -281,8 +281,8 @@ void CImageManager::CreateLODTexture(CEditableObject *OBJECT, U32Vec &lod_pixels
 
     float tN = 0.f, tH = 0.f, tT = 0.f, tR = 0.f;
 
-    float LOD_CALC_SAMPLES = quality;
-    s32 LOD_CALC_SAMPLES_LIM = LOD_CALC_SAMPLES / 2;
+    float LOD_CALC_SAMPLES = static_cast<float>(quality);
+    s32 LOD_CALC_SAMPLES_LIM = quality / 2;
 
     xr_vector<CSurface*> loadedSurfaces;
 
@@ -389,7 +389,7 @@ void CImageManager::CreateLODTexture(CEditableObject *OBJECT, U32Vec &lod_pixels
                     for (FvectorIt it = n_vec.begin(); it != n_vec.end(); it++)
                         N.add(*it);
 
-                    N.div(n_vec.size());
+                    N.div(static_cast<float>(n_vec.size()));
                     N.normalize_safe();
                     Mi.transform_dir(N);
                 }

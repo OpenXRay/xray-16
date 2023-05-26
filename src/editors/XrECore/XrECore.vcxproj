@@ -23,10 +23,17 @@
     <ClCompile>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_EDITOR;XRECORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(xrExternals)libtheora\include;$(xrExternals)libogg\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)libtheora\include;$(xrExternals)libogg\include;$(xrExternals)libvorbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Layers\xrRenderDX9\BufferUtils.cpp" />
+    <ClCompile Include="..\..\Layers\xrRenderDX9\dx9ResourceManager_Resources.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\dxStatGraphRender.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\SkeletonXSkinXW_CPP.cpp" />
     <ClCompile Include="..\..\XrEngine\defines.cpp" />
     <ClCompile Include="..\..\XrEngine\GameFont.cpp" />
     <ClCompile Include="..\..\XrEngine\GameMtlLib.cpp" />
@@ -98,6 +105,7 @@
     <ClCompile Include="..\..\Layers\xrRender\stats_manager.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\Texture.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\TextureDescrManager.cpp" />
+    <ClCompile Include="ELocatorAPI.cpp" />
     <ClCompile Include="tga.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\tss_def.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\xrRender_console.cpp" />
@@ -260,6 +268,7 @@
     <ClInclude Include="Editor\ui_main.h" />
     <ClInclude Include="Editor\UI_MainCommand.h" />
     <ClInclude Include="Editor\UI_ToolsCustom.h" />
+    <ClInclude Include="ELocatorAPI.h" />
     <ClInclude Include="Engine\ai_sounds.h" />
     <ClInclude Include="Engine\cl_collector.h" />
     <ClInclude Include="Engine\cl_intersect.h" />
@@ -332,11 +341,17 @@
     <ProjectReference Include="..\..\..\Externals\libvorbis_static.vcxproj">
       <Project>{3a214e06-b95e-4d61-a291-1f8df2ec10fd}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Layers\xrAPI\xrAPI.vcxproj">
+      <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\utils\ETools\ETools.vcxproj">
       <Project>{65cbb9d0-fbc6-41a4-8316-f5e9b5d7fb33}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\utils\xrDXT\DXT.vcxproj">
       <Project>{ebf9b543-0830-4866-9b48-dc0740e87e8a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\utils\xrMiscMath\xrMiscMath.vcxproj">
+      <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\xrCDB\xrCDB.vcxproj">
       <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
@@ -344,11 +359,17 @@
     <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\xrEngine\xrEngine.vcxproj">
+      <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\xrParticles\xrParticles.vcxproj">
       <Project>{94a1c366-3d19-48e6-8170-4adc2e70df97}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\xrPhysics\xrPhysics.vcxproj">
       <Project>{98d24a3d-7666-4c11-9d6e-b10393ce8cba}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xrScriptEngine\xrScriptEngine.vcxproj">
+      <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\xrSound\xrSound.vcxproj">
       <Project>{ccca7859-eb86-493e-9b53-c4235f45b3c5}</Project>

@@ -70,6 +70,11 @@ public:
     IDirect3DStateBlock9* dwDebugSB = nullptr;
 #endif
 
+#ifdef _EDITOR
+    IDirect3DSurface9* pBaseRT;
+    IDirect3DSurface9* pBaseZB;
+#endif
+
     IDirect3D9* pD3D = nullptr; // D3D
 
     u32 DevAdapter;
@@ -83,8 +88,8 @@ public:
 
     u32 GetBackBufferWidth() { return DevPP.BackBufferWidth; }
     u32 GetBackBufferHeight() { return DevPP.BackBufferHeight; }
-    u32 SetBackBufferWidth(u32 val) { DevPP.BackBufferWidth = val; }
-    u32 SetBackBufferHeight(u32 val) { DevPP.BackBufferHeight = val; }
+    void SetBackBufferWidth(u32 val) { DevPP.BackBufferWidth = val; }
+    void SetBackBufferHeight(u32 val) { DevPP.BackBufferHeight = val; }
 
 private:
     D3DPRESENT_PARAMETERS DevPP;

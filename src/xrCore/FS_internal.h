@@ -138,7 +138,7 @@ public:
     CCompressedReader(const char* name, const char* sign);
     ~CCompressedReader() override;
 };
-class CVirtualFileReader final : public IReader
+class XRCORE_API CVirtualFileReader final : public IReader
 {
 private:
 #if defined(XR_PLATFORM_WINDOWS)

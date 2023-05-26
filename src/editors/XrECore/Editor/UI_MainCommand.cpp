@@ -1,7 +1,5 @@
-//---------------------------------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
+#include "xrCore/_fbox2.h"
 
 #include "ui_main.h"
 #include "UI_ToolsCustom.h"
@@ -13,12 +11,12 @@
 #include "d3dutils.h"
 
 #include "Library.h"
-#include "LightAnimLibrary.h"
+#include "xrEngine/LightAnimLibrary.h"
 
 #include "ImageManager.h"
 #include "SoundManager.h"
-#include "ResourceManager.h"
-#include "igame_persistent.h"
+#include "Layers/xrRender/ResourceManager.h"
+#include "xrEngine/igame_persistent.h"
 
 ECommandVec ECommands;
 BOOL bAllowReceiveCommand = FALSE;
@@ -177,7 +175,7 @@ BOOL LoadShortcuts(CInifile *ini)
                 if (ini->line_exist("shortcuts", nm))
                 {
                     LPCSTR val = ini->r_string("shortcuts", nm);
-                    int res = sscanf(val, "%d,%s", &SUB->shortcut.hotkey, tmp);
+                    int res = sscanf(val, "%hd,%s", &SUB->shortcut.hotkey, tmp);
                     if (2 == res)
                     {
                         xr_string sp;
@@ -298,7 +296,7 @@ CCommandVar CommandInitialize(CCommandVar p1, CCommandVar p2)
             {
                 if (EPrefs)
                     EPrefs->Load();
-                EDevice.seqAppStart.Process(rp_AppStart);
+                EDevice.seqAppStart.Process();
                 ExecCommand(COMMAND_RESTORE_UI_BAR);
                 ExecCommand(COMMAND_REFRESH_UI_BAR);
                 ExecCommand(COMMAND_CLEAR);
@@ -331,7 +329,7 @@ CCommandVar CommandDestroy(CCommandVar p1, CCommandVar p2)
     ExecCommand(COMMAND_SAVE_UI_BAR);
     EPrefs->OnDestroy();
     ExecCommand(COMMAND_CLEAR);
-    EDevice.seqAppEnd.Process(rp_AppEnd);
+    EDevice.seqAppEnd.Process();
     xr_delete(g_pGamePersistent);
     LALib.OnDestroy();
     Tools->OnDestroy();

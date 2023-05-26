@@ -5,19 +5,17 @@
 #include "ExportObjectOGF.h"
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "fmesh.h"
 
-#include "bone.h"
-#include "SkeletonMotions.h"
-#include "motion.h"
+#include "xrCore/FMesh.hpp"
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
+#include "xrCore/Animation/SkeletonMotions.hpp"
 
-//#include "library.h"
+#define MAX_BONE 64
 
 #ifdef _EDITOR
 #include "ui_main.h"
-
 #endif
-//#include "../../../xrRender/Private/SkeletonAnimated.h"
 
 ECORE_API BOOL g_force16BitTransformQuant = FALSE;
 ECORE_API float g_EpsSkelPositionDelta = EPS_L;
@@ -90,8 +88,8 @@ CSkeletonCollectorPacked::CSkeletonCollectorPacked(const Fbox &_bb, int apx_vert
     bb.set(_bb);
     bb.grow(EPS_L);
     // Params
-    m_VMscale.set(bb.max.x - bb.min.x + EPS, bb.max.y - bb.min.y + EPS, bb.max.z - bb.min.z + EPS);
-    m_VMmin.set(bb.min).sub(EPS);
+    m_VMscale.set(bb.vMax.x - bb.vMin.x + EPS, bb.vMax.y - bb.vMin.y + EPS, bb.vMax.z - bb.vMin.z + EPS);
+    m_VMmin.set(bb.vMin).sub(EPS);
     m_VMeps.set(m_VMscale.x / clpSMX / 2, m_VMscale.y / clpSMY / 2, m_VMscale.z / clpSMZ / 2);
     m_VMeps.x = (m_VMeps.x < EPS_L) ? m_VMeps.x : EPS_L;
     m_VMeps.y = (m_VMeps.y < EPS_L) ? m_VMeps.y : EPS_L;
@@ -238,8 +236,8 @@ void CExportSkeleton::SSplit::Save(IWriter &F)
     H.format_version = xrOGF_FormatVersion;
     H.type = (m_SWR.size()) ? MT_SKELETON_GEOMDEF_PM : MT_SKELETON_GEOMDEF_ST;
     H.shader_id = 0;
-    H.bb.min = m_Box.min;
-    H.bb.max = m_Box.max;
+    H.bb.min = m_Box.vMin;
+    H.bb.max = m_Box.vMax;
     m_Box.getsphere(H.bs.c, H.bs.r);
     F.w(&H, sizeof(H));
     F.close_chunk();
@@ -601,7 +599,7 @@ bool CExportSkeleton::PrepareGeometry(u8 influence)
     R_ASSERT(m_Source->IsDynamic() && m_Source->IsSkeleton());
 
 #ifdef _EDITOR
-    SPBItem *pb = UI->ProgressStart(5 + m_Source->MeshCount() * 2 + m_Source->SurfaceCount(), "..Prepare skeleton geometry");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(5 + m_Source->MeshCount() * 2 + m_Source->SurfaceCount()), "..Prepare skeleton geometry");
     pb->Inc();
 #endif
 
@@ -667,7 +665,7 @@ bool CExportSkeleton::PrepareGeometry(u8 influence)
 
                 {
                     SSkelVert v[3];
-                    tmp_bone_lst.clear_not_free();
+                    tmp_bone_lst.clear();
                     u32 link_type = _max(MESH->m_SVertices[f_idx * 3 + 0].bones.size(), MESH->m_SVertices[f_idx * 3 + 1].bones.size());
                     link_type = _max(link_type, MESH->m_SVertices[f_idx * 3 + 2].bones.size());
                     VERIFY(link_type > 0 && link_type <= (u32)influence);
@@ -833,7 +831,7 @@ bool CExportSkeleton::ExportGeometry(IWriter &F, u8 infl)
         return false;
 
 #ifdef _EDITOR
-    SPBItem *pb = UI->ProgressStart(3 + m_Splits.size(), "..Export skeleton geometry");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(3 + m_Splits.size()), "..Export skeleton geometry");
     pb->Inc("Make Progressive...");
 #endif
     // fill per bone vertices
@@ -852,7 +850,7 @@ bool CExportSkeleton::ExportGeometry(IWriter &F, u8 infl)
         for (SkelVertIt sv_it = lst.begin(); sv_it != lst.end(); sv_it++)
         {
             bone_points[sv_it->bones[0].id].push_back(sv_it->offs);
-            bones[sv_it->bones[0].id]->_RITransform().transform_tiny(bone_points[sv_it->bones[0].id].back());
+            bones[sv_it->bones[0].id]->RITransform().transform_tiny(bone_points[sv_it->bones[0].id].back());
         }
 #ifdef _EDITOR
         pb->Inc();
@@ -865,8 +863,8 @@ bool CExportSkeleton::ExportGeometry(IWriter &F, u8 infl)
     H.format_version = xrOGF_FormatVersion;
     H.type = m_Source->IsAnimated() ? MT_SKELETON_ANIM : MT_SKELETON_RIGID;
     H.shader_id = 0;
-    H.bb.min = m_Box.min;
-    H.bb.max = m_Box.max;
+    H.bb.min = m_Box.vMin;
+    H.bb.max = m_Box.vMax;
     m_Box.getsphere(H.bs.c, H.bs.r);
     F.w_chunk(OGF_HEADER, &H, sizeof(H));
 
@@ -910,7 +908,7 @@ bool CExportSkeleton::ExportGeometry(IWriter &F, u8 infl)
 
     F.open_chunk(OGF_S_IKDATA);
     for (auto bone_it = m_Source->FirstBone(); bone_it != m_Source->LastBone(); ++bone_it, ++bone_idx)
-        if (!(*bone_it)->ExportOGF(F))
+        if (!BoneExportOGF(*bone_it, F))
             bRes = false;
 
     F.close_chunk();
@@ -993,7 +991,7 @@ bool CExportSkeleton::ExportMotionKeys(IWriter &F)
     }
 
 #ifdef _EDITOR
-    SPBItem *pb = UI->ProgressStart(1 + m_Source->SMotionCount(), "..Export skeleton motions keys");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(1 + m_Source->SMotionCount()), "..Export skeleton motions keys");
     pb->Inc();
 #endif
     // mem active motion
@@ -1047,10 +1045,10 @@ bool CExportSkeleton::ExportMotionKeys(IWriter &F)
                     cur_motion->_Evaluate(bone_id, t, T, R);
                 else
                 {
-                    T = (*b_it)->_Offset();
-                    R = (*b_it)->_Rotate();
+                    T = (*b_it)->Offset();
+                    R = (*b_it)->Rotate();
                 }
-                (*b_it)->_Update(T, R);
+                (*b_it)->Update(T, R);
 
                 if (bone_id == 0 && frame == (cur_motion->FrameEnd()))
                 {
@@ -1070,7 +1068,7 @@ bool CExportSkeleton::ExportMotionKeys(IWriter &F)
             for (auto b_it = b_lst.begin(); b_it != b_lst.end(); b_it++, bone_id++)
             {
                 CBone *B = *b_it;
-                Fmatrix mat = B->_MTransform();
+                Fmatrix mat = B->MTransform();
                 if (B->IsRoot())
                     mat.mulA_43(mGT);
                 Fquaternion q;
@@ -1117,7 +1115,7 @@ bool CExportSkeleton::ExportMotionKeys(IWriter &F)
                 Bt.y = _max(Bt.y, t.y);
                 Bt.z = _max(Bt.z, t.z);
             }
-            Mt.div(dwLen);
+            Mt.div(static_cast<float>(dwLen));
             Ct.add(Bt, At);
             Ct.mul(0.5f);
             St.sub(Bt, At);
@@ -1372,43 +1370,44 @@ bool CExportSkeleton::Export(IWriter &F, u8 infl)
 
 #if defined _EDITOR || defined _MAYA_EXPORT
 
-bool CBone::ExportOGF(IWriter &F)
+bool BoneExportOGF(CBone *bone, IWriter &F)
 {
     // check valid
-    if (!shape.Valid())
+    if (!bone->shape.Valid())
     {
-        ELog.Msg(mtError, "Bone '%s' has invalid shape.", *Name());
+        ELog.Msg(mtError, "Bone '%s' has invalid shape.", *bone->Name());
         return false;
     }
+
 #ifdef _EDITOR
-    SGameMtl *M = GMLib.GetMaterial(game_mtl.c_str());
+    SGameMtl *M = GMLib.GetMaterial(bone->game_mtl.c_str());
     if (!M)
     {
-        ELog.Msg(mtError, "Bone '%s' has invalid game material.", *Name());
+        ELog.Msg(mtError, "Bone '%s' has invalid game material.", *bone->Name());
         return false;
     }
     if (!M->Flags.is(SGameMtl::flDynamic))
     {
-        ELog.Msg(mtError, "Bone '%s' has non-dynamic game material.", *Name());
+        ELog.Msg(mtError, "Bone '%s' has non-dynamic game material.", *bone->Name());
         return false;
     }
 #endif
 
     F.w_u32(OGF_IKDATA_VERSION);
 
-    F.w_stringZ(game_mtl);
-    F.w(&shape, sizeof(SBoneShape));
+    F.w_stringZ(bone->game_mtl);
+    F.w(&bone->shape, sizeof(SBoneShape));
 
-    IK_data.Export(F);
+    bone->IK_data.Export(F);
 
     //	Fvector xyz;
-    //	Fmatrix& R	= _RTransform();
+    //	Fmatrix& R	= RTransform();
     //	R.getXYZi	(xyz);
 
-    F.w_fvector3(rest_rotate);
-    F.w_fvector3(rest_offset);
-    F.w_float(mass);
-    F.w_fvector3(center_of_mass);
+    F.w_fvector3(bone->rest_rotate);
+    F.w_fvector3(bone->rest_offset);
+    F.w_float(bone->mass);
+    F.w_fvector3(bone->center_of_mass);
     return true;
 }
 

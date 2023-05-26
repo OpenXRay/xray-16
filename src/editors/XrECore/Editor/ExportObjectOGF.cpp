@@ -125,8 +125,8 @@ void CExportObjectOGF::SSplit::SavePart(IWriter &F, CObjectOGFCollectorPacked *p
     H.format_version = xrOGF_FormatVersion;
     H.type = (part->m_SWR.size()) ? MT_PROGRESSIVE : MT_NORMAL;
     H.shader_id = 0;
-    H.bb.min = part->m_Box.min;
-    H.bb.max = part->m_Box.max;
+    H.bb.min = part->m_Box.vMin;
+    H.bb.max = part->m_Box.vMax;
     part->m_Box.getsphere(H.bs.c, H.bs.r);
     F.w(&H, sizeof(H));
     F.close_chunk();
@@ -436,8 +436,8 @@ bool CExportObjectOGF::Export(IWriter &F, bool gen_tb, CEditableMesh *mesh)
         H.format_version = xrOGF_FormatVersion;
         H.type = MT_HIERRARHY;
         H.shader_id = 0;
-        H.bb.min = m_Box.min;
-        H.bb.max = m_Box.max;
+        H.bb.min = m_Box.vMin;
+        H.bb.max = m_Box.vMax;
         m_Box.getsphere(H.bs.c, H.bs.r);
         F.w_chunk(OGF_HEADER, &H, sizeof(H));
 
@@ -564,7 +564,7 @@ bool CExportObjectOGF::ExportAsWavefrontOBJ(IWriter &F, LPCSTR fn)
     for (auto split_it = m_Splits.begin(); split_it != m_Splits.end(); ++split_it)
     {
         _splitpath((*split_it)->m_Surf->_Texture(), 0, 0, tex_name, 0);
-        sprintf(tmp, "g %d", split_it - m_Splits.begin());
+        sprintf(tmp, "g %u", static_cast<u32>(split_it - m_Splits.begin()));
         F.w_string(tmp);
         sprintf(tmp, "usemtl %s", tex_name);
         F.w_string(tmp);

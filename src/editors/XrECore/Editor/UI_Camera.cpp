@@ -209,6 +209,8 @@ void CUI_Camera::Rotate(float dx, float dy)
     BuildCamera();
 }
 
+void IR_GetMousePosScreen(Ivector2& p) { GetCursorPos((LPPOINT)&p); }
+
 bool CUI_Camera::MoveStart(TShiftState Shift)
 {
     if (Shift & ssShift)
@@ -216,7 +218,7 @@ bool CUI_Camera::MoveStart(TShiftState Shift)
         if (!m_bMoving)
         {
             ShowCursor(FALSE);
-            UI->IR_GetMousePosScreen(m_StartPos);
+            IR_GetMousePosScreen(m_StartPos);
             m_bMoving = true;
         }
         m_Shift = Shift;
@@ -229,7 +231,7 @@ bool CUI_Camera::MoveStart(TShiftState Shift)
 bool CUI_Camera::MoveEnd(TShiftState Shift)
 {
     m_Shift = Shift;
-    if ((!Shift & ssLeft) || (!Shift & ssShift))
+    if ((~Shift & ssLeft) || (~Shift & ssShift))
     {
         SetCursorPos(m_StartPos.x, m_StartPos.y);
         ShowCursor(TRUE);
@@ -271,7 +273,7 @@ bool CUI_Camera::Process(TShiftState Shift, int dx, int dy)
                 //                else if (Shift&ssRight)) Scale(d.y);
                 break;
             case cs3DArcBall:
-                ArcBall(m_Shift, dx, dy);
+                ArcBall(m_Shift, static_cast<float>(dx), static_cast<float>(dy));
                 break;
             }
             UI->RedrawScene();
@@ -321,8 +323,8 @@ bool CUI_Camera::KeyUp(WORD Key, TShiftState Shift)
 
 void CUI_Camera::MouseRayFromPoint(Fvector &start, Fvector &direction, const Ivector2 &point)
 {
-    int halfwidth = UI->GetRenderWidth() * 0.5f / EDevice.m_ScreenQuality;
-    int halfheight = UI->GetRenderHeight() * 0.5f / EDevice.m_ScreenQuality;
+    int halfwidth = static_cast<int>(UI->GetRenderWidth() * 0.5f / EDevice.m_ScreenQuality);
+    int halfheight = static_cast<int>(UI->GetRenderHeight() * 0.5f / EDevice.m_ScreenQuality);
 
     if (!halfwidth || !halfheight)
         return;
@@ -357,7 +359,7 @@ void CUI_Camera::ZoomExtents(const Fbox &bb)
 
     BuildCamera();
     /*
-        eye_k - фокусное расстояние, eye_k=eye_width/2
+        eye_k - С„РѕРєСѓСЃРЅРѕРµ СЂР°СЃСЃС‚РѕСЏРЅРёРµ, eye_k=eye_width/2
         camera.alfa:=0;
          camera.beta:=-30*pi/180;
          camera.gama:=0;

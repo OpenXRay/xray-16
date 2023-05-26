@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 CListHelper LHelper_impl;
-IListHelper &LHelper() { return LHelper_impl; }
+XREPROPS_API IListHelper& LHelper() { return LHelper_impl; }
 //---------------------------------------------------------------------------
 
 ListItem *CListHelper::FindItem(ListItemsVec &items, LPCSTR key)

@@ -22,16 +22,20 @@ class UICore;
 class XRAPI_API EngineGlobalEnvironment
 {
 public:
-    IRender* Render;
+#ifndef _EDITOR    
     IDebugRender* DRender;
     CDUInterface* DU;
     IUIRender* UIRender;
-    IRenderFactory* RenderFactory;
     CScriptEngine* ScriptEngine;
-    AISpaceBase* AISpace;
-    ISoundManager* Sound;
+    AISpaceBase* AISpace;    
     UICore* UI;
 
+    
+#endif
+
+    ISoundManager* Sound;
+    IRender* Render;
+    IRenderFactory* RenderFactory;
     bool isDedicatedServer;
 };
 

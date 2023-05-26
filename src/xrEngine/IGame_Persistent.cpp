@@ -4,9 +4,9 @@
 #include "IGame_Persistent.h"
 #include "GameFont.h"
 #include "Common/RDevice.h"
-#include "Environment.h"
 
 #ifndef _EDITOR
+#include "Environment.h"
 #include "PerformanceAlert.hpp"
 #include "x_ray.h"
 #include "IGame_Level.h"

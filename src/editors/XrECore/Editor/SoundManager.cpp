@@ -1,24 +1,18 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "SoundManager.h"
 #include "EThumbnail.h"
 #include "ui_main.h"
 
 CSoundManager *SndLib = 0;
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
 
 extern "C" int ogg_enc(const char *in_fn, const char *out_fn, float quality, void *comment, int size);
-//------------------------------------------------------------------------------
+
 xr_string CSoundManager::UpdateFileName(xr_string &fn)
 {
     return EFS.AppendFolderToName(fn, -1, FALSE);
 }
 
-//------------------------------------------------------------------------------
-// âîçâðàùàåò ñïèñîê âñåõ çâóêîâ
-//------------------------------------------------------------------------------
+// Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ ÑÐ¿Ð¸ÑÐ¾Ðº Ð²ÑÐµÑ… Ð·Ð²ÑƒÐºÐ¾Ð²
 int CSoundManager::GetSounds(FS_FileSet &files, BOOL bFolders)
 {
     return FS.file_list(files, _sounds_, (bFolders ? FS_ListFolders : 0) | FS_ListFiles | FS_ClampExt, "*.wav");
@@ -46,20 +40,20 @@ bool CSoundManager::OnCreate()
 {
     //.	psSoundFreq			= sf_44K;
     //	psSoundFlags.set	(ssHardware,FALSE);
-    CSound_manager_interface::_create(0);
-    CSound_manager_interface::_create(1);
+    ISoundManager::_create_devices_list();
+    ISoundManager::_create();
     return true;
 }
 
 void CSoundManager::OnDestroy()
-{
-    CSound_manager_interface::_destroy();
+{ 
+    ISoundManager::_destroy(); 
 }
 
 void CSoundManager::OnFrame()
 {
     ::psSoundVEffects = psDeviceFlags.is(rsMuteSounds) ? 0.f : 1.f;
-    Sound->update(EDevice.m_Camera.GetPosition(), EDevice.m_Camera.GetDirection(), EDevice.m_Camera.GetNormal());
+    GEnv.Sound->update(EDevice.m_Camera.GetPosition(), EDevice.m_Camera.GetDirection(), EDevice.m_Camera.GetNormal());
 }
 
 void CSoundManager::MuteSounds(BOOL bVal)
@@ -100,7 +94,7 @@ void CSoundManager::RenameSound(LPCSTR nm0, LPCSTR nm1, EItemType type)
         FS.update_path(fn1, _game_sounds_, nm1);
         strcat(fn1, ".ogg");
         FS.file_rename(fn0, fn1, false);
-        Sound->refresh_sources();
+        GEnv.Sound->refresh_sources();
     }
 }
 
@@ -126,7 +120,7 @@ BOOL CSoundManager::RemoveSound(LPCSTR fname, EItemType type)
             FS.file_delete(_sounds_, thm_name.c_str());
             // game
             FS.file_delete(_game_sounds_, game_name.c_str());
-            Sound->refresh_sources();
+            GEnv.Sound->refresh_sources();
             return TRUE;
         }
     }
@@ -134,7 +128,7 @@ BOOL CSoundManager::RemoveSound(LPCSTR fname, EItemType type)
 }
 
 //------------------------------------------------------------------------------
-// âîçâðàùàåò ñïèñîê íîâûõ çâóêîâ
+// Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ ÑÐ¿Ð¸ÑÐ¾Ðº Ð½Ð¾Ð²Ñ‹Ñ… Ð·Ð²ÑƒÐºÐ¾Ð²
 //------------------------------------------------------------------------------
 int CSoundManager::GetLocalNewSounds(FS_FileSet &files)
 {
@@ -142,8 +136,8 @@ int CSoundManager::GetLocalNewSounds(FS_FileSet &files)
 }
 
 //------------------------------------------------------------------------------
-// êîïèðóåò îáíîâëåííûå çâóêè ñ Import'a â Sounds
-// files - ñïèñîê ôàéëîâ äëÿ êîïèðîâàíèå
+// ÐºÐ¾Ð¿Ð¸Ñ€ÑƒÐµÑ‚ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð½Ñ‹Ðµ Ð·Ð²ÑƒÐºÐ¸ Ñ Import'a Ð² Sounds
+// files - ÑÐ¿Ð¸ÑÐ¾Ðº Ñ„Ð°Ð¹Ð»Ð¾Ð² Ð´Ð»Ñ ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ
 //------------------------------------------------------------------------------
 /*
 void CSoundManager::SafeCopyLocalToServer(FS_FileSet& files)
@@ -179,7 +173,7 @@ void CSoundManager::SafeCopyLocalToServer(FS_FileSet& files)
 }
 */
 //------------------------------------------------------------------------------
-// ñîçäàåò òõì
+// ÑÐ¾Ð·Ð´Ð°ÐµÑ‚ Ñ‚Ñ…Ð¼
 //------------------------------------------------------------------------------
 void CSoundManager::CreateSoundThumbnail(ESoundThumbnail *THM, const xr_string &src_name, LPCSTR initial, bool bSetDefParam)
 {
@@ -191,7 +185,7 @@ void CSoundManager::CreateSoundThumbnail(ESoundThumbnail *THM, const xr_string &
         FS.update_path(base_name, _sounds_, src_name.c_str());
     strcpy(base_name, EFS.ChangeFileExt(base_name, ".wav").c_str());
 
-    // âûñòàâèòü íà÷àëüíûå ïàðàìåòðû
+    // Ð²Ñ‹ÑÑ‚Ð°Ð²Ð¸Ñ‚ÑŒ Ð½Ð°Ñ‡Ð°Ð»ÑŒÐ½Ñ‹Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹
     if (bSetDefParam)
     {
         THM->m_Age = FS.get_file_age(base_name);
@@ -220,9 +214,9 @@ void CSoundManager::MakeGameSound(ESoundThumbnail *THM, LPCSTR src_name, LPCSTR 
 }
 
 //------------------------------------------------------------------------------
-// âîçâðàùàåò ñïèñîê íå ñèíõðîíèçèðîâàííûõ (ìîäèôèöèðîâàííûõ) òåêñòóð
-// source_list - ñîäåðæèò ñïèñîê òåêñòóð ñ ðàñøèðåíèÿìè
-// sync_list - ðåàëüíî ñîõðàíåííûå ôàéëû (ïîñëå èñïîëüçîâàíèÿ îñâîáîäèòü)
+// Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ ÑÐ¿Ð¸ÑÐ¾Ðº Ð½Ðµ ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ñ… (Ð¼Ð¾Ð´Ð¸Ñ„Ð¸Ñ†Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ñ…) Ñ‚ÐµÐºÑÑ‚ÑƒÑ€
+// source_list - ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ñ‚ ÑÐ¿Ð¸ÑÐ¾Ðº Ñ‚ÐµÐºÑÑ‚ÑƒÑ€ Ñ Ñ€Ð°ÑÑˆÐ¸Ñ€ÐµÐ½Ð¸ÑÐ¼Ð¸
+// sync_list - Ñ€ÐµÐ°Ð»ÑŒÐ½Ð¾ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð½Ñ‹Ðµ Ñ„Ð°Ð¹Ð»Ñ‹ (Ð¿Ð¾ÑÐ»Ðµ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ñ Ð¾ÑÐ²Ð¾Ð±Ð¾Ð´Ð¸Ñ‚ÑŒ)
 //------------------------------------------------------------------------------
 void CSoundManager::SynchronizeSounds(bool sync_thm, bool sync_game, bool bForceGame, FS_FileSet *source_list, AStringVec *sync_list, FS_FileSet *modif_map)
 {
@@ -250,7 +244,7 @@ void CSoundManager::SynchronizeSounds(bool sync_thm, bool sync_game, bool bForce
 
     SPBItem *pb = 0;
     if (bProgress)
-        pb = UI->ProgressStart(M_BASE.size(), "Synchronize sounds...");
+        pb = UI->ProgressStart(static_cast<float>(M_BASE.size()), "Synchronize sounds...");
 
     auto it = M_BASE.begin();
     auto it_e = M_BASE.end();
@@ -339,12 +333,9 @@ void CSoundManager::CleanupSounds()
     FS.file_list(M_THUM, _sounds_, FS_ListFiles | FS_ClampExt, "*.thm");
     FS.file_list(M_GAME, _game_sounds_, FS_ListFiles | FS_ClampExt, "*.ogg");
 
-    auto it;
-    auto it_e;
-
     // check source exist
-    it = M_GAME.begin();
-    it_e = M_GAME.end();
+    auto it = M_GAME.begin();
+    auto it_e = M_GAME.end();
 
     for (; it != it_e; ++it)
     {
@@ -367,7 +358,7 @@ void CSoundManager::CleanupSounds()
             M_THM_DEL.insert(*it);
     }
 
-    SPBItem *pb = UI->ProgressStart(M_GAME_DEL.size() + M_THM_DEL.size(), "Cleanup sounds...");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(M_GAME_DEL.size() + M_THM_DEL.size()), "Cleanup sounds...");
     // mark game del sounds
     it = M_GAME_DEL.begin();
     it_e = M_GAME_DEL.end();
@@ -426,8 +417,8 @@ void CSoundManager::ChangeFileAgeTo(FS_FileSet* tgt_map, int age)
 }
 */
 //------------------------------------------------------------------------------
-// åñëè ïåðåäàí ïàðàìåòð modif - îáíîâëÿåì DX-Surface only è òîëüêî èç ñïèñêà
-// èíà÷å ïîëíàÿ ñèíõðîíèçàöèÿ
+// ÐµÑÐ»Ð¸ Ð¿ÐµÑ€ÐµÐ´Ð°Ð½ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€ modif - Ð¾Ð±Ð½Ð¾Ð²Ð»ÑÐµÐ¼ DX-Surface only Ð¸ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¸Ð· ÑÐ¿Ð¸ÑÐºÐ°
+// Ð¸Ð½Ð°Ñ‡Ðµ Ð¿Ð¾Ð»Ð½Ð°Ñ ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ
 //------------------------------------------------------------------------------
 void CSoundManager::RefreshSounds(bool bSync)
 {
@@ -439,7 +430,7 @@ void CSoundManager::RefreshSounds(bool bSync)
             SynchronizeSounds(true, true, false, 0, 0);
             CleanupSounds();
         }
-        Sound->refresh_sources();
+        GEnv.Sound->refresh_sources();
         UI->SetStatus("");
     }
     else

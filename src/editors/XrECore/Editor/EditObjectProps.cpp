@@ -1,18 +1,15 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "EditObject.h"
 #include "EditMesh.h"
 #include "ui_main.h"
-#include "motion.h"
-#include "bone.h"
+#include "xrCore/Animation/Motion.hpp"
+#include "xrCore/Animation/Bone.hpp"
 
 void CEditableObject::OnChangeShader(PropValue *)
 {
     OnDeviceDestroy();
     UI->RedrawScene();
 }
-//---------------------------------------------------------------------------
 
 void CEditableObject::FillSurfaceProps(CSurface *SURF, LPCSTR pref, PropItemVec &items)
 {
@@ -57,8 +54,8 @@ void CEditableObject::FillBasicProps(LPCSTR pref, PropItemVec &items)
     V->OnChangeEvent.bind(this, &CEditableObject::OnChangeTransform);
     V = PHelper().CreateVector(items, PrepareKey(pref, "Transform\\Scale"), &t_vScale, 0.01, 10000, 0.01, 2);
     V->OnChangeEvent.bind(this, &CEditableObject::OnChangeTransform);
-    V = PHelper().CreateCaption(items, PrepareKey(pref, "Transform\\BBox Min"), shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(GetBox().min)));
-    V = PHelper().CreateCaption(items, PrepareKey(pref, "Transform\\BBox Max"), shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(GetBox().max)));
+    V = PHelper().CreateCaption(items, PrepareKey(pref, "Transform\\BBox Min"), shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(GetBox().vMin)));
+    V = PHelper().CreateCaption(items, PrepareKey(pref, "Transform\\BBox Max"), shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(GetBox().vMax)));
     //.    PHelper().CreateChoose	    (items, PrepareKey(pref,"LOD\\Reference"),	&m_LODs, smObject);
     PHelper().CreateChoose(items, PrepareKey(pref, "LOD\\Reference"), &m_LODs, smVisual);
 
@@ -68,13 +65,12 @@ void CEditableObject::FillBasicProps(LPCSTR pref, PropItemVec &items)
 
 void CEditableObject::FillSummaryProps(LPCSTR pref, PropItemVec &items)
 {
-    xr_string t;
-    t.sprintf("V: %d, F: %d", GetVertexCount(), GetFaceCount());
+    auto t = make_string("V: %d, F: %d", GetVertexCount(), GetFaceCount());
     PHelper().CreateCaption(items, PrepareKey(pref, "Geometry\\Object"), t.c_str());
     for (EditMeshIt m_it = FirstMesh(); m_it != LastMesh(); m_it++)
     {
         CEditableMesh *MESH = *m_it;
-        t.sprintf("V: %d, F: %d", MESH->GetVertexCount(), MESH->GetFaceCount());
+        t = make_string("V: %d, F: %d", MESH->GetVertexCount(), MESH->GetFaceCount());
         PHelper().CreateCaption(items, PrepareKey(pref, xr_string(xr_string("Geometry\\Meshes\\") + MESH->Name().c_str()).c_str()), t.c_str());
     }
     PHelper().CreateSText(items, PrepareKey(pref, "Game options\\User Data"), &m_ClassScript);

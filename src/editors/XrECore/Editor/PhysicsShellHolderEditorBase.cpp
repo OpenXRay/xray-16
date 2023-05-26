@@ -1,10 +1,8 @@
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "PhysicsShellHolderEditorBase.h"
 #include "../../xrphysics/physicsshell.h"
-#include "GameMtlLib.h"
-// CObjectList	 Objects;
+#include "xrEngine/GameMtlLib.h"
+
 static void SetBoneMaterials(IKinematics &K)
 {
     const u16 count = K.LL_BoneCount();
