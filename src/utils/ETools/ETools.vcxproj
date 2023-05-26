@@ -32,13 +32,22 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="audio.cpp" />
+    <ClCompile Include="encode.cpp" />
     <ClCompile Include="ETools.cpp" />
+    <ClCompile Include="ETools_cm.cpp" />
+    <ClCompile Include="Intersect.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="object_sliding.cpp" />
+    <ClCompile Include="ogg_enc.cpp" />
+    <ClCompile Include="optimize_vertex_order.cpp" />
+    <ClCompile Include="platform.cpp" />
     <ClCompile Include="PropSlimTools.cpp" />
+    <ClCompile Include="resample.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="xrXRC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArbitraryList.h" />
