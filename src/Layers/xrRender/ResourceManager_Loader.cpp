@@ -3,10 +3,11 @@
 
 #include "ResourceManager.h"
 #include "Blender.h"
+#include "Common/RDevice.h"
 
 void CResourceManager::OnDeviceDestroy(BOOL)
 {
-    if (Device.b_is_Ready)
+    if (RDEVICE.b_is_Ready)
         return;
     m_textures_description.UnLoad();
 
@@ -49,7 +50,7 @@ void CResourceManager::OnDeviceDestroy(BOOL)
 
 void CResourceManager::OnDeviceCreate(IReader* F)
 {
-    if (!Device.b_is_Ready)
+    if (!RDEVICE.b_is_Ready)
         return;
 
     string256 name;

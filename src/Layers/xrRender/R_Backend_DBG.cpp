@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Common/RDevice.h"
 #pragma hdrstop
 
 #if defined(USE_DX11) || defined(USE_OGL)
@@ -271,10 +272,10 @@ void CBackend::dbg_OverdrawEnd()
         u32 c = color_xrgb(_c, _c, _c);
 #ifdef USE_DX9
         FVF::TL pv[4];
-        pv[0].set(float(0), float(Device.dwHeight), c, 0, 0);
+        pv[0].set(float(0), float(RDEVICE.dwHeight), c, 0, 0);
         pv[1].set(float(0), float(0), c, 0, 0);
-        pv[2].set(float(Device.dwWidth), float(Device.dwHeight), c, 0, 0);
-        pv[3].set(float(Device.dwWidth), float(0), c, 0, 0);
+        pv[2].set(float(RDEVICE.dwWidth), float(RDEVICE.dwHeight), c, 0, 0);
+        pv[3].set(float(RDEVICE.dwWidth), float(0), c, 0, 0);
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILREF, I));
         CHK_DX(HW.pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pv, sizeof(FVF::TL)));
 #elif defined(USE_DX11) || defined(USE_OGL)

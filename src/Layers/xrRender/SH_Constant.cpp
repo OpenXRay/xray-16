@@ -1,5 +1,5 @@
 #include "stdafx.h"
-
+#include "Common/RDevice.h"
 #include "SH_Constant.h"
 
 /*
@@ -26,13 +26,13 @@ BOOL	AAA_test		()
 
 void CConstant::Calculate()
 {
-    if (dwFrame == Device.dwFrame)
+    if (dwFrame == RDEVICE.dwFrame)
         return;
-    dwFrame = Device.dwFrame;
+    dwFrame = RDEVICE.dwFrame;
     if (modeProgrammable == dwMode)
         return;
 
-    float t = Device.fTimeGlobal;
+    float t = RDEVICE.fTimeGlobal;
     set_float(_R.Calculate(t), _G.Calculate(t), _B.Calculate(t), _A.Calculate(t));
 }
 

@@ -8,6 +8,8 @@
 #include "Render.h"
 #endif
 
+#include "Common/RDevice.h"
+
 extern ENGINE_API bool g_bRendering;
 ENGINE_API Fvector2 g_current_font_scale = {1.0f, 1.0f};
 
@@ -292,7 +294,7 @@ u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, 
 void CGameFont::MasterOut(bool bCheckDevice, bool bUseCoords, bool bScaleCoords, bool bUseSkip, float _x, float _y,
     float _skip, pcstr fmt, va_list p)
 {
-    if (bCheckDevice && (!Device.b_is_Active))
+    if (bCheckDevice && (!RDEVICE.b_is_Active))
         return;
 
     String rs;
@@ -439,7 +441,7 @@ float CGameFont::CurrentHeight_() { return fCurrentHeight * vInterval.y; }
 void CGameFont::SetHeightI(float S)
 {
     VERIFY(uFlags & fsDeviceIndependent);
-    fCurrentHeight = S * Device.dwHeight;
+    fCurrentHeight = S * RDEVICE.dwHeight;
 };
 
 void CGameFont::SetHeight(float S)

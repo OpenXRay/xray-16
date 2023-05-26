@@ -1,6 +1,9 @@
 #pragma once
 
+#ifndef _EDITOR
 #include "xrEngine/Engine.h"
+#endif
+
 #include "xrCDB/Frustum.h"
 #include "vis_common.h"
 #include "Include/xrRender/FactoryPtr.h"

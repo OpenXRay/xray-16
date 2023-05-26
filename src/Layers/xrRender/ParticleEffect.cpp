@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 #include "ParticleEffect.h"
+#include "Common/RDevice.h"
 
 #include "xrCore/Threading/ParallelFor.hpp"
 
@@ -33,8 +34,8 @@ static void ApplyTexgen(const Fmatrix& mVP)
     Fmatrix mTexgen;
 
 #if defined(USE_DX9)
-    float _w = float(Device.dwWidth);
-    float _h = float(Device.dwHeight);
+    float _w = float(RDEVICE.dwWidth);
+    float _h = float(RDEVICE.dwHeight);
     float o_w = (.5f / _w);
     float o_h = (.5f / _h);
     Fmatrix mTexelAdjust =
@@ -318,7 +319,7 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, co
     const Fvector& T = dir;
 
     Fvector R;
-    R.crossproduct(T, Device.vCameraDirection).normalize_safe();
+    R.crossproduct(T, RDEVICE.vCameraDirection).normalize_safe();
 
     Fvector Vr, Vt;
 
@@ -829,12 +830,12 @@ void CParticleEffect::Render(float)
                     {
                         Fvector p;
                         m_XFORM.transform_tiny(p, m.pos);
-                        FillSprite(pv, Device.vCameraTop, Device.vCameraRight, p, lt, rb, r_x, r_y, m.color, m.rot.x);
+                        FillSprite(pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, p, lt, rb, r_x, r_y, m.color, m.rot.x);
                     }
                     else
                     {
                         FillSprite(
-                            pv, Device.vCameraTop, Device.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, m.rot.x);
+                            pv, RDEVICE.vCameraTop, RDEVICE.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, m.rot.x);
                     }
                 }
             }

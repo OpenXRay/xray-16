@@ -25,9 +25,9 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
     dwPrimitives = 0;
     BOOL loaded_v = false;
 
+#ifndef _EDITOR
     if (data->find_chunk(OGF_GCONTAINER))
     {
-#ifndef _EDITOR
         // verts
         u32 ID = data->r_u32();
         vBase = data->r_u32();
@@ -49,7 +49,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         VERIFY(nullptr == p_rm_Indices);
         p_rm_Indices = RImplementation.getIB(ID);
         p_rm_Indices->AddRef();
-#endif
+
         // check for fast-vertices
 #if RENDER == R_R1
         if (data->find_chunk(OGF_FASTPATH) && ps_r1_force_geomx)
@@ -89,6 +89,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             m_fast->rm_geom.create(fmt, *m_fast->p_rm_Vertices, *m_fast->p_rm_Indices);
         }
     }
+#endif
 
     // read vertices
     if (!loaded_v && (dwFlags & VLOAD_NOVERTICES) == 0)

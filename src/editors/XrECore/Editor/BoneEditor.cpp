@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "bone.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "ui_toolscustom.h"
 
 void SJointIKData::clamp_by_limits(Fvector &dest_xyz)

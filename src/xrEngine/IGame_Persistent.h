@@ -92,10 +92,10 @@ public:
     CEnvironment* pEnvironment;
     CEnvironment& Environment() { return *pEnvironment; };
     void Prefetch();
+    static bool MainMenuActiveOrLevelNotExist();
 #endif
     IMainMenu* m_pMainMenu;
     static bool IsMainMenuActive();
-    static bool MainMenuActiveOrLevelNotExist();
 
     ParticleStatistics stats;
 

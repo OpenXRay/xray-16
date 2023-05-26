@@ -6,6 +6,7 @@
 #include "GameFont.h"
 #include "xrCore/Text/StringConversion.hpp"
 #include "xrCore/xr_token.h"
+#include "Common/RDevice.h"
 
 #include <locale>
 
@@ -51,9 +52,9 @@ CInput::CInput(const bool exclusive)
     SDL_StopTextInput(); // sanity
     SDL_SetHint(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, "1"); // We need to handle it manually
 
-    Device.seqAppActivate.Add(this);
-    Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
-    Device.seqFrame.Add(this, REG_PRIORITY_HIGH);
+    RDEVICE.seqAppActivate.Add(this);
+    RDEVICE.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
+    RDEVICE.seqFrame.Add(this, REG_PRIORITY_HIGH);
 
     if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
     {
@@ -70,9 +71,9 @@ CInput::~CInput()
         SDL_GameControllerClose(controller);
     SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
 
-    Device.seqFrame.Remove(this);
-    Device.seqAppDeactivate.Remove(this);
-    Device.seqAppActivate.Remove(this);
+    RDEVICE.seqFrame.Remove(this);
+    RDEVICE.seqAppDeactivate.Remove(this);
+    RDEVICE.seqAppActivate.Remove(this);
 }
 
 void CInput::OpenController(int idx)

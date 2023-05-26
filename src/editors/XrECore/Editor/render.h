@@ -14,6 +14,8 @@
 #include "Layers/xrRender/ModelPool.h"
 #include "Layers/xrRender/SkeletonCustom.h"
 
+#include "xrEngine/Render.h"
+
 // definition (Renderer)
 class CRenderTarget /*:public IRender_Target*/
 {
@@ -51,6 +53,20 @@ public:
 	CPSLibrary PSLibrary;
 
 	CModelPool *Models;
+    IRender::RenderStatistics BasicStats;
+    // TODO: hack
+    CResourceManager* Resources;
+
+    struct _options
+    {
+        u32 vis_intersect : 1; // config
+        u32 distortion : 1; // run-time modified
+        u32 color_mapping : 1; // true if SM 1.4 and higher
+        u32 disasm : 1; // config
+        u32 forceskinw : 1; // config
+        u32 no_detail_textures : 1; // config
+        u32 no_ram_textures : 1; // don't keep textures in RAM
+    } o = {};
 
 public:
 	// Occlusion culling

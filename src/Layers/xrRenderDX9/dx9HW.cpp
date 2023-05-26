@@ -9,8 +9,10 @@ CHW::CHW()
     if (!ThisInstanceIsGlobal())
         return;
 
+#ifndef _EDITOR
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this);
+#endif
 }
 
 CHW::~CHW()
@@ -18,8 +20,10 @@ CHW::~CHW()
     if (!ThisInstanceIsGlobal())
         return;
 
+#ifndef _EDITOR
     Device.seqAppActivate.Remove(this);
     Device.seqAppDeactivate.Remove(this);
+#endif
 }
 
 void CHW::OnAppActivate()
@@ -146,8 +150,13 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     D3DPRESENT_PARAMETERS& P = DevPP;
     ZeroMemory(&P, sizeof(P));
 
+#ifdef _EDITOR
+    P.BackBufferWidth = EDevice.m_RenderWidth;
+    P.BackBufferHeight = EDevice.m_RenderHeight;
+#else
     P.BackBufferWidth = Device.dwWidth;
     P.BackBufferHeight = Device.dwHeight;
+#endif
 
     // Back buffer
     BackBufferCount = 1;
@@ -258,8 +267,14 @@ void CHW::Reset()
 #ifdef DEBUG
     _RELEASE(dwDebugSB);
 #endif
+    
+#ifdef _EDITOR
+    DevPP.BackBufferWidth = EDevice.m_RenderWidth;
+    DevPP.BackBufferHeight = EDevice.m_RenderHeight;
+#else
     DevPP.BackBufferWidth = Device.dwWidth;
     DevPP.BackBufferHeight = Device.dwHeight;
+#endif
 
     // Windoze
     const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
@@ -302,8 +317,11 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget) const
 {
     // R2 hack
 #pragma todo("R2 need to specify depth format")
+
+#ifndef _EDITOR
     if (GEnv.Render->GenerationIsR2())
         return D3DFMT_D24S8;
+#endif
 
     // R1 usual
     constexpr D3DFORMAT formats[] =
@@ -465,6 +483,7 @@ void CHW::Present()
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
+#ifndef _EDITOR
 DeviceState CHW::GetDeviceState() const
 {
     const auto result = pDevice->TestCooperativeLevel();
@@ -482,3 +501,4 @@ DeviceState CHW::GetDeviceState() const
 
     return DeviceState::Normal;
 }
+#endif

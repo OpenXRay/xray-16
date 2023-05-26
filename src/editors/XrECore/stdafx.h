@@ -188,6 +188,8 @@ DEFINE_VECTOR(int*, LPIntVec, LPIntIt);
 #include "Layers/xrRender/ResourceManager.h"
 #include "Editor/ImageManager.h"
 
+#include "xrEngine/Render.h"
+
 inline xr_string ChangeFileExt(const char *name, const char *e)
 {
 	string_path path;

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Common/RDevice.h"
 
 void fix_texture_name(pstr fn);
 
@@ -108,7 +109,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sam
         CRT* RT = xr_new<CRT>();
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_rtargets.emplace(RT->set_name(Name), RT);
-        if (Device.b_is_Ready)
+        if (RDEVICE.b_is_Ready)
             RT->create(Name, w, h, f, sampleCount, flags);
         return RT;
     }
@@ -214,7 +215,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     T->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     m_textures.emplace(T->set_name(Name), T);
     T->Preload();
-    if (Device.b_is_Ready && !bDeferredLoad)
+    if (RDEVICE.b_is_Ready && !bDeferredLoad)
         T->Load();
     return T;
 }

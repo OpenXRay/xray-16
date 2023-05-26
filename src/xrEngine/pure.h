@@ -25,6 +25,10 @@ DECLARE_MESSAGE(AppEnd);
 DECLARE_MESSAGE(DeviceReset);
 DECLARE_MESSAGE(UIReset);
 
+#ifdef _EDITOR
+DECLARE_MESSAGE(DrawUI);
+#endif
+
 template<class T>
 class MessageRegistry
 {

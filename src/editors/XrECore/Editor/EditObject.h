@@ -1,17 +1,15 @@
-#ifndef EditObjectH
-#define EditObjectH
+#pragma once
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
 
-#include "Bone.h"
-#include "Motion.h"
 #ifdef _EDITOR
-//	#include "PropertiesListHelper.h"
-#include "GameMtlLib.h"
+#include "xrEngine/GameMtlLib.h"
 #include "pick_defs.h"
 #endif
-#include "..\..\..\xrRender\Public\kinematics.h"
 
+#include "Include/xrRender/Kinematics.h"
 #include "physicsshellholdereditorbase.h"
-//----------------------------------------------------
+
 struct SRayPickInfo;
 class CEditableMesh;
 class CFrustum;
@@ -616,6 +614,3 @@ private:
 #define EOBJ_CHUNK_SMOTIONS2 0x0924
 #define EOBJ_CHUNK_LODS 0x0925
 #define EOBJ_CHUNK_SMOTIONS3 0x0926
-//----------------------------------------------------
-
-#endif /*_INCDEF_EditObject_H_*/

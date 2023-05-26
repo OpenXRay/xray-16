@@ -19,14 +19,10 @@ void CBlender_DESC::Setup(LPCSTR N)
     xr_strlwr(cName);
 
     xr_strcpy(cComputer, Core.CompName); // Computer
-#ifndef _EDITOR
+
 #if defined(XR_PLATFORM_WINDOWS) // TODO Implement for Linux
     _tzset();
     _time32((__time32_t*)&cTime); // Time
-#endif
-#else
-    _tzset();
-    time((long*)&cTime); // Time
 #endif
 };
 
@@ -79,6 +75,7 @@ void IBlender::Compile(CBlender_Compile& C)
         C.SetParams(oPriority.value, oStrictSorting.value ? true : false);
 }
 
+#ifndef _EDITOR
 IBlender* IBlender::Create(CLASS_ID cls)
 {
     return ::RImplementation.blender_create(cls);
@@ -88,3 +85,49 @@ void IBlender::Destroy(IBlender*& B)
 {
     ::RImplementation.blender_destroy(B);
 }
+#else
+
+// Editor
+#include "blenders/BlenderDefault.h"
+#include "blenders/Blender_default_aref.h"
+#include "blenders/Blender_Vertex.h"
+#include "blenders/Blender_Vertex_aref.h"
+#include "blenders/Blender_Screen_SET.h"
+#include "blenders/Blender_Screen_GRAY.h"
+#include "blenders/Blender_Editor_Wire.h"
+#include "blenders/Blender_Editor_Selection.h"
+#include "blenders/Blender_LaEmB.h"
+#include "blenders/Blender_Lm(EbB).h"
+#include "blenders/Blender_BmmD.h"
+#include "blenders/Blender_Model.h"
+#include "blenders/Blender_Model_EbB.h"
+#include "blenders/Blender_detail_still.h"
+#include "blenders/Blender_tree.h"
+#include "blenders/Blender_Particle.h"
+
+IBlender* IBlender::Create(CLASS_ID cls)
+{
+    switch (cls)
+    {
+    case B_DEFAULT: return xr_new<CBlender_default>();
+    case B_DEFAULT_AREF: return xr_new<CBlender_default_aref>();
+    case B_VERT: return xr_new<CBlender_Vertex>();
+    case B_VERT_AREF: return xr_new<CBlender_Vertex_aref>();
+    case B_SCREEN_SET: return xr_new<CBlender_Screen_SET>();
+    case B_SCREEN_GRAY: return xr_new<CBlender_Screen_GRAY>();
+    case B_EDITOR_WIRE: return xr_new<CBlender_Editor_Wire>();
+    case B_EDITOR_SEL: return xr_new<CBlender_Editor_Selection>();
+    case B_LaEmB: return xr_new<CBlender_LaEmB>();
+    case B_LmEbB: return xr_new<CBlender_LmEbB>();
+    case B_BmmD: return xr_new<CBlender_BmmD>();
+    case B_MODEL: return xr_new<CBlender_Model>();
+    case B_MODEL_EbB: return xr_new<CBlender_Model_EbB>();
+    case B_DETAIL: return xr_new<CBlender_Detail_Still>();
+    case B_TREE: return xr_new<CBlender_Tree>();
+    case B_PARTICLE: return xr_new<CBlender_Particle>();
+    }
+    return 0;
+}
+void IBlender::Destroy(IBlender*& B) { xr_delete(B); }
+
+#endif

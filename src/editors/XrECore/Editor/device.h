@@ -14,7 +14,73 @@ class CInifile;
 class CResourceManager;
 #undef CreateWindow
 
-class ECORE_API CEditorRenderDevice
+class ENGINE_API CRenderDeviceData
+{
+public:
+    bool dwMaximized;
+    u32 dwWidth;
+    u32 dwHeight;
+    u32 dwPrecacheFrame;
+    BOOL b_is_Ready;
+    BOOL b_is_Active;
+
+public:
+    // Engine flow-control
+    u32 dwFrame;
+
+    float fTimeDelta;
+    float fTimeGlobal;
+    u32 dwTimeDelta;
+    u32 dwTimeGlobal;
+    u32 dwTimeContinual;
+
+    Fvector vCameraPosition;
+    Fvector vCameraDirection;
+    Fvector vCameraTop;
+    Fvector vCameraRight;
+
+    Fmatrix mView;
+    Fmatrix mProject;
+    Fmatrix mFullTransform;
+
+    // Copies of corresponding members. Used for synchronization.
+    Fvector vCameraPosition_saved;
+
+    Fmatrix mView_saved;
+    Fmatrix mProject_saved;
+    Fmatrix mFullTransform_saved;
+
+    float fFOV;
+    float fASPECT;
+
+protected:
+    u32 Timer_MM_Delta;
+    CTimer_paused Timer;
+    CTimer_paused TimerGlobal;
+
+public:
+    // Registrators
+    MessageRegistry<pureRender> seqRender;
+    MessageRegistry<pureAppActivate> seqAppActivate;
+    MessageRegistry<pureAppDeactivate> seqAppDeactivate;
+    MessageRegistry<pureAppStart> seqAppStart;
+    MessageRegistry<pureAppEnd> seqAppEnd;
+    MessageRegistry<pureFrame> seqFrame;
+    //MessageRegistry<pureScreenResolutionChanged> seqResolutionChanged;
+#ifdef _EDITOR
+    MessageRegistry<pureDrawUI> seqDrawUI;
+#endif
+
+    HWND m_hWnd;
+    //	CStats*									Statistic;
+};
+
+class ENGINE_API CRenderDeviceBase : public CRenderDeviceData
+{
+public:
+};
+
+class ECORE_API CEditorRenderDevice : public CRenderDeviceBase
 {
 	friend class CUI_Camera;
 	friend class TUI;

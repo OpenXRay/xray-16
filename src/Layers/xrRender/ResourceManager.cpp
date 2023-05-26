@@ -11,6 +11,7 @@
 #include "tss.h"
 #include "Blender.h"
 #include "Blender_Recorder.h"
+#include "Common/RDevice.h"
 
 //	Already defined in Texture.cpp
 void fix_texture_name(pstr fn);
@@ -356,7 +357,7 @@ void CResourceManager::Delete(const Shader* S)
 
 void CResourceManager::DeferredUpload()
 {
-    if (!Device.b_is_Ready)
+    if (!RDEVICE.b_is_Ready)
         return;
 
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -371,7 +372,7 @@ void CResourceManager::DeferredUpload()
 
 void CResourceManager::DeferredUnload()
 {
-    if (!Device.b_is_Ready)
+    if (!RDEVICE.b_is_Ready)
         return;
 
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -392,14 +393,14 @@ void CResourceManager::ED_UpdateTextures(AStringVec* names)
     {
         for (u32 nid = 0; nid < names->size(); nid++)
         {
-            map_TextureIt I = m_textures.find((*names)[nid].c_str());
+            auto I = m_textures.find((*names)[nid].c_str());
             if (I != m_textures.end())
                 I->second->Unload();
         }
     }
     else
     {
-        for (map_TextureIt t = m_textures.begin(); t != m_textures.end(); t++)
+        for (auto t = m_textures.begin(); t != m_textures.end(); t++)
             t->second->Unload();
     }
 

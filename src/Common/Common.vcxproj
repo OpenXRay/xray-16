@@ -75,6 +75,7 @@
     <ClInclude Include="Platform.hpp" />
     <ClInclude Include="PlatformLinux.inl" />
     <ClInclude Include="PlatformWindows.inl" />
+    <ClInclude Include="RDevice.h" />
     <ClInclude Include="Util.hpp" />
     <ClInclude Include="_d3d_extensions.h" />
   </ItemGroup>

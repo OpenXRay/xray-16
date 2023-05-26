@@ -3,10 +3,11 @@
 
 #include "IGame_Persistent.h"
 #include "GameFont.h"
-#include "PerformanceAlert.hpp"
+#include "Common/RDevice.h"
+#include "Environment.h"
 
 #ifndef _EDITOR
-#include "Environment.h"
+#include "PerformanceAlert.hpp"
 #include "x_ray.h"
 #include "IGame_Level.h"
 #include "XR_IOConsole.h"
@@ -23,18 +24,20 @@ bool IGame_Persistent::IsMainMenuActive()
     return g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive();
 }
 
+#ifndef _EDITOR
 bool IGame_Persistent::MainMenuActiveOrLevelNotExist()
 {
     return !g_pGameLevel || g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive();
 }
+#endif
 
 IGame_Persistent::IGame_Persistent()
 {
-    Device.seqAppStart.Add(this);
-    Device.seqAppEnd.Add(this);
-    Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 1);
-    Device.seqAppActivate.Add(this);
-    Device.seqAppDeactivate.Add(this);
+    RDEVICE.seqAppStart.Add(this);
+    RDEVICE.seqAppEnd.Add(this);
+    RDEVICE.seqFrame.Add(this, REG_PRIORITY_HIGH + 1);
+    RDEVICE.seqAppActivate.Add(this);
+    RDEVICE.seqAppDeactivate.Add(this);
 
     m_pMainMenu = nullptr;
 
@@ -45,11 +48,11 @@ IGame_Persistent::IGame_Persistent()
 
 IGame_Persistent::~IGame_Persistent()
 {
-    Device.seqFrame.Remove(this);
-    Device.seqAppStart.Remove(this);
-    Device.seqAppEnd.Remove(this);
-    Device.seqAppActivate.Remove(this);
-    Device.seqAppDeactivate.Remove(this);
+    RDEVICE.seqFrame.Remove(this);
+    RDEVICE.seqAppStart.Remove(this);
+    RDEVICE.seqAppEnd.Remove(this);
+    RDEVICE.seqAppActivate.Remove(this);
+    RDEVICE.seqAppDeactivate.Remove(this);
 #ifndef _EDITOR
     xr_delete(pEnvironment);
 #endif

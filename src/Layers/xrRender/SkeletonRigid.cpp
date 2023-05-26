@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include "Common/RDevice.h"
 #include "SkeletonCustom.h"
 
 extern int psSkeletonUpdate;
@@ -15,11 +16,11 @@ void CKinematics::CalculateBones(BOOL bForceExact)
     // early out.
     // check if the info is still relevant
     // skip all the computations - assume nothing changes in a small period of time :)
-    if (Device.dwTimeGlobal == UCalc_Time)
+    if (RDEVICE.dwTimeGlobal == UCalc_Time)
         return; // early out for "fast" update
     UCalc_mtlock lock;
     OnCalculateBones();
-    if (!bForceExact && (Device.dwTimeGlobal < (UCalc_Time + UCalc_Interval)))
+    if (!bForceExact && (RDEVICE.dwTimeGlobal < (UCalc_Time + UCalc_Interval)))
         return; // early out for "slow" update
     if (Update_Visibility)
         Visibility_Update();
@@ -28,7 +29,7 @@ void CKinematics::CalculateBones(BOOL bForceExact)
     // here we have either:
     //	1:	timeout elapsed
     //	2:	exact computation required
-    UCalc_Time = Device.dwTimeGlobal;
+    UCalc_Time = RDEVICE.dwTimeGlobal;
 
 // exact computation
 // Calculate bones

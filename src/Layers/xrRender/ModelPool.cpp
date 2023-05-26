@@ -2,7 +2,7 @@
 
 #include "ModelPool.h"
 
-#ifndef _EDITOR
+
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/FMesh.hpp"
 #include "FHierrarhyVisual.h"
@@ -10,20 +10,12 @@
 #include "FVisual.h"
 #include "FProgressive.h"
 #include "FSkinned.h"
+
+#ifndef _EDITOR
 #include "FLOD.h"
 #include "FTreeVisual.h"
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
-#else
-#include "FMesh.h"
-#include "FVisual.h"
-#include "FProgressive.h"
-#include "ParticleEffect.h"
-#include "ParticleGroup.h"
-#include "FSkinned.h"
-#include "FHierrarhyVisual.h"
-#include "SkeletonAnimated.h"
-#include "IGame_Persistent.h"
 #endif
 
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
@@ -564,7 +556,7 @@ void CModelPool::Render(
         //		if (_IsBoxVisible(m_pVisual,mTransform))
         {
             RCache.set_xform_world(mTransform);
-            for (PS::CParticleGroup::SItemVecIt i_it = pG->items.begin(); i_it != pG->items.end(); i_it++)
+            for (auto i_it = pG->items.begin(); i_it != pG->items.end(); i_it++)
             {
                 xr_vector<dxRender_Visual*> visuals;
                 i_it->GetVisuals(visuals);
