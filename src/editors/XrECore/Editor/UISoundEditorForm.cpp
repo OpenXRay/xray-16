@@ -122,7 +122,7 @@ void UISoundEditorForm::AppendModif(LPCSTR nm)
     FS_File dest;
     string_path fname;
     FS.update_path(fname, _sounds_, EFS.ChangeFileExt(nm, ".wav").c_str());
-    BOOL bFind = EditorFS.file_find(fname, dest);
+    BOOL bFind = FS.file_find(fname, dest);
     R_ASSERT(bFind);
     modif_map.insert(dest);
 }
@@ -284,7 +284,7 @@ void UISoundEditorForm::PlaySound(LPCSTR name, u32 &size, u32 &time)
     string_path fname;
     FS.update_path(fname, _game_sounds_, EFS.ChangeFileExt(name, ".ogg").c_str());
     FS_File F;
-    if (EditorFS.file_find(fname, F))
+    if (FS.file_find(fname, F))
     {
         m_Snd.create(name, st_Effect, sg_Undefined);
         m_Snd.play(0, sm_2D);

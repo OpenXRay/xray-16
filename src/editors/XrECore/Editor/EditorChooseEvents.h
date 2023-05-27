@@ -1,14 +1,13 @@
-#ifndef EditorChooseEventsH
-#define EditorChooseEventsH
+#pragma once
 #include "SoundManager.h"
 #include "Library.h"
-#include "GameMtlLib.h"
-#include "LightAnimLibrary.h"
-#include "SkeletonAnimated.h"
-#include "ResourceManager.h"
-#include "ParticleEffect.h"
-#include "ParticleGroup.h"
-#include "defines.h"
+#include "xrEngine/GameMtlLib.h"
+#include "xrEngine/LightAnimLibrary.h"
+#include "Layers/xrRender/SkeletonAnimated.h"
+#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/ParticleEffect.h"
+#include "Layers/xrRender/ParticleGroup.h"
+#include "xrEngine/defines.h"
 #include "EditObject.h"
 ref_sound *choose_snd;
 
@@ -16,9 +15,8 @@ namespace ChoseEvents
 {
     void FillEntity(ChooseItemVec &items, void *param)
     {
-        //.    AppendItem	   					(RPOINT_CHOOSE_NAME);
         CInifile::Root const &data = pSettings->sections();
-        for (CInifile::RootCIt it = data.begin(); it != data.end(); it++)
+        for (auto it = data.begin(); it != data.end(); it++)
         {
             LPCSTR val;
             if ((*it)->line_exist("$spawn", &val))
@@ -195,7 +193,7 @@ namespace ChoseEvents
         LAItemIt it = lst.begin();
         LAItemIt _E = lst.end();
         for (; it != _E; it++)
-            items.push_back(SChooseItem(*(*it)->cName, ""));
+            items.push_back(SChooseItem((*it)->cName.c_str(), ""));
     }
     void UpdateLAnim(LPCSTR name, ImTextureID &Texture)
     {
@@ -236,8 +234,8 @@ namespace ChoseEvents
     void FillEShader(ChooseItemVec &items, void *param)
     {
         CResourceManager::map_Blender &blenders = EDevice.Resources->_GetBlenders();
-        CResourceManager::map_BlenderIt _S = blenders.begin();
-        CResourceManager::map_BlenderIt _E = blenders.end();
+        auto _S = blenders.begin();
+        auto _E = blenders.end();
         for (; _S != _E; _S++)
             items.push_back(SChooseItem(_S->first, ""));
     }
@@ -245,8 +243,8 @@ namespace ChoseEvents
     void FillCShader(ChooseItemVec &items, void *param)
     {
         Shader_xrLCVec &shaders = EDevice.ShaderXRLC.Library();
-        Shader_xrLCIt _F = shaders.begin();
-        Shader_xrLCIt _E = shaders.end();
+        auto _F = shaders.begin();
+        auto _E = shaders.end();
         for (; _F != _E; _F++)
             items.push_back(SChooseItem(_F->Name, ""));
     }
@@ -273,8 +271,9 @@ namespace ChoseEvents
         for (PS::PGDIt G = ::Render->PSLibrary.FirstPGD(); G != ::Render->PSLibrary.LastPGD(); ++G)
         {
             PS::CPGDef *def = (*G);
-            PS::CPGDef::EffectIt pe_it = def->m_Effects.begin();
-            PS::CPGDef::EffectIt pe_it_e = def->m_Effects.end();
+            auto pe_it = def->m_Effects.begin();
+            auto pe_it_e = def->m_Effects.end();
+
             for (; pe_it != pe_it_e; ++pe_it)
             {
                 if ((*pe_it)->m_EffectName == item->name)
@@ -296,12 +295,12 @@ namespace ChoseEvents
             PS::CPGDef *def = (*G);
             if (def->m_Name == item->name)
             {
-                PS::CPGDef::EffectIt pe_it = def->m_Effects.begin();
-                PS::CPGDef::EffectIt pe_it_e = def->m_Effects.end();
+                auto pe_it = def->m_Effects.begin();
+                auto pe_it_e = def->m_Effects.end();
                 for (; pe_it != pe_it_e; ++pe_it)
                 {
                     xr_sprintf(str, sizeof(str), "%d", ++i);
-                    PHelper().CreateCaption(info_items, str, (*pe_it)->m_EffectName);
+                    PHelper().CreateCaption(info_items, (LPCSTR)str, (*pe_it)->m_EffectName);
                 }
                 break;
             }
@@ -480,6 +479,3 @@ void ClearChooseEvents()
     UIChooseForm::ClearEvents();
     xr_delete(choose_snd);
 }
-
-//---------------------------------------------------------------------------
-#endif

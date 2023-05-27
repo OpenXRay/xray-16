@@ -38,7 +38,9 @@
 #include "..\..\XrCore\xrCore.h"
 
 #define time_t __time32_t
+#include "ELocatorAPI.h"
 #include "..\XrEProps\stdafx.h"
+
 #ifdef _EDITOR
 class PropValue;
 class PropItem;
@@ -77,7 +79,6 @@ DEFINE_VECTOR(xr_string *, LPAStringVec, LPAStringIt);
 
 #define USE_DX9 1
 #include "Layers/XrRender/FVF.h"
-#include "ELocatorAPI.h"
 
 struct str_pred
 {

@@ -106,6 +106,7 @@
     <ClCompile Include="..\..\Layers\xrRender\Texture.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\TextureDescrManager.cpp" />
     <ClCompile Include="ELocatorAPI.cpp" />
+    <ClCompile Include="GameMtlLib_Editor.cpp" />
     <ClCompile Include="tga.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\tss_def.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\xrRender_console.cpp" />

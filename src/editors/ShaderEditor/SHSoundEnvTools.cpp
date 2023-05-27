@@ -5,7 +5,7 @@
 
 #include "ui_shadermain.h"
 #include "../../xrSound/stdafx.h"
-#include "eax.h"
+#include "eax/eax.h"
 #include "../../xrSound/SoundRender_Source.h"
 #include "../XrECORE/Editor/D3DUtils.h"
 
@@ -86,7 +86,7 @@ void CSHSoundEnvTools::OnControlClick(ButtonValue *V, bool &bModif, bool &bSafe)
 
 void CSHSoundEnvTools::OnActivate()
 {
-    if (!psSoundFlags.is(ss_Hardware | ss_EAX))
+    if (!psSoundFlags.is(ss_Hardware | ss_EFX))
     {
         Log("#!HARDWARE or FX flags are not set. Preview is disabled.");
     }
@@ -177,8 +177,8 @@ void CSHSoundEnvTools::FillItemList()
     // fill items
     ListItemsVec items;
     SoundEnvironment_LIB::SE_VEC &lst = m_Library.Library();
-    for (SoundEnvironment_LIB::SE_IT it = lst.begin(); it != lst.end(); it++)
-        LHelper().CreateItem(items, *(*it)->name, 0);
+    for (auto it = lst.begin(); it != lst.end(); it++)
+        LHelper().CreateItem(items, (*it)->name.c_str(), 0);
     // assign items
     Ext.m_Items->AssignItems(items, 0, false);
 }
@@ -319,14 +319,14 @@ void CSHSoundEnvTools::OnEnvSizeChange(PropValue *sender)
     test_env.Reverb = m_EnvSrc.Reverb;
     test_env.ReverbDelay = m_EnvSrc.ReverbDelay;
     CSound_environment *E = m_Env;
-    Sound->set_environment_size(&test_env, &E);
+    GEnv.Sound->set_environment_size(&test_env, &E);
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
 void CSHSoundEnvTools::OnEnvChange(PropValue *sender)
 {
     CSound_environment *E = m_Env;
-    Sound->set_environment(m_Env->Environment, &E);
+    GEnv.Sound->set_environment(m_Env->Environment, &E);
     m_EnvSrc = *m_Env;
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }

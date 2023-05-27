@@ -1,8 +1,5 @@
-//---------------------------------------------------------------------------
-#ifndef SHCompilerToolsH
-#define SHCompilerToolsH
-
-#include "Shader_xrLC.h"
+#pragma once
+#include "utils/Shader_xrLC.h"
 #include "SHToolsInterface.h"
 
 // refs
@@ -52,5 +49,3 @@ public:
     virtual void OnDeviceCreate() { ; }
     virtual void OnDeviceDestroy() { ; }
 };
-//---------------------------------------------------------------------------
-#endif

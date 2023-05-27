@@ -137,8 +137,8 @@ void CEditorRenderDevice::Initialize()
 
 	// compiler shader
 	string_path fn;
-	FS.update_path(fn, _game_data_, "shaders_xrlc.xr");
-	if (FS.exist(fn))
+    FS.update_path(fn, _game_data_, "shaders_xrlc.xr");
+    if (FS.exist(fn))
 	{
 		ShaderXRLC.Load(fn);
 	}
@@ -215,8 +215,8 @@ bool CEditorRenderDevice::Create()
 		string_path ini_name;
 		xr_strcpy(ini_name, UI->EditorName());
 		xr_strcat(ini_name, "_imgui.ini");
-		FS.update_path(ini_path, "$local_root$", ini_name);
-		if (!FS.exist(ini_path))
+        FS.update_path(ini_path, "$local_root$", ini_name);
+        if (!FS.exist(ini_path))
 			UI->ResetUI();
 		UI->Initialize(m_hWnd, HW.pDevice, ini_path);
 	}
@@ -228,8 +228,8 @@ bool CEditorRenderDevice::Create()
 	FS.update_path(sh, _game_data_, "shaders.xr");
 
 	IReader *F = 0;
-	if (FS.exist(sh))
-		F = FS.r_open(0, sh);
+    if (FS.exist(sh))
+        F = FS.r_open(0, sh);
 	Resources = xr_new<CResourceManager>();
 
 	// if build options - load textures immediately
@@ -237,7 +237,7 @@ bool CEditorRenderDevice::Create()
 		EDevice.Resources->DeferredLoad(FALSE);
 
 	_Create(F);
-	FS.r_close(F);
+    FS.r_close(F);
 
 	ELog.Msg(mtInformation, "D3D: initialized");
 

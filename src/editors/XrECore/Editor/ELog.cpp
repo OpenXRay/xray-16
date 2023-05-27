@@ -9,7 +9,7 @@
 #ifdef _EDITOR
 #include "UILogForm.h"
 #include "ui_main.h"
-void ELogCallback(LPCSTR txt)
+void ELogCallback(void* context, const char* txt)
 {
 	if (0 == txt[0])
 		return;

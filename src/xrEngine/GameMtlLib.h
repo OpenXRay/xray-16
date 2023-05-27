@@ -160,6 +160,11 @@ struct MTL_EXPORT_API SGameMtlPair
     };
     CGameMtlLibrary* m_Owner;
 
+#ifdef _EDITOR
+    bool m_EditParent;
+    bool m_EditCommand;
+#endif
+
 private:
     int mtl0;
     int mtl1;
@@ -188,6 +193,11 @@ public:
 public:
     SGameMtlPair(CGameMtlLibrary* owner)
     {
+#ifdef _EDITOR
+        m_EditParent = false;
+        m_EditCommand = false;
+#endif
+
         mtl0 = -1;
         mtl1 = -1;
         ID = -1;
@@ -221,7 +231,6 @@ public:
     PropValue* propCollideParticles;
     PropValue* propCollideMarks;
 
-    SGameMtlPair(const SGameMtlPair& src);
     void OnFlagChange(PropValue* sender);
     void OnParentClick(ButtonValue* sender, bool& bModif, bool& bSafe);
     void OnCommandClick(ButtonValue* sender, bool& bModif, bool& bSafe);
@@ -229,6 +238,8 @@ public:
     void FillProp(PropItemVec& values);
     void TransferFromParent(SGameMtlPair* parent);
     bool SetParent(int parentId);
+    void OnDrawUI();
+    void CopyFrom(SGameMtlPair* parent);
 #endif
 };
 
@@ -311,7 +322,7 @@ public:
     GameMtlIt FirstMaterial() { return materials.begin(); }
     GameMtlIt LastMaterial() { return materials.end(); }
     u32 CountMaterial() const { return materials.size(); }
-#ifdef EDITOR
+#ifdef _EDITOR
     SGameMtl* AppendMaterial(SGameMtl* parent);
     void RemoveMaterial(pcstr name);
     void CopyMtlPairs(SGameMtl* src, SGameMtl* dst);
@@ -326,7 +337,7 @@ public:
     void RemoveMaterialPair(GameMtlPairIt rem_it);
     void RemoveMaterialPair(int mtl);
     void RemoveMaterialPair(int mtl0, int mtl1);
-    GameMtlPairIt GetMaterialPairIt(int id);
+    GameMtlPairIt GetMaterialPairIt(int id);   
     GameMtlPairIt GetMaterialPairIt(int mtl0, int mtl1);
     SGameMtlPair* GetMaterialPair(int id);
     SGameMtlPair* GetMaterialPair(int mtl0, int mtl1);

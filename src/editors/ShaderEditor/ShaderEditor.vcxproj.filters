@@ -27,9 +27,6 @@
     <ClCompile Include="UI_shadertools.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="GameMtlLib_Editor.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="ShaderEditor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>

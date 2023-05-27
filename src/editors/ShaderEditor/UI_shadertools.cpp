@@ -95,7 +95,7 @@ void CShaderTool::OnDestroy()
 	UnregisterTools();
 }
 
-#include "igame_persistent.h"
+#include "xrEngine/igame_persistent.h"
 
 void CShaderTool::RenderEnvironment()
 {

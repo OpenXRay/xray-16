@@ -1,9 +1,6 @@
-//---------------------------------------------------------------------------
-#ifndef SHGameMtlToolsH
-#define SHGameMtlToolsH
-
+#pragma once
 #include "SHToolsInterface.h"
-#include "GameMtlLib.h"
+#include "xrEngine/GameMtlLib.h"
 
 // refs
 class PropValue;
@@ -57,5 +54,3 @@ public:
 
 	virtual void OnDrawUI();
 };
-//---------------------------------------------------------------------------
-#endif // SHGameMtlToolsH

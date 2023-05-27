@@ -1,24 +1,17 @@
-//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "UI_ShaderMain.h"
 #include "UI_ShaderTools.h"
-#include "xr_input.h"
-
-//---------------------------------------------------------------------------
+#include "xrEngine/xr_input.h"
 
 CShaderMain::CShaderMain()
 {
     EPrefs = xr_new<CCustomPreferences>();
 }
-//---------------------------------------------------------------------------
 
 CShaderMain::~CShaderMain()
 {
     xr_delete(EPrefs);
 }
-//---------------------------------------------------------------------------
 
 CCommandVar CShaderTool::CommandSave(CCommandVar p1, CCommandVar p2)
 {

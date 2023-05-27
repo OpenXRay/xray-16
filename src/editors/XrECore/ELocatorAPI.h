@@ -75,5 +75,7 @@ public:
 	};
 };
 
+#undef FS // LocatorApi
+
 extern ECORE_API ELocatorAPI* xr_EditorFS;
-#define EditorFS (*xr_EditorFS)
+#define FS (*xr_EditorFS)

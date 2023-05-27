@@ -1,11 +1,8 @@
-//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
+#include "xrEngine/GameMtlLib.h"
+#include "Editor/UI_MainCommand.h"
 
-#include "GameMtlLib.h"
-//------------------------------------------------------------------------------
 // material routines
-//------------------------------------------------------------------------------
 void SGameMtl::FillProp(PropItemVec &items, ListItem *owner)
 {
     PropValue *V = 0;
@@ -56,9 +53,9 @@ void CGameMtlLibrary::CopyMtlPairs(SGameMtl *from, SGameMtl *to)
     }
 }
 
-BOOL CGameMtlLibrary::UpdateMtlPairs(SGameMtl *src)
+bool CGameMtlLibrary::UpdateMtlPairs(SGameMtl *src)
 {
-    BOOL bRes = FALSE;
+    bool bRes = false;
     SGameMtl *M0 = src;
     for (GameMtlIt m1_it = materials.begin(); m1_it != materials.end(); ++m1_it)
     {
@@ -75,19 +72,19 @@ BOOL CGameMtlLibrary::UpdateMtlPairs(SGameMtl *src)
             {
                 // create pair
                 CreateMaterialPair(M0->GetID(), M1->GetID(), 0);
-                bRes = TRUE;
+                bRes = true;
             }
         }
     }
     return bRes;
 }
 
-BOOL CGameMtlLibrary::UpdateMtlPairs()
+bool CGameMtlLibrary::UpdateMtlPairs()
 {
-    BOOL bRes = FALSE;
+    bool bRes = false;
     for (GameMtlIt m0_it = materials.begin(); m0_it != materials.end(); m0_it++)
         if (UpdateMtlPairs(*m0_it))
-            bRes = TRUE;
+            bRes = true;
     return bRes;
 }
 
@@ -105,7 +102,7 @@ SGameMtl *CGameMtlLibrary::AppendMaterial(SGameMtl *parent)
         CopyMtlPairs(parent, M);
     return M;
 }
-void CGameMtlLibrary::RemoveMaterial(LPCSTR name)
+void CGameMtlLibrary::RemoveMaterial(pcstr name)
 {
     // find material
     GameMtlIt rem_it = GetMaterialIt(name);
@@ -168,7 +165,7 @@ IC BOOL ValidateParent(SGameMtlPair *who, SGameMtlPair *parent)
         return ValidateParent(who, parent->m_Owner->GetMaterialPair(parent->GetParent()));
 }
 
-BOOL SGameMtlPair::SetParent(int parent)
+bool SGameMtlPair::SetParent(int parent)
 {
     int ID_parent_save = ID_parent;
     ID_parent = parent;
@@ -195,7 +192,7 @@ BOOL SGameMtlPair::SetParent(int parent)
         OwnProps.set(flCollideParticles, CollideParticles.size());
         OwnProps.set(flCollideMarks, CollideMarks.size());
     }
-    return TRUE;
+    return true;
 }
 
 void SGameMtlPair::FillChooseMtl(ChooseItemVec &items, void *param)
@@ -347,7 +344,7 @@ LPCSTR CGameMtlLibrary::MtlPairToName(int mtl0, int mtl1)
     sprintf(buf, "%s \\ %s", buf0, buf1);
     return buf;
 }
-void CGameMtlLibrary::NameToMtlPair(LPCSTR name, int &mtl0, int &mtl1)
+void CGameMtlLibrary::NameToMtlPair(pcstr name, int &mtl0, int &mtl1)
 {
     string256 buf0, buf1;
     if (_GetItemCount(name, '\\') < 2)
@@ -365,7 +362,7 @@ void CGameMtlLibrary::NameToMtlPair(LPCSTR name, int &mtl0, int &mtl1)
     SGameMtl *M1 = GetMaterial(buf1);
     mtl1 = M1 ? M1->GetID() : GAMEMTL_NONE_ID;
 }
-void CGameMtlLibrary::MtlNameToMtlPair(LPCSTR name, int &mtl0, int &mtl1)
+void CGameMtlLibrary::MtlNameToMtlPair(pcstr name, int &mtl0, int &mtl1)
 {
     string256 buf;
     SGameMtl *M0 = GetMaterial(_GetItem(name, 0, buf, ','));
@@ -389,6 +386,7 @@ SGameMtlPair *CGameMtlLibrary::CreateMaterialPair(int m0, int m1, SGameMtlPair *
     material_pairs.push_back(M);
     return M;
 }
+
 SGameMtlPair *CGameMtlLibrary::AppendMaterialPair(int m0, int m1, SGameMtlPair *parent)
 {
     SGameMtlPair *S = GetMaterialPair(m0, m1);
@@ -401,12 +399,14 @@ SGameMtlPair *CGameMtlLibrary::AppendMaterialPair(int m0, int m1, SGameMtlPair *
         return S;
     }
 }
-void CGameMtlLibrary::RemoveMaterialPair(LPCSTR name)
+
+void CGameMtlLibrary::RemoveMaterialPair(pcstr name)
 {
     int mtl0, mtl1;
     NameToMtlPair(name, mtl0, mtl1);
     RemoveMaterialPair(mtl0, mtl1);
 }
+
 void CGameMtlLibrary::RemoveMaterialPair(GameMtlPairIt rem_it)
 {
     if (rem_it == material_pairs.end())
@@ -424,6 +424,7 @@ void CGameMtlLibrary::RemoveMaterialPair(GameMtlPairIt rem_it)
     xr_delete(*rem_it);
     material_pairs.erase(rem_it);
 }
+
 void CGameMtlLibrary::RemoveMaterialPair(int mtl)
 {
     for (int i = 0; i < (int)material_pairs.size(); i++)
@@ -436,6 +437,7 @@ void CGameMtlLibrary::RemoveMaterialPair(int mtl)
         }
     }
 }
+
 void CGameMtlLibrary::RemoveMaterialPair(int mtl0, int mtl1)
 {
     GameMtlPairIt rem_it = GetMaterialPairIt(mtl0, mtl1);
@@ -443,6 +445,7 @@ void CGameMtlLibrary::RemoveMaterialPair(int mtl0, int mtl1)
         return;
     RemoveMaterialPair(rem_it);
 }
+
 GameMtlPairIt CGameMtlLibrary::GetMaterialPairIt(int id)
 {
     for (GameMtlPairIt it = material_pairs.begin(); it != material_pairs.end(); it++)
@@ -450,6 +453,7 @@ GameMtlPairIt CGameMtlLibrary::GetMaterialPairIt(int id)
             return it;
     return material_pairs.end();
 }
+
 SGameMtlPair *CGameMtlLibrary::GetMaterialPair(int id)
 {
     GameMtlPairIt it = GetMaterialPairIt(id);
@@ -462,12 +466,14 @@ GameMtlPairIt CGameMtlLibrary::GetMaterialPairIt(int mtl0, int mtl1)
             return it;
     return material_pairs.end();
 }
+
 SGameMtlPair *CGameMtlLibrary::GetMaterialPair(int mtl0, int mtl1)
 {
     GameMtlPairIt it = GetMaterialPairIt(mtl0, mtl1);
     return it != material_pairs.end() ? *it : 0;
 }
-SGameMtlPair *CGameMtlLibrary::GetMaterialPair(LPCSTR name)
+
+SGameMtlPair *CGameMtlLibrary::GetMaterialPair(pcstr name)
 {
     if (name && name[0])
     {

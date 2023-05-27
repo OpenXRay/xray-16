@@ -1,13 +1,14 @@
-// ShaderEditor.cpp : Определяет точку входа для приложения.
+// ShaderEditor.cpp : РћРїСЂРµРґРµР»СЏРµС‚ С‚РѕС‡РєСѓ РІС…РѕРґР° РґР»СЏ РїСЂРёР»РѕР¶РµРЅРёСЏ.
 
 #include "stdafx.h"
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
 {
     if (!IsDebuggerPresent())
-        Debug._initialize(false);
+        xrDebug::Initialize(pCmdLine);
 
-    Core.InitCore("shader", ELogCallback);
+
+    Core.Initialize("shader", pCmdLine, LogCallback(ELogCallback, nullptr));
     STools = xr_new<CShaderTool>();
     Tools = STools;
 
@@ -23,6 +24,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     }
     
     xr_delete(MainForm);
-    Core.DestroyCore();
-    return 0;
+    Core._destroy();
+    return EXIT_SUCCESS;
 }

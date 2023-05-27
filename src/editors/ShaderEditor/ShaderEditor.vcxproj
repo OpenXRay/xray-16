@@ -11,7 +11,14 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="..\..\xray_project_configuration.props" />
   </ImportGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets" Condition="Exists('..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" />
+  </ImportGroup>
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
@@ -24,10 +31,10 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <PreprocessorDefinitions>_EDITOR;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(xrExternals)libtheora\include;$(xrExternals)libogg\include;$(xrExternals)libvorbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GameMtlLib_Editor.cpp" />
     <ClCompile Include="ShaderEditor.cpp" />
     <ClCompile Include="SHCompilerTools.cpp" />
     <ClCompile Include="SHCompilerToolsProperties.cpp" />
@@ -63,6 +70,12 @@
     <ClInclude Include="UI_shadertools.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Layers\xrAPI\xrAPI.vcxproj">
+      <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\utils\xrMiscMath\xrMiscMath.vcxproj">
+      <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>

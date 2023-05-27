@@ -33,7 +33,7 @@ public:
     virtual void OnRenameItem(LPCSTR old_full_name, LPCSTR new_full_name, EItemType type);
     virtual void FillItemList();
 
-    void UseEnvironment() { Sound->set_user_env(m_Env); }
+    void UseEnvironment() { GEnv.Sound->set_user_env(m_Env); }
 
 public:
     CSHSoundEnvTools(const ISHInit &init);

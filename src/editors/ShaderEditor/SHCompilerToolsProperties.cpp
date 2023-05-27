@@ -10,9 +10,9 @@ void CSHCompilerTools::FillItemList()
 {
     ListItemsVec items;
     Shader_xrLCVec &lst = m_Library.Library();
-    for (Shader_xrLCIt it = lst.begin(); it != lst.end(); it++)
+    for (auto it = lst.begin(); it != lst.end(); it++)
         LHelper().CreateItem(items, it->Name, 0);
-    Ext.m_Items->AssignItems(items, false);
+    Ext.m_Items->AssignItems(items, nullptr, false);
 }
 
 //------------------------------------------------------------------------------
