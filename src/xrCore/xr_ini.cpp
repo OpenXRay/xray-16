@@ -736,7 +736,7 @@ CInifile::Sect& CInifile::r_section(pcstr S) const
     return **I;
 }
 
-pcstr CInifile::r_string(pcstr S, pcstr L) const
+constexpr pcstr CInifile::r_string(pcstr S, pcstr L) const
 {
     Sect const& I = r_section(S);
     auto A = std::lower_bound(I.Data.cbegin(), I.Data.cend(), L, item_pred);

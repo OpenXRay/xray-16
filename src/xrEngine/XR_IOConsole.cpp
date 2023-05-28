@@ -687,7 +687,7 @@ IConsole_Command* CConsole::find_next_cmd(pcstr in_str, shared_str& out_str)
 {
     pcstr radmin_cmd_name = "ra ";
     bool b_ra = (in_str == strstr(in_str, radmin_cmd_name));
-    u32 offset = (b_ra) ? xr_strlen(radmin_cmd_name) : 0;
+    u32 offset = (b_ra) ? std::char_traits<char>::length(radmin_cmd_name) : 0;
 
     pstr t2;
     STRCONCAT(t2, in_str + offset, " ");

@@ -384,20 +384,20 @@ namespace
 {
 bool CheckBenchmark()
 {
-    pcstr benchName = "-batch_benchmark ";
+    static constexpr pcstr benchName = "-batch_benchmark ";
     if (strstr(Core.Params, benchName))
     {
-        const size_t sz = xr_strlen(benchName);
+        const size_t sz = std::char_traits<char>::length(benchName);
         string64 benchmarkName;
         sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", benchmarkName);
         RunBenchmark(benchmarkName);
         return true;
     }
 
-    pcstr sashName = "-openautomate ";
+    static constexpr pcstr sashName = "-openautomate ";
     if (strstr(Core.Params, sashName))
     {
-        const size_t sz = xr_strlen(sashName);
+        const size_t sz = std::char_traits<char>::length(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
 

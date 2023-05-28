@@ -82,9 +82,9 @@ void CConsole::Find_cmd() // SDL_SCANCODE_TAB
 void CConsole::Find_cmd_back() // SDL_SCANCODE_TAB+shift
 {
     pcstr edt = ec().str_edit();
-    pcstr radmin_cmd_name = "ra ";
+    static constexpr pcstr radmin_cmd_name = "ra ";
     bool b_ra = (edt == strstr(edt, radmin_cmd_name));
-    u32 offset = (b_ra) ? xr_strlen(radmin_cmd_name) : 0;
+    u32 offset = (b_ra) ? std::char_traits<char>::length(radmin_cmd_name) : 0;
 
     vecCMD_IT it = Commands.lower_bound(edt + offset);
     if (it != Commands.begin())

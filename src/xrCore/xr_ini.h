@@ -194,8 +194,8 @@ public:
     // Generic reading functions
     CLASS_ID r_clsid(pcstr S, pcstr L) const;
     CLASS_ID r_clsid(const shared_str& S, pcstr L) const { return r_clsid(*S, L); }
-    pcstr r_string(pcstr S, pcstr L) const; // Left quotes in place
-    pcstr r_string(const shared_str& S, pcstr L) const { return r_string(*S, L); } // Left quotes in place
+    constexpr pcstr r_string(pcstr S, pcstr L) const; // Left quotes in place
+    constexpr pcstr r_string(const shared_str& S, pcstr L) const { return r_string(*S, L); } // Left quotes in place
     shared_str r_string_wb(pcstr S, pcstr L) const; // Remove quotes
     shared_str r_string_wb(const shared_str& S, pcstr L) const { return r_string_wb(*S, L); } // Remove quotes
     u8 r_u8(pcstr S, pcstr L) const;

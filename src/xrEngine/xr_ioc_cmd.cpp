@@ -263,13 +263,13 @@ class CCC_Start : public IConsole_Command
         xr_strcpy(out, sizeof(out), str);
         xr_strlwr(str);
 
-        pcstr name_str = "name=";
+        static constexpr pcstr name_str = "name=";
         pcstr name1 = strstr(str, name_str);
         if (!name1 || !xr_strlen(name1))
         {
             return;
         }
-        int begin_p = xr_strlen(str) - xr_strlen(name1) + xr_strlen(name_str);
+        int begin_p = xr_strlen(str) - xr_strlen(name1) + std::char_traits<char>::length(name_str);
         if (begin_p < 1)
         {
             return;
