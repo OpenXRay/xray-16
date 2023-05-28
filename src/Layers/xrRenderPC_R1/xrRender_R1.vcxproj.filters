@@ -1001,6 +1001,9 @@
     <ClCompile Include="..\xrRender\blenders\blender_light.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9DetailManager_VS.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Pipeline.txt" />
