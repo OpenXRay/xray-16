@@ -635,6 +635,16 @@ void CRender::destroy()
 
 void CRender::reset_begin()
 {
+    // Wait for tasks to be done
+    r_main.sync();
+    r_sun.sync();
+    r_sun_old.sync();
+#if RENDER != R_R2
+    r_rain.sync();
+#endif
+
+    Resources->reset_begin();
+
     // Update incremental shadowmap-visibility solver
     // BUG-ID: 10646
     {
@@ -691,6 +701,9 @@ void CRender::reset_end()
 #if defined(USE_DX11)
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 #endif
+
+    cleanup_contexts();
+
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
     m_bFirstFrameAfterReset = true;
