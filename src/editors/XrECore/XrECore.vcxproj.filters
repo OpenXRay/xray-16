@@ -387,7 +387,6 @@
     <ClCompile Include="..\..\Layers\xrRender\blenders\Blender_Shadow_World.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\blenders\Blender_Vertex.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\blenders\Blender_Vertex_aref.cpp" />
-    <ClCompile Include="ELocatorAPI.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\SkeletonXSkinXW_CPP.cpp" />
     <ClCompile Include="..\..\Layers\xrRenderDX9\BufferUtils.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\dxStatGraphRender.cpp" />
@@ -628,7 +627,6 @@
     <ClInclude Include="Editor\UIEditLightAnim.h">
       <Filter>Editor</Filter>
     </ClInclude>
-    <ClInclude Include="ELocatorAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WildMagic\WmlMath.inl">

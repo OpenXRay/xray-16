@@ -73,11 +73,14 @@ DEFINE_VECTOR(xr_rtoken, RTokenVec, RTokenVecIt);
 #include "log.h"
 #include "xr_trims.h"
 #include "xr_ini.h"
-#ifdef NO_FS_SCAN
-#include "ELocatorAPI.h"
-#else
+
+#include "ILocatorApi.h"
 #include "LocatorAPI.h"
+
+#if defined(XR_PLATFORM_WINDOWS)
+#include "ELocatorAPI.h"
 #endif
+
 #include "FileSystem.h"
 #include "FTimer.h"
 #include "fastdelegate.h"
@@ -123,7 +126,7 @@ public:
     bool SocSdk;
 
     void Initialize(
-        pcstr ApplicationName, pcstr commandLine = nullptr, LogCallback cb = nullptr, bool init_fs = true, pcstr fs_fname = nullptr, bool plugin = false);
+        pcstr ApplicationName, pcstr commandLine = nullptr, LogCallback cb = nullptr, bool init_fs = true, pcstr fs_fname = nullptr, bool plugin = false, bool editor = false);
     void _destroy();
 
     u32 GetBuildId() const { return buildId; }

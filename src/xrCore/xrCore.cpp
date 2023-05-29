@@ -156,7 +156,7 @@ void xrCore::PrintBuildInfo()
     Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
 }
 
-void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
+void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin, bool editor)
 {
     Threading::SetCurrentThreadName("Primary thread");
     xr_strcpy(ApplicationName, _ApplicationName);
@@ -196,16 +196,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         SDL_free(base_path);
 #else
 #   error Select or add implementation for your platform
-#endif
-
-#ifdef _EDITOR
-        // working path
-        if (strstr(Params, "-wf"))
-        {
-            string_path c_name;
-            sscanf(strstr(Core.Params, "-wf ") + 4, "%[^ ] ", c_name);
-            SetCurrentDirectory(c_name);
-        }
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS)
@@ -254,7 +244,14 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
         rtc_initialize();
 
+#if defined(XR_PLATFORM_WINDOWS)
+        if (editor)
+            xr_FS = xr_make_unique<ELocatorAPI>();
+        else
+            xr_FS = xr_make_unique<CLocatorAPI>();
+#else
         xr_FS = xr_make_unique<CLocatorAPI>();
+#endif
 
         xr_EFS = xr_make_unique<EFS_Utils>();
         //. R_ASSERT (co_res==S_OK);

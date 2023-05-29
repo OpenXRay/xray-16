@@ -55,6 +55,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Compression\ppmd_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor9.cpp" />
+    <ClCompile Include="ELocatorAPI.cpp" />
     <ClCompile Include="Media\ImageJPEG.cpp" />
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="Crypto\trivial_encryptor.cpp" />
@@ -161,6 +162,7 @@ call .GitInfo.cmd</Command>
     </ClInclude>
     <ClInclude Include="Debug\MiniDump.h" />
     <ClInclude Include="dump_string.h" />
+    <ClInclude Include="ELocatorAPI.h" />
     <ClInclude Include="Events\Notifier.h" />
     <ClInclude Include="fastdelegate.h" />
     <CustomBuild Include="FileSystem.h" />
@@ -172,6 +174,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="FS_impl.h" />
     <ClInclude Include="FS_internal.h" />
     <ClInclude Include="FTimer.h" />
+    <ClInclude Include="ILocatorApi.h" />
     <ClInclude Include="intrusive_ptr.h" />
     <ClInclude Include="LocatorAPI.h" />
     <ClInclude Include="LocatorAPI_defs.h" />

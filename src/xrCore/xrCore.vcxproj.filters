@@ -327,6 +327,9 @@
     <ClCompile Include="_cylinder.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="ELocatorAPI.cpp">
+      <Filter>FS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -703,6 +706,12 @@
     </ClInclude>
     <ClInclude Include="Threading\ParallelForEach.hpp">
       <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="ELocatorAPI.h">
+      <Filter>FS</Filter>
+    </ClInclude>
+    <ClInclude Include="ILocatorApi.h">
+      <Filter>FS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,7 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm);
-CLocatorAPI* getFS() { return &FS; }
+CLocatorAPI* getFS() { return dynamic_cast<CLocatorAPI*>(&FS); }
 LPCSTR update_path_script(CLocatorAPI* fs, LPCSTR initial, LPCSTR src)
 {
     string_path temp;

@@ -7,8 +7,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
     if (!IsDebuggerPresent())
         xrDebug::Initialize(pCmdLine);
 
-
-    Core.Initialize("shader", pCmdLine, LogCallback(ELogCallback, nullptr));
+    GEnv.Render = &RImplementation;
+    Core.Initialize("shader", pCmdLine, LogCallback(ELogCallback, nullptr), true, "fs.ltx", false, true);
     STools = xr_new<CShaderTool>();
     Tools = STools;
 

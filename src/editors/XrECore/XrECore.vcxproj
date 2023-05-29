@@ -105,7 +105,6 @@
     <ClCompile Include="..\..\Layers\xrRender\stats_manager.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\Texture.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\TextureDescrManager.cpp" />
-    <ClCompile Include="ELocatorAPI.cpp" />
     <ClCompile Include="GameMtlLib_Editor.cpp" />
     <ClCompile Include="tga.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\tss_def.cpp" />
@@ -269,7 +268,6 @@
     <ClInclude Include="Editor\ui_main.h" />
     <ClInclude Include="Editor\UI_MainCommand.h" />
     <ClInclude Include="Editor\UI_ToolsCustom.h" />
-    <ClInclude Include="ELocatorAPI.h" />
     <ClInclude Include="Engine\ai_sounds.h" />
     <ClInclude Include="Engine\cl_collector.h" />
     <ClInclude Include="Engine\cl_intersect.h" />

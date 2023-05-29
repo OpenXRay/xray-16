@@ -10,7 +10,6 @@
 #include "LocatorAPI_defs.h"
 //#include "xrCore/Threading/Lock.hpp"
 #include "xrCommon/xr_map.h"
-#include "xrCommon/xr_smart_pointers.h"
 #include "xrCommon/predicates.h"
 #include "Common/Noncopyable.hpp"
 
@@ -53,28 +52,9 @@ struct _finddata32_t
 class CStreamReader;
 class Lock;
 
-enum class FSType
-{
-    Virtual = 1,
-    External = 2,
-    Any = Virtual | External,
-};
-
 IMPLEMENT_ENUM_FLAG_OPERATORS(FSType, int);
 
-class FileStatus
-{
-public:
-    bool Exists;
-    bool External; // File can be accessed only as external
-
-    FileStatus(bool exists, bool external)
-        : Exists(exists), External(external) {}
-
-    operator bool() const { return Exists; }
-};
-
-class XRCORE_API CLocatorAPI : Noncopyable
+class XRCORE_API CLocatorAPI : Noncopyable, public ILocatorAPI
 {
     friend class FS_Path;
 
@@ -93,27 +73,6 @@ public:
         u32 modif; // for editor
     };
 
-    struct archive
-    {
-        size_t size = 0;
-        size_t vfs_idx = size_t(-1);
-        shared_str path;
-        u32 modif = 0;
-#if defined(XR_PLATFORM_WINDOWS)
-        void *hSrcFile = nullptr;
-        void *hSrcMap = nullptr;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
-        int hSrcFile = 0;
-#else
-#   error Select or add implementation for your platform
-#endif
-        CInifile* header = nullptr;
-        
-        archive() = default;
-        void open();
-        void close();
-    };
-
     // IMPORTNT: don't replace u32 with size_t for this struct
     // (Letter A in the first word is forgotten intentionally,
     //  size_t will blow up the engine compatibility with it's resources)
@@ -124,8 +83,6 @@ public:
         u32 crc;
     };
 
-    using archives_vec = xr_vector<archive>;
-    archives_vec m_archives;
     void LoadArchive(archive& A, pcstr entrypoint = nullptr);
 
 private:
@@ -159,24 +116,6 @@ private:
     bool Recurse(pcstr path);
 
     files_it file_find_it(pcstr n);
-
-public:
-    enum : u32
-    {
-        flNeedRescan = (1 << 0),
-        flBuildCopy = (1 << 1),
-        flReady = (1 << 2),
-        flEBuildCopy = (1 << 3),
-        flEventNotificator = (1 << 4),
-        flTargetFolderOnly = (1 << 5),
-        flCacheFiles = (1 << 6),
-        flScanAppRoot = (1 << 7),
-        flNeedCheck = (1 << 8),
-        flDumpFileActivity = (1 << 9),
-    };
-    Flags32 m_Flags;
-    u32 dwAllocGranularity;
-    u32 dwOpenCounter;
 
 private:
     void check_cached_files(pstr fname, const size_t& fname_size, const file& desc, pcstr& source_name);
@@ -269,6 +208,3 @@ public:
     void lock_rescan();
     void unlock_rescan();
 };
-
-extern XRCORE_API xr_unique_ptr<CLocatorAPI> xr_FS;
-#define FS (*xr_FS)

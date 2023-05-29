@@ -27,7 +27,7 @@ constexpr size_t VFS_STANDARD_FILE = std::numeric_limits<size_t>::max();
 
 const u32 BIG_FILE_READER_WINDOW_SIZE = 1024 * 1024;
 
-xr_unique_ptr<CLocatorAPI> xr_FS;
+xr_unique_ptr<ILocatorAPI> xr_FS;
 
 #ifdef _EDITOR
 static constexpr pcstr FSLTX = "fs.ltx"

@@ -152,9 +152,12 @@ public:
         PropItemVec& items, shared_str key, u32* val, const TokenValueSH::Item* lst, u32 cnt) = 0;
     virtual CTextValue* CreateTexture(PropItemVec& items, shared_str key, pstr val, u32 sz) = 0;
 };
-//---------------------------------------------------------------------------
+
+#ifndef XREPROPS_API
+#define XREPROPS_API
+#endif
+
 extern XREPROPS_API IPropHelper& PHelper();
-//---------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // List
