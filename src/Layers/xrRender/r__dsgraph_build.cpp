@@ -730,12 +730,13 @@ void R_dsgraph_structure::build_subspace()
         {
             CSector* sector = PortalTraverser.r_sectors[s_it];
             dxRender_Visual* root = sector->root();
-            VERIFY(root->getType() == MT_HIERRARHY);
+            //VERIFY(root->getType() == MT_HIERRARHY);
 
             const auto &children = static_cast<FHierrarhyVisual*>(root)->children;
 
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
+#if 0
                 const auto traverse_children = [&, this](const TaskRange<size_t>& range)
                 {
                     for (size_t id = range.cbegin(); id != range.cend(); ++id)
@@ -745,16 +746,18 @@ void R_dsgraph_structure::build_subspace()
                     }
                 };
 
-#if 0
                 if (o.mt_calculate) // NOTE: this code doesn't work until visuals maps are separated by worker ID.
                 {
                     static_geo_tasks[s_it] = &xr_parallel_for(TaskRange<size_t>(0, children.size()), false, traverse_children);
                 }
                 else
-#endif
                 {
                     traverse_children(TaskRange<size_t>(0, children.size()));
                 }
+#else
+                const auto& view = sector->r_frustums[v_it];
+                add_static(root, view, view.getMask());
+#endif
             }
         }
     }
