@@ -618,10 +618,12 @@ void player_hud::render_hud(u32 context_id, IRenderable* root)
 
 #include "xrCore/Animation/Motion.hpp"
 
-u32 player_hud::motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md)
+u32 player_hud::motion_length(const shared_str& anim_name, const CHudItem* hudItem, const CMotionDef*& md)
 {
     const float speed = CalcMotionSpeed(anim_name);
-    attachable_hud_item* pi = create_hud_item(hud_name);
+    attachable_hud_item* pi = create_hud_item(hudItem);
+    shared_str hud_name = hudItem->HudSection();
+
     const player_hud_motion* pm = pi->m_hand_motions.find_motion(anim_name);
 
     if (!pm)
@@ -828,13 +830,12 @@ void player_hud::update_inertion(Fmatrix& trans) const
     }
 }
 
-attachable_hud_item* player_hud::create_hud_item(const shared_str& sect)
+attachable_hud_item* player_hud::create_hud_item(const CHudItem* hudItem)
 {
-    current_player_hud_sect = sect;
-    auto& item = m_pool[sect];
+    auto& item = m_pool[hudItem->UniqueHudSection()];
 
     if (!item)
-        item = xr_new<attachable_hud_item>(this, sect, m_model);
+        item = xr_new<attachable_hud_item>(this, hudItem->HudSection(), m_model);
 
     return item;
 }
@@ -849,7 +850,7 @@ bool player_hud::allow_activation(CHudItem* item) const
 
 void player_hud::attach_item(CHudItem* item)
 {
-    attachable_hud_item* pi = create_hud_item(item->HudSection());
+    attachable_hud_item* pi = create_hud_item(item);
     const int item_idx = pi->m_attach_place_idx;
 
     if (m_attached_items[item_idx] != pi)

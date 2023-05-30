@@ -40,7 +40,9 @@ CHudItem::~CHudItem() {}
 void CHudItem::Load(cpcstr section)
 {
     //загрузить hud, если он нужен
+    IncrementInstanceId();
     hud_sect = pSettings->read_if_exists<pcstr>(section, "hud", nullptr);
+    m_unique_hud_sect = shared_str().printf("%s_%d", hud_sect.c_str(), m_inst_id);
 
     if (m_animation_slot != u32(-1)) // if it has default hardcoded slot, then don't crash
         pSettings->read_if_exists(m_animation_slot, section, "animation_slot");
@@ -309,7 +311,7 @@ u32 CHudItem::PlayHUDMotion_noCB(const shared_str& motion_name, BOOL bMixIn)
     else
     {
         m_started_rnd_anim_idx = 0;
-        return g_player_hud->motion_length(motion_name, HudSection(), m_current_motion_def);
+        return g_player_hud->motion_length(motion_name, this, m_current_motion_def);
     }
 }
 
@@ -388,7 +390,7 @@ bool CHudItem::isHUDAnimationExist(pcstr anim_name) const
     else if (HudSection().c_str()) // Third person
     {
         const CMotionDef* temp_motion_def;
-        if (g_player_hud->motion_length(anim_name, HudSection(), temp_motion_def) > 100)
+        if (g_player_hud->motion_length(anim_name, this, temp_motion_def) > 100)
             return true;
     }
     else

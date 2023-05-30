@@ -163,9 +163,13 @@ protected:
 private:
     CPhysicItem* m_object;
     CInventoryItem* m_item;
+    inline static int m_inst_id = 0;
+    shared_str m_unique_hud_sect;
 
 public:
+    void IncrementInstanceId() { m_inst_id += 1; }
     const shared_str& HudSection() const { return hud_sect; }
+    const shared_str& UniqueHudSection() const { return m_unique_hud_sect; }
     IC CPhysicItem& object() const
     {
         VERIFY(m_object);
