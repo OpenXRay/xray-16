@@ -62,10 +62,12 @@ public:
 
     void Activate(u16 slot, /*EActivationReason reason=eGeneral, */ bool bForce = false);
 
-    bool m_change_after_deactivate;
-    void ActivateDeffered();
-    PIItem GetNextActiveGrenade();
+    xr_vector<shared_str> m_available_grenade_types;
+    bool m_isActivatingNextGrenade;
+    bool HasNextGrenade() { return m_available_grenade_types.size() > 1; };
+    PIItem GetNextGrenade();
     bool ActivateNextGrenade();
+    void ActivateNextGrenadeDeffered();
 
     static u32 const qs_priorities_count = 5;
     PIItem GetNextItemInActiveSlot(u8 const priority_value, bool ignore_ammo);

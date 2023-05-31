@@ -288,7 +288,7 @@ bool CGrenade::Action(u16 cmd, u32 flags)
         if (flags & CMD_START)
         {
             if (m_pInventory)
-                m_pInventory->ActivateDeffered();
+                m_pInventory->ActivateNextGrenadeDeffered();
         }
         return true;
     };

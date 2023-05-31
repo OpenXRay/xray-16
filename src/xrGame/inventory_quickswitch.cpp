@@ -241,46 +241,22 @@ bool priority_group::is_item_in_group(shared_str const& section_name) const
     return m_sections.find(section_name) != m_sections.end();
 }
 
-void CInventory::ActivateDeffered()
+void CInventory::ActivateNextGrenadeDeffered()
 {
-    m_change_after_deactivate = true;
-    Activate(NO_ACTIVE_SLOT);
+    m_isActivatingNextGrenade = HasNextGrenade();
+    if (m_isActivatingNextGrenade)
+        Activate(NO_ACTIVE_SLOT);
 }
 
-PIItem CInventory::GetNextActiveGrenade()
+PIItem CInventory::GetNextGrenade()
 {
-    xr_vector<shared_str> types_sect_grn;
-    types_sect_grn.push_back(ActiveItem()->cast_game_object()->cNameSect());
-    int count_types = 1;
-    TIItemContainer::iterator it = m_ruck.begin();
-    TIItemContainer::iterator it_e = m_ruck.end();
-    for (; it != it_e; ++it)
-    {
-        CGrenade* pGrenade = smart_cast<CGrenade*>(*it);
-        if (pGrenade)
-        {
-            xr_vector<shared_str>::const_iterator I = types_sect_grn.begin();
-            xr_vector<shared_str>::const_iterator E = types_sect_grn.end();
-            bool new_type = true;
-            for (; I != E; ++I)
-            {
-                if (!xr_strcmp(pGrenade->cNameSect(), *I))
-                    new_type = false;
-            }
-            if (new_type)
-            {
-                types_sect_grn.push_back(pGrenade->cNameSect());
-                count_types++;
-            }
-        }
-    }
+    int count_types = m_available_grenade_types.size();
 
     if (count_types > 1)
     {
         int curr_num = 0;
-        std::sort(types_sect_grn.begin(), types_sect_grn.end());
-        xr_vector<shared_str>::const_iterator I = types_sect_grn.begin();
-        xr_vector<shared_str>::const_iterator E = types_sect_grn.end();
+        auto I = m_available_grenade_types.begin();
+        auto E = m_available_grenade_types.end();
         for (; I != E; ++I)
         {
             if (!xr_strcmp(ActiveItem()->cast_game_object()->cNameSect(), *I))
@@ -291,10 +267,11 @@ PIItem CInventory::GetNextActiveGrenade()
         if (next_num >= count_types)
             next_num = 0;
 
-        shared_str sect_next_grn = types_sect_grn[next_num];
+        shared_str sect_next_grn = m_available_grenade_types[next_num];
        
-        it = m_ruck.begin();
-        it_e = m_ruck.end();
+        auto it = m_ruck.begin();
+        auto it_e = m_ruck.end();
+
         for (; it != it_e; ++it)
         {
             CGrenade* pGrenade = smart_cast<CGrenade*>(*it);
@@ -315,14 +292,14 @@ bool CInventory::ActivateNextGrenade()
     if (Level().CurrentViewEntity() != pActor_owner)
         return false;
 
-    PIItem new_item = GetNextActiveGrenade();
+    PIItem new_item = GetNextGrenade();
     if (!new_item)
         return false;
 
     PIItem current_item = ActiveItem();
     if (current_item)
     {
-        m_change_after_deactivate = false;
+        m_isActivatingNextGrenade = false;
         Ruck(current_item);
         Slot(new_item->BaseSlot(), new_item);
     }
