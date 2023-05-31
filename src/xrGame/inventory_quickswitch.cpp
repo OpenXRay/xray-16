@@ -255,11 +255,9 @@ PIItem CInventory::GetNextGrenade()
     if (count_types > 1)
     {
         int curr_num = 0;
-        auto I = m_available_grenade_types.begin();
-        auto E = m_available_grenade_types.end();
-        for (; I != E; ++I)
+        for (auto grenade_type : m_available_grenade_types)
         {
-            if (!xr_strcmp(ActiveItem()->cast_game_object()->cNameSect(), *I))
+            if (!xr_strcmp(ActiveItem()->cast_game_object()->cNameSect(), grenade_type))
                 break;
             curr_num++;
         }
@@ -268,15 +266,12 @@ PIItem CInventory::GetNextGrenade()
             next_num = 0;
 
         shared_str sect_next_grn = m_available_grenade_types[next_num];
-       
-        auto it = m_ruck.begin();
-        auto it_e = m_ruck.end();
 
-        for (; it != it_e; ++it)
+        for (auto itm : m_ruck)
         {
-            CGrenade* pGrenade = smart_cast<CGrenade*>(*it);
+            CGrenade* pGrenade = smart_cast<CGrenade*>(itm);
             if (pGrenade && !xr_strcmp(pGrenade->cNameSect(), sect_next_grn))
-                return *it;
+                return itm;
         }
     }
 

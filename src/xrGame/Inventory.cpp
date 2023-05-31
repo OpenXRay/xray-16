@@ -526,12 +526,10 @@ bool CInventory::Ruck(PIItem pIItem, bool strict_placement)
     CGrenade* pGrenade = smart_cast<CGrenade*>(pIItem);
     if (pGrenade)
     {
-        xr_vector<shared_str>::const_iterator I = m_available_grenade_types.begin();
-        xr_vector<shared_str>::const_iterator E = m_available_grenade_types.end();
         bool new_type = true;
-        for (; I != E; ++I)
+        for (auto grenade_type : m_available_grenade_types)
         {
-            if (!xr_strcmp(pGrenade->cNameSect(), *I))
+            if (!xr_strcmp(pGrenade->cNameSect(), grenade_type))
                 new_type = false;
         }
         if (new_type)
