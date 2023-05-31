@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "Inventory.h"
 #include "Weapon.h"
+#include "Grenade.h"
 #include "Actor.h"
 #include "xrCore/xr_ini.h"
 
@@ -238,4 +239,92 @@ void priority_group::init_group(shared_str const& game_section, shared_str const
 bool priority_group::is_item_in_group(shared_str const& section_name) const
 {
     return m_sections.find(section_name) != m_sections.end();
+}
+
+void CInventory::ActivateDeffered()
+{
+    m_change_after_deactivate = true;
+    Activate(NO_ACTIVE_SLOT);
+}
+
+PIItem CInventory::GetNextActiveGrenade()
+{
+    xr_vector<shared_str> types_sect_grn;
+    types_sect_grn.push_back(ActiveItem()->cast_game_object()->cNameSect());
+    int count_types = 1;
+    TIItemContainer::iterator it = m_ruck.begin();
+    TIItemContainer::iterator it_e = m_ruck.end();
+    for (; it != it_e; ++it)
+    {
+        CGrenade* pGrenade = smart_cast<CGrenade*>(*it);
+        if (pGrenade)
+        {
+            xr_vector<shared_str>::const_iterator I = types_sect_grn.begin();
+            xr_vector<shared_str>::const_iterator E = types_sect_grn.end();
+            bool new_type = true;
+            for (; I != E; ++I)
+            {
+                if (!xr_strcmp(pGrenade->cNameSect(), *I))
+                    new_type = false;
+            }
+            if (new_type)
+            {
+                types_sect_grn.push_back(pGrenade->cNameSect());
+                count_types++;
+            }
+        }
+    }
+
+    if (count_types > 1)
+    {
+        int curr_num = 0;
+        std::sort(types_sect_grn.begin(), types_sect_grn.end());
+        xr_vector<shared_str>::const_iterator I = types_sect_grn.begin();
+        xr_vector<shared_str>::const_iterator E = types_sect_grn.end();
+        for (; I != E; ++I)
+        {
+            if (!xr_strcmp(ActiveItem()->cast_game_object()->cNameSect(), *I))
+                break;
+            curr_num++;
+        }
+        int next_num = curr_num + 1;
+        if (next_num >= count_types)
+            next_num = 0;
+
+        shared_str sect_next_grn = types_sect_grn[next_num];
+       
+        it = m_ruck.begin();
+        it_e = m_ruck.end();
+        for (; it != it_e; ++it)
+        {
+            CGrenade* pGrenade = smart_cast<CGrenade*>(*it);
+            if (pGrenade && !xr_strcmp(pGrenade->cNameSect(), sect_next_grn))
+                return *it;
+        }
+    }
+
+    return nullptr;
+}
+
+bool CInventory::ActivateNextGrenade()
+{
+    if (m_iActiveSlot == NO_ACTIVE_SLOT)
+        return false;
+
+    CGameObject* pActor_owner = smart_cast<CGameObject*>(m_pOwner);
+    if (Level().CurrentViewEntity() != pActor_owner)
+        return false;
+
+    PIItem new_item = GetNextActiveGrenade();
+    if (!new_item)
+        return false;
+
+    PIItem current_item = ActiveItem();
+    if (current_item)
+    {
+        m_change_after_deactivate = false;
+        Ruck(current_item);
+        Slot(new_item->BaseSlot(), new_item);
+    }
+    return true;
 }

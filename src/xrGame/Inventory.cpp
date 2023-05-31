@@ -100,6 +100,7 @@ CInventory::CInventory()
     // ^ resize will default initialize everything with 0
 
     InitPriorityGroupsForQSwitch();
+    m_change_after_deactivate = false;
 }
 
 CInventory::~CInventory() {}
@@ -792,6 +793,9 @@ void CInventory::Update()
                     return;
                 }
             }
+
+            if (m_change_after_deactivate)
+                ActivateNextGrenade();
 
             if (GetNextActiveSlot() != NO_ACTIVE_SLOT)
             {
