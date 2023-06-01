@@ -332,7 +332,6 @@ set(SRC_FILES
     "../xrRender_R2/r3_rendertarget_mark_msaa_edges.cpp"
     "../xrRender_R2/r3_rendertarget_phase_ssao.cpp"
     "../xrRender_R2/r3_rendertarget_phase_smap_D.cpp"
-    "../xrRender_R2/r3_rendertarget_phase_rain.cpp"
     "../xrRender_R2/r3_rendertarget_phase_occq.cpp"
     "../xrRender_R2/r3_rendertarget_phase_scene.cpp"
     "../xrRender_R2/render_phase_sun.cpp"

@@ -127,6 +127,7 @@ struct render_rain : public i_render_phase
 
     light RainLight;
     u32 context_id{ R_dsgraph_structure::INVALID_CONTEXT_ID };
+    float rain_factor{ 0.0f };
 };
 
 struct render_sun : public i_render_phase
