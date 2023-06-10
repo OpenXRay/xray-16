@@ -110,6 +110,9 @@ CWeapon::CWeapon()
     m_activation_speed_is_overriden = false;
     m_cur_scope = 0;
     m_bRememberActorNVisnStatus = false;
+
+    if (m_bLightShotEnabled)
+        Light_Create();
 }
 
 CWeapon::~CWeapon()

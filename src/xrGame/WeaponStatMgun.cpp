@@ -34,6 +34,9 @@ CWeaponStatMgun::CWeaponStatMgun()
     camera = xr_new<CCameraFirstEye>(
         this, CCameraBase::flRelativeLink | CCameraBase::flPositionRigid | CCameraBase::flDirectionRigid);
     camera->Load("mounted_weapon_cam");
+
+    if (m_bLightShotEnabled)
+        inheritedShooting::Light_Create();
 }
 
 CWeaponStatMgun::~CWeaponStatMgun()
@@ -117,8 +120,6 @@ bool CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
     m_cur_y_rot = m_bind_y_rot;
     m_destEnemyDir.setHP(m_bind_y_rot, m_bind_x_rot);
     XFORM().transform_dir(m_destEnemyDir);
-
-    inheritedShooting::Light_Create();
 
     processing_activate();
     setVisible(TRUE);
