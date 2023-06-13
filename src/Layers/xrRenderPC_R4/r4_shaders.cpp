@@ -284,6 +284,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     // Static sun on R2 and higher
     appendShaderOption(o.sunstatic, "USE_R2_STATIC_SUN", "1");
 
+    // Instanced details rendering
+    appendShaderOption(o.instanced_details, "INSTANCED_DETAILS", "1");
+
     // Force gloss
     {
         xr_sprintf(c_gloss, "%f", o.forcegloss_v);

@@ -43,6 +43,12 @@ void CDetailManager::hw_Load_Geom()
 
     // Analyze batch-size
     hw_BatchSize = (u32(HW.Caps.geometry.dwRegisters) - c_hdr) / c_size;
+#if RENDER == R_R4
+    if (RImplementation.o.instanced_details)
+    {
+        hw_BatchSize = 1;
+    }
+#endif
     clamp<size_t>(hw_BatchSize, 0, 64);
     Msg("* [DETAILS] VertexConsts(%u), Batch(%zu)", u32(HW.Caps.geometry.dwRegisters), hw_BatchSize);
 
@@ -108,6 +114,7 @@ void CDetailManager::hw_Load_Geom()
     hw_Geom.create(dwDecl, hw_VB, hw_IB);
 }
 
+#if RENDER != R_R4
 void CDetailManager::hw_Unload()
 {
     // Destroy VS/VB/IB
@@ -118,3 +125,4 @@ void CDetailManager::hw_Unload()
     if (hw_VB)
         hw_VB.Release();
 }
+#endif

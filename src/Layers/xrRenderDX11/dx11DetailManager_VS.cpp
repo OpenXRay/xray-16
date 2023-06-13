@@ -10,8 +10,39 @@ extern const int quant;
 //extern const int c_hdr;
 }
 
+static const shared_str strConsts("consts");
+static const shared_str strWave("wave");
+static const shared_str strDir2D("dir2D");
+static const shared_str strArray("array");
+static const shared_str strXForm("xform");
+
+static constexpr size_t BATCH_DATA_ENTRIES_NUM = 2u;
+static constexpr size_t MAX_ENTRIES_NUM = 4096u; // max 1D texture size
+static constexpr size_t BATCH_INSTANCES_MAX = MAX_ENTRIES_NUM / BATCH_DATA_ENTRIES_NUM;
+
 void CDetailManager::hw_Load_Shaders()
 {
+    if (RImplementation.o.instanced_details)
+    {
+        t_draw_matrices.create("$details$array");
+        ID3D11Texture1D* array_texture;
+        D3D11_TEXTURE1D_DESC desc;
+        ZeroMemory(&desc, sizeof(desc));
+        desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.ArraySize = 1;
+        desc.MipLevels = 1;
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        desc.Width = MAX_ENTRIES_NUM;
+        CHK_DX(HW.pDevice->CreateTexture1D(&desc, nullptr, &array_texture));
+        t_draw_matrices->surface_set(array_texture);
+        for (int idx = 0; idx < R__NUM_CONTEXTS; ++idx)
+        {
+            upload_buffer[idx] = (Fvector4*)xr_malloc(sizeof(Fvector4) * MAX_ENTRIES_NUM);
+        }
+    }
+
     // Create shader to access constant storage
     ref_shader S;
     S.create("details\\set");
@@ -24,6 +55,26 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_consts = T1.get("consts");
     hwc_s_xform = T1.get("xform");
     hwc_s_array = T1.get("array");
+}
+
+void CDetailManager::hw_Unload()
+{
+    if (RImplementation.o.instanced_details)
+    {
+        t_draw_matrices.destroy();
+        for (int idx = 0; idx < R__NUM_CONTEXTS; ++idx)
+        {
+            xr_free(upload_buffer[idx]);
+        }
+    }
+
+    // Destroy VS/VB/IB
+    if (hw_Geom)
+        hw_Geom.destroy();
+    if (hw_IB)
+        hw_IB.Release();
+    if (hw_VB)
+        hw_VB.Release();
 }
 
 void CDetailManager::hw_Render(CBackend& cmd_list)
@@ -90,6 +141,12 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
 void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id)
 {
+    if (RImplementation.o.instanced_details)
+    {
+        draw_instances(cmd_list, consts, wave, wind, var_id, lod_id);
+        return;
+    }
+
     static shared_str strConsts("consts");
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");
@@ -258,6 +315,120 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                     // RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
                     // RCache.get_ConstantCache_Vertex().get_array_f().dirty	(c_base,c_base+dwBatch*4);
                     cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
+                    cmd_list.stat.r.s_details.add(dwCNT_verts);
+                }
+            }
+        }
+        vOffset += hw_BatchSize * Object.number_vertices;
+        iOffset += hw_BatchSize * Object.number_indices;
+    }
+}
+
+void CDetailManager::draw_instances(
+    CBackend& cmd_list,
+    const Fvector4& consts,
+    const Fvector4& wave,
+    const Fvector4& wind,
+    u32 var_id,
+    u32 lod_id)
+{
+    PIX_EVENT_CTX(cmd_list, Details_draw_instances);
+
+    u32 vOffset = 0;
+    u32 iOffset = 0;
+
+    vis_list& list = m_visibles[var_id];
+
+    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
+    Fvector c_sun, c_ambient, c_hemi;
+    c_sun.set(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z);
+    c_sun.mul(.5f);
+    c_ambient.set(desc.ambient.x, desc.ambient.y, desc.ambient.z);
+    c_hemi.set(desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z);
+
+    // Iterate
+    for (u32 O = 0; O < objects.size(); O++)
+    {
+        PIX_EVENT_CTX(cmd_list, Object_draw);
+
+        CDetail& Object = *objects[O];
+        xr_vector<SlotItemVec*>& vis = list[O];
+        if (!vis.empty())
+        {
+            for (u32 iPass = 0; iPass < Object.shader->E[lod_id]->passes.size(); ++iPass)
+            {
+                cmd_list.set_Element(Object.shader->E[lod_id], iPass);
+                cmd_list.apply_lmaterial();
+
+                cmd_list.set_c(strConsts, consts);
+                cmd_list.set_c(strWave, wave);
+                cmd_list.set_c(strDir2D, wind);
+                cmd_list.set_c(strXForm, Device.mFullTransform);
+
+                Fvector4* c_storage = upload_buffer[cmd_list.context_id];
+
+                u32 dwBatch = 0;
+
+                xr_vector<SlotItemVec*>::iterator _vI = vis.begin();
+                xr_vector<SlotItemVec*>::iterator _vE = vis.end();
+                for (; _vI != _vE; ++_vI)
+                {
+                    SlotItemVec* items = *_vI;
+
+                    auto _iI = items->begin();
+                    auto _iE = items->end();
+                    for (; _iI != _iE; ++_iI)
+                    {
+                        SlotItem& Instance = **_iI;
+                        u32 base = dwBatch * 2;
+
+                        float scale = Instance.scale_calculated;
+                        Fmatrix& M = Instance.mRotY;
+
+                        c_storage[base + 0].set(M._13 * scale, M._11 * scale, Instance.c_hemi, Instance.c_sun);
+                        c_storage[base + 1].set(M._41, M._42, M._43, scale);
+
+                        dwBatch++;
+                        if (dwBatch == BATCH_INSTANCES_MAX)
+                        {
+                            u32 dwCNT_verts = dwBatch * Object.number_vertices;
+                            u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
+                            
+                            {
+                                HW.get_context(cmd_list.context_id)->UpdateSubresource(
+                                    t_draw_matrices->surface_get(),
+                                    0,
+                                    nullptr,
+                                    upload_buffer[cmd_list.context_id],
+                                    MAX_ENTRIES_NUM * sizeof(Fvector4),
+                                    1
+                                );
+
+                                cmd_list.render_instanced(D3DPT_TRIANGLELIST, vOffset, iOffset, Object.number_indices, BATCH_INSTANCES_MAX);
+                                cmd_list.stat.r.s_details.add(dwCNT_verts);
+                            }
+
+                            // restart
+                            dwBatch = 0;
+                        }
+                    }
+                }
+
+                // flush if necessary
+                if (dwBatch)
+                {
+                    HW.get_context(cmd_list.context_id)->UpdateSubresource(
+                        t_draw_matrices->surface_get(),
+                        0,
+                        nullptr,
+                        upload_buffer[cmd_list.context_id],
+                        dwBatch * BATCH_DATA_ENTRIES_NUM * sizeof(Fvector4),
+                        1
+                    );
+
+                    u32 dwCNT_verts = dwBatch * Object.number_vertices;
+                    u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
+                    cmd_list.render_instanced(D3DPT_TRIANGLELIST, vOffset, iOffset, Object.number_indices, dwBatch);
                     cmd_list.stat.r.s_details.add(dwCNT_verts);
                 }
             }

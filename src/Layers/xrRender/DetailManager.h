@@ -207,6 +207,11 @@ public:
     void hw_Render_dump(CBackend& cmd_list, ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
 #elif defined(USE_DX11) || defined(USE_OGL)
     void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
+#if RENDER == R_R4
+    void draw_instances(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
+    Fvector4 *upload_buffer[R__NUM_CONTEXTS];
+    ref_texture t_draw_matrices;
+#endif
 #else
 #   error No graphics API selected or enabled!
 #endif

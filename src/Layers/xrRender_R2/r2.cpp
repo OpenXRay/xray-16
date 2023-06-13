@@ -456,6 +456,7 @@ void CRender::create()
     o.distortion = o.distortion_enabled;
     o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
     o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
+    o.instanced_details = ps_r2_ls_flags_ext.test(R_FLAGEXT_INSTANCED_DETAILS);
 
     o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);

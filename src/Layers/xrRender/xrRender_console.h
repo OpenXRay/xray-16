@@ -215,6 +215,7 @@ enum
     R3FLAGEXT_SSR_HALF_DEPTH = (1 << 10),
     R3FLAGEXT_SSR_JITTER = (1 << 11),
     R_FLAGEXT_LIGHT_DETAILS = (1 << 12), // include grass in local lights shadowmaps
+    R_FLAGEXT_INSTANCED_DETAILS = (1 << 13), // instanced details draw
 };
 
 extern void xrRender_initconsole();
