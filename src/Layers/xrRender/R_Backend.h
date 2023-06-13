@@ -528,6 +528,8 @@ public:
     ICF void Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
     ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
 
+    ICF void render_instanced(D3DPRIMITIVETYPE prim_type, u32 base_vertex, u32 start_index, u32 num_indices, u32 instance_count);
+
     ICF void submit()
     {
 #ifdef USE_DX11
