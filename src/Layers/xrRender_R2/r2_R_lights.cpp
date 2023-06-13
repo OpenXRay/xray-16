@@ -152,7 +152,7 @@ void CRender::render_lights(light_Package& LP)
                 dsgraph.cmd_list.set_xform_view(L->X.S.view);
                 dsgraph.cmd_list.set_xform_project(L->X.S.project);
                 dsgraph.render_graph(0);
-                if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+                if (ps_r2_ls_flags.test(R_FLAGEXT_LIGHT_DETAILS))
                 {
                     if (check_grass_shadow(L, ViewBase))
                     {
