@@ -59,6 +59,12 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
             C.r_StencilRef(0x01);
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_CullMode(D3DCULL_NONE);
+#if defined(USE_DX11)
+            if (RImplementation.o.instanced_details)
+            {
+                C.r_dx11Texture("array", "$details$array");
+            }
+#endif
             //	Alpha to coverage.
             C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
             C.r_End();
@@ -68,6 +74,12 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
         C.r_CullMode(D3DCULL_NONE);
+#if defined(USE_DX11)
+        if (RImplementation.o.instanced_details)
+        {
+            C.r_dx11Texture("array", "$details$array");
+        }
+#endif
         if (bUseATOC)
             C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
         C.r_End();
@@ -80,6 +92,12 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
             C.r_StencilRef(0x01);
             C.r_CullMode(D3DCULL_NONE);
             C.r_ColorWriteEnable(false, false, false, false);
+#if defined(USE_DX11)
+            if (RImplementation.o.instanced_details)
+            {
+                C.r_dx11Texture("array", "$details$array");
+            }
+#endif
             //	Alpha to coverage.
             C.RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, TRUE);
             C.r_End();
@@ -89,6 +107,12 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
         C.r_CullMode(D3DCULL_NONE);
+#if defined(USE_DX11)
+        if (RImplementation.o.instanced_details)
+        {
+            C.r_dx11Texture("array", "$details$array");
+        }
+#endif
         //	Need this for ATOC
         if (bUseATOC)
             C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
