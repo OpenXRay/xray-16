@@ -51,7 +51,7 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
 
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ: // deffer wave
+    case SE_R2_NORMAL_HQ: { // deffer wave
         if (bUseATOC)
         {
             uber_deffer(C, false, "detail_w", "base_atoc", true, 0, true);
@@ -63,6 +63,15 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
             if (RImplementation.o.instanced_details)
             {
                 C.r_dx11Texture("array", "$details$array");
+            }
+
+            if (RImplementation.o.linear_grass_filter)
+            {
+                const u32 stage = C.r_dx11Sampler("smp_base");
+                if (stage != -1)
+                {
+                    C.i_dx11FilterAnizo(stage, false);
+                }
             }
 #endif
             //	Alpha to coverage.
@@ -79,12 +88,21 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
         {
             C.r_dx11Texture("array", "$details$array");
         }
+
+        if (RImplementation.o.linear_grass_filter)
+        {
+            const u32 stage = C.r_dx11Sampler("smp_base");
+            if (stage != -1)
+            {
+                C.i_dx11FilterAnizo(stage, false);
+            }
+        }
 #endif
         if (bUseATOC)
             C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
-        C.r_End();
+        C.r_End(); }
         break;
-    case SE_R2_NORMAL_LQ: // deffer still
+    case SE_R2_NORMAL_LQ: { // deffer still
         if (bUseATOC)
         {
             uber_deffer(C, false, "detail_s", "base_atoc", true, 0, true);
@@ -96,6 +114,15 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
             if (RImplementation.o.instanced_details)
             {
                 C.r_dx11Texture("array", "$details$array");
+            }
+
+            if (RImplementation.o.linear_grass_filter)
+            {
+                const u32 stage = C.r_dx11Sampler("smp_base");
+                if (stage != -1)
+                {
+                    C.i_dx11FilterAnizo(stage, false);
+                }
             }
 #endif
             //	Alpha to coverage.
@@ -112,11 +139,17 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
         {
             C.r_dx11Texture("array", "$details$array");
         }
+
+        const u32 stage = C.r_dx11Sampler("smp_base");
+        if (stage != -1)
+        {
+            C.i_dx11FilterAnizo(stage, false);
+        }
 #endif
         //	Need this for ATOC
         if (bUseATOC)
             C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
-        C.r_End();
+        C.r_End(); }
         break;
     }
 }

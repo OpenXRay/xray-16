@@ -216,6 +216,7 @@ enum
     R3FLAGEXT_SSR_JITTER = (1 << 11),
     R_FLAGEXT_LIGHT_DETAILS = (1 << 12), // include grass in local lights shadowmaps
     R_FLAGEXT_INSTANCED_DETAILS = (1 << 13), // instanced details draw
+    R_FLAGEXT_LINEAR_GRASS_FILTER = (1 << 14), // force disable anisotropy for grass filtering
 };
 
 extern void xrRender_initconsole();
