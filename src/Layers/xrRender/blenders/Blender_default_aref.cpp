@@ -120,6 +120,7 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
                 C.StageEnd();
             }
             C.PassEnd();
+            break;
         }
         case SE_R1_LMODELS:
         {
@@ -141,9 +142,6 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
             C.PassEnd();
             break;
         }
-
-        default:
-            break;
         } // switch (C.iElement)
     }
 }
