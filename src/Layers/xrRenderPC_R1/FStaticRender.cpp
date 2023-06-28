@@ -90,7 +90,7 @@ void CRender::create()
     m_skinning = -1;
 
     // Fixed-function pipeline
-    o.ffp = !!strstr(Core.Params, "-force_ffp") || ps_r1_flags.test(R1FLAG_FFP);
+    o.ffp = HW.Caps.hasFixedPipeline && ps_r1_flags.test(R1FLAG_FFP);
 
     // disasm
     o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
