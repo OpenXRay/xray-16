@@ -469,13 +469,13 @@ void CRenderTarget::phase_combine_fpp(u32 p_color, u32 p_gray, u32 p_alpha,
     if (param_noise > 0.001f)
     {
         auto* pv2 = static_cast<FVF::TL*>(RImplementation.Vertex.Lock(4, g_postprocess[0].stride(), Offset));
-        pv2->set(0,         float(_h), EPS_S, 1.f, p_gray, n0.x, n1.y);
+        pv2->set(0,         float(_h), EPS_S, 1.f, p_color, n0.x, n1.y);
         pv2++;
-        pv2->set(0,         0,         EPS_S, 1.f, p_gray, n0.x, n0.y);
+        pv2->set(0,         0,         EPS_S, 1.f, p_color, n0.x, n0.y);
         pv2++;
-        pv2->set(float(_w), float(_h), EPS_S, 1.f, p_gray, n1.x, n1.y);
+        pv2->set(float(_w), float(_h), EPS_S, 1.f, p_color, n1.x, n1.y);
         pv2++;
-        pv2->set(float(_w), 0,         EPS_S, 1.f, p_gray, n1.x, n0.y);
+        pv2->set(float(_w), 0,         EPS_S, 1.f, p_color, n1.x, n0.y);
         pv2++;
         RImplementation.Vertex.Unlock(4, g_postprocess[0].stride());
 
