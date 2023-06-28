@@ -1,5 +1,9 @@
 #include "stdafx.h"
 #include "FStaticRender_RenderTarget.h"
+
+#include "Layers/xrRender/blenders/Blender_Blur.h"
+#include "Layers/xrRender/blenders/Blender_Screen_GRAY.h"
+
 #include "xrEngine/IGame_Persistent.h"
 
 CRenderTarget::CRenderTarget()
@@ -59,27 +63,49 @@ CRenderTarget::CRenderTarget()
     rt_async_ss.create(r1_RT_async_ss, rtWidth, rtHeight, HW.Caps.fTarget, 0, { CRT::CreateSurface });
 
     // Shaders and stream
-    s_postprocess[0].create("postprocess");
-    if (RImplementation.o.distortion)
-        s_postprocess_D[0].create("postprocess_d");
-
-    if (RImplementation.o.color_mapping)
+    if (RImplementation.o.ffp)
     {
-        s_postprocess[1].create("postprocess_cm");
-        if (RImplementation.o.distortion)
-            s_postprocess_D[1].create("postprocess_dcm");
-        if (!s_postprocess[1] || !s_postprocess_D[1])
+        g_postprocess[0].create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+        g_postprocess[1].create(FVF::F_TL2uv, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+        s_set.create("effects\\screen_set", r1_RT_generic);
+        s_gray.create("effects\\screen_gray", r1_RT_generic);
+        if (!s_gray)
         {
-            Log("~ Color mapping disabled due to lack of one shader or both shaders");
-            s_postprocess[1].destroy();
-            s_postprocess_D[1].destroy();
-            rt_color_map->destroy();
-            RImplementation.o.color_mapping = FALSE;
+            CBlender_Screen_GRAY b;
+            s_gray.create(&b, "effects\\screen_gray", r1_RT_generic);
         }
+        s_blend.create("effects\\screen_blend", r1_RT_generic);
+        s_duality.create("effects\\blur", r1_RT_generic "," r1_RT_generic);
+        if (!s_duality)
+        {
+            CBlender_Blur b;
+            s_duality.create(&b, "effects\\blur", r1_RT_generic "," r1_RT_generic);
+        }
+        s_noise.create("effects\\screen_noise", "fx\\fx_noise2");
     }
-    g_postprocess.create(
-        D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+    else
+    {
+        s_postprocess[0].create("postprocess");
+        if (RImplementation.o.distortion)
+            s_postprocess_D[0].create("postprocess_d");
 
+        if (RImplementation.o.color_mapping)
+        {
+            s_postprocess[1].create("postprocess_cm");
+            if (RImplementation.o.distortion)
+                s_postprocess_D[1].create("postprocess_dcm");
+            if (!s_postprocess[1] || !s_postprocess_D[1])
+            {
+                Log("~ Color mapping disabled due to lack of one shader or both shaders");
+                s_postprocess[1].destroy();
+                s_postprocess_D[1].destroy();
+                rt_color_map->destroy();
+                RImplementation.o.color_mapping = FALSE;
+            }
+        }
+        g_postprocess[0].create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3,
+            RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+    }
 
     bAvailable = rt_Generic->valid() && rt_distort->valid();
     Msg("* SSample: %s", bAvailable ? "enabled" : "disabled");
@@ -295,18 +321,25 @@ void CRenderTarget::phase_combine(bool bDistort, bool bCMap)
     const u32 p_gray = subst_alpha(param_color_gray, gblend);
     Fvector p_brightness = param_color_add;
 
+    Fvector2 n0, n1, r0, r1, l0, l1;
+    calc_tc_duality_ss(r0, r1, l0, l1);
+    calc_tc_noise(n0, n1);
+
+    if (RImplementation.o.ffp)
+    {
+        const u32 p_alpha = color_rgba(255, 255, 255, gblend);
+        phase_combine_fpp(p_color, p_gray, p_alpha, n0, n1, r0, r1, l0, l1);
+        return;
+    }
+
     // Draw full-screen quad textured with our scene image
     u32 Offset;
     const float _w = float(Device.dwWidth);
     const float _h = float(Device.dwHeight);
 
-    Fvector2 n0, n1, r0, r1, l0, l1;
-    calc_tc_duality_ss(r0, r1, l0, l1);
-    calc_tc_noise(n0, n1);
-
     // Fill vertex buffer
     const float du = ps_r1_pps_u, dv = ps_r1_pps_v;
-    TL_2c3uv* pv = (TL_2c3uv*)RImplementation.Vertex.Lock(4, g_postprocess.stride(), Offset);
+    TL_2c3uv* pv = (TL_2c3uv*)RImplementation.Vertex.Lock(4, g_postprocess[0].stride(), Offset);
     pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
     pv++;
     pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
@@ -315,7 +348,7 @@ void CRenderTarget::phase_combine(bool bDistort, bool bCMap)
     pv++;
     pv->set(du + float(_w), dv + 0, p_color, p_gray, r1.x, r0.y, l1.x, l0.y, n1.x, n0.y);
     pv++;
-    RImplementation.Vertex.Unlock(4, g_postprocess.stride());
+    RImplementation.Vertex.Unlock(4, g_postprocess[0].stride());
 
     static shared_str s_colormap = "c_colormap";
     if (bCMap)
@@ -324,7 +357,7 @@ void CRenderTarget::phase_combine(bool bDistort, bool bCMap)
 
         //  Prepare colormapped buffer
         RCache.set_Element(bDistort ? s_postprocess_D[1]->E[4] : s_postprocess[1]->E[4]);
-        RCache.set_Geometry(g_postprocess);
+        RCache.set_Geometry(g_postprocess[0]);
         RCache.set_c(s_colormap, param_color_map_influence, param_color_map_interpolate, 0.0f, 0.0f);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
@@ -345,8 +378,112 @@ void CRenderTarget::phase_combine(bool bDistort, bool bCMap)
     static shared_str s_brightness = "c_brightness";
     RCache.set_c(s_brightness, p_brightness.x, p_brightness.y, p_brightness.z, 0.0f);
     RCache.set_c(s_colormap, param_color_map_influence, param_color_map_interpolate, 0.0f, 0.0f);
-    RCache.set_Geometry(g_postprocess);
+    RCache.set_Geometry(g_postprocess[0]);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+}
+
+void CRenderTarget::phase_combine_fpp(u32 p_color, u32 p_gray, u32 p_alpha,
+    Fvector2 n0, Fvector2 n1, Fvector2 r0, Fvector2 r1, Fvector2 l0, Fvector2 l1)
+{
+    u32 Offset;
+    const float _w = float(Device.dwWidth);
+    const float _h = float(Device.dwHeight);
+
+    // Fill vertex buffer
+    auto pv = static_cast<FVF::TL*>(RImplementation.Vertex.Lock(12, g_postprocess[0].stride(), Offset));
+    pv->set(0,         float(_h), EPS_S, 1.f, p_gray, r0.x, l1.y);
+    pv++;
+    pv->set(0,         0,         EPS_S, 1.f, p_gray, r0.x, r0.y);
+    pv++;
+    pv->set(float(_w), float(_h), EPS_S, 1.f, p_gray, l1.x, l1.y);
+    pv++;
+    pv->set(float(_w), 0,         EPS_S, 1.f, p_gray, l1.x, r0.y);
+    pv++;
+
+    pv->set(0,         float(_h), EPS_S, 1.f, p_color, r0.x, l1.y);
+    pv++;
+    pv->set(0,         0,         EPS_S, 1.f, p_color, r0.x, r0.y);
+    pv++;
+    pv->set(float(_w), float(_h), EPS_S, 1.f, p_color, l1.x, l1.y);
+    pv++;
+    pv->set(float(_w), 0,         EPS_S, 1.f, p_color, l1.x, r0.y);
+    pv++;
+
+    pv->set(0,         float(_h), EPS_S, 1.f, p_alpha, r0.x, l1.y);
+    pv++;
+    pv->set(0,         0,         EPS_S, 1.f, p_alpha, r0.x, r0.y);
+    pv++;
+    pv->set(float(_w), float(_h), EPS_S, 1.f, p_alpha, l1.x, l1.y);
+    pv++;
+    pv->set(float(_w), 0,         EPS_S, 1.f, p_alpha, l1.x, r0.y);
+    pv++;
+    RImplementation.Vertex.Unlock(12, g_postprocess[0].stride());
+
+    // Actual rendering
+    if (param_duality_h > 0.001f || param_duality_v > 0.001f)
+    {
+        constexpr u32 C = 0xffffffff;
+
+        auto pv2 = static_cast<FVF::TL2uv*>(RImplementation.Vertex.Lock(4, g_postprocess[1].stride(), Offset));
+        pv2->set(0,         float(_h), EPS_S, 1.f, C, r0.x, r1.y, l0.x, l1.y);
+        pv2++;
+        pv2->set(0,         0,         EPS_S, 1.f, C, r0.x, r0.y, l0.x, l0.y);
+        pv2++;
+        pv2->set(float(_w), float(_h), EPS_S, 1.f, C, r1.x, r1.y, l1.x, l1.y);
+        pv2++;
+        pv2->set(float(_w), 0,         EPS_S, 1.f, C, r1.x, r0.y, l1.x, l0.y);
+        pv2++;
+        RImplementation.Vertex.Unlock(4, g_postprocess[1].stride());
+
+        // Draw Noise
+        RCache.set_Shader(s_duality);
+        RCache.set_Geometry(g_postprocess[1]);
+        RCache.Render(D3DPT_TRIANGLELIST, Offset + 0, 0, 4, 0, 2);
+    }
+    else
+    {
+        if (param_gray > 0.001f)
+        {
+            // Draw GRAY
+            RCache.set_Shader(s_gray);
+            RCache.set_Geometry(g_postprocess[0]);
+            RCache.Render(D3DPT_TRIANGLELIST, Offset + 0, 0, 4, 0, 2);
+
+            if (param_gray < 0.999f)
+            {
+                // Blend COLOR
+                RCache.set_Shader(s_blend);
+                RCache.set_Geometry(g_postprocess[0]);
+                RCache.Render(D3DPT_TRIANGLELIST, Offset + 4, 0, 4, 0, 2);
+            }
+        }
+        else
+        {
+            // Draw COLOR
+            RCache.set_Shader(s_set);
+            RCache.set_Geometry(g_postprocess[0]);
+            RCache.Render(D3DPT_TRIANGLELIST, Offset + 8, 0, 4, 0, 2);
+        }
+    }
+
+    if (param_noise > 0.001f)
+    {
+        auto* pv2 = static_cast<FVF::TL*>(RImplementation.Vertex.Lock(4, g_postprocess[0].stride(), Offset));
+        pv2->set(0,         float(_h), EPS_S, 1.f, p_gray, n0.x, n1.y);
+        pv2++;
+        pv2->set(0,         0,         EPS_S, 1.f, p_gray, n0.x, n0.y);
+        pv2++;
+        pv2->set(float(_w), float(_h), EPS_S, 1.f, p_gray, n1.x, n1.y);
+        pv2++;
+        pv2->set(float(_w), 0,         EPS_S, 1.f, p_gray, n1.x, n0.y);
+        pv2++;
+        RImplementation.Vertex.Unlock(4, g_postprocess[0].stride());
+
+        // Draw Noise
+        RCache.set_Shader(s_noise);
+        RCache.set_Geometry(g_postprocess[0]);
+        RCache.Render(D3DPT_TRIANGLELIST, Offset + 0, 0, 4, 0, 2);
+    }
 }
 
 void CRenderTarget::phase_distortion()
