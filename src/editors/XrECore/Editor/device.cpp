@@ -120,8 +120,6 @@ void UpdateWindowProps(HWND m_hWnd)
         SWP_SHOWWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
 }
 
-extern IRenderFactory* RenderFactory;
-
 // extern void Surface_Init();
 #include "Include/xrAPI/xrAPI.h"
 #include "Layers/xrRender/dxRenderFactory.h"
@@ -149,7 +147,8 @@ void CEditorRenderDevice::Initialize()
 
 	CreateWindow();
 
-	RenderFactory = &RenderFactoryImpl;
+	GEnv.Render = ::Render;
+	GEnv.RenderFactory = &RenderFactoryImpl;
 
 	// Startup shaders
 	Create();
@@ -232,6 +231,9 @@ bool CEditorRenderDevice::Create()
         F = FS.r_open(0, sh);
 	Resources = xr_new<CResourceManager>();
 
+	// hack
+	RImplementation.Resources = Resources;
+
 	// if build options - load textures immediately
 	if (strstr(Core.Params, "-build") || strstr(Core.Params, "-ebuild"))
 		EDevice.Resources->DeferredLoad(FALSE);
@@ -255,6 +257,7 @@ void CEditorRenderDevice::Destroy()
 	// before destroy
 	_Destroy(FALSE);
 	xr_delete(Resources);
+	RImplementation.Resources = nullptr;
 
 	UI->Destroy();
 	// real destroy

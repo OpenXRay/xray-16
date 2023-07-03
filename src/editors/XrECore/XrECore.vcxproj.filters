@@ -389,7 +389,6 @@
     <ClCompile Include="..\..\Layers\xrRender\blenders\Blender_Vertex_aref.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\SkeletonXSkinXW_CPP.cpp" />
     <ClCompile Include="..\..\Layers\xrRenderDX9\BufferUtils.cpp" />
-    <ClCompile Include="..\..\Layers\xrRender\dxStatGraphRender.cpp" />
     <ClCompile Include="..\..\Layers\xrRenderDX9\dx9ResourceManager_Resources.cpp" />
     <ClCompile Include="GameMtlLib_Editor.cpp" />
   </ItemGroup>

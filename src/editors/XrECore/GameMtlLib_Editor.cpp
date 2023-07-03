@@ -718,3 +718,8 @@ void SGameMtlPair::OnDrawUI()
         UIChooseForm::Update();
     }
 }
+
+SGameMtlPair::~SGameMtlPair()
+{
+
+}

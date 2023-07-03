@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "render.h"
 #include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/ShaderResourceTraits.h"
 
 float ssaDISCARD = 4.f;
 float ssaDONTSORT = 32.f;
@@ -10,8 +11,6 @@ ECORE_API float g_fSCREEN;
 
 CRender RImplementation;
 ECORE_API CRender *Render = &RImplementation;
-
-IRenderFactory *RenderFactory = NULL;
 
 CRender::CRender()
 {
@@ -36,30 +35,30 @@ void CRender::ShutDown()
 	PSLibrary.OnDestroy();
 }
 
-void CRender::OnDeviceCreate()
+void CRender::OnDeviceCreate(pcstr str)
 {
 	Models = xr_new<CModelPool>();
 	Models->Logging(FALSE);
 }
-void CRender::OnDeviceDestroy()
+void CRender::OnDeviceDestroy(bool keep_textures)
 {
 	xr_delete(Models);
 }
 
 ref_shader CRender::getShader(int id) { return 0; } // VERIFY(id<int(Shaders.size()));	return Shaders[id];	}
 
-BOOL CRender::occ_visible(Fbox &B)
+bool CRender::occ_visible(Fbox &B)
 {
 	u32 mask = 0xff;
 	return ViewBase.testAABB(B.data(), mask);
 }
 
-BOOL CRender::occ_visible(sPoly &P)
+bool CRender::occ_visible(sPoly &P)
 {
 	return ViewBase.testPolyInside(P);
 }
 
-BOOL CRender::occ_visible(vis_data &P)
+bool CRender::occ_visible(vis_data &P)
 {
 	return occ_visible(P.box);
 }
@@ -135,7 +134,7 @@ void CRender::set_Transform(Fmatrix *M)
 void CRender::add_Visual(IRenderVisual *visual) { Models->RenderSingle(dynamic_cast<dxRender_Visual *>(visual), current_matrix, 1.f); }
 IRenderVisual *CRender::model_Create(LPCSTR name, IReader *data) { return Models->Create(name, data); }
 IRenderVisual *CRender::model_CreateChild(LPCSTR name, IReader *data) { return Models->CreateChild(name, data); }
-void CRender::model_Delete(IRenderVisual *&V, BOOL bDiscard)
+void CRender::model_Delete(IRenderVisual *&V, bool bDiscard)
 {
 	auto v = dynamic_cast<dxRender_Visual *>(V);
 	Models->Delete(v, bDiscard);
@@ -166,32 +165,104 @@ HRESULT CRender::CompileShader(
 	LPD3DXCONSTANTTABLE *ppConstantTable = (LPD3DXCONSTANTTABLE *)_ppConstantTable;
 	return D3DXCompileShader(pSrcData, SrcDataLen, pDefines, pInclude, pFunctionName, pTarget, Flags, ppShader, ppErrorMsgs, ppConstantTable);
 }
-HRESULT CRender::shader_compile(
-	LPCSTR name,
-	LPCSTR pSrcData,
-	UINT SrcDataLen,
-	void *_pDefines,
-	void *_pInclude,
-	LPCSTR pFunctionName,
-	LPCSTR pTarget,
-	DWORD Flags,
-	void *_ppShader,
-	void *_ppErrorMsgs,
-	void *_ppConstantTable)
+
+
+class includer : public ID3DXInclude
+{
+public:
+    HRESULT __stdcall Open(
+        D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
+    {
+        string_path pname;
+        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
+        IReader* R = FS.r_open("$game_shaders$", pname);
+        if (nullptr == R)
+        {
+            // possibly in shared directory or somewhere else - open directly
+            R = FS.r_open("$game_shaders$", pFileName);
+            if (nullptr == R)
+                return E_FAIL;
+        }
+
+        // duplicate and zero-terminate
+        const size_t size = R->length();
+        u8* data = xr_alloc<u8>(size + 1);
+        CopyMemory(data, R->pointer(), size);
+        data[size] = 0;
+        FS.r_close(R);
+
+        *ppData = data;
+        *pBytes = size;
+        return D3D_OK;
+    }
+    HRESULT __stdcall Close(LPCVOID pData)
+    {
+        xr_free(pData);
+        return D3D_OK;
+    }
+};
+
+template <typename T>
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
+    T*& result, bool const disasm)
+{
+    HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
+    if (!SUCCEEDED(_hr))
+    {
+        Log("! Shader: ", file_name);
+        Msg("! CreateHWShader hr == 0x%08x", _hr);
+        return E_FAIL;
+    }
+
+    LPCVOID data = nullptr;
+
+    _hr = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
+
+    if (SUCCEEDED(_hr) && data)
+    {
+        // Parse constant table data
+        LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
+        result->constants.parse(pConstants, ShaderTypeTraits<T>::GetShaderDest());
+    }
+    else
+        Msg("! D3DXFindShaderComment %s hr == 0x%08x", file_name, _hr);
+
+    if (disasm)
+    {
+        ID3DXBuffer* disasm = nullptr;
+        D3DXDisassembleShader(LPDWORD(buffer), FALSE, nullptr, &disasm);
+        if (!disasm)
+            return _hr;
+
+        string_path dname;
+        strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
+        IWriter* W = FS.w_open("$app_data_root$", dname);
+        W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
+        FS.w_close(W);
+        _RELEASE(disasm);
+    }
+
+    return _hr;
+}
+
+inline HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
+    void*& result, bool const disasm)
+{
+    if (pTarget[0] == 'p')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SPS*&)result, disasm);
+
+    if (pTarget[0] == 'v')
+        return create_shader(pTarget, buffer, buffer_size, file_name, (SVS*&)result, disasm);
+
+    NODEFAULT;
+    return E_FAIL;
+}
+
+HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result)
 {
 	D3DXMACRO defines[128];
 	int def_it = 0;
-	CONST D3DXMACRO *pDefines = (CONST D3DXMACRO *)_pDefines;
-	if (pDefines)
-	{
-		// transfer existing defines
-		for (;; def_it++)
-		{
-			if (0 == pDefines[def_it].Name)
-				break;
-			defines[def_it] = pDefines[def_it];
-		}
-	}
+
 	// options
 	if (m_skinning < 0)
 	{
@@ -234,16 +305,33 @@ HRESULT CRender::shader_compile(
 	defines[def_it].Definition = 0;
 	def_it++;
 
-	LPD3DXINCLUDE pInclude = (LPD3DXINCLUDE)_pInclude;
-	LPD3DXBUFFER *ppShader = (LPD3DXBUFFER *)_ppShader;
-	LPD3DXBUFFER *ppErrorMsgs = (LPD3DXBUFFER *)_ppErrorMsgs;
-	LPD3DXCONSTANTTABLE *ppConstantTable = (LPD3DXCONSTANTTABLE *)_ppConstantTable;
-//.	return D3DXCompileShader		(pSrcData,SrcDataLen,defines,pInclude,pFunctionName,pTarget,Flags,ppShader,ppErrorMsgs,ppConstantTable);
-#ifdef D3DXSHADER_USE_LEGACY_D3DX9_31_DLL //	December 2006 and later
-	HRESULT _result = D3DXCompileShader(pSrcData, SrcDataLen, defines, pInclude, pFunctionName, pTarget, Flags | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL, ppShader, ppErrorMsgs, ppConstantTable);
-#else
-	HRESULT _result = D3DXCompileShader(pSrcData, SrcDataLen, defines, pInclude, pFunctionName, pTarget, Flags, ppShader, ppErrorMsgs, ppConstantTable);
+    fs->seek(0);
+
+    includer Includer;
+    LPD3DXBUFFER pShaderBuf = nullptr;
+    LPD3DXBUFFER pErrorBuf = nullptr;
+    LPD3DXCONSTANTTABLE pConstants = nullptr;
+    LPD3DXINCLUDE pInclude = (LPD3DXINCLUDE)&Includer;
+
+    HRESULT _result = D3DXCompileShader((LPCSTR)fs->pointer(), fs->length(), defines, pInclude, pFunctionName, pTarget,
+        Flags | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL, &pShaderBuf, &pErrorBuf, &pConstants);
+    if (SUCCEEDED(_result))
+    {
+#ifdef DEBUG
+        Log("- Compile shader:", file_name);
 #endif
+        _result = create_shader(
+            pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(), name, result, o.disasm);
+    }
+    else
+    {
+        Log("! ", name);
+        if (pErrorBuf)
+            Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());
+        else
+            Msg("Can't compile shader hr=0x%08x", _result);
+    }
+
 	return _result;
 }
 

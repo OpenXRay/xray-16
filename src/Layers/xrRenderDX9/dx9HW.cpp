@@ -265,6 +265,15 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:dwDebugSB", dwDebugSB);
     _RELEASE(dwDebugSB);
 #endif
+
+#ifdef _EDITOR
+    _SHOW_REF("refCount:pBaseZB", pBaseZB);
+    _RELEASE(pBaseZB);
+
+    _SHOW_REF("refCount:pBaseRT", pBaseRT);
+    _RELEASE(pBaseRT);
+#endif
+
     _SHOW_REF("DeviceREF:", pDevice);
     _RELEASE(pDevice);
 
@@ -279,14 +288,13 @@ void CHW::Reset()
 #ifdef DEBUG
     _RELEASE(dwDebugSB);
 #endif
-    
+
 #ifdef _EDITOR
-    DevPP.BackBufferWidth = EDevice.m_RenderWidth;
-    DevPP.BackBufferHeight = EDevice.m_RenderHeight;
+    _RELEASE(pBaseZB);
+    _RELEASE(pBaseRT);
 #else
     DevPP.BackBufferWidth = Device.dwWidth;
     DevPP.BackBufferHeight = Device.dwHeight;
-#endif
 
     // Windoze
     const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
@@ -302,6 +310,7 @@ void CHW::Reset()
         DevPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
         DevPP.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
     }
+#endif
 
     while (true)
     {
@@ -313,6 +322,12 @@ void CHW::Reset()
         Msg("! ERROR: [%dx%d]: %s", DevPP.BackBufferWidth, DevPP.BackBufferHeight, xrDebug::ErrorToString(result));
         Sleep(100);
     }
+
+#ifdef _EDITOR
+    R_CHK(pDevice->GetRenderTarget(0, &pBaseRT));
+    R_CHK(pDevice->GetDepthStencilSurface(&pBaseZB));
+#endif
+
 #ifdef DEBUG
     R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
 #endif

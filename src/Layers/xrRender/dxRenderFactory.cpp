@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "dxRenderFactory.h"
-#include "dxStatGraphRender.h"
 
 #ifndef _EDITOR
+#include "dxStatGraphRender.h"
 #include "dxLensFlareRender.h"
 #include "dxImGuiRender.h"
 #include "dxEnvironmentRender.h"
@@ -29,6 +29,7 @@ dxRenderFactory RenderFactoryImpl;
 #ifndef _EDITOR
 RENDER_FACTORY_IMPLEMENT(UISequenceVideoItem)
 RENDER_FACTORY_IMPLEMENT(UIShader)
+RENDER_FACTORY_IMPLEMENT(StatGraphRender)
 #ifdef DEBUG
 RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
 #endif // DEBUG
@@ -46,4 +47,3 @@ RENDER_FACTORY_IMPLEMENT(EnvironmentRender)
 RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)
 #endif
 RENDER_FACTORY_IMPLEMENT(FontRender)
-RENDER_FACTORY_IMPLEMENT(StatGraphRender)

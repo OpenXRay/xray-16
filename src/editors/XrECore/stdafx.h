@@ -49,6 +49,8 @@ class ListItem;
 DEFINE_VECTOR(ListItem *, ListItemsVec, ListItemsIt);
 #endif
 
+#define USE_DX9 1
+
 #include "..\..\xrCDB\xrCDB.h"
 #include "Include\xrApi\xrApi.h"
 #include "..\..\xrSound\Sound.h"
@@ -76,7 +78,7 @@ DEFINE_VECTOR(xr_string *, LPAStringVec, LPAStringIt);
 
 #include "../../xrphysics/xrphysics.h"
 
-#define USE_DX9 1
+
 #include "Layers/XrRender/FVF.h"
 
 struct str_pred

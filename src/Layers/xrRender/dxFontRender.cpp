@@ -7,6 +7,9 @@
 
 #ifdef _EDITOR
 #include "xrEngine/xr_level_controller.h"
+
+// fake, remove me
+pcstr GetActionBinding(EGameActions action) { return "";  }
 #endif
 
 dxFontRender::~dxFontRender()

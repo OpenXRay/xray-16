@@ -22,16 +22,12 @@ class UICore;
 class XRAPI_API EngineGlobalEnvironment
 {
 public:
-#ifndef _EDITOR    
     IDebugRender* DRender;
     CDUInterface* DU;
     IUIRender* UIRender;
     CScriptEngine* ScriptEngine;
     AISpaceBase* AISpace;    
     UICore* UI;
-
-    
-#endif
 
     ISoundManager* Sound;
     IRender* Render;
