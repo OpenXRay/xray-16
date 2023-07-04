@@ -39,6 +39,7 @@
 
 #define time_t __time32_t
 #include "..\XrEProps\stdafx.h"
+#include "OgfDesc.h"
 
 #ifdef _EDITOR
 class PropValue;
@@ -62,7 +63,6 @@ DEFINE_VECTOR(ListItem *, ListItemsVec, ListItemsIt);
 #include "..\..\Layers\xrRenderDX9\CommonTypes.h"
 
 #include <dinput.h>
-//#include <dsound.h>
 
 // some user components
 #include "XrCore\Fmesh.hpp"
@@ -77,8 +77,6 @@ DEFINE_VECTOR(xr_string *, LPAStringVec, LPAStringIt);
 #include "..\..\XrEngine\defines.h"
 
 #include "../../xrphysics/xrphysics.h"
-
-
 #include "Layers/XrRender/FVF.h"
 
 struct str_pred

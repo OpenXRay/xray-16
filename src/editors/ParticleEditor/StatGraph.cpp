@@ -1,7 +1,6 @@
 #include "stdafx.h"
-#pragma hdrstop
+#include "xrCommon/xr_deque.h"
 #include "StatGraph.h"
-//---------------------------------------------
 
 CStatGraph::CStatGraph()
 {

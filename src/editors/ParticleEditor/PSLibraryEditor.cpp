@@ -1,10 +1,7 @@
 #include "stdafx.h"
-#pragma hdrstop
-
-#include "..\..\XrRender\Private\PSLibrary.h"
-#include "..\..\XrRender\Private\ParticleEffect.h"
-#include "..\..\XrRender\Private\ParticleGroup.h"
-//------------------------------------------------------------------------------
+#include "Layers/XrRender/PSLibrary.h"
+#include "Layers/XrRender/ParticleEffect.h"
+#include "Layers/XrRender/ParticleGroup.h"
 
 void CPSLibrary::FindByName(LPCSTR new_name, bool &res)
 {
@@ -20,7 +17,6 @@ PS::CPEDef *CPSLibrary::AppendPED(PS::CPEDef *src)
 #endif
     return m_PEDs.back();
 }
-//------------------------------------------------------------------------------
 
 PS::CPGDef *CPSLibrary::AppendPGD(PS::CPGDef *src)
 {
@@ -46,7 +42,7 @@ bool CPSLibrary::Save2()
 {
     FS.dir_delete("$game_particles$", "", TRUE);
     string_path fn;
-    SPBItem *pb = UI->ProgressStart(m_PEDs.size() + m_PGDs.size(), "Saving particles...");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(m_PEDs.size() + m_PGDs.size()), "Saving particles...");
     for (PS::PEDIt it = m_PEDs.begin(); it != m_PEDs.end(); ++it)
     {
         pb->Inc();

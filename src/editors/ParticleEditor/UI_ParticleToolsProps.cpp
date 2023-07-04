@@ -149,7 +149,7 @@ void CParticleTool::RealUpdateProperties()
             I->SetIcon(2);
         }
     }
-    m_PList->AssignItems(items, false, true);
+    m_PList->AssignItems(items, nullptr, false, true);
     if (_item_to_select_after_edit.size())
     {
         m_PList->SelectItem(_item_to_select_after_edit.c_str());

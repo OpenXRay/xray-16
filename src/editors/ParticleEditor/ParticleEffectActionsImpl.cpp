@@ -22,7 +22,7 @@ xr_token2 actions_token[] =
 	{"Gravity", "Accelerate particles in the given direction.", PAGravityID},
 	{"Jet", "Accelerate particles that are near the center of the jet.", PAJetID},
 	{"Kill Old", "Remove old particles.", PAKillOldID},
-	{"Match Velocity", "Modify each particle’s velocity to be similar to that of its neighbors.", PAMatchVelocityID},
+	{"Match Velocity", "Modify each particleâ€™s velocity to be similar to that of its neighbors.", PAMatchVelocityID},
 	{"Move", "Move particle positions based on velocities.", PAMoveID},
 	{"Orbit Line", "Accelerate toward the closest point on the given line.", PAOrbitLineID},
 	{"Orbit Point", "Accelerate toward the given center point.", PAOrbitPointID},
@@ -34,7 +34,7 @@ xr_token2 actions_token[] =
 	{"Sink", "Kill particles with positions on wrong side of the specified domain.", PASinkID},
 	{"Sink Velocity", "Kill particles with velocities on wrong side of the specified domain.", PASinkVelocityID},
 	{"Source", "Add particles in the specified domain.", PASourceID},
-	{"Speed Limit", "Clamp each particle’s speed to the given min and max.", PASpeedLimitID},
+	{"Speed Limit", "Clamp each particleâ€™s speed to the given min and max.", PASpeedLimitID},
 	{"Target Color", "Change color of all particles toward the specified color.", PATargetColorID},
 	{"Target Size", "Change sizes of all particles toward the specified size.", PATargetSizeID},
 	{"Target Rotate", "Change rotate of all particles toward the specified rotation.", PATargetRotateID},
@@ -1358,12 +1358,12 @@ void EPATurbulence::Render(const Fmatrix &parent)
 				else if (draw_p)
 				{
 					if (nval[i][j][k] > 0.0)
-						clr.set(nval[i][j][k]);
+						clr.set(static_cast<u32>(nval[i][j][k]));
 				}
 				else if (draw_n)
 				{
 					if (nval[i][j][k] < 0.0)
-						clr.set(fabs(nval[i][j][k]));
+                        clr.set(static_cast<u32>(fabs(nval[i][j][k])));
 				}
 				pts.push_back(Stp(vec, clr));
 			}

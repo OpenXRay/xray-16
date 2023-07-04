@@ -1,8 +1,5 @@
-//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
-
-#include "..\..\XrRender\Private\ParticleGroup.h"
+#include "Layers/xrRender/ParticleGroup.h"
 #include "ui_particletools.h"
 
 BOOL PS::CPGDef::SEffect::Equal(const SEffect &src)
@@ -26,8 +23,8 @@ BOOL PS::CPGDef::Equal(const CPGDef *pg)
         return FALSE;
     if (m_Effects.size() != pg->m_Effects.size())
         return FALSE;
-    EffectIt s_it = m_Effects.begin();
-    for (EffectIt d_it = m_Effects.begin(); d_it != m_Effects.end(); s_it++, d_it++)
+    auto s_it = m_Effects.begin();
+    for (auto d_it = m_Effects.begin(); d_it != m_Effects.end(); s_it++, d_it++)
         if (!(*s_it)->Equal(**d_it))
             return FALSE;
     return TRUE;
@@ -158,11 +155,10 @@ void PS::CPGDef::FillProp(LPCSTR pref, ::PropItemVec &items, ::ListItem *owner)
     V->OnChangeEvent.bind(this, &PS::CPGDef::OnParamsChange);
 
     u32 i = 0;
-    for (EffectIt it = m_Effects.begin(); it != m_Effects.end(); ++it, ++i)
+    for (auto it = m_Effects.begin(); it != m_Effects.end(); ++it, ++i)
     {
         u32 clr = (*it)->m_Flags.is(CPGDef::SEffect::flEnabled) ? 0xFF000000 : 0xFFC0C0C0;
-        xr_string nm;
-        nm.sprintf("Effect #%d", i + 1);
+        auto nm = make_string("Effect #%d", i + 1);
 
         B = PHelper().CreateButton(items, PrepareKey(pref, nm.c_str()), "Preview,Select,Remove", ButtonValue::flFirstOnly);
         B->tag = it - m_Effects.begin();

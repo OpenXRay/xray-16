@@ -48,7 +48,13 @@ struct SFrame
     }
 };
 
-class ECORE_API CPEDef
+#ifdef _PARTICLE_EDITOR
+#define PSDEF_API
+#else
+#define PSDEF_API ECORE_API
+#endif
+
+class PSDEF_API CPEDef
 {
 public:
     enum
@@ -114,6 +120,7 @@ public:
 public:
     DEFINE_VECTOR(EParticleAction*, EPAVec, EPAVecIt);
     EPAVec m_EActionList;
+    bool m_EditChoose;
 
 public:
     void __stdcall FindActionByName(LPCSTR new_name, bool& res);
@@ -139,6 +146,7 @@ public:
     void __stdcall FillActionList(ChooseItemVec& items, void* param);
     bool Validate(bool bMsg);
     void Compile(EPAVec& v);
+    void OnDrawUI();
 #endif
 };
 };

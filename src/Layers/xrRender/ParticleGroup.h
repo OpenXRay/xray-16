@@ -6,7 +6,13 @@ namespace PS
 {
 class CParticleEffect;
 
-class ECORE_API CPGDef
+#ifdef _PARTICLE_EDITOR
+#define PGROUP_API
+#else
+#define PGROUP_API ECORE_API
+#endif
+
+class PGROUP_API CPGDef
 {
 public:
     shared_str m_Name;

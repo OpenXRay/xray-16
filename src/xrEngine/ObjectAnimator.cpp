@@ -133,8 +133,8 @@ float CObjectAnimator::GetLength() const
 
 #ifdef _EDITOR
 
-#include "editors/ECore/Editor/d3dutils.h"
-#include "envelope.h"
+#include "editors/xrECore/Editor/d3dutils.h"
+#include "xrCore/Animation/envelope.hpp"
 
 static xr_vector<Fvector> path_points; // XXX: can cause crash on launch/exit
 
@@ -160,7 +160,7 @@ void CObjectAnimator::DrawPath()
         RCache.set_xform_world(Fidentity);
         if (!path_points.empty())
             DU_impl.DrawPrimitiveL(
-                D3DPT_LINESTRIP, path_points.size() - 1, path_points.begin(), path_points.size(), clr, true, false);
+                D3DPT_LINESTRIP, path_points.size() - 1, path_points.data(), path_points.size(), clr, true, false);
         CEnvelope* E = m_Current->Envelope();
         for (KeyIt k_it = E->keys.begin(); k_it != E->keys.end(); k_it++)
         {
@@ -168,7 +168,7 @@ void CObjectAnimator::DrawPath()
             if (EDevice.m_Camera.GetPosition().distance_to_sqr(T) < 50.f * 50.f)
             {
                 DU_impl.DrawCross(T, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, clr, false);
-                DU_impl.OutText(T, AnsiString().sprintf("K: %3.3f", (*k_it)->time).c_str(), 0xffffffff, 0x00000000);
+                DU_impl.OutText(T, make_string("K: %3.3f", (*k_it)->time).c_str(), 0xffffffff, 0x00000000);
             }
         }
     }

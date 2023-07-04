@@ -216,9 +216,6 @@
     <ClCompile Include="Animation\SkeletonMotions.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
-    <ClCompile Include="FMesh.cpp">
-      <Filter>FMesh</Filter>
-    </ClCompile>
     <ClCompile Include="PostProcess\PPInfo.cpp">
       <Filter>PostProcess</Filter>
     </ClCompile>

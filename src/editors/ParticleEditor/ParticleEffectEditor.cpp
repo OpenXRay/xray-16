@@ -1,10 +1,8 @@
-//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
 
 #ifdef _PARTICLE_EDITOR
 
-#include "..\..\xrRender\Private\ParticleEffect.h"
+#include "Layers/xrRender/ParticleEffect.h"
 #include "..\XrEcore\Editor\ParticleEffectActions.h"
 #include "ui_particletools.h"
 
@@ -120,7 +118,7 @@ void PS::CPEDef::OnDrawUI()
                             }
                             else
                             {
-                                temp.sprintf("%s_%02d", pref.c_str(), i - 1);
+                                temp = make_string("%s_%02d", pref.c_str(), i - 1);
                             }
                             FindActionByName(temp.c_str(), result);
                             if (!result)

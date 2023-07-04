@@ -98,9 +98,9 @@ void CShaderMain::OnDrawUI()
     }
 }
 
-char *CShaderMain::GetCaption()
+const char *CShaderMain::GetCaption()
 {
-    return (LPSTR)STools->CurrentToolsName(); // "shaders&materials";
+    return STools->CurrentToolsName(); // "shaders&materials";
 }
 
 bool CShaderMain::ApplyShortCut(DWORD Key, TShiftState Shift)

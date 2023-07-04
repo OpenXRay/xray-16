@@ -85,6 +85,32 @@ struct LIT
 };
 const u32 F_LIT = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
 
+struct TL0uv
+{
+    Fvector4 p;
+    u32 color;
+    IC void set(const TL0uv& src) { *this = src; };
+    IC void set(float x, float y, u32 c) { set(x, y, .0001f, .9999f, c); };
+    IC void set(int x, int y, u32 c) { set(float(x), float(y), .0001f, .9999f, c); };
+    IC void set(float x, float y, float z, float w, u32 c)
+    {
+        p.set(x, y, z, w);
+        color = c;
+    };
+    IC void transform(const Fvector& v, const Fmatrix& matSet)
+    {
+        // Transform it through the matrix set. Takes in mean projection.
+        // Finally, scale the vertices to screen coords.
+        // Note 1: device coords range from -1 to +1 in the viewport.
+        // Note 2: the p.z-coordinate will be used in the z-buffer.
+        p.w = matSet._14 * v.x + matSet._24 * v.y + matSet._34 * v.z + matSet._44;
+        p.x = (matSet._11 * v.x + matSet._21 * v.y + matSet._31 * v.z + matSet._41) / p.w;
+        p.y = -(matSet._12 * v.x + matSet._22 * v.y + matSet._32 * v.z + matSet._42) / p.w;
+        p.z = (matSet._13 * v.x + matSet._23 * v.y + matSet._33 * v.z + matSet._43) / p.w;
+    };
+};
+const u32 F_TL0uv = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
+
 struct TL
 {
     Fvector4 p;

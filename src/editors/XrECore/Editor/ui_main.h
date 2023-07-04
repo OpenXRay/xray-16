@@ -150,7 +150,7 @@ public:
     virtual bool OnCreate();
     virtual void OnDestroy();
 
-    virtual char *GetCaption() = 0;
+    virtual const char *GetCaption() = 0;
 
     bool IsModified();
 

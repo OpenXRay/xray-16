@@ -60,9 +60,6 @@
     <ClCompile Include="UILeftBarForm.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\XrEngine\ObjectAnimator.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="..\XrECore\Editor\pDomain.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>

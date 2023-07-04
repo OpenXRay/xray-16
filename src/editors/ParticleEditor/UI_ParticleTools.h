@@ -1,10 +1,6 @@
-//---------------------------------------------------------------------------
-#ifndef UI_ParticleToolsH
-#define UI_ParticleToolsH
-
-//. ?#include "ParticleSystem.h"
-#include "..\..\XrRender\Private\ParticleEffect.h"
-#include "..\..\XrRender\Private\ParticleGroup.h"
+#pragma once
+#include "Layers/xrRender/ParticleEffect.h"
+#include "Layers/xrRender/ParticleGroup.h"
 
 // refs
 class CEditableObject;
@@ -213,5 +209,3 @@ public:
 #define EFFECT_PREFIX "Effects"
 #define GROUP_PREFIX "Groups"
 extern CParticleTool *PTools;
-//---------------------------------------------------------------------------
-#endif

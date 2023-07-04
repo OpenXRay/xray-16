@@ -15,7 +15,7 @@ bool pgd_sort_pred(const PS::CPGDef* a, const PS::CPGDef* b) { return xr_strcmp(
 void CPSLibrary::OnCreate()
 {
 #ifdef _EDITOR
-    if (pCreateEAction)
+    if (pCreateEAction && !Core.SocSdk)
     {
         Load2();
     }

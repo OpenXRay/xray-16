@@ -391,6 +391,8 @@
     <ClCompile Include="..\..\Layers\xrRenderDX9\BufferUtils.cpp" />
     <ClCompile Include="..\..\Layers\xrRenderDX9\dx9ResourceManager_Resources.cpp" />
     <ClCompile Include="GameMtlLib_Editor.cpp" />
+    <ClCompile Include="..\..\xrEngine\ObjectAnimator.cpp" />
+    <ClCompile Include="OgfDesc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WildMagic\WmlMath.h">
@@ -626,6 +628,7 @@
     <ClInclude Include="Editor\UIEditLightAnim.h">
       <Filter>Editor</Filter>
     </ClInclude>
+    <ClInclude Include="OgfDesc.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WildMagic\WmlMath.inl">

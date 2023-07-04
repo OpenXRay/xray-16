@@ -69,7 +69,6 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="FileSystem_borland.cpp" />
     <ClCompile Include="file_stream_reader.cpp" />
-    <ClCompile Include="FMesh.cpp" />
     <ClCompile Include="FS.cpp" />
     <ClCompile Include="FTimer.cpp" />
     <ClCompile Include="LocatorAPI.cpp" />

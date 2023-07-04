@@ -1,7 +1,5 @@
 #include "stdafx.h"
-#pragma hdrstop
-
-#include "FMesh.hpp"
+#include "OgfDesc.h"
 
 void ogf_desc::Load(IReader& F)
 {

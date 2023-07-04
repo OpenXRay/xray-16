@@ -1,32 +1,26 @@
-//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "UI_ParticleMain.h"
 #include "UI_ParticleTools.h"
-#include "xr_input.h"
+#include "xrEngine/xr_input.h"
 
-//---------------------------------------------------------------------------
 CParticleMain *PUI = (CParticleMain *)UI;
-//---------------------------------------------------------------------------
 
 CParticleMain::CParticleMain()
 {
     EPrefs = xr_new<CCustomPreferences>();
 }
-//---------------------------------------------------------------------------
 
 CParticleMain::~CParticleMain()
 {
     xr_delete(EPrefs);
 }
-//---------------------------------------------------------------------------
 
 CCommandVar CParticleTool::CommandSelectPreviewObj(CCommandVar p1, CCommandVar p2)
 {
     SelectPreviewObject(p1);
     return TRUE;
 }
+
 CCommandVar CParticleTool::CommandEditPreviewProps(CCommandVar p1, CCommandVar p2)
 {
     return TRUE;
@@ -167,7 +161,7 @@ void CParticleMain::OnDrawUI()
     PTools->OnDrawUI();
 }
 
-char *CParticleMain::GetCaption()
+const char *CParticleMain::GetCaption()
 {
     return "particles";
 }

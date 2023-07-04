@@ -3,7 +3,7 @@
 #include "Common/Common.hpp"
 
 #ifdef _EDITOR
-#include "editors/ECore/stdafx.h"
+#include "editors/XrECore/stdafx.h"
 #else
 
 #if 1//ndef NDEBUG

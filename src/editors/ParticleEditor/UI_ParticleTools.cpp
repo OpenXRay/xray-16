@@ -1,15 +1,11 @@
-//---------------------------------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "UI_ParticleTools.h"
-
-#include "ObjectAnimator.h"
+#include "xrEngine/ObjectAnimator.h"
 #include "..\XrECore\Editor\ParticleEffectActions.h"
-//------------------------------------------------------------------------------
+#include "xrEngine/igame_persistent.h"
+
 CParticleTool *PTools = (CParticleTool *)Tools;
-//------------------------------------------------------------------------------
+
 #define CHECK_SNAP(R, A, C)   \
     {                         \
         R += A;               \
@@ -136,7 +132,6 @@ void CParticleTool::OnItemModified()
         CompileEffect();
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
-#include "igame_persistent.h"
 
 void CParticleTool::RenderEnvironment()
 {
@@ -247,9 +242,7 @@ void CParticleTool::OnFrame()
     case emEffect:
         if (m_EditPE->IsPlaying())
         {
-
-            xr_string nn;
-            nn.sprintf(" PE Playing...[%d]", m_EditPE->ParticlesCount()).c_str();
+            auto nn = make_string(" PE Playing...[%d]", m_EditPE->ParticlesCount());
             UI->SetStatus(nn.c_str(), false);
         }
 
@@ -657,8 +650,8 @@ void CParticleTool::DrawReferenceList()
             for (; G != G_e; ++G)
             {
                 PS::CPGDef *def = (*G);
-                PS::CPGDef::EffectIt pe_it = def->m_Effects.begin();
-                PS::CPGDef::EffectIt pe_it_e = def->m_Effects.end();
+                auto pe_it = def->m_Effects.begin();
+                auto pe_it_e = def->m_Effects.end();
                 for (; pe_it != pe_it_e; ++pe_it)
                 {
                     if ((*pe_it)->m_EffectName == m_EditPE->Name())

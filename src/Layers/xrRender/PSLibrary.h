@@ -18,7 +18,13 @@ using PGDIt = PGDVec::iterator;
 
 } // namespace PS
 
-class ECORE_API CPSLibrary : public particles_systems::library_interface
+#ifdef _PARTICLE_EDITOR
+#define PSLib_API
+#else
+#define PSLib_API ECORE_API
+#endif
+
+class PSLib_API CPSLibrary : public particles_systems::library_interface
 {
     PS::PEDVec m_PEDs;
     PS::PGDVec m_PGDs;
