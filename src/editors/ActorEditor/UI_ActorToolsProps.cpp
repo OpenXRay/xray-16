@@ -1,9 +1,7 @@
-﻿//---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop
-#include "..\..\XrRender\Private\KinematicAnimatedDefs.h"
-#include "SkeletonAnimated.h"
-//------------------------------------------------------------------------------
+#include "Layers/xrRender/KinematicAnimatedDefs.h"
+#include "Layers/xrRender/SkeletonAnimated.h"
+#include "xrCore/Animation/envelope.hpp"
 
 void CActorTools::OnObjectItemsFocused(xr_vector<ListItem *> &items)
 {
@@ -14,7 +12,6 @@ void CActorTools::OnObjectItemsFocused(xr_vector<ListItem *> &items)
     if (m_pEditObject)
     {
         m_pEditObject->ResetSAnimation(false);
-        //.	    StopMotion					();     // ����� ��-�� ���� ��� �� �������� �������� � ������ ������
         m_pEditObject->SelectBones(false);
     }
     for (ListItem *prop : items)
@@ -95,8 +92,8 @@ void CActorTools::OnExportImportRefsClick(ButtonValue *V, bool &bModif, bool &bS
             CInifile ini(fname.c_str(), TRUE, TRUE, FALSE);
             m_pEditObject->m_SMotionRefs.clear();
             CInifile::Sect &S = ini.r_section("refs");
-            CInifile::SectCIt it = S.Data.begin();
-            CInifile::SectCIt it_e = S.Data.end();
+            auto it = S.Data.begin();
+            auto it_e = S.Data.end();
             for (; it != it_e; ++it)
             {
                 m_pEditObject->m_SMotionRefs.push_back(it->second);
@@ -342,8 +339,8 @@ void CActorTools::OnCylinderAxisClick(ButtonValue *V, bool &bModif, bool &bSafe)
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
-#include "envelope.h"
 Fvector StartMotionPoint, EndMotionPoint;
+
 void CActorTools::FillMotionProperties(PropItemVec &items, LPCSTR pref, ListItem *sender)
 {
     R_ASSERT(m_pEditObject);
@@ -361,7 +358,7 @@ void CActorTools::FillMotionProperties(PropItemVec &items, LPCSTR pref, ListItem
         }
         else
         {
-            m_cnt = xr_string(m_pEditObject->SMotionCount()) + " (Inaccessible)";
+            m_cnt = make_string("%d (Inaccessible)", m_pEditObject->SMotionCount());
         }
     }
     else
@@ -838,7 +835,7 @@ void CActorTools::FillBoneProperties(PropItemVec &items, LPCSTR pref, ListItem *
         Fmatrix mLocal, mBind, mBindI;
         mBind.setXYZi(BONE->RestRotate().x, BONE->RestRotate().y, BONE->RestRotate().z);
         mBindI.invert(mBind);
-        mLocal.setXYZi(BONE->_Rotate().x, BONE->_Rotate().y, BONE->_Rotate().z);
+        mLocal.setXYZi(BONE->Rotate().x, BONE->Rotate().y, BONE->Rotate().z);
         mLocal.mulA_43(mBindI);
         mLocal.getXYZi(lim_rot);
         lim_rot.x = rad2deg(lim_rot.x);
@@ -974,8 +971,8 @@ void CActorTools::FillObjectProperties(PropItemVec &items, LPCSTR pref, ListItem
     V->OnChangeEvent.bind(this, &CActorTools::OnChangeTransform);
     V = PHelper().CreateVector(items, "Object\\Transform\\Scale", &m_pEditObject->t_vScale, -10000, 10000, 0.1, 1);
     V->OnChangeEvent.bind(this, &CActorTools::OnChangeTransform);
-    V = PHelper().CreateCaption(items, "Object\\Transform\\BBox Min", shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(m_pEditObject->GetBox().min)));
-    V = PHelper().CreateCaption(items, "Object\\Transform\\BBox Max", shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(m_pEditObject->GetBox().max)));
+    V = PHelper().CreateCaption(items, "Object\\Transform\\BBox Min", shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(m_pEditObject->GetBox().vMin)));
+    V = PHelper().CreateCaption(items, "Object\\Transform\\BBox Max", shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(m_pEditObject->GetBox().vMax)));
 
     //.    PHelper().CreateChoose		 (items, "Object\\LOD\\Reference",  			&m_pEditObject->m_LODs, smObject);
     PHelper().CreateChoose(items, "Object\\LOD\\Reference", &m_pEditObject->m_LODs, smVisual);

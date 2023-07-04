@@ -1,15 +1,16 @@
-//---------------------------------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
+
+#ifndef dSINGLE
 #define dSINGLE
-#include "animation_blend.h"
+#endif
+
+#include "include\xrRender\animation_blend.h"
 #include "..\..\XrPhysics\Physics.h"
 #include "..\XrECore\Editor\EditMesh.h"
-#include "KinematicAnimatedDefs.h"
-#include "SkeletonAnimated.h"
+#include "Layers\xrRender\KinematicAnimatedDefs.h"
+#include "Layers\xrRender\SkeletonAnimated.h"
 CActorTools *ATools = (CActorTools *)Tools;
-//------------------------------------------------------------------------------
+
 #define CHECK_SNAP(R, A, C)   \
     {                         \
         R += A;               \
@@ -1256,7 +1257,10 @@ void CActorTools::CreatePhysicsWorld()
 {
     VERIFY(!os);
     VERIFY(!physics_world());
-    set_mtl_lib(&GMLib);
+
+    #pragma TODO("check why it was here")
+    //set_mtl_lib(&GMLib);
+
     os = create_object_space();
     create_physics_world(false, os, 0);
 }

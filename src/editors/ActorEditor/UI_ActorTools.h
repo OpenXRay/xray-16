@@ -1,7 +1,7 @@
-//---------------------------------------------------------------------------
-#ifndef UI_ActorToolsH
-#define UI_ActorToolsH
-#include "animation_motion.h"
+#pragma once
+#include "include/xrRender/animation_motion.h"
+#include "xrCommon/xr_deque.h"
+
 // refs
 class UIPropertiesForm;
 class CEditableObject;
@@ -75,6 +75,10 @@ public:
     MotionID FindMotionID(LPCSTR name, u16 slot);
     CMotionDef *FindMotionDef(LPCSTR name, u16 slot);
     CMotion *FindMotionKeys(LPCSTR name, u16 slot);
+
+    IGameObject* IObject() override { R_ASSERT(false); return nullptr; }
+    bool IsCollideWithBullets() override { R_ASSERT(false); return false; }
+    bool IsCollideWithActorCamera() { R_ASSERT(false); return false; }
 
 private:
     //	virtual	Fmatrix&				   		ObjectXFORM							()				 { return m_pobject_matrix; }
@@ -385,5 +389,3 @@ extern CActorTools *ATools;
 #define BONES_PREFIX "Bones"
 #define MOTIONS_PREFIX "Motions"
 #define OBJECT_PREFIX "Object"
-//---------------------------------------------------------------------------
-#endif

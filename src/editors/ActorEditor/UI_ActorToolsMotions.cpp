@@ -1,16 +1,12 @@
-//---------------------------------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "UI_ActorTools.h"
 #include "../xrECore/Editor/UI_Main.h"
 #include "../xrECore/Editor/EditObject.h"
-#include "motion.h"
-#include "bone.h"
-#include "SkeletonAnimated.h"
+#include "xrCore/Animation/motion.hpp"
+#include "xrCore/Animation/bone.hpp"
+#include "Layers/xrRender/SkeletonAnimated.h"
 #include "../../xrphysics/physicsshell.h"
-//---------------------------------------------------------------------------
+
 MotionID EngineModel::FindMotionID(LPCSTR name, u16 slot)
 {
     MotionID M;
@@ -19,6 +15,7 @@ MotionID EngineModel::FindMotionID(LPCSTR name, u16 slot)
         M = VA->ID_Motion(name, slot);
     return M;
 }
+
 CMotionDef *EngineModel::FindMotionDef(LPCSTR name, u16 slot)
 {
     CKinematicsAnimated *VA = PKinematicsAnimated(m_pVisual);
@@ -30,6 +27,7 @@ CMotionDef *EngineModel::FindMotionDef(LPCSTR name, u16 slot)
     }
     return 0;
 }
+
 CMotion *EngineModel::FindMotionKeys(LPCSTR name, u16 slot)
 {
     CKinematicsAnimated *VA = PKinematicsAnimated(m_pVisual);
@@ -61,7 +59,10 @@ void EngineModel::FillMotionList(LPCSTR pref, ListItemsVec &items, int modeID)
                 for (; I != E; ++I)
                 {
                     shared_str tmp = PrepareKey(slot_pref.c_str(), *(*I).first);
-                    LHelper().CreateItem(items, tmp.c_str(), modeID, 0, *(void **)&MotionID((u16)k, I->second));
+                    
+                    #pragma TODO("TSMP: Seems that here is error with MotionID object lifetime")
+                    MotionID id((u16)k, I->second);
+                    LHelper().CreateItem(items, tmp.c_str(), modeID, 0, &id);
                 }
                 // fxs
                 I = SA->m_Motions[k].motions.fx()->begin();
@@ -69,7 +70,8 @@ void EngineModel::FillMotionList(LPCSTR pref, ListItemsVec &items, int modeID)
                 for (; I != E; ++I)
                 {
                     shared_str tmp = PrepareKey(slot_pref.c_str(), *(*I).first);
-                    LHelper().CreateItem(items, tmp.c_str(), modeID, 0, *(void **)&MotionID((u16)k, I->second));
+                    MotionID id((u16)k, I->second);
+                    LHelper().CreateItem(items, tmp.c_str(), modeID, 0, &id);
                 }
             }
         }

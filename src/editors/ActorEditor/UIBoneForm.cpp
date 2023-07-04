@@ -301,8 +301,8 @@ void UIBoneForm::LoadFrom()
 			sprintf(buff, "part_%d", i);
 			xr_strcpy(m_Name[i], ini.r_string(buff, "partition_name"));
 			CInifile::Sect &S = ini.r_section(buff);
-			CInifile::SectCIt it = S.Data.begin();
-			CInifile::SectCIt e = S.Data.end();
+			auto it = S.Data.begin();
+			auto e = S.Data.end();
 			for (; it != e; ++it)
 			{
 				if (0 != stricmp(it->first.c_str(), "partition_name"))

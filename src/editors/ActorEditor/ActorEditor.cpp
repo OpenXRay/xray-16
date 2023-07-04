@@ -1,13 +1,13 @@
-﻿// ActorEditor.cpp : Определяет точку входа для приложения.
+// ActorEditor.cpp : Определяет точку входа для приложения.
 
 #include "stdafx.h"
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
 {
     if (!IsDebuggerPresent())
-        Debug._initialize(false);
+        xrDebug::Initialize(pCmdLine);
 
-    Core.InitCore("actor", ELogCallback);
+    Core.Initialize("actor", pCmdLine, LogCallback(ELogCallback, nullptr), true, "fs.ltx", false, true);
 
     ATools = xr_new<CActorTools>();
     Tools = ATools;
@@ -24,6 +24,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     }
 
     xr_delete(MainForm);
-    Core.DestroyCore();
+    Core._destroy();
     return 0;
 }

@@ -225,7 +225,7 @@ CCommandVar CActorTools::CommandBatchConvert(CCommandVar p1, CCommandVar p2)
     return res;
 }
 
-char *CActorMain::GetCaption()
+const char *CActorMain::GetCaption()
 {
     return ATools->GetEditFileName().empty() ? "noname" : ATools->GetEditFileName().c_str();
 }
@@ -234,19 +234,16 @@ bool CActorMain::ApplyShortCut(DWORD Key, TShiftState Shift)
 {
     return inherited::ApplyShortCut(Key, Shift);
 }
-//---------------------------------------------------------------------------
 
 bool CActorMain::ApplyGlobalShortCut(DWORD Key, TShiftState Shift)
 {
     return inherited::ApplyGlobalShortCut(Key, Shift);
 }
-//---------------------------------------------------------------------------
 
 void CActorMain::RealUpdateScene()
 {
     inherited::RealUpdateScene();
 }
-//---------------------------------------------------------------------------
 
 void CActorMain::ResetStatus()
 {
@@ -256,6 +253,7 @@ void CActorMain::ResetStatus()
          fraBottomBar->paStatus->Caption=""; fraBottomBar->paStatus->Repaint();
      }*/
 }
+
 void CActorMain::SetStatus(LPCSTR s, bool bOutLog)
 {
     VERIFY(m_bReady);

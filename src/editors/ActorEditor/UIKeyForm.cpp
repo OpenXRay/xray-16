@@ -49,7 +49,7 @@ void UIKeyForm::Draw()
 			static float Zero = 0;
 			if (size.x != m_TempForPlotHistogram.size())
 			{
-				m_TempForPlotHistogram.resize(size.x);
+				m_TempForPlotHistogram.resize(static_cast<size_t>(size.x));
 			}
 			if (Mark1)
 				DrawMark(0);
@@ -247,7 +247,7 @@ void UIKeyForm::DrawMark(int id)
 	{
 		const motion_marks::interval &iv = *it;
 		Ivector2 posLT, posRB;
-		for (int i = iv.first * k_len; i < iv.second * k_len; i++)
+		for (int i = static_cast<int>(iv.first * k_len); i < iv.second * k_len; i++)
 		{
 			m_TempForPlotHistogram[i] = 1;
 		}
