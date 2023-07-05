@@ -5,8 +5,8 @@
 #endif
 
 #include "include\xrRender\animation_blend.h"
-#include "..\..\XrPhysics\Physics.h"
-#include "..\XrECore\Editor\EditMesh.h"
+#include "..\..\xrPhysics\Physics.h"
+#include "..\xrECore\Editor\EditMesh.h"
 #include "Layers\xrRender\KinematicAnimatedDefs.h"
 #include "Layers\xrRender\SkeletonAnimated.h"
 CActorTools *ATools = (CActorTools *)Tools;

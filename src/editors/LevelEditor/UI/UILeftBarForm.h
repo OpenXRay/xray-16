@@ -1,5 +1,5 @@
 #pragma once
-class UILeftBarForm : public XrUI
+class UILeftBarForm : public xrUI
 {
 public:
 	UILeftBarForm();

@@ -1,6 +1,6 @@
 #pragma once
-#include "..\XrEUI\stdafx.h"
-class UITest : public XrUI
+#include "..\xrEUI\stdafx.h"
+class UITest : public xrUI
 {
 public:
 	UITest();

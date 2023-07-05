@@ -2,7 +2,7 @@
 class EDetailManager;
 class EImageThumbnail;
 class UIDOOneColor;
-class UIDOShuffle : public XrUI
+class UIDOShuffle : public xrUI
 {
 	friend UIDOOneColor;
 

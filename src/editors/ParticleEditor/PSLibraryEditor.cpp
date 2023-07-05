@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "Layers/XrRender/PSLibrary.h"
-#include "Layers/XrRender/ParticleEffect.h"
-#include "Layers/XrRender/ParticleGroup.h"
+#include "Layers/xrRender/PSLibrary.h"
+#include "Layers/xrRender/ParticleEffect.h"
+#include "Layers/xrRender/ParticleGroup.h"
 
 void CPSLibrary::FindByName(LPCSTR new_name, bool &res)
 {

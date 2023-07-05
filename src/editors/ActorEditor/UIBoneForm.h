@@ -1,5 +1,5 @@
 #pragma once
-class UIBoneForm : public XrUI
+class UIBoneForm : public xrUI
 {
 public:
 	UIBoneForm();

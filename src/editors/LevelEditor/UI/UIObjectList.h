@@ -1,6 +1,6 @@
 #pragma once
 class CCustomObject;
-class UIObjectList : public XrUI
+class UIObjectList : public xrUI
 {
 public:
 	UIObjectList();

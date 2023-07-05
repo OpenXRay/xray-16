@@ -3,7 +3,7 @@
 #pragma hdrstop
 
 #include "SHToolsInterface.h"
-#include "../XrECore/Editor/ui_main.h"
+#include "../xrECore/Editor/ui_main.h"
 
 ISHTools::ISHTools(const ISHInit &init)
 {

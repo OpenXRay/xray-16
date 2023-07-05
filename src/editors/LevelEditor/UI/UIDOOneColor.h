@@ -1,6 +1,6 @@
 #pragma once
 class UIDOShuffle;
-class UIDOOneColor : public XrUI
+class UIDOOneColor : public xrUI
 {
 public:
 	UIDOOneColor();

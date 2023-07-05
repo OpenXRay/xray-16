@@ -4,7 +4,7 @@
 
 #include "SHEngineTools.h"
 #include "ui_shadermain.h"
-#include "..\XrECore\Editor\EditMesh.h"
+#include "..\xrECore\Editor\EditMesh.h"
 //------------------------------------------------------------------------------
 class CCollapseBlender : public CParseBlender
 {

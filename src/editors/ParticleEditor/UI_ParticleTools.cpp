@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UI_ParticleTools.h"
 #include "xrEngine/ObjectAnimator.h"
-#include "..\XrECore\Editor\ParticleEffectActions.h"
+#include "..\xrECore\Editor\ParticleEffectActions.h"
 #include "xrEngine/igame_persistent.h"
 
 CParticleTool *PTools = (CParticleTool *)Tools;
@@ -901,7 +901,7 @@ PS::CPGDef *CParticleTool::AppendPG(PS::CPGDef *src, const char *path)
     return S;
 }
 
-#include "../XrECore/Editor/EditMesh.h"
+#include "../xrECore/Editor/EditMesh.h"
 
 bool CParticleTool::RayPick(const Fvector &start, const Fvector &dir, float &dist, Fvector *pt, Fvector *n)
 {

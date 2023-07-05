@@ -60,7 +60,7 @@
     <ClCompile Include="UILeftBarForm.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="..\XrECore\Editor\pDomain.cpp">
+    <ClCompile Include="..\xrECore\Editor\pDomain.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="UIRightBarForm.cpp">

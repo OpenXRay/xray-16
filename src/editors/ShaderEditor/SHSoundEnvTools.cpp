@@ -7,7 +7,7 @@
 #include "../../xrSound/stdafx.h"
 #include "eax/eax.h"
 #include "../../xrSound/SoundRender_Source.h"
-#include "../XrECORE/Editor/D3DUtils.h"
+#include "../xrECore/Editor/D3DUtils.h"
 
 #include "SHSoundEnvTools.h"
 //------------------------------------------------------------------------------

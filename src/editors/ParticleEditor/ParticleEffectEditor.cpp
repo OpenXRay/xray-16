@@ -3,7 +3,7 @@
 #ifdef _PARTICLE_EDITOR
 
 #include "Layers/xrRender/ParticleEffect.h"
-#include "..\XrEcore\Editor\ParticleEffectActions.h"
+#include "..\xrEcore\Editor\ParticleEffectActions.h"
 #include "ui_particletools.h"
 
 BOOL PS::CPEDef::Equal(const CPEDef *pe)

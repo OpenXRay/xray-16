@@ -2,7 +2,7 @@
 #ifndef LevelPreferencesH
 #define LevelPreferencesH
 
-#include "../XrECore/Editor/EditorPreferences.h"
+#include "../xrECore/Editor/EditorPreferences.h"
 
 class CLevelPreferences : public CCustomPreferences
 {

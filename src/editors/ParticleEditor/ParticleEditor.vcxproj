@@ -30,7 +30,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\XrECore\Editor\pDomain.cpp" />
+    <ClCompile Include="..\xrECore\Editor\pDomain.cpp" />
     <ClCompile Include="noise.cpp" />
     <ClCompile Include="ParticleEditor.cpp" />
     <ClCompile Include="ParticleEffectActionsImpl.cpp" />
@@ -78,13 +78,13 @@
     <ProjectReference Include="..\..\xrSound\xrSound.vcxproj">
       <Project>{ccca7859-eb86-493e-9b53-c4235f45b3c5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\XrECore\XrECore.vcxproj">
+    <ProjectReference Include="..\xrECore\xrECore.vcxproj">
       <Project>{9187be98-531a-4276-b78e-dba3c8ab8447}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\XrEProps\XrEProps.vcxproj">
+    <ProjectReference Include="..\xrEProps\xrEProps.vcxproj">
       <Project>{6d47afc7-0557-4bbf-8902-b248f3621419}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\XrEUI\XrEUI.vcxproj">
+    <ProjectReference Include="..\xrEUI\xrEUI.vcxproj">
       <Project>{7e28883c-db86-4ee8-813a-991ba20c68c9}</Project>
     </ProjectReference>
   </ItemGroup>

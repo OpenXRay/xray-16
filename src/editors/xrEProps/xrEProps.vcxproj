@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configurations.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6D47AFC7-0557-4BBF-8902-B248F3621419}</ProjectGuid>
+    <RootNamespace>xrEProps</RootNamespace>
+    <ProjectName>xrEProps</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configuration.props" />
+  </ImportGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\xray.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>XREPROPS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="FolderLib.cpp" />
+    <ClCompile Include="ItemListHelper.cpp" />
+    <ClCompile Include="PropertiesListHelper.cpp" />
+    <ClCompile Include="PropertiesListTypes.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Tree\Base\UITreeItem.cpp" />
+    <ClCompile Include="Tree\Choose\UIChooseForm.cpp" />
+    <ClCompile Include="Tree\Choose\UIChooseFormItem.cpp" />
+    <ClCompile Include="Tree\Properties\UIPropertiesForm.cpp" />
+    <ClCompile Include="Tree\Properties\UIPropertiesItem_DrawProp.cpp" />
+    <ClCompile Include="Tree\Properties\UIPropertiesItem_Mixed.cpp" />
+    <ClCompile Include="Tree\Properties\UiPropertiesItem.cpp" />
+    <ClCompile Include="UIItemListForm.cpp" />
+    <ClCompile Include="UIKeyPressForm.cpp" />
+    <ClCompile Include="UINumericVectorForm.cpp" />
+    <ClCompile Include="UITextForm.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FolderLib.h" />
+    <ClInclude Include="ItemListHelper.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Tree\Base\UITreeItem.h" />
+    <ClInclude Include="Tree\Choose\UIChooseForm.h" />
+    <ClInclude Include="Tree\Choose\UIChooseFormItem.h" />
+    <ClInclude Include="Tree\Properties\UIPropertiesForm.h" />
+    <ClInclude Include="Tree\Properties\UiPropertiesItem.h" />
+    <ClInclude Include="UIItemListForm.h" />
+    <ClInclude Include="UIKeyPressForm.h" />
+    <ClInclude Include="UINumericVectorForm.h" />
+    <ClInclude Include="UITextForm.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrEUI\xrEUI.vcxproj">
+      <Project>{7e28883c-db86-4ee8-813a-991ba20c68c9}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

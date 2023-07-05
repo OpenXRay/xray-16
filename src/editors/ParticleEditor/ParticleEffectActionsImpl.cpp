@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../XrECore/Editor/ParticleEffectActions.h"
+#include "../xrECore/Editor/ParticleEffectActions.h"
 #include "../../xrParticles/particle_actions_collection.h"
 
 using namespace PAPI;

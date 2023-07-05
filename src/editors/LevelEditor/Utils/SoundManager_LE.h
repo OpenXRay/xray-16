@@ -2,7 +2,7 @@
 #ifndef SoundManager_LEH
 #define SoundManager_LEH
 
-#include "../XrECore/Editor/SoundManager.h"
+#include "../xrECore/Editor/SoundManager.h"
 
 // refs
 class ESoundThumbnail;
