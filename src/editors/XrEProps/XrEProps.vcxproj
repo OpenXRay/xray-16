@@ -5,7 +5,8 @@
   </ImportGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6D47AFC7-0557-4BBF-8902-B248F3621419}</ProjectGuid>
-    <RootNamespace>XrEProps</RootNamespace>
+    <RootNamespace>xrEProps</RootNamespace>
+    <ProjectName>xrEProps</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <ImportGroup Label="PropertySheets">
