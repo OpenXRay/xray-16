@@ -185,7 +185,7 @@ void CScenePhyscs::CreateWorld()
 {
 
     VERIFY(!physics_world());
-    set_mtl_lib(&GMLib);
+    //set_mtl_lib(&GMLib);
 
     VERIFY(m_object_space);
     create_physics_world(false, m_object_space, 0);

@@ -34,7 +34,7 @@ void CGlow::OnDeviceCreate()
 {
     if (m_bDefLoad)
         return;
-    // создать заново shaders
+    // СЃРѕР·РґР°С‚СЊ Р·Р°РЅРѕРІРѕ shaders
     if (m_TexName.size() && m_ShaderName.size())
         m_GShader.create(*m_ShaderName, *m_TexName);
     m_bDefLoad = true;
@@ -43,7 +43,7 @@ void CGlow::OnDeviceCreate()
 void CGlow::OnDeviceDestroy()
 {
     m_bDefLoad = false;
-    // удалить shaders
+    // СѓРґР°Р»РёС‚СЊ shaders
     m_GShader.destroy();
 }
 
@@ -55,8 +55,8 @@ void CGlow::ShaderChange(PropValue *value)
 bool CGlow::GetBox(Fbox &box)
 {
     box.set(GetPosition(), GetPosition());
-    box.min.sub(m_fRadius);
-    box.max.add(m_fRadius);
+    box.vMin.sub(m_fRadius);
+    box.vMax.add(m_fRadius);
     return true;
 }
 
@@ -91,7 +91,7 @@ void CGlow::Render(int priority, bool strictB2F)
             }
             else
             {
-                // рендерим bounding sphere
+                // СЂРµРЅРґРµСЂРёРј bounding sphere
                 EDevice.SetShader(EDevice.m_WireShader);
                 DU_impl.DrawRomboid(GetPosition(), VIS_RADIUS, 0x00FF8507);
             }

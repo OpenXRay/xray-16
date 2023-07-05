@@ -7,7 +7,6 @@
 #define SPAWNPOINT_CHUNK_SQUADID 0xE415
 #define SPAWNPOINT_CHUNK_GROUPID 0xE416
 #define SPAWNPOINT_CHUNK_TYPE 0xE417
-#define SPAWNPOINT_CHUNK_FLAGS 0xE418
 
 #define SPAWNPOINT_CHUNK_ENTITYREF 0xE419
 #define SPAWNPOINT_CHUNK_SPAWNDATA 0xE420
@@ -17,6 +16,9 @@
 #define SPAWNPOINT_CHUNK_ENVMOD 0xE422
 #define SPAWNPOINT_CHUNK_ENVMOD2 0xE423
 #define SPAWNPOINT_CHUNK_ENVMOD3 0xE424
+
+// ??
+//#define SPAWNPOINT_CHUNK_FLAGS 0xE418
 #define SPAWNPOINT_CHUNK_FLAGS 0xE425
 
 const float RPOINT_SIZE = 0.5f;
@@ -244,19 +246,19 @@ void CSpawnPoint::CLE_Motion::PlayMotion()
 //------------------------------------------------------------------------------
 void CSpawnPoint::SSpawnData::Create(LPCSTR _entity_ref)
 {
-    m_Data = XrSE_Factory::create_entity(_entity_ref);
+    m_Data = create_entity(_entity_ref);
     if (m_Data)
     {
         m_Data->set_name(_entity_ref);
         if (m_Data->visual())
         {
             m_Visual = xr_new<CLE_Visual>(m_Data->visual());
-            m_Data->set_editor_flag(ISE_Abstract::flVisualChange | ISE_Abstract::flVisualAnimationChange);
+            m_Data->set_editor_flag(IServerEntity::flVisualChange | IServerEntity::flVisualAnimationChange);
         }
         if (m_Data->motion())
         {
             m_Motion = xr_new<CLE_Motion>(m_Data->motion());
-            m_Data->set_editor_flag(ISE_Abstract::flMotionChange);
+            m_Data->set_editor_flag(IServerEntity::flMotionChange);
         }
         if (pSettings->line_exist(m_Data->name(), "$player"))
         {
@@ -282,7 +284,7 @@ void CSpawnPoint::SSpawnData::Create(LPCSTR _entity_ref)
 
 void CSpawnPoint::SSpawnData::Destroy()
 {
-    XrSE_Factory::destroy_entity(m_Data);
+    destroy_entity(m_Data);
     xr_delete(m_Visual);
     xr_delete(m_Motion);
 }
@@ -388,7 +390,7 @@ bool CSpawnPoint::SSpawnData::ExportGame(SExportStreams *F, CSpawnPoint *owner)
     m_Data->angle().set(owner->GetRotation());
 
     // export cform (if needed)
-    ISE_Shape *cform = m_Data->shape();
+    IServerEntityShape* cform = m_Data->shape();
 
     // SHAPE
     if (cform && !(owner->m_AttachedObject && (owner->m_AttachedObject->FClassID == OBJCLASS_SHAPE)))
@@ -500,18 +502,18 @@ void CSpawnPoint::SSpawnData::Render(bool bSelected, const Fmatrix &parent, int 
 
 void CSpawnPoint::SSpawnData::OnFrame()
 {
-    if (m_Data->m_editor_flags.is(ISE_Abstract::flUpdateProperties))
+    if (m_Data->m_editor_flags.is(IServerEntity::flUpdateProperties))
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
     // visual part
     if (m_Visual)
     {
-        if (m_Data->m_editor_flags.is(ISE_Abstract::flVisualChange))
+        if (m_Data->m_editor_flags.is(IServerEntity::flVisualChange))
             m_Visual->OnChangeVisual();
 
-        if (m_Data->m_editor_flags.is(ISE_Abstract::flVisualAnimationChange))
+        if (m_Data->m_editor_flags.is(IServerEntity::flVisualAnimationChange))
         {
             m_Visual->PlayAnimationFirstFrame();
-            m_Data->m_editor_flags.set(ISE_Abstract::flVisualAnimationChange, FALSE);
+            m_Data->m_editor_flags.set(IServerEntity::flVisualAnimationChange, FALSE);
         }
 
         if (m_Visual->visual && PKinematics(m_Visual->visual))
@@ -520,13 +522,13 @@ void CSpawnPoint::SSpawnData::OnFrame()
     // motion part
     if (m_Motion)
     {
-        if (m_Data->m_editor_flags.is(ISE_Abstract::flMotionChange))
+        if (m_Data->m_editor_flags.is(IServerEntity::flMotionChange))
             m_Motion->OnChangeMotion();
         if (m_Motion->animator)
             m_Motion->animator->Update(EDevice.fTimeDelta);
     }
 
-    if (m_Data->m_editor_flags.is(ISE_Abstract::flVisualChange))
+    if (m_Data->m_editor_flags.is(IServerEntity::flVisualChange))
     {
         xr_vector<CLE_Visual *>::iterator it = m_VisualHelpers.begin();
         xr_vector<CLE_Visual *>::iterator it_e = m_VisualHelpers.end();
@@ -587,7 +589,7 @@ void CSpawnPoint::Construct(LPVOID data)
 
         if (Core.SocSdk)
         {
-            m_GameType.m_GameType.assign(static_cast<u16>(rpgtGameAny));
+            m_GameType.m_GameType.assign(static_cast<u16>(0) /*ERPGameType::rpgtGameAny*/);
             m_RP_TeamID = 0;
         }
         else
@@ -736,12 +738,12 @@ bool CSpawnPoint::GetBox(Fbox &box)
     {
     case ptRPoint:
         box.set(GetPosition(), GetPosition());
-        box.min.x -= RPOINT_SIZE;
-        box.min.y -= 0;
-        box.min.z -= RPOINT_SIZE;
-        box.max.x += RPOINT_SIZE;
-        box.max.y += RPOINT_SIZE * 2.f;
-        box.max.z += RPOINT_SIZE;
+        box.vMin.x -= RPOINT_SIZE;
+        box.vMin.y -= 0;
+        box.vMin.z -= RPOINT_SIZE;
+        box.vMax.x += RPOINT_SIZE;
+        box.vMax.y += RPOINT_SIZE * 2.f;
+        box.vMax.z += RPOINT_SIZE;
         break;
     case ptEnvMod:
         box.set(GetPosition(), GetPosition());
@@ -767,7 +769,7 @@ bool CSpawnPoint::GetBox(Fbox &box)
                     CShapeData::ShapeVec &SV = shape->GetShapes();
                     box.invalidate();
                     Fvector p;
-                    for (CShapeData::ShapeIt it = SV.begin(); it != SV.end(); it++)
+                    for (auto it = SV.begin(); it != SV.end(); it++)
                     {
                         switch (it->type)
                         {
@@ -795,24 +797,24 @@ bool CSpawnPoint::GetBox(Fbox &box)
                 else
                 {
                     box.set(GetPosition(), GetPosition());
-                    box.min.x -= RPOINT_SIZE;
-                    box.min.y -= 0;
-                    box.min.z -= RPOINT_SIZE;
-                    box.max.x += RPOINT_SIZE;
-                    box.max.y += RPOINT_SIZE * 2.f;
-                    box.max.z += RPOINT_SIZE;
+                    box.vMin.x -= RPOINT_SIZE;
+                    box.vMin.y -= 0;
+                    box.vMin.z -= RPOINT_SIZE;
+                    box.vMax.x += RPOINT_SIZE;
+                    box.vMax.y += RPOINT_SIZE * 2.f;
+                    box.vMax.z += RPOINT_SIZE;
                 }
             }
         }
         else
         {
             box.set(GetPosition(), GetPosition());
-            box.min.x -= RPOINT_SIZE;
-            box.min.y -= 0;
-            box.min.z -= RPOINT_SIZE;
-            box.max.x += RPOINT_SIZE;
-            box.max.y += RPOINT_SIZE * 2.f;
-            box.max.z += RPOINT_SIZE;
+            box.vMin.x -= RPOINT_SIZE;
+            box.vMin.y -= 0;
+            box.vMin.z -= RPOINT_SIZE;
+            box.vMax.x += RPOINT_SIZE;
+            box.vMax.y += RPOINT_SIZE * 2.f;
+            box.vMax.z += RPOINT_SIZE;
         }
         break;
     default:
@@ -834,7 +836,7 @@ void CSpawnPoint::OnFrame()
         m_AttachedObject->OnFrame();
     if (m_SpawnData.Valid())
     {
-        if (m_physics_shell && m_SpawnData.m_Data->m_editor_flags.is(ISE_Abstract::flVisualAnimationChange))
+        if (m_physics_shell && m_SpawnData.m_Data->m_editor_flags.is(IServerEntity::flVisualAnimationChange))
         {
             DeletePhysicsShell();
             m_SpawnData.OnFrame();
@@ -941,10 +943,10 @@ void CSpawnPoint::Render(int priority, bool strictB2F)
                     switch (m_Type)
                     {
                     case ptRPoint:
-                        s_name.sprintf("RPoint T:%d", m_RP_TeamID);
+                        s_name = make_string("RPoint T:%d", m_RP_TeamID).c_str();
                         break;
                     case ptEnvMod:
-                        s_name.sprintf("EnvMod V:%3.2f, F:%3.2f", m_EM_ViewDist, m_EM_FogDensity);
+                        s_name = make_string("EnvMod V:%3.2f, F:%3.2f", m_EM_ViewDist, m_EM_FogDensity).c_str();
                         break;
                     default:
                         THROW2("CSpawnPoint:: Unknown Type");
@@ -1437,8 +1439,8 @@ void CSpawnPoint::OnFillRespawnItemProfile(ChooseValue *val)
     string_path fn;
     FS.update_path(fn, "$game_config$", "mp\\respawn_items.ltx");
     CInifile ini(fn);
-    CInifile::RootIt it = ini.sections().begin();
-    CInifile::RootIt it_e = ini.sections().end();
+    auto it = ini.sections().begin();
+    auto it_e = ini.sections().end();
 
     for (; it != it_e; ++it)
     {
@@ -1500,13 +1502,13 @@ void CSpawnPoint::OnProfileChange(PropValue *prop)
         VERIFY(s_name.size());
         if (0 != strcmp(m_SpawnData.m_Data->name(), *s_name))
         {
-            ISE_Abstract *tmp = XrSE_Factory::create_entity(*s_name);
+            IServerEntity *tmp = create_entity(*s_name);
             VERIFY(tmp);
             NET_Packet Packet;
             tmp->Spawn_Write(Packet, TRUE);
             R_ASSERT(m_SpawnData.m_Data->Spawn_Read(Packet));
-            m_SpawnData.m_Data->set_editor_flag(ISE_Abstract::flVisualChange | ISE_Abstract::flVisualAnimationChange);
-            XrSE_Factory::destroy_entity(tmp);
+            m_SpawnData.m_Data->set_editor_flag(IServerEntity::flVisualChange | IServerEntity::flVisualAnimationChange);
+            destroy_entity(tmp);
         }
     }
     else

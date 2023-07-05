@@ -79,8 +79,8 @@ void CLight::AffectD3D(BOOL flag)
 bool CLight::GetBox(Fbox &box)
 {
     box.set(GetPosition(), GetPosition());
-    box.min.sub(m_Range);
-    box.max.add(m_Range);
+    box.vMin.sub(m_Range);
+    box.vMax.add(m_Range);
     return true;
 }
 

@@ -1,11 +1,7 @@
-// file: D3DUtils.cpp
-
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "xrEngine/GameFont.h"
 #include "d3dutils.h"
-#include "du_box.h"
+#include "Layers/xrRender/du_box.h"
 #include "du_sphere.h"
 #include "du_sphere_part.h"
 #include "du_cone.h"

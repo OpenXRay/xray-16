@@ -1,16 +1,11 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
-class ISE_Abstract;
-
-
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
 {
     if (!IsDebuggerPresent())
-        Debug._initialize(false);
+        xrDebug::Initialize(pCmdLine);
 
-    Core.InitCore("level", ELogCallback);
-    XrSE_Factory::initialize();
-    
+    Core.Initialize("level", pCmdLine, LogCallback(ELogCallback, nullptr), true, "fs.ltx", false, true);    
     LTools = xr_new<CLevelTool>();
     Tools = LTools;
     
@@ -29,7 +24,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     }
 
     xr_delete(MainForm);
-    XrSE_Factory::destroy();
-    Core.DestroyCore();
+    Core._destroy();
     return 0;
 }

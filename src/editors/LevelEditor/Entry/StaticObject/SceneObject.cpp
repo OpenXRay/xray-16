@@ -418,7 +418,7 @@ void CSceneObject::OnShowHint(AStringVec &dest)
             {
                 SGameMtl *mtl = GMLib.GetMaterialByID(gm_id);
                 if (mtl)
-                    dest.push_back(make_string("Occlusion Factor: %3.2f", mtl->fSndOcclusionFactor));
+                    dest.push_back(make_string("Occlusion Factor: %3.2f", mtl->fSndOcclusionFactor).c_str());
             }
         }
         else if (pinf.e_obj->m_objectFlags.is(CEditableObject::eoHOM))
@@ -438,7 +438,7 @@ void CSceneObject::OnShowHint(AStringVec &dest)
 void CSceneObject::Blink(CSurface *surf)
 {
     m_BlinkSurf = surf;
-    m_iBlinkTime = EDevice.dwTimeGlobal + BLINK_TIME + EDevice.dwTimeDelta;
+    m_iBlinkTime = static_cast<int>(EDevice.dwTimeGlobal + BLINK_TIME + EDevice.dwTimeDelta);
 }
 //----------------------------------------------------
 
@@ -457,7 +457,7 @@ void CSceneObject::ClearSurface()
         i->OnDeviceDestroy();
         xr_delete(i);
     }
-    m_Surfaces.clear_and_free();
+    m_Surfaces.clear();
     if (m_pReference)
     {
         for (size_t i = 0; i < m_pReference->SurfaceCount(); i++)

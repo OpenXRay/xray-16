@@ -64,6 +64,4 @@ public:
 };
 
 // refs
-class ISE_Abstract;
-
-#include "..\..\XrSE_Factory\xrSE_Factory_import_export.h"
+class IServerEntity;

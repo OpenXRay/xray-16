@@ -1,8 +1,5 @@
-#ifndef SceneSummaryInfoH
-#define SceneSummaryInfoH
 #pragma once
-
-#include "../../xrRender/Private/ETextureParams.h"
+#include "Layers/xrRender/ETextureParams.h"
 
 class SSceneSummary
 {
@@ -18,7 +15,7 @@ public:
         sttGlow,
         sttLOD,
         sttLast
-    }; // не забывать токен менять
+    }; // РЅРµ Р·Р°Р±С‹РІР°С‚СЊ С‚РѕРєРµРЅ РјРµРЅСЏС‚СЊ
 private:
     struct STextureInfo
     {
@@ -199,4 +196,3 @@ public:
     static void Load(CInifile *I);
     static void Save(CInifile *I);
 };
-#endif

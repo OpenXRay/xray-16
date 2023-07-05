@@ -116,7 +116,7 @@ bool SBPart::prepare(SBAdjVec &adjs, u32 bone_face_min)
         int bone_cnt_calc = iFloor(float(m_Faces.size()) / bone_face_min);
         int bone_cnt_max = (bone_cnt_calc < 62) ? (bone_cnt_calc <= 0 ? 1 : bone_cnt_calc) : 62;
         int bone_face_max = iFloor(float(m_Faces.size()) / bone_cnt_max + 0.5f);
-        bone_face_max *= 4.f;
+        bone_face_max *= 4;
         int bone_idx = 0;
         // create big fragment
         u32 face_accum_total = 0;
@@ -151,7 +151,8 @@ bool SBPart::prepare(SBAdjVec &adjs, u32 bone_face_min)
             }
             else
             {
-                m_Bones.push_back(SBBone(bone_idx, parent_bone, F->surf->_GameMtlName(), face_accum, area));
+                m_Bones.push_back(
+                    SBBone(std::to_string(bone_idx).c_str(), parent_bone, F->surf->_GameMtlName(), face_accum, area));
                 parent_bone = "0";
                 bone_idx++;
                 face_accum_total += face_accum;
@@ -229,7 +230,7 @@ bool SBPart::prepare(SBAdjVec &adjs, u32 bone_face_min)
         {
             SBBone &B = *b_it;
             VERIFY(0 != B.f_cnt);
-            B.offset.div(B.f_cnt * 3);
+            B.offset.div(static_cast<float>(B.f_cnt * 3));
         }
         Fvector &offs = m_Bones.front().offset;
         for (SBBoneVecIt b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
@@ -322,8 +323,8 @@ bool SBPart::Export(IWriter &F, u8 infl)
     H.format_version = xrOGF_FormatVersion;
     H.type = MT_SKELETON_RIGID;
     H.shader_id = 0;
-    H.bb.min = m_Box.min;
-    H.bb.max = m_Box.max;
+    H.bb.min = m_Box.vMin;
+    H.bb.max = m_Box.vMax;
     m_Box.getsphere(H.bs.c, H.bs.r);
     F.w_chunk(OGF_HEADER, &H, sizeof(H));
 
@@ -459,7 +460,7 @@ BOOL CGeomPartExtractor::Process()
     }
     // extract parts
     {
-        SPBItem *pb = UI->ProgressStart(m_Faces.size(), "Extract Parts...");
+        SPBItem *pb = UI->ProgressStart(static_cast<float>(m_Faces.size()), "Extract Parts...");
         for (SBFaceVecIt f_it = m_Faces.begin(); f_it != m_Faces.end(); f_it++)
         {
             pb->Inc();
@@ -475,7 +476,7 @@ BOOL CGeomPartExtractor::Process()
     }
     // simplify parts
     {
-        SPBItem *pb = UI->ProgressStart(m_Parts.size(), "Simplify Parts...");
+        SPBItem *pb = UI->ProgressStart(static_cast<float>(m_Parts.size()), "Simplify Parts...");
         for (SBPartVecIt p_it = m_Parts.begin(); p_it != m_Parts.end(); p_it++)
         {
             pb->Inc();

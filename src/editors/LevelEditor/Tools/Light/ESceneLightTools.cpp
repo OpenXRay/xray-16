@@ -152,7 +152,7 @@ void ESceneLightTool::OnControlAppendClick(ButtonValue *sender, bool &bDataModif
 
 void ESceneLightTool::OnControlRenameRemoveClick(ButtonValue *V, bool &bDataModified, bool &bSafe)
 {
-    R_ASSERT(!"Âûâåäåíî èç ýêñïëîòàöèè");
+    R_ASSERT(!"Ð’Ñ‹Ð²ÐµÐ´ÐµÐ½Ð¾ Ð¸Ð· ÑÐºÑÐ¿Ð»Ð¾Ñ‚Ð°Ñ†Ð¸Ð¸");
     /*  xr_string item_name = V->Owner()->Item()->Text;
       switch (V->btn_num){
       case 0:{
@@ -213,7 +213,7 @@ xr_string ESceneLightTool::GenLightControlName()
     int idx = 0;
     do
     {
-        name.sprintf("control_%02d", idx++);
+        name = make_string("control_%02d", idx++).c_str();
     } while (FindLightControl(name.c_str()));
     return name;
 }

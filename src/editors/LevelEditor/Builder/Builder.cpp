@@ -38,7 +38,7 @@ SceneBuilder::~SceneBuilder()
     CHECK_BREAK                                     \
     if (!x)                                         \
     {                                               \
-        error_text.sprintf("ERROR: %s %s", c1, c2); \
+        error_text = make_string("ERROR: %s %s", c1, c2); \
         break;                                      \
     }
 //------------------------------------------------------------------------------

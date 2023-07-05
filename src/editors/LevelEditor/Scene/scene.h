@@ -1,10 +1,10 @@
 #pragma once
+#include "OldFixedMap.h" // todo: replace with FixedMap from xrCore
+#include "xrCommon/xr_deque.h"
 
 #if 1
-extern doug_lea_allocator g_render_lua_allocator;
-
 template <class T>
-class doug_lea_alloc
+class alloc
 {
 public:
 	typedef size_t size_type;
@@ -19,21 +19,24 @@ public:
 	template <class _Other>
 	struct rebind
 	{
-		typedef doug_lea_alloc<_Other> other;
+		typedef alloc<_Other> other;
 	};
 
 public:
 	pointer address(reference _Val) const { return (&_Val); }
 	const_pointer address(const_reference _Val) const { return (&_Val); }
-	doug_lea_alloc() {}
-	doug_lea_alloc(const doug_lea_alloc<T> &) {}
+	alloc() {}
+	alloc(const alloc<T> &) {}
 	template <class _Other>
-	doug_lea_alloc(const doug_lea_alloc<_Other> &) {}
+	alloc(const alloc<_Other> &) {}
 	template <class _Other>
-	doug_lea_alloc<T> &operator=(const doug_lea_alloc<_Other> &) { return (*this); }
-	pointer allocate(size_type n, const void *p = 0) const { return (T *)g_render_lua_allocator.malloc_impl(sizeof(T) * (u32)n); }
-	void deallocate(pointer p, size_type n) const { g_render_lua_allocator.free_impl((void *&)p); }
-	void deallocate(void *p, size_type n) const { g_render_lua_allocator.free_impl(p); }
+	alloc<T> &operator=(const alloc<_Other> &) { return (*this); }
+    pointer allocate(size_type n, const void* p = 0) const
+    {
+        return (T*)Memory.mem_alloc(sizeof(T) * (u32)n);
+    }
+    void deallocate(pointer p, size_type n) const { Memory.mem_free((void*&)p); }
+    void deallocate(void* p, size_type n) const { Memory.mem_free(p); }
 	char *__charalloc(size_type n) { return (char *)allocate(n); }
 	void construct(pointer p, const T &_Val) { new (p) T(_Val); }
 
@@ -46,25 +49,25 @@ public:
 };
 
 template <class _Ty, class _Other>
-inline bool operator==(const doug_lea_alloc<_Ty> &, const doug_lea_alloc<_Other> &) { return (true); }
+inline bool operator==(const alloc<_Ty> &, const alloc<_Other> &) { return (true); }
 template <class _Ty, class _Other>
-inline bool operator!=(const doug_lea_alloc<_Ty> &, const doug_lea_alloc<_Other> &) { return (false); }
+inline bool operator!=(const alloc<_Ty> &, const alloc<_Other> &) { return (false); }
 
-struct doug_lea_allocator_wrapper
+struct allocator_wrapper
 {
 	template <typename T>
 	struct helper
 	{
-		typedef doug_lea_alloc<T> result;
+		typedef alloc<T> result;
 	};
 
-	static void *alloc(const u32 &n) { return g_render_lua_allocator.malloc_impl((u32)n); }
+	static void* alloc(const u32& n) { return Memory.mem_alloc((u32)n); }
 	template <typename T>
-	static void dealloc(T *&p) { g_render_lua_allocator.free_impl((void *&)p); }
+	static void dealloc(T *&p) { Memory.mem_free((void *&)p); }
 };
 
-#define render_alloc doug_lea_alloc
-typedef doug_lea_allocator_wrapper render_allocator;
+#define render_alloc alloc
+typedef allocator_wrapper render_allocator;
 #endif
 
 struct FSChunkDef;
@@ -112,7 +115,7 @@ class EScene
 	CMemoryWriter m_SaveCache;
 
 public:
-	typedef FixedMAP<float, CCustomObject *, render_allocator> mapObject_D;
+    typedef FixedMAP<float, CCustomObject*, render_allocator> mapObject_D;
 	typedef mapObject_D::TNode mapObject_Node;
 	mapObject_D mapRenderObjects;
 
@@ -137,7 +140,7 @@ protected:
 
 	TProperties *m_SummaryInfo;
 
-	ObjectList m_ESO_SnapObjects; // временно здесь а вообще нужно перенести в ESceneTools
+	ObjectList m_ESO_SnapObjects; // РІСЂРµРјРµРЅРЅРѕ Р·РґРµСЃСЊ Р° РІРѕРѕР±С‰Рµ РЅСѓР¶РЅРѕ РїРµСЂРµРЅРµСЃС‚Рё РІ ESceneTools
 protected:
 	bool OnLoadAppendObject(CCustomObject *O);
 	bool OnLoadSelectionAppendObject(CCustomObject *O);
@@ -308,23 +311,6 @@ public:
 
 public:
 	int GetQueryObjects(ObjectList &objset, ObjClassID classfilter, int iSel = 1, int iVis = 1, int iLock = 0);
-	template <class Predicate>
-	int GetQueryObjects_if(ObjectList &dest, ObjClassID classfilter, Predicate cmp)
-	{
-		for (ObjectPairIt it = FirstClass(); it != LastClass(); it++)
-		{
-			ObjectList &lst = it->second;
-			if ((classfilter == OBJCLASS_DUMMY) || (classfilter == it->first))
-			{
-				for (ObjectIt _F = lst.begin(); _F != lst.end(); _F++)
-				{
-					if (cmp(_F))
-						dest.push_back(*_F);
-				}
-			}
-		}
-		return dest.size();
-	}
 
 public:
 	void OnCreate();

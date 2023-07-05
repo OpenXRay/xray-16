@@ -4,9 +4,6 @@
     <Filter Include="UI">
       <UniqueIdentifier>{8de59519-90ea-45b4-aa15-357dbcb5c246}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine">
-      <UniqueIdentifier>{d1483583-4055-4c23-bc0e-cd2774fa481f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Render">
       <UniqueIdentifier>{820cd9c6-8985-464f-82cf-f053ef14ef09}</UniqueIdentifier>
     </Filter>
@@ -132,32 +129,8 @@
     <ClCompile Include="UI\UIMainMenuForm.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\XrRender\Private\DetailManager.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\XrRender\Private\DetailManager_VS.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\XrRender\Private\DetailManager_Decompress.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\XrRender\Private\DetailManager_soft.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\XrRender\Private\DetailManager_CACHE.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\XrRender\Private\stats_manager.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\gametype_chooser.cpp">
       <Filter>ServerEntities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\LevelGameDef.cpp">
-      <Filter>ServerEntities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\XrEngine\ObjectAnimator.cpp">
-      <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="UI\Tools\UILightTool.cpp">
       <Filter>UI\Tools</Filter>
@@ -229,9 +202,6 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Utils\Custom2DProjector.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils\FS2.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Utils\GeometryPartExtractor.cpp">
@@ -310,9 +280,6 @@
       <Filter>Entry</Filter>
     </ClCompile>
     <ClCompile Include="Entry\CustomObjectLE.cpp">
-      <Filter>Entry</Filter>
-    </ClCompile>
-    <ClCompile Include="Entry\EditObjectExportLWO.cpp">
       <Filter>Entry</Filter>
     </ClCompile>
     <ClCompile Include="Entry\Glow\Glow.cpp">
@@ -525,6 +492,30 @@
     <ClCompile Include="Tools\WayPoint\ESceneWayToolsIO.cpp">
       <Filter>Tools\WayPoint</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager_CACHE.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager_Decompress.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager_VS.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRender\stats_manager.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerEntities\LevelGameDef.cpp">
+      <Filter>ServerEntities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager_soft.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRenderDX9\BufferUtils.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\UIMainMenuForm.h">
@@ -541,9 +532,6 @@
     </ClInclude>
     <ClInclude Include="UI\UIMainForm.h">
       <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\XrRender\Private\DetailManager.h">
-      <Filter>Render</Filter>
     </ClInclude>
     <ClInclude Include="UI\Tools\UILightTool.h">
       <Filter>UI\Tools</Filter>
@@ -620,9 +608,6 @@
     <ClInclude Include="Utils\Custom2DProjector.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\FS2.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\GeometryPartExtractor.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -630,9 +615,6 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Utils\LevelPreferences.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\lwchunks.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Utils\portalutils.h">
@@ -793,6 +775,15 @@
     </ClInclude>
     <ClInclude Include="Tools\WayPoint\ESceneWayTools.h">
       <Filter>Tools\WayPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Layers\xrRender\DetailManager.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Layers\xrRender\stats_manager.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\LevelGameDef.h">
+      <Filter>ServerEntities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

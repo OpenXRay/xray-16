@@ -7,9 +7,9 @@ class CCustomObject;
 typedef u32 ObjClassID;
 
 //----------------------------------------------------
-enum
+enum : u32
 {
-    OBJCLASS_DUMMY = -1,
+    OBJCLASS_DUMMY = u32(-1),
     OBJCLASS_FIRST_CLASS = 0,
     OBJCLASS_GROUP = 0,
     OBJCLASS_GLOW = 1,

@@ -1059,7 +1059,7 @@ void CLevelMain::RegisterCommands()
     REGISTER_CMD_S(COMMAND_SHOW_CLIP_EDITOR, CommandShowClipEditor);
 }
 
-char *CLevelMain::GetCaption()
+const char *CLevelMain::GetCaption()
 {
     return Tools->m_LastFileName.empty() ? "noname" : Tools->m_LastFileName.c_str();
 }
@@ -1239,8 +1239,8 @@ bool CLevelMain::SelectionFrustum(CFrustum &frustum)
 
     float depth = 0;
 
-    float x1 = m_StartCp.x, x2 = m_CurrentCp.x;
-    float y1 = m_StartCp.y, y2 = m_CurrentCp.y;
+    int x1 = m_StartCp.x, x2 =  m_CurrentCp.x;
+    int y1 = m_StartCp.y, y2 = m_CurrentCp.y;
 
     if (!(x1 != x2 && y1 != y2))
         return false;
@@ -1340,7 +1340,7 @@ void CLevelMain::OutCameraPos()
     {
         xr_string s;
         const Fvector &c = EDevice.m_Camera.GetPosition();
-        s.sprintf("C: %3.1f, %3.1f, %3.1f", c.x, c.y, c.z);
+        //  s.sprintf("C: %3.1f, %3.1f, %3.1f", c.x, c.y, c.z);
         //	const Fvector& hpb 	= EDevice.m_Camera.GetHPB();
         //	s.sprintf(" Cam: %3.1f�, %3.1f�, %3.1f�",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
         // fraBottomBar->paCamera->Caption=s; fraBottomBar->paCamera->Repaint();

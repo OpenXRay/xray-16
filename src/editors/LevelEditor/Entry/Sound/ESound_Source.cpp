@@ -58,8 +58,8 @@ ESoundSource::~ESoundSource()
 bool ESoundSource::GetBox(Fbox &box)
 {
     box.set(m_Params.position, m_Params.position);
-    box.min.sub(m_Params.max_distance);
-    box.max.add(m_Params.max_distance);
+    box.vMin.sub(m_Params.max_distance);
+    box.vMax.add(m_Params.max_distance);
     return true;
 }
 
@@ -469,12 +469,12 @@ bool ESoundSource::ExportGame(SExportStreams *F)
     I.stream.w_fvector3(m_Params.position);
     I.stream.w_float(m_Params.volume);
     I.stream.w_float(m_Params.freq);
-    I.stream.w_u32(m_ActiveTime.x * 1000);
-    I.stream.w_u32(m_ActiveTime.y * 1000);
-    I.stream.w_u32(m_PlayTime.x * 1000);
-    I.stream.w_u32(m_PlayTime.y * 1000);
-    I.stream.w_u32(m_RandomPause.x * 1000);
-    I.stream.w_u32(m_RandomPause.y * 1000);
+    I.stream.w_u32(static_cast<u32>(m_ActiveTime.x * 1000));
+    I.stream.w_u32(static_cast<u32>(m_ActiveTime.y * 1000));
+    I.stream.w_u32(static_cast<u32>(m_PlayTime.x * 1000));
+    I.stream.w_u32(static_cast<u32>(m_PlayTime.y * 1000));
+    I.stream.w_u32(static_cast<u32>(m_RandomPause.x * 1000));
+    I.stream.w_u32(static_cast<u32>(m_RandomPause.y * 1000));
     I.stream.close_chunk();
     I.stream.close_chunk();
     return true;

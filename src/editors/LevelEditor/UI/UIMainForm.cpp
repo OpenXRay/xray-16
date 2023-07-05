@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "../XrECore/Editor/EditorChooseEvents.h"
 
+void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
+
 UIMainForm *MainForm = nullptr;
 
 UIMainForm::UIMainForm()

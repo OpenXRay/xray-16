@@ -374,7 +374,7 @@ void CEditorRenderDevice::Reset()
 BOOL CEditorRenderDevice::Begin()
 {
 	VERIFY(b_is_Ready);
-	mFullTransform_saved = mFullTransform;
+    mFullTransformSaved = mFullTransform;
 	mProject_saved = mProject;
 	mView = mView_saved;
 	vCameraPosition_saved = vCameraPosition;

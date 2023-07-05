@@ -153,5 +153,5 @@ public:
 };
 extern CLevelTool *LTools;
 
-extern void ResetActionToSelect();
+extern ECORE_API void ResetActionToSelect();
 extern TShiftState ssRBOnly;

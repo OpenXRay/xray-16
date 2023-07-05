@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <thread>
 #include <atomic>
+#include <random>
 
 static std::atomic<bool> RefreshInProgress;
 
@@ -251,7 +252,7 @@ void UIObjectTool::OnDrawUI()
                 Fvector up = {0.f, 1.f, 0.f};
                 Scene->SelectObjects(false, OBJCLASS_SCENEOBJECT);
 
-                SPBItem *pb = UI->ProgressStart(lst.size(), "Append object: ");
+                SPBItem *pb = UI->ProgressStart(static_cast<float>(lst.size()), "Append object: ");
                 for (AStringIt it = lst.begin(); it != lst.end(); it++)
                 {
                     string256 namebuffer;
@@ -353,7 +354,11 @@ void UIObjectTool::MultiSelByRefObject(bool clear_prev)
         }
         std::sort(sellist.begin(), sellist.end());
         sellist.erase(std::unique(sellist.begin(), sellist.end()), sellist.end());
-        std::random_shuffle(sellist.begin(), sellist.end());
+
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(sellist.begin(), sellist.end(), g);
+
         int max_k = iFloor(float(sellist.size()) / 100.f * float(m_selPercent) + 0.5f);
         int k = 0;
         for (LPU32It o_it = sellist.begin(); k < max_k; o_it++, k++)

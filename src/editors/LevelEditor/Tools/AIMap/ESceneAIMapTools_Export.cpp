@@ -1,9 +1,11 @@
 #include "stdafx.h"
 
+const u32 MAX_NODE_BIT_COUNT = 23; // original, todo: replace
+
 void ESceneAIMapTool::UnpackPosition(Fvector &Pdest, const NodePosition &Psrc, Fbox &bb, SAIParams &params)
 {
     Pdest.x = float(Psrc.x) * params.fPatchSize;
-    Pdest.y = (float(Psrc.y) / 65535) * (bb.max.y - bb.min.y) + bb.min.y;
+    Pdest.y = (float(Psrc.y) / 65535) * (bb.vMax.y - bb.vMin.y) + bb.vMin.y;
     Pdest.z = float(Psrc.z) * params.fPatchSize;
 }
 
@@ -17,7 +19,7 @@ void ESceneAIMapTool::PackPosition(NodePosition &Dest, Fvector &Src, Fbox &bb, S
     float sp = 1 / params.fPatchSize;
     int px, py, pz;
     px = iFloor(Src.x * sp + EPS_L);
-    py = iFloor(65535.f * (Src.y - bb.min.y) / (bb.max.y - bb.min.y) + EPS_L);
+    py = iFloor(65535.f * (Src.y - bb.vMin.y) / (bb.vMax.y - bb.vMin.y) + EPS_L);
     pz = iFloor(Src.z * sp + EPS_L);
 
     clamp(px, -32767, 32767);

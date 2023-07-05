@@ -283,8 +283,7 @@ void CLight::OnTypeChange(PropValue *value)
 void CLight::OnShowHint(AStringVec &dest)
 {
     CCustomObject::OnShowHint(dest);
-    xr_string temp;
-    temp.sprintf("Type:  ");
+    xr_string temp = make_string("Type:  ").c_str();
     switch (m_Type)
     {
     case ELight::ltPoint:
@@ -305,6 +304,6 @@ void CLight::OnShowHint(AStringVec &dest)
     if (m_Flags.is(ELight::flProcedural))
         temp += "Proc ";
     dest.push_back(temp);
-    temp.sprintf("Pos:   %3.2f, %3.2f, %3.2f", GetPosition().x, GetPosition().y, GetPosition().z);
+    temp = make_string("Pos:   %3.2f, %3.2f, %3.2f", GetPosition().x, GetPosition().y, GetPosition().z).c_str();
     dest.push_back(temp);
 }

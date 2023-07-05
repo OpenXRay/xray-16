@@ -184,7 +184,7 @@ void CCustomObject::OnDrawUI()
             if (m_MotionParams->max_t < mx)
             {
                 m_MotionParams->max_t = mx;
-                m_Motion->SetParam(m_MotionParams->min_t * 30.f, m_MotionParams->max_t * 30.f, 30.f);
+                m_Motion->SetParam(static_cast<int>(m_MotionParams->min_t * 30.f), static_cast<int>(m_MotionParams->max_t * 30.f), 30.f);
             }
             EDevice.seqDrawUI.Remove(this);
             m_ButtonId = 0;
@@ -206,7 +206,7 @@ void CCustomObject::OnDrawUI()
             if (m_MotionParams->max_t < mx)
             {
                 m_MotionParams->max_t = mx;
-                m_Motion->SetParam(m_MotionParams->min_t * 30.f, m_MotionParams->max_t * 30.f, 30.f);
+                m_Motion->SetParam(static_cast<int>(m_MotionParams->min_t * 30.f), static_cast<int>(m_MotionParams->max_t * 30.f), 30.f);
             }
             EDevice.seqDrawUI.Remove(this);
             m_ButtonId = 0;
@@ -263,7 +263,7 @@ void CCustomObject::OnMotionCommandsClick(ButtonValue *value, bool &bModif, bool
         m_Motion->GetLength(&mn, &mx);
         m_MotionParams->min_t = mn;
         m_MotionParams->max_t = mx;
-        m_Motion->SetParam(mn * 30.f, mx * 30.f, 30.f);
+        m_Motion->SetParam(static_cast<int>(mn * 30.f), static_cast<int>(mx * 30.f), 30.f);
     }
     break;
     }
@@ -298,7 +298,7 @@ void CCustomObject::OnMotionFilesClick(ButtonValue *value, bool &bModif, bool &b
 
 void CCustomObject::OnMotionFrameChange(PropValue *value)
 {
-    m_Motion->SetParam(m_MotionParams->min_t * 30.f, m_MotionParams->max_t * 30.f, 30.f);
+    m_Motion->SetParam(static_cast<int>(m_MotionParams->min_t * 30.f), static_cast<int>(m_MotionParams->max_t * 30.f), 30.f);
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
@@ -321,7 +321,7 @@ void CCustomObject::OnMotionCurrentFrameChange(PropValue *value)
     else if (m_MotionParams->t_current > m_MotionParams->max_t)
         m_MotionParams->max_t = m_MotionParams->t_current;
 
-    m_Motion->SetParam(m_MotionParams->min_t * 30.f, m_MotionParams->max_t * 30.f, 30.f);
+    m_Motion->SetParam(static_cast<int>(m_MotionParams->min_t * 30.f), static_cast<int>(m_MotionParams->max_t * 30.f), 30.f);
     m_MotionParams->bPlay = FALSE;
     AnimationUpdate(m_MotionParams->Frame());
     ExecCommand(COMMAND_UPDATE_PROPERTIES);

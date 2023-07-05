@@ -69,7 +69,7 @@ void EScene::GenObjectName(ObjClassID cls_id, char *buffer, const char *pref)
     for (int i = 0; true; i++)
     {
         bool result;
-        xr_string temp;
+        std::string temp;
         if (pref)
         {
             if (i == 0)
@@ -84,10 +84,10 @@ void EScene::GenObjectName(ObjClassID cls_id, char *buffer, const char *pref)
                 temp = pref;                     
             }
             else            
-                temp.sprintf("%s_%02d", pref, i - 1);            
+                temp = make_string("%s_%02d", pref, i - 1);            
         }
         else        
-            temp.sprintf("%02d", i);        
+            temp = make_string("%02d", i);        
 
         FindObjectByNameCB(temp.c_str(), result);
 
@@ -97,7 +97,4 @@ void EScene::GenObjectName(ObjClassID cls_id, char *buffer, const char *pref)
             return;
         }
     }
-    /*ESceneCustomOTool* ot = GetOTool(cls_id); VERIFY(ot);
-    xr_string result	= FHelper.GenerateName(pref&&pref[0]?pref:ot->ClassName(),4,fastdelegate::bind<TFindObjectByName>(this,&EScene::FindObjectByNameCB),true,true);
-    strcpy				(buffer,result.c_str());*/
 }

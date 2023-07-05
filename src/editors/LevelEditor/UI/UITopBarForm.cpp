@@ -75,14 +75,14 @@ void UITopBarForm::Draw()
 	}                                            \
 	ImGui::SameLine();                           \
 	ImGui::PopID();
-#define ADD_BUTTON_IMAGE_T1_1(Class, Name, T)                            \
-	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0, 0, 0)); \
-	if (ImGui::Button("" #T, ImVec2(20, 20)))                            \
-	{                                                                    \
-		Click##Class##Name();                                            \
-	}                                                                    \
-	ImGui::SameLine();                                                   \
-	ImGui::PopStyleColor(1);
+//#define ADD_BUTTON_IMAGE_T1_1(Class, Name, T)                            \
+//	ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4)ImColor::HSV(0, 0, 0)); \
+//	if (ImGui::Button("" #T, ImVec2(20, 20)))                            \
+//	{                                                                    \
+//		Click##Class##Name();                                            \
+//	}                                                                    \
+//	ImGui::SameLine();                                                   \
+//	ImGui::PopStyleColor(1);
 #include "UITopBarForm_ButtonList.h"
 	}
 	ImGui::End();

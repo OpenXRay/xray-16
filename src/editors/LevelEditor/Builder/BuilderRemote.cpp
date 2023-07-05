@@ -34,7 +34,7 @@ public:
         bb.getsize(sz);
         bb_sx = iFloor(sz.x + 1.f);
         bb_sz = iFloor(sz.z + 1.f);
-        bb_min.set(bb.min);
+        bb_min.set(bb.vMin);
         max_svert = 0;
         svertices.resize(bb_sx * bb_sz, 0);
         max_muvert = 0;
@@ -768,12 +768,10 @@ BOOL SceneBuilder::BuildMesh(const Fmatrix &parent,
 BOOL SceneBuilder::BuildObject(CSceneObject *obj)
 {
     CEditableObject *O = obj->GetReference();
-    xr_string temp;
-    temp.sprintf("Building object: %s", obj->GetName());
+    auto temp = make_string("Building object: %s", obj->GetName());
     UI->SetStatus(temp.c_str());
 
     Fmatrix T = obj->_Transform();
-
     Fmatrix cv = Fidentity;
 
     if (m_save_as_object)
@@ -838,8 +836,7 @@ int GetModelIdx(LPCSTR model_name)
 BOOL SceneBuilder::BuildMUObject(CSceneObject *obj)
 {
     CEditableObject *O = obj->GetReference();
-    xr_string temp;
-    temp.sprintf("Building object: %s", obj->GetName());
+    auto temp = make_string("Building object: %s", obj->GetName());
     UI->SetStatus(temp.c_str());
 
     int model_idx = GetModelIdx(O->GetName());
@@ -1366,7 +1363,7 @@ int SceneBuilder::BuildMaterial(LPCSTR esh_name, LPCSTR csh_name, LPCSTR tx_name
 BOOL SceneBuilder::ParseStaticObjects(ObjectList &lst, LPCSTR prefix, bool b_selected_only)
 {
     BOOL bResult = TRUE;
-    SPBItem *pb = UI->ProgressStart(lst.size(), "Parse static objects...");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(lst.size()), "Parse static objects...");
     for (ObjectIt _F = lst.begin(); _F != lst.end(); _F++)
     {
         pb->Inc((*_F)->GetName());
@@ -1485,7 +1482,7 @@ BOOL SceneBuilder::CompileStatic(bool b_selected_only)
     // make sun
     BuildSun(Scene->m_LevelOp.m_LightSunQuality, lt->m_SunShadowDir);
     // parse scene
-    SPBItem *pb = UI->ProgressStart(Scene->ObjCount(), "Parse scene objects...");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(Scene->ObjCount()), "Parse scene objects...");
 
     if (b_selected_only)
     {
@@ -1514,7 +1511,7 @@ BOOL SceneBuilder::CompileStatic(bool b_selected_only)
     // process lods
     if (bResult && !l_lods.empty())
     {
-        SPBItem *pb = UI->ProgressStart(l_lods.size() * 2, "Merge LOD textures...");
+        SPBItem *pb = UI->ProgressStart(static_cast<float>(l_lods.size() * 2), "Merge LOD textures...");
         Fvector2Vec offsets;
         Fvector2Vec scales;
         boolVec rotated;

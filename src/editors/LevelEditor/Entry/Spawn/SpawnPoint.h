@@ -6,7 +6,7 @@
 class CSE_Visual;
 class CSE_Motion;
 class CObjectAnimator;
-class ISE_Abstract;
+class IServerEntity;
 
 
 
@@ -49,11 +49,11 @@ public:
         CLE_Motion(CSE_Motion *src);
         virtual ~CLE_Motion();
     };
-    struct SSpawnData : public ISE_AbstractLEOwner
+    struct SSpawnData : public IServerEntityLEOwner
     {
         CLASS_ID m_ClassID;
         shared_str m_Profile;
-        ISE_Abstract *m_Data;
+        IServerEntity *m_Data;
         CLE_Visual *m_Visual;
         Flags8 m_flags;
         xr_vector<CLE_Visual *> m_VisualHelpers;
@@ -177,6 +177,11 @@ public:
     virtual bool OnChooseQuery(LPCSTR specific);
     virtual void OnSceneRemove();
     void UseSimulatePose();
+
+    // --#SM+#-- shit
+    IGameObject* IObject() override { R_ASSERT(false); return nullptr; }
+    bool IsCollideWithBullets() override { R_ASSERT(false); return false; }
+    bool IsCollideWithActorCamera() override { R_ASSERT(false); return false; }
 
 public:
     virtual IKinematics *ObjectKinematics()

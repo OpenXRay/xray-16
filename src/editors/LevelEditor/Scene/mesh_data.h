@@ -2,7 +2,7 @@
 #define _MESH_DATA_H_
 namespace CDB
 {
-	struct TRI;
+	class TRI;
 }
 struct mesh_build_data
 {

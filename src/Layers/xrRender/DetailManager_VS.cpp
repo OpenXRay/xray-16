@@ -1,10 +1,7 @@
 #include "stdafx.h"
-#pragma hdrstop
 #include "DetailManager.h"
-#ifdef _EDITOR
-#include "IGame_Persistent.h"
-#include "Environment.h"
-#else
+
+#ifndef _EDITOR
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #endif
@@ -148,10 +145,10 @@ void CDetailManager::hw_Render()
     // Render-prepare
     //	Update timer
     //	Can't use Device.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!
-    float fDelta = Device.fTimeGlobal - m_global_time_old;
+    float fDelta = RDEVICE.fTimeGlobal - m_global_time_old;
     if ((fDelta < 0) || (fDelta > 1))
         fDelta = 0.03f;
-    m_global_time_old = Device.fTimeGlobal;
+    m_global_time_old = RDEVICE.fTimeGlobal;
 
     m_time_rot_1 += (PI_MUL_2 * fDelta / swing_current.rot1);
     m_time_rot_2 += (PI_MUL_2 * fDelta / swing_current.rot2);
@@ -188,7 +185,7 @@ void CDetailManager::hw_Render()
 
     // Still
     RCache.set_c(&*hwc_s_consts, scale, scale, scale, 1.f);
-    RCache.set_c(&*hwc_s_xform, Device.mFullTransform);
+    RCache.set_c(&*hwc_s_xform, RDEVICE.mFullTransform);
     hw_Render_dump(&*hwc_s_array, 0, 1, c_hdr);
 }
 

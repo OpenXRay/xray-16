@@ -9,8 +9,8 @@ class IReader;
 class IWriter;
 class COMotion;
 class CCustomMotion;
-class SAnimParams;
-struct SSceneSummary;
+struct SAnimParams;
+class SSceneSummary;
 class ESceneCustomOTool;
 
 struct SExportStreamItem

@@ -1,7 +1,7 @@
 #pragma once
 
 // refs
-struct SSceneSummary;
+class SSceneSummary;
 class TUI_CustomControl;
 class ESceneCustomMTools;
 class SceneBuilder;

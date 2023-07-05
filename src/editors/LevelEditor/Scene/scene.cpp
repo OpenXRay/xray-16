@@ -42,7 +42,7 @@ void st_LevelOptions::SetHighQuality()
 
 #define MAX_VISUALS 16384
 #ifdef USE_ARENA_ALLOCATOR
-extern char *s_fake_array;
+char* s_fake_array = nullptr;
 #endif
 EScene::EScene()
 {
@@ -53,7 +53,7 @@ EScene::EScene()
     m_Locked = 0;
 
     for (int i = 0; i < OBJCLASS_COUNT; i++)
-        m_SceneTools.insert(make_pair((ObjClassID)i, (ESceneToolBase *)NULL));
+        m_SceneTools.insert(std::make_pair((ObjClassID)i, (ESceneToolBase *)NULL));
 
     // first init scene graph for objects
     // mapRenderObjects.init(MAX_VISUALS);
@@ -272,8 +272,8 @@ bool EScene::GetBox(Fbox &box, ObjectList &lst)
 
         if ((*it)->GetBox(bb))
         {
-            box.modify(bb.min);
-            box.modify(bb.max);
+            box.modify(bb.vMin);
+            box.modify(bb.vMax);
             bRes = true;
         }
     }

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <string>
 
 #define WAYPOINT_SIZE 1.5f
 #define WAYPOINT_RADIUS WAYPOINT_SIZE * .5f
@@ -29,11 +30,11 @@ CWayPoint::~CWayPoint()
 void CWayPoint::GetBox(Fbox &bb)
 {
     bb.set(m_vPosition, m_vPosition);
-    bb.max.y += WAYPOINT_SIZE;
-    bb.max.x += WAYPOINT_RADIUS;
-    bb.max.z += WAYPOINT_RADIUS;
-    bb.min.x -= WAYPOINT_RADIUS;
-    bb.min.z -= WAYPOINT_RADIUS;
+    bb.vMax.y += WAYPOINT_SIZE;
+    bb.vMax.x += WAYPOINT_RADIUS;
+    bb.vMax.z += WAYPOINT_RADIUS;
+    bb.vMin.x -= WAYPOINT_RADIUS;
+    bb.vMin.z -= WAYPOINT_RADIUS;
 }
 void CWayPoint::Render(LPCSTR parent_name, bool bParentSelect)
 {
@@ -484,7 +485,7 @@ CWayPoint *CWayObject::AppendWayPoint()
             }
             else
             {
-                temp.sprintf("%s_%02d", pref, i - 1);
+                temp = make_string("%s_%02d", pref, i - 1).c_str();
             }
             FindWPByName(temp.c_str(), result);
             if (!result)
@@ -559,11 +560,11 @@ bool CWayObject::GetBox(Fbox &box)
     for (WPVec::const_iterator it = m_WayPoints.begin(); it != m_WayPoints.end(); it++)
         box.modify((*it)->m_vPosition);
 
-    box.max.x += WAYPOINT_RADIUS;
-    box.max.z += WAYPOINT_RADIUS;
-    box.max.y += WAYPOINT_SIZE;
-    box.min.x -= WAYPOINT_RADIUS;
-    box.min.z -= WAYPOINT_RADIUS;
+    box.vMax.x += WAYPOINT_RADIUS;
+    box.vMax.z += WAYPOINT_RADIUS;
+    box.vMax.y += WAYPOINT_SIZE;
+    box.vMin.x -= WAYPOINT_RADIUS;
+    box.vMin.z -= WAYPOINT_RADIUS;
     return true;
 }
 
@@ -692,8 +693,8 @@ bool CWayObject::LoadLTX(CInifile &ini, LPCSTR sect_name)
     }
 
     CInifile::Sect &S = ini.r_section(sect_name);
-    CInifile::SectCIt cit = S.Data.begin();
-    CInifile::SectCIt cit_e = S.Data.end();
+    auto cit = S.Data.begin();
+    auto cit_e = S.Data.end();
     for (; cit != cit_e; ++cit)
     {
         if (cit->first.c_str() == strstr(cit->first.c_str(), "link_wp_"))
@@ -936,7 +937,7 @@ void CWayObject::FillProp(LPCSTR pref, PropItemVec &items)
                     PHelper().CreateFloat(items, PrepareKey(pref, "Way Point\\Links", *(*l_it)->way_point->m_Name), &(*l_it)->probability);
 
                 for (int k = 0; k < 32; k++)
-                    PHelper().CreateFlag32(items, PrepareKey(pref, "Way Point\\Flags", xr_string(k).c_str()), &W->m_Flags, 1 << k);
+                    PHelper().CreateFlag32(items, PrepareKey(pref, "Way Point\\Flags", std::to_string(k).c_str()), &W->m_Flags, 1 << k);
             }
         }
     }

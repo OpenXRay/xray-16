@@ -274,9 +274,9 @@ public:
         u32 P = 0xffffffff;
 
         u32 ix, iy, iz;
-        ix = floorf(float(V.x - VMmin.x) / VMscale.x * clpMX);
-        iy = floorf(float(V.y - VMmin.y) / VMscale.y * clpMY);
-        iz = floorf(float(V.z - VMmin.z) / VMscale.z * clpMZ);
+        ix = iFloor(float(V.x - VMmin.x) / VMscale.x * clpMX);
+        iy = iFloor(float(V.y - VMmin.y) / VMscale.y * clpMY);
+        iz = iFloor(float(V.z - VMmin.z) / VMscale.z * clpMZ);
         R_ASSERT(ix <= clpMX && iy <= clpMY && iz <= clpMZ);
 
         {
@@ -305,9 +305,9 @@ public:
             VM[ix][iy][iz].push_back(P);
 
             u32 ixE, iyE, izE;
-            ixE = floorf(float(V.x + VMeps.x - VMmin.x) / VMscale.x * clpMX);
-            iyE = floorf(float(V.y + VMeps.y - VMmin.y) / VMscale.y * clpMY);
-            izE = floorf(float(V.z + VMeps.z - VMmin.z) / VMscale.z * clpMZ);
+            ixE = iFloor(float(V.x + VMeps.x - VMmin.x) / VMscale.x * clpMX);
+            iyE = iFloor(float(V.y + VMeps.y - VMmin.y) / VMscale.y * clpMY);
+            izE = iFloor(float(V.z + VMeps.z - VMmin.z) / VMscale.z * clpMZ);
 
             R_ASSERT(ixE <= clpMX && iyE <= clpMY && izE <= clpMZ);
 
@@ -337,8 +337,8 @@ public:
 
     sCollector(const Fbox &bb)
     {
-        VMscale.set(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.max.z - bb.min.z);
-        VMmin.set(bb.min);
+        VMscale.set(bb.vMax.x - bb.vMin.x, bb.vMax.y - bb.vMin.y, bb.vMax.z - bb.vMin.z);
+        VMmin.set(bb.vMin);
         VMeps.set(VMscale.x / clpMX / 2, VMscale.y / clpMY / 2, VMscale.z / clpMZ / 2);
         VMeps.x = (VMeps.x < EPS_L) ? VMeps.x : EPS_L;
         VMeps.y = (VMeps.y < EPS_L) ? VMeps.y : EPS_L;

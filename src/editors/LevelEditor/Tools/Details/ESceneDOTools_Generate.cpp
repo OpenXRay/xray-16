@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <random>
 
 static Fvector down_vec = {0.f, -1.f, 0.f};
 static Fvector left_vec = {-1.f, 0.f, 0.f};
@@ -10,9 +11,9 @@ static CRandom DetailRandom(0x26111975);
 
 DetailSlot &EDetailManager::GetSlot(u32 sx, u32 sz)
 {
-    VERIFY(sx < dtH.size_x);
-    VERIFY(sz < dtH.size_z);
-    return dtSlots[sz * dtH.size_x + sx];
+    VERIFY(sx < dtH.x_size());
+    VERIFY(sz < dtH.z_size());
+    return dtSlots[sz * dtH.x_size() + sx];
 }
 
 void EDetailManager::FindClosestIndex(const Fcolor &C, SIndexDistVec &best)
@@ -150,10 +151,10 @@ bool EDetailManager::UpdateHeader()
         return false;
 
     // fill header
-    int mn_x = iFloor(m_BBox.min.x / DETAIL_SLOT_SIZE);
-    int mn_z = iFloor(m_BBox.min.z / DETAIL_SLOT_SIZE);
-    int mx_x = iFloor(m_BBox.max.x / DETAIL_SLOT_SIZE) + 1;
-    int mx_z = iFloor(m_BBox.max.z / DETAIL_SLOT_SIZE) + 1;
+    int mn_x = iFloor(m_BBox.vMin.x / DETAIL_SLOT_SIZE);
+    int mn_z = iFloor(m_BBox.vMin.z / DETAIL_SLOT_SIZE);
+    int mx_x = iFloor(m_BBox.vMax.x / DETAIL_SLOT_SIZE) + 1;
+    int mx_z = iFloor(m_BBox.vMax.z / DETAIL_SLOT_SIZE) + 1;
     dtH.offs_x = -mn_x;
     dtH.offs_z = -mn_z;
     dtH.size_x = mx_x - mn_x;
@@ -167,8 +168,8 @@ void EDetailManager::UpdateSlotBBox(int sx, int sz, DetailSlot &slot)
     Fbox bbox;
     Frect rect;
     GetSlotRect(rect, sx, sz);
-    bbox.min.set(rect.x1, m_BBox.min.y, rect.y1);
-    bbox.max.set(rect.x2, m_BBox.max.y, rect.y2);
+    bbox.vMin.set(rect.x1, m_BBox.vMin.y, rect.y1);
+    bbox.vMax.set(rect.x2, m_BBox.vMax.y, rect.y2);
 
     SBoxPickInfoVec pinf;
     ETOOLS::box_options(0);
@@ -176,10 +177,10 @@ void EDetailManager::UpdateSlotBBox(int sx, int sz, DetailSlot &slot)
     {
         bbox.grow(EPS_L_VAR);
         Fplane frustum_planes[4];
-        frustum_planes[0].build(bbox.min, left_vec);
-        frustum_planes[1].build(bbox.min, back_vec);
-        frustum_planes[2].build(bbox.max, right_vec);
-        frustum_planes[3].build(bbox.max, fwd_vec);
+        frustum_planes[0].build(bbox.vMin, left_vec);
+        frustum_planes[1].build(bbox.vMin, back_vec);
+        frustum_planes[2].build(bbox.vMax, right_vec);
+        frustum_planes[3].build(bbox.vMax, fwd_vec);
 
         CFrustum frustum;
         frustum.CreateFromPlanes(frustum_planes, 4);
@@ -229,21 +230,21 @@ bool EDetailManager::UpdateSlots()
 {
     // clear previous slots
     xr_free(dtSlots);
-    dtSlots = xr_alloc<DetailSlot>(dtH.size_x * dtH.size_z);
+    dtSlots = xr_alloc<DetailSlot>(dtH.x_size() * dtH.z_size());
 
-    SPBItem *pb = UI->ProgressStart(dtH.size_x * dtH.size_z, "Updating bounding boxes...");
-    for (u32 z = 0; z < dtH.size_z; z++)
+    SPBItem* pb = UI->ProgressStart(static_cast<float>(dtH.z_size() * dtH.z_size()), "Updating bounding boxes...");
+    for (u32 z = 0; z < dtH.z_size(); z++)
     {
-        for (u32 x = 0; x < dtH.size_x; x++)
+        for (u32 x = 0; x < dtH.x_size(); x++)
         {
-            DetailSlot *slot = dtSlots + z * dtH.size_x + x;
+            DetailSlot* slot = dtSlots + z * dtH.x_size() + x;
             UpdateSlotBBox(x, z, *slot);
             pb->Inc();
         }
     }
     UI->ProgressEnd(pb);
 
-    m_Selected.resize(dtH.size_x * dtH.size_z);
+    m_Selected.resize(dtH.x_size() * dtH.z_size());
 
     return true;
 }
@@ -264,7 +265,7 @@ void EDetailManager::GetSlotTCRect(Irect &rect, int sx, int sz)
     GetSlotRect(R, sx, sz);
     rect.x1 = m_Base.GetPixelUFromX(R.x1, m_BBox);
     rect.x2 = m_Base.GetPixelUFromX(R.x2, m_BBox);
-    rect.y2 = m_Base.GetPixelVFromZ(R.y1, m_BBox); // v - координата флипнута
+    rect.y2 = m_Base.GetPixelVFromZ(R.y1, m_BBox); // v - РєРѕРѕСЂРґРёРЅР°С‚Р° С„Р»РёРїРЅСѓС‚Р°
     rect.y1 = m_Base.GetPixelVFromZ(R.y2, m_BBox);
 }
 
@@ -323,7 +324,7 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
 {
     srand(time(NULL));
 
-    DetailSlot *slot = dtSlots + z * dtH.size_x + x;
+    DetailSlot* slot = dtSlots + z * dtH.x_size() + x;
     Irect R;
     GetSlotTCRect(R, x, z);
     // ELog.Msg(mtInformation,"TC [%d,%d]-[%d,%d]",R.x1,R.y1,R.x2,R.y2);
@@ -345,7 +346,7 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
         }
     }
     std::sort(best.begin(), best.end(), CompareWeightFunc);
-    // пройдем по 4 частям слота и определим плотность заполнения (учесть переворот V)
+    // РїСЂРѕР№РґРµРј РїРѕ 4 С‡Р°СЃС‚СЏРј СЃР»РѕС‚Р° Рё РѕРїСЂРµРґРµР»РёРј РїР»РѕС‚РЅРѕСЃС‚СЊ Р·Р°РїРѕР»РЅРµРЅРёСЏ (СѓС‡РµСЃС‚СЊ РїРµСЂРµРІРѕСЂРѕС‚ V)
     Irect P[4];
     float dx = float(R.x2 - R.x1) / 2.f;
     float dy = float(R.y2 - R.y1) / 2.f;
@@ -400,7 +401,7 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
     u32 o_cnt = 0;
     for (u32 i = 0; i < best.size(); i++)
         o_cnt += m_ColorIndices[best[i].index].size();
-    // равномерно заполняем пустые слоты
+    // СЂР°РІРЅРѕРјРµСЂРЅРѕ Р·Р°РїРѕР»РЅСЏРµРј РїСѓСЃС‚С‹Рµ СЃР»РѕС‚С‹
     if (o_cnt > best.size())
     {
         while (best.size() < 4)
@@ -418,7 +419,7 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
         }
     }
 
-    // заполним палитру и установим Random'ы
+    // Р·Р°РїРѕР»РЅРёРј РїР°Р»РёС‚СЂСѓ Рё СѓСЃС‚Р°РЅРѕРІРёРј Random'С‹
     //	Msg("Slot: %d %d",x,z);
     for (u32 k = 0; k < best.size(); k++)
     {
@@ -429,8 +430,11 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
         elem.resize(CI->second.size());
         for (U8It b_it = elem.begin(); b_it != elem.end(); b_it++)
             *b_it = u8(b_it - elem.begin());
-        //        best_rand A(DetailRandom);
-        std::random_shuffle(elem.begin(), elem.end()); //,A);
+
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(elem.begin(), elem.end(), g);
+
         for (auto b_it = elem.begin(); b_it != elem.end(); b_it++)
         {
             bool bNotFound = true;
@@ -455,7 +459,7 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
         slot->palette[k].a3 = (u16)iFloor(best[k].dens[3] * f * 15.f + .5f);
     }
 
-    // определим ID незаполненных слотов как пустышки
+    // РѕРїСЂРµРґРµР»РёРј ID РЅРµР·Р°РїРѕР»РЅРµРЅРЅС‹С… СЃР»РѕС‚РѕРІ РєР°Рє РїСѓСЃС‚С‹С€РєРё
     for (u32 k = best.size(); k < 4; k++)
         slot->w_id(k, DetailSlot::ID_Empty);
     return true;
@@ -475,11 +479,11 @@ bool EDetailManager::UpdateObjects(bool bUpdateTex, bool bUpdateSelectedOnly)
         return false;
     }
     // update objects
-    SPBItem *pb = UI->ProgressStart(dtH.size_x * dtH.size_z, "Updating objects...");
-    for (u32 z = 0; z < dtH.size_z; z++)
-        for (u32 x = 0; x < dtH.size_x; x++)
+    SPBItem* pb = UI->ProgressStart(static_cast<float>(dtH.x_size() * dtH.z_size()), "Updating objects...");
+    for (u32 z = 0; z < dtH.z_size(); z++)
+        for (u32 x = 0; x < dtH.x_size(); x++)
         {
-            if (!bUpdateSelectedOnly || (bUpdateSelectedOnly && m_Selected[z * dtH.size_x + x]))
+            if (!bUpdateSelectedOnly || (bUpdateSelectedOnly && m_Selected[z * dtH.x_size() + x]))
                 UpdateSlotObjects(x, z);
             pb->Inc();
         }
@@ -537,7 +541,7 @@ EDetail *EDetailManager::AppendDO(LPCSTR name, bool bTestUnique)
 
 void EDetailManager::InvalidateSlots()
 {
-    int slot_cnt = dtH.size_x * dtH.size_z;
+    int slot_cnt = dtH.x_size() * dtH.z_size();
     for (int k = 0; k < slot_cnt; k++)
     {
         DetailSlot *it = &dtSlots[k];

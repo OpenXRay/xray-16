@@ -91,7 +91,7 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams *F)
     UI->SetStatus("Export breakable objects...");
     // collect verts&&faces
     {
-        SPBItem *pb = UI->ProgressStart(m_Objects.size(), "Prepare geometry...");
+        SPBItem *pb = UI->ProgressStart(static_cast<float>(m_Objects.size()), "Prepare geometry...");
         for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); it++)
         {
             pb->Inc();
@@ -117,7 +117,7 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams *F)
     if (bResult)
     {
         SBPartVec &parts = extractor->GetParts();
-        SPBItem *pb = UI->ProgressStart(parts.size(), "Export Parts...");
+        SPBItem *pb = UI->ProgressStart(static_cast<float>(parts.size()), "Export Parts...");
         for (SBPartVecIt p_it = parts.begin(); p_it != parts.end(); p_it++)
         {
             pb->Inc();
@@ -125,7 +125,7 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams *F)
             if (P->Valid())
             {
                 // export visual
-                xr_string sn = make_string("meshes\\brkbl#%d.ogf", (p_it - parts.begin()));
+                xr_string sn = make_string("meshes\\brkbl#%d.ogf", (p_it - parts.begin())).c_str();
                 xr_string fn = Scene->LevelPath() + sn.c_str();
                 IWriter *W = FS.w_open(fn.c_str());
                 R_ASSERT(W);
@@ -139,7 +139,7 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams *F)
                 // export spawn object
                 {
                     xr_string entity_ref = "breakable_object";
-                    ISE_Abstract *m_Data = XrSE_Factory::create_entity(entity_ref.c_str());
+                    IServerEntity *m_Data = create_entity(entity_ref.c_str());
                     VERIFY(m_Data);
                     CSE_Visual *m_Visual = m_Data->visual();
                     VERIFY(m_Visual);
@@ -166,7 +166,7 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams *F)
                     F->spawn.stream.open_chunk(F->spawn.chunk++);
                     F->spawn.stream.w(Packet.B.data, Packet.B.count);
                     F->spawn.stream.close_chunk();
-                    XrSE_Factory::destroy_entity(m_Data);
+                    destroy_entity(m_Data);
                 }
             }
             else
@@ -220,7 +220,7 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams *F)
     UI->SetStatus("Export climable objects...");
     // collect verts&&faces
     {
-        SPBItem *pb = UI->ProgressStart(m_Objects.size(), "Prepare geometry...");
+        SPBItem *pb = UI->ProgressStart(static_cast<float>(m_Objects.size()), "Prepare geometry...");
         for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); it++)
         {
             pb->Inc();
@@ -248,7 +248,7 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams *F)
     if (bResult)
     {
         SBPartVec &parts = extractor->GetParts();
-        SPBItem *pb = UI->ProgressStart(parts.size(), "Export Parts...");
+        SPBItem *pb = UI->ProgressStart(static_cast<float>(parts.size()), "Export Parts...");
         for (SBPartVecIt p_it = parts.begin(); p_it != parts.end(); p_it++)
         {
             pb->Inc();
@@ -256,7 +256,7 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams *F)
             if (P->Valid())
             {
                 // export visual
-                xr_string sn = make_string("clmbl#%d", (p_it - parts.begin()));
+                xr_string sn = make_string("clmbl#%d", (p_it - parts.begin())).c_str();
 
                 Fvector local_normal = {0, 0, 0};
 
@@ -274,9 +274,9 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams *F)
                 // export spawn object
                 {
                     xr_string entity_ref = "climable_object";
-                    ISE_Abstract *m_Data = XrSE_Factory::create_entity(entity_ref.c_str());
+                    IServerEntity *m_Data = create_entity(entity_ref.c_str());
                     VERIFY(m_Data);
-                    ISE_Shape *m_Shape = m_Data->shape();
+                    IServerEntityShape* m_Shape = m_Data->shape();
                     VERIFY(m_Shape);
                     //					CSE_Visual* m_Visual		= m_Data->visual();	VERIFY(m_Visual);
                     // set params
@@ -285,9 +285,9 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams *F)
                     // set shape
                     CShapeData::shape_def shape;
                     shape.type = CShapeData::cfBox;
-                    shape.data.box.scale((P->m_BBox.max.x - P->m_BBox.min.x) * 0.5f,
-                                         (P->m_BBox.max.y - P->m_BBox.min.y) * 0.5f,
-                                         (P->m_BBox.max.z - P->m_BBox.min.z) * 0.5f);
+                    shape.data.box.scale((P->m_BBox.vMax.x - P->m_BBox.vMin.x) * 0.5f,
+                                         (P->m_BBox.vMax.y - P->m_BBox.vMin.y) * 0.5f,
+                                         (P->m_BBox.vMax.z - P->m_BBox.vMin.z) * 0.5f);
                     m_Shape->assign_shapes(&shape, 1);
                     // orientate object
                     if (!OrientToNorm(local_normal, P->m_OBB.m_rotate, P->m_OBB.m_halfsize))
@@ -298,7 +298,7 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams *F)
                     {
                         Fmatrix M;
                         M.set(P->m_OBB.m_rotate.i, P->m_OBB.m_rotate.j, P->m_OBB.m_rotate.k, P->m_OBB.m_translate);
-                        M.getXYZ(P->m_RefRotate); // íå i ïîòîìó ÷òî â äâèæêå òàê
+                        M.getXYZ(P->m_RefRotate); // Ð½Ðµ i Ð¿Ð¾Ñ‚Ð¾Ð¼Ñƒ Ñ‡Ñ‚Ð¾ Ð² Ð´Ð²Ð¸Ð¶ÐºÐµ Ñ‚Ð°Ðº
                         m_Data->position().set(P->m_RefOffset);
                         m_Data->angle().set(P->m_RefRotate);
 
@@ -317,7 +317,7 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams *F)
                             Tools->m_DebugDraw.AppendLine(P->m_RefOffset, Fvector().mad(P->m_RefOffset, local_normal, 1.f));
                         }
                     }
-                    XrSE_Factory::destroy_entity(m_Data);
+                    destroy_entity(m_Data);
                 }
             }
             else

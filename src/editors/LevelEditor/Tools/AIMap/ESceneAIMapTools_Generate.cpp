@@ -315,8 +315,8 @@ void ESceneAIMapTool::HashRect(const Fvector &v, float radius, Irect &result)
     Fvector VMmin, VMscale, VMeps, scale;
 
     Fbox &bb = m_AIBBox;
-    VMscale.set(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.max.z - bb.min.z);
-    VMmin.set(bb.min);
+    VMscale.set(bb.vMax.x - bb.vMin.x, bb.vMax.y - bb.vMin.y, bb.vMax.z - bb.vMin.z);
+    VMmin.set(bb.vMin);
     VMeps.set(float(VMscale.x / HDIM_X / 2.f), float(0), float(VMscale.z / HDIM_Z / 2.f));
     VMeps.x = (VMeps.x < EPS_L) ? VMeps.x : EPS_L;
     VMeps.y = (VMeps.y < EPS_L) ? VMeps.y : EPS_L;
@@ -346,8 +346,8 @@ AINodeVec *ESceneAIMapTool::HashMap(Fvector &V)
     Fvector VMmin, VMscale, VMeps, scale;
 
     Fbox &bb = m_AIBBox;
-    VMscale.set(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.max.z - bb.min.z);
-    VMmin.set(bb.min);
+    VMscale.set(bb.vMax.x - bb.vMin.x, bb.vMax.y - bb.vMin.y, bb.vMax.z - bb.vMin.z);
+    VMmin.set(bb.vMin);
     VMeps.set(float(VMscale.x / HDIM_X / 2.f), float(0), float(VMscale.z / HDIM_Z / 2.f));
     VMeps.x = (VMeps.x < EPS_L) ? VMeps.x : EPS_L;
     VMeps.y = (VMeps.y < EPS_L) ? VMeps.y : EPS_L;
@@ -481,7 +481,7 @@ int ESceneAIMapTool::BuildNodes(const Fvector &pos, int sz, bool bIC)
         return 0;
 
     // Estimate nodes
-    float estimated_nodes = (2 * sz - 1) * (2 * sz - 1);
+    float estimated_nodes = static_cast<float>((2 * sz - 1) * (2 * sz - 1));
 
     SPBItem *pb = 0;
     if (estimated_nodes > 1024)
@@ -727,7 +727,7 @@ bool ESceneAIMapTool::GenerateMap(bool bFromSelectedOnly)
                 }
             }
 
-            SPBItem *pb = UI->ProgressStart(mesh_cnt, "Prepare collision model...");
+            SPBItem *pb = UI->ProgressStart(static_cast<float>(mesh_cnt), "Prepare collision model...");
 
             CDB::Collector *CL = ETOOLS::create_collector();
             Fvector verts[3];
@@ -1014,7 +1014,7 @@ void ESceneAIMapTool::MakeLinks(u8 side_flag, EMode mode, bool bIgnoreConstraint
 
 void ESceneAIMapTool::ResetNodes()
 {
-    SPBItem *pb = UI->ProgressStart(m_Nodes.size(), "Smoothing nodes...");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(m_Nodes.size()), "Smoothing nodes...");
 
     int n_cnt = 0;
 
@@ -1040,7 +1040,7 @@ void ESceneAIMapTool::ResetNodes()
     }
 void ESceneAIMapTool::SmoothNodes()
 {
-    SPBItem *pb = UI->ProgressStart(m_Nodes.size(), "Smoothing nodes...");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(m_Nodes.size()), "Smoothing nodes...");
 
     AINodeVec smoothed;
     smoothed.reserve(m_Nodes.size());
@@ -1241,10 +1241,11 @@ void ESceneAIMapTool::SmoothNodes()
                 vNorm.invert();
             // create _new node
             SAINode *NEW = xr_new<SAINode>(N);
-            NEW->n1 = (SAINode *)(N.n1 ? N.n1->idx : InvalidNode);
-            NEW->n2 = (SAINode *)(N.n2 ? N.n2->idx : InvalidNode);
-            NEW->n3 = (SAINode *)(N.n3 ? N.n3->idx : InvalidNode);
-            NEW->n4 = (SAINode *)(N.n4 ? N.n4->idx : InvalidNode);
+#pragma TODO("TSMP: seems wrong to cast 32 bit value to 64 bit pointer (on x64)")
+            NEW->n1 = (SAINode*)(size_t)(N.n1 ? N.n1->idx : InvalidNode);
+            NEW->n2 = (SAINode*)(size_t)(N.n2 ? N.n2->idx : InvalidNode);
+            NEW->n3 = (SAINode*)(size_t)(N.n3 ? N.n3->idx : InvalidNode);
+            NEW->n4 = (SAINode*)(size_t)(N.n4 ? N.n4->idx : InvalidNode);
             NEW->Plane.build(vOffs, vNorm);
             D.set(0, 1, 0);
             N.Plane.intersectRayPoint(N.Pos, D, NEW->Pos); // "project" position
@@ -1254,17 +1255,18 @@ void ESceneAIMapTool::SmoothNodes()
         {
             // create _new node
             SAINode *NEW = xr_new<SAINode>(N);
-            NEW->n1 = (SAINode *)(N.n1 ? N.n1->idx : InvalidNode);
-            NEW->n2 = (SAINode *)(N.n2 ? N.n2->idx : InvalidNode);
-            NEW->n3 = (SAINode *)(N.n3 ? N.n3->idx : InvalidNode);
-            NEW->n4 = (SAINode *)(N.n4 ? N.n4->idx : InvalidNode);
+#pragma TODO("TSMP: seems wrong to cast 32 bit value to 64 bit pointer (on x64)")
+            NEW->n1 = (SAINode*)(size_t)(N.n1 ? N.n1->idx : InvalidNode);
+            NEW->n2 = (SAINode*)(size_t)(N.n2 ? N.n2->idx : InvalidNode);
+            NEW->n3 = (SAINode*)(size_t)(N.n3 ? N.n3->idx : InvalidNode);
+            NEW->n4 = (SAINode*)(size_t)(N.n4 ? N.n4->idx : InvalidNode);
             smoothed.push_back(NEW);
         }
 
         int k = it - m_Nodes.begin();
         if (k % 128 == 0)
         {
-            pb->Update(k);
+            pb->Update(static_cast<float>(k));
             if (UI->NeedAbort())
                 break;
         }

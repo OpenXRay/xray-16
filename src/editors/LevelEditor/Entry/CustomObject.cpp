@@ -17,7 +17,7 @@ enum class SocFlags : u32
 	flMotion = (1 << 3),
 
 	flAutoKey = (1 << 30),
-	flCameraView = (1 << 31),
+	flCameraView = (1ul << 31),
 };
 
 CCustomObject::CCustomObject(LPVOID data, LPCSTR name)
@@ -301,8 +301,8 @@ bool CCustomObject::GetSummaryInfo(SSceneSummary *inf)
 
 	if (GetBox(bb))
 	{
-		inf->bbox.modify(bb.min);
-		inf->bbox.modify(bb.max);
+		inf->bbox.modify(bb.vMin);
+		inf->bbox.modify(bb.vMax);
 	}
 
 	return true;

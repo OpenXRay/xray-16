@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <random>
 
 UISpawnTool::UISpawnTool()
 {
@@ -145,9 +146,14 @@ void UISpawnTool::MultiSelByRefObject(bool clear_prev)
                 }
             }
         }
+        
         std::sort(sellist.begin(), sellist.end());
         sellist.erase(std::unique(sellist.begin(), sellist.end()), sellist.end());
-        std::random_shuffle(sellist.begin(), sellist.end());
+
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(sellist.begin(), sellist.end(), g);
+
         int max_k = iFloor(float(sellist.size()) / 100.f * float(m_selPercent) + 0.5f);
         int k = 0;
         for (LPU32It o_it = sellist.begin(); k < max_k; o_it++, k++)
@@ -161,10 +167,10 @@ void UISpawnTool::MultiSelByRefObject(bool clear_prev)
 void UISpawnTool::RefreshList()
 {
     ListItemsVec items;
-    LHelper().CreateItem(items, RPOINT_CHOOSE_NAME, 0, 0, RPOINT_CHOOSE_NAME);
-    LHelper().CreateItem(items, ENVMOD_CHOOSE_NAME, 0, 0, ENVMOD_CHOOSE_NAME);
+    LHelper().CreateItem(items, RPOINT_CHOOSE_NAME, 0, 0, const_cast<char*>(RPOINT_CHOOSE_NAME));
+    LHelper().CreateItem(items, ENVMOD_CHOOSE_NAME, 0, 0, const_cast<char*>(ENVMOD_CHOOSE_NAME));
     CInifile::Root &data = ((CInifile *)pSettings)->sections();
-    for (CInifile::RootIt it = data.begin(); it != data.end(); it++)
+    for (auto it = data.begin(); it != data.end(); it++)
     {
         LPCSTR val;
         if ((*it)->line_exist("$spawn", &val))

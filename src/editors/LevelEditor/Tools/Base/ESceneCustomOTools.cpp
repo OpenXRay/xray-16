@@ -192,7 +192,7 @@ int ESceneCustomOTool::SelectionCount(bool testflag)
     int count = 0;
 
     for (ObjectIt _F = m_Objects.begin(); _F != m_Objects.end(); _F++)
-        if ((*_F)->Visible() && ((*_F)->Selected() == testflag))
+        if ((*_F)->Visible() && (!!(*_F)->Selected() == testflag))
             count++;
 
     return count;
@@ -204,7 +204,7 @@ void ESceneCustomOTool::ShowObjects(bool flag, bool bAllowSelectionFlag, bool bS
     {
         if (bAllowSelectionFlag)
         {
-            if ((*_F)->Selected() == bSelFlag)
+            if (!!(*_F)->Selected() == bSelFlag)
             {
                 (*_F)->Show(flag);
             }

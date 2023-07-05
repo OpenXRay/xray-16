@@ -428,7 +428,7 @@ void CPortal::Simplify()
         mView.transform_tiny(m_SimplifyVertices[k], p);
         center.add(m_SimplifyVertices[k]);
     }
-    center.div(vertices.size());
+    center.div(static_cast<float>(vertices.size()));
 
     norm.set(0, 0, 0);
     for (u32 k = 0; k < m_SimplifyVertices.size() - 1; k++)
@@ -436,7 +436,7 @@ void CPortal::Simplify()
         temp.mknormal(center, m_SimplifyVertices[k], m_SimplifyVertices[k + 1]);
         norm.add(temp);
     }
-    norm.div(m_SimplifyVertices.size());
+    norm.div(static_cast<float>(m_SimplifyVertices.size()));
     float m = norm.magnitude();
     VERIFY(fabsf(m) > EPS);
     norm.div(m);

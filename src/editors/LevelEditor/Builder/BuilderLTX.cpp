@@ -63,7 +63,7 @@ BOOL SceneBuilder::BuildLTX()
         }
 
         F->w_string("[level_map]");
-        sprintf(buff, "bound_rect = %f,%f,%f,%f", bb.min.x, bb.min.z, bb.max.x, bb.max.z);
+        sprintf(buff, "bound_rect = %f,%f,%f,%f", bb.vMin.x, bb.vMin.z, bb.vMax.x, bb.vMax.z);
         F->w_string(buff);
         sprintf(buff, "texture = map\\map_%s", Scene->m_LevelOp.m_FNLevelPath.c_str());
         F->w_string(buff);

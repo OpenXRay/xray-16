@@ -1,13 +1,5 @@
 #include "stdafx.h"
 
-#ifdef USE_ARENA_ALLOCATOR
-static const u32 s_arena_size = 32 * 1024 * 1024;
-char *s_fake_array = nullptr;
-doug_lea_allocator g_render_lua_allocator(s_fake_array, s_arena_size, "render:lua");
-#else  // #ifdef USE_ARENA_ALLOCATOR
-doug_lea_allocator g_render_lua_allocator(0, 0, "render:lua");
-#endif // #ifdef USE_ARENA_ALLOCATOR
-
 #define RENDER_OBJECT(P, B)                                                                                                                                                                                \
     {                                                                                                                                                                                                      \
         try                                                                                                                                                                                                \
@@ -71,9 +63,8 @@ void EScene::RenderSky(const Fmatrix &camera)
         }
     */
 }
-//------------------------------------------------------------------------------
 
-struct tools_rp_pred : public std::binary_function<ESceneToolBase *, ESceneToolBase *, bool>
+struct tools_rp_pred
 {
     IC bool operator()(ESceneToolBase *x, ESceneToolBase *y) const
     {

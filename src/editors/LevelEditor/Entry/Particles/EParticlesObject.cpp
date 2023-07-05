@@ -31,12 +31,12 @@ EParticlesObject::~EParticlesObject()
 bool EParticlesObject::GetBox(Fbox &box)
 {
     box.set(GetPosition(), GetPosition());
-    box.min.x -= PSOBJECT_SIZE;
-    box.min.y -= PSOBJECT_SIZE;
-    box.min.z -= PSOBJECT_SIZE;
-    box.max.x += PSOBJECT_SIZE;
-    box.max.y += PSOBJECT_SIZE;
-    box.max.z += PSOBJECT_SIZE;
+    box.vMin.x -= PSOBJECT_SIZE;
+    box.vMin.y -= PSOBJECT_SIZE;
+    box.vMin.z -= PSOBJECT_SIZE;
+    box.vMax.x += PSOBJECT_SIZE;
+    box.vMax.y += PSOBJECT_SIZE;
+    box.vMax.z += PSOBJECT_SIZE;
     return true;
 }
 

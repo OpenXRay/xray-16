@@ -23,6 +23,7 @@ typedef ObjectMap::iterator ObjectPairIt;
 
 #else
 const int dm_max_decompress = 7;
+#include "Common/RDevice.h"
 #endif
 //const int dm_size = 24;
 const int dm_cache1_count = 4;
@@ -50,7 +51,13 @@ extern float dm_current_fade;// = float(2*dm_current_size)-.5f;
 extern float ps_current_detail_density;
 extern float ps_current_detail_height;
 
-class ECORE_API CDetailManager
+#ifdef _EDITOR
+#define DET_MANAGER_API
+#else
+#define DET_MANAGER_API ECORE_API
+#endif
+
+class DET_MANAGER_API CDetailManager
 {
 public:
     struct SlotItem
@@ -170,6 +177,12 @@ public:
     virtual ObjectList* GetSnapList() = 0;
 #endif
 
+    // Software processor
+    ref_geom soft_Geom;
+    void soft_Load();
+    void soft_Unload();
+    void soft_Render();
+
     // Hardware processor
     ref_geom hw_Geom;
     size_t hw_BatchSize;
@@ -224,7 +237,7 @@ public:
     void MT_CALC();
     ICF void MT_SYNC()
     {
-        if (m_frame_calc == Device.dwFrame)
+        if (m_frame_calc == RDEVICE.dwFrame)
             return;
 
         MT_CALC();

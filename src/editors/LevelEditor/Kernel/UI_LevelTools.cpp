@@ -150,7 +150,7 @@ void CLevelTool::RealSetAction(ETAction act)
 
 void CLevelTool::SetAction(ETAction act)
 {
-    // если мышь захвачена - изменим action после того как она освободится
+    // РµСЃР»Рё РјС‹С€СЊ Р·Р°С…РІР°С‡РµРЅР° - РёР·РјРµРЅРёРј action РїРѕСЃР»Рµ С‚РѕРіРѕ РєР°Рє РѕРЅР° РѕСЃРІРѕР±РѕРґРёС‚СЃСЏ
     if (UI->IsMouseCaptured() || UI->IsMouseInUse() || !false)
     {
         m_Flags.set(flChangeAction, TRUE);
@@ -196,7 +196,7 @@ void CLevelTool::ResetSubTarget()
 
 void CLevelTool::SetTarget(ObjClassID tgt, int sub_tgt)
 {
-    // если мышь захвачена - изменим target после того как она освободится
+    // РµСЃР»Рё РјС‹С€СЊ Р·Р°С…РІР°С‡РµРЅР° - РёР·РјРµРЅРёРј target РїРѕСЃР»Рµ С‚РѕРіРѕ РєР°Рє РѕРЅР° РѕСЃРІРѕР±РѕРґРёС‚СЃСЏ
     if (UI->IsMouseCaptured() || UI->IsMouseInUse() || !false)
     {
         m_Flags.set(flChangeTarget, TRUE);
@@ -310,9 +310,8 @@ void CLevelTool::GetCurrentFog(u32 &fog_color, float &s_fog, float &e_fog)
 
 LPCSTR CLevelTool::GetInfo()
 {
-    static xr_string sel;
     int cnt = Scene->SelectionCount(true, CurrentClassID());
-    return sel.sprintf(" Sel: %d", cnt).c_str();
+    return make_string(" Sel: %d", cnt).c_str();
 }
 
 void CLevelTool::OnFrame()
@@ -323,10 +322,10 @@ void CLevelTool::OnFrame()
     {
         if (true /*!UI->IsMouseCaptured()*/)
         {
-            // если нужно изменить target выполняем после того как мышь освободится
+            // РµСЃР»Рё РЅСѓР¶РЅРѕ РёР·РјРµРЅРёС‚СЊ target РІС‹РїРѕР»РЅСЏРµРј РїРѕСЃР»Рµ С‚РѕРіРѕ РєР°Рє РјС‹С€СЊ РѕСЃРІРѕР±РѕРґРёС‚СЃСЏ
             if (m_Flags.is(flChangeTarget))
                 RealSetTarget(iNeedTarget, iNeedSubTarget, false);
-            // если нужно изменить action выполняем после того как мышь освободится
+            // РµСЃР»Рё РЅСѓР¶РЅРѕ РёР·РјРµРЅРёС‚СЊ action РІС‹РїРѕР»РЅСЏРµРј РїРѕСЃР»Рµ С‚РѕРіРѕ РєР°Рє РјС‹С€СЊ РѕСЃРІРѕР±РѕРґРёС‚СЃСЏ
             if (m_Flags.is(flChangeAction))
                 RealSetAction(ETAction(iNeedAction));
         }
@@ -447,7 +446,7 @@ bool CLevelTool::GetSelectionPosition(Fmatrix &result)
         const_cast<CCustomObject *>(object)->GetBox(BB);
 
         BB.getcenter(center);
-        center.y = BB.max.y;
+        center.y = BB.vMax.y;
 
         Fvector2 pt_ss;
         pt_ss.set(10000, -10000);

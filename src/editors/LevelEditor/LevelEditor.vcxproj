@@ -11,6 +11,9 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="..\..\xray_project_configuration.props" />
   </ImportGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -22,19 +25,19 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(xrExternals)libvorbis\include;$(xrExternals)libogg\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_EDITOR;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\XrEngine\ObjectAnimator.cpp" />
-    <ClCompile Include="..\..\XrRender\Private\DetailManager.cpp" />
-    <ClCompile Include="..\..\XrRender\Private\DetailManager_CACHE.cpp" />
-    <ClCompile Include="..\..\XrRender\Private\DetailManager_Decompress.cpp" />
-    <ClCompile Include="..\..\XrRender\Private\DetailManager_soft.cpp" />
-    <ClCompile Include="..\..\XrRender\Private\DetailManager_VS.cpp" />
-    <ClCompile Include="..\..\XrRender\Private\stats_manager.cpp" />
+    <ClCompile Include="..\..\Layers\xrRenderDX9\BufferUtils.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager_CACHE.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager_Decompress.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager_soft.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\DetailManager_VS.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\stats_manager.cpp" />
     <ClCompile Include="..\..\xrServerEntities\gametype_chooser.cpp" />
-    <ClCompile Include="..\..\xrServerEntities\LevelGameDef.cpp" />
     <ClCompile Include="Builder\Builder.cpp" />
     <ClCompile Include="Builder\BuilderCore.cpp" />
     <ClCompile Include="Builder\BuilderGame.cpp" />
@@ -45,7 +48,6 @@
     <ClCompile Include="Entry\CustomObject.cpp" />
     <ClCompile Include="Entry\CustomObjectAnimation.cpp" />
     <ClCompile Include="Entry\CustomObjectLE.cpp" />
-    <ClCompile Include="Entry\EditObjectExportLWO.cpp" />
     <ClCompile Include="Entry\Glow\Glow.cpp" />
     <ClCompile Include="Entry\Group\GroupObject.cpp" />
     <ClCompile Include="Entry\Group\GroupObjectUtils.cpp" />
@@ -79,6 +81,7 @@
     <ClCompile Include="Scene\SceneUndo.cpp" />
     <ClCompile Include="Scene\SceneUtil.cpp" />
     <ClCompile Include="Scene\Scene_Tools.cpp" />
+    <ClCompile Include="ServerEntities\LevelGameDef.cpp" />
     <ClCompile Include="Tools\AIMap\ESceneAIMapControls.cpp" />
     <ClCompile Include="Tools\AIMap\ESceneAIMapTools.cpp" />
     <ClCompile Include="Tools\AIMap\ESceneAIMapTools_Controls.cpp" />
@@ -157,7 +160,6 @@
     <ClCompile Include="UI\UITopBarForm.cpp" />
     <ClCompile Include="Utils\Cursor3D.cpp" />
     <ClCompile Include="Utils\Custom2DProjector.cpp" />
-    <ClCompile Include="Utils\FS2.cpp" />
     <ClCompile Include="Utils\GeometryPartExtractor.cpp" />
     <ClCompile Include="Utils\iniStreamImpl.cpp" />
     <ClCompile Include="Utils\LevelPreferences.cpp" />
@@ -165,7 +167,9 @@
     <ClCompile Include="Utils\SoundManager_LE.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\XrRender\Private\DetailManager.h" />
+    <ClInclude Include="..\..\Common\LevelGameDef.h" />
+    <ClInclude Include="..\..\Layers\xrRender\DetailManager.h" />
+    <ClInclude Include="..\..\Layers\xrRender\stats_manager.h" />
     <ClInclude Include="Builder\Builder.h" />
     <ClInclude Include="Entry\CustomObject.h" />
     <ClInclude Include="Entry\Glow\Glow.h" />
@@ -247,17 +251,21 @@
     <ClInclude Include="UI\UITopBarForm_ButtonList.h" />
     <ClInclude Include="Utils\Cursor3D.h" />
     <ClInclude Include="Utils\Custom2DProjector.h" />
-    <ClInclude Include="Utils\FS2.h" />
     <ClInclude Include="Utils\GeometryPartExtractor.h" />
     <ClInclude Include="Utils\iniStreamImpl.h" />
     <ClInclude Include="Utils\LevelPreferences.h" />
-    <ClInclude Include="Utils\lwchunks.h" />
     <ClInclude Include="Utils\portalutils.h" />
     <ClInclude Include="Utils\SoundManager_LE.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Layers\xrAPI\xrAPI.vcxproj">
+      <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\utils\ETools\ETools.vcxproj">
       <Project>{65cbb9d0-fbc6-41a4-8316-f5e9b5d7fb33}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\utils\xrMiscMath\xrMiscMath.vcxproj">
+      <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\utils\xrSE_Factory\xrSE_Factory.vcxproj">
       <Project>{3ad26fd3-4f52-4e22-a4cf-ad4c49e74c61}</Project>
@@ -293,6 +301,10 @@
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets" Condition="Exists('..\..\packages\Microsoft.DXSDK.D3DX.9.29.952.8\build\native\Microsoft.DXSDK.D3DX.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" />
+  </ImportGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources\LevelEditor.rc" />
   </ItemGroup>

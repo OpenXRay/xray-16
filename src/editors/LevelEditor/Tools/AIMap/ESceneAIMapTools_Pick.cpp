@@ -14,8 +14,8 @@ SAINode *ESceneAIMapTool::PickNode(const Fvector &start, const Fvector &dir, flo
             u32 mask = 0xffff;
             Fbox bb;
             bb.set(N.Pos, N.Pos);
-            bb.min.sub(m_Params.fPatchSize * 0.35f);
-            bb.max.add(m_Params.fPatchSize * 0.35f);
+            bb.vMin.sub(m_Params.fPatchSize * 0.35f);
+            bb.vMax.add(m_Params.fPatchSize * 0.35f);
             if (frustum.testSAABB(N.Pos, m_Params.fPatchSize, bb.data(), mask))
             {
                 Fvector dest;
@@ -95,8 +95,8 @@ int ESceneAIMapTool::FrustumSelect(int flag, const CFrustum &frustum)
                 u32 mask = 0xffff;
                 Fbox bb;
                 bb.set(N.Pos, N.Pos);
-                bb.min.sub(m_Params.fPatchSize * 0.35f);
-                bb.max.add(m_Params.fPatchSize * 0.35f);
+                bb.vMin.sub(m_Params.fPatchSize * 0.35f);
+                bb.vMax.add(m_Params.fPatchSize * 0.35f);
                 if (frustum.testSAABB(N.Pos, m_Params.fPatchSize, bb.data(), mask))
                 {
                     if (-1 == flag)

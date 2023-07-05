@@ -854,8 +854,8 @@ bool EScene::LoadLTX(LPCSTR map_name, bool bUndo)
         if (ini.section_exist("snap_objects"))
         {
             CInifile::Sect &S = ini.r_section("snap_objects");
-            CInifile::SectCIt Si = S.Data.begin();
-            CInifile::SectCIt Se = S.Data.end();
+            auto Si = S.Data.begin();
+            auto Se = S.Data.end();
             for (; Si != Se; ++Si)
             {
                 CCustomObject *O = FindObjectByName(Si->first.c_str(), OBJCLASS_SCENEOBJECT);
@@ -957,7 +957,7 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
         if (F->find_chunk(CHUNK_OBJECT_COUNT))
             obj_cnt = F->r_u32();
 
-        SPBItem *pb = UI->ProgressStart(obj_cnt, "Loading objects...");
+        SPBItem *pb = UI->ProgressStart(static_cast<float>(obj_cnt), "Loading objects...");
         ReadObjectsStream(*F, CHUNK_OBJECT_LIST, TAppendObject(this, &EScene::OnLoadAppendObject), pb);
         UI->ProgressEnd(pb);
 

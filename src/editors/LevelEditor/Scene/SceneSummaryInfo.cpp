@@ -149,11 +149,11 @@ void SSceneSummary::STextureInfo::FillProp(PropItemVec &items, LPCSTR main_pref,
         V->Owner()->Enable(FALSE);
         PHelper().CreateCaption(items, PrepareKey(pref.c_str(), "Format"), info.FormatString());
         PHelper().CreateCaption(items, PrepareKey(pref.c_str(), "Size"), shared_str().printf("%d x %d x %s", info.width, info.height, info.HasAlpha() ? "32b" : "24b"));
-        PHelper().CreateCaption(items, PrepareKey(pref.c_str(), "Memory Usage"), shared_str().printf("%d Kb", iFloor(tex_mem / 1024)));
+        PHelper().CreateCaption(items, PrepareKey(pref.c_str(), "Memory Usage"), shared_str().printf("%d Kb", iFloor(tex_mem / 1024.f)));
         PHelper().CreateCaption(items, PrepareKey(pref.c_str(), "Effective Area"), shared_str().printf("%3.2f m^2", effective_area));
         PHelper().CreateCaption(items, PrepareKey(pref.c_str(), "Pixel Density"), shared_str().printf("%3.2f p/m", _sqrt((pixel_area * info.width * info.height) / effective_area)));
         /*
-        //. óáðàë èç-çà êîë-âà > 4096
+        //. ÑƒÐ±Ñ€Ð°Ð» Ð¸Ð·-Ð·Ð° ÐºÐ¾Ð»-Ð²Ð° > 4096
                 xr_string tmp 		= "on demand";
                 for (objinf_map_it o_it=objects.begin(); o_it!=objects.end(); o_it++){
                     tmp += make_string("%s%s[%d*%3.2f]",tmp.Length()?"; ":"",o_it->first.c_str(),o_it->second.ref_count,o_it->second.area);
@@ -195,7 +195,6 @@ void SSceneSummary::STextureInfo::FillProp(PropItemVec &items, LPCSTR main_pref,
 void SSceneSummary::STextureInfo::Export(IWriter *F, u32 &mem_use)
 {
     string128 mask;
-    xr_string tmp;
     strcpy(mask, "%s=%s,%d,%d,%s,%d,%3.2f,%3.2f,%s");
     if (info.flags.is_any(STextureParams::flDiffuseDetail | STextureParams::flBumpDetail))
     {
@@ -218,9 +217,9 @@ void SSceneSummary::STextureInfo::Export(IWriter *F, u32 &mem_use)
     }
     int tex_mem = info.MemoryUsage(*file_name);
     mem_use += tex_mem;
-    tmp.sprintf(mask, *file_name, info.FormatString(),
+    auto tmp = make_string(mask, *file_name, info.FormatString(),
                 info.width, info.height, info.HasAlpha() ? "present" : "absent",
-                iFloor(tex_mem / 1024),
+                iFloor(tex_mem / 1024.f),
                 effective_area, _sqrt((pixel_area * info.width * info.height) / effective_area), tmp2.c_str(),
                 *info.detail_name, info.detail_scale, *info.bump_name);
     F->w_string(tmp.c_str());
@@ -343,8 +342,8 @@ void SSceneSummary::FillProp(PropItemVec &items)
     B->OnBtnClickEvent.bind(this, &SSceneSummary::OnFileClick);
     // fill items
     PHelper().CreateCaption(items, "Common\\Level Name", Scene->m_LevelOp.m_FNLevelPath.c_str());
-    PHelper().CreateCaption(items, "Geometry\\Bounding\\Min", shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(bbox.min)));
-    PHelper().CreateCaption(items, "Geometry\\Bounding\\Max", shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(bbox.max)));
+    PHelper().CreateCaption(items, "Geometry\\Bounding\\Min", shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(bbox.vMin)));
+    PHelper().CreateCaption(items, "Geometry\\Bounding\\Max", shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(bbox.vMax)));
     PHelper().CreateCaption(items, "Geometry\\Mesh\\Total Faces", shared_str().printf("%d", face_cnt));
     PHelper().CreateCaption(items, "Geometry\\Mesh\\Total Vertices", shared_str().printf("%d", vert_cnt));
     PHelper().CreateCaption(items, "Geometry\\MU\\Objects", shared_str().printf("%d", mu_objects.size()));
@@ -378,7 +377,7 @@ void SSceneSummary::FillProp(PropItemVec &items)
     for (PDVecIt pd_it = pm_colors.begin(); pd_it != pm_colors.end(); pd_it++)
     {
         string128 tmp;
-        sprintf(tmp, "Textures\\Highlight Textures\\Color Legend\\Item #%d", pd_it - pm_colors.begin());
+        sprintf(tmp, "Textures\\Highlight Textures\\Color Legend\\Item #%d", static_cast<int>(pd_it - pm_colors.begin()));
         PHelper().CreateColor(items, PrepareKey(tmp, "Color").c_str(), &pd_it->color);
         FloatValue *V = PHelper().CreateFloat(items, PrepareKey(tmp, "Weight (p/m)").c_str(), &pd_it->pm, 0, 1000000, 1, 0);
         V->OnAfterEditEvent.bind(this, &SSceneSummary::OnWeightAfterEditClick);
@@ -403,13 +402,13 @@ void SSceneSummary::FillProp(PropItemVec &items)
                     info->FillProp(items, pref.c_str(), cur_mem_usage);
                 }
             }
-            mem->ApplyValue(shared_str().printf("%d Kb", iFloor(cur_mem_usage / 1024)));
+            mem->ApplyValue(shared_str().printf("%d Kb", iFloor(cur_mem_usage / 1024.f)));
             area->ApplyValue(shared_str().printf("%3.2f m^2", cur_area));
             total_mem_usage += cur_mem_usage;
         }
     }
     total_count->ApplyValue(shared_str().printf("%d", textures.size()));
-    total_mem->ApplyValue(shared_str().printf("%d Kb", iFloor(total_mem_usage / 1024)));
+    total_mem->ApplyValue(shared_str().printf("%d Kb", iFloor(total_mem_usage / 1024.f)));
     // sound
     PHelper().CreateCaption(items, "Sounds\\Occluder\\Faces", shared_str().printf("%d", snd_occ_face_cnt));
     PHelper().CreateCaption(items, "Sounds\\Occluder\\Vertices", shared_str().printf("%d", snd_occ_vert_cnt));
@@ -489,9 +488,13 @@ u32 SSceneSummary::SelectPMColor(float pm)
         from = s_summary.pm_colors[idx_clr + 0].color;
         to = s_summary.pm_colors[idx_clr + 1].color;
     }
-    float inv_w = 1.f - w;
-    return color_rgba(color_get_R(from) * inv_w + color_get_R(to) * w, color_get_G(from) * inv_w + color_get_G(to) * w,
-                      color_get_B(from) * inv_w + color_get_B(to) * w, color_get_A(from) * inv_w + color_get_A(to) * w);
+
+    const float inv_w = 1.f - w;
+    const u32 r = static_cast<u32>(color_get_R(from) * inv_w + color_get_R(to) * w);
+    const u32 g = static_cast<u32>(color_get_G(from) * inv_w + color_get_G(to) * w);
+    const u32 b = static_cast<u32>(color_get_B(from) * inv_w + color_get_B(to) * w);
+    const u32 a = static_cast<u32>(color_get_A(from) * inv_w + color_get_A(to) * w);
+    return color_rgba(r, g, b, a);
 }
 
 void EScene::ClearSummaryInfo()

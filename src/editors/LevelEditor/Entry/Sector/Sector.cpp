@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <string>
 
 #define SECTOR_VERSION 0x0012
 
@@ -363,7 +364,7 @@ void CSector::CaptureAllUnusedMeshes()
     CSceneObject *obj = NULL;
     ObjectList &lst = Scene->ListObj(OBJCLASS_SCENEOBJECT);
     // ignore dynamic objects
-    SPBItem *pb = UI->ProgressStart(lst.size(), "Capturing unused face...");
+    SPBItem *pb = UI->ProgressStart(static_cast<float>(lst.size()), "Capturing unused face...");
     for (ObjectIt _F = lst.begin(); _F != lst.end(); _F++)
     {
         pb->Inc();
@@ -648,9 +649,9 @@ void CSector::FillProp(LPCSTR pref, PropItemVec &items)
     PHelper().CreateFColor(items, PrepareKey(pref, "Color"), &sector_color);
     int faces, objects, meshes;
     GetCounts(&objects, &meshes, &faces);
-    PHelper().CreateCaption(items, PrepareKey(pref, GetName(), "Contents\\Objects"), xr_string(objects).c_str());
-    PHelper().CreateCaption(items, PrepareKey(pref, GetName(), "Contents\\Meshes"), xr_string(meshes).c_str());
-    PHelper().CreateCaption(items, PrepareKey(pref, GetName(), "Contents\\Faces"), xr_string(faces).c_str());
+    PHelper().CreateCaption(items, PrepareKey(pref, GetName(), "Contents\\Objects"), std::to_string(objects).c_str());
+    PHelper().CreateCaption(items, PrepareKey(pref, GetName(), "Contents\\Meshes"), std::to_string(meshes).c_str());
+    PHelper().CreateCaption(items, PrepareKey(pref, GetName(), "Contents\\Faces"), std::to_string(faces).c_str());
     PHelper().CreateToken8(items, PrepareKey(pref, GetName(), "Change LevelMap to"), &m_map_idx, level_sub_map);
 }
 //----------------------------------------------------

@@ -31,8 +31,8 @@ bool ESceneLightTool::LoadLTX(CInifile &ini)
     lcontrol_last_idx = ini.r_u32("main", "lcontrol_last_idx");
 
     CInifile::Sect S = ini.r_section("lcontrols");
-    CInifile::SectCIt it = S.Data.begin();
-    CInifile::SectCIt it_e = S.Data.end();
+    auto it = S.Data.begin();
+    auto it_e = S.Data.end();
     for (; it != it_e; ++it)
     {
         u32 idx = ini.r_u32("lcontrols", it->first.c_str());

@@ -54,6 +54,7 @@
     u16*            indices;
 */
 
+class EDetailManager;
 #define DO_NO_WAVING 0x0001
 
 class DetailHeader
@@ -115,6 +116,8 @@ public:
     u32 slot_count() const { return size_x * size_z; }
     float slot_min_x(int _x) const { return (int(_x) - int(offs_x)) * DETAIL_SLOT_SIZE; }
     float slot_min_z(int _z) const { return (int(_z) - int(offs_z)) * DETAIL_SLOT_SIZE; }
+
+    friend class EDetailManager;
 };
 
 struct DetailPalette

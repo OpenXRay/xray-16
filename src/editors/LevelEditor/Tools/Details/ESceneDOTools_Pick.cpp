@@ -14,15 +14,15 @@ int EDetailManager::RaySelect(int flag, float &dist, const Fvector &start, const
 
     int count = 0;
 
-    for (u32 z = 0; z < dtH.size_z; z++)
+    for (u32 z = 0; z < dtH.z_size(); z++)
     {
         fz = fromSlotZ(z);
-        for (u32 x = 0; x < dtH.size_x; x++)
+        for (u32 x = 0; x < dtH.x_size(); x++)
         {
-            DetailSlot *slot = dtSlots + z * dtH.size_x + x;
+            DetailSlot* slot = dtSlots + z * dtH.z_size() + x;
             fx = fromSlotX(x);
-            bbox.min.set(fx - DETAIL_SLOT_SIZE_2, slot->r_ybase(), fz - DETAIL_SLOT_SIZE_2);
-            bbox.max.set(fx + DETAIL_SLOT_SIZE_2, slot->r_ybase() + slot->r_yheight(), fz + DETAIL_SLOT_SIZE_2);
+            bbox.vMin.set(fx - DETAIL_SLOT_SIZE_2, slot->r_ybase(), fz - DETAIL_SLOT_SIZE_2);
+            bbox.vMax.set(fx + DETAIL_SLOT_SIZE_2, slot->r_ybase() + slot->r_yheight(), fz + DETAIL_SLOT_SIZE_2);
             if (bbox.Pick2(start, direction, P))
             {
                 float d = start.distance_to(P);
@@ -40,9 +40,9 @@ int EDetailManager::RaySelect(int flag, float &dist, const Fvector &start, const
         if (!bDistanceOnly)
         {
             if (flag == -1)
-                m_Selected[sz * dtH.size_x + sx] = !m_Selected[sz * dtH.size_x + sx];
+                m_Selected[sz * dtH.x_size() + sx] = !m_Selected[sz * dtH.x_size() + sx];
             else
-                m_Selected[sz * dtH.size_x + sx] = (u8)flag;
+                m_Selected[sz * dtH.x_size() + sx] = (u8)flag;
             count++;
             UI->RedrawScene();
         }
@@ -61,24 +61,24 @@ int EDetailManager::FrustumSelect(int flag, const CFrustum &frustum)
 
     float fx, fz;
     Fbox bbox;
-    for (u32 z = 0; z < dtH.size_z; z++)
+    for (u32 z = 0; z < dtH.z_size(); z++)
     {
         fz = fromSlotZ(z);
-        for (u32 x = 0; x < dtH.size_x; x++)
+        for (u32 x = 0; x < dtH.x_size(); x++)
         {
-            DetailSlot *slot = dtSlots + z * dtH.size_x + x;
+            DetailSlot *slot = dtSlots + z * dtH.x_size() + x;
             fx = fromSlotX(x);
 
-            bbox.min.set(fx - DETAIL_SLOT_SIZE_2, slot->r_ybase(), fz - DETAIL_SLOT_SIZE_2);
-            bbox.max.set(fx + DETAIL_SLOT_SIZE_2, slot->r_ybase() + slot->r_yheight(), fz + DETAIL_SLOT_SIZE_2);
+            bbox.vMin.set(fx - DETAIL_SLOT_SIZE_2, slot->r_ybase(), fz - DETAIL_SLOT_SIZE_2);
+            bbox.vMax.set(fx + DETAIL_SLOT_SIZE_2, slot->r_ybase() + slot->r_yheight(), fz + DETAIL_SLOT_SIZE_2);
             u32 mask = 0xff;
             bool bRes = !!frustum.testAABB(bbox.data(), mask);
             if (bRes)
             {
                 if (flag == -1)
-                    m_Selected[z * dtH.size_x + x] = !m_Selected[z * dtH.size_x + x];
+                    m_Selected[z * dtH.x_size() + x] = !m_Selected[z * dtH.x_size() + x];
                 else
-                    m_Selected[z * dtH.size_x + x] = (u8)flag;
+                    m_Selected[z * dtH.x_size() + x] = (u8)flag;
 
                 count++;
             }
@@ -114,7 +114,7 @@ int EDetailManager::SelectionCount(bool testflag)
     //	for (int i=0; i<m_Selected.size(); i++)
     //    	if (m_Selected[i]==testflag) count++;
     for (U8It it = m_Selected.begin(); it != m_Selected.end(); it++)
-        if (*it == testflag)
+        if (!!*it == testflag)
             count++;
     return count;
 }

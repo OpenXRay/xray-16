@@ -12,7 +12,9 @@ struct SIndexDist
     float cnt[4];
     SIndexDist() { ZeroMemory(this, sizeof(SIndexDist)); }
 };
-DEFINE_SVECTOR(SIndexDist, 4, SIndexDistVec, SIndexDistIt);
+
+using SIndexDistVec = svector<SIndexDist, 4>;
+
 
 DEFINE_MAP(u32, DOVec, ColorIndexMap, ColorIndexPairIt);
 
@@ -46,10 +48,10 @@ class EDetailManager : public CDetailManager,
 
     Fbox m_BBox;
 
-    IC u32 toSlotX(float x) { return (x / DETAIL_SLOT_SIZE + 0.5f) + dtH.offs_x; }
-    IC u32 toSlotZ(float z) { return (z / DETAIL_SLOT_SIZE + 0.5f) + dtH.offs_z; }
-    IC float fromSlotX(int x) { return (x - dtH.offs_x) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
-    IC float fromSlotZ(int z) { return (z - dtH.offs_z) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
+    IC u32 toSlotX(float x) { return static_cast<u32>(x / DETAIL_SLOT_SIZE + 0.5f) + dtH.x_offs(); }
+    IC u32 toSlotZ(float z) { return static_cast<u32>(z / DETAIL_SLOT_SIZE + 0.5f) + dtH.z_offs(); }
+    IC float fromSlotX(int x) { return (x - dtH.x_offs()) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
+    IC float fromSlotZ(int z) { return (z - dtH.z_offs()) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
 
     void UpdateSlotBBox(int x, int z, DetailSlot &slot);
 

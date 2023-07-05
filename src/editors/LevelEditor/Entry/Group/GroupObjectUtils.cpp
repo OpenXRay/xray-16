@@ -90,7 +90,7 @@ void CGroupObject::UpdatePivot(LPCSTR nm, bool center)
         for (; it != m_ObjectsInGroup.end(); ++it)
             C.add(it->pObject->GetPosition());
 
-        FPosition.div(C, m_ObjectsInGroup.size());
+        FPosition.div(C, static_cast<float>(m_ObjectsInGroup.size()));
         FRotation.set(0, 0, 0);
         UpdateTransform(true);
     }

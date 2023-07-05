@@ -393,6 +393,8 @@
     <ClCompile Include="GameMtlLib_Editor.cpp" />
     <ClCompile Include="..\..\xrEngine\ObjectAnimator.cpp" />
     <ClCompile Include="OgfDesc.cpp" />
+    <ClCompile Include="EditObjectExportLWO.cpp" />
+    <ClCompile Include="FS2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WildMagic\WmlMath.h">
@@ -629,6 +631,8 @@
       <Filter>Editor</Filter>
     </ClInclude>
     <ClInclude Include="OgfDesc.h" />
+    <ClInclude Include="FS2.h" />
+    <ClInclude Include="lwchunks.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WildMagic\WmlMath.inl">

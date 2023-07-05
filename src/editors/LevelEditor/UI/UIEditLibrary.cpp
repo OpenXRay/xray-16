@@ -25,7 +25,7 @@ UIEditLibrary::UIEditLibrary()
 
 void UIEditLibrary::OnItemFocused(ListItem *item)
 {
-	// TODO: возможно нужно текстуру удалять
+	// TODO: РІРѕР·РјРѕР¶РЅРѕ РЅСѓР¶РЅРѕ С‚РµРєСЃС‚СѓСЂСѓ СѓРґР°Р»СЏС‚СЊ
 	// if (m_RealTexture)m_RemoveTexture = m_RealTexture;
 	m_RealTexture = nullptr;
 	m_Props->ClearProperties();
@@ -112,7 +112,7 @@ void UIEditLibrary::Show()
 void UIEditLibrary::Close()
 {
 	UI->EndEState(esEditLibrary);
-	// TODO: возможно еще кого то надо грохнуть
+	// TODO: РІРѕР·РјРѕР¶РЅРѕ РµС‰Рµ РєРѕРіРѕ С‚Рѕ РЅР°РґРѕ РіСЂРѕС…РЅСѓС‚СЊ
 	xr_delete(Form);
 }
 
@@ -328,7 +328,7 @@ void UIEditLibrary::DrawObject(CCustomObject *obj, const char *name)
 void UIEditLibrary::GenerateLOD(RStringVec &props, bool bHighQuality)
 {
 	u32 lodsCnt = 0;
-	SPBItem* pb = UI->ProgressStart(props.size(), "Making LOD");
+	SPBItem* pb = UI->ProgressStart(static_cast<float>(props.size()), "Making LOD");
 
 	for (const shared_str &str: props)
 	{

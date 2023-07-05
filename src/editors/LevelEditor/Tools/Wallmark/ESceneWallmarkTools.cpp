@@ -324,9 +324,9 @@ void ESceneWallmarkTool::SaveLTX(CInifile &ini, int id)
             ini.w_u32(buff, buff2, W->flags.get());
 
             sprintf(buff2, "itm_%d_bb_min", ii);
-            ini.w_fvector3(buff, buff2, W->bbox.min);
+            ini.w_fvector3(buff, buff2, W->bbox.vMin);
             sprintf(buff2, "itm_%d_bb_max", ii);
-            ini.w_fvector3(buff, buff2, W->bbox.max);
+            ini.w_fvector3(buff, buff2, W->bbox.vMax);
 
             sprintf(buff2, "itm_%d_bsphere_p", ii);
             ini.w_fvector3(buff, buff2, W->bounds.P);

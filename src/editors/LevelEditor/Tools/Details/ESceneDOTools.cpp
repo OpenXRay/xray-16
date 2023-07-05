@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\..\xrRender\Private\DetailFormat.h"
+#include "Layers/xrRender/DetailFormat.h"
 
 static const u32 DETMGR_VERSION = 0x0003ul;
 
@@ -104,20 +104,20 @@ void EDetailManager::OnRender(int priority, bool strictB2F)
                     u32 inactive = 0xff808080;
                     u32 selected = 0xffffffff;
                     float dist_lim = 75.f * 75.f;
-                    for (u32 z = 0; z < dtH.size_z; z++)
+                    for (u32 z = 0; z < dtH.z_size(); z++)
                     {
                         c.z = fromSlotZ(z);
-                        for (u32 x = 0; x < dtH.size_x; x++)
+                        for (u32 x = 0; x < dtH.x_size(); x++)
                         {
-                            bool bSel = m_Selected[z * dtH.size_x + x];
-                            DetailSlot *slot = dtSlots + z * dtH.size_x + x;
+                            bool bSel = m_Selected[z * dtH.x_size() + x];
+                            DetailSlot* slot = dtSlots + z * dtH.x_size() + x;
                             c.x = fromSlotX(x);
                             c.y = slot->r_ybase() + slot->r_yheight() * 0.5f; //(slot->y_max+slot->y_min)*0.5f;
                             float dist = EDevice.m_Camera.GetPosition().distance_to_sqr(c);
                             if ((dist < dist_lim) && ::Render->ViewBase.testSphere_dirty(c, DETAIL_SLOT_SIZE_2))
                             {
-                                bbox.min.set(c.x - DETAIL_SLOT_SIZE_2, slot->r_ybase(), c.z - DETAIL_SLOT_SIZE_2);
-                                bbox.max.set(c.x + DETAIL_SLOT_SIZE_2, slot->r_ybase() + slot->r_yheight(), c.z + DETAIL_SLOT_SIZE_2);
+                                bbox.vMin.set(c.x - DETAIL_SLOT_SIZE_2, slot->r_ybase(), c.z - DETAIL_SLOT_SIZE_2);
+                                bbox.vMax.set(c.x + DETAIL_SLOT_SIZE_2, slot->r_ybase() + slot->r_yheight(), c.z + DETAIL_SLOT_SIZE_2);
                                 bbox.shrink(0.05f);
                                 DU_impl.DrawSelectionBoxB(bbox, bSel ? &selected : &inactive);
                             }
@@ -442,8 +442,8 @@ void EDetailManager::SaveStream(IWriter &F)
 
     // slots
     F.open_chunk(DETMGR_CHUNK_SLOTS);
-    F.w_u32(dtH.size_x * dtH.size_z);
-    F.w(dtSlots, dtH.size_x * dtH.size_z * sizeof(DetailSlot));
+    F.w_u32(dtH.x_size() * dtH.z_size());
+    F.w(dtSlots, dtH.x_size() * dtH.z_size() * sizeof(DetailSlot));
     F.close_chunk();
     // internal
     // bbox
@@ -488,7 +488,7 @@ bool EDetailManager::Export(LPCSTR path)
     U32Vec remap;
     U8Vec remap_object(objects.size(), u8(-1));
 
-    int slot_cnt = dtH.size_x * dtH.size_z;
+    int slot_cnt = dtH.x_size() * dtH.z_size();
     for (int slot_idx = 0; slot_idx < slot_cnt; slot_idx++)
     {
         DetailSlot *it = &dtSlots[slot_idx];
@@ -575,13 +575,13 @@ bool EDetailManager::Export(LPCSTR path)
             }
         }
         F.open_chunk(DETMGR_CHUNK_SLOTS);
-        F.w(dt_slots.data(), dtH.size_x * dtH.size_z * sizeof(DetailSlot));
+        F.w(dt_slots.data(), dtH.x_size() * dtH.z_size() * sizeof(DetailSlot));
         F.close_chunk();
         pb->Inc();
 
         // write header
-        dtH.version = DETAIL_VERSION;
-        dtH.object_count = object_idx;
+        dtH._version = DETAIL_VERSION;
+        dtH.obj_count = object_idx;
 
         F.w_chunk(DETMGR_CHUNK_HEADER, &dtH, sizeof(DetailHeader));
 

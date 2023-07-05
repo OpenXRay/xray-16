@@ -1,20 +1,9 @@
 // DetailManager.cpp: implementation of the CDetailManager class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
-#pragma hdrstop
-
 #include "DetailManager.h"
 #include "xrCDB/Intersect.hpp"
 
-#ifdef _EDITOR
-#include "ESceneClassList.h"
-#include "Scene.h"
-#include "SceneObject.h"
-#include "IGame_Persistent.h"
-#include "Environment.h"
-#else
+#ifndef _EDITOR
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
@@ -80,7 +69,10 @@ void CDetailManager::SSwingValue::lerp(const SSwingValue& A, const SSwingValue& 
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 // XXX stats: add to statistics
-CDetailManager::CDetailManager() : xrc("detail manager")
+CDetailManager::CDetailManager() 
+    #ifndef _EDITOR
+    : xrc("detail manager")
+    #endif
 {
     dtFS = nullptr;
     dtSlots = nullptr;
@@ -237,7 +229,7 @@ void CDetailManager::UpdateVisibleM()
             vis.clear();
 
     CFrustum View;
-    View.CreateFromMatrix(Device.mFullTransformSaved, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+    View.CreateFromMatrix(RDEVICE.mFullTransformSaved, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
     float fade_limit = dm_fade;
     fade_limit = fade_limit * fade_limit;
@@ -299,7 +291,7 @@ void CDetailManager::UpdateVisibleM()
                 }
 #endif
                 // Add to visibility structures
-                if (Device.dwFrame > S.frame)
+                if (RDEVICE.dwFrame > S.frame)
                 {
                     // Calc fade factor (per slot)
                     float dist_sq = EYE.distance_to_sqr(S.vis.sphere.P);
@@ -309,7 +301,7 @@ void CDetailManager::UpdateVisibleM()
                     float alpha_i = 1.f - alpha;
                     float dist_sq_rcp = 1.f / dist_sq;
 
-                    S.frame = Device.dwFrame + Random.randI(15, 30);
+                    S.frame = RDEVICE.dwFrame + Random.randI(15, 30);
                     for (int sp_id = 0; sp_id < dm_obj_in_slot; sp_id++)
                     {
                         SlotPart& sp = S.G[sp_id];
@@ -379,9 +371,9 @@ void CDetailManager::Render()
     MT_SYNC();
 
     RImplementation.BasicStats.DetailRender.Begin();
-    g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 1.0f; //--#SM+#-- Флаг начала рендера травы [begin of grass render]
 
 #ifndef _EDITOR
+    g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 1.0f; //--#SM+#-- Флаг начала рендера травы [begin of grass render]
     float factor = g_pGamePersistent->Environment().wind_strength_factor;
 #else
     float factor = 0.3f;
@@ -395,9 +387,12 @@ void CDetailManager::Render()
 
     RCache.set_CullMode(CULL_CCW);
 
+#ifndef _EDITOR
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
+#endif
+
     RImplementation.BasicStats.DetailRender.End();
-    m_frame_rendered = Device.dwFrame;
+    m_frame_rendered = RDEVICE.dwFrame;
 }
 
 void CDetailManager::MT_CALC()
@@ -411,11 +406,11 @@ void CDetailManager::MT_CALC()
         return;
 #endif
 
-    EYE = Device.vCameraPosition;
+    EYE = RDEVICE.vCameraPosition;
 
     MT.Enter();
-    if (m_frame_calc != Device.dwFrame)
-        if ((m_frame_rendered + 1) == Device.dwFrame) // already rendered
+    if (m_frame_calc != RDEVICE.dwFrame)
+        if ((m_frame_rendered + 1) == RDEVICE.dwFrame) // already rendered
         {
             int s_x = iFloor(EYE.x / dm_slot_size + .5f);
             int s_z = iFloor(EYE.z / dm_slot_size + .5f);
@@ -425,7 +420,7 @@ void CDetailManager::MT_CALC()
             RImplementation.BasicStats.DetailCache.End();
 
             UpdateVisibleM();
-            m_frame_calc = Device.dwFrame;
+            m_frame_calc = RDEVICE.dwFrame;
         }
     MT.Leave();
 }

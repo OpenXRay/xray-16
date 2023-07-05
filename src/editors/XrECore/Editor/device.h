@@ -48,7 +48,7 @@ public:
 
     Fmatrix mView_saved;
     Fmatrix mProject_saved;
-    Fmatrix mFullTransform_saved;
+    Fmatrix mFullTransformSaved;
 
     float fFOV;
     float fASPECT;

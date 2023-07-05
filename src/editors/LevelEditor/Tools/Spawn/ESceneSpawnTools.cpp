@@ -112,7 +112,7 @@ ESceneSpawnTool::ESceneSpawnTool() : ESceneCustomOTool(OBJCLASS_SPAWNPOINT)
     UIChooseForm::AppendEvents(smSpawnItem, "Select Spawn Item", FillSpawnItems, 0, 0, 0, 0);
     m_Classes.clear();
     CInifile::Root const &data = pSettings->sections();
-    for (CInifile::RootCIt it = data.begin(); it != data.end(); it++)
+    for (auto it = data.begin(); it != data.end(); it++)
     {
         LPCSTR val;
         if ((*it)->line_exist("$spawn", &val))

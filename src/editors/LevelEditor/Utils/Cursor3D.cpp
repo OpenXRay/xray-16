@@ -2,8 +2,6 @@
 
 static WORD CrossIndices[4] = {0, 2, 1, 3};
 
-#pragma package(smart_init)
-
 C3DCursor::C3DCursor()
 {
     m_Visible = false;
@@ -13,7 +11,6 @@ C3DCursor::C3DCursor()
     SetBrushSegment();
     eStyle = csLasso;
 }
-//---------------------------------------------------------------------------
 
 C3DCursor::~C3DCursor()
 {
@@ -23,8 +20,8 @@ C3DCursor::~C3DCursor()
 
 void C3DCursor::SetBrushSegment(float segment)
 {
-    m_RenderBuffer.resize(segment);
-    d_angle = float(PI_MUL_2) / float(segment);
+    m_RenderBuffer.resize(static_cast<size_t>(segment));
+    d_angle = PI_MUL_2 / segment;
 }
 //---------------------------------------------------------------------------
 
@@ -135,7 +132,7 @@ bool C3DCursor::PrepareBrush()
     POINT start_pt;
     Ivector2 pt;
     // GetCursorPos(&start_pt); start_pt=UI->GetD3DWindow()->ScreenToClient(start_pt);
-    pt.set(iFloor(start_pt.x), iFloor(start_pt.y));
+    pt.set(iFloor((float)start_pt.x), iFloor((float)start_pt.y));
     EDevice.m_Camera.MouseRayFromPoint(brush_start, brush_dir, pt);
     bPickObject = !!Scene->RayPickObject(pinf.inf.range, brush_start, brush_dir, OBJCLASS_SCENEOBJECT, &pinf, Scene->GetSnapList(false));
     if (!bPickObject)

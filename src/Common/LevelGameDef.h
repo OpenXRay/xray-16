@@ -22,6 +22,7 @@ enum ERPpointType
     rptActorSpawn = 0,
     rptArtefactSpawn,
     rptItemSpawn,
+    rptTeamBaseParticle = rptItemSpawn,
     rptLast = 0xff
 };
 
@@ -35,14 +36,9 @@ enum EEnvModUsedParams
     eHemiColor = (1 << 5)
 };
 
-/* // XXX: find better place for this (need cpp)
-xr_token rpoint_type[] = {
-    {"Actor Spawn", rptActorSpawn},
-    {"Artefact Spawn", rptArtefactSpawn},
-    {"Item Spawn", rptItemSpawn},
-    {nullptr, rptLast}
-};
-*/
+extern xr_token rpoint_type[];
+extern xr_token rpoint_type_soc[];
+extern const xr_token rpoint_game_type[];
 
 // BASE offset
 #define WAY_BASE 0x1000

@@ -11,8 +11,8 @@
 #define AIMAP_CHUNK_SNAP_OBJECTS 0x0007
 #define AIMAP_CHUNK_INTERNAL_DATA 0x0008
 #define AIMAP_CHUNK_INTERNAL_DATA2 0x0009
-//----------------------------------------------------
 
+/* ??
 poolSS<SAINode, 1024> g_ainode_pool;
 
 void *SAINode::operator new(std::size_t size)
@@ -30,6 +30,7 @@ void SAINode::operator delete(void *ptr)
     auto node = (SAINode *)ptr;
     g_ainode_pool.destroy(node);
 }
+*/
 
 void SAINode::PointLF(Fvector &D, float patch_size)
 {
@@ -119,14 +120,17 @@ void SAINode::LoadStream(IReader &F, ESceneAIMapTool *tools)
     u32 id;
     u16 pl;
     NodePosition np;
+
+#pragma TODO("TSMP: seems wrong to cast 32 bit value to 64 bit pointer (on x64)")
+
     F.r(&id, 3);
-    n1 = (SAINode *)tools->UnpackLink(id);
+    n1 = (SAINode*)(size_t)tools->UnpackLink(id);
     F.r(&id, 3);
-    n2 = (SAINode *)tools->UnpackLink(id);
+    n2 = (SAINode*)(size_t)tools->UnpackLink(id);
     F.r(&id, 3);
-    n3 = (SAINode *)tools->UnpackLink(id);
+    n3 = (SAINode*)(size_t)tools->UnpackLink(id);
     F.r(&id, 3);
-    n4 = (SAINode *)tools->UnpackLink(id);
+    n4 = (SAINode*)(size_t)tools->UnpackLink(id);
     pl = F.r_u16();
     pvDecompress(Plane.n, pl);
     F.r(&np, sizeof(np));
@@ -182,13 +186,13 @@ void ESceneAIMapTool::Clear(bool bOnlyNodes)
     hash_Clear();
     for (SAINode *node : m_Nodes)
         xr_delete(node);
-    m_Nodes.clear_and_free();
+    m_Nodes.clear();
     if (!bOnlyNodes)
     {
         // m_SnapObjects.clear	();
         m_AIBBox.invalidate();
         ExecCommand(COMMAND_REFRESH_SNAP_OBJECTS);
-        g_ainode_pool.clear();
+        //g_ainode_pool.clear();
         RealUpdateSnapList();
     }
 }
@@ -241,13 +245,15 @@ void ESceneAIMapTool::EnumerateNodes()
 
 void ESceneAIMapTool::DenumerateNodes()
 {
+#pragma TODO("TSMP: seems wrong to cast 64 bit pointer to 32 bit value (on x64)")
+
     u32 cnt = m_Nodes.size();
     for (AINodeIt it = m_Nodes.begin(); it != m_Nodes.end(); it++)
     {
-        if (!((((u32)(*it)->n1 < cnt) || ((u32)(*it)->n1 == InvalidNode)) &&
-              (((u32)(*it)->n2 < cnt) || ((u32)(*it)->n2 == InvalidNode)) &&
-              (((u32)(*it)->n3 < cnt) || ((u32)(*it)->n3 == InvalidNode)) &&
-              (((u32)(*it)->n4 < cnt) || ((u32)(*it)->n4 == InvalidNode))))
+        if (!((((u32)(size_t)(*it)->n1 < cnt) || ((u32)(size_t)(*it)->n1 == InvalidNode)) &&
+                (((u32)(size_t)(*it)->n2 < cnt) || ((u32)(size_t)(*it)->n2 == InvalidNode)) &&
+                (((u32)(size_t)(*it)->n3 < cnt) || ((u32)(size_t)(*it)->n3 == InvalidNode)) &&
+                (((u32)(size_t)(*it)->n4 < cnt) || ((u32)(size_t)(*it)->n4 == InvalidNode))))
         {
             ELog.Msg(mtError, "Node: has wrong link [%3.2f, %3.2f, %3.2f], {%d,%d,%d,%d}", VPUSH((*it)->Pos), (*it)->n1, (*it)->n2, (*it)->n3, (*it)->n4);
             (*it)->n1 = 0;
@@ -257,10 +263,10 @@ void ESceneAIMapTool::DenumerateNodes()
             continue;
         }
         //                     ,"AINode: Wrong link found.");
-        (*it)->n1 = ((u32)(*it)->n1 == InvalidNode) ? 0 : m_Nodes[(u32)(*it)->n1];
-        (*it)->n2 = ((u32)(*it)->n2 == InvalidNode) ? 0 : m_Nodes[(u32)(*it)->n2];
-        (*it)->n3 = ((u32)(*it)->n3 == InvalidNode) ? 0 : m_Nodes[(u32)(*it)->n3];
-        (*it)->n4 = ((u32)(*it)->n4 == InvalidNode) ? 0 : m_Nodes[(u32)(*it)->n4];
+        (*it)->n1 = ((u32)(size_t)(*it)->n1 == InvalidNode) ? 0 : m_Nodes[(u32)(size_t)(*it)->n1];
+        (*it)->n2 = ((u32)(size_t)(*it)->n2 == InvalidNode) ? 0 : m_Nodes[(u32)(size_t)(*it)->n2];
+        (*it)->n3 = ((u32)(size_t)(*it)->n3 == InvalidNode) ? 0 : m_Nodes[(u32)(size_t)(*it)->n3];
+        (*it)->n4 = ((u32)(size_t)(*it)->n4 == InvalidNode) ? 0 : m_Nodes[(u32)(size_t)(*it)->n4];
         /*
                 if (((u32)(*it)->n1<cnt)||((u32)(*it)->n1==InvalidNode)) (*it)->n1	= ((u32)(*it)->n1==InvalidNode)?0:m_Nodes[(u32)(*it)->n1];
                 else (*it)->n1=0;
@@ -286,8 +292,8 @@ void ESceneAIMapTool::SaveLTX(CInifile &ini, int id)
     ini.w_u32("main", "version", AIMAP_VERSION);
     ini.w_u32("main", "flags", m_Flags.get());
 
-    ini.w_fvector3("main", "bbox_min", m_AIBBox.min);
-    ini.w_fvector3("main", "bbox_max", m_AIBBox.max);
+    ini.w_fvector3("main", "bbox_min", m_AIBBox.vMin);
+    ini.w_fvector3("main", "bbox_max", m_AIBBox.vMax);
 
     ini.w_float("params", "patch_size", m_Params.fPatchSize);
     ini.w_float("params", "test_height", m_Params.fTestHeight);
@@ -488,12 +494,6 @@ int ESceneAIMapTool::AddNode(const Fvector &pos, bool bIgnoreConstraints, bool b
     }
 }
 
-struct invalid_node_pred : public std::unary_function<SAINode *, bool>
-{
-    int link;
-    invalid_node_pred(int _link) : link(_link) { ; }
-    bool operator()(const SAINode *&x) { return x->Links() == link; }
-};
 void ESceneAIMapTool::SelectNodesByLink(int link)
 {
     SelectObjects(false);
@@ -520,7 +520,7 @@ void ESceneAIMapTool::SelectObjects(bool flag)
     UpdateHLSelected();
     UI->RedrawScene();
 }
-struct delete_sel_node_pred : public std::unary_function<SAINode *, bool>
+struct delete_sel_node_pred
 {
     bool operator()(SAINode *&x)
     {

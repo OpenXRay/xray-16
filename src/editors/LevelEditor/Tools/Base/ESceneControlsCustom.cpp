@@ -1,5 +1,17 @@
 #include "stdafx.h"
 
+void IR_GetMousePosScreen(Ivector2& p) 
+{ 
+    GetCursorPos((LPPOINT)&p); 
+}
+
+void IR_GetMousePosReal(HWND hwnd, Ivector2& p)
+{
+    IR_GetMousePosScreen(p);
+    if (hwnd)
+        ScreenToClient(hwnd, (LPPOINT)&p);
+}
+
 TUI_CustomControl::TUI_CustomControl(int st, int act, ESceneToolBase *parent)
 {
     parent_tool = parent;
@@ -248,7 +260,7 @@ bool TUI_CustomControl::MovingStart(TShiftState Shift)
             if (lst.size() == 1)
             {
                 Fvector p, n;
-                UI->IR_GetMousePosReal(EDevice.m_hWnd, UI->m_CurrentCp);
+                IR_GetMousePosReal(EDevice.m_hWnd, UI->m_CurrentCp);
                 EDevice.m_Camera.MouseRayFromPoint(UI->m_CurrentRStart, UI->m_CurrentRDir, UI->m_CurrentCp);
                 if (LUI->PickGround(p, UI->m_CurrentRStart, UI->m_CurrentRDir, 1, &n))
                 {

@@ -50,7 +50,7 @@ public:
     IC float GetUFromX(float x, const Fbox &box)
     {
         R_ASSERT(Valid());
-        return (x - box.min.x) / (box.max.x - box.min.x);
+        return (x - box.vMin.x) / (box.vMax.x - box.vMin.x);
     }
     IC int GetPixelUFromX(float x, const Fbox &box)
     {
@@ -62,7 +62,7 @@ public:
     IC float GetVFromZ(float z, const Fbox &box)
     {
         R_ASSERT(Valid());
-        return 1.f - (z - box.min.z) / (box.max.z - box.min.z);
+        return 1.f - (z - box.vMin.z) / (box.vMax.z - box.vMin.z);
     }
     IC int GetPixelVFromZ(float z, const Fbox &box)
     {

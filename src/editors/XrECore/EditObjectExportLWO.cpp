@@ -1,5 +1,7 @@
 #include "stdafx.h"
-#include "../Utils/FS2.h"
+#include "FS2.h"
+#include "Editor/EditObject.h"
+#include "Editor/EditMesh.h"
 
 int FindLPCSTR(LPCSTRVec &vec, LPCSTR key)
 {
@@ -53,8 +55,8 @@ bool CEditableObject::ExportLWO(LPCSTR fname)
 		F->w_layer(u16(mesh_it - FirstMesh()), MESH->Name().c_str());
 		// bounding box
 		F->open_chunk(ID_BBOX);
-		F->w_vector(MESH->m_Box.min);
-		F->w_vector(MESH->m_Box.max);
+		F->w_vector(MESH->m_Box.vMin);
+		F->w_vector(MESH->m_Box.vMax);
 		F->close_chunk();
 		// points
 		F->open_chunk(ID_PNTS);
