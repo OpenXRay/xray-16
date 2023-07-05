@@ -246,7 +246,7 @@ void CSpawnPoint::CLE_Motion::PlayMotion()
 //------------------------------------------------------------------------------
 void CSpawnPoint::SSpawnData::Create(LPCSTR _entity_ref)
 {
-    m_Data = create_entity(_entity_ref);
+    m_Data = xrSE_Factory::create_entity(_entity_ref);
     if (m_Data)
     {
         m_Data->set_name(_entity_ref);
@@ -284,10 +284,11 @@ void CSpawnPoint::SSpawnData::Create(LPCSTR _entity_ref)
 
 void CSpawnPoint::SSpawnData::Destroy()
 {
-    destroy_entity(m_Data);
+    xrSE_Factory::destroy_entity(m_Data);
     xr_delete(m_Visual);
     xr_delete(m_Motion);
 }
+
 void CSpawnPoint::SSpawnData::get_bone_xform(LPCSTR name, Fmatrix &xform)
 {
     xform.identity();
@@ -1502,13 +1503,13 @@ void CSpawnPoint::OnProfileChange(PropValue *prop)
         VERIFY(s_name.size());
         if (0 != strcmp(m_SpawnData.m_Data->name(), *s_name))
         {
-            IServerEntity *tmp = create_entity(*s_name);
+            IServerEntity* tmp = xrSE_Factory::create_entity(*s_name);
             VERIFY(tmp);
             NET_Packet Packet;
             tmp->Spawn_Write(Packet, TRUE);
             R_ASSERT(m_SpawnData.m_Data->Spawn_Read(Packet));
             m_SpawnData.m_Data->set_editor_flag(IServerEntity::flVisualChange | IServerEntity::flVisualAnimationChange);
-            destroy_entity(tmp);
+            xrSE_Factory::destroy_entity(tmp);
         }
     }
     else

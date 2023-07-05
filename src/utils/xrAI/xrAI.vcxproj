@@ -106,6 +106,9 @@
     <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\xrSE_Factory\xrSE_Factory.vcxproj">
+      <Project>{3ad26fd3-4f52-4e22-a4cf-ad4c49e74c61}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />

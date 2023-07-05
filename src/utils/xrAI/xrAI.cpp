@@ -12,10 +12,6 @@
 #include "xrCore/ModuleLookup.hpp"
 
 #include "factory_api.h"
-
-CreateEntity* create_entity = nullptr;
-DestroyEntity* destroy_entity = nullptr;
-
 extern void xrCompiler(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name);
 extern void verify_level_graph(LPCSTR name, bool verbose);
 
@@ -102,27 +98,9 @@ void execute(pstr cmd)
             char* no_separator_check = strstr(cmd, "-no_separator_check");
             clear_temp_folder();
 
-            const auto hFactory = XRay::LoadModule("xrSE_Factory");
-
-            R_ASSERT2(hFactory->IsLoaded(), "Factory DLL raised exception during loading or there is no factory DLL at all");
-
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
-            pcstr create_entity_name = "create_entity";
-            pcstr destroy_entity_name = "destroy_entity";
-#else
-            pcstr create_entity_name = "_create_entity@4";
-            pcstr destroy_entity_name = "_destroy_entity@4";
-#endif
-            create_entity = static_cast<CreateEntity*>(hFactory->GetProcAddress(create_entity_name));
-            destroy_entity = static_cast<DestroyEntity*>(hFactory->GetProcAddress(destroy_entity_name));
-
-            R_ASSERT(create_entity);
-            R_ASSERT(destroy_entity);
-
+            xrSE_Factory::initialize();
             CGameSpawnConstructor(name, output, start, !!no_separator_check);
-
-            create_entity = nullptr;
-            destroy_entity = nullptr;
+            xrSE_Factory::destroy();
         }
         else if (strstr(cmd, "-verify"))
         {

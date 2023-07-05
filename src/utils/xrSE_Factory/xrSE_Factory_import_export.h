@@ -1,6 +1,4 @@
-#ifndef XRSE_FACTORY_IMPORT_EXPORTH
-#define XRSE_FACTORY_IMPORT_EXPORTH
-
+#pragma once
 #include "Common/Common.hpp"
 
 #ifdef XRAY_STATIC_BUILD
@@ -13,9 +11,11 @@
 #   endif
 #endif
 
-extern "C" {
+namespace xrSE_Factory
+{
 FACTORY_API IServerEntity* create_entity(LPCSTR section);
 FACTORY_API void destroy_entity(IServerEntity*&);
-};
+FACTORY_API void initialize();
+FACTORY_API void destroy();
+} // namespace XrSE_Factory
 
-#endif

@@ -22,52 +22,43 @@ extern CSE_Abstract* F_entity_Create(LPCSTR section, bool no_assert);
 extern CScriptPropertiesListHelper* g_property_list_helper;
 extern XRay::Module prop_helper_module;
 
-extern "C" {
-FACTORY_API IServerEntity* create_entity(LPCSTR section) { return F_entity_Create(section, true); }
-FACTORY_API void destroy_entity(IServerEntity*& abstract)
+namespace xrSE_Factory
+{
+IServerEntity* create_entity(LPCSTR section) { return F_entity_Create(section, true); }
+
+void destroy_entity(IServerEntity*& abstract)
 {
     auto object = smart_cast<CSE_Abstract*>(abstract);
     F_entity_Destroy(object);
     abstract = 0;
 }
-};
 
-BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
+void initialize()
 {
-    switch (call_reason)
-    {
-    case DLL_PROCESS_ATTACH:
-    {
-        //xrDebug::Initialize();
-        //Core.Initialize("xrSE_Factory", nullptr, true, "fsfactory.ltx");
-        string_path SYSTEM_LTX;
-        FS.update_path(SYSTEM_LTX, "$game_config$", "system.ltx");
-        pSettings = xr_new<CInifile>(SYSTEM_LTX);
+    string_path SYSTEM_LTX;
+    FS.update_path(SYSTEM_LTX, "$game_config$", "system.ltx");
+    pSettings = xr_new<CInifile>(SYSTEM_LTX);
 
-        CCharacterInfo::InitInternal();
-        CSpecificCharacter::InitInternal();
-
-        break;
-    }
-    case DLL_PROCESS_DETACH:
-    {
-        CCharacterInfo::DeleteSharedData();
-        CCharacterInfo::DeleteIdToIndexData();
-        CSpecificCharacter::DeleteSharedData();
-        CSpecificCharacter::DeleteIdToIndexData();
-
-        auto s = (CInifile**)&pSettings;
-        xr_delete(*s);
-        xr_delete(g_property_list_helper);
-        xr_delete(g_ai_space);
-        xr_delete(g_object_factory);
-        prop_helper_module = nullptr;
-        //Core._destroy();
-        break;
-    }
-    }
-    return (TRUE);
+    CCharacterInfo::InitInternal();
+    CSpecificCharacter::InitInternal();
 }
+
+void destroy()
+{
+    CCharacterInfo::DeleteSharedData();
+    CCharacterInfo::DeleteIdToIndexData();
+    CSpecificCharacter::DeleteSharedData();
+    CSpecificCharacter::DeleteIdToIndexData();
+
+    auto s = (CInifile**)&pSettings;
+    xr_delete(*s);
+    xr_delete(g_property_list_helper);
+    xr_delete(g_ai_space);
+    xr_delete(g_object_factory);
+    prop_helper_module = nullptr;
+}
+
+}; // xrSE_Factory
 
 void _destroy_item_data_vector_cont(T_VECTOR* vec)
 {
