@@ -76,42 +76,42 @@ public:
 
 public:
 	// Occlusion culling
-	virtual bool occ_visible(Fbox &B);
-	virtual bool occ_visible(sPoly &P);
-	virtual bool occ_visible(vis_data &P);
+    bool occ_visible(Fbox &B) override;
+    bool occ_visible(sPoly &P) override;
+    bool occ_visible(vis_data &P) override;
 
 	// Constructor/destructor
 	CRender();
-	virtual ~CRender();
+    ~CRender() override;
 
 	void shader_option_skinning(u32 mode) { m_skinning = mode; }
 
 	void Initialize();
 	void ShutDown();
 
-	void OnDeviceCreate(pcstr shName = nullptr);
-	void OnDeviceDestroy(bool bKeepTextures = false);
+	void OnDeviceCreate(pcstr shName = nullptr) override;
+	void OnDeviceDestroy(bool bKeepTextures = false) override;
 
-	void Calculate();
-	void Render();
+	void Calculate() override;
+	void Render() override;
 
 	void set_Transform(Fmatrix *M);
 	void add_Visual(IRenderVisual *visual);
 
 	virtual ref_shader getShader(int id);
-	CRenderTarget *getTarget() { return Target; }
+	CRenderTarget *getTarget() override { return Target; }
 	//.	virtual IRender_Target*	getTarget		(){return Target;}
 
-	void reset_begin();
-	void reset_end();
-	virtual IRenderVisual* model_Create(pcstr name, IReader* data = 0);
-	virtual IRenderVisual* model_CreateChild(pcstr name, IReader* data);
+	void reset_begin() override;
+	void reset_end() override;
+    IRenderVisual* model_Create(pcstr name, IReader* data = 0) override;
+    IRenderVisual* model_CreateChild(pcstr name, IReader* data) override;
 	virtual IRenderVisual* model_CreatePE(pcstr name);
-	virtual IRenderVisual* model_CreateParticles(pcstr name);
+    IRenderVisual* model_CreateParticles(pcstr name) override;
 
 	virtual IRender_DetailModel *model_CreateDM(IReader *R);
-	virtual IRenderVisual *model_Duplicate(IRenderVisual *V);
-	virtual void model_Delete(IRenderVisual *&V, bool bDiscard = TRUE);
+    IRenderVisual *model_Duplicate(IRenderVisual *V) override;
+    void model_Delete(IRenderVisual *&V, bool bDiscard = TRUE) override;
 	virtual void model_Delete(IRender_DetailModel *&F)
 	{
 		if (F)
@@ -124,23 +124,23 @@ public:
 	}
 	void model_Render(IRenderVisual *m_pVisual, const Fmatrix &mTransform, int priority, bool strictB2F, float m_fLOD);
 	void model_RenderSingle(IRenderVisual *m_pVisual, const Fmatrix &mTransform, float m_fLOD);
-	virtual GenerationLevel GetGeneration() const { return GENERATION_R1; }
-	virtual bool is_sun_static() { return true; };
-	virtual BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D9; }
-	virtual u32 get_dx_level() override { return 0x00090000; }
+    GenerationLevel GetGeneration() const override { return GENERATION_R1; }
+    bool is_sun_static() override { return true; };
+    BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D9; }
+    u32 get_dx_level() override { return 0x00090000; }
 
 	virtual void add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm){};
 	virtual void add_SkeletonWallmark(const Fmatrix *xf, CKinematics *obj, ref_shader &sh, const Fvector &start, const Fvector &dir, float size){};
 
 	// Render mode
-	virtual void rmNear();
-	virtual void rmFar();
-	virtual void rmNormal();
+    void rmNear() override;
+    void rmFar() override;
+    void rmNormal() override;
 
 	void apply_lmaterial() {}
 
-	virtual LPCSTR getShaderPath()
-	{
+    LPCSTR getShaderPath() override
+    {
 #ifndef _EDITOR
 		return "R1\\";
 #else
@@ -162,100 +162,100 @@ public:
 
 	virtual IDirect3DBaseTexture9 *texture_load(LPCSTR fname, u32 &mem_size);
 
-	virtual HRESULT shader_compile(
-		pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result);
+    HRESULT shader_compile(
+		pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
 
 	// fake for interface
-	virtual void create() {}
-	virtual void destroy() {}
-	virtual void Destroy() {}
+    void create() override {}
+    void destroy() override {}
+    void Destroy() override {}
 
-	virtual void level_Load(IReader* fs) {}
-	virtual void level_Unload() {}
+    void level_Load(IReader* fs) override {}
+    void level_Unload() override {}
 
-	virtual void DumpStatistics(IGameFont& font, IPerformanceAlert* alert) {}
+    void DumpStatistics(IGameFont& font, IPerformanceAlert* alert) override {}
 
-	virtual IRender_Sector* getSector(int id) { return nullptr; }
-	virtual IRenderVisual* getVisual(int id) { return nullptr; }
-	virtual IRender_Sector* detectSector(const Fvector& P) { return nullptr; }
+    IRender_Sector* getSector(int id) override { return nullptr; }
+    IRenderVisual* getVisual(int id) override { return nullptr; }
+    IRender_Sector* detectSector(const Fvector& P) override { return nullptr; }
 
-	virtual void flush() {}
-	virtual void add_Occluder(Fbox2& bb_screenspace) {}
-	virtual void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) {}
-	virtual void add_Geometry(IRenderVisual* V, const CFrustum& view) {}
-	virtual void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) {}
-	virtual void add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V) {}
-	virtual void clear_static_wallmarks() {}
+    void flush() override {}
+    void add_Occluder(Fbox2& bb_screenspace) override {}
+    void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override {}
+    void add_Geometry(IRenderVisual* V, const CFrustum& view) override {}
+    void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override {}
+    void add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override {}
+    void clear_static_wallmarks() override {}
 
-	virtual void add_SkeletonWallmark(const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start,
-        const Fvector& dir, float size) {}
+    void add_SkeletonWallmark(const Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, const Fvector& start,
+        const Fvector& dir, float size) override {}
 
-	virtual IRender_ObjectSpecific* ros_create(IRenderable* parent) { return nullptr; }
-	virtual void ros_destroy(IRender_ObjectSpecific*&) {}
+    IRender_ObjectSpecific* ros_create(IRenderable* parent) override { return nullptr; }
+    void ros_destroy(IRender_ObjectSpecific*&) override {}
 
-	virtual IRender_Light* light_create() { return nullptr; }
-	virtual IRender_Glow* glow_create() { return nullptr; }
+    IRender_Light* light_create() override { return nullptr; }
+    IRender_Glow* glow_create() override { return nullptr; }
 
-	virtual void model_Logging(bool bEnable) {}
-	virtual void models_Prefetch() {}
-	virtual void models_Clear(bool b_complete) {}
+    void model_Logging(bool bEnable) override {}
+    void models_Prefetch() override {}
+    void models_Clear(bool b_complete) override {}
 
-	virtual void BeforeWorldRender() {} //--#SM+#-- Перед рендерингом мира
-	virtual void AfterWorldRender() {} //--#SM+#-- После рендеринга мира (до UI)
+    void BeforeWorldRender() override {} //--#SM+#-- Перед рендерингом мира
+    void AfterWorldRender() override {} //--#SM+#-- После рендеринга мира (до UI)
 
-	virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = 0) {}
-	virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) {}
-	virtual void ScreenshotAsyncBegin() {}
-	virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) {}
+    void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = 0) override {}
+    void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) override {}
+    void ScreenshotAsyncBegin() override {}
+    void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override {}
 
-	virtual u32 active_phase() { return 0; }
+    u32 active_phase() override { return 0; }
 
 	// Gamma correction functions
-	virtual void setGamma(float fGamma) {}
-	virtual void setBrightness(float fGamma) {}
-	virtual void setContrast(float fGamma) {}
-	virtual void updateGamma() {}
+    void setGamma(float fGamma) override {}
+    void setBrightness(float fGamma) override {}
+    void setContrast(float fGamma) override {}
+    void updateGamma() override {}
 
-	virtual void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) {}
+    void Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override {}
 
 	// Init
-	virtual void ObtainRequiredWindowFlags(u32& windowFlags) {}
-	virtual void SetupStates() {}
-	virtual void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) {}
+    void ObtainRequiredWindowFlags(u32& windowFlags) override {}
+    void SetupStates() override {}
+    void Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) override {}
 
 	// Overdraw
-	virtual void overdrawBegin() {}
-	virtual void overdrawEnd() {}
+    void overdrawBegin() override {}
+    void overdrawEnd() override {}
 
 	// Resources control
-	virtual void DeferredLoad(bool E) {}
-	virtual void ResourcesDeferredUpload(){}
-	virtual void ResourcesDeferredUnload(){}
-	virtual void ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps) {}
-	virtual void ResourcesDestroyNecessaryTextures() {}
-	virtual void ResourcesStoreNecessaryTextures() {}
-	virtual void ResourcesDumpMemoryUsage() {}
+    void DeferredLoad(bool E) override {}
+    void ResourcesDeferredUpload() override {}
+    void ResourcesDeferredUnload() override {}
+    void ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps) override {}
+    void ResourcesDestroyNecessaryTextures() override {}
+    void ResourcesStoreNecessaryTextures() override {}
+    void ResourcesDumpMemoryUsage() override {}
 
 	// HWSupport
-	virtual bool HWSupportsShaderYUV2RGB() { return false; }
+    bool HWSupportsShaderYUV2RGB() override { return false; }
 
 	// Device state
-	virtual DeviceState GetDeviceState() { return DeviceState::Normal; }
-	virtual bool GetForceGPU_REF() { return false; }
-	virtual u32 GetCacheStatPolys() { return 0; }
-	virtual void BeforeRender() {}
-	virtual void Begin() {}
-	virtual void Clear() {}
-	virtual void End() {}
-	virtual void ClearTarget() {}
-	virtual void SetCacheXform(Fmatrix& mView, Fmatrix& mProject) {}
-	virtual void OnAssetsChanged() {}
+    DeviceState GetDeviceState() override { return DeviceState::Normal; }
+    bool GetForceGPU_REF() override { return false; }
+    u32 GetCacheStatPolys() override { return 0; }
+    void BeforeRender() override {}
+    void Begin() override {}
+    void Clear() override {}
+    void End() override {}
+    void ClearTarget() override {}
+    void SetCacheXform(Fmatrix& mView, Fmatrix& mProject) override {}
+    void OnAssetsChanged() override {}
 
-	virtual RenderContext GetCurrentContext() const { return RenderContext::NoContext; }
-	virtual void MakeContextCurrent(RenderContext context) {}
+    RenderContext GetCurrentContext() const override { return RenderContext::NoContext; }
+    void MakeContextCurrent(RenderContext context) override {}
 
 protected:
-	virtual void ScreenshotImpl(ScreenshotMode mode, pcstr name, CMemoryWriter* memory_writer) {}
+    void ScreenshotImpl(ScreenshotMode mode, pcstr name, CMemoryWriter* memory_writer) override {}
 };
 
 IC float CalcSSA(Fvector &C, float R)

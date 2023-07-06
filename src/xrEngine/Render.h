@@ -351,16 +351,16 @@ public:
 
     // Lighting/glowing
     virtual IRender_Light* light_create() = 0;
-    virtual void light_destroy(IRender_Light* p_){};
+    virtual void light_destroy(IRender_Light* p_) {}
     virtual IRender_Glow* glow_create() = 0;
-    virtual void glow_destroy(IRender_Glow* p_){};
+    virtual void glow_destroy(IRender_Glow* p_) {}
 
     // Models
     virtual IRenderVisual* model_CreateParticles(pcstr name) = 0;
     // virtual IRender_DetailModel* model_CreateDM (IReader* F) = 0;
     // virtual IRenderDetailModel* model_CreateDM (IReader* F) = 0;
     // virtual IRenderVisual* model_Create (pcstr name, IReader* data=0) = 0;
-    virtual IRenderVisual* model_Create(pcstr name, IReader* data = 0) = 0;
+    virtual IRenderVisual* model_Create(pcstr name, IReader* data = nullptr) = 0;
     virtual IRenderVisual* model_CreateChild(pcstr name, IReader* data) = 0;
     virtual IRenderVisual* model_Duplicate(IRenderVisual* V) = 0;
     // virtual void model_Delete (IRenderVisual* & V, bool bDiscard=false) = 0;
@@ -382,7 +382,7 @@ public:
     virtual void BeforeWorldRender() = 0; //--#SM+#-- Перед рендерингом мира
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
 
-    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = 0) = 0;
+    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) = 0;
     virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) = 0;
     virtual void ScreenshotAsyncBegin() = 0;
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
