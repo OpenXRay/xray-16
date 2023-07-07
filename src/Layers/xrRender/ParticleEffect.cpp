@@ -729,7 +729,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
 }
 
 extern ENGINE_API float psHUD_FOV;
-void CParticleEffect::Render(float, bool)
+void CParticleEffect::Render(CBackend& cmd_list, float, bool)
 {
     u32 dwOffset, dwCount;
     // Get a pointer to the particles in gp memory
@@ -852,27 +852,27 @@ void CParticleEffect::Render(float, bool)
                         g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
                     Device.mFullTransform.mul(Device.mProject, Device.mView);
-                    RCache.set_xform_project(Device.mProject);
+                    cmd_list.set_xform_project(Device.mProject);
                     RImplementation.rmNear();
                     ApplyTexgen(Device.mFullTransform);
                 }
 #endif
 
-                RCache.set_xform_world(Fidentity);
-                RCache.set_Geometry(geom);
+                cmd_list.set_xform_world(Fidentity);
+                cmd_list.set_Geometry(geom);
 
-                RCache.set_CullMode(m_Def->m_Flags.is(CPEDef::dfCulling) ?
+                cmd_list.set_CullMode(m_Def->m_Flags.is(CPEDef::dfCulling) ?
                         (m_Def->m_Flags.is(CPEDef::dfCullCCW) ? CULL_CCW : CULL_CW) :
                         CULL_NONE);
-                RCache.Render(D3DPT_TRIANGLELIST, dwOffset, 0, dwCount, 0, dwCount / 2);
-                RCache.set_CullMode(CULL_CCW);
+                cmd_list.Render(D3DPT_TRIANGLELIST, dwOffset, 0, dwCount, 0, dwCount / 2);
+                cmd_list.set_CullMode(CULL_CCW);
 #ifndef _EDITOR
                 if (GetHudMode())
                 {
                     RImplementation.rmNormal();
                     Device.mProject = Pold;
                     Device.mFullTransform = FTold;
-                    RCache.set_xform_project(Device.mProject);
+                    cmd_list.set_xform_project(Device.mProject);
                     ApplyTexgen(Device.mFullTransform);
                 }
 #endif

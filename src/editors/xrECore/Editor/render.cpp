@@ -81,6 +81,10 @@ void CRender::Render()
 {
 }
 
+void CRender::RenderMenu()
+{
+}
+
 IRender_DetailModel *CRender::model_CreateDM(IReader *F)
 {
 	VERIFY(F);
@@ -107,23 +111,22 @@ IRenderVisual *CRender::model_CreateParticles(LPCSTR name)
 	}
 }
 
-void CRender::rmNear()
+void CRender::rmNear(CBackend& cmd_list)
 {
-	CRenderTarget *T = getTarget();
-	D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 0.02f};
-	CHK_DX(HW.pDevice->SetViewport(&VP));
+    IRender_Target* T = getTarget();
+    RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0, 0.02f });
 }
-void CRender::rmFar()
+
+void CRender::rmFar(CBackend& cmd_list)
 {
-	CRenderTarget *T = getTarget();
-	D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f};
-	CHK_DX(HW.pDevice->SetViewport(&VP));
+    IRender_Target* T = getTarget();
+    RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0.99999f, 1.f });
 }
-void CRender::rmNormal()
+
+void CRender::rmNormal(CBackend& cmd_list)
 {
-	CRenderTarget *T = getTarget();
-	D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 1.f};
-	CHK_DX(HW.pDevice->SetViewport(&VP));
+    IRender_Target* T = getTarget();
+    RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0, 1.f });
 }
 
 void CRender::set_Transform(Fmatrix *M)
@@ -318,7 +321,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
     if (SUCCEEDED(_result))
     {
 #ifdef DEBUG
-        Log("- Compile shader:", file_name);
+        Log("- Compile shader:", name);
 #endif
         _result = create_shader(
             pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(), name, result, o.disasm);

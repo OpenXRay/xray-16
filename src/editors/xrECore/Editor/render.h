@@ -16,33 +16,45 @@
 
 #include "xrEngine/Render.h"
 
+static constexpr auto c_sbase = "s_base";
+
 // definition (Renderer)
-class CRenderTarget : public IRender_Target
+class CRenderTarget final : public IRender_Target
 {
 public:
-	virtual u32 get_width() { return EDevice.m_RenderWidth; }
-	virtual u32 get_height() { return EDevice.m_RenderHeight; }
+	u32 get_width(CBackend&) override { return EDevice.m_RenderWidth; }
+	u32 get_height(CBackend&) override { return EDevice.m_RenderHeight; }
 
 	// fake for interface
-	virtual void set_blur(float f) {}
-	virtual void set_gray(float f) {}
-	virtual void set_duality_h(float f) {}
-	virtual void set_duality_v(float f) {}
-	virtual void set_noise(float f) {}
-	virtual void set_noise_scale(float f) {}
-	virtual void set_noise_fps(float f) {}
-	virtual void set_color_base(u32 f) {}
-	virtual void set_color_gray(u32 f) {}
-	virtual void set_color_add(const Fvector& f) {}
-	virtual void set_cm_imfluence(float f) {}
-	virtual void set_cm_interpolate(float f) {}
-	virtual void set_cm_textures(const shared_str& tex0, const shared_str& tex1) {}
+    void set_blur(float f) override {}
+    void set_gray(float f) override {}
+    void set_duality_h(float f) override {}
+    void set_duality_v(float f) override {}
+    void set_noise(float f) override {}
+    void set_noise_scale(float f) override {}
+    void set_noise_fps(float f) override {}
+    void set_color_base(u32 f) override {}
+    void set_color_gray(u32 f) override {}
+    void set_color_add(const Fvector& f) override {}
+    void set_cm_imfluence(float f) override {}
+    void set_cm_interpolate(float f) override {}
+    void set_cm_textures(const shared_str& tex0, const shared_str& tex1) override {}
 };
 
 class ECORE_API CRender : public IRender
 {
 	CRenderTarget *Target;
 	Fmatrix current_matrix;
+
+    CBackend cmd_list;
+
+public:
+    // Dynamic geometry streams
+    _VertexStream Vertex;
+    _IndexStream Index;
+
+    IndexStagingBuffer QuadIB;
+    IndexBufferHandle old_QuadIB;
 
 public:
 	// options
@@ -72,6 +84,7 @@ public:
         u32 forceskinw : 1; // config
         u32 no_detail_textures : 1; // config
         u32 no_ram_textures : 1; // don't keep textures in RAM
+        u32 ffp : 1;
     } o = {};
 
 public:
@@ -94,6 +107,7 @@ public:
 
 	void Calculate() override;
 	void Render() override;
+    void RenderMenu() override;
 
 	void set_Transform(Fmatrix *M);
 	void add_Visual(IRenderVisual *visual);
@@ -133,9 +147,9 @@ public:
 	virtual void add_SkeletonWallmark(const Fmatrix *xf, CKinematics *obj, ref_shader &sh, const Fvector &start, const Fvector &dir, float size){};
 
 	// Render mode
-    void rmNear() override;
-    void rmFar() override;
-    void rmNormal() override;
+    void rmNear(CBackend& cmd_list) override;
+    void rmFar(CBackend& cmd_list) override;
+    void rmNormal(CBackend& cmd_list) override;
 
 	void apply_lmaterial() {}
 
@@ -175,14 +189,9 @@ public:
 
     void DumpStatistics(IGameFont& font, IPerformanceAlert* alert) override {}
 
-    IRender_Sector* getSector(int id) override { return nullptr; }
     IRenderVisual* getVisual(int id) override { return nullptr; }
-    IRender_Sector* detectSector(const Fvector& P) override { return nullptr; }
 
-    void flush() override {}
-    void add_Occluder(Fbox2& bb_screenspace) override {}
-    void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) override {}
-    void add_Geometry(IRenderVisual* V, const CFrustum& view) override {}
+    void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) override {}
     void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override {}
     void add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V) override {}
     void clear_static_wallmarks() override {}
@@ -207,8 +216,6 @@ public:
     void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) override {}
     void ScreenshotAsyncBegin() override {}
     void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override {}
-
-    u32 active_phase() override { return 0; }
 
 	// Gamma correction functions
     void setGamma(float fGamma) override {}
@@ -253,6 +260,13 @@ public:
 
     RenderContext GetCurrentContext() const override { return RenderContext::NoContext; }
     void MakeContextCurrent(RenderContext context) override {}
+
+    CBackend& get_imm_command_list() override
+    {
+        return cmd_list;
+    }
+
+    void CreateQuadIB();
 
 protected:
     void ScreenshotImpl(ScreenshotMode mode, pcstr name, CMemoryWriter* memory_writer) override {}

@@ -303,7 +303,7 @@ void CEditableObject::DefferedLoadRP()
 
     // skeleton
     if (IsSkeleton())
-        vs_SkeletonGeom.create(FVF_SV, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+        vs_SkeletonGeom.create(FVF_SV, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 
     //*/
     // создать LOD shader

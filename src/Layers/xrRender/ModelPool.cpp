@@ -509,7 +509,7 @@ void CModelPool::Render(
                 {
                     RCache.set_Shader(pV->m_lod->shader ? pV->m_lod->shader : EDevice.m_WireShader);
                     RCache.set_xform_world(mTransform);
-                    pV->m_lod->Render(1.f);
+                    pV->m_lod->Render(RCache, 1.f, false);
                 }
             }
             else
@@ -522,7 +522,7 @@ void CModelPool::Render(
                     {
                         RCache.set_Shader((*I)->shader ? (*I)->shader : EDevice.m_WireShader);
                         RCache.set_xform_world(mTransform);
-                        (*I)->Render(m_fLOD);
+                        (*I)->Render(RCache, m_fLOD, false);
                     }
                 }
             }
@@ -543,7 +543,7 @@ void CModelPool::Render(
                 {
                     RCache.set_Shader((*I)->shader ? (*I)->shader : EDevice.m_WireShader);
                     RCache.set_xform_world(mTransform);
-                    (*I)->Render(m_fLOD);
+                    (*I)->Render(RCache, m_fLOD, false);
                 }
             }
         }
@@ -574,7 +574,7 @@ void CModelPool::Render(
             {
                 RCache.set_Shader(m_pVisual->shader ? m_pVisual->shader : EDevice.m_WireShader);
                 RCache.set_xform_world(mTransform);
-                m_pVisual->Render(m_fLOD);
+                m_pVisual->Render(RCache, m_fLOD, false);
             }
         }
     }
@@ -586,7 +586,7 @@ void CModelPool::Render(
             {
                 RCache.set_Shader(m_pVisual->shader ? m_pVisual->shader : EDevice.m_WireShader);
                 RCache.set_xform_world(mTransform);
-                m_pVisual->Render(m_fLOD);
+                m_pVisual->Render(RCache, m_fLOD, false);
             }
         }
         break;

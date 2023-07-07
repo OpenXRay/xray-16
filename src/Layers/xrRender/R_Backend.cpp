@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#ifdef _EDITOR
+void CRender::CreateQuadIB()
+#else
 void D3DXRenderBase::CreateQuadIB()
+#endif
 {
     constexpr auto triCount = 4 * 1024;
     constexpr auto idxCount = triCount * 2 * 3;

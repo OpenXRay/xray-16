@@ -6,6 +6,9 @@
 #include <DirectXMath.h>
 #endif
 
+#include "LightTrack.h"
+#include "xrEngine/IRenderable.h"
+
 void CBackend::OnFrameEnd()
 {
     if (!GEnv.isDedicatedServer)
@@ -574,9 +577,6 @@ void CBackend::OnDeviceDestroy()
     _RELEASE(pAnnotation);
 #endif
 }
-
-#include "LightTrack.h"
-#include "xrEngine/IRenderable.h"
 
 void CBackend::apply_lmaterial()
 {

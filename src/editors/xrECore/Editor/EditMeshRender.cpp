@@ -365,7 +365,7 @@ void CEditableMesh::RenderSkeleton(const Fmatrix &, CSurface *S)
     SurfFacesPairIt sp_it = m_SurfFaces.find(S);
     R_ASSERT(sp_it != m_SurfFaces.end());
     IntVec &face_lst = sp_it->second;
-    _VertexStream *Stream = &RCache.Vertex;
+    _VertexStream *Stream = &RImplementation.Vertex;
     u32 vBase;
 
     svertRender *pv = (svertRender *)Stream->Lock(SKEL_MAX_FACE_COUNT * 3, m_Parent->vs_SkeletonGeom->vb_stride, vBase);
