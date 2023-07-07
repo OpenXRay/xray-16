@@ -342,7 +342,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
 
     // Access to template
     C.BT = nullptr;
-    C.bEditor = FALSE;
+    C.bFFP = FALSE;
     C.bDetail = FALSE;
 
     // Prepare

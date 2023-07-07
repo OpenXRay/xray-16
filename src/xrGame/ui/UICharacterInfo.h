@@ -22,10 +22,11 @@ protected:
     void ResetAllStrings();
     void UpdateRelation();
     bool hasOwner() { return (m_ownerID != u16(-1)); }
+
     // Biography
-    CUIScrollView* pUIBio;
-    bool m_bForceUpdate;
-    u16 m_ownerID;
+    CUIScrollView* pUIBio{};
+    bool m_bForceUpdate{};
+    u16 m_ownerID{ u16(-1) };
 
     enum UIItemType
     {
@@ -51,13 +52,12 @@ protected:
 
         eMaxCaption
     };
-    CUIStatic* m_icons[eMaxCaption];
+    CUIStatic* m_icons[eMaxCaption]{};
     shared_str m_texture_name;
     u32 m_deadbody_color;
 
 public:
-    CUICharacterInfo();
-    virtual ~CUICharacterInfo();
+    CUICharacterInfo() : CUIWindow("CUICharacterInfo") {}
 
     void InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xml_doc);
     void InitCharacterInfo(Fvector2 pos, Fvector2 size, cpcstr xml_name, cpcstr xml_name2 = nullptr);

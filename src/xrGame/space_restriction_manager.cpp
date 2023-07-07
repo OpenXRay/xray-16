@@ -127,7 +127,7 @@ void CSpaceRestrictionManager::restrict(ALife::_OBJECT_ID id, shared_str out_res
     join_restrictions(merged_out_restrictions, _default_out_restrictions);
     join_restrictions(merged_in_restrictions, _default_in_restrictions);
 
-    CLIENT_RESTRICTIONS::iterator I = m_clients->find(id);
+    [[maybe_unused]] auto I = m_clients->find(id);
     VERIFY2((m_clients->end() == I) || !(*I).second.m_restriction || !(*I).second.m_restriction->applied(),
         "Restriction cannot be changed since its border is still applied!");
     (*m_clients)[id].m_restriction = restriction(merged_out_restrictions, merged_in_restrictions);

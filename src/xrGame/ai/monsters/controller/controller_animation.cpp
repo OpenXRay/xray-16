@@ -25,27 +25,23 @@ void CControllerAnimation::reinit()
 
 void CControllerAnimation::on_start_control(ControlCom::EControlType type)
 {
-    switch (type)
+    if (type == ControlCom::eControlAnimation)
     {
-    case ControlCom::eControlAnimation:
         m_man->subscribe(this, ControlCom::eventAnimationEnd);
         m_man->subscribe(this, ControlCom::eventTorsoAnimationEnd);
         m_man->subscribe(this, ControlCom::eventLegsAnimationEnd);
 
         on_switch_controller();
-        break;
     }
 }
 
 void CControllerAnimation::on_stop_control(ControlCom::EControlType type)
 {
-    switch (type)
+    if (type == ControlCom::eControlAnimation)
     {
-    case ControlCom::eControlAnimation:
         m_man->unsubscribe(this, ControlCom::eventAnimationEnd);
         m_man->unsubscribe(this, ControlCom::eventTorsoAnimationEnd);
         m_man->unsubscribe(this, ControlCom::eventLegsAnimationEnd);
-        break;
     }
 }
 
@@ -60,10 +56,16 @@ void CControllerAnimation::on_event(ControlCom::EEventType type, ControlCom::IEv
         break;
     }
     case ControlCom::eventTorsoAnimationEnd:
+    {
         m_wait_torso_anim_end = false;
         select_torso_animation();
         break;
-    case ControlCom::eventLegsAnimationEnd: select_legs_animation(); break;
+    }
+    case ControlCom::eventLegsAnimationEnd:
+    {
+        select_legs_animation();
+        break;
+    }
     case ControlCom::eventAnimationSignal:
     {
         SAnimationSignalEventData* event_data = (SAnimationSignalEventData*)data;

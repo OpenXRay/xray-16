@@ -98,7 +98,7 @@ public:
         count++;
         array[id] = V;
     }
-    IC void assign(iterator p, int c)
+    IC void assign(const_iterator p, int c)
     {
         VERIFY(c > 0 && c <= dim);
         CopyMemory(array, p, c * sizeof(value_type));

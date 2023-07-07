@@ -1,4 +1,9 @@
+//////////////////////////////////////////////////////////////////////
+// UIPdaMsgListItem.h: элемент окна списка в основном 
+// экране для сообщений PDA
+//////////////////////////////////////////////////////////////////////
 #pragma once
+
 #include "xrUICore/Static/UIStatic.h"
 
 class CUIPdaMsgListItem final : public CUIColorAnimConrollerContainer

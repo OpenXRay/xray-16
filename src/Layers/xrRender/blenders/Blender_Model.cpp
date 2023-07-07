@@ -65,35 +65,94 @@ LPCSTR CBlender_Model::getComment()
     return "MODEL: Default";
 }
 
-void CBlender_Model::CompileForEditor(CBlender_Compile& C)
-{
-    C.PassBegin();
-    {
-        C.PassSET_ZB(TRUE, oBlend.value && (oAREF.value < 200) ? FALSE : TRUE);
-        if (oBlend.value)
-            C.PassSET_Blend_BLEND(TRUE, oAREF.value);
-        else
-            C.PassSET_Blend_SET();
-        C.PassSET_LightFog(TRUE, TRUE);
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-        C.StageSET_TMC(oT_Name, "$null", "$null", 0);
-        C.StageEnd();
-    }
-    C.PassEnd();
-}
-
 void CBlender_Model::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (C.bEditor)
-    {
-        CompileForEditor(C);
-        return;
-    }
+    if (C.bFFP)
+        CompileFFP(C);
+    else
+        CompileProgrammable(C);
+}
 
+void CBlender_Model::CompileFFP(CBlender_Compile& C) const
+{
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
+    {
+        C.PassBegin();
+        {
+            C.PassSET_ZB(TRUE, oBlend.value && (oAREF.value < 200) ? FALSE : TRUE);
+            if (oBlend.value)
+                C.PassSET_Blend_BLEND(TRUE, oAREF.value);
+            else
+                C.PassSET_Blend_SET();
+            C.PassSET_LightFog(TRUE, TRUE);
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+            C.StageEnd();
+        }
+        C.PassEnd();
+    }
+    else
+    {
+        switch (C.iElement)
+        {
+        case SE_R1_NORMAL_HQ:
+        {
+            C.PassBegin();
+            {
+                C.PassSET_ZB(TRUE, TRUE);
+                C.PassSET_Blend_SET();
+                C.PassSET_LightFog(TRUE, TRUE);
+#if 1
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+                C.StageSET_TMC("$user$projector", "$user$projector", "$null", 0);
+                C.StageEnd();
+#else
+                // https://github.com/OpenXRay/xray-soc-history/commit/de357fa58d7a6aaf14fe1626cf00d48850ced36f
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_ADD, D3DTA_DIFFUSE);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+                C.StageSET_TMC("$user$projector", "$user$projector", "$null", 0);
+                C.StageEnd();
+
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+                C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+                C.StageEnd();
+#endif
+            }
+            C.PassEnd();
+            break;
+        }
+        case SE_R1_NORMAL_LQ:
+        {
+            C.PassBegin();
+            {
+                C.PassSET_ZB(TRUE, TRUE);
+                C.PassSET_Blend_SET();
+                C.PassSET_LightFog(TRUE, TRUE);
+
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+                C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+                C.StageEnd();
+            }
+            C.PassEnd();
+            break;
+        }
+        } // switch (C.iElement)
+    }
+}
+
+void CBlender_Model::CompileProgrammable(CBlender_Compile& C) const
+{
     LPCSTR vsname = nullptr;
     LPCSTR psname = nullptr;
     switch (C.iElement)

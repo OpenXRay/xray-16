@@ -43,6 +43,6 @@ SCRIPT_EXPORT(CScriptWatchAction, (),
             .def("direct", &CScriptWatchAction::SetWatchDirection) // time
             .def("type", &CScriptWatchAction::SetWatchType)
             .def("bone", &CScriptWatchAction::SetWatchBone)
-            .def("completed", (bool (CScriptWatchAction::*)())(&CScriptWatchAction::completed))
+            .def("completed", &CScriptAbstractAction::completed)
     ];
 });

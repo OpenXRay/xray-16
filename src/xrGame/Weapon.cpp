@@ -423,10 +423,6 @@ void CWeapon::Load(LPCSTR section)
 
     m_bIsSingleHanded = pSettings->read_if_exists<bool>(section, "single_handed", true);
 
-    //
-    m_fMinRadius = pSettings->r_float(section, "min_radius");
-    m_fMaxRadius = pSettings->r_float(section, "max_radius");
-
     // информация о возможных апгрейдах и их визуализации в инвентаре
     m_eScopeStatus = (ALife::EWeaponAddonStatus)pSettings->r_s32(section, "scope_status");
     m_eSilencerStatus = (ALife::EWeaponAddonStatus)pSettings->r_s32(section, "silencer_status");
@@ -505,9 +501,9 @@ void CWeapon::Load(LPCSTR section)
     m_u8TracerColorID = READ_IF_EXISTS(pSettings, r_u8, section, "tracers_color_ID", u8(-1));
 
     string256 temp;
-    for (int i = egdNovice; i < egdCount; ++i)
+    for (u32 i = egdNovice; i < egdCount; ++i)
     {
-        strconcat(sizeof(temp), temp, "hit_probability_", get_token_name(difficulty_type_token, i));
+        strconcat(temp, "hit_probability_", get_token_name(difficulty_type_token, static_cast<int>(i)));
         m_hit_probability[i] = READ_IF_EXISTS(pSettings, r_float, section, temp, 1.f);
     }
 
@@ -915,8 +911,10 @@ void CWeapon::EnableActorNVisnAfterZoom()
 }
 
 bool CWeapon::need_renderable() { return !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom()); }
-void CWeapon::renderable_Render(IRenderable* root)
+void CWeapon::renderable_Render(u32 context_id, IRenderable* root)
 {
+    ScopeLock lock{ &render_lock };
+
     UpdateXForm();
 
     //нарисовать подсветку
@@ -929,7 +927,7 @@ void CWeapon::renderable_Render(IRenderable* root)
     else
         RenderHud(TRUE);
 
-    inherited::renderable_Render(root);
+    inherited::renderable_Render(context_id, root);
 }
 
 void CWeapon::signal_HideComplete()
@@ -984,9 +982,11 @@ bool CWeapon::Action(u16 cmd, u32 flags)
             {
                 FireEnd();
             }
+            return true;
         };
+        return false;
     }
-        return true;
+
     case kWPN_NEXT: { return SwitchAmmoType(flags);
     }
 

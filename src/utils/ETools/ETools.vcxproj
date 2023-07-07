@@ -24,6 +24,9 @@
   <PropertyGroup>
     <OutDir>$(xrBinDir)utils\</OutDir>
   </PropertyGroup>
+  <PropertyGroup>
+    <CopyLocalProjectReference>true</CopyLocalProjectReference>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim;$(xrExternals)libvorbis\include;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

@@ -309,6 +309,9 @@
     <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp">
       <Filter>Details</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\DetailManager_soft.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRender\DetailModel.cpp">
       <Filter>Details</Filter>
     </ClCompile>
@@ -642,9 +645,6 @@
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_rain.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -692,6 +692,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

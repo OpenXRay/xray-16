@@ -62,8 +62,11 @@ public:
     [[nodiscard]] Task& CreateTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
     [[nodiscard]] Task& CreateTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
-    // Run task
+    // Run task in parallel
     void PushTask(Task& task);
+
+    // Run task immediately in this thread
+    void RunTask(Task& task);
 
     // Shortcut: create a task and run it immediately
     Task& AddTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);

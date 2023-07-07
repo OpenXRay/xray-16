@@ -270,7 +270,7 @@ void CUITalkDialogWnd::AddIconedAnswer(LPCSTR caption, LPCSTR text, LPCSTR textu
     Actor()->game_news_registry->registry().objects().push_back(news_data);
 }
 
-void CUITalkDialogWnd::AddIconedAnswer(cpcstr text, cpcstr texture_name, Frect texture_rect, cpcstr templ_name)
+void CUITalkDialogWnd::AddIconedAnswer(pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name)
 {
     CUIAnswerItemIconed* itm = xr_new<CUIAnswerItemIconed>(m_uiXml, templ_name);
     itm->Init(text, texture_name, texture_rect);
@@ -428,7 +428,7 @@ void CUIAnswerItemIconed::Init(LPCSTR text, LPCSTR name, LPCSTR texture_name)
     m_icon->SetStretchTexture(true);
 }
 
-void CUIAnswerItemIconed::Init(cpcstr text, cpcstr texture_name, Frect texture_rect)
+void CUIAnswerItemIconed::Init(pcstr text, pcstr texture_name, Frect texture_rect)
 {
     inherited::Init(text, "");
     m_icon->InitTexture(texture_name);

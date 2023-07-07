@@ -22,14 +22,21 @@ void CLight_DB::Load(IReader* fs)
         v_static.reserve(count);
         for (size_t i = 0; i < count; ++i)
         {
-            Flight Ldata;
-            F->advance(sizeof(u32)); // u32 controller = F->r_u32();
-            F->r(&Ldata, sizeof(Flight));
-
             light* L = Create();
             L->flags.bStatic = true;
 
-            if (Ldata.type == D3DLIGHT_DIRECTIONAL)
+#if RENDER == R_R1
+            Flight& Ldata = L->ldata;
+#else
+            Flight Ldata;
+#endif
+            F->advance(sizeof(u32)); // u32 controller = F->r_u32();
+            F->r(&Ldata, sizeof(Flight));
+
+            Ldata.specular.set(Ldata.diffuse);
+            Ldata.specular.mul_rgb(0.2f);
+
+            if (Ldata.type == Flight::Type::Directional)
             {
                 Fvector tmp_R;
                 tmp_R.set(1, 0, 0);
@@ -143,7 +150,10 @@ void CLight_DB::add_light(light* L)
     L->frame_render = Device.dwFrame;
 #if RENDER == R_R1
     if (L->flags.bStatic)
-        return; // skip static lighting, 'cause they are in lmaps
+    {
+        if (!RImplementation.o.ffp || ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+            return; // skip static lighting, 'cause they are in lmaps
+    }
     if (ps_r1_flags.test(R1FLAG_DLIGHTS))
         RImplementation.L_Dynamic->add(L);
 #else

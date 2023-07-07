@@ -31,11 +31,7 @@ namespace smart_cover
 {
 using namespace StalkerDecisionSpace;
 
-animation_planner::animation_planner(CAI_Stalker* object, LPCSTR action_name)
-    : inherited(), m_time_object_hit(0), m_last_transition_time(0), m_default_idle_interval(0),
-    m_default_lookout_interval(0), m_loophole_value(1000), m_head_speed(flt_max), m_idle_min_time(0.f),
-    m_idle_max_time(0.f), m_lookout_min_time(0.f), m_lookout_max_time(0.f), m_stay_idle(true), m_last_idle_time(0),
-    m_last_lookout_time(0)
+animation_planner::animation_planner(CAI_Stalker* object, LPCSTR action_name) : inherited()
 {
 }
 

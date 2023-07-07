@@ -951,9 +951,9 @@ void CAI_Stalker::debug_text()
     }
 }
 
-void CAI_Stalker::OnHUDDraw(CCustomHUD* hud, IRenderable* root)
+void CAI_Stalker::OnHUDDraw(u32 context_id, CCustomHUD* hud, IRenderable* root)
 {
-    inherited::OnHUDDraw(hud, root);
+    inherited::OnHUDDraw(context_id, hud, root);
     m_dbg_hud_draw = true;
 }
 

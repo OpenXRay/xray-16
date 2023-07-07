@@ -138,7 +138,7 @@ void STextureList::clear()
     erase(begin(), end());
 }
 
-u32 STextureList::find_texture_stage(const shared_str& TexName) const
+u32 STextureList::find_texture_stage(const shared_str& TexName, bool warnIfMissing /*= true*/) const
 {
     for (const auto& [stage, texture] : *this)
     {
@@ -148,15 +148,17 @@ u32 STextureList::find_texture_stage(const shared_str& TexName) const
             return stage;
     }
 
+    if (!warnIfMissing)
+        return u32(-1);
     VERIFY3(false, "Couldn't find texture stage", TexName.c_str());
     return 0;
 }
 
-void STextureList::create_texture(u32 stage, pcstr textureName, bool evenIfNotNull)
+void STextureList::create_texture(u32 stage, pcstr textureName, bool overrideIfExists)
 {
     for (auto& loader : *this)
     {
-        if (loader.first == stage && (!loader.second || evenIfNotNull))
+        if (loader.first == stage && (!loader.second || overrideIfExists))
         {
             //  Assign correct texture
             loader.second.create(textureName);

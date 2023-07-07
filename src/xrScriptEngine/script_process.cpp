@@ -29,19 +29,18 @@ CScriptProcess::CScriptProcess(CScriptEngine* scriptEngine, shared_str name, sha
 CScriptProcess::~CScriptProcess() { delete_data(m_scripts); }
 void CScriptProcess::run_scripts()
 {
-    pstr S;
-    for (; !m_scripts_to_run.empty();)
+    while (!m_scripts_to_run.empty())
     {
-        pstr I = m_scripts_to_run.back().m_script_name;
-        bool do_string = m_scripts_to_run.back().m_do_string;
-        bool reload = m_scripts_to_run.back().m_reload;
-        S = xr_strdup(I);
+        cpcstr I = m_scripts_to_run.back().m_script_name;
+        const bool do_string = m_scripts_to_run.back().m_do_string;
+        const bool reload = m_scripts_to_run.back().m_reload;
+        pstr S = xr_strdup(I);
         m_scripts_to_run.pop_back();
 
         CScriptThread* script = scriptEngine->CreateScriptThread(S, do_string, reload);
         xr_free(S);
 
-        if (script->active())
+        if (script && script->active())
             m_scripts.push_back(script);
         else
             xr_delete(script);

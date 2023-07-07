@@ -21,6 +21,13 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
         return E_FAIL;
     }
 
+#ifdef DEBUG
+    if (result->sh)
+    {
+        result->sh->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(file_name), file_name);
+    }
+#endif
+
     ID3DShaderReflection* pReflection = 0;
     _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 
@@ -140,7 +147,8 @@ public:
     }
     HRESULT __stdcall Close(LPCVOID pData)
     {
-        xr_free(pData);
+        auto mutableData = const_cast<LPVOID>(pData);
+        xr_free(mutableData);
         return D3D_OK;
     }
 };
@@ -203,9 +211,6 @@ public:
 
     D3D_SHADER_MACRO* data() { return m_options; }
 };
-
-static inline bool match_shader_id(
-    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
 HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     pcstr pTarget, u32 Flags, void*& result)
@@ -500,27 +505,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     string_path filename;
     strconcat(sizeof(filename), filename, renderer, name, ".", extension);
 
-    string_path folder_name, folder;
-    strconcat(sizeof(folder), folder, renderer, "objects" DELIMITER, filename);
-
-    FS.update_path(folder_name, "$game_shaders$", folder);
-    xr_strcat(folder_name, DELIMITER);
-
-    m_file_set.clear();
-    FS.file_list(m_file_set, folder_name, FS_ListFiles | FS_RootOnly, "*");
-
-    string_path temp_file_name, file_name;
-    if (!match_shader_id(name, sh_name.c_str(), m_file_set, temp_file_name))
+    string_path file_name;
     {
         string_path file;
         strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename, DELIMITER, sh_name.c_str());
         strconcat(sizeof(filename), filename, filename, DELIMITER, sh_name.c_str());
         FS.update_path(file_name, "$app_data_root$", file);
-    }
-    else
-    {
-        xr_strcpy(file_name, folder_name);
-        xr_strcat(file_name, temp_file_name);
     }
 
     string_path shadersFolder;
@@ -606,78 +596,4 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     return _result;
-}
-
-static inline bool match_shader(
-    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, LPCSTR const mask, size_t const mask_length)
-{
-    size_t const full_shader_id_length = xr_strlen(full_shader_id);
-    if (full_shader_id_length == mask_length)
-    {
-#ifndef MASTER_GOLD
-        Msg("bad cache for shader %s, [%s], [%s]", debug_shader_id, mask, full_shader_id);
-#endif
-        return false;
-    }
-    char const* i = full_shader_id;
-    char const* const e = full_shader_id + full_shader_id_length;
-    char const* j = mask;
-    for (; i != e; ++i, ++j)
-    {
-        if (*i == *j)
-            continue;
-
-        if (*j == '_')
-            continue;
-
-        return false;
-    }
-
-    return true;
-}
-
-static inline bool match_shader_id(
-    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result)
-{
-    // XXX: -no_shaders_cache command line key
-    // Don't put here this code:
-    // if (strstr(Core.Params, "-no_shaders_cache"))
-    // It would decrease performance.
-    // It's better to use a console command for this
-#if 0
-    strcpy_s(result, "");
-    return false;
-#else // #if 1
-#ifdef DEBUG
-    LPCSTR temp = "";
-    bool found = false;
-    FS_FileSet::const_iterator i = file_set.begin();
-    FS_FileSet::const_iterator const e = file_set.end();
-    for (; i != e; ++i)
-    {
-        if (match_shader(debug_shader_id, full_shader_id, (*i).name.c_str(), (*i).name.size()))
-        {
-            VERIFY(!found);
-            found = true;
-            temp = (*i).name.c_str();
-        }
-    }
-
-    xr_strcpy(result, temp);
-    return found;
-#else // #ifdef DEBUG
-    FS_FileSet::const_iterator i = file_set.begin();
-    FS_FileSet::const_iterator const e = file_set.end();
-    for (; i != e; ++i)
-    {
-        if (match_shader(debug_shader_id, full_shader_id, (*i).name.c_str(), (*i).name.size()))
-        {
-            xr_strcpy(result, (*i).name.c_str());
-            return true;
-        }
-    }
-
-    return false;
-#endif // #ifdef DEBUG
-#endif // #if 1
 }

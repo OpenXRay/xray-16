@@ -1,5 +1,7 @@
 #pragma once
 
+#include "r__sector.h"
+
 // feedback	for receiving visuals
 class R_feedback
 {
@@ -7,19 +9,40 @@ public:
     virtual void rfeedback_static(dxRender_Visual* V) = 0;
 };
 
-class R_dsgraph_structure
+struct R_dsgraph_structure
 {
+    static constexpr auto INVALID_CONTEXT_ID = static_cast<u32>(-1);
+#if RENDER == R_R1
+    static constexpr auto IMM_CTX_ID = 0; // TODO: to remove this ugly #ifdef we need to introduce per-render configuration
+#else
+    static constexpr auto IMM_CTX_ID = R__NUM_PARALLEL_CONTEXTS; // the next after pooled
+#endif
+
     R_feedback* val_feedback{}; // feedback for geometry being rendered
     u32 val_feedback_breakp{}; // breakpoint
     xr_vector<Fbox3>* val_recorder; // coarse structure recorder
-
-public:
-    u32 phase{};
     u32 marker{};
-    bool pmask[2];
-    bool pmask_wmark;
+    u32 context_id{ INVALID_CONTEXT_ID };
 
-public:
+    struct options_t
+    {
+        u32 phase{};
+        u32 portal_traverse_flags{};
+        u32 spatial_traverse_flags{};
+        u32 spatial_types{ STYPE_RENDERABLE };
+        float query_box_side{ EPS_L * 20.0f };
+        Fvector view_pos{};
+        Fmatrix xform{};
+        CFrustum view_frustum{};
+        IRender_Sector::sector_id_t sector_id;
+        bool pmask[2];
+        bool pmask_wmark;
+        bool use_hom{ false };
+        bool precise_portals{ false };
+        bool is_main_pass{ false };
+        bool mt_calculate{ false };
+    } o;
+
     // Dynamic scene graph
     // R_dsgraph::mapNormal_T										mapNormal	[2]		;	// 2==(priority/2)
     R_dsgraph::mapNormalPasses_T mapNormalPasses[2]; // 2==(priority/2)
@@ -37,6 +60,11 @@ public:
     R_dsgraph::mapSorted_T mapHUDEmissive;
 #endif
 
+    xr_vector<CSector*> Sectors;
+    xr_vector<CPortal*> Portals;
+    CPortalTraverser PortalTraverser;
+    xrXRC Sectors_xrc;
+
     // Runtime structures
     xr_vector<R_dsgraph::mapNormal_T::value_type*> nrmPasses;
     xr_vector<R_dsgraph::mapMatrix_T::value_type*> matPasses;
@@ -46,11 +74,11 @@ public:
     xr_vector<ISpatial*> lstSpatial;
     xr_vector<dxRender_Visual*> lstVisuals;
 
+    CBackend cmd_list{};
+
     u32 counter_S{};
     u32 counter_D{};
-    BOOL b_loaded{};
 
-public:
     void set_Feedback(R_feedback* V, u32 id)
     {
         val_feedback_breakp = id;
@@ -69,14 +97,27 @@ public:
     }
     void clear_Counters() { counter_S = counter_D = 0; }
 
-public:
-    R_dsgraph_structure()
+    R_dsgraph_structure() : Sectors_xrc("dsgraph")
     {
         r_pmask(true, true);
     };
 
-    void r_dsgraph_destroy()
+    void reset()
     {
+        //marker = 0;
+        context_id = INVALID_CONTEXT_ID;
+
+        o.query_box_side = EPS_L * 20;
+        o.use_hom = false;
+        o.precise_portals = false;
+        o.is_main_pass = false;
+        o.spatial_traverse_flags = 0;
+        o.portal_traverse_flags = 0;
+        o.spatial_types = STYPE_RENDERABLE;
+
+        val_recorder = nullptr;
+        val_feedback = nullptr;
+
         nrmPasses.clear();
         matPasses.clear();
 
@@ -104,36 +145,49 @@ public:
         mapEmissive.clear();
         mapHUDEmissive.clear();
 #endif
+        cmd_list.Invalidate();
     }
 
     void r_pmask(bool _1, bool _2, bool _wm = false)
     {
-        pmask[0] = _1;
-        pmask[1] = _2;
-        pmask_wmark = _wm;
+        o.pmask[0] = _1;
+        o.pmask[1] = _2;
+        o.pmask_wmark = _wm;
     }
 
-protected:
-    void add_Static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
-    void add_leafs_Dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility
-    void add_leafs_Static(dxRender_Visual* pVisual); // if detected node's full visibility
+    void load(const xr_vector<CSector::level_sector_data_t> &sectors, const xr_vector<CPortal::level_portal_data_t> &portals);
+    void unload();
 
-public:
-    void r_dsgraph_insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center);
-    void r_dsgraph_insert_static(dxRender_Visual* pVisual);
+    ICF IRender_Portal* get_portal(size_t id) const
+    {
+        VERIFY(id < Portals.size());
+        return Portals[id];
+    }
+    ICF IRender_Sector* get_sector(size_t id) const
+    {
+        VERIFY(id < Sectors.size());
+        return Sectors[id];
+    }
+    IRender_Sector::sector_id_t detect_sector(const Fvector& P);
+    IRender_Sector::sector_id_t detect_sector(const Fvector& P, Fvector& D);
+
+    void add_static(dxRender_Visual* pVisual, const CFrustum& view, u32 planes);
+    void add_leafs_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform); // if detected node's full visibility
+    void add_leafs_static(dxRender_Visual* pVisual); // if detected node's full visibility
+
+    void insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center);
+    void insert_static(dxRender_Visual* pVisual);
 
     // render primitives
-    void r_dsgraph_render_graph(u32 _priority);
-    void r_dsgraph_render_hud();
-    void r_dsgraph_render_hud_ui();
-    void r_dsgraph_render_lods(bool _setup_zb, bool _clear);
-    void r_dsgraph_render_sorted();
-    void r_dsgraph_render_emissive();
-    void r_dsgraph_render_wmarks();
-    void r_dsgraph_render_distort();
-    void r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum* _frustum, Fmatrix& mCombined, Fvector& _cop,
-        BOOL _dynamic, BOOL _precise_portals = FALSE);
-    void r_dsgraph_render_subspace(
-        IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
-    void r_dsgraph_render_R1_box(IRender_Sector* _sector, Fbox& _bb, int _element);
+    void render_graph(u32 _priority);
+    void render_hud();
+    void render_hud_ui();
+    void render_lods(bool _setup_zb, bool _clear);
+    void render_sorted();
+    void render_emissive();
+    void render_wmarks();
+    void render_distort();
+    void render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& _bb, int _element);
+
+    void build_subspace();
 };

@@ -17,7 +17,7 @@
 #define BIND_DECLARE(xf)\
     class cl_xform_##xf : public R_constant_setup\
     {\
-        virtual void setup(R_constant* C) { RCache.xforms.set_c_##xf(C); }\
+        void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.xforms.set_c_##xf(C); }\
     };\
     static cl_xform_##xf binder_##xf
 BIND_DECLARE(w);
@@ -31,7 +31,7 @@ BIND_DECLARE(wvp);
 #define DECLARE_TREE_BIND(c)\
     class cl_tree_##c : public R_constant_setup\
     {\
-        virtual void setup(R_constant* C) { RCache.tree.set_c_##c(C); }\
+        void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.tree.set_c_##c(C); }\
     };\
     static cl_tree_##c tree_binder_##c
 
@@ -46,28 +46,28 @@ DECLARE_TREE_BIND(c_sun);
 
 class cl_hemi_cube_pos_faces : public R_constant_setup
 {
-    virtual void setup(R_constant* C) { RCache.hemi.set_c_pos_faces(C); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.set_c_pos_faces(C); }
 };
 
 static cl_hemi_cube_pos_faces binder_hemi_cube_pos_faces;
 
 class cl_hemi_cube_neg_faces : public R_constant_setup
 {
-    virtual void setup(R_constant* C) { RCache.hemi.set_c_neg_faces(C); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.set_c_neg_faces(C); }
 };
 
 static cl_hemi_cube_neg_faces binder_hemi_cube_neg_faces;
 
 class cl_material : public R_constant_setup
 {
-    virtual void setup(R_constant* C) { RCache.hemi.set_c_material(C); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.set_c_material(C); }
 };
 
 static cl_material binder_material;
 
 class cl_texgen : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fmatrix mTexgen;
 
@@ -103,15 +103,15 @@ class cl_texgen : public R_constant_setup
 #    error No graphics API selected or in use!
 #endif
 
-        mTexgen.mul(mTexelAdjust, RCache.xforms.m_wvp);
-        RCache.set_c(C, mTexgen);
+        mTexgen.mul(mTexelAdjust, cmd_list.xforms.m_wvp);
+        cmd_list.set_c(C, mTexgen);
     }
 };
 static cl_texgen binder_texgen;
 
 class cl_VPtexgen : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fmatrix mTexgen;
 
@@ -147,8 +147,8 @@ class cl_VPtexgen : public R_constant_setup
 #    error No graphics API selected or in use!
 #endif
 
-        mTexgen.mul(mTexelAdjust, RCache.xforms.m_vp);
-        RCache.set_c(C, mTexgen);
+        mTexgen.mul(mTexelAdjust, cmd_list.xforms.m_vp);
+        cmd_list.set_c(C, mTexgen);
     }
 };
 static cl_VPtexgen binder_VPtexgen;
@@ -159,7 +159,7 @@ class cl_fog_plane : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -178,7 +178,7 @@ class cl_fog_plane : public R_constant_setup
             float B = 1 / (g_pGamePersistent->Environment().CurrentEnv.fog_far - A);
             result.set(-plane.x * B, -plane.y * B, -plane.z * B, 1 - (plane.w - A) * B); // view-plane
         }
-        RCache.set_c(C, result);
+        cmd_list.set_c(C, result);
     }
 };
 static cl_fog_plane binder_fog_plane;
@@ -188,7 +188,7 @@ class cl_fog_params : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -198,7 +198,7 @@ class cl_fog_params : public R_constant_setup
             float r = 1 / (f - n);
             result.set(-n * r, r, r, r);
         }
-        RCache.set_c(C, result);
+        cmd_list.set_c(C, result);
     }
 };
 static cl_fog_params binder_fog_params;
@@ -208,14 +208,14 @@ class cl_fog_color : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
             const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.fog_color.x, desc.fog_color.y, desc.fog_color.z, 0);
         }
-        RCache.set_c(C, result);
+        cmd_list.set_c(C, result);
     }
 };
 static cl_fog_color binder_fog_color;
@@ -224,10 +224,10 @@ static cl_fog_color binder_fog_color;
 // times
 class cl_times : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float t = RDEVICE.fTimeGlobal;
-        RCache.set_c(C, t, t * 10, t / 10, _sin(t));
+        cmd_list.set_c(C, t, t * 10, t / 10, _sin(t));
     }
 };
 static cl_times binder_times;
@@ -235,10 +235,10 @@ static cl_times binder_times;
 // eye-params
 class cl_eye_P : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fvector& V = RDEVICE.vCameraPosition;
-        RCache.set_c(C, V.x, V.y, V.z, 1.f);
+        cmd_list.set_c(C, V.x, V.y, V.z, 1.f);
     }
 };
 static cl_eye_P binder_eye_P;
@@ -246,10 +246,10 @@ static cl_eye_P binder_eye_P;
 // eye-params
 class cl_eye_D : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fvector& V = RDEVICE.vCameraDirection;
-        RCache.set_c(C, V.x, V.y, V.z, 0.f);
+        cmd_list.set_c(C, V.x, V.y, V.z, 0.f);
     }
 };
 static cl_eye_D binder_eye_D;
@@ -257,10 +257,10 @@ static cl_eye_D binder_eye_D;
 // eye-params
 class cl_eye_N : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         Fvector& V = RDEVICE.vCameraTop;
-        RCache.set_c(C, V.x, V.y, V.z, 0.f);
+        cmd_list.set_c(C, V.x, V.y, V.z, 0.f);
     }
 };
 static cl_eye_N binder_eye_N;
@@ -271,14 +271,14 @@ class cl_sun0_color : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
             const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z, 0);
         }
-        RCache.set_c(C, result);
+        cmd_list.set_c(C, result);
     }
 };
 static cl_sun0_color binder_sun0_color;
@@ -286,14 +286,14 @@ class cl_sun0_dir_w : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
             const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.sun_dir.x, desc.sun_dir.y, desc.sun_dir.z, 0);
         }
-        RCache.set_c(C, result);
+        cmd_list.set_c(C, result);
     }
 };
 static cl_sun0_dir_w binder_sun0_dir_w;
@@ -301,7 +301,7 @@ class cl_sun0_dir_e : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
@@ -311,7 +311,7 @@ class cl_sun0_dir_e : public R_constant_setup
             D.normalize();
             result.set(D.x, D.y, D.z, 0);
         }
-        RCache.set_c(C, result);
+        cmd_list.set_c(C, result);
     }
 };
 static cl_sun0_dir_e binder_sun0_dir_e;
@@ -321,14 +321,14 @@ class cl_amb_color : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
             const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.ambient.x, desc.ambient.y, desc.ambient.z, desc.weight);
         }
-        RCache.set_c(C, result);
+        cmd_list.set_c(C, result);
     }
 };
 static cl_amb_color binder_amb_color;
@@ -336,14 +336,14 @@ class cl_hemi_color : public R_constant_setup
 {
     u32 marker;
     Fvector4 result;
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (marker != Device.dwFrame)
         {
             const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z, desc.hemi_color.w);
         }
-        RCache.set_c(C, result);
+        cmd_list.set_c(C, result);
     }
 };
 static cl_hemi_color binder_hemi_color;
@@ -351,44 +351,44 @@ static cl_hemi_color binder_hemi_color;
 
 static class cl_screen_res : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
-        RCache.set_c(C, (float)RDEVICE.dwWidth, (float)RDEVICE.dwHeight, 1.0f / (float)RDEVICE.dwWidth,
+        cmd_list.set_c(C, (float)RDEVICE.dwWidth, (float)RDEVICE.dwHeight, 1.0f / (float)RDEVICE.dwWidth,
             1.0f / (float)RDEVICE.dwHeight);
     }
 } binder_screen_res;
 
-// SM_TODO: RCache.hemi заменить на более "логичное" место
+// SM_TODO: cmd_list.hemi заменить на более "логичное" место
 static class cl_hud_params : public R_constant_setup //--#SM+#--
 {
-    virtual void setup(R_constant* C) { RCache.set_c(C, g_pGamePersistent->m_pGShaderConstants->hud_params); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->hud_params); }
 } binder_hud_params;
 
 static class cl_script_params : public R_constant_setup //--#SM+#--
 {
-    virtual void setup(R_constant* C) { RCache.set_c(C, g_pGamePersistent->m_pGShaderConstants->m_script_params); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->m_script_params); }
 } binder_script_params;
 
 static class cl_blend_mode : public R_constant_setup //--#SM+#--
 {
-    virtual void setup(R_constant* C) { RCache.set_c(C, g_pGamePersistent->m_pGShaderConstants->m_blender_mode); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, g_pGamePersistent->m_pGShaderConstants->m_blender_mode); }
 } binder_blend_mode;
 
 class cl_camo_data : public R_constant_setup //--#SM+#--
 {
-    virtual void setup(R_constant* C) { RCache.hemi.c_camo_data = C; }
+    void setup(CBackend& cmd_list, R_constant* C) override  { cmd_list.hemi.c_camo_data = C; }
 };
 static cl_camo_data binder_camo_data;
 
 class cl_custom_data : public R_constant_setup //--#SM+#--
 {
-    virtual void setup(R_constant* C) { RCache.hemi.c_custom_data = C; }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.c_custom_data = C; }
 };
 static cl_custom_data binder_custom_data;
 
 class cl_entity_data : public R_constant_setup //--#SM+#--
 {
-    virtual void setup(R_constant* C) { RCache.hemi.c_entity_data = C; }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.c_entity_data = C; }
 };
 static cl_entity_data binder_entity_data;
 

@@ -2,7 +2,7 @@
 
 void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 {
-    R_constant* C = RCache.get_c(RImplementation.c_snoise)._get(); // get texture
+    R_constant* C = RCache.get_c(c_snoise)._get(); // get texture
     VERIFY2(C, "s_noise texture in noise shader should be set");
     VERIFY(RC_dest_sampler == C->destination);
 #if defined(USE_DX9) || defined(USE_OGL)
@@ -48,9 +48,9 @@ void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 void CRenderTarget::u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1)
 {
     // Calculate ordinaty TCs from blur and SS
-    float tw = float(dwWidth);
-    float th = float(dwHeight);
-    if (dwHeight != Device.dwHeight)
+    float tw = float(dwWidth[RCache.context_id]);
+    float th = float(dwHeight[RCache.context_id]);
+    if (dwHeight[RCache.context_id] != Device.dwHeight)
         param_blur = 1.f;
     Fvector2 shift, p0, p1;
     shift.set(.5f / tw, .5f / th);
@@ -129,7 +129,7 @@ struct TL_2c3uv
 void CRenderTarget::phase_pp()
 {
     // combination/postprocess
-    u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
+    u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
     //	Element 0 for for normal post-process
     //	Element 4 for color map post-process
     bool bCMap = u_need_CM();
@@ -156,7 +156,7 @@ void CRenderTarget::phase_pp()
 
     // Fill vertex buffer
     float du = ps_r1_pps_u, dv = ps_r1_pps_v;
-    TL_2c3uv* pv = (TL_2c3uv*)RCache.Vertex.Lock(4, g_postprocess.stride(), Offset);
+    TL_2c3uv* pv = (TL_2c3uv*)RImplementation.Vertex.Lock(4, g_postprocess.stride(), Offset);
 #if defined(USE_DX9) || defined(USE_DX11)
     pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
     pv++;
@@ -178,7 +178,7 @@ void CRenderTarget::phase_pp()
 #else
 #   error No graphics API selected or enabled!
 #endif // USE_DX9 || USE_DX11
-    RCache.Vertex.Unlock(4, g_postprocess.stride());
+    RImplementation.Vertex.Unlock(4, g_postprocess.stride());
 
     // Actual rendering
     static shared_str s_brightness = "c_brightness";

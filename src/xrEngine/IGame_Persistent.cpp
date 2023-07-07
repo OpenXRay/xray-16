@@ -236,12 +236,10 @@ void IGame_Persistent::destroy_particles(const bool& all_particles)
         CPS_Instance** I = (CPS_Instance**)xr_alloca(active_size * sizeof(CPS_Instance*));
         std::copy(ps_active.begin(), ps_active.end(), I);
 
-        struct destroy_on_game_load
+        CPS_Instance** E = std::remove_if(I, I + active_size, [](CPS_Instance* const& object)
         {
-            static IC bool predicate(CPS_Instance* const& object) { return (!object->destroy_on_game_load()); }
-        };
-
-        CPS_Instance** E = std::remove_if(I, I + active_size, &destroy_on_game_load::predicate);
+            return (!object->destroy_on_game_load());
+        });
         for (; I != E; ++I)
             (*I)->PSI_internal_delete();
     }

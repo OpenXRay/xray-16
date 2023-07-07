@@ -6,12 +6,7 @@
 
 namespace award_system
 {
-player_state_climber::player_state_climber(game_state_accumulator* owner) : inherited(owner)
-{
-    m_player_is_climber = false;
-}
-
-u32 const player_state_climber::get_u32_param()
+u32 player_state_climber::get_u32_param()
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
     if (!tmp_local_player)

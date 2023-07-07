@@ -294,15 +294,17 @@ void UICore::pp_start()
 {
     m_bPostprocess = true;
 
-    m_pp_scale_.set(float(GEnv.Render->getTarget()->get_width()) / float(UI_BASE_WIDTH),
-        float(GEnv.Render->getTarget()->get_height()) / float(UI_BASE_HEIGHT));
-    m_2DFrustumPP.CreateFromRect(Frect().set(0.0f, 0.0f, float(GEnv.Render->getTarget()->get_width()),
-        float(GEnv.Render->getTarget()->get_height())));
+    auto& cmd_list_imm = GEnv.Render->get_imm_command_list();
+
+    m_pp_scale_.set(float(GEnv.Render->getTarget()->get_width(cmd_list_imm)) / float(UI_BASE_WIDTH),
+        float(GEnv.Render->getTarget()->get_height(cmd_list_imm)) / float(UI_BASE_HEIGHT));
+    m_2DFrustumPP.CreateFromRect(Frect().set(0.0f, 0.0f, float(GEnv.Render->getTarget()->get_width(cmd_list_imm)),
+        float(GEnv.Render->getTarget()->get_height(cmd_list_imm))));
 
     m_current_scale = &m_pp_scale_;
 
-    g_current_font_scale.set(float(GEnv.Render->getTarget()->get_width()) / float(Device.dwWidth),
-        float(GEnv.Render->getTarget()->get_height()) / float(Device.dwHeight));
+    g_current_font_scale.set(float(GEnv.Render->getTarget()->get_width(cmd_list_imm)) / float(Device.dwWidth),
+        float(GEnv.Render->getTarget()->get_height(cmd_list_imm)) / float(Device.dwHeight));
 }
 
 void UICore::pp_stop()

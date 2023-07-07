@@ -181,7 +181,7 @@ public:
     virtual const Fvector& Position() const = 0;
     virtual float Radius() const = 0;
     virtual const Fbox& BoundingBox() const = 0;
-    virtual IRender_Sector* Sector() = 0;
+    virtual IRender_Sector::sector_id_t Sector() = 0;
     virtual IRender_ObjectSpecific* ROS() = 0;
     // Accessors and converters
     virtual IRenderVisual* Visual() const = 0;
@@ -225,7 +225,7 @@ public:
     virtual void ForceTransform(const Fmatrix& m) = 0;
     virtual void ForceTransformAndDirection(const Fmatrix& m) = 0;
     // HUD
-    virtual void OnHUDDraw(CCustomHUD* hud, IRenderable* root) = 0;
+    virtual void OnHUDDraw(u32 context_id, CCustomHUD* hud, IRenderable* root) = 0;
     virtual void OnRenderHUD(IGameObject* pCurViewEntity) = 0; //--#SM+#--
     virtual void OnOwnedCameraMove(CCameraBase* pCam, float fOldYaw, float fOldPitch) = 0; //--#SM+#--
     // Active/non active

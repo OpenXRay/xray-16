@@ -34,7 +34,7 @@ class CPatrolPathParams;
 class CScriptMovementAction : public CScriptAbstractAction
 {
 public:
-    enum EGoalType
+    enum EGoalType : u32
     {
         eGoalTypeObject = u32(0),
         eGoalTypePatrolPath,
@@ -44,7 +44,7 @@ public:
         eGoalTypeInput,
         eGoalTypeJumpToPosition,
         eGoalTypeFollowLeader,
-        eGoalTypeDummy = u32(-1),
+        eGoalTypeDummy = u32(-1)
     };
 
     enum EInputKeys
@@ -59,24 +59,23 @@ public:
         eInputKeyBreaks = u32(1) << 7,
         eInputKeyEngineOn = u32(1) << 8,
         eInputKeyEngineOff = u32(1) << 9,
-        eInputKeyDummy = u32(1) << 10,
     };
 
 public:
-    shared_str m_path_name;
-    MonsterSpace::EBodyState m_tBodyState;
-    MonsterSpace::EMovementType m_tMovementType;
-    DetailPathManager::EDetailPathType m_tPathType;
-    IGameObject* m_tpObjectToGo;
-    const CPatrolPath* m_path;
-    EPatrolStartType m_tPatrolPathStart;
-    EPatrolRouteType m_tPatrolPathStop;
-    Fvector m_tDestinationPosition;
+    shared_str m_path_name{ "" };
+    MonsterSpace::EBodyState m_tBodyState{ MonsterSpace::eBodyStateStand };
+    MonsterSpace::EMovementType m_tMovementType{ MonsterSpace::eMovementTypeStand };
+    DetailPathManager::EDetailPathType m_tPathType{ DetailPathManager::eDetailPathTypeSmooth };
+    IGameObject* m_tpObjectToGo{};
+    const CPatrolPath* m_path{};
+    EPatrolStartType m_tPatrolPathStart{ ePatrolStartTypeNearest };
+    EPatrolRouteType m_tPatrolPathStop{ ePatrolRouteTypeContinue };
+    Fvector m_tDestinationPosition{};
     u32 m_tNodeID;
-    EGoalType m_tGoalType;
-    float m_fSpeed;
-    bool m_bRandom;
-    EInputKeys m_tInputKeys;
+    EGoalType m_tGoalType{ eGoalTypeDummy };
+    float m_fSpeed{};
+    bool m_bRandom{ true };
+    EInputKeys m_tInputKeys{ eInputKeyNone };
     MonsterSpace::EScriptMonsterMoveAction m_tMoveAction;
     MonsterSpace::EScriptMonsterSpeedParam m_tSpeedParam;
     u32 m_previous_patrol_point;
@@ -86,7 +85,7 @@ public:
     float m_jump_factor;
 
 public:
-    CScriptMovementAction();
+    CScriptMovementAction() = default;
     IC CScriptMovementAction(MonsterSpace::EBodyState tBodyState, MonsterSpace::EMovementType tMovementType,
         DetailPathManager::EDetailPathType tPathType, CScriptGameObject* tpObjectToGo, float fSpeed = 0.f);
     CScriptMovementAction(MonsterSpace::EBodyState tBodyState, MonsterSpace::EMovementType tMovementType,
@@ -111,7 +110,6 @@ public:
         float dist_to_end, MonsterSpace::EScriptMonsterSpeedParam speed_param);
     IC CScriptMovementAction(MonsterSpace::EScriptMonsterMoveAction tAct, CScriptGameObject* tpObjectToGo,
         float dist_to_end, MonsterSpace::EScriptMonsterSpeedParam speed_param);
-    virtual ~CScriptMovementAction();
     IC void SetBodyState(const MonsterSpace::EBodyState tBodyState);
     IC void SetMovementType(const MonsterSpace::EMovementType tMovementType);
     IC void SetPathType(const DetailPathManager::EDetailPathType tPathType);

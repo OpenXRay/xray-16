@@ -15,12 +15,14 @@ CParticleManager::~CParticleManager() {}
 
 ParticleEffect* CParticleManager::GetEffectPtr(int effect_id)
 {
+    ScopeLock lock{ &pm_lock };
     R_ASSERT(effect_id >= 0 && effect_id < (int)effect_vec.size());
     return effect_vec[effect_id];
 }
 
 ParticleActions* CParticleManager::GetActionListPtr(int a_list_num)
 {
+    ScopeLock lock{ &pm_lock };
     R_ASSERT(a_list_num >= 0 && a_list_num < (int)m_alist_vec.size());
     return m_alist_vec[a_list_num];
 }
@@ -28,18 +30,21 @@ ParticleActions* CParticleManager::GetActionListPtr(int a_list_num)
 // create
 int CParticleManager::CreateEffect(u32 max_particles)
 {
+    ScopeLock lock{ &pm_lock };
     int eff_id = -1;
     for (int i = 0; i < (int)effect_vec.size(); i++)
+    {
         if (!effect_vec[i])
         {
             eff_id = i;
             break;
         }
+    }
 
     if (eff_id < 0)
     {
         // Couldn't find a big enough gap. Reallocate.
-        eff_id = effect_vec.size();
+        eff_id = (int)effect_vec.size();
         effect_vec.push_back(nullptr);
     }
 
@@ -50,12 +55,14 @@ int CParticleManager::CreateEffect(u32 max_particles)
 
 void CParticleManager::DestroyEffect(int effect_id)
 {
+    ScopeLock lock{ &pm_lock };
     R_ASSERT(effect_id >= 0 && effect_id < (int)effect_vec.size());
     xr_delete(effect_vec[effect_id]);
 }
 
 int CParticleManager::CreateActionList()
 {
+    ScopeLock lock{ &pm_lock };
     int list_id = -1;
     for (u32 i = 0; i < m_alist_vec.size(); ++i)
         if (!m_alist_vec[i])
@@ -67,7 +74,7 @@ int CParticleManager::CreateActionList()
     if (list_id < 0)
     {
         // Couldn't find a big enough gap. Reallocate.
-        list_id = m_alist_vec.size();
+        list_id = (int)m_alist_vec.size();
         m_alist_vec.push_back(nullptr);
     }
 
@@ -78,6 +85,7 @@ int CParticleManager::CreateActionList()
 
 void CParticleManager::DestroyActionList(int alist_id)
 {
+    ScopeLock lock{ &pm_lock };
     R_ASSERT(alist_id >= 0 && alist_id < (int)m_alist_vec.size());
     xr_delete(m_alist_vec[alist_id]);
 }
@@ -327,7 +335,7 @@ void CParticleManager::SaveActions(int alist_id, IWriter& W)
     ParticleActions* pa = GetActionListPtr(alist_id);
     VERIFY(pa);
     pa->lock();
-    W.w_u32(pa->size());
+    W.w_u32(static_cast<u32>(pa->size()));
     for (auto& it : *pa)
         it->Save(W);
     pa->unlock();

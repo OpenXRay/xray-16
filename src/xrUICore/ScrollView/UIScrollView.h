@@ -57,7 +57,10 @@ public:
     void ScrollToEnd();
     bool GetVertFlip() { return !!m_flags.test(eVertFlip); }
     bool Empty() { return m_pad->GetChildWndList().empty(); }
-    u32 GetSize();
+
+    [[nodiscard]]
+    u32 GetSize() const;
+
     WINDOW_LIST& Items() { return m_pad->GetChildWndList(); }
     CUIWindow* GetItem(u32 idx);
     void SetFixedScrollBar(bool b);

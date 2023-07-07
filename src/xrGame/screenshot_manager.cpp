@@ -265,8 +265,8 @@ void screenshot_manager::jpeg_compress_cb(long progress)
 
 void screenshot_manager::screenshot_maker_thread(void* arg_ptr)
 {
-    screenshot_manager* this_ptr = static_cast<screenshot_manager*>(arg_ptr);
 #ifdef XR_PLATFORM_WINDOWS // FIXME!!
+    screenshot_manager* this_ptr = static_cast<screenshot_manager*>(arg_ptr);
     u32 wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {

@@ -207,13 +207,13 @@ void CUIZoneMap::SetupCurrentMap()
     m_activeMap->SetWndSize(wnd_size);
 }
 
-void CUIZoneMap::OnSectorChanged(int sector)
+void CUIZoneMap::OnSectorChanged(IRender_Sector::sector_id_t sector)
 {
     if (!g_pGameLevel->pLevel->section_exist("sub_level_map"))
         return;
     u8 map_idx = u8(-1);
     string64 s_sector;
-    xr_sprintf(s_sector, "%d", sector);
+    xr_sprintf(s_sector, "%zd", sector);
 
     if (!g_pGameLevel->pLevel->line_exist("sub_level_map", s_sector))
         return;

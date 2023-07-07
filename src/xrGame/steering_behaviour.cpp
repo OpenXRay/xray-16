@@ -302,5 +302,5 @@ void manager::remove_scheduled()
     m_schedule_remove.clear();
 }
 
-void manager::deleter(base* p) { delete (p); }
+void manager::deleter(base* p) { xr_delete(p); }
 } // namespace steering_behaviour

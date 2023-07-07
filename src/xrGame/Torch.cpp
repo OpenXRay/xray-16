@@ -27,8 +27,6 @@ static Fvector TORCH_OFFSET = {-0.2f, +0.1f, -0.3f};
 static const Fvector OMNI_OFFSET = {-0.2f, +0.1f, -0.1f};
 static const float OPTIMIZATION_DISTANCE = 100.f;
 
-static bool stalker_use_dynamic_lights = false;
-
 CTorch::CTorch()
     : fBrightness(1.f), lanim(nullptr), guid_bone(BI_NONE),
       m_delta_h(0), m_switched_on(false),

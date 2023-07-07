@@ -451,14 +451,15 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
         // Select nearest lights
         Fvector bb_size = {radius, radius, radius};
 
+        static xr_vector<ISpatial*> lstSpatial;
 #if RENDER != R_R1
-        g_SpatialSpace->q_box(RImplementation.lstSpatial, 0, STYPE_LIGHTSOURCEHEMI, position, bb_size);
+        g_SpatialSpace->q_box(lstSpatial, 0, STYPE_LIGHTSOURCEHEMI, position, bb_size);
 #else
-        g_SpatialSpace->q_box(RImplementation.lstSpatial, 0, STYPE_LIGHTSOURCE, position, bb_size);
+        g_SpatialSpace->q_box(lstSpatial, 0, STYPE_LIGHTSOURCE, position, bb_size);
 #endif
-        for (u32 o_it = 0; o_it < RImplementation.lstSpatial.size(); o_it++)
+        for (u32 o_it = 0; o_it < lstSpatial.size(); o_it++)
         {
-            ISpatial* spatial = RImplementation.lstSpatial[o_it];
+            ISpatial* spatial = lstSpatial[o_it];
             light* source = (light*)(spatial->dcast_Light());
             VERIFY(source); // sanity check
             float R = radius + source->range;

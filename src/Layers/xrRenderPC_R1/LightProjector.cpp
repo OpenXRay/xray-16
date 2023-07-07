@@ -82,8 +82,10 @@ void CLightProjector::set_object(IRenderable* O)
                 current = nullptr;
             else
             {
-                spatial->spatial_updatesector();
-                if (nullptr == spatial->GetSpatialData().sector)
+                auto& dsgraph = RImplementation.get_imm_context();
+                const auto& entity_pos = spatial->spatial_sector_point();
+                spatial->spatial_updatesector(dsgraph.detect_sector(entity_pos));
+                if (spatial->GetSpatialData().sector_id == IRender_Sector::INVALID_SECTOR_ID)
                 {
                     IGameObject* obj = dynamic_cast<IGameObject*>(O);
                     if (obj)
@@ -184,6 +186,8 @@ void CLightProjector::calculate()
     RCache.set_ZB(RImplementation.Target->rt_temp_zb->pRT);
     RCache.ClearZB(RImplementation.Target->rt_temp_zb, 1.f, 0);
     RCache.set_xform_world(Fidentity);
+
+    auto& dsgraph = RImplementation.get_imm_context();
 
     // reallocate/reassociate structures + perform all the work
     for (u32 c_it = 0; c_it < cache.size(); c_it++)
@@ -319,11 +323,19 @@ void CLightProjector::calculate()
         ISpatial* spatial = dynamic_cast<ISpatial*>(O);
         if (spatial)
         {
-            spatial->spatial_updatesector();
-            if (spatial->GetSpatialData().sector)
-                RImplementation.r_dsgraph_render_R1_box(spatial->GetSpatialData().sector, BB, SE_R1_LMODELS);
+            const auto& entity_pos = spatial->spatial_sector_point();
+            const auto sector_id = dsgraph.detect_sector(entity_pos);
+            spatial->spatial_updatesector(sector_id);
+            if (spatial->GetSpatialData().sector_id != IRender_Sector::INVALID_SECTOR_ID)
+                dsgraph.render_R1_box(spatial->GetSpatialData().sector_id, BB, SE_R1_LMODELS);
         }
-        // if (spatial)      RImplementation.r_dsgraph_render_subspace   (spatial->spatial.sector,mCombine,v_C,FALSE);
+        /*if (spatial)
+        {
+            dsgraph.o.sector_id = spatial->GetSpatialData().sector_id;
+            dsgraph.o.xform = mCombine;
+            dsgraph.o.view_pos = v_C;
+            dsgraph.build_subspace();
+        }*/
     }
 
     // Blur
@@ -331,9 +343,15 @@ void CLightProjector::calculate()
     {
         // Fill vertex buffer
         u32                         Offset;
-        FVF::TL4uv* pv              = (FVF::TL4uv*) RCache.Vertex.Lock  (4,geom_Blur.stride(),Offset);
+        if (RImplementation.o.ffp)  {
+        FVF::TL2uv* pv              = (FVF::TL2uv*) RImplementation.Vertex.Lock  (8,geom_Blur.stride(),Offset);
+        RImplementation.ApplyBlur2  (pv, rt_size);
+        RImplementation.Vertex.Unlock        (8,geom_Blur.stride());
+        } else {
+        FVF::TL4uv* pv              = (FVF::TL4uv*) RImplementation.Vertex.Lock  (4,geom_Blur.stride(),Offset);
         RImplementation.ApplyBlur4  (pv,P_rt_size,P_rt_size,P_blur_kernel);
-        RCache.Vertex.Unlock        (4,geom_Blur.stride());
+        RImplementation.Vertex.Unlock        (4,geom_Blur.stride());
+        }
 
         // Actual rendering (pass0, temp2real)
         RCache.set_RT               (RT->pRT);

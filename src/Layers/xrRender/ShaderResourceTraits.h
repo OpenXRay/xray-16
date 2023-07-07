@@ -704,7 +704,7 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
 #   ifdef NDEBUG
         flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #   else
-        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | (xrDebug::DebuggerIsPresent() ? D3DCOMPILE_DEBUG : 0);
+        flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_DEBUG;
 #   endif
 #endif
 

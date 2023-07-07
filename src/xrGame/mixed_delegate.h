@@ -33,9 +33,18 @@ public:
 
     mixed_delegate(lua_object_type ptr_this, lua_function_type func_ptr) { m_lua_delegate.set(func_ptr, ptr_this); }
     mixed_delegate(mixed_delegate const& copy)
-        : m_cpp_delegate(copy.m_cpp_delegate), m_lua_delegate(copy.m_lua_delegate)
+        : m_cpp_delegate(copy.m_cpp_delegate), m_lua_delegate(copy.m_lua_delegate) {};
 
-                                                   {};
+    mixed_delegate& operator=(const mixed_delegate& other)
+    {
+        if (this == &other)
+            return *this;
+
+        m_cpp_delegate = other.m_cpp_delegate;
+        m_lua_delegate = other.m_lua_delegate;
+
+        return *this;
+    }
 
     template <class ThisRef, class ClassType>
     void bind(ThisRef* ptr_this, R (ClassType::*func_ptr)(Param1, Param2))

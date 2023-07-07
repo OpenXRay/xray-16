@@ -494,6 +494,7 @@ CParticleGroup::~CParticleGroup()
 
 void CParticleGroup::OnFrame(u32 u_dt)
 {
+    ScopeLock lock{ &render_lock };
     if (m_Def && m_RT_Flags.is(flRT_Playing))
     {
         float ct = m_CurrentTime;
@@ -548,6 +549,7 @@ void CParticleGroup::OnFrame(u32 u_dt)
 
 void CParticleGroup::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM)
 {
+    ScopeLock lock{ &render_lock };
     m_InitialPosition = m.c;
     for (auto& item : items)
         item.UpdateParent(m, velocity, bXFORM);
@@ -585,6 +587,7 @@ void CParticleGroup::Play()
 
 void CParticleGroup::Stop(BOOL bDefferedStop)
 {
+    ScopeLock lock{ &render_lock };
     if (bDefferedStop)
     {
         m_RT_Flags.set(flRT_DefferedStop, TRUE);
@@ -611,6 +614,7 @@ void CParticleGroup::OnDeviceDestroy()
 
 u32 CParticleGroup::ParticlesCount()
 {
+    ScopeLock lock{ &render_lock };
     int p_count = 0;
     for (auto& item : items)
         p_count += item.ParticlesCount();
@@ -619,6 +623,7 @@ u32 CParticleGroup::ParticlesCount()
 
 void CParticleGroup::SetHudMode(BOOL b)
 {
+    ScopeLock lock{ &render_lock };
     for (auto& item : items)
     {
         CParticleEffect* E = static_cast<CParticleEffect*>(item._effect);
@@ -628,6 +633,7 @@ void CParticleGroup::SetHudMode(BOOL b)
 
 BOOL CParticleGroup::GetHudMode()
 {
+    ScopeLock lock{ &render_lock };
     if (items.size())
     {
         CParticleEffect* E = static_cast<CParticleEffect*>(items[0]._effect);

@@ -173,7 +173,7 @@ jobs:
 
   build-macos:
     name: macOS ${{ matrix.Configuration }} ${{ matrix.Platform }}
-    runs-on: macos-11
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
@@ -190,7 +190,7 @@ jobs:
     - name: Install packages
       run: |
           brew update
-          brew install sdl2 glew lzo jpeg openal-soft libogg libvorbis theora
+          brew install sdl2 glew lzo libogg libvorbis theora
 
     - name: Run CMake
       run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON

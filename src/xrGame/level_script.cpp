@@ -540,7 +540,20 @@ int g_get_general_goodwill_between(u16 from, u16 to)
     return presonal_goodwill + community_to_obj_goodwill + community_to_community_goodwill;
 }
 
-u32 vertex_id(Fvector position) { return (ai().level_graph().vertex_id(position)); }
+u32 vertex_id(Fvector position)
+{
+    return (ai().level_graph().vertex_id(position));
+}
+
+u64 vertex_id_awful(Fvector position)
+{
+    // Original Clear Sky's LuaJIT or luabind converts
+    // 4294967295 (which is u32(-1)) to 4294967296
+    // for some reason :(
+    const u32 id = ai().level_graph().vertex_id(position);
+    return id == u32(-1) ? id + 1 : id; // reproduce Clear Sky behaviour
+}
+
 u32 render_get_dx_level() { return GEnv.Render->get_dx_level(); }
 CUISequencer* g_tutorial = NULL;
 CUISequencer* g_tutorial2 = NULL;
@@ -783,11 +796,24 @@ IC static void CLevel_Export(lua_State* luaState)
         def("add_complex_effector", &add_complex_effector),
         def("remove_complex_effector", &remove_complex_effector),
 
-        def("vertex_id", &vertex_id),
-
         def("game_id", &GameID),
         def("ray_pick", &ray_pick)
-    ],
+    ];
+
+    if (ClearSkyMode)
+    {
+        module(luaState, "level")
+        [
+            def("vertex_id", &vertex_id_awful)
+        ];
+    }
+    else
+    {
+        module(luaState, "level")
+        [
+            def("vertex_id", &vertex_id)
+        ];
+    }
 
     module(luaState, "actor_stats")
     [

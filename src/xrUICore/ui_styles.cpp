@@ -36,13 +36,19 @@ UIStyleManager::~UIStyleManager()
     for (auto& token : m_token)
     {
         if (token.name && token.id != DEFAULT_STYLE_ID)
-            xr_free(token.name);
+        {
+            char* tokenName = const_cast<char*>(token.name);
+            xr_free(tokenName);
+        }
     }
     m_token.clear();
     if (!DefaultStyleIsSet())
     {
-        xr_free(UI_PATH);
-        xr_free(UI_PATH_WITH_DELIMITER);
+        char* mutable_UI_PATH = const_cast<char*>(UI_PATH);
+        char* mutable_UI_PATH_WITH_DELIMITER = const_cast<char*>(UI_PATH_WITH_DELIMITER);
+
+        xr_free(mutable_UI_PATH);
+        xr_free(mutable_UI_PATH_WITH_DELIMITER);
     }
 }
 

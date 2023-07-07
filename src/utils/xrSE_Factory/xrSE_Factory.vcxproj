@@ -29,6 +29,9 @@
   <PropertyGroup>
     <OutDir>$(xrBinDir)utils\</OutDir>
   </PropertyGroup>
+  <PropertyGroup>
+    <CopyLocalProjectReference>true</CopyLocalProjectReference>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

@@ -114,7 +114,7 @@ IClientStatistic::IClientStatistic(const IClientStatistic& rhs)
 
 IClientStatistic::~IClientStatistic()
 {
-    delete m_pimpl;
+    xr_delete(m_pimpl);
 }
 
 u32 IClientStatistic::getPing() const { return 0; }

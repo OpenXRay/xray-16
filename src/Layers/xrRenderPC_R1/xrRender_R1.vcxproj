@@ -69,6 +69,8 @@
     <ClInclude Include="..\xrRender\Animation.h" />
     <ClInclude Include="..\xrRender\AnimationKeyCalculate.h" />
     <ClInclude Include="..\xrRender\Blender.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_light.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Shadow_Texture.h" />
     <ClInclude Include="..\xrRender\Blender_CLSID.h" />
     <ClInclude Include="..\xrRender\Blender_Recorder.h" />
     <ClInclude Include="..\xrRender\blenders\Blender_BmmD.h" />
@@ -189,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\xrRenderDX9\BufferUtils.cpp" />
+    <ClCompile Include="..\xrRenderDX9\dx9DetailManager_VS.cpp" />
     <ClCompile Include="..\xrRenderDX9\dx9HW.cpp" />
     <ClCompile Include="..\xrRenderDX9\dx9HWCaps.cpp" />
     <ClCompile Include="..\xrRenderDX9\dx9ResourceManager_Resources.cpp" />
@@ -196,6 +199,8 @@
     <ClCompile Include="..\xrRenderDX9\dx9SH_RT.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\Blender.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_light.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Shadow_Texture.cpp" />
     <ClCompile Include="..\xrRender\Blender_Recorder.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still.cpp" />
@@ -214,6 +219,7 @@
     <ClCompile Include="..\xrRender\DetailManager.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_CACHE.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp" />
+    <ClCompile Include="..\xrRender\DetailManager_soft.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_VS.cpp" />
     <ClCompile Include="..\xrRender\DetailModel.cpp" />
     <ClCompile Include="..\xrRender\du_box.cpp" />

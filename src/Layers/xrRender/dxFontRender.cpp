@@ -21,7 +21,7 @@ dxFontRender::~dxFontRender()
 void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
 {
     pShader.create(cShader, cTexture);
-    pGeom.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    pGeom.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 }
 
 extern ENGINE_API bool g_bRendering;
@@ -40,7 +40,7 @@ void dxFontRender::OnRender(CGameFont& owner)
 #ifdef _EDITOR
         CTexture* T = RCache.get_ActiveTexture(0);
 #else
-        R_constant* C = RCache.get_c(RImplementation.c_sbase)._get(); // get sampler
+        R_constant* C = RCache.get_c(c_sbase)._get(); // get sampler
         CTexture* T = RCache.get_ActiveTexture(C ? C->samp.index : 0);
 #endif // _EDITOR
 
@@ -76,7 +76,7 @@ void dxFontRender::OnRender(CGameFont& owner)
 
         // lock AGP memory
         u32 vOffset;
-        FVF::TL* v = (FVF::TL*)RCache.Vertex.Lock(length * 4, pGeom.stride(), vOffset);
+        FVF::TL* v = (FVF::TL*)RImplementation.Vertex.Lock(length * 4, pGeom.stride(), vOffset);
         FVF::TL* start = v;
 
         // fill vertices
@@ -178,7 +178,7 @@ void dxFontRender::OnRender(CGameFont& owner)
 
         // Unlock and draw
         u32 vCount = (u32)(v - start);
-        RCache.Vertex.Unlock(vCount, pGeom.stride());
+        RImplementation.Vertex.Unlock(vCount, pGeom.stride());
         if (vCount)
         {
             RCache.set_Geometry(pGeom);

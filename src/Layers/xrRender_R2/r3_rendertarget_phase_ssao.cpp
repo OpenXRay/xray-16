@@ -8,7 +8,7 @@ void CRenderTarget::phase_ssao()
     RCache.ClearRT(rt_ssao_temp, {});
 
     // low/hi RTs
-    u_setrt(rt_ssao_temp, nullptr, nullptr, nullptr /*rt_MSAADepth*/);
+    u_setrt(RCache, rt_ssao_temp, nullptr, nullptr, nullptr /*rt_MSAADepth*/);
 
     RCache.set_Stencil(FALSE);
 
@@ -37,7 +37,7 @@ void CRenderTarget::phase_ssao()
     RCache.SetViewport({ 0.f, 0.f, _w, _h, 0.f, 1.f });
 
     // Fill vertex buffer
-    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
     pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
     pv++;
     pv->set(-1, -1, 0, 0, 0, 0, 0);
@@ -46,7 +46,7 @@ void CRenderTarget::phase_ssao()
     pv++;
     pv->set(1, -1, 1, 0, 0, scale_X, 0);
     pv++;
-    RCache.Vertex.Unlock(4, g_combine->vb_stride);
+    RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 
     // Draw
     RCache.set_Element(s_ssao->E[0]);
@@ -100,7 +100,7 @@ void CRenderTarget::phase_downsamp()
     // Fvector2	p0,p1;
     u32 Offset = 0;
 
-    u_setrt(rt_half_depth, nullptr, nullptr, nullptr /*rt_MSAADepth*/);
+    u_setrt(RCache, rt_half_depth, nullptr, nullptr, nullptr /*rt_MSAADepth*/);
     RCache.ClearRT(rt_half_depth, {}); // black
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;
@@ -120,7 +120,7 @@ void CRenderTarget::phase_downsamp()
         float scale_Y = float(h) / float(TEX_jitter);
 
         // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
         pv++;
         pv->set(-1, -1, 0, 0, 0, 0, 0);
@@ -129,7 +129,7 @@ void CRenderTarget::phase_downsamp()
         pv++;
         pv->set(1, -1, 1, 0, 0, scale_X, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 
         // Draw
         RCache.set_Element(s_ssao->E[1]);

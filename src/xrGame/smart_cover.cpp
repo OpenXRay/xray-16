@@ -22,8 +22,8 @@ shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
 
 cover::cover(smart_cover::object const& object, DescriptionPtr description, bool const is_combat_cover,
     bool const can_fire, luabind::object const& loopholes_availability)
-    : inherited(object.Position(), object.ai_location().level_vertex_id()), m_object(object),
-      m_description(description), m_id(m_object.cName()), m_is_combat_cover(is_combat_cover), m_can_fire(can_fire)
+    : inherited(object.Position(), object.ai_location().level_vertex_id()), m_description(description),
+      m_object(object), m_id(m_object.cName()), m_is_combat_cover(is_combat_cover), m_can_fire(can_fire)
 {
     m_is_smart_cover = 1;
 
@@ -63,7 +63,7 @@ cover::cover(smart_cover::object const& object, DescriptionPtr description, bool
     {
         Fvector position = this->fov_position(**J);
         position.y += 2.0f;
-        u32 level_vertex_id = graph.vertex_id(position);
+        [[maybe_unused]] u32 level_vertex_id = graph.vertex_id(position);
         VERIFY2(graph.valid_vertex_id(level_vertex_id), make_string("invalid vertex id: smart cover[%s], loophole [%s]",
                                                             m_object.cName().c_str(), (*J)->id().c_str()));
         vertex(**J, (*i).second);

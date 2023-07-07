@@ -33,10 +33,8 @@ private:
     bool m_active;
     lua_State* m_virtual_machine;
 
-private:
-    CScriptThread(CScriptEngine* scriptEngine, LPCSTR caNamespaceName, bool do_string = false, bool reload = false);
-
 public:
+    CScriptThread(CScriptEngine* scriptEngine, LPCSTR caNamespaceName, bool do_string = false, bool reload = false);
     virtual ~CScriptThread();
     bool update();
     bool active() const { return m_active; }

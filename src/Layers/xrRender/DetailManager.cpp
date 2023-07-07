@@ -76,6 +76,7 @@ CDetailManager::CDetailManager()
 {
     dtFS = nullptr;
     dtSlots = nullptr;
+    soft_Geom = nullptr;
     hw_Geom = nullptr;
     hw_BatchSize = 0;
     m_time_rot_1 = 0;
@@ -186,7 +187,11 @@ void CDetailManager::Load()
     // Make dither matrix
     bwdithermap(2, dither);
 
-    hw_Load();
+    // Hardware specific optimizations
+    if (UseVS())
+        hw_Load();
+    else
+        soft_Load();
 
     // swing desc
     // normal
@@ -205,7 +210,10 @@ void CDetailManager::Load()
 #endif
 void CDetailManager::Unload()
 {
-    hw_Unload();
+    if (UseVS())
+        hw_Unload();
+    else
+        soft_Unload();
 
     for (CDetail* detailObject : objects)
     {
@@ -358,7 +366,12 @@ void CDetailManager::UpdateVisibleM()
     RImplementation.BasicStats.DetailVisibility.End();
 }
 
-void CDetailManager::Render()
+bool CDetailManager::UseVS() const
+{
+    return HW.Caps.geometry_major >= 1 && !RImplementation.o.ffp;
+}
+
+void CDetailManager::Render(CBackend& cmd_list)
 {
 #ifndef _EDITOR
     if (nullptr == dtFS)
@@ -380,12 +393,13 @@ void CDetailManager::Render()
 #endif
     swing_current.lerp(swing_desc[0], swing_desc[1], factor);
 
-    RCache.set_CullMode(CULL_NONE);
-    RCache.set_xform_world(Fidentity);
-
-    hw_Render();
-
-    RCache.set_CullMode(CULL_CCW);
+    cmd_list.set_CullMode(CULL_NONE);
+    cmd_list.set_xform_world(Fidentity);
+    if (UseVS())
+        hw_Render(cmd_list);
+    else
+        soft_Render();
+    cmd_list.set_CullMode(CULL_CCW);
 
 #ifndef _EDITOR
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]

@@ -110,6 +110,8 @@ int g_inv_highlight_equipped = 0;
 //-Alundaio
 
 int g_first_person_death = 0;
+int g_normalize_mouse_sens = 0;
+int g_normalize_upgrade_mouse_sens = 0;
 
 void register_mp_console_commands();
 //-----------------------------------------------------------
@@ -119,7 +121,7 @@ int net_cl_inputupdaterate = 50;
 Flags32 g_mt_config = {mtLevelPath | mtDetailPath | mtObjectHandler | mtSoundPlayer | mtAiVision | mtBullets |
     mtLUA_GC | mtLevelSounds | mtALife | mtMap};
 #ifdef DEBUG
-Flags32 dbg_net_Draw_Flags = {0};
+Flags32 dbg_net_Draw_Flags{};
 #endif
 
 #ifdef DEBUG
@@ -792,7 +794,7 @@ public:
             strncpy_s(saved_game, sizeof(saved_game), args, _MAX_PATH - 1);
         }
 
-        if (saved_game && *saved_game)
+        if (*saved_game)
         {
             xr_strcpy(g_last_saved_game, saved_game);
             return;
@@ -2121,6 +2123,8 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
     CMD4(CCC_Integer, "g_unload_ammo_after_pick_up", &g_auto_ammo_unload, 0, 1);
+    CMD4(CCC_Integer, "g_normalize_mouse_sens", &g_normalize_mouse_sens, 0, 1);
+    CMD4(CCC_Integer, "g_normalize_upgrade_mouse_sens", &g_normalize_upgrade_mouse_sens, 0, 1);
 
     CMD1(CCC_CleanupTasks, "dbg_cleanup_tasks");
 

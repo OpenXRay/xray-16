@@ -90,7 +90,7 @@ void CDetailManager::cache_Decompress(Slot* S)
     u32 triCount = pinf.size();
 #else
     xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bC, bD);
-    u32 triCount = xrc.r_count();
+    const auto triCount = xrc.r_count();
     CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
 #endif
@@ -198,7 +198,7 @@ void CDetailManager::cache_Decompress(Slot* S)
             dir.set(0, -1, 0);
 
             float r_u, r_v, r_range;
-            for (u32 tid = 0; tid < triCount; tid++)
+            for (size_t tid = 0; tid < triCount; tid++)
             {
 #ifdef _EDITOR
                 Fvector verts[3];
@@ -298,17 +298,24 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
 
 // Vis-sorting
 #ifndef DBG_SWITCHOFF_RANDOMIZE
-            if (Dobj->m_Flags.is(DO_NO_WAVING))
+            if (!UseVS())
+            {
+                // Always still on CPU pipe
                 Item.vis_ID = 0;
+            }
             else
             {
-                if (::Random.randI(0, 3) == 0)
-                    Item.vis_ID = 2; // Second wave
+                if (Dobj->m_Flags.is(DO_NO_WAVING))
+                    Item.vis_ID = 0;
                 else
-                    Item.vis_ID = 1; // First wave
+                {
+                    if (::Random.randI(0, 3) == 0)
+                        Item.vis_ID = 2; // Second wave
+                    else
+                        Item.vis_ID = 1; // First wave
+                }
             }
 #else
-            // Always still on CPU pipe
             Item.vis_ID = 0;
 #endif
             // Save it

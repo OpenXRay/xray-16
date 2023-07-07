@@ -10,7 +10,7 @@
 namespace detail_manager
 {
 extern const int quant = 16384;
-/*extern*/ const int c_hdr = 10;
+extern const int c_hdr = 10;
 const int c_size = 4;
 
 static VertexElement dwDecl[] =
@@ -116,9 +116,12 @@ void CDetailManager::hw_Load_Geom()
 void CDetailManager::hw_Unload()
 {
     // Destroy VS/VB/IB
-    hw_Geom.destroy();
-    hw_IB.Release();
-    hw_VB.Release();
+    if (hw_Geom)
+        hw_Geom.destroy();
+    if (hw_IB)
+        hw_IB.Release();
+    if (hw_VB)
+        hw_VB.Release();
 }
 
 #if defined(USE_DX9)

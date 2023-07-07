@@ -5,6 +5,7 @@
 #endif
 
 #include "xrCDB/Frustum.h"
+#include "xrCDB/ISpatial.h"
 #include "vis_common.h"
 #include "Include/xrRender/FactoryPtr.h"
 #include "xrCore/xr_resource.h"
@@ -116,21 +117,7 @@ public:
     virtual ~IRender_ObjectSpecific(){};
 };
 
-//////////////////////////////////////////////////////////////////////////
-// definition (Portal)
-class ENGINE_API IRender_Portal
-{
-public:
-    virtual ~IRender_Portal(){};
-};
-
-//////////////////////////////////////////////////////////////////////////
-// definition (Sector)
-class ENGINE_API IRender_Sector
-{
-public:
-    virtual ~IRender_Sector(){};
-};
+class CBackend; // TODO: the real command list interface should be defined here
 
 //////////////////////////////////////////////////////////////////////////
 // definition (Target)
@@ -148,8 +135,8 @@ public:
     virtual void set_color_gray(u32 f) = 0;
     // virtual void set_color_add (u32 f) = 0;
     virtual void set_color_add(const Fvector& f) = 0;
-    virtual u32 get_width() = 0;
-    virtual u32 get_height() = 0;
+    virtual u32 get_width(CBackend& cmd_list) = 0; // TODO: use equivalent from cmd_list
+    virtual u32 get_height(CBackend& cmd_list) = 0;
     virtual void set_cm_imfluence(float f) = 0;
     virtual void set_cm_interpolate(float f) = 0;
     virtual void set_cm_textures(const shared_str& tex0, const shared_str& tex1) = 0;
@@ -310,8 +297,7 @@ public:
 
     virtual void level_Load(IReader* fs) = 0;
     virtual void level_Unload() = 0;
-
-    // virtual IDirect3DBaseTexture9* texture_load (pcstr fname, u32& msize) = 0;
+    
     void shader_option_skinning(s32 mode) { m_skinning = mode; }
     virtual HRESULT shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags,
         void*& result) = 0;
@@ -321,16 +307,12 @@ public:
 
     virtual pcstr getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
-    virtual IRender_Sector* getSector(int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
-    virtual IRender_Sector* detectSector(const Fvector& P) = 0;
     virtual IRender_Target* getTarget() = 0;
+    virtual CBackend& get_imm_command_list() = 0;
 
     // Main
-    virtual void flush() = 0;
-    virtual void add_Occluder(Fbox2& bb_screenspace) = 0; // mask screen region as oclluded (-1..1, -1..1)
-    virtual void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
-    virtual void add_Geometry(IRenderVisual* V, const CFrustum& view) = 0; // add visual(s) (all culling performed)
+    virtual void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
     // virtual void add_StaticWallmark (ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)=0;
     virtual void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) = 0;
     // Prefer this function when possible
@@ -378,6 +360,7 @@ public:
     // Main
     virtual void Calculate() = 0;
     virtual void Render() = 0;
+    virtual void RenderMenu() = 0;
 
     virtual void BeforeWorldRender() = 0; //--#SM+#-- Перед рендерингом мира
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
@@ -388,10 +371,9 @@ public:
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
 
     // Render mode
-    virtual void rmNear() = 0;
-    virtual void rmFar() = 0;
-    virtual void rmNormal() = 0;
-    virtual u32 active_phase () = 0;
+    virtual void rmNear(CBackend& cmd_list) = 0;
+    virtual void rmFar(CBackend& cmd_list) = 0;
+    virtual void rmNormal(CBackend& cmd_list) = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}

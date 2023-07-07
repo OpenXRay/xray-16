@@ -29,6 +29,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>lzo\src;lzo\include</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

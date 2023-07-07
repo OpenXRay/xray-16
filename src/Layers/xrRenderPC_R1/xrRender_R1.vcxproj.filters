@@ -597,6 +597,12 @@
     <ClInclude Include="..\xrRender\dxImGuiRender.h">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\blender_light.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_Shadow_Texture.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -648,6 +654,9 @@
       <Filter>Details</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\DetailManager_soft.cpp">
       <Filter>Details</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\DetailManager_VS.cpp">
@@ -991,6 +1000,15 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\blender_light.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_Shadow_Texture.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9DetailManager_VS.cpp">
+      <Filter>Details</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

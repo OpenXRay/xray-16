@@ -119,19 +119,19 @@ bool best_scores_helper::OnPlayerKilled(
 
     switch (kill_type.second)
     {
-    case SKT_HEADSHOT: { ++m_headshots_kills_in_row;
-    }
-    break;
-    case SKT_BACKSTAB: { ++m_backstab_kills_in_row;
-    }
-    break;
-    case SKT_KNIFEKILL: { ++m_knife_kills_in_row;
-    }
-    break;
-    case SKT_EYESHOT: { ++m_eyeshots_kills_in_row;
-    }
-    break;
-    }; // switch (kill_type.second)
+    case SKT_HEADSHOT:
+        ++m_headshots_kills_in_row;
+        break;
+    case SKT_BACKSTAB:
+        ++m_backstab_kills_in_row;
+        break;
+    case SKT_KNIFEKILL:
+        ++m_knife_kills_in_row;
+        break;
+    case SKT_EYESHOT:
+        ++m_eyeshots_kills_in_row;
+        break;
+    } // switch (kill_type.second)
 
     ++m_kills_in_row;
     return false;

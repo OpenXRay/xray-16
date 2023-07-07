@@ -23,9 +23,9 @@ enum EFlags
 
 enum EType
 {
-    ltPoint = D3DLIGHT_POINT,
-    ltSpot = D3DLIGHT_SPOT,
-    ltDirect = D3DLIGHT_DIRECTIONAL,
+    ltPoint = Flight::Type::Point,
+    ltSpot = Flight::Type::Spot,
+    ltDirect = Flight::Type::Directional,
     ltMaxCount,
     lt_max_type = u32(-1),
 };

@@ -4,7 +4,6 @@
 #include "dx11StateCache.h"
 
 dx11State::dx11State()
-    : m_pRasterizerState(0), m_pDepthStencilState(0), m_pBlendState(0), m_uiStencilRef(u32(-1)), m_uiAlphaRef(0)
 {
 }
 
@@ -21,46 +20,45 @@ dx11State* dx11State::Create(SimulatorStates& state_code)
 
     state_code.UpdateState(*pState);
 
-    pState->m_pRasterizerState = RSManager.GetState(state_code);
+    // TODO: possibly lock on state managers access
+
+    pState->m_pRasterizerState   = RSManager.GetState(state_code);
     pState->m_pDepthStencilState = DSSManager.GetState(state_code);
-    pState->m_pBlendState = BSManager.GetState(state_code);
-    // ID3DxxDevice::CreateSamplerState
+    pState->m_pBlendState        = BSManager.GetState(state_code);
 
     //	Create samplers here
     {
         InitSamplers(pState->m_VSSamplers, state_code, CTexture::rstVertex);
         InitSamplers(pState->m_PSSamplers, state_code, CTexture::rstPixel);
         InitSamplers(pState->m_GSSamplers, state_code, CTexture::rstGeometry);
-#ifdef USE_DX11
         InitSamplers(pState->m_HSSamplers, state_code, CTexture::rstHull);
         InitSamplers(pState->m_DSSamplers, state_code, CTexture::rstDomain);
         InitSamplers(pState->m_CSSamplers, state_code, CTexture::rstCompute);
-#endif
     }
 
     return pState;
 }
 
-HRESULT dx11State::Apply()
+HRESULT dx11State::Apply(CBackend& cmd_list)
 {
-    VERIFY(m_pRasterizerState);
-    StateManager.SetRasterizerState(m_pRasterizerState);
-    VERIFY(m_pDepthStencilState);
-    StateManager.SetDepthStencilState(m_pDepthStencilState);
-    if (m_uiStencilRef != -1)
-        StateManager.SetStencilRef(m_uiStencilRef);
-    VERIFY(m_pBlendState);
-    StateManager.SetBlendState(m_pBlendState);
-    StateManager.SetAlphaRef(m_uiAlphaRef);
+    const auto context_id = cmd_list.context_id;
 
-    SSManager.GSApplySamplers(m_GSSamplers);
-    SSManager.VSApplySamplers(m_VSSamplers);
-    SSManager.PSApplySamplers(m_PSSamplers);
-#ifdef USE_DX11
-    SSManager.HSApplySamplers(m_HSSamplers);
-    SSManager.DSApplySamplers(m_DSSamplers);
-    SSManager.CSApplySamplers(m_CSSamplers);
-#endif
+    VERIFY(m_pRasterizerState);
+    cmd_list.StateManager.SetRasterizerState(m_pRasterizerState);
+    VERIFY(m_pDepthStencilState);
+    cmd_list.StateManager.SetDepthStencilState(m_pDepthStencilState);
+    if (m_uiStencilRef != -1)
+        cmd_list.StateManager.SetStencilRef(m_uiStencilRef);
+    VERIFY(m_pBlendState);
+    cmd_list.StateManager.SetBlendState(m_pBlendState);
+    cmd_list.StateManager.SetAlphaRef(m_uiAlphaRef);
+
+    SSManager.GSApplySamplers(context_id, m_GSSamplers);
+    SSManager.VSApplySamplers(context_id, m_VSSamplers);
+    SSManager.PSApplySamplers(context_id, m_PSSamplers);
+    SSManager.HSApplySamplers(context_id, m_HSSamplers);
+    SSManager.DSApplySamplers(context_id, m_DSSamplers);
+    SSManager.CSApplySamplers(context_id, m_CSSamplers);
 
     //	static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
     //	static const UINT SampleMask = 0xffffffff;

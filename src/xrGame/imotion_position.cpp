@@ -35,6 +35,7 @@ imotion_position::imotion_position()
 
                                                                                   };
 
+[[maybe_unused]]
 static void interactive_motion_diag(LPCSTR message, const CBlend& b, CPhysicsShell* s, float time_left)
 {
 #ifdef DEBUG
@@ -318,9 +319,7 @@ void imotion_position::state_end()
 
 void imotion_position::disable_update(bool v)
 {
-    VERIFY(shell);
-    IKinematics* K = shell->PKinematics();
-    VERIFY(K);
+    VERIFY(shell && shell->PKinematics());
     // K->SetUpdateCallback( v ? 0 : saved_visual_callback );
     update_callback.update = !v;
     // disable_bone_calculation( *K, v );

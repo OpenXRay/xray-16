@@ -185,8 +185,16 @@ CGameFont::~CGameFont()
     GEnv.RenderFactory->DestroyFontRender(pFontRender);
 }
 
-#define DI2PX(x) float(iFloor((x + 1) * float(GEnv.Render->getTarget()->get_width()) * 0.5f))
-#define DI2PY(y) float(iFloor((y + 1) * float(GEnv.Render->getTarget()->get_height()) * 0.5f))
+static inline float DI2PX(float x)
+{
+    auto& cmd_list = GEnv.Render->get_imm_command_list();
+    return float(iFloor((x + 1) * float(GEnv.Render->getTarget()->get_width(cmd_list)) * 0.5f));
+}
+static inline float DI2PY(float y)
+{
+    auto& cmd_list = GEnv.Render->get_imm_command_list();
+    return float(iFloor((y + 1) * float(GEnv.Render->getTarget()->get_height(cmd_list)) * 0.5f));
+}
 
 void CGameFont::OutSet(float x, float y)
 {

@@ -15,6 +15,7 @@ set(RELVER 5)
 set(ABIVER 5.1)
 set(NODOTABIVER 51)
 
+set(CMAKE_OSX_SYSROOT "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
 set(LUAJIT_DIR ${CMAKE_SOURCE_DIR}/Externals/LuaJIT/src CACHE PATH "Location of luajit sources")
 
 option(BUILD_STATIC_LIB "Build static library" OFF)
@@ -68,7 +69,12 @@ else()
 	set(CCOPT_OPT_LEVEL "-O2")
 endif()
 
-set(CCOPT "${CCOPT_OPT_LEVEL} -fomit-frame-pointer -fno-stack-protector")
+# TODO Refactor all these options
+if (USE_ADDRESS_SANITIZER)
+	set(CCOPT "${CCOPT_OPT_LEVEL} -fno-stack-protector")
+else()
+	set(CCOPT "${CCOPT_OPT_LEVEL} -fomit-frame-pointer -fno-stack-protector")
+endif()
 
 # Target-specific compiler options
 set(CCOPT_x86 "-march=i686 -msse -msse2 -mfpmath=sse")
@@ -129,6 +135,10 @@ string(REPLACE " " ";" TESTARCH_C_FLAGS "${TESTARCH_C_FLAGS}")
 
 set(TESTARCH_FLAGS "${TESTARCH_C_FLAGS} ${CCOPTIONS} -E lj_arch.h -dM")
 string(REPLACE " " ";" TESTARCH_FLAGS "${TESTARCH_FLAGS}")
+
+if (APPLE)
+	set(ENV{SDKROOT} ${CMAKE_OSX_SYSROOT})
+endif()
 
 execute_process(
 	COMMAND ${CMAKE_C_COMPILER} ${TESTARCH_FLAGS}

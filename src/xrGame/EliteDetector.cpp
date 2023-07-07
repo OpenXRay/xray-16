@@ -25,14 +25,10 @@ void CEliteDetector::UpdateAf()
     if (m_artefacts.m_ItemInfos.size() == 0)
         return;
 
-    CAfList::ItemsMapIt it_b = m_artefacts.m_ItemInfos.begin();
-    CAfList::ItemsMapIt it_e = m_artefacts.m_ItemInfos.end();
-    CAfList::ItemsMapIt it = it_b;
-
     Fvector detector_pos = Position();
-    for (; it_b != it_e; ++it_b)
+    for (const auto& itemInfo : m_artefacts.m_ItemInfos)
     {
-        CArtefact* pAf = it_b->first;
+        auto pAf = itemInfo.first;
         if (pAf->H_Parent())
             continue;
 
@@ -229,34 +225,26 @@ void CScientificDetector::UpfateWork()
 {
     ui().Clear();
 
-    CAfList::ItemsMapIt ait_b = m_artefacts.m_ItemInfos.begin();
-    CAfList::ItemsMapIt ait_e = m_artefacts.m_ItemInfos.end();
-    CAfList::ItemsMapIt ait = ait_b;
     Fvector detector_pos = Position();
-    for (; ait_b != ait_e; ++ait_b)
+
+    for (const auto& [artefact, _] : m_artefacts.m_ItemInfos)
     {
-        CArtefact* pAf = ait_b->first;
-        if (pAf->H_Parent())
+        if (artefact->H_Parent())
             continue;
 
-        ui().RegisterItemToDraw(pAf->Position(), pAf->cNameSect());
+        ui().RegisterItemToDraw(artefact->Position(), artefact->cNameSect());
 
-        if (pAf->CanBeInvisible())
+        if (artefact->CanBeInvisible())
         {
-            float d = detector_pos.distance_to(pAf->Position());
+            float d = detector_pos.distance_to(artefact->Position());
             if (d < m_fAfVisRadius)
-                pAf->SwitchVisibility(true);
+                artefact->SwitchVisibility(true);
         }
     }
 
-    CZoneList::ItemsMapIt zit_b = m_zones.m_ItemInfos.begin();
-    CZoneList::ItemsMapIt zit_e = m_zones.m_ItemInfos.end();
-    CZoneList::ItemsMapIt zit = zit_b;
-
-    for (; zit_b != zit_e; ++zit_b)
+    for (const auto& [zone, _] : m_zones.m_ItemInfos)
     {
-        CCustomZone* pZone = zit_b->first;
-        ui().RegisterItemToDraw(pZone->Position(), pZone->cNameSect());
+        ui().RegisterItemToDraw(zone->Position(), zone->cNameSect());
     }
 
     m_ui->update();

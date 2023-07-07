@@ -4,6 +4,7 @@
 
 #if __has_include(<openal/efx.h>)
 #   include <openal/efx.h>
+#   include <openal/efx-presets.h>
 #   define XR_HAS_EFX
 
 class CSoundRender_EffectsA_EFX : public CSoundRender_Effects

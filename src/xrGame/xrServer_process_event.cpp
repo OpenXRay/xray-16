@@ -179,12 +179,16 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     case GE_DIE:
     {
         // Parse message
-        u16 id_dest = destination, id_src;
+
+        u16 id_src;
         P.r_u16(id_src);
 
-        xrClientData* l_pC = ID_to_client(sender);
+        [[maybe_unused]] xrClientData* l_pC = ID_to_client(sender);
         VERIFY(game && l_pC);
+
 #ifndef MASTER_GOLD
+        u16 id_dest = destination;
+
         if ((game->Type() != eGameIDSingle) && l_pC && l_pC->owner)
         {
             Msg("* [%2d] killed by [%2d] - sended by [0x%08x]", id_dest, id_src, l_pC->ID.value());

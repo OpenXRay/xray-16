@@ -7,7 +7,7 @@
 class XRCORE_API xrMemory
 {
 public:
-    xrMemory();
+    xrMemory() = default;
     void _initialize();
     void _destroy();
 
@@ -74,69 +74,34 @@ public:
 #define FillMemory(dst, size, val) memset(dst, val, size)
 
 // Global C++ new/delete overrides.
-[[nodiscard]] inline void* operator new(size_t size)
-{
-    return Memory.mem_alloc(size);
-}
+[[nodiscard]] void* operator new(size_t size);
+[[nodiscard]] void* operator new[](size_t size);
+[[nodiscard]] void* operator new(size_t size, const std::nothrow_t&) noexcept;
+[[nodiscard]] void* operator new[](size_t size, const std::nothrow_t&) noexcept;
+[[nodiscard]] void* operator new(size_t size, std::align_val_t alignment);
+[[nodiscard]] void* operator new[](size_t size, std::align_val_t alignment);
+[[nodiscard]] void* operator new(size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept;
+[[nodiscard]] void* operator new[](size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept;
 
-[[nodiscard]] inline void* operator new(size_t size, const std::nothrow_t&) noexcept
-{
-    return Memory.mem_alloc(size);
-}
-
-[[nodiscard]] inline void* operator new(size_t size, std::align_val_t alignment)
-{
-    return Memory.mem_alloc(size, static_cast<size_t>(alignment));
-}
-
-[[nodiscard]] inline void* operator new(size_t size, std::align_val_t alignment, const std::nothrow_t&) noexcept
-{
-    return Memory.mem_alloc(size, static_cast<size_t>(alignment));
-}
-
-inline void operator delete(void* ptr) noexcept
-{
-    Memory.mem_free(ptr);
-}
-
-inline void operator delete(void* ptr, std::align_val_t alignment) noexcept
-{
-    Memory.mem_free(ptr, static_cast<size_t>(alignment));
-}
-
-inline void operator delete(void* ptr, size_t) noexcept
-{
-    Memory.mem_free(ptr);
-}
-
-inline void operator delete(void* ptr, size_t, std::align_val_t alignment) noexcept
-{
-    Memory.mem_free(ptr, static_cast<size_t>(alignment));
-}
-
-template <typename T, typename... Args>
-inline T* xr_new(Args&&... args)
-{
-    auto ptr = static_cast<T*>(Memory.mem_alloc(sizeof(T)));
-    return new (ptr) T(std::forward<Args>(args)...);
-}
-
-template <class T>
-inline void xr_delete(T*& ptr) noexcept
-{
-    delete ptr;
-    ptr = nullptr;
-}
+void operator delete(void* ptr) noexcept;
+void operator delete[](void* ptr) noexcept;
+void operator delete(void* ptr, std::align_val_t alignment) noexcept;
+void operator delete[](void* ptr, std::align_val_t alignment) noexcept;
+void operator delete(void* ptr, size_t) noexcept;
+void operator delete[](void* ptr, size_t) noexcept;
+void operator delete(void* ptr, size_t, std::align_val_t alignment) noexcept;
+void operator delete[](void* ptr, size_t, std::align_val_t alignment) noexcept;
 
 // generic "C"-like allocations/deallocations
-template <class T>
-inline T* xr_alloc(size_t count)
+
+template<typename T>
+T* xr_alloc(size_t count)
 {
-    return (T*)Memory.mem_alloc(count * sizeof(T));
+    return static_cast<T*>(Memory.mem_alloc(count * sizeof(T)));
 }
 
-template <class T>
-inline void xr_free(T*& ptr) noexcept
+template<typename T>
+void xr_free(T*& ptr) noexcept
 {
     if (ptr)
     {
@@ -145,8 +110,57 @@ inline void xr_free(T*& ptr) noexcept
     }
 }
 
-inline void* xr_malloc            (size_t size) { return Memory.mem_alloc       (size); }
-inline void* xr_realloc(void* ptr, size_t size) { return Memory.mem_realloc(ptr, size); }
+template<bool, typename T>
+struct xr_special_free
+{
+    IC void operator()(T*& ptr)
+    {
+        auto real_ptr = dynamic_cast<void*>(ptr);
+        ptr->~T();
+        xr_free(real_ptr);
+    }
+};
+
+template<typename T>
+struct xr_special_free<false, T>
+{
+    IC void operator()(T*& ptr)
+    {
+        ptr->~T();
+        xr_free(ptr);
+    }
+};
+
+template<typename T, typename... Args>
+T* xr_new(Args&&... args)
+{
+    auto ptr = static_cast<T*>(Memory.mem_alloc(sizeof(T)));
+    return new (ptr) T(std::forward<Args>(args)...);
+}
+
+template<typename T>
+void xr_delete(T*& ptr) noexcept
+{
+    if (ptr)
+    {
+        xr_special_free<std::is_polymorphic_v<T>, T>()(ptr);
+    }
+    ptr = nullptr;
+}
+
+template<typename T>
+void xr_delete(T* const& ptr) noexcept
+{
+    auto hacked_ptr = const_cast<T*&>(ptr);
+    if (hacked_ptr)
+    {
+        xr_special_free<std::is_polymorphic_v<T>, T>()(hacked_ptr);
+    }
+    hacked_ptr = nullptr;
+}
+
+XRCORE_API void* xr_malloc(size_t size);
+XRCORE_API void* xr_realloc(void* ptr, size_t size);
 
 XRCORE_API pstr xr_strdup(pcstr string);
 

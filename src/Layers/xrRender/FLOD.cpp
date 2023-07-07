@@ -59,7 +59,7 @@ void FLOD::Load(LPCSTR name, IReader* data, u32 dwFlags)
     }
 
     // VS
-    geom.create(flod::dwDecl, RCache.Vertex.Buffer(), RCache.QuadIB);
+    geom.create(flod::dwDecl, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 
     // lod correction
     Fvector3 S;
@@ -80,7 +80,7 @@ void FLOD::Copy(dxRender_Visual* pFrom)
     lod_factor = F->lod_factor;
     CopyMemory(facets, F->facets, sizeof(facets));
 }
-void FLOD::Render(float /*LOD*/)
+void FLOD::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
 {
     /*
     Fvector				Ldir;
@@ -105,12 +105,12 @@ void FLOD::Render(float /*LOD*/)
     // Fill VB
     _face&		F					= facets[best_id];
     u32			vOffset				= 0;
-    auto*		V					= (flod::_hw*) RCache.Vertex.Lock(4,geom->vb_stride,vOffset);
+    auto*		V					= (flod::_hw*) RImplementation.Vertex.Lock(4,geom->vb_stride,vOffset);
     V[0].set	(F.v[0].v,F.N,F.v[0].c_rgb_hemi,F.v[0].t.x,F.v[0].t.y);
     V[1].set	(F.v[1].v,F.N,F.v[1].c_rgb_hemi,F.v[1].t.x,F.v[1].t.y);
     V[2].set	(F.v[2].v,F.N,F.v[2].c_rgb_hemi,F.v[2].t.x,F.v[2].t.y);
     V[3].set	(F.v[3].v,F.N,F.v[3].c_rgb_hemi,F.v[3].t.x,F.v[3].t.y);
-    RCache.Vertex.Unlock			(4,geom->vb_stride);
+    RImplementation.Vertex.Unlock			(4,geom->vb_stride);
 
     // Draw IT
     RCache.set_Geometry		(geom);

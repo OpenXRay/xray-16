@@ -40,7 +40,10 @@ void CMonsterEventManager::raise(EEventType event, IEventData* data)
             (I->delegate)(data);
     }
 
-    auto it_del = std::remove_if(it->second.begin(), it->second.end(), pred_remove());
+    auto it_del = std::remove_if(it->second.begin(), it->second.end(), [](const event_struc& event)
+    {
+        return event.need_remove;
+    });
     it->second.erase(it_del, it->second.end());
 }
 

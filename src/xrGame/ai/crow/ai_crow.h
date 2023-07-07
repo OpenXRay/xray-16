@@ -54,6 +54,8 @@ class CAI_Crow : public CEntity
         void Unload();
     };
 
+    Lock render_lock{}; // TODO: this can be avoided as well.
+
 public:
     void OnHitEndPlaying(CBlend* B);
 
@@ -121,7 +123,7 @@ public:
     virtual void net_Destroy();
     virtual bool renderable_ShadowGenerate() { return FALSE; }
     virtual bool renderable_ShadowReceive() { return FALSE; }
-    void renderable_Render(IRenderable* root) override;
+    void renderable_Render(u32 context_id, IRenderable* root) override;
     virtual void shedule_Update(u32 DT);
     virtual void UpdateCL();
 

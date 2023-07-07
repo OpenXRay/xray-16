@@ -38,15 +38,28 @@ BOOL CBlender_Tree::canBeDetailed()
     return TRUE;
 }
 
-void CBlender_Tree::CompileForEditor(CBlender_Compile& C)
+void CBlender_Tree::Compile(CBlender_Compile& C)
+{
+    IBlender::Compile(C);
+
+    if (C.bFFP)
+        CompileFFP(C);
+    else
+        CompileProgrammable(C);
+}
+
+void CBlender_Tree::CompileFFP(CBlender_Compile& C) const
 {
     C.PassBegin();
+
+    C.PassSET_ZB(TRUE, TRUE);
+    if (oBlend.value)
+        C.PassSET_Blend_BLEND(TRUE, 200);
+    else
+        C.PassSET_Blend_SET(TRUE, 200);
+
+    /*if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
     {
-        C.PassSET_ZB(TRUE, TRUE);
-        if (oBlend.value)
-            C.PassSET_Blend_BLEND(TRUE, 200);
-        else
-            C.PassSET_Blend_SET(TRUE, 200);
         C.PassSET_LightFog(TRUE, TRUE);
 
         // Stage1 - Base texture
@@ -56,19 +69,49 @@ void CBlender_Tree::CompileForEditor(CBlender_Compile& C)
         C.StageSET_TMC(oT_Name, "$null", "$null", 0);
         C.StageEnd();
     }
+    else*/
+    {
+        if (oNotAnTree.value)
+            C.PassSET_Shaders("tree_s", "null");
+        else
+            C.PassSET_Shaders("tree_wave", "null");
+
+        switch (C.iElement)
+        {
+        case SE_R1_NORMAL_HQ:
+        case SE_R1_NORMAL_LQ:
+        {
+            C.PassSET_LightFog(FALSE, TRUE);
+
+            // Stage1 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+            C.StageEnd();
+            break;
+        }
+        case SE_R1_LMODELS:
+        {
+            // Lighting only
+            C.PassSET_LightFog(FALSE, FALSE);
+
+            // Stage1 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, "$null", "$null", 0);
+            C.StageEnd();
+            break;
+        }
+        } // switch (C.iElement)
+    }
+
     C.PassEnd();
 }
 
-void CBlender_Tree::Compile(CBlender_Compile& C)
+void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
 {
-    IBlender::Compile(C);
-
-    if (C.bEditor)
-    {
-        CompileForEditor(C);
-        return;
-    }
-
     u32 tree_aref = 200;
     if (oNotAnTree.value)
         tree_aref = 0;
@@ -157,5 +200,5 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         C.r_End			();
         */
         break;
-    }
+    } // switch (C.iElement)
 }

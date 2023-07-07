@@ -62,7 +62,7 @@ void CHudItem::PlaySound(pcstr alias, const Fvector& position, u8 index)
 }
 //-Alundaio
 
-void CHudItem::renderable_Render(IRenderable* root)
+void CHudItem::renderable_Render(u32 context_id, IRenderable* root)
 {
     UpdateXForm();
     const bool _hud_render = root && root->renderable_HUD() && GetHUDmode();
@@ -74,7 +74,7 @@ void CHudItem::renderable_Render(IRenderable* root)
     {
         if (!object().H_Parent() || (!_hud_render && !IsHidden()))
         {
-            on_renderable_Render(root);
+            on_renderable_Render(context_id, root);
             debug_draw_firedeps();
         }
         else if (object().H_Parent())
@@ -83,7 +83,7 @@ void CHudItem::renderable_Render(IRenderable* root)
             VERIFY(owner);
             CInventoryItem* self = smart_cast<CInventoryItem*>(this);
             if (owner->attached(self))
-                on_renderable_Render(root);
+                on_renderable_Render(context_id, root);
         }
     }
 }
@@ -357,7 +357,7 @@ bool CHudItem::TryPlayAnimIdle()
             }
             if (pActor->AnyMove())
             {
-                if (!st.bCrouch)
+                if (!st.bCrouch && isHUDAnimationExist("anm_idle_moving"))
                 {
                     PlayAnimIdleMoving();
                     return true;
@@ -376,31 +376,49 @@ bool CHudItem::TryPlayAnimIdle()
 //AVO: check if animation exists
 bool CHudItem::isHUDAnimationExist(pcstr anim_name) const
 {
-    if (HudItemData()) // First person
+    if (const auto* data = HudItemData()) // First person
     {
         string256 anim_name_r;
-        bool is_16x9 = UI().is_widescreen();
-        u16 attach_place_idx = pSettings->r_u16(HudItemData()->m_sect_name, "attach_place_idx");
+        const bool is_16x9 = UI().is_widescreen();
+        const u16 attach_place_idx = data->m_attach_place_idx;
         xr_sprintf(anim_name_r, "%s%s", anim_name, (attach_place_idx == 1 && is_16x9) ? "_16x9" : "");
-        player_hud_motion* anm = HudItemData()->m_hand_motions.find_motion(anim_name_r);
-        if (anm)
+        if (data->m_hand_motions.find_motion(anim_name_r))
             return true;
     }
-    else // Third person
+    else if (HudSection().c_str()) // Third person
     {
         const CMotionDef* temp_motion_def;
         if (g_player_hud->motion_length(anim_name, HudSection(), temp_motion_def) > 100)
             return true;
     }
+    else
+        return false; // No hud section, no warning
 #ifdef DEBUG
     Msg("~ [WARNING] ------ Animation [%s] does not exist in [%s]", anim_name, HudSection().c_str());
 #endif
     return false;
 }
 
+pcstr CHudItem::WhichHUDAnimationExist(pcstr anim_name, pcstr anim_name2) const
+{
+    if (isHUDAnimationExist(anim_name))
+        return anim_name;
+    if (isHUDAnimationExist(anim_name2))
+        return anim_name2;
+    return nullptr;
+}
+
 void CHudItem::PlayAnimIdleMovingCrouch() { PlayHUDMotion("anm_idle_moving_crouch", "anim_idle", true, nullptr, GetState()); }
 void CHudItem::PlayAnimIdleMoving() { PlayHUDMotion("anm_idle_moving", "anim_idle", true, nullptr, GetState()); }
-void CHudItem::PlayAnimIdleSprint() { PlayHUDMotion("anm_idle_sprint", "anim_idle", true, nullptr, GetState()); }
+
+void CHudItem::PlayAnimIdleSprint()
+{
+    if (cpcstr anim_name = WhichHUDAnimationExist("anm_idle_sprint", "anim_idle_sprint"))
+        PlayHUDMotion(anim_name, true, nullptr, GetState());
+    else
+        PlayHUDMotion("anm_idle", "anim_idle", true, nullptr, GetState());
+}
+
 void CHudItem::OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd)
 {
     if (GetState() == eIdle && !m_bStopAtEndAnimIsRunning)

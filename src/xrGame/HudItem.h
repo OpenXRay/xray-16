@@ -121,7 +121,7 @@ public:
     virtual void PlayAnimIdleSprint();
 
     virtual void UpdateCL();
-    virtual void renderable_Render(IRenderable* root);
+    virtual void renderable_Render(u32 context_id, IRenderable* root);
 
     virtual void UpdateHudAdditonal(Fmatrix&);
 
@@ -177,10 +177,11 @@ public:
         return (*m_item);
     }
     IC u32 animation_slot() { return m_animation_slot; }
-    virtual void on_renderable_Render(IRenderable* root) = 0;
+    virtual void on_renderable_Render(u32 context_id, IRenderable* root) = 0;
     virtual void debug_draw_firedeps(){};
 
     virtual CHudItem* cast_hud_item() { return this; }
     void PlayAnimIdleMovingCrouch(); //AVO: new crouch idle animation
     bool isHUDAnimationExist(pcstr anim_name) const;
+    pcstr WhichHUDAnimationExist(pcstr anim_name, pcstr anim_name2) const;
 };
