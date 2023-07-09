@@ -57,6 +57,13 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
         }
     }
 
+    luabind::functor<void> before_game_save_callback;
+
+    if (GEnv.ScriptEngine->functor("_G.on_before_game_save", before_game_save_callback))
+    {
+        before_game_save_callback((LPCSTR)m_save_name);
+    }
+
     u32 source_count;
     u32 dest_count;
     void* dest_data;
@@ -91,6 +98,13 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 #else // DEBUG
     Msg("* Game %s is successfully saved to file '%s'", m_save_name, temp);
 #endif // DEBUG
+    
+    luabind::functor<void> game_save_callback;
+
+    if (GEnv.ScriptEngine->functor("_G.on_game_save", game_save_callback))
+    {
+        game_save_callback((LPCSTR)m_save_name);
+    }
 
     if (!update_name)
         xr_strcpy(m_save_name, saveBackup);
@@ -98,6 +112,13 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 
 void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR file_name)
 {
+    luabind::functor<void> before_game_load_callback;
+
+    if (GEnv.ScriptEngine->functor("_G.on_before_game_load", before_game_load_callback))
+    {
+        before_game_load_callback(file_name);
+    }
+
     IReader source(buffer, buffer_size);
     header().load(source);
     time_manager().load(source);
@@ -127,6 +148,13 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR fil
         return;
 
     Level().autosave_manager().on_game_loaded();
+
+    luabind::functor<void> game_load_callback;
+
+    if (GEnv.ScriptEngine->functor("_G.on_game_load", game_load_callback))
+    {
+        game_load_callback(file_name);
+    }
 }
 
 bool CALifeStorageManager::load(LPCSTR save_name_no_check)
