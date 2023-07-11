@@ -914,6 +914,9 @@ void CActor::ChangeVisual(shared_str NewVisual)
             return;
     }
 
+    if (m_firstPersonBody)
+        GEnv.Render->model_Delete(m_firstPersonBody);
+
     cNameVisual_set(NewVisual);
 
     g_SetAnimation(mstate_real);

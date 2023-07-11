@@ -320,7 +320,7 @@ BOOL g_ShowAnimationInfo = FALSE;
 constexpr pcstr mov_state[] = {
     "idle", "walk", "run", "sprint",
 };
-void CActor::g_SetAnimation(u32 mstate_rl)
+void CActor::g_SetAnimation(u32 mstate_rl, bool force)
 {
     if (!g_Alive())
     {
@@ -605,7 +605,7 @@ void CActor::g_SetAnimation(u32 mstate_rl)
         m_current_head = M_head;
     }
 
-    if (m_current_legs != M_legs)
+    if (m_current_legs != M_legs || force)
     {
         float pos = 0.f;
         VERIFY(!m_current_legs_blend || !fis_zero(m_current_legs_blend->timeTotal));
@@ -626,6 +626,14 @@ void CActor::g_SetAnimation(u32 mstate_rl)
             m_current_legs_blend->timeCurrent = m_current_legs_blend->timeTotal * pos;
 
         m_current_legs = M_legs;
+
+        if (m_firstPersonBody) // Yohji: hacky way to force bones to render correctly on load
+        {
+            if (m_current_legs_blend)
+                PlayMotionByParts(m_firstPersonBody->dcast_PKinematicsAnimated(), m_current_legs_blend->motionID, TRUE, legs_play_callback, this);
+            else
+                PlayMotionByParts(m_firstPersonBody->dcast_PKinematicsAnimated(), M_legs, TRUE, legs_play_callback, this);
+        }
 
         CStepManager::on_animation_start(M_legs, m_current_legs_blend);
     }

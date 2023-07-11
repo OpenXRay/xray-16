@@ -102,6 +102,13 @@ public:
     // Render
     void renderable_Render(u32 context_id, IRenderable* root) override;
     virtual bool renderable_ShadowGenerate();
+    // First person body
+    virtual void RenderFirstPersonBody(u32 context_id, IRenderable* root);
+    IRenderVisual* m_firstPersonBody{};
+    xr_unordered_map<u16, bool> m_firstPersonBodyBonesToHide;
+    xr_unordered_map<u16, bool> m_firstPersonBodyBonesToIgnoreAnims;
+    Fmatrix headPosition{};
+
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
         const Fvector& position, float power) override;
     virtual Feel::Sound* dcast_FeelSound() { return this; }
@@ -302,7 +309,7 @@ public:
 
     virtual const SRotation Orientation() const { return r_torso; };
     SRotation& Orientation() { return r_torso; };
-    void g_SetAnimation(u32 mstate_rl);
+    void g_SetAnimation(u32 mstate_rl, bool force = false);
     void g_SetSprintAnimation(u32 mstate_rl, MotionID& head, MotionID& torso, MotionID& legs);
 
 public:

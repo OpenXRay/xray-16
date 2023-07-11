@@ -112,6 +112,8 @@ int g_first_person_death = 0;
 int g_normalize_mouse_sens = 0;
 int g_normalize_upgrade_mouse_sens = 0;
 
+float g_first_person_body_offset = -0.75f;
+
 void register_mp_console_commands();
 //-----------------------------------------------------------
 
@@ -2118,6 +2120,8 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
     CMD3(CCC_Mask, "g_loading_stages", &psActorFlags, AF_LOADING_STAGES);
     CMD3(CCC_Mask, "g_always_use_attitude_sensors", &psActorFlags, AF_ALWAYS_USE_ATTITUDE_SENSORS);
+    CMD3(CCC_Mask, "g_first_person_body", &psActorFlags, AF_FIRST_PERSON_BODY);
+
 
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
@@ -2293,6 +2297,8 @@ void CCC_RegisterCommands()
     g_uCommonFlags.set(flAiUseTorchDynamicLights, TRUE);
 
     CMD3(CCC_Mask, "ai_use_torch_dynamic_lights", &g_uCommonFlags, flAiUseTorchDynamicLights);
+
+    CMD4(CCC_Float, "g_first_person_body_offset", &g_first_person_body_offset, -10.f, 10.f);
 
 #ifndef MASTER_GOLD
     CMD4(CCC_Vector3, "psp_cam_offset", &CCameraLook2::m_cam_offset, Fvector().set(-1000, -1000, -1000),

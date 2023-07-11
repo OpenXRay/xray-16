@@ -60,11 +60,12 @@ void CHudItem::PlaySound(pcstr alias, const Fvector& position, u8 index)
 {
     m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode(), false, index);
 }
-//-Alundaio
 
+//-Alundaio
 void CHudItem::renderable_Render(u32 context_id, IRenderable* root)
 {
     UpdateXForm();
+
     const bool _hud_render = root && root->renderable_HUD() && GetHUDmode();
 
     if (_hud_render && !IsHidden())

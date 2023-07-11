@@ -93,7 +93,8 @@ Flags32 psActorFlags =
     AF_AUTOPICKUP | 
     AF_RUN_BACKWARD | 
     AF_IMPORTANT_SAVE |
-    AF_MULTI_ITEM_PICKUP
+    AF_MULTI_ITEM_PICKUP | 
+    AF_FIRST_PERSON_BODY
 };
 int psActorSleepTime = 1;
 
@@ -238,6 +239,9 @@ CActor::~CActor()
     //Alundaio: For car
     xr_delete(m_vehicle_anims);
     //-Alundaio
+
+    if (m_firstPersonBody)
+        xr_delete(m_firstPersonBody);
 }
 
 void CActor::reinit()
@@ -457,6 +461,22 @@ void CActor::Load(LPCSTR section)
     m_sInventoryBoxUseAction = "inventory_box_use";
     //---------------------------------------------------------------------
     m_sHeadShotParticle = READ_IF_EXISTS(pSettings, r_string, section, "HeadShotParticle", 0);
+
+    // initialize bones for first person body
+    m_firstPersonBodyBonesToHide =
+    {
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_head"), true},
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_neck"), true },
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_l_clavicle"), true },
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_r_clavicle"), true },
+    };
+
+    m_firstPersonBodyBonesToIgnoreAnims =
+    {
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_spine"), true },
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_spine1"), true },
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_spine2"), true },
+    };
 }
 
 void CActor::PHHit(SHit& H) { m_pPhysics_support->in_Hit(H, false); }
@@ -1506,6 +1526,68 @@ bool CActor::renderable_ShadowGenerate()
         return FALSE;
 
     return inherited::renderable_ShadowGenerate();
+}
+
+extern float g_first_person_body_offset;
+void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
+{
+    if (!(psActorFlags.test(AF_FIRST_PERSON_BODY) && cam_active == eacFirstEye))
+        return;
+
+    if (!m_firstPersonBody) // initialize first person body if necessary
+    {
+        m_firstPersonBody = GEnv.Render->model_Duplicate(Visual());
+        g_SetAnimation(mstate_real, true); // Yohji: hacky way to reset anim state / bones when our visual changes
+        return;
+    }
+
+    IKinematics* kinematics = m_firstPersonBody->dcast_PKinematics();
+    IKinematics* realBodyK = Visual()->dcast_PKinematics();
+
+    // adjust body position
+    Fvector camdir = { cam_Active()->Direction().x, 0.f, cam_Active()->Direction().z }; // ignore Y (vertical) value
+    Fmatrix trans = XFORM();
+    trans.c.add(camdir.normalize().mul(g_first_person_body_offset)); // push model back so it doesn't look weird (default value: -0.75f)
+    XFORM().translate_over(trans.c); // move our original body to where our first person body is, so shadow renders in correct place
+
+    // Add body to render
+    GEnv.Render->add_Visual(context_id, root, m_firstPersonBody, trans);
+    m_firstPersonBody->getVisData().hom_frame = Device.dwFrame;
+
+    // Copy transforms from actual body visual, excluding bones we don't want to animate
+    const u16 bones_count = kinematics->LL_BoneCount();
+    for (u16 i = 0; i < bones_count; ++i)
+    {
+        if (m_firstPersonBodyBonesToIgnoreAnims[i])
+            continue;
+
+        kinematics->LL_GetTransform(i).set(realBodyK->LL_GetTransform(i));
+        kinematics->LL_GetTransform_R(i).set(realBodyK->LL_GetTransform_R(i));
+    }
+
+    // Hide bones
+    for (auto [boneId, vis] : m_firstPersonBodyBonesToHide)
+        kinematics->LL_SetBoneVisible(boneId, !vis, true);
+
+    // Update head position
+    headPosition.set(trans);
+    headPosition.mulB_43(realBodyK->LL_GetTransform(realBodyK->LL_BoneID("bip01_head")));
+
+#ifdef DEBUG
+    Fvector ypr;
+    trans.getHPB(ypr);
+    string1024 text;
+    CGameFont* F = UI().Font().pFontArial14;
+    F->SetAligment(CGameFont::alLeft);
+    F->OutSetI(-.9, 0);
+    F->SetColor(color_rgba(255, 0, 0, 255));
+    xr_sprintf(text, "first person body position [%3.3f %3.3f %3.3f]", trans.c.x, trans.c.y, trans.c.z);
+    F->OutNext(text);
+    xr_sprintf(text, "head position [%3.3f %3.3f %3.3f]", headPosition.c.x, headPosition.c.y, headPosition.c.z);
+    F->OutNext(text);
+    xr_sprintf(text, "camera position [%3.3f %3.3f %3.3f]", cam_Active()->Position().x, cam_Active()->Position().y, cam_Active()->Position().z);
+    F->OutNext(text);
+#endif // DEBUG
 }
 
 void CActor::g_PerformDrop()

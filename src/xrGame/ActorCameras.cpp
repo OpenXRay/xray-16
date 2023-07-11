@@ -370,7 +370,10 @@ void CActor::cam_Update(float dt, float fFOV)
     }
     if (Level().CurrentEntity() == this)
     {
-        collide_camera(*cameras[eacFirstEye], _viewport_near, this);
+        if (m_firstPersonBody)
+            collide_camera(*cameras[eacFirstEye], _viewport_near, this, headPosition.c);
+        else
+            collide_camera(*cameras[eacFirstEye], _viewport_near, this);
     }
     if (psActorFlags.test(AF_PSP))
     {
