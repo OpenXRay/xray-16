@@ -95,6 +95,17 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     static shared_str strDir2D("dir2D");
     static shared_str strArray("array");
     static shared_str strXForm("xform");
+    static shared_str strPos("benders_pos");
+    static shared_str strGrassSetup("benders_setup");
+
+    // Grass benders data
+    IGame_Persistent::grass_data& GData = g_pGamePersistent->grass_shader_data;
+    Fvector4 player_pos = { 0, 0, 0, 0 };
+    int BendersQty = _min(16, (int)(ps_ssfx_grass_interactive.y + 1));
+
+    // Add Player?
+    if (ps_ssfx_grass_interactive.x > 0)
+        player_pos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, -1);
 
     RImplementation.BasicStats.DetailCount = 0;
 
@@ -132,6 +143,31 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 cmd_list.set_c(strDir2D, wind);
                 cmd_list.set_c(strXForm, Device.mFullTransform);
 
+                if (ps_ssfx_grass_interactive.y > 0)
+                {
+                    cmd_list.set_c(strGrassSetup, ps_ssfx_int_grass_params_1);
+
+                    Fvector4* c_grass;
+                    {
+                        void* GrassData;
+                        cmd_list.get_ConstantDirect(strPos, BendersQty * sizeof(Fvector4), &GrassData, 0, 0);
+                        c_grass = (Fvector4*)GrassData;
+                    }
+                    VERIFY(c_grass);
+
+                    if (c_grass)
+                    {
+                        c_grass[0].set(player_pos);
+                        c_grass[16].set(0.0f, -99.0f, 0.0f, 1.0f);
+
+                        for (int Bend = 1; Bend < BendersQty; Bend++)
+                        {
+                            c_grass[Bend].set(GData.pos[Bend].x, GData.pos[Bend].y, GData.pos[Bend].z, GData.radius_curr[Bend]);
+                            c_grass[Bend + 16].set(GData.dir[Bend].x, GData.dir[Bend].y, GData.dir[Bend].z, GData.str[Bend]);
+                        }
+                    }
+                }
+
                 // ref_constant constArray = RCache.get_c(strArray);
                 // VERIFY(constArray);
 
@@ -163,6 +199,17 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
 
                         // Build matrix ( 3x4 matrix, last row - color )
                         float scale = Instance.scale_calculated;
+
+                        // Sort of fade using the scale
+                        // fade_distance == -1 use light_position to define "fade", anything else uses fade_distance
+                        if (fade_distance <= -1)
+                            scale *= 1.0f - Instance.position.distance_to_xz_sqr(light_position) * 0.005f;
+                        else if (Instance.distance > fade_distance)
+                            scale *= 1.0f - abs(Instance.distance - fade_distance) * 0.005f;
+
+                        if (scale <= 0)
+                            break;
+
                         Fmatrix& M = Instance.mRotY;
                         c_storage[base + 0].set(M._11 * scale, M._21 * scale, M._31 * scale, M._41);
                         c_storage[base + 1].set(M._12 * scale, M._22 * scale, M._32 * scale, M._42);
@@ -206,6 +253,16 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 // flush if necessary
                 if (dwBatch)
                 {
+                    // TODO: add phase to RImplementation
+                    //if (ps_ssfx_grass_shadows.x <= 0)
+                    //    if (!ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) || 
+                    //        ((ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_SMAP == RImplementation.phase)) || 
+                    //            (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_NORMAL == RImplementation.phase) && (!RImplementation.is_sun())) || 
+                    //            (!ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_NORMAL == RImplementation.phase))))
+                    //    {
+                    //        vis.clear_not_free();
+                    //    }
+
                     RImplementation.BasicStats.DetailCount += dwBatch;
                     u32 dwCNT_verts = dwBatch * Object.number_vertices;
                     u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;

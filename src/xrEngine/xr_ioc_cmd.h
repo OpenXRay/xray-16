@@ -30,6 +30,12 @@
 
 extern ENGINE_API bool renderer_allow_override; // allows to change renderer setting
 
+extern ENGINE_API Fvector4 ps_ssfx_grass_shadows;
+extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
+extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
+extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
+extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
+
 class ENGINE_API IConsole_Command
 {
 public:
@@ -318,6 +324,68 @@ public:
         tips.push_back(str);
         IConsole_Command::fill_tips(tips, mode);
     }
+};
+
+class CCC_Vector4 : public IConsole_Command
+{
+protected:
+    Fvector4* value;
+    Fvector4 min, max;
+    public
+        :
+            CCC_Vector4(LPCSTR N, Fvector4* V, const Fvector4 _min, const Fvector4 _max) :
+                IConsole_Command(N),
+                value(V)
+            {
+                min.set(_min);
+                max.set(_max);
+            };
+            const Fvector4 GetValue() const { return *value; };
+            Fvector4* GetValuePtr() const { return value; };
+
+            virtual void Execute(LPCSTR args)
+            {
+                Fvector4 v;
+                if (4 != sscanf(args, "%f,%f,%f,%f", &v.x, &v.y, &v.z, &v.w))
+                {
+                    if (4 != sscanf(args, "(%f,%f,%f,%f)", &v.x, &v.y, &v.z, &v.w))
+                    {
+                        InvalidSyntax();
+                        return;
+                    }
+                }
+
+                if (v.x < min.x || v.y < min.y || v.z < min.z || v.w < min.w)
+                {
+                    InvalidSyntax();
+                    return;
+                }
+                if (v.x > max.x || v.y > max.y || v.z > max.z || v.w > max.w)
+                {
+                    InvalidSyntax();
+                    return;
+                }
+                value->set(v);
+            }
+
+            virtual void Status(TStatus& S)
+            {
+                xr_sprintf(S, sizeof(S), "(%f, %f, %f, %f)", value->x, value->y, value->z, value->w);
+            }
+
+            virtual void Info(TInfo& I)
+            {
+                xr_sprintf(I, sizeof(I), "vector4 in range [%e,%e,%e,%e]-[%e,%e,%e,%e]", min.x, min.y, min.z, min.w, max.x, max.y, max.z, max.w);
+            }
+
+            virtual void fill_tips(vecTips& tips, u32 mode)
+            {
+                TStatus str;
+                xr_sprintf(str, sizeof(str), "(%e, %e, %e, %e) (current) [(%e,%e,%e,%e)-(%e,%e,%e,%e)]", value->x, value->y, value->z, value->w,
+                    min.x, min.y, min.z, min.w, max.x, max.y, max.z, max.w);
+                tips.push_back(str);
+                IConsole_Command::fill_tips(tips, mode);
+            }
 };
 
 class ENGINE_API CCC_Integer : public IConsole_Command

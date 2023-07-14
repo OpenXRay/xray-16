@@ -387,6 +387,45 @@ class cl_entity_data : public R_constant_setup //--#SM+#--
 };
 static cl_entity_data binder_entity_data;
 
+// Ascii1457's Screen Space Shaders
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
+extern ENGINE_API float ps_ssfx_wpn_dof_2;
+
+class cl_sky_color : public R_constant_setup
+{
+    u32 marker;
+    Fvector4 result;
+
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        if (marker != Device.dwFrame)
+        {
+            CEnvDescriptor& desc = g_pGamePersistent->Environment().CurrentEnv;
+            result.set(desc.sky_color.x, desc.sky_color.y, desc.sky_color.z, desc.sky_rotation);
+        }
+        cmd_list.set_c(C, result);
+    }
+};
+static cl_sky_color binder_sky_color;
+
+class ssfx_wpn_dof_1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_wpn_dof_1.x, ps_ssfx_wpn_dof_1.y, ps_ssfx_wpn_dof_1.z, ps_ssfx_wpn_dof_1.w);
+    }
+};
+static ssfx_wpn_dof_1 binder_ssfx_wpn_dof_1;
+
+class ssfx_wpn_dof_2 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_wpn_dof_2, 0.f, 0.f, 0.f);
+    }
+};
+static ssfx_wpn_dof_2 binder_ssfx_wpn_dof_2;
+
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
 {
@@ -466,4 +505,9 @@ void CBlender_Compile::SetMapping()
         std::pair<shared_str, R_constant_setup*> cs = RImplementation.Resources->v_constant_setup[it];
         r_Constant(*cs.first, cs.second);
     }
+
+    // Ascii1457's Screen Space Shaders
+    r_Constant("sky_color", &binder_sky_color);
+    r_Constant("ssfx_wpn_dof_1", &binder_ssfx_wpn_dof_1);
+    r_Constant("ssfx_wpn_dof_2", &binder_ssfx_wpn_dof_2);
 }

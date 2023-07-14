@@ -728,6 +728,9 @@ void CRender::OnFrame()
         Device.seqParallel.insert(
             Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
     }
+
+    if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+        g_pGamePersistent->GrassBendersUpdateAnimations();
 }
 
 #ifdef USE_OGL

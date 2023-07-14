@@ -237,6 +237,7 @@ void CDetailManager::Unload()
 }
 
 extern ECORE_API float r_ssaDISCARD;
+extern int ps_screen_space_shaders;
 
 void CDetailManager::UpdateVisibleM()
 {
@@ -267,7 +268,13 @@ void CDetailManager::UpdateVisibleM()
                 continue;
             }
             u32 mask = 0xff;
-            u32 res = View.testSAABB(MS.vis.sphere.P, MS.vis.sphere.R, MS.vis.box.data(), mask);
+
+            u32 res;
+            if (ps_screen_space_shaders)
+                res = View.testSphere(MS.vis.sphere.P, MS.vis.sphere.R, mask);
+            else
+                res = View.testSAABB(MS.vis.sphere.P, MS.vis.sphere.R, MS.vis.box.data(), mask);
+
             if (fcvNone == res)
             {
                 continue; // invisible-view frustum
@@ -294,7 +301,12 @@ void CDetailManager::UpdateVisibleM()
                 if (fcvPartial == res)
                 {
                     u32 _mask = mask;
-                    u32 _res = View.testSAABB(S.vis.sphere.P, S.vis.sphere.R, S.vis.box.data(), _mask);
+                    u32 _res;
+                    if (ps_screen_space_shaders)
+                        _res = View.testSphere(S.vis.sphere.P, S.vis.sphere.R, _mask);
+                    else
+                        _res = View.testSAABB(S.vis.sphere.P, S.vis.sphere.R, S.vis.box.data(), _mask);
+                    
                     if (fcvNone == _res)
                     {
                         continue; // invisible-view frustum
@@ -346,6 +358,8 @@ void CDetailManager::UpdateVisibleM()
 
                             sp.r_items[vis_id].push_back(siIT);
 
+                            Item.distance = dist_sq;
+                            Item.position = S.vis.sphere.P;
                             // 2 visible[vis_id][sp.id].push_back(&Item);
                         }
                     }
@@ -442,4 +456,28 @@ void CDetailManager::MT_CALC()
             m_frame_calc = Device.dwFrame;
         }
     MT.Leave();
+}
+
+void CDetailManager::details_clear()
+{
+    // Disable fade, next render will be scene
+    fade_distance = 99999;
+    
+    if (ps_ssfx_grass_shadows.x <= 0)
+    return;
+    
+    for (u32 x = 0; x < 3; x++)
+    {
+        vis_list & list = m_visibles[x];
+        
+        for (u32 O = 0; O < objects.size(); O++)
+        {
+            CDetail & Object = *objects[O];
+            xr_vector<SlotItemVec*>&vis = list[O];
+            if (!vis.empty())
+            {
+                vis.erase(vis.begin(), vis.end());
+            }
+        }
+    }
 }
