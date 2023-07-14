@@ -28,6 +28,10 @@
 #elif defined (_M_ARM64) || defined(__aarch64__)
 #   define XR_ARCHITECTURE_ARM64
 #   define _XRAY_ARCHITECTURE_MARKER "ARM 64-bit"
+#elif defined(__powerpc64__) || defined(__ppc64__)
+#   define XR_ARCHITECTURE_PPC64
+#elif defined (_M_PPC) || defined(__powerpc__)
+#   define XR_ARCHITECTURE_PPC
 #elif defined (__e2k__)
 #   define XR_ARCHITECTURE_E2K
 #   define _XRAY_ARCHITECTURE_MARKER "E2K"
