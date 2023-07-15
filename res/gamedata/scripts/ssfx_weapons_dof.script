@@ -1,0 +1,544 @@
+-- @ Version: SCREEN SPACE SHADERS - UPDATE 12.3
+-- @ Description: Weapons DOF script
+-- @ Author: https://www.moddb.com/members/ascii1457
+-- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+
+-- Internal vars
+local ssfx_wpn_dof_minlen = 0
+local ssfx_wpn_dof_maxlen = 0
+local ssfx_wpn_dof_blur = 0
+local ssfx_wpn_dof_edgeblur = 0
+
+local ssfx_wpn_dof_aim_minlen = 0
+local ssfx_wpn_dof_aim_maxlen = 0
+local ssfx_wpn_dof_aim_blur = 0
+local ssfx_wpn_dof_aim_edgeblur = 0
+
+local ssfx_wpn_dof_reload = true
+local ssfx_wpn_dof_pda = true
+local ssfx_wpn_dof_inventory = true
+local ssfx_wpn_dof_FDDA = true
+local ssfx_wpn_dof_loot_mutant = true
+
+-- Weapons that have kind "pistol" but aren't pistols
+local ssfx_not_pistol = {
+	wpn_svt40_short = true,
+	wpn_avt40_short = true,
+	wpn_aek919k = true,
+}
+
+local ssfx_wpn_dof_blur_current = 0.0
+local ssfx_wpn_dof_blur_to = 0.0
+
+local ssfx_reloading = 0
+local ssfx_reloadtime = 0
+local ssfx_reloadforce_end = 0
+
+local ssfx_wpn_one_shot = false
+local ssfx_wpn_state = 0
+local ssfx_inv_state = 0
+local ssfx_itm_state = 0
+local ssfx_pda_state = 0
+local ssfx_pda_zoom = 0
+
+local ssfx_itm_in_use
+
+local ssfx_wpn_reloadtime_save = {}
+
+-- Load FDDA settigns if exist
+local ssfx_items_anim = ini_file("items\\items\\animations_settings.ltx") or {}
+
+local tg_update = 0
+
+local function ssfx_aim_in()
+	
+	-- Apply aim DOF
+	if (not ssfx_check_item()) then
+		ssfx_set_dof(ssfx_wpn_dof_aim_minlen, ssfx_wpn_dof_aim_maxlen, 0, ssfx_wpn_dof_aim_blur)
+		ssfx_wpn_state = 1
+	else
+		ssfx_wpn_state = 2
+		get_console():execute("ssfx_wpn_dof_1 (0,0,0," .. ssfx_wpn_dof_aim_blur .. ")")
+	end
+	
+	get_console():execute("ssfx_wpn_dof_2 " .. ssfx_wpn_dof_aim_edgeblur )
+	
+end
+
+local function ssfx_aim_out()
+
+	-- Apply default DOF
+	ssfx_set_dof(ssfx_wpn_dof_minlen, ssfx_wpn_dof_maxlen, 0, ssfx_wpn_dof_blur)
+	get_console():execute("ssfx_wpn_dof_2 " .. ssfx_wpn_dof_edgeblur )
+	ssfx_wpn_state = 0
+	
+end
+
+-- End Item animation
+local function ssfx_item_anim_stop()
+	
+	ssfx_itm_state = 0
+	ssfx_far_blur(0, 0)
+	return true
+	
+end
+
+-- Use Item
+local original_function = itms_manager.actor_on_item_before_use
+function itms_manager.actor_on_item_before_use(obj,flags)
+
+	original_function(obj,flags)
+	
+	if ssfx_wpn_dof_FDDA == false then 
+		return 
+	end
+	
+	-- Item passes the utilization checks? only_movekeys is only true if check is ok ( FDDA reset the flags.ret_value )
+	if game.only_movekeys_allowed() then
+		ssfx_itm_state = 1
+		ssfx_itm_in_use = obj:section()
+	end
+end
+
+-- Loot monsters with FFDA
+local function ssfx_monster_on_actor_use(obj)
+
+	if (ssfx_wpn_dof_loot_mutant == false) then
+		return
+	end
+	
+	ssfx_itm_state = 1
+	ssfx_itm_in_use = "mutant_looting"
+
+end
+
+local function GUI_on_show(name)
+	
+	if ssfx_wpn_dof_loot_mutant == false then return end
+	
+	if name == "UIMutantLoot" then -- Remove time animation end if loot UIMutantLoot GUI shows
+		RemoveTimeEvent("ssfx_endanim", "ssfx_item_anim_stop")
+		
+		-- Even without the FFDA animation, we want DOF with the UI
+		ssfx_itm_state = 2
+		ssfx_far_blur(1, 0)
+	end
+end
+
+local function GUI_on_hide(name)
+	if name == "UIMutantLoot" then -- Remove DOF if UIMutantLoot GUI hide
+		ssfx_item_anim_stop()
+	end
+end
+
+-- Check for PDA zoom
+local function ssfx_on_key_press(dik)
+
+	if ssfx_pda_state ~= 2 then return end
+
+	local bind = dik_to_bind(dik)
+	local kb = key_bindings
+
+	if bind == kb.kWPN_ZOOM or bind == kb.kWPN_FIRE or bind == kb.kWPN_RELOAD then
+		if bind == kb.kWPN_RELOAD then
+			ssfx_pda_zoom = 1 - ssfx_pda_zoom
+		else
+			ssfx_pda_zoom = 1
+		end
+	end
+end
+
+-- Check PDA states
+local function ssfx_PDA_state()
+
+	if ssfx_pda_state == 0 or ssfx_wpn_dof_pda == false then 
+		return
+	end
+	
+	-- Sprint disable PDA zoom
+	if IsMoveState("mcSprint") then
+		ssfx_pda_zoom = 0
+	end
+	
+	-- PDA states
+	if ssfx_pda_state == 1 then
+		-- Wait for 100% ready
+		itm = db.actor:active_item()
+		if itm then
+			if itm:get_state() == 0 then ssfx_pda_state = 2 end
+		end
+	elseif ssfx_pda_state == 2 then
+		
+		-- If Zoom, Enable DOF
+		if ssfx_pda_zoom == 1 then 
+			ssfx_far_blur(1, 0)
+		else
+			ssfx_wpn_dof_minlen = 0
+			ssfx_wpn_dof_maxlen = 0
+			ssfx_far_blur(0, 0)
+		end
+	end
+	
+end
+
+-- Function to end the PDA state
+local function ssfx_PDA_reset()
+	ssfx_wpn_dof_minlen = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "fadestart", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_maxlen = ssfx_wpn_dof_minlen + ssfx_001_mcm.ssfx_get_setting("wpn_dof", "fadelen", ssfx_weapons_dof_settings)
+	ssfx_far_blur(0, 0)
+	ssfx_pda_state = 0
+	ssfx_pda_zoom = 0
+end
+
+local function actor_on_update()
+
+	-- Check Inventory, Reloading, PDA and Items states
+	
+	ssfx_PDA_state() -- Outside the tick limit to avoid any unsync ( The zoom code is very hacky )
+	
+	-- Not necessary to check every tick, let's update each 100ms
+	local tg = time_global()
+	if tg < tg_update then
+		return
+	end
+	tg_update = tg + 100
+	
+	local itm = db.actor:active_item()
+	local slot = db.actor:active_slot()
+	local is_weapon = itm and IsWeapon(itm) or false
+	local is_pda = itm and slot == 8 or slot == 14 or false
+	local sec = nil
+	
+	-- Item usage FDDA
+	if ssfx_itm_state == 1 then
+		
+		if not db.actor:active_detector() and slot == 0 then -- ( Without a detector equiped and using slot 0 )
+			-- Change item state
+			ssfx_itm_state = 2
+			
+			-- Get the animation time
+			local tm = ssfx_items_anim:r_float_ex(ssfx_itm_in_use, "tm")
+			
+			if ssfx_itm_in_use == "mutant_looting" then
+				tm = 4500
+			end
+			
+			if tm > 0 then
+			
+				-- Initialize far blur
+				ssfx_far_blur(1, 0)
+				
+				-- Millisecs to secs
+				anim_tm = tm * 0.001
+				
+				-- 70% of the animation or custom from settings...
+				if ssfx_weapons_dof_settings.items_time[ssfx_itm_in_use] then
+					anim_tm = anim_tm * ssfx_weapons_dof_settings.items_time[ssfx_itm_in_use]
+				else
+					anim_tm = anim_tm * 0.7
+				end
+				
+				-- Create end of animation event
+				CreateTimeEvent("ssfx_endanim", "ssfx_item_anim_stop", anim_tm, ssfx_item_anim_stop)
+				
+			end
+		end
+	end
+	
+	-- Inventory stuff ( "Inventory" = 1 -- "trade" = 2 -- "repair" = 3 -- "loot" = 4 )
+	if actor_menu.last_mode == 1 and ssfx_wpn_dof_inventory then
+		if (ssfx_inv_state == 0) then
+			ssfx_inv_state = 1
+			ssfx_far_blur(1, 0)
+		end
+	else
+		if (ssfx_inv_state == 1) then
+			ssfx_inv_state = 0
+			ssfx_far_blur(0, ssfx_reloading + ssfx_itm_state)
+		end
+	end
+	
+	-- PDA stuff
+	if is_pda then
+		
+		local itm_state = itm:get_state()
+		
+		if itm_state == 1 then -- Show PDA
+			ssfx_pda_state = 1
+			ssfx_set_dof(0, 0, 0, ssfx_wpn_dof_blur)
+		elseif itm_state == 2 then -- Hide PDA
+			ssfx_PDA_reset()
+		end
+		
+
+	end
+	
+	-- Reload stuff ( "Idle" = 0 -- "Raise" = 1 -- "Lower" = 2 -- "Reload" = 7 )
+	if is_weapon and ssfx_wpn_dof_reload then
+		
+		-- Reload states
+		if ssfx_reloading == 0 then -- Idle
+		
+			if itm:get_state() == 7 then -- Reload start
+				
+				sec = itm:section()
+				
+				-- Pump action, bold action, etc.
+				ssfx_wpn_one_shot = (ini_sys:r_string_ex(sec, "tri_state_reload") == "on") or (ini_sys:r_string_ex(sec, "class") == "WP_BM16")
+	
+				ssfx_reloading = 1 -- Reloading
+				ssfx_far_blur(1, 0)
+				ssfx_reloadtime = tg
+				
+				-- Check if we know the reload animation length, omit if ssfx_wpn_one_shot true
+				if ssfx_wpn_reloadtime_save[sec] or ssfx_weapons_dof_settings.wpn_reloadtime[sec] then
+					if not ssfx_wpn_one_shot then
+						
+						-- Stop DOF at 80% of the animation
+						local anim_percentage = 0.8
+						
+						-- Pistols lower the %
+						if SYS_GetParam(0, sec, "kind", "") == "w_pistol" and not ssfx_not_pistol[sec] then
+							anim_percentage = 0.7
+						end
+						
+						-- From reloatime file or save
+						if ssfx_weapons_dof_settings.wpn_reloadtime[sec] then
+							ssfx_reloadforce_end = ssfx_weapons_dof_settings.wpn_reloadtime[sec] * anim_percentage -- % of animation
+						else
+							ssfx_reloadforce_end = ssfx_wpn_reloadtime_save[sec] * anim_percentage -- % of animation
+						end
+						
+					end
+				else
+					ssfx_reloadforce_end = nil
+				end
+			end
+		
+		elseif ssfx_reloading == 1 then -- Reload in progress...
+				
+			if ssfx_reloadforce_end then
+			
+				-- End reload if reload time
+				if (tg - ssfx_reloadtime) > ssfx_reloadforce_end then
+					ssfx_far_blur(0, ssfx_inv_state)
+					ssfx_reloading = 2 -- Wait animation to end
+				end
+			else
+				
+				sec = itm:section()
+				
+				-- End reload if current ammo == mag size
+				if itm:get_ammo_in_magazine() == ini_sys:r_u32(sec, "ammo_mag_size") then
+
+					ssfx_far_blur(0, ssfx_inv_state)
+					ssfx_reloading = 2 -- Wait animation to end
+					
+					-- Save time if not ssfx_wpn_one_shot
+					if not ssfx_wpn_one_shot then
+						ssfx_wpn_reloadtime_save[sec] = tg - ssfx_reloadtime
+					end
+
+				end
+			end
+		end
+		
+		-- Wait for the end of the reloading animation or any other state.
+		if itm:get_state() ~= 7 and ssfx_reloading > 0 then
+			ssfx_far_blur(0, ssfx_inv_state)
+			ssfx_reloading = 0
+		end
+	end
+	
+	-- If weapon or PDA is dropped
+	if itm == nil then
+		if ssfx_reloading > 0 then
+			ssfx_far_blur(0, ssfx_inv_state)
+			ssfx_reloading = 0
+		end
+		if ssfx_pda_state > 0 then
+			ssfx_PDA_reset()
+		end
+	end
+end
+
+local function ssfx_change_blur()
+	
+	-- Smooth to target
+	local smoothed = ssfx_diminish()
+	
+	if (ssfx_wpn_dof_blur_to == 1) then
+		ssfx_set_dof(0, 0, smoothed, ssfx_wpn_dof_blur)
+	else
+		ssfx_set_dof(ssfx_wpn_dof_minlen, ssfx_wpn_dof_maxlen, smoothed, ssfx_wpn_dof_blur)
+	end
+	
+	if (smoothed == ssfx_wpn_dof_blur_to) then
+		ssfx_stop_blur()
+	end
+end
+
+function ssfx_far_blur(to_val, checkvar)
+	
+	if checkvar > 0 then return end
+	
+	if (ssfx_wpn_dof_blur_to ~= to_val) then
+		ssfx_stop_blur()
+		ssfx_wpn_dof_blur_to = to_val
+		RegisterScriptCallback("actor_on_update", ssfx_change_blur)
+	end
+end
+
+function ssfx_stop_blur()
+	UnregisterScriptCallback("actor_on_update", ssfx_change_blur)
+end
+
+function ssfx_check_item()
+	
+	local itm = db.actor:active_item()
+	
+	if itm then
+		local name = itm:section() or nil
+		if (name and ssfx_weapons_dof_settings.wpn_nodof[name]) then
+			return true
+		end
+	end
+	
+	return false
+end
+
+function ssfx_diminish()
+	
+	-- Frame independent smoothing
+	local smoothing = math.min(0.1 * device().time_delta / 20, 0.19)
+	
+	-- Let's go!
+	if (ssfx_wpn_dof_blur_current < ssfx_wpn_dof_blur_to) then
+		ssfx_wpn_dof_blur_current = ssfx_wpn_dof_blur_current + smoothing
+	else
+		ssfx_wpn_dof_blur_current = ssfx_wpn_dof_blur_current - smoothing
+	end
+	
+	if math.abs(ssfx_wpn_dof_blur_current - ssfx_wpn_dof_blur_to) <= 0.1 then
+		ssfx_wpn_dof_blur_current = ssfx_wpn_dof_blur_to
+	end
+	
+	return ssfx_wpn_dof_blur_current
+end
+
+function ssfx_set_dof(var1, var2, var3, var4)
+	ssfx_wpn_dof_blur_current = var3
+	get_console():execute("ssfx_wpn_dof_1 (" .. var1 .. "," .. var2 .. "," .. var3 .. "," .. var4 .. ")")
+end
+
+function actor_on_first_update()
+	-- Let's be sure
+	ssfx_aim_out()
+end
+
+local function save_state(mdata)
+	-- Save reload times
+	mdata.ssfx_saved_reload_time = ssfx_wpn_reloadtime_save
+end
+
+local function load_state(mdata)
+	-- Load reload times
+	ssfx_wpn_reloadtime_save = mdata.ssfx_saved_reload_time or {}
+end
+
+function on_option_change()
+
+	-- Force DOF
+	get_console():execute("r2_dof_enable 1")
+	
+	-- Get settings
+	ssfx_wpn_dof_minlen = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "fadestart", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_maxlen = ssfx_wpn_dof_minlen + ssfx_001_mcm.ssfx_get_setting("wpn_dof", "fadelen", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_blur = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "blur", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_edgeblur = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "edgeblur", ssfx_weapons_dof_settings) / 2
+
+	ssfx_wpn_dof_aim_minlen = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "aim_fadestart", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_aim_maxlen = ssfx_wpn_dof_aim_minlen + ssfx_001_mcm.ssfx_get_setting("wpn_dof", "aim_fadelen", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_aim_blur = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "aim_blur", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_aim_edgeblur = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "aim_edgeblur", ssfx_weapons_dof_settings) / 2
+	
+	ssfx_wpn_dof_reload = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "reloading", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_pda = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "pda", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_inventory = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "inventory", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_FDDA = ssfx_001_mcm.ssfx_get_setting("wpn_dof", "fdda", ssfx_weapons_dof_settings)
+	ssfx_wpn_dof_loot_mutant =  ssfx_001_mcm.ssfx_get_setting("wpn_dof", "looting_mutant", ssfx_weapons_dof_settings)
+	
+	-- Apply settings to current state
+	
+	-- Weapon
+	if ssfx_wpn_state == 0 then -- IDLE
+		ssfx_set_dof(ssfx_wpn_dof_minlen, ssfx_wpn_dof_maxlen, 0, ssfx_wpn_dof_blur)
+		get_console():execute("ssfx_wpn_dof_2 " .. ssfx_wpn_dof_edgeblur )
+	elseif ssfx_wpn_state == 1 then -- Aim
+		ssfx_set_dof(ssfx_wpn_dof_aim_minlen, ssfx_wpn_dof_aim_maxlen, 0, ssfx_wpn_dof_aim_blur)
+		get_console():execute("ssfx_wpn_dof_2 " .. ssfx_wpn_dof_aim_edgeblur )
+	elseif ssfx_wpn_state == 2 then -- Aim no DOF
+		get_console():execute("ssfx_wpn_dof_2 " .. ssfx_wpn_dof_aim_edgeblur )
+	end
+	
+	-- Reload
+	if ssfx_reloading > 0 and ssfx_wpn_dof_reload ~= true then
+		ssfx_far_blur(0, ssfx_inv_state)
+		ssfx_reloading = 0
+	end
+	
+	-- Inventory
+	if actor_menu.last_mode == 1 and ssfx_wpn_dof_inventory ~= true then
+		ssfx_inv_state = 0
+		ssfx_far_blur(0, ssfx_reloading)
+	end
+
+	-- FDAA or Looting mutant
+	if enhanced_animations == nil then
+		ssfx_wpn_dof_FDDA = false
+	else
+		if enhanced_animations.enable_animations == false then
+			ssfx_wpn_dof_FDDA = false
+		end
+	end
+	
+	if ssfx_wpn_dof_FDDA == false or ssfx_wpn_dof_loot_mutant == false then
+		if ssfx_itm_state > 0 then
+			ssfx_itm_state = 0
+			ssfx_far_blur(0, ssfx_reloading)
+		end
+	end
+	
+	-- PDA Zoom
+	if ssfx_wpn_dof_pda then
+		RegisterScriptCallback("on_key_press", ssfx_on_key_press)
+	else
+		UnregisterScriptCallback("on_key_press", ssfx_on_key_press)
+	end
+	
+	
+end
+
+function on_game_start()
+
+	-- General Functions
+	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
+	RegisterScriptCallback("on_option_change", on_option_change)
+	RegisterScriptCallback("actor_on_update", actor_on_update)
+	
+	-- Save reload times
+	RegisterScriptCallback("save_state", save_state)
+	RegisterScriptCallback("load_state", load_state)
+	
+	-- Weapon
+	RegisterScriptCallback("actor_on_weapon_zoom_in", ssfx_aim_in)
+	RegisterScriptCallback("actor_on_weapon_zoom_out", ssfx_aim_out)
+	
+	-- Used for mutant loot
+	RegisterScriptCallback("GUI_on_show", GUI_on_show)
+	RegisterScriptCallback("GUI_on_hide", GUI_on_hide)
+	RegisterScriptCallback("monster_on_actor_use_callback",ssfx_monster_on_actor_use)
+	
+	-- Read and apply settigns
+	on_option_change()
+end

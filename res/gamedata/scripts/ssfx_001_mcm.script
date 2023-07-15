@@ -1,0 +1,42 @@
+-- @ Version: SCREEN SPACE SHADERS - UPDATE 12
+-- @ Description: SSS Main script
+-- @ Author: https://www.moddb.com/members/ascii1457
+-- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+
+function on_mcm_load()
+
+	op =  { id= "general", sh=true, text="ui_mcm_ssfx_module_general", gr ={
+				{id = "title",type= "slide",link= "ui_options_slider_player",text="ui_mcm_ssfx_module_general_title",size= {512,50},spacing= 20 },
+				
+				{id = "shaderscope_patch_mcm", type = "check", val = 1, def=false},
+			}
+		}
+
+	return op, "ssfx_module"
+end
+
+function on_option_change()
+
+	-- Apply general settings
+	if ssfx_get_setting("general", "shaderscope_patch", ssfx_001_settings) then
+		get_console():execute("r__fakescope 1")
+	else
+		get_console():execute("r__fakescope 0")
+	end
+end
+
+function ssfx_get_setting(module_name, var_name, default_script)
+
+	-- Get MCM setting
+	if ui_mcm then 
+		return ui_mcm.get("ssfx_module/" .. module_name .. "/" .. var_name .. "_mcm")
+	end
+	
+	-- Get Default
+	return default_script.ssfx_default_settings[var_name]
+end
+
+function on_game_start()
+	RegisterScriptCallback("on_option_change", on_option_change)
+	on_option_change()
+end
