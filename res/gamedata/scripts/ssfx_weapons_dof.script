@@ -84,7 +84,7 @@ local function ssfx_item_anim_stop()
 end
 
 -- Use Item
-local original_function = itms_manager.actor_on_item_before_use
+--[[local original_function = itms_manager.actor_on_item_before_use
 function itms_manager.actor_on_item_before_use(obj,flags)
 
 	original_function(obj,flags)
@@ -98,7 +98,7 @@ function itms_manager.actor_on_item_before_use(obj,flags)
 		ssfx_itm_state = 1
 		ssfx_itm_in_use = obj:section()
 	end
-end
+end--]]
 
 -- Loot monsters with FFDA
 local function ssfx_monster_on_actor_use(obj)
@@ -385,12 +385,12 @@ function ssfx_far_blur(to_val, checkvar)
 	if (ssfx_wpn_dof_blur_to ~= to_val) then
 		ssfx_stop_blur()
 		ssfx_wpn_dof_blur_to = to_val
-		RegisterScriptCallback("actor_on_update", ssfx_change_blur)
+		-- RegisterScriptCallback("actor_on_update", ssfx_change_blur)
 	end
 end
 
 function ssfx_stop_blur()
-	UnregisterScriptCallback("actor_on_update", ssfx_change_blur)
+	-- UnregisterScriptCallback("actor_on_update", ssfx_change_blur)
 end
 
 function ssfx_check_item()
@@ -511,9 +511,9 @@ function on_option_change()
 	
 	-- PDA Zoom
 	if ssfx_wpn_dof_pda then
-		RegisterScriptCallback("on_key_press", ssfx_on_key_press)
+		-- RegisterScriptCallback("on_key_press", ssfx_on_key_press)
 	else
-		UnregisterScriptCallback("on_key_press", ssfx_on_key_press)
+		-- UnregisterScriptCallback("on_key_press", ssfx_on_key_press)
 	end
 	
 	
@@ -522,22 +522,22 @@ end
 function on_game_start()
 
 	-- General Functions
-	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
-	RegisterScriptCallback("on_option_change", on_option_change)
-	RegisterScriptCallback("actor_on_update", actor_on_update)
+	-- RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
+	-- RegisterScriptCallback("on_option_change", on_option_change)
+	-- RegisterScriptCallback("actor_on_update", actor_on_update)
 	
 	-- Save reload times
-	RegisterScriptCallback("save_state", save_state)
-	RegisterScriptCallback("load_state", load_state)
+	-- RegisterScriptCallback("save_state", save_state)
+	-- RegisterScriptCallback("load_state", load_state)
 	
 	-- Weapon
-	RegisterScriptCallback("actor_on_weapon_zoom_in", ssfx_aim_in)
-	RegisterScriptCallback("actor_on_weapon_zoom_out", ssfx_aim_out)
+	-- RegisterScriptCallback("actor_on_weapon_zoom_in", ssfx_aim_in)
+	-- RegisterScriptCallback("actor_on_weapon_zoom_out", ssfx_aim_out)
 	
 	-- Used for mutant loot
-	RegisterScriptCallback("GUI_on_show", GUI_on_show)
-	RegisterScriptCallback("GUI_on_hide", GUI_on_hide)
-	RegisterScriptCallback("monster_on_actor_use_callback",ssfx_monster_on_actor_use)
+	-- RegisterScriptCallback("GUI_on_show", GUI_on_show)
+	-- RegisterScriptCallback("GUI_on_hide", GUI_on_hide)
+	-- RegisterScriptCallback("monster_on_actor_use_callback",ssfx_monster_on_actor_use)
 	
 	-- Read and apply settigns
 	on_option_change()

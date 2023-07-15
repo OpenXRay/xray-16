@@ -71,7 +71,7 @@ end
 function on_game_start()
 
 	-- General Functions
-	RegisterScriptCallback("on_option_change", update_settings)
+	-- RegisterScriptCallback("on_option_change", update_settings)
 
 	-- Read and apply settigns
 	update_settings()

@@ -37,6 +37,6 @@ function ssfx_get_setting(module_name, var_name, default_script)
 end
 
 function on_game_start()
-	RegisterScriptCallback("on_option_change", on_option_change)
+	-- RegisterScriptCallback("on_option_change", on_option_change)
 	on_option_change()
 end
