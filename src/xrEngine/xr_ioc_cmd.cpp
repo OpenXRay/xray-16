@@ -565,6 +565,12 @@ virtual void Save (IWriter *F) {};
 
 ENGINE_API bool renderer_allow_override = false;
 
+// Anomaly
+ENGINE_API float ps_r2_img_exposure = 1.0f; // r2-only
+ENGINE_API float ps_r2_img_gamma = 1.0f; // r2-only
+ENGINE_API float ps_r2_img_saturation = 1.0f; // r2-only
+ENGINE_API Fvector ps_r2_img_cg = { .0f, .0f, .0f }; // r2-only
+
 // Ascii1457's Screen Space Shaders
 ENGINE_API Fvector3 ps_ssfx_shadow_cascades = { 20.f, 40.f, 160.f };
 ENGINE_API Fvector4 ps_ssfx_grass_shadows = { .0f, .35f, 30.0f, .0f };

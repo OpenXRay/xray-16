@@ -197,11 +197,19 @@ public:
     virtual void DestroyInternal(bool bForce) = 0;
 };
 
-extern ENGINE_API IGame_Persistent* g_pGamePersistent;
+// Anomaly
+extern ENGINE_API float ps_r2_img_exposure; // r2-only
+extern ENGINE_API float ps_r2_img_gamma; // r2-only
+extern ENGINE_API float ps_r2_img_saturation; // r2-only
+extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
+
+
+// Ascii's shaders
 extern ENGINE_API Fvector4 ps_ssfx_grass_shadows;
 extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
 extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
 
+extern ENGINE_API IGame_Persistent* g_pGamePersistent;
 #endif // IGame_PersistentH

@@ -210,6 +210,12 @@ int ps_r2_wait_timeout = 500;
 float ps_r2_lt_smooth = 1.f; // 1.f
 float ps_r2_slight_fade = 0.5f; // 1.f
 
+// Anomaly
+extern ENGINE_API float ps_r2_img_exposure; // r2-only
+extern ENGINE_API float ps_r2_img_gamma; // r2-only
+extern ENGINE_API float ps_r2_img_saturation; // r2-only
+extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
+
 // Ascii1457's Screen Space Shaders
 extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
 extern ENGINE_API Fvector4 ps_ssfx_grass_shadows;
@@ -790,6 +796,11 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__wallmark_ttl", &ps_r__WallmarkTTL, 1.0f, 10.f * 60.f);
 
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 8);
+
+    // Anomaly
+    CMD4(CCC_Float, "r__exposure", &ps_r2_img_exposure, 0.5f, 4.0f);
+    CMD4(CCC_Float, "r__gamma", &ps_r2_img_gamma, 0.5f, 2.2f);
+    CMD4(CCC_Float, "r__saturation", &ps_r2_img_saturation, 0.0f, 2.0f);
 
     Fvector tw_min, tw_max;
 

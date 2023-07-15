@@ -391,6 +391,39 @@ static cl_entity_data binder_entity_data;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
 extern ENGINE_API float ps_ssfx_wpn_dof_2;
 
+class cl_rain_params : public R_constant_setup
+{
+    u32 marker;
+    Fvector4 result;
+
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        float rainDensity = g_pGamePersistent->Environment().CurrentEnv.rain_density;
+        float rainWetness = g_pGamePersistent->Environment().wetness_factor;
+
+        cmd_list.set_c(C, rainDensity, rainWetness, 0.0f, 0.0f);
+    }
+};
+static cl_rain_params binder_rain_params;
+
+class pp_image_corrections : public R_constant_setup
+{
+    virtual void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_r2_img_exposure, ps_r2_img_gamma, ps_r2_img_saturation, 1.f);
+    }
+};
+static pp_image_corrections binder_image_corrections;
+
+class pp_color_grading : public R_constant_setup
+{
+    virtual void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_r2_img_cg.x, ps_r2_img_cg.y, ps_r2_img_cg.z, 1.f);
+    }
+};
+static pp_color_grading binder_color_grading;
+
 class cl_sky_color : public R_constant_setup
 {
     u32 marker;
@@ -505,6 +538,10 @@ void CBlender_Compile::SetMapping()
         std::pair<shared_str, R_constant_setup*> cs = RImplementation.Resources->v_constant_setup[it];
         r_Constant(*cs.first, cs.second);
     }
+
+    // Anomaly
+    r_Constant("pp_img_corrections", &binder_image_corrections);
+    r_Constant("pp_img_cg", &binder_color_grading);
 
     // Ascii1457's Screen Space Shaders
     r_Constant("sky_color", &binder_sky_color);
