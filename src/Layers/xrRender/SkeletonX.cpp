@@ -5,9 +5,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#ifdef _EDITOR
-#include "Include/xrAPI/xrAPI.h"
-#endif
 #include "SkeletonX.h"
 #include "SkeletonXSkinXW.h"
 #include "xrCore/FMesh.hpp"
@@ -41,24 +38,24 @@ void CSkeletonX::_Copy(CSkeletonX* B)
     RMS_bonecount = B->RMS_bonecount;
 }
 //////////////////////////////////////////////////////////////////////
-void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
+void CSkeletonX::_Render(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 {
-    RCache.stat.r.s_dynamic.add(vCount);
+    cmd_list.stat.r.s_dynamic.add(vCount);
     switch (RenderMode)
     {
     case RM_SKINNING_SOFT:
-        _Render_soft(hGeom, vCount, iOffset, pCount);
-        RCache.stat.r.s_dynamic_sw.add(vCount);
+        _Render_soft(cmd_list, hGeom, vCount, iOffset, pCount);
+        cmd_list.stat.r.s_dynamic_sw.add(vCount);
         break;
     case RM_SINGLE:
     case RM_SINGLE_HQ:
     {
         Fmatrix W;
-        W.mul_43(RCache.xforms.m_w, Parent->LL_GetTransform_R(u16(RMS_boneid)));
-        RCache.set_xform_world(W);
-        RCache.set_Geometry(hGeom);
-        RCache.Render(D3DPT_TRIANGLELIST, 0, 0, vCount, iOffset, pCount);
-        RCache.stat.r.s_dynamic_inst.add(vCount);
+        W.mul_43(cmd_list.xforms.m_w, Parent->LL_GetTransform_R(u16(RMS_boneid)));
+        cmd_list.set_xform_world(W);
+        cmd_list.set_Geometry(hGeom);
+        cmd_list.Render(D3DPT_TRIANGLELIST, 0, 0, vCount, iOffset, pCount);
+        cmd_list.stat.r.s_dynamic_inst.add(vCount);
     }
     break;
     case RM_SKINNING_1B:
@@ -71,37 +68,37 @@ void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
     case RM_SKINNING_4B_HQ:
     {
         // transfer matrices
-        ref_constant array = RCache.get_c(s_bones_array_const);
+        ref_constant array = cmd_list.get_c(s_bones_array_const);
         u32 count = RMS_bonecount;
         for (u32 mid = 0; mid < count; mid++)
         {
             Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
             u32 id = mid * 3;
-            RCache.set_ca(&*array, id + 0, M._11, M._21, M._31, M._41);
-            RCache.set_ca(&*array, id + 1, M._12, M._22, M._32, M._42);
-            RCache.set_ca(&*array, id + 2, M._13, M._23, M._33, M._43);
+            cmd_list.set_ca(&*array, id + 0, M._11, M._21, M._31, M._41);
+            cmd_list.set_ca(&*array, id + 1, M._12, M._22, M._32, M._42);
+            cmd_list.set_ca(&*array, id + 2, M._13, M._23, M._33, M._43);
         }
 
         // render
-        RCache.set_Geometry(hGeom);
-        RCache.Render(D3DPT_TRIANGLELIST, 0, 0, vCount, iOffset, pCount);
+        cmd_list.set_Geometry(hGeom);
+        cmd_list.Render(D3DPT_TRIANGLELIST, 0, 0, vCount, iOffset, pCount);
         if (RM_SKINNING_1B == RenderMode || RM_SKINNING_1B_HQ == RenderMode)
-            RCache.stat.r.s_dynamic_1B.add(vCount);
+            cmd_list.stat.r.s_dynamic_1B.add(vCount);
         else if (RM_SKINNING_2B == RenderMode || RM_SKINNING_2B_HQ == RenderMode)
-            RCache.stat.r.s_dynamic_2B.add(vCount);
+            cmd_list.stat.r.s_dynamic_2B.add(vCount);
         else if (RM_SKINNING_3B == RenderMode || RM_SKINNING_3B_HQ == RenderMode)
-            RCache.stat.r.s_dynamic_3B.add(vCount);
+            cmd_list.stat.r.s_dynamic_3B.add(vCount);
         else if (RM_SKINNING_4B == RenderMode || RM_SKINNING_4B_HQ == RenderMode)
-            RCache.stat.r.s_dynamic_4B.add(vCount);
+            cmd_list.stat.r.s_dynamic_4B.add(vCount);
     }
     break;
     }
 }
-void CSkeletonX::_Render_soft(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
+void CSkeletonX::_Render_soft(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
 {
     u32 vOffset = cache_vOffset;
 
-    _VertexStream& _VS = RCache.Vertex;
+    _VertexStream& _VS = RImplementation.Vertex;
     if (cache_DiscardID != _VS.DiscardID() || vCount != cache_vCount)
     {
         vertRender* Dest = (vertRender*)_VS.Lock(vCount, hGeom->vb_stride, vOffset);
@@ -149,8 +146,8 @@ void CSkeletonX::_Render_soft(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCou
         _VS.Unlock(vCount, hGeom->vb_stride);
     }
 
-    RCache.set_Geometry(hGeom);
-    RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, iOffset, pCount);
+    cmd_list.set_Geometry(hGeom);
+    cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, iOffset, pCount);
 }
 
 void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
@@ -166,21 +163,18 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
     u16 hw_bones_cnt = u16((HW.Caps.geometry.dwRegisters - 22 - 3) / 3);
 
 #if RENDER == R_R1
-    if (ps_r1_SoftwareSkinning == 1)
+    if (ps_r1_SoftwareSkinning == 1 || RImplementation.o.ffp)
         hw_bones_cnt = 0;
 #endif // RENDER == R_R1
 
     u16 sw_bones_cnt = 0;
-#ifdef _EDITOR
-    hw_bones_cnt = 0;
-#endif
 
     u32 dwVertType, size, it, crc;
     dwVertType = data->r_u32();
     dwVertCount = data->r_u32();
 
     RenderMode = RM_SKINNING_SOFT;
-    GEnv.Render->shader_option_skinning(-1);
+    RImplementation.shader_option_skinning(-1);
 
     switch (dwVertType)
     {
@@ -200,33 +194,33 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
             sw_bones_cnt = _max(sw_bones_cnt, mid);
         }
-#ifdef _EDITOR
-        // software
-        crc = crc32(data->pointer(), size);
-        Vertices1W.create(crc, dwVertCount, (vertBoned1W*)data->pointer());
-#else
-        if (1 == bids.size())
+
+        // Still allow HW skinning for single bone case
+        // go full SW skinning only if FFP is forced
+        if (!RImplementation.o.ffp)
         {
-            // HW- single bone
-            RenderMode = RImplementation.m_hq_skinning ? RM_SINGLE_HQ : RM_SINGLE;
-            RMS_boneid = *bids.begin();
-            GEnv.Render->shader_option_skinning(0);
-        }
-        else if (sw_bones_cnt <= hw_bones_cnt)
-        {
-            // HW- one weight
-            RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_1B_HQ : RM_SKINNING_1B;
-            RMS_bonecount = sw_bones_cnt + 1;
-            GEnv.Render->shader_option_skinning(1);
+            if (1 == bids.size())
+            {
+                // HW- single bone
+                RenderMode = RImplementation.m_hq_skinning ? RM_SINGLE_HQ : RM_SINGLE;
+                RMS_boneid = *bids.begin();
+                RImplementation.shader_option_skinning(0);
+            }
+            else if (sw_bones_cnt <= hw_bones_cnt)
+            {
+                // HW- one weight
+                RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_1B_HQ : RM_SKINNING_1B;
+                RMS_bonecount = sw_bones_cnt + 1;
+                RImplementation.shader_option_skinning(1);
+            }
         }
         else
         {
             // software
             crc = crc32(data->pointer(), size);
             Vertices1W.create(crc, dwVertCount, (vertBoned1W*)data->pointer());
-            GEnv.Render->shader_option_skinning(-1);
+            RImplementation.shader_option_skinning(-1);
         }
-#endif
     }
     break;
     case OGF_VERTEXFORMAT_FVF_2L: // 2-Link
@@ -253,14 +247,14 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
             // HW- two weights
             RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_2B_HQ : RM_SKINNING_2B;
             RMS_bonecount = sw_bones_cnt + 1;
-            GEnv.Render->shader_option_skinning(2);
+            RImplementation.shader_option_skinning(2);
         }
         else
         {
             // software
             crc = crc32(data->pointer(), size);
             Vertices2W.create(crc, dwVertCount, (vertBoned2W*)data->pointer());
-            GEnv.Render->shader_option_skinning(-1);
+            RImplementation.shader_option_skinning(-1);
         }
     }
     break;
@@ -286,13 +280,13 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         {
             RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_3B_HQ : RM_SKINNING_3B;
             RMS_bonecount = sw_bones_cnt + 1;
-            GEnv.Render->shader_option_skinning(3);
+            RImplementation.shader_option_skinning(3);
         }
         else
         {
             crc = crc32(data->pointer(), size);
             Vertices3W.create(crc, dwVertCount, (vertBoned3W*)data->pointer());
-            GEnv.Render->shader_option_skinning(-1);
+            RImplementation.shader_option_skinning(-1);
         }
     }
     break;
@@ -319,23 +313,23 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         {
             RenderMode = RImplementation.m_hq_skinning ? RM_SKINNING_4B_HQ : RM_SKINNING_4B;
             RMS_bonecount = sw_bones_cnt + 1;
-            GEnv.Render->shader_option_skinning(4);
+            RImplementation.shader_option_skinning(4);
         }
         else
         {
             crc = crc32(data->pointer(), size);
             Vertices4W.create(crc, dwVertCount, (vertBoned4W*)data->pointer());
-            GEnv.Render->shader_option_skinning(-1);
+            RImplementation.shader_option_skinning(-1);
         }
     }
     break;
     default: xrDebug::Fatal(DEBUG_INFO, "Invalid vertex type in skinned model '%s'", N); break;
     }
-#ifdef _EDITOR
-    if (bids.size() > 0)
-#else
-    if (bids.size() > 1)
-#endif
+
+    // Look at single bone case in the switch above
+    const size_t count = RImplementation.o.ffp ? 0 : 1;
+
+    if (bids.size() > count)
     {
         crc = crc32(&*bids.begin(), bids.size() * sizeof(u16));
         BonesUsed.create(crc, bids.size(), &*bids.begin());

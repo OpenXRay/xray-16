@@ -378,6 +378,7 @@ bool CScriptEntity::bfAssignSound(CScriptEntityAction* tpEntityAction)
     if (m_current_sound)
     {
         if (!m_current_sound->_feedback())
+        {
             if (!l_tSoundAction.m_bStartedToPlay)
             {
 #ifdef _DEBUG
@@ -393,6 +394,7 @@ bool CScriptEntity::bfAssignSound(CScriptEntityAction* tpEntityAction)
             {
                 l_tSoundAction.m_bCompleted = true;
             }
+        }
     }
     else
     {
@@ -415,6 +417,7 @@ bool CScriptEntity::bfAssignParticles(CScriptEntityAction* tpEntityAction)
     if (l_tParticleAction.m_tpParticleSystem)
     {
         if (true /** !l_tParticleAction.m_tpParticleSystem**/)
+        {
             if (!l_tParticleAction.m_bStartedToPlay)
             {
                 const Fmatrix& l_tMatrix = GetUpdatedMatrix(*l_tParticleAction.m_caBoneName,
@@ -428,6 +431,7 @@ bool CScriptEntity::bfAssignParticles(CScriptEntityAction* tpEntityAction)
             {
                 l_tParticleAction.m_bCompleted = true;
             }
+        }
     }
     else
         l_tParticleAction.m_bCompleted = true;
@@ -639,7 +643,7 @@ bool CScriptEntity::bfScriptAnimation()
             if (!blend)
                 continue;
             result = blend;
-            CMotionDef* MD = skeleton_animated->LL_GetMotionDef(animation);
+            [[maybe_unused]] CMotionDef* MD = skeleton_animated->LL_GetMotionDef(animation);
             VERIFY(MD);
             if (m_use_animation_movement_controller)
                 m_object->create_anim_mov_ctrl(blend, 0, true);

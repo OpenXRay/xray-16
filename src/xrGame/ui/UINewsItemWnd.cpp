@@ -18,9 +18,16 @@ void CUINewsItemWnd::Init(CUIXml& uiXml, LPCSTR start_from)
     uiXml.SetLocalRoot(node);
 
     m_UIImage = UIHelper::CreateStatic(uiXml, "image", this);
-    m_UICaption = UIHelper::CreateTextWnd(uiXml, "caption_static", this);
-    m_UIText = UIHelper::CreateTextWnd(uiXml, "text_static", this);
-    m_UIDate = UIHelper::CreateTextWnd(uiXml, "date_static", this);
+    m_UICaption = UIHelper::CreateTextWnd(uiXml, "caption_static", this, false); // no caption tag in SOC
+
+    m_UIText = UIHelper::CreateTextWnd(uiXml, "text_static", this, false);
+    m_UIDate = UIHelper::CreateTextWnd(uiXml, "date_static", this, false);
+
+    // SOC
+    if (!m_UIText)
+        m_UIText = UIHelper::CreateTextWnd(uiXml, "text_cont", this, false);
+    if (!m_UIDate)
+        m_UIDate = UIHelper::CreateTextWnd(uiXml, "date_text_cont", this, false);
 
     uiXml.SetLocalRoot(stored_root);
 }
@@ -31,15 +38,19 @@ void CUINewsItemWnd::Setup(GAME_NEWS_DATA& news_data)
     u32 sz = (time_str.size() + 5) * sizeof(char);
     PSTR str = (PSTR)xr_alloca(sz);
     xr_strcpy(str, sz, time_str.c_str());
-    xr_strcat(str, sz, " -");
+    if (m_UICaption)
+        xr_strcat(str, sz, " -");
     m_UIDate->SetText(str);
     m_UIDate->AdjustWidthToText();
 
-    m_UICaption->SetTextST(news_data.news_caption.c_str());
-    Fvector2 pos = m_UICaption->GetWndPos();
-    pos.x = m_UIDate->GetWndPos().x + m_UIDate->GetWndSize().x + 5.0f;
-    m_UICaption->SetWndPos(pos);
-    m_UICaption->SetWidth(_min(m_UIText->GetWidth() - m_UIDate->GetWidth() - 5.0f, m_UICaption->GetWidth()));
+    if (m_UICaption)
+    {
+        m_UICaption->SetTextST(news_data.news_caption.c_str());
+        Fvector2 pos = m_UICaption->GetWndPos();
+        pos.x = m_UIDate->GetWndPos().x + m_UIDate->GetWndSize().x + 5.0f;
+        m_UICaption->SetWndPos(pos);
+        m_UICaption->SetWidth(_min(m_UIText->GetWidth() - m_UIDate->GetWidth() - 5.0f, m_UICaption->GetWidth()));
+    }
 
     m_UIText->SetTextST(news_data.news_text.c_str());
     m_UIText->AdjustHeightToText();

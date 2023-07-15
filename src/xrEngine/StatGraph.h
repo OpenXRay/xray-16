@@ -131,7 +131,7 @@ public:
             it->elements.pop_front();
     };
 
-    u32 AppendSubGraph(EStyle S)
+    size_t AppendSubGraph(EStyle S)
     {
         subgraphs.push_back(SSubGraph(S));
         return subgraphs.size() - 1;

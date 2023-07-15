@@ -166,23 +166,24 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         rm_geom.create(vFormat, *p_rm_Vertices, *p_rm_Indices);
 }
 
-void Fvisual::Render(float)
+void Fvisual::Render(CBackend& cmd_list, float, bool use_fast_geo)
 {
 #if RENDER == R_R1
     if (m_fast && ps_r1_force_geomx)
 #else
-    if (m_fast && (ps_r1_force_geomx || RImplementation.phase == CRender::PHASE_SMAP && !RCache.is_TessEnabled()))
+    if (m_fast &&
+        (ps_r1_force_geomx || use_fast_geo && !cmd_list.is_TessEnabled()))
 #endif
     {
-        RCache.set_Geometry(m_fast->rm_geom);
-        RCache.Render(D3DPT_TRIANGLELIST, m_fast->vBase, 0, m_fast->vCount, m_fast->iBase, m_fast->dwPrimitives);
-        RCache.stat.r.s_static.add(m_fast->vCount);
+        cmd_list.set_Geometry(m_fast->rm_geom);
+        cmd_list.Render(D3DPT_TRIANGLELIST, m_fast->vBase, 0, m_fast->vCount, m_fast->iBase, m_fast->dwPrimitives);
+        cmd_list.stat.r.s_static.add(m_fast->vCount);
     }
     else
     {
-        RCache.set_Geometry(rm_geom);
-        RCache.Render(D3DPT_TRIANGLELIST, vBase, 0, vCount, iBase, dwPrimitives);
-        RCache.stat.r.s_static.add(vCount);
+        cmd_list.set_Geometry(rm_geom);
+        cmd_list.Render(D3DPT_TRIANGLELIST, vBase, 0, vCount, iBase, dwPrimitives);
+        cmd_list.stat.r.s_static.add(vCount);
     }
 }
 

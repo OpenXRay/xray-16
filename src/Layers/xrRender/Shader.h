@@ -46,8 +46,8 @@ struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std
 
     // Avoid using these functions.
     // If possible use precompiled texture list.
-    u32 find_texture_stage(const shared_str& TexName) const;
-    void create_texture(u32 stage, pcstr textureName, bool evenIfNotNull);
+    u32 find_texture_stage(const shared_str& TexName, bool warnIfMissing = true) const;
+    void create_texture(u32 stage, pcstr textureName, bool overrideIfExists);
 };
 typedef resptr_core<STextureList, resptr_base<STextureList>> ref_texture_list;
 //////////////////////////////////////////////////////////////////////////
@@ -105,9 +105,7 @@ struct ECORE_API SPass : public xr_resource_flagged
 
     ref_texture_list T;
     ref_constant_list C;
-#ifdef _EDITOR
     ref_matrix_list M;
-#endif
 
     SPass() = default;
     ~SPass();

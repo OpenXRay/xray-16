@@ -8,6 +8,7 @@
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #endif
 
+class CBackend;
 class ECORE_API R_constant_setup;
 
 enum
@@ -176,7 +177,7 @@ class ECORE_API XR_NOVTABLE R_constant_setup
 {
 public:
     R_constant_setup() = default;
-    virtual void setup(R_constant* C) = 0;
+    virtual void setup(CBackend& cmd_list, R_constant* C) = 0;
     virtual ~R_constant_setup() = default;
 };
 
@@ -191,7 +192,7 @@ public:
 #if defined(USE_DX11)
     typedef std::pair<u32, ref_cbuffer> cb_table_record;
     typedef xr_vector<cb_table_record> cb_table;
-    cb_table m_CBTable;
+    cb_table m_CBTable[R__NUM_CONTEXTS];
 #endif
 
 private:
@@ -209,8 +210,8 @@ public:
     void clear();
     BOOL parse(void* desc, u32 destination);
     void merge(R_constant_table* C);
-    ref_constant get(pcstr name, u16 type = u16(-1)); // slow search
-    ref_constant get(const shared_str& name, u16 type = u16(-1)); // fast search
+    ref_constant get(pcstr name, u16 type = u16(-1)) const; // slow search
+    ref_constant get(const shared_str& name, u16 type = u16(-1)) const; // fast search
 
     BOOL equal(R_constant_table& C);
     BOOL equal(R_constant_table* C) { return equal(*C); }

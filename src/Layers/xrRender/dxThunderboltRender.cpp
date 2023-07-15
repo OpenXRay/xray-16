@@ -8,8 +8,8 @@
 dxThunderboltRender::dxThunderboltRender()
 {
     // geom
-    hGeom_model.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RCache.Vertex.Buffer(), RCache.Index.Buffer());
-    hGeom_gradient.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
+    hGeom_model.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
+    hGeom_gradient.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 }
 
 dxThunderboltRender::~dxThunderboltRender()
@@ -35,13 +35,13 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
     u32 vCount_Lock = pThRen->l_model->number_vertices;
     u32 iCount_Lock = pThRen->l_model->number_indices;
     IRender_DetailModel::fvfVertexOut* v_ptr =
-        (IRender_DetailModel::fvfVertexOut*)RCache.Vertex.Lock(vCount_Lock, hGeom_model->vb_stride, v_offset);
-    u16* i_ptr = RCache.Index.Lock(iCount_Lock, i_offset);
+        (IRender_DetailModel::fvfVertexOut*)RImplementation.Vertex.Lock(vCount_Lock, hGeom_model->vb_stride, v_offset);
+    u16* i_ptr = RImplementation.Index.Lock(iCount_Lock, i_offset);
     // XForm verts
     pThRen->l_model->transfer(owner.current_xform, v_ptr, 0xffffffff, i_ptr, 0, 0.f, dv);
     // Flush if needed
-    RCache.Vertex.Unlock(vCount_Lock, hGeom_model->vb_stride);
-    RCache.Index.Unlock(iCount_Lock);
+    RImplementation.Vertex.Unlock(vCount_Lock, hGeom_model->vb_stride);
+    RImplementation.Index.Unlock(iCount_Lock);
     RCache.set_xform_world(Fidentity);
     RCache.set_Shader(pThRen->l_model->shader);
     RCache.set_Geometry(hGeom_model);
@@ -51,7 +51,7 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
     // gradient
     Fvector vecSx, vecSy;
     u32 VS_Offset;
-    FVF::LIT* pv = (FVF::LIT*)RCache.Vertex.Lock(8, hGeom_gradient.stride(), VS_Offset);
+    FVF::LIT* pv = (FVF::LIT*)RImplementation.Vertex.Lock(8, hGeom_gradient.stride(), VS_Offset);
     // top
     {
         u32 c_val = iFloor(owner.current->m_GradientTop->fOpacity * owner.lightning_phase * 255.f);
@@ -90,7 +90,7 @@ void dxThunderboltRender::Render(CEffect_Thunderbolt& owner)
             owner.lightning_center.z - vecSx.z + vecSy.z, c, 1, 1);
         pv++;
     }
-    RCache.Vertex.Unlock(8, hGeom_gradient.stride());
+    RImplementation.Vertex.Unlock(8, hGeom_gradient.stride());
     RCache.set_xform_world(Fidentity);
     RCache.set_Geometry(hGeom_gradient);
     RCache.set_Shader(((dxFlareRender*)&*owner.current->m_GradientTop->m_pFlare)->hShader);

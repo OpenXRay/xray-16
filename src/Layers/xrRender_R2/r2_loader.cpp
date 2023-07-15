@@ -106,10 +106,6 @@ void CRender::level_Load(IReader* fs)
     // End
     pApp->LoadEnd();
 
-    // sanity-clear
-    lstLODgroups.clear();
-    mapLOD.clear();
-
     // signal loaded
     b_loaded = TRUE;
 }
@@ -130,18 +126,11 @@ void CRender::level_Unload()
     //*** Sectors
     // 1.
     xr_delete(rmPortals);
-    pLastSector = nullptr;
+    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     Device.vCameraPositionSaved.set(0, 0, 0);
 
     // 2.
-    for (IRender_Sector* sector : Sectors)
-        xr_delete(sector);
-    Sectors.clear();
-
-    // 3.
-    for (IRender_Portal* portal : Portals)
-        xr_delete(portal);
-    Portals.clear();
+    cleanup_contexts();
 
     //*** Lights
     // Glows.Unload			();
@@ -311,32 +300,56 @@ void CRender::LoadSectors(IReader* fs)
 {
     // allocate memory for portals
     const u32 size = fs->find_chunk(fsL_PORTALS);
-    R_ASSERT(0 == size % sizeof(CPortal::b_portal));
+    R_ASSERT(0 == size % sizeof(CPortal::level_portal_data_t));
 
-    const u32 count = size / sizeof(CPortal::b_portal);
-    Portals.resize(count);
-
-    for (u32 c = 0; c < count; c++)
-        Portals[c] = xr_new<CPortal>();
+    const u32 portals_count = size / sizeof(CPortal::level_portal_data_t);
+    xr_vector<CPortal::level_portal_data_t> portals_data{portals_count};
 
     // load sectors
+    xr_vector<CSector::level_sector_data_t> sectors_data;
+    
+    float largest_sector_vol = 0.0f;
     IReader* S = fs->open_chunk(fsL_SECTORS);
     for (u32 i = 0;; i++)
     {
         IReader* P = S->open_chunk(i);
         if (!P)
             break;
+        
+        auto& sector_data = sectors_data.emplace_back();
+        {
+            u32 size = P->find_chunk(fsP_Portals);
+            R_ASSERT(0 == (size & 1));
+            u32 portals_in_sector = size / sizeof(u16);
 
-        CSector* __S = xr_new<CSector>();
-        __S->load(*P);
-        Sectors.push_back(__S);
+            sector_data.portals_id.reserve(portals_in_sector);
+            while (portals_in_sector)
+            {
+                const u16 ID = P->r_u16();
+                sector_data.portals_id.emplace_back(ID);
+                --portals_in_sector;
+            }
 
+            size = P->find_chunk(fsP_Root);
+            R_ASSERT(size == 4);
+            sector_data.root_id = P->r_u32();
+
+            // Search for default sector - assume "default" or "outdoor" sector is the largest one
+            // XXX: hack: need to know real outdoor sector
+            auto* V = static_cast<dxRender_Visual*>(RImplementation.getVisual(sector_data.root_id));
+            float vol = V->vis.box.getvolume();
+            if (vol > largest_sector_vol)
+            {
+                largest_sector_vol = vol;
+                largest_sector_id = static_cast<IRender_Sector::sector_id_t>(i);
+            }
+        }
         P->close();
     }
     S->close();
 
     // load portals
-    if (count)
+    if (portals_count)
     {
         bool do_rebuild = true;
         const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
@@ -366,13 +379,11 @@ void CRender::LoadSectors(IReader* fs)
 
         CDB::Collector CL;
         fs->find_chunk(fsL_PORTALS);
-        for (u32 i = 0; i < count; i++)
+        for (u32 i = 0; i < portals_count; i++)
         {
-            CPortal::b_portal P;
+            auto &P = portals_data[i];
             fs->r(&P, sizeof(P));
-            CPortal* __P = (CPortal*)Portals[i];
-            __P->Setup(P.vertices.begin(), P.vertices.size(), (CSector*)getSector(P.sector_front),
-                (CSector*)getSector(P.sector_back));
+
             if (do_rebuild)
             {
                 for (u32 j = 2; j < P.vertices.size(); j++)
@@ -400,11 +411,19 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    // debug
-    //	for (int d=0; d<Sectors.size(); d++)
-    //		Sectors[d]->DebugDump	();
+    for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
+    {
+        auto& dsgraph = contexts_pool[id];
+        dsgraph.reset();
+        dsgraph.load(sectors_data, portals_data);
+        contexts_used.set(id, false);
+    }
 
-    pLastSector = nullptr;
+    auto& dsgraph = get_imm_context();
+    dsgraph.reset();
+    dsgraph.load(sectors_data, portals_data);
+
+    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
 
 void CRender::LoadSWIs(CStreamReader* base_fs)
@@ -458,8 +477,11 @@ void CRender::Load3DFluid()
                 dx113DFluidVolume* pVolume = xr_new<dx113DFluidVolume>();
                 pVolume->Load("", F, 0);
 
+                auto& dsgraph = get_imm_context();
+
                 //	Attach to sector's static geometry
-                CSector* pSector = (CSector*)detectSector(pVolume->getVisData().sphere.P);
+                const auto sector_id = dsgraph.detect_sector(pVolume->getVisData().sphere.P);
+                auto* pSector = static_cast<CSector*>(dsgraph.get_sector(sector_id));
                 //	3DFluid volume must be in render sector
                 VERIFY(pSector);
 

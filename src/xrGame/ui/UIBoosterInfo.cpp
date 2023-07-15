@@ -111,23 +111,38 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
             if (fis_zero(val))
                 continue;
 
-            EBoostParams type = (EBoostParams)i;
+            auto type = static_cast<EBoostParams>(i);
             switch (type)
             {
             case eBoostHpRestore:
             case eBoostPowerRestore:
             case eBoostBleedingRestore:
-            case eBoostMaxWeight: max_val = 1.0f; break;
-            case eBoostRadiationRestore: max_val = -1.0f; break;
-            case eBoostBurnImmunity: max_val = actor->conditions().GetZoneMaxPower(ALife::infl_fire); break;
-            case eBoostShockImmunity: max_val = actor->conditions().GetZoneMaxPower(ALife::infl_electra); break;
+            case eBoostMaxWeight:
+                max_val = 1.0f;
+                break;
+            case eBoostRadiationRestore:
+                max_val = -1.0f;
+                break;
+            case eBoostBurnImmunity:
+                max_val = actor->conditions().GetZoneMaxPower(ALife::infl_fire);
+                break;
+            case eBoostShockImmunity:
+                max_val = actor->conditions().GetZoneMaxPower(ALife::infl_electra);
+                break;
             case eBoostRadiationImmunity:
-            case eBoostRadiationProtection: max_val = actor->conditions().GetZoneMaxPower(ALife::infl_rad); break;
+            case eBoostRadiationProtection:
+                max_val = actor->conditions().GetZoneMaxPower(ALife::infl_rad);
+                break;
             case eBoostTelepaticImmunity:
-            case eBoostTelepaticProtection: max_val = actor->conditions().GetZoneMaxPower(ALife::infl_psi); break;
+            case eBoostTelepaticProtection:
+                max_val = actor->conditions().GetZoneMaxPower(ALife::infl_psi);
+                break;
             case eBoostChemicalBurnImmunity:
-            case eBoostChemicalBurnProtection: max_val = actor->conditions().GetZoneMaxPower(ALife::infl_acid); break;
-            }
+            case eBoostChemicalBurnProtection:
+                max_val = actor->conditions().GetZoneMaxPower(ALife::infl_acid);
+                break;
+            } // switch (type)
+
             val /= max_val;
             m_booster_items[i]->SetValue(val);
 

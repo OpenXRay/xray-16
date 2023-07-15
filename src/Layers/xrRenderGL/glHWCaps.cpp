@@ -63,6 +63,9 @@ void CHWCaps::Update()
     soDec = D3DSTENCILOP_DECRSAT;
     dwMaxStencilValue = (1 << 8) - 1;
 
+    // FFP lights
+    max_ffp_lights = 0;
+
     // DEV INFO
 
     iGPUNum = GetGpuNum();

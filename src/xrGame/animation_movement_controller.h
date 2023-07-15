@@ -25,10 +25,10 @@ private:
     IKinematics* m_pKinematicsC;
     IKinematicsAnimated* m_pKinematicsA;
     CBlend* m_control_blend;
-    bool inital_position_blending;
-    bool stopped;
-    float blend_linear_speed;
-    float blend_angular_speed;
+    bool inital_position_blending{ true };
+    bool stopped{};
+    float blend_linear_speed{};
+    float blend_angular_speed{};
     static void RootBoneCallback(CBoneInstance* B);
     void deinitialize();
     void BlendDestroy(CBlend& blend);

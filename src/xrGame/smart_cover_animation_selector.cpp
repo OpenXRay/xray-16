@@ -24,7 +24,7 @@ float g_smart_cover_animation_speed_factor = 1.f;
 namespace smart_cover
 {
 animation_selector::animation_selector(CAI_Stalker* object)
-    : m_object(object), m_callback_called(false), m_first_time(true), m_previous_time(flt_max)
+    : m_object(object)
 {
     m_skeleton_animated = smart_cast<IKinematicsAnimated*>(object->Visual());
     VERIFY(m_skeleton_animated);

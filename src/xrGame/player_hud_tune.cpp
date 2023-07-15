@@ -349,32 +349,32 @@ void hud_adjust_mode_keyb(int dik)
 {
     if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
     {
-        if (dik == SDL_SCANCODE_KP_0)
+        if (dik == SDL_SCANCODE_KP_0 || dik == SDL_SCANCODE_0)
             hud_adj_mode = 0;
-        if (dik == SDL_SCANCODE_KP_1)
+        if (dik == SDL_SCANCODE_KP_1 || dik == SDL_SCANCODE_1)
             hud_adj_mode = 1;
-        if (dik == SDL_SCANCODE_KP_2)
+        if (dik == SDL_SCANCODE_KP_2 || dik == SDL_SCANCODE_2)
             hud_adj_mode = 2;
-        if (dik == SDL_SCANCODE_KP_3)
+        if (dik == SDL_SCANCODE_KP_3 || dik == SDL_SCANCODE_3)
             hud_adj_mode = 3;
-        if (dik == SDL_SCANCODE_KP_4)
+        if (dik == SDL_SCANCODE_KP_4 || dik == SDL_SCANCODE_4)
             hud_adj_mode = 4;
-        if (dik == SDL_SCANCODE_KP_5)
+        if (dik == SDL_SCANCODE_KP_5 || dik == SDL_SCANCODE_5)
             hud_adj_mode = 5;
-        if (dik == SDL_SCANCODE_KP_6)
+        if (dik == SDL_SCANCODE_KP_6 || dik == SDL_SCANCODE_6)
             hud_adj_mode = 6;
-        if (dik == SDL_SCANCODE_KP_7)
+        if (dik == SDL_SCANCODE_KP_7 || dik == SDL_SCANCODE_7)
             hud_adj_mode = 7;
-        if (dik == SDL_SCANCODE_KP_8)
+        if (dik == SDL_SCANCODE_KP_8 || dik == SDL_SCANCODE_8)
             hud_adj_mode = 8;
-        if (dik == SDL_SCANCODE_KP_9)
+        if (dik == SDL_SCANCODE_KP_9 || dik == SDL_SCANCODE_9)
             hud_adj_mode = 9;
     }
     if (pInput->iGetAsyncKeyState(SDL_SCANCODE_LCTRL))
     {
-        if (dik == SDL_SCANCODE_KP_0)
+        if (dik == SDL_SCANCODE_KP_0 || dik == SDL_SCANCODE_0)
             hud_adj_item_idx = 0;
-        if (dik == SDL_SCANCODE_KP_1)
+        if (dik == SDL_SCANCODE_KP_1 || dik == SDL_SCANCODE_1)
             hud_adj_item_idx = 1;
     }
 }

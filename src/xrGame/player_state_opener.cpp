@@ -6,8 +6,7 @@
 
 namespace award_system
 {
-player_state_opener::player_state_opener(game_state_accumulator* owner) : inherited(owner) { m_opener_ready = false; }
-u32 const player_state_opener::get_u32_param() { return m_opener_ready ? 1 : 0; }
+u32 player_state_opener::get_u32_param() { return m_opener_ready ? 1 : 0; }
 void player_state_opener::reset_game() { m_opener_ready = false; }
 void player_state_opener::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)

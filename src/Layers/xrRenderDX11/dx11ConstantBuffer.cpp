@@ -5,7 +5,10 @@
 
 dx11ConstantBuffer::~dx11ConstantBuffer()
 {
-    RImplementation.Resources->_DeleteConstantBuffer(this);
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        RImplementation.Resources->_DeleteConstantBuffer(id, this);
+    }
     //	Flush();
     _RELEASE(m_pBuffer);
     xr_free(m_pBufferData);
@@ -47,6 +50,13 @@ dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
     VERIFY(m_pBuffer);
     m_pBufferData = xr_malloc(Desc.Size);
     VERIFY(m_pBufferData);
+
+#ifdef DEBUG
+    if (m_pBuffer)
+    {
+        m_pBuffer->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(Desc.Name), Desc.Name);
+    }
+#endif
 }
 
 bool dx11ConstantBuffer::Similar(dx11ConstantBuffer& _in)
@@ -78,14 +88,14 @@ bool dx11ConstantBuffer::Similar(dx11ConstantBuffer& _in)
     return true;
 }
 
-void dx11ConstantBuffer::Flush()
+void dx11ConstantBuffer::Flush(u32 context_id)
 {
     if (m_bChanged)
     {
         void* pData;
 #ifdef USE_DX11
         D3D11_MAPPED_SUBRESOURCE pSubRes;
-        CHK_DX(HW.pContext->Map(m_pBuffer, 0, D3D_MAP_WRITE_DISCARD, 0, &pSubRes));
+        CHK_DX(HW.get_context(context_id)->Map(m_pBuffer, 0, D3D_MAP_WRITE_DISCARD, 0, &pSubRes));
         pData = pSubRes.pData;
 #else
         CHK_DX(m_pBuffer->Map(D3D_MAP_WRITE_DISCARD, 0, &pData));
@@ -94,7 +104,7 @@ void dx11ConstantBuffer::Flush()
         VERIFY(m_pBufferData);
         CopyMemory(pData, m_pBufferData, m_uiBufferSize);
 #ifdef USE_DX11
-        HW.pContext->Unmap(m_pBuffer, 0);
+        HW.get_context(context_id)->Unmap(m_pBuffer, 0);
 #else
         m_pBuffer->Unmap();
 #endif

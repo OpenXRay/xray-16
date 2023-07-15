@@ -1,7 +1,7 @@
 namespace award_system
 {
 template <typename Predicate>
-u32 const hits_store::fetch_hits(Predicate& predicate, buffer_vector<bullet_hit>& dest_hits) const
+u32 hits_store::fetch_hits(Predicate& predicate, buffer_vector<bullet_hit>& dest_hits) const
 {
     u32 ret_count = 0;
     for (bullet_hits_map_t::const_iterator i = m_bullet_hits.begin(), ie = m_bullet_hits.end(); i != ie; ++i)

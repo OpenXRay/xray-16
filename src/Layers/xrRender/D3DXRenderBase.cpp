@@ -6,6 +6,11 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
+#if DEBUG
+#include <renderdoc/renderdoc_app.h>
+RENDERDOC_API_1_0_0* g_renderdoc_api;
+#endif
+
 void D3DXRenderBase::setGamma(float fGamma)
 {
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -52,13 +57,29 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
     {
         UIRenderImpl.DestroyUIGeom();
         DUImpl.OnDeviceDestroy();
+        m_PortalFadeGeom.destroy();
+        m_PortalFadeShader.destroy();
         m_SelectionShader.destroy();
         m_WireShader.destroy();
     }
     destroy();
 
     Resources->OnDeviceDestroy(bKeepTextures);
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.OnDeviceDestroy();
+    }
+#else
     RCache.OnDeviceDestroy();
+#endif
+
+    // Quad
+    QuadIB.Release();
+
+    // streams
+    Index.Destroy();
+    Vertex.Destroy();
 }
 
 void D3DXRenderBase::Destroy()
@@ -73,7 +94,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif // DEBUG
 
-    Resources->reset_begin();
+    reset_begin();
     Memory.mem_compact();
 
 #ifdef USE_DX9
@@ -108,13 +129,35 @@ void D3DXRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 void D3DXRenderBase::SetupStates()
 {
     HW.Caps.Update();
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.SetupStates();
+    }
+#else
     RCache.SetupStates();
+#endif
 }
 
 void D3DXRenderBase::OnDeviceCreate(const char* shName)
 {
     // Signal everyone - device created
+
+    // streams
+    Vertex.Create();
+    Index.Create();
+
+    CreateQuadIB();
+
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.context_id = id;
+        contexts_pool[id].cmd_list.OnDeviceCreate();
+    }
+#else
     RCache.OnDeviceCreate();
+#endif
 #if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Update();
 #endif
@@ -125,6 +168,8 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     {
         m_WireShader.create("editor" DELIMITER "wire");
         m_SelectionShader.create("editor" DELIMITER "selection");
+        m_PortalFadeShader.create("portal");
+        m_PortalFadeGeom.create(FVF::F_L, RImplementation.Vertex.Buffer(), 0);        
         DUImpl.OnDeviceCreate();
         UIRenderImpl.CreateUIGeom();
     }
@@ -132,6 +177,45 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 
 void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
+#if defined(DEBUG) && defined(USE_DX11)
+    if (!g_renderdoc_api)
+    {
+        HMODULE hModule = GetModuleHandleA("renderdoc.dll");
+        if (hModule == 0)
+        {
+            hModule = LoadLibraryA("renderdoc.dll");
+        }
+
+        if (hModule)
+        {
+            auto const RENDERDOC_GetAPI =
+                reinterpret_cast<pRENDERDOC_GetAPI>(GetProcAddress(hModule, "RENDERDOC_GetAPI"));
+            auto const Result =
+                RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_0_0, reinterpret_cast<void**>(&g_renderdoc_api));
+            if (Result == 1)
+            {
+                g_renderdoc_api->UnloadCrashHandler();
+
+                string_path FolderName;
+                FS.update_path(FolderName, "$app_data_root$", "captures\\openxray");
+                g_renderdoc_api->SetCaptureFilePathTemplate(FolderName);
+
+                RENDERDOC_InputButton CaptureButton[] = {eRENDERDOC_Key_PrtScrn};
+                g_renderdoc_api->SetCaptureKeys(CaptureButton, ARRAYSIZE(CaptureButton));
+
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_AllowVSync, 0);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_DebugOutputMute, 0);
+
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_RefAllResources, 1);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_CaptureCallstacks, 1);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_VerifyBufferAccess, 1);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_APIValidation, 1);
+                g_renderdoc_api->SetCaptureOptionU32(eRENDERDOC_Option_CaptureAllCmdLists, 1);
+            }
+        }
+    }
+#endif
+
     HW.CreateDevice(hWnd);
 
     std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
@@ -193,9 +277,20 @@ u32 D3DXRenderBase::GetCacheStatPolys()
 void D3DXRenderBase::Begin()
 {
     HW.BeginScene();
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.OnFrameBegin();
+        contexts_pool[id].cmd_list.set_CullMode(CULL_CW);
+        contexts_pool[id].cmd_list.set_CullMode(CULL_CCW);
+    }
+#else
     RCache.OnFrameBegin();
     RCache.set_CullMode(CULL_CW);
     RCache.set_CullMode(CULL_CCW);
+#endif
+    Vertex.Flush();
+    Index.Flush();
     if (HW.Caps.SceneMode)
         overdrawBegin();
 }
@@ -215,8 +310,19 @@ void D3DXRenderBase::End()
 {
     if (HW.Caps.SceneMode)
         overdrawEnd();
+ #if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.OnFrameEnd();
+    }
+#else
     RCache.OnFrameEnd();
+#endif
     DoAsyncScreenshot();
+
+    // we're done with rendering
+    cleanup_contexts();
+
     HW.EndScene();
     HW.Present();
 }
@@ -232,8 +338,16 @@ void D3DXRenderBase::ClearTarget()
 
 void D3DXRenderBase::SetCacheXform(Fmatrix& mView, Fmatrix& mProject)
 {
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.set_xform_view(mView);
+        contexts_pool[id].cmd_list.set_xform_project(mProject);
+    }
+#else
     RCache.set_xform_view(mView);
     RCache.set_xform_project(mProject);
+#endif
 }
 
 bool D3DXRenderBase::HWSupportsShaderYUV2RGB()

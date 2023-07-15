@@ -7,16 +7,25 @@ shared_str CGameSpy_GP::TryToTranslate(GPResult const& res)
     LPCSTR tmp_string = NULL;
     switch (res)
     {
-    case GP_MEMORY_ERROR: { STRCONCAT(tmp_string, "mp_gp_memory_error");
+    case GP_MEMORY_ERROR:
+    {
+        STRCONCAT(tmp_string, "mp_gp_memory_error");
+        break;
     }
-    break;
-    case GP_PARAMETER_ERROR: { STRCONCAT(tmp_string, "mp_gp_parameter_error");
+    case GP_PARAMETER_ERROR:
+    {
+        STRCONCAT(tmp_string, "mp_gp_parameter_error");
+        break;
     }
-    break;
-    case GP_NETWORK_ERROR: { STRCONCAT(tmp_string, "mp_gp_network_error");
+    case GP_NETWORK_ERROR:
+    {
+        STRCONCAT(tmp_string, "mp_gp_network_error");
+        break;
     }
-    break;
-    case GP_SERVER_ERROR: { STRCONCAT(tmp_string, "mp_gp_server_error");
+    case GP_SERVER_ERROR:
+    {
+        STRCONCAT(tmp_string, "mp_gp_server_error");
+        break;
     }
     default:
     {

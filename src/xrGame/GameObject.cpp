@@ -102,6 +102,8 @@ CGameObject::~CGameObject()
 
 void CGameObject::MakeMeCrow()
 {
+    ScopeLock lock{ &render_lock };
+
     if (Props.crow)
         return;
     if (!processing_enabled())
@@ -118,8 +120,8 @@ void CGameObject::MakeMeCrow()
         return;
 
     VERIFY(dwFrame_AsCrow == device_frame_id);
-    Props.crow = 1;
     g_pGameLevel->Objects.o_crow(this);
+    Props.crow = 1;
 }
 
 void CGameObject::cName_set(shared_str N) { NameObject = N; }
@@ -383,9 +385,6 @@ void CGameObject::OnEvent(NET_Packet& P, u16 type)
         {
             if (GameID() != eGameIDSingle)
                 Game().m_WeaponUsageStatistic->OnBullet_Check_Request(&HDS);
-        }
-        break;
-        default: {
         }
         break;
         }
@@ -1071,12 +1070,12 @@ Fvector CGameObject::get_last_local_point_on_mesh(Fvector const& local_point, u1
     return result;
 }
 
-void CGameObject::renderable_Render(IRenderable* root)
+void CGameObject::renderable_Render(u32 context_id, IRenderable* root)
 {
     //
     MakeMeCrow();
     // ~
-    GEnv.Render->add_Visual(root, Visual(), XFORM());
+    GEnv.Render->add_Visual(context_id, root, Visual(), XFORM());
     Visual()->getVisData().hom_frame = Device.dwFrame;
 }
 
@@ -1112,7 +1111,7 @@ bool CGameObject::TestServerFlag(u32 Flag) const { return (m_server_flags.test(F
 void CGameObject::add_visual_callback(visual_callback callback)
 {
     VERIFY(smart_cast<IKinematics*>(Visual()));
-    CALLBACK_VECTOR_IT I = std::find(visual_callbacks().begin(), visual_callbacks().end(), callback);
+    [[maybe_unused]] auto I = std::find(visual_callbacks().begin(), visual_callbacks().end(), callback);
     VERIFY(I == visual_callbacks().end());
 
     if (m_visual_callback.empty())

@@ -22,14 +22,7 @@ public:
 };
 
 BulletData::BulletData(shared_str FName, shared_str WName, SBullet* pBullet)
-{
-    FirerName = FName;
-    WeaponName = WName;
-    Bullet = *pBullet;
-    HitRefCount = 0;
-    HitResponds = 0;
-    Removed = false;
-};
+    : FirerName(FName), WeaponName(WName), Bullet(*pBullet) {}
 
 u32 const HitData::net_packet_size = (3 * 2 * sizeof(float) + 1 + 2 + 1 + 1);
 void HitData::net_save(NET_Packet* P, victims_table const& vt, bone_table const& bt)

@@ -85,8 +85,6 @@ void CControlMeleeJump::on_release()
 
 void CControlMeleeJump::on_event(ControlCom::EEventType type, ControlCom::IEventData* dat)
 {
-    switch (type)
-    {
-    case ControlCom::eventAnimationEnd: m_man->notify(ControlCom::eventMeleeJumpEnd, 0); break;
-    }
+    if (type == ControlCom::eventAnimationEnd)
+        m_man->notify(ControlCom::eventMeleeJumpEnd, 0);
 }

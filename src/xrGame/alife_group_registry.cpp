@@ -17,8 +17,7 @@ void CALifeGroupRegistry::add(CSE_ALifeDynamicObject* object)
     if (!group)
         return;
 
-    OBJECTS::const_iterator I = objects().find(group->ID);
-    VERIFY(I == objects().end());
+    VERIFY(objects().find(group->ID) == objects().end());
     m_objects.insert(std::make_pair(group->ID, group));
 }
 

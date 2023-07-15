@@ -423,7 +423,7 @@ void RunBenchmark(pcstr name)
         ini.r_line("benchmark", i, &benchmarkName, &t);
         xr_strcpy(g_sBenchmarkName, benchmarkName);
         shared_str benchmarkCommand = ini.r_string_wb("benchmark", benchmarkName);
-        u32 cmdSize = benchmarkCommand.size() + 1;
+        const auto cmdSize = benchmarkCommand.size() + 1;
         Core.Params = (char*)xr_realloc(Core.Params, cmdSize);
         xr_strcpy(Core.Params, cmdSize, benchmarkCommand.c_str());
         xr_strlwr(Core.Params);

@@ -171,20 +171,20 @@ private:
     LoopholePath m_path;
     LoopholePath m_temp_loophole_path;
     target_selector_type* m_target_selector;
-    animation_selector_type* m_animation_selector;
-    transition_action const* m_current_transition;
-    animation_action const* m_current_transition_animation;
-    CPropertyStorage* m_property_storage;
-    float m_apply_loophole_direction_distance;
+    animation_selector_type* m_animation_selector{};
+    transition_action const* m_current_transition{};
+    animation_action const* m_current_transition_animation{};
+    CPropertyStorage* m_property_storage{};
+    float m_apply_loophole_direction_distance{ 4.0f };
     MotionID m_enter_animation;
-    shared_str m_enter_cover_id;
-    shared_str m_enter_loophole_id;
+    shared_str m_enter_cover_id{ "" };
+    shared_str m_enter_loophole_id{ "" };
     mutable collide::rq_results m_ray_query_storage;
-    bool m_entering_smart_cover_with_animation;
-    bool m_non_animated_loophole_change;
-    bool m_default_behaviour;
-    bool m_check_can_kill_enemy;
-    bool m_combat_behaviour;
+    bool m_entering_smart_cover_with_animation{};
+    bool m_non_animated_loophole_change{};
+    bool m_default_behaviour{};
+    bool m_check_can_kill_enemy{};
+    bool m_combat_behaviour{};
 }; // class stalker_movement_manager_smart_cover
 
 #include "stalker_movement_manager_smart_cover_inline.h"

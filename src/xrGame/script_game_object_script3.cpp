@@ -164,6 +164,15 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("give_info_portion", &CScriptGameObject::GiveInfoPortion)
         .def("disable_info_portion", &CScriptGameObject::DisableInfoPortion)
 
+        .def("give_game_news", +[](CScriptGameObject* self,
+            pcstr news, pcstr texture_name, Frect /*tex_rect*/, int delay, int show_time)
+        {
+            // SOC give_game_news style
+            // tex_rect is ignored, we could add support for it back, if really needed.
+            // It also should be safe to pass nullptr to caption param
+            self->GiveGameNews(nullptr, news, texture_name, delay, show_time);
+            return true;
+        })
         .def("give_game_news",
             (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, int, int))(&CScriptGameObject::GiveGameNews))
         .def("give_game_news",
@@ -171,7 +180,7 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
 
         .def("clear_game_news", &CScriptGameObject::ClearGameNews)
 
-        .def("give_talk_message", (void (CScriptGameObject::*)(cpcstr, cpcstr, Frect, cpcstr))
+        .def("give_talk_message", (void (CScriptGameObject::*)(pcstr, pcstr, Frect, pcstr))
             (&CScriptGameObject::AddIconedTalkMessage))
 
         .def("give_talk_message", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR))
@@ -230,6 +239,10 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("switch_to_upgrade", &CScriptGameObject::SwitchToUpgrade)
         .def("switch_to_talk", &CScriptGameObject::SwitchToTalk)
         .def("run_talk_dialog", &CScriptGameObject::RunTalkDialog)
+        .def("run_talk_dialog", +[](CScriptGameObject* self, CScriptGameObject* pToWho)
+        {
+            self->RunTalkDialog(pToWho, false);
+        })
         .def("allow_break_talk_dialog", &CScriptGameObject::AllowBreakTalkDialog)
 
         .def("hide_weapon", &CScriptGameObject::HideWeapon)

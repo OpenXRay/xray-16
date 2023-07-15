@@ -89,10 +89,10 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
     next_lightning_time = 0.f;
     bEnabled = false;
 
-    string_path filePath;
-    const auto load_config = [&filePath](pcstr path) -> CInifile*
+    const auto load_config = [](pcstr path) -> CInifile*
     {
-        if (FS.update_path(filePath, "$game_config$", path, false))
+        string_path filePath;
+        if (FS.exist(filePath, "$game_config$", path))
             return xr_new<CInifile>(filePath, true, true, false);
         return nullptr;
     };
@@ -127,7 +127,7 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
     p_fog_color = config->r_float(section, "fog_color");
 
     if (config != pSettings)
-        xr_delete(config);
+        xr_delete(const_cast<CInifile *>(config));
 }
 
 CEffect_Thunderbolt::~CEffect_Thunderbolt()

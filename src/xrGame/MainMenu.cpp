@@ -77,7 +77,7 @@ CMainMenu::CMainMenu()
         CMainMenu* m_mainmenu;
 
     public:
-        CResetEventCb(CID cid, CMainMenu* mm) : m_mainmenu(mm), CEventNotifierCallbackWithCid(cid) {}
+        CResetEventCb(CID cid, CMainMenu* mm) : CEventNotifierCallbackWithCid(cid), m_mainmenu(mm) {}
         void ProcessEvent() override { m_mainmenu->DestroyInternal(true); }
     };
 
@@ -166,7 +166,9 @@ CMainMenu::~CMainMenu()
 
     xr_delete(g_btnHint);
     xr_delete(g_statHint);
+
     xr_delete(m_startDialog);
+
     g_pGamePersistent->m_pMainMenu = nullptr;
 
 #ifdef XR_PLATFORM_WINDOWS
@@ -331,6 +333,7 @@ bool CMainMenu::ReloadUI()
         return false;
     }
     xr_delete(m_startDialog);
+
     m_startDialog = smart_cast<CUIDialogWnd*>(dlg);
     VERIFY(m_startDialog);
     m_startDialog->m_bWorkInPause = true;
@@ -490,10 +493,7 @@ void CMainMenu::OnRender()
     if (m_Flags.test(flGameSaveScreenshot))
         return;
 
-    if (g_pGameLevel)
-        GEnv.Render->Calculate();
-
-    GEnv.Render->Render();
+    GEnv.Render->RenderMenu();
     if (!OnRenderPPUI_query())
     {
         DoRenderDialogs();
@@ -531,11 +531,9 @@ void CMainMenu::OnRenderPPUI_PP()
 
     UI().pp_start();
 
-    xr_vector<CUIWindow*>::iterator it = m_pp_draw_wnds.begin();
-    for (; it != m_pp_draw_wnds.end(); ++it)
-    {
-        (*it)->Draw();
-    }
+    for (auto& window : m_pp_draw_wnds)
+        window->Draw();
+
     UI().pp_stop();
 }
 /*
@@ -964,7 +962,7 @@ void CMainMenu::OnDownloadMPMap(CUIWindow* w, void* d)
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
 #else
     std::string command = "xdg-open " + std::string{url};
-    system(command.c_str());
+    std::ignore = system(command.c_str());
 #endif
 }
 

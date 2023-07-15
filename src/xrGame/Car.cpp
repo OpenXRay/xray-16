@@ -476,9 +476,9 @@ void CCar::VisualUpdate(float fov)
     m_lights.Update();
 }
 
-void CCar::renderable_Render(IRenderable* root)
+void CCar::renderable_Render(u32 context_id, IRenderable* root)
 {
-    inherited::renderable_Render(root);
+    inherited::renderable_Render(context_id, root);
     if (m_car_weapon)
         m_car_weapon->Render_internal();
 }
@@ -499,7 +499,7 @@ void CCar::net_Import(NET_Packet& P)
     //	P.w_u32 (NumItems);
 }
 
-void CCar::OnHUDDraw(CCustomHUD* /*hud*/, IRenderable* /*root*/)
+void CCar::OnHUDDraw(u32 context_id, CCustomHUD* /*hud*/, IRenderable* /*root*/)
 {
 #ifdef DEBUG
     Fvector velocity;

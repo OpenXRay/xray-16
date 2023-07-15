@@ -75,14 +75,12 @@ bool CControlRotationJump::check_start_conditions()
 
 void CControlRotationJump::on_event(ControlCom::EEventType type, ControlCom::IEventData* dat)
 {
-    switch (type)
+    if (type == ControlCom::eventAnimationEnd)
     {
-    case ControlCom::eventAnimationEnd:
         if ((m_stage == eStop) && (m_data.flags.is(SControlRotationJumpData::eRotateOnce) == FALSE))
             build_line_second();
         else
             m_man->notify(ControlCom::eventRotationJumpEnd, 0);
-        break;
     }
 }
 

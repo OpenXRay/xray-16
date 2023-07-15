@@ -159,18 +159,11 @@ void CTrade::StopTrade()
 {
     TradeState = false;
     m_dwLastTradeTime = 0;
-    //	Msg("--TRADE:: [%s]: Trade stopped...",*pThis.base->cName());
 
-    CAI_Trader* pTrader = NULL;
-    if (pThis.type == TT_TRADER)
-    {
-        // pTrader = smart_cast<CAI_Trader*>(pThis.base);
-        // pTrader->OnStopTrade();
-    }
-    else if (pPartner.type == TT_TRADER)
-    {
-        pTrader = smart_cast<CAI_Trader*>(pPartner.base);
-    }
+    //if (pThis.type == TT_TRADER)
+    //{
+    //    smart_cast<CAI_Trader*>(pThis.base)->OnStopTrade();
+    //}
 
     RemovePartner();
 }

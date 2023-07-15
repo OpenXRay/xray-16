@@ -131,19 +131,7 @@ inline int GetExceptionCode()
     return 0;
 }
 
-inline void convert_path_separators(char * path)
-{
-    while (char* sep = strchr(path, '\\')) *sep = '/';
-}
-
-inline int xr_unlink(const char *path)
-{
-    char* conv_fn = strdup(path);
-    convert_path_separators(conv_fn);
-    int result = unlink(conv_fn);
-    free(conv_fn);
-    return result;
-}
+inline void convert_path_separators(char * path);
 
 #include <inttypes.h>
 typedef int32_t BOOL;
@@ -1091,15 +1079,28 @@ decltype(auto) do_nothing(const T& obj)
 #define xr_fs_strlwr(str) do_nothing(str)
 #define xr_fs_nostrlwr(str) xr_strlwr(str)
 
-/** For backward compability of FS, for real filesystem delimiter set to back
- * @brief restore_path_separators
- * @param path
- */
+/// For backward compability of FS, for real filesystem delimiter set to back
 inline void restore_path_separators(char * path)
 {
     while (char* sep = strchr(path, '/')) *sep = '\\'; //
 }
 
+inline void convert_path_separators(char * path)
+{
+    while (char* sep = strchr(path, '\\')) *sep = '/';
+}
+
+inline int xr_unlink(const char *path)
+{
+    char* conv_fn = strdup(path);
+    convert_path_separators(conv_fn);
+    int result = unlink(conv_fn);
+    free(conv_fn);
+    return result;
+}
+
 inline tm* localtime_safe(const time_t *time, struct tm* result){ return localtime_r(time, result); }
 
 #define xr_strerror(errno, buffer, bufferSize) strerror_r(errno, buffer, sizeof(buffer))
+
+using xrpid_t = pid_t;

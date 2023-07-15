@@ -1,44 +1,25 @@
 #include "stdafx.h"
 
-int CRender::translateSector(IRender_Sector* pSector)
-{
-    if (!pSector)
-        return -1;
-
-    for (u32 i = 0; i < Sectors.size(); ++i)
-    {
-        if (Sectors[i] == pSector)
-            return i;
-    }
-
-    FATAL("Sector was not found!");
-    NODEFAULT;
-
-#ifdef DEBUG
-    return (-1);
-#endif // #ifdef DEBUG
-}
-
-IRender_Sector* CRender::detectSector(const Fvector& P)
+IRender_Sector::sector_id_t R_dsgraph_structure::detect_sector(const Fvector& P)
 {
     Fvector dir{ 0, -1, 0 };
-    IRender_Sector* sector = detectSector(P, dir);
-    if (!sector)
+    auto sector = detect_sector(P, dir);
+    if (sector == IRender_Sector::INVALID_SECTOR_ID)
     {
         dir = { 0, 1, 0 };
-        sector = detectSector(P, dir);
+        sector = detect_sector(P, dir);
     }
     return sector;
 }
 
-IRender_Sector* CRender::detectSector(const Fvector& P, Fvector& dir)
+IRender_Sector::sector_id_t R_dsgraph_structure::detect_sector(const Fvector& P, Fvector& dir)
 {
     // Portals model
     int id1 = -1;
     float range1 = 500.f;
-    if (rmPortals)
+    if (RImplementation.rmPortals)
     {
-        Sectors_xrc.ray_query(CDB::OPT_ONLYNEAREST, rmPortals, P, dir, range1);
+        Sectors_xrc.ray_query(CDB::OPT_ONLYNEAREST, RImplementation.rmPortals, P, dir, range1);
         if (Sectors_xrc.r_count())
         {
             CDB::RESULT* RP1 = Sectors_xrc.r_begin();
@@ -70,16 +51,16 @@ IRender_Sector* CRender::detectSector(const Fvector& P, Fvector& dir)
     else if (id2 >= 0)
         ID = id2; // only id2 found
     else
-        return nullptr;
+        return IRender_Sector::INVALID_SECTOR_ID;
 
     if (ID == id1)
     {
         // Take sector, facing to our point from portal
-        CDB::TRI* pTri = rmPortals->get_tris() + ID;
-        CPortal* pPortal = (CPortal*)Portals[pTri->dummy];
-        return pPortal->getSectorFacing(P);
+        CDB::TRI* pTri = RImplementation.rmPortals->get_tris() + ID;
+        CPortal* pPortal = Portals[pTri->dummy];
+        return pPortal->getSectorFacing(P)->unique_id;
     }
     // Take triangle at ID and use it's Sector
     CDB::TRI* pTri = g_pGameLevel->ObjectSpace.GetStaticTris() + ID;
-    return getSector(pTri->sector);
+    return static_cast<IRender_Sector::sector_id_t>(pTri->sector);
 }

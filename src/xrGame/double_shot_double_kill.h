@@ -12,12 +12,12 @@ class double_shot_double_kill : public player_state_param
     typedef player_state_param inherited;
 
 public:
-    double_shot_double_kill(game_state_accumulator* owner);
+    double_shot_double_kill(game_state_accumulator* owner) : inherited(owner) {}
     virtual ~double_shot_double_kill(){};
 
     virtual void update(){};
-    virtual u32 const get_u32_param();
-    virtual float const get_float_param() { return 0.0f; };
+    virtual u32 get_u32_param();
+    virtual float get_float_param() { return 0.0f; };
     virtual void reset_game();
 
     virtual void OnWeapon_Fire(u16 sender, u16 sender_weapon_id);
@@ -34,7 +34,7 @@ protected:
     typedef obsolete_queue<buffer_vector<kill_shot_id>, 2> kills_times_t;
 
     kills_times_t m_kills;
-    u32 m_shot_count;
+    u32 m_shot_count{};
 }; // class double_shot_double_kill
 
 } // namespace award_system

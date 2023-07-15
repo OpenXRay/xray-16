@@ -969,15 +969,9 @@ bool CWeaponKnife::victim_filter::operator()(spartial_base_t::value_type const& 
 
 CWeaponKnife::best_victim_selector::best_victim_selector(
     u16 except_id, Fvector const& pos, float const query_distance, spartial_base_t::value_type& dest_result)
-    : m_except_id(except_id), m_start_pos(pos), m_query_distance(query_distance), m_dest_result(dest_result)
+    : m_start_pos(pos), m_query_distance(query_distance), m_except_id(except_id), m_dest_result(dest_result)
 {
-    m_dest_result = NULL;
-}
-
-CWeaponKnife::best_victim_selector::best_victim_selector(best_victim_selector const& copy)
-    : m_min_dist(copy.m_min_dist), m_except_id(copy.m_except_id), m_start_pos(copy.m_start_pos),
-      m_query_distance(copy.m_query_distance), m_dest_result(copy.m_dest_result)
-{
+    m_dest_result = nullptr;
 }
 
 void CWeaponKnife::best_victim_selector::operator()(spartial_base_t::value_type const& left)

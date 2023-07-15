@@ -12,7 +12,7 @@ public:
     seed_generator();
     ~seed_generator();
 
-    s32 const genrate();
+    s32 genrate();
 
 private:
     CRandom m_random;
@@ -27,11 +27,11 @@ struct key_t
     s32 m_key[max_key_length];
 }; // struct key_t
 
-u32 const generate_key(s32 const seed, key_t& result_key);
+u32 generate_key(s32 const seed, key_t& result_key);
 
 // returns checksum of raw data
-u32 const encrypt(void* buffer, u32 buffer_size, key_t const& sec_key);
-u32 const decrypt(void* buffer, u32 buffer_size, key_t const& sec_key);
+u32 encrypt(void* buffer, u32 buffer_size, key_t const& sec_key);
+u32 decrypt(void* buffer, u32 buffer_size, key_t const& sec_key);
 
 } // namespace secure_messaging
 

@@ -163,7 +163,6 @@ int PsiEquation::roots(float* t) const
         t[0] = root_pts[0];
         t[1] = root_pts[1];
         break;
-    default: break;
     }
     return num_roots;
 }

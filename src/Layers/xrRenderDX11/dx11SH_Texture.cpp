@@ -28,7 +28,7 @@ CTexture::CTexture()
     flags.bUser = false;
     flags.seqCycles = FALSE;
     m_material = 1.0f;
-    bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_load);
+    bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_load);
 }
 
 CTexture::~CTexture()
@@ -50,7 +50,6 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
     if (surf)
         surf->AddRef();
     _RELEASE(pSurface);
-    _RELEASE(m_pSRView);
 
     pSurface = surf;
 
@@ -63,6 +62,7 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
         if (D3D_RESOURCE_DIMENSION_TEXTURE2D == type)
         {
             D3D_SHADER_RESOURCE_VIEW_DESC ViewDesc;
+            ZeroMemory(&ViewDesc, sizeof(ViewDesc));
 
             if (desc.MiscFlags & D3D_RESOURCE_MISC_TEXTURECUBE)
             {
@@ -74,12 +74,13 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
             {
                 if (desc.SampleDesc.Count <= 1)
                 {
-                    ViewDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE2D;
+                    ViewDesc.ViewDimension = (desc.ArraySize > 1) ? D3D_SRV_DIMENSION_TEXTURE2DARRAY : D3D_SRV_DIMENSION_TEXTURE2D;
                     ViewDesc.Texture2D.MostDetailedMip = 0;
                     ViewDesc.Texture2D.MipLevels = desc.MipLevels;
                 }
                 else
                 {
+                    VERIFY(desc.ArraySize == 1);
                     ViewDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE2DMS;
                     ViewDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
                 }
@@ -106,15 +107,37 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
                 break;
             }
 
+            if (desc.ArraySize > 1)
+            {
+                ViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
+            }
+
             // this would be supported by DX10.1 but is not needed for stalker // XXX: why?
             // if( ViewDesc.Format != DXGI_FORMAT_R24_UNORM_X8_TYPELESS )
             if ((desc.SampleDesc.Count <= 1) || (ViewDesc.Format != DXGI_FORMAT_R24_UNORM_X8_TYPELESS))
-                CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &m_pSRView));
+            {
+                _RELEASE(srv_all);
+                CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_all));
+            }
             else
-                m_pSRView = 0;
+                srv_all = 0;
+
+            srv_per_slice.resize(desc.ArraySize);
+            for (int id = 0; id < desc.ArraySize; ++id)
+            {
+                _RELEASE(srv_per_slice[id]);
+
+                ViewDesc.Texture2DArray.ArraySize = 1;
+                ViewDesc.Texture2DArray.FirstArraySlice = id;
+                CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_per_slice[id]));
+            }
+            set_slice(-1);
         }
         else
+        {
+            _RELEASE(m_pSRView);
             CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
+        }
     }
 }
 
@@ -128,25 +151,25 @@ ID3DBaseTexture* CTexture::surface_get() const
 void CTexture::PostLoad()
 {
     if (pTheora)
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_theora);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_theora);
     else if (pAVI)
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_avi);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_avi);
     else if (!seqDATA.empty())
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_seq);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_seq);
     else
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_normal);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_normal);
 }
 
-void CTexture::apply_load(u32 dwStage)
+void CTexture::apply_load(CBackend& cmd_list, u32 dwStage)
 {
     if (!flags.bLoaded)
         Load();
     else
         PostLoad();
-    bind(dwStage);
+    bind(cmd_list, dwStage);
 };
 
-void CTexture::Apply(u32 dwStage) const
+void CTexture::Apply(CBackend& cmd_list, u32 dwStage) const
 {
     // if( !RImplementation.o.msaa )
     //   VERIFY( !((!pSurface)^(!m_pSRView)) );	//	Both present or both missing
@@ -159,37 +182,35 @@ void CTexture::Apply(u32 dwStage) const
     if (dwStage < rstVertex) //	Pixel shader stage resources
     {
         // HW.pDevice->PSSetShaderResources(dwStage, 1, &m_pSRView);
-        SRVSManager.SetPSResource(dwStage, m_pSRView);
+        cmd_list.SRVSManager.SetPSResource(dwStage, m_pSRView);
     }
     else if (dwStage < rstGeometry) //	Vertex shader stage resources
     {
         // HW.pDevice->VSSetShaderResources(dwStage-rstVertex, 1, &m_pSRView);
-        SRVSManager.SetVSResource(dwStage - rstVertex, m_pSRView);
+        cmd_list.SRVSManager.SetVSResource(dwStage - rstVertex, m_pSRView);
     }
     else if (dwStage < rstHull) //	Geometry shader stage resources
     {
         // HW.pDevice->GSSetShaderResources(dwStage-rstGeometry, 1, &m_pSRView);
-        SRVSManager.SetGSResource(dwStage - rstGeometry, m_pSRView);
+        cmd_list.SRVSManager.SetGSResource(dwStage - rstGeometry, m_pSRView);
     }
-#ifdef USE_DX11
     else if (dwStage < rstDomain) //	Geometry shader stage resources
     {
-        SRVSManager.SetHSResource(dwStage - rstHull, m_pSRView);
+        cmd_list.SRVSManager.SetHSResource(dwStage - rstHull, m_pSRView);
     }
     else if (dwStage < rstCompute) //	Geometry shader stage resources
     {
-        SRVSManager.SetDSResource(dwStage - rstDomain, m_pSRView);
+        cmd_list.SRVSManager.SetDSResource(dwStage - rstDomain, m_pSRView);
     }
     else if (dwStage < rstInvalid) //	Geometry shader stage resources
     {
-        SRVSManager.SetCSResource(dwStage - rstCompute, m_pSRView);
+        cmd_list.SRVSManager.SetCSResource(dwStage - rstCompute, m_pSRView);
     }
-#endif
     else
         VERIFY("Invalid stage");
 }
 
-void CTexture::apply_theora(u32 dwStage)
+void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
 {
     if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual))
     {
@@ -208,7 +229,7 @@ void CTexture::apply_theora(u32 dwStage)
 
 // R_CHK				(T2D->LockRect(0,&R,&rect,0));
 #ifdef USE_DX11
-        R_CHK(HW.pContext->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
+        R_CHK(HW.get_context(cmd_list.context_id)->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #else
         R_CHK(T2D->Map(0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #endif
@@ -219,15 +240,15 @@ void CTexture::apply_theora(u32 dwStage)
         VERIFY(u32(_pos) == rect.bottom * _w);
 // R_CHK				(T2D->UnlockRect(0));
 #ifdef USE_DX11
-        HW.pContext->Unmap(T2D, 0);
+        HW.get_context(cmd_list.context_id)->Unmap(T2D, 0);
 #else
         T2D->Unmap(0);
 #endif
     }
-    Apply(dwStage);
+    Apply(cmd_list, dwStage);
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
 };
-void CTexture::apply_avi(u32 dwStage) const
+void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage) const
 {
     if (pAVI->NeedUpdate())
     {
@@ -240,7 +261,7 @@ void CTexture::apply_avi(u32 dwStage) const
 // AVI
 // R_CHK	(T2D->LockRect(0,&R,NULL,0));
 #ifdef USE_DX11
-        R_CHK(HW.pContext->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
+        R_CHK(HW.get_context(CHW::IMM_CTX_ID)->Map(T2D, 0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #else
         R_CHK(T2D->Map(0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #endif
@@ -250,15 +271,15 @@ void CTexture::apply_avi(u32 dwStage) const
         CopyMemory(mapData.pData, ptr, pAVI->m_dwWidth * pAVI->m_dwHeight * 4);
 // R_CHK	(T2D->UnlockRect(0));
 #ifdef USE_DX11
-        HW.pContext->Unmap(T2D, 0);
+        HW.get_context(CHW::IMM_CTX_ID)->Unmap(T2D, 0);
 #else
         T2D->Unmap(0);
 #endif
     }
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
-    Apply(dwStage);
+    Apply(cmd_list, dwStage);
 };
-void CTexture::apply_seq(u32 dwStage)
+void CTexture::apply_seq(CBackend& cmd_list, u32 dwStage)
 {
     // SEQ
     u32 frame = Device.dwTimeContinual / seqMSPF; // Device.dwTimeGlobal
@@ -278,13 +299,19 @@ void CTexture::apply_seq(u32 dwStage)
         m_pSRView = m_seqSRView[frame_id];
     }
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
-    Apply(dwStage);
+    Apply(cmd_list, dwStage);
 };
-void CTexture::apply_normal(u32 dwStage) const
+void CTexture::apply_normal(CBackend& cmd_list, u32 dwStage) const
 {
     // CHK_DX(HW.pDevice->SetTexture(dwStage,pSurface));
-    Apply(dwStage);
+    Apply(cmd_list, dwStage);
 };
+
+void CTexture::set_slice(int slice)
+{
+    m_pSRView = (slice < 0) ? srv_all : srv_per_slice[slice];
+    curr_slice = slice;
+}
 
 void CTexture::Preload()
 {
@@ -471,6 +498,13 @@ void CTexture::Load()
         }
     }
 
+#ifdef DEBUG
+    if (pSurface)
+    {
+        pSurface->SetPrivateData(WKPDID_D3DDebugObjectName, cName.size(), cName.c_str());
+    }
+#endif
+
     PostLoad();
 }
 
@@ -495,16 +529,20 @@ void CTexture::Unload()
         seqDATA.clear();
         m_seqSRView.clear();
         pSurface = 0;
-        m_pSRView = 0;
     }
     
     _RELEASE(pSurface);
-    _RELEASE(m_pSRView);
+    _RELEASE(srv_all);
+    for (auto& srv : srv_per_slice)
+    {
+        _RELEASE(srv);
+    }
+
 
     xr_delete(pAVI);
     xr_delete(pTheora);
 
-    bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_load);
+    bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_load);
 }
 
 void CTexture::desc_update()

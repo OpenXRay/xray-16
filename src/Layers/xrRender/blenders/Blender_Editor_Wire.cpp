@@ -52,7 +52,7 @@ void CBlender_Editor_Wire::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (C.bEditor)
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
     {
         CompileForEditor(C);
         return;

@@ -32,12 +32,12 @@ bool CAI_Stalker::feel_vision_isRelevant(IGameObject* O)
     return (true);
 }
 
-void CAI_Stalker::renderable_Render(IRenderable* root)
+void CAI_Stalker::renderable_Render(u32 context_id, IRenderable* root)
 {
-    inherited::renderable_Render(root);
+    inherited::renderable_Render(context_id, root);
 
     if (!already_dead())
-        CInventoryOwner::renderable_Render(root);
+        CInventoryOwner::renderable_Render(context_id, root);
 
 #ifdef DEBUG
     if (g_Alive())

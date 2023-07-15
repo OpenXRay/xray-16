@@ -512,7 +512,6 @@ Fvector CMonsterHome::get_home_point()
             return (m_object->Position());
     }
 
-    typedef CPatrolPath::CVertex CVertex;
     if (!m_path->vertices().empty())
         return (ai().level_graph().vertex_position(m_path->vertex(0)->data().level_vertex_id()));
 

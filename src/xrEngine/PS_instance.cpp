@@ -60,5 +60,6 @@ void CPS_Instance::PSI_destroy()
 //----------------------------------------------------
 void CPS_Instance::PSI_internal_delete()
 {
-    delete this;
+    CPS_Instance* self = this;
+    xr_delete(self);
 }

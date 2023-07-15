@@ -130,7 +130,7 @@ void CSpectator::UpdateCL()
             //-------------------------------------
             int idx = 0;
             game_PlayerState* P = Game().local_player;
-            if (P && (P->team >= 0) && (P->team < (int)Level().seniority_holder().teams().size()))
+            if (P && P->team < Level().seniority_holder().teams().size())
             {
                 const CTeamHierarchyHolder& T = Level().seniority_holder().team(P->team);
                 for (u32 i = 0; i < T.squads().size(); ++i)
@@ -418,13 +418,14 @@ void CSpectator::cam_Update(CActor* A)
             Fvector P, D, N;
             pACam->Get(P, D, N);
             cam->Set(P, D, N);
+            break;
         }
-        break;
         case eacLookAt:
         {
             float y, p, r;
             M.getHPB(y, p, r);
             cam->Set(pACam->yaw, pACam->pitch, -r);
+            break;
         }
         case eacFreeLook:
         {
@@ -441,8 +442,8 @@ void CSpectator::cam_Update(CActor* A)
             if (!A->g_Alive())
                 point.set(point1);
             cam->Update(point, dangle);
+            break;
         }
-        break;
         }
         //-----------------------------------
         Fvector P, D, N;
@@ -632,10 +633,12 @@ void CSpectator::net_Relcase(IGameObject* O)
         cam_Set(eacFreeFly);
 };
 
+// XXX: rewrite to return string
 void CSpectator::GetSpectatorString(string1024& pStr)
 {
-    if (!pStr)
-        return;
+//    if (!pStr)
+//        return;
+
     if (GameID() == eGameIDSingle)
         return;
 
@@ -647,8 +650,8 @@ void CSpectator::GetSpectatorString(string1024& pStr)
         SpectatorMsg = *StringTable().translate("mp_spectator");
         SpectatorMsg += " ";
         SpectatorMsg += *StringTable().translate("mp_free_fly");
+        break;
     }
-    break;
     case eacFirstEye:
     {
         SpectatorMsg = *StringTable().translate("mp_spectator");
@@ -657,8 +660,8 @@ void CSpectator::GetSpectatorString(string1024& pStr)
         SpectatorMsg += " ";
         //			SpectatorMsg = "SPECTATOR (First-Eye): ";
         SpectatorMsg += m_pActorToLookAt ? m_pActorToLookAt->Name() : "";
+        break;
     }
-    break;
     case eacFreeLook:
     {
         SpectatorMsg = *StringTable().translate("mp_spectator");
@@ -667,8 +670,8 @@ void CSpectator::GetSpectatorString(string1024& pStr)
         SpectatorMsg += " ";
         //			SpectatorMsg = "SPECTATOR (Free-Look):";
         SpectatorMsg += m_pActorToLookAt ? m_pActorToLookAt->Name() : "";
+        break;
     }
-    break;
     case eacLookAt:
     {
         SpectatorMsg = *StringTable().translate("mp_spectator");
@@ -677,8 +680,8 @@ void CSpectator::GetSpectatorString(string1024& pStr)
         SpectatorMsg += " ";
         //			SpectatorMsg = "SPECTATOR (Look-At):";
         SpectatorMsg += m_pActorToLookAt ? m_pActorToLookAt->Name() : "";
+        break;
     }
-    break;
     };
     xr_strcpy(pStr, SpectatorMsg.c_str());
 };

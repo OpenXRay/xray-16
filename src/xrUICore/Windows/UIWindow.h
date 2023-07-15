@@ -23,7 +23,10 @@ public:
     virtual void DetachChild(CUIWindow* pChild);
     virtual bool IsChild(CUIWindow* pChild) const;
     virtual void DetachAll();
-    int GetChildNum() { return m_ChildWndList.size(); }
+
+    [[nodiscard]]
+    u32 GetChildNum() const { return (u32)m_ChildWndList.size(); }
+
     void SetParent(CUIWindow* pNewParent);
     CUIWindow* GetParent() const { return m_pParentWnd; }
     //получить окно самого верхнего уровня

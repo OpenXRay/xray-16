@@ -8,18 +8,15 @@
 
 #pragma once
 
-class CParticleParams
+struct CParticleParams final
 {
-public:
     Fvector m_tParticlePosition;
     Fvector m_tParticleAngles;
     Fvector m_tParticleVelocity;
 
-public:
-    IC CParticleParams(const Fvector& tPositionOffset = Fvector().set(0, 0, 0),
-        const Fvector& tAnglesOffset = Fvector().set(0, 0, 0), const Fvector& tVelocity = Fvector().set(0, 0, 0));
-    virtual ~CParticleParams();
-    IC void initialize();
+    CParticleParams(const Fvector& tPositionOffset = {}, const Fvector& tAnglesOffset = {}, const Fvector& tVelocity = {})
+        : m_tParticlePosition(tPositionOffset), m_tParticleAngles(tAnglesOffset), m_tParticleVelocity(tVelocity) {}
+
+    void initialize() {}
 };
 
-#include "particle_params_inline.h"

@@ -16,12 +16,10 @@ u16 dbg_frame_count = 0;
 
 animation_movement_controller::animation_movement_controller(
     Fmatrix* _pObjXForm, const Fmatrix& inital_pose, IKinematics* _pKinematicsC, CBlend* b)
-    : m_startObjXForm(inital_pose), m_pObjXForm(*_pObjXForm), m_pKinematicsC(_pKinematicsC),
-      m_pKinematicsA(smart_cast<IKinematicsAnimated*>(_pKinematicsC)), inital_position_blending(true), stopped(false),
-      blend_linear_speed(0), blend_angular_speed(0), m_control_blend(b), m_poses_blending(Fidentity, Fidentity, -1.f)
+    : m_pObjXForm(*_pObjXForm), m_startObjXForm(inital_pose), m_poses_blending(Fidentity, Fidentity, -1.f),
+      m_pKinematicsC(_pKinematicsC),  m_pKinematicsA(smart_cast<IKinematicsAnimated*>(_pKinematicsC)),  m_control_blend(b)
 #ifdef DEBUG
-      ,
-      DBG_previous_position(*_pObjXForm)
+      , DBG_previous_position(*_pObjXForm)
 #endif
 {
     VERIFY(_pKinematicsC);
@@ -185,7 +183,7 @@ static void get_animation_root_position(Fmatrix& pos, IKinematics* K, IKinematic
     keys.chanel_blend_conts[0] = 1;
     keys.keys[0][0] = *key;
 
-    for (int j = 1; j < MAX_CHANNELS; ++j)
+    for (u32 j = 1; j < MAX_CHANNELS; ++j)
         keys.chanel_blend_conts[j] = 0;
 
     CBoneInstance BI = K->LL_GetBoneInstance(0);

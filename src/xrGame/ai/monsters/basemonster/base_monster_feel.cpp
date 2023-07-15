@@ -40,7 +40,8 @@ void CBaseMonster::feel_sound_new(IGameObject* who, int eType, const CSound_User
         user_data->accept(sound_user_data_visitor());
 
     // ignore unknown sounds
-    if (eType == 0xffffffff)
+    // XXX: should be correct, but it's not good to use magic number
+    if (eType == static_cast<int>(0xffffffff))
         return;
 
     // ignore distant sounds

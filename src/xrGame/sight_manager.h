@@ -46,7 +46,6 @@ private:
 
     struct bone_parameters : bone_parameters_base
     {
-        Fmatrix m_rotation;
         float m_factor;
     }; // struct bone_parameters
 
@@ -68,14 +67,14 @@ private:
     parameters m_current;
     parameters_base m_target;
     shared_str m_animation_id;
-    aiming_type m_aiming_type;
+    aiming_type m_aiming_type{ aiming_none };
     animation_frame_type m_animation_frame;
 
 private:
     float m_max_left_angle;
     float m_max_right_angle;
-    bool m_enabled;
-    bool m_turning_in_place;
+    bool m_enabled{ true };
+    bool m_turning_in_place{};
 
 private:
     bool aim_target(Fvector& my_position, Fvector& aim_target, const CGameObject* object) const;

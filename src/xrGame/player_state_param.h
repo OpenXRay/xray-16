@@ -14,8 +14,8 @@ public:
     virtual ~player_state_param(){};
     virtual void update() = 0;
     virtual void init_player(game_PlayerState* new_local_player){};
-    virtual u32 const get_u32_param() = 0;
-    virtual float const get_float_param() = 0;
+    virtual u32 get_u32_param() = 0;
+    virtual float get_float_param() = 0;
     virtual void reset_game() = 0;
 
     virtual void OnWeapon_Fire(u16 sender, u16 sender_weapon_id){};

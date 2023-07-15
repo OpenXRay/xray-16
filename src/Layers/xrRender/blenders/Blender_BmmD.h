@@ -10,7 +10,8 @@ class CBlender_BmmD : public IBlender
     string64 oA_Name; //. задел на будущее
 
 private:
-    void CompileForEditor(CBlender_Compile& C);
+    void CompileFFP(CBlender_Compile& C) const;
+    void CompileProgrammable(CBlender_Compile& C) const;
 
 public:
     LPCSTR getComment() override;

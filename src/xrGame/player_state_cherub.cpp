@@ -7,13 +7,6 @@
 
 namespace award_system
 {
-player_state_cherub::player_state_cherub(game_state_accumulator* owner) : inherited(owner)
-{
-    m_kill_count = 0;
-    m_art_take_time = 0;
-    m_bearer_id = u16(-1);
-}
-
 void player_state_cherub::reset_game()
 {
     m_kill_count = 0;

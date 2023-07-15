@@ -57,7 +57,7 @@ void CBuild::BuildSectors()
     for (u32 I = 0; I < L_dynamic.size(); I++)
     {
         b_light_dynamic& L = L_dynamic[I];
-        if (L.data.type == D3DLIGHT_DIRECTIONAL)
+        if (L.data.type == Flight::Type::Directional)
         {
             for (u32 j = 0; j < g_sectors.size(); j++)
             {

@@ -8,7 +8,7 @@
 CHitImmunity::CHitImmunity()
 {
     m_HitImmunityKoefs.resize(ALife::eHitTypeMax);
-    for (int i = 0; i < ALife::eHitTypeMax; i++)
+    for (u32 i = 0; i < ALife::eHitTypeMax; i++)
         m_HitImmunityKoefs[i] = 1.0f;
 }
 

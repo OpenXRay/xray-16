@@ -4,6 +4,7 @@
 #include "CustomOutfit.h"
 #include "trade.h"
 #include "Weapon.h"
+#include "Grenade.h"
 
 #include "ui/UIInventoryUtilities.h"
 #include "ui/UIActorMenu.h"
@@ -87,16 +88,20 @@ CInventory::CInventory()
     } while (true);
 
     m_iLastSlot = i;
-    VERIFY2(m_iLastSlot >= slotsCount, make_string(
-        "Not critical, but check [inventory] section in your system.ltx.\n"
-        "slots_count = %u, but real slots count is less: %u", slotsCount, i).c_str()
-    );
+#ifndef MASTER_GOLD
+    if (m_iLastSlot != slotsCount)
+    {
+        Log("~ Not critical, but check [inventory] section in your system.ltx.");
+        Msg("~ slots_count = %u, but real slots count is %u", slotsCount, m_iLastSlot);
+    }
+#endif
 
     m_blocked_slots.resize(m_slots.size());
     // ^ no need to initialize members of array
     // ^ resize will default initialize everything with 0
 
     InitPriorityGroupsForQSwitch();
+    m_isActivatingNextGrenade = false;
 }
 
 CInventory::~CInventory() {}
@@ -518,6 +523,22 @@ bool CInventory::Ruck(PIItem pIItem, bool strict_placement)
     if (in_slot)
         pIItem->object().processing_deactivate();
 
+    CGrenade* pGrenade = smart_cast<CGrenade*>(pIItem);
+    if (pGrenade)
+    {
+        bool new_type = true;
+        for (auto grenade_type : m_available_grenade_types)
+        {
+            if (!xr_strcmp(pGrenade->cNameSect(), grenade_type))
+                new_type = false;
+        }
+        if (new_type)
+        {
+            m_available_grenade_types.push_back(pGrenade->cNameSect());
+            std::sort(m_available_grenade_types.begin(), m_available_grenade_types.end());
+        }
+    }
+
     return true;
 }
 /*
@@ -789,6 +810,9 @@ void CInventory::Update()
                     return;
                 }
             }
+
+            if (m_isActivatingNextGrenade)
+                ActivateNextGrenade();
 
             if (GetNextActiveSlot() != NO_ACTIVE_SLOT)
             {
@@ -1315,7 +1339,6 @@ void CInventory::InvalidateState() throw()
     m_dwModifyFrame = Device.dwFrame;
 }
 
-//.#include "WeaponHUD.h"
 void CInventory::Items_SetCurrentEntityHud(bool current_entity)
 {
     TIItemContainer::iterator it;

@@ -8,7 +8,7 @@ CRT::CRT()
 {
     pSurface = NULL;
     pRT = NULL;
-    pZRT = NULL;
+    ZeroMemory(pZRT, sizeof(pZRT));
 #ifdef USE_DX11
     pUAView = NULL;
 #endif
@@ -38,7 +38,7 @@ bool CRT::used_as_depth() const
     }
 }
 
-void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= {}*/)
+void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
 {
     if (pSurface)
         return;
@@ -50,6 +50,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     dwHeight = h;
     fmt = f;
     sampleCount = SampleCount;
+    n_slices = slices_num;
 
     const bool createBaseTarget = flags.test(CreateBase);
     if (createBaseTarget)
@@ -140,7 +141,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         desc.Width = dwWidth;
         desc.Height = dwHeight;
         desc.MipLevels = 1;
-        desc.ArraySize = 1;
+        desc.ArraySize = n_slices;
         desc.Format = dx11FMT;
         desc.SampleDesc.Count = SampleCount;
         desc.Usage = D3D_USAGE_DEFAULT;
@@ -175,6 +176,13 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     }
     HW.stats_manager.increment_stats_rtarget(pSurface);
 
+#ifdef DEBUG
+    if (pSurface)
+    {
+        pSurface->SetPrivateData(WKPDID_D3DDebugObjectName, cName.size(), cName.c_str());
+    }
+#endif
+
     // OK
     if (useAsDepth)
     {
@@ -184,10 +192,11 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         ViewDesc.Format = DXGI_FORMAT_UNKNOWN;
         if (SampleCount <= 1)
         {
-            ViewDesc.ViewDimension = D3D_DSV_DIMENSION_TEXTURE2D;
+            ViewDesc.ViewDimension = n_slices > 1 ? D3D_DSV_DIMENSION_TEXTURE2DARRAY : D3D_DSV_DIMENSION_TEXTURE2D;;
         }
         else
         {
+            VERIFY(n_slices == 1);
             ViewDesc.ViewDimension = D3D_DSV_DIMENSION_TEXTURE2DMS;
             ViewDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
         }
@@ -216,7 +225,38 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
             ViewDesc.Format = desc.Format;
         }
 
-        CHK_DX(HW.pDevice->CreateDepthStencilView(pSurface, &ViewDesc, &pZRT));
+        if (n_slices > 1)
+        {
+            ViewDesc.Texture2DArray.ArraySize = n_slices;
+        }
+
+        CHK_DX(HW.pDevice->CreateDepthStencilView(pSurface, &ViewDesc, &dsv_all));
+#if defined(DEBUG)
+        {
+            char name[128];
+            xr_sprintf(name, "%s:all", Name);
+            dsv_all->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(name), name);
+        }
+#endif
+
+        dsv_per_slice.resize(n_slices);
+        for (int idx = 0; idx < n_slices; ++idx)
+        {
+            ViewDesc.Texture2DArray.ArraySize = 1;
+            ViewDesc.Texture2DArray.FirstArraySlice = idx;
+            CHK_DX(HW.pDevice->CreateDepthStencilView(pSurface, &ViewDesc, &dsv_per_slice[idx]));
+#if DEBUG
+            {
+                char name[128];
+                xr_sprintf(name, "%s:s%d", Name, idx);
+                dsv_per_slice[idx]->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(name), name);
+            }
+#endif
+        }
+        for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+        {
+            set_slice_write(id, -1);
+        }
     }
     else
         CHK_DX(HW.pDevice->CreateRenderTargetView(pSurface, 0, &pRT));
@@ -253,7 +293,11 @@ void CRT::destroy()
         pTexture = NULL;
     }
     _RELEASE(pRT);
-    _RELEASE(pZRT);
+    for (auto& dsv : dsv_per_slice)
+    {
+        _RELEASE(dsv);
+    }
+    _RELEASE(dsv_all);
 
     HW.stats_manager.decrement_stats_rtarget(pSurface);
     _RELEASE(pSurface);
@@ -262,23 +306,36 @@ void CRT::destroy()
 #endif
 }
 
+void CRT::set_slice_read(int slice)
+{
+    VERIFY(slice <= n_slices || slice == -1);
+    pTexture->set_slice(slice);
+}
+
+void CRT::set_slice_write(u32 context_id, int slice)
+{ 
+    VERIFY(slice <= n_slices || slice == -1);
+    pZRT[context_id] = (slice < 0) ? dsv_all : dsv_per_slice[slice];
+}
+
+
 void CRT::reset_begin() { destroy(); }
 void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dwFlags }); }
 
-void CRT::resolve_into(CRT& destination) const
+void CRT::resolve_into(CRT& destination) const // TODO: this should be moved into backend
 {
     VERIFY(fmt == destination.fmt); // only RTs with same format supported
     auto srcSurf = pTexture->surface_get();
     auto destSurf = destination.pTexture->surface_get();
-    HW.pContext->ResolveSubresource(destSurf, 0,
+    HW.get_context(CHW::IMM_CTX_ID)->ResolveSubresource(destSurf, 0,
         srcSurf, 0, dx11TextureUtils::ConvertTextureFormat(fmt));
     _RELEASE(srcSurf);
     _RELEASE(destSurf);
 }
 
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, Flags32 flags /*= 0*/)
+void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= 0*/)
 {
-    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, flags));
+    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, slices_num, flags));
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -13,7 +13,7 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     // Matrices
     for (map_Matrix::iterator m = m_matrices.begin(); m != m_matrices.end(); ++m)
     {
-        R_ASSERT(1 == m->second->dwReference);
+        R_ASSERT(1 == m->second->ref_count);
         xr_delete(m->second);
     }
     m_matrices.clear();
@@ -21,7 +21,7 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     // Constants
     for (map_Constant::iterator c = m_constants.begin(); c != m_constants.end(); ++c)
     {
-        R_ASSERT(1 == c->second->dwReference);
+        R_ASSERT(1 == c->second->ref_count);
         xr_delete(c->second);
     }
     m_constants.clear();

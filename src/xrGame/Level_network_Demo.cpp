@@ -188,7 +188,7 @@ bool CLevel::LoadDemoHeader()
     m_demo_info->read_from_file(m_reader);
 
     m_reader->seek(demo_info_start_pos + demo_info::max_demo_info_size);
-    return (m_reader->elapsed() >= sizeof(DemoPacket));
+    return (m_reader->elapsed() >= static_cast<std::intptr_t>(sizeof(DemoPacket)));
 }
 
 bool CLevel::LoadPacket(NET_Packet& dest_packet, u32 global_time_delta)
@@ -211,7 +211,7 @@ bool CLevel::LoadPacket(NET_Packet& dest_packet, u32 global_time_delta)
         dest_packet.B.count = tmp_hdr.m_packet_size;
         dest_packet.timeReceive = tmp_hdr.m_timeReceive; // not used ..
         dest_packet.r_pos = 0;
-        if (m_reader->elapsed() <= sizeof(DemoPacket))
+        if (m_reader->elapsed() <= static_cast<std::intptr_t>(sizeof(DemoPacket)))
         {
             StopPlayDemo();
         }

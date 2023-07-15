@@ -588,7 +588,8 @@ void CWeaponMagazined::state_Fire(float dt)
         if (iAmmoElapsed == 0)
             OnMagazineEmpty();
 
-        StopShooting();
+        if (m_dwMotionCurrTm >= m_dwMotionEndTm)
+            StopShooting();
     }
     else
     {
@@ -639,6 +640,9 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
 {
     switch (state)
     {
+    case eFire:
+        SwitchState(eIdle);
+        break;
     case eReload:
         ReloadMagazine();
         SwitchState(eIdle);
@@ -673,11 +677,13 @@ void CWeaponMagazined::switch2_Idle()
 void CWeaponMagazined::switch2_Fire()
 {
     CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
-    CInventoryItem* ii = smart_cast<CInventoryItem*>(this);
+
 #ifdef DEBUG
     if (!io)
         return;
-    // VERIFY2					(io,make_string("no inventory owner, item %s",*cName()));
+    // VERIFY2(io, make_string("no inventory owner, item %s", *cName()));
+
+    CInventoryItem* ii = smart_cast<CInventoryItem*>(this);
 
     if (ii != io->inventory().ActiveItem())
         Msg("! not an active item, item %s, owner %s, active item %s", *cName(), *H_Parent()->cName(),
@@ -1120,20 +1126,19 @@ void CWeaponMagazined::PlayAnimHide()
 
 void CWeaponMagazined::PlayAnimReload()
 {
-    auto state = GetState();
+    const auto state = GetState();
     VERIFY(state == eReload);
     if (bMisfire)
-        if (isHUDAnimationExist("anm_reload_misfire"))
-            PlayHUDMotion("anm_reload_misfire", true, this, state);
+    {
+        if (cpcstr anim_name = WhichHUDAnimationExist("anm_reload_misfire", "anim_reload_misfire"))
+            PlayHUDMotion(anim_name, true, this, state);
         else
             PlayHUDMotion("anm_reload", "anim_reload", true, this, state);
+    }
     else
     {
-        if (iAmmoElapsed == 0)
-            if (isHUDAnimationExist("anm_reload_empty"))
-                PlayHUDMotion("anm_reload_empty", true, this, state);
-            else
-                PlayHUDMotion("anm_reload", "anim_reload", true, this, state);
+        if (cpcstr anim_name = iAmmoElapsed == 0 ? WhichHUDAnimationExist("anm_reload_empty", "anim_reload_empty") : nullptr)
+            PlayHUDMotion(anim_name, true, this, state);
         else
             PlayHUDMotion("anm_reload", "anim_reload", true, this, state);
     }

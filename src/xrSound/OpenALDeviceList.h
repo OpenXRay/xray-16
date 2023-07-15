@@ -45,9 +45,16 @@ public:
     ALDeviceList();
     ~ALDeviceList();
 
-    u32 GetNumDevices() const { return m_devices.size(); }
-    const ALDeviceDesc& GetDeviceDesc(u32 index) { return m_devices[index]; }
-    pcstr GetDeviceName(u32 index) const;
-    void GetDeviceVersion(u32 index, int* major, int* minor);
+    [[nodiscard]]
+    size_t GetNumDevices() const { return m_devices.size(); }
+
+    [[nodiscard]]
+    const ALDeviceDesc& GetDeviceDesc(size_t index) const { return m_devices[index]; }
+
+    [[nodiscard]]
+    pcstr GetDeviceName(size_t index) const;
+
+    void GetDeviceVersion(size_t index, int* major, int* minor);
+
     void SelectBestDevice();
 };

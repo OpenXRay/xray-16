@@ -33,7 +33,7 @@ void writer::set_player_cdkey_digest(shared_str const& cdkeydigest)
     m_info_data.w_string(ss_info_secion, ss_admin_name_key, admin_name.c_str());
 }*/
 
-u32 const writer::write_info(crypto::yielder_t* yielder)
+u32 writer::write_info(crypto::yielder_t* yielder)
 {
     string64 time_string;
     m_info_data.w_string(ss_info_secion, ss_creation_date, current_time(time_string));

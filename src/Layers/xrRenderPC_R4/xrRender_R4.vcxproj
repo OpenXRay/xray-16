@@ -232,6 +232,7 @@
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp" />
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp" />
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
@@ -256,7 +257,6 @@
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp" />
-    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateManager.cpp" />
     <ClCompile Include="..\xrRender\Animation.cpp" />
     <ClCompile Include="..\xrRender\Blender.cpp" />
@@ -273,6 +273,7 @@
     <ClCompile Include="..\xrRender\DetailManager.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_CACHE.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp" />
+    <ClCompile Include="..\xrRender\DetailManager_soft.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_VS.cpp" />
     <ClCompile Include="..\xrRender\DetailModel.cpp" />
     <ClCompile Include="..\xrRender\du_box.cpp" />
@@ -391,18 +392,18 @@
     <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_R_render.cpp" />
-    <ClCompile Include="..\xrRender_R2\r2_R_sun.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_point.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_spot.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_draw_rain.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_mark_msaa_edges.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp" />
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_rain.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_smap_D.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_ssao.cpp" />
     <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp" />
+    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp" />
+    <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp" />
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="CSCompiler.cpp" />
     <ClCompile Include="..\xrRender\blenders\dx11HDAOCSBlender.cpp" />

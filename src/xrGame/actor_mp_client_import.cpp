@@ -114,7 +114,7 @@ void CActorMP::postprocess_packet(net_update_A& N_A)
     N_A.State.previous_position = N_A.State.position;
     N_A.State.previous_quaternion = N_A.State.quaternion;
 
-    if (Local() && OnClient() || !g_Alive())
+    if ((Local() && OnClient()) || !g_Alive())
         return;
 
     {

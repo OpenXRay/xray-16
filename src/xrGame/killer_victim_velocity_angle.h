@@ -11,18 +11,18 @@ class killer_victim_angle : public player_state_param
     typedef player_state_param inherited;
 
 public:
-    killer_victim_angle(game_state_accumulator* owner);
+    killer_victim_angle(game_state_accumulator* owner) : inherited(owner) {}
     virtual ~killer_victim_angle(){};
 
     virtual void update(){};
-    virtual u32 const get_u32_param();
-    virtual float const get_float_param() { return m_killer_victim_angle_cos; };
+    virtual u32 get_u32_param();
+    virtual float get_float_param() { return m_killer_victim_angle_cos; };
     virtual void reset_game();
     virtual void OnPlayerKilled(
         u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type);
 
 protected:
-    float m_killer_victim_angle_cos;
+    float m_killer_victim_angle_cos{ 1.0f };
 }; // class killer_victim_angle
 
 } // namespace award_system

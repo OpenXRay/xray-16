@@ -10,7 +10,7 @@ CHelmet::CHelmet()
 {
     m_flags.set(FUsingCondition, TRUE);
     m_HitTypeProtection.resize(ALife::eHitTypeMax);
-    for (int i = 0; i < ALife::eHitTypeMax; i++)
+    for (u32 i = 0; i < ALife::eHitTypeMax; i++)
         m_HitTypeProtection[i] = 1.0f;
 
     m_boneProtection = xr_new<SBoneProtections>();
@@ -166,7 +166,7 @@ bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
     result |= process_if_exists(
         section, "fire_wound_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeFireWound], test);
 
-    LPCSTR str;
+    LPCSTR str{};
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
     if (result2 && !test)
     {

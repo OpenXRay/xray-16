@@ -16,7 +16,7 @@ void r_pixel_calculator::begin()
 
     RCache.set_RT(rt->pRT);
 #ifdef USE_DX11
-    RCache.set_ZB(zb->pZRT);
+    RCache.set_ZB(zb->pZRT[RCache.context_id]);
 #elif defined(USE_DX9) || defined(USE_OGL)
     RCache.set_ZB(zb->pRT);
 #endif
@@ -49,6 +49,8 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
     r_aabb_ssa result = {0};
     float area = float(_sqr(rt_dimensions));
 
+    auto& dsgraph = RImplementation.get_imm_context();
+
     //
     u32 id[6];
     for (u32 face = 0; face < 6; face++)
@@ -72,11 +74,11 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
         // render-0
         Device.Clear(); // clear-ZB
         RCache.set_Shader(V->shader);
-        V->Render(1.f);
+        V->Render(RCache, 1.f, dsgraph.o.phase == CRender::PHASE_SMAP);
 
         // render-1
         RImplementation.HWOCC.occq_begin(id[face]);
-        V->Render(1.f);
+        V->Render(RCache, 1.f, dsgraph.o.phase == CRender::PHASE_SMAP);
         RImplementation.HWOCC.occq_end(id[face]);
     }
 

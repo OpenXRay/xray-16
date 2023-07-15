@@ -69,7 +69,12 @@ else()
 	set(CCOPT_OPT_LEVEL "-O2")
 endif()
 
-set(CCOPT "${CCOPT_OPT_LEVEL} -fomit-frame-pointer -fno-stack-protector")
+# TODO Refactor all these options
+if (USE_ADDRESS_SANITIZER)
+	set(CCOPT "${CCOPT_OPT_LEVEL} -fno-stack-protector")
+else()
+	set(CCOPT "${CCOPT_OPT_LEVEL} -fomit-frame-pointer -fno-stack-protector")
+endif()
 
 # Target-specific compiler options
 set(CCOPT_x86 "-march=i686 -msse -msse2 -mfpmath=sse")

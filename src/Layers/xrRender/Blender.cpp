@@ -73,7 +73,12 @@ void IBlender::Load(IReader& fs, u16)
 
 void IBlender::Compile(CBlender_Compile& C)
 {
-    if (C.bEditor)
+    // XXX: there was a bLighting variable
+    // which was set to false in 'if' path
+    // and set to true in 'else' path
+    // but it was ignored anyway in the SetParams ¯\_(ツ)_/¯.
+    // Need to research commits from 2003 in xray-soc-history more
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
         C.SetParams(oPriority.value, oStrictSorting.value ? true : false);
     else
         C.SetParams(oPriority.value, oStrictSorting.value ? true : false);

@@ -25,6 +25,9 @@
   <PropertyGroup>
     <OutDir>$(xrBinDir)utils\</OutDir>
   </PropertyGroup>
+  <PropertyGroup>
+    <CopyLocalProjectReference>true</CopyLocalProjectReference>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>

@@ -63,7 +63,7 @@ public:
     using mapped_type = T;
     using value_type = xr_fixed_map_node<K, T>;
 
-    using callback = void __fastcall(const value_type&);
+    using callback = void __fastcall(u32, const value_type&);
     using callback_cmp = bool __fastcall(const value_type& N1, const value_type& N2);
 
     static_assert(TGrowMultiplier >= 1, "Grow multiplier can't be less than 1");
@@ -156,22 +156,22 @@ private:
         return N;
     }
 
-    void recurse_left_right(value_type* N, callback CB)
+    void recurse_left_right(u32 id, value_type* N, callback CB)
     {
         if (N->left)
-            recurse_left_right(N->left, CB);
-        CB(*N);
+            recurse_left_right(id, N->left, CB);
+        CB(id, *N);
         if (N->right)
-            recurse_left_right(N->right, CB);
+            recurse_left_right(id, N->right, CB);
     }
 
-    void recurse_right_left(value_type* N, callback CB)
+    void recurse_right_left(u32 id, value_type* N, callback CB)
     {
         if (N->right)
-            recurse_right_left(N->right, CB);
-        CB(*N);
+            recurse_right_left(id, N->right, CB);
+        CB(id, *N);
         if (N->left)
-            recurse_right_left(N->left, CB);
+            recurse_right_left(id, N->left, CB);
     }
 
     void get_left_right(value_type* N, xr_vector<T, xr_allocator<T>>& D)
@@ -361,16 +361,16 @@ public:
     mapped_type& at(const key_type& key) { return insert(key)->second; }
     mapped_type& operator[](const key_type& key) { return insert(key)->second; }
 
-    void traverse_left_right(callback CB)
+    void traverse_left_right(u32 id, callback CB)
     {
         if (pool)
-            recurse_left_right(nodes, CB);
+            recurse_left_right(id, nodes, CB);
     }
 
-    void traverse_right_left(callback CB)
+    void traverse_right_left(u32 id, callback CB)
     {
         if (pool)
-            recurse_right_left(nodes, CB);
+            recurse_right_left(id, nodes, CB);
     }
 
     void traverse_any(callback CB)

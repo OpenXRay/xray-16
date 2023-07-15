@@ -6,8 +6,7 @@
 
 namespace award_system
 {
-double_shot_double_kill::double_shot_double_kill(game_state_accumulator* owner) : inherited(owner) { m_shot_count = 0; }
-u32 const double_shot_double_kill::get_u32_param()
+u32 double_shot_double_kill::get_u32_param()
 {
     if (m_kills.size() == 2)
     {
