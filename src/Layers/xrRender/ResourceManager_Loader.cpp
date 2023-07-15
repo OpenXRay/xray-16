@@ -111,7 +111,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
                 chunk->seek(0);
                 B->Load(*chunk, desc.version);
 
-                auto I = m_blenders.insert(std::make_pair(xr_strdup(desc.cName), B));
+                auto I = m_blenders.emplace(xr_strdup(desc.cName), B);
                 R_ASSERT2(I.second, "shader.xr - found duplicate name!!!");
             }
             chunk->close();

@@ -130,8 +130,8 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
         pool.push_back(Q);
     else
     {
-        int it = int(pool.size()) - 1;
-        while ((it >= 0) && (pool[it].order < Q.order))
+        size_t it = pool.size() - 1;
+        while (pool[it].order < Q.order)
             it--;
         pool.insert(pool.begin() + it + 1, Q);
     }
