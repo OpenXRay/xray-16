@@ -370,6 +370,11 @@ CRenderTarget::CRenderTarget()
         //	temp: for higher quality blends
         if (options.advancedpp)
             rt_Generic_2.create(r2_RT_generic2, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+
+        if (options.msaa)
+            rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A8R8G8B8, SampleCount);
+        else
+            rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A8R8G8B8, 1);
     }
 
     // OCCLUSION

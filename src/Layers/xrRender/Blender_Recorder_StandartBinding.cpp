@@ -540,6 +540,7 @@ void CBlender_Compile::SetMapping()
     }
 
     // Anomaly
+    r_Constant("rain_params", &binder_rain_params);
     r_Constant("pp_img_corrections", &binder_image_corrections);
     r_Constant("pp_img_cg", &binder_color_grading);
 

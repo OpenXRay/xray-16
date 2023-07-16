@@ -16,7 +16,6 @@
 #include "perlin.h"
 #endif
 
-extern Fvector4 ps_ssfx_grass_interactive; 
 ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
 
 //ECO_RENDER add

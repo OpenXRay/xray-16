@@ -79,6 +79,9 @@ public:
     ref_texture t_material;
     ref_texture t_noise[TEX_jitter_count];
 
+    // Anomaly
+    resptr_core<CRT, resptrcode_crt> rt_Generic_temp;
+
 private:
     // OCCq
     ref_shader s_occq;
