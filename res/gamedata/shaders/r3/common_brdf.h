@@ -8,21 +8,17 @@
 */
 #include "common.h"
 
+// SSS Settings
+#include "settings_screenspace_FLORA.h"
+
 ////////////////////////
 //Material table
-#define MAT_FLORA 6.0
+#define MAT_FLORA 0.15f
+#define MAT_FLORA_ELIPSON 0.04f
 
-////////////////////////
-//Simple subsurface scattering with Half-Lambert
-
-//Author: LVutner
-//Do not copy or redistribute without permission.
+// Simple subsurface scattering
 float SSS(float3 N, float3 V, float3 L)
 {
-	const float SSS_DIST = 0.5; //Scattering distortion
-	const float SSS_AMB = 0.5; //Scattering ambient
-		
-    float3 SSS_vector = L + N * SSS_DIST;
-    float SSS_light = saturate(dot(V, -SSS_vector)) * 0.5 + 0.5; //Half-Lambert approx.	
-    return SSS_light + SSS_AMB; //Add some ambient
+	float S = saturate(dot(V, -(L + N))) * G_SSS_INTENSITY;
+	return S;
 }

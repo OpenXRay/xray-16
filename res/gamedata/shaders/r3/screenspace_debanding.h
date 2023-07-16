@@ -65,7 +65,7 @@ void dband_process(inout float3 color, float2 tc, float noise, float2 dir, float
 float3 ssfx_debanding(float3 color, float2 tc)
 {
 	// Noise
-	float db_noise = SSFX_permute(SSFX_permute(SSFX_permute(tc.x) + tc.y) + SSFX_noise(tc));
+	float db_noise = SSFX_permute(SSFX_permute(SSFX_permute(tc.x) + tc.y) + generic_noise(tc));
 
 	// Get random direction [ -1 ~ 1 ]
 	float2 dir = float2(cos(db_noise), sin(db_noise));
