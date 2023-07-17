@@ -226,6 +226,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     string32 c_sun_quality;
     char c_msaa_samples[2];
     char c_msaa_current_sample[2];
+    char c_inter_grass[32];
 
     // options:
     const auto appendShaderOption = [&](u32 option, cpcstr macro, cpcstr value)
@@ -415,6 +416,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Minmax SM
     appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
+
+    if (ps_ssfx_grass_interactive.y > 0)
+    {
+        xr_sprintf(c_inter_grass, "%d", u8(ps_ssfx_grass_interactive.y));
+        appendShaderOption((u8)ps_ssfx_grass_interactive.y, "SSFX_INT_GRASS", c_inter_grass);
+    }
 
     // Be carefull!!!!! this should be at the end to correctly generate
     // compiled shader name;
