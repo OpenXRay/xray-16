@@ -10,6 +10,7 @@ class xrCompressor
     IWriter* fs_pack_writer{};
     CMemoryWriter fs_desc;
     shared_str target_name;
+    shared_str output_name;
     IReader* pPackHeader{};
     CInifile* config_ltx{};
     xr_vector<char*>* files_list{};
@@ -64,6 +65,7 @@ public:
     void SetStoreFiles(bool b) { bStoreFiles = b; }
     void SetPackingToXDB(bool b) { bPackingToXDB = b; }
     void SetTargetName(LPCSTR n) { target_name = n; }
+    void SetOutputName(LPCSTR n) { output_name = n; }
     void SetPackHeaderName(LPCSTR n);
     void SetMaxVolumeSize(size_t size)
     {

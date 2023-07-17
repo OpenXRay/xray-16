@@ -291,10 +291,15 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
 
     string_path fname;
     string128 s_num;
-    if (bPackingToXDB)
-        strconcat(fname, tgt_folder, ".xdb", xr_itoa(num, s_num, 10));
+    if (!output_name.empty())
+        strconcat(fname, output_name.c_str(), num > 0 ? xr_itoa(num, s_num, 10) : "");
     else
-        strconcat(fname, tgt_folder, ".pack_#", xr_itoa(num, s_num, 10));
+    {
+        if (bPackingToXDB)
+            strconcat(fname, tgt_folder, ".xdb", xr_itoa(num, s_num, 10));
+        else
+            strconcat(fname, tgt_folder, ".pack_#", xr_itoa(num, s_num, 10));
+    }
     xr_unlink(fname);
     fs_pack_writer = FS.w_open(fname);
     fs_desc.clear();

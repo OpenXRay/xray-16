@@ -26,6 +26,7 @@ int __cdecl main(int argc, char* argv[])
             printf("-fast	- fast compression.\n");
             printf("-store	- store files. No compression.\n");
             printf("-max_size <MB>       - set maximum archive size. Default: [%zu MB]\n", xrCompressor::XRP_MAX_SIZE);
+            printf("-filename <file_name.xdb> - full name of the archive (with extension) to be created by the compressor");
             printf("-ltx <file_name.ltx> - pathes to compress.\n");
             printf("\n");
             printf("LTX format:\n");
@@ -52,6 +53,13 @@ int __cdecl main(int argc, char* argv[])
         C.SetFastMode(nullptr != strstr(params, "-fast"));
         C.SetPackingToXDB(nullptr != strstr(params, "-xdb"));
         C.SetTargetName(argv[1]);
+
+        if (strstr(params, "-filename"))
+        {
+            string64 pack_name;
+            if (1 == sscanf(strstr(params, "-filename ") + 10, "%[^ ] ", pack_name))
+                C.SetOutputName(pack_name);
+        }
 
         if (strstr(params, "-max_size"))
         {
