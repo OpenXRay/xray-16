@@ -407,7 +407,7 @@ void xrCompressor::PerformWork()
         SetWindowText(GetConsoleWindow(), caption);
         printf("\n%-80s   ", (*files_list)[it]);
 
-        if (fs_pack_writer->tell() > XRP_MAX_SIZE)
+        if (fs_pack_writer->tell() > XRP_TARGET_SIZE)
         {
             ClosePack();
             OpenPack(target_name.c_str(), pack_num++);

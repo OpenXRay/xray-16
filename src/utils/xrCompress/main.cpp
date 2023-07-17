@@ -29,6 +29,7 @@ int __cdecl main(int argc, char* argv[])
             printf("-diff /? option to get information about creating difference.\n");
             printf("-fast	- fast compression.\n");
             printf("-store	- store files. No compression.\n");
+            printf("-max_size <MB>       - set maximum archive size. Default: [%zu MB]\n", xrCompressor::XRP_MAX_SIZE);
             printf("-ltx <file_name.ltx> - pathes to compress.\n");
             printf("\n");
             printf("LTX format:\n");
@@ -55,6 +56,16 @@ int __cdecl main(int argc, char* argv[])
         C.SetStoreFiles(nullptr != strstr(params, "-store"));
         C.SetFastMode(nullptr != strstr(params, "-fast"));
         C.SetTargetName(argv[1]);
+
+        if (cpcstr temp = strstr(params, "-max_size"))
+        {
+            u32 size{};
+            if (1 == sscanf(strstr(params, "-max_size ") + 9, "%u", &size))
+            {
+                const size_t final_size = 1024 * 1024 * size_t(size);
+                C.SetMaxVolumeSize(final_size);
+            }
+        }
 
         cpcstr p = strstr(params, "-ltx");
 
