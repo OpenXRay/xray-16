@@ -565,6 +565,21 @@ virtual void Save (IWriter *F) {};
 
 ENGINE_API bool renderer_allow_override = false;
 
+// Anomaly
+ENGINE_API float ps_r2_img_exposure = 1.0f; // r2-only
+ENGINE_API float ps_r2_img_gamma = 1.0f; // r2-only
+ENGINE_API float ps_r2_img_saturation = 1.0f; // r2-only
+ENGINE_API Fvector ps_r2_img_cg = { .0f, .0f, .0f }; // r2-only
+
+// Ascii1457's Screen Space Shaders
+ENGINE_API Fvector3 ps_ssfx_shadow_cascades = { 20.f, 40.f, 160.f };
+ENGINE_API Fvector4 ps_ssfx_grass_shadows = { .0f, .35f, 30.0f, .0f };
+ENGINE_API Fvector4 ps_ssfx_grass_interactive = { 1.0f, 8.f, 2000.0f, 1.0f };
+ENGINE_API Fvector4 ps_ssfx_int_grass_params_1 = { 1.0f, 1.0f, 1.0f, 25.0f };
+ENGINE_API Fvector4 ps_ssfx_int_grass_params_2 = { 1.0f, 5.0f, 1.0f, 1.0f };
+ENGINE_API Fvector4 ps_ssfx_wpn_dof_1 = { .0f, .0f, .0f, .0f };
+ENGINE_API float ps_ssfx_wpn_dof_2 = 1.0f;
+
 class CCC_renderer : public CCC_Token
 {
     typedef CCC_Token inherited;
@@ -747,6 +762,8 @@ extern int g_ErrorLineCount;
 ENGINE_API int ps_r__Supersample = 1;
 ENGINE_API int ps_r__WallmarksOnSkeleton = 0;
 
+Fvector3 ssfx_wetness_multiplier = { 1.0f, 0.3f, 0.0f };
+
 extern int ps_fps_limit;
 extern int ps_fps_limit_in_menu;
 
@@ -913,4 +930,6 @@ void CCC_Register()
     extern int g_bShowRedText;
     CMD4(CCC_Integer, "debug_show_red_text", &g_bShowRedText, 0, 1);
 #endif
+
+    CMD4(CCC_Vector3, "ssfx_wetness_multiplier", &ssfx_wetness_multiplier, Fvector3().set(0.1f, 0.1f, 0.0f), Fvector3().set(20.0f, 20.0f, 0.0f));
 };

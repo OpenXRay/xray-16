@@ -728,6 +728,9 @@ void CRender::OnFrame()
         Device.seqParallel.insert(
             Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
     }
+
+    if (Details)
+        g_pGamePersistent->GrassBendersUpdateAnimations();
 }
 
 #ifdef USE_OGL
@@ -921,6 +924,7 @@ void CRender::rmNormal(CBackend& cmd_list)
 CRender::CRender()
     : Sectors_xrc("render")
 {
+    r_sun.init_cascades();
 }
 
 CRender::~CRender() {}

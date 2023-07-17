@@ -321,6 +321,8 @@ float CExplosive::TestPassEffect(const Fvector& source_p, const Fvector& dir, fl
         return dist_factor;
     return shoot_factor * dist_factor;
 }
+
+extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
 void CExplosive::Explode()
 {
     VERIFY(0xffff != Initiator());
@@ -339,6 +341,9 @@ void CExplosive::Explode()
         DBG_DrawPoint(pos, 0.3f, color_xrgb(255, 0, 0));
     }
 #endif
+    // Interactive Grass FX
+    g_pGamePersistent->GrassBendersAddExplosion(cast_game_object()->ID(), pos, Fvector().set(0, -99, 0), 1.33f, ps_ssfx_int_grass_params_2.y, ps_ssfx_int_grass_params_2.x, m_fBlastRadius * 2.0f);
+
     //	Msg("---------CExplosive Explode [%d] frame[%d]",cast_game_object()->ID(), Device.dwFrame);
     OnBeforeExplosion();
 
