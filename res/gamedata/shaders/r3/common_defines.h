@@ -11,11 +11,9 @@
 #define def_hdr         float(9.h)         		// hight luminance range float(3.h)
 #define def_hdr_clip	float(0.75h)        		//
 
-#define	LUMINANCE_VECTOR	float3(0.3f, 0.38f, 0.22f)
-
 //////////////////////////////////////////////////////////////////////////////////////////
 #ifndef SMAP_size
-#define SMAP_size        1024
+#define SMAP_size        2048
 #endif
 //////////////////////////////////////////////////////////////////////////////////////////
 
