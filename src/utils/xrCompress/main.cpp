@@ -53,7 +53,7 @@ int __cdecl main(int argc, char* argv[])
         C.SetPackingToXDB(nullptr != strstr(params, "-xdb"));
         C.SetTargetName(argv[1]);
 
-        if (cpcstr temp = strstr(params, "-max_size"))
+        if (strstr(params, "-max_size"))
         {
             u32 size{};
             if (1 == sscanf(strstr(params, "-max_size ") + 9, "%u", &size))
@@ -63,23 +63,32 @@ int __cdecl main(int argc, char* argv[])
             }
         }
 
-        cpcstr p = strstr(params, "-ltx");
-
-        if (nullptr != p)
+        if (strstr(params, "-ltx"))
         {
             string64 ltx_name;
-            sscanf(strstr(params, "-ltx ") + 5, "%[^ ] ", ltx_name);
-
-            CInifile ini(ltx_name);
-            printf("Processing LTX...\n");
-            C.ProcessLTX(ini);
+            if (1 == sscanf(strstr(params, "-ltx ") + 5, "%[^ ] ", ltx_name))
+            {
+                CInifile ini(ltx_name);
+                printf("Processing LTX...\n");
+                C.ProcessLTX(ini);
+            }
+            else
+            {
+                Log("Couldn't process -ltx key, aborting...");
+            }
         }
         else
         {
             string64 header_name;
-            sscanf(strstr(params, "-header ") + 8, "%[^ ] ", header_name);
-            C.SetPackHeaderName(header_name);
-            C.ProcessTargetFolder();
+            if (1 == sscanf(strstr(params, "-header ") + 8, "%[^ ] ", header_name))
+            {
+                C.SetPackHeaderName(header_name);
+                C.ProcessTargetFolder();
+            }
+            else
+            {
+                Log("Couldn't process -header key, aborting...");
+            }
         }
     }
 
