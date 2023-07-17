@@ -1,0 +1,575 @@
+function init    (obj)
+				xr_motivator.AddToMotivator(obj)
+end
+
+function actor_init    (npc)
+				npc:bind_object(actor_binder(npc))
+end
+
+local game_difficulty_by_num = {
+				[0] = "gd_novice",
+				[1] = "gd_stalker",
+				[2] = "gd_veteran",
+				[3] = "gd_master"
+				}
+
+local weapon_hide = {}
+local primary_objects_filled = false
+----------------------------------------------------------------------------------------------------------------------
+class "actor_binder" (object_binder)
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:__init (obj) super(obj)
+	self.bCheckStart = false
+	self.weather_manager = level_weathers.get_weather_manager()
+	self.surge_manager = surge_manager.get_surge_manager()
+	--self.actor_detector = xr_detector.actor_detector()
+	self.last_level_name = nil
+	self.deimos_intensity = nil
+--	self.actor_weapon_on_start = true
+	self.loaded_active_slot = 3
+	self.loaded_slot_applied = false
+	self.last_detective_achievement_spawn_time 	= nil
+	self.last_mutant_hunter_achievement_spawn_time	= nil
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:net_spawn(data)
+--	printf("actor net spawn")
+	level.show_indicators()
+	self.bCheckStart = true
+	self.weapon_hide = false -- спрятано или нет оружие при разговоре.
+	self.weapon_hide_in_dialog = false
+	weapon_hide = {} -- устанавливаем глобальный дефолтовый флаг.
+	if object_binder.net_spawn(self,data) == false then
+		return false
+	end
+	db.add_actor(self.object)
+	db.actor.deimos_intensity = self.deimos_intensity
+	self.deimos_intensity = nil
+	if self.st.disable_input_time == nil then
+		level.enable_input()
+	end
+	xr_s.on_game_load()                                    --' Distemper 03.2008 --
+	self.weather_manager:reset()
+	--' Загружаем настройки дропа
+	death_manager.init_drop_settings()
+	--'Устанавливаем ссылку на таскменеджер
+	self.task_manager = task_manager.get_task_manager()
+	self.spawn_frame = device().frame
+	self.already_jumped = false
+	self.loaded = false
+	benchmark.main()							          --' Distemper 06.2008 --
+	return true
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:net_destroy()
+	xr_sound.stop_sounds_by_id(self.object:id())
+	local board_factions = sim_board.get_sim_board().players
+	if(board_factions) then
+			for k,v in pairs (board_factions) do
+					xr_sound.stop_sounds_by_id(v.id)
+			end
+	end
+	if(actor_stats.remove_from_ranking~=nil)then
+		actor_stats.remove_from_ranking(self.object:id())
+	end
+	level.show_weapon(true)
+	db.del_actor(self.object)
+
+	self.object:set_callback(callback.inventory_info, nil)
+	self.object:set_callback(callback.article_info, nil)
+	self.object:set_callback(callback.on_item_take, nil)
+	self.object:set_callback(callback.on_item_drop, nil)
+	self.object:set_callback(callback.task_state, nil)
+	self.object:set_callback(callback.level_border_enter, nil)
+	self.object:set_callback(callback.level_border_exit, nil)
+	self.object:set_callback(callback.take_item_from_box, nil)
+	self.object:set_callback(callback.use_object, nil)
+
+	log("--------->"..tostring(_G.amb_vol))
+	log("--------->"..tostring(_G.mus_vol))
+	if(_G.amb_vol~=0) then
+		get_console():execute("snd_volume_eff "..tostring(_G.amb_vol))
+		_G.amb_vol = 0
+	end
+	if(_G.mus_vol~=0) then
+	    get_console():execute("snd_volume_music "..tostring(_G.mus_vol))
+		_G.mus_vol = 0
+	end
+	if sr_psy_antenna.psy_antenna then
+		sr_psy_antenna.psy_antenna:destroy()
+		sr_psy_antenna.psy_antenna = false
+	end
+	xrs_dyn_music.finish_theme()
+	xr_s.on_actor_destroy()
+	object_binder.net_destroy(self)
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:reinit()
+	object_binder.reinit(self)
+	local npc_id = self.object:id()
+	db.storage[npc_id] = { }
+	self.st = db.storage[npc_id]
+	self.st.pstor = nil
+
+	self.object:set_callback(callback.inventory_info, self.info_callback, self)
+	self.object:set_callback(callback.on_item_take, self.on_item_take, self)
+	self.object:set_callback(callback.on_item_drop, self.on_item_drop, self)
+	self.object:set_callback(callback.trade_sell_buy_item, self.on_trade, self) -- for game stats
+	self.object:set_callback(callback.task_state, self.task_callback, self)
+	self.object:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
+	self.object:set_callback(callback.use_object, self.use_inventory_item, self)
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:take_item_from_box(box, item)
+	local box_name = box:name()
+end
+
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:info_callback(npc, info_id)
+	printf("*INFO*: npc='%s' id='%s'", npc:name(), info_id)
+	--' Сюжет
+	-- Отметки на карте
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:on_trade (item, sell_bye, money)
+	if sell_bye == true then
+		 game_stats.money_trade_update (money)
+	else
+		 game_stats.money_trade_update (-money)
+	end
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:article_callback(npc, group, name)
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:on_item_take (obj)
+	printf("on_item_take [%s]", obj:name())
+	if isArtefact(obj) then
+		local anomal_zone = bind_anomaly_zone.parent_zones_by_artefact_id[obj:id()]
+		if anomal_zone ~= nil then
+			anomal_zone:on_artefact_take(obj)
+		else
+			bind_anomaly_zone.artefact_ways_by_id[obj:id()] = nil
+		end
+		local artefact = obj:get_artefact()
+		artefact:FollowByPath("NULL",0,vector():set(500,500,500))
+		xr_statistic.inc_founded_artefacts_counter(obj:id())
+--[[
+		local s_art = alife():object(obj:id())
+		if(s_art) then
+			xr_statistic.inc_founded_artefacts_counter(s_art:section_name())
+		else
+			xr_statistic.inc_founded_artefacts_counter()
+		end
+]]
+	end
+	treasure_manager.get_treasure_manager():on_item_take(obj:id())
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:on_item_drop (obj)
+end
+
+function actor_binder:use_inventory_item(obj)
+	if(obj) then
+		local s_obj = alife():object(obj:id())
+		if(s_obj) and (s_obj:section_name()=="drug_anabiotic") then
+			xr_effects.disable_ui_only(db.actor, nil)
+			level.add_cam_effector("camera_effects\\surge_02.anm", 10, false, "bind_stalker.anabiotic_callback")
+			level.add_pp_effector("surge_fade.ppe", 11, false)
+			give_info("anabiotic_in_process")
+			_G.mus_vol = get_console():get_float("snd_volume_music")
+			_G.amb_vol = get_console():get_float("snd_volume_eff")
+			get_console():execute("snd_volume_music 0")
+			get_console():execute("snd_volume_eff 0")
+		end
+	end
+end
+
+function anabiotic_callback()
+	level.add_cam_effector("camera_effects\\surge_01.anm", 10, false, "bind_stalker.anabiotic_callback2")
+	local rnd = math.random(35,45)
+	local m = surge_manager.get_surge_manager()
+	if(m.started) then
+		local tf = level.get_time_factor()
+		local diff_sec = math.ceil(game.get_game_time():diffSec(m.inited_time)/tf)
+			if(rnd>(m.surge_time-diff_sec)*tf/60) then
+			m.time_forwarded = true
+			m.ui_disabled = true
+			m:kill_all_unhided()
+			m:end_surge()
+		end
+	end
+	level.change_game_time(0,0,rnd)
+	level_weathers.get_weather_manager():forced_weather_change()
+	printf("anabiotic_callback: time forwarded on [%d]", rnd)
+end
+
+function anabiotic_callback2()
+	xr_effects.enable_ui(db.actor, nil)
+    get_console():execute("snd_volume_music "..tostring(_G.mus_vol))
+	get_console():execute("snd_volume_eff "..tostring(_G.amb_vol))
+	_G.amb_vol = 0
+	_G.mus_vol = 0
+	disable_info("anabiotic_in_process")
+end
+----------------------------------------------------------------------------------------------------------------------
+
+function actor_binder:task_callback(_task, _state)
+	if _state ~= task.fail then
+		if _state == task.completed then
+			news_manager.send_task(db.actor, "complete", _task)
+		else
+			news_manager.send_task(db.actor, "new", _task)
+		end
+	end
+	task_manager.task_callback(_task, _state)
+end
+
+----------------------------------------------------------------------------------------------------------------------
+
+function actor_binder:update(delta)
+	object_binder.update(self, delta)
+
+	if string.find(command_line(), "-designer") then
+		return
+	end
+
+	if self.already_jumped==false and jump_level.need_jump==true and (device().frame > self.spawn_frame+2000) then
+		jump_level.try_to_jump()
+		self.already_jumped = true
+		return
+	end
+
+	-- Вызов апдейта переноса игрока проводником
+	if travel_func ~= nil then
+		travel_func()
+	end
+
+	-- DEBUG slowdown
+	--slowdown.update()
+	local time = time_global()
+	game_stats.update (delta, self.object)
+	-- апдейт погоды
+	self.weather_manager:update()
+
+	self:check_detective_achievement()
+	self:check_mutant_hunter_achievement()
+
+	--' Апдейт саундменеджера
+	xr_sound.update(self.object:id())
+
+	-- Обновление отключения ввода с клавиатуры.
+	if self.st.disable_input_time ~= nil and
+		game.get_game_time():diffSec(self.st.disable_input_time) >= self.st.disable_input_idle
+		then
+		level.enable_input()
+		self.st.disable_input_time = nil
+	end
+
+	-- Апдейт прятание оружия игрока во время диалога
+	if self.object:is_talking() then
+		if self.weapon_hide_in_dialog == false then
+			self.object:hide_weapon()
+			printf("hiding weapon!!!")
+			self.weapon_hide_in_dialog = true
+		end
+	else
+		if self.weapon_hide_in_dialog == true then
+			printf("restoring weapon!!!")
+			self.object:restore_weapon()
+			self.weapon_hide_in_dialog = false
+		end
+	end
+	-- Апдейт прятание оружия игрока в зоне sr_no_weapon
+	if check_for_weapon_hide_by_zones() == true then
+		if self.weapon_hide == false then
+			printf("hiding weapon!!!")
+			self.object:hide_weapon()
+			self.weapon_hide = true
+		end
+	else
+		if self.weapon_hide == true then
+			printf("restoring weapon!!!")
+			self.object:restore_weapon()
+			self.weapon_hide = false
+		end
+	end
+
+	-- обновление пси-антенны
+	if sr_psy_antenna.psy_antenna then
+		sr_psy_antenna.psy_antenna:update(delta)
+	end
+--[[
+	--' Вывод сообщения о большой радиации
+	if self.object.radiation >= 0.7 then
+		local hud = get_hud()
+		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
+		if custom_static == nil then
+			hud:AddCustomStatic("cs_radiation_danger", true)
+			hud:GetCustomStatic("cs_radiation_danger"):wnd():TextControl():SetTextST("st_radiation_danger")
+		end
+	else
+		local hud = get_hud()
+		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
+		if custom_static ~= nil then
+			hud:RemoveCustomStatic("cs_radiation_danger")
+		end
+	end
+]]--
+
+	if self.bCheckStart then
+		printf("SET DEFAULT INFOS")
+		if not has_alife_info("global_dialogs") then
+			self.object:give_info_portion("global_dialogs")
+		end
+		if not has_alife_info("level_changer_icons") then
+			self.object:give_info_portion("level_changer_icons")
+		end
+		self.bCheckStart = false
+
+--		if self.actor_weapon_on_start == true then
+--			db.actor:activate_slot(3)
+--			self.actor_weapon_on_start = false
+--		end
+	end
+--	device().precache_frame  == 0 and
+	if not self.loaded_slot_applied then
+		self.object:activate_slot(self.loaded_active_slot)
+		self.loaded_slot_applied = true
+	end
+	
+	xr_s.on_actor_update(delta)
+
+	if(self.surge_manager) then
+		if(self.f_surge_manager_loaded ~= true) then
+			self.surge_manager:initialize()
+			self.f_surge_manager_loaded = true
+		end
+		if(self.surge_manager.levels_respawn[level.name()]) then
+			self.surge_manager:respawn_artefacts_and_replace_anomaly_zone()
+		end
+		self.surge_manager:update()
+	end
+	-- Апдейт доступности для симуляции.
+	simulation_objects.get_sim_obj_registry():update_avaliability(alife():actor())
+
+	if not self.loaded then
+		get_console():execute("dump_infos")
+		self.loaded = true
+	end
+	treasure_manager.get_treasure_manager():update()
+
+	if not(primary_objects_filled) then
+		pda.fill_primary_objects()
+		primary_objects_filled = true
+	end
+	pda.fill_sleep_zones()
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:save(packet)
+	set_save_marker(packet, "save", false, "actor_binder")
+	object_binder.save(self, packet)
+	--' Сохраняем уровень сложности
+	packet:w_u8(level.get_game_difficulty())
+	--' Сохраняем данные об отключенном вводе
+	if self.st.disable_input_time == nil then
+		packet:w_bool(false)
+	else
+		packet:w_bool(true)
+		utils.w_CTime(packet, self.st.disable_input_time)
+	end
+	xr_logic.pstor_save_all(self.object, packet)
+	self.weather_manager:save(packet)
+	release_body_manager.get_release_body_manager():save(packet)
+	self.surge_manager:save(packet)
+	sr_psy_antenna.save( packet )
+	packet:w_bool(sim_board.get_sim_board().simulation_started)
+
+	xr_sound.actor_save(packet)
+	packet:w_stringZ(tostring(self.last_level_name))
+	xr_statistic.save(packet)
+	treasure_manager.get_treasure_manager():save(packet)
+
+	local n = 0
+	for k,v in pairs(db.script_ids) do
+		n = n + 1
+	end
+	packet:w_u8(n)
+	for k,v in pairs (db.script_ids) do
+		packet:w_u16(k)
+		packet:w_stringZ(v)
+	end
+	task_manager.get_task_manager():save(packet)
+
+--	packet:w_bool(self.actor_weapon_on_start)
+	
+	packet:w_u8(self.object:active_slot())
+
+
+	local deimos_exist = false
+	for k,v in pairs(db.zone_by_name) do
+		if(db.storage[v:id()] and db.storage[v:id()].active_scheme=="sr_deimos") then
+			deimos_exist = true
+			packet:w_bool(true)
+			packet:w_float(db.storage[v:id()].sr_deimos.intensity)
+		end
+	end
+	if not deimos_exist then
+		packet:w_bool(false)
+	end
+
+	if self.last_detective_achievement_spawn_time == nil then
+		packet:w_bool(false)
+	else
+		packet:w_bool(true)
+		utils.w_CTime(packet, self.last_detective_achievement_spawn_time)
+	end
+	if self.last_mutant_hunter_achievement_spawn_time == nil then
+		packet:w_bool(false)
+	else
+		packet:w_bool(true)
+		utils.w_CTime(packet, self.last_mutant_hunter_achievement_spawn_time)
+	end
+	set_save_marker(packet, "save", true, "actor_binder")
+end
+----------------------------------------------------------------------------------------------------------------------
+function actor_binder:load(reader)
+	set_save_marker(reader, "load", false, "actor_binder")
+	object_binder.load(self, reader)
+	--' Загружаем уровень сложности
+	local game_difficulty = reader:r_u8()
+	printf("load game_difficulty %s", tostring(game_difficulty))
+	get_console():execute("g_game_difficulty "..game_difficulty_by_num[game_difficulty])
+	local stored_input_time = reader:r_u8()
+	if stored_input_time == true then
+		self.st.disable_input_time = utils.r_CTime(reader)
+	end
+	xr_logic.pstor_load_all(self.object, reader)
+	self.weather_manager:load(reader)
+	release_body_manager.get_release_body_manager():load(reader)
+--	self.surge_manager:initialize()
+	self.surge_manager:load(reader)
+	self.f_surge_manager_loaded = true
+	sr_psy_antenna.load(reader)
+	sim_board.get_sim_board().simulation_started = reader:r_bool()
+
+	xr_sound.actor_load(reader)
+	local n = reader:r_stringZ()
+	if(n~="nil") then
+		self.last_level_name = n
+	end
+	xr_statistic.load(reader)
+	treasure_manager.get_treasure_manager():load(reader)
+	n = reader:r_u8()
+	for i = 1,n do
+		db.script_ids[reader:r_u16()] = reader:r_stringZ()
+	end
+
+	task_manager.get_task_manager():load(reader)
+
+--	self.actor_weapon_on_start = reader:r_bool()
+	
+	self.loaded_active_slot = reader:r_u8()
+	
+	self.loaded_slot_applied = false
+
+	local b = reader:r_bool()
+	if(b) then
+		self.deimos_intensity = reader:r_float()
+	end
+
+	local stored_achievement_time = reader:r_bool()
+	if stored_achievement_time == true then
+		self.last_detective_achievement_spawn_time = utils.r_CTime(reader)
+	end
+	stored_achievement_time = reader:r_bool()
+	if stored_achievement_time == true then
+		self.last_mutant_hunter_achievement_spawn_time = utils.r_CTime(reader)
+	end
+	set_save_marker(reader, "load", true, "actor_binder")
+end
+
+--*************************************************************
+--*					Подспаун вещей в ящики					  *
+--*************************************************************
+local detective_achievement_items 		= {	"medkit",
+											"antirad",
+											"bandage"}
+
+local mutant_hunter_achievement_items	= {	"ammo_5.45x39_ap",
+											"ammo_5.56x45_ap",
+											"ammo_9x39_ap",
+											"ammo_5.56x45_ap",
+											"ammo_12x76_zhekan"}
+
+local function spawn_achivement_items(items_table, count, inv_box_story_id)
+	local inv_box = alife():object(get_story_object_id(inv_box_story_id))
+	for i = 1,count do
+		alife():create(items_table[math.random(#items_table)],
+						inv_box.position,
+						inv_box.m_level_vertex_id,
+						inv_box.m_game_vertex_id,
+						inv_box.id)
+	end
+end
+
+function actor_binder:check_detective_achievement()
+	if not has_alife_info("detective_achievement_gained") then
+		return
+	end
+	if self.last_detective_achievement_spawn_time == nil then
+		self.last_detective_achievement_spawn_time = game.get_game_time()
+	end
+	if game.get_game_time():diffSec(self.last_detective_achievement_spawn_time) > 43200 then
+		spawn_achivement_items(detective_achievement_items, 4, "zat_a2_actor_treasure")
+		xr_effects.send_tip(db.actor, nil, {"st_detective_news","got_medicine"})
+		self.last_detective_achievement_spawn_time = game.get_game_time()
+	end
+end
+
+function actor_binder:check_mutant_hunter_achievement()
+	if not has_alife_info("mutant_hunter_achievement_gained") then
+		return
+	end
+	if self.last_mutant_hunter_achievement_spawn_time == nil then
+		self.last_mutant_hunter_achievement_spawn_time = game.get_game_time()
+	end
+	if game.get_game_time():diffSec(self.last_mutant_hunter_achievement_spawn_time) > 43200 then
+		spawn_achivement_items(mutant_hunter_achievement_items, 5, "jup_b202_actor_treasure")
+		xr_effects.send_tip(db.actor, nil, {"st_mutant_hunter_news","got_ammo"})
+		self.last_mutant_hunter_achievement_spawn_time = game.get_game_time()
+	end
+
+end
+
+----------------------------------------------------------------------------------------------------------------------
+
+function check_for_weapon_hide_by_zones()
+	for k,v in pairs(weapon_hide) do
+		if v == true then
+			return true
+		end
+	end
+	return false
+end
+
+-- Weapon functions
+function hide_weapon(zone_id)
+	printf("[WEAPON_CONTROL]:hiding weapon from zone [%s] in section [%s]!!!", zone_id, db.storage[zone_id].active_section)
+	weapon_hide[zone_id] = true
+end
+
+function restore_weapon(zone_id)
+	printf("[WEAPON_CONTROL]:restoring weapon from zone [%s] in section [%s]!!!", zone_id, db.storage[zone_id].active_section)
+	weapon_hide[zone_id] = false
+end
+
+
+
+
+
+
+
+
+
+
