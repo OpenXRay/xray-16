@@ -191,7 +191,7 @@ class cl_fog_params : public R_constant_setup
             float n = g_pGamePersistent->Environment().CurrentEnv.fog_near;
             float f = g_pGamePersistent->Environment().CurrentEnv.fog_far;
             float r = 1 / (f - n);
-            result.set(-n * r, r, r, r);
+            result.set(-n * r, n, f, r);
         }
         cmd_list.set_c(C, result);
     }
@@ -208,7 +208,7 @@ class cl_fog_color : public R_constant_setup
         if (marker != Device.dwFrame)
         {
             const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
-            result.set(desc.fog_color.x, desc.fog_color.y, desc.fog_color.z, 0);
+            result.set(desc.fog_color.x, desc.fog_color.y, desc.fog_color.z, desc.fog_density);
         }
         cmd_list.set_c(C, result);
     }
@@ -391,6 +391,19 @@ static cl_entity_data binder_entity_data;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
 extern ENGINE_API float ps_ssfx_wpn_dof_2;
 
+class cl_inv_v : public R_constant_setup
+{
+    u32    marker;
+    Fmatrix    result;
+
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        result.invert(Device.mView);
+        cmd_list.set_c(C, result);
+    }
+};
+static cl_inv_v binder_inv_v;
+
 class cl_rain_params : public R_constant_setup
 {
     u32 marker;
@@ -543,6 +556,7 @@ void CBlender_Compile::SetMapping()
     r_Constant("rain_params", &binder_rain_params);
     r_Constant("pp_img_corrections", &binder_image_corrections);
     r_Constant("pp_img_cg", &binder_color_grading);
+    r_Constant("m_inv_V", &binder_inv_v);
 
     // Ascii1457's Screen Space Shaders
     r_Constant("sky_color", &binder_sky_color);
