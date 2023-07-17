@@ -45,14 +45,16 @@ v2p_bumped 	main 	(v_tree I)
 	// Calculate the 3x3 transform from tangent space to eye-space
 	// TangentToEyeSpace = object2eye * tangent2object
 	//		     = object2eye * transpose(object2tangent) (since the inverse of a rotation is its transpose)
-	float3 	N 		= unpack_bx4(I.Nh);	// just scale (assume normal in the -.5f, .5f)
-	float3 	T 		= unpack_bx4(I.T);	//
-	float3 	B 		= unpack_bx4(I.B);	//
+	//Normal mapping
+	float3 	N 	= unpack_bx4(I.Nh);
+	float3 	T 	= unpack_bx4(I.T);
+	float3 	B 	= unpack_bx4(I.B);
+
 	float3x3 xform	= mul	((float3x3)m_xform_v, float3x3(
 						T.x,B.x,N.x,
 						T.y,B.y,N.y,
 						T.z,B.z,N.z
-					));
+				));
 
 	// The pixel shader operates on the bump-map in [0..1] range
 	// Remap this range in the matrix, anyway we are pixel-shader limited :)
