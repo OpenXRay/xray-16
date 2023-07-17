@@ -49,7 +49,7 @@ class xrCompressor
     u8* c_heap{};
     u32 dwTimeStart{};
 
-    size_t XRP_TARGET_SIZE{ 1024u * 1024u * 640u }; // bytes (640Mb)
+    size_t XRP_TARGET_SIZE{ XRP_MAX_SIZE }; // bytes (640Mb)
 
 public:
     static constexpr
