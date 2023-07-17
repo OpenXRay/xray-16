@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "xrCompress.h"
 
-#ifndef MOD_COMPRESS
 extern int ProcessDifference();
-#endif
 
 int __cdecl main(int argc, char* argv[])
 {
@@ -14,19 +12,17 @@ int __cdecl main(int argc, char* argv[])
     printf("\n\n");
 
 
-#ifndef MOD_COMPRESS
     if (strstr(params, "-diff"))
     {
         ProcessDifference();
     }
     else
-#endif
     {
-#ifndef MOD_COMPRESS
         if (argc < 2)
         {
             printf("ERROR: u must pass folder name as parameter.\n");
             printf("-diff /? option to get information about creating difference.\n");
+            printf("-xdb	- pack files into .xdb format\n");
             printf("-fast	- fast compression.\n");
             printf("-store	- store files. No compression.\n");
             printf("-max_size <MB>       - set maximum archive size. Default: [%zu MB]\n", xrCompressor::XRP_MAX_SIZE);
@@ -41,7 +37,6 @@ int __cdecl main(int argc, char* argv[])
             Core._destroy();
             return 3;
         }
-#endif
 
         string_path folder;
         strconcat(sizeof(folder), folder, argv[1], "\\");
@@ -55,6 +50,7 @@ int __cdecl main(int argc, char* argv[])
 
         C.SetStoreFiles(nullptr != strstr(params, "-store"));
         C.SetFastMode(nullptr != strstr(params, "-fast"));
+        C.SetPackingToXDB(nullptr != strstr(params, "-xdb"));
         C.SetTargetName(argv[1]);
 
         if (cpcstr temp = strstr(params, "-max_size"))

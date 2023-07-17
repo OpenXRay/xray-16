@@ -6,6 +6,7 @@ class xrCompressor
 {
     bool bFast{};
     bool bStoreFiles{};
+    bool bPackingToXDB;
     IWriter* fs_pack_writer{};
     CMemoryWriter fs_desc;
     shared_str target_name;
@@ -61,6 +62,7 @@ public:
 
     void SetFastMode(bool b) { bFast = b; }
     void SetStoreFiles(bool b) { bStoreFiles = b; }
+    void SetPackingToXDB(bool b) { bPackingToXDB = b; }
     void SetTargetName(LPCSTR n) { target_name = n; }
     void SetPackHeaderName(LPCSTR n);
     void SetMaxVolumeSize(size_t size)
