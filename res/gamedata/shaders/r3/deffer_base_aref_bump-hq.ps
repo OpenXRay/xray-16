@@ -1,2 +1,105 @@
-#define USE_PARALLAX
-#include "deffer_base_aref_bump.ps"
+#if ( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1) ) 
+#define EXTEND_F_DEFFER
+#endif
+
+#include "common.h"
+#include "sload.h"
+
+// SSS Settings
+#include "settings_screenspace_FLORA.h"
+
+#ifdef	ATOC
+
+float4 	main	( p_bumped I ) : SV_Target
+{
+	surface_bumped 	S 		= sload 	(I);
+	S.base.w = (S.base.w-def_aref*0.5f)/(1-def_aref*0.5f);
+	return S.base;
+}
+
+#else	//	ATOC
+
+#ifdef	MSAA_ALPHATEST_DX10_1_ATOC
+f_deffer 	main	( p_bumped I, float4 pos2d : SV_Position )
+#else	//	MSAA_ALPHATEST_DX10_1_ATOC
+f_deffer 	main	( p_bumped I )
+#endif	//	MSAA_ALPHATEST_DX10_1_ATOC
+{
+	f_deffer		O;
+
+#if !defined(MSAA_ALPHATEST_DX10_1)
+	surface_bumped 	S 		= sload 	(I);
+
+#if	!( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_0_ATOC) )
+	clip					(S.base.w-def_aref);
+#endif	//	!( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1_ATOC) )
+#ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
+	float alpha = (S.base.w-def_aref*0.5f)/(1-def_aref*0.5f);
+	uint mask = alpha_to_coverage ( alpha, pos2d );
+#endif	//	MSAA_ALPHATEST_DX10_1_ATOC
+
+#else	//	!defined(MSAA_ALPHATEST_DX10_1)
+	uint mask = 0x0;
+	
+	surface_bumped 	S 		= sload 	(I,MSAAOffsets[0]*(1.0/16.0));
+	
+	if( S.base.w-def_aref >= 0 ) mask |= 0x1;
+	
+	[unroll] for( int i = 1; i < MSAA_SAMPLES; ++i )
+	{
+		surface_bumped 	SI 		= sload 	(I,MSAAOffsets[i]*(1.0/16.0));
+		if( SI.base.w-def_aref >= 0 ) mask |= ( uint(0x1) << i );
+	}
+	
+	if( mask == 0x0 )
+		discard;
+#endif	//	!defined(MSAA_ALPHATEST_DX10_1)
+
+	// FLORA FIXES & IMPROVEMENTS - SSS Update 14
+	// https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders/
+
+	// Normal from texture and force Y vector to generate a nice fake SSS and specular
+	// Sun works extremly well with this fake normal, but point lights and others need a fix later on 'accum_base.ps' and 'accum_omni_unshadowed.ps'
+	float3 Ne	= mul(m_V, float3(S.normal.x, 1, S.normal.y));
+	Ne = normalize(Ne);
+
+	// Material value ( MAT_FLORA )
+	float 	ms	= 0.15f;
+
+	// Fake gloss
+	S.gloss = G_TREES_SPECULAR * saturate(S.base.g - (S.base.r + S.base.b) * 0.54f);
+	// -----------------------------------------------------------------------
+
+#ifdef USE_LM_HEMI
+//	float4	lm 	= tex2D			(s_hemi, I.lmh);
+	float4	lm 	= s_hemi.Sample( smp_rtlinear, I.lmh);
+	//float 	h  	= dot			(lm.rgb,1.h/3.h);
+	float 	h  	= get_hemi(lm);
+# ifdef USE_R2_STATIC_SUN
+//		 	ms 	= lm.w;
+			ms 	= get_sun(lm);
+# endif
+#else
+	float 	h	= I.position.w	;
+# ifdef USE_R2_STATIC_SUN
+		 	ms	= I.tcdh.w		;
+# endif
+#endif
+
+#ifndef EXTEND_F_DEFFER
+	O = pack_gbuffer(
+						float4	(Ne,										h),
+  						float4 	(I.position.xyz + Ne*S.height*def_virtualh, ms),
+  						float4	(S.base.rgb,								S.gloss) );
+#else
+	O = pack_gbuffer(
+						float4	(Ne,										h),
+  						float4 	(I.position.xyz + Ne*S.height*def_virtualh, ms),
+  						float4	(S.base.rgb,								S.gloss),
+  						mask );
+#endif
+
+	return 	O	;
+}
+
+#endif //	ATOC

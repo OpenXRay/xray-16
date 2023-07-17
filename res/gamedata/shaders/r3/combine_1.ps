@@ -1,15 +1,26 @@
+#include "anomaly_shaders.h"
 #include "common.h"
-
-//#define USE_SUPER_SPECULAR
-//#define USE_ORIGINAL_SSAO
-//#define HBAO_WORLD_JITTER
 
 #include "lmodel.h"
 #include "hmodel.h"
 
-uniform	Texture2D					s_half_depth;
+// Check MODs
+#include "check_screenspace.h"
 
-//#include "ssao_blur.ps"
+#ifdef SSFX_BEEFS_NVG
+//	#include "night_vision.h"
+#endif
+
+#ifdef SSFX_SSR
+	#include "screenspace_reflections.h"
+#endif
+
+#ifdef SSFX_FOG
+	#include "screenspace_fog.h"
+#endif
+
+Texture2D s_half_depth;
+#include "ssao.ps"
 
 #ifdef HDAO
 #define USE_HDAO 1
@@ -19,21 +30,15 @@ uniform	Texture2D					s_half_depth;
 Texture2D<float> s_occ;
 #endif // SM_5
 
-//#ifdef SSAO_QUALITY
-//#undef SSAO_QUALITY
-//#define SSAO_QUALITY 4
-//#endif
-
 #if SSAO_QUALITY <=3
-#include "ssao.ps"
-//#ifdef SM_5
-//#undef SM_5
-//#endif
+#include "ssdo.ps"
+
 #else
 #ifndef USE_HDAO
 #define USE_HDAO
 #endif
 #endif
+
 
 #ifdef USE_HDAO
 #if SSAO_QUALITY > 3
@@ -41,15 +46,11 @@ Texture2D<float> s_occ;
 #endif
 #define USE_HDAO_CODE
 #if SSAO_QUALITY <=3
-#define  g_f2RTSize ( pos_decompression_params2.xy )
-//#define  g_f2RTSize float2( 1280.0f, 1024.0f )
-#ifdef GBUFFER_OPTIMIZATION
+#define  g_f2RTSize ( screen_res.xy )
+
 #define g_txDepth s_position
 #define g_txNormal s_position
-#else
-#define g_txDepth s_position
-#define g_txNormal s_normal
-#endif
+
 #include "ssao_hdao.ps"
 #endif
 #else // USE_HDAO
@@ -57,6 +58,7 @@ Texture2D<float> s_occ;
 #include "ssao_hbao.ps"
 #endif	//	USE_HBAO
 #endif // USE_HDAO
+
 
 struct	_input
 {
@@ -87,36 +89,17 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 #ifndef USE_MSAA
 	float4	L = s_accumulator.Sample( smp_nofilter, I.tc0);	// diffuse.specular
 #else
-#	ifdef GBUFFER_OPTIMIZATION
-	float4	L = s_accumulator.Load( int3( I.pos2d.xy, 0 ), ISAMPLE);	// diffuse.specular
-#	else
-	float4   L = s_accumulator.Load( int3( I.tc0 * pos_decompression_params2.xy, 0 ), ISAMPLE );
-#	endif
+	float4   L = s_accumulator.Load( int3( I.tc0 * screen_res.xy, 0 ), ISAMPLE );
 #endif
 
-#ifdef USE_SUPER_SPECULAR
-	{
-		float ds = dot( D.rgb, 1.h/3.h );
-		D.w = max( D.w, ds*ds/8.h );
-	}
-#endif
-
-#ifdef FORCE_GLOSS
-	D.w = FORCE_GLOSS;
-#endif
-
-#ifdef USE_GAMMA_22
-	D.rgb = ( D.rgb*D.rgb ); // pow(2.2)
-#endif
-
-        // static sun
+     // static sun
 	float mtl = P.w;
 
 #ifdef USE_R2_STATIC_SUN
 	float sun_occ = P.w*2;
 
 	mtl = xmaterial;
-	L += Ldynamic_color * sun_occ * plight_infinity	(mtl, P.xyz, N.xyz, Ldynamic_dir);
+	L += Ldynamic_color * sun_occ * plight_infinity	(mtl, P.xyz, N.xyz, D.xyzw, Ldynamic_dir);
 #endif
 
 	// hemisphere
@@ -125,127 +108,138 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 	//  Calculate SSAO
 
 #ifdef USE_MSAA
-#	ifdef GBUFFER_OPTIMIZATION
 	int2	texCoord = I.pos2d;
-#	else
-	int2	texCoord = int2( I.tc0 * pos_decompression_params2.xy );
-#	endif
 #endif
 	
-/*#ifdef USE_SSAO_BLUR	
-#	ifndef USE_MSAA
-	float	occ = ssao_blur_ps(I.tc0);
-#	else
-	float   occ = ssao_blur_ps( texCoord, ISAMPLE );
-#	endif*/
+float3 occ = float3(1.0,1.0,1.0);
 
 #ifdef USE_HDAO
 #ifdef SM_5
 #if SSAO_QUALITY > 3
-    float occ = s_occ.Sample( smp_nofilter, I.tc0);	
+     occ = s_occ.Sample( smp_nofilter, I.tc0);	
 #else // SSAO_QUALITY > 3
-	float occ = calc_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+	 occ = calc_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
 #endif // SSAO_QUALITY > 3
 #else // SM_5
 #if SSAO_QUALITY > 3
-	float occ = calc_new_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+	 occ = calc_new_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
 #else // SSAO_QUALITY > 3
-	float occ = calc_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+	 occ = calc_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
 #endif // SSAO_QUALITY > 3
 #endif // SM_5
 #else // USE_HDAO
 #ifdef USE_HBAO
-	float occ = calc_hbao( P.z, N, I.tc0, I.pos2d );
+	 occ = calc_hbao( P.z, N, I.tc0, I.pos2d );
 #else // USE_HBAO
-	float occ = calc_ssao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+	occ = calc_ssdo(P, N, I.tc0, I.pos2d, ISAMPLE);
 #endif
 #endif // USE_HDAO
-	
+
+#ifdef SSAO_QUALITY
+	occ = compute_colored_ao(occ.x, D.xyz);
+#endif
+
 	hmodel	(hdiffuse, hspecular, mtl, N.w, D.w, P.xyz, N.xyz);
-//      hmodel		(hdiffuse, hspecular, mtl, 1, D.w, P.xyz, N.xyz);
-//	hdiffuse*=hdiffuse;			//. high contrast hemi
-//	hdiffuse*=(D.rgb*0.8 + 0.2h);	// rise texture contrast for diffuse lighting
-//	hdiffuse = 0.8;
-//	hdiffuse *= (occ*(D.rgb + .1h));
-	hdiffuse *= occ;
-	hspecular *= occ;
 
-        float4         light       = float4         (L.rgb + hdiffuse, L.w)        ;
-        float4         C           = D*light       ;                             // rgb.gloss * light(diffuse.specular)
-//        float3         spec        = (C.rgb*.5h + .5h)*C.w + hspecular + hspecular + hspecular;			// replicated specular
-	float3         spec        = C.www         + hspecular;      // replicated specular
-
-#ifdef         USE_SUPER_SPECULAR
-                      spec      = (C.rgb*.5h + .5h)*C.w + hspecular        ;
-#endif
-//		float3       color     = C.rgb + D.rgb*spec     ;
-//		float3       color     = C.rgb + (D.rgb*spec+spec)/0.5h;
-		float3       color     = C.rgb + spec     ;
-//		float3       color     = C.rgb + D.rgb*spec+hspecular+hspecular     ;	//	More realistic and contrast specular - Ugrumiy edition
-
-////////////////////////////////////////////////////////////////////////////////
-/// For Test ///////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-#ifdef         DBG_TEST_NMAP
-//. hemi + sun + lighting + specular
-					color 	= 	hdiffuse + L.rgb + N;
+	// AO implementation
+#ifdef SSFX_AO
+	hdiffuse *= (1.0f - (1.0f - occ) * (1.0f - dot(hdiffuse.rgb, LUMINANCE_VECTOR)));
+#else
+	hdiffuse *= occ;	
 #endif
 
-#ifdef         DBG_TEST_NMAP_SPEC
-//. hemi + sun + lighting + specular
-					color 	= 	hdiffuse + L.rgb + N + spec;
+	// Disable specular if SSR is enabled. ( Temporary fix? )
+#ifdef SSFX_SSR
+	hspecular = 0;
 #endif
 
-#ifdef         DBG_TEST_LIGHT
-//. hemi + sun + lighting + specular
-					color 	= 	hdiffuse + L.rgb;
+        float4 light = float4(L.rgb + hdiffuse, L.w)        ;
+        float4 C = D*light;                             // rgb.gloss * light(diffuse.specular)
+		float3 spec = C.www * L.rgb + hspecular * C.rgba;              // replicated specular
+
+		float3       color     = C.rgb + spec;
+		
+	// SSR Implementation
+#ifdef SSFX_SSR
+	SSFX_ScreenSpaceReflections(I.tc0, P, N, D.a, color, ISAMPLE);	
 #endif
 
-#ifdef         DBG_TEST_LIGHT_SPEC
-//. hemi + sun + lighting + specular
-					color 	= 	hdiffuse + L.rgb + spec;
-#endif
-
-#ifdef         DBG_TEST_SPEC
-//. only lighting and specular
-					color 		= spec;
-#endif
 ////////////////////////////////////////////////////////////////////////////////
 
         // here should be distance fog
-        float3        	pos        		= P.xyz;
-        float         	distance		= length		(pos);
-        float         	fog				= saturate		(distance*fog_params.w + fog_params.x); //
-                      	color			= lerp     		(color,fog_color,fog);        			//
+#ifdef SSFX_FOG
+		float3 		WorldP			= mul(m_inv_V, float4(P.xyz, 1));
+		float		fog				= SSFX_HEIGHT_FOG(P.xyz, WorldP.y, color);
+#else
+		float		distance		= length		(P.xyz);
+		float		fog				= saturate		(distance*fog_params.w + fog_params.x);
+					color			= lerp			(color,fog_color,fog);
+#endif
         float        	skyblend		= saturate		(fog*fog);
 
-#ifdef         DBG_TMAPPING
-        color                        	= D.xyz;
-#endif
         float          	tm_scale        = I.tc0.w;                // interpolated from VS
 
-#ifdef        USE_SUPER_SPECULAR
-        color        	= spec          - hspecular	;
-#endif
-//		color 		= N; //show normals
-//		color                        	= D.xyz;
-//		color 
-
-//float3 color = (0.5 * (sign( gbd.N - gbd.N_org ) + 1.0 ) );
-//color = float3( abs( gbd.hemi - gbd.hemi_org), 0, abs( gbd.mtl - gbd.mtl_org) );
-//color = abs( gbd.N - gbd.N_org );
-//		color = occ; // holger test
-		//color = gbd.N;
         _out        	o;
-        tonemap        	(o.low, o.high, color, tm_scale )	;
-                        o.low.a         = skyblend	;
-						o.high.a		= skyblend	;
-//		o.low	= skyblend;
-//		o.hight	= 0;
 
-	//o.low = float4(gbd.P,1);
+#ifndef SSFX_BEEFS_NVG
 
-	//o.low = float4( 1.0f, 0.0f, 0.0f, 1.0f );
+	tonemap(o.low, o.high, color, tm_scale);
+	o.low.a = skyblend;
+	o.high.a = skyblend;
 
-		return        	o;
+	return o;
+
+#else
+		/////////// BEEFS NVGS CHANGES ///////////
+		float lua_param_nvg_generation = floor(shader_param_8.x);             		// 1, 2, or 3
+		float lua_param_nvg_num_tubes = frac(shader_param_8.x) * 10.0f;            // 1, 2, 4, 1.1, or 1.2
+		float lua_param_nvg_gain_current = floor(shader_param_8.y) / 10.0f; 
+		float lua_param_vignette_current = floor(shader_param_8.z) / 100.0f;
+		
+		if (lua_param_nvg_generation > 0.0f && compute_lens_mask(aspect_ratio_correction(I.tc0), lua_param_nvg_num_tubes) == 1.0f)
+		{
+			float lua_param_nvg_gain_offset = floor(shader_param_8.w) / 10.0f;
+	        tonemap(o.low, o.high, color, 10.0f * lua_param_nvg_gain_offset);
+		
+			// Turn split tonemapping data to YUV and discard UV
+			o.low.r = dot(o.low.rgb, luma_conversion_coeff);
+			o.high.r = dot(o.high.rgb, luma_conversion_coeff);
+		
+			o.low.r *= 4.0f;
+			o.high.r *= 4.0f;
+		
+			// Turn s_accumulator data in to YUV and discard UV
+			o.low.g = pow(dot(L.rgb, luma_conversion_coeff),2.0f)*1.3f;
+			o.high.g = o.low.g;
+		
+			// Turn albedo into YUV and discard UV
+			o.low.b = dot(D.rgb, luma_conversion_coeff);
+			o.high.b = o.low.b;
+			
+			o.low *= lua_param_nvg_gain_current;
+			o.high *= lua_param_nvg_gain_current;
+				
+			// Extra
+			o.low.a = skyblend;
+			o.high.a = skyblend;
+					
+
+			// APPLY VIGNETTE
+			float vignette = calc_vignette(lua_param_nvg_num_tubes, I.tc0, lua_param_vignette_current+0.02);
+			
+			o.high = clamp(o.high,0.0,1.0);
+			o.low= clamp(o.low,0.0,1.0);
+			
+			o.high.rgb *= vignette;
+			o.low.rgb *= vignette;
+
+		}
+		else
+		{
+			tonemap(o.low, o.high, color, tm_scale);
+			o.low.a = skyblend;
+			o.high.a = skyblend;
+		}		
+		return o;
+#endif
 }

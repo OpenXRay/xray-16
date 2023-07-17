@@ -3,8 +3,8 @@
 struct 	v2p
 {
  	float2 	tc0: 		TEXCOORD0;	// base
-// 	float2 	tc1: 		TEXCOORD1;	// lmap
   	float3	c0:			COLOR0;		// sun
+	float  fog:			FOG;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -15,8 +15,11 @@ float4 main( v2p I ) : SV_Target
 	float4	t_base 	= s_base.Sample( smp_base, I.tc0 );
 
 	float3	light	= I.c0;
-	float3	final 	= light*t_base*2;
+	float3	final 	= light * t_base * 2;
+
+	// Fogging
+	final = lerp(fog_color, final, I.fog);
 
 	// out
-	return  float4	(final.r,final.g,final.b,t_base.a);
+	return  float4	(final.rgb,  I.fog *  I.fog * t_base.a);
 }

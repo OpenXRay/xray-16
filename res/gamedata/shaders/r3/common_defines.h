@@ -19,4 +19,13 @@
 #endif
 //////////////////////////////////////////////////////////////////////////////////////////
 
+#define SKY_DEPTH float(10000.0)
+#define SKY_EPS float(0.001)
+#define FARPLANE float(180.0)
+
+#define USABLE_BIT_13 uint(0x02000000)   // This will be translated to a +/-MAX_FLOAT in the FP16 render target (0xFBFF/0x7BFF), overwriting the 
+#define USABLE_BIT_14 uint(0x04000000)   // mantissa bits where other bit flags are stored.
+#define USABLE_BIT_15 uint(0x80000000)
+#define MUST_BE_SET uint(0x40000000)   // This flag *must* be stored in the floating-point representation of the bit flag to store
+
 #endif	//	common_defines_h_included
