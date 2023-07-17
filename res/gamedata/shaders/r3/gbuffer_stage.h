@@ -1,8 +1,6 @@
 #ifndef	GBUFFER_STAGE_H
 #define	GBUFFER_STAGE_H
 
-uniform float4		screen_res;
-
 //GBuffer targets struct
 struct f_deffer        		
 {
