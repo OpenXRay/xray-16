@@ -79,7 +79,7 @@ c2_out main( v2p_aa_AA I )
 	float2	center 	= I.Tex0;
 #endif
 
-	float3 img = s_image.Load(int3(center.xy * screen_res.xy, 0),0);
+	float3 img = s_image.SampleLevel(smp_rtlinear, center.xy, 0);
 
 	float4 bloom = s_bloom.Sample(smp_rtlinear,center);
 
