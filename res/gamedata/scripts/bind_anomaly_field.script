@@ -8,7 +8,7 @@ end
 
 class "anomaly_field_binder" (object_binder)
 function anomaly_field_binder:__init(obj) super(obj)
-	self.last_update = time_global()
+	--self.last_update = time_global()
 end
 
 function anomaly_field_binder:reload(section)
@@ -47,6 +47,7 @@ function anomaly_field_binder:set_enable(bEnable)
 	end
 end
 
+--[[
 function anomaly_field_binder:update(delta)
 	object_binder.update(self, delta)
 	if(time_global()-self.last_update<10000) then
@@ -54,6 +55,7 @@ function anomaly_field_binder:update(delta)
 	end
 	self.last_update = time_global()
 end
+]]
 
 -- Standart function for save
 function anomaly_field_binder:net_save_relevant()

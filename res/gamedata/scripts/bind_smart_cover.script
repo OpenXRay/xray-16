@@ -24,7 +24,9 @@ function smart_cover_binder:net_destroy()
 	object_binder.net_destroy(self)
 end
 
+--[[
 function smart_cover_binder:update(delta)
 	object_binder.update(self, delta)
 end
+]]
 
