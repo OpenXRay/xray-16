@@ -143,7 +143,7 @@ struct render_sun : public i_render_phase
 
     void init_cascades();
 
-    xr_vector<sun::cascade> m_sun_cascades;
+    sun::cascade m_sun_cascades[R__NUM_SUN_CASCADES];
     light* sun{ nullptr };
     bool need_to_render_sunshafts{ false };
     bool last_cascade_chain_mode{ false };

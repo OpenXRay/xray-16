@@ -5,18 +5,6 @@
 
 void render_sun::init()
 {
-    float fBias = -0.0000025f;
-
-    m_sun_cascades[0].reset_chain = true;
-    m_sun_cascades[0].size = ps_ssfx_shadow_cascades.x; //20
-    m_sun_cascades[0].bias = m_sun_cascades[0].size * fBias;
-
-    m_sun_cascades[1].size = ps_ssfx_shadow_cascades.y; //40
-    m_sun_cascades[1].bias = m_sun_cascades[1].size * fBias;
-
-    m_sun_cascades[2].size = ps_ssfx_shadow_cascades.z; //160
-    m_sun_cascades[2].bias = m_sun_cascades[2].size * fBias;
-
     // 	for( u32 i = 0; i < cascade_count; ++i )
     // 	{
     // 		m_sun_cascades[i].size = size;
@@ -413,17 +401,16 @@ void render_sun::accumulate_cascade(u32 cascade_ind)
 void render_sun::init_cascades()
 {
     u32 cascade_count = 3;
-    m_sun_cascades.resize(cascade_count);
 
     float fBias = -0.0000025f;
-    //	float size = MAP_SIZE_START;
+
     m_sun_cascades[0].reset_chain = true;
-    m_sun_cascades[0].size = 20;
+    m_sun_cascades[0].size = ps_ssfx_shadow_cascades.x; //20
     m_sun_cascades[0].bias = m_sun_cascades[0].size * fBias;
 
-    m_sun_cascades[1].size = 40;
+    m_sun_cascades[1].size = ps_ssfx_shadow_cascades.y; //40
     m_sun_cascades[1].bias = m_sun_cascades[1].size * fBias;
 
-    m_sun_cascades[2].size = 160;
+    m_sun_cascades[2].size = ps_ssfx_shadow_cascades.z; //160
     m_sun_cascades[2].bias = m_sun_cascades[2].size * fBias;
 }
