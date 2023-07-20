@@ -238,7 +238,6 @@ void CDetailManager::Unload()
 }
 
 extern ECORE_API float r_ssaDISCARD;
-extern int ps_screen_space_shaders;
 
 void CDetailManager::UpdateVisibleM()
 {
@@ -270,11 +269,7 @@ void CDetailManager::UpdateVisibleM()
             }
             u32 mask = 0xff;
 
-            u32 res;
-            if (ps_screen_space_shaders)
-                res = View.testSphere(MS.vis.sphere.P, MS.vis.sphere.R, mask);
-            else
-                res = View.testSAABB(MS.vis.sphere.P, MS.vis.sphere.R, MS.vis.box.data(), mask);
+            u32 res = View.testSphere(MS.vis.sphere.P, MS.vis.sphere.R, mask);
 
             if (fcvNone == res)
             {
@@ -302,11 +297,7 @@ void CDetailManager::UpdateVisibleM()
                 if (fcvPartial == res)
                 {
                     u32 _mask = mask;
-                    u32 _res;
-                    if (ps_screen_space_shaders)
-                        _res = View.testSphere(S.vis.sphere.P, S.vis.sphere.R, _mask);
-                    else
-                        _res = View.testSAABB(S.vis.sphere.P, S.vis.sphere.R, S.vis.box.data(), _mask);
+                    u32 _res = View.testSphere(S.vis.sphere.P, S.vis.sphere.R, _mask);
                     
                     if (fcvNone == _res)
                     {

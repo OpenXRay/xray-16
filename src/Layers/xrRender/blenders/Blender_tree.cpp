@@ -110,7 +110,6 @@ void CBlender_Tree::CompileFFP(CBlender_Compile& C) const
     C.PassEnd();
 }
 
-extern int ps_screen_space_shaders;
 void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
 {
     u32 tree_aref = 200;
@@ -130,7 +129,7 @@ void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
                 tsp = "vert_dt";
             }
             // Is a branch/bush. Use a different VS
-            if (oBlend.value && ps_screen_space_shaders)
+            if (oBlend.value)
                 tsv = "tree_branch";
             if (oBlend.value)
                 C.r_Pass(
