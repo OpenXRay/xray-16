@@ -135,15 +135,19 @@ struct r1v_lmap_unpacked
     r1v_lmap_unpacked& operator=(const r1v_lmap& packed)
     {
         P = packed.P;
-        N = Fcolor(packed.N).get();
+
+        Fcolor unpackedN(packed.N);
+        unpackedN.mul_rgb(2);
+        unpackedN.sub_rgb(1);
+        N = unpackedN.get();
 
         Fcolor T(packed.T);
         Fcolor B(packed.B);
         
         tc0x = (packed.tc0x + T.a) * (32.f / 32768.f);
         tc0y = (packed.tc0y + B.a) * (32.f / 32768.f);
-        tc1x = tc0x;
-        tc1y = tc0y;
+        tc1x = packed.tc1x * (1.f / 32768.f);
+        tc1y = packed.tc1y * (1.f / 32768.f);
         
         return *this;
     }
@@ -188,7 +192,12 @@ struct r1v_vert_unpacked
     r1v_vert_unpacked& operator=(const r1v_vert& packed)
     {
         P = packed.P;
-        N = Fcolor(packed.N).get();
+
+        Fcolor unpackedN(packed.N);
+        unpackedN.mul_rgb(2);
+        unpackedN.sub_rgb(1);
+        N = unpackedN.get();
+
         C = packed.C;
 
         Fcolor T(packed.T);

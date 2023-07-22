@@ -34,23 +34,14 @@ struct WaveForm
     }
 
 public:
-    EFunction F;
-    float arg[4];
+    EFunction F{ fCONSTANT };
+    float arg[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
     IC float Calculate(float t) noexcept
     {
         // y = arg0 + arg1*func( (time+arg2)*arg3 )
         float x = (t + arg[2]) * arg[3];
         return arg[0] + arg[1] * Func(x - floorf(x));
-    }
-
-    WaveForm()
-    {
-        F = fCONSTANT;
-        arg[0] = 0;
-        arg[1] = 1;
-        arg[2] = 0;
-        arg[3] = 1;
     }
 
     IC bool Similar(const WaveForm& W) const noexcept

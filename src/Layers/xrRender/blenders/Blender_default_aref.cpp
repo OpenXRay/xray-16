@@ -67,7 +67,7 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
 
 void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
 {
-    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
     {
         C.PassBegin();
         {
@@ -105,9 +105,12 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
                 C.PassSET_LightFog(false, true);
 
                 // Stage0 - Lightmap
-                C.StageBegin();
-                C.StageTemplate_LMAP0();
-                C.StageEnd();
+                if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+                {
+                    C.StageBegin();
+                    C.StageTemplate_LMAP0();
+                    C.StageEnd();
+                }
 
                 // Stage1 - Base texture
                 C.StageBegin();
@@ -117,6 +120,7 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
                 C.StageEnd();
             }
             C.PassEnd();
+            break;
         }
         case SE_R1_LMODELS:
         {
@@ -128,16 +132,16 @@ void CBlender_default_aref::CompileFFP(CBlender_Compile& C) const
                 C.PassSET_LightFog(false, true);
 
                 // Stage0 - Lightmap
-                C.StageBegin();
-                C.StageTemplate_LMAP0();
-                C.StageEnd();
+                if (ps_r1_flags.test(R1FLAG_FFP_LIGHTMAPS))
+                {
+                    C.StageBegin();
+                    C.StageTemplate_LMAP0();
+                    C.StageEnd();
+                }
             }
             C.PassEnd();
             break;
         }
-
-        default:
-            break;
         } // switch (C.iElement)
     }
 }

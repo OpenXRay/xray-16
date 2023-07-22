@@ -19,7 +19,7 @@ void CRenderTarget::phase_flip()
     float d_Z = EPS_S, d_W = 1.f;
 
     // Fill vertex buffer
-    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_flip->vb_stride, Offset);
+    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_flip->vb_stride, Offset);
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p0.y);
     pv++;
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p1.y);
@@ -28,7 +28,7 @@ void CRenderTarget::phase_flip()
     pv++;
     pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p1.y);
     pv++;
-    RCache.Vertex.Unlock(4, g_flip->vb_stride);
+    RImplementation.Vertex.Unlock(4, g_flip->vb_stride);
 
     // Draw
     RCache.set_Element(s_flip->E[0]);

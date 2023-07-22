@@ -17,6 +17,8 @@ template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs
 
 void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
 {
+    PIX_EVENT_CTX(cmd_list, dsgraph_render_lods);
+
     if (mapLOD.empty())
         return;
 
@@ -37,7 +39,7 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
         ssaRange = EPS_S;
 
     const u32 uiVertexPerImposter = 4;
-    const u32 uiImpostersFit = RCache.Vertex.GetSize() / (firstV->geom->vb_stride * uiVertexPerImposter);
+    const u32 uiImpostersFit = RImplementation.Vertex.GetSize() / (firstV->geom->vb_stride * uiVertexPerImposter);
 
     //Msg("dbg_lods: shid[%d],firstV[%X]",shid,u32((void*)firstV));
     //Msg("dbg_lods: shader[%X]",u32((void*)firstV->shader._get()));
@@ -49,7 +51,7 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
         int cur_count = 0;
         u32 vOffset;
         FLOD::_hw* V =
-            (FLOD::_hw*)RCache.Vertex.Lock(iBatchSize * uiVertexPerImposter, firstV->geom->vb_stride, vOffset);
+            (FLOD::_hw*)RImplementation.Vertex.Lock(iBatchSize * uiVertexPerImposter, firstV->geom->vb_stride, vOffset);
 
         for (u32 j = 0; j < iBatchSize; ++j, ++i)
         {
@@ -118,10 +120,10 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
             }
         }
         lstLODgroups.push_back(cur_count);
-        RCache.Vertex.Unlock(iBatchSize * uiVertexPerImposter, firstV->geom->vb_stride);
+        RImplementation.Vertex.Unlock(iBatchSize * uiVertexPerImposter, firstV->geom->vb_stride);
 
         // *** Render
-        RCache.set_xform_world(Fidentity);
+        cmd_list.set_xform_world(Fidentity);
         for (u32 uiPass = 0; uiPass < SHADER_PASSES_MAX; ++uiPass)
         {
             int current = 0;
@@ -133,11 +135,11 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
                 u32 uiNumPasses = lstLODs[current].pVisual->shader->E[shid]->passes.size();
                 if (uiPass < uiNumPasses)
                 {
-                    RCache.set_Element(lstLODs[current].pVisual->shader->E[shid], uiPass);
-                    RCache.set_Geometry(firstV->geom);
-                    RCache.Render(D3DPT_TRIANGLELIST, vCurOffset, 0, 4 * p_count, 0, 2 * p_count);
+                    cmd_list.set_Element(lstLODs[current].pVisual->shader->E[shid], uiPass);
+                    cmd_list.set_Geometry(firstV->geom);
+                    cmd_list.Render(D3DPT_TRIANGLELIST, vCurOffset, 0, 4 * p_count, 0, 2 * p_count);
                 }
-                RCache.stat.r.s_flora_lods.add(4 * p_count);
+                cmd_list.stat.r.s_flora_lods.add(4 * p_count);
                 current += p_count;
                 vCurOffset += 4 * p_count;
             }

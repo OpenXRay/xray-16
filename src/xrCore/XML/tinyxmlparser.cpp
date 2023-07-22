@@ -655,7 +655,7 @@ const char* TiXmlBase::ReadText(const char* p, TIXML_STRING* text, bool trimWhit
 //			{
 //				node->StreamIn( in, tag );
 //				bool isElement = node->ToElement() != 0;
-//				delete node;
+//				xr_delete(node);
 //				node = 0;
 //
 //				// If this is the root element, we're done. Parsing will be
@@ -1010,7 +1010,7 @@ TiXmlNode* TiXmlNode::Identify(const char* p, TiXmlEncoding encoding)
 //				if ( !node )
 //					return;
 //				node->StreamIn( in, tag );
-//				delete node;
+//				xr_delete(node);
 //				node = 0;
 //
 //				// No return: go around from the beginning: text, closing tag, or node.
@@ -1132,7 +1132,7 @@ const char* TiXmlElement::Parse(TiXmlDocument* document, const char* p, TiXmlPar
             {
                 if (document)
                     document->SetError(TIXML_ERROR_PARSING_ELEMENT, pErr, data, encoding);
-                delete attrib;
+                xr_delete(attrib);
                 return 0;
             }
 
@@ -1145,7 +1145,7 @@ const char* TiXmlElement::Parse(TiXmlDocument* document, const char* p, TiXmlPar
             if (node)
             {
                 node->SetValue(attrib->Value());
-                delete attrib;
+                xr_delete(attrib);
                 return 0;
             }
 
@@ -1191,7 +1191,7 @@ const char* TiXmlElement::ReadValue(const char* p, TiXmlParsingData* data, TiXml
             if (!textNode->Blank())
                 LinkEndChild(textNode);
             else
-                delete textNode;
+                xr_delete(textNode);
         }
         else
         {

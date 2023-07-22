@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-void CRenderTarget::accum_reflected(light* L)
+void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
 {
-    phase_accumulator();
+    phase_accumulator(cmd_list);
     RImplementation.Stats.l_visible++;
 
     // *** assume accumulator setted up ***
@@ -10,19 +10,19 @@ void CRenderTarget::accum_reflected(light* L)
 
     bool bIntersect = false; // enable_scissor(L);
     L->xform_calc();
-    RCache.set_xform_world(L->m_xform);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    cmd_list.set_xform_world(L->m_xform);
+    cmd_list.set_xform_view(Device.mView);
+    cmd_list.set_xform_project(Device.mProject);
     bIntersect = enable_scissor(L);
     enable_dbt_bounds(L);
 
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
-    RCache.set_ColorWriteEnable();
+    cmd_list.set_ColorWriteEnable();
     if (bIntersect)
-        RCache.set_CullMode(CULL_CW); // back
+        cmd_list.set_CullMode(CULL_CW); // back
     else
-        RCache.set_CullMode(CULL_CCW); // front
+        cmd_list.set_CullMode(CULL_CCW); // front
 
     // 2D texgen (texture adjustment matrix)
     Fmatrix m_Texgen;
@@ -50,7 +50,7 @@ void CRenderTarget::accum_reflected(light* L)
 #else
 #   error No graphics API selected or enabled!
 #endif
-        m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
+        m_Texgen.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
     }
 
     // Common constants
@@ -64,55 +64,55 @@ void CRenderTarget::accum_reflected(light* L)
 
     {
         // Lighting
-        RCache.set_Shader(s_accum_reflected);
+        cmd_list.set_Shader(s_accum_reflected);
 
         // Constants
-        RCache.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, 1 / (L->range * L->range));
-        RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
-        RCache.set_c("direction", L_dir.x, L_dir.y, L_dir.z, 0.f);
-        RCache.set_c("m_texgen", m_Texgen);
+        cmd_list.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, 1 / (L->range * L->range));
+        cmd_list.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
+        cmd_list.set_c("direction", L_dir.x, L_dir.y, L_dir.z, 0.f);
+        cmd_list.set_c("m_texgen", m_Texgen);
 
 #ifdef USE_DX9
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
-        draw_volume(L);
+        draw_volume(cmd_list, L);
 #elif defined(USE_DX11) || defined(USE_OGL)
         if (!RImplementation.o.msaa)
         {
-            RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
-            draw_volume(L);
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
+            draw_volume(cmd_list, L);
         }
         else // checked Holger
         {
             // per pixel
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0x00);
-            draw_volume(L);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0x00);
+            draw_volume(cmd_list, L);
 
             // per sample
             if (RImplementation.o.msaa_opt)
             {
-                RCache.set_Shader(s_accum_reflected_msaa[0]);
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
+                cmd_list.set_Shader(s_accum_reflected_msaa[0]);
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
                 if (bIntersect)
-                    RCache.set_CullMode(CULL_CW); // back
+                    cmd_list.set_CullMode(CULL_CW); // back
                 else
-                    RCache.set_CullMode(CULL_CCW); // front
-                draw_volume(L);
+                    cmd_list.set_CullMode(CULL_CCW); // front
+                draw_volume(cmd_list, L);
             }
             else // checked Holger
             {
 #   if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
-                    RCache.set_Shader(s_accum_reflected_msaa[i]);
-                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
+                    cmd_list.set_Shader(s_accum_reflected_msaa[i]);
+                    cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
                     if (bIntersect)
-                        RCache.set_CullMode(CULL_CW); // back
+                        cmd_list.set_CullMode(CULL_CW); // back
                     else
-                        RCache.set_CullMode(CULL_CCW); // front
-                    StateManager.SetSampleMask(u32(1) << i);
-                    draw_volume(L);
+                        cmd_list.set_CullMode(CULL_CCW); // front
+                    cmd_list.StateManager.SetSampleMask(u32(1) << i);
+                    draw_volume(cmd_list, L);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                cmd_list.StateManager.SetSampleMask(0xffffffff);
 #   elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #   endif // USE_DX11
@@ -124,47 +124,47 @@ void CRenderTarget::accum_reflected(light* L)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        u_setrt(rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
-        RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
-        RCache.set_c("m_texgen", m_Texgen);
+        u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+        cmd_list.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
+        cmd_list.set_c("m_texgen", m_Texgen);
 #ifdef USE_DX9
-        draw_volume(L);
+        draw_volume(cmd_list, L);
 #elif defined(USE_DX11) || defined(USE_OGL)
         if (!RImplementation.o.msaa)
         {
             // per pixel
-            RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
-            draw_volume(L);
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
+            draw_volume(cmd_list, L);
         }
         else // checked holger
         {
             // per pixel
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0x00);
-            draw_volume(L);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0x00);
+            draw_volume(cmd_list, L);
             // per sample
             if (RImplementation.o.msaa_opt)
             {
-                RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_VOL]);
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
-                draw_volume(L);
+                cmd_list.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_VOL]);
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
+                draw_volume(cmd_list, L);
             }
             else // checked holger
             {
 #   if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
-                    RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
-                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
-                    StateManager.SetSampleMask(u32(1) << i);
-                    draw_volume(L);
+                    cmd_list.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
+                    cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0x00);
+                    cmd_list.StateManager.SetSampleMask(u32(1) << i);
+                    draw_volume(cmd_list, L);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                cmd_list.StateManager.SetSampleMask(0xffffffff);
 #   elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #   endif // USE_DX11
             }
 #   if defined(USE_DX9) || defined(USE_DX11) // XXX: not sure why this is needed. Just preserving original behaviour
-            RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
 #   endif // !USE_OGL
         }
 #endif // USE_DX9

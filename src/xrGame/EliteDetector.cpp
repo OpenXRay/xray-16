@@ -32,7 +32,7 @@ void CEliteDetector::UpdateAf()
         if (pAf->H_Parent())
             continue;
 
-        ui().RegisterItemToDraw(pAf->Position(), "af_sign");
+        ui().RegisterItemToDraw(pAf->Position(), AF_SIGN);
 
         if (pAf->CanBeInvisible())
         {

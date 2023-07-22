@@ -17,7 +17,7 @@ struct XRCORE_API smem_value
 {
     u32 dwReference;
     u32 dwCRC;
-    u32 dwLength;
+    u32 dwLength; // XXX: make size_t
     u32 _align_16;
     u8 value[];
 };
@@ -67,11 +67,13 @@ public:
     smem_value* dock(u32 dwCRC, u32 dwLength, void* ptr);
     void clean();
     void dump();
-    u32 stat_economy();
+
+    [[nodiscard]]
+    size_t stat_economy() const;
 
 private:
     typedef xr_vector<smem_value*> cdb;
-    Lock lock;
+    mutable Lock lock;
     cdb container;
 };
 XRCORE_API extern smem_container* g_pSharedMemoryContainer;
@@ -103,6 +105,8 @@ public:
         _dec();
         p_ = v;
     }
+
+    [[nodiscard]]
     const smem_value* _get() const { return p_; }
 public:
     // construction
@@ -132,14 +136,17 @@ public:
     bool operator!() const { return p_ == 0; }
     T& operator[](size_t id) { return ((T*)(p_->value))[id]; }
     const T& operator[](size_t id) const { return ((T*)(p_->value))[id]; }
+
     // misc func
-    u32 size()
+    [[nodiscard]]
+    u32 size() const
     {
         if (0 == p_)
             return 0;
-        else
-            return p_->dwLength / sizeof(T);
+
+        return p_->dwLength / sizeof(T);
     }
+
     void swap(ref_smem<T>& rhs)
     {
         smem_value* tmp = p_;
@@ -147,12 +154,14 @@ public:
         rhs.p_ = tmp;
     }
     bool equal(ref_smem<T>& rhs) { return p_ == rhs.p_; }
-    u32 ref_count()
+
+    [[nodiscard]]
+    u32 ref_count() const
     {
         if (0 == p_)
             return 0;
-        else
-            return p_->dwReference;
+
+        return p_->dwReference;
     }
 };
 

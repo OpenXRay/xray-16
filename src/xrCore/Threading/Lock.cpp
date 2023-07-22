@@ -65,7 +65,7 @@ void Lock::Enter()
 #else
 Lock::Lock() : impl(xr_new<LockImpl>()), lockCounter(0) {}
 
-Lock::~Lock() { delete impl; }
+Lock::~Lock() { xr_delete(impl); }
 
 void Lock::Enter()
 {

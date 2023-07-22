@@ -1133,9 +1133,6 @@
     <ClCompile Include="..\xrRender\r__sector_detect.cpp">
       <Filter>Visibility\Sector/Portal</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r2_R_sun.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
@@ -1144,6 +1141,15 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9DetailManager_VS.cpp">
+      <Filter>Details</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

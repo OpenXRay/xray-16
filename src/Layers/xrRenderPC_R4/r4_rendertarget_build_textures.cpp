@@ -260,9 +260,9 @@ void CRenderTarget::build_textures()
 
             //	Update texture. Generate mips.
 
-            HW.pContext->CopySubresourceRegion(t_noise_surf_mipped, 0, 0, 0, 0, t_noise_surf[0], 0, 0);
+            HW.get_context(CHW::IMM_CTX_ID)->CopySubresourceRegion(t_noise_surf_mipped, 0, 0, 0, 0, t_noise_surf[0], 0, 0); // TODO: id
 
-            D3DX11FilterTexture(HW.pContext, t_noise_surf_mipped, 0, D3DX11_FILTER_POINT);
+            D3DX11FilterTexture(HW.get_context(CHW::IMM_CTX_ID), t_noise_surf_mipped, 0, D3DX11_FILTER_POINT); // TODO: id
             _RELEASE(t_noise_surf_mipped);
         }
         for (size_t it2 = 0; it2 < TEX_jitter_count; ++it2)

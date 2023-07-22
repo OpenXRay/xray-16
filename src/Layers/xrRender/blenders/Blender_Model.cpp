@@ -77,7 +77,7 @@ void CBlender_Model::Compile(CBlender_Compile& C)
 
 void CBlender_Model::CompileFFP(CBlender_Compile& C) const
 {
-    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
     {
         C.PassBegin();
         {

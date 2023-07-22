@@ -6,9 +6,11 @@ class xrCompressor
 {
     bool bFast{};
     bool bStoreFiles{};
+    bool bPackingToXDB;
     IWriter* fs_pack_writer{};
     CMemoryWriter fs_desc;
     shared_str target_name;
+    shared_str output_name;
     IReader* pPackHeader{};
     CInifile* config_ltx{};
     xr_vector<char*>* files_list{};
@@ -49,7 +51,11 @@ class xrCompressor
     u8* c_heap{};
     u32 dwTimeStart{};
 
-    size_t XRP_MAX_SIZE{ 1024 * 1024 * 640 }; // bytes (640Mb)
+    size_t XRP_TARGET_SIZE{ XRP_MAX_SIZE }; // bytes (640Mb)
+
+public:
+    static constexpr
+    size_t XRP_MAX_SIZE{ 1024u * 1024u * 1900u }; // bytes (1900Mb)
 
 public:
     xrCompressor() = default;
@@ -57,9 +63,20 @@ public:
 
     void SetFastMode(bool b) { bFast = b; }
     void SetStoreFiles(bool b) { bStoreFiles = b; }
-    void SetMaxVolumeSize(u32 sz) { XRP_MAX_SIZE = sz; }
+    void SetPackingToXDB(bool b) { bPackingToXDB = b; }
     void SetTargetName(LPCSTR n) { target_name = n; }
+    void SetOutputName(LPCSTR n) { output_name = n; }
     void SetPackHeaderName(LPCSTR n);
+    void SetMaxVolumeSize(size_t size)
+    {
+        if (size > XRP_MAX_SIZE)
+        {
+            Log("~ Trying to set too big target archive size. Setting it to 1900 MB, which is max.");
+            XRP_TARGET_SIZE = XRP_MAX_SIZE;
+            return;
+        }
+        XRP_TARGET_SIZE = size;
+    }
 
     void ProcessLTX(CInifile& ini);
     void ProcessTargetFolder();

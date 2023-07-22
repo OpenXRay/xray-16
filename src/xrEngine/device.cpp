@@ -274,7 +274,7 @@ void CRenderDevice::ProcessFrame()
     if (GEnv.isDedicatedServer)
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
 
-    else if (Paused())
+    else if (Paused() || g_pGameLevel == nullptr)
         updateDelta = 16; // 16 ms, ~60 FPS max while paused
 
     if (frameTime < updateDelta)

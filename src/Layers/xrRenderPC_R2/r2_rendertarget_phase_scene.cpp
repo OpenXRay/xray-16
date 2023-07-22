@@ -17,12 +17,12 @@ void CRenderTarget::phase_scene_prepare()
     if (RImplementation.o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
         ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
-        u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, NULL, NULL, get_base_zb());
+        u_setrt(RCache, Device.dwWidth, Device.dwHeight, rt_Position->pRT, NULL, NULL, get_base_zb());
         CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x0, 1.0f, 0L));
     }
     else
     {
-        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, get_base_zb());
+        u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), NULL, NULL, get_base_zb());
         RCache.ClearZB(get_base_zb(), 1.f, 0);
     }
 
@@ -40,9 +40,9 @@ void CRenderTarget::phase_scene_begin()
 
     // Targets, use accumulator for temporary storage
     if (RImplementation.o.albedo_wo)
-        u_setrt(rt_Position, rt_Normal, rt_Accumulator, get_base_zb());
+        u_setrt(RCache, rt_Position, rt_Normal, rt_Accumulator, get_base_zb());
     else
-        u_setrt(rt_Position, rt_Normal, rt_Color, get_base_zb());
+        u_setrt(RCache, rt_Position, rt_Normal, rt_Color, get_base_zb());
 
     // Stencil - write 0x1 at pixel pos
     RCache.set_Stencil(
@@ -70,11 +70,11 @@ void CRenderTarget::phase_scene_end()
         return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
-    u_setrt(rt_Color, 0, 0, get_base_zb());
+    u_setrt(RCache, rt_Color, 0, 0, get_base_zb());
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     if (RImplementation.o.nvstencil)
-        u_stencil_optimize(FALSE);
+        u_stencil_optimize(RCache, FALSE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     RCache.set_ColorWriteEnable();
 
@@ -89,7 +89,7 @@ void CRenderTarget::phase_scene_end()
     float d_Z = EPS_S, d_W = 1.f;
 
     // Fill vertex buffer
-    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
     pv++;
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -98,7 +98,7 @@ void CRenderTarget::phase_scene_end()
     pv++;
     pv->set(float(_w + EPS), EPS, d_Z, d_W, C, p1.x, p0.y);
     pv++;
-    RCache.Vertex.Unlock(4, g_combine->vb_stride);
+    RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 
     // if (stencil>=1 && aref_pass) stencil = light_id
     RCache.set_Element(s_accum_mask->E[SE_MASK_ALBEDO]); // masker

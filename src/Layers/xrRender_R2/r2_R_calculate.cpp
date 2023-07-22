@@ -20,11 +20,12 @@ extern int ps_r2_mt_render;
 //-----
 void render_main::init()
 {
-    o.mt_enabled = RImplementation.o.mt_calculate && !RImplementation.o.oldshadowcascades && !ps_r2_ls_flags.test(R2FLAG_ZFILL);
+    o.mt_calc_enabled = RImplementation.o.mt_calculate && !RImplementation.o.oldshadowcascades && !ps_r2_ls_flags.test(R2FLAG_ZFILL);
+    o.mt_draw_enabled = false; // always on imm context
     o.active = true; // always active
 }
 
-void render_main::calculate_task(Task&, void*)
+void render_main::calculate()
 {
     auto& dsgraph_main = RImplementation.get_imm_context();
 
@@ -46,7 +47,7 @@ void render_main::calculate_task(Task&, void*)
     dsgraph_main.o.view_frustum = RImplementation.ViewBase;
     dsgraph_main.o.query_box_side = VIEWPORT_NEAR + EPS_L;
     dsgraph_main.o.precise_portals = true;
-    dsgraph_main.o.mt_calculate = o.mt_enabled;
+    dsgraph_main.o.mt_calculate = o.mt_calc_enabled;
 
     dsgraph_main.build_subspace();
 }
@@ -63,7 +64,7 @@ void CRender::Calculate()
     // Transfer to global space to avoid deep pointer access
     IRender_Target* T = getTarget();
     float fov_factor = _sqr(90.f / Device.fFOV);
-    g_fSCREEN = float(T->get_width() * T->get_height()) * fov_factor * (EPS_S + ps_r__LOD);
+    g_fSCREEN = float(T->get_width(RCache) * T->get_height(RCache)) * fov_factor * (EPS_S + ps_r__LOD);
     r_ssaDISCARD = _sqr(ps_r__ssaDISCARD) / g_fSCREEN;
     r_ssaDONTSORT = _sqr(ps_r__ssaDONTSORT / 3) / g_fSCREEN;
     r_ssaLOD_A = _sqr(ps_r2_ssaLOD_A / 3) / g_fSCREEN;
@@ -73,11 +74,13 @@ void CRender::Calculate()
     r_ssaHZBvsTEX = _sqr(ps_r__ssaHZBvsTEX / 3) / g_fSCREEN;
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
 
-    
     // Configure
     o.distortion    = o.distortion_enabled;
     o.mt_calculate  = ps_r2_mt_calculate > 0;
     o.mt_render     = ps_r2_mt_render > 0;
+
+    if (m_bFirstFrameAfterReset)
+        return;
 
     auto& dsgraph_main = get_imm_context();
 
@@ -133,25 +136,18 @@ void CRender::Calculate()
     // Main calc
     BasicStats.Culling.Begin();
     {
-        r_main.calculate();
+        r_main.run();
     }
     BasicStats.Culling.End();
 
     // Rain calc
 #if RENDER != R_R2
-    if (r_rain.o.active)
-    {
-        {
-            r_rain.calculate();
-        }
-    }
+    r_rain.run();
 #endif
 
     // Sun calc
-    if (r_sun.o.active)
-    {
-        {
-            r_sun.calculate();
-        }
-    }
+    if (o.oldshadowcascades)
+        r_sun_old.run();
+    else
+        r_sun.run();
 }

@@ -8,8 +8,8 @@ extern IC u32 GetIndexCount(D3DPRIMITIVETYPE T, u32 iPrimitiveCount);
 void CBackend::InitializeDebugDraw()
 {
 #ifndef USE_DX9
-    vs_L.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.Index.Buffer());
-    vs_TL.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+    vs_L.create(FVF::F_L, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
+    vs_TL.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 #endif
 }
 
@@ -40,25 +40,25 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
 #ifndef USE_DX9
     u32 vBase;
     {
-        FVF::L* pv = (FVF::L*)Vertex.Lock(vcnt, vs_L->vb_stride, vBase);
+        FVF::L* pv = (FVF::L*)RImplementation.Vertex.Lock(vcnt, vs_L->vb_stride, vBase);
         for (size_t i = 0; i < vcnt; i++)
         {
             pv[i] = pVerts[i];
         }
-        Vertex.Unlock(vcnt, vs_L->vb_stride);
+        RImplementation.Vertex.Unlock(vcnt, vs_L->vb_stride);
     }
 
     u32 iBase;
     {
         const size_t count = GetIndexCount(T, pcnt);
-        u16* indices = Index.Lock(count, iBase);
+        u16* indices = RImplementation.Index.Lock(count, iBase);
         for (size_t i = 0; i < count; i++)
             indices[i] = pIdx[i];
-        Index.Unlock(count);
+        RImplementation.Index.Unlock(count);
     }
     set_Geometry(vs_L);
     set_RT(RImplementation.Target->get_base_rt());
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
     set_Stencil(FALSE);
     Render(T, vBase, 0, vcnt, iBase, pcnt);
 #elif defined(USE_DX9)
@@ -75,16 +75,16 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
     u32 vBase;
     {
         const size_t count = GetIndexCount(T, pcnt);
-        FVF::L* pv = (FVF::L*)Vertex.Lock(count, vs_L->vb_stride, vBase);
+        FVF::L* pv = (FVF::L*)RImplementation.Vertex.Lock(count, vs_L->vb_stride, vBase);
         for (size_t i = 0; i < count; i++)
         {
             pv[i] = pVerts[i];
         }
-        Vertex.Unlock(count, vs_L->vb_stride);
+        RImplementation.Vertex.Unlock(count, vs_L->vb_stride);
     }
     set_Geometry(vs_L);
     set_RT(RImplementation.Target->get_base_rt());
-    RImplementation.rmFar();
+    RImplementation.rmFar(RCache);
     set_Stencil(FALSE);
     Render(T, vBase, pcnt);
 #elif defined(USE_DX9)
@@ -279,12 +279,12 @@ void CBackend::dbg_OverdrawEnd()
         CHK_DX(HW.pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pv, sizeof(FVF::TL)));
 #elif defined(USE_DX11) || defined(USE_OGL)
         u32 vBase;
-        FVF::TL* pv = (FVF::TL*)Vertex.Lock(4, vs_L->vb_stride, vBase);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, vs_L->vb_stride, vBase);
         pv[0].set(float(0), float(Device.dwHeight), c, 0, 0);
         pv[1].set(float(0), float(0), c, 0, 0);
         pv[2].set(float(Device.dwWidth), float(Device.dwHeight), c, 0, 0);
         pv[3].set(float(Device.dwWidth), float(0), c, 0, 0);
-        Vertex.Unlock(4, vs_L->vb_stride);
+        RImplementation.Vertex.Unlock(4, vs_L->vb_stride);
         // Set up the stencil states
         set_Stencil(TRUE, D3DCMP_EQUAL, I, 0xff, 0xffffffff,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);

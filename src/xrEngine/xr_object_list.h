@@ -107,7 +107,13 @@ public:
     void o_remove(Objects& v, IGameObject* O);
     void o_activate(IGameObject* O);
     void o_sleep(IGameObject* O);
-    IC u32 o_count() { return objects_active.size() + objects_sleeping.size(); };
+
+    [[nodiscard]]
+    IC u32 o_count() const
+    {
+        return u32(objects_active.size() + objects_sleeping.size());
+    }
+
     IC IGameObject* o_get_by_iterator(u32 _it)
     {
         if (_it < objects_active.size())

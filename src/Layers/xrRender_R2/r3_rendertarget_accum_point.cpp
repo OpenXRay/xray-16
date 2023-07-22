@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-void CRenderTarget::accum_point(light* L)
+void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
 {
-    phase_accumulator();
+    phase_accumulator(cmd_list);
     RImplementation.Stats.l_visible++;
 
     ref_shader shader = L->s_point;
@@ -25,9 +25,9 @@ void CRenderTarget::accum_point(light* L)
 
     // Xforms
     L->xform_calc();
-    RCache.set_xform_world(L->m_xform);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    cmd_list.set_xform_world(L->m_xform);
+    cmd_list.set_xform_view(Device.mView);
+    cmd_list.set_xform_project(Device.mProject);
     enable_scissor(L);
     enable_dbt_bounds(L);
 
@@ -35,46 +35,46 @@ void CRenderTarget::accum_point(light* L)
     // *** similar to "Carmack's reverse", but assumes convex, non intersecting objects,
     // *** thus can cope without stencil clear with 127 lights
     // *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
-    RCache.set_Element(s_accum_mask->E[SE_MASK_POINT]); // masker
+    cmd_list.set_Element(s_accum_mask->E[SE_MASK_POINT]); // masker
     //	Done in blender!
     // RCache.set_ColorWriteEnable		(FALSE);
 
     // backfaces: if (1<=stencil && zfail)	stencil = light_id
-    RCache.set_CullMode(CULL_CW);
+    cmd_list.set_CullMode(CULL_CW);
     if (!RImplementation.o.msaa)
     {
-        RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff,
+        cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
     }
     else
     {
-        RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0x7f,
+        cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0x7f,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
     }
-    draw_volume(L);
+    draw_volume(cmd_list, L);
 
     // frontfaces: if (1<=stencil && zfail)	stencil = 0x1
-    RCache.set_CullMode(CULL_CCW);
+    cmd_list.set_CullMode(CULL_CCW);
     if (!RImplementation.o.msaa)
     {
-        RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0xff,
+        cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0xff,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
     }
     else
     {
-        RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0x7f, 0x7f,
+        cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0x7f, 0x7f,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
     }
-    draw_volume(L);
+    draw_volume(cmd_list, L);
 
     // nv-stencil recompression
     if (RImplementation.o.nvstencil)
-        u_stencil_optimize();
+        u_stencil_optimize(cmd_list);
 
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
-    RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_CW); // back
+    cmd_list.set_ColorWriteEnable();
+    cmd_list.set_CullMode(CULL_CW); // back
     /*
     if (bIntersect)	RCache.set_CullMode		(CULL_CW);		// back
     else			RCache.set_CullMode		(CULL_CCW);		// front
@@ -82,9 +82,9 @@ void CRenderTarget::accum_point(light* L)
 
     // 2D texgens
     Fmatrix m_Texgen;
-    u_compute_texgen_screen(m_Texgen);
+    u_compute_texgen_screen(cmd_list, m_Texgen);
     Fmatrix m_Texgen_J;
-    u_compute_texgen_jitter(m_Texgen_J);
+    u_compute_texgen_jitter(cmd_list, m_Texgen_J);
 
     // Draw volume with projective texgen
     {
@@ -105,12 +105,12 @@ void CRenderTarget::accum_point(light* L)
             _id = SE_L_UNSHADOWED;
             // m_Shadow				= m_Lmap;
         }
-        RCache.set_Element(shader->E[_id]);
+        cmd_list.set_Element(shader->E[_id]);
 
         // Constants
-        RCache.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, 1 / (L_R * L_R));
-        RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
-        RCache.set_c("m_texgen", m_Texgen);
+        cmd_list.set_c("Ldynamic_pos", L_pos.x, L_pos.y, L_pos.z, 1 / (L_R * L_R));
+        cmd_list.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
+        cmd_list.set_c("m_texgen", m_Texgen);
 
         // Fetch4 : enable
         //		if (RImplementation.o.HW_smap_FETCH4)	{
@@ -119,46 +119,46 @@ void CRenderTarget::accum_point(light* L)
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
         //		}
 
-        RCache.set_CullMode(CULL_CW); // back
+        cmd_list.set_CullMode(CULL_CW); // back
         // Render if (light_id <= stencil && z-pass)
         if (!RImplementation.o.msaa)
         {
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
-            draw_volume(L);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
+            draw_volume(cmd_list, L);
         }
         else // checked Holger
         {
             // per pixel
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
-            draw_volume(L);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
+            draw_volume(cmd_list, L);
 
             // per sample
             if (RImplementation.o.msaa_opt)
             {
-                RCache.set_Element(shader_msaa[0]->E[_id]);
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
-                RCache.set_CullMode(D3DCULL_CW);
-                draw_volume(L);
+                cmd_list.set_Element(shader_msaa[0]->E[_id]);
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
+                cmd_list.set_CullMode(D3DCULL_CW);
+                draw_volume(cmd_list, L);
             }
             else // checked Holger
             {
 #if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
-                    RCache.set_Element(shader_msaa[i]->E[_id]);
-                    StateManager.SetSampleMask(u32(1) << i);
-                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
-                    RCache.set_CullMode(D3DCULL_CW);
-                    draw_volume(L);
+                    cmd_list.set_Element(shader_msaa[i]->E[_id]);
+                    cmd_list.StateManager.SetSampleMask(u32(1) << i);
+                    cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
+                    cmd_list.set_CullMode(D3DCULL_CW);
+                    draw_volume(cmd_list, L);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                cmd_list.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else
 #   error No graphics API selected or enabled!
 #endif
             }
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
         }
 
         // Fetch4 : disable
@@ -172,54 +172,54 @@ void CRenderTarget::accum_point(light* L)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        u_setrt(rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
-        RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
-        RCache.set_c("m_texgen", m_Texgen);
+        u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+        cmd_list.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
+        cmd_list.set_c("m_texgen", m_Texgen);
         if (!RImplementation.o.msaa)
         {
-            RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
-            draw_volume(L);
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+            draw_volume(cmd_list, L);
         }
         else // checked Holger
         {
             // per pixel
-            RCache.set_CullMode(D3DCULL_CW);
-            RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
-            draw_volume(L);
+            cmd_list.set_CullMode(D3DCULL_CW);
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
+            draw_volume(cmd_list, L);
             if (RImplementation.o.msaa_opt)
             {
                 // per sample
-                RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_VOL]);
-                RCache.set_CullMode(D3DCULL_CW);
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
-                draw_volume(L);
+                cmd_list.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_VOL]);
+                cmd_list.set_CullMode(D3DCULL_CW);
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
+                draw_volume(cmd_list, L);
             }
             else // checked Holger
             {
 #if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
-                    RCache.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
-                    RCache.set_CullMode(D3DCULL_CW);
-                    StateManager.SetSampleMask(u32(1) << i);
-                    RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
-                    draw_volume(L);
+                    cmd_list.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
+                    cmd_list.set_CullMode(D3DCULL_CW);
+                    cmd_list.StateManager.SetSampleMask(u32(1) << i);
+                    cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
+                    draw_volume(cmd_list, L);
                 }
-                StateManager.SetSampleMask(0xffffffff);
+                cmd_list.StateManager.SetSampleMask(0xffffffff);
 #elif defined(USE_OGL)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #else
 #   error No graphics API selected or enabled!
 #endif
             }
-            RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
         }
     }
 
-    RCache.set_Scissor(0);
+    cmd_list.set_Scissor(0);
 
     // dwLightMarkerID					+=	2;	// keep lowest bit always setted up
-    increment_light_marker();
+    increment_light_marker(cmd_list);
 
     u_DBT_disable();
 }
