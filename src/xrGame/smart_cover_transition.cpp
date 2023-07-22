@@ -51,8 +51,8 @@ void action::load_animations(luabind::object const& table)
     while (it != end)
     {
         auto tmp = *it;
-        const Fvector& pos = parse_fvector(tmp, "position");
-        const shared_str& anim_id = parse_string(tmp, "animation");
+        const Fvector pos = parse_fvector(tmp, "position");
+        const shared_str anim_id = parse_string(tmp, "animation");
         const auto body_state = (MonsterSpace::EBodyState)parse_int(tmp, "body_state");
         const auto movement_type = (MonsterSpace::EMovementType)parse_int(tmp, "movement_type");
         auto* animation = xr_new<animation_action>(pos, anim_id, body_state, movement_type);

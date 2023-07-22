@@ -66,7 +66,7 @@ void smart_cover::action::add_animation(LPCSTR type, luabind::object const& tabl
             continue;
         }
 
-        const shared_str& animation = luabind::object_cast<LPCSTR>(string);
+        const shared_str animation = luabind::object_cast<LPCSTR>(string);
         VERIFY2(std::find(animations->begin(), animations->end(), animation) == animations->end(),
             make_string("duplicated_animation found: %s", animation.c_str()));
         animations->push_back(animation);
