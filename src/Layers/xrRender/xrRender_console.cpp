@@ -277,7 +277,6 @@ class CCC_ssfx_cascades : public CCC_Vector3
 public:
     void apply()
     {
-    // TODO: Crash here when quitting game
 #if defined(USE_DX10) || defined(USE_DX11)
         RImplementation.r_sun.init_cascades();
 #endif
