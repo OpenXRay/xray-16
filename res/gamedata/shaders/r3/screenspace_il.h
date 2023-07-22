@@ -17,7 +17,6 @@ static const int il_quality[4] = { 8, 16, 24, 32 };
 
 // Some vars to fix incompatibilities for the moment...
 uniform float4 ssfx_wpn_dof_1;
-uniform float4 fakescope_params3;
 
 float3 ssfx_il_bounce(float3 P, float3 N, float Range, int count, uint iSample) 
 {
@@ -72,8 +71,8 @@ float3 ssfx_il_bounce(float3 P, float3 N, float Range, int count, uint iSample)
 
 void ssfx_il(float2 tc, float2 pos2d, float3 P, float3 N, inout float3 color, uint iSample)
 {
-	// Skip Sky. ( Disable when used with Shader Based 2D Scopes )
-	if (P.z <= SKY_EPS || fakescope_params3.x > 0)
+	// Skip Sky.
+	if (P.z <= SKY_EPS)
 		return;
 
 	// Discard IL when using NV
