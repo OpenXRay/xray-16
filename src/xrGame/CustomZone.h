@@ -370,7 +370,7 @@ protected:
     float m_BendGrass_Blowout_speed;
     float m_BendGrass_Blowout_radius;
 
-    u8 grassbender_id;
+    u8 grassbender_id{};
     u32 grassbender_frame;
 
     void GrassZoneUpdate();
