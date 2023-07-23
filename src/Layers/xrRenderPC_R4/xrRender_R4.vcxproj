@@ -70,6 +70,9 @@
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Blur.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_dof.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_nightvision.h" />
     <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h" />
@@ -233,9 +236,12 @@
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp" />
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Blur.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_dof.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_nightvision.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\dx11RainBlender.cpp" />
@@ -414,6 +420,9 @@
     <ClCompile Include="..\xrRender\light_smapvis.cpp" />
     <ClCompile Include="..\xrRender\light_vis.cpp" />
     <ClCompile Include="r4_rendertarget_build_textures.cpp" />
+    <ClCompile Include="r4_rendertarget_phase_blur.cpp" />
+    <ClCompile Include="r4_rendertarget_phase_dof.cpp" />
+    <ClCompile Include="r4_rendertarget_phase_nightvision.cpp" />
     <ClCompile Include="r4_rendertarget_u_set_rt.cpp" />
     <ClCompile Include="r2_test_hw.cpp" />
     <ClCompile Include="r4_rendertarget_accum_direct.cpp" />
