@@ -17,13 +17,34 @@ struct 	v2p
 //	b):	64x64p	=> 8x8p
 float	sample	(float2	tc)	
 {
-//	float4	data = tex2D(s_image,tc);
 	float4	data = s_image.Sample( smp_rtlinear, tc );
 	return 	dot( data, 1.h/4.h );	// sum components
 }
 
 float4 main( p_filter I ) : SV_Target
 {
+    
+	float4 ratio = float2( 1/screen_res.x,1/screen_res.y).xyxy;   
+	
+    ratio.x = 1;  
+    //ratio.y = 1.77;  
+    //ratio.y = 0.5625;  
+    ratio.y = screen_res.x/screen_res.y;  
+	//ratio.xyzw = ratio.xyxy;
+	ratio.xyzw = ratio.xyyx; 
+	
+	float4	UVavg	= (I.Tex0+I.Tex1+I.Tex2+I.Tex3+I.Tex4+I.Tex5+I.Tex6+I.Tex7)/8;
+	
+	//adjust for aspect ratio
+	I.Tex0 = UVavg + ((I.Tex0 - UVavg) * ratio);
+	I.Tex1 = UVavg + ((I.Tex1 - UVavg) * ratio);
+	I.Tex2 = UVavg + ((I.Tex2 - UVavg) * ratio);
+	I.Tex3 = UVavg + ((I.Tex3 - UVavg) * ratio);
+	I.Tex4 = UVavg + ((I.Tex4 - UVavg) * ratio);
+	I.Tex5 = UVavg + ((I.Tex5 - UVavg) * ratio);
+	I.Tex6 = UVavg + ((I.Tex6 - UVavg) * ratio);
+	I.Tex7 = UVavg + ((I.Tex7 - UVavg) * ratio);
+	
 	// sample
 	float4 	accum0;
 		accum0.x =	sample(I.Tex0);

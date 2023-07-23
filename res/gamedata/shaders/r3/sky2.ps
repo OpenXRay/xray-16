@@ -1,9 +1,10 @@
 #include "common.h"
+#include "pbr_cubemap_check.h"
 
 struct         v2p
 {
-	float4	factor	: COLOR0;        // for SM3 - factor.rgb - tonemap-prescaled
-	float3	tc0		: TEXCOORD0;
+	float4	factor	: COLOR0;        // rgb tint
+	float4	tc0		: TEXCOORD0; //tonemap in alpha
 	float3	tc1		: TEXCOORD1;
 };
 struct        _out
@@ -18,20 +19,25 @@ TextureCube	s_sky1	:register(t1);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
-_out main( v2p I )
+_out main(v2p I )
 {
-//        float3         	s0  	= texCUBE        (s_sky0,I.tc0);
-//        float3         	s1      = texCUBE        (s_sky1,I.tc1);
-	float3	s0		= s_sky0.Sample( smp_rtlinear, I.tc0 );
-	float3	s1		= s_sky1.Sample( smp_rtlinear, I.tc1 );
-	float3	sky		= I.factor*lerp( s0, s1, I.factor.w );
-			sky		*= 0.33f;
+
+	float3	s0 = s_sky0.Sample(smp_rtlinear, I.tc0 );
+	float3	s1 = s_sky1.Sample(smp_rtlinear, I.tc1 );
+	
+	float3			sky = lerp (s0,s1,I.factor.w);
+	
+	//srgb tint (matches hmodel)
+	float3 SkyTint = I.factor.rgb;
+	float TintPow = 1.0;
+	
+	sky = pow(sky, TintPow); 
+	sky *= SkyTint;
+	sky = pow(sky, 1/TintPow); 
 
 	// final tone-mapping
+	float tm_scale = I.tc0.w;
 	_out			o;
-
-	o.low        	=		sky.xyzz		;
-	o.high        	=		o.low/def_hdr	;
-
-	return        	o;
+	tonemap(o.low, o.high, sky, tm_scale)	; //factor contains tonemapping
+	return			o;
 }

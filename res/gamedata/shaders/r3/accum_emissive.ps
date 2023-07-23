@@ -1,7 +1,19 @@
 #include "common.h"
+#include "sload.h"
 
-//float4  main  ( p_flat I )  : SV_Target
-float4 main() : SV_Target
+
+
+float4 main( p_flat I ) : SV_Target
 {
-  return   float4    (1,1,1,1)*16.0h;
+  //f_deffer	O;
+
+  // diffuse
+  float3 D	= tbase		(I.tcdh);	// IN:  rgb.a
+  D	= SRGBToLinear(D);
+	
+	float brightness = 16;
+	float4 color = float4(D.rgb,1);
+	//color *= float4(brightness,brightness,brightness,brightness);
+	color.w *= brightness;
+  return color;
 }

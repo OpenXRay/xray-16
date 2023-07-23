@@ -1,20 +1,7 @@
 #include "common.h"
-/*
-struct 	v2p
-{
-  float4 tc0: 		TEXCOORD0;	// Central
-  float4 tc1: 		TEXCOORD1;	// -1,+1
-  float4 tc2: 		TEXCOORD2;	// -2,+2
-  float4 tc3: 		TEXCOORD3;	// -3,+3
-  float4 tc4: 		TEXCOORD4;	// -4,+4
-  float4 tc5: 		TEXCOORD5;	// -5,+5
-  float4 tc6: 		TEXCOORD6;	// -6,+6
-  float4 tc7: 		TEXCOORD7;	// -7,+7
-};
-*/
 
 //////////////////////////////////////////////////////////////////////////////////////////
-uniform float4	MiddleGray;
+float4	MiddleGray;
 //////////////////////////////////////////////////////////////////////////////////////////
 //	perform 4x4 bilinear, 8x8p, the step (C)
 //	c):	8x8p	=> 1x1p		with exp
@@ -22,13 +9,34 @@ uniform float4	MiddleGray;
 	// native bilinear
 float sample( float2 tc )
 {
-//	float4	data = tex2D(s_image,tc);
 	float4	data = s_image.Sample( smp_rtlinear, tc );
-	return 	dot( data, 1.h/4.h );	// sum components
+	return 	dot( data, 1.0/4.0 );	// sum components
 }
 
 float4 main ( p_filter I ) : SV_Target
 {
+    
+	float4 ratio = float2( 1/screen_res.x,1/screen_res.y).xyxy;  
+	
+    ratio.x = 1;  
+    //ratio.y = 1.77;  
+    //ratio.y = 0.5625;  
+    ratio.y = screen_res.x/screen_res.y;  
+	//ratio.xyzw = ratio.xyxy;
+	ratio.xyzw = ratio.xyyx; 
+	
+	float4	UVavg	= (I.Tex0+I.Tex1+I.Tex2+I.Tex3+I.Tex4+I.Tex5+I.Tex6+I.Tex7)/8;
+	
+	//adjust for aspect ratio
+	I.Tex0 = UVavg + ((I.Tex0 - UVavg) * ratio);
+	I.Tex1 = UVavg + ((I.Tex1 - UVavg) * ratio);
+	I.Tex2 = UVavg + ((I.Tex2 - UVavg) * ratio);
+	I.Tex3 = UVavg + ((I.Tex3 - UVavg) * ratio);
+	I.Tex4 = UVavg + ((I.Tex4 - UVavg) * ratio);
+	I.Tex5 = UVavg + ((I.Tex5 - UVavg) * ratio);
+	I.Tex6 = UVavg + ((I.Tex6 - UVavg) * ratio);
+	I.Tex7 = UVavg + ((I.Tex7 - UVavg) * ratio);
+	
 	// sample
 	float4 	accum0;
 		accum0.x =	sample(I.Tex0);
@@ -53,22 +61,20 @@ float4 main ( p_filter I ) : SV_Target
 
 	// perform accumulation
 	float4	final;
-		final.x	= dot(accum0,1/4.h);
-		final.y	= dot(accum1,1/4.h);
-		final.z	= dot(accum2,1/4.h);
-		final.w	= dot(accum3,1/4.h);
-	float 	result	= dot(final, 1/4.h);
+		final.x	= dot(accum0,1.0/4.0);
+		final.y	= dot(accum1,1.0/4.0);
+		final.z	= dot(accum2,1.0/4.0);
+		final.w	= dot(accum3,1.0/4.0);
+	float 	result	= dot(final, 1.0/4.0);
 
 	// OK
 	float	scale 		= MiddleGray.x / (result*MiddleGray.y + MiddleGray.z);	// final
-//	float  	scale_prev	= tex2D	(s_tonemap,I.tc0).x;
+
 	float  	scale_prev	= s_tonemap.Sample( smp_nofilter, I.Tex0 ).x;
-	float 	rvalue		= lerp	(scale_prev,scale,MiddleGray.w);
+	float 	rvalue = lerp(scale_prev,scale,MiddleGray.w);
 
-//			clamp		(rvalue, 1.f/8.f, 2.0f);
+			clamp(rvalue, 1.0/128.0, 20.0);
 
-			clamp		(rvalue, 1.f/128.f, 20.0f);
-
-	return 	rvalue		;
+	return rvalue;
 
 }
