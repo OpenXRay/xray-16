@@ -17,7 +17,7 @@ protected:
 
 public:
     CScriptIniFile(IReader* F, LPCSTR path = nullptr);
-    CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly = TRUE, BOOL bLoadAtStart = TRUE, BOOL SaveAtEnd = TRUE);
+    CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly = TRUE, BOOL bLoadAtStart = TRUE, BOOL SaveAtEnd = TRUE, LPCSTR path = NULL);
     CScriptIniFile(LPCSTR initial, LPCSTR szFileName, BOOL ReadOnly = TRUE, BOOL bLoadAtStart = TRUE, BOOL SaveAtEnd = TRUE);
 
     int r_clsid(LPCSTR S, LPCSTR L);

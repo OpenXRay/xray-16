@@ -14,8 +14,8 @@
 #include "xrCore/xrDebug.h"
 
 CScriptIniFile::CScriptIniFile(IReader* F, LPCSTR path) : inherited(F, path) {}
-CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
-    : inherited(update("$game_config$", szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
+CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd, LPCSTR path)
+    : inherited(path ? path : update("$game_config$", szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
 {}
 CScriptIniFile::CScriptIniFile(LPCSTR initial, LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
     : inherited(update(initial, szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
