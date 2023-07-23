@@ -1,6 +1,8 @@
 #ifndef	common_functions_h_included
 #define	common_functions_h_included
 
+#include "srgb.h"
+
 //	contrast function
 float Contrast(float Input, float ContrastPower)
 {
@@ -12,21 +14,27 @@ float Contrast(float Input, float ContrastPower)
      return Output;
 }
 
-float3 vibrance( float3 img, half val )
+float3 vibrance(float3 img, float val )
 {
     float luminance = dot( float3( img.rgb ), LUMINANCE_VECTOR );
     return float3( lerp( luminance, float3( img.rgb ), val ));
 }
 
-void        tonemap              (out half4 low, out half4 high, half3 rgb, half scale)
+void        tonemap (out float4 low, out float4 high, float3 rgb, float scale)
 {
+	rgb =    	SRGBToLinear(rgb);
         rgb     =      	rgb*scale       ;
+	rgb =    	LinearTosRGB(rgb);
 
-		const float fWhiteIntensity = 1.7;
+	const float fWhiteIntensity = 11.2;
 
-		const float fWhiteIntensitySQR = fWhiteIntensity*fWhiteIntensity;
-        low		=   half4( ( (rgb*(1+rgb/fWhiteIntensitySQR)) / (rgb+1) ),           0 )	;
-		high	= 	half4(rgb/def_hdr, 0);
+	low =   float4(tonemap_sRGB(rgb, fWhiteIntensity ), 0);
+	high = 	float4(rgb/def_hdr, 0);
+}
+
+void		tonemap_hipri (out float4 low, out float4 high, float3 rgb, float scale)
+{
+	tonemap (low, high, rgb, scale);
 }
 
 float3 compute_colored_ao(float ao, float3 albedo)
@@ -37,10 +45,40 @@ float3 compute_colored_ao(float ao, float3 albedo)
 
     return max(ao, ((ao * a + b) * ao + c) * ao);
 }
+//CUSTOM
+float3 blend_soft(float3 a, float3 b)
+{
+	//return 1.0 - (1.0 - a) * (1.0 - b);
+	
+	//gamma correct and inverse tonemap to add bloom
+	a = SRGBToLinear(a); //post tonemap render
+	a = a / max(0.004, 1-a); //inverse tonemap
+	//a = a / max(0.001, 1-a); //inverse tonemap
+	b = SRGBToLinear(b); //bloom
+
+	//constrast reduction of ACES output
+	float Contrast_Amount = 0.7;
+	const float mid = 0.18;
+	a = pow(a, Contrast_Amount) * mid/pow(mid,Contrast_Amount);
+	
+	ACES_LMT(b); //color grading bloom
+	a += b; //bloom add
+
+	//Boost the contrast to match ACES RRT
+	float Contrast_Boost = 1.42857;
+	a = pow(a, Contrast_Boost) * mid/pow(mid,Contrast_Boost);
+	
+	a = a / (1+a) ; //tonemap
+	
+	a = LinearTosRGB(a);
+	return a;
+}
 
 float4 combine_bloom(float3 low, float4 high)    
 {
-        return        float4(low + high*high.a, 1.0);
+	//return	float4(low + high*high.a, 1); //add
+	high.rgb  *= high.a;
+	return	float4(blend_soft(low.rgb, high.rgb),1); //screen
 }	
 
 float calc_fogging( float4 w_pos )      
@@ -108,11 +146,6 @@ float3	v_sun(float3 n)
 float3	calc_reflection( float3 pos_w, float3 norm_w )
 {
     return reflect(normalize(pos_w-eye_position), norm_w);
-}
-//CUSTOM
-float3 blend_soft(float3 a, float3 b)
-{
-	return 1.0 - (1.0 - a) * (1.0 - b);
 }
 
 float4 screen_to_proj(float2 screen, float z)

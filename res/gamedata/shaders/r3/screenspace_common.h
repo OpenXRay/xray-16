@@ -40,6 +40,9 @@ static const float3 ssfx_hemisphere[32] =
 
 uniform float4 sky_color;
 
+TextureCube sky_s0;
+TextureCube sky_s1;
+
 static const float2 ssfx_pixel_size = 1.0f / screen_res.xy;
 static const float ssfx_PI = 3.14159265f;
 

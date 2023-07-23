@@ -4,7 +4,7 @@
 #include "lmodel.h"
 #include "hmodel.h"
 
-// Check MODs
+// Check Addons
 #include "check_screenspace.h"
 
 #ifdef SSFX_BEEFS_NVG
@@ -86,11 +86,19 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 	float4	P = float4( gbd.P, gbd.mtl );	// position.(mtl or sun)
 	float4	N = float4( gbd.N, gbd.hemi );		// normal.hemi
 	float4	D = float4( gbd.C, gbd.gloss );		// rgb.gloss
+	
 #ifndef USE_MSAA
 	float4	L = s_accumulator.Sample( smp_nofilter, I.tc0);	// diffuse.specular
 #else
 	float4   L = s_accumulator.Load( int3( I.tc0 * screen_res.xy, 0 ), ISAMPLE );
 #endif
+
+	if (abs(P.w - MAT_FLORA) <= 0.05) {
+		// Reapply distance factor to fix overtly glossy plants in distance
+		// Unfortunately some trees etc don't seem to use the same detail shader
+		float	fAtten = 1 - smoothstep(0, 50, P.z);
+		D.a	*= (fAtten * fAtten);
+  }
 
      // static sun
 	float mtl = P.w;
@@ -99,11 +107,9 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 	float sun_occ = P.w*2;
 
 	mtl = xmaterial;
-	L += Ldynamic_color * sun_occ * plight_infinity	(mtl, P.xyz, N.xyz, D.xyzw, Ldynamic_dir);
+	L += SRGBToLinear(D.rgb * Ldynamic_color.rgb * sun_occ) * plight_infinity	(mtl, P.xyz, N.xyz, D.xyzw, Ldynamic_dir);
 #endif
 
-	// hemisphere
-	float3 hdiffuse, hspecular;
 
 	//  Calculate SSAO
 
@@ -111,7 +117,7 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 	int2	texCoord = I.pos2d;
 #endif
 	
-float3 occ = float3(1.0,1.0,1.0);
+	float3 occ = float3(1.0,1.0,1.0);
 
 #ifdef USE_HDAO
 #ifdef SM_5
@@ -138,49 +144,62 @@ float3 occ = float3(1.0,1.0,1.0);
 #ifdef SSAO_QUALITY
 	occ = compute_colored_ao(occ.x, D.xyz);
 #endif
-
-	hmodel	(hdiffuse, hspecular, mtl, N.w, D.w, P.xyz, N.xyz);
+	
+	//occ.rgb = SRGBToLinear(occ.rgb); 		//gamma correct
+	
+	L.rgb += L.a * SRGBToLinear(D.rgb); //illum in alpha
+	
+	
+	// hemisphere
+	float3 hdiffuse, hspecular;
+	hmodel	(hdiffuse, hspecular, mtl, N.w, D, P.xyz, N.xyz);
 
 	// AO implementation
 #ifdef SSFX_AO
-	hdiffuse *= (1.0f - (1.0f - occ) * (1.0f - dot(hdiffuse.rgb, LUMINANCE_VECTOR)));
+	hdiffuse *= (1.0f - SRGBToLinear(1.0f - occ) * (1.0f - dot(hdiffuse.rgb, LUMINANCE_VECTOR)));
 #else
 	hdiffuse *= occ;	
 #endif
+	//hspecular *= occ;
 
-	// Disable specular if SSR is enabled. ( Temporary fix? )
-#ifdef SSFX_SSR
-	hspecular = 0;
-#endif
+		float3       color     = L.rgb + hdiffuse.rgb;
+					 color = LinearTosRGB(color); 			//gamma correct
 
-        float4 light = float4(L.rgb + hdiffuse, L.w)        ;
-        float4 C = D*light;                             // rgb.gloss * light(diffuse.specular)
-		float3 spec = C.www * L.rgb + hspecular * C.rgba;              // replicated specular
-
-		float3       color     = C.rgb + spec;
-		
 	// SSR Implementation
 #ifdef SSFX_SSR
 	SSFX_ScreenSpaceReflections(I.tc0, P, N, D.a, color, ISAMPLE);	
 #endif
 
+#ifdef SSFX_BEEFS_NVG
+	//// SOME NVG SHIT ////
+	float lua_param_nvg_generation = floor(shader_param_8.x);			// 1, 2, or 3
+	float lua_param_nvg_num_tubes = frac(shader_param_8.x) * 10.0f;		// 1, 2, 4, 1.1, or 1.2
+	float lua_param_nvg_gain_current = floor(shader_param_8.y) / 10.0f; 
+	float lua_param_vignette_current = floor(shader_param_8.z) / 100.0f;
+
+	// NVG reduces gloss to 0 inside mask	
+	D.a *= (1.0 - compute_lens_mask(aspect_ratio_correction(I.tc0), lua_param_nvg_num_tubes));
+	//// END NVG SHIT ////
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 
-        // here should be distance fog
+	// here should be distance fog
 #ifdef SSFX_FOG
-		float3 		WorldP			= mul(m_inv_V, float4(P.xyz, 1));
-		float		fog				= SSFX_HEIGHT_FOG(P.xyz, WorldP.y, color);
+	float3 		WorldP			= mul(m_inv_V, float4(P.xyz, 1));
+	float		fog				= SSFX_HEIGHT_FOG(P.xyz, WorldP.y, color);
 #else
-		float		distance		= length		(P.xyz);
-		float		fog				= saturate		(distance*fog_params.w + fog_params.x);
-					color			= lerp			(color,fog_color,fog);
+	float		distance		= length		(P.xyz);
+	float		fog				= saturate		(distance*fog_params.w + fog_params.x);
+				color			= lerp			(color,fog_color,fog);
 #endif
-        float        	skyblend		= saturate		(fog*fog);
 
-        float          	tm_scale        = I.tc0.w;                // interpolated from VS
+	float		skyblend		= saturate		(fog*fog);
 
-        _out        	o;
+	float		tm_scale		= I.tc0.w; // interpolated from VS
 
+	_out		o;
+	
 #ifndef SSFX_BEEFS_NVG
 
 	tonemap(o.low, o.high, color, tm_scale);
@@ -190,56 +209,52 @@ float3 occ = float3(1.0,1.0,1.0);
 	return o;
 
 #else
-		/////////// BEEFS NVGS CHANGES ///////////
-		float lua_param_nvg_generation = floor(shader_param_8.x);             		// 1, 2, or 3
-		float lua_param_nvg_num_tubes = frac(shader_param_8.x) * 10.0f;            // 1, 2, 4, 1.1, or 1.2
-		float lua_param_nvg_gain_current = floor(shader_param_8.y) / 10.0f; 
-		float lua_param_vignette_current = floor(shader_param_8.z) / 100.0f;
+	/////////// BEEFS NVGS CHANGES ///////////
+	if (lua_param_nvg_generation > 0.0f && compute_lens_mask(aspect_ratio_correction(I.tc0), lua_param_nvg_num_tubes) == 1.0f)
+	{
+		float lua_param_nvg_gain_offset = floor(shader_param_8.w) / 10.0f;
+		tonemap(o.low, o.high, color, 10.0f * lua_param_nvg_gain_offset);
+
+		// Turn split tonemapping data to YUV and discard UV
+		o.low.r = dot(o.low.rgb, luma_conversion_coeff);
+		o.high.r = dot(o.high.rgb, luma_conversion_coeff);
+
+		o.low.r *= 4.0f;
+		o.high.r *= 4.0f;
+
+		// Turn s_accumulator data in to YUV and discard UV
+		o.low.g = pow(dot(L.rgb, luma_conversion_coeff),2.0f)*1.3f;
+		o.high.g = o.low.g;
+
+		// Turn albedo into YUV and discard UV
+		o.low.b = dot(D.rgb, luma_conversion_coeff);
+		o.high.b = o.low.b;
 		
-		if (lua_param_nvg_generation > 0.0f && compute_lens_mask(aspect_ratio_correction(I.tc0), lua_param_nvg_num_tubes) == 1.0f)
-		{
-			float lua_param_nvg_gain_offset = floor(shader_param_8.w) / 10.0f;
-	        tonemap(o.low, o.high, color, 10.0f * lua_param_nvg_gain_offset);
-		
-			// Turn split tonemapping data to YUV and discard UV
-			o.low.r = dot(o.low.rgb, luma_conversion_coeff);
-			o.high.r = dot(o.high.rgb, luma_conversion_coeff);
-		
-			o.low.r *= 4.0f;
-			o.high.r *= 4.0f;
-		
-			// Turn s_accumulator data in to YUV and discard UV
-			o.low.g = pow(dot(L.rgb, luma_conversion_coeff),2.0f)*1.3f;
-			o.high.g = o.low.g;
-		
-			// Turn albedo into YUV and discard UV
-			o.low.b = dot(D.rgb, luma_conversion_coeff);
-			o.high.b = o.low.b;
+		o.low *= lua_param_nvg_gain_current;
+		o.high *= lua_param_nvg_gain_current;
 			
-			o.low *= lua_param_nvg_gain_current;
-			o.high *= lua_param_nvg_gain_current;
+		// Extra
+		o.low.a = skyblend;
+		o.high.a = skyblend;
 				
-			// Extra
-			o.low.a = skyblend;
-			o.high.a = skyblend;
-					
 
-			// APPLY VIGNETTE
-			float vignette = calc_vignette(lua_param_nvg_num_tubes, I.tc0, lua_param_vignette_current+0.02);
-			
-			o.high = clamp(o.high,0.0,1.0);
-			o.low= clamp(o.low,0.0,1.0);
-			
-			o.high.rgb *= vignette;
-			o.low.rgb *= vignette;
+		// APPLY VIGNETTE
+		float vignette = calc_vignette(lua_param_nvg_num_tubes, I.tc0, lua_param_vignette_current+0.02);
+		
+		o.high = clamp(o.high,0.0,1.0);
+		o.low= clamp(o.low,0.0,1.0);
+		
+		o.high.rgb *= vignette;
+		o.low.rgb *= vignette;
 
-		}
-		else
-		{
-			tonemap(o.low, o.high, color, tm_scale);
-			o.low.a = skyblend;
-			o.high.a = skyblend;
-		}		
-		return o;
+	}
+	else
+	{
+		tonemap(o.low, o.high, color, tm_scale);
+		o.low.a = skyblend;
+		o.high.a = skyblend;
+	}		
+	return o;
 #endif
+
 }

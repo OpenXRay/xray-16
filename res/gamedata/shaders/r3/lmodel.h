@@ -3,48 +3,68 @@
 
 #include "common.h"
 #include "common_brdf.h"
+#include "pbr_brdf.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Lighting formulas
+
 float4 compute_lighting(float3 N, float3 V, float3 L, float4 alb_gloss, float mat_id)
 {
-	//Half vector
-  	float3 H = normalize(L+V);
+	float3 albedo = calc_albedo(alb_gloss, mat_id);
+	float3 specular = calc_specular(alb_gloss, mat_id);
+	float rough = calc_rough(alb_gloss, mat_id);
+	//calc_rain(albedo, specular, rough, alb_gloss, mat_id, 1);
+	calc_foliage(albedo, specular, rough, alb_gloss, mat_id);
 	
-	//Combined light
-	float4 light = s_material.Sample(smp_material, float3( dot(L,N), dot(H,N), mat_id)).xxxy;
-	
-	if(mat_id == MAT_FLORA) //Be aware of precision loss/errors
+	float3 light = Lit_BRDF(rough, albedo, specular, V, N, L );
+
+	//if(mat_id == MAT_FLORA) //Be aware of precision loss/errors
+	if(abs(mat_id-MAT_FLORA) <= MAT_FLORA_ELIPSON) //Be aware of precision loss/errors
 	{
 		//Simple subsurface scattering
 		float subsurface = SSS(N,V,L);
-		light.rgb += subsurface;
+		light.rgb += subsurface*albedo;
 	}	
 
-	return light;
+	return float4(light, 0);
 }
 
-float4 plight_infinity( float m, float3 pnt, float3 normal, float4 c_tex, float3 light_direction )
+float4 plight_infinity(float m, float3 pnt, float3 normal, float4 c_tex, float3 light_direction )
 {
 	//gsc vanilla stuff
 	float3 N = normalize(normal);							// normal 
-  	float3 V = -normalize(pnt);					// vector2eye
-  	float3 L = -normalize(light_direction);						// vector2light
+	float3 V = normalize(-pnt);					// vector2eye
+	float3 L = normalize(-light_direction);						// vector2light
 
 	float4 light = compute_lighting(N,V,L,c_tex,m);
 	
 	return light; // output (albedo.gloss)
 }
 
-float4 plight_local( float m, float3 pnt, float3 normal, float4 c_tex, float3 light_position, float light_range_rsq, out float rsqr )
+float4 plight_local(float m, float3 pnt, float3 normal, float4 c_tex, float3 light_position, float light_range_rsq, out float rsqr )
 {
-	float3 N		= normalize(normal);							// normal 
-	float3 L2P 	= pnt - light_position;                         		// light2point 
-	float3 V 		= -normalize	(pnt);					// vector2eye
-	float3 L 		= -normalize	((float3)L2P);					// vector2light
-	float3 H		= normalize	(L+V);						// half-angle-vector
-		rsqr	= dot		(L2P,L2P);					// distance 2 light (squared)
-	float  att 	= saturate	(1 - rsqr*light_range_rsq);			// q-linear attenuate
+	float atteps = 0.1;
+	
+	float3 L2P = pnt - light_position;                       		// light2point 
+	rsqr = dot(L2P,L2P); // distance 2 light (squared)
+	rsqr = max(rsqr, atteps);
+	//rsqr = rsqr + 1.0;
+	
+	//vanilla atten - linear
+	float att = saturate(1.0 - rsqr*light_range_rsq); // q-linear attenuate
+	att = SRGBToLinear(att);
+	/*
+	//unity atten - quadtratic
+	//catlikecoding.com/unity/tutorials/custom-srp/point-and-spot-lights/
+	att = rsqr * light_range_rsq;
+	att *= att;
+	att = saturate(1.0 - att);
+	att *= att;
+	att = att / rsqr;
+	*/
+	float3 N = normalize(normal);							// normal 
+	float3 V = normalize(-pnt);					// vector2eye
+	float3 L = normalize(-L2P);					// vector2light
 
 	float4 light = compute_lighting(N,V,L,c_tex,m);
 	
@@ -53,16 +73,22 @@ float4 plight_local( float m, float3 pnt, float3 normal, float4 c_tex, float3 li
 
 float3 specular_phong(float3 pnt, float3 normal, float3 light_direction)
 {
-	return L_sun_color.rgb * pow( abs( dot(normalize(pnt + light_direction), normal) ), 256.0);
+	float3 H = normalize(pnt + light_direction );
+	float nDotL = saturate(dot(normal, light_direction));
+	float nDotH = saturate(dot(normal, H));
+	float nDotV = saturate(dot(normal, pnt));
+	float lDotH = saturate(dot(light_direction, H));
+	//float vDotH = saturate(dot(pnt, H));
+	return L_sun_color.rgb * Lit_Specular(nDotL, nDotH, nDotV, lDotH, 0.02, 0.1);
 }
 
 //	TODO: DX10: Remove path without blending
-half4 blendp( half4 value, float4 tcp)
+half4 blendp(half4 value, float4 tcp)
 {
 	return 	value;
 }
 
-half4 blend( half4 value, float2 tc)
+half4 blend(half4 value, float2 tc)
 {
 	return 	value;
 }
