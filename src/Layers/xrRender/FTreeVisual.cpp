@@ -170,7 +170,6 @@ void FTreeVisual::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
 
             c_grass = (Fvector4*)GrassData;
         }
-        VERIFY(c_grass);
 
         if (c_grass)
         {
