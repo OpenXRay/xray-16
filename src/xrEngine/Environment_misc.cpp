@@ -591,6 +591,8 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     else
         parent.wetness_factor -= 0.0001f * ssfx_wetness_multiplier.y;
 
+    clamp(parent.wetness_factor, 0.f, 1.f);
+
     sun_azimuth = (fi * A.sun_azimuth + f * B.sun_azimuth);
 
      // Igor. Dynamic sun position.

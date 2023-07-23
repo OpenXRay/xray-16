@@ -153,7 +153,6 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                         cmd_list.get_ConstantDirect(strPos, BendersQty * sizeof(Fvector4), &GrassData, 0, 0);
                         c_grass = (Fvector4*)GrassData;
                     }
-                    VERIFY(c_grass);
 
                     if (c_grass)
                     {

@@ -1043,6 +1043,7 @@ void xrRender_initconsole()
     CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 20, 1, 5));
     CMD4(CCC_Vector4, "ssfx_wpn_dof_1", &ps_ssfx_wpn_dof_1, tw2_min, tw2_max);
     CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0, 1);
+    CMD4(CCC_Vector3, "r__color_grading", &ps_r2_img_cg, tw_min, tw_max);
 }
 
 #endif
