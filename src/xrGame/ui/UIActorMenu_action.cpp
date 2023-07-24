@@ -92,11 +92,8 @@ bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, C
 
         const PIItem _iitem = _citem ? static_cast<PIItem>(_citem->m_pData) : nullptr;
 
-        if (_iitem == nullptr)
-            return false;
-
         CGameObject* GO1 = smart_cast<CGameObject*>(CurrentIItem());
-        CGameObject* GO2 = smart_cast<CGameObject*>(_iitem);
+        CGameObject* GO2 = _iitem ? smart_cast<CGameObject*>(_iitem) : nullptr;
 
         return funct1(GO1 ? GO1->lua_game_object() : nullptr, GO2 ? GO2->lua_game_object() : nullptr, (int)t_old, (int)t_new);
     }
