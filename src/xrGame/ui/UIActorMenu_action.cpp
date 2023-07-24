@@ -92,8 +92,12 @@ bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, C
 
         const PIItem _iitem = _citem ? static_cast<PIItem>(_citem->m_pData) : nullptr;
 
+        // Callback handles dropping item on item, in other cases (moving, dropping from inventory) we do not fire it.
+        if (_iitem == nullptr)
+            return true;
+
         CGameObject* GO1 = smart_cast<CGameObject*>(CurrentIItem());
-        CGameObject* GO2 = _iitem ? smart_cast<CGameObject*>(_iitem) : nullptr;
+        CGameObject* GO2 = smart_cast<CGameObject*>(_iitem);
 
         return funct1(GO1 ? GO1->lua_game_object() : nullptr, GO2 ? GO2->lua_game_object() : nullptr, (int)t_old, (int)t_new);
     }
