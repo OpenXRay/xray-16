@@ -59,6 +59,18 @@
 
 #define     r2_base             "$user$base"
 
+//Anomaly
+#define		r2_RT_dof			"$user$dof"
+
+#define		r2_RT_blur_h_2		"$user$blur_h_2"
+#define		r2_RT_blur_2		"$user$blur_2"
+
+#define		r2_RT_blur_h_4		"$user$blur_h_4"
+#define		r2_RT_blur_4		"$user$blur_4"
+
+#define		r2_RT_blur_h_8		"$user$blur_h_8"
+#define		r2_RT_blur_8		"$user$blur_8"
+
 static constexpr auto c_lmaterial = "L_material";
 static constexpr auto c_sbase = "s_base";
 static constexpr auto c_snoise = "s_noise";

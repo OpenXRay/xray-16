@@ -215,6 +215,7 @@ extern ENGINE_API float ps_r2_img_exposure; // r2-only
 extern ENGINE_API float ps_r2_img_gamma; // r2-only
 extern ENGINE_API float ps_r2_img_saturation; // r2-only
 extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
+int ps_r2_nightvision = 0;
 
 // Ascii1457's Screen Space Shaders
 extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
@@ -1031,6 +1032,8 @@ void xrRender_initconsole()
 #if RENDER == R_R4
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
 #endif
+
+    CMD4(CCC_Integer, "r__nightvision", &ps_r2_nightvision, 0, 3); //For beef's nightvision shader or other stuff
 
     // Screen Space Shaders
     Fvector4 tw2_min = { -100.f, -100.f, -100.f, -100.f };

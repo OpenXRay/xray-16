@@ -310,6 +310,13 @@ void CRenderTarget::phase_combine()
 
     RCache.set_Stencil(FALSE);
 
+	//(Anomaly) Compute blur textures
+	phase_blur();
+
+	//(Anomaly) Compute depth of field effect
+	if (ps_r2_ls_flags.test(R2FLAG_DOF))
+		phase_dof();
+
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
     BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
