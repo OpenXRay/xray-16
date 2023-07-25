@@ -317,6 +317,10 @@ void CRenderTarget::phase_combine()
 	if (ps_r2_ls_flags.test(R2FLAG_DOF))
 		phase_dof();
 
+    //(Anomaly) Compute night vision effect
+    if (ps_r2_nightvision > 0)
+        phase_nightvision();
+
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
     BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
