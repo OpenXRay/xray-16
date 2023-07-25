@@ -118,7 +118,8 @@ void calc_rain(inout float3 albedo, inout float3 specular, inout float rough, in
 {
 	//rain based on Remember Me's implementation
 	//float wetness = saturate(rain_params.x*rainmask);
-	float wetness = saturate(smoothstep(0.1,0.9,rain_params.x*rainmask));
+	// yohji - edited to clamp rain_density between 0-0.5, to prevent weird shading with high rain_density
+	float wetness = saturate(smoothstep(0.1,0.9,clamp(rain_params.x, 0.0, 0.5)*rainmask));
 
 	float porosity = 1-saturate(material_ID*1.425); //metal material at 0, concrete at 1
 	//porosity = saturate((porosity-0.5)/0.4); //Remember Me rain porosity
