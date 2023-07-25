@@ -217,6 +217,16 @@ extern ENGINE_API float ps_r2_img_saturation; // r2-only
 extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
 int ps_r2_nightvision = 0;
 
+//debug
+Fvector4 ps_dev_param_1 = { .0f, .0f, .0f, .0f };
+Fvector4 ps_dev_param_2 = { .0f, .0f, .0f, .0f };
+Fvector4 ps_dev_param_3 = { .0f, .0f, .0f, .0f };
+Fvector4 ps_dev_param_4 = { .0f, .0f, .0f, .0f };
+Fvector4 ps_dev_param_5 = { .0f, .0f, .0f, .0f };
+Fvector4 ps_dev_param_6 = { .0f, .0f, .0f, .0f };
+Fvector4 ps_dev_param_7 = { .0f, .0f, .0f, .0f };
+Fvector4 ps_dev_param_8 = { .0f, .0f, .0f, .0f };
+
 // Ascii1457's Screen Space Shaders
 extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
 extern ENGINE_API Fvector4 ps_ssfx_grass_shadows;
@@ -1035,11 +1045,20 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
 #endif
 
-    CMD4(CCC_Integer, "r__nightvision", &ps_r2_nightvision, 0, 3); //For beef's nightvision shader or other stuff
-
-    // Screen Space Shaders
+    // Anomaly
     Fvector4 tw2_min = { -100.f, -100.f, -100.f, -100.f };
     Fvector4 tw2_max = { 100.f, 100.f, 100.f, 100.f };
+    CMD4(CCC_Integer, "r__nightvision", &ps_r2_nightvision, 0, 3); //For beef's nightvision shader or other stuff
+    CMD4(CCC_Vector4, "shader_param_1", &ps_dev_param_1, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_2", &ps_dev_param_2, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_3", &ps_dev_param_3, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_4", &ps_dev_param_4, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_5", &ps_dev_param_5, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_6", &ps_dev_param_6, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_7", &ps_dev_param_7, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_8", &ps_dev_param_8, tw2_min, tw2_max);
+
+    // Screen Space Shaders
     CMD4(CCC_Integer, "r__screen_space_shaders", &ps_screen_space_shaders, 0, 1);
     CMD4(CCC_Vector4, "ssfx_grass_shadows", &ps_ssfx_grass_shadows, Fvector4().set(0, 0, 0, 0), Fvector4().set(3, 1, 100, 100));
     CMD4(CCC_ssfx_cascades, "ssfx_shadow_cascades", &ps_ssfx_shadow_cascades, Fvector3().set(1.0f, 1.0f, 1.0f), Fvector3().set(300, 300, 300));
