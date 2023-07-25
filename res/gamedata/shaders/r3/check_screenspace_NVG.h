@@ -1,1 +1,1 @@
-//#define SSFX_BEEFS_NVG
+#define SSFX_BEEFS_NVG
