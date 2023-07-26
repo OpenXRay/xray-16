@@ -30,6 +30,8 @@
 	#   include "Layers/xrRender/blenders/Blender_Blur.h"
 	#   include "Layers/xrRender/blenders/blender_dof.h"
 	#   include "Layers/xrRender/blenders/blender_nightvision.h"
+    #   include "Layers/xrRender/blenders/blender_gasmask_drops.h"
+    #   include "Layers/xrRender/blenders/blender_gasmask_dudv.h"
 #endif
 #if defined(USE_DX9)
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, BOOL common_stencil)
@@ -392,6 +394,8 @@ CRenderTarget::CRenderTarget()
 		//Blenders
 		b_blur = xr_new<CBlender_Blur>();
 		b_dof = xr_new<CBlender_dof>();
+        b_gasmask_drops = xr_new<CBlender_gasmask_drops>();
+        b_gasmask_dudv = xr_new<CBlender_gasmask_dudv>();
 		b_nightvision = xr_new<CBlender_nightvision>();
 
 		//Rendertargets
@@ -409,6 +413,8 @@ CRenderTarget::CRenderTarget()
 		//Shader
 		s_blur.create(b_blur, "r2\\blur");
 		s_dof.create(b_dof, "r2\\dof");
+        s_gasmask_drops.create(b_gasmask_drops, "r2\\gasmask_drops");
+        s_gasmask_dudv.create(b_gasmask_dudv, "r2\\gasmask_dudv");
 		s_nightvision.create(b_nightvision, "r2\\nightvision");
 	}
 	#endif
@@ -901,6 +907,8 @@ CRenderTarget::~CRenderTarget()
 #if RENDER == R_R4
 	xr_delete(b_blur);		
 	xr_delete(b_dof);
+    xr_delete(b_gasmask_drops);
+    xr_delete(b_gasmask_dudv);
 	xr_delete(b_nightvision);
 #endif
 }

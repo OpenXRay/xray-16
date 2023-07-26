@@ -145,8 +145,6 @@ extern ECORE_API float ps_r2_slight_fade; // 1.f
 extern ECORE_API int ps_r2_wait_sleep;
 extern ECORE_API int ps_r2_wait_timeout;
 
-extern ECORE_API int ps_r2_nightvision;
-
 //	x - min (0), y - focus (1.4), z - max (100)
 extern ECORE_API Fvector3 ps_r2_dof;
 extern ECORE_API float ps_r2_dof_sky; //	distance to sky
@@ -155,6 +153,11 @@ extern ECORE_API float ps_r2_dof_kernel_size; //	7.0f
 extern ECORE_API float ps_r3_dyn_wet_surf_near; // 10.0f
 extern ECORE_API float ps_r3_dyn_wet_surf_far; // 30.0f
 extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
+
+// Anomaly support
+extern ECORE_API int ps_r2_nightvision;
+extern ECORE_API Fvector4 ps_r2_mask_control;
+extern ECORE_API Fvector ps_r2_drops_control;
 
 enum
 {

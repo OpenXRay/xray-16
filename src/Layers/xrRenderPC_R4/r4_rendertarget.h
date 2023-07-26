@@ -90,6 +90,8 @@ public:
 	//Blenders
 	IBlender* b_blur;	
 	IBlender* b_dof;
+    IBlender* b_gasmask_drops;
+    IBlender* b_gasmask_dudv;
 	IBlender* b_nightvision;	
 	
 	//Rendertargets
@@ -130,6 +132,8 @@ private:
 	//Anomaly
 	ref_shader s_blur;	
 	ref_shader s_dof;
+    ref_shader s_gasmask_drops;
+    ref_shader s_gasmask_dudv;
 	ref_shader s_nightvision;
 
     //	generate min/max
@@ -294,6 +298,8 @@ public:
 	//Anomaly renderphases
 	void phase_blur();
 	void phase_dof();
+    void phase_gasmask_drops();
+    void phase_gasmask_dudv();
 	void phase_nightvision();
 
     //	Generates min/max sm

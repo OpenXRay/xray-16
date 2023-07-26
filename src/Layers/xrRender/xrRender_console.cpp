@@ -215,6 +215,8 @@ extern ENGINE_API float ps_r2_img_exposure; // r2-only
 extern ENGINE_API float ps_r2_img_gamma; // r2-only
 extern ENGINE_API float ps_r2_img_saturation; // r2-only
 extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
+Fvector4 ps_r2_mask_control = { .0f, .0f, .0f, .0f }; // r2-only
+Fvector ps_r2_drops_control = { .0f, 1.15f, .0f }; // r2-only
 int ps_r2_nightvision = 0;
 
 //debug
@@ -1046,9 +1048,16 @@ void xrRender_initconsole()
 #endif
 
     // Anomaly
-    Fvector4 tw2_min = { -100.f, -100.f, -100.f, -100.f };
-    Fvector4 tw2_max = { 100.f, 100.f, 100.f, 100.f };
+    Fvector4 tw2_min = { 0.f, 0.f, 0.f, 0.f };
+    Fvector4 tw2_max = { 10.f, 3.f, 1.f, 1.f };
+    tw_min.set(0, 0, 0);
+    tw_max.set(1, 2, 1);
     CMD4(CCC_Integer, "r__nightvision", &ps_r2_nightvision, 0, 3); //For beef's nightvision shader or other stuff
+    CMD4(CCC_Vector4, "r2_mask_control", &ps_r2_mask_control, tw2_min, tw2_max);
+    CMD4(CCC_Vector3, "r2_drops_control", &ps_r2_drops_control, tw_min, tw_max);
+
+    tw2_max.set(-100.f, -100.f, -100.f, -100.f);
+    tw2_max.set(100.f, 100.f, 100.f, 100.f);
     CMD4(CCC_Vector4, "shader_param_1", &ps_dev_param_1, tw2_min, tw2_max);
     CMD4(CCC_Vector4, "shader_param_2", &ps_dev_param_2, tw2_min, tw2_max);
     CMD4(CCC_Vector4, "shader_param_3", &ps_dev_param_3, tw2_min, tw2_max);
@@ -1067,6 +1076,9 @@ void xrRender_initconsole()
     CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 20, 1, 5));
     CMD4(CCC_Vector4, "ssfx_wpn_dof_1", &ps_ssfx_wpn_dof_1, tw2_min, tw2_max);
     CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0, 1);
+
+    tw_min.set(0, 0, 0);
+    tw_max.set(1, 1, 1);
     CMD4(CCC_Vector3, "r__color_grading", &ps_r2_img_cg, tw_min, tw_max);
 }
 
