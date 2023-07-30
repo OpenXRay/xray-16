@@ -405,9 +405,9 @@ function gamespy_page:OnKeyboard(dik, keyboard_action)
 	elseif keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if dik == DIK_keys.DIK_LCONTROL then
 			ctrl = true
-		elseif dik == DIK_keys.DIK_ESCAPE then
+		elseif bind == key_bindings.kQUIT then
 			self:OnBtnCancel()
-		elseif dik == DIK_keys.DIK_TAB then
+		elseif bind == key_bindings.kSCORES then
 			if(ctrl) then
 	            if(self.active_page=="login_page") then
 					self:OnBtnShowCreateAccountPage()

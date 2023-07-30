@@ -159,10 +159,13 @@ end
 
 function numpad:OnKeyboard(dik, keyboard_action)  --virtual function
 	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	local bind = dik_to_bind(dik)
 
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
-		if dik == DIK_keys.DIK_ESCAPE then
+		if bind == key_bindings.kQUIT then
 			self:HideDialog()
+		elseif bind == key_bindings.kENTER or dik == DIK_keys.DIK_RETURN or dik == DIK_keys.DIK_NUMPADENTER then
+			self:OnButton_OK_clicked()
 		end
 
 		if dik == DIK_keys.DIK_0 or dik == DIK_keys.DIK_NUMPAD0 then
@@ -187,8 +190,6 @@ function numpad:OnKeyboard(dik, keyboard_action)  --virtual function
 			self:AddNumber(9)
 		elseif dik == DIK_keys.DIK_BACK then
 			self:OnButton_backspace_clicked()
-		elseif dik == DIK_keys.DIK_RETURN or dik == DIK_keys.DIK_NUMPADENTER then
-			self:OnButton_OK_clicked()
 		elseif dik == DIK_keys.DIK_DELETE or dik == DIK_keys.DIK_NUMPADCOMMA then
 			self:OnButton_c_clicked()
 		end

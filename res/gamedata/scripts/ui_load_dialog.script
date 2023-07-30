@@ -322,10 +322,7 @@ function load_dialog:OnKeyboard(dik, keyboard_action)  --virtual function
 	if bind == key_bindings.kQUIT then
 		self:OnButton_back_clicked()
 	else
-
-		 DIK_RETURN = 28
-
-		if dik == DIK_RETURN and keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if bind == key_bindings.kENTER and keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 			self:OnButton_load_clicked()
 		end
 	end

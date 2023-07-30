@@ -109,7 +109,7 @@ function localnet_page:OnKeyboard(dik, keyboard_action)
 	local console = get_console()
 
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
-		if dik == DIK_keys.DIK_ESCAPE then
+		if bind == key_bindings.kQUIT then
 			self:OnBtnCancel()
 		end
 	end
