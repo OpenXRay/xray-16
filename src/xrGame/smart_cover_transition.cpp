@@ -45,15 +45,19 @@ bool action::applicable() const
 
 void action::load_animations(luabind::object const& table)
 {
-    for (luabind::iterator it(table), end; it != end; ++it)
+    luabind::iterator it(table), end;
+    const size_t count = luabind_it_distance(it, end);
+    m_animations.reserve(count);
+    while (it != end)
     {
         auto tmp = *it;
-        Fvector const& pos = parse_fvector(tmp, "position");
-        shared_str anim_id = parse_string(tmp, "animation");
-        MonsterSpace::EBodyState body_state = (MonsterSpace::EBodyState)parse_int(tmp, "body_state");
-        MonsterSpace::EMovementType movement_type = (MonsterSpace::EMovementType)parse_int(tmp, "movement_type");
-        animation_action* animation = xr_new<animation_action>(pos, anim_id, body_state, movement_type);
+        const Fvector pos = parse_fvector(tmp, "position");
+        const shared_str anim_id = parse_string(tmp, "animation");
+        const auto body_state = (MonsterSpace::EBodyState)parse_int(tmp, "body_state");
+        const auto movement_type = (MonsterSpace::EMovementType)parse_int(tmp, "movement_type");
+        auto* animation = xr_new<animation_action>(pos, anim_id, body_state, movement_type);
         m_animations.push_back(animation);
+        ++it;
     }
 }
 

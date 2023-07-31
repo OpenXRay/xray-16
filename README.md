@@ -91,7 +91,12 @@ of all the original source code and S.T.A.L.K.E.R. franchise. However, they know
 ### Funding
 [![Financial Contributors](https://opencollective.com/openxray/tiers/badge.svg?label=Financial%20contributors)](https://opencollective.com/openxray) [![Sponsors](https://img.shields.io/github/sponsors/openxray?color=brightgreen&label=Sponsors)](https://github.com/sponsors/OpenXRay) [![Patreon](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F5950725&query=data.attributes.patron_count&suffix=%20Patrons&color=success&label=Patreon&style=flat)](https://patreon.com/openxray)
 
-You may provide financial support for this project by donating via [Boosty](https://boosty.to/openxray), [GitHub Sponsors](https://github.com/sponsors/OpenXRay), [Patreon](https://patreon.com/openxray), or [Open Collective](https://opencollective.com/openxray). Thank you for your support!
+You may provide financial support for this project by donating via different ways:
+* [Boosty](https://boosty.to/openxray) – a large part of the team is located in Russia, if you have an ability to donate through Boosty, please use it, since we don't have an ability to withdraw funds from services like Patreon, etc. to our local Russian banking cards/accounts.
+* [GitHub Sponsors](https://github.com/sponsors/OpenXRay), [Patreon](https://patreon.com/openxray), [Open Collective](https://opencollective.com/openxray) – funds raised from these services will be used to support our developers outside of Russia, and also we may use them to pay for paid services on GitHub, AppVeyor, etc.
+* Bitcoin wallet: 363ZUoWcQe9fDvRPK9Kee2YuPdyhSFQpr2
+
+Thank you for your support!
 
 ## Thanks
 * [GSC Game World](https://gsc-game.com/) – for creating S.T.A.L.K.E.R. and supporting the community;
@@ -121,6 +126,7 @@ You may provide financial support for this project by donating via [Boosty](http
     * [Zigatun](https://github.com/Zigatun) – work on ARM port.
     * [Masterkatze](https://github.com/Masterkatze) – work on the build system, bug fixing.
     * [Chugunov Roman](https://github.com/ChugunovRoman) – work on [porting Call of Chernobyl to latest OpenXRay](https://github.com/ChugunovRoman/xray-16), extending functionality for modmakers.
+    * [yohjimane](https://github.com/yohjimane) – work on original game bugs fixes and new features.
   * Other contributors:
     * [alexgdi](https://github.com/alexgdi) – work on organizing project infrastructure, external dependencies.
     * [NeoAnomaly](https://github.com/NeoAnomaly) – help with debug functionality on Windows.
