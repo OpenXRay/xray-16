@@ -46,3 +46,5 @@
 [submodule "Externals/xrLuaFix"]
 	path = Externals/xrLuaFix
 	url = https://github.com/OpenXRay/xrLuaFix.git
+[submodule "LuaJIT"]
+	url = https://github.com/OpenXRay/LuaJIT.git
