@@ -105,7 +105,7 @@ void xrCore::CalculateBuildId()
 
 void xrCore::PrintBuildInfo()
 {
-//    Msg("%s %s build %d, %s (%s)", ApplicationName, XRAY_BUILD_CONFIGURATION, buildId, buildDate, XRAY_BUILD_CONFIGURATION2);
+    Msg("%s %s build %d, %s (%s)", ApplicationName, XRAY_BUILD_CONFIGURATION, buildId, buildDate, XRAY_BUILD_CONFIGURATION2);
 
     pcstr name      = "Custom";
     pcstr buildUniqueId = nullptr;
