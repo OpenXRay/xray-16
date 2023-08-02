@@ -107,7 +107,6 @@ CLevel::CLevel()
     pActors4CrPr.clear();
     g_player_hud = xr_new<player_hud>();
     g_player_hud->load_default();
-    Msg("%s", Core.Params);
 }
 
 CLevel::~CLevel()
