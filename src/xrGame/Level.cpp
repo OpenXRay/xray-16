@@ -105,6 +105,7 @@ CLevel::CLevel()
     m_ph_commander_scripts = xr_new<CPHCommander>();
     pObjects4CrPr.clear();
     pActors4CrPr.clear();
+    pHUD = xr_new<CHUDManager>();
     g_player_hud = xr_new<player_hud>();
     g_player_hud->load_default();
 }
@@ -112,6 +113,7 @@ CLevel::CLevel()
 CLevel::~CLevel()
 {
     xr_delete(g_player_hud);
+    xr_delete(pHUD);
     delete_data(hud_zones_list);
     hud_zones_list = nullptr;
     Msg("- Destroying level");

@@ -238,8 +238,8 @@ bool CLevel::net_start_client6()
         }
         if (!GEnv.isDedicatedServer)
         {
-            g_hud->Load();
-            g_hud->OnConnected();
+            pHUD->Load();
+            pHUD->OnConnected();
         }
 
 #ifdef DEBUG
