@@ -1560,8 +1560,6 @@ set(SRC_FILES
     "trajectories.h"
     "UIAchivementsIndicator.cpp"
     "UIAchivementsIndicator.h"
-    #"UI.cpp"
-    #"UI.h"
     "UIDialogHolder.cpp"
     "UIDialogHolder.h"
     "ui_export_script.cpp"

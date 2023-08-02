@@ -9,9 +9,6 @@ namespace collide { struct rq_result; }
 
 class CHUDManager final : public CCustomHUD
 {
-    friend class CUI;
-
-private:
     Lock render_lock{}; // TODO: I believe this can be avoided, need to think more about it
     CUIGameCustom* pUIGame{};
     CHitMarker HitMarker;
