@@ -656,6 +656,8 @@ bool CMainMenu::FillDebugInfo()
     ImGui::TreePop();
     ImGui::Separator();
     return true;
+#else
+    return false;
 #endif
 }
 
