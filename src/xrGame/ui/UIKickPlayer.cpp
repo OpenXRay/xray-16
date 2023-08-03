@@ -14,6 +14,7 @@
 #include "xrEngine/XR_IOConsole.h"
 
 CUIKickPlayer::CUIKickPlayer()
+    : CUIDialogWnd("CUIKickPlayer")
 {
     m_prev_upd_time = 0;
     bkgrnd = xr_new<CUIStatic>("Background");

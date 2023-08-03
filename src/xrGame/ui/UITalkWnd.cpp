@@ -15,7 +15,7 @@
 #include "UIXmlInit.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 
-CUITalkWnd::CUITalkWnd()
+CUITalkWnd::CUITalkWnd() : CUIDialogWnd("CUITalkWnd")
 {
     m_pActor = NULL;
 
@@ -32,7 +32,6 @@ CUITalkWnd::CUITalkWnd()
     b_disable_break = false;
 }
 
-CUITalkWnd::~CUITalkWnd() {}
 void CUITalkWnd::InitTalkWnd()
 {
     inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));

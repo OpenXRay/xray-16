@@ -15,6 +15,7 @@
 #endif
 
 CUIServerInfo::CUIServerInfo()
+    : CUIDialogWnd("CUIServerInfo")
 {
     m_dds_file_created = false;
 

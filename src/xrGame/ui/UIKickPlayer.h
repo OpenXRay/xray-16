@@ -10,7 +10,7 @@ class CUISpinNum;
 class CUIXml;
 struct game_PlayerState;
 
-class CUIKickPlayer : public CUIDialogWnd
+class CUIKickPlayer final : public CUIDialogWnd
 {
 public:
     CUIKickPlayer();

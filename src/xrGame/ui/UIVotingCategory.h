@@ -11,7 +11,7 @@ class ChangeGameTypeDialog;
 class CUIXml;
 class CUITextVote;
 
-class CUIVotingCategory : public CUIDialogWnd
+class CUIVotingCategory final : public CUIDialogWnd
 {
 private:
     typedef CUIDialogWnd inherited;

@@ -61,7 +61,7 @@ enum EMenuMode
     mmDeadBodySearch,
 };
 
-class CUIActorMenu : public CUIDialogWnd, public CUIWndCallback
+class CUIActorMenu final : public CUIDialogWnd, public CUIWndCallback
 {
     typedef CUIDialogWnd inherited;
     typedef inventory::upgrade::Upgrade Upgrade_type;

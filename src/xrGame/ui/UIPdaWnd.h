@@ -21,7 +21,7 @@ class CUILogsWnd;
 class CUIAnimatedStatic;
 class UIHint;
 
-class CUIPdaWnd : public CUIDialogWnd
+class CUIPdaWnd final : public CUIDialogWnd
 {
     typedef CUIDialogWnd inherited;
 

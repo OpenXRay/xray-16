@@ -4,7 +4,7 @@
 
 class CUIMessageBox;
 
-class CUIMessageBoxEx : public CUIDialogWnd, public CUIWndCallback
+class CUIMessageBoxEx final : public CUIDialogWnd, public CUIWndCallback
 {
 public:
     CUIMessageBoxEx();

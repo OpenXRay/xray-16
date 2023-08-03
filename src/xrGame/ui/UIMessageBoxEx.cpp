@@ -3,7 +3,7 @@
 #include "UIMessageBoxEx.h"
 #include "UIDialogHolder.h"
 
-CUIMessageBoxEx::CUIMessageBoxEx()
+CUIMessageBoxEx::CUIMessageBoxEx() : CUIDialogWnd("CUIMessageBoxEx")
 {
     m_pMessageBox = xr_new<CUIMessageBox>();
     m_pMessageBox->SetWindowName("msg_box");
@@ -12,6 +12,7 @@ CUIMessageBoxEx::CUIMessageBoxEx()
 }
 
 CUIMessageBoxEx::~CUIMessageBoxEx() { xr_delete(m_pMessageBox); }
+
 bool CUIMessageBoxEx::InitMessageBox(LPCSTR xml_template)
 {
     // CUIDialogWnd::SetWndRect(Frect().set(0.0f,0.0f,1024.0f,768.0f));

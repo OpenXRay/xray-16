@@ -43,7 +43,7 @@ private:
 
 using ITEMS_vec = xr_vector<SBuyItemInfo*>;
 
-class CUIMpTradeWnd : public IBuyWnd, public CUIWndCallback
+class CUIMpTradeWnd final : public IBuyWnd, public CUIWndCallback
 {
     typedef CUIDialogWnd inherited;
     friend class CUICellItemTradeMenuDraw;

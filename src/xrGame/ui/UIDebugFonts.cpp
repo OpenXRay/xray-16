@@ -2,13 +2,12 @@
 #include "UIDebugFonts.h"
 #include "UIDialogHolder.h"
 
-CUIDebugFonts::CUIDebugFonts() : m_background("Background")
+CUIDebugFonts::CUIDebugFonts() : CUIDialogWnd("CUIDebugFonts"), m_background("Background")
 {
     AttachChild(&m_background);
     InitDebugFonts({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
 }
 
-CUIDebugFonts::~CUIDebugFonts() {}
 void CUIDebugFonts::InitDebugFonts(Frect&& r)
 {
     CUIDialogWnd::SetWndRect(r);

@@ -259,7 +259,7 @@ void CUIGameSP::ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id
     }
 }
 
-CChangeLevelWnd::CChangeLevelWnd()
+CChangeLevelWnd::CChangeLevelWnd() : CUIDialogWnd("CChangeLevelWnd")
 {
     m_messageBox = xr_new<CUIMessageBox>();
     m_messageBox->SetAutoDelete(true);

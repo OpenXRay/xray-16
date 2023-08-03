@@ -13,6 +13,7 @@
 #include "DemoPlay_Control.h"
 
 CUIDemoPlayControl::CUIDemoPlayControl()
+    : CUIDialogWnd("CUIDemoPlayControl")
 {
     m_progress_bar = xr_new<CUIProgressBar>();
     AttachChild(m_progress_bar);

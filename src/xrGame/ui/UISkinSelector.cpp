@@ -12,6 +12,7 @@
 #include "Common/object_broker.h"
 
 CUISkinSelectorWnd::CUISkinSelectorWnd(const char* strSectionName, s16 team)
+    : CUIDialogWnd("CUISkinSelectorWnd")
 {
     m_team = team;
     m_iActiveIndex = -1;

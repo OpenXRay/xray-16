@@ -11,11 +11,10 @@
 #include "xrUICore/Static/UIStatic.h"
 #include "UIDialogWnd.h"
 
-class CUIDebugFonts : public CUIDialogWnd
+class CUIDebugFonts final : public CUIDialogWnd
 {
 public:
     CUIDebugFonts();
-    virtual ~CUIDebugFonts();
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     void FillUpList();

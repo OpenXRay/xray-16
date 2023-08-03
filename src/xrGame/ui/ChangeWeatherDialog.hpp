@@ -26,7 +26,7 @@ private:
     xr_vector<NamedButton> buttons;
 
 protected:
-    ButtonListDialog();
+    ButtonListDialog(pcstr window_name);
     virtual ~ButtonListDialog() {}
     void Initialize(int buttonCount);
     const NamedButton& GetButton(int i) const;
@@ -40,7 +40,7 @@ protected:
     virtual void OnCancel();
 };
 
-class ChangeWeatherDialog : public ButtonListDialog
+class ChangeWeatherDialog final : public ButtonListDialog
 {
 private:
     struct WeatherDesc
@@ -52,6 +52,8 @@ private:
     xr_vector<WeatherDesc> weathers;
 
 public:
+    ChangeWeatherDialog() : ButtonListDialog("ChangeWeatherDialog") {}
+
     void InitChangeWeather(CUIXml& xmlDoc);
     // ButtonListDialog
     virtual void OnButtonClick(int i) override;
@@ -61,12 +63,14 @@ private:
     void ParseWeather();
 };
 // XXX nitrocaster: move to separate file
-class ChangeGameTypeDialog : public ButtonListDialog
+class ChangeGameTypeDialog final : public ButtonListDialog
 {
 private:
     xr_vector<shared_str> gameTypes;
 
 public:
+    ChangeGameTypeDialog() : ButtonListDialog("ChangeGameTypeDialog") {}
+
     void InitChangeGameType(CUIXml& xmlDoc);
     // ButtonListDialog
     virtual void OnButtonClick(int i) override;

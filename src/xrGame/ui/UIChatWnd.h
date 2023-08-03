@@ -7,7 +7,7 @@ class CUIGameLog;
 class CUIEditBox;
 class CUITextWnd;
 
-class CUIChatWnd : public CUIDialogWnd, public CUIWndCallback
+class CUIChatWnd final : public CUIDialogWnd, public CUIWndCallback
 {
     typedef CUIDialogWnd inherited;
 

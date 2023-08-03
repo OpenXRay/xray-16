@@ -8,7 +8,7 @@ class CUI3tButton;
 class CUIMapInfo;
 class CUIStatsPlayerList;
 
-class CUIMapDesc : public CUIDialogWnd
+class CUIMapDesc final : public CUIDialogWnd
 {
 public:
     CUIMapDesc();

@@ -12,7 +12,7 @@ class CUIListWnd;
 class CUIListBox;
 
 template <typename T>
-struct CUIDialogWndExWrapperBase : public T, public luabind::wrap_base
+struct CUIDialogWndExWrapperBase final : public T, public luabind::wrap_base
 {
     typedef T inherited;
     typedef CUIDialogWndExWrapperBase<T> self_type;

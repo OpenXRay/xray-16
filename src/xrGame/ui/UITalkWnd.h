@@ -15,7 +15,7 @@ class CUITalkDialogWnd;
 //
 ///////////////////////////////////////
 
-class CUITalkWnd : public CUIDialogWnd
+class CUITalkWnd final : public CUIDialogWnd
 {
 private:
     typedef CUIDialogWnd inherited;
@@ -25,7 +25,6 @@ private:
 
 public:
     CUITalkWnd();
-    virtual ~CUITalkWnd();
 
     IC bool playing_sound() { return !!m_sound._feedback(); }
     IC CInventoryOwner* OthersInvOwner() const { return m_pOthersInvOwner; };

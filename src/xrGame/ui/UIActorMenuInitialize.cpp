@@ -43,7 +43,7 @@ constexpr cpcstr CARBODY_ITEM_XML    = "carbody_item.xml";
 }
 
 CUIActorMenu::CUIActorMenu()
-    : m_currMenuMode(mmUndefined), m_last_time(u32(-1)),
+    : CUIDialogWnd("CUIActorMenu"), m_currMenuMode(mmUndefined), m_last_time(u32(-1)),
       m_repair_mode(false), m_item_info_view(false), m_highlight_clear(true),
       m_trade_partner_inventory_state(0)
 {

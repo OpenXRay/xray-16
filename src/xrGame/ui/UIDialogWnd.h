@@ -13,7 +13,7 @@ private:
 protected:
 public:
     bool m_bWorkInPause;
-    CUIDialogWnd();
+    CUIDialogWnd(pcstr window_name);
     virtual ~CUIDialogWnd();
 
     virtual void Show(bool status);

@@ -3,11 +3,10 @@
 
 class CUIScrollView;
 
-class CUISpeechMenu : public CUIDialogWnd
+class CUISpeechMenu final : public CUIDialogWnd
 {
 public:
     CUISpeechMenu(LPCSTR section_name);
-    virtual ~CUISpeechMenu();
     void InitList(LPCSTR section_name);
     virtual bool NeedCursor() const { return false; }
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);

@@ -37,7 +37,7 @@ u32 g_pda_info_state = 0;
 void RearrangeTabButtons(CUITabControl* pTab);
 CDialogHolder* CurrentDialogHolder();
 
-CUIPdaWnd::CUIPdaWnd()
+CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd("CUIPdaWnd")
 {
     pUIMapWnd = nullptr;
     pUITaskWnd = nullptr;

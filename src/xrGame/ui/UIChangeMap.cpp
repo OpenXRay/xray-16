@@ -15,6 +15,7 @@
 #include "xrUICore/Windows/UIFrameWindow.h"
 
 CUIChangeMap::CUIChangeMap()
+    :CUIDialogWnd("CUIChangeMap")
 {
     m_prev_upd_time = 0;
 
@@ -59,7 +60,6 @@ CUIChangeMap::CUIChangeMap()
     AttachChild(btn_cancel);
 }
 
-CUIChangeMap::~CUIChangeMap() {}
 void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "change_map", 0, this);
