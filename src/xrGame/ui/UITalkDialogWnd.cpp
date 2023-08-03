@@ -135,8 +135,6 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
     CGameFont* pFont = nullptr;
     CUIXmlInit::InitFont(*m_uiXml, "font", 1, m_uOurReplicsColor, pFont);
 
-    SetWindowName("----CUITalkDialogWnd");
-
     Register(&UIToTradeButton);
     AddCallbackStr("question_item", LIST_ITEM_CLICKED, CUIWndCallback::void_function(this, &CUITalkDialogWnd::OnQuestionClicked));
 

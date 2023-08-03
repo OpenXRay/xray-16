@@ -129,6 +129,9 @@ public:
     void UpdatePda();
     void update_fake_indicators(u8 type, float power);
     void enable_fake_indicators(bool enable);
+
+    pcstr GetDebugType() override { return "CUIGameCustom"; }
+    bool FillDebugInfo() override;
 };
 
 extern CUIGameCustom* CurrentGameUI();

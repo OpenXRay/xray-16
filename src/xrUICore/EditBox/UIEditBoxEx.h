@@ -15,6 +15,8 @@ public:
     virtual bool InitTexture(pcstr texture, bool fatal = true);
     virtual bool InitTextureEx(pcstr texture, pcstr shader, bool fatal = true);
 
+    pcstr GetDebugType() override { return "CUIEditBoxEx"; }
+
 protected:
     CUIFrameWindow* m_pFrameWindow;
 };

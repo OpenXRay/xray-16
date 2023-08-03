@@ -33,6 +33,8 @@ public:
     void SetFont(CGameFont* F);
     CGameFont* GetFont();
 
+    pcstr GetDebugType() override { return "CUIListBoxItem"; }
+
 protected:
     CUITextWnd* m_text;
     u32 tag;

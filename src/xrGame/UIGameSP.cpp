@@ -296,6 +296,29 @@ void CChangeLevelWnd::OnOk()
     Level().Send(p, net_flags(TRUE));
 }
 
+bool CUIGameSP::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    if (!ImGui::TreeNode("CUIGameSP"))
+        return false;
+
+    CUIGameCustom::FillDebugInfo();
+
+    TalkMenu->FillDebugInfo();
+    UIChangeLevelWnd->FillDebugInfo();
+    if (ImGui::CollapsingHeader("Game objective"))
+    {
+        if (m_game_objective)
+            m_game_objective->wnd()->FillDebugInfo();
+    }
+
+    ImGui::TreePop();
+    return true;
+#else
+    return false;
+#endif
+}
+
 void CChangeLevelWnd::OnCancel()
 {
     HideDialog();
@@ -364,4 +387,28 @@ void CChangeLevelWnd::HideDialog()
     g_block_pause = false;
     Device.Pause(FALSE, TRUE, TRUE, "CChangeLevelWnd_hide");
     inherited::HideDialog();
+}
+
+bool CChangeLevelWnd::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    if (!CUIDialogWnd::FillDebugInfo())
+        return false;
+
+    if (ImGui::CollapsingHeader("CChangeLevelWnd"))
+    {
+        ImGui::Checkbox("Level change allowed", &m_b_allow_change_level);
+        ImGui::DragScalar("Game vertex ID", ImGuiDataType_U16, &m_game_vertex_id);
+        ImGui::DragScalar("Level vertex ID", ImGuiDataType_U32, &m_level_vertex_id);
+        ImGui::DragFloat3("Position", (float*)&m_position);
+        ImGui::DragFloat3("Angles", (float*)&m_angles);
+        ImGui::Separator();
+        ImGui::Checkbox("Teleport Actor on cancel", &m_b_position_cancel);
+        ImGui::DragFloat3("Position on cancel", (float*)&m_position_cancel);
+        ImGui::DragFloat3("Angles on cancel", (float*)&m_angles_cancel);
+    }
+    return true;
+#else
+    return false;
+#endif
 }

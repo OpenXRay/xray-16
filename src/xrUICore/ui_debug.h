@@ -8,9 +8,9 @@ public:
     void RegisterDebuggable();
     void UnregisterDebuggable();
 
-    virtual pcstr GetDebuggableType() { return "Debuggable"; }
+    virtual pcstr GetDebugType() { return "Debuggable"; }
 
-    virtual void FillDebugInfo() = 0;
+    virtual bool FillDebugInfo() = 0;
 };
 
 inline CUIDebuggable::~CUIDebuggable() = default;

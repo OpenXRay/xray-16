@@ -180,8 +180,8 @@ public:
     EErrorDlg GetErrorDialogType() const { return m_NeedErrDialog; }
     void CheckForErrorDlg();
 
-    pcstr GetDebuggableType() override { return "Main menu"; }
-    void FillDebugInfo() override;
+    pcstr GetDebugType() override { return "CMainMenu"; }
+    bool FillDebugInfo() override;
 
     void SwitchToMultiplayerMenu();
 

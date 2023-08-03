@@ -16,6 +16,8 @@ public:
     void ResetPPMode();
     bool GetPPMode() const { return m_bPP; };
 
+    pcstr GetDebugType() override { return "CUIMMMagnifer"; }
+
 protected:
     bool m_bPP{};
 };
@@ -62,6 +64,9 @@ protected:
     void ShowNewGame();
     void ShowNetworkGame();
     float pos(float x1, float x2, u32 t);
+
+    pcstr GetDebugType() override { return "CUIMMShniaga"; }
+    bool FillDebugInfo() override;
 
     CUIStatic* m_shniaga;
     CUIMMMagnifer* m_magnifier;

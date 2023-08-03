@@ -525,6 +525,17 @@ float CUIMMShniaga::pos(float x1, float x2, u32 t)
         return x1 + x;
 }
 
+bool CUIMMShniaga::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    if (!CUIWindow::FillDebugInfo())
+        return false;
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool b_shniaganeed_pp = true;
 void CUIMMShniaga::SetVisibleMagnifier(bool f)
 {

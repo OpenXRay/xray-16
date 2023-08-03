@@ -137,8 +137,8 @@ public:
     IC bool GetCustomDraw() const { return m_bCustomDraw; }
     IC void SetCustomDraw(bool b) { m_bCustomDraw = b; }
 
-    pcstr GetDebuggableType() override { return "Window"; }
-    void FillDebugInfo() override;
+    pcstr GetDebugType() override { return "CUIWindow"; }
+    bool FillDebugInfo() override;
 
 protected:
     IC void SafeRemoveChild(CUIWindow* child)

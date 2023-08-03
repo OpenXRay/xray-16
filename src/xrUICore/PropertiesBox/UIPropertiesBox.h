@@ -36,6 +36,8 @@ public:
     void ShowSubMenu();
     void OnItemReceivedFocus(CUIWindow* w, void* d);
 
+    pcstr GetDebugType() override { return "CUIPropertiesBox"; }
+
 protected:
     CUIListBox m_UIListWnd;
 

@@ -44,6 +44,8 @@ public:
     void disable_id(int id);
     void enable_id(int id);
 
+    pcstr GetDebugType() override { return "CUIComboBox"; }
+
 protected:
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnBtnClicked();

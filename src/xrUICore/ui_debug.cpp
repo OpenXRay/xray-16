@@ -15,14 +15,18 @@ void CUIDebuggable::UnregisterDebuggable()
 
 void CUIDebugger::Register(CUIDebuggable* debuggable)
 {
+#ifndef MASTER_GOLD
     m_root_windows.emplace_back(debuggable);
+#endif
 }
 
 void CUIDebugger::Unregister(CUIDebuggable* debuggable)
 {
+#ifndef MASTER_GOLD
     const auto it = std::find(m_root_windows.begin(), m_root_windows.end(), debuggable);
     if (it != m_root_windows.end())
         m_root_windows.erase(it);
+#endif
 }
 
 CUIDebugger::CUIDebugger()
@@ -42,12 +46,17 @@ CUIDebugger::CUIDebugger()
 
 void CUIDebugger::OnFrame()
 {
+#ifndef MASTER_GOLD
     if (!get_open_state())
         return;
 
     if (ImGui::Begin(tool_name(), &get_open_state(), get_default_window_flags()))
     {
-        ImGui::Checkbox("Draw rects", &m_draw_wnd_rects);
+        if (ImGui::BeginMenuBar())
+        {
+            ImGui::Checkbox("Draw rects", &m_draw_wnd_rects);
+            ImGui::EndMenuBar();
+        }
 
         if (ImGui::TreeNode("Windows"))
         {
@@ -57,4 +66,5 @@ void CUIDebugger::OnFrame()
         }
     }
     ImGui::End();
+#endif
 }

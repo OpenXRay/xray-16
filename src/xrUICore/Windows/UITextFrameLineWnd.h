@@ -32,6 +32,8 @@ public:
     CUIStatic* GetTitleStatic() { return &m_title; };
     void SetText(pcstr text) { m_title.SetText(text); }
 
+    pcstr GetDebugType() override { return "CUITextFrameLineWnd"; }
+
 protected:
     friend class CUIXmlInitBase;
 

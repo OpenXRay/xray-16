@@ -31,7 +31,7 @@ CDialogHolder::CDialogHolder()
 
 CDialogHolder::~CDialogHolder()
 {
-    RegisterDebuggable();
+    UnregisterDebuggable();
 }
 
 void CDialogHolder::StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
@@ -523,9 +523,11 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
     return true;
 }
 
-void CDialogHolder::FillDebugInfo()
+bool CDialogHolder::FillDebugInfo()
 {
 #ifndef MASTER_GOLD
-
+    return true;
+#else
+    return false;
 #endif
 }

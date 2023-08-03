@@ -103,6 +103,7 @@ public:
 
     int GetListPosition() const { return m_iFirstShownIndex; }
 
+    pcstr GetDebugType() override { return "CUIListWnd"; }
 
 protected:
     void create_active_back();

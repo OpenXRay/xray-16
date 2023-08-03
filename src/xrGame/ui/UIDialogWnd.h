@@ -34,6 +34,6 @@ public:
 
     virtual bool IR_process();
 
-    pcstr GetDebuggableType() override { return "Dialog window"; }
-    void FillDebugInfo() override;
+    pcstr GetDebugType() override { return "CUIDialogWnd"; }
+    bool FillDebugInfo() override;
 };

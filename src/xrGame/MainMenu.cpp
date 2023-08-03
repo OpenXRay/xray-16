@@ -642,18 +642,20 @@ void CMainMenu::CheckForErrorDlg()
     m_NeedErrDialog = ErrNoError;
 };
 
-void CMainMenu::FillDebugInfo()
+bool CMainMenu::FillDebugInfo()
 {
 #ifndef MASTER_GOLD
-    CDialogHolder::FillDebugInfo();
-
     if (!ImGui::TreeNode("Main menu"))
-        return;
+        return false;
+
+    CDialogHolder::FillDebugInfo();
 
     if (m_startDialog)
         m_startDialog->FillDebugInfo();
 
     ImGui::TreePop();
+    ImGui::Separator();
+    return true;
 #endif
 }
 

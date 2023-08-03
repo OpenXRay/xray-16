@@ -62,6 +62,8 @@ public:
 
     void ResetTab();
 
+    pcstr GetDebugType() override { return "CUITabControl"; }
+
 protected:
     // Список кнопок - переключателей закладок
     TABS_VECTOR m_TabsArr;

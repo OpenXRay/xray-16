@@ -49,7 +49,11 @@ bool CUIDialogWndEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
 void CUIDialogWndEx::Update() { inherited::Update(); }
 
-void CUIDialogWndEx::FillDebugInfo()
+bool CUIDialogWndEx::FillDebugInfo()
 {
-    CUIDialogWnd::FillDebugInfo();
+#ifndef MASTER_GOLD
+    return CUIDialogWnd::FillDebugInfo();
+#else
+    return false;
+#endif
 }

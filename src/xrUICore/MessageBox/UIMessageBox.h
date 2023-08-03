@@ -45,6 +45,8 @@ public:
 
     void OnYesOk();
 
+    pcstr GetDebugType() override { return "CUIMessageBox"; }
+
 protected:
     xr_string m_ret_val;
     CUI3tButton* m_UIButtonYesOk;

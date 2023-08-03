@@ -175,18 +175,17 @@ void ide::ShowMain()
 
             ImGui::EndMenu();
         }
+#ifndef MASTER_GOLD
         if (ImGui::BeginMenu("Tools"))
         {
-#ifndef MASTER_GOLD
             ImGui::MenuItem("Weather Editor", nullptr, &m_windows.weather);
-#endif
             for (const auto& tool : m_tools)
             {
                 ImGui::MenuItem(tool->tool_name(), nullptr, &tool->get_open_state());
             }
-
             ImGui::EndMenu();
         }
+#endif
         if (ImGui::BeginMenu("About"))
         {
 #ifndef MASTER_GOLD

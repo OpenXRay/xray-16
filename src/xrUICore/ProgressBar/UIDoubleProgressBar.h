@@ -11,6 +11,8 @@ public: // func
     void InitFromXml(CUIXml& xml_doc, LPCSTR path);
     void SetTwoPos(float cur_value, float compare_value);
 
+    pcstr GetDebugType() override { return "CUIDoubleProgressBar"; }
+
 protected:
     CUIProgressBar m_progress_one;
     CUIProgressBar m_progress_two;

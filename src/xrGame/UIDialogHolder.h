@@ -76,6 +76,6 @@ public:
     virtual bool IR_UIOnControllerRelease(int dik, float x, float y);
     virtual bool IR_UIOnControllerHold(int dik, float x, float y);
 
-    pcstr GetDebuggableType() override { return "Dialog holder"; }
-    void FillDebugInfo() override;
+    pcstr GetDebugType() override { return "CDialogHolder"; }
+    bool FillDebugInfo() override;
 };

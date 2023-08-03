@@ -598,14 +598,15 @@ bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16po
     return true;
 }
 
-void CUIWindow::FillDebugInfo()
+bool CUIWindow::FillDebugInfo()
 {
 #ifndef MASTER_GOLD
+    // We need to provide more robust hash to ImGui.
+    // Let's use this address
     string256 temp;
-    xr_sprintf(temp, "%s ## %p", WindowName().c_str(), this);
+    xr_sprintf(temp, "%s (%s) ## %p", WindowName().c_str(), GetDebugType(), this);
 
-    if (!ImGui::TreeNode(temp))
-        return;
+    const bool open = ImGui::CollapsingHeader(temp);
 
     if (UI().Debugger().ShouldDrawRects())
     {
@@ -621,6 +622,11 @@ void CUIWindow::FillDebugInfo()
             color
         );
     }
+
+    if (!open)
+        return false;
+
+    ImGui::Separator();
 
     ImGui::DragFloat2("Position", (float*)&m_wndPos);
     ImGui::DragFloat2("Size", (float*)&m_wndSize);
@@ -650,15 +656,22 @@ void CUIWindow::FillDebugInfo()
         ImGui::BulletText("Children: 0");
     else
     {
-        xr_sprintf(temp, "Children: %zu ### children_list", m_ChildWndList.size());
+        xr_sprintf(temp, "Children: %zu", m_ChildWndList.size());
         if (ImGui::TreeNode(temp))
         {
             for (const auto& child : m_ChildWndList)
+            {
+                ImGui::PushID(child);
                 child->FillDebugInfo();
+                ImGui::PopID();
+            }
             ImGui::TreePop();
         }
     }
 
-    ImGui::TreePop();
+    ImGui::Separator();
+    return true;
+#else
+    return false;
 #endif
 }

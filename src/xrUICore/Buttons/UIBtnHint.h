@@ -3,7 +3,7 @@
 
 class CUITextWnd;
 
-class XRUICORE_API CUIButtonHint : public CUIFrameWindow
+class XRUICORE_API CUIButtonHint final : public CUIFrameWindow
 {
     CUIWindow* m_ownerWnd;
 
@@ -18,6 +18,7 @@ public:
     void OnRender();
     void Draw_() { m_enabledOnFrame = true; };
     void SetHintText(CUIWindow* w, LPCSTR text);
+    pcstr GetDebugType() override { return "CUIButtonHint"; }
 };
 
 XRUICORE_API extern CUIButtonHint* g_btnHint;

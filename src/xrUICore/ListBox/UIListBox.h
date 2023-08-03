@@ -41,6 +41,8 @@ public:
     void SetFont(CGameFont* pFont);
     CGameFont* GetFont();
 
+    pcstr GetDebugType() override { return "CUIListBox"; }
+
 protected:
     CGameFont* m_pFont;
     float m_def_item_height;

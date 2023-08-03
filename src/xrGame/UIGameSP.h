@@ -13,7 +13,7 @@ class CUIMessageBox;
 class CInventoryBox;
 class CInventoryOwner;
 
-class CUIGameSP : public CUIGameCustom
+class CUIGameSP final : public CUIGameCustom
 {
 private:
     game_cl_Single* m_game;
@@ -46,9 +46,12 @@ public:
     CChangeLevelWnd* UIChangeLevelWnd;
 
     StaticDrawableWrapper* m_game_objective;
+
+    pcstr GetDebugType() override { return "CUIGameSP"; }
+    bool FillDebugInfo() override;
 };
 
-class CChangeLevelWnd : public CUIDialogWnd
+class CChangeLevelWnd final : public CUIDialogWnd
 {
     CUIMessageBox* m_messageBox;
     typedef CUIDialogWnd inherited;
@@ -74,4 +77,7 @@ public:
     void ShowDialog(bool bDoHideIndicators) override;
     void HideDialog() override;
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+
+    pcstr GetDebugType() override { return "Change level window"; }
+    bool FillDebugInfo() override;
 };

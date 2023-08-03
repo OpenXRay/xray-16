@@ -34,6 +34,11 @@ struct CUIDialogWndExWrapperBase final : public CUIDialogWndEx, public luabind::
     typedef CUIDialogWndEx inherited;
     typedef CUIDialogWndExWrapperBase self_type;
 
+    CUIDialogWndExWrapperBase()
+    {
+        SetWindowName(GetDebugType());
+    }
+
     bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override
     {
         return luabind::call_member<bool>(this, "OnKeyboard", dik, keyboard_action);
@@ -62,6 +67,20 @@ struct CUIDialogWndExWrapperBase final : public CUIDialogWndEx, public luabind::
     static bool Dispatch_static(inherited* ptr, int cmd, int param)
     {
         return ptr->self_type::inherited::Dispatch(cmd, param);
+    }
+
+    pcstr GetDebugType() override { return "CUIScriptWnd"; }
+
+    bool FillDebugInfo() override
+    {
+#ifndef MASTER_GOLD
+        if (!inherited::FillDebugInfo())
+            return false;
+
+        return true;
+#else
+        return false;
+#endif
     }
 };
 

@@ -2629,6 +2629,7 @@ target_link_libraries(${PROJECT_NAME}
     xrEngine
     xrMiscMath
     xrLuabind
+    xrImGui
     xrAPI
     xrAICore
     xrUICore

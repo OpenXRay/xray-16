@@ -294,6 +294,37 @@ void CUIGameCustom::enable_fake_indicators(bool enable)
     UIMainIngameWnd->get_hud_states()->EnableFakeIndicators(enable);
 }
 
+bool CUIGameCustom::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    if (!ImGui::CollapsingHeader("CUIGameCustom"))
+        return false;
+
+    CDialogHolder::FillDebugInfo();
+
+    ImGui::Checkbox("Show game indicators", &showGameIndicators);
+
+    Window->FillDebugInfo();
+    ActorMenu->FillDebugInfo();
+    PdaMenu->FillDebugInfo();
+    UIMainIngameWnd->FillDebugInfo();
+    m_pMessagesWnd->FillDebugInfo();
+    if (ImGui::TreeNode("Custom statics"))
+    {
+        for (const auto& custom_static : CustomStatics)
+        {
+            if (custom_static)
+                custom_static->wnd()->FillDebugInfo();
+        }
+        ImGui::TreePop();
+    }
+
+    return true;
+#else
+    return false;
+#endif
+}
+
 StaticDrawableWrapper::StaticDrawableWrapper()
 {
     m_static = nullptr;
