@@ -22,8 +22,18 @@ recvItem::recvItem(CUIDialogWnd* r)
     m_flags.zero();
 }
 bool operator==(const recvItem& i1, const recvItem& i2) { return i1.m_item == i2.m_item; }
-CDialogHolder::CDialogHolder() { m_b_in_update = false; }
-CDialogHolder::~CDialogHolder() {}
+
+CDialogHolder::CDialogHolder()
+{
+    m_b_in_update = false;
+    RegisterDebuggable();
+}
+
+CDialogHolder::~CDialogHolder()
+{
+    RegisterDebuggable();
+}
+
 void CDialogHolder::StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 {
     R_ASSERT(!pDialog->IsShown());
@@ -511,4 +521,11 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
         }
     };
     return true;
+}
+
+void CDialogHolder::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+
+#endif
 }

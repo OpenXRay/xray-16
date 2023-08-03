@@ -597,3 +597,68 @@ bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16po
     w->SetWndPos(rect.lt);
     return true;
 }
+
+void CUIWindow::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    string256 temp;
+    xr_sprintf(temp, "%s ## %p", WindowName().c_str(), this);
+
+    if (!ImGui::TreeNode(temp))
+        return;
+
+    if (UI().Debugger().ShouldDrawRects())
+    {
+        const bool isHovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
+        const u32 color = isHovered ? color_rgba(0, 255, 0, 255) : color_rgba(255, 0, 0, 255);
+        Frect rect;
+        GetAbsoluteRect(rect);
+        UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
+        UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
+        ImGui::GetBackgroundDrawList()->AddRect(
+            (const ImVec2&)rect.lt,
+            (const ImVec2&)rect.rb,
+            color
+        );
+    }
+
+    ImGui::DragFloat2("Position", (float*)&m_wndPos);
+    ImGui::DragFloat2("Size", (float*)&m_wndSize);
+
+    ImGui::Checkbox("Visible", &m_bShowMe);
+    ImGui::Checkbox("Enabled", &m_bIsEnabled);
+
+    ImGui::Separator();
+    ImGui::BeginDisabled();
+    ImGui::Checkbox("Auto delete", &m_bAutoDelete);
+    ImGui::Checkbox("Cursor over window", &m_bCursorOverWindow);
+    ImGui::Checkbox("Custom draw", &m_bCustomDraw);
+
+    ImGui::DragFloat2("Last cursor position", (float*)&cursor_pos);
+    ImGui::DragScalar("Last click time", ImGuiDataType_U32, &m_dwLastClickTime);
+    ImGui::DragScalar("Focus receive time", ImGuiDataType_U32, &m_dwFocusReceiveTime);
+    ImGui::EndDisabled();
+
+    ImGui::Separator();
+    ImGui::LabelText("Parent", "%s", m_pParentWnd ? m_pParentWnd->WindowName().c_str() : "none");
+    ImGui::LabelText("Mouse capturer", "%s", m_pMouseCapturer ? m_pMouseCapturer->WindowName().c_str() : "none");
+    ImGui::LabelText("Keyboard capturer", "%s", m_pKeyboardCapturer ? m_pKeyboardCapturer->WindowName().c_str() : "none");
+    ImGui::LabelText("Message target", "%s", m_pMessageTarget ? m_pMessageTarget->WindowName().c_str() : "none");
+    ImGui::Separator();
+
+    if (m_ChildWndList.empty())
+        ImGui::BulletText("Children: 0");
+    else
+    {
+        xr_sprintf(temp, "Children: %zu ### children_list", m_ChildWndList.size());
+        if (ImGui::TreeNode(temp))
+        {
+            for (const auto& child : m_ChildWndList)
+                child->FillDebugInfo();
+            ImGui::TreePop();
+        }
+    }
+
+    ImGui::TreePop();
+#endif
+}

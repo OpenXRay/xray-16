@@ -49,6 +49,15 @@ bool CUIDialogWnd::IR_process()
     return true;
 }
 
+void CUIDialogWnd::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIWindow::FillDebugInfo();
+    ImGui::LabelText("Current holder", "%s", m_pParentHolder ? m_pParentHolder->GetDebuggableType() : "none");
+    ImGui::LabelText("Work in pause", m_bWorkInPause ? "true" : "false");
+#endif
+}
+
 CDialogHolder* CurrentDialogHolder();
 
 void CUIDialogWnd::ShowOrHideDialog(bool bDoHideIndicators)

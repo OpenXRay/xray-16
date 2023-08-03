@@ -275,6 +275,7 @@
       <Filter>Windows</Filter>
     </ClCompile>
     <ClCompile Include="ui_styles.cpp" />
+    <ClCompile Include="ui_debug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arrow\ui_arrow.h">
@@ -456,6 +457,7 @@
       <Filter>Windows</Filter>
     </ClInclude>
     <ClInclude Include="ui_styles.h" />
+    <ClInclude Include="ui_debug.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />

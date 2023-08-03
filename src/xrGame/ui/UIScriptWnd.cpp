@@ -46,4 +46,10 @@ bool CUIDialogWndEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
+
 void CUIDialogWndEx::Update() { inherited::Update(); }
+
+void CUIDialogWndEx::FillDebugInfo()
+{
+    CUIDialogWnd::FillDebugInfo();
+}

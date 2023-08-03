@@ -1,7 +1,10 @@
 #pragma once
+
+#include "xrCommon/xr_vector.h"
 #include "xrCore/_flags.h"
 #include "xrEngine/pure.h"
-#include "xrCommon/xr_vector.h"
+#include "xrUICore/ui_debug.h"
+
 #include <SDL.h>
 
 class CUIDialogWnd;
@@ -29,7 +32,7 @@ public:
     Flags8 m_flags;
 };
 
-class CDialogHolder : public pureFrame
+class CDialogHolder : public pureFrame, public CUIDebuggable
 {
     // dialogs
     xr_vector<recvItem> m_input_receivers;
@@ -72,4 +75,7 @@ public:
     virtual bool IR_UIOnControllerPress(int dik, float x, float y);
     virtual bool IR_UIOnControllerRelease(int dik, float x, float y);
     virtual bool IR_UIOnControllerHold(int dik, float x, float y);
+
+    pcstr GetDebuggableType() override { return "Dialog holder"; }
+    void FillDebugInfo() override;
 };

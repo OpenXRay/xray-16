@@ -30,4 +30,7 @@ public:
 
     template <typename T>
     T* GetControl(pcstr name);
+
+    pcstr GetDebuggableType() override { return "CUIDialogWndEx (CUIScriptWnd)"; }
+    void FillDebugInfo() override;
 };

@@ -642,6 +642,21 @@ void CMainMenu::CheckForErrorDlg()
     m_NeedErrDialog = ErrNoError;
 };
 
+void CMainMenu::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CDialogHolder::FillDebugInfo();
+
+    if (!ImGui::TreeNode("Main menu"))
+        return;
+
+    if (m_startDialog)
+        m_startDialog->FillDebugInfo();
+
+    ImGui::TreePop();
+#endif
+}
+
 void CMainMenu::SwitchToMultiplayerMenu() { m_startDialog->Dispatch(2, 1); };
 void CMainMenu::DestroyInternal(bool bForce)
 {

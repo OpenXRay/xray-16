@@ -4,6 +4,33 @@
 
 namespace xray::editor
 {
+ide_tool::ide_tool()
+{
+    Device.editor().RegisterTool(this);
+}
+
+ide_tool::~ide_tool()
+{
+    Device.editor().UnregisterTool(this);
+}
+
+ImGuiWindowFlags ide_tool::get_default_window_flags() const
+{
+    return Device.editor().get_default_window_flags();
+}
+
+void ide::RegisterTool(ide_tool* tool)
+{
+    m_tools.emplace_back(tool);
+}
+
+void ide::UnregisterTool(const ide_tool* tool)
+{
+    const auto it = std::find(m_tools.begin(), m_tools.end(), tool);
+    if (it != m_tools.end())
+        m_tools.erase(it);
+}
+
 ide::ide()
 {
     ImGui::SetAllocatorFunctions(
@@ -122,6 +149,9 @@ void ide::OnFrame()
         SwitchToNextState();
     }
 
+    for (const auto& tool : m_tools)
+        tool->OnFrame();
+
     ImGui::EndFrame();
 }
 
@@ -137,15 +167,23 @@ void ide::ShowMain()
     {
         if (ImGui::BeginMenu("File"))
         {
-#ifndef MASTER_GOLD
-            ImGui::MenuItem("Weather Editor", nullptr, &m_windows.weather);
-#endif
-
             if (ImGui::MenuItem("Stats", nullptr, psDeviceFlags.test(rsStatistic)))
                 psDeviceFlags.set(rsStatistic, !psDeviceFlags.test(rsStatistic));
 
             if (ImGui::MenuItem("Close"))
                 IR_Release();
+
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Tools"))
+        {
+#ifndef MASTER_GOLD
+            ImGui::MenuItem("Weather Editor", nullptr, &m_windows.weather);
+#endif
+            for (const auto& tool : m_tools)
+            {
+                ImGui::MenuItem(tool->tool_name(), nullptr, &tool->get_open_state());
+            }
 
             ImGui::EndMenu();
         }

@@ -11,6 +11,20 @@ namespace xray::editor
 {
 struct ide_backend;
 
+class ENGINE_API ide_tool : public pureFrame
+{
+    bool is_opened{};
+
+public:
+    ide_tool();
+    virtual ~ide_tool();
+
+    virtual pcstr tool_name() = 0;
+
+    bool& get_open_state() { return is_opened; }
+    ImGuiWindowFlags get_default_window_flags() const;
+};
+
 class ENGINE_API ide final :
     public pureRender,
     public pureFrame,
@@ -20,6 +34,8 @@ class ENGINE_API ide final :
     public pureAppEnd,
     public IInputReceiver
 {
+    friend class ide_tool;
+
 public:
     enum class visible_state
     {
@@ -45,6 +61,8 @@ public:
 
     void SetState(visible_state state);
     void SwitchToNextState();
+
+    auto GetImGuiContext() const { return m_context; }
 
 public:
     // Interface implementations
@@ -88,6 +106,9 @@ private:
     void ShowMain();
     void ShowWeatherEditor();
 
+    void RegisterTool(ide_tool* tool);
+    void UnregisterTool(const ide_tool* tool);
+
 private:
     CTimer m_timer;
     IImGuiRender* m_render{};
@@ -101,5 +122,7 @@ private:
         bool imgui_demo;
         bool imgui_metrics;
     } m_windows{};
+
+    xr_vector<ide_tool*> m_tools;
 };
 } // namespace xray::editor

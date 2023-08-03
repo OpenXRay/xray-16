@@ -33,4 +33,7 @@ public:
     virtual void HideDialog();
 
     virtual bool IR_process();
+
+    pcstr GetDebuggableType() override { return "Dialog window"; }
+    void FillDebugInfo() override;
 };
