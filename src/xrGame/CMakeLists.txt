@@ -2442,7 +2442,6 @@ set(SRC_FILES
     "ui/UIScriptWnd.cpp"
     "ui/UIScriptWnd.h"
     "ui/UIScriptWnd_script.cpp"
-    "ui/uiscriptwnd_script.h"
     "ui/UISecondTaskWnd.cpp"
     "ui/UISecondTaskWnd.h"
     "ui/UIServerInfo.cpp"
@@ -2655,9 +2654,9 @@ target_compile_options(${PROJECT_NAME}
 )
 
 if ((CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo") AND PROJECT_PLATFORM_E2K) # E2K: hack for debug compile (MCST lcc compiler does not support a file > 4Gb, this is a bug in EDG frontend)
-    target_compile_options(${PROJECT_NAME} 
+    target_compile_options(${PROJECT_NAME}
         PRIVATE
-        -g0 
+        -g0
     )
     message(STATUS "Build type is ${CMAKE_BUILD_TYPE}, so disable generation of debug info for xrGame module, because MCST lcc compiler does not support a file > 4 GB (this is a bug in EDG frontend).")
 endif()

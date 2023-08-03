@@ -6033,9 +6033,6 @@
     <ClInclude Include="ui\UIScriptWnd.h">
       <Filter>UI\UIWindows\ScriptWnd</Filter>
     </ClInclude>
-    <ClInclude Include="ui\uiscriptwnd_script.h">
-      <Filter>UI\UIWindows\ScriptWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UICellCustomItems.h">
       <Filter>UI\UIWindows\DragDrop</Filter>
     </ClInclude>
