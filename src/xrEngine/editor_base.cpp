@@ -139,6 +139,8 @@ void ide::OnFrame()
     case visible_state::light:
         if (m_windows.weather)
             ShowWeatherEditor();
+        for (const auto& tool : m_tools)
+            tool->OnFrame();
         break;
     }
 
@@ -148,9 +150,6 @@ void ide::OnFrame()
     {
         SwitchToNextState();
     }
-
-    for (const auto& tool : m_tools)
-        tool->OnFrame();
 
     ImGui::EndFrame();
 }
@@ -217,6 +216,11 @@ ImGuiWindowFlags ide::get_default_window_flags() const
 
 bool ide::is_shown() const
 {
+    for (const auto& tool : m_tools)
+    {
+        if (tool->get_open_state())
+            return true;
+    }
     return m_windows.weather;
 }
 
