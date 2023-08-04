@@ -12,44 +12,13 @@
 
 namespace xray::editor
 {
+using namespace imgui;
+
 static bool window_weather_cycle = false;
 static bool window_suns = false;
 static bool window_ambients = false;
 static bool window_thunderbolts = false;
 static bool window_level_weathers = false;
-
-static void ItemHelp(const char* desc, bool use_separate_marker = true, bool call_same_line = true)
-{
-    if (use_separate_marker)
-    {
-        if (call_same_line)
-            ImGui::SameLine();
-        ImGui::TextDisabled("(?)");
-    }
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
-    {
-        ImGui::BeginTooltip();
-        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-        ImGui::TextUnformatted(desc);
-        ImGui::PopTextWrapPos();
-        ImGui::EndTooltip();
-    }
-}
-
-bool TextureSelector(pcstr label, shared_str& texture_name)
-{
-    bool changed = false;
-    string_path temp;
-    xr_strcpy(temp, texture_name.empty() ? "" : texture_name.c_str());
-
-    if (ImGui::InputText(label, temp, std::size(temp)))
-    {
-        texture_name = temp;
-        changed = true;
-    }
-
-    return changed;
-}
 
 struct combo_raii
 {
@@ -185,7 +154,7 @@ void display_property(CEnvDescriptor& descriptor)
     }
     if (ImGui::CollapsingHeader("hemisphere##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (TextureSelector("sky texture", descriptor.sky_texture_name))
+        if (InputText("sky texture", descriptor.sky_texture_name))
         {
             string_path temp;
             strconcat(temp, descriptor.sky_texture_name.c_str(), "#small");
@@ -205,7 +174,7 @@ void display_property(CEnvDescriptor& descriptor)
     }
     if (ImGui::CollapsingHeader("clouds##category", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (TextureSelector("clouds texture", descriptor.clouds_texture_name))
+        if (InputText("clouds texture", descriptor.clouds_texture_name))
             descriptor.on_device_create();
 
         ImGui::ColorEdit4("clouds color", (float*)&descriptor.clouds_color, ImGuiColorEditFlags_AlphaBar);

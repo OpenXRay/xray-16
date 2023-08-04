@@ -5,6 +5,8 @@
 
 namespace xray::editor
 {
+using namespace imgui;
+
 struct ide_backend
 {
     char* clipboard_text_data;
