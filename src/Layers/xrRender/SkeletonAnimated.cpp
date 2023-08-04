@@ -11,6 +11,7 @@
 #ifdef DEBUG
 #include "xrCore/dump_string.h"
 #endif
+extern ENGINE_API shared_str current_player_hud_sect;
 extern int psSkeletonUpdate;
 using namespace animation;
 
@@ -734,7 +735,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
                 Msg("! Can't find motion file '%s'.", nm);
                 return;
 #else
-                xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'\nsection '%s'\nmodel '%s'", _path, dcast_RenderVisual()->getDebugName().c_str(), N);
+                xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'\nsection '%s'\nmodel '%s'", _path, current_player_hud_sect.c_str(), N);
 #endif
             }
         }
@@ -753,7 +754,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         else
         {
             m_Motions.pop_back();
-            Msg("! error in model [%s]. Unable to load motion file '%s', section '%s'.", N, _path, dcast_RenderVisual()->getDebugName().c_str());
+            Msg("! error in model [%s]. Unable to load motion file '%s', section '%s'.", N, _path, current_player_hud_sect.c_str());
         }
     };
 
@@ -764,7 +765,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         string_path items_nm;
         data->r_stringZ(items_nm, sizeof(items_nm));
         u32 set_cnt = _GetItemCount(items_nm);
-        R_ASSERT2(set_cnt < MAX_ANIM_SLOT, make_string("section '%s'\nmodel '%s'", dcast_RenderVisual()->getDebugName().c_str(), N).c_str());
+        R_ASSERT2(set_cnt < MAX_ANIM_SLOT, make_string("section '%s'\nmodel '%s'", current_player_hud_sect.c_str(), N).c_str());
         m_Motions.reserve(set_cnt);
         string_path nm;
         for (u32 k = 0; k < set_cnt; ++k)
@@ -821,7 +822,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         m_Motions.back().motions.create(nm, data, bones);
     }
 
-    R_ASSERT2(m_Motions.size(), make_string("section '%s'\nmodel '%s'", dcast_RenderVisual()->getDebugName().c_str(), N).c_str());
+    R_ASSERT2(m_Motions.size(), make_string("section '%s'\nmodel '%s'", current_player_hud_sect.c_str(), N).c_str());
 
     m_Partition = m_Motions[0].motions.partition();
     m_Partition->load(this, N);
