@@ -263,7 +263,7 @@ void ide::IR_OnControllerRelease(int key, float x, float y)
 
     if (key > XR_CONTROLLER_BUTTON_INVALID && key < XR_CONTROLLER_BUTTON_MAX)
     {
-        io.AddKeyEvent(xr_key_to_imgui_key(key), true);
+        io.AddKeyEvent(xr_key_to_imgui_key(key), false);
         return;
     }
 
@@ -274,10 +274,10 @@ void ide::IR_OnControllerRelease(int key, float x, float y)
     case XR_CONTROLLER_AXIS_RIGHT:
         break;
     case XR_CONTROLLER_AXIS_TRIGGER_LEFT:
-        io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, true, x);
+        io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, false, x);
         break;
     case XR_CONTROLLER_AXIS_TRIGGER_RIGHT:
-        io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, true, x);
+        io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, false, x);
         break;
     }
 }
