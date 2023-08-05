@@ -759,7 +759,6 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
     };
 
     // Load animation
-    string16 bulkAnimMask = "*hand*hud*.omf";
     if (data->find_chunk(OGF_S_MOTION_REFS))
     {
         string_path items_nm;
@@ -771,11 +770,11 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         for (u32 k = 0; k < set_cnt; ++k)
         {
             _GetItem(items_nm, k, nm);
-            if (strstr(nm, "hand") && strstr(nm, "hud_animation") && ps_r__common_flags.test(RFLAG_BULK_ANIM_LOAD))
+            if (strstr(nm, "\\*.omf"))
             {
                 FS_FileSet fset;
-                FS.file_list(fset, "$game_meshes$", FS_ListFiles, bulkAnimMask);
-                FS.file_list(fset, "$level$", FS_ListFiles, bulkAnimMask);
+                FS.file_list(fset, "$game_meshes$", FS_ListFiles, nm);
+                FS.file_list(fset, "$level$", FS_ListFiles, nm);
 
                 m_Motions.reserve(fset.size() - 1);
 
@@ -797,11 +796,11 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         for (u32 k = 0; k < set_cnt; ++k)
         {
             data->r_stringZ(nm, sizeof(nm));
-            if (strstr(nm, "hand") && strstr(nm, "hud_animation") && ps_r__common_flags.test(RFLAG_BULK_ANIM_LOAD))
+            if (strstr(nm, "\\*.omf"))
             {
                 FS_FileSet fset;
-                FS.file_list(fset, "$game_meshes$", FS_ListFiles, bulkAnimMask);
-                FS.file_list(fset, "$level$", FS_ListFiles, bulkAnimMask);
+                FS.file_list(fset, "$game_meshes$", FS_ListFiles, nm);
+                FS.file_list(fset, "$level$", FS_ListFiles, nm);
 
                 m_Motions.reserve(fset.size() - 1);
 
