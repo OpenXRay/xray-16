@@ -75,6 +75,8 @@
 #include "ui/UIDragDropReferenceList.h"
 #include "xrCore/xr_token.h"
 
+#include "xrEngine/Rain.h"
+
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
 const float respawn_auto = 7.f;
@@ -83,6 +85,7 @@ constexpr float default_feedback_duration = 0.2f;
 
 extern float cammera_into_collision_shift;
 extern int g_first_person_death;
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
 
 string32 ACTOR_DEFS::g_quick_use_slots[4] = {};
 // skeleton
@@ -1180,6 +1183,62 @@ void CActor::UpdateCL()
 
     if (psActorFlags.test(AF_MULTI_ITEM_PICKUP))
         m_bPickupMode = false;
+
+    // Ascii hud rain drops support
+    {
+        float animSpeed = 1.f;
+        float buildSpeed = 2.f;
+        float dryingSpeed = 1.f;
+        float rainFactor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
+        float rainHemi{};
+        CEffect_Rain* rain = g_pGamePersistent->pEnvironment->eff_Rain;
+
+        if (rainFactor > 0.f)
+        {
+            // get rain hemi
+            if (rain)
+            {
+                rainHemi = rain->GetRainHemi();
+            }
+            else
+            {
+                IGameObject* E = g_pGameLevel->CurrentViewEntity();
+                if (E && E->renderable_ROS())
+                {
+                    float* hemi_cube = E->renderable_ROS()->get_luminocity_hemi_cube();
+                    float hemi_val = _max(hemi_cube[0], hemi_cube[1]);
+                    hemi_val = _max(hemi_val, hemi_cube[2]);
+                    hemi_val = _max(hemi_val, hemi_cube[3]);
+                    hemi_val = _max(hemi_val, hemi_cube[5]);
+
+                    rainHemi = hemi_val;
+                }
+            }
+
+            if (rainHemi > 0.15f)
+            {
+                float rainSpeedFactor = (1.5f - rainFactor) * 10.f;
+                m_dropsAnimIncrementor += (animSpeed * Device.fTimeDelta) / rainSpeedFactor;
+                m_dropsIntensity += (buildSpeed * Device.fTimeDelta) / 100.f;
+            }
+            else
+            {
+                m_dropsIntensity -= (dryingSpeed * Device.fTimeDelta) / 100.f;
+            }
+        }
+        else
+        {
+            m_dropsIntensity -= (dryingSpeed * Device.fTimeDelta) / 100.f;
+        }
+
+        clamp(m_dropsIntensity, 0.f, 1.f);
+
+        if (fsimilar(m_dropsAnimIncrementor, FLT_MAX, 1.f))
+            m_dropsAnimIncrementor = 0.f;
+
+        ps_ssfx_hud_drops_1.x = m_dropsAnimIncrementor;
+        ps_ssfx_hud_drops_1.y = m_dropsIntensity;
+    }
 }
 
 float NET_Jump = 0;

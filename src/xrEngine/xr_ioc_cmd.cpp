@@ -572,8 +572,8 @@ ENGINE_API float ps_r2_img_saturation = 1.0f; // r2-only
 ENGINE_API Fvector ps_r2_img_cg = { .0f, .0f, .0f }; // r2-only
 
 // Ascii1457's Screen Space Shaders
-ENGINE_API Fvector4 ps_ssfx_hud_drops_1 = { 1.0f, 1.0f, 1.0f, 1.0f }; // Anim Speed, Int, Reflection, Refraction
-ENGINE_API Fvector4 ps_ssfx_hud_drops_2 = { 1.5f, 0.85f, 0.0f, 2.0f }; // Density, Size, Extra Gloss, Gloss
+ENGINE_API Fvector4 ps_ssfx_hud_drops_1 = { 1.0f, 1.0f, 30.f, .05f }; // Anim Speed, Int, Reflection, Refraction
+ENGINE_API Fvector4 ps_ssfx_hud_drops_2 = { .0225f, 1.f, 0.0f, 2.0f }; // Density, Size, Extra Gloss, Gloss
 ENGINE_API Fvector4 ps_ssfx_blood_decals = { 0.6f, 0.6f, 0.f, 0.f };
 ENGINE_API Fvector4 ps_ssfx_rain_1 = { 2.0f, 0.1f, 0.6f, 2.f }; // Len, Width, Speed, Quality
 ENGINE_API Fvector4 ps_ssfx_rain_2 = { 0.7f, 0.1f, 1.0f, 0.5f }; // Alpha, Brigthness, Refraction, Reflection
