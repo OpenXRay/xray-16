@@ -265,7 +265,7 @@ bool CUIStatic::FillDebugInfo()
     ImGui::Checkbox("Const heading", &m_bConstHeading);
     ImGui::DragFloat("Heading", &m_fHeading);
     //m_pTextControl->FillDebugInfo(); // XXX: to do
-    ImGui::LabelText("Stat hint text", "%s", m_stat_hint_text.c_str());
+    ImGui::LabelText("Stat hint text", "%s", m_stat_hint_text.empty() ? "" : m_stat_hint_text.c_str());
 
     return true;
 #else
