@@ -310,23 +310,26 @@ void CRenderTarget::phase_combine()
 
     RCache.set_Stencil(FALSE);
 
-	//(Anomaly) Compute blur textures
-	phase_blur();
-
-	//(Anomaly) Compute depth of field effect
-	if (ps_r2_ls_flags.test(R2FLAG_DOF))
-		phase_dof();
-
-    //(Anomaly) Compute night vision effect
-    if (ps_r2_nightvision > 0)
-        phase_nightvision();
-
-    if (ps_r2_mask_control.x > 0)
+    if (ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT))
     {
-        phase_gasmask_dudv();
-        phase_gasmask_drops();
-    }
+        //(Anomaly) Compute blur textures
+        phase_blur();
 
+        //(Anomaly) Compute depth of field effect
+        if (ps_r2_ls_flags.test(R2FLAG_DOF))
+            phase_dof();
+
+        //(Anomaly) Compute night vision effect
+        if (ps_r2_nightvision > 0)
+            phase_nightvision();
+
+        if (ps_r2_mask_control.x > 0)
+        {
+            phase_gasmask_dudv();
+            phase_gasmask_drops();
+        }
+    }
+	
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
     BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
