@@ -388,6 +388,9 @@ class cl_entity_data : public R_constant_setup //--#SM+#--
 static cl_entity_data binder_entity_data;
 
 // Ascii1457's Screen Space Shaders
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
+extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
 extern ENGINE_API float ps_ssfx_wpn_dof_2;
 
@@ -540,6 +543,33 @@ class ssfx_wpn_dof_2 : public R_constant_setup
 };
 static ssfx_wpn_dof_2 binder_ssfx_wpn_dof_2;
 
+class ssfx_blood_decals : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_blood_decals);
+    }
+};
+static ssfx_blood_decals binder_ssfx_blood_decals;
+
+class ssfx_hud_drops_1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_hud_drops_1);
+    }
+};
+static ssfx_hud_drops_1 binder_ssfx_hud_drops_1;
+
+class ssfx_hud_drops_2 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_hud_drops_2);
+    }
+};
+static ssfx_hud_drops_2 binder_ssfx_hud_drops_2;
+
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
 {
@@ -639,4 +669,7 @@ void CBlender_Compile::SetMapping()
     r_Constant("sky_color", &binder_sky_color);
     r_Constant("ssfx_wpn_dof_1", &binder_ssfx_wpn_dof_1);
     r_Constant("ssfx_wpn_dof_2", &binder_ssfx_wpn_dof_2);
+    r_Constant("ssfx_blood_decals", &binder_ssfx_blood_decals);
+    r_Constant("ssfx_hud_drops_1", &binder_ssfx_hud_drops_1);
+    r_Constant("ssfx_hud_drops_2", &binder_ssfx_hud_drops_2);
 }

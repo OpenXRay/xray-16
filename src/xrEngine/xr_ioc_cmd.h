@@ -37,6 +37,12 @@ extern ENGINE_API float ps_r2_img_saturation;
 extern ENGINE_API Fvector ps_r2_img_cg;
 
 // Ascii's Shaders
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
+extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
+extern ENGINE_API Fvector4 ps_ssfx_rain_1;
+extern ENGINE_API Fvector4 ps_ssfx_rain_2;
+extern ENGINE_API Fvector4 ps_ssfx_rain_3;
 extern ENGINE_API Fvector4 ps_ssfx_grass_shadows;
 extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
 extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;

@@ -274,6 +274,8 @@ public:
     // data
     CFrustum ViewBase;
 
+    bool hud_loading;
+
 public:
     // feature level
     virtual GenerationLevel GetGeneration() const = 0;

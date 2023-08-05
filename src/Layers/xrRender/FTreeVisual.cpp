@@ -166,7 +166,7 @@ void FTreeVisual::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
         Fvector4* c_grass;
         {
             void* GrassData;
-            cmd_list.get_ConstantDirect(c_c_BendersPos, BendersQty * sizeof(Fvector4), &GrassData, 0, 0);
+            cmd_list.get_ConstantDirect(c_c_BendersPos, BendersQty * sizeof(Fvector4) * 2, &GrassData, 0, 0);
 
             c_grass = (Fvector4*)GrassData;
         }
