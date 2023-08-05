@@ -32,6 +32,7 @@
 #define ROTATION_TIME 0.25f
 
 BOOL b_toggle_weapon_aim = FALSE;
+extern float g_first_person_body_offset;
 
 static class CUIWpnScopeXmlManager : public CUIResetNotifier, public pureAppEnd
 {
@@ -186,6 +187,13 @@ void CWeapon::UpdateXForm()
         mRes.set(R, N, D, mR.c);
         mRes.mulA_43(E->XFORM());
     }
+
+    if (auto actorOwner = smart_cast<CActor*>(H_Parent()))
+        if ((psActorFlags.test(AF_FIRST_PERSON_BODY)) && actorOwner->active_cam() == eacFirstEye)
+        {
+            Fvector camdir = { actorOwner->cam_Active()->Direction().x, 0.f, actorOwner->cam_Active()->Direction().z }; // ignore Y (vertical) value
+            mRes.c.add(camdir.normalize().mul(g_first_person_body_offset)); // push model back so it doesn't look weird (default value: -0.75f)
+        }
 
     UpdatePosition(mRes);
 }
@@ -911,21 +919,8 @@ void CWeapon::EnableActorNVisnAfterZoom()
 }
 
 bool CWeapon::need_renderable() { return !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom()); }
-
-extern float g_first_person_body_offset;
 void CWeapon::renderable_Render(u32 context_id, IRenderable* root)
 {
-    if (auto actorOwner = smart_cast<CActor*>(H_Parent()))
-    {
-        if ((psActorFlags.test(AF_FIRST_PERSON_BODY)) && actorOwner->active_cam() == eacFirstEye)
-        {
-            Fvector camdir = { actorOwner->cam_Active()->Direction().x, 0.f, actorOwner->cam_Active()->Direction().z }; // ignore Y (vertical) value
-            Fmatrix trans = XFORM();
-            trans.c.add(camdir.normalize().mul(g_first_person_body_offset)); // push model back so it doesn't look weird (default value: -0.75f)
-            XFORM().translate_over(trans.c); // move our original weapon to where our first person body is, so shadow render in correct place
-        }
-    }
-
     ScopeLock lock{ &render_lock };
 
     UpdateXForm();
