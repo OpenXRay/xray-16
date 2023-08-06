@@ -123,6 +123,14 @@ void ide::IR_OnKeyboardPress(int key)
         SwitchToNextState();
         return;
 
+    case kSCORES:
+        if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+        {
+            psDeviceFlags.set(rsStatistic, !psDeviceFlags.test(rsStatistic));
+            return;
+        }
+        break;
+
     case kQUIT:
         if (io.WantTextInput)
             break; // bypass to ImGui
@@ -135,7 +143,7 @@ void ide::IR_OnKeyboardPress(int key)
         }
 
         // Second
-        SetState(visible_state::light);
+        SetState(visible_state::hidden);
         return;
     }
 

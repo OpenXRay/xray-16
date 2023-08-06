@@ -20,6 +20,15 @@ inline void ItemHelp(const char* desc, bool use_separate_marker = true, bool on_
     }
 }
 
+inline bool MenuItemWithShortcut(pcstr label, EGameActions shortcut, const char* desc = nullptr, bool selected = false)
+{
+    cpcstr key_name = GetActionBinding(shortcut);
+    const bool result = ImGui::MenuItem(label, key_name, selected);
+    if (desc)
+        ItemHelp(desc);
+    return result;
+}
+
 inline bool InputText(pcstr label, shared_str& texture_name)
 {
     string_path temp;

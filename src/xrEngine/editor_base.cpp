@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "editor_base.h"
+#include "editor_helper.h"
 
 namespace xray::editor
 {
@@ -166,12 +167,21 @@ void ide::ShowMain()
     {
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("Stats", nullptr, psDeviceFlags.test(rsStatistic)))
+            if (imgui::MenuItemWithShortcut("Stats", kSCORES,
+                "Show engine statistics.\n"
+                "Key shortcut will only work when no window is in focus",
+                psDeviceFlags.test(rsStatistic)))
+            {
                 psDeviceFlags.set(rsStatistic, !psDeviceFlags.test(rsStatistic));
-
-            if (ImGui::MenuItem("Close"))
-                IR_Release();
-
+            }
+            if (imgui::MenuItemWithShortcut("Hide", kEDITOR, "Hide main ImGui windows and this menu bar, but leave tools visible (a.k.a. light mode)"))
+            {
+                SetState(visible_state::light);
+            }
+            if (imgui::MenuItemWithShortcut("Close", kQUIT, "Close editor and all windows"))
+            {
+                SetState(visible_state::hidden);
+            }
             ImGui::EndMenu();
         }
 #ifndef MASTER_GOLD
