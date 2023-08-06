@@ -259,7 +259,7 @@ void CUIGameSP::ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id
     }
 }
 
-CChangeLevelWnd::CChangeLevelWnd() : CUIDialogWnd("CChangeLevelWnd")
+CChangeLevelWnd::CChangeLevelWnd() : CUIDialogWnd(CChangeLevelWnd::GetDebugType())
 {
     m_messageBox = xr_new<CUIMessageBox>();
     m_messageBox->SetAutoDelete(true);
@@ -339,7 +339,7 @@ bool CChangeLevelWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
 bool g_block_pause = false;
 
-// Morrey: Не инициализировалась форма, поскольку виртуальная функция отличалась набором аргуметов 
+// Morrey: Не инициализировалась форма, поскольку виртуальная функция отличалась набором аргуметов
 void CChangeLevelWnd::Show(bool status)
 {
     inherited::Show(status);

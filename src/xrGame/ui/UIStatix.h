@@ -2,7 +2,7 @@
 
 #include "xrUICore/Static/UIStatic.h"
 
-class CUIStatix : public CUIStatic
+class CUIStatix final : public CUIStatic
 {
 public:
     CUIStatix();

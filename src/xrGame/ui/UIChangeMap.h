@@ -22,6 +22,8 @@ public:
     void OnBtnCancel();
     void OnItemSelect();
 
+    pcstr GetDebugType() override { return "CUIChangeMap"; }
+
 protected:
     void FillUpList();
 

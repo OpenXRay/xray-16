@@ -2,7 +2,7 @@
 #include "xrUICore/Windows/UIWindow.h"
 #include "xrUICore/Buttons/UIButton.h"
 
-class XRUICORE_API CUIProgressBar : public CUIWindow
+class XRUICORE_API CUIProgressBar final : public CUIWindow
 {
     friend class CUIXmlInitBase;
     typedef CUIWindow inherited;

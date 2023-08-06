@@ -2,10 +2,11 @@
 
 #include "xrUICore/SpinBox/UICustomSpin.h"
 
-class XRUICORE_API CUISpinText : public CUICustomSpin
+class XRUICORE_API CUISpinText final : public CUICustomSpin
 {
 public:
     CUISpinText();
+
     // CUIOptionsItem
     virtual void SetCurrentOptValue(); // opt->current
     virtual void SaveBackUpOptValue(); // current->backup

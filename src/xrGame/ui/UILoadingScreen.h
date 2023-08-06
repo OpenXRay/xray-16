@@ -14,7 +14,7 @@
 
 class CApplication;
 
-class UILoadingScreen : public ILoadingScreen, public CUIWindow
+class UILoadingScreen final : public ILoadingScreen, public CUIWindow
 {
     Lock loadingLock;
     bool alwaysShowStage;

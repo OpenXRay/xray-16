@@ -26,11 +26,12 @@ struct _preset_item
 };
 using preset_items = xr_vector<_preset_item>;
 
-class IBuyWnd : public CUIDialogWnd
+class XR_NOVTABLE IBuyWnd : public CUIDialogWnd
 {
 public:
     IBuyWnd(pcstr window_name) : CUIDialogWnd(window_name) {}
-    virtual ~IBuyWnd();
+    ~IBuyWnd() override = 0;
+
     virtual void Init(const shared_str& sectionName, const shared_str& sectionPrice) = 0;
     virtual void BindDragDropListEvents(CUIDragDropListEx* lst, bool bDrag) = 0;
 
@@ -59,6 +60,8 @@ public:
     virtual void ClearPreset(ETradePreset idx) = 0;
     virtual void TryUsePreset(ETradePreset idx) = 0;
     virtual bool IsIgnoreMoneyAndRank() = 0;
+
+    pcstr GetDebugType() override { return "IBuyWnd"; }
 };
 
 inline IBuyWnd::~IBuyWnd() = default;

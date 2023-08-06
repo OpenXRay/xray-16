@@ -39,6 +39,8 @@ public:
     void OnRewindTypeSelected(CUIWindow* w, void* d);
     void OnRewindPlayerSelected(CUIWindow* w, void* d);
 
+    pcstr GetDebugType() override { return "CUIDemoPlayControl"; }
+
 private:
     void StopRewind();
     void UIStartRewind();

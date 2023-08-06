@@ -28,4 +28,6 @@ public:
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool NeedCenterCursor() const { return false; }
     CUIMessageBox* m_pMessageBox;
+
+    pcstr GetDebugType() override { return "CUIMessageBoxEx"; }
 };

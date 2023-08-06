@@ -23,6 +23,8 @@ public:
     bool HasInfo() { return m_dds_file_created; };
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
 
+    pcstr GetDebugType() override { return "CUIServerInfo"; }
+
 private:
     void InitCallbacks();
 

@@ -11,7 +11,7 @@
 #include "UIGameCustom.h"
 
 CUISpawnWnd::CUISpawnWnd()
-    : CUIDialogWnd("CUISpawnWnd"), m_iCurTeam(0)
+    : CUIDialogWnd(CUISpawnWnd::GetDebugType()), m_iCurTeam(0)
 {
     m_pBackground = xr_new<CUIStatic>("Background");
     AttachChild(m_pBackground);

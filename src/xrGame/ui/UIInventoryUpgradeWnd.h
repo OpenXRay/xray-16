@@ -31,7 +31,7 @@ class CUIItemInfo;
 class CUIFrameLineWnd;
 class CUI3tButton;
 
-class CUIInventoryUpgradeWnd : public CUIWindow
+class CUIInventoryUpgradeWnd final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -58,6 +58,8 @@ public:
 
     virtual bool Init();
     void InitInventory(CUICellItem* item, bool can_upgrade);
+
+    pcstr GetDebugType() override { return "CUIInventoryUpgradeWnd"; }
 
     IC CInventoryItem const* get_inventory() const { return m_inv_item; }
     IC LPCSTR get_cell_texture(UIUpgrade::ViewState state) const { return m_cell_textures[state].c_str(); }
@@ -91,14 +93,14 @@ private:
     Manager_type& get_manager();
 
 public:
-    CUI3tButton* m_btn_repair;
+    CUI3tButton* m_btn_repair{};
 
 protected:
-    CUIStatic* m_background;
-    CUIWindow* m_back;
-    CUIStatic* m_item;
-    CUIItemInfo* m_item_info;
-    CInventoryItem* m_inv_item;
+    CUIStatic* m_background{};
+    CUIWindow* m_back{};
+    CUIStatic* m_item{};
+    CUIItemInfo* m_item_info{};
+    CInventoryItem* m_inv_item{};
 
     shared_str m_cell_textures[UIUpgrade::STATE_COUNT];
     shared_str m_point_textures[UIUpgrade::STATE_COUNT];
@@ -106,13 +108,13 @@ protected:
     shared_str m_ink_texture;
 
     SCHEMES m_schemes;
-    Scheme* m_current_scheme;
-    LPCSTR m_cur_upgrade_id;
-    CUIWindow* m_scheme_wnd;
+    Scheme* m_current_scheme{};
+    pcstr m_cur_upgrade_id{};
+    CUIWindow* m_scheme_wnd{};
 
 public:
-    ui_shader* m_WeaponIconsShader;
-    ui_shader* m_OutfitIconsShader;
+    ui_shader* m_WeaponIconsShader{};
+    ui_shader* m_OutfitIconsShader{};
 
 }; // class CUIInventoryUpgradeWnd
 

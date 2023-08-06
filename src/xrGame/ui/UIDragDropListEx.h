@@ -203,9 +203,11 @@ public:
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 
     void OnDragEvent(CUIDragItem* drag_item, bool b_receive);
+
+    pcstr GetDebugType() override { return "CUIDragDropListEx"; }
 };
 
-class CUICellContainer : public CUIWindow
+class CUICellContainer final : public CUIWindow
 {
     friend class CUIDragDropListEx;
     friend class CUIDragDropReferenceList;
@@ -230,11 +232,12 @@ protected:
 
 public:
     CUICellContainer(CUIDragDropListEx* parent);
-    virtual ~CUICellContainer();
 
     Ivector2 PickCell(const Fvector2& abs_pos); //Alundaio made public
     bool ValidCell(const Ivector2& pos) const; //Alundaio made public
     CUICell& GetCellAt(const Ivector2& pos); //Alundaio made public
+
+    pcstr GetDebugType() override { return "CUICellContainer"; }
 
 protected:
     virtual void Draw();

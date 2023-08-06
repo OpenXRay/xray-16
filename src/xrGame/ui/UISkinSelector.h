@@ -32,6 +32,8 @@ public:
     s16 GetTeam() { return m_team; };
     virtual void Update();
 
+    pcstr GetDebugType() override { return "CUISkinSelectorWnd"; }
+
 protected:
     void OnBtnOK();
     void OnBtnCancel();

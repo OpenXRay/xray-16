@@ -54,7 +54,6 @@ class XRUICORE_API UIHintWindow : public CUIWindow
 
 public:
     UIHintWindow();
-    virtual ~UIHintWindow(){};
 
     virtual void Update();
     virtual void OnFocusReceive();

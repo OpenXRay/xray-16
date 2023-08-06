@@ -12,13 +12,13 @@
 
 #include "Common/object_broker.h"
 
-LPCSTR _list_names[] =
+pcstr _list_names[] =
 {
     "lst_pistol", "lst_pistol_ammo", "lst_rifle", "lst_rifle_ammo", "lst_outfit", "lst_medkit", "lst_granade",
     "lst_others", "lst_player_bag", "lst_shop",
 };
 
-CUIMpTradeWnd::CUIMpTradeWnd() : IBuyWnd("CUIMpTradeWnd")
+CUIMpTradeWnd::CUIMpTradeWnd() : IBuyWnd("MP Trade Window")
 {
     m_money = 0;
     g_mp_restrictions.InitGroups();

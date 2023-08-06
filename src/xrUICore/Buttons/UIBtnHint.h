@@ -12,12 +12,13 @@ class XRUICORE_API CUIButtonHint final : public CUIFrameWindow
 
 public:
     CUIButtonHint();
-    virtual ~CUIButtonHint();
-    CUIWindow* Owner() { return m_ownerWnd; }
-    void Discard() { m_ownerWnd = NULL; };
+
+    CUIWindow* Owner() const { return m_ownerWnd; }
+    void Discard() { m_ownerWnd = nullptr; }
     void OnRender();
-    void Draw_() { m_enabledOnFrame = true; };
+    void Draw_() { m_enabledOnFrame = true; }
     void SetHintText(CUIWindow* w, LPCSTR text);
+
     pcstr GetDebugType() override { return "CUIButtonHint"; }
 };
 

@@ -87,4 +87,6 @@ public:
     virtual bool StopAnyMove() { return false; }
     void UpdatePda();
     void UpdateRankingWnd();
+
+    pcstr GetDebugType() override { return "CUIPdaWnd"; }
 };

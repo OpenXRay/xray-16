@@ -1,6 +1,6 @@
 #pragma once
 
-class XRUICORE_API CUIDebuggable
+class XR_NOVTABLE XRUICORE_API CUIDebuggable
 {
 public:
     virtual ~CUIDebuggable() = 0;

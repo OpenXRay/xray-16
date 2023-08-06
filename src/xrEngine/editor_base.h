@@ -11,7 +11,7 @@ namespace xray::editor
 {
 struct ide_backend;
 
-class ENGINE_API ide_tool : public pureFrame
+class XR_NOVTABLE ENGINE_API ide_tool : public pureFrame
 {
     bool is_opened{};
 

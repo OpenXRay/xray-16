@@ -9,7 +9,7 @@ constexpr pcstr MOTION_ICON_XML = "motion_icon.xml";
 CUIMotionIcon* g_pMotionIcon = nullptr;
 
 CUIMotionIcon::CUIMotionIcon()
-    : CUIStatic("CUIMotionIcon")
+    : CUIStatic("Motion Icon")
 {
     m_current_state = stLast;
     g_pMotionIcon = this;
@@ -49,10 +49,10 @@ bool CUIMotionIcon::Init(Frect const& zonemap_rect)
     if (!independent)
     {
         const float rel_sz = uiXml.ReadAttribFlt("window", 0, "rel_size", 1.0f);
-        
+
         zonemap_rect.getsize(sz);
         pos.set(sz.x / 2.0f, sz.y / 2.0f);
-        
+
         SetWndSize(sz);
         SetWndPos(pos);
 
@@ -76,7 +76,7 @@ bool CUIMotionIcon::Init(Frect const& zonemap_rect)
             m_luminosity_progress_shape->SetWndPos(pos);
         }
     }
-    
+
     if (!m_noise_progress_bar)
     {
         m_noise_progress_shape = UIHelper::CreateProgressShape(uiXml, "noise_progress", this, false);

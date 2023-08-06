@@ -18,13 +18,13 @@ void CUICell::Clear()
     m_item = NULL;
 }
 
-CUIDragDropListEx::CUIDragDropListEx() : CUIWindow("CUIDragDropListEx")
+CUIDragDropListEx::CUIDragDropListEx() : CUIWindow(CUIDragDropListEx::GetDebugType())
 {
     m_flags.zero();
     m_container = xr_new<CUICellContainer>(this);
     m_vScrollBar = xr_new<CUIScrollBar>();
     m_vScrollBar->SetAutoDelete(true);
-    m_selected_item = NULL;
+    m_selected_item = nullptr;
     m_bConditionProgBarVisible = false;
 
     SetCellSize(Ivector2().set(50, 50));
@@ -636,7 +636,7 @@ CUICell& CUIDragDropListEx::GetCellAt(const Ivector2& pos) { return m_container-
 // =================================================================================================
 
 CUICellContainer::CUICellContainer(CUIDragDropListEx* parent)
-    : CUIWindow("CUICellContainer")
+    : CUIWindow(CUICellContainer::GetDebugType())
 {
     m_pParentDragDropList = parent;
     hShader->create("hud" DELIMITER "fog_of_war", "ui" DELIMITER "ui_grid");
@@ -644,7 +644,6 @@ CUICellContainer::CUICellContainer(CUIDragDropListEx* parent)
     m_cellSpacing.set(0, 0);
 }
 
-CUICellContainer::~CUICellContainer() {}
 bool CUICellContainer::AddSimilar(CUICellItem* itm)
 {
     if (!m_pParentDragDropList->IsGrouping())

@@ -10,7 +10,7 @@
 #include "xrEngine/xr_level_controller.h"
 #include "Level.h"
 
-CUIChatWnd::CUIChatWnd() : CUIDialogWnd("CUIChatWnd"), sendNextMessageToAll(true) {}
+CUIChatWnd::CUIChatWnd() : CUIDialogWnd(CUIChatWnd::GetDebugType()), sendNextMessageToAll(true) {}
 
 void CUIChatWnd::PendingMode(bool const is_pending_mode)
 {

@@ -70,7 +70,6 @@ public:
     shared_str m_message_str;
 
     CChangeLevelWnd();
-    virtual ~CChangeLevelWnd(){};
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     virtual bool WorkInPause() const { return true; }
     void Show(bool status) override;
@@ -78,6 +77,6 @@ public:
     void HideDialog() override;
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
 
-    pcstr GetDebugType() override { return "Change level window"; }
+    pcstr GetDebugType() override { return "CChangeLevelWnd"; }
     bool FillDebugInfo() override;
 };

@@ -8,11 +8,11 @@ class CUITextWnd;
 
 typedef bool (*player_cmp_func)(LPVOID v1, LPVOID v2);
 
-class CUIStatsPlayerList : public CUIScrollView
+class CUIStatsPlayerList final : public CUIScrollView
 {
 public:
     CUIStatsPlayerList();
-    virtual ~CUIStatsPlayerList();
+    ~CUIStatsPlayerList() override;
 
     void Init(CUIXml& xml_doc, LPCSTR path);
     void SetSpectator(bool f);
@@ -24,6 +24,8 @@ public:
     void SetHeaderHeight(float h);
     virtual void AddWindow(CUIWindow* pWnd, bool auto_delete = true);
     virtual void Update();
+
+    pcstr GetDebugType() override { return "CUIStatsPlayerList"; }
 
 protected:
     void InitHeader(CUIXml& xml_doc, LPCSTR path);

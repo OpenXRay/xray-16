@@ -52,7 +52,7 @@ void CScriptXmlInit::InitWindow(LPCSTR path, int index, CUIWindow* pWnd)
 
 CUIFrameWindow* CScriptXmlInit::InitFrame(LPCSTR path, CUIWindow* parent)
 {
-    CUIFrameWindow* pWnd = xr_new<CUIFrameWindow>();
+    CUIFrameWindow* pWnd = xr_new<CUIFrameWindow>("CUIFrameWindowScriptInit");
     CUIXmlInit::InitFrameWindow(m_xml, path, 0, pWnd);
     _attach_child(pWnd, parent);
     return pWnd;

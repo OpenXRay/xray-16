@@ -11,7 +11,7 @@ using LIST_ITEM_LIST_it = LIST_ITEM_LIST::iterator;
 class CUIScrollBar;
 class CUIFrameLineWnd;
 
-class XRUICORE_API CUIListWnd : public CUIWindow
+class XRUICORE_API CUIListWnd final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;

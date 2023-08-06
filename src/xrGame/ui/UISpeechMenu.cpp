@@ -8,7 +8,7 @@
 #include "Level.h"
 
 CUISpeechMenu::CUISpeechMenu(LPCSTR section_name)
-    : CUIDialogWnd("CUISpeechMenu")
+    : CUIDialogWnd(CUISpeechMenu::GetDebugType())
 {
     m_pList = xr_new<CUIScrollView>();
     AttachChild(m_pList);

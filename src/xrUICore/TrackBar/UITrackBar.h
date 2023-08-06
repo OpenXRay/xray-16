@@ -4,7 +4,7 @@
 
 class CUI3tButton;
 
-class XRUICORE_API CUITrackBar : public CUI_IB_FrameLineWnd, public CUIOptionsItem
+class XRUICORE_API CUITrackBar final : public CUI_IB_FrameLineWnd, public CUIOptionsItem
 {
 public:
     CUITrackBar();

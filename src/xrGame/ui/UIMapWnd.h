@@ -22,7 +22,7 @@ class UIHint;
 
 using GAME_MAPS = xr_map<shared_str, CUICustomMap*>;
 
-class CUIMapWnd : public CUIWindow, public CUIWndCallback
+class CUIMapWnd final : public CUIWindow, public CUIWndCallback
 {
     typedef CUIWindow inherited;
 
@@ -167,4 +167,6 @@ public:
     u16 GetIdxByName(const shared_str& map_name);
     void UpdateScroll();
     shared_str cName() const { return "ui_map_wnd"; }
+
+    pcstr GetDebugType() override { return "CUIMapWnd"; }
 };

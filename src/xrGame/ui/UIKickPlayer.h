@@ -25,6 +25,8 @@ public:
     void OnBtnOk();
     void OnBtnCancel();
 
+    pcstr GetDebugType() override { return "CUIKickPlayer"; }
+
 protected:
     typedef enum { MODE_KICK, MODE_BAN } E_MODE;
 

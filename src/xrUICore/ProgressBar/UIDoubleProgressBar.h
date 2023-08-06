@@ -2,7 +2,7 @@
 #include "xrUICore/Windows/UIWindow.h"
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 
-class XRUICORE_API CUIDoubleProgressBar : public CUIWindow
+class XRUICORE_API CUIDoubleProgressBar final : public CUIWindow
 {
 public: // func
     CUIDoubleProgressBar();

@@ -143,7 +143,7 @@ public:
     shared_str m_stat_hint_text;
 };
 
-class XRUICORE_API CUITextWnd : public CUIWindow, public CUILightAnimColorConrollerImpl
+class XRUICORE_API CUITextWnd final : public CUIWindow, public CUILightAnimColorConrollerImpl
 {
     typedef CUIWindow inherited;
     CUILines m_lines;

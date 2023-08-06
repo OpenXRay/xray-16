@@ -10,7 +10,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 
 CUIAchievements::CUIAchievements(CUIScrollView* parent)
-    : CUIWindow("CUIAchievements"), m_parent(parent) {}
+    : CUIWindow(CUIAchievements::GetDebugType()), m_parent(parent) {}
 
 CUIAchievements::~CUIAchievements() { xr_delete(m_hint); }
 

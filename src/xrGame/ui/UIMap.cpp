@@ -12,7 +12,7 @@ const u32 activeLocalMapColor = 0xffffffff; // 0xffc80000;
 const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
 const u32 ourLevelMapColor = 0xffffffff;
 
-CUICustomMap::CUICustomMap() : CUIStatic("CUICustomMap")
+CUICustomMap::CUICustomMap() : CUIStatic("Custom Map")
 {
     m_BoundRect_.set(0, 0, 0, 0);
     m_flags.zero();

@@ -12,10 +12,12 @@ class CUIMapDesc final : public CUIDialogWnd
 {
 public:
     CUIMapDesc();
-    ~CUIMapDesc();
+    ~CUIMapDesc() override;
 
-    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0);
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0) override;
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+
+    pcstr GetDebugType() override { return "CUIMapDesc"; }
 
 private:
     void Init();

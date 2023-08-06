@@ -41,4 +41,6 @@ public:
     void SetActiveSubdialog(const shared_str& section);
     void RemoteAdminLogin(CUIWindow*, void*);
     void ShowMessageBox(CUIMessageBox::E_MESSAGEBOX_STYLE style, LPCSTR reason = "");
+
+    pcstr GetDebugType() override { return "CUIMpAdminMenu"; }
 };

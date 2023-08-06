@@ -10,7 +10,7 @@
 #include "game_cl_teamdeathmatch.h"
 #include "xrEngine/XR_IOConsole.h"
 
-CUIVote::CUIVote() : CUIDialogWnd("CUIVote")
+CUIVote::CUIVote() : CUIDialogWnd(CUIVote::GetDebugType())
 {
     m_prev_upd_time = 0;
     bkgrnd = xr_new<CUIStatic>("Background");

@@ -53,13 +53,7 @@ using namespace InventoryUtilities;
 static constexpr pcstr MAININGAME_XML = "maingame.xml";
 
 CUIMainIngameWnd::CUIMainIngameWnd()
-    : CUIWindow("CUIMainIngameWnd"), /*m_pGrenade(NULL),m_pItem(NULL),*/
-      UIArtefactPanel(nullptr), UIArtefactIcon(nullptr), m_pMPChatWnd(nullptr),
-      m_pMPLogWnd(nullptr), m_pPickUpItem(nullptr)
-
-{
-    UIZoneMap = xr_new<CUIZoneMap>();
-}
+    : CUIWindow(CUIMainIngameWnd::GetDebugType()), UIZoneMap(xr_new<CUIZoneMap>()) {}
 
 extern CUIProgressShape* g_MissileForceShape;
 

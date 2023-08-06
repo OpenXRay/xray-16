@@ -51,6 +51,8 @@ public:
     void AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
     void AddIconedMessage(pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name);
 
+    pcstr GetDebugType() override { return "CUITalkWnd"; }
+
 protected:
     //диалог
     void InitTalkDialog();

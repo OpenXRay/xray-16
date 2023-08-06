@@ -13,7 +13,7 @@
 #include "xrEngine/XR_IOConsole.h"
 
 CUIMpAdminMenu::CUIMpAdminMenu()
-    : CUIDialogWnd("CUIMpAdminMenu")
+    : CUIDialogWnd(CUIMpAdminMenu::GetDebugType())
 {
     xml_doc = NULL;
     m_pActiveDialog = NULL;

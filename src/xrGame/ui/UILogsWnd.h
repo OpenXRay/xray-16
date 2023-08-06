@@ -28,7 +28,7 @@ class CUICheckButton;
 struct GAME_NEWS_DATA;
 class CUINewsItemWnd;
 
-class CUILogsWnd : public CUIWindow, public CUIWndCallback
+class CUILogsWnd final : public CUIWindow, public CUIWndCallback
 {
 private:
     typedef CUIWindow inherited;
@@ -71,7 +71,7 @@ private:
 
 public:
     CUILogsWnd();
-    virtual ~CUILogsWnd();
+    ~CUILogsWnd() override;
 
     bool Init();
 
@@ -83,6 +83,8 @@ public:
 
     IC void UpdateNews() { m_need_reload = true; }
     void PerformWork();
+
+    pcstr GetDebugType() override { return "CUILogsWnd"; }
 
 protected:
     void ReLoadNews();

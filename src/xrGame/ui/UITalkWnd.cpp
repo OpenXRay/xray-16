@@ -15,7 +15,7 @@
 #include "UIXmlInit.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 
-CUITalkWnd::CUITalkWnd() : CUIDialogWnd("CUITalkWnd")
+CUITalkWnd::CUITalkWnd() : CUIDialogWnd(CUITalkWnd::GetDebugType())
 {
     m_pActor = NULL;
 

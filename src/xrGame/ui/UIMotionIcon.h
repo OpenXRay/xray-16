@@ -51,4 +51,5 @@ public:
     void SetLuminosity(float newPos);
     void SetActorVisibility(u16 who_id, float value);
     void ResetVisibility();
+    pcstr GetDebugType() override { return "CUIMotionIcon"; }
 };

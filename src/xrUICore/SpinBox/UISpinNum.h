@@ -2,7 +2,7 @@
 
 #include "xrUICore/SpinBox/UICustomSpin.h"
 
-class XRUICORE_API CUISpinNum : public CUICustomSpin
+class XRUICORE_API CUISpinNum final : public CUICustomSpin
 {
 public:
     CUISpinNum();
@@ -39,7 +39,7 @@ protected:
     int m_opt_backup_value;
 };
 
-class XRUICORE_API CUISpinFlt : public CUICustomSpin
+class XRUICORE_API CUISpinFlt final : public CUICustomSpin
 {
 public:
     CUISpinFlt();
@@ -58,6 +58,8 @@ public:
 
     void SetMax(float max);
     void SetMin(float min);
+
+    pcstr GetDebugType() override { return "CUISpinFlt"; }
 
 protected:
     void SetValue(float v);

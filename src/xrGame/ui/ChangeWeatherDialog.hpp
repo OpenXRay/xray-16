@@ -27,7 +27,6 @@ private:
 
 protected:
     ButtonListDialog(pcstr window_name);
-    virtual ~ButtonListDialog() {}
     void Initialize(int buttonCount);
     const NamedButton& GetButton(int i) const;
     // CUIDialogWnd
@@ -38,6 +37,8 @@ protected:
     // ~CUIWindow
     virtual void OnButtonClick(int i) {}
     virtual void OnCancel();
+
+    pcstr GetDebugType() override { return "ButtonListDialog"; }
 };
 
 class ChangeWeatherDialog final : public ButtonListDialog
@@ -52,12 +53,14 @@ private:
     xr_vector<WeatherDesc> weathers;
 
 public:
-    ChangeWeatherDialog() : ButtonListDialog("ChangeWeatherDialog") {}
+    ChangeWeatherDialog() : ButtonListDialog(ChangeWeatherDialog::GetDebugType()) {}
 
     void InitChangeWeather(CUIXml& xmlDoc);
     // ButtonListDialog
     virtual void OnButtonClick(int i) override;
     // ~ButtonListDialog
+
+    pcstr GetDebugType() override { return "ChangeWeatherDialog"; }
 
 private:
     void ParseWeather();
@@ -69,10 +72,12 @@ private:
     xr_vector<shared_str> gameTypes;
 
 public:
-    ChangeGameTypeDialog() : ButtonListDialog("ChangeGameTypeDialog") {}
+    ChangeGameTypeDialog() : ButtonListDialog(ChangeGameTypeDialog::GetDebugType()) {}
 
     void InitChangeGameType(CUIXml& xmlDoc);
     // ButtonListDialog
     virtual void OnButtonClick(int i) override;
     // ~ButtonListDialog
+
+    pcstr GetDebugType() override { return "ChangeGameTypeDialog"; }
 };

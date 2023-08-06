@@ -60,7 +60,9 @@ public:
 
 public:
     CUITaskWnd(UIHint* hint);
-    virtual ~CUITaskWnd();
+    ~CUITaskWnd() override;
+
+    pcstr GetDebugType() override { return "CUITaskWnd"; }
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     bool Init();
@@ -142,6 +144,9 @@ public:
     void Init(CUIXml& uiXml, LPCSTR path);
     void InitTask(CGameTask* task);
     CGameTask* OwnerTask() { return m_owner; }
+
+    pcstr GetDebugType() override { return "CUITaskItem"; }
+
 public:
     bool show_hint_can;
     bool show_hint;

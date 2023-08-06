@@ -18,7 +18,7 @@
 
 extern string_path g_last_saved_game;
 
-CUIMMMagnifer::CUIMMMagnifer() : CUIStatic("CUIMMMagnifer") {}
+CUIMMMagnifer::CUIMMMagnifer() : CUIStatic(CUIMMMagnifer::GetDebugType()) {}
 
 CUIMMMagnifer::~CUIMMMagnifer()
 {
@@ -44,7 +44,7 @@ void CUIMMMagnifer::ResetPPMode()
 
 ////////////////////////////////////////////
 
-CUIMMShniaga::CUIMMShniaga() : CUIWindow("CUIMMShniaga")
+CUIMMShniaga::CUIMMShniaga() : CUIWindow(CUIMMShniaga::GetDebugType())
 {
     m_sound = xr_new<CMMSound>();
 

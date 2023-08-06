@@ -202,7 +202,7 @@ CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWind
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = xr_new<CUIFrameWindow>();
+    auto ui = xr_new<CUIFrameWindow>("CUIFrameWindow");
     if (!CUIXmlInit::InitFrameWindow(xml, ui_path, 0, ui, critical) && !critical)
     {
         xr_delete(ui);

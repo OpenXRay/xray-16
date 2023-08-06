@@ -400,4 +400,6 @@ public:
 
     void RefreshCurrentItemCell();
     void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu
+
+    pcstr GetDebugType() override { return "CUIActorMenu"; }
 }; // class CUIActorMenu

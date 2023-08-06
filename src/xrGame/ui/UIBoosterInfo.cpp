@@ -8,17 +8,7 @@
 #include "UIXmlInit.h"
 #include "UIHelper.h"
 
-CUIBoosterInfo::CUIBoosterInfo() : CUIWindow("CUIBoosterInfo")
-{
-    for (u32 i = 0; i < eBoostExplImmunity; ++i)
-    {
-        m_booster_items[i] = NULL;
-    }
-    m_booster_satiety = NULL;
-    m_booster_anabiotic = NULL;
-    m_booster_time = NULL;
-    m_Prop_line = nullptr;
-}
+CUIBoosterInfo::CUIBoosterInfo() : CUIWindow(CUIBoosterInfo::GetDebugType()) {}
 
 CUIBoosterInfo::~CUIBoosterInfo()
 {
@@ -29,10 +19,13 @@ CUIBoosterInfo::~CUIBoosterInfo()
     xr_delete(m_Prop_line);
 }
 
-LPCSTR boost_influence_caption[] = {"ui_inv_health", "ui_inv_power", "ui_inv_radiation", "ui_inv_bleeding",
+constexpr pcstr boost_influence_caption[] =
+{
+    "ui_inv_health", "ui_inv_power", "ui_inv_radiation", "ui_inv_bleeding",
     "ui_inv_outfit_additional_weight", "ui_inv_outfit_radiation_protection", "ui_inv_outfit_telepatic_protection",
     "ui_inv_outfit_chemical_burn_protection", "ui_inv_outfit_burn_immunity", "ui_inv_outfit_shock_immunity",
-    "ui_inv_outfit_radiation_immunity", "ui_inv_outfit_telepatic_immunity", "ui_inv_outfit_chemical_burn_immunity"};
+    "ui_inv_outfit_radiation_immunity", "ui_inv_outfit_telepatic_immunity", "ui_inv_outfit_chemical_burn_immunity"
+};
 
 bool CUIBoosterInfo::InitFromXml(CUIXml& xml)
 {
@@ -199,10 +192,8 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
 
 /// ----------------------------------------------------------------
 
-UIBoosterInfoItem::UIBoosterInfoItem() : CUIWindow("UIBoosterInfoItem")
+UIBoosterInfoItem::UIBoosterInfoItem() : CUIWindow(UIBoosterInfoItem::GetDebugType())
 {
-    m_caption = NULL;
-    m_value = NULL;
     m_magnitude = 1.0f;
     m_show_sign = false;
 

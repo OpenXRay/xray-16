@@ -16,8 +16,10 @@ class CUIDebugFonts final : public CUIDialogWnd
 public:
     CUIDebugFonts();
 
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
     void FillUpList();
+
+    pcstr GetDebugType() override { return "CUIDebugFonts"; }
 
 private:
     void InitDebugFonts(Frect&& r);

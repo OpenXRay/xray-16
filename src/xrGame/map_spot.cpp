@@ -15,7 +15,7 @@
 #include "GametaskManager.h"
 #include "GameTask.h"
 
-CMapSpot::CMapSpot(CMapLocation* ml) : CUIStatic("CMapSpot"), m_map_location(ml), m_mark_focused(false)
+CMapSpot::CMapSpot(CMapLocation* ml) : CUIStatic("Map Spot"), m_map_location(ml), m_mark_focused(false)
 {
     m_bScale = false;
     m_location_level = 0;

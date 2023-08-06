@@ -1,7 +1,7 @@
 #pragma once
 #include "UIStatic.h"
 
-class XRUICORE_API CUIAnimatedStatic : public CUIStatic
+class XRUICORE_API CUIAnimatedStatic final : public CUIStatic
 {
     typedef CUIStatic inherited;
     // Количекство кадров анимации

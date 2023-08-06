@@ -3,7 +3,7 @@
 #include "UIMessageBoxEx.h"
 #include "UIDialogHolder.h"
 
-CUIMessageBoxEx::CUIMessageBoxEx() : CUIDialogWnd("CUIMessageBoxEx")
+CUIMessageBoxEx::CUIMessageBoxEx() : CUIDialogWnd(CUIMessageBoxEx::GetDebugType())
 {
     m_pMessageBox = xr_new<CUIMessageBox>();
     m_pMessageBox->SetWindowName("msg_box");

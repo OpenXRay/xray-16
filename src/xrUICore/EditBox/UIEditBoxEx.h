@@ -3,11 +3,11 @@
 
 class CUIFrameWindow;
 
-class CUIEditBoxEx : public CUICustomEdit
+class CUIEditBoxEx final : public CUICustomEdit
 {
 public:
     CUIEditBoxEx();
-    virtual ~CUIEditBoxEx();
+    ~CUIEditBoxEx() override;
 
     virtual void InitCustomEdit(Fvector2 pos, Fvector2 size);
 

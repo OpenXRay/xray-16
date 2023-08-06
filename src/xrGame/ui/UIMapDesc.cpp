@@ -12,7 +12,7 @@
 #include "xrEngine/xr_level_controller.h"
 #include "UIStatsPlayerList.h"
 
-CUIMapDesc::CUIMapDesc() : CUIDialogWnd("CUIMapDesc")
+CUIMapDesc::CUIMapDesc() : CUIDialogWnd(CUIMapDesc::GetDebugType())
 {
     m_pBackground = xr_new<CUIStatic>("Background");
     AttachChild(m_pBackground);
