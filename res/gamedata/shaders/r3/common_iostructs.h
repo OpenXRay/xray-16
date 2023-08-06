@@ -302,6 +302,7 @@ struct v2p_bumped
 	float3	M1		: TEXCOORD2;	// nmap 2 eye - 1
 	float3	M2		: TEXCOORD3;	// nmap 2 eye - 2
 	float3	M3		: TEXCOORD4;	// nmap 2 eye - 3
+	float4	RDrops	: TEXCOORD7;	// SSS Update 17 - HUD raindrops
 #ifdef USE_TDETAIL
 	float2	tcdbump	: TEXCOORD5;	// d-bump
 #endif
@@ -322,6 +323,7 @@ struct p_bumped
 	float3	M1		: TEXCOORD2;	// nmap 2 eye - 1
 	float3	M2		: TEXCOORD3;	// nmap 2 eye - 2
 	float3	M3		: TEXCOORD4;	// nmap 2 eye - 3
+	float4	RDrops	: TEXCOORD7;	// SSS Update 17 - HUD raindrops
 #ifdef USE_TDETAIL
 	float2	tcdbump	: TEXCOORD5;	// d-bump
 #endif
@@ -340,6 +342,7 @@ struct	v2p_flat
 #endif
 	float4	position: TEXCOORD1;	// position + hemi
 	float3	N		: TEXCOORD2;	// Eye-space normal        (for lighting)
+	float4	RDrops	: TEXCOORD7;	// SSS Update 17 - HUD raindrops
 #ifdef USE_TDETAIL
 	float2	tcdbump	: TEXCOORD3;	// d-bump
 #endif
@@ -358,6 +361,7 @@ struct	p_flat
 #endif
 	float4	position: TEXCOORD1;	// position + hemi
 	float3	N		: TEXCOORD2;	// Eye-space normal        (for lighting)
+	float4	RDrops	: TEXCOORD7;	// SSS Update 17 - HUD raindrops
 #ifdef USE_TDETAIL
 	float2	tcdbump	: TEXCOORD3;	// d-bump
 #endif
