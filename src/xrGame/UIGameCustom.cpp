@@ -322,7 +322,7 @@ bool CUIGameCustom::FillDebugTree(const CUIDebugState& debugState)
 
     return open;
 #else
-    UNUSED(showItem, debugState);
+    UNUSED(debugState);
     return false;
 #endif
 }

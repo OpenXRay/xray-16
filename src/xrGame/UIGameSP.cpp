@@ -298,6 +298,7 @@ void CChangeLevelWnd::OnOk()
 
 bool CUIGameSP::FillDebugTree(const CUIDebugState& debugState)
 {
+#ifndef MASTER_GOLD
     if (!CUIGameCustom::FillDebugTree(debugState))
         return false;
 
@@ -319,6 +320,10 @@ bool CUIGameSP::FillDebugTree(const CUIDebugState& debugState)
     }
 
     return open;
+#else
+    UNUSED(debugState);
+    return false;
+#endif
 }
 
 void CUIGameSP::FillDebugInfo()

@@ -664,8 +664,8 @@ bool CMainMenu::FillDebugTree(const CUIDebugState& debugState)
 
     return open;
 #else
-    UNUSED(showItem, debugState);
-    return nullptr;
+    UNUSED(debugState);
+    return false;
 #endif
 }
 

@@ -601,7 +601,6 @@ bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16po
 bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
 {
 #ifndef MASTER_GOLD
-
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
     if (debugState.selected == this)
         flags |= ImGuiTreeNodeFlags_Selected;
@@ -638,8 +637,8 @@ bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
 
     return open;
 #else
-    UNUSED(showItem, debugState);
-    return nullptr;
+    UNUSED(debugState);
+    return false;
 #endif
 }
 

@@ -79,6 +79,7 @@ struct CUIDialogWndExWrapperBase final : public CUIDialogWndEx, public luabind::
 
         return true;
 #else
+        UNUSED(debugState);
         return false;
 #endif
     }
