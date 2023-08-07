@@ -730,7 +730,7 @@ public:
         pInput->RegisterKeyMapChangeWatcher(this, REG_PRIORITY_HIGH);
     }
 
-    void Destroy() 
+    void Destroy()
     {
         if (pInput) // XXX: this check should not exist
             pInput->RemoveKeyMapChangeWatcher(this);
@@ -888,8 +888,8 @@ class CCC_DefControls : public CCC_UnBindAll
 
         { kINVENTORY,           { SDL_SCANCODE_I,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_RIGHTSHOULDER } },
         { kACTIVE_JOBS,         { SDL_SCANCODE_P,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_LEFTSHOULDER } },
-        { kMAP,                 { SDL_SCANCODE_M,           SDL_SCANCODE_UNKNOWN,   SDL_SCANCODE_UNKNOWN } },
-        { kCONTACTS,            { SDL_SCANCODE_H,           SDL_SCANCODE_UNKNOWN,   SDL_SCANCODE_UNKNOWN } },
+        { kMAP,                 { SDL_SCANCODE_M,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_INVALID } },
+        { kCONTACTS,            { SDL_SCANCODE_H,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_INVALID } },
 
         { kJUMP,                { SDL_SCANCODE_SPACE,       SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_A } },
         { kCROUCH_TOGGLE,       { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_B } },
