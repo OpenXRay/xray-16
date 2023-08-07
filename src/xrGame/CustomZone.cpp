@@ -1778,7 +1778,7 @@ void CCustomZone::GrassZoneUpdate()
         targetAnim = m_BendGrass_idle_anim;
 
     // Update grass bender if the animation is > -1
-    if (targetAnim > 0 || (GData.anim[grassbender_id] > 0 && grassbender_id > 0))
+    if (targetAnim > 0 || (grassbender_id > 0 && GData.anim[grassbender_id] > 0))
         g_pGamePersistent->GrassBendersUpdate(ID(), grassbender_id, grassbender_frame, Position(), m_BendGrass_idle_radius, 0.0f, false);
     else
         g_pGamePersistent->GrassBendersRemoveByIndex(grassbender_id);
