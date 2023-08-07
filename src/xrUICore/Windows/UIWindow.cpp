@@ -612,9 +612,9 @@ bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
     if (ImGui::IsItemClicked())
         debugState.newSelected = this;
 
-    if (debugState.drawWndRects)
+    const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
+    if (debugState.drawWndRects && (IsShown() || hovered))
     {
-        const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
         Frect rect;
         GetAbsoluteRect(rect);
         UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
