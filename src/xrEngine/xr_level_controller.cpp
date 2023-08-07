@@ -887,6 +887,7 @@ class CCC_DefControls : public CCC_UnBindAll
         { kCROUCH_TOGGLE,       { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_B } },
 
         { kTORCH,               { SDL_SCANCODE_L,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_RIGHTSTICK } },
+        { kSCORES,              { SDL_SCANCODE_TAB,         SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_LEFTSTICK } },
 
         { kWPN_FIRE,            { MOUSE_1,                  SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_TRIGGER_RIGHT } },
         { kWPN_ZOOM,            { MOUSE_2,                  SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_TRIGGER_LEFT } },
