@@ -903,6 +903,8 @@ class CCC_DefControls : public CCC_UnBindAll
         { kQUICK_USE_2,         { SDL_SCANCODE_F2,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_LEFT } },
         { kQUICK_USE_3,         { SDL_SCANCODE_F3,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
         { kQUICK_USE_4,         { SDL_SCANCODE_F4,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_DOWN } },
+
+        { kEDITOR,              { SDL_SCANCODE_F10,         SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_INVALID } },
     };
 
 public:
