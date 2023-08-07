@@ -296,26 +296,40 @@ void CChangeLevelWnd::OnOk()
     Level().Send(p, net_flags(TRUE));
 }
 
-bool CUIGameSP::FillDebugInfo()
+bool CUIGameSP::FillDebugTree(const CUIDebugState& debugState)
 {
-#ifndef MASTER_GOLD
-    if (!ImGui::TreeNode("CUIGameSP"))
+    if (!CUIGameCustom::FillDebugTree(debugState))
         return false;
 
-    CUIGameCustom::FillDebugInfo();
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
 
-    TalkMenu->FillDebugInfo();
-    UIChangeLevelWnd->FillDebugInfo();
-    if (ImGui::CollapsingHeader("Game objective"))
+    const bool open = ImGui::TreeNodeEx(this, flags, "Game UI (%s)", CUIGameSP::GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.newSelected = this;
+
+    if (open)
     {
+        TalkMenu->FillDebugTree(debugState);
+        UIChangeLevelWnd->FillDebugTree(debugState);
         if (m_game_objective)
-            m_game_objective->wnd()->FillDebugInfo();
+            m_game_objective->wnd()->FillDebugTree(debugState);
+        ImGui::TreePop();
     }
 
-    ImGui::TreePop();
-    return true;
-#else
-    return false;
+    return open;
+}
+
+void CUIGameSP::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIGameCustom::FillDebugInfo();
+
+    if (ImGui::CollapsingHeader(CUIGameSP::GetDebugType()))
+    {
+
+    }
 #endif
 }
 
@@ -389,13 +403,12 @@ void CChangeLevelWnd::HideDialog()
     inherited::HideDialog();
 }
 
-bool CChangeLevelWnd::FillDebugInfo()
+void CChangeLevelWnd::FillDebugInfo()
 {
 #ifndef MASTER_GOLD
-    if (!CUIDialogWnd::FillDebugInfo())
-        return false;
+    CUIDialogWnd::FillDebugInfo();
 
-    if (ImGui::CollapsingHeader("CChangeLevelWnd"))
+    if (ImGui::CollapsingHeader(CChangeLevelWnd::GetDebugType()))
     {
         ImGui::Checkbox("Level change allowed", &m_b_allow_change_level);
         ImGui::DragScalar("Game vertex ID", ImGuiDataType_U16, &m_game_vertex_id);
@@ -407,8 +420,5 @@ bool CChangeLevelWnd::FillDebugInfo()
         ImGui::DragFloat3("Position on cancel", (float*)&m_position_cancel);
         ImGui::DragFloat3("Angles on cancel", (float*)&m_angles_cancel);
     }
-    return true;
-#else
-    return false;
 #endif
 }

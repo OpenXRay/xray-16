@@ -123,7 +123,7 @@ public:
     virtual void ColorAnimationSetTextColor(u32 color, bool only_alpha);
 
     pcstr GetDebugType() override { return "CUIStatic"; }
-    bool FillDebugInfo() override;
+    void FillDebugInfo() override;
 
 protected:
     CUILines* m_pTextControl;
@@ -180,5 +180,5 @@ public:
     CUILines& TextItemControl() { return m_lines; }
 
     pcstr GetDebugType() override { return "CUITextWnd"; }
-    bool FillDebugInfo() override;
+    void FillDebugInfo() override;
 };

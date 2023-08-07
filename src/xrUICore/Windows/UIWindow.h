@@ -138,7 +138,8 @@ public:
     IC void SetCustomDraw(bool b) { m_bCustomDraw = b; }
 
     pcstr GetDebugType() override { return "CUIWindow"; }
-    bool FillDebugInfo() override;
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+    void FillDebugInfo() override;
 
 protected:
     IC void SafeRemoveChild(CUIWindow* child)

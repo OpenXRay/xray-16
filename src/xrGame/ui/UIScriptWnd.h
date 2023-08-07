@@ -32,5 +32,4 @@ public:
     T* GetControl(pcstr name);
 
     pcstr GetDebugType() override { return "CUIDialogWndEx"; }
-    bool FillDebugInfo() override;
 };

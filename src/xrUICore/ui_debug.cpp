@@ -3,6 +3,12 @@
 #include "ui_debug.h"
 #include "ui_base.h"
 
+CUIDebuggable::~CUIDebuggable()
+{
+    if (UI().Debugger().GetSelected() == this)
+        UI().Debugger().SetSelected(nullptr);
+}
+
 void CUIDebuggable::RegisterDebuggable()
 {
     UI().Debugger().Register(this);
@@ -27,6 +33,12 @@ void CUIDebugger::Unregister(CUIDebuggable* debuggable)
     if (it != m_root_windows.end())
         m_root_windows.erase(it);
 #endif
+}
+
+void CUIDebugger::SetSelected(CUIDebuggable* debuggable)
+{
+    m_state.selected = debuggable;
+    m_state.newSelected = debuggable;
 }
 
 CUIDebugger::CUIDebugger()
@@ -54,17 +66,35 @@ void CUIDebugger::OnFrame()
     {
         if (ImGui::BeginMenuBar())
         {
-            ImGui::Checkbox("Draw rects", &m_draw_wnd_rects);
+            ImGui::Checkbox("Draw rects", &m_state.drawWndRects);
             ImGui::EndMenuBar();
         }
 
-        if (ImGui::TreeNode("Windows"))
+        constexpr ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable |
+            ImGuiTableFlags_BordersInner | ImGuiTableFlags_SizingFixedFit |
+            ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY;
+
+        if (ImGui::BeginTable("UI tree and properties", 2, flags))
         {
+            ImGui::TableSetupColumn("Tree");
+            ImGui::TableSetupColumn("Selected element properties", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableHeadersRow();
+
+            ImGui::TableNextColumn();
             for (const auto& window : m_root_windows)
-                window->FillDebugInfo();
-            ImGui::TreePop();
+            {
+                window->FillDebugTree(m_state);
+                if (m_state.selected != m_state.newSelected)
+                    m_state.selected = m_state.newSelected;
+            }
+            ImGui::TableNextColumn();
+            if (m_state.selected)
+                m_state.selected->FillDebugInfo();
+
+            ImGui::EndTable();
         }
     }
+
     ImGui::End();
 #endif
 }

@@ -523,11 +523,12 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
     return true;
 }
 
-bool CDialogHolder::FillDebugInfo()
+void CDialogHolder::FillDebugInfo()
 {
 #ifndef MASTER_GOLD
-    return true;
-#else
-    return false;
+    if (ImGui::CollapsingHeader(CDialogHolder::GetDebugType()))
+    {
+
+    }
 #endif
 }

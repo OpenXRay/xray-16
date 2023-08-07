@@ -48,7 +48,8 @@ public:
     StaticDrawableWrapper* m_game_objective;
 
     pcstr GetDebugType() override { return "CUIGameSP"; }
-    bool FillDebugInfo() override;
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+    void FillDebugInfo() override;
 };
 
 class CChangeLevelWnd final : public CUIDialogWnd
@@ -78,5 +79,5 @@ public:
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
 
     pcstr GetDebugType() override { return "CChangeLevelWnd"; }
-    bool FillDebugInfo() override;
+    void FillDebugInfo() override;
 };

@@ -131,7 +131,8 @@ public:
     void enable_fake_indicators(bool enable);
 
     pcstr GetDebugType() override { return "CUIGameCustom"; }
-    bool FillDebugInfo() override;
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+    void FillDebugInfo() override;
 };
 
 extern CUIGameCustom* CurrentGameUI();

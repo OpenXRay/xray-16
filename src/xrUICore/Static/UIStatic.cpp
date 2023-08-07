@@ -251,25 +251,23 @@ void CUIStatic::ColorAnimationSetTextColor(u32 color, bool only_alpha)
     TextItemControl()->SetTextColor((only_alpha) ? subst_alpha(TextItemControl()->GetTextColor(), color) : color);
 }
 
-bool CUIStatic::FillDebugInfo()
+void CUIStatic::FillDebugInfo()
 {
 #ifndef MASTER_GOLD
-    if (!CUIWindow::FillDebugInfo())
-        return false;
+    CUIWindow::FillDebugInfo();
 
-    ImGui::Checkbox("Enable texture", &m_bTextureEnable);
-    ImGui::Checkbox("Stretch texture", &m_bStretchTexture);
-    ImGui::DragFloat2("Texture offset", (float*)&m_TextureOffset);
-    //m_UIStaticItem->FillDebugInfo(); // XXX: to do
-    ImGui::Checkbox("Enable heading", &m_bHeading);
-    ImGui::Checkbox("Const heading", &m_bConstHeading);
-    ImGui::DragFloat("Heading", &m_fHeading);
-    //m_pTextControl->FillDebugInfo(); // XXX: to do
-    ImGui::LabelText("Stat hint text", "%s", m_stat_hint_text.empty() ? "" : m_stat_hint_text.c_str());
-
-    return true;
-#else
-    return false;
+    if (ImGui::CollapsingHeader(CUIStatic::GetDebugType()))
+    {
+        ImGui::Checkbox("Enable texture", &m_bTextureEnable);
+        ImGui::Checkbox("Stretch texture", &m_bStretchTexture);
+        ImGui::DragFloat2("Texture offset", (float*)&m_TextureOffset);
+        //m_UIStaticItem->FillDebugInfo(); // XXX: to do
+        ImGui::Checkbox("Enable heading", &m_bHeading);
+        ImGui::Checkbox("Const heading", &m_bConstHeading);
+        ImGui::DragFloat("Heading", &m_fHeading);
+        //m_pTextControl->FillDebugInfo(); // XXX: to do
+        ImGui::LabelText("Stat hint text", "%s", m_stat_hint_text.empty() ? "" : m_stat_hint_text.c_str());
+    }
 #endif
 }
 
@@ -326,13 +324,9 @@ void CUITextWnd::ColorAnimationSetTextColor(u32 color, bool only_alpha)
     SetTextColor((only_alpha) ? subst_alpha(GetTextColor(), color) : color);
 }
 
-bool CUITextWnd::FillDebugInfo()
+void CUITextWnd::FillDebugInfo()
 {
 #ifndef MASTER_GOLD
-    if (!CUIWindow::FillDebugInfo())
-        return false;
-    return true;
-#else
-    return false;
+
 #endif
 }

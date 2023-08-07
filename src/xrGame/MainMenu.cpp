@@ -642,22 +642,30 @@ void CMainMenu::CheckForErrorDlg()
     m_NeedErrDialog = ErrNoError;
 };
 
-bool CMainMenu::FillDebugInfo()
+bool CMainMenu::FillDebugTree(const CUIDebugState& debugState)
 {
 #ifndef MASTER_GOLD
-    if (!ImGui::TreeNode("Main menu"))
-        return false;
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
 
-    CDialogHolder::FillDebugInfo();
+    const bool open = ImGui::TreeNodeEx(this, flags, "Main menu (%s)", GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.newSelected = this;
 
-    if (m_startDialog)
-        m_startDialog->FillDebugInfo();
+    if (open)
+    {
+        if (m_startDialog)
+            m_startDialog->FillDebugTree(debugState);
+        else
+            ImGui::BulletText("Please, open main menu to see it's structure");
+        ImGui::TreePop();
+    }
 
-    ImGui::TreePop();
-    ImGui::Separator();
-    return true;
+    return open;
 #else
-    return false;
+    UNUSED(showItem, debugState);
+    return nullptr;
 #endif
 }
 

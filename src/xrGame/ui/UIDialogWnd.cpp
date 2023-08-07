@@ -49,20 +49,16 @@ bool CUIDialogWnd::IR_process()
     return true;
 }
 
-bool CUIDialogWnd::FillDebugInfo()
+void CUIDialogWnd::FillDebugInfo()
 {
 #ifndef MASTER_GOLD
-    if (!CUIWindow::FillDebugInfo())
-        return false;
+    CUIWindow::FillDebugInfo();
 
-    if (ImGui::CollapsingHeader("CUIDialogWnd"))
+    if (ImGui::CollapsingHeader(CUIDialogWnd::GetDebugType()))
     {
         ImGui::LabelText("Current holder", "%s", m_pParentHolder ? m_pParentHolder->GetDebugType() : "none");
         ImGui::LabelText("Work in pause", m_bWorkInPause ? "true" : "false");
     }
-    return true;
-#else
-    return false;
 #endif
 }
 

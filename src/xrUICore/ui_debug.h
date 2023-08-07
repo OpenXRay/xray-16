@@ -1,25 +1,34 @@
 #pragma once
 
+struct CUIDebugState;
+
 class XR_NOVTABLE XRUICORE_API CUIDebuggable
 {
 public:
-    virtual ~CUIDebuggable() = 0;
+    virtual ~CUIDebuggable();
 
     void RegisterDebuggable();
     void UnregisterDebuggable();
 
-    virtual pcstr GetDebugType() { return "Debuggable"; }
+    virtual pcstr GetDebugType() = 0;
 
-    virtual bool FillDebugInfo() = 0;
+    virtual bool FillDebugTree(const CUIDebugState& debugState) = 0;
+    virtual void FillDebugInfo() = 0;
 };
 
-inline CUIDebuggable::~CUIDebuggable() = default;
+inline pcstr CUIDebuggable::GetDebugType() { return "CUIDebuggable"; }
+
+struct CUIDebugState
+{
+    CUIDebuggable* selected{};
+    mutable CUIDebuggable* newSelected{};
+    bool drawWndRects{};
+};
 
 class XRUICORE_API CUIDebugger final : public xray::editor::ide_tool
 {
     xr_vector<CUIDebuggable*> m_root_windows;
-
-    bool m_draw_wnd_rects{};
+    CUIDebugState m_state;
 
 public:
     CUIDebugger();
@@ -30,7 +39,11 @@ public:
     void OnFrame() override;
 
     [[nodiscard]]
-    bool ShouldDrawRects() const { return m_draw_wnd_rects; }
+    CUIDebuggable* GetSelected() const { return m_state.selected; }
+    void SetSelected(CUIDebuggable* debuggable);
+
+    [[nodiscard]]
+    bool ShouldDrawRects() const { return m_state.drawWndRects; }
 
 private:
     pcstr tool_name() override { return "UI Debugger"; }

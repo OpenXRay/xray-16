@@ -49,7 +49,7 @@ protected:
 
 public:
     CDialogHolder();
-    virtual ~CDialogHolder();
+    ~CDialogHolder() override;
 
     // dialogs
     void OnExternalHideIndicators();
@@ -77,5 +77,5 @@ public:
     virtual bool IR_UIOnControllerHold(int dik, float x, float y);
 
     pcstr GetDebugType() override { return "CDialogHolder"; }
-    bool FillDebugInfo() override;
+    void FillDebugInfo() override;
 };

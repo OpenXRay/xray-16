@@ -294,34 +294,48 @@ void CUIGameCustom::enable_fake_indicators(bool enable)
     UIMainIngameWnd->get_hud_states()->EnableFakeIndicators(enable);
 }
 
-bool CUIGameCustom::FillDebugInfo()
+bool CUIGameCustom::FillDebugTree(const CUIDebugState& debugState)
 {
 #ifndef MASTER_GOLD
-    if (!ImGui::CollapsingHeader("CUIGameCustom"))
-        return false;
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
 
-    CDialogHolder::FillDebugInfo();
+    const bool open = ImGui::TreeNodeEx(this, flags, "Game UI (%s)", CUIGameCustom::GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.newSelected = this;
 
-    ImGui::Checkbox("Show game indicators", &showGameIndicators);
-
-    Window->FillDebugInfo();
-    ActorMenu->FillDebugInfo();
-    PdaMenu->FillDebugInfo();
-    UIMainIngameWnd->FillDebugInfo();
-    m_pMessagesWnd->FillDebugInfo();
-    if (ImGui::TreeNode("Custom statics"))
+    if (open)
     {
+        Window->FillDebugTree(debugState);
+        ActorMenu->FillDebugTree(debugState);
+        PdaMenu->FillDebugTree(debugState);
+        UIMainIngameWnd->FillDebugTree(debugState);
+        m_pMessagesWnd->FillDebugTree(debugState);
         for (const auto& custom_static : CustomStatics)
         {
             if (custom_static)
-                custom_static->wnd()->FillDebugInfo();
+                custom_static->wnd()->FillDebugTree(debugState);
         }
         ImGui::TreePop();
     }
 
-    return true;
+    return open;
 #else
+    UNUSED(showItem, debugState);
     return false;
+#endif
+}
+
+void CUIGameCustom::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CDialogHolder::FillDebugInfo();
+
+    if (ImGui::CollapsingHeader(CUIGameCustom::GetDebugType()))
+    {
+        ImGui::Checkbox("Show game indicators", &showGameIndicators);
+    }
 #endif
 }
 

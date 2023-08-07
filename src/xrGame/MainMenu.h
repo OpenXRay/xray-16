@@ -181,7 +181,7 @@ public:
     void CheckForErrorDlg();
 
     pcstr GetDebugType() override { return "CMainMenu"; }
-    bool FillDebugInfo() override;
+    bool FillDebugTree(const CUIDebugState& debugState) override;
 
     void SwitchToMultiplayerMenu();
 

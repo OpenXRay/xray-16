@@ -598,35 +598,56 @@ bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16po
     return true;
 }
 
-bool CUIWindow::FillDebugInfo()
+bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
 {
 #ifndef MASTER_GOLD
-    // We need to provide more robust hash to ImGui.
-    // Let's use this address
-    string256 temp;
-    xr_sprintf(temp, "%s (%s) ## %p", WindowName().c_str(), GetDebugType(), this);
 
-    const bool open = ImGui::CollapsingHeader(temp);
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
+    if (m_ChildWndList.empty())
+        flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet;
 
-    if (UI().Debugger().ShouldDrawRects())
+    const bool open = ImGui::TreeNodeEx(this, flags, "%s (%s)", WindowName().c_str(), GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.newSelected = this;
+
+    if (debugState.drawWndRects)
     {
-        const bool isHovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
-        const u32 color = isHovered ? color_rgba(0, 255, 0, 255) : color_rgba(255, 0, 0, 255);
+        const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
         Frect rect;
         GetAbsoluteRect(rect);
         UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
         UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
-        ImGui::GetBackgroundDrawList()->AddRect(
-            (const ImVec2&)rect.lt,
-            (const ImVec2&)rect.rb,
-            color
-        );
+
+        const u32 color = hovered ? color_rgba(0, 255, 0, 255) : color_rgba(255, 0, 0, 255);
+        const auto draw_list = hovered ? ImGui::GetForegroundDrawList() : ImGui::GetBackgroundDrawList();
+
+        draw_list->AddRect((const ImVec2&)rect.lt, (const ImVec2&)rect.rb, color);
     }
 
-    if (!open)
-        return false;
+    if (open)
+    {
+        for (const auto& child : m_ChildWndList)
+        {
+            child->FillDebugTree(debugState);
+        }
+        if (!m_ChildWndList.empty())
+            ImGui::TreePop();
+    }
 
-    ImGui::Separator();
+    return open;
+#else
+    UNUSED(showItem, debugState);
+    return nullptr;
+#endif
+}
+
+void CUIWindow::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    if (!ImGui::CollapsingHeader(CUIWindow::GetDebugType()))
+        return;
 
     ImGui::DragFloat2("Position", (float*)&m_wndPos);
     ImGui::DragFloat2("Size", (float*)&m_wndSize);
@@ -650,28 +671,5 @@ bool CUIWindow::FillDebugInfo()
     ImGui::LabelText("Mouse capturer", "%s", m_pMouseCapturer ? m_pMouseCapturer->WindowName().c_str() : "none");
     ImGui::LabelText("Keyboard capturer", "%s", m_pKeyboardCapturer ? m_pKeyboardCapturer->WindowName().c_str() : "none");
     ImGui::LabelText("Message target", "%s", m_pMessageTarget ? m_pMessageTarget->WindowName().c_str() : "none");
-    ImGui::Separator();
-
-    if (m_ChildWndList.empty())
-        ImGui::BulletText("Children: 0");
-    else
-    {
-        xr_sprintf(temp, "Children: %zu", m_ChildWndList.size());
-        if (ImGui::TreeNode(temp))
-        {
-            for (const auto& child : m_ChildWndList)
-            {
-                ImGui::PushID(child);
-                child->FillDebugInfo();
-                ImGui::PopID();
-            }
-            ImGui::TreePop();
-        }
-    }
-
-    ImGui::Separator();
-    return true;
-#else
-    return false;
 #endif
 }

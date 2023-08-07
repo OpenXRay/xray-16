@@ -71,10 +71,10 @@ struct CUIDialogWndExWrapperBase final : public CUIDialogWndEx, public luabind::
 
     pcstr GetDebugType() override { return "CUIScriptWnd"; }
 
-    bool FillDebugInfo() override
+    bool FillDebugTree(const CUIDebugState& debugState) override
     {
 #ifndef MASTER_GOLD
-        if (!inherited::FillDebugInfo())
+        if (!inherited::FillDebugTree(debugState))
             return false;
 
         return true;
