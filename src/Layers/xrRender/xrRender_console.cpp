@@ -215,19 +215,19 @@ extern ENGINE_API float ps_r2_img_exposure; // r2-only
 extern ENGINE_API float ps_r2_img_gamma; // r2-only
 extern ENGINE_API float ps_r2_img_saturation; // r2-only
 extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
-Fvector4 ps_r2_mask_control = { .0f, .0f, .0f, .0f }; // r2-only
-Fvector ps_r2_drops_control = { .0f, 1.15f, .0f }; // r2-only
-int ps_r2_nightvision = 0;
+extern ENGINE_API Fvector4 ps_r2_mask_control; // r2-only
+extern ENGINE_API Fvector ps_r2_drops_control; // r2-only
+extern ENGINE_API int ps_r2_nightvision;
 
 //debug
-Fvector4 ps_dev_param_1 = { .0f, .0f, .0f, .0f };
-Fvector4 ps_dev_param_2 = { .0f, .0f, .0f, .0f };
-Fvector4 ps_dev_param_3 = { .0f, .0f, .0f, .0f };
-Fvector4 ps_dev_param_4 = { .0f, .0f, .0f, .0f };
-Fvector4 ps_dev_param_5 = { .0f, .0f, .0f, .0f };
-Fvector4 ps_dev_param_6 = { .0f, .0f, .0f, .0f };
-Fvector4 ps_dev_param_7 = { .0f, .0f, .0f, .0f };
-Fvector4 ps_dev_param_8 = { .0f, .0f, .0f, .0f };
+extern ENGINE_API Fvector4 ps_dev_param_1;
+extern ENGINE_API Fvector4 ps_dev_param_2;
+extern ENGINE_API Fvector4 ps_dev_param_3;
+extern ENGINE_API Fvector4 ps_dev_param_4;
+extern ENGINE_API Fvector4 ps_dev_param_5;
+extern ENGINE_API Fvector4 ps_dev_param_6;
+extern ENGINE_API Fvector4 ps_dev_param_7;
+extern ENGINE_API Fvector4 ps_dev_param_8;
 
 // Ascii1457's Screen Space Shaders
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;

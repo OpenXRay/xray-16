@@ -154,11 +154,6 @@ extern ECORE_API float ps_r3_dyn_wet_surf_near; // 10.0f
 extern ECORE_API float ps_r3_dyn_wet_surf_far; // 30.0f
 extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
-// Anomaly support
-extern ECORE_API int ps_r2_nightvision;
-extern ECORE_API Fvector4 ps_r2_mask_control;
-extern ECORE_API Fvector ps_r2_drops_control;
-
 enum
 {
     R2FLAG_SUN = (1 << 0),

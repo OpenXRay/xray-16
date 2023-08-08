@@ -86,6 +86,9 @@ constexpr float default_feedback_duration = 0.2f;
 extern float cammera_into_collision_shift;
 extern int g_first_person_death;
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
+extern ENGINE_API Fvector4 ps_r2_mask_control;
+extern ENGINE_API Fvector ps_r2_drops_control;
+extern ENGINE_API int ps_r2_nightvision;
 
 string32 ACTOR_DEFS::g_quick_use_slots[4] = {};
 // skeleton
@@ -1238,6 +1241,49 @@ void CActor::UpdateCL()
 
         ps_ssfx_hud_drops_1.x = m_dropsAnimIncrementor;
         ps_ssfx_hud_drops_1.y = m_dropsIntensity;
+
+        // Visor Rain Drops
+        float visorBuildSpeed = 4.f;
+        float visorDryingSpeed = 8.f;
+        if (rainHemi > 0.15f)
+        {
+            if (ps_r2_drops_control.x < 0.1f) // jump start the rain effect when we move out of cover
+                ps_r2_drops_control.x = 0.1f;
+
+            ps_r2_drops_control.x += (visorBuildSpeed * Device.fTimeDelta) / 100.f;
+        }
+        else
+            ps_r2_drops_control.x -= (visorDryingSpeed * Device.fTimeDelta) / 100.f;
+
+        clamp(ps_r2_drops_control.x, 0.f, 1.f);
+
+        if (rainHemi > 0.15 || fsimilar(ps_r2_drops_control.x, 0.f, 0.01f))
+            ps_r2_drops_control.z = m_dropsIntensity / 2.f;
+
+        // Visor Condition, Reflection
+        PIItem pVisor = inventory().ItemFromSlot(HELMET_SLOT);
+        if (!pVisor)
+        {
+            auto pOutfit = smart_cast<CCustomOutfit*>(inventory().ItemFromSlot(OUTFIT_SLOT));
+            if (pOutfit && !pOutfit->bIsHelmetAvaliable) // if our outfit blocks the helmet, it probably includes it's own helmet
+                pVisor = pOutfit->cast_inventory_item();
+        }
+
+        if (pVisor)
+        {
+            float condition = 1.1f - pVisor->GetCondition();
+            ps_r2_mask_control.x = round(condition * 10.f);
+            // TODO: dont hardcode these
+            // and add cracking sounds when the condition changes
+            ps_r2_mask_control.y = 1.f; 
+            ps_r2_mask_control.z = 1.f;
+        }
+        else
+        {
+            ps_r2_mask_control.x = 0.f;
+            ps_r2_mask_control.y = 0.f;
+            ps_r2_mask_control.z = 0.f;
+        }
     }
 }
 

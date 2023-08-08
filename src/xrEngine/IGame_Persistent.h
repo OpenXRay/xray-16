@@ -203,6 +203,18 @@ extern ENGINE_API float ps_r2_img_gamma; // r2-only
 extern ENGINE_API float ps_r2_img_saturation; // r2-only
 extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
 
+extern ENGINE_API Fvector4 ps_r2_mask_control;
+extern ENGINE_API Fvector ps_r2_drops_control;
+extern ENGINE_API int ps_r2_nightvision;
+
+extern ENGINE_API Fvector4 ps_dev_param_1;
+extern ENGINE_API Fvector4 ps_dev_param_2;
+extern ENGINE_API Fvector4 ps_dev_param_3;
+extern ENGINE_API Fvector4 ps_dev_param_4;
+extern ENGINE_API Fvector4 ps_dev_param_5;
+extern ENGINE_API Fvector4 ps_dev_param_6;
+extern ENGINE_API Fvector4 ps_dev_param_7;
+extern ENGINE_API Fvector4 ps_dev_param_8;
 
 // Ascii's shaders
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;

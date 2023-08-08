@@ -452,14 +452,14 @@ class cl_sky_color : public R_constant_setup
 static cl_sky_color binder_sky_color;
 
 //Sneaky debug stuff
-extern Fvector4 ps_dev_param_1;
-extern Fvector4 ps_dev_param_2;
-extern Fvector4 ps_dev_param_3;
-extern Fvector4 ps_dev_param_4;
-extern Fvector4 ps_dev_param_5;
-extern Fvector4 ps_dev_param_6;
-extern Fvector4 ps_dev_param_7;
-extern Fvector4 ps_dev_param_8;
+extern ENGINE_API Fvector4 ps_dev_param_1;
+extern ENGINE_API Fvector4 ps_dev_param_2;
+extern ENGINE_API Fvector4 ps_dev_param_3;
+extern ENGINE_API Fvector4 ps_dev_param_4;
+extern ENGINE_API Fvector4 ps_dev_param_5;
+extern ENGINE_API Fvector4 ps_dev_param_6;
+extern ENGINE_API Fvector4 ps_dev_param_7;
+extern ENGINE_API Fvector4 ps_dev_param_8;
 
 static class dev_param_1 : public R_constant_setup
 {
