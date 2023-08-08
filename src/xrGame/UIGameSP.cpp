@@ -75,15 +75,18 @@ void CUIGameSP::OnFrame()
 
     if (m_game_objective)
     {
-        bool b_remove = false;
-        for (u8 i = 0; i < bindtypes_count && !b_remove; ++i)
+        bool keyPressed = false;
+        ForAllActionKeys(kSCORES, [&](size_t /*keyboard_index*/, int key)
         {
-            const int dik = GetActionDik(kSCORES, i);
-            if (dik && !pInput->iGetAsyncKeyState(dik))
-                b_remove = true;
-        }
+            if (pInput->iGetAsyncKeyState(key))
+            {
+                keyPressed = true;
+                return true;
+            }
+            return false;
+        });
 
-        if (b_remove)
+        if (!keyPressed)
         {
             RemoveCustomStatic("main_task");
             RemoveCustomStatic("secondary_task");
