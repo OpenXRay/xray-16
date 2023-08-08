@@ -542,19 +542,20 @@ bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
         UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
         UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
 
-        // This is pseudo RNG, so when we are seeding it with 'this' pointer
-        // we can expect predictable and stable values (no *blinking* at all)
-        CRandom rnd;
-        rnd.seed((s32)(intptr_t)this);
-
+        // XXX: make colours user configurable
         u32 color = color_rgba(255, 0, 0, 255);
         if (hovered)
             color = color_rgba(255, 255, 0, 255);
         else if (debugState.coloredRects)
+        {
+            // This is pseudo RNG, so when we are seeding it with 'this' pointer
+            // we can expect predictable and stable values (no *blinking* at all)
+            CRandom rnd;
+            rnd.seed((s32)(intptr_t)this);
             color = color_rgba(rnd.randI(255), rnd.randI(255), rnd.randI(255), 255);
+        }
 
         const auto draw_list = hovered ? ImGui::GetForegroundDrawList() : ImGui::GetBackgroundDrawList();
-
         draw_list->AddRect((const ImVec2&)rect.lt, (const ImVec2&)rect.rb, color);
     }
 
