@@ -67,6 +67,11 @@ void CUIDebugger::OnFrame()
         if (ImGui::BeginMenuBar())
         {
             ImGui::Checkbox("Draw rects", &m_state.drawWndRects);
+
+            ImGui::BeginDisabled(!m_state.drawWndRects);
+            ImGui::Checkbox("Coloured rects", &m_state.coloredRects);
+            ImGui::EndDisabled();
+
             ImGui::EndMenuBar();
         }
 
