@@ -545,6 +545,16 @@ float IGame_Persistent::GrassBenderToValue(float& current, float go_to, float in
     return current < go_to ? r_value : -r_value;
 }
 
+bool IGame_Persistent::IsActorInHideout()
+{
+    if (Device.dwTimeGlobal > m_last_ray_pick_time)
+    { // Апдейт рейтрейса - раз в секунду. Чаще апдейтить нет смысла.
+        m_last_ray_pick_time = Device.dwTimeGlobal + 1000;
+        collide::rq_result RQ;
+        m_isInHideout = !!g_pGameLevel->ObjectSpace.RayPick(Device.vCameraPosition, Fvector{ 0.f, 1.f, 0.f }, 50.f, collide::rqtBoth, RQ, g_pGameLevel->CurrentViewEntity());
+    }
+    return m_isInHideout;
+}
 
 void IGame_Persistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
