@@ -1,73 +1,7 @@
 #include "pch.hpp"
+
 #include "UIWindow.h"
 #include "Cursor/UICursor.h"
-#include "Include/xrRender/DebugRender.h"
-#include "Include/xrRender/UIRender.h"
-
-xr_vector<Frect> g_wnds_rects;
-xr_vector<Frect> g_focused_wnds_rects;
-BOOL g_show_wnd_rect2 = FALSE;
-
-XRUICORE_API void clean_wnd_rects()
-{
-#ifdef DEBUG
-    GEnv.DRender->DestroyDebugShader(IDebugRender::dbgShaderWindow);
-#endif // DEBUG
-}
-
-void add_rect_to_draw(Frect&& r)
-{
-    g_wnds_rects.emplace_back(r);
-}
-
-void add_focused_rect_to_draw(Frect&& r)
-{
-    g_focused_wnds_rects.emplace_back(r);
-}
-
-void draw_rect(Frect& r, u32 color)
-{
-#ifdef DEBUG
-
-    GEnv.DRender->SetDebugShader(IDebugRender::dbgShaderWindow);
-
-    //.	GlobalEnv.UIRender->StartLineStrip	(5);
-    GEnv.UIRender->StartPrimitive(5, IUIRender::ptLineStrip, UI().m_currentPointType);
-
-    GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
-    GEnv.UIRender->PushPoint(r.rb.x, r.lt.y, 0, color, 0, 0);
-    GEnv.UIRender->PushPoint(r.rb.x, r.rb.y, 0, color, 0, 0);
-    GEnv.UIRender->PushPoint(r.lt.x, r.rb.y, 0, color, 0, 0);
-    GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
-
-    //.	GlobalEnv.UIRender->FlushLineStrip();
-    GEnv.UIRender->FlushPrimitive();
-
-#endif // DEBUG
-}
-
-XRUICORE_API void draw_wnds_rects()
-{
-    if (g_wnds_rects.empty() && g_focused_wnds_rects.empty())
-        return;
-
-    for (Frect& rect : g_wnds_rects)
-    {
-        UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
-        UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
-        draw_rect(rect, color_rgba(255, 0, 0, 255));
-    }
-
-    for (Frect& rect : g_focused_wnds_rects)
-    {
-        UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
-        UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
-        draw_rect(rect, color_rgba(0, 255, 0, 255));
-    }
-
-    g_wnds_rects.clear();
-    g_focused_wnds_rects.clear();
-}
 
 CUIWindow::CUIWindow(pcstr window_name)
     : m_windowName(window_name), m_pParentWnd(NULL), m_pMouseCapturer(NULL), m_pKeyboardCapturer(NULL), m_pMessageTarget(NULL),
@@ -99,17 +33,6 @@ void CUIWindow::Draw()
             continue;
         (*it)->Draw();
     }
-#ifdef DEBUG
-    if (g_show_wnd_rect2)
-    {
-        Frect r;
-        GetAbsoluteRect(r);
-        if (CursorOverWindow())
-            add_focused_rect_to_draw(std::move(r));
-        else
-            add_rect_to_draw(std::move(r));
-    }
-#endif
 }
 
 void CUIWindow::Draw(float x, float y)

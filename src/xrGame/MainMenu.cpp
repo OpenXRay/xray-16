@@ -487,7 +487,7 @@ void CMainMenu::IR_OnControllerHold(int dik, float x, float y)
 }
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }
-extern void draw_wnds_rects();
+
 void CMainMenu::OnRender()
 {
     if (m_Flags.test(flGameSaveScreenshot))
@@ -498,7 +498,6 @@ void CMainMenu::OnRender()
     {
         DoRenderDialogs();
         UI().RenderFont();
-        draw_wnds_rects();
     }
 }
 

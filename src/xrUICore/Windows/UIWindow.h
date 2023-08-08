@@ -185,5 +185,4 @@ protected:
     bool m_bCustomDraw;
 };
 
-XRUICORE_API extern BOOL g_show_wnd_rect2;
 XRUICORE_API bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border = 0.0f, float dx16pos = 0.0f);

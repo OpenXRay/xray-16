@@ -587,8 +587,6 @@ void test_precise_path();
 extern Flags32 dbg_net_Draw_Flags;
 #endif
 
-extern void draw_wnds_rects();
-
 void CLevel::OnRender()
 {
     GEnv.Render->BeforeWorldRender();	//--#SM+#-- +SecondVP+
@@ -614,7 +612,6 @@ void CLevel::OnRender()
         HUD().RenderUI();
 
 #ifdef DEBUG
-    draw_wnds_rects();
     physics_world()->OnRender();
 #endif
 #ifdef DEBUG
