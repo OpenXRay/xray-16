@@ -198,7 +198,9 @@ void ide::ShowMain()
         if (ImGui::BeginMenu("About"))
         {
 #ifndef MASTER_GOLD
+#   ifdef DEBUG
             ImGui::MenuItem("ImGui demo", nullptr, &m_windows.imgui_demo);
+#   endif
             ImGui::MenuItem("ImGui metrics", nullptr, &m_windows.imgui_metrics);
 #endif
             ImGui::EndMenu();
