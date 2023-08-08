@@ -303,7 +303,7 @@ bool CUIGameCustom::FillDebugTree(const CUIDebugState& debugState)
 
     const bool open = ImGui::TreeNodeEx(this, flags, "Game UI (%s)", CUIGameCustom::GetDebugType());
     if (ImGui::IsItemClicked())
-        debugState.newSelected = this;
+        debugState.select(this);
 
     if (open)
     {

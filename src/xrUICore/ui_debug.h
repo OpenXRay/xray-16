@@ -23,6 +23,14 @@ struct CUIDebugState
     CUIDebuggable* selected{};
     mutable CUIDebuggable* newSelected{};
     bool drawWndRects{};
+
+    void select(CUIDebuggable* debuggable) const
+    {
+        if (selected == debuggable)
+            newSelected = nullptr;
+        else
+            newSelected = debuggable;
+    }
 };
 
 class XRUICORE_API CUIDebugger final : public xray::editor::ide_tool

@@ -609,7 +609,7 @@ bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
 
     const bool open = ImGui::TreeNodeEx(this, flags, "%s (%s)", WindowName().c_str(), GetDebugType());
     if (ImGui::IsItemClicked())
-        debugState.newSelected = this;
+        debugState.select(this);
 
     const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
     if (debugState.drawWndRects && (IsShown() || hovered))
