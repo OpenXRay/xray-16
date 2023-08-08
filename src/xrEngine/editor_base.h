@@ -116,12 +116,7 @@ private:
     ide_backend* m_backend_data{};
 
     visible_state m_state;
-    struct
-    {
-        bool weather;
-        bool imgui_demo;
-        bool imgui_metrics;
-    } m_windows{};
+    bool m_show_weather_editor; // to be refactored
 
     xr_vector<ide_tool*> m_tools;
 };

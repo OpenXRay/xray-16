@@ -94,7 +94,6 @@ void CUIDebugger::OnFrame()
             ImGui::EndTable();
         }
     }
-
     ImGui::End();
 #endif
 }

@@ -305,7 +305,7 @@ void display_property(CEffect_Thunderbolt& bolt)
 
 void ide::ShowWeatherEditor()
 {
-    if (ImGui::Begin("Weather editor", &m_windows.weather, get_default_window_flags()))
+    if (ImGui::Begin("Weather editor", &m_show_weather_editor, get_default_window_flags()))
     {
         auto& env = g_pGamePersistent->Environment();
 
