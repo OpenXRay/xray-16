@@ -152,3 +152,23 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
     p.y = iFloor(vPos.y / correction.y);
     pInput->iSetMousePos(p);
 }
+
+void CUICursor::WarpToWindow(CUIWindow* wnd, bool change_visibility /*= true*/)
+{
+    if (!wnd)
+    {
+        if (change_visibility)
+            Hide();
+        return;
+    }
+
+    if (!IsVisible() && change_visibility)
+        Show();
+
+    Fvector2 pos;
+    wnd->GetAbsolutePos(pos);
+    Fvector2 size = wnd->GetWndSize();
+    const Fvector2 sizeOfThird = Fvector2(size).div(3);
+    pos.add(size).sub(sizeOfThird);
+    SetUICursorPosition(pos);
+}

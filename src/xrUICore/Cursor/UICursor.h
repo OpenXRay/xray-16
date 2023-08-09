@@ -26,6 +26,7 @@ public:
 
     Fvector2 GetCursorPosition();
     void SetUICursorPosition(Fvector2 pos);
+    void WarpToWindow(CUIWindow* wnd, bool change_visibility = true);
     void UpdateCursorPosition(int _dx, int _dy);
 
     void OnDeviceReset() override;
