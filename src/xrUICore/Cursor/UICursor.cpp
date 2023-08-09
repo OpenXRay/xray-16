@@ -47,11 +47,13 @@ void CUICursor::OnUIReset()
 void CUICursor::Show()
 {
     bVisible = true;
+    m_become_visible_time  = Device.dwTimeContinual;
 }
 
 void CUICursor::Hide()
 {
     bVisible = false;
+    m_become_visible_time = 0;
 }
 
 void CUICursor::InitInternal()
@@ -101,7 +103,18 @@ void CUICursor::OnRender()
     m_static->Draw();
 }
 
+void CUICursor::UpdateAutohideTiming()
+{
+    const u32 cur_time = Device.dwTimeContinual;
+
+    if (float(cur_time - m_become_visible_time) > (psControllerCursorAutohideTime * 1000.f))
+    {
+        Hide();
+    }
+}
+
 Fvector2 CUICursor::GetCursorPosition() { return vPos; }
+
 Fvector2 CUICursor::GetCursorPositionDelta()
 {
     Fvector2 res_delta;

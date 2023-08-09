@@ -224,6 +224,10 @@ void CDialogHolder::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 void CDialogHolder::OnFrame()
 {
     m_b_in_update = true;
+
+    if (GetUICursor().IsVisible() && pInput->GetCurrentInputType() == CInput::Controller)
+        GetUICursor().UpdateAutohideTiming();
+
     CUIDialogWnd* wnd = TopInputReceiver();
     if (wnd && wnd->IsEnabled())
     {

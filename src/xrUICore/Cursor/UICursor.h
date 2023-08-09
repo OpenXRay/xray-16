@@ -1,5 +1,6 @@
 #pragma once
 
+class CUIWindow;
 class CUIStatic;
 
 class XRUICORE_API CUICursor : public pureRender, public CDeviceResetNotifier, public CUIResetNotifier
@@ -10,12 +11,16 @@ class XRUICORE_API CUICursor : public pureRender, public CDeviceResetNotifier, p
     Fvector2 correction;
     bool m_bound_to_system_cursor;
     CUIStatic* m_static;
+    u32 m_become_visible_time{};
+
     void InitInternal();
 
 public:
     CUICursor();
     virtual ~CUICursor();
     virtual void OnRender();
+
+    void UpdateAutohideTiming();
 
     Fvector2 GetCursorPositionDelta();
 

@@ -865,6 +865,7 @@ void CCC_Register()
     psControllerSensorDeadZone = 0.005f;
     CMD4(CCC_Float, "gamepad_sensor_deadzone", &psControllerSensorDeadZone, 0.001f, 1.f);
     CMD3(CCC_ControllerSensorEnable, "gamepad_sensors_enable", &psControllerEnableSensors, 1);
+    CMD4(CCC_Float, "gamepad_cursor_autohide_time", &psControllerCursorAutohideTime, 0.5f, 3.f);
 
     // Camera
     CMD2(CCC_Float, "cam_inert", &psCamInert);
