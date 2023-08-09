@@ -217,30 +217,23 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         m_pActiveDialog->Show(false);
     }
 
-    if (section == "eptMap" && pUIMapWnd)
+    const std::tuple<shared_str, CUIWindow*> availableWindowsList[] =
     {
-        m_pActiveDialog = pUIMapWnd;
-    }
-    else if (section == "eptTasks" && pUITaskWnd)
+        { "eptMap",         pUIMapWnd },
+        { "eptTasks",       pUITaskWnd },
+        { "eptFractionWar", pUIFactionWarWnd },
+        { "eptStatistics",  pUIActorInfo },
+        { "eptRanking",     pUIRankingWnd },
+        { "eptLogs",        pUILogsWnd },
+    };
+
+    for (const auto& [id, wnd] : availableWindowsList)
     {
-        m_pActiveDialog = pUITaskWnd;
-    }
-    else if (section == "eptFractionWar" && pUIFactionWarWnd)
-    {
-   		m_pActiveDialog = pUIFactionWarWnd;
-    }
-    else if (section == "eptStatistics" && pUIActorInfo)
-    {
-        m_pActiveDialog = pUIActorInfo;
-        InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
-    }
-    else if (section == "eptRanking" && pUIRankingWnd)
-    {
-        m_pActiveDialog = pUIRankingWnd;
-    }
-    else if (section == "eptLogs" && pUILogsWnd)
-    {
-        m_pActiveDialog = pUILogsWnd;
+        if (section == id && wnd)
+        {
+            m_pActiveDialog = wnd;
+            break;
+        }
     }
 
     luabind::functor<CUIDialogWndEx*> functor;
@@ -252,6 +245,11 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
             scriptWnd->SetHolder(CurrentDialogHolder());
             m_pActiveDialog = scriptWnd;
         }
+    }
+
+    if (m_pActiveDialog == pUIActorInfo && pUIActorInfo)
+    {
+        InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
     }
 
     R_ASSERT(m_pActiveDialog);
