@@ -32,7 +32,7 @@ public:
     void OnDeviceReset() override;
     void OnUIReset() override;
 
-    bool IsVisible() { return bVisible; }
+    bool IsVisible() const { return bVisible; }
     void Show();
     void Hide();
 };
