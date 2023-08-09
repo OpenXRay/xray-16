@@ -198,6 +198,30 @@ void CUITabControl::SetActiveTabByIndex(u32 index)
     SetActiveTab(newBtn->m_btn_id);
 }
 
+bool CUITabControl::SetNextActiveTab(bool next, bool loop)
+{
+    const int idx = GetActiveIndex();
+    if (next)
+    {
+        if (idx < (int)GetTabsCount() - 1)
+            SetActiveTabByIndex(idx + 1);
+        else if (loop)
+            SetActiveTabByIndex(0);
+        else
+            return false;
+    }
+    else
+    {
+        if (idx > 0)
+            SetActiveTabByIndex(idx - 1);
+        else if (loop)
+            SetActiveTabByIndex(GetTabsCount() - 1);
+        else
+            return false;
+    }
+    return true;
+}
+
 bool CUITabControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (GetAcceleratorsMode() && WINDOW_KEY_PRESSED == keyboard_action)
