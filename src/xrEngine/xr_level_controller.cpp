@@ -688,15 +688,28 @@ bool IsGroupMatching(EKeyGroup g1, EKeyGroup g2)
     return ((g1 == g2) || (g1 == _both) || (g2 == _both));
 }
 
-EGameActions GetBindedAction(int dik)
+bool IsContextNotConflicted(EKeyContext c1, EKeyContext c2)
+{
+    return c1 != c2;
+}
+
+bool IsContextMatching(EKeyContext c1, EKeyContext c2)
+{
+    return c1 == c2 || (c1 == EKeyContext::Undefined && c2 == EKeyContext::Undefined);
+}
+
+EGameActions GetBindedAction(int dik, EKeyContext context /*= EKeyContext::Undefined*/)
 {
     for (int idx = 0; idx < bindings_count; ++idx)
     {
         key_binding* binding = &g_key_bindings[idx];
 
-        bool isGroupMatching = IsGroupMatching(binding->m_action->key_group, g_current_keygroup);
-
+        const bool isGroupMatching = IsGroupMatching(binding->m_action->key_group, g_current_keygroup);
         if (!isGroupMatching)
+            continue;
+
+        const bool isContextMatching = IsContextMatching(binding->m_action->key_context, context);
+        if (!isContextMatching)
             continue;
 
         for (u8 i = 0; i < bindtypes_count && isGroupMatching; ++i)
@@ -794,10 +807,11 @@ public:
             if (binding == currBinding)
                 continue;
 
-            bool isConflict = !IsGroupNotConflicted(binding->m_action->key_group, currBinding->m_action->key_group);
+            const bool groupConflict = !IsGroupNotConflicted(binding->m_action->key_group, currBinding->m_action->key_group);
+            const bool contextConflict = !IsContextNotConflicted(binding->m_action->key_context, currBinding->m_action->key_context);
 
             for (u8 i = 0; i < bindtypes_count; ++i)
-                if (binding->m_keyboard[i] == keyboard && isConflict)
+                if (binding->m_keyboard[i] == keyboard && (groupConflict && contextConflict))
                     binding->m_keyboard[i] = nullptr;
         }
 

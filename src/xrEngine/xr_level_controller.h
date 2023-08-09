@@ -139,6 +139,11 @@ enum EGameActions : u32
     kNOTBINDED
 };
 
+enum class EKeyContext
+{
+    Undefined = 0, // default behaviour
+};
+
 constexpr char GAME_ACTION_MARK = 27; // escape symbol
 
 struct keyboard_key
@@ -160,6 +165,7 @@ struct game_action
     pcstr action_name;
     EGameActions id;
     EKeyGroup key_group;
+    EKeyContext key_context{ EKeyContext::Undefined };
 };
 
 #define bindtypes_count 3
@@ -177,6 +183,7 @@ extern ENGINE_API keyboard_key keyboards[];
 extern ENGINE_API key_binding g_key_bindings[];
 
 ENGINE_API bool IsGroupNotConflicted(EKeyGroup g1, EKeyGroup g2);
+ENGINE_API bool IsContextNotConflicted(EKeyContext c1, EKeyContext c2);
 
 ENGINE_API pcstr IdToActionName(EGameActions id);
 ENGINE_API EGameActions ActionNameToId(pcstr name);
@@ -189,7 +196,7 @@ ENGINE_API keyboard_key* DikToPtr(int dik, bool safe);
 
 ENGINE_API bool IsBinded(EGameActions action_id, int dik);
 ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);
-ENGINE_API EGameActions GetBindedAction(int dik);
+ENGINE_API EGameActions GetBindedAction(int dik, EKeyContext context = EKeyContext::Undefined);
 
 ENGINE_API pcstr GetActionBinding(EGameActions action);
 
