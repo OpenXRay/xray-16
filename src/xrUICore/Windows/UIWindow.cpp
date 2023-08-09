@@ -43,22 +43,21 @@ void CUIWindow::Draw(float x, float y)
 
 void CUIWindow::Update()
 {
+    bool cursor_on_window = false;
     if (GetUICursor().IsVisible())
     {
-        bool cursor_on_window;
-
         Fvector2 temp = GetUICursor().GetCursorPosition();
         Frect r;
         GetAbsoluteRect(r);
         cursor_on_window = !!r.in(temp);
-        // RECEIVE and LOST focus
-        if (m_bCursorOverWindow != cursor_on_window)
-        {
-            if (cursor_on_window)
-                OnFocusReceive();
-            else
-                OnFocusLost();
-        }
+    }
+    // RECEIVE and LOST focus
+    if (m_bCursorOverWindow != cursor_on_window)
+    {
+        if (cursor_on_window)
+            OnFocusReceive();
+        else
+            OnFocusLost();
     }
 
     for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
