@@ -42,14 +42,17 @@ private:
     CUI3tButton* m_btn_focus;
     CUI3tButton* m_btn_focus2;
 
-    CUICheckButton* m_cbTreasures;
-    CUICheckButton* m_cbQuestNpcs;
-    CUICheckButton* m_cbSecondaryTasks;
-    CUICheckButton* m_cbPrimaryObjects;
-    bool m_bTreasuresEnabled;
-    bool m_bQuestNpcsEnabled;
-    bool m_bSecondaryTasksEnabled;
-    bool m_bPrimaryObjectsEnabled;
+    enum eSpotsFilter
+    {
+        eSpotsFilterTreasures,
+        eSpotsFilterQuestNpcs,
+        eSpotsFilterSecondaryTasks,
+        eSpotsFilterPrimaryObjects,
+
+        eSpotsFilter_Count
+    };
+    std::array<CUICheckButton*, eSpotsFilter_Count> m_filters;
+    std::array<bool, eSpotsFilter_Count> m_filters_state;
 
     UITaskListWnd* m_task_wnd;
     bool m_task_wnd_show;
@@ -76,34 +79,45 @@ public:
     void ShowMapLegend(bool status) const;
     void Switch_ShowMapLegend() const;
 
-    bool IsTreasuresEnabled() const { return m_bTreasuresEnabled; };
-    bool IsQuestNpcsEnabled() const { return m_bQuestNpcsEnabled; };
-    bool IsSecondaryTasksEnabled() const { return m_bSecondaryTasksEnabled; };
-    bool IsPrimaryObjectsEnabled() const { return m_bPrimaryObjectsEnabled; };
+    [[nodiscard]]
+    bool IsTreasuresEnabled() const { return m_filters_state[eSpotsFilterTreasures]; }
+
+    [[nodiscard]]
+    bool IsQuestNpcsEnabled() const { return m_filters_state[eSpotsFilterQuestNpcs]; }
+
+    [[nodiscard]]
+    bool IsSecondaryTasksEnabled() const { return m_filters_state[eSpotsFilterSecondaryTasks]; }
+
+    [[nodiscard]]
+    bool IsPrimaryObjectsEnabled() const { return m_filters_state[eSpotsFilterPrimaryObjects]; }
+
     void TreasuresEnabled(bool enable)
     {
-        m_bTreasuresEnabled = enable;
-        if (m_cbTreasures)
-            m_cbTreasures->SetCheck(enable);
-    };
+        m_filters_state[eSpotsFilterTreasures] = enable;
+        if (m_filters[eSpotsFilterTreasures])
+            m_filters[eSpotsFilterTreasures]->SetCheck(enable);
+    }
+
     void QuestNpcsEnabled(bool enable)
     {
-        m_bQuestNpcsEnabled = enable;
-        if (m_cbQuestNpcs)
-            m_cbQuestNpcs->SetCheck(enable);
-    };
+        m_filters_state[eSpotsFilterQuestNpcs] = enable;
+        if (m_filters[eSpotsFilterQuestNpcs])
+            m_filters[eSpotsFilterQuestNpcs]->SetCheck(enable);
+    }
+
     void SecondaryTasksEnabled(bool enable)
     {
-        m_bSecondaryTasksEnabled = enable;
-        if (m_cbSecondaryTasks)
-            m_cbSecondaryTasks->SetCheck(enable);
-    };
+        m_filters_state[eSpotsFilterSecondaryTasks] = enable;
+        if (m_filters[eSpotsFilterSecondaryTasks])
+            m_filters[eSpotsFilterSecondaryTasks]->SetCheck(enable);
+    }
+
     void PrimaryObjectsEnabled(bool enable)
     {
-        m_bPrimaryObjectsEnabled = enable;
-        if (m_cbPrimaryObjects)
-            m_cbPrimaryObjects->SetCheck(enable);
-    };
+        m_filters_state[eSpotsFilterPrimaryObjects] = enable;
+        if (m_filters[eSpotsFilterPrimaryObjects])
+            m_filters[eSpotsFilterPrimaryObjects]->SetCheck(enable);
+    }
 
     void Show_TaskListWnd(bool status);
 
@@ -117,10 +131,7 @@ private:
     void OnTask1DbClicked(CUIWindow*, void*);
     void OnTask2DbClicked(CUIWindow*, void*);
 
-    void OnShowTreasures(CUIWindow*, void*);
-    void OnShowPrimaryObjects(CUIWindow*, void*);
-    void OnShowSecondaryTasks(CUIWindow*, void*);
-    void OnShowQuestNpcs(CUIWindow*, void*);
+    void OnMapSpotFilterClicked(CUIWindow*, void*);
 };
 
 class CUITaskItem final : public CUIWindow

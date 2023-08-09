@@ -29,10 +29,6 @@ CUITaskWnd::CUITaskWnd(UIHint* hint)
       m_BtnTaskListWnd(nullptr), m_second_task_index(nullptr),
       m_devider(nullptr), m_actual_frame(0),
       m_btn_focus(nullptr), m_btn_focus2(nullptr),
-      m_cbTreasures(nullptr), m_cbQuestNpcs(nullptr),
-      m_cbSecondaryTasks(nullptr), m_cbPrimaryObjects(nullptr),
-      m_bTreasuresEnabled(false), m_bQuestNpcsEnabled(false),
-      m_bSecondaryTasksEnabled(false), m_bPrimaryObjectsEnabled(false),
       m_task_wnd(nullptr), m_task_wnd_show(false),
       m_map_legend_wnd(nullptr), hint_wnd(hint)
 {
@@ -55,39 +51,25 @@ bool CUITaskWnd::Init()
 
     m_task_split = UIHelper::CreateFrameLine(xml, "task_split", this, false);
 
-    m_cbTreasures = UIHelper::CreateCheck(xml, "filter_treasures", this, false);
-    if (m_cbTreasures)
+    constexpr std::tuple<eSpotsFilter, pcstr> filters[] =
     {
-        m_cbTreasures->SetCheck(true);
-        AddCallback(m_cbTreasures, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowTreasures));
-    }
-    m_bTreasuresEnabled = true;
+        { eSpotsFilterTreasures,        "filter_treasures" },
+        { eSpotsFilterQuestNpcs,        "filter_primary_objects" },
+        { eSpotsFilterSecondaryTasks,   "filter_secondary_tasks" },
+        { eSpotsFilterPrimaryObjects,   "filter_quest_npcs" },
+    };
 
-    m_cbPrimaryObjects = UIHelper::CreateCheck(xml, "filter_primary_objects", this, false);
-    if (m_cbPrimaryObjects)
+    for (const auto& [filter_id, filter_section] : filters)
     {
-        m_cbPrimaryObjects->SetCheck(true);
-        AddCallback(
-            m_cbPrimaryObjects, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowPrimaryObjects));
+        auto& filter = m_filters[filter_id];
+        filter = UIHelper::CreateCheck(xml, filter_section, this, false);
+        if (filter)
+        {
+            filter->SetCheck(true);
+            AddCallback(filter, BUTTON_CLICKED, void_function(this, &CUITaskWnd::OnMapSpotFilterClicked));
+        }
+        m_filters_state[filter_id] = true;
     }
-    m_bPrimaryObjectsEnabled = true;
-
-    m_cbSecondaryTasks = UIHelper::CreateCheck(xml, "filter_secondary_tasks", this, false);
-    if (m_cbSecondaryTasks)
-    {
-        m_cbSecondaryTasks->SetCheck(true);
-        AddCallback(
-            m_cbSecondaryTasks, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowSecondaryTasks));
-    }
-    m_bSecondaryTasksEnabled = true;
-
-    m_cbQuestNpcs = UIHelper::CreateCheck(xml, "filter_quest_npcs", this, false);
-    if (m_cbQuestNpcs)
-    {
-        m_cbQuestNpcs->SetCheck(true);
-        AddCallback(m_cbQuestNpcs, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowQuestNpcs));
-    }
-    m_bQuestNpcsEnabled = true;
 
     m_pMapWnd = xr_new<CUIMapWnd>(hint_wnd);
     m_pMapWnd->SetAutoDelete(false);
@@ -186,7 +168,7 @@ void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         TaskSetTargetMap(task);
         return;
     }
-    if (msg == PDA_TASK_SHOW_MAP_SPOT && pData && m_bSecondaryTasksEnabled)
+    if (msg == PDA_TASK_SHOW_MAP_SPOT && pData && IsSecondaryTasksEnabled())
     {
         CGameTask* task = static_cast<CGameTask*>(pData);
         TaskShowMapSpot(task, true);
@@ -246,17 +228,17 @@ void CUITaskWnd::ReloadTaskInfo()
     {
         shared_str spot = b->spot_type;
         if (strstr(spot.c_str(), "treasure"))
-            m_bTreasuresEnabled ? b->location->EnableSpot() : b->location->DisableSpot();
+            IsTreasuresEnabled() ? b->location->EnableSpot() : b->location->DisableSpot();
         else if (spot == "primary_object")
-            m_bPrimaryObjectsEnabled ? b->location->EnableSpot() : b->location->DisableSpot();
+            IsPrimaryObjectsEnabled() ? b->location->EnableSpot() : b->location->DisableSpot();
         else if (spot == "secondary_task_location" || spot == "secondary_task_location_complex_timer")
-            (/*b->location->SpotEnabled() && */ m_bSecondaryTasksEnabled) ? b->location->EnableSpot() :
+            (/*b->location->SpotEnabled() && */ IsSecondaryTasksEnabled()) ? b->location->EnableSpot() :
                                                                             b->location->DisableSpot();
         else if (spot == "ui_pda2_trader_location" || spot == "ui_pda2_mechanic_location" ||
             spot == "ui_pda2_scout_location" || spot == "ui_pda2_quest_npc_location" ||
             spot == "ui_pda2_medic_location" || spot == "ui_pda2_actor_box_location" ||
             spot == "ui_pda2_actor_sleep_location")
-            m_bQuestNpcsEnabled ? b->location->EnableSpot() : b->location->DisableSpot();
+            IsQuestNpcsEnabled() ? b->location->EnableSpot() : b->location->DisableSpot();
     }
 
     if (storyTask || additionalTask)
@@ -344,7 +326,7 @@ void CUITaskWnd::Show_TaskListWnd(bool status)
 
 void CUITaskWnd::TaskSetTargetMap(CGameTask* task)
 {
-    if (!task || !m_bSecondaryTasksEnabled)
+    if (!task || !IsSecondaryTasksEnabled())
     {
         return;
     }
@@ -360,7 +342,7 @@ void CUITaskWnd::TaskSetTargetMap(CGameTask* task)
 
 void CUITaskWnd::TaskShowMapSpot(CGameTask* task, bool show) const
 {
-    if (!task || !m_bSecondaryTasksEnabled)
+    if (!task || !IsSecondaryTasksEnabled())
     {
         return;
     }
@@ -395,26 +377,18 @@ void CUITaskWnd::OnTask2DbClicked(CUIWindow*, void*)
 
 void CUITaskWnd::ShowMapLegend(bool status) const { m_map_legend_wnd->Show(status); }
 void CUITaskWnd::Switch_ShowMapLegend() const { m_map_legend_wnd->Show(!m_map_legend_wnd->IsShown()); }
-void CUITaskWnd::OnShowTreasures(CUIWindow* ui, void* d)
+
+void CUITaskWnd::OnMapSpotFilterClicked(CUIWindow* ui, void* d)
 {
-    m_bTreasuresEnabled = !m_bTreasuresEnabled;
+    for (u32 i = 0; i < eSpotsFilter_Count; ++i)
+    {
+        if (m_filters[i] == ui)
+            m_filters_state[i] = m_filters[i]->GetCheck();
+
+    }
     ReloadTaskInfo();
 }
-void CUITaskWnd::OnShowPrimaryObjects(CUIWindow* ui, void* d)
-{
-    m_bPrimaryObjectsEnabled = !m_bPrimaryObjectsEnabled;
-    ReloadTaskInfo();
-}
-void CUITaskWnd::OnShowSecondaryTasks(CUIWindow* ui, void* d)
-{
-    m_bSecondaryTasksEnabled = !m_bSecondaryTasksEnabled;
-    ReloadTaskInfo();
-}
-void CUITaskWnd::OnShowQuestNpcs(CUIWindow* ui, void* d)
-{
-    m_bQuestNpcsEnabled = !m_bQuestNpcsEnabled;
-    ReloadTaskInfo();
-}
+
 // --------------------------------------------------------------------------------------------------
 CUITaskItem::CUITaskItem()
     : CUIWindow("CUITaskItem"),
