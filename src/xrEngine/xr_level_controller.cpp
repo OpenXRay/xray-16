@@ -602,13 +602,15 @@ game_action* ActionNameToPtr(pcstr name)
     return nullptr;
 }
 
-bool IsBinded(EGameActions action_id, int dik)
+bool IsBinded(EGameActions action_id, int dik, EKeyContext context /*= EKeyContext::Undefined*/)
 {
     key_binding* binding = &g_key_bindings[action_id];
     for (u8 i = 0; i < bindtypes_count; ++i)
+    {
         if (binding->m_keyboard[i] && binding->m_keyboard[i]->dik == dik)
-            return true;
-
+            if (binding->m_action->key_context == context)
+                return true;
+    }
     return false;
 }
 

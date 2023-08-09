@@ -194,7 +194,7 @@ ENGINE_API int KeynameToDik(pcstr name);
 ENGINE_API keyboard_key* KeynameToPtr(pcstr name);
 ENGINE_API keyboard_key* DikToPtr(int dik, bool safe);
 
-ENGINE_API bool IsBinded(EGameActions action_id, int dik);
+ENGINE_API bool IsBinded(EGameActions action_id, int dik, EKeyContext context = EKeyContext::Undefined);
 ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);
 ENGINE_API EGameActions GetBindedAction(int dik, EKeyContext context = EKeyContext::Undefined);
 
