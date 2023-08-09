@@ -54,6 +54,7 @@ void CUICursor::Hide()
 {
     bVisible = false;
     m_become_visible_time = 0;
+    m_pause_autohide = false;
 }
 
 void CUICursor::InitInternal()
@@ -105,12 +106,25 @@ void CUICursor::OnRender()
 
 void CUICursor::UpdateAutohideTiming()
 {
+    if (m_pause_autohide)
+        return;
+
     const u32 cur_time = Device.dwTimeContinual;
 
     if (float(cur_time - m_become_visible_time) > (psControllerCursorAutohideTime * 1000.f))
     {
         Hide();
     }
+}
+
+void CUICursor::PauseAutohiding(bool pause)
+{
+    if (m_pause_autohide == pause)
+        return;
+
+    m_pause_autohide = pause;
+    if (!m_pause_autohide)
+        m_become_visible_time = Device.dwTimeContinual;
 }
 
 Fvector2 CUICursor::GetCursorPosition() { return vPos; }

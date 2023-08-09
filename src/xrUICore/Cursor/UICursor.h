@@ -12,6 +12,7 @@ class XRUICORE_API CUICursor : public pureRender, public CDeviceResetNotifier, p
     bool m_bound_to_system_cursor;
     CUIStatic* m_static;
     u32 m_become_visible_time{};
+    bool m_pause_autohide{};
 
     void InitInternal();
 
@@ -21,6 +22,7 @@ public:
     virtual void OnRender();
 
     void UpdateAutohideTiming();
+    void PauseAutohiding(bool pause);
 
     Fvector2 GetCursorPositionDelta();
 
