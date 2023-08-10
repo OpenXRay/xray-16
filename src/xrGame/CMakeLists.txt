@@ -2378,6 +2378,8 @@ set(SRC_FILES
     "ui/UIMap.cpp"
     "ui/UIMapDesc.cpp"
     "ui/UIMapDesc.h"
+    "ui/UIMapFilters.cpp"
+    "ui/UIMapFilters.h"
     "ui/UIMap.h"
     "ui/UIMapInfo.cpp"
     "ui/UIMapInfo.h"

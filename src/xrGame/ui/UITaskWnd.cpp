@@ -51,25 +51,9 @@ bool CUITaskWnd::Init()
 
     m_task_split = UIHelper::CreateFrameLine(xml, "task_split", this, false);
 
-    constexpr std::tuple<eSpotsFilter, pcstr> filters[] =
-    {
-        { eSpotsFilterTreasures,        "filter_treasures" },
-        { eSpotsFilterQuestNpcs,        "filter_primary_objects" },
-        { eSpotsFilterSecondaryTasks,   "filter_secondary_tasks" },
-        { eSpotsFilterPrimaryObjects,   "filter_quest_npcs" },
-    };
-
-    for (const auto& [filter_id, filter_section] : filters)
-    {
-        auto& filter = m_filters[filter_id];
-        filter = UIHelper::CreateCheck(xml, filter_section, this, false);
-        if (filter)
-        {
-            filter->SetCheck(true);
-            AddCallback(filter, BUTTON_CLICKED, void_function(this, &CUITaskWnd::OnMapSpotFilterClicked));
-        }
-        m_filters_state[filter_id] = true;
-    }
+    AttachChild(&m_filters);
+    m_filters.SetMessageTarget(this);
+    m_filters.Init(xml);
 
     m_pMapWnd = xr_new<CUIMapWnd>(hint_wnd);
     m_pMapWnd->SetAutoDelete(false);
@@ -161,84 +145,26 @@ void CUITaskWnd::Update()
 void CUITaskWnd::Draw() { inherited::Draw(); }
 void CUITaskWnd::DrawHint() { m_pMapWnd->DrawHint(); }
 
-void CUITaskWnd::DropFilterSelection()
-{
-    m_selected_filter = -1;
-    GetUICursor().WarpToWindow(nullptr, pInput->IsCurrentInputTypeController());
-}
-
 bool CUITaskWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (IsBinded(kPDA_FILTER_TOGGLE, dik, EKeyContext::PDA) && m_selected_filter == -1)
+        switch (GetBindedAction(dik, EKeyContext::PDA))
         {
-            m_selected_filter = 0;
-            GetUICursor().WarpToWindow(m_filters[m_selected_filter]);
-            GetUICursor().PauseAutohiding(true);
-            return true;
-        }
-
-        if (m_selected_filter >= 0)
-        {
-            if (IsBinded(kQUIT, dik))
-            {
-                DropFilterSelection();
-                return false; // allow PDA to hide
-            }
-
-            switch (GetBindedAction(dik, EKeyContext::UI))
-            {
-            case kUI_BACK:
-                DropFilterSelection();
-                return true;
-
-            case kUI_ACCEPT:
-                m_filters[m_selected_filter]->OnMouseDown(MOUSE_1);
-                return true;
-
-            case kUI_MOVE_LEFT:
-            case kUI_MOVE_DOWN:
-                if (m_selected_filter > 0)
-                    m_selected_filter--;
-                else
-                    m_selected_filter = int(m_filters.size() - 1);
-                break;
-
-            case kUI_MOVE_RIGHT:
-            case kUI_MOVE_UP:
-                if (m_selected_filter < int(m_filters.size() - 1))
-                    m_selected_filter++;
-                else
-                    m_selected_filter = 0;
-                break;
-            } // switch (GetBindedAction(dik, EKeyContext::UI))
-
-            if (IsBinded(kPDA_FILTER_TOGGLE, dik, EKeyContext::PDA))
-            {
-                DropFilterSelection();
-                return true;
-            }
-
-            GetUICursor().WarpToWindow(m_filters[m_selected_filter]);
+        case kPDA_FILTER_TOGGLE:
+            if (m_pKeyboardCapturer == &m_filters)
+                SetKeyboardCapture(nullptr, false);
+            else
+                SetKeyboardCapture(&m_filters, true);
+            m_filters.SendMessage(this, PDA_TASK_SELECT_FILTERS, nullptr);
             return true;
         }
     }
 
-    return inherited::OnKeyboardAction(dik, keyboard_action);
-}
-
-bool CUITaskWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
-{
-    switch (GetBindedAction(axis, EKeyContext::UI))
-    {
-    default:
-        return OnKeyboardAction(axis, controller_action);
-    case kUI_MOVE:
-        if (m_selected_filter >= 0)
-            return true; // just screw it for now
-    }
-    return inherited::OnControllerAction(axis, x, y, controller_action);
+    return false;
 }
 
 void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -271,6 +197,11 @@ void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     if (msg == PDA_TASK_HIDE_HINT)
     {
         m_pMapWnd->HideCurHint();
+        return;
+    }
+    if (msg == PDA_TASK_RELOAD_FILTERS)
+    {
+        ReloadTaskInfo();
         return;
     }
 
@@ -390,7 +321,6 @@ void CUITaskWnd::Show(bool status)
     }
 }
 
-void CUITaskWnd::Reset() { inherited::Reset(); }
 void CUITaskWnd::OnNextTaskClicked() {}
 void CUITaskWnd::OnPrevTaskClicked() {}
 void CUITaskWnd::OnShowTaskListWnd(CUIWindow* w, void* d)
@@ -458,16 +388,6 @@ void CUITaskWnd::OnTask2DbClicked(CUIWindow*, void*)
 
 void CUITaskWnd::ShowMapLegend(bool status) const { m_map_legend_wnd->Show(status); }
 void CUITaskWnd::Switch_ShowMapLegend() const { m_map_legend_wnd->Show(!m_map_legend_wnd->IsShown()); }
-
-void CUITaskWnd::OnMapSpotFilterClicked(CUIWindow* ui, void* d)
-{
-    for (u32 i = 0; i < eSpotsFilter_Count; ++i)
-    {
-        if (m_filters[i] == ui)
-            m_filters_state[i] = m_filters[i]->GetCheck();
-    }
-    ReloadTaskInfo();
-}
 
 // --------------------------------------------------------------------------------------------------
 CUITaskItem::CUITaskItem()

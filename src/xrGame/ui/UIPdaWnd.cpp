@@ -402,6 +402,9 @@ void RearrangeTabButtons(CUITabControl* pTab)
 
 bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
     switch (GetBindedAction(dik, EKeyContext::UI))
     {
     case kUI_TAB_PREV:
@@ -424,5 +427,5 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     if (IsBinded(kACTIVE_JOBS, dik))
         goto hide_pda;
 
-    return inherited::OnKeyboardAction(dik, keyboard_action);
+    return false;
 }

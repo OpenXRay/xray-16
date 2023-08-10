@@ -1,9 +1,10 @@
 #pragma once
+
 #include "xrUICore/Windows/UIWindow.h"
 #include "xrUICore/Callbacks/UIWndCallback.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "GameTaskDefs.h"
-#include "xrUICore/Buttons/UICheckButton.h"
+#include "UIMapFilters.h"
 
 class CUIMapWnd;
 class CUIStatic;
@@ -13,7 +14,6 @@ class CUITaskItem;
 class CUI3tButton;
 class CUIFrameLineWnd;
 class CUIFrameWindow;
-class CUICheckButton;
 class UITaskListWnd;
 class UIMapLegend;
 class UIHint;
@@ -42,18 +42,7 @@ private:
     CUI3tButton* m_btn_focus;
     CUI3tButton* m_btn_focus2;
 
-    enum eSpotsFilter
-    {
-        eSpotsFilterTreasures,
-        eSpotsFilterQuestNpcs,
-        eSpotsFilterSecondaryTasks,
-        eSpotsFilterPrimaryObjects,
-
-        eSpotsFilter_Count
-    };
-    std::array<CUICheckButton*, eSpotsFilter_Count> m_filters;
-    std::array<bool, eSpotsFilter_Count> m_filters_state;
-    int m_selected_filter{ -1 };
+    CUIMapFilters m_filters;
 
     UITaskListWnd* m_task_wnd;
     bool m_task_wnd_show;
@@ -69,60 +58,31 @@ public:
     pcstr GetDebugType() override { return "CUITaskWnd"; }
 
     bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
-    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     bool Init();
     virtual void Update();
     virtual void Draw();
     void DrawHint();
     virtual void Show(bool status);
-    virtual void Reset();
 
     void ReloadTaskInfo();
     void ShowMapLegend(bool status) const;
     void Switch_ShowMapLegend() const;
-
-    [[nodiscard]]
-    bool IsTreasuresEnabled() const { return m_filters_state[eSpotsFilterTreasures]; }
-
-    [[nodiscard]]
-    bool IsQuestNpcsEnabled() const { return m_filters_state[eSpotsFilterQuestNpcs]; }
-
-    [[nodiscard]]
-    bool IsSecondaryTasksEnabled() const { return m_filters_state[eSpotsFilterSecondaryTasks]; }
-
-    [[nodiscard]]
-    bool IsPrimaryObjectsEnabled() const { return m_filters_state[eSpotsFilterPrimaryObjects]; }
-
-    void TreasuresEnabled(bool enable)
-    {
-        m_filters_state[eSpotsFilterTreasures] = enable;
-        if (m_filters[eSpotsFilterTreasures])
-            m_filters[eSpotsFilterTreasures]->SetCheck(enable);
-    }
-
-    void QuestNpcsEnabled(bool enable)
-    {
-        m_filters_state[eSpotsFilterQuestNpcs] = enable;
-        if (m_filters[eSpotsFilterQuestNpcs])
-            m_filters[eSpotsFilterQuestNpcs]->SetCheck(enable);
-    }
-
-    void SecondaryTasksEnabled(bool enable)
-    {
-        m_filters_state[eSpotsFilterSecondaryTasks] = enable;
-        if (m_filters[eSpotsFilterSecondaryTasks])
-            m_filters[eSpotsFilterSecondaryTasks]->SetCheck(enable);
-    }
-
-    void PrimaryObjectsEnabled(bool enable)
-    {
-        m_filters_state[eSpotsFilterPrimaryObjects] = enable;
-        if (m_filters[eSpotsFilterPrimaryObjects])
-            m_filters[eSpotsFilterPrimaryObjects]->SetCheck(enable);
-    }
-
     void Show_TaskListWnd(bool status);
+
+    [[nodiscard]]
+    bool IsTreasuresEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::Treasures); }
+    [[nodiscard]]
+    bool IsQuestNpcsEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::QuestNpcs); }
+    [[nodiscard]]
+    bool IsSecondaryTasksEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::SecondaryTasks); }
+    [[nodiscard]]
+    bool IsPrimaryObjectsEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::PrimaryObjects); }
+
+    void TreasuresEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::Treasures, enable); }
+    void QuestNpcsEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::QuestNpcs, enable); }
+    void SecondaryTasksEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::SecondaryTasks, enable); }
+    void PrimaryObjectsEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::PrimaryObjects, enable); }
 
 private:
     void TaskSetTargetMap(CGameTask* task);
@@ -133,10 +93,6 @@ private:
     void OnShowTaskListWnd(CUIWindow* w, void* d);
     void OnTask1DbClicked(CUIWindow*, void*);
     void OnTask2DbClicked(CUIWindow*, void*);
-
-    void OnMapSpotFilterClicked(CUIWindow*, void*);
-
-    void DropFilterSelection();
 };
 
 class CUITaskItem final : public CUIWindow
