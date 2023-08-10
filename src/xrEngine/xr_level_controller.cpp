@@ -154,8 +154,8 @@ game_action actions[] = {
     { "ui_move_up",             kUI_MOVE_UP,                _sp,    EKeyContext::UI },
     { "ui_move_down",           kUI_MOVE_DOWN,              _sp,    EKeyContext::UI },
 
-    { "ui_move_accept",         kUI_ACCEPT,                 _sp,    EKeyContext::UI },
-    { "ui_move_back",           kUI_BACK,                   _sp,    EKeyContext::UI },
+    { "ui_accept",              kUI_ACCEPT,                 _sp,    EKeyContext::UI },
+    { "ui_back",                kUI_BACK,                   _sp,    EKeyContext::UI },
 
     { "ui_tab_prev",            kUI_TAB_PREV,               _sp,    EKeyContext::UI },
     { "ui_tab_next",            kUI_TAB_NEXT,               _sp,    EKeyContext::UI },
