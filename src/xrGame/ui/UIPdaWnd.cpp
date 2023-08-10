@@ -402,33 +402,27 @@ void RearrangeTabButtons(CUITabControl* pTab)
 
 bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (IsBinded(kUI_BACK, dik, EKeyContext::UI))
+    switch (GetBindedAction(dik, EKeyContext::UI))
     {
-        if (WINDOW_KEY_PRESSED == keyboard_action)
-            HideDialog();
-        return true;
-    }
-
-    switch (GetBindedAction(dik, EKeyContext::PDA))
-    {
-    case kPDA_TAB_PREV:
+    case kUI_TAB_PREV:
         if (WINDOW_KEY_PRESSED == keyboard_action)
             UITabControl->SetNextActiveTab(false, true);
         return true;
 
-    case kPDA_TAB_NEXT:
+    case kUI_TAB_NEXT:
         if (WINDOW_KEY_PRESSED == keyboard_action)
             UITabControl->SetNextActiveTab(true, true);
         return true;
-    }
 
-    // Context has a priority over default actions
-    if (IsBinded(kACTIVE_JOBS, dik))
-    {
+    hide_pda:
+    case kUI_BACK:
         if (WINDOW_KEY_PRESSED == keyboard_action)
             HideDialog();
         return true;
     }
+
+    if (IsBinded(kACTIVE_JOBS, dik))
+        goto hide_pda;
 
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }

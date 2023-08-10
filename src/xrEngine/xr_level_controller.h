@@ -139,6 +139,20 @@ enum EGameActions : u32
     kUI_ACCEPT,
     kUI_BACK,
 
+    kUI_TAB_PREV,
+    kUI_TAB_NEXT,
+
+    kUI_BUTTON_1,
+    kUI_BUTTON_2,
+    kUI_BUTTON_3,
+    kUI_BUTTON_4,
+    kUI_BUTTON_5,
+    kUI_BUTTON_6,
+    kUI_BUTTON_7,
+    kUI_BUTTON_8,
+    kUI_BUTTON_9,
+    kUI_BUTTON_0,
+
     // PDA:
     kPDA_MAP_MOVE, // gamepad axis
     kPDA_MAP_MOVE_LEFT,
@@ -152,15 +166,6 @@ enum EGameActions : u32
 
     kPDA_MAP_SHOW_ACTOR,
     kPDA_MAP_SHOW_LEGEND,
-
-    kPDA_TAB_PREV,
-    kPDA_TAB_NEXT,
-    kPDA_TAB1,
-    kPDA_TAB2,
-    kPDA_TAB3,
-    kPDA_TAB4,
-    kPDA_TAB5,
-    kPDA_TAB6,
 
     kPDA_FILTER_TOGGLE,
 

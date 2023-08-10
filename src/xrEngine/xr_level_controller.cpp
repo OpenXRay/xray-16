@@ -157,6 +157,20 @@ game_action actions[] = {
     { "ui_move_accept",         kUI_ACCEPT,                 _sp,    EKeyContext::UI },
     { "ui_move_back",           kUI_BACK,                   _sp,    EKeyContext::UI },
 
+    { "ui_tab_prev",            kUI_TAB_PREV,               _sp,    EKeyContext::UI },
+    { "ui_tab_next",            kUI_TAB_NEXT,               _sp,    EKeyContext::UI },
+
+    { "ui_button_1",            kUI_BUTTON_1,               _sp,    EKeyContext::UI },
+    { "ui_button_2",            kUI_BUTTON_2,               _sp,    EKeyContext::UI },
+    { "ui_button_3",            kUI_BUTTON_3,               _sp,    EKeyContext::UI },
+    { "ui_button_4",            kUI_BUTTON_4,               _sp,    EKeyContext::UI },
+    { "ui_button_5",            kUI_BUTTON_5,               _sp,    EKeyContext::UI },
+    { "ui_button_6",            kUI_BUTTON_6,               _sp,    EKeyContext::UI },
+    { "ui_button_7",            kUI_BUTTON_7,               _sp,    EKeyContext::UI },
+    { "ui_button_8",            kUI_BUTTON_8,               _sp,    EKeyContext::UI },
+    { "ui_button_9",            kUI_BUTTON_9,               _sp,    EKeyContext::UI },
+    { "ui_button_0",            kUI_BUTTON_0,               _sp,    EKeyContext::UI },
+
     // PDA:
     { "pda_map_move",           kPDA_MAP_MOVE,              _sp,    EKeyContext::PDA },
     { "pda_map_move_left",      kPDA_MAP_MOVE_LEFT,         _sp,    EKeyContext::PDA },
@@ -170,15 +184,6 @@ game_action actions[] = {
 
     { "pda_map_show_actor",     kPDA_MAP_SHOW_ACTOR,        _sp,    EKeyContext::PDA },
     { "pda_map_show_legend",    kPDA_MAP_SHOW_LEGEND,       _sp,    EKeyContext::PDA },
-
-    { "pda_tab_prev",           kPDA_TAB_PREV,              _sp,    EKeyContext::PDA },
-    { "pda_tab_next",           kPDA_TAB_NEXT,              _sp,    EKeyContext::PDA },
-    { "pda_tab1",               kPDA_TAB1,                  _sp,    EKeyContext::PDA },
-    { "pda_tab2",               kPDA_TAB2,                  _sp,    EKeyContext::PDA },
-    { "pda_tab3",               kPDA_TAB3,                  _sp,    EKeyContext::PDA },
-    { "pda_tab4",               kPDA_TAB4,                  _sp,    EKeyContext::PDA },
-    { "pda_tab5",               kPDA_TAB5,                  _sp,    EKeyContext::PDA },
-    { "pda_tab6",               kPDA_TAB6,                  _sp,    EKeyContext::PDA },
 
     { "pda_filter_toggle",      kPDA_FILTER_TOGGLE,         _sp,    EKeyContext::PDA },
 
@@ -969,6 +974,20 @@ class CCC_DefControls : public CCC_UnBindAll
         { kUI_ACCEPT,               { SDL_SCANCODE_RETURN,  SDL_SCANCODE_F,             XR_CONTROLLER_BUTTON_A } },
         { kUI_BACK,                 { SDL_SCANCODE_ESCAPE,  SDL_SCANCODE_G,             XR_CONTROLLER_BUTTON_B } },
 
+        { kUI_TAB_PREV,             { SDL_SCANCODE_Q,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_LEFTSHOULDER } },
+        { kUI_TAB_NEXT,             { SDL_SCANCODE_E,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_RIGHTSHOULDER } },
+
+        { kUI_BUTTON_1,             { SDL_SCANCODE_1,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kUI_BUTTON_2,             { SDL_SCANCODE_2,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kUI_BUTTON_3,             { SDL_SCANCODE_3,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kUI_BUTTON_4,             { SDL_SCANCODE_4,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kUI_BUTTON_5,             { SDL_SCANCODE_5,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kUI_BUTTON_6,             { SDL_SCANCODE_6,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kUI_BUTTON_7,             { SDL_SCANCODE_7,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kUI_BUTTON_8,             { SDL_SCANCODE_8,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kUI_BUTTON_9,             { SDL_SCANCODE_9,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kUI_BUTTON_0,             { SDL_SCANCODE_0,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+
         // PDA:
         { kPDA_MAP_MOVE,            { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_RIGHT } },
         { kPDA_MAP_MOVE_LEFT,       { SDL_SCANCODE_A,       SDL_SCANCODE_LEFT,          XR_CONTROLLER_BUTTON_INVALID } },
@@ -983,14 +1002,6 @@ class CCC_DefControls : public CCC_UnBindAll
         { kPDA_MAP_SHOW_ACTOR,      { SDL_SCANCODE_R,       SDL_SCANCODE_KP_COMMA,      XR_CONTROLLER_BUTTON_RIGHTSTICK } },
         { kPDA_MAP_SHOW_LEGEND,     { SDL_SCANCODE_V,       SDL_SCANCODE_KP_MULTIPLY,   XR_CONTROLLER_BUTTON_INVALID } },
 
-        { kPDA_TAB_PREV,            { SDL_SCANCODE_Q,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_LEFTSHOULDER } },
-        { kPDA_TAB_NEXT,            { SDL_SCANCODE_E,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_RIGHTSHOULDER } },
-        { kPDA_TAB1,                { SDL_SCANCODE_1,       SDL_SCANCODE_KP_1,          XR_CONTROLLER_BUTTON_INVALID } },
-        { kPDA_TAB2,                { SDL_SCANCODE_2,       SDL_SCANCODE_KP_2,          XR_CONTROLLER_BUTTON_INVALID } },
-        { kPDA_TAB3,                { SDL_SCANCODE_3,       SDL_SCANCODE_KP_3,          XR_CONTROLLER_BUTTON_INVALID } },
-        { kPDA_TAB4,                { SDL_SCANCODE_4,       SDL_SCANCODE_KP_4,          XR_CONTROLLER_BUTTON_INVALID } },
-        { kPDA_TAB5,                { SDL_SCANCODE_5,       SDL_SCANCODE_KP_5,          XR_CONTROLLER_BUTTON_INVALID } },
-        { kPDA_TAB6,                { SDL_SCANCODE_6,       SDL_SCANCODE_KP_6,          XR_CONTROLLER_BUTTON_INVALID } },
 
         { kPDA_FILTER_TOGGLE,       { SDL_SCANCODE_B,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_Y } },
 
