@@ -145,7 +145,10 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     {
         if (pWnd == UITabControl)
         {
-            SetActiveSubdialog(UITabControl->GetActiveId());
+            const auto& id = UITabControl->GetActiveId();
+            SetActiveSubdialog(id);
+            if (pInput->IsCurrentInputTypeController())
+                UI().GetUICursor().WarpToWindow(UITabControl->GetButtonById(id));
         }
         break;
     }
@@ -399,11 +402,31 @@ void RearrangeTabButtons(CUITabControl* pTab)
 
 bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
+    if (IsBinded(kUI_BACK, dik, EKeyContext::UI))
+    {
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+            HideDialog();
+        return true;
+    }
+
+    switch (GetBindedAction(dik, EKeyContext::PDA))
+    {
+    case kPDA_TAB_PREV:
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+            UITabControl->SetNextActiveTab(false, true);
+        return true;
+
+    case kPDA_TAB_NEXT:
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+            UITabControl->SetNextActiveTab(true, true);
+        return true;
+    }
+
+    // Context has a priority over default actions
     if (IsBinded(kACTIVE_JOBS, dik))
     {
         if (WINDOW_KEY_PRESSED == keyboard_action)
             HideDialog();
-
         return true;
     }
 

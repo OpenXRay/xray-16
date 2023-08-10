@@ -142,16 +142,45 @@ game_action actions[] = {
     { "custom14",          kCUSTOM14,          _sp },
     { "custom15",          kCUSTOM15,          _sp },
 
-    { "pda_tab1",          kPDA_TAB1,          _sp },
-    { "pda_tab2",          kPDA_TAB2,          _sp },
-    { "pda_tab3",          kPDA_TAB3,          _sp },
-    { "pda_tab4",          kPDA_TAB4,          _sp },
-    { "pda_tab5",          kPDA_TAB5,          _sp },
-    { "pda_tab6",          kPDA_TAB6,          _sp },
-
     { "kick",              kKICK,              _sp },
 
     { "editor",            kEDITOR,            _both },
+
+    // Contextual actions:
+    // UI
+    { "ui_move",                kUI_MOVE,                   _sp,    EKeyContext::UI },
+    { "ui_move_left",           kUI_MOVE_LEFT,              _sp,    EKeyContext::UI },
+    { "ui_move_right",          kUI_MOVE_RIGHT,             _sp,    EKeyContext::UI },
+    { "ui_move_up",             kUI_MOVE_UP,                _sp,    EKeyContext::UI },
+    { "ui_move_down",           kUI_MOVE_DOWN,              _sp,    EKeyContext::UI },
+
+    { "ui_move_accept",         kUI_ACCEPT,                 _sp,    EKeyContext::UI },
+    { "ui_move_back",           kUI_BACK,                   _sp,    EKeyContext::UI },
+
+    // PDA:
+    { "pda_map_move",           kPDA_MAP_MOVE,              _sp,    EKeyContext::PDA },
+    { "pda_map_move_left",      kPDA_MAP_MOVE_LEFT,         _sp,    EKeyContext::PDA },
+    { "pda_map_move_right",     kPDA_MAP_MOVE_RIGHT,        _sp,    EKeyContext::PDA },
+    { "pda_map_move_up",        kPDA_MAP_MOVE_UP,           _sp,    EKeyContext::PDA },
+    { "pda_map_move_down",      kPDA_MAP_MOVE_DOWN,         _sp,    EKeyContext::PDA },
+
+    { "pda_map_zoom_in",        kPDA_MAP_ZOOM_IN,           _sp,    EKeyContext::PDA },
+    { "pda_map_zoom_out",       kPDA_MAP_ZOOM_OUT,          _sp,    EKeyContext::PDA },
+    { "pda_map_zoom_reset",     kPDA_MAP_ZOOM_RESET,        _sp,    EKeyContext::PDA },
+
+    { "pda_map_show_actor",     kPDA_MAP_SHOW_ACTOR,        _sp,    EKeyContext::PDA },
+    { "pda_map_show_legend",    kPDA_MAP_SHOW_LEGEND,       _sp,    EKeyContext::PDA },
+
+    { "pda_tab_prev",           kPDA_TAB_PREV,              _sp,    EKeyContext::PDA },
+    { "pda_tab_next",           kPDA_TAB_NEXT,              _sp,    EKeyContext::PDA },
+    { "pda_tab1",               kPDA_TAB1,                  _sp,    EKeyContext::PDA },
+    { "pda_tab2",               kPDA_TAB2,                  _sp,    EKeyContext::PDA },
+    { "pda_tab3",               kPDA_TAB3,                  _sp,    EKeyContext::PDA },
+    { "pda_tab4",               kPDA_TAB4,                  _sp,    EKeyContext::PDA },
+    { "pda_tab5",               kPDA_TAB5,                  _sp,    EKeyContext::PDA },
+    { "pda_tab6",               kPDA_TAB6,                  _sp,    EKeyContext::PDA },
+
+    { "pda_filter_toggle",      kPDA_FILTER_TOGGLE,         _sp,    EKeyContext::PDA },
 
     { nullptr,             kLASTACTION,        _both }
 };
@@ -923,7 +952,43 @@ class CCC_DefControls : public CCC_UnBindAll
         { kQUICK_USE_3,         { SDL_SCANCODE_F3,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
         { kQUICK_USE_4,         { SDL_SCANCODE_F4,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_DOWN } },
 
-        { kEDITOR,              { SDL_SCANCODE_F10,         SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_INVALID } },
+        // Contextual actions:
+        // UI
+        { kUI_MOVE,                 { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_RIGHT } },
+        { kUI_MOVE_LEFT,            { SDL_SCANCODE_A,       SDL_SCANCODE_LEFT,          XR_CONTROLLER_BUTTON_DPAD_LEFT } },
+        { kUI_MOVE_RIGHT,           { SDL_SCANCODE_D,       SDL_SCANCODE_RIGHT,         XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
+        { kUI_MOVE_UP,              { SDL_SCANCODE_W,       SDL_SCANCODE_UP,            XR_CONTROLLER_BUTTON_DPAD_UP } },
+        { kUI_MOVE_DOWN,            { SDL_SCANCODE_S,       SDL_SCANCODE_DOWN,          XR_CONTROLLER_BUTTON_DPAD_DOWN } },
+
+        { kUI_ACCEPT,               { SDL_SCANCODE_RETURN,  SDL_SCANCODE_F,             XR_CONTROLLER_BUTTON_A } },
+        { kUI_BACK,                 { SDL_SCANCODE_ESCAPE,  SDL_SCANCODE_G,             XR_CONTROLLER_BUTTON_B } },
+
+        // PDA:
+        { kPDA_MAP_MOVE,            { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_RIGHT } },
+        { kPDA_MAP_MOVE_LEFT,       { SDL_SCANCODE_A,       SDL_SCANCODE_LEFT,          XR_CONTROLLER_BUTTON_INVALID } },
+        { kPDA_MAP_MOVE_RIGHT,      { SDL_SCANCODE_D,       SDL_SCANCODE_RIGHT,         XR_CONTROLLER_BUTTON_INVALID } },
+        { kPDA_MAP_MOVE_UP,         { SDL_SCANCODE_W,       SDL_SCANCODE_UP,            XR_CONTROLLER_BUTTON_INVALID } },
+        { kPDA_MAP_MOVE_DOWN,       { SDL_SCANCODE_S,       SDL_SCANCODE_DOWN,          XR_CONTROLLER_BUTTON_INVALID } },
+
+        { kPDA_MAP_ZOOM_IN,         { SDL_SCANCODE_Z,       SDL_SCANCODE_KP_PLUS,       XR_CONTROLLER_AXIS_TRIGGER_RIGHT } },
+        { kPDA_MAP_ZOOM_OUT,        { SDL_SCANCODE_C,       SDL_SCANCODE_KP_MINUS,      XR_CONTROLLER_AXIS_TRIGGER_LEFT } },
+        { kPDA_MAP_ZOOM_RESET,      { SDL_SCANCODE_X,       SDL_SCANCODE_KP_0,          XR_CONTROLLER_BUTTON_INVALID } },
+
+        { kPDA_MAP_SHOW_ACTOR,      { SDL_SCANCODE_R,       SDL_SCANCODE_KP_COMMA,      XR_CONTROLLER_BUTTON_RIGHTSTICK } },
+        { kPDA_MAP_SHOW_LEGEND,     { SDL_SCANCODE_V,       SDL_SCANCODE_KP_MULTIPLY,   XR_CONTROLLER_BUTTON_INVALID } },
+
+        { kPDA_TAB_PREV,            { SDL_SCANCODE_Q,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_LEFTSHOULDER } },
+        { kPDA_TAB_NEXT,            { SDL_SCANCODE_E,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_RIGHTSHOULDER } },
+        { kPDA_TAB1,                { SDL_SCANCODE_1,       SDL_SCANCODE_KP_1,          XR_CONTROLLER_BUTTON_INVALID } },
+        { kPDA_TAB2,                { SDL_SCANCODE_2,       SDL_SCANCODE_KP_2,          XR_CONTROLLER_BUTTON_INVALID } },
+        { kPDA_TAB3,                { SDL_SCANCODE_3,       SDL_SCANCODE_KP_3,          XR_CONTROLLER_BUTTON_INVALID } },
+        { kPDA_TAB4,                { SDL_SCANCODE_4,       SDL_SCANCODE_KP_4,          XR_CONTROLLER_BUTTON_INVALID } },
+        { kPDA_TAB5,                { SDL_SCANCODE_5,       SDL_SCANCODE_KP_5,          XR_CONTROLLER_BUTTON_INVALID } },
+        { kPDA_TAB6,                { SDL_SCANCODE_6,       SDL_SCANCODE_KP_6,          XR_CONTROLLER_BUTTON_INVALID } },
+
+        { kPDA_FILTER_TOGGLE,       { SDL_SCANCODE_B,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_Y } },
+
+        { kEDITOR,                  { SDL_SCANCODE_F10,     SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
     };
 
 public:

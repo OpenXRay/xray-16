@@ -124,6 +124,37 @@ enum EGameActions : u32
     kCUSTOM14,
     kCUSTOM15,
 
+    kKICK, // alpet: kick dynamic objects
+
+    kEDITOR,
+
+    // Contextual actions:
+    // UI
+    kUI_MOVE,
+    kUI_MOVE_LEFT,
+    kUI_MOVE_RIGHT,
+    kUI_MOVE_UP,
+    kUI_MOVE_DOWN,
+
+    kUI_ACCEPT,
+    kUI_BACK,
+
+    // PDA:
+    kPDA_MAP_MOVE, // gamepad axis
+    kPDA_MAP_MOVE_LEFT,
+    kPDA_MAP_MOVE_RIGHT,
+    kPDA_MAP_MOVE_UP,
+    kPDA_MAP_MOVE_DOWN,
+
+    kPDA_MAP_ZOOM_IN,
+    kPDA_MAP_ZOOM_OUT,
+    kPDA_MAP_ZOOM_RESET,
+
+    kPDA_MAP_SHOW_ACTOR,
+    kPDA_MAP_SHOW_LEGEND,
+
+    kPDA_TAB_PREV,
+    kPDA_TAB_NEXT,
     kPDA_TAB1,
     kPDA_TAB2,
     kPDA_TAB3,
@@ -131,9 +162,7 @@ enum EGameActions : u32
     kPDA_TAB5,
     kPDA_TAB6,
 
-    kKICK, // alpet: kick dynamic objects
-
-    kEDITOR,
+    kPDA_FILTER_TOGGLE,
 
     kLASTACTION,
     kNOTBINDED
@@ -142,6 +171,8 @@ enum EGameActions : u32
 enum class EKeyContext
 {
     Undefined = 0, // default behaviour
+    UI, // UI overall
+    PDA,
 };
 
 constexpr char GAME_ACTION_MARK = 27; // escape symbol

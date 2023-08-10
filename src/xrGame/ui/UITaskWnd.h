@@ -53,6 +53,7 @@ private:
     };
     std::array<CUICheckButton*, eSpotsFilter_Count> m_filters;
     std::array<bool, eSpotsFilter_Count> m_filters_state;
+    int m_selected_filter{ -1 };
 
     UITaskListWnd* m_task_wnd;
     bool m_task_wnd_show;
@@ -67,6 +68,8 @@ public:
 
     pcstr GetDebugType() override { return "CUITaskWnd"; }
 
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     bool Init();
     virtual void Update();
@@ -132,6 +135,8 @@ private:
     void OnTask2DbClicked(CUIWindow*, void*);
 
     void OnMapSpotFilterClicked(CUIWindow*, void*);
+
+    void DropFilterSelection();
 };
 
 class CUITaskItem final : public CUIWindow
