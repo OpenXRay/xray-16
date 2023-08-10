@@ -1,33 +1,33 @@
 #pragma once
 
+// Standard includes
 #include "ExtendedGeom.h"
 #include "MathUtils.h"
-
 #include "Geometry.h"
-#include "tri-colliderknoopc/dTriColliderMath.h"
-
-#include "ode_redefine.h"
 #include "xrCDB/xr_area.h"
+#include "tri-colliderknoopc/dTriColliderMath.h"
+#include "ode_redefine.h"
 
+// Disable specific compiler warnings
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
-ICF void GetNormal(CDB::TRI* XTri, Fvector& n, const Fvector* V_array)
-{
-    // VERIFY(g_pGameLevel);
-    // const Fvector* V_array=inl_ph_world().ObjectSpace().GetStaticVerts();
-    Fvector sd1;
-    sd1.sub(V_array[XTri->verts[1]], V_array[XTri->verts[0]]);
-    Fvector sd2;
-    sd2.sub(V_array[XTri->verts[2]], V_array[XTri->verts[1]]);
+
+// Calculates normal for a given triangle
+ICF void GetNormal(CDB::TRI* XTri, Fvector& n, const Fvector* V_array) {
+    Fvector sd1 = V_array[XTri->verts[1]] - V_array[XTri->verts[0]];
+    Fvector sd2 = V_array[XTri->verts[2]] - V_array[XTri->verts[1]];
     n.crossproduct(sd1, sd2);
 }
-ICF void CalculateInitTriangle(CDB::TRI* XTri, Triangle& triangle, const Fvector* V_array)
-{
-    // VERIFY(g_pGameLevel);
-    // const Fvector* V_array=inl_ph_world().ObjectSpace().GetStaticVerts();
+
+// Initializes a given triangle
+ICF void CalculateInitTriangle(CDB::TRI* XTri, Triangle& triangle, const Fvector* V_array) {
     const float* VRT[3] = {
-        (dReal*)&V_array[XTri->verts[0]], (dReal*)&V_array[XTri->verts[1]], (dReal*)&V_array[XTri->verts[2]]};
+        (dReal*)&V_array[XTri->verts[0]],
+        (dReal*)&V_array[XTri->verts[1]],
+        (dReal*)&V_array[XTri->verts[2]]
+    };
+
     dVectorSub(triangle.side0, VRT[1], VRT[0]);
     dVectorSub(triangle.side1, VRT[2], VRT[1]);
     triangle.T = XTri;
