@@ -388,7 +388,7 @@ bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages cont
 {
     if (controller_action == WINDOW_KEY_PRESSED)
     {
-        switch (GetBindedAction(axis, EKeyContext::Trade))
+        switch (GetBindedAction(axis, EKeyContext::Talk))
         {
         default:
             return OnKeyboardAction(axis, controller_action);

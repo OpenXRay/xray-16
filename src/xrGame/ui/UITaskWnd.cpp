@@ -169,7 +169,6 @@ void CUITaskWnd::DropFilterSelection()
 
 bool CUITaskWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
         if (IsBinded(kPDA_FILTER_TOGGLE, dik, EKeyContext::PDA) && m_selected_filter == -1)
