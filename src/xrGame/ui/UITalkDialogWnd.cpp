@@ -338,6 +338,14 @@ void CUITalkDialogWnd::UpdateButtonsLayout(bool b_disable_break, bool trade_enab
     }
 }
 
+void CUITalkDialogWnd::TryScrollAnswersList(bool down)
+{
+    if (down)
+        UIAnswersList->ScrollBar()->TryScrollDec();
+    else
+        UIAnswersList->ScrollBar()->TryScrollInc();
+}
+
 void CUIQuestionItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 CUIQuestionItem::CUIQuestionItem(CUIXml* xml_doc, LPCSTR path)
     : CUIWindow("CUIQuestionItem")

@@ -182,6 +182,12 @@ game_action actions[] = {
 
     { "pda_filter_toggle",      kPDA_FILTER_TOGGLE,         _sp,    EKeyContext::PDA },
 
+    // Talk:
+    { "talk_switch_to_trade",   kTALK_SWITCH_TO_TRADE,      _sp,    EKeyContext::Talk },
+    { "talk_log_scroll",        kTALK_LOG_SCROLL,           _sp,    EKeyContext::Talk },
+    { "talk_log_scroll_up",     kTALK_LOG_SCROLL_UP,        _sp,    EKeyContext::Talk },
+    { "talk_log_scroll_down",   kTALK_LOG_SCROLL_DOWN,      _sp,    EKeyContext::Talk },
+
     { nullptr,             kLASTACTION,        _both }
 };
 
@@ -987,6 +993,12 @@ class CCC_DefControls : public CCC_UnBindAll
         { kPDA_TAB6,                { SDL_SCANCODE_6,       SDL_SCANCODE_KP_6,          XR_CONTROLLER_BUTTON_INVALID } },
 
         { kPDA_FILTER_TOGGLE,       { SDL_SCANCODE_B,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_Y } },
+
+        // Talk:
+        { kTALK_SWITCH_TO_TRADE,    { SDL_SCANCODE_X,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_X } },
+        { kTALK_LOG_SCROLL,         { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_RIGHT } },
+        { kTALK_LOG_SCROLL_UP,      { SDL_SCANCODE_E,       SDL_SCANCODE_PAGEUP,        XR_CONTROLLER_AXIS_TRIGGER_LEFT } },
+        { kTALK_LOG_SCROLL_DOWN,    { SDL_SCANCODE_Q,       SDL_SCANCODE_PAGEDOWN,      XR_CONTROLLER_AXIS_TRIGGER_RIGHT } },
 
         { kEDITOR,                  { SDL_SCANCODE_F10,     SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
     };

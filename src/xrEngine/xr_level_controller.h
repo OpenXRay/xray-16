@@ -164,6 +164,12 @@ enum EGameActions : u32
 
     kPDA_FILTER_TOGGLE,
 
+    // Talk:
+    kTALK_SWITCH_TO_TRADE, // _OR_UPGRADE
+    kTALK_LOG_SCROLL,
+    kTALK_LOG_SCROLL_UP,
+    kTALK_LOG_SCROLL_DOWN,
+
     kLASTACTION,
     kNOTBINDED
 };
@@ -173,6 +179,7 @@ enum class EKeyContext
     Undefined = 0, // default behaviour
     UI, // UI overall
     PDA,
+    Talk,
 };
 
 constexpr char GAME_ACTION_MARK = 27; // escape symbol

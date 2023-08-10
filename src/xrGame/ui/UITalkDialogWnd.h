@@ -68,6 +68,8 @@ public:
     void SetTradeMode();
     void UpdateButtonsLayout(bool b_disable_break, bool trade_enabled);
 
+    void TryScrollAnswersList(bool down);
+
 private:
     // List of questions we can ask the character
     CUIScrollView* UIQuestionsList;

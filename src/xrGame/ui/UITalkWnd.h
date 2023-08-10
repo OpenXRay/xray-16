@@ -46,6 +46,7 @@ public:
     //инициализации начального диалога собеседника
     void InitOthersStartDialog();
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     void SwitchToTrade();
     void SwitchToUpgrade();
     void AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
