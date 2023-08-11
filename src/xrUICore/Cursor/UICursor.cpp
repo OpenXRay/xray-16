@@ -169,6 +169,8 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
 
 void CUICursor::WarpToWindow(CUIWindow* wnd, bool change_visibility /*= true*/)
 {
+    // When change_visibility is true, call Show/Hide anyway
+    // to update autohide data
     if (!wnd)
     {
         if (change_visibility)
@@ -176,7 +178,7 @@ void CUICursor::WarpToWindow(CUIWindow* wnd, bool change_visibility /*= true*/)
         return;
     }
 
-    if (!IsVisible() && change_visibility)
+    if (change_visibility)
         Show();
 
     Fvector2 pos;

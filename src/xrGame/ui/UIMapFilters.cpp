@@ -108,7 +108,12 @@ void CUIMapFilters::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         SelectFilter(!GetSelectedFilter());
         return;
     }
-    if (msg == WINDOW_KEYBOARD_CAPTURE_LOST || msg == WINDOW_FOCUS_LOST)
+    if (msg == WINDOW_KEYBOARD_CAPTURE_LOST && pWnd == GetMessageTarget())
+    {
+        SelectFilter(false);
+        return;
+    }
+    if (msg == WINDOW_FOCUS_LOST && pWnd == this)
     {
         SelectFilter(false);
         return;
