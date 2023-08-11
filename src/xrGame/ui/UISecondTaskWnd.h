@@ -36,6 +36,8 @@ public:
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnMouseScroll(float iDirection);
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     virtual void Show(bool status);
     virtual void OnFocusReceive();
     virtual void OnFocusLost();

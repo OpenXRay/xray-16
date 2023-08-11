@@ -148,6 +148,8 @@ SCRIPT_EXPORT(KeyBindings, (),
 
                 value("kUI_ACCEPT",                 int(kUI_ACCEPT)),
                 value("kUI_BACK",                   int(kUI_BACK)),
+                value("kUI_ACTION_1",               int(kUI_ACTION_1)),
+                value("kUI_ACTION_2",               int(kUI_ACTION_2)),
 
                 value("kUI_TAB_PREV",               int(kUI_TAB_PREV)),
                 value("kUI_TAB_NEXT",               int(kUI_TAB_NEXT)),
@@ -178,6 +180,7 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kPDA_MAP_SHOW_LEGEND",       int(kPDA_MAP_SHOW_LEGEND)),
 
                 value("kPDA_FILTER_TOGGLE",         int(kPDA_FILTER_TOGGLE)),
+                value("kPDA_TASKS_TOGGLE",          int(kPDA_TASKS_TOGGLE)),
 
                 // Talk:
                 value("kTALK_SWITCH_TO_TRADE",      int(kTALK_SWITCH_TO_TRADE)),

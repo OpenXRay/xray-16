@@ -161,6 +161,14 @@ bool CUITaskWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                 SetKeyboardCapture(&m_filters, true);
             m_filters.SendMessage(this, PDA_TASK_SELECT_FILTERS, nullptr);
             return true;
+
+        case kPDA_TASKS_TOGGLE:
+            if (m_pKeyboardCapturer == m_task_wnd)
+                SetKeyboardCapture(nullptr, false);
+            else
+                SetKeyboardCapture(m_task_wnd, true);
+            OnShowTaskListWnd(nullptr, nullptr);
+            return true;
         }
     }
 
