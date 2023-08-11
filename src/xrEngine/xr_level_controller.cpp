@@ -22,129 +22,130 @@ struct action_binding_desc
 static action_binding_desc g_action_bindings[bindings_count];
 
 // clang-format off
-game_action actions[] = {
-    { "look_around",       kLOOK_AROUND,       _both }, // gamepad
-    { "left",              kLEFT,              _both },
-    { "right",             kRIGHT,             _both },
-    { "up",                kUP,                _both },
-    { "down",              kDOWN,              _both },
+game_action actions[] =
+{
+    { "look_around",            kLOOK_AROUND,               _both }, // gamepad
+    { "left",                   kLEFT,                      _both },
+    { "right",                  kRIGHT,                     _both },
+    { "up",                     kUP,                        _both },
+    { "down",                   kDOWN,                      _both },
 
-    { "move_around",       kMOVE_AROUND,       _both }, // gamepad
-    { "forward",           kFWD,               _both },
-    { "back",              kBACK,              _both },
-    { "lstrafe",           kL_STRAFE,          _both },
-    { "rstrafe",           kR_STRAFE,          _both },
+    { "move_around",            kMOVE_AROUND,               _both }, // gamepad
+    { "forward",                kFWD,                       _both },
+    { "back",                   kBACK,                      _both },
+    { "lstrafe",                kL_STRAFE,                  _both },
+    { "rstrafe",                kR_STRAFE,                  _both },
 
-    { "llookout",          kL_LOOKOUT,         _both },
-    { "rlookout",          kR_LOOKOUT,         _both },
+    { "llookout",               kL_LOOKOUT,                 _both },
+    { "rlookout",               kR_LOOKOUT,                 _both },
 
-    { "jump",              kJUMP,              _both },
-    { "crouch",            kCROUCH,            _both },
-    { "crouch_toggle",     kCROUCH_TOGGLE,     _both },
-    { "accel",             kACCEL,             _both },
-    { "sprint_toggle",     kSPRINT_TOGGLE,     _both },
+    { "jump",                   kJUMP,                      _both },
+    { "crouch",                 kCROUCH,                    _both },
+    { "crouch_toggle",          kCROUCH_TOGGLE,             _both },
+    { "accel",                  kACCEL,                     _both },
+    { "sprint_toggle",          kSPRINT_TOGGLE,             _both },
 
-    { "turn_engine",       kENGINE,            _sp},
+    { "turn_engine",            kENGINE,                    _sp},
 
-    { "cam_1",             kCAM_1,             _both },
-    { "cam_2",             kCAM_2,             _both },
-    { "cam_3",             kCAM_3,             _both },
-    { "cam_4",             kCAM_4,             _both},
-    { "cam_zoom_in",       kCAM_ZOOM_IN,       _both },
-    { "cam_zoom_out",      kCAM_ZOOM_OUT,      _both },
-    { "cam_autoaim",       kCAM_AUTOAIM,       _sp },
+    { "cam_1",                  kCAM_1,                     _both },
+    { "cam_2",                  kCAM_2,                     _both },
+    { "cam_3",                  kCAM_3,                     _both },
+    { "cam_4",                  kCAM_4,                     _both},
+    { "cam_zoom_in",            kCAM_ZOOM_IN,               _both },
+    { "cam_zoom_out",           kCAM_ZOOM_OUT,              _both },
+    { "cam_autoaim",            kCAM_AUTOAIM,               _sp },
 
-    { "torch",             kTORCH,             _both },
-    { "night_vision",      kNIGHT_VISION,      _both },
-    { "show_detector",     kDETECTOR,          _sp },
+    { "torch",                  kTORCH,                     _both },
+    { "night_vision",           kNIGHT_VISION,              _both },
+    { "show_detector",          kDETECTOR,                  _sp },
 
-    { "wpn_1",             kWPN_1,             _both },
-    { "wpn_2",             kWPN_2,             _both },
-    { "wpn_3",             kWPN_3,             _both },
-    { "wpn_4",             kWPN_4,             _both },
-    { "wpn_5",             kWPN_5,             _both },
-    { "wpn_6",             kWPN_6,             _both },
-    { "artefact",          kARTEFACT,          _both /*_mp*/ },
-    { "wpn_next",          kWPN_NEXT,          _both }, // means next ammo type
-    { "wpn_fire",          kWPN_FIRE,          _both },
-    { "wpn_zoom",          kWPN_ZOOM,          _both },
-    { "wpn_zoom_inc",      kWPN_ZOOM_INC,      _both },
-    { "wpn_zoom_dec",      kWPN_ZOOM_DEC,      _both },
-    { "wpn_reload",        kWPN_RELOAD,        _both },
-    { "wpn_func",          kWPN_FUNC,          _both },
-    { "wpn_firemode_prev", kWPN_FIREMODE_PREV, _both },
-    { "wpn_firemode_next", kWPN_FIREMODE_NEXT, _both },
+    { "wpn_1",                  kWPN_1,                     _both },
+    { "wpn_2",                  kWPN_2,                     _both },
+    { "wpn_3",                  kWPN_3,                     _both },
+    { "wpn_4",                  kWPN_4,                     _both },
+    { "wpn_5",                  kWPN_5,                     _both },
+    { "wpn_6",                  kWPN_6,                     _both },
+    { "artefact",               kARTEFACT,                  _both /*_mp*/ },
+    { "wpn_next",               kWPN_NEXT,                  _both }, // means next ammo type
+    { "wpn_fire",               kWPN_FIRE,                  _both },
+    { "wpn_zoom",               kWPN_ZOOM,                  _both },
+    { "wpn_zoom_inc",           kWPN_ZOOM_INC,              _both },
+    { "wpn_zoom_dec",           kWPN_ZOOM_DEC,              _both },
+    { "wpn_reload",             kWPN_RELOAD,                _both },
+    { "wpn_func",               kWPN_FUNC,                  _both },
+    { "wpn_firemode_prev",      kWPN_FIREMODE_PREV,         _both },
+    { "wpn_firemode_next",      kWPN_FIREMODE_NEXT,         _both },
 
-    { "pause",             kPAUSE,             _both },
-    { "drop",              kDROP,              _both },
-    { "use",               kUSE,               _both },
-    { "scores",            kSCORES,            _both },
-    { "chat",              kCHAT,              _mp },
-    { "chat_team",         kCHAT_TEAM,         _mp },
-    { "screenshot",        kSCREENSHOT,        _both },
-    { "enter",             kENTER,             _both },
-    { "quit",              kQUIT,              _both },
-    { "console",           kCONSOLE,           _both },
-    { "inventory",         kINVENTORY,         _both },
-    { "buy_menu",          kBUY,               _mp },
-    { "skin_menu",         kSKIN,              _mp },
-    { "team_menu",         kTEAM,              _mp },
-    { "active_jobs",       kACTIVE_JOBS,       _sp },
-    { "map",                kMAP,               _both },
-    { "contacts",           kCONTACTS,          _sp },
-    { "ext_1",              kEXT_1,             _both },
+    { "pause",                  kPAUSE,                     _both },
+    { "drop",                   kDROP,                      _both },
+    { "use",                    kUSE,                       _both },
+    { "scores",                 kSCORES,                    _both },
+    { "chat",                   kCHAT,                      _mp },
+    { "chat_team",              kCHAT_TEAM,                 _mp },
+    { "screenshot",             kSCREENSHOT,                _both },
+    { "enter",                  kENTER,                     _both },
+    { "quit",                   kQUIT,                      _both },
+    { "console",                kCONSOLE,                   _both },
+    { "inventory",              kINVENTORY,                 _both },
+    { "buy_menu",               kBUY,                       _mp },
+    { "skin_menu",              kSKIN,                      _mp },
+    { "team_menu",              kTEAM,                      _mp },
+    { "active_jobs",            kACTIVE_JOBS,               _sp },
+    { "map",                    kMAP,                       _both },
+    { "contacts",               kCONTACTS,                  _sp },
+    { "ext_1",                  kEXT_1,                     _both },
 
-    { "vote_begin",        kVOTE_BEGIN,        _mp },
-    { "show_admin_menu",   kSHOW_ADMIN_MENU,   _mp },
-    { "vote",              kVOTE,              _mp },
-    { "vote_yes",          kVOTEYES,           _mp },
-    { "vote_no",           kVOTENO,            _mp },
+    { "vote_begin",             kVOTE_BEGIN,                _mp },
+    { "show_admin_menu",        kSHOW_ADMIN_MENU,           _mp },
+    { "vote",                   kVOTE,                      _mp },
+    { "vote_yes",               kVOTEYES,                   _mp },
+    { "vote_no",                kVOTENO,                    _mp },
 
-    { "next_slot",         kNEXT_SLOT,         _both },
-    { "prev_slot",         kPREV_SLOT,         _both },
+    { "next_slot",              kNEXT_SLOT,                 _both },
+    { "prev_slot",              kPREV_SLOT,                 _both },
 
-    { "speech_menu_0",     kSPEECH_MENU_0,     _mp },
-    { "speech_menu_1",     kSPEECH_MENU_1,     _mp },
-    { "speech_menu_2",     kSPEECH_MENU_2,     _mp },
-    { "speech_menu_3",     kSPEECH_MENU_3,     _mp },
-    { "speech_menu_4",     kSPEECH_MENU_4,     _mp },
-    { "speech_menu_5",     kSPEECH_MENU_5,     _mp },
-    { "speech_menu_6",     kSPEECH_MENU_6,     _mp },
-    { "speech_menu_7",     kSPEECH_MENU_7,     _mp },
-    { "speech_menu_8",     kSPEECH_MENU_8,     _mp },
-    { "speech_menu_9",     kSPEECH_MENU_9,     _mp },
+    { "speech_menu_0",          kSPEECH_MENU_0,             _mp },
+    { "speech_menu_1",          kSPEECH_MENU_1,             _mp },
+    { "speech_menu_2",          kSPEECH_MENU_2,             _mp },
+    { "speech_menu_3",          kSPEECH_MENU_3,             _mp },
+    { "speech_menu_4",          kSPEECH_MENU_4,             _mp },
+    { "speech_menu_5",          kSPEECH_MENU_5,             _mp },
+    { "speech_menu_6",          kSPEECH_MENU_6,             _mp },
+    { "speech_menu_7",          kSPEECH_MENU_7,             _mp },
+    { "speech_menu_8",          kSPEECH_MENU_8,             _mp },
+    { "speech_menu_9",          kSPEECH_MENU_9,             _mp },
 
-    { "use_bandage",       kUSE_BANDAGE,       _sp },
-    { "use_medkit",        kUSE_MEDKIT,        _sp },
+    { "use_bandage",            kUSE_BANDAGE,               _sp },
+    { "use_medkit",             kUSE_MEDKIT,                _sp },
 
-    { "quick_use_1",       kQUICK_USE_1,       _both },
-    { "quick_use_2",       kQUICK_USE_2,       _both },
-    { "quick_use_3",       kQUICK_USE_3,       _both },
-    { "quick_use_4",       kQUICK_USE_4,       _both },
+    { "quick_use_1",            kQUICK_USE_1,               _both },
+    { "quick_use_2",            kQUICK_USE_2,               _both },
+    { "quick_use_3",            kQUICK_USE_3,               _both },
+    { "quick_use_4",            kQUICK_USE_4,               _both },
 
-    { "quick_save",        kQUICK_SAVE,        _sp },
-    { "quick_load",        kQUICK_LOAD,        _sp },
-    { "alife_command",     kALIFE_CMD,         _sp },
+    { "quick_save",             kQUICK_SAVE,                _sp },
+    { "quick_load",             kQUICK_LOAD,                _sp },
+    { "alife_command",          kALIFE_CMD,                 _sp },
 
-    { "custom1",           kCUSTOM1,           _sp },
-    { "custom2",           kCUSTOM2,           _sp },
-    { "custom3",           kCUSTOM3,           _sp },
-    { "custom4",           kCUSTOM4,           _sp },
-    { "custom5",           kCUSTOM5,           _sp },
-    { "custom6",           kCUSTOM6,           _sp },
-    { "custom7",           kCUSTOM7,           _sp },
-    { "custom8",           kCUSTOM8,           _sp },
-    { "custom9",           kCUSTOM9,           _sp },
-    { "custom10",          kCUSTOM10,          _sp },
-    { "custom11",          kCUSTOM11,          _sp },
-    { "custom12",          kCUSTOM12,          _sp },
-    { "custom13",          kCUSTOM13,          _sp },
-    { "custom14",          kCUSTOM14,          _sp },
-    { "custom15",          kCUSTOM15,          _sp },
+    { "custom1",                kCUSTOM1,                   _sp },
+    { "custom2",                kCUSTOM2,                   _sp },
+    { "custom3",                kCUSTOM3,                   _sp },
+    { "custom4",                kCUSTOM4,                   _sp },
+    { "custom5",                kCUSTOM5,                   _sp },
+    { "custom6",                kCUSTOM6,                   _sp },
+    { "custom7",                kCUSTOM7,                   _sp },
+    { "custom8",                kCUSTOM8,                   _sp },
+    { "custom9",                kCUSTOM9,                   _sp },
+    { "custom10",               kCUSTOM10,                  _sp },
+    { "custom11",               kCUSTOM11,                  _sp },
+    { "custom12",               kCUSTOM12,                  _sp },
+    { "custom13",               kCUSTOM13,                  _sp },
+    { "custom14",               kCUSTOM14,                  _sp },
+    { "custom15",               kCUSTOM15,                  _sp },
 
-    { "kick",              kKICK,              _sp },
+    { "kick",                   kKICK,                      _sp },
 
-    { "editor",            kEDITOR,            _both },
+    { "editor",                 kEDITOR,                    _both },
 
     // Contextual actions:
     // UI
@@ -196,7 +197,7 @@ game_action actions[] = {
     { "talk_log_scroll_up",     kTALK_LOG_SCROLL_UP,        _sp,    EKeyContext::Talk },
     { "talk_log_scroll_down",   kTALK_LOG_SCROLL_DOWN,      _sp,    EKeyContext::Talk },
 
-    { nullptr,             kLASTACTION,        _both }
+    { nullptr,                  kLASTACTION,                _both }
 };
 
 keyboard_key keyboards[] =
@@ -518,7 +519,7 @@ keyboard_key keyboards[] =
     { "gpAXIS_TRIGGER_LEFT",    XR_CONTROLLER_AXIS_TRIGGER_LEFT,    "Left Trigger" },
     { "gpAXIS_TRIGGER_RIGHT",   XR_CONTROLLER_AXIS_TRIGGER_RIGHT,   "Right Trigger" },
 
-    { nullptr,                  -1,                              "(null)" }
+    { nullptr,                  -1,                                 "(null)" }
 };
 // clang-format on
 
@@ -937,34 +938,35 @@ class CCC_DefControls : public CCC_UnBindAll
         int keys[bindtypes_count];
     };
 
+    // clang-format off
     constexpr static binding predefined_bindings[] =
     {
-        { kLOOK_AROUND,         { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_RIGHT } },
-        { kMOVE_AROUND,         { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_LEFT } },
+        { kLOOK_AROUND,             { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_RIGHT } },
+        { kMOVE_AROUND,             { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_LEFT } },
 
-        { kWPN_FIRE,            { MOUSE_1,                  SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_TRIGGER_RIGHT } },
-        { kWPN_ZOOM,            { MOUSE_2,                  SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_AXIS_TRIGGER_LEFT } },
+        { kWPN_FIRE,                { MOUSE_1,              SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_TRIGGER_RIGHT } },
+        { kWPN_ZOOM,                { MOUSE_2,              SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_TRIGGER_LEFT } },
 
-        { kINVENTORY,           { SDL_SCANCODE_I,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_RIGHTSHOULDER } },
-        { kACTIVE_JOBS,         { SDL_SCANCODE_P,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_LEFTSHOULDER } },
-        { kMAP,                 { SDL_SCANCODE_M,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_INVALID } },
-        { kCONTACTS,            { SDL_SCANCODE_H,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_INVALID } },
+        { kINVENTORY,               { SDL_SCANCODE_I,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_RIGHTSHOULDER } },
+        { kACTIVE_JOBS,             { SDL_SCANCODE_P,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_LEFTSHOULDER } },
+        { kMAP,                     { SDL_SCANCODE_M,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
+        { kCONTACTS,                { SDL_SCANCODE_H,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
 
-        { kJUMP,                { SDL_SCANCODE_SPACE,       SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_A } },
-        { kCROUCH_TOGGLE,       { SDL_SCANCODE_UNKNOWN,     SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_B } },
-        { kWPN_RELOAD,          { SDL_SCANCODE_R,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_X } },
-        { kUSE,                 { SDL_SCANCODE_F,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_Y } },
+        { kJUMP,                    { SDL_SCANCODE_SPACE,   SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_A } },
+        { kCROUCH_TOGGLE,           { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_B } },
+        { kWPN_RELOAD,              { SDL_SCANCODE_R,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_X } },
+        { kUSE,                     { SDL_SCANCODE_F,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_Y } },
 
-        { kTORCH,               { SDL_SCANCODE_L,           SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_RIGHTSTICK } },
-        { kSCORES,              { SDL_SCANCODE_TAB,         SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_LEFTSTICK } },
+        { kTORCH,                   { SDL_SCANCODE_L,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_RIGHTSTICK } },
+        { kSCORES,                  { SDL_SCANCODE_TAB,     SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_LEFTSTICK } },
 
-        { kENTER,               { SDL_SCANCODE_RETURN,      SDL_SCANCODE_KP_ENTER,  XR_CONTROLLER_BUTTON_START } },
-        { kQUIT,                { SDL_SCANCODE_ESCAPE,      SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_BACK } },
+        { kENTER,                   { SDL_SCANCODE_RETURN,  SDL_SCANCODE_KP_ENTER,      XR_CONTROLLER_BUTTON_START } },
+        { kQUIT,                    { SDL_SCANCODE_ESCAPE,  SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_BACK } },
 
-        { kQUICK_USE_1,         { SDL_SCANCODE_F1,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_UP } },
-        { kQUICK_USE_2,         { SDL_SCANCODE_F2,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_LEFT } },
-        { kQUICK_USE_3,         { SDL_SCANCODE_F3,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
-        { kQUICK_USE_4,         { SDL_SCANCODE_F4,          SDL_SCANCODE_UNKNOWN,   XR_CONTROLLER_BUTTON_DPAD_DOWN } },
+        { kQUICK_USE_1,             { SDL_SCANCODE_F1,      SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_DPAD_UP } },
+        { kQUICK_USE_2,             { SDL_SCANCODE_F2,      SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_DPAD_LEFT } },
+        { kQUICK_USE_3,             { SDL_SCANCODE_F3,      SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
+        { kQUICK_USE_4,             { SDL_SCANCODE_F4,      SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_DPAD_DOWN } },
 
         // Contextual actions:
         // UI
@@ -1018,6 +1020,7 @@ class CCC_DefControls : public CCC_UnBindAll
 
         { kEDITOR,                  { SDL_SCANCODE_F10,     SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
     };
+    // clang-format on
 
 public:
     CCC_DefControls(LPCSTR n) : CCC_UnBindAll(n) {}
