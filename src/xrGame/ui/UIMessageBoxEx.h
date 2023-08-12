@@ -25,7 +25,6 @@ public:
     void OnOKClicked(CUIWindow*, void*);
     void OnNOClicked(CUIWindow*, void*);
 
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool NeedCenterCursor() const { return false; }
     CUIMessageBox* m_pMessageBox;
 

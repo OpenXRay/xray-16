@@ -41,9 +41,14 @@ public:
     LPCSTR GetTextEditURL();
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
     void OnYesOk();
+
+    [[nodiscard]]
+    bool IsInputHandlingAllowed() const { return m_allowInputHandling; }
+    void AllowInputHandling(bool allow) { m_allowInputHandling = allow; }
 
     pcstr GetDebugType() override { return "CUIMessageBox"; }
 
@@ -65,4 +70,5 @@ protected:
     CUIEditBox* m_UIEditURL;
 
     E_MESSAGEBOX_STYLE m_eMessageBoxStyle;
+    bool m_allowInputHandling{};
 };
