@@ -5,8 +5,11 @@
 
 CUIDebuggable::~CUIDebuggable()
 {
-    if (UI().Debugger().GetSelected() == this)
-        UI().Debugger().SetSelected(nullptr);
+    if (GEnv.UI)
+    {
+        if (UI().Debugger().GetSelected() == this)
+            UI().Debugger().SetSelected(nullptr);
+    }
 }
 
 void CUIDebuggable::RegisterDebuggable()
