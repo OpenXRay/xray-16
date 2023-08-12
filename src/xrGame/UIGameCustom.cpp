@@ -307,6 +307,7 @@ bool CUIGameCustom::FillDebugTree(const CUIDebugState& debugState)
 
     if (open)
     {
+        CDialogHolder::FillDebugTree(debugState);
         Window->FillDebugTree(debugState);
         ActorMenu->FillDebugTree(debugState);
         PdaMenu->FillDebugTree(debugState);

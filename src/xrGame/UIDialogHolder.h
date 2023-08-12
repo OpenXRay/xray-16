@@ -77,5 +77,6 @@ public:
     virtual bool IR_UIOnControllerHold(int dik, float x, float y);
 
     pcstr GetDebugType() override { return "CDialogHolder"; }
+    bool FillDebugTree(const CUIDebugState& debugState) override;
     void FillDebugInfo() override;
 };

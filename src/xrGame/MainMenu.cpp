@@ -654,6 +654,7 @@ bool CMainMenu::FillDebugTree(const CUIDebugState& debugState)
 
     if (open)
     {
+        CDialogHolder::FillDebugTree(debugState);
         if (m_startDialog)
             m_startDialog->FillDebugTree(debugState);
         else
