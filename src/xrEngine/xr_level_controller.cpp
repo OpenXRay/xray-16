@@ -549,8 +549,15 @@ void initialize_bindings()
     }
 #endif
 
-    for (int idx = 0; idx < bindings_count; ++idx)
+    for (size_t idx = 0; idx < bindings_count; ++idx)
+    {
+        R_ASSERT3(actions[idx].id == (EGameActions)idx,
+            make_string("actions array and EGameActions IDs mismatch: %s has index %zu, but correct index is %u",
+                 actions[idx].action_name, idx, actions[idx].id).c_str(),
+            "Did you added action to EGameActions enum, but didn't added it to 'actions' array in the correct place?"
+        );
         g_key_bindings[idx].m_action = &actions[idx];
+    }
 }
 
 static void TranslateBinding(key_binding& keyBinding, action_binding_desc& actionBinding)
