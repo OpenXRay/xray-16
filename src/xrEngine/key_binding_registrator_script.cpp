@@ -7,6 +7,7 @@
 // clang-format off
 SCRIPT_EXPORT(KeyBindings, (),
 {
+    class EnumGameActionsContexts {};
     class EnumGameActions {};
     class KeyBindingRegistrator {};
 
@@ -14,6 +15,17 @@ SCRIPT_EXPORT(KeyBindings, (),
     module(luaState)
     [
         def("dik_to_bind", +[](int dik) -> int { return GetBindedAction(dik); }),
+        def("dik_to_bind", +[](int dik, int ctx) -> int { return GetBindedAction(dik, (EKeyContext)ctx); }),
+
+        class_<EnumGameActionsContexts>("key_bindings_context")
+            .enum_("context")
+            [
+                value("undefined",                  int(EKeyContext::Undefined)),
+                value("ui",                         int(EKeyContext::UI)),
+                value("pda",                        int(EKeyContext::PDA)),
+                value("talk",                       int(EKeyContext::Talk))
+            ],
+
         class_<EnumGameActions>("key_bindings")
             .enum_("commands")
             [
