@@ -155,6 +155,8 @@ game_action actions[] =
     { "ui_move_up",             kUI_MOVE_UP,                _both,  EKeyContext::UI },
     { "ui_move_down",           kUI_MOVE_DOWN,              _both,  EKeyContext::UI },
 
+    { "ui_move_secondary",      kUI_MOVE_SECONDARY,         _both,  EKeyContext::UI },
+
     { "ui_accept",              kUI_ACCEPT,                 _both,  EKeyContext::UI },
     { "ui_back",                kUI_BACK,                   _both,  EKeyContext::UI },
     { "ui_action_1",            kUI_ACTION_1,               _both,  EKeyContext::UI },
@@ -982,6 +984,8 @@ class CCC_DefControls : public CCC_UnBindAll
         { kUI_MOVE_RIGHT,           { SDL_SCANCODE_D,       SDL_SCANCODE_RIGHT,         XR_CONTROLLER_BUTTON_DPAD_RIGHT } },
         { kUI_MOVE_UP,              { SDL_SCANCODE_W,       SDL_SCANCODE_UP,            XR_CONTROLLER_BUTTON_DPAD_UP } },
         { kUI_MOVE_DOWN,            { SDL_SCANCODE_S,       SDL_SCANCODE_DOWN,          XR_CONTROLLER_BUTTON_DPAD_DOWN } },
+
+        { kUI_MOVE_SECONDARY,       { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_LEFT } },
 
         { kUI_ACCEPT,               { SDL_SCANCODE_RETURN,  SDL_SCANCODE_F,             XR_CONTROLLER_BUTTON_A } },
         { kUI_BACK,                 { SDL_SCANCODE_ESCAPE,  SDL_SCANCODE_G,             XR_CONTROLLER_BUTTON_B } },
