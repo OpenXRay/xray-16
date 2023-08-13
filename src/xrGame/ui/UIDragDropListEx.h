@@ -142,7 +142,7 @@ public:
     bool GetVirtualCells();
     void SetVirtualCells(bool b);
 
-    void SetHighlighter(CUIStatic* highlighter, Fvector2 spacing);
+    void SetHighlighter(CUIStatic* highlighter, Fvector2 spacing, bool convertPosToOurs = true);
     CUIStatic* GetHighlighter() const
     {
         return m_highlighter;
@@ -153,7 +153,7 @@ public:
     }
     void Highlight(bool highlight);
 
-    void SetBlocker(CUIStatic* blocker, Fvector2 spacing);
+    void SetBlocker(CUIStatic* blocker, Fvector2 spacing, bool convertPosToOurs = true);
     CUIStatic* GetBlocker() const
     {
         return m_blocker;
@@ -163,7 +163,7 @@ public:
         return m_blocker_spacing;
     }
 
-    void SetConditionIndicator(CUIProgressBar* indicator);
+    void SetConditionIndicator(CUIProgressBar* indicator, bool convertPosToOurs = true);
     CUIProgressBar* GetConditionIndicator() const
     {
         return m_condition_indicator;

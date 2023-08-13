@@ -103,9 +103,6 @@ void CUIMainIngameWnd::Init()
     m_iPickUpItemIconY = UIPickUpItemIcon->GetWndRect().top;
     //---------------------------------------------------------
 
-    //индикаторы
-    UIZoneMap->Init();
-
     // Подсказки, которые возникают при наведении прицела на объект
     UIStaticQuickHelp = UIHelper::CreateTextWnd(uiXml, "quick_info", this);
 
@@ -207,11 +204,20 @@ void CUIMainIngameWnd::Init()
 
     UIMotionIcon = xr_new<CUIMotionIcon>();
     UIMotionIcon->SetAutoDelete(true);
-    const bool independent = UIMotionIcon->Init(UIZoneMap->MapFrame().GetWndRect());
-    if (!independent)
+    const bool attachedToMinimap = UIMotionIcon->Init();
+
+    //индикаторы
+    UIZoneMap->Init(attachedToMinimap);
+
+    if (attachedToMinimap)
+    {
         UIZoneMap->MapFrame().AttachChild(UIMotionIcon);
+        UIMotionIcon->AttachToMinimap(UIZoneMap->MapFrame().GetWndRect());
+    }
     else
+    {
         AttachChild(UIMotionIcon);
+    }
 
     UIStaticDiskIO = UIHelper::CreateStatic(uiXml, "disk_io", this);
 

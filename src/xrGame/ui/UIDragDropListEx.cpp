@@ -90,7 +90,7 @@ void CUIDragDropListEx::InitDragDropList(Fvector2 pos, Fvector2 size)
         Fvector2().set(m_vScrollBar->GetWndPos().x - m_vScrollBar->GetWidth(), m_vScrollBar->GetWndPos().y));
 }
 
-void CUIDragDropListEx::SetHighlighter(CUIStatic* highlighter, Fvector2 spacing)
+void CUIDragDropListEx::SetHighlighter(CUIStatic* highlighter, Fvector2 spacing, bool convertPosToOurs /*= true*/)
 {
     if (m_highlighter)
     {
@@ -113,7 +113,7 @@ void CUIDragDropListEx::SetHighlighter(CUIStatic* highlighter, Fvector2 spacing)
             AttachChild(m_highlighter);
             // Convert absolute position to relative
             // Without this, UI Frustum will cull our highlighter
-            if (!m_highlighter->WndPosIsProbablyRelative())
+            if (convertPosToOurs)
             {
                 Fvector2 ourAbsPos;
                 GetAbsolutePos(ourAbsPos);
@@ -130,7 +130,7 @@ void CUIDragDropListEx::Highlight(bool highlight)
         m_highlighter->Show(highlight);
 }
 
-void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
+void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing, bool convertPosToOurs /*= true*/)
 {
     if (m_blocker)
     {
@@ -152,7 +152,7 @@ void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
             AttachChild(m_blocker);
             // Convert absolute position to relative
             // Without this, UI Frustum will cull our blocker
-            if (!m_blocker->WndPosIsProbablyRelative())
+            if (convertPosToOurs)
             {
                 Fvector2 ourAbsPos;
                 GetAbsolutePos(ourAbsPos);
@@ -163,7 +163,7 @@ void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
     }
 }
 
-void CUIDragDropListEx::SetConditionIndicator(CUIProgressBar* indicator)
+void CUIDragDropListEx::SetConditionIndicator(CUIProgressBar* indicator, bool convertPosToOurs /*= true*/)
 {
     if (m_condition_indicator && m_condition_indicator->GetParent() == this)
     {
@@ -178,7 +178,7 @@ void CUIDragDropListEx::SetConditionIndicator(CUIProgressBar* indicator)
         AttachChild(m_condition_indicator);
         // Convert absolute position to relative
         // Without this, UI Frustum will cull our indicator
-        if (!m_condition_indicator->WndPosIsProbablyRelative())
+        if (convertPosToOurs)
         {
             Fvector2 ourAbsPos;
             GetAbsolutePos(ourAbsPos);

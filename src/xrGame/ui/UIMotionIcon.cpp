@@ -32,32 +32,17 @@ void CUIMotionIcon::ResetVisibility()
     m_bchanged = true;
 }
 
-bool CUIMotionIcon::Init(Frect const& zonemap_rect)
+bool CUIMotionIcon::Init()
 {
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, MOTION_ICON_XML);
 
-    bool independent = false; // Not bound to minimap
-    if (!CUIXmlInit::InitWindow(uiXml, "window", 0, this, false))
+    const bool attachedToMinimap = CUIXmlInit::InitWindow(uiXml, "window", 0, this, false);
+    if (attachedToMinimap)
+        m_relative_size = uiXml.ReadAttribFlt("window", 0, "rel_size", 1.0f);
+    else
     {
-        independent = CUIXmlInit::InitStatic(uiXml, "background", 0, this, false);
-    }
-
-    Fvector2 sz{};
-    Fvector2 pos{};
-
-    if (!independent)
-    {
-        const float rel_sz = uiXml.ReadAttribFlt("window", 0, "rel_size", 1.0f);
-
-        zonemap_rect.getsize(sz);
-        pos.set(sz.x / 2.0f, sz.y / 2.0f);
-
-        SetWndSize(sz);
-        SetWndPos(pos);
-
-        const float k = UICore::get_current_kx();
-        sz.mul(rel_sz * k);
+        CUIXmlInit::InitStatic(uiXml, "background", 0, this, false);
     }
 
     m_power_progress = UIHelper::CreateProgressBar(uiXml, "power_progress", this, false);
@@ -68,29 +53,14 @@ bool CUIMotionIcon::Init(Frect const& zonemap_rect)
 
     // Allow only shape or bar, not both
     if (!m_luminosity_progress_bar)
-    {
         m_luminosity_progress_shape = UIHelper::CreateProgressShape(uiXml, "luminosity_progress", this, false);
-        if (m_luminosity_progress_shape && !independent)
-        {
-            m_luminosity_progress_shape->SetWndSize(sz);
-            m_luminosity_progress_shape->SetWndPos(pos);
-        }
-    }
 
     if (!m_noise_progress_bar)
-    {
         m_noise_progress_shape = UIHelper::CreateProgressShape(uiXml, "noise_progress", this, false);
-        if (m_noise_progress_shape && !independent)
-        {
-            m_noise_progress_shape->SetWndSize(sz);
-            m_noise_progress_shape->SetWndPos(pos);
-        }
-    }
 
     const auto create_static = [&uiXml, this](pcstr ui_path, EState state)
     {
-        auto ui_static = UIHelper::CreateStatic(uiXml, ui_path, this, false);
-        if (ui_static)
+        if (const auto ui_static = UIHelper::CreateStatic(uiXml, ui_path, this, false))
         {
             m_states[state] = ui_static;
             ui_static->Show(false);
@@ -106,7 +76,32 @@ bool CUIMotionIcon::Init(Frect const& zonemap_rect)
 
     ShowState(stNormal);
 
-    return independent;
+    return attachedToMinimap;
+}
+
+void CUIMotionIcon::AttachToMinimap(const Frect& rect)
+{
+    Fvector2 sz{}, pos{};
+
+    rect.getsize(sz);
+    pos.set(sz.x / 2.0f, sz.y / 2.0f);
+
+    SetWndSize(sz);
+    SetWndPos(pos);
+
+    const float k = UICore::get_current_kx();
+    sz.mul(m_relative_size * k);
+
+    if (m_luminosity_progress_shape)
+    {
+        m_luminosity_progress_shape->SetWndSize(sz);
+        m_luminosity_progress_shape->SetWndPos(pos);
+    }
+    if (m_noise_progress_shape)
+    {
+        m_noise_progress_shape->SetWndSize(sz);
+        m_noise_progress_shape->SetWndPos(pos);
+    }
 }
 
 void CUIMotionIcon::ShowState(EState state)
