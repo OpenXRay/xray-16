@@ -60,15 +60,10 @@ SCRIPT_EXPORT(UIStyleManager, (),
             .def("GetAllStyles", &UIStyleManager::GetToken, return_stl_iterator())
             .def("DefaultStyleIsSet", &UIStyleManager::DefaultStyleIsSet)
             .def("GetCurrentStyleId", &UIStyleManager::GetCurrentStyleId)
-
-            .def("SetStyle",        &UIStyleManager::SetupStyle)
-            .def("SetStyle",        +[](UIStyleManager* self, u32 styleID, bool reloadUI)
-            {
-                self->SetupStyle(styleID);
-
-                if (reloadUI)
-                    self->Reset();
-            }),
+            .def("GetCurrentStyleName", &UIStyleManager::GetCurrentStyleName)
+            .def("SetStyle", &UIStyleManager::SetStyle)
+            .def("SetupStyle", &UIStyleManager::SetupStyle)
+            .def("ResetUI", &UIStyleManager::Reset),
 
         def("GetUIStyleManager", +[] { return UIStyles; })
     ];
