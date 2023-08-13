@@ -69,7 +69,9 @@ function load_dialog:InitControls()
 
 	self.picture			= xml:InitStatic("form:picture",self.form)
 
---	xml:InitStatic			("form:file_info",self.form)
+	if GetUIStyleManager():GetCurrentStyleName() == "ui_style_cs" then
+		xml:InitStatic		("form:file_info",self.form)
+	end
 
 	self.file_caption 		= xml:InitTextWnd("form:file_caption",self.form)
 	self.file_data			= xml:InitTextWnd("form:file_data",self.form)

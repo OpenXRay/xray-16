@@ -1,0 +1,472 @@
+<w>
+  <team_panels_wnd x="125" y="65" width="848" height="600">
+
+    <!--This nodes will process by UITeamPanels::InitAllFrames(...)-->
+    <frame class="frame_line" x="0" y="0" with="845" height="400" vertical="1">
+      <texture>ui_statTwo</texture>
+    </frame>
+  
+    <frame class="frame_line" x="0" y="400" width="845" height="200" vertical="1">
+      <texture>ui_statTwo2</texture>
+    </frame>
+
+    <!--This nodes will process by UITeamPanels::InitAllTeams(...)-->
+    <team tname="greenteam" x="0" y="0" width="424" height="400">
+      <auto_static x="45" y="50" width="80">
+        <text font="letterica16" color="ui_7">mp_team_free_stalkers</text>
+      </auto_static>
+
+      <scroll_panels count="1">
+        
+        <panel number="0">
+          <scroll_panel x="15" y="80" width="409" height="271" always_show_scroll="0" vert_interval="20" left_ident="10"/>
+
+          <team_header x="35" y="50" width="370" height="50">
+
+            <field name="mp_artefacts_upcase" x="140" y="0" width="80">
+              <text font="letterica16" color="ui_10" />
+            </field>
+
+            <field name="mp_players" x="240" y="0" width="60">
+              <text font="letterica16" color="ui_10" />
+            </field>
+
+            <field name="mp_frags_upcase" x="320" y="0" width="80">
+              <text font="letterica16" color="ui_10" />
+            </field>
+
+
+           <column name="mp_name"  x="10" y="26" width="100" height="21">
+              <text vert_align="c" font="letterica16" color="ui_1">mp_name</text>
+              <texture a="0">mp_stats_icon_c_frags</texture>
+            </column>
+
+            <auto_static x="145" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_frags" x="153" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_frags</texture>
+            </column>
+
+            <auto_static x="185" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_deaths" x="193" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_deaths</texture>
+            </column>
+
+            <auto_static x="225" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_artefacts"  x="233" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_art</texture>
+            </column>
+
+            <auto_static x="265" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_spots" x="273" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_assist</texture>
+            </column>
+
+            <auto_static x="305" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_status" x="313" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_rank</texture>
+            </column>
+
+            <auto_static x="345" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_ping" x="353" y="26" width="50" height="21">
+              <texture>mp_stats_icon_c_ping</texture>
+            </column>
+          </team_header>
+
+        </panel>
+      </scroll_panels>
+
+      <player_item>
+        <textparam name="mp_name"  x="30" y="0" width="130" height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_frags" x="180" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_deaths" x="220" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_artefacts" x="260" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_spots" x="300" y="0" width="20" height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <iconparam name="rank" x="330"  y="0" width="16"  height="16" stretch="1"/>
+        <iconparam name="death_atf" x="350"  y="0" width="16"  height="16" stretch="1"/>
+        <textparam name="mp_ping" x="380" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+      </player_item>
+
+      <local_player_item>
+        <auto_static x="10" y="0" width="400" height="16" stretch="1">
+          <texture>ui_string_statTwo_back</texture>
+        </auto_static>
+        <textparam name="mp_name"  x="30" y="0" width="130" height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_frags" x="180" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_deaths" x="220" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_artefacts" x="260" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_spots" x="300" y="0" width="20" height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <iconparam name="rank" x="330"  y="0" width="16"  height="16" stretch="1"/>
+        <iconparam name="death_atf" x="350"  y="0" width="16"  height="16" stretch="1"/>
+        <textparam name="mp_ping" x="380" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+      </local_player_item>
+    </team>
+    
+    
+    <team tname="blueteam"  x="400" y="0" width="400" height="400">
+      <auto_static x="45" y="50" width="80">
+        <text font="letterica16" color="ui_7">mp_headhuntrs</text>
+      </auto_static>
+      <scroll_panels count="1">
+        <panel number="0">
+          <scroll_panel x="15" y="80" width="409" height="271" always_show_scroll="0" vert_interval="20" left_ident="10"/>
+          
+          <team_header x="35" y="50" width="370" height="50">
+
+            <field name="mp_artefacts_upcase" x="140" y="0" width="80">
+              <text font="letterica16" color="ui_10" />
+            </field>
+
+            <field name="mp_players" x="240" y="0" width="60">
+              <text font="letterica16" color="ui_10" />
+            </field>
+
+            <field name="mp_frags_upcase" x="320" y="0" width="80">
+              <text font="letterica16" color="ui_10" />
+            </field>
+
+
+           <column name="mp_name"  x="10" y="26" width="100" height="21">
+              <text vert_align="c" font="letterica16" color="ui_1">mp_name</text>
+              <texture a="0">mp_stats_icon_c_frags</texture>
+            </column>
+
+            <auto_static x="145" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_frags" x="153" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_frags</texture>
+            </column>
+
+            <auto_static x="185" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_deaths" x="193" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_deaths</texture>
+            </column>
+
+            <auto_static x="225" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_artefacts"  x="233" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_art</texture>
+            </column>
+
+            <auto_static x="265" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_spots" x="273" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_assist</texture>
+            </column>
+
+            <auto_static x="305" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_status" x="313" y="26" width="40" height="21">
+              <texture>mp_stats_icon_c_rank</texture>
+            </column>
+
+            <auto_static x="345" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_ping" x="353" y="26" width="50" height="21">
+              <texture>mp_stats_icon_c_ping</texture>
+            </column>
+			
+          </team_header>
+        </panel>
+      </scroll_panels>
+      
+      <player_item>
+        <textparam name="mp_name"  x="30" y="0" width="130" height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_frags" x="180" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_deaths" x="220" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_artefacts" x="260" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_spots" x="300" y="0" width="20" height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <iconparam name="rank" x="330"  y="0" width="16"  height="16" stretch="1"/>
+        <iconparam name="death_atf" x="350"  y="0" width="16"  height="16" stretch="1"/>
+        <textparam name="mp_ping" x="380" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+      </player_item>
+
+      <local_player_item>
+        <auto_static x="15" y="0" width="400" height="16" stretch="1">
+          <texture>ui_string_statTwo_back</texture>
+        </auto_static>
+        <textparam name="mp_name"  x="30" y="0" width="130" height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_frags" x="180" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_deaths" x="220" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_artefacts" x="260" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_spots" x="300" y="0" width="20" height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <iconparam name="rank" x="330"  y="0" width="16"  height="16" stretch="1"/>
+        <iconparam name="death_atf" x="350"  y="0" width="16"  height="16" stretch="1"/>
+        <textparam name="mp_ping" x="380" y="0" width="20"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+      </local_player_item>
+      
+    </team>
+
+    <team tname="spectatorsteam"  x="0" y="380" width="845" height="200">
+      <auto_static x="35" y="0" width="80">
+        <text font="letterica16" color="ui_7">mp_spectators</text>
+      </auto_static>
+
+      <!--If this tag preset, team consist of several scroll panels, the first column is parent-->
+      <scroll_panels count="3">
+        <panel number="0">
+          <scroll_panel x="25" y="0" width="264" height="200" always_show_scroll="0" vert_interval="20" />
+          <team_header x="25" y="0" width="264" height="20">
+            <auto_static x="224" y="20" width="1" height="177" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+            <auto_static x="264" y="20" width="1" height="177" stretch="1">
+              <texture>ui_v_line_bold</texture>
+            </auto_static>
+          </team_header>
+        </panel>
+        <panel number="1">
+          <scroll_panel x="289" y="0" width="264" height="157" always_show_scroll="0" vert_interval="20" />
+          <team_header x="289" y="0" width="264" height="20">
+            <auto_static x="224" y="20" width="1" height="177" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+            <auto_static x="264" y="20" width="1" height="177" stretch="1">
+              <texture>ui_v_line_bold</texture>
+            </auto_static>
+          </team_header>
+        </panel>
+        <panel number="2">
+          <scroll_panel x="550" y="0" width="264" height="157" always_show_scroll="0" vert_interval="20" />
+          <team_header x="550" y="0" width="264" height="20">
+            <auto_static x="233" y="20" width="1" height="177" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+          </team_header>
+        </panel>
+      </scroll_panels>
+
+      <player_item>
+        <textparam name="mp_name"  x="35" y="0" width="100" height="20">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_ping"  x="239" y="0" width="40" height="20">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+      </player_item>
+      <local_player_item>
+        <auto_static x="0" y="0" width="400" height="16" stretch="1">
+          <texture>ui_string_statTwo_back</texture>
+        </auto_static>
+        <textparam name="mp_name"  x="35" y="0" width="100" height="20">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_ping"  x="239" y="0" width="40" height="20">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+      </local_player_item>
+
+    </team>
+
+
+
+    <team tname="greenteam_pending" x="0" y="0" width="424" height="400">
+      <auto_static x="45" y="50" width="80">
+        <text font="letterica16" color="ui_7">mp_team_free_stalkers</text>
+      </auto_static>
+      <!--<texture>ui_statGreen</texture>-->
+      <scroll_panels count="1">
+        <panel number="0">
+          <scroll_panel x="15" y="80" width="409" height="271" always_show_scroll="0" vert_interval="20" left_ident="10"/>
+
+          <team_header x="35" y="50" width="370" height="50">
+
+            <field name="mp_players" x="140" y="0" width="60">
+              <text font="letterica16" color="ui_10" />
+            </field>
+
+            <column name="mp_name"  x="10" y="28" width="80" height="16">
+              <text font="letterica16" color="ui_1" />
+            </column>
+
+            <auto_static x="305" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_status" x="310" y="28" width="40" height="16">
+              <text font="letterica16" color="ui_1" />
+            </column>
+
+            <auto_static x="345" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_ping" x="350" y="28" width="50" height="16">
+              <text font="letterica16" color="ui_1" />
+            </column>
+          </team_header>
+          
+        </panel>
+      </scroll_panels>
+      
+      <player_item>
+        <textparam name="mp_name"  x="30" y="0" width="100" height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_status" x="330"  y="0" width="40"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_ping" x="380" y="0" width="40"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+      </player_item>
+
+      <local_player_item>
+        <auto_static x="10" y="0" width="400" height="16" stretch="1">
+          <texture>ui_string_statTwo_back</texture>
+        </auto_static>
+        <textparam name="mp_name"  x="30" y="0" width="100" height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_status" x="330"  y="0" width="40"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_ping" x="380" y="0" width="40"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+      </local_player_item>
+    </team>
+
+    <team tname="blueteam_pending"  x="400" y="0" width="400" height="400">
+      <auto_static x="45" y="50" width="80">
+        <text font="letterica16" color="ui_7">mp_headhuntrs</text>
+      </auto_static>
+      <scroll_panels count="1">
+        <panel number="0">
+          <scroll_panel x="15" y="80" width="409" height="271" always_show_scroll="0" vert_interval="20" left_ident="10"/>
+          <team_header x="35" y="50" width="370" height="50">
+
+            <field name="mp_players" x="140" y="0" width="60">
+              <text font="letterica16" color="ui_10" />
+            </field>
+
+            <column name="mp_name"  x="10" y="28" width="80" height="16">
+              <text font="letterica16" color="ui_1" />
+            </column>
+
+            <auto_static x="305" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_status" x="310" y="28" width="40" height="16">
+              <text font="letterica16" color="ui_1" />
+            </column>
+
+            <auto_static x="345" y="27" width="1" height="298" stretch="1">
+              <texture>ui_v_line_normal</texture>
+            </auto_static>
+
+            <column name="mp_ping" x="350" y="28" width="50" height="16">
+              <text font="letterica16" color="ui_1" />
+            </column>
+          </team_header>
+        </panel>
+      </scroll_panels>
+
+      <player_item>
+        <textparam name="mp_name"  x="30" y="0" width="100" height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_status" x="330"  y="0" width="16"  height="16" stretch="1">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+        <textparam name="mp_ping" x="380" y="0" width="40"  height="16">
+          <text font="letterica16" color="ui_8" />
+        </textparam>
+      </player_item>
+
+      <local_player_item>
+        <auto_static x="15" y="0" width="400" height="16" stretch="1">
+          <texture>ui_string_statTwo_back</texture>
+        </auto_static>
+        <textparam name="mp_name"  x="30" y="0" width="100" height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_status" x="330"  y="0" width="16"  height="16" stretch="1">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+        <textparam name="mp_ping" x="380" y="0" width="40"  height="16">
+          <text font="letterica16" color="ui_2" />
+        </textparam>
+      </local_player_item>
+    </team>
+  </team_panels_wnd>
+</w>

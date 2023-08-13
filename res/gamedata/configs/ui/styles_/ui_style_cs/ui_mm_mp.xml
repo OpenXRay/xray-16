@@ -1,0 +1,142 @@
+<w>
+  <wrk_area width="1024" height="768"/>
+
+  <background width="1024" height="768">
+    <auto_static width="1024" height="430">
+      <texture width="1024" height="430">ui\ui_mm_window_back_crop</texture>
+    </auto_static>
+    
+    <auto_static width="1024" height="768" stretch="1">
+      <texture>ui_inGame2_back_03</texture>
+    </auto_static>
+
+    <auto_static x="524" y="641" width="256" height="128">
+      <texture>ui\ui_mm_coal</texture>
+    </auto_static>
+
+    <auto_static width="1024" height="768" stretch="1">
+      <texture>mp_background</texture>
+    </auto_static>
+
+    <auto_static x="120" y="737" width="820" height="30">
+      <text align="l" font="graffiti22" r="135" g="123" b="116" complex_mode="0">ui_st_mp_experience_grow</text>
+    </auto_static>
+
+  </background>
+  
+	<anim_00 x="109" y="77" width="80" height="60" x_offset="544" y_offset="784" frames="24" duration="2000" columns="6" frame_width="80" frame_height="60" cyclic="1" autoplay="1">
+		<texture>ui\ui_mp_main</texture>		
+	</anim_00>
+	
+	<cap_multiplayer x="270" y="93" width="378" height="33">
+		<text font="graffiti22" r="215" g="195" b="170" complex_mode="0" vert_align="c">ui_mm_multiplayer</text>
+	</cap_multiplayer>
+	<static_player_name x="137" y="143" width="100" height="24">		
+		<text font="letterica16" r="129" g="123" b="113" complex_mode="0" vert_align="c">mm_mp_player_name</text>
+	</static_player_name>
+	<edit_player_name x="237" y="143" width="235" height="24" max_symb_count="18">
+		<options_item entry="mm_net_player_name" group="mm_mp_client"/>
+		<text x="3" font="letterica18" r="235" g="219" b="185"/>
+	</edit_player_name>
+	<edit_player_pass x="470" y="143" width="100" height="24" max_symb_count="18">
+		<text x="3" font="letterica18" r="235" g="219" b="185"/>
+	</edit_player_pass>
+
+	<cap_cd_key x="561" y="143" width="70" height="24">
+		<text font="letterica16" r="129" g="123" b="113" complex_mode="0" vert_align="c">mm_mp_cd_key</text>
+	</cap_cd_key>
+	<edit_cd_key x="617" y="143" width="236" height="24" max_symb_count="17">
+		<text x="3" font="letterica18" r="235" g="219" b="185" complex_mode="0" vert_align="c"/>
+	</edit_cd_key>
+
+  <tab x="128" y="195" width="1014" height="26">
+		<!-- BUTTONS -->
+		<button x="0" y="-5" width="114" height="44" id="client">
+			<texture>ui_button_tablist</texture>
+			<text font="graffiti19" align="c" complex_mode="0">mm_mp_client</text>
+			<text_color>
+				<e r="106" g="95" b="91"/>
+				<t r="227" g="199" b="178"/>
+				<h r="180" g="153" b="155"/>
+			</text_color>
+		</button>
+		<button x="114" y="-5" width="114" height="44" id="server">
+			<texture>ui_button_tablist</texture>
+			<text font="graffiti19" align="c" complex_mode="0">mm_mp_server</text>
+			<text_color>
+				<e r="106" g="95" b="91"/>				
+				<t r="227" g="199" b="178"/>				
+				<h r="180" g="153" b="155"/>
+			</text_color>
+		</button>
+		<button x="228" y="-5" width="114" height="44" id="options">			
+			<texture>ui_button_tablist</texture>
+			<text font="graffiti19" align="c" complex_mode="0">mm_mp_options</text>
+			<text_color>
+				<e r="106" g="95" b="91"/>				
+				<t r="227" g="199" b="178"/>				
+				<h r="180" g="153" b="155"/>
+			</text_color>
+		</button>
+	</tab>
+	
+#include "ui\ui_mm_mp_tabclient.xml"	
+#include "ui\ui_mm_mp_tabserver.xml"	
+#include "ui\ui_mm_mp_taboptions.xml"	
+
+	
+	<frame x="0" y="0" width="738" height="416">
+		<texture>ui_tablist_textbox</texture>		
+	</frame>
+	
+	<btn_create x="393" y="646" width="157" height="48">
+		<text font="graffiti19" align="c">mm_mp_create</text>
+		<texture>ui_button_main02</texture>
+		<text_color>
+			<e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/>		
+		</text_color>
+	</btn_create>
+	
+	<btn_join x="549" y="646" width="157" height="48">
+		<text font="graffiti19" align="c">mm_mp_join</text>
+		<texture>ui_button_main02</texture>
+		<text_color>
+			<e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/>		
+		</text_color>
+	</btn_join>
+	
+	<btn_cancel x="705" y="646" width="157" height="48">
+		<text font="graffiti19" align="c">mm_mp_cancel</text>
+		<texture>ui_button_main02</texture>
+		<text_color>
+			<e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/>		
+		</text_color>
+	</btn_cancel>
+
+	<download_static x="186" y="717" width="603" height="51">
+		<texture>ui_patch_back</texture>
+	</download_static>
+
+	<download_text x="200" y="730" width="480" height="30">
+		<text align="c" font="letterica16" r="135" g="123" b="116" complex_mode="0">mm_mp_progress</text>	
+	</download_text>
+	
+	<progress_download x="222" y="754" width="403" height="10" horz="1" min="0" max="100">
+		<progress>
+			<texture>ui_patch_progress</texture>
+		</progress>
+	</progress_download>
+	
+	<btn_cancel_download x="652" y="732" width="111" height="29">
+		<text align="c" font="letterica16" r="227" g="199" b="178">mm_mp_cancel</text>	
+		<texture>ui_button_ordinary</texture>			
+	</btn_cancel_download>
+	
+	<static_version x="15" y="740" width="100" height="30">
+		<text align="l" font="graffiti19" r="135" g="123" b="116" complex_mode="0"/>
+	</static_version>
+
+  <static_gs_logo x="850" y="717" width="128" height="35" stretch="1">
+    <texture x="0" y="0" width="256" height="70">ui\ui_gs_logo</texture>
+  </static_gs_logo>
+</w>
