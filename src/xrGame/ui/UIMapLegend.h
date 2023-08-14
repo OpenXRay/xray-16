@@ -33,6 +33,8 @@ public:
     virtual void Show(bool status);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
+    pcstr GetDebugType() override { return "UIMapLegend"; }
+
 private: // m_
     CUIFrameWindow* m_background;
     CUIScrollView* m_list;
@@ -54,6 +56,8 @@ public:
 
     void init_from_xml(CUIXml& xml, int index);
     //	virtual void	Update				();
+
+    pcstr GetDebugType() override { return "UIMapLegendItem"; }
 
 private: // m_
     CUIStatic* m_image[4];

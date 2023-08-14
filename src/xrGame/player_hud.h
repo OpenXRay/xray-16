@@ -59,6 +59,7 @@ struct hud_item_measures
     Fmatrix load(const shared_str& sect_name, IKinematics* K);
     Fmatrix load_monolithic(const shared_str& sect_name, IKinematics* K, CHudItem* owner);
     void load_inertion_params(const shared_str& sect_name);
+    void update(Fmatrix& attach_offset);
 
     struct inertion_params
     {

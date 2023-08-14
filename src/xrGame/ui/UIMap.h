@@ -28,6 +28,8 @@ public:
 
     CUICustomMap();
 
+    pcstr GetDebugType() override { return "CUICustomMap"; }
+
     virtual void SetActivePoint(const Fvector& vNewPoint);
 
     void Initialize(shared_str name, LPCSTR sh_name);
@@ -67,7 +69,7 @@ protected:
     virtual void UpdateSpots(){};
 };
 
-class CUIGlobalMap : public CUICustomMap
+class CUIGlobalMap final : public CUICustomMap
 {
     typedef CUICustomMap inherited;
 
@@ -97,11 +99,13 @@ public:
     virtual void Update();
     void Initialize();
 
+    pcstr GetDebugType() override { return "CUIGlobalMap"; }
+
 protected:
     void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
 };
 
-class CUILevelMap : public CUICustomMap
+class CUILevelMap final : public CUICustomMap
 {
     typedef CUICustomMap inherited;
 
@@ -111,6 +115,7 @@ class CUILevelMap : public CUICustomMap
     CUILevelMap& operator=(const CUILevelMap& obj) = delete;
 public:
     CUILevelMap(CUIMapWnd*);
+
     const Frect& GlobalRect() const { return m_GlobalRect; }
     virtual void Draw();
     virtual void Show(bool status);
@@ -122,23 +127,28 @@ public:
     CUIMapWnd* MapWnd() { return m_mapWnd; }
     virtual void OnFocusLost();
 
+    pcstr GetDebugType() override { return "CUILevelMap"; }
+
 protected:
     virtual void UpdateSpots();
     void Init_internal(const shared_str& name, const CInifile& pLtx, const shared_str& sect_name, LPCSTR sh_name) override;
 };
 
 // Rounded by default
-class CUIMiniMap : public CUICustomMap
+class CUIMiniMap final : public CUICustomMap
 {
     typedef CUICustomMap inherited;
 
 public:
     CUIMiniMap();
+
     virtual void Draw();
     virtual bool GetPointerTo(const Fvector2& src, float item_radius, Fvector2& pos,
         float& heading); // position and heading for drawing pointer to src pos
     virtual bool NeedShowPointer(Frect r);
     virtual bool IsRectVisible(Frect r);
+
+    pcstr GetDebugType() override { return "CUIMiniMap"; }
 
 protected:
     virtual void UpdateSpots();

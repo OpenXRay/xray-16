@@ -75,15 +75,18 @@ void CUIGameSP::OnFrame()
 
     if (m_game_objective)
     {
-        bool b_remove = false;
-        for (u8 i = 0; i < bindtypes_count && !b_remove; ++i)
+        bool keyPressed = false;
+        ForAllActionKeys(kSCORES, [&](size_t /*keyboard_index*/, int key)
         {
-            const int dik = GetActionDik(kSCORES, i);
-            if (dik && !pInput->iGetAsyncKeyState(dik))
-                b_remove = true;
-        }
+            if (pInput->iGetAsyncKeyState(key))
+            {
+                keyPressed = true;
+                return true;
+            }
+            return false;
+        });
 
-        if (b_remove)
+        if (!keyPressed)
         {
             RemoveCustomStatic("main_task");
             RemoveCustomStatic("secondary_task");
@@ -259,7 +262,7 @@ void CUIGameSP::ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id
     }
 }
 
-CChangeLevelWnd::CChangeLevelWnd()
+CChangeLevelWnd::CChangeLevelWnd() : CUIDialogWnd(CChangeLevelWnd::GetDebugType())
 {
     m_messageBox = xr_new<CUIMessageBox>();
     m_messageBox->SetAutoDelete(true);
@@ -296,6 +299,48 @@ void CChangeLevelWnd::OnOk()
     Level().Send(p, net_flags(TRUE));
 }
 
+bool CUIGameSP::FillDebugTree(const CUIDebugState& debugState)
+{
+#ifndef MASTER_GOLD
+    if (!CUIGameCustom::FillDebugTree(debugState))
+        return false;
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
+
+    const bool open = ImGui::TreeNodeEx(this, flags, "Game UI (%s)", CUIGameSP::GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.select(this);
+
+    if (open)
+    {
+        TalkMenu->FillDebugTree(debugState);
+        UIChangeLevelWnd->FillDebugTree(debugState);
+        if (m_game_objective)
+            m_game_objective->wnd()->FillDebugTree(debugState);
+        ImGui::TreePop();
+    }
+
+    return open;
+#else
+    UNUSED(debugState);
+    return false;
+#endif
+}
+
+void CUIGameSP::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIGameCustom::FillDebugInfo();
+
+    if (ImGui::CollapsingHeader(CUIGameSP::GetDebugType()))
+    {
+
+    }
+#endif
+}
+
 void CChangeLevelWnd::OnCancel()
 {
     HideDialog();
@@ -316,7 +361,7 @@ bool CChangeLevelWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
 bool g_block_pause = false;
 
-// Morrey: Не инициализировалась форма, поскольку виртуальная функция отличалась набором аргуметов 
+// Morrey: Не инициализировалась форма, поскольку виртуальная функция отличалась набором аргуметов
 void CChangeLevelWnd::Show(bool status)
 {
     inherited::Show(status);
@@ -364,4 +409,24 @@ void CChangeLevelWnd::HideDialog()
     g_block_pause = false;
     Device.Pause(FALSE, TRUE, TRUE, "CChangeLevelWnd_hide");
     inherited::HideDialog();
+}
+
+void CChangeLevelWnd::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIDialogWnd::FillDebugInfo();
+
+    if (ImGui::CollapsingHeader(CChangeLevelWnd::GetDebugType()))
+    {
+        ImGui::Checkbox("Level change allowed", &m_b_allow_change_level);
+        ImGui::DragScalar("Game vertex ID", ImGuiDataType_U16, &m_game_vertex_id);
+        ImGui::DragScalar("Level vertex ID", ImGuiDataType_U32, &m_level_vertex_id);
+        ImGui::DragFloat3("Position", (float*)&m_position);
+        ImGui::DragFloat3("Angles", (float*)&m_angles);
+        ImGui::Separator();
+        ImGui::Checkbox("Teleport Actor on cancel", &m_b_position_cancel);
+        ImGui::DragFloat3("Position on cancel", (float*)&m_position_cancel);
+        ImGui::DragFloat3("Angles on cancel", (float*)&m_angles_cancel);
+    }
+#endif
 }

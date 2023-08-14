@@ -10,7 +10,8 @@
 #include "xrUICore/Cursor/UICursor.h"
 #include "UIGameCustom.h"
 
-CUISpawnWnd::CUISpawnWnd() : m_iCurTeam(0)
+CUISpawnWnd::CUISpawnWnd()
+    : CUIDialogWnd(CUISpawnWnd::GetDebugType()), m_iCurTeam(0)
 {
     m_pBackground = xr_new<CUIStatic>("Background");
     AttachChild(m_pBackground);

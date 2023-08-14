@@ -94,7 +94,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif // DEBUG
 
-    Resources->reset_begin();
+    reset_begin();
     Memory.mem_compact();
 
 #ifdef USE_DX9

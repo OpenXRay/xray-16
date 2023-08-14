@@ -1,0 +1,845 @@
+<window>
+
+#include "ui\game_tutorial_pda.xml"
+
+	<part_2_binocular>
+		<global_wnd/>
+
+		<item>
+			<length_sec>5</length_sec>
+			<pause_state/>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="5000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">binoc_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_2_binocular>
+
+	<!----------------------------------------------------------------------------------->
+	<!--Test----------------------------------------------------------------------------->
+	<!----------------------------------------------------------------------------------->
+	<test>
+		<global_wnd/>
+
+		<item>
+			<length_sec>20</length_sec>
+			<pause_state>off</pause_state>
+			<sound/>
+			<function_on_start>mob_trader.on_start_tutorial_item_1</function_on_start>
+			<function_on_stop>mob_trader.on_stop_tutorial_item</function_on_stop>
+			<guard_key/>
+			<cursor_pos/>
+			<grab_input>1</grab_input>
+			<pda_section>pda_closed</pda_section>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="18" x="100" y="100" width="150" height="150" alignment="c" stretch="1"
+							light_anim="ui_pda_contacts" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<texture>ui_icons_newPDA_CrclMiddle_h</texture>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</test>
+	<!----------------------------------------------------------------------------------->
+
+
+	<part_3_jump><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!--Для того чтобы перепрыгнуть невысокое препятствие - нажмите клавишу "пробел" $$ACTION_JUMP$$-->
+			<length_sec>5</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="5000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">jump_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_3_jump>
+
+	<part_4_crouch><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- Для того чтобы пройти под невысоким препятствием - нажмите клавишу "ctrl" $$ACTION_CROUCH$$-->
+			<length_sec>5</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="5000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">crouch_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+
+	</part_4_crouch>
+
+	<part_5_crouch_down><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- Для того чтобы пройти под низким препятствием - нажмите клавишу "ctrl+shift" $$ACTION_CROUCH_DOWN$$-->
+			<length_sec>5</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="5000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">crouch_down_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_5_crouch_down>
+
+	<part_6_radiation><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- Радиация -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">radiation_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_6_radiation>
+
+	<part_7_psy><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- Радиация -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">radiation_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_7_psy>
+
+	<part_8_wound><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- Кровотечения -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">wound_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_8_wound>
+
+	<part_9_weapon><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- Поломка оружия -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">weapon_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_9_weapon>
+
+	<part_10_sprint><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- Бег в спринте -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">sprint_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_10_sprint>
+
+	<part_11_weakness><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- Усталость -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">weakness_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_11_weakness>
+
+	<part_12_relations><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- отношение персонажей -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">relation_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_12_relations>
+
+	<part_14_overload><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- перегрузка -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">overload_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_14_overload>
+
+	<part_15_hide_weapon><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- спрятать/достать оружие -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">hide_weapon_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_15_hide_weapon>
+
+	<part_pda_diary><!--делаю новый туториал-->
+		<global_wnd/>
+
+		<item><!-- спрятать/достать оружие -->
+			<length_sec>10</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key/>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>0</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="712" y="475" width="400" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+					<window_name>w1</window_name>
+					<text font="graffiti22" r="225" g="225" b="250" a="255">pda_diary_tutorial</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</part_pda_diary>
+
+
+	<!-- !!!tutorials for presentation!!! -->
+
+  <after_fight_tutorial>
+    <global_wnd/>
+
+    <item>
+      <length_sec/>
+      <pause_state>off</pause_state>
+      <guard_key>use</guard_key>
+      <sound>characters_voice\scenario\polygon\polygon_win_fight</sound>
+      <cursor_pos/>
+      <pda_section/>
+      <function_on_stop>xr_effects.arena_after_fight</function_on_stop>
+      <grab_input>0</grab_input>
+      <main_wnd>
+        <!--auto_static start_time="0" length_sec="10000" x="500" y="400" width="600" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">after_fight_tutorial</text>
+        </auto_static-->
+        <auto_static start_time="0" length_sec="5000" x="500" y="550" width="550" height="150" alignment="c" stretch="1"
+							light_anim="ui_pda_contacts" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">tutorial_skip</text>
+        </auto_static>
+      </main_wnd>
+    </item>
+  </after_fight_tutorial>
+
+  <after_arena_tutorial>
+    <global_wnd/>
+
+    <item>
+      <length_sec/>
+      <pause_state>on</pause_state>
+      <guard_key>use</guard_key>
+      <sound>characters_voice\scenario\polygon\polygon_complete</sound>
+      <cursor_pos/>
+      <pda_section/>
+      <function_on_stop>xr_effects.arena_after_arena</function_on_stop>
+      <grab_input>0</grab_input>
+      <main_wnd>
+        <auto_static start_time="0" length_sec="10000" x="500" y="400" width="600" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">after_arena_tutorial</text>
+        </auto_static>
+        <auto_static start_time="0" length_sec="5000" x="500" y="550" width="550" height="150" alignment="c" stretch="1"
+							light_anim="ui_pda_contacts" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">arena_restart</text>
+        </auto_static>
+      </main_wnd>
+    </item>
+  </after_arena_tutorial>
+
+  <first_battle_tutorial>
+    <global_wnd/>
+     <!-- <auto_static x="0" y="0" width="1024" height="768" stretch="1">
+        <window_name>back</window_name>
+        <texture>intro\intro_back</texture>
+      </auto_static>
+    </global_wnd-->
+    <item>
+      <length_sec/>
+      <pause_state>on</pause_state>
+      <guard_key>use</guard_key>
+      <sound>characters_voice\scenario\polygon\polygon_intro</sound>
+      <cursor_pos/>
+      <pda_section/>
+      <function_on_stop>xr_effects.arena_camera_begin</function_on_stop>
+      <grab_input>0</grab_input>
+      <main_wnd>
+        <!--auto_static start_time="0" length_sec="10000" x="500" y="250" width="600" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">first_battle_tutorial</text>
+        </auto_static>
+        <auto_static start_time="0" length_sec="10000" x="500" y="400" width="600" height="250" alignment="c" stretch="1"
+             light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">first_battle_tutorial_2</text>
+        </auto_static-->
+        <auto_static start_time="0" length_sec="5000" x="500" y="650" width="550" height="150" alignment="c" stretch="1"
+							light_anim="ui_pda_contacts" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="150" align="c">battle_tutorial_skip</text>
+        </auto_static>
+      </main_wnd>
+    </item>
+  </first_battle_tutorial>
+
+  <second_battle_tutorial>
+    <global_wnd>
+      <auto_static x="0" y="0" width="1024" height="768" stretch="1">
+        <window_name>back</window_name>
+        <texture>intro\intro_back</texture>
+      </auto_static>
+    </global_wnd>
+
+    <item>
+      <length_sec/>
+      <pause_state>on</pause_state>
+      <guard_key>use</guard_key>
+      <sound></sound>
+      <cursor_pos/>
+      <pda_section/>
+      <function_on_stop>xr_effects.arena_camera_begin</function_on_stop>
+      <grab_input>0</grab_input>
+      <main_wnd>
+        <auto_static start_time="0" length_sec="10000" x="500" y="400" width="600" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">second_battle_tutorial</text>
+        </auto_static>
+        <auto_static start_time="0" length_sec="5000" x="500" y="550" width="550" height="150" alignment="c" stretch="1"
+							light_anim="ui_pda_contacts" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti22" r="240" g="217" b="182" a="255" align="c">battle_tutorial_skip</text>
+        </auto_static>
+      </main_wnd>
+    </item>
+  </second_battle_tutorial>
+
+  <third_battle_tutorial>
+    <global_wnd>
+      <auto_static x="0" y="0" width="1024" height="768" stretch="1">
+        <window_name>back</window_name>
+        <texture>intro\intro_back</texture>
+      </auto_static>
+    </global_wnd>
+
+    <item>
+      <length_sec/>
+      <pause_state>on</pause_state>
+      <guard_key>use</guard_key>
+      <sound></sound>
+      <cursor_pos/>
+      <pda_section/>
+      <function_on_stop>xr_effects.arena_camera_begin</function_on_stop>
+      <grab_input>0</grab_input>
+      <main_wnd>
+        <auto_static start_time="0" length_sec="10000" x="500" y="400" width="600" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">third_battle_tutorial</text>
+        </auto_static>
+        <auto_static start_time="0" length_sec="5000" x="500" y="550" width="550" height="150" alignment="c" stretch="1"
+							light_anim="ui_pda_contacts" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti22" r="240" g="217" b="182" a="255" align="c">battle_tutorial_skip</text>
+        </auto_static>
+      </main_wnd>
+    </item>
+  </third_battle_tutorial>
+
+  <fourth_battle_tutorial>
+    <global_wnd>
+      <auto_static x="0" y="0" width="1024" height="768" stretch="1">
+        <window_name>back</window_name>
+        <texture>intro\intro_back</texture>
+      </auto_static>
+    </global_wnd>
+
+    <item>
+      <length_sec/>
+      <pause_state>on</pause_state>
+      <guard_key>use</guard_key>
+      <sound></sound>
+      <cursor_pos/>
+      <pda_section/>
+      <grab_input>0</grab_input>
+      <function_on_stop>xr_effects.arena_camera_begin</function_on_stop>
+      <main_wnd>
+        <auto_static start_time="0" length_sec="10000" x="500" y="400" width="600" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">fourth_battle_tutorial</text>
+        </auto_static>
+        <auto_static start_time="0" length_sec="5000" x="500" y="550" width="550" height="150" alignment="c" stretch="1"
+							light_anim="ui_pda_contacts" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti22" r="240" g="217" b="182" a="255" align="c">battle_tutorial_skip</text>
+        </auto_static>
+      </main_wnd>
+    </item>
+  </fourth_battle_tutorial>
+
+  <fifth_battle_tutorial>
+    <global_wnd>
+      <auto_static x="0" y="0" width="1024" height="768" stretch="1">
+        <window_name>back</window_name>
+        <texture>intro\intro_back</texture>
+      </auto_static>
+    </global_wnd>
+
+    <item>
+      <length_sec/>
+      <pause_state>on</pause_state>
+      <guard_key>use</guard_key>
+      <sound></sound>
+      <cursor_pos/>
+      <pda_section/>
+      <grab_input>0</grab_input>
+      <function_on_stop>xr_effects.arena_camera_begin</function_on_stop>
+      <main_wnd>
+        <auto_static start_time="0" length_sec="10000" x="500" y="400" width="600" height="150" alignment="c" stretch="1"
+							light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti32" r="240" g="217" b="182" a="255" align="c">fifth_battle_tutorial</text>
+        </auto_static>
+        <auto_static start_time="0" length_sec="5000" x="500" y="550" width="550" height="150" alignment="c" stretch="1"
+							light_anim="ui_pda_contacts" la_cyclic="1" la_texture="1" la_alpha="1">
+          <window_name>w1</window_name>
+          <text font="graffiti22" r="240" g="217" b="182" a="255" align="c">battle_tutorial_skip</text>
+        </auto_static>
+      </main_wnd>
+    </item>
+  </fifth_battle_tutorial>
+
+	<game_over>
+	    <global_wnd>
+	        <_auto_static x="0" y="0" width="1024" height="768" stretch="1">
+	            <window_name>back</window_name>
+		        <texture>intro\intro_back</texture>
+	        </_auto_static>
+	    </global_wnd>
+
+		<item>
+			<length_sec>4</length_sec>
+			<pause_state>off</pause_state>
+			<guard_key>jump</guard_key>
+			<function_on_stop>xr_effects.on_tutor_gameover_stop</function_on_stop>
+      <action id="quick_load" finalize="1">xr_effects.on_tutor_gameover_quickload</action>
+			<sound/>
+			<cursor_pos/>
+			<pda_section/>
+			<grab_input>1</grab_input>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="10000" x="350" y="360" width="300" height="60">
+					<window_name>w1</window_name>
+					<text font="graffiti50"  r="255" g="0" b="0" a="255" align="c">st_game_over</text>
+				</auto_static>
+				<auto_static start_time="3" length_sec="10000" x="350" y="660" width="300" height="60" light_anim="ui_pda_contacts" la_cyclic="1" la_text="1" la_alpha="1">
+					<window_name>w2</window_name>
+					<text font="graffiti22"  r="255" g="0" b="0" a="255" align="c">st_game_over_press_jump</text>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</game_over>
+
+#include "ui\ui_credits.xml"
+#include "ui\ui_movies.xml" FOR RUSSIAN ONLY
+<!-- FOR RUSSIAN ONLY-->
+
+	<intro_logo>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+		<play_each_item>1</play_each_item>
+
+		<item type="video">
+			<delay>1</delay>
+			<pause_state>on</pause_state>
+			<sound>characters_voice\scenario\video\thq_logo_audio</sound>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="720" height="484">intro\thq_logo_hyuv</texture>
+			</video_wnd>
+		</item>
+
+		<item type="video">
+			<delay>1</delay>
+			<pause_state>on</pause_state>
+			<sound>characters_voice\scenario\video\intro_gsc_wp</sound>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="800" height="358">intro\intro_gsc-wp</texture>
+			</video_wnd>
+		</item>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\intro_gsc</sound>
+			<delay>1</delay>
+			<pause_state>on</pause_state>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="800" height="358">intro\intro_gsc</texture>
+			</video_wnd>
+		</item>
+
+		<item type="image">
+			<length_sec>9</length_sec>
+			<pause_state>on</pause_state>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="4"  x="0" y="0" width="1024" height="768" stretch="1" light_anim="asus_logo_01" light_anim_cyclic="0" la_alpha="1" la_texture="1">
+					<window_name>w1</window_name>
+					<texture>ui_asus_01</texture>
+				</auto_static>
+				<auto_static start_time="4" length_sec="4"  x="0" y="0" width="1024" height="768" stretch="1" light_anim="asus_logo_01" light_anim_cyclic="0" la_alpha="1" la_texture="1">
+					<window_name>w2</window_name>
+					<texture>ui_asus_02</texture>
+				</auto_static>
+			</main_wnd>
+		</item>
+	</intro_logo>
+
+	<intro_game>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\intro_stalker</sound>
+			<pause_state>on</pause_state>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\intro_stalker</texture>
+			</video_wnd>
+		</item>
+	</intro_game>
+
+
+	<x18_dream>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\dream_rats</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.end_x18_dream</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\dream_rats</texture>
+			</video_wnd>
+		</item>
+	</x18_dream>
+
+	<radar_dream>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\dream_sarcofag</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.end_radar_dream</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\dream_sarcofag</texture>
+			</video_wnd>
+		</item>
+	</radar_dream>
+
+	<yantar_dream>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\dream_doctor</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.end_yantar_dream</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\dream_doctor</texture>
+			</video_wnd>
+		</item>
+	</yantar_dream>
+
+	<mov_desire_1>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\final_blind</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.game_credits</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\final_blind</texture>
+			</video_wnd>
+		</item>
+	</mov_desire_1>
+
+	<mov_desire_2>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\final_gold</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.game_credits</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\final_gold</texture>
+			</video_wnd>
+		</item>
+	</mov_desire_2>
+
+	<mov_desire_3>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\final_to_monolith</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.game_credits</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\final_to_monolith</texture>
+			</video_wnd>
+		</item>
+	</mov_desire_3>
+
+	<mov_desire_4>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\final_apocal</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.game_credits</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\final_apocal</texture>
+			</video_wnd>
+		</item>
+	</mov_desire_4>
+
+	<mov_desire_5>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\final_immortal</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.game_credits</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\final_immortal</texture>
+			</video_wnd>
+		</item>
+	</mov_desire_5>
+
+	<mov_join_osoznanie>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\dream_doctor_2</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.game_credits</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\dream_doctor_2</texture>
+			</video_wnd>
+		</item>
+	</mov_join_osoznanie>
+
+	<mov_refuse_osoznanie>
+		<play_each_item>1</play_each_item>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+				<window_name>back</window_name>
+				<texture>intro\intro_back</texture>
+			</auto_static>
+		</global_wnd>
+
+		<item type="video">
+			<sound>characters_voice\scenario\video\final_peace</sound>
+			<pause_state>on</pause_state>
+			<function_on_stop>xr_effects.game_credits</function_on_stop>
+			<video_wnd x="0" y="0" width="1024" height="768" stretch="1">
+				<texture x="0" y="1" width="512" height="286">intro\final_peace</texture>
+			</video_wnd>
+		</item>
+	</mov_refuse_osoznanie>
+
+
+</window>

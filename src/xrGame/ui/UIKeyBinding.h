@@ -8,12 +8,13 @@
 class CUIXml;
 class CUIScrollView;
 
-class CUIKeyBinding : public CUIWindow, public pureKeyMapChanged
+class CUIKeyBinding final : public CUIWindow, public pureKeyMapChanged
 {
 public:
     CUIKeyBinding();
     ~CUIKeyBinding() override;
     void InitFromXml(CUIXml& xml_doc, LPCSTR path);
+    pcstr GetDebugType() override { return "CUIKeyBinding"; }
 
 protected:
     void FillUpList(CUIXml& xml_doc, LPCSTR path);

@@ -168,6 +168,8 @@ void CLightR_Manager::render_point(u32 _priority)
         if (L->range < 0.01f)
             continue;
 
+        RImplementation.BasicStats.Lights.Begin();
+
         // 1. Calculate light frustum
         Fvector L_dir, L_up, L_right, L_pos;
         Fmatrix L_view, L_project, L_combine;
@@ -223,10 +225,12 @@ void CLightR_Manager::render_point(u32 _priority)
         // 5. Dump sorting tree
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
-            g_hud->Render_Last(dsgraph.context_id);
+            g_pGameLevel->pHUD->Render_Last(dsgraph.context_id);
         dsgraph.render_graph(_priority);
         if (bHUD && _priority == 0)
             dsgraph.render_hud();
+
+        RImplementation.BasicStats.Lights.End();
     }
     // ??? grass ???
 }
@@ -249,6 +253,8 @@ void CLightR_Manager::render_spot(u32 _priority)
         float lc_scale = 1 - lc_dist / lc_limit;
         if (lc_scale < EPS)
             continue;
+
+        RImplementation.BasicStats.Lights.Begin();
 
         // 1. Calculate light frustum
         Fvector L_dir, L_up, L_right, L_pos;
@@ -308,11 +314,13 @@ void CLightR_Manager::render_spot(u32 _priority)
         //RCache.set_ClipPlanes(true,  &L_combine);
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
-            g_hud->Render_Last(dsgraph.context_id);
+            g_pGameLevel->pHUD->Render_Last(dsgraph.context_id);
         dsgraph.render_graph(_priority);
         if (bHUD && _priority == 0)
             dsgraph.render_hud();
         //RCache.set_ClipPlanes(false, &L_combine);
+
+        RImplementation.BasicStats.Lights.End();
     }
     // ??? grass ???l
 }
@@ -365,6 +373,8 @@ void CLightR_Manager::render_ffp_light(const light& L)
     const u32 triCount = static_cast<u32>(XRC.r_count());
     if (0 == triCount)
         return;
+
+    RImplementation.BasicStats.Lights.Begin();
 
     const CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     const Fvector* VERTS = DB->get_verts();
@@ -430,6 +440,8 @@ void CLightR_Manager::render_ffp_light(const light& L)
     RImplementation.Vertex.Unlock(actual * 3, hGeom->vb_stride);
     if (actual)
         RCache.Render(D3DPT_TRIANGLELIST, vOffset, actual);
+
+    RImplementation.BasicStats.Lights.End();
 }
 
 void CLightR_Manager::render(u32 _priority)

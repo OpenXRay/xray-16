@@ -42,7 +42,7 @@ struct i_render_phase
         if (!o.active)
             return;
 
-        main_task = &TaskScheduler->CreateTask(xr_string{ name + "_calculate" }.c_str(), { this, &i_render_phase::calculate_task });
+        main_task = &TaskScheduler->CreateTask("phase_calculate", { this, &i_render_phase::calculate_task });
 
         if (o.mt_calc_enabled)
         {
@@ -72,6 +72,8 @@ struct i_render_phase
         }
 
         flush();
+
+        o.active = false;
     }
 
     void calculate_task(Task&, void*)
@@ -80,7 +82,7 @@ struct i_render_phase
 
         if (o.mt_draw_enabled)
         {
-            draw_task = &TaskScheduler->AddTask(*main_task, xr_string{ name + "_render" }.c_str(), { this, &i_render_phase::render_task });
+            draw_task = &TaskScheduler->AddTask(*main_task, "phase_render", { this, &i_render_phase::render_task });
         }
     }
 
@@ -107,7 +109,7 @@ struct i_render_phase
 
 struct render_main : public i_render_phase
 {
-    explicit render_main(const xr_string& name_in) : i_render_phase(name) {}
+    render_main() : i_render_phase("main_render") {}
 
     void init() override;
     void calculate() override;
@@ -116,7 +118,7 @@ struct render_main : public i_render_phase
 
 struct render_rain : public i_render_phase
 {
-    explicit render_rain(const xr_string& name_in) : i_render_phase(name) {}
+    render_rain() : i_render_phase("rain_render") {}
 
     void init() override;
     void calculate() override;
@@ -125,11 +127,12 @@ struct render_rain : public i_render_phase
 
     light RainLight;
     u32 context_id{ R_dsgraph_structure::INVALID_CONTEXT_ID };
+    float rain_factor{ 0.0f };
 };
 
 struct render_sun : public i_render_phase
 {
-    explicit render_sun(const xr_string& name_in) : i_render_phase(name) {}
+    render_sun() : i_render_phase("sun_render") {}
 
     void init() override;
     void calculate() override;
@@ -148,7 +151,7 @@ struct render_sun : public i_render_phase
 
 struct render_sun_old : public i_render_phase
 {
-    explicit render_sun_old(const xr_string& name_in) : i_render_phase(name) {}
+    render_sun_old() : i_render_phase("sun_render_old") {}
 
     void init() override;
     void calculate() override {}

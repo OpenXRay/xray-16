@@ -83,7 +83,9 @@ void CRender::Render()
     IMainMenu* pMainMenu = g_pGamePersistent ? g_pGamePersistent->m_pMainMenu : 0;
     bool bMenu = pMainMenu ? pMainMenu->CanSkipSceneRendering() : false;
 
-    if (!(g_pGameLevel && g_hud) || bMenu)
+    // XXX: do we need to handle case when there is level, but HUD isn't loaded yet?
+    // if (!(g_pGameLevel && g_hud) || bMenu)
+    if (!g_pGameLevel || bMenu)
     {
 #if defined(USE_DX11) || defined(USE_OGL) // XXX: probably we can just enable this on DX9 too
         Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
@@ -94,7 +96,6 @@ void CRender::Render()
     if (m_bFirstFrameAfterReset)
     {
         m_bFirstFrameAfterReset = false;
-        cleanup_contexts();
         return;
     }
 
@@ -279,7 +280,7 @@ void CRender::Render()
         Target->phase_scene_end();
     }
 
-    if (g_hud && g_hud->RenderActiveItemUIQuery())
+    if (g_pGameLevel->pHUD && g_pGameLevel->pHUD->RenderActiveItemUIQuery())
     {
         Target->phase_wallmarks();
         dsgraph.render_hud_ui();

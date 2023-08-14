@@ -78,10 +78,9 @@ bool CUIXmlInitBase::InitWindow(CUIXml& xml_doc, LPCSTR path, int index, CUIWind
     pWnd->SetWndSize(size);
 
     string512 buf;
-
-    strconcat(sizeof(buf), buf, path, ":window_name");
+    strconcat(buf, path, ":window_name");
     if (xml_doc.NavigateToNode(buf, index))
-        pWnd->SetWindowName(xml_doc.Read(buf, index, NULL));
+        pWnd->SetWindowName(xml_doc.Read(buf, index, nullptr));
 
     InitAutoStaticGroup(xml_doc, path, index, pWnd);
     //.	InitAutoFrameLineGroup		(xml_doc, path, index, pWnd);
@@ -601,7 +600,6 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
             xr_sprintf(buff, "auto_static_%d", cnt_static);
             CUIStatic* pUIStatic = xr_new<CUIStatic>(buff);
             InitStatic(xml_doc, "auto_static", cnt_static, pUIStatic);
-            pUIStatic->SetWindowName(buff);
             pUIStatic->SetAutoDelete(true);
             pParentWnd->AttachChild(pUIStatic);
 
@@ -612,7 +610,6 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
             xr_sprintf(buff, "auto_frameline_%d", cnt_frameline);
             CUIFrameLineWnd* pUIFrameline = xr_new<CUIFrameLineWnd>(buff);
             InitFrameLine(xml_doc, "auto_frameline", cnt_frameline, pUIFrameline);
-            pUIFrameline->SetWindowName(buff);
             pUIFrameline->SetAutoDelete(true);
             pParentWnd->AttachChild(pUIFrameline);
 

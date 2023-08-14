@@ -25,7 +25,7 @@ class CUIFrameWindow;
 class UIInvUpgPropertiesWnd;
 class CInventoryItem;
 
-class UIInvUpgradeInfo : public CUIWindow
+class UIInvUpgradeInfo final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -33,24 +33,25 @@ private:
 
 public:
     UIInvUpgradeInfo();
-    virtual ~UIInvUpgradeInfo();
 
     void init_from_xml(LPCSTR xml_name);
     bool init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item);
-    bool is_upgrade() { return (m_upgrade != NULL); }
+    bool is_upgrade() const { return m_upgrade != nullptr; }
     IC Upgrade_type const* get_upgrade() const { return m_upgrade; }
     virtual void Draw();
 
+    pcstr GetDebugType() override { return "UIInvUpgradeInfo"; }
+
 protected:
-    Upgrade_type* m_upgrade;
-    CUIFrameWindow* m_background;
+    Upgrade_type* m_upgrade{};
+    CUIFrameWindow* m_background{};
 
-    UIInvUpgPropertiesWnd* m_properties_wnd;
+    UIInvUpgPropertiesWnd* m_properties_wnd{};
 
-    CUIStatic* m_name;
-    CUIStatic* m_cost;
-    CUIStatic* m_desc;
-    CUIStatic* m_prereq;
+    CUIStatic* m_name{};
+    CUIStatic* m_cost{};
+    CUIStatic* m_desc{};
+    CUIStatic* m_prereq{};
 
 }; // class UIInvUpgradeInfo
 

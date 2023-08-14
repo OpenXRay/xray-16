@@ -78,6 +78,17 @@ void UITaskListWnd::OnMouseScroll(float iDirection)
     else if (iDirection == WINDOW_MOUSE_WHEEL_DOWN)
         m_list->ScrollBar()->TryScrollInc();
 }
+
+bool UITaskListWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    return inherited::OnKeyboardAction(dik, keyboard_action);
+}
+
+bool UITaskListWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    return inherited::OnControllerAction(axis, x, y, controller_action);
+}
+
 void UITaskListWnd::Show(bool status)
 {
     inherited::Show(status);

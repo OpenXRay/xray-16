@@ -8,17 +8,20 @@ class CUI3tButton;
 class CUIListBox;
 class CUIFrameWindow;
 
-class CUIVote : public CUIDialogWnd
+class CUIVote final : public CUIDialogWnd
 {
 public:
     CUIVote();
+
     void Init();
-    virtual void Update();
-    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0);
+    void Update() override;
+    void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0) override;
     void OnBtnYes();
     void OnBtnNo();
     void OnBtnCancel();
     void SetVoting(LPCSTR txt);
+
+    pcstr GetDebugType() override { return "CUIVote"; }
 
 protected:
     CUITextWnd* msg;

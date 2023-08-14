@@ -275,7 +275,7 @@ void CRenderDevice::ProcessFrame()
     if (GEnv.isDedicatedServer)
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
 
-    else if (Paused())
+    else if (Paused() || g_pGameLevel == nullptr)
         updateDelta = 1000 / g_menu_fps_limit;
 
     if (frameTime < updateDelta)

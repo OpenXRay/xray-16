@@ -26,7 +26,7 @@ CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* 
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = xr_new<CUIWindow>("<noname>");
+    auto ui = xr_new<CUIWindow>(ui_path);
     if (!CUIXmlInit::InitWindow(xml, ui_path, 0, ui, critical) && !critical)
     {
         xr_delete(ui);
@@ -50,7 +50,9 @@ CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, int index, CUIWin
     if (!critical && !xml.NavigateToNode(ui_path, index))
         return nullptr;
 
-    auto ui = xr_new<CUIStatic>("CUIStatic");
+    string256 temp;
+    xr_sprintf(temp, "%s (%d)", ui_path, index);
+    auto ui = xr_new<CUIStatic>(temp);
     if (!CUIXmlInit::InitStatic(xml, ui_path, index, ui, critical) && !critical)
     {
         xr_delete(ui);
@@ -164,7 +166,7 @@ CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindo
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = xr_new<CUIFrameLineWnd>("CUIFrameLineWnd");
+    auto ui = xr_new<CUIFrameLineWnd>(ui_path);
     if (!CUIXmlInit::InitFrameLine(xml, ui_path, 0, ui, critical) && !critical)
     {
         xr_delete(ui);
@@ -202,7 +204,7 @@ CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWind
     if (!critical && !xml.NavigateToNode(ui_path, 0))
         return nullptr;
 
-    auto ui = xr_new<CUIFrameWindow>();
+    auto ui = xr_new<CUIFrameWindow>(ui_path);
     if (!CUIXmlInit::InitFrameWindow(xml, ui_path, 0, ui, critical) && !critical)
     {
         xr_delete(ui);

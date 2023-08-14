@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<window>
+	<team_selector x="144" y="115" width="749" height="543">
+		<background x="0" y="0" width="749" height="543">
+			<texture>ui_frame_mainDes</texture>
+		</background>
+		<caption x="42" y="4" width="330" height="32">
+			<text font="graffiti22" r="192" g="168" b="144" vert_align="c">mp_team_selection</text>
+		</caption>
+		<image_frames_tl x="53" y="56" width="332" height="57">
+			<texture>ui_TV_team_tl</texture>
+		</image_frames_tl>
+		<image_frames_tr x="385" y="56" width="332" height="57">
+			<texture>ui_TV_team_tr</texture>
+		</image_frames_tr>
+		<image_frames_bottom x="53" y="113" width="664" height="208">
+			<texture>ui_TV_team_bottom</texture>
+		</image_frames_bottom>
+		<image_0 x="80" y="69" width="293" height="219" stretch="1">
+			<texture>freedom_big</texture>
+			<!--text font="graffiti32" align="r" vert_align="t">1</text-->
+		</image_0>
+		<image_1 x="391" y="69" width="293" height="219" stretch="1">
+			<texture>merc_big</texture>
+			<!--text font="graffiti32" align="r" vert_align="t">2</text-->
+		</image_1>				
+		<text_desc x="72" y="331" width="620" height="160" complex_mode="1">
+			<text font="graffiti22" r="192" g="168" b="144">team_1_name</text>
+			<text>\n </text>
+			<text r="106" g="95" b="91">team_1_desc</text>
+			<text>\n </text>
+			<text font="graffiti22" r="192" g="168" b="144">team_2_name</text>
+			<text r="106" g="95" b="91">team_2_desc</text>
+		</text_desc>
+		
+		<btn_back x="51" y="504" width="157" height="48">
+			<texture>ui_button_main01</texture>
+			<text font="graffiti19" align="c">mp_back</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>				
+				<t r="180" g="153" b="155"/>				
+				<d r="106" g="95" b="91"/>							
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_back>		
+		<btn_autoselect x="394" y="504" width="157" height="48">
+			<texture>ui_button_main02</texture>
+			<text font="graffiti19" align="c">mp_auto_select</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>				
+				<t r="180" g="153" b="155"/>				
+				<d r="106" g="95" b="91"/>							
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_autoselect>
+		<btn_spectator x="551" y="504" width="157" height="48">
+			<texture>ui_button_main03</texture>
+			<text font="graffiti19" align="c">mp_spectator</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>				
+				<t r="180" g="153" b="155"/>				
+				<d r="106" g="95" b="91"/>							
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_spectator>
+	</team_selector>
+</window>

@@ -7,6 +7,8 @@ void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& 
 
     GLenum buffers[3] = {GL_NONE, GL_NONE, GL_NONE};
 
+    cmd_list.set_FB(HW.pFB);
+
     if (_1)
     {
         dwWidth[cmd_list.context_id]  = _1->dwWidth;
@@ -97,6 +99,8 @@ void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& 
 
     GLenum buffers[3] = {GL_NONE, GL_NONE, GL_NONE};
 
+    cmd_list.set_FB(HW.pFB);
+
     if (_1)
     {
         dwWidth[cmd_list.context_id]  = _1->dwWidth;
@@ -172,6 +176,8 @@ void CRenderTarget::u_setrt(CBackend& cmd_list, u32 W, u32 H, GLuint _1, GLuint 
         (GLenum)(_2 ? GL_COLOR_ATTACHMENT1 : GL_NONE),
         (GLenum)(_3 ? GL_COLOR_ATTACHMENT2 : GL_NONE)
     };
+
+    cmd_list.set_FB(HW.pFB);
 
     cmd_list.set_RT(_1, 0);
     cmd_list.set_RT(_2, 1);

@@ -124,19 +124,72 @@ enum EGameActions : u32
     kCUSTOM14,
     kCUSTOM15,
 
-    kPDA_TAB1,
-    kPDA_TAB2,
-    kPDA_TAB3,
-    kPDA_TAB4,
-    kPDA_TAB5,
-    kPDA_TAB6,
-
     kKICK, // alpet: kick dynamic objects
 
     kEDITOR,
 
+    // Contextual actions:
+    // UI
+    kUI_MOVE,
+    kUI_MOVE_LEFT,
+    kUI_MOVE_RIGHT,
+    kUI_MOVE_UP,
+    kUI_MOVE_DOWN,
+
+    kUI_MOVE_SECONDARY,
+
+    kUI_ACCEPT,
+    kUI_BACK,
+    kUI_ACTION_1,
+    kUI_ACTION_2,
+
+    kUI_TAB_PREV,
+    kUI_TAB_NEXT,
+
+    kUI_BUTTON_1,
+    kUI_BUTTON_2,
+    kUI_BUTTON_3,
+    kUI_BUTTON_4,
+    kUI_BUTTON_5,
+    kUI_BUTTON_6,
+    kUI_BUTTON_7,
+    kUI_BUTTON_8,
+    kUI_BUTTON_9,
+    kUI_BUTTON_0,
+
+    // PDA:
+    kPDA_MAP_MOVE, // gamepad axis
+    kPDA_MAP_MOVE_LEFT,
+    kPDA_MAP_MOVE_RIGHT,
+    kPDA_MAP_MOVE_UP,
+    kPDA_MAP_MOVE_DOWN,
+
+    kPDA_MAP_ZOOM_IN,
+    kPDA_MAP_ZOOM_OUT,
+    kPDA_MAP_ZOOM_RESET,
+
+    kPDA_MAP_SHOW_ACTOR,
+    kPDA_MAP_SHOW_LEGEND,
+
+    kPDA_FILTER_TOGGLE,
+    kPDA_TASKS_TOGGLE,
+
+    // Talk:
+    kTALK_SWITCH_TO_TRADE, // _OR_UPGRADE
+    kTALK_LOG_SCROLL,
+    kTALK_LOG_SCROLL_UP,
+    kTALK_LOG_SCROLL_DOWN,
+
     kLASTACTION,
     kNOTBINDED
+};
+
+enum class EKeyContext
+{
+    Undefined = 0, // default behaviour
+    UI, // UI overall
+    PDA,
+    Talk,
 };
 
 constexpr char GAME_ACTION_MARK = 27; // escape symbol
@@ -160,6 +213,7 @@ struct game_action
     pcstr action_name;
     EGameActions id;
     EKeyGroup key_group;
+    EKeyContext key_context{ EKeyContext::Undefined };
 };
 
 #define bindtypes_count 3
@@ -177,6 +231,7 @@ extern ENGINE_API keyboard_key keyboards[];
 extern ENGINE_API key_binding g_key_bindings[];
 
 ENGINE_API bool IsGroupNotConflicted(EKeyGroup g1, EKeyGroup g2);
+ENGINE_API bool IsContextNotConflicted(EKeyContext c1, EKeyContext c2);
 
 ENGINE_API pcstr IdToActionName(EGameActions id);
 ENGINE_API EGameActions ActionNameToId(pcstr name);
@@ -187,9 +242,9 @@ ENGINE_API int KeynameToDik(pcstr name);
 ENGINE_API keyboard_key* KeynameToPtr(pcstr name);
 ENGINE_API keyboard_key* DikToPtr(int dik, bool safe);
 
-ENGINE_API bool IsBinded(EGameActions action_id, int dik);
+ENGINE_API bool IsBinded(EGameActions action_id, int dik, EKeyContext context = EKeyContext::Undefined);
 ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);
-ENGINE_API EGameActions GetBindedAction(int dik);
+ENGINE_API EGameActions GetBindedAction(int dik, EKeyContext context = EKeyContext::Undefined);
 
 ENGINE_API pcstr GetActionBinding(EGameActions action);
 

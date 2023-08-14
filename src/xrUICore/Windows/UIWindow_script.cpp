@@ -60,15 +60,10 @@ SCRIPT_EXPORT(UIStyleManager, (),
             .def("GetAllStyles", &UIStyleManager::GetToken, return_stl_iterator())
             .def("DefaultStyleIsSet", &UIStyleManager::DefaultStyleIsSet)
             .def("GetCurrentStyleId", &UIStyleManager::GetCurrentStyleId)
-
-            .def("SetStyle",        &UIStyleManager::SetupStyle)
-            .def("SetStyle",        +[](UIStyleManager* self, u32 styleID, bool reloadUI)
-            {
-                self->SetupStyle(styleID);
-
-                if (reloadUI)
-                    self->Reset();
-            }),
+            .def("GetCurrentStyleName", &UIStyleManager::GetCurrentStyleName)
+            .def("SetStyle", &UIStyleManager::SetStyle)
+            .def("SetupStyle", &UIStyleManager::SetupStyle)
+            .def("ResetUI", &UIStyleManager::Reset),
 
         def("GetUIStyleManager", +[] { return UIStyles; })
     ];
@@ -119,10 +114,11 @@ SCRIPT_EXPORT(CUITextureMaster, (),
 
 // We don't change game assets.
 // This class allowes original game scripts to not specify the window name.
-class CUIWindowScript : public CUIWindow
+class CUIWindowScript final : public CUIWindow
 {
 public:
-    CUIWindowScript() : CUIWindow("CUIWindowScript") {}
+    CUIWindowScript() : CUIWindow(CUIWindowScript::GetDebugType()) {}
+    pcstr GetDebugType() override { return "CUIWindowScript"; }
 };
 
 SCRIPT_EXPORT(CUIWindow, (),
@@ -156,7 +152,7 @@ SCRIPT_EXPORT(CUIWindow, (),
                 const Frect rect { x, y, width, height };
                 self->SetWndRect(rect);
             })
-            
+
             .def("SetWndSize", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndSize_script)
 
             .def("GetWndPos", +[](CUIWindow* w) -> Fvector2 { return w->GetWndPos(); })
@@ -201,10 +197,19 @@ SCRIPT_EXPORT(CUIFrameWindow, (CUIWindow),
     using namespace luabind;
     using namespace luabind::policy;
 
+    // We don't change game assets.
+    // This class allowes original game scripts to not specify the window name.
+    class CUIFrameWindowScript final : public CUIFrameWindow
+    {
+    public:
+        CUIFrameWindowScript() : CUIFrameWindow(CUIFrameWindowScript::GetDebugType()) {}
+        pcstr GetDebugType() override { return "CUIFrameWindowScript"; }
+    };
+
     module(luaState)
     [
-        class_<CUIFrameWindow, CUIWindow>("CUIFrameWindow")
-            .def(constructor<>())
+        class_<CUIFrameWindow, CUIWindow>("CUIFrameWindowBase")
+            .def(constructor<pcstr>())
             .def("SetWidth", &CUIFrameWindow::SetWidth)
             .def("SetHeight", &CUIFrameWindow::SetHeight)
             .def("SetColor", &CUIFrameWindow::SetTextureColor)
@@ -213,7 +218,9 @@ SCRIPT_EXPORT(CUIFrameWindow, (CUIWindow),
                 const Frect rect { x, y, width, height };
                 self->SetWndRect(rect);
                 self->InitTexture(texture);
-            })
+            }),
+        class_<CUIFrameWindowScript, CUIFrameWindow>("CUIFrameWindow")
+            .def(constructor<>())
     ];
 });
 
@@ -224,10 +231,11 @@ SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow),
 
     // We don't change game assets.
     // This class allowes original game scripts to not specify the window name.
-    class CUIFrameLineWndScript : public CUIFrameLineWnd
+    class CUIFrameLineWndScript final : public CUIFrameLineWnd
     {
     public:
-        CUIFrameLineWndScript() : CUIFrameLineWnd("CUIFrameLineWndScript") {}
+        CUIFrameLineWndScript() : CUIFrameLineWnd(CUIFrameLineWndScript::GetDebugType()) {}
+        pcstr GetDebugType() override { return "CUIFrameLineWndScript"; }
     };
 
     module(luaState)
@@ -244,7 +252,7 @@ SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow),
                 self->InitFrameLineWnd(texture, pos, size, horizontal);
             }),
         class_<CUIFrameLineWndScript, CUIFrameLineWnd>("CUIFrameLineWnd")
-            .def(constructor<>()) 
+            .def(constructor<>())
     ];
 });
 

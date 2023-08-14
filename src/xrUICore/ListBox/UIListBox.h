@@ -3,7 +3,7 @@
 
 class CUIListBoxItem;
 
-class XRUICORE_API CUIListBox : public CUIScrollView
+class XRUICORE_API CUIListBox final : public CUIScrollView
 {
 public:
     CUIListBox();
@@ -40,6 +40,8 @@ public:
     u32 GetTextColor();
     void SetFont(CGameFont* pFont);
     CGameFont* GetFont();
+
+    pcstr GetDebugType() override { return "CUIListBox"; }
 
 protected:
     CGameFont* m_pFont;

@@ -6,7 +6,7 @@ class XRUICORE_API CUIFrameWindow : public CUIWindow, public ITextureOwner
     typedef CUIWindow inherited;
 
 public:
-    CUIFrameWindow();
+    CUIFrameWindow(pcstr window_name);
 
     virtual void SetTextureRect(const Frect& r){};
     virtual const Frect& GetTextureRect() const { return m_tex_rect[fmBK]; }
@@ -20,6 +20,8 @@ public:
     virtual void SetStretchTexture(bool stretch) {}
     virtual bool GetStretchTexture() { return false; };
     virtual void Draw();
+
+    pcstr GetDebugType() override { return "CUIFrameWindow"; }
 
 protected:
     bool m_bTextureVisible;

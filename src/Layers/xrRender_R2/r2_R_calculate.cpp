@@ -74,11 +74,13 @@ void CRender::Calculate()
     r_ssaHZBvsTEX = _sqr(ps_r__ssaHZBvsTEX / 3) / g_fSCREEN;
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
 
-    
     // Configure
     o.distortion    = o.distortion_enabled;
     o.mt_calculate  = ps_r2_mt_calculate > 0;
     o.mt_render     = ps_r2_mt_render > 0;
+
+    if (m_bFirstFrameAfterReset)
+        return;
 
     auto& dsgraph_main = get_imm_context();
 

@@ -108,7 +108,7 @@ void CInventoryItem::Load(LPCSTR section)
     m_ItemCurrPlace.base_slot_id = (sl == u32(-1)) ? 0 : (sl + 1);
 
     // Description
-    if (pSettings->line_exist(section, "description"))
+    if (pSettings->line_exist(section, DESCRIPTION_KEY))
         m_Description = StringTable().translate(pSettings->r_string(section, DESCRIPTION_KEY));
     else
         m_Description = "";
@@ -135,7 +135,7 @@ void CInventoryItem::ReloadNames()
 {
     m_name = StringTable().translate(pSettings->r_string(m_object->cNameSect(), INV_NAME_KEY));
     m_nameShort = StringTable().translate(pSettings->r_string(m_object->cNameSect(), INV_NAME_SHORT_KEY));
-    if (pSettings->line_exist(m_object->cNameSect(), "description"))
+    if (pSettings->line_exist(m_object->cNameSect(), DESCRIPTION_KEY))
         m_Description = StringTable().translate(pSettings->r_string(m_object->cNameSect(), DESCRIPTION_KEY));
     else
         m_Description = "";

@@ -2,7 +2,7 @@
 #include "UIBuyWndShared.h"
 #include "UIMpTradeWnd.h"
 
-extern LPCSTR _list_names[];
+extern pcstr _list_names[];
 
 void CItemMgr::Load(const shared_str& sect_cost)
 {
