@@ -22,7 +22,7 @@
 		<text>Erstelle neues Spiel</text>
 	</string>
 	<string id="ui_mm_always_active">
-		<text>Immer aktiv</text>
+		<text>Nicht pausieren bei Alt+Tab</text>
 	</string>
 	<string id="ui_mm_detail_radius">
 		<text>Grasdetail Radius</text>

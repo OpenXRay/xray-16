@@ -28,7 +28,7 @@
 		<text>Creating new game</text>
 	</string>
 	<string id="ui_mm_always_active">
-		<text>Always active</text>
+		<text>Don't pause on Alt+Tab</text>
 	</string>
 	<string id="ui_mm_detail_radius">
 		<text>Grass detail radius</text>
