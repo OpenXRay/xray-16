@@ -238,14 +238,6 @@
             <options_item entry="r2_detail_bump" group="mm_opt_video"/>
         </check_r2_detail_bump>
 
-        <cap_r2_fxaa x="16" y="3" width="108" height="24">
-            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r2_fxaa</text>
-        </cap_r2_fxaa>
-        <check_r2_fxaa x="133" y="0" width="35" stretch="1" height="29">
-	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="r2_fxaa" group="mm_opt_video" depend="runtime"/>
-        </check_r2_fxaa>
-
         <cap_r2_steep_parallax x="16" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r2_steep_parallax</text>
         </cap_r2_steep_parallax>
@@ -286,15 +278,6 @@
 	        <texture>ui_inGame2_checkbox</texture>
             <options_item entry="r3_dynamic_wet_surfaces" group="mm_opt_video"/>
         </check_r3_dynamic_wet_surfaces>
-
-        <cap_r3_dynamic_wet_surfaces_opt x="16" y="3" width="108" height="24">
-            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r3_dynamic_wet_surfaces_opt</text>
-        </cap_r3_dynamic_wet_surfaces_opt>
-
-        <check_r3_dynamic_wet_surfaces_opt x="133" y="0" width="35" stretch="1" height="29">
-	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="r3_dynamic_wet_surfaces_opt" group="mm_opt_video" is_integer="1" depend="vid"/>
-        </check_r3_dynamic_wet_surfaces_opt>
 
         <cap_r3_dynamic_wet_surfaces_near x="16" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_r3_dynamic_wet_surfaces_near</text>

@@ -48,14 +48,8 @@
 	<string id="renderer_gl">
 		<text>Rozsz. pe³ne oœw. dynam. (OpenGL)</text>
 	</string>
-	<string id="ui_mm_r2_fxaa">
-		<text>FXAA</text>
-	</string>
 	<string id="ui_mm_r2_smap_size">
 		<text>Jakoœæ cieni map</text>
-	</string>
-	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
-		<text>Optymalizacja mokrych pow.</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
 		<text>Mokre pow. na blisk. odleg³oœci</text>

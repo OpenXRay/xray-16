@@ -51,14 +51,8 @@
 	<string id="renderer_gl">
 		<text>Enhanced full dyn. lighting (OpenGL)</text>
 	</string>
-	<string id="ui_mm_r2_fxaa">
-		<text>FXAA</text>
-	</string>
 	<string id="ui_mm_r2_smap_size">
 		<text>Shadow map quality</text>
-	</string>
-	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
-		<text>Wet surfaces optimization</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
 		<text>Wet surfaces near dist.</text>
