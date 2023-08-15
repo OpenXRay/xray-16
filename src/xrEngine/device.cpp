@@ -32,7 +32,9 @@ ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
 ENGINE_API bool g_bRendering = false;
-ENGINE_API int g_menu_fps_limit = 60;
+
+int ps_fps_limit = 501;
+int ps_fps_limit_in_menu = 60;
 
 const u32 CRenderDeviceData::MaximalWaitTime = 16;
 constexpr size_t MAX_WINDOW_EVENTS = 32;
@@ -270,13 +272,13 @@ void CRenderDevice::ProcessFrame()
     const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
     const u64 frameTime = frameEndTime - frameStartTime;
 
-    u32 updateDelta = 1; // 1 ms
+    u32 updateDelta = 1000 / ps_fps_limit;
 
     if (GEnv.isDedicatedServer)
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
 
     else if (Paused() || g_pGameLevel == nullptr)
-        updateDelta = 1000 / g_menu_fps_limit;
+        updateDelta = 1000 / ps_fps_limit_in_menu;
 
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);
