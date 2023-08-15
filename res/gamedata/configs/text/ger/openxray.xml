@@ -66,6 +66,12 @@
 	<string id="ui_mm_fov">
 		<text>Blickwinkel (FOV)</text>
 	</string>
+	<string id="ui_mm_fps_limit">
+		<text>Spiel-FPS-Limit</text>
+	</string>
+	<string id="ui_mm_fps_limit_in_menu">
+		<text>Menü-FPS-Limit</text>
+	</string>
 	<string id="ui_mm_localization">
 		<text>Sprache</text>
 	</string>

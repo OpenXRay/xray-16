@@ -78,6 +78,12 @@
 	<string id="ui_mm_gamepad_setup">
 		<text>Konfiguracja gamepada</text>
 	</string>
+	<string id="ui_mm_fps_limit">
+		<text>Limit FPS w grze</text>
+	</string>
+	<string id="ui_mm_fps_limit_in_menu">
+		<text>Limit FPS w menu</text>
+	</string>
 	<string id="eng">
 		<text>Angielski (English)</text>
 	</string>
