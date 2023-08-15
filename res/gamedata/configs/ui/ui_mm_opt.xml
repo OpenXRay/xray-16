@@ -356,14 +356,6 @@
             <options_item entry="rs_v_sync" group="mm_opt_video_adv" depend="vid"/>
         </check_vsync>
 
-        <cap_60hz x="20" y="3" width="135" height="24">
-            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_60_hz</text>
-        </cap_60hz>
-        <check_60hz x="167" y="0" width="44" height="29">
-	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="rs_refresh_60hz" group="mm_opt_video_adv" depend="vid"/>
-        </check_60hz>
-
         <cap_always_active x="20" y="3" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_always_active</text>
         </cap_always_active>
