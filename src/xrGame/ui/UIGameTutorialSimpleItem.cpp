@@ -44,6 +44,7 @@ CUIWindow* find_child_window(CUIWindow* parent, const shared_str& _name)
     for (; _I != _E; ++_I)
         if ((*_I)->WindowName() == _name)
             return (*_I);
+
     return nullptr;
 }
 
@@ -123,7 +124,11 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
         _si->m_visible = false;
         _si->m_wnd = smart_cast<CUIStatic*>(find_child_window(m_UIWindow, sname));
-        VERIFY(_si->m_wnd);
+        if (!_si->m_wnd)
+        {
+            Msg("Skipping SubItem: %s", sname);
+            continue;
+        }
 
         _si->m_wnd->TextItemControl()->SetTextComplexMode(true);
         _si->m_wnd->Show(false);
@@ -160,15 +165,21 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
 void CUISequenceSimpleItem::SSubItem::Start()
 {
-    m_wnd->Show(true);
-    m_wnd->ResetColorAnimation();
-    m_visible = true;
+    if (m_wnd)
+    {
+        m_wnd->Show(true);
+        m_wnd->ResetColorAnimation();
+        m_visible = true;
+    }
 }
 
 void CUISequenceSimpleItem::SSubItem::Stop()
 {
-    m_wnd->Show(false);
-    m_visible = false;
+    if (m_wnd)
+    {
+        m_wnd->Show(false);
+        m_visible = false;
+    }
 }
 
 void CUISequenceSimpleItem::OnRender()
