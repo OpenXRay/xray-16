@@ -83,6 +83,7 @@ constexpr float default_feedback_duration = 0.2f;
 
 extern float cammera_into_collision_shift;
 extern int g_first_person_death;
+extern float g_first_person_body_offset;
 
 string32 ACTOR_DEFS::g_quick_use_slots[4] = {};
 // skeleton
@@ -1519,7 +1520,7 @@ void CActor::renderable_Render(u32 context_id, IRenderable* root)
 
     if (m_firstPersonBody && psActorFlags.test(AF_FIRST_PERSON_BODY) && cam_active == eacFirstEye)
     {
-        MakeMeCrow();
+        ScopeLock lock{ &render_lock };
         GEnv.Render->add_Visual(context_id, root, Visual(), firstPersonBodyXform);
         Visual()->getVisData().hom_frame = Device.dwFrame;
     }
@@ -1537,9 +1538,10 @@ bool CActor::renderable_ShadowGenerate()
     return inherited::renderable_ShadowGenerate();
 }
 
-extern float g_first_person_body_offset;
 void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
 {
+    ScopeLock lock{ &render_lock };
+
     if (!(psActorFlags.test(AF_FIRST_PERSON_BODY) && cam_active == eacFirstEye))
         return;
 

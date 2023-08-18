@@ -109,6 +109,7 @@ public:
     xr_unordered_map<u16, bool> m_firstPersonBodyBonesToIgnoreAnims;
     Fmatrix firstPersonBodyXform{};
     Fmatrix headPosition{};
+    Lock render_lock{};
 
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
         const Fvector& position, float power) override;
