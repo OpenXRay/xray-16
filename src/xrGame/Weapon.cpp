@@ -190,7 +190,7 @@ void CWeapon::UpdateXForm()
     }
 
     if (auto actorOwner = smart_cast<CActor*>(H_Parent()))
-        if ((psActorFlags.test(AF_FIRST_PERSON_BODY)) && actorOwner->active_cam() == eacFirstEye)
+        if (actorOwner->FirstPersonBodyActive())
         {
             Fvector camdir = { actorOwner->cam_Active()->Direction().x, 0.f, actorOwner->cam_Active()->Direction().z }; // ignore Y (vertical) value
             mRes.c.add(camdir.normalize().mul(g_first_person_body_offset)); // push model back so it doesn't look weird (default value: -0.75f)

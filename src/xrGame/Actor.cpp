@@ -1518,7 +1518,7 @@ void CActor::renderable_Render(u32 context_id, IRenderable* root)
 {
     VERIFY(_valid(XFORM()));
 
-    if (m_firstPersonBody && psActorFlags.test(AF_FIRST_PERSON_BODY) && cam_active == eacFirstEye)
+    if (FirstPersonBodyActive())
     {
         ScopeLock lock{ &render_lock };
         GEnv.Render->add_Visual(context_id, root, Visual(), firstPersonBodyXform);
@@ -1538,11 +1538,21 @@ bool CActor::renderable_ShadowGenerate()
     return inherited::renderable_ShadowGenerate();
 }
 
+bool CActor::FirstPersonBodyEnabled()
+{
+    return psActorFlags.test(AF_FIRST_PERSON_BODY) && cam_active == eacFirstEye;
+}
+
+bool CActor::FirstPersonBodyActive() 
+{
+    return m_firstPersonBody && FirstPersonBodyEnabled();
+}
+
 void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
 {
     ScopeLock lock{ &render_lock };
 
-    if (!(psActorFlags.test(AF_FIRST_PERSON_BODY) && cam_active == eacFirstEye))
+    if (!FirstPersonBodyEnabled())
         return;
 
     if (!m_firstPersonBody) // initialize first person body if necessary
