@@ -367,7 +367,6 @@ void CActor::cam_Update(float dt, float fFOV)
         if (!g_Alive()) //first person death cam
         {
             point = m_firstPersonCameraXform.c;
-            dangle = m_firstPersonCameraXform.k;
         }
         else
         {
@@ -379,6 +378,10 @@ void CActor::cam_Update(float dt, float fFOV)
     }
 
     C->Update(point, dangle);
+
+    if (psActorFlags.test(AF_FIRST_PERSON_BODY) && eacFirstEye == cam_active && !g_Alive()) // manually update position for first person death because it gets overridden in `Update`
+        C->vDirection.set(m_firstPersonCameraXform.k);
+
     C->f_fov = fFOV;
 
     if (eacFirstEye != cam_active)
