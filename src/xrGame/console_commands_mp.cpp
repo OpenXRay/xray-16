@@ -168,7 +168,15 @@ public:
     virtual void Execute(LPCSTR args)
     {
         if (IsGameTypeSingle())
+        {
+#ifdef DEBUG
+            IGameObject* l_pObj = Level().CurrentControlEntity();
+            CEntity* l_pPlayer = smart_cast<CEntity*>(l_pObj);
+            if (l_pPlayer)
+                l_pPlayer->KillEntity(l_pPlayer->ID());
+#endif
             return;
+        }
         if (!g_pGameLevel)
             return;
         if (Game().local_player && Game().local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
