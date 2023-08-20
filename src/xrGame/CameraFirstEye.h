@@ -9,6 +9,7 @@ class CCameraFirstEye : public CCameraBase
     Fvector lookat_point;
     bool lookat_active;
     void UpdateLookat();
+    void UpdateFirstPerson(Fvector& point, Fvector& noise_dangle);
 
 public:
     CCameraFirstEye(IGameObject* p, u32 flags = 0);

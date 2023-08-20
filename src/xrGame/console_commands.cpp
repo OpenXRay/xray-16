@@ -112,7 +112,7 @@ int g_first_person_death = 0;
 int g_normalize_mouse_sens = 0;
 int g_normalize_upgrade_mouse_sens = 0;
 
-float g_first_person_body_offset = -0.75f;
+Fvector g_first_person_cam_offset = { 0.f, 0.f, 0.f };
 
 void register_mp_console_commands();
 //-----------------------------------------------------------
@@ -2298,7 +2298,7 @@ void CCC_RegisterCommands()
 
     CMD3(CCC_Mask, "ai_use_torch_dynamic_lights", &g_uCommonFlags, flAiUseTorchDynamicLights);
 
-    CMD4(CCC_Float, "g_first_person_body_offset", &g_first_person_body_offset, -10.f, 10.f);
+    CMD4(CCC_Vector3, "g_first_person_cam_offset", &g_first_person_cam_offset, Fvector().set(-10, -10, -10), Fvector().set(10, 10, 10));
 
 #ifndef MASTER_GOLD
     CMD4(CCC_Vector3, "psp_cam_offset", &CCameraLook2::m_cam_offset, Fvector().set(-1000, -1000, -1000),

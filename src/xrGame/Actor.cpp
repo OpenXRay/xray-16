@@ -83,7 +83,6 @@ constexpr float default_feedback_duration = 0.2f;
 
 extern float cammera_into_collision_shift;
 extern int g_first_person_death;
-extern float g_first_person_body_offset;
 
 string32 ACTOR_DEFS::g_quick_use_slots[4] = {};
 // skeleton
@@ -1517,16 +1516,7 @@ void CActor::shedule_Update(u32 DT)
 void CActor::renderable_Render(u32 context_id, IRenderable* root)
 {
     VERIFY(_valid(XFORM()));
-
-    if (FirstPersonBodyActive())
-    {
-        ScopeLock lock{ &render_lock };
-        GEnv.Render->add_Visual(context_id, root, Visual(), firstPersonBodyXform);
-        Visual()->getVisData().hom_frame = Device.dwFrame;
-    }
-    else
-        inherited::renderable_Render(context_id, root);
-
+    inherited::renderable_Render(context_id, root);
     CInventoryOwner::renderable_Render(context_id, root);
 }
 
@@ -1567,11 +1557,10 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
 
     // adjust body position
     Fvector camdir = { cam_Active()->Direction().x, 0.f, cam_Active()->Direction().z }; // ignore Y (vertical) value
-    firstPersonBodyXform = XFORM();
-    firstPersonBodyXform.translate_add(camdir.normalize().mul(g_first_person_body_offset));
+    m_firstPersonBodyXform = XFORM();
 
     // Add body to render
-    GEnv.Render->add_Visual(context_id, root, m_firstPersonBody, firstPersonBodyXform);
+    GEnv.Render->add_Visual(context_id, root, m_firstPersonBody, m_firstPersonBodyXform);
     m_firstPersonBody->getVisData().hom_frame = Device.dwFrame;
 
     // Copy transforms from actual body visual, excluding bones we don't want to animate
@@ -1588,23 +1577,25 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     for (auto [boneId, vis] : m_firstPersonBodyBonesToHide)
         kinematics->LL_SetBoneVisible(boneId, !vis, true);
 
-    // Update head position
-    headPosition.set(firstPersonBodyXform);
-    headPosition.mulB_43(realBodyK->LL_GetTransform_R(realBodyK->LL_BoneID("bip01_head")));
+    // Update camera position
+    m_firstPersonCameraXform.set(m_firstPersonBodyXform);
+    m_firstPersonCameraXform.mulB_43(realBodyK->LL_GetTransform(realBodyK->LL_BoneID("eyelid_1"))); // should be a bone that is inbetween the eye bones (maybe more accurate than using bip01_head)
 
 #ifdef DEBUG
     Fvector ypr;
-    firstPersonBodyXform.getHPB(ypr);
+    m_firstPersonBodyXform.getHPB(ypr);
     string1024 text;
     CGameFont* F = UI().Font().pFontArial14;
     F->SetAligment(CGameFont::alLeft);
     F->OutSetI(-.9, 0);
     F->SetColor(color_rgba(255, 0, 0, 255));
-    xr_sprintf(text, "first person body position [%3.3f %3.3f %3.3f]", firstPersonBodyXform.c.x, firstPersonBodyXform.c.y, firstPersonBodyXform.c.z);
+    xr_sprintf(text, "first person body position [%3.3f %3.3f %3.3f]", m_firstPersonBodyXform.c.x, m_firstPersonBodyXform.c.y, m_firstPersonBodyXform.c.z);
     F->OutNext(text);
-    xr_sprintf(text, "first person body direction [%3.3f %3.3f %3.3f]", firstPersonBodyXform.k.x, firstPersonBodyXform.k.y, firstPersonBodyXform.k.z);
+    xr_sprintf(text, "first person body direction [%3.3f %3.3f %3.3f]", m_firstPersonBodyXform.k.x, m_firstPersonBodyXform.k.y, m_firstPersonBodyXform.k.z);
     F->OutNext(text);
-    xr_sprintf(text, "head position [%3.3f %3.3f %3.3f]", headPosition.c.x, headPosition.c.y, headPosition.c.z);
+    xr_sprintf(text, "head position [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.c.x, m_firstPersonCameraXform.c.y, m_firstPersonCameraXform.c.z);
+    F->OutNext(text);
+    xr_sprintf(text, "head direction [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.k.x, m_firstPersonCameraXform.k.y, m_firstPersonCameraXform.k.z);
     F->OutNext(text);
     xr_sprintf(text, "camera position [%3.3f %3.3f %3.3f]", cam_Active()->Position().x, cam_Active()->Position().y, cam_Active()->Position().z);
     F->OutNext(text);

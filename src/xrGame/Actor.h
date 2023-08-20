@@ -109,8 +109,8 @@ public:
     IRenderVisual* m_firstPersonBody{};
     xr_unordered_map<u16, bool> m_firstPersonBodyBonesToHide;
     xr_unordered_map<u16, bool> m_firstPersonBodyBonesToIgnoreAnims;
-    Fmatrix firstPersonBodyXform{};
-    Fmatrix headPosition{};
+    Fmatrix m_firstPersonBodyXform{};
+    Fmatrix m_firstPersonCameraXform{};
     Lock render_lock{};
 
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,

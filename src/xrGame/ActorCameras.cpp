@@ -24,6 +24,9 @@
 #include "xrPhysics/ActorCameraCollision.h"
 #include "IKLimbsController.h"
 #include "GamePersistent.h"
+#include "Actor.h"
+
+extern Fvector g_first_person_cam_offset;
 
 void CActor::cam_Set(EActorCameras style)
 {
@@ -318,7 +321,6 @@ void CActor::cam_Update(float dt, float fFOV)
     }
 
     Fvector point = { 0, CurrentHeight + current_ik_cam_shift, 0 };
-
     Fvector dangle = {0, 0, 0};
     Fmatrix xform;
     xform.setXYZ(0, r_torso.yaw, 0);
@@ -360,6 +362,22 @@ void CActor::cam_Update(float dt, float fFOV)
 
     CCameraBase* C = cam_Active();
 
+    if (psActorFlags.test(AF_FIRST_PERSON_BODY) && eacFirstEye == cam_active) // override camera position / direction for first person body
+    {
+        if (!g_Alive()) //first person death cam
+        {
+            point = m_firstPersonCameraXform.c;
+            dangle = m_firstPersonCameraXform.k;
+        }
+        else
+        {
+            point = m_firstPersonCameraXform.c;
+            point.y += g_first_person_cam_offset.y;
+            Fvector camdir = { cam_Active()->Direction().x, 0.f, cam_Active()->Direction().z }; // ignore Y (vertical) value
+            point.add(camdir.normalize().mul(g_first_person_cam_offset.z));
+        }
+    }
+
     C->Update(point, dangle);
     C->f_fov = fFOV;
 
@@ -370,10 +388,7 @@ void CActor::cam_Update(float dt, float fFOV)
     }
     if (Level().CurrentEntity() == this)
     {
-        if (m_firstPersonBody)
-            collide_camera(*cameras[eacFirstEye], _viewport_near, this, headPosition.c);
-        else
-            collide_camera(*cameras[eacFirstEye], _viewport_near, this);
+        collide_camera(*cameras[eacFirstEye], _viewport_near, this);
     }
     if (psActorFlags.test(AF_PSP))
     {

@@ -32,7 +32,6 @@
 #define ROTATION_TIME 0.25f
 
 BOOL b_toggle_weapon_aim = FALSE;
-extern float g_first_person_body_offset;
 
 static class CUIWpnScopeXmlManager : public CUIResetNotifier, public pureAppEnd
 {
@@ -188,13 +187,6 @@ void CWeapon::UpdateXForm()
         mRes.set(R, N, D, mR.c);
         mRes.mulA_43(E->XFORM());
     }
-
-    if (auto actorOwner = smart_cast<CActor*>(H_Parent()))
-        if (actorOwner->FirstPersonBodyActive())
-        {
-            Fvector camdir = { actorOwner->cam_Active()->Direction().x, 0.f, actorOwner->cam_Active()->Direction().z }; // ignore Y (vertical) value
-            mRes.c.add(camdir.normalize().mul(g_first_person_body_offset)); // push model back so it doesn't look weird (default value: -0.75f)
-        }
 
     UpdatePosition(mRes);
 }

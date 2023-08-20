@@ -332,7 +332,7 @@ bool test_camera_collide(
     return test_camera_box(box_size, xform, l_actor);
 }
 
-void collide_camera(CCameraBase& camera, float _viewport_near, IPhysicsShellHolder* l_actor, Fvector posOverride)
+void collide_camera(CCameraBase& camera, float _viewport_near, IPhysicsShellHolder* l_actor)
 {
     // CPhysicsShellHolder* l_actor = smart_cast<CPhysicsShellHolder*>( Level().CurrentEntity() );
     VERIFY(l_actor);
@@ -366,9 +366,6 @@ void collide_camera(CCameraBase& camera, float _viewport_near, IPhysicsShellHold
     if (dbg_draw_camera_collision)
         shell->dbg_draw_geometry(1, color_xrgb(0, 255, 0));
 #endif
-    if (posOverride.magnitude() > 0.f)
-        roote->GetGlobalPositionDynamic(&posOverride);
-    else
-        roote->GetGlobalPositionDynamic(&camera.vPosition);
+    roote->GetGlobalPositionDynamic(&camera.vPosition);
     camera.vPosition.mad(camera.Direction(), -_viewport_near / 2.f);
 }
