@@ -465,17 +465,14 @@ void CActor::Load(LPCSTR section)
     // initialize bones for first person body
     m_firstPersonBodyBonesToHide =
     {
-        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_head"), true},
-        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_neck"), true },
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_head"), true },
         { Visual()->dcast_PKinematics()->LL_BoneID("bip01_l_clavicle"), true },
         { Visual()->dcast_PKinematics()->LL_BoneID("bip01_r_clavicle"), true },
     };
 
     m_firstPersonBodyBonesToIgnoreAnims =
     {
-        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_spine"), true },
-        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_spine1"), true },
-        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_spine2"), true },
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_head"), false},
     };
 }
 
@@ -1563,19 +1560,49 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     GEnv.Render->add_Visual(context_id, root, m_firstPersonBody, m_firstPersonBodyXform);
     m_firstPersonBody->getVisData().hom_frame = Device.dwFrame;
 
-    // Copy transforms from actual body visual, excluding bones we don't want to animate
+    PIItem pItem = inventory().ActiveItem();
+    bool noItemEquipped = 0 == pItem;
+
+    // On death or unarmed, show arms
+    if (!g_Alive() || noItemEquipped)
+    {
+        m_firstPersonBodyBonesToHide[m_firstPersonBody->dcast_PKinematics()->LL_BoneID("bip01_l_clavicle")] = false;
+        m_firstPersonBodyBonesToHide[m_firstPersonBody->dcast_PKinematics()->LL_BoneID("bip01_r_clavicle")] = false;
+
+        for (auto [boneId, vis] : m_firstPersonBodyBonesToIgnoreAnims)
+        {
+            m_firstPersonBodyBonesToIgnoreAnims[boneId] = false;
+        }
+    }
+    else
+    {
+        m_firstPersonBodyBonesToHide[m_firstPersonBody->dcast_PKinematics()->LL_BoneID("bip01_l_clavicle")] = true;
+        m_firstPersonBodyBonesToHide[m_firstPersonBody->dcast_PKinematics()->LL_BoneID("bip01_r_clavicle")] = true;
+
+        for (auto [boneId, vis] : m_firstPersonBodyBonesToIgnoreAnims)
+        {
+            m_firstPersonBodyBonesToIgnoreAnims[boneId] = true;
+        }
+    }
+
+    // Copy transforms from actual body visual, excluding hidden bones and bones we don't want to animate
     const u16 bones_count = kinematics->LL_BoneCount();
     for (u16 i = 0; i < bones_count; ++i)
     {
-        if (m_firstPersonBodyBonesToIgnoreAnims[i])
+        if (m_firstPersonBodyBonesToIgnoreAnims.find(i) != m_firstPersonBodyBonesToIgnoreAnims.end() && m_firstPersonBodyBonesToIgnoreAnims[i])
+            continue;
+        if (m_firstPersonBodyBonesToHide.find(i) != m_firstPersonBodyBonesToHide.end() && m_firstPersonBodyBonesToHide[i])
             continue;
 
+        kinematics->LL_GetTransform(i).set(realBodyK->LL_GetTransform(i));
         kinematics->LL_GetTransform_R(i).set(realBodyK->LL_GetTransform_R(i));
     }
 
-    // Hide bones
-    for (auto [boneId, vis] : m_firstPersonBodyBonesToHide)
-        kinematics->LL_SetBoneVisible(boneId, !vis, true);
+    // Hide/show bones AFTER copying transforms so we update all child bones properly
+    for (auto [boneId, hide] : m_firstPersonBodyBonesToHide)
+    {
+        kinematics->LL_SetBoneVisible(boneId, hide ? FALSE : TRUE, TRUE);
+    }
 
     // Update camera position
     m_firstPersonCameraXform.set(m_firstPersonBodyXform);
