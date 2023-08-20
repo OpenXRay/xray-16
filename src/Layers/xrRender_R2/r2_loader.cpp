@@ -411,7 +411,7 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
+    for (auto id = 0u; id < R__NUM_PARALLEL_CONTEXTS; ++id)
     {
         auto& dsgraph = contexts_pool[id];
         dsgraph.reset();

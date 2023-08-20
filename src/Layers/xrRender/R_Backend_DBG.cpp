@@ -41,7 +41,7 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
     u32 vBase;
     {
         FVF::L* pv = (FVF::L*)RImplementation.Vertex.Lock(vcnt, vs_L->vb_stride, vBase);
-        for (size_t i = 0; i < vcnt; i++)
+        for (int i = 0; i < vcnt; i++)
         {
             pv[i] = pVerts[i];
         }

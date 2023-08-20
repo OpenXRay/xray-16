@@ -100,7 +100,7 @@ TextureFormatPairs TextureFormatList[] =
 GLenum ConvertTextureFormat(D3DFORMAT dx9FMT)
 {
     constexpr size_t arrayLength = sizeof(TextureFormatList) / sizeof(TextureFormatList[0]);
-    for (int i = 0; i < arrayLength; ++i)
+    for (auto i = 0u; i < arrayLength; ++i)
     {
         if (TextureFormatList[i].m_dx9FMT == dx9FMT)
             return TextureFormatList[i].m_glFMT;

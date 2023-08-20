@@ -148,7 +148,7 @@ private:
     // TODO: OGL: make ignore commented includes
     void load_includes(IReader* file)
     {
-        cpcstr sourceData = static_cast<cpcstr>(file->pointer());
+        const auto sourceData = const_cast<pcstr>(static_cast<pstr>(file->pointer()));
         const size_t dataLength = file->length();
 
         // Copy source file data into a null-terminated buffer
