@@ -275,8 +275,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #ifdef _EDITOR // for EDITORS - no cache
         flags &= ~CLocatorAPI::flCacheFiles;
 #endif // _EDITOR
+#ifndef DISABLE_PORTABLE_MODE
         flags |= CLocatorAPI::flScanAppRoot;
-
+#endif
 #ifndef _EDITOR
 #ifndef ELocatorAPIH
         if (strstr(Params, "-file_activity") != nullptr)
