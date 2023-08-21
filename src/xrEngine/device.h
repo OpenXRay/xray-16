@@ -244,7 +244,7 @@ public:
 
     void time_factor(const float time_factor);
 
-    IC const float time_factor() const
+    IC float time_factor() const
     {
         VERIFY(Timer.time_factor() == TimerGlobal.time_factor());
         return (Timer.time_factor());

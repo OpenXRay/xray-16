@@ -354,25 +354,25 @@ keyboard_key keyboards[] =
     { "kNUMPADCOMMA",           SDL_SCANCODE_KP_COMMA,           "Numpad Comma" },
     { "kNUMPADEQUALSAS400",     SDL_SCANCODE_KP_EQUALSAS400,     "Equals AS400" },
 
-    { "kINTERNATIONAL1",        SDL_SCANCODE_INTERNATIONAL1      /* Give a better name? */ },
-    { "kINTERNATIONAL2",        SDL_SCANCODE_INTERNATIONAL2      /* Give a better name? */ },
+    { "kINTERNATIONAL1",        SDL_SCANCODE_INTERNATIONAL1,     "kINTERNATIONAL1" /* Give a better name? */ },
+    { "kINTERNATIONAL2",        SDL_SCANCODE_INTERNATIONAL2,     "kINTERNATIONAL2" /* Give a better name? */ },
     { "kYEN",                   SDL_SCANCODE_INTERNATIONAL3,     "Yen" },
-    { "kINTERNATIONAL4",        SDL_SCANCODE_INTERNATIONAL4      /* Give a better name? */ },
-    { "kINTERNATIONAL5",        SDL_SCANCODE_INTERNATIONAL5      /* Give a better name? */ },
-    { "kINTERNATIONAL6",        SDL_SCANCODE_INTERNATIONAL6      /* Give a better name? */ },
-    { "kINTERNATIONAL7",        SDL_SCANCODE_INTERNATIONAL7      /* Give a better name? */ },
-    { "kINTERNATIONAL8",        SDL_SCANCODE_INTERNATIONAL8      /* Give a better name? */ },
-    { "kINTERNATIONAL9",        SDL_SCANCODE_INTERNATIONAL9      /* Give a better name? */ },
+    { "kINTERNATIONAL4",        SDL_SCANCODE_INTERNATIONAL4,     "kINTERNATIONAL4" /* Give a better name? */ },
+    { "kINTERNATIONAL5",        SDL_SCANCODE_INTERNATIONAL5,     "kINTERNATIONAL5" /* Give a better name? */ },
+    { "kINTERNATIONAL6",        SDL_SCANCODE_INTERNATIONAL6,     "kINTERNATIONAL6" /* Give a better name? */ },
+    { "kINTERNATIONAL7",        SDL_SCANCODE_INTERNATIONAL7,     "kINTERNATIONAL7" /* Give a better name? */ },
+    { "kINTERNATIONAL8",        SDL_SCANCODE_INTERNATIONAL8,     "kINTERNATIONAL8" /* Give a better name? */ },
+    { "kINTERNATIONAL9",        SDL_SCANCODE_INTERNATIONAL9,     "kINTERNATIONAL9" /* Give a better name? */ },
 
     { "kHANGUL",                SDL_SCANCODE_LANG1,              "Hangul" },
     { "kHANJA",                 SDL_SCANCODE_LANG2,              "Hanja" },
     { "kKATAKANA",              SDL_SCANCODE_LANG3,              "Katakana" },
     { "kHIRAGANA",              SDL_SCANCODE_LANG4,              "Hiragana" },
     { "kZENHANKAKU",            SDL_SCANCODE_LANG5,              "Zen-Han-kaku" },
-    { "kLANG6",                 SDL_SCANCODE_LANG6               /* Give a better name? */ },
-    { "kLANG7",                 SDL_SCANCODE_LANG7               /* Give a better name? */ },
-    { "kLANG8",                 SDL_SCANCODE_LANG8               /* Give a better name? */ },
-    { "kLANG9",                 SDL_SCANCODE_LANG9               /* Give a better name? */ },
+    { "kLANG6",                 SDL_SCANCODE_LANG6,              "kLANG6" /* Give a better name? */ },
+    { "kLANG7",                 SDL_SCANCODE_LANG7,              "kLANG7" /* Give a better name? */ },
+    { "kLANG8",                 SDL_SCANCODE_LANG8,              "kLANG8" /* Give a better name? */ },
+    { "kLANG9",                 SDL_SCANCODE_LANG9,              "kLANG9" /* Give a better name? */ },
 
     { "kALTERASE",              SDL_SCANCODE_ALTERASE,           "Alterase" },
     { "kCANCEL",                SDL_SCANCODE_CANCEL,             "Cancel" },
@@ -755,7 +755,7 @@ bool IsContextMatching(EKeyContext c1, EKeyContext c2)
 
 EGameActions GetBindedAction(int dik, EKeyContext context /*= EKeyContext::Undefined*/)
 {
-    for (int idx = 0; idx < bindings_count; ++idx)
+    for (int idx = 0; idx < static_cast<int>(bindings_count); ++idx)
     {
         key_binding* binding = &g_key_bindings[idx];
 
@@ -856,7 +856,7 @@ public:
 
         currBinding->m_keyboard[m_workIdx] = keyboard;
 
-        for (int idx = 0; idx < bindings_count; ++idx)
+        for (size_t idx = 0; idx < bindings_count; ++idx)
         {
             key_binding* binding = &g_key_bindings[idx];
             if (binding == currBinding)
@@ -878,7 +878,7 @@ public:
         if (m_workIdx == 0)
             f->w_printf("default_controls\r\n");
 
-        for (int idx = 0; idx < bindings_count; ++idx)
+        for (int idx = 0; idx < static_cast<int>(bindings_count); ++idx)
         {
             key_binding* binding = &g_key_bindings[idx];
             if (binding->m_keyboard[m_workIdx])
@@ -911,7 +911,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         Log("- --- Action list start ---");
-        for (int idx = 0; idx < bindings_count; ++idx)
+        for (int idx = 0; idx < static_cast<int>(bindings_count); ++idx)
         {
             key_binding* binding = &g_key_bindings[idx];
             Log("-", binding->m_action->action_name);
@@ -927,7 +927,7 @@ public:
 
     virtual void Execute(LPCSTR args)
     {
-        for (int idx = 0; idx < bindings_count; ++idx)
+        for (int idx = 0; idx < static_cast<int>(bindings_count); ++idx)
         {
             key_binding* binding = &g_key_bindings[idx];
             for (u8 i = 0; i < bindtypes_count; ++i)
@@ -1070,7 +1070,7 @@ public:
         Log("- --- Bind list start ---");
         string512 buff;
 
-        for (int idx = 0; idx < bindings_count; ++idx)
+        for (int idx = 0; idx < static_cast<int>(bindings_count); ++idx)
         {
             key_binding* binding = &g_key_bindings[idx];
             xr_sprintf(buff, "[%s] primary is[%s] secondary is[%s] pad button is[%s]", binding->m_action->action_name,

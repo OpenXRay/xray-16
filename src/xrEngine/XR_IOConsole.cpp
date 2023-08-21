@@ -48,6 +48,7 @@ u32 CConsole::get_mark_color(Console_mark type)
     u32 color = default_font_color;
     switch (type)
     {
+    case no_mark: break;
     case mark0: color = color_rgba(255, 255, 0, 255); break;
     case mark1: color = color_rgba(255, 0, 0, 255); break;
     case mark2: color = color_rgba(100, 100, 255, 255); break;
@@ -61,8 +62,6 @@ u32 CConsole::get_mark_color(Console_mark type)
     case mark10: color = color_rgba(55, 155, 140, 255); break;
     case mark11: color = color_rgba(205, 205, 105, 255); break;
     case mark12: color = color_rgba(128, 128, 250, 255); break;
-    case no_mark:
-    default: break;
     }
     return color;
 }
@@ -71,6 +70,7 @@ bool CConsole::is_mark(Console_mark type)
 {
     switch (type)
     {
+    case no_mark: break;
     case mark0:
     case mark1:
     case mark2:
@@ -83,14 +83,15 @@ bool CConsole::is_mark(Console_mark type)
     case mark9:
     case mark10:
     case mark11:
-    case mark12: return true; break;
+    case mark12:
+        return true;
     }
     return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CConsole::CConsole() : m_hShader_back(NULL)
+CConsole::CConsole()
 {
     m_editor = xr_new<text_editor::line_editor>(CONSOLE_BUF_SIZE);
     m_cmd_history_max = cmd_history_max;
@@ -170,7 +171,8 @@ void CConsole::OutFont(pcstr text, float& pos_y)
     float scr_width = 1.98f * Device.fWidth_2;
     if (str_length > scr_width) // 1024.0f
     {
-        float f = 0.0f;
+        // XXX: do something with 'f' after its assignment in while loop?
+        [[maybe_unused]] float f = 0.0f;
         int sz = 0;
         int ln = 0;
         PSTR one_line = (PSTR)xr_alloca((CONSOLE_BUF_SIZE + 1) * sizeof(char));
@@ -631,7 +633,7 @@ extern CInput* pInput;
 
 void CConsole::Hide()
 {
-    if (!bVisible || g_pGamePersistent && GEnv.isDedicatedServer)
+    if (!bVisible || (g_pGamePersistent && GEnv.isDedicatedServer))
         return;
 
     // if ( g_pGameLevel ||

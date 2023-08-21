@@ -3,8 +3,6 @@
 #include "Render.h"
 #include "xrCDB/xrXRC.h"
 
-extern XRCDB_API bool* cdb_bDebug;
-
 void CRenderDevice::_SetupStates()
 {
     // General Render States

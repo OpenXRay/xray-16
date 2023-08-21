@@ -81,7 +81,7 @@ void CRenderDevice::UpdateWindowProps()
 
     // Changing monitor, unset fullscreen for the previous monitor
     // and move the window to the new monitor
-    if (SDL_GetWindowDisplayIndex(m_sdlWnd) != psDeviceMode.Monitor)
+    if (SDL_GetWindowDisplayIndex(m_sdlWnd) != static_cast<int>(psDeviceMode.Monitor))
     {
         SDL_SetWindowFullscreen(m_sdlWnd, SDL_DISABLE);
 
@@ -174,7 +174,8 @@ void CRenderDevice::SelectResolution(const bool windowed)
                 SDL_PIXELFORMAT_UNKNOWN,
                 (int)psDeviceMode.Width,
                 (int)psDeviceMode.Height,
-                (int)psDeviceMode.RefreshRate
+                (int)psDeviceMode.RefreshRate,
+                nullptr
             };
 
             SDL_DisplayMode closest; // try closest or fallback to desktop mode
