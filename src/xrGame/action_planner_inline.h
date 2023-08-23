@@ -256,7 +256,18 @@ IC void CPlanner::show(LPCSTR offset)
     Msg("\n%sEVALUATORS : %d\n", offset, this->evaluators().size());
 
     for (const auto& it : this->evaluators())
-        Msg("%sevaluator   [%d][%s]", offset, it.first, property2string(it.first));
+    {
+        auto J = std::lower_bound(this->current_state().conditions().cbegin(),
+            this->current_state().conditions().cend(), CWorldProperty(it.first, false));
+        char current = '?';
+
+         if ((J != this->current_state().conditions().end()) && ((*J).condition() == it.first))
+        {
+            current = (*J).value() ? '+' : '-';
+        }
+
+        Msg("%sevaluator   [%d][%s][%c]", offset, it.first, property2string(it.first), current);
+    }
 
     Msg("\n%sOPERATORS : %d\n", offset, this->operators().size());
     for (const auto& it : this->operators())
