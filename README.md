@@ -28,7 +28,7 @@
 
 ## Main differences from original X-Ray are:
 - Support for 64-bit.
-- Support for ARM, ARM64, E2K (Elbrus 2000).
+- Support for ARM, ARM64, E2K (Elbrus 2000), PPC64LE.
 - Works on Linux, macOS, OSL (Elbrus OS).
 - New OpenGL renderer. (currently, requires OpenGL 4.1 minimum, lowering to at least OpenGL 3.3 is planned)
 - Improved performance, better FPS.
