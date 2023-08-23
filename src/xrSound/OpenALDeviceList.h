@@ -14,7 +14,6 @@ struct ALDeviceDesc
             u16 selected : 1;
             u16 eax : 3;
             u16 efx : 1;
-            u16 xram : 1;
 
             u16 unused : 9;
         };

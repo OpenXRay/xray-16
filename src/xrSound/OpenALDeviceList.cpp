@@ -84,7 +84,6 @@ void ALDeviceList::IterateAndAddDevicesString(pcstr devices)
                         addedDevice.props.eax = 5;
 
                     addedDevice.props.efx = alcIsExtensionPresent(device, "ALC_EXT_EFX") == AL_TRUE;
-                    addedDevice.props.xram = alIsExtensionPresent("EAX-RAM") == AL_TRUE;
                 }
                 alcDestroyContext(context);
             }
@@ -111,7 +110,7 @@ void ALDeviceList::Enumerate()
 #ifndef MASTER_GOLD
     Msg("SOUND: OpenAL: enumerate devices...");
 #endif
-    // have a set of vectors storing the device list, selection status, spec version #, and XRAM support status
+    // have a set of vectors storing the device list, selection status, spec version #
     // -- empty all the lists and reserve space for 10 devices
     m_devices.clear();
 
@@ -184,10 +183,9 @@ void ALDeviceList::Enumerate()
     for (u32 j = 0; j < GetNumDevices(); j++)
     {
         GetDeviceVersion(j, &majorVersion, &minorVersion);
-        Msg("%d. %s, Spec Version %d.%d %s eax[%d] efx[%s] xram[%s]", j + 1, GetDeviceName(j), majorVersion,
+        Msg("%d. %s, Spec Version %d.%d %s eax[%d] efx[%s]", j + 1, GetDeviceName(j), majorVersion,
             minorVersion, xr_stricmp(GetDeviceName(j), m_defaultDeviceName) == 0 ? "(default)" : "",
-            GetDeviceDesc(j).props.eax, GetDeviceDesc(j).props.efx ? "yes" : "no",
-            GetDeviceDesc(j).props.xram ? "yes" : "no");
+            GetDeviceDesc(j).props.eax, GetDeviceDesc(j).props.efx ? "yes" : "no");
     }
 #endif
 }
