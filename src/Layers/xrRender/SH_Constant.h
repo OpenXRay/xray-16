@@ -17,17 +17,15 @@ public:
     };
 
 public:    
-    Fcolor const_float;
-    u32 const_dword;
+    Fcolor const_float{ 0.0f, 0.0f, 0.0f, 0.0f };
+    u32 const_dword{ 0 };
 
-    u32 dwFrame;
-    u32 dwMode;
+    u32 dwFrame{ 0 };
+    u32 dwMode{ 0 };
     WaveForm _R;
     WaveForm _G;
     WaveForm _B;
     WaveForm _A;
-
-    CConstant() { memset(this, 0, sizeof(CConstant)); }
 
     void set_float(float r, float g, float b, float a)
     {

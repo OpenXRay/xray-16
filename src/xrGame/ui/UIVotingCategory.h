@@ -11,22 +11,24 @@ class ChangeGameTypeDialog;
 class CUIXml;
 class CUITextVote;
 
-class CUIVotingCategory : public CUIDialogWnd
+class CUIVotingCategory final : public CUIDialogWnd
 {
 private:
     typedef CUIDialogWnd inherited;
 
 public:
     CUIVotingCategory();
-    virtual ~CUIVotingCategory();
+    ~CUIVotingCategory() override;
 
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
-    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0);
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+    void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0) override;
 
     void OnBtn(int i);
     void OnBtnCancel();
 
-    virtual void Update();
+    void Update() override;
+
+    pcstr GetDebugType() override { return "CUIVotingCategory"; }
 
 protected:
     void InitVotingCategory();

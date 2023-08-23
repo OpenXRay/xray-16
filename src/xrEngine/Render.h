@@ -114,6 +114,8 @@ public:
     virtual ~IRender_ObjectSpecific(){};
 };
 
+class CBackend; // TODO: the real command list interface should be defined here
+
 //////////////////////////////////////////////////////////////////////////
 // definition (Target)
 class ENGINE_API IRender_Target
@@ -130,8 +132,8 @@ public:
     virtual void set_color_gray(u32 f) = 0;
     // virtual void set_color_add (u32 f) = 0;
     virtual void set_color_add(const Fvector& f) = 0;
-    virtual u32 get_width() = 0;
-    virtual u32 get_height() = 0;
+    virtual u32 get_width(CBackend& cmd_list) = 0; // TODO: use equivalent from cmd_list
+    virtual u32 get_height(CBackend& cmd_list) = 0;
     virtual void set_cm_imfluence(float f) = 0;
     virtual void set_cm_interpolate(float f) = 0;
     virtual void set_cm_textures(const shared_str& tex0, const shared_str& tex1) = 0;
@@ -304,6 +306,7 @@ public:
     // virtual ref_shader getShader (int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
     virtual IRender_Target* getTarget() = 0;
+    virtual CBackend& get_imm_command_list() = 0;
 
     // Main
     virtual void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
@@ -365,9 +368,9 @@ public:
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
 
     // Render mode
-    virtual void rmNear() = 0;
-    virtual void rmFar() = 0;
-    virtual void rmNormal() = 0;
+    virtual void rmNear(CBackend& cmd_list) = 0;
+    virtual void rmFar(CBackend& cmd_list) = 0;
+    virtual void rmNormal(CBackend& cmd_list) = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}

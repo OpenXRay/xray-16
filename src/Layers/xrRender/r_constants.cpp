@@ -23,30 +23,30 @@ void R_constant_table::fatal(LPCSTR S) { FATAL(S); }
 // predicates
 IC bool p_sort(const ref_constant& C1, const ref_constant C2) { return xr_strcmp(C1->name, C2->name) < 0; }
 
-ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/)
+ref_constant R_constant_table::get(pcstr S, u16 type /*= u16(-1)*/) const
 {
     // assumption - sorted by name
-    c_table::iterator it;
+    c_table::const_iterator it;
     if (type == u16(-1))
     {
-        it = std::lower_bound(table.begin(), table.end(), S, [](const ref_constant& C, cpcstr S)
+        it = std::lower_bound(table.cbegin(), table.cend(), S, [](const ref_constant& C, cpcstr S)
         {
             return xr_strcmp(*C->name, S) < 0;
         });
     }
     else
     {
-        it = std::find_if(table.begin(), table.end(), [&](const ref_constant& constant)
+        it = std::find_if(table.cbegin(), table.cend(), [&](const ref_constant& constant)
         {
             return 0 == xr_strcmp(constant->name.c_str(), S) && constant->type == type;
         });
     }
 
-    if (it == table.end() || (0 != xr_strcmp((*it)->name.c_str(), S)))
+    if (it == table.cend() || (0 != xr_strcmp((*it)->name.c_str(), S)))
         return nullptr;
     return *it;
 }
-ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/)
+ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/) const
 {
     // linear search, but only ptr-compare
     if (type == u16(-1))
@@ -263,9 +263,12 @@ void R_constant_table::merge(R_constant_table* T)
 
 #if defined(USE_DX11)
     //	TODO:	DX11:	Implement merge with validity check
-    m_CBTable.reserve(m_CBTable.size() + T->m_CBTable.size());
-    for (u32 i = 0; i < T->m_CBTable.size(); ++i)
-        m_CBTable.push_back(T->m_CBTable[i]);
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        m_CBTable[id].reserve(m_CBTable[id].size() + T->m_CBTable[id].size());
+        for (u32 i = 0; i < T->m_CBTable[id].size(); ++i)
+            m_CBTable[id].push_back((T->m_CBTable[id])[i]);
+    }
 #endif
 }
 
@@ -276,7 +279,10 @@ void R_constant_table::clear()
         table[it] = 0; //.g_constant_allocator.destroy(table[it]);
     table.clear();
 #if defined(USE_DX11)
-    m_CBTable.clear();
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        m_CBTable[id].clear();
+    }
 #endif
 }
 

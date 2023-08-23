@@ -139,9 +139,10 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
 }
 
 static u32 g_saved_event_count = 0;
+
 void CSoundRender_Core::update_events()
 {
-    g_saved_event_count = s_events.size();
+    g_saved_event_count = static_cast<u32>(s_events.size());
     for (auto& E : s_events)
         Handler(E.first, E.second);
 
@@ -158,7 +159,7 @@ void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
             if (T->get_emitter() && T->get_Rendering())
                 dest->_rendered++;
         }
-        dest->_simulated = s_emitters.size();
+        dest->_simulated = static_cast<u32>(s_emitters.size());
         dest->_cache_hits = cache._stat_hit;
         dest->_cache_misses = cache._stat_miss;
         dest->_events = g_saved_event_count;
@@ -220,14 +221,14 @@ float CSoundRender_Core::get_occlusion_to(const Fvector& hear_pt, const Fvector&
         dir.div(range);
 
         geom_DB.ray_query(CDB::OPT_CULL, geom_SOM, hear_pt, dir, range);
-        u32 r_cnt = geom_DB.r_count();
+        const auto r_cnt = geom_DB.r_count();
         CDB::RESULT* _B = geom_DB.r_begin();
         if (0 != r_cnt)
         {
-            for (u32 k = 0; k < r_cnt; k++)
+            for (size_t k = 0; k < r_cnt; k++)
             {
                 CDB::RESULT* R = _B + k;
-                occ_value *= *(float*)&R->dummy;
+                occ_value *= *reinterpret_cast<float*>(&R->dummy);
             }
         }
     }
@@ -280,14 +281,14 @@ float CSoundRender_Core::get_occlusion(Fvector& P, float R, Fvector* occ)
     if (nullptr != geom_SOM)
     {
         geom_DB.ray_query(CDB::OPT_CULL, geom_SOM, base, dir, range);
-        u32 r_cnt = geom_DB.r_count();
+        const auto r_cnt = geom_DB.r_count();
         CDB::RESULT* _B = geom_DB.r_begin();
         if (0 != r_cnt)
         {
-            for (u32 k = 0; k < r_cnt; k++)
+            for (size_t k = 0; k < r_cnt; k++)
             {
                 CDB::RESULT* R2 = _B + k;
-                occ_value *= *(float*)&R2->dummy;
+                occ_value *= *reinterpret_cast<float*>(&R2->dummy);
             }
         }
     }

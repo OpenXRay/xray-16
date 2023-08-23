@@ -1,0 +1,11 @@
+<window>
+  <button_hint x="0" y="0" width="200" height="30">
+		<frame_line  x="0" y="0" width="200" height="30">
+			<texture>ui_icons_PDA_string_tooltips</texture>
+		</frame_line>	
+		<description x="10" y="2" width="192" height="20" complex_mode="0" light_anim="ui_btn_hint"  la_cyclic="0" la_texture="0" la_text="1" la_alpha="1">
+			<text align="l" x="0" y="0" font="letterica18"/>
+		</description>
+	</button_hint>
+</window>
+

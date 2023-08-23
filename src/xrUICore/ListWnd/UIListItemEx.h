@@ -23,6 +23,8 @@ public:
     virtual void SetSelectionColor(u32 dwColor);
     virtual void Draw();
 
+    pcstr GetDebugType() override { return "CUIListItemEx"; }
+
 protected:
     u32 m_dwSelectionColor;
 };

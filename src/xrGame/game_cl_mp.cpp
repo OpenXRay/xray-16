@@ -767,7 +767,7 @@ void game_cl_mp::OnSwitchPhase(u32 old_phase, u32 new_phase)
     }
     default:
     {
-        if (g_hud && CurrentGameUI())
+        if (CurrentGameUI())
             CurrentGameUI()->ShowGameIndicators(false);
         HideMessageMenus();
         break;

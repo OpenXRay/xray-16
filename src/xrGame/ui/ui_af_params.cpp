@@ -199,7 +199,7 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
 /// ----------------------------------------------------------------
 
 UIArtefactParamItem::UIArtefactParamItem()
-    : CUIStatic("UIArtefactParamItem"),
+    : CUIStatic("Artefact Param Item"),
       m_magnitude(1.0f), m_sign_inverse(false), m_unit_str(""),
       m_texture_minus(""), m_texture_plus("") {}
 

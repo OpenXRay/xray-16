@@ -38,8 +38,7 @@ public:
     void Init(CUIXml& uiXml, LPCSTR path);
     virtual void Update();
 
-protected:
-private:
+    pcstr GetDebugType() override { return "UITeamHeader"; }
 }; // UITeamHeader
 
 #endif // UI_TEAM_HEADER

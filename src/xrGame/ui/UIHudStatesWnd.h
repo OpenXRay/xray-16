@@ -14,7 +14,7 @@ class CActor;
 
 int const it_max = ALife::infl_max_count - 1;
 
-class CUIHudStatesWnd : public CUIWindow
+class CUIHudStatesWnd final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -84,7 +84,6 @@ private:
 
 public:
     CUIHudStatesWnd();
-    virtual ~CUIHudStatesWnd();
 
     void InitFromXml(CUIXml& xml, LPCSTR path);
     void Load_section();
@@ -105,6 +104,8 @@ public:
     void DrawZoneIndicators();
     void FakeUpdateIndicatorType(u8 t, float power);
     void EnableFakeIndicators(bool enable);
+
+    pcstr GetDebugType() override { return "CUIHudStatesWnd"; }
 
 protected:
     static ALife::EInfluenceType get_indik_type(ALife::EHitType hit_type);

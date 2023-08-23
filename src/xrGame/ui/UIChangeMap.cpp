@@ -14,7 +14,7 @@
 #include "UIDialogHolder.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
 
-CUIChangeMap::CUIChangeMap()
+CUIChangeMap::CUIChangeMap() : CUIDialogWnd(CUIChangeMap::GetDebugType())
 {
     m_prev_upd_time = 0;
 
@@ -38,11 +38,11 @@ CUIChangeMap::CUIChangeMap()
     map_version->SetAutoDelete(true);
     AttachChild(map_version);
 
-    frame = xr_new<CUIFrameWindow>();
+    frame = xr_new<CUIFrameWindow>("Frame");
     frame->SetAutoDelete(true);
     AttachChild(frame);
 
-    lst_back = xr_new<CUIFrameWindow>();
+    lst_back = xr_new<CUIFrameWindow>("Map list back");
     lst_back->SetAutoDelete(true);
     AttachChild(lst_back);
 
@@ -59,7 +59,6 @@ CUIChangeMap::CUIChangeMap()
     AttachChild(btn_cancel);
 }
 
-CUIChangeMap::~CUIChangeMap() {}
 void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "change_map", 0, this);

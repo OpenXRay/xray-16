@@ -22,7 +22,7 @@ class CActor;
 
 class ui_actor_state_item;
 
-class ui_actor_state_wnd : public CUIWindow
+class ui_actor_state_wnd final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -49,8 +49,9 @@ private:
     UIHint* m_hint_wnd{};
 
 public:
-    ui_actor_state_wnd() : CUIWindow("ui_actor_state_wnd") {}
+    ui_actor_state_wnd() : CUIWindow(ui_actor_state_wnd::GetDebugType()) {}
     ~ui_actor_state_wnd() override;
+
     void init_from_xml(CUIXml& xml);
     void init_from_xml(CUIXml& xml, LPCSTR path);
     void UpdateActorInfo(CInventoryOwner* owner);
@@ -59,11 +60,13 @@ public:
     virtual void Draw();
     virtual void Show(bool status);
 
+    pcstr GetDebugType() override { return "ui_actor_state_wnd"; }
+
 private:
     void update_round_states(EStateType stt_type, float initial, float max_power);
 };
 
-class ui_actor_state_item : public UIHintWindow
+class ui_actor_state_item final : public UIHintWindow
 {
     typedef UIHintWindow inherited;
 
@@ -79,7 +82,7 @@ protected:
 
 public:
     ui_actor_state_item();
-    ~ui_actor_state_item() override = default;
+
     void init_from_xml(CUIXml& xml, LPCSTR path, bool critical = true);
     void init_from_xml_plain(CUIXml& xml, LPCSTR path);
 
@@ -89,6 +92,7 @@ public:
     int set_arrow(float value); // 0..1
     bool show_static(bool status, u8 number = 1);
 
+    pcstr GetDebugType() override { return "ui_actor_state_item"; }
 }; // class ui_actor_state_item
 
 #endif // UI_ACTOR_STATE_INFO_H_INCLUDED

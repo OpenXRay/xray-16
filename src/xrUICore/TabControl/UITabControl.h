@@ -47,6 +47,7 @@ public:
     void SetActiveTab(const shared_str& sNewTab);
     void SetActiveTab_script(LPCSTR sNewTab) { SetActiveTab(sNewTab); };
     void SetActiveTabByIndex(u32 index);
+    bool SetNextActiveTab(bool next, bool loop);
 
     const u32 GetTabsCount() const { return m_TabsArr.size(); }
 
@@ -61,6 +62,8 @@ public:
     CUITabButton* GetButtonByIndex(u32 index) const;
 
     void ResetTab();
+
+    pcstr GetDebugType() override { return "CUITabControl"; }
 
 protected:
     // Список кнопок - переключателей закладок

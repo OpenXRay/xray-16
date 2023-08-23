@@ -13,7 +13,7 @@ public:
     float scale;
 
     cl_dt_scaler(float s) : scale(s) {}
-    void setup(R_constant* C) override { RCache.set_c(C, scale, scale, scale, 1 / r__dtex_range); }
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, scale, scale, scale, 1 / r__dtex_range); }
 };
 
 void fix_texture_thm_name(pstr fn)

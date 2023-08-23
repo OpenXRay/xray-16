@@ -14,7 +14,7 @@ class CUIWindow;
 class CUI3tButton;
 class CUIMessageBoxEx;
 
-class CUIMpAdminMenu : public CUIDialogWnd, public CUIWndCallback
+class CUIMpAdminMenu final : public CUIDialogWnd, public CUIWndCallback
 {
 private:
     typedef CUIWindow inherited;
@@ -41,4 +41,6 @@ public:
     void SetActiveSubdialog(const shared_str& section);
     void RemoteAdminLogin(CUIWindow*, void*);
     void ShowMessageBox(CUIMessageBox::E_MESSAGEBOX_STYLE style, LPCSTR reason = "");
+
+    pcstr GetDebugType() override { return "CUIMpAdminMenu"; }
 };

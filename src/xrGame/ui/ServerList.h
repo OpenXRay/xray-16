@@ -41,7 +41,7 @@ public:
     bool listen_servers;
 };
 
-class CServerList : public CUIWindow
+class CServerList final : public CUIWindow
 {
 public:
     enum ESortingMode
@@ -82,6 +82,8 @@ public:
     void RefreshQuick();
     void ShowServerInfo();
     virtual void RefreshList();
+
+    pcstr GetDebugType() override { return "CServerList"; }
 
 private:
     void OnUpdate() { RefreshList(); }

@@ -10,7 +10,7 @@ class CUI3tButton;
 class CUI3tButton;
 class CUITextWnd;
 
-class CUIServerInfo : public CUIDialogWnd, public CUIWndCallback
+class CUIServerInfo final : public CUIDialogWnd, public CUIWndCallback
 {
 public:
     CUIServerInfo();
@@ -22,6 +22,8 @@ public:
     void SetServerRules(u8 const* data_ptr, u32 const data_size);
     bool HasInfo() { return m_dds_file_created; };
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+
+    pcstr GetDebugType() override { return "CUIServerInfo"; }
 
 private:
     void InitCallbacks();

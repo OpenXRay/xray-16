@@ -22,7 +22,7 @@
 		<text>Erstelle neues Spiel</text>
 	</string>
 	<string id="ui_mm_always_active">
-		<text>Immer aktiv</text>
+		<text>Nicht pausieren bei Alt+Tab</text>
 	</string>
 	<string id="ui_mm_detail_radius">
 		<text>Grasdetail Radius</text>
@@ -45,14 +45,8 @@
 	<string id="renderer_gl">
 		<text>Erw. Volldyn. Beleuchtung (OpenGL)</text>
 	</string>
-	<string id="ui_mm_r2_fxaa">
-		<text>FXAA</text>
-	</string>
 	<string id="ui_mm_r2_smap_size">
 		<text>Qualitat der Schattenkarte</text>
-	</string>
-	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
-		<text>Nassflachenoptimierung</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
 		<text>Nassflachen Nahbereich</text>
@@ -65,6 +59,12 @@
 	</string>
 	<string id="ui_mm_fov">
 		<text>Blickwinkel (FOV)</text>
+	</string>
+	<string id="ui_mm_fps_limit">
+		<text>Spiel-FPS-Limit</text>
+	</string>
+	<string id="ui_mm_fps_limit_in_menu">
+		<text>Menü-FPS-Limit</text>
 	</string>
 	<string id="ui_mm_localization">
 		<text>Sprache</text>

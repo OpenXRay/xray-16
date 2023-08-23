@@ -1,0 +1,49 @@
+<window>
+	<map_desc x="144" y="115" width="749" height="543">
+		<background x="0" y="0" width="749" height="543">
+			<texture>ui_frame_mainDes</texture>
+		</background>
+		<caption x="42" y="4" width="220" height="32">
+			<text font="graffiti22" r="192" g="168" b="144" vert_align="c">mp_map_desc</text>
+		</caption>
+		<image_frames_1 x="53" y="44" width="220" height="277">
+			<texture>ui_TV_descr_b</texture>
+		</image_frames_1>
+		<image_frames_2 x="273" y="44" width="224" height="277">
+			<texture>ui_TV_descr_back</texture>
+		</image_frames_2>
+		<image_frames_3 x="497" y="44" width="220" height="277">
+			<texture>ui_TV_descr_e</texture>
+		</image_frames_3>
+
+    <image x="80" y="61" width="287" height="215" stretch="1">
+      <texture width="256" height="175">ui\ui_noise</texture>
+    </image>
+		
+		<map_info x="470" y="100" width="250" height="215" />
+		
+		<text_desc x="72" y="331" width="620" height="160" always_show_scroll="0" complex_mode="1"/>			
+		
+		<btn_next x="394" y="504" width="157" height="48">
+			<texture>ui_button_main02</texture>
+			<text font="graffiti19" align="c">mp_next</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>				
+				<t r="180" g="153" b="155"/>				
+				<d r="106" g="95" b="91"/>							
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_next>
+
+    <btn_spectator x="551" y="504" width="157" height="48">
+			<texture>ui_button_main02</texture>
+			<text font="graffiti19" align="c">mp_spectator</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>				
+				<t r="180" g="153" b="155"/>				
+				<d r="106" g="95" b="91"/>							
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_spectator>
+	</map_desc>
+</window>

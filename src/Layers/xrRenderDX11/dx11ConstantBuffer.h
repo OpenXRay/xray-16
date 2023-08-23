@@ -13,7 +13,7 @@ public:
 
     bool Similar(dx11ConstantBuffer& _in);
     ID3DBuffer* GetBuffer() { return m_pBuffer; }
-    void Flush();
+    void Flush(u32 context_id);
 
     //	Set copy data into constant buffer
     //	Plain buffer member

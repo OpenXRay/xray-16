@@ -60,7 +60,7 @@ void CBlender_Vertex_aref::Compile(CBlender_Compile& C)
 
 void CBlender_Vertex_aref::CompileFFP(CBlender_Compile& C) const
 {
-    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
     {
         C.PassBegin();
         {
@@ -96,7 +96,7 @@ void CBlender_Vertex_aref::CompileFFP(CBlender_Compile& C) const
                     C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
                 else
                     C.PassSET_Blend(TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, oAREF.value);
-                C.PassSET_LightFog(ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT, TRUE);
+                C.PassSET_LightFog(FALSE, TRUE);
 
                 // Stage1 - Base texture
                 C.StageBegin();
@@ -110,7 +110,6 @@ void CBlender_Vertex_aref::CompileFFP(CBlender_Compile& C) const
             C.PassEnd();
             break;
         }
-
         case SE_R1_LMODELS:
         {
             // Lighting only

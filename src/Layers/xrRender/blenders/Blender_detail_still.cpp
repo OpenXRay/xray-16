@@ -46,7 +46,7 @@ void CBlender_Detail_Still::CompileFFP(CBlender_Compile& C) const
     else
         C.PassSET_Blend_SET(TRUE, 200);
 
-    if (ps_r1_ffp_lighting_mode == R1_FFP_LIGHTING_CONSTANT)
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
     {
         C.PassSET_LightFog(TRUE, TRUE);
 

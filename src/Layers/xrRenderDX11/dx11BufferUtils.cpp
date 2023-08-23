@@ -368,14 +368,14 @@ void VertexStreamBuffer::Destroy()
     _RELEASE(m_DeviceBuffer);
 }
 
-void* VertexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= false*/)
+void* VertexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= false*/) // TODO: this should be moved into backend
 {
     VERIFY(m_DeviceBuffer);
 
     const auto flag = flush ? D3D_MAP_WRITE_DISCARD : D3D_MAP_WRITE_NO_OVERWRITE;
 
     D3D11_MAPPED_SUBRESOURCE MappedSubRes;
-    HW.pContext->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes);
+    HW.get_context(CHW::IMM_CTX_ID)->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes); // TODO: proper context id + check for flush & imm
 
     u8* pData = static_cast<u8*>(MappedSubRes.pData);
     pData += offset;
@@ -383,10 +383,10 @@ void* VertexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= fal
     return static_cast<void*>(pData);
 }
 
-void VertexStreamBuffer::Unmap()
+void VertexStreamBuffer::Unmap() // TODO: this should be moved into backend
 {
     VERIFY(m_DeviceBuffer);
-    HW.pContext->Unmap(m_DeviceBuffer, 0);
+    HW.get_context(CHW::IMM_CTX_ID)->Unmap(m_DeviceBuffer, 0); // TODO: proper context id
 }
 
 bool VertexStreamBuffer::IsValid() const
@@ -424,7 +424,7 @@ void* IndexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= fals
     const auto flag = flush ? D3D_MAP_WRITE_DISCARD : D3D_MAP_WRITE_NO_OVERWRITE;
 
     D3D11_MAPPED_SUBRESOURCE MappedSubRes;
-    HW.pContext->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes);
+    HW.get_context(CHW::IMM_CTX_ID)->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes); // TODO: see above comms for vertex
 
     u8* pData = static_cast<u8*>(MappedSubRes.pData);
     pData += offset;
@@ -435,7 +435,7 @@ void* IndexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= fals
 void IndexStreamBuffer::Unmap()
 {
     VERIFY(m_DeviceBuffer);
-    HW.pContext->Unmap(m_DeviceBuffer, 0);
+    HW.get_context(CHW::IMM_CTX_ID)->Unmap(m_DeviceBuffer, 0); // TODO: see above comms for vertex
 }
 
 bool IndexStreamBuffer::IsValid() const

@@ -1,7 +1,5 @@
 #pragma once
 
-//. #define MOD_COMPRESS
-
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 

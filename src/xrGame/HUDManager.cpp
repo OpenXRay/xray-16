@@ -19,7 +19,7 @@
 extern CUIGameCustom* CurrentGameUI() { return HUD().GetGameUI(); }
 
 //--------------------------------------------------------------------
-CHUDManager::CHUDManager() : pUIGame(nullptr), m_pHUDTarget(xr_new<CHUDTarget>()), b_online(false) {}
+CHUDManager::CHUDManager() : m_pHUDTarget(xr_new<CHUDTarget>()) {}
 //--------------------------------------------------------------------
 CHUDManager::~CHUDManager()
 {
@@ -194,8 +194,6 @@ void CHUDManager::Update_GrenadeView(Fvector& pos_actor) { HitMarker.Update_Gren
 void CHUDManager::SetHitmarkType(LPCSTR tex_name) { HitMarker.InitShader(tex_name); }
 void CHUDManager::SetGrenadeMarkType(LPCSTR tex_name) { HitMarker.InitShader_Grenade(tex_name); }
 // ------------------------------------------------------------------------------------
-
-#include "ui/UIMainIngameWnd.h"
 
 void CHUDManager::Load()
 {

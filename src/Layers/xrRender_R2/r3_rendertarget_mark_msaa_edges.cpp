@@ -31,9 +31,9 @@ void CRenderTarget::mark_msaa_edges()
 #endif
     RImplementation.Vertex.Unlock(4, g_combine_2UV->vb_stride);
 #if defined(USE_DX11) // XXX: remove this difference
-    u_setrt(nullptr, nullptr, nullptr, rt_MSAADepth);
+    u_setrt(RCache, nullptr, nullptr, nullptr, rt_MSAADepth);
 #elif defined(USE_OGL)
-    u_setrt(Device.dwWidth, Device.dwHeight, 0, 0, 0, rt_MSAADepth->pZRT);
+    u_setrt(RCache, Device.dwWidth, Device.dwHeight, 0, 0, 0, rt_MSAADepth->pZRT);
 #endif
     RCache.set_Element(s_mark_msaa_edges->E[0]);
     RCache.set_Geometry(g_combine_2UV);

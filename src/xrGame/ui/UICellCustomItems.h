@@ -8,6 +8,7 @@ class CUIInventoryCellItem : public CUICellItem
 
 public:
     CUIInventoryCellItem(CInventoryItem* itm);
+
     virtual bool EqualTo(CUICellItem* itm);
     virtual void UpdateItemText();
     CUIDragItem* CreateDragItem();
@@ -16,9 +17,11 @@ public:
     bool IsHelperOrHasHelperChild();
     void Update();
     CInventoryItem* object() { return (CInventoryItem*)m_pData; }
+
+    pcstr GetDebugType() override { return "CUIInventoryCellItem"; }
 };
 
-class CUIAmmoCellItem : public CUIInventoryCellItem
+class CUIAmmoCellItem final : public CUIInventoryCellItem
 {
     typedef CUIInventoryCellItem inherited;
 
@@ -32,9 +35,11 @@ public:
     virtual bool EqualTo(CUICellItem* itm);
     virtual CUIDragItem* CreateDragItem();
     CWeaponAmmo* object() { return (CWeaponAmmo*)m_pData; }
+
+    pcstr GetDebugType() override { return "CUIAmmoCellItem"; }
 };
 
-class CUIWeaponCellItem : public CUIInventoryCellItem
+class CUIWeaponCellItem final : public CUIInventoryCellItem
 {
     typedef CUIInventoryCellItem inherited;
 
@@ -71,9 +76,11 @@ public:
     virtual CUIDragItem* CreateDragItem();
     virtual bool EqualTo(CUICellItem* itm);
     CUIStatic* get_addon_static(u32 idx) { return m_addons[idx]; }
+
+    pcstr GetDebugType() override { return "CUIWeaponCellItem"; }
 };
 
-class CBuyItemCustomDrawCell : public ICustomDrawCellItem
+class CBuyItemCustomDrawCell final : public ICustomDrawCellItem
 {
     CGameFont* m_pFont;
     string16 m_string;

@@ -20,6 +20,8 @@ public:
     CUITalkDialogWnd();
     ~CUITalkDialogWnd() override;
 
+    pcstr GetDebugType() override { return "CUITalkDialogWnd"; }
+
     void InitTalkDialogWnd();
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
@@ -66,6 +68,8 @@ public:
     void SetTradeMode();
     void UpdateButtonsLayout(bool b_disable_break, bool trade_enabled);
 
+    void TryScrollAnswersList(bool down);
+
 private:
     // List of questions we can ask the character
     CUIScrollView* UIQuestionsList;
@@ -98,9 +102,11 @@ public:
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
     void OnTextClicked(CUIWindow* w, void*);
+
+    pcstr GetDebugType() override { return "CUIQuestionItem"; }
 };
 
-class CUIAnswerItem : public CUIWindow
+class CUIAnswerItem: public CUIWindow
 {
     typedef CUIWindow inherited;
 
@@ -112,6 +118,7 @@ class CUIAnswerItem : public CUIWindow
 public:
     CUIAnswerItem(CUIXml* xml_doc, LPCSTR path);
     void Init(LPCSTR text, LPCSTR name);
+    pcstr GetDebugType() override { return "CUIAnswerItem"; }
 };
 
 class CUIAnswerItemIconed final : public CUIAnswerItem
@@ -123,4 +130,5 @@ public:
     CUIAnswerItemIconed(CUIXml* xml_doc, LPCSTR path);
     void Init(LPCSTR text, LPCSTR name, LPCSTR texture_name);
     void Init(pcstr text, pcstr texture_name, Frect texture_rect);
+    pcstr GetDebugType() override { return "CUIAnswerItemIconed"; }
 };

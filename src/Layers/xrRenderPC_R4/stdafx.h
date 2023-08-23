@@ -37,7 +37,6 @@
 #include "Layers/xrRenderDX11/CommonTypes.h"
 
 #include "Layers/xrRenderDX11/dx11HW.h"
-#include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 #include "Layers/xrRender/Shader.h"
 

@@ -1,0 +1,380 @@
+<w>
+  <main x="85" y="0" width="854" height="768">
+    <auto_static x="249" y="0" width="604" height="768" stretch="1">
+      <texture>ui_inGame2_inventory_back</texture>
+    </auto_static>
+
+    <auto_static x="853" y="0" width="86" height="768" stretch="1">
+      <texture>ui_inGame2_back_invw10_r</texture>
+    </auto_static>
+
+  </main>
+  
+  <actor_ch_info x="583" y="0" width="270" height="135">
+    <name_static x="8" y="18" width="116" height="16">
+      <text align="l" font="letterica18" color="ui_2"/>
+    </name_static>
+    <community_static x="8" y="36" width="116" height="14">
+      <text align="l" font="letterica16" color="ui_3"/>
+    </community_static>
+
+    <icon      x="126" y="8" width="138" height="110" stretch="1">
+		<deadbody r="255" g="160" b="160" a="205"/>
+	</icon>
+    <icon_over x="126" y="8" width="138" height="110" stretch="1">
+      <texture>ui_inGame2_character_border</texture>
+    </icon_over>
+
+    <rank_icon      x="7" y="60" width="38" height="47" stretch="1"/>
+
+    <commumity_big_icon      x="44" y="59" width="88" height="46" stretch="1"/>
+    <commumity_big_icon_over x="43" y="58" width="90" height="48" stretch="1">
+      <texture>ui_inv_flogo_over</texture>
+	</commumity_big_icon_over>
+  </actor_ch_info>
+ 
+  <partner_ch_info x="4" y="0" width="270" height="135">
+    <name_static x="8" y="18" width="116" height="16">
+      <text align="l" font="letterica18" color="ui_2"/>
+    </name_static>
+    <community_static x="8" y="36" width="116" height="14">
+      <text align="l" font="letterica16" color="ui_3"/>
+    </community_static>
+
+
+    <icon x="128" y="8" width="138" height="110" stretch="1">
+		<deadbody r="255" g="160" b="160" a="205"/>
+	</icon>
+    <icon_over x="128" y="8" width="138" height="110" stretch="1">
+      <texture>ui_inGame2_character_border</texture>
+    </icon_over>
+   
+    <rank_icon      x="7" y="60" width="38" height="47" stretch="1"/>
+
+    <commumity_big_icon      x="44" y="59" width="88" height="46" stretch="1"/>
+    <commumity_big_icon_over x="43" y="58" width="90" height="48" stretch="1">
+      <texture>ui_inv_flogo_over</texture>
+	</commumity_big_icon_over>
+
+  </partner_ch_info>
+  
+  <actor_money_static x="588" y="116" width="67" height="20">
+    <text align="r" font="graffiti22" color="ui_7"/>
+  </actor_money_static>
+
+  <partner_money_static x="8" y="116" width="67" height="20">
+    <text align="r" font="graffiti22" color="ui_7"/>
+  </partner_money_static>
+  
+  
+	<actor_weight_caption x="658" y="738" width="71" height="14">
+		<text align="l" font="letterica16" color="ui_3">ui_total_weight</text>
+	</actor_weight_caption>
+    <actor_weight x="733" y="738" width="38" height="14">
+		<text align="l" font="letterica16" color="ui_7"/>
+	</actor_weight>
+	<actor_weight_max x="775" y="738" width="71" height="14">
+		<text align="l" font="letterica16" color="ui_3"/>
+	</actor_weight_max>
+
+	<partner_weight_caption x="75" y="738" width="71" height="14">
+        <text align="r" font="letterica16" color="ui_3">ui_total_weight</text>
+    </partner_weight_caption>
+   <partner_weight x="250" y="738" width="38" height="14">
+    <text align="l" font="letterica16" color="ui_7"/>
+  </partner_weight>
+
+  <left_delimiter_frl  x="-5" y="326" width="280" height="39" stretch="1">
+    <texture>ui_inv_delimiter</texture>
+  </left_delimiter_frl>
+  <!-- partner  ---------------------------------------------------------------- -->
+ <left_delimiter  x="-5" y="326" width="280" height="39" stretch="1">
+    <texture>ui_inGame2_delimiter_02</texture>
+    <trade_caption x="85" y="8" width="71" height="14">
+      <text align="l" font="letterica16" color="ui_3">ui_total_price</text>
+    </trade_caption>
+	<trade_price x="160"  y="8" width="38" height="14">
+		<text align="l" font="letterica16" color="ui_7"/>
+	</trade_price>
+	<trade_weight_max x="208" y="8" width="71" height="14">
+		<text align="l" font="letterica16" color="ui_3"/>
+	</trade_weight_max>
+  </left_delimiter>
+  
+  <right_delimiter_frl x="573" y="326" width="280" height="39" stretch="1">
+    <texture>ui_inv_delimiter</texture>
+  </right_delimiter_frl>
+  <!-- actor  ---------------------------------------------------------------- -->
+  <right_delimiter x="573" y="326" width="280" height="39" stretch="1">
+    <texture>ui_inGame2_delimiter_02</texture>
+    <trade_caption x="85" y="8" width="71" height="14">
+      <text align="l" font="letterica16" color="ui_3">ui_total_price</text>
+    </trade_caption>
+    <trade_price x="160"  y="8" width="38" height="14">
+		<text align="l" font="letterica16" color="ui_7"/>
+	</trade_price>
+	<trade_weight_max x="208" y="8" width="71" height="14">
+		<text align="l" font="letterica16" color="ui_3"/>
+	</trade_weight_max>
+  </right_delimiter>
+
+  <left_background x="0" y="0" width="275" height="768" stretch="1">
+    <texture>ui_inGame2_left_side</texture>
+    <auto_static x="-85" y="0" width="85" height="768" stretch="1">
+      <texture>ui_inGame2_back_invw10_l</texture>
+    </auto_static>
+  </left_background>
+
+  <clock_value x="-82" y="721" width="90" height="47" stretch="1">
+	<texture>ui_watch_back</texture>
+    <text x="42" y="15" font="graffiti22" color="ui_7"/>
+  </clock_value>
+	
+  <belt_list_over x="298" y="94" width="48" height="58" dy="65" stretch="1">
+	<texture a="200">ui_closed_af_slot</texture>
+  </belt_list_over>
+
+  <dragdrop_bag x="588" y="140" width="257" height="590"
+          cell_width="34" cell_height="41" rows_num="14" cols_num="7"
+          unlimited="1" group_similar="1" always_show_scroll="1"/>
+
+  <dragdrop_belt x="303" y="97" width="38" height="320"
+          cell_width="38" cell_height="45" rows_num="5" cols_num="1"
+		  cell_sp_x="0" cell_sp_y="20" a="0"/>
+
+  <dragdrop_outfit x="379" y="160" width="68" height="123"
+          cell_width="34" cell_height="41" rows_num="3" cols_num="2"
+          custom_placement="0" a="0"/>
+  
+  <dragdrop_detector x="388" y="100" width="34" height="41"
+          cell_width="34" cell_height="41" rows_num="1" cols_num="1"
+          custom_placement="0" a="0"/>
+
+  <dragdrop_pistol x="379" y="305" width="68" height="41"
+          cell_width="34" cell_height="41" rows_num="1" cols_num="2"
+          custom_placement="0" a="0"/>
+
+  <dragdrop_automatic x="467" y="100" width="68" height="246"
+          cell_width="34" cell_height="41" rows_num="6" cols_num="2"
+          custom_placement="0" vertical_placement="1" a="0"/>
+  
+  <dragdrop_actor_trade x="588" y="144" width="257" height="180"
+          cell_width="34" cell_height="41" rows_num="4" cols_num="7"
+          unlimited="1" group_similar="1" always_show_scroll="1"/>
+
+  <dragdrop_actor_trade_bag x="588" y="365" width="257" height="363"
+          cell_width="34" cell_height="41" rows_num="8" cols_num="7"
+          unlimited="1" group_similar="1" always_show_scroll="1"/>
+
+  <dragdrop_partner_trade x="8" y="144" width="257" height="180"
+            cell_width="34" cell_height="41" rows_num="4" cols_num="7"
+            unlimited="1" group_similar="1" always_show_scroll="1"/>
+
+  <dragdrop_partner_bag x="8" y="365" width="257" height="363"
+            cell_width="34" cell_height="41" rows_num="8" cols_num="7"
+            unlimited="1" group_similar="1" always_show_scroll="1"/>
+
+  <dragdrop_deadbody_bag x="8" y="140" width="257" height="590"
+            cell_width="34" cell_height="41" rows_num="14" cols_num="7"
+            unlimited="1" group_similar="1" always_show_scroll="1"/>
+
+  <trade_button x="296" y="725" width="131" height="48" stretch="1">
+   <window_name>trade_button</window_name>
+    <texture>ui_button_main01</texture>
+    <text font="graffiti22" align="c">ui_st_trade</text>
+    <text_color>
+      <e color ="ui_6"/>
+      <t color ="ui_black"/>
+      <d color ="ui_5"/>
+      <h color ="ui_black"/>
+    </text_color>
+  </trade_button>
+  
+  <takeall_button x="296" y="725" width="131" height="48" stretch="1">
+    <window_name>takeall_button</window_name>
+    <texture>ui_button_main01</texture>
+    <text font="graffiti22" align="c">ui_st_take_all</text>
+    <text_color>
+      <e color ="ui_6"/>
+      <t color ="ui_black"/>
+      <d color ="ui_5"/>
+      <h color ="ui_black"/>
+    </text_color>
+  </takeall_button>
+  
+  <exit_button x="361" y="725" width="131" height="48" stretch="1">
+    <window_name>exit_button</window_name>
+    <texture>ui_button_main01</texture>
+    <text font="graffiti22" align="c">ui_inv_exit</text>
+    <text_color>
+      <e color ="ui_6"/>
+      <t color ="ui_black"/>
+      <d color ="ui_5"/>
+      <h color ="ui_black"/>
+    </text_color>
+  </exit_button>
+
+  <action_sounds>
+    <snd_open>interface\inv_open</snd_open>
+    <snd_close>interface\inv_close</snd_close>
+    <snd_item_to_slot>interface\inv_slot</snd_item_to_slot>
+    <snd_item_to_belt>interface\inv_belt</snd_item_to_belt>
+    <snd_item_to_ruck>interface\inv_ruck</snd_item_to_ruck>
+    <snd_properties>interface\inv_properties</snd_properties>
+    <snd_drop_item>interface\inv_drop</snd_drop_item>
+    <snd_attach_addon>interface\inv_attach_addon</snd_attach_addon>
+    <snd_detach_addon>interface\inv_detach_addon</snd_detach_addon>
+    <snd_item_use>interface\inv_slot</snd_item_use>
+  </action_sounds>
+  
+	<hint_wnd x="0" y="0" width="210" height="100">
+		<background x="0" y="0" width="210" height="100" border="10" stretch="1">
+			<texture a="100">ui_temp_frame</texture>
+		</background>
+		<text x="17" y="20" width="158" height="100">
+			<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t"/>
+		</text>
+	</hint_wnd>
+
+  <actor_state_info x="275" y="450" width="300" height="310">
+	
+	<hint_wnd x="0" y="0" width="175" height="100">
+		<background x="0" y="0" width="175" height="100" border="10" stretch="1">
+			<texture a="100">ui_temp_frame</texture>
+		</background>
+		<text x="17" y="20" width="158" height="100">
+			<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t"/>
+		</text>
+	</hint_wnd>
+  
+   <stamina_state x="23" y="22" width="260" height="30">
+        <hint_text delay="800">st_ui_stamina_state</hint_text>
+		<icon x="3" y="6" width="18" height="22" magnitude="1000">
+			<text align="c" vert_align="c" font="graffiti22" color="ui_4">99</text>
+		</icon>
+		<state_progress x="43" y="11" width="174" height="9" horz="1" min="0" max="1" pos="0">
+			<progress stretch="1">
+				<texture>ui_char_stamina</texture>
+			</progress>
+		</state_progress>
+	</stamina_state>
+
+  <health_state x="23" y="57" width="260" height="30">
+        <hint_text delay="800">st_ui_health_static</hint_text>
+		<icon x="3" y="5" width="18" height="22" magnitude="100" light_anim="ui_slow_blinking" la_cyclic="1" la_texture="1" la_text="0" la_alpha="1" stretch="1">
+			<texture a="255">ui_char_bleeding</texture>
+		</icon>
+		<state_progress x="43" y="11" width="174" height="9" horz="1" min="0" max="1" pos="0">
+			<progress stretch="1">
+				<texture>ui_char_health</texture>
+			</progress>
+		</state_progress>
+	</health_state>
+
+  <armor_state x="23" y="92" width="260" height="30">
+        <hint_text delay="800">st_ui_armor_static</hint_text>
+		<icon x="3" y="7" width="18" height="22" magnitude="100">
+			<text align="c" vert_align="c" font="graffiti22" color="ui_4">99</text>
+		</icon>
+		<state_progress x="43" y="11" width="174" height="9" horz="1" min="0" max="1" pos="0">
+			<progress stretch="1">
+				<texture>ui_char_armor</texture>
+			</progress>
+		</state_progress>
+	</armor_state>
+
+	<main_sensor x="110" y="150" width="83" height="100">
+		<hint_text delay="800">st_ui_main_sensor</hint_text>
+		<icon x="15" y="54" width="55" height="51" stretch="1">
+			<texture>ui_hud2_rad01_over</texture>
+		</icon>
+		<arrow x="38" y="32" width="9" height="97" heading="1" clockwise="1" begin_angle="0.75" end_angle="-0.75" ang_velocity="0.75">
+			<texture a="255">ui_hud2_rad01_arrow</texture>
+		</arrow>
+		<arrow_shadow x="40" y="34" width="9" height="97" heading="1" clockwise="1" begin_angle="0.75" end_angle="-0.8" ang_velocity="0.75">
+			<texture a="250">ui_hud2_rad01_arrow_shadow</texture>
+		</arrow_shadow>
+		
+		<progress_shape x="3" y="40" width="96" height="96" sector_count="36" clockwise="1" blend="0" begin_angle="0.75" end_angle="-0.75">
+			<front x="0" y="0" width="80" height="96" stretch="1">
+				<texture>ui_hud2_rad01_progress</texture>
+			</front>
+		</progress_shape>
+
+	</main_sensor>
+	
+	<fire_sensor x="28" y="132" width="78" height="67">
+		<hint_text delay="800">st_ui_fire_sensor</hint_text>
+		<icon x="6" y="41" width="17" height="20" magnitude="100">
+			<text align="c" vert_align="c" font="graffiti22" color="ui_7">99</text>
+		</icon>
+		<arrow x="48" y="14" width="9" height="39" heading="1" clockwise="1" begin_angle="2.4" end_angle="-2.4">
+			<texture a="255">ui_char_arrow</texture>
+		</arrow>
+		<arrow_shadow x="49" y="16" width="9" height="39" heading="1" clockwise="1" begin_angle="2.4" end_angle="-2.45">
+			<texture a="150">ui_char_arrow_shadow</texture>
+		</arrow_shadow>
+		<!--progress_shape x="38" y="17" width="31" height="31" sector_count="24" clockwise="1" blend="0" begin_angle="2.4" end_angle="-2.4">
+			<front x="0" y="0" width="26" height="31" stretch="1">
+				<texture>ui_char_resist_fire</texture>
+			</front>
+		</progress_shape-->
+	</fire_sensor>
+	
+	<radia_sensor x="200" y="132" width="78" height="67">
+		<hint_text delay="800">st_ui_radia_sensor</hint_text>
+		<icon x="57" y="41" width="17" height="20" magnitude="100">
+			<text align="c" vert_align="c" font="graffiti22" color="ui_7">99</text>
+		</icon>
+		<arrow x="23" y="14" width="9" height="39" heading="1" clockwise="1" begin_angle="2.4" end_angle="-2.4">
+			<texture a="255">ui_char_arrow</texture>
+		</arrow>
+		<arrow_shadow x="25" y="16" width="9" height="39" heading="1" clockwise="1" begin_angle="2.4" end_angle="-2.45">
+			<texture a="150">ui_char_arrow_shadow</texture>
+		</arrow_shadow>
+		<!--progress_shape x="14" y="17" width="31" height="31" sector_count="24" clockwise="1" blend="0" begin_angle="2.4" end_angle="-2.4">
+			<front x="0" y="0" width="26" height="31" stretch="1">
+				<texture>ui_char_resist_rad</texture>
+			</front>
+		</progress_shape-->
+	</radia_sensor>
+
+	<acid_sensor x="27" y="208" width="78" height="67">
+		<hint_text delay="800">st_ui_acid_sensor</hint_text>
+		<icon x="6" y="8" width="17" height="20" magnitude="100">
+			<text align="c" vert_align="c" font="graffiti22" color="ui_7">99</text>
+		</icon>
+		<arrow x="48" y="14" width="9" height="39" heading="1" clockwise="1" begin_angle="2.4" end_angle="-2.4">
+			<texture a="255">ui_char_arrow</texture>
+		</arrow>
+		<arrow_shadow x="49" y="16" width="9" height="39" heading="1" clockwise="1" begin_angle="2.4" end_angle="-2.45">
+			<texture a="150">ui_char_arrow_shadow</texture>
+		</arrow_shadow>
+		<!--progress_shape x="38" y="15" width="31" height="31" sector_count="24" clockwise="1" blend="0" begin_angle="2.4" end_angle="-2.4">
+			<front x="0" y="0" width="26" height="31" stretch="1">
+				<texture>ui_char_resist_acid</texture>
+			</front>
+		</progress_shape-->
+	</acid_sensor>
+
+	<psi_sensor x="200" y="208" width="78" height="67">
+		<hint_text delay="800">st_ui_psi_sensor</hint_text>
+		<icon x="57" y="8" width="17" height="20" magnitude="100">
+			<text align="c" vert_align="c" font="graffiti22" color="ui_7">99</text>
+		</icon>
+		<arrow x="23" y="14" width="9" height="39" heading="1" clockwise="1" begin_angle="2.4" end_angle="-2.4">
+			<texture a="255">ui_char_arrow</texture>
+		</arrow>
+		<arrow_shadow x="25" y="16" width="9" height="39" heading="1" clockwise="1" begin_angle="2.4" end_angle="-2.45">
+			<texture a="150">ui_char_arrow_shadow</texture>
+		</arrow_shadow>
+		<!--progress_shape x="14" y="15" width="31" height="31" sector_count="24" clockwise="1" blend="0" begin_angle="2.4" end_angle="-2.4">
+			<front x="0" y="0" width="26" height="31" stretch="1">
+				<texture>ui_char_resist_psi</texture>
+			</front>
+		</progress_shape-->
+	</psi_sensor>
+
+  </actor_state_info>
+
+</w>

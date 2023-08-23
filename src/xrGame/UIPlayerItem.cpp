@@ -24,7 +24,6 @@ UIPlayerItem::UIPlayerItem(ETeam team, ClientID const& clientId, UITeamState* ts
     m_player_node_root = nullptr;
 }
 
-UIPlayerItem::~UIPlayerItem() {}
 void UIPlayerItem::Init(CUIXml& uiXml, LPCSTR playerNode, int index)
 {
     CUIXmlInit::InitWindow(uiXml, playerNode, index, this);

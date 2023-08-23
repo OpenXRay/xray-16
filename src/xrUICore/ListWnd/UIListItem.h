@@ -37,6 +37,8 @@ public:
     virtual bool IsHighlightText();
     virtual void SetHighlightText(bool Highlight) { m_bHighlightText = Highlight; }
 
+    pcstr GetDebugType() override { return "CUIListItem"; }
+
 protected:
     //указатель на произвольные данные, которые могут
     //присоедениены к элементу
