@@ -9,7 +9,7 @@
 #include "game_cl_teamdeathmatch.h"
 #include "game_sv_mp_vote_flags.h"
 
-CUIVotingCategory::CUIVotingCategory()
+CUIVotingCategory::CUIVotingCategory() : CUIDialogWnd(CUIVotingCategory::GetDebugType())
 {
     xml_doc = NULL;
     kick = NULL;

@@ -1,9 +1,10 @@
 #pragma once
+
 #include "xrUICore/Windows/UIWindow.h"
 #include "xrUICore/Callbacks/UIWndCallback.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "GameTaskDefs.h"
-#include "xrUICore/Buttons/UICheckButton.h"
+#include "UIMapFilters.h"
 
 class CUIMapWnd;
 class CUIStatic;
@@ -13,7 +14,6 @@ class CUITaskItem;
 class CUI3tButton;
 class CUIFrameLineWnd;
 class CUIFrameWindow;
-class CUICheckButton;
 class UITaskListWnd;
 class UIMapLegend;
 class UIHint;
@@ -42,14 +42,7 @@ private:
     CUI3tButton* m_btn_focus;
     CUI3tButton* m_btn_focus2;
 
-    CUICheckButton* m_cbTreasures;
-    CUICheckButton* m_cbQuestNpcs;
-    CUICheckButton* m_cbSecondaryTasks;
-    CUICheckButton* m_cbPrimaryObjects;
-    bool m_bTreasuresEnabled;
-    bool m_bQuestNpcsEnabled;
-    bool m_bSecondaryTasksEnabled;
-    bool m_bPrimaryObjectsEnabled;
+    CUIMapFilters m_filters;
 
     UITaskListWnd* m_task_wnd;
     bool m_task_wnd_show;
@@ -60,50 +53,36 @@ public:
 
 public:
     CUITaskWnd(UIHint* hint);
-    virtual ~CUITaskWnd();
+    ~CUITaskWnd() override;
 
+    pcstr GetDebugType() override { return "CUITaskWnd"; }
+
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     bool Init();
     virtual void Update();
     virtual void Draw();
     void DrawHint();
     virtual void Show(bool status);
-    virtual void Reset();
 
     void ReloadTaskInfo();
     void ShowMapLegend(bool status) const;
     void Switch_ShowMapLegend() const;
-
-    bool IsTreasuresEnabled() const { return m_bTreasuresEnabled; };
-    bool IsQuestNpcsEnabled() const { return m_bQuestNpcsEnabled; };
-    bool IsSecondaryTasksEnabled() const { return m_bSecondaryTasksEnabled; };
-    bool IsPrimaryObjectsEnabled() const { return m_bPrimaryObjectsEnabled; };
-    void TreasuresEnabled(bool enable)
-    {
-        m_bTreasuresEnabled = enable;
-        if (m_cbTreasures)
-            m_cbTreasures->SetCheck(enable);
-    };
-    void QuestNpcsEnabled(bool enable)
-    {
-        m_bQuestNpcsEnabled = enable;
-        if (m_cbQuestNpcs)
-            m_cbQuestNpcs->SetCheck(enable);
-    };
-    void SecondaryTasksEnabled(bool enable)
-    {
-        m_bSecondaryTasksEnabled = enable;
-        if (m_cbSecondaryTasks)
-            m_cbSecondaryTasks->SetCheck(enable);
-    };
-    void PrimaryObjectsEnabled(bool enable)
-    {
-        m_bPrimaryObjectsEnabled = enable;
-        if (m_cbPrimaryObjects)
-            m_cbPrimaryObjects->SetCheck(enable);
-    };
-
     void Show_TaskListWnd(bool status);
+
+    [[nodiscard]]
+    bool IsTreasuresEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::Treasures); }
+    [[nodiscard]]
+    bool IsQuestNpcsEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::QuestNpcs); }
+    [[nodiscard]]
+    bool IsSecondaryTasksEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::SecondaryTasks); }
+    [[nodiscard]]
+    bool IsPrimaryObjectsEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::PrimaryObjects); }
+
+    void TreasuresEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::Treasures, enable); }
+    void QuestNpcsEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::QuestNpcs, enable); }
+    void SecondaryTasksEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::SecondaryTasks, enable); }
+    void PrimaryObjectsEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::PrimaryObjects, enable); }
 
 private:
     void TaskSetTargetMap(CGameTask* task);
@@ -114,11 +93,6 @@ private:
     void OnShowTaskListWnd(CUIWindow* w, void* d);
     void OnTask1DbClicked(CUIWindow*, void*);
     void OnTask2DbClicked(CUIWindow*, void*);
-
-    void OnShowTreasures(CUIWindow*, void*);
-    void OnShowPrimaryObjects(CUIWindow*, void*);
-    void OnShowSecondaryTasks(CUIWindow*, void*);
-    void OnShowQuestNpcs(CUIWindow*, void*);
 };
 
 class CUITaskItem final : public CUIWindow
@@ -142,6 +116,9 @@ public:
     void Init(CUIXml& uiXml, LPCSTR path);
     void InitTask(CGameTask* task);
     CGameTask* OwnerTask() { return m_owner; }
+
+    pcstr GetDebugType() override { return "CUITaskItem"; }
+
 public:
     bool show_hint_can;
     bool show_hint;

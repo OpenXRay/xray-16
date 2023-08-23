@@ -1,0 +1,54 @@
+<scroll_bar>
+	<default height="15" hold_delay="40">
+		<up_arrow width="15" height="16">
+			<texture_e>ui_scroll_btn_up</texture_e>
+		</up_arrow>
+		<down_arrow width="15" height="16">
+			<texture_e>ui_scroll_btn_down</texture_e>
+		</down_arrow>		
+		<back_v width="15" height="15">
+			<texture>ui_scroll_back</texture>
+		</back_v>		
+		<box_v>
+			<texture>ui_scroll_box</texture>
+		</box_v>		
+	</default>	
+  
+	<pda height="17" hold_delay="40">
+		<up_arrow width="17" height="21">
+			<texture_e>ui_scroll_PDA_btn_up_e</texture_e>
+			<texture_h>ui_scroll_PDA_btn_up_h</texture_h>
+			<texture_t>ui_scroll_PDA_btn_up_t</texture_t>
+		</up_arrow>
+		<down_arrow width="17" height="30">
+			<texture_e>ui_scroll_PDA_btn_down_e</texture_e>
+			<texture_h>ui_scroll_PDA_btn_down_h</texture_h>
+			<texture_t>ui_scroll_PDA_btn_down_t</texture_t>
+		</down_arrow>
+		
+		<left_arrow width="21" height="17">
+			<texture_e>ui_scroll_PDA_btn_left_e</texture_e>
+			<texture_h>ui_scroll_PDA_btn_left_h</texture_h>
+			<texture_t>ui_scroll_PDA_btn_left_t</texture_t>
+		</left_arrow>
+		<right_arrow width="21" height="17">
+			<texture_e>ui_scroll_PDA_btn_right_e</texture_e>
+			<texture_h>ui_scroll_PDA_btn_right_h</texture_h>
+			<texture_t>ui_scroll_PDA_btn_right_t</texture_t>
+		</right_arrow>
+		
+		<back width="17" height="17">
+			<texture>ui_scroll_PDA_back</texture>
+		</back>		
+		<back_v width="17" height="17">
+			<texture>ui_scroll_PDA_back</texture>
+		</back_v>
+		
+		<box>
+			<texture>ui_scroll_PDA_move</texture>
+		</box>
+		<box_v> <!-- 17x17 -->
+			<texture>ui_scroll_PDA_move</texture>
+		</box_v>	
+	</pda>
+</scroll_bar>

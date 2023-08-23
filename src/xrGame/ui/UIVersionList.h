@@ -23,6 +23,8 @@ public:
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
+    pcstr GetDebugType() override { return "CUIVersionList"; }
+
 private:
     void UpdateVersionList();
 };

@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<window>
+
+	<!-- ICON -->
+	<icon_static x="0" y="0" width="165" height="108"/>
+
+
+	<!-- RANK -->
+	<rank_static x="165" y="15" width="120" height="16">
+		<text x="0" y="0" font="letterica18" r="150" g="150" b="180"/>
+	</rank_static>
+	
+	<!-- RANK CAPTION -->
+	<rank_caption x="165" y="0" width="120" height="15">
+		<text x="0" y="0" font="letterica16" r="128" g="128" b="128">ui_st_rank</text>
+	</rank_caption>
+
+	<!-- COMMUNITY -->
+	<community_static x="165" y="59" width="120" height="15">
+		<text x="0" y="0" font="letterica18" r="150" g="150" b="180"></text>
+	</community_static>
+
+	<!-- COMMUNITY CAPTION -->
+	<community_caption x="165" y="44" width="120" height="15">
+		<text x="0" y="0" font="letterica16" r="128" g="128" b="128" a="255">ui_st_community</text>
+	</community_caption>
+
+	<!-- RELATION -->
+	<relation_static x="165" y="104" width="120" height="15">
+		<text x="0" y="0" font="letterica18" r="150" g="150" b="180"/>
+	</relation_static>
+
+	<!-- RELATION CAPTION -->
+	<relation_caption x="165" y="91" width="120" height="15">
+		<text x="0" y="0" font="letterica16" r="128" g="128" b="128" a="255">ui_st_relation</text>
+	</relation_caption>
+
+	<!-- BIO -->
+	<_biography_list x="0" y="143" width="273" height="268" always_show_scroll="0" left_ident="23" scroll_profile="pda">
+		<font font="letterica16" r="190" g="190" b="225"/>
+	</_biography_list>
+
+</window>
+

@@ -1,0 +1,6 @@
+<w>
+   <file name="ui\ui_ingame2_back_02">
+    <texture id="ui_inGame2_back_02" x="0" y="0" width="1024" height="768" />
+     <texture id="ui_inGame2_load_info" x="0" y="768" width="501" height="180" />
+   </file>
+</w>

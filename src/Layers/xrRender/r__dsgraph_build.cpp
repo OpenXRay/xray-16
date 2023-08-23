@@ -128,7 +128,7 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
         // Create common node
         // NOTE: Invisible elements exist only in R1
         matrixItems.emplace_back(_MatrixItem{ SSA, root, pVisual, xform });
-        
+
         // Need to sort for HZB efficient use
         if (SSA > matrixItems.ssa)
         {
@@ -711,7 +711,7 @@ void R_dsgraph_structure::build_subspace()
     if (o.is_main_pass && (o.sector_id == IRender_Sector::INVALID_SECTOR_ID))
     {
         if (g_pGameLevel)
-            g_hud->Render_Last(context_id);
+            g_pGameLevel->pHUD->Render_Last(context_id);
         return;
     }
 
@@ -914,14 +914,14 @@ void R_dsgraph_structure::build_subspace()
                             continue;
 
                         // renderable
-                        g_hud->Render_First(context_id);
+                        g_pGameLevel->pHUD->Render_First(context_id);
                     }
                 } while (0);
             }
 #endif
 
             if (o.is_main_pass)
-                g_hud->Render_Last(context_id);
+                g_pGameLevel->pHUD->Render_Last(context_id);
         }
     }
 

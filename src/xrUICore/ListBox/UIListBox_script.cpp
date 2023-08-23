@@ -9,11 +9,13 @@
 struct CUIListBoxItemWrapper : public CUIListBoxItem, public luabind::wrap_base
 {
     CUIListBoxItemWrapper(float h) : CUIListBoxItem(h) {}
+    pcstr GetDebugType() override { return "CUIListBoxItemScript"; }
 };
 
 struct CUIListBoxItemMsgChainWrapper : public CUIListBoxItemMsgChain, public luabind::wrap_base
 {
     CUIListBoxItemMsgChainWrapper(float h) : CUIListBoxItemMsgChain(h) {}
+    pcstr GetDebugType() override { return "CUIListBoxItemMsgChainScript"; }
 };
 
 // clang-format off

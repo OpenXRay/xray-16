@@ -1,9 +1,37 @@
 #include "stdafx.h"
 
 #include "editor_base.h"
+#include "editor_helper.h"
 
 namespace xray::editor
 {
+ide_tool::ide_tool()
+{
+    Device.editor().RegisterTool(this);
+}
+
+ide_tool::~ide_tool()
+{
+    Device.editor().UnregisterTool(this);
+}
+
+ImGuiWindowFlags ide_tool::get_default_window_flags() const
+{
+    return Device.editor().get_default_window_flags();
+}
+
+void ide::RegisterTool(ide_tool* tool)
+{
+    m_tools.emplace_back(tool);
+}
+
+void ide::UnregisterTool(const ide_tool* tool)
+{
+    const auto it = std::find(m_tools.begin(), m_tools.end(), tool);
+    if (it != m_tools.end())
+        m_tools.erase(it);
+}
+
 ide::ide()
 {
     ImGui::SetAllocatorFunctions(
@@ -110,8 +138,10 @@ void ide::OnFrame()
         [[fallthrough]];
 
     case visible_state::light:
-        if (m_windows.weather)
+        if (m_show_weather_editor)
             ShowWeatherEditor();
+        for (const auto& tool : m_tools)
+            tool->OnFrame();
         break;
     }
 
@@ -133,38 +163,59 @@ void ide::OnRender()
 
 void ide::ShowMain()
 {
+    static bool show_imgui_demo = false;
+    static bool show_imgui_metrics = false;
+
     if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("File"))
         {
-#ifndef MASTER_GOLD
-            ImGui::MenuItem("Weather Editor", nullptr, &m_windows.weather);
-#endif
-
-            if (ImGui::MenuItem("Stats", nullptr, psDeviceFlags.test(rsStatistic)))
+            if (imgui::MenuItemWithShortcut("Stats", kSCORES,
+                "Show engine statistics.\n"
+                "Key shortcut will only work when no window is in focus",
+                psDeviceFlags.test(rsStatistic)))
+            {
                 psDeviceFlags.set(rsStatistic, !psDeviceFlags.test(rsStatistic));
-
-            if (ImGui::MenuItem("Close"))
-                IR_Release();
-
+            }
+            if (imgui::MenuItemWithShortcut("Hide", kEDITOR, "Hide main ImGui windows and this menu bar, but leave tools visible (a.k.a. light mode)"))
+            {
+                SetState(visible_state::light);
+            }
+            if (imgui::MenuItemWithShortcut("Close", kQUIT, "Close editor and all windows"))
+            {
+                SetState(visible_state::hidden);
+            }
             ImGui::EndMenu();
         }
+#ifndef MASTER_GOLD
+        if (ImGui::BeginMenu("Tools"))
+        {
+            ImGui::MenuItem("Weather Editor", nullptr, &m_show_weather_editor);
+            for (const auto& tool : m_tools)
+            {
+                ImGui::MenuItem(tool->tool_name(), nullptr, &tool->get_open_state());
+            }
+            ImGui::EndMenu();
+        }
+#endif
         if (ImGui::BeginMenu("About"))
         {
 #ifndef MASTER_GOLD
-            ImGui::MenuItem("ImGui demo", nullptr, &m_windows.imgui_demo);
-            ImGui::MenuItem("ImGui metrics", nullptr, &m_windows.imgui_metrics);
+#   ifdef DEBUG
+            ImGui::MenuItem("ImGui demo", nullptr, &show_imgui_demo);
+#   endif
+            ImGui::MenuItem("ImGui metrics", nullptr, &show_imgui_metrics);
 #endif
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
 
-    if (m_windows.imgui_demo)
-        ImGui::ShowDemoWindow(&m_windows.imgui_demo);
+    if (show_imgui_demo)
+        ImGui::ShowDemoWindow(&show_imgui_demo);
 
-    if (m_windows.imgui_metrics)
-        ImGui::ShowMetricsWindow(&m_windows.imgui_metrics);
+    if (show_imgui_metrics)
+        ImGui::ShowMetricsWindow(&show_imgui_metrics);
 }
 
 ImGuiWindowFlags ide::get_default_window_flags() const
@@ -180,7 +231,12 @@ ImGuiWindowFlags ide::get_default_window_flags() const
 
 bool ide::is_shown() const
 {
-    return m_windows.weather;
+    for (const auto& tool : m_tools)
+    {
+        if (tool->get_open_state())
+            return true;
+    }
+    return m_show_weather_editor;
 }
 
 void ide::SetState(visible_state state)

@@ -251,6 +251,26 @@ void CUIStatic::ColorAnimationSetTextColor(u32 color, bool only_alpha)
     TextItemControl()->SetTextColor((only_alpha) ? subst_alpha(TextItemControl()->GetTextColor(), color) : color);
 }
 
+void CUIStatic::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIWindow::FillDebugInfo();
+
+    if (ImGui::CollapsingHeader(CUIStatic::GetDebugType()))
+    {
+        ImGui::Checkbox("Enable texture", &m_bTextureEnable);
+        ImGui::Checkbox("Stretch texture", &m_bStretchTexture);
+        ImGui::DragFloat2("Texture offset", (float*)&m_TextureOffset);
+        //m_UIStaticItem->FillDebugInfo(); // XXX: to do
+        ImGui::Checkbox("Enable heading", &m_bHeading);
+        ImGui::Checkbox("Const heading", &m_bConstHeading);
+        ImGui::DragFloat("Heading", &m_fHeading);
+        //m_pTextControl->FillDebugInfo(); // XXX: to do
+        ImGui::LabelText("Stat hint text", "%s", m_stat_hint_text.empty() ? "" : m_stat_hint_text.c_str());
+    }
+#endif
+}
+
 void CUIStatic::OnFocusLost()
 {
     inherited::OnFocusLost();
@@ -302,4 +322,11 @@ void CUITextWnd::Update()
 void CUITextWnd::ColorAnimationSetTextColor(u32 color, bool only_alpha)
 {
     SetTextColor((only_alpha) ? subst_alpha(GetTextColor(), color) : color);
+}
+
+void CUITextWnd::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+
+#endif
 }

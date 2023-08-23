@@ -21,15 +21,11 @@
 #include "inventory_upgrade_property.h"
 #include "UIHelper.h"
 
-UIProperty::UIProperty()
-    : CUIWindow("UIInvUpgradeProperty")
+UIProperty::UIProperty() : CUIWindow(UIProperty::GetDebugType())
 {
     m_text[0] = 0;
-    m_ui_icon = NULL;
-    m_ui_text = NULL;
 }
 
-UIProperty::~UIProperty() {}
 void UIProperty::init_from_xml(CUIXml& ui_xml)
 {
     CUIXmlInit::InitWindow(ui_xml, "properties", 0, this);
@@ -132,7 +128,7 @@ bool UIProperty::show_result(LPCSTR values)
 // =================== UIPropertiesWnd =====================================================
 
 UIInvUpgPropertiesWnd::UIInvUpgPropertiesWnd()
-    : CUIWindow("UIInvUpgPropertiesWnd")
+    : CUIWindow(UIInvUpgPropertiesWnd::GetDebugType())
 {
     m_properties_ui.reserve(15);
     m_temp_upgrade_vector.reserve(1);

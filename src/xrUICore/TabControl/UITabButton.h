@@ -19,4 +19,6 @@ public:
     virtual bool OnMouseDown(int mouse_btn);
 
     bool IsIdDefaultAssigned() const { return m_btn_id_default_assigned; }
+
+    pcstr GetDebugType() override { return "CUITabButton"; }
 };

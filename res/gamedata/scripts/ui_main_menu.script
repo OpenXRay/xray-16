@@ -349,7 +349,7 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 	local console = get_console()
 
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
-		if dik == DIK_keys.DIK_ESCAPE then
+		if bind == key_bindings.kQUIT then
 			if level.present() and
 				(	((db.actor ~= nil)and(db.actor:alive())) or
 					(false==IsGameTypeSingle())

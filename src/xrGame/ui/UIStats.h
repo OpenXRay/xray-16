@@ -6,10 +6,10 @@
 class CUIXml;
 class CUIFrameWindow;
 
-class CUIStats : public CUIScrollView
+class CUIStats final : public CUIScrollView
 {
 public:
     CUIStats();
-    virtual ~CUIStats();
     CUIWindow* InitStats(CUIXml& xml_doc, LPCSTR path, int team);
+    pcstr GetDebugType() override { return "CUIStats"; }
 };

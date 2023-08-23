@@ -35,6 +35,8 @@ public:
     void SetTextColor(u32 color);
     void SetTextColorD(u32 color);
 
+    pcstr GetDebugType() override { return "CUICustomSpin"; }
+
 protected:
     virtual bool CanPressUp() = 0;
     virtual bool CanPressDown() = 0;

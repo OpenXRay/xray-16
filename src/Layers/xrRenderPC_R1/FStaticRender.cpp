@@ -505,7 +505,7 @@ void CRender::Calculate()
         {
             if (sector_id != last_sector_id)
                 g_pGamePersistent->OnSectorChanged(sector_id);
-        
+
             last_sector_id = sector_id;
         }
         vLastCameraPos.set(Device.vCameraPosition);
@@ -567,9 +567,9 @@ void CRender::Calculate()
             });
 
             if (ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
-                g_hud->Render_First(dsgraph.context_id); // R1 shadows
+                g_pGameLevel->pHUD->Render_First(dsgraph.context_id); // R1 shadows
 
-            g_hud->Render_Last(dsgraph.context_id);
+            g_pGameLevel->pHUD->Render_Last(dsgraph.context_id);
 
             // Determine visibility for dynamic part of scene
             u32 uID_LTRACK = 0xffffffff;
@@ -703,7 +703,7 @@ void CRender::RenderMenu()
 
         if (g_pGamePersistent)
             g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
-    
+
         // combination/postprocess
         Target->phase_combine(_menu_pp, false);
     }

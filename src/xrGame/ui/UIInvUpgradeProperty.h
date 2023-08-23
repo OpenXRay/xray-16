@@ -22,7 +22,7 @@ class Property;
 }
 } // namespace upgrade, inventory
 
-class UIProperty : public CUIWindow
+class UIProperty final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -34,13 +34,13 @@ private:
 protected:
     shared_str m_property_id;
 
-    CUIStatic* m_ui_icon;
-    CUIStatic* m_ui_text;
+    CUIStatic* m_ui_icon{};
+    CUIStatic* m_ui_text{};
     string256 m_text;
 
 public:
     UIProperty();
-    virtual ~UIProperty();
+
     void init_from_xml(CUIXml& ui_xml);
     bool init_property(shared_str const& property_id);
     Property_type* get_property();
@@ -49,11 +49,12 @@ public:
     bool compute_value(ItemUpgrades_type const& item_upgrades);
     bool show_result(LPCSTR values);
 
+    pcstr GetDebugType() override { return "UIProperty"; }
 }; // class UIProperty
 
 // =========================================================================================
 
-class UIInvUpgPropertiesWnd : public CUIWindow
+class UIInvUpgPropertiesWnd final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -68,11 +69,13 @@ protected:
 
 public:
     UIInvUpgPropertiesWnd();
-    virtual ~UIInvUpgPropertiesWnd();
+    ~UIInvUpgPropertiesWnd() override;
     bool init_from_xml(LPCSTR xml_name);
 
     void set_upgrade_info(Upgrade_type& upgrade);
     void set_item_info(CInventoryItem& item);
+
+    pcstr GetDebugType() override { return "UIInvUpgPropertiesWnd"; }
 
 protected:
     void set_info(ItemUpgrades_type const& item_upgrades);

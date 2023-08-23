@@ -10,7 +10,7 @@ class CUICharacterInfo;
 class CUIScrollView;
 class CUIXml;
 
-class CUIActorInfoWnd : public CUIWindow
+class CUIActorInfoWnd final : public CUIWindow
 {
     typedef CUIWindow inherited;
 
@@ -24,18 +24,21 @@ public:
     void FillPointsDetail(const shared_str& idx);
     virtual void Reset();
 
+    pcstr GetDebugType() override { return "CUIActorInfoWnd"; }
+
 protected:
-    CUIFrameWindow* UIInfoFrame;
-    CUITextFrameLineWnd* UIInfoHeader;
-    CUIFrameWindow* UICharIconFrame;
-    CUITextFrameLineWnd* UICharIconHeader;
-    CUIAnimatedStatic* UIAnimatedIcon;
+    CUIFrameWindow* UIInfoFrame{};
+    CUITextFrameLineWnd* UIInfoHeader{};
+    CUIFrameWindow* UICharIconFrame{};
+    CUITextFrameLineWnd* UICharIconHeader{};
+    CUIAnimatedStatic* UIAnimatedIcon{};
 
-    CUIWindow* UICharacterWindow;
-    CUICharacterInfo* UICharacterInfo;
+    CUIWindow* UICharacterWindow{};
+    CUICharacterInfo* UICharacterInfo{};
 
-    CUIScrollView* UIMasterList;
-    CUIScrollView* UIDetailList;
+    CUIScrollView* UIMasterList{};
+    CUIScrollView* UIDetailList{};
+
     void FillPointsInfo();
     void FillReputationDetails(CUIXml* xml, LPCSTR path);
     void FillMasterPart(CUIXml* xml, const shared_str& key_name);
@@ -56,17 +59,22 @@ public:
     virtual void SetSelected(bool b);
 
     shared_str m_id;
+
+public:
+    pcstr GetDebugType() override { return "CUIActorStaticticHeader"; }
 };
 
 class CUIActorStaticticDetail final : public CUIWindow
 {
-protected:
 public:
     CUIStatic* m_text0;
     CUIStatic* m_text1;
     CUIStatic* m_text2;
     CUIStatic* m_text3;
+
 public:
-    CUIActorStaticticDetail() : CUIWindow("CUIActorStaticticDetail") {}
+    CUIActorStaticticDetail() : CUIWindow(CUIActorStaticticDetail::GetDebugType()) {}
     void Init(CUIXml* xml, LPCSTR path, int xml_idx);
+
+    pcstr GetDebugType() override { return "CUIActorStaticticDetail"; }
 };

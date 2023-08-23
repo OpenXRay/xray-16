@@ -8,6 +8,7 @@
 #define ITEM_HEIGHT (GetFont()->CurrentHeight() + 2.0f)
 
 CUIPropertiesBox::CUIPropertiesBox(CUIPropertiesBox* sub_property_box)
+    : CUIFrameWindow(CUIPropertiesBox::GetDebugType())
 {
     m_UIListWnd.SetFont(UI().Font().pFontArial14);
     m_UIListWnd.SetImmediateSelection(true);

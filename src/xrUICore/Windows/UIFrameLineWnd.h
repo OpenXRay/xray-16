@@ -37,6 +37,8 @@ public:
         m_tex_rect[idx] = rect;
     }
 
+    pcstr GetDebugType() override { return "CUIFrameLineWnd"; }
+
 protected:
     bool bHorizontal;
     bool inc_pos(Frect& rect, int counter, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt);

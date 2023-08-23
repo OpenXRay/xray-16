@@ -1,7 +1,7 @@
 #pragma once
 #include "xrUICore/TabControl/UITabButton.h"
 
-class CUITabButtonMP : public CUITabButton
+class CUITabButtonMP final : public CUITabButton
 {
     typedef CUITabButton inherited;
 
@@ -15,6 +15,8 @@ public:
     virtual bool IsEnabled() { return true; }
     void SetOrientation(bool bVert) { m_orientationVertical = bVert; };
     void CreateHint();
+
+    pcstr GetDebugType() override { return "CUITabButtonMP"; }
 
     shared_str m_temp_id;
 

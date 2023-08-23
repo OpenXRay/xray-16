@@ -13,7 +13,7 @@ class CUIAnimatedStatic;
 
 typedef enum { SKIN_MENU_BACK = 0, SKIN_MENU_SPECTATOR, SKIN_MENU_AUTOSELECT } ESKINMENU_BTN;
 
-class CUISkinSelectorWnd : public CUIDialogWnd
+class CUISkinSelectorWnd final : public CUIDialogWnd
 {
     typedef CUIDialogWnd inherited;
 
@@ -31,6 +31,8 @@ public:
     int GetActiveIndex();
     s16 GetTeam() { return m_team; };
     virtual void Update();
+
+    pcstr GetDebugType() override { return "CUISkinSelectorWnd"; }
 
 protected:
     void OnBtnOK();

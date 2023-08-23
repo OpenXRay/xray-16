@@ -21,10 +21,11 @@ SCRIPT_EXPORT(CUILines, (),
 
 // We don't change game assets.
 // This class allowes original game scripts to not specify the window name.
-class CUIStaticScript : public CUIStatic
+class CUIStaticScript final : public CUIStatic
 {
 public:
     CUIStaticScript() : CUIStatic("CUIStaticScript") {}
+    pcstr GetDebugType() override { return "CUIStaticScript"; }
 };
 
 SCRIPT_EXPORT(CUIStatic, (CUIWindow),

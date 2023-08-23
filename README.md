@@ -35,6 +35,7 @@
 - Original bugs fixes.
 - New features for modmakers.
 - Gamepad support. (not yet finished, but you can try already, see [#943](https://github.com/OpenXRay/xray-16/issues/943))
+- New game SDK being currently developed. (see [Game Editor](https://github.com/OpenXRay/xray-16/wiki/[EN]-Game-Editor))
 
 You can see the detailed differences table [here](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-Differences-from-original-X‐Ray)
 

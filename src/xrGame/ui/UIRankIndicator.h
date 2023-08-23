@@ -20,4 +20,6 @@ public:
 
     void InitFromXml(CUIXml& xml_doc);
     void SetRank(u8 team, u8 rank);
+
+    pcstr GetDebugType() override { return "CUIRankIndicator"; }
 };
