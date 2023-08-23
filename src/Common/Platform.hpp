@@ -30,8 +30,10 @@
 #   define _XRAY_ARCHITECTURE_MARKER "ARM 64-bit"
 #elif defined(__powerpc64__) || defined(__ppc64__)
 #   define XR_ARCHITECTURE_PPC64
+#   define _XRAY_ARCHITECTURE_MARKER "PowerPC 64-bit"
 #elif defined (_M_PPC) || defined(__powerpc__)
 #   define XR_ARCHITECTURE_PPC
+#   define _XRAY_ARCHITECTURE_MARKER "PowerPC 32-bit"
 #elif defined (__e2k__)
 #   define XR_ARCHITECTURE_E2K
 #   define _XRAY_ARCHITECTURE_MARKER "E2K"
