@@ -1,0 +1,140 @@
+<w>
+	<items_hierarchy>
+		<level name="root" btn_ref ="">
+			<level name = "pistols" btn_ref="btn_tab_pistols" />
+			
+			<level name = "primary_weapons" btn_ref="btn_tab_primary">
+				<level name="shotgun" btn_ref="btn_bag_shotgun" horz_al="0"/>
+
+				<level name="assault" btn_ref="btn_bag_assault" horz_al="0"/>
+
+				<level name="sniper_rifles" btn_ref="btn_bag_sniper" horz_al="0"/>
+
+				<level name="heavy_weapons" btn_ref="btn_bag_heavy" horz_al="0"/>
+			</level>
+			
+			<level name = "granades" btn_ref="btn_tab_granades" horz_al="1"/>
+			
+			<level name = "outfits" btn_ref="btn_tab_outfits" horz_al="1"/>
+			
+			<level name = "equipment" btn_ref="btn_tab_equipment" horz_al="1"/>
+		</level>
+	</items_hierarchy>
+	
+	<main x="0" y="0" width="1024" height="768">
+		<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+			<texture>ui_bm_back</texture>
+		</auto_static>
+		
+		<auto_static x="920" y="4" width="99" height="64">
+			<texture>ui_hud_frame_money</texture>
+		</auto_static>
+
+		<auto_static x="860" y="4" width="60" height="65">
+			<texture>ui_hud_frame_rank</texture>
+		</auto_static>
+		
+	</main>
+	
+	<item_color_restr_rank	r="128" g="0" b="0" a="128"/>
+	<item_color_restr_money r="255" g="255" b="0" a="128"/>
+	<item_color_normal	r="255" g="255" b="255" a="255"/>
+	
+	<money_color_positive	r="135" g="123" b="116" a="255"/>
+	<money_color_negative	r="255" g="0" b="0" a="255"/>
+
+	<static_player_money x="914" y="26" width="112" height="34">
+		<text font="graffiti32" r="231" g="153" b="22" align="c"/>
+	</static_player_money>
+
+	<static_diff_money x="914" y="65" width="112" height="34">
+		<text font="graffiti32" color="ui_green" align="c" vert_align="c"/>
+	</static_diff_money>
+	
+	<static_curr_items_money x="745" y="10" width="92" height="34">
+		<text font="graffiti32" color="ui_8" vert_align="c" align="c"/>
+	</static_curr_items_money>
+
+	<static_preset_money_last x="880" y="476" width="73" height="27">
+		<text font="graffiti22" color="ui_5" align="c" vert_align="c"/>
+	</static_preset_money_last>
+
+	<static_preset_money_1 x="880" y="207" width="73" height="27">
+		<text font="graffiti22" color="ui_5" align="c" vert_align="c"/>
+	</static_preset_money_1>
+	
+	<static_preset_money_2 x="880" y="295" width="73" height="27">
+		<text font="graffiti22" color="ui_5" align="c" vert_align="c"/>
+	</static_preset_money_2>
+	
+	<static_preset_money_3 x="880" y="386" width="73" height="27">
+		<text font="graffiti22" color="ui_5" align="c" vert_align="c"/>
+	</static_preset_money_3>
+	
+	<static_preset_money_def x="880" y="566" width="73" height="27">
+		<text font="graffiti22" color="ui_5" align="c" vert_align="c"/>
+	</static_preset_money_def>
+	
+	<static_player_rank x="867" y="19" width="46" height="47" stretch="1"/>
+
+	<static_item_rank x="300" y="610" width="44" height="44" stretch="1"/>
+
+	<static_info x="0" y="730" width="755" height="34" light_anim="buy_menu_info" la_cyclic="0" la_texture="0" la_alpha="1">
+		<text font="letterica18" align="c" vert_align="c"/>
+	</static_info>
+
+	<static_money_change x="914" y="71" width="100" height="34" light_anim="buy_menu_info" la_cyclic="0" la_texture="0" la_alpha="1">
+		<text font="letterica18" r="231" g="153" b="22" align="c" vert_align="c"/>
+	</static_money_change>
+	
+	<shop_wnd x="65" y="0" width="300" height="570"/>
+	
+    <lst_player_bag x="390" y="358" width="450" height="170"
+            cell_width = "43" cell_height="43" rows_num="5" cols_num="10"
+            unlimited="1" group_similar="1"/>
+
+    <lst_shop x="5" y="43" width="278" height="518"
+            cell_width = "43" cell_height="43" rows_num="10" cols_num="6"
+            unlimited="1" group_similar="1" custom_placement="0"/>
+
+
+    <lst_pistol x="402" y="44" width="126" height="86"
+            cell_width = "43" cell_height="43" rows_num="2" cols_num="3"
+            custom_placement="0"/>
+
+    <lst_pistol_ammo x="402" y="135" width="130" height="43"
+            cell_width = "43" cell_height="43" rows_num="1" cols_num="4"
+            custom_placement="0" group_similar="1"/>
+
+
+    <lst_rifle x="550" y="44" width="260" height="86"
+            cell_width = "43" cell_height="43" rows_num="2" cols_num="6"
+            custom_placement="0"/>
+
+    <lst_rifle_ammo x="550" y="135" width="260" height="43"
+            cell_width = "43" cell_height="43" rows_num="1" cols_num="6"
+            custom_placement="0" group_similar="1"/>
+	
+    <lst_outfit x="402" y="190" width="86" height="130"
+            cell_width = "43" cell_height="43" rows_num="3" cols_num="2"
+            custom_placement="0"/>
+	
+    <lst_medkit x="497" y="188" width="86" height="43"
+            cell_width = "43" cell_height="43" rows_num="1" cols_num="2"
+            custom_placement="0" group_similar="1"/>`
+	
+    <lst_granade x="497" y="235" width="86" height="86"
+            cell_width = "43" cell_height="43" rows_num="2" cols_num="2"
+            custom_placement="0" group_similar="1"/>
+            
+    <lst_others x="593" y="190" width="215" height="130"
+            cell_width = "43" cell_height="43" rows_num="3" cols_num="5"
+            group_similar="1"/>
+
+
+	<tab_control x="0" y="0" width="65" height="565">
+		<window_name>tab_control</window_name>
+	</tab_control>
+	
+#include "ui\mp_buy_menu_buttons.xml"
+</w>

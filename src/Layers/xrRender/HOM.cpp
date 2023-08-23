@@ -197,7 +197,7 @@ void CHOM::Render_DB(CFrustum& base)
     clip.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_NEAR);
     sPoly src, dst;
     u32 _frame = Device.dwFrame;
-    stats.FrustumTriangleCount = xrc.r_count();
+    stats.FrustumTriangleCount = static_cast<u32>(xrc.r_count());
     stats.VisibleTriangleCount = 0;
 
     // Perfrom selection, sorting, culling
@@ -446,7 +446,7 @@ void CHOM::OnRender()
             // draw wire
             if (bDebug)
             {
-                RImplementation.rmNear();
+                RImplementation.rmNear(RCache);
             }
             else
             {
@@ -459,7 +459,7 @@ void CHOM::OnRender()
             RCache.dbg_Draw(D3DPT_LINELIST, &*line.begin(), line.size() / 2);
             if (bDebug)
             {
-                RImplementation.rmNormal();
+                RImplementation.rmNormal(RCache);
             }
             else
             {

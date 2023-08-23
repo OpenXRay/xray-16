@@ -210,14 +210,14 @@ void CWallmarksEngine::AddWallmark_internal(
         bb_query.grow(sz * 2.5f);
         bb_query.get_CD(bbc, bbd);
         xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bbc, bbd);
-        u32 triCount = xrc.r_count();
+        const auto triCount = xrc.r_count();
         if (0 == triCount)
             return;
 
         CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
         sml_collector.clear();
         sml_collector.add_face_packed_D(pVerts[pTri->verts[0]], pVerts[pTri->verts[1]], pVerts[pTri->verts[2]], 0);
-        for (u32 t = 0; t < triCount; t++)
+        for (size_t t = 0; t < triCount; t++)
         {
             CDB::TRI* T = tris + xrc.r_begin()[t].id;
             if (T == pTri)
@@ -360,18 +360,21 @@ ICF u32 FlushStream(
 
 void CWallmarksEngine::Render()
 {
+    auto& dsgraph = RImplementation.get_imm_context();
+    auto& cmd_list = dsgraph.cmd_list;
+
     //	if (marks.empty())			return;
     // Projection and xform
-    float _43 = Device.mProject._43;
-    Device.mProject._43 -= ps_r__WallmarkSHIFT;
-    RCache.set_xform_world(Fidentity);
-    RCache.set_xform_project(Device.mProject);
+    Fmatrix proj = Device.mProject;
+    proj._43 -= ps_r__WallmarkSHIFT;
+    cmd_list.set_xform_world(Fidentity);
+    cmd_list.set_xform_project(proj);
 
-    Fmatrix mSavedView = Device.mView;
     Fvector mViewPos;
     mViewPos.mad(Device.vCameraPosition, Device.vCameraDirection, ps_r__WallmarkSHIFT_V);
-    Device.mView.build_camera_dir(mViewPos, Device.vCameraDirection, Device.vCameraTop);
-    RCache.set_xform_view(Device.mView);
+    Fmatrix view;
+    view.build_camera_dir(mViewPos, Device.vCameraDirection, Device.vCameraTop);
+    cmd_list.set_xform_view(view);
 
     RImplementation.BasicStats.Wallmarks.Begin();
     RImplementation.BasicStats.StaticWMCount = 0;
@@ -482,13 +485,9 @@ void CWallmarksEngine::Render()
     lock.Leave(); // Physics may add wallmarks in parallel with rendering
 
     // Level-wmarks
-    auto& dsgraph = RImplementation.get_imm_context();
     dsgraph.render_wmarks();
     RImplementation.BasicStats.Wallmarks.End();
 
-    // Projection
-    Device.mView = mSavedView;
-    Device.mProject._43 = _43;
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    cmd_list.set_xform_view(Device.mView);
+    cmd_list.set_xform_project(Device.mProject);
 }

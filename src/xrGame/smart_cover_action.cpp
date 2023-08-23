@@ -52,20 +52,25 @@ smart_cover::action::~action() { delete_data(m_animations); }
 void smart_cover::action::add_animation(LPCSTR type, luabind::object const& table)
 {
     VERIFY(luabind::type(table) == LUA_TTABLE);
-    Animations* animations = xr_new<Animations>();
-    for (luabind::iterator I(table), E; I != E; ++I)
+    auto* animations = xr_new<Animations>();
+
+    luabind::iterator it(table), end;
+    const size_t count = luabind_it_distance(it, end);
+    animations->reserve(count);
+    while (it != end)
     {
-        luabind::object string = *I;
+        const luabind::object& string = *it;
         if (luabind::type(string) != LUA_TSTRING)
         {
             VERIFY(luabind::type(string) != LUA_TNIL);
             continue;
         }
 
-        shared_str animation = luabind::object_cast<LPCSTR>(string);
+        const shared_str animation = luabind::object_cast<LPCSTR>(string);
         VERIFY2(std::find(animations->begin(), animations->end(), animation) == animations->end(),
             make_string("duplicated_animation found: %s", animation.c_str()));
         animations->push_back(animation);
+        ++it;
     }
 
     m_animations.emplace(type, animations);

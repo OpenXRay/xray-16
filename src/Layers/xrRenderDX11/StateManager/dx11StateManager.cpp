@@ -5,7 +5,8 @@
 
 //  DX11: TODO: Implement alpha referense control
 
-dx11StateManager::dx11StateManager()
+dx11StateManager::dx11StateManager(CBackend& cmd_list_in)
+    : cmd_list(cmd_list_in)
 {
     //  If dx11StateManager would ever own any object
     //  implement correct state manager
@@ -105,7 +106,7 @@ void dx11StateManager::SetAlphaRef(u32 uiAlphaRef)
     {
         m_uiAlphaRef = uiAlphaRef;
         if (m_cAlphaRef)
-            RCache.set_c(m_cAlphaRef, (float)m_uiAlphaRef / 255.0f);
+            cmd_list.set_c(m_cAlphaRef, (float)m_uiAlphaRef / 255.0f);
     }
 }
 
@@ -113,7 +114,7 @@ void dx11StateManager::BindAlphaRef(R_constant* C)
 {
     m_cAlphaRef = C;
     if (m_cAlphaRef)
-        RCache.set_c(m_cAlphaRef, (float)m_uiAlphaRef / 255.0f);
+        cmd_list.set_c(m_cAlphaRef, (float)m_uiAlphaRef / 255.0f);
 }
 
 void dx11StateManager::ValidateRDesc()
@@ -155,19 +156,21 @@ void dx11StateManager::ValidateBDesc()
     }
 }
 
-//  Sends states to DX11 runtime, creates new state objects if nessessary
+//  Sends states to DX11 runtime, creates new state objects if necessary
 void dx11StateManager::Apply()
 {
+    auto* d3d_context = HW.get_context(cmd_list.context_id);
+
     //  Apply rasterizer state
     if (m_bRSNeedApply || m_bRSChanged)
     {
         if (m_bRSChanged)
         {
-            m_pRState = RCache.RSManager.GetState(m_RDesc);
+            m_pRState = RSManager.GetState(m_RDesc);
             m_bRSChanged = false;
         }
 
-        HW.pContext->RSSetState(m_pRState);
+        d3d_context->RSSetState(m_pRState);
         m_bRSNeedApply = false;
     }
 
@@ -176,11 +179,11 @@ void dx11StateManager::Apply()
     {
         if (m_bDSSChanged)
         {
-            m_pDepthStencilState = RCache.DSSManager.GetState(m_DSDesc);
+            m_pDepthStencilState = DSSManager.GetState(m_DSDesc);
             m_bDSSChanged = false;
         }
 
-        HW.pContext->OMSetDepthStencilState(m_pDepthStencilState, m_uiStencilRef);
+        d3d_context->OMSetDepthStencilState(m_pDepthStencilState, m_uiStencilRef);
         m_bDSSNeedApply = false;
     }
 
@@ -189,13 +192,13 @@ void dx11StateManager::Apply()
     {
         if (m_bBSChanged)
         {
-            m_pBlendState = RCache.BSManager.GetState(m_BDesc);
+            m_pBlendState = BSManager.GetState(m_BDesc);
             m_bBSChanged = false;
         }
 
         static const float BlendFactor[4] = {0.000f, 0.000f, 0.000f, 0.000f};
 
-        HW.pContext->OMSetBlendState(m_pBlendState, BlendFactor, m_uiSampleMask);
+        d3d_context->OMSetBlendState(m_pBlendState, BlendFactor, m_uiSampleMask);
         m_bBSNeedApply = false;
     }
 }

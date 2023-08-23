@@ -1,0 +1,774 @@
+<!-- 4x3 -->
+<w>
+  <message_box_change_level type="yes_no" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">level_changer_invitation</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+	  <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_change_level>
+  
+  <message_box_change_level_disabled type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">level_changer_invitation</text>
+    </message_text>
+
+    <button_ok x="250" y="154" width="117" height="29" check_mode="0">
+	  <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_change_level_disabled>
+
+  <message_box_error type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">ui_st_error</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_error>
+
+  <message_box_empty_file_name type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">ui_st_file_name_is_empty</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_empty_file_name>
+
+  <message_box_delete_file_name type="yes_no" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">ui_mm_delete_existing_file_q</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_delete_file_name>
+
+  <message_box_file_already_exist type="yes_no" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">ui_st_file_exist_owerwrite_q</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_file_already_exist>
+
+  <message_box_buy_spawn type="yes_no" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_info</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >You can buy a spawn for 1000 $. Press Yes to pay</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140">ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140">ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_buy_spawn>
+
+  <message_box_direct_ip type="direct_ip" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_info</texture>
+    </picture>
+
+    <cap_host x="180" y="50" width="112" height="24">
+      <text font="letterica16" r="207" g="155" b="80" vert_align="c">mm_mp_host_port</text>
+    </cap_host>
+
+    <cap_password x="180" y="85" width="112" height="24">
+      <text font="letterica16" r="207" g="155" b="80" vert_align="c">mm_mp_password</text>
+    </cap_password>
+
+    <edit_host  x="294" y="50" width="170" height="24" max_symb_count="24">
+      <text x="3" font="letterica16" r="207" g="155" b="80" vert_align="c"></text>
+      <texture>ui_linetextSmall_e</texture>
+    </edit_host>
+
+    <edit_password x="294" y="85" width="170" height="24" password="1" max_symb_count="24">
+      <text x="3" font="letterica16" r="207" g="155" b="80" vert_align="c"></text>
+      <texture>ui_linetextSmall_e</texture>
+    </edit_password>
+
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_cancel</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_direct_ip>
+
+  <message_box_password type="password" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_info</texture>
+    </picture>
+
+	  <cap_user_password x="180" y="50" width="112" height="24">
+		  <text font="letterica16" r="207" g="155" b="80" vert_align="c">mm_mp_userpassword</text>
+	  </cap_user_password>
+
+	  <cap_password x="180" y="85" width="112" height="24">
+		  <text font="letterica16" r="207" g="155" b="80" vert_align="c">mm_mp_password</text>
+	  </cap_password>
+
+	  <edit_user_password x="294" y="50" width="170" height="24" password="1" max_symb_count="20">
+		  <text x="3" font="letterica16" r="207" g="155" b="80" vert_align="c"/>
+		  <texture>ui_linetextSmall_e</texture>
+	  </edit_user_password>
+
+	  <edit_password x="294" y="85" width="170" height="24" password="1" max_symb_count="20">
+		  <text x="3" font="letterica16" r="207" g="155" b="80" vert_align="c"></text>
+		  <texture>ui_linetextSmall_e</texture>
+	  </edit_password>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_cancel</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+
+  </message_box_password>
+
+  <message_box_quit_windows type="quit_windows" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">ui_mm_quit_windows_message</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_quit_windows>
+  <message_box_quit_game type="quit_game" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">ui_st_want_to_leave_game_q</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_quit_game>
+
+  <message_box_confirm_load_save type="yes_no" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">ui_st_load_game_confirm</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_confirm_load_save>
+
+  <message_box_invalid_saved_game type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18">ui_st_invalid_saved_game</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140">ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_invalid_saved_game>
+
+  <message_box_invalid_host type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_invalid_host</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_invalid_host>
+
+  <message_box_invalid_pass type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_invalid_pass</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_invalid_pass>
+
+  <message_box_session_full type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_sess_full</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_session_full>
+
+  <message_box_server_reject type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_rejected_server</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_server_reject>
+
+  <message_box_cdkey_invalid type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_cdkey_invalid</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_cdkey_invalid>
+
+  <message_box_cdkey_in_use type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_cdkey_in_use</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_cdkey_in_use>
+
+  <message_box_cdkey_disabled type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_cdkey_disabled</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_cdkey_disabled>
+
+  <message_box_different_version type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_version_differs</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_different_version>
+
+  <message_box_gs_service_not_available type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_err_gs_not_available</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_gs_service_not_available>
+
+  <message_box_sb_master_server_connect_failed type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_err_sb_master_server_conn_fail</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_sb_master_server_connect_failed>
+
+  <msg_box_new_patch type="yes_no" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_info</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_new_patch</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </msg_box_new_patch>
+
+  <msg_box_no_new_patch type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_info</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_conn_no_new_patch</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </msg_box_no_new_patch>
+
+  <cant_vote type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_voting_disabled</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </cant_vote>
+
+  <select_map type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_select_one_map</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </select_map>
+
+  <message_box_restart_game type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_mm_need_restart</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_restart_game>
+
+  <message_box_check_r2 type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_red</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_cant_run_r2</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_check_r2>
+
+  <msg_box_patch_download_error type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_patch_download_error</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </msg_box_patch_download_error>
+
+  <msg_box_patch_download_success type="yes_no" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_info</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_patch_download_success</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </msg_box_patch_download_success>
+
+  <msg_box_connect_to_master_server type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_info</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_connecting_to_masterserver</text>
+    </message_text>
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_mm_cancel</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </msg_box_connect_to_master_server>
+
+  <msg_box_kicked_by_server type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_kicked_by_server</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </msg_box_kicked_by_server>
+
+  <msg_box_error_loading type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >ui_st_error_loading</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </msg_box_error_loading>
+
+  <message_box_yes_no type="yes_no" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_info</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18"  >a</text>
+    </message_text>
+
+    <button_yes x="250" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_yes</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_no</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_yes_no>
+
+  <message_box_ok type="ok" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >a</text>
+    </message_text>
+
+    <button_ok x="370" y="154" width="117" height="29" check_mode="0">
+      <window_name>button_ok</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_ok</text>
+      <texture>ui_button_ordinary</texture>
+    </button_ok>
+  </message_box_ok>
+
+  <message_box_download_level type="yes_no_copy" x="200" y="250" width="510" height="206">
+    <texture>ui_frame_error</texture>
+
+    <picture x="35" y="65" width="77" height="77">
+      <texture>ui_frame_error_sign_alarm</texture>
+    </picture>
+
+    <message_text x="170" y="40" width="310" height="60" complex_mode="1">
+      <text r="216" g="186" b="140" font="letterica18" >download_map</text>
+    </message_text>
+
+	<edit_url  x="170" y="90" width="270" height="24" read_only="1" max_symb_count="110">
+      <text x="3" font="letterica16" r="207" g="155" b="80" vert_align="c"></text>
+      <texture>ui_linetextSmall_e</texture>
+    </edit_url>
+
+	<button_copy x="160" y="125" width="208" height="29" check_mode="0">
+	  <window_name>button_copy</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_copy_url</text>
+      <texture>ui_button_ordinary</texture>
+    </button_copy>
+	
+    <button_yes x="230" y="154" width="137" height="29" check_mode="0">
+	  <window_name>button_yes</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_download_map</text>
+      <texture>ui_button_ordinary</texture>
+    </button_yes>
+    <button_no x="370" y="154" width="117" height="29" check_mode="0">
+	  <window_name>button_no</window_name>
+      <text font="letterica16"  r="216" g="186" b="140" >ui_st_btn_cancel</text>
+      <texture>ui_button_ordinary</texture>
+    </button_no>
+  </message_box_download_level>
+  
+</w>

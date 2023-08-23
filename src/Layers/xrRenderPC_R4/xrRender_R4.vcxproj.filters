@@ -1286,9 +1286,6 @@
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_rain.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -1327,6 +1324,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp">
+      <Filter>StateManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

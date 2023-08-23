@@ -1,7 +1,7 @@
 #pragma once
 #include "xrUICore/TabControl/UITabButton.h"
 
-class CUIRadioButton : public CUITabButton
+class CUIRadioButton final : public CUITabButton
 {
     typedef CUITabButton inherited;
 
@@ -10,4 +10,5 @@ public:
     virtual bool InitTexture(pcstr texture, bool fatal = true);
     virtual void SetTextX(float x) { /*do nothing*/}
     bool OnMouseDown(int mouse_btn) override;
+    pcstr GetDebugType() override { return "CUIRadioButton"; }
 };

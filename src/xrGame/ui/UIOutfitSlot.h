@@ -1,7 +1,7 @@
 #pragma once
 #include "UIDragDropListEx.h"
 
-class CUIOutfitDragDropList : public CUIDragDropListEx
+class CUIOutfitDragDropList final : public CUIDragDropListEx
 {
     using inherited = CUIDragDropListEx;
     CUIStatic* m_background;
@@ -21,4 +21,6 @@ public:
     CUICellItem* RemoveItem(CUICellItem* itm, bool force_root) override;
 
     void SetDefaultOutfit(pcstr default_outfit);
+
+    pcstr GetDebugType() override { return "CUIOutfitDragDropList"; }
 };

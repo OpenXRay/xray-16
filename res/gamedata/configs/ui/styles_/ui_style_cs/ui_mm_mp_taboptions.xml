@@ -1,0 +1,240 @@
+<tab_options>
+  <main x="121" y="224" width="738" height="416"/>
+  <vert_separator x="225" y="4" width="37" height="406" vertical="1">
+		<texture>ui_tablist_divider</texture>
+	</vert_separator>
+	<vert_separator_2 x="474" y="4" width="37" height="406" vertical="1">
+		<texture>ui_tablist_divider</texture>
+	</vert_separator_2>
+	
+	<cap_network_connection x="6" y="12" width="226" height="23">
+		<texture>ui_brokenline</texture>
+		<auto_static x="10" y="0" width="216" height="23">
+			<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_network_connection</text>
+		</auto_static>
+	</cap_network_connection>
+	<cap_respawn_options x="6" y="157" width="226" height="23">
+		<texture>ui_brokenline</texture>
+		<auto_static x="10" y="0" width="216" height="23">
+			<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_respawnoptions</text>
+		</auto_static>
+	</cap_respawn_options>
+	<cap_server_list x="257" y="12" width="226" height="23">
+		<texture>ui_brokenline</texture>
+		<auto_static x="10" y="0" width="216" height="23">
+			<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_serverlist</text>
+		</auto_static>
+	</cap_server_list>
+	<cap_weather_options x="503" y="12" width="226" height="23">
+		<texture>ui_brokenline</texture>
+		<auto_static x="10" y="0" width="216" height="23">
+			<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_weatheroptions</text>
+		</auto_static>
+	</cap_weather_options>
+	<cap_spectator_options x="503" y="115" width="226" height="23">
+		<texture>ui_brokenline</texture>
+		<auto_static x="10" y="0" width="216" height="23">
+			<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_spectator_options</text>
+		</auto_static>
+	</cap_spectator_options>
+<!-- 1st column-->	
+
+
+	<cap_damage_block x="22" y="295" width="143" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_damageblock</text>
+	</cap_damage_block>
+	
+	<cap_artreturn_time x="22" y="343" width="143" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_artret_time</text>
+	</cap_artreturn_time>
+	
+	<check_public_server x="18" y="40" width="32" height="21">
+		<options_item entry="mm_net_con_publicserver" group="mm_mp_server"/>
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_publicserver</text>
+	</check_public_server>
+
+  <check_use_battleye x="18" y="62" width="32" height="21">
+    <options_item entry="mm_net_use_battleye" group="mm_mp_server"/>
+    <text font="letterica16" r="115" g="114" b="112" vert_align="c">BattlEye</text>
+  </check_use_battleye>
+
+  <cap_max_ping x="18" y="85" width="143" height="23">
+    <text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_max_ping</text>
+  </cap_max_ping>
+  <spin_max_ping x="165" y="85" width="55" height="23">
+    <options_item entry="sv_max_ping_limit" group="mm_mp_server"/>
+  </spin_max_ping>
+
+	<check_allow_voting x="18" y="135" width="32" height="21">
+		<options_item entry="sv_vote_enabled" group="mm_mp_server"/>
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_allowvoting</text>
+	</check_allow_voting>
+
+	<check_damage_block x="18" y="325" width="32" height="21">
+		<options_item entry="sv_dmgblockindicator" group="mm_mp_server"/>
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_damageblockindicator</text>
+	</check_damage_block>
+
+  <check_spectator x="18" y="110" width="32" height="21">
+    <options_item entry="mm_net_con_spectator_on" group="mm_mp_server"/>
+    <text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_spectator</text>
+  </check_spectator>
+  <spin_spectator x="175" y="110" width="45" height="23">
+		<options_item entry="mm_net_con_spectator" group="mm_mp_server"/>
+	</spin_spectator>
+	<spin_force_respawn x="175" y="185" width="45" height="23">
+		<options_item entry="sv_forcerespawn" group="mm_mp_server"/>
+	</spin_force_respawn>
+	<spin_reinforcement x="175" y="210" width="45" height="23">
+		<options_item entry="sv_reinforcement_time" group="mm_mp_server"/>
+	</spin_reinforcement>
+
+	<spin_damage_block x="175" y="295" width="45" height="23">
+		<options_item entry="sv_dmgblocktime" group="mm_mp_server"/>
+	</spin_damage_block>
+	<spin_artreturn_time x="175" y="343" width="45" height="23">
+		<options_item entry="sv_artefact_returning_time" group="mm_mp_server"/>
+	</spin_artreturn_time>
+	<check_activated_return x="18" y="370" width="32" height="23">
+		<options_item entry="sv_activated_return" group="mm_mp_server"/>
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_actret_time</text>
+	</check_activated_return>
+	
+
+	<radio_tab_respawn_options x="10" y="185" width="142" height="76" radio="1">
+		<options_item entry="mm_net_srv_reinforcement_type" group="mm_mp_server"/>
+		<button x="0" y="0" width="32" height="21" id="forcerespawn">
+			<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_forcerespawn</text>
+		</button>		
+		<button x="0" y="25" width="32" height="21" id="reinforcement">
+			<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_reinforcement</text>
+		</button>		
+		<button x="0" y="50" width="32" height="21" id="artefactcapture">
+			<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_artefactcapture</text>
+		</button>		
+	</radio_tab_respawn_options>		
+	
+<!-- 2nd column-->	
+	<cap_friendly_fire x="269" y="40" width="150" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_friendlyfire</text>
+	</cap_friendly_fire>
+	<spin_friendly_fire x="423" y="40" width="45" height="23">
+		<options_item entry="sv_friendlyfire" group="mm_mp_server"/>					
+	</spin_friendly_fire>
+
+	<cap_frag_limit x="269" y="65" width="150" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_fraglimit</text>
+	</cap_frag_limit>
+	<spin_frag_limit x="423" y="65" width="45" height="23">
+		<options_item entry="sv_fraglimit" group="mm_mp_server"/>
+	</spin_frag_limit>
+
+	<cap_time_limit x="269" y="90" width="150" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_timelimit</text>
+	</cap_time_limit>
+	<spin_time_limit x="423" y="90" width="45" height="23">
+		<options_item entry="sv_timelimit" group="mm_mp_server"/>
+	</spin_time_limit>
+
+	<cap_artefact_stay x="269" y="115" width="150" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_artefstay</text>
+	</cap_artefact_stay>
+	<spin_artefact_stay x="423" y="115" width="45" height="23">
+		<options_item entry="sv_artefact_stay_time" group="mm_mp_server"/>
+	</spin_artefact_stay>
+
+	<cap_artefact_num x="269" y="140" width="150" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_artefnum</text>
+	</cap_artefact_num>
+	<spin_artefacts_num x="423" y="140" width="45" height="23">
+		<options_item entry="sv_artefacts_count" group="mm_mp_server"/>		
+	</spin_artefacts_num>		
+
+	<cap_artefact_delay x="269" y="165" width="150" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_artefdelay</text>
+	</cap_artefact_delay>
+	<spin_artefact_delay x="423" y="165" width="45" height="23">
+		<options_item entry="sv_artefact_respawn_delta" group="mm_mp_server"/>
+	</spin_artefact_delay>
+
+	<check_pda_hunt x="269" y="200" width="32" height="21">
+    <options_item entry="sv_pda_hunt" group="mm_mp_server"/>
+    <text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_pda_hunt</text>
+  </check_pda_hunt>
+
+  <check_auto_team_balance x="269" y="225" width="32" height="21">
+		<options_item entry="sv_auto_team_balance" group="mm_mp_server"/>
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_autoteambalance</text>
+	</check_auto_team_balance>
+	<check_auto_team_swap x="269" y="250" width="32" height="21">
+		<options_item entry="sv_auto_team_swap" group="mm_mp_server"/>
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_autoteamswap</text>
+	</check_auto_team_swap>
+	<check_friendly_indicators x="269" y="275" width="32" height="21">
+		<options_item entry="sv_friendly_indicators" group="mm_mp_server"/>
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_friendlyindicators</text>
+	</check_friendly_indicators>
+	<check_friendly_names x="269" y="300" width="32" height="21">
+		<options_item entry="sv_friendly_names" group="mm_mp_server"/>
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_friendlynames</text>
+	</check_friendly_names>
+	<check_no_anmalies x="269" y="325" width="32" height="21">
+		<options_item entry="sv_anomalies_enabled" group="mm_mp_server"/>
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_noanomalies</text>
+	</check_no_anmalies>
+	
+	<cap_anomaly_time x="269" y="350" width="150" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_anomalytime</text>
+	</cap_anomaly_time>
+	<spin_anomaly_time x="423" y="350" width="45" height="23">
+		<options_item entry="sv_anomalies_length" group="mm_mp_server"/>
+	</spin_anomaly_time>
+
+	<cap_warm_up_time x="269" y="375" width="150" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_warmuptime</text>
+	</cap_warm_up_time>
+	<spin_warm_up_time x="413" y="375" width="55" height="23">
+		<options_item entry="sv_warm_up" group="mm_mp_server"/>
+	</spin_warm_up_time>
+
+
+<!-- 3rd column-->	
+	<cap_starting_weather x="519" y="40" width="112" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_startweather</text>
+	</cap_starting_weather>
+	<cap_rate_of_change x="519" y="65" width="112" height="23">
+		<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_rateofchange</text>
+	</cap_rate_of_change>
+
+	<spin_rate_of_change x="671" y="65" width="45" height="23">
+		<options_item entry="mm_net_weather_rateofchange" group="mm_mp_server"/>
+	</spin_rate_of_change>
+	
+	<spin_weather x="637" y="40" width="80" height="23">	
+		<text_color>
+			<e r="216" g="186" b="140"/>
+		</text_color>				
+	</spin_weather>
+	
+	<check_spec_teamonly x="519" y="140" width="32" height="21">
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_spectator_teamonly</text>
+		<options_item entry="sv_spectr_teamcamera" group="mm_mp_server"/>
+	</check_spec_teamonly>
+	<check_spec_freefly x="519" y="165" width="32" height="21">
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_spectator_freefly</text>
+		<options_item entry="sv_spectr_freefly" group="mm_mp_server"/>
+	</check_spec_freefly>
+	<check_spec_firsteye x="519" y="190" width="32" height="21">
+    <text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_spectator_firsteye</text>
+    <options_item entry="sv_spectr_firsteye" group="mm_mp_server"/>
+  </check_spec_firsteye>
+  <check_spec_lookat x="519" y="215" width="32" height="21">
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_spectator_lookat</text>
+		<options_item entry="sv_spectr_lookat" group="mm_mp_server"/>
+	</check_spec_lookat>
+	<check_spec_freelook x="519" y="240" width="32" height="21">
+		<text font="letterica16" r="115" g="114" b="112" vert_align="c">mm_mp_spectator_freelook</text>
+		<options_item entry="sv_spectr_freelook" group="mm_mp_server"/>
+	</check_spec_freelook>
+
+</tab_options>

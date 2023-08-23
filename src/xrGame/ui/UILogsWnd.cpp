@@ -30,7 +30,7 @@
 
 u64 constexpr day2ms = u64(24 * 60 * 60 * 1000);
 
-CUILogsWnd::CUILogsWnd() : CUIWindow("CUILogsWnd")
+CUILogsWnd::CUILogsWnd() : CUIWindow(CUILogsWnd::GetDebugType())
 {
     m_list = nullptr;
     m_actor_ch_info = nullptr;

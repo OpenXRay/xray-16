@@ -7,8 +7,9 @@ CUIButtonHint* g_btnHint = nullptr;
 CUIButtonHint* g_statHint = nullptr;
 
 CUIButtonHint::CUIButtonHint()
-    : m_ownerWnd(nullptr)
-    , m_enabledOnFrame(false)
+    : CUIFrameWindow(CUIButtonHint::GetDebugType()),
+      m_ownerWnd(nullptr),
+      m_enabledOnFrame(false)
 {
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "hint_item.xml");
@@ -20,8 +21,6 @@ CUIButtonHint::CUIButtonHint()
     CUIXmlInitBase::InitTextWnd(uiXml, "button_hint:description", 0, m_text);
 }
 
-CUIButtonHint::~CUIButtonHint()
-{}
 
 void CUIButtonHint::OnRender()
 {

@@ -16,7 +16,7 @@ class CUIXml;
 
 #define MAP_ROTATION_LIST "maprot_list.ltx"
 
-class CUIMapList : public CUIWindow
+class CUIMapList final : public CUIWindow
 {
 public:
     CUIMapList();
@@ -40,6 +40,8 @@ public:
     void ClearList();
     bool IsEmpty();
     const MPLevelDesc& GetMapNameInt(EGameIDs _type, u32 idx);
+
+    pcstr GetDebugType() override { return "CUIMapList"; }
 
 private:
     CUIListBoxItem* GetMapItem_fromList1(shared_str const& map_name);

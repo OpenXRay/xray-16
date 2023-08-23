@@ -6033,9 +6033,6 @@
     <ClInclude Include="ui\UIScriptWnd.h">
       <Filter>UI\UIWindows\ScriptWnd</Filter>
     </ClInclude>
-    <ClInclude Include="ui\uiscriptwnd_script.h">
-      <Filter>UI\UIWindows\ScriptWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UICellCustomItems.h">
       <Filter>UI\UIWindows\DragDrop</Filter>
     </ClInclude>
@@ -6500,6 +6497,9 @@
     </ClInclude>
     <ClInclude Include="UITimeDilator.h">
       <Filter>UI\Common\InventoryUtilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIMapFilters.h">
+      <Filter>UI\Common\PDA\Tasks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9865,6 +9865,9 @@
     </ClCompile>
     <ClCompile Include="UITimeDilator.cpp">
       <Filter>UI\Common\InventoryUtilities</Filter>
+    </ClInclude>
+    <ClCompile Include="ui\UIMapFilters.cpp">
+      <Filter>UI\Common\PDA\Tasks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "dx11StateCache.h"
 
+dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
+dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
+dx11StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
 
 template <class IDeviceState, class StateDecs>
 dx11StateCache<IDeviceState, StateDecs>::dx11StateCache()

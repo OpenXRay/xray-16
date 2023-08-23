@@ -3,15 +3,17 @@
 
 class CUIScrollView;
 
-class CUISpeechMenu : public CUIDialogWnd
+class CUISpeechMenu final : public CUIDialogWnd
 {
 public:
     CUISpeechMenu(LPCSTR section_name);
-    virtual ~CUISpeechMenu();
+
     void InitList(LPCSTR section_name);
-    virtual bool NeedCursor() const { return false; }
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
-    virtual bool StopAnyMove() { return false; }
+    bool NeedCursor() const override { return false; }
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+    bool StopAnyMove() override { return false; }
+    pcstr GetDebugType() override { return "CUISpeechMenu"; }
+
 private:
     CUIScrollView* m_pList;
     u32 m_text_color;

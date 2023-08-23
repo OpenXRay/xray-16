@@ -1,0 +1,105 @@
+	<secondary_task_location_complex_flesh_up_ac_mp5>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_ac_mp5>
+	
+	<secondary_task_location_complex_flesh_up_bd_mp5>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_bd_mp5>
+	
+	<secondary_task_location_complex_flesh_up_a_novice_outfit>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_a_novice_outfit>
+	
+	<secondary_task_location_complex_flesh_up_ac_wincheaster1300>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_ac_wincheaster1300>
+	
+	<secondary_task_location_complex_flesh_up_bd_wincheaster1300>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_bd_wincheaster1300>
+	
+	<secondary_task_location_complex_flesh_up_ac_ak74u>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_ac_ak74u>
+	
+	<secondary_task_location_complex_flesh_up_fh_scientific_outfit>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_fh_scientific_outfit>
+	
+	<secondary_task_location_complex_flesh_up_aceg_scientific_outfit>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_aceg_scientific_outfit>
+	
+	<secondary_task_location_complex_flesh_up_bdfh_scientific_outfit>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_bdfh_scientific_outfit>
+	
+	<secondary_task_location_complex_flesh_up_ab_svu>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_ab_svu>
+	
+	<secondary_task_location_complex_flesh_up_cd_svu>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_cd_svu>
+	
+	<secondary_task_location_complex_flesh_up_abcd_svu>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_abcd_svu>
+	
+	<secondary_task_location_complex_flesh_up_ab_pkm>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_ab_pkm>
+	
+	<secondary_task_location_complex_flesh_up_cd_pkm>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_cd_pkm>
+	
+	<secondary_task_location_complex_flesh_up_abcd_pkm>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_abcd_pkm>
+	
+	<secondary_task_location_complex_flesh_up_ac_desert_eagle>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_ac_desert_eagle>
+	
+	<secondary_task_location_complex_flesh_up_bd_desert_eagle>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_bd_desert_eagle>
+	
+	<secondary_task_location_complex_flesh_up_ac_spas12>
+		<complex_spot spot="secondary_task_find_upgrade_complex_spot" pointer="quest_pointer2"/>
+		<mini_map     spot="secondary_task_spot_mini" pointer="quest_pointer2"/>
+    </secondary_task_location_complex_flesh_up_ac_spas12>
+	
+	
+    <secondary_task_find_upgrade_complex_spot x="0"  y="0"  width="30" height="27" stretch="0" alignment="c" location_level="5" scale="0" scale_min="2.5" scale_max="5.1">
+	    <left_icon   x="0"  y="0"  width="0"  height="0"  stretch="1" />
+        <right_icon  x="0"  y="0"  width="0"  height="0"  stretch="1" />
+        <top_icon    x="6"  y="5.5"  width="19" height="19" stretch="1" >
+			<texture  r="242" g="231" b="11">ui_pda2_upgrades2</texture>
+		</top_icon>
+        <timer       x="0"  y="25" width="30" height="10" >
+        <text font="letterica18" r="238" g="155" b="223" align="c" stretch="1" vert_align="c" />
+            <texture></texture>
+        </timer>
+		<static_border x="2.5" y="2.5" width="25" height="25" stretch="0" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="1" la_text="0" la_alpha="1">
+			<texture r="242" g="231" b="11">ui_pda2_stask_last_02a</texture>
+		</static_border>
+    </secondary_task_find_upgrade_complex_spot>

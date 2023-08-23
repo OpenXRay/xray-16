@@ -11,9 +11,10 @@
 #include "xrUICore/InteractiveBackground/UIInteractiveBackground.h"
 #include "xrUICore/Static/UIStatic.h"
 
-class CUI_IB_Static : public CUIInteractiveBackground<CUIStatic>
+class CUI_IB_Static final : public CUIInteractiveBackground<CUIStatic>
 {
 public:
     virtual void SetTextureOffset(float x, float y);
     void SetStretchTexture(bool stretch_texture);
+    pcstr GetDebugType() override { return "CUI_IB_Static"; }
 };

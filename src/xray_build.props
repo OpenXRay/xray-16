@@ -50,6 +50,7 @@
   <PropertyGroup Condition="$(Configuration.Contains('Debug'))" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
     <LinkIncremental>true</LinkIncremental>
+	<EnableASAN>true</EnableASAN>
   </PropertyGroup>
 
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Debug'))">

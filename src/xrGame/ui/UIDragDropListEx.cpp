@@ -18,13 +18,13 @@ void CUICell::Clear()
     m_item = NULL;
 }
 
-CUIDragDropListEx::CUIDragDropListEx() : CUIWindow("CUIDragDropListEx")
+CUIDragDropListEx::CUIDragDropListEx() : CUIWindow(CUIDragDropListEx::GetDebugType())
 {
     m_flags.zero();
     m_container = xr_new<CUICellContainer>(this);
     m_vScrollBar = xr_new<CUIScrollBar>();
     m_vScrollBar->SetAutoDelete(true);
-    m_selected_item = NULL;
+    m_selected_item = nullptr;
     m_bConditionProgBarVisible = false;
 
     SetCellSize(Ivector2().set(50, 50));
@@ -90,7 +90,7 @@ void CUIDragDropListEx::InitDragDropList(Fvector2 pos, Fvector2 size)
         Fvector2().set(m_vScrollBar->GetWndPos().x - m_vScrollBar->GetWidth(), m_vScrollBar->GetWndPos().y));
 }
 
-void CUIDragDropListEx::SetHighlighter(CUIStatic* highlighter, Fvector2 spacing)
+void CUIDragDropListEx::SetHighlighter(CUIStatic* highlighter, Fvector2 spacing, bool convertPosToOurs /*= true*/)
 {
     if (m_highlighter)
     {
@@ -113,7 +113,7 @@ void CUIDragDropListEx::SetHighlighter(CUIStatic* highlighter, Fvector2 spacing)
             AttachChild(m_highlighter);
             // Convert absolute position to relative
             // Without this, UI Frustum will cull our highlighter
-            if (!m_highlighter->WndPosIsProbablyRelative())
+            if (convertPosToOurs)
             {
                 Fvector2 ourAbsPos;
                 GetAbsolutePos(ourAbsPos);
@@ -130,7 +130,7 @@ void CUIDragDropListEx::Highlight(bool highlight)
         m_highlighter->Show(highlight);
 }
 
-void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
+void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing, bool convertPosToOurs /*= true*/)
 {
     if (m_blocker)
     {
@@ -152,7 +152,7 @@ void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
             AttachChild(m_blocker);
             // Convert absolute position to relative
             // Without this, UI Frustum will cull our blocker
-            if (!m_blocker->WndPosIsProbablyRelative())
+            if (convertPosToOurs)
             {
                 Fvector2 ourAbsPos;
                 GetAbsolutePos(ourAbsPos);
@@ -163,7 +163,7 @@ void CUIDragDropListEx::SetBlocker(CUIStatic* blocker, Fvector2 spacing)
     }
 }
 
-void CUIDragDropListEx::SetConditionIndicator(CUIProgressBar* indicator)
+void CUIDragDropListEx::SetConditionIndicator(CUIProgressBar* indicator, bool convertPosToOurs /*= true*/)
 {
     if (m_condition_indicator && m_condition_indicator->GetParent() == this)
     {
@@ -178,7 +178,7 @@ void CUIDragDropListEx::SetConditionIndicator(CUIProgressBar* indicator)
         AttachChild(m_condition_indicator);
         // Convert absolute position to relative
         // Without this, UI Frustum will cull our indicator
-        if (!m_condition_indicator->WndPosIsProbablyRelative())
+        if (convertPosToOurs)
         {
             Fvector2 ourAbsPos;
             GetAbsolutePos(ourAbsPos);
@@ -636,7 +636,7 @@ CUICell& CUIDragDropListEx::GetCellAt(const Ivector2& pos) { return m_container-
 // =================================================================================================
 
 CUICellContainer::CUICellContainer(CUIDragDropListEx* parent)
-    : CUIWindow("CUICellContainer")
+    : CUIWindow(CUICellContainer::GetDebugType())
 {
     m_pParentDragDropList = parent;
     hShader->create("hud" DELIMITER "fog_of_war", "ui" DELIMITER "ui_grid");
@@ -644,7 +644,6 @@ CUICellContainer::CUICellContainer(CUIDragDropListEx* parent)
     m_cellSpacing.set(0, 0);
 }
 
-CUICellContainer::~CUICellContainer() {}
 bool CUICellContainer::AddSimilar(CUICellItem* itm)
 {
     if (!m_pParentDragDropList->IsGrouping())

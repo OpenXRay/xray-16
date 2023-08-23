@@ -5,7 +5,7 @@
 
 static class cl_sampler : public R_constant_setup
 {
-    void setup(R_constant* C) override
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         if (HW.SeparateShaderObjectsSupported)
             CHK_GL(glProgramUniform1i(C->samp.program, C->samp.location, C->samp.index));

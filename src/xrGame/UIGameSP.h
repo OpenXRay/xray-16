@@ -17,7 +17,7 @@ class CInventoryOwner;
 extern UITimeDilator* TimeDilator();
 extern void CloseTimeDilator();
 
-class CUIGameSP : public CUIGameCustom
+class CUIGameSP final : public CUIGameCustom
 {
 private:
     game_cl_Single* m_game;
@@ -53,9 +53,13 @@ public:
     CChangeLevelWnd* UIChangeLevelWnd;
 
     StaticDrawableWrapper* m_game_objective;
+
+    pcstr GetDebugType() override { return "CUIGameSP"; }
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+    void FillDebugInfo() override;
 };
 
-class CChangeLevelWnd : public CUIDialogWnd
+class CChangeLevelWnd final : public CUIDialogWnd
 {
     CUIMessageBox* m_messageBox;
     typedef CUIDialogWnd inherited;
@@ -74,11 +78,13 @@ public:
     shared_str m_message_str;
 
     CChangeLevelWnd();
-    virtual ~CChangeLevelWnd(){};
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     virtual bool WorkInPause() const { return true; }
     void Show(bool status) override;
     void ShowDialog(bool bDoHideIndicators) override;
     void HideDialog() override;
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+
+    pcstr GetDebugType() override { return "CChangeLevelWnd"; }
+    void FillDebugInfo() override;
 };

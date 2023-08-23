@@ -93,6 +93,8 @@ void CRenderTarget::accum_volumetric_geom_destroy()
     _SHOW_REF("g_accum_volumetric_ib", &g_accum_volumetric_ib);
     _SHOW_REF("g_accum_volumetric_vb", &g_accum_volumetric_vb);
 #endif
-    g_accum_volumetric_ib.Release();
-    g_accum_volumetric_vb.Release();
+    if (g_accum_volumetric_ib)
+        g_accum_volumetric_ib.Release();
+    if (g_accum_volumetric_vb)
+        g_accum_volumetric_vb.Release();
 }

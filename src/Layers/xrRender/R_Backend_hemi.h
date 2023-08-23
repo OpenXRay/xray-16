@@ -15,7 +15,7 @@ public:
     R_constant* c_entity_data; //--#SM+#--
 
 public:
-    R_hemi();
+    explicit R_hemi(CBackend& cmd_list_in);
     void unmap();
 
     void set_c_pos_faces(R_constant* C) { c_pos_faces = C; }
@@ -26,5 +26,7 @@ public:
     void set_material(float x, float y, float z, float w);
 
     void c_update(IRenderVisual* pVisual); //--#SM+#--
+
+    CBackend& cmd_list;
 };
 #endif

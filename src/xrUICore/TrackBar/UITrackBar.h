@@ -4,7 +4,7 @@
 
 class CUI3tButton;
 
-class XRUICORE_API CUITrackBar : public CUI_IB_FrameLineWnd, public CUIOptionsItem
+class XRUICORE_API CUITrackBar final : public CUI_IB_FrameLineWnd, public CUIOptionsItem
 {
 public:
     CUITrackBar();
@@ -33,6 +33,8 @@ public:
     float GetFValue() { return m_f_val; }
     void SetOptIBounds(int imin, int imax);
     void SetOptFBounds(float fmin, float fmax);
+
+    pcstr GetDebugType() override { return "CUITrackBar"; }
 
     CUIStatic* m_static;
     shared_str m_static_format;

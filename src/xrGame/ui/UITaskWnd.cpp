@@ -29,10 +29,6 @@ CUITaskWnd::CUITaskWnd(UIHint* hint)
       m_BtnTaskListWnd(nullptr), m_second_task_index(nullptr),
       m_devider(nullptr), m_actual_frame(0),
       m_btn_focus(nullptr), m_btn_focus2(nullptr),
-      m_cbTreasures(nullptr), m_cbQuestNpcs(nullptr),
-      m_cbSecondaryTasks(nullptr), m_cbPrimaryObjects(nullptr),
-      m_bTreasuresEnabled(false), m_bQuestNpcsEnabled(false),
-      m_bSecondaryTasksEnabled(false), m_bPrimaryObjectsEnabled(false),
       m_task_wnd(nullptr), m_task_wnd_show(false),
       m_map_legend_wnd(nullptr), hint_wnd(hint)
 {
@@ -55,39 +51,9 @@ bool CUITaskWnd::Init()
 
     m_task_split = UIHelper::CreateFrameLine(xml, "task_split", this, false);
 
-    m_cbTreasures = UIHelper::CreateCheck(xml, "filter_treasures", this, false);
-    if (m_cbTreasures)
-    {
-        m_cbTreasures->SetCheck(true);
-        AddCallback(m_cbTreasures, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowTreasures));
-    }
-    m_bTreasuresEnabled = true;
-
-    m_cbPrimaryObjects = UIHelper::CreateCheck(xml, "filter_primary_objects", this, false);
-    if (m_cbPrimaryObjects)
-    {
-        m_cbPrimaryObjects->SetCheck(true);
-        AddCallback(
-            m_cbPrimaryObjects, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowPrimaryObjects));
-    }
-    m_bPrimaryObjectsEnabled = true;
-
-    m_cbSecondaryTasks = UIHelper::CreateCheck(xml, "filter_secondary_tasks", this, false);
-    if (m_cbSecondaryTasks)
-    {
-        m_cbSecondaryTasks->SetCheck(true);
-        AddCallback(
-            m_cbSecondaryTasks, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowSecondaryTasks));
-    }
-    m_bSecondaryTasksEnabled = true;
-
-    m_cbQuestNpcs = UIHelper::CreateCheck(xml, "filter_quest_npcs", this, false);
-    if (m_cbQuestNpcs)
-    {
-        m_cbQuestNpcs->SetCheck(true);
-        AddCallback(m_cbQuestNpcs, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowQuestNpcs));
-    }
-    m_bQuestNpcsEnabled = true;
+    AttachChild(&m_filters);
+    m_filters.SetMessageTarget(this);
+    m_filters.Init(xml);
 
     m_pMapWnd = xr_new<CUIMapWnd>(hint_wnd);
     m_pMapWnd->SetAutoDelete(false);
@@ -178,6 +144,37 @@ void CUITaskWnd::Update()
 
 void CUITaskWnd::Draw() { inherited::Draw(); }
 void CUITaskWnd::DrawHint() { m_pMapWnd->DrawHint(); }
+
+bool CUITaskWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
+    if (keyboard_action == WINDOW_KEY_PRESSED)
+    {
+        switch (GetBindedAction(dik, EKeyContext::PDA))
+        {
+        case kPDA_FILTER_TOGGLE:
+            if (m_pKeyboardCapturer == &m_filters)
+                SetKeyboardCapture(nullptr, false);
+            else
+                SetKeyboardCapture(&m_filters, true);
+            m_filters.SendMessage(this, PDA_TASK_SELECT_FILTERS, nullptr);
+            return true;
+
+        case kPDA_TASKS_TOGGLE:
+            if (m_pKeyboardCapturer == m_task_wnd)
+                SetKeyboardCapture(nullptr, false);
+            else
+                SetKeyboardCapture(m_task_wnd, true);
+            OnShowTaskListWnd(nullptr, nullptr);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     if (msg == PDA_TASK_SET_TARGET_MAP && pData)
@@ -186,7 +183,7 @@ void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         TaskSetTargetMap(task);
         return;
     }
-    if (msg == PDA_TASK_SHOW_MAP_SPOT && pData && m_bSecondaryTasksEnabled)
+    if (msg == PDA_TASK_SHOW_MAP_SPOT && pData && IsSecondaryTasksEnabled())
     {
         CGameTask* task = static_cast<CGameTask*>(pData);
         TaskShowMapSpot(task, true);
@@ -208,6 +205,11 @@ void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     if (msg == PDA_TASK_HIDE_HINT)
     {
         m_pMapWnd->HideCurHint();
+        return;
+    }
+    if (msg == PDA_TASK_RELOAD_FILTERS)
+    {
+        ReloadTaskInfo();
         return;
     }
 
@@ -246,17 +248,17 @@ void CUITaskWnd::ReloadTaskInfo()
     {
         shared_str spot = b->spot_type;
         if (strstr(spot.c_str(), "treasure"))
-            m_bTreasuresEnabled ? b->location->EnableSpot() : b->location->DisableSpot();
+            IsTreasuresEnabled() ? b->location->EnableSpot() : b->location->DisableSpot();
         else if (spot == "primary_object")
-            m_bPrimaryObjectsEnabled ? b->location->EnableSpot() : b->location->DisableSpot();
+            IsPrimaryObjectsEnabled() ? b->location->EnableSpot() : b->location->DisableSpot();
         else if (spot == "secondary_task_location" || spot == "secondary_task_location_complex_timer")
-            (/*b->location->SpotEnabled() && */ m_bSecondaryTasksEnabled) ? b->location->EnableSpot() :
+            (/*b->location->SpotEnabled() && */ IsSecondaryTasksEnabled()) ? b->location->EnableSpot() :
                                                                             b->location->DisableSpot();
         else if (spot == "ui_pda2_trader_location" || spot == "ui_pda2_mechanic_location" ||
             spot == "ui_pda2_scout_location" || spot == "ui_pda2_quest_npc_location" ||
             spot == "ui_pda2_medic_location" || spot == "ui_pda2_actor_box_location" ||
             spot == "ui_pda2_actor_sleep_location")
-            m_bQuestNpcsEnabled ? b->location->EnableSpot() : b->location->DisableSpot();
+            IsQuestNpcsEnabled() ? b->location->EnableSpot() : b->location->DisableSpot();
     }
 
     if (storyTask || additionalTask)
@@ -327,7 +329,6 @@ void CUITaskWnd::Show(bool status)
     }
 }
 
-void CUITaskWnd::Reset() { inherited::Reset(); }
 void CUITaskWnd::OnNextTaskClicked() {}
 void CUITaskWnd::OnPrevTaskClicked() {}
 void CUITaskWnd::OnShowTaskListWnd(CUIWindow* w, void* d)
@@ -344,7 +345,7 @@ void CUITaskWnd::Show_TaskListWnd(bool status)
 
 void CUITaskWnd::TaskSetTargetMap(CGameTask* task)
 {
-    if (!task || !m_bSecondaryTasksEnabled)
+    if (!task || !IsSecondaryTasksEnabled())
     {
         return;
     }
@@ -360,7 +361,7 @@ void CUITaskWnd::TaskSetTargetMap(CGameTask* task)
 
 void CUITaskWnd::TaskShowMapSpot(CGameTask* task, bool show) const
 {
-    if (!task || !m_bSecondaryTasksEnabled)
+    if (!task || !IsSecondaryTasksEnabled())
     {
         return;
     }
@@ -395,26 +396,7 @@ void CUITaskWnd::OnTask2DbClicked(CUIWindow*, void*)
 
 void CUITaskWnd::ShowMapLegend(bool status) const { m_map_legend_wnd->Show(status); }
 void CUITaskWnd::Switch_ShowMapLegend() const { m_map_legend_wnd->Show(!m_map_legend_wnd->IsShown()); }
-void CUITaskWnd::OnShowTreasures(CUIWindow* ui, void* d)
-{
-    m_bTreasuresEnabled = !m_bTreasuresEnabled;
-    ReloadTaskInfo();
-}
-void CUITaskWnd::OnShowPrimaryObjects(CUIWindow* ui, void* d)
-{
-    m_bPrimaryObjectsEnabled = !m_bPrimaryObjectsEnabled;
-    ReloadTaskInfo();
-}
-void CUITaskWnd::OnShowSecondaryTasks(CUIWindow* ui, void* d)
-{
-    m_bSecondaryTasksEnabled = !m_bSecondaryTasksEnabled;
-    ReloadTaskInfo();
-}
-void CUITaskWnd::OnShowQuestNpcs(CUIWindow* ui, void* d)
-{
-    m_bQuestNpcsEnabled = !m_bQuestNpcsEnabled;
-    ReloadTaskInfo();
-}
+
 // --------------------------------------------------------------------------------------------------
 CUITaskItem::CUITaskItem()
     : CUIWindow("CUITaskItem"),

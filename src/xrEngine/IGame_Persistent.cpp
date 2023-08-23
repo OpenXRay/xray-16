@@ -72,10 +72,6 @@ void IGame_Persistent::OnAppEnd()
     Environment().unload();
 #endif
     OnGameEnd();
-
-#ifndef _EDITOR
-    DEL_INSTANCE(g_hud);
-#endif
 }
 
 void IGame_Persistent::PreStart(pcstr op)
@@ -101,10 +97,6 @@ void IGame_Persistent::Start(pcstr op)
     {
         if (*m_game_params.m_game_type)
             OnGameStart();
-#ifndef _EDITOR
-        if (g_hud)
-            DEL_INSTANCE(g_hud);
-#endif
     }
     else
         UpdateGameType();
@@ -117,10 +109,6 @@ void IGame_Persistent::Disconnect()
 #ifndef _EDITOR
     // clear "need to play" particles
     destroy_particles(true);
-
-    if (g_hud)
-        DEL_INSTANCE(g_hud);
-//. g_hud->OnDisconnected ();
 #endif
 }
 

@@ -7,7 +7,7 @@ class CUIGameLog;
 class CUIEditBox;
 class CUITextWnd;
 
-class CUIChatWnd : public CUIDialogWnd, public CUIWndCallback
+class CUIChatWnd final : public CUIDialogWnd, public CUIWndCallback
 {
     typedef CUIDialogWnd inherited;
 
@@ -21,6 +21,8 @@ public:
     void PendingMode(bool const is_pending_mode);
     virtual bool NeedCursor() const { return false; }
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
+
+    pcstr GetDebugType() override { return "CUIChatWnd"; }
 
 protected:
     CUIEditBox* UIEditBox;

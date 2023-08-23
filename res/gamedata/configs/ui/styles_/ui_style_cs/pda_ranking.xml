@@ -1,0 +1,225 @@
+<w>
+	<main_wnd x="0" y="0" width="1024" height="768"/>
+
+	<background x="35" y="89" width="955" height="620" vertical="1">
+		<texture>ui_pda2_fr2</texture>
+		
+		<auto_frameline x="305" y="3" width="3" height="186" vertical="1">
+			<texture>ui_pda2_line_v</texture>
+		</auto_frameline>
+		
+		<auto_frameline x="7" y="3" width="4" height="191" vertical="1">
+			<texture>ui_pda2_line_vl</texture>
+		</auto_frameline>
+
+		<auto_frameline x="945" y="3" width="4" height="186" vertical="1">
+			<texture>ui_pda2_line_vr</texture>
+		</auto_frameline>
+		
+		<auto_frameline x="15" y="117" width="280" height="3">
+			<texture>ui_pda2_line_h</texture>
+		</auto_frameline>
+		
+		<auto_frameline x="310" y="20" width="630" height="3">
+			<texture>ui_pda2_line_h</texture>
+		</auto_frameline>
+		<auto_frameline x="310" y="90" width="630" height="3">
+			<texture>ui_pda2_line_h</texture>
+		</auto_frameline>
+		<auto_frameline x="310" y="160" width="630" height="3">
+			<texture>ui_pda2_line_h</texture>
+		</auto_frameline>
+		
+		<auto_static x="315" y="1" width="50" height="16">
+			<text align="l" font="letterica16" a="160" r="148" g="138" b="128">pda_stat_common</text>
+		</auto_static>
+		<auto_static x="315" y="71" width="50" height="16">
+			<text align="l" font="letterica16" a="160" r="148" g="138" b="128">pda_stat_missions</text>
+		</auto_static>
+		<auto_static x="315" y="141" width="50" height="16">
+			<text align="l" font="letterica16" a="160" r="148" g="138" b="128">pda_stat_frags</text>
+		</auto_static>
+		
+	</background>
+
+	<center_background x="35" y="276" width="955" height="67">
+		<texture>ui_pda2_fr_delimiter_ranking</texture>
+		
+		<auto_frameline x="7" y="70" width="4" height="356" vertical="1">
+			<texture>ui_pda2_line_vl</texture>
+		</auto_frameline>
+	</center_background>
+
+	<center_caption x="55" y="315" width="650" height="16">
+		<text align="l" font="letterica16" color="ui_3">#root15/FD-655#68/</text>
+	</center_caption>
+
+	<actor_ch_info x="50" y="92" width="285" height="205">
+		<name_static x="5" y="118" width="200" height="25">
+			<text align="l" font="letterica25" color="ui_2"/>
+		</name_static>
+
+		<icon      x="0" y="0" width="165" height="108" stretch="1"/>
+		<icon_over x="0" y="0" width="165" height="108">
+			<texture>ui_fm_over_chars</texture>
+		</icon_over>
+
+		<rank_icon   x="175" y="0" width="46" height="47"/>
+		
+		<commumity_big_icon      x="166" y="48" width="127" height="56" stretch="1"/>
+		<commumity_big_icon_over x="166" y="48" width="127" height="56">
+			<texture>ui_fm_base_fraction</texture>
+		</commumity_big_icon_over>		
+		
+		<community_caption x="5" y="148" width="200" height="18">
+			<text align="l" font="letterica18" color="ui_3">ui_st_community</text>
+		</community_caption>
+		<community_static x="5" y="148" width="200" height="18">
+			<text align="l" font="letterica18" color="ui_2"/>
+		</community_static>
+		
+	</actor_ch_info>
+
+	<money_caption x="55" y="265" width="200" height="18">
+		<text align="l" font="letterica18" color="ui_3">ui_inv_money</text>
+	</money_caption>
+	<money_value x="150" y="265" width="200" height="18">
+		<text align="l" font="letterica18" color="ui_2">0 RU</text>	
+	</money_value>
+
+	<fraction_static x="55" y="343" width="150" height="16">
+		<text align="l" font="letterica16" color="ui_3">ui_fraction_standing</text>
+	</fraction_static>
+	<fraction_line1 x="50" y="360" width="400" height="3">
+		<texture>ui_pda2_line_h</texture>
+	</fraction_line1>
+	<fraction_line2 x="450" y="360" width="500" height="4">
+		<texture>ui_pda2_line_d</texture>
+	</fraction_line2>
+
+
+	<fraction_list x="55" y="362" width="928" height="340" always_show_scroll="1" scroll_profile="pda">
+		<fraction_stand_wnd x="0" y="0" width="920" height="68"/>
+
+		<serial_number x="10" y="8" width="30" height="25">
+			<text font="letterica25" align="l" color="ui_4">0</text>
+		</serial_number>
+		<name x="40" y="9" width="250" height="18">
+			<text font="letterica18" align="l" color="ui_2">name</text>
+		</name>
+		<icon x="770" y="4" width="127" height="56">
+			<texture>actor_big</texture>
+		</icon>
+		<icon_over x="770" y="4" width="127" height="56">
+			<texture>ui_fm_list_foverlay</texture>
+		</icon_over>
+
+		<location_static x="40" y="28" width="100" height="16">
+			<text font="letterica16" align="l" color="ui_3">st_location</text>
+		</location_static>
+		<location_value x="100" y="28" width="100" height="16">
+			<text font="letterica16" align="l" color="ui_2">location</text>
+		</location_value>
+
+		<power_static x="40" y="45" width="100" height="16">
+			<text font="letterica16" align="l" color="ui_3">st_fraction_state</text>
+		</power_static>
+		<power_value x="100" y="45" width="100" height="16">
+			<text font="letterica16" align="l" color="ui_2">fraction_state</text>
+		</power_value>
+
+		<relation_minus x="354" y="16" width="98" height="38" min="0" max="1000" pos="0" mode="back">
+			<progress>
+				<texture color="pda_red">ui_pda2_small_progress</texture>
+			</progress>
+			<background>
+				<texture a="60">ui_pda2_small_progress2</texture>
+			</background>
+		</relation_minus>
+		<relation_center_minus x="452" y="16" width="98" height="38" min="0" max="1000" pos="0" mode="back">
+			<progress>
+				<texture color="pda_yellow">ui_pda2_small_progress</texture>
+			</progress>
+			<background>
+				<texture a="60">ui_pda2_small_progress2</texture>
+			</background>
+		</relation_center_minus>
+
+		<relation_center_plus x="564" y="16" width="98" height="38" min="0" max="1000" pos="0" mode="horz">
+			<progress>
+				<texture color="pda_yellow">ui_pda2_small_progress</texture>
+			</progress>
+			<background>
+				<texture a="60">ui_pda2_small_progress2</texture>
+			</background>
+		</relation_center_plus>
+		<relation_plus x="662" y="16" width="98" height="38" min="0" max="1000" pos="0" mode="horz">
+			<progress>
+				<texture color="pda_green">ui_pda2_small_progress</texture>
+			</progress>
+			<background>
+				<texture a="60">ui_pda2_small_progress2</texture>
+			</background>
+		</relation_plus>
+
+		<origin_static x="535" y="14" width="42" height="50">
+			<texture>ui_pda2_delimiter_02</texture>
+		</origin_static>
+		<border_minus x="447" y="58" width="10" height="5">
+			<texture>ui_pda2_delimiter_01</texture>
+		</border_minus>
+		<border_plus x="657" y="58" width="10" height="5">
+			<texture>ui_pda2_delimiter_01</texture>
+		</border_plus>
+		<enemy_static x="430" y="53" width="100" height="16">
+			<text font="letterica16" align="r" color="ui_3">st_enemy</text>
+		</enemy_static>
+		<frined_static x="584" y="53" width="100" height="16">
+			<text font="letterica16" align="l" color="ui_3">st_friend</text>
+		</frined_static>
+
+		<rating_up x="24" y="12" width="9" height="5" stretch="0">
+			<texture>ui_pda2_place_up</texture>
+		</rating_up>
+		<rating_down x="24" y="20" width="9" height="5" stretch="0">
+			<texture>ui_pda2_place_down</texture>
+		</rating_down>
+	
+	</fraction_list>
+	
+	<stat_info>
+		<value color="ui_1"/>
+	
+		<stat x="350" y="117" width="50" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_stat_1</text>
+		</stat>
+		<stat x="550" y="117" width="50" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_stat_2</text>
+		</stat>
+		<stat x="750" y="117" width="50" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_stat_3</text>
+		</stat>
+		<stat x="750" y="140" width="50" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_stat_4</text>
+		</stat>
+
+		<stat x="350" y="187" width="50" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_stat_5</text>
+		</stat>
+		<stat x="550" y="187" width="50" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_stat_6</text>
+		</stat>
+		<stat x="750" y="187" width="50" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_stat_7</text>
+		</stat>
+
+		<stat x="350" y="257" width="50" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_stat_8</text>
+		</stat>
+		<stat x="550" y="257" width="50" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_stat_9</text>
+		</stat>
+	
+	</stat_info>
+	
+</w>

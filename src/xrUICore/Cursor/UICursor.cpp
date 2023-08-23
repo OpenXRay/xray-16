@@ -47,11 +47,14 @@ void CUICursor::OnUIReset()
 void CUICursor::Show()
 {
     bVisible = true;
+    m_become_visible_time  = Device.dwTimeContinual;
 }
 
 void CUICursor::Hide()
 {
     bVisible = false;
+    m_become_visible_time = 0;
+    m_pause_autohide = false;
 }
 
 void CUICursor::InitInternal()
@@ -101,7 +104,31 @@ void CUICursor::OnRender()
     m_static->Draw();
 }
 
+void CUICursor::UpdateAutohideTiming()
+{
+    if (m_pause_autohide)
+        return;
+
+    const u32 cur_time = Device.dwTimeContinual;
+
+    if (float(cur_time - m_become_visible_time) > (psControllerCursorAutohideTime * 1000.f))
+    {
+        Hide();
+    }
+}
+
+void CUICursor::PauseAutohiding(bool pause)
+{
+    if (m_pause_autohide == pause)
+        return;
+
+    m_pause_autohide = pause;
+    if (!m_pause_autohide)
+        m_become_visible_time = Device.dwTimeContinual;
+}
+
 Fvector2 CUICursor::GetCursorPosition() { return vPos; }
+
 Fvector2 CUICursor::GetCursorPositionDelta()
 {
     Fvector2 res_delta;
@@ -138,4 +165,26 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
     p.x = iFloor(vPos.x / correction.x);
     p.y = iFloor(vPos.y / correction.y);
     pInput->iSetMousePos(p);
+}
+
+void CUICursor::WarpToWindow(CUIWindow* wnd, bool change_visibility /*= true*/)
+{
+    // When change_visibility is true, call Show/Hide anyway
+    // to update autohide data
+    if (!wnd)
+    {
+        if (change_visibility)
+            Hide();
+        return;
+    }
+
+    if (change_visibility)
+        Show();
+
+    Fvector2 pos;
+    wnd->GetAbsolutePos(pos);
+    Fvector2 size = wnd->GetWndSize();
+    const Fvector2 sizeOfThird = Fvector2(size).div(3);
+    pos.add(size).sub(sizeOfThird);
+    SetUICursorPosition(pos);
 }

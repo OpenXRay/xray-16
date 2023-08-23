@@ -10,20 +10,21 @@ class CUIScrollView;
 // typedef	void (*ButtonClickCallback) (int);
 typedef enum { TEAM_MENU_BACK = 0, TEAM_MENU_SPECTATOR, TEAM_MENU_AUTOSELECT } ETEAMMENU_BTN;
 
-class CUISpawnWnd : public CUIDialogWnd
+class CUISpawnWnd final : public CUIDialogWnd
 {
-private:
-    typedef CUIDialogWnd inherited;
+    using inherited = CUIDialogWnd;
 
 public:
     CUISpawnWnd();
-    virtual ~CUISpawnWnd();
+    ~CUISpawnWnd() override;
 
     virtual void Init();
-    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    void SendMessage(CUIWindow* pWnd, s16 msg, void* pData) override;
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
     void SetVisibleForBtn(ETEAMMENU_BTN btn, bool state);
     void SetCurTeam(int team);
+
+    pcstr GetDebugType() override { return "CUISpawnWnd"; }
 
 protected:
     void InitTeamLogo();
