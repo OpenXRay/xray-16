@@ -1,0 +1,36 @@
+<w>
+
+	<team1_icon x="230" y="0" width="38" height="43">
+		<texture>ui_hud_teamF_leftS</texture>
+		<auto_static x="5" y="8" width="32" height="32" stretch="1">
+			<texture>freedom_icon</texture>
+		</auto_static>
+		<auto_static x="38" y="0" width="488" height="4" stretch="1">
+			<texture>ui_hud_teamF_line</texture>
+		</auto_static>
+	</team1_icon>
+
+	<team2_icon x="755" y="0" width="38" height="43">
+		<texture>ui_hud_teamF_rightS</texture>
+		<auto_static x="2" y="8" width="32" height="32" stretch="1">
+			<texture>merc_icon</texture>
+		</auto_static>
+	</team2_icon>
+
+	<team1_score x="272" y="7" width="225" height="30">
+		<text align="r" vert_align="c" font="graffiti50" r="0" g="255" b="0" a="255"/>
+
+		<auto_static x="0" y="0" width="175" height="30">
+			<text align="c" vert_align="c" font="graffiti32" r="0" g="255" b="0" a="255">ui_st_team1_name</text>
+		</auto_static>
+	</team1_score>
+
+	<team2_score x="527" y="7" width="225" height="30">
+		<text align="l" vert_align="c" font="graffiti50" r="0" g="0" b="255" a="255"/>
+
+		<auto_static x="50" y="0" width="175" height="30">
+			<text align="c" vert_align="c" font="graffiti32" r="0" g="0" b="255" a="255">ui_st_team2_name</text>
+		</auto_static>
+	</team2_score>
+	
+</w>

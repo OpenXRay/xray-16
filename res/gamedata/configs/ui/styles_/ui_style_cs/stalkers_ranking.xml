@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<window>
+
+	<main_wnd x="110" y="90" width="761" height="455"/>
+
+	<character_info x="20" y="58" width="270" height="450"/>
+
+	<list x="20" y="50" width="422" height="419" top_indent="23" always_show_scroll="1" can_select="1" scroll_profile="pda"/>
+
+	<chicon_frame_window x="463" y="0" width="298" height="475" a="80">
+		<texture>ui_pda_frame_sub</texture>		
+	</chicon_frame_window>
+
+	<chicon_frame_line x="8" y="17" width="284" height="21">
+        <texture>ui_string_03</texture>		
+	</chicon_frame_line>
+
+	<info_frame_window x="0" y="0" width="448" height="475" a="80">
+		<texture>ui_pda_frame_sub</texture>		
+	</info_frame_window>
+	<info_frame_line x="8" y="17" width="434" height="27">
+		<title x="10" y="1" width="435" height="18">
+			<text font="letterica25" r="255" g="255" b="255">st_pda_top20</text>
+		</title>
+		<texture>ui_string_02</texture>		
+	</info_frame_line>
+    <left_auto>
+		<auto_static x="8" y="52" width="4" height="388">
+			<texture>ui\ui_pda_vertical_line_r_l</texture>
+		</auto_static>
+		<auto_static x="416" y="52" width="4" height="388">
+			<texture>ui\ui_pda_vertical_line_r_r</texture>
+		</auto_static>
+		<auto_static x="14" y="50" width="405" height="2" stretch="1">
+			<texture>ui\ui_pda_horizontal_line</texture>
+		</auto_static>
+		<auto_static x="14" y="70" width="405" height="2" stretch="1">
+			<texture>ui\ui_pda_horizontal_line</texture>
+		</auto_static>
+		<auto_static align="r" x="14" y="50" width="30" height="20" >
+			<text font="letterica18" r="180" g="180" b="180">##</text>
+		</auto_static>
+		<auto_static align="r" x="100" y="50" width="100" height="20" >
+			<text font="letterica18" r="180" g="180" b="180">Name</text>
+		</auto_static>
+		<auto_static x="300" y="50" width="100" height="20" >
+			<text align="r" font="letterica18" r="180" g="180" b="180">Rank</text>
+		</auto_static>
+    </left_auto>
+
+
+
+	<a_static x="400" y="-3" width="32" height="32" frames="16" duration="1000" columns="8" frame_width="32" frame_height="32" cyclic="1" autoplay="1">
+		<texture>ui\ui_pda_anims_03</texture>
+	</a_static>
+
+    
+    <right_auto>
+		<auto_static x="8" y="52" width="4" height="420">
+			<texture>ui\ui_pda_vertical_line_r_l</texture>
+		</auto_static>
+		<auto_static x="269" y="52" width="4" height="420">
+			<texture>ui\ui_pda_vertical_line_r_r</texture>
+		</auto_static>
+		<auto_static x="8" y="48" width="262" height="2" stretch="1">
+			<texture>ui\ui_pda_horizontal_line</texture>
+		</auto_static>
+		<auto_static x="14" y="189" width="249" height="2" stretch="1">
+			<texture>ui\ui_pda_horizontal_line</texture>
+		</auto_static>
+    </right_auto>
+
+
+	<stalkers_list>
+		<item_human width="400" height="19">
+			<text_1 x="0" y="0" width="30" height="19">
+				<text align="l" font="letterica18" r="180" g="180" b="180" a="160"/>
+			</text_1>
+			
+			<text_2 x="50" y="0" width="280" height="19" highlight_text="1" hA="255" hR="255" hB="255" hG="255">
+				<text align="l" font="letterica18" r="180" g="180" b="180" a="160"/>
+			</text_2>
+			
+			<text_3 x="230" y="0" width="150" height="19">
+				<text align="r" font="letterica18" r="180" g="180" b="180" a="160"/>
+			</text_3>
+		</item_human>
+
+		<item_actor width="400" height="19">
+			<text_1 x="0" y="0" width="30" height="19">
+				<text align="l" font="letterica18" r="255" g="0" b="0"/>
+			</text_1>
+			
+			<text_2 x="50" y="0" width="280" height="19" highlight_text="1" hA="255" hR="255" hB="255" hG="255">
+				<text align="l" font="letterica18" r="200" g="180" b="180" a="160"/>
+			</text_2>
+			
+			<text_3 x="230" y="0" width="150" height="19">
+				<text align="r" font="letterica18" r="255" g="180" b="180" a="160"/>
+			</text_3>
+			<auto>
+				<auto_static x="0" y="0" width="400" height="2" stretch="1">
+					<texture>ui\ui_pda_horizontal_line</texture>
+				</auto_static>
+				<auto_static x="0" y="19" width="400" height="2" stretch="1">
+					<texture>ui\ui_pda_horizontal_line</texture>
+				</auto_static>
+			</auto>
+		</item_actor>
+		
+		<item_ellipsis width="400" height="10">
+			<text_1 x="0" y="-15" width="30" height="10">
+				<text align="l" x="0" y="0" font="letterica25" r="180" g="180" b="180" a="160">...</text>
+			</text_1>
+			
+			<text_2/>
+			<text_3/>
+		</item_ellipsis>
+		<no_items width="400" height="40">
+			<text_1 x="30" y="0" width="300" height="40">
+				<text align="l" x="0" y="0" font="letterica18" r="180" g="180" b="180" a="160">...empty...</text>
+			</text_1>
+			
+			<text_2/>
+			<text_3/>
+		</no_items>
+	</stalkers_list>
+</window>

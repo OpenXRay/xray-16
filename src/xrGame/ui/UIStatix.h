@@ -2,7 +2,7 @@
 
 #include "xrUICore/Static/UIStatic.h"
 
-class CUIStatix : public CUIStatic
+class CUIStatix final : public CUIStatic
 {
 public:
     CUIStatix();
@@ -13,6 +13,8 @@ public:
     virtual bool OnMouseDown(int mouse_btn);
     void SetSelectedState(bool state);
     bool GetSelectedState();
+
+    pcstr GetDebugType() override { return "CUIStatix"; }
 
 private:
     void start_anim();

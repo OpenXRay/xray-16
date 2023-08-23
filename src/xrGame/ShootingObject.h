@@ -20,6 +20,7 @@ extern const Fvector zero_vel;
 
 class CShootingObject : public IAnticheatDumpable
 {
+    Lock render_lock{};
 protected:
     CShootingObject();
     virtual ~CShootingObject();
@@ -101,12 +102,6 @@ protected:
 
 public:
     SilencerKoeffs cur_silencer_koef;
-
-protected:
-    //для сталкеров, чтоб они знали эффективные границы использования
-    //оружия
-    float m_fMinRadius;
-    float m_fMaxRadius;
 
 protected:
     Fcolor light_base_color;

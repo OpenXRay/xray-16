@@ -184,7 +184,7 @@ CLocatorAPI::~CLocatorAPI()
 {
     VERIFY(0 == m_iLockRescan);
     _dump_open_files(1);
-    delete m_auth_lock;
+    xr_delete(m_auth_lock);
 }
 
 const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
@@ -454,24 +454,11 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 
     while (!hdr->eof())
     {
-        string_path name, full;
-        archive_header header;
+        archive_file_header header{ *hdr };
 
-        u16 buffer_size = hdr->r_u16(); // Read the total length of all crap
-        VERIFY(buffer_size < sizeof(name) + sizeof(archive_header) + sizeof(u32));
-
-        hdr->r(&header, sizeof(archive_header)); // Read header
-
-        const size_t name_length = buffer_size - sizeof(archive_header) - sizeof(u32);
-        VERIFY(name_length > 0);
-        hdr->r(&name, name_length); // Read file name
-        name[name_length] = 0;
-
-        u32 ptr = 0;
-        hdr->r(&ptr, sizeof(ptr)); // Obtain internal pointer to the file in archive
-
-        strconcat(sizeof full, full, fs_entry_point, name);
-        Register(full, A.vfs_idx, header.crc, ptr, header.size_real, header.size_compr, A.modif);
+        string_path full;
+        strconcat(full, fs_entry_point, header.name);
+        Register(full, A.vfs_idx, header.crc, header.ptr, header.size_real, header.size_compr, A.modif);
     }
     hdr->close();
 } //-V773
@@ -866,24 +853,45 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
                 pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
 
             /* A final decision must be made regarding the changed resources. Since only OpenGL shaders remain mandatory for Linux for the entire trilogy,
-             * I propose adding shaders from /usr/share/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
+             * I propose adding shaders from <CMAKE_INSTALL_FULL_DATAROOTDIR>/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
              * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
             chdir(pref_path);
-            string_path tmp;
+            constexpr pcstr install_dir = MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR);
+            string_path tmp, tmp_link;
             xr_sprintf(tmp, "%sfsgame.ltx", pref_path);
             struct stat statbuf;
             ZeroMemory(&statbuf, sizeof(statbuf));
-            int res = lstat(tmp, &statbuf);
-            if (-1 == res || !S_ISLNK(statbuf.st_mode))
-                symlink("/usr/share/openxray/fsgame.ltx", tmp);
+            /* First check if following symlinks returns success.
+             * If it doesn't, additionally check if not following symlinks is successful (catches symlink itself being broken),
+             * -> delete the symlink if it is broken.
+             * Then, make a new symlink to our resources.
+             * TODO This doesn't account for other stat errors (EACCES, ENAMETOOLONG, ENOENT caused by missing path component) */
+            int res = stat(tmp, &statbuf);
+            if (res != 0)
+            {
+                ZeroMemory(&statbuf, sizeof(statbuf));
+                res = lstat(tmp, &statbuf);
+                if (res == 0)
+                    xr_unlink(tmp);
+                xr_sprintf(tmp_link, "%s/openxray/fsgame.ltx", install_dir);
+                symlink(tmp_link, tmp);
+            }
             xr_sprintf(tmp, "%sgamedata/shaders/gl", pref_path);
             ZeroMemory(&statbuf, sizeof(statbuf));
-            res = lstat(tmp, &statbuf);
-            if (-1 == res || !S_ISLNK(statbuf.st_mode))
+            res = stat(tmp, &statbuf);
+            if (res != 0)
             {
-                mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-                symlink("/usr/share/openxray/gamedata/shaders/gl", tmp);
+                ZeroMemory(&statbuf, sizeof(statbuf));
+                res = lstat(tmp, &statbuf);
+                if (res == 0)
+                    xr_unlink(tmp);
+                else
+                {
+                    mkdir("gamedata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                    mkdir("gamedata/shaders", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                }
+                xr_sprintf(tmp_link, "%s/openxray/gamedata/shaders/gl", install_dir);
+                symlink(tmp_link, tmp);
             }
 
             SDL_strlcpy(full_current_directory, pref_path, sizeof full_current_directory);
@@ -2017,4 +2025,44 @@ bool CLocatorAPI::can_modify_file(pcstr path, pcstr name)
     string_path temp;
     update_path(temp, path, name);
     return can_modify_file(temp);
+}
+
+CLocatorAPI::archive_file_header::archive_file_header(IReader& reader)
+{
+    size = reader.r_u16();
+    size_real = reader.r_u32();
+    size_compr = reader.r_u32();
+    crc = reader.r_u32();
+
+    const size_t name_length = size - ELEMENTS_SIZE;
+    VERIFY(name_length < sizeof(name));
+
+    reader.r(&name, name_length);
+    name[name_length] = 0;
+
+    ptr = reader.r_u32();
+}
+
+CLocatorAPI::archive_file_header::archive_file_header(IWriter& writer,
+    pcstr file_name, u32 real_size, u32 compressed_size, u32 crc_sum, u32 pointer
+)
+    : size_real(real_size),
+      size_compr(compressed_size),
+      crc(crc_sum),
+      ptr(pointer)
+{
+    const size_t file_name_size = (xr_strlen(file_name) + 0) * sizeof(char);
+    const size_t buffer_size = file_name_size + ELEMENTS_SIZE;
+    VERIFY(buffer_size <= size_t(u16(-1)));
+    size = u16(buffer_size);
+
+    writer.w_u16(size);
+    writer.w_u32(size_real);
+    writer.w_u32(size_compr);
+    writer.w_u32(crc);
+
+    writer.w(file_name, file_name_size);
+    xr_strcpy(name, file_name);
+
+    writer.w_u32(ptr);
 }

@@ -25,7 +25,12 @@ size_t ov_read_func(void* ptr, size_t size, size_t nmemb, void* datasource)
     return read_block;
 }
 int ov_close_func(void* datasource) { return 0; }
-long ov_tell_func(void* datasource) { return ((IReader*)datasource)->tell(); }
+long ov_tell_func(void* datasource)
+{
+    const auto file = static_cast<IReader*>(datasource);
+    return static_cast<long>(file->tell());
+}
+
 void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
 {
     VERIFY(ovf);

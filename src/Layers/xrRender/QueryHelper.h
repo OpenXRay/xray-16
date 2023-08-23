@@ -51,18 +51,18 @@ IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type)
 IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize)
 {
     //	Use D3Dxx_ASYNC_GETDATA_DONOTFLUSH for prevent flushing
-    return HW.pContext->GetData(pQuery, pData, DataSize, 0);
+    return HW.get_context(CHW::IMM_CTX_ID)->GetData(pQuery, pData, DataSize, 0); // we can fetch data on imm only
 }
 
 IC HRESULT BeginQuery(ID3DQuery* pQuery)
 {
-    HW.pContext->Begin(pQuery);
+    HW.get_context(CHW::IMM_CTX_ID)->Begin(pQuery);
     return S_OK;
 }
 
 IC HRESULT EndQuery(ID3DQuery* pQuery)
 {
-    HW.pContext->End(pQuery);
+    HW.get_context(CHW::IMM_CTX_ID)->End(pQuery);
     return S_OK;
 }
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "dxRainRender.h"
 
+#include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Rain.h"
 
 //	Warning: duplicated in rain.cpp
@@ -30,15 +31,14 @@ dxRainRender::dxRainRender()
 
     //
     SH_Rain.create("effects" DELIMITER "rain", "fx" DELIMITER "fx_rain");
-    hGeom_Rain.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
-    hGeom_Drops.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+    hGeom_Rain.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+    hGeom_Drops.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 
     FS.r_close(F);
 }
 
 dxRainRender::~dxRainRender() { ::RImplementation.model_Delete(DM_Drop); }
 void dxRainRender::Copy(IRainRender& _in) { *this = *(dxRainRender*)&_in; }
-#include "xrEngine/IGame_Persistent.h"
 
 void dxRainRender::Render(CEffect_Rain& owner)
 {
@@ -46,17 +46,12 @@ void dxRainRender::Render(CEffect_Rain& owner)
     if (factor < EPS_L)
         return;
 
-    u32 desired_items = iFloor(0.5f * (1.f + factor) * float(max_desired_items));
-    // visual
-    float factor_visual = factor / 2.f + .5f;
-    Fvector3 f_rain_color = g_pGamePersistent->Environment().CurrentEnv.rain_color;
-    u32 u_rain_color = color_rgba_f(f_rain_color.x, f_rain_color.y, f_rain_color.z, factor_visual);
+    const u32 desired_items = iFloor(0.5f * (1.f + factor) * float(max_desired_items));
 
     // born _new_ if needed
-    float b_radius_wrap_sqr = _sqr((source_radius + .5f));
     if (owner.items.size() < desired_items)
     {
-        // owner.items.reserve		(desired_items);
+        owner.items.reserve(desired_items);
         while (owner.items.size() < desired_items)
         {
             CEffect_Rain::Item one;
@@ -64,6 +59,13 @@ void dxRainRender::Render(CEffect_Rain& owner)
             owner.items.push_back(one);
         }
     }
+
+    // visual
+    const float factor_visual = factor / 2.f + .5f;
+    const Fvector3 f_rain_color = g_pGamePersistent->Environment().CurrentEnv.rain_color;
+    const u32 u_rain_color = color_rgba_f(f_rain_color.x, f_rain_color.y, f_rain_color.z, factor_visual);
+
+    const float b_radius_wrap_sqr = _sqr((source_radius + .5f));
 
     // build source plane
     Fplane src_plane;
@@ -74,10 +76,10 @@ void dxRainRender::Render(CEffect_Rain& owner)
 
     // perform update
     u32 vOffset;
-    FVF::LIT* verts = (FVF::LIT*)RCache.Vertex.Lock(desired_items * 4, hGeom_Rain->vb_stride, vOffset);
+    FVF::LIT* verts = (FVF::LIT*)RImplementation.Vertex.Lock(desired_items * 4, hGeom_Rain->vb_stride, vOffset);
     FVF::LIT* start = verts;
     const Fvector& vEye = Device.vCameraPosition;
-    for (u32 I = 0; I < owner.items.size(); I++)
+    for (u32 I = 0; I < desired_items; I++)
     {
         // physics and time control
         CEffect_Rain::Item& one = owner.items[I];
@@ -181,7 +183,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
         verts++;
     }
     u32 vCount = (u32)(verts - start);
-    RCache.Vertex.Unlock(vCount, hGeom_Rain->vb_stride);
+    RImplementation.Vertex.Unlock(vCount, hGeom_Rain->vb_stride);
 
     // Render if needed
     if (vCount)
@@ -203,7 +205,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
 
     {
         float dt = Device.fTimeDelta;
-        _IndexStream& _IS = RCache.Index;
+        _IndexStream& _IS = RImplementation.Index;
         RCache.set_Shader(DM_Drop->shader);
 
         Fmatrix mXform, mScale;
@@ -212,7 +214,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
         u32 vCount_Lock = particles_cache * DM_Drop->number_vertices;
         u32 iCount_Lock = particles_cache * DM_Drop->number_indices;
         IRender_DetailModel::fvfVertexOut* v_ptr =
-            (IRender_DetailModel::fvfVertexOut*)RCache.Vertex.Lock(vCount_Lock, hGeom_Drops->vb_stride, v_offset);
+            (IRender_DetailModel::fvfVertexOut*)RImplementation.Vertex.Lock(vCount_Lock, hGeom_Drops->vb_stride, v_offset);
         u16* i_ptr = _IS.Lock(iCount_Lock, i_offset);
         while (P)
         {
@@ -246,12 +248,12 @@ void dxRainRender::Render(CEffect_Rain& owner)
                 {
                     // flush
                     u32 dwNumPrimitives = iCount_Lock / 3;
-                    RCache.Vertex.Unlock(vCount_Lock, hGeom_Drops->vb_stride);
+                    RImplementation.Vertex.Unlock(vCount_Lock, hGeom_Drops->vb_stride);
                     _IS.Unlock(iCount_Lock);
                     RCache.set_Geometry(hGeom_Drops);
                     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, vCount_Lock, i_offset, dwNumPrimitives);
 
-                    v_ptr = (IRender_DetailModel::fvfVertexOut*)RCache.Vertex.Lock(
+                    v_ptr = (IRender_DetailModel::fvfVertexOut*)RImplementation.Vertex.Lock(
                         vCount_Lock, hGeom_Drops->vb_stride, v_offset);
                     i_ptr = _IS.Lock(iCount_Lock, i_offset);
 
@@ -266,7 +268,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
         vCount_Lock = pcount * DM_Drop->number_vertices;
         iCount_Lock = pcount * DM_Drop->number_indices;
         u32 dwNumPrimitives = iCount_Lock / 3;
-        RCache.Vertex.Unlock(vCount_Lock, hGeom_Drops->vb_stride);
+        RImplementation.Vertex.Unlock(vCount_Lock, hGeom_Drops->vb_stride);
         _IS.Unlock(iCount_Lock);
         if (pcount)
         {

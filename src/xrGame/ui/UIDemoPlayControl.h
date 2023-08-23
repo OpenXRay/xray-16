@@ -13,7 +13,7 @@ class CUITextWnd;
 class CUIStatic;
 class demoplay_control;
 
-class CUIDemoPlayControl : public CUIDialogWnd, public CUIWndCallback
+class CUIDemoPlayControl final : public CUIDialogWnd, public CUIWndCallback
 {
     typedef CUIDialogWnd inherited;
 
@@ -38,6 +38,8 @@ public:
 
     void OnRewindTypeSelected(CUIWindow* w, void* d);
     void OnRewindPlayerSelected(CUIWindow* w, void* d);
+
+    pcstr GetDebugType() override { return "CUIDemoPlayControl"; }
 
 private:
     void StopRewind();

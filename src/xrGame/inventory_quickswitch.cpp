@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "Inventory.h"
 #include "Weapon.h"
+#include "Grenade.h"
 #include "Actor.h"
 #include "xrCore/xr_ini.h"
 
@@ -238,4 +239,64 @@ void priority_group::init_group(shared_str const& game_section, shared_str const
 bool priority_group::is_item_in_group(shared_str const& section_name) const
 {
     return m_sections.find(section_name) != m_sections.end();
+}
+
+void CInventory::ActivateNextGrenadeDeffered()
+{
+    m_isActivatingNextGrenade = HasNextGrenade();
+    if (m_isActivatingNextGrenade)
+        Activate(NO_ACTIVE_SLOT);
+}
+
+PIItem CInventory::GetNextGrenade()
+{
+    int count_types = m_available_grenade_types.size();
+
+    if (count_types > 1)
+    {
+        int curr_num = 0;
+        for (auto grenade_type : m_available_grenade_types)
+        {
+            if (!xr_strcmp(ActiveItem()->cast_game_object()->cNameSect(), grenade_type))
+                break;
+            curr_num++;
+        }
+        int next_num = curr_num + 1;
+        if (next_num >= count_types)
+            next_num = 0;
+
+        shared_str sect_next_grn = m_available_grenade_types[next_num];
+
+        for (auto itm : m_ruck)
+        {
+            CGrenade* pGrenade = smart_cast<CGrenade*>(itm);
+            if (pGrenade && !xr_strcmp(pGrenade->cNameSect(), sect_next_grn))
+                return itm;
+        }
+    }
+
+    return nullptr;
+}
+
+bool CInventory::ActivateNextGrenade()
+{
+    if (m_iActiveSlot == NO_ACTIVE_SLOT)
+        return false;
+
+    CGameObject* pActor_owner = smart_cast<CGameObject*>(m_pOwner);
+    if (Level().CurrentViewEntity() != pActor_owner)
+        return false;
+
+    PIItem new_item = GetNextGrenade();
+    if (!new_item)
+        return false;
+
+    PIItem current_item = ActiveItem();
+    if (current_item)
+    {
+        m_isActivatingNextGrenade = false;
+        Ruck(current_item);
+        Slot(new_item->BaseSlot(), new_item);
+    }
+    return true;
 }

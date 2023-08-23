@@ -3,7 +3,6 @@
 #include "xrCore/clsid.h"
 
 //***** Standart extension classes
-constexpr CLASS_ID CLSID_HUDMANAGER        = MK_CLSID('H', 'U', 'D', '_', 'M', 'N', 'G', 'R');
 constexpr CLASS_ID CLSID_LEVEL             = MK_CLSID('C', 'R', 'E', 'A', 'T', 'O', 'R', ' ');
 
 constexpr CLASS_ID CLSID_TEXTURE           = MK_CLSID('T', 'E', 'X', 'T', 'U', 'R', 'E', ' ');

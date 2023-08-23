@@ -121,10 +121,6 @@ bool IGame_Level::Load(u32 dwNum)
 
     pApp->LoadSwitch();
 
-    // HUD + Environment
-    if (!g_hud)
-        g_hud = smart_cast<CCustomHUD*>(NEW_INSTANCE(CLSID_HUDMANAGER));
-
     // Render-level Load
     GEnv.Render->level_Load(LL_Stream);
     // tscreate.FrameEnd ();
@@ -190,7 +186,7 @@ void IGame_Level::OnFrame()
     // Update all objects
     VERIFY(bReady);
     Objects.Update(false);
-    g_hud->OnFrame();
+    pHUD->OnFrame();
 
     // Ambience
     if (Sounds_Random.size() && (Device.dwTimeGlobal > Sounds_Random_dwNextTime))

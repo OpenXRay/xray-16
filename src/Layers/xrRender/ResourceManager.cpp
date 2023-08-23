@@ -152,7 +152,7 @@ Shader* CResourceManager::_cpp_Create(
 
     // Access to template
     C.BT = B;
-    C.bEditor = FALSE;
+    C.bFFP = RImplementation.o.ffp;
     C.bDetail = FALSE;
 #ifdef _EDITOR
     if (!C.BT)
@@ -160,7 +160,7 @@ Shader* CResourceManager::_cpp_Create(
         ELog.Msg(mtError, "Can't find shader '%s'", s_shader);
         return 0;
     }
-    C.bEditor = TRUE;
+    C.bFFP = true;
 #else
     UNUSED(s_shader);
 #endif
@@ -313,14 +313,10 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
     if (!GEnv.isDedicatedServer)
     {
 #if defined(USE_DX9)
-#   ifndef _EDITOR
-        if (_lua_HasShader(s_shader))
+        const bool useCppBlender = RImplementation.o.ffp && _GetBlender(s_shader);
+        if (!useCppBlender && _lua_HasShader(s_shader))
             return _lua_Create(s_shader, s_textures);
-        else
-#   endif
-        {
-            return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
-        }
+        return _cpp_Create(s_shader, s_textures, s_constants, s_matrices);
 #else // TODO: DX11: When all shaders are ready switch to common path
         if (_lua_HasShader(s_shader))
             return _lua_Create(s_shader, s_textures);
@@ -441,7 +437,7 @@ void CResourceManager::_DumpMemoryUsage()
         {
             u32 m = I->second->flags.MemoryUsage;
             shared_str n = I->second->cName;
-            mtex.insert(std::make_pair(m, std::make_pair(I->second->dwReference, n)));
+            mtex.insert(std::make_pair(m, std::make_pair(I->second->ref_count.load(), n)));
         }
     }
 

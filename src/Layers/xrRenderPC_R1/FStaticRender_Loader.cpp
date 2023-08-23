@@ -2,6 +2,7 @@
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
 #include "Common/LevelStructure.hpp"
+#include "Common/OGF_GContainer_Vertices.hpp"
 #include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
@@ -47,10 +48,8 @@ void CRender::level_Load(IReader* fs)
     Wallmarks = xr_new<CWallmarksEngine>();
     Details = xr_new<CDetailManager>();
 
-    rmFar();
-    rmNormal();
-
-    dsgraph.marker = 0;
+    rmFar(RCache);
+    rmNormal(RCache);
 
     if (!GEnv.isDedicatedServer)
     {
@@ -123,18 +122,12 @@ void CRender::level_Unload()
     //*** Sectors
     // 1.
     xr_delete(rmPortals);
-    pLastSector = nullptr;
+    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
     vLastCameraPos.set(flt_max, flt_max, flt_max);
     uLastLTRACK = 0;
 
     // 2.
-    for (I = 0; I < Sectors.size(); I++)
-        xr_delete(Sectors[I]);
-    Sectors.clear();
-    // 3.
-    for (I = 0; I < Portals.size(); I++)
-        xr_delete(Portals[I]);
-    Portals.clear();
+    cleanup_contexts();
 
     //*** Lights
     L_Glows->Unload();
@@ -230,23 +223,64 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
             _DC[i].resize(dcl_len);
             fs->r(_DC[i].begin(), dcl_len * sizeof(VertexElement));
-            //.????????? remove T&B from _DC[]
 
             // count, size
-            u32 vCount = fs->r_u32();
+            const u32 vCount = fs->r_u32();
             u32 vSize = GetDeclVertexSize(dcl, 0);
 #ifndef MASTER_GOLD
             Msg("* [Loading VB] %d verts, %d Kb", vCount, (vCount * vSize) / 1024);
 #endif
 
-            // Create and fill
-            _VB[i].Create(vCount * vSize);
-            u8* pData = static_cast<u8*>(_VB[i].Map());
-            fs->r(pData, vCount * vSize);
-            //			CopyMemory			(pData,fs->pointer(),vCount*vSize);	//.???? copy while skip T&B
-            _VB[i].Unmap(true); // upload vertex data
+            if (o.ffp)
+            {
+                // Replace packed data with unpacked
+                xr_vector<u8> temp;
+                temp.resize(vCount * vSize);
+                fs->r(temp.data(), vCount * vSize);
 
-            //			fs->advance			(vCount*vSize);
+                if (dcl_equal(dcl, r1_decl_lmap))
+                {
+                    dcl_len = std::size(r1_decl_lmap_unpacked);
+                    _DC[i].resize(dcl_len);
+                    CopyMemory(_DC[i].begin(), r1_decl_lmap_unpacked, dcl_len * sizeof(VertexElement));
+                    
+                    vSize = GetDeclVertexSize(r1_decl_lmap_unpacked, 0);
+                    _VB[i].Create(vCount * vSize);
+                    auto* data = static_cast<r1v_lmap_unpacked*>(_VB[i].Map());
+                    const auto* packedData = (r1v_lmap*)temp.data();
+                    for (size_t i = 0; i < vCount; ++i)
+                        data[i] = packedData[i];
+                }
+                else if (dcl_equal(dcl, r1_decl_vert))
+                {
+                    dcl_len = std::size(r1_decl_vert_unpacked);
+                    _DC[i].resize(dcl_len);
+                    CopyMemory(_DC[i].begin(), r1_decl_vert_unpacked, dcl_len * sizeof(VertexElement));
+
+                    vSize = GetDeclVertexSize(r1_decl_vert_unpacked, 0);
+                    _VB[i].Create(vCount * vSize);
+                    auto* data = static_cast<r1v_vert_unpacked*>(_VB[i].Map());
+                    const auto* packedData = (r1v_vert*)temp.data();
+                    for (size_t i = 0; i < vCount; ++i)
+                        data[i] = packedData[i];
+                }
+                else
+                {
+                    _VB[i].Create(vCount * vSize);
+                    u8* pData = static_cast<u8*>(_VB[i].Map());
+                    CopyMemory(pData, temp.data(), vCount * vSize);
+                }
+
+                _VB[i].Unmap(true); // upload vertex data
+            }
+            else
+            {
+                // Create and fill
+                _VB[i].Create(vCount * vSize);
+                u8* pData = static_cast<u8*>(_VB[i].Map());
+                fs->r(pData, vCount * vSize);
+                _VB[i].Unmap(true); // upload vertex data
+            }
         }
         fs->close();
     }
@@ -318,30 +352,43 @@ void CRender::LoadSectors(IReader* fs)
 {
     // allocate memory for portals
     u32 size = fs->find_chunk(fsL_PORTALS);
-    R_ASSERT(0 == size % sizeof(CPortal::b_portal));
-    u32 count = size / sizeof(CPortal::b_portal);
-    Portals.resize(count);
-    for (u32 c = 0; c < count; c++)
-        Portals[c] = xr_new<CPortal>();
+    R_ASSERT(0 == size % sizeof(CPortal::level_portal_data_t));
+    const u32 portals_count = size / sizeof(CPortal::level_portal_data_t);
+    xr_vector<CPortal::level_portal_data_t> portals_data{portals_count};
 
     // load sectors
+    xr_vector<CSector::level_sector_data_t> sectors_data;
     IReader* S = fs->open_chunk(fsL_SECTORS);
     for (u32 i = 0;; i++)
     {
         IReader* P = S->open_chunk(i);
-        if (nullptr == P)
+        if (!P)
             break;
 
-        CSector* __S = xr_new<CSector>();
-        __S->load(*P);
-        Sectors.push_back(__S);
+        auto& sector_data = sectors_data.emplace_back();
+        {
+            u32 size = P->find_chunk(fsP_Portals);
+            R_ASSERT(0 == (size & 1));
+            u32 portals_in_sector = size / sizeof(u16);
 
+            sector_data.portals_id.reserve(portals_in_sector);
+            while (portals_in_sector)
+            {
+                const u16 ID = P->r_u16();
+                sector_data.portals_id.emplace_back(ID);
+                --portals_in_sector;
+            }
+
+            size = P->find_chunk(fsP_Root);
+            R_ASSERT(size == 4);
+            sector_data.root_id = P->r_u32();
+        }
         P->close();
     }
     S->close();
 
     // load portals
-    if (count)
+    if (portals_count)
     {
         bool do_rebuild = true;
         const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
@@ -371,13 +418,11 @@ void CRender::LoadSectors(IReader* fs)
 
         CDB::Collector CL;
         fs->find_chunk(fsL_PORTALS);
-        for (u32 i = 0; i < count; i++)
+        for (u32 i = 0; i < portals_count; i++)
         {
-            CPortal::b_portal P;
+            auto& P = portals_data[i];
             fs->r(&P, sizeof(P));
-            CPortal* __P = (CPortal*)Portals[i];
-            __P->Setup(P.vertices.begin(), P.vertices.size(), (CSector*)getSector(P.sector_front),
-                (CSector*)getSector(P.sector_back));
+
             if (do_rebuild)
             {
                 for (u32 j = 2; j < P.vertices.size(); j++)
@@ -405,11 +450,11 @@ void CRender::LoadSectors(IReader* fs)
         rmPortals = nullptr;
     }
 
-    // debug
-    //	for (int d=0; d<Sectors.size(); d++)
-    //		Sectors[d]->DebugDump	();
+    auto& dsgraph = get_imm_context();
+    dsgraph.reset();
+    dsgraph.load(sectors_data, portals_data);
 
-    pLastSector = nullptr;
+    last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
 
 void CRender::LoadSWIs(CStreamReader* base_fs)

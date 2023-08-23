@@ -26,7 +26,7 @@ SpatialBase::SpatialBase(ISpatial_DB* space)
     spatial.node_center.set(0, 0, 0);
     spatial.node_radius = 0;
     spatial.node_ptr = NULL;
-    spatial.sector = NULL;
+    spatial.sector_id = IRender_Sector::INVALID_SECTOR_ID;
     spatial.space = space;
 }
 SpatialBase::~SpatialBase(void) { spatial_unregister(); }
@@ -78,7 +78,7 @@ void SpatialBase::spatial_register()
         // register
         R_ASSERT(spatial.space);
         spatial.space->insert(this);
-        spatial.sector = 0;
+        spatial.sector_id = IRender_Sector::INVALID_SECTOR_ID;
     }
 }
 
@@ -89,7 +89,7 @@ void SpatialBase::spatial_unregister()
         // remove
         spatial.space->remove(this);
         spatial.node_ptr = NULL;
-        spatial.sector = NULL;
+        spatial.sector_id = IRender_Sector::INVALID_SECTOR_ID;
     }
     else
     {
@@ -117,12 +117,11 @@ void SpatialBase::spatial_move()
     }
 }
 
-void SpatialBase::spatial_updatesector_internal()
+void SpatialBase::spatial_updatesector_internal(IRender_Sector::sector_id_t sector_id)
 {
-    IRender_Sector* S = GEnv.Render->detectSector(spatial_sector_point());
     spatial.type &= ~STYPEFLAG_INVALIDSECTOR;
-    if (S)
-        spatial.sector = S;
+    if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
+        spatial.sector_id = sector_id;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -178,20 +177,17 @@ ISpatial_DB::~ISpatial_DB()
 
 void ISpatial_DB::initialize(Fbox& BB)
 {
-    if (0 == m_root)
-    {
-        // initialize
-        Fvector bbc, bbd;
-        BB.get_CD(bbc, bbd);
+    // initialize
+    Fvector bbc, bbd;
+    BB.get_CD(bbc, bbd);
 
-        allocator_pool.reserve(128);
-        m_center.set(bbc);
-        m_bounds = _max(_max(bbd.x, bbd.y), bbd.z);
-        rt_insert_object = NULL;
-        if (0 == m_root)
-            m_root = _node_create();
-        m_root->_init(NULL);
-    }
+    allocator_pool.reserve(128);
+    m_center.set(bbc);
+    m_bounds = _max(_max(bbd.x, bbd.y), bbd.z);
+    rt_insert_object = NULL;
+    if (0 == m_root)
+        m_root = _node_create();
+    m_root->_init(NULL);
 }
 ISpatial_NODE* ISpatial_DB::_node_create()
 {

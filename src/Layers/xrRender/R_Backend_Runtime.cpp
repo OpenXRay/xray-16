@@ -1,13 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "xrCDB/Frustum.h"
-
-#if defined(USE_DX11)
-#include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
-#include "Layers/xrRenderDX11/StateManager/dx11ShaderResourceStateCache.h"
-#endif
-
 #if defined(USE_DX9) || defined(USE_DX11)
 #include <DirectXMath.h>
 #endif
@@ -17,7 +10,7 @@ void CBackend::OnFrameEnd()
     if (!GEnv.isDedicatedServer)
     {
 #if !defined(USE_DX9) && !defined(USE_OGL)
-        HW.pContext->ClearState();
+        HW.get_context(CHW::IMM_CTX_ID)->ClearState();
 #elif defined(USE_DX9)
         for (u32 stage = 0; stage < HW.Caps.raster.dwStages; stage++)
             CHK_DX(HW.pDevice->SetTexture(0, nullptr));
@@ -41,7 +34,7 @@ void CBackend::OnFrameBegin()
         // DX9 sets base rt and base zb by default
 #ifndef USE_OGL
         // XXX: Getting broken HUD hands for OpenGL after calling rmNormal()
-        RImplementation.rmNormal();
+        RImplementation.rmNormal(*this);
 #else
         set_FB(HW.pFB);
 #endif
@@ -50,8 +43,6 @@ void CBackend::OnFrameBegin()
 #endif
 
         ZeroMemory(&stat, sizeof(stat));
-        Vertex.Flush();
-        Index.Flush();
         set_Stencil(FALSE);
     }
 }
@@ -65,6 +56,7 @@ void CBackend::Invalidate()
     pZB = 0;
 #if defined(USE_OGL)
     pFB = 0;
+    pp = 0;
 #endif
 
     decl = nullptr;
@@ -134,16 +126,16 @@ void CBackend::Invalidate()
         textures_ds[ds_it++] = 0;
     for (u32 cs_it = 0; cs_it < CTexture::mtMaxComputeShaderTextures;)
         textures_cs[cs_it++] = 0;
+
+    context_id = CHW::IMM_CTX_ID;
 #endif // USE_DX11
 
     for (u32 ps_it = 0; ps_it < CTexture::mtMaxPixelShaderTextures;)
         textures_ps[ps_it++] = nullptr;
     for (u32 vs_it = 0; vs_it < CTexture::mtMaxVertexShaderTextures;)
         textures_vs[vs_it++] = nullptr;
-#ifdef _EDITOR
-    for (u32 m_it = 0; m_it < 8;)
-        matrices[m_it++] = 0;
-#endif
+    for (auto& matrix : matrices)
+        matrix = nullptr;
 }
 
 void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count /* =0*/)
@@ -219,8 +211,9 @@ void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask
 
 void CBackend::set_Textures(STextureList* _T)
 {
-    if (T == _T)
-        return;
+    // TODO: expose T invalidation method
+    //if (T == _T) // disabled due to cases when the set of resources the same, but different srv is need to be bind
+    //    return;
     T = _T;
     // If resources weren't set at all we should clear from resource #0.
     int _last_ps = -1;
@@ -247,7 +240,7 @@ void CBackend::set_Textures(STextureList* _T)
             // ordinary pixel surface
             if ((int)load_id > _last_ps)
                 _last_ps = load_id;
-            if (textures_ps[load_id] != load_surf)
+            if (textures_ps[load_id] != load_surf || (load_surf && (load_surf->last_slice != load_surf->curr_slice)))
             {
                 textures_ps[load_id] = load_surf;
                 stat.textures++;
@@ -255,8 +248,9 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
+                    load_surf->last_slice = load_surf->curr_slice;
                 }
             }
         }
@@ -280,7 +274,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
                 }
             }
@@ -303,7 +297,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
                 }
             }
@@ -325,7 +319,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
                 }
             }
@@ -347,7 +341,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Apply(load_id);
                 }
             }
@@ -369,7 +363,7 @@ void CBackend::set_Textures(STextureList* _T)
                 if (load_surf)
                 {
                     PGO(Msg("PGO:tex%d:%s", load_id, load_surf->cName.c_str()));
-                    load_surf->bind(load_id);
+                    load_surf->bind(*this, load_id);
                     //load_surf->Applyload_id);
                 }
             }
@@ -512,6 +506,17 @@ void CBackend::SetupStates()
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, D3DMCS_COLOR1));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE));
+
+    Fmaterial mat
+    {
+        /*.diffuse  =*/ { 1, 1, 1, 1 },
+        /*.ambient  =*/ { 1, 1, 1, 1 },
+        /*.emissive =*/ { 0, 0, 0, 0 },
+        /*.specular =*/ { 1, 1, 1, 1 },
+        /*.power    =*/ 15.f
+    };
+    CHK_DX(HW.pDevice->SetMaterial(reinterpret_cast<D3DMATERIAL9*>(&mat)));
+
     if (psDeviceFlags.test(rsWireframe))
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME));
     else
@@ -537,4 +542,70 @@ void CBackend::SetupStates()
 #else
 #   error No graphics API selected or enabled!
 #endif
+}
+
+
+// Device dependance
+void CBackend::OnDeviceCreate()
+{
+#if defined(USE_DX11)
+    HW.get_context(context_id)->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), reinterpret_cast<void**>(&pAnnotation));
+#endif
+
+    // Debug Draw
+    InitializeDebugDraw();
+
+    // invalidate caching
+    Invalidate();
+}
+
+void CBackend::OnDeviceDestroy()
+{
+    // Debug Draw
+    DestroyDebugDraw();
+
+#if defined(USE_DX11)
+    //  Destroy state managers
+    StateManager.Reset();
+#endif
+
+#if defined(USE_DX11)
+    _RELEASE(pAnnotation);
+#endif
+}
+
+#include "LightTrack.h"
+#include "xrEngine/IRenderable.h"
+
+void CBackend::apply_lmaterial()
+{
+    R_constant* C = get_c(c_sbase)._get(); // get sampler
+    if (!C)
+        return;
+
+    VERIFY(RC_dest_sampler == C->destination);
+#if defined(USE_DX9)
+    VERIFY(RC_sampler == C->type);
+#elif defined(USE_DX11)
+    VERIFY(RC_dx11texture == C->type);
+#elif defined(USE_OGL)
+    VERIFY(RC_sampler == C->type);
+#else
+#   error No graphics API selected or enabled!
+#endif
+
+    CTexture* T = get_ActiveTexture(u32(C->samp.index));
+    VERIFY(T);
+    float mtl = T->m_material;
+#ifdef DEBUG
+    if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL))
+        mtl = ps_r2_gmaterial;
+#endif
+    hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
+    hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
+                                o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
+                                o_hemi_cube[CROS_impl::CUBE_FACE_POS_Z]);
+    hemi.set_neg_faces(o_hemi_cube[CROS_impl::CUBE_FACE_NEG_X],
+                                o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Y],
+                                o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
 }

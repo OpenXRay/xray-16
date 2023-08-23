@@ -81,7 +81,7 @@ void dxImGuiRender::OnDeviceCreate(ImGuiContext* context)
 #if defined(USE_DX9)
     ImGui_ImplDX9_Init(HW.pDevice);
 #elif defined(USE_DX11)
-    ImGui_ImplDX11_Init(HW.pDevice, HW.pContext);
+    ImGui_ImplDX11_Init(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
 #elif defined(USE_OGL)
     ImGui_ImplOpenGL3_Init();
 #endif

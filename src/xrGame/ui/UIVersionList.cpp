@@ -9,7 +9,7 @@ CUIVersionList::CUIVersionList()
     itemsCount = 0;
 
     versionsList = xr_new<CUIListBox>();
-    frame = xr_new<CUIFrameWindow>();
+    frame = xr_new<CUIFrameWindow>("Frame");
     header = xr_new<CUIFrameLineWnd>("Header");
 
     versionsList->SetAutoDelete(true);

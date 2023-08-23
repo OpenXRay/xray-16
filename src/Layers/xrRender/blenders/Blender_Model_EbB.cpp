@@ -39,11 +39,25 @@ LPCSTR CBlender_Model_EbB::getComment()
     return "MODEL: env^base";
 }
 
-void CBlender_Model_EbB::CompileForEditor(CBlender_Compile& C)
+void CBlender_Model_EbB::Compile(CBlender_Compile& C)
 {
+    IBlender::Compile(C);
+
+    if (C.bFFP)
+        CompileFFP(C);
+    else
+        CompileProgrammable(C);
+}
+
+void CBlender_Model_EbB::CompileFFP(CBlender_Compile& C) const
+{
+    const bool constant_lighting = !ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS);
+    const size_t element = constant_lighting ? SE_R1_NORMAL_LQ : C.iElement;
+    const auto modulate = constant_lighting ? D3DTOP_MODULATE : D3DTOP_MODULATE2X;
+
     C.PassBegin();
     {
-        if (oBlend.value)
+        if (constant_lighting && oBlend.value)
         {
             C.PassSET_ZB(TRUE, FALSE);
             C.PassSET_Blend_BLEND();
@@ -55,43 +69,63 @@ void CBlender_Model_EbB::CompileForEditor(CBlender_Compile& C)
         }
         C.PassSET_LightFog(TRUE, TRUE);
 
-        // Stage1 - Env texture
-        C.StageBegin();
-        C.StageSET_Address(D3DTADDRESS_CLAMP);
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-        C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
-        C.StageEnd();
+        switch (element)
+        {
+        case SE_R1_NORMAL_HQ:
+        {
+            // Stage0 - projector
+            C.StageBegin();
+            C.StageSET_TMC("$user$projector", "$user$projector", "$null", 0);
+            C.StageEnd();
 
-        // Stage2 - Base texture
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_BLENDTEXTUREALPHA, D3DTA_CURRENT);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
-        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
-        C.StageEnd();
+            // Stage1 - Env texture
+            C.StageBegin();
+            C.StageSET_Address(D3DTADDRESS_CLAMP);
+            C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+            C.StageEnd();
 
-        // Stage3 - Lighting - should work on all 2tex hardware
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_DIFFUSE, D3DTOP_MODULATE, D3DTA_CURRENT);
-        C.StageSET_Alpha(D3DTA_DIFFUSE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
-        C.Stage_Texture("$null");
-        C.Stage_Matrix("$null", 0);
-        C.Stage_Constant("$null");
-        C.StageEnd();
+            // Stage2 - Base texture
+            C.StageBegin();
+            C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+            C.StageEnd();
+
+            C.PassSET_Shaders("null", "model_env");
+            break;
+        }
+        case SE_R1_NORMAL_LQ:
+        {
+            // Stage1 - Env texture
+            C.StageBegin();
+            C.StageSET_Address(D3DTADDRESS_CLAMP);
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+            C.StageEnd();
+
+            // Stage2 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_BLENDTEXTUREALPHA, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_CURRENT);
+            C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+            C.StageEnd();
+
+            // Stage3 - Lighting - should work on all 2tex hardware
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_DIFFUSE, modulate, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_DIFFUSE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
+            C.Stage_Texture("$null");
+            C.Stage_Matrix("$null", 0);
+            C.Stage_Constant("$null");
+            C.StageEnd();
+            break;
+        }
+        } // switch (C.iElement)
     }
     C.PassEnd();
 }
 
-void CBlender_Model_EbB::Compile(CBlender_Compile& C)
+void CBlender_Model_EbB::CompileProgrammable(CBlender_Compile& C) const
 {
-    IBlender::Compile(C);
-
-    if (C.bEditor)
-    {
-        CompileForEditor(C);
-        return;
-    }
-
     LPCSTR vsname = nullptr;
     LPCSTR psname = nullptr;
     switch (C.iElement)
@@ -141,5 +175,5 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         C.r_Pass(vsname, psname, FALSE, FALSE, FALSE, TRUE, D3DBLEND_ZERO, D3DBLEND_SRCCOLOR, FALSE, 0);
         C.r_End();
         break;
-    }
+    } // switch (C.iElement)
 }

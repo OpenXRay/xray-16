@@ -18,7 +18,7 @@
 #include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
-void CUIZoneMap::Init()
+void CUIZoneMap::Init(bool motionIconAttached)
 {
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "zone_map.xml");
@@ -39,10 +39,7 @@ void CUIZoneMap::Init()
     m_activeMap->SetAutoDelete(true);
     m_activeMap->EnableHeading(true);
 
-    // Clear Sky and Shadow of Chernobyl compatibility
-    // Check for m_pointerDistanceText reduces flexibility
-    // But it's all we can, probably.
-    m_activeMap->SetRounded(!m_pointerDistanceText);
+    m_activeMap->SetRounded(motionIconAttached);
 
     CUIXmlInit::InitStatic(uiXml, "minimap:compass", 0, &m_compass);
     m_background.AttachChild(&m_compass);
@@ -55,7 +52,7 @@ void CUIZoneMap::Init()
     Fvector2 temp;
     const float k = UI().get_current_kx();
 
-    if (m_clipFrame.WndRectIsProbablyRelative())
+    if (motionIconAttached)
     {
         temp = m_clipFrame.GetWndSize();
         temp.y *= UI_BASE_HEIGHT * k;
@@ -66,7 +63,7 @@ void CUIZoneMap::Init()
         m_clipFrame.SetWndPos(temp.mul(UI_BASE_HEIGHT));
     }
 
-    if (m_background.WndSizeIsProbablyRelative())
+    if (motionIconAttached)
     {
         m_background.SetHeight(m_background.GetHeight() * UI_BASE_HEIGHT);
         m_background.SetWidth(m_background.GetHeight() * k);
@@ -78,14 +75,14 @@ void CUIZoneMap::Init()
     temp = m_clipFrame.GetWndSize();
     m_center.SetWndPos(temp.div(2.0f));
 
-    if (m_compass.WndPosIsProbablyRelative())
+    if (motionIconAttached)
     {
         temp = m_compass.GetWndPos();
         temp.mul(m_background.GetWndSize());
         m_compass.SetWndPos(temp);
     }
 
-    if (m_clock_wnd && m_clock_wnd->WndPosIsProbablyRelative())
+    if (m_clock_wnd && motionIconAttached)
     {
         temp = m_clock_wnd->GetWndPos();
         temp.mul(m_background.GetWndSize());
@@ -99,7 +96,7 @@ void CUIZoneMap::Init()
         CUIXmlInit::InitTextWnd(uiXml, "minimap:static_counter:text_static", 0, &m_Counter_text);
         m_Counter.AttachChild(&m_Counter_text);
 
-        if (m_Counter.WndPosIsProbablyRelative())
+        if (motionIconAttached)
         {
             temp = m_Counter.GetWndPos();
             temp.mul(m_background.GetWndSize());
@@ -207,13 +204,13 @@ void CUIZoneMap::SetupCurrentMap()
     m_activeMap->SetWndSize(wnd_size);
 }
 
-void CUIZoneMap::OnSectorChanged(int sector)
+void CUIZoneMap::OnSectorChanged(IRender_Sector::sector_id_t sector)
 {
     if (!g_pGameLevel->pLevel->section_exist("sub_level_map"))
         return;
     u8 map_idx = u8(-1);
     string64 s_sector;
-    xr_sprintf(s_sector, "%d", sector);
+    xr_sprintf(s_sector, "%zd", sector);
 
     if (!g_pGameLevel->pLevel->line_exist("sub_level_map", s_sector))
         return;

@@ -3,7 +3,7 @@
 #include "xrUICore/Static/UIStatic.h"
 
 class CActor;
-class CUIMiniMap;
+class CUICustomMap;
 
 class CUIZoneMap
 {
@@ -11,7 +11,7 @@ public:
     bool visible{ true };
 
 private:
-    CUIMiniMap* m_activeMap{};
+    CUICustomMap* m_activeMap{};
 
     CUIStatic m_background{ "Background" };
     CUIStatic m_center{ "Center" };
@@ -27,7 +27,7 @@ private:
 public:
     virtual ~CUIZoneMap() = default;
 
-    void Init();
+    void Init(bool motionIconAttached);
 
     void Render();
     void Update();
@@ -38,7 +38,7 @@ public:
     CUIStatic& Background() { return m_background; };
     CUIWindow& MapFrame() { return m_clipFrame; };
     void SetupCurrentMap();
-    void OnSectorChanged(int sector);
+    void OnSectorChanged(IRender_Sector::sector_id_t sector);
     void Counter_ResetClrAnimation();
 
 private:

@@ -41,6 +41,7 @@ protected:
     void SetUpIndention(float val);
     void SetDownIndention(float val);
     void SetVertFlip(bool val) { m_flags.set(eVertFlip, val); }
+
 public:
     CUIScrollView();
     CUIScrollView(CUIScrollBar* scroll_bar);
@@ -57,7 +58,10 @@ public:
     void ScrollToEnd();
     bool GetVertFlip() { return !!m_flags.test(eVertFlip); }
     bool Empty() { return m_pad->GetChildWndList().empty(); }
-    u32 GetSize();
+
+    [[nodiscard]]
+    u32 GetSize() const;
+
     WINDOW_LIST& Items() { return m_pad->GetChildWndList(); }
     CUIWindow* GetItem(u32 idx);
     void SetFixedScrollBar(bool b);
@@ -77,6 +81,9 @@ public:
     void UpdateChildrenLenght(); // set default width for all children
     float Scroll2ViewV(); // calculate scale for scroll position
     CUIScrollBar* ScrollBar() { return m_VScrollBar; }
+
+    pcstr GetDebugType() override { return "CUIScrollView"; }
+
     typedef fastdelegate::FastDelegate2<CUIWindow*, CUIWindow*, bool> cmp_function;
     cmp_function m_sort_function;
 };

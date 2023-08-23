@@ -68,41 +68,70 @@ BOOL CBlender_BmmD::canUseSteepParallax()
     return TRUE;
 }
 
-void CBlender_BmmD::CompileForEditor(CBlender_Compile& C)
-{
-    C.PassBegin();
-    {
-        C.PassSET_ZB(TRUE, TRUE);
-        C.PassSET_Blend_SET();
-        C.PassSET_LightFog(TRUE, TRUE);
-
-        // Stage1 - Base texture
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
-        C.StageEnd();
-
-        // Stage2 - Second texture
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
-        C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
-        C.StageEnd();
-    }
-    C.PassEnd();
-}
-
 void CBlender_BmmD::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (C.bEditor)
-    {
-        CompileForEditor(C);
-        return;
-    }
+    if (C.bFFP)
+        CompileFFP(C);
+    else
+        CompileProgrammable(C);
+}
 
+void CBlender_BmmD::CompileFFP(CBlender_Compile& C) const
+{
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
+    {
+        C.PassBegin();
+        {
+            C.PassSET_ZB(TRUE, TRUE);
+            C.PassSET_Blend_SET();
+            C.PassSET_LightFog(TRUE, TRUE);
+
+            // Stage1 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+            C.StageEnd();
+
+            // Stage2 - Second texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
+            C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+            C.StageEnd();
+        }
+        C.PassEnd();
+    }
+    else
+    {
+        C.PassBegin();
+        {
+            C.PassSET_ZB(TRUE, TRUE);
+            C.PassSET_Blend_SET();
+            C.PassSET_LightFog(FALSE, TRUE);
+
+            // Stage1 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+            C.StageSET_TMC(oT_Name, oT_xform, "$null", 0);
+            C.StageEnd();
+
+            // Stage2 - Second texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_CURRENT);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_CURRENT);
+            C.StageSET_TMC(oT2_Name, oT2_xform, "$null", 0);
+            C.StageEnd();
+        }
+        C.PassEnd();
+    }
+}
+
+void CBlender_BmmD::CompileProgrammable(CBlender_Compile& C) const
+{
     R_ASSERT3(C.L_textures.size() >= 2, "Not enought textures for shader, base tex: %s", *C.L_textures[0]);
     switch (C.iElement)
     {

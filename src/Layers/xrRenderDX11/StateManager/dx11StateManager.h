@@ -5,7 +5,7 @@
 class dx11StateManager
 {
 public:
-    dx11StateManager();
+    explicit dx11StateManager(CBackend& cmd_list_in);
     ~dx11StateManager();
 
     //	Set all states to default
@@ -89,8 +89,8 @@ private:
     bool m_bOverrideScissoring;
     BOOL m_bOverrideScissoringValue;
     u32 m_uiSampleMask;
-};
 
-extern dx11StateManager StateManager;
+    CBackend& cmd_list;
+};
 
 #endif //	dx11StateManager_included

@@ -12,6 +12,7 @@ class CParticleManager : public IParticleManager
     using ParticleActionsVec = xr_vector<ParticleActions*>;
     ParticleEffectVec effect_vec;
     ParticleActionsVec m_alist_vec;
+    Lock pm_lock;
 
 public:
     CParticleManager();

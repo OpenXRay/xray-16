@@ -12,7 +12,7 @@ const u32 activeLocalMapColor = 0xffffffff; // 0xffc80000;
 const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
 const u32 ourLevelMapColor = 0xffffffff;
 
-CUICustomMap::CUICustomMap() : CUIStatic("CUICustomMap")
+CUICustomMap::CUICustomMap() : CUIStatic("Custom Map")
 {
     m_BoundRect_.set(0, 0, 0, 0);
     m_flags.zero();
@@ -44,7 +44,9 @@ void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
         m_name = name;
     }
     if (levelIni != g_pGameLevel->pLevel)
-        xr_delete(levelIni);
+    {
+        xr_delete(const_cast<CInifile*>(levelIni));
+    }
 }
 
 void CUICustomMap::Update()
@@ -576,8 +578,6 @@ void CUIMiniMap::Init_internal(const shared_str& name, const CInifile& pLtx, con
     CUIStatic::SetTextureColor(0x7fffffff);
 }
 
-// XXX: examine the difference with CUILevelMap::UpdateSpots()
-// maybe we need to use inherited::UpdateSpots() here when minimap is not rounded..
 void CUIMiniMap::UpdateSpots()
 {
     DetachAll();

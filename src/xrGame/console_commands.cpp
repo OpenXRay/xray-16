@@ -89,7 +89,6 @@ extern BOOL g_ShowAnimationInfo;
 extern BOOL g_bShowHitSectors;
 // extern	BOOL	g_bDebugDumpPhysicsStep	;
 extern ESingleGameDifficulty g_SingleGameDifficulty;
-XRUICORE_API extern BOOL g_show_wnd_rect2;
 //-----------------------------------------------------------
 extern float g_fTimeFactor;
 extern BOOL b_toggle_weapon_aim;
@@ -2313,7 +2312,6 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "dbg_imotion_draw_skeleton", &dbg_imotion_draw_skeleton, FALSE, TRUE);
     CMD4(CCC_Float, "dbg_imotion_draw_velocity_scale", &dbg_imotion_draw_velocity_scale, 0.0001f, 100.0f);
 
-    CMD4(CCC_Integer, "show_wnd_rect_all", &g_show_wnd_rect2, 0, 1);
     CMD4(CCC_Integer, "dbg_show_ani_info", &g_ShowAnimationInfo, 0, 1);
     CMD4(CCC_Integer, "dbg_dump_physics_step", &ph_console::g_bDebugDumpPhysicsStep, 0, 1);
     CMD1(CCC_InvUpgradesHierarchy, "inv_upgrades_hierarchy");

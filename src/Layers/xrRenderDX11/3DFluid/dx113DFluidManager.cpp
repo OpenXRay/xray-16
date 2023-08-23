@@ -339,9 +339,9 @@ void dx113DFluidManager::Update(dx113DFluidData& FluidData, float timestep)
 
     //  Restore render state
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
+    pTarget->u_setrt(RCache, pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT[RCache.context_id]); // LDR RT
 
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
     // RImplementation.Target->phase_scene_begin();
 }
 
@@ -430,7 +430,7 @@ void dx113DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
     u32 dwTextureStage = _T->find_texture_stage(strColorName);
     //  This will be overritten by the next technique.
     //  Otherwise we had to reset current texture list manually.
-    pRTTextures[RENDER_TARGET_TEMPVECTOR]->bind(dwTextureStage);
+    pRTTextures[RENDER_TARGET_TEMPVECTOR]->bind(RCache, dwTextureStage);
 
     // TimeStepShaderVariable->SetFloat(timestep);
     RCache.set_c(strTimeStep, timestep);
@@ -658,7 +658,7 @@ void dx113DFluidManager::ComputePressure(float /*timestep*/)
         // TechniqueJacobi->GetPassByIndex(0)->Apply(0);
         // SetRenderTarget( RENDER_TARGET_TEMPSCALAR );
         RCache.set_RT(pRenderTargetViews[RENDER_TARGET_TEMPSCALAR]);
-        pRTTextures[RENDER_TARGET_PRESSURE]->bind(dwTextureStage);
+        pRTTextures[RENDER_TARGET_PRESSURE]->bind(RCache, dwTextureStage);
         m_pGrid->DrawSlices();
         // m_pD3DDevice->OMSetRenderTargets(0, NULL, NULL);
         // RCache.set_RT(0);
@@ -668,7 +668,7 @@ void dx113DFluidManager::ComputePressure(float /*timestep*/)
         // TechniqueJacobi->GetPassByIndex(0)->Apply(0);
         // SetRenderTarget( RENDER_TARGET_PRESSURE );
         RCache.set_RT(pRenderTargetViews[RENDER_TARGET_PRESSURE]);
-        pRTTextures[RENDER_TARGET_TEMPSCALAR]->bind(dwTextureStage);
+        pRTTextures[RENDER_TARGET_TEMPSCALAR]->bind(RCache, dwTextureStage);
         m_pGrid->DrawSlices();
         // m_pD3DDevice->OMSetRenderTargets(0, NULL, NULL);
         // RCache.set_RT(0);
@@ -714,9 +714,9 @@ void dx113DFluidManager::RenderFluid(dx113DFluidData& FluidData)
 
     //  Restore render state
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
+    pTarget->u_setrt(RCache, pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT[RCache.context_id]); // LDR RT
 
-    RImplementation.rmNormal();
+    RImplementation.rmNormal(RCache);
 }
 
 void dx113DFluidManager::UpdateObstacles(const dx113DFluidData& FluidData, float timestep)

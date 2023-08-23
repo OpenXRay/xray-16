@@ -7,29 +7,25 @@ class CHUDTarget;
 class CUIGameCustom;
 namespace collide { struct rq_result; }
 
-class CHUDManager : public CCustomHUD
+class CHUDManager final : public CCustomHUD
 {
-    friend class CUI;
-
-private:
-    //.	CUI*					pUI;
-    CUIGameCustom* pUIGame;
+    Lock render_lock{}; // TODO: I believe this can be avoided, need to think more about it
+    CUIGameCustom* pUIGame{};
     CHitMarker HitMarker;
     CHUDTarget* m_pHUDTarget;
-    bool b_online;
+    bool b_online{};
 
 public:
     CHUDManager();
     virtual ~CHUDManager();
     virtual void OnEvent(EVENT E, u64 P1, u64 P2);
 
-    virtual void Render_First();
-    virtual void Render_Last();
+    virtual void Render_First(u32 context_id);
+    virtual void Render_Last(u32 context_id);
     virtual void OnFrame();
 
     virtual void RenderUI();
 
-    //.				CUI*		GetUI				(){return pUI;}
     CUIGameCustom* GetGameUI() { return pUIGame; }
     void HitMarked(const Fvector& dir);
     bool AddGrenade_ForMark(CGrenade* grn);
@@ -62,4 +58,4 @@ public:
     void SetRenderable(bool renderable) { psHUD_Flags.set(HUD_DRAW_RT2, renderable); }
 };
 
-IC CHUDManager& HUD() { return *((CHUDManager*)g_hud); }
+IC CHUDManager& HUD() { return *static_cast<CHUDManager*>(Level().pHUD); }

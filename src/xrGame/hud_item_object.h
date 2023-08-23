@@ -29,8 +29,8 @@ public:
     virtual bool ActivateItem();
     virtual void DeactivateItem();
     virtual void UpdateCL();
-    void renderable_Render(IRenderable* root) override;
-    void on_renderable_Render(IRenderable* root) override;
+    void renderable_Render(u32 context_id, IRenderable* root) override;
+    void on_renderable_Render(u32 context_id, IRenderable* root) override;
     virtual void OnMoveToRuck(const SInvItemPlace& prev);
 
     virtual bool use_parent_ai_locations() const

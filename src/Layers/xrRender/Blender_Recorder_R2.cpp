@@ -81,7 +81,7 @@ void CBlender_Compile::r_ColorWriteEnable(bool cR, bool cG, bool cB, bool cA)
     RS.SetRS(D3DRS_COLORWRITEENABLE3, Mask);
 }
 
-u32 CBlender_Compile::i_Sampler(LPCSTR _name)
+u32 CBlender_Compile::i_Sampler(LPCSTR _name) const
 {
     string256 name;
     xr_strcpy(name, _name);
@@ -220,8 +220,6 @@ void CBlender_Compile::r_End()
     dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
     dest.C = nullptr;
-#ifdef _EDITOR
-    dest.M = 0;
-#endif
+    dest.M = nullptr;
     SH->passes.push_back(RImplementation.Resources->_CreatePass(dest));
 }

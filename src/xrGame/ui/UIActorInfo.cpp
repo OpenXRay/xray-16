@@ -18,13 +18,7 @@
 constexpr cpcstr ACTOR_STATISTIC_XML = "actor_statistic.xml";
 constexpr cpcstr ACTOR_CHARACTER_XML = "pda_dialog_character.xml";
 
-CUIActorInfoWnd::CUIActorInfoWnd()
-    : CUIWindow("CUIActorInfoWnd"),
-      UIInfoFrame(nullptr), UIInfoHeader(nullptr),
-      UICharIconFrame(nullptr), UICharIconHeader(nullptr),
-      UIAnimatedIcon(nullptr), UICharacterWindow(nullptr),
-      UICharacterInfo(nullptr), UIMasterList(nullptr),
-      UIDetailList(nullptr) {}
+CUIActorInfoWnd::CUIActorInfoWnd() : CUIWindow(CUIActorInfoWnd::GetDebugType()) {}
 
 bool CUIActorInfoWnd::Init()
 {
@@ -35,7 +29,7 @@ bool CUIActorInfoWnd::Init()
     CUIXmlInit::InitWindow(uiXml, "main_wnd", 0, this);
 
     // Декоративное оформление
-    UICharIconFrame = xr_new<CUIFrameWindow>();
+    UICharIconFrame = xr_new<CUIFrameWindow>("Character icon frame");
     UICharIconFrame->SetAutoDelete(true);
     CUIXmlInit::InitFrameWindow(uiXml, "chicon_frame_window", 0, UICharIconFrame);
     AttachChild(UICharIconFrame);
@@ -50,7 +44,7 @@ bool CUIActorInfoWnd::Init()
     CUIXmlInit::InitAnimatedStatic(uiXml, "a_static", 0, UIAnimatedIcon);
     UICharIconHeader->AttachChild(UIAnimatedIcon);
 
-    UIInfoFrame = xr_new<CUIFrameWindow>();
+    UIInfoFrame = xr_new<CUIFrameWindow>("Info frame");
     UIInfoFrame->SetAutoDelete(true);
     CUIXmlInit::InitFrameWindow(uiXml, "info_frame_window", 0, UIInfoFrame);
     AttachChild(UIInfoFrame);
@@ -83,7 +77,7 @@ bool CUIActorInfoWnd::Init()
     // Элементы автоматического добавления
     CUIXmlInit::InitAutoStaticGroup(uiXml, "right_auto_static", 0, UICharIconFrame);
     CUIXmlInit::InitAutoStaticGroup(uiXml, "left_auto_static", 0, UIInfoFrame);
-    
+
     return true;
 }
 
@@ -292,7 +286,7 @@ void CUIActorInfoWnd::FillReputationDetails(CUIXml* xml, LPCSTR path)
 
 
 CUIActorStaticticHeader::CUIActorStaticticHeader(CUIActorInfoWnd* w)
-    : CUIWindow("CUIActorStaticticHeader"), m_actorInfoWnd(w),
+    : CUIWindow(CUIActorStaticticHeader::GetDebugType()), m_actorInfoWnd(w),
       m_stored_alpha(0), m_text1(nullptr), m_text2(nullptr) {}
 
 void CUIActorStaticticHeader::Init(CUIXml* xml, LPCSTR path, int idx_in_xml)

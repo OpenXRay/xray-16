@@ -4,44 +4,43 @@
 #include "xrstring.h"
 
 // resource itself, the base class for all derived resources
-class XRCORE_API xr_resource
+struct xr_resource
 {
-public:
+    xr_resource() = default;
+    virtual ~xr_resource() = default;
+
+    xr_resource(xr_resource const& other)
+    {
+        *this = other;
+    }
+    xr_resource& operator =(xr_resource const& other)
+    {
+        ref_count.exchange(other.ref_count);
+        return *this;
+    }
+
+    std::atomic<u32> ref_count{ 0 };
+};
+
+struct xr_resource_flagged : public xr_resource
+{
     enum
     {
         RF_REGISTERED = 1 << 0
     };
 
-public:
-    u32 dwReference;
-    xr_resource() : dwReference(0) {}
+    u32 dwFlags{ 0 };
 };
 
-class XRCORE_API xr_resource_flagged : public xr_resource
+struct xr_resource_named : public xr_resource_flagged
 {
-public:
-    enum
-    {
-        RF_REGISTERED = 1 << 0
-    };
-
-public:
-    u32 dwFlags;
-    xr_resource_flagged() : dwFlags(0) {}
-};
-
-class XRCORE_API xr_resource_named : public xr_resource_flagged
-{
-public:
-    shared_str cName;
+    shared_str cName{ 0 };
 
     const char* set_name(const char* name)
     {
         cName = name;
         return *cName;
     }
-    xr_resource_named() : cName(0) {}
-    ~xr_resource_named() {}
 };
 
 // resptr_BASE
@@ -57,14 +56,14 @@ protected:
     {
         if (0 == p_)
             return;
-        ++p_->dwReference;
+        ++p_->ref_count;
     }
     void _dec()
     {
         if (0 == p_)
             return;
-        --p_->dwReference;
-        if (0 == p_->dwReference)
+        --p_->ref_count;
+        if (0 == p_->ref_count)
             xr_delete(p_);
     }
 
@@ -72,7 +71,7 @@ public:
     ICF void _set(T* rhs)
     {
         if (0 != rhs)
-            ++rhs->dwReference;
+            ++rhs->ref_count;
         _dec();
         p_ = rhs;
     }

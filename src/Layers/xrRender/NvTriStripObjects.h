@@ -73,7 +73,8 @@ public:
     {
         if (--m_refCount == 0)
         {
-            delete this;
+            auto self = this;
+            xr_delete(self);
         }
     }
 

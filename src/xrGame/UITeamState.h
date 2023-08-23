@@ -18,7 +18,7 @@ class CUIXml;
 class UIPlayerItem;
 class UITeamHeader;
 
-class UITeamState : public CUIWindow
+class UITeamState final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -66,6 +66,7 @@ private:
 public:
     UITeamState(ETeam teamId, UITeamPanels* teamPanels);
     virtual ~UITeamState();
+
     void Init(CUIXml& uiXml, LPCSTR teamNodeName, int index);
 
     void AddPlayer(ClientID const& clientId);
@@ -79,6 +80,8 @@ public:
 
     virtual void Update();
     virtual void Draw();
+
+    pcstr GetDebugType() override { return "UITeamState"; }
 };
 
 #endif

@@ -36,7 +36,7 @@ void CPartition::load(IKinematics* V, LPCSTR model_name)
 
     if (ini.sections().size() == 0)
         return;
-    shared_str part_name = "partition_name";
+    const shared_str part_name = "partition_name";
     for (u32 i = 0; i < MAX_PARTS; ++i)
     {
         string64 buff;
@@ -85,7 +85,7 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
 
     if (MP)
     {
-        u16 vers = MP->r_u16();
+        const u16 vers = MP->r_u16();
         u16 part_bone_cnt = 0;
         string128 buf;
         R_ASSERT3(vers <= xrOGF_SMParamsVersion, "Invalid OGF/OMF version:", N);
@@ -139,14 +139,14 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
         if (bRes)
         {
             // motion defs (cycle&fx)
-            u16 mot_count = MP->r_u16();
+            const u16 mot_count = MP->r_u16();
             m_mdefs.resize(mot_count);
 
             for (u16 mot_i = 0; mot_i < mot_count; mot_i++)
             {
                 MP->r_stringZ(buf, sizeof(buf));
                 shared_str nm = xr_strlwr(buf);
-                u32 dwFlags = MP->r_u32();
+                const u32 dwFlags = MP->r_u32();
                 CMotionDef& D = m_mdefs[mot_i];
                 D.Load(MP, dwFlags, vers);
                 //. m_mdefs.push_back (D);
@@ -194,10 +194,10 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
         VERIFY3(I != m_motion_map.end(), "Can't find motion:", mname);
         VERIFY3(I->second == m_idx, "Invalid motion index:", mname);
 #endif
-        u32 dwLen = MS->r_u32();
+        const u32 dwLen = MS->r_u32();
         for (u32 i = 0; i < bones->size(); i++)
         {
-            u16 bone_id = rm_bones[i];
+            const u16 bone_id = rm_bones[i];
             VERIFY2(bone_id != BI_NONE, "Invalid remap index.");
             CMotion& M = m_motions[bones->at(bone_id)->name][m_idx];
             M.set_count(dwLen);
@@ -206,19 +206,19 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
             if (M.test_flag(flRKeyAbsent))
             {
                 CKeyQR* r = (CKeyQR*)MS->pointer();
-                u32 crc_q = crc32(r, sizeof(CKeyQR));
+                const u32 crc_q = crc32(r, sizeof(CKeyQR));
                 M._keysR.create(crc_q, 1, r);
                 MS->advance(1 * sizeof(CKeyQR));
             }
             else
             {
-                u32 crc_q = MS->r_u32();
+                const u32 crc_q = MS->r_u32();
                 M._keysR.create(crc_q, dwLen, (CKeyQR*)MS->pointer());
                 MS->advance(dwLen * sizeof(CKeyQR));
             }
             if (M.test_flag(flTKeyPresent))
             {
-                u32 crc_t = MS->r_u32();
+                const u32 crc_t = MS->r_u32();
                 if (M.test_flag(flTKey16IsBit))
                 {
                     M._keysT16.create(crc_t, dwLen, (CKeyQT16*)MS->pointer());
@@ -247,7 +247,7 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
 
 MotionVec* motions_value::bone_motions(shared_str bone_name)
 {
-    auto I = m_motions.find(bone_name);
+    const auto I = m_motions.find(bone_name);
     // VERIFY (I != m_motions.end());
     if (I == m_motions.end())
         return nullptr;
@@ -271,7 +271,7 @@ bool motions_container::has(shared_str key) { return (container.find(key) != con
 motions_value* motions_container::dock(shared_str key, IReader* data, vecBones* bones)
 {
     motions_value* result = nullptr;
-    auto I = container.find(key);
+    const auto I = container.find(key);
     if (I != container.end())
         result = I->second;
     if (nullptr == result)
@@ -280,7 +280,7 @@ motions_value* motions_container::dock(shared_str key, IReader* data, vecBones* 
         VERIFY(data);
         result = xr_new<motions_value>();
         result->m_dwReference = 0;
-        BOOL bres = result->load(key.c_str(), data, bones);
+        const BOOL bres = result->load(key.c_str(), data, bones);
         if (bres)
             container.insert(std::make_pair(key, result));
         else
@@ -291,7 +291,7 @@ motions_value* motions_container::dock(shared_str key, IReader* data, vecBones* 
 void motions_container::clean(bool force_destroy)
 {
     auto it = container.begin();
-    auto _E = container.end();
+    const auto _E = container.end();
     if (force_destroy)
     {
         for (; it != _E; ++it)
@@ -308,8 +308,8 @@ void motions_container::clean(bool force_destroy)
             motions_value* sv = it->second;
             if (0 == sv->m_dwReference)
             {
-                auto i_current = it;
-                auto i_next = ++it;
+                const auto i_current = it;
+                const auto i_next = ++it;
                 xr_delete(sv);
                 container.erase(i_current);
                 it = i_next;
@@ -324,7 +324,7 @@ void motions_container::clean(bool force_destroy)
 void motions_container::dump()
 {
     auto it = container.begin();
-    auto _E = container.end();
+    const auto _E = container.end();
     Log("--- motion container --- begin:");
     size_t sz = sizeof(*this);
     for (u32 k = 0; it != _E; k++, ++it)
@@ -353,7 +353,7 @@ void CMotionDef::Load(IReader* MP, u32 fl, u16 version)
 
     if (version >= 4)
     {
-        u32 cnt = MP->r_u32();
+        const u32 cnt = MP->r_u32();
         if (cnt > 0)
         {
             marks.resize(cnt);
@@ -388,7 +388,7 @@ bool shared_motions::create(shared_motions const& rhs)
 const motion_marks::interval* motion_marks::pick_mark(const float& t) const
 {
     C_ITERATOR it = intervals.begin();
-    C_ITERATOR it_e = intervals.end();
+    const C_ITERATOR it_e = intervals.end();
 
     for (; it != it_e; ++it)
     {
@@ -407,7 +407,7 @@ bool motion_marks::is_mark_between(float const& t0, float const& t1) const
     VERIFY(t0 <= t1);
 
     C_ITERATOR i = intervals.begin();
-    C_ITERATOR e = intervals.end();
+    const C_ITERATOR e = intervals.end();
     for (; i != e; ++i)
     {
         VERIFY((*i).first <= (*i).second);
@@ -441,11 +441,11 @@ bool motion_marks::is_mark_between(float const& t0, float const& t1) const
 float motion_marks::time_to_next_mark(float time) const
 {
     C_ITERATOR i = intervals.begin();
-    C_ITERATOR e = intervals.end();
+    const C_ITERATOR e = intervals.end();
     float result_dist = FLT_MAX;
     for (; i != e; ++i)
     {
-        float dist = (*i).first - time;
+        const float dist = (*i).first - time;
         if (dist > 0.f && dist < result_dist)
             result_dist = dist;
     }
@@ -457,7 +457,7 @@ void motion_marks::Load(IReader* R)
     xr_string tmp;
     R->r_string(tmp);
     name = tmp.c_str();
-    u32 cnt = R->r_u32();
+    const u32 cnt = R->r_u32();
     intervals.resize(cnt);
     for (u32 i = 0; i < cnt; ++i)
     {
@@ -470,11 +470,11 @@ void motion_marks::Load(IReader* R)
 void motion_marks::Save(IWriter* W)
 {
     W->w_string(name.c_str());
-    u32 cnt = intervals.size();
+    const u32 cnt = intervals.size();
     W->w_u32(cnt);
     for (u32 i = 0; i < cnt; ++i)
     {
-        interval& item = intervals[i];
+        const interval& item = intervals[i];
         W->w_float(item.first);
         W->w_float(item.second);
     }

@@ -72,6 +72,7 @@
     <ClInclude Include="object_loader.h" />
     <ClInclude Include="object_saver.h" />
     <ClInclude Include="object_type_traits.h" />
+    <ClInclude Include="OGF_GContainer_Vertices.hpp" />
     <ClInclude Include="Platform.hpp" />
     <ClInclude Include="PlatformLinux.inl" />
     <ClInclude Include="PlatformWindows.inl" />

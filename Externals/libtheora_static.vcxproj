@@ -29,8 +29,7 @@
       <PreprocessorDefinitions>_CRT_NONSTDC_NO_DEPRECATE;_BIND_TO_CURRENT_CRT_VERSION;_USRDLL;LIBTHEORA_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Platform)'=='Win32'">OC_X86_ASM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <DisableSpecificWarnings Condition="'$(Configuration)'=='Release'">4244;4267;4057;4100;4245;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <TreatWarningAsError>false</TreatWarningAsError>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

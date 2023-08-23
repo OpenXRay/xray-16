@@ -127,7 +127,7 @@ CEffect_Thunderbolt::CEffect_Thunderbolt()
     p_fog_color = config->r_float(section, "fog_color");
 
     if (config != pSettings)
-        xr_delete(config);
+        xr_delete(const_cast<CInifile *>(config));
 }
 
 CEffect_Thunderbolt::~CEffect_Thunderbolt()

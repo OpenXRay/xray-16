@@ -5,7 +5,7 @@
 
 class CUIXml;
 
-class CUIBuyWeaponTab : public CUITabControl
+class CUIBuyWeaponTab final : public CUITabControl
 {
     typedef CUITabControl inherited;
 
@@ -19,7 +19,11 @@ public:
     // 	virtual void Init						(CUIXml* xml, char* path);
     // 	virtual void OnTabChange				(const shared_str& sCur, const shared_str& sPrev);
     // 			void SetActiveState				(bool bState = true);
+
+    pcstr GetDebugType() override { return "CUIBuyWeaponTab"; }
+
     // private:
     // 	bool			m_bActiveState;
     // 	shared_str		m_sStubId;
+
 };

@@ -9,11 +9,10 @@ class CUIFrameWindow;
 class CUIListBox;
 class CUIXml;
 
-class CUIChangeMap : public CUIDialogWnd
+class CUIChangeMap final : public CUIDialogWnd
 {
 public:
     CUIChangeMap();
-    ~CUIChangeMap();
     void InitChangeMap(CUIXml& xml_doc);
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
@@ -22,6 +21,8 @@ public:
     void OnBtnOk();
     void OnBtnCancel();
     void OnItemSelect();
+
+    pcstr GetDebugType() override { return "CUIChangeMap"; }
 
 protected:
     void FillUpList();

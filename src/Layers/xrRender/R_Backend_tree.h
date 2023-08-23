@@ -15,7 +15,7 @@ public:
     R_constant* c_c_sun;
 
 public:
-    R_tree();
+    explicit R_tree(CBackend& cmd_list_in);
     void unmap();
 
     void set_c_m_xform_v(R_constant* C) { c_m_xform_v = C; }
@@ -34,5 +34,7 @@ public:
     void set_c_scale(float x, float y, float z, float w);
     void set_c_bias(float x, float y, float z, float w);
     void set_c_sun(float x, float y, float z, float w);
+
+    CBackend& cmd_list;
 };
 #endif

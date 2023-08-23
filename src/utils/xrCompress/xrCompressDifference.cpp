@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#ifndef MOD_COMPRESS
-
 string_path target_folder;
 string_path new_folder, old_folder;
 
@@ -14,24 +12,18 @@ struct file_comparer
         eDontCheckBinary = 4,
         eDontCheckFileSize = 8
     };
+
     Flags32 m_flags;
-    string_path m_short_name;
     string_path m_full_name;
     CLocatorAPI* m_fs_new;
     CLocatorAPI* m_fs_old;
-    IReader* m_freader;
-    u32 m_crc32;
+    u32 m_crc32{};
     u32 m_file_size;
 
-    file_comparer(char* c, CLocatorAPI* fs1, CLocatorAPI* fs2, Flags32 flag)
+    file_comparer(pcstr name, CLocatorAPI* fs1, CLocatorAPI* fs2, Flags32 flag)
+        : m_flags(flag), m_fs_new(fs1), m_fs_old(fs2)
     {
-        m_flags = flag;
-        m_fs_new = fs1;
-        m_fs_old = fs2;
-        m_freader = 0;
-        m_crc32 = 0;
-        //		xr_strcpy(m_short_name,c+xr_strlen(arget_folder)+1);
-        xr_strcpy(m_full_name, c);
+        xr_strcpy(m_full_name, name);
 
         string_path path;
         m_fs_new->update_path(path, "$target_folder$", m_full_name);
@@ -39,11 +31,10 @@ struct file_comparer
             m_file_size = m_fs_new->file_length(path);
     }
 
-    bool operator()(char* o)
+    bool operator()(pcstr o)
     {
         // compare file names
-        int eq = xr_strcmp(m_full_name, o);
-        if (0 != eq)
+        if (0 != xr_strcmp(m_full_name, o))
             return false;
 
         if (!m_flags.test(eDontCheckFileSize))
@@ -53,22 +44,22 @@ struct file_comparer
             m_fs_old->update_path(path, "$target_folder$", o);
             if (!m_fs_old->exist(path))
                 return false;
-            auto fileDesc = m_fs_old->GetFileDesc(path);
+            const auto fileDesc = m_fs_old->GetFileDesc(path);
             if (fileDesc->vfs == 0xffffffff && fileDesc->size_real != m_file_size)
                 return false;
-        };
+        }
         // compare file crc
         if (!m_crc32 && !m_flags.test(eDontCheckCRC))
         {
             IReader* r = m_fs_new->r_open("$target_folder$", m_full_name);
             m_crc32 = crc32(r->pointer(), r->length());
             m_fs_new->r_close(r);
-        };
+        }
 
         if (!m_flags.test(eDontCheckCRC))
         {
             IReader* r_ = m_fs_old->r_open("$target_folder$", o);
-            u32 crc32_ = crc32(r_->pointer(), r_->length());
+            const u32 crc32_ = crc32(r_->pointer(), r_->length());
             m_fs_old->r_close(r_);
             if (m_crc32 != crc32_)
                 return false;
@@ -80,7 +71,7 @@ struct file_comparer
             IReader* f1 = m_fs_new->r_open("$target_folder$", m_full_name);
             IReader* f2 = m_fs_old->r_open("$target_folder$", o);
 
-            int res = memcmp(f1->pointer(), f2->pointer(), f1->length());
+            const int res = memcmp(f1->pointer(), f2->pointer(), f1->length());
             m_fs_new->r_close(f1);
             m_fs_old->r_close(f2);
 
@@ -93,7 +84,7 @@ struct file_comparer
 
 int ProcessDifference()
 {
-    LPCSTR params = GetCommandLine();
+    cpcstr params = GetCommandLine();
     Flags32 _flags;
     _flags.zero();
     if (strstr(params, "-diff /?"))
@@ -109,67 +100,58 @@ int ProcessDifference()
         return 3;
     }
 
-    CLocatorAPI* FS_new = NULL;
-    CLocatorAPI* FS_old = NULL;
-
-    xr_vector<char*>* file_list_old = NULL;
-    xr_vector<char*>* folder_list_old = NULL;
-
-    xr_vector<char*>* file_list_new = NULL;
-    xr_vector<char*>* folder_list_new = NULL;
-
     sscanf(strstr(params, "-diff ") + 6, "%[^ ] ", new_folder);
     sscanf(strstr(params, "-diff ") + 6 + xr_strlen(new_folder) + 1, "%[^ ] ", old_folder);
     sscanf(strstr(params, "-out ") + 5, "%[^ ] ", target_folder);
 
     if (strstr(params, "-nofileage"))
     {
-        _flags.set(file_comparer::eDontCheckFileAge, TRUE);
-    };
+        _flags.set(file_comparer::eDontCheckFileAge, true);
+    }
     if (strstr(params, "-nocrc"))
     {
-        _flags.set(file_comparer::eDontCheckCRC, TRUE);
-    };
+        _flags.set(file_comparer::eDontCheckCRC, true);
+    }
     if (strstr(params, "-nobinary"))
     {
-        _flags.set(file_comparer::eDontCheckBinary, TRUE);
-    };
+        _flags.set(file_comparer::eDontCheckBinary, true);
+    }
     if (strstr(params, "-nosize"))
     {
-        _flags.set(file_comparer::eDontCheckFileSize, TRUE);
-    };
+        _flags.set(file_comparer::eDontCheckFileSize, true);
+    }
 
-    FS_new = xr_new<CLocatorAPI>();
+    auto FS_new = xr_new<CLocatorAPI>();
     FS_new->_initialize(CLocatorAPI::flTargetFolderOnly, new_folder);
-    file_list_new = FS_new->file_list_open("$target_folder$", FS_ListFiles);
-    folder_list_new = FS_new->file_list_open("$target_folder$", FS_ListFolders);
+    auto file_list_new = FS_new->file_list_open("$target_folder$", FS_ListFiles);
+    auto folder_list_new = FS_new->file_list_open("$target_folder$", FS_ListFolders);
 
-    FS_old = xr_new<CLocatorAPI>();
+    auto FS_old = xr_new<CLocatorAPI>();
     FS_old->_initialize(CLocatorAPI::flTargetFolderOnly, old_folder);
-    file_list_old = FS_old->file_list_open("$target_folder$", FS_ListFiles);
-    folder_list_old = FS_old->file_list_open("$target_folder$", FS_ListFolders);
+    auto file_list_old = FS_old->file_list_open("$target_folder$", FS_ListFiles);
+    auto folder_list_old = FS_old->file_list_open("$target_folder$", FS_ListFolders);
 
     xr_vector<LPCSTR> target_file_list;
     target_file_list.reserve(file_list_new->size());
 
-    for (u32 i = 0; i < file_list_new->size(); ++i)
+    for (const auto& file : *file_list_new)
     {
-        file_comparer fc(file_list_new->at(i), FS_new, FS_old, _flags);
-        xr_vector<char*>::iterator it = std::find_if(file_list_old->begin(), file_list_old->end(), fc);
+        const file_comparer fc(file, FS_new, FS_old, _flags);
+        auto it = std::find_if(file_list_old->begin(), file_list_old->end(), fc);
         if (it != file_list_old->end())
         {
-            printf("skip file %s\n", file_list_new->at(i));
+            printf("skip file %s\n", file);
         }
         else
-            target_file_list.push_back(file_list_new->at(i));
+            target_file_list.emplace_back(file);
     }
 
     string_path out_path;
     string_path stats;
-    u32 total = target_file_list.size();
+    const u32 total = target_file_list.size();
     for (u32 i = 0; i < total; ++i)
     {
-        LPCSTR fn = target_file_list[i];
+        const LPCSTR fn = target_file_list[i];
         xr_sprintf(stats, "%d of %d (%3.1f%%)", i, total, 100.0f * ((float)i / (float)total));
         SetConsoleTitle(stats);
 
@@ -193,4 +175,3 @@ int ProcessDifference()
 
     return 0;
 }
-#endif

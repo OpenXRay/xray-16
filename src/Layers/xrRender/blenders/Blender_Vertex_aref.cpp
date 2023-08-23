@@ -48,38 +48,101 @@ void CBlender_Vertex_aref::Load(IReader& fs, u16 version)
     }
 }
 
-void CBlender_Vertex_aref::CompileForEditor(CBlender_Compile& C)
-{
-    C.PassBegin();
-    {
-        const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
-        const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;
-
-        C.PassSET_Blend(true, blend_src, blend_dst, true, oAREF.value);
-        C.PassSET_LightFog(true, true);
-
-        // Stage1 - Base texture
-        C.StageBegin();
-        C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-        C.Stage_Texture(oT_Name);
-        C.Stage_Matrix(oT_xform, 0);
-        C.Stage_Constant("$null");
-        C.StageEnd();
-    }
-    C.PassEnd();
-}
-
 void CBlender_Vertex_aref::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (C.bEditor)
-    {
-        CompileForEditor(C);
-        return;
-    }
+    if (C.bFFP)
+        CompileFFP(C);
+    else
+        CompileProgrammable(C);
+}
 
+void CBlender_Vertex_aref::CompileFFP(CBlender_Compile& C) const
+{
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
+    {
+        C.PassBegin();
+        {
+            const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
+            const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;
+
+            //C.PassSET_Blend(true, blend_src, blend_dst, true, oAREF.value);
+            C.PassSET_LightFog(true, true);
+
+            // Stage1 - Base texture
+            C.StageBegin();
+            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
+            C.Stage_Texture(oT_Name);
+            C.Stage_Matrix(oT_xform, 0);
+            C.Stage_Constant("$null");
+            C.StageEnd();
+        }
+        C.PassEnd();
+    }
+    else
+    {
+        switch (C.iElement)
+        {
+        case SE_R1_NORMAL_HQ:
+        case SE_R1_NORMAL_LQ:
+        {
+            // Level view
+            C.PassBegin();
+            {
+                C.PassSET_ZB(TRUE, TRUE);
+                if (oBlend.value)
+                    C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
+                else
+                    C.PassSET_Blend(TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, oAREF.value);
+                C.PassSET_LightFog(FALSE, TRUE);
+
+                // Stage1 - Base texture
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
+                C.Stage_Texture(oT_Name);
+                C.Stage_Matrix(oT_xform, 0);
+                C.Stage_Constant("$null");
+                C.StageEnd();
+            }
+            C.PassEnd();
+            break;
+        }
+        case SE_R1_LMODELS:
+        {
+            // Lighting only
+            C.PassBegin();
+            {
+                C.PassSET_ZB(TRUE, TRUE);
+                if (oBlend.value)
+                    C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
+                else
+                    C.PassSET_Blend(TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, oAREF.value);
+                C.PassSET_LightFog(FALSE, FALSE);
+
+                // Stage1 - Base texture
+                C.StageBegin();
+                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG2, D3DTA_DIFFUSE);
+                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
+                C.Stage_Texture(oT_Name);
+                C.Stage_Matrix(oT_xform, 0);
+                C.Stage_Constant("$null");
+                C.StageEnd();
+            }
+            C.PassEnd();
+            break;
+        }
+
+        default:
+            break;
+        } // switch (C.iElement)
+    }
+}
+
+void CBlender_Vertex_aref::CompileProgrammable(CBlender_Compile& C) const
+{
     const D3DBLEND blend_src = oBlend.value ? D3DBLEND_SRCALPHA : D3DBLEND_ONE;
     const D3DBLEND blend_dst = oBlend.value ? D3DBLEND_INVSRCALPHA : D3DBLEND_ZERO;
 
@@ -177,5 +240,5 @@ void CBlender_Vertex_aref::Compile(CBlender_Compile& C)
 
     default:
         break;
-    }
+    } // switch (C.iElement)
 }

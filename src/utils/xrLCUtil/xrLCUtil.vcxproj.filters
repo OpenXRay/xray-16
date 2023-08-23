@@ -56,4 +56,7 @@
     <CopyFileToFolders Include="..\..\..\sdk\binaries\$(PlatformShortName)\FreeImage.dll" />
     <CopyFileToFolders Include="..\..\..\sdk\binaries\$(PlatformShortName)\FreeImagePlus.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

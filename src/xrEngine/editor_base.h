@@ -11,6 +11,20 @@ namespace xray::editor
 {
 struct ide_backend;
 
+class XR_NOVTABLE ENGINE_API ide_tool : public pureFrame
+{
+    bool is_opened{};
+
+public:
+    ide_tool();
+    virtual ~ide_tool();
+
+    virtual pcstr tool_name() = 0;
+
+    bool& get_open_state() { return is_opened; }
+    ImGuiWindowFlags get_default_window_flags() const;
+};
+
 class ENGINE_API ide final :
     public pureRender,
     public pureFrame,
@@ -20,6 +34,8 @@ class ENGINE_API ide final :
     public pureAppEnd,
     public IInputReceiver
 {
+    friend class ide_tool;
+
 public:
     enum class visible_state
     {
@@ -30,7 +46,7 @@ public:
 
 public:
     ide();
-    ~ide();
+    ~ide() override;
 
     [[nodiscard]]
     bool is_shown() const;
@@ -46,36 +62,38 @@ public:
     void SetState(visible_state state);
     void SwitchToNextState();
 
+    auto GetImGuiContext() const { return m_context; }
+
 public:
     // Interface implementations
-    void OnFrame() final;
-    void OnRender() final;
+    void OnFrame() override;
+    void OnRender() override;
 
-    void OnAppActivate() final;
-    void OnAppDeactivate() final;
+    void OnAppActivate() override;
+    void OnAppDeactivate() override;
 
-    void OnAppStart() final;
-    void OnAppEnd() final;
+    void OnAppStart() override;
+    void OnAppEnd() override;
 
-    void IR_Capture() final;
-    void IR_Release() final;
+    void IR_Capture() override;
+    void IR_Release() override;
 
-    void IR_OnMousePress(int key) final;
-    void IR_OnMouseRelease(int key) final;
-    void IR_OnMouseHold(int key) final;
-    void IR_OnMouseWheel(int x, int y) final;
-    void IR_OnMouseMove(int x, int y) final;
+    void IR_OnMousePress(int key) override;
+    void IR_OnMouseRelease(int key) override;
+    void IR_OnMouseHold(int key) override;
+    void IR_OnMouseWheel(int x, int y) override;
+    void IR_OnMouseMove(int x, int y) override;
 
-    void IR_OnKeyboardPress(int key) final;
-    void IR_OnKeyboardRelease(int key) final;
-    void IR_OnKeyboardHold(int key) final;
-    void IR_OnTextInput(pcstr text) final;
+    void IR_OnKeyboardPress(int key) override;
+    void IR_OnKeyboardRelease(int key) override;
+    void IR_OnKeyboardHold(int key) override;
+    void IR_OnTextInput(pcstr text) override;
 
-    void IR_OnControllerPress(int key, float x, float y) final;
-    void IR_OnControllerRelease(int key, float x, float y) final;
-    void IR_OnControllerHold(int key, float x, float y) final;
+    void IR_OnControllerPress(int key, float x, float y) override;
+    void IR_OnControllerRelease(int key, float x, float y) override;
+    void IR_OnControllerHold(int key, float x, float y) override;
 
-    void IR_OnControllerAttitudeChange(Fvector change) final;
+    void IR_OnControllerAttitudeChange(Fvector change) override;
 
 private:
     ImGuiWindowFlags get_default_window_flags() const;
@@ -88,6 +106,9 @@ private:
     void ShowMain();
     void ShowWeatherEditor();
 
+    void RegisterTool(ide_tool* tool);
+    void UnregisterTool(const ide_tool* tool);
+
 private:
     CTimer m_timer;
     IImGuiRender* m_render{};
@@ -95,11 +116,8 @@ private:
     ide_backend* m_backend_data{};
 
     visible_state m_state;
-    struct
-    {
-        bool weather;
-        bool imgui_demo;
-        bool imgui_metrics;
-    } m_windows{};
+    bool m_show_weather_editor; // to be refactored
+
+    xr_vector<ide_tool*> m_tools;
 };
 } // namespace xray::editor

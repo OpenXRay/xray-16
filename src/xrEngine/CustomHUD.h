@@ -20,24 +20,20 @@ ENGINE_API extern Flags32 psHUD_Flags;
 
 class IGameObject;
 
-class ENGINE_API CCustomHUD : public FactoryObjectBase, public IEventReceiver,
-                              public CUIResetNotifier
+class ENGINE_API XR_NOVTABLE CCustomHUD
+    : public FactoryObjectBase,
+      public IEventReceiver,
+      public CUIResetNotifier
 {
 public:
-    CCustomHUD();
-    virtual ~CCustomHUD();
+    virtual void Render_First(u32 context_id) = 0;
+    virtual void Render_Last(u32 context_id) = 0;
 
-    virtual void Render_First() {}
-    virtual void Render_Last() {}
-
-    virtual void OnFrame() { ; }
-    virtual void OnEvent(EVENT /*E*/, u64 /*P1*/, u64 /*P2*/) { ; }
-    virtual void Load() { ; }
+    virtual void OnFrame() = 0;
+    virtual void Load() = 0;
     virtual void OnDisconnected() = 0;
     virtual void OnConnected() = 0;
     virtual void RenderActiveItemUI() = 0;
     virtual bool RenderActiveItemUIQuery() = 0;
     virtual void net_Relcase(IGameObject* object) = 0;
 };
-
-extern ENGINE_API CCustomHUD* g_hud;

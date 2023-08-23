@@ -747,6 +747,9 @@ extern int g_ErrorLineCount;
 ENGINE_API int ps_r__Supersample = 1;
 ENGINE_API int ps_r__WallmarksOnSkeleton = 0;
 
+extern int ps_fps_limit;
+extern int ps_fps_limit_in_menu;
+
 void CCC_Register()
 {
     // General
@@ -791,6 +794,8 @@ void CCC_Register()
 
     CMD1(CCC_Editor, "rs_editor");
 
+    CMD4(CCC_Integer, "rs_fps_limit", &ps_fps_limit, 30, 501);
+    CMD4(CCC_Integer, "rs_fps_limit_in_menu", &ps_fps_limit_in_menu, 30, 501);
     CMD3(CCC_Mask, "rs_always_active", &psDeviceFlags, rsAlwaysActive);
     CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
     // CMD3(CCC_Mask, "rs_disable_objects_as_crows",&psDeviceFlags, rsDisableObjectsAsCrows );
@@ -865,6 +870,7 @@ void CCC_Register()
     psControllerSensorDeadZone = 0.005f;
     CMD4(CCC_Float, "gamepad_sensor_deadzone", &psControllerSensorDeadZone, 0.001f, 1.f);
     CMD3(CCC_ControllerSensorEnable, "gamepad_sensors_enable", &psControllerEnableSensors, 1);
+    CMD4(CCC_Float, "gamepad_cursor_autohide_time", &psControllerCursorAutohideTime, 0.5f, 3.f);
 
     // Camera
     CMD2(CCC_Float, "cam_inert", &psCamInert);

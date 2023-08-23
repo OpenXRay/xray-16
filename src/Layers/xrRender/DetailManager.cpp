@@ -17,7 +17,7 @@
 #else
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
@@ -84,6 +84,7 @@ CDetailManager::CDetailManager() : xrc("detail manager")
 {
     dtFS = nullptr;
     dtSlots = nullptr;
+    soft_Geom = nullptr;
     hw_Geom = nullptr;
     hw_BatchSize = 0;
     m_time_rot_1 = 0;
@@ -168,6 +169,7 @@ void CDetailManager::Load()
     dtFS->r_chunk_safe(0, &dtH, sizeof(dtH));
     R_ASSERT(dtH.version() == DETAIL_VERSION);
     u32 m_count = dtH.object_count();
+    objects.reserve(m_count);
 
     // Models
     IReader* m_fs = dtFS->open_chunk(1);
@@ -194,7 +196,11 @@ void CDetailManager::Load()
     // Make dither matrix
     bwdithermap(2, dither);
 
-    hw_Load();
+    // Hardware specific optimizations
+    if (UseVS())
+        hw_Load();
+    else
+        soft_Load();
 
     // swing desc
     // normal
@@ -213,7 +219,10 @@ void CDetailManager::Load()
 #endif
 void CDetailManager::Unload()
 {
-    hw_Unload();
+    if (UseVS())
+        hw_Unload();
+    else
+        soft_Unload();
 
     for (CDetail* detailObject : objects)
     {
@@ -366,7 +375,12 @@ void CDetailManager::UpdateVisibleM()
     RImplementation.BasicStats.DetailVisibility.End();
 }
 
-void CDetailManager::Render()
+bool CDetailManager::UseVS() const
+{
+    return HW.Caps.geometry_major >= 1 && !RImplementation.o.ffp;
+}
+
+void CDetailManager::Render(CBackend& cmd_list)
 {
 #ifndef _EDITOR
     if (nullptr == dtFS)
@@ -388,12 +402,13 @@ void CDetailManager::Render()
 #endif
     swing_current.lerp(swing_desc[0], swing_desc[1], factor);
 
-    RCache.set_CullMode(CULL_NONE);
-    RCache.set_xform_world(Fidentity);
-
-    hw_Render();
-
-    RCache.set_CullMode(CULL_CCW);
+    cmd_list.set_CullMode(CULL_NONE);
+    cmd_list.set_xform_world(Fidentity);
+    if (UseVS())
+        hw_Render(cmd_list);
+    else
+        soft_Render();
+    cmd_list.set_CullMode(CULL_CCW);
 
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
     RImplementation.BasicStats.DetailRender.End();

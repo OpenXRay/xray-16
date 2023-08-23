@@ -95,7 +95,7 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
         else
         {
             xrc.ray_query(CDB::OPT_ONLYFIRST, &Static, start, dir, range);
-            return xrc.r_count();
+            return !!xrc.r_count();
         }
     }
     return FALSE;
@@ -134,7 +134,11 @@ bool CObjectSpace::_RayPick(
             STYPE_COLLIDEABLE | ((tgt & rqtObstacle) ? STYPE_OBSTACLE : 0) | ((tgt & rqtShape) ? STYPE_SHAPE : 0);
         g_SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
         // Determine visibility for dynamic part of scene
-        for (auto spatial : r_spatial)
+#ifdef DEBUG
+        if (bDebug())
+            (*m_pRender)->dbgReserveSphere(r_spatial.size());
+#endif
+        for (auto* spatial : r_spatial)
         {
             IGameObject* collidable = spatial->dcast_GameObject();
             if (0 == collidable)

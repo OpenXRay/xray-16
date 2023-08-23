@@ -36,13 +36,19 @@ UIStyleManager::~UIStyleManager()
     for (auto& token : m_token)
     {
         if (token.name && token.id != DEFAULT_STYLE_ID)
-            xr_free(token.name);
+        {
+            char* tokenName = const_cast<char*>(token.name);
+            xr_free(tokenName);
+        }
     }
     m_token.clear();
     if (!DefaultStyleIsSet())
     {
-        xr_free(UI_PATH);
-        xr_free(UI_PATH_WITH_DELIMITER);
+        char* mutable_UI_PATH = const_cast<char*>(UI_PATH);
+        char* mutable_UI_PATH_WITH_DELIMITER = const_cast<char*>(UI_PATH_WITH_DELIMITER);
+
+        xr_free(mutable_UI_PATH);
+        xr_free(mutable_UI_PATH_WITH_DELIMITER);
     }
 }
 
@@ -96,4 +102,30 @@ void UIStyleManager::Reset()
 
     if (shouldHideMainMenu)
         g_pGamePersistent->m_pMainMenu->Activate(false);
+}
+
+bool UIStyleManager::SetStyle(pcstr name, bool reloadUI)
+{
+    for (const auto& token : m_token)
+    {
+        if (0 == xr_strcmp(token.name, name))
+        {
+            SetupStyle(token.id);
+            if (reloadUI)
+                Reset();
+            return true;
+        }
+    }
+    return false;
+}
+
+pcstr UIStyleManager::GetCurrentStyleName() const
+{
+    for (const auto& token : m_token)
+    {
+        if (token.id == m_style_id)
+            return token.name;
+    }
+    VERIFY(!"Could retrieve current style name!");
+    return nullptr;
 }

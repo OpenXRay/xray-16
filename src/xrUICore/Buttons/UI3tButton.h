@@ -34,6 +34,8 @@ public:
 
     virtual bool OnMouseDown(int mouse_btn);
 
+    pcstr GetDebugType() override { return "CUI3tButton"; }
+
     void SetStateTextColor(u32 color, IBState state)
     {
         m_dwTextColor[state] = color;

@@ -52,7 +52,7 @@ void CScriptXmlInit::InitWindow(LPCSTR path, int index, CUIWindow* pWnd)
 
 CUIFrameWindow* CScriptXmlInit::InitFrame(LPCSTR path, CUIWindow* parent)
 {
-    CUIFrameWindow* pWnd = xr_new<CUIFrameWindow>();
+    CUIFrameWindow* pWnd = xr_new<CUIFrameWindow>(path);
     CUIXmlInit::InitFrameWindow(m_xml, path, 0, pWnd);
     _attach_child(pWnd, parent);
     return pWnd;
@@ -60,7 +60,7 @@ CUIFrameWindow* CScriptXmlInit::InitFrame(LPCSTR path, CUIWindow* parent)
 
 CUIFrameLineWnd* CScriptXmlInit::InitFrameLine(LPCSTR path, CUIWindow* parent)
 {
-    CUIFrameLineWnd* pWnd = xr_new<CUIFrameLineWnd>("CUIFrameLineWndScriptInit");
+    CUIFrameLineWnd* pWnd = xr_new<CUIFrameLineWnd>(path);
     CUIXmlInit::InitFrameLine(m_xml, path, 0, pWnd);
     _attach_child(pWnd, parent);
     return pWnd;
@@ -76,7 +76,7 @@ CUIEditBox* CScriptXmlInit::InitEditBox(LPCSTR path, CUIWindow* parent)
 
 CUIStatic* CScriptXmlInit::InitStatic(LPCSTR path, CUIWindow* parent)
 {
-    CUIStatic* pWnd = xr_new<CUIStatic>("CUIStaticScriptInit");
+    CUIStatic* pWnd = xr_new<CUIStatic>(path);
     CUIXmlInit::InitStatic(m_xml, path, 0, pWnd);
     _attach_child(pWnd, parent);
     return pWnd;

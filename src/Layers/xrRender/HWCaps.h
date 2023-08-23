@@ -58,6 +58,7 @@ public:
     u16 raster_minor;
     pcstr raster_profile;
     caps_Raster raster;
+    u32 max_ffp_lights;
 
     u32 id_vendor;
     u32 id_device;

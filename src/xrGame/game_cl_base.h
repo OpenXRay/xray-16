@@ -7,7 +7,6 @@
 class NET_Packet;
 class CGameObject;
 class CUIGameCustom;
-class CUI;
 class CUIDialogWnd;
 
 struct SZoneMapEntityData

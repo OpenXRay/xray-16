@@ -18,7 +18,7 @@
 CUICellItem* CUICellItem::m_mouse_selected_item = NULL;
 
 CUICellItem::CUICellItem()
-    : CUIStatic("CUICellItem")
+    : CUIStatic("Cell Item")
 {
     m_pParentList = NULL;
     m_pData = NULL;
@@ -333,7 +333,7 @@ void CUICellItem::SetCustomDraw(ICustomDrawCellItem* c)
 // -------------------------------------------------------------------------------------------------
 
 CUIDragItem::CUIDragItem(CUICellItem* parent)
-    : CUIWindow("CUIDragItem"), m_static("Static")
+    : CUIWindow(CUIDragItem::GetDebugType()), m_static("Static")
 {
     m_pParent = parent;
     AttachChild(&m_static);

@@ -108,22 +108,22 @@ public:
 
     void Clear();
 
-    void _Evaluate(float t, Fvector& T, Fvector& R);
+    void _Evaluate(float t, Fvector& T, Fvector& R) const;
     void Save(IWriter& F) override;
     bool Load(IReader& F) override;
 
     void SaveMotion(const char* buf) override;
     bool LoadMotion(const char* buf) override;
 
-    void FindNearestKey(float t, float& min_k, float& max_k, float eps = EPS_L);
-    void CreateKey(float t, const Fvector& P, const Fvector& R);
-    void DeleteKey(float t);
+    void FindNearestKey(float t, float& min_k, float& max_k, float eps = EPS_L) const;
+    void CreateKey(float t, const Fvector& P, const Fvector& R) const;
+    void DeleteKey(float t) const;
     void NormalizeKeys();
-    int KeyCount();
+    int KeyCount() const;
     CEnvelope* Envelope(EChannelType et = ctPositionX) { return envs[et]; }
-    BOOL ScaleKeys(float from_time, float to_time, float scale_factor);
+    BOOL ScaleKeys(float from_time, float to_time, float scale_factor) const;
     BOOL NormalizeKeys(float from_time, float to_time, float speed);
-    float GetLength(float* mn = 0, float* mx = 0);
+    float GetLength(float* mn = 0, float* mx = 0) const;
 };
 
 //--------------------------------------------------------------------------
@@ -250,6 +250,6 @@ public:
 public:
     virtual void Save(IWriter& F);
     virtual bool Load(IReader& F);
-    bool Equal(CClip* c);
+    bool Equal(CClip* c) const;
 };
 #endif

@@ -6033,9 +6033,6 @@
     <ClInclude Include="ui\UIScriptWnd.h">
       <Filter>UI\UIWindows\ScriptWnd</Filter>
     </ClInclude>
-    <ClInclude Include="ui\uiscriptwnd_script.h">
-      <Filter>UI\UIWindows\ScriptWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UICellCustomItems.h">
       <Filter>UI\UIWindows\DragDrop</Filter>
     </ClInclude>
@@ -6497,6 +6494,9 @@
     </ClInclude>
     <ClInclude Include="game_cl_mp_script.h">
       <Filter>Core\Server\Games\client\mp_script</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIMapFilters.h">
+      <Filter>UI\Common\PDA\Tasks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9859,6 +9859,9 @@
     </ClCompile>
     <ClCompile Include="CustomOutfit_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIMapFilters.cpp">
+      <Filter>UI\Common\PDA\Tasks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

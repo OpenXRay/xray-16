@@ -19,9 +19,9 @@
 #define _A_HIDDEN      0x02
 #define _A_SUBDIR 0x00000010
 
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #define _finddata_t _finddata64i32_t
-#elif defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+#elif defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_PPC)
 #define _finddata_t _finddata32_t
 #endif
 
@@ -117,11 +117,21 @@ public:
     // IMPORTNT: don't replace u32 with size_t for this struct
     // (Letter A in the first word is forgotten intentionally,
     //  size_t will blow up the engine compatibility with it's resources)
-    struct archive_header
+    struct XRCORE_API archive_file_header
     {
-        u32 size_real;
-        u32 size_compr;
-        u32 crc;
+        u16  size; // size of following members:
+        u32  size_real;
+        u32  size_compr;
+        u32  crc;
+        //char name[]; // there's a string with variable size between crc and ptr
+        string_path name; // but we use fixed-size string for simplicity
+        u32  ptr;
+
+        // Used in file name string size calculation
+        static constexpr auto ELEMENTS_SIZE = sizeof(size_real) + sizeof(size_compr) + sizeof(crc) + sizeof(ptr);
+
+        archive_file_header(IReader& reader);
+        archive_file_header(IWriter& writer, pcstr file_name, u32 real_size, u32 compressed_size, u32 crc_sum, u32 pointer);
     };
 
     using archives_vec = xr_vector<archive>;

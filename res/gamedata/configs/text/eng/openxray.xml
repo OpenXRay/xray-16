@@ -28,7 +28,7 @@
 		<text>Creating new game</text>
 	</string>
 	<string id="ui_mm_always_active">
-		<text>Always active</text>
+		<text>Don't pause on Alt+Tab</text>
 	</string>
 	<string id="ui_mm_detail_radius">
 		<text>Grass detail radius</text>
@@ -51,14 +51,8 @@
 	<string id="renderer_gl">
 		<text>Enhanced full dyn. lighting (OpenGL)</text>
 	</string>
-	<string id="ui_mm_r2_fxaa">
-		<text>FXAA</text>
-	</string>
 	<string id="ui_mm_r2_smap_size">
 		<text>Shadow map quality</text>
-	</string>
-	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
-		<text>Wet surfaces optimization</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
 		<text>Wet surfaces near dist.</text>
@@ -80,6 +74,12 @@
 	</string>
 	<string id="ui_mm_gamepad_setup">
 		<text>Gamepad setup</text>
+	</string>
+	<string id="ui_mm_fps_limit">
+		<text>In-game FPS limit</text>
+	</string>
+	<string id="ui_mm_fps_limit_in_menu">
+		<text>Menu FPS limit</text>
 	</string>
 	<string id="eng">
 		<text>English</text>

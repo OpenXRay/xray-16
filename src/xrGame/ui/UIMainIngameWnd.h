@@ -15,7 +15,7 @@ class CUIHudStatesWnd;
 class CUIMotionIcon;
 class CUIArtefactPanel;
 
-class CUIMainIngameWnd : public CUIWindow
+class CUIMainIngameWnd final : public CUIWindow
 {
 public:
     CUIMainIngameWnd();
@@ -24,6 +24,8 @@ public:
     virtual void Init();
     virtual void Draw();
     virtual void Update();
+
+    pcstr GetDebugType() override { return "CUIMainIngameWnd"; }
 
 protected:
     CUIStatic* UIStaticDiskIO{};
@@ -60,7 +62,7 @@ public:
     void DrawMainIndicatorsForInventory();
 
     CUIHudStatesWnd* get_hud_states() { return m_ui_hud_states; } // temp
-    void OnSectorChanged(int sector);
+    void OnSectorChanged(IRender_Sector::sector_id_t sector);
 
     xr_vector<CUIStatic*> m_quick_slots_icons;
     xr_vector<CUITextWnd*> m_quick_slots_texts;
@@ -141,8 +143,8 @@ protected:
     using FlashingIcons = xr_map<EFlashingIcons, CUIStatic*>;
     FlashingIcons m_FlashingIcons;
 
-    //	CMissile*			m_pGrenade;
-    //	CInventoryItem*		m_pItem;
+    //	CMissile*			m_pGrenade{};
+    //	CInventoryItem*		m_pItem{};
 
     // Отображение подсказок при наведении прицела на объект
     void RenderQuickInfos();
@@ -153,8 +155,8 @@ public:
     void reset_ui();
 
 protected:
-    CInventoryItem* m_pPickUpItem;
-    CUIStatic* UIPickUpItemIcon;
+    CInventoryItem* m_pPickUpItem{};
+    CUIStatic* UIPickUpItemIcon{};
 
     float m_iPickUpItemIconX;
     float m_iPickUpItemIconY;
