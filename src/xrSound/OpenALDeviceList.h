@@ -1,8 +1,5 @@
 #pragma once
 
-#include "openal/al.h"
-#include "openal/alc.h"
-
 #include "xrCore/_std_extensions.h"
 
 struct ALDeviceDesc

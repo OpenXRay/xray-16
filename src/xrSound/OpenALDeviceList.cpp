@@ -26,6 +26,9 @@
 #include "OpenALDeviceList.h"
 #include "xrCore/xr_token.h"
 
+#include <al.h>
+#include <alc.h>
+
 constexpr pcstr AL_GENERIC_HARDWARE = "Generic Hardware";
 constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";
 
