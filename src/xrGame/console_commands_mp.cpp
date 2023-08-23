@@ -169,7 +169,7 @@ public:
     {
         if (IsGameTypeSingle())
         {
-#ifdef DEBUG
+#ifndef MASTER_GOLD
             IGameObject* l_pObj = Level().CurrentControlEntity();
             CEntity* l_pPlayer = smart_cast<CEntity*>(l_pObj);
             if (l_pPlayer)
