@@ -26,6 +26,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers Condition="'$(Platform)'=='Win32'" />
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
