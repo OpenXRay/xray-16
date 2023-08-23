@@ -76,7 +76,6 @@ void CUICustomEdit::Init(u32 max_char_count, bool number_only_mode, bool read_mo
 
     Register_callbacks();
     ClearText();
-    
     CaptureFocus(false);
 }
 
@@ -314,4 +313,3 @@ void CUICustomEdit::CaptureFocus(bool bCapture)
 
     m_bInputFocus = bCapture;
 }
-
