@@ -4,6 +4,7 @@
 
 #if __has_include(<efx.h>)
 #   include <efx.h>
+#   include <efx-creative.h>
 #   include <efx-presets.h>
 #   define XR_HAS_EFX
 
