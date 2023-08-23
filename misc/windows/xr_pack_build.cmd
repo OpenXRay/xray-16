@@ -53,7 +53,7 @@ mkdir patches
 move %PACKED_ARCHIVE_NAME% patches/%PACKED_ARCHIVE_NAME%
 
 rem Make archives
-7z a "OpenXRay.%EDITION_NAME%.7z" bin -xr!.* -xr!*.pdb -x!bin\utils -i!patches -i!fsgame.ltx -i!oalinst.exe -i!License.txt -i!README.md
+7z a "OpenXRay.%EDITION_NAME%.7z" bin -xr!.* -xr!*.pdb -x!bin\utils -i!patches -i!fsgame.ltx -i!License.txt -i!README.md
 7z a "Symbols.%EDITION_NAME%.7z" bin\*.pdb -i!License.txt -i!README.md -xr!.*
 7z a "Utils.%EDITION_NAME%.7z" bin\utils\* -i!License.txt -i!README.md -xr!.*
 
