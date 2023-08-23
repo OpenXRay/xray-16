@@ -326,11 +326,11 @@ void CActor::g_SetAnimation(u32 mstate_rl, bool force)
     {
         if (m_current_legs || m_current_torso)
         {
-//            SActorState* ST = 0;
-//            if (mstate_rl & mcCrouch)
-//                ST = &m_anims->m_crouch;
-//            else
-//                ST = &m_anims->m_normal;
+            SActorState* ST = 0;
+            if (mstate_rl & mcCrouch)
+                ST = &m_anims->m_crouch;
+            else
+                ST = &m_anims->m_normal;
             mstate_real = 0;
             m_current_legs.invalidate();
             m_current_torso.invalidate();
@@ -514,6 +514,9 @@ void CActor::g_SetAnimation(u32 mstate_rl, bool force)
                             default: M_torso = TW->moving[moving_idx]; break;
                             }
                         }
+
+                        if (!M_torso)
+                            M_torso = ST->m_torso[4].moving[moving_idx]; //Alundaio: Fix torso animations for binoc
                     }
                     else if (M)
                     {
@@ -560,10 +563,12 @@ void CActor::g_SetAnimation(u32 mstate_rl, bool force)
                 }
             }
         }
+        else if (!m_bAnimTorsoPlayed)
+            M_torso = ST->m_torso[4].moving[moving_idx]; //Alundaio: Fix torso animations for no weapon
     }
 
     // XXX: check why 'mid' was unused
-    //MotionID mid = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("norm_idle_0");
+    MotionID mid = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("norm_idle_0");
 
     if (!M_legs)
     {
@@ -626,14 +631,6 @@ void CActor::g_SetAnimation(u32 mstate_rl, bool force)
             m_current_legs_blend->timeCurrent = m_current_legs_blend->timeTotal * pos;
 
         m_current_legs = M_legs;
-
-        if (m_firstPersonBody) // Yohji: hacky way to force bones to render correctly on load
-        {
-            if (m_current_legs_blend)
-                PlayMotionByParts(m_firstPersonBody->dcast_PKinematicsAnimated(), m_current_legs_blend->motionID, TRUE, legs_play_callback, this);
-            else
-                PlayMotionByParts(m_firstPersonBody->dcast_PKinematicsAnimated(), M_legs, TRUE, legs_play_callback, this);
-        }
 
         CStepManager::on_animation_start(M_legs, m_current_legs_blend);
     }
