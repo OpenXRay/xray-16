@@ -1538,6 +1538,10 @@ bool CActor::FirstPersonBodyActive()
 void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
 {
     ScopeLock lock{ &render_lock };
+    IKinematics* realBodyK = Visual()->dcast_PKinematics();
+
+    m_firstPersonCameraXform.set(XFORM());
+    m_firstPersonCameraXform.mulB_43(realBodyK->LL_GetTransform(realBodyK->LL_BoneID("bip01_head")));
 
     if (!FirstPersonBodyEnabled())
         return;
@@ -1550,9 +1554,6 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     }
 
     IKinematics* kinematics = m_firstPersonBody->dcast_PKinematics();
-    IKinematics* realBodyK = Visual()->dcast_PKinematics();
-
-    // adjust body position
     m_firstPersonBodyXform = XFORM();
 
     // Add body to render
@@ -1613,8 +1614,7 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     head_bone_xform.mul(m_firstPersonBodyXform, BoneMatrixRes);
 
     //m_firstPersonCameraXform.set(head_bone_xform);
-    m_firstPersonCameraXform.set(m_firstPersonBodyXform);
-    m_firstPersonCameraXform.mulB_43(realBodyK->LL_GetTransform(realBodyK->LL_BoneID("bip01_head")));
+
 
 #ifdef DEBUG
     string1024 text;
@@ -1630,7 +1630,7 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     F->OutNext(text);
     xr_sprintf(text, "m_firstPersonCameraXform dir [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.k.x, m_firstPersonCameraXform.k.y, m_firstPersonCameraXform.k.z);
     F->OutNext(text);
-    xr_sprintf(text, "m_firstPersonCameraXform norm [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.j.x, m_firstPersonCameraXform.j.y, m_firstPersonCameraXform.j.z);
+    xr_sprintf(text, "m_firstPersonCameraXform norm [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.i.x, m_firstPersonCameraXform.i.y, m_firstPersonCameraXform.i.z);
     F->OutNext(text);
     xr_sprintf(text, "cameras[eacFirstEye] vPosition [%3.3f %3.3f %3.3f]", cameras[eacFirstEye]->vPosition.x, cameras[eacFirstEye]->vPosition.y, cameras[eacFirstEye]->vPosition.z);
     F->OutNext(text);

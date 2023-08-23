@@ -393,12 +393,11 @@ void CActor::cam_Update(float dt, float fFOV)
         if (m_firstPersonCameraXform.k.magnitude() > 0.f)
         {
             point2.mad(m_firstPersonCameraXform.i, .15f);
-            cameras[eacFirstEye]->vDirection.set(m_firstPersonCameraXform.k);
+            cameras[eacFirstEye]->vDirection.lerp(cameras[eacFirstEye]->vDirection, m_firstPersonCameraXform.k, .5); // yohji: hacky fix for camera direction immediately returning to 'neutral' on death
             cameras[eacFirstEye]->vNormal.set(m_firstPersonCameraXform.i);
             cameras[eacFirstEye]->vPosition.set(point2);
         }
     }
-
     else if (Level().CurrentEntity() == this)
         collide_camera(*cameras[eacFirstEye], _viewport_near, this);
 
