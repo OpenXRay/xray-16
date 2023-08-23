@@ -1532,7 +1532,7 @@ bool CActor::FirstPersonBodyEnabled()
 
 bool CActor::FirstPersonBodyActive() 
 {
-    return m_firstPersonBody && FirstPersonBodyEnabled();
+    return m_firstPersonBody;
 }
 
 void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
@@ -1553,7 +1553,6 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     IKinematics* realBodyK = Visual()->dcast_PKinematics();
 
     // adjust body position
-    Fvector camdir = { cam_Active()->Direction().x, 0.f, cam_Active()->Direction().z }; // ignore Y (vertical) value
     m_firstPersonBodyXform = XFORM();
 
     // Add body to render
@@ -1604,13 +1603,20 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
         kinematics->LL_SetBoneVisible(boneId, hide ? FALSE : TRUE, TRUE);
     }
 
-    // Update camera position
+    // Update FP camera position
+    Fmatrix head_bone_xform;
+    Fmatrix BoneMatrixRes;
+    Fmatrix BoneMatrix;
+    Fobb BoneOBB = kinematics->LL_GetBox(kinematics->LL_BoneID("bip01_head"));
+    BoneOBB.xform_full(head_bone_xform);
+    BoneMatrixRes.mul(kinematics->LL_GetTransform(kinematics->LL_BoneID("bip01_head")), head_bone_xform);
+    head_bone_xform.mul(m_firstPersonBodyXform, BoneMatrixRes);
+
+    //m_firstPersonCameraXform.set(head_bone_xform);
     m_firstPersonCameraXform.set(m_firstPersonBodyXform);
-    m_firstPersonCameraXform.mulB_43(realBodyK->LL_GetTransform(realBodyK->LL_BoneID("eyelid_1"))); // should be a bone that is inbetween the eye bones (maybe more accurate than using bip01_head)
+    m_firstPersonCameraXform.mulB_43(realBodyK->LL_GetTransform(realBodyK->LL_BoneID("bip01_head")));
 
 #ifdef DEBUG
-    Fvector ypr;
-    m_firstPersonBodyXform.getHPB(ypr);
     string1024 text;
     CGameFont* F = UI().Font().pFontArial14;
     F->SetAligment(CGameFont::alLeft);
@@ -1620,13 +1626,17 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     F->OutNext(text);
     xr_sprintf(text, "first person body direction [%3.3f %3.3f %3.3f]", m_firstPersonBodyXform.k.x, m_firstPersonBodyXform.k.y, m_firstPersonBodyXform.k.z);
     F->OutNext(text);
-    xr_sprintf(text, "head position [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.c.x, m_firstPersonCameraXform.c.y, m_firstPersonCameraXform.c.z);
+    xr_sprintf(text, "m_firstPersonCameraXform pos [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.c.x, m_firstPersonCameraXform.c.y, m_firstPersonCameraXform.c.z);
     F->OutNext(text);
-    xr_sprintf(text, "head direction [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.k.x, m_firstPersonCameraXform.k.y, m_firstPersonCameraXform.k.z);
+    xr_sprintf(text, "m_firstPersonCameraXform dir [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.k.x, m_firstPersonCameraXform.k.y, m_firstPersonCameraXform.k.z);
     F->OutNext(text);
-    xr_sprintf(text, "camera position [%3.3f %3.3f %3.3f]", cam_Active()->Position().x, cam_Active()->Position().y, cam_Active()->Position().z);
+    xr_sprintf(text, "m_firstPersonCameraXform norm [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.j.x, m_firstPersonCameraXform.j.y, m_firstPersonCameraXform.j.z);
     F->OutNext(text);
-    xr_sprintf(text, "camera direction [%3.3f %3.3f %3.3f]", cam_Active()->Direction().x, cam_Active()->Direction().y, cam_Active()->Direction().z);
+    xr_sprintf(text, "cameras[eacFirstEye] vPosition [%3.3f %3.3f %3.3f]", cameras[eacFirstEye]->vPosition.x, cameras[eacFirstEye]->vPosition.y, cameras[eacFirstEye]->vPosition.z);
+    F->OutNext(text);
+    xr_sprintf(text, "cameras[eacFirstEye] vDirection [%3.3f %3.3f %3.3f]", cameras[eacFirstEye]->vDirection.x, cameras[eacFirstEye]->vDirection.y, cameras[eacFirstEye]->vDirection.z);
+    F->OutNext(text);
+    xr_sprintf(text, "cameras[eacFirstEye] vNormal [%3.3f %3.3f %3.3f]", cameras[eacFirstEye]->vNormal.x, cameras[eacFirstEye]->vNormal.y, cameras[eacFirstEye]->vNormal.z);
     F->OutNext(text);
 #endif // DEBUG
 }

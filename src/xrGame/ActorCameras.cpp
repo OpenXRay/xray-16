@@ -362,26 +362,15 @@ void CActor::cam_Update(float dt, float fFOV)
 
     CCameraBase* C = cam_Active();
 
-    if (psActorFlags.test(AF_FIRST_PERSON_BODY) && eacFirstEye == cam_active) // override camera position / direction for first person body
+    if (FirstPersonBodyActive()) // update camera position with offset for first person body
     {
-        if (!g_Alive()) //first person death cam
-        {
-            point = m_firstPersonCameraXform.c;
-        }
-        else
-        {
-            point = m_firstPersonCameraXform.c;
-            point.y += g_first_person_cam_offset.y;
-            Fvector camdir = { cam_Active()->Direction().x, 0.f, cam_Active()->Direction().z }; // ignore Y (vertical) value
-            point.add(camdir.normalize().mul(g_first_person_cam_offset.z));
-        }
+        point = m_firstPersonCameraXform.c;
+        point.y += g_first_person_cam_offset.y;
+        Fvector camdir = { cam_Active()->Direction().x, 0.f, cam_Active()->Direction().z };
+        point.add(camdir.normalize().mul(g_first_person_cam_offset.z));
     }
 
     C->Update(point, dangle);
-
-    if (psActorFlags.test(AF_FIRST_PERSON_BODY) && eacFirstEye == cam_active && !g_Alive()) // manually update position for first person death because it gets overridden in `Update`
-        C->vDirection.set(m_firstPersonCameraXform.k);
-
     C->f_fov = fFOV;
 
     if (eacFirstEye != cam_active)
@@ -389,10 +378,30 @@ void CActor::cam_Update(float dt, float fFOV)
         cameras[eacFirstEye]->Update(point, dangle);
         cameras[eacFirstEye]->f_fov = fFOV;
     }
-    if (Level().CurrentEntity() == this)
+    
+    if (FirstPersonBodyActive() && !g_Alive()) // override camera position / direction for first person body on death
     {
-        collide_camera(*cameras[eacFirstEye], _viewport_near, this);
+        Fvector point2 = m_firstPersonCameraXform.c;
+        point2.y += g_first_person_cam_offset.y;
+        Fvector camdir = { cameras[eacFirstEye]->Direction().x, 0.f, cameras[eacFirstEye]->Direction().z };
+        if (!fis_zero(g_first_person_cam_offset.z))
+            point2.add(camdir.normalize().mul(g_first_person_cam_offset.z));
+
+        _viewport_near = VIEWPORT_NEAR - 0.08f;
+        cameras[eacFirstEye]->Update(point2, dangle);
+        cameras[eacFirstEye]->f_fov = fFOV;
+        if (m_firstPersonCameraXform.k.magnitude() > 0.f)
+        {
+            point2.mad(m_firstPersonCameraXform.i, .15f);
+            cameras[eacFirstEye]->vDirection.set(m_firstPersonCameraXform.k);
+            cameras[eacFirstEye]->vNormal.set(m_firstPersonCameraXform.i);
+            cameras[eacFirstEye]->vPosition.set(point2);
+        }
     }
+
+    else if (Level().CurrentEntity() == this)
+        collide_camera(*cameras[eacFirstEye], _viewport_near, this);
+
     if (psActorFlags.test(AF_PSP))
     {
         Cameras().UpdateFromCamera(C);
