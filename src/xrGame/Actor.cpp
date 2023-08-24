@@ -823,6 +823,9 @@ void CActor::Die(IGameObject* who)
 #ifdef DEBUG
     Msg("--- Actor [%s] dies !", this->Name());
 #endif // #ifdef DEBUG
+    m_timeOfDeath = Device.dwTimeGlobal;
+    m_fpDeathCamOfffsetTime = m_timeOfDeath + 1000;
+
     inherited::Die(who);
 
     if (OnServer())

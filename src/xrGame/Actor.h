@@ -109,9 +109,10 @@ public:
     IRenderVisual* m_firstPersonBody{};
     xr_unordered_map<u16, bool> m_firstPersonBodyBonesToHide;
     xr_unordered_map<u16, bool> m_firstPersonBodyBonesToIgnoreAnims;
+    u32 m_timeOfDeath{};
+    u32 m_fpDeathCamOfffsetTime{};
     Fmatrix m_firstPersonBodyXform{};
     Fmatrix m_firstPersonCameraXform{};
-    Fvector m_firstPersonCameraRot{};
 
     Lock render_lock{};
 
