@@ -369,6 +369,7 @@ void CActor::cam_Update(float dt, float fFOV)
         point.y += g_first_person_cam_offset.y;
         point.add(camdir.normalize().mul(g_first_person_cam_offset.z));
         _viewport_near = VIEWPORT_NEAR * .1f; // .02f
+        Visual()->dcast_PKinematics()->CalculateBones(true);
     }
 
     C->Update(point, dangle);
@@ -391,7 +392,7 @@ void CActor::cam_Update(float dt, float fFOV)
         cameras[eacFirstEye]->vNormal.lerp(cameras[eacFirstEye]->vNormal, m_firstPersonCameraXform.i, timeScalar);
         cameras[eacFirstEye]->vPosition.lerp(cameras[eacFirstEye]->vPosition, fpDeathPos, timeScalar);
     }
-    else if (Level().CurrentEntity() == this)
+    if (!FirstPersonBodyActive() && Level().CurrentEntity() == this)
         collide_camera(*cameras[eacFirstEye], _viewport_near, this);
 
     if (psActorFlags.test(AF_PSP))

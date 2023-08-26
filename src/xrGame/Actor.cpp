@@ -1544,7 +1544,7 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     IKinematics* realBodyK = Visual()->dcast_PKinematics();
 
     m_firstPersonCameraXform.set(XFORM());
-    m_firstPersonCameraXform.mulB_43(realBodyK->LL_GetTransform(realBodyK->LL_BoneID("bip01_head")));
+    m_firstPersonCameraXform.mulB_43(realBodyK->LL_GetTransform(m_head));
 
     if (!FirstPersonBodyEnabled())
         return;
@@ -1569,8 +1569,8 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     // On death or unarmed, show arms
     if (!g_Alive() || noItemEquipped)
     {
-        m_firstPersonBodyBonesToHide[m_firstPersonBody->dcast_PKinematics()->LL_BoneID("bip01_l_clavicle")] = false;
-        m_firstPersonBodyBonesToHide[m_firstPersonBody->dcast_PKinematics()->LL_BoneID("bip01_r_clavicle")] = false;
+        m_firstPersonBodyBonesToHide[m_l_clavicle] = false;
+        m_firstPersonBodyBonesToHide[m_r_clavicle] = false;
 
         for (auto [boneId, vis] : m_firstPersonBodyBonesToIgnoreAnims)
         {
@@ -1579,8 +1579,8 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     }
     else
     {
-        m_firstPersonBodyBonesToHide[m_firstPersonBody->dcast_PKinematics()->LL_BoneID("bip01_l_clavicle")] = true;
-        m_firstPersonBodyBonesToHide[m_firstPersonBody->dcast_PKinematics()->LL_BoneID("bip01_r_clavicle")] = true;
+        m_firstPersonBodyBonesToHide[m_l_clavicle] = true;
+        m_firstPersonBodyBonesToHide[m_r_clavicle] = true;
 
         for (auto [boneId, vis] : m_firstPersonBodyBonesToIgnoreAnims)
         {
@@ -1606,18 +1606,6 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     {
         kinematics->LL_SetBoneVisible(boneId, hide ? FALSE : TRUE, TRUE);
     }
-
-    // Update FP camera position
-    Fmatrix head_bone_xform;
-    Fmatrix BoneMatrixRes;
-    Fmatrix BoneMatrix;
-    Fobb BoneOBB = kinematics->LL_GetBox(kinematics->LL_BoneID("bip01_head"));
-    BoneOBB.xform_full(head_bone_xform);
-    BoneMatrixRes.mul(kinematics->LL_GetTransform(kinematics->LL_BoneID("bip01_head")), head_bone_xform);
-    head_bone_xform.mul(m_firstPersonBodyXform, BoneMatrixRes);
-
-    //m_firstPersonCameraXform.set(head_bone_xform);
-
 
 #ifdef DEBUG
     string1024 text;
