@@ -513,7 +513,8 @@ void CActor::g_cl_Orientate(u32 mstate_rl, float dt)
     if (FirstPersonBodyActive())
     {
         r_torso.yaw += fpYawOffset;
-        r_torso.pitch = 0.f; // yohji: ignore pitch rotations for first person body so arms remain in neutral state regardless of where camera is pointed
+        if (inventory().GetActiveSlot() == NO_ACTIVE_SLOT)
+            r_torso.pitch = 0.f; // yohji: ignore pitch rotations for first person body when unarmed so arms remain in neutral state regardless of where camera is pointed
     }
 
     unaffected_r_torso.yaw = r_torso.yaw;
