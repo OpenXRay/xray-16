@@ -509,14 +509,6 @@ void CActor::g_cl_Orientate(u32 mstate_rl, float dt)
         r_torso.pitch = cam_FirstEye()->GetWorldPitch();
     }
 
-    float fpYawOffset = (g_first_person_cam_offset.x * 10.f) * (PI / 180.f);
-    if (FirstPersonBodyActive())
-    {
-        r_torso.yaw += fpYawOffset;
-        if (inventory().GetActiveSlot() == NO_ACTIVE_SLOT)
-            r_torso.pitch = 0.f; // yohji: ignore pitch rotations for first person body when unarmed so arms remain in neutral state regardless of where camera is pointed
-    }
-
     unaffected_r_torso.yaw = r_torso.yaw;
     unaffected_r_torso.pitch = r_torso.pitch;
     unaffected_r_torso.roll = r_torso.roll;
@@ -533,7 +525,7 @@ void CActor::g_cl_Orientate(u32 mstate_rl, float dt)
     // если есть движение - выровнять модель по камере
     if (mstate_rl & mcAnyMove)
     {
-        r_model_yaw = angle_normalize(r_torso.yaw - fpYawOffset);
+        r_model_yaw = angle_normalize(r_torso.yaw);
         mstate_real &= ~mcTurn;
     }
     else

@@ -74,8 +74,9 @@ void CActor::Spine2Callback(CBoneInstance* B)
     float bone_yaw = angle_normalize_signed(A->r_torso.yaw - A->r_model_yaw - A->r_model_yaw_delta) * y_shoulder_factor;
     float bone_pitch = angle_normalize_signed(A->r_torso.pitch) * p_shoulder_factor;
     float bone_roll = angle_normalize_signed(A->r_torso.roll) * r_shoulder_factor;
+    float correctedPitch = A->inventory().GetActiveSlot() == NO_ACTIVE_SLOT ? 0.f : bone_pitch; // yohji: force arms pitch to be neutral when we are unarmed
     Fvector c = B->mTransform.c;
-    spin.setXYZ(-bone_pitch, bone_yaw, bone_roll);
+    spin.setXYZ(-correctedPitch, bone_yaw, bone_roll);
     B->mTransform.mulA_43(spin);
     B->mTransform.c = c;
 }
