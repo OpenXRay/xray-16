@@ -38,7 +38,7 @@ static const float r_head_factor = 0.2f;
 CBlend* PlayMotionByParts(
     IKinematicsAnimated* sa, MotionID motion_ID, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam);
 
-void CActor::Spin0Callback(CBoneInstance* B)
+void CActor::Spine0Callback(CBoneInstance* B)
 {
     CActor* A = static_cast<CActor*>(B->callback_param());
     VERIFY(A);
@@ -52,7 +52,7 @@ void CActor::Spin0Callback(CBoneInstance* B)
     B->mTransform.mulA_43(spin);
     B->mTransform.c = c;
 }
-void CActor::Spin1Callback(CBoneInstance* B)
+void CActor::Spine1Callback(CBoneInstance* B)
 {
     CActor* A = static_cast<CActor*>(B->callback_param());
     VERIFY(A);
@@ -66,7 +66,7 @@ void CActor::Spin1Callback(CBoneInstance* B)
     B->mTransform.mulA_43(spin);
     B->mTransform.c = c;
 }
-void CActor::ShoulderCallback(CBoneInstance* B)
+void CActor::Spine2Callback(CBoneInstance* B)
 {
     CActor* A = static_cast<CActor*>(B->callback_param());
     VERIFY(A);

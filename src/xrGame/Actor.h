@@ -308,9 +308,9 @@ public:
     // callback на анимации модели актера
     void SetCallbacks();
     void ResetCallbacks();
-    static void Spin0Callback(CBoneInstance*);
-    static void Spin1Callback(CBoneInstance*);
-    static void ShoulderCallback(CBoneInstance*);
+    static void Spine0Callback(CBoneInstance*);
+    static void Spine1Callback(CBoneInstance*);
+    static void Spine2Callback(CBoneInstance*);
     static void HeadCallback(CBoneInstance*);
     static void VehicleHeadCallback(CBoneInstance*);
 
@@ -519,19 +519,19 @@ public:
 
 protected:
     //косточки используемые при стрельбе
-    int m_r_hand;
-    int m_l_finger1;
-    int m_r_finger2;
-    int m_head;
-    int m_eye_left;
-    int m_eye_right;
+    int m_r_hand{};
+    int m_l_finger1{};
+    int m_r_finger2{};
+    int m_head{};
+    int m_eye_left{};
+    int m_eye_right{};
 
-    int m_l_clavicle;
-    int m_r_clavicle;
-    int m_spine2;
-    int m_spine1;
-    int m_spine;
-    int m_neck;
+    int m_l_clavicle{};
+    int m_r_clavicle{};
+    int m_spine2{};
+    int m_spine1{};
+    int m_spine{};
+    int m_neck{};
 
     //////////////////////////////////////////////////////////////////////////
     // Network
