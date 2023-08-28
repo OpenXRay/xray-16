@@ -48,7 +48,7 @@ public:
     void OnAppDeactivate() override;
 
 private:
-    void CreateSwapChain(HWND hwnd);
+    bool CreateSwapChain(HWND hwnd);
     bool CreateSwapChain2(HWND hwnd);
 
     bool ThisInstanceIsGlobal() const;

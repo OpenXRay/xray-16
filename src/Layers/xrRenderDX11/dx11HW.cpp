@@ -59,9 +59,13 @@ void CHW::CreateD3D()
 
     // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
     const auto createDXGIFactory = static_cast<decltype(&CreateDXGIFactory1)>(hDXGI->GetProcAddress("CreateDXGIFactory1"));
-    R_CHK(createDXGIFactory(__uuidof(IDXGIFactory1), (void**)(&m_pFactory)));
+    if (createDXGIFactory)
+        createDXGIFactory(__uuidof(IDXGIFactory1), (void**)(&m_pFactory));
 
-    R_CHK(m_pFactory->EnumAdapters1(0, &m_pAdapter));
+    if (m_pFactory)
+        m_pFactory->EnumAdapters1(0, &m_pAdapter);
+
+    Valid = m_pAdapter;
 }
 
 void CHW::DestroyD3D()
@@ -82,8 +86,9 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     m_DriverType = Caps.bForceGPU_REF ? D3D_DRIVER_TYPE_REFERENCE : D3D_DRIVER_TYPE_HARDWARE;
 
     // Display the name of video board
-    DXGI_ADAPTER_DESC1 Desc;
-    R_CHK(m_pAdapter->GetDesc1(&Desc));
+    DXGI_ADAPTER_DESC1 Desc{};
+    if (FAILED(m_pAdapter->GetDesc1(&Desc)))
+        Msg("! [%s] failed to retrieve adapter description", __FUNCTION__);
     //  Warning: Desc.Description is wide string
     Msg("* GPU [vendor:%X]-[device:%X]: %S", Desc.VendorId, Desc.DeviceId, Desc.Description);
 
@@ -206,13 +211,19 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
 
-    R_ASSERT2(SDL_GetWindowWMInfo(sdlWnd, &info), SDL_GetError());
+    if (!SDL_GetWindowWMInfo(sdlWnd, &info))
+    {
+        Msg("! Failed to retrieve SDL window handle: %s", SDL_GetError());
+        Valid = false;
+        return;
+    }
 
     const HWND hwnd = info.info.win.window;
 
     if (!CreateSwapChain2(hwnd))
     {
-        CreateSwapChain(hwnd);
+        if (!CreateSwapChain(hwnd))
+            Valid = false;
     }
 
     // Select depth-stencil format
@@ -240,7 +251,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
 }
 
-void CHW::CreateSwapChain(HWND hwnd)
+bool CHW::CreateSwapChain(HWND hwnd)
 {
     // Set up the presentation parameters
     DXGI_SWAP_CHAIN_DESC& sd = m_ChainDesc;
@@ -287,7 +298,8 @@ void CHW::CreateSwapChain(HWND hwnd)
     //  Additional set up
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    R_CHK(m_pFactory->CreateSwapChain(pDevice, &sd, &m_pSwapChain));
+    const auto hr = m_pFactory->CreateSwapChain(pDevice, &sd, &m_pSwapChain);
+    return SUCCEEDED(hr);
 }
 
 bool CHW::CreateSwapChain2(HWND hwnd)
@@ -347,8 +359,12 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     if (FAILED(result))
         return false;
 
+    if (!swapchain->GetDesc(&m_ChainDesc))
+    {
+        _RELEASE(swapchain);
+        return false;
+    }
     m_pSwapChain = swapchain;
-    R_CHK(m_pSwapChain->GetDesc(&m_ChainDesc));
 
     m_pSwapChain->QueryInterface(__uuidof(IDXGISwapChain2), reinterpret_cast<void**>(&m_pSwapChain2));
 
