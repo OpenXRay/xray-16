@@ -378,7 +378,7 @@ void CHW::DestroyDevice()
         SSManager.ClearStateArray();
     }
     //  Must switch to windowed mode to release swap chain
-    if (!m_ChainDesc.Windowed)
+    if (!m_ChainDesc.Windowed && m_pSwapChain)
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
 #ifdef HAS_DX11_2
     _RELEASE(m_pSwapChain2);
