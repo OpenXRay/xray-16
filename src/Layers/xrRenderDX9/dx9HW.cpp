@@ -45,12 +45,15 @@ void CHW::OnAppDeactivate()
 void CHW::CreateD3D()
 {
     hD3D = XRay::LoadModule(GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9");
-    R_ASSERT2(hD3D->IsLoaded(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
+    if (!hD3D->IsLoaded())
+        return;
 
     const auto createD3D = (decltype(&Direct3DCreate9))hD3D->GetProcAddress("Direct3DCreate9");
-    R_ASSERT(createD3D);
-    pD3D = createD3D(D3D_SDK_VERSION);
-    R_ASSERT2(pD3D, "Please install DirectX 9.0c");
+    if (createD3D)
+        pD3D = createD3D(D3D_SDK_VERSION);
+
+    if (!pD3D)
+        Log("! Found d3d9.dll, but couldn't initialize it. Please install latest DirectX 9.0.");
 }
 
 void CHW::DestroyD3D()
