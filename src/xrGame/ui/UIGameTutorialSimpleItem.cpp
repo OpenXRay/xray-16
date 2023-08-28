@@ -109,7 +109,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
     // initialize auto_static
     int cnt = xml->GetNodesNum("main_wnd", 0, "auto_static");
-    m_subitems.resize(cnt);
+    m_subitems.reserve(cnt);
     string64 sname;
     for (int i = 0; i < cnt; ++i)
     {
@@ -117,18 +117,19 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
         xml->SetLocalRoot(xml->NavigateToNode("main_wnd", 0));
 
         xr_sprintf(sname, "auto_static_%d", i);
-
-        SSubItem* _si = &m_subitems[i];
-        _si->m_start = xml->ReadAttribFlt("auto_static", i, "start_time", 0);
-        _si->m_length = xml->ReadAttribFlt("auto_static", i, "length_sec", 0);
-
-        _si->m_visible = false;
-        _si->m_wnd = smart_cast<CUIStatic*>(find_child_window(m_UIWindow, sname));
-        if (!_si->m_wnd)
+        const auto wnd = smart_cast<CUIStatic*>(find_child_window(m_UIWindow, sname));
+        if (!wnd)
         {
-            Msg("Skipping SubItem: %s", sname);
+#ifndef MASTER_GOLD
+            VERIFY3(false, "Cannot find tutorial subitem", sname);
+            Msg("! [%s] cannot find tutorial subitem: %s", __FUNCTION__, sname);
+#endif
             continue;
         }
+
+        SSubItem* _si = &m_subitems.emplace_back(wnd);
+        _si->m_start = xml->ReadAttribFlt("auto_static", i, "start_time", 0);
+        _si->m_length = xml->ReadAttribFlt("auto_static", i, "length_sec", 0);
 
         _si->m_wnd->TextItemControl()->SetTextComplexMode(true);
         _si->m_wnd->Show(false);
@@ -165,21 +166,15 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
 void CUISequenceSimpleItem::SSubItem::Start()
 {
-    if (m_wnd)
-    {
-        m_wnd->Show(true);
-        m_wnd->ResetColorAnimation();
-        m_visible = true;
-    }
+    m_wnd->Show(true);
+    m_wnd->ResetColorAnimation();
+    m_visible = true;
 }
 
 void CUISequenceSimpleItem::SSubItem::Stop()
 {
-    if (m_wnd)
-    {
-        m_wnd->Show(false);
-        m_visible = false;
-    }
+    m_wnd->Show(false);
+    m_visible = false;
 }
 
 void CUISequenceSimpleItem::OnRender()
