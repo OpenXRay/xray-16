@@ -105,6 +105,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     {
         switch (psDeviceMode.BitsPerPixel)
         {
+        default:
         case 32:
             fTarget = D3DFMT_X8R8G8B8;
             if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
@@ -118,7 +119,6 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
             fTarget = D3DFMT_UNKNOWN;
             break;
         case 16:
-        default:
             fTarget = D3DFMT_R5G6B5;
             if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
                 break;
