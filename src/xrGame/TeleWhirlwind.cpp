@@ -154,7 +154,7 @@ bool CTeleWhirlwindObject::destroy_object(const Fvector dir, float val)
         if (IsGameTypeSingle())
         {
             m_telekinesis->reserve_impact(D->m_destroyed_obj_visual_names.size());
-            for ([[maybe_unused]] auto i : D->m_destroyed_obj_visual_names)
+            for ([[maybe_unused]] const auto& i : D->m_destroyed_obj_visual_names)
                 m_telekinesis->add_impact(dir, val * 10.f);
         };
 
