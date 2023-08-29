@@ -383,7 +383,7 @@ void SDLLogOutput(void* /*userdata*/, int category, SDL_LogPriority priority, co
     default:                            mark = ' '; type = "unknown"; break;
     }
 
-    constexpr pcstr format = "%c [sdl][%s][%s]: %s";
+    static constexpr pcstr format = "%c [sdl][%s][%s]: %s";
     const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
     pstr buf = (pstr)xr_alloca(size);
 

@@ -186,7 +186,7 @@ public:
 
 void Manager::load_all_inventory()
 {
-    constexpr pcstr items_section = "upgraded_inventory";
+    static constexpr pcstr items_section = "upgraded_inventory";
 
     if (g_upgrades_log == 1)
     {
