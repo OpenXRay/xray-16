@@ -359,7 +359,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     if (FAILED(result))
         return false;
 
-    if (!swapchain->GetDesc(&m_ChainDesc))
+    if (FAILED(swapchain->GetDesc(&m_ChainDesc)))
     {
         _RELEASE(swapchain);
         return false;
