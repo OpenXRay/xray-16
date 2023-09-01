@@ -31,6 +31,8 @@ public:
     u32 dbg_ID;
 #endif
 
+    static constexpr float TIME_TO_STOP_INFINITE = static_cast<float>(0xffffffff);
+
     CSoundRender_Target* target;
     ref_sound_data_ptr owner_data;
 
