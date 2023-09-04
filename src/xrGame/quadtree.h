@@ -50,6 +50,7 @@ public:
         IC T* get_object()
         {
             VERIFY(m_free);
+            VERIFY(m_free);
             if (!m_free)
                 return nullptr;
 
