@@ -75,6 +75,15 @@ void CHW::DestroyD3D()
 
     _SHOW_REF("refCount:m_pFactory", m_pFactory);
     _RELEASE(m_pFactory);
+
+    // Manually close and unload additional DLLs
+    // To make it work with DXVK, etc.
+    hD3D->Close();
+    hDXGI->Close();
+    if (auto hModule = GetModuleHandleA("d3d11.dll"))
+        FreeLibrary(hModule);
+    if (auto hModule = GetModuleHandleA("dxgi.dll"))
+        FreeLibrary(hModule);
 }
 
 void CHW::CreateDevice(SDL_Window* sdlWnd)
