@@ -14,7 +14,7 @@ inline u32 u8_vec4(Fvector N, u8 A = 0)
 }
 
 #ifdef LEVEL_COMPILER
-u32 u8_vec4(base_basis N, u8 A = 0)
+inline u32 u8_vec4(base_basis N, u8 A = 0)
 {
     return color_rgba(N.x, N.y, N.z, A);
 }
