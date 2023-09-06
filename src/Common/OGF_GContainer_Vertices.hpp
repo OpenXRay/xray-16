@@ -89,6 +89,24 @@ constexpr D3DVERTEXELEMENT9 x_decl_vert[] = // 12
     D3DDECL_END()
 };
 
+constexpr D3DVERTEXELEMENT9 mu_model_decl[] = // 12+4+4+4+8 = 32
+{
+    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
+    { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0 },
+    { 0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0 },
+    { 0, 24, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+    D3DDECL_END()
+};
+
+constexpr D3DVERTEXELEMENT9 mu_model_decl_unpacked[] = // 12+4+4+8 = 28
+{
+    { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+    { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
+    { 0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
+    { 0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+    D3DDECL_END()
+};
 #pragma pack(push, 1)
 struct x_vert
 {
@@ -208,4 +226,37 @@ struct r1v_vert_unpacked
         return *this;
     }
 };
+
+struct mu_model_vert
+{
+    Fvector3 P;
+    u32 N;
+    u32 T;
+    u32 B;
+    _vector4<s16> misc;
+};
+
+struct mu_model_vert_unpacked
+{
+    Fvector3 P;
+    u32 N;
+    u32 C;
+    Fvector2 tc;
+
+    mu_model_vert_unpacked& operator=(const mu_model_vert& packed)
+    {
+        P = packed.P;
+
+        Fcolor unpackedN(packed.N);
+        unpackedN.mul_rgb(2);
+        unpackedN.sub_rgb(1);
+        N = unpackedN.get();
+
+        tc.x = (packed.misc.x) * (32.f / 32768.f);
+        tc.y = (packed.misc.y) * (32.f / 32768.f);
+
+        return *this;
+    }
+};
+
 #pragma pack(pop)
