@@ -73,6 +73,12 @@ CInventoryItem::CInventoryItem()
     m_custom_text_font = nullptr;
     m_custom_text_clr_inv = 0;
     m_custom_text_offset.set(0.f, 0.f);
+
+    m_custom_mark_texture = nullptr;
+    m_custom_mark = false;
+    m_custom_mark_offset.set(0.f, 0.f);
+    m_custom_mark_size.set(0.f, 0.f);
+    m_custom_mark_clr = 0;
 }
 
 CInventoryItem::~CInventoryItem()
@@ -205,6 +211,19 @@ void CInventoryItem::ReadCustomTextAndMarks(LPCSTR section)
     else
     {
         m_custom_text_clr_inv = 0;
+    }
+    m_custom_mark_texture = READ_IF_EXISTS(pSettings, r_string, section, "item_custom_mark_texture", nullptr);
+    m_custom_mark = READ_IF_EXISTS(pSettings, r_bool, section, "item_custom_mark", false);
+    m_custom_mark_offset = READ_IF_EXISTS(pSettings, r_fvector2, section, "item_custom_mark_offset", Fvector2().set(0.f, 0.f));
+    m_custom_mark_size = READ_IF_EXISTS(pSettings, r_fvector2, section, "item_custom_mark_size", Fvector2().set(0.f, 0.f));
+
+    if (pSettings->line_exist(section, "item_custom_mark_clr"))
+    {
+        m_custom_mark_clr = pSettings->r_color(section, "item_custom_mark_clr");
+    }
+    else
+    {
+        m_custom_mark_clr = 0;
     }
 }
 
