@@ -16,7 +16,10 @@ public:
     VertexBufferHandle old_pVB{};
 
 public:
-    _VertexStream() = default;
+    _VertexStream() 
+    { 
+        _clear();
+    }
     ~_VertexStream() = default;
 
     void Create();

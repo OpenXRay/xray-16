@@ -29,7 +29,7 @@ static t_node_tc node_tc[16] =
 void ESceneAIMapTool::OnDeviceCreate()
 {
     m_Shader.create("editor\\ai_node", "ed\\ed_ai_arrows_01");
-    m_RGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+    m_RGeom.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 }
 
 void ESceneAIMapTool::OnDeviceDestroy()
@@ -65,7 +65,7 @@ void ESceneAIMapTool::OnRender(int priority, bool strictB2F)
                 HashRect(EDevice.m_Camera.GetPosition(), m_VisRadius, rect);
 
                 u32 vBase;
-                _VertexStream *Stream = &RCache.Vertex;
+                _VertexStream* Stream = &RImplementation.Vertex;
                 FVF::LIT *pv = (FVF::LIT *)Stream->Lock(block_size, m_RGeom->vb_stride, vBase);
                 u32 cnt = 0;
                 //				EDevice.Statistic.TEST0.Begin();

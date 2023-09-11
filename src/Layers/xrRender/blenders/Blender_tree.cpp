@@ -71,10 +71,12 @@ void CBlender_Tree::CompileFFP(CBlender_Compile& C) const
     }
     else*/
     {
+        #ifndef _EDITOR
         if (oNotAnTree.value)
             C.PassSET_Shaders("tree_s", "null");
         else
             C.PassSET_Shaders("tree_wave", "null");
+        #endif
 
         switch (C.iElement)
         {

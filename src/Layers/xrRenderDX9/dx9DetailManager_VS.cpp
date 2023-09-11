@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 #include "Layers/xrRender/DetailManager.h"
+#include "Common/RDevice.h"
 
 namespace detail_manager
 {
@@ -31,10 +32,10 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
     // Render-prepare
     //	Update timer
     //	Can't use Device.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!
-    float fDelta = Device.fTimeGlobal - m_global_time_old;
+    float fDelta = RDEVICE.fTimeGlobal - m_global_time_old;
     if ((fDelta < 0) || (fDelta > 1))
         fDelta = 0.03f;
-    m_global_time_old = Device.fTimeGlobal;
+    m_global_time_old = RDEVICE.fTimeGlobal;
 
     m_time_rot_1 += (PI_MUL_2 * fDelta / swing_current.rot1);
     m_time_rot_2 += (PI_MUL_2 * fDelta / swing_current.rot2);
@@ -71,7 +72,7 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
 
     // Still
     cmd_list.set_c(&*hwc_s_consts, scale, scale, scale, 1.f);
-    cmd_list.set_c(&*hwc_s_xform, Device.mFullTransform);
+    cmd_list.set_c(&*hwc_s_xform, RDEVICE.mFullTransform);
     hw_Render_dump(cmd_list, &*hwc_s_array, 0, 1, c_hdr);
 }
 

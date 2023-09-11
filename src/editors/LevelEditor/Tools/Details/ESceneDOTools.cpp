@@ -131,7 +131,7 @@ void EDetailManager::OnRender(int priority, bool strictB2F)
                 if (m_Flags.is(flBaseTextureDraw))
                     m_Base.Render(m_Flags.is(flBaseTextureBlended));
                 if (m_Flags.is(flObjectsDraw))
-                    CDetailManager::Render();
+                    CDetailManager::Render(RCache);
             }
         }
     }

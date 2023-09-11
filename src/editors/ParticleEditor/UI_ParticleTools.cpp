@@ -297,7 +297,7 @@ void CParticleTool::PrepareLighting()
     // add directional light
     Flight L;
     ZeroMemory(&L, sizeof(Flight));
-    L.type = D3DLIGHT_DIRECTIONAL;
+    L.type = Flight::Type::Directional;
     L.diffuse.set(1, 1, 1, 1);
     L.direction.set(1, -1, 1);
     L.direction.normalize();

@@ -943,7 +943,7 @@ void SceneBuilder::BuildHemiLights(u8 quality, LPCSTR lcontrol)
     BLVec dest;
     Flight RL;
     // set def params
-    RL.type = D3DLIGHT_DIRECTIONAL;
+    RL.type = Flight::Type::Directional;
     RL.diffuse.set(1.f, 1.f, 1.f, 1.f);
     if (quality)
     {
@@ -967,7 +967,7 @@ void SceneBuilder::BuildHemiLights(u8 quality, LPCSTR lcontrol)
         l_light_static.push_back(b_light_static());
         b_light_static &sl = l_light_static.back();
         sl.controller_ID = control_ID;
-        sl.data.type = D3DLIGHT_DIRECTIONAL;
+        sl.data.type = Flight::Type::Directional;
         sl.data.diffuse.set(1.f, 1.f, 1.f, 1.f);
         sl.data.direction.set(0.f, -1.f, 0.f);
     }
@@ -1014,7 +1014,7 @@ BOOL SceneBuilder::BuildSun(u8 quality, Fvector2 dir)
             l_light_static.push_back(b_light_static());
             b_light_static &sl = l_light_static.back();
             sl.controller_ID = controller_ID;
-            sl.data.type = D3DLIGHT_DIRECTIONAL;
+            sl.data.type = Flight::Type::Directional;
             sl.data.position.set(0, 0, 0);
             sl.data.diffuse.set(color);
             sl.data.direction.setHP(fy, fx);
@@ -1025,7 +1025,7 @@ BOOL SceneBuilder::BuildSun(u8 quality, Fvector2 dir)
         l_light_dynamic.push_back(b_light_dynamic());
         b_light_dynamic &dl = l_light_dynamic.back();
         dl.controller_ID = controller_ID;
-        dl.data.type = D3DLIGHT_DIRECTIONAL;
+        dl.data.type = Flight::Type::Directional;
         dl.data.position.set(0, 0, 0);
         dl.data.diffuse.set(1.f, 1.f, 1.f, 1.f);
         dl.data.direction.setHP(dir.y, dir.x);
@@ -1091,7 +1091,7 @@ BOOL SceneBuilder::BuildLight(CLight *e)
     }
 
     b_light L;
-    L.data.type = e->m_Type;
+    L.data.type = static_cast<Flight::Type>(e->m_Type);
     L.data.diffuse.mul_rgb(e->m_Color, e->m_Brightness);
     L.data.position.set(e->GetPosition());
     Fvector dir;

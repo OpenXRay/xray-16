@@ -300,6 +300,11 @@ void CEditorRenderDevice::_Create(IReader *F)
 	// General Render States
 	_SetupStates();
 
+    // TODO: inherit render from D3DXRenderBase and use that from its OnDeviceCreate
+    ::Render->CreateQuadIB();
+    ::Render->Vertex.Create();
+    ::Render->Index.Create();
+
 	RCache.OnDeviceCreate();
 	Resources->OnDeviceCreate(F);
 	::Render->OnDeviceCreate();

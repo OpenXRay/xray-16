@@ -516,6 +516,9 @@
     <ClCompile Include="..\..\Layers\xrRenderDX9\BufferUtils.cpp">
       <Filter>Render</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRenderDX9\dx9DetailManager_VS.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\UIMainMenuForm.h">

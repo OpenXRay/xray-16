@@ -47,7 +47,7 @@ void ESceneLightTool::AppendFrameLight(CLight *src)
 {
     Flight L;
     ZeroMemory(&L, sizeof(Flight));
-    L.type = src->m_Type;
+    L.type = static_cast<Flight::Type>(src->m_Type);
     L.diffuse.mul_rgb(src->m_Color, src->m_Brightness);
     L.specular.set(L.diffuse);
     L.position.set(src->GetPosition());
@@ -92,7 +92,7 @@ void ESceneLightTool::BeforeRender()
             L.diffuse.set(C.x, C.y, C.z, 1.f);
             L.ambient.set(0.f, 0.f, 0.f, 0.f);
             L.specular.set(C.x, C.y, C.z, 1.f);
-            L.type = D3DLIGHT_DIRECTIONAL;
+            L.type = Flight::Type::Directional;
             EDevice.SetLight(frame_light.size(), L);
             EDevice.LightEnable(frame_light.size(), TRUE);
         }

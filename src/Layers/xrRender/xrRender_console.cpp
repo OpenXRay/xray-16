@@ -125,7 +125,12 @@ float ps_r__tf_Mipbias = 0.0f;
 // R1
 float ps_r1_ssaLOD_A = 64.f;
 float ps_r1_ssaLOD_B = 48.f;
+
+#ifdef _EDITOR
+Flags32 ps_r1_flags = {R1FLAG_FFP}; // r1-only
+#else
 Flags32 ps_r1_flags = {R1FLAG_DLIGHTS}; // r1-only
+#endif
 float ps_r1_lmodel_lerp = 0.1f;
 float ps_r1_dlights_clip = 40.f;
 float ps_r1_pps_u = 0.f;

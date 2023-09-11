@@ -31,6 +31,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Layers\xrRenderDX9\BufferUtils.cpp" />
+    <ClCompile Include="..\..\Layers\xrRenderDX9\dx9DetailManager_VS.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\DetailManager.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\DetailManager_CACHE.cpp" />
     <ClCompile Include="..\..\Layers\xrRender\DetailManager_Decompress.cpp" />

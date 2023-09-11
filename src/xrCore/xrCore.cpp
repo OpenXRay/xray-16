@@ -246,9 +246,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 
 #if defined(XR_PLATFORM_WINDOWS)
         if (editor)
-            xr_FS = xr_make_unique<ELocatorAPI>();
+            xr_FS = xr_unique_ptr<ILocatorAPI>(xr_new<ELocatorAPI>());
         else
-            xr_FS = xr_make_unique<CLocatorAPI>();
+            xr_FS = xr_unique_ptr<ILocatorAPI>(xr_new<CLocatorAPI>());
 #else
         xr_FS = xr_make_unique<CLocatorAPI>();
 #endif

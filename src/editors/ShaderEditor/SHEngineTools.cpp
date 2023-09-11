@@ -542,9 +542,9 @@ CMatrix *CSHEngineTools::AppendMatrix(LPSTR name)
 {
     CMatrix *M = FindMatrix(name);
     VERIFY(M);
-    if (M->dwReference > 1)
+    if (M->ref_count > 1)
     {
-        M->dwReference--;
+        M->ref_count--;
         strcpy(name, AppendMatrix(M, &M));
     }
     return M;
@@ -563,9 +563,9 @@ CConstant *CSHEngineTools::FindConstant(LPCSTR name)
 CConstant *CSHEngineTools::AppendConstant(LPSTR name)
 {
     CConstant *C = FindConstant(name);
-    if (C->dwReference > 1)
+    if (C->ref_count > 1)
     {
-        C->dwReference--;
+        C->ref_count--;
         strcpy(name, AppendConstant(C, &C));
     }
     return C;
@@ -641,14 +641,14 @@ void CSHEngineTools::AddMatrixRef(LPSTR name)
 {
     CMatrix *M = FindMatrix(name);
     R_ASSERT(M);
-    M->dwReference++;
+    M->ref_count++;
 }
 
 void CSHEngineTools::AddConstantRef(LPSTR name)
 {
     CConstant *C = FindConstant(name);
     R_ASSERT(C);
-    C->dwReference++;
+    C->ref_count++;
 }
 
 LPCSTR CSHEngineTools::AppendConstant(CConstant *src, CConstant **dest)
@@ -656,7 +656,7 @@ LPCSTR CSHEngineTools::AppendConstant(CConstant *src, CConstant **dest)
     CConstant *C = xr_new<CConstant>();
     if (src)
         *C = *src;
-    C->dwReference = 1;
+    C->ref_count = 1;
     char name[128];
     std::pair<ConstantPairIt, bool> I = m_Constants.insert(std::make_pair(xr_strdup(GenerateConstantName(name)), C));
     VERIFY(I.second);
@@ -670,7 +670,7 @@ LPCSTR CSHEngineTools::AppendMatrix(CMatrix *src, CMatrix **dest)
     CMatrix *M = xr_new<CMatrix>();
     if (src)
         *M = *src;
-    M->dwReference = 1;
+    M->ref_count = 1;
     char name[128];
     std::pair<MatrixPairIt, bool> I = m_Matrices.insert(std::make_pair(xr_strdup(GenerateMatrixName(name)), M));
     VERIFY(I.second);
@@ -720,8 +720,8 @@ void CSHEngineTools::RemoveMatrix(LPCSTR name)
     R_ASSERT(name && name[0]);
     CMatrix *M = FindMatrix(name);
     VERIFY(M);
-    M->dwReference--;
-    if (M->dwReference == 0)
+    M->ref_count--;
+    if (M->ref_count == 0)
     {
         LPSTR N = LPSTR(name);
         MatrixPairIt I = m_Matrices.find(N);
@@ -738,8 +738,8 @@ void CSHEngineTools::RemoveConstant(LPCSTR name)
     R_ASSERT(name && name[0]);
     CConstant *C = FindConstant(name);
     VERIFY(C);
-    C->dwReference--;
-    if (C->dwReference == 0)
+    C->ref_count--;
+    if (C->ref_count == 0)
     {
         LPSTR N = LPSTR(name);
         ConstantPairIt I = m_Constants.find(N);
@@ -797,19 +797,19 @@ void CSHEngineTools::CollapseMatrix(LPSTR name)
     R_ASSERT(name && name[0]);
     CMatrix *M = FindMatrix(name);
     VERIFY(M);
-    M->dwReference--;
+    M->ref_count--;
     for (MatrixPairIt m = m_OptMatrices.begin(); m != m_OptMatrices.end(); m++)
     {
         if (m->second->Similar(*M))
         {
             strcpy(name, m->first);
-            m->second->dwReference++;
+            m->second->ref_count++;
             return;
         }
     }
     // append new optimized matrix
     CMatrix *N = xr_new<CMatrix>(*M);
-    N->dwReference = 1;
+    N->ref_count = 1;
     m_OptMatrices.insert(std::make_pair(xr_strdup(name), N));
 }
 
@@ -820,19 +820,19 @@ void CSHEngineTools::CollapseConstant(LPSTR name)
     R_ASSERT(name && name[0]);
     CConstant *C = FindConstant(name);
     VERIFY(C);
-    C->dwReference--;
+    C->ref_count--;
     for (ConstantPairIt c = m_OptConstants.begin(); c != m_OptConstants.end(); c++)
     {
         if (c->second->Similar(*C))
         {
             strcpy(name, c->first);
-            c->second->dwReference++;
+            c->second->ref_count++;
             return;
         }
     }
     // append opt constant
     CConstant *N = xr_new<CConstant>(*C);
-    N->dwReference = 1;
+    N->ref_count = 1;
     m_OptConstants.insert(std::make_pair(xr_strdup(name), N));
 }
 
@@ -843,7 +843,7 @@ void CSHEngineTools::UpdateMatrixRefs(LPSTR name)
     R_ASSERT(name && name[0]);
     CMatrix *M = FindMatrix(name);
     R_ASSERT(M);
-    M->dwReference++;
+    M->ref_count++;
 }
 
 void CSHEngineTools::UpdateConstantRefs(LPSTR name)
@@ -853,7 +853,7 @@ void CSHEngineTools::UpdateConstantRefs(LPSTR name)
     R_ASSERT(name && name[0]);
     CConstant *C = FindConstant(name);
     R_ASSERT(C);
-    C->dwReference++;
+    C->ref_count++;
 }
 
 void CSHEngineTools::ParseBlender(IBlender *B, CParseBlender &P)

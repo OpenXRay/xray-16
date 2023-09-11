@@ -210,7 +210,7 @@ void ESceneWallmarkTool::OnRender(int priority, bool strictB2F)
             float ssaCLIP = r_ssaDISCARD / 4;
 
             u32 w_offset = 0;
-            FVF::LIT *w_verts = (FVF::LIT *)RCache.Vertex.Lock(MAX_R_VERTEX, hGeom->vb_stride, w_offset);
+            FVF::LIT* w_verts = (FVF::LIT*)RImplementation.Vertex.Lock(MAX_R_VERTEX, hGeom->vb_stride, w_offset);
             FVF::LIT *w_start = w_verts;
 
             for (WMVecIt w_it = slot->items.begin(); w_it != slot->items.end(); w_it++)
@@ -232,12 +232,13 @@ void ESceneWallmarkTool::OnRender(int priority, bool strictB2F)
                             if (w_count + 3 > MAX_R_VERTEX)
                             {
                                 // Flush stream
-                                RCache.Vertex.Unlock(w_count, hGeom->vb_stride);
+                                RImplementation.Vertex.Unlock(w_count, hGeom->vb_stride);
                                 RCache.set_Shader(slot->shader);
                                 RCache.set_Geometry(hGeom);
                                 RCache.Render(D3DPT_TRIANGLELIST, w_offset, w_count / 3);
                                 // Restart (re-lock/re-calc)
-                                w_verts = (FVF::LIT *)RCache.Vertex.Lock(MAX_R_VERTEX, hGeom->vb_stride, w_offset);
+                                w_verts =
+                                    (FVF::LIT*)RImplementation.Vertex.Lock(MAX_R_VERTEX, hGeom->vb_stride, w_offset);
                                 w_start = w_verts;
                             }
                             // real fill buffer
@@ -254,7 +255,7 @@ void ESceneWallmarkTool::OnRender(int priority, bool strictB2F)
             }
             // Flush stream
             u32 w_count = u32(w_verts - w_start);
-            RCache.Vertex.Unlock(w_count, hGeom->vb_stride);
+            RImplementation.Vertex.Unlock(w_count, hGeom->vb_stride);
             if (w_count)
             {
                 RCache.set_Shader(slot->shader);
@@ -575,9 +576,7 @@ bool ESceneWallmarkTool::Export(LPCSTR path)
 }
 
 void ESceneWallmarkTool::OnDeviceCreate()
-{
-    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), NULL);
-}
+{ hGeom.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), NULL); }
 
 void ESceneWallmarkTool::OnDeviceDestroy()
 {

@@ -7,7 +7,6 @@
 #endif
 
 #include "LightTrack.h"
-#include "xrEngine/IRenderable.h"
 
 void CBackend::OnFrameEnd()
 {
