@@ -95,6 +95,7 @@ public:
 
 public:
     virtual void Load(LPCSTR section);
+    void ReadCustomTextAndMarks(LPCSTR section);
     void ReloadNames();
 
     LPCSTR NameItem(); // remove <virtual> by sea
@@ -154,6 +155,11 @@ public:
     shared_str m_name;
     shared_str m_nameShort;
     shared_str m_nameComplex;
+
+    shared_str m_custom_text;
+    Fvector2 m_custom_text_offset;
+    CGameFont* m_custom_text_font;
+    u32 m_custom_text_clr_inv;
 
     SInvItemPlace m_ItemCurrPlace;
 

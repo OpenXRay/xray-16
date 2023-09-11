@@ -27,6 +27,7 @@ CUICellItem::CUICellItem()
     //-	m_mark				= NULL;
     m_upgrade = NULL;
     m_pConditionState = NULL;
+    m_custom_text = NULL;
     m_drawn_frame = 0;
     SetAccelerator(0);
     m_b_destroy_childs = true;
@@ -34,6 +35,7 @@ CUICellItem::CUICellItem()
     m_select_armament = false;
     m_cur_mark = false;
     m_has_upgrade = false;
+    m_with_custom_text = false;
 
     init();
 }
@@ -79,6 +81,16 @@ void CUICellItem::init()
 
     if (m_pConditionState)
         m_pConditionState->Show(true);
+    
+    if (uiXml.NavigateToNode("cell_item_custom_text", 0))
+    {
+        m_custom_text = xr_new<CUIStatic>("CustomText");
+        m_custom_text->SetAutoDelete(true);
+        AttachChild(m_custom_text);
+        CUIXmlInit::InitStatic(uiXml, "cell_item_custom_text", 0, m_custom_text);
+        m_custom_text_pos = m_custom_text->GetWndPos();
+        m_custom_text->Show(false);
+    }
 }
 
 void CUICellItem::Draw()
@@ -132,6 +144,40 @@ void CUICellItem::Update()
         }
         m_upgrade->Show(m_has_upgrade);
     }
+    UpdateCustomMarksAndText();
+}
+
+void CUICellItem::UpdateCustomMarksAndText()
+{
+    PIItem item = (PIItem)m_pData;
+    if (item)
+    {
+        m_with_custom_text = item->m_custom_text != nullptr;
+        if (m_with_custom_text && m_custom_text)
+        {
+            Fvector2 pos;
+            pos.set(m_custom_text_pos);
+            Fvector2 size = GetWndSize();
+            Fvector2 up_size = m_custom_text->GetWndSize();
+            pos.x = size.x - up_size.x - 4.0f; // making pos at right-end of cell
+            pos.y = size.y - up_size.y - 4.0f; // making pos at bottom-end of cell
+            m_custom_text->SetWndPos(pos);
+            m_custom_text->TextItemControl()->SetTextST(*item->m_custom_text);
+
+            if (item->m_custom_text_clr_inv != 0)
+            {
+                m_custom_text->TextItemControl()->SetTextColor(item->m_custom_text_clr_inv);
+            }
+            if (item->m_custom_text_font != nullptr)
+            {
+                m_custom_text->TextItemControl()->SetFont(item->m_custom_text_font);
+            }
+
+            m_custom_text->TextItemControl()->m_TextOffset = item->m_custom_text_offset;
+        }
+    }
+    if (m_custom_text)
+        m_custom_text->Show(m_with_custom_text);
 }
 
 bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
