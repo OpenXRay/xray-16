@@ -4,8 +4,8 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
 
-#if __has_include(<openal/efx.h>)
-#   include <openal/efx.h>
+#if __has_include(<efx.h>)
+#   include <efx.h>
 #endif
 
 xr_vector<u8> g_target_temp_data;
@@ -35,7 +35,7 @@ bool CSoundRender_TargetA::_initialize()
         A_CHK(alSourcef(pSource, AL_MAX_GAIN, 1.f));
         A_CHK(alSourcef(pSource, AL_GAIN, cache_gain));
         A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
-#if __has_include(<openal/efx.h>)
+#if __has_include(<efx.h>)
         if (pAuxSlot != ALuint(-1))
             A_CHK(alSource3i(pSource, AL_AUXILIARY_SEND_FILTER, pAuxSlot, 0, AL_FILTER_NULL));
 #endif

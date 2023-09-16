@@ -20,6 +20,7 @@ CTracer::CTracer()
     m_aColors.clear();
     string64 LineName;
 
+    m_aColors.reserve(255);
     for (u8 i = 0; i < 255; i++)
     {
         xr_sprintf(LineName, "color_%d", i);

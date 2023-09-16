@@ -6,7 +6,7 @@ BOOL xrRender_test_hw()
     CHW _HW;
     _HW.CreateD3D();
 
-    if (!_HW.pD3D)
+    if (!_HW.pD3D || _HW.pD3D->GetAdapterCount() == 0)
         return FALSE;
 
     _HW.pD3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &caps);
