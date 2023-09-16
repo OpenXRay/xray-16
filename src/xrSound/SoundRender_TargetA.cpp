@@ -191,17 +191,19 @@ void CSoundRender_TargetA::fill_parameters()
     }
 
     VERIFY2(m_pEmitter, SE->source()->file_name());
+
     float _pitch = m_pEmitter->p_source.freq;
-    clamp(_pitch, EPS_L, 2.f);
+    clamp(_pitch, EPS_L, 100.f); //--#SM+#-- Increase sound frequency (speed) limit
     if (m_pEmitter->bIsIgnoreTimeFactor && !fsimilar(cache_pitch, _pitch))
     {
-        cache_pitch = 1.f;
+        cache_pitch = _pitch;
         A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
     }
     else if (!m_pEmitter->bIsIgnoreTimeFactor && !fsimilar(cache_pitch, _pitch * psSoundTimeFactor))
     {
         time_played = time_played + (SoundRender->fTimer_Value - last_pitch_change_time) * cache_pitch;
         cache_pitch = _pitch * psSoundTimeFactor;
+
         // Only update time to stop for non-looped sounds
         if (!m_pEmitter->iPaused && (m_pEmitter->m_current_state == CSoundRender_Emitter::stStarting || m_pEmitter->m_current_state == CSoundRender_Emitter::stPlaying || m_pEmitter->m_current_state == CSoundRender_Emitter::stSimulating))
             m_pEmitter->fTimeToStop = SoundRender->fTimer_Value + ((m_pEmitter->get_length_sec() - time_played) / cache_pitch);
@@ -209,7 +211,6 @@ void CSoundRender_TargetA::fill_parameters()
 
         last_pitch_change_time = SoundRender->fTimer_Value;
     }
-    
     VERIFY2(m_pEmitter, SE->source()->file_name());
 }
 
