@@ -348,7 +348,7 @@
         </cap_always_active>
         <check_always_active x="167" y="0" width="44" height="29">
 	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="always_active" group="mm_opt_video_adv" is_integer="1"/>
+            <options_item entry="rs_always_active" group="mm_opt_video_adv" is_integer="1"/>
         </check_always_active>
 
         <cap_fps_limit x="20" y="3" width="135" height="24">
@@ -703,7 +703,7 @@
 
         <check_loadingstages x="167" y="0" width="44" height="29">
 	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="rs_loadingstages" group="mm_opt_gameplay" is_integer="1"/>
+            <options_item entry="g_loading_stages" group="mm_opt_gameplay" is_integer="1"/>
         </check_loadingstages>
 
         <cap_unload_after_pickup x="20" y="3" width="135" height="24">
