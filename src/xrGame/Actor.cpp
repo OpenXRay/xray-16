@@ -400,6 +400,7 @@ void CActor::Load(LPCSTR section)
                 Msg("~ [%s] is missing sounds for type [%s]", hit_snd_sect, hit_name);
             }
 #endif
+            sndHit[hit_type].reserve(cnt);
             for (int i = 0; i < cnt; ++i)
             {
                 sndHit[hit_type].emplace_back().create(_GetItem(hit_snds, i, buf), st_Effect, sg_SourceType);

@@ -176,7 +176,7 @@ protected:
     void BannedList_Load();
     void IpList_Load();
     void IpList_Unload();
-    pcstr GetBannedListName() const;
+    constexpr pcstr GetBannedListName();
 
     void UpdateBannedList();
 

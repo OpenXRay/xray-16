@@ -48,7 +48,7 @@ public:
     void OnAppDeactivate() override;
 
 private:
-    void CreateSwapChain(HWND hwnd);
+    bool CreateSwapChain(HWND hwnd);
     bool CreateSwapChain2(HWND hwnd);
 
     bool ThisInstanceIsGlobal() const;
@@ -82,7 +82,7 @@ public:
     bool SAD4ShaderInstructions;
     bool ExtendedDoublesShaderInstructions;
 
-    ID3DDeviceContext *d3d_contexts_pool[R__NUM_CONTEXTS];
+    ID3DDeviceContext* d3d_contexts_pool[R__NUM_CONTEXTS]{};
 
     bool DX10Only = false;
 #ifdef HAS_DX11_2

@@ -22,7 +22,7 @@ void CSoundRender_Emitter::set_frequency(float scale)
 {
     VERIFY(_valid(scale));
     p_source.freq = scale;
-    if (!fis_zero(fTimeToStop) && fTimeToStop != 0xffffffff)
+    if (!fis_zero(fTimeToStop) && fTimeToStop != TIME_TO_STOP_INFINITE)
         fTimeToStop = SoundRender->fTimer_Value + ((get_length_sec() - (SoundRender->fTimer_Value - fTimeStarted)) / (scale * psSoundTimeFactor));
 }
 

@@ -791,6 +791,7 @@ extern int g_ErrorLineCount;
 
 ENGINE_API int ps_r__Supersample = 1;
 ENGINE_API int ps_r__WallmarksOnSkeleton = 0;
+ENGINE_API shared_str current_player_hud_sect{};
 
 Fvector3 ssfx_wetness_multiplier = { 1.0f, 0.3f, 0.0f };
 

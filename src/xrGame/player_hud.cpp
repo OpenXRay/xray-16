@@ -10,7 +10,7 @@
 
 extern u32 hud_adj_mode;
 player_hud* g_player_hud = nullptr;
-
+extern ENGINE_API shared_str current_player_hud_sect;
 // clang-format off
 // --#SM+# Begin--
 constexpr float PITCH_OFFSET_R    = 0.0f;   // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
@@ -832,6 +832,7 @@ void player_hud::update_inertion(Fmatrix& trans) const
 
 attachable_hud_item* player_hud::create_hud_item(const shared_str& sect)
 {
+    current_player_hud_sect = sect;
     auto& item = m_pool[sect];
 
     if (!item)
