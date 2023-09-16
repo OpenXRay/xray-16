@@ -52,6 +52,8 @@ CSoundRender_Core::CSoundRender_Core()
     isLocked = false;
     fTimer_Value = Timer.GetElapsed_sec();
     fTimer_Delta = 0.0f;
+    fTimerPersistent_Value = TimerPersistent.GetElapsed_sec();
+    fTimerPersistent_Delta = 0.0f;
     m_iPauseCounter = 1;
 }
 
@@ -64,6 +66,7 @@ CSoundRender_Core::~CSoundRender_Core()
 void CSoundRender_Core::_initialize()
 {
     Timer.Start();
+    TimerPersistent.Start();
 
     // load environment
     env_load();
@@ -314,13 +317,12 @@ void CSoundRender_Core::play(ref_sound& S, IGameObject* O, u32 flags, float dela
     if (S._feedback())
         ((CSoundRender_Emitter*)S._feedback())->rewind();
     else
-        i_play(&S, flags & sm_Looped, delay);
+        i_play(&S, flags, delay);
 
     if (flags & sm_2D || S._handle()->channels_num() == 2)
         S._feedback()->switch_to_2D();
 
-    if (flags & sm_IgnoreTimeFactor)
-        S._feedback()->start_ignore_time_factor();
+    S._feedback()->set_ignore_time_factor(flags & sm_IgnoreTimeFactor);
 }
 
 void CSoundRender_Core::play_no_feedback(
@@ -338,7 +340,7 @@ void CSoundRender_Core::play_no_feedback(
     S._p->fn_attached[0] = orig->fn_attached[0];
     S._p->fn_attached[1] = orig->fn_attached[1];
 
-    i_play(&S, flags & sm_Looped, delay);
+    i_play(&S, flags, delay);
 
     if (flags & sm_2D || S._handle()->channels_num() == 2)
         S._feedback()->switch_to_2D();
@@ -362,15 +364,14 @@ void CSoundRender_Core::play_at_pos(ref_sound& S, IGameObject* O, const Fvector&
     if (S._feedback())
         ((CSoundRender_Emitter*)S._feedback())->rewind();
     else
-        i_play(&S, flags & sm_Looped, delay);
+        i_play(&S, flags, delay);
 
     S._feedback()->set_position(pos);
 
     if (flags & sm_2D || S._handle()->channels_num() == 2)
         S._feedback()->switch_to_2D();
 
-    if (flags & sm_IgnoreTimeFactor)
-        S._feedback()->start_ignore_time_factor();
+    S._feedback()->set_ignore_time_factor(flags & sm_IgnoreTimeFactor);
 }
 
 void CSoundRender_Core::destroy(ref_sound& S)

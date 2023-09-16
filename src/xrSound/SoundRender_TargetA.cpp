@@ -63,9 +63,6 @@ void CSoundRender_TargetA::start(CSoundRender_Emitter* E)
 {
     inherited::start(E);
 
-    last_pitch_change_time = E->fTimeStarted;
-    time_played = SoundRender->fTimer_Value - E->fTimeStarted;
-
     // Calc storage
     buf_block = sdef_target_block * E->source()->m_wformat.nAvgBytesPerSec / 1000;
     g_target_temp_data.resize(buf_block);
@@ -193,23 +190,14 @@ void CSoundRender_TargetA::fill_parameters()
     VERIFY2(m_pEmitter, SE->source()->file_name());
 
     float _pitch = m_pEmitter->p_source.freq;
+    if (!m_pEmitter->bIgnoringTimeFactor)
+        _pitch *= psSoundTimeFactor; //--#SM+#-- Correct sound "speed" by time factor
     clamp(_pitch, EPS_L, 100.f); //--#SM+#-- Increase sound frequency (speed) limit
-    if (m_pEmitter->bIsIgnoreTimeFactor && !fsimilar(cache_pitch, _pitch))
+
+    if (!fsimilar(_pitch, cache_pitch))
     {
         cache_pitch = _pitch;
-        A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
-    }
-    else if (!m_pEmitter->bIsIgnoreTimeFactor && !fsimilar(cache_pitch, _pitch * psSoundTimeFactor))
-    {
-        time_played = time_played + (SoundRender->fTimer_Value - last_pitch_change_time) * cache_pitch;
-        cache_pitch = _pitch * psSoundTimeFactor;
-
-        // Only update time to stop for non-looped sounds
-        if (!m_pEmitter->iPaused && (m_pEmitter->m_current_state == CSoundRender_Emitter::stStarting || m_pEmitter->m_current_state == CSoundRender_Emitter::stPlaying || m_pEmitter->m_current_state == CSoundRender_Emitter::stSimulating))
-            m_pEmitter->fTimeToStop = SoundRender->fTimer_Value + ((m_pEmitter->get_length_sec() - time_played) / cache_pitch);
-        A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
-
-        last_pitch_change_time = SoundRender->fTimer_Value;
+        A_CHK(alSourcef(pSource, AL_PITCH, _pitch));
     }
     VERIFY2(m_pEmitter, SE->source()->file_name());
 }

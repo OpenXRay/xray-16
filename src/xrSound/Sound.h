@@ -168,9 +168,9 @@ public:
     virtual void set_priority(float vol) = 0;
     virtual void set_time(float t) = 0; //--#SM+#--
     virtual void stop(bool isDeffered) = 0;
+    virtual void set_ignore_time_factor(bool ignore) = 0;
     virtual const CSound_params* get_params() = 0;
     virtual u32 play_time() = 0;
-    virtual void start_ignore_time_factor() = 0;
 };
 
 inline CSound_emitter::~CSound_emitter() = default;

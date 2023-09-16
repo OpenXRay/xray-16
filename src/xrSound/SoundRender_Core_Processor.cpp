@@ -9,12 +9,12 @@
 #include "SoundRender_Target.h"
 #include "SoundRender_Source.h"
 
-CSoundRender_Emitter* CSoundRender_Core::i_play(ref_sound* S, bool _loop, float delay)
+CSoundRender_Emitter* CSoundRender_Core::i_play(ref_sound* S, u32 flags, float delay)
 {
     VERIFY(S->_p->feedback == 0);
     CSoundRender_Emitter* E = xr_new<CSoundRender_Emitter>();
     S->_p->feedback = E;
-    E->start(S, _loop, delay);
+    E->start(S, flags, delay);
     s_emitters.push_back(E);
     return E;
 }
@@ -26,13 +26,17 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         return;
     Stats.Update.Begin();
     isLocked = true;
-    Timer.time_factor(psSoundTimeFactor); //--#SM+#--
-    float new_tm = Timer.GetElapsed_sec();
-    fTimer_Delta = new_tm - fTimer_Value;
-    //float dt = float(Timer_Delta)/1000.f;
-    float dt_sec = fTimer_Delta;
-    fTimer_Value = new_tm;
 
+    Timer.time_factor(psSoundTimeFactor); //--#SM+#--
+    {
+        const float new_tm = Timer.GetElapsed_sec();
+        fTimer_Delta = new_tm - fTimer_Value;
+        fTimer_Value = new_tm;
+
+        const float new_tm_p = TimerPersistent.GetElapsed_sec();
+        fTimerPersistent_Delta = new_tm_p - fTimerPersistent_Value;
+        fTimerPersistent_Value = new_tm_p;
+    }
     s_emitters_u++;
 
     // Firstly update emitters, which are now being rendered
@@ -43,7 +47,10 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         CSoundRender_Emitter* E = T->get_emitter();
         if (E)
         {
-            E->update(dt_sec);
+            const bool ignore = E->bIgnoringTimeFactor;
+            const float time = ignore ? fTimerPersistent_Value : fTimer_Value;
+            const float delta = ignore ? fTimerPersistent_Delta : fTimer_Delta;
+            E->update(time, delta);
             E->marker = s_emitters_u;
             E = T->get_emitter(); // update can stop itself
             if (E)
@@ -64,7 +71,10 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         CSoundRender_Emitter* pEmitter = s_emitters[it];
         if (pEmitter->marker != s_emitters_u)
         {
-            pEmitter->update(dt_sec);
+            const bool ignore = pEmitter->bIgnoringTimeFactor;
+            const float time = ignore ? fTimerPersistent_Value : fTimer_Value;
+            const float delta = ignore ? fTimerPersistent_Delta : fTimer_Delta;
+            pEmitter->update(time, delta);
             pEmitter->marker = s_emitters_u;
         }
         if (!pEmitter->isPlaying())
@@ -115,14 +125,14 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
             e_target = *get_environment(P);
         }
 
-        e_current.lerp(e_current, e_target, dt_sec);
+        e_current.lerp(e_current, e_target, fTimer_Delta);
 
         m_effects->set_listener(e_current);
         m_effects->commit();
     }
 
     // update listener
-    update_listener(P, D, N, dt_sec);
+    update_listener(P, D, N, fTimer_Delta);
 
     // Start rendering of pending targets
     if (!s_targets_defer.empty())
