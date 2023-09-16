@@ -21,7 +21,8 @@ void CSoundRender_Emitter::set_position(const Fvector& pos)
 void CSoundRender_Emitter::set_frequency(float scale)
 {
     VERIFY(_valid(scale));
-    p_source.freq = scale;
+    if (_valid(scale))
+        p_source.freq = scale;
 }
 
 // Перемотка звука на заданную секунду [rewind snd to target time] --#SM+#--
