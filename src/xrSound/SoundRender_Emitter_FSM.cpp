@@ -20,11 +20,8 @@ inline u32 calc_cursor(const float& fTimeStarted, float& fTime, const float& fTi
     return curr_sample_num * (wfx.wBitsPerSample / 8) * wfx.nChannels;
 }
 
-void CSoundRender_Emitter::update(float dt)
+void CSoundRender_Emitter::update(float fTime, float dt)
 {
-    float fTime = SoundRender->fTimer_Value;
-    float fDeltaTime = SoundRender->fTimer_Delta;
-
     VERIFY2(!!(owner_data) || (!(owner_data) && (m_current_state == stStopped)), "owner");
     VERIFY2(owner_data ? *(int*)(&owner_data->feedback) : 1, "owner");
 
@@ -102,9 +99,9 @@ void CSoundRender_Emitter::update(float dt)
                 SoundRender->i_stop(this);
                 m_current_state = stSimulating;
             }
-            fTimeStarted += fDeltaTime;
-            fTimeToStop += fDeltaTime;
-            fTimeToPropagade += fDeltaTime;
+            fTimeStarted += dt;
+            fTimeToStop += dt;
+            fTimeToPropagade += dt;
             break;
         }
         if (fTime >= fTimeToStop)
@@ -131,9 +128,9 @@ void CSoundRender_Emitter::update(float dt)
     case stSimulating:
         if (iPaused)
         {
-            fTimeStarted += fDeltaTime;
-            fTimeToStop += fDeltaTime;
-            fTimeToPropagade += fDeltaTime;
+            fTimeStarted += dt;
+            fTimeToStop += dt;
+            fTimeToPropagade += dt;
             break;
         }
         if (fTime >= fTimeToStop)
@@ -169,8 +166,8 @@ void CSoundRender_Emitter::update(float dt)
                 SoundRender->i_stop(this);
                 m_current_state = stSimulatingLooped;
             }
-            fTimeStarted += fDeltaTime;
-            fTimeToPropagade += fDeltaTime;
+            fTimeStarted += dt;
+            fTimeToPropagade += dt;
             break;
         }
         if (!update_culling(dt))
@@ -188,8 +185,8 @@ void CSoundRender_Emitter::update(float dt)
     case stSimulatingLooped:
         if (iPaused)
         {
-            fTimeStarted += fDeltaTime;
-            fTimeToPropagade += fDeltaTime;
+            fTimeStarted += dt;
+            fTimeToPropagade += dt;
             break;
         }
         if (update_culling(dt))
@@ -224,25 +221,25 @@ void CSoundRender_Emitter::update(float dt)
             float fRemainingTime = (fLength - fTimeToRewind) / p_source.freq;
             float fPastTime = fTimeToRewind / p_source.freq;
 
-            fTimeStarted = SoundRender->fTimer_Value - fPastTime;
+            fTimeStarted = fTime - fPastTime;
             fTimeToPropagade = fTimeStarted; //--> For AI events
 
             if (fTimeStarted < 0.0f)
             {
-                Log("fTimer_Value = ", SoundRender->fTimer_Value);
+                Log("fTimer_Value = ", fTime);
                 Log("fTimeStarted = ", fTimeStarted);
                 Log("fRemainingTime = ", fRemainingTime);
                 Log("fPastTime = ", fPastTime);
                 R_ASSERT2(fTimeStarted >= 0.0f, "Possible error in sound rewind logic! See log.");
 
-                fTimeStarted = SoundRender->fTimer_Value;
+                fTimeStarted = fTime;
                 fTimeToPropagade = fTimeStarted;
             }
 
             if (!bLooped)
             {
                 //--> Пересчитываем время, когда звук должен остановиться [recalculate stop time]
-                fTimeToStop = SoundRender->fTimer_Value + fRemainingTime;
+                fTimeToStop = fTime + fRemainingTime;
             }
 
             u32 ptr = calc_cursor(fTimeStarted, fTime, fLength, p_source.freq, source()->m_wformat);

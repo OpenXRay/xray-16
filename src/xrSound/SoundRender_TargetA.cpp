@@ -189,8 +189,11 @@ void CSoundRender_TargetA::fill_parameters()
 
     VERIFY2(m_pEmitter, SE->source()->file_name());
 
-    float _pitch = m_pEmitter->p_source.freq * psSoundTimeFactor; //--#SM+#-- Correct sound "speed" by time factor
+    float _pitch = m_pEmitter->p_source.freq;
+    if (!m_pEmitter->bIgnoringTimeFactor)
+        _pitch *= psSoundTimeFactor; //--#SM+#-- Correct sound "speed" by time factor
     clamp(_pitch, EPS_L, 100.f); //--#SM+#-- Increase sound frequency (speed) limit
+
     if (!fsimilar(_pitch, cache_pitch))
     {
         cache_pitch = _pitch;

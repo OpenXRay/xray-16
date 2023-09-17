@@ -5,8 +5,10 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
 
-void CSoundRender_Emitter::start(ref_sound* _owner, bool _loop, float delay)
+void CSoundRender_Emitter::start(ref_sound* _owner, u32 flags, float delay)
 {
+    const bool _loop = flags & sm_Looped;
+    bIgnoringTimeFactor = flags & sm_IgnoreTimeFactor;
     starting_delay = delay;
 
     VERIFY(_owner);
@@ -28,7 +30,7 @@ void CSoundRender_Emitter::start(ref_sound* _owner, bool _loop, float delay)
     else
     {
         m_current_state = _loop ? stStartingLoopedDelayed : stStartingDelayed;
-        fTimeToPropagade = SoundRender->Timer.GetElapsed_sec();
+        fTimeToPropagade = bIgnoringTimeFactor ? SoundRender->TimerPersistent.GetElapsed_sec() : SoundRender->Timer.GetElapsed_sec();
     }
     bStopping = FALSE;
     bRewind = FALSE;
@@ -61,7 +63,7 @@ void CSoundRender_Emitter::rewind()
 {
     bStopping = FALSE;
 
-    float fTime = SoundRender->Timer.GetElapsed_sec();
+    const float fTime = bIgnoringTimeFactor ? SoundRender->TimerPersistent.GetElapsed_sec() : SoundRender->Timer.GetElapsed_sec();
     float fDiff = fTime - fTimeStarted;
     fTimeStarted += fDiff;
     fTimeToStop += fDiff;

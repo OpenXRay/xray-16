@@ -77,6 +77,7 @@ enum : u32
 {
     sm_Looped = 1ul << 0ul, //!< Looped
     sm_2D = 1ul << 1ul, //!< 2D mode
+    sm_IgnoreTimeFactor = 1ul << 2ul
 };
 
 enum esound_type : u32
@@ -167,6 +168,7 @@ public:
     virtual void set_priority(float vol) = 0;
     virtual void set_time(float t) = 0; //--#SM+#--
     virtual void stop(bool isDeffered) = 0;
+    virtual void set_ignore_time_factor(bool ignore) = 0;
     virtual const CSound_params* get_params() = 0;
     virtual u32 play_time() = 0;
 };

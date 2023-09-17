@@ -112,7 +112,7 @@ void UIHintWindow::update_hint_text()
     {
         return;
     }
-    if (Device.dwTimeGlobal < (m_dwFocusReceiveTime + m_hint_delay))
+    if (Device.dwTimeGlobal < (m_dwFocusReceiveTime + m_hint_delay * Device.time_factor()))
     {
         return;
     }

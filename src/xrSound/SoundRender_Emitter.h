@@ -62,6 +62,7 @@ public:
     bool b2D;
     bool bStopping;
     bool bRewind;
+    bool bIgnoringTimeFactor;
     float fTimeStarted; // time of "Start"
     float fTimeToStop; // time to "Stop"
     float fTimeToPropagade;
@@ -107,9 +108,9 @@ public:
     void fill_data(u8* ptr, u32 offset, u32 size);
 
     float priority();
-    void start(ref_sound* _owner, bool _loop, float delay);
+    void start(ref_sound* _owner, u32 flags, float delay);
     void cancel(); // manager forces out of rendering
-    void update(float dt);
+    void update(float time, float dt);
     bool update_culling(float dt);
     void update_environment(float dt);
     void rewind();
@@ -117,6 +118,8 @@ public:
     void pause(bool bVal, int id);
 
     u32 play_time() override;
+
+    void set_ignore_time_factor(bool ignore) override { bIgnoringTimeFactor = ignore; };
 
     CSoundRender_Emitter();
     ~CSoundRender_Emitter() override;
