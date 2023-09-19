@@ -342,11 +342,15 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
         read_byte = ::read(fd, &dwType, 4);
         if (read_byte == -1)
             return nullptr;
+        else if (read_byte == 0)
+            return nullptr;
 
         u32 tempSize = 0;
         read_byte = ::read(fd, &tempSize, 4);
         dwSize = tempSize;
         if (read_byte == -1)
+            return nullptr;
+        else if (read_byte == 0)
             return nullptr;
 
         if ((dwType & ~CFS_CompressMark) == ID)
