@@ -62,9 +62,9 @@
 void SetActorVisibility(u16 who, float value);
 extern int g_AI_inactive_time;
 
-#ifndef MASTER_GOLD
+#if defined(DEBUG) || !defined(MASTER_GOLD)
 Flags32 psAI_Flags = {aiObstaclesAvoiding | aiUseSmartCovers};
-#endif // MASTER_GOLD
+#endif // defined(DEBUG) || !defined(MASTER_GOLD)
 
 void CCustomMonster::SAnimState::Create(IKinematicsAnimated* K, LPCSTR base)
 {
