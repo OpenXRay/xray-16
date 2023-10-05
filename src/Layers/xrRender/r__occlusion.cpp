@@ -3,8 +3,14 @@
 
 #include "QueryHelper.h"
 
-R_occlusion::R_occlusion(void) { enabled = strstr(Core.Params, "-no_occq") ? FALSE : TRUE; }
+R_occlusion::R_occlusion(void) {}
 R_occlusion::~R_occlusion(void) { occq_destroy(); }
+
+void R_occlusion::initialize()
+{
+    enabled = strstr(Core.Params, "-no_occq") ? FALSE : TRUE;
+}
+
 void R_occlusion::occq_create(u32 limit)
 {
     pool.reserve(limit);

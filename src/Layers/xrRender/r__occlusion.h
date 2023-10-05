@@ -47,6 +47,8 @@ public:
     R_occlusion();
     ~R_occlusion();
 
+    void initialize();
+
     void occq_create(u32 limit);
     void occq_destroy();
     u32 occq_begin(u32& ID); // returns 'order'
