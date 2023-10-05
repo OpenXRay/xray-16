@@ -8,7 +8,7 @@ set(KERNEL_SRC
 
 source_group("Kernel" FILES ${KERNEL_SRC})
 
-add_library(${PROJECT_NAME} SHARED ${KERNEL_SRC})
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE} ${KERNEL_SRC})
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE

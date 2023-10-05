@@ -338,7 +338,7 @@ source_group("Render\\Particle system" FILES ${RENDER_PARTICLE_SYSTEM_SRC})
 source_group("Render\\Visibility" FILES ${RENDER_VISIBILITY_SRC})
 source_group("Render\\Visuals\\Skeleton" FILES ${RENDER_VISUALS_SKELETON_SRC})
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE}
     ${EDITOR_SRC}
     ${ENGINE_SRC}
     ${ENGINE_CONSOLE_SRC}

@@ -81,7 +81,12 @@ option(STATIC_BUILD "Use static build" ${MASTER_GOLD})
 message(STATUS "STATIC_BUILD: ${STATIC_BUILD}")
 if (STATIC_BUILD)
     # XXX: Uncomment only after build with XRAY_STATIC_BUILD is fixed
-    #add_definitions(-DXRAY_STATIC_BUILD)
+    add_definitions(-DXRAY_STATIC_BUILD)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    set(LIBS_LINK_TYPE STATIC)
+else()
+    set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
+    set(LIBS_LINK_TYPE SHARED)
 endif()
 
 function(xr_install tgt)

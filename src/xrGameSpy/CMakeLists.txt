@@ -39,11 +39,7 @@ set(WRAPPER_SRC
 source_group("Kernel" FILES ${KERNEL_SRC})
 source_group("Wrapper" FILES ${WRAPPER_SRC})
 
-if (STATIC_BUILD)
-    add_library(${PROJECT_NAME} STATIC ${KERNEL_SRC} ${WRAPPER_SRC})
-else()
-    add_library(${PROJECT_NAME} SHARED ${KERNEL_SRC} ${WRAPPER_SRC})
-endif()
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE} ${KERNEL_SRC} ${WRAPPER_SRC})
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE

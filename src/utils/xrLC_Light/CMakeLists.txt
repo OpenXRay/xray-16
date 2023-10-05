@@ -175,7 +175,7 @@ set(SRC_FILES
 
 group_sources(SRC_FILES)
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE} ${SRC_FILES})
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
