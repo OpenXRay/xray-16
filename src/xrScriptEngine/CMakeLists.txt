@@ -112,7 +112,7 @@ target_link_libraries(${PROJECT_NAME}
     xrCore
     xrLuaFix
     xrLuabind
-    xrGame
+    $<$<BOOL:${STATIC_BUILD}>:xrGame>
     ${LUA_LIBRARIES}
 )
 

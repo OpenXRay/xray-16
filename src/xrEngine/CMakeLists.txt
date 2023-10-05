@@ -409,8 +409,8 @@ target_link_libraries(${PROJECT_NAME}
     xrScriptEngine
     xrNetServer
     xrImGui
-    xrRender_GL
-    xrGame
+    $<$<BOOL:${STATIC_BUILD}>:xrRender_GL>
+    $<$<BOOL:${STATIC_BUILD}>:xrGame>
     ${LUA_LIBRARIES}
     ${SDL2_LIBRARIES}
     ${OPENAL_LIBRARY}
