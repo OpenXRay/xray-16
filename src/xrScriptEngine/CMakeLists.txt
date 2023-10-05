@@ -112,6 +112,7 @@ target_link_libraries(${PROJECT_NAME}
     xrCore
     xrLuaFix
     xrLuabind
+    xrGame
     ${LUA_LIBRARIES}
 )
 
