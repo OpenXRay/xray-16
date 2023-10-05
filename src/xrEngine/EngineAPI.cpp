@@ -12,6 +12,18 @@
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
+#ifdef XRAY_STATIC_BUILD
+extern "C"
+{
+    XR_EXPORT RendererModule* GetRendererModule();
+    
+    XR_EXPORT IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid);
+    XR_EXPORT void __cdecl xrFactory_Destroy(IFactoryObject* O);
+    XR_EXPORT void initialize_library();
+    XR_EXPORT void finalize_library();
+}
+#endif
+
 extern xr_vector<xr_token> VidQualityToken;
 
 constexpr pcstr GET_RENDERER_MODULE_FUNC = "GetRendererModule";
@@ -104,6 +116,14 @@ void CEngineAPI::Initialize(void)
 {
     InitializeRenderers();
 
+#ifdef XRAY_STATIC_BUILD
+    pCreate = xrFactory_Create;
+    pDestroy = xrFactory_Destroy;
+    pInitializeGame = initialize_library;
+    pFinalizeGame = finalize_library;
+
+    pInitializeGame();
+#else
     hGame = XRay::LoadModule("xrGame");
     if (!CanSkipGameModuleLoading())
     {
@@ -125,6 +145,7 @@ void CEngineAPI::Initialize(void)
     }
 
     CloseUnusedLibraries();
+#endif
 }
 
 void CEngineAPI::Destroy(void)
@@ -160,11 +181,16 @@ void CEngineAPI::CreateRendererList()
 
     const auto loadLibrary = [&](pcstr library) -> bool
     {
+#ifdef XRAY_STATIC_BUILD
+        const auto handle = nullptr;
+        const auto getModule = ::GetRendererModule;
+#else
         auto handle = XRay::LoadModule(library);
         if (!handle->IsLoaded())
             return false;
 
         const auto getModule = (GetRendererModule)handle->GetProcAddress(GET_RENDERER_MODULE_FUNC);
+#endif
         RendererModule* module = getModule ? getModule() : nullptr;
         if (!module)
             return false;
