@@ -6,7 +6,7 @@
 
 #ifdef XRAY_STATIC_BUILD
 #define SCRIPT_EXPORT_PULL(id, dependencies, ...) \
-    extern ScriptExporter::Node id##_ScriptExporterNode; \
+    extern const ScriptExporter::Node id##_ScriptExporterNode; \
     gModulesPull += (intptr_t)&(id##_ScriptExporterNode);
 
 #define SCRIPT_EXPORT_FUNC_PULL(id, dependencies, func) SCRIPT_EXPORT_PULL(id, dependencies, func)
