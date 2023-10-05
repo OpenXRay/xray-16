@@ -182,6 +182,9 @@ protected:
     shared_str m_sScopeName;
     shared_str m_sSilencerName;
     shared_str m_sGrenadeLauncherName;
+    shared_str m_sWpnScopeName = "wpn_scope";
+    shared_str m_sWpnSilencerName = "wpn_silencer";
+    shared_str m_sWpnGrenadeLauncher = "wpn_launcher";
 
     //смещение иконов апгрейдов в инвентаре
     int m_iScopeX, m_iScopeY;
