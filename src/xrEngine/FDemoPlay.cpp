@@ -198,7 +198,27 @@ void CDemoPlay::stat_Stop()
 #define FIX(a)           \
     while (a >= m_count) \
     a -= m_count
-extern void spline1(float t, Fvector* p, Fvector* ret);
+static void spline1(float t, Fvector* p, Fvector* ret)
+{
+    float t2 = t * t;
+    float t3 = t2 * t;
+    float m[4];
+
+    ret->x = 0.0f;
+    ret->y = 0.0f;
+    ret->z = 0.0f;
+    m[0] = (0.5f * ((-1.0f * t3) + (2.0f * t2) + (-1.0f * t)));
+    m[1] = (0.5f * ((3.0f * t3) + (-5.0f * t2) + (0.0f * t) + 2.0f));
+    m[2] = (0.5f * ((-3.0f * t3) + (4.0f * t2) + (1.0f * t)));
+    m[3] = (0.5f * ((1.0f * t3) + (-1.0f * t2) + (0.0f * t)));
+
+    for (int i = 0; i < 4; i++)
+    {
+        ret->x += p[i].x * m[i];
+        ret->y += p[i].y * m[i];
+        ret->z += p[i].z * m[i];
+    }
+}
 
 bool CDemoPlay::ProcessCam(SCamEffectorInfo& info)
 {
