@@ -82,13 +82,11 @@ message(STATUS "STATIC_BUILD: ${STATIC_BUILD}")
 if (STATIC_BUILD)
     # XXX: Uncomment only after build with XRAY_STATIC_BUILD is fixed
     add_definitions(-DXRAY_STATIC_BUILD)
-    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     set(LIBS_LINK_TYPE STATIC)
     set(LUABIND_BUILD_SHARED OFF) # xrLuaBind
     set(BUILD_STATIC_LIB ON) # LuaJIT
     set(BUILD_DYNAMIC_LIB OFF)  # LuaJIT
 else()
-    set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
     set(LIBS_LINK_TYPE SHARED)
 endif()
 
