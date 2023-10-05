@@ -12,7 +12,6 @@ public:
     void SetValue(LPCSTR str);
     pcstr GetDebugType() override { return "CUIStatsIcon"; }
 
-protected:
     enum DEF_TEX
     {
         RANK_0 = 0,
@@ -26,13 +25,8 @@ protected:
 
         MAX_DEF_TEX
     };
-    typedef struct
-    {
-        ui_shader sh;
-        Frect rect;
-    } TEX_INFO;
 
+protected:
     static void InitTexInfo();
     static void FreeTexInfo();
-    static TEX_INFO m_tex_info[MAX_DEF_TEX][2];
 };
