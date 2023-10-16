@@ -833,8 +833,13 @@ public:
     u8 GetAmmoType();
 
     //Weapon & Outfit
+    bool AddUpgrade(pcstr upgrade);
     bool InstallUpgrade(pcstr upgrade);
     bool HasUpgrade(pcstr upgrade) const;
+    bool HasUpgradeGroup(pcstr upgrade_group) const;
+    bool HasUpgradeGroupByUpgradeId(pcstr upgrade) const;
+    bool CanAddUpgrade(pcstr upgrade) const;
+    bool CanInstallUpgrade(pcstr upgrade) const;
     void IterateInstalledUpgrades(luabind::functor<void> functor);
 
     //Car

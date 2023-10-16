@@ -1789,12 +1789,29 @@ void CScriptGameObject::Weapon_AddonDetach(pcstr item_section)
         weapon->Detach(item_section, true);
 }
 
+bool CScriptGameObject::AddUpgrade(pcstr upgrade)
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(
+            LuaMessageType::Error, "CInventoryItem : cannot access class member AddUpgrade!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return false;
+
+    return ai().alife().inventory_upgrade_manager().upgrade_add(*item, upgrade);
+}
+
 bool CScriptGameObject::InstallUpgrade(pcstr upgrade)
 {
     CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
     if (!item)
     {
-        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member InstallUpgrade!");
+        GEnv.ScriptEngine->script_log(
+            LuaMessageType::Error, "CInventoryItem : cannot access class member InstallUpgrade!");
         return false;
     }
 
@@ -1802,6 +1819,36 @@ bool CScriptGameObject::InstallUpgrade(pcstr upgrade)
         return false;
 
     return ai().alife().inventory_upgrade_manager().upgrade_install(*item, upgrade, false);
+}
+
+bool CScriptGameObject::CanAddUpgrade(pcstr upgrade) const
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member CanAddUpgrade!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return false;
+
+    return ai().alife().inventory_upgrade_manager().can_add_upgrade(*item, upgrade);
+}
+
+bool CScriptGameObject::CanInstallUpgrade(pcstr upgrade) const
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member CanInstallUpgrade!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return false;
+
+    return ai().alife().inventory_upgrade_manager().can_install_upgrade(*item, upgrade);
 }
 
 bool CScriptGameObject::HasUpgrade(pcstr upgrade) const
@@ -1817,6 +1864,36 @@ bool CScriptGameObject::HasUpgrade(pcstr upgrade) const
         return false;
 
     return item->has_upgrade(upgrade);
+}
+
+bool CScriptGameObject::HasUpgradeGroup(pcstr upgrade_group) const
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member HasUpgradeGroup!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade_group))
+        return false;
+
+    return item->has_upgrade_group(upgrade_group);
+}
+
+bool CScriptGameObject::HasUpgradeGroupByUpgradeId(pcstr upgrade) const
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member HasUpgradeGroupByUpgradeId!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return false;
+
+    return item->has_upgrade_group_by_upgrade_id(upgrade);
 }
 
 void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
