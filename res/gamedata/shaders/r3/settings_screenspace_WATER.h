@@ -14,7 +14,7 @@
 
 #define G_SSR_WATER_FOG_MAXDEPTH		2.0f	// Maximum visibility underwater.
 
-#define G_SSR_WATER_RAIN				0.4f	// Max intensity of rain drops
+#define G_SSR_WATER_RAIN				1.25f	// Intensity of rain ripples
 
 #define G_SSR_WATER_SPECULAR			6.0f	// Sun/Moon specular intensity
 #define G_SSR_WATER_SPECULAR_NORMAL		0.2f	// Specular normal intensity. ( You may need to adjust this if you change the value of G_SSR_WATER_WAVES )

@@ -7,7 +7,7 @@
 #define G_SSR_INTENSITY					1.3f	// Global reflection intensity ( 1.0f = 100% ~ 0.0f = 0% )
 #define G_SSR_MAX_INTENSITY				0.5f	// Global reflection MAX intensity.
 #define G_SSR_SKY_INTENSITY				0.6f	// Sky reflection intensity ( 1.0f = 100% ~ 0.0f = 0% )
-#define G_SSR_FLORA_INTENSITY 			0.5f	// Adjust grass and tree branches intensity
+#define G_SSR_FLORA_INTENSITY 			0.2f	// Adjust grass and tree branches intensity
 #define G_SSR_TERRAIN_BUMP_INTENSITY	0.6f	// Terrain bump intensity ( Lower values will generate cleaner reflections )
 
 #define G_SSR_WEAPON_INTENSITY  		0.5f	// Weapons & arms reflection intensity. ( 1.0f = 100% ~ 0.0f = 0% )

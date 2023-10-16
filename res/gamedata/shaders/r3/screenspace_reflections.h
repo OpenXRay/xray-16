@@ -1,13 +1,15 @@
 /**
- * @ Version: SCREEN SPACE SHADERS - UPDATE 14.3
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 18
  * @ Description: SSR implementation
- * @ Modified time: 2023-01-29 08:40
+ * @ Modified time: 2023-09-29 06:42
  * @ Author: https://www.moddb.com/members/ascii1457
  * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
  */
 
 #include "screenspace_common.h"
 #include "settings_screenspace_SSR.h"
+
+uniform float4 ssfx_is_underground;
 
 static const int2 q_ssr_steps[6] =
 {
@@ -161,9 +163,9 @@ void SSFX_ScreenSpaceReflections(float2 tc, float4 P, float3 N, float gloss, ino
 
 	// Sky is the reflection base...
 #ifdef G_SSR_CHEAP_SKYBOX
-	reflection = SSFX_calc_env(v2reflect) * G_SSR_SKY_INTENSITY;
+	reflection = SSFX_calc_env(v2reflect) * G_SSR_SKY_INTENSITY * !ssfx_is_underground.x;
 #else
-	reflection = SSFX_calc_sky(v2reflect) * G_SSR_SKY_INTENSITY;
+	reflection = SSFX_calc_sky(v2reflect) * G_SSR_SKY_INTENSITY * !ssfx_is_underground.x;
 #endif
 
 	// Valid UV coor? SSFX_trace_ssr_ray return 0.0f if uv is out of bounds or sky.
