@@ -93,7 +93,16 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 	float4   L = s_accumulator.Load( int3( I.tc0 * screen_res.xy, 0 ), ISAMPLE );
 #endif
 
-     // static sun
+#ifndef SSFX_NEWGLOSS
+	if (abs(P.w - MAT_FLORA) <= 0.05) {
+		// Reapply distance factor to fix overtly glossy plants in distance
+		// Unfortunately some trees etc don't seem to use the same detail shader
+		float	fAtten = 1 - smoothstep(0, 50, P.z);
+		D.a	*= (fAtten * fAtten);
+	}
+#endif
+
+	// static sun
 	float mtl = P.w;
 
 #ifdef USE_R2_STATIC_SUN
@@ -145,7 +154,7 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 	
 	// hemisphere
 	float3 hdiffuse, hspecular;
-	hmodel	(hdiffuse, hspecular, mtl, N.w, D.xyz, D.w, P.xyz, N.xyz);
+	hmodel	(hdiffuse, hspecular, mtl, N.w, D, P.xyz, N.xyz);
 
 	// AO implementation
 #ifdef SSFX_AO
@@ -154,11 +163,6 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 	hdiffuse *= occ;	
 #endif
 	//hspecular *= occ;
-
-	// Disable specular if SSR is enabled. ( Temporary fix? )
-#ifdef SSFX_SSR
-	hspecular = 0;
-#endif
 
 		float3       color     = L.rgb + hdiffuse.rgb;
 					 color = LinearTosRGB(color); 			//gamma correct
