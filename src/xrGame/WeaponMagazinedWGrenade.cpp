@@ -790,7 +790,7 @@ void CWeaponMagazinedWGrenade::load(IReader& input_packet)
     if (b != m_bGrenadeMode)
         SwitchMode();
 
-    u32 sz = 0;
+    size_t sz = 0;
     load_data(sz, input_packet);
 
     CCartridge l_cartridge;
