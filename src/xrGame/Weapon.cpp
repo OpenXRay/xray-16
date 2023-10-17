@@ -110,9 +110,6 @@ CWeapon::CWeapon()
     m_activation_speed_is_overriden = false;
     m_cur_scope = 0;
     m_bRememberActorNVisnStatus = false;
-
-    if (m_bLightShotEnabled)
-        Light_Create();
 }
 
 CWeapon::~CWeapon()
@@ -581,6 +578,9 @@ bool CWeapon::net_Spawn(CSE_Abstract* DC)
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
     m_bAmmoWasSpawned = false;
+
+    if (m_bLightShotEnabled)
+        Light_Create();
 
     return bResult;
 }
