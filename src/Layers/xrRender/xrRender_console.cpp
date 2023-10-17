@@ -246,7 +246,16 @@ extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
+extern ENGINE_API float ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
+extern ENGINE_API int ps_ssfx_is_underground;
+extern ENGINE_API int ps_ssfx_gloss_method;
+extern ENGINE_API float ps_ssfx_gloss_factor;
+extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
+extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
 
 //  x - min (0), y - focus (1.4), z - max (100)
 Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
@@ -1117,6 +1126,16 @@ void xrRender_initconsole()
     CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4{}, Fvector4({ 5.f, 20.f, 1.f, 5.f }));
     CMD4(CCC_Vector4, "ssfx_wpn_dof_1", &ps_ssfx_wpn_dof_1, tw2_min, tw2_max);
     CMD4(CCC_Vector4, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, tw2_min, tw2_max);
+
+    CMD4(CCC_Vector4, "ssfx_florafixes_1", &ps_ssfx_florafixes_1, Fvector4().set(0.0, 0.0, 0.0, 0.0), Fvector4().set(1.0, 1.0, 1.0, 1.0));
+    CMD4(CCC_Vector4, "ssfx_florafixes_2", &ps_ssfx_florafixes_2, Fvector4().set(0.0, 0.0, 0.0, 0.0), Fvector4().set(10.0, 1.0, 1.0, 1.0));
+    CMD4(CCC_Vector4, "ssfx_wetsurfaces_1", &ps_ssfx_wetsurfaces_1, Fvector4().set(0.01, 0.01, 0.01, 0.01), Fvector4().set(2.0, 2.0, 2.0, 2.0));
+    CMD4(CCC_Vector4, "ssfx_wetsurfaces_2", &ps_ssfx_wetsurfaces_2, Fvector4().set(0.01, 0.01, 0.01, 0.01), Fvector4().set(2.0, 2.0, 2.0, 2.0));
+    CMD4(CCC_Integer, "ssfx_is_underground", &ps_ssfx_is_underground, 0, 1);
+    CMD4(CCC_Integer, "ssfx_gloss_method", &ps_ssfx_gloss_method, 0, 1);
+    CMD4(CCC_Vector3, "ssfx_gloss_minmax", &ps_ssfx_gloss_minmax, Fvector3().set(0, 0, 0), Fvector3().set(1.0, 1.0, 1.0));
+    CMD4(CCC_Float, "ssfx_gloss_factor", &ps_ssfx_gloss_factor, 0.0f, 1.0f);
+    CMD4(CCC_Vector4, "ssfx_lightsetup_1", &ps_ssfx_lightsetup_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(1.0, 1.0, 1.0, 1.0));
 
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);

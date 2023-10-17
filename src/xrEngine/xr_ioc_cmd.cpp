@@ -608,7 +608,16 @@ ENGINE_API Fvector4 ps_ssfx_grass_interactive = { 1.0f, 8.f, 2000.0f, 1.0f };
 ENGINE_API Fvector4 ps_ssfx_int_grass_params_1 = { 1.0f, 1.0f, 1.0f, 25.0f };
 ENGINE_API Fvector4 ps_ssfx_int_grass_params_2 = { 1.0f, 5.0f, 1.0f, 1.0f };
 ENGINE_API Fvector4 ps_ssfx_wpn_dof_1 = { .0f, .0f, .0f, .0f };
-ENGINE_API Fvector4 ps_ssfx_wpn_dof_2 = { 0.15f, .0f, .0f, .0f };
+ENGINE_API float ps_ssfx_wpn_dof_2 = 1.0f;
+ENGINE_API Fvector4 ps_ssfx_florafixes_1 = { 0.3f, 0.21f, 0.3f, 0.21f }; // Flora fixes 1
+ENGINE_API Fvector4 ps_ssfx_florafixes_2 = { 2.0f, 1.0f, 0.0f, 0.0f }; // Flora fixes 2
+ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1 = { 1.0f, 1.0f, 1.0f, 1.0f }; // Wet surfaces 1
+ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2 = { 1.0f, 1.0f, 1.0f, 1.0f }; // Wet surfaces 2
+ENGINE_API int ps_ssfx_is_underground = 0;
+ENGINE_API int ps_ssfx_gloss_method = 0;
+ENGINE_API float ps_ssfx_gloss_factor = 0.5f;
+ENGINE_API Fvector3 ps_ssfx_gloss_minmax = { 0.0f,0.92f,0.0f }; // Gloss
+ENGINE_API Fvector4 ps_ssfx_lightsetup_1 = { 0.35f, 0.5f, 0.0f, 0.0f }; // Spec intensity
 
 class CCC_renderer : public CCC_Token
 {
