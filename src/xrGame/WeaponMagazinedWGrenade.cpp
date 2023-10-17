@@ -779,7 +779,7 @@ void CWeaponMagazinedWGrenade::save(NET_Packet& output_packet)
 {
     inherited::save(output_packet);
     save_data(m_bGrenadeMode, output_packet);
-    save_data(m_magazine2.size(), output_packet);
+    save_data(static_cast<u32>(m_magazine2.size()), output_packet);
 }
 
 void CWeaponMagazinedWGrenade::load(IReader& input_packet)
@@ -790,7 +790,7 @@ void CWeaponMagazinedWGrenade::load(IReader& input_packet)
     if (b != m_bGrenadeMode)
         SwitchMode();
 
-    size_t sz = 0;
+    u32 sz = 0;
     load_data(sz, input_packet);
 
     CCartridge l_cartridge;
