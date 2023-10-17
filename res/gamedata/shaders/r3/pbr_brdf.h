@@ -14,7 +14,6 @@
 uniform float4 ssfx_lightsetup_1; // Spec intensity
 
 //Metalness
-//
 float calc_metalness(float4 alb_gloss, float material_ID)
 {
 	//material ID experiment
@@ -127,7 +126,8 @@ void calc_rain(inout float3 albedo, inout float3 specular, inout float rough, in
 	//rain based on Remember Me's implementation
 	//float wetness = saturate(rain_params.x*rainmask);
 	// yohji - edited to clamp rain_density between 0-0.5, to prevent weird shading with high rain_density
-	float wetness = saturate(smoothstep(0.1,0.9,clamp(rain_params.x, 0.0, 0.5)*rainmask));
+	//float wetness = saturate(smoothstep(0.1,0.9,clamp(rain_params.x, 0.0, 0.5)*rainmask));
+	float wetness = saturate(smoothstep(0.1,0.9,rain_params.x*rainmask));
 
 	float porosity = 1-saturate(material_ID*1.425); //metal material at 0, concrete at 1
 	//porosity = saturate((porosity-0.5)/0.4); //Remember Me rain porosity
@@ -221,25 +221,27 @@ float3 Lit_Specular(float nDotL, float nDotH, float nDotV, float vDotH, float3 f
 
 float3 Lit_BRDF(float rough, float3 albedo, float3 f0, float3 V, float3 N, float3 L )
 {
-	float3 H = normalize(V + L );
+	// SPECULAR ADJUSTMENTS - SSS Update 18
+	// Color, intensity and some minor adjustments.
+	// https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders/
+	
+	float3 H = normalize(V + L);
+	
+	float DotNV = dot(N, V);
 	
 	float nDotL = saturate(dot(N, L));
 	float nDotH = saturate(dot(N, H));
-	//float nDotV = saturate(dot(N, V));
-	//float nDotV = 1e-5 + abs(dot(N, V)); //DICE
-	float nDotV = max(1e-5, dot(N, V));
+	float nDotV = max(1e-5, DotNV);
 	float vDotH = saturate(dot(V, H));
 	
 	float3 diffuse_term = Lit_Diffuse(nDotL, nDotV, vDotH, rough).rrr;
 	diffuse_term *= albedo;
-
-#ifdef AFX_GGX_BRDF
-	float3 specular_term = GGXSmith_BRDF(nDotL, nDotV, nDotH, vDotH, f0, rough);
-#else
+	
+	// Specular
 	float3 specular_term = Lit_Specular(nDotL, nDotH, nDotV, vDotH, f0, rough);
 	
 	// Horizon falloff
-	float horizon = saturate(dot(N, V) * 2.0f);
+	float horizon = saturate(DotNV * 2.0f);
 	specular_term *= horizon * horizon;
 	
 	// Specular color
@@ -247,8 +249,6 @@ float3 Lit_BRDF(float rough, float3 albedo, float3 f0, float3 V, float3 N, float
 	specular_term *= 1.0f - ((light.r + light.g + light.b) / 3.0) * (1.0f - ssfx_lightsetup_1.x);
 	specular_term *= lerp(1.0f, Ldynamic_color.rgb, ssfx_lightsetup_1.y);
 
-#endif
-	
 	return (diffuse_term + specular_term) *  nDotL * PI;
 }
 
@@ -284,12 +284,13 @@ float3 Amb_Specular(float3 f0, float rough, float nDotV)
 
 float3 Amb_BRDF(float rough, float3 albedo, float3 f0, float3 env_d, float3 env_s, float3 V, float3 N)
 {
-	//float nDotV = saturate(dot(N, V));
+	float DotNV = dot(N, V);
 	//float nDotV = 1e-5 + abs(dot(N, V)); //DICE
-	float nDotV = max(1e-5, dot(N, V));
+	float nDotV = max(1e-5, DotNV);
 	 
 	float3 diffuse_term = Amb_Diffuse(f0, rough, nDotV);
 	diffuse_term *= env_d * albedo;
+	
 	
 	float3 specular_term = Amb_Specular(f0, rough, nDotV);
 	specular_term *= env_s;
@@ -297,7 +298,7 @@ float3 Amb_BRDF(float rough, float3 albedo, float3 f0, float3 env_d, float3 env_
 	// horizon occlusion with falloff, should be computed for direct specular too
 	//float R = reflect(V, N);
 	//float horizon = saturate(1.0 + dot(R, N)); //needs vertex normals
-	float horizon = saturate(2.0 * dot(N, V));
+	float horizon = saturate(DotNV * 2.0f); // 0.95
 	horizon *= horizon;
 
 	specular_term *= horizon; //horizon atten
