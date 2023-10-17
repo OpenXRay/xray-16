@@ -17,7 +17,7 @@ class CUICellItem;
 
 extern const char* const fieldsCaptionColor;
 
-class CUIItemInfo : public CUIWindow
+class CUIItemInfo final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -32,7 +32,10 @@ private:
 
 public:
     CUIItemInfo();
-    virtual ~CUIItemInfo();
+    ~CUIItemInfo() override;
+
+    pcstr GetDebugType() override { return "CUIItemInfo"; }
+
     CInventoryItem* CurrentItem() const { return m_pInvItem; }
     void InitItemInfo(Fvector2 pos, Fvector2 size, LPCSTR xml_name);
     bool InitItemInfo(cpcstr xml_name);

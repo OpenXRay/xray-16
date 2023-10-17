@@ -128,7 +128,7 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
         // Create common node
         // NOTE: Invisible elements exist only in R1
         matrixItems.emplace_back(_MatrixItem{ SSA, root, pVisual, xform });
-        
+
         // Need to sort for HZB efficient use
         if (SSA > matrixItems.ssa)
         {
@@ -711,7 +711,7 @@ void R_dsgraph_structure::build_subspace()
     if (o.is_main_pass && (o.sector_id == IRender_Sector::INVALID_SECTOR_ID))
     {
         if (g_pGameLevel)
-            g_hud->Render_Last(context_id);
+            g_pGameLevel->pHUD->Render_Last(context_id);
         return;
     }
 
@@ -730,12 +730,13 @@ void R_dsgraph_structure::build_subspace()
         {
             CSector* sector = PortalTraverser.r_sectors[s_it];
             dxRender_Visual* root = sector->root();
-            VERIFY(root->getType() == MT_HIERRARHY);
+            //VERIFY(root->getType() == MT_HIERRARHY);
 
             const auto &children = static_cast<FHierrarhyVisual*>(root)->children;
 
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
+#if 0
                 const auto traverse_children = [&, this](const TaskRange<size_t>& range)
                 {
                     for (size_t id = range.cbegin(); id != range.cend(); ++id)
@@ -745,16 +746,18 @@ void R_dsgraph_structure::build_subspace()
                     }
                 };
 
-#if 0
                 if (o.mt_calculate) // NOTE: this code doesn't work until visuals maps are separated by worker ID.
                 {
                     static_geo_tasks[s_it] = &xr_parallel_for(TaskRange<size_t>(0, children.size()), false, traverse_children);
                 }
                 else
-#endif
                 {
                     traverse_children(TaskRange<size_t>(0, children.size()));
                 }
+#else
+                const auto& view = sector->r_frustums[v_it];
+                add_static(root, view, view.getMask());
+#endif
             }
         }
     }
@@ -911,14 +914,14 @@ void R_dsgraph_structure::build_subspace()
                             continue;
 
                         // renderable
-                        g_hud->Render_First(context_id);
+                        g_pGameLevel->pHUD->Render_First(context_id);
                     }
                 } while (0);
             }
 #endif
 
             if (o.is_main_pass)
-                g_hud->Render_Last(context_id);
+                g_pGameLevel->pHUD->Render_Last(context_id);
         }
     }
 

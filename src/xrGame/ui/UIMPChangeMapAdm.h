@@ -26,4 +26,6 @@ public:
     void OnBtnOk();
     void OnItemSelect();
     void FillUpList();
+
+    pcstr GetDebugType() override { return "CUIMpChangeMapAdm"; }
 };

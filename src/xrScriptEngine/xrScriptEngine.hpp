@@ -39,3 +39,5 @@ extern "C" {
 #      define XRSCRIPTENGINE_API XR_IMPORT
 #   endif
 #endif
+
+XRSCRIPTENGINE_API size_t luabind_it_distance(luabind::iterator first, const luabind::iterator& last);

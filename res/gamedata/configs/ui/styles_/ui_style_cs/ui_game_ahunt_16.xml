@@ -1,0 +1,46 @@
+<w>
+	<fraglimit x="263" y="0" width="498" height="4" stretch="1">
+		<text y="3" align="c" font="graffiti22" r="238" g="155" b="23" a="255"/>
+		<texture>ui_hud_teamF_line</texture>
+	</fraglimit>
+
+	<reinforcement x="497" y="3" width="33" height="70" text="1"  sector_count="30" clockwise="0">
+		<back x="0" y="0" width="30" height="70" stretch="1">
+			<texture>ui_hud_teamF_counter</texture>
+		</back>
+		<front x="2" y="34" width="28" height="33" stretch="1">
+			<texture>ui_hud_teamF_counterC</texture>
+			<text font="letterica18" r="200" g="200" b="200" align="c" vert_align="c" complex_mode="0"/>
+		</front>
+	</reinforcement>
+
+	<team1_icon x="230" y="0" width="33" height="43" stretch="1">
+		<texture>ui_hud_teamF_leftS</texture>
+		<auto_static x="4" y="8" width="28" height="32" stretch="1">
+			<texture>freedom_icon</texture>
+		</auto_static>
+	</team1_icon>
+
+	<team2_icon x="755" y="0" width="33" height="43" stretch="1">
+		<texture>ui_hud_teamF_rightS</texture>
+		<auto_static x="2" y="8" width="28" height="32" stretch="1">
+			<texture>merc_icon</texture>
+		</auto_static>
+	</team2_icon>
+	
+	<team1_score x="272" y="11" width="215" height="30" stretch="1">
+		<text align="r" vert_align="c" font="graffiti50" r="0" g="255" b="0" a="255"/>
+
+		<auto_static x="0" y="0" width="165" height="30" stretch="1">
+			<text align="c" vert_align="c" font="graffiti32" r="0" g="255" b="0" a="255">ui_st_team1_name</text>
+		</auto_static>
+	</team1_score>
+
+	<team2_score x="537" y="11" width="215" height="30" stretch="1">
+		<text align="l" vert_align="c" font="graffiti50" r="0" g="0" b="255" a="255"/>
+
+		<auto_static x="50" y="0" width="165" height="30" stretch="1">
+			<text align="c" vert_align="c" font="graffiti32" r="0" g="0" b="255" a="255">ui_st_team2_name</text>
+		</auto_static>
+	</team2_score>
+</w>

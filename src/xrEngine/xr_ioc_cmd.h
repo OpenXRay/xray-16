@@ -189,13 +189,25 @@ public:
     }
     virtual void Info(TInfo& I)
     {
+        auto available_size = (std::intptr_t)std::size(I) - 1;
+
         I[0] = 0;
         const xr_token* tok = GetToken();
         while (tok->name)
         {
             if (I[0])
                 xr_strcat(I, "/");
+
+            const auto name_size = (std::intptr_t)xr_strlen(tok->name);
+            if (name_size > available_size)
+            {
+                if (available_size >= 3)
+                    xr_strcat(I, "...");
+                break; // don't just crash there, come in
+            }
+
             xr_strcat(I, tok->name);
+            available_size -= name_size;
             tok++;
         }
     }

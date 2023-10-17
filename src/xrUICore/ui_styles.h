@@ -11,6 +11,11 @@ public:
     void SetupStyle(u32 styleID);
     void Reset();
 
+    bool SetStyle(pcstr name, bool reloadUI);
+
+    [[nodiscard]]
+    pcstr GetCurrentStyleName() const;
+
     [[nodiscard]]
     auto GetCurrentStyleId() const
     {

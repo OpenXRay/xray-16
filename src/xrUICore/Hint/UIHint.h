@@ -15,14 +15,13 @@ class CUITextWnd;
 class CUIFrameWindow;
 class CUIXml;
 
-class XRUICORE_API UIHint : public CUIWindow
+class XRUICORE_API UIHint final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
 
 public:
     UIHint();
-    virtual ~UIHint(){};
 
     IC void set_visible(bool status = true) { m_visible = status; }
     IC bool is_visible() const { return m_visible; }
@@ -35,6 +34,8 @@ public:
 
     //	virtual void	Update		();
     virtual void Draw();
+
+    pcstr GetDebugType() override { return "UIHint"; }
 
 protected:
     CUIFrameWindow* m_background;
@@ -53,7 +54,6 @@ class XRUICORE_API UIHintWindow : public CUIWindow
 
 public:
     UIHintWindow();
-    virtual ~UIHintWindow(){};
 
     virtual void Update();
     virtual void OnFocusReceive();
@@ -68,6 +68,8 @@ public:
     void set_hint_text(shared_str const& text);
     void set_hint_text_ST(shared_str const& text);
     void update_hint_text();
+
+    pcstr GetDebugType() override { return "UIHintWindow"; }
 
 private:
     UIHint* m_hint_wnd;

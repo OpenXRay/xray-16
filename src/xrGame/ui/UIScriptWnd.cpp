@@ -3,7 +3,7 @@
 #include "Common/object_broker.h"
 #include "xrUICore/Callbacks/callback_info.h"
 
-CUIDialogWndEx::CUIDialogWndEx() {}
+CUIDialogWndEx::CUIDialogWndEx() : CUIDialogWnd("CUIDialogWndEx") {}
 CUIDialogWndEx::~CUIDialogWndEx() { delete_data(m_callbacks); }
 void CUIDialogWndEx::Register(CUIWindow* pChild) { pChild->SetMessageTarget(this); }
 void CUIDialogWndEx::Register(CUIWindow* pChild, LPCSTR name)
@@ -46,4 +46,5 @@ bool CUIDialogWndEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
+
 void CUIDialogWndEx::Update() { inherited::Update(); }

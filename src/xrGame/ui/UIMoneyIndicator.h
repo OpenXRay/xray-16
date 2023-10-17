@@ -6,7 +6,7 @@
 class CUIXml;
 class CUIGameLog;
 
-class CUIMoneyIndicator : public CUIWindow
+class CUIMoneyIndicator final : public CUIWindow
 {
 public:
     CUIMoneyIndicator();
@@ -16,6 +16,7 @@ public:
     void SetMoneyAmount(LPCSTR money);
     void SetMoneyChange(LPCSTR money);
     void AddBonusMoney(KillMessageStruct& msg);
+    pcstr GetDebugType() override { return "CUIMoneyIndicator"; }
 
 protected:
     CUIStatic m_back;

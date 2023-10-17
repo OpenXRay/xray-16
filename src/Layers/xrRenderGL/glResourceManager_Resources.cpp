@@ -53,7 +53,7 @@ SDeclaration* CResourceManager::_CreateDecl(u32 FVF)
     return D;
 }
 
-SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
+SDeclaration* CResourceManager::_CreateDecl(const D3DVERTEXELEMENT9* dcl)
 {
     // Search equal code
     for (SDeclaration* D : v_declarations)
@@ -239,7 +239,7 @@ SCS* CResourceManager::_CreateCS(LPCSTR Name) { return CreateShader<SCS>(Name); 
 void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 
 //--------------------------------------------------------------------------------------------------------------
-SGeometry* CResourceManager::CreateGeom(VertexElement* decl, GLuint vb, GLuint ib)
+SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, GLuint vb, GLuint ib)
 {
     R_ASSERT(decl && vb);
 

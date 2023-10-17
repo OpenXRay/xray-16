@@ -110,7 +110,6 @@ void CBlender_Vertex_aref::CompileFFP(CBlender_Compile& C) const
             C.PassEnd();
             break;
         }
-
         case SE_R1_LMODELS:
         {
             // Lighting only

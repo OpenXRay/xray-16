@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<window>
+
+
+	<list x="20" y="87" width="420" height="370" item_height = "18">
+		<font font="letterica18" r="255" g="255" b="255"></font>
+	</list>
+	<article_header_static x="22" y="48" width="430" height="22">
+		<text font="letterica25" r="225" g="225" b="250">st_pda_player_statistic</text>
+	</article_header_static>
+	<mask_frame_window x="0" y="0" width="1" height="1">
+		<texture>ui_pda_frame2</texture>		
+	</mask_frame_window>
+	
+		
+	<main_wnd x="110" y="90" width="761" height="455"/>
+
+	<character_info x="26" y="58" width="236" height="120"/>
+
+	<master_list x="15" y="200" width="280" height="262" always_show_scroll="0" can_select="1" scroll_profile="pda"/>
+
+	<detail_list x="20" y="80" width="423" height="380" always_show_scroll="0" scroll_profile="pda"/>
+
+	<info_frame_window x="313" y="0" width="448" height="475" a="80">
+		<texture>ui_pda_frame_sub</texture>		
+	</info_frame_window>
+
+	<info_frame_line x="8" y="17" width="434" height="21">
+		<title x="10" y="1" width="435" height="18">
+			<text font="letterica16">st_pda_detail_info</text>
+		</title>
+		<texture>ui_string_03</texture>		
+	</info_frame_line>
+
+	<chicon_frame_window x="0" y="0" width="298" height="475" a="80">
+		<texture>ui_pda_frame_sub</texture>		
+	</chicon_frame_window>
+
+	<chicon_frame_line x="8" y="16" width="284" height="27">
+        <title x="15" y="1" width="250" height="27">
+            <text font="letterica25" r="225" g="225" b="250"/>
+        </title>
+		<texture>ui_string_02</texture>		
+	</chicon_frame_line>
+	
+	<a_static x="250" y="-3" width="32" height="32"	frames="16" duration="1000" columns="8" frame_width="32" frame_height="32" cyclic="1" autoplay="1">
+		<texture>ui\ui_pda_anims_03</texture>
+	</a_static>
+
+   
+	<right_auto_static x="8" y="52" width="4" height="420">
+		<texture>ui\ui_pda_vertical_line_r_l</texture>
+	</right_auto_static>
+	<right_auto_static x="269" y="52" width="4" height="420">
+		<texture>ui\ui_pda_vertical_line_r_r</texture>
+	</right_auto_static>
+	<right_auto_static x="8" y="48" width="262" height="2" stretch="1">
+		<texture>ui\ui_pda_horizontal_line</texture>
+	</right_auto_static>
+	<right_auto_static x="14" y="189" width="249" height="2" stretch="1">
+		<texture>ui\ui_pda_horizontal_line</texture>
+	</right_auto_static>
+
+	<left_auto_static x="8" y="41" width="4" height="430">
+		<texture>ui\ui_pda_vertical_line_l_l</texture>
+	</left_auto_static>
+	<left_auto_static x="416" y="82" width="4" height="388">
+		<texture>ui\ui_pda_vertical_line_l_r</texture>
+	</left_auto_static>
+	<left_auto_static x="14" y="78" width="405" height="2" stretch="1">
+		<texture>ui\ui_pda_horizontal_line</texture>
+	</left_auto_static>
+
+	<actor_stats_wnd>
+		<master_part_foo x="0" y="0" width="250" height="55">
+			<text_1 x="0" y="20" width="200" height="20">
+				<text align="l" x="0" y="0" font="letterica25" r="230" g="230" b="200" a="230">st_pda_statistic_score</text>
+			</text_1>
+			<text_2 x="0" y="0" width="0" height="0"/>
+		</master_part_foo>
+
+    <master_part_stalkerkills x="0" y="0" width="250" height="25">
+			<text_1 x="0" y="0" width="200" height="20" highlight_text="1" hA="255" hR="255" hB="255" hG="255">
+				<text align="l" x="0" y="0" font="letterica18" r="170" g="170" b="170" a="160">st_pda_stalker_kills</text>
+			</text_1>
+			<text_2 x="210" y="0" width="25" height="20">
+				<text align="r" x="0" y="0" font="letterica18" a="200"/>
+			</text_2>
+			<auto>
+				<auto_static x="0" y="20" width="250" height="3" stretch="1">
+					<texture>ui\ui_pda_horizontal_line</texture>
+				</auto_static>
+			</auto>
+		</master_part_stalkerkills>
+
+    <master_part_monsterkills x="0" y="0" width="250" height="25">
+			<text_1 x="0" y="0" width="200" height="20" highlight_text="1" hA="255" hR="255" hB="255" hG="255">
+				<text align="l" x="0" y="0" font="letterica18" r="170" g="170" b="170" a="160">st_pda_monster_kills</text>
+			</text_1>
+			<text_2 x="210" y="0" width="25" height="20">
+				<text align="r" x="0" y="0" font="letterica18" a="200"/>
+			</text_2>
+			<auto>
+				<auto_static x="0" y="20" width="250" height="3" stretch="1">
+					<texture>ui\ui_pda_horizontal_line</texture>
+				</auto_static>
+			</auto>
+		</master_part_monsterkills>
+
+    <master_part_quests x="0" y="0" width="250" height="25">
+			<text_1 x="0" y="0" width="200" height="20" highlight_text="1" hA="255" hR="255" hB="255" hG="255">
+				<text align="l" x="0" y="0" font="letterica18" r="170" g="170" b="170" a="160">st_pda_quest_complete</text>
+			</text_1>
+			<text_2 x="210" y="0" width="25" height="20">
+				<text align="r" x="0" y="0" font="letterica18" a="200"/>
+			</text_2>
+			<auto>
+				<auto_static x="0" y="20" width="250" height="3" stretch="1">
+					<texture>ui\ui_pda_horizontal_line</texture>
+				</auto_static>
+			</auto>
+		</master_part_quests>
+    
+		<master_part_total x="0" y="0" width="250" height="45">
+			<text_1 x="0" y="20" width="200" height="20">
+				<text align="l" x="0" y="0" font="letterica18" r="180" g="180" b="180" a="230">st_pda_total</text>
+			</text_1>
+			<text_2 x="210" y="20" width="25" height="20">
+				<text align="r" x="0" y="0" font="letterica18" a="200"/>
+			</text_2>
+		</master_part_total>
+
+		<detail_part_def x="0" y="0" width="390" height="25">
+			<text_0 x="0" y="0" width="20" height="20">
+				<text align="l" x="0" y="0" font="letterica18" a="200"/>
+			</text_0>
+			<text_1 x="30" y="0" width="270" height="20" complex_mode="1">
+				<text align="l" x="0" y="0" font="letterica18" a="200"/>
+			</text_1>
+			<text_2 x="290" y="0" width="30" height="20">
+				<text align="r" x="0" y="0" font="letterica16" a="200"/>
+			</text_2>
+			<text_3 x="330" y="0" width="60" height="20">
+				<text align="r" x="0" y="0" font="letterica18" a="200"/>
+			</text_3>
+			<auto>
+				<auto_static x="0" y="0" width="390" height="3" stretch="1">
+					<texture>ui\ui_pda_horizontal_line</texture>
+				</auto_static>
+			</auto>
+		</detail_part_def>
+
+	</actor_stats_wnd>
+
+	
+</window>
+

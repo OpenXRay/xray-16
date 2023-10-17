@@ -44,10 +44,12 @@ static int facetable[6][4] =
 
 void render_rain::init()
 {
-    o.active = ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF);
-    o.active &= (!Device.vCameraPositionSaved.similar(Device.vCameraPosition, EPS_L) ||
-        !Device.vCameraDirectionSaved.similar(Device.vCameraDirection, EPS_L) ||
-        RainLight.frame_render == 0);
+    rain_factor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
+
+    o.active  = ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF);
+    o.active &= rain_factor >= EPS_L;
+    o.active &= !Device.vCameraPositionSaved.similar(Device.vCameraPosition, EPS_L) ||
+        !Device.vCameraDirectionSaved.similar(Device.vCameraDirection, EPS_L);
 
     if (!o.active)
         return;
@@ -63,13 +65,6 @@ void render_rain::init()
 //////////////////////////////////////////////////////////////////////////
 void render_rain::calculate()
 {
-    float fRainFactor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
-    if (fRainFactor < EPS_L)
-    {
-        RainLight.frame_render = 0;
-        return;
-    }
-
     // static const float	source_offset		= 40.f;
 
     static const float source_offset = 10000.f;
@@ -332,8 +327,17 @@ void render_rain::flush()
     cmd_list_imm.set_xform_project(Device.mProject);
 
     // Accumulate
-    RImplementation.Target->phase_rain(cmd_list_imm); // TODO: move into this class as well
-    RImplementation.Target->draw_rain(cmd_list_imm, RainLight);
+    if (rain_factor >= EPS_L)
+    {
+        PIX_EVENT_CTX(cmd_list_imm, RainApply);
 
-    RainLight.frame_render = Device.dwFrame;
+        cmd_list_imm.set_pass_targets(
+            RImplementation.Target->rt_Color, /*rt_Normal*/
+            nullptr,
+            nullptr,
+            RImplementation.Target->rt_MSAADepth
+        );
+        RImplementation.Target->draw_rain(cmd_list_imm, RainLight);
+        RainLight.frame_render = Device.dwFrame;
+    }
 }

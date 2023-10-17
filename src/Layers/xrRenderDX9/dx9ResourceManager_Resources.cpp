@@ -30,7 +30,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
 
 //--------------------------------------------------------------------------------------------------------------
 
-SDeclaration* CResourceManager::_CreateDecl(VertexElement* dcl)
+SDeclaration* CResourceManager::_CreateDecl(const VertexElement* dcl)
 {
     // Search equal code
     for (SDeclaration* D : v_declarations)
@@ -83,7 +83,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, n
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
 //--------------------------------------------------------------------------------------------------------------
-SGeometry* CResourceManager::CreateGeom(VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib)
+SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib)
 {
     R_ASSERT(decl && vb);
 

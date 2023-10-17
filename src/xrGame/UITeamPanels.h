@@ -8,7 +8,7 @@
 
 class UITeamState;
 
-class UITeamPanels : public CUIWindow
+class UITeamPanels final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -27,7 +27,8 @@ private:
 
 public:
     UITeamPanels();
-    virtual ~UITeamPanels();
+    ~UITeamPanels() override;
+
     virtual void Update();
 
     void Init(LPCSTR xmlName, LPCSTR panelsRootNode);
@@ -39,6 +40,8 @@ public:
     void NeedUpdatePanels();
 
     void SetArtefactsCount(s32 greenTeamArtC, s32 blueTeamArtC);
+
+    pcstr GetDebugType() override { return "UITeamPanels"; }
 };
 
 #endif

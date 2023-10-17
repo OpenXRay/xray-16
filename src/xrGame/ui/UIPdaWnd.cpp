@@ -37,7 +37,7 @@ u32 g_pda_info_state = 0;
 void RearrangeTabButtons(CUITabControl* pTab);
 CDialogHolder* CurrentDialogHolder();
 
-CUIPdaWnd::CUIPdaWnd()
+CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
 {
     pUIMapWnd = nullptr;
     pUITaskWnd = nullptr;
@@ -145,7 +145,10 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     {
         if (pWnd == UITabControl)
         {
-            SetActiveSubdialog(UITabControl->GetActiveId());
+            const auto& id = UITabControl->GetActiveId();
+            SetActiveSubdialog(id);
+            if (pInput->IsCurrentInputTypeController())
+                UI().GetUICursor().WarpToWindow(UITabControl->GetButtonById(id));
         }
         break;
     }
@@ -217,30 +220,23 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         m_pActiveDialog->Show(false);
     }
 
-    if (section == "eptMap" && pUIMapWnd)
+    const std::tuple<shared_str, CUIWindow*> availableWindowsList[] =
     {
-        m_pActiveDialog = pUIMapWnd;
-    }
-    else if (section == "eptTasks" && pUITaskWnd)
+        { "eptMap",         pUIMapWnd },
+        { "eptTasks",       pUITaskWnd },
+        { "eptFractionWar", pUIFactionWarWnd },
+        { "eptStatistics",  pUIActorInfo },
+        { "eptRanking",     pUIRankingWnd },
+        { "eptLogs",        pUILogsWnd },
+    };
+
+    for (const auto& [id, wnd] : availableWindowsList)
     {
-        m_pActiveDialog = pUITaskWnd;
-    }
-    else if (section == "eptFractionWar" && pUIFactionWarWnd)
-    {
-   		m_pActiveDialog = pUIFactionWarWnd;
-    }
-    else if (section == "eptStatistics" && pUIActorInfo)
-    {
-        m_pActiveDialog = pUIActorInfo;
-        InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
-    }
-    else if (section == "eptRanking" && pUIRankingWnd)
-    {
-        m_pActiveDialog = pUIRankingWnd;
-    }
-    else if (section == "eptLogs" && pUILogsWnd)
-    {
-        m_pActiveDialog = pUILogsWnd;
+        if (section == id && wnd)
+        {
+            m_pActiveDialog = wnd;
+            break;
+        }
     }
 
     luabind::functor<CUIDialogWndEx*> functor;
@@ -252,6 +248,11 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
             scriptWnd->SetHolder(CurrentDialogHolder());
             m_pActiveDialog = scriptWnd;
         }
+    }
+
+    if (m_pActiveDialog == pUIActorInfo && pUIActorInfo)
+    {
+        InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
     }
 
     R_ASSERT(m_pActiveDialog);
@@ -366,7 +367,7 @@ void CUIPdaWnd::Reset()
         pUIMapWnd->Reset();
     if (pUITaskWnd)
         pUITaskWnd->ResetAll();
-    if (pUIFactionWarWnd)	
+    if (pUIFactionWarWnd)
         pUIFactionWarWnd->ResetAll();
     if (pUIActorInfo)
         pUIActorInfo->ResetAll();
@@ -401,13 +402,30 @@ void RearrangeTabButtons(CUITabControl* pTab)
 
 bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (IsBinded(kACTIVE_JOBS, dik))
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
+    switch (GetBindedAction(dik, EKeyContext::UI))
     {
+    case kUI_TAB_PREV:
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+            UITabControl->SetNextActiveTab(false, true);
+        return true;
+
+    case kUI_TAB_NEXT:
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+            UITabControl->SetNextActiveTab(true, true);
+        return true;
+
+    hide_pda:
+    case kUI_BACK:
         if (WINDOW_KEY_PRESSED == keyboard_action)
             HideDialog();
-
         return true;
     }
 
-    return inherited::OnKeyboardAction(dik, keyboard_action);
+    if (IsBinded(kACTIVE_JOBS, dik))
+        goto hide_pda;
+
+    return false;
 }

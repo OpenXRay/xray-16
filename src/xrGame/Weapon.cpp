@@ -985,9 +985,11 @@ bool CWeapon::Action(u16 cmd, u32 flags)
             {
                 FireEnd();
             }
+            return true;
         };
+        return false;
     }
-        return true;
+
     case kWPN_NEXT: { return SwitchAmmoType(flags);
     }
 

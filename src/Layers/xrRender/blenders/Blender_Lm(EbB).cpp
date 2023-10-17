@@ -60,11 +60,10 @@ void CBlender_LmEbB::CompileFFP(CBlender_Compile& C) const
         compile_ED(C);
     else
     {
-        if (2 == C.iElement)
+        switch (C.iElement)
         {
-            compile_L(C);
-        }
-        else
+        case SE_R1_NORMAL_HQ:
+        case SE_R1_NORMAL_LQ:
         {
             switch (HW.Caps.raster.dwStages)
             {
@@ -75,8 +74,15 @@ void CBlender_LmEbB::CompileFFP(CBlender_Compile& C) const
             default:
                 compile_3(C);
                 break;
-            }
-        } // switch (HW.Caps.raster.dwStages)
+            } // switch (HW.Caps.raster.dwStages)
+            break;
+        }
+        case SE_R1_LMODELS:
+        {
+            compile_L(C);
+            break;
+        }
+        } // switch (C.iElement)
     }
 }
 

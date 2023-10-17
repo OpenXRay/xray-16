@@ -1,3 +1,14 @@
+openxray (1.6.02-13) experimental; urgency=medium
+
+  * Update debian build infrastructure
+  * Switch to quilt
+  * Update source format
+  * Add symbol file
+  * Make packages multi-arch compliant
+  * Explicit install files
+
+ -- Krzysztof Sobiecki <sobkas@sobkas.io>  Sat, 19 Aug 2023 01:54:15 +0200
+
 openxray (1.6.02-12-ubuntu1) disco; urgency=medium
 
   * move shlib to /usr/lib

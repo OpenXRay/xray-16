@@ -1,0 +1,247 @@
+<btn_tab_pistols x="0" y="43" width="57" height="106" accel="k1" horz_al="0" stretch="1">
+	<texture>ui_bm_equp_01</texture>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_tab_pistols>
+
+<btn_tab_primary x="0" y="148" width="57" height="106" accel="k2" horz_al="1" stretch="1">
+	<texture>ui_bm_equp_02</texture>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_tab_primary>
+<btn_tab_granades x="0" y="256"  width="57" height="106" accel="k3" horz_al="1" stretch="1">
+	<texture>ui_bm_equp_03</texture>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_tab_granades>
+<btn_tab_outfits x="0" y="360"  width="57" height="106" accel="k4" horz_al="1" stretch="1">
+	<texture>ui_bm_equp_04</texture>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_tab_outfits>
+
+<btn_tab_equipment x="0" y="468"  width="57" height="106" accel="k5" horz_al="1" stretch="1">
+	<texture>ui_bm_equp_05</texture>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_tab_equipment>
+
+
+<btn_bag_shotgun x="21" y="90" width="213" height="100" horz_al="0" accel="k1" stretch="1">
+  <window_name>sub_btn</window_name>
+  <idention over_x="133" normal_x="50" normal_y="12" over_y="12"/>
+  <texture>ui_btn_shotgun</texture>
+  <text x="-3" font="graffiti19" align="l">ui_inv_shotguns</text>
+  <text_color>
+    <e r="181" g="170" b="148"/>
+    <h r="255" g="187" b="51"/>
+    <t r="255" g="187" b="51"/>
+  </text_color>
+  <sound_h>weapons\gen_empty</sound_h>
+  <sound_t>weapons\generic_close</sound_t>
+  <hint x="23" y="3" width="24" height="29">
+    <text font="letterica25" align="c">1</text>
+    <text_color>
+      <e a="255" r="255" g="255" b="0"/>
+      <d a="255" r="87" g="87" b="72"/>
+      <h a="255" r="255" g="226" b="79"/>
+      <t a="0" r="0" g="0" b="0"/>
+    </text_color>
+  </hint>
+</btn_bag_shotgun>
+
+<btn_bag_assault x="21" y="200" width="213" height="100" horz_al="0" accel="k2" stretch="1">
+  <window_name>sub_btn</window_name>
+  <idention over_x="133" normal_x="50" normal_y="12" over_y="12"/>
+  <texture>ui_btn_assault</texture>
+  <text x="-3" font="graffiti19" align="l">ui_inv_rifles</text>
+  <text_color>
+    <e r="181" g="170" b="148"/>
+    <h r="255" g="187" b="51"/>
+    <t r="255" g="187" b="51"/>
+  </text_color>
+  <sound_h>weapons\gen_empty</sound_h>
+  <sound_t>weapons\generic_close</sound_t>
+  <hint x="23" y="3" width="24" height="29">
+    <text font="letterica25" align="c">2</text>
+    <text_color>
+      <e a="255" r="255" g="255" b="0"/>
+      <d a="255" r="87" g="87" b="72"/>
+      <h a="255" r="255" g="226" b="79"/>
+      <t a="0" r="0" g="0" b="0"/>
+    </text_color>
+  </hint>
+</btn_bag_assault>
+
+<btn_bag_sniper x="21" y="310" width="213" height="100" horz_al="0" accel="k3" stretch="1">
+	<window_name>sub_btn</window_name>
+  <idention over_x="133" normal_x="50" normal_y="12" over_y="12"/>
+  <texture>ui_btn_sniper</texture>
+  <text x="-3" font="graffiti19" align="l">ui_inv_sniper_rifles</text>
+  <text_color>
+    <e r="181" g="170" b="148"/>
+    <h r="255" g="187" b="51"/>
+    <t r="255" g="187" b="51"/>
+	</text_color>
+	<sound_h>weapons\gen_empty</sound_h>
+	<sound_t>weapons\generic_close</sound_t>
+	<hint x="23" y="3" width="24" height="29">
+		<text font="letterica25" align="c">3</text>
+		<text_color>
+			<e a="255" r="255" g="255" b="0"/>
+			<d a="255" r="87" g="87" b="72"/>					
+			<h a="255" r="255" g="226" b="79"/>
+			<t a="0" r="0" g="0" b="0"/>
+		</text_color>
+	</hint>
+</btn_bag_sniper>
+
+<btn_bag_heavy x="21" y="420" width="213" height="100" horz_al="0" accel="k4" stretch="1">
+	<window_name>sub_btn</window_name>
+  <idention over_x="133" normal_x="50" normal_y="12" over_y="12"/>
+  <texture>ui_btn_heavy</texture>
+  <text x="-3" font="graffiti19" align="l">ui_inv_heavy_weapons</text>
+  <text_color>
+    <e r="181" g="170" b="148"/>
+    <h r="255" g="187" b="51"/>
+    <t r="255" g="187" b="51"/>
+	</text_color>
+	<sound_h>weapons\gen_empty</sound_h>
+	<sound_t>weapons\generic_close</sound_t>
+	<hint x="23" y="3" width="24" height="29">
+		<text font="letterica25" align="c">4</text>
+		<text_color>
+			<e a="255" r="255" g="255" b="0"/>
+			<d a="255" r="87" g="87" b="72"/>					
+			<h a="255" r="255" g="226" b="79"/>
+			<t a="0" r="0" g="0" b="0"/>
+		</text_color>
+	</hint>
+</btn_bag_heavy>	
+
+<shop_back_btn x="424" y="0" width="39" height="41" accel="kBACK" accel_ext="kESCAPE" stretch="1">
+	<window_name>btn_shop_back</window_name>
+	<texture>ui_bm_back_to_buy</texture>			
+	<sound_t>weapons\generic_close</sound_t>
+</shop_back_btn>
+
+
+<btn_ok x="894" y="580" width="131" height="48" accel="kRETURN" accel_ext="kSPACE" stretch="1">		
+	<window_name>btn_ok</window_name>
+	<texture>ui_button_main01</texture>
+	<text font="graffiti22" color="ui_8">ui_inv_ok</text>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_ok>
+
+<btn_cancel x="894" y="630" width="131" height="48" accel="kESCAPE" stretch="1">
+	<window_name>btn_cancel</window_name>
+	<texture>ui_button_main01</texture>
+	<text font="graffiti22" color="ui_8">ui_inv_cancel</text>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_cancel>
+
+
+
+
+<btn_preset_1 x="894" y="160" width="131" height="48" hint="ui_inv_preset1(F1)" accel="kF1" stretch="1">
+	<window_name>btn_preset_1</window_name>
+	<texture>ui_button_main01</texture>
+	<text font="graffiti22" color="ui_8">ui_st_preset1</text>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_preset_1>
+
+<btn_preset_2 x="894" y="250" width="131" height="48" hint="ui_inv_preset2(F2)" accel="kF2" stretch="1">
+	<window_name>btn_preset_2</window_name>
+	<texture>ui_button_main01</texture>
+	<text font="graffiti22" color="ui_8">ui_st_preset2</text>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_preset_2>
+
+<btn_preset_3 x="894" y="340" width="131" height="48" hint="ui_inv_preset3(F3)" accel="kF3" stretch="1">
+	<window_name>btn_preset_3</window_name>
+	<texture>ui_button_main01</texture>
+	<text font="graffiti22" color="ui_8">ui_st_preset3</text>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_preset_3>
+
+<btn_last_set x="894" y="430" width="131" height="48" hint="ui_inv_last_buy(F4)" accel="kF4" stretch="1">
+	<window_name>btn_last_set</window_name>
+	<texture>ui_button_main01</texture>
+	<text font="graffiti22" color="ui_8">ui_st_last_set</text>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_last_set>
+
+<btn_preset_def x="894" y="520" width="131" height="48" hint="ui_inv_default(F5)" accel="kF5" stretch="1">
+	<window_name>btn_preset_def</window_name>
+	<texture>ui_button_main01</texture>
+	<text font="graffiti22" color="ui_8">ui_st_preset_def</text>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_preset_def>
+
+
+<!------------- -->
+<btn_save_preset_1 x="978" y="207" width="31" height="25" check_mode="0" stretch="1">
+	<window_name>btn_save_preset_1</window_name>
+	<texture>ui_bm_save_preset</texture>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_save_preset_1>
+
+<btn_save_preset_2 x="978" y="296" width="31" height="25" check_mode="0" stretch="1">
+	<window_name>btn_save_preset_2</window_name>
+	<texture>ui_bm_save_preset</texture>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_save_preset_2>
+
+<btn_save_preset_3 x="978" y="387" width="31" height="25" check_mode="0" stretch="1">
+	<window_name>btn_save_preset_3</window_name>
+	<texture>ui_bm_save_preset</texture>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_save_preset_3>
+<!------------- -->
+
+<btn_sell x="773" y="530" width="98" height="29" hint="ui_inv_sell_items(X)"  accel="kX" stretch="1">
+	<window_name>btn_sell</window_name>
+	<texture>ui_button_ordinary</texture>
+	<text font="graffiti22" color="ui_8">ui_st_sell_all</text>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_sell>
+
+<btn_reset x="895" y="695" width="131" height="48" hint="ui_inv_reset_items(C)" accel="kC" stretch="1">
+	<window_name>btn_reset</window_name>
+	<texture>ui_button_main01</texture>
+	<text font="graffiti22" color="ui_8">ui_st_reset</text>
+	<sound_t>weapons\generic_close</sound_t>
+</btn_reset>
+
+<!-- quick buttons -->
+
+<btn_pistol_ammo x="502" y="108" width="18" height="22" hint="ui_inv_ammo_pistol" accel="kQ" stretch="1">
+	<window_name>btn_pistol_ammo</window_name>
+	<texture>ui_beltbut_patrons</texture>
+</btn_pistol_ammo>
+
+<btn_pistol_silencer x="594" y="108" width="18" height="22" hint="ui_inv_silencer_pistol" accel="kA" stretch="1">
+	<window_name>btn_pistol_silencer</window_name>
+	<texture>ui_beltbut_silencer</texture>
+</btn_pistol_silencer>
+
+
+<btn_rifle_ammo x="848" y="86" width="18" height="22" hint="ui_inv_ammo_rifle" accel="kW" stretch="1">
+	<window_name>btn_rifle_ammo</window_name>
+	<texture>ui_beltbut_patrons</texture>
+</btn_rifle_ammo>	
+
+<btn_rifle_ammo2 x="848" y="108" width="18" height="22" hint="ui_inv_granades_rifle" accel="kE" stretch="1">
+	<window_name>btn_rifle_ammo2</window_name>
+	<texture>ui_beltbut_granadeBig</texture>
+</btn_rifle_ammo2>	
+
+<btn_rifle_silencer x="826" y="108" width="18" height="22" hint="ui_inv_silencer_rifle" accel="kF" stretch="1">
+	<window_name>btn_rifle_silencer</window_name>
+	<texture>ui_beltbut_silencer</texture>		
+</btn_rifle_silencer>
+
+<btn_rifle_scope x="809" y="108" width="18" height="22" hint="ui_inv_scope_rifle" accel="kS" stretch="1">
+	<window_name>btn_rifle_scope</window_name>
+	<texture>ui_beltbut_aim</texture>		
+</btn_rifle_scope>
+
+<btn_rifle_glauncher x="791" y="108" width="18" height="22" hint="ui_inv_granadelauncher_rifle" accel="kD" stretch="1">
+	<window_name>btn_rifle_glauncher</window_name>
+	<texture>ui_beltbut_granade</texture>
+</btn_rifle_glauncher>
