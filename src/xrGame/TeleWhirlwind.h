@@ -46,6 +46,7 @@ public:
     void SetCenter(const Fvector center) { m_center.set(center); }
     void SetOwnerObject(CGameObject* owner_object) { m_owner_object = owner_object; }
     void add_impact(const Fvector& dir, float val);
+    void reserve_impact(const size_t count);
     void draw_out_impact(Fvector& dir, float& val);
     void clear_impacts();
     void set_destroing_particles(const shared_str& destroying_particles)

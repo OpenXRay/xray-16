@@ -5,6 +5,7 @@
 #include "xrEngine/Environment.h"
 #include "xrCore/FMesh.hpp"
 #include "FTreeVisual.h"
+#include "Common/OGF_GContainer_Vertices.hpp"
 
 shared_str m_xform;
 shared_str m_xform_v;
@@ -22,7 +23,7 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
 {
     dxRender_Visual::Load(N, data, dwFlags);
 
-    VertexElement* vFormat = nullptr;
+    const VertexElement* vFormat = nullptr;
 
     // read vertices
     R_ASSERT(data->find_chunk(OGF_GCONTAINER));
@@ -63,6 +64,30 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
         c_bias.sun *= .5f;
         // Msg				("hemi[%f / %f], sun[%f / %f]",c_scale.hemi,c_bias.hemi,c_scale.sun,c_bias.sun);
     }
+
+    /*if (RImplementation.o.ffp && dcl_equal(vFormat, mu_model_decl_unpacked))
+    {
+        const size_t vertices_size = vCount * sizeof(mu_model_vert_unpacked);
+
+        const auto new_buffer = xr_new<VertexStagingBuffer>();
+        new_buffer->Create(vertices_size);
+
+        auto vert_new = static_cast<mu_model_vert_unpacked*>(new_buffer->Map());
+        const auto vert_orig = static_cast<mu_model_vert_unpacked*>(p_rm_Vertices->Map(vBase, vertices_size, true)); // read-back
+        CopyMemory(vert_new, vert_orig, vertices_size);
+
+        for (size_t i = 0; i < vCount; ++i)
+        {
+            //vert_new->P.mul(xform.j);
+            ++vert_new;
+        }
+
+        new_buffer->Unmap(true);
+        p_rm_Vertices->Unmap(false);
+        _RELEASE(p_rm_Vertices);
+        p_rm_Vertices = new_buffer;
+        vBase = 0;
+    }*/
 
     // Geom
     rm_geom.create(vFormat, *p_rm_Vertices, *p_rm_Indices);

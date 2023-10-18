@@ -599,7 +599,12 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
         {
             xr_sprintf(buff, "auto_static_%d", cnt_static);
             CUIStatic* pUIStatic = xr_new<CUIStatic>(buff);
+
+            // some code (e.g. CUISequenceSimpleItem) relies on window name
+            // but it can get overriden during initialization, so set name again.
             InitStatic(xml_doc, "auto_static", cnt_static, pUIStatic);
+            pUIStatic->SetWindowName(buff);
+
             pUIStatic->SetAutoDelete(true);
             pParentWnd->AttachChild(pUIStatic);
 
@@ -609,7 +614,12 @@ void CUIXmlInitBase::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index
         {
             xr_sprintf(buff, "auto_frameline_%d", cnt_frameline);
             CUIFrameLineWnd* pUIFrameline = xr_new<CUIFrameLineWnd>(buff);
+
+            // some code relies on window name
+            // but it can get overriden during initialization, so set name again.
             InitFrameLine(xml_doc, "auto_frameline", cnt_frameline, pUIFrameline);
+            pUIFrameline->SetWindowName(buff);
+
             pUIFrameline->SetAutoDelete(true);
             pParentWnd->AttachChild(pUIFrameline);
 
@@ -1055,32 +1065,62 @@ void CUIXmlInitBase::ApplyAlign(float& x, float& y, u32 align)
 
 //////////////////////////////////////////////////////////////////////////
 
+// source: https://stackoverflow.com/questions/650162/why-cant-the-switch-statement-be-applied-to-strings
+constexpr uint32_t hash(const std::string_view data) noexcept 
+{ 
+    uint32_t hash = 5385;    
+    for (const auto& e : data)     
+        hash = ((hash << 5) + hash) + e;    
+    return hash; 
+}
+
 bool CUIXmlInitBase::InitAlignment(CUIXml& xml_doc, const char* path, int index, float& x, float& y, CUIWindow* pWnd)
 {
+    // Alignment: top: "t", right: "r", bottom: "b", left: "l", center: "c"
     xr_string wnd_alignment = xml_doc.ReadAttrib(path, index, "alignment", "");
 
-    if (strchr(wnd_alignment.c_str(), 'c'))
+    switch (hash(wnd_alignment.c_str()))
+    {
+    case hash("r"):
+        pWnd->SetAlignment(waRight);
+        break;
+    case hash("l"):
+        pWnd->SetAlignment(waLeft);
+        break;
+    case hash("t"):
+        pWnd->SetAlignment(waTop);
+        break;
+    case hash("b"):
+        pWnd->SetAlignment(waBottom);
+        break;
+    case hash("c"):
         pWnd->SetAlignment(waCenter);
+        break;
+    default:
+        break;
+    }
 
     // Alignment: right: "r", bottom: "b". Top, left - useless
     shared_str alignStr = xml_doc.ReadAttrib(path, index, "align", "");
 
     bool result = false;
 
-    if (strchr(*alignStr, 'r'))
+    switch (hash(alignStr.c_str()))
     {
+    case hash("r"):
         x = ApplyAlignX(x, alRight);
         result = true;
-    }
-    if (strchr(*alignStr, 'b'))
-    {
+        break;
+    case hash("b"):
         y = ApplyAlignY(y, alBottom);
         result = true;
-    }
-    if (strchr(*alignStr, 'c'))
-    {
+        break;
+    case hash("c"):
         ApplyAlign(x, y, alCenter);
         result = true;
+        break;
+    default:
+        break;
     }
 
     return result;

@@ -62,6 +62,9 @@ LPCSTR CScriptGameObject::Section() const { return (*object().cNameSect()); }
 void CScriptGameObject::Kill(CScriptGameObject* who, bool bypass_actor_check /*AVO: added for actor before death callback*/)
 {
     CEntity* l_tpEntity = smart_cast<CEntity*>(&object());
+    if (psActorFlags.test(AF_GODMODE) && !!l_tpEntity->cast_actor())
+        return;
+
     if (!l_tpEntity)
     {
         GEnv.ScriptEngine->script_log(
