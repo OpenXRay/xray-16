@@ -44,6 +44,7 @@ CUIWindow* find_child_window(CUIWindow* parent, const shared_str& _name)
     for (; _I != _E; ++_I)
         if ((*_I)->WindowName() == _name)
             return (*_I);
+
     return nullptr;
 }
 
@@ -108,7 +109,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
     // initialize auto_static
     int cnt = xml->GetNodesNum("main_wnd", 0, "auto_static");
-    m_subitems.resize(cnt);
+    m_subitems.reserve(cnt);
     string64 sname;
     for (int i = 0; i < cnt; ++i)
     {
@@ -116,14 +117,19 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
         xml->SetLocalRoot(xml->NavigateToNode("main_wnd", 0));
 
         xr_sprintf(sname, "auto_static_%d", i);
+        const auto wnd = smart_cast<CUIStatic*>(find_child_window(m_UIWindow, sname));
+        if (!wnd)
+        {
+#ifndef MASTER_GOLD
+            VERIFY3(false, "Cannot find tutorial subitem", sname);
+            Msg("! [%s] cannot find tutorial subitem: %s", __FUNCTION__, sname);
+#endif
+            continue;
+        }
 
-        SSubItem* _si = &m_subitems[i];
+        SSubItem* _si = &m_subitems.emplace_back(wnd);
         _si->m_start = xml->ReadAttribFlt("auto_static", i, "start_time", 0);
         _si->m_length = xml->ReadAttribFlt("auto_static", i, "length_sec", 0);
-
-        _si->m_visible = false;
-        _si->m_wnd = smart_cast<CUIStatic*>(find_child_window(m_UIWindow, sname));
-        VERIFY(_si->m_wnd);
 
         _si->m_wnd->TextItemControl()->SetTextComplexMode(true);
         _si->m_wnd->Show(false);
@@ -299,7 +305,11 @@ void CUISequenceSimpleItem::Start()
         }
 
         if ((!pda.IsShown() && bShowPda) || (pda.IsShown() && !bShowPda))
+        {
+            isTimeDilatedInPDA = TimeDilator()->GetModeEnability(UITimeDilator::Pda);
+            TimeDilator()->SetModeEnability(UITimeDilator::Pda, false);
             pda.ShowOrHideDialog(true);
+        }
     }
 }
 
@@ -328,6 +338,7 @@ bool CUISequenceSimpleItem::Stop(bool bForce)
         if (ui_game_sp && ui_game_sp->GetPdaMenu().IsShown())
         {
             ui_game_sp->GetPdaMenu().HideDialog();
+            TimeDilator()->SetModeEnability(UITimeDilator::Pda, isTimeDilatedInPDA);
         }
     }
     inherited::Stop();

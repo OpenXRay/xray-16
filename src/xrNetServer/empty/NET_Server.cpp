@@ -693,4 +693,4 @@ void IPureServer::UpdateBannedList()
     }
 }
 
-pcstr IPureServer::GetBannedListName() const { return "banned_list_ip.ltx"; }
+constexpr pcstr IPureServer::GetBannedListName() { return "banned_list_ip.ltx"; }

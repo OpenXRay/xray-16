@@ -26,7 +26,7 @@ public:
         }
         CHW hw;
         hw.CreateD3D();
-        const bool result = hw.pD3D;
+        const bool result = hw.pD3D && hw.pD3D->GetAdapterCount() > 0;
         hw.DestroyD3D();
         return result;
     }

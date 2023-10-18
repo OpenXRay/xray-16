@@ -336,8 +336,21 @@ void CRenderDevice::message_loop()
                 switch (event.window.event)
                 {
                 case SDL_WINDOWEVENT_MOVED:
+                {
                     UpdateWindowRects();
+#if !SDL_VERSION_ATLEAST(2, 0, 18) // without SDL_WINDOWEVENT_DISPLAY_CHANGED, let's detect monitor change ourselves
+                    const int display = SDL_GetWindowDisplayIndex(m_sdlWnd);
+                    if (display != -1)
+                        psDeviceMode.Monitor = display;
+#endif
                     break;
+                }
+
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+                case SDL_WINDOWEVENT_DISPLAY_CHANGED:
+                    psDeviceMode.Monitor = event.window.data1;
+                    break;
+#endif
 
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
                 {

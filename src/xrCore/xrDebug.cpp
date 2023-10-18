@@ -149,7 +149,7 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
     if (data->always_ignore)
         return SDL_ASSERTION_ALWAYS_IGNORE;
 
-    constexpr pcstr desc = "SDL2 assertion triggered";
+    static constexpr pcstr desc = "SDL2 assertion triggered";
     bool alwaysIgnore = false;
 
     const auto result = xrDebug::Fail(alwaysIgnore,
@@ -820,13 +820,13 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (windowHandler)
         windowHandler->OnErrorDialog(true);
 
-    constexpr pcstr fatalError = "Fatal error";
+    static constexpr pcstr fatalError = "Fatal error";
 
     AssertionResult msgRes = AssertionResult::abort;
 
     if (!ErrorAfterDialog && ShowErrorMessage)
     {
-        constexpr pcstr msg = "Fatal error occurred\n\n"
+        static constexpr pcstr msg = "Fatal error occurred\n\n"
             "Press OK to abort program execution";
         msgRes = ShowMessage(fatalError, msg);
     }

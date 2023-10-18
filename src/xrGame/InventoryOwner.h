@@ -178,6 +178,8 @@ public:
         CharacterInfo().m_SpecificCharacter.data()->m_icon_name = iconName;
     }
 
+    void SetMonsterCommunity() const;
+
     //для работы с relation system
     u16 object_id() const;
     CHARACTER_COMMUNITY_INDEX Community() const { return CharacterInfo().Community().index(); };

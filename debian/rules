@@ -7,14 +7,22 @@ endif
 %:
 	dh $@ --buildsystem=cmake --parallel
 
-DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
-UBUNTU_CODENAME  := $(shell lsb_release -sc)
-UBUNTU_RELEASE  := $(shell lsb_release -sr)
-
 extra_flags += \
--DCMAKE_C_COMPILER=gcc-8 \
--DCMAKE_CXX_COMPILER=g++-8 \
--DCMAKE_BUILD_TYPE="Release" \
+-DCMAKE_C_COMPILER=gcc-10 \
+-DCMAKE_CXX_COMPILER=g++-10 \
+-DCMAKE_BUILD_TYPE="RelWithDebInfo" \
+-DCMAKE_INSTALL_BINDIR="/usr/games" \
+-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=FALSE \
+-DALLOW_RPATH=FALSE \
+-DDISABLE_PORTABLE_MODE=TRUE
 
 override_dh_auto_configure:
 	dh_auto_configure -- $(extra_flags)
+
+override_dh_clean:
+	rm -rf bin
+	dh_clean
+
+override_dh_missing:
+	dh_missing --fail-missing
+
