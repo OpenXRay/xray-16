@@ -440,8 +440,13 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
 
         //For Weapon & Outfit
+        .def("add_upgrade", &CScriptGameObject::AddUpgrade)
         .def("install_upgrade", &CScriptGameObject::InstallUpgrade)
         .def("has_upgrade", &CScriptGameObject::HasUpgrade)
+        .def("has_upgrade_group", &CScriptGameObject::HasUpgradeGroup)
+        .def("has_upgrade_group_by_upgrade_id", &CScriptGameObject::HasUpgradeGroupByUpgradeId)
+        .def("can_install_upgrade", &CScriptGameObject::CanInstallUpgrade)
+        .def("can_add_upgrade", &CScriptGameObject::CanAddUpgrade)
         .def("iterate_installed_upgrades", &CScriptGameObject::IterateInstalledUpgrades)
 
         // For CHudItem

@@ -37,6 +37,18 @@ bool CInventoryItem::has_upgrade_group(const shared_str& upgrade_group_id)
     return false;
 }
 
+bool CInventoryItem::has_upgrade_group_by_upgrade_id(const shared_str& upgrade_id)
+{
+    inventory::upgrade::Upgrade* upgrade = ai().alife().inventory_upgrade_manager().get_upgrade(upgrade_id);
+
+    if (!upgrade)
+    {
+        return false;
+    }
+
+    return has_upgrade_group(upgrade->parent_group_id());
+}
+
 bool CInventoryItem::has_upgrade(const shared_str& upgrade_id)
 {
     if (m_section_id == upgrade_id)
@@ -137,22 +149,28 @@ void CInventoryItem::log_upgrades()
 }
 #endif // DEBUG
 
-void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades) // net_Spawn
+void CInventoryItem::net_Spawn_install_upgrades(CSE_Abstract* DC) // net_Spawn
 {
-    m_upgrades.clear();
-
-    if (!ai().get_alife())
+    if (!IsGameTypeSingle() || !ai().get_alife())
     {
         return;
     }
 
+    CSE_ALifeInventoryItem* pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(DC);
+    if (!pSE_InventoryItem)
+    {
+        return;
+    }
+
+    Upgrades_type saved_upgrades = pSE_InventoryItem->m_upgrades;
+
+    m_upgrades.clear();
+
     ai().alife().inventory_upgrade_manager().init_install(*this); // from pSettings
 
-    auto ib = saved_upgrades.begin();
-    auto ie = saved_upgrades.end();
-    for (; ib != ie; ++ib)
+    for (const auto& upgrade : saved_upgrades)
     {
-        ai().alife().inventory_upgrade_manager().upgrade_install(*this, (*ib), true);
+        ai().alife().inventory_upgrade_manager().upgrade_install(*this, *upgrade, true);
     }
 }
 

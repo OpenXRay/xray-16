@@ -60,7 +60,10 @@ public:
     bool is_known_upgrade(shared_str const& upgrade_id);
     //*			bool		is_disabled_upgrade( CInventoryItem& item, shared_str const& upgrade_id );
 
+    bool can_install_upgrade(CInventoryItem& item, shared_str const& upgrade_id);
+    bool can_add_upgrade(CInventoryItem& item, shared_str const& upgrade_id);
     bool upgrade_install(CInventoryItem& item, shared_str const& upgrade_id, bool loading);
+    bool upgrade_add(CInventoryItem& item, shared_str const& upgrade_id);
     void init_install(CInventoryItem& item);
 
     bool compute_range(LPCSTR parameter, float& low, float& high);
