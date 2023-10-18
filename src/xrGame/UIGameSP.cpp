@@ -32,6 +32,7 @@ CUIGameSP::~CUIGameSP()
 {
     delete_data(TalkMenu);
     delete_data(UIChangeLevelWnd);
+    CloseTimeDilator();
 }
 
 void CUIGameSP::HideShownDialogs()
@@ -260,6 +261,24 @@ void CUIGameSP::ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id
 
         UIChangeLevelWnd->ShowDialog(true);
     }
+}
+
+void CUIGameSP::StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators)
+{ 
+    inherited::StartDialog(pDialog, bDoHideIndicators);
+
+    if (pDialog == ActorMenu && ActorMenu->GetMenuMode() == mmInventory)
+        TimeDilator()->SetCurrentMode(UITimeDilator::Inventory);
+    else if (pDialog == PdaMenu)
+        TimeDilator()->SetCurrentMode(UITimeDilator::Pda);
+}
+
+void CUIGameSP::StopDialog(CUIDialogWnd* pDialog)
+{
+    inherited::StopDialog(pDialog);
+
+    if (pDialog == ActorMenu || pDialog == PdaMenu)
+        TimeDilator()->SetCurrentMode(UITimeDilator::None);
 }
 
 CChangeLevelWnd::CChangeLevelWnd() : CUIDialogWnd(CChangeLevelWnd::GetDebugType())

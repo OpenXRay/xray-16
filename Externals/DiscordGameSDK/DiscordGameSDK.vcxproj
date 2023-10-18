@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\src\xray_project_configurations.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{cff9f0dd-c2fc-424c-800b-bfba35003932}</ProjectGuid>
+    <RootNamespace>DiscordGameSDK</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\src\xray_project_configuration.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\src\xray.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <CopyFileToFolders>
+      <DestinationFolders>$(xrBinDir)</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="activity_manager.cpp" />
+    <ClCompile Include="core.cpp" />
+    <ClCompile Include="overlay_manager.cpp" />
+    <ClCompile Include="relationship_manager.cpp" />
+    <ClCompile Include="types.cpp" />
+    <ClCompile Include="user_manager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="activity_manager.h" />
+    <ClInclude Include="core.h" />
+    <ClInclude Include="discord.h" />
+    <ClInclude Include="event.h" />
+    <ClInclude Include="ffi.h" />
+    <ClInclude Include="overlay_manager.h" />
+    <ClInclude Include="pch.hpp" />
+    <ClInclude Include="relationship_manager.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="user_manager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord_game_sdk.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

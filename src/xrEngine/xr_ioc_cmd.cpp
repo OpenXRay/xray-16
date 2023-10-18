@@ -746,6 +746,7 @@ extern int g_ErrorLineCount;
 
 ENGINE_API int ps_r__Supersample = 1;
 ENGINE_API int ps_r__WallmarksOnSkeleton = 0;
+ENGINE_API shared_str current_player_hud_sect{};
 
 extern int ps_fps_limit;
 extern int ps_fps_limit_in_menu;

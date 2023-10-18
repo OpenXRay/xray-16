@@ -80,6 +80,7 @@ static void CScriptIniFile_Export(lua_State* luaState)
     [
         class_<CScriptIniFile>("ini_file")
             .def(constructor<pcstr>())
+            .def(constructor<pcstr, pcstr>())
             //Alundaio: Extend script ini file
             .def("w_bool", &CScriptIniFile::w_bool)
             .def("w_color", &CScriptIniFile::w_color)
