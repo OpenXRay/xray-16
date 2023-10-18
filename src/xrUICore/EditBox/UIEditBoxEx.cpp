@@ -4,13 +4,17 @@
 
 CUIEditBoxEx::CUIEditBoxEx()
 {
-    m_pFrameWindow = xr_new<CUIFrameWindow>();
+    m_pFrameWindow = xr_new<CUIFrameWindow>("Frame window");
     AttachChild(m_pFrameWindow);
 
     TextItemControl()->SetTextComplexMode(true);
 }
 
-CUIEditBoxEx::~CUIEditBoxEx() { xr_delete(m_pFrameWindow); }
+CUIEditBoxEx::~CUIEditBoxEx()
+{
+    xr_delete(m_pFrameWindow);
+}
+
 void CUIEditBoxEx::InitCustomEdit(Fvector2 pos, Fvector2 size)
 {
     m_pFrameWindow->SetWndSize(size);

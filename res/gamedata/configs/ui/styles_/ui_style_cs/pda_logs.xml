@@ -1,0 +1,126 @@
+<w>
+    <main_wnd x="0" y="0" width="1024" height="768" update_delay="2900"/>
+
+    <background x="35" y="89" width="955" height="620" vertical="1">
+        <texture>ui_pda2_fr2</texture>
+		
+		<auto_frameline x="310" y="34" width="630" height="3">
+			<texture>ui_pda2_line_h</texture>
+		</auto_frameline>
+		
+		<!--auto_static x="20" y="176" width="150" height="16">
+			<text align="l" font="letterica16" color="ui_3">pda_logs_list_caption</text>
+		</auto_static-->
+		
+		<auto_frameline x="7" y="3" width="4" height="114" vertical="1">
+			<texture>ui_pda2_line_vl</texture>
+		</auto_frameline>
+		
+		<auto_frameline x="945" y="3" width="4" height="110" vertical="1">
+			<texture>ui_pda2_line_vr</texture>
+		</auto_frameline>
+		
+    </background>
+
+    <center_background x="35" y="198" width="955" height="67">
+        <texture>ui_pda2_fr_delimiter_ranking</texture>
+		
+		<!--auto_frameline x="15" y="82" width="932" height="3">
+			<texture>ui_pda2_line_h</texture>
+		</auto_frameline-->
+
+		<auto_frameline x="305" y="-107" width="3" height="114" vertical="1">
+			<texture>ui_pda2_line_v</texture>
+		</auto_frameline>
+
+		<auto_frameline x="765" y="-69" width="3" height="75" vertical="1">
+			<texture>ui_pda2_line_v</texture>
+		</auto_frameline>	
+
+		<auto_frameline x="7" y="62" width="4" height="433" vertical="1">
+			<texture>ui_pda2_line_vl</texture>
+		</auto_frameline>
+		
+    </center_background>
+
+    <center_caption x="55" y="237" width="650" height="16">
+		<text align="l" font="letterica16" color="ui_3">#root15/FD-655#69/</text>
+	</center_caption>
+	
+	<actor_ch_info x="50" y="92" width="500" height="125">
+		
+		<icon      x="0" y="0" width="165" height="108" stretch="1"/>
+		<icon_over x="0" y="0" width="165" height="108">
+			<texture>ui_fm_over_chars</texture>
+		</icon_over>
+		
+		<name_static x="300" y="4" width="200" height="25">
+			<text align="l" font="letterica25" color="ui_2"/>
+		</name_static>
+		
+		<rank_icon   x="175" y="0" width="46" height="47"/>
+		
+		<commumity_big_icon      x="166" y="48" width="127" height="56" stretch="1"/>
+		<commumity_big_icon_over x="166" y="48" width="127" height="56">
+			<texture>ui_fm_base_fraction</texture>
+		</commumity_big_icon_over>
+		
+	</actor_ch_info>
+
+	<logs_list x="55" y="267" width="928" height="436" item_height="35" scroll_profile="pda" always_show_scroll="1">
+		<font font="letterica18" color="ui_4"/>
+	</logs_list>
+	
+	<logs_item  x="0" y="0" width="905" height="30">
+		<date_static x="55" y="1" width="100" height="14">
+			<text align="l" font="letterica16" color="ui_3"/>
+		</date_static>	
+		<caption_static x="155" y="1" width="750" height="14">
+			<text align="l" font="letterica16" color="ui_1"/>
+		</caption_static>	
+		<text_static x="55" y="16" width="845" height="14" complex_mode="1">
+			<text align="l" font="letterica16" color="ui_4"/>
+		</text_static>	
+		<image x="0" y="0" width="49" height="29" stretch="1"/>
+	</logs_item>
+	
+	<filter_news x="815" y="140" width="17" height="17">
+		<window_name>filter_news</window_name>
+        <texture>ui_PDA_checker</texture>
+		<text x="5" font="letterica16" color="ui_3">pda_filter_news</text>
+		<options_item entry="pda_filter_news" group="pda_filter_logs"/>
+	</filter_news>
+
+	<filter_talk x="815" y="170" width="17" height="17">
+		<window_name>filter_talk</window_name>
+        <texture>ui_PDA_checker</texture>
+		<text x="5" font="letterica16" color="ui_3">pda_filter_talk</text>
+		<options_item entry="pda_filter_talk" group="pda_filter_logs"/>
+	</filter_talk>
+		
+	<date_caption x="600" y="100" width="100" height="18">
+		<text align="r" font="letterica18" color="ui_3">pda_cur_time</text>
+	</date_caption>
+	<date x="700" y="100" width="140" height="18">
+		<text align="l" font="letterica18" color="ui_4"/>
+	</date>
+	
+	<period_caption x="400" y="170" width="100" height="23">
+		<text align="r" vert_align="c" font="letterica18" color="ui_3">pda_date_filter</text>
+	</period_caption>
+	<period x="525" y="170" width="225" height="23" stretch="1">
+		<texture a="80">ui_date_back_tile</texture>
+		<text align="c" vert_align="c" font="letterica18" color="ui_4"/>
+	</period>
+	
+	<btn_prev_period x="500" y="170" width="25" height="23">
+		<window_name>btn_prev_period</window_name>
+		<texture>ui_date_bt_left</texture>
+	</btn_prev_period>
+	
+	<btn_next_period x="750" y="170" width="25" height="23">
+		<window_name>btn_next_period</window_name>
+		<texture>ui_date_bt_right</texture>
+	</btn_next_period>
+
+</w>

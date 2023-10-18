@@ -27,6 +27,8 @@
 #include <immintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#elif defined(XR_ARCHITECTURE_PPC64)
+#include <xmmintrin.h>
 #else
 #error Add your platform here
 #endif

@@ -27,20 +27,18 @@ public:
     };
 
 public:    
-    Fmatrix xform;
+    Fmatrix xform{};
 
-    u32 dwFrame;
-    u32 dwMode;
+    u32 dwFrame{ 0 };
+    u32 dwMode{ 0 };
     union
     {
-        u32 tcm; // mask for tc-modifiers
+        u32 tcm{ 0 }; // mask for tc-modifiers
         Flags32 tcm_flags;
     };
     WaveForm scaleU, scaleV;
     WaveForm rotate;
     WaveForm scrollU, scrollV;
-
-    CMatrix() { memset(this, 0, sizeof(CMatrix)); }
 
     void tc_trans(Fmatrix& T, float u, float v)
     {

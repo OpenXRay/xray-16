@@ -799,12 +799,10 @@ bool CGamePersistent::OnRenderPPUI_query()
     // enable PP or not
 }
 
-extern void draw_wnds_rects();
 void CGamePersistent::OnRenderPPUI_main()
 {
     // always
     MainMenu()->OnRenderPPUI_main();
-    draw_wnds_rects();
 }
 
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }

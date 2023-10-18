@@ -29,7 +29,7 @@ void CSoundRender_Environment::set_default()
     EnvironmentSize = EAXLISTENER_DEFAULTENVIRONMENTSIZE;
     EnvironmentDiffusion = EAXLISTENER_DEFAULTENVIRONMENTDIFFUSION;
     AirAbsorptionHF = EAXLISTENER_DEFAULTAIRABSORPTIONHF;
-#else
+#elif defined(XR_HAS_EFX)
 
     EFXEAXREVERBPROPERTIES reverbs[1] =
     {
@@ -64,7 +64,7 @@ void CSoundRender_Environment::set_identity()
     set_default();
 #if defined(XR_HAS_EAX)
     Room = EAXLISTENER_MINROOM;
-#else
+#elif defined(XR_HAS_EFX)
     Room = AL_EAXREVERB_MIN_GAIN;
 #endif
     clamp();
@@ -104,16 +104,14 @@ void CSoundRender_Environment::lerp(CSoundRender_Environment& A, CSoundRender_En
 void CSoundRender_Environment::get			(EAXLISTENERPROPERTIES& ep)
 {
     ep.lRoom					= iFloor(Room)					;	// room effect level at low frequencies
-    ep.lRoomHF					= iFloor(RoomHF)				;   // room effect high-frequency level re. low
-frequency level
+    ep.lRoomHF					= iFloor(RoomHF)				;   // room effect high-frequency level re. low frequency level
     ep.flRoomRolloffFactor		= RoomRolloffFactor				;   // like DS3D flRolloffFactor but for room effect
     ep.flDecayTime				= DecayTime						;   // reverberation decay time at low frequencies
     ep.flDecayHFRatio			= DecayHFRatio					;   // high-frequency to low-frequency decay time ratio
     ep.lReflections				= iFloor(Reflections)			;   // early reflections level relative to room effect
     ep.flReflectionsDelay		= ReflectionsDelay				;   // initial reflection delay time
     ep.lReverb					= iFloor(Reverb)	 			;   // late reverberation level relative to room effect
-    ep.flReverbDelay			= ReverbDelay					;   // late reverberation delay time relative to
-initial reflection
+    ep.flReverbDelay			= ReverbDelay					;   // late reverberation delay time relative to initial reflection
     ep.dwEnvironment			= EAXLISTENER_DEFAULTENVIRONMENT;  	// sets all listener properties
     ep.flEnvironmentSize		= EnvironmentSize				;  	// environment size in meters
     ep.flEnvironmentDiffusion	= EnvironmentDiffusion			; 	// environment diffusion
@@ -136,7 +134,7 @@ void CSoundRender_Environment::clamp()
     ::clamp(EnvironmentSize, EAXLISTENER_MINENVIRONMENTSIZE, EAXLISTENER_MAXENVIRONMENTSIZE);
     ::clamp(EnvironmentDiffusion, EAXLISTENER_MINENVIRONMENTDIFFUSION, EAXLISTENER_MAXENVIRONMENTDIFFUSION);
     ::clamp(AirAbsorptionHF, EAXLISTENER_MINAIRABSORPTIONHF, EAXLISTENER_MAXAIRABSORPTIONHF);
-#else
+#elif defined(XR_HAS_EFX)
     ::clamp(Room, (float)AL_EAXREVERB_MIN_GAIN, (float)AL_EAXREVERB_MAX_GAIN);
     ::clamp(RoomHF, (float)AL_EAXREVERB_MIN_GAINHF, (float)AL_EAXREVERB_MAX_GAINHF);
     ::clamp(RoomRolloffFactor,AL_EAXREVERB_MIN_ROOM_ROLLOFF_FACTOR, AL_EAXREVERB_MAX_ROOM_ROLLOFF_FACTOR);
@@ -224,7 +222,7 @@ void CSoundRender_Environment::save(IWriter* fs)
 
     if (sdef_env_version >= 0x0004)
         fs->w_u32(Environment);
-        
+
     if (sdef_env_version >= 0x0005)
     {
         fs->w_u32(DecayHFLimit);

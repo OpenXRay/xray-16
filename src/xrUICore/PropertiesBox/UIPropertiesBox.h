@@ -2,14 +2,14 @@
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "xrUICore/ListBox/UIListBox.h"
 
-class XRUICORE_API CUIPropertiesBox : public CUIFrameWindow, public CUIWndCallback
+class XRUICORE_API CUIPropertiesBox final : public CUIFrameWindow, public CUIWndCallback
 {
 private:
     typedef CUIFrameWindow inherited;
 
 public:
-    CUIPropertiesBox(CUIPropertiesBox* sub_property_box = NULL);
-    virtual ~CUIPropertiesBox();
+    CUIPropertiesBox(CUIPropertiesBox* sub_property_box = nullptr);
+    ~CUIPropertiesBox() override;
 
     void InitPropertiesBox(Fvector2 pos, Fvector2 size);
 
@@ -35,6 +35,8 @@ public:
 
     void ShowSubMenu();
     void OnItemReceivedFocus(CUIWindow* w, void* d);
+
+    pcstr GetDebugType() override { return "CUIPropertiesBox"; }
 
 protected:
     CUIListBox m_UIListWnd;

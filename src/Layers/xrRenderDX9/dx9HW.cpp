@@ -45,13 +45,15 @@ void CHW::OnAppDeactivate()
 void CHW::CreateD3D()
 {
     hD3D = XRay::LoadModule(GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9");
-    R_ASSERT2(hD3D->IsLoaded(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
+    if (!hD3D->IsLoaded())
+        return;
 
-    using _Direct3DCreate9 = IDirect3D9* WINAPI(UINT SDKVersion);
-    const auto createD3D = (_Direct3DCreate9*)hD3D->GetProcAddress("Direct3DCreate9");
-    R_ASSERT(createD3D);
-    pD3D = createD3D(D3D_SDK_VERSION);
-    R_ASSERT2(pD3D, "Please install DirectX 9.0c");
+    const auto createD3D = (decltype(&Direct3DCreate9))hD3D->GetProcAddress("Direct3DCreate9");
+    if (createD3D)
+        pD3D = createD3D(D3D_SDK_VERSION);
+
+    if (!pD3D)
+        Log("! Found d3d9.dll, but couldn't initialize it. Please install latest DirectX 9.0.");
 }
 
 void CHW::DestroyD3D()
@@ -105,6 +107,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
     {
         switch (psDeviceMode.BitsPerPixel)
         {
+        default:
         case 32:
             fTarget = D3DFMT_X8R8G8B8;
             if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
@@ -118,7 +121,6 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
             fTarget = D3DFMT_UNKNOWN;
             break;
         case 16:
-        default:
             fTarget = D3DFMT_R5G6B5;
             if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
                 break;

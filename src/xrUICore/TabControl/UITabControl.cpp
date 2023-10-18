@@ -198,6 +198,30 @@ void CUITabControl::SetActiveTabByIndex(u32 index)
     SetActiveTab(newBtn->m_btn_id);
 }
 
+bool CUITabControl::SetNextActiveTab(bool next, bool loop)
+{
+    const int idx = GetActiveIndex();
+    if (next)
+    {
+        if (idx < (int)GetTabsCount() - 1)
+            SetActiveTabByIndex(idx + 1);
+        else if (loop)
+            SetActiveTabByIndex(0);
+        else
+            return false;
+    }
+    else
+    {
+        if (idx > 0)
+            SetActiveTabByIndex(idx - 1);
+        else if (loop)
+            SetActiveTabByIndex(GetTabsCount() - 1);
+        else
+            return false;
+    }
+    return true;
+}
+
 bool CUITabControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (GetAcceleratorsMode() && WINDOW_KEY_PRESSED == keyboard_action)
@@ -227,24 +251,6 @@ CUITabButton* CUITabControl::GetButtonByIndex(u32 index) const
     R_ASSERT(index < (int)m_TabsArr.size());
     return m_TabsArr[index];
 }
-
-/*
-const shared_str CUITabControl::GetCommandName(const shared_str& id)
-{
-    CUITabButton* tb			= GetButtonById(id);
-    R_ASSERT2					(tb, id.c_str());
-
-    return (GetButtonByIndex(i))->WindowName();
-};
-
-CUIButton* CUITabControl::GetButtonByCommand(const shared_str& n)
-{
-    for(u32 i = 0; i<m_TabsArr.size(); ++i)
-        if(m_TabsArr[i]->WindowName() == n)
-            return m_TabsArr[i];
-
-    return NULL;
-}*/
 
 void CUITabControl::ResetTab()
 {

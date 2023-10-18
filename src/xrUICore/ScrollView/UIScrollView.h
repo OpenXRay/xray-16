@@ -41,6 +41,7 @@ protected:
     void SetUpIndention(float val);
     void SetDownIndention(float val);
     void SetVertFlip(bool val) { m_flags.set(eVertFlip, val); }
+
 public:
     CUIScrollView();
     CUIScrollView(CUIScrollBar* scroll_bar);
@@ -80,6 +81,9 @@ public:
     void UpdateChildrenLenght(); // set default width for all children
     float Scroll2ViewV(); // calculate scale for scroll position
     CUIScrollBar* ScrollBar() { return m_VScrollBar; }
+
+    pcstr GetDebugType() override { return "CUIScrollView"; }
+
     typedef fastdelegate::FastDelegate2<CUIWindow*, CUIWindow*, bool> cmp_function;
     cmp_function m_sort_function;
 };

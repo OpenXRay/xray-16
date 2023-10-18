@@ -105,14 +105,15 @@ CLevel::CLevel()
     m_ph_commander_scripts = xr_new<CPHCommander>();
     pObjects4CrPr.clear();
     pActors4CrPr.clear();
+    pHUD = xr_new<CHUDManager>();
     g_player_hud = xr_new<player_hud>();
     g_player_hud->load_default();
-    Msg("%s", Core.Params);
 }
 
 CLevel::~CLevel()
 {
     xr_delete(g_player_hud);
+    xr_delete(pHUD);
     delete_data(hud_zones_list);
     hud_zones_list = nullptr;
     Msg("- Destroying level");
@@ -586,8 +587,6 @@ void test_precise_path();
 extern Flags32 dbg_net_Draw_Flags;
 #endif
 
-extern void draw_wnds_rects();
-
 void CLevel::OnRender()
 {
     GEnv.Render->BeforeWorldRender();	//--#SM+#-- +SecondVP+
@@ -613,7 +612,6 @@ void CLevel::OnRender()
         HUD().RenderUI();
 
 #ifdef DEBUG
-    draw_wnds_rects();
     physics_world()->OnRender();
 #endif
 #ifdef DEBUG

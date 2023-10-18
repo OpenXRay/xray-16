@@ -74,6 +74,8 @@ struct R_dsgraph_structure
     xr_vector<ISpatial*> lstSpatial;
     xr_vector<dxRender_Visual*> lstVisuals;
 
+    CBackend cmd_list{};
+
     u32 counter_S{};
     u32 counter_D{};
 
@@ -127,22 +129,23 @@ struct R_dsgraph_structure
 
         for (int i = 0; i < SHADER_PASSES_MAX; ++i)
         {
-            mapNormalPasses[0][i].clear();
-            mapNormalPasses[1][i].clear();
-            mapMatrixPasses[0][i].clear();
-            mapMatrixPasses[1][i].clear();
+            mapNormalPasses[0][i].destroy();
+            mapNormalPasses[1][i].destroy();
+            mapMatrixPasses[0][i].destroy();
+            mapMatrixPasses[1][i].destroy();
         }
-        mapSorted.clear();
-        mapHUD.clear();
-        mapLOD.clear();
-        mapDistort.clear();
-        mapHUDSorted.clear();
+        mapSorted.destroy();
+        mapHUD.destroy();
+        mapLOD.destroy();
+        mapDistort.destroy();
+        mapHUDSorted.destroy();
 
 #if RENDER != R_R1
-        mapWmark.clear();
-        mapEmissive.clear();
-        mapHUDEmissive.clear();
+        mapWmark.destroy();
+        mapEmissive.destroy();
+        mapHUDEmissive.destroy();
 #endif
+        cmd_list.Invalidate();
     }
 
     void r_pmask(bool _1, bool _2, bool _wm = false)

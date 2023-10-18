@@ -113,7 +113,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/xrEngine
     ${CMAKE_SOURCE_DIR}/Externals/libvorbis/include
     ${CMAKE_SOURCE_DIR}/Externals/libogg/include
-    ${CMAKE_SOURCE_DIR}/Externals/openal/include
+    ${OPENAL_INCLUDE_DIR}
     ${OGG_INCLUDE_DIRS}
     ${SDL2_INCLUDE_DIRS}
 )

@@ -81,7 +81,7 @@ void CBlender_Compile::r_ColorWriteEnable(bool cR, bool cG, bool cB, bool cA)
     RS.SetRS(D3DRS_COLORWRITEENABLE3, Mask);
 }
 
-u32 CBlender_Compile::i_Sampler(LPCSTR _name)
+u32 CBlender_Compile::i_Sampler(LPCSTR _name) const
 {
     string256 name;
     xr_strcpy(name, _name);

@@ -34,6 +34,7 @@ public:
 
     static BOOL m_bWriteErrorsToLog;
 
+    shared_str GetCurrentLanguage() const;
     xr_token* GetLanguagesToken() const;
     static u32 LanguageID;
 

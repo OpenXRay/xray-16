@@ -2,8 +2,8 @@
 
 #include "SoundRender_Core.h"
 
-#include "openal/al.h"
-#include "openal/alc.h"
+#include <al.h>
+#include <alc.h>
 
 #ifdef DEBUG
 #define A_CHK(expr)                                             \

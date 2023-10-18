@@ -279,7 +279,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 
             // correct "mstate_real" if opposite keys pressed
             if (_abs(vControlAccel.z) < EPS)
-                mstate_real &= ~(mcFwd + mcBack);
+                mstate_real &= ~(mcFwd + mcBack + mcSprint);
             if (_abs(vControlAccel.x) < EPS)
                 mstate_real &= ~(mcLStrafe + mcRStrafe);
 

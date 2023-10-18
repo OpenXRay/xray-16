@@ -212,7 +212,11 @@ typedef void* HANDLE;
 typedef void* HMODULE;
 typedef void* PVOID;
 typedef void* LPVOID;
+#if defined(XR_ARCHITECTURE_PPC64)
+typedef LONG_PTR WPARAM;
+#else
 typedef UINT_PTR WPARAM;
+#endif
 typedef LONG_PTR LPARAM;
 typedef long HRESULT;
 typedef long LRESULT;

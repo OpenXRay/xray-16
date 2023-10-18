@@ -2,9 +2,10 @@
 
 #include "SoundRender_Effects.h"
 
-#if __has_include(<openal/efx.h>)
-#   include <openal/efx.h>
-#   include <openal/efx-presets.h>
+#if __has_include(<efx.h>)
+#   include <efx.h>
+#   include <efx-creative.h>
+#   include <efx-presets.h>
 #   define XR_HAS_EFX
 
 class CSoundRender_EffectsA_EFX : public CSoundRender_Effects
@@ -43,4 +44,4 @@ public:
 
     void commit() override;
 };
-#endif // #if __has_include(<openal/efx.h>)
+#endif // #if __has_include(<efx.h>)

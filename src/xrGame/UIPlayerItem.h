@@ -15,7 +15,7 @@ class UITeamState;
 class UITeamPanels; // for switching teams
 class CUIStatsIcon;
 
-class UIPlayerItem : public CUIWindow
+class UIPlayerItem final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -48,10 +48,10 @@ private:
 
 public:
     UIPlayerItem(ETeam team, ClientID const& clientId, UITeamState* tstate, UITeamPanels* tpanels);
-    virtual ~UIPlayerItem();
     void Init(CUIXml& uiXml, LPCSTR playerNode, int index);
     s32 GetPlayerCheckPoints() const;
-    virtual void Update();
+    void Update() override;
+    pcstr GetDebugType() override { return "UIPlayerItem"; }
 };
 
 #endif

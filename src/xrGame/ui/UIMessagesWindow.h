@@ -30,6 +30,8 @@ public:
     CUIChatWnd* GetChatWnd() { return m_pChatWnd; }
     virtual void Show(bool show);
 
+    pcstr GetDebugType() override { return "CUIMessagesWindow"; }
+
 protected:
     virtual void Init(float x, float y, float width, float height);
 

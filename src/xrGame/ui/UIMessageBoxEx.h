@@ -4,7 +4,7 @@
 
 class CUIMessageBox;
 
-class CUIMessageBoxEx : public CUIDialogWnd, public CUIWndCallback
+class CUIMessageBoxEx final : public CUIDialogWnd, public CUIWndCallback
 {
 public:
     CUIMessageBoxEx();
@@ -25,7 +25,8 @@ public:
     void OnOKClicked(CUIWindow*, void*);
     void OnNOClicked(CUIWindow*, void*);
 
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool NeedCenterCursor() const { return false; }
     CUIMessageBox* m_pMessageBox;
+
+    pcstr GetDebugType() override { return "CUIMessageBoxEx"; }
 };

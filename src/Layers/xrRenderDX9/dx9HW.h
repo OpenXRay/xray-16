@@ -52,6 +52,8 @@ private:
     bool ThisInstanceIsGlobal() const;
 
 public:
+    static constexpr auto IMM_CTX_ID = 0;
+
     CHWCaps Caps;
 
     u32 BackBufferCount{};

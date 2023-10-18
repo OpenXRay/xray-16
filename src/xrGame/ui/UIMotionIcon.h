@@ -38,17 +38,20 @@ private:
     bool m_bchanged;
     float m_luminosity;
     float m_cur_pos;
+    float m_relative_size{ 1.0f };
 
 public:
     CUIMotionIcon();
     ~CUIMotionIcon() override;
     virtual void Update();
     virtual void Draw();
-    bool Init(Frect const& rect);
+    bool Init();
+    void AttachToMinimap(const Frect& rect);
     void ShowState(EState state);
     void SetPower(float Pos);
     void SetNoise(float Pos);
     void SetLuminosity(float newPos);
     void SetActorVisibility(u16 who_id, float value);
     void ResetVisibility();
+    pcstr GetDebugType() override { return "CUIMotionIcon"; }
 };

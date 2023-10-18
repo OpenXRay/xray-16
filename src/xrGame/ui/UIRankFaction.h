@@ -53,4 +53,6 @@ public:
     void update_info(u8 sn);
     float get_faction_power() const;
     IC u8 get_cur_sn() const { return m_prev_sn; }
+
+    pcstr GetDebugType() override { return "CUIRankFaction"; }
 }; // class CUIRankFaction

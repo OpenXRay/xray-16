@@ -91,7 +91,6 @@ void CBlender_Tree::CompileFFP(CBlender_Compile& C) const
             C.StageEnd();
             break;
         }
-
         case SE_R1_LMODELS:
         {
             // Lighting only
@@ -105,9 +104,6 @@ void CBlender_Tree::CompileFFP(CBlender_Compile& C) const
             C.StageEnd();
             break;
         }
-
-        default:
-            break;
         } // switch (C.iElement)
     }
 

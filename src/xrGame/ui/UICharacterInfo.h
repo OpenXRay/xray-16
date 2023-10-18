@@ -12,7 +12,7 @@ class CCharacterInfo;
 class CUIXml;
 class CUIScrollView;
 
-class CUICharacterInfo : public CUIWindow
+class CUICharacterInfo final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -57,7 +57,7 @@ protected:
     u32 m_deadbody_color;
 
 public:
-    CUICharacterInfo() : CUIWindow("CUICharacterInfo") {}
+    CUICharacterInfo() : CUIWindow(CUICharacterInfo::GetDebugType()) {}
 
     void InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xml_doc);
     void InitCharacterInfo(Fvector2 pos, Fvector2 size, cpcstr xml_name, cpcstr xml_name2 = nullptr);
@@ -96,4 +96,6 @@ public:
     const shared_str& IconName() const { return m_texture_name; }
     static bool get_actor_community(shared_str* our, shared_str* enemy);
     static bool ignore_community(shared_str const& check_community);
+
+    pcstr GetDebugType() override { return "CUICharacterInfo"; }
 };

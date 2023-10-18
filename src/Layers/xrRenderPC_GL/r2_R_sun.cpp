@@ -321,7 +321,7 @@ void render_sun_old::init()
     if (!o.active)
         return;
 
-    o.mt_enabled = RImplementation.o.mt_calculate;
+    o.mt_calc_enabled = RImplementation.o.mt_calculate;
 
     // pre-allocate context
     context_id = RImplementation.alloc_context();
@@ -769,7 +769,7 @@ void render_sun_old::render_sun() const
             !dsgraph.mapSorted.empty();
         if (bNormal || bSpecial)
         {
-            RImplementation.Target->phase_smap_direct(sun, SE_SUN_FAR);
+            RImplementation.Target->phase_smap_direct(RCache, sun, SE_SUN_FAR);
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(sun->X.D[0].combine);
@@ -778,7 +778,7 @@ void render_sun_old::render_sun() const
             if (bSpecial)
             {
                 sun->X.D[0].transluent = TRUE;
-                RImplementation.Target->phase_smap_direct_tsh(sun, SE_SUN_FAR);
+                RImplementation.Target->phase_smap_direct_tsh(RCache, sun, SE_SUN_FAR);
                 dsgraph.render_graph(1); // normal level, secondary priority
                 dsgraph.render_sorted(); // strict-sorted geoms
             }
@@ -792,16 +792,16 @@ void render_sun_old::render_sun() const
     }
 
     // Accumulate
-    RImplementation.Target->phase_accumulator();
+    RImplementation.Target->phase_accumulator(RCache);
 
     if (RImplementation.Target->use_minmax_sm_this_frame())
     {
         PIX_EVENT(SE_SUN_FAR_MINMAX_GENERATE);
-        RImplementation.Target->create_minmax_SM();
+        RImplementation.Target->create_minmax_SM(RCache);
     }
 
     PIX_EVENT(SE_SUN_FAR);
-    RImplementation.Target->accum_direct(SE_SUN_FAR);
+    RImplementation.Target->accum_direct(RCache, SE_SUN_FAR);
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
@@ -944,7 +944,7 @@ void render_sun_old::render_sun_near()
         dsgraph.o.xform = *(Fmatrix*)glm::value_ptr(cull_xform);
         dsgraph.o.view_frustum = cull_frustum;
         dsgraph.o.view_pos = cull_COP;
-        dsgraph.o.mt_calculate = o.mt_enabled;
+        dsgraph.o.mt_calculate = o.mt_calc_enabled;
 
         // Fill the database
         dsgraph.build_subspace();
@@ -961,18 +961,18 @@ void render_sun_old::render_sun_near()
             !dsgraph.mapSorted.empty();
         if (bNormal || bSpecial)
         {
-            RImplementation.Target->phase_smap_direct(sun, SE_SUN_NEAR);
+            RImplementation.Target->phase_smap_direct(RCache, sun, SE_SUN_NEAR);
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(sun->X.D[0].combine);
             dsgraph.render_graph(0);
             if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                RImplementation.Details->Render();
+                RImplementation.Details->Render(RCache);
             sun->X.D[0].transluent = FALSE;
             if (bSpecial)
             {
                 sun->X.D[0].transluent = TRUE;
-                RImplementation.Target->phase_smap_direct_tsh(sun, SE_SUN_NEAR);
+                RImplementation.Target->phase_smap_direct_tsh(RCache, sun, SE_SUN_NEAR);
                 dsgraph.render_graph(1); // normal level, secondary priority
                 dsgraph.render_sorted(); // strict-sorted geoms
             }
@@ -986,16 +986,16 @@ void render_sun_old::render_sun_near()
     }
 
     // Accumulate
-    RImplementation.Target->phase_accumulator();
+    RImplementation.Target->phase_accumulator(RCache);
 
     if (RImplementation.Target->use_minmax_sm_this_frame())
     {
         PIX_EVENT(SE_SUN_NEAR_MINMAX_GENERATE);
-        RImplementation.Target->create_minmax_SM();
+        RImplementation.Target->create_minmax_SM(RCache);
     }
 
     PIX_EVENT(SE_SUN_NEAR);
-    RImplementation.Target->accum_direct(SE_SUN_NEAR);
+    RImplementation.Target->accum_direct(RCache, SE_SUN_NEAR);
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
@@ -1007,7 +1007,7 @@ void render_sun_old::render_sun_filtered() const
 {
     if (!RImplementation.o.sunfilter)
         return;
-    RImplementation.Target->phase_accumulator();
+    RImplementation.Target->phase_accumulator(RCache);
     PIX_EVENT(SE_SUN_LUMINANCE);
-    RImplementation.Target->accum_direct(SE_SUN_LUMINANCE);
+    RImplementation.Target->accum_direct(RCache, SE_SUN_LUMINANCE);
 }

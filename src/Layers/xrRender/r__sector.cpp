@@ -69,7 +69,7 @@ void CPortal::OnRender()
         V.back().set(poly[0], portalColor);
         
         if (bDebug)
-            RImplementation.rmNear();
+            RImplementation.rmNear(RCache);
         else
             Device.SetNearer(TRUE);
       
@@ -80,7 +80,7 @@ void CPortal::OnRender()
 #endif
         RCache.dbg_Draw(D3DPT_LINESTRIP, &*V.begin(), V.size() - 1);
         if (bDebug)
-            RImplementation.rmNormal();
+            RImplementation.rmNormal(RCache);
         else
             Device.SetNearer(FALSE);
     }

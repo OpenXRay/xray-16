@@ -51,6 +51,18 @@ extern "C"
 #ifdef DEBUG
         g_profiler = xr_new<CProfiler>();
 #endif
+
+        ImGui::SetAllocatorFunctions(
+            [](size_t size, void* /*user_data*/)
+        {
+            return xr_malloc(size);
+        },
+            [](void* ptr, void* /*user_data*/)
+        {
+            xr_free(ptr);
+        }
+        );
+        ImGui::SetCurrentContext(Device.editor().GetImGuiContext());
     }
 
     XR_EXPORT void finalize_library()

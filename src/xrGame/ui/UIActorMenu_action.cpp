@@ -92,8 +92,9 @@ bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, C
 
         const PIItem _iitem = _citem ? static_cast<PIItem>(_citem->m_pData) : nullptr;
 
+        // Callback handles dropping item on item, in other cases (moving, dropping from inventory) we do not fire it.
         if (_iitem == nullptr)
-            return false;
+            return true;
 
         CGameObject* GO1 = smart_cast<CGameObject*>(CurrentIItem());
         CGameObject* GO2 = smart_cast<CGameObject*>(_iitem);
@@ -343,7 +344,7 @@ bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
             set_highlight_item(itm);
         }
     }
-    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + (m_ItemInfo ? m_ItemInfo->delay : 0))
+    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + (m_ItemInfo ? m_ItemInfo->delay * Device.time_factor() : 0))
     {
         return true; // false
     }

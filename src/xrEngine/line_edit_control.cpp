@@ -632,21 +632,26 @@ void line_edit_control::delete_word_forward()
 
 void line_edit_control::move_pos_home() { m_cur_pos = 0; }
 void line_edit_control::move_pos_end() { m_cur_pos = xr_strlen(m_edit_str); }
-void line_edit_control::move_pos_left() { --m_cur_pos; }
+void line_edit_control::move_pos_left()
+{
+    if (m_cur_pos > 0)
+        --m_cur_pos;
+}
 void line_edit_control::move_pos_right() { ++m_cur_pos; }
 void line_edit_control::move_pos_left_word()
 {
-    size_t i = m_cur_pos - 1;
+    size_t i = m_cur_pos > 0 ? m_cur_pos - 1 : 0;
 
-    while (i >= 0 && m_edit_str[i] == ' ')
+    while (i > 0 && m_edit_str[i] == ' ')
         --i;
 
-    if (!terminate_char(m_edit_str[i]))
+    if (i > 0 && !terminate_char(m_edit_str[i]))
     {
-        while (i >= 0 && !terminate_char(m_edit_str[i], true))
+        while (i > 0 && !terminate_char(m_edit_str[i], true))
             --i;
 
-        ++i;
+        if (i > 0)
+            ++i;
     }
 
     m_cur_pos = i;

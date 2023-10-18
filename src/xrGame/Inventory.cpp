@@ -4,6 +4,7 @@
 #include "CustomOutfit.h"
 #include "trade.h"
 #include "Weapon.h"
+#include "Grenade.h"
 
 #include "ui/UIInventoryUtilities.h"
 #include "ui/UIActorMenu.h"
@@ -100,6 +101,7 @@ CInventory::CInventory()
     // ^ resize will default initialize everything with 0
 
     InitPriorityGroupsForQSwitch();
+    m_isActivatingNextGrenade = false;
 }
 
 CInventory::~CInventory() {}
@@ -521,6 +523,22 @@ bool CInventory::Ruck(PIItem pIItem, bool strict_placement)
     if (in_slot)
         pIItem->object().processing_deactivate();
 
+    CGrenade* pGrenade = smart_cast<CGrenade*>(pIItem);
+    if (pGrenade)
+    {
+        bool new_type = true;
+        for (auto grenade_type : m_available_grenade_types)
+        {
+            if (!xr_strcmp(pGrenade->cNameSect(), grenade_type))
+                new_type = false;
+        }
+        if (new_type)
+        {
+            m_available_grenade_types.push_back(pGrenade->cNameSect());
+            std::sort(m_available_grenade_types.begin(), m_available_grenade_types.end());
+        }
+    }
+
     return true;
 }
 /*
@@ -792,6 +810,9 @@ void CInventory::Update()
                     return;
                 }
             }
+
+            if (m_isActivatingNextGrenade)
+                ActivateNextGrenade();
 
             if (GetNextActiveSlot() != NO_ACTIVE_SLOT)
             {
