@@ -356,8 +356,11 @@ void stalker_movement_manager_smart_cover::loophole_path(smart_cover::cover cons
     shared_str source = smart_cover::transform_vertex(source_raw, true);
     shared_str target = smart_cover::transform_vertex(target_raw, false);
 
+    // XXX: casting u32(-1) to _dist_type, this may be safe,
+    // but we may want to recheck that
+    // the same cast happens in xrGame/smart_cover.cpp
     typedef GraphEngineSpace::CBaseParameters CBaseParameters;
-    CBaseParameters parameters(u32(-1), u32(-1), u32(-1));
+    CBaseParameters parameters(_dist_type(u32(-1)), u32(-1), u32(-1));
     path.clear();
     R_ASSERT2(ai().graph_engine().search(cover.get_description()->transitions(), source, target, &path, parameters),
         make_string("cannot build path via loopholes [%s] -> [%s] (cover %s)", source_raw.c_str(), target_raw.c_str(),

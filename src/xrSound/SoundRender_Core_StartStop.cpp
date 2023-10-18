@@ -53,10 +53,8 @@ bool CSoundRender_Core::i_allow_play(CSoundRender_Emitter* E)
 {
     // Search available target
     float Ptest = E->priority();
-    for (auto T : s_targets)
+    return std::any_of(s_targets.begin(), s_targets.end(), [Ptest](CSoundRender_Target* target)
     {
-        if (T->priority < Ptest)
-            return true;
-    }
-    return false;
+        return target->priority < Ptest;
+    });
 }

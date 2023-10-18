@@ -26,7 +26,7 @@ private:
 
         // Mark end node
         // so we can spot that in debugger, if we need
-        NodeCompressed& endNode = nodes[vertex_count + 1];
+        NodeCompressed& endNode = nodes[vertex_count];
         endNode.data[0]  = 'A';
         endNode.data[1]  = 'I';
         endNode.data[2]  = version;

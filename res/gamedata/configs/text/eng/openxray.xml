@@ -51,6 +51,21 @@
 	<string id="renderer_gl">
 		<text>Enhanced full dyn. lighting (OpenGL)</text>
 	</string>
+	<string id="ui_mm_window_mode">
+		<text>Window mode</text>
+	</string>
+	<string id="st_opt_windowed">
+		<text>Windowed</text>
+	</string>
+	<string id="st_opt_windowed_borderless">
+		<text>Windowed borderless</text>
+	</string>
+	<string id="st_opt_fullscreen">
+		<text>Fullscreen</text>
+	</string>
+	<string id="st_opt_fullscreen_borderless">
+		<text>Fullscreen (fast Alt+Tab)</text>
+	</string>
 	<string id="ui_mm_r2_smap_size">
 		<text>Shadow map quality</text>
 	</string>

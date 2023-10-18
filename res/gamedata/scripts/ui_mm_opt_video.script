@@ -15,9 +15,6 @@ function opt_video:InitControls(x, y, xml, handler)
 
 --	self.bk = xml:InitFrame			("frame", self)
 
-	xml:InitStatic					("tab_video:cap_fullscreen",		self)
-	xml:InitCheck					("tab_video:check_fullscreen",		self)
-
 	xml:InitStatic					("tab_video:cap_brightness",		self)
 	xml:InitTrackBar				("tab_video:track_brightness",		self)
 
@@ -26,6 +23,9 @@ function opt_video:InitControls(x, y, xml, handler)
 
 	xml:InitStatic					("tab_video:cap_gamma",				self)
 	xml:InitTrackBar				("tab_video:track_gamma",			self)
+
+	xml:InitStatic					("tab_video:cap_window_mode",		self)
+	xml:InitComboBox				("tab_video:list_window_mode",		self)
 
 	xml:InitStatic					("tab_video:cap_resolution",		self)
 	xml:InitComboBox				("tab_video:list_resolution",		self)
@@ -42,6 +42,9 @@ function opt_video:InitControls(x, y, xml, handler)
 	handler:Register				(btn, "btn_advanced_graphic")
 
 	-- Disable `combo_renderer` combobox control if `renderer` command locked
-	local _enable = renderer_allow_override()
+	local _enable = true
+    if renderer_allow_override ~= nil then
+        _enable = renderer_allow_override()
+    end
 	handler.combo_renderer:Enable(_enable)
 end

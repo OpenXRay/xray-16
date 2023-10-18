@@ -70,16 +70,37 @@ public:
     }
     IC void GetWndRect(Frect& res) const
     {
+        const float width = (float)Device.dwWidth * (UI_BASE_WIDTH / (float)Device.dwWidth);
+        const float height = (float)Device.dwHeight * (UI_BASE_HEIGHT / (float)Device.dwHeight);
+
         switch (m_alignment)
         {
-        case waNone: res.set(m_wndPos.x, m_wndPos.y, m_wndPos.x + m_wndSize.x, m_wndPos.y + m_wndSize.y); break;
+        case waNone:
+        case waLeft:
+        {
+            res.set(m_wndPos.x, m_wndPos.y, m_wndPos.x + m_wndSize.x, m_wndPos.y + m_wndSize.y);
+            break;
+        }
         case waCenter:
         {
             float half_w = m_wndSize.x / 2.0f;
             float half_h = m_wndSize.y / 2.0f;
             res.set(m_wndPos.x - half_w, m_wndPos.y - half_h, m_wndPos.x + half_w, m_wndPos.y + half_h);
+            break;
         }
-        break;
+        case waRight:
+        {
+            res.set(width - m_wndSize.x, m_wndPos.y, width, m_wndPos.y + m_wndSize.y);
+            break;
+        }
+        case waTop:
+        {
+            res.set(m_wndPos.x, 0.f, m_wndPos.x + m_wndSize.x, m_wndSize.y);
+            break;
+        }
+        case waBottom:
+            res.set(m_wndPos.x, height - m_wndSize.y, m_wndPos.x + m_wndSize.x, height);
+            break;
         default: NODEFAULT;
         };
     }

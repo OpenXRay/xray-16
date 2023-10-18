@@ -96,7 +96,8 @@ last_updates_cache::last_update_t* last_updates_cache::search_most_expired(
 
 server_updates_compressor::server_updates_compressor()
 {
-    u32 const need_to_reserve = (start_compress_buffer_size / sizeof(m_acc_buff.B.data)) + 1;
+    const u32 need_to_reserve = (start_compress_buffer_size / sizeof(m_acc_buff.B.data)) + 1;
+    m_ready_for_send.reserve(need_to_reserve);
     for (u32 i = 0; i < need_to_reserve; ++i)
     {
         m_ready_for_send.push_back(xr_new<NET_Packet>());

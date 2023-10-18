@@ -118,7 +118,8 @@ bool CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
     m_destEnemyDir.setHP(m_bind_y_rot, m_bind_x_rot);
     XFORM().transform_dir(m_destEnemyDir);
 
-    inheritedShooting::Light_Create();
+    if (m_bLightShotEnabled)
+        inheritedShooting::Light_Create();
 
     processing_activate();
     setVisible(TRUE);

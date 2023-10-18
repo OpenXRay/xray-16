@@ -216,8 +216,11 @@ bool cover::loophole_path(shared_str const& source_raw, shared_str const& target
     shared_str source = transform_vertex(source_raw, true);
     shared_str target = transform_vertex(target_raw, false);
 
+    // XXX: casting u32(-1) to _dist_type, this may be safe,
+    // but we may want to recheck that
+    // the same cast happens in xrGame/stalker_movement_manager_smart_cover.cpp
     typedef GraphEngineSpace::CBaseParameters CBaseParameters;
-    CBaseParameters parameters(u32(-1), u32(-1), u32(-1));
+    CBaseParameters parameters(_dist_type(u32(-1)), u32(-1), u32(-1));
     bool result = ai().graph_engine().search(m_description->transitions(), source, target, 0, parameters);
 
     VERIFY2(result, make_string("failde to find loophole path [%s]->[%s] in cover [%s]", source.c_str(), target.c_str(),

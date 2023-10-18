@@ -48,6 +48,21 @@
 	<string id="renderer_gl">
 		<text>Rozsz. pe³ne oœw. dynam. (OpenGL)</text>
 	</string>
+	<string id="ui_mm_window_mode">
+		<text>Tryb wyœwietlania</text>
+	</string>
+	<string id="st_opt_windowed">
+		<text>Okienkowy</text>
+	</string>
+	<string id="st_opt_windowed_borderless">
+		<text>Okienkowy (bez ramek)</text>
+	</string>
+	<string id="st_opt_fullscreen">
+		<text>Pe³noekranowy</text>
+	</string>
+	<string id="st_opt_fullscreen_borderless">
+		<text>Pe³noekranowy (szybki Alt+Tab)</text>
+	</string>
 	<string id="ui_mm_r2_smap_size">
 		<text>Jakoœæ cieni map</text>
 	</string>

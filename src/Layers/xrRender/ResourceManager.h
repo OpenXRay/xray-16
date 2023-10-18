@@ -204,7 +204,7 @@ public:
     SDeclaration* _CreateDecl (u32 FVF);
 #endif
 
-    SDeclaration* _CreateDecl(VertexElement* dcl);
+    SDeclaration* _CreateDecl(const VertexElement* dcl);
     void _DeleteDecl(const SDeclaration* dcl);
 
     STextureList* _CreateTextureList(STextureList& L);
@@ -255,7 +255,7 @@ public:
         v_constant_setup.emplace_back(shared_str(name), s);
     }
 
-    SGeometry* CreateGeom(VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib);
+    SGeometry* CreateGeom(const VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib);
     SGeometry* CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib);
 
     void DeleteGeom(const SGeometry* VS);

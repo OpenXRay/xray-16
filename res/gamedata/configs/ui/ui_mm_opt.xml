@@ -108,34 +108,38 @@
             </text_color>
         </list_resolution>
 
-        <cap_gamma x="15" y="93" width="135" height="24">
+        <cap_window_mode x="15" y="93" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_window_mode</text>
+        </cap_window_mode>
+        <list_window_mode x="175" y="95" width="235" height="16">
+            <options_item entry="vid_window_mode" group="mm_opt_video" depend="vid"/>
+            <list_font r="170" g="170" b="170" font="letterica16"/>
+            <text_color>
+	            <e r="170" g="170" b="170"/>
+	            <d r="70" g="70" b="70"/>
+            </text_color>
+        </list_window_mode>
+
+        <cap_gamma x="15" y="123" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_gamma</text>
         </cap_gamma>
-        <track_gamma x="175" y="97" width="235" height="16">
+        <track_gamma x="175" y="127" width="235" height="16">
             <options_item entry="rs_c_gamma" group="mm_opt_video" depend="runtime"/>
         </track_gamma>
 
-        <cap_contrast x="15" y="123" width="135" height="24">
+        <cap_contrast x="15" y="153" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_contrast</text>
         </cap_contrast>
-        <track_contrast x="175" y="127" width="235" height="16">
+        <track_contrast x="175" y="157" width="235" height="16">
             <options_item entry="rs_c_contrast" group="mm_opt_video" depend="runtime"/>
           </track_contrast>
 
-          <cap_brightness x="15" y="153" width="135" height="24">
+          <cap_brightness x="15" y="183" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_brightness</text>
           </cap_brightness>
-          <track_brightness x="175" y="157" width="235" height="16">
+          <track_brightness x="175" y="187" width="235" height="16">
             <options_item entry="rs_c_brightness" group="mm_opt_video" depend="runtime"/>
         </track_brightness>
-
-        <cap_fullscreen x="15" y="183" width="135" height="24">
-            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_fullscreen</text>
-        </cap_fullscreen>
-        <check_fullscreen x="162" y="180" width="44" height="29">
-	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="rs_fullscreen" group="mm_opt_video" depend="vid"/>
-        </check_fullscreen>
 
 
         <btn_advanced x="338" y="322" width="108" height="24">
@@ -344,7 +348,7 @@
         </cap_always_active>
         <check_always_active x="167" y="0" width="44" height="29">
 	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="always_active" group="mm_opt_video_adv" is_integer="1"/>
+            <options_item entry="rs_always_active" group="mm_opt_video_adv" is_integer="1"/>
         </check_always_active>
 
         <cap_fps_limit x="20" y="3" width="135" height="24">
@@ -699,7 +703,7 @@
 
         <check_loadingstages x="167" y="0" width="44" height="29">
 	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="rs_loadingstages" group="mm_opt_gameplay" is_integer="1"/>
+            <options_item entry="g_loading_stages" group="mm_opt_gameplay" is_integer="1"/>
         </check_loadingstages>
 
         <cap_unload_after_pickup x="20" y="3" width="135" height="24">
