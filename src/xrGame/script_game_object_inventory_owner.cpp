@@ -1794,8 +1794,7 @@ bool CScriptGameObject::AddUpgrade(pcstr upgrade)
     CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
     if (!item)
     {
-        GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "CInventoryItem : cannot access class member AddUpgrade!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member AddUpgrade!");
         return false;
     }
 
@@ -1810,8 +1809,7 @@ bool CScriptGameObject::InstallUpgrade(pcstr upgrade)
     CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
     if (!item)
     {
-        GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "CInventoryItem : cannot access class member InstallUpgrade!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member InstallUpgrade!");
         return false;
     }
 
