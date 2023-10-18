@@ -169,7 +169,11 @@ void IGame_Persistent::OnFrame()
 {
 #ifndef _EDITOR
     if (!Device.Paused() || Device.dwPrecacheFrame)
+    {
         Environment().OnFrame();
+        UpdateHudRaindrops();
+        UpdateRainGloss();
+    }
 
     stats.Starting = ps_needtoplay.size();
     stats.Active = ps_active.size();
@@ -545,15 +549,121 @@ float IGame_Persistent::GrassBenderToValue(float& current, float go_to, float in
     return current < go_to ? r_value : -r_value;
 }
 
-bool IGame_Persistent::IsActorInHideout()
+bool IGame_Persistent::IsActorInHideout() const
 {
-    if (Device.dwTimeGlobal > m_last_ray_pick_time)
+    static bool actor_in_hideout = true;
+    static u32 last_ray_pick_time = Device.dwTimeGlobal;
+    if (Device.dwTimeGlobal > (last_ray_pick_time + 1000))
     { // Апдейт рейтрейса - раз в секунду. Чаще апдейтить нет смысла.
-        m_last_ray_pick_time = Device.dwTimeGlobal + 1000;
+        last_ray_pick_time = Device.dwTimeGlobal;
         collide::rq_result RQ;
-        m_isInHideout = !!g_pGameLevel->ObjectSpace.RayPick(Device.vCameraPosition, Fvector{ 0.f, 1.f, 0.f }, 50.f, collide::rqtBoth, RQ, g_pGameLevel->CurrentViewEntity());
+        actor_in_hideout = !!g_pGameLevel->ObjectSpace.RayPick(Device.vCameraPosition, Fvector{ 0.f, 1.f, 0.f }, 50.f, collide::rqtBoth, RQ, g_pGameLevel->CurrentViewEntity());
     }
-    return m_isInHideout;
+    return actor_in_hideout;
+}
+
+void IGame_Persistent::UpdateHudRaindrops() const
+{
+    const struct // Настройки
+    {
+        float density = ps_ssfx_hud_drops_1_cfg.x; // Quantity of drops
+        float reflection_str = ps_ssfx_hud_drops_1_cfg.y; // Refrelction intensity
+        float refraction_str = ps_ssfx_hud_drops_1_cfg.z; // Refraction intensity
+        float animation_speed = ps_ssfx_hud_drops_1_cfg.w; // Speed of the drops animation
+        float buildup = ps_ssfx_hud_drops_2_cfg.x; // Drops build up speed
+        float drying = ps_ssfx_hud_drops_2_cfg.y; // Drying speed
+        float size = ps_ssfx_hud_drops_2_cfg.z; // Size of the drops
+        float gloss = ps_ssfx_hud_drops_2_cfg.w; // Raindrops gloss intensity
+        float extra_gloss{ 0.f }; // Extra gloss to the weapons HUD elements when raining
+    } ssfx_default_settings;
+    const float ssfx_hud_raindrops_density = ssfx_default_settings.density;
+    const float ssfx_hud_raindrops_refle = 30.f * ssfx_default_settings.reflection_str;
+    const float ssfx_hud_raindrops_refra = 0.05f * ssfx_default_settings.refraction_str;
+    const float ssfx_hud_raindrops_anim_speed = 0.02f * ssfx_default_settings.animation_speed;
+    const float ssfx_hud_raindrops_build_speed = 0.1f * ssfx_default_settings.buildup;
+    const float ssfx_hud_raindrops_drying_speed = 0.1f * ssfx_default_settings.drying;
+    const float ssfx_hud_raindrops_size = ssfx_default_settings.size;
+    const float ssfx_hud_raindrops_gloss = ssfx_default_settings.gloss;
+    const float ssfx_hud_raindrops_extragloss = ssfx_default_settings.extra_gloss;
+    const float val_density = 0.15f * (3.5f - ssfx_hud_raindrops_density); // 0.5 ~3.0
+    const float val_texsize = 2.0f - ssfx_hud_raindrops_size;
+    ps_ssfx_hud_drops_2.set(val_density, val_texsize, ssfx_hud_raindrops_extragloss, ssfx_hud_raindrops_gloss);
+    static float drops_int{}, drops_anim{};
+    const float Rain_factor = g_pGamePersistent->pEnvironment->CurrentEnv.rain_density;
+    // Don 't do anything if intensity of drops is <= 0 and isn' t raining
+    if (Rain_factor <= 0.f && drops_int <= 0.f)
+        return;
+    const float delta_time = Device.fTimeDelta;
+    if (Rain_factor > 0.f)
+    {
+        if (!IsActorInHideout())
+        {
+            // Use rain intensity factor to slowdown <->speedup rain animation
+            float rain_speed_factor = (1.5f - Rain_factor) * 10.f;
+            drops_anim = drops_anim + ssfx_hud_raindrops_anim_speed * delta_time / rain_speed_factor;
+            drops_int = drops_int + ssfx_hud_raindrops_build_speed * delta_time / 100.f;
+        }
+        else
+        {
+            drops_int = drops_int - ssfx_hud_raindrops_drying_speed * delta_time / 100.f;
+        }
+    }
+    else
+    {
+        drops_int = drops_int - ssfx_hud_raindrops_drying_speed * delta_time / 100.f;
+    }
+    // Saturate drops intensity
+    clamp(drops_int, 0.0f, 1.0f);
+    // Reset after 99k
+    if (drops_anim > 99000.f)
+        drops_anim = 0.f;
+    // Update shader data
+    ps_ssfx_hud_drops_1.set(drops_anim, drops_int, ssfx_hud_raindrops_refle, ssfx_hud_raindrops_refra);
+}
+
+void IGame_Persistent::UpdateRainGloss() const
+{
+    const struct // Настройки
+    {
+        bool auto_gloss{ true }; // Automatic adjustment of gloss based on wetness.
+        float auto_gloss_max{ 1.0f }; // Value to control the maximum value of gloss when full wetness is reached. ( 0 = 0% | 1 = 100% )
+
+        float ripples_size{ 1.5f };
+        float ripples_speed{ 1.4f };
+        float ripples_min_speed{ 0.7f };
+        float ripples_intensity{ 1.25f };
+
+        float waterfall_size{ 1.2 };
+        float waterfall_speed{ 1.5f };
+        float waterfall_min_speed{ 0.2f };
+        float waterfall_intensity{ 0.35f };
+
+        int cover_res{ 1 }; // Resolution of the rain cover rendering.(0 Low ~5 High)
+        float cover_distance{ 30.f }; // Distance of the rain cover rendering.Higher values are more performance expensive.
+    } ssfx_default_settings;
+
+    if (ssfx_default_settings.auto_gloss)
+    {
+        const float Wetness_gloss =
+            ps_ssfx_gloss_minmax.x + fmax(ssfx_default_settings.auto_gloss_max - ps_ssfx_gloss_minmax.x, 0.f) * g_pGamePersistent->Environment().wetness_factor;
+
+        ps_ssfx_gloss_factor = Wetness_gloss * 0.96f;
+    }
+    else
+    {
+        ps_ssfx_gloss_factor = 0.f;
+    }
+
+    const float ripples_size = fmax(2.0f - ssfx_default_settings.ripples_size, 0.01f); // Change how the value works to be more intuitive(<1.0 smaller |> 1.0 bigger)
+    ps_ssfx_wetsurfaces_1.set(ripples_size, ssfx_default_settings.ripples_speed, ssfx_default_settings.ripples_min_speed, ssfx_default_settings.ripples_intensity);
+
+    const float waterfall_size = fmax(2.0f - ssfx_default_settings.waterfall_size, 0.01f); // Change how the value works to be more intuitive(<1.0 smaller |> 1.0 bigger) get_console()
+    ps_ssfx_wetsurfaces_2.set(waterfall_size, ssfx_default_settings.waterfall_speed, ssfx_default_settings.waterfall_min_speed, ssfx_default_settings.waterfall_intensity);
+
+    const int wet_resolution = (int)pow(2, ssfx_default_settings.cover_res + 6);
+    ps_r3_dyn_wet_surf_sm_res = wet_resolution;
+
+    ps_r3_dyn_wet_surf_far = ssfx_default_settings.cover_distance;
 }
 
 void IGame_Persistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)

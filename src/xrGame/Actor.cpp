@@ -88,6 +88,8 @@ extern int g_first_person_death;
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
 extern ENGINE_API Fvector4 ps_r2_mask_control;
 extern ENGINE_API Fvector ps_r2_drops_control;
+extern ENGINE_API float ps_ssfx_gloss_factor;
+extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
 
 string32 ACTOR_DEFS::g_quick_use_slots[4] = {};
 // skeleton
@@ -1018,42 +1020,6 @@ float CActor::currentFOV()
     {
         return g_fov;
     }
-}
-
-// Ascii hud rain drops support
-void CActor::UpdateHudRainDrops()
-{
-    constexpr float animSpeed = 1.f;
-    constexpr float buildSpeed = 2.f;
-    constexpr float dryingSpeed = 1.f;
-    float rainFactor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
-    CEffect_Rain* rain = g_pGamePersistent->pEnvironment->eff_Rain;
-
-    if (rainFactor > 0.f)
-    {
-        if (!g_pGamePersistent->IsActorInHideout())
-        {
-            float rainSpeedFactor = (1.5f - rainFactor) * 10.f;
-            m_dropsAnimIncrementor += (animSpeed * Device.fTimeDelta) / rainSpeedFactor;
-            m_dropsIntensity += (buildSpeed * Device.fTimeDelta) / 100.f;
-        }
-        else
-        {
-            m_dropsIntensity -= (dryingSpeed * Device.fTimeDelta) / 100.f;
-        }
-    }
-    else
-    {
-        m_dropsIntensity -= (dryingSpeed * Device.fTimeDelta) / 100.f;
-    }
-
-    clamp(m_dropsIntensity, 0.f, 1.f);
-
-    if (fsimilar(m_dropsAnimIncrementor, FLT_MAX, 1.f))
-        m_dropsAnimIncrementor = 0.f;
-
-    ps_ssfx_hud_drops_1.x = m_dropsAnimIncrementor;
-    ps_ssfx_hud_drops_1.y = m_dropsIntensity;
 }
 
 // Currently WIP

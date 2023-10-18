@@ -333,6 +333,7 @@ protected:
     void cam_UnsetLadder();
     float currentFOV();
 
+    void UpdateWetness();
     void UpdateHudRainDrops();
     void UpdateVisorRainDrops();
     void UpdateVisor();
