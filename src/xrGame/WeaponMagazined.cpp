@@ -588,7 +588,8 @@ void CWeaponMagazined::state_Fire(float dt)
         if (iAmmoElapsed == 0)
             OnMagazineEmpty();
 
-        StopShooting();
+        if (m_dwMotionCurrTm >= m_dwMotionEndTm)
+            StopShooting();
     }
     else
     {
@@ -639,6 +640,9 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
 {
     switch (state)
     {
+    case eFire:
+        SwitchState(eIdle);
+        break;
     case eReload:
         ReloadMagazine();
         SwitchState(eIdle);

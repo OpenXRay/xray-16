@@ -30,7 +30,6 @@ extern STORY_PAIRS story_ids;
 extern STORY_PAIRS spawn_story_ids;
 
 extern void release_smart_cast_stats();
-extern void clean_wnd_rects();
 extern void InitHudSoundSettings();
 
 #include "xrEngine/IGame_Persistent.h"
@@ -100,6 +99,4 @@ void clean_game_globals()
 #endif
 
     RELATION_REGISTRY::clear_relation_registry();
-
-    clean_wnd_rects();
 }

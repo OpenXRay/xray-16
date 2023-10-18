@@ -17,6 +17,7 @@ LPCSTR GameTypeToStringEx(u32 gt, bool bShort);
 
 CServerList::CServerList()
     : CUIWindow("CServerList"),
+      m_frame{ "Server frame", "Server properties frame", "Players list frame" },
       m_header2{ "Server properties", "Players list", "Frags", "Deaths" },
       m_header_frames{ "Icon frame", "Server name frame", "Map frame", "Game type frame", "Players frame", "Ping frame", "Version frame" }
 {

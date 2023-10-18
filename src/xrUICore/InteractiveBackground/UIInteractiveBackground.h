@@ -43,6 +43,8 @@ public:
     virtual void SetWidth(float width);
     virtual void SetHeight(float heigth);
 
+    pcstr GetDebugType() override { return "CUIInteractiveBackground"; }
+
 protected:
     T* m_states[S_Total];
 };

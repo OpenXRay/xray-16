@@ -111,7 +111,6 @@ void CBlender_Vertex::CompileFFP(CBlender_Compile& C) const
             C.PassEnd();
             break;
         }
-
         case SE_R1_LMODELS:
         {
             // Lighting only
@@ -133,9 +132,6 @@ void CBlender_Vertex::CompileFFP(CBlender_Compile& C) const
             C.PassEnd();
             break;
         }
-
-        default:
-            break;
         } // switch (C.iElement)
     }
 }

@@ -581,6 +581,7 @@ public:
         , tree(*this)
         , hemi(*this)
 #if defined(USE_DX11)
+        , LOD(*this)
         , constants(*this)
         , StateManager(*this)
 #endif

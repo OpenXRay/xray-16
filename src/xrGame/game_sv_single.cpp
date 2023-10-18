@@ -205,7 +205,7 @@ void game_sv_Single::SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTi
     if (ai().get_alife() && ai().alife().initialized())
         return (alife().time_manager().set_game_time_factor(GameTime, fTimeFactor));
     else
-        return (inherited::SetGameTimeFactor(fTimeFactor));
+        return (inherited::SetGameTimeFactor(GameTime, fTimeFactor));
 }
 
 ALife::_TIME_ID game_sv_Single::GetEnvironmentGameTime()

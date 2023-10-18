@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="activity_manager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="overlay_manager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="relationship_manager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="user_manager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="core.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="types.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="activity_manager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="overlay_manager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="relationship_manager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="user_manager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="core.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="discord.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="event.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ffi.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{5f921152-9128-4f22-a7d2-a6f7bd9e18b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{2074231d-b44a-4fd4-a569-01e1d1303636}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord_game_sdk.dll" />
+  </ItemGroup>
+</Project>

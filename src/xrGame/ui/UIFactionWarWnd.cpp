@@ -24,7 +24,7 @@
 
 constexpr pcstr PDA_FACTION_WAR_XML = "pda_fraction_war.xml";
 
-CUIFactionWarWnd::CUIFactionWarWnd(UIHint* hint) : CUIWindow("CUIFactionWarWnd")
+CUIFactionWarWnd::CUIFactionWarWnd(UIHint* hint) : CUIWindow(CUIFactionWarWnd::GetDebugType())
 {
     Reset();
     hint_wnd = hint;
@@ -82,14 +82,14 @@ bool CUIFactionWarWnd::Init()
 	m_td_pos				= m_target_desc->GetWndPos();
 
 	m_state_static			= UIHelper::CreateStatic( xml, "state_static", this );
-	
+
 	m_our_icon				= UIHelper::CreateStatic( xml, "static_our_icon", this );
 	m_our_icon_over			= UIHelper::CreateStatic( xml, "static_our_icon_over", this );
 	m_our_name				= UIHelper::CreateStatic( xml, "static_our_name", this );
 	m_st_our_frac_info		= UIHelper::CreateStatic( xml, "static_our_frac_info", this );
 	m_st_our_mem_count		= UIHelper::CreateStatic( xml, "static_our_mem_count", this );
 	m_st_our_resource		= UIHelper::CreateStatic( xml, "static_our_resource", this );
-	
+
 	m_pb_our_state			= UIHelper::CreateProgressBar( xml, "progress_our_state", this );
 	m_pb_our_mem_count		= UIHelper::CreateProgressBar( xml, "progress_our_mem_count", this );
 	m_pb_our_resource		= UIHelper::CreateProgressBar( xml, "progress_our_resource", this );
@@ -102,8 +102,8 @@ bool CUIFactionWarWnd::Init()
 	m_st_enemy_resource		= UIHelper::CreateStatic( xml, "static_enemy_resource", this );
 
 	m_pb_enemy_state		= UIHelper::CreateProgressBar( xml, "progress_enemy_state", this );
-	m_pb_enemy_mem_count	= UIHelper::CreateProgressBar( xml, "progress_enemy_mem_count", this );	
-	m_pb_enemy_resource		= UIHelper::CreateProgressBar( xml, "progress_enemy_resource", this );	
+	m_pb_enemy_mem_count	= UIHelper::CreateProgressBar( xml, "progress_enemy_mem_count", this );
+	m_pb_enemy_resource		= UIHelper::CreateProgressBar( xml, "progress_enemy_resource", this );
 
 	m_static_line1			= UIHelper::CreateFrameLine( xml, "static_line1", this );
 	m_static_line2			= UIHelper::CreateFrameLine( xml, "static_line2", this );
@@ -127,7 +127,7 @@ bool CUIFactionWarWnd::Init()
 		m_war_state[i]->InitXML( xml, "static_vs_state", m_war_states_parent );
 		m_war_state[i]->set_hint_wnd( hint_wnd );
 	}
-	
+
 	float dx = xml.ReadAttribFlt( "static_vs_state", 0, "dx" );
 	m_war_states_dx = dx;
 	m_war_states_xcenter = xml.ReadAttribFlt( "static_vs_state", 0, "xcenter", 511.0f );
@@ -237,7 +237,7 @@ void CUIFactionWarWnd::Update()
     {
         Reset();
     }
-    if ( Device.dwTimeGlobal - m_previous_time > m_update_delay )
+    if ( Device.dwTimeGlobal - m_previous_time > m_update_delay * Device.time_factor() )
     {
         m_previous_time = Device.dwTimeGlobal;
         UpdateInfo();

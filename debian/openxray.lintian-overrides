@@ -1,0 +1,9 @@
+openxray binary: embedded-library
+openxray binary: shared-library-is-multi-arch-foreign
+openxray binary: shared-library-lacks-version
+openxray binary: package-name-doesnt-match-sonames
+openxray binary: no-manual-page
+openxray binary: copyright-without-copyright-notice
+openxray binary: script-not-executable
+openxray binary: unusual-interpreter
+openxray binary: extended-description-line-too-long

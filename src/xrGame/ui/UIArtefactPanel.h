@@ -6,7 +6,7 @@ class CUIXml;
 class CArtefact;
 class CUIStaticItem;
 
-class CUIArtefactPanel : public CUIWindow
+class CUIArtefactPanel final : public CUIWindow
 {
 protected:
     bool m_bVert;
@@ -15,11 +15,13 @@ protected:
     Fvector2 m_cell_size;
     xr_vector<Frect> m_vRects;
     CUIStaticItem m_StaticItem;
+
 public:
     CUIArtefactPanel();
-    ~CUIArtefactPanel();
 
     void InitIcons(const xr_vector<const CArtefact*>& artefacts);
     void InitFromXML(CUIXml& xml, pcstr path, int index);
-    virtual void Draw() override;
+    void Draw() override;
+
+    pcstr GetDebugType() override { return "CUIArtefactPanel"; }
 };

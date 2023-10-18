@@ -24,6 +24,8 @@ ENGINE_API float psControllerSensorDeadZone = 0.f;
 ENGINE_API Flags32 psControllerInvertY = { false };
 ENGINE_API Flags32 psControllerEnableSensors = { true };
 
+ENGINE_API float psControllerCursorAutohideTime = 1.5f;
+
 static bool AltF4Pressed = false;
 
 // Max events per frame

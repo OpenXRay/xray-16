@@ -4,6 +4,7 @@
 #include "xrUICore/XML/xrUIXmlParser.h"
 
 void CUIDetectorWave::SetVelocity(float v) { m_curr_v = v; }
+
 void CUIDetectorWave::Update()
 {
     Fvector2 P = GetWndPos();

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "utils/xrLC_Light/xrMU_Model.h"
 #include "OGF_Face.h"
+#include "Common/OGF_GContainer_Vertices.hpp"
 
 const u32 max_tile = 16;
 const s32 quant = 32768 / max_tile;
@@ -12,18 +13,11 @@ s16 QC(float v)
     return s16(t);
 }
 
-D3DVERTEXELEMENT9 decl[] = // 12+4+4+4+8=32
-    {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-        {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
-        {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
-        {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
-        {0, 24, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, D3DDECL_END()};
-
 void export_geometry(xrMU_Model& mu_model)
 {
     // Declarator
     VDeclarator D;
-    D.set(decl);
+    D.set(mu_model_decl);
 
     // RT-check, BOX, low-point, frac-size
     Fbox BB;

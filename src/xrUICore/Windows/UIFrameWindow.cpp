@@ -5,10 +5,11 @@
 
 void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts);
 
-CUIFrameWindow::CUIFrameWindow()
-    : CUIWindow("CUIFrameWindow"), m_bTextureVisible(false), m_texture_color(color_argb(255, 255, 255, 255))
-{
-}
+CUIFrameWindow::CUIFrameWindow(pcstr window_name)
+    : CUIWindow(window_name),
+      m_bTextureVisible(false),
+      m_texture_color(color_argb(255, 255, 255, 255)) {}
+
 void CUIFrameWindow::SetWndSize(const Fvector2& sz)
 {
     Fvector2 size = sz;
@@ -86,7 +87,7 @@ bool CUIFrameWindow::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= t
 
     //const bool L_and_BK_are_similar_by_height = fsimilar(m_tex_rect[fmL].height(), m_tex_rect[fmBK].height());
     const bool L_and_R_are_similar_by_height = fsimilar(m_tex_rect[fmL].height(), m_tex_rect[fmR].height());
-    
+
     const bool LB_and_B_are_similar_by_height = fsimilar(m_tex_rect[fmLB].height(), m_tex_rect[fmB].height());
     const bool LB_and_RB_are_similar_by_height = fsimilar(m_tex_rect[fmLB].height(), m_tex_rect[fmRB].height());
 

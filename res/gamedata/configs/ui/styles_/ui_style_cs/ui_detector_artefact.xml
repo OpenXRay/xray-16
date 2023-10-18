@@ -1,0 +1,17 @@
+<w>
+  <elite x="0" y="0" width="0.0576" height="0.029">
+    <wrk_area width="0.0576" height="0.029">
+      <auto_static width="0.0576" height="0.029" stretch="1">
+        <texture shader="hud\p3d">ui_temp_ad3_radar_glow</texture>
+      </auto_static>
+    </wrk_area>
+
+    <af_sign width="0.0045" height="0.005" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
+    </af_sign>
+  </elite>
+
+  // elite x="0.00096" y="0.0035"
+  //  0,028
+  //  0,057
+</w>

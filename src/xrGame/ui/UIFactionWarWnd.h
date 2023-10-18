@@ -17,7 +17,7 @@ class CUIXml;
 class CUIProgressBar;
 class CUIFrameLineWnd;
 
-class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
+class CUIFactionWarWnd final : public CUIWindow, public CUIWndCallback
 {
     using inherited = CUIWindow;
 
@@ -47,7 +47,7 @@ class CUIFactionWarWnd : public CUIWindow, public CUIWndCallback
 	CUIStatic*			m_st_our_frac_info;
 	CUIStatic*			m_st_our_mem_count;
 	CUIStatic*			m_st_our_resource;
-	
+
 	CUIProgressBar*		m_pb_our_state;
 	CUIProgressBar*		m_pb_our_mem_count;
 	CUIProgressBar*		m_pb_our_resource;
@@ -98,7 +98,7 @@ public:
 
 			void		Reset					();
 			bool		Init					();
-			
+
 			bool		InitFactions			();
 			void		UpdateInfo				();
 			void		UpdateWarStates			( FactionState const& faction );
@@ -107,6 +107,8 @@ public:
 			void		set_amount_enemy_bonus	( int value );
 
 			UIHint*		hint_wnd;
+
+			pcstr		GetDebugType			() override { return "CUIFactionWarWnd"; }
 protected:
 			int			get_max_member_count	();
 			float		get_max_resource		();

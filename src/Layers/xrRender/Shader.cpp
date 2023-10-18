@@ -31,7 +31,7 @@ void resptrcode_geom::create(u32 FVF, VertexBufferHandle vb, IndexBufferHandle i
     _set(RImplementation.Resources->CreateGeom(FVF, vb, ib));
 }
 
-void resptrcode_geom::create(VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib)
+void resptrcode_geom::create(const VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib)
 {
     _set(RImplementation.Resources->CreateGeom(decl, vb, ib));
 }

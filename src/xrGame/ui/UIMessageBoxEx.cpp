@@ -3,15 +3,17 @@
 #include "UIMessageBoxEx.h"
 #include "UIDialogHolder.h"
 
-CUIMessageBoxEx::CUIMessageBoxEx()
+CUIMessageBoxEx::CUIMessageBoxEx() : CUIDialogWnd(CUIMessageBoxEx::GetDebugType())
 {
     m_pMessageBox = xr_new<CUIMessageBox>();
     m_pMessageBox->SetWindowName("msg_box");
+    m_pMessageBox->AllowInputHandling(true);
     //	m_pMessageBox->SetAutoDelete(true);
     AttachChild(m_pMessageBox);
 }
 
 CUIMessageBoxEx::~CUIMessageBoxEx() { xr_delete(m_pMessageBox); }
+
 bool CUIMessageBoxEx::InitMessageBox(LPCSTR xml_template)
 {
     // CUIDialogWnd::SetWndRect(Frect().set(0.0f,0.0f,1024.0f,768.0f));
@@ -73,30 +75,6 @@ void CUIMessageBoxEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData /* = NUL
 
 LPCSTR CUIMessageBoxEx::GetHost() { return m_pMessageBox->GetHost(); }
 LPCSTR CUIMessageBoxEx::GetPassword() { return m_pMessageBox->GetPassword(); }
-bool CUIMessageBoxEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
-{
-    if (keyboard_action == WINDOW_KEY_PRESSED)
-    {
-        auto action = GetBindedAction(dik);
-        if (action == kENTER || action == kJUMP)
-        {
-            m_pMessageBox->OnYesOk();
-            return true;
-            /*
-                    }else
-                        if ( IsBinded(kQUIT, dik) )
-                    {
-                        CUIMessageBox::E_MESSAGEBOX_STYLE style = m_pMessageBox->GetBoxStyle();
-                        if(style != CUIMessageBox::MESSAGEBOX_INFO)
-                            HideDialog();
-                        return true;
-            */
-        }
-        else
-            return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
-    }
-    return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
-}
 
 void CUIMessageBoxEx::SetTextEditURL(LPCSTR text) { m_pMessageBox->SetTextEditURL(text); }
 LPCSTR CUIMessageBoxEx::GetTextEditURL() { return m_pMessageBox->GetTextEditURL(); }

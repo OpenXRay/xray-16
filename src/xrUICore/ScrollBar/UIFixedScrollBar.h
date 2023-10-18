@@ -5,7 +5,7 @@ class CUI3tButton;
 class CUIScrollBox;
 class CUIFrameLineWnd;
 
-class XRUICORE_API CUIFixedScrollBar : public CUIScrollBar
+class XRUICORE_API CUIFixedScrollBar final : public CUIScrollBar
 {
 private:
     using inherited = CUIWindow;
@@ -31,4 +31,6 @@ public:
     bool OnMouseDownEx() override;
     void OnMouseUp(int mouse_btn) override;
     bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+
+    pcstr GetDebugType() override { return "CUIFixedScrollBar"; }
 };

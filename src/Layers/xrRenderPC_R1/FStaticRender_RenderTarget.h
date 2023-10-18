@@ -24,11 +24,18 @@ private:
     ref_rt rt_color_map;
     ref_rt rt_distort;
 
+    // FFP postprocessing
+    ref_shader s_set;
+    ref_shader s_gray;
+    ref_shader s_blend;
+    ref_shader s_duality;
+    ref_shader s_noise;
+
     // Can't implement in a single pass of a shader since
     // should be compiled only for the hardware that supports it.
     ref_shader s_postprocess[2]{};   // Igor: 0 - plain, 1 - colormapped
     ref_shader s_postprocess_D[2]{}; // Igor: 0 - plain, 1 - colormapped
-    ref_geom g_postprocess;
+    ref_geom g_postprocess[2]{};
 
     float im_noise_time;
     u32 im_noise_shift_w{};
@@ -112,4 +119,8 @@ public:
 
     void phase_distortion();
     void phase_combine(bool bDistort, bool bCMap);
+
+private:
+    void phase_combine_fpp(u32 p_color, u32 p_gray, u32 p_alpha,
+        Fvector2 n0, Fvector2 n1, Fvector2 r0, Fvector2 r1, Fvector2 l0, Fvector2 l1);
 };

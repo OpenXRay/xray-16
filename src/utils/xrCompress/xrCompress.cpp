@@ -211,16 +211,19 @@ void xrCompressor::CompressOne(LPCSTR path)
                 t_compress.Begin();
 
                 c_size_compressed = c_size_max;
+
+                lzo_uint lzo_size_temp{};
                 if (bFast)
                 {
                     R_ASSERT(LZO_E_OK ==
-                        lzo1x_1_compress((u8*)src->pointer(), c_size_real, c_data, (lzo_uintp)&c_size_compressed, c_heap));
+                        lzo1x_1_compress((u8*)src->pointer(), c_size_real, c_data, &lzo_size_temp, c_heap));
                 }
                 else
                 {
                     R_ASSERT(LZO_E_OK ==
-                        lzo1x_999_compress((u8*)src->pointer(), c_size_real, c_data, (lzo_uintp)&c_size_compressed, c_heap));
+                        lzo1x_999_compress((u8*)src->pointer(), c_size_real, c_data, &lzo_size_temp, c_heap));
                 }
+                c_size_compressed = lzo_size_temp;
 
                 t_compress.End();
 
@@ -239,9 +242,9 @@ void xrCompressor::CompressOne(LPCSTR path)
                     if (!bFast)
                     {
                         u8* c_out = xr_alloc<u8>(c_size_real);
-                        u32 c_orig = c_size_real;
-                        R_ASSERT(LZO_E_OK == lzo1x_optimize(c_data, c_size_compressed, c_out, (lzo_uintp)&c_orig, NULL));
-                        R_ASSERT(c_orig == c_size_real);
+                        lzo_size_temp = c_size_real;
+                        R_ASSERT(LZO_E_OK == lzo1x_optimize(c_data, c_size_compressed, c_out, &lzo_size_temp, nullptr));
+                        R_ASSERT(lzo_size_temp == c_size_real);
                         xr_free(c_out);
                     } // bFast
                     fs_pack_writer->w(c_data, c_size_compressed);
@@ -288,11 +291,15 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
 
     string_path fname;
     string128 s_num;
-#ifdef MOD_COMPRESS
-    strconcat(sizeof(fname), fname, tgt_folder, ".xdb", xr_itoa(num, s_num, 10));
-#else
-    strconcat(sizeof(fname), fname, tgt_folder, ".pack_#", xr_itoa(num, s_num, 10));
-#endif
+    if (!output_name.empty())
+        strconcat(fname, output_name.c_str(), num > 0 ? xr_itoa(num, s_num, 10) : "");
+    else
+    {
+        if (bPackingToXDB)
+            strconcat(fname, tgt_folder, ".xdb", xr_itoa(num, s_num, 10));
+        else
+            strconcat(fname, tgt_folder, ".pack_#", xr_itoa(num, s_num, 10));
+    }
     xr_unlink(fname);
     fs_pack_writer = FS.w_open(fname);
     fs_desc.clear();
@@ -404,7 +411,7 @@ void xrCompressor::PerformWork()
         SetWindowText(GetConsoleWindow(), caption);
         printf("\n%-80s   ", (*files_list)[it]);
 
-        if (fs_pack_writer->tell() > XRP_MAX_SIZE)
+        if (fs_pack_writer->tell() > XRP_TARGET_SIZE)
         {
             ClosePack();
             OpenPack(target_name.c_str(), pack_num++);

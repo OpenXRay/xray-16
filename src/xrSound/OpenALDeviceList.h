@@ -1,8 +1,5 @@
 #pragma once
 
-#include "openal/al.h"
-#include "openal/alc.h"
-
 #include "xrCore/_std_extensions.h"
 
 struct ALDeviceDesc
@@ -17,7 +14,6 @@ struct ALDeviceDesc
             u16 selected : 1;
             u16 eax : 3;
             u16 efx : 1;
-            u16 xram : 1;
 
             u16 unused : 9;
         };

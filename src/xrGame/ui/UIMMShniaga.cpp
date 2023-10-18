@@ -18,7 +18,7 @@
 
 extern string_path g_last_saved_game;
 
-CUIMMMagnifer::CUIMMMagnifer() : CUIStatic("CUIMMMagnifer") {}
+CUIMMMagnifer::CUIMMMagnifer() : CUIStatic(CUIMMMagnifer::GetDebugType()) {}
 
 CUIMMMagnifer::~CUIMMMagnifer()
 {
@@ -44,7 +44,7 @@ void CUIMMMagnifer::ResetPPMode()
 
 ////////////////////////////////////////////
 
-CUIMMShniaga::CUIMMShniaga() : CUIWindow("CUIMMShniaga")
+CUIMMShniaga::CUIMMShniaga() : CUIWindow(CUIMMShniaga::GetDebugType())
 {
     m_sound = xr_new<CMMSound>();
 
@@ -397,22 +397,27 @@ void CUIMMShniaga::OnBtnClick()
 
 bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    int action = GetBindedAction(dik);
+    if (IsBinded(kQUIT, dik))
+    {
+        if (m_page != epi_main)
+            ShowMain();
+        return true;
+    }
+
+    const auto action = GetBindedAction(dik, EKeyContext::UI);
 
     // Check here only for key press to fix too fast clicks
     if (WINDOW_KEY_PRESSED == keyboard_action)
     {
         switch (action)
         {
-        case kENTER:
-        case kJUMP:
-        case kUSE:
+        case kUI_ACCEPT:
             if (WINDOW_KEY_HOLD == keyboard_action)
                 return false;
             OnBtnClick();
             return true;
 
-        case kQUIT:
+        case kUI_BACK:
             if (m_page != epi_main)
                 ShowMain();
             return true;
@@ -421,11 +426,9 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     // CInput sends both 'key hold' and 'key press' during one frame, no need to check WINDOW_KEY_PRESSED here
     else if (WINDOW_KEY_HOLD == keyboard_action)
     {
-    try_again:
         switch (action)
         {
-        case kUP:
-        case kFWD:
+        case kUI_MOVE_UP:
             if (WINDOW_KEY_HOLD == keyboard_action && !m_flags.test(fl_MovingStoped))
                 return true;
 
@@ -435,8 +438,7 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                 SelectBtn(BtnCount() - 1);
             return true;
 
-        case kDOWN:
-        case kBACK:
+        case kUI_MOVE_DOWN:
             if (WINDOW_KEY_HOLD == keyboard_action && !m_flags.test(fl_MovingStoped))
                 return true;
 
@@ -445,21 +447,6 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             else
                 SelectBtn(0);
             return true;
-
-        case kLEFT:
-        case kRIGHT:
-            break;
-
-        default:
-        {
-            switch (dik)
-            {
-            case XR_CONTROLLER_BUTTON_DPAD_UP:    action = kUP;    goto try_again;
-            case XR_CONTROLLER_BUTTON_DPAD_DOWN:  action = kDOWN;  goto try_again;
-            case XR_CONTROLLER_BUTTON_DPAD_LEFT:  action = kLEFT;  goto try_again;
-            case XR_CONTROLLER_BUTTON_DPAD_RIGHT: action = kRIGHT; goto try_again;
-            }
-        }
         } // switch (GetBindedAction(dik))
     }
 
@@ -470,7 +457,7 @@ bool CUIMMShniaga::OnControllerAction(int axis, float x, float y, EUIMessages co
 {
     if (WINDOW_KEY_PRESSED == controller_action || WINDOW_KEY_HOLD == controller_action)
     {
-        if (IsBinded(kMOVE_AROUND, axis) && !fis_zero(y))
+        if (IsBinded(kUI_MOVE, axis, EKeyContext::UI) && !fis_zero(y))
         {
             if (!m_flags.test(fl_MovingStoped))
                 return true;

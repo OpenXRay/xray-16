@@ -7,8 +7,9 @@
 #include "xrEngine/xr_level_controller.h"
 
 CUIKeyBinding::CUIKeyBinding()
-    : CUIWindow("CUIKeyBinding"),
-      m_header{ "Header 1", "Header 2", "Header 3" }
+    : CUIWindow(CUIKeyBinding::GetDebugType()),
+      m_header{ "Game actions header", "Primary bindings header", "Secondary bindings header" },
+      m_frame( "Frame" )
 {
     for (auto& header : m_header)
         AttachChild(&header);

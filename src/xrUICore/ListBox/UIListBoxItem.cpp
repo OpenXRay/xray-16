@@ -4,7 +4,8 @@
 #include "Common/object_broker.h"
 #include "Static/UIStatic.h"
 
-CUIListBoxItem::CUIListBoxItem(float height) : CUIFrameLineWnd("CUIListBoxItem"), m_text(nullptr), tag(u32(-1))
+CUIListBoxItem::CUIListBoxItem(float height)
+    : CUIFrameLineWnd(CUIListBoxItem::GetDebugType()), m_text(nullptr), tag(u32(-1))
 {
     SetHeight(height);
     m_text = AddTextField("---", 10.0f);

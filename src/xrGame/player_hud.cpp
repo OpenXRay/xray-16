@@ -8,8 +8,9 @@
 #include "ActorEffector.h"
 #include "WeaponMagazinedWGrenade.h" // XXX: move somewhere
 
+extern u32 hud_adj_mode;
 player_hud* g_player_hud = nullptr;
-
+extern ENGINE_API shared_str current_player_hud_sect;
 // clang-format off
 // --#SM+# Begin--
 constexpr float PITCH_OFFSET_R    = 0.0f;   // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
@@ -129,6 +130,9 @@ void attachable_hud_item::update(bool bForce)
     {
         reload_measures();
     }
+    
+    if (hud_adj_mode > 0)
+        m_measures.update(m_attach_offset);
 
     m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform);
     m_upd_firedeps_frame = Device.dwFrame;
@@ -217,12 +221,8 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     m_item_attach[0] = pSettings->r_fvector3(sect_name, "item_position");
     m_item_attach[1] = pSettings->r_fvector3(sect_name, "item_orientation");
 
-    Fvector ypr = m_item_attach[1];
-    ypr.mul(PI / 180.f);
-
     Fmatrix attach_offset;
-    attach_offset.setHPB(ypr.x, ypr.y, ypr.z);
-    attach_offset.translate_over(m_item_attach[0]);
+    update(attach_offset);
 
     shared_str bone_name;
     m_prop_flags.set(e_fire_point, pSettings->line_exist(sect_name, "fire_bone"));
@@ -286,12 +286,8 @@ Fmatrix hud_item_measures::load_monolithic(const shared_str& sect_name, IKinemat
     m_item_attach[0] = pSettings->r_fvector3(sect_name, "position");
     m_item_attach[1] = pSettings->r_fvector3(sect_name, "orientation");
 
-    Fvector ypr = m_item_attach[1];
-    ypr.mul(PI / 180.f);
-
     Fmatrix attach_offset;
-    attach_offset.setHPB(ypr.x, ypr.y, ypr.z);
-    attach_offset.translate_over(m_item_attach[0]);
+    update(attach_offset);
 
     // fire bone
     if (auto* wpn = smart_cast<CWeapon*>(owner))
@@ -360,6 +356,14 @@ void hud_item_measures::load_inertion_params(const shared_str& sect_name)
     m_inertion_params.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, sect_name, "inertion_tendto_speed", TENDTO_SPEED);
     m_inertion_params.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, sect_name, "inertion_tendto_aim_speed", TENDTO_SPEED_AIM);
     //--#SM+# End--
+}
+
+void hud_item_measures::update(Fmatrix& attach_offset)
+{
+    Fvector ypr = m_item_attach[1];
+    ypr.mul(PI / 180.f);
+    attach_offset.setHPB(ypr.x, ypr.y, ypr.z);
+    attach_offset.translate_over(m_item_attach[0]);
 }
 
 attachable_hud_item::~attachable_hud_item()
@@ -826,6 +830,7 @@ void player_hud::update_inertion(Fmatrix& trans) const
 
 attachable_hud_item* player_hud::create_hud_item(const shared_str& sect)
 {
+    current_player_hud_sect = sect;
     auto& item = m_pool[sect];
 
     if (!item)

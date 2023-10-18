@@ -136,7 +136,7 @@ void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 
 //--------------------------------------------------------------------------------------------------------------
 
-SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
+SDeclaration* CResourceManager::_CreateDecl(const D3DVERTEXELEMENT9* dcl)
 {
     // Search equal code
     for (SDeclaration* D : v_declarations)
@@ -158,7 +158,7 @@ SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
+SGeometry* CResourceManager::CreateGeom(const D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
 {
     R_ASSERT(decl && vb);
 

@@ -78,6 +78,17 @@ void UITaskListWnd::OnMouseScroll(float iDirection)
     else if (iDirection == WINDOW_MOUSE_WHEEL_DOWN)
         m_list->ScrollBar()->TryScrollInc();
 }
+
+bool UITaskListWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    return inherited::OnKeyboardAction(dik, keyboard_action);
+}
+
+bool UITaskListWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    return inherited::OnControllerAction(axis, x, y, controller_action);
+}
+
 void UITaskListWnd::Show(bool status)
 {
     inherited::Show(status);
@@ -227,7 +238,7 @@ void UITaskListWndItem::Update()
 
     if (m_task && m_name->CursorOverWindow() && show_hint_can)
     {
-        if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700))
+        if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700 * Device.time_factor()))
         {
             show_hint = true;
             GetMessageTarget()->SendMessage(this, PDA_TASK_SHOW_HINT, (void*)m_task);

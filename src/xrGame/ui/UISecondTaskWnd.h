@@ -23,19 +23,21 @@ class CUIFrameLineWnd;
 class CGameTask;
 class UIHint;
 
-class UITaskListWnd : public CUIWindow, public CUIWndCallback
+class UITaskListWnd final : public CUIWindow, public CUIWndCallback
 {
 private:
     typedef CUIWindow inherited;
 
 public:
     UITaskListWnd();
-    virtual ~UITaskListWnd();
+    ~UITaskListWnd() override;
 
     void init_from_xml(CUIXml& xml, LPCSTR path);
 
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnMouseScroll(float iDirection);
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     virtual void Show(bool status);
     virtual void OnFocusReceive();
     virtual void OnFocusLost();
@@ -43,6 +45,8 @@ public:
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
     void UpdateList();
+
+    pcstr GetDebugType() override { return "UITaskListWnd"; }
 
 protected:
     void OnBtnClose(CUIWindow* w, void* d);
@@ -67,7 +71,7 @@ private: // m_
 
 // -------------------------------------------------------------------------------------------------
 
-class UITaskListWndItem : public CUIWindow
+class UITaskListWndItem final : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;

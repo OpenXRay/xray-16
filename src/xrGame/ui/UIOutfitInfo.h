@@ -9,13 +9,15 @@ class CUIStatic;
 class CUIDoubleProgressBar;
 class CUIXml;
 
-class CUIOutfitImmunity : public CUIWindow
+class CUIOutfitImmunity final : public CUIWindow
 {
 public:
     CUIOutfitImmunity();
 
     bool InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type);
     void SetProgressValue(float cur, float comp);
+
+    pcstr GetDebugType() override { return "CUIOutfitImmunity"; }
 
 protected:
     CUIStatic m_name; // texture + name
@@ -27,7 +29,7 @@ protected:
 
 // -------------------------------------------------------------------------------------
 
-class CUIOutfitInfo : public CUIWindow
+class CUIOutfitInfo final : public CUIWindow
 {
 public:
     CUIOutfitInfo() : CUIWindow("CUIOutfitInfo") {}
@@ -35,6 +37,8 @@ public:
     void InitFromXml(CUIXml& xml_doc);
     void UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit = nullptr);
     void UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet = nullptr);
+
+    pcstr GetDebugType() override { return "CUIOutfitInfo"; }
 
 protected:
     enum
