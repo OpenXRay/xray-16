@@ -52,7 +52,7 @@ CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
     xr_strcat(temp, p.m_alife);
     *command_line = temp;
 
-    bool isNewGame = xr_strcmp(p.m_new_or_load, "new") != -1;
+    const bool isNewGame = xr_strcmp(p.m_new_or_load, "new") != -1;
 
     LPCSTR start_game_callback = pSettings->r_string(alife_section, "start_game_callback");
     luabind::functor<void> functor;
