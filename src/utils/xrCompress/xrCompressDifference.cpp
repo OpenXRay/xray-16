@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#ifndef MOD_COMPRESS
-
 string_path target_folder;
 string_path new_folder, old_folder;
 
@@ -177,4 +175,3 @@ int ProcessDifference()
 
     return 0;
 }
-#endif

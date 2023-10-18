@@ -40,8 +40,12 @@ public:
     bool bReady;
 
     CTimer Timer;
+    CTimer TimerPersistent; // time-factor is always 1.0f
     float fTimer_Value;
     float fTimer_Delta;
+    float fTimerPersistent_Value;
+    float fTimerPersistent_Delta;
+
     sound_event* Handler;
 
 protected:
@@ -132,7 +136,7 @@ public:
     void i_create_all_sources();
 
     void i_destroy_source(CSoundRender_Source* S);
-    CSoundRender_Emitter* i_play(ref_sound* S, bool _loop, float delay);
+    CSoundRender_Emitter* i_play(ref_sound* S, u32 flags, float delay);
     void i_start(CSoundRender_Emitter* E);
     void i_stop(CSoundRender_Emitter* E);
     void i_rewind(CSoundRender_Emitter* E);

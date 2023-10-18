@@ -86,8 +86,7 @@ void CSoundRender_CoreA::_initialize()
             xr_delete(m_effects);
         }
     }
-#endif
-#if defined(XR_HAS_EFX) // XXX: temporary, EAX has higher priority than EFX
+#elif defined(XR_HAS_EFX)
     // Check for EFX extension
     if (deviceDesc.props.efx && !m_effects)
     {

@@ -10,11 +10,12 @@ class UIArtefactParamItem;
 class CUIArtefactParams final : public CUIWindow
 {
 public:
-    CUIArtefactParams() : CUIWindow("CUIArtefactParams") {}
+    CUIArtefactParams() : CUIWindow("Artefact Params") {}
     ~CUIArtefactParams() override;
     bool InitFromXml(CUIXml& xml);
     bool Check(const shared_str& af_section);
     void SetInfo(const shared_str& af_section);
+    pcstr GetDebugType() override { return "CUIArtefactParams"; }
 
 protected:
     UIArtefactParamItem* CreateItem(CUIXml& uiXml, pcstr section,
@@ -52,6 +53,8 @@ public:
     void SetDefaultValuesPlain(float magnitude, bool isSignInverse, const shared_str& unit);
     void SetCaption(LPCSTR name);
     void SetValue(float value);
+
+    pcstr GetDebugType() override { return "UIArtefactParamItem"; }
 
 protected:
     InitResult InitPlain(CUIXml& xml, pcstr section);

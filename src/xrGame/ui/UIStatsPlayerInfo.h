@@ -11,11 +11,13 @@ typedef struct
     float width;
 } PI_FIELD_INFO;
 
-class CUIStatsPlayerInfo : public CUIWindow
+class CUIStatsPlayerInfo final : public CUIWindow
 {
 public:
     CUIStatsPlayerInfo(xr_vector<PI_FIELD_INFO>* info, CGameFont* pF, u32 text_col);
-    virtual ~CUIStatsPlayerInfo();
+    ~CUIStatsPlayerInfo() override;
+
+    pcstr GetDebugType() override { return "CUIStatsPlayerInfo"; }
 
     void SetInfo(game_PlayerState* pInfo);
     void InitPlayerInfo(Fvector2 pos, Fvector2 size);

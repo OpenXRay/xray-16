@@ -3,7 +3,8 @@
 #include "XML/UITextureMaster.h"
 
 CUITextFrameLineWnd::CUITextFrameLineWnd()
-    : CUIWindow("CUITextFrameLineWnd"), bHorizontal(true), m_frameline("Frameline"), m_title("Title")
+    : CUIWindow(CUITextFrameLineWnd::GetDebugType()),
+      bHorizontal(true), m_frameline("Frameline"), m_title("Title")
 {
     AttachChild(&m_title);
     AttachChild(&m_frameline);

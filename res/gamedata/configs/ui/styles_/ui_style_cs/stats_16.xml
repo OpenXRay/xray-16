@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<window x="0" y="0" w="640" h="480" r="227" g="121" b="222" texture="1">
+
+	<frag_wnd_tdm x="0" y="0" width="845" height="642">
+		<back_t x="0" y="0" width="845" height="98">
+			<texture>ui_statTwo_t</texture>
+		</back_t>
+		<back_c x="11" y="98" width="832" height="163" count="3">
+			<texture>ui_statTwo_back</texture>
+		</back_c>		
+		<back_b x="4" y="584" width="839" height="58">
+			<texture>ui_statTwo_b</texture>
+		</back_b>
+	</frag_wnd_tdm>
+	
+	<frag_wnd_dm x="0" y="0" width="440" height="642">
+		<back_t x="0" y="0" width="440" height="95">
+			<texture>ui_statOne_t</texture>
+		</back_t>
+		<back_c x="8" y="95" width="440" height="163" count="3">
+			<texture>ui_statOne_back</texture>
+		</back_c>		
+		<back_b x="1" y="584" width="440" height="58">
+			<texture>ui_statOne_b</texture>
+		</back_b>
+	</frag_wnd_dm>
+				
+	<stats_wnd x="25" x2="430" y="65" width="400" height="480">
+		<back_ground x="0" y="0" width="400" height="480">
+			<!--texture>ui_frame</texture-->
+		</back_ground>
+		<player_list x="0" y="0" width="400" height="0" spectator="0"> <!-- dinamic height -->
+			<team_header x="10" y="45" width="400" height="20">
+				<text_format font="letterica18" a="255" r="188" g="188" b="180" />
+				<logo x="0" y="0" width="24" height="32" stretch="1"/>
+				<header x="42" y="0" width="368" height="20">
+					<texture></texture>
+					<text></text>
+				</header>
+			</team_header>
+			
+			<list_header x="0" y="0" width="400" height="35">
+				<texture></texture>
+				<text_format font="letterica16" a="255" r="188" g="188" b="180" />
+			</list_header>
+			
+			<text_format font="letterica16" a="255" r="215" g="187" b="139" height="16"/>
+			<field name="name"		width="120" />
+			<field name="frags"		width="40" />
+			<field name="deaths"	width="50" />
+			<field name="ping"		width="35" />
+			<field name="artefacts"	width="65" />
+			<field name="rank"		width="15" />
+			<field name="death_atf"	width="15" />
+		</player_list>
+		
+		<spectator_list x="0" y="0" width="400" height="0" spectator="1">
+			<list_header x="0" y="0" width="400" height="25"> <!-- dimensions not using yet-->
+				<text_format font="letterica16" a="255" r="238" g="155" b="23" />
+				<texture>ui_statTwo_tabdiv_l</texture>
+			</list_header>
+			<text_format font="letterica16" a="255" r="215" g="187" b="139" height="16"/>
+			<field name="name"		width="210" />
+			<field name="ping"		width="30" />
+		</spectator_list>
+	</stats_wnd>
+	
+	<players_wnd x="25" x2="430" y="65" width="400" height="480">
+		<player_list x="0" y="0" width="400" height="0" status_mode="1"> <!-- dinamic height -->
+			<team_header x="10" y="45" width="400" height="20">
+				<text_format font="letterica18" a="255" r="188" g="188" b="180" />
+				<logo x="0" y="0" width="24" height="32" stretch="1"/>
+				<header x="42" y="0" width="368" height="20">
+					<texture></texture>
+					<text></text>
+				</header>
+			</team_header>
+			
+			<list_header x="0" y="0" width="400" height="35">
+				<texture></texture>
+				<text_format font="letterica16" a="255" r="188" g="188" b="180" />
+			</list_header>
+			
+			<text_format font="letterica16" a="255" r="215" g="187" b="139" height="16"/>
+			<field name="name"		width="120" />
+			<field name="frags"		width="80" />
+			<field name="status"	width="50" />			
+		</player_list>
+	</players_wnd>
+
+    <!-- BACKGROUND -->
+	<frame_window x="0" y="0" width="400" height="480">
+		<texture>ui_frame</texture>
+		<_left_top_texture x="15" y="20">ui\ui_inv_list_over_lt</_left_top_texture>
+		<_left_bottom_texture x="19" y="155">ui\ui_frame_over_lb</_left_bottom_texture>
+		<title x="20" y="0" width="240" height="60"><text font="graffiti22" r="255" g="255" b="255">Players</text></title>
+	</frame_window>
+
+	<!-- LOG LIST -->
+	<list x="10" y="65" width="390" height="400" item_height="18" active_bg="0">
+		<font font="letterica18" r="255" g="255" b="255"></font>
+		<!-- SUBITEMS IN LISTITEM -->
+		<static x="0" y="0" width="150" height="15">
+			<text font="letterica18" r="192" g="192" b="192"></text>
+		</static>
+		<static x="150" y="0" width="40" height="15">
+			<text font="letterica18" r="192" g="192" b="192"></text>
+		</static>
+		<static x="220" y="0" width="50" height="15">
+			<text font="letterica18" r="192" g="192" b="192"></text>
+		</static>
+		<static x="270" y="0" width="50" height="15">
+			<text font="letterica18" r="192" g="192" b="192"></text>
+		</static>
+		<static x="320" y="0" width="50" height="15">
+			<text font="letterica18" r="192" g="192" b="192"></text>
+		</static>
+
+	</list>
+	
+	<!-- BUTTON -->
+	<button x="100" y="340" width="157" height="48">
+		<texture>ui_button_main02</texture>
+		<text>JOIN</text>
+	</button>
+	
+	<!-- Column headers -->
+	<headers_mt_static x="10" y="40" width="290" height="25">
+		<phrase x="0" y="0" font="graffiti22" r="240" g="217" b="182" a="255"/>
+		<phrase x="150" y="0" font="graffiti22" r="240" g="217" b="182" a="255"/>
+		<phrase x="220" y="0" font="graffiti22" r="240" g="217" b="182" a="255"/>
+		<phrase x="270" y="0" font="graffiti22" r="240" g="217" b="182" a="255"/>
+		<phrase x="320" y="0" font="graffiti22" r="240" g="217" b="182" a="255"/>
+	</headers_mt_static>
+</window>

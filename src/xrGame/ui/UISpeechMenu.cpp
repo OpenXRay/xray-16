@@ -8,6 +8,7 @@
 #include "Level.h"
 
 CUISpeechMenu::CUISpeechMenu(LPCSTR section_name)
+    : CUIDialogWnd(CUISpeechMenu::GetDebugType())
 {
     m_pList = xr_new<CUIScrollView>();
     AttachChild(m_pList);
@@ -20,12 +21,6 @@ CUISpeechMenu::CUISpeechMenu(LPCSTR section_name)
     m_text_color = 0xffffffff;
     CUIXmlInit::InitFont(xml_doc, "speech_menu:text", 0, m_text_color, m_pFont);
     InitList(section_name);
-}
-
-CUISpeechMenu::~CUISpeechMenu()
-{
-    int x = 0;
-    x = x;
 }
 
 void CUISpeechMenu::InitList(LPCSTR section_name)

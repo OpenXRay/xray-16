@@ -8,19 +8,23 @@ class CUIDragDropListEx;
 class CUICellItem;
 class CUIProgressBar;
 
-class ICustomDrawCellItem
+class XR_NOVTABLE ICustomDrawCellItem
 {
 public:
-    virtual ~ICustomDrawCellItem(){};
+    virtual ~ICustomDrawCellItem() = 0;
     virtual void OnDraw(CUICellItem* cell) = 0;
 };
 
-class ICustomDrawDragItem
+inline ICustomDrawCellItem::~ICustomDrawCellItem() = default;
+
+class XR_NOVTABLE ICustomDrawDragItem
 {
 public:
-    virtual ~ICustomDrawDragItem(){};
+    virtual ~ICustomDrawDragItem() = 0;
     virtual void OnDraw(CUIDragItem* drag_item) = 0;
 };
+
+inline ICustomDrawDragItem::~ICustomDrawDragItem() = default;
 
 class CUICellItem : public CUIStatic
 {
@@ -44,7 +48,7 @@ protected:
 
 public:
     CUICellItem();
-    virtual ~CUICellItem();
+    ~CUICellItem() override;
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
@@ -70,7 +74,10 @@ public:
     void Mark(bool status);
     CUIStatic& get_ui_text() const { return *m_text; }
     virtual bool IsHelper() { return false; }
-    virtual void SetIsHelper(bool is_helper) { ; }
+    virtual void SetIsHelper(bool is_helper) {}
+
+    pcstr GetDebugType() override { return "CUICellItem"; }
+
 public:
     static CUICellItem* m_mouse_selected_item;
     void* m_pData;
@@ -83,7 +90,7 @@ public:
     bool m_has_upgrade;
 };
 
-class CUIDragItem : public CUIWindow, public pureRender, public pureFrame
+class CUIDragItem final : public CUIWindow, public pureRender, public pureFrame
 {
     typedef CUIWindow inherited;
     CUIStatic m_static;
@@ -109,4 +116,6 @@ public:
     void SetBackList(CUIDragDropListEx* l);
     CUIDragDropListEx* BackList() { return m_back_list; }
     Fvector2 GetPosition();
+
+    pcstr GetDebugType() override { return "CUIDragItem"; }
 };

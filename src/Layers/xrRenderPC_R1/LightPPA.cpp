@@ -225,7 +225,7 @@ void CLightR_Manager::render_point(u32 _priority)
         // 5. Dump sorting tree
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
-            g_hud->Render_Last(dsgraph.context_id);
+            g_pGameLevel->pHUD->Render_Last(dsgraph.context_id);
         dsgraph.render_graph(_priority);
         if (bHUD && _priority == 0)
             dsgraph.render_hud();
@@ -314,7 +314,7 @@ void CLightR_Manager::render_spot(u32 _priority)
         //RCache.set_ClipPlanes(true,  &L_combine);
         RCache.set_Constants((R_constant_table*)nullptr);
         if (bHUD && _priority == 0)
-            g_hud->Render_Last(dsgraph.context_id);
+            g_pGameLevel->pHUD->Render_Last(dsgraph.context_id);
         dsgraph.render_graph(_priority);
         if (bHUD && _priority == 0)
             dsgraph.render_hud();
@@ -505,8 +505,8 @@ CLightR_Manager::CLightR_Manager() : xrc("LightR_Manager")
     {
         hGeom.create(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX2, RImplementation.Vertex.Buffer(), nullptr);
 
-        constexpr pcstr shader = "effects\\light";
-        constexpr pcstr textures = "effects\\light,effects\\light";
+        static constexpr pcstr shader = "effects\\light";
+        static constexpr pcstr textures = "effects\\light,effects\\light";
 
         hShader.create(shader, textures);
         if (!hShader)

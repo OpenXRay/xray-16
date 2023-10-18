@@ -25,7 +25,7 @@
 		<text>Tworzenie nowej gry</text>
 	</string>
 	<string id="ui_mm_always_active">
-		<text>Zawsze aktywny</text>
+		<text>Dzia³anie w tle (Alt+Tab)</text>
 	</string>
 	<string id="ui_mm_detail_radius">
 		<text>Odleg³oœæ rys. trawy</text>
@@ -48,14 +48,23 @@
 	<string id="renderer_gl">
 		<text>Rozsz. pe³ne oœw. dynam. (OpenGL)</text>
 	</string>
-	<string id="ui_mm_r2_fxaa">
-		<text>FXAA</text>
+	<string id="ui_mm_window_mode">
+		<text>Tryb wyœwietlania</text>
+	</string>
+	<string id="st_opt_windowed">
+		<text>Okienkowy</text>
+	</string>
+	<string id="st_opt_windowed_borderless">
+		<text>Okienkowy (bez ramek)</text>
+	</string>
+	<string id="st_opt_fullscreen">
+		<text>Pe³noekranowy</text>
+	</string>
+	<string id="st_opt_fullscreen_borderless">
+		<text>Pe³noekranowy (szybki Alt+Tab)</text>
 	</string>
 	<string id="ui_mm_r2_smap_size">
 		<text>Jakoœæ cieni map</text>
-	</string>
-	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
-		<text>Optymalizacja mokrych pow.</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
 		<text>Mokre pow. na blisk. odleg³oœci</text>
@@ -77,6 +86,12 @@
 	</string>
 	<string id="ui_mm_gamepad_setup">
 		<text>Konfiguracja gamepada</text>
+	</string>
+	<string id="ui_mm_fps_limit">
+		<text>Limit FPS w grze</text>
+	</string>
+	<string id="ui_mm_fps_limit_in_menu">
+		<text>Limit FPS w menu</text>
 	</string>
 	<string id="eng">
 		<text>Angielski (English)</text>

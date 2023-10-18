@@ -98,7 +98,7 @@ void CUIProgressBar::Update()
         float _diff = m_ProgressPos.y - m_ProgressPos.x;
 
         float _length = (m_MaxPos - m_MinPos);
-        float _val = _length * (1.0f - m_inertion) * Device.fTimeDelta;
+        float _val = _length * (1.0f - m_inertion) * Device.fTimeDelta / Device.time_factor();
 
         _val = _min(_abs(_val), _abs(_diff));
         _val *= _sign(_diff);

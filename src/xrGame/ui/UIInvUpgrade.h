@@ -28,7 +28,7 @@ class CUIInventoryUpgradeWnd;
 class CInventoryItem;
 class CUIUpgradePoint;
 
-class UIUpgrade : public CUIWindow
+class UIUpgrade final : public CUIWindow
 {
 private:
     typedef inventory::upgrade::Upgrade Upgrade_type;
@@ -127,6 +127,8 @@ public:
     CUIInventoryUpgradeWnd* get_upgrade_window() { return m_parent_wnd; }
     void attach_point(CUIUpgradePoint* point);
 
+    pcstr GetDebugType() override { return "CUIDragDropListEx"; }
+
 public:
     CUIUpgradePoint* m_point;
     CUIStatic* m_border;
@@ -145,6 +147,7 @@ public:
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnFocusReceive();
     virtual void OnFocusLost();
+    pcstr GetDebugType() override { return "CUIUpgradePoint"; }
 };
 
 #endif // UI_INVENTORY_UPGRADE_H_INCLUDED

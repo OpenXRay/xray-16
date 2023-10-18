@@ -44,7 +44,7 @@ extern "C" {
 	typedef HRESULT (FAR PASCAL *LPEAXDIRECTSOUNDCREATE)(GUID*, LPDIRECTSOUND*, IUnknown FAR*);
 
 #else
-	#include <openal/al.h>
+	#include <al.h>
 
 	#ifndef GUID_DEFINED
 		#define GUID_DEFINED

@@ -268,7 +268,10 @@ void CUIEditKeyBind::OnMessage(LPCSTR message)
         return; // fuck
 
     game_action* other_action = ActionNameToPtr(command);
-    if (IsGroupNotConflicted(m_action->key_group, other_action->key_group))
+
+    bool no_conflict  = IsGroupNotConflicted(m_action->key_group, other_action->key_group);
+         no_conflict &= IsContextNotConflicted(m_action->key_context, other_action->key_context);
+    if (no_conflict)
         return;
 
     SetText("---");

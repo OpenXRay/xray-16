@@ -28,13 +28,14 @@
 
 ## Main differences from original X-Ray are:
 - Support for 64-bit.
-- Support for ARM, ARM64, E2K (Elbrus 2000).
+- Support for ARM, ARM64, E2K (Elbrus 2000), PPC64LE.
 - Works on Linux, macOS, OSL (Elbrus OS).
 - New OpenGL renderer. (currently, requires OpenGL 4.1 minimum, lowering to at least OpenGL 3.3 is planned)
 - Improved performance, better FPS.
 - Original bugs fixes.
 - New features for modmakers.
 - Gamepad support. (not yet finished, but you can try already, see [#943](https://github.com/OpenXRay/xray-16/issues/943))
+- New game SDK being currently developed. (see [Game Editor](https://github.com/OpenXRay/xray-16/wiki/[EN]-Game-Editor))
 
 You can see the detailed differences table [here](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-Differences-from-original-X‐Ray)
 

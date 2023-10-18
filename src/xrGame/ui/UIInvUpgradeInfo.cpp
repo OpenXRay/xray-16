@@ -20,19 +20,8 @@
 #include "inventory_upgrade_property.h"
 #include "UIHelper.h"
 
-UIInvUpgradeInfo::UIInvUpgradeInfo()
-    : CUIWindow("UIInvUpgradeInfo")
-{
-    m_upgrade = nullptr;
-    m_background = nullptr;
-    m_name = nullptr;
-    m_cost = nullptr;
-    m_desc = nullptr;
-    m_prereq = nullptr;
-    m_properties_wnd = nullptr;
-}
+UIInvUpgradeInfo::UIInvUpgradeInfo() : CUIWindow(UIInvUpgradeInfo::GetDebugType()) {}
 
-UIInvUpgradeInfo::~UIInvUpgradeInfo() {}
 void UIInvUpgradeInfo::init_from_xml(LPCSTR xml_name)
 {
     CUIXml ui_xml;
@@ -167,7 +156,7 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
         }
         } // switch (upg_res)
         if (str_res[0])
-            m_prereq->SetText(str_res);            
+            m_prereq->SetText(str_res);
     }
     else
     {

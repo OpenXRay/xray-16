@@ -1,6 +1,6 @@
 #pragma once
 
-class CUIWeightBar : public CUIWindow
+class CUIWeightBar final : public CUIWindow
 {
     CUIStatic* m_BottomInfo{};
     CUITextWnd* m_Weight{};
@@ -16,4 +16,5 @@ public:
     void init_from_xml(CUIXml& uiXml, pcstr path);
     void UpdateData(float weight);
     void UpdateData(CInventoryOwner* pInvOwner);
+    pcstr GetDebugType() override { return "CUIWeightBar"; }
 };

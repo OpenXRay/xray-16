@@ -1,0 +1,102 @@
+<w>
+
+	<main x="85" y="0" width="854" height="768" stretch="1">
+		<auto_static x="-86" y="0" width="86" height="768" stretch="1">
+			<texture>ui_inGame2_back_pdaw10_l</texture>
+		</auto_static>
+		<auto_static x="854" y="0" width="86" height="768" stretch="1">
+			<texture>ui_inGame2_back_pdaw10_r</texture>
+		</auto_static>
+	</main>
+
+	<background_static x="0" y="0" width="854" height="768" stretch="1">
+		<texture>ui_pda2</texture>
+	</background_static>
+	
+	<!--noice_static x="21" y="33" width="811" height="683" light_anim="ui_too_slow_blinking_1" la_cyclic="1" la_texture="1" la_text="0" la_alpha="1" stretch="1"-->
+	<noice_static x="106" y="33" width="811" height="683" stretch="1">
+		<texture a="70">ui_pda2_noice</texture>
+	</noice_static>
+
+	<caption_static x="29" y="41" width="797" height="48" stretch="1">
+		<texture>ui_pda2_caption</texture>
+		<text font="letterica16" align="l" x="20" y="21" color="ui_9">FFD@32-45\\</text>
+	</caption_static>
+
+	<anim_static x="790" y="55" width="27" height="32" frames = "16" duration = "1000" columns = "8" frame_width = "32" frame_height = "32" cyclic = "1" autoplay = "1" stretch="1"> 
+		<texture>ui\ui_pda_anims_03</texture>
+	</anim_static>
+
+	<close_button x="724" y="0" width="30" height="16" hint="pda_btn_close" stretch="1">
+	</close_button>
+	
+	<hint_wnd x="0" y="0" width="175" height="120" stretch="1">
+		<background x="0" y="0" width="175" height="100" border="5" stretch="1">
+			<texture a="100">ui_icons_PDA_tooltips</texture>
+		</background>
+		<text x="17" y="20" width="158" height="100">
+			<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t"/>
+		</text>
+	</hint_wnd>
+
+
+	<tab x="783" y="56" width="42" height="27">
+		<button x="0" y="0" width="42" height="27" id="eptTasks" hint="pda_btn_quests_hint" frame_mode="1" stretch="1">
+			<text align="c" vert_align="c" x="0" y="0" font="letterica16">pda_btn_quests</text>
+			<texture_t>ui_nav_bt_t</texture_t>
+			<texture_e>ui_nav_bt_e</texture_e>
+			<texture_h>ui_nav_bt_h</texture_h>
+			<texture_d>ui_nav_bt_d</texture_d>
+			<text_color>
+				<t color="ui_4"/>
+				<d color="ui_4"/>
+				<e color="ui_9"/>
+				<h color="ui_1"/>
+			</text_color>
+		</button>
+
+		<button x="25" y="0" width="42" height="27" id="eptFractionWar" hint="pda_btn_fractionwar_hint" frame_mode="1" stretch="1">
+			<text align="c" vert_align="c" x="0" y="0" font="letterica16">pda_btn_fractionwar</text>
+			<texture_t>ui_nav_bt_t</texture_t>
+			<texture_e>ui_nav_bt_e</texture_e>
+			<texture_h>ui_nav_bt_h</texture_h>
+			<texture_d>ui_nav_bt_d</texture_d>
+			<text_color>
+				<t color="ui_4"/>
+				<d color="ui_4"/>
+				<e color="ui_9"/>
+				<h color="ui_1"/>
+			</text_color>
+		</button>
+
+		<button x="50" y="0" width="42" height="27" id="eptRanking" hint="pda_btn_ranking_hint" frame_mode="1" stretch="1">
+			<text align="c" vert_align="c" x="0" y="0" font="letterica16">pda_btn_ranking</text>
+			<texture_t>ui_nav_bt_t</texture_t>
+			<texture_e>ui_nav_bt_e</texture_e>
+			<texture_h>ui_nav_bt_h</texture_h>
+			<texture_d>ui_nav_bt_d</texture_d>
+			<text_color>
+				<t color="ui_4"/>
+				<d color="ui_4"/>
+				<e color="ui_9"/>
+				<h color="ui_1"/>
+			</text_color>
+		</button>
+		
+		<button x="75" y="0" width="42" height="27" id="eptLogs" hint="pda_btn_logs_hint" frame_mode="1" stretch="1">
+			<text align="c" vert_align="c" x="0" y="0" font="letterica16">pda_btn_logs</text>
+			<texture_t>ui_nav_bt_t</texture_t>
+			<texture_e>ui_nav_bt_e</texture_e>
+			<texture_h>ui_nav_bt_h</texture_h>
+			<texture_d>ui_nav_bt_d</texture_d>
+			<text_color>
+				<t color="ui_4"/>
+				<d color="ui_4"/>
+				<e color="ui_9"/>
+				<h color="ui_1"/>
+			</text_color>
+		</button>
+		
+	</tab>
+  
+</w>

@@ -22,7 +22,7 @@ class UIHint;
 
 using GAME_MAPS = xr_map<shared_str, CUICustomMap*>;
 
-class CUIMapWnd : public CUIWindow, public CUIWndCallback
+class CUIMapWnd final : public CUIWindow, public CUIWndCallback
 {
     typedef CUIWindow inherited;
 
@@ -143,6 +143,7 @@ public:
     void Hint(const shared_str& text);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 
@@ -167,4 +168,6 @@ public:
     u16 GetIdxByName(const shared_str& map_name);
     void UpdateScroll();
     shared_str cName() const { return "ui_map_wnd"; }
+
+    pcstr GetDebugType() override { return "CUIMapWnd"; }
 };

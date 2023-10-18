@@ -1,0 +1,29 @@
+<window>
+	<minimap>
+		<level_frame x="20" y="14" width="163" height="166"/>
+		
+		<background x="4" y="3" width="197" height="191" stretch="1"> 
+			<texture>ui_hud_map</texture>
+			
+			<dist_text x="140" y="4" width="45" height="14">
+				<text align="r" font="arial_14" color="ui_3"/>
+			</dist_text>
+		</background>
+		
+		<compass x="141" y="18" width="31" height="31" heading="1">
+			<texture a="170">ui_hud_compas</texture>
+		</compass>
+		
+		<center width="4" height="4" alignment="c" stretch="1"> 
+			<texture >ui_minimap_point</texture>
+		</center>
+		
+		<static_counter x="159" y="167" width="35" height="29" light_anim="ui_pda_contacts" la_cyclic="0" la_texture="0" la_text="1" la_alpha="1" stretch="1">
+			<texture>ui_hud_map_counter</texture>
+			<text_static x="8" y="7" width="14" height="14">
+				<text  align="c" font="graffiti19" color="ui_7"/>
+			</text_static>
+		</static_counter>
+	
+	</minimap>
+</window>

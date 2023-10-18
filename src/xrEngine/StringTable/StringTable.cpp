@@ -143,6 +143,11 @@ void CStringTable::SetLanguage()
     }
 }
 
+shared_str CStringTable::GetCurrentLanguage() const
+{
+    return pData ? pData->m_sLanguage : nullptr;
+}
+
 xr_token* CStringTable::GetLanguagesToken() const { return languagesToken.data(); }
 
 void CStringTable::Load(LPCSTR xml_file_full)

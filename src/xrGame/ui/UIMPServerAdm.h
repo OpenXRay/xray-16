@@ -74,4 +74,6 @@ public:
     void ShowChangeGameLimitsBtns();
     void OnBackBtn();
     bool IsBackBtnShown() { return m_pBackBtn->IsShown(); };
+
+    pcstr GetDebugType() override { return "CUIMpServerAdm"; }
 };

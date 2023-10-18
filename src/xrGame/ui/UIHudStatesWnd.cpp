@@ -21,7 +21,7 @@
 #include "xrUICore/XML/UITextureMaster.h"
 
 CUIHudStatesWnd::CUIHudStatesWnd()
-    : CUIWindow("CUIHudStatesWnd"), m_b_force_update(true)
+    : CUIWindow(CUIHudStatesWnd::GetDebugType()), m_b_force_update(true)
 {
     for (int i = 0; i < ALife::infl_max_count; ++i)
     {
@@ -40,7 +40,6 @@ CUIHudStatesWnd::CUIHudStatesWnd()
     //-	Load_section();
 }
 
-CUIHudStatesWnd::~CUIHudStatesWnd() {}
 void CUIHudStatesWnd::reset_ui()
 {
     if (g_pGameLevel)
@@ -411,7 +410,7 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
             }
             else
             {
-                m_ui_weapon_sign_ammo->Show(false);  
+                m_ui_weapon_sign_ammo->Show(false);
             }
         }
 
@@ -422,7 +421,7 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
             m_ui_grenade->Show(true);
 
             m_ui_grenade->SetText(m_item_info.grenade.c_str());
-            
+
             CWeaponMagazinedWGrenade* wpn = smart_cast<CWeaponMagazinedWGrenade*>(item);
             if (wpn && wpn->m_bGrenadeMode)
                 m_ui_grenade->SetTextColor(color_rgba(238, 155, 23, 255));
@@ -712,7 +711,7 @@ void CUIHudStatesWnd::UpdateIndicatorType(CActor* actor, ALife::EInfluenceType t
     constexpr u32 c_green = color_rgba(0, 255, 0, 255);
     constexpr u32 c_yellow = color_rgba(255, 255, 0, 255);
     constexpr u32 c_red = color_rgba(255, 0, 0, 255);
-    
+
     LPCSTR texture = "";
     string256 str;
     switch (type)

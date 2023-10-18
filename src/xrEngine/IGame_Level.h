@@ -81,6 +81,7 @@ public:
     bool bReady;
 
     CInifile* pLevel;
+    CCustomHUD* pHUD{};
 
 public: // deferred sound events
     struct _esound_delegate

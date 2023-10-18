@@ -28,7 +28,7 @@ extern const LPCSTR g_inventory_upgrade_xml;
 #define INV_GRID_WIDTH2 40.0f
 #define INV_GRID_HEIGHT2 40.0f
 
-CUIItemInfo::CUIItemInfo() : CUIWindow("CUIItemInfo")
+CUIItemInfo::CUIItemInfo() : CUIWindow(CUIItemInfo::GetDebugType())
 {
     UIItemImageSize.set(0.0f, 0.0f);
 

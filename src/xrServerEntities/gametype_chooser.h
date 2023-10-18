@@ -33,7 +33,7 @@ enum EGameIDs_ext
 
 inline EGameIDs ParseStringToGameType(pcstr str)
 {
-    auto IS = [&](pcstr name)
+    const auto IS = [str](pcstr name)
     {
         return !xr_strcmp(str, name);
     };

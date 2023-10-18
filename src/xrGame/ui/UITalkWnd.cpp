@@ -15,7 +15,7 @@
 #include "UIXmlInit.h"
 #include "xrUICore/Buttons/UI3tButton.h"
 
-CUITalkWnd::CUITalkWnd()
+CUITalkWnd::CUITalkWnd() : CUIDialogWnd(CUITalkWnd::GetDebugType())
 {
     m_pActor = NULL;
 
@@ -32,7 +32,6 @@ CUITalkWnd::CUITalkWnd()
     b_disable_break = false;
 }
 
-CUITalkWnd::~CUITalkWnd() {}
 void CUITalkWnd::InitTalkWnd()
 {
     inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
@@ -348,7 +347,7 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (IsBinded(kUSE, dik) || IsBinded(kQUIT, dik))
+        if (IsBinded(kUSE, dik) || IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI))
         {
             if (!b_disable_break)
             {
@@ -356,8 +355,9 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                 return true;
             }
         }
-        else if (IsBinded(kSPRINT_TOGGLE, dik))
+        switch (GetBindedAction(dik, EKeyContext::Talk))
         {
+        case kTALK_SWITCH_TO_TRADE:
             if (!m_pOthersInvOwner->NeedOsoznanieMode())
             {
                 if (UITalkDialogWnd->mechanic_mode)
@@ -366,10 +366,37 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                     SwitchToTrade();
                 return true;
             }
+            break;
         }
     }
-
+    else if (keyboard_action == WINDOW_KEY_HOLD)
+    {
+        switch (GetBindedAction(dik, EKeyContext::Talk))
+        {
+        case kTALK_LOG_SCROLL_UP:
+            UITalkDialogWnd->TryScrollAnswersList(false);
+            break;
+        case kTALK_LOG_SCROLL_DOWN:
+            UITalkDialogWnd->TryScrollAnswersList(true);
+            break;
+        }
+    }
     return inherited::OnKeyboardAction(dik, keyboard_action);
+}
+
+bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    if (controller_action == WINDOW_KEY_PRESSED)
+    {
+        switch (GetBindedAction(axis, EKeyContext::Talk))
+        {
+        default:
+            return OnKeyboardAction(axis, controller_action);
+        case kTALK_LOG_SCROLL:
+            return true;
+        }
+    }
+    return inherited::OnControllerAction(axis, x, y, controller_action);
 }
 
 void CUITalkWnd::PlaySnd(LPCSTR text)

@@ -1,0 +1,915 @@
+<w>
+  <main x="0" y="0" width="276" height="768">
+    <auto_static x="0" y="0" width="276" height="142" stretch="1">
+		<texture>ui_inGame2_left_top</texture>
+	</auto_static>
+	<auto_static x="-85" y="0" width="85" height="768" stretch="1">
+		<texture>ui_inGame2_back_invw10_l</texture>
+    </auto_static>
+  </main>
+  <scheme x="0" y="280" width="276" height="488" />
+  <property x="42" y="15" width="16" height="19" />
+  
+  <background x="0" y="141" width="276" height="627" stretch="1">
+    <texture>ui_inv_mechanic_back</texture>
+  </background>
+  
+  <!--delimiter  x="0" y="260" width="275" height="19" stretch="1">
+    <texture>ui_inv_delimiter</texture>
+  </delimiter-->
+  
+  <repair_button x="220" y="212" width="47" height="57" stretch="1">
+    <window_name>repair_button</window_name>
+	<texture>ui_bt_repair</texture>
+	<hint_text delay="800">ui_repair_button_hint</hint_text>
+
+  </repair_button>
+
+  <border texture="ui_bt_upgrade_border" />
+  <inking texture="ui_bt_upgrade_chain" />
+
+  <cell_states>
+    <state>
+      <type>enabled</type>
+      <back_texture></back_texture>
+    </state>
+
+    <state>
+      <type>highlight</type>
+      <back_texture></back_texture>
+    </state>
+
+    <state>
+      <type>touched</type>
+      <back_texture></back_texture>
+    </state>
+
+    <state>
+      <type>selected</type>
+      <back_texture>ui_bt_upgrade_taken</back_texture>
+    </state>
+
+    <state>
+      <type>unknown</type>
+      <back_texture>ui_bt_upgrade_unknown</back_texture>
+    </state>
+	
+    <state>
+      <type>disabled_parent</type>
+      <back_texture>ui_bt_upgrade_not_allowed</back_texture>
+    </state>
+
+    <state>
+      <type>disabled_group</type>
+      <back_texture>ui_bt_upgrade_dissabled</back_texture>
+    </state>
+
+    <state>
+      <type>disabled_money</type>
+      <back_texture>ui_bt_upgrade_not_allowed</back_texture>
+    </state>
+	
+    <state>
+      <type>disabled_quest</type>
+      <back_texture>ui_bt_upgrade_not_allowed</back_texture>
+    </state>
+
+  </cell_states>
+
+  <templates>
+	<cell_item   x="0"  y="0"  width="58"  height="40"/>
+  	<cell_border x="-4" y="-5" width="88" height="56"/>
+
+    <template name="upgrade_scheme_u20a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+     </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="195" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="335" />
+        <cell x="100" y="385" />
+      </column>
+
+      <column>
+        <cell x="183" y="50"  />
+        <cell x="183" y="100" />
+        <cell x="183" y="195" />
+        <cell x="183" y="290" />       
+      </column>
+
+    </template>
+    <template name="upgrade_scheme_u20">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+        <cell x="17" y="430" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="385" />
+        <cell x="100" y="430" />
+      </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+        <cell x="183" y="385" />
+        <cell x="183" y="430" />
+      </column>
+
+    </template>
+
+   <template name="upgrade_scheme_u19">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+	  </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="195" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="335" />
+        <cell x="100" y="385" />
+       </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+        <cell x="183" y="385" />
+      </column>
+
+    </template>
+	
+	<template name="upgrade_scheme_u19a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+     </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="195" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="335" />        
+      </column>
+
+      <column>
+        <cell x="183" y="50"  />
+        <cell x="183" y="100" />
+        <cell x="183" y="195" />
+        <cell x="183" y="290" />       
+      </column>
+	
+	</template>
+
+   <template name="upgrade_scheme_u18">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+        <cell x="17" y="430" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="195" />
+        <cell x="100" y="240" />
+        <cell x="100" y="385" />
+        <cell x="100" y="430" />
+       </column>
+
+      <column>
+        <cell x="183" y="195" />
+        <cell x="183" y="240" />
+      </column>
+
+    </template>
+    
+   <template name="upgrade_scheme_u17b">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="385" />
+       </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+        <cell x="183" y="385" />
+      </column>
+
+    </template>
+
+   <template name="upgrade_scheme_u17a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="385" />
+       </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+        <cell x="183" y="385" />
+      </column>
+
+    </template>
+
+   <template name="upgrade_scheme_u17">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+        <cell x="17" y="430" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="385" />
+       </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+      </column>
+
+    </template>
+
+   <template name="upgrade_scheme_u16b">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+	</column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="195" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="335" />
+       </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+      </column>
+
+    </template>	
+
+   <template name="upgrade_scheme_u16a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="385" />
+       </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+      </column>
+
+    </template>	
+	
+   <template name="upgrade_scheme_u16">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+        <cell x="17" y="430" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+       </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+      </column>
+
+    </template>	
+
+	<template name="upgrade_scheme_u15a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+        <cell x="100" y="385" />
+       </column>
+
+      <column>
+        <cell x="183" y="385" />
+      </column>
+
+    </template>		
+	
+	<template name="upgrade_scheme_u15">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+       </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+      </column>
+
+    </template>	
+
+    <template name="upgrade_scheme_u14">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+      </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+      </column>
+
+    </template>	
+	
+    <template name="upgrade_scheme_u14a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+      </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="195" />
+      </column>
+
+    </template>	
+	
+	<template name="upgrade_scheme_u14b">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+		<cell x="100" y="385" />
+      </column>
+
+    </template>
+	
+    <template name="upgrade_scheme_u13">
+
+      <column>
+        <cell x="17" y="30"  />
+        <cell x="17" y="75"  />
+        <cell x="17" y="130" />
+        <cell x="17" y="175" />
+        <cell x="17" y="230" />
+        <cell x="17" y="280" />
+      </column>
+
+      <column>
+        <cell x="100" y="80"  />
+        <cell x="100" y="125" />
+        <cell x="100" y="230" />
+        <cell x="100" y="280" />
+      </column>
+
+      <column>
+        <cell x="183" y="180" />
+        <cell x="183" y="230" />
+        <cell x="183" y="280" />
+      </column>
+
+    </template>
+	
+	<template name="upgrade_scheme_u13a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+      </column>
+
+    </template>	
+	
+    <template name="upgrade_scheme_u12">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="240" />
+        <cell x="100" y="290" />
+      </column>
+
+    </template>
+	
+    <template name="upgrade_scheme_u11a">
+
+	  <column>
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+     </column>
+
+      <column>
+        <cell x="100" y="100" />
+        <cell x="100" y="145" />
+      </column>
+      
+      <column>
+        <cell x="183" y="100" />
+        <cell x="183" y="145" />
+      </column>
+	
+	</template>
+	
+    <template name="upgrade_scheme_u11">
+
+	  <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+      </column>
+
+    </template>
+	
+    <template name="upgrade_scheme_u10a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+        <cell x="17" y="335" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+      </column>
+
+    </template>
+	
+    <template name="upgrade_scheme_u10">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="195" />		
+      </column>
+
+    </template>
+	
+    <template name="upgrade_scheme_u9">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+      </column>
+
+	    </template>
+		
+    <template name="upgrade_scheme_u9a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+        <cell x="100" y="195" />	
+      </column>
+
+    </template>		
+	
+    <template name="upgrade_scheme_u9b">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="100" />
+        <cell x="17" y="195" />
+        <cell x="17" y="290" />
+        <cell x="17" y="385" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="240" />
+      </column>
+
+      <column>
+        <cell x="183" y="145" />
+        <cell x="183" y="335" />		
+      </column>
+
+    </template>	
+
+    <template name="upgrade_scheme_u9c">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+      </column>
+
+      <column>
+        <cell x="100" y="5"  />
+        <cell x="100" y="50" />
+      </column>
+
+	    </template>
+	    
+    <template name="upgrade_scheme_u9d">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+      </column>
+
+	    </template>
+
+    <template name="upgrade_scheme_u8a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+        <cell x="17" y="290" />
+      </column>
+
+      <column>
+        <cell x="100" y="290" />
+      </column>
+
+    </template>	
+	
+    <template name="upgrade_scheme_u8">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="200" />
+      </column>
+
+      <column>
+        <cell x="100" y="50"  />
+        <cell x="100" y="100" />
+      </column>
+
+      <column>
+        <cell x="183" y="75" />
+      </column>
+
+    </template>	
+
+    <template name="upgrade_scheme_u7a">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="200" />
+      </column>
+
+      <column>
+        <cell x="100" y="22"  />
+        <cell x="100" y="123" />
+      </column>
+
+    </template>
+
+    <template name="upgrade_scheme_u7">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="55"  />
+        <cell x="17" y="105" />
+        <cell x="17" y="155" />
+        <cell x="17" y="205" />
+        <cell x="17" y="255" />
+        <cell x="17" y="305" />
+      </column>
+
+    </template>
+
+    <template name="upgrade_scheme_u6">
+
+      <column>
+        <cell x="17" y="5"   />
+        <cell x="17" y="50"  />
+        <cell x="17" y="100" />
+        <cell x="17" y="145" />
+        <cell x="17" y="195" />
+        <cell x="17" y="240" />
+      </column>
+
+    </template>
+		
+    <template name="upgrade_scheme_u5">
+
+      <column>
+        <cell x="17" y="30"  />
+        <cell x="17" y="75"  />
+        <cell x="17" y="130" />
+        <cell x="17" y="175" />
+        <cell x="17" y="230" />
+      </column>
+
+    </template>
+
+    <template name="upgrade_scheme_u3">
+
+      <column>
+        <cell x="17" y="30"  />
+        <cell x="17" y="80"  />
+        <cell x="17" y="130" />
+      </column>
+
+    </template>
+
+  </templates>
+
+</w>

@@ -58,4 +58,6 @@ ENGINE_API extern float psControllerSensorDeadZone;
 ENGINE_API extern Flags32 psControllerInvertY;
 ENGINE_API extern Flags32 psControllerEnableSensors;
 
+ENGINE_API extern float psControllerCursorAutohideTime;
+
 #endif
