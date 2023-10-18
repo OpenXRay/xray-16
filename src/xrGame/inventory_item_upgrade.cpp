@@ -168,9 +168,9 @@ void CInventoryItem::net_Spawn_install_upgrades(CSE_Abstract* DC) // net_Spawn
 
     ai().alife().inventory_upgrade_manager().init_install(*this); // from pSettings
 
-    for (auto it : saved_upgrades)
+    for (const auto& upgrade : saved_upgrades)
     {
-        ai().alife().inventory_upgrade_manager().upgrade_install(*this, (*it), true);
+        ai().alife().inventory_upgrade_manager().upgrade_install(*this, *upgrade, true);
     }
 }
 
