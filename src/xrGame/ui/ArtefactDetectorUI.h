@@ -11,12 +11,14 @@ class CUIXml;
 class CLAItem;
 class CBoneInstance;
 
-class CUIArtefactDetectorBase
+class XR_NOVTABLE CUIArtefactDetectorBase
 {
 public:
-    virtual ~CUIArtefactDetectorBase() = default;
+    virtual ~CUIArtefactDetectorBase();
     virtual void update() {}
 };
+
+inline CUIArtefactDetectorBase::~CUIArtefactDetectorBase() = default;
 
 class CUIDetectorWave final : public CUIFrameLineWnd
 {
@@ -27,10 +29,13 @@ protected:
     float m_step{};
 
 public:
-    CUIDetectorWave() : CUIFrameLineWnd("CUIDetectorWave") {}
+    CUIDetectorWave() : CUIFrameLineWnd(CUIDetectorWave::GetDebugType()) {}
+
     void InitFromXML(CUIXml& xml, LPCSTR path);
     void SetVelocity(float v);
-    virtual void Update();
+    void Update() override;
+
+    pcstr GetDebugType() override { return "CUIDetectorWave"; }
 };
 
 class CUIArtefactDetectorSimple final : public CUIArtefactDetectorBase
@@ -50,7 +55,7 @@ class CUIArtefactDetectorSimple final : public CUIArtefactDetectorBase
 
 public:
     ~CUIArtefactDetectorSimple() override;
-    void update();
+    void update() override;
     void Flash(bool bOn, float fRelPower);
 
     void construct(CSimpleDetector* p);
@@ -77,7 +82,7 @@ class CUIArtefactDetectorElite final : public CUIArtefactDetectorBase, public CU
     void GetUILocatorMatrix(Fmatrix& _m);
 
 public:
-    CUIArtefactDetectorElite() : CUIWindow("CUIArtefactDetectorElite") {}
+    CUIArtefactDetectorElite() : CUIWindow(CUIArtefactDetectorElite::GetDebugType()) {}
 
     void update() override;
     void Draw() override;
@@ -85,6 +90,8 @@ public:
     void construct(CEliteDetector* p);
     void Clear();
     void RegisterItemToDraw(const Fvector& p, const shared_str& palette_idx);
+
+    pcstr GetDebugType() override { return "CUIArtefactDetectorElite"; }
 };
 
 class CUIArtefactDetectorAdv final : public CUIArtefactDetectorBase

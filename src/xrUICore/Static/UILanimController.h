@@ -120,4 +120,6 @@ public:
     void Update() override;
     void ColorAnimationSetTextureColor(u32 color, bool only_alpha) override;
     void ColorAnimationSetTextColor(u32 color, bool only_alpha) override;
+
+    pcstr GetDebugType() override { return "CUIColorAnimConrollerContainer"; }
 };

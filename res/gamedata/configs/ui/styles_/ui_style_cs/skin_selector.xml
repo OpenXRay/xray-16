@@ -1,0 +1,86 @@
+<window>
+	<skin_selector x="144" y="115" width="749" height="543">
+		<!--skin_shader>hud\set</skin_shader-->
+		<background x="0" y="0" width="749" height="543">
+			<texture>ui_frame_mainDes</texture>
+		</background>
+		<caption x="42" y="4" width="330" height="32">
+			<text font="graffiti22" r="192" g="168" b="144" vert_align="c">mp_skin_selection</text>
+		</caption>
+		<image_frames x="53" y="45" width="664" height="273">
+			<texture>ui_TV_Skin</texture>
+			
+			<a_static_1 x="12" y="61" width="12" height="128"
+				frames			= "17"
+				duration		= "1000"
+				columns			= "17"
+				frame_width		= "12"
+				frame_height	= "128"
+				cyclic			= "0"
+				autoplay		= "0">
+				<texture>ui\ui_mp_skin_select_anim</texture>
+			</a_static_1>
+			
+			<a_static_2 x="641" y="61" width="12" height="128"
+				frames			= "17"
+				duration		= "1000"
+				columns			= "17"
+				frame_width		= "12"
+				frame_height	= "128"
+				cyclic			= "0"
+				autoplay		= "0">
+				<texture>ui\ui_mp_skin_select_anim</texture>
+			</a_static_2>
+			
+			<btn_left x="0" y="17" width="33" height="218">
+				<texture>ui_TV_Skin_button_l</texture>								
+			</btn_left>
+			<btn_right x="632" y="17" width="33" height="218">
+				<texture>ui_TV_Skin_button_r</texture>							
+			</btn_right>
+		</image_frames>
+		<image_0 x="94" y="64" width="125" height="215">			
+			<text font="graffiti32" align="r" vert_align="t">1 </text>
+		</image_0>
+		<image_1 x="246" y="64" width="125" height="215">			
+			<text font="graffiti32" align="r" vert_align="t">2 </text>
+		</image_1>
+		<image_2 x="398" y="64" width="125" height="215">			
+			<text font="graffiti32" align="r" vert_align="t">3 </text>
+		</image_2>
+		<image_3 x="550" y="64" width="125" height="215">			
+			<text font="graffiti32" align="r" vert_align="t">4 </text>
+		</image_3>
+		
+		<btn_back x="51" y="504" width="157" height="48">
+			<texture>ui_button_main01</texture>
+			<text font="graffiti19" align="c">mp_back</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>				
+				<t r="180" g="153" b="155"/>				
+				<d r="106" g="95" b="91"/>							
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_back>		
+		<btn_autoselect x="394" y="504" width="157" height="48">
+			<texture>ui_button_main02</texture>
+			<text font="graffiti19" align="c">mp_auto_select</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>				
+				<t r="180" g="153" b="155"/>				
+				<d r="106" g="95" b="91"/>							
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_autoselect>
+		<btn_spectator x="551" y="504" width="157" height="48">
+			<texture>ui_button_main03</texture>
+			<text font="graffiti19" align="c">mp_spectator</text>
+			<text_color>
+				<e r="227" g="199" b="178"/>				
+				<t r="180" g="153" b="155"/>				
+				<d r="106" g="95" b="91"/>							
+				<h r="0" g="0" b="0"/>
+			</text_color>
+		</btn_spectator>		
+	</skin_selector>
+</window>

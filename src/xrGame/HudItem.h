@@ -18,10 +18,10 @@ class CHUDState
 public:
     enum EHudStates
     {
-        eIdle = 0,
+        eHidden = 0,
+        eIdle,
         eShowing,
         eHiding,
-        eHidden,
         eBore,
         eLastBaseState = eBore,
     };

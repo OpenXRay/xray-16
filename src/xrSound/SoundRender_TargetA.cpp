@@ -4,8 +4,8 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
 
-#if __has_include(<openal/efx.h>)
-#   include <openal/efx.h>
+#if __has_include(<efx.h>)
+#   include <efx.h>
 #endif
 
 xr_vector<u8> g_target_temp_data;
@@ -35,7 +35,7 @@ bool CSoundRender_TargetA::_initialize()
         A_CHK(alSourcef(pSource, AL_MAX_GAIN, 1.f));
         A_CHK(alSourcef(pSource, AL_GAIN, cache_gain));
         A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
-#if __has_include(<openal/efx.h>)
+#if __has_include(<efx.h>)
         if (pAuxSlot != ALuint(-1))
             A_CHK(alSource3i(pSource, AL_AUXILIARY_SEND_FILTER, pAuxSlot, 0, AL_FILTER_NULL));
 #endif
@@ -188,17 +188,16 @@ void CSoundRender_TargetA::fill_parameters()
     }
 
     VERIFY2(m_pEmitter, SE->source()->file_name());
+
     float _pitch = m_pEmitter->p_source.freq;
-    clamp(_pitch, EPS_L, 2.f);
-    if (!fsimilar(cache_pitch, _pitch * psSoundTimeFactor))
+    if (!m_pEmitter->bIgnoringTimeFactor)
+        _pitch *= psSoundTimeFactor; //--#SM+#-- Correct sound "speed" by time factor
+    clamp(_pitch, EPS_L, 100.f); //--#SM+#-- Increase sound frequency (speed) limit
+
+    if (!fsimilar(_pitch, cache_pitch))
     {
-        cache_pitch = _pitch * psSoundTimeFactor;
-
-        // Only update time to stop for non-looped sounds
-        if (!m_pEmitter->iPaused && (m_pEmitter->m_current_state == CSoundRender_Emitter::stStarting || m_pEmitter->m_current_state == CSoundRender_Emitter::stPlaying || m_pEmitter->m_current_state == CSoundRender_Emitter::stSimulating))
-            m_pEmitter->fTimeToStop = SoundRender->fTimer_Value + ((m_pEmitter->get_length_sec() - (SoundRender->fTimer_Value - m_pEmitter->fTimeStarted)) / cache_pitch);
-
-        A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
+        cache_pitch = _pitch;
+        A_CHK(alSourcef(pSource, AL_PITCH, _pitch));
     }
     VERIFY2(m_pEmitter, SE->source()->file_name());
 }

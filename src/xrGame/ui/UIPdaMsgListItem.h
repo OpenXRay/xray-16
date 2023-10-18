@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-// UIPdaMsgListItem.h: элемент окна списка в основном 
+// UIPdaMsgListItem.h: элемент окна списка в основном
 // экране для сообщений PDA
 //////////////////////////////////////////////////////////////////////
 #pragma once
@@ -15,6 +15,8 @@ public:
 
     void InitPdaMsgListItem(const Fvector2& size);
     void SetFont(CGameFont* pFont) override;
+
+    pcstr GetDebugType() override { return "CUIPdaMsgListItem"; }
 
     CUIStatic UIIcon{ "Icon" };
     CUITextWnd UITimeText;

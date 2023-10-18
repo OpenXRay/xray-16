@@ -76,7 +76,7 @@ struct ECORE_API SGeometry : public xr_resource_flagged
 
 struct ECORE_API resptrcode_geom : public resptr_base<SGeometry>
 {
-    void create(VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib);
+    void create(const VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib);
     void create(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib);
     void destroy() { _set(nullptr); }
     u32 stride() const { return _get()->vb_stride; }

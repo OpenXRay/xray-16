@@ -5,14 +5,10 @@
 
 #include "../Artefact.h"
 
-CUIArtefactPanel::CUIArtefactPanel() : CUIWindow("CUIArtefactPanel")
+CUIArtefactPanel::CUIArtefactPanel() : CUIWindow(CUIArtefactPanel::GetDebugType())
 {
     m_cell_size.set(50.0f, 50.0f);
     m_fScale = 0.5f;
-}
-
-CUIArtefactPanel::~CUIArtefactPanel()
-{
 }
 
 void CUIArtefactPanel::InitFromXML(CUIXml& xml, pcstr path, int index)

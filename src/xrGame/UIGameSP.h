@@ -2,6 +2,7 @@
 #include "UIGameCustom.h"
 #include "ui/UIDialogWnd.h"
 #include "xrAICore/Navigation/game_graph_space.h"
+#include "UITimeDilator.h"
 
 class CUITradeWnd;
 class CUITalkWnd;
@@ -13,7 +14,10 @@ class CUIMessageBox;
 class CInventoryBox;
 class CInventoryOwner;
 
-class CUIGameSP : public CUIGameCustom
+extern UITimeDilator* TimeDilator();
+extern void CloseTimeDilator();
+
+class CUIGameSP final : public CUIGameCustom
 {
 private:
     game_cl_Single* m_game;
@@ -39,6 +43,9 @@ public:
     void HideShownDialogs() override;
     void ReinitDialogs() override;
 
+    void StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators) override;
+    void StopDialog(CUIDialogWnd* pDialog) override;
+
 #ifdef DEBUG
     virtual void Render();
 #endif
@@ -46,9 +53,13 @@ public:
     CChangeLevelWnd* UIChangeLevelWnd;
 
     StaticDrawableWrapper* m_game_objective;
+
+    pcstr GetDebugType() override { return "CUIGameSP"; }
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+    void FillDebugInfo() override;
 };
 
-class CChangeLevelWnd : public CUIDialogWnd
+class CChangeLevelWnd final : public CUIDialogWnd
 {
     CUIMessageBox* m_messageBox;
     typedef CUIDialogWnd inherited;
@@ -67,11 +78,13 @@ public:
     shared_str m_message_str;
 
     CChangeLevelWnd();
-    virtual ~CChangeLevelWnd(){};
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     virtual bool WorkInPause() const { return true; }
     void Show(bool status) override;
     void ShowDialog(bool bDoHideIndicators) override;
     void HideDialog() override;
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+
+    pcstr GetDebugType() override { return "CChangeLevelWnd"; }
+    void FillDebugInfo() override;
 };

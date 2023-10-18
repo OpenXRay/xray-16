@@ -246,14 +246,15 @@ void R_dsgraph_structure::render_hud()
     }
 
 #if RENDER == R_R1
-    if (g_hud && g_hud->RenderActiveItemUIQuery())
+    if (g_pGameLevel->pHUD && g_pGameLevel->pHUD->RenderActiveItemUIQuery())
         render_hud_ui(); // hud ui
 #endif
 }
 
 void R_dsgraph_structure::render_hud_ui()
 {
-    VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
+    CCustomHUD* levelHud = g_pGameLevel->pHUD;
+    VERIFY(levelHud && levelHud->RenderActiveItemUIQuery());
 
     PIX_EVENT_CTX(cmd_list, dsgraph_render_hud_ui);
 
@@ -276,7 +277,7 @@ void R_dsgraph_structure::render_hud_ui()
         rt_null, rt_null, zb);
 #endif // RENDER!=R_R1
 
-    g_hud->RenderActiveItemUI();
+    levelHud->RenderActiveItemUI();
 }
 
 //////////////////////////////////////////////////////////////////////////

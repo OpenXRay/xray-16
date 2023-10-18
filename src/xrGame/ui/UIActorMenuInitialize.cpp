@@ -43,7 +43,7 @@ constexpr cpcstr CARBODY_ITEM_XML    = "carbody_item.xml";
 }
 
 CUIActorMenu::CUIActorMenu()
-    : m_currMenuMode(mmUndefined), m_last_time(u32(-1)),
+    : CUIDialogWnd(CUIActorMenu::GetDebugType()), m_currMenuMode(mmUndefined), m_last_time(u32(-1)),
       m_repair_mode(false), m_item_info_view(false), m_highlight_clear(true),
       m_trade_partner_inventory_state(0)
 {
@@ -338,7 +338,7 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
             m_pLists[id] = UIHelper::CreateDragDropListEx(uiXml, section, parent, required);
         else // eInventoryOutfitList
         {
-            if (!required && !uiXml.NavigateToNode(section))	
+            if (!required && !uiXml.NavigateToNode(section))
                 continue;
             CUIOutfitDragDropList* list = xr_new<CUIOutfitDragDropList>();
             list->SetAutoDelete(true);
@@ -363,7 +363,7 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
     UIHelper::CreateStatic(uiXml, "top_background", m_pTradeWnd);
     UIHelper::CreateStatic(uiXml, "bottom_background", m_pTradeWnd);
 
-    m_pTradeWnd->AttachChild(m_ActorTradeBar);   // just dummy to prevent 
+    m_pTradeWnd->AttachChild(m_ActorTradeBar);   // just dummy to prevent
     m_pTradeWnd->AttachChild(m_PartnerTradeBar); // memory leaks
 
     CUIStatic* actorIcon = UIHelper::CreateStatic(uiXml, "static_icon", 0, m_pTradeWnd);
@@ -394,7 +394,7 @@ void CUIActorMenu::InitializeTradeMode(CUIXml& uiXml)
         // { id,                   index, parent }
         { eTradeActorList,         2,     actorTradeWnd },
         { eTradeActorBagList,      0,     actorBagWnd },
-                                              
+
         { eTradePartnerList,       3,     partnerTradeWnd },
         { eTradePartnerBagList,    1,     partnerBagWnd },
     };

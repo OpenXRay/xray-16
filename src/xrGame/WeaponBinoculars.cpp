@@ -114,7 +114,7 @@ void CWeaponBinoculars::ZoomInc()
     float delta, min_zoom_factor;
     GetZoomData(m_zoom_params.m_fScopeZoomFactor, delta, min_zoom_factor);
 
-    float f = GetZoomFactor() - delta;
+    float f = GetZoomFactor() + delta;
     clamp(f, m_zoom_params.m_fScopeZoomFactor, min_zoom_factor);
     SetZoomFactor(f);
 }
@@ -124,7 +124,7 @@ void CWeaponBinoculars::ZoomDec()
     float delta, min_zoom_factor;
     GetZoomData(m_zoom_params.m_fScopeZoomFactor, delta, min_zoom_factor);
 
-    float f = GetZoomFactor() + delta;
+    float f = GetZoomFactor() - delta;
     clamp(f, m_zoom_params.m_fScopeZoomFactor, min_zoom_factor);
     SetZoomFactor(f);
 }

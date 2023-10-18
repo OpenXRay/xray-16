@@ -1,0 +1,103 @@
+<!-- 16:10 ready -->
+<tab_server>
+    <main x="101" y="224" width="615" height="416"/>
+    <cap_server_settings x="5" y="12" width="349" height="21" stretch="1">
+			<texture>ui_brokenline</texture>
+			<auto_static x="8" y="0" width="342" height="23">
+				<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_serversettings</text>
+			</auto_static>
+		</cap_server_settings>
+		
+		<cap_server_name x="19" y="40" width="101" height="21">
+			<text font="letterica16" r="215" g="195" b="170" complex_mode="0" vert_align="c">mm_mp_servername</text>
+		</cap_server_name>
+		<cap_password x="19" y="65" width="101" height="21">
+			<text font="letterica16" r="215" g="195" b="170" complex_mode="0" vert_align="c">mm_mp_password</text>
+		</cap_password>
+		<cap_game_mode x="19" y="90" width="101" height="21">
+			<text font="letterica16" r="215" g="195" b="170" complex_mode="0" vert_align="c">mm_mp_gamemode</text>
+		</cap_game_mode>
+		<cap_max_players x="19" y="115" width="101" height="21">
+			<text font="letterica16" r="215" g="195" b="170" complex_mode="0" vert_align="c">mm_mp_maxplayers</text>
+		</cap_max_players>
+		
+		<spin_max_players x="125" y="115" width="38" height="21">
+			<options_item entry="mm_net_srv_maxplayers" group="mm_mp_server"/>	
+		</spin_max_players>
+		<spin_game_mode x="125" y="90" width="229" height="21">
+			<options_item entry="mm_net_srv_gamemode" group="mm_mp_server"/>	
+		</spin_game_mode>
+		
+		<edit_server_name x="125" y="40" width="229" height="21" max_symb_count="24" stretch="1">
+			<text x="3" font="letterica16" color="ui_2" complex_mode="0" vert_align="c"/>
+			<options_item entry="mm_net_srv_name" group="mm_mp_server"/>
+			<texture>ui_linetextSmall_e</texture>
+		</edit_server_name>		
+		<edit_password x="125" y="65" width="229" height="21" password="1" max_symb_count="8" stretch="1">		
+			<text x="3" font="letterica16" color="ui_2" complex_mode="0" vert_align="c"/>
+			<texture>ui_linetextSmall_e</texture>
+		</edit_password>
+		
+		<check_dedicated x="256" y="115" width="27" height="21">
+			<text font="letterica16" r="115" g="114" b="112" complex_mode="0" vert_align="c">mm_mp_dedicated</text>			
+		</check_dedicated>
+
+  <static_map_pic x="392" y="10" width="213" height="180">
+    <texture width="213" height="175">ui\ui_noise</texture>
+  </static_map_pic>
+  <static_map_pic_fore x="392" y="8" width="213" height="180" stretch="1">
+    <texture>ui_mp_map_info_fore</texture>
+  </static_map_pic_fore>
+  <cap_map_info x="408" y="200" width="204" height="200">
+    <text>CAP_MAP_INFO</text>
+  </cap_map_info>
+
+    <map_list x="6" y="158" width="349" height="247">
+			<header_1 x="0" y="0" width="155" height="17" stretch="1">
+				<texture>ui_table_button_e</texture>
+				<auto_static x="0" y="3" width="155" height="17">
+					<text font="arial_14" r="215" g="195" b="170" vert_align="c" align="c">mm_mp_avail_maps</text>
+				</auto_static>
+			</header_1>
+			<header_2 x="196" y="0" width="155" height="17" stretch="1">
+				<texture>ui_table_button_e</texture>
+				<auto_static x="0" y="3" width="155" height="17">
+					<text font="arial_14" r="215" g="195" b="170" vert_align="c" align="c">mm_mp_sel_maps</text>
+				</auto_static>
+			</header_2>
+			<frame_1 x="0" y="18" width="138" height="231" stretch="1">
+				<texture>ui_cb_listbox</texture>
+			</frame_1>
+			<frame_2 x="196" y="18" width="138" height="231" stretch="1">
+				<texture>ui_cb_listbox</texture>
+			</frame_2>
+			<list_1 x="4" y="18" width="149" height="231" item_height="18"  always_show_scroll="1" can_select="1" multiselect="1" stretch="1">
+				<texture>ui_cb_listbox</texture>
+				<font_s r="218" g="217" b="213"/>
+				<font r="131" g="131" b="131" font="arial_14"/>
+			</list_1>
+			<list_2 x="200" y="18" width="149" height="231" item_height="18"  always_show_scroll="1" can_select="1" stretch="1">
+				<font_s r="218" g="217" b="213" />
+				<font r="131" g="131" b="131" font="arial_14"/>
+				<texture>ui_cb_listbox</texture>
+			</list_2>
+			<btn_left x="158" y="62" width="31" height="23" stretch="1">
+				<texture_offset x="-3" y="-1"/>
+				<texture>ui_button_arrow_left</texture>
+			</btn_left>
+			<btn_right x="158" y="90" width="31" height="23" stretch="1">
+				<texture_offset x="-3" y="-1"/>
+				<texture>ui_button_arrow_right</texture>
+			</btn_right>
+			<btn_up x="158" y="138" width="31" height="23" stretch="1">
+				<texture_offset x="-3" y="-1"/>
+				<texture>ui_button_arrow_up</texture>
+			</btn_up>
+			<btn_down x="158" y="166" width="31" height="23" stretch="1">
+				<texture_offset x="-3" y="-1"/>
+				<texture>ui_button_arrow_down</texture>
+			</btn_down>
+						
+		</map_list>
+		
+	</tab_server>

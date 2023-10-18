@@ -32,15 +32,25 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 set(CMAKE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
 
-# Set the shared object search path for the installation
-set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
+if (DISABLE_PORTABLE_MODE)
+    add_definitions(-DDISABLE_PORTABLE_MODE)
+endif()
 
-# Set the shared object search path for the build tree
-# On Linux/BSD we can use $ORIGIN to search for modules next to the executable
-if (NOT APPLE)
-    set(CMAKE_BUILD_RPATH $ORIGIN)
-else()
-    set(CMAKE_BUILD_RPATH ${COMPILE_OUTPUT_FOLDER})
+if (NOT DEFINED ALLOW_RPATH)
+    set(ALLOW_RPATH TRUE)
+endif()
+
+if (ALLOW_RPATH)
+    # Set the shared object search path for the installation
+    set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
+
+    # Set the shared object search path for the build tree
+    # On Linux/BSD we can use $ORIGIN to search for modules next to the executable
+    if (NOT APPLE)
+        set(CMAKE_BUILD_RPATH $ORIGIN)
+    else()
+        set(CMAKE_BUILD_RPATH ${COMPILE_OUTPUT_FOLDER})
+    endif()
 endif()
 
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
@@ -50,6 +60,8 @@ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "armv*")
     set(PROJECT_PLATFORM_ARM TRUE)
 elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "e2k")
     set(PROJECT_PLATFORM_E2K TRUE)
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc64le")
+    set(PROJECT_PLATFORM_PPC TRUE)
 endif()
 
 
@@ -207,6 +219,9 @@ elseif (PROJECT_PLATFORM_ARM64)
 elseif (PROJECT_PLATFORM_E2K)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-pragmas")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
+elseif (PROJECT_PLATFORM_PPC)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_WARN_X86_INTRINSICS")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maltivec -mabi=altivec -DNO_WARN_X86_INTRINSICS")
 else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpmath=sse -msse3")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=sse -msse3")

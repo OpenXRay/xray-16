@@ -45,6 +45,8 @@ public:
 
     shared_str m_hint_text;
 
+    pcstr GetDebugType() override { return "CUIButton"; }
+
 protected:
     E_BUTTON_STATE m_eButtonState;
     s16 m_uAccelerator[4];

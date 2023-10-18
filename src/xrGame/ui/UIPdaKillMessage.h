@@ -12,6 +12,8 @@ public:
 
     void Init(KillMessageStruct& msg, CGameFont* F);
 
+    pcstr GetDebugType() override { return "CUIPdaKillMessage"; }
+
 protected:
     float InitText(CUITextWnd& refStatic, float x, ColoredName& info);
     float InitIcon(CUIStatic& refStatic, float x, IconInfo& info);

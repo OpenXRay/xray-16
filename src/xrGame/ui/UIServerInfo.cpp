@@ -15,6 +15,7 @@
 #endif
 
 CUIServerInfo::CUIServerInfo()
+    : CUIDialogWnd(CUIServerInfo::GetDebugType())
 {
     m_dds_file_created = false;
 

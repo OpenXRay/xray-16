@@ -14,4 +14,5 @@ public:
     virtual void Draw();
     virtual void Update();
     virtual void InitTextureEx(LPCSTR tex_name, LPCSTR sh_name = "hud" DELIMITER "default");
+    pcstr GetDebugType() override { return "CUISleepStatic"; }
 };

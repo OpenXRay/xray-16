@@ -884,7 +884,9 @@ void CCustomMonster::load_killer_clsids(LPCSTR section)
     m_killer_clsids.clear();
     LPCSTR killers = pSettings->r_string(section, "killer_clsids");
     string16 temp;
-    for (u32 i = 0, n = _GetItemCount(killers); i < n; ++i)
+    const u32 n = _GetItemCount(killers);
+    m_killer_clsids.reserve(n);
+    for (u32 i = 0; i < n; ++i)
         m_killer_clsids.push_back(TEXT2CLSID(_GetItem(killers, i, temp)));
 }
 

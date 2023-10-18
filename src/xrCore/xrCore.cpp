@@ -275,8 +275,9 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #ifdef _EDITOR // for EDITORS - no cache
         flags &= ~CLocatorAPI::flCacheFiles;
 #endif // _EDITOR
+#ifndef DISABLE_PORTABLE_MODE
         flags |= CLocatorAPI::flScanAppRoot;
-
+#endif
 #ifndef _EDITOR
 #ifndef ELocatorAPIH
         if (strstr(Params, "-file_activity") != nullptr)
@@ -382,7 +383,7 @@ void SDLLogOutput(void* /*userdata*/, int category, SDL_LogPriority priority, co
     default:                            mark = ' '; type = "unknown"; break;
     }
 
-    constexpr pcstr format = "%c [sdl][%s][%s]: %s";
+    static constexpr pcstr format = "%c [sdl][%s][%s]: %s";
     const size_t size = sizeof(mark) + sizeof(from) + sizeof(type) + sizeof(format) + sizeof(message);
     pstr buf = (pstr)xr_alloca(size);
 

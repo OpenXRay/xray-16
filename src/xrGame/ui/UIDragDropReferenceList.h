@@ -3,7 +3,7 @@
 #include "xrServerEntities/inventory_space.h"
 class CInventoryOwner;
 
-class CUIDragDropReferenceList : public CUIDragDropListEx
+class CUIDragDropReferenceList final : public CUIDragDropListEx
 {
 private:
     typedef CUIDragDropListEx inherited;
@@ -29,4 +29,6 @@ public:
 
     virtual void OnItemDBClick(CUIWindow* w, void* pData);
     virtual void OnItemDrop(CUIWindow* w, void* pData);
+
+    pcstr GetDebugType() override { return "CUIDragDropReferenceList"; }
 };

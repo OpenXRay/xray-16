@@ -294,6 +294,52 @@ void CUIGameCustom::enable_fake_indicators(bool enable)
     UIMainIngameWnd->get_hud_states()->EnableFakeIndicators(enable);
 }
 
+bool CUIGameCustom::FillDebugTree(const CUIDebugState& debugState)
+{
+#ifndef MASTER_GOLD
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
+
+    const bool open = ImGui::TreeNodeEx(this, flags, "Game UI (%s)", CUIGameCustom::GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.select(this);
+
+    if (open)
+    {
+        CDialogHolder::FillDebugTree(debugState);
+        Window->FillDebugTree(debugState);
+        ActorMenu->FillDebugTree(debugState);
+        PdaMenu->FillDebugTree(debugState);
+        UIMainIngameWnd->FillDebugTree(debugState);
+        m_pMessagesWnd->FillDebugTree(debugState);
+        for (const auto& custom_static : CustomStatics)
+        {
+            if (custom_static)
+                custom_static->wnd()->FillDebugTree(debugState);
+        }
+        ImGui::TreePop();
+    }
+
+    return open;
+#else
+    UNUSED(debugState);
+    return false;
+#endif
+}
+
+void CUIGameCustom::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CDialogHolder::FillDebugInfo();
+
+    if (ImGui::CollapsingHeader(CUIGameCustom::GetDebugType()))
+    {
+        ImGui::Checkbox("Show game indicators", &showGameIndicators);
+    }
+#endif
+}
+
 StaticDrawableWrapper::StaticDrawableWrapper()
 {
     m_static = nullptr;

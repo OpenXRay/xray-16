@@ -1,0 +1,391 @@
+<w>
+	<main_wnd x="0" y="0" width="854" height="768">
+		<window_name>pda_tasks</window_name>
+	</main_wnd>
+
+	<background x="29" y="89" width="797" height="150" vertical="1" stretch="1">
+		<texture>ui_pda2_fr2</texture>
+		<auto_frameline x="6" y="1" width="783" height="4">
+			<texture>ui_pda2_line_d</texture>
+		</auto_frameline>
+
+		<auto_frameline x="788" y="6" width="3" height="68" vertical="1">
+			<texture>ui_pda2_line_v</texture>
+		</auto_frameline>
+	</background>
+
+	<center_background x="29" y="168" width="797" height="31" stretch="1">
+		<texture>ui_pda2_delimiter_03</texture>
+	</center_background>
+
+	<right_bottom_background x="708" y="700" width="18" height="14" stretch="1">
+		<texture>ui_pda2_delimiter_03_bottom</texture>
+	</right_bottom_background>
+
+	<task_split x="70" y="132" width="746" height="7" stretch="1">
+		<texture>ui_pda2_split</texture>
+	</task_split>
+
+	<map_wnd scroll_enable="1" map_move_step="11">
+		<main_wnd x="29" y="190" width="797" height="520"/>
+
+		<main_map_frame x="0" y="0" width="797" height="520" dx="5" dy="5" sx="22" sy="22">
+			<texture>ui_pda2_mapframe</texture>
+		</main_map_frame>
+
+		<level_frame x="5" y="5" width="768" height="488"/>
+
+		<!--text_hint x="70" y="650" width="83" height="22">
+			<text font="graffiti22"/>
+		</text_hint>
+
+		<dbg_info x="70" y="620" width="83" height="22">
+			<text font="graffiti22"/>
+		</dbg_info-->
+
+		<!--__map_header_frame_line x="0" y="0" width="2" height="2">
+			<texture>ui_string_03</texture>
+		</__map_header_frame_line-->
+
+		<map_hint_item x="0" y="0" width="250" height="200" stretch="1">
+			<texture>ui_icons_PDA_tooltips</texture>
+
+			<simple_text x="7" y="12" width="154" height="192" complex_mode="1">
+				<text  align="l" font="letterica18"/>
+			</simple_text>
+
+			<t_icon x="9" y="11" width="35" height="37" stretch="1"/>
+
+			<t_caption x="54" y="12" width="175" height="18" complex_mode="1">
+				<text align="l" font="letterica18"/>
+			</t_caption>
+
+			<t_time x="54" y="38" width="175" height="18">
+				<text align="l" font="letterica16" color="ui_9"/>
+			</t_time>
+
+			<t_time_rem x="54" y="58" width="175" height="18" _light_anim="ui_too_slow_blinking" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+				<text align="l" font="letterica16" color="ui_9"/>
+			</t_time_rem>
+
+			<t_hint_text x="7" y="75" width="229" height="18" complex_mode="1">
+				<text  align="l" font="letterica18"/>
+			</t_hint_text>
+		</map_hint_item>
+
+	</map_wnd>
+
+	<!--btn_prev_task x="35" y="139" width="34" height="33" stretch="1">
+		<window_name>btn_prev_task</window_name>
+		<texture>ui_task_bt_left</texture>
+	</btn_prev_task>
+	<btn_next_task x="787" y="139" width="34" height="33" stretch="1">
+		<window_name>btn_next_task</window_name>
+		<texture>ui_task_bt_right</texture>
+	</btn_next_task-->
+
+	<btn_second_task x="35" y="138" width="34" height="33" stretch="1">
+		<window_name>btn_second_task</window_name>
+		<texture>ui_task_bt_tslist</texture>
+		<hint_text delay="700">ui_show_second_task_wnd</hint_text>
+	</btn_second_task>
+
+	<second_task_index x="757" y="146" width="25" height="16">
+		<text align="r" font="letterica18" color="ui_4"/>
+	</second_task_index>
+
+	<storyline_task_item x="35" y="96" width="750" height="35">
+		<window_name>pda_task_item1</window_name>
+		<t_icon x="0" y="2" width="34" height="33" stretch="1"/>
+
+		<t_icon_over x="-1" y="0" width="35" height="37" stretch="1">
+			<texture>ui_pda2_mtask_overlay</texture>
+		</t_icon_over>
+
+		<t_caption x="43" y="4" width="667" height="22" stretch="1">
+			<text align="l" font="letterica25" color="ui_1"/>
+		</t_caption>
+
+		<!--t_time x="43" y="22" width="167" height="14">
+			<text align="l" font="letterica16" color="ui_3"/>
+		</t_time>
+
+		<t_time_rem x="138" y="22" width="417" height="14" _light_anim="ui_too_slow_blinking" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+			<text align="l" font="letterica16" color="ui_3"/>
+		</t_time_rem-->
+	</storyline_task_item>
+
+	<secondary_task_item x="78" y="139" width="675" height="35">
+		<window_name>pda_task_item2</window_name>
+
+		<t_caption x="0" y="8" width="667" height="20" stretch="1">
+			<text align="l" font="letterica18" color="ui_4"/>
+		</t_caption>
+
+		<!--t_time x="43" y="20" width="167" height="14">
+			<text align="l" font="letterica16" color="ui_3"/>
+		</t_time>
+
+		<t_time_rem x="138" y="20" width="375" height="14" _light_anim="ui_too_slow_blinking" la_cyclic="1" la_texture="0" la_text="1" la_alpha="1">
+			<text align="l" font="letterica16" color="ui_3"/>
+		</t_time_rem-->
+	</secondary_task_item>
+
+	<btn_task_focus x="793" y="104" width="18" height="21" stretch="1">
+		<window_name>btn_task_focus</window_name>
+		<texture>ui_task_bt_center</texture>
+		<hint_text delay="700">ui_task_btn_focus_center</hint_text>
+	</btn_task_focus>
+
+	<btn_task_focus2 x="793" y="145" width="18" height="21" stretch="1">
+		<window_name>btn_task_focus2</window_name>
+		<texture>ui_task_bt_center</texture>
+		<hint_text delay="700">ui_task_btn_focus_center2</hint_text>
+	</btn_task_focus2>
+
+	<btn_nav_parent x="708" y="421" width="60" height="72" stretch="1">
+
+		<btn_nav_0 x="0" y="0" width="18" height="21" stretch="1">
+			<window_name>btn_nav_legend</window_name>
+			<texture>ui_mnav_bt_legend</texture>
+			<hint_text delay="700">ui_map_btn_legend</hint_text>
+		</btn_nav_0>
+		<btn_nav_1 x="20" y="0" width="18" height="21" stretch="1">
+			<window_name>btn_nav_up</window_name>
+			<texture>ui_mnav_bt_up</texture>
+			<hint_text delay="700">ui_map_btn_up</hint_text>
+		</btn_nav_1>
+		<btn_nav_2 x="40" y="0" width="18" height="21" stretch="1">
+			<window_name>btn_nav_zoom_in</window_name>
+			<texture>ui_mnav_bt_zoom_in</texture>
+			<hint_text delay="700">ui_map_btn_zoom_in</hint_text>
+		</btn_nav_2>
+
+		<btn_nav_3 x="0" y="24" width="18" height="21" stretch="1">
+			<window_name>btn_nav_left</window_name>
+			<texture>ui_mnav_bt_left</texture>
+			<hint_text delay="700">ui_map_btn_left</hint_text>
+		</btn_nav_3>
+		<btn_nav_4 x="20" y="24" width="18" height="21" stretch="1">
+			<window_name>btn_nav_center</window_name>
+			<texture>ui_mnav_bt_center</texture>
+			<hint_text delay="700">ui_map_btn_center</hint_text>
+		</btn_nav_4>
+		<btn_nav_5 x="40" y="24" width="18" height="21" stretch="1">
+			<window_name>btn_nav_right</window_name>
+			<texture>ui_mnav_bt_right</texture>
+			<hint_text delay="700">ui_map_btn_right</hint_text>
+		</btn_nav_5>
+
+		<btn_nav_6 x="0" y="48" width="18" height="21" stretch="1">
+			<window_name>btn_nav_zoom_out</window_name>
+			<texture>ui_mnav_bt_zoom_out</texture>
+			<hint_text delay="700">ui_map_btn_zoom_out</hint_text>
+		</btn_nav_6>
+		<btn_nav_7 x="20" y="48" width="18" height="21" stretch="1">
+			<window_name>btn_nav_down</window_name>
+			<texture>ui_mnav_bt_down</texture>
+			<hint_text delay="700">ui_map_btn_down</hint_text>
+		</btn_nav_7>
+		<btn_nav_8 x="40" y="48" width="18" height="21" stretch="1">
+			<window_name>btn_nav_zmreset</window_name>
+			<texture>ui_mnav_bt_zmreset</texture>
+			<hint_text delay="700">ui_map_btn_zmreset</hint_text>
+		</btn_nav_8>
+
+	</btn_nav_parent>
+
+	<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++   second_task_wnd   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+	<second_task_wnd x="8" y="10" width="292" height="484" stretch="1">
+
+		<background_frame x="0" y="0" width="292" height="484" stretch="1">
+			<texture>ui_icons_PDA_dialog</texture>
+
+			<auto_frameline x="12" y="33" width="269" height="4" stretch="1">
+				<texture>ui_pda2_line_d</texture>
+			</auto_frameline>
+		</background_frame>
+
+		<t_caption x="13" y="15" width="67" height="14" stretch="1">
+			<text align="l" font="letterica16" r="128" g="128" b="128" a="160">ui_pda_secondary_task</text>
+		</t_caption>
+
+		<t_counter x="179" y="15" width="42" height="14" stretch="1">
+			<text align="r" font="letterica16" color="ui_4"/>
+		</t_counter>
+
+		<btn_close x="267" y="10" width="13" height="15" stretch="1">
+			<window_name>task_btn_close</window_name>
+			<texture>ui_task_bt_close</texture>
+		</btn_close>
+
+		<task_list x="13" y="44" width="268" height="427" item_height="35" scroll_profile="pda" always_show_scroll="1" />
+
+		<task_item  x="0" y="0" width="248" height="35" stretch="1">
+			<activ  color = "ui_1"/>
+			<unread color = "ui_4"/>
+			<read   color = "ui_3"/>
+
+			<name x="0" y="0" width="205" height="30" stretch="1">
+				<text align="l" font="letterica18" color="ui_1" complex_mode="1"/>
+			</name>
+
+			<btn_view x="207" y="0" width="20" height="21" stretch="1">
+				<window_name>task_item_btn_view</window_name>
+				<texture>ui_task_bt_visible</texture>
+				<hint_text delay="700">ui_task_btn_visible_map_spot</hint_text>
+			</btn_view>
+
+			<btn_focus x="230" y="0" width="18" height="21" stretch="1">
+				<window_name>task_item_btn_focus</window_name>
+				<texture>ui_task_bt_center</texture>
+				<hint_text delay="700">ui_task_btn_focus_center2</hint_text>
+			</btn_focus>
+		</task_item>
+
+	</second_task_wnd>
+
+	<map_legend_wnd x="522" y="10" width="250" height="398" stretch="1">
+
+		<background_frame x="0" y="0" width="250" height="398" stretch="1">
+			<texture>ui_icons_PDA_dialog</texture>
+
+			<auto_frameline x="12" y="33" width="227" height="4">
+				<texture>ui_pda2_line_d</texture>
+			</auto_frameline>
+		</background_frame>
+
+		<t_caption x="13" y="15" width="67" height="14" stretch="1">
+			<text align="l" font="letterica16" r="128" g="128" b="128" a="160">pda_legend_caption</text>
+		</t_caption>
+
+		<btn_close x="225" y="10" width="13" height="15" stretch="1">
+			<window_name>task_btn_close</window_name>
+			<texture>ui_task_bt_close</texture>
+		</btn_close>
+
+		<legend_list x="13" y="44" width="229" height="350" item_height="25" scroll_profile="pda" always_show_scroll="0">
+
+			<item x="0" y="0" width="229" height="26"><!-- 1 -->
+				<image x="8" y="0" width="16" height="19" stretch="1">
+					<texture>ui_cur_task</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_main_task</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!-- 2 -->
+				<image x="10" y="0" width="13" height="15" stretch="1">
+					<texture r="242" g="231" b="11">ui_pda2_secondary_task</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_additional_task</text>
+				</text_static>
+			</item>
+
+			<!--item x="0" y="0" width="229" height="26"><!-- 3 >
+				<image x="8" y="-2" width="18" height="21" stretch="1">
+					<texture>ui_pda2_base</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_base</text>
+				</text_static>
+			</item-->
+
+			<item x="0" y="0" width="229" height="26"><!-- 4 -->
+				<image x="12" y="3" width="9" height="11" stretch="1">
+					<texture>ui_pda2_squad_leader</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_squad</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!-- 5 -->
+				<image x="11" y="2" width="11" height="13" stretch="1">
+					<texture>ui_sm_mapQuest_gold</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_secrets</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!--6 -->
+				<image x="8" y="-2" width="16" height="21" stretch="1">
+					<texture r="10" g="250" b="250">ui_pda2_exit_point</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_lchanger</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!-- 7 -->
+				<image x="11" y="2" width="11" height="13" stretch="1">
+					<texture color="pda_blue">ui_pda2_important1</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_vip</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!-- 8 -->
+				<image x="11" y="1" width="11" height="13" stretch="1">
+					<texture color="pda_blue">ui_pda2_trader</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_trader</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!-- 9 -->
+				<image x="11" y="1" width="11" height="13" stretch="1">
+					<texture color="pda_blue">ui_pda2_guide</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_scout</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!-- 10 -->
+				<image x="11" y="1" width="11" height="13" stretch="1">
+					<texture color="pda_blue">ui_pda2_mechanic</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_mechanic</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!-- 11 -->
+				<image x="11" y="2" width="10" height="12" stretch="1">
+					<texture r="30" g="215" b="30">ui_minimap_point</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_friends</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!-- 12 -->
+				<image x="11" y="2" width="10" height="12" stretch="1">
+					<texture r="215" g="215" b="10">ui_minimap_point</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_neutrals</text>
+				</text_static>
+			</item>
+
+			<item x="0" y="0" width="229" height="26"><!-- 13 -->
+				<image x="11" y="2" width="10" height="12" stretch="1">
+					<texture r="215" g="30" b="30">ui_minimap_point</texture>
+				</image>
+				<text_static x="33" y="2" width="192" height="16" complex_mode="1">
+					<text align="l" font="letterica16" color="ui_3">st_ui_pda_legend_enemies</text>
+				</text_static>
+			</item>
+
+		</legend_list>
+
+	</map_legend_wnd>
+
+</w>

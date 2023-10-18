@@ -14,6 +14,7 @@
 #include "xrEngine/XR_IOConsole.h"
 
 CUIKickPlayer::CUIKickPlayer()
+    : CUIDialogWnd(CUIKickPlayer::GetDebugType())
 {
     m_prev_upd_time = 0;
     bkgrnd = xr_new<CUIStatic>("Background");
@@ -24,7 +25,7 @@ CUIKickPlayer::CUIKickPlayer()
     header->SetAutoDelete(true);
     AttachChild(header);
 
-    lst_back = xr_new<CUIFrameWindow>();
+    lst_back = xr_new<CUIFrameWindow>("Players list background");
     lst_back->SetAutoDelete(true);
     AttachChild(lst_back);
 

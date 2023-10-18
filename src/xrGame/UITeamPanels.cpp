@@ -4,15 +4,19 @@
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/Static/UIStatic.h"
 
+constexpr cpcstr TEAM_NODE_NAME = "team";
+constexpr cpcstr FRAME_NODE_NAME = "frame";
+
 UITeamPanels::UITeamPanels() : CUIWindow("UITeamPanels")
 {
     need_update_players = false;
     need_update_panels = false;
 }
 
-UITeamPanels::~UITeamPanels() { CUIStatsIcon::FreeTexInfo(); }
-#define TEAM_NODE_NAME "team"
-#define FRAME_NODE_NAME "frame"
+UITeamPanels::~UITeamPanels()
+{
+    CUIStatsIcon::FreeTexInfo();
+}
 
 void UITeamPanels::Init(LPCSTR xmlName, LPCSTR panelsRootNode)
 {

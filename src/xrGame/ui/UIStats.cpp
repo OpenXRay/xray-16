@@ -9,7 +9,7 @@
 #include "game_base_space.h"
 
 CUIStats::CUIStats() {}
-CUIStats::~CUIStats() {}
+
 CUIWindow* CUIStats::InitStats(CUIXml& xml_doc, LPCSTR path, int team)
 {
     string256 _path;

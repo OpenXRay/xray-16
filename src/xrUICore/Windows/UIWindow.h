@@ -10,8 +10,9 @@
 
 #include "xrUICore/UIMessages.h"
 #include "xrUICore/uiabstract.h"
+#include "xrUICore/ui_debug.h"
 
-class XRUICORE_API CUIWindow : public CUISimpleWindow
+class XRUICORE_API CUIWindow : public CUISimpleWindow, public CUIDebuggable
 {
 public:
     CUIWindow(pcstr window_name);
@@ -135,6 +136,11 @@ public:
     IC u32 FocusReceiveTime() const { return m_dwFocusReceiveTime; }
     IC bool GetCustomDraw() const { return m_bCustomDraw; }
     IC void SetCustomDraw(bool b) { m_bCustomDraw = b; }
+
+    pcstr GetDebugType() override { return "CUIWindow"; }
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+    void FillDebugInfo() override;
+
 protected:
     IC void SafeRemoveChild(CUIWindow* child)
     {
@@ -177,11 +183,6 @@ protected:
     // Если курсор над окном
     bool m_bCursorOverWindow;
     bool m_bCustomDraw;
-
-#ifdef DEBUG
-    int m_dbg_id;
-#endif
 };
 
-XRUICORE_API extern BOOL g_show_wnd_rect2;
 XRUICORE_API bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border = 0.0f, float dx16pos = 0.0f);

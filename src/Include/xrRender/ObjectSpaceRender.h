@@ -13,6 +13,7 @@ public:
 
     virtual void dbgRender() = 0;
     virtual void dbgAddSphere(const Fsphere& sphere, u32 colour) = 0;
+    virtual void dbgReserveSphere(size_t count) = 0;
     virtual void SetShader() = 0;
 };
 #endif // DEBUG

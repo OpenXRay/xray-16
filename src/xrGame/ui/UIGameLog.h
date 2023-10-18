@@ -17,7 +17,7 @@ class CUIStatic;
 class CUITextWnd;
 struct KillMessageStruct;
 
-class CUIGameLog : public CUIScrollView
+class CUIGameLog final : public CUIScrollView
 {
 public:
     CUIGameLog();
@@ -29,6 +29,9 @@ public:
 
     void SetTextAtrib(CGameFont* pFont, u32 color);
     u32 GetTextColor() { return txt_color; }
+
+    pcstr GetDebugType() override { return "CUIGameLog"; }
+
 private:
     WINDOW_LIST toDelList;
     float kill_msg_height;
