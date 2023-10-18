@@ -44,7 +44,7 @@ struct LIST_SRV_ITEM
     LIST_SRV_INFO info;
 };
 
-class CUIListItemServer : public CUIListBoxItem
+class CUIListItemServer final : public CUIListBoxItem
 {
     typedef CUIListBoxItem inherited;
 
@@ -57,6 +57,9 @@ public:
 
     int Get_gs_index() { return m_srv_info.info.Index; }
     LIST_SRV_ITEM* GetInfo() { return &m_srv_info; };
+
+    pcstr GetDebugType() override { return "CUIListItemServer"; }
+
 protected:
     LIST_SRV_SIZES m_sizes;
 

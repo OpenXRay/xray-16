@@ -36,7 +36,7 @@
 #include <thread>
 #include <SDL.h>
 
-#if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)) && !defined(XR_COMPILER_MSVC)
+#if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)) && !defined(XR_COMPILER_MSVC)
 #define _FPU_EXTENDED 0
 #define _FPU_DOUBLE 0
 #define _FPU_SINGLE 0
@@ -247,7 +247,7 @@ void _initialize_cpu()
 }
 
 // per-thread initialization
-#if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
+#if defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_PPC64)
 #define _MM_SET_FLUSH_ZERO_MODE(mode)
 #define _MM_SET_DENORMALS_ZERO_MODE(mode)
 #else

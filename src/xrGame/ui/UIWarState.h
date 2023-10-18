@@ -11,7 +11,7 @@
 class CUIXml;
 class CUIStatic;
 
-class UIWarState : public UIHintWindow
+class UIWarState final : public UIHintWindow
 {
     using inherited = UIHintWindow;
 
@@ -21,10 +21,11 @@ class UIWarState : public UIHintWindow
 
 public:
     UIWarState();
-    virtual ~UIWarState() {};
 
     void InitXML(CUIXml& xml, LPCSTR att_name, CUIWindow* parent);
     void ClearInfo();
     bool UpdateInfo(LPCSTR icon, LPCSTR hint_text);
     void Draw() override;
+
+    pcstr GetDebugType() override { return "UIWarState"; }
 }; // class UIWarState

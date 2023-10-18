@@ -9,10 +9,10 @@ namespace
 // Volume texture width
 class cl_textureWidth : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tW = (float)FluidManager.GetTextureWidth();
-        RCache.set_c(C, tW);
+        cmd_list.set_c(C, tW);
     }
 };
 static cl_textureWidth binder_textureWidth;
@@ -20,10 +20,10 @@ static cl_textureWidth binder_textureWidth;
 // Volume texture height
 class cl_textureHeight : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tH = (float)FluidManager.GetTextureHeight();
-        RCache.set_c(C, tH);
+        cmd_list.set_c(C, tH);
     }
 };
 static cl_textureHeight binder_textureHeight;
@@ -31,47 +31,47 @@ static cl_textureHeight binder_textureHeight;
 // Volume texture depth
 class cl_textureDepth : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tD = (float)FluidManager.GetTextureDepth();
-        RCache.set_c(C, tD);
+        cmd_list.set_c(C, tD);
     }
 };
 static cl_textureDepth binder_textureDepth;
 
 class cl_gridDim : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tW = (float)FluidManager.GetTextureWidth();
         float tH = (float)FluidManager.GetTextureHeight();
         float tD = (float)FluidManager.GetTextureDepth();
-        RCache.set_c(C, tW, tH, tD, 0.0f);
+        cmd_list.set_c(C, tW, tH, tD, 0.0f);
     }
 };
 static cl_gridDim binder_gridDim;
 
 class cl_recGridDim : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float tW = (float)FluidManager.GetTextureWidth();
         float tH = (float)FluidManager.GetTextureHeight();
         float tD = (float)FluidManager.GetTextureDepth();
-        RCache.set_c(C, 1.0f / tW, 1.0f / tH, 1.0f / tD, 0.0f);
+        cmd_list.set_c(C, 1.0f / tW, 1.0f / tH, 1.0f / tD, 0.0f);
     }
 };
 static cl_recGridDim binder_recGridDim;
 
 class cl_maxDim : public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         int tW = FluidManager.GetTextureWidth();
         int tH = FluidManager.GetTextureHeight();
         int tD = FluidManager.GetTextureDepth();
         float tMax = (float)_max(tW, _max(tH, tD));
-        RCache.set_c(C, (float)tMax);
+        cmd_list.set_c(C, (float)tMax);
     }
 };
 static cl_maxDim binder_maxDim;
@@ -80,10 +80,10 @@ static cl_maxDim binder_maxDim;
 //  decay simulation option
 class cl_decay		: public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float fDecay = FluidManager.GetDecay();
-        RCache.set_c( C, fDecay );
+        cmd_list.set_c( C, fDecay );
     }
 };
 static cl_decay		binder_decay;
@@ -91,10 +91,10 @@ static cl_decay		binder_decay;
 //  decay simulation ImpulseSize
 class cl_impulseSize		: public R_constant_setup
 {
-    virtual void setup(R_constant* C)
+    void setup(CBackend& cmd_list, R_constant* C) override
     {
         float fIS = FluidManager.GetImpulseSize();
-        RCache.set_c( C, fIS );
+        cmd_list.set_c( C, fIS );
     }
 };
 static cl_impulseSize		binder_impulseSize;

@@ -27,7 +27,7 @@ using namespace ALife;
 
 extern string_path g_last_saved_game;
 
-CALifeStorageManager::~CALifeStorageManager() { *g_last_saved_game = 0; }
+CALifeStorageManager::~CALifeStorageManager() {}
 void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 {
     pcstr gameSaveExtension = SAVE_EXTENSION;

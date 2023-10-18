@@ -10,7 +10,7 @@ class CUISpinNum;
 class CUIXml;
 struct game_PlayerState;
 
-class CUIKickPlayer : public CUIDialogWnd
+class CUIKickPlayer final : public CUIDialogWnd
 {
 public:
     CUIKickPlayer();
@@ -24,6 +24,8 @@ public:
 
     void OnBtnOk();
     void OnBtnCancel();
+
+    pcstr GetDebugType() override { return "CUIKickPlayer"; }
 
 protected:
     typedef enum { MODE_KICK, MODE_BAN } E_MODE;

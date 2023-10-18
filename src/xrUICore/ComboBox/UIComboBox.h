@@ -7,7 +7,7 @@
 
 class CUIListBoxItem;
 
-class XRUICORE_API CUIComboBox : public CUIWindow, public CUIOptionsItem, public pureRender
+class XRUICORE_API CUIComboBox final : public CUIWindow, public CUIOptionsItem, public pureRender
 {
     friend class CUIXmlInitBase;
     typedef enum { LIST_EXPANDED, LIST_FONDED } E_COMBO_STATE;
@@ -17,6 +17,7 @@ class XRUICORE_API CUIComboBox : public CUIWindow, public CUIOptionsItem, public
 public:
     CUIComboBox();
     virtual ~CUIComboBox();
+
     // CUIOptionsItem
     virtual void SetCurrentOptValue(); // opt->current
     virtual void SaveBackUpOptValue(); // current->backup
@@ -44,6 +45,8 @@ public:
     void disable_id(int id);
     void enable_id(int id);
 
+    pcstr GetDebugType() override { return "CUIComboBox"; }
+
 protected:
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnBtnClicked();
@@ -66,7 +69,7 @@ protected:
 
     CUI_IB_FrameLineWnd m_frameLine;
     CUITextWnd m_text;
-    CUIFrameWindow m_list_frame;
+    CUIFrameWindow m_list_frame{ "List frame" };
 
     u32 m_textColor[2];
 

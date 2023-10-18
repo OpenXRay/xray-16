@@ -7,6 +7,7 @@
 // clang-format off
 SCRIPT_EXPORT(KeyBindings, (),
 {
+    class EnumGameActionsContexts {};
     class EnumGameActions {};
     class KeyBindingRegistrator {};
 
@@ -14,6 +15,17 @@ SCRIPT_EXPORT(KeyBindings, (),
     module(luaState)
     [
         def("dik_to_bind", +[](int dik) -> int { return GetBindedAction(dik); }),
+        def("dik_to_bind", +[](int dik, int ctx) -> int { return GetBindedAction(dik, (EKeyContext)ctx); }),
+
+        class_<EnumGameActionsContexts>("key_bindings_context")
+            .enum_("context")
+            [
+                value("undefined",                  int(EKeyContext::Undefined)),
+                value("ui",                         int(EKeyContext::UI)),
+                value("pda",                        int(EKeyContext::PDA)),
+                value("talk",                       int(EKeyContext::Talk))
+            ],
+
         class_<EnumGameActions>("key_bindings")
             .enum_("commands")
             [
@@ -134,16 +146,61 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kCUSTOM14",                  int(kCUSTOM14)),
                 value("kCUSTOM15",                  int(kCUSTOM15)),
 
-                value("kPDA_TAB1",                  int(kPDA_TAB1)),
-                value("kPDA_TAB2",                  int(kPDA_TAB2)),
-                value("kPDA_TAB3",                  int(kPDA_TAB3)),
-                value("kPDA_TAB4",                  int(kPDA_TAB4)),
-                value("kPDA_TAB5",                  int(kPDA_TAB5)),
-                value("kPDA_TAB6",                  int(kPDA_TAB6)),
-
                 value("kKICK",                      int(kKICK)),
 
-                value("kEDITOR",                    int(kEDITOR))
+                value("kEDITOR",                    int(kEDITOR)),
+
+                // Contextual actions:
+                // UI
+                value("kUI_MOVE",                   int(kUI_MOVE)),
+                value("kUI_MOVE_LEFT",              int(kUI_MOVE_LEFT)),
+                value("kUI_MOVE_RIGHT",             int(kUI_MOVE_RIGHT)),
+                value("kUI_MOVE_UP",                int(kUI_MOVE_UP)),
+                value("kUI_MOVE_DOWN",              int(kUI_MOVE_DOWN)),
+
+                value("kUI_MOVE_SECONDARY",         int(kUI_MOVE_SECONDARY)),
+
+                value("kUI_ACCEPT",                 int(kUI_ACCEPT)),
+                value("kUI_BACK",                   int(kUI_BACK)),
+                value("kUI_ACTION_1",               int(kUI_ACTION_1)),
+                value("kUI_ACTION_2",               int(kUI_ACTION_2)),
+
+                value("kUI_TAB_PREV",               int(kUI_TAB_PREV)),
+                value("kUI_TAB_NEXT",               int(kUI_TAB_NEXT)),
+
+                value("kUI_BUTTON_1",               int(kUI_BUTTON_1)),
+                value("kUI_BUTTON_2",               int(kUI_BUTTON_2)),
+                value("kUI_BUTTON_3",               int(kUI_BUTTON_3)),
+                value("kUI_BUTTON_4",               int(kUI_BUTTON_4)),
+                value("kUI_BUTTON_5",               int(kUI_BUTTON_5)),
+                value("kUI_BUTTON_6",               int(kUI_BUTTON_6)),
+                value("kUI_BUTTON_7",               int(kUI_BUTTON_7)),
+                value("kUI_BUTTON_8",               int(kUI_BUTTON_8)),
+                value("kUI_BUTTON_9",               int(kUI_BUTTON_9)),
+                value("kUI_BUTTON_0",               int(kUI_BUTTON_0)),
+
+                // PDA:
+                value("kPDA_MAP_MOVE",              int(kPDA_MAP_MOVE)),
+                value("kPDA_MAP_MOVE_LEFT",         int(kPDA_MAP_MOVE_LEFT)),
+                value("kPDA_MAP_MOVE_RIGHT",        int(kPDA_MAP_MOVE_RIGHT)),
+                value("kPDA_MAP_MOVE_UP",           int(kPDA_MAP_MOVE_UP)),
+                value("kPDA_MAP_MOVE_DOWN",         int(kPDA_MAP_MOVE_DOWN)),
+
+                value("kPDA_MAP_ZOOM_IN",           int(kPDA_MAP_ZOOM_IN)),
+                value("kPDA_MAP_ZOOM_OUT",          int(kPDA_MAP_ZOOM_OUT)),
+                value("kPDA_MAP_ZOOM_RESET",        int(kPDA_MAP_ZOOM_RESET)),
+
+                value("kPDA_MAP_SHOW_ACTOR",        int(kPDA_MAP_SHOW_ACTOR)),
+                value("kPDA_MAP_SHOW_LEGEND",       int(kPDA_MAP_SHOW_LEGEND)),
+
+                value("kPDA_FILTER_TOGGLE",         int(kPDA_FILTER_TOGGLE)),
+                value("kPDA_TASKS_TOGGLE",          int(kPDA_TASKS_TOGGLE)),
+
+                // Talk:
+                value("kTALK_SWITCH_TO_TRADE",      int(kTALK_SWITCH_TO_TRADE)),
+                value("kTALK_LOG_SCROLL",           int(kTALK_LOG_SCROLL)),
+                value("kTALK_LOG_SCROLL_UP",        int(kTALK_LOG_SCROLL_UP)),
+                value("kTALK_LOG_SCROLL_DOWN",      int(kTALK_LOG_SCROLL_DOWN))
             ],
 
         class_<KeyBindingRegistrator>("DIK_keys")
@@ -199,7 +256,7 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("DIK_RBRACKET",               int(SDL_SCANCODE_RIGHTBRACKET)),
                 value("DIK_BACKSLASH",              int(SDL_SCANCODE_BACKSLASH)),
                 value("DIK_NONUSHASH",              int(SDL_SCANCODE_NONUSHASH)),
-                
+
                 value("DIK_SEMICOLON",              int(SDL_SCANCODE_SEMICOLON)),
                 value("DIK_APOSTROPHE",             int(SDL_SCANCODE_APOSTROPHE)),
                 value("DIK_GRAVE",                  int(SDL_SCANCODE_GRAVE)),
@@ -422,14 +479,14 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("DIK_BRIGHTNESSDOWN",         int(SDL_SCANCODE_BRIGHTNESSDOWN)),
                 value("DIK_BRIGHTNESSUP",           int(SDL_SCANCODE_BRIGHTNESSUP)),
                 value("DIK_DISPLAYSWITCH",          int(SDL_SCANCODE_DISPLAYSWITCH)),
-               
+
                 value("DIK_KBDILLUMTOGGLE)",        int(SDL_SCANCODE_KBDILLUMTOGGLE)),
                 value("DIK_KBDILLUMDOWN",           int(SDL_SCANCODE_KBDILLUMDOWN)),
                 value("DIK_KBDILLUMUP",             int(SDL_SCANCODE_KBDILLUMUP)),
-               
+
                 value("DIK_EJECT",                  int(SDL_SCANCODE_EJECT)),
                 value("DIK_SLEEP",                  int(SDL_SCANCODE_SLEEP)),
-               
+
                 value("DIK_APP1",                   int(SDL_SCANCODE_APP1)),
                 value("DIK_APP2",                   int(SDL_SCANCODE_APP2)),
 

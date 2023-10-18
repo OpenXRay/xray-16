@@ -25,6 +25,8 @@
 #include <utime.h>
 #include <ctime>
 
+#include <xlocale.h> // for locale_t
+
 #define _LINUX // for GameSpy
 
 #define _MAX_PATH 4096 + 1
@@ -40,6 +42,7 @@
 
 #define __cdecl
 #define __stdcall
+#define __fastcall
 
 //#define __declspec
 #define __forceinline FORCE_INLINE

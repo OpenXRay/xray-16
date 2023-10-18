@@ -8,7 +8,7 @@
 class CUIXml;
 class CUIGameLog;
 
-class CUIAchivementIndicator : public CUIWindow
+class CUIAchivementIndicator final : public CUIWindow
 {
     typedef CUIWindow inherited;
 
@@ -19,6 +19,8 @@ public:
 
     void AddAchivement(
         shared_str const& achivement_name, shared_str const& color_animation, u32 const width, u32 const height);
+
+    pcstr GetDebugType() override { return "CUIAchivementIndicator"; }
 
 protected:
     CUIGameLog* m_achivement_log;

@@ -274,11 +274,11 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         desc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
 
-        CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
+        CHK_DX(D3DX11LoadTextureFromTexture(HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, NULL, pSrcSmallTexture));
 
         // save (logical & physical)
         ID3DBlob* saved = nullptr;
-        HRESULT hr = D3DX11SaveTextureToMemory(HW.pContext, pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
+        HRESULT hr = D3DX11SaveTextureToMemory(HW.get_context(CHW::IMM_CTX_ID), pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
         if (hr == D3D_OK)
         {
             IWriter* fs = FS.w_open(name);
@@ -310,11 +310,11 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
 
-        CHK_DX(D3DX11LoadTextureFromTexture(HW.pContext, pSrcTexture, NULL, pSrcSmallTexture));
+        CHK_DX(D3DX11LoadTextureFromTexture(HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, NULL, pSrcSmallTexture));
 
         // save (logical & physical)
         ID3DBlob* saved = nullptr;
-        HRESULT hr = D3DX11SaveTextureToMemory(HW.pContext, pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
+        HRESULT hr = D3DX11SaveTextureToMemory(HW.get_context(CHW::IMM_CTX_ID), pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
         if (hr == D3D_OK)
         {
             if (!memory_writer)
@@ -345,7 +345,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
                    g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
 
         ID3DBlob* saved = nullptr;
-        CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_JPG, &saved, 0));
+        CHK_DX(D3DX11SaveTextureToMemory(HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, D3DX11_IFF_JPG, &saved, 0));
 
         IWriter* fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
@@ -359,7 +359,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
                        g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
 
             ID3DBlob* saved2 = nullptr;
-            CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_BMP, &saved2, 0));
+            CHK_DX(D3DX11SaveTextureToMemory(HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, D3DX11_IFF_BMP, &saved2, 0));
 
             IWriter* fs2 = FS.w_open("$screenshots$", buf);
             R_ASSERT(fs2);
@@ -379,10 +379,10 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         R_ASSERT(fs);
 
         ID3DTexture2D* pTex = Target->t_ss_async;
-        HW.pContext->CopyResource(pTex, pSrcTexture);
+        HW.get_context(CHW::IMM_CTX_ID)->CopyResource(pTex, pSrcTexture);
 
         D3D_MAPPED_TEXTURE2D MappedData;
-        HW.pContext->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
+        HW.get_context(CHW::IMM_CTX_ID)->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
         // Swap r and b, but don't kill alpha
         {
             u32* pPixel = (u32*)MappedData.pData;
@@ -397,7 +397,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         // save
         u32* data = (u32*)xr_malloc(Device.dwHeight * Device.dwHeight * 4);
         imf_Process(data, Device.dwHeight, Device.dwHeight, (u32*)MappedData.pData, Device.dwWidth, Device.dwHeight, imf_lanczos3);
-        HW.pContext->Unmap(pTex, 0);
+        HW.get_context(CHW::IMM_CTX_ID)->Unmap(pTex, 0);
 
         Image img;
         img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageDataFormat::RGBA8);
@@ -587,7 +587,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 
     D3D_MAPPED_TEXTURE2D MappedData;
 
-    HW.pContext->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
+    HW.get_context(CHW::IMM_CTX_ID)->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
     {
         u32* pPixel = (u32*)MappedData.pData;
         u32* pEnd = pPixel + (Device.dwWidth * Device.dwHeight);
@@ -603,7 +603,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
         memory_writer.w(&Device.dwHeight, sizeof(Device.dwHeight));
         memory_writer.w(MappedData.pData, (Device.dwWidth * Device.dwHeight) * 4);
     }
-    HW.pContext->Unmap(pTex, 0);
+    HW.get_context(CHW::IMM_CTX_ID)->Unmap(pTex, 0);
 }
 #elif defined(USE_OGL)
 void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)

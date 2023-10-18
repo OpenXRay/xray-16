@@ -103,3 +103,29 @@ void UIStyleManager::Reset()
     if (shouldHideMainMenu)
         g_pGamePersistent->m_pMainMenu->Activate(false);
 }
+
+bool UIStyleManager::SetStyle(pcstr name, bool reloadUI)
+{
+    for (const auto& token : m_token)
+    {
+        if (0 == xr_strcmp(token.name, name))
+        {
+            SetupStyle(token.id);
+            if (reloadUI)
+                Reset();
+            return true;
+        }
+    }
+    return false;
+}
+
+pcstr UIStyleManager::GetCurrentStyleName() const
+{
+    for (const auto& token : m_token)
+    {
+        if (token.id == m_style_id)
+            return token.name;
+    }
+    VERIFY(!"Could retrieve current style name!");
+    return nullptr;
+}

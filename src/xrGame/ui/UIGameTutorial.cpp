@@ -403,14 +403,14 @@ void CUISequencer::IR_OnMouseWheel(int x, int y)
 
 void CUISequencer::IR_OnKeyboardPress(int dik)
 {
-    if (m_sequencer_items.size())
+    CUISequenceItem* item = m_sequencer_items.empty() ? nullptr : m_sequencer_items.front();
+
+    if (item)
         m_sequencer_items.front()->OnKeyboardPress(dik);
 
-    bool b = true;
-    if (m_sequencer_items.size())
-        b &= m_sequencer_items.front()->AllowKey(dik);
+    const bool b = item ? item->AllowKey(dik) : true;
 
-    bool binded = IsBinded(kQUIT, dik);
+    const bool binded = IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI);
     if (b && binded)
     {
         Stop();
@@ -439,14 +439,14 @@ void CUISequencer::IR_OnKeyboardPress(int dik)
 
 void CUISequencer::IR_OnControllerPress(int key, float x, float y)
 {
-    if (m_sequencer_items.size())
-        m_sequencer_items.front()->OnControllerPress(key);
+    CUISequenceItem* item = m_sequencer_items.empty() ? nullptr : m_sequencer_items.front();
 
-    bool b = true;
-    if (m_sequencer_items.size())
-        b &= m_sequencer_items.front()->AllowKey(key);
+    if (item)
+        m_sequencer_items.front()->OnKeyboardPress(key);
 
-    bool binded = IsBinded(kQUIT, key);
+    const bool b = item ? item->AllowKey(key) : true;
+
+    const bool binded = IsBinded(kQUIT, key) || IsBinded(kUI_BACK, key, EKeyContext::UI);
     if (b && binded)
     {
         Stop();

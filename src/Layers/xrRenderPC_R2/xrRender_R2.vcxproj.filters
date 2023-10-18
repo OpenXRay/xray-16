@@ -1148,6 +1148,9 @@
     <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9DetailManager_VS.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

@@ -18,10 +18,11 @@ protected:
 public:
     CScriptIniFile(IReader* F, LPCSTR path = nullptr);
     CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly = TRUE, BOOL bLoadAtStart = TRUE, BOOL SaveAtEnd = TRUE);
+    CScriptIniFile(LPCSTR initial, LPCSTR szFileName, BOOL ReadOnly = TRUE, BOOL bLoadAtStart = TRUE, BOOL SaveAtEnd = TRUE);
 
     int r_clsid(LPCSTR S, LPCSTR L);
     int r_token(LPCSTR S, LPCSTR L, const CScriptTokenList& token_list);
-    LPCSTR update(LPCSTR file_name);
+    LPCSTR update(LPCSTR initial, LPCSTR file_name);
     u32 line_count(LPCSTR S);
     LPCSTR r_string(LPCSTR S, LPCSTR L);
     u32 r_u32(LPCSTR S, LPCSTR L);

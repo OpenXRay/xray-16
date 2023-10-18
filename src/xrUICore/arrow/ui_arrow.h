@@ -13,6 +13,9 @@ public:
     void SetNewValue(float new_value);
     void SetPos(float pos);
     IC float GetPos() { return m_pos; }
+
+    pcstr GetDebugType() override { return "UI_Arrow"; }
+
 private:
     float m_angle_begin;
     float m_angle_end;

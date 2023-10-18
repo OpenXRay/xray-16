@@ -1,0 +1,11 @@
+<w>
+    <file name="ui\ui_ingame2_back_add2_w">
+    
+    <texture id="ui_inGame2_back_mmw10_l" x="68"	y="0" width="102" height="768" />
+    <texture id="ui_inGame2_back_mmw10_r" x="172"	y="0" width="102" height="768" />
+
+    <texture id="ui_inGame2_back_ldw10_l" x="748"	y="0" width="102" height="768" />
+    <texture id="ui_inGame2_back_ldw10_r" x="850"	y="0" width="102" height="768" />
+
+   </file>
+</w>

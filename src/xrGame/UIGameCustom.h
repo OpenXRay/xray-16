@@ -9,7 +9,6 @@
 #include "xrCommon/xr_string.h"
 
 // fwd. decl.
-class CUI;
 class CTeamBaseZone;
 class game_cl_GameState;
 class CUIDialogWnd;
@@ -130,6 +129,10 @@ public:
     void UpdatePda();
     void update_fake_indicators(u8 type, float power);
     void enable_fake_indicators(bool enable);
+
+    pcstr GetDebugType() override { return "CUIGameCustom"; }
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+    void FillDebugInfo() override;
 };
 
 extern CUIGameCustom* CurrentGameUI();

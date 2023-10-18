@@ -39,6 +39,9 @@
     <ProjectReference Include="$(xrExternals)luabind.vcxproj">
       <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Externals\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Externals\LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
     </ProjectReference>
@@ -103,6 +106,7 @@
     <ClInclude Include="TrackBar\UITrackBar.h" />
     <ClInclude Include="uiabstract.h" />
     <ClInclude Include="UIMessages.h" />
+    <ClInclude Include="ui_debug.h" />
     <ClInclude Include="ui_styles.h" />
     <ClInclude Include="ui_base.h" />
     <ClInclude Include="ui_defs.h" />
@@ -174,6 +178,7 @@
     <ClCompile Include="TabControl\UITabControl.cpp" />
     <ClCompile Include="TabControl\UITabControl_script.cpp" />
     <ClCompile Include="TrackBar\UITrackBar.cpp" />
+    <ClCompile Include="ui_debug.cpp" />
     <ClCompile Include="ui_styles.cpp" />
     <ClCompile Include="ui_base.cpp" />
     <ClCompile Include="Windows\UIFrameLineWnd.cpp" />

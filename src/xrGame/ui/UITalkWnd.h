@@ -15,7 +15,7 @@ class CUITalkDialogWnd;
 //
 ///////////////////////////////////////
 
-class CUITalkWnd : public CUIDialogWnd
+class CUITalkWnd final : public CUIDialogWnd
 {
 private:
     typedef CUIDialogWnd inherited;
@@ -25,7 +25,6 @@ private:
 
 public:
     CUITalkWnd();
-    virtual ~CUITalkWnd();
 
     IC bool playing_sound() { return !!m_sound._feedback(); }
     IC CInventoryOwner* OthersInvOwner() const { return m_pOthersInvOwner; };
@@ -47,10 +46,13 @@ public:
     //инициализации начального диалога собеседника
     void InitOthersStartDialog();
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     void SwitchToTrade();
     void SwitchToUpgrade();
     void AddIconedMessage(LPCSTR caption, LPCSTR text, LPCSTR texture_name, LPCSTR templ_name);
     void AddIconedMessage(pcstr text, pcstr texture_name, Frect texture_rect, pcstr templ_name);
+
+    pcstr GetDebugType() override { return "CUITalkWnd"; }
 
 protected:
     //диалог

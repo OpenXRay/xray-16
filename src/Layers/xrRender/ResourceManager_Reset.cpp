@@ -10,9 +10,6 @@
 
 void CResourceManager::reset_begin()
 {
-    // destroy everything, renderer may use
-    GEnv.Render->reset_begin();
-
     // destroy state-blocks
     for (SState* sstate : v_states)
         _RELEASE(sstate->state);
@@ -105,7 +102,7 @@ void mdump(C c)
     if (0 == c.size())
         return;
     for (auto I = c.begin(); I != c.end(); ++I)
-        Msg("*        : %3d: %s", I->second->dwReference, I->second->cName.c_str());
+        Msg("*        : %3d: %s", I->second->ref_count.load() , I->second->cName.c_str());
 }
 
 CResourceManager::~CResourceManager()

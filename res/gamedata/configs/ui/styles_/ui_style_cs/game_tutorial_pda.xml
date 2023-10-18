@@ -1,0 +1,356 @@
+<part_1_pda>
+  <!-- <global_wnd x="0" y="0" width="1024" height="768">
+			<auto_static x="200" y="100" width="150" height="50">
+				<text font="graffiti50" color="ui_yellow">pda_start_tutorial</text>
+			</auto_static>
+		</global_wnd>-->
+  <global_wnd/>
+  <item>
+    <!--Смотри. Вот твой главный проводник - раздел «Задачи».-->
+    <length_sec>5</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_00</sound>
+    <pda_section>pda_tasks</pda_section>
+    <cursor_pos x="571" y="78"/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="1" length_sec="5" x="546" y="70" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Здесь отображается твое основное задание...-->
+    <length_sec>3</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_01</sound>
+    <pda_section>pda_tasks</pda_section>
+    <cursor_pos x="962" y="115"/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="3" x="250" y="115" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--А также выбранное дополнительное задание.-->
+    <length_sec>3</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_02</sound>
+    <pda_section>pda_tasks</pda_section>
+    <cursor_pos x="962" y="157"/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="3" x="250" y="155" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Дополнительных заданий может быть несколько, ты можешь прокручивать их с помощью этих кнопок.-->
+    <length_sec>7</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_03</sound>
+    <!-- 	<pda_section>pda_tasks</pda_section> -->
+    <pda_section>pda_show_second_task_wnd</pda_section>
+    <cursor_pos x="75" y="157"/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="7" x="373" y="252" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <auto_static start_time="0" length_sec="7" x="373" y="652" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Большинство заданий также будут отображены на карте. За исключением редких случаев, когда цель задания невозможно локализовать.-->
+    <length_sec>9</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_04</sound>
+    <pda_section>pda_tasks</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="9" x="589" y="470" width="60" height="60" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Нам нужна будет твоя помощь не только в уничтожении врага, но и в захвате ключевых позиций.-->
+    <!--В таких ситуациях наши бойцы оценят, если ты их прикроешь, пока они занимают точку.-->
+    <!--Кстати, не игнорируй призывы о помощи - от этого может зависеть жизнь ребят.-->
+    <length_sec>19</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_05</sound>
+    <pda_section>pda_tasks</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd/>
+  </item>
+
+  <item>
+    <!--При наведении на отметку на карте, ты можешь получить дополнительную информацию о ней. -->
+    <length_sec>5</length_sec>
+    <cursor_pos x="589" y="470"/>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_06</sound>
+    <pda_section>pda_tasks</pda_section>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="1" length_sec="5" x="730" y="385" width="80" height="80" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Кроме заданий также на твоей карте будут отображены координаты дружественных отрядов, а также координаты замеченных противников.-->
+    <length_sec>9</length_sec>
+    <cursor_pos/>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_07</sound>
+    <pda_section>pda_tasks</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="9" x="833" y="355" width="60" height="60" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <auto_static start_time="0" length_sec="9" x="538" y="470" width="60" height="60" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Лады. Как ты понимаешь, наша основная задача - контроль над Болотами, а значит - война с агрессором.-->
+    <length_sec>8</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_08</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd/>
+  </item>
+
+  <item>
+    <!--В этом разделе ты в любой момент найдешь полную тактическую информацию о ходе военных действий.-->
+    <length_sec>6</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_09</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <cursor_pos x="644" y="79"/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="1" length_sec="6" x="616" y="70" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Слева отображается информация о твоей текущей группировке. В данный момент это "Чистое Небо", то есть мы.-->
+    <length_sec>8</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_10</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="8" x="170" y="185" width="200" height="200" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Справа информация об основном противнике.-->
+    <length_sec>3</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_11</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="3" x="850" y="185" width="200" height="200" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Вот это - примерный уровень нашей военной мощи.-->
+    <length_sec>3</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_12</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="3" x="380" y="330" width="100" height="100" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Тут показано количество наших бойцов.-->
+    <length_sec>4</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_13</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="4" x="260" y="490" width="80" height="80" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--А здесь - уровень нашего материального обеспечения.-->
+    <length_sec>4</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_14</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="4" x="260" y="570" width="80" height="80" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <!--<item>В самом же низу находятся символы, демонстрирующие особенности нашего военного снаряжения.
+			<length_sec>6</length_sec>
+			<sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_15</sound>
+			<pda_section>pda_fraction_war</pda_section>
+			<grab_input>1</grab_input>
+			<pause_state>off</pause_state>
+			<main_wnd>
+				<auto_static start_time="0" length_sec="6" x="280" y="635" width="120" height="120" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+					<texture>ui_highlight</texture>
+				</auto_static>
+			</main_wnd>
+		</item>-->
+
+  <item>
+    <!--Аналогичные индикаторы отображаются и для нашего врага.-->
+    <length_sec>4</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_16</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="4" x="625" y="330" width="100" height="100" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <auto_static start_time="0" length_sec="4" x="750" y="490" width="80" height="80" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <auto_static start_time="0" length_sec="4" x="750" y="570" width="80" height="80" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <!-- <auto_static start_time="0" length_sec="4" x="740" y="635" width="120" height="120" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+					<texture>ui_highlight</texture>
+				</auto_static> -->
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Наконец, в этом поле ты сможешь увидеть текущую стратегическую цель, а также тактические задачи, которые нужно выплонить для достижения стратегической цели.-->
+    <length_sec>9</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_17</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="4" x="520" y="114" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <auto_static start_time="4" length_sec="9" x="418" y="165" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Внизу же будут показаны выполненные стратегические задачи.-->
+    <length_sec>5</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_18</sound>
+    <pda_section>pda_fraction_war</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="5" x="429" y="387" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <auto_static start_time="0" length_sec="5" x="516" y="387" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <auto_static start_time="0" length_sec="5" x="600" y="387" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--На последней закладке ты сможешь узнать о своих текущих отношениях со всеми группировками, а также военную мощь каждой группировки.-->
+    <length_sec>9</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_19</sound>
+    <pda_section>pda_ranking</pda_section>
+    <cursor_pos x="734" y="79"/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="1" length_sec="9" x="767" y="70" width="50" height="50" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Кроме этого здесь же указана твоя статистика.-->
+    <length_sec>4</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_20</sound>
+    <pda_section>pda_ranking</pda_section>
+    <cursor_pos/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd>
+      <auto_static start_time="0" length_sec="4" x="169" y="264" width="60" height="60" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <auto_static start_time="0" length_sec="4" x="655" y="202" width="250" height="250" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+        <texture>ui_highlight</texture>
+      </auto_static>
+      <!-- <auto_static start_time="0" length_sec="4" x="794" y="202" width="250" height="250" stretch="1" light_anim="tutor_rad_sign_clr" light_anim_cyclic="1" la_alpha="0" la_texture="1" xform_anim="tutor_rad_sign_xform" xform_anim_cyclic="1" alignment="c">
+					<texture>ui_highlight</texture>
+				</auto_static>	 -->
+    </main_wnd>
+  </item>
+
+  <item>
+    <!--Вот собственно и все…-->
+    <length_sec>2</length_sec>
+    <sound>characters_voice\scenario\marsh\mar_csky_tactic_pda_tutorial_21</sound>
+    <pda_section>pda_ranking</pda_section>
+    <cursor_pos x="898" y="11"/>
+    <grab_input>1</grab_input>
+    <pause_state>off</pause_state>
+    <main_wnd/>
+  </item>
+</part_1_pda>

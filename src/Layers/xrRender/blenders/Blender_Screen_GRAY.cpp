@@ -3,11 +3,6 @@
 
 #include "Blender_Screen_GRAY.h"
 
-/*
- * TODO: Seems there is no use for this blender even in R1.
- * Consider removing.
- */
-
 #if RENDER != R_R1
 #error "The blender can't be used in this renderer generation"
 #endif

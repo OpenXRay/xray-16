@@ -59,6 +59,14 @@
 
 #define     r2_base             "$user$base"
 
+static constexpr auto c_lmaterial = "L_material";
+static constexpr auto c_sbase = "s_base";
+static constexpr auto c_snoise = "s_noise";
+static constexpr auto c_ssky0 = "s_sky0";
+static constexpr auto c_ssky1 = "s_sky1";
+static constexpr auto c_sclouds0 = "s_clouds0";
+static constexpr auto c_sclouds1 = "s_clouds1";
+
 #define JITTER(a) r2_jitter #a
 
 const float SMAP_near_plane = .1f;

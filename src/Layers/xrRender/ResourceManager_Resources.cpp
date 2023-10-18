@@ -94,7 +94,7 @@ void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
     Msg("! ERROR: Failed to find compiled constant-table");
 }
 
-CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, Flags32 flags /*= {}*/)
+CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
 {
     R_ASSERT(Name && Name[0] && w && h);
 
@@ -109,7 +109,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sam
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_rtargets.emplace(RT->set_name(Name), RT);
         if (Device.b_is_Ready)
-            RT->create(Name, w, h, f, sampleCount, flags);
+            RT->create(Name, w, h, f, sampleCount, slices_num, flags);
         return RT;
     }
 }
@@ -264,7 +264,7 @@ CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
     {
         CMatrix* M = xr_new<CMatrix>();
         M->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        M->dwReference = 1;
+        M->ref_count = 1;
         m_matrices.emplace(M->set_name(Name), M);
         return M;
     }
@@ -304,7 +304,7 @@ CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
     {
         CConstant* C = xr_new<CConstant>();
         C->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        C->dwReference = 1;
+        C->ref_count = 1;
         m_constants.emplace(C->set_name(Name), C);
         return C;
     }

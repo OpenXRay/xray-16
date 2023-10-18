@@ -5,7 +5,7 @@
 
 class UIHint;
 
-class XRUICORE_API CUICheckButton : public CUI3tButton, public CUIOptionsItem
+class XRUICORE_API CUICheckButton final : public CUI3tButton, public CUIOptionsItem
 {
     typedef CUI3tButton inherited;
 
@@ -34,6 +34,8 @@ public:
     IC bool GetCheck() const { return GetButtonState() == BUTTON_PUSHED; }
     IC void SetCheck(bool ch) { SetButtonState(ch ? BUTTON_PUSHED : BUTTON_NORMAL); }
     void SetDependControl(CUIWindow* pWnd);
+
+    pcstr GetDebugType() override { return "CUICheckButton"; }
 
 private:
     bool m_opt_backup_value;

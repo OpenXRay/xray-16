@@ -111,7 +111,7 @@ public:
     void StageEnd();
 
     // R1/R2-compiler	[programmable]
-    u32 i_Sampler(LPCSTR name);
+    u32 i_Sampler(LPCSTR name) const;
     void i_Texture(u32 s, LPCSTR name);
     void i_Projective(u32 s, bool b);
     void i_Address(u32 s, u32 address);

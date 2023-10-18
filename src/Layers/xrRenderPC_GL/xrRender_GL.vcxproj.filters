@@ -645,9 +645,6 @@
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_rain.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>

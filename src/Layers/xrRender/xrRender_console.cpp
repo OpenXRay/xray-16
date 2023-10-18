@@ -299,7 +299,7 @@ public:
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
 #elif defined(USE_DX11)
-        RCache.SSManager.SetMaxAnisotropy(val);
+        SSManager.SetMaxAnisotropy(val);
 #elif defined(USE_OGL)
         // OGL: don't set aniso here because it will be updated after vid restart
 #else
@@ -332,7 +332,7 @@ public:
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
 #elif defined(USE_DX11)
-        RCache.SSManager.SetMipLODBias(*value);
+        SSManager.SetMipLODBias(*value);
 #endif
     }
 
@@ -980,7 +980,9 @@ void xrRender_initconsole()
     //CMD3(CCC_Mask, "r2_sun_ignore_portals", &ps_r2_ls_flags, R2FLAG_SUN_IGNORE_PORTALS);
 
     CMD4(CCC_Integer, "r2_mt_calculate",    &ps_r2_mt_calculate, 0, 1);
+#if RENDER == R_R4
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
+#endif
 }
 
 #endif

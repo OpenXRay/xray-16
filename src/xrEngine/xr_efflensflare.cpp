@@ -113,8 +113,9 @@ CLensFlareDescriptor::CLensFlareDescriptor(shared_str sect, CInifile const* pIni
         pcstr O = pIni->r_string(sect, "flare_opacity");
         pcstr P = pIni->r_string(sect, "flare_position");
         u32 tcnt = _GetItemCount(T);
+        m_Flares.reserve(tcnt);
         string256 name;
-        for (u32 i = 0; i < tcnt; i++)
+        for (u32 i = 0; i < tcnt; ++i)
         {
             _GetItem(R, i, name);
             float r = (float)atof(name);

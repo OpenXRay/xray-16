@@ -41,6 +41,8 @@ public:
     virtual void SetText(LPCSTR text);
     void SetEditMode(bool b);
 
+    pcstr GetDebugType() override { return "CUIEditKeyBind"; }
+
 protected:
     void BindAction2Key();
 
