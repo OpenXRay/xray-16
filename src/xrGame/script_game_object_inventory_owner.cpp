@@ -1136,19 +1136,11 @@ void CScriptGameObject::attachable_item_load_attach(LPCSTR section)
 
 void CScriptGameObject::RestoreWeapon()
 {
-#ifdef DEBUG
-    GEnv.ScriptEngine->script_log(LuaMessageType::Message, "CScriptGameObject::RestoreWeapon called!!!");
-    GEnv.ScriptEngine->print_stack();
-#endif //#ifdef DEBUG
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
 }
 
 void CScriptGameObject::HideWeapon()
 {
-#ifdef DEBUG
-    GEnv.ScriptEngine->script_log(LuaMessageType::Message, "CScriptGameObject::HideWeapon called!!!");
-    GEnv.ScriptEngine->print_stack();
-#endif //#ifdef DEBUG
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
 }
 
