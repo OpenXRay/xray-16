@@ -1,0 +1,22 @@
+<w>
+    <background width="1024" height="768">
+        <auto_static x="102" y="0" width="819" height="768" stretch="1">
+            <texture>ui_mm_loading_screen</texture>
+        </auto_static>
+        <auto_static x="0" y="0" width="104" height="768" stretch="1">
+            <texture>ui_mm_loading_left_widepanel</texture>
+        </auto_static>
+        <auto_static x="920" y="0" width="104" height="768" stretch="1">
+            <texture>ui_mm_loading_right_widepanel</texture>
+        </auto_static>
+    </background>
+    <loading_logo x="307" y="368.3" width="409.5" height="256" stretch="1"/>
+    <loading_progress x="379" y="726" width="268" height="37" mode="from_center" min="0" max="100" pos="0" inertion="5.0" under_background="0">
+        <progress>
+            <texture>ui_mm_loading_progress_bar</texture>
+        </progress>
+    </loading_progress>
+    <loading_stage x="310" y="698" width="405" height="20" stretch="1" always_show="1">
+        <text align="c" r="157" g="140" b="120" font="graffiti22"/>
+    </loading_stage>
+</w>

@@ -40,6 +40,7 @@ void CTeleWhirlwind::add_impact(const Fvector& dir, float val)
     point.set(0.f, 0.f, 0.f);
     m_saved_impacts.push_back(SPHImpact(force, point, 0));
 }
+void CTeleWhirlwind::reserve_impact(const size_t count) { m_saved_impacts.reserve(count); }
 void CTeleWhirlwind::set_throw_power(float throw_pow) { m_throw_power = throw_pow; }
 void CTeleWhirlwind::draw_out_impact(Fvector& dir, float& val)
 {
@@ -150,11 +151,10 @@ bool CTeleWhirlwindObject::destroy_object(const Fvector dir, float val)
 
         //.		m_telekinesis->add_impact(dir,val*10.f);
 
-        xr_vector<shared_str>::iterator i = D->m_destroyed_obj_visual_names.begin();
-        xr_vector<shared_str>::iterator e = D->m_destroyed_obj_visual_names.end();
         if (IsGameTypeSingle())
         {
-            for (; e != i; ++i)
+            m_telekinesis->reserve_impact(D->m_destroyed_obj_visual_names.size());
+            for ([[maybe_unused]] const auto& i : D->m_destroyed_obj_visual_names)
                 m_telekinesis->add_impact(dir, val * 10.f);
         };
 

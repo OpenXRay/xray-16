@@ -8,14 +8,14 @@
 #include "FS_impl.h"
 #include <SDL.h>
 
-XRCORE_API str_container* g_pStringContainer = NULL;
+XRCORE_API str_container* g_pStringContainer = nullptr;
 
 #if 1
 
 struct str_container_impl
 {
     Lock cs;
-    static const u32 buffer_size = 1024 * 256;
+    static constexpr size_t buffer_size = 1024u * 256u;
     str_value* buffer[buffer_size];
     int num_docs;
 
@@ -25,7 +25,7 @@ struct str_container_impl
         ZeroMemory(buffer, sizeof(buffer));
     }
 
-    str_value* find(str_value* value, const char* str)
+    str_value* find(str_value* value, const char* str) const
     {
         str_value* candidate = buffer[value->dwCRC % buffer_size];
         while (candidate)
@@ -39,7 +39,7 @@ struct str_container_impl
             candidate = candidate->next;
         }
 
-        return NULL;
+        return nullptr;
     }
 
     void insert(str_value* value)
@@ -51,11 +51,11 @@ struct str_container_impl
 
     void clean()
     {
-        for (u32 i = 0; i < buffer_size; ++i)
+        for (size_t i = 0; i < buffer_size; ++i)
         {
             str_value** current = &buffer[i];
 
-            while (*current != NULL)
+            while (*current != nullptr)
             {
                 str_value* value = *current;
                 if (!value->dwReference)
@@ -71,15 +71,15 @@ struct str_container_impl
         }
     }
 
-    void verify()
+    void verify() const
     {
         Msg("strings verify started");
-        for (u32 i = 0; i < buffer_size; ++i)
+        for (size_t i = 0; i < buffer_size; ++i)
         {
-            str_value* value = buffer[i];
+            const str_value* value = buffer[i];
             while (value)
             {
-                u32 crc = crc32(value->value, value->dwLength);
+                const auto crc = crc32(value->value, value->dwLength);
                 string32 crc_str;
                 R_ASSERT3(crc == value->dwCRC, "CorePanic: read-only memory corruption (shared_strings)",
                     xr_itoa(value->dwCRC, crc_str, 16));
@@ -93,7 +93,7 @@ struct str_container_impl
 
     void dump(FILE* f) const
     {
-        for (u32 i = 0; i < buffer_size; ++i)
+        for (size_t i = 0; i < buffer_size; ++i)
         {
             str_value* value = buffer[i];
             while (value)
@@ -107,7 +107,7 @@ struct str_container_impl
 
     void dump(IWriter* f) const
     {
-        for (u32 i = 0; i < buffer_size; ++i)
+        for (size_t i = 0; i < buffer_size; ++i)
         {
             str_value* value = buffer[i];
             string4096 temp;
@@ -121,12 +121,12 @@ struct str_container_impl
         }
     }
 
-    int stat_economy()
+    ptrdiff_t stat_economy() const
     {
-        int counter = 0;
-        for (u32 i = 0; i < buffer_size; ++i)
+        ptrdiff_t counter = 0;
+        for (size_t i = 0; i < buffer_size; ++i)
         {
-            str_value* value = buffer[i];
+            const str_value* value = buffer[i];
             while (value)
             {
                 counter -= sizeof(str_value);
@@ -146,42 +146,42 @@ str_container::str_container() :
 #endif
 {}
 
-str_value* str_container::dock(pcstr value)
+str_value* str_container::dock(pcstr value) const
 {
-    if (0 == value)
-        return 0;
+    if (nullptr == value)
+        return nullptr;
 
     impl->cs.Enter();
 
-    str_value* result = 0;
+    str_value* result = nullptr;
 
     // calc len
-    u32 s_len = xr_strlen(value);
-    u32 s_len_with_zero = (u32)s_len + 1;
+    const auto s_len = xr_strlen(value);
+    const auto s_len_with_zero = s_len + 1;
     VERIFY(sizeof(str_value) + s_len_with_zero < 4096);
 
     // setup find structure
     char header[sizeof(str_value)];
     str_value* sv = (str_value*)header;
     sv->dwReference = 0;
-    sv->dwLength = s_len;
+    sv->dwLength = static_cast<u32>(s_len);
     sv->dwCRC = crc32(value, s_len);
 
     // search
     result = impl->find(sv, value);
 
 #ifdef DEBUG
-    bool is_leaked_string = !xr_strcmp(value, "enter leaked string here");
+    const bool is_leaked_string = !xr_strcmp(value, "enter leaked string here");
 #endif // DEBUG
 
     // it may be the case, string is not found or has "non-exact" match
-    if (0 == result
+    if (nullptr == result
 #ifdef DEBUG
         || is_leaked_string
 #endif // DEBUG
         )
     {
-        result = (str_value*)xr_malloc(sizeof(str_value) + s_len_with_zero);
+        result = static_cast<str_value*>(xr_malloc(sizeof(str_value) + s_len_with_zero));
 
 #ifdef DEBUG
         static int num_leaked_string = 0;
@@ -204,21 +204,21 @@ str_value* str_container::dock(pcstr value)
     return result;
 }
 
-void str_container::clean()
+void str_container::clean() const
 {
     impl->cs.Enter();
     impl->clean();
     impl->cs.Leave();
 }
 
-void str_container::verify()
+void str_container::verify() const
 {
     impl->cs.Enter();
     impl->verify();
     impl->cs.Leave();
 }
 
-void str_container::dump()
+void str_container::dump() const
 {
     impl->cs.Enter();
     FILE* F = fopen("d:\\$str_dump$.txt", "w");
@@ -227,21 +227,21 @@ void str_container::dump()
     impl->cs.Leave();
 }
 
-void str_container::dump(IWriter* W)
+void str_container::dump(IWriter* W) const
 {
     impl->cs.Enter();
     impl->dump(W);
     impl->cs.Leave();
 }
 
-u32 str_container::stat_economy()
+size_t str_container::stat_economy() const
 {
     impl->cs.Enter();
-    int counter = 0;
+    ptrdiff_t counter = 0;
     counter -= sizeof(*this);
     counter += impl->stat_economy();
     impl->cs.Leave();
-    return u32(counter);
+    return size_t(counter);
 }
 
 str_container::~str_container()

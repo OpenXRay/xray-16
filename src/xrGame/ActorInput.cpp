@@ -219,7 +219,7 @@ void CActor::IR_OnMouseWheel(int x, int y)
         return;
     }
 
-    if (inventory().Action((y > 0) ? (u16)kWPN_ZOOM_DEC : (u16)kWPN_ZOOM_INC, CMD_START))
+    if (inventory().Action((y > 0) ? (u16)kWPN_ZOOM_INC : (u16)kWPN_ZOOM_DEC, CMD_START))
         return;
 
     if (y > 0)

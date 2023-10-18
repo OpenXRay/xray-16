@@ -44,8 +44,10 @@ CBaseMonster::SDebugInfo CBaseMonster::show_debug_info()
         return SDebugInfo();
     }
 
+    auto& cmd_list = GEnv.Render->get_imm_command_list();
+
     float y = 200;
-    float x = (m_show_debug_info == 1) ? 40.f : float(GEnv.Render->getTarget()->get_width() / 2) + 40.f;
+    float x = (m_show_debug_info == 1) ? 40.f : float(GEnv.Render->getTarget()->get_width(cmd_list) / 2) + 40.f;
     const float delta_y = 12;
 
     string256 text;

@@ -31,6 +31,7 @@ private:
     typedef CUIWindow inherited;
     lanim_cont_xf m_lanim_xform;
     void EnableHeading_int(bool b) { m_bHeading = b; }
+
 public:
     CUIStatic(pcstr window_name);
     ~CUIStatic() override;
@@ -121,6 +122,9 @@ public:
     virtual void ColorAnimationSetTextureColor(u32 color, bool only_alpha);
     virtual void ColorAnimationSetTextColor(u32 color, bool only_alpha);
 
+    pcstr GetDebugType() override { return "CUIStatic"; }
+    void FillDebugInfo() override;
+
 protected:
     CUILines* m_pTextControl;
 
@@ -139,14 +143,14 @@ public:
     shared_str m_stat_hint_text;
 };
 
-class XRUICORE_API CUITextWnd : public CUIWindow, public CUILightAnimColorConrollerImpl
+class XRUICORE_API CUITextWnd final : public CUIWindow, public CUILightAnimColorConrollerImpl
 {
     typedef CUIWindow inherited;
     CUILines m_lines;
 
 public:
     CUITextWnd();
-    virtual ~CUITextWnd(){};
+
     virtual void Draw();
     virtual void Update();
 
@@ -174,4 +178,7 @@ public:
     virtual void ColorAnimationSetTextColor(u32 color, bool only_alpha);
 
     CUILines& TextItemControl() { return m_lines; }
+
+    pcstr GetDebugType() override { return "CUITextWnd"; }
+    void FillDebugInfo() override;
 };

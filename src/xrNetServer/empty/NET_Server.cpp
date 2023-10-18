@@ -114,7 +114,7 @@ IClientStatistic::IClientStatistic(const IClientStatistic& rhs)
 
 IClientStatistic::~IClientStatistic()
 {
-    delete m_pimpl;
+    xr_delete(m_pimpl);
 }
 
 u32 IClientStatistic::getPing() const { return 0; }
@@ -693,4 +693,4 @@ void IPureServer::UpdateBannedList()
     }
 }
 
-pcstr IPureServer::GetBannedListName() const { return "banned_list_ip.ltx"; }
+constexpr pcstr IPureServer::GetBannedListName() { return "banned_list_ip.ltx"; }

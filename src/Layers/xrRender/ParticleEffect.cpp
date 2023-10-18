@@ -5,7 +5,7 @@
 #include "xrCore/Threading/ParallelFor.hpp"
 
 #ifndef _EDITOR
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
@@ -28,7 +28,7 @@ const float PS::fDT_STEP = float(uDT_STEP) / 1000.f;
 #pragma warning(disable : 4701) // " potentially uninitialized local variable" (magnitude_sse does initialize it)
 #endif
 
-static void ApplyTexgen(const Fmatrix& mVP)
+static void ApplyTexgen(CBackend& cmd_list, const Fmatrix& mVP)
 {
     Fmatrix mTexgen;
 
@@ -65,7 +65,7 @@ static void ApplyTexgen(const Fmatrix& mVP)
 #endif
 
     mTexgen.mul(mTexelAdjust, mVP);
-    RCache.set_c("mVPTexgen", mTexgen);
+    cmd_list.set_c("mVPTexgen", mTexgen);
 }
 
 void PS::OnEffectParticleBirth(void* owner, u32, PAPI::Particle& m, u32)
@@ -262,7 +262,7 @@ void CParticleEffect::OnDeviceCreate()
     {
         if (m_Def->m_Flags.is(CPEDef::dfSprite))
         {
-            geom.create(FVF::F_LIT, RCache.Vertex.Buffer(), RCache.QuadIB);
+            geom.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
             if (m_Def)
                 shader = m_Def->m_CachedShader;
         }
@@ -352,7 +352,7 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, co
 //----------------------------------------------------
 Lock m_sprite_section;
 
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
@@ -485,7 +485,7 @@ ICF void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const
 
 extern ENGINE_API float psHUD_FOV;
 
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 ICF void magnitude_sse(Fvector& vec, float& res) // XXX: move this to Fvector class
 {
     __m128 tv, tu;
@@ -642,7 +642,7 @@ void CParticleEffect::ParticleRenderStream(FVF::LIT* pv, u32 count, PAPI::Partic
     }
 }
 
-void CParticleEffect::Render(float, bool use_fast_geo)
+void CParticleEffect::Render(CBackend& cmd_list, float, bool use_fast_geo)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CParticleEffect::Render()");
@@ -665,13 +665,13 @@ void CParticleEffect::Render(float, bool use_fast_geo)
     {
         if (m_Def && m_Def->m_Flags.is(CPEDef::dfSprite))
         {
-            FVF::LIT* pv_start = (FVF::LIT*)RCache.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
+            FVF::LIT* pv_start = (FVF::LIT*)RImplementation.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
 
             ParticleRenderStream(pv_start, p_cnt, particles);
 
             dwCount = p_cnt << 2;
 
-            RCache.Vertex.Unlock(dwCount, geom->vb_stride);
+            RImplementation.Vertex.Unlock(dwCount, geom->vb_stride);
             if (dwCount)
             {
 #ifndef _EDITOR
@@ -683,28 +683,28 @@ void CParticleEffect::Render(float, bool use_fast_geo)
                         g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
                     Device.mFullTransform.mul(Device.mProject, Device.mView);
-                    RCache.set_xform_project(Device.mProject);
-                    RImplementation.rmNear();
-                    ApplyTexgen(Device.mFullTransform);
+                    cmd_list.set_xform_project(Device.mProject);
+                    RImplementation.rmNear(cmd_list);
+                    ApplyTexgen(cmd_list, Device.mFullTransform);
                 }
 #endif
 
-                RCache.set_xform_world(Fidentity);
-                RCache.set_Geometry(geom);
+                cmd_list.set_xform_world(Fidentity);
+                cmd_list.set_Geometry(geom);
 
-                RCache.set_CullMode(m_Def->m_Flags.is(CPEDef::dfCulling) ?
+                cmd_list.set_CullMode(m_Def->m_Flags.is(CPEDef::dfCulling) ?
                         (m_Def->m_Flags.is(CPEDef::dfCullCCW) ? CULL_CCW : CULL_CW) :
                         CULL_NONE);
-                RCache.Render(D3DPT_TRIANGLELIST, dwOffset, 0, dwCount, 0, dwCount / 2);
-                RCache.set_CullMode(CULL_CCW);
+                cmd_list.Render(D3DPT_TRIANGLELIST, dwOffset, 0, dwCount, 0, dwCount / 2);
+                cmd_list.set_CullMode(CULL_CCW);
 #ifndef _EDITOR
                 if (GetHudMode())
                 {
-                    RImplementation.rmNormal();
+                    RImplementation.rmNormal(cmd_list);
                     Device.mProject = Pold;
                     Device.mFullTransform = FTold;
-                    RCache.set_xform_project(Device.mProject);
-                    ApplyTexgen(Device.mFullTransform);
+                    cmd_list.set_xform_project(Device.mProject);
+                    ApplyTexgen(cmd_list, Device.mFullTransform);
                 }
 #endif
             }
@@ -740,7 +740,7 @@ void CParticleEffect::Render(float, bool)
     {
         if (m_Def && m_Def->m_Flags.is(CPEDef::dfSprite))
         {
-            FVF::LIT* pv_start = (FVF::LIT*)RCache.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
+            FVF::LIT* pv_start = (FVF::LIT*)RImplementation.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
             FVF::LIT* pv = pv_start;
 
             for (u32 i = 0; i < p_cnt; i++)
@@ -839,7 +839,7 @@ void CParticleEffect::Render(float, bool)
                 }
             }
             dwCount = u32(pv - pv_start);
-            RCache.Vertex.Unlock(dwCount, geom->vb_stride);
+            RImplementation.Vertex.Unlock(dwCount, geom->vb_stride);
             if (dwCount)
             {
 #ifndef _EDITOR

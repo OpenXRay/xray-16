@@ -7,7 +7,7 @@ class CUIStatic;
 class CUITextWnd;
 class UIBoosterInfoItem;
 
-class CUIBoosterInfo : public CUIWindow
+class CUIBoosterInfo final : public CUIWindow
 {
 public:
     CUIBoosterInfo();
@@ -16,14 +16,15 @@ public:
     bool InitFromXml(CUIXml& xml);
     void SetInfo(const shared_str& section);
 
+    pcstr GetDebugType() override { return "CUIBoosterInfo"; }
+
 protected:
-    UIBoosterInfoItem* m_booster_items[eBoostExplImmunity];
-    UIBoosterInfoItem* m_booster_satiety;
-    UIBoosterInfoItem* m_booster_anabiotic;
-    UIBoosterInfoItem* m_booster_time;
+    UIBoosterInfoItem* m_booster_items[eBoostExplImmunity]{};
+    UIBoosterInfoItem* m_booster_satiety{};
+    UIBoosterInfoItem* m_booster_anabiotic{};
+    UIBoosterInfoItem* m_booster_time{};
 
-    CUIStatic* m_Prop_line;
-
+    CUIStatic* m_Prop_line{};
 }; // class CUIBoosterInfo
 
 // -----------------------------------
@@ -37,9 +38,11 @@ public:
     void SetCaption(LPCSTR name);
     void SetValue(float value);
 
+    pcstr GetDebugType() override { return "UIBoosterInfoItem"; }
+
 private:
-    CUIStatic* m_caption;
-    CUITextWnd* m_value;
+    CUIStatic* m_caption{};
+    CUITextWnd* m_value{};
     float m_magnitude;
     bool m_show_sign;
     shared_str m_unit_str;

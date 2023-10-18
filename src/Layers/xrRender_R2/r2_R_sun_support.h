@@ -3,6 +3,81 @@
 const u32 LIGHT_CUBOIDSIDEPOLYS_COUNT = 4;
 const u32 LIGHT_CUBOIDVERTICES_COUNT = 2 * LIGHT_CUBOIDSIDEPOLYS_COUNT;
 
+const float tweak_COP_initial_offs = 1200.f;
+const float tweak_ortho_xform_initial_offs = 1000.f; //. ?
+const float tweak_guaranteed_range = 20.f; //. ?
+
+const float MAP_SIZE_START = 6.f;
+const float MAP_GROW_FACTOR = 4.f;
+
+#if !defined(USE_OGL)
+#include <DirectXMath.h>
+
+using namespace DirectX;
+#else
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/matrix_access.hpp"
+
+static void XRVec3TransformCoordArray(glm::vec3* out, const glm::vec3* in, const glm::mat4& matrix, unsigned int elements)
+{
+    for (unsigned int i = 0; i < elements; ++i)
+        out[i] = glm::vec3(glm::translate(matrix, in[i]) * glm::vec4(1.f,1.f,1.f,1.f));
+}
+
+static void XRMatrixOrthoOffCenterLH(Fmatrix* pout, float l, float r, float b, float t, float zn, float zf)
+{
+    pout->identity();
+    pout->m[0][0] = 2.0f / (r - l);
+    pout->m[1][1] = 2.0f / (t - b);
+    pout->m[2][2] = 2.0f / (zf -zn);
+    pout->m[3][0] = -1.0f -2.0f *l / (r - l);
+    pout->m[3][1] = 1.0f + 2.0f * t / (b - t);
+    pout->m[3][2] = (zn + zf) / (zn -zf);
+}
+
+static void XRMatrixInverse(Fmatrix* pout, float* pdeterminant, const Fmatrix& pm)
+{
+    glm::mat4 out = glm::inverse(glm::make_mat4x4(&pm.m[0][0]));
+    *pout = *(Fmatrix*)glm::value_ptr(out);
+}
+#endif
+
+//////////////////////////////////////////////////////////////////////////
+// tables to calculate view-frustum bounds in world space
+// note: D3D uses [0..1] range for Z
+namespace sun
+{
+static const Fvector3 corners[8] =
+{
+    { -1, -1, +0 }, { -1, -1, +1 },
+    { -1, +1, +1 }, { -1, +1, +0 },
+    { +1, +1, +1 }, { +1, +1, +0 },
+    { +1, -1, +1 }, { +1, -1, +0 }
+};
+static const int facetable[6][4] =
+{
+    { 6, 7, 5, 4 }, { 1, 0, 7, 6 },
+    { 1, 2, 3, 0 }, { 3, 2, 4, 5 },
+    // near and far planes
+    { 0, 3, 5, 7 }, { 1, 6, 4, 2 },
+};
+} // namespace sun
+
+//////////////////////////////////////////////////////////////////////////
+static inline Fvector3 wform(Fmatrix const& m, Fvector3 const& v)
+{
+    Fvector4 r;
+    r.x = v.x * m._11 + v.y * m._21 + v.z * m._31 + m._41;
+    r.y = v.x * m._12 + v.y * m._22 + v.z * m._32 + m._42;
+    r.z = v.x * m._13 + v.y * m._23 + v.z * m._33 + m._43;
+    r.w = v.x * m._14 + v.y * m._24 + v.z * m._34 + m._44;
+    // VERIFY		(r.w>0.f);
+    const float invW = 1.0f / r.w;
+    return { r.x * invW, r.y * invW, r.z * invW };
+}
+
 template <bool _debug>
 class FixedConvexVolume
 {

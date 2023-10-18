@@ -76,7 +76,7 @@ public:
     // node_index - номер, если узлов с одним именем несколько
     XML_NODE NavigateToNode(pcstr path, const size_t node_index = 0) const;
     XML_NODE NavigateToNode(CONST_XML_NODE start_node, pcstr path, const size_t node_index = 0) const;
-    XML_NODE NavigateToNodeWithAttribute(pcstr tag_name, pcstr attrib_name, pcstr attrib_value);
+    XML_NODE NavigateToNodeWithAttribute(pcstr tag_name, pcstr attrib_name, pcstr attrib_value) const;
 
     void SetLocalRoot(XML_NODE pLocalRoot) { m_pLocalRoot = pLocalRoot; }
     XML_NODE GetLocalRoot() const { return m_pLocalRoot; }

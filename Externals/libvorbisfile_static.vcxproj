@@ -29,7 +29,7 @@
       <AdditionalIncludeDirectories>libvorbis\include;libogg\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;LIBVORBISFILE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <TreatWarningAsError>false</TreatWarningAsError>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

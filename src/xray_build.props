@@ -49,14 +49,14 @@
   <!-- Common debug settings -->
   <PropertyGroup Condition="$(Configuration.Contains('Debug'))" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
-    <LinkIncremental>true</LinkIncremental>
+	<EnableASAN>true</EnableASAN>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
 
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Debug'))">
     <ClCompile>
       <PreprocessorDefinitions>DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <!-- MultiProcessorCompilation isn't compatible with LinkIncremental and UseDebugLibraries -->
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
@@ -103,6 +103,11 @@
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+
+  <!-- Mixed non-CI settings -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Mixed' and '$(CI)' == ''" Label="Configuration">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
 
   <!-- Master Gold settings -->
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Master Gold'))">

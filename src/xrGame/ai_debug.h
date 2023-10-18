@@ -39,11 +39,11 @@
 #define aiDrawGameGraphRealPos (1 << 28)
 #endif // DEBUG
 
-#ifndef MASTER_GOLD
+#if defined(DEBUG) || !defined(MASTER_GOLD)
 #define aiIgnoreActor (1 << 24)
 #define aiObstaclesAvoiding (1 << 28)
 #define aiObstaclesAvoidingStatic (1 << 29)
 #define aiUseSmartCovers (1 << 30)
 #define aiUseSmartCoversAnimationSlot (1 << 31)
 extern Flags32 psAI_Flags;
-#endif // MASTER_GOLD
+#endif // defined(DEBUG) || !defined(MASTER_GOLD)

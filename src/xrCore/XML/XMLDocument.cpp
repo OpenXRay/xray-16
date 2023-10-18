@@ -162,7 +162,7 @@ XML_NODE XMLDocument::NavigateToNode(pcstr path, const size_t node_index) const
     return NavigateToNode(GetLocalRoot() ? GetLocalRoot() : GetRoot(), path, node_index);
 }
 
-XML_NODE XMLDocument::NavigateToNodeWithAttribute(pcstr tag_name, pcstr attrib_name, pcstr attrib_value)
+XML_NODE XMLDocument::NavigateToNodeWithAttribute(pcstr tag_name, pcstr attrib_name, pcstr attrib_value) const
 {
     CONST_XML_NODE root = GetLocalRoot() ? GetLocalRoot() : GetRoot();
     int tabsCount = GetNodesNum(root, tag_name);

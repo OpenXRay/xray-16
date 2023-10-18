@@ -19,6 +19,9 @@
 
 #ifdef USE_DX11
 #include "Layers/xrRenderPC_R4/r_backend_lod.h"
+#include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
+#include "Layers/xrRenderDX11/StateManager/dx11ShaderResourceStateCache.h"
+#include "Layers/xrRenderDX11/StateManager/dx11StateCache.h"
 #endif
 
 #include "FVF.h"
@@ -65,13 +68,6 @@ public:
     };
 
 public:
-    // Dynamic geometry streams
-    _VertexStream Vertex;
-    _IndexStream Index;
-
-    IndexStagingBuffer QuadIB;
-    IndexBufferHandle old_QuadIB;
-
     R_xforms xforms;
     R_hemi hemi;
     R_tree tree;
@@ -194,8 +190,6 @@ private:
 
     CMatrix* matrices[8]{}; // matrices are supported only for FFP
 
-    void Invalidate();
-
 public:
     struct _stats
     {
@@ -233,6 +227,8 @@ public:
         R_statistics r;
     } stat;
 
+    u32 context_id{ CHW::IMM_CTX_ID };
+
 public:
     CTexture* get_ActiveTexture(u32 stage)
     {
@@ -258,12 +254,20 @@ public:
         return nullptr;
     }
 
+    float o_hemi;
+    float o_hemi_cube[/*CROS_impl::NUM_FACES*/6];
+    float o_sun;
+
+    void apply_lmaterial();
+
 #if defined(USE_DX9)
     R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
     R_constant_array& get_ConstantCache_Pixel() { return constants.a_pixel; }
 #elif defined(USE_DX11)
     IC void get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData);
 #endif
+
+    void Invalidate();
 
     // API
     IC void set_xform(u32 ID, const Fmatrix& M);
@@ -273,6 +277,11 @@ public:
     IC const Fmatrix& get_xform_world();
     IC const Fmatrix& get_xform_view();
     IC const Fmatrix& get_xform_project();
+
+    u32 curr_rt_width{};
+    u32 curr_rt_height{};
+
+    IC void set_pass_targets(const ref_rt& mrt0, const ref_rt& mrt1, const ref_rt& mrt2, const ref_rt& zb);
 
 #if defined(USE_DX9) || defined(USE_DX11)
     IC void set_RT(ID3DRenderTargetView* RT, u32 ID = 0);
@@ -324,11 +333,11 @@ public:
         return ClearZBRect(zb->pRT, depth, numRects, rects);
     }
 #elif defined(USE_DX11)
-    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT, depth);}
-    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT, depth, stencil);}
+    ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT[context_id], depth); }
+    ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT[context_id], depth, stencil); }
     ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
     {
-        return ClearZBRect(zb->pZRT, depth, numRects, rects);
+        return ClearZBRect(zb->pZRT[context_id], depth, numRects, rects);
     }
 #else
 #   error No graphics API selected or enabled!
@@ -405,6 +414,7 @@ public:
 #if defined(USE_DX11)
     ICF void set_CS(ID3D11ComputeShader* _cs, LPCSTR _n = nullptr);
     ICF void set_CS(ref_cs& _cs) { set_CS(_cs->sh, _cs->cName.c_str()); }
+    ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
 #endif
 
 public:
@@ -436,6 +446,9 @@ public:
     void set_ClipPlanes(u32 _enable, Fmatrix* _xform = nullptr, u32 fmask = 0xff);
     IC void set_Scissor(Irect* rect = nullptr);
     IC void SetViewport(const D3D_VIEWPORT& viewport) const;
+
+    IC void SetTextureFactor(u32 factor) const;
+    IC void SetAmbient(u32 ambient) const;
 
     // constants
     ICF ref_constant get_c(LPCSTR n)
@@ -515,12 +528,21 @@ public:
     ICF void Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
     ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
 
+    ICF void submit()
+    {
 #ifdef USE_DX11
-    ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
+        VERIFY(context_id != CHW::IMM_CTX_ID);
+        ID3D11CommandList* pCommandList{ nullptr };
+        CHK_DX(HW.get_context(context_id)->FinishCommandList(false, &pCommandList));
+        HW.get_context(CHW::IMM_CTX_ID)->ExecuteCommandList(pCommandList, false);
+        _RELEASE(pCommandList);
 #endif
+    }
+
+    void gpu_mark_begin(const wchar_t* name);
+    void gpu_mark_end();
 
     // Device create / destroy / frame signaling
-    void CreateQuadIB();
     void OnFrameBegin();
     void OnFrameEnd();
     void OnDeviceCreate();
@@ -554,7 +576,18 @@ public:
     void dbg_OverdrawBegin();
     void dbg_OverdrawEnd();
 
-    CBackend() { Invalidate(); }
+    CBackend()
+        : xforms(*this)
+        , tree(*this)
+        , hemi(*this)
+#if defined(USE_DX11)
+        , LOD(*this)
+        , constants(*this)
+        , StateManager(*this)
+#endif
+    {
+        Invalidate();
+    }
 
 private:
     // Debug Draw
@@ -578,13 +611,18 @@ private:
     bool CBuffersNeedUpdate(ref_cbuffer buf1[MaxCBuffers], ref_cbuffer buf2[MaxCBuffers], u32& uiMin, u32& uiMax);
 
 private:
-    ID3DBlob* m_pInputSignature;
+    ID3DBlob* m_pInputSignature{ nullptr };
+    ID3DUserDefinedAnnotation* pAnnotation{ nullptr };
 
     bool m_bChangedRTorZB;
+
+public:
+    dx11StateManager StateManager;
+    dx11ShaderResourceStateCache SRVSManager;
 #endif // USE_DX11
 };
 #pragma warning(pop)
 
-extern ECORE_API CBackend RCache;
+#define RCache RImplementation.get_imm_context().cmd_list
 
 #endif

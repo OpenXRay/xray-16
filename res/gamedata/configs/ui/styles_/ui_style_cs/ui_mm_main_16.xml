@@ -1,0 +1,142 @@
+<!-- 16:10 ready -->
+<w>
+  <background x="0" y="0" width="1024" height="768">
+    <auto_static x="563" y="0" width="518" height="542" stretch="1">
+      <texture>ui\ui_mm2_back_video</texture>
+    </auto_static>
+
+    <auto_static x="85" y="0" width="854" height="768" stretch="1">
+      <texture>ui_menu2_backgraund</texture>
+    </auto_static>
+
+    <auto_static x="0" y="0" width="85" height="768" stretch="1">
+      <texture>ui_inGame2_back_mmw10_l</texture>
+    </auto_static>
+    <auto_static x="939" y="0" width="85" height="768" stretch="1">
+      <texture>ui_inGame2_back_mmw10_r</texture>
+    </auto_static>
+
+    <auto_static x="425" y="513" width="211" height="254" stretch="1">
+      <texture x="1" y="1" width="254" height="254">ui\ui_mm2_pautina</texture>
+    </auto_static>
+
+    
+    <auto_static x="487" y="420" width="207" height="156" stretch="1" light_anim="mm_flicker_01" la_alpha="1">
+      <texture>ui_menu2_ray_01</texture>
+    </auto_static>
+    <auto_static x="393" y="380" width="183" height="163" stretch="1" light_anim="mm_flicker_02" la_alpha="1">
+      <texture>ui_menu2_ray_02</texture>
+    </auto_static>
+    <auto_static x="443" y="355" width="183" height="163" stretch="1" light_anim="mm_flicker_01" la_alpha="1">
+      <texture>ui_menu2_ray_02</texture>
+    </auto_static>
+    <auto_static x="263" y="664" width="233" height="148" stretch="1" light_anim="mm_flicker_01" la_alpha="1">
+      <texture>ui_menu2_fog_01</texture>
+    </auto_static>
+
+    <auto_static x="610" y="661" width="233" height="148" stretch="1" light_anim="mm_flicker_02" la_alpha="1">
+      <texture>ui_menu2_fog_01</texture>
+    </auto_static>
+    <auto_static x="441" y="719" width="223" height="76" stretch="1" light_anim="mm_flicker_01" la_alpha="1">
+      <texture>ui_menu2_fog_02</texture>
+    </auto_static>
+
+  </background>
+
+  <shniaga_wnd x="118" y="425" width="327" height="280">
+    <buttons_region	x="87" y="-4" width="167" height="280" always_show_scroll="false" vert_interval="9"/>
+		
+		<shniaga x="57" y="0" width="232" height="40" stretch="1">
+			<texture>ui_menu2_move_e</texture>			
+			<magnifire x="29" y="8" width="176" height="24" stretch="1">
+				<texture>ui_magnifier2</texture>
+        <y_offset>-3</y_offset>
+			</magnifire>
+      <auto_static x="32" y="8" width="172" height="24" stretch="1">
+        <texture shader="hud\add-alpha" a="100">ui_menu2_highlight_one</texture>
+      </auto_static>
+    </shniaga>		
+	</shniaga_wnd>
+
+  <button h="25"/>
+
+  <menu_main btn_height="34" font="graffiti22" color="ui_mm_font">
+    <btn name="btn_new_game"	caption="ui_mm_newgame" />
+    <btn name="btn_load"		caption="ui_mm_load_game" />
+    <btn name="btn_net_game"	caption="ui_mm_network_game" />
+    <btn name="btn_options"		caption="ui_mm_options_n" />
+    <btn name="btn_credits"		caption="ui_mm_credits" />
+    <btn name="btn_quit"		caption="ui_mm_quit2windows" />
+  </menu_main>
+
+  <menu_network_game btn_height="34" font="graffiti22"  color="ui_mm_font">
+    <btn name="btn_internet"		caption="ui_mp_internet" />
+    <btn name="btn_localnet"		caption="ui_mp_localnet" />
+    <btn name="btn_new_back"    caption="ui_mm_back" />
+  </menu_network_game>
+
+  <menu_main_logout btn_height="34" font="graffiti22"  color="ui_mm_font">
+    <btn name="btn_new_game"	caption="ui_mm_newgame" />
+    <btn name="btn_load"		caption="ui_mm_load_game" />
+    <btn name="btn_multiplayer"	caption="ui_mm_network_game" />
+    <btn name="btn_logout"		caption="ui_mm_logout" />
+    <btn name="btn_options"		caption="ui_mm_options_n" />
+    <btn name="btn_credits"		caption="ui_mm_credits" />
+    <btn name="btn_quit"		caption="ui_mm_quit2windows" />
+  </menu_main_logout>
+	
+  <menu_main_last_save btn_height="34" font="graffiti22" color="ui_mm_font">
+    <btn name="btn_new_game"	caption="ui_mm_newgame" />
+    <btn name="btn_load"		caption="ui_mm_load_game" />
+    <btn name="btn_lastsave"	caption="ui_mm_last_save" />
+    <btn name="btn_net_game"	caption="ui_mm_network_game" />
+    <btn name="btn_options"		caption="ui_mm_options_n" />
+    <btn name="btn_credits"		caption="ui_mm_credits" />
+    <btn name="btn_quit"		caption="ui_mm_quit2windows" />
+  </menu_main_last_save>
+
+  <menu_new_game btn_height="34" font="graffiti22" color="ui_mm_font">
+    <btn name="btn_novice"		caption="ui_mm_novice" />
+    <btn name="btn_stalker"		caption="ui_mm_stalker" />
+    <btn name="btn_veteran"		caption="ui_mm_veteran" />
+    <btn name="btn_master"		caption="ui_mm_master" />
+    <btn name="btn_new_back"	caption="ui_mm_back" />
+  </menu_new_game>
+
+  <menu_main_single btn_height="34" font="graffiti22" color="ui_mm_font">
+    <btn name="btn_ret"			caption="ui_mm_return_game" />
+    <btn name="btn_lastsave"	caption="ui_mm_last_save" />
+    <btn name="btn_load"		caption="ui_mm_load_game" />
+    <btn name="btn_save"		caption="ui_mm_save_game" />
+    <btn name="btn_options"		caption="ui_mm_options_n" />
+    <btn name="btn_credits"		caption="ui_mm_credits" />
+    <btn name="btn_quit_to_mm"	caption="ui_mm_quit_game" />
+    <btn name="btn_quit"		caption="ui_mm_quit2windows" />
+  </menu_main_single>
+
+  <menu_main_single_dead btn_height="34" font="graffiti22" color="ui_mm_font">
+    <btn name="btn_lastsave"	caption="ui_mm_last_save" />
+    <btn name="btn_load"		caption="ui_mm_load_game" />
+    <btn name="btn_options"		caption="ui_mm_options_n" />
+    <btn name="btn_credits"		caption="ui_mm_credits" />
+    <btn name="btn_quit_to_mm"	caption="ui_mm_quit_game" />
+    <btn name="btn_quit"		caption="ui_mm_quit2windows" />
+  </menu_main_single_dead>
+
+  <menu_main_mm btn_height="35" font="graffiti22" a="255" r="0" g="0" b="0">
+    <btn name="btn_ret"			caption="ui_mm_return_game" />
+    <btn name="btn_options"		caption="ui_mm_options_n" />
+    <btn name="btn_credits"		caption="ui_mm_credits" />
+    <btn name="btn_quit_to_mm"	caption="ui_mm_disconnect" />
+    <btn name="btn_quit"		caption="ui_mm_quit2windows" />
+  </menu_main_mm>
+
+  <menu_sound random="0" >
+    <menu_music>music\wasteland2</menu_music>
+  </menu_sound>
+
+  <static_version x="15" y="740" width="100" height="30">
+		<text align="l" font="graffiti19" r="135" g="123" b="116" complex_mode="0"/>
+	</static_version>
+	
+</w>

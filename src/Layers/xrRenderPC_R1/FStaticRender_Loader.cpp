@@ -48,8 +48,8 @@ void CRender::level_Load(IReader* fs)
     Wallmarks = xr_new<CWallmarksEngine>();
     Details = xr_new<CDetailManager>();
 
-    rmFar();
-    rmNormal();
+    rmFar(RCache);
+    rmNormal(RCache);
 
     if (!GEnv.isDedicatedServer)
     {
@@ -264,6 +264,19 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
                     for (size_t i = 0; i < vCount; ++i)
                         data[i] = packedData[i];
                 }
+                /*else if (dcl_equal(dcl, mu_model_decl))
+                {
+                    dcl_len = std::size(mu_model_decl_unpacked);
+                    _DC[i].resize(dcl_len);
+                    CopyMemory(_DC[i].begin(), mu_model_decl_unpacked, dcl_len * sizeof(VertexElement));
+
+                    vSize = GetDeclVertexSize(mu_model_decl_unpacked, 0);
+                    _VB[i].Create(vCount * vSize, true);
+                    auto* data = static_cast<mu_model_vert_unpacked*>(_VB[i].Map());
+                    const auto* packedData = (mu_model_vert*)temp.data();
+                    for (size_t i = 0; i < vCount; ++i)
+                        data[i] = packedData[i];
+                }*/
                 else
                 {
                     _VB[i].Create(vCount * vSize);

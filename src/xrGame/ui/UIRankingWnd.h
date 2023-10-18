@@ -81,6 +81,8 @@ public:
     bool Init();
     void update_info();
 
+    pcstr GetDebugType() override { return "CUIRankingWnd"; }
+
 protected:
     void add_faction(CUIXml& xml, shared_str const& faction_id);
     void clear_all_factions();

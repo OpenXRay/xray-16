@@ -1292,6 +1292,7 @@
     <ClInclude Include="UITeamHeader.h" />
     <ClInclude Include="UITeamPanels.h" />
     <ClInclude Include="UITeamState.h" />
+    <ClInclude Include="UITimeDilator.h" />
     <ClInclude Include="UIZoneMap.h" />
     <ClInclude Include="ui\ArtefactDetectorUI.h" />
     <ClInclude Include="ui\FactionState.h" />
@@ -1345,6 +1346,7 @@
     <ClInclude Include="ui\UIMainIngameWnd.h" />
     <ClInclude Include="ui\UIMap.h" />
     <ClInclude Include="ui\UIMapDesc.h" />
+    <ClInclude Include="ui\UIMapFilters.h" />
     <ClInclude Include="ui\UIMapInfo.h" />
     <ClInclude Include="ui\UIMapLegend.h" />
     <ClInclude Include="ui\UIMapList.h" />
@@ -1373,7 +1375,6 @@
     <ClInclude Include="ui\UIRankIndicator.h" />
     <ClInclude Include="ui\UIRankingWnd.h" />
     <ClInclude Include="ui\UIScriptWnd.h" />
-    <ClInclude Include="ui\uiscriptwnd_script.h" />
     <ClInclude Include="ui\UISecondTaskWnd.h" />
     <ClInclude Include="ui\UIServerInfo.h" />
     <ClInclude Include="ui\UISkinSelector.h" />
@@ -3194,6 +3195,7 @@
     <ClCompile Include="UITeamHeader.cpp" />
     <ClCompile Include="UITeamPanels.cpp" />
     <ClCompile Include="UITeamState.cpp" />
+    <ClCompile Include="UITimeDilator.cpp" />
     <ClCompile Include="UIZoneMap.cpp" />
     <ClCompile Include="ui\ArtefactDetectorUI.cpp" />
     <ClCompile Include="ui\FactionState.cpp" />
@@ -3302,6 +3304,7 @@
     <ClCompile Include="ui\UIMainIngameWnd.cpp" />
     <ClCompile Include="ui\UIMap.cpp" />
     <ClCompile Include="ui\UIMapDesc.cpp" />
+    <ClCompile Include="ui\UIMapFilters.cpp" />
     <ClCompile Include="ui\UIMapInfo.cpp" />
     <ClCompile Include="ui\UIMapInfo_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3524,6 +3527,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrUICore\xrUICore.vcxproj">
       <Project>{37b3642c-b706-4c93-bc54-badadc8fc9b1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Externals\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

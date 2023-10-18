@@ -249,7 +249,7 @@ void AngleIntList::remove(AngleIntListNode* t)
     if (tail == t)
         tail = prev;
 
-    delete t;
+    xr_delete(t);
 }
 
 //

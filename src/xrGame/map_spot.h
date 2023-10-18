@@ -36,9 +36,11 @@ public:
 
     void show_static_border(bool status);
     void mark_focused();
+
+    pcstr GetDebugType() override { return "CMapSpot"; }
 };
 
-class CMapSpotPointer : public CMapSpot
+class CMapSpotPointer final : public CMapSpot
 {
     typedef CMapSpot inherited;
     xr_string m_pointer_hint;
@@ -47,9 +49,10 @@ public:
     CMapSpotPointer(CMapLocation*);
     virtual ~CMapSpotPointer();
     virtual LPCSTR GetHint();
+    pcstr GetDebugType() override { return "CMapSpotPointer"; }
 };
 
-class CMiniMapSpot : public CMapSpot
+class CMiniMapSpot final : public CMapSpot
 {
     typedef CMapSpot inherited;
     ui_shader m_icon_above, m_icon_normal, m_icon_below;
@@ -60,6 +63,7 @@ public:
     virtual ~CMiniMapSpot();
     virtual void Load(CUIXml* xml, LPCSTR path);
     virtual void Draw();
+    pcstr GetDebugType() override { return "CMiniMapSpot"; }
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -78,7 +82,7 @@ public:
     IC const Fvector2& GetWndSizeOrigin() const { return m_origin_size; }
     void InitWndOrigin();
     void ScaleOrigin(float k);
-
+    pcstr GetDebugType() override { return "CUIStaticOrig"; }
 }; // class CUIStaticOrig
 
 class CComplexMapSpot final : public CMapSpot
@@ -118,6 +122,9 @@ public:
     }
     void SetTimerFinish(ALife::_TIME_ID time); // ms game_time
     ALife::_TIME_ID GetTimerFinish() const { return m_timer_finish; }
+
+    pcstr GetDebugType() override { return "CComplexMapSpot"; }
+
 protected:
     CUIStaticOrig* CreateStaticOrig(CUIXml& xml, LPCSTR ui_path);
 

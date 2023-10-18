@@ -16,6 +16,7 @@ public:
     //	ALIGN(16)	R_constant_array	a_pixel;
     //	ALIGN(16)	R_constant_array	a_vertex;
 
+    explicit R_constants(CBackend& cmd_list_in) : cmd_list(cmd_list_in) {}
     void flush_cache();
 
 public:
@@ -163,6 +164,8 @@ private:
 
     template<BufferType BType>
     dx11ConstantBuffer& GetCBuffer(R_constant* C) const = delete; // no implicit specialization
+
+    CBackend& cmd_list;
 };
 
 template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_PixelBuffer>(R_constant* C) const;

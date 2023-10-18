@@ -4,6 +4,7 @@
 #include "xrEngine/xr_object.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/blenders/Blender_Blur.h"
+#include "Layers/xrRender/blenders/Blender_Shadow_Texture.h"
 #include "xrEngine/CustomHUD.h"
 
 const float S_distance = 144;
@@ -48,8 +49,18 @@ CLightShadows::CLightShadows() : xrc("LightShadows")
     //
     recreate_rt();
 
+    if (RImplementation.o.ffp)
+    {
+        sh_Texture.create("effects\\shadow_texture");
+        if (!sh_Texture)
+        {
+            CBlender_ShTex blender;
+            sh_Texture.create(&blender, "effects\\shadow_texture");
+        }
+    }
+
     sh_World.create("effects" DELIMITER "shadow_world", r1_RT_shadow);
-    geom_World.create(FVF::F_LIT, RCache.Vertex.Buffer(), nullptr);
+    geom_World.create(FVF::F_LIT, RImplementation.Vertex.Buffer(), nullptr);
 
     if (RImplementation.o.ffp)
     {
@@ -63,18 +74,18 @@ CLightShadows::CLightShadows() : xrc("LightShadows")
         if (!sh_BlurRT)
             sh_BlurRT.create(&blender, "effects\\blur", TWO_SHADOW_TEXTURES);
 
-        geom_Blur.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+        geom_Blur.create(FVF::F_TL2uv, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
     }
     else
     {
         sh_BlurTR.create("blur4", TWO_TEMP_TEXTURES);
         sh_BlurRT.create("blur4", TWO_SHADOW_TEXTURES);
-        geom_Blur.create(FVF::F_TL4uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+        geom_Blur.create(FVF::F_TL4uv, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
     }
 
     // Debug
     sh_Screen.create("effects" DELIMITER "screen_set", r1_RT_shadow);
-    geom_Screen.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    geom_Screen.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 }
 
 CLightShadows::~CLightShadows()
@@ -215,6 +226,8 @@ void CLightShadows::calculate()
                 bRTS = TRUE;
                 RCache.set_RT(rt_temp->pRT);
                 RCache.set_ZB(RImplementation.Target->rt_temp_zb->pRT);
+                if (RImplementation.o.ffp)
+                    RCache.set_Shader(sh_Texture);
                 RCache.ClearRT(rt_temp, { 1.0f, 1.0f, 1.0f, 1.0f });
             }
 
@@ -317,9 +330,10 @@ void CLightShadows::calculate()
             {
                 NODE& N = C.nodes[n_it];
                 dxRender_Visual* V = N.pVisual;
-                RCache.set_Element(V->shader->E[SE_R1_LMODELS]);
+                if (!RImplementation.o.ffp)
+                    RCache.set_Element(V->shader->E[SE_R1_LMODELS]);
                 RCache.set_xform_world(N.Matrix);
-                V->Render(-1.0f, dsgraph.o.phase == CRender::PHASE_SMAP);
+                V->Render(RCache, -1.0f, dsgraph.o.phase == CRender::PHASE_SMAP);
             }
 
             // register shadow and increment slot
@@ -349,15 +363,15 @@ void CLightShadows::calculate()
         u32 Offset;
         if (RImplementation.o.ffp)
         {
-            FVF::TL2uv* pv = (FVF::TL2uv*)RCache.Vertex.Lock(8, geom_Blur.stride(), Offset);
+            FVF::TL2uv* pv = (FVF::TL2uv*)RImplementation.Vertex.Lock(8, geom_Blur.stride(), Offset);
             RImplementation.ApplyBlur2(pv, rt_size);
-            RCache.Vertex.Unlock(8, geom_Blur.stride());
+            RImplementation.Vertex.Unlock(8, geom_Blur.stride());
         }
         else
         {
-            FVF::TL4uv* pv = (FVF::TL4uv*)RCache.Vertex.Lock(4, geom_Blur.stride(), Offset);
+            FVF::TL4uv* pv = (FVF::TL4uv*)RImplementation.Vertex.Lock(4, geom_Blur.stride(), Offset);
             RImplementation.ApplyBlur4(pv, rt_size, rt_size, S_blur_kernel);
-            RCache.Vertex.Unlock(4, geom_Blur.stride());
+            RImplementation.Vertex.Unlock(4, geom_Blur.stride());
         }
 
         // Actual rendering (pass0, temp2real)
@@ -412,7 +426,15 @@ static ICF float PLC_energy_SSE(const Fvector& p, const Fvector& n, const light*
     const float D = lDir.dotproduct(n);
     if (D <= 0)
         return 0;
+
     // Trace Light
+    if (RImplementation.o.ffp)
+    {
+        const auto& ldata = L->ldata;
+        const float R = _sqrt(sqD);
+        const float A = D * e / (ldata.attenuation0 + ldata.attenuation1 * R + ldata.attenuation2 * sqD);
+        return A;
+    }
     __m128 rcpr = _mm_rsqrt_ss(_mm_load_ss(&sqD));
     rcpr = _mm_rcp_ss(_mm_add_ss(rcpr, _mm_set_ss(1.0f)));
     float att;
@@ -475,11 +497,11 @@ void CLightShadows::render()
     RCache.set_Geometry(geom_World);
     int batch = 0;
     u32 Offset = 0;
-    FVF::LIT* pv = (FVF::LIT*)RCache.Vertex.Lock(batch_size * 3, geom_World->vb_stride, Offset);
+    FVF::LIT* pv = (FVF::LIT*)RImplementation.Vertex.Lock(batch_size * 3, geom_World->vb_stride, Offset);
     for (u32 s_it = 0; s_it < shadows.size(); s_it++)
     {
         shadow& S = shadows[s_it];
-        float Le = S.L->color.intensity() * S.E;
+        float Le = RImplementation.o.ffp ? S.L->ldata.diffuse.magnitude_rgb() : S.L->color.intensity() * S.E;
         int s_x = S.slot % slot_line;
         int s_y = S.slot / slot_line;
         Fvector2 t_scale, t_offset;
@@ -634,17 +656,17 @@ void CLightShadows::render()
             if (batch == batch_size)
             {
                 // Flush
-                RCache.Vertex.Unlock(batch * 3, geom_World->vb_stride);
+                RImplementation.Vertex.Unlock(batch * 3, geom_World->vb_stride);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, batch);
 
-                pv = (FVF::LIT*)RCache.Vertex.Lock(batch_size * 3, geom_World->vb_stride, Offset);
+                pv = (FVF::LIT*)RImplementation.Vertex.Lock(batch_size * 3, geom_World->vb_stride, Offset);
                 batch = 0;
             }
         }
     }
 
     // Flush if nessesary
-    RCache.Vertex.Unlock(batch * 3, geom_World->vb_stride);
+    RImplementation.Vertex.Unlock(batch * 3, geom_World->vb_stride);
     if (batch)
     {
         RCache.Render(D3DPT_TRIANGLELIST, Offset, batch);

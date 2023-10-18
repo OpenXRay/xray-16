@@ -25,3 +25,10 @@
 #define r2_T_envs1 "$user$env_s1"
 
 #define r2_RT_luminance_cur "$user$tonemap" // --- result
+
+static constexpr auto c_ldynamic_props = "L_dynamic_props";
+static constexpr auto c_sbase = "s_base";
+static constexpr auto c_ssky0 = "s_sky0";
+static constexpr auto c_ssky1 = "s_sky1";
+static constexpr auto c_sclouds0 = "s_clouds0";
+static constexpr auto c_sclouds1 = "s_clouds1";

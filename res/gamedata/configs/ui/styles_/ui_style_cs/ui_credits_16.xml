@@ -1,0 +1,27 @@
+<credits_seq>
+		<global_wnd x="0" y="0" width="1024" height="768">
+			
+			<auto_static x="0" y="0" width="728" height="660" stretch = "1">		
+						<texture width="728" height="660">ui\ui_mm_credits_back</texture>
+			</auto_static>
+			
+			<auto_static x="85" y="0" width="854" height="768" stretch="1">
+				<texture>ui_inGame2_back_03</texture>
+			</auto_static>
+      
+      <auto_static x="0" y="0" width="85" height="768" stretch="1">
+        <texture>ui_inGame2_back_03w10_l</texture>
+      </auto_static>
+      <auto_static x="939" y="0" width="85" height="768" stretch="1">
+        <texture>ui_inGame2_back_03w10_r</texture>
+      </auto_static>
+
+      <auto_static x="523" y="641" width="211" height="128" stretch="1">
+        <texture x="1" y="1" width="254" height="126">ui\ui_mm_coal</texture>
+      </auto_static>
+
+    </global_wnd>
+		
+		<play_each_item>1</play_each_item>
+#include "ui\ui_credits_base.xml"
+</credits_seq>

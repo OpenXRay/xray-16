@@ -724,7 +724,7 @@ void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
     else if (E == eDemoStart)
     {
         string256 cmd;
-        LPCSTR demo = LPCSTR(P1);
+        pstr demo = pstr(P1);
         xr_sprintf(cmd, "demo_play %s", demo);
         Console->Execute(cmd);
         xr_free(demo);
@@ -799,12 +799,10 @@ bool CGamePersistent::OnRenderPPUI_query()
     // enable PP or not
 }
 
-extern void draw_wnds_rects();
 void CGamePersistent::OnRenderPPUI_main()
 {
     // always
     MainMenu()->OnRenderPPUI_main();
-    draw_wnds_rects();
 }
 
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }

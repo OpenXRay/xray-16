@@ -149,7 +149,7 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
     if (data->always_ignore)
         return SDL_ASSERTION_ALWAYS_IGNORE;
 
-    constexpr pcstr desc = "SDL2 assertion triggered";
+    static constexpr pcstr desc = "SDL2 assertion triggered";
     bool alwaysIgnore = false;
 
     const auto result = xrDebug::Fail(alwaysIgnore,
@@ -634,9 +634,9 @@ int out_of_memory_handler(size_t size)
     else
     {
         Memory.mem_compact();
-        size_t processHeap = Memory.mem_usage();
-        size_t ecoStrings = g_pStringContainer->stat_economy();
-        size_t ecoSmem = g_pSharedMemoryContainer->stat_economy();
+        const size_t processHeap = Memory.mem_usage();
+        const size_t ecoStrings = g_pStringContainer->stat_economy();
+        const size_t ecoSmem = g_pSharedMemoryContainer->stat_economy();
         Msg("* [x-ray]: process heap[%zu K]", processHeap / 1024);
         Msg("* [x-ray]: economy: strings[%zu K], smem[%zu K]", ecoStrings / 1024, ecoSmem);
     }
@@ -820,13 +820,13 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (windowHandler)
         windowHandler->OnErrorDialog(true);
 
-    constexpr pcstr fatalError = "Fatal error";
+    static constexpr pcstr fatalError = "Fatal error";
 
     AssertionResult msgRes = AssertionResult::abort;
 
     if (!ErrorAfterDialog && ShowErrorMessage)
     {
-        constexpr pcstr msg = "Fatal error occurred\n\n"
+        static constexpr pcstr msg = "Fatal error occurred\n\n"
             "Press OK to abort program execution";
         msgRes = ShowMessage(fatalError, msg);
     }

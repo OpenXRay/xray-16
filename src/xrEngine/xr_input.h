@@ -159,7 +159,10 @@ public:
     bool IsControllerAvailable() const { return !controllers.empty(); }
     void EnableControllerSensors(bool enable);
 
-    auto GetCurrentInputType() { return currentInputType; }
+    auto GetCurrentInputType() const { return currentInputType; }
+    auto IsCurrentInputTypeController() const { return GetCurrentInputType() == InputType::Controller; }
+    auto IsCurrentInputTypeKeyboardMouse() const { return GetCurrentInputType() == InputType::KeyboardMouse; }
+
 public:
     void ExclusiveMode(const bool exclusive);
     bool IsExclusiveMode() const;

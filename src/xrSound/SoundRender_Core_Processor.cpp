@@ -9,12 +9,12 @@
 #include "SoundRender_Target.h"
 #include "SoundRender_Source.h"
 
-CSoundRender_Emitter* CSoundRender_Core::i_play(ref_sound* S, bool _loop, float delay)
+CSoundRender_Emitter* CSoundRender_Core::i_play(ref_sound* S, u32 flags, float delay)
 {
     VERIFY(S->_p->feedback == 0);
     CSoundRender_Emitter* E = xr_new<CSoundRender_Emitter>();
     S->_p->feedback = E;
-    E->start(S, _loop, delay);
+    E->start(S, flags, delay);
     s_emitters.push_back(E);
     return E;
 }
@@ -26,12 +26,17 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         return;
     Stats.Update.Begin();
     isLocked = true;
-    float new_tm = Timer.GetElapsed_sec();
-    fTimer_Delta = new_tm - fTimer_Value;
-    //float dt = float(Timer_Delta)/1000.f;
-    float dt_sec = fTimer_Delta;
-    fTimer_Value = new_tm;
 
+    Timer.time_factor(psSoundTimeFactor); //--#SM+#--
+    {
+        const float new_tm = Timer.GetElapsed_sec();
+        fTimer_Delta = new_tm - fTimer_Value;
+        fTimer_Value = new_tm;
+
+        const float new_tm_p = TimerPersistent.GetElapsed_sec();
+        fTimerPersistent_Delta = new_tm_p - fTimerPersistent_Value;
+        fTimerPersistent_Value = new_tm_p;
+    }
     s_emitters_u++;
 
     // Firstly update emitters, which are now being rendered
@@ -42,7 +47,10 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         CSoundRender_Emitter* E = T->get_emitter();
         if (E)
         {
-            E->update(dt_sec);
+            const bool ignore = E->bIgnoringTimeFactor;
+            const float time = ignore ? fTimerPersistent_Value : fTimer_Value;
+            const float delta = ignore ? fTimerPersistent_Delta : fTimer_Delta;
+            E->update(time, delta);
             E->marker = s_emitters_u;
             E = T->get_emitter(); // update can stop itself
             if (E)
@@ -63,7 +71,10 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         CSoundRender_Emitter* pEmitter = s_emitters[it];
         if (pEmitter->marker != s_emitters_u)
         {
-            pEmitter->update(dt_sec);
+            const bool ignore = pEmitter->bIgnoringTimeFactor;
+            const float time = ignore ? fTimerPersistent_Value : fTimer_Value;
+            const float delta = ignore ? fTimerPersistent_Delta : fTimer_Delta;
+            pEmitter->update(time, delta);
             pEmitter->marker = s_emitters_u;
         }
         if (!pEmitter->isPlaying())
@@ -114,14 +125,14 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
             e_target = *get_environment(P);
         }
 
-        e_current.lerp(e_current, e_target, dt_sec);
+        e_current.lerp(e_current, e_target, fTimer_Delta);
 
         m_effects->set_listener(e_current);
         m_effects->commit();
     }
 
     // update listener
-    update_listener(P, D, N, dt_sec);
+    update_listener(P, D, N, fTimer_Delta);
 
     // Start rendering of pending targets
     if (!s_targets_defer.empty())
@@ -139,9 +150,10 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
 }
 
 static u32 g_saved_event_count = 0;
+
 void CSoundRender_Core::update_events()
 {
-    g_saved_event_count = s_events.size();
+    g_saved_event_count = static_cast<u32>(s_events.size());
     for (auto& E : s_events)
         Handler(E.first, E.second);
 
@@ -158,7 +170,7 @@ void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
             if (T->get_emitter() && T->get_Rendering())
                 dest->_rendered++;
         }
-        dest->_simulated = s_emitters.size();
+        dest->_simulated = static_cast<u32>(s_emitters.size());
         dest->_cache_hits = cache._stat_hit;
         dest->_cache_misses = cache._stat_miss;
         dest->_events = g_saved_event_count;
@@ -220,14 +232,14 @@ float CSoundRender_Core::get_occlusion_to(const Fvector& hear_pt, const Fvector&
         dir.div(range);
 
         geom_DB.ray_query(CDB::OPT_CULL, geom_SOM, hear_pt, dir, range);
-        u32 r_cnt = geom_DB.r_count();
+        const auto r_cnt = geom_DB.r_count();
         CDB::RESULT* _B = geom_DB.r_begin();
         if (0 != r_cnt)
         {
-            for (u32 k = 0; k < r_cnt; k++)
+            for (size_t k = 0; k < r_cnt; k++)
             {
                 CDB::RESULT* R = _B + k;
-                occ_value *= *(float*)&R->dummy;
+                occ_value *= *reinterpret_cast<float*>(&R->dummy);
             }
         }
     }
@@ -280,14 +292,14 @@ float CSoundRender_Core::get_occlusion(Fvector& P, float R, Fvector* occ)
     if (nullptr != geom_SOM)
     {
         geom_DB.ray_query(CDB::OPT_CULL, geom_SOM, base, dir, range);
-        u32 r_cnt = geom_DB.r_count();
+        const auto r_cnt = geom_DB.r_count();
         CDB::RESULT* _B = geom_DB.r_begin();
         if (0 != r_cnt)
         {
-            for (u32 k = 0; k < r_cnt; k++)
+            for (size_t k = 0; k < r_cnt; k++)
             {
                 CDB::RESULT* R2 = _B + k;
-                occ_value *= *(float*)&R2->dummy;
+                occ_value *= *reinterpret_cast<float*>(&R2->dummy);
             }
         }
     }

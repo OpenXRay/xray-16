@@ -29,7 +29,7 @@
       <PreprocessorDefinitions>_USRDLL;LIBVORBIS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <DisableSpecificWarnings Condition="'$(Configuration)'=='Release'">4244;4100;4267;4189;4305;4127;4706;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

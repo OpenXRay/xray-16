@@ -1,0 +1,162 @@
+<!-- 16:10 ready -->
+<tab_client>
+    <main x="101" y="224" width="615" height="416"/>
+    <rust_00 x="215" y="-30" width="258" height="99" stretch="1">
+			<texture>rusty_01</texture>
+		</rust_00>
+		<rust_01 x="458" y="300" width="168" height="134" stretch="1">
+			<texture>rust_bot_client</texture>
+		</rust_01>
+		<server_list x="7" y="99" width="449" height="310">			
+			<sizes icon="36" server="129" map="108" game="46" players="45" ping="28" version="53"/>
+			<frame x="0" y="20" width="429" height="290">
+				<texture>ui_cb_listbox</texture>
+			</frame>
+			<list x="0" y="20" width="446" height="250" height2="140" item_height="18" always_show_scroll="1"/>
+			<list_item>
+				<text r="131" g="131" b="131" font="letterica16" complex_mode="0"/>
+			</list_item>
+			<header x="0" y="0" width="8" height="18">
+				<text font="arial_14" r="215" g="195" b="170" x="2" y="1" align="l" vert_align="c" complex_mode="0"/>
+				<text_color>
+					<e r="227" g="199" b="178"/>
+					<d r="215" g="195" b="170"/>					
+				</text_color>
+			</header>
+			
+			<header_frames x="0" y="0" width="16" height="19" stretch="1">
+				<texture>ui_table_button_o</texture>
+			</header_frames>
+			
+			<separator x="0" y="3" width="1" height="29" vertical="1">
+				<texture>ui_table_divider</texture>
+			</separator>
+			<filter max_symb_count="32">
+				<text font="letterica16" r="215" g="195" b="170" vert_align="c" complex_mode="0"/>
+			</filter>
+			<edit_gs_filter x="55" y2="167" y="277" width="390" height="21" max_symb_count="48" stretch="1">
+				<text x="3" font="letterica16" r="235" g="219" b="185" complex_mode="0"/>
+				<texture>ui_linetextSmall_e</texture>
+				<auto_static x="-50" y="0" width="42" height="21">
+					<text font="letterica16" r="188" g="153" b="123" vert_align="c" complex_mode="0">st_mp_gsfilter</text>
+				</auto_static>
+			</edit_gs_filter>
+			<cap_server_properties x="0" y="191" width="274" height="17" stretch="1">
+				<text font="arial_14" r="215" g="195" b="170" x="2" y="1" vert_align="c" complex_mode="0">mm_mp_server_prop</text>
+				<texture>ui_table_button_e</texture>
+			</cap_server_properties>		
+			<cap_players_list x="281" y="191" width="81" height="17" stretch="1">
+				<text font="arial_14" r="215" g="195" b="170" x="2" y="1" vert_align="c" complex_mode="0">mm_mp_players</text>
+				<texture>ui_table_button_e</texture>
+			</cap_players_list>
+			<cap_frags x="362" y="191" width="37" height="17" stretch="1">
+				<text font="arial_14" r="215" g="195" b="170" x="2" y="1" vert_align="c" complex_mode="0">mm_mp_frags</text>
+				<texture>ui_table_button_e</texture>
+			</cap_frags>
+			<cap_death x="397" y="191" width="51" height="17" stretch="1">
+				<text font="arial_14" r="215" g="195" b="170" x="2" y="1" vert_align="c" complex_mode="0">mm_mp_deaths</text>
+				<texture>ui_table_button_e</texture>
+			</cap_death>
+			<list_server_properties x="0" y="210" width="273" height="96" item_height="18" always_show_scroll="1" stretch="1">
+				<texture>ui_cb_listbox</texture>
+				<font r="131" g="131" b="131" font="letterica16"/>
+				<frame x="0" y="210" width="258" height="96">
+					<texture>ui_cb_listbox</texture>
+				</frame>
+			</list_server_properties>
+			<list_players_list x="281" y="210" width="165" height="96" item_height="18" always_show_scroll="1" stretch="1">
+				<texture>ui_cb_listbox</texture>
+				<font r="131" g="131" b="131" font="letterica16"/>
+				<frame x="281" y="210" width="150" height="96">
+					<texture>ui_cb_listbox</texture>
+				</frame>
+			</list_players_list>
+		</server_list>	
+		
+		<vert_separator x="448" y="4" width="31" height="406" vertical="1">
+			<texture>ui_tablist_divider</texture>
+		</vert_separator>
+	
+		<cap_network_connection x="5" y="12" width="417" height="23" stretch="1">
+			<texture>ui_brokenline</texture>
+			<auto_static x="8" y="0" width="408" height="23">
+				<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_network_connection</text>
+			</auto_static>
+		</cap_network_connection>
+		
+		<cap_server_list x="5" y="70" width="446" height="23" stretch="1">
+			<texture>ui_brokenline</texture>
+			<auto_static x="8" y="0" width="438" height="23">
+				<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_server_list</text>
+			</auto_static>
+		</cap_server_list>
+		
+		<cap_filters x="475" y="12" width="129" height="23" stretch="1">
+			<texture>ui_brokenline</texture>
+			<auto_static x="8" y="0" width="121" height="23">
+				<text font="letterica16" r="215" g="195" b="170" vert_align="c">mm_mp_filters</text>
+			</auto_static>
+		</cap_filters>
+
+		<radio_tab_network_connection x="13" y="40" width="333" height="18" radio="1">
+			<button x="0" y="2" width="27" height="21" id="internet"  stretch="1">
+				<text font="letterica16" r="115" g="114" b="112" complex_mode="0">mm_mp_internet</text>
+			</button>		
+			<button x="153" y="2" width="27" height="21" id="lan"  stretch="1">
+				<text font="letterica16" r="115" g="114" b="112" complex_mode="0">mm_mp_lan</text>
+			</button>		
+		</radio_tab_network_connection>
+		
+		<btn_direct_ip x="333" y="40" width="93" height="25" stretch="1">
+			<text align="c" font="letterica16" r="188" g="153" b="123" complex_mode="0">st_mp_direct_ip</text>
+			<texture>ui_button_ordinary</texture>
+			<texture_offset x="-3"/>
+		</btn_direct_ip>
+		
+		<check_empty x="475" y="40" width="27" height="21" stretch="1">
+			<text font="letterica16" r="115" g="114" b="112">mm_mp_empty</text>
+      <options_item entry="mm_net_filter_empty" group="mm_mp_srv_filter"/>
+    </check_empty>
+		<check_full x="475" y="65" width="27" height="21" stretch="1">
+			<text font="letterica16" r="115" g="114" b="112">mm_mp_full</text>
+      <options_item entry="mm_net_filter_full" group="mm_mp_srv_filter"/>
+    </check_full>
+    <check_with_pass x="475" y="90" width="27" height="21"  stretch="1">
+      <text font="letterica16" r="115" g="114" b="112">mm_mp_withpassword</text>
+      <options_item entry="mm_net_filter_pass" group="mm_mp_srv_filter"/>
+    </check_with_pass>
+    <check_without_pass x="475" y="115" width="27" height="21" stretch="1">
+      <text font="letterica16" r="115" g="114" b="112">mm_mp_withoutpassword</text>
+      <options_item entry="mm_net_filter_wo_pass" group="mm_mp_srv_filter"/>
+    </check_without_pass>
+    <check_without_ff x="475" y="140" width="27" height="21" stretch="1">
+			<text font="letterica16" r="115" g="114" b="112">mm_mp_withoutfriendlyfire</text>
+      <options_item entry="mm_net_filter_wo_ff" group="mm_mp_srv_filter"/>
+    </check_without_ff>
+    <check_listen_servers x="475" y="165" width="27" height="21" stretch="1">
+      <text font="letterica16" r="115" g="114" b="112">mm_mp_listenservers</text>
+      <options_item entry="mm_net_filter_listen" group="mm_mp_srv_filter"/>
+    </check_listen_servers>		
+    <check_with_battleye x="475" y="190" width="27" height="21" stretch="1">
+      <text font="letterica16" r="115" g="114" b="112">BattlEye</text>
+      <options_item entry="mm_net_filter_battleye" group="mm_mp_srv_filter"/>
+    </check_with_battleye>
+		
+		<btn_refresh x="497" y="225" width="93" height="25" stretch="1">
+			<text align="c" font="letterica16" r="188" g="153" b="123" complex_mode="0">mm_mp_refresh</text>	
+			<texture>ui_button_ordinary</texture>
+			<texture_offset x="-3"/>
+		</btn_refresh>
+		<btn_quick_refresh x="497" y="255" width="93" height="25" stretch="1">
+			<text align="c" font="letterica16" r="188" g="153" b="123" complex_mode="0">mm_mp_quickrefresh</text>
+			<texture>ui_button_ordinary</texture>
+			<texture_offset x="-3"/>
+		</btn_quick_refresh>
+		<btn_server_info x="497" y="285" width="93" height="25" stretch="1">
+			<text align="c" font="letterica16" r="188" g="153" b="123" complex_mode="0">mm_mp_serverinfo</text>
+			<texture>ui_button_ordinary</texture>
+			<texture_offset x="-3"/>
+		</btn_server_info>
+
+	</tab_client>
+	

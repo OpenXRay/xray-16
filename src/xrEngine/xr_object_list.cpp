@@ -312,7 +312,7 @@ void CObjectList::Update(bool bForce)
             for (auto& dit : destroy_queue)
             {
                 (*it).m_Callback(dit);
-                g_hud->net_Relcase(dit);
+                g_pGameLevel->pHUD->net_Relcase(dit);
             }
         }
 

@@ -137,15 +137,6 @@ int ps_r1_GlowsPerFrame = 16; // r1-only
 float ps_r1_fog_luminance = 1.1f; // r1-only
 int ps_r1_SoftwareSkinning = 0; // r1-only
 
-u32 ps_r1_ffp_lighting_mode = R1_FFP_LIGHTING_LIGHTMAP; // r1-only
-const xr_token qffp_lighting_token[] =
-{
-    { "st_opt_ffp_constant", R1_FFP_LIGHTING_CONSTANT },
-    { "st_opt_ffp_lightmap", R1_FFP_LIGHTING_LIGHTMAP },
-    { "st_opt_ffp_dynamic", R1_FFP_LIGHTING_LIGHTS },
-    { nullptr, -1 }
-};
-
 // R2
 bool ps_r2_sun_static = false;
 bool ps_r2_advanced_pp = true; // advanced post process and effects
@@ -814,7 +805,7 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r1_software_skinning", &ps_r1_SoftwareSkinning, 0, 2);
 
     CMD3(CCC_Mask, "r1_ffp", &ps_r1_flags, R1FLAG_FFP);
-    CMD3(CCC_Token, "r1_ffp_lighting", &ps_r1_ffp_lighting_mode, qffp_lighting_token);
+    CMD3(CCC_Mask, "r1_ffp_lightmaps", &ps_r1_flags, R1FLAG_FFP_LIGHTMAPS);
 
     // R2
     CMD4(CCC_Float, "r2_ssa_lod_a", &ps_r2_ssaLOD_A, 16, 96);
@@ -989,7 +980,9 @@ void xrRender_initconsole()
     //CMD3(CCC_Mask, "r2_sun_ignore_portals", &ps_r2_ls_flags, R2FLAG_SUN_IGNORE_PORTALS);
 
     CMD4(CCC_Integer, "r2_mt_calculate",    &ps_r2_mt_calculate, 0, 1);
+#if RENDER == R_R4
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
+#endif
 }
 
 #endif

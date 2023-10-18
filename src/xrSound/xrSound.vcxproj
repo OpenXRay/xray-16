@@ -21,9 +21,13 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrExternals)libvorbis\include;$(xrExternals)libogg\include;$(xrExternals)OpenAL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrExternals)libvorbis\include;$(xrExternals)libogg\include;$(xrSdkDir)include\AL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers Condition="'$(Platform)'=='Win32'" />
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="OpenALDeviceList.h" />
@@ -80,9 +84,6 @@
     <ProjectReference Include="$(xrExternals)libvorbisfile_static.vcxproj">
       <Project>{cebde98b-a6aa-46e6-bc79-faaf823db9ec}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(xrExternals)openal\OpenAL-Windows\Router\Router.vcxproj">
-      <Project>{566551f4-4ef1-4cb4-a131-f982e7606907}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
     </ProjectReference>
@@ -95,6 +96,9 @@
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\soft_oal.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\OpenAL32.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
   </ItemGroup>

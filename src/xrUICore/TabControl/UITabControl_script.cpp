@@ -19,7 +19,7 @@ SCRIPT_EXPORT(CUITabControl, (CUIWindow),
                 self->AddItem(pItemName, pTexName, { x, y }, { width, height });
             })
             .def("RemoveItem", &CUITabControl::RemoveItemByIndex)
-            .def("RemoveItem", &CUITabControl::RemoveItemById_script)
+            .def("RemoveItemById", &CUITabControl::RemoveItemById_script)
             .def("RemoveAll", &CUITabControl::RemoveAll)
             .def("GetActiveId", &CUITabControl::GetActiveId_script)
             .def("GetActiveIndex", &CUITabControl::GetActiveIndex)

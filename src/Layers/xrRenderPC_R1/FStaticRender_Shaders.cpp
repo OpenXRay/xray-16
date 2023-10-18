@@ -90,7 +90,8 @@ public:
     }
     HRESULT __stdcall Close(LPCVOID pData)
     {
-        xr_free(pData);
+        auto mutableData = const_cast<LPVOID>(pData);
+        xr_free(mutableData);
         return D3D_OK;
     }
 };

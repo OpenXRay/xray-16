@@ -5,7 +5,7 @@
 #include "xrCore/xr_resource.h"
 
 class CAviPlayerCustom;
-class CTheoraSurface;
+class ENGINE_API CTheoraSurface;
 
 class ECORE_API CTexture : public xr_resource_named
 {
@@ -73,11 +73,13 @@ public:
 #endif
 
 public:
-    void apply_load(u32 stage);
-    void apply_theora(u32 stage);
-    void apply_avi(u32 stage) const;
-    void apply_seq(u32 stage);
-    void apply_normal(u32 stage) const;
+    void apply_load(CBackend& cmd_list, u32 stage);
+    void apply_theora(CBackend& cmd_list, u32 stage);
+    void apply_avi(CBackend& cmd_list, u32 stage) const;
+    void apply_seq(CBackend& cmd_list, u32 stage);
+    void apply_normal(CBackend& cmd_list, u32 stage) const;
+
+    void set_slice(int slice);
 
     void Preload();
     void Load();
@@ -139,7 +141,7 @@ private:
 
     void desc_update();
 #if defined(USE_DX11)
-    void Apply(u32 dwStage) const;
+    void Apply(CBackend& cmd_list, u32 dwStage) const;
     D3D_USAGE GetUsage();
 #endif
 
@@ -153,7 +155,7 @@ public: //	Public class members (must be encapsulated further)
         u32 MemoryUsage : 28;
     } flags;
 
-    fastdelegate::FastDelegate1<u32> bind;
+    fastdelegate::FastDelegate2<CBackend&,u32> bind;
 
     CAviPlayerCustom* pAVI;
     CTheoraSurface* pTheora;
@@ -165,6 +167,9 @@ public: //	Public class members (must be encapsulated further)
         u32 m_play_time; // sync theora time
         u32 seqMSPF; // Sequence data milliseconds per frame
     };
+
+    int curr_slice{ -1 };
+    int last_slice{ -1 };
 
 private:
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -192,7 +197,9 @@ private:
 #endif
 
 #if defined(USE_DX11)
-    ID3DShaderResourceView* m_pSRView;
+    ID3DShaderResourceView* m_pSRView{ nullptr };
+    ID3DShaderResourceView* srv_all{ nullptr };
+    xr_vector<ID3DShaderResourceView*> srv_per_slice;
     // Sequence view data
     xr_vector<ID3DShaderResourceView*> m_seqSRView;
 #endif

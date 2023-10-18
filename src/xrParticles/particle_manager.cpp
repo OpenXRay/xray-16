@@ -33,16 +33,18 @@ int CParticleManager::CreateEffect(u32 max_particles)
     ScopeLock lock{ &pm_lock };
     int eff_id = -1;
     for (int i = 0; i < (int)effect_vec.size(); i++)
+    {
         if (!effect_vec[i])
         {
             eff_id = i;
             break;
         }
+    }
 
     if (eff_id < 0)
     {
         // Couldn't find a big enough gap. Reallocate.
-        eff_id = effect_vec.size();
+        eff_id = (int)effect_vec.size();
         effect_vec.push_back(nullptr);
     }
 
@@ -72,7 +74,7 @@ int CParticleManager::CreateActionList()
     if (list_id < 0)
     {
         // Couldn't find a big enough gap. Reallocate.
-        list_id = m_alist_vec.size();
+        list_id = (int)m_alist_vec.size();
         m_alist_vec.push_back(nullptr);
     }
 
@@ -333,7 +335,7 @@ void CParticleManager::SaveActions(int alist_id, IWriter& W)
     ParticleActions* pa = GetActionListPtr(alist_id);
     VERIFY(pa);
     pa->lock();
-    W.w_u32(pa->size());
+    W.w_u32(static_cast<u32>(pa->size()));
     for (auto& it : *pa)
         it->Save(W);
     pa->unlock();

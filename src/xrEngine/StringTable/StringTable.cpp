@@ -23,7 +23,10 @@ void CStringTable::Destroy()
     pData.reset(nullptr);
 
     for (auto& token : languagesToken)
-        xr_free(token.name);
+    {
+        auto tokenName = const_cast<char*>(token.name);
+        xr_free(tokenName);
+    }
 
     languagesToken.clear();
 }
@@ -138,6 +141,11 @@ void CStringTable::SetLanguage()
         if (it != languagesToken.end())
             LanguageID = (*it).id;
     }
+}
+
+shared_str CStringTable::GetCurrentLanguage() const
+{
+    return pData ? pData->m_sLanguage : nullptr;
 }
 
 xr_token* CStringTable::GetLanguagesToken() const { return languagesToken.data(); }

@@ -39,22 +39,6 @@ void CRenderDevice::FillVideoModes()
         FillResolutionsForMonitor(i);
     }
     vid_monitor_token.emplace_back(nullptr, -1);
-
-    const int display = SDL_GetWindowDisplayIndex(m_sdlWnd);
-    if (display != -1)
-        psDeviceMode.Monitor = display;
-    else
-    {
-        Log("! Failed to determine on which monitor the game is launched.");
-        Log("! SDL:", SDL_GetError());
-    }
-
-    SDL_DisplayMode current;
-    SDL_GetCurrentDisplayMode(psDeviceMode.Monitor, &current);
-
-    psDeviceMode.Width = current.w;
-    psDeviceMode.Height = current.h;
-    psDeviceMode.RefreshRate = current.refresh_rate;
 }
 
 void CRenderDevice::CleanupVideoModes()
@@ -62,13 +46,19 @@ void CRenderDevice::CleanupVideoModes()
     for (auto& [monitor_id, tokens] : vid_mode_token)
     {
         for (auto& token : tokens)
-            xr_free(token.name);
+        {
+            auto tokenName = const_cast<pstr>(token.name);
+            xr_free(tokenName);
+        }
         tokens.clear();
     }
     vid_mode_token.clear();
 
     for (auto& token : vid_monitor_token)
-        xr_free(token.name);
+    {
+        pstr tokenName = const_cast<pstr>(token.name);
+        xr_free(tokenName);
+    }
     vid_monitor_token.clear();
 }
 
@@ -84,31 +74,21 @@ void CRenderDevice::SetWindowDraggable(bool draggable)
 #endif
 }
 
-bool windowIntersectsWithMonitor(const SDL_Rect& window, const SDL_Rect& monitor)
-{
-    const int x = std::max(window.x, monitor.x);
-    const int num1 = std::min(window.w, monitor.w);
-    const int y = std::max(window.y, monitor.y);
-    const int num2 = std::min(window.y, monitor.h);
-
-    return num1 >= x && num2 >= y;
-}
-
 void CRenderDevice::UpdateWindowProps()
 {
     const bool windowed = psDeviceMode.WindowStyle != rsFullscreen;
     SelectResolution(windowed);
 
     // Changing monitor, unset fullscreen for the previous monitor
+    // and move the window to the new monitor
     if (SDL_GetWindowDisplayIndex(m_sdlWnd) != psDeviceMode.Monitor)
+    {
         SDL_SetWindowFullscreen(m_sdlWnd, SDL_DISABLE);
 
-    SDL_Rect rect;
-    SDL_GetDisplayBounds(psDeviceMode.Monitor, &rect);
-
-    // If fullscreen or window is located on another monitor
-    if (!windowed || !windowIntersectsWithMonitor(m_rcWindowBounds, rect))
+        SDL_Rect rect;
+        SDL_GetDisplayBounds(psDeviceMode.Monitor, &rect);
         SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
+    }
 
     SDL_SetWindowSize(m_sdlWnd, psDeviceMode.Width, psDeviceMode.Height);
 
@@ -148,8 +128,6 @@ void CRenderDevice::UpdateWindowRects()
 
     SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowBounds.x, &m_rcWindowBounds.y);
     SDL_GetWindowSize(m_sdlWnd, &m_rcWindowBounds.w, &m_rcWindowBounds.h);
-    m_rcWindowBounds.w += m_rcWindowBounds.x;
-    m_rcWindowBounds.h += m_rcWindowBounds.y;
 
 #if SDL_VERSION_ATLEAST(2, 0, 5)
     int top, left, bottom, right;
@@ -169,6 +147,14 @@ void CRenderDevice::SelectResolution(const bool windowed)
     {
         psDeviceMode.Width = 640;
         psDeviceMode.Height = 480;
+    }
+    else if (psDeviceMode.Width == 0 && psDeviceMode.Height == 0 && psDeviceMode.RefreshRate == 0)
+    {
+        SDL_DisplayMode current;
+        SDL_GetCurrentDisplayMode(psDeviceMode.Monitor, &current);
+        psDeviceMode.Width = current.w;
+        psDeviceMode.Height = current.h;
+        psDeviceMode.RefreshRate = current.refresh_rate;
     }
     else if (!windowed) // check if safe for fullscreen
     {

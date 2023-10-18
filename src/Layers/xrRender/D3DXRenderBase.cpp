@@ -65,7 +65,21 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
     destroy();
 
     Resources->OnDeviceDestroy(bKeepTextures);
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.OnDeviceDestroy();
+    }
+#else
     RCache.OnDeviceDestroy();
+#endif
+
+    // Quad
+    QuadIB.Release();
+
+    // streams
+    Index.Destroy();
+    Vertex.Destroy();
 }
 
 void D3DXRenderBase::Destroy()
@@ -80,7 +94,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif // DEBUG
 
-    Resources->reset_begin();
+    reset_begin();
     Memory.mem_compact();
 
 #ifdef USE_DX9
@@ -115,13 +129,35 @@ void D3DXRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 void D3DXRenderBase::SetupStates()
 {
     HW.Caps.Update();
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.SetupStates();
+    }
+#else
     RCache.SetupStates();
+#endif
 }
 
 void D3DXRenderBase::OnDeviceCreate(const char* shName)
 {
     // Signal everyone - device created
+
+    // streams
+    Vertex.Create();
+    Index.Create();
+
+    CreateQuadIB();
+
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.context_id = id;
+        contexts_pool[id].cmd_list.OnDeviceCreate();
+    }
+#else
     RCache.OnDeviceCreate();
+#endif
 #if defined(USE_DX9) || defined(USE_DX11)
     m_Gamma.Update();
 #endif
@@ -133,7 +169,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
         m_WireShader.create("editor" DELIMITER "wire");
         m_SelectionShader.create("editor" DELIMITER "selection");
         m_PortalFadeShader.create("portal");
-        m_PortalFadeGeom.create(FVF::F_L, RCache.Vertex.Buffer(), 0);        
+        m_PortalFadeGeom.create(FVF::F_L, RImplementation.Vertex.Buffer(), 0);        
         DUImpl.OnDeviceCreate();
         UIRenderImpl.CreateUIGeom();
     }
@@ -241,9 +277,20 @@ u32 D3DXRenderBase::GetCacheStatPolys()
 void D3DXRenderBase::Begin()
 {
     HW.BeginScene();
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.OnFrameBegin();
+        contexts_pool[id].cmd_list.set_CullMode(CULL_CW);
+        contexts_pool[id].cmd_list.set_CullMode(CULL_CCW);
+    }
+#else
     RCache.OnFrameBegin();
     RCache.set_CullMode(CULL_CW);
     RCache.set_CullMode(CULL_CCW);
+#endif
+    Vertex.Flush();
+    Index.Flush();
     if (HW.Caps.SceneMode)
         overdrawBegin();
 }
@@ -263,8 +310,19 @@ void D3DXRenderBase::End()
 {
     if (HW.Caps.SceneMode)
         overdrawEnd();
+ #if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.OnFrameEnd();
+    }
+#else
     RCache.OnFrameEnd();
+#endif
     DoAsyncScreenshot();
+
+    // we're done with rendering
+    cleanup_contexts();
+
     HW.EndScene();
     HW.Present();
 }
@@ -280,8 +338,16 @@ void D3DXRenderBase::ClearTarget()
 
 void D3DXRenderBase::SetCacheXform(Fmatrix& mView, Fmatrix& mProject)
 {
+#if RENDER == R_R4
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].cmd_list.set_xform_view(mView);
+        contexts_pool[id].cmd_list.set_xform_project(mProject);
+    }
+#else
     RCache.set_xform_view(mView);
     RCache.set_xform_project(mProject);
+#endif
 }
 
 bool D3DXRenderBase::HWSupportsShaderYUV2RGB()

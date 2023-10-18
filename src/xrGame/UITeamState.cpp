@@ -35,6 +35,7 @@ UITeamState::UITeamState(ETeam teamId, UITeamPanels* teamPanels)
 }
 
 UITeamState::~UITeamState() { CleanupInternal(); }
+
 void UITeamState::CleanupInternal()
 {
     MapClientIdToUIPlayer::iterator it = myPlayers.begin();

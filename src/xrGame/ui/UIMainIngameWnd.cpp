@@ -53,13 +53,7 @@ using namespace InventoryUtilities;
 static constexpr pcstr MAININGAME_XML = "maingame.xml";
 
 CUIMainIngameWnd::CUIMainIngameWnd()
-    : CUIWindow("CUIMainIngameWnd"), /*m_pGrenade(NULL),m_pItem(NULL),*/
-      UIArtefactPanel(nullptr), UIArtefactIcon(nullptr), m_pMPChatWnd(nullptr),
-      m_pMPLogWnd(nullptr), m_pPickUpItem(nullptr)
-
-{
-    UIZoneMap = xr_new<CUIZoneMap>();
-}
+    : CUIWindow(CUIMainIngameWnd::GetDebugType()), UIZoneMap(xr_new<CUIZoneMap>()) {}
 
 extern CUIProgressShape* g_MissileForceShape;
 
@@ -108,9 +102,6 @@ void CUIMainIngameWnd::Init()
     m_iPickUpItemIconX = UIPickUpItemIcon->GetWndRect().left;
     m_iPickUpItemIconY = UIPickUpItemIcon->GetWndRect().top;
     //---------------------------------------------------------
-
-    //индикаторы
-    UIZoneMap->Init();
 
     // Подсказки, которые возникают при наведении прицела на объект
     UIStaticQuickHelp = UIHelper::CreateTextWnd(uiXml, "quick_info", this);
@@ -213,11 +204,20 @@ void CUIMainIngameWnd::Init()
 
     UIMotionIcon = xr_new<CUIMotionIcon>();
     UIMotionIcon->SetAutoDelete(true);
-    const bool independent = UIMotionIcon->Init(UIZoneMap->MapFrame().GetWndRect());
-    if (!independent)
+    const bool attachedToMinimap = UIMotionIcon->Init();
+
+    //индикаторы
+    UIZoneMap->Init(attachedToMinimap);
+
+    if (attachedToMinimap)
+    {
         UIZoneMap->MapFrame().AttachChild(UIMotionIcon);
+        UIMotionIcon->AttachToMinimap(UIZoneMap->MapFrame().GetWndRect());
+    }
     else
+    {
         AttachChild(UIMotionIcon);
+    }
 
     UIStaticDiskIO = UIHelper::CreateStatic(uiXml, "disk_io", this);
 

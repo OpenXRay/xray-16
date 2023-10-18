@@ -268,7 +268,7 @@ NET_Compressor::~NET_Compressor()
         RawTrafficDump = nullptr;
     }
 #endif // DEBUG
-	delete pcs;
+    xr_delete(pcs);
 }
 
 /*

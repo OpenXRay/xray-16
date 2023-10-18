@@ -84,7 +84,7 @@ void CDetailManager::cache_Decompress(Slot* S)
     D.vis.box.get_CD(bC, bD);
 
     xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bC, bD);
-    u32 triCount = xrc.r_count();
+    const auto triCount = xrc.r_count();
     CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
 
@@ -191,7 +191,7 @@ void CDetailManager::cache_Decompress(Slot* S)
             dir.set(0, -1, 0);
 
             float r_u, r_v, r_range;
-            for (u32 tid = 0; tid < triCount; tid++)
+            for (size_t tid = 0; tid < triCount; tid++)
             {
                 CDB::TRI& T = tris[xrc.r_begin()[tid].id];
                 SGameMtl* mtl = GMLib.GetMaterialByIdx(T.material);

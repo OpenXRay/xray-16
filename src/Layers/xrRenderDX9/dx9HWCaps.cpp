@@ -268,6 +268,9 @@ void CHWCaps::Update()
         dwMaxStencilValue = (1 << 8) - 1;
     }
 
+    // FFP lights
+    max_ffp_lights = caps.MaxActiveLights;
+
     // DEV INFO
 
     iGPUNum = GetGpuNum();

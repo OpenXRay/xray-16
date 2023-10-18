@@ -65,7 +65,7 @@ public:
     void set_enabled(bool value) { m_p_params->enabled = value; }
     bool is_enabled() const { return m_p_params->enabled; }
     params* get_supplier() { return m_p_params; }
-    virtual ~base() { delete m_p_params; }
+    virtual ~base() { xr_delete(m_p_params); }
 protected:
     float calc_dist_factor(float dist) const;
     float calc_dist_factor(vec_arg factor, float dist) const;

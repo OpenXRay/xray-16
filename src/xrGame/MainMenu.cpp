@@ -166,7 +166,9 @@ CMainMenu::~CMainMenu()
 
     xr_delete(g_btnHint);
     xr_delete(g_statHint);
+
     xr_delete(m_startDialog);
+
     g_pGamePersistent->m_pMainMenu = nullptr;
 
 #ifdef XR_PLATFORM_WINDOWS
@@ -331,6 +333,7 @@ bool CMainMenu::ReloadUI()
         return false;
     }
     xr_delete(m_startDialog);
+
     m_startDialog = smart_cast<CUIDialogWnd*>(dlg);
     VERIFY(m_startDialog);
     m_startDialog->m_bWorkInPause = true;
@@ -484,7 +487,7 @@ void CMainMenu::IR_OnControllerHold(int dik, float x, float y)
 }
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }
-extern void draw_wnds_rects();
+
 void CMainMenu::OnRender()
 {
     if (m_Flags.test(flGameSaveScreenshot))
@@ -495,7 +498,6 @@ void CMainMenu::OnRender()
     {
         DoRenderDialogs();
         UI().RenderFont();
-        draw_wnds_rects();
     }
 }
 
@@ -528,11 +530,9 @@ void CMainMenu::OnRenderPPUI_PP()
 
     UI().pp_start();
 
-    xr_vector<CUIWindow*>::iterator it = m_pp_draw_wnds.begin();
-    for (; it != m_pp_draw_wnds.end(); ++it)
-    {
-        (*it)->Draw();
-    }
+    for (auto& window : m_pp_draw_wnds)
+        window->Draw();
+
     UI().pp_stop();
 }
 /*
@@ -640,6 +640,34 @@ void CMainMenu::CheckForErrorDlg()
     m_pMB_ErrDlgs[m_NeedErrDialog]->ShowDialog(false);
     m_NeedErrDialog = ErrNoError;
 };
+
+bool CMainMenu::FillDebugTree(const CUIDebugState& debugState)
+{
+#ifndef MASTER_GOLD
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
+
+    const bool open = ImGui::TreeNodeEx(this, flags, "Main menu (%s)", GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.select(this);
+
+    if (open)
+    {
+        CDialogHolder::FillDebugTree(debugState);
+        if (m_startDialog)
+            m_startDialog->FillDebugTree(debugState);
+        else
+            ImGui::BulletText("Please, open main menu to see it's structure");
+        ImGui::TreePop();
+    }
+
+    return open;
+#else
+    UNUSED(debugState);
+    return false;
+#endif
+}
 
 void CMainMenu::SwitchToMultiplayerMenu() { m_startDialog->Dispatch(2, 1); };
 void CMainMenu::DestroyInternal(bool bForce)

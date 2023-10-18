@@ -1,7 +1,48 @@
 #pragma once
 
-namespace xray::editor
+namespace xray::imgui
 {
+inline void ItemHelp(const char* desc, bool use_separate_marker = true, bool on_same_line = true)
+{
+    if (use_separate_marker)
+    {
+        if (on_same_line)
+            ImGui::SameLine();
+        ImGui::TextDisabled("(?)");
+    }
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
+
+inline bool MenuItemWithShortcut(pcstr label, EGameActions shortcut, const char* desc = nullptr, bool selected = false)
+{
+    cpcstr key_name = GetActionBinding(shortcut);
+    const bool result = ImGui::MenuItem(label, key_name, selected);
+    if (desc)
+        ItemHelp(desc);
+    return result;
+}
+
+inline bool InputText(pcstr label, shared_str& texture_name)
+{
+    string_path temp;
+    xr_strcpy(temp, texture_name.empty() ? "" : texture_name.c_str());
+
+    if (ImGui::InputText(label, temp, std::size(temp)))
+    {
+        texture_name = temp;
+        return true;
+    }
+
+    return false;
+}
+
 inline ImGuiKey xr_key_to_imgui_key(int key)
 {
     switch (key)
@@ -279,4 +320,4 @@ inline ImGuiKey xr_key_to_imgui_key(int key)
     return ImGuiKey_None;
 }
 
-} // namespace xray::editor
+} // namespace xray::imgui

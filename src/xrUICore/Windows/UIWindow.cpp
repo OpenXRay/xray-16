@@ -1,73 +1,7 @@
 #include "pch.hpp"
+
 #include "UIWindow.h"
 #include "Cursor/UICursor.h"
-#include "Include/xrRender/DebugRender.h"
-#include "Include/xrRender/UIRender.h"
-
-xr_vector<Frect> g_wnds_rects;
-xr_vector<Frect> g_focused_wnds_rects;
-BOOL g_show_wnd_rect2 = FALSE;
-
-XRUICORE_API void clean_wnd_rects()
-{
-#ifdef DEBUG
-    GEnv.DRender->DestroyDebugShader(IDebugRender::dbgShaderWindow);
-#endif // DEBUG
-}
-
-void add_rect_to_draw(Frect&& r)
-{
-    g_wnds_rects.emplace_back(r);
-}
-
-void add_focused_rect_to_draw(Frect&& r)
-{
-    g_focused_wnds_rects.emplace_back(r);
-}
-
-void draw_rect(Frect& r, u32 color)
-{
-#ifdef DEBUG
-
-    GEnv.DRender->SetDebugShader(IDebugRender::dbgShaderWindow);
-
-    //.	GlobalEnv.UIRender->StartLineStrip	(5);
-    GEnv.UIRender->StartPrimitive(5, IUIRender::ptLineStrip, UI().m_currentPointType);
-
-    GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
-    GEnv.UIRender->PushPoint(r.rb.x, r.lt.y, 0, color, 0, 0);
-    GEnv.UIRender->PushPoint(r.rb.x, r.rb.y, 0, color, 0, 0);
-    GEnv.UIRender->PushPoint(r.lt.x, r.rb.y, 0, color, 0, 0);
-    GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
-
-    //.	GlobalEnv.UIRender->FlushLineStrip();
-    GEnv.UIRender->FlushPrimitive();
-
-#endif // DEBUG
-}
-
-XRUICORE_API void draw_wnds_rects()
-{
-    if (g_wnds_rects.empty() && g_focused_wnds_rects.empty())
-        return;
-
-    for (Frect& rect : g_wnds_rects)
-    {
-        UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
-        UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
-        draw_rect(rect, color_rgba(255, 0, 0, 255));
-    }
-
-    for (Frect& rect : g_focused_wnds_rects)
-    {
-        UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
-        UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
-        draw_rect(rect, color_rgba(0, 255, 0, 255));
-    }
-
-    g_wnds_rects.clear();
-    g_focused_wnds_rects.clear();
-}
 
 CUIWindow::CUIWindow(pcstr window_name)
     : m_windowName(window_name), m_pParentWnd(NULL), m_pMouseCapturer(NULL), m_pKeyboardCapturer(NULL), m_pMessageTarget(NULL),
@@ -99,17 +33,6 @@ void CUIWindow::Draw()
             continue;
         (*it)->Draw();
     }
-#ifdef DEBUG
-    if (g_show_wnd_rect2)
-    {
-        Frect r;
-        GetAbsoluteRect(r);
-        if (CursorOverWindow())
-            add_focused_rect_to_draw(std::move(r));
-        else
-            add_rect_to_draw(std::move(r));
-    }
-#endif
 }
 
 void CUIWindow::Draw(float x, float y)
@@ -120,22 +43,21 @@ void CUIWindow::Draw(float x, float y)
 
 void CUIWindow::Update()
 {
+    bool cursor_on_window = false;
     if (GetUICursor().IsVisible())
     {
-        bool cursor_on_window;
-
         Fvector2 temp = GetUICursor().GetCursorPosition();
         Frect r;
         GetAbsoluteRect(r);
         cursor_on_window = !!r.in(temp);
-        // RECEIVE and LOST focus
-        if (m_bCursorOverWindow != cursor_on_window)
-        {
-            if (cursor_on_window)
-                OnFocusReceive();
-            else
-                OnFocusLost();
-        }
+    }
+    // RECEIVE and LOST focus
+    if (m_bCursorOverWindow != cursor_on_window)
+    {
+        if (cursor_on_window)
+            OnFocusReceive();
+        else
+            OnFocusLost();
     }
 
     for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
@@ -187,12 +109,13 @@ void CUIWindow::DetachAll()
 
 void CUIWindow::GetAbsoluteRect(Frect& r)
 {
-    if (GetParent() == NULL)
+    auto parent = GetParent();
+    if (parent == nullptr)
     {
         GetWndRect(r);
         return;
     }
-    GetParent()->GetAbsoluteRect(r);
+    parent->GetAbsoluteRect(r);
 
     Frect rr;
     GetWndRect(rr);
@@ -595,4 +518,90 @@ bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16po
 
     w->SetWndPos(rect.lt);
     return true;
+}
+
+bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
+{
+#ifndef MASTER_GOLD
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
+    if (m_ChildWndList.empty())
+        flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet;
+
+    const bool open = ImGui::TreeNodeEx(this, flags, "%s (%s)", WindowName().c_str(), GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.select(this);
+
+    const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
+    if (debugState.drawWndRects && (IsShown() || hovered))
+    {
+        Frect rect;
+        GetAbsoluteRect(rect);
+        UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
+        UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
+
+        // XXX: make colours user configurable
+        u32 color = color_rgba(255, 0, 0, 255);
+        if (hovered)
+            color = color_rgba(255, 255, 0, 255);
+        else if (debugState.coloredRects)
+        {
+            // This is pseudo RNG, so when we are seeding it with 'this' pointer
+            // we can expect predictable and stable values (no *blinking* at all)
+            CRandom rnd;
+            rnd.seed((s32)(intptr_t)this);
+            color = color_rgba(rnd.randI(255), rnd.randI(255), rnd.randI(255), 255);
+        }
+
+        const auto draw_list = hovered ? ImGui::GetForegroundDrawList() : ImGui::GetBackgroundDrawList();
+        draw_list->AddRect((const ImVec2&)rect.lt, (const ImVec2&)rect.rb, color);
+    }
+
+    if (open)
+    {
+        for (const auto& child : m_ChildWndList)
+        {
+            child->FillDebugTree(debugState);
+        }
+        if (!m_ChildWndList.empty())
+            ImGui::TreePop();
+    }
+
+    return open;
+#else
+    UNUSED(debugState);
+    return false;
+#endif
+}
+
+void CUIWindow::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    if (!ImGui::CollapsingHeader(CUIWindow::GetDebugType()))
+        return;
+
+    ImGui::DragFloat2("Position", (float*)&m_wndPos);
+    ImGui::DragFloat2("Size", (float*)&m_wndSize);
+
+    ImGui::Checkbox("Visible", &m_bShowMe);
+    ImGui::Checkbox("Enabled", &m_bIsEnabled);
+
+    ImGui::Separator();
+    ImGui::BeginDisabled();
+    ImGui::Checkbox("Auto delete", &m_bAutoDelete);
+    ImGui::Checkbox("Cursor over window", &m_bCursorOverWindow);
+    ImGui::Checkbox("Custom draw", &m_bCustomDraw);
+
+    ImGui::DragFloat2("Last cursor position", (float*)&cursor_pos);
+    ImGui::DragScalar("Last click time", ImGuiDataType_U32, &m_dwLastClickTime);
+    ImGui::DragScalar("Focus receive time", ImGuiDataType_U32, &m_dwFocusReceiveTime);
+    ImGui::EndDisabled();
+
+    ImGui::Separator();
+    ImGui::LabelText("Parent", "%s", m_pParentWnd ? m_pParentWnd->WindowName().c_str() : "none");
+    ImGui::LabelText("Mouse capturer", "%s", m_pMouseCapturer ? m_pMouseCapturer->WindowName().c_str() : "none");
+    ImGui::LabelText("Keyboard capturer", "%s", m_pKeyboardCapturer ? m_pKeyboardCapturer->WindowName().c_str() : "none");
+    ImGui::LabelText("Message target", "%s", m_pMessageTarget ? m_pMessageTarget->WindowName().c_str() : "none");
+#endif
 }

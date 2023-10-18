@@ -26,7 +26,7 @@ CTexture::CTexture()
     flags.bUser = false;
     flags.seqCycles = FALSE;
     m_material = 1.0f;
-    bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_load);
+    bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_load);
 }
 // XXX: render scripts should call this destructor before resource manager gets destroyed
 CTexture::~CTexture()
@@ -62,25 +62,25 @@ ID3DBaseTexture* CTexture::surface_get() const
 void CTexture::PostLoad()
 {
     if (pTheora)
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_theora);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_theora);
     else if (pAVI)
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_avi);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_avi);
     else if (!seqDATA.empty())
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_seq);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_seq);
     else
-        bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_normal);
+        bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_normal);
 }
 
-void CTexture::apply_load(u32 dwStage)
+void CTexture::apply_load(CBackend& cmd_list, u32 dwStage)
 {
     if (!flags.bLoaded)
         Load();
     else
         PostLoad();
-    bind(dwStage);
+    bind(cmd_list, dwStage);
 };
 
-void CTexture::apply_theora(u32 dwStage)
+void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
 {
     if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual))
     {
@@ -104,7 +104,7 @@ void CTexture::apply_theora(u32 dwStage)
     }
     CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
 };
-void CTexture::apply_avi(u32 dwStage) const
+void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage) const
 {
     if (pAVI->NeedUpdate())
     {
@@ -125,7 +125,7 @@ void CTexture::apply_avi(u32 dwStage) const
     }
     CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
 };
-void CTexture::apply_seq(u32 dwStage)
+void CTexture::apply_seq(CBackend& cmd_list, u32 dwStage)
 {
     // SEQ
     u32 frame = Device.dwTimeContinual / seqMSPF; // Device.dwTimeGlobal
@@ -144,7 +144,7 @@ void CTexture::apply_seq(u32 dwStage)
     }
     CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
 };
-void CTexture::apply_normal(u32 dwStage) const
+void CTexture::apply_normal(CBackend& cmd_list, u32 dwStage) const
 {
     CHK_DX(HW.pDevice->SetTexture(dwStage, pSurface));
 };
@@ -323,7 +323,7 @@ void CTexture::Unload()
     xr_delete(pAVI);
     xr_delete(pTheora);
 
-    bind = fastdelegate::FastDelegate1<u32>(this, &CTexture::apply_load);
+    bind = fastdelegate::FastDelegate2<CBackend&,u32>(this, &CTexture::apply_load);
 }
 
 void CTexture::desc_update()

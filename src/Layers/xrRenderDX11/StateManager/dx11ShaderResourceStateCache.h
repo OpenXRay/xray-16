@@ -9,26 +9,22 @@ public:
 
     void ResetDeviceState();
 
-    void Apply();
+    void Apply(u32 context_id);
 
     void SetPSResource(u32 uiSlot, ID3DShaderResourceView* pRes);
     void SetGSResource(u32 uiSlot, ID3DShaderResourceView* pRes);
     void SetVSResource(u32 uiSlot, ID3DShaderResourceView* pRes);
-#ifdef USE_DX11
     void SetDSResource(u32 uiSlot, ID3DShaderResourceView* pRes);
     void SetHSResource(u32 uiSlot, ID3DShaderResourceView* pRes);
     void SetCSResource(u32 uiSlot, ID3DShaderResourceView* pRes);
-#endif
 
 private:
     ID3DShaderResourceView* m_PSViews[CTexture::mtMaxPixelShaderTextures];
     ID3DShaderResourceView* m_GSViews[CTexture::mtMaxGeometryShaderTextures];
     ID3DShaderResourceView* m_VSViews[CTexture::mtMaxVertexShaderTextures];
-#ifdef USE_DX11
     ID3DShaderResourceView* m_HSViews[CTexture::mtMaxHullShaderTextures];
     ID3DShaderResourceView* m_DSViews[CTexture::mtMaxDomainShaderTextures];
     ID3DShaderResourceView* m_CSViews[CTexture::mtMaxComputeShaderTextures];
-#endif
 
     u32 m_uiMinPSView;
     u32 m_uiMaxPSView;
@@ -39,7 +35,6 @@ private:
     u32 m_uiMinVSView;
     u32 m_uiMaxVSView;
 
-#ifdef USE_DX11
     u32 m_uiMinHSView;
     u32 m_uiMaxHSView;
 
@@ -48,18 +43,13 @@ private:
 
     u32 m_uiMinCSView;
     u32 m_uiMaxCSView;
-#endif
 
     bool m_bUpdatePSViews;
     bool m_bUpdateGSViews;
     bool m_bUpdateVSViews;
-#ifdef USE_DX11
     bool m_bUpdateHSViews;
     bool m_bUpdateDSViews;
     bool m_bUpdateCSViews;
-#endif
 };
-
-extern dx11ShaderResourceStateCache SRVSManager;
 
 #endif //	dx11ShaderResourceStateCache_included

@@ -26,24 +26,26 @@
 #endif
 
 #if defined(USE_DX9)
-void CRenderTarget::u_stencil_optimize(BOOL common_stencil)
+void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, BOOL common_stencil)
 #elif defined(USE_DX11) || defined(USE_OGL)
-void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
+void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
 #else
 #   error No graphics API selected or enabled!
 #endif
 {
+    PIX_EVENT(stencil_optimize);
+
 #if defined(USE_DX9) || defined(USE_DX11)
     // TODO: DX11: remove half pixel offset?
     VERIFY(RImplementation.o.nvstencil);
 #   ifdef USE_DX9
-    RCache.set_ColorWriteEnable(false);
+    cmd_list.set_ColorWriteEnable(false);
 #   endif
     u32 Offset;
     float _w = float(Device.dwWidth);
     float _h = float(Device.dwHeight);
     u32 C = color_rgba(255, 255, 255, 255);
-    FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+    FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
 #   ifdef USE_DX9
     float eps = EPS_S;
     pv->set(eps, float(_h + eps), eps, 1.f, C, 0, 0);
@@ -67,25 +69,25 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
     pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
     pv++;
 #   endif
-    RCache.Vertex.Unlock(4, g_combine->vb_stride);
+    RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 #   ifdef USE_DX9
-    RCache.set_CullMode(CULL_NONE);
+    cmd_list.set_CullMode(CULL_NONE);
     if (common_stencil)
-        RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00); // keep/keep/keep
+        cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00); // keep/keep/keep
 #   endif
-    RCache.set_Element(s_occq->E[1]);
+    cmd_list.set_Element(s_occq->E[1]);
 
 #   if defined(USE_DX11)
     switch (eSOM)
     {
-    case SO_Light: StateManager.SetStencilRef(dwLightMarkerID); break;
-    case SO_Combine: StateManager.SetStencilRef(0x01); break;
+    case SO_Light: cmd_list.StateManager.SetStencilRef(dwLightMarkerID); break;
+    case SO_Combine: cmd_list.StateManager.SetStencilRef(0x01); break;
     default: VERIFY(!"CRenderTarget::u_stencil_optimize. switch no default!");
     }
 #   endif
 
-    RCache.set_Geometry(g_combine);
-    RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+    cmd_list.set_Geometry(g_combine);
+    cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 #elif defined(USE_OGL)
     //	TODO: OGL: should we implement stencil optimization?
     VERIFY(RImplementation.o.nvstencil);
@@ -97,7 +99,7 @@ void CRenderTarget::u_stencil_optimize(eStencilOptimizeMode eSOM)
 }
 
 // 2D texgen (texture adjustment matrix)
-void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
+void CRenderTarget::u_compute_texgen_screen(CBackend& cmd_list, Fmatrix& m_Texgen)
 {
 #if defined(USE_DX9)
     float _w = float(Device.dwWidth);
@@ -131,11 +133,11 @@ void CRenderTarget::u_compute_texgen_screen(Fmatrix& m_Texgen)
 #   error No graphics API selected or enabled!
 #endif
 
-    m_Texgen.mul(m_TexelAdjust, RCache.xforms.m_wvp);
+    m_Texgen.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
 }
 
 // 2D texgen for jitter (texture adjustment matrix)
-void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
+void CRenderTarget::u_compute_texgen_jitter(CBackend& cmd_list, Fmatrix& m_Texgen_J)
 {
     // place into 0..1 space
     Fmatrix m_TexelAdjust =
@@ -151,7 +153,7 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f, 0.5f, 0.0f, 1.0f
     };
-    m_Texgen_J.mul(m_TexelAdjust, RCache.xforms.m_wvp);
+    m_Texgen_J.mul(m_TexelAdjust, cmd_list.xforms.m_wvp);
 
     // rescale - tile it
     float scale_X = float(Device.dwWidth) / float(TEX_jitter);
@@ -407,7 +409,8 @@ CRenderTarget::CRenderTarget()
 
         // Create D3DFMT_D24X8 depth-stencil surface if HW smap is not supported,
         // otherwise - create texture with specified HW_smap_FORMAT
-        rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, flags);
+        const auto num_slices = RImplementation.o.support_rt_arrays ? R__NUM_SUN_CASCADES : 1;
+        rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, num_slices, flags);
 #if defined(USE_DX11) || defined(USE_OGL)
         rt_smap_rain.create(r2_RT_smap_rain, options.rain_smapsize, options.rain_smapsize, depth_format);
         if (options.minmax_sm)
@@ -593,8 +596,8 @@ CRenderTarget::CRenderTarget()
             D3DFVF_TEXCOORDSIZE4(6) | D3DFVF_TEXCOORDSIZE4(7);
         rt_Bloom_1.create(r2_RT_bloom1, w, h, fmt);
         rt_Bloom_2.create(r2_RT_bloom2, w, h, fmt);
-        g_bloom_build.create(fvf_build, RCache.Vertex.Buffer(), RCache.QuadIB);
-        g_bloom_filter.create(fvf_filter, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_bloom_build.create(fvf_build, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+        g_bloom_filter.create(fvf_filter, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
         s_bloom_dbg_1.create("effects" DELIMITER "screen_set", r2_RT_bloom1);
         s_bloom_dbg_2.create("effects" DELIMITER "screen_set", r2_RT_bloom2);
 
@@ -711,11 +714,11 @@ CRenderTarget::CRenderTarget()
             xr_sprintf(name, "%s_%d", r2_RT_luminance_pool, it);
             rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
 #ifdef USE_DX9
-            u_setrt(rt_LUM_pool[it], 0, 0, 0);
+            u_setrt(RCache, rt_LUM_pool[it], 0, 0, 0);
 #endif
             RCache.ClearRT(rt_LUM_pool[it], 0x7f7f7f7f);
         }
-        u_setrt(Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
+        u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
     }
 
     // COMBINE
@@ -743,24 +746,24 @@ CRenderTarget::CRenderTarget()
         s_combine_dbg_0.create("effects" DELIMITER "screen_set", r2_RT_smap_surf);
         s_combine_dbg_1.create("effects" DELIMITER "screen_set", r2_RT_luminance_t8);
         s_combine_dbg_Accumulator.create("effects" DELIMITER "screen_set", r2_RT_accum);
-        g_combine_VP.create(dwDecl, RCache.Vertex.Buffer(), RCache.QuadIB);
-        g_combine.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
-        g_combine_2UV.create(FVF::F_TL2uv, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_combine_VP.create(dwDecl, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+        g_combine.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
+        g_combine_2UV.create(FVF::F_TL2uv, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 #ifdef USE_DX9
-        g_combine_cuboid.create(FVF::F_L, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+        g_combine_cuboid.create(FVF::F_L, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 #elif defined(USE_DX11) || defined(USE_OGL)
-        g_combine_cuboid.create(dwDecl, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+        g_combine_cuboid.create(dwDecl, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 #else
 #   error No graphics API selected or enabled!
 #endif
         constexpr u32 fvf_aa_blur = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);
-        g_aa_blur.create(fvf_aa_blur, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_aa_blur.create(fvf_aa_blur, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 
         constexpr u32 fvf_aa_AA = D3DFVF_XYZRHW | D3DFVF_TEX7 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3) | D3DFVF_TEXCOORDSIZE2(4) | D3DFVF_TEXCOORDSIZE4(5) |
             D3DFVF_TEXCOORDSIZE4(6);
-        g_aa_AA.create(fvf_aa_AA, RCache.Vertex.Buffer(), RCache.QuadIB);
+        g_aa_AA.create(fvf_aa_AA, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
     }
 
     // Build textures
@@ -769,7 +772,7 @@ CRenderTarget::CRenderTarget()
     // PP
     s_postprocess.create("postprocess");
     g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3,
-        RCache.Vertex.Buffer(), RCache.QuadIB);
+        RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
     if (!options.msaa)
         s_postprocess_msaa = s_postprocess;
     else
@@ -786,19 +789,19 @@ CRenderTarget::CRenderTarget()
 
     // Menu
     s_menu.create("distort");
-    g_menu.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    g_menu.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 
 #if 0 // OpenGL: kept for historical reasons
     // Flip
     t_base = RImplementation.Resources->_CreateTexture(r2_base);
     t_base->surface_set(GL_TEXTURE_2D, get_base_rt());
     s_flip.create("effects" DELIMITER "screen_set", r2_base);
-    g_flip.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
+    g_flip.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 #endif
 
     //
-    dwWidth = Device.dwWidth;
-    dwHeight = Device.dwHeight;
+    dwWidth[RCache.context_id] = Device.dwWidth;
+    dwHeight[RCache.context_id] = Device.dwHeight;
 }
 
 CRenderTarget::~CRenderTarget()
@@ -854,13 +857,13 @@ CRenderTarget::~CRenderTarget()
 #endif
 }
 
-void CRenderTarget::reset_light_marker(bool bResetStencil)
+void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)
 {
     dwLightMarkerID = 5;
     if (bResetStencil)
     {
 #ifdef USE_DX9
-        RCache.set_ColorWriteEnable(FALSE);
+        cmd_list.set_ColorWriteEnable(FALSE);
 #endif
         u32 Offset;
         float _w = float(Device.dwWidth);
@@ -868,7 +871,7 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         u32 C = color_rgba(255, 255, 255, 255);
 #ifdef USE_DX9
         float eps = EPS_S;
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(eps, float(_h + eps), eps, 1.f, C, 0, 0);
         pv++;
         pv->set(eps, eps, eps, 1.f, C, 0, 0);
@@ -877,17 +880,17 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         pv++;
         pv->set(float(_w + eps), eps, eps, 1.f, C, 0, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
-        RCache.set_CullMode(CULL_NONE);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
+        cmd_list.set_CullMode(CULL_NONE);
         //  Clear everything except last bit
-        RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, dwLightMarkerID, 0x00, 0xFE,
+        cmd_list.set_Stencil(TRUE, D3DCMP_ALWAYS, dwLightMarkerID, 0x00, 0xFE,
             D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO, D3DSTENCILOP_ZERO);
-        RCache.set_Element(s_occq->E[1]);
+        cmd_list.set_Element(s_occq->E[1]);
 #elif defined(USE_DX11) || defined(USE_OGL)
         float eps = 0;
         float _dw = 0.5f;
         float _dh = 0.5f;
-        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(4, g_combine->vb_stride, Offset);
+        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
         pv->set(-_dw, _h - _dh, eps, 1.f, C, 0, 0);
         pv++;
         pv->set(-_dw, -_dh, eps, 1.f, C, 0, 0);
@@ -896,24 +899,24 @@ void CRenderTarget::reset_light_marker(bool bResetStencil)
         pv++;
         pv->set(_w - _dw, -_dh, eps, 1.f, C, 0, 0);
         pv++;
-        RCache.Vertex.Unlock(4, g_combine->vb_stride);
-        RCache.set_Element(s_occq->E[2]);
+        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
+        cmd_list.set_Element(s_occq->E[2]);
 #else
 #   error No graphics API selected or enabled!
 #endif
-        RCache.set_Geometry(g_combine);
-        RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+        cmd_list.set_Geometry(g_combine);
+        cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
 }
 
-void CRenderTarget::increment_light_marker()
+void CRenderTarget::increment_light_marker(CBackend& cmd_list)
 {
     dwLightMarkerID += 2;
 
     const u32 iMaxMarkerValue = RImplementation.o.msaa ? 127 : 255;
 
     if (dwLightMarkerID > iMaxMarkerValue)
-        reset_light_marker(true);
+        reset_light_marker(cmd_list, true);
 }
 
 bool CRenderTarget::need_to_render_sunshafts()

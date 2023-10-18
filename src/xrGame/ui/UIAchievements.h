@@ -7,18 +7,18 @@ class CUITextWnd;
 class UIHint;
 class CUIScrollView;
 
-class CUIAchievements : public CUIWindow
+class CUIAchievements final : public CUIWindow
 {
     typedef CUIWindow inherited;
 
 private:
-    CUIScrollView* m_parent;
-    CUITextWnd* m_name;
-    CUITextWnd* m_descr;
-    CUIStatic* m_icon;
-    UIHint* m_hint;
+    CUIScrollView* m_parent{};
+    CUITextWnd* m_name{};
+    CUITextWnd* m_descr{};
+    CUIStatic* m_icon{};
+    UIHint* m_hint{};
     string128 m_functor_str;
-    bool m_repeat;
+    bool m_repeat{};
 
 public:
     CUIAchievements(CUIScrollView* parent);
@@ -36,6 +36,8 @@ public:
 
     virtual void DrawHint();
     virtual void Reset();
+
+    pcstr GetDebugType() override { return "CUIAchievements"; }
 
 protected:
     bool ParentHasMe();

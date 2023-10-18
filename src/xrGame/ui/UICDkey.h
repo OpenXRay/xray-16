@@ -2,7 +2,7 @@
 #pragma once
 #include "xrUICore/EditBox/UIEditBox.h"
 
-class CUICDkey : public CUIEditBox
+class CUICDkey final : public CUIEditBox
 {
 private:
     typedef CUIEditBox inherited;
@@ -26,6 +26,8 @@ public:
     virtual void Draw();
     virtual void OnFocusLost();
 
+    pcstr GetDebugType() override { return "CUICDkey"; }
+
 private:
     void paste_from_clipboard();
 
@@ -34,14 +36,13 @@ private:
     bool m_view_access;
 }; // class CUICDkey
 
-class CUIMPPlayerName : public CUIEditBox
+class CUIMPPlayerName final : public CUIEditBox
 {
 private:
     typedef CUIEditBox inherited;
 
 public:
-    CUIMPPlayerName(){};
-    virtual ~CUIMPPlayerName(){};
+    CUIMPPlayerName() = default;
 
     //	virtual	void	SetText			(LPCSTR str) {}
 
@@ -49,8 +50,9 @@ public:
     //	virtual void	SaveValue();
     //	virtual bool	IsChanged();
 
-    virtual void OnFocusLost();
+    void OnFocusLost() override;
 
+    pcstr GetDebugType() override { return "CUIMPPlayerName"; }
 }; // class CUIMPPlayerName
 
 extern void GetCDKey_FromRegistry(char* cdkey);

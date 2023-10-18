@@ -184,7 +184,7 @@ CLocatorAPI::~CLocatorAPI()
 {
     VERIFY(0 == m_iLockRescan);
     _dump_open_files(1);
-    delete m_auth_lock;
+    xr_delete(m_auth_lock);
 }
 
 const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
@@ -342,11 +342,15 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
         read_byte = ::read(fd, &dwType, 4);
         if (read_byte == -1)
             return nullptr;
+        else if (read_byte == 0)
+            return nullptr;
 
         u32 tempSize = 0;
         read_byte = ::read(fd, &tempSize, 4);
         dwSize = tempSize;
         if (read_byte == -1)
+            return nullptr;
+        else if (read_byte == 0)
             return nullptr;
 
         if ((dwType & ~CFS_CompressMark) == ID)
@@ -856,7 +860,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
              * I propose adding shaders from <CMAKE_INSTALL_FULL_DATAROOTDIR>/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
              * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
             chdir(pref_path);
-            constexpr pcstr install_dir = MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR);
+            static constexpr pcstr install_dir = MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR);
             string_path tmp, tmp_link;
             xr_sprintf(tmp, "%sfsgame.ltx", pref_path);
             struct stat statbuf;

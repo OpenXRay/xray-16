@@ -2,7 +2,7 @@
 #include "xrUICore/Windows/UIWindow.h"
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 
-class XRUICORE_API CUIDoubleProgressBar : public CUIWindow
+class XRUICORE_API CUIDoubleProgressBar final : public CUIWindow
 {
 public: // func
     CUIDoubleProgressBar();
@@ -10,6 +10,8 @@ public: // func
 
     void InitFromXml(CUIXml& xml_doc, LPCSTR path);
     void SetTwoPos(float cur_value, float compare_value);
+
+    pcstr GetDebugType() override { return "CUIDoubleProgressBar"; }
 
 protected:
     CUIProgressBar m_progress_one;

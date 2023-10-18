@@ -90,19 +90,12 @@ void CRender::create()
     m_skinning = -1;
 
     // Fixed-function pipeline
-    o.ffp = !!strstr(Core.Params, "-force_ffp") || ps_r1_flags.test(R1FLAG_FFP);
+    o.ffp = HW.Caps.hasFixedPipeline && ps_r1_flags.test(R1FLAG_FFP);
 
     // disasm
     o.disasm = (strstr(Core.Params, "-disasm")) ? TRUE : FALSE;
     o.forceskinw = (strstr(Core.Params, "-skinw")) ? TRUE : FALSE;
     o.no_detail_textures = !ps_r2_ls_flags.test(R1FLAG_DETAIL_TEXTURES);
-
-    c_ldynamic_props = "L_dynamic_props";
-    c_sbase = "s_base";
-    c_ssky0 = "s_sky0";
-    c_ssky1 = "s_sky1";
-    c_sclouds0 = "s_clouds0";
-    c_sclouds1 = "s_clouds1";
 
     o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
     if (o.no_ram_textures)
@@ -134,6 +127,8 @@ void CRender::destroy()
 
 void CRender::reset_begin()
 {
+    Resources->reset_begin();
+
     //AVO: let's reload details while changed details options on vid_restart
     if (b_loaded && (dm_current_size != dm_size ||
         !fsimilar(ps_r__Detail_density, ps_current_detail_density) ||
@@ -375,7 +370,18 @@ void CRender::set_Object(IRenderable* O, u32 phase)
             L_Projector->set_object(nullptr);
     }
 }
-void CRender::apply_object(IRenderable* O)
+
+static u32 gm_Ambient = 0;
+IC void gm_SetAmbient(u32 C)
+{
+    if (C != gm_Ambient)
+    {
+        gm_Ambient = C;
+        CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, color_xrgb(C, C, C)));
+    }
+}
+
+void CRender::apply_object(CBackend& cmd_list, IRenderable* O)
 {
     if (nullptr == O)
         return;
@@ -389,42 +395,58 @@ void CRender::apply_object(IRenderable* O)
         RCache.set_c(c_ldynamic_props, o_sun, o_sun, o_sun, o_hemi);
         // shadowing
         if ((LT.shadow_recv_frame == Device.dwFrame) && O->renderable_ShadowReceive())
+        {
+            gm_SetAmbient(0);
             RImplementation.L_Projector->setup(LT.shadow_recv_slot);
+        }
+        else
+        {
+            //gm_SetAmbient(iFloor(LT.ambient) / 2);
+        }
+
+        // ambience
+        //gm_SetAmbient(iFloor(LT.ambient) / 2);
+
+        // set up to 8 lights to device
+        const int max = _min(int(LT.lights.size()), HW.Caps.max_ffp_lights);
+        for (int L = 0; L < max; L++)
+        {
+            CHK_DX(HW.pDevice->SetLight(L, (D3DLIGHT9*)&LT.lights[L].source->ldata));
+        }
+
+        // enable them, disable others
+        static int gm_Lcount = 0;
+        for (int L = gm_Lcount; L < max; L++)
+        {
+            CHK_DX(HW.pDevice->LightEnable(L, TRUE));
+        }
+        for (int L = max; L < gm_Lcount; L++)
+        {
+            CHK_DX(HW.pDevice->LightEnable(L, FALSE));
+        }
+        gm_Lcount = max;
     }
 }
 
 // Misc
 float g_fSCREEN;
-static BOOL gm_Nearer = 0;
 
-IC void gm_SetNearer(BOOL bNearer)
-{
-    if (bNearer != gm_Nearer)
-    {
-        gm_Nearer = bNearer;
-        if (gm_Nearer)
-            RImplementation.rmNear();
-        else
-            RImplementation.rmNormal();
-    }
-}
-
-void CRender::rmNear()
+void CRender::rmNear(CBackend& cmd_list)
 {
     IRender_Target* T = getTarget();
-    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 0.02f });
+    RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0, 0.02f });
 }
 
-void CRender::rmFar()
+void CRender::rmFar(CBackend& cmd_list)
 {
     IRender_Target* T = getTarget();
-    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f });
+    RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0.99999f, 1.f });
 }
 
-void CRender::rmNormal()
+void CRender::rmNormal(CBackend& cmd_list)
 {
     IRender_Target* T = getTarget();
-    RCache.SetViewport({ 0, 0, T->get_width(), T->get_height(), 0, 1.f });
+    RCache.SetViewport({ 0, 0, T->get_width(RCache), T->get_height(RCache), 0, 1.f });
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -449,7 +471,7 @@ void CRender::Calculate()
     // Transfer to global space to avoid deep pointer access
     IRender_Target* T = getTarget();
     float fov_factor = _sqr(90.f / Device.fFOV);
-    g_fSCREEN = float(T->get_width() * T->get_height()) * fov_factor * (EPS_S + ps_r__LOD);
+    g_fSCREEN = float(T->get_width(RCache) * T->get_height(RCache)) * fov_factor * (EPS_S + ps_r__LOD);
     r_ssaDISCARD = _sqr(ps_r__ssaDISCARD) / g_fSCREEN;
     r_ssaDONTSORT = _sqr(ps_r__ssaDONTSORT / 3) / g_fSCREEN;
     r_ssaLOD_A = _sqr(ps_r1_ssaLOD_A / 3) / g_fSCREEN;
@@ -461,7 +483,16 @@ void CRender::Calculate()
     // Frustum
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    gm_SetNearer(FALSE);
+    // Build L_DB visibility & perform basic initialization
+    gm_Ambient = 0xFFFFFFFF;
+    gm_SetAmbient(0);
+
+    if (!ps_r1_flags.is_any(R1FLAG_FFP_LIGHTMAPS | R1FLAG_DLIGHTS))
+        HW.pDevice->SetRenderState(D3DRS_AMBIENT, 0xFFFFFFFF);
+    else
+        HW.pDevice->SetRenderState(D3DRS_AMBIENT, 0x00000000);
+
+    rmNormal(RCache);
     auto& dsgraph = get_imm_context();
     dsgraph.o.use_hom = true;
     dsgraph.o.phase = PHASE_NORMAL;
@@ -474,7 +505,7 @@ void CRender::Calculate()
         {
             if (sector_id != last_sector_id)
                 g_pGamePersistent->OnSectorChanged(sector_id);
-        
+
             last_sector_id = sector_id;
         }
         vLastCameraPos.set(Device.vCameraPosition);
@@ -485,7 +516,7 @@ void CRender::Calculate()
             Fvector box_radius;
             box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
             dsgraph.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, rmPortals, Device.vCameraPosition, box_radius);
-            for (int K = 0; K < dsgraph.Sectors_xrc.r_count(); K++)
+            for (size_t K = 0; K < dsgraph.Sectors_xrc.r_count(); K++)
             {
                 CPortal* pPortal = dsgraph.Portals[rmPortals->get_tris()[dsgraph.Sectors_xrc.r_begin()[K].id].dummy];
                 pPortal->bDualRender = TRUE;
@@ -536,9 +567,9 @@ void CRender::Calculate()
             });
 
             if (ps_r__common_flags.test(RFLAG_ACTOR_SHADOW)) // Actor Shadow (Sun + Light)
-                g_hud->Render_First(dsgraph.context_id); // R1 shadows
+                g_pGameLevel->pHUD->Render_First(dsgraph.context_id); // R1 shadows
 
-            g_hud->Render_Last(dsgraph.context_id);
+            g_pGameLevel->pHUD->Render_Last(dsgraph.context_id);
 
             // Determine visibility for dynamic part of scene
             u32 uID_LTRACK = 0xffffffff;
@@ -672,7 +703,7 @@ void CRender::RenderMenu()
 
         if (g_pGamePersistent)
             g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
-    
+
         // combination/postprocess
         Target->phase_combine(_menu_pp, false);
     }
@@ -701,7 +732,7 @@ void CRender::Render()
     dsgraph.render_hud(); // hud
     dsgraph.render_graph(0); // normal level
     if (Details)
-        Details->Render(); // grass / details
+        Details->Render(RCache); // grass / details
     dsgraph.render_lods(true, false); // lods - FB
 
     g_pGamePersistent->Environment().RenderSky(); // sky / sun
@@ -754,8 +785,6 @@ void CRender::Render()
 
     // HUD
     BasicStats.Primitives.End();
-
-    cleanup_contexts();
 }
 
 void CRender::ApplyBlur2(FVF::TL2uv* pv, u32 size) const

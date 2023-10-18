@@ -62,8 +62,13 @@ public:
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 
+    CBackend& get_imm_command_list() override
+    {
+        return get_imm_context().cmd_list;
+    }
+
 #if RENDER != R_R1
-    ICF u32 alloc_context()
+    ICF u32 alloc_context(bool alloc_cmd_list = true)
     {
         if (contexts_used.all())
             return R_dsgraph_structure::INVALID_CONTEXT_ID;
@@ -75,7 +80,9 @@ public:
                 break;
         }
         contexts_used.set(id, true);
+        contexts_pool[id].reset();
         contexts_pool[id].context_id = id;
+        contexts_pool[id].cmd_list.context_id = alloc_cmd_list ? id : CHW::IMM_CTX_ID;
         return id;
     }
 
@@ -91,14 +98,13 @@ public:
         return contexts_pool[id];
     }
 
-    ICF void release_context(u32 context_id)
+    ICF void release_context(u32 id)
     {
-        VERIFY(context_id != R_dsgraph_structure::IMM_CTX_ID); // never release immediate context
-        VERIFY(context_id < R__NUM_PARALLEL_CONTEXTS);
-        VERIFY(contexts_used.test(context_id));
-        VERIFY(contexts_pool[context_id].context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
-        contexts_pool[context_id].reset();
-        contexts_used.set(context_id, false);
+        VERIFY(id != R_dsgraph_structure::IMM_CTX_ID); // never release immediate context
+        VERIFY(id < R__NUM_PARALLEL_CONTEXTS);
+        VERIFY(contexts_used.test(id));
+        VERIFY(contexts_pool[id].context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
+        contexts_used.set(id, false);
     }
 
     ICF R_dsgraph_structure& get_imm_context()
@@ -114,11 +120,10 @@ public:
         for (int id = 0; id < R__NUM_CONTEXTS; ++id)
         {
             contexts_pool[id].reset();
-            contexts_used.set(id, false);
         }
+        contexts_used.reset();
     }
 #else
-
     ICF R_dsgraph_structure& get_imm_context()
     {
         context_imm.context_id = R_dsgraph_structure::IMM_CTX_ID;
@@ -135,7 +140,9 @@ public:
     {
         context_imm.reset();
     }
-#endif // RENDER != R_R1
+#endif
+
+    void CreateQuadIB();
 
 public:
     CResourceManager* Resources{};
@@ -143,6 +150,13 @@ public:
     ref_shader m_SelectionShader;
     ref_shader m_PortalFadeShader;
     ref_geom   m_PortalFadeGeom;
+
+    // Dynamic geometry streams
+    _VertexStream Vertex;
+    _IndexStream Index;
+
+    IndexStagingBuffer QuadIB;
+    IndexBufferHandle old_QuadIB;
 
 protected:
 #if RENDER == R_R1

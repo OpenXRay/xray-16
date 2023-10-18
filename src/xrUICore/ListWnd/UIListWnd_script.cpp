@@ -8,12 +8,14 @@ bool CUIListWnd::AddItem_script(CUIListItem* item)
     return AddItem(item, -1);
 }
 
-struct CUIListItemWrapper : public CUIListItem, public luabind::wrap_base
+struct CUIListItemWrapper final : public CUIListItem, public luabind::wrap_base
 {
+    pcstr GetDebugType() override { return "CUIListItemScript"; }
 };
 
-struct CUIListItemExWrapper : public CUIListItemEx, public luabind::wrap_base
+struct CUIListItemExWrapper final : public CUIListItemEx, public luabind::wrap_base
 {
+    pcstr GetDebugType() override { return "CUIListItemExScript"; }
 };
 
 // clang-format off

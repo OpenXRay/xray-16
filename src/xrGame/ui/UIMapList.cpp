@@ -33,8 +33,8 @@ CUIMapList::CUIMapList() : CUIWindow("CUIMapList")
     m_pWeatherSelector = NULL;
     m_pList1 = xr_new<CUIListBox>();
     m_pList2 = xr_new<CUIListBox>();
-    m_pFrame1 = xr_new<CUIFrameWindow>();
-    m_pFrame2 = xr_new<CUIFrameWindow>();
+    m_pFrame1 = xr_new<CUIFrameWindow>("Frame 1");
+    m_pFrame2 = xr_new<CUIFrameWindow>("Frame 2");
     m_pLbl1 = xr_new<CUIFrameLineWnd>("Label 1");
     m_pLbl2 = xr_new<CUIFrameLineWnd>("Label 2");
     m_pBtnLeft = xr_new<CUI3tButton>();

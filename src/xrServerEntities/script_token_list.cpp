@@ -18,7 +18,10 @@ CScriptTokenList::CScriptTokenList()
 CScriptTokenList::~CScriptTokenList() noexcept
 {
     for (xr_token& token : m_token_list)
-        xr_free(token.name);
+    {
+        auto tokenName = const_cast<char*>(token.name);
+        xr_free(tokenName);
+    }
 }
 
 void CScriptTokenList::add(pcstr name, int id)
@@ -39,7 +42,8 @@ void CScriptTokenList::remove(pcstr name)
     const bool tokenFound = I != m_token_list.end();
     if (tokenFound)
     {
-        xr_delete((*I).name);
+        auto tokenName = const_cast<char*>((*I).name);
+        xr_delete(tokenName);
         m_token_list.erase(I);
     }
     else
