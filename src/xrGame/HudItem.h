@@ -167,7 +167,13 @@ private:
     shared_str m_unique_hud_sect;
 
 public:
-    void IncrementInstanceId() { m_inst_id += 1; }
+    void IncrementInstanceId()
+    {
+        if (m_inst_id < std::numeric_limits<int>::max())
+            m_inst_id += 1;
+        else
+            m_inst_id = 0;
+    }
     const shared_str& HudSection() const { return hud_sect; }
     const shared_str& UniqueHudSection() const { return m_unique_hud_sect; }
     IC CPhysicItem& object() const
