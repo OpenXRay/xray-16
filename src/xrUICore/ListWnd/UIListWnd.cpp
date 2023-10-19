@@ -479,16 +479,12 @@ bool CUIListWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     switch (mouse_action)
     {
-    case WINDOW_LBUTTON_DB_CLICK:
-        break;
     case WINDOW_MOUSE_WHEEL_DOWN:
         m_ScrollBar->TryScrollInc();
         return true;
-        break;
     case WINDOW_MOUSE_WHEEL_UP:
         m_ScrollBar->TryScrollDec();
         return true;
-        break;
     }
 
     return inherited::OnMouseAction(x, y, mouse_action);
