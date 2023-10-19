@@ -123,6 +123,7 @@ private:
     InputStatistics stats;
     bool exclusiveInput;
     bool inputGrabbed;
+    int textInputCounter{};
 
     MessageRegistry<pureKeyMapChanged> seqKeyMapChanged;
 
@@ -143,6 +144,10 @@ public:
 
     void GrabInput(const bool grab);
     bool InputIsGrabbed() const;
+
+    void EnableTextInput();
+    void DisableTextInput();
+    bool IsTextInputEnabled() const;
 
     void RegisterKeyMapChangeWatcher(pureKeyMapChanged* watcher, int priority = REG_PRIORITY_NORMAL);
     void RemoveKeyMapChangeWatcher(pureKeyMapChanged* watcher);

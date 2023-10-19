@@ -62,17 +62,16 @@ void ide::OnAppDeactivate()
     io.AddFocusEvent(false);
 }
 
-void ide::IR_Capture()
+void ide::IR_OnActivate()
 {
-    IInputReceiver::IR_Capture();
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = true;
 }
 
-void ide::IR_Release()
+void ide::IR_OnDeactivate()
 {
-    SDL_StopTextInput();
-    IInputReceiver::IR_Release();
+    UpdateTextInput(true);
+
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = false;
 }
@@ -212,7 +211,8 @@ void ide::IR_OnKeyboardHold(int /*key*/)
 void ide::IR_OnTextInput(pcstr text)
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.AddInputCharactersUTF8(text);
+    if (io.WantTextInput)
+        io.AddInputCharactersUTF8(text);
 }
 
 void ide::IR_OnControllerPress(int key, float x, float y)

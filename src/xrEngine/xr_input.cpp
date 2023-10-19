@@ -228,6 +228,13 @@ void CInput::KeyUpdate()
     if (count)
         SetCurrentInputType(KeyboardMouse);
 
+    // If textInputCounter has changed,
+    // we assume that text input target changed.
+    // Theoretically, this is not always true, though.
+    // But we always can change the solution.
+    // If we find out something not work as expected.
+    const auto cnt = textInputCounter;
+
     for (int i = 0; i < count; ++i)
     {
         const SDL_Event& event = events[i];
@@ -245,6 +252,8 @@ void CInput::KeyUpdate()
             break;
 
         case SDL_TEXTINPUT:
+            if (cnt != textInputCounter)
+                continue; // if input target changed, skip this frame
             cbStack.back()->IR_OnTextInput(event.text.text);
             break;
 
@@ -534,6 +543,35 @@ void CInput::GrabInput(const bool grab)
 bool CInput::InputIsGrabbed() const
 {
     return inputGrabbed;
+}
+
+void CInput::EnableTextInput()
+{
+    ++textInputCounter;
+
+    if (textInputCounter == 1)
+        SDL_StartTextInput();
+
+    SDL_PumpEvents();
+    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+}
+
+void CInput::DisableTextInput()
+{
+    --textInputCounter;
+    if (textInputCounter < 0)
+        textInputCounter = 0;
+
+    if (textInputCounter == 0)
+        SDL_StopTextInput();
+
+    SDL_PumpEvents();
+    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+}
+
+bool CInput::IsTextInputEnabled() const
+{
+    return textInputCounter > 0;
 }
 
 void CInput::RegisterKeyMapChangeWatcher(pureKeyMapChanged* watcher, int priority /*= REG_PRIORITY_NORMAL*/)
