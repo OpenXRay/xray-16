@@ -53,7 +53,7 @@ static int FloatTo565( Vec3::Arg colour )
 	return ( r << 11 ) | ( g << 5 ) | b;
 }
 
-static void WriteColourBlock( int a, int b, u8* indices, void* block )
+void WriteColourBlock( int a, int b, u8* indices, void* block )
 {
 	// get the block as bytes
 	u8* bytes = ( u8* )block;

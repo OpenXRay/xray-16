@@ -1,11 +1,14 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
+
+message(STATUS "CMAKE_VERSION: ${CMAKE_VERSION}")
 
 project(OpenXRay)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 if (CMAKE_VERBOSE_MAKEFILE)
-    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
 endif()
 
@@ -18,22 +21,24 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "/usr")
 endif()
 
-# Installation paths
 include(GNUInstallDirs)
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-include(${PROJECT_SOURCE_DIR}/cmake/utils.cmake)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+include(utils)
+
+set_git_info()
 
 # Output all libraries and executable to one folder
-set(COMPILE_OUTPUT_FOLDER ${CMAKE_SOURCE_DIR}/bin/${ARCH_TYPE}/${CMAKE_BUILD_TYPE})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
-set(CMAKE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
-set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY ${COMPILE_OUTPUT_FOLDER})
+set(COMPILE_OUTPUT_FOLDER "${CMAKE_SOURCE_DIR}/bin/${ARCH_TYPE}/${CMAKE_BUILD_TYPE}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
+set(CMAKE_PDB_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
+set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
 
 if (DISABLE_PORTABLE_MODE)
-    add_definitions(-DDISABLE_PORTABLE_MODE)
+    add_compile_definitions(DISABLE_PORTABLE_MODE)
 endif()
 
 if (NOT DEFINED ALLOW_RPATH)
@@ -42,18 +47,18 @@ endif()
 
 if (ALLOW_RPATH)
     # Set the shared object search path for the installation
-    set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_FULL_LIBDIR}")
 
     # Set the shared object search path for the build tree
     # On Linux/BSD we can use $ORIGIN to search for modules next to the executable
     if (NOT APPLE)
         set(CMAKE_BUILD_RPATH $ORIGIN)
     else()
-        set(CMAKE_BUILD_RPATH ${COMPILE_OUTPUT_FOLDER})
+        set(CMAKE_BUILD_RPATH "${COMPILE_OUTPUT_FOLDER}")
     endif()
 endif()
 
-message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
+message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
     set(PROJECT_PLATFORM_ARM64 TRUE)
 elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "armv*")
@@ -64,77 +69,32 @@ elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc" OR CMAKE_SYSTEM_PROCESSOR STREQUAL
     set(PROJECT_PLATFORM_PPC TRUE)
 endif()
 
-
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     set(MASTER_GOLD_DEFAULT_VALUE ON)
 else()
     set(MASTER_GOLD_DEFAULT_VALUE OFF)
 endif()
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 option(MASTER_GOLD "Build with MASTER_GOLD" ${MASTER_GOLD_DEFAULT_VALUE})
-message(STATUS "MASTER_GOLD: ${MASTER_GOLD}")
 if (MASTER_GOLD)
-    add_definitions(-DMASTER_GOLD)
+    add_compile_definitions(MASTER_GOLD)
 endif()
+message(STATUS "MASTER_GOLD: ${MASTER_GOLD}")
 
 option(STATIC_BUILD "Use static build" ${MASTER_GOLD})
-message(STATUS "STATIC_BUILD: ${STATIC_BUILD}")
 if (STATIC_BUILD)
     # XXX: Uncomment only after build with XRAY_STATIC_BUILD is fixed
-    #add_definitions(-DXRAY_STATIC_BUILD)
+    #add_compile_definitions(XRAY_STATIC_BUILD)
 endif()
-
-function(xr_install tgt)
-    if (NOT MSVC)
-        install(TARGETS ${tgt} DESTINATION "."
-            PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE # chmod 755
-        )
-    else()
-        install(TARGETS ${tgt}
-            CONFIGURATIONS Debug
-            RUNTIME DESTINATION Debug/
-            LIBRARY DESTINATION Debug/
-        )
-        install(FILES $<TARGET_PDB_FILE:${tgt}>
-            CONFIGURATIONS Debug
-            DESTINATION Debug/
-        )
-        install(TARGETS ${tgt}
-            CONFIGURATIONS Release
-            RUNTIME DESTINATION Release/
-            LIBRARY DESTINATION Release/
-        )
-    endif()
-endfunction()
-
-# Use only if install defined outside target directory(like luabind, for example)
-function(xr_install_file tgt)
-    if (NOT MSVC)
-        install(FILES $<TARGET_FILE:${tgt}> DESTINATION "."
-            PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE # chmod 755
-        )
-    else()
-        install($<TARGET_FILE:${tgt}>
-            CONFIGURATIONS Debug
-            RUNTIME DESTINATION Debug/
-        )
-        install(FILES $<TARGET_PDB_FILE:${tgt}>
-            CONFIGURATIONS Debug
-            DESTINATION Debug/
-        )
-        install($<TARGET_FILE:${tgt}>
-           CONFIGURATIONS Release
-           RUNTIME DESTINATION Release/
-        )
-    endif()
-endfunction()
+message(STATUS "STATIC_BUILD: ${STATIC_BUILD}")
 
 find_program(CCACHE_FOUND ccache)
 if (CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
     set(ENV{CCACHE_SLOPPINESS} pch_defines,time_macros)
-endif (CCACHE_FOUND)
+endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0 AND NOT PROJECT_PLATFORM_E2K)
@@ -144,7 +104,11 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     endif()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # XXX: Remove -fdelayed-template-parsing
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdelayed-template-parsing -Wno-unused-command-line-argument -Wno-inconsistent-missing-override")
+    add_compile_options(
+        -fdelayed-template-parsing
+        -Wno-unused-command-line-argument
+        -Wno-inconsistent-missing-override
+    )
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
@@ -163,44 +127,41 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
     endif()
 
     if (XRAY_CXX_LIB STREQUAL "libstdc++")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+        add_compile_options(-stdlib=libstdc++)
     elseif (XRAY_CXX_LIB STREQUAL "libc++")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+        add_compile_options(-stdlib=libc++)
         if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lcxxrt")
+            add_compile_options(-lcxxrt)
         else()
-            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+            add_compile_options(-lc++abi)
         endif()
     endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
+add_compile_options(-Wno-attributes)
 if (APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-undefined,error")
+    add_compile_options(-Wl,-undefined,error)
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-undefined")
+    add_compile_options(-Wl,--no-undefined)
 endif()
 
+# TODO test
 option(USE_ADDRESS_SANITIZER "Use AddressSanitizer" OFF)
+
 if (USE_ADDRESS_SANITIZER)
-    set(SANITIZE_FLAGS
-        "-fsanitize=address"
-        "-fsanitize=leak"
-        "-fno-omit-frame-pointer"
-        "-fno-optimize-sibling-calls"
-        "-fsanitize=undefined"
-        "-fno-sanitize=vptr"
+    add_compile_options(
+        -fsanitize=address
+        -fsanitize=leak
+        -fsanitize=undefined
+        -fno-omit-frame-pointer
+        -fno-optimize-sibling-calls
+        -fno-sanitize=vptr
     )
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        list(APPEND SANITIZE_FLAGS "-g")
-    endif()
-
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        add_link_options("-shared-libasan")
-    endif()
+    add_link_options(
+        $<$<CXX_COMPILER_ID:Clang>:-shared-libasan>
+    )
 endif()
-string(REPLACE ";" " " SANITIZE_FLAGS "${SANITIZE_FLAGS}")
 
 message(STATUS "USE_ADDRESS_SANITIZER: ${USE_ADDRESS_SANITIZER}")
 
@@ -212,7 +173,7 @@ if (USE_LTO)
     if (LTO_SUPPORTED)
         # With clang cmake only enables '-flto=thin' but we want full LTO
         if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-            set(LTO_FLAGS "-flto=full")
+            add_compile_options(-flto=full)
         else()
             set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
         endif()
@@ -221,35 +182,31 @@ endif()
 
 message(STATUS "USE_LTO: ${USE_LTO}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZE_FLAGS} ${LTO_FLAGS}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SANITIZE_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SANITIZE_FLAGS} ${LTO_FLAGS}")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SANITIZE_FLAGS} ${LTO_FLAGS}")
-
-set(LUA_LIBRARIES xrLuajit)
-
 if (PROJECT_PLATFORM_ARM)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon")
+    add_compile_options(-mfpu=neon)
 elseif (PROJECT_PLATFORM_ARM64)
-    set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+    #add_compile_options()
 elseif (PROJECT_PLATFORM_E2K)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-pragmas")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
+    add_compile_options(-Wno-unknown-pragmas)
 elseif (PROJECT_PLATFORM_PPC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_WARN_X86_INTRINSICS")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maltivec -mabi=altivec -DNO_WARN_X86_INTRINSICS")
+    add_compile_options(
+        -maltivec
+        -mabi=altivec
+    )
+    add_compile_definitions(NO_WARN_X86_INTRINSICS)
 else()
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpmath=sse -msse3")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpmath=sse -msse3")
+    add_compile_options(
+        -mfpmath=sse
+        -msse3
+    )
 endif()
 
 option(XRAY_USE_DEFAULT_LINKER "Don't select linker, use system default." OFF)
 
-if (NOT XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER AND NOT APPLE) # XXX: check if we can remove check for Apple
+if (NOT XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER AND NOT APPLE) # XXX: check if we can remove this check for Apple
     include(CheckCXXCompilerFlag)
-    CHECK_CXX_COMPILER_FLAG("-fuse-ld=gold" GOLD_LINKER_AVAILABLE)
-    CHECK_CXX_COMPILER_FLAG("-fuse-ld=lld" LLD_LINKER_AVAILABLE)
+    check_cxx_compiler_flag("-fuse-ld=gold" GOLD_LINKER_AVAILABLE)
+    check_cxx_compiler_flag("-fuse-ld=lld" LLD_LINKER_AVAILABLE)
 
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND LLD_LINKER_AVAILABLE)
         set(XRAY_LINKER "lld" CACHE STRING "" FORCE)
@@ -259,30 +216,21 @@ if (NOT XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER AND NOT APPLE) # XXX: check 
 endif()
 
 if (XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=${XRAY_LINKER}")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=${XRAY_LINKER}")
+    add_link_options(-fuse-ld=${XRAY_LINKER})
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(-DDEBUG -DMIXED)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og")
-    set(LUA_LIBRARIES xrLuajit-debug)
+    add_compile_definitions(
+        DEBUG
+        MIXED
+    )
+    add_compile_options(-Og)
 endif()
 
-set(LUA_FOUND true)
-
-message("CMake build ${CMAKE_BUILD_TYPE}, CFLAGS=${CMAKE_C_FLAGS}, CXXFLAGS=${CMAKE_CXX_FLAGS}")
-
-add_definitions(-D_MT -D_CPPUNWIND -DPURE_DYNAMIC_CAST -DDECLARE_SPECIALIZATION -DM_NOSTDCONTAINERS_EXT)
-add_definitions(-DLUABIND_DYNAMIC_LINK) #self-explanatory
-add_definitions(-DdSINGLE) # for ODE and xrPhysics
-if (MASTER_GOLD)
-    add_definitions(-DLUABIND_NO_EXCEPTIONS)
-    add_definitions(-DLUABIND_NO_ERROR_CHECKING)
-    add_definitions(-DdNODEBUG)
-endif()
-
-set(LUA_INCLUDE_DIR Externals/LuaJIT/src)
+add_compile_definitions(
+    _MT
+    _CPPUNWIND
+)
 
 if (NOT WIN32)
     find_package(SDL2 REQUIRED)
@@ -308,75 +256,38 @@ else()
 endif()
 set_property(CACHE MEMORY_ALLOCATOR PROPERTY STRINGS "mimalloc" "standard")
 
-if (MEMORY_ALLOCATOR STREQUAL "mimalloc")
-    add_definitions(-DUSE_MIMALLOC)
-    if (NOT mimalloc_FOUND)
-        message(FATAL_ERROR "mimalloc allocator requested but not found. Please, install mimalloc package or select standard allocator.")
-    endif()
-else()
-    add_definitions(-DUSE_PURE_ALLOC)
+if (MEMORY_ALLOCATOR STREQUAL "mimalloc" AND NOT mimalloc_FOUND)
+    message(FATAL_ERROR "mimalloc allocator requested but not found. Please, install mimalloc package or select standard allocator.")
 endif()
 
 message("Using ${MEMORY_ALLOCATOR} memory allocator")
 
-# XXX: move to LuaJIT
-include_directories(${LUA_INCLUDE_DIR})
-
-execute_process(COMMAND git rev-parse --verify HEAD
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    OUTPUT_VARIABLE GIT_SHA1
-    ERROR_QUIET
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-message("git commit: " ${GIT_SHA1})
-
-execute_process(COMMAND git rev-parse --abbrev-ref HEAD
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    OUTPUT_VARIABLE GIT_BRANCH
-    ERROR_QUIET
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-message("git branch: " ${GIT_BRANCH})
-
-include_directories(
-    ${CMAKE_SOURCE_DIR}/Externals
-    ${CMAKE_SOURCE_DIR}/Externals/luabind
-    ${CMAKE_SOURCE_DIR}/Externals/imgui
-)
+option(XRAY_USE_LUAJIT "Use LuaJIT" ON)
 
 add_subdirectory(Externals)
 
-set(CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS}"
-    "-Wall"
-    #"-Werror"
-    "-Wextra"
-    #"-pedantic"
-    "-Wno-unknown-pragmas"
-    "-Wno-strict-aliasing"
-    "-Wno-parentheses"
-    "-Wno-unused-label"
-    "-Wno-unused-parameter"
-    "-Wno-switch"
-    #"-Wno-padded"
-    #"-Wno-c++98-compat"
-    #"-Wno-c++98-compat-pedantic"
-    #"-Wno-c++11-compat"
-    #"-Wno-c++11-compat-pedantic"
-    #"-Wno-c++14-compat"
-    #"-Wno-c++14-compat-pedantic"
-    #"-Wno-newline-eof"
+add_compile_options(
+    -Wall
+    #-Werror
+    -Wextra
+    #-pedantic
+    -Wno-unknown-pragmas
+    -Wno-strict-aliasing
+    -Wno-parentheses
+    -Wno-unused-label
+    -Wno-unused-parameter
+    -Wno-switch
+    #-Wno-padded
+    #-Wno-c++98-compat
+    #-Wno-c++98-compat-pedantic
+    #-Wno-c++11-compat
+    #-Wno-c++11-compat-pedantic
+    #-Wno-c++14-compat
+    #-Wno-c++14-compat-pedantic
+    #-Wno-newline-eof
+    $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
+    $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
 )
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS}"
-        "-Wno-class-memaccess"
-        "-Wno-interference-size"
-    )
-endif()
-string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(src)
 add_subdirectory(res)

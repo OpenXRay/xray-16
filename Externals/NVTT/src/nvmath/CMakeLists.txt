@@ -1,54 +1,46 @@
-PROJECT(nvmath)
-
-set(NVMATH_SHARED OFF)
-
-set(SRC_FILES
-    "nvmath.h"
-    "Vector.h"
-    "Matrix.h"
-    "Quaternion.h"
-    "Box.h"
-    "Color.h"
-    "Montecarlo.h"
-    "Montecarlo.cpp"
-    "Random.h"
-    "Random.cpp"
-    "SphericalHarmonic.h"
-    "SphericalHarmonic.cpp"
-    "Basis.h"
-    "Basis.cpp"
-    "Triangle.h"
-    "Triangle.cpp"
-    "TriBox.cpp"
-)
-
-group_sources(SRC_FILES)
+option(NVMATH_SHARED "Build nvmath as shared library" OFF)
 
 if (NVMATH_SHARED)
-    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+    add_library(nvmath SHARED)
+
+    target_compile_definitions(nvmath
+        PRIVATE
+        NVCORE_SHARED
+    )
 else()
-    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+    add_library(nvmath STATIC)
 endif()
 
-target_include_directories(${PROJECT_NAME}
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/Externals/NVTT/src
-    ${CMAKE_SOURCE_DIR}/Externals/NVTT/include
+target_sources(nvmath PRIVATE
+    nvmath.h
+    Vector.h
+    Matrix.h
+    Quaternion.h
+    Box.h
+    Color.h
+    Montecarlo.h
+    Montecarlo.cpp
+    Random.h
+    Random.cpp
+    SphericalHarmonic.h
+    SphericalHarmonic.cpp
+    Basis.h
+    Basis.cpp
+    Triangle.h
+    Triangle.cpp
+    TriBox.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE
+target_link_libraries(nvmath
+    PUBLIC
     nvcore
 )
 
-target_compile_definitions(${PROJECT_NAME}
+target_compile_definitions(nvmath
     PRIVATE
-    -DNVCORE_EXPORTS
-    $<$<BOOL:${NVMATH_SHARED}>:-DNVMATH_SHARED=1>
+    NVCORE_EXPORTS
 )
 
-install(TARGETS ${PROJECT_NAME} LIBRARY
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+install(TARGETS nvmath LIBRARY
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

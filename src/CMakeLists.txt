@@ -13,5 +13,3 @@ add_subdirectory(xrParticles)
 add_subdirectory(xrPhysics)
 add_subdirectory(xrScriptEngine)
 add_subdirectory(xrSound)
-
-#add_subdirectory(xrMicroBenchmark)

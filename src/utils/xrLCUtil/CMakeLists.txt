@@ -1,44 +1,40 @@
-project(xrLCUtil)
+add_library(xrLCUtil SHARED)
 
-set(SRC_FILES
-    #"ILevelCompilerLogger.hpp"
-    #"LevelCompilerLoggerWindow.hpp"
-    #"LevelCompilerLoggerWindow.cpp"
-    "pch.cpp"
-    "pch.cpp"
-    "resource.h"
-    "xrLCUtil.hpp"
-    "xrLCUtil.cpp"
-    "xrThread.hpp"
-    "xrThread.cpp"
+target_sources(xrLCUtil PRIVATE
+    #ILevelCompilerLogger.hpp
+    #LevelCompilerLoggerWindow.hpp
+    #LevelCompilerLoggerWindow.cpp
+    pch.cpp
+    pch.cpp
+    resource.h
+    xrLCUtil.hpp
+    xrLCUtil.cpp
+    xrThread.hpp
+    xrThread.cpp
 )
 
-group_sources(SRC_FILES)
-
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
-
-target_include_directories(${PROJECT_NAME}
+target_include_directories(xrLCUtil
     PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
+    "${CMAKE_SOURCE_DIR}/src"
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(xrLCUtil
     PRIVATE
     xrCore
 )
 
-target_compile_definitions(${PROJECT_NAME}
+target_compile_definitions(xrLCUtil
     PRIVATE
-    -DLEVEL_COMPILER
-    -DXRLCUTIL_EXPORTS
-    -D_USE_MATH_DEFINES
+    LEVEL_COMPILER
+    XRLCUTIL_EXPORTS
+    _USE_MATH_DEFINES
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(xrLCUtil PROPERTIES
     PREFIX ""
 )
 
-target_precompile_headers(${PROJECT_NAME}
+target_precompile_headers(xrLCUtil
     PRIVATE
-    "pch.hpp"
+    pch.hpp
 )
