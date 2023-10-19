@@ -14,7 +14,7 @@ IInputReceiver dummyController;
 
 ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
-ENGINE_API Flags32 psMouseInvert = {false};
+ENGINE_API Flags32 psMouseInvert = {};
 
 ENGINE_API float psControllerStickSens = 1.f;
 ENGINE_API float psControllerStickSensScale = 1.f;

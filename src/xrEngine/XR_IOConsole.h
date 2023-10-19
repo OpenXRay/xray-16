@@ -83,7 +83,7 @@ protected:
     CGameFont* pFont;
     CGameFont* pFont2;
 
-    FactoryPtr<IUIShader>* m_hShader_back;
+    FactoryPtr<IUIShader>* m_hShader_back{};
 
     POINT m_mouse_pos;
     bool m_disable_tips;
