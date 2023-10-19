@@ -24,17 +24,12 @@ void lanim_cont_xf::set_defaults()
     m_origSize.set(0, 0);
 }
 
-CUIStatic::CUIStatic(pcstr window_name)
-    : CUIWindow(window_name), m_pTextControl(nullptr),
-      m_bStretchTexture(false), m_bTextureEnable(true),
-      m_bHeading(false), m_bConstHeading(false),
-      m_fHeading(0.0f)
+CUIStatic::CUIStatic(pcstr window_name) : CUIWindow(window_name)
 {
+    m_pTextControl.SetTextAlignment(CGameFont::alLeft);
     m_TextureOffset.set(0.0f, 0.0f);
     m_lanim_xform.set_defaults();
 }
-
-CUIStatic::~CUIStatic() { xr_delete(m_pTextControl); }
 
 void CUIStatic::SetXformLightAnim(LPCSTR lanim, bool bCyclic)
 {
@@ -78,18 +73,15 @@ void CUIStatic::Draw()
 
 void CUIStatic::DrawText()
 {
-    if (m_pTextControl)
+    if (!fsimilar(m_pTextControl.m_wndSize.x, m_wndSize.x) || !fsimilar(m_pTextControl.m_wndSize.y, m_wndSize.y))
     {
-        if (!fsimilar(m_pTextControl->m_wndSize.x, m_wndSize.x) || !fsimilar(m_pTextControl->m_wndSize.y, m_wndSize.y))
-        {
-            m_pTextControl->m_wndSize = m_wndSize;
-            m_pTextControl->ParseText(true);
-        }
-
-        Fvector2 p;
-        GetAbsolutePos(p);
-        m_pTextControl->Draw(p.x, p.y);
+        m_pTextControl.m_wndSize = m_wndSize;
+        m_pTextControl.ParseText(true);
     }
+
+    Fvector2 p;
+    GetAbsolutePos(p);
+    m_pTextControl.Draw(p.x, p.y);
     if (g_statHint->Owner() == this)
         g_statHint->Draw_();
 }
@@ -212,14 +204,10 @@ void CUIStatic::Update()
 
 void CUIStatic::ResetXformAnimation() { m_lanim_xform.m_lanim_start_time = Device.dwTimeGlobal / 1000.0f; }
 void CUIStatic::SetShader(const ui_shader& sh) { m_UIStaticItem.SetShader(sh); }
+
 CUILines* CUIStatic::TextItemControl()
 {
-    if (!m_pTextControl)
-    {
-        m_pTextControl = xr_new<CUILines>();
-        m_pTextControl->SetTextAlignment(CGameFont::alLeft);
-    }
-    return m_pTextControl;
+    return &m_pTextControl;
 }
 
 void CUIStatic::AdjustHeightToText()
@@ -234,9 +222,7 @@ void CUIStatic::AdjustHeightToText()
 
 void CUIStatic::AdjustWidthToText()
 {
-    if (!m_pTextControl)
-        return;
-    float _len = m_pTextControl->GetFont()->SizeOf_(m_pTextControl->GetText());
+    float _len = m_pTextControl.GetFont()->SizeOf_(m_pTextControl.GetText());
     UI().ClientToScreenScaledWidth(_len);
     SetWidth(_len);
 }

@@ -224,7 +224,7 @@ void CUIScrollView::Draw()
         std::advance(it, m_visible_rgn.x);
         for (int idx = m_visible_rgn.x; idx <= m_visible_rgn.y; ++it, ++idx)
         {
-            CUIScrollView* sw = smart_cast<CUIScrollView*>(*it);
+            [[maybe_unused]] auto sw = smart_cast<CUIScrollView*>(*it);
             VERIFY(sw == NULL);
 
             if ((*it)->GetVisible())

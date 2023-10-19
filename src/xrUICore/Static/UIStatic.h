@@ -34,13 +34,13 @@ private:
 
 public:
     CUIStatic(pcstr window_name);
-    ~CUIStatic() override;
+    ~CUIStatic() override = default;
 
     virtual void Draw();
     virtual void Update();
     virtual void OnFocusLost();
 
-    virtual pcstr GetText() { return TextItemControl()->GetText(); }
+    virtual pcstr GetText() const { return const_cast<CUIStatic*>(this)->TextItemControl()->GetText(); }
     virtual void SetText(pcstr txt) { TextItemControl()->SetText(txt); }
     virtual void SetTextST(pcstr txt) { TextItemControl()->SetTextST(txt); }
 
@@ -126,15 +126,15 @@ public:
     void FillDebugInfo() override;
 
 protected:
-    CUILines* m_pTextControl;
+    CUILines m_pTextControl;
 
-    bool m_bStretchTexture;
-    bool m_bTextureEnable;
+    bool m_bStretchTexture{};
+    bool m_bTextureEnable{ true };
     CUIStaticItem m_UIStaticItem;
 
-    bool m_bHeading;
-    bool m_bConstHeading;
-    float m_fHeading;
+    bool m_bHeading{};
+    bool m_bConstHeading{};
+    float m_fHeading{};
 
     Fvector2 m_TextureOffset;
 

@@ -67,8 +67,7 @@ void CUIAnimatedStatic::Update()
 
 void CUIAnimatedStatic::SetFrame(const u32 frameNum)
 {
-    // static u32 currRow = 0xffffffff, currCol = 0xffffffff;
-    int currRow = frameNum / m_uAnimCols;
+    int currRow = frameNum / m_uAnimRows;
     int currCol = frameNum % m_uAnimCols;
     Frect texture_rect;
 
