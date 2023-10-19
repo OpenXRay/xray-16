@@ -57,6 +57,9 @@ CInput::CInput(const bool exclusive)
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH);
 
+    if (strstr(Core.Params, "-no_gamepad"))
+        return;
+
     if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
     {
         for (int i = 0; i < SDL_NumJoysticks(); ++i)
