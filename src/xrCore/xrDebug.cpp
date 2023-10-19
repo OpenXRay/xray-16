@@ -27,7 +27,6 @@ static BOOL bException = FALSE;
 #include <csignal>
 
 #if defined(XR_PLATFORM_WINDOWS)
-#   include <SDL_syswm.h>
 #   include <direct.h>
 #   include <new.h> // for _set_new_mode
 #   include <errorrep.h> // ReportFault
@@ -89,22 +88,8 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
 {
 #ifdef XR_PLATFORM_WINDOWS // because Windows default Message box is fancy
     HWND hwnd = nullptr;
-
     if (windowHandler)
-    {
-        SDL_SysWMinfo info;
-        SDL_VERSION(&info.version);
-        if (SDL_GetWindowWMInfo(windowHandler->GetApplicationWindow(), &info))
-        {
-            switch (info.subsystem)
-            {
-            case SDL_SYSWM_WINDOWS:
-                hwnd = info.info.win.window;
-                break;
-            default: break;
-            }
-        }
-    }
+        hwnd = static_cast<HWND>(windowHandler->GetApplicationWindowHandle());
 
     if (simpleMode)
     {

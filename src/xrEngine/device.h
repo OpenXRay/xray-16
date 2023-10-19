@@ -238,6 +238,7 @@ public:
     void SetWindowDraggable(bool draggable);
     bool IsWindowDraggable() const { return m_allowWindowDrag; }
 
+    void* GetApplicationWindowHandle() const override;
     SDL_Window* GetApplicationWindow() override;
     void OnErrorDialog(bool beforeDialog) override;
     void OnFatalError() override;

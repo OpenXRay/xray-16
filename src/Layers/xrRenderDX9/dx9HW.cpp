@@ -2,6 +2,8 @@
 
 #include "dx9HW.h"
 
+#include <SDL_syswm.h>
+
 CHW HW;
 
 CHW::CHW()
@@ -63,7 +65,7 @@ void CHW::DestroyD3D()
     hD3D = nullptr;
 }
 
-void CHW::CreateDevice(SDL_Window* m_sdlWnd)
+void CHW::CreateDevice(SDL_Window* sdlWnd)
 {
     CreateD3D();
 
@@ -162,23 +164,18 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
     // Windoze
     P.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
+    P.Windowed = bWindowed;
 
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
-    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
-    {
-        switch (info.subsystem)
-        {
-        case SDL_SYSWM_WINDOWS:
-            P.hDeviceWindow = info.info.win.window;
-            break;
-        default: break;
-        }
-    }
+    if (SDL_GetWindowWMInfo(sdlWnd, &info))
+        P.hDeviceWindow = info.info.win.window;
     else
-        Log("! Couldn't get window information: ", SDL_GetError());
-
-    P.Windowed = bWindowed;
+    {
+        cpcstr error = SDL_GetError();
+        Log("! Couldn't get window information: ", error);
+        FATAL(error);
+    }
 
     // Depth/stencil
     P.EnableAutoDepthStencil = TRUE;

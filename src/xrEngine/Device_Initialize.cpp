@@ -7,6 +7,7 @@
 #include "xrCore/ModuleLookup.hpp"
 
 #include <SDL.h>
+#include <SDL_syswm.h>
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
 
@@ -110,4 +111,15 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, 
         return SDL_HITTEST_RESIZE_LEFT;
 
     return SDL_HITTEST_DRAGGABLE;
+}
+
+void* CRenderDevice::GetApplicationWindowHandle() const
+{
+#if defined(XR_PLATFORM_WINDOWS)
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
+        return info.info.win.window;
+#endif
+    return nullptr;
 }

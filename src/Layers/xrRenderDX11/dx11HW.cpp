@@ -5,6 +5,8 @@
 #include "StateManager/dx11SamplerStateCache.h"
 #include "dx11TextureUtils.h"
 
+#include <SDL_syswm.h>
+
 CHW HW;
 
 CHW::CHW()

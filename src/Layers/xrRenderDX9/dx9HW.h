@@ -6,7 +6,6 @@
 #include "Layers/xrRender/stats_manager.h"
 
 #include <SDL.h>
-#include <SDL_syswm.h>
 
 class CHW
     : public pureAppActivate,
