@@ -94,9 +94,7 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
         break;
     }
     default:
-    {
         break;
-    }
     };
     return true;
 }

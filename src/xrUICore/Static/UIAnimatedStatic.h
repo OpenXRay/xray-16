@@ -4,7 +4,8 @@
 class XRUICORE_API CUIAnimatedStatic final : public CUIStatic
 {
     typedef CUIStatic inherited;
-    // Количекство кадров анимации
+
+    // Количество кадров анимации
     u32 m_uFrameCount{};
     // Текущий фрейм
     u32 m_uCurFrame{ 0xFFFFFFFF };
@@ -23,7 +24,7 @@ class XRUICORE_API CUIAnimatedStatic final : public CUIStatic
     // Признак проигрывания анимации
     bool m_bPlaying{};
 
-    Fvector2 m_pos;
+    Fvector2 m_pos{};
 
     u32 m_prevTime{};
 
@@ -70,6 +71,7 @@ public:
         m_uTimeElapsed = delta;
     }
     void SetAnimPos(float pos);
+
     // Флаг-признак циклического проигрывания
     bool m_bCyclic{ true };
 
