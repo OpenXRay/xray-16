@@ -249,17 +249,13 @@ void CMainMenu::Activate(bool bActivate)
 
         Device.seqRender.Remove(this);
 
-        bool b = !!Console->bVisible;
-        if (b)
-        {
+        const bool show = Console->bVisible;
+        if (show)
             Console->Hide();
-        }
 
         IR_Release();
-        if (b)
-        {
+        if (show)
             Console->Show();
-        }
 
         if (m_startDialog->IsShown())
             m_startDialog->HideDialog();

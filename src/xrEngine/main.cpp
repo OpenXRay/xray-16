@@ -301,10 +301,10 @@ ENGINE_API void Startup()
     TaskScheduler->Wait(createApplication);
     TaskScheduler->Wait(createSpatialSpace);
 
-    Console->Show();
-
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
     R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
+    if (!g_pGamePersistent)
+        Console->Show();
 
     // Main cycle
     Device.Run();
