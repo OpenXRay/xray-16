@@ -34,7 +34,7 @@ private:
 
 public:
     CUIStatic(pcstr window_name);
-    ~CUIStatic() override = default;
+    ~CUIStatic() override;
 
     virtual void Draw();
     virtual void Update();
@@ -126,7 +126,7 @@ public:
     void FillDebugInfo() override;
 
 protected:
-    CUILines m_pTextControl;
+    CUILines* m_pTextControl{};
 
     bool m_bStretchTexture{};
     bool m_bTextureEnable{ true };

@@ -26,10 +26,11 @@ void lanim_cont_xf::set_defaults()
 
 CUIStatic::CUIStatic(pcstr window_name) : CUIWindow(window_name)
 {
-    m_pTextControl.SetTextAlignment(CGameFont::alLeft);
     m_TextureOffset.set(0.0f, 0.0f);
     m_lanim_xform.set_defaults();
 }
+
+CUIStatic::~CUIStatic() { xr_delete(m_pTextControl); }
 
 void CUIStatic::SetXformLightAnim(LPCSTR lanim, bool bCyclic)
 {
@@ -73,15 +74,18 @@ void CUIStatic::Draw()
 
 void CUIStatic::DrawText()
 {
-    if (!fsimilar(m_pTextControl.m_wndSize.x, m_wndSize.x) || !fsimilar(m_pTextControl.m_wndSize.y, m_wndSize.y))
+    if (m_pTextControl)
     {
-        m_pTextControl.m_wndSize = m_wndSize;
-        m_pTextControl.ParseText(true);
-    }
+        if (!fsimilar(m_pTextControl->m_wndSize.x, m_wndSize.x) || !fsimilar(m_pTextControl->m_wndSize.y, m_wndSize.y))
+        {
+            m_pTextControl->m_wndSize = m_wndSize;
+            m_pTextControl->ParseText(true);
+        }
 
-    Fvector2 p;
-    GetAbsolutePos(p);
-    m_pTextControl.Draw(p.x, p.y);
+        Fvector2 p;
+        GetAbsolutePos(p);
+        m_pTextControl->Draw(p.x, p.y);
+    }
     if (g_statHint->Owner() == this)
         g_statHint->Draw_();
 }
@@ -207,7 +211,12 @@ void CUIStatic::SetShader(const ui_shader& sh) { m_UIStaticItem.SetShader(sh); }
 
 CUILines* CUIStatic::TextItemControl()
 {
-    return &m_pTextControl;
+    if (!m_pTextControl)
+    {
+        m_pTextControl = xr_new<CUILines>();
+        m_pTextControl->SetTextAlignment(CGameFont::alLeft);
+    }
+    return m_pTextControl;
 }
 
 void CUIStatic::AdjustHeightToText()
@@ -222,7 +231,9 @@ void CUIStatic::AdjustHeightToText()
 
 void CUIStatic::AdjustWidthToText()
 {
-    float _len = m_pTextControl.GetFont()->SizeOf_(m_pTextControl.GetText());
+    if (!m_pTextControl)
+        return;
+    float _len = m_pTextControl->GetFont()->SizeOf_(m_pTextControl->GetText());
     UI().ClientToScreenScaledWidth(_len);
     SetWidth(_len);
 }
