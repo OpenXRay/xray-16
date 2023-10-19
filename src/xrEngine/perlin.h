@@ -13,8 +13,8 @@ protected:
 
 protected:
     int mOctaves{ 2 };
-    float mFrequency{ 1 };
-    float mAmplitude{ 1 };
+    float mFrequency{ 1.0f };
+    float mAmplitude{ 1.0f };
     xr_vector<float> mTimes;
 
 public:

@@ -396,7 +396,7 @@ void CRenderDevice::message_loop()
                     Engine.Event.Defer("KERNEL:disconnect");
                     Engine.Event.Defer("KERNEL:quit");
                     break;
-                }
+                } // switch (event.window.event)
             }
             } // switch (event.type)
         } // for (int i = 0; i < count; ++i)
