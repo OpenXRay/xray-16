@@ -232,6 +232,7 @@
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp" />
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp" />
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />

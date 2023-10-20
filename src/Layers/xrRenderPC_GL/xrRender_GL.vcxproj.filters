@@ -696,6 +696,9 @@
     <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderGL\glr_screenshot.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

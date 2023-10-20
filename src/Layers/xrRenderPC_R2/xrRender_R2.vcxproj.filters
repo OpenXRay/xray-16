@@ -1151,6 +1151,9 @@
     <ClCompile Include="..\xrRenderDX9\dx9DetailManager_VS.cpp">
       <Filter>Details</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9r_screenshot.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

@@ -41,6 +41,7 @@
     <ClCompile Include="..\xrRenderGL\glResourceManager_Resources.cpp" />
     <ClCompile Include="..\xrRenderGL\glResourceManager_Scripting.cpp" />
     <ClCompile Include="..\xrRenderGL\glr_constants.cpp" />
+    <ClCompile Include="..\xrRenderGL\glr_screenshot.cpp" />
     <ClCompile Include="..\xrRenderGL\glTexture.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />

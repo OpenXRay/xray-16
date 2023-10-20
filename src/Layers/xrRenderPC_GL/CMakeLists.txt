@@ -346,6 +346,7 @@ set(SRC_FILES
     "../xrRenderGL/glR_Backend_Runtime.h"
     "../xrRenderGL/glr_constants.cpp"
     "../xrRenderGL/glr_constants_cache.h"
+    "../xrRenderGL/glr_screenshot.cpp"
     "../xrRenderGL/glResourceManager_Resources.cpp"
     "../xrRenderGL/glResourceManager_Scripting.cpp"
     "../xrRenderGL/glSH_RT.cpp"
