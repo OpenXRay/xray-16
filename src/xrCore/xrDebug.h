@@ -54,7 +54,7 @@ class XR_NOVTABLE IWindowHandler
 {
 public:
     virtual ~IWindowHandler() = 0;
-    virtual void* GetApplicationWindowHandle() const;
+    virtual void* GetApplicationWindowHandle() const = 0;
     virtual SDL_Window* GetApplicationWindow() = 0;
     virtual void OnErrorDialog(bool beforeDialog) = 0;
     virtual void OnFatalError() = 0;
