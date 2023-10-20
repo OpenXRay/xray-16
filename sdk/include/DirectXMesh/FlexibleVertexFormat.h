@@ -11,7 +11,9 @@
 
 #pragma once
 
+#if __has_include(<d3d9.h>)
 #include <d3d9.h>
+#endif
 
 #include <cstdint>
 #include <iterator>
