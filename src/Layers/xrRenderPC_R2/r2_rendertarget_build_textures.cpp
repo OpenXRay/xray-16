@@ -40,10 +40,10 @@ void CRenderTarget::build_textures()
         ID3DTexture3D* temp_material_surf;
         ID3DTexture3D* t_material_surf;
 
-        R_CHK(D3DXCreateVolumeTexture(HW.pDevice, TEX_material_LdotN, TEX_material_LdotH, 4, 1, 0, D3DFMT_A8L8,
-            D3DPOOL_SYSTEMMEM, &temp_material_surf));
-        R_CHK(D3DXCreateVolumeTexture(HW.pDevice, TEX_material_LdotN, TEX_material_LdotH, 4, 1, 0, D3DFMT_A8L8,
-            D3DPOOL_DEFAULT, &t_material_surf));
+        R_CHK(HW.pDevice->CreateVolumeTexture(TEX_material_LdotN, TEX_material_LdotH, 4, 1, 0, D3DFMT_A8L8,
+            D3DPOOL_SYSTEMMEM, &temp_material_surf, nullptr));
+        R_CHK(HW.pDevice->CreateVolumeTexture(TEX_material_LdotN, TEX_material_LdotH, 4, 1, 0, D3DFMT_A8L8,
+            D3DPOOL_DEFAULT, &t_material_surf, nullptr));
 
         // Fill it (addr: x=dot(L,N),y=dot(L,H))
         D3DLOCKED_BOX R;
@@ -126,10 +126,10 @@ void CRenderTarget::build_textures()
             xr_sprintf(name, "%s%d", r2_jitter, it1);
             t_noise[it1] = RImplementation.Resources->_CreateTexture(name);
 
-            R_CHK(D3DXCreateTexture(
-                HW.pDevice, TEX_jitter, TEX_jitter, 1, 0, D3DFMT_Q8W8V8U8, D3DPOOL_SYSTEMMEM, &temp_noise_surf[it1]));
-            R_CHK(D3DXCreateTexture(
-                HW.pDevice, TEX_jitter, TEX_jitter, 1, 0, D3DFMT_Q8W8V8U8, D3DPOOL_DEFAULT, &t_noise_surf[it1]));
+            R_CHK(HW.pDevice->CreateTexture(TEX_jitter, TEX_jitter, 1, 0,
+                D3DFMT_Q8W8V8U8, D3DPOOL_SYSTEMMEM, &temp_noise_surf[it1], nullptr));
+            R_CHK(HW.pDevice->CreateTexture(TEX_jitter, TEX_jitter, 1, 0,
+                D3DFMT_Q8W8V8U8, D3DPOOL_DEFAULT, &t_noise_surf[it1], nullptr));
 
             R_CHK(temp_noise_surf[it1]->LockRect(0, &R[it1], nullptr, 0));
         }
@@ -163,10 +163,10 @@ void CRenderTarget::build_textures()
         // generate HBAO jitter texture (last)
         int it = TEX_jitter_count - 1;
 
-        R_CHK(D3DXCreateTexture(
-            HW.pDevice, TEX_jitter, TEX_jitter, 1, 0, D3DFMT_A32B32G32R32F, D3DPOOL_SYSTEMMEM, &temp_noise_surf[it]));
-        R_CHK(D3DXCreateTexture(
-            HW.pDevice, TEX_jitter, TEX_jitter, 1, 0, D3DFMT_A32B32G32R32F, D3DPOOL_DEFAULT, &t_noise_surf[it]));
+        R_CHK(HW.pDevice->CreateTexture(TEX_jitter, TEX_jitter, 1, 0,
+            D3DFMT_A32B32G32R32F, D3DPOOL_SYSTEMMEM, &temp_noise_surf[it], nullptr));
+        R_CHK(HW.pDevice->CreateTexture(TEX_jitter, TEX_jitter, 1, 0,
+            D3DFMT_A32B32G32R32F, D3DPOOL_DEFAULT, &t_noise_surf[it], nullptr));
 
         R_CHK(temp_noise_surf[it]->LockRect(0, &R[it], 0, 0));
 
