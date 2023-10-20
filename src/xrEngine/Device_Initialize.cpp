@@ -7,7 +7,9 @@
 #include "xrCore/ModuleLookup.hpp"
 
 #include <SDL.h>
-#include <SDL_syswm.h>
+#ifdef XR_PLATFORM_WINDOWS
+#   include <SDL_syswm.h>
+#endif
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
 
