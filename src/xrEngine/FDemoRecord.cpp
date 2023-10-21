@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "IGame_Level.h"
+#include "IGame_Persistent.h"
 
 #include "GameFont.h"
 #include "FDemoRecord.h"
@@ -283,6 +284,12 @@ void CDemoRecord::MakeLevelMapProcess()
             psDeviceMode.WindowStyle = s_window_mode;
             if (bDevReset)
                 Device.Reset();
+
+            if (!m_CurrentWeatherCycle.empty())
+            {
+                g_pGamePersistent->Environment().SetWeather(m_CurrentWeatherCycle, true);
+                m_CurrentWeatherCycle = nullptr;
+            }
 
             m_bMakeLevelMap = false;
             m_iLMScreenshotFragment = -1;
@@ -845,7 +852,9 @@ void CDemoRecord::MakeScreenshot()
 
 void CDemoRecord::MakeLevelMapScreenshot(bool bHQ)
 {
-    Console->Execute("run_string level.set_weather(\"map\",true)");
+    auto& env = g_pGamePersistent->Environment();
+    m_CurrentWeatherCycle = env.CurrentCycleName;
+    env.SetWeather("map", true);
 
     if (!bHQ)
         m_iLMScreenshotFragment = -1;
