@@ -170,7 +170,6 @@ public:
         SM_FOR_CUBEMAP = 1, // tga, name used as postfix
         SM_FOR_GAMESAVE = 2, // dds/dxt1,name used as full-path
         SM_FOR_LEVELMAP = 3, // tga, name used as postfix (level_name)
-        SM_FOR_MPSENDING = 4,
     };
 
     enum RenderContext
@@ -362,8 +361,7 @@ public:
     virtual void BeforeWorldRender() = 0; //--#SM+#-- Перед рендерингом мира
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
 
-    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = 0) = 0;
-    virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) = 0;
+    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) = 0;
     virtual void ScreenshotAsyncBegin() = 0;
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
 
@@ -374,9 +372,6 @@ public:
 
     // Constructor/destructor
     virtual ~IRender() {}
-
-protected:
-    virtual void ScreenshotImpl(ScreenshotMode mode, pcstr name, CMemoryWriter* memory_writer) = 0;
 
 public:
     //	Gamma correction functions

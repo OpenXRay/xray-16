@@ -10,12 +10,9 @@
 
 #define GAMESAVE_SIZE 128
 
-#define SM_FOR_SEND_WIDTH 640
-#define SM_FOR_SEND_HEIGHT 480
-
 using namespace XRay::Media;
 
-void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
+void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nullptr*/)
 {
     ID3DResource* pSrcTexture;
     Target->get_base_rt()->GetResource(&pSrcTexture);
@@ -61,38 +58,6 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
             goto _end_;
 
         if (IWriter* fs = FS.w_open(name))
-        {
-            fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
-            FS.w_close(fs);
-        }
-        break;
-    }
-    case IRender::SM_FOR_MPSENDING:
-    {
-        // resize
-        DirectX::ScratchImage resized;
-        auto hr = Resize(*image.GetImage(0, 0, 0), SM_FOR_SEND_WIDTH, SM_FOR_SEND_HEIGHT,
-            DirectX::TEX_FILTER_DEFAULT, resized);
-        if (FAILED(hr))
-            goto _end_;
-
-        // convert
-        DirectX::ScratchImage converted;
-        hr = Convert(*resized.GetImage(0, 0, 0), DXGI_FORMAT_R8G8B8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, 0.0f, converted);
-        if (FAILED(hr))
-            goto _end_;
-
-        // save (logical & physical)
-        DirectX::Blob saved;
-        hr = SaveToDDSMemory(*converted.GetImage(0, 0, 0), DirectX::DDS_FLAGS_FORCE_DX9_LEGACY, saved);
-        if (FAILED(hr))
-            goto _end_;
-
-        if (memory_writer)
-        {
-            memory_writer->w(saved.GetBufferPointer(), saved.GetBufferSize());
-        }
-        else if (IWriter* fs = FS.w_open(name))
         {
             fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
             FS.w_close(fs);

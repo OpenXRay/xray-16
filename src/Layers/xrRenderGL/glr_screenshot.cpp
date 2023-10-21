@@ -11,10 +11,8 @@ using namespace XRay::Media;
 #define SM_FOR_SEND_HEIGHT 480
 
 // XXX: Provide full implementation
-void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
+void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nullptr*/)
 {
-    UNUSED(memory_writer);
-
     switch (mode)
     {
     case SM_NORMAL:

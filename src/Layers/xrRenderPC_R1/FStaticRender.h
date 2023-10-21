@@ -178,8 +178,7 @@ public:
     void Render() override;
     void RenderMenu() override;
 
-    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;
-    virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) override;
+    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) override;
     virtual void ScreenshotAsyncBegin() override;
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override;
     virtual void OnFrame() override;
@@ -195,9 +194,6 @@ public:
     // Constructor/destructor/loader
     CRender();
     virtual ~CRender();
-
-protected:
-    virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
 };
 
 extern CRender RImplementation;

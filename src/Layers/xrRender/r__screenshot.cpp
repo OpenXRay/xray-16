@@ -28,17 +28,6 @@ IC void MouseRayFromPoint(Fvector& direction, int x, int y, Fmatrix& m_CamMat)
     direction.normalize();
 }
 
-void CRender::Screenshot(ScreenshotMode mode, LPCSTR name) { ScreenshotImpl(mode, name, nullptr); }
-void CRender::Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer)
-{
-    if (mode != SM_FOR_MPSENDING)
-    {
-        Log("~ Not implemented screenshot mode...");
-        return;
-    }
-    ScreenshotImpl(mode, nullptr, &memory_writer);
-}
-
 void CRender::ScreenshotAsyncBegin()
 {
     VERIFY(!m_bMakeAsyncSS);
