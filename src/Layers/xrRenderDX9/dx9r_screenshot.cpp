@@ -1,22 +1,31 @@
 #include "stdafx.h"
+
 //#include "xr_effgamma.h"
+
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
 
-using namespace XRay::Media;
+#include <DirectXPackedVector.h>
+#include <DirectXTex.h>
+#include <wincodec.h>
 
 #define GAMESAVE_SIZE 128
 
 #define SM_FOR_SEND_WIDTH 640
 #define SM_FOR_SEND_HEIGHT 480
 
+using namespace XRay::Media;
+
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
     if (!Device.b_is_Ready)
         return;
+
     // Create temp-surface
+    DirectX::ScratchImage image;
     u32* pPixel = nullptr;
     u32* pEnd = nullptr;
+    u32* pDst = nullptr;
     IDirect3DSurface9* pFB;
     D3DLOCKED_RECT D;
     HRESULT hr;
@@ -30,7 +39,11 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
     if (FAILED(hr))
         goto _end_;
+    hr = image.Initialize2D(DXGI_FORMAT_B8G8R8A8_UNORM, Device.dwWidth, Device.dwHeight, 1, 1);
+    if (FAILED(hr))
+        goto _end_;
     // Image processing (gamma-correct)
+    pDst = (u32*)image.GetPixels();
     pPixel = (u32*)D.pBits;
     pEnd = pPixel + (Device.dwWidth * Device.dwHeight);
     //	IGOR: Remove inverse color correction and kill alpha
@@ -53,10 +66,10 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     */
 
     // Kill alpha
-    for (; pPixel != pEnd; pPixel++)
+    for (; pPixel != pEnd; pPixel++, pDst++)
     {
         u32 p = *pPixel;
-        *pPixel = color_xrgb(color_get_R(p), color_get_G(p), color_get_B(p));
+        *pDst = color_xrgb(color_get_R(p), color_get_G(p), color_get_B(p));
     }
 
     hr = pFB->UnlockRect();
@@ -68,147 +81,126 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     {
     case IRender::SM_FOR_GAMESAVE:
     {
-        // texture
-        ID3DTexture2D* texture = nullptr;
-        hr = D3DXCreateTexture(HW.pDevice, GAMESAVE_SIZE, GAMESAVE_SIZE, 1, 0, D3DFMT_DXT1, D3DPOOL_SCRATCH, &texture);
-        if (hr != D3D_OK)
-            goto _end_;
-        if (nullptr == texture)
+        // resize
+        DirectX::ScratchImage resized;
+        hr = Resize(*image.GetImage(0, 0, 0), GAMESAVE_SIZE, GAMESAVE_SIZE,
+            DirectX::TEX_FILTER_BOX, resized);
+        if (FAILED(hr))
             goto _end_;
 
-        // resize&convert to surface
-        IDirect3DSurface9* surface = nullptr;
-        hr = texture->GetSurfaceLevel(0, &surface);
-        if (hr != D3D_OK)
-            goto _end_;
-        VERIFY(surface);
-        hr = D3DXLoadSurfaceFromSurface(surface, nullptr, nullptr, pFB, nullptr, nullptr, D3DX_DEFAULT, 0);
-        _RELEASE(surface);
-        if (hr != D3D_OK)
+        // compress
+        DirectX::ScratchImage compressed;
+        hr = Compress(*resized.GetImage(0, 0, 0), DXGI_FORMAT_BC1_UNORM,
+            DirectX::TEX_COMPRESS_DEFAULT | DirectX::TEX_COMPRESS_PARALLEL, 0.0f, compressed);
+        if (FAILED(hr))
             goto _end_;
 
         // save (logical & physical)
-        ID3DBlob* saved = nullptr;
-        hr = D3DXSaveTextureToFileInMemory(&saved, D3DXIFF_DDS, texture, nullptr);
-        if (hr != D3D_OK)
+        DirectX::Blob saved;
+        hr = SaveToDDSMemory(*compressed.GetImage(0, 0, 0), DirectX::DDS_FLAGS_FORCE_DX9_LEGACY, saved);
+        if (FAILED(hr))
             goto _end_;
 
-        IWriter* fs = FS.w_open(name);
-        if (fs)
+        if (IWriter* fs = FS.w_open(name))
         {
-            fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
+            fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
             FS.w_close(fs);
         }
-        _RELEASE(saved);
-
-        // cleanup
-        _RELEASE(texture);
-    }
         break;
+    }
     case IRender::SM_FOR_MPSENDING:
     {
-        // texture
-        ID3DTexture2D* texture = nullptr;
-        hr = D3DXCreateTexture(
-            HW.pDevice, SM_FOR_SEND_WIDTH, SM_FOR_SEND_HEIGHT, 1, 0, D3DFMT_R8G8B8, D3DPOOL_SCRATCH, &texture);
-        if (hr != D3D_OK)
-            goto _end_;
-        if (nullptr == texture)
+        // resize
+        DirectX::ScratchImage resized;
+        hr = Resize(*image.GetImage(0, 0, 0), SM_FOR_SEND_WIDTH, SM_FOR_SEND_HEIGHT,
+            DirectX::TEX_FILTER_DEFAULT, resized);
+        if (FAILED(hr))
             goto _end_;
 
-        // resize&convert to surface
-        IDirect3DSurface9* surface = nullptr;
-        hr = texture->GetSurfaceLevel(0, &surface);
-        if (hr != D3D_OK)
-            goto _end_;
-        VERIFY(surface);
-        hr = D3DXLoadSurfaceFromSurface(surface, nullptr, nullptr, pFB, nullptr, nullptr, D3DX_DEFAULT, 0);
-        _RELEASE(surface);
-        if (hr != D3D_OK)
+        // convert
+        DirectX::ScratchImage converted;
+        hr = Convert(*resized.GetImage(0, 0, 0), DXGI_FORMAT_R8G8B8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, 0.0f, converted);
+        if (FAILED(hr))
             goto _end_;
 
         // save (logical & physical)
-        ID3DBlob* saved = nullptr;
-        hr = D3DXSaveTextureToFileInMemory(&saved, D3DXIFF_DDS, texture, nullptr);
-        if (hr != D3D_OK)
+        DirectX::Blob saved;
+        hr = SaveToDDSMemory(*converted.GetImage(0, 0, 0), DirectX::DDS_FLAGS_FORCE_DX9_LEGACY, saved);
+        if (FAILED(hr))
             goto _end_;
 
-        if (!memory_writer)
+        if (memory_writer)
         {
-            IWriter* fs = FS.w_open(name);
-            if (fs)
-            {
-                fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
-                FS.w_close(fs);
-            }
+            memory_writer->w(saved.GetBufferPointer(), saved.GetBufferSize());
         }
-        else
+        else if (IWriter* fs = FS.w_open(name))
         {
-            memory_writer->w(saved->GetBufferPointer(), saved->GetBufferSize());
+            fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
+            FS.w_close(fs);
         }
-
-        _RELEASE(saved);
-
-        // cleanup
-        _RELEASE(texture);
-    }
         break;
+    }
     case IRender::SM_NORMAL:
     {
         string64 t_stemp;
         string_path buf;
-        xr_sprintf(buf, sizeof buf, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(t_stemp),
-                   g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
-        ID3DBlob* saved = nullptr;
-        CHK_DX(D3DXSaveSurfaceToFileInMemory(&saved, D3DXIFF_JPG, pFB, nullptr, nullptr));
-        IWriter* fs = FS.w_open("$screenshots$", buf);
-        R_ASSERT(fs);
-        fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
-        FS.w_close(fs);
-        _RELEASE(saved);
-        if (strstr(Core.Params, "-ss_tga"))
-        { // hq
-            xr_sprintf(buf, sizeof(buf), "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
-                       (g_pGameLevel) ? g_pGameLevel->name().c_str() : "mainmenu");
-            ID3DBlob* saved = nullptr;
-            CHK_DX(D3DXSaveSurfaceToFileInMemory(&saved, D3DXIFF_TGA, pFB, nullptr, nullptr));
-            IWriter* fs = FS.w_open("$screenshots$", buf);
-            R_ASSERT(fs);
-            fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
-            FS.w_close(fs);
-            _RELEASE(saved);
+        xr_sprintf(buf, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(t_stemp), g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+
+        DirectX::Blob saved;
+        hr = SaveToWICMemory(*image.GetImage(0, 0, 0), DirectX::WIC_FLAGS_NONE, GUID_ContainerFormatJpeg, saved);
+        if (SUCCEEDED(hr))
+        {
+            if (IWriter* fs = FS.w_open("$screenshots$", buf))
+            {
+                fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
+                FS.w_close(fs);
+            }
         }
-    }
+
+        // hq
+        if (strstr(Core.Params, "-ss_tga"))
+        {
+            xr_sprintf(buf, "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp), g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+
+            hr = SaveToTGAMemory(*image.GetImage(0, 0, 0), saved);
+            if (FAILED(hr))
+                goto _end_;
+
+            if (IWriter* fs = FS.w_open("$screenshots$", buf))
+            {
+                fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
+                FS.w_close(fs);
+            }
+        }
         break;
+    }
     case IRender::SM_FOR_LEVELMAP:
     case IRender::SM_FOR_CUBEMAP:
     {
-        // string64 t_stemp;
         string_path buf;
         VERIFY(name);
         strconcat(sizeof(buf), buf, name, ".tga");
-        IWriter* fs = FS.w_open("$screenshots$", buf);
-        R_ASSERT(fs);
-        // TODO: DX11: This is totally incorrect but mimics
-        // original behavior. Fix later.
-        hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
-        if (hr != D3D_OK)
-            return;
-        hr = pFB->UnlockRect();
-        if (hr != D3D_OK)
+
+        DirectX::ScratchImage img;
+        hr = img.Initialize2D(image.GetMetadata().format, Device.dwHeight, Device.dwHeight, 1, 1);
+        if (FAILED(hr))
             goto _end_;
 
-        // save
-        u32* data = (u32*)xr_malloc(Device.dwHeight * Device.dwHeight * 4);
-        imf_Process(data, Device.dwHeight, Device.dwHeight, (u32*)D.pBits, Device.dwWidth, Device.dwHeight, imf_lanczos3);
-        Image img;
-        img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageDataFormat::RGBA8);
-        img.SaveTGA(*fs, true);
-        xr_free(data);
-        FS.w_close(fs);
-    }
+        imf_Process((u32*)img.GetPixels(), Device.dwHeight, Device.dwHeight, (u32*)image.GetPixels(), Device.dwWidth, Device.dwHeight, imf_lanczos3);
+
+        DirectX::Blob saved;
+        hr = DirectX::SaveToTGAMemory(*img.GetImage(0, 0, 0), saved);
+        if (FAILED(hr))
+            goto _end_;
+
+        if (IWriter* fs = FS.w_open("$screenshots$", buf))
+        {
+            fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
+            FS.w_close(fs);
+        }
         break;
     }
+    } // switch (mode)
 
 _end_:
     _RELEASE(pFB);
@@ -246,14 +238,15 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
     if (Target->rt_Color->fmt == D3DFMT_A16B16G16R16F)
     {
         static const int iMaxPixelsInARow = 1024;
-        D3DXFLOAT16* pPixelElement16 = (D3DXFLOAT16*)pPixel;
+        auto* pPixelElement16 = (DirectX::PackedVector::HALF*)pPixel;
 
         float tmpArray[4 * iMaxPixelsInARow];
         while (pPixel != pEnd)
         {
             const int iProcessPixels = _min(iMaxPixelsInARow, (s32)(pEnd - pPixel));
 
-            D3DXFloat16To32Array(tmpArray, pPixelElement16, iProcessPixels * 4);
+            DirectX::PackedVector::XMConvertHalfToFloatStream(tmpArray, sizeof(float),
+                pPixelElement16, sizeof(DirectX::PackedVector::HALF), iProcessPixels * 4);
 
             for (int i = 0; i < iProcessPixels; ++i)
             {

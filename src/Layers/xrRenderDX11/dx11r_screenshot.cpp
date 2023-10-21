@@ -1,146 +1,144 @@
 #include "stdafx.h"
+
 //#include "xr_effgamma.h"
+
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
 
-#include "d3dx11tex.h"
-
-using namespace XRay::Media;
+#include <DirectXTex.h>
+#include <wincodec.h>
 
 #define GAMESAVE_SIZE 128
 
 #define SM_FOR_SEND_WIDTH 640
 #define SM_FOR_SEND_HEIGHT 480
 
+using namespace XRay::Media;
+
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
     ID3DResource* pSrcTexture;
     Target->get_base_rt()->GetResource(&pSrcTexture);
 
-    VERIFY(pSrcTexture);
+    if (!pSrcTexture)
+    {
+        Log("! Failed to make a screenshot: couldn't obtain base RT resource");
+        return;
+    }
+
+    // Load source texture
+    DirectX::ScratchImage image;
+    if (FAILED(CaptureTexture(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, image)))
+    {
+        Log("! Failed to make a screenshot: couldn't capture texture");
+        _RELEASE(pSrcTexture);
+        return;
+    }
 
     // Save
     switch (mode)
     {
     case IRender::SM_FOR_GAMESAVE:
     {
-        ID3DTexture2D* pSrcSmallTexture;
+        // resize
+        DirectX::ScratchImage resized;
+        auto hr = Resize(*image.GetImage(0, 0, 0), GAMESAVE_SIZE, GAMESAVE_SIZE,
+            DirectX::TEX_FILTER_BOX, resized);
+        if (FAILED(hr))
+            goto _end_;
 
-        D3D_TEXTURE2D_DESC desc;
-        ZeroMemory(&desc, sizeof(desc));
-        desc.Width = GAMESAVE_SIZE;
-        desc.Height = GAMESAVE_SIZE;
-        desc.MipLevels = 1;
-        desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_BC1_UNORM;
-        desc.SampleDesc.Count = 1;
-        desc.Usage = D3D_USAGE_DEFAULT;
-        desc.BindFlags = D3D10_BIND_SHADER_RESOURCE;
-        CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
-
-        CHK_DX(D3DX11LoadTextureFromTexture(HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, NULL, pSrcSmallTexture));
+        // compress
+        DirectX::ScratchImage compressed;
+        hr = Compress(*resized.GetImage(0, 0, 0), DXGI_FORMAT_BC1_UNORM,
+            DirectX::TEX_COMPRESS_DEFAULT | DirectX::TEX_COMPRESS_PARALLEL, 0.0f, compressed);
+        if (FAILED(hr))
+            goto _end_;
 
         // save (logical & physical)
-        ID3DBlob* saved = nullptr;
-        HRESULT hr = D3DX11SaveTextureToMemory(HW.get_context(CHW::IMM_CTX_ID), pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
-        if (hr == D3D_OK)
-        {
-            IWriter* fs = FS.w_open(name);
-            if (fs)
-            {
-                fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
-                FS.w_close(fs);
-            }
-        }
-        _RELEASE(saved);
+        DirectX::Blob saved;
+        hr = SaveToDDSMemory(*compressed.GetImage(0, 0, 0), DirectX::DDS_FLAGS_FORCE_DX9_LEGACY, saved);
+        if (FAILED(hr))
+            goto _end_;
 
-        // cleanup
-        _RELEASE(pSrcSmallTexture);
+        if (IWriter* fs = FS.w_open(name))
+        {
+            fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
+            FS.w_close(fs);
+        }
+        break;
     }
-    break;
     case IRender::SM_FOR_MPSENDING:
     {
-        ID3DTexture2D* pSrcSmallTexture;
+        // resize
+        DirectX::ScratchImage resized;
+        auto hr = Resize(*image.GetImage(0, 0, 0), SM_FOR_SEND_WIDTH, SM_FOR_SEND_HEIGHT,
+            DirectX::TEX_FILTER_DEFAULT, resized);
+        if (FAILED(hr))
+            goto _end_;
 
-        D3D_TEXTURE2D_DESC desc;
-        ZeroMemory(&desc, sizeof(desc));
-        desc.Width = SM_FOR_SEND_WIDTH;
-        desc.Height = SM_FOR_SEND_HEIGHT;
-        desc.MipLevels = 1;
-        desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_BC1_UNORM;
-        desc.SampleDesc.Count = 1;
-        desc.Usage = D3D_USAGE_DEFAULT;
-        desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
-        CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSrcSmallTexture));
-
-        CHK_DX(D3DX11LoadTextureFromTexture(HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, NULL, pSrcSmallTexture));
+        // convert
+        DirectX::ScratchImage converted;
+        hr = Convert(*resized.GetImage(0, 0, 0), DXGI_FORMAT_R8G8B8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, 0.0f, converted);
+        if (FAILED(hr))
+            goto _end_;
 
         // save (logical & physical)
-        ID3DBlob* saved = nullptr;
-        HRESULT hr = D3DX11SaveTextureToMemory(HW.get_context(CHW::IMM_CTX_ID), pSrcSmallTexture, D3DX11_IFF_DDS, &saved, 0);
-        if (hr == D3D_OK)
-        {
-            if (!memory_writer)
-            {
-                IWriter* fs = FS.w_open(name);
-                if (fs)
-                {
-                    fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
-                    FS.w_close(fs);
-                }
-            }
-            else
-            {
-                memory_writer->w(saved->GetBufferPointer(), saved->GetBufferSize());
-            }
-        }
-        _RELEASE(saved);
+        DirectX::Blob saved;
+        hr = SaveToDDSMemory(*converted.GetImage(0, 0, 0), DirectX::DDS_FLAGS_FORCE_DX9_LEGACY, saved);
+        if (FAILED(hr))
+            goto _end_;
 
-        // cleanup
-        _RELEASE(pSrcSmallTexture);
-    }
+        if (memory_writer)
+        {
+            memory_writer->w(saved.GetBufferPointer(), saved.GetBufferSize());
+        }
+        else if (IWriter* fs = FS.w_open(name))
+        {
+            fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
+            FS.w_close(fs);
+        }
         break;
+    }
     case IRender::SM_NORMAL:
     {
         string64 t_stemp;
         string_path buf;
-        xr_sprintf(buf, sizeof buf, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(t_stemp),
-                   g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+        xr_sprintf(buf, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(t_stemp), g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
 
-        ID3DBlob* saved = nullptr;
-        CHK_DX(D3DX11SaveTextureToMemory(HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, D3DX11_IFF_JPG, &saved, 0));
-
-        IWriter* fs = FS.w_open("$screenshots$", buf);
-        R_ASSERT(fs);
-        fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
-        FS.w_close(fs);
-        _RELEASE(saved);
-
-        if (strstr(Core.Params, "-ss_tga"))
-        { // hq
-            xr_sprintf(buf, sizeof buf, "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
-                       g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
-
-            ID3DBlob* saved2 = nullptr;
-            CHK_DX(D3DX11SaveTextureToMemory(HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, D3DX11_IFF_BMP, &saved2, 0));
-
-            IWriter* fs2 = FS.w_open("$screenshots$", buf);
-            R_ASSERT(fs2);
-            fs2->w(saved2->GetBufferPointer(), saved2->GetBufferSize());
-            FS.w_close(fs2);
-            _RELEASE(saved2);
+        DirectX::Blob saved;
+        auto hr = SaveToWICMemory(*image.GetImage(0, 0, 0), DirectX::WIC_FLAGS_NONE, GUID_ContainerFormatJpeg, saved);
+        if (SUCCEEDED(hr))
+        {
+            if (IWriter* fs = FS.w_open("$screenshots$", buf))
+            {
+                fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
+                FS.w_close(fs);
+            }
         }
-    }
+
+        // hq
+        if (strstr(Core.Params, "-ss_tga"))
+        {
+            xr_sprintf(buf, "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp), g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+
+            hr = SaveToTGAMemory(*image.GetImage(0, 0, 0), saved);
+            if (FAILED(hr))
+                goto _end_;
+
+            if (IWriter* fs = FS.w_open("$screenshots$", buf))
+            {
+                fs->w(saved.GetBufferPointer(), saved.GetBufferSize());
+                FS.w_close(fs);
+            }
+        }
         break;
+    }
     case IRender::SM_FOR_LEVELMAP:
     case IRender::SM_FOR_CUBEMAP:
     {
         string_path buf;
         VERIFY(name);
         strconcat(sizeof(buf), buf, name, ".tga");
-        IWriter* fs = FS.w_open("$screenshots$", buf);
-        R_ASSERT(fs);
 
         ID3DTexture2D* pTex = Target->t_ss_async;
         HW.get_context(CHW::IMM_CTX_ID)->CopyResource(pTex, pSrcTexture);
@@ -163,15 +161,19 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         imf_Process(data, Device.dwHeight, Device.dwHeight, (u32*)MappedData.pData, Device.dwWidth, Device.dwHeight, imf_lanczos3);
         HW.get_context(CHW::IMM_CTX_ID)->Unmap(pTex, 0);
 
-        Image img;
-        img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageDataFormat::RGBA8);
-        img.SaveTGA(*fs, true);
+        if (IWriter* fs = FS.w_open("$screenshots$", buf))
+        {
+            Image img;
+            img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, ImageDataFormat::RGBA8);
+            img.SaveTGA(*fs, true);
+            FS.w_close(fs);
+        }
         xr_free(data);
-        FS.w_close(fs);
-    }
         break;
     }
+    } // switch (mode)
 
+_end_:
     _RELEASE(pSrcTexture);
 }
 
