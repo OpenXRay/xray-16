@@ -1,8 +1,6 @@
 #include "stdafx.h"
 
 //#include "xr_effgamma.h"
-
-#include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
 
 #include <DirectXPackedVector.h>
@@ -10,8 +8,6 @@
 #include <wincodec.h>
 
 #define GAMESAVE_SIZE 128
-
-using namespace XRay::Media;
 
 void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nullptr*/)
 {

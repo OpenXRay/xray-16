@@ -15,6 +15,11 @@
 #include <d3d9.h>
 #endif
 
+#if !__has_include(<sal.h>)
+#define _In_reads_()
+#define _Success_()
+#endif
+
 #include <cstdint>
 #include <iterator>
 #include <vector>
