@@ -30,7 +30,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
     if (disasm)
     {
-        ID3DBlob* blob = nullptr;
+        IShaderBlob* blob = nullptr;
         DisassembleShader(buffer, buffer_size, FALSE, nullptr, &blob);
         if (!blob)
             return _hr;
@@ -62,7 +62,7 @@ inline HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 HRESULT CRender::shader_compile(
     pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result)
 {
-    D3D_SHADER_MACRO defines[128];
+    SHADER_MACRO defines[128];
     int def_it = 0;
 
     // Don't move these variables to lower scope!
@@ -466,8 +466,8 @@ HRESULT CRender::shader_compile(
     if (FAILED(_result))
     {
         ShaderIncluder includer;
-        ID3DBlob* pShaderBuf = nullptr;
-        ID3DBlob* pErrorBuf = nullptr;
+        IShaderBlob* pShaderBuf = nullptr;
+        IShaderBlob* pErrorBuf = nullptr;
 
         _result = CompileShader(fs->pointer(), fs->length(), defines, &includer,
             pFunctionName, pTarget, Flags, &pShaderBuf, &pErrorBuf);

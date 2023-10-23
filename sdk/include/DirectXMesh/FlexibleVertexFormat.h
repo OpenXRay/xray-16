@@ -16,8 +16,8 @@
 #endif
 
 #if !__has_include(<sal.h>)
-#define _In_reads_()
-#define _Success_()
+#define _In_reads_(size)
+#define _Success_(expr)
 #endif
 
 #include <cstdint>

@@ -1,27 +1,21 @@
 #pragma once
 
 #ifdef USE_D3DX
-using ID3DBlob = ID3DXBuffer;
-using ID3DInclude = ID3DXInclude;
-using D3D_SHADER_MACRO = D3DXMACRO;
-using D3D_INCLUDE_TYPE = D3DXINCLUDE_TYPE;
+// When building with Unity build, d3dx9.h and d3dcompiler.h both get included in files
+// So we cannot just declare:
+// using D3D_SHADER_MACRO = D3DXMACRO;
+// because it would conflict.
+// I could exclude some files from Unity build, but why?
+// Let's just make it robustly compileable in all cases.
+using IShaderBlob = ID3DXBuffer;
+using IShaderIncluder = ID3DXInclude;
+using SHADER_MACRO = D3DXMACRO;
+using INCLUDE_TYPE = D3DXINCLUDE_TYPE;
 #else
-// Errors
-#define _FACDD  0x876
-#define MAKE_DDHRESULT(code) MAKE_HRESULT(1, _FACDD, code)
-
-enum _D3DXERR
-{
-    D3DXERR_CANNOTMODIFYINDEXBUFFER = MAKE_DDHRESULT(2900),
-    D3DXERR_INVALIDMESH = MAKE_DDHRESULT(2901),
-    D3DXERR_CANNOTATTRSORT = MAKE_DDHRESULT(2902),
-    D3DXERR_SKINNINGNOTSUPPORTED = MAKE_DDHRESULT(2903),
-    D3DXERR_TOOMANYINFLUENCES = MAKE_DDHRESULT(2904),
-    D3DXERR_INVALIDDATA = MAKE_DDHRESULT(2905),
-    D3DXERR_LOADEDMESHASNODATA = MAKE_DDHRESULT(2906),
-    D3DXERR_DUPLICATENAMEDFRAGMENT = MAKE_DDHRESULT(2907),
-    D3DXERR_CANNOTREMOVELASTITEM = MAKE_DDHRESULT(2908),
-};
+using IShaderBlob = ID3DBlob;
+using IShaderIncluder = ID3DInclude;
+using SHADER_MACRO = D3D_SHADER_MACRO;
+using INCLUDE_TYPE = D3D_INCLUDE_TYPE;
 
 typedef struct _D3DXSHADER_CONSTANTTABLE
 {
@@ -113,13 +107,30 @@ typedef enum D3DXPARAMETER_TYPE
     D3DXPT_UNSUPPORTED,
     D3DXPT_FORCE_DWORD = 0x7fffffff
 } D3DXPARAMETER_TYPE, * LPD3DXPARAMETER_TYPE;
+
+// Errors
+#define _FACDD  0x876
+#define MAKE_DDHRESULT(code) MAKE_HRESULT(1, _FACDD, code)
+
+enum _D3DXERR
+{
+    D3DXERR_CANNOTMODIFYINDEXBUFFER = MAKE_DDHRESULT(2900),
+    D3DXERR_INVALIDMESH = MAKE_DDHRESULT(2901),
+    D3DXERR_CANNOTATTRSORT = MAKE_DDHRESULT(2902),
+    D3DXERR_SKINNINGNOTSUPPORTED = MAKE_DDHRESULT(2903),
+    D3DXERR_TOOMANYINFLUENCES = MAKE_DDHRESULT(2904),
+    D3DXERR_INVALIDDATA = MAKE_DDHRESULT(2905),
+    D3DXERR_LOADEDMESHASNODATA = MAKE_DDHRESULT(2906),
+    D3DXERR_DUPLICATENAMEDFRAGMENT = MAKE_DDHRESULT(2907),
+    D3DXERR_CANNOTREMOVELASTITEM = MAKE_DDHRESULT(2908),
+};
 #endif
 
-class ShaderIncluder final : public ID3DInclude
+class ShaderIncluder final : public IShaderIncluder
 {
 public:
     HRESULT __stdcall Open(
-        D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) noexcept override
+        INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) noexcept override
     {
         string_path pname;
         strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
@@ -205,7 +216,7 @@ inline HRESULT WINAPI FindShaderComment(const DWORD* byte_code, DWORD fourcc, co
 }
 
 inline HRESULT WINAPI DisassembleShader(CONST DWORD* pShader, SIZE_T SrcDataSize,
-    BOOL EnableColorCode, LPCSTR pComments, ID3DBlob** ppDisassembly)
+    BOOL EnableColorCode, LPCSTR pComments, IShaderBlob** ppDisassembly)
 {
 #ifdef USE_D3DX
     std::ignore = SrcDataSize;
@@ -216,9 +227,9 @@ inline HRESULT WINAPI DisassembleShader(CONST DWORD* pShader, SIZE_T SrcDataSize
 }
 
 inline HRESULT WINAPI CompileShader(LPCVOID pSrcData, SIZE_T SrcDataSize,
-    CONST D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude,
+    CONST SHADER_MACRO* pDefines, IShaderIncluder* pInclude,
     LPCSTR pEntrypoint, LPCSTR pTarget, DWORD Flags,
-    ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs)
+    IShaderBlob** ppCode, IShaderBlob** ppErrorMsgs)
 {
 #ifdef USE_D3DX
     return D3DXCompileShader((LPCSTR)pSrcData, SrcDataSize, pDefines, pInclude,
