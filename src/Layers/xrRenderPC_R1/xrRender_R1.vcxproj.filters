@@ -1013,6 +1013,9 @@
     <ClCompile Include="..\xrRenderDX9\dx9r_screenshot.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9r_constants.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Pipeline.txt" />
