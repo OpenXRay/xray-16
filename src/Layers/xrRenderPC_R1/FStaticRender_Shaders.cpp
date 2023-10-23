@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FStaticRender.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
+#include "Layers/xrRenderDX9/dx9shader_utils.h"
 #include "xrCore/FileCRC32.h"
 
 template <typename T>
@@ -8,7 +9,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     T*& result, bool const disasm)
 {
     HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
-    if (!SUCCEEDED(_hr))
+    if (FAILED(_hr))
     {
         Log("! Shader: ", file_name);
         Msg("! CreateHWShader hr == 0x%08x", _hr);
@@ -17,30 +18,29 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
     LPCVOID data = nullptr;
 
-    _hr = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
+    _hr = FindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
 
     if (SUCCEEDED(_hr) && data)
     {
         // Parse constant table data
-        LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
-        result->constants.parse(pConstants, ShaderTypeTraits<T>::GetShaderDest());
+        result->constants.parse(const_cast<void*>(data), ShaderTypeTraits<T>::GetShaderDest());
     }
     else
         Msg("! D3DXFindShaderComment %s hr == 0x%08x", file_name, _hr);
 
     if (disasm)
     {
-        ID3DXBuffer* disasm = nullptr;
-        D3DXDisassembleShader(LPDWORD(buffer), FALSE, nullptr, &disasm);
-        if (!disasm)
+        ID3DBlob* blob = nullptr;
+        DisassembleShader(buffer, buffer_size, FALSE, nullptr, &blob);
+        if (!blob)
             return _hr;
 
         string_path dname;
         strconcat(sizeof(dname), dname, "disasm" DELIMITER, file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
         IWriter* W = FS.w_open("$app_data_root$", dname);
-        W->w(disasm->GetBufferPointer(), disasm->GetBufferSize());
+        W->w(blob->GetBufferPointer(), blob->GetBufferSize());
         FS.w_close(W);
-        _RELEASE(disasm);
+        _RELEASE(blob);
     }
 
     return _hr;
@@ -59,46 +59,9 @@ inline HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return E_FAIL;
 }
 
-
-class includer : public ID3DXInclude
-{
-public:
-    HRESULT __stdcall Open(
-        D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
-    {
-        string_path pname;
-        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
-        IReader* R = FS.r_open("$game_shaders$", pname);
-        if (nullptr == R)
-        {
-            // possibly in shared directory or somewhere else - open directly
-            R = FS.r_open("$game_shaders$", pFileName);
-            if (nullptr == R)
-                return E_FAIL;
-        }
-
-        // duplicate and zero-terminate
-        const size_t size = R->length();
-        u8* data = xr_alloc<u8>(size + 1);
-        CopyMemory(data, R->pointer(), size);
-        data[size] = 0;
-        FS.r_close(R);
-
-        *ppData = data;
-        *pBytes = size;
-        return D3D_OK;
-    }
-    HRESULT __stdcall Close(LPCVOID pData)
-    {
-        auto mutableData = const_cast<LPVOID>(pData);
-        xr_free(mutableData);
-        return D3D_OK;
-    }
-};
-
 HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result)
 {
-    D3DXMACRO defines[128];
+    D3D_SHADER_MACRO defines[128];
     int def_it = 0;
 
     char sh_name[MAX_PATH] = "";
@@ -175,6 +138,13 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
 
     sh_name[len] = '\0';
 
+#ifndef USE_D3DX
+    // Required for compatibility with D3DCompile()
+    defines[def_it].Name = "point";
+    defines[def_it].Definition = "__pnt__";
+    def_it++;
+#endif
+
     // finish
     defines[def_it].Name = nullptr;
     defines[def_it].Definition = nullptr;
@@ -229,14 +199,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName, pc
 
     if (FAILED(_result))
     {
-        includer Includer;
-        LPD3DXBUFFER pShaderBuf = nullptr;
-        LPD3DXBUFFER pErrorBuf = nullptr;
-        LPD3DXCONSTANTTABLE pConstants = nullptr;
-        LPD3DXINCLUDE pInclude = (LPD3DXINCLUDE)&Includer;
+        ShaderIncluder includer;
+        ID3DBlob* pShaderBuf = nullptr;
+        ID3DBlob* pErrorBuf = nullptr;
 
-        _result = D3DXCompileShader((LPCSTR)fs->pointer(), fs->length(), defines, pInclude, pFunctionName, pTarget,
-            Flags | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL, &pShaderBuf, &pErrorBuf, &pConstants);
+        _result = CompileShader(fs->pointer(), fs->length(), defines, &includer,
+            pFunctionName, pTarget, Flags, &pShaderBuf, &pErrorBuf);
         if (SUCCEEDED(_result))
         {
             IWriter* file = FS.w_open(file_name);

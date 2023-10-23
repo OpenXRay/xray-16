@@ -639,6 +639,9 @@
     <ClInclude Include="..\xrRender\dxImGuiRender.h">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRenderDX9\dx9shader_utils.h">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

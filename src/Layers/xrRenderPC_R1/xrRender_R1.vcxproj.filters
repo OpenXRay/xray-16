@@ -603,6 +603,9 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Shadow_Texture.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRenderDX9\dx9shader_utils.h">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

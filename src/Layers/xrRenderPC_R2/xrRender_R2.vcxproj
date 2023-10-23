@@ -66,6 +66,7 @@
     <ClInclude Include="..\xrRenderDX9\dx9HW.h" />
     <ClInclude Include="..\xrRenderDX9\dx9R_Backend_Runtime.h" />
     <ClInclude Include="..\xrRenderDX9\dx9r_constants_cache.h" />
+    <ClInclude Include="..\xrRenderDX9\dx9shader_utils.h" />
     <ClInclude Include="..\xrRender\Animation.h" />
     <ClInclude Include="..\xrRender\AnimationKeyCalculate.h" />
     <ClInclude Include="..\xrRender\Blender.h" />

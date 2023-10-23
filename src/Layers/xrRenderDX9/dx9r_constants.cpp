@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Layers/xrRender/r_constants.h"
+#include "Layers/xrRenderDX9/dx9shader_utils.h"
 
 BOOL R_constant_table::parse(void* _desc, u32 destination)
 {
