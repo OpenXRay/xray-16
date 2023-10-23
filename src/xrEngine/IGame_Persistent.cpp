@@ -590,9 +590,6 @@ void IGame_Persistent::UpdateHudRaindrops() const
     ps_ssfx_hud_drops_2.set(val_density, val_texsize, ssfx_hud_raindrops_extragloss, ssfx_hud_raindrops_gloss);
     static float drops_int{}, drops_anim{};
     const float Rain_factor = g_pGamePersistent->pEnvironment->CurrentEnv.rain_density;
-    // Don 't do anything if intensity of drops is <= 0 and isn' t raining
-    if (Rain_factor <= 0.f && drops_int <= 0.f)
-        return;
     const float delta_time = Device.fTimeDelta;
     if (Rain_factor > 0.f)
     {
