@@ -75,19 +75,10 @@ u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 }
 
 const float _BUMPHEIGH = 8.f;
+
 //////////////////////////////////////////////////////////////////////
 // Utility pack
 //////////////////////////////////////////////////////////////////////
-IC u32 GetPowerOf2Plus1(u32 v)
-{
-    u32 cnt = 0;
-    while (v)
-    {
-        v >>= 1;
-        cnt++;
-    };
-    return cnt;
-}
 IC void Reduce(int& w, int& h, int& l, int& skip)
 {
     while ((l > 1) && skip)
@@ -120,18 +111,6 @@ IC void Reduce(UINT& w, UINT& h, int l, int skip)
         h = 1;
 }
 
-void TW_Save(ID3DTexture2D* T, LPCSTR name, LPCSTR prefix, LPCSTR postfix)
-{
-    string256 fn;
-    strconcat(sizeof(fn), fn, name, "_", prefix, "-", postfix);
-    for (int it = 0; it < int(xr_strlen(fn)); it++)
-        if ('\\' == fn[it])
-            fn[it] = '_';
-    string256 fn2;
-    strconcat(sizeof(fn2), fn2, "debug\\", fn, ".dds");
-    Log("* debug texture save: ", fn2);
-    R_CHK(D3DX11SaveTextureToFile(HW.get_context(CHW::IMM_CTX_ID), T, D3DX11_IFF_DDS, fn2));
-}
 /*
 ID3DTexture2D*  TW_LoadTextureFromTexture
 (

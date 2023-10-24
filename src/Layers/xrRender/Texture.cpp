@@ -82,19 +82,10 @@ u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 }
 
 const float _BUMPHEIGH = 8.f;
+
 //////////////////////////////////////////////////////////////////////
 // Utility pack
 //////////////////////////////////////////////////////////////////////
-IC u32 GetPowerOf2Plus1(u32 v)
-{
-    u32 cnt = 0;
-    while (v)
-    {
-        v >>= 1;
-        cnt++;
-    };
-    return cnt;
-}
 IC void Reduce(int& w, int& h, int& l, int& skip)
 {
     while ((l > 1) && skip)
@@ -109,19 +100,6 @@ IC void Reduce(int& w, int& h, int& l, int& skip)
         w = 1;
     if (h < 1)
         h = 1;
-}
-
-void TW_Save(ID3DTexture2D* T, LPCSTR name, LPCSTR prefix, LPCSTR postfix)
-{
-    string256 fn;
-    strconcat(sizeof(fn), fn, name, "_", prefix, "-", postfix);
-    for (int it = 0; it < int(xr_strlen(fn)); it++)
-        if (_DELIMITER == fn[it])
-            fn[it] = '_';
-    string256 fn2;
-    strconcat(sizeof(fn2), fn2, "debug" DELIMITER, fn, ".dds");
-    Log("* debug texture save: ", fn2);
-    R_CHK(D3DXSaveTextureToFile(fn2, D3DXIFF_DDS, T, nullptr));
 }
 
 ID3DTexture2D* TW_LoadTextureFromTexture(
@@ -199,6 +177,7 @@ void TW_Iterate_1OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src, const _It pred)
         t_src->UnlockRect(i);
     }
 }
+
 template <class _It>
 void TW_Iterate_2OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src0, ID3DTexture2D* t_src1, const _It pred)
 {
@@ -292,7 +271,6 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     xr_strcpy(fname, fRName); //. andy if (strext(fname)) *strext(fname)=0;
     fix_texture_name(fname);
     IReader* S = nullptr;
-    // if (FS.exist(fn,"$game_textures$",fname, ".dds") && strstr(fname,"_bump")) goto _BUMP;
     if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump"))
         goto _BUMP_from_base;
     if (FS.exist(fn, "$level$", fname, ".dds"))
@@ -306,7 +284,6 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     ELog.Msg(mtError, "Can't find texture '%s'", fname);
     return 0;
 #else
-
     Msg("! Can't find texture '%s'", fname);
     dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
     if (!ShadowOfChernobylMode)
@@ -314,9 +291,6 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     if (!dummyTextureExist)
         return nullptr;
     goto _DDS;
-
-//xrDebug::Fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
-
 #endif
 
 _DDS:
@@ -404,78 +378,6 @@ _DDS_2D:
     return pTexture2D;
 }
 }
-/*
-_BUMP:
-{
-    // Load SYS-MEM-surface, bound to device restrictions
-    D3DXIMAGE_INFO IMG;
-    IReader* S = FS.r_open (fn);
-    msize = S->length ();
-    ID3DTexture2D* T_height_gloss;
-    R_CHK(D3DXCreateTextureFromFileInMemoryEx(
-        HW.pDevice, S->pointer(), S->length(),
-        D3DX_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8,
-        D3DPOOL_SYSTEMMEM, D3DX_DEFAULT,D3DX_DEFAULT,
-        0, &IMG, 0, &T_height_gloss));
-    FS.r_close(S);
-    //TW_Save(T_height_gloss, fname, "debug-0", "original");
-
-    // Create HW-surface, compute normal map
-    ID3DTexture2D* T_normal_1 = 0;
-    R_CHK(D3DXCreateTexture
-        (HW.pDevice, IMG.Width, IMG.Height, D3DX_DEFAULT, 0, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &T_normal_1));
-    R_CHK(D3DXComputeNormalMap(T_normal_1, T_height_gloss, 0, 0, D3DX_CHANNEL_RED,_BUMPHEIGH));
-    //TW_Save(T_normal_1, fname, "debug-1", "normal");
-
-    // Transfer gloss-map
-    TW_Iterate_1OP(T_normal_1, T_height_gloss, it_gloss_rev);
-    //TW_Save(T_normal_1, fname, "debug-2", "normal-G");
-
-    // Compress
-    fmt = D3DFMT_DXT5;
-    ID3DTexture2D* T_normal_1C = TW_LoadTextureFromTexture(T_normal_1, fmt, psTextureLOD, dwWidth, dwHeight);
-    //TW_Save(T_normal_1C, fname, "debug-3", "normal-G-C");
-
-#if RENDER==R_R2
-    // Decompress (back)
-    fmt = D3DFMT_A8R8G8B8;
-    ID3DTexture2D* T_normal_1U = TW_LoadTextureFromTexture(T_normal_1C, fmt, 0, dwWidth, dwHeight);
-    // TW_Save(T_normal_1U, fname, "debug-4", "normal-G-CU");
-
-    // Calculate difference
-    ID3DTexture2D*  T_normal_1D = 0;
-    R_CHK(D3DXCreateTexture(HW.pDevice, dwWidth, dwHeight, T_normal_1U->GetLevelCount(), 0, D3DFMT_A8R8G8B8,
-        D3DPOOL_SYSTEMMEM, &T_normal_1D));
-    TW_Iterate_2OP(T_normal_1D, T_normal_1, T_normal_1U, it_difference);
-    //TW_Save(T_normal_1D, fname, "debug-5", "normal-G-diff");
-
-    // Reverse channels back + transfer heightmap
-    TW_Iterate_1OP(T_normal_1D, T_height_gloss, it_height_rev);
-    //TW_Save(T_normal_1D, fname, "debug-6", "normal-G-diff-H");
-
-    // Compress
-    fmt = D3DFMT_DXT5;
-    ID3DTexture2D* T_normal_2C = TW_LoadTextureFromTexture(T_normal_1D, fmt, 0, dwWidth, dwHeight);
-    //TW_Save(T_normal_2C, fname, "debug-7", "normal-G-diff-H-C");
-    _RELEASE(T_normal_1U);
-    _RELEASE(T_normal_1D);
-
-    //
-    string256 fnameB;
-    strconcat(fnameB, "$user$", fname, "X");
-    ref_texture t_temp = dxRenderDeviceRender::Instance().Resources->_CreateTexture(fnameB);
-    t_temp->surface_set(T_normal_2C);
-    RELEASE(T_normal_2C); // texture should keep reference to it by itself
-#endif
-
-    // release and return
-    // T_normal_1C - normal.gloss, reversed
-    // T_normal_2C - 2*error.height, non-reversed
-    _RELEASE(T_height_gloss);
-    _RELEASE(T_normal_1);
-    return T_normal_1C;
-}
-*/
 _BUMP_from_base:
 {
     Msg("! auto-generated bump map: %s", fname);
