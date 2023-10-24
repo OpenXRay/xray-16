@@ -421,7 +421,6 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DXRRENDER_GL_EXPORTS
     -DUSE_OGL
-    -DNO_XR_VDECLARATOR
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
