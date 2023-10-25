@@ -323,15 +323,14 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
 #endif
 
-    _DDS:
+_DDS:
 {
     // Load and get header
-
     S = FS.r_open(fn);
-#ifdef DEBUG
-    Msg("* Loaded: %s[%d]", fn, S->length());
-#endif // DEBUG
     img_size = S->length();
+#ifdef DEBUG
+    Msg("* Loaded: %s[%zu]", fn, img_size);
+#endif // DEBUG
     R_ASSERT(S);
 // R_CHK2                   (D3DXGetImageInfoFromFileInMemory   (S->pointer(),S->length(),&IMG), fn);
     R_CHK2(D3DX11GetImageInfoFromMemory(S->pointer(), S->length(), 0, &IMG, 0), fn);
