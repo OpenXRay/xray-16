@@ -1080,11 +1080,17 @@ class CCC_DebugFonts : public IConsole_Command
 {
 public:
     CCC_DebugFonts(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
+    ~CCC_DebugFonts() { xr_free(m_ui); }
     virtual void Execute(LPCSTR args)
     {
-        // BUG: leak
-        (xr_new<CUIDebugFonts>())->ShowDialog(true);
+        if (!m_ui)
+            m_ui = xr_new<CUIDebugFonts>();
+
+        m_ui->ShowDialog(true);
     }
+
+private:
+    CUIDebugFonts* m_ui;
 };
 
 class CCC_DebugNode : public IConsole_Command
