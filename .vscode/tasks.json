@@ -51,7 +51,7 @@
       "options": {
         "cwd": "${workspaceFolder}/bin"
       },
-      "command": "make -j${CPU_COUNT}",
+      "command": "cmake --build . -j${CPU_COUNT}",
       "dependsOn": [
         "mkdir"
       ]
