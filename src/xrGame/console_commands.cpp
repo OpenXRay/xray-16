@@ -1080,7 +1080,12 @@ class CCC_DebugFonts : public IConsole_Command
 {
 public:
     CCC_DebugFonts(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
-    ~CCC_DebugFonts() { xr_free(m_ui); }
+
+    ~CCC_DebugFonts()
+    {
+        xr_free(m_ui);
+    }
+
     virtual void Execute(LPCSTR args)
     {
         if (!m_ui)
