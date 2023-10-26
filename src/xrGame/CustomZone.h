@@ -309,7 +309,7 @@ protected:
 protected:
     xr_vector<CArtefact*> m_SpawnedArtefacts;
 
-    //вероятность того, что артефакт засповниться при единичном 
+    //вероятность того, что артефакт засповниться при единичном
     //срабатывании аномалии
     float m_fArtefactSpawnProbability;
     //величина импульса выкидывания артефакта из зоны
@@ -327,7 +327,7 @@ protected:
         shared_str section;
         float      probability;
     };
-    
+
     xr_vector<ARTEFACT_SPAWN> m_ArtefactSpawn;
 
     //расстояние от зоны до текущего актера

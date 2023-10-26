@@ -23,7 +23,7 @@ protected:
     bool m_bAutoApply;
     SPPInfo pp_affected;
     void UpdateDeffered();
-    
+
     virtual void UpdateCamEffectors();
     virtual void UpdatePPEffectors();
     virtual bool ProcessCameraEffector(CEffectorCam* eff);

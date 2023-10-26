@@ -117,7 +117,7 @@ protected:
     bool parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size, pstr c, size_t c_size);
     bool do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName);
     void reinit();
-    
+
     static constexpr std::pair<cpcstr, cpcstr> get_message_headers(LuaMessageType message)
     {
         switch (message)

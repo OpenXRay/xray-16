@@ -16,7 +16,7 @@ inline u32 calc_cursor(const float& fTimeStarted, float& fTime, const float& fTi
     {
         fTime -= fTimeTotal / fFreq;
     }
-    u32 curr_sample_num = iFloor((fTime - fTimeStarted) * fFreq * wfx.nSamplesPerSec); 
+    u32 curr_sample_num = iFloor((fTime - fTimeStarted) * fFreq * wfx.nSamplesPerSec);
     return curr_sample_num * (wfx.wBitsPerSample / 8) * wfx.nChannels;
 }
 

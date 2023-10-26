@@ -199,7 +199,7 @@ void CRenderTarget::build_textures()
 
         HW.pDevice->UpdateTexture(temp_noise_surf[it], t_noise_surf[it]);
         _RELEASE(temp_noise_surf[it]);
-        
+
         string_path name;
         xr_sprintf(name, "%s%d", r2_jitter, it);
         t_noise[it] = RImplementation.Resources->_CreateTexture(name);

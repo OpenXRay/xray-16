@@ -119,7 +119,7 @@ void Skin4W(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
 	mulps		xmm3, xmm7					; xmm3 = N3
 
 	mulps		xmm4, XMMWORD PTR [P0]		; xmm4 = P0
-	mulps		xmm5, XMMWORD PTR [P1]		; xmm5 = P1 
+	mulps		xmm5, XMMWORD PTR [P1]		; xmm5 = P1
 	mulps		xmm6, XMMWORD PTR [P2]		; xmm6 = P2
 	addps		xmm4, xmm5					; xmm4 = P0 + P1
 	mulps		xmm7, XMMWORD PTR [P3]		; xmm7 = P3
@@ -143,7 +143,7 @@ void Skin4W(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
         // ------------------------------------------------------------------
         //	writing data
         // ------------------------------------------------------------------
-	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm4		; 
+	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm4		;
 	movntps		XMMWORD PTR [edi+16-(TYPE vertRender)],xmm0		;
         // ------------------------------------------------------------------
 	jnz			new_vert						; // vCount == 0 ? exit : goto new_vert
@@ -207,11 +207,11 @@ void Skin3W(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
 	mulps		xmm0, xmm4					; xmm0 = N0
 	mulps		xmm1, xmm5					; xmm1 = N1
 	mulps		xmm3, xmm6					; xmm2 = N2
-	
+
 	addps		xmm0, xmm1					; xmm0 = N0 + N1
 
 	mulps		xmm4, XMMWORD PTR [P0]		; xmm4 = P0
-	mulps		xmm5, XMMWORD PTR [P1]		; xmm5 = P1 
+	mulps		xmm5, XMMWORD PTR [P1]		; xmm5 = P1
 	mulps		xmm6, xmm2					; xmm6 = P2
 
 	addps		xmm4, xmm5					; xmm4 = P0 + P1
@@ -233,7 +233,7 @@ void Skin3W(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
         // ------------------------------------------------------------------
         //	writing data
         // ------------------------------------------------------------------
-	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm4		; 
+	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm4		;
 	movntps		XMMWORD PTR [edi+16-(TYPE vertRender)],xmm0		;
         // ------------------------------------------------------------------
 	jnz			new_vert						; // vCount == 0 ? exit : goto new_vert
@@ -322,7 +322,7 @@ void Skin2W(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
         // ------------------------------------------------------------------
         //	writing data
         // ------------------------------------------------------------------
-	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm0		; 
+	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm0		;
 	movntps		XMMWORD PTR [edi+16-(TYPE vertRender)],xmm2		;
         // ------------------------------------------------------------------
 	jnz			new_vert						; // vCount == 0 ? exit : goto new_vert
@@ -392,7 +392,7 @@ void Skin1W(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
         // ------------------------------------------------------------------
         //	writing data
         // ------------------------------------------------------------------
-	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm0		; 
+	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm0		;
 	movntps		XMMWORD PTR [edi+16-(TYPE vertRender)],xmm3		;
         // ------------------------------------------------------------------
 	jnz			new_vert						; // vCount == 0 ? exit : goto new_vert

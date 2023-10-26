@@ -84,7 +84,7 @@ bool AnselManager::Init() const
 
             stored_red_text = g_bDisableRedText;
             g_bDisableRedText = TRUE;
-            
+
             g_pGameLevel->Cameras().AddCamEffector(xr_new<AnselCameraEffector>());
             Device.seqFrame.Add(mutable_this, REG_PRIORITY_CAPTURE);
 
@@ -152,7 +152,7 @@ bool AnselManager::Init() const
         case ansel::kSetConfigurationIncorrectConfiguration:
             Log("! Nvidia Ansel: incorrect configuration");
             break;
-        
+
         case ansel::kSetConfigurationSdkNotLoaded:
             Log("! Nvidia Ansel: SDK wasn't loaded");
             break;

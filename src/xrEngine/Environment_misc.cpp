@@ -696,7 +696,7 @@ std::pair<Fvector3, float> CEnvDescriptorMixer::calculate_dynamic_sun_dir(float 
     Fvector3 result;
     result.setHP(AZ, SEA);
     R_ASSERT(_valid(result));
-    
+
     return
     {
         result,

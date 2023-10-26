@@ -35,7 +35,7 @@ void CUIListItem::InitTexture(pcstr tex_name)
 void CUIListItem::Init(const char* str, float x, float y, float width, float height)
 {
     Init(x,y,width, height);
-    SetTextST(str);	
+    SetTextST(str);
 }*/
 
 bool CUIListItem::IsHighlightText()

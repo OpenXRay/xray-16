@@ -1,16 +1,16 @@
 Summary of engine features:
     Sometimes the engine outstrips its time and in generally is designed for modern and (even future) hardware.
     The main goal was to utilize all resources of video boards especially the T&L
-    'Cause not all of us have it (even the developers :) the most of engine features (almost the vertex-related) 
+    'Cause not all of us have it (even the developers :) the most of engine features (almost the vertex-related)
     are emulated (and very fast emulated) in software.
 
-    Distinguishing feature of XRay engine is high parallelism, which results in low number of situations when CPU 
+    Distinguishing feature of XRay engine is high parallelism, which results in low number of situations when CPU
     is waiting for GPU or GPU resources to be available.
 
 In Detail (not sorted by any kind of priority):
 * Variable, dynamic geometry detail of scene
     - highly optimized for T&L hardware
-    - doesn't modify vertex data - only rearrange indices 
+    - doesn't modify vertex data - only rearrange indices
         - which results in ZERO overhead
         - disadvantage: can kill GPU vertex cache :(
 * Colored dynamic, per vertex lighting
@@ -46,7 +46,7 @@ In Detail (not sorted by any kind of priority):
         - Real alternative to CubicEnvMap on all current hardware
         - Doesn't highly depends on geometry complexity
 * Reflections
-    - Pre-rendered textured reflection simulation can be applied on any object or part of it 
+    - Pre-rendered textured reflection simulation can be applied on any object or part of it
         without any performance penalty
 * Curved surfaces
     - 'Cause even modern hardware can't do the tessellation in real-time - it is done on load-time
@@ -74,7 +74,7 @@ In Detail (not sorted by any kind of priority):
     - All objects lies in independent DLLs and the Engine itself doesn't know of them until level load time
     - Results in increased speed of development (and especially team development)
 * Powerful scripting
-    - Full realization of C-language 
+    - Full realization of C-language
     - Only 6-8 times slower than real (x86) code   (isn't great? :)
     - Enables fast AI development and almost infinite number of texturing effects
 * The most important part of the mathematics is optimized for PIII SSE & K6/K7 3DNow instructions
@@ -83,11 +83,11 @@ In Detail (not sorted by any kind of priority):
 * High quality HRTF-3D sound, accelerated by hardware if possible
 * Low-penalty & "low-delay" reaction technology (about 1-3ms to start HRTF 3D Sound Source to play)
 * No "glitches" when starting a sound even in full HRTF model
-* Incredible support for sound environments 
+* Incredible support for sound environments
     - Requires EAX-capable sound card
     - A3D now used only to speed up some calculations (handled by DirectSound subsystem)
 * Sound clipping and sound reflection
     - If Diamond Corp. continues support for its A3D standard - will be realized on hardware
 * High speed streaming sound decoding
     - Means playing MP3/MP2/WMA/ADPCM tracks with almost no penalty to performance
-* Context relative multiple-mixed music streams 
+* Context relative multiple-mixed music streams

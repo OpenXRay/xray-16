@@ -313,7 +313,7 @@ void render_rain::flush()
     if (o.active)
     {
         auto& dsgraph = RImplementation.get_context(context_id);
-    
+
         dsgraph.cmd_list.submit();
         RImplementation.release_context(context_id);
     }

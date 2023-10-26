@@ -29,7 +29,7 @@ bool CRT::used_as_depth() const
     case D3DFMT_D15S1:
     case D3DFMT_D24X8:
     case D3DFMT_D24S8:
-        return true; 
+        return true;
     }
 
     if (fmt == MAKEFOURCC('D', 'F', '2', '4'))

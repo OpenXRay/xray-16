@@ -456,7 +456,7 @@ void CRenderTarget::phase_combine()
 		Fplane&		P	=	dbg_planes[it];
 		Fvector		zero	;
 		zero.mul	(P.n,P.d);
-		
+
 		Fvector             L_dir,L_up=P.n,L_right;
 		L_dir.set           (0,0,1);                if (_abs(L_up.dotproduct(L_dir))>.99f)  L_dir.set(1,0,0);
 		L_right.crossproduct(L_up,L_dir);           L_right.normalize       ();
@@ -493,7 +493,7 @@ void CRenderTarget::phase_combine()
         if (0) for (u32 it=0; it<dbg_spheres.size(); it++)
         {
             Fsphere				S	= dbg_spheres[it].first;
-            Fmatrix				M;	
+            Fmatrix				M;
             u32				ccc		= dbg_spheres[it].second.get();
             M.scale					(S.R,S.R,S.R);
             M.translate_over		(S.P);
@@ -502,7 +502,7 @@ void CRenderTarget::phase_combine()
         }
 #endif
         // Draw quater-screen quad textured with our direct-shadow-map-image
-        if (1) 
+        if (1)
         {
             u32							IX=0,IY=1;
             p0.set						(.5f/_w, .5f/_h);

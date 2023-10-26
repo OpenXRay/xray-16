@@ -299,7 +299,7 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .enum_("CLSIDS")[value("no_pda_msg", int(ePdaMsgMax))]
 
         // CustomZone
-        .def("set_restrictor_type",	 &CScriptGameObject::SetRestrictionType) 
+        .def("set_restrictor_type",	 &CScriptGameObject::SetRestrictionType)
         .def("get_restrictor_type", &CScriptGameObject::GetRestrictionType)
         .def("enable_anomaly", &CScriptGameObject::EnableAnomaly)
         .def("disable_anomaly", &CScriptGameObject::DisableAnomaly)

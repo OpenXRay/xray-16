@@ -313,7 +313,7 @@ void CRT::set_slice_read(int slice)
 }
 
 void CRT::set_slice_write(u32 context_id, int slice)
-{ 
+{
     VERIFY(slice <= n_slices || slice == -1);
     pZRT[context_id] = (slice < 0) ? dsv_all : dsv_per_slice[slice];
 }

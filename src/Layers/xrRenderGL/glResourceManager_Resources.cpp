@@ -85,7 +85,7 @@ SPP* CResourceManager::_CreatePP(pcstr vs, pcstr ps, pcstr gs, pcstr hs, pcstr d
 
     string256 name{};
     strconcat(name, vs, skinning, "|", ps, samples, "|", gs/*, "|", hs, "|", ds*/); // XXX: Tesselation
-    
+
     const auto iterator = m_pp.find(name);
 
     if (iterator != m_pp.end())

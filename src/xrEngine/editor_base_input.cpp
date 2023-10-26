@@ -195,8 +195,8 @@ void ide::IR_OnKeyboardRelease(int key)
     case SDL_SCANCODE_RALT:   check(ImGuiMod_Alt,   SDL_SCANCODE_LALT  ); break;
     case SDL_SCANCODE_LGUI:   check(ImGuiMod_Super, SDL_SCANCODE_RGUI  ); break;
     case SDL_SCANCODE_RGUI:   check(ImGuiMod_Super, SDL_SCANCODE_LGUI  ); break;
-    } // switch (key)                                                 
-                                                                      
+    } // switch (key)
+
     const auto imkey = xr_key_to_imgui_key(key);
     if (imkey == ImGuiKey_None)
         return;

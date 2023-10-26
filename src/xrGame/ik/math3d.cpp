@@ -448,7 +448,7 @@ void project_plane(float p[3], float u[3], float n[3])
 float angle_between_vectors(float u[3], float v[3], float n[3])
 {
 #if 0
-    float temp[3]; 
+    float temp[3];
     float up[3];
     float vp[3];
 
@@ -460,7 +460,7 @@ float angle_between_vectors(float u[3], float v[3], float n[3])
     crossproduct(temp, up, vp);
     float mag = DOT(temp,n);
 
-    // Vectors are parallel at 0 or 180 
+    // Vectors are parallel at 0 or 180
     if (mag*mag < 1e-8)
     {
 	if (DOT(up,vp) < 0)
@@ -470,7 +470,7 @@ float angle_between_vectors(float u[3], float v[3], float n[3])
     }
 
     int sign = (mag > 0) ? 1 : -1;
-    float t = DOT(up,vp); 
+    float t = DOT(up,vp);
     if (t > 1.0)
 	t = 1.0;
     else if (t < -1.0)

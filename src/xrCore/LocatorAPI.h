@@ -108,7 +108,7 @@ public:
 #   error Select or add implementation for your platform
 #endif
         CInifile* header = nullptr;
-        
+
         archive() = default;
         void open();
         void close();

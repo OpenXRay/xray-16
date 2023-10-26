@@ -163,7 +163,7 @@ public:
 
 #pragma warning( push )
 #pragma warning( disable : 4512)
-// wrapper																																					
+// wrapper
 class adopt_compiler
 {
     CBlender_Compile* C;

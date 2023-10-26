@@ -332,7 +332,7 @@ void CUITrackBar::UpdatePos()
 
     if (m_static->IsEnabled())
     {
-        string256 buff;      
+        string256 buff;
         if (m_b_is_float)
         {
             xr_sprintf(buff, (m_static_format == nullptr ? "%.1f" : m_static_format.c_str()), m_f_val);
