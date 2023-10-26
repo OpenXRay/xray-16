@@ -2141,7 +2141,7 @@ void CScriptGameObject::SetActorJumpSpeed(float jump_speed)
         return;
     }
     pActor->m_fJumpSpeed = jump_speed;
-    //character_physics_support()->movement()->SetJumpUpVelocity(m_fJumpSpeed);  
+    //character_physics_support()->movement()->SetJumpUpVelocity(m_fJumpSpeed);
 }
 
 float CScriptGameObject::GetActorSprintKoef() const

@@ -694,7 +694,7 @@ void CDemoRecord::IR_OnMouseMove(int dx, int dy)
         g_pGameLevel->IR_OnMouseMove(dx, dy);
         return;
     }
-    
+
     const float scale = .5f; // psMouseSens;
     OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
 }
@@ -824,7 +824,7 @@ void CDemoRecord::IR_OnControllerAttitudeChange(Fvector change)
         g_pGameLevel->IR_OnControllerAttitudeChange(change);
         return;
     }
-    
+
     const float scale = 5.f; // psControllerSensorSens;
     OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
 }

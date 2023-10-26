@@ -19,7 +19,7 @@ class CPathManager<CLevelGraph, _DataStorage, SNearestVertex<_dist_type, _index_
 protected:
     using _Graph = CLevelGraph;
     using _Parameters = SNearestVertex<_dist_type, _index_type, _iteration_type>;
-    using inherited = CPathManager<_Graph, _DataStorage, SBaseParameters<_dist_type, _index_type, 
+    using inherited = CPathManager<_Graph, _DataStorage, SBaseParameters<_dist_type, _index_type,
           _iteration_type>, _dist_type, _index_type, _iteration_type>;
 
 protected:

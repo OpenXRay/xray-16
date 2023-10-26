@@ -78,7 +78,7 @@ public:
 #if defined(USE_DX11)
     ref_cbuffer m_aVertexConstants[MaxCBuffers];
     ref_cbuffer m_aPixelConstants[MaxCBuffers];
-    
+
     ref_cbuffer m_aGeometryConstants[MaxCBuffers];
     ref_cbuffer m_aComputeConstants[MaxCBuffers];
 
@@ -87,9 +87,9 @@ public:
 
     D3D_PRIMITIVE_TOPOLOGY m_PrimitiveTopology;
     ID3DInputLayout* m_pInputLayout;
-    u32 dummy0; // Padding to avoid warning	
-    u32 dummy1; // Padding to avoid warning	
-    u32 dummy2; // Padding to avoid warning	
+    u32 dummy0; // Padding to avoid warning
+    u32 dummy1; // Padding to avoid warning
+    u32 dummy2; // Padding to avoid warning
 #endif
 private:
     // Render-targets

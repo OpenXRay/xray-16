@@ -1338,7 +1338,7 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
         return false;
     }
     GetSuitableAmmoTotal(); // update m_BriefInfo_CalcFrame
-    
+
     info.grenade = "";
 
     const u32 at_size = m_ammoTypes.size();

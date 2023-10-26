@@ -104,7 +104,7 @@ CUISequencer::CUISequencer()
 bool CUISequencer::Start(LPCSTR tutor_name)
 {
     VERIFY(m_sequencer_items.empty());
-    
+
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "game_tutorials.xml");
 

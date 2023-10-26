@@ -61,7 +61,7 @@ inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr
 
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    if (GLEW_VERSION_4_3) 
+    if (GLEW_VERSION_4_3)
         CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
     if (HW.ShaderBinarySupported)

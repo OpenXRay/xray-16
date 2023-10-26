@@ -155,7 +155,7 @@ void SetVertexDeclaration(const VertexElement* dxdecl)
 {
     auto stride = GetDeclVertexSize(dxdecl, 0);
     IterVertexDeclaration(dxdecl,
-    [&](GLuint location, GLint size, GLenum type, GLboolean normalized, intptr_t offset, GLuint /*stream*/) 
+    [&](GLuint location, GLint size, GLenum type, GLboolean normalized, intptr_t offset, GLuint /*stream*/)
     {
         CHK_GL(glVertexAttribPointer(
             location, size, type, normalized, stride, (void*)offset));
@@ -166,7 +166,7 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
 {
     RCache.set_Format(decl);
     IterVertexDeclaration(dxdecl,
-    [](GLuint location, GLint size, GLenum type, GLboolean normalized, GLuint offset, GLuint stream) 
+    [](GLuint location, GLint size, GLenum type, GLboolean normalized, GLuint offset, GLuint stream)
     {
         CHK_GL(glEnableVertexAttribArray(location));
         if (GLEW_ARB_vertex_attrib_binding)
@@ -177,7 +177,7 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
     });
 }
 
-void SetGLVertexPointer(SDeclaration* decl) 
+void SetGLVertexPointer(SDeclaration* decl)
 {
     SetVertexDeclaration(decl->dcl_code.data());
 }

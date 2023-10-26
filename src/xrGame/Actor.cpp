@@ -90,8 +90,8 @@ string32 ACTOR_DEFS::g_quick_use_slots[4] = {};
 Flags32 psActorFlags =
 {
     AF_GODMODE_RT |
-    AF_AUTOPICKUP | 
-    AF_RUN_BACKWARD | 
+    AF_AUTOPICKUP |
+    AF_RUN_BACKWARD |
     AF_IMPORTANT_SAVE |
     AF_MULTI_ITEM_PICKUP
 };
@@ -1165,7 +1165,7 @@ void CActor::UpdateCL()
                 };
             }
         }
-        
+
     }
 
     Fmatrix trans;

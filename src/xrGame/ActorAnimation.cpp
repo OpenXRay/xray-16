@@ -282,7 +282,7 @@ void CActor::steer_Vehicle(float angle)
         smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(anims.idles[0]);
     else if (angle > 0.f)
         smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(anims.steer_right);
-    else 
+    else
         smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(anims.steer_left);
     //-Alundaio
 }

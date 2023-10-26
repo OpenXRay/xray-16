@@ -129,7 +129,7 @@ public:
         _set(rhs);
         return (shared_str&)*this;
     }
-    // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use 
+    // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use
     [[nodiscard]]
     pcstr operator*() const { return p_ ? p_->value : 0; }
 

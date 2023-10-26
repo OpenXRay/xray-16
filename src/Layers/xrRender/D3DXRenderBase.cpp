@@ -169,7 +169,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
         m_WireShader.create("editor" DELIMITER "wire");
         m_SelectionShader.create("editor" DELIMITER "selection");
         m_PortalFadeShader.create("portal");
-        m_PortalFadeGeom.create(FVF::F_L, RImplementation.Vertex.Buffer(), 0);        
+        m_PortalFadeGeom.create(FVF::F_L, RImplementation.Vertex.Buffer(), 0);
         DUImpl.OnDeviceCreate();
         UIRenderImpl.CreateUIGeom();
     }

@@ -72,7 +72,7 @@ struct hud_item_measures
         float m_tendto_speed;
         float m_tendto_speed_aim;
     };
-    inertion_params m_inertion_params; //--#SM+#--	
+    inertion_params m_inertion_params; //--#SM+#--
 };
 
 struct attachable_hud_item

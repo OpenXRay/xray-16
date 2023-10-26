@@ -79,7 +79,7 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, 
     constexpr int hit = 15;
     constexpr int fix = 65535; // u32(-1)
 
-    // Workaround for SDL bug 
+    // Workaround for SDL bug
     if (area.x + hit >= fix && rect.w <= fix - hit)
         area.x -= fix;
 

@@ -535,7 +535,7 @@ public:
 
     bool isActiveEngine	();
     /***** added by Ray Twitty (aka Shadows) END *****/
-  
+
 
 private:
     void OnCameraChange(int type);
