@@ -5,7 +5,7 @@ branches:
   except:
     - /^dependabot\/.*$/
 
-os: linux	
+os: linux   
 dist: focal
 virt: lxd
 group: edge

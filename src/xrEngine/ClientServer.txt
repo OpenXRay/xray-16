@@ -1,47 +1,47 @@
 Server
-	- версии критических файлов
-	- хранит информацию об уровне
-		- имя уровня (папка)
+    - версии критических файлов
+    - хранит информацию об уровне
+        - имя уровня (папка)
 
 Клиент
-	- Процесс коннекта
-		1. Сетевой коннект
-		2. SEND: 'M_CONNECT' ClientName, Version, FileVersion, etc
-			RECEIVE: 'accept(+инфо)' or 'decline'
-				'accept'	: goto p.3.
-				'decline'	: сообщение об ошибке
-		3. В пакете 'accept' информация об уровне - загрузка уровня
-			* имя уровня
-		4. SEND: 'M_LOADED'
-			RECEIVE: 'M_START'	
-				* Spawn entities
-				* 1st update
-				* Syncronise time
+    - Процесс коннекта
+        1. Сетевой коннект
+        2. SEND: 'M_CONNECT' ClientName, Version, FileVersion, etc
+            RECEIVE: 'accept(+инфо)' or 'decline'
+                'accept'    : goto p.3.
+                'decline'   : сообщение об ошибке
+        3. В пакете 'accept' информация об уровне - загрузка уровня
+            * имя уровня
+        4. SEND: 'M_LOADED'
+            RECEIVE: 'M_START'  
+                * Spawn entities
+                * 1st update
+                * Syncronise time
 
 
 typedef DWORD CRC32;
 
-MSYS_CONFIG			// server 2 client - first packet ever, uncompressed
+MSYS_CONFIG         // server 2 client - first packet ever, uncompressed
 {
-	u16				probability_table[256];
+    u16             probability_table[256];
 }
  
-M_CONNECT			// client 2 server
+M_CONNECT           // client 2 server
 {
-	char	ClientName	[32];
-	DWORD	Version;
-	CRC32	vEXE;
-	CRC32	vSystemLTX;	
+    char    ClientName  [32];
+    DWORD   Version;
+    CRC32   vEXE;
+    CRC32   vSystemLTX; 
 }
 
-M_ACCEPT			// server 2 client
+M_ACCEPT            // server 2 client
 {
-	char	Level		[32];
+    char    Level       [32];
 }
 
-M_LOADED			// client 2 server
+M_LOADED            // client 2 server
 {
-	
+    
 }
 
 //------------------------------------------------------------------------------------------------
