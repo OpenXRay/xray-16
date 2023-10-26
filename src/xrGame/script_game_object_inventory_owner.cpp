@@ -486,7 +486,7 @@ void CScriptGameObject::TransferMoney(u32 money, CScriptGameObject* pForWho)
     CInventoryOwner* pOtherOwner = smart_cast<CInventoryOwner*>(&pForWho->object());
     VERIFY(pOtherOwner);
 
-    if (pOurOwner->get_money() - money < 0)
+    if (pOurOwner->get_money() < money)
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Character does not have enought money");
         return;
