@@ -42,7 +42,7 @@ constexpr std::array<u32, 256> generate_crc32_lookup_table() noexcept
 }
 
 // Lookup table array
-static constexpr const auto crc32_table = generate_crc32_lookup_table();
+static constexpr auto crc32_table = generate_crc32_lookup_table();
 
 u32 crc32(const void* P, u32 len)
 {
