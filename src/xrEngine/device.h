@@ -30,18 +30,11 @@
 
 class Task;
 
-#pragma pack(push, 4)
-
-// XXX: Merge CRenderDeviceData into CRenderDevice to make it look like in X-Ray 1.5
-
-class ENGINE_API CRenderDeviceData
+// refs
+class ENGINE_API CRenderDevice : public IWindowHandler
 {
 public:
-    static const u32 MaximalWaitTime; // ms
-
-    // Rendering resolution
-    u32 dwWidth;
-    u32 dwHeight;
+    // Main objects used for creating and rendering the 3D scene
 
     // Real application window resolution
     SDL_Rect m_rcWindowBounds;
@@ -49,24 +42,96 @@ public:
     // Real game window resolution
     SDL_Rect m_rcWindowClient;
 
+private:
+    u32 Timer_MM_Delta;
+    CTimer_paused Timer;
+    CTimer_paused TimerGlobal;
+    CTimer TimerMM;
+
+    void _SetupStates();
+
+public:
     // Main window
     SDL_Window* m_sdlWnd;
 
+    // Engine flow-control
+    u32 dwFrame;
     u32 dwPrecacheFrame;
+    u32 dwPrecacheTotal;
+
+    // Rendering resolution
+    u32 dwWidth;
+    u32 dwHeight;
+
+    float fWidth_2;
+    float fHeight_2;
+
     bool b_is_Ready;
     bool b_is_Active;
     bool b_is_InFocus;
     bool IsAnselActive;
 
-    // Engine flow-control
-    u32 dwFrame;
+    // ref_shader m_WireShader;
+    // ref_shader m_SelectionShader;
 
+    bool m_bNearer;
+    void SetNearer(bool enabled)
+    {
+        if (enabled && !m_bNearer)
+        {
+            m_bNearer = true;
+            mProject._43 -= EPS_L;
+        }
+        else if (!enabled && m_bNearer)
+        {
+            m_bNearer = false;
+            mProject._43 += EPS_L;
+        }
+        GEnv.Render->SetCacheXform(mView, mProject);
+        // R_ASSERT(0);
+        // TODO: re-implement set projection
+        // RCache.set_xform_project (mProject);
+    }
+
+    // Registrators
+    MessageRegistry<pureRender> seqRender;
+    MessageRegistry<pureAppActivate> seqAppActivate;
+    MessageRegistry<pureAppDeactivate> seqAppDeactivate;
+    MessageRegistry<pureAppStart> seqAppStart;
+    MessageRegistry<pureAppEnd> seqAppEnd;
+    MessageRegistry<pureFrame> seqFrame;
+    MessageRegistry<pureFrame> seqFrameMT;
+    MessageRegistry<pureDeviceReset> seqDeviceReset;
+    MessageRegistry<pureUIReset> seqUIReset;
+    xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
+
+private:
+    struct RenderDeviceStatistics
+    {
+        CStatTimer RenderTotal; // pureRender
+        CStatTimer EngineTotal; // pureFrame
+        float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
+
+        RenderDeviceStatistics()
+        {
+            fFPS = 30.f;
+            fRFPS = 30.f;
+            fTPS = 0;
+        }
+    };
+
+    RenderDeviceStatistics stats;
+    CStats* Statistic{};
+
+public:
+    // Engine flow-control
     float fTimeDelta;
     float fTimeGlobal;
     u32 dwTimeDelta;
     u32 dwTimeGlobal;
     u32 dwTimeContinual;
 
+    // Cameras & projection
     Fvector vCameraPosition;
     Fvector vCameraDirection;
     Fvector vCameraTop;
@@ -91,85 +156,9 @@ public:
     float fFOV;
     float fASPECT;
 
-protected:
-    u32 Timer_MM_Delta;
-    CTimer_paused Timer;
-    CTimer_paused TimerGlobal;
-
     bool m_allowWindowDrag; // For windowed mode
 
-public:
-    // Registrators
-    MessageRegistry<pureRender> seqRender;
-    MessageRegistry<pureAppActivate> seqAppActivate;
-    MessageRegistry<pureAppDeactivate> seqAppDeactivate;
-    MessageRegistry<pureAppStart> seqAppStart;
-    MessageRegistry<pureAppEnd> seqAppEnd;
-    MessageRegistry<pureFrame> seqFrame;
-};
-
-#pragma pack(pop)
-// refs
-class ENGINE_API CRenderDevice : public CRenderDeviceData, public IWindowHandler
-{
-    struct RenderDeviceStatictics
-    {
-        CStatTimer RenderTotal; // pureRender
-        CStatTimer EngineTotal; // pureFrame
-        float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
-
-        RenderDeviceStatictics()
-        {
-            fFPS = 30.f;
-            fRFPS = 30.f;
-            fTPS = 0;
-        }
-    };
-
-    // Main objects used for creating and rendering the 3D scene
-    CTimer TimerMM;
-    RenderDeviceStatictics stats;
-    CStats* Statistic{};
-
-    void _SetupStates();
-
-public:
-    // u32 dwFrame;
-    // u32 dwPrecacheFrame;
-    u32 dwPrecacheTotal;
-
-    // u32 dwWidth, dwHeight;
-    float fWidth_2, fHeight_2;
-    // bool b_is_Ready;
-    // bool b_is_Active;
     void OnWindowActivate(bool activated);
-
-    // ref_shader m_WireShader;
-    // ref_shader m_SelectionShader;
-
-    bool m_bNearer;
-    void SetNearer(bool enabled)
-    {
-        if (enabled && !m_bNearer)
-        {
-            m_bNearer = true;
-            mProject._43 -= EPS_L;
-        }
-        else if (!enabled && m_bNearer)
-        {
-            m_bNearer = false;
-            mProject._43 += EPS_L;
-        }
-        GEnv.Render->SetCacheXform(mView, mProject);
-        // R_ASSERT(0);
-        // TODO: re-implement set projection
-        // RCache.set_xform_project (mProject);
-    }
-
-    MessageRegistry<pureFrame> seqFrameMT;
-    MessageRegistry<pureDeviceReset> seqDeviceReset;
-    MessageRegistry<pureUIReset> seqUIReset;
-    xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
 
     CRenderDevice()
         : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
@@ -232,7 +221,7 @@ public:
     void FillVideoModes();
     void CleanupVideoModes();
 
-    const RenderDeviceStatictics& GetStats() const { return stats; }
+    const RenderDeviceStatistics& GetStats() const { return stats; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
 
     void SetWindowDraggable(bool draggable);
@@ -254,6 +243,8 @@ public:
 public:
     Event PresentationFinished = nullptr;
     volatile bool mt_bMustExit;
+
+    static constexpr u32 MaximalWaitTime = 16; // ms
 
     // Usable only when called from thread, that initialized SDL
     // Calls SDL_PumpEvents() at least twice.

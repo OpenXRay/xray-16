@@ -36,7 +36,6 @@ ENGINE_API bool g_bRendering = false;
 int ps_fps_limit = 501;
 int ps_fps_limit_in_menu = 60;
 
-const u32 CRenderDeviceData::MaximalWaitTime = 16;
 constexpr size_t MAX_WINDOW_EVENTS = 32;
 
 bool g_bLoaded = false;
