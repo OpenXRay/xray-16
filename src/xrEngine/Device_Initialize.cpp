@@ -23,6 +23,7 @@ void CRenderDevice::Initialize()
         Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
             SDL_WINDOW_RESIZABLE;
 
+        SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
         GEnv.Render->ObtainRequiredWindowFlags(flags);
 
         int icon = IDI_ICON_COP;
