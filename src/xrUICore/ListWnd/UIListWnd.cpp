@@ -8,7 +8,7 @@
 //#define ACTIVE_BACKGROUND_HEIGHT	16
 
 // разделитель для интерактивных строк в листе
-static const char cSeparatorChar = '%';
+//static const char cSeparatorChar = '%';
 
 CUIListWnd::CUIListWnd() : CUIWindow("CUIListWnd")
 {

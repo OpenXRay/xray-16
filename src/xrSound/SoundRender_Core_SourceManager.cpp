@@ -67,10 +67,10 @@ void CSoundRender_Core::i_create_all_sources()
 #ifndef MASTER_GOLD
     CTimer T;
     T.Start();
+    const size_t sizeBefore = s_sources.size();
 #endif
     FS_FileSet flist;
     FS.file_list(flist, "$game_sounds$", FS_ListFiles, "*.ogg");
-    const size_t sizeBefore = s_sources.size();
 
     const auto processFile = [&](const FS_File& file)
     {

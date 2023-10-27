@@ -316,10 +316,11 @@ CMotion* FindMotionKeys(MotionID motion_ID, IRenderVisual* V)
 
 #ifdef DEBUG
 BOOL g_ShowAnimationInfo = FALSE;
-#endif // DEBUG
 constexpr pcstr mov_state[] = {
     "idle", "walk", "run", "sprint",
 };
+#endif // DEBUG
+
 void CActor::g_SetAnimation(u32 mstate_rl)
 {
     if (!g_Alive())

@@ -30,7 +30,7 @@
 
 const float LOSE_CONTROL_DISTANCE = 0.5f; // fly distance to lose control
 const float CLAMB_DISTANCE = 0.5f;
-const float CLIMB_GETUP_HEIGHT = 0.3f;
+//const float CLIMB_GETUP_HEIGHT = 0.3f;
 
 float IC sgn(float v) { return v < 0.f ? -1.f : 1.f; }
 bool test_sides(const Fvector& center, const Fvector& side_dir, const Fvector& fv_dir, const Fvector& box, int tri_id)
@@ -808,7 +808,7 @@ void CPHSimpleCharacter::PhTune(dReal step)
 
 const float CHWON_ACCLEL_SHIFT = 0.4f;
 const float CHWON_AABB_FACTOR = 1.f;
-const float CHWON_ANG_COS = M_SQRT1_2;
+//const float CHWON_ANG_COS = M_SQRT1_2;
 const float CHWON_CALL_UP_SHIFT = 0.05f;
 const float CHWON_CALL_FB_HIGHT = 1.5f;
 const float CHWON_AABB_FB_FACTOR = 1.f;
@@ -1874,8 +1874,10 @@ void CPHSimpleCharacter::TestRestrictorContactCallbackFun(
     CPHActorCharacter* actor_character = (static_cast<CPHCharacter*>(obj_data->ph_object))->CastActorCharacter();
     if (!actor_character)
         return;
-    CPHSimpleCharacter* ch_this = static_cast<CPHSimpleCharacter*>(retrieveGeomUserData(g_this)->ph_object);
+
+    [[maybe_unused]] CPHSimpleCharacter* ch_this = static_cast<CPHSimpleCharacter*>(retrieveGeomUserData(g_this)->ph_object);
     VERIFY(ch_this);
+
     save_max(restrictor_depth, c.geom.depth);
     do_colide = true;
     c.surface.mu = 0.f;

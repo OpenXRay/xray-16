@@ -48,8 +48,7 @@ MxVertexID MxStdModel::alloc_vertex(float x, float y, float z)
     vertex_mark_valid(id);
 
     face_links.add(xr_new<MxFaceList>());
-    unsigned int l = face_links.last_id();
-    VERIFY(l == id);
+    VERIFY(face_links.last_id() == id);
     VERIFY(neighbors(id).length() == 0);
 
     return id;
@@ -560,7 +559,7 @@ void MxStdModel::apply_expansion(const MxPairExpansion& conx)
         MxFaceID fid = conx.delta_faces(i);
         face(fid).remap_vertex(v1, v2);
         neighbors(v2).add(fid);
-        bool found = varray_find(neighbors(v1), fid, &j);
+        [[maybe_unused]] bool found = varray_find(neighbors(v1), fid, &j);
         VERIFY(found);
         neighbors(v1).remove(j);
     }

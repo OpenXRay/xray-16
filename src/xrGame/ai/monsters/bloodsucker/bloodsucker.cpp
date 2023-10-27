@@ -26,10 +26,10 @@ namespace detail::bloodsucker
 {
 // default hit settings
 float const default_critical_hit_chance = 0.25f;
-float const default_hit_camera_effector_angle = 0;
-float const default_critical_hit_camera_effector_angle = 3.1415f / 6;
+//float const default_hit_camera_effector_angle = 0;
+//float const default_critical_hit_camera_effector_angle = 3.1415f / 6;
 
-float const default_camera_effector_move_angular_speed = 1.5f;
+//float const default_camera_effector_move_angular_speed = 1.5f;
 u32 const default_visibility_state_change_min_delay = 1000;
 
 float const default_full_visibility_radius = 5;

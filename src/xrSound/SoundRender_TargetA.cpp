@@ -153,7 +153,7 @@ void CSoundRender_TargetA::update()
 
 void CSoundRender_TargetA::fill_parameters()
 {
-    CSoundRender_Emitter* SE = m_pEmitter;
+    [[maybe_unused]] CSoundRender_Emitter* SE = m_pEmitter;
     VERIFY(SE);
 
     inherited::fill_parameters();

@@ -75,9 +75,9 @@
 #include "ui/UIDragDropReferenceList.h"
 #include "xrCore/xr_token.h"
 
-const u32 patch_frames = 50;
-const float respawn_delay = 1.f;
-const float respawn_auto = 7.f;
+//const u32 patch_frames = 50;
+//const float respawn_delay = 1.f;
+//const float respawn_auto = 7.f;
 
 constexpr float default_feedback_duration = 0.2f;
 
