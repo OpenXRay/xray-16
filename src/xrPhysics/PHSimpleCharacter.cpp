@@ -156,6 +156,7 @@ CPHSimpleCharacter::CPHSimpleCharacter()
     is_contact = false;
     was_contact = false;
     is_control = false;
+    was_control = false;
     b_depart = false;
     b_meet = false;
     b_lose_control = true;
