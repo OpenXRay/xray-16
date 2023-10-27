@@ -1,5 +1,12 @@
 #pragma once
 
+#if __has_include(<d3dx9.h>)
+#   include <d3dx9.h>
+#   define USE_D3DX
+#else
+#   include <d3dcompiler.h>
+#endif
+
 #ifdef USE_D3DX
 // When building with Unity build, d3dx9.h and d3dcompiler.h both get included in files
 // So we cannot just declare:

@@ -2,6 +2,8 @@
 
 #include "ResourceManager.h"
 
+#include "Layers/xrRenderDX9/dx9shader_utils.h"
+
 #ifdef USE_OGL
 static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
 {
@@ -694,13 +696,13 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
         pcstr c_target, c_entry;
         ShaderTypeTraits<T>::GetCompilationTarget(c_target, c_entry, data);
 
-#if defined(USE_DX9)
+#if defined(USE_D3DX)
 #   ifdef NDEBUG
         flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR;
 #   else
         flags |= D3DXSHADER_PACKMATRIX_ROWMAJOR | (xrDebug::DebuggerIsPresent() ? D3DXSHADER_DEBUG : 0);
 #   endif
-#elif defined(USE_DX11)
+#elif !defined(USE_OGL)
 #   ifdef NDEBUG
         flags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #   else

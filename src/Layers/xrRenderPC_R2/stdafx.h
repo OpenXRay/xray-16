@@ -15,15 +15,6 @@
 #endif
 #include <d3d9.h>
 
-#if __has_include(<d3dx9.h>)
-#   include <d3dx9.h>
-#   define USE_D3DX
-#endif
-
-#ifndef USE_D3DX
-#   include <d3dcompiler.h>
-#endif
-
 #include "Layers/xrRenderDX9/CommonTypes.h"
 
 #include "Layers/xrRenderDX9/dx9HW.h"

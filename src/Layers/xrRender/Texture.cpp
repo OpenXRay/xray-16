@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include <d3dx9.h>
+
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
 void fix_texture_name(pstr fn)
