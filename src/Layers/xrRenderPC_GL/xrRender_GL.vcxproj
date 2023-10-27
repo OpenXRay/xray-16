@@ -114,6 +114,7 @@
     <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp" />
     <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp" />
     <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp" />
+    <ClCompile Include="..\xrRender\xr_effgamma.cpp" />
     <ClCompile Include="..\xrRender_R2\r2.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_blenders.cpp" />
     <ClCompile Include="..\xrRender_R2\r2_loader.cpp" />
@@ -362,6 +363,7 @@
     <ClInclude Include="..\xrRender\blenders\uber_deffer.h" />
     <ClInclude Include="..\xrRender\WallmarksEngine.h" />
     <ClInclude Include="..\xrRender\xrRender_console.h" />
+    <ClInclude Include="..\xrRender\xr_effgamma.h" />
     <ClInclude Include="..\xrRender_R2\r2.h" />
     <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h" />
     <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h" />

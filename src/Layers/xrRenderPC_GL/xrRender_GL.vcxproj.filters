@@ -699,6 +699,9 @@
     <ClCompile Include="..\xrRenderGL\glr_screenshot.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\xr_effgamma.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Gamma</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1156,6 +1159,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\dxImGuiRender.h">
       <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\xr_effgamma.h">
+      <Filter>Refactored\Execution &amp; 3D\Gamma</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
