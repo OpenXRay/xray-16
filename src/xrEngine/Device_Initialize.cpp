@@ -44,8 +44,12 @@ void CRenderDevice::Initialize()
             "window", "title", title);
 
         xr_strcpy(Core.ApplicationTitle, title);
+        SDL_SetHint(SDL_HINT_APP_NAME, title);
+        SDL_SetHint(SDL_HINT_AUDIO_DEVICE_APP_NAME, title);
+
         m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
+
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
         xrDebug::SetWindowHandler(this);
