@@ -1,8 +1,9 @@
 #pragma once
 
 #include "ResourceManager.h"
-
-#include "Layers/xrRenderDX9/dx9shader_utils.h"
+#ifdef USE_DX9
+#   include "Layers/xrRenderDX9/dx9shader_utils.h"
+#endif
 
 #ifdef USE_OGL
 static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
