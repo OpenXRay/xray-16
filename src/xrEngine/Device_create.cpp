@@ -3,7 +3,7 @@
 #include "Render.h"
 #include "xrCDB/xrXRC.h"
 
-void CRenderDevice::_SetupStates()
+void CRenderDevice::SetupStates()
 {
     // General Render States
     mView.identity();
@@ -17,17 +17,6 @@ void CRenderDevice::_SetupStates()
 }
 
 void CRenderDevice::Create()
-{
-    if (b_is_Ready)
-        return; // prevent double call
-
-    // Start all threads
-    mt_bMustExit = false;
-
-    CreateInternal();
-}
-
-void CRenderDevice::CreateInternal()
 {
     if (b_is_Ready)
         return; // prevent double call
@@ -50,7 +39,7 @@ void CRenderDevice::CreateInternal()
     Memory.mem_compact();
     b_is_Ready = true;
 
-    _SetupStates();
+    SetupStates();
     string_path fname;
     FS.update_path(fname, "$game_data$", "shaders.xr");
     GEnv.Render->OnDeviceCreate(fname);

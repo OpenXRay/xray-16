@@ -50,7 +50,7 @@ void CRenderDevice::Reset(bool precache /*= true*/)
     if (GEnv.Render->GetBackendAPI() == IRender::BackendAPI::D3D9) // XXX: I don't remember why this hack is needed, thus, I'm not sure if it is needed at all
         UpdateWindowProps(); // hack
 
-    _SetupStates();
+    SetupStates();
 
     if (precache)
         PreCache(20, true, false);
