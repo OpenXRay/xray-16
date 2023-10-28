@@ -150,12 +150,14 @@ CPHSimpleCharacter::CPHSimpleCharacter()
     m_ext_imulse.set(0, 0, 0);
     m_phys_ref_object = NULL;
     b_on_object = false;
+    b_was_on_object = false;
     m_friction_factor = 1.f;
     dVectorSetZero(m_control_force);
     dVectorSetZero(m_depart_position);
     is_contact = false;
     was_contact = false;
     is_control = false;
+    was_control = false;
     b_depart = false;
     b_meet = false;
     b_lose_control = true;

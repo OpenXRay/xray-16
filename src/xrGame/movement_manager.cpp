@@ -33,6 +33,7 @@ using namespace MovementManager;
 const float verify_distance = 15.f;
 
 CMovementManager::CMovementManager(CCustomMonster* object)
+    : m_path_actuality(true), m_enabled(true), m_extrapolate_path(true)
 {
     VERIFY(object);
     m_object = object;
