@@ -242,8 +242,6 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     {
         DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
         DXGI_FORMAT_D24_UNORM_S8_UINT,
-        DXGI_FORMAT_D32_FLOAT,
-        DXGI_FORMAT_D16_UNORM
     };
     const DXGI_FORMAT selectedFormat = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats);
     if (selectedFormat == DXGI_FORMAT_UNKNOWN)
