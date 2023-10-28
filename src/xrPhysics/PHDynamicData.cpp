@@ -56,7 +56,7 @@ bool PHDynamicData::SetChild(unsigned int childNum,unsigned int numOfchilds,dBod
 		if(numOfchilds>0)
 			//Childs[childNum].Childs=new PHDynamicData[numOfchilds];
 			Childs[childNum].Childs.resize(numOfchilds);
-		else   
+		else
 			//Childs[childNum].Childs=NULL;
 			Childs[childNum].numOfChilds=0;
 

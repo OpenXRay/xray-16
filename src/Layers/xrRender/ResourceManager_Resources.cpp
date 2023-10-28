@@ -29,7 +29,7 @@ void simplify_texture(string_path& fn)
 
 SState* CResourceManager::_CreateState(SimulatorStates& state_code)
 {
-    // Search equal state-code 
+    // Search equal state-code
     for (SState* C : v_states)
     {
         SimulatorStates& base = C->state_code;

@@ -615,7 +615,7 @@ CSE_ALifeCustomZone::~CSE_ALifeCustomZone() {}
 void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
-    
+
     tNetPacket.r_float(m_maxPower);
 
     if (m_wVersion < 113)

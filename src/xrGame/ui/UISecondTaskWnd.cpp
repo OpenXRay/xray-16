@@ -283,7 +283,7 @@ void UITaskListWndItem::update_view()
 
     const CGameTask* storyTask = Level().GameTaskManager().ActiveTask(eTaskTypeStoryline);
     const CGameTask* additionalTask = Level().GameTaskManager().ActiveTask(eTaskTypeAdditional);
-    
+
     if (m_task == storyTask || m_task == additionalTask)
     {
         m_name->SetStateTextColor(m_color_states[stt_activ], S_Enabled);
@@ -320,7 +320,7 @@ void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             return;
         }
     }
-    
+
     if (pWnd == m_name)
     {
         if (msg == BUTTON_DOWN)

@@ -24,7 +24,7 @@
 //Alundaio
 #include "RadioactiveZone.h"
 BOOL g_ai_die_in_anomaly = 0;
-//-Alundaio 
+//-Alundaio
 
 CSpaceRestrictor::~CSpaceRestrictor() {}
 void CSpaceRestrictor::Center(Fvector& C) const { XFORM().transform_tiny(C, GetCForm()->getSphere().P); }

@@ -39,7 +39,7 @@ void CBlender_ShTex::Compile(CBlender_Compile& C)
         C.Stage_Constant("$null");
         C.StageEnd();
 
-        // 
+        //
         C.R().SetRS(D3DRS_TEXTUREFACTOR, 0);
     }
     C.PassEnd();

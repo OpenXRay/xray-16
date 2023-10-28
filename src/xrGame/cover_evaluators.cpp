@@ -59,7 +59,7 @@ bool CCoverEvaluatorBase::inertia(Fvector const& position, float radius)
         return false;
 
     smart_cover::loophole const* loophole = m_stalker->get_current_loophole();
-    
+
     if (!loophole || !cover->is_position_in_danger_fov(*loophole, position))
         return false;
 

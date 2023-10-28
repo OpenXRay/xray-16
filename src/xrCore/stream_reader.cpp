@@ -2,7 +2,7 @@
 #include "stream_reader.h"
 #include "xrCore/_std_extensions.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <sys/mman.h>
 #endif
 
@@ -18,7 +18,7 @@ void CStreamReader::construct(const HANDLE& file_mapping_handle, const size_t& s
 
     map(0);
 }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 void CStreamReader::construct(int file_mapping_handle, const size_t& start_offset, const size_t& file_size,
     const size_t& archive_size, const size_t& window_size)
 {
@@ -59,7 +59,7 @@ void CStreamReader::map(const size_t& new_offset)
 #if defined(XR_PLATFORM_WINDOWS)
     m_current_map_view_of_file =
         static_cast<u8*>(MapViewOfFile(m_file_mapping_handle, FILE_MAP_READ, 0, start_offset, m_current_window_size));
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     m_current_map_view_of_file =
         static_cast<u8*>(::mmap(NULL, m_current_window_size, PROT_READ, MAP_SHARED, m_file_mapping_handle, start_offset));
 #else

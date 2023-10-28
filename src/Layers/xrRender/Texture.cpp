@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include <d3dx9.h>
+
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
 void fix_texture_name(pstr fn)
@@ -298,10 +300,10 @@ _DDS:
     // Load and get header
     D3DXIMAGE_INFO IMG;
     S = FS.r_open(fn);
-#ifdef DEBUG
-    Msg("* Loaded: %s[%d]", fn, S->length());
-#endif // DEBUG
     img_size = S->length();
+#ifdef DEBUG
+    Msg("* Loaded: %s[%zu]", fn, img_size);
+#endif // DEBUG
     R_ASSERT(S);
     result = D3DXGetImageInfoFromFileInMemory(S->pointer(), S->length(), &IMG);
     if (FAILED(result))

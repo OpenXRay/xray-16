@@ -264,7 +264,7 @@ void CUIGameSP::ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id
 }
 
 void CUIGameSP::StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators)
-{ 
+{
     inherited::StartDialog(pDialog, bDoHideIndicators);
 
     if (pDialog == ActorMenu && ActorMenu->GetMenuMode() == mmInventory)

@@ -491,8 +491,8 @@ public:
     float GetCurrentOutfitProtection(int hit_type);
 
     bool IsOnBelt(CScriptGameObject* obj) const;
-    CScriptGameObject* ItemOnBelt(u32 item_id) const;  
-    u32 BeltSize() const;  
+    CScriptGameObject* ItemOnBelt(u32 item_id) const;
+    u32 BeltSize() const;
 
     void deadbody_closed(bool status);
     bool deadbody_closed_status();
@@ -795,7 +795,7 @@ public:
     void unlock_door_for_npc();
     bool is_door_blocked_by_npc() const;
     bool is_weapon_going_to_be_strapped(CScriptGameObject const* object) const;
-    
+
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
     // Alundaio
     void inactualize_level_path();

@@ -163,7 +163,7 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
 
     // check version
     R_ASSERT(I->find_chunk(0));
-    u32 version = I->r_u32();
+    [[maybe_unused]] u32 version = I->r_u32();
     VERIFY2(version == 0, "Invalid SOM version");
 
     struct SOM_poly

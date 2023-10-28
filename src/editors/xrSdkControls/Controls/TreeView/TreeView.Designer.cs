@@ -70,7 +70,7 @@ namespace XRay.SdkControls
             {
                 Name = "contextMenu",
                 Size = new System.Drawing.Size(153, 92)
-                
+
             };
 
             this.contextMenu.SuspendLayout();

@@ -60,7 +60,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
         xr_strcat(name, "_4");
         break;
     }
-    
+
     return CreateShader<SVS>(name, shader, flags);
 }
 

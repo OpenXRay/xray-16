@@ -278,7 +278,7 @@ void CHW::Reset()
     while (true)
     {
         const HRESULT result = pDevice->Reset(&DevPP);
-        
+
         if (SUCCEEDED(result))
             break;
 

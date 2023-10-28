@@ -110,7 +110,7 @@ IC void CBackend::set_Matrices(SMatrixList* _M)
         {
             for (u32 it = 0; it < M->size(); it++)
             {
-                CMatrix* mat = &*((*M)[it]);
+                CMatrix* mat = (*M)[it]._get();
                 if (mat && matrices[it] != mat)
                 {
                     matrices[it] = mat;

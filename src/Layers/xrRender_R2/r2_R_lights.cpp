@@ -97,7 +97,7 @@ void CRender::render_lights(light_Package& LP)
         auto& dsgraph = RImplementation.get_context(task_data->batch_id);
         {
             auto* L = task_data->L;
-            
+
             L->svis[task_data->batch_id].begin();
 
             dsgraph.o.phase = PHASE_SMAP;

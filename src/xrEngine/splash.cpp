@@ -64,7 +64,7 @@ public:
         }
 
         Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
-    
+
 #if SDL_VERSION_ATLEAST(2,0,5)
         if (topmost)
             flags |= SDL_WINDOW_ALWAYS_ON_TOP;

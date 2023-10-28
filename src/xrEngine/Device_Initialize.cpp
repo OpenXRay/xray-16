@@ -23,6 +23,7 @@ void CRenderDevice::Initialize()
         Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
             SDL_WINDOW_RESIZABLE;
 
+        SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
         GEnv.Render->ObtainRequiredWindowFlags(flags);
 
         int icon = IDI_ICON_COP;
@@ -43,8 +44,12 @@ void CRenderDevice::Initialize()
             "window", "title", title);
 
         xr_strcpy(Core.ApplicationTitle, title);
+        SDL_SetHint(SDL_HINT_APP_NAME, title);
+        SDL_SetHint(SDL_HINT_AUDIO_DEVICE_APP_NAME, title);
+
         m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
+
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
         xrDebug::SetWindowHandler(this);
@@ -79,7 +84,7 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, 
     constexpr int hit = 15;
     constexpr int fix = 65535; // u32(-1)
 
-    // Workaround for SDL bug 
+    // Workaround for SDL bug
     if (area.x + hit >= fix && rect.w <= fix - hit)
         area.x -= fix;
 

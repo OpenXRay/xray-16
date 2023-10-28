@@ -83,20 +83,20 @@ void CGameSpy_QR2::RegisterAdditionalKeys()
 };
 
 bool CGameSpy_QR2::Init(int PortID, int Public, SInitConfig& ctx)
-{        
-    qr2_error_t err = xrGS_qr2_initA(nullptr, 
-                                     nullptr, 
-                                     PortID, 
-                                     Public, 
-                                     0, 
-                                     ctx.OnServerKey, 
-                                     ctx.OnPlayerKey, 
+{
+    qr2_error_t err = xrGS_qr2_initA(nullptr,
+                                     nullptr,
+                                     PortID,
+                                     Public,
+                                     0,
+                                     ctx.OnServerKey,
+                                     ctx.OnPlayerKey,
                                      ctx.OnTeamKey,
-                                     ctx.OnKeyList, 
-                                     ctx.OnCount, 
-                                     ctx.OnError, 
+                                     ctx.OnKeyList,
+                                     ctx.OnCount,
+                                     ctx.OnError,
                                      ctx.GSServer);
-        
+
 #ifndef MASTER_GOLD
     Msg("xrGS::xrGS_qr2_initA returned code is [%d]", err);
 #endif // #ifndef MASTER_GOLD
@@ -115,7 +115,7 @@ bool CGameSpy_QR2::Init(int PortID, int Public, SInitConfig& ctx)
     // Set a function to be called when we receive a nat negotiation request
     qr2_register_natneg_callback(NULL, ctx.OnNatNeg);
 
-    // Set a function to be called when gamespy responds my IP and port number    
+    // Set a function to be called when gamespy responds my IP and port number
     qr2_register_denyresponsetoip_callback(NULL, ctx.OnDenyIP);
 
 #ifndef MASTER_GOLD

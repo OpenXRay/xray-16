@@ -84,7 +84,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         strconcat(sizeof(_path), _path, profile, ":back:texture");
         LPCSTR texture = xml_doc.Read(_path, 0, nullptr);
         R_ASSERT(texture);
-        
+
         if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
         {
             tempBackground = xr_new<CUIStatic>("temporary background");

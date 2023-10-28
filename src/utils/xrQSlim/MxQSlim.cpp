@@ -298,7 +298,6 @@ void MxEdgeQSlim::apply_mesh_penalties(MxQSlimEdge* info)
     if (nfailed)
         bias += nfailed * meshing_penalty;
 
-    static u32 a = 0;
     //	if (a)
     {
         double Nmin1 = check_local_inversion(info->v1, info->v2, info->vnew);
@@ -481,7 +480,7 @@ void MxEdgeQSlim::update_pre_contract(const MxPairContraction& conx)
         if (u == v1 || varray_find(star, u))
         {
             // This is a useless link --- kill it
-            bool found = varray_find(edge_links(u), e, &j);
+            [[maybe_unused]] bool found = varray_find(edge_links(u), e, &j);
             VERIFY(found);
             edge_links(u).remove(j);
             heap.remove(e);

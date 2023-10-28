@@ -16,7 +16,7 @@ The following keys are supported / required:
 <FILE> == any file name
 
 Используемые в работе компилятора файлы:
-    
+
 При сборке level.ai из build.aimap:
 Пример ключей запуска:
     "-f labx8 -keep_temp_files -out level.ai -pure_alloc"

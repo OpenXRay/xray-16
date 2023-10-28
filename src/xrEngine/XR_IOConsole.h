@@ -114,9 +114,9 @@ public:
 
     virtual void OnRender();
     virtual void OnFrame();
-    
+
     void OnUIReset() override;
-    
+
     pcstr GetUserConfigFileName() override { return ConfigFile; }
 
     string64 ConfigFile;
