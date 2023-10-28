@@ -52,8 +52,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     sampleCount = SampleCount;
     n_slices = slices_num;
 
-    const bool createBaseTarget = flags.test(CreateBase);
-    if (createBaseTarget)
+    if (flags.test(CreateBase))
     {
         dwFlags |= CreateBase;
         if (!used_as_depth())
@@ -111,8 +110,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         dx11FMT = dx11TextureUtils::ConvertTextureFormat(fmt);
         break;
     }
-    if (createBaseTarget) // just override
-        dx11FMT = dx11TextureUtils::ConvertTextureFormat(fmt);
 
     const bool useAsDepth = usage != D3DUSAGE_RENDERTARGET;
 
@@ -136,7 +133,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         pSurface->GetDesc(&desc);
     else
     {
-        const u32 initialBindFlag = createBaseTarget ? 0 : D3D_BIND_SHADER_RESOURCE;
         ZeroMemory(&desc, sizeof(desc));
         desc.Width = dwWidth;
         desc.Height = dwHeight;
@@ -145,11 +141,10 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         desc.Format = dx11FMT;
         desc.SampleDesc.Count = SampleCount;
         desc.Usage = D3D_USAGE_DEFAULT;
-        if (SampleCount <= 1)
-            desc.BindFlags = initialBindFlag | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
-        else
+        desc.BindFlags = D3D_BIND_SHADER_RESOURCE | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
+        if (SampleCount > 1)
         {
-            desc.BindFlags = (useAsDepth ? D3D_BIND_DEPTH_STENCIL : (initialBindFlag | D3D_BIND_RENDER_TARGET));
+            desc.BindFlags = D3D_BIND_SHADER_RESOURCE | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
             if (RImplementation.o.msaa_opt)
             {
                 desc.SampleDesc.Quality = u32(D3D_STANDARD_MULTISAMPLE_PATTERN);
@@ -273,11 +268,11 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         CHK_DX(HW.pDevice->CreateUnorderedAccessView(pSurface, &UAVDesc, &pUAView));
     }
 #endif
-    if (createBaseTarget)
+    if (!(desc.BindFlags & D3D_BIND_SHADER_RESOURCE))
     {
         // pTexture->surface_set(pSurface) creates shader resource view
-        // which requires D3D_BIND_SHADER_RESOURCE flag to be set,
-        // but it isn't set for Base target.
+        // which requires D3D_BIND_SHADER_RESOURCE flag to be set.
+        // Usually, it isn't set swapchain's buffers.
         return;
     }
 
