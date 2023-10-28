@@ -14,9 +14,8 @@
 #include "GameFont.h"
 
 #include "Include/xrRender/UIRender.h"
+#include "xrUICore/ui_defs.h"
 
-static float const UI_BASE_WIDTH = 1024.0f;
-static float const UI_BASE_HEIGHT = 768.0f;
 static float const LDIST = 0.05f;
 static u32 const cmd_history_max = 64;
 
