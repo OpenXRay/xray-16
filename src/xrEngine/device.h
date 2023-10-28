@@ -4,10 +4,7 @@
 
 // Note:
 // ZNear - always 0.0f
-// ZFar - always 1.0f
-
-// class ENGINE_API CResourceManager;
-// class ENGINE_API CGammaControl;
+// ZFar  - always 1.0f
 
 #include "pure.h"
 
@@ -28,53 +25,50 @@
 
 #include <SDL.h>
 
+// refs
 class Task;
 
-// refs
 class ENGINE_API CRenderDevice : public IWindowHandler
 {
 public:
     // Main objects used for creating and rendering the 3D scene
-
     // Real application window resolution
-    SDL_Rect m_rcWindowBounds;
+    SDL_Rect m_rcWindowBounds{};
 
     // Real game window resolution
-    SDL_Rect m_rcWindowClient;
+    SDL_Rect m_rcWindowClient{};
 
 private:
-    u32 Timer_MM_Delta;
+    u32 Timer_MM_Delta{};
     CTimer_paused Timer;
     CTimer_paused TimerGlobal;
     CTimer TimerMM;
 
-    void _SetupStates();
+    void SetupStates();
 
 public:
     // Main window
-    SDL_Window* m_sdlWnd;
+    SDL_Window* m_sdlWnd{};
 
     // Engine flow-control
-    u32 dwFrame;
-    u32 dwPrecacheFrame;
-    u32 dwPrecacheTotal;
+    u32 dwFrame{};
+    u32 dwPrecacheFrame{};
+    u32 dwPrecacheTotal{};
 
     // Rendering resolution
-    u32 dwWidth;
-    u32 dwHeight;
+    u32 dwWidth{};
+    u32 dwHeight{};
 
-    float fWidth_2;
-    float fHeight_2;
+    float fWidth_2{};
+    float fHeight_2{};
 
-    bool b_is_Ready;
-    bool b_is_Active;
-    bool b_is_InFocus;
-    bool IsAnselActive;
+    bool b_is_Ready{};
+    bool b_is_Active{};
+    bool b_is_InFocus{};
 
-    // ref_shader m_WireShader;
-    // ref_shader m_SelectionShader;
+    bool m_bNearer{};
 
-    bool m_bNearer;
+public:
     void SetNearer(bool enabled)
     {
         if (enabled && !m_bNearer)
@@ -93,6 +87,7 @@ public:
         // RCache.set_xform_project (mProject);
     }
 
+public:
     // Registrators
     MessageRegistry<pureRender> seqRender;
     MessageRegistry<pureAppActivate> seqAppActivate;
@@ -125,51 +120,44 @@ private:
 
 public:
     // Engine flow-control
-    float fTimeDelta;
-    float fTimeGlobal;
-    u32 dwTimeDelta;
-    u32 dwTimeGlobal;
-    u32 dwTimeContinual;
+    float fTimeDelta{};
+    float fTimeGlobal{};
+    u32 dwTimeDelta{};
+    u32 dwTimeGlobal{};
+    u32 dwTimeContinual{};
 
     // Cameras & projection
-    Fvector vCameraPosition;
-    Fvector vCameraDirection;
-    Fvector vCameraTop;
-    Fvector vCameraRight;
+    Fvector vCameraPosition{};
+    Fvector vCameraDirection{};
+    Fvector vCameraTop{};
+    Fvector vCameraRight{};
 
-    Fmatrix mView;
-    Fmatrix mInvView;
-    Fmatrix mProject;
-    Fmatrix mFullTransform;
-    Fmatrix mInvFullTransform;
+    Fmatrix mView{};
+    Fmatrix mInvView{};
+    Fmatrix mProject{};
+    Fmatrix mFullTransform{};
+    Fmatrix mInvFullTransform{};
 
     // Copies of corresponding members. Used for synchronization.
-    Fvector vCameraPositionSaved;
-    Fvector vCameraDirectionSaved;
-    Fvector vCameraTopSaved;
-    Fvector vCameraRightSaved;
+    Fvector vCameraPositionSaved{};
+    Fvector vCameraDirectionSaved{};
+    Fvector vCameraTopSaved{};
+    Fvector vCameraRightSaved{};
 
-    Fmatrix mViewSaved;
-    Fmatrix mProjectSaved;
-    Fmatrix mFullTransformSaved;
+    Fmatrix mViewSaved{};
+    Fmatrix mProjectSaved{};
+    Fmatrix mFullTransformSaved{};
 
-    float fFOV;
-    float fASPECT;
+    float fFOV{};
+    float fASPECT{};
 
-    bool m_allowWindowDrag; // For windowed mode
-
-    void OnWindowActivate(bool activated);
+    bool m_allowWindowDrag{}; // For windowed mode
+    bool IsAnselActive{};
 
     CRenderDevice()
-        : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
-          mt_bMustExit(false)
     {
-        m_sdlWnd = NULL;
-        b_is_Active = false;
-        b_is_Ready = false;
         Timer.Start();
-        m_bNearer = false;
-    };
+    }
 
     void Pause(bool bOn, bool bTimer, bool bSound, pcstr reason);
     bool Paused();
@@ -200,23 +188,18 @@ public:
     u32 TimerAsync() { return TimerGlobal.GetElapsed_ms(); }
     u32 TimerAsync_MMT() { return TimerMM.GetElapsed_ms() + Timer_MM_Delta; }
 
-private:
-    // Creation & Destroying
-    void CreateInternal();
-
 public:
+    // Creation & Destroying
     void Create();
-
-    void Run(void);
-    void Destroy(void);
+    void Run();
+    void Destroy();
     void Reset(bool precache = true);
 
     void UpdateWindowProps();
     void UpdateWindowRects();
     void SelectResolution(bool windowed);
 
-    void Initialize(void);
-    void ShutDown(void);
+    void Initialize();
 
     void FillVideoModes();
     void CleanupVideoModes();
@@ -241,8 +224,9 @@ public:
     }
 
 public:
+    // Multi-threading
     Event PresentationFinished = nullptr;
-    volatile bool mt_bMustExit;
+    volatile bool mt_bMustExit{};
 
     static constexpr u32 MaximalWaitTime = 16; // ms
 
@@ -274,11 +258,9 @@ public:
 private:
     void CalcFrameStats();
 
-private:
-    void message_loop();
+    void OnWindowActivate(bool activated);
 
-private:
-    xray::editor::ide m_editor;
+    void message_loop();
 
 public:
     [[nodiscard]]
@@ -286,6 +268,9 @@ public:
 
     [[nodiscard]]
     auto editor_mode() const { return m_editor.is_shown(); }
+
+private:
+    xray::editor::ide m_editor;
 };
 
 extern ENGINE_API CRenderDevice Device;
