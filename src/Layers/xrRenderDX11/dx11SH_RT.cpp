@@ -24,20 +24,6 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
-bool CRT::used_as_depth() const
-{
-    switch (fmt)
-    {
-    case D3DFMT_D15S1:
-    case D3DFMT_D24X8:
-    case D3DFMT_D32S8X24:
-    case MAKEFOURCC('D', 'F', '2', '4'):
-        return true;
-    default:
-        return false;
-    }
-}
-
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
 {
     if (pSurface)
@@ -51,18 +37,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     fmt = f;
     sampleCount = SampleCount;
     n_slices = slices_num;
-
-    if (flags.test(CreateBase))
-    {
-        dwFlags |= CreateBase;
-        if (!used_as_depth())
-        {
-            u32 idx;
-            char const* str = strrchr(Name, '_');
-            sscanf(++str, "%d", &idx);
-            R_CHK(HW.m_pSwapChain->GetBuffer(idx, __uuidof(ID3DTexture2D), (LPVOID*)&pSurface));
-        }
-    }
 
     //	DirectX 10 supports non-power of two textures
     // Pow2
@@ -79,9 +53,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 
     // Select usage
     u32 usage = D3DUSAGE_RENDERTARGET;
-    if (used_as_depth())
-        usage = D3DUSAGE_DEPTHSTENCIL;
-
     DXGI_FORMAT dx11FMT;
 
     switch (fmt)
@@ -92,6 +63,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         break;
 
     case D3DFMT_D24S8:
+    case D3DFMT_D24X8:
+    case D3DFMT_D24X4S4:
         dx11FMT = DXGI_FORMAT_R24G8_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
@@ -101,6 +74,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
 
+    case D3DFMT_D16:
     case D3DFMT_D16_LOCKABLE:
         dx11FMT = DXGI_FORMAT_R16_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
@@ -111,7 +85,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         break;
     }
 
-    const bool useAsDepth = usage != D3DUSAGE_RENDERTARGET;
+    const bool useAsDepth = usage == D3DUSAGE_DEPTHSTENCIL;
 
     // Validate render-target usage
     u32 required = D3D_FORMAT_SUPPORT_TEXTURE2D;
@@ -123,6 +97,18 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 
     if (!HW.CheckFormatSupport(dx11FMT, required))
         return;
+
+    if (flags.test(CreateBase))
+    {
+        dwFlags |= CreateBase;
+        if (!useAsDepth)
+        {
+            u32 idx;
+            char const* str = strrchr(Name, '_');
+            sscanf(++str, "%d", &idx);
+            R_CHK(HW.m_pSwapChain->GetBuffer(idx, __uuidof(ID3DTexture2D), (LPVOID*)&pSurface));
+        }
+    }
 
     // Try to create texture/surface
     RImplementation.Resources->Evict();
