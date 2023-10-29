@@ -240,7 +240,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     // Select depth-stencil format
     constexpr DXGI_FORMAT formats[] =
     {
-        DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
+        //DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
         DXGI_FORMAT_D24_UNORM_S8_UINT,
     };
     const DXGI_FORMAT selectedFormat = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats);
