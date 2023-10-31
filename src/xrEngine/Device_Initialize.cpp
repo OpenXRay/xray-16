@@ -44,8 +44,13 @@ void CRenderDevice::Initialize()
             "window", "title", title);
 
         xr_strcpy(Core.ApplicationTitle, title);
-        SDL_SetHint(SDL_HINT_APP_NAME, title);
+
+#if SDL_VERSION_ATLEAST(2, 0, 14)
         SDL_SetHint(SDL_HINT_AUDIO_DEVICE_APP_NAME, title);
+#   if SDL_VERSION_ATLEAST(2, 0, 18)
+        SDL_SetHint(SDL_HINT_APP_NAME, title);
+#   endif
+#endif
 
         m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
