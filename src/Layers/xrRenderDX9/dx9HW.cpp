@@ -50,9 +50,21 @@ void CHW::CreateD3D()
     if (!hD3D->IsLoaded())
         return;
 
-    const auto createD3D = (decltype(&Direct3DCreate9))hD3D->GetProcAddress("Direct3DCreate9");
-    if (createD3D)
-        pD3D = createD3D(D3D_SDK_VERSION);
+    // XXX: enable when D3DPOOL_MANAGED will be removed from the engine
+    //const auto createD3DEx = (decltype(&Direct3DCreate9Ex))hD3D->GetProcAddress("Direct3DCreate9Ex");
+    //if (createD3DEx)
+    //{
+    //    IDirect3D9Ex* pD3DEx{};
+    //    if (SUCCEEDED(createD3DEx(D3D_SDK_VERSION, &pD3DEx)))
+    //        pD3D = pD3DEx;
+    //}
+
+    //if (!pD3D)
+    {
+        const auto createD3D = (decltype(&Direct3DCreate9))hD3D->GetProcAddress("Direct3DCreate9");
+        if (createD3D)
+            pD3D = createD3D(D3D_SDK_VERSION);
+    }
 
     if (!pD3D)
         Log("! Found d3d9.dll, but couldn't initialize it. Please install latest DirectX 9.0.");
