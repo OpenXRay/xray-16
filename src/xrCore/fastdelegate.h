@@ -632,7 +632,7 @@ public:
     {
         // Ensure that there's a compilation failure if function pointers
         // and data pointers have different sizes.
-        static_assert(sizeof(StaticFuncPtr) == sizeof(this),
+        static_assert(sizeof(StaticFuncPtr) == sizeof(*this),
             "Function ptr size != data ptr size.");
         return horrible_cast<StaticFuncPtr>(this);
     }
