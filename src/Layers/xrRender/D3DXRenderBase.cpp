@@ -96,6 +96,13 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     fHeight_2 = float(dwHeight / 2);
     Resources->reset_end();
 
+    // create everything, renderer may use
+    reset_end();
+
+#ifndef MASTER_GOLD
+    Resources->Dump(true);
+#endif
+
 #if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
     _SHOW_REF("*ref +CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif

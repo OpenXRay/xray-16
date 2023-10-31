@@ -88,12 +88,6 @@ void CResourceManager::reset_end()
     {
         sstate->state_code.record(sstate->state);
     }
-
-    // create everything, renderer may use
-    GEnv.Render->reset_end();
-#ifndef MASTER_GOLD
-    Dump(true);
-#endif
 }
 
 template <class C>
