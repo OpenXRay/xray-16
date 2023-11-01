@@ -14,4 +14,4 @@ jobs:
         with:
           target_repo_url: git@bitbucket.org:OpenXRay/xray-16.git
           ssh_private_key: ${{ secrets.RABOTYAGA_BITBUCKET_PRIVATE_SSH_KEY }}
-    
+

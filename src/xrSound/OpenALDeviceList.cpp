@@ -29,8 +29,10 @@
 #include <al.h>
 #include <alc.h>
 
+#ifdef XR_PLATFORM_WINDOWS
 constexpr pcstr AL_GENERIC_HARDWARE = "Generic Hardware";
 constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";
+#endif
 
 ALDeviceList::ALDeviceList()
 {

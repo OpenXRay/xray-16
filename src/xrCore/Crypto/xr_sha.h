@@ -41,7 +41,7 @@ using yielder_t = fastdelegate::FastDelegate1<long>;
 constexpr auto EmptyYielder = [](auto) {};
 
 /// This class contains all necessary API for SHA1 hash computation
-/// You can't create the object of this class. It is only needed to 
+/// You can't create the object of this class. It is only needed to
 /// group the hashing logic.
 class XRCORE_API xr_sha1
 {
@@ -88,8 +88,8 @@ public:
     /// Calculates the SHA1 hash of passed data.
     /// @param data the address of data to be hashed.
     /// @param data_size the size of data to be hashed.
-    static hash_t calculate(const u8* data, u32 data_size) 
-    { 
+    static hash_t calculate(const u8* data, u32 data_size)
+    {
         return calculate_with_yielder(data, data_size, EmptyYielder);
     }
 };

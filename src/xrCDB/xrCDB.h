@@ -151,7 +151,7 @@ class XRCDB_API COLLIDER
 
 public:
     ~COLLIDER();
-    
+
     void ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range = 10000.f);
     void box_query(u32 box_mode, const MODEL* m_def, const Fvector& b_center, const Fvector& b_dim);
     void frustum_query(u32 frustum_mode, const MODEL* m_def, const CFrustum& F);

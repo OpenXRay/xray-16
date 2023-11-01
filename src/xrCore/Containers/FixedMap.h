@@ -43,7 +43,7 @@ struct xr_fixed_map_node
         right = other.right;
         return *this;
     }
-    
+
     friend void swap(xr_fixed_map_node& left, xr_fixed_map_node& right) noexcept
     {
         std::swap(left.first, right.first);

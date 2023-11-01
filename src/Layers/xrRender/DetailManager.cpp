@@ -110,15 +110,15 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     cache = (Slot***)xr_malloc(dm_cache_line * sizeof(Slot**));
     for (u32 i = 0; i < dm_cache_line; ++i)
         cache[i] = (Slot**)xr_malloc(dm_cache_line * sizeof(Slot*));
-        
+
     cache_pool = (Slot *)xr_malloc(dm_cache_size * sizeof(Slot));
-    
+
     for (u32 i = 0; i < dm_cache_size; ++i)
         new(&cache_pool[i]) Slot();
     /*
     CacheSlot1 cache_level1[dm_cache1_line][dm_cache1_line];
     Slot* cache [dm_cache_line][dm_cache_line]; // grid-cache itself
-    Slot cache_pool [dm_cache_size]; // just memory for slots 
+    Slot cache_pool [dm_cache_size]; // just memory for slots
     */
 }
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include <D3DX11Tex.h>
+#include <DirectXTex.h>
 
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
@@ -75,19 +75,10 @@ u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 }
 
 const float _BUMPHEIGH = 8.f;
+
 //////////////////////////////////////////////////////////////////////
 // Utility pack
 //////////////////////////////////////////////////////////////////////
-IC u32 GetPowerOf2Plus1(u32 v)
-{
-    u32 cnt = 0;
-    while (v)
-    {
-        v >>= 1;
-        cnt++;
-    };
-    return cnt;
-}
 IC void Reduce(int& w, int& h, int& l, int& skip)
 {
     while ((l > 1) && skip)
@@ -104,8 +95,9 @@ IC void Reduce(int& w, int& h, int& l, int& skip)
         h = 1;
 }
 
-IC void Reduce(UINT& w, UINT& h, int l, int skip)
+IC void Reduce(size_t& w, size_t& h, size_t& l, int skip, bool compressed)
 {
+    const size_t min_size = compressed ? 4 : 1;
     while ((l > 1) && skip)
     {
         w /= 2;
@@ -114,24 +106,12 @@ IC void Reduce(UINT& w, UINT& h, int l, int skip)
 
         skip--;
     }
-    if (w < 1)
-        w = 1;
-    if (h < 1)
-        h = 1;
+    if (w < min_size)
+        w = min_size;
+    if (h < min_size)
+        h = min_size;
 }
 
-void TW_Save(ID3DTexture2D* T, LPCSTR name, LPCSTR prefix, LPCSTR postfix)
-{
-    string256 fn;
-    strconcat(sizeof(fn), fn, name, "_", prefix, "-", postfix);
-    for (int it = 0; it < int(xr_strlen(fn)); it++)
-        if ('\\' == fn[it])
-            fn[it] = '_';
-    string256 fn2;
-    strconcat(sizeof(fn2), fn2, "debug\\", fn, ".dds");
-    Log("* debug texture save: ", fn2);
-    R_CHK(D3DX11SaveTextureToFile(HW.get_context(CHW::IMM_CTX_ID), T, D3DX11_IFF_DDS, fn2));
-}
 /*
 ID3DTexture2D*  TW_LoadTextureFromTexture
 (
@@ -295,17 +275,12 @@ IC u32 it_height_rev_base(u32 d, u32 s) {   return  color_rgba  (
 */
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
-//  Moved here just to avoid warning
-    D3DX11_IMAGE_INFO IMG;
-    ZeroMemory(&IMG, sizeof(IMG));
-
+    DirectX::TexMetadata IMG;
+    DirectX::ScratchImage texture;
     ID3DBaseTexture* pTexture2D = NULL;
-    // IDirect3DCubeTexture9*   pTextureCUBE    = NULL;
     string_path fn;
-    // u32                      dwWidth,dwHeight;
     size_t img_size = 0;
     int img_loaded_lod = 0;
-    // D3DFORMAT                fmt;
     u32 mip_cnt = u32(-1);
     bool dummyTextureExist;
 
@@ -344,52 +319,31 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
 #endif
 
-    _DDS:
+_DDS:
 {
     // Load and get header
-
     S = FS.r_open(fn);
-#ifdef DEBUG
-    Msg("* Loaded: %s[%d]", fn, S->length());
-#endif // DEBUG
     img_size = S->length();
+#ifdef DEBUG
+    Msg("* Loaded: %s[%zu]", fn, img_size);
+#endif // DEBUG
     R_ASSERT(S);
-// R_CHK2                   (D3DXGetImageInfoFromFileInMemory   (S->pointer(),S->length(),&IMG), fn);
-    R_CHK2(D3DX11GetImageInfoFromMemory(S->pointer(), S->length(), 0, &IMG, 0), fn);
-    // if (IMG.ResourceType == D3DRTYPE_CUBETEXTURE)            goto _DDS_CUBE;
-    if (IMG.MiscFlags & D3D_RESOURCE_MISC_TEXTURECUBE)
+
+    R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_NONE, &IMG, texture), fn);
+
+    if (IMG.IsCubemap())
         goto _DDS_CUBE;
     else
         goto _DDS_2D;
 
 _DDS_CUBE:
 {
-// R_CHK(D3DXCreateCubeTextureFromFileInMemoryEx(
-//  HW.pDevice,
-//  S->pointer(),S->length(),
-//  D3DX_DEFAULT,
-//  IMG.MipLevels,0,
-//  IMG.Format,
-//  D3DPOOL_MANAGED,
-//  D3DX_DEFAULT,
-//  D3DX_DEFAULT,
-//  0,&IMG,0,
-//  &pTextureCUBE
-//  ));
-
-//  Inited to default by provided default constructor
-    D3DX11_IMAGE_LOAD_INFO LoadInfo;
-    LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
-    LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
-
-    LoadInfo.pSrcInfo = &IMG;
-
-    R_CHK(D3DX11CreateTextureFromMemory(HW.pDevice, S->pointer(), S->length(), &LoadInfo, 0, &pTexture2D, 0));
-
+    R_CHK(CreateTextureEx(HW.pDevice, texture.GetImages(), texture.GetImageCount(), IMG, D3D_USAGE_IMMUTABLE,
+        D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT, &pTexture2D));
     FS.r_close(S);
 
     // OK
-    mip_cnt = IMG.MipLevels;
+    mip_cnt = IMG.mipLevels;
     ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
     return pTexture2D;
 }
@@ -398,43 +352,24 @@ _DDS_2D:
     // Check for LMAP and compress if needed
     xr_strlwr(fn);
 
-    // Load   SYS-MEM-surface, bound to device restrictions
-    // ID3DTexture2D*       T_sysmem;
-    // R_CHK2(D3DXCreateTextureFromFileInMemoryEx
-    //  (
-    //  HW.pDevice,S->pointer(),S->length(),
-    //  D3DX_DEFAULT,D3DX_DEFAULT,
-    //  IMG.MipLevels,0,
-    //  IMG.Format,
-    //  D3DPOOL_SYSTEMMEM,
-    //  D3DX_DEFAULT,
-    //  D3DX_DEFAULT,
-    //  0,&IMG,0,
-    //  &T_sysmem
-    //  ), fn);
-
     img_loaded_lod = get_texture_load_lod(fn);
 
-//  Inited to default by provided default constructor
-    D3DX11_IMAGE_LOAD_INFO LoadInfo;
-    LoadInfo.Width = IMG.Width;
-    LoadInfo.Height = IMG.Height;
-
-    // x64 crash workaround
-#ifdef XR_ARCHITECTURE_X64
-    LoadInfo.FirstMipLevel = img_loaded_lod;
-#else
+    size_t mip_lod = 0;
     if (img_loaded_lod)
-        Reduce(LoadInfo.Width, LoadInfo.Height, IMG.MipLevels, img_loaded_lod);
-#endif
+    {
+        const auto old_mipmap_cnt = IMG.mipLevels;
+        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod, DirectX::IsCompressed(IMG.format));
+        mip_lod = old_mipmap_cnt - IMG.mipLevels;
+    }
 
-    LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
-    LoadInfo.BindFlags = D3D_BIND_SHADER_RESOURCE;
-    LoadInfo.pSrcInfo = &IMG;
+    R_CHK(CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,
+        D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
+        &pTexture2D)
+    );
 
-    R_CHK2(D3DX11CreateTextureFromMemory(HW.pDevice, S->pointer(), S->length(), &LoadInfo, 0, &pTexture2D, 0), fn);
+
     FS.r_close(S);
-    mip_cnt = IMG.MipLevels;
+    mip_cnt = IMG.mipLevels;
     // OK
     ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
     return pTexture2D;

@@ -167,7 +167,7 @@ bool CUIEditKeyBind::OnControllerAction(int axis, float x, float y, EUIMessages 
 }
 
 void CUIEditKeyBind::Update()
-{ 
+{
     CUIStatic::Update();
 }
 

@@ -62,7 +62,7 @@ static float const FLOOR_DISTANCE = 2.f;
 static float const NEAR_DISTANCE = 2.5f;
 static u32 const FIRE_MAKE_SENSE_INTERVAL = 10000;
 
-static float const min_throw_distance = 10.f;
+//static float const min_throw_distance = 10.f;
 
 float CAI_Stalker::GetWeaponAccuracy() const
 {

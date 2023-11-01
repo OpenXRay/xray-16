@@ -41,7 +41,7 @@ void callback_base::on_key_press(line_edit_control* const control)
 
 // -------------------------------------------------------------------------------------------------
 
-key_state_base::key_state_base(key_state state, base* type_pair) : m_type_pair(type_pair), m_state(state) {}
+key_state_base::key_state_base(key_state state, base* type_pair) : m_state(state), m_type_pair(type_pair) {}
 key_state_base::~key_state_base() { xr_delete(m_type_pair); }
 void key_state_base::on_key_press(line_edit_control* const control)
 {

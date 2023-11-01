@@ -361,6 +361,40 @@ bool Manager::is_disabled_upgrade( CInventoryItem& item, shared_str const& upgra
 }
 */
 
+bool Manager::can_install_upgrade(CInventoryItem& item, shared_str const& upgrade_id)
+{
+    return upgrade_verify(item.m_section_id, upgrade_id)->can_install(item, false) == result_ok;
+}
+
+bool Manager::can_add_upgrade(CInventoryItem& item, shared_str const& upgrade_id)
+{
+    return upgrade_verify(item.m_section_id, upgrade_id)->can_add(item) == result_ok;
+}
+
+bool Manager::upgrade_add(CInventoryItem& item, shared_str const& upgrade_id)
+{
+    Upgrade* upgrade = upgrade_verify(item.m_section_id, upgrade_id);
+    UpgradeStateResult res = upgrade->can_add(item);
+
+    if (res == result_ok)
+    {
+        if (item.install_upgrade(upgrade->section()))
+        {
+            item.add_upgrade(upgrade_id, false);
+
+            return true;
+        }
+        else
+        {
+            FATAL(make_string("! Upgrade <%s> of item [%s] (id = %d) is EMPTY or FAILED !", upgrade_id.c_str(),
+                item.m_section_id.c_str(), item.object_id())
+                      .c_str());
+        }
+    }
+
+    return false;
+}
+
 bool Manager::upgrade_install(CInventoryItem& item, shared_str const& upgrade_id, bool loading)
 {
     Upgrade* upgrade = upgrade_verify(item.m_section_id, upgrade_id);

@@ -310,7 +310,7 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         m_UIEditUserPass->SetNextFocusCapturer(m_UIEditPass);
         m_UIEditPass->SetNextFocusCapturer(m_UIEditUserPass);
         m_UIEditUserPass->CaptureFocus(true);
-
+        [[fallthrough]];
     case MESSAGEBOX_QUIT_WINDOWS:
     case MESSAGEBOX_QUIT_GAME:
     case MESSAGEBOX_YES_NO:
@@ -461,13 +461,15 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
                 GetMessageTarget()->SendMessage(this, MESSAGE_BOX_COPY_CLICKED);
             }
             break;
+        case MESSAGEBOX_INFO:
+            break;
         };
     };
     inherited::SendMessage(pWnd, msg, pData);
 }
 
 void CUIMessageBox::SetText(LPCSTR str) { m_UIStaticText->SetTextST(str); }
-LPCSTR CUIMessageBox::GetText() { return m_UIStaticText->GetText(); }
+LPCSTR CUIMessageBox::GetText() const { return m_UIStaticText->GetText(); }
 LPCSTR CUIMessageBox::GetHost()
 {
     if (m_UIEditHost)

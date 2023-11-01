@@ -325,6 +325,7 @@ if (NOT PROJECT_PLATFORM_E2K)
 		OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua/minilua"
 		COMMAND ${CMAKE_COMMAND}
 			-B"HostBuildTools/minilua"
+			-G "${CMAKE_GENERATOR}"
 			-H${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/minilua
 			-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
 			-DCMAKE_BUILD_TYPE:STRING="Release"
@@ -362,6 +363,7 @@ add_custom_command(
 	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/buildvm/buildvm"
 	COMMAND ${CMAKE_COMMAND}
 		-B"HostBuildTools/buildvm"
+		-G "${CMAKE_GENERATOR}"
 		-H${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/buildvm
 		-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
 		-DCMAKE_BUILD_TYPE:STRING="Release"

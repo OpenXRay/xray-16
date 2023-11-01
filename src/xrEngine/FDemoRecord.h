@@ -41,6 +41,7 @@ private:
     bool m_bMakeScreenshot;
     int m_iLMScreenshotFragment;
     bool m_bMakeLevelMap;
+    shared_str m_CurrentWeatherCycle;
 
     float m_fSpeed0;
     float m_fSpeed1;

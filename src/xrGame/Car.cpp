@@ -446,7 +446,7 @@ void CCar::VisualUpdate(float fov)
     Fvector C, V;
     Center(C);
     V.set(lin_vel);
-    
+
     m_car_sound->Update();
     if (Owner())
     {
@@ -1988,7 +1988,7 @@ void CCar::SetfFuel(float fuel)
     m_fuel = fuel;
 }
 
-// получить и задать размер топливного бака 
+// получить и задать размер топливного бака
 float CCar::GetfFuelTank()
 {
     return m_fuel_tank;

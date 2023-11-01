@@ -2,11 +2,7 @@
 
 typedef IDirect3DVertexShader9 ID3DVertexShader;
 typedef IDirect3DPixelShader9 ID3DPixelShader;
-typedef ID3DXBuffer ID3DBlob;
-typedef D3DXMACRO D3D_SHADER_MACRO;
-typedef D3DDEVTYPE D3D_DRIVER_TYPE;
 typedef IDirect3DQuery9 ID3DQuery;
-typedef ID3DXInclude ID3DInclude;
 typedef IDirect3DTexture9 ID3DTexture2D;
 typedef IDirect3DSurface9 ID3DRenderTargetView;
 typedef IDirect3DSurface9 ID3DDepthStencilView;

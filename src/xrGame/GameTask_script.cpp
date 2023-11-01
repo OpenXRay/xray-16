@@ -43,7 +43,7 @@ SCRIPT_EXPORT(CGameTask, (),
 
             .def("get_title", &SGameTaskObjective::GetTitle_script)
             .def("set_title", &SGameTaskObjective::SetTitle_script)
-                
+
             .def("get_description", &SGameTaskObjective::GetDescription_script)
             .def("set_description", &SGameTaskObjective::SetDescription_script)
 

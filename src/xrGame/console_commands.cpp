@@ -539,7 +539,7 @@ class CCC_SpawnToInventory : public IConsole_Command
 {
 public:
     CCC_SpawnToInventory(pcstr name) : IConsole_Command(name) {}
-    
+
     void Execute(pcstr args) override
     {
         if (!g_pGameLevel)
@@ -559,7 +559,7 @@ public:
 
         Level().spawn_item(args, Actor()->Position(), false, Actor()->ID());
     }
-    
+
     void Info(TInfo& I) override
     {
         xr_strcpy(I, "valid name of an item that can be spawned");
@@ -1080,11 +1080,22 @@ class CCC_DebugFonts : public IConsole_Command
 {
 public:
     CCC_DebugFonts(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
+
+    ~CCC_DebugFonts()
+    {
+        xr_free(m_ui);
+    }
+
     virtual void Execute(LPCSTR args)
     {
-        // BUG: leak
-        (xr_new<CUIDebugFonts>())->ShowDialog(true);
+        if (!m_ui)
+            m_ui = xr_new<CUIDebugFonts>();
+
+        m_ui->ShowDialog(true);
     }
+
+private:
+    CUIDebugFonts* m_ui;
 };
 
 class CCC_DebugNode : public IConsole_Command
@@ -1479,7 +1490,7 @@ public:
         CCC_Token::Execute(args);
         UIStyles->SetupStyle(m_id);
     }
-    
+
     const xr_token* GetToken() noexcept override // may throw exceptions!
     {
         return UIStyles->GetToken().data();
@@ -1948,13 +1959,13 @@ public:
     }
 
     void GetStatus(TStatus& status) override
-    {    
-        xr_strcpy(status, isEnable ? "on" : "off"); 
+    {
+        xr_strcpy(status, isEnable ? "on" : "off");
     }
 
     void Info(TInfo& info) override
     {
-        xr_strcpy(info, "'on/off' or '1/0'"); 
+        xr_strcpy(info, "'on/off' or '1/0'");
     }
 
     void fill_tips(vecTips& tips, u32 /*mode*/) override
@@ -1982,7 +1993,7 @@ public:
 
     void Info(TInfo& info) override
     {
-        xr_strcpy(info, "[0.001 - 1.0]"); 
+        xr_strcpy(info, "[0.001 - 1.0]");
     }
 
     void fill_tips(vecTips& tips, u32 mode) override
@@ -1992,9 +2003,9 @@ public:
         tips.push_back(str);
     }
 
-    void GetStatus(TStatus& status) override 
-    { 
-        xr_sprintf(status, sizeof(status), "%f", uiTimeFactor); 
+    void GetStatus(TStatus& status) override
+    {
+        xr_sprintf(status, sizeof(status), "%f", uiTimeFactor);
     }
 };
 

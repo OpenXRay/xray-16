@@ -284,12 +284,12 @@ void show_indicators()
     psActorFlags.set(AF_GODMODE_RT, FALSE);
 }
 
-void show_weapon(bool b) 
+void show_weapon(bool b)
 {
     if (psActorFlags.test(AF_GODMODE) && Actor())
         return;
 
-    psHUD_Flags.set(HUD_WEAPON_RT2, b); 
+    psHUD_Flags.set(HUD_WEAPON_RT2, b);
 }
 bool is_level_present() { return (!!g_pGameLevel); }
 void add_call(const luabind::functor<bool>& condition, const luabind::functor<void>& action)

@@ -163,7 +163,7 @@ template Dquaternion& Dquaternion::set(const _matrix<double>& M);
 /* Commented out, since it's currently unused (only use is commented out in xrPhysics)
 void twoq_2w(const Fquaternion& q1, const Fquaternion& q2, float dt, Fvector& w) noexcept
 {
-	//	
+	//
 	//	w=	2/dt*arccos(q1.w*q2.w+ q1.v.dotproduct(q2.v))
 	//		*1/sqr(1-(q1.w*q2.w+ q1.v.dotproduct(q2.v))^2)
 	//		[q1.w*q2.v-q2.w*q1.v-q1.v.crossproduct(q2.v)]

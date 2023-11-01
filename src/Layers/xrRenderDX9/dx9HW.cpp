@@ -2,6 +2,8 @@
 
 #include "dx9HW.h"
 
+#include <SDL_syswm.h>
+
 CHW HW;
 
 CHW::CHW()
@@ -48,9 +50,21 @@ void CHW::CreateD3D()
     if (!hD3D->IsLoaded())
         return;
 
-    const auto createD3D = (decltype(&Direct3DCreate9))hD3D->GetProcAddress("Direct3DCreate9");
-    if (createD3D)
-        pD3D = createD3D(D3D_SDK_VERSION);
+    // XXX: enable when D3DPOOL_MANAGED will be removed from the engine
+    //const auto createD3DEx = (decltype(&Direct3DCreate9Ex))hD3D->GetProcAddress("Direct3DCreate9Ex");
+    //if (createD3DEx)
+    //{
+    //    IDirect3D9Ex* pD3DEx{};
+    //    if (SUCCEEDED(createD3DEx(D3D_SDK_VERSION, &pD3DEx)))
+    //        pD3D = pD3DEx;
+    //}
+
+    //if (!pD3D)
+    {
+        const auto createD3D = (decltype(&Direct3DCreate9))hD3D->GetProcAddress("Direct3DCreate9");
+        if (createD3D)
+            pD3D = createD3D(D3D_SDK_VERSION);
+    }
 
     if (!pD3D)
         Log("! Found d3d9.dll, but couldn't initialize it. Please install latest DirectX 9.0.");
@@ -63,7 +77,7 @@ void CHW::DestroyD3D()
     hD3D = nullptr;
 }
 
-void CHW::CreateDevice(SDL_Window* m_sdlWnd)
+void CHW::CreateDevice(SDL_Window* sdlWnd)
 {
     CreateD3D();
 
@@ -162,23 +176,18 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
 
     // Windoze
     P.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
+    P.Windowed = bWindowed;
 
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
-    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
-    {
-        switch (info.subsystem)
-        {
-        case SDL_SYSWM_WINDOWS:
-            P.hDeviceWindow = info.info.win.window;
-            break;
-        default: break;
-        }
-    }
+    if (SDL_GetWindowWMInfo(sdlWnd, &info))
+        P.hDeviceWindow = info.info.win.window;
     else
-        Log("! Couldn't get window information: ", SDL_GetError());
-
-    P.Windowed = bWindowed;
+    {
+        cpcstr error = SDL_GetError();
+        Log("! Couldn't get window information: ", error);
+        FATAL(error);
+    }
 
     // Depth/stencil
     P.EnableAutoDepthStencil = TRUE;
@@ -281,7 +290,7 @@ void CHW::Reset()
     while (true)
     {
         const HRESULT result = pDevice->Reset(&DevPP);
-        
+
         if (SUCCEEDED(result))
             break;
 

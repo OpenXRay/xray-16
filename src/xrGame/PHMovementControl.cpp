@@ -36,7 +36,7 @@
 #define def_Y_SIZE_2 0.8f
 #define def_Z_SIZE_2 0.35f
 
-const u64 after_creation_collision_hit_block_steps_number = 100;
+//const u64 after_creation_collision_hit_block_steps_number = 100;
 
 CPHMovementControl::CPHMovementControl(IGameObject* parent)
 {

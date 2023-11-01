@@ -838,7 +838,7 @@ void CSE_ALifeLevelChanger::FillProps(LPCSTR pref, PropItemVec& items)
 // CSE_ALifeObjectPhysic
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeObjectPhysic::CSE_ALifeObjectPhysic(LPCSTR caSection)
-    : CSE_ALifeDynamicObjectVisual(caSection), CSE_PHSkeleton(caSection)
+    : CSE_ALifeDynamicObjectVisual(caSection), CSE_PHSkeleton(caSection), freezed(false)
 {
     type = epotSkeleton;
     mass = 10.f;

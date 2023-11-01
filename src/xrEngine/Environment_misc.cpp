@@ -134,7 +134,7 @@ void CEnvAmbient::SSndChannel::load(const CInifile& config, pcstr sect, pcstr se
 
     m_sounds.resize(cnt);
 
-    for (size_t k = 0; k < cnt; ++k)
+    for (int k = 0; k < cnt; ++k)
     {
         _GetItem(snds, k, tmp);
         m_sounds[k].create(tmp, st_Effect, sg_SourceType);
@@ -696,7 +696,7 @@ std::pair<Fvector3, float> CEnvDescriptorMixer::calculate_dynamic_sun_dir(float 
     Fvector3 result;
     result.setHP(AZ, SEA);
     R_ASSERT(_valid(result));
-    
+
     return
     {
         result,
