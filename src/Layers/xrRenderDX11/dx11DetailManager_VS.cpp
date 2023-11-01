@@ -252,18 +252,6 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 // flush if necessary
                 if (dwBatch)
                 {
-                    if (ps_ssfx_grass_shadows.x <= 0)
-                    {
-                        auto& dsgraph = RImplementation.get_context(CHW::IMM_CTX_ID);
-                        if (!ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) ||
-                            ((ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_SMAP == dsgraph.o.phase)) ||
-                                (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_NORMAL == dsgraph.o.phase) && (!RImplementation.r_sun.o.active)) ||
-                                (!ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && (RImplementation.PHASE_NORMAL == dsgraph.o.phase))))
-                        {
-                            vis.erase(vis.begin(), vis.end());
-                        }
-                    }
-
                     RImplementation.BasicStats.DetailCount += dwBatch;
                     u32 dwCNT_verts = dwBatch * Object.number_vertices;
                     u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;
