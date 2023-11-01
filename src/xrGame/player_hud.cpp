@@ -852,7 +852,7 @@ void player_hud::attach_item(CHudItem* item)
     attachable_hud_item* pi = create_hud_item(item->HudSection());
     const int item_idx = pi->m_attach_place_idx;
 
-    if (m_attached_items[item_idx] != pi)
+    if (m_attached_items[item_idx] != pi || pi->m_parent_hud_item != item)
     {
         if (m_attached_items[item_idx])
             m_attached_items[item_idx]->m_parent_hud_item->on_b_hud_detach();
