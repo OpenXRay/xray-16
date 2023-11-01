@@ -1129,8 +1129,6 @@ void CAI_Stalker::dbg_draw_visibility_rays()
 
 xr_vector<Fmatrix> g_stalker_skeleton;
 
-static Fvector s_spine_bone;
-
 static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_position,
     Fvector const& weapon_direction, Fvector const& target, bool const& debug_draw)
 {

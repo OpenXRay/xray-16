@@ -27,7 +27,7 @@ private:
     typedef CConsole inherited;
 
 private:
-    HWND* m_pMainWnd;
+    HWND m_pMainWnd{};
 
     HWND m_hConsoleWnd;
     void CreateConsoleWnd();
@@ -56,7 +56,6 @@ private:
 
 public:
     CTextConsole();
-    virtual ~CTextConsole();
 
     virtual void Initialize();
     virtual void Destroy();

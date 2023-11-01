@@ -14,7 +14,7 @@ IInputReceiver dummyController;
 
 ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
-ENGINE_API Flags32 psMouseInvert = {false};
+ENGINE_API Flags32 psMouseInvert = {};
 
 ENGINE_API float psControllerStickSens = 1.f;
 ENGINE_API float psControllerStickSensScale = 1.f;
@@ -56,6 +56,9 @@ CInput::CInput(const bool exclusive)
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH);
+
+    if (strstr(Core.Params, "-no_gamepad"))
+        return;
 
     if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
     {

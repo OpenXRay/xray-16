@@ -4,6 +4,35 @@
 #include "xrCore/fs.h"
 
 static const u32 c_VB_maxSize = 4096 * 1024; // bytes
+
+struct VDeclarator : public svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1>
+{
+    void set(u32 FVF)
+    {
+        D3DXDeclaratorFromFVF(FVF, begin());
+        resize(D3DXGetDeclLength(begin()) + 1);
+    }
+    void set(const D3DVERTEXELEMENT9* dcl)
+    {
+        resize(D3DXGetDeclLength(dcl) + 1);
+        CopyMemory(begin(), dcl, size() * sizeof(D3DVERTEXELEMENT9));
+    }
+    void set(const VDeclarator& d)
+    {
+        *this = d;
+    }
+    u32 vertex()
+    {
+        return D3DXGetDeclVertexSize(begin(), 0);
+    }
+    BOOL equal(VDeclarator& d)
+    {
+        if (size() != d.size())
+            return false;
+        return 0 == memcmp(begin(), d.begin(), size() * sizeof(D3DVERTEXELEMENT9));
+    }
+};
+
 // Vertex containers
 class VBContainer
 {

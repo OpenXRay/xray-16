@@ -40,7 +40,7 @@ class small_buffer final
 {
     void* m_ptr;
     bool m_small;
-    
+
 public:
     small_buffer(size_t size)
         : m_ptr(size <= xrMemory::SMALL_SIZE_MAX ? Memory.small_alloc(size) : Memory.mem_alloc(size)),

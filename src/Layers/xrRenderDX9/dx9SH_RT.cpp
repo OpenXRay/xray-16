@@ -19,7 +19,7 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
-bool CRT::used_as_depth() const
+bool used_as_depth(D3DFORMAT fmt)
 {
     switch (fmt)
     {
@@ -27,6 +27,7 @@ bool CRT::used_as_depth() const
     case D3DFMT_D16_LOCKABLE:
     case D3DFMT_D24X8:
     case D3DFMT_D32:
+    case D3DFMT_D32F_LOCKABLE:
     case D3DFMT_D15S1:
     case D3DFMT_D24X4S4:
     case D3DFMT_D24S8:
@@ -55,10 +56,12 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     fmt = f;
     sampleCount = SampleCount;
 
+    const bool useAsDepth = used_as_depth(fmt);
+
     if (flags.test(CreateBase))
     {
         dwFlags |= CreateBase;
-        if (used_as_depth())
+        if (useAsDepth)
             R_CHK(HW.pDevice->GetDepthStencilSurface(&pRT));
         else
         {
@@ -98,7 +101,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         return;
 
     // Select usage
-    const bool useAsDepth = used_as_depth();
     const u32 usage = useAsDepth ? D3DUSAGE_DEPTHSTENCIL : D3DUSAGE_RENDERTARGET;
 
     // Validate render-target usage

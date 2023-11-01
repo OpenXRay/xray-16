@@ -2645,7 +2645,6 @@ target_link_libraries(${PROJECT_NAME}
     xrCDB
     xrPhysics
     xrNetServer
-    ${SDL2_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME}

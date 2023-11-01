@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "occRasterizer.h"
 
-#ifdef DEBUG 
+#ifdef DEBUG
 #include "xrRender_console.h"
 #endif
 

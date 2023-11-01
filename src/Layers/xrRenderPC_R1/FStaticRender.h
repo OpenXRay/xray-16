@@ -35,7 +35,6 @@ public:
         u32 disasm : 1; // config
         u32 forceskinw : 1; // config
         u32 no_detail_textures : 1; // config
-        u32 no_ram_textures : 1; // don't keep textures in RAM
         u32 ffp : 1; // don't use shaders, only fixed-function pipeline or software processing
     } o;
 
@@ -178,8 +177,7 @@ public:
     void Render() override;
     void RenderMenu() override;
 
-    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;
-    virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) override;
+    virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) override;
     virtual void ScreenshotAsyncBegin() override;
     virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override;
     virtual void OnFrame() override;
@@ -195,9 +193,6 @@ public:
     // Constructor/destructor/loader
     CRender();
     virtual ~CRender();
-
-protected:
-    virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
 };
 
 extern CRender RImplementation;

@@ -212,8 +212,8 @@ set(SRC_FILES
     "../xrRender/VertexCache.h"
     "../xrRender/WallmarksEngine.cpp"
     "../xrRender/WallmarksEngine.h"
-    #"../xrRender/xr_effgamma.cpp"
-    #"../xrRender/xr_effgamma.h"
+    "../xrRender/xr_effgamma.cpp"
+    "../xrRender/xr_effgamma.h"
     "../xrRender/xrRender_console.cpp"
     "../xrRender/xrRender_console.h"
     "../xrRender/xrStripify.cpp"
@@ -346,6 +346,7 @@ set(SRC_FILES
     "../xrRenderGL/glR_Backend_Runtime.h"
     "../xrRenderGL/glr_constants.cpp"
     "../xrRenderGL/glr_constants_cache.h"
+    "../xrRenderGL/glr_screenshot.cpp"
     "../xrRenderGL/glResourceManager_Resources.cpp"
     "../xrRenderGL/glResourceManager_Scripting.cpp"
     "../xrRenderGL/glSH_RT.cpp"
@@ -398,7 +399,8 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME}
-	SYSTEM PRIVATE
+    SYSTEM PRIVATE
+    ${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/gli
     ${CMAKE_SOURCE_DIR}/Externals/gli/external
@@ -423,7 +425,6 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DXRRENDER_GL_EXPORTS
     -DUSE_OGL
-    -DNO_XR_VDECLARATOR
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

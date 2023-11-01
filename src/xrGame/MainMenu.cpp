@@ -44,6 +44,7 @@ extern ENGINE_API bool bShowPauseString;
 
 //#define DEMO_BUILD
 
+#ifdef XR_PLATFORM_WINDOWS
 constexpr cpcstr ErrMsgBoxTemplate[] =
 {
     "message_box_invalid_pass",
@@ -65,6 +66,7 @@ constexpr cpcstr ErrMsgBoxTemplate[] =
     "msg_box_error_loading",
     "message_box_download_level"
 };
+#endif
 
 extern bool b_shniaganeed_pp;
 

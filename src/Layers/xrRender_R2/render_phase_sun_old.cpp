@@ -176,7 +176,7 @@ struct DumbClipper
         }
         return true;
     }
-    
+
     XMFLOAT3 point(Fbox& bb, int i) const
     {
         return XMFLOAT3((i & 1) ? bb.vMin.x : bb.vMax.x, (i & 2) ? bb.vMin.y : bb.vMax.y, (i & 4) ? bb.vMin.z : bb.vMax.z);

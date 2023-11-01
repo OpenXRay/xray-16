@@ -107,8 +107,8 @@ _DDS:
         R_ASSERT(S);
         gli::texture texture = gli::load((char*)S->pointer(), img_size);
         R_ASSERT2(!texture.empty(), fn);
-        
-        
+
+
         gli::gl GL(gli::gl::PROFILE_GL33);
 
         gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
@@ -231,14 +231,14 @@ _DDS:
                         }
                         break;
                     }
-                    default: 
-                        NODEFAULT; 
+                    default:
+                        NODEFAULT;
                         break;
                     }
                 }
             }
         }
-        
+
         FS.r_close(S);
 
         xr_strlwr(fn);

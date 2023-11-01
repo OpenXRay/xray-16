@@ -130,7 +130,7 @@ Frustum::Frustum(const glm::mat4* matrix)
     {
         camPlanes[p] = glm::normalize(planes[p]);
         // build a bit-field that will tell us the indices for the nearest and farthest vertices from each plane...
-        nVertexLUT[p] = (camPlanes[p].x < 0.f ? 1 : 0) | (camPlanes[p].y < 0.f ? 2 : 0) | (camPlanes[p].z < 0.f ? 4 : 0); 
+        nVertexLUT[p] = (camPlanes[p].x < 0.f ? 1 : 0) | (camPlanes[p].y < 0.f ? 2 : 0) | (camPlanes[p].z < 0.f ? 4 : 0);
     }
 
     for (int i = 0; i < 8; i++) // compute extrema
@@ -677,7 +677,7 @@ void render_sun_old::render_sun()
             view_clipper.planes.emplace_back(P.n.x, P.n.y, P.n.z, P.d);
         }
 
-        // 
+        //
         Fbox3 b_casters, b_receivers;
         Fvector3 pt;
 

@@ -10,7 +10,7 @@
 #include "xrGameSpy/GameSpy_GP.h"
 #include "xrCore/os_clipboard.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <sys/types.h>
 #include <pwd.h>
 #endif
@@ -234,7 +234,7 @@ void GetPlayerName_FromRegistry(char* name, u32 const name_size)
 #if defined(XR_PLATFORM_WINDOWS)
     if (!ReadRegistry_StrValue(REGISTRY_VALUE_USERNAME, name))
         name[0] = 0;
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     uid_t uid = geteuid();
     struct passwd* pw = getpwuid(uid);
     if (pw)

@@ -184,6 +184,8 @@ void initialize()
 
 namespace CPU
 {
+XRCORE_API bool HasSSE = SDL_HasSSE();
+
 XRCORE_API u64 qpc_freq = SDL_GetPerformanceFrequency();
 
 XRCORE_API u32 qpc_counter = 0;
@@ -235,6 +237,8 @@ void _initialize_cpu()
 
     Msg("* CPU features: %s", features);
     Msg("* CPU threads: %d", std::thread::hardware_concurrency());
+
+    CPU::HasSSE = SDL_HasSSE(); // just in case, not sure if needed
 
     Log("");
     Fidentity.identity(); // Identity matrix

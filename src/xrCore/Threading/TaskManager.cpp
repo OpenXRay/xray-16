@@ -52,7 +52,7 @@ class TaskStorageSize
     {
         static constexpr size_t value = 1;
     };
-    
+
 public:
     template <size_t Power>
     static constexpr size_t Get()

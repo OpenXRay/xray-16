@@ -2,12 +2,12 @@
 {
     partial class ColorPicker
     {
-        /// <summary> 
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -22,8 +22,8 @@
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -42,45 +42,45 @@
             this.nslBlue = new XRay.SdkControls.NumericSlider();
             this.nslAlpha = new XRay.SdkControls.NumericSlider();
             this.SuspendLayout();
-            // 
+            //
             // lRed
-            // 
+            //
             this.lRed.AutoSize = true;
             this.lRed.Location = new System.Drawing.Point(3, 11);
             this.lRed.Name = "lRed";
             this.lRed.Size = new System.Drawing.Size(15, 13);
             this.lRed.TabIndex = 9;
             this.lRed.Text = "R";
-            // 
+            //
             // lGreen
-            // 
+            //
             this.lGreen.AutoSize = true;
             this.lGreen.Location = new System.Drawing.Point(3, 37);
             this.lGreen.Name = "lGreen";
             this.lGreen.Size = new System.Drawing.Size(15, 13);
             this.lGreen.TabIndex = 10;
             this.lGreen.Text = "G";
-            // 
+            //
             // lBlue
-            // 
+            //
             this.lBlue.AutoSize = true;
             this.lBlue.Location = new System.Drawing.Point(3, 63);
             this.lBlue.Name = "lBlue";
             this.lBlue.Size = new System.Drawing.Size(14, 13);
             this.lBlue.TabIndex = 11;
             this.lBlue.Text = "B";
-            // 
+            //
             // lAlpha
-            // 
+            //
             this.lAlpha.AutoSize = true;
             this.lAlpha.Location = new System.Drawing.Point(3, 89);
             this.lAlpha.Name = "lAlpha";
             this.lAlpha.Size = new System.Drawing.Size(14, 13);
             this.lAlpha.TabIndex = 12;
             this.lAlpha.Text = "A";
-            // 
+            //
             // chkHexadecimal
-            // 
+            //
             this.chkHexadecimal.AutoSize = true;
             this.chkHexadecimal.Location = new System.Drawing.Point(3, 115);
             this.chkHexadecimal.Name = "chkHexadecimal";
@@ -88,9 +88,9 @@
             this.chkHexadecimal.TabIndex = 13;
             this.chkHexadecimal.Text = "Hexadecimal";
             this.chkHexadecimal.UseVisualStyleBackColor = true;
-            // 
+            //
             // tbHexColor
-            // 
+            //
             this.tbHexColor.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.tbHexColor.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.tbHexColor.Location = new System.Drawing.Point(167, 113);
@@ -101,9 +101,9 @@
             this.tbHexColor.TabIndex = 14;
             this.tbHexColor.Text = "AAAAAAAA";
             this.tbHexColor.Visible = false;
-            // 
+            //
             // lHexColor
-            // 
+            //
             this.lHexColor.AutoSize = true;
             this.lHexColor.Location = new System.Drawing.Point(150, 116);
             this.lHexColor.Name = "lHexColor";
@@ -111,9 +111,9 @@
             this.lHexColor.TabIndex = 15;
             this.lHexColor.Text = "#";
             this.lHexColor.Visible = false;
-            // 
+            //
             // pbColor
-            // 
+            //
             this.pbColor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pbColor.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbColor.BackgroundImage")));
             this.pbColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -123,10 +123,10 @@
             this.pbColor.Size = new System.Drawing.Size(98, 98);
             this.pbColor.TabIndex = 8;
             this.pbColor.TabStop = false;
-            // 
+            //
             // nslRed
-            // 
-            this.nslRed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.nslRed.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.nslRed.BackColor = System.Drawing.SystemColors.Window;
             this.nslRed.DecimalPlaces = 0;
@@ -157,10 +157,10 @@
             0,
             0,
             0});
-            // 
+            //
             // nslGreen
-            // 
-            this.nslGreen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.nslGreen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.nslGreen.BackColor = System.Drawing.SystemColors.Window;
             this.nslGreen.DecimalPlaces = 0;
@@ -191,10 +191,10 @@
             0,
             0,
             0});
-            // 
+            //
             // nslBlue
-            // 
-            this.nslBlue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.nslBlue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.nslBlue.BackColor = System.Drawing.SystemColors.Window;
             this.nslBlue.DecimalPlaces = 0;
@@ -225,10 +225,10 @@
             0,
             0,
             0});
-            // 
+            //
             // nslAlpha
-            // 
-            this.nslAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.nslAlpha.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.nslAlpha.BackColor = System.Drawing.SystemColors.Window;
             this.nslAlpha.DecimalPlaces = 0;
@@ -259,9 +259,9 @@
             0,
             0,
             0});
-            // 
+            //
             // ColorPicker
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;

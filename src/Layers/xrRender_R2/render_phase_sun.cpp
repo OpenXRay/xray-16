@@ -281,7 +281,7 @@ void render_sun::calculate()
             }
         }
     };
-    
+
     if (o.mt_calc_enabled)
     {
         xr_parallel_for(TaskRange<u32>(0, R__NUM_SUN_CASCADES), process_cascade);

@@ -417,7 +417,7 @@ void CEnvironment::OnFrame()
 {
     if (!g_pGameLevel)
         return;
-    
+
     lerp();
 
     PerlinNoise1D->SetFrequency(wind_gust_factor * MAX_NOISE_FREQ);
