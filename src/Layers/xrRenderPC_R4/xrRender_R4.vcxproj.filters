@@ -1364,13 +1364,17 @@
     <ClCompile Include="..\xrRender\rendertarget_phase_blur.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_drops.cpp" />
-    <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_dudv.cpp" />
     <ClCompile Include="..\xrRender\blenders\blender_gasmask_dudv.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\blenders\blender_gasmask_drops.cpp">
       <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_drops.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_dudv.cpp">
+      <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

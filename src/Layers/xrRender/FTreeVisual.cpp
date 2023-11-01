@@ -172,7 +172,7 @@ void FTreeVisual::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
 #endif
     cmd_list.tree.set_c_sun(s * c_scale.sun, s * c_bias.sun, 0, 0); // sun
 
-#if RENDER == R_R4 || RENDER == R_R3
+#if RENDER == R_R4
     if (ps_ssfx_grass_interactive.y > 0)
     {
         // Inter grass Settings
@@ -189,7 +189,7 @@ void FTreeVisual::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
             player_pos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, -1);
         }
 
-        Fvector4* c_grass;
+        Fvector4* c_grass{};
         {
             void* GrassData;
             cmd_list.get_ConstantDirect(c_c_BendersPos, BendersQty * sizeof(Fvector4) * 2, &GrassData, 0, 0);

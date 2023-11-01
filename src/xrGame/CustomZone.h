@@ -354,24 +354,24 @@ private:
 
 protected:
     // Interactive grass Settings
-    float m_fBlowoutTimeLeft;
+    float m_fBlowoutTimeLeft{};
 
-    s8 m_BendGrass_idle_anim;
-    float m_BendGrass_idle_radius;
-    float m_BendGrass_idle_speed;
-    float m_BendGrass_idle_str;
+    s8 m_BendGrass_idle_anim{};
+    float m_BendGrass_idle_radius{};
+    float m_BendGrass_idle_speed{};
+    float m_BendGrass_idle_str{};
 
-    s8 m_BendGrass_whenactive_anim;
-    float m_BendGrass_whenactive_speed;
-    float m_BendGrass_whenactive_str;
+    s8 m_BendGrass_whenactive_anim{};
+    float m_BendGrass_whenactive_speed{};
+    float m_BendGrass_whenactive_str{};
 
-    bool m_BendGrass_Blowout;
-    s32 m_BendGrass_Blowout_time;
-    float m_BendGrass_Blowout_speed;
-    float m_BendGrass_Blowout_radius;
+    bool m_BendGrass_Blowout{};
+    s32 m_BendGrass_Blowout_time{};
+    float m_BendGrass_Blowout_speed{};
+    float m_BendGrass_Blowout_radius{};
 
     u8 grassbender_id{};
-    u32 grassbender_frame;
+    u32 grassbender_frame{};
 
     void GrassZoneUpdate();
 };

@@ -58,7 +58,7 @@ void CBlender_Blur::Compile(CBlender_Compile& C)
 
     switch (C.iElement)
     {
-    case 0:	//Fullres Horizontal
+    case 0: //Fullres Horizontal
         C.r_Pass("stub_screen_space", "pp_blur", FALSE, FALSE, FALSE);
         C.r_dx11Texture("s_image", r2_RT_generic0);
         C.r_dx11Texture("s_position", r2_RT_P);
@@ -68,7 +68,7 @@ void CBlender_Blur::Compile(CBlender_Compile& C)
         C.r_dx11Sampler("smp_rtlinear");
         C.r_End();
         break;
-    case 1:	//Fullres Vertical
+    case 1: //Fullres Vertical
         C.r_Pass("stub_screen_space", "pp_blur", FALSE, FALSE, FALSE);
         C.r_dx11Texture("s_image", r2_RT_blur_h_2);
         C.r_dx11Texture("s_position", r2_RT_P);

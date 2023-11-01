@@ -649,7 +649,7 @@ void CCustomZone::shedule_Update(u32 dt)
         if (!m_zone_flags.test(eFastMode))
             UpdateWorkload(dt);
 
-        float act_distance = Level().CurrentControlEntity()->Position().distance_to(P) - s.R;
+        const float act_distance = Level().CurrentControlEntity()->Position().distance_to(P) - s.R;
         if (act_distance < ps_ssfx_int_grass_params_1.w)
             GrassZoneUpdate();
         else

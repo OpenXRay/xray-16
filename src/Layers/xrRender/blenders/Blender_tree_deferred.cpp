@@ -101,7 +101,6 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case SE_R2_NORMAL_HQ:   // deffer
-
         // Is a branch/bush. Use a different VS
         if (ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT) && oBlend.value && RImplementation.o.ssfx_branches)
             tvs = "tree_branch";

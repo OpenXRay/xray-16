@@ -147,7 +147,7 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 {
                     cmd_list.set_c(strGrassSetup, ps_ssfx_int_grass_params_1);
 
-                    Fvector4* c_grass;
+                    Fvector4* c_grass{};
                     {
                         void* GrassData;
                         cmd_list.get_ConstantDirect(strPos, BendersQty * sizeof(Fvector4), &GrassData, 0, 0);

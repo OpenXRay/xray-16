@@ -86,13 +86,6 @@ public:
     ref_texture t_noise_mipped;
 
     // Anomaly
-    //Blenders
-    IBlender* b_blur;
-    IBlender* b_dof;
-    IBlender* b_gasmask_drops;
-    IBlender* b_gasmask_dudv;
-    IBlender* b_nightvision;
-
     //Rendertargets
     ref_rt rt_Generic_temp;
 

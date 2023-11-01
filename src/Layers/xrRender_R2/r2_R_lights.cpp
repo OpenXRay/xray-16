@@ -153,13 +153,14 @@ void CRender::render_lights(light_Package& LP)
                 dsgraph.cmd_list.set_xform_project(L->X.S.project);
                 dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+                {
                     if (check_grass_shadow(L, ViewBase))
                     {
                         Details->fade_distance = -1; // Use light position to calc "fade"
                         Details->light_position.set(L->position);
                         Details->Render(dsgraph.cmd_list);
                     }
-                    
+                }
                 L->X.S.transluent = FALSE;
                 if (bSpecial)
                 {

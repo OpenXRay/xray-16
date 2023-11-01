@@ -91,7 +91,9 @@ public:
 
     ref_texture t_base;
 
-    resptr_core<CRT, resptrcode_crt> rt_Generic_temp;
+    // Anomaly
+    ref_rt rt_Generic_temp;
+
 private:
     // OCCq
     ref_shader s_occq;

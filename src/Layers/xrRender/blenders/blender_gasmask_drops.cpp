@@ -12,7 +12,6 @@ LPCSTR CBlender_gasmask_drops::getComment()
     return "INTERNAL: beef's nightvision";
 }
 
-
 void CBlender_gasmask_drops::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
