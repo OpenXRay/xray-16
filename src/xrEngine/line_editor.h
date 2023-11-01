@@ -22,8 +22,7 @@ public:
     IC line_edit_control& control() { return m_control; }
     void on_frame();
 
-    void IR_Capture() final;
-    void IR_Release() final;
+    void IR_OnActivate() final;
     void IR_OnDeactivate() final;
 
 protected:

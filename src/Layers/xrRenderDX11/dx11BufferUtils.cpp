@@ -1,19 +1,21 @@
 #include "stdafx.h"
 #include "Layers/xrRender/BufferUtils.h"
 
+#include <FlexibleVertexFormat.h>
+
 u32 GetFVFVertexSize(u32 FVF)
 {
-    return D3DXGetFVFVertexSize(FVF);
+    return static_cast<u32>(FVF::ComputeVertexSize(FVF));
 }
 
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream)
 {
-    return D3DXGetDeclVertexSize(decl, Stream);
+    return static_cast<u32>(FVF::ComputeVertexSize(decl, Stream));
 }
 
 u32 GetDeclLength(const VertexElement* decl)
 {
-    return D3DXGetDeclLength(decl);
+    return static_cast<u32>(FVF::GetDeclLength(decl));
 }
 
 static HRESULT CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, u32 dataSize,

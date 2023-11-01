@@ -344,7 +344,7 @@ const int ConnectionTimeOut = 60000; // 1 min
 
 bool CLevel::Connect2Server(const char* options)
 {
-    NET_Packet P;
+    //NET_Packet P;
     m_bConnectResultReceived = false;
     m_bConnectResult = true;
 

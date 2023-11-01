@@ -50,6 +50,6 @@ SCRIPT_EXPORT(CConsole, (),
             .def("get_float", &get_console_float)
             .def("get_token", &CConsole::GetToken)
             .def("execute_deferred", &execute_console_command_deferred),
-            
+
         def("renderer_allow_override", &get_renderer_command_state)];
 });

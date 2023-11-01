@@ -8,7 +8,6 @@
 #include "UISpinNum.h"
 #include "Lines/UILines.h"
 
-CUISpinNum::CUISpinNum() : m_iVal(0), m_iMin(0), m_iMax(100), m_iStep(1) {}
 void CUISpinNum::SetCurrentOptValue() // opt->current
 {
     GetOptIntegerValue(m_iVal, m_iMin, m_iMax);
@@ -80,7 +79,7 @@ void CUISpinNum::SetValue(int v)
 
 bool CUISpinNum::CanPressUp() { return m_iVal + m_iStep <= m_iMax; }
 bool CUISpinNum::CanPressDown() { return m_iVal - m_iStep >= m_iMin; }
-CUISpinFlt::CUISpinFlt() : m_fVal(0), m_fMin(0), m_fMax(100), m_fStep(0.1f) {}
+
 void CUISpinFlt::SaveBackUpOptValue()
 {
     m_opt_backup_value = m_fVal;

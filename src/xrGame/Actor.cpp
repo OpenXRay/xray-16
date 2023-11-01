@@ -75,9 +75,9 @@
 #include "ui/UIDragDropReferenceList.h"
 #include "xrCore/xr_token.h"
 
-const u32 patch_frames = 50;
-const float respawn_delay = 1.f;
-const float respawn_auto = 7.f;
+//const u32 patch_frames = 50;
+//const float respawn_delay = 1.f;
+//const float respawn_auto = 7.f;
 
 constexpr float default_feedback_duration = 0.2f;
 
@@ -90,8 +90,8 @@ string32 ACTOR_DEFS::g_quick_use_slots[4] = {};
 Flags32 psActorFlags =
 {
     AF_GODMODE_RT |
-    AF_AUTOPICKUP | 
-    AF_RUN_BACKWARD | 
+    AF_AUTOPICKUP |
+    AF_RUN_BACKWARD |
     AF_IMPORTANT_SAVE |
     AF_MULTI_ITEM_PICKUP | 
     AF_FIRST_PERSON_BODY
@@ -1185,7 +1185,7 @@ void CActor::UpdateCL()
                 };
             }
         }
-        
+
     }
 
     Fmatrix trans;

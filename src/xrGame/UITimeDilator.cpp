@@ -4,7 +4,7 @@
 UITimeDilator* time_dilator;
 
 UITimeDilator* TimeDilator()
-{ 
+{
     if (!time_dilator)
     {
         time_dilator = xr_new<UITimeDilator>();
@@ -14,7 +14,7 @@ UITimeDilator* TimeDilator()
 }
 
 void CloseTimeDilator()
-{ 
+{
     if (time_dilator)
     {
         xr_delete(time_dilator);

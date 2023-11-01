@@ -53,7 +53,7 @@ public:
 
 private:
 	int				m_actor_goodwill;
-	
+
 	shared_str		m_id;
 	shared_str		m_name;
 	shared_str		m_icon;

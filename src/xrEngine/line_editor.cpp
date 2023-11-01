@@ -20,16 +20,10 @@ void line_editor::IR_OnKeyboardHold(int dik) { m_control.on_key_hold(dik); }
 void line_editor::IR_OnKeyboardRelease(int dik) { m_control.on_key_release(dik); }
 void line_editor::IR_OnTextInput(const char *text) { m_control.on_text_input(text); }
 
-void line_editor::IR_Capture()
+void line_editor::IR_OnActivate()
 {
-    IInputReceiver::IR_Capture();
     m_control.on_ir_capture();
-}
-
-void line_editor::IR_Release()
-{
-    m_control.on_ir_release();
-    IInputReceiver::IR_Release();
+    IInputReceiver::IR_OnDeactivate();
 }
 
 void line_editor::IR_OnDeactivate()

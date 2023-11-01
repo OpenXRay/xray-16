@@ -393,12 +393,6 @@ void CRender::create()
     if (o.nvdbt)
         Msg("* NV-DBT supported and used");
 
-#if defined(USE_DX9) || defined(USE_DX11)
-    o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
-    if (o.no_ram_textures)
-        Msg("* Managed textures disabled");
-#endif
-
     o.ffp = false;
 
     // options (smap-pool-size)

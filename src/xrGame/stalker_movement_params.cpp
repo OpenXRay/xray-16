@@ -139,7 +139,7 @@ void stalker_movement_params::cover_loophole_id(shared_str const& loophole_id)
     {
         return (loophole->id()._get() == loophole_id._get());
     };
-    
+
     const auto& loopholes = m_cover->get_description()->loopholes();
     const auto i = std::find_if(loopholes.begin(), loopholes.end(), predicate);
 

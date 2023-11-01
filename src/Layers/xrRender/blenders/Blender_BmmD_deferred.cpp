@@ -69,7 +69,7 @@ BOOL CBlender_BmmD::canUseSteepParallax()
     return TRUE;
 }
 
-#if RENDER == R_R2 
+#if RENDER == R_R2
 void CBlender_BmmD::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
@@ -134,7 +134,7 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 	// ***only pixel shaders differ***
 	string256				mask;
 	strconcat				(sizeof(mask),mask,C.L_textures[0].c_str(),"_mask");
-	switch(C.iElement) 
+	switch(C.iElement)
 	{
 	case SE_R2_NORMAL_HQ: 		// deffer
 		uber_deffer		(C, true,	"impl","impl",false,oT2_Name[0]?oT2_Name:0,true);

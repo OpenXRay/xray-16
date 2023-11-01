@@ -442,7 +442,7 @@ void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_star
     const AABBNoLeafNode* N = T->GetNodes();
     r_clear();
 
-    if (SDL_HasSSE())
+    if (CPU::HasSSE)
     {
         // SSE
         // Binary dispatcher

@@ -1198,7 +1198,7 @@ void CCustomMonster::OnRender()
 		float const jump_time	=	0.3f;
 		TransferenceToThrowVel	(velocity,jump_time,physics_world()->Gravity());
 
-		bool const result	=	trajectory_intersects_geometry	(jump_time, 
+		bool const result	=	trajectory_intersects_geometry	(jump_time,
 																 start,
 																 end,
 																 velocity,

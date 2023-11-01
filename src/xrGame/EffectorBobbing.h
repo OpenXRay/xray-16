@@ -8,7 +8,6 @@
 class CEffectorBobbing : public CEffectorCam
 {
     float fTime;
-    Fvector vAngleAmplitude;
     float fYAmplitude;
     float fSpeed;
 

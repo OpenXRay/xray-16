@@ -204,10 +204,27 @@ string(REPLACE ";" " " SANITIZE_FLAGS "${SANITIZE_FLAGS}")
 
 message(STATUS "USE_ADDRESS_SANITIZER: ${USE_ADDRESS_SANITIZER}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZE_FLAGS}")
+option(USE_LTO "Use Link Time Optimization" ${MASTER_GOLD})
+if (USE_LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT LTO_SUPPORTED)
+
+    if (LTO_SUPPORTED)
+        # With clang cmake only enables '-flto=thin' but we want full LTO
+        if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+            set(LTO_FLAGS "-flto=full")
+        else()
+            set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+        endif()
+    endif()
+endif()
+
+message(STATUS "USE_LTO: ${USE_LTO}")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZE_FLAGS} ${LTO_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SANITIZE_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SANITIZE_FLAGS}")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SANITIZE_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SANITIZE_FLAGS} ${LTO_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${SANITIZE_FLAGS} ${LTO_FLAGS}")
 
 set(LUA_LIBRARIES xrLuajit)
 

@@ -90,7 +90,7 @@ const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autod
 extern int psSkeletonUpdate;
 extern float r__dtex_range;
 
-Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW | RFLAG_NO_RAM_TEXTURES }; // All renders
+Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW }; // All renders
 
 //int ps_r__Supersample = 1;
 int ps_r__LightSleepFrames = 10;
@@ -513,8 +513,8 @@ public:
         float ib_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
         Msg("index buffer      \t \t %f \t %f \t %f ", ib_video, ib_managed, ib_system);
 
-        float textures_managed = (m_base+m_lmaps)/MiB;
-        Msg("textures          \t \t %f \t %f \t %f ", 0.f, textures_managed, 0.f);
+        float textures_video = (m_base+m_lmaps)/MiB;
+        Msg("textures          \t \t %f \t %f \t %f ", textures_video, 0.f, 0.f);
 
         mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget];
         float rt_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
@@ -522,8 +522,8 @@ public:
         float rt_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
         Msg("R-Targets         \t \t %f \t %f \t %f ", rt_video, rt_managed, rt_system);
 
-        Msg("\nTotal             \t \t %f \t %f \t %f ", vb_video + ib_video + rt_video,
-            textures_managed + vb_managed + ib_managed + rt_managed, vb_system + ib_system + rt_system);
+        Msg("\nTotal             \t \t %f \t %f \t %f ", vb_video + ib_video + textures_video + rt_video,
+            vb_managed + ib_managed + rt_managed, vb_system + ib_system + rt_system);
 #endif // !USE_OGL
     }
 };
@@ -775,7 +775,6 @@ void xrRender_initconsole()
     CMD4(CCC_Vector3, "r__d_tree_wave", &ps_r__Tree_Wave, tw_min, tw_max);
 #endif // DEBUG
 
-    CMD3(CCC_Mask, "r__no_ram_textures", &ps_r__common_flags, RFLAG_NO_RAM_TEXTURES);
     CMD3(CCC_Mask, "r__actor_shadow", &ps_r__common_flags, RFLAG_ACTOR_SHADOW);
 
     CMD2(CCC_tf_Aniso, "r__tf_aniso", &ps_r__tf_Anisotropic); // {1..16}

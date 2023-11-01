@@ -129,7 +129,7 @@ public:
         _set(rhs);
         return (shared_str&)*this;
     }
-    // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use 
+    // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use
     [[nodiscard]]
     pcstr operator*() const { return p_ ? p_->value : 0; }
 
@@ -198,7 +198,8 @@ struct std::hash<shared_str>
 {
     [[nodiscard]] size_t operator()(const shared_str& str) const noexcept
     {
-        return std::hash<pcstr>{}(str._get()->value);
+        const auto str_val = str._get();
+        return std::hash<pcstr>{}(str_val ? str_val->value : nullptr);
     }
 };
 

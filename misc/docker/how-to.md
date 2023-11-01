@@ -14,7 +14,7 @@ Then start a new terminal session (or reboot the machine).
 Download and install [Docker Desktop](https://download.docker.com/mac/stable/Docker.dmg).
 
 ## Create container
-Navigate to directory `xray-16/docker` and run the following to create 
+Navigate to directory `xray-16/docker` and run the following to create
 container:
 ```shell script
 bash create.sh
@@ -54,7 +54,7 @@ User `user` is used for integration with CLion, don't try to log in as him manua
 - In CLion:
     1. Open `xray-16` project
     2. In `Preferences/Settings` > `Build, Execution, Deployment` > `Toolchains`
-       create Remote Host and fill paths to the tools (compiler, cmake and 
+       create Remote Host and fill paths to the tools (compiler, cmake and
        so on) like on the screenshot below:
        ![Setup toolchain](pics/toolchain.png)
        ```
@@ -63,7 +63,7 @@ User `user` is used for integration with CLion, don't try to log in as him manua
        ```
        ![Insert credentials](pics/credentials.png)
 
-    3. In `Preferences/Settings` > `Build, Execution, Deployment` > `CMake` 
+    3. In `Preferences/Settings` > `Build, Execution, Deployment` > `CMake`
        choose `Toolchain` – created above Remote Host:
 
        ![Setup cmake](pics/cmake.png)

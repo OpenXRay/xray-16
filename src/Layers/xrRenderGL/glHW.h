@@ -48,7 +48,7 @@ public:
 
     u32 BackBufferCount{};
     u32 CurrentBackBuffer{};
-    
+
     GLuint pFB{};
 
     SDL_Window* m_window{};

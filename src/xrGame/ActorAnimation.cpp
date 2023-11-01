@@ -285,7 +285,7 @@ void CActor::steer_Vehicle(float angle)
         smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(anims.idles[0]);
     else if (angle > 0.f)
         smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(anims.steer_right);
-    else 
+    else
         smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(anims.steer_left);
     //-Alundaio
 }
@@ -319,10 +319,11 @@ CMotion* FindMotionKeys(MotionID motion_ID, IRenderVisual* V)
 
 #ifdef DEBUG
 BOOL g_ShowAnimationInfo = FALSE;
-#endif // DEBUG
 constexpr pcstr mov_state[] = {
     "idle", "walk", "run", "sprint",
 };
+#endif // DEBUG
+
 void CActor::g_SetAnimation(u32 mstate_rl, bool force)
 {
     if (!g_Alive())

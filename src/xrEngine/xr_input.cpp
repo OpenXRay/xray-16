@@ -14,7 +14,7 @@ IInputReceiver dummyController;
 
 ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
-ENGINE_API Flags32 psMouseInvert = {false};
+ENGINE_API Flags32 psMouseInvert = {};
 
 ENGINE_API float psControllerStickSens = 1.f;
 ENGINE_API float psControllerStickSensScale = 1.f;
@@ -56,6 +56,9 @@ CInput::CInput(const bool exclusive)
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH);
+
+    if (strstr(Core.Params, "-no_gamepad"))
+        return;
 
     if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
     {
@@ -228,6 +231,13 @@ void CInput::KeyUpdate()
     if (count)
         SetCurrentInputType(KeyboardMouse);
 
+    // If textInputCounter has changed,
+    // we assume that text input target changed.
+    // Theoretically, this is not always true, though.
+    // But we always can change the solution.
+    // If we find out something not work as expected.
+    const auto cnt = textInputCounter;
+
     for (int i = 0; i < count; ++i)
     {
         const SDL_Event& event = events[i];
@@ -245,6 +255,8 @@ void CInput::KeyUpdate()
             break;
 
         case SDL_TEXTINPUT:
+            if (cnt != textInputCounter)
+                continue; // if input target changed, skip this frame
             cbStack.back()->IR_OnTextInput(event.text.text);
             break;
 
@@ -536,6 +548,35 @@ bool CInput::InputIsGrabbed() const
     return inputGrabbed;
 }
 
+void CInput::EnableTextInput()
+{
+    ++textInputCounter;
+
+    if (textInputCounter == 1)
+        SDL_StartTextInput();
+
+    SDL_PumpEvents();
+    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+}
+
+void CInput::DisableTextInput()
+{
+    --textInputCounter;
+    if (textInputCounter < 0)
+        textInputCounter = 0;
+
+    if (textInputCounter == 0)
+        SDL_StopTextInput();
+
+    SDL_PumpEvents();
+    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+}
+
+bool CInput::IsTextInputEnabled() const
+{
+    return textInputCounter > 0;
+}
+
 void CInput::RegisterKeyMapChangeWatcher(pureKeyMapChanged* watcher, int priority /*= REG_PRIORITY_NORMAL*/)
 {
     seqKeyMapChanged.Add(watcher, priority);
@@ -640,8 +681,9 @@ void CInput::ExclusiveMode(const bool exclusive)
 
     // Original CInput was using DirectInput in exclusive mode
     // In which keyboard was grabbed with the mouse.
-    // Uncomment it below, if you want.
-    //SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, exclusive ? "1" : "0");
+    // It produces problems on Linux, so it's disabled by default.
+    if (strstr(Core.Params, "-grab_keyboard"))
+        SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, exclusive ? "1" : "0");
     exclusiveInput = exclusive;
 
     GrabInput(true);

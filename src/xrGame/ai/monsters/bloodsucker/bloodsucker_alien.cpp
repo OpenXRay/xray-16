@@ -83,7 +83,6 @@ class CAlienEffector final : public CEffectorCam
 private:
     typedef CEffectorCam inherited;
 
-    float m_time_total;
     Fvector dangle_target;
     Fvector dangle_current;
 
