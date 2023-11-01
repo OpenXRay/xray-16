@@ -436,7 +436,6 @@ void CGamePersistent::start_logo_intro()
     if (!allow_intro())
     {
         m_intro_event = nullptr;
-        Console->Show();
         Console->Execute("main_menu on");
         return;
     }
@@ -450,7 +449,6 @@ void CGamePersistent::start_logo_intro()
             m_intro = xr_new<CUISequencer>();
             m_intro->m_on_destroy_event.bind(this, &CGamePersistent::update_logo_intro);
             m_intro->Start("intro_logo");
-            Console->Hide();
         }
     }
 }

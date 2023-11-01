@@ -3,9 +3,7 @@
 #include "UIWindow.h"
 #include "Cursor/UICursor.h"
 
-CUIWindow::CUIWindow(pcstr window_name)
-    : m_windowName(window_name), m_pParentWnd(NULL), m_pMouseCapturer(NULL), m_pKeyboardCapturer(NULL), m_pMessageTarget(NULL),
-      m_dwFocusReceiveTime(0), m_bAutoDelete(false), m_bCursorOverWindow(false), m_bCustomDraw(false)
+CUIWindow::CUIWindow(pcstr window_name) : m_windowName(window_name)
 {
     Show(true);
     Enable(true);

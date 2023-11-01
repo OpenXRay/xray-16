@@ -243,7 +243,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
                     dcl_len = std::size(r1_decl_lmap_unpacked);
                     _DC[i].resize(dcl_len);
                     CopyMemory(_DC[i].begin(), r1_decl_lmap_unpacked, dcl_len * sizeof(VertexElement));
-                    
+
                     vSize = GetDeclVertexSize(r1_decl_lmap_unpacked, 0);
                     _VB[i].Create(vCount * vSize);
                     auto* data = static_cast<r1v_lmap_unpacked*>(_VB[i].Map());

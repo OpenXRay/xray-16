@@ -385,7 +385,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     // Lain: added
     case SDL_SCANCODE_F5:
     {
-        if (CBaseMonster* pBM = smart_cast<CBaseMonster*>(CurrentEntity()))
+        if (smart_cast<CBaseMonster*>(CurrentEntity()))
         {
             DBG().log_debug_info();
         }
@@ -483,7 +483,7 @@ void CLevel::IR_OnKeyboardHold(int key)
         static u32 time = Device.dwTimeGlobal;
         if (Device.dwTimeGlobal - time > 20)
         {
-            if (CBaseMonster* pBM = smart_cast<CBaseMonster*>(CurrentEntity()))
+            if (smart_cast<CBaseMonster*>(CurrentEntity()))
             {
                 DBG().debug_info_up();
                 time = Device.dwTimeGlobal;
@@ -495,7 +495,7 @@ void CLevel::IR_OnKeyboardHold(int key)
         static u32 time = Device.dwTimeGlobal;
         if (Device.dwTimeGlobal - time > 20)
         {
-            if (CBaseMonster* pBM = smart_cast<CBaseMonster*>(CurrentEntity()))
+            if (smart_cast<CBaseMonster*>(CurrentEntity()))
             {
                 DBG().debug_info_down();
                 time = Device.dwTimeGlobal;

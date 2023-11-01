@@ -9,7 +9,7 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "xrNetServer/NET_Server.h"
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include "xrNetServer/empty/NET_Server.h"
 #endif
 #include "game_sv_base.h"
@@ -32,8 +32,8 @@ constexpr u32 NET_Latency = 50; // time in (ms)
 #ifdef XR_PLATFORM_WINDOWS
 using xrS_entities = xr_unordered_map<u16, CSE_Abstract*>;
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
-// XXX: For the game engine to work correctly, the actor must always load first, the xr_unordered_map implementation for win 
-// provides this, but the CPP standard order of elements in the container is not defined, which leads to crashes when 
+// XXX: For the game engine to work correctly, the actor must always load first, the xr_unordered_map implementation for win
+// provides this, but the CPP standard order of elements in the container is not defined, which leads to crashes when
 // loading saved game under UNIX
 using xrS_entities = xr_map<u16, CSE_Abstract*>;
 #else

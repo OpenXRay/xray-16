@@ -200,10 +200,6 @@ public:
     SState* _CreateState(SimulatorStates& Code);
     void _DeleteState(const SState* SB);
 
-#ifdef USE_OGL
-    SDeclaration* _CreateDecl (u32 FVF);
-#endif
-
     SDeclaration* _CreateDecl(const VertexElement* dcl);
     void _DeleteDecl(const SDeclaration* dcl);
 

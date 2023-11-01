@@ -19,22 +19,22 @@ int ik_blend_free_foot = 1;
 int ik_local_blending = 0;
 int ik_collide_blend = 0;
 
-const Matrix Midentity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}; //. in XGlobal
+//const Matrix Midentity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}; //. in XGlobal
 
-const Matrix IKLocalJoint = {0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1}; //. in XGlobal
-const Fmatrix XLocalJoint = {0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+//const Matrix IKLocalJoint = {0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1}; //. in XGlobal
+//const Fmatrix XLocalJoint = {0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 
 const Fmatrix xm2im = {0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
 
-const Fvector xgproj_axis = {0, 1, 0};
-const Fvector xgpos_axis = {0, 0, 1};
+//const Fvector xgproj_axis = {0, 1, 0};
+//const Fvector xgpos_axis = {0, 0, 1};
 
-const Fvector xlproj_axis = {1, 0, 0};
-const Fvector xlpos_axis = {0, 0, 1};
+//const Fvector xlproj_axis = {1, 0, 0};
+//const Fvector xlpos_axis = {0, 0, 1};
 typedef float IVektor[3];
 
-const IVektor lproj_vector = {0, 0, 1};
-const IVektor lpos_vector = {-1, 0, 0};
+//const IVektor lproj_vector = {0, 0, 1};
+//const IVektor lpos_vector = {-1, 0, 0};
 
 const IVektor gproj_vector = {0, 0, 1}; //. in XGlobal
 const IVektor gpos_vector = {1, 0, 0};
@@ -845,7 +845,7 @@ void CIKLimb::ToeTimeDiff(Fvector& v, const SCalculateData& cd) const
 
 void CIKLimb::ToeTimeDiffPredict(Fvector& v) const { v.set(0, -1, 0); }
 static const float pick_dir_mix_in_factor = 0.01f;
-static const float pick_dir_mix_in_doun_factor = 0.01f;
+//static const float pick_dir_mix_in_doun_factor = 0.01f;
 void pick_dir_update(Fvector& v, const Fvector& previous_dir, const Fvector& new_dir)
 {
     Fvector dir = new_dir;

@@ -153,7 +153,7 @@ struct RefreshData
     CGameSpy_Browser* pGSBrowser;
     string4096 FilterStr;
 
-    RefreshData(CGameSpy_Browser* browser, pcstr filter) : pGSBrowser(browser) 
+    RefreshData(CGameSpy_Browser* browser, pcstr filter) : pGSBrowser(browser)
     {
         xr_strcpy(FilterStr, filter);
     }

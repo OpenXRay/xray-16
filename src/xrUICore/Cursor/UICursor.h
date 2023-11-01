@@ -5,12 +5,12 @@ class CUIStatic;
 
 class XRUICORE_API CUICursor : public pureRender, public CDeviceResetNotifier, public CUIResetNotifier
 {
-    bool bVisible;
-    Fvector2 vPos;
-    Fvector2 vPrevPos;
+    bool bVisible{};
+    Fvector2 vPos{};
+    Fvector2 vPrevPos{};
     Fvector2 correction;
-    bool m_bound_to_system_cursor;
-    CUIStatic* m_static;
+    bool m_bound_to_system_cursor{};
+    CUIStatic* m_static{};
     u32 m_become_visible_time{};
     bool m_pause_autohide{};
 

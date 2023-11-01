@@ -152,15 +152,12 @@ void line_edit_control::clear_states()
 
 void line_edit_control::on_ir_capture()
 {
-    SDL_PumpEvents();
-    SDL_StartTextInput();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    pInput->EnableTextInput();
 }
 
 void line_edit_control::on_ir_release()
 {
-    SDL_StopTextInput();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    pInput->DisableTextInput();
 }
 
 void line_edit_control::init(size_t str_buffer_size, init_mode mode)

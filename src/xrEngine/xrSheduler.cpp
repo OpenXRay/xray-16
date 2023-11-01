@@ -319,7 +319,10 @@ void CSheduler::ProcessStep()
 {
     // Normal priority
     const u32 dwTime = Device.dwTimeGlobal;
+
+#ifdef DEBUG
     CTimer eTimer;
+#endif
 
     for (int i = 0; !Items.empty() && Top().dwTimeForExecute < dwTime; ++i)
     {

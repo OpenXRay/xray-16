@@ -222,7 +222,7 @@ void CreateLog(BOOL nl)
 #endif
             abort();
         }
-        
+
 #ifdef USE_LOG_TIMING
         time_t t = time(nullptr);
         tm* ti = localtime(&t);
@@ -251,6 +251,6 @@ void CloseLog(void)
     FlushLog();
     if (LogWriter)
         FS.w_close(LogWriter);
-    
+
     LogFile.clear();
 }

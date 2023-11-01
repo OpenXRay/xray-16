@@ -431,7 +431,8 @@ bool CScriptEngine::load_file_into_namespace(LPCSTR caScriptName, LPCSTR caNames
 
 bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
 {
-    int start = lua_gettop(lua());
+    [[maybe_unused]] int start = lua_gettop(lua());
+
     lua_pushstring(lua(), GlobalNamespace);
     lua_rawget(lua(), LUA_GLOBALSINDEX);
     string256 S2 = { 0 };
@@ -487,7 +488,8 @@ bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
 
 bool CScriptEngine::object(LPCSTR identifier, int type)
 {
-    int start = lua_gettop(lua());
+    [[maybe_unused]] int start = lua_gettop(lua());
+
     lua_pushnil(lua());
     while (lua_next(lua(), -2))
     {
@@ -508,7 +510,8 @@ bool CScriptEngine::object(LPCSTR identifier, int type)
 
 bool CScriptEngine::object(LPCSTR namespace_name, LPCSTR identifier, int type)
 {
-    int start = lua_gettop(lua());
+    [[maybe_unused]] int start = lua_gettop(lua());
+
     if (xr_strlen(namespace_name) && !namespace_loaded(namespace_name, false))
     {
         VERIFY(lua_gettop(lua()) == start);
@@ -616,8 +619,8 @@ bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int error
 
 void CScriptEngine::print_error(lua_State* L, int iErrorCode)
 {
-    CScriptEngine* scriptEngine = GetInstance(L);
-    VERIFY(scriptEngine);
+    VERIFY(GetInstance(L));
+
     switch (iErrorCode)
     {
     case LUA_ERRRUN:
@@ -657,8 +660,10 @@ void CScriptEngine::flush_log()
 #include "LuaStudio/LuaStudio.hpp"
 typedef cs::lua_studio::create_world_function_type create_world_function_type;
 typedef cs::lua_studio::destroy_world_function_type destroy_world_function_type;
+#ifdef XR_PLATFORM_WINDOWS
 static create_world_function_type s_create_world = nullptr;
 static destroy_world_function_type s_destroy_world = nullptr;
+#endif
 static LogCallback s_old_log_callback = nullptr;
 #endif
 #endif
@@ -689,11 +694,11 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
         return;
     }
 
-    s_create_world = 
+    s_create_world =
         (create_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_create_world@12");
     R_ASSERT2(s_create_world, "can't find function \"cs_lua_studio_backend_create_world\"");
 
-    s_destroy_world = 
+    s_destroy_world =
         (destroy_world_function_type)s_script_debugger_module->GetProcAddress("_cs_lua_studio_backend_destroy_world@4");
     R_ASSERT2(s_destroy_world, "can't find function \"cs_lua_studio_backend_destroy_world\" in the library");
 
@@ -935,7 +940,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     {
         const bool nilConversion =
             pSettingsOpenXRay->read_if_exists<bool>("lua_scripting", "allow_nil_conversion", true);
-     
+
         luabind::allow_nil_conversion(nilConversion);
         luabind::disable_super_deprecation();
 
@@ -1243,7 +1248,7 @@ void CScriptEngine::collect_all_garbage()
 
 void CScriptEngine::on_error(lua_State* state)
 {
-    CScriptEngine* scriptEngine = GetInstance(state);
+    [[maybe_unused]] CScriptEngine* scriptEngine = GetInstance(state);
     VERIFY(scriptEngine);
 #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
     if (!scriptEngine->debugger())

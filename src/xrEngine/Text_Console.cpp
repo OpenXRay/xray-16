@@ -3,7 +3,6 @@
 #include "line_editor.h"
 #include "x_ray.h"
 
-#include <SDL_syswm.h>
 #include <windowsx.h>
 
 extern char const* const ioc_prompt;
@@ -12,7 +11,6 @@ int g_svTextConsoleUpdateRate = 1;
 
 CTextConsole::CTextConsole()
 {
-    m_pMainWnd = NULL;
     m_hConsoleWnd = NULL;
     m_hLogWnd = NULL;
     m_hLogWndFont = NULL;
@@ -25,7 +23,6 @@ CTextConsole::CTextConsole()
     m_last_time = Device.dwTimeGlobal;
 }
 
-CTextConsole::~CTextConsole() { m_pMainWnd = NULL; }
 //-------------------------------------------------------------------------------------------
 LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void CTextConsole::CreateConsoleWnd()
@@ -33,7 +30,7 @@ void CTextConsole::CreateConsoleWnd()
     HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
     //----------------------------------
     RECT cRc;
-    GetClientRect(*m_pMainWnd, &cRc);
+    GetClientRect(m_pMainWnd, &cRc);
     int lX = cRc.left;
     int lY = cRc.top;
     int lWidth = cRc.right - cRc.left;
@@ -56,7 +53,7 @@ void CTextConsole::CreateConsoleWnd()
 
     // Create the render window
     m_hConsoleWnd = CreateWindow(
-        wndclass, "XRAY Text Console", dwWindowStyle, lX, lY, lWidth, lHeight, *m_pMainWnd, 0, hInstance, 0L);
+        wndclass, "XRAY Text Console", dwWindowStyle, lX, lY, lWidth, lHeight, m_pMainWnd, 0, hInstance, 0L);
     //---------------------------------------------------------------------------
     R_ASSERT2(m_hConsoleWnd, "Unable to Create TextConsole Window!");
 };
@@ -152,20 +149,7 @@ void CTextConsole::Initialize()
 
 void CTextConsole::OnDeviceInitialize()
 {
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-    if (SDL_GetWindowWMInfo(Device.m_sdlWnd, &info))
-    {
-        switch (info.subsystem)
-        {
-        case SDL_SYSWM_WINDOWS:
-            m_pMainWnd = &info.info.win.window;
-            break;
-        default: break;
-        }
-    }
-    else
-        Log("Couldn't get window information: ", SDL_GetError());
+    m_pMainWnd = (HWND)Device.GetApplicationWindowHandle();
 
     CreateConsoleWnd();
     CreateLogWnd();

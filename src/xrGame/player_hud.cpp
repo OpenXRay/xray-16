@@ -130,13 +130,13 @@ void attachable_hud_item::update(bool bForce)
     {
         reload_measures();
     }
-    
+
     if (hud_adj_mode > 0)
         m_measures.update(m_attach_offset);
 
     m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform);
     m_upd_firedeps_frame = Device.dwFrame;
-    
+
     if (IKinematicsAnimated* ka = m_model->dcast_PKinematicsAnimated())
     {
         ka->UpdateTracks();
@@ -483,7 +483,7 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
             CEffectorCam* ec = current_actor->Cameras().GetCamEffector(eCEWeaponAction);
             if (ec)
                 current_actor->Cameras().RemoveCamEffector(eCEWeaponAction);
-            
+
             CAnimatorCamEffector* e = xr_new<CAnimatorCamEffector>();
             e->SetType(eCEWeaponAction);
             e->SetHudAffect(false);
@@ -502,7 +502,7 @@ player_hud::~player_hud()
         IRenderVisual* v = m_model->dcast_RenderVisual();
         GEnv.Render->model_Delete(v);
     }
-    
+
     for (auto& [name, item] : m_pool)
     {
         xr_delete(item);

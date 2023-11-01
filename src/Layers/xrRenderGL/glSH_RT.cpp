@@ -20,24 +20,6 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
-bool CRT::used_as_depth() const
-{
-    switch (fmt)
-    {
-    case D3DFMT_D16:
-    case D3DFMT_D16_LOCKABLE:
-    case D3DFMT_D15S1:
-    case D3DFMT_D24X8:
-    case D3DFMT_D24S8:
-        return true; 
-    }
-
-    if (fmt == MAKEFOURCC('D', 'F', '2', '4'))
-        return true;
-
-    return false;
-}
-
 void CRT::set_slice_read(int slice) {}
 void CRT::set_slice_write(u32 context_id, int slice) {}
 

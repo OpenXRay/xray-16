@@ -25,4 +25,4 @@ void CWeaponCustomPistolAuto::FireEnd()
 void CWeaponCustomPistolAuto::PlayAnimReload()
 {
     inherited::PlayAnimReload();
-} 
+}

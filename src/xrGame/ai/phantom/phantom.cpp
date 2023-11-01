@@ -80,7 +80,7 @@ bool CPhantom::net_Spawn(CSE_Abstract* DC)
     if (!inherited::net_Spawn(DC))
         return FALSE;
 
-    OBJ->set_killer_id(u16(-1)); // Alundaio: Hack to prevent strange crash with dynamic phantoms    
+    OBJ->set_killer_id(u16(-1)); // Alundaio: Hack to prevent strange crash with dynamic phantoms
 
     m_enemy = Level().CurrentEntity();
     VERIFY(m_enemy);

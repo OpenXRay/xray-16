@@ -198,7 +198,6 @@ target_compile_definitions(${PROJECT_NAME}
     -D_USE_MATH_DEFINES
     -DXRLC_LIGHT_EXPORTS
     -DFORCE_NO_EXCEPTIONS
-    -DNO_XR_VDECLARATOR
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

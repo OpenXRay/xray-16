@@ -327,16 +327,12 @@ void ide::ShowWeatherEditor()
             }
             if (ImGui::BeginMenu("Windows"))
             {
-                if (ImGui::MenuItem("Weather cycles", nullptr, &window_weather_cycle))
-                    ;
-                if (ImGui::MenuItem("Suns", nullptr, &window_suns))
-                    ;
-                if (ImGui::MenuItem("Ambients", nullptr, &window_ambients))
-                    ;
-                if (ImGui::MenuItem("Thunderbolts", nullptr, &window_thunderbolts))
-                    ;
-                if (ImGui::MenuItem("Level weathers", nullptr, &window_level_weathers))
-                    ;
+                if (ImGui::MenuItem("Weather cycles", nullptr, &window_weather_cycle)) {}
+                if (ImGui::MenuItem("Suns", nullptr, &window_suns)) {}
+                if (ImGui::MenuItem("Ambients", nullptr, &window_ambients)) {}
+                if (ImGui::MenuItem("Thunderbolts", nullptr, &window_thunderbolts)) {}
+                if (ImGui::MenuItem("Level weathers", nullptr, &window_level_weathers)) {}
+
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
@@ -387,8 +383,7 @@ void ide::ShowWeatherEditor()
 
                 if (ImGui::BeginCombo("Weather cycle", env.CurrentCycleName.c_str()))
                 {
-                    if (ImGui::Selectable("<edit>", false))
-                        ;
+                    if (ImGui::Selectable("<edit>", false)) {}
                     for (const auto& [identifier, env_descriptors] : env.WeatherCycles)
                     {
                         if (ImGui::Selectable(identifier.c_str(), env.CurrentCycleName == identifier))
@@ -403,8 +398,7 @@ void ide::ShowWeatherEditor()
                 ImGui::TableNextColumn();
                 if (ImGui::BeginCombo("Effect", env.IsWFXPlaying() ? env.CurrentWeatherName.c_str() : ""))
                 {
-                    if (ImGui::Selectable("<edit>", false))
-                        ;
+                    if (ImGui::Selectable("<edit>", false)) {}
 
                     if (ImGui::Selectable("##", !env.IsWFXPlaying()))
                         env.StopWFX();

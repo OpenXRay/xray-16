@@ -821,7 +821,7 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, LPCSTR path, int index, CUIF
     pWnd->SetTextureColor(color);
 
     InitWindow(xml_doc, path, index, pWnd);
-    
+
     return pWnd->InitFrameLineWnd(*base_name, pos, size, !vertical, fatal);
 }
 
@@ -1066,12 +1066,12 @@ void CUIXmlInitBase::ApplyAlign(float& x, float& y, u32 align)
 //////////////////////////////////////////////////////////////////////////
 
 // source: https://stackoverflow.com/questions/650162/why-cant-the-switch-statement-be-applied-to-strings
-constexpr uint32_t hash(const std::string_view data) noexcept 
-{ 
-    uint32_t hash = 5385;    
-    for (const auto& e : data)     
-        hash = ((hash << 5) + hash) + e;    
-    return hash; 
+constexpr uint32_t hash(const std::string_view data) noexcept
+{
+    uint32_t hash = 5385;
+    for (const auto& e : data)
+        hash = ((hash << 5) + hash) + e;
+    return hash;
 }
 
 bool CUIXmlInitBase::InitAlignment(CUIXml& xml_doc, const char* path, int index, float& x, float& y, CUIWindow* pWnd)
@@ -1299,7 +1299,7 @@ bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, LPCSTR path, int index, CUITr
     {
         float fmin = xml_doc.ReadAttribFlt(path, index, "min", 0.0f);
         float fmax = xml_doc.ReadAttribFlt(path, index, "max", 0.0f);
-        
+
         if (fmin != fmax)
         {
             pWnd->SetOptFBounds(fmin, fmax);

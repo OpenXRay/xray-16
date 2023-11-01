@@ -51,9 +51,9 @@
       "options": {
         "cwd": "${workspaceFolder}/bin"
       },
-      "command": "make -j${CPU_COUNT}",
+      "command": "cmake --build . -j${CPU_COUNT}",
       "dependsOn": [
-        "mkdir"
+        "Configure"
       ]
     },
     {
@@ -64,7 +64,7 @@
       },
       "command": "./xr_3da -soc -nointro -fsltx ${SOC_LTX_FILE_PATH}",
       "dependsOn": [
-        "mkdir"
+        "Compile"
       ],
       "problemMatcher": []
     },
@@ -76,7 +76,7 @@
       },
       "command": "./xr_3da -cs -nointro -fsltx ${CS_LTX_FILE_PATH}",
       "dependsOn": [
-        "mkdir"
+        "Compile"
       ],
       "problemMatcher": []
     },
@@ -88,7 +88,7 @@
       },
       "command": "./xr_3da -nointro -fsltx ${COP_LTX_FILE_PATH}",
       "dependsOn": [
-        "mkdir"
+        "Compile"
       ],
       "problemMatcher": []
     },

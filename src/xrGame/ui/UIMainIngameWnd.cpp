@@ -170,9 +170,8 @@ void CUIMainIngameWnd::Init()
         UIArtefactIcon->Show(false);
     }
 
-    shared_str warningStrings[7] = {"jammed", "radiation", "wounds", "starvation", "fatigue",
-        "invincible"
-        "artefact"};
+    const static shared_str warningStrings[7] = {"jammed", "radiation", "wounds", "starvation", "fatigue",
+        "invincible", "artefact"};
 
     // Загружаем пороговые значения для индикаторов
     EWarningIcons j = ewiWeaponJammed;

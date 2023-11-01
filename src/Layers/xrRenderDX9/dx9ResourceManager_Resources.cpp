@@ -82,39 +82,6 @@ void CResourceManager::_DeleteVS(const SVS* vs) { DestroyShader(vs); }
 SPS* CResourceManager::_CreatePS(LPCSTR name) { return CreateShader<SPS>(name, nullptr); }
 void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 
-//--------------------------------------------------------------------------------------------------------------
-SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, VertexBufferHandle vb, IndexBufferHandle ib)
-{
-    R_ASSERT(decl && vb);
-
-    SDeclaration* dcl = _CreateDecl(decl);
-    u32 vb_stride = GetDeclVertexSize(decl, 0);
-
-    // ***** first pass - search already loaded shader
-    for (SGeometry* v_geom : v_geoms)
-    {
-        SGeometry& G = *v_geom;
-        if ((G.dcl == dcl) && (G.vb == vb) && (G.ib == ib) && (G.vb_stride == vb_stride))
-            return v_geom;
-    }
-
-    SGeometry* Geom = v_geoms.emplace_back(xr_new<SGeometry>());
-    Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    Geom->dcl = dcl;
-    Geom->vb = vb;
-    Geom->vb_stride = vb_stride;
-    Geom->ib = ib;
-
-    return Geom;
-}
-SGeometry* CResourceManager::CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib)
-{
-    VertexElement dcl[MAX_FVF_DECL_SIZE];
-    CHK_DX(D3DXDeclaratorFromFVF(FVF, dcl));
-    SGeometry* g = CreateGeom(dcl, vb, ib);
-    return g;
-}
-
 #ifdef _EDITOR
 //--------------------------------------------------------------------------------------------------------------
 class includer : public ID3DXInclude
