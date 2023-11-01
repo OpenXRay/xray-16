@@ -41,6 +41,7 @@
 #include "raypick.h"
 #include "xrCDB/xr_collide_defs.h"
 #include "xrNetServer/NET_Messages.h"
+#include "xrEngine/Rain.h"
 
 LPCSTR command_line() { return Core.Params; }
 bool IsDynamicMusic() { return !!psActorFlags.test(AF_DYNAMIC_MUSIC); }
@@ -191,6 +192,33 @@ float low_cover_in_direction(u32 level_vertex_id, const Fvector& direction)
 }
 
 float rain_factor() { return (g_pGamePersistent->Environment().CurrentEnv.rain_density); }
+float rain_wetness() { return (g_pGamePersistent->Environment().wetness_factor); }
+float rain_hemi()
+{
+    CEffect_Rain* rain = g_pGamePersistent->pEnvironment->eff_Rain;
+
+    if (rain)
+    {
+        return rain->GetRainHemi();
+    }
+    else
+    {
+        IGameObject* E = g_pGameLevel->CurrentViewEntity();
+        if (E && E->renderable_ROS())
+        {
+            float* hemi_cube = E->renderable_ROS()->get_luminocity_hemi_cube();
+            float hemi_val = _max(hemi_cube[0], hemi_cube[1]);
+            hemi_val = _max(hemi_val, hemi_cube[2]);
+            hemi_val = _max(hemi_val, hemi_cube[3]);
+            hemi_val = _max(hemi_val, hemi_cube[5]);
+
+            return hemi_val;
+        }
+
+        return 0.f;
+    }
+}
+
 u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distance)
 {
     direction.normalize_safe();
@@ -747,6 +775,7 @@ IC static void CLevel_Export(lua_State* luaState)
 
         def("high_cover_in_direction", high_cover_in_direction), def("low_cover_in_direction", low_cover_in_direction),
         def("vertex_in_direction", vertex_in_direction), def("rain_factor", rain_factor),
+        def("rain_wetness", rain_wetness), def("rain_hemi", rain_hemi),
         def("patrol_path_exists", patrol_path_exists), def("vertex_position", vertex_position),
         def("name", +[]() { return Level().name().c_str(); }),
         def("prefetch_sound", prefetch_sound),

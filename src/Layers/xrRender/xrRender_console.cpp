@@ -210,6 +210,40 @@ int ps_r2_wait_timeout = 500;
 float ps_r2_lt_smooth = 1.f; // 1.f
 float ps_r2_slight_fade = 0.5f; // 1.f
 
+// Anomaly
+extern ENGINE_API float ps_r2_img_exposure; // r2-only
+extern ENGINE_API float ps_r2_img_gamma; // r2-only
+extern ENGINE_API float ps_r2_img_saturation; // r2-only
+extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
+extern ENGINE_API Fvector4 ps_r2_mask_control; // r2-only
+extern ENGINE_API Fvector ps_r2_drops_control; // r2-only
+extern ENGINE_API int ps_r2_nightvision;
+
+//debug
+extern ENGINE_API Fvector4 ps_dev_param_1;
+extern ENGINE_API Fvector4 ps_dev_param_2;
+extern ENGINE_API Fvector4 ps_dev_param_3;
+extern ENGINE_API Fvector4 ps_dev_param_4;
+extern ENGINE_API Fvector4 ps_dev_param_5;
+extern ENGINE_API Fvector4 ps_dev_param_6;
+extern ENGINE_API Fvector4 ps_dev_param_7;
+extern ENGINE_API Fvector4 ps_dev_param_8;
+
+// Ascii1457's Screen Space Shaders
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
+extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
+extern ENGINE_API Fvector4 ps_ssfx_rain_1;
+extern ENGINE_API Fvector4 ps_ssfx_rain_2;
+extern ENGINE_API Fvector4 ps_ssfx_rain_3;
+extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
+extern ENGINE_API Fvector4 ps_ssfx_grass_shadows;
+extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
+extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
+extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
+extern ENGINE_API float ps_ssfx_wpn_dof_2;
+
 //  x - min (0), y - focus (1.4), z - max (100)
 Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
@@ -245,6 +279,7 @@ xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
 
 //- Mad Max
 float ps_r2_gloss_factor = 4.0f;
+float ps_r2_gloss_min = 0.0f;
 //- Mad Max
 #ifndef _EDITOR
 #include "xrEngine/XR_IOConsole.h"
@@ -753,6 +788,11 @@ void xrRender_initconsole()
 
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 8);
 
+    // Anomaly
+    CMD4(CCC_Float, "r__exposure", &ps_r2_img_exposure, 0.5f, 4.0f);
+    CMD4(CCC_Float, "r__gamma", &ps_r2_img_gamma, 0.5f, 2.2f);
+    CMD4(CCC_Float, "r__saturation", &ps_r2_img_saturation, 0.0f, 2.0f);
+
     Fvector tw_min, tw_max;
 
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 2.f);
@@ -834,7 +874,8 @@ void xrRender_initconsole()
 
     //- Mad Max
     CMD4(CCC_Float, "r2_gloss_factor", &ps_r2_gloss_factor, .0f, 10.f);
-//- Mad Max
+    CMD4(CCC_Float, "r2_gloss_min", &ps_r2_gloss_min, .0f, 1.f);
+    //- Mad Max
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "r2_use_nvdbt", &ps_r2_ls_flags, R2FLAG_USE_NVDBT);
@@ -950,6 +991,7 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r3_water_refl", &ps_r_water_reflection, qwater_reflection_quality_token);
     CMD3(CCC_Mask, "r3_water_refl_half_depth", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_HALF_DEPTH);
     CMD3(CCC_Mask, "r3_water_refl_jitter", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_JITTER);
+    CMD3(CCC_Mask, "r4_new_shader_support", &ps_r2_ls_flags_ext, R4FLAGEXT_NEW_SHADER_SUPPORT);
 
     //CMD3(CCC_Mask, "r3_msaa", &ps_r2_ls_flags, R3FLAG_MSAA);
     CMD3(CCC_Token, "r3_msaa", &ps_r3_msaa, qmsaa_token);
@@ -982,6 +1024,45 @@ void xrRender_initconsole()
 #if RENDER == R_R4
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
 #endif
+
+    // Anomaly
+    Fvector4 tw2_min = { 0.f, 0.f, 0.f, 0.f };
+    Fvector4 tw2_max = { 10.f, 3.f, 1.f, 1.f };
+    tw_min.set(0.f, 0.f, 0.f);
+    tw_max.set(1.f, 2.f, 1.f);
+    CMD4(CCC_Integer, "r__nightvision", &ps_r2_nightvision, 0, 3); //For beef's nightvision shader or other stuff
+    CMD4(CCC_Vector4, "r2_mask_control", &ps_r2_mask_control, tw2_min, tw2_max);
+    CMD4(CCC_Vector3, "r2_drops_control", &ps_r2_drops_control, tw_min, tw_max);
+
+    tw2_max.set(-100.f, -100.f, -100.f, -100.f);
+    tw2_max.set(100.f, 100.f, 100.f, 100.f);
+    CMD4(CCC_Vector4, "shader_param_1", &ps_dev_param_1, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_2", &ps_dev_param_2, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_3", &ps_dev_param_3, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_4", &ps_dev_param_4, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_5", &ps_dev_param_5, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_6", &ps_dev_param_6, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_7", &ps_dev_param_7, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_8", &ps_dev_param_8, tw2_min, tw2_max);
+
+    // Ascii's Screen Space Shaders
+    CMD4(CCC_Vector4, "ssfx_hud_drops_1", &ps_ssfx_hud_drops_1, Fvector4{}, Fvector4({ 100000.f, 100.f, 100.f, 100.f }));
+    CMD4(CCC_Vector4, "ssfx_hud_drops_2", &ps_ssfx_hud_drops_2, Fvector4{}, tw2_max);
+    CMD4(CCC_Vector4, "ssfx_blood_decals", &ps_ssfx_blood_decals, Fvector4{}, Fvector4({ 5.f, 5.f, 0.f, 0.f }));
+    CMD4(CCC_Vector4, "ssfx_rain_1", &ps_ssfx_rain_1, Fvector4{}, Fvector4({ 10.f, 5.f, 5.f, 2.f }));
+    CMD4(CCC_Vector4, "ssfx_rain_2", &ps_ssfx_rain_2, Fvector4{}, Fvector4({ 1.f, 10.f, 10.f, 10.f }));
+    CMD4(CCC_Vector4, "ssfx_rain_3", &ps_ssfx_rain_3, Fvector4{}, Fvector4({ 1.f, 10.f, 10.f, 10.f }));
+    CMD4(CCC_Vector4, "ssfx_grass_shadows", &ps_ssfx_grass_shadows, Fvector4{}, Fvector4({ 3.f, 1.f, 100.f, 100.f }));
+    CMD4(CCC_Vector3, "ssfx_shadow_cascades", &ps_ssfx_shadow_cascades, Fvector3({ 1.0f, 1.0f, 1.0f }), Fvector3({ 300.f, 300.f, 300.f }));
+    CMD4(CCC_Vector4, "ssfx_grass_interactive", &ps_ssfx_grass_interactive, Fvector4{}, Fvector4({ 1.f, 15.f, 5000.f, 1.f }));
+    CMD4(CCC_Vector4, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, Fvector4{}, Fvector4({ 5.f, 5.f, 5.f, 60.f }));
+    CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4{}, Fvector4({ 5.f, 20.f, 1.f, 5.f }));
+    CMD4(CCC_Vector4, "ssfx_wpn_dof_1", &ps_ssfx_wpn_dof_1, tw2_min, tw2_max);
+    CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0.f, 1.f);
+
+    tw_min.set(0, 0, 0);
+    tw_max.set(1, 1, 1);
+    CMD4(CCC_Vector3, "r__color_grading", &ps_r2_img_cg, tw_min, tw_max);
 }
 
 #endif

@@ -154,6 +154,8 @@ Shader* CResourceManager::_cpp_Create(
     C.BT = B;
     C.bFFP = RImplementation.o.ffp;
     C.bDetail = FALSE;
+    C.HudElement = false;
+
 #ifdef _EDITOR
     if (!C.BT)
     {
@@ -169,6 +171,13 @@ Shader* CResourceManager::_cpp_Create(
     _ParseList(C.L_textures, s_textures);
     _ParseList(C.L_constants, s_constants);
     _ParseList(C.L_matrices, s_matrices);
+
+#if defined(USE_DX11)
+    if (RImplementation.hud_loading && RImplementation.o.ssfx_hud_raindrops)
+    {
+        C.HudElement = true;
+    }
+#endif
 
     // Compile element	(LOD0 - HQ)
     {

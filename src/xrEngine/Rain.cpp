@@ -53,7 +53,7 @@ CEffect_Rain::~CEffect_Rain()
 }
 
 // Born
-void CEffect_Rain::Born(Item& dest, float radius)
+void CEffect_Rain::Born(Item& dest, float radius, float speed)
 {
     Fvector axis;
     axis.set(0, -1, 0);
@@ -72,7 +72,7 @@ void CEffect_Rain::Born(Item& dest, float radius)
     dest.D.random_dir(axis, deg2rad(drop_angle));
     dest.P.set(x + view.x - dest.D.x * source_offset, source_offset + view.y, z + view.z - dest.D.z * source_offset);
     // dest.P.set (x+view.x,height+view.y,z+view.z);
-    dest.fSpeed = ::Random.randF(drop_speed_min, drop_speed_max);
+    dest.fSpeed = ::Random.randF(drop_speed_min, drop_speed_max) * speed;
 
     float height = max_distance;
     RenewItem(dest, height, RayPick(dest.P, dest.D, height, collide::rqtBoth));
@@ -139,6 +139,7 @@ void CEffect_Rain::OnFrame()
         float t = Device.fTimeDelta;
         clamp(t, 0.001f, 1.0f);
         hemi_factor = hemi_factor * (1.0f - t) + f * t;
+        rain_hemi = hemi_val;
     }
 #endif
 

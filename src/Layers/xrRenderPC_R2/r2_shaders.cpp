@@ -72,6 +72,10 @@ HRESULT CRender::shader_compile(
     string32 c_ssao;
     string32 c_sun_quality;
 
+    // Ascii's Screen Space Shaders - SSS preprocessor stuff
+    char c_rain_quality[32];
+    char c_inter_grass[32];
+
     char sh_name[MAX_PATH] = "";
     u32 len = 0;
     // options
@@ -402,6 +406,42 @@ HRESULT CRender::shader_compile(
         sh_name[len] = '0';
         ++len;
     }
+
+    if (ps_ssfx_rain_1.w > 0)
+    {
+        xr_sprintf(c_rain_quality, "%d", ps_ssfx_rain_1.w);
+        defines[def_it].Name = "SSFX_RAIN_QUALITY";
+        defines[def_it].Definition = c_rain_quality;
+        def_it++;
+        xr_strcat(sh_name, c_rain_quality);
+        len += xr_strlen(c_rain_quality);
+    }
+    else
+    {
+        sh_name[len] = '0';
+        ++len;
+    }
+
+    if (ps_ssfx_grass_interactive.y > 0)
+    {
+        xr_sprintf(c_inter_grass, "%d", ps_ssfx_grass_interactive.y);
+        defines[def_it].Name = "SSFX_INT_GRASS";
+        defines[def_it].Definition = c_inter_grass;
+        def_it++;
+        xr_strcat(sh_name, c_inter_grass);
+        len += xr_strlen(c_inter_grass);
+    }
+    else
+    {
+        sh_name[len] = '0';
+        ++len;
+    }
+
+    defines[def_it].Name = "SSFX_MODEXE";
+    defines[def_it].Definition = "1";
+    def_it++;
+    sh_name[len] = '1';
+    ++len;
 
     sh_name[len] = '\0';
 
