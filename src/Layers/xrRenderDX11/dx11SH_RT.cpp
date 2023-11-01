@@ -24,20 +24,6 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
-bool CRT::used_as_depth() const
-{
-    switch (fmt)
-    {
-    case D3DFMT_D15S1:
-    case D3DFMT_D24X8:
-    case D3DFMT_D32S8X24:
-    case MAKEFOURCC('D', 'F', '2', '4'):
-        return true;
-    default:
-        return false;
-    }
-}
-
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
 {
     if (pSurface)
@@ -51,19 +37,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     fmt = f;
     sampleCount = SampleCount;
     n_slices = slices_num;
-
-    const bool createBaseTarget = flags.test(CreateBase);
-    if (createBaseTarget)
-    {
-        dwFlags |= CreateBase;
-        if (!used_as_depth())
-        {
-            u32 idx;
-            char const* str = strrchr(Name, '_');
-            sscanf(++str, "%d", &idx);
-            R_CHK(HW.m_pSwapChain->GetBuffer(idx, __uuidof(ID3DTexture2D), (LPVOID*)&pSurface));
-        }
-    }
 
     //	DirectX 10 supports non-power of two textures
     // Pow2
@@ -80,9 +53,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 
     // Select usage
     u32 usage = D3DUSAGE_RENDERTARGET;
-    if (used_as_depth())
-        usage = D3DUSAGE_DEPTHSTENCIL;
-
     DXGI_FORMAT dx11FMT;
 
     switch (fmt)
@@ -93,6 +63,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         break;
 
     case D3DFMT_D24S8:
+    case D3DFMT_D24X8:
+    case D3DFMT_D24X4S4:
         dx11FMT = DXGI_FORMAT_R24G8_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
@@ -102,6 +74,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         usage = D3DUSAGE_DEPTHSTENCIL;
         break;
 
+    case D3DFMT_D16:
     case D3DFMT_D16_LOCKABLE:
         dx11FMT = DXGI_FORMAT_R16_TYPELESS;
         usage = D3DUSAGE_DEPTHSTENCIL;
@@ -111,10 +84,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         dx11FMT = dx11TextureUtils::ConvertTextureFormat(fmt);
         break;
     }
-    if (createBaseTarget) // just override
-        dx11FMT = dx11TextureUtils::ConvertTextureFormat(fmt);
 
-    const bool useAsDepth = usage != D3DUSAGE_RENDERTARGET;
+    const bool useAsDepth = usage == D3DUSAGE_DEPTHSTENCIL;
 
     // Validate render-target usage
     u32 required = D3D_FORMAT_SUPPORT_TEXTURE2D;
@@ -127,6 +98,18 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     if (!HW.CheckFormatSupport(dx11FMT, required))
         return;
 
+    if (flags.test(CreateBase))
+    {
+        dwFlags |= CreateBase;
+        if (!useAsDepth)
+        {
+            u32 idx;
+            char const* str = strrchr(Name, '_');
+            sscanf(++str, "%d", &idx);
+            R_CHK(HW.m_pSwapChain->GetBuffer(idx, __uuidof(ID3DTexture2D), (LPVOID*)&pSurface));
+        }
+    }
+
     // Try to create texture/surface
     RImplementation.Resources->Evict();
 
@@ -136,7 +119,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         pSurface->GetDesc(&desc);
     else
     {
-        const u32 initialBindFlag = createBaseTarget ? 0 : D3D_BIND_SHADER_RESOURCE;
         ZeroMemory(&desc, sizeof(desc));
         desc.Width = dwWidth;
         desc.Height = dwHeight;
@@ -145,11 +127,10 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         desc.Format = dx11FMT;
         desc.SampleDesc.Count = SampleCount;
         desc.Usage = D3D_USAGE_DEFAULT;
-        if (SampleCount <= 1)
-            desc.BindFlags = initialBindFlag | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
-        else
+        desc.BindFlags = D3D_BIND_SHADER_RESOURCE | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
+        if (SampleCount > 1)
         {
-            desc.BindFlags = (useAsDepth ? D3D_BIND_DEPTH_STENCIL : (initialBindFlag | D3D_BIND_RENDER_TARGET));
+            desc.BindFlags = D3D_BIND_SHADER_RESOURCE | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
             if (RImplementation.o.msaa_opt)
             {
                 desc.SampleDesc.Quality = u32(D3D_STANDARD_MULTISAMPLE_PATTERN);
@@ -273,11 +254,11 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         CHK_DX(HW.pDevice->CreateUnorderedAccessView(pSurface, &UAVDesc, &pUAView));
     }
 #endif
-    if (createBaseTarget)
+    if (!(desc.BindFlags & D3D_BIND_SHADER_RESOURCE))
     {
         // pTexture->surface_set(pSurface) creates shader resource view
-        // which requires D3D_BIND_SHADER_RESOURCE flag to be set,
-        // but it isn't set for Base target.
+        // which requires D3D_BIND_SHADER_RESOURCE flag to be set.
+        // Usually, it isn't set swapchain's buffers.
         return;
     }
 
@@ -313,7 +294,7 @@ void CRT::set_slice_read(int slice)
 }
 
 void CRT::set_slice_write(u32 context_id, int slice)
-{ 
+{
     VERIFY(slice <= n_slices || slice == -1);
     pZRT[context_id] = (slice < 0) ? dsv_all : dsv_per_slice[slice];
 }

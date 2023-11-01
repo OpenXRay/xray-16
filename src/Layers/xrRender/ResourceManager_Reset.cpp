@@ -26,6 +26,10 @@ void CResourceManager::reset_begin()
 
     RImplementation.Index.reset_begin();
     RImplementation.Vertex.reset_begin();
+
+#ifdef USE_DX9
+    DeferredUnload();
+#endif
 }
 
 bool cmp_rt(const CRT* A, const CRT* B) { return A->_order < B->_order; }
@@ -89,10 +93,8 @@ void CResourceManager::reset_end()
         sstate->state_code.record(sstate->state);
     }
 
-    // create everything, renderer may use
-    GEnv.Render->reset_end();
-#ifndef MASTER_GOLD
-    Dump(true);
+#ifdef USE_DX9
+    DeferredUpload();
 #endif
 }
 

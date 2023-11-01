@@ -75,8 +75,8 @@ public:
     void OnAppStart() override;
     void OnAppEnd() override;
 
-    void IR_Capture() override;
-    void IR_Release() override;
+    void IR_OnActivate() override;
+    void IR_OnDeactivate() override;
 
     void IR_OnMousePress(int key) override;
     void IR_OnMouseRelease(int key) override;
@@ -109,6 +109,8 @@ private:
     void RegisterTool(ide_tool* tool);
     void UnregisterTool(const ide_tool* tool);
 
+    void UpdateTextInput(bool force_disable = false);
+
 private:
     CTimer m_timer;
     IImGuiRender* m_render{};
@@ -117,6 +119,7 @@ private:
 
     visible_state m_state;
     bool m_show_weather_editor; // to be refactored
+    bool m_text_input_enabled{};
 
     xr_vector<ide_tool*> m_tools;
 };

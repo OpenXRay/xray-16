@@ -232,7 +232,6 @@ public:
         u32 nvdbt : 1;
 
         u32 nullrt : 1;
-        u32 no_ram_textures : 1; // don't keep textures in RAM
         u32 ffp : 1; // don't use shaders, only fixed-function pipeline or software processing
 
         u32 distortion : 1;
@@ -491,8 +490,7 @@ public:
     void Render() override;
     void RenderMenu() override;
 
-    void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = nullptr) override;
-    void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer) override;
+    void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) override;
     void ScreenshotAsyncBegin() override;
     void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override;
     void OnFrame() override;
@@ -531,9 +529,6 @@ private:
 #else
 #   error No graphics API selected or enabled!
 #endif
-
-protected:
-    void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
 
 private:
     IRender_Sector::sector_id_t largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };

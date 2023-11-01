@@ -145,6 +145,12 @@ enum UpgradeStateResultScript
 
 UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
 {
+    // If loading data, it was already saved in such state and checked in process of installation.
+    if (loading)
+    {
+        return result_ok;
+    }
+
     UpgradeStateResult res = inherited::can_install(item, loading);
     if (res != result_ok)
     {
@@ -152,10 +158,6 @@ UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
     }
 
     res = m_parent_group->can_install(item, *this, loading);
-    if (loading)
-    {
-        return res; // later script check
-    }
 
     int script_res = m_preconditions();
 
@@ -180,6 +182,11 @@ UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
     }
 
     return result_ok;
+}
+
+UpgradeStateResult Upgrade::can_add(CInventoryItem& item)
+{
+   return inherited::can_install(item, false);
 }
 
 bool Upgrade::check_scheme_index(Ivector2 const& scheme_index)

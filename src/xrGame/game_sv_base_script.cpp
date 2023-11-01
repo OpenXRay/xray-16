@@ -27,14 +27,14 @@ SCRIPT_EXPORT(game_sv_GameState, (game_GameState),
             //.def("get_name_it",			&game_sv_GameState::get_name_it)
             .def("get_name_id", &game_sv_GameState::get_name_id)
             .def("get_player_name_id", &game_sv_GameState::get_player_name_id)
-        
+
             .def("get_players_count", &game_sv_GameState::get_players_count)
             .def("get_id_2_eid", &game_sv_GameState::get_id_2_eid)
-        
+
             .def("get_option_i", &game_sv_GameState::get_option_i)
             .def("get_option_s", &game_sv_GameState::get_option_s)
             .def("u_EventSend", &game_sv_GameState::u_EventSend)
-        
+
             .def("GenerateGameMessage", &game_sv_GameState::GenerateGameMessage)
             .def("getRP", &game_sv_GameState::getRP)
             .def("getRPcount", &game_sv_GameState::getRPcount)

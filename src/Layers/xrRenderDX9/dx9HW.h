@@ -6,7 +6,6 @@
 #include "Layers/xrRender/stats_manager.h"
 
 #include <SDL.h>
-#include <SDL_syswm.h>
 
 class CHW
     : public pureAppActivate,
@@ -61,7 +60,7 @@ public:
 
     ID3DDevice* pDevice = nullptr; // render device
 
-    D3D_DRIVER_TYPE m_DriverType;
+    D3DDEVTYPE m_DriverType;
 
 #ifdef DEBUG
     IDirect3DStateBlock9* dwDebugSB = nullptr;

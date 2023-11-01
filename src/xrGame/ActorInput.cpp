@@ -370,7 +370,7 @@ void CActor::IR_OnMouseMove(int dx, int dy)
         m_holder->OnMouseMove(dx, dy);
         return;
     }
-    
+
     const float LookFactor = GetLookFactor();
     const float scale = (cam_Active()->f_fov / g_fov) * psMouseSens * psMouseSensScale / 50.f / LookFactor;
     OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
@@ -566,7 +566,7 @@ void CActor::IR_OnControllerAttitudeChange(Fvector change)
         m_holder->OnControllerAttitudeChange(change);
         return;
     }
-    
+
     const float LookFactor = GetLookFactor();
     const float scale = (cam_Active()->f_fov / g_fov) * psControllerSensorSens / 50.f / LookFactor;
     OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));

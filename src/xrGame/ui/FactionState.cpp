@@ -28,7 +28,7 @@ FactionState::FactionState():
 	m_target._set     (nullptr);
 	m_target_desc._set(nullptr);
 	m_location._set   (nullptr);
-	
+
 	ResetStates();
 }
 

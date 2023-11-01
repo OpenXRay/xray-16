@@ -78,7 +78,7 @@ inline void _splitpath(const char* path, // Path Input
 {
     if(!path)
         return;
-    
+
     const char *p, *end;
 
     if(drive)

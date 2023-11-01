@@ -1,7 +1,7 @@
 // File:        UIListWndEx.cpp
 // Description: Extended ListItem
 //              Required to use feature "Selected Item"
-// Created:     
+// Created:
 // Author:      Serhiy O. Vynnychenko
 // Mail:        narrator@gsc-game.kiev.ua
 

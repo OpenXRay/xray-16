@@ -7,6 +7,9 @@
 #include "xrCore/ModuleLookup.hpp"
 
 #include <SDL.h>
+#ifdef XR_PLATFORM_WINDOWS
+#   include <SDL_syswm.h>
+#endif
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
 
@@ -20,6 +23,7 @@ void CRenderDevice::Initialize()
         Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
             SDL_WINDOW_RESIZABLE;
 
+        SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
         GEnv.Render->ObtainRequiredWindowFlags(flags);
 
         int icon = IDI_ICON_COP;
@@ -40,8 +44,17 @@ void CRenderDevice::Initialize()
             "window", "title", title);
 
         xr_strcpy(Core.ApplicationTitle, title);
+
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+        SDL_SetHint(SDL_HINT_AUDIO_DEVICE_APP_NAME, title);
+#   if SDL_VERSION_ATLEAST(2, 0, 18)
+        SDL_SetHint(SDL_HINT_APP_NAME, title);
+#   endif
+#endif
+
         m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
+
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
         xrDebug::SetWindowHandler(this);
@@ -76,7 +89,7 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, 
     constexpr int hit = 15;
     constexpr int fix = 65535; // u32(-1)
 
-    // Workaround for SDL bug 
+    // Workaround for SDL bug
     if (area.x + hit >= fix && rect.w <= fix - hit)
         area.x -= fix;
 
@@ -110,4 +123,15 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, 
         return SDL_HITTEST_RESIZE_LEFT;
 
     return SDL_HITTEST_DRAGGABLE;
+}
+
+void* CRenderDevice::GetApplicationWindowHandle() const
+{
+#if defined(XR_PLATFORM_WINDOWS)
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
+        return info.info.win.window;
+#endif
+    return nullptr;
 }

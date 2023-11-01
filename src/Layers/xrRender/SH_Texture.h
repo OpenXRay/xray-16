@@ -173,7 +173,8 @@ public: //	Public class members (must be encapsulated further)
 
 private:
 #if defined(USE_DX9) || defined(USE_DX11)
-    ID3DBaseTexture* pSurface;
+    ID3DBaseTexture* pSurface{};
+    ID3DBaseTexture* pTempSurface{};
     // Sequence data
     xr_vector<ID3DBaseTexture*> seqDATA;
 

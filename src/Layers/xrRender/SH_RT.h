@@ -21,7 +21,6 @@ public:
     void reset_begin();
     void reset_end();
     BOOL valid() { return !!pTexture; }
-    bool used_as_depth() const;
 
     void set_slice_read(int slice);
     void set_slice_write(u32 context_id, int slice);

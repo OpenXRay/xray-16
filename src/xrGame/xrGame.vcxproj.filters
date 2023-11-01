@@ -9865,7 +9865,7 @@
     </ClCompile>
     <ClCompile Include="UITimeDilator.cpp">
       <Filter>UI\Common\InventoryUtilities</Filter>
-    </ClInclude>
+    </ClCompile>
     <ClCompile Include="ui\UIMapFilters.cpp">
       <Filter>UI\Common\PDA\Tasks</Filter>
     </ClCompile>

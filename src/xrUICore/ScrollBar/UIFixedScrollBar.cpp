@@ -162,18 +162,28 @@ bool CUIFixedScrollBar::OnMouseAction(float x, float y, EUIMessages mouse_action
     switch (mouse_action)
     {
     case WINDOW_MOUSE_WHEEL_DOWN:
+    {
         TryScrollInc(true);
         return true;
         break;
+    }
     case WINDOW_MOUSE_WHEEL_UP:
+    {
         TryScrollDec(true);
         return true;
         break;
+    }
     case WINDOW_LBUTTON_UP:
+    {
         SetCapture(m_ScrollBox, false);
         m_mouse_state = 0;
         return true;
-    case WINDOW_LBUTTON_DOWN: SetCapture(m_ScrollBox, true); return true;
+    }
+    case WINDOW_LBUTTON_DOWN:
+    {
+        SetCapture(m_ScrollBox, true);
+        return true;
+    }
     case WINDOW_MOUSE_MOVE:
     {
         bool im_capturer = (GetMouseCapturer() == m_ScrollBox);

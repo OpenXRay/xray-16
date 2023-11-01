@@ -8,7 +8,7 @@
 //#define ACTIVE_BACKGROUND_HEIGHT	16
 
 // разделитель для интерактивных строк в листе
-static const char cSeparatorChar = '%';
+//static const char cSeparatorChar = '%';
 
 CUIListWnd::CUIListWnd() : CUIWindow("CUIListWnd")
 {
@@ -81,9 +81,9 @@ void CUIListWnd::InitListWnd(Fvector2 pos, Fvector2 size, float item_height)
 
     /*
         m_StaticActiveBackground.Init(ACTIVE_BACKGROUND,"hud\\default", 0,0,alNone);
-        m_StaticActiveBackground.SetTile(iFloor(m_iItemWidth/ACTIVE_BACKGROUND_WIDTH), 
+        m_StaticActiveBackground.SetTile(iFloor(m_iItemWidth/ACTIVE_BACKGROUND_WIDTH),
                                          iFloor(m_iItemHeight/ACTIVE_BACKGROUND_HEIGHT),
-                                         fmod(m_iItemWidth,float(ACTIVE_BACKGROUND_WIDTH)), 
+                                         fmod(m_iItemWidth,float(ACTIVE_BACKGROUND_WIDTH)),
                                          fmod(m_iItemHeight,float(ACTIVE_BACKGROUND_HEIGHT)));
     */
     UpdateList();
@@ -107,9 +107,9 @@ void CUIListWnd::SetWidth(float width)
 {
     inherited::SetWidth(width);
     /*
-        m_StaticActiveBackground.SetTile(iFloor(GetWidth()/ACTIVE_BACKGROUND_WIDTH), 
+        m_StaticActiveBackground.SetTile(iFloor(GetWidth()/ACTIVE_BACKGROUND_WIDTH),
                                          iFloor(m_iItemHeight/ACTIVE_BACKGROUND_HEIGHT),
-                                         fmod(GetWidth(),float(ACTIVE_BACKGROUND_WIDTH)), 
+                                         fmod(GetWidth(),float(ACTIVE_BACKGROUND_WIDTH)),
                                          fmod(float(m_iItemHeight),float(ACTIVE_BACKGROUND_HEIGHT))
                                          );
     */
@@ -217,7 +217,7 @@ void CUIListWnd::UpdateList()
 
     LIST_ITEM_LIST_it it = m_ItemList.begin();
 
-    //спрятать все элементы до участка 
+    //спрятать все элементы до участка
     //отображающейся в данный момент
     for (int i = 0; i < _min(m_ItemList.size(), m_iFirstShownIndex); ++i, ++it)
     {
@@ -479,16 +479,12 @@ bool CUIListWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     switch (mouse_action)
     {
-    case WINDOW_LBUTTON_DB_CLICK:
-        break;
     case WINDOW_MOUSE_WHEEL_DOWN:
         m_ScrollBar->TryScrollInc();
         return true;
-        break;
     case WINDOW_MOUSE_WHEEL_UP:
         m_ScrollBar->TryScrollDec();
         return true;
-        break;
     }
 
     return inherited::OnMouseAction(x, y, mouse_action);

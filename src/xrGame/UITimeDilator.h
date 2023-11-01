@@ -25,7 +25,7 @@ private:
 
     void startTimeDilation();
     void stopTimeDilation();
-};  
+};
 
 extern UITimeDilator* TimeDilator();
 extern void CloseTimeDilator();

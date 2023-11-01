@@ -530,7 +530,7 @@ void CTexture::Unload()
         m_seqSRView.clear();
         pSurface = 0;
     }
-    
+
     _RELEASE(pSurface);
     _RELEASE(srv_all);
     for (auto& srv : srv_per_slice)

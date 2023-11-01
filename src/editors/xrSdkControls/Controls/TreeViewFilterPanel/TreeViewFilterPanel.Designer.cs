@@ -20,27 +20,27 @@ namespace XRay.SdkControls
             this.filterLabel = new System.Windows.Forms.Label();
             this.filterTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
-            // 
+            //
             // filterLabel
-            // 
+            //
             this.filterLabel.AutoSize = true;
             this.filterLabel.Location = new System.Drawing.Point(3, 7);
             this.filterLabel.Name = "filterLabel";
             this.filterLabel.Size = new System.Drawing.Size(32, 13);
             this.filterLabel.TabIndex = 0;
             this.filterLabel.Text = "Filter:";
-            // 
+            //
             // filterTextBox
-            // 
-            this.filterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.filterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.filterTextBox.Location = new System.Drawing.Point(41, 4);
             this.filterTextBox.Name = "filterTextBox";
             this.filterTextBox.Size = new System.Drawing.Size(197, 20);
             this.filterTextBox.TabIndex = 1;
-            // 
+            //
             // TreeViewFilterPanel
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.filterTextBox);

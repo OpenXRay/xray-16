@@ -7,11 +7,8 @@
 
 #define C_DEFAULT color_xrgb(0xff, 0xff, 0xff)
 
-CUICursor::CUICursor() : m_static(NULL), m_bound_to_system_cursor(false)
+CUICursor::CUICursor()
 {
-    bVisible = false;
-    vPrevPos.set(0.0f, 0.0f);
-    vPos.set(0.f, 0.f);
     InitInternal();
     Device.seqRender.Add(this, -3 /*2*/);
 }

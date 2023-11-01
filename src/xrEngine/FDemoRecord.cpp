@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "IGame_Level.h"
+#include "IGame_Persistent.h"
 
 #include "GameFont.h"
 #include "FDemoRecord.h"
@@ -13,9 +14,9 @@
 constexpr cpcstr DEMO_RECORD_HELP_FONT = "ui_font_letterica18_russian"; // "ui_font_graffiti19_russian";
 
 ENGINE_API extern bool g_bDisableRedText;
-static Flags32 s_hud_flag = {0};
-static Flags32 s_dev_flags = {0};
-static u32     s_window_mode = {0};
+static Flags32 s_hud_flag = {};
+static Flags32 s_dev_flags = {};
+static u32     s_window_mode = {};
 
 bool stored_weapon;
 bool stored_cross;
@@ -283,6 +284,12 @@ void CDemoRecord::MakeLevelMapProcess()
             psDeviceMode.WindowStyle = s_window_mode;
             if (bDevReset)
                 Device.Reset();
+
+            if (!m_CurrentWeatherCycle.empty())
+            {
+                g_pGamePersistent->Environment().SetWeather(m_CurrentWeatherCycle, true);
+                m_CurrentWeatherCycle = nullptr;
+            }
 
             m_bMakeLevelMap = false;
             m_iLMScreenshotFragment = -1;
@@ -687,7 +694,7 @@ void CDemoRecord::IR_OnMouseMove(int dx, int dy)
         g_pGameLevel->IR_OnMouseMove(dx, dy);
         return;
     }
-    
+
     const float scale = .5f; // psMouseSens;
     OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
 }
@@ -817,7 +824,7 @@ void CDemoRecord::IR_OnControllerAttitudeChange(Fvector change)
         g_pGameLevel->IR_OnControllerAttitudeChange(change);
         return;
     }
-    
+
     const float scale = 5.f; // psControllerSensorSens;
     OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
 }
@@ -845,7 +852,9 @@ void CDemoRecord::MakeScreenshot()
 
 void CDemoRecord::MakeLevelMapScreenshot(bool bHQ)
 {
-    Console->Execute("run_string level.set_weather(\"map\",true)");
+    auto& env = g_pGamePersistent->Environment();
+    m_CurrentWeatherCycle = env.CurrentCycleName;
+    env.SetWeather("map", true);
 
     if (!bHQ)
         m_iLMScreenshotFragment = -1;

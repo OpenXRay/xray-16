@@ -5,7 +5,7 @@
 #include "Threading/Lock.hpp"
 
 #include <string>
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <cstdio>
 #elif defined(XR_PLATFORM_WINDOWS)
 #pragma warning(push)
@@ -54,6 +54,7 @@ class XR_NOVTABLE IWindowHandler
 {
 public:
     virtual ~IWindowHandler() = 0;
+    virtual void* GetApplicationWindowHandle() const = 0;
     virtual SDL_Window* GetApplicationWindow() = 0;
     virtual void OnErrorDialog(bool beforeDialog) = 0;
     virtual void OnFatalError() = 0;
