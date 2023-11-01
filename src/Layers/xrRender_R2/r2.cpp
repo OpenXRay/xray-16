@@ -932,7 +932,6 @@ void CRender::rmNormal(CBackend& cmd_list)
 CRender::CRender()
     : Sectors_xrc("render")
 {
-    r_sun.init_cascades();
 }
 
 CRender::~CRender() {}

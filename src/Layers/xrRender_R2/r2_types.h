@@ -128,6 +128,7 @@ const u32 LUMINANCE_size = 16;
 
 extern float ps_r2_gloss_factor;
 extern float ps_r2_gloss_min;
+
 IC float u_diffuse2s(float x, float y, float z)
 {
     float v = (x + y + z) / 3.f;

@@ -409,7 +409,7 @@ HRESULT CRender::shader_compile(
 
     if (ps_ssfx_rain_1.w > 0)
     {
-        xr_sprintf(c_rain_quality, "%d", u8(ps_ssfx_rain_1.w));
+        xr_sprintf(c_rain_quality, "%d", ps_ssfx_rain_1.w);
         defines[def_it].Name = "SSFX_RAIN_QUALITY";
         defines[def_it].Definition = c_rain_quality;
         def_it++;
@@ -424,7 +424,7 @@ HRESULT CRender::shader_compile(
 
     if (ps_ssfx_grass_interactive.y > 0)
     {
-        xr_sprintf(c_inter_grass, "%d", u8(ps_ssfx_grass_interactive.y));
+        xr_sprintf(c_inter_grass, "%d", ps_ssfx_grass_interactive.y);
         defines[def_it].Name = "SSFX_INT_GRASS";
         defines[def_it].Definition = c_inter_grass;
         def_it++;

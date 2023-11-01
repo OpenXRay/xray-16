@@ -962,5 +962,5 @@ void CCC_Register()
     CMD4(CCC_Integer, "debug_show_red_text", &g_bShowRedText, 0, 1);
 #endif
 
-    CMD4(CCC_Vector3, "ssfx_wetness_multiplier", &ssfx_wetness_multiplier, Fvector3().set(0.1f, 0.1f, 0.0f), Fvector3().set(20.0f, 20.0f, 0.0f));
+    CMD4(CCC_Vector3, "ssfx_wetness_multiplier", &ssfx_wetness_multiplier, Fvector3({ 0.1f, 0.1f, 0.0f} ), Fvector3({ 20.0f, 20.0f, 0.0f }));
 };

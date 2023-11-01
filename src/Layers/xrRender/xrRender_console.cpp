@@ -291,33 +291,6 @@ float ps_r2_gloss_min = 0.0f;
 
 //-----------------------------------------------------------------------
 
-class CCC_ssfx_cascades : public CCC_Vector3
-{
-public:
-    void apply()
-    {
-#if defined(USE_DX11)
-        RImplementation.r_sun.init_cascades();
-#endif
-    }
-
-    CCC_ssfx_cascades(LPCSTR N, Fvector3* V, const Fvector3 _min, const Fvector3 _max) : CCC_Vector3(N, V, _min, _max)
-    {
-    };
-
-    virtual void Execute(LPCSTR args)
-    {
-        CCC_Vector3::Execute(args);
-        apply();
-    }
-
-    virtual void GetStatus(TStatus& S)
-    {
-        CCC_Vector3::GetStatus(S);
-        apply();
-    }
-};
-
 //AVO: detail draw radius
 class CCC_detail_radius : public CCC_Integer
 {
@@ -1055,8 +1028,8 @@ void xrRender_initconsole()
     // Anomaly
     Fvector4 tw2_min = { 0.f, 0.f, 0.f, 0.f };
     Fvector4 tw2_max = { 10.f, 3.f, 1.f, 1.f };
-    tw_min.set(0, 0, 0);
-    tw_max.set(1, 2, 1);
+    tw_min.set(0.f, 0.f, 0.f);
+    tw_max.set(1.f, 2.f, 1.f);
     CMD4(CCC_Integer, "r__nightvision", &ps_r2_nightvision, 0, 3); //For beef's nightvision shader or other stuff
     CMD4(CCC_Vector4, "r2_mask_control", &ps_r2_mask_control, tw2_min, tw2_max);
     CMD4(CCC_Vector3, "r2_drops_control", &ps_r2_drops_control, tw_min, tw_max);
@@ -1073,19 +1046,19 @@ void xrRender_initconsole()
     CMD4(CCC_Vector4, "shader_param_8", &ps_dev_param_8, tw2_min, tw2_max);
 
     // Ascii's Screen Space Shaders
-    CMD4(CCC_Vector4, "ssfx_hud_drops_1", &ps_ssfx_hud_drops_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(100000, 100, 100, 100));
-    CMD4(CCC_Vector4, "ssfx_hud_drops_2", &ps_ssfx_hud_drops_2, Fvector4().set(0, 0, 0, 0), tw2_max);
-    CMD4(CCC_Vector4, "ssfx_blood_decals", &ps_ssfx_blood_decals, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 5, 0, 0));
-    CMD4(CCC_Vector4, "ssfx_rain_1", &ps_ssfx_rain_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(10, 5, 5, 2));
-    CMD4(CCC_Vector4, "ssfx_rain_2", &ps_ssfx_rain_2, Fvector4().set(0, 0, 0, 0), Fvector4().set(1, 10, 10, 10));
-    CMD4(CCC_Vector4, "ssfx_rain_3", &ps_ssfx_rain_3, Fvector4().set(0, 0, 0, 0), Fvector4().set(1, 10, 10, 10));
-    CMD4(CCC_Vector4, "ssfx_grass_shadows", &ps_ssfx_grass_shadows, Fvector4().set(0, 0, 0, 0), Fvector4().set(3, 1, 100, 100));
-    CMD4(CCC_ssfx_cascades, "ssfx_shadow_cascades", &ps_ssfx_shadow_cascades, Fvector3().set(1.0f, 1.0f, 1.0f), Fvector3().set(300, 300, 300));
-    CMD4(CCC_Vector4, "ssfx_grass_interactive", &ps_ssfx_grass_interactive, Fvector4().set(0, 0, 0, 0), Fvector4().set(1, 15, 5000, 1));
-    CMD4(CCC_Vector4, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 5, 5, 60));
-    CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 20, 1, 5));
+    CMD4(CCC_Vector4, "ssfx_hud_drops_1", &ps_ssfx_hud_drops_1, Fvector4{}, Fvector4({ 100000.f, 100.f, 100.f, 100.f }));
+    CMD4(CCC_Vector4, "ssfx_hud_drops_2", &ps_ssfx_hud_drops_2, Fvector4{}, tw2_max);
+    CMD4(CCC_Vector4, "ssfx_blood_decals", &ps_ssfx_blood_decals, Fvector4{}, Fvector4({ 5.f, 5.f, 0.f, 0.f }));
+    CMD4(CCC_Vector4, "ssfx_rain_1", &ps_ssfx_rain_1, Fvector4{}, Fvector4({ 10.f, 5.f, 5.f, 2.f }));
+    CMD4(CCC_Vector4, "ssfx_rain_2", &ps_ssfx_rain_2, Fvector4{}, Fvector4({ 1.f, 10.f, 10.f, 10.f }));
+    CMD4(CCC_Vector4, "ssfx_rain_3", &ps_ssfx_rain_3, Fvector4{}, Fvector4({ 1.f, 10.f, 10.f, 10.f }));
+    CMD4(CCC_Vector4, "ssfx_grass_shadows", &ps_ssfx_grass_shadows, Fvector4{}, Fvector4({ 3.f, 1.f, 100.f, 100.f }));
+    CMD4(CCC_Vector3, "ssfx_shadow_cascades", &ps_ssfx_shadow_cascades, Fvector3({ 1.0f, 1.0f, 1.0f }), Fvector3({ 300.f, 300.f, 300.f }));
+    CMD4(CCC_Vector4, "ssfx_grass_interactive", &ps_ssfx_grass_interactive, Fvector4{}, Fvector4({ 1.f, 15.f, 5000.f, 1.f }));
+    CMD4(CCC_Vector4, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, Fvector4{}, Fvector4({ 5.f, 5.f, 5.f, 60.f }));
+    CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4{}, Fvector4({ 5.f, 20.f, 1.f, 5.f }));
     CMD4(CCC_Vector4, "ssfx_wpn_dof_1", &ps_ssfx_wpn_dof_1, tw2_min, tw2_max);
-    CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0, 1);
+    CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0.f, 1.f);
 
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);
