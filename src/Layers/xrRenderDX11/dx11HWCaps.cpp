@@ -113,7 +113,7 @@ u32 GetATIGpuNum()
 
     const u32 crossfireGpuCount = returnedParams.crossfireGPUCount;
     agsDriverExtensionsDX11_DestroyDevice(ags, returnedParams.pDevice, nullptr, returnedParams.pImmediateContext, nullptr);
-    
+
     Msg("* AMD AGS: %d-Way CrossFire detected.", crossfireGpuCount);
     agsDeInitialize(ags);
     return crossfireGpuCount;

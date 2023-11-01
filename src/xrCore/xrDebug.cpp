@@ -27,7 +27,6 @@ static BOOL bException = FALSE;
 #include <csignal>
 
 #if defined(XR_PLATFORM_WINDOWS)
-#   include <SDL_syswm.h>
 #   include <direct.h>
 #   include <new.h> // for _set_new_mode
 #   include <errorrep.h> // ReportFault
@@ -89,22 +88,8 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
 {
 #ifdef XR_PLATFORM_WINDOWS // because Windows default Message box is fancy
     HWND hwnd = nullptr;
-
     if (windowHandler)
-    {
-        SDL_SysWMinfo info;
-        SDL_VERSION(&info.version);
-        if (SDL_GetWindowWMInfo(windowHandler->GetApplicationWindow(), &info))
-        {
-            switch (info.subsystem)
-            {
-            case SDL_SYSWM_WINDOWS:
-                hwnd = info.info.win.window;
-                break;
-            default: break;
-            }
-        }
-    }
+        hwnd = static_cast<HWND>(windowHandler->GetApplicationWindowHandle());
 
     if (simpleMode)
     {
@@ -192,7 +177,7 @@ Lock xrDebug::failLock;
 
 #if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
 #else
 #   error Select or add implementation for your platform
@@ -427,7 +412,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         }
     }
     buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "\n");
-    
+
     Log(assertionInfo);
     FlushLog();
 
@@ -717,7 +702,7 @@ void xrDebug::SetupExceptionHandler()
     else if (!strstr(commandLine, "-detailed_minidump"))
         minidumpFlags |= MiniDumpFilterMemory;
 #endif
-    
+
     BT_SetDumpType(minidumpFlags);
     //BT_SetSupportEMail("cop-crash-report@stalker-game.com");
     BT_SetSupportEMail("openxray@yahoo.com");

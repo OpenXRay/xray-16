@@ -21,7 +21,6 @@
 const float right_forward_angle = PI_DIV_4;
 const float left_forward_angle = PI_DIV_4;
 // const float standing_turn_angle			= PI_DIV_6;
-const float epsilon = EPS_L;
 
 const u32 direction_switch_interval = 500;
 

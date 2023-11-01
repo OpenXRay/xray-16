@@ -312,7 +312,13 @@ void show_indicators()
     psActorFlags.set(AF_GODMODE_RT, FALSE);
 }
 
-void show_weapon(bool b) { psHUD_Flags.set(HUD_WEAPON_RT2, b); }
+void show_weapon(bool b)
+{
+    if (psActorFlags.test(AF_GODMODE) && Actor())
+        return;
+
+    psHUD_Flags.set(HUD_WEAPON_RT2, b);
+}
 bool is_level_present() { return (!!g_pGameLevel); }
 void add_call(const luabind::functor<bool>& condition, const luabind::functor<void>& action)
 {
@@ -377,6 +383,9 @@ CEnvDescriptor* current_environment(CEnvironment* self) { return &self->CurrentE
 extern bool g_bDisableAllInput;
 void disable_input()
 {
+    if (psActorFlags.test(AF_GODMODE) && Actor())
+        return;
+
     g_bDisableAllInput = true;
 #ifdef DEBUG
     Msg("input disabled");

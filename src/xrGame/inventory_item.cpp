@@ -337,11 +337,6 @@ bool CInventoryItem::net_Spawn(CSE_Abstract* DC)
     //!!!
     m_fCondition = pSE_InventoryItem->m_fCondition;
 
-    if (IsGameTypeSingle())
-    {
-        net_Spawn_install_upgrades(pSE_InventoryItem->m_upgrades);
-    }
-
     if (GameID() != eGameIDSingle)
         object().processing_activate();
 

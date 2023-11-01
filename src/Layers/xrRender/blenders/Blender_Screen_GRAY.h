@@ -7,6 +7,6 @@ public:
     ~CBlender_Screen_GRAY() override = default;
 
     LPCSTR getComment() override;
-   
+
     void Compile(CBlender_Compile& C) override;
 };

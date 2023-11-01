@@ -184,7 +184,7 @@ void Skin3W(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
 
 void Skin4W(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
 {
-    xr_parallel_for(TaskRange<u32>(0, vCount), [&](const TaskRange<u32>& range) 
+    xr_parallel_for(TaskRange<u32>(0, vCount), [&](const TaskRange<u32>& range)
     {
         Fvector P0, N0, P1, N1, P2, N2, P3, N3;
         for (u32 i = range.begin(); i != range.end(); ++i)

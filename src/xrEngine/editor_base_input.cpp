@@ -62,17 +62,16 @@ void ide::OnAppDeactivate()
     io.AddFocusEvent(false);
 }
 
-void ide::IR_Capture()
+void ide::IR_OnActivate()
 {
-    IInputReceiver::IR_Capture();
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = true;
 }
 
-void ide::IR_Release()
+void ide::IR_OnDeactivate()
 {
-    SDL_StopTextInput();
-    IInputReceiver::IR_Release();
+    UpdateTextInput(true);
+
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = false;
 }
@@ -196,8 +195,8 @@ void ide::IR_OnKeyboardRelease(int key)
     case SDL_SCANCODE_RALT:   check(ImGuiMod_Alt,   SDL_SCANCODE_LALT  ); break;
     case SDL_SCANCODE_LGUI:   check(ImGuiMod_Super, SDL_SCANCODE_RGUI  ); break;
     case SDL_SCANCODE_RGUI:   check(ImGuiMod_Super, SDL_SCANCODE_LGUI  ); break;
-    } // switch (key)                                                 
-                                                                      
+    } // switch (key)
+
     const auto imkey = xr_key_to_imgui_key(key);
     if (imkey == ImGuiKey_None)
         return;
@@ -212,7 +211,8 @@ void ide::IR_OnKeyboardHold(int /*key*/)
 void ide::IR_OnTextInput(pcstr text)
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.AddInputCharactersUTF8(text);
+    if (io.WantTextInput)
+        io.AddInputCharactersUTF8(text);
 }
 
 void ide::IR_OnControllerPress(int key, float x, float y)

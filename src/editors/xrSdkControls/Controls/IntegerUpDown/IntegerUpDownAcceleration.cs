@@ -10,8 +10,8 @@ namespace XRay.SdkControls
     /// </summary>
     public class IntegerUpDownAcceleration
     {
-        private Int32 seconds;    // Ideally we would use UInt32 but it is not CLS-compliant. 
-        private Int32 increment;  // Ideally we would use UInt32 but it is not CLS-compliant. 
+        private Int32 seconds;    // Ideally we would use UInt32 but it is not CLS-compliant.
+        private Int32 increment;  // Ideally we would use UInt32 but it is not CLS-compliant.
 
         public IntegerUpDownAcceleration(Int32 seconds, Int32 increment)
         {
@@ -30,7 +30,7 @@ namespace XRay.SdkControls
         }
 
         /// <summary>
-        /// Determines the amount of time for the UpDown control to wait to set the increment 
+        /// Determines the amount of time for the UpDown control to wait to set the increment
         /// step when holding the up/down button.
         /// </summary>
         public Int32 Seconds

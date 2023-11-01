@@ -79,21 +79,21 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     //*************** codepath is the same, only shaders differ
     LPCSTR tvs;
     LPCSTR tvs_s;
-    if (oNotAnTree.value)	
-    { 
+    if (oNotAnTree.value)
+    {
         tvs="tree_s";
         if (oBlend.value)
-            tvs_s="shadow_direct_tree_s_aref"; 
+            tvs_s="shadow_direct_tree_s_aref";
         else
-            tvs_s="shadow_direct_tree_s"; 
+            tvs_s="shadow_direct_tree_s";
     }
     else
     {
         tvs = "tree";
         if (oBlend.value)
-            tvs_s="shadow_direct_tree_aref"; 
+            tvs_s="shadow_direct_tree_aref";
         else
-            tvs_s="shadow_direct_tree"; 
+            tvs_s="shadow_direct_tree";
     }
 
     bool bUseATOC = (oBlend.value && (RImplementation.o.msaa_alphatest==CRender::MSAA_ATEST_DX10_0_ATOC));

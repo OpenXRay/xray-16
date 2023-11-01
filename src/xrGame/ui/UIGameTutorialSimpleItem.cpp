@@ -305,7 +305,11 @@ void CUISequenceSimpleItem::Start()
         }
 
         if ((!pda.IsShown() && bShowPda) || (pda.IsShown() && !bShowPda))
+        {
+            isTimeDilatedInPDA = TimeDilator()->GetModeEnability(UITimeDilator::Pda);
+            TimeDilator()->SetModeEnability(UITimeDilator::Pda, false);
             pda.ShowOrHideDialog(true);
+        }
     }
 }
 
@@ -334,6 +338,7 @@ bool CUISequenceSimpleItem::Stop(bool bForce)
         if (ui_game_sp && ui_game_sp->GetPdaMenu().IsShown())
         {
             ui_game_sp->GetPdaMenu().HideDialog();
+            TimeDilator()->SetModeEnability(UITimeDilator::Pda, isTimeDilatedInPDA);
         }
     }
     inherited::Stop();

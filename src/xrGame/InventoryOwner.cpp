@@ -387,6 +387,14 @@ void CInventoryOwner::SetCommunity(CHARACTER_COMMUNITY_INDEX new_community)
     trader->m_community_index = new_community;
 }
 
+void CInventoryOwner::SetMonsterCommunity() const
+{
+    CHARACTER_COMMUNITY community;
+    community.set("monster", true);
+    if (community.index() != NO_COMMUNITY_INDEX)
+        CharacterInfo().SetCommunity(community.index());
+}
+
 void CInventoryOwner::SetRank(CHARACTER_RANK_VALUE rank)
 {
     CEntityAlive* EA = smart_cast<CEntityAlive*>(this);

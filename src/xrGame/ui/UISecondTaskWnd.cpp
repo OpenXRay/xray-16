@@ -238,7 +238,7 @@ void UITaskListWndItem::Update()
 
     if (m_task && m_name->CursorOverWindow() && show_hint_can)
     {
-        if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700))
+        if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700 * Device.time_factor()))
         {
             show_hint = true;
             GetMessageTarget()->SendMessage(this, PDA_TASK_SHOW_HINT, (void*)m_task);
@@ -283,7 +283,7 @@ void UITaskListWndItem::update_view()
 
     const CGameTask* storyTask = Level().GameTaskManager().ActiveTask(eTaskTypeStoryline);
     const CGameTask* additionalTask = Level().GameTaskManager().ActiveTask(eTaskTypeAdditional);
-    
+
     if (m_task == storyTask || m_task == additionalTask)
     {
         m_name->SetStateTextColor(m_color_states[stt_activ], S_Enabled);
@@ -320,7 +320,7 @@ void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             return;
         }
     }
-    
+
     if (pWnd == m_name)
     {
         if (msg == BUTTON_DOWN)

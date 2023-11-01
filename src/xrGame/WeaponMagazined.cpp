@@ -22,7 +22,7 @@
 #include "script_game_object.h"
 #include "HudSound.h"
 
-CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
+CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon(), m_bStopedAfterQueueFired(false)
 {
     m_eSoundShow = ESoundTypes(SOUND_TYPE_ITEM_TAKING | eSoundType);
     m_eSoundHide = ESoundTypes(SOUND_TYPE_ITEM_HIDING | eSoundType);
@@ -1338,7 +1338,7 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
         return false;
     }
     GetSuitableAmmoTotal(); // update m_BriefInfo_CalcFrame
-    
+
     info.grenade = "";
 
     const u32 at_size = m_ammoTypes.size();

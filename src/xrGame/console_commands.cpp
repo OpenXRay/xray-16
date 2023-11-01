@@ -539,7 +539,7 @@ class CCC_SpawnToInventory : public IConsole_Command
 {
 public:
     CCC_SpawnToInventory(pcstr name) : IConsole_Command(name) {}
-    
+
     void Execute(pcstr args) override
     {
         if (!g_pGameLevel)
@@ -559,7 +559,7 @@ public:
 
         Level().spawn_item(args, Actor()->Position(), false, Actor()->ID());
     }
-    
+
     void Info(TInfo& I) override
     {
         xr_strcpy(I, "valid name of an item that can be spawned");
@@ -1080,11 +1080,22 @@ class CCC_DebugFonts : public IConsole_Command
 {
 public:
     CCC_DebugFonts(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
+
+    ~CCC_DebugFonts()
+    {
+        xr_free(m_ui);
+    }
+
     virtual void Execute(LPCSTR args)
     {
-        // BUG: leak
-        (xr_new<CUIDebugFonts>())->ShowDialog(true);
+        if (!m_ui)
+            m_ui = xr_new<CUIDebugFonts>();
+
+        m_ui->ShowDialog(true);
     }
+
+private:
+    CUIDebugFonts* m_ui;
 };
 
 class CCC_DebugNode : public IConsole_Command
@@ -1479,7 +1490,7 @@ public:
         CCC_Token::Execute(args);
         UIStyles->SetupStyle(m_id);
     }
-    
+
     const xr_token* GetToken() noexcept override // may throw exceptions!
     {
         return UIStyles->GetToken().data();
@@ -1920,6 +1931,81 @@ public:
     void Execute(pcstr /*args*/) override
     {
         Level().GameTaskManager().CleanupTasks();
+    }
+};
+
+class CCC_UI_Time_Dilation_Mode : public IConsole_Command
+{
+    UITimeDilator::UIMode mode;
+    bool isEnable;
+
+public:
+    CCC_UI_Time_Dilation_Mode(pcstr name, UITimeDilator::UIMode mode) : IConsole_Command(name), mode(mode) {};
+
+    void Execute(pcstr args) override
+    {
+        if (EQ(args, "on") || EQ(args, "1"))
+        {
+            TimeDilator()->SetModeEnability(mode, true);
+            isEnable = true;
+        }
+        else if (EQ(args, "off") || EQ(args, "0"))
+        {
+            TimeDilator()->SetModeEnability(mode, false);
+            isEnable = false;
+        }
+        else
+            InvalidSyntax();
+    }
+
+    void GetStatus(TStatus& status) override
+    {
+        xr_strcpy(status, isEnable ? "on" : "off");
+    }
+
+    void Info(TInfo& info) override
+    {
+        xr_strcpy(info, "'on/off' or '1/0'");
+    }
+
+    void fill_tips(vecTips& tips, u32 /*mode*/) override
+    {
+        TStatus str;
+        xr_sprintf(str, sizeof(str), "%s (current) [on/off]", isEnable ? "on" : "off");
+        tips.push_back(str);
+    }
+};
+
+class CCC_UI_Time_Factor : public IConsole_Command
+{
+    float uiTimeFactor = 1.0;
+
+public:
+    CCC_UI_Time_Factor(pcstr name) : IConsole_Command(name){};
+
+    void Execute(pcstr args) override
+    {
+        float time_factor = (float)atof(args);
+        clamp(time_factor, EPS, 1.f);
+        TimeDilator()->SetUiTimeFactor(time_factor);
+        uiTimeFactor = time_factor;
+    }
+
+    void Info(TInfo& info) override
+    {
+        xr_strcpy(info, "[0.001 - 1.0]");
+    }
+
+    void fill_tips(vecTips& tips, u32 mode) override
+    {
+        TStatus str;
+        xr_sprintf(str, sizeof(str), "%3.3f (current) [0.001 - 1.0]", uiTimeFactor);
+        tips.push_back(str);
+    }
+
+    void GetStatus(TStatus& status) override
+    {
+        xr_sprintf(status, sizeof(status), "%f", uiTimeFactor);
     }
 };
 
@@ -2382,5 +2468,9 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "dbg_load_pre_c5ef6c7_saves", &g_dbg_load_pre_c5ef6c7_saves, 0, 1); //Alundaio
 
     CMD4(CCC_Integer, "keypress_on_start", &g_keypress_on_start, 0, 1);
+    CMD1(CCC_UI_Time_Factor, "ui_time_factor");
+    CMD2(CCC_UI_Time_Dilation_Mode, "time_dilation_inventory", UITimeDilator::Inventory);
+    CMD2(CCC_UI_Time_Dilation_Mode, "time_dilation_pda", UITimeDilator::Pda);
+
     register_mp_console_commands();
 }

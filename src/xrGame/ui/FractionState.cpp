@@ -34,8 +34,8 @@ FractionState::FractionState():
 }
 
 FractionState::FractionState( shared_str const& id )
+	: FractionState()
 {
-	FractionState();
 	set_fraction_id2( id );
 }
 

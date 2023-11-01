@@ -36,7 +36,7 @@ void SStaticSound::Update(u32 game_time, u32 global_time)
             Fvector occ[3];
             const float occluder_volume = GEnv.Sound->get_occlusion(m_Position, .2f, occ);
             const float vol = m_Volume * occluder_volume;
-            
+
             if ((0 == m_PauseTime.x) && (0 == m_PauseTime.y))
             {
                 m_Source.play_at_pos(0, m_Position, sm_Looped);
@@ -132,9 +132,9 @@ BOOL SMusicTrack::in(u32 game_time)
 
 void SMusicTrack::Play()
 {
-    m_SourceStereo.play_at_pos(0, Fvector().set(0.0f, 0.0f, 0.0f), sm_2D);
-    m_SourceLeft.play_at_pos(0, Fvector().set(-0.5f, 0.f, 0.3f), sm_2D);
-    m_SourceRight.play_at_pos(0, Fvector().set(+0.5f, 0.f, 0.3f), sm_2D);
+    m_SourceStereo.play_at_pos(0, Fvector().set(0.0f, 0.0f, 0.0f), sm_2D | sm_IgnoreTimeFactor);
+    m_SourceLeft.play_at_pos(0, Fvector().set(-0.5f, 0.f, 0.3f), sm_2D | sm_IgnoreTimeFactor);
+    m_SourceRight.play_at_pos(0, Fvector().set(+0.5f, 0.f, 0.3f), sm_2D | sm_IgnoreTimeFactor);
 
     SetVolume(1.0f);
 }

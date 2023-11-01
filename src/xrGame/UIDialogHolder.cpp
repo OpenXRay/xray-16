@@ -529,7 +529,8 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
 
 bool CDialogHolder::FillDebugTree(const CUIDebugState& debugState)
 {
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    // XXX: Was this meant to be used somewhere here? Because currently its unused and could also be constexpr
+    //ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
 
     if (m_input_receivers.empty())
         ImGui::BulletText("Input receivers: 0");

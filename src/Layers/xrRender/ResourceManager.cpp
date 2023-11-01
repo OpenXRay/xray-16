@@ -40,7 +40,7 @@ IBlender* CResourceManager::_GetBlender(LPCSTR Name)
         Msg("! Shader '%s' not found in library.", Name);
         return nullptr;
     }
-    
+
     return I->second;
 }
 

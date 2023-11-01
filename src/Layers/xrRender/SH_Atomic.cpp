@@ -70,7 +70,7 @@ SPS::~SPS()
 #else
 #   error No graphics API selected or enabled!
 #endif
-    
+
     RImplementation.Resources->_DeletePS(this);
 }
 

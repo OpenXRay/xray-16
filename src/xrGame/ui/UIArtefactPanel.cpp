@@ -26,7 +26,7 @@ void CUIArtefactPanel::InitIcons(const xr_vector<const CArtefact*>& artefacts)
 {
     m_StaticItem.SetShader(InventoryUtilities::GetEquipmentIconsShader());
     m_vRects.clear();
-    
+
     for (const CArtefact* artefact : artefacts)
     {
         const shared_str& sectionName = artefact->cNameSect();
@@ -48,8 +48,8 @@ void CUIArtefactPanel::Draw()
     Frect rect;
     GetAbsoluteRect(rect);
     x = rect.left;
-    y = rect.top;    
-    
+    y = rect.top;
+
     float _s = m_cell_size.x/m_cell_size.y;
 
     for (const Frect& r : m_vRects)

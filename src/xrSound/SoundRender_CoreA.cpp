@@ -47,7 +47,7 @@ void CSoundRender_CoreA::_initialize()
     }
 
     // Get the device specifier.
-    const ALCchar* deviceSpecifier = alcGetString(pDevice, ALC_DEVICE_SPECIFIER);
+    //const ALCchar* deviceSpecifier = alcGetString(pDevice, ALC_DEVICE_SPECIFIER);
 
     // Create context
     pContext = alcCreateContext(pDevice, nullptr);

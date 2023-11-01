@@ -125,7 +125,7 @@ protected:
 
 public:
     CCC_Mask(pcstr N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M){};
-    const bool GetValue() const { return value->test(mask); }
+    bool GetValue() const { return value->test(mask); }
     virtual void Execute(pcstr args)
     {
         if (EQ(args, "on"))
@@ -157,7 +157,7 @@ protected:
 
 public:
     CCC_ToggleMask(pcstr N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) { bEmptyArgsHandled = true; }
-    const bool GetValue() const { return value->test(mask); }
+    bool GetValue() const { return value->test(mask); }
     virtual void Execute(pcstr /*args*/)
     {
         value->set(mask, !GetValue());
@@ -281,7 +281,7 @@ protected:
 public:
     CCC_Float(pcstr N, float* V, float _min = 0, float _max = 1)
         : IConsole_Command(N), value(V), min(_min), max(_max){}
-    const float GetValue() const { return *value; }
+    float GetValue() const { return *value; }
     void GetBounds(float& fmin, float& fmax) const
     {
         fmin = min;
@@ -433,7 +433,7 @@ protected:
     int min, max;
 
 public:
-    const int GetValue() const { return *value; }
+    int GetValue() const { return *value; }
     void GetBounds(int& imin, int& imax) const
     {
         imin = min;

@@ -72,7 +72,7 @@ void CUIActorMenu::OnDragItemOnTrash(CUIDragItem* item, bool b_receive)
 
 bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, CUIDragDropListEx* old_owner, CUIDragDropListEx* new_owner)
 {
-    //Alundaio: Here we export the action of dragging one inventory item on top of another! 
+    //Alundaio: Here we export the action of dragging one inventory item on top of another!
     luabind::functor<bool> funct1;
     if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemDropped", funct1))
     {
@@ -344,7 +344,7 @@ bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
             set_highlight_item(itm);
         }
     }
-    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + (m_ItemInfo ? m_ItemInfo->delay : 0))
+    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + (m_ItemInfo ? m_ItemInfo->delay * Device.time_factor() : 0))
     {
         return true; // false
     }
@@ -429,7 +429,7 @@ void CUIActorMenu::OnPressUserKey(bool take)
         //		OnBtnPerformTrade( this, 0 );
         break;
     case mmUpgrade: TrySetCurUpgrade(); break;
-    case mmDeadBodySearch: 
+    case mmDeadBodySearch:
     {
         if (take)
             TakeAllFromPartner(this, 0);

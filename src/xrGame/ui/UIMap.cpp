@@ -8,9 +8,9 @@
 #include "xrEngine/xr_input.h" //remove me !!!
 #include "xrCore/_fbox2.h"
 
-const u32 activeLocalMapColor = 0xffffffff; // 0xffc80000;
-const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
-const u32 ourLevelMapColor = 0xffffffff;
+//const u32 activeLocalMapColor = 0xffffffff; // 0xffc80000;
+//const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
+//const u32 ourLevelMapColor = 0xffffffff;
 
 CUICustomMap::CUICustomMap() : CUIStatic("Custom Map")
 {
@@ -510,7 +510,7 @@ void CUILevelMap::Update()
     if (m_bCursorOverWindow)
     {
         VERIFY(m_dwFocusReceiveTime >= 0);
-        if (Device.dwTimeGlobal > (m_dwFocusReceiveTime + 500))
+        if (Device.dwTimeGlobal > (m_dwFocusReceiveTime + 500 * Device.time_factor()))
         {
             if (fsimilar(MapWnd()->GlobalMap()->GetCurrentZoom().x, MapWnd()->GlobalMap()->GetMinZoom(), EPS_L))
                 MapWnd()->ShowHintStr(this, MapName().c_str());

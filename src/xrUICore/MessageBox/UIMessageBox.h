@@ -30,7 +30,7 @@ public:
     virtual bool InitMessageBox(LPCSTR xml_template);
     void Clear();
     virtual void SetText(LPCSTR str);
-    virtual LPCSTR GetText();
+    virtual LPCSTR GetText() const;
     LPCSTR GetHost();
     LPCSTR GetPassword();
     LPCSTR GetUserPassword();

@@ -15,13 +15,14 @@
 
 CScriptIniFile::CScriptIniFile(IReader* F, LPCSTR path) : inherited(F, path) {}
 CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
-    : inherited(update(szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
-{}
+    : inherited(update("$game_config$", szFileName), ReadOnly, bLoadAtStart, SaveAtEnd) {}
+CScriptIniFile::CScriptIniFile(LPCSTR initial, LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
+    : inherited(update(initial, szFileName), ReadOnly, bLoadAtStart, SaveAtEnd) {}
 
-LPCSTR CScriptIniFile::update(LPCSTR file_name)
+LPCSTR CScriptIniFile::update(LPCSTR initial, LPCSTR file_name)
 {
     string_path S1;
-    FS.update_path(S1, "$game_config$", file_name);
+    FS.update_path(S1, initial, file_name);
     return *shared_str(S1);
 }
 

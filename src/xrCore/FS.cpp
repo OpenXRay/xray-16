@@ -518,7 +518,7 @@ CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     pstr conv_path = xr_strdup(cFileName);
     convert_path_separators(conv_path);
     hSrcFile = ::open(conv_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
@@ -547,7 +547,7 @@ CVirtualFileRW::~CVirtualFileRW()
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     ::munmap((void*)data, Size);
     ::close(hSrcFile);
     hSrcFile = -1;
@@ -570,7 +570,7 @@ CVirtualFileReader::CVirtualFileReader(pcstr cFileName)
 
     data = (char*)MapViewOfFile(hSrcMap, FILE_MAP_READ, 0, 0, 0);
     R_ASSERT3(data, cFileName, xrDebug::ErrorToString(GetLastError()));
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     pstr conv_path = xr_strdup(cFileName);
     convert_path_separators(conv_path);
     hSrcFile = ::open(conv_path, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); //за такое использование указателя нужно убивать, но пока пусть будет
@@ -600,7 +600,7 @@ CVirtualFileReader::~CVirtualFileReader()
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
     CloseHandle(hSrcFile);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     ::munmap((void*)data, Size);
     ::close(hSrcFile);
     hSrcFile = -1;

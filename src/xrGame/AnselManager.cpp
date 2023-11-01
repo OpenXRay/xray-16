@@ -7,11 +7,6 @@
 
 #include "AnselManager.h"
 #include "holder_custom.h"
-#include <SDL.h>
-
-#ifdef XR_PLATFORM_WINDOWS
-#   include "SDL_syswm.h"
-#endif
 
 ENGINE_API extern bool bShowPauseString;
 ENGINE_API extern bool g_bDisableRedText;
@@ -67,15 +62,7 @@ bool AnselManager::Init() const
         config.captureLatency = 0;
         config.captureSettleLatency = 0;
 
-        SDL_SysWMinfo info;
-        SDL_VERSION(&info.version);
-        if (SDL_GetWindowWMInfo(Device.m_sdlWnd, &info))
-            config.gameWindowHandle = info.info.win.window;
-        else
-        {
-            Log("! Couldn't get window information required for Nvidia Ansel: ", SDL_GetError());
-            return false;
-        }
+        config.gameWindowHandle = Device.GetApplicationWindowHandle();
 
         static auto mutable_this = const_cast<AnselManager*>(this);
 
@@ -97,7 +84,7 @@ bool AnselManager::Init() const
 
             stored_red_text = g_bDisableRedText;
             g_bDisableRedText = TRUE;
-            
+
             g_pGameLevel->Cameras().AddCamEffector(xr_new<AnselCameraEffector>());
             Device.seqFrame.Add(mutable_this, REG_PRIORITY_CAPTURE);
 
@@ -165,7 +152,7 @@ bool AnselManager::Init() const
         case ansel::kSetConfigurationIncorrectConfiguration:
             Log("! Nvidia Ansel: incorrect configuration");
             break;
-        
+
         case ansel::kSetConfigurationSdkNotLoaded:
             Log("! Nvidia Ansel: SDK wasn't loaded");
             break;

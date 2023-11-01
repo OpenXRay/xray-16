@@ -1592,6 +1592,8 @@ set(SRC_FILES
     "UITeamPanels.h"
     "UITeamState.cpp"
     "UITeamState.h"
+    "UITimeDilator.cpp"
+    "UITimeDilator.h"
     "UIZoneMap.cpp"
     "UIZoneMap.h"
     "VersionSwitcher.cpp"
@@ -2643,7 +2645,6 @@ target_link_libraries(${PROJECT_NAME}
     xrCDB
     xrPhysics
     xrNetServer
-    ${SDL2_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME}

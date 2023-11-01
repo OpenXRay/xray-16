@@ -146,6 +146,8 @@ class CUISequenceSimpleItem : public CUISequenceItem
         bool m_bfinalize;
     };
 
+    bool isTimeDilatedInPDA;
+
 public:
     CUIWindow* m_UIWindow;
     ref_sound m_sound;

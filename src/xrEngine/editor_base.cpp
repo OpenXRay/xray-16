@@ -110,6 +110,31 @@ void ide::OnAppEnd()
     Device.seqRender.Remove(this);
 }
 
+void ide::UpdateTextInput(bool force_disable /*= false*/)
+{
+    if (force_disable)
+    {
+        if (m_text_input_enabled)
+        {
+            pInput->DisableTextInput();
+            m_text_input_enabled = false;
+        }
+        return;
+    }
+
+    const ImGuiIO& io = ImGui::GetIO();
+
+    if (m_text_input_enabled != io.WantTextInput)
+    {
+        m_text_input_enabled = io.WantTextInput;
+
+        if (m_text_input_enabled)
+            pInput->EnableTextInput();
+        else
+            pInput->DisableTextInput();
+    }
+}
+
 void ide::OnFrame()
 {
     const float frametime = m_timer.GetElapsed_sec();
@@ -118,22 +143,13 @@ void ide::OnFrame()
     ImGuiIO& io = ImGui::GetIO();
     io.DeltaTime = frametime;
 
-    // When shown, input being is updated
-    // through IInputReceiver interface
-    if (m_state == visible_state::full)
-    {
-        if (io.WantTextInput)
-            SDL_StartTextInput();
-        else
-            SDL_StopTextInput();
-    }
-
     m_render->Frame();
     ImGui::NewFrame();
 
     switch (m_state)
     {
     case visible_state::full:
+        UpdateTextInput();
         ShowMain();
         [[fallthrough]];
 

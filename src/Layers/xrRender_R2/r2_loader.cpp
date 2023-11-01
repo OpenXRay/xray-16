@@ -307,7 +307,7 @@ void CRender::LoadSectors(IReader* fs)
 
     // load sectors
     xr_vector<CSector::level_sector_data_t> sectors_data;
-    
+
     float largest_sector_vol = 0.0f;
     IReader* S = fs->open_chunk(fsL_SECTORS);
     for (u32 i = 0;; i++)
@@ -315,7 +315,7 @@ void CRender::LoadSectors(IReader* fs)
         IReader* P = S->open_chunk(i);
         if (!P)
             break;
-        
+
         auto& sector_data = sectors_data.emplace_back();
         {
             u32 size = P->find_chunk(fsP_Portals);

@@ -4,26 +4,29 @@
 class XRUICORE_API CUIAnimatedStatic final : public CUIStatic
 {
     typedef CUIStatic inherited;
-    // Количекство кадров анимации
-    u32 m_uFrameCount;
+
+    // Количество кадров анимации
+    u32 m_uFrameCount{};
     // Текущий фрейм
-    u32 m_uCurFrame;
+    u32 m_uCurFrame{ 0xFFFFFFFF };
     // Размеры текстуры с анимацией в кадрах
-    u32 m_uAnimRows, m_uAnimCols;
+    u32 m_uAnimRows{ 0xFFFFFFFF };
+    u32 m_uAnimCols{ 0xFFFFFFFF };
     // Размеры кадра на тектуре
-    float m_uFrameWidth, m_uFrameHeight;
+    float m_uFrameWidth{};
+    float m_uFrameHeight{};
     // Время показа всей анимации в ms.
-    u32 m_uAnimationDuration;
+    u32 m_uAnimationDuration{};
     // Время прошедшее с начала анимации
-    u32 m_uTimeElapsed;
+    u32 m_uTimeElapsed{};
     // флаг-признак необходимости пересчета статичных параметров анимации
-    bool m_bParamsChanged;
+    bool m_bParamsChanged{ true };
     // Признак проигрывания анимации
-    bool m_bPlaying;
+    bool m_bPlaying{};
 
-    Fvector2 m_pos;
+    Fvector2 m_pos{};
 
-    u32 m_prevTime;
+    u32 m_prevTime{};
 
     // Инициализация первого кадра
     // Params:	frameNum	- номер кадра: [0..m_uFrameCount)
@@ -68,8 +71,9 @@ public:
         m_uTimeElapsed = delta;
     }
     void SetAnimPos(float pos);
+
     // Флаг-признак циклического проигрывания
-    bool m_bCyclic;
+    bool m_bCyclic{ true };
 
     virtual void Update();
 

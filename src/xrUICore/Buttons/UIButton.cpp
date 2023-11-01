@@ -117,8 +117,9 @@ void CUIButton::DrawTexture()
 
 void CUIButton::DrawText()
 {
-    float right_offset;
-    float down_offset;
+    // XXX: use `right_offset` and `down_offset` variables
+    [[maybe_unused]] float right_offset;
+    [[maybe_unused]] float down_offset;
 
     if (GetButtonState() == BUTTON_UP || GetButtonState() == BUTTON_NORMAL)
     {
@@ -146,7 +147,7 @@ void CUIButton::Update()
     inherited::Update();
 
     if (CursorOverWindow() && m_hint_text.size() && !g_btnHint->Owner() &&
-        Device.dwTimeGlobal > m_dwFocusReceiveTime + 700)
+        Device.dwTimeGlobal > m_dwFocusReceiveTime + 700 * Device.time_factor())
     {
         g_btnHint->SetHintText(this, m_hint_text.c_str());
 
@@ -202,7 +203,7 @@ void CUIButton::SetAccelerator(int iAccel, int idx)
     m_uAccelerator[idx] = s16(iAccel);
 }
 
-const int CUIButton::GetAccelerator(int idx) const
+int CUIButton::GetAccelerator(int idx) const
 {
     VERIFY(idx >= 0 && idx < 4);
     return m_uAccelerator[idx];

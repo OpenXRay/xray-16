@@ -62,9 +62,9 @@
 void SetActorVisibility(u16 who, float value);
 extern int g_AI_inactive_time;
 
-#ifndef MASTER_GOLD
+#if defined(DEBUG) || !defined(MASTER_GOLD)
 Flags32 psAI_Flags = {aiObstaclesAvoiding | aiUseSmartCovers};
-#endif // MASTER_GOLD
+#endif // defined(DEBUG) || !defined(MASTER_GOLD)
 
 void CCustomMonster::SAnimState::Create(IKinematicsAnimated* K, LPCSTR base)
 {
@@ -1198,7 +1198,7 @@ void CCustomMonster::OnRender()
 		float const jump_time	=	0.3f;
 		TransferenceToThrowVel	(velocity,jump_time,physics_world()->Gravity());
 
-		bool const result	=	trajectory_intersects_geometry	(jump_time, 
+		bool const result	=	trajectory_intersects_geometry	(jump_time,
 																 start,
 																 end,
 																 velocity,

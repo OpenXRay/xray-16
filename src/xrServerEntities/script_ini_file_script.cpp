@@ -37,7 +37,7 @@ bool r_line2(CScriptIniFile* self, pcstr S, pcstr L, luabind::string& N, luabind
 
     N = "";
     V = "";
-    
+
     cpcstr v = READ_IF_EXISTS(self, r_string, S, L, nullptr);
     if (!v)
         return false;
@@ -80,6 +80,7 @@ static void CScriptIniFile_Export(lua_State* luaState)
     [
         class_<CScriptIniFile>("ini_file")
             .def(constructor<pcstr>())
+            .def(constructor<pcstr, pcstr>())
             //Alundaio: Extend script ini file
             .def("w_bool", &CScriptIniFile::w_bool)
             .def("w_color", &CScriptIniFile::w_color)

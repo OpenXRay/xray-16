@@ -1343,6 +1343,9 @@
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp">
       <Filter>StateManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRender\blenders\Blender_Blur.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>

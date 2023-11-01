@@ -821,7 +821,7 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, LPCSTR path, int index, CUIF
     pWnd->SetTextureColor(color);
 
     InitWindow(xml_doc, path, index, pWnd);
-    
+
     return pWnd->InitFrameLineWnd(*base_name, pos, size, !vertical, fatal);
 }
 
@@ -1065,32 +1065,62 @@ void CUIXmlInitBase::ApplyAlign(float& x, float& y, u32 align)
 
 //////////////////////////////////////////////////////////////////////////
 
+// source: https://stackoverflow.com/questions/650162/why-cant-the-switch-statement-be-applied-to-strings
+constexpr uint32_t hash(const std::string_view data) noexcept
+{
+    uint32_t hash = 5385;
+    for (const auto& e : data)
+        hash = ((hash << 5) + hash) + e;
+    return hash;
+}
+
 bool CUIXmlInitBase::InitAlignment(CUIXml& xml_doc, const char* path, int index, float& x, float& y, CUIWindow* pWnd)
 {
+    // Alignment: top: "t", right: "r", bottom: "b", left: "l", center: "c"
     xr_string wnd_alignment = xml_doc.ReadAttrib(path, index, "alignment", "");
 
-    if (strchr(wnd_alignment.c_str(), 'c'))
+    switch (hash(wnd_alignment.c_str()))
+    {
+    case hash("r"):
+        pWnd->SetAlignment(waRight);
+        break;
+    case hash("l"):
+        pWnd->SetAlignment(waLeft);
+        break;
+    case hash("t"):
+        pWnd->SetAlignment(waTop);
+        break;
+    case hash("b"):
+        pWnd->SetAlignment(waBottom);
+        break;
+    case hash("c"):
         pWnd->SetAlignment(waCenter);
+        break;
+    default:
+        break;
+    }
 
     // Alignment: right: "r", bottom: "b". Top, left - useless
     shared_str alignStr = xml_doc.ReadAttrib(path, index, "align", "");
 
     bool result = false;
 
-    if (strchr(*alignStr, 'r'))
+    switch (hash(alignStr.c_str()))
     {
+    case hash("r"):
         x = ApplyAlignX(x, alRight);
         result = true;
-    }
-    if (strchr(*alignStr, 'b'))
-    {
+        break;
+    case hash("b"):
         y = ApplyAlignY(y, alBottom);
         result = true;
-    }
-    if (strchr(*alignStr, 'c'))
-    {
+        break;
+    case hash("c"):
         ApplyAlign(x, y, alCenter);
         result = true;
+        break;
+    default:
+        break;
     }
 
     return result;
@@ -1269,7 +1299,7 @@ bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, LPCSTR path, int index, CUITr
     {
         float fmin = xml_doc.ReadAttribFlt(path, index, "min", 0.0f);
         float fmax = xml_doc.ReadAttribFlt(path, index, "max", 0.0f);
-        
+
         if (fmin != fmax)
         {
             pWnd->SetOptFBounds(fmin, fmax);
