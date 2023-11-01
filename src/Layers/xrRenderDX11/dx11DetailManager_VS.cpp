@@ -263,7 +263,6 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                             vis.erase(vis.begin(), vis.end());
                         }
                     }
-                        
 
                     RImplementation.BasicStats.DetailCount += dwBatch;
                     u32 dwCNT_verts = dwBatch * Object.number_vertices;

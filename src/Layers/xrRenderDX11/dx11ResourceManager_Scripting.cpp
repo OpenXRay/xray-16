@@ -286,7 +286,7 @@ public:
         C->r_StencilRef(Ref);
         return *this;
     }
-    adopt_compiler & _dx10CullMode(u32 Ref)
+    adopt_compiler& _dx10CullMode(u32 Ref)
     {
         C->r_CullMode((D3DCULL)Ref);
         return *this;

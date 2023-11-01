@@ -27,9 +27,9 @@
 
 //Anomaly blenders
 #if defined(USE_DX11)
-	#   include "Layers/xrRender/blenders/Blender_Blur.h"
-	#   include "Layers/xrRender/blenders/blender_dof.h"
-	#   include "Layers/xrRender/blenders/blender_nightvision.h"
+    #   include "Layers/xrRender/blenders/Blender_Blur.h"
+    #   include "Layers/xrRender/blenders/blender_dof.h"
+    #   include "Layers/xrRender/blenders/blender_nightvision.h"
     #   include "Layers/xrRender/blenders/blender_gasmask_drops.h"
     #   include "Layers/xrRender/blenders/blender_gasmask_dudv.h"
 #endif
@@ -385,39 +385,39 @@ CRenderTarget::CRenderTarget()
             rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A8R8G8B8, 1);
     }
 
-	//Anomaly stuff
-	#if defined(USE_DX11)
-	{
-		//Base resolution
-		u32 w = Device.dwWidth, h = Device.dwHeight;
+    //Anomaly stuff
+    #if defined(USE_DX11)
+    {
+        //Base resolution
+        u32 w = Device.dwWidth, h = Device.dwHeight;
 
-		//Blenders
-		b_blur = xr_new<CBlender_Blur>();
-		b_dof = xr_new<CBlender_dof>();
+        //Blenders
+        b_blur = xr_new<CBlender_Blur>();
+        b_dof = xr_new<CBlender_dof>();
         b_gasmask_drops = xr_new<CBlender_gasmask_drops>();
         b_gasmask_dudv = xr_new<CBlender_gasmask_dudv>();
-		b_nightvision = xr_new<CBlender_nightvision>();
+        b_nightvision = xr_new<CBlender_nightvision>();
 
-		//Rendertargets
-		rt_dof.create(r2_RT_dof, w, h, D3DFMT_A8R8G8B8);
+        //Rendertargets
+        rt_dof.create(r2_RT_dof, w, h, D3DFMT_A8R8G8B8);
 
-		rt_blur_h_2.create(r2_RT_blur_h_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);
-		rt_blur_2.create(r2_RT_blur_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);		
+        rt_blur_h_2.create(r2_RT_blur_h_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);
+        rt_blur_2.create(r2_RT_blur_2, u32(w/2), u32(h/2), D3DFMT_A8R8G8B8);
 
-		rt_blur_h_4.create(r2_RT_blur_h_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);
-		rt_blur_4.create(r2_RT_blur_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);		
+        rt_blur_h_4.create(r2_RT_blur_h_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);
+        rt_blur_4.create(r2_RT_blur_4, u32(w/4), u32(h/4), D3DFMT_A8R8G8B8);
 
-		rt_blur_h_8.create(r2_RT_blur_h_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
-		rt_blur_8.create(r2_RT_blur_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
+        rt_blur_h_8.create(r2_RT_blur_h_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
+        rt_blur_8.create(r2_RT_blur_8, u32(w/8), u32(h/8), D3DFMT_A8R8G8B8);
 
-		//Shader
-		s_blur.create(b_blur, "r2\\blur");
-		s_dof.create(b_dof, "r2\\dof");
+        //Shader
+        s_blur.create(b_blur, "r2\\blur");
+        s_dof.create(b_dof, "r2\\dof");
         s_gasmask_drops.create(b_gasmask_drops, "r2\\gasmask_drops");
         s_gasmask_dudv.create(b_gasmask_dudv, "r2\\gasmask_dudv");
-		s_nightvision.create(b_nightvision, "r2\\nightvision");
-	}
-	#endif
+        s_nightvision.create(b_nightvision, "r2\\nightvision");
+    }
+    #endif
 
     // OCCLUSION
     {
@@ -903,13 +903,13 @@ CRenderTarget::~CRenderTarget()
     }
 #endif
 
-	//Anomaly blenders
+    //Anomaly blenders
 #if RENDER == R_R4
-	xr_delete(b_blur);		
-	xr_delete(b_dof);
+    xr_delete(b_blur);
+    xr_delete(b_dof);
     xr_delete(b_gasmask_drops);
     xr_delete(b_gasmask_dudv);
-	xr_delete(b_nightvision);
+    xr_delete(b_nightvision);
 #endif
 }
 

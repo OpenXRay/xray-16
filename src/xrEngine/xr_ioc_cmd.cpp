@@ -586,14 +586,14 @@ ENGINE_API Fvector4 ps_dev_param_6 = { .0f, .0f, .0f, .0f };
 // z = vignette power (0.0-1.0) . glitch power (0-0.9)
 // w = gain offset (0.5-3.0) . mode (0.0-1.0)
 // TODO: put into it's own var, keep dev params for dev work
-ENGINE_API Fvector4 ps_dev_param_7 = { .0f, .0f, .0f, .0f }; 
-// beef's nvg 
+ENGINE_API Fvector4 ps_dev_param_7 = { .0f, .0f, .0f, .0f };
+// beef's nvg
 // x = flipdown amount (1.0-100.0) . unused
 // y = unused . nvg_radius (0.0, 0.9)
 // z = unused
 // w = unused
-// TODO: put into it's own var, keep dev params for dev work 
-ENGINE_API Fvector4 ps_dev_param_8 = { .0f, .0f, .0f, .0f }; 
+// TODO: put into it's own var, keep dev params for dev work
+ENGINE_API Fvector4 ps_dev_param_8 = { .0f, .0f, .0f, .0f };
 
 // Ascii1457's Screen Space Shaders
 ENGINE_API Fvector4 ps_ssfx_hud_drops_1 = { 1.0f, 1.0f, 30.f, .05f }; // Anim Speed, Int, Reflection, Refraction

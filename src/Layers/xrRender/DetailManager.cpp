@@ -298,7 +298,6 @@ void CDetailManager::UpdateVisibleM()
                 {
                     u32 _mask = mask;
                     u32 _res = View.testSphere(S.vis.sphere.P, S.vis.sphere.R, _mask);
-                    
                     if (fcvNone == _res)
                     {
                         continue; // invisible-view frustum
@@ -454,14 +453,13 @@ void CDetailManager::details_clear()
 {
     // Disable fade, next render will be scene
     fade_distance = 99999;
-    
+
     if (ps_ssfx_grass_shadows.x <= 0)
-    return;
-    
+        return;
+
     for (u32 x = 0; x < 3; x++)
     {
-        vis_list & list = m_visibles[x];
-        
+        vis_list& list = m_visibles[x];
         for (u32 O = 0; O < objects.size(); O++)
         {
             CDetail & Object = *objects[O];

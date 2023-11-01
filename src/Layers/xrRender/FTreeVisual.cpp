@@ -14,9 +14,10 @@ shared_str c_wave;
 shared_str c_wind;
 shared_str c_c_bias;
 shared_str c_c_scale;
-shared_str c_c_sun; 
+shared_str c_c_sun;
 shared_str c_c_BendersPos;
 shared_str c_c_BendersSetup;
+
 FTreeVisual::FTreeVisual(void) {}
 FTreeVisual::~FTreeVisual(void) {}
 void FTreeVisual::Release() { dxRender_Visual::Release(); }
@@ -171,7 +172,7 @@ void FTreeVisual::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
 #endif
     cmd_list.tree.set_c_sun(s * c_scale.sun, s * c_bias.sun, 0, 0); // sun
 
-#if RENDER==R_R4 || RENDER==R_R3
+#if RENDER == R_R4 || RENDER == R_R3
     if (ps_ssfx_grass_interactive.y > 0)
     {
         // Inter grass Settings

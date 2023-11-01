@@ -86,27 +86,26 @@ public:
     ref_texture t_noise_mipped;
 
     // Anomaly
-	
-	//Blenders
-	IBlender* b_blur;	
-	IBlender* b_dof;
+    //Blenders
+    IBlender* b_blur;
+    IBlender* b_dof;
     IBlender* b_gasmask_drops;
     IBlender* b_gasmask_dudv;
-	IBlender* b_nightvision;	
-	
-	//Rendertargets
-    resptr_core<CRT, resptrcode_crt> rt_Generic_temp;
+    IBlender* b_nightvision;
 
-	ref_rt rt_dof;
+    //Rendertargets
+    ref_rt rt_Generic_temp;
 
-	ref_rt rt_blur_h_2;
-	ref_rt rt_blur_2;
+    ref_rt rt_dof;
 
-	ref_rt rt_blur_h_4;
-	ref_rt rt_blur_4;
+    ref_rt rt_blur_h_2;
+    ref_rt rt_blur_2;
 
-	ref_rt rt_blur_h_8;
-	ref_rt rt_blur_8;
+    ref_rt rt_blur_h_4;
+    ref_rt rt_blur_4;
+
+    ref_rt rt_blur_h_8;
+    ref_rt rt_blur_8;
 
 private:
     // OCCq
@@ -129,12 +128,12 @@ private:
     ref_shader s_accum_volume;
     ref_shader s_accum_volume_msaa[8];
 
-	//Anomaly
-	ref_shader s_blur;	
-	ref_shader s_dof;
+    //Anomaly
+    ref_shader s_blur;
+    ref_shader s_dof;
     ref_shader s_gasmask_drops;
     ref_shader s_gasmask_dudv;
-	ref_shader s_nightvision;
+    ref_shader s_nightvision;
 
     //	generate min/max
     ref_shader s_create_minmax_sm;
@@ -295,12 +294,12 @@ public:
     void phase_accumulator(CBackend& cmd_list);
     void phase_vol_accumulator(CBackend& cmd_list);
 
-	//Anomaly renderphases
-	void phase_blur();
-	void phase_dof();
+    //Anomaly renderphases
+    void phase_blur();
+    void phase_dof();
     void phase_gasmask_drops();
     void phase_gasmask_dudv();
-	void phase_nightvision();
+    void phase_nightvision();
 
     //	Generates min/max sm
     void create_minmax_SM(CBackend& cmd_list);

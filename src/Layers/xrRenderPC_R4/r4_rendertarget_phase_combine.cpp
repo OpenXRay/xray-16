@@ -329,7 +329,7 @@ void CRenderTarget::phase_combine()
             phase_gasmask_drops();
         }
     }
-	
+
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
     BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
