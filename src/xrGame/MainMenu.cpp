@@ -80,7 +80,13 @@ CMainMenu::CMainMenu()
 
     public:
         CResetEventCb(CID cid, CMainMenu* mm) : CEventNotifierCallbackWithCid(cid), m_mainmenu(mm) {}
-        void ProcessEvent() override { m_mainmenu->DestroyInternal(true); }
+        void ProcessEvent() override
+        {
+            if (m_mainmenu->IsActive())
+                m_mainmenu->ReloadUI();
+            else
+                m_mainmenu->DestroyInternal(true);
+        }
     };
 
     m_script_reset_event_cid = ai().template Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET, this);
@@ -671,7 +677,10 @@ void CMainMenu::SwitchToMultiplayerMenu() { m_startDialog->Dispatch(2, 1); };
 void CMainMenu::DestroyInternal(bool bForce)
 {
     if (m_startDialog && ((m_deactivated_frame < Device.dwFrame + 4) || bForce))
+    {
+        m_startDialog->HideDialog();
         xr_delete(m_startDialog);
+    }
 }
 
 void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
