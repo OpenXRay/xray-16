@@ -179,7 +179,9 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     // Always called in Primary thread
     // Uncomment below if you will change the behaviour
     // if (!g_mt_config.test(mtBullets))
+#ifdef DEBUG
     VERIFY(Threading::ThreadIdsAreEqual(m_thread_id, Threading::GetCurrThreadId()));
+#endif
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
     //	u32 CurID					= Level().CurrentControlEntity()->ID();
@@ -200,7 +202,9 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
 
 void CBulletManager::UpdateWorkload()
 {
+#ifdef DEBUG
     VERIFY(g_mt_config.test(mtBullets) || Threading::ThreadIdsAreEqual(m_thread_id, Threading::GetCurrThreadId()));
+#endif
 
     rq_storage.r_clear();
 
