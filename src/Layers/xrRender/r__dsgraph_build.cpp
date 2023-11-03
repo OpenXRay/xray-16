@@ -58,10 +58,14 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
     // a) Allow to optimize RT order
     // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
-    ShaderElement* sh_d = pVisual->shader->E[4]._get(); // 4=L_special
-    if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && o.pmask[sh_d->flags.iPriority / 2])
+    const Shader* vis_sh = pVisual->shader._get();
+    ShaderElement* sh_d = vis_sh ? vis_sh->E[4]._get() : nullptr; // 4=L_special
+    if (sh_d)
     {
-        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
+        if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && o.pmask[sh_d->flags.iPriority / 2])
+        {
+            mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
+        }
     }
 
     // Select shader
@@ -82,7 +86,7 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
         mapHUD.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
 
 #if RENDER != R_R1
-        if (sh->flags.bEmissive)
+        if (sh->flags.bEmissive && sh_d)
             mapHUDEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
 #endif
         return;
@@ -169,10 +173,14 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
     // a) Allow to optimize RT order
     // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
-    ShaderElement* sh_d = pVisual->shader->E[4]._get(); // 4=L_special
-    if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && o.pmask[sh_d->flags.iPriority / 2])
+    const Shader* vis_sh = pVisual->shader._get();
+    ShaderElement* sh_d = vis_sh ? vis_sh->E[4]._get() : nullptr; // 4=L_special
+    if (sh_d)
     {
-        mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
+        if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && o.pmask[sh_d->flags.iPriority / 2])
+        {
+            mapDistort.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
+        }
     }
 
     // Select shader
@@ -197,7 +205,7 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
     // b) Allow to make them 100% lit and really bright
     // c) Should not cast shadows
     // d) Should be rendered to accumulation buffer in the second pass
-    if (sh->flags.bEmissive)
+    if (sh->flags.bEmissive && sh_d)
     {
         mapEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d })); // sh_d -> L_special
     }

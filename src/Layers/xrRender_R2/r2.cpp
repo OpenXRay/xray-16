@@ -47,6 +47,8 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float c
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase)
 {
+    if (!pVisual->shader)
+        return nullptr;
     int id = SE_R2_SHADOW;
     if (CRender::PHASE_NORMAL == phase)
     {
