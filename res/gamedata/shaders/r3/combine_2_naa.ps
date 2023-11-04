@@ -1,0 +1,130 @@
+#include "common.h"
+#include "anomaly_shaders.h"
+
+// Check Screen Space Shaders modules
+#include "check_screenspace.h"
+
+#ifdef SSFX_BEEFS_NVG
+	#include "night_vision.h"
+#endif
+
+#ifdef SSFX_DEBAND
+	#include "screenspace_debanding.h"
+#endif
+
+#ifdef SSFX_FOG
+	#include "screenspace_fog.h"
+#endif
+
+#ifdef SSFX_INDIRECT_LIGHT
+	#include "screenspace_il.h"
+#endif
+
+//////////////////////////////////////////////////////////////////////////////////////////
+#ifndef USE_MSAA
+Texture2D 			s_distort;
+#define	EPSDEPTH	0.001
+#else
+	#ifndef SM_5
+		Texture2DMS<float4,MSAA_SAMPLES> s_distort;
+	#else
+		Texture2DMS<float4>	s_distort;
+	#endif
+#define	EPSDEPTH	0.001
+#endif
+//////////////////////////////////////////////////////////////////////////////////////////
+float4 e_barrier;	// x=norm(.8f), y=depth(.1f), z=clr
+float4 e_weights;	// x=norm, y=depth, z=clr
+float4 e_kernel;	// x=norm, y=depth, z=clr
+
+//////////////////////////////////////////////////////////////////////////////////////////
+#include "mblur.h"
+#include "img_corrections.h"
+#include "tonemapping.h"
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+
+struct c2_out
+{
+	float4	Color : SV_Target;
+#ifdef USE_MSAA
+	float	Depth : SV_Depth;
+#endif
+};
+
+c2_out main( v2p_aa_AA I )
+{
+	c2_out	res;
+	res.Color = float4(0,0,0,0);
+
+	int iSample = 0;
+
+	gbuffer_data gbd	= gbuffer_load_data(I.Tex0, I.HPos, iSample );
+	
+  	float 	depth 	= gbd.P.z;
+#ifdef 	USE_DISTORT
+#ifndef USE_MSAA
+	float4 	distort	= s_distort.Sample(smp_nofilter, I.Tex0);
+#else // USE_MSAA
+	float4 	distort	= s_distort.Load( int3( I.Tex0 * screen_res.xy, 0 ), iSample );
+#endif // USE_MSAA
+	float2	offset	= (distort.xy-(127.0h/255.0h))*def_distort;  // fix newtral offset
+	float2	center	= I.Tex0 + offset;
+
+	gbuffer_data gbdx	= gbuffer_load_data_offset(I.Tex0, center, I.HPos, iSample);
+
+	float 	depth_x	= gbdx.P.z;
+	if ((depth_x+EPSDEPTH)<depth)	center	= I.Tex0;	// discard new sample
+#else // USE_DISTORT
+	float2	center 	= I.Tex0;
+#endif
+
+	float3 img = s_image.SampleLevel(smp_rtlinear, center.xy, 0);
+
+	float4 bloom = s_bloom.Sample(smp_rtlinear,center);
+
+	img = mblur( center, ( gbd ).P, img.rgb);
+
+	// Indirect light - SCREEN SPACE SHADERS - UPDATE 14
+#ifdef SSFX_INDIRECT_LIGHT
+	ssfx_il(I.Tex0, I.HPos, gbd.P, gbd.N, img, iSample);
+#endif
+
+	// Sky Debanding Implementation  - SCREEN SPACE SHADERS - UPDATE 12.5
+#ifdef SSFX_DEBAND
+	if (depth <= SKY_EPS)
+		img = ssfx_debanding(img, I.Tex0.xy);
+#endif
+
+#ifdef SSFX_BEEFS_NVG
+	// NVG CHANGE TO PREVENT WEIRD COLORS, ONLY APPLY BLOOM WHEN WE'RE NOT IN NVG MASK
+	float lua_param_nvg_generation = floor(shader_param_8.x);			// 1, 2, or 3
+	float lua_param_nvg_num_tubes = frac(shader_param_8.x) * 10.0f;		// 1, 2, 4, 1.1, or 1.2
+	if (lua_param_nvg_generation < 0.01f && compute_lens_mask(aspect_ratio_correction(I.Tex0), lua_param_nvg_num_tubes) == 0.0f)
+	{
+		img = blend_soft(img, bloom.xyz*bloom.w);
+	}
+#else
+	img = blend_soft(img, bloom.xyz*bloom.w);
+#endif
+
+	if (tnmp_onoff == 1.0)
+	{		
+		img = Uncharted2ToneMapping(img);
+	}
+
+	img = img_corrections(img);
+		
+#ifdef 	USE_DISTORT
+ 	float3	blurred	= bloom*def_hdr	;
+			img		= lerp	(img,blurred,distort.z);
+#endif
+	
+		res.Color = float4(img,1.0);
+#ifdef USE_MSAA
+	float4 ptp = mul(m_P, float4(gbd.P, 1));
+	res.Depth = ptp.w==0?1:ptp.z/ptp.w;
+#endif
+	
+	return res;
+}

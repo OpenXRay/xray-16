@@ -6,7 +6,11 @@
 #include "xrCore/Animation/SkeletonMotions.hpp"
 
 u32 ps_Preset = 2;
+u32 ps_ShaderPreset = 0;
+u32 ps_ColorGradingPreset = 0;
 const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
+const xr_token qshader_preset_token[] = {{"Vanilla", 0}, {"New Shader Support (Default)", 1}, {"New Shader Support (High)", 2}, {nullptr, 0}};
+const xr_token qcolorgrading_preset_token[] = {{"Default", 0}, {"Cold", 1}, {"Filmic 1", 2}, {"Filmic 2", 3}, {"Filmic 3", 4} , {"Hollywood", 5}, {"Vanilla", 6}, {"Vibrant", 7} , {"Warm", 8}, {nullptr, 0}};
 
 u32 ps_r2_smapsize = 2048;
 const xr_token qsmapsize_token[] =
@@ -242,7 +246,7 @@ extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API float ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
 
 //  x - min (0), y - focus (1.4), z - max (100)
 Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
@@ -518,6 +522,58 @@ public:
     }
 };
 
+class CCC_Shader_Preset : public CCC_Token
+{
+public:
+    CCC_Shader_Preset(LPCSTR N, u32* V, const xr_token* T) : CCC_Token(N, V, T) {};
+
+    virtual void Execute(LPCSTR args)
+    {
+        CCC_Token::Execute(args);
+        string_path _cfg;
+        string_path cmd;
+
+        switch (*value)
+        {
+        case 0: xr_strcpy(_cfg, "shaders_vanilla.ltx"); break;
+        case 1: xr_strcpy(_cfg, "shaders_new_default.ltx"); break;
+        case 2: xr_strcpy(_cfg, "shaders_new_high.ltx"); break;
+        }
+        FS.update_path(_cfg, "$game_config$", _cfg);
+        strconcat(sizeof(cmd), cmd, "cfg_load", " ", _cfg);
+        Console->Execute(cmd);
+    }
+};
+
+class CCC_ColorGrading_Preset : public CCC_Token
+{
+public:
+    CCC_ColorGrading_Preset(LPCSTR N, u32* V, const xr_token* T) : CCC_Token(N, V, T) {};
+
+    virtual void Execute(LPCSTR args)
+    {
+        CCC_Token::Execute(args);
+        string_path _cfg;
+        string_path cmd;
+
+        switch (*value)
+        {
+        case 0: xr_strcpy(_cfg, "grading_default.ltx"); break;
+        case 1: xr_strcpy(_cfg, "grading_cold.ltx"); break;
+        case 2: xr_strcpy(_cfg, "grading_filmic01.ltx"); break;
+        case 3: xr_strcpy(_cfg, "grading_filmic02.ltx"); break;
+        case 4: xr_strcpy(_cfg, "grading_filmic03.ltx"); break;
+        case 5: xr_strcpy(_cfg, "grading_hollywood.ltx"); break;
+        case 6: xr_strcpy(_cfg, "grading_vanilla.ltx"); break;
+        case 7: xr_strcpy(_cfg, "grading_vibrant.ltx"); break;
+        case 8: xr_strcpy(_cfg, "grading_warm.ltx"); break;
+        }
+        FS.update_path(_cfg, "$game_config$", _cfg);
+        strconcat(sizeof(cmd), cmd, "cfg_load", " ", _cfg);
+        Console->Execute(cmd);
+    }
+};
+
 class CCC_memory_stats : public IConsole_Command
 {
 public:
@@ -760,6 +816,8 @@ public:
 void xrRender_initconsole()
 {
     CMD3(CCC_Preset, "_preset", &ps_Preset, qpreset_token);
+    CMD3(CCC_Shader_Preset, "_shader_preset", &ps_ShaderPreset, qshader_preset_token);
+    CMD3(CCC_ColorGrading_Preset, "_colorgrading_preset", &ps_ColorGradingPreset, qcolorgrading_preset_token);
 
     CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128);
 #ifndef MASTER_GOLD
@@ -1058,7 +1116,7 @@ void xrRender_initconsole()
     CMD4(CCC_Vector4, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, Fvector4{}, Fvector4({ 5.f, 5.f, 5.f, 60.f }));
     CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4{}, Fvector4({ 5.f, 20.f, 1.f, 5.f }));
     CMD4(CCC_Vector4, "ssfx_wpn_dof_1", &ps_ssfx_wpn_dof_1, tw2_min, tw2_max);
-    CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0.f, 1.f);
+    CMD4(CCC_Vector4, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, tw2_min, tw2_max);
 
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);
