@@ -270,6 +270,12 @@ public:
         u32 support_rt_arrays : 1;
 
         float forcegloss_v;
+
+        // Ascii - Screen Space Shaders
+        u32 ssfx_branches : 1;
+        u32 ssfx_blood : 1;
+        u32 ssfx_rain : 1;
+        u32 ssfx_hud_raindrops : 1;
     } o;
 
     struct RenderR2Statistics

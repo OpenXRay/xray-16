@@ -269,7 +269,7 @@ void CGamePersistent::WeathersUpdate()
         CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
         BOOL bIndoor = TRUE;
         if (actor)
-            bIndoor = actor->renderable_ROS()->get_luminocity_hemi() < 0.05f;
+            bIndoor = g_pGamePersistent->IsActorInHideout() && (actor->renderable_ROS()->get_luminocity_hemi() < 0.05f);
 
         if (CEnvAmbient* env_amb = Environment().CurrentEnv.env_ambient)
         {
@@ -433,17 +433,19 @@ bool allow_game_intro()
 
 void CGamePersistent::start_logo_intro()
 {
+    const bool notLoadingLevel = xr_strlen(m_game_params.m_game_or_spawn) == 0 && g_pGameLevel == nullptr;
     if (!allow_intro())
     {
         m_intro_event = nullptr;
-        Console->Execute("main_menu on");
+        if (notLoadingLevel)
+            m_pMainMenu->Activate(true);
         return;
     }
 
     if (Device.dwPrecacheFrame == 0)
     {
         m_intro_event = nullptr;
-        if (!GEnv.isDedicatedServer && 0 == xr_strlen(m_game_params.m_game_or_spawn) && NULL == g_pGameLevel)
+        if (!GEnv.isDedicatedServer && notLoadingLevel)
         {
             VERIFY(NULL == m_intro);
             m_intro = xr_new<CUISequencer>();
@@ -456,7 +458,7 @@ void CGamePersistent::start_logo_intro()
 void CGamePersistent::update_logo_intro()
 {
     xr_delete(m_intro);
-    Console->Execute("main_menu on");
+    m_pMainMenu->Activate(true);
 }
 
 extern int g_keypress_on_start;

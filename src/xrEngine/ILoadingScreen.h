@@ -15,8 +15,9 @@ public:
 
     virtual void Initialize() = 0;
 
+    [[nodiscard]]
+    virtual bool IsShown() const = 0;
     virtual void Show(bool show) = 0;
-    virtual bool IsShown() = 0;
 
     virtual void Update(int stagesCompleted, int stagesTotal) = 0;
     virtual void Draw() = 0;

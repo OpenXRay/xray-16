@@ -307,8 +307,14 @@ bool CUIXmlInitBase::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUILines*
     CGameFont* pTmpFont = NULL;
     InitFont(xml_doc, path, index, color, pTmpFont);
     pLines->SetTextColor(color);
-    R_ASSERT(pTmpFont);
-    pLines->SetFont(pTmpFont);
+    if (pTmpFont)
+        pLines->SetFont(pTmpFont);
+    else
+    {
+#ifndef MASTER_GOLD
+        Msg("~ Missing 'font' attribute in node [%s] in file [%s]", path, xml_doc.m_xml_file_name);
+#endif
+    }
 
     // Load font alignment
     shared_str al = xml_doc.ReadAttrib(path, index, "align");

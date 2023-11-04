@@ -34,7 +34,9 @@ public:
     void Initialize() override;
 
     void Show(bool show) override;
-    bool IsShown() override;
+
+    [[nodiscard]]
+    bool IsShown() const override;
 
     void Update(const int stagesCompleted, const int stagesTotal) override;
     void Draw() override;
