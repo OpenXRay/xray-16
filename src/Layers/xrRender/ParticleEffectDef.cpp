@@ -116,12 +116,12 @@ void CPEDef::ExecuteCollision(
 {
     pVector pt, n;
     // Must traverse list in reverse order so Remove will work
-    for (u32 i = p_cnt - 1; i >= 0; i--)
+    for (int i = p_cnt - 1; i >= 0; i--)
     {
         Particle& m = particles[i];
 
         bool pick_needed;
-        size_t pick_cnt = 0;
+        int pick_cnt = 0;
         do
         {
             pick_needed = false;
