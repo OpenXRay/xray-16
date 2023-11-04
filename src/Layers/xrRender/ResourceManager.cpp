@@ -69,7 +69,7 @@ void CResourceManager::ED_UpdateBlender(LPCSTR Name, IBlender* data)
     }
     else
     {
-        m_blenders.insert(std::make_pair(xr_strdup(Name), data));
+        m_blenders.emplace(xr_strdup(Name), data);
     }
 }
 
@@ -122,9 +122,9 @@ ShaderElement* CResourceManager::_CreateElement(ShaderElement&& S)
         return nullptr;
 
     // Search equal in shaders array
-    for (u32 it = 0; it < v_elements.size(); it++)
-        if (S.equal(*(v_elements[it])))
-            return v_elements[it];
+    for (ShaderElement* elem : v_elements)
+        if (S.equal(*elem))
+            return elem;
 
     // Create _new_ entry
     ShaderElement* N = v_elements.emplace_back(xr_new<ShaderElement>(std::move(S)));
@@ -446,7 +446,7 @@ void CResourceManager::_DumpMemoryUsage()
         {
             u32 m = I->second->flags.MemoryUsage;
             shared_str n = I->second->cName;
-            mtex.insert(std::make_pair(m, std::make_pair(I->second->ref_count.load(), n)));
+            mtex.emplace(m, std::make_pair(I->second->ref_count.load(), n));
         }
     }
 
