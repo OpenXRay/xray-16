@@ -242,7 +242,7 @@ extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API float ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
 
 //  x - min (0), y - focus (1.4), z - max (100)
 Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
@@ -1058,7 +1058,7 @@ void xrRender_initconsole()
     CMD4(CCC_Vector4, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, Fvector4{}, Fvector4({ 5.f, 5.f, 5.f, 60.f }));
     CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4{}, Fvector4({ 5.f, 20.f, 1.f, 5.f }));
     CMD4(CCC_Vector4, "ssfx_wpn_dof_1", &ps_ssfx_wpn_dof_1, tw2_min, tw2_max);
-    CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0.f, 1.f);
+    CMD4(CCC_Vector4, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, tw2_min, tw2_max);
 
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);

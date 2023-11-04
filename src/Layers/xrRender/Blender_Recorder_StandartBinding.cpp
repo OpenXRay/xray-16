@@ -392,7 +392,7 @@ extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
 extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API float ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
 
 class cl_inv_v : public R_constant_setup
 {
@@ -538,7 +538,7 @@ class ssfx_wpn_dof_2 : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
     {
-        cmd_list.set_c(C, ps_ssfx_wpn_dof_2, 0.f, 0.f, 0.f);
+        cmd_list.set_c(C, ps_ssfx_wpn_dof_2.x, ps_ssfx_wpn_dof_2.y, ps_ssfx_wpn_dof_2.z, ps_ssfx_wpn_dof_2.w);
     }
 };
 static ssfx_wpn_dof_2 binder_ssfx_wpn_dof_2;

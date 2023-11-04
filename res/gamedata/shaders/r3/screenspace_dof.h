@@ -9,7 +9,7 @@
 #include "check_screenspace.h"
 
 uniform float4 ssfx_wpn_dof_1;
-uniform float ssfx_wpn_dof_2;
+uniform float4 ssfx_wpn_dof_2;
 
 float3 SSFX_DOF(float2 tc, float3 depth, float3 img)
 {
@@ -27,11 +27,11 @@ float3 SSFX_DOF(float2 tc, float3 depth, float3 img)
 	float edgeBlur = 0;
 
 	// Peripheral vision blur
-	if (ssfx_wpn_dof_2 > 0)
+	if (ssfx_wpn_dof_2.x > 0)
 	{
 		// Vignette to calc blur
 		float2 mid_uv = tc - float2(0.5f, 0.5f);
- 		edgeBlur = pow(smoothstep(0.0f, saturate(1.0f - ssfx_wpn_dof_2), length(mid_uv)), 1.5f) * 1.33f;
+ 		edgeBlur = pow(smoothstep(0.0f, saturate(1.0f - ssfx_wpn_dof_2.x), length(mid_uv)), 1.5f) * 1.33f;
 
 		blur_w = saturate(blur_w + edgeBlur) * ssfx_wpn_dof_1.w;
 	}
