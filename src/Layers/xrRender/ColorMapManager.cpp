@@ -42,7 +42,7 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
             ref_texture tmp;
             tmp.create(strTexName.c_str());
 
-            m_TexCache.insert(std::make_pair(strTexName, tmp));
+            m_TexCache.emplace(strTexName, tmp);
 
 #if defined(USE_DX9) || defined(USE_DX11)
             ID3DBaseTexture* e0 = tmp->surface_get();

@@ -47,6 +47,8 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float c
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase)
 {
+    if (!pVisual->shader)
+        return nullptr;
     int id = SE_R2_SHADOW;
     if (CRender::PHASE_NORMAL == phase)
     {
@@ -579,6 +581,20 @@ void CRender::create()
     }
 #endif
 
+#if defined(USE_DX11)
+    // Ascii's Screen Space Shaders - Check if SSS shaders exist
+    string_path fn;
+    o.ssfx_rain = FS.exist(fn, "$game_shaders$", "r3\\effects_rain_splash", ".ps") ? 1 : 0;
+    o.ssfx_blood = FS.exist(fn, "$game_shaders$", "r3\\effects_wallmark_blood", ".ps") ? 1 : 0;
+    o.ssfx_branches = FS.exist(fn, "$game_shaders$", "r3\\deffer_tree_branch_bump-hq", ".vs") ? 1 : 0;
+    o.ssfx_hud_raindrops = FS.exist(fn, "$game_shaders$", "r3\\deffer_base_hud_bump", ".ps") ? 1 : 0;
+
+    Msg("- SSS HUD RAINDROPS SHADER INSTALLED %i", o.ssfx_hud_raindrops);
+    Msg("- SSS RAIN SHADER INSTALLED %i", o.ssfx_rain);
+    Msg("- SSS BLOOD SHADER INSTALLED %i", o.ssfx_blood);
+    Msg("- SSS BRANCHES SHADER INSTALLED %i", o.ssfx_branches);
+#endif
+
     // constants
     Resources->RegisterConstantSetup("parallax", &binder_parallax);
     Resources->RegisterConstantSetup("water_intensity", &binder_water_intensity);
@@ -722,6 +738,9 @@ void CRender::OnFrame()
         Device.seqParallel.insert(
             Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
     }
+
+    if (Details)
+        g_pGamePersistent->GrassBendersUpdateAnimations();
 }
 
 #ifdef USE_OGL

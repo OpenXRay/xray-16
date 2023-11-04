@@ -208,6 +208,7 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_lmap", r2_sunmask);
         C.r_dx11Texture("s_smap", r2_RT_smap_depth);
         C.r_dx11Texture("s_smap_minmax", r2_RT_smap_depth_minmax);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
 
         C.r_dx11Sampler("smp_nofilter");
         C.r_dx11Sampler("smp_material");
@@ -249,6 +250,7 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_accumulator", r2_RT_accum);
         C.r_dx11Texture("s_lmap", r2_sunmask);
         C.r_dx11Texture("s_smap", r2_RT_smap_depth);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
 
         C.r_dx11Sampler("smp_nofilter");
         C.r_dx11Sampler("smp_material");
@@ -276,6 +278,7 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_normal", r2_RT_N);
         C.r_dx11Texture("s_material", r2_material);
         C.r_dx11Texture("s_smap", r2_RT_generic0);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
 
         C.r_dx11Sampler("smp_nofilter");
         C.r_dx11Sampler("smp_material");
@@ -304,6 +307,7 @@ void CBlender_accum_direct::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_lmap", r2_sunmask);
         C.r_dx11Texture("s_smap", r2_RT_smap_depth);
         C.r_dx11Texture("s_smap_minmax", r2_RT_smap_depth_minmax);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
 
         C.r_dx11Sampler("smp_nofilter");
         C.r_dx11Sampler("smp_material");
@@ -473,6 +477,7 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_accumulator", r2_RT_accum);
         C.r_dx11Texture("s_lmap", r2_sunmask);
         C.r_dx11Texture("s_smap", r2_RT_smap_depth);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
 
         C.r_dx11Sampler("smp_nofilter");
         C.r_dx11Sampler("smp_material");
@@ -514,6 +519,7 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_accumulator", r2_RT_accum);
         C.r_dx11Texture("s_lmap", r2_sunmask);
         C.r_dx11Texture("s_smap", r2_RT_smap_depth);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
 
         C.r_dx11Sampler("smp_nofilter");
         C.r_dx11Sampler("smp_material");
@@ -541,6 +547,7 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_normal", r2_RT_N);
         C.r_dx11Texture("s_material", r2_material);
         C.r_dx11Texture("s_smap", r2_RT_generic0);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
 
         C.r_dx11Sampler("smp_nofilter");
         C.r_dx11Sampler("smp_material");
@@ -569,6 +576,7 @@ void CBlender_accum_direct_msaa::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_lmap", r2_sunmask);
         C.r_dx11Texture("s_smap", r2_RT_smap_depth);
         C.r_dx11Texture("s_smap_minmax", r2_RT_smap_depth_minmax);
+        C.r_dx11Texture("s_diffuse", r2_RT_albedo);
 
         C.r_dx11Sampler("smp_nofilter");
         C.r_dx11Sampler("smp_material");

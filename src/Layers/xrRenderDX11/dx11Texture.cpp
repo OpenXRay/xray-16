@@ -338,8 +338,8 @@ _DDS:
 
 _DDS_CUBE:
 {
-    R_CHK(CreateTextureEx(HW.pDevice, texture.GetImages(), texture.GetImageCount(), IMG, D3D_USAGE_IMMUTABLE,
-        D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT, &pTexture2D));
+    R_CHK2(CreateTextureEx(HW.pDevice, texture.GetImages(), texture.GetImageCount(), IMG, D3D_USAGE_IMMUTABLE,
+        D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT, &pTexture2D), fn);
     FS.r_close(S);
 
     // OK
@@ -362,9 +362,9 @@ _DDS_2D:
         mip_lod = old_mipmap_cnt - IMG.mipLevels;
     }
 
-    R_CHK(CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,
+    R_CHK2(CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,
         D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
-        &pTexture2D)
+        &pTexture2D), fn
     );
 
 
@@ -386,8 +386,7 @@ _BUMP_from_base:
         R_ASSERT2(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump#", ".dds"), "ed_dummy_bump#");
         S = FS.r_open(fn);
         R_ASSERT2(S, fn);
-        img_size = S->length();
-        goto _DDS_2D;
+        goto _DDS;
     }
     if (strstr(fname, "_bump"))
     {
@@ -395,9 +394,7 @@ _BUMP_from_base:
         S = FS.r_open(fn);
 
         R_ASSERT2(S, fn);
-
-        img_size = S->length();
-        goto _DDS_2D;
+        goto _DDS;
     }
     //////////////////
 }

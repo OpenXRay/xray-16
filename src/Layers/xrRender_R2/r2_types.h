@@ -59,6 +59,18 @@
 
 #define     r2_base             "$user$base"
 
+//Anomaly
+#define     r2_RT_dof       	"$user$dof"
+
+#define     r2_RT_blur_h_2      "$user$blur_h_2"
+#define     r2_RT_blur_2        "$user$blur_2"
+
+#define     r2_RT_blur_h_4	    "$user$blur_h_4"
+#define     r2_RT_blur_4        "$user$blur_4"
+
+#define     r2_RT_blur_h_8      "$user$blur_h_8"
+#define     r2_RT_blur_8        "$user$blur_8"
+
 static constexpr auto c_lmaterial = "L_material";
 static constexpr auto c_sbase = "s_base";
 static constexpr auto c_snoise = "s_noise";
@@ -115,10 +127,12 @@ const u32 LUMINANCE_size = 16;
 #define SE_SUN_RAIN_SMAP    5
 
 extern float ps_r2_gloss_factor;
+extern float ps_r2_gloss_min;
+
 IC float u_diffuse2s(float x, float y, float z)
 {
     float v = (x + y + z) / 3.f;
-    return ps_r2_gloss_factor * ((v < 1) ? powf(v, 2.f / 3.f) : v);
+    return ps_r2_gloss_min + ps_r2_gloss_factor * ((v < 1) ? powf(v, 2.f / 3.f) : v);
 }
 
 IC float u_diffuse2s(Fvector3& c)
