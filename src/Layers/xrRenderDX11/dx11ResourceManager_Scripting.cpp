@@ -27,7 +27,7 @@ public:
 	{
 		const shared_str level_name = g_pGameLevel->name();
 		return level_name.c_str();
-	}	
+	}
 };
 
 // wrapper
