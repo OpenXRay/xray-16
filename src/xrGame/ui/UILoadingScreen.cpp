@@ -144,7 +144,7 @@ void UILoadingScreen::Show(bool show)
     }
 }
 
-bool UILoadingScreen::IsShown()
+bool UILoadingScreen::IsShown() const
 {
     return CUIWindow::IsShown();
 }

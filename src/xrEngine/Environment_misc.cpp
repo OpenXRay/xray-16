@@ -11,6 +11,7 @@
 #include "Common/LevelGameDef.h"
 
 ENGINE_API float SunshaftsIntensity = 0.f;
+extern Fvector3 ssfx_wetness_multiplier;
 
 void CEnvModifier::load(IReader* fs, u32 version)
 {
@@ -584,6 +585,13 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     }
 
     sun_color.lerp(A.sun_color, B.sun_color, f);
+
+    if (rain_density > 0.f)
+        parent.wetness_factor += (rain_density * ssfx_wetness_multiplier.x) / 10000.f;
+    else
+        parent.wetness_factor -= 0.0001f * ssfx_wetness_multiplier.y;
+
+    clamp(parent.wetness_factor, 0.f, 1.f);
 
     sun_azimuth = (fi * A.sun_azimuth + f * B.sun_azimuth);
 

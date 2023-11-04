@@ -214,6 +214,7 @@ enum
     R2FLAGEXT_SUN_OLD = (1 << 9),
     R3FLAGEXT_SSR_HALF_DEPTH = (1 << 10),
     R3FLAGEXT_SSR_JITTER = (1 << 11),
+    R4FLAGEXT_NEW_SHADER_SUPPORT = (1 << 12),
 };
 
 extern void xrRender_initconsole();

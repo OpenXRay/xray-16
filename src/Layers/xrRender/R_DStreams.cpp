@@ -37,13 +37,13 @@ void* _VertexStream::Lock(u32 vl_Count, u32 Stride, u32& vOffset)
 #endif
 
     // Ensure there is enough space in the VB for this data
-    u32 bytes_need = vl_Count * Stride;
+    const u32 bytes_need = vl_Count * Stride;
     R_ASSERT2((bytes_need <= mSize) && vl_Count,
         make_string("bytes_need = %d, mSize = %d, vl_Count = %d", bytes_need, mSize, vl_Count));
 
     // Vertex-local info
-    u32 vl_mSize = mSize / Stride;
-    u32 vl_mPosition = mPosition / Stride + 1;
+    const u32 vl_mSize = mSize / Stride;
+    const u32 vl_mPosition = mPosition / Stride + 1;
 
     // Check if there is need to flush and perform lock
     bool bFlush = false;

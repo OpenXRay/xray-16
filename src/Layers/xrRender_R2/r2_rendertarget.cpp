@@ -25,6 +25,14 @@
 #   endif
 #endif
 
+//Anomaly blenders
+#if defined(USE_DX11)
+    #include "Layers/xrRender/blenders/Blender_Blur.h"
+    #include "Layers/xrRender/blenders/blender_dof.h"
+    #include "Layers/xrRender/blenders/blender_nightvision.h"
+    #include "Layers/xrRender/blenders/blender_gasmask_drops.h"
+    #include "Layers/xrRender/blenders/blender_gasmask_dudv.h"
+#endif
 #if defined(USE_DX9)
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, BOOL common_stencil)
 #elif defined(USE_DX11) || defined(USE_OGL)
@@ -370,7 +378,43 @@ CRenderTarget::CRenderTarget()
         //	temp: for higher quality blends
         if (options.advancedpp)
             rt_Generic_2.create(r2_RT_generic2, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+
+        rt_Generic_temp.create("$user$generic_temp", w, h, D3DFMT_A8R8G8B8, SampleCount);
     }
+
+#if defined(USE_DX11)
+    //Anomaly stuff
+    {
+        //Base resolution
+        u32 w = Device.dwWidth, h = Device.dwHeight;
+
+        //Blenders
+        CBlender_Blur b_blur;
+        CBlender_dof b_dof;
+        CBlender_gasmask_drops b_gasmask_drops;
+        CBlender_gasmask_dudv b_gasmask_dudv;
+        CBlender_nightvision b_nightvision;
+
+        //Rendertargets
+        rt_dof.create(r2_RT_dof, w, h, D3DFMT_A8R8G8B8);
+
+        rt_blur_h_2.create(r2_RT_blur_h_2, u32(w / 2), u32(h / 2), D3DFMT_A8R8G8B8);
+        rt_blur_2.create(r2_RT_blur_2, u32(w / 2), u32(h / 2), D3DFMT_A8R8G8B8);
+
+        rt_blur_h_4.create(r2_RT_blur_h_4, u32(w / 4), u32(h / 4), D3DFMT_A8R8G8B8);
+        rt_blur_4.create(r2_RT_blur_4, u32(w / 4), u32(h / 4), D3DFMT_A8R8G8B8);
+
+        rt_blur_h_8.create(r2_RT_blur_h_8, u32(w / 8), u32(h / 8), D3DFMT_A8R8G8B8);
+        rt_blur_8.create(r2_RT_blur_8, u32(w / 8), u32(h / 8), D3DFMT_A8R8G8B8);
+
+        //Shader
+        s_blur.create(&b_blur, "r2\\blur");
+        s_dof.create(&b_dof, "r2\\dof");
+        s_gasmask_drops.create(&b_gasmask_drops, "r2\\gasmask_drops");
+        s_gasmask_dudv.create(&b_gasmask_dudv, "r2\\gasmask_dudv");
+        s_nightvision.create(&b_nightvision, "r2\\nightvision");
+    }
+#endif
 
     // OCCLUSION
     {

@@ -53,6 +53,10 @@ extern float ps_current_detail_height;
 class ECORE_API CDetailManager
 {
 public:
+    float fade_distance = 99999;
+    Fvector light_position;
+    void details_clear();
+
     struct SlotItem
     { // один кустик
         float scale;
@@ -61,6 +65,8 @@ public:
         u32 vis_ID; // индекс в visibility списке он же тип [не качается, качается1, качается2]
         float c_hemi;
         float c_sun;
+        float distance;
+        Fvector position;
 #if RENDER == R_R1
         Fvector c_rgb;
 #endif

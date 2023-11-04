@@ -336,22 +336,22 @@ void TextLoadingScreen::Initialize()
 
 }
 
+bool TextLoadingScreen::IsShown() const
+{
+    return false;
+}
+
 void TextLoadingScreen::Show(bool status)
 {
 
 }
 
-void TextLoadingScreen::Draw()
-{
-
-}
-
-bool TextLoadingScreen::IsShown()
-{
-    return false;
-}
-
 void TextLoadingScreen::Update(int stagesCompleted, int stagesTotal)
+{
+
+}
+
+void TextLoadingScreen::Draw()
 {
 
 }

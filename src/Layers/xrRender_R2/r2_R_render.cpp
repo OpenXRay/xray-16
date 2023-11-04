@@ -383,6 +383,9 @@ void CRender::Render()
         Target->phase_combine();
     }
 
+    if (Details)
+        Details->details_clear();
+
     VERIFY(dsgraph.mapDistort.empty());
 }
 
