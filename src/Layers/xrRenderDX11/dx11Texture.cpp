@@ -330,6 +330,13 @@ _DDS:
     R_ASSERT(S);
 
     R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_NONE, &IMG, texture), fn);
+    const bool compressed = DirectX::IsCompressed(IMG.format);
+
+    if (compressed)
+    {
+        IMG.width = (IMG.width + 3u) & ~0x3u;
+        IMG.height = (IMG.height + 3u) & ~0x3u;
+    }
 
     if (IMG.IsCubemap())
         goto _DDS_CUBE;
@@ -358,7 +365,7 @@ _DDS_2D:
     if (img_loaded_lod)
     {
         const auto old_mipmap_cnt = IMG.mipLevels;
-        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod, DirectX::IsCompressed(IMG.format));
+        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod, compressed);
         mip_lod = old_mipmap_cnt - IMG.mipLevels;
     }
 
@@ -366,7 +373,6 @@ _DDS_2D:
         D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
         &pTexture2D), fn
     );
-
 
     FS.r_close(S);
     mip_cnt = IMG.mipLevels;
