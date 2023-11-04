@@ -8,9 +8,38 @@
 u32 ps_Preset = 2;
 u32 ps_ShaderPreset = 0;
 u32 ps_ColorGradingPreset = 0;
-const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
-const xr_token qshader_preset_token[] = {{"Vanilla", 0}, {"New Shader Support (Default)", 1}, {"New Shader Support (High)", 2}, {nullptr, 0}};
-const xr_token qcolorgrading_preset_token[] = {{"Default", 0}, {"Cold", 1}, {"Filmic 1", 2}, {"Filmic 2", 3}, {"Filmic 3", 4} , {"Hollywood", 5}, {"Vanilla", 6}, {"Vibrant", 7} , {"Warm", 8}, {nullptr, 0}};
+
+const xr_token qpreset_token[] =
+{
+    { "Minimum", 0 },
+    { "Low", 1 },
+    { "Default", 2 },
+    { "High", 3 },
+    { "Extreme", 4 },
+    { nullptr, 0 }
+};
+
+const xr_token qshader_preset_token[] =
+{
+    { "ui_mm_shader_preset_vanilla", 0 },
+    { "ui_mm_shader_preset_enhanced_default", 1 },
+    { "ui_mm_shader_preset_enhanced_high", 2 },
+    { nullptr, 0 }
+};
+
+const xr_token qcolorgrading_preset_token[] =
+{
+    { "ui_mm_color_grading_default", 0 },
+    { "ui_mm_color_grading_cold", 1 },
+    { "ui_mm_color_grading_filmic_01", 2 },
+    { "ui_mm_color_grading_filmic_02", 3 },
+    { "ui_mm_color_grading_filmic_03", 4 },
+    { "ui_mm_color_grading_hollywood", 5 },
+    { "ui_mm_color_grading_vanilla", 6 },
+    { "ui_mm_color_grading_vibrant", 7 },
+    { "ui_mm_color_grading_warm", 8 },
+    { nullptr, 0 }
+};
 
 u32 ps_r2_smapsize = 2048;
 const xr_token qsmapsize_token[] =
