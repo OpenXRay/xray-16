@@ -332,6 +332,8 @@ _DDS:
     R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_NONE, &IMG, texture), fn);
     const bool compressed = DirectX::IsCompressed(IMG.format);
 
+    // DirectX requires compressed texture size to be
+    // a multiple of 4. Make sure to meet this requirement.
     if (compressed)
     {
         IMG.width = (IMG.width + 3u) & ~0x3u;
