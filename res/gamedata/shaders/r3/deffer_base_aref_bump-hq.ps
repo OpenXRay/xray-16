@@ -5,6 +5,8 @@
 #include "common.h"
 #include "sload.h"
 
+Texture2D s_rain_tex;
+
 // SSS Settings
 #include "settings_screenspace_FLORA.h"
 
@@ -55,19 +57,23 @@ f_deffer 	main	( p_bumped I )
 		discard;
 #endif	//	!defined(MSAA_ALPHATEST_DX10_1)
 
+	// FLORA FIXES & IMPROVEMENTS - SSS Update 18
+	// https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders/
+	S.normal.xy += float2(.02f, .02f);
+	S.normal.xy *= max(5.0f * rain_params.y, 3.0f);
+	
 	// FLORA FIXES & IMPROVEMENTS - SSS Update 14
 	// https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders/
-
 	// Normal from texture and force Y vector to generate a nice fake SSS and specular
 	// Sun works extremly well with this fake normal, but point lights and others need a fix later on 'accum_base.ps' and 'accum_omni_unshadowed.ps'
-	float3 Ne	= mul(m_V, float3(S.normal.x, 1, S.normal.y));
-	Ne = normalize(Ne);
+	float3 Ne	= mul(m_WV, (float3(S.normal.x, 1.0f, S.normal.y)));
+	Ne	= normalize	(Ne);
 
 	// Material value ( MAT_FLORA )
 	float 	ms	= 0.15f;
 
-	// Fake gloss
-	S.gloss = G_TREES_SPECULAR * saturate(S.base.g - (S.base.r + S.base.b) * 0.54f);
+	// Gloss
+	S.gloss = lerp(ssfx_florafixes_1.z, ssfx_florafixes_1.w, rain_params.y);
 	// -----------------------------------------------------------------------
 
 #ifdef USE_LM_HEMI

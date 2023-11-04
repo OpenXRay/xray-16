@@ -93,14 +93,16 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 	float4   L = s_accumulator.Load( int3( I.tc0 * screen_res.xy, 0 ), ISAMPLE );
 #endif
 
+#ifndef SSFX_NEWGLOSS
 	if (abs(P.w - MAT_FLORA) <= 0.05) {
 		// Reapply distance factor to fix overtly glossy plants in distance
 		// Unfortunately some trees etc don't seem to use the same detail shader
 		float	fAtten = 1 - smoothstep(0, 50, P.z);
 		D.a	*= (fAtten * fAtten);
-  }
+	}
+#endif
 
-     // static sun
+	// static sun
 	float mtl = P.w;
 
 #ifdef USE_R2_STATIC_SUN

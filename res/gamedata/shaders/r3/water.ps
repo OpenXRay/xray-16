@@ -1,7 +1,7 @@
 /**
- * @ Version: SCREEN SPACE SHADERS - UPDATE 14
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 18
  * @ Description: Water implementation
- * @ Modified time: 2023-01-18 17:54
+ * @ Modified time: 2023-09-30 10:46
  * @ Author: https://www.moddb.com/members/ascii1457
  * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
  */
@@ -39,6 +39,7 @@ Texture2D	s_bluenoise;
 Texture2D	s_rainsplash;
 Texture2D	s_watercaustics;
 
+uniform float4 ssfx_is_underground;
 //float3	water_intensity; // Unused?
 
 float4 main( vf I ) : SV_Target
@@ -49,7 +50,7 @@ float4 main( vf I ) : SV_Target
 	// Normal Textures
 	float3	n0	= s_nmap.Sample(smp_base, I.tnorm0.xy);
 	float3	n1	= s_nmap.Sample(smp_base, I.tnorm0.zw);
-	float3	basenormal	= (((n0 * 2 - 1) + (n1 * 2 - 1)) / 2.0f);
+	float3	basenormal = ((n0 + n1) * 0.5f) * 2.0f - 1.0f;
 	basenormal += float3(0.1f, 0.1f, 0.1f); // Offset the normal to "center" the textures again
 	
 	// Load Data
@@ -57,14 +58,19 @@ float4 main( vf I ) : SV_Target
 	gbuffer_data gbd = gbuffer_load_data( PosTc, I.hpos.xy );
 	float4 _P = float4( gbd.P, 1.0f );
 
+	// Water Surface to world space
+	float3 w_s = mul(m_inv_V, Pv );
+
 	// Trick to check if rain can fall on the water, gloss include the rain_apply_gloss
 	float rain_cover = step(0.035f * (-0.4f + rain_params.x), gbd.gloss - 0.04f );
 	
 	// Rain intensity. Fadeout and rain cover
-	float RainInt = clamp( rain_cover * rain_params.x, 0, G_SSR_WATER_RAIN ) * (1 - smoothstep(20, 30, _P.z));
+	half is_raining = rain_params.x > 0 ? 1.0f : 0.0f;
+	float RainInt = clamp(rain_params.x * 1.6f, 0.65f * is_raining, 1.0f);
 	
 	// Ripples normal
-	basenormal += lerp(float3(0, 0, 1), SSFX_ripples( s_rainsplash, I.tbase ) * 2.0f - 1.0f, RainInt);
+	float2 Ripples = ssfx_rain_ripples( s_rainsplash, (w_s.xz + eye_position.xz) * 0.13f, float3(RainInt, G_SSR_WATER_RAIN, 15.0f), _P.z);
+	basenormal += float3(Ripples, 0) * is_raining;
 	
 	// Water wave intensity
 	float3 Navg = normalize(float3(basenormal.x * G_SSR_WATER_WAVES, basenormal.y * G_SSR_WATER_WAVES, basenormal.z));
@@ -132,12 +138,12 @@ float4 main( vf I ) : SV_Target
 		float refl_power = saturate(ray_fade * edgeFade * fog);
 		
 		// Fallback to Skybox
-		reflection = lerp(refl_skybox, refl_ray * G_SSR_WATER_MAP_REFLECTION, refl_power);
+		reflection = lerp(refl_skybox * !ssfx_is_underground.x, refl_ray * G_SSR_WATER_MAP_REFLECTION, refl_power);
 	}
 	else
 	{
 		// No reflection data, we use only refl_skybox
-		reflection = refl_skybox;
+		reflection = refl_skybox * !ssfx_is_underground.x;
 	}
 
 #else
@@ -164,9 +170,6 @@ float4 main( vf I ) : SV_Target
 
 	// Bottom of the water to world space ( Project the caustics and water fog )
 	float3 w_b = mul(m_inv_V, float4(_P2 , 1));
-
-	// Water Surface to world space
-	float3 w_s = mul(m_inv_V, Pv );
 
 	// Caustics offset anim
 	float4 CausticsT = float4( timers.x * 0.1f, 0.0f, -timers.x * 0.07f, 0.2f );

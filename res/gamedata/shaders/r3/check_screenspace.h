@@ -7,3 +7,4 @@
 #include "check_screenspace_IL.h"
 #include "check_screenspace_FLORA.h"
 #include "check_screenspace_INTER_GRASS.h"
+#include "check_screenspace_NEWGLOSS.h"

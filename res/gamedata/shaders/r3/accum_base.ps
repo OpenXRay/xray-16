@@ -39,7 +39,10 @@ float4 main(p_volume I, float4 pos2d : SV_Position ) : SV_Target
 	// Fix Flora ilumination ( Align normal to light )
 #ifdef SSFX_FLORAFIX
 	if(abs(m - MAT_FLORA) <= 0.05)
+	{
 		_N.rgb = -normalize(_P - Ldynamic_pos.xyz);
+		_C.w *= 0.3f;
+	}
 #endif
 
 	// ----- light-model

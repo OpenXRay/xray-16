@@ -1,48 +1,62 @@
 /**
- * @ Version: SCREEN SPACE SHADERS - UPDATE 12
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 18
  * @ Description: Ripples code
- * @ Modified time: 2022-10-29 05:05
+ * @ Modified time: 2023-09-21 01:31
  * @ Author: https://www.moddb.com/members/ascii1457
  * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
- */
+ *
+ * Based on the work of Sébastien Lagarde for the game "Remember Me"
+ * https://seblagarde.wordpress.com/2013/01/03/water-drop-2b-dynamic-rain-and-its-effects/
+ *
+ * Setup : [ x: speed | y: intensity | z: ripple frequency ]
+ * Sample : [ x: Fade | y: Normal-Y | z: Normal-X | w: Time Offset ]
+*/
 
-static const float4 SSFX_ripples_timemul = float4(1.0f, 0.85f, 0.93f, 1.13f); 
-static const float4 SSFX_ripples_timeadd = float4(0.0f, 0.2f, 0.45f, 0.7f);
+static const float3 SSFX_ripples_speed = float3( 1.05f, 1.31f, 1.58f ); 
+static const float4 SSFX_ripples_offset = float4( 0.5f, 0.25f, 0.31f, 0.5f );
 
-// https://seblagarde.wordpress.com/2013/01/03/water-drop-2b-dynamic-rain-and-its-effects/
-float3 SSFX_computeripple(float4 Ripple, float CurrentTime, float Weight)
+static const float SSFX_ripples_PI = 3.141592f;
+
+float2 ssfx_process_ripples(float4 ripples, float3 setup)
 {
-	Ripple.yz = Ripple.yz * 2 - 1; // Decompress perturbation
+	// Get bump from texture and transform to -1.0 ~ 1.0
+	float2 ripples_N = ripples.yz * 2.0 - 1.0;
 
-	float DropFrac = frac(Ripple.w + CurrentTime); // Apply time shift
-	float TimeFrac = DropFrac - 1.0f + Ripple.x;
-	float DropFactor = saturate(0.2f + Weight * 0.8f - DropFrac);
-	float FinalFactor = DropFactor * Ripple.x * 
-						sin( clamp(TimeFrac * 9.0f, 0.0f, 3.0f) * 3.14159265359f);
+	// Apply time
+	float RFrac = frac(ripples.w + timers.x * setup.x); // Apply time shift
+	float TimeFrac = RFrac - 1.0f + ripples.x; // Fade
+	float RFreq = clamp(TimeFrac * setup.z, 0.0f, 4.0); // Frequency and limit ( 2 = 1 full ripple )
+	float FinalFactor = saturate(0.7f - RFrac) * ripples.x * sin( RFreq * SSFX_ripples_PI); // Create ripples
 
-	return float3(Ripple.yz * FinalFactor * 0.65f, 1.0f);
+	// Fade
+	FinalFactor *= smoothstep(4.0f, 0, RFreq);
+
+	// Apply intensity
+	ripples_N *= FinalFactor * setup.y;
+
+	return ripples_N;
 }
 
-float3 SSFX_ripples( Texture2D ripple_tex, float2 tc ) 
+float2 ssfx_rain_ripples( Texture2D ripples_tex, float2 uvs, float3 setup, float depth)
 {
-	float4 Times = (timers.x * SSFX_ripples_timemul + SSFX_ripples_timeadd) * 1.5f;
-	Times = frac(Times);
-
-	float4 Weights = float4( 0, 1.0, 0.65, 0.25);
-
-	// Compute ripples
-	float3 Ripple1 = SSFX_computeripple(ripple_tex.Sample( smp_base, tc + float2( 0.25f,0.0f)), Times.x, Weights.x);
-	float3 Ripple2 = SSFX_computeripple(ripple_tex.Sample( smp_base, tc + float2(-0.55f,0.3f)), Times.y, Weights.y);
-	float3 Ripple3 = SSFX_computeripple(ripple_tex.Sample( smp_base, tc + float2(0.6f, 0.85f)), Times.z, Weights.z);
-	float3 Ripple4 = SSFX_computeripple(ripple_tex.Sample( smp_base, tc + float2(0.5f,-0.75f)), Times.w, Weights.w);
+	// Falloff
+	float Dist = 15.0f - depth;
 	
-	Weights = saturate(Weights * 4);
-	float4 Z = lerp(1, float4(Ripple1.z, Ripple2.z, Ripple3.z, Ripple4.z), Weights);
-	float3 Normal = float3( Weights.x * Ripple1.xy +
-							Weights.y * Ripple2.xy + 
-							Weights.z * Ripple3.xy +
-							Weights.w * Ripple4.xy, 
-							Z.x * Z.y * Z.z * Z.w);
-	
-	return normalize(Normal) * 0.5 + 0.5;
+	// Discard when depth > 15
+	if (Dist < 0)
+		return 0;
+
+	// Sample layers
+	float4 Layer0 = ripples_tex.Sample( smp_linear, uvs );
+	float4 Layer1 = ripples_tex.Sample( smp_linear, uvs * 0.61f + SSFX_ripples_offset.xy);
+	float4 Layer2 = ripples_tex.Sample( smp_linear, uvs * 0.87f + SSFX_ripples_offset.zw);
+
+	// Process 3 layers of ripples
+	float2 result =	ssfx_process_ripples(Layer0, float3(SSFX_ripples_speed.x * setup.x, setup.yz)) +
+					ssfx_process_ripples(Layer1, float3(SSFX_ripples_speed.y * setup.x, setup.yz)) +
+					ssfx_process_ripples(Layer2, float3(SSFX_ripples_speed.z * setup.x, setup.yz));
+
+	result *= Dist * 0.0666f; // 0.0 ~ 15.0 To 0.0 ~ 1.0
+
+	return clamp(result, -1.0f, 1.0f);
 }

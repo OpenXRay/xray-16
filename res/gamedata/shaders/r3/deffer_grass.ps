@@ -58,10 +58,15 @@ f_deffer 	main	( p_bumped I )
 	if( mask == 0x0 )
 		discard;
 #endif	//	!defined(MSAA_ALPHATEST_DX10_1)
+	
+	// FLORA FIXES & IMPROVEMENTS - SSS Update 18
+	// https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders/
+	S.normal.xy += float2(0.1f, 0.1f);
+	S.normal.xy *= max(5.0f * rain_params.y, 3.0f);
 
 	// FLORA FIXES & IMPROVEMENTS - SSS Update 14.3
 	// https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders/
-  	float3	Ne  = mul		(float3x3(I.M1, I.M2, I.M3), S.normal);
+	float3 	Ne	= mul(m_WV, (float3(S.normal.x, 1, S.normal.y)));
 			Ne	= normalize	(Ne);
 
 	float 	ms	= xmaterial;
@@ -72,7 +77,7 @@ f_deffer 	main	( p_bumped I )
 	ms	= 0.15f;
 
 	// Fake gloss
-	S.gloss = G_GRASS_SPECULAR * saturate(S.base.g - (S.base.r + S.base.b) * 0.54f);
+	S.gloss = lerp(ssfx_florafixes_1.x, ssfx_florafixes_1.y, rain_params.y);
 #endif
 	// -----------------------------------------------------------------------
 

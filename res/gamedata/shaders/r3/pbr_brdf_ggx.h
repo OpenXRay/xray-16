@@ -48,7 +48,7 @@ float3 Lit_GGX(float NdotL, float NdotH, float NdotV, float VdotH, float3 F0, fl
     float3 numerator = (D * V) * F;
     
     //Denominator
-    float denominator = 4.0 * NdotV;
+    //float denominator = 4.0 * NdotV;
     
     return numerator; //UE4 has no denom
     //return numerator / denominator;
@@ -112,13 +112,13 @@ float3 EnvGGX(float3 f0, float rough, float nDotV )
 	//UE4 GGX
 	float3 f90Atten = saturate(50*f0); //UE4 specular shadowing
     float2 AB = EnvBRDFApprox(rough, nDotV);
-	/*
+	
 	//Matt Pettineo GGX
-    float2 AB = GGXEnvironmentBRDFScaleBias(rough, nDotV);  
+    //float2 AB = GGXEnvironmentBRDFScaleBias(rough, nDotV);  
 	
 	//LVutner GGX
-    float2 AB = integrate_brdf(rough, nDotV);  
-	*/
+    //float2 AB = integrate_brdf(rough, nDotV);  
+	
 	
 	return (f0 * AB.x + AB.y * f90Atten);
 }

@@ -1,3 +1,4 @@
+#include "check_screenspace.h"
 #include "settings_screenspace_PUDDLES.h"
 #include "settings_screenspace_SSR.h"
 
@@ -111,26 +112,27 @@ f_deffer 	main	( p_flat I 		)
 	// Base ripples Normal
 	float3 WN0 = s_puddles_normal.Sample(smp_base, I.tcdh * ripples_scale + float2(0, ripples_anim));
 	float3 WN1 = s_puddles_normal.Sample(smp_base, I.tcdh * ripples_scale - float2(0.33f, ripples_anim));
-	float3 ripplesNormal = ((WN0 * 2 - 1) + (WN1 * 2 - 1)) / 2.0f;
+	float3 ripplesNormal = ((WN0 + WN1) * 0.5f) * 2.0f - 1.0f;
 
 	// Rain Ripples
-	float3 rainRipples = SSFX_ripples( s_rainsplash, I.tcdh * ripples_scale * 2.8f / G_PUDDLES_RAIN_RIPPLES_SCALE ) * 2 - 1;
+	float2 ripplesUV = I.tcdh * ripples_scale * 1.3f / G_PUDDLES_RAIN_RIPPLES_SCALE;
+	float2 rainRipples = ssfx_rain_ripples( s_rainsplash, ripplesUV, float3(0.85f, 1.0f, 10.0f), I.position.z);
 
 	// Rain ripples intensity... ( Rain intensity * Depth fadeout * Intensity )
-	rainRipples *= clamp(1.5f - I.position.z * 0.15f, 0.3f, 1.0f) * rain_params.x * 3.0f * G_PUDDLES_RAIN_RIPPLES_INTENSITY;
+	rainRipples *= rain_params.x * 3.0f * G_PUDDLES_RAIN_RIPPLES_INTENSITY;
 
 	// Base ripples Intensity
-	ripplesNormal *= (0.05f + rain_int * G_PUDDLES_RIPPLES_RAINING_INT) * G_PUDDLES_RIPPLES_INTENSITY;
+	ripplesNormal *= saturate(0.05f + rain_int * G_PUDDLES_RIPPLES_RAINING_INT * G_PUDDLES_RIPPLES_INTENSITY);
 	
 	// Mix ripples
-	ripplesNormal = ( ripplesNormal * 0.666f ) + ( rainRipples * 0.333f );
+	ripplesNormal = ripplesNormal * 0.666f + float3(rainRipples * 0.333f, 0);
 
 #else
 	float3 ripplesNormal = 0;
 #endif
 
 	// Normal Up and ripples for puddles
-	float3 MirrorUp	= mul(m_V,  float3(ripplesNormal.x, 1.0f, ripplesNormal.y));
+	float3 MirrorUp	= mul(m_V,  float3(ripplesNormal.x, 1.0, ripplesNormal.y));
 	N = lerp(N, MirrorUp, puddles);
 
 	// Refraction Normal
@@ -155,7 +157,9 @@ f_deffer 	main	( p_flat I 		)
 	puddles = clamp(puddles, 0, G_PUDDLES_REFLECTIVITY);
 
 	// Add at the end the extra wetness. Full intensity at 50% of wetness ( rain_params.y )
+#ifndef SSFX_NEWGLOSS
 	puddles = puddles + saturate(rain_params.y * 2.0f) * G_PUDDLES_TERRAIN_EXTRA_WETNESS;
+#endif
 
 	// Add gloss and puddles to the final gloss result
 	G = max(g_R + g_G + g_B + g_A, puddles);
