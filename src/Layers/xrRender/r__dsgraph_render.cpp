@@ -21,20 +21,21 @@ bool cmp_ssa(const T &lhs, const T &rhs)
     return lhs.ssa > rhs.ssa;
 }
 
+// Sorting by SSA and changes minimizations
+template <typename T>
+bool cmp_pass(const T& left, const T& right)
+{
+    if (left->first->equal(*right->first))
+        return false;
+    return left->second.ssa >= right->second.ssa;
+}
+
 void R_dsgraph_structure::render_graph(u32 _priority)
 {
     PIX_EVENT_CTX(cmd_list, dsgraph_render_graph);
     RImplementation.BasicStats.Primitives.Begin(); // XXX: Refactor a bit later
 
     cmd_list.set_xform_world(Fidentity);
-
-    // Sorting by SSA and changes minimizations
-    auto cmp_pass = [](const auto& left, const auto& right)
-    {
-        if (left->first->equal(*right->first))
-            return false;
-        return left->second.ssa >= right->second.ssa;
-    };
 
     // **************************************************** NORMAL
     // Perform sorting based on ScreenSpaceArea
@@ -48,7 +49,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
             auto& map = mapNormalPasses[_priority][iPass];
 
             map.get_any_p(nrmPasses);
-            std::sort(nrmPasses.begin(), nrmPasses.end(), cmp_pass);
+            std::sort(nrmPasses.begin(), nrmPasses.end(), cmp_pass<mapNormal_T::value_type*>);
             for (const auto& it : nrmPasses)
             {
                 cmd_list.set_Pass(it->first);
@@ -89,7 +90,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
             auto& map = mapMatrixPasses[_priority][iPass];
 
             map.get_any_p(matPasses);
-            std::sort(matPasses.begin(), matPasses.end(), cmp_pass);
+            std::sort(matPasses.begin(), matPasses.end(), cmp_pass<mapMatrix_T::value_type*>);
             for (const auto& it : matPasses)
             {
                 cmd_list.set_Pass(it->first);
