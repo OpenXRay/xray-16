@@ -392,7 +392,7 @@ extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
 extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API float ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
 extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
 extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
 extern ENGINE_API float ps_ssfx_gloss_factor;

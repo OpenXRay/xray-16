@@ -248,7 +248,7 @@ extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API float ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
 extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
 extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
 extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
