@@ -106,39 +106,51 @@ bool CFrustum::testSphere_dirty(const Fvector& c, float r) const
     case 12:
         if (planes[11].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 11:
         if (planes[10].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 10:
         if (planes[9].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 9:
         if (planes[8].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 8:
         if (planes[7].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 7:
         if (planes[6].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 6:
         if (planes[5].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 5:
         if (planes[4].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 4:
         if (planes[3].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 3:
         if (planes[2].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 2:
         if (planes[1].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 1:
         if (planes[0].classify(c) > r)
             return FALSE;
+        [[fallthrough]];
     case 0: break;
     default: NODEFAULT;
     }

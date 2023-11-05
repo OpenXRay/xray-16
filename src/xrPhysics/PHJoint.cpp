@@ -563,6 +563,8 @@ CPHJoint::CPHJoint(CPhysicsJoint::enumType type, CPhysicsElement* first, CPhysic
         axes.push_back(axis);
         axes.push_back(axis2);
         axes.push_back(axis3);
+        [[fallthrough]];
+
     case slider: axes.push_back(axis); axes.push_back(axis);
     }
 }
@@ -700,6 +702,7 @@ void CPHJoint::SetForceActive(const int axis_num)
         case -1:
             dJointSetHinge2Param(m_joint, dParamFMax, axes[0].force);
             dJointSetHinge2Param(m_joint, dParamFMax2, axes[1].force);
+            break;
         case 0: dJointSetHinge2Param(m_joint, dParamFMax, axes[0].force); break;
         case 1: dJointSetHinge2Param(m_joint, dParamFMax2, axes[1].force); break;
         }
@@ -710,6 +713,7 @@ void CPHJoint::SetForceActive(const int axis_num)
         case -1:
             dJointSetSliderParam(m_joint, dParamFMax, axes[0].force);
             dJointSetAMotorParam(m_joint1, dParamFMax, axes[1].force);
+            break;
         case 0: dJointSetSliderParam(m_joint, dParamFMax, axes[0].force); break;
         case 1: dJointSetAMotorParam(m_joint1, dParamFMax, axes[1].force); break;
         }
@@ -724,6 +728,7 @@ void CPHJoint::SetForceActive(const int axis_num)
             dJointSetAMotorParam(m_joint1, dParamFMax, axes[0].force);
             dJointSetAMotorParam(m_joint1, dParamFMax2, axes[1].force);
             dJointSetAMotorParam(m_joint1, dParamFMax3, axes[2].force);
+            break;
         case 0: dJointSetAMotorParam(m_joint1, dParamFMax, axes[0].force); break;
         case 1: dJointSetAMotorParam(m_joint1, dParamFMax2, axes[1].force); break;
         case 2: dJointSetAMotorParam(m_joint1, dParamFMax3, axes[2].force); break;
@@ -776,6 +781,7 @@ void CPHJoint::SetVelocityActive(const int axis_num)
         case -1:
             dJointSetHinge2Param(m_joint, dParamVel, axes[0].velocity);
             dJointSetHinge2Param(m_joint, dParamVel2, axes[1].velocity);
+            break;
         case 0: dJointSetHinge2Param(m_joint, dParamVel, axes[0].velocity); break;
         case 1: dJointSetHinge2Param(m_joint, dParamVel2, axes[1].velocity); break;
         }
@@ -786,6 +792,7 @@ void CPHJoint::SetVelocityActive(const int axis_num)
         case -1:
             dJointSetSliderParam(m_joint, dParamVel, axes[0].velocity);
             dJointSetAMotorParam(m_joint1, dParamVel, axes[1].velocity);
+            break;
         case 0: dJointSetSliderParam(m_joint, dParamVel, axes[0].velocity); break;
         case 1: dJointSetAMotorParam(m_joint1, dParamVel, axes[1].velocity); break;
         }
@@ -800,6 +807,7 @@ void CPHJoint::SetVelocityActive(const int axis_num)
             dJointSetAMotorParam(m_joint1, dParamVel, axes[0].velocity);
             dJointSetAMotorParam(m_joint1, dParamVel2, axes[1].velocity);
             dJointSetAMotorParam(m_joint1, dParamVel3, axes[2].velocity);
+            break;
         case 0: dJointSetAMotorParam(m_joint1, dParamVel, axes[0].velocity); break;
         case 1: dJointSetAMotorParam(m_joint1, dParamVel2, axes[1].velocity); break;
         case 2: dJointSetAMotorParam(m_joint1, dParamVel3, axes[2].velocity); break;
@@ -1255,6 +1263,8 @@ void CPHJoint::SetAxisSDfactorsActive(int axis_num)
         case 0:
             dJointSetSliderParam(m_joint, dParamStopERP, axes[0].erp);
             dJointSetSliderParam(m_joint, dParamStopCFM, axes[0].cfm);
+            [[fallthrough]];
+
         case 1:
             dJointSetAMotorParam(m_joint1, dParamStopERP, axes[1].erp);
             dJointSetAMotorParam(m_joint1, dParamStopCFM, axes[1].cfm);
