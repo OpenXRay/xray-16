@@ -306,17 +306,12 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     ELog.Msg(mtError, "Can't find texture '%s'", fname);
     return 0;
 #else
-
     Msg("! Can't find texture '%s'", fname);
     dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
     if (!ShadowOfChernobylMode)
         R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
     if (!dummyTextureExist)
         return nullptr;
-    goto _DDS;
-
-//  xrDebug::Fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
-
 #endif
 
 _DDS:
@@ -330,35 +325,26 @@ _DDS:
     R_ASSERT(S);
 
     R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_NONE, &IMG, texture), fn);
+    const bool compressed = DirectX::IsCompressed(IMG.format);
 
-    if (IMG.IsCubemap())
-        goto _DDS_CUBE;
-    else
-        goto _DDS_2D;
+    // DirectX requires compressed texture size to be
+    // a multiple of 4. Make sure to meet this requirement.
+    if (compressed)
+    {
+        IMG.width = (IMG.width + 3u) & ~0x3u;
+        IMG.height = (IMG.height + 3u) & ~0x3u;
+    }
 
-_DDS_CUBE:
-{
-    R_CHK2(CreateTextureEx(HW.pDevice, texture.GetImages(), texture.GetImageCount(), IMG, D3D_USAGE_IMMUTABLE,
-        D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT, &pTexture2D), fn);
-    FS.r_close(S);
-
-    // OK
-    mip_cnt = IMG.mipLevels;
-    ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
-    return pTexture2D;
-}
-_DDS_2D:
-{
     // Check for LMAP and compress if needed
     xr_strlwr(fn);
 
     img_loaded_lod = get_texture_load_lod(fn);
 
     size_t mip_lod = 0;
-    if (img_loaded_lod)
+    if (img_loaded_lod && !IMG.IsCubemap())
     {
         const auto old_mipmap_cnt = IMG.mipLevels;
-        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod, DirectX::IsCompressed(IMG.format));
+        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod, compressed);
         mip_lod = old_mipmap_cnt - IMG.mipLevels;
     }
 
@@ -366,14 +352,12 @@ _DDS_2D:
         D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
         &pTexture2D), fn
     );
-
-
     FS.r_close(S);
-    mip_cnt = IMG.mipLevels;
+
     // OK
+    mip_cnt = IMG.mipLevels;
     ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
     return pTexture2D;
-}
 }
 
 _BUMP_from_base:
@@ -399,5 +383,5 @@ _BUMP_from_base:
     //////////////////
 }
 
-    return 0;
+    return nullptr;
 }

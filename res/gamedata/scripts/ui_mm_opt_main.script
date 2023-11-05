@@ -145,6 +145,7 @@ function options_dialog:UpdateDependControls()
 
 	self.texture_lod_track:SetOptIBounds(min_texture_lod, max_texture_lod)
 	self:OnAOOptionChange()
+	self:OnShaderPresetChanged()
 end
 
 function options_dialog:OnDynWetSurfNearUpdate()
@@ -179,6 +180,8 @@ function options_dialog:InitCallBacks()
 	self:AddCallback("btn_default_graphic",	ui_events.BUTTON_CLICKED,	self.OnBtnDefGraph,			self)
 	self:AddCallback("btn_default_sound",	ui_events.BUTTON_CLICKED,	self.OnBtnDefSound,			self)
 	self:AddCallback("combo_preset",		ui_events.LIST_ITEM_SELECT,	self.OnPresetChanged,		self)
+	self:AddCallback("combo_shader_preset",	ui_events.LIST_ITEM_SELECT,	self.OnShaderPresetChanged,	self)
+	self:AddCallback("combo_color_grading_preset",	ui_events.LIST_ITEM_SELECT,	self.OnPresetChanged,	self)
 	self:AddCallback("btn_simply_graphic",	ui_events.BUTTON_CLICKED,	self.OnSimplyGraphic,		self)
 	self:AddCallback("btn_keyb_default",	ui_events.BUTTON_CLICKED,	self.OnBtnKeybDefault,		self)
 	self:AddCallback("btn_check_updates",	ui_events.BUTTON_CLICKED,	self.OnBtnCheckUpdates,		self)
@@ -218,6 +221,13 @@ function options_dialog:OnPresetChanged()
 	opt:SetCurrentValues		("mm_opt_video_adv")
 end
 
+function options_dialog:OnShaderPresetChanged()
+	local opt					= COptionsManager()
+	opt:SetCurrentValues		("mm_opt_video_adv")
+
+    local current_preset = self.combo_shader_preset:CurrentID()
+    self.combo_color_grading_preset:Enable(current_preset ~= 0)
+end
 
 function options_dialog:OnBtnDefGraph()
 	local opt = COptionsManager()

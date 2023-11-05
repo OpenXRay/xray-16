@@ -392,7 +392,15 @@ extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
 extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API float ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
+extern ENGINE_API float ps_ssfx_gloss_factor;
+extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
+extern ENGINE_API int ps_ssfx_is_underground;
+extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
 
 class cl_inv_v : public R_constant_setup
 {
@@ -538,7 +546,7 @@ class ssfx_wpn_dof_2 : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
     {
-        cmd_list.set_c(C, ps_ssfx_wpn_dof_2, 0.f, 0.f, 0.f);
+        cmd_list.set_c(C, ps_ssfx_wpn_dof_2.x, ps_ssfx_wpn_dof_2.y, ps_ssfx_wpn_dof_2.z, ps_ssfx_wpn_dof_2.w);
     }
 };
 static ssfx_wpn_dof_2 binder_ssfx_wpn_dof_2;
@@ -569,6 +577,69 @@ class ssfx_hud_drops_2 : public R_constant_setup
     }
 };
 static ssfx_hud_drops_2 binder_ssfx_hud_drops_2;
+
+class ssfx_lightsetup_1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_lightsetup_1);
+	}
+};
+static ssfx_lightsetup_1 binder_ssfx_lightsetup_1;
+
+class ssfx_is_underground : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, (float)ps_ssfx_is_underground, 0.f, 0.f, 0.f);
+	}
+};
+static ssfx_is_underground binder_ssfx_is_underground;
+
+class ssfx_wetsurfaces_1 : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_wetsurfaces_1);
+	}
+};
+static ssfx_wetsurfaces_1 binder_ssfx_wetsurfaces_1;
+
+class ssfx_wetsurfaces_2 : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_wetsurfaces_2);
+	}
+};
+static ssfx_wetsurfaces_2 binder_ssfx_wetsurfaces_2;
+
+class ssfx_gloss : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_gloss_minmax.x, ps_ssfx_gloss_minmax.y, ps_ssfx_gloss_factor, 0.f);
+	}
+};
+static ssfx_gloss binder_ssfx_gloss;
+
+class ssfx_florafixes_1 : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_florafixes_1);
+	}
+};
+static ssfx_florafixes_1 binder_ssfx_florafixes_1;
+
+class ssfx_florafixes_2 : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_florafixes_2);
+	}
+};
+static ssfx_florafixes_2 binder_ssfx_florafixes_2;
 
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
@@ -672,4 +743,11 @@ void CBlender_Compile::SetMapping()
     r_Constant("ssfx_blood_decals", &binder_ssfx_blood_decals);
     r_Constant("ssfx_hud_drops_1", &binder_ssfx_hud_drops_1);
     r_Constant("ssfx_hud_drops_2", &binder_ssfx_hud_drops_2);
+	r_Constant("ssfx_lightsetup_1", &binder_ssfx_lightsetup_1);
+	r_Constant("ssfx_is_underground", &binder_ssfx_is_underground);
+	r_Constant("ssfx_wetsurfaces_1", &binder_ssfx_wetsurfaces_1);
+	r_Constant("ssfx_wetsurfaces_2", &binder_ssfx_wetsurfaces_2);
+	r_Constant("ssfx_gloss", &binder_ssfx_gloss);
+	r_Constant("ssfx_florafixes_1", &binder_ssfx_florafixes_1);
+	r_Constant("ssfx_florafixes_2", &binder_ssfx_florafixes_2);
 }

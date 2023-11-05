@@ -1,0 +1,36 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 17
+ * @ Description: Rain Shader - VS
+ * @ Modified time: 2023-06-26 06:47
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "screenspace_common.h"
+
+// Pixel Struct
+struct p_Rain
+{
+	float2 Tex0	 : TEXCOORD0;
+	float4 tc	 : TEXCOORD1;
+};
+
+float4 ssfx_rain_setup;
+
+float4 main ( p_Rain I ) : SV_Target
+{
+	// Screen Space
+	float2 PosTc = I.tc.xy / I.tc.w;
+
+	// Normal Setup
+	float4 N0 = s_base.Sample( smp_base, I.Tex0 );
+	N0.xy = N0.xy * 2.0f - 1.0f; // Convert to -1.0f ~ 1.0f
+
+	// Adjust "refraction" Intensity
+	N0.xy = normalize(float3(N0.xy * 0.05f * ssfx_rain_setup.y, 1.0f));
+
+	// Screen Buffer
+	float3 Screen = SSFX_get_image(saturate(PosTc + N0.xy), 0);
+
+	return float4( Screen, N0.w * ssfx_rain_setup.x );
+}
