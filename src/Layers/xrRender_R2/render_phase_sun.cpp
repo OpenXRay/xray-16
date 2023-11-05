@@ -178,7 +178,6 @@ void render_sun::calculate()
         Fmatrix cull_xform_inv;
         cull_xform_inv.invert(cull_xform[cascade_ind]);
 
-        //		light_cuboid.light_cuboid_points.reserve		(9);
         for (int p = 0; p < 8; p++)
         {
             Fvector3 xf = wform(cull_xform_inv, sun::corners[p]);

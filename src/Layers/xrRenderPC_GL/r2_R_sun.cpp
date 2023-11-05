@@ -353,19 +353,20 @@ void render_sun_old::render_sun() const
         // Lets begin from base frustum
         DumbConvexVolume<false> hull;
         {
-            hull.points.reserve(8);
+            hull.points.reserve(std::size(sun::corners));
+            hull.polys.reserve(std::size(sun::facetable));
+
             for (auto corner : sun::corners)
             {
                 Fvector3 xf = wform(ex_full_inverse, corner);
-                hull.points.push_back(xf);
+                hull.points.emplace_back(xf);
             }
-            hull.polys.reserve(6);
             for (auto& plane : sun::facetable)
             {
-                hull.polys.emplace_back();
-                hull.polys.back().points.reserve(4);
+                auto& poly = hull.polys.emplace_back();
+                poly.points.reserve(std::size(plane));
                 for (int pt : plane)
-                    hull.polys.back().points.push_back(pt);
+                    poly.points.emplace_back(pt);
             }
         }
         hull.compute_caster_model(cull_planes, sun->direction);
@@ -393,9 +394,9 @@ void render_sun_old::render_sun() const
         // projection: box
         Fbox frustum_bb;
         frustum_bb.invalidate();
-        for (int it = 0; it < 8; it++)
+        for (const auto& point : hull.points)
         {
-            Fvector xf = wform(mdir_View, hull.points[it]);
+            Fvector xf = wform(mdir_View, point);
             frustum_bb.modify(xf);
         }
         Fbox& bb = frustum_bb;
@@ -834,19 +835,21 @@ void render_sun_old::render_sun_near()
 #endif
         t_volume hull;
         {
-            hull.points.reserve(8);
+            hull.points.reserve(std::size(sun::corners));
+            hull.polys.reserve(std::size(sun::facetable));
+
             for (auto corner : sun::corners)
             {
                 Fvector3 xf = wform(ex_full_inverse, corner);
-                hull.points.push_back(xf);
+                hull.points.emplace_back(xf);
             }
             hull.polys.reserve(6);
             for (auto& plane : sun::facetable)
             {
-                hull.polys.emplace_back();
-                hull.polys.back().points.reserve(4);
+                auto& poly = hull.polys.emplace_back();
+                poly.points.reserve(std::size(plane));
                 for (int pt : plane)
-                    hull.polys.back().points.push_back(pt);
+                    poly.points.emplace_back(pt);
             }
         }
         hull.compute_caster_model(cull_planes, sun->direction);
@@ -878,10 +881,9 @@ void render_sun_old::render_sun_near()
         //	Simple
         Fbox frustum_bb;
         frustum_bb.invalidate();
-        for (int it = 0; it < 8; it++)
+        for (const auto& point : hull.points)
         {
-            // for (int it=0; it<9; it++)	{
-            Fvector xf = wform(mdir_View, hull.points[it]);
+            Fvector xf = wform(mdir_View, point);
             frustum_bb.modify(xf);
         }
         Fbox& bb = frustum_bb;
@@ -890,7 +892,7 @@ void render_sun_old::render_sun_near()
                                   bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z);
 
         // build viewport xform
-        float view_dim = float(RImplementation.o.smapsize);
+        const float view_dim = float(RImplementation.o.smapsize);
         glm::mat4 m_viewport =
         {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,
@@ -918,9 +920,9 @@ void render_sun_old::render_sun_near()
         scissor.invalidate();
         glm::mat4 scissor_xf;
         scissor_xf = m_viewport * cull_xform;
-        for (int it = 0; it < 9; it++)
+        for (const auto& point : hull.points)
         {
-            Fvector xf = wform(scissor_xf, hull.points[it]);
+            Fvector xf = wform(scissor_xf, point);
             scissor.modify(xf);
         }
         s32 limit = RImplementation.o.smapsize - 1;
