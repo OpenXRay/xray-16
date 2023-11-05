@@ -1,0 +1,26 @@
+-- @ Version: SCREEN SPACE SHADERS - UPDATE 15
+-- @ Description: Shadow Cascades script - MCM Menu
+-- @ Author: https://www.moddb.com/members/ascii1457
+-- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+
+function on_mcm_load()
+
+	op = { id= "shw_cascades", sh=true, text="ui_mcm_ssfx_module_shw_cascades", gr ={
+
+				{id = "title",type= "slide",link= "ui_options_slider_player",text="ui_mcm_ssfx_module_shw_cascades_title",size= {512,50},spacing= 20 },
+					
+				{id = "size_1_mcm", type = "track", val = 2, min=10.0,max=30,step=1.0, def = 20},
+				{id = "size_2_mcm", type = "track", val = 2, min=40.0,max=110,step=1.0, def = 60},
+				{id = "size_3_mcm", type = "track", val = 2, min=120.0,max=300,step=1.0, def = 160},
+
+				{ id = "line", type = "line" },
+
+				{id = "grass_shw_quality_mcm", type = "list", val = 2, content={ {0.0,"shw_cascades_low"} , {1.0,"shw_cascades_medium"}, {2.0,"shw_cascades_high"}, {3.0,"shw_cascades_ultra"}}, def=0.0},
+				{id = "grass_shw_distance_mcm", type = "track", val = 2, min=0.0,max=100.0,step=1.0, def = 35},
+				{id = "grass_shw_nondir_maxdistance_mcm", type = "track", val = 2, min=10.0,max=50.0,step=1.0, def = 30},
+				
+			}
+		}
+
+	return op, "ssfx_module"
+end

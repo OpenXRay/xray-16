@@ -1,0 +1,86 @@
+#include "common.h"
+#include "lmodel.h"
+
+// Check Screen Space Shaders modules & addons
+#include "check_screenspace.h"
+
+#ifdef USE_MINMAX_SM
+#define SM_MINMAX
+#endif
+
+#if SUN_QUALITY>2
+#define ULTRA_SHADOWS_ON
+#endif //	SUN_QUALITY>2
+
+#ifdef ULTRA_SHADOWS_ON
+#define USE_ULTRA_SHADOWS
+#endif
+
+#include "shadow.h"
+
+uniform float3 view_shadow_proj; // Unused
+
+#ifdef USE_SUNFILTER
+#ifdef MSAA_OPTIMIZATION
+float4 main ( v2p_volume I, uint iSample : SV_SAMPLEINDEX  ) : SV_Target
+#else
+float4 main ( v2p_volume I  ) : SV_Target
+#endif
+{
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc, I.hpos, ISAMPLE) );
+
+	float4 _P = float4( gbd.P, 1.0);
+
+	float4 PS = mul( m_shadow,  _P );
+
+	float s	= shadowtest_sun( PS, I.tcJ ) * sunmask( _P );
+
+	return s;
+}
+#else
+#ifdef MSAA_OPTIMIZATION
+float4 main ( v2p_volume I,  uint iSample : SV_SAMPLEINDEX ) : SV_Target
+#else
+float4 main ( v2p_volume I ) : SV_Target
+#endif
+{
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc.xy/I.tc.w, I.hpos, ISAMPLE) );
+
+	float4 _P = float4( gbd.P, gbd.mtl );
+	float4  _N = float4( gbd.N, gbd.hemi );
+	float4 _C = float4( gbd.C, gbd.gloss );
+	
+	// ----- light-model
+	float	m	= xmaterial;
+#ifndef USE_R2_STATIC_SUN
+			m 	= _P.w;
+#endif
+	float4	light	= plight_infinity ( m, _P, _N, _C, Ldynamic_dir );
+
+	// ----- shadow
+  	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.0);
+	float4 	PS	= mul( m_shadow, P4 );
+	
+	// SHADOWS FIXES - SSS Update 14.7
+	// New far edge fading code
+	float s = shadow( PS ); // Far Shadows
+	float shadows = sunmask( P4 ); // Clouds. Don't fade clouds.
+
+	// Fade UV
+	float2 FadeUV = PS.xy / PS.w;
+
+	// Fade calc
+	float4 fade = smoothstep(0.0f, 0.1f, float4(FadeUV.x, 1.0f - FadeUV.x, FadeUV.y, 1.0f - FadeUV.y));
+	float f = fade.x * fade.y * fade.z * fade.w;
+	s += ( 1.0f - s ) * ( 1.0f - f );
+
+	// Add Shadows
+	shadows *= s;
+
+#ifdef SSFX_ENHANCED_SHADERS
+	return blend( float4( SRGBToLinear( Ldynamic_color.rgb * shadows.xxx ), 1.0f ) * light, I.tc );
+#else
+	return blend( Ldynamic_color * light * shadows, I.tc );
+#endif
+}
+#endif

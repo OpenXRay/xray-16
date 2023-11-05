@@ -22,6 +22,12 @@ public:
     {
         return RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
     }
+
+	LPCSTR _get_level()
+	{
+		const shared_str level_name = g_pGameLevel->name();
+		return level_name.c_str();
+	}
 };
 
 // wrapper
@@ -334,6 +340,7 @@ void CResourceManager::LS_Load()
         [
             class_<adopt_dx10options>("_dx10options")
                .def("dx10_msaa_alphatest_atoc", &adopt_dx10options::_dx10_msaa_alphatest_atoc)
+			   .def("getLevel", &adopt_dx10options::_get_level)
                //.def("",					&adopt_dx10options::_dx10Options		),	// returns options-object
             ,
 

@@ -961,6 +961,7 @@ void CPHJoint::SetLimitsActive(int axis_num)
             dJointSetSliderParam(m_joint, dParamHiStop, axes[0].high);
             dJointSetAMotorParam(m_joint1, dParamLoStop, axes[1].low);
             dJointSetAMotorParam(m_joint1, dParamHiStop, axes[1].high);
+            break;
         case 0:
             dJointSetSliderParam(m_joint, dParamLoStop, axes[0].low);
             dJointSetSliderParam(m_joint, dParamHiStop, axes[0].high);
@@ -982,11 +983,12 @@ void CPHJoint::SetLimitsActive(int axis_num)
         {
         case -1:
             dJointSetAMotorParam(m_joint1, dParamLoStop, axes[0].low);
-            dJointSetAMotorParam(m_joint1, dParamLoStop, axes[0].low);
+            dJointSetAMotorParam(m_joint1, dParamHiStop, axes[0].high);
             dJointSetAMotorParam(m_joint1, dParamLoStop2, axes[1].low);
             dJointSetAMotorParam(m_joint1, dParamHiStop2, axes[1].high);
+            dJointSetAMotorParam(m_joint1, dParamLoStop3, axes[2].low);
             dJointSetAMotorParam(m_joint1, dParamHiStop3, axes[2].high);
-            dJointSetAMotorParam(m_joint1, dParamHiStop3, axes[2].high);
+            break;
         case 0:
             dJointSetAMotorParam(m_joint1, dParamLoStop, axes[0].low);
             dJointSetAMotorParam(m_joint1, dParamHiStop, axes[0].high);

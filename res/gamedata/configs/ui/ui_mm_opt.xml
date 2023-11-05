@@ -96,10 +96,34 @@
             </text_color>
         </list_presets>
 
-        <cap_resolution x="15" y="63" width="135" height="24">
+        <cap_shader_preset x="15" y="63" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_shader_preset</text>
+        </cap_shader_preset>
+        <list_shader_presets x="175" y="65" width="235" height="20" list_length="5"  always_show_scroll="0">
+            <options_item entry="_shader_preset" group="mm_opt_video_preset" depend="restart"/>
+            <list_font r="170" g="170" b="170" font="letterica16"/>
+            <text_color>
+	            <e r="170" g="170" b="170"/>
+	            <d r="70" g="70" b="70"/>
+            </text_color>
+        </list_shader_presets>
+
+        <cap_color_grading_preset x="15" y="93" width="135" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_color_grading_preset</text>
+        </cap_color_grading_preset>
+        <list_color_grading_presets x="175" y="95" width="235" height="20" list_length="5"  always_show_scroll="0">
+            <options_item entry="_colorgrading_preset" group="mm_opt_video_preset" depend="restart"/>
+            <list_font r="170" g="170" b="170" font="letterica16"/>
+            <text_color>
+	            <e r="170" g="170" b="170"/>
+	            <d r="70" g="70" b="70"/>
+            </text_color>
+        </list_color_grading_presets>
+
+        <cap_resolution x="15" y="123" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_resolution</text>
         </cap_resolution>
-        <list_resolution x="175" y="65" width="235" height="20" list_length="7" always_show_scroll="1">
+        <list_resolution x="175" y="125" width="235" height="20" list_length="7" always_show_scroll="1">
             <options_item entry="vid_mode" group="mm_opt_video" depend="vid"/>
             <list_font r="170" g="170" b="170" font="letterica16"/>
             <text_color>
@@ -108,10 +132,10 @@
             </text_color>
         </list_resolution>
 
-        <cap_window_mode x="15" y="93" width="135" height="24">
+        <cap_window_mode x="15" y="153" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_window_mode</text>
         </cap_window_mode>
-        <list_window_mode x="175" y="95" width="235" height="16">
+        <list_window_mode x="175" y="155" width="235" height="16">
             <options_item entry="vid_window_mode" group="mm_opt_video" depend="vid"/>
             <list_font r="170" g="170" b="170" font="letterica16"/>
             <text_color>
@@ -120,27 +144,26 @@
             </text_color>
         </list_window_mode>
 
-        <cap_gamma x="15" y="123" width="135" height="24">
+        <cap_gamma x="15" y="183" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_gamma</text>
         </cap_gamma>
-        <track_gamma x="175" y="127" width="235" height="16">
+        <track_gamma x="175" y="187" width="235" height="16">
             <options_item entry="rs_c_gamma" group="mm_opt_video" depend="runtime"/>
         </track_gamma>
 
-        <cap_contrast x="15" y="153" width="135" height="24">
+        <cap_contrast x="15" y="213" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_contrast</text>
         </cap_contrast>
-        <track_contrast x="175" y="157" width="235" height="16">
+        <track_contrast x="175" y="217" width="235" height="16">
             <options_item entry="rs_c_contrast" group="mm_opt_video" depend="runtime"/>
           </track_contrast>
 
-          <cap_brightness x="15" y="183" width="135" height="24">
+          <cap_brightness x="15" y="243" width="135" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_brightness</text>
           </cap_brightness>
-          <track_brightness x="175" y="187" width="235" height="16">
+          <track_brightness x="175" y="247" width="235" height="16">
             <options_item entry="rs_c_brightness" group="mm_opt_video" depend="runtime"/>
         </track_brightness>
-
 
         <btn_advanced x="338" y="322" width="108" height="24">
             <text align="c" font="letterica16">ui_mm_advanced</text>

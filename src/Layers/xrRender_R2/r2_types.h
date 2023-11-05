@@ -129,10 +129,22 @@ const u32 LUMINANCE_size = 16;
 extern float ps_r2_gloss_factor;
 extern float ps_r2_gloss_min;
 
+extern ENGINE_API int ps_ssfx_gloss_method;
+extern ENGINE_API float ps_ssfx_gloss_factor;
+extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
+
 IC float u_diffuse2s(float x, float y, float z)
 {
-    float v = (x + y + z) / 3.f;
-    return ps_r2_gloss_min + ps_r2_gloss_factor * ((v < 1) ? powf(v, 2.f / 3.f) : v);
+	if (ps_ssfx_gloss_method == 0)
+	{
+		float v = (x + y + z) / 3.f;
+		return ps_r2_gloss_min + ps_r2_gloss_factor * ((v < 1) ? powf(v, 2.f / 3.f) : v);
+	}
+	else
+	{
+		// Remove sun from the equation and clamp value.
+		return ps_ssfx_gloss_minmax.x + clampr(ps_ssfx_gloss_minmax.y - ps_ssfx_gloss_minmax.x, 0.0f, 1.0f) * ps_ssfx_gloss_factor;
+	}
 }
 
 IC float u_diffuse2s(Fvector3& c)

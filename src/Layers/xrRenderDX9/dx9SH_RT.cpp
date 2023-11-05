@@ -3,14 +3,6 @@
 
 #include "Layers/xrRender/ResourceManager.h"
 
-CRT::CRT()
-{
-    pSurface = NULL;
-    pRT = NULL;
-    dwWidth = 0;
-    dwHeight = 0;
-    fmt = D3DFMT_UNKNOWN;
-}
 CRT::~CRT()
 {
     destroy();
