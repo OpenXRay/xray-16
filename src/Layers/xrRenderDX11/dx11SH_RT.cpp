@@ -115,8 +115,13 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         desc.SampleDesc.Count = SampleCount;
         desc.Usage = D3D_USAGE_DEFAULT;
         desc.BindFlags = D3D_BIND_SHADER_RESOURCE | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
+
         if (SampleCount > 1)
         {
+            // For feature level 10.0 and lower we can't have both SRV and DSV for a texture
+            if (HW.FeatureLevel <= D3D_FEATURE_LEVEL_10_0 && useAsDepth)
+                desc.BindFlags &= ~D3D_BIND_SHADER_RESOURCE; // remove SRV flag
+
             if (RImplementation.o.msaa_opt)
             {
                 desc.SampleDesc.Quality = u32(D3D_STANDARD_MULTISAMPLE_PATTERN);
@@ -128,8 +133,11 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         {
             dwFlags |= CreateUAV;
 
-            if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1)
+            if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1 &&
+                HW.CheckFormatSupport(dx11FMT, D3D_FORMAT_SUPPORT_TYPED_UNORDERED_ACCESS_VIEW))
+            {
                 desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+            }
         }
 #else
         UNUSED(flags);
@@ -138,7 +146,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSurface));
         // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT)); // TODO: DX11: check if texture is created?
 #ifdef DEBUG
-        Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, dx11FMT, SampleCount);
+        Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, desc.Format, SampleCount);
 #endif // DEBUG
     }
     HW.stats_manager.increment_stats_rtarget(pSurface);
@@ -158,13 +166,15 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         ViewDesc.Format = DXGI_FORMAT_UNKNOWN;
         if (SampleCount <= 1)
         {
-            ViewDesc.ViewDimension = n_slices > 1 ? D3D_DSV_DIMENSION_TEXTURE2DARRAY : D3D_DSV_DIMENSION_TEXTURE2D;;
+            ViewDesc.ViewDimension = n_slices > 1 ? D3D_DSV_DIMENSION_TEXTURE2DARRAY : D3D_DSV_DIMENSION_TEXTURE2D;
+            if (n_slices > 1)
+                ViewDesc.Texture2DArray.ArraySize = n_slices;
         }
         else
         {
-            VERIFY(n_slices == 1);
-            ViewDesc.ViewDimension = D3D_DSV_DIMENSION_TEXTURE2DMS;
-            ViewDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
+            ViewDesc.ViewDimension = n_slices > 1 ? D3D_DSV_DIMENSION_TEXTURE2DMSARRAY : D3D_DSV_DIMENSION_TEXTURE2DMS;
+            if (n_slices > 1)
+                ViewDesc.Texture2DMSArray.ArraySize = n_slices;
         }
 
         switch (desc.Format)
@@ -189,11 +199,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
             ViewDesc.Format = desc.Format;
         }
 
-        if (n_slices > 1)
-        {
-            ViewDesc.Texture2DArray.ArraySize = n_slices;
-        }
-
         CHK_DX(HW.pDevice->CreateDepthStencilView(pSurface, &ViewDesc, &dsv_all));
 #if defined(DEBUG)
         {
@@ -206,8 +211,16 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         dsv_per_slice.resize(n_slices);
         for (int idx = 0; idx < n_slices; ++idx)
         {
-            ViewDesc.Texture2DArray.ArraySize = 1;
-            ViewDesc.Texture2DArray.FirstArraySlice = idx;
+            if (SampleCount <= 1)
+            {
+                ViewDesc.Texture2DArray.ArraySize = 1;
+                ViewDesc.Texture2DArray.FirstArraySlice = idx;
+            }
+            else
+            {
+                ViewDesc.Texture2DMSArray.ArraySize = 1;
+                ViewDesc.Texture2DMSArray.FirstArraySlice = idx;
+            }
             CHK_DX(HW.pDevice->CreateDepthStencilView(pSurface, &ViewDesc, &dsv_per_slice[idx]));
 #if DEBUG
             {
@@ -226,13 +239,13 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         CHK_DX(HW.pDevice->CreateRenderTargetView(pSurface, 0, &pRT));
 
 #ifdef USE_DX11
-    if (flags.test(CreateUAV) && HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1)
+    if (desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS)
     {
         D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc{};
         UAVDesc.Format = dx11FMT;
-        UAVDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
-        UAVDesc.Buffer.FirstElement = 0;
-        UAVDesc.Buffer.NumElements = dwWidth * dwHeight;
+        UAVDesc.ViewDimension = n_slices > 1 ? D3D_UAV_DIMENSION_TEXTURE2DARRAY : D3D_UAV_DIMENSION_TEXTURE2D;
+        if (n_slices > 1)
+            UAVDesc.Texture2DArray.ArraySize = n_slices;
         CHK_DX(HW.pDevice->CreateUnorderedAccessView(pSurface, &UAVDesc, &pUAView));
     }
 #endif
