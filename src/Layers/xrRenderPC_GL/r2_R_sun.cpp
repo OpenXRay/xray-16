@@ -356,7 +356,7 @@ void render_sun_old::render_sun() const
             hull.points.reserve(std::size(sun::corners));
             hull.polys.reserve(std::size(sun::facetable));
 
-            for (auto corner : sun::corners)
+            for (const auto& corner : sun::corners)
             {
                 Fvector3 xf = wform(ex_full_inverse, corner);
                 hull.points.emplace_back(xf);
@@ -365,7 +365,7 @@ void render_sun_old::render_sun() const
             {
                 auto& poly = hull.polys.emplace_back();
                 poly.points.reserve(std::size(plane));
-                for (int pt : plane)
+                for (const int pt : plane)
                     poly.points.emplace_back(pt);
             }
         }
@@ -708,7 +708,7 @@ void render_sun_old::render_sun() const
             x_full.mul(x_project, Device.mView);
             XRMatrixInverse(&x_full_inverse, nullptr, x_full);
         }
-        for (auto corner : sun::corners)
+        for (const auto& corner : sun::corners)
         {
             pt = wform(x_full_inverse, corner); // world space
             pt = wform(xform, pt); // trapezoid space
@@ -838,17 +838,16 @@ void render_sun_old::render_sun_near()
             hull.points.reserve(std::size(sun::corners));
             hull.polys.reserve(std::size(sun::facetable));
 
-            for (auto corner : sun::corners)
+            for (const auto& corner : sun::corners)
             {
                 Fvector3 xf = wform(ex_full_inverse, corner);
                 hull.points.emplace_back(xf);
             }
-            hull.polys.reserve(6);
-            for (auto& plane : sun::facetable)
+            for (const auto& plane : sun::facetable)
             {
                 auto& poly = hull.polys.emplace_back();
                 poly.points.reserve(std::size(plane));
-                for (int pt : plane)
+                for (const int pt : plane)
                     poly.points.emplace_back(pt);
             }
         }

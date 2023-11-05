@@ -292,7 +292,7 @@ void render_sun_old::init()
     VERIFY(context_id != R_dsgraph_structure::INVALID_CONTEXT_ID);
 }
 
-void render_sun_old::render_sun()
+void render_sun_old::render_sun() const
 {
     PIX_EVENT(render_sun);
     XMMATRIX m_LightViewProj;
@@ -330,12 +330,12 @@ void render_sun_old::render_sun()
                 Fvector3 xf = wform(fullxform_inv, corner);
                 hull.points.emplace_back(xf);
             }
-            for (auto& plane : sun::facetable)
+            for (const auto& plane : sun::facetable)
             {
                 auto& poly = hull.polys.emplace_back();
                 poly.points.reserve(std::size(plane));
                 for (const int pt : plane)
-                    hull.polys.back().points.emplace_back(pt);
+                    poly.points.emplace_back(pt);
             }
         }
         hull.compute_caster_model(cull_planes, sun->direction);
@@ -780,7 +780,7 @@ void render_sun_old::render_sun_near()
             {
                 auto& poly = hull.polys.emplace_back();
                 poly.points.reserve(std::size(plane));
-                for (int pt : plane)
+                for (const int pt : plane)
                     poly.points.emplace_back(pt);
             }
         }
