@@ -4,14 +4,6 @@
 #include "../xrRender/ResourceManager.h"
 #include "glTextureUtils.h"
 
-CRT::CRT()
-{
-    pRT = 0;
-    dwWidth = 0;
-    dwHeight = 0;
-    fmt = D3DFMT_UNKNOWN;
-}
-
 CRT::~CRT()
 {
     destroy();

@@ -4,18 +4,6 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "dx11TextureUtils.h"
 
-CRT::CRT()
-{
-    pSurface = NULL;
-    pRT = NULL;
-    ZeroMemory(pZRT, sizeof(pZRT));
-#ifdef USE_DX11
-    pUAView = NULL;
-#endif
-    dwWidth = 0;
-    dwHeight = 0;
-    fmt = D3DFMT_UNKNOWN;
-}
 CRT::~CRT()
 {
     destroy();
@@ -114,12 +102,11 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     RImplementation.Resources->Evict();
 
     // Create the render target texture
-    D3D_TEXTURE2D_DESC desc;
+    D3D_TEXTURE2D_DESC desc{};
     if (pSurface)
         pSurface->GetDesc(&desc);
     else
     {
-        ZeroMemory(&desc, sizeof(desc));
         desc.Width = dwWidth;
         desc.Height = dwHeight;
         desc.MipLevels = 1;
@@ -130,7 +117,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         desc.BindFlags = D3D_BIND_SHADER_RESOURCE | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
         if (SampleCount > 1)
         {
-            desc.BindFlags = D3D_BIND_SHADER_RESOURCE | (useAsDepth ? D3D_BIND_DEPTH_STENCIL : D3D_BIND_RENDER_TARGET);
             if (RImplementation.o.msaa_opt)
             {
                 desc.SampleDesc.Quality = u32(D3D_STANDARD_MULTISAMPLE_PATTERN);
@@ -167,8 +153,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     // OK
     if (useAsDepth)
     {
-        D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc;
-        ZeroMemory(&ViewDesc, sizeof(ViewDesc));
+        D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc{};
 
         ViewDesc.Format = DXGI_FORMAT_UNKNOWN;
         if (SampleCount <= 1)
@@ -181,8 +166,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
             ViewDesc.ViewDimension = D3D_DSV_DIMENSION_TEXTURE2DMS;
             ViewDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
         }
-
-        ViewDesc.Texture2D.MipSlice = 0;
 
         switch (desc.Format)
         {
@@ -245,8 +228,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 #ifdef USE_DX11
     if (flags.test(CreateUAV) && HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !useAsDepth && SampleCount == 1)
     {
-        D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
-        ZeroMemory(&UAVDesc, sizeof(D3D11_UNORDERED_ACCESS_VIEW_DESC));
+        D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc{};
         UAVDesc.Format = dx11FMT;
         UAVDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
         UAVDesc.Buffer.FirstElement = 0;

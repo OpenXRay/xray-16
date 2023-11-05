@@ -61,8 +61,7 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
         pSurface->GetType(&type);
         if (D3D_RESOURCE_DIMENSION_TEXTURE2D == type)
         {
-            D3D_SHADER_RESOURCE_VIEW_DESC ViewDesc;
-            ZeroMemory(&ViewDesc, sizeof(ViewDesc));
+            D3D_SHADER_RESOURCE_VIEW_DESC ViewDesc{};
 
             if (desc.MiscFlags & D3D_RESOURCE_MISC_TEXTURECUBE)
             {
@@ -85,8 +84,6 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
                     ViewDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
                 }
             }
-
-            ViewDesc.Format = DXGI_FORMAT_UNKNOWN;
 
             switch (desc.Format)
             {
