@@ -37,6 +37,8 @@ struct i_render_phase
         o.mt_draw_enabled = false;
     }
 
+    virtual ~i_render_phase() = default;
+
     ICF void run()
     {
         if (!o.active)
@@ -94,7 +96,7 @@ struct i_render_phase
     virtual void init() = 0;
     virtual void calculate() = 0;
     virtual void render() = 0;
-    virtual void flush() {};
+    virtual void flush() {}
 
     struct options_t
     {
