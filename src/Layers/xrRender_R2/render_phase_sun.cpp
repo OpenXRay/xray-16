@@ -134,6 +134,7 @@ void render_sun::calculate()
             if (cascade_ind == 0 || m_sun_cascades[cascade_ind].reset_chain)
             {
                 Fvector3 near_p, edge_vec;
+                light_cuboid.view_frustum_rays.reserve(4);
                 for (int p = 0; p < 4; p++)
                 {
                     near_p = wform(fullxform_inv, sun::corners[sun::facetable[4][p]]);
@@ -177,7 +178,6 @@ void render_sun::calculate()
         Fmatrix cull_xform_inv;
         cull_xform_inv.invert(cull_xform[cascade_ind]);
 
-        //		light_cuboid.light_cuboid_points.reserve		(9);
         for (int p = 0; p < 8; p++)
         {
             Fvector3 xf = wform(cull_xform_inv, sun::corners[p]);
