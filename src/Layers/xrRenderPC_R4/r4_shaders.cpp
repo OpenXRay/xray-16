@@ -421,7 +421,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     // Ascii's Screen Space Shaders - SSS preprocessor stuff
     if (ps_ssfx_rain_1.w > 0)
     {
-        xr_sprintf(c_rain_quality, "%d", ps_ssfx_rain_1.w);
+        xr_sprintf(c_rain_quality, "%d", (u8)ps_ssfx_rain_1.w);
         options.add("SSFX_RAIN_QUALITY", c_rain_quality);
         sh_name.append(c_rain_quality);
     }
@@ -430,7 +430,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     if (ps_ssfx_grass_interactive.y > 0)
     {
-        xr_sprintf(c_inter_grass, "%d", ps_ssfx_grass_interactive.y);
+        xr_sprintf(c_inter_grass, "%d", (u8)ps_ssfx_grass_interactive.y);
         options.add("SSFX_INT_GRASS", c_inter_grass);
         sh_name.append(c_inter_grass);
     }
