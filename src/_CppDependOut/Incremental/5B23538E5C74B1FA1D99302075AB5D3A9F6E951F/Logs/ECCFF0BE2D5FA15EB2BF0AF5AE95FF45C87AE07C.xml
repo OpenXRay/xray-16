@@ -1,9 +1,0 @@
-<log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
- <error level="error" id="err_pp_file_not_found" file="C:\OpenXRay\Externals\lzo\src/lzo_func.h" line="51" col="10" msg="&apos;intrin.h&apos; file not found" />
-</log>

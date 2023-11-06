@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\core3d\mgcmatrix3.h"><violation beginline="64" endline="64" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\externals\freemagic\source\core3d\mgcquaternion.cpp"><violation beginline="240" endline="240" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="306" endline="306" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="347" endline="347" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="364" endline="364" rule="Rule6-6-5" ruleset="Statements">
-</violation></file></cppdepend-plugin>

@@ -1,9 +1,0 @@
-c:\openxray\src\utils\mp_screenshots_info\pch.h
-c:\openxray\src\utils\mp_screenshots_info\screenshots_common.h
-c:\openxray\src\utils\mp_screenshots_info\screenshots_reader.h
-c:\openxray\src\utils\mp_screenshots_info\screenshots_writer.h
-c:\openxray\src\utils\mp_screenshots_info\entry_point.cpp
-c:\openxray\src\utils\mp_screenshots_info\pch.cpp
-c:\openxray\src\utils\mp_screenshots_info\screenshots_common.cpp
-c:\openxray\src\utils\mp_screenshots_info\screenshots_reader.cpp
-c:\openxray\src\utils\mp_screenshots_info\screenshots_writer.cpp

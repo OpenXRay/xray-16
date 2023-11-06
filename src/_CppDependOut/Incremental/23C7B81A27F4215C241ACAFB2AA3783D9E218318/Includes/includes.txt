@@ -1,9 +1,0 @@
-c:\openxray\src\utils\mp_configs_verifyer\configs_common.h
-c:\openxray\src\utils\mp_configs_verifyer\configs_dump_verifyer.h
-c:\openxray\src\utils\mp_configs_verifyer\mp_config_sections.h
-c:\openxray\src\utils\mp_configs_verifyer\pch.h
-c:\openxray\src\utils\mp_configs_verifyer\configs_common.cpp
-c:\openxray\src\utils\mp_configs_verifyer\configs_dump_verifyer.cpp
-c:\openxray\src\utils\mp_configs_verifyer\entry_point.cpp
-c:\openxray\src\utils\mp_configs_verifyer\mp_config_sections.cpp
-c:\openxray\src\utils\mp_configs_verifyer\pch.cpp

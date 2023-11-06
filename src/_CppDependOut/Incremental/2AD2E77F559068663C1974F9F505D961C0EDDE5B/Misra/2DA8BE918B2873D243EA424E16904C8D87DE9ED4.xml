@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\cryptopp\cpu.h"><violation beginline="180" endline="180" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="191" endline="191" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\externals\cryptopp\rdrand.cpp"><violation beginline="103" endline="103" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="107" endline="107" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

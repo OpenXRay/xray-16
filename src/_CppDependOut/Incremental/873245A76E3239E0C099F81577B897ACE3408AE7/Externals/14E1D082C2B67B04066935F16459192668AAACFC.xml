@@ -1,5 +1,0 @@
-<Externals>
-<cr access="none" depth="0" pod="true" kind="struct" name="vorbis_func_residue" id="4f2cde099eb85fa1f46f6e2603ce3b88_a4bccd07e83fde1a2c85d5b96ebb2425" file="2" linestart="87" lineend="101"/>
-<cr access="none" depth="0" pod="true" kind="struct" name="vorbis_func_floor" id="4f2cde099eb85fa1f46f6e2603ce3b88_859116c22588428196ef3efd32ac7051" file="2" linestart="29" lineend="38"/>
-<cr access="none" depth="0" pod="true" kind="struct" name="vorbis_func_mapping" id="4f2cde099eb85fa1f46f6e2603ce3b88_dfabd29aa0a489aab5146692bc586a08" file="2" linestart="121" lineend="128"/>
-</Externals>

@@ -1,9 +1,0 @@
-<log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
- <error level="warning" id="warn_doc_param_not_found" file="C:\OpenXRay\Externals\NVTT\src\nvcore\Radix.cpp" line="286" col="12" msg="parameter &apos;input&apos; not found in the function declaration" />
-</log>

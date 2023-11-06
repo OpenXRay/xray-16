@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\lzo\src\lzo1b_d.ch"><violation beginline="78" endline="78" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="108" endline="108" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="116" endline="116" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="162" endline="162" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="203" endline="203" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="209" endline="209" rule="Rule6-3-1" ruleset="Statements">
-</violation></file></cppdepend-plugin>

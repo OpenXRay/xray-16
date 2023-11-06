@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\cryptopp\fips140.cpp"><violation beginline="72" endline="72" rule="Rule5-18-1" ruleset="Statements">
-</violation><violation beginline="80" endline="80" rule="Rule5-18-1" ruleset="Statements">
-</violation></file></cppdepend-plugin>

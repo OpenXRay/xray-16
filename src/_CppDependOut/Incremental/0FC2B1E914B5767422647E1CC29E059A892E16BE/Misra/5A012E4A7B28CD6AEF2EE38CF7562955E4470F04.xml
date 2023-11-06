@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\numerics\mgceuler.cpp"><violation beginline="31" endline="31" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="39" endline="39" rule="Rule6-3-1" ruleset="Statements">
-</violation></file></cppdepend-plugin>

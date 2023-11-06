@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\surface\mgcbeziercylinderg.cpp"><violation beginline="33" endline="33" rule="Rule18-4-1" ruleset="Library">
-</violation><violation beginline="38" endline="38" rule="Rule18-4-1" ruleset="Library">
-</violation><violation beginline="43" endline="43" rule="Rule18-4-1" ruleset="Library">
-</violation></file></cppdepend-plugin>

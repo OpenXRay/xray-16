@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\common\nvmender2003\nvmeshmender.cpp"><violation beginline="85" endline="85" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="112" endline="112" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="137" endline="137" rule="Rule6-6-5" ruleset="Statements">
-</violation></file></cppdepend-plugin>

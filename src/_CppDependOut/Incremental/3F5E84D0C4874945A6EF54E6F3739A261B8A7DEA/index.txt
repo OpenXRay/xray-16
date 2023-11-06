@@ -1,1 +1,0 @@
-{"a":"Mixed|x64","b":{"c:\\openxray\\src\\utils\\xrlc_lightstab\\xrlc_lightstab.cpp":{"Timestamp":1601357660.0,"Reparse":false,"Includes":["c:\\openxray\\src\\utils\\xrlc_lightstab\\xrlc_lightstab.cpp"],"IsSource":true,"Errors":[]},"c:\\openxray\\src\\utils\\xrlc_lightstab\\xrlc_lightstab.h":{"Timestamp":1639714999.0,"Reparse":false,"Includes":[],"IsSource":false,"Errors":[]}}}

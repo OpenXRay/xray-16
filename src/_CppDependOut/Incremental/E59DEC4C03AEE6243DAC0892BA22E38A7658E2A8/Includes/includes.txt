@@ -1,1 +1,0 @@
-c:\openxray\src\dummy\00dummy_tester.cpp

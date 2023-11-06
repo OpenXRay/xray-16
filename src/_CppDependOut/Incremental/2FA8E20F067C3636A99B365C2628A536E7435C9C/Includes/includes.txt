@@ -1,4 +1,0 @@
-c:\openxray\src\include\xrapi\xrapi.h
-c:\openxray\src\layers\xrapi\stdafx.h
-c:\openxray\src\layers\xrapi\stdafx.cpp
-c:\openxray\src\layers\xrapi\xrapi.cpp

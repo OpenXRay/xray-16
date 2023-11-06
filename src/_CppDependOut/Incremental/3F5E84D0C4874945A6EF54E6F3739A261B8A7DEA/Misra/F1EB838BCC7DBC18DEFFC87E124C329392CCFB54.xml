@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\utils\xrlc_light\lightstab_interface.h"><violation beginline="8" endline="8" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\src\utils\xrlc_lightstab\xrlc_lightstab.cpp"><violation beginline="14" endline="14" rule="Rule6-6-5" ruleset="Statements">
-</violation></file></cppdepend-plugin>

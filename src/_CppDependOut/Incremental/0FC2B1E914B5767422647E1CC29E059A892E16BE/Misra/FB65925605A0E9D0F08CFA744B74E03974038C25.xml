@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\numerics\mgcode.cpp"><violation beginline="22" endline="22" rule="Rule4-10-2" ruleset="Expressions">
-</violation><violation beginline="29" endline="29" rule="Rule4-10-2" ruleset="Expressions">
-</violation></file></cppdepend-plugin>

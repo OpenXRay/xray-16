@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\libtheora\lib\state.h"><violation beginline="492" endline="492" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\externals\libtheora\lib\x86_vc\x86cpu.h"><violation beginline="34" endline="34" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

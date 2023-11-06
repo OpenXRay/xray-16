@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\interpolation2d\mgcinterp2dbicubic.cpp"><violation beginline="61" endline="61" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="134" endline="134" rule="Rule18-4-1" ruleset="Library">
-</violation><violation beginline="135" endline="135" rule="Rule18-4-1" ruleset="Library">
-</violation><violation beginline="136" endline="136" rule="Rule6-3-1" ruleset="Statements">
-</violation></file><file path="h:\programs\codergears\cppdepend\defaulttoolchain\include\assert.h"><violation beginline="38" endline="38" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="38" endline="38" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

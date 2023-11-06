@@ -1,1 +1,0 @@
-c:\openxray\externals\luajit\src\ljamalg.c

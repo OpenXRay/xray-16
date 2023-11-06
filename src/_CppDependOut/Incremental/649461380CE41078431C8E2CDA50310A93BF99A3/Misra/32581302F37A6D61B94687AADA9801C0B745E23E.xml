@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\xrcore\xrstring.h"><violation beginline="186" endline="186" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="186" endline="186" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\src\xruicore\ui_base.h"><violation beginline="56" endline="56" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="56" endline="56" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\src\xruicore\xml\xruixmlparser.cpp"><violation beginline="17" endline="17" rule="Rule6-6-5" ruleset="Statements">
-</violation></file></cppdepend-plugin>

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\opcode\opc_triangle.cpp"><violation beginline="40" endline="40" rule="Rule6-6-5" ruleset="Statements">
-</violation></file></cppdepend-plugin>

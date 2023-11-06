@@ -1,9 +1,0 @@
-<log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
- <error level="error" id="err_pp_file_not_found" file="C:\OpenXRay\Externals\openal\OpenAL-Windows\Router\alc.cpp" line="43" col="10" msg="&apos;crtdbg.h&apos; file not found" />
-</log>

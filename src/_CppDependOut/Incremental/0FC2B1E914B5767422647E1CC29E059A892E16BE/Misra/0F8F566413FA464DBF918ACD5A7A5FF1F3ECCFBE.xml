@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\numerics\mgcbisect1.cpp"><violation beginline="38" endline="38" rule="Rule6-6-5" ruleset="Statements">
-</violation></file></cppdepend-plugin>

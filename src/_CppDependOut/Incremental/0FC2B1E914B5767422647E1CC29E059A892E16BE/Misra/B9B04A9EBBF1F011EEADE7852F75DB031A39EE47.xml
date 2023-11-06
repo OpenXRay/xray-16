@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\distance3d\mgcdist3dvectri.h"><violation beginline="21" endline="21" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

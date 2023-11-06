@@ -1,5 +1,0 @@
-<Externals>
-<cr access="none" depth="0" pod="true" kind="struct" name="z_stream_s" id="ab3439502eb24404f5136aff4b30b757_f5c2ce9c3af4222fe05a75b4ff3eefe8" file="2" linestart="86" lineend="106"/>
-<cr access="none" depth="0" pod="true" kind="struct" name="gz_header_s" id="ab3439502eb24404f5136aff4b30b757_27e3c64dfda98c06df90e53ae306c10b" file="2" linestart="114" lineend="129"/>
-<cr access="none" depth="0" pod="true" kind="struct" name="internal_state" id="fcae3fa428c61fdc72aa9505202333c3_0dc08df630f6f733e424eaf7c70d7f97" file="3" linestart="100" lineend="271" previous="ab3439502eb24404f5136aff4b30b757_0dc08df630f6f733e424eaf7c70d7f97"/>
-</Externals>

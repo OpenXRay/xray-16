@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\ode\ode\src\fastldlt.c"><violation beginline="307" endline="307" rule="Rule6-4-4" ruleset="Statements">
-</violation><violation beginline="379" endline="379" rule="Rule4-10-2" ruleset="Expressions">
-</violation></file></cppdepend-plugin>

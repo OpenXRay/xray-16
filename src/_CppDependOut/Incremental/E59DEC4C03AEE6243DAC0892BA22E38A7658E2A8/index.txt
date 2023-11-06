@@ -1,1 +1,0 @@
-{"a":"Mixed|x64","b":{"c:\\openxray\\src\\dummy\\00dummy_tester.cpp":{"Timestamp":1591630405.0,"Reparse":false,"Includes":["c:\\openxray\\src\\dummy\\00dummy_tester.cpp"],"IsSource":true,"Errors":[]}}}

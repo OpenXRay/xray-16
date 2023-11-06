@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\lzo\include\lzo\lzoconf.h"><violation beginline="369" endline="369" rule="Rule9-5-1" ruleset="Classes">
-</violation><violation beginline="405" endline="405" rule="Rule9-5-1" ruleset="Classes">
-</violation><violation beginline="406" endline="406" rule="Rule9-5-1" ruleset="Classes">
-</violation></file><file path="c:\openxray\externals\lzo\src\lzo_ptr.c"><violation beginline="70" endline="70" rule="Rule6-6-5" ruleset="Statements">
-</violation></file><file path="c:\openxray\externals\lzo\src\lzo_ptr.h"><violation beginline="77" endline="77" rule="Rule9-5-1" ruleset="Classes">
-</violation></file></cppdepend-plugin>

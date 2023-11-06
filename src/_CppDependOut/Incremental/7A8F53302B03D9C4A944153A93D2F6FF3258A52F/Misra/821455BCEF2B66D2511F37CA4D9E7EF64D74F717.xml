@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\common\nvmender2003\mender_input_output.h"><violation beginline="31" endline="31" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="34" endline="34" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="50" endline="50" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="57" endline="57" rule="Rule6-3-1" ruleset="Statements">
-</violation></file><file path="c:\openxray\src\common\nvmender2003\remove_isolated_verts.h"><violation beginline="33" endline="33" rule="Rule6-3-1" ruleset="Statements">
-</violation></file><file path="c:\openxray\src\utils\xrlc\ogf_face.h"><violation beginline="17" endline="17" rule="Rule11-0-1" ruleset="Classes">
-</violation></file></cppdepend-plugin>

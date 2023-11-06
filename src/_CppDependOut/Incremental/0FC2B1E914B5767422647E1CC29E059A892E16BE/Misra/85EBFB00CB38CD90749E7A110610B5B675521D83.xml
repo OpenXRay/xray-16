@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\numerics\mgcspecialfunction.cpp"><violation beginline="65" endline="65" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="101" endline="101" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="109" endline="109" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="129" endline="129" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="250" endline="250" rule="Rule6-6-5" ruleset="Statements">
-</violation></file><file path="c:\openxray\externals\freemagic\source\numerics\mgcspecialfunction.h"><violation beginline="31" endline="31" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

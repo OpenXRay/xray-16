@@ -1,9 +1,0 @@
-<Externals>
-<cr access="none" kind="struct" name="dxBody" id="b87c42e3e7f540f34245a84e2aad3c0b_3c46cdec71cd6531416ca12a07474040" file="2" linestart="180" lineend="180"/>
-<cr access="none" kind="struct" name="dxGeom" id="b87c42e3e7f540f34245a84e2aad3c0b_05fda43f4c64d6951a9d80a8c555148d" file="2" linestart="181" lineend="181"/>
-<cr access="none" kind="struct" name="dxJoint" id="b87c42e3e7f540f34245a84e2aad3c0b_75f4d3d5ed793e763650e815a1bf5390" file="2" linestart="182" lineend="182"/>
-<cr access="none" kind="struct" name="dxJointGroup" id="b87c42e3e7f540f34245a84e2aad3c0b_21b13c6da840578a24769fdeea65a9b1" file="2" linestart="184" lineend="184"/>
-<cr access="none" depth="0" pod="true" kind="struct" name="dJointFeedback" id="b87c42e3e7f540f34245a84e2aad3c0b_3fa57cc3d430b09ff3cca4a4724f79c7" file="2" linestart="305" lineend="310"/>
-<cr access="none" kind="struct" name="dxWorld" id="b87c42e3e7f540f34245a84e2aad3c0b_0fd708708bcd24dee496aabc0c723579" file="2" linestart="178" lineend="178"/>
-<cr access="none" kind="struct" name="dxSpace" id="b87c42e3e7f540f34245a84e2aad3c0b_9f8d5d96912fdbb9dc17a390d1d7ac9b" file="2" linestart="179" lineend="179"/>
-</Externals>

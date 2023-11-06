@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\include\editor\property_holder_base.hpp"><violation beginline="233" endline="233" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="233" endline="233" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="233" endline="233" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\src\xrcore\xrdebug.h"><violation beginline="111" endline="111" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

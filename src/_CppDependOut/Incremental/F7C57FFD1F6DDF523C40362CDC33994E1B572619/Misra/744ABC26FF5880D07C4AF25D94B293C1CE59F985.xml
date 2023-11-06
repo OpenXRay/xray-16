@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\ode\include\ode\memory.h"><violation beginline="41" endline="41" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="42" endline="42" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="43" endline="43" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\src\xrcore\xrmemory.h"><violation beginline="148" endline="148" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="149" endline="149" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

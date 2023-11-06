@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\zlib\zutil.c"><violation beginline="37" endline="37" rule="Rule6-4-4" ruleset="Statements">
-</violation><violation beginline="43" endline="43" rule="Rule6-4-4" ruleset="Statements">
-</violation><violation beginline="49" endline="49" rule="Rule6-4-4" ruleset="Statements">
-</violation><violation beginline="55" endline="55" rule="Rule6-4-4" ruleset="Statements">
-</violation></file></cppdepend-plugin>
