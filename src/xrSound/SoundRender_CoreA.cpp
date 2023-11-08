@@ -24,8 +24,8 @@ void CSoundRender_CoreA::_initialize_devices_list()
 
     if (0 == pDeviceList->GetNumDevices())
     {
-        CHECK_OR_EXIT(0, "OpenAL: Can't create sound device.");
-        xr_delete(pDeviceList);
+        Log("! SOUND: OpenAL: No sound devices found.");
+        bPresent = false;
     }
 }
 

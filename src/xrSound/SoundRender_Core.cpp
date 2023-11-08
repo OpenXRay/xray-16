@@ -553,3 +553,9 @@ void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
 #endif
     }*/
 }
+
+[[nodiscard]] bool CSoundRender_Core::is_enabled() const
+{
+    static bool no_sound = strstr(Core.Params, "-nosound") != nullptr;
+    return bPresent && !no_sound;
+}
