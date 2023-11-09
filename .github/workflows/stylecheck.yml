@@ -21,13 +21,13 @@ jobs:
       - name: Fix spacing
         run: |
           # Fix mixed tabs and spaces
-          find . \( -path ./Externals -o -path ./src/_CppDependOut -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(cs\|rc\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
+          find . \( -path ./Externals -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(cs\|rc\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
 
           # Fix trailing white spaces
-          find . \( -path ./Externals -o -path ./src/_CppDependOut -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(h\|hpp\|inl\|c\|cpp\|cs\|rc\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'sed -i '' -e "s/[[:space:]]*$//" "$0"' {} \;
+          find . \( -path ./Externals -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(h\|hpp\|inl\|c\|cpp\|cs\|rc\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'sed -i '' -e "s/[[:space:]]*$//" "$0"' {} \;
 
           # Ensure files end with a new line
-          find . \( -path ./Externals -o -path ./src/_CppDependOut -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(h\|hpp\|inl\|c\|cpp\|cs\|rc\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'tail -c1 < "$0" | read -r _ || echo >> "$0"' {} \;
+          find . \( -path ./Externals -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(h\|hpp\|inl\|c\|cpp\|cs\|rc\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'tail -c1 < "$0" | read -r _ || echo >> "$0"' {} \;
 
       - name: Report result
         run: |
@@ -52,10 +52,10 @@ jobs:
       - name: Fix encoding
         run: |
           # Ensure that files are UTF-8 encoded
-          find . \( -path ./Externals -o -path ./src/_CppDependOut -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(h\|hpp\|inl\|c\|cpp\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'recode UTF-8 "$0" 2> /dev/null' {} \;
+          find . \( -path ./Externals -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(h\|hpp\|inl\|c\|cpp\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'recode UTF-8 "$0" 2> /dev/null' {} \;
 
           # Ensure that files have LF line endings and do not contain a BOM
-          find . \( -path ./Externals -o -path ./src/_CppDependOut -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(h\|hpp\|inl\|c\|cpp\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'dos2unix "$0" 2> /dev/null' {} \;
+          find . \( -path ./Externals -o -path ./sdk -o -path ./src/utils/mp_gpprof_server/libraries -o -path ./res \) -prune -o -iregex '.*\.\(h\|hpp\|inl\|c\|cpp\|yaml\|yml\|md\|txt\|cmake\|sh\)' -type f -exec bash -c 'dos2unix "$0" 2> /dev/null' {} \;
 
       - name: Report result
         run: |
