@@ -33,7 +33,7 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
         F->r_string(str, sizeof str);
 
         // Skip any spaces or tabs
-        const char* begin_of_include = str;
+        pcstr begin_of_include = str;
         while (*begin_of_include != '\0' && std::isblank(*begin_of_include))
             ++begin_of_include;
 
