@@ -32,10 +32,15 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
     {
         F->r_string(str, sizeof str);
 
-        if (str[0] && str[0] == '#' && strstr(str, "#include"))
+        // Skip any spaces or tabs
+        pcstr begin_of_include = str;
+        while (*begin_of_include != '\0' && std::isblank(*begin_of_include))
+            ++begin_of_include;
+
+        if (std::strncmp(begin_of_include, "#include", 8) == 0)
         {
             string256 inc_name;
-            if (_GetItem(str, 1, inc_name, '"'))
+            if (_GetItem(begin_of_include, 1, inc_name, '"'))
             {
                 IReader* I = nullptr;
                 tryOpenFile(I, inc_name, UI_PATH, UI_PATH, UI_PATH_WITH_DELIMITER);
