@@ -160,7 +160,7 @@ void xrSASH::ReportNative(pcstr pszTestName)
 
     // min/max/average
     float fMinFps = flt_max;
-    float fMaxFps = flt_min;
+    float fMaxFps = flt_lowest;
 
     const u32 iWindowSize = 15;
 

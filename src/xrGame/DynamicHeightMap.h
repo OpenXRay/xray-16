@@ -31,7 +31,7 @@ class CHM_Static
         {
             for (u32 i = 0; i < dhm_precision; ++i)
                 for (u32 j = 0; j < dhm_precision; ++j)
-                    data[i][j] = flt_min;
+                    data[i][j] = flt_lowest;
         }
         Slot()
         {

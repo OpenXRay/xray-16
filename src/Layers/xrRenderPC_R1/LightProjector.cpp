@@ -243,7 +243,7 @@ void CLightProjector::calculate()
         v.sub(v_Cs, v_C);
         ;
 #ifdef DEBUG
-        if ((v.x * v.x + v.y * v.y + v.z * v.z) <= flt_zero)
+        if ((v.x * v.x + v.y * v.y + v.z * v.z) <= flt_min)
         {
             IGameObject* OO = dynamic_cast<IGameObject*>(R.O);
             Msg("Object[%s] Visual[%s] has invalid position. ", *OO->cName(), *OO->cNameVisual());
@@ -274,7 +274,7 @@ void CLightProjector::calculate()
         }
 #endif
         // handle invalid object-bug
-        if ((v.x * v.x + v.y * v.y + v.z * v.z) <= flt_zero)
+        if ((v.x * v.x + v.y * v.y + v.z * v.z) <= flt_min)
         {
             // invalidate record, so that object will be unshadowed, but doesn't crash
             R.dwTimeValid = Device.dwTimeGlobal;

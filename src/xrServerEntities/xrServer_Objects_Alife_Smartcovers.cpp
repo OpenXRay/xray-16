@@ -194,7 +194,7 @@ Fvector parse_fvector(luabind::object const& table, LPCSTR identifier)
     return (luabind::object_cast<Fvector>(result));
 }
 
-float parse_float(luabind::object const& table, LPCSTR identifier, float const& min_threshold = flt_min,
+float parse_float(luabind::object const& table, LPCSTR identifier, float const& min_threshold = flt_lowest,
     float const& max_threshold = flt_max)
 {
     VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");

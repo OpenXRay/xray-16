@@ -155,7 +155,7 @@ _matrix<T>& _matrix<T>::invert(const _matrix<T>& a)   // important: this is 4x3 
 		a._12 * (a._21 * a._33 - a._23 * a._31) +
 		a._13 * (a._21 * a._32 - a._22 * a._31));
 
-	VERIFY(_abs(fDetInv) > flt_zero);
+	VERIFY(_abs(fDetInv) > flt_min);
 	fDetInv = 1.0f / fDetInv;
 
 	_11 = fDetInv * (a._22 * a._33 - a._23 * a._32);
@@ -188,7 +188,7 @@ bool _matrix<T>::invert_b(const _matrix<T>& a)   // important: this is 4x3 inver
 		a._12 * (a._21 * a._33 - a._23 * a._31) +
 		a._13 * (a._21 * a._32 - a._22 * a._31));
 
-	if (_abs(fDetInv) <= flt_zero) return false;
+	if (_abs(fDetInv) <= flt_min) return false;
 	fDetInv = 1.0f / fDetInv;
 
 	_11 = fDetInv * (a._22 * a._33 - a._23 * a._32);
@@ -234,7 +234,7 @@ _matrix<T>& _matrix<T>::invert_44(const _matrix<T>& a)
     T A14 = -(a21 * mn3 - a22 * mn5 + a23 * mn6);
 
     T detInv = a11 * A11 + a12 * A12 + a13 * A13 + a14 * A14;
-    VERIFY(_abs(detInv) > flt_zero);
+    VERIFY(_abs(detInv) > flt_min);
 
     detInv = 1.f / detInv;
 

@@ -211,7 +211,7 @@ float CHM_Static::Query(float x, float z)
 
 //
 void CHM_Dynamic::Update() {}
-float CHM_Dynamic::Query(float x, float z) { return flt_min; }
+float CHM_Dynamic::Query(float x, float z) { return flt_lowest; }
 //
 float CHeightMap::Query(float x, float z)
 {

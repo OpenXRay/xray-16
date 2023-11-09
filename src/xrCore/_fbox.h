@@ -67,7 +67,7 @@ public:
     auto& invalidate()
     {
         vMin.set(type_max<float>, type_max<float>, type_max<float>);
-        vMax.set(type_min<float>, type_min<float>, type_min<float>);
+        vMax.set(type_lowest<float>, type_lowest<float>, type_lowest<float>);
         return *this;
     }
 

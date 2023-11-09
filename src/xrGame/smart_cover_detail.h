@@ -19,10 +19,10 @@ namespace detail
 {
 typedef RestrictionSpace::CTimeIntrusiveBase intrusive_base_time;
 
-float parse_float(luabind::adl::object const& table, LPCSTR identifier, float const& min_threshold = flt_min,
+float parse_float(luabind::adl::object const& table, LPCSTR identifier, float const& min_threshold = flt_lowest,
     float const& max_threshold = flt_max);
 bool parse_float(float& output, luabind::adl::object const& table, LPCSTR identifier,
-    float const& min_threshold = flt_min, float const& max_threshold = flt_max);
+    float const& min_threshold = flt_lowest, float const& max_threshold = flt_max);
 LPCSTR parse_string(luabind::adl::object const& table, LPCSTR identifier);
 void parse_table(luabind::adl::object const& table, LPCSTR identifier, luabind::adl::object& result);
 bool parse_bool(luabind::adl::object const& table, LPCSTR identifier);
