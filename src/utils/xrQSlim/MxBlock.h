@@ -31,22 +31,22 @@ template <class T>
 class MxBlock
 {
 private:
-    int N;
+    u32 N;
     T* block;
 
 protected:
     MxBlock() {}
-    void init_block(int n)
+    void init_block(u32 n)
     {
         // Allocate memory for block
         N = n;
         block = xr_alloc<T>(n);
 
         // Initialize each entry
-        for (int i = 0; i < n; i++)
+        for (u32 i = 0; i < n; i++)
             new ((void*)&block[i], ARRAY_ALLOC_INPLACE) T;
     }
-    void resize_block(int n)
+    void resize_block(u32 n)
     {
         T* old = block;
 
@@ -54,7 +54,7 @@ protected:
         block = (T*)xr_realloc(old, sizeof(T) * n);
 
         // Initialize all the newly allocated entries
-        for (int i = N; i < n; i++)
+        for (u32 i = N; i < n; i++)
             new ((void*)&block[i], ARRAY_ALLOC_INPLACE) T;
 
         N = n;
@@ -69,40 +69,40 @@ protected:
                 // expanding it into the following pointer-based
                 // version makes it work.  Don't ask me why.
                 //
-                for(int i=0; i<N; i++)  { T *p = &block[i]; p->~T(); }
+                for(u32 i = 0; i < N; i++) { T *p = &block[i]; p->~T(); }
                 xr_free(block);
         #else
         */
         // Call the relevant destructors for each element before
         // freeing the block.  Has now effect for types like 'int'.
         //
-        for (int i = 0; i < N; i++)
+        for (u32 i = 0; i < N; i++)
             block[i].~T();
         xr_free(block);
         //#endif
     }
 
 public:
-    MxBlock(int n) { init_block(n); }
+    MxBlock(u32 n) { init_block(n); }
     ~MxBlock() { free_block(); }
     operator const T*() const { return block; }
     operator T*() { return block; }
-    int length() const { return N; }
+    u32 length() const { return N; }
     // These parenthesized accessors are included for backwards
     // compatibility.  Their continued use is discouraged.
     //
-    T& operator()(int i) { return (*this)[i]; }
-    const T& operator()(int i) const { return (*this)[i]; }
+    T& operator()(u32 i) { return (*this)[i]; }
+    const T& operator()(u32 i) const { return (*this)[i]; }
     // Primitive methods for altering the data block
     //
-    void resize(int n) { resize_block(n); }
-    void bitcopy(const T* a, int n) // copy bits directly
+    void resize(u32 n) { resize_block(n); }
+    void bitcopy(const T* a, u32 n) // copy bits directly
     {
         CopyMemory(block, a, std::min(n, N) * sizeof(T));
     }
-    void copy(const T* a, const int n) // copy using assignment operator
+    void copy(const T* a, const u32 n) // copy using assignment operator
     {
-        for (int i = 0; i < std::min(n, N); i++)
+        for (u32 i = 0; i < std::min(n, N); i++)
             block[i] = a[i];
     }
     void bitcopy(const MxBlock<T>& b) { bitcopy(b, b.length()); }
@@ -114,7 +114,7 @@ public:
     typedef value_type* iterator;
     typedef value_type* const_iterator;
 
-    int size() const { return length(); }
+    u32 size() const { return length(); }
     iterator begin() { return block; }
     const_iterator begin() const { return block; }
     iterator end() { return begin() + size(); }
