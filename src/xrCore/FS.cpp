@@ -482,6 +482,27 @@ void IReader::skip_stringZ()
     Pos++;
 };
 
+bool IReader::try_r_string(char* dest, size_t tgt_sz)
+{
+    char* src = (char*)data + Pos;
+    size_t sz = advance_term_string();
+    if (sz >= tgt_sz)
+        return false;
+
+#if defined(XR_PLATFORM_WINDOWS)
+    R_ASSERT(!IsBadReadPtr((void*)src, sz));
+#endif
+
+#ifdef _EDITOR
+    CopyMemory(dest, src, sz);
+#else
+    strncpy_s(dest, tgt_sz, src, sz);
+#endif
+    dest[sz] = 0;
+
+    return true;
+}
+
 //---------------------------------------------------
 // temp stream
 CTempReader::~CTempReader() { xr_free(data); };

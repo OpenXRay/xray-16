@@ -400,6 +400,11 @@ public:
     void r_stringZ(shared_str& dest);
     void r_stringZ(xr_string& dest);
 
+    // Same as r_string but with the difference that it returns 'false' if the read string is longer than 'tgt_sz' and
+    // 'true' if it is shorter
+    [[nodiscard]]
+    bool try_r_string(char* dest, size_t tgt_sz);
+
 public:
     void close();
 

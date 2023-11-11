@@ -270,6 +270,11 @@ void TiXmlParsingData::Stamp(const char* now, TiXmlEncoding encoding)
                         ++col;
                     } // A normal character.
                 }
+                else
+                {
+                    ++p;
+                    ++col;
+                }
             }
             else
             {
