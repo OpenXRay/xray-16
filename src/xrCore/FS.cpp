@@ -139,7 +139,7 @@ void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size)
     do
     {
         const ssize_t r_bytes =
-            _read(file_handle, reinterpret_cast<char*>(buffer) + total_r_bytes, file_size - total_r_bytes);
+            _read(file_handle, reinterpret_cast<u8*>(buffer) + total_r_bytes, file_size - total_r_bytes);
         R_ASSERT3(r_bytes > 0, "Can't read from file : ", file_name);
 
         total_r_bytes += r_bytes;
