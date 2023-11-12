@@ -89,7 +89,10 @@ void CDestroyablePhysicsObject::Hit(SHit* pHDS)
 }
 void CDestroyablePhysicsObject::Destroy()
 {
+#ifdef DEBUG
     VERIFY(!physics_world()->Processing());
+#endif
+
     const CGameObject* who_object = smart_cast<const CGameObject*>(FatalHit().initiator());
     callback(GameObject::eDeath)(lua_game_object(), who_object ? who_object->lua_game_object() : 0);
     CPHDestroyable::Destroy(ID(), "physic_destroyable_object");
