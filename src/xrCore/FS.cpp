@@ -144,10 +144,10 @@ void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size)
 
         total_r_bytes += r_bytes;
     } while (total_r_bytes < file_size);
-#elif defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     int total_r_bytes = _read(file_handle, buffer, file_size);
 #else
-#error Select or add implementation for your platform
+#   error Select or add implementation for your platform
 #endif
     R_ASSERT3(total_r_bytes == file_size, "Can't read from file : ", file_name);
 
