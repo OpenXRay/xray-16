@@ -400,6 +400,10 @@ void CInventoryItem::net_Import(NET_Packet& P)
     ////////////////////////////////////////////
     P.r_u8(); // active (not freezed ot not)
 
+    float _cond;
+    P.r_float_q8(_cond, 0.0f, 1.0f);
+    SetCondition(_cond);
+
     if (this->cast_game_object()->Local())
     {
         return;
@@ -662,6 +666,8 @@ void CInventoryItem::net_Export(NET_Packet& P)
     {
         P.w_u8(0); // freezed
     }
+
+    P.w_float_q8(GetCondition(), 0.0f, 1.0f);
 
     /*if (object().H_Parent() || IsGameTypeSingle())
     {
