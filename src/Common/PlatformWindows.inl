@@ -64,3 +64,5 @@ inline tm* localtime_safe(const time_t *time, struct tm* result){ return localti
 #define xr_strerror(errno, buffer, bufferSize) strerror_s(buffer, sizeof(buffer), errno)
 
 using xrpid_t = DWORD;
+
+using ssize_t = SSIZE_T;
