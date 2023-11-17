@@ -113,6 +113,7 @@ public:
                      const char* desc = "assertion failed", const char* arg1 = nullptr, const char* arg2 = nullptr);
     static AssertionResult Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
+    [[noreturn]]
     static void DoExit(const std::string& message);
 
     static AssertionResult ShowMessage(pcstr title, pcstr message, bool simpleMode = true);

@@ -565,6 +565,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
     return Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2);
 }
 
+[[noreturn]]
 void xrDebug::DoExit(const std::string& message)
 {
     ScopeLock lock(&failLock);
@@ -848,6 +849,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 }
 
 #ifndef USE_BUG_TRAP
+[[noreturn]]
 void _terminate()
 {
 #if defined(XR_PLATFORM_WINDOWS)
