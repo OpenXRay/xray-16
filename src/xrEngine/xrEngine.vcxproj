@@ -196,7 +196,6 @@
     <ClCompile Include="XR_IOConsole_control.cpp" />
     <ClCompile Include="XR_IOConsole_get.cpp" />
     <ClCompile Include="xr_ioc_cmd.cpp" />
-    <ClCompile Include="xr_object.cpp" />
     <ClCompile Include="xr_object_list.cpp" />
     <ClCompile Include="x_ray.cpp" />
     <ClCompile Include="main.cpp" />

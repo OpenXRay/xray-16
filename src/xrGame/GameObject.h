@@ -92,7 +92,6 @@ private:
     ai_obstacle* m_ai_obstacle;
     Fmatrix m_previous_matrix;
     CALLBACK_VECTOR m_visual_callback;
-    Lock render_lock{};
 
 protected:
     CScriptBinder scriptBinder;
