@@ -154,7 +154,6 @@ set(ENGINE_GAME_API_OBJECTS_SRC
     "IGame_Persistent.h"
     "pure_relcase.cpp"
     "pure_relcase.h"
-    "xr_object.cpp"
     "xr_object.h"
     "xr_object_list.cpp"
     "xr_object_list.h"
