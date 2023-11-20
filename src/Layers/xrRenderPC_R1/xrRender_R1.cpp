@@ -1,8 +1,11 @@
 #include "stdafx.h"
+
 #include "Layers/xrRender/dxRenderFactory.h"
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
 #include "Layers/xrRender/D3DUtils.h"
+
+#include "Layers/xrRenderDX9/dx9shader_utils.h"
 
 constexpr pcstr RENDERER_R1_MODE = "renderer_r1";
 
@@ -28,7 +31,14 @@ public:
         hw.CreateD3D();
         const bool result = hw.pD3D && hw.pD3D->GetAdapterCount() > 0;
         hw.DestroyD3D();
-        return result;
+
+#ifdef USE_D3DX
+        const bool shaderCompilerAvailable = XRay::ModuleHandle{ "d3dx9_31" }.IsLoaded();
+#else
+        constexpr bool shaderCompilerAvailable = true;
+#endif
+
+        return result && shaderCompilerAvailable;
     }
 
     const xr_vector<pcstr>& ObtainSupportedModes() override
