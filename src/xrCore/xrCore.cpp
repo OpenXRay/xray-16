@@ -65,6 +65,27 @@ const pcstr xrCore::buildDate = __DATE__;
 const pcstr xrCore::buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
 const pcstr xrCore::buildBranch = MACRO_TO_STRING(GIT_INFO_CURRENT_BRANCH);
 
+void SanitizeString(pcstr str)
+{
+    pstr mut_str = const_cast<pstr>(str);
+
+    while(*mut_str != '\0')
+    {
+        switch (*mut_str)
+        {
+            case '\\':
+            case '/':
+            case ',':
+            case '.':
+                *mut_str = '_';
+                [[fallthrough]];
+
+            default:
+                ++mut_str;
+        }
+    }
+}
+
 xrCore::xrCore()
     : ApplicationName{}, ApplicationPath{},
       WorkingPath{},
@@ -221,19 +242,29 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
         uid_t uid = geteuid();
         struct passwd *pw = getpwuid(uid);
-        if(pw)
+        if (pw)
         {
-            strcpy(UserName, pw->pw_gecos);
-            char* pos = strchr(UserName, ','); // pw_gecos return string
-            if(NULL != pos)
-                *pos = 0;
-            if(0 == UserName[0])
-                strcpy(UserName, pw->pw_name);
+            strncpy(UserName, pw->pw_gecos, sizeof(UserName) - 1);
+            if(UserName[0] == '\0')
+                strncpy(UserName, pw->pw_name, sizeof(UserName) - 1);
         }
+        else
+            Msg("! Failed to get user name");
 
-        gethostname(CompName, sizeof(CompName));
+        if (gethostname(CompName, sizeof(CompName)) == 0)
+            CompName[sizeof(CompName) - 1] = '\0';
+        else
+            Msg("! Failed to get computer name");
 #else
 #   error Select or add implementation for your platform
+#endif
+
+        SanitizeString(UserName);
+        SanitizeString(CompName);
+
+#ifdef DEBUG
+        Msg("UserName: %s", UserName);
+        Msg("ComputerName: %s", CompName);
 #endif
 
         Memory._initialize();
