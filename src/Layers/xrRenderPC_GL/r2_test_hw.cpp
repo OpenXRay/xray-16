@@ -2,8 +2,8 @@
 
 class sdl_window_test_helper
 {
-    SDL_Window* m_window = nullptr;
-    SDL_GLContext m_context = nullptr;
+    SDL_Window* m_window{};
+    SDL_GLContext m_context{};
 
 public:
     sdl_window_test_helper()
@@ -25,6 +25,7 @@ public:
         }
     }
 
+    [[nodiscard]]
     bool successful() const
     {
         return m_window && m_context;
@@ -37,24 +38,19 @@ public:
     }
 };
 
-bool TestOpenGLSupport()
+BOOL xrRender_test_hw()
 {
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
     if (!windowTest.successful())
-        return false;
+        return FALSE;
 
     GLenum err = glewInit();
     if (GLEW_OK != err)
     {
-         Log("~ Could not initialize glew:", (pcstr)glewGetErrorString(err));
-         return false;
+        Log("~ Could not initialize glew:", (pcstr)glewGetErrorString(err));
+        return FALSE;
     }
 
-    return true;
-}
-
-BOOL xrRender_test_hw()
-{
-    return TestOpenGLSupport() ? TRUE : FALSE;
+    return TRUE;
 }
