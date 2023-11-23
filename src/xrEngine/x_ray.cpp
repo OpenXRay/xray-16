@@ -453,15 +453,6 @@ CInifile* CApplication::GetArchiveHeader(pcstr name, pcstr ver)
     return nullptr;
 }
 
-void CApplication::LoadAllArchives()
-{
-    if (FS.load_all_unloaded_archives())
-    {
-        Level_Scan();
-        g_pGamePersistent->OnAssetsChanged();
-    }
-}
-
 void CApplication::load_draw_internal()
 {
     loadingScreen->Draw();

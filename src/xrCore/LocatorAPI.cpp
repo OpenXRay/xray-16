@@ -571,21 +571,6 @@ void CLocatorAPI::unload_archive(CLocatorAPI::archive& A)
     A.close();
 }
 
-bool CLocatorAPI::load_all_unloaded_archives()
-{
-    bool res = false;
-    for (auto& archive : m_archives)
-    {
-        if (!archive.hSrcFile)
-        {
-            LoadArchive(archive);
-            res = true;
-        }
-    }
-
-    return res;
-}
-
 bool ignore_name(const char* _name)
 {
     if (!strcmp(_name, "Thumbs.db"))

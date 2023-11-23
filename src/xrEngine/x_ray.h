@@ -43,7 +43,6 @@ public:
     void Level_Scan();
     int Level_ID(pcstr name, pcstr ver, bool bSet);
     void Level_Set(u32 ID);
-    void LoadAllArchives();
     static CInifile* GetArchiveHeader(pcstr name, pcstr ver);
 
     // Loading
