@@ -58,7 +58,7 @@ void CSkeletonX_PM::Load(const char* N, IReader* data, u32 dwFlags)
     _Load(N, data, vCount);
     void* _verts_ = data->pointer();
     inherited1::Load(N, data, dwFlags | VLOAD_NOVERTICES);
-    GEnv.Render->shader_option_skinning(-1);
+    RImplementation.shader_option_skinning(-1);
     vBase = 0;
     _Load_hw(*this, _verts_);
 }
@@ -67,7 +67,7 @@ void CSkeletonX_ST::Load(const char* N, IReader* data, u32 dwFlags)
     _Load(N, data, vCount);
     void* _verts_ = data->pointer();
     inherited1::Load(N, data, dwFlags | VLOAD_NOVERTICES);
-    GEnv.Render->shader_option_skinning(-1);
+    RImplementation.shader_option_skinning(-1);
     vBase = 0;
     _Load_hw(*this, _verts_);
 }

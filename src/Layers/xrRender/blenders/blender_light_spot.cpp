@@ -278,9 +278,9 @@ void CBlender_accum_spot_msaa::Compile(CBlender_Compile& C)
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     if (Name)
-        GEnv.Render->m_MSAASample = atoi(Definition);
+        RImplementation.m_MSAASample = atoi(Definition);
     else
-        GEnv.Render->m_MSAASample = -1;
+        RImplementation.m_MSAASample = -1;
 
 #if RENDER == R_GL
     switch (C.iElement)
@@ -450,7 +450,7 @@ void CBlender_accum_spot_msaa::Compile(CBlender_Compile& C)
         break;
     }
 #endif
-    GEnv.Render->m_MSAASample = -1;
+    RImplementation.m_MSAASample = -1;
 }
 
 void CBlender_accum_volumetric_msaa::Compile(CBlender_Compile& C)
@@ -458,9 +458,9 @@ void CBlender_accum_volumetric_msaa::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     if (Name)
-        GEnv.Render->m_MSAASample = atoi(Definition);
+        RImplementation.m_MSAASample = atoi(Definition);
     else
-        GEnv.Render->m_MSAASample = -1;
+        RImplementation.m_MSAASample = -1;
 
     switch (C.iElement)
     {
@@ -483,6 +483,6 @@ void CBlender_accum_volumetric_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     }
-    GEnv.Render->m_MSAASample = -1;
+    RImplementation.m_MSAASample = -1;
 }
 #endif

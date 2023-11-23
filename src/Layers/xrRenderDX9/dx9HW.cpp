@@ -313,7 +313,7 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget) const
 {
     // R2 hack
 #pragma todo("R2 need to specify depth format")
-    if (GEnv.Render->GenerationIsR2())
+    if (RImplementation.GenerationIsR2())
         return D3DFMT_D24S8;
 
     // R1 usual

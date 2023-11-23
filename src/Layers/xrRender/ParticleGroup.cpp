@@ -184,7 +184,7 @@ void CParticleGroup::SItem::Clear()
     GetVisuals(visuals);
     for (auto& visual : visuals)
     {
-        // GEnv.Render->model_Delete(*it);
+        // RImplementation.model_Delete(*it);
         IRenderVisual* pVisual = smart_cast<IRenderVisual*>(visual);
         GEnv.Render->model_Delete(pVisual);
         visual = nullptr;
@@ -283,14 +283,14 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
     {
         for (auto& p : _children_related)
         {
-            // GEnv.Render->model_Delete(*it);
+            // RImplementation.model_Delete(*it);
             IRenderVisual* pVisual = smart_cast<IRenderVisual*>(p);
             GEnv.Render->model_Delete(pVisual);
             p = nullptr;
         }
         for (auto& p : _children_free)
         {
-            // GEnv.Render->model_Delete(*it);
+            // RImplementation.model_Delete(*it);
             IRenderVisual* pVisual = smart_cast<IRenderVisual*>(p);
             GEnv.Render->model_Delete(pVisual);
             p = nullptr;
@@ -433,7 +433,7 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
                 else
                 {
                     rem_cnt++;
-                    // GEnv.Render->model_Delete(*it);
+                    // RImplementation.model_Delete(*it);
                     IRenderVisual* pVisual = smart_cast<IRenderVisual*>(p);
                     GEnv.Render->model_Delete(pVisual);
                     p = nullptr;

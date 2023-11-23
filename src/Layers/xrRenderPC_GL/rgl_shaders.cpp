@@ -171,7 +171,7 @@ private:
             *str = '\0'; // Terminate filename path
 
             // Create path to included shader
-            strconcat(sizeof(path), path, GEnv.Render->getShaderPath(), fn);
+            strconcat(path, RImplementation.getShaderPath(), fn);
             FS.update_path(path, _game_shaders_, path);
             while (cpstr sep = strchr(path, '/'))
                 *sep = '\\';
@@ -510,7 +510,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         FS.update_path(full_path, "$app_data_root$", file);
 
         string_path shadersFolder;
-        FS.update_path(shadersFolder, "$game_shaders$", GEnv.Render->getShaderPath());
+        FS.update_path(shadersFolder, "$game_shaders$", RImplementation.getShaderPath());
 
         getFileCrc32(fs, shadersFolder, fileCrc);
         fs->seek(0);

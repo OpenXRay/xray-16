@@ -663,7 +663,7 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
 
         // Open file
         string_path cname;
-        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), shName,
+        strconcat(cname, RImplementation.getShaderPath(), shName,
             ShaderTypeTraits<T>::GetShaderExt());
         FS.update_path(cname, "$game_shaders$", cname);
 
@@ -678,10 +678,10 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
             fallback = false;
 
             string_path tmp;
-            strconcat(sizeof(tmp), tmp, "stub_default", ShaderTypeTraits<T>::GetShaderExt());
+            strconcat(tmp, "stub_default", ShaderTypeTraits<T>::GetShaderExt());
 
             Msg("CreateShader: %s is missing. Replacing it with %s", cname, tmp);
-            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), tmp);
+            strconcat(cname, RImplementation.getShaderPath(), tmp);
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
         }
@@ -712,7 +712,7 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
 #endif
 
         // Compile
-        HRESULT const _hr = GEnv.Render->shader_compile(name, file, c_entry, c_target, flags, (void*&)sh);
+        HRESULT const _hr = RImplementation.shader_compile(name, file, c_entry, c_target, flags, (void*&)sh);
 
         FS.r_close(file);
 

@@ -273,9 +273,9 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     if (Name)
-        GEnv.Render->m_MSAASample = atoi(Definition);
+        RImplementation.m_MSAASample = atoi(Definition);
     else
-        GEnv.Render->m_MSAASample = -1;
+        RImplementation.m_MSAASample = -1;
 
     // BOOL	b_HW_smap		= RImplementation.o.HW_smap;
     // BOOL	b_HW_PCF		= RImplementation.o.HW_smap_PCF;
@@ -449,6 +449,6 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
         break;
     }
 #endif
-    GEnv.Render->m_MSAASample = -1;
+    RImplementation.m_MSAASample = -1;
 }
 #endif

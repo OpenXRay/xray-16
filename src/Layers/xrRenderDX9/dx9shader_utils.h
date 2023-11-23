@@ -140,7 +140,7 @@ public:
         INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) noexcept override
     {
         string_path pname;
-        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
+        strconcat(pname, RImplementation.getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
         if (nullptr == R)
         {

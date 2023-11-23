@@ -487,7 +487,7 @@ IC bool _IsBoxVisible(dxRender_Visual* visual, const Fmatrix& transform)
 {
     Fbox bb;
     bb.xform(visual->vis.box, transform);
-    return GEnv.Render->occ_visible(bb);
+    return RImplementation.occ_visible(bb);
 }
 IC bool _IsValidShader(dxRender_Visual* visual, u32 priority, bool strictB2F)
 {

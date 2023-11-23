@@ -124,7 +124,7 @@ public:
         D3D10_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
-        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
+        strconcat(pname, RImplementation.getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
         if (nullptr == R)
         {
@@ -537,7 +537,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     string_path shadersFolder;
-    FS.update_path(shadersFolder, "$game_shaders$", GEnv.Render->getShaderPath());
+    FS.update_path(shadersFolder, "$game_shaders$", RImplementation.getShaderPath());
 
     u32 fileCrc = 0;
     getFileCrc32(fs, shadersFolder, fileCrc);

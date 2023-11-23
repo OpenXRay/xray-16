@@ -204,7 +204,7 @@ void dxEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRe
 
 void dxEnvironmentRender::RenderSky(CEnvironment& env)
 {
-    GEnv.Render->rmFar(RCache);
+    RImplementation.rmFar(RCache);
 
     // draw sky box
     Fmatrix mSky;
@@ -249,7 +249,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 #endif // USE_OGL
 
     // Sun
-    GEnv.Render->rmNormal(RCache);
+    RImplementation.rmNormal(RCache);
 #if RENDER != R_R1
     //
     // This hack is done to make sure that the state is set for sure:
@@ -278,7 +278,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     if (!clouds_sh)
         return;
 
-    GEnv.Render->rmFar(RCache);
+    RImplementation.rmFar(RCache);
 
     Fmatrix mXFORM, mScale;
     mScale.scale(10, 0.4f, 10);
@@ -359,7 +359,7 @@ void dxEnvironmentRender::OnDeviceCreate()
             tclouds1_tstage = C->samp.index;
     }
 
-    const bool r2 = GEnv.Render->GenerationIsR2OrHigher();
+    const bool r2 = RImplementation.GenerationIsR2OrHigher();
     tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
     tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
 }

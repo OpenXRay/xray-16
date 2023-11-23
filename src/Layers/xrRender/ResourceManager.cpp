@@ -260,7 +260,7 @@ IReader* open_shader(pcstr shader)
 {
     string_path shaderPath;
 
-    FS.update_path(shaderPath, "$game_shaders$", GEnv.Render->getShaderPath());
+    FS.update_path(shaderPath, "$game_shaders$", RImplementation.getShaderPath());
     xr_strcat(shaderPath, shader);
 
     return FS.r_open(shaderPath);

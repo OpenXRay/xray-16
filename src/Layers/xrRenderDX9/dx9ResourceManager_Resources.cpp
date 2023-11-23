@@ -54,7 +54,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
 {
     string_path name;
     xr_strcpy(name, shader);
-    switch (GEnv.Render->m_skinning)
+    switch (RImplementation.m_skinning)
     {
     case 0:
         xr_strcat(name, "_0");
@@ -91,7 +91,7 @@ public:
         D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
-        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
+        strconcat(pname, RImplementation.getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
         if (0 == R)
         {
@@ -123,15 +123,15 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
-    if (0 == GEnv.Render->m_skinning)
+    if (0 == RImplementation.m_skinning)
         xr_strcat(name, "_0");
-    if (1 == GEnv.Render->m_skinning)
+    if (1 == RImplementation.m_skinning)
         xr_strcat(name, "_1");
-    if (2 == GEnv.Render->m_skinning)
+    if (2 == RImplementation.m_skinning)
         xr_strcat(name, "_2");
-    if (3 == GEnv.Render->m_skinning)
+    if (3 == RImplementation.m_skinning)
         xr_strcat(name, "_3");
-    if (4 == GEnv.Render->m_skinning)
+    if (4 == RImplementation.m_skinning)
         xr_strcat(name, "_4");
     pstr N = pstr(name);
     map_VS::iterator I = m_vs.find(N);
@@ -154,7 +154,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         LPD3DXSHADER_CONSTANTTABLE pConstants = NULL;
         HRESULT _hr = S_OK;
         string_path cname;
-        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), _name, ".vs");
+        strconcat(cname, RImplementation.getShaderPath(), _name, ".vs");
         FS.update_path(cname, "$game_shaders$", cname);
         //		LPCSTR						target		= NULL;
 
@@ -190,7 +190,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
 
         // vertex
         R_ASSERT2(fs, cname);
-        _hr = GEnv.Render->shader_compile(name, LPCSTR(fs->pointer()), fs->length(), NULL, &Includer, c_entry,
+        _hr = RImplementation.shader_compile(name, LPCSTR(fs->pointer()), fs->length(), NULL, &Includer, c_entry,
             c_target, D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR /*| D3DXSHADER_PREFER_FLOW_CONTROL*/,
             &pShaderBuf, &pErrorBuf, NULL);
         //		_hr = D3DXCompileShader		(LPCSTR(fs->pointer()),fs->length(), NULL, &Includer, "main", target,
@@ -272,8 +272,8 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         // Open file
         includer Includer;
         string_path cname;
-        LPCSTR shader_path = GEnv.Render->getShaderPath();
-        strconcat(sizeof(cname), cname, shader_path, name, ".ps");
+        LPCSTR shader_path = RImplementation.getShaderPath();
+        strconcat(cname, shader_path, name, ".ps");
         FS.update_path(cname, "$game_shaders$", cname);
 
         // duplicate and zero-terminate
@@ -319,7 +319,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         LPD3DXBUFFER pErrorBuf = NULL;
         LPD3DXSHADER_CONSTANTTABLE pConstants = NULL;
         HRESULT _hr = S_OK;
-        _hr = GEnv.Render->shader_compile(name, data, size, NULL, &Includer, c_entry, c_target,
+        _hr = RImplementation.shader_compile(name, data, size, NULL, &Includer, c_entry, c_target,
             D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, &pShaderBuf, &pErrorBuf, NULL);
         //_hr = D3DXCompileShader		(text,text_size, NULL, &Includer, c_entry, c_target, D3DXSHADER_DEBUG |
         // D3DXSHADER_PACKMATRIX_ROWMAJOR, &pShaderBuf, &pErrorBuf, NULL);

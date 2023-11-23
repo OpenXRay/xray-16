@@ -469,7 +469,7 @@ public:
         name[0] = 0;
         sscanf(args, "%s", name);
         LPCSTR image = xr_strlen(name) ? name : 0;
-        GEnv.Render->Screenshot(IRender::SM_NORMAL, image);
+        RImplementation.Screenshot(IRender::SM_NORMAL, image);
     }
 };
 

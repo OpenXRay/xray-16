@@ -49,9 +49,9 @@ void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     if (Name)
-        GEnv.Render->m_MSAASample = atoi(Definition);
+        RImplementation.m_MSAASample = atoi(Definition);
     else
-        GEnv.Render->m_MSAASample = -1;
+        RImplementation.m_MSAASample = -1;
 
 #if RENDER == R_GL
     C.r_Pass("accum_volume", "accum_indirect_msaa", false, FALSE,FALSE, blend, D3DBLEND_ONE, dest);
@@ -76,6 +76,6 @@ void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
 #endif
     C.r_End();
 
-    GEnv.Render->m_MSAASample = -1;
+    RImplementation.m_MSAASample = -1;
 }
 #endif

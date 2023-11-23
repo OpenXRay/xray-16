@@ -474,7 +474,7 @@ HRESULT CRender::shader_compile(
     }
 
     string_path shadersFolder;
-    FS.update_path(shadersFolder, "$game_shaders$", GEnv.Render->getShaderPath());
+    FS.update_path(shadersFolder, "$game_shaders$", RImplementation.getShaderPath());
 
     u32 fileCrc = 0;
     getFileCrc32(fs, shadersFolder, fileCrc);
