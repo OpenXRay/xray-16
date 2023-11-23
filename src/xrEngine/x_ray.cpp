@@ -283,13 +283,11 @@ void CApplication::LoadStage(bool draw /*= true*/)
 }
 
 void CApplication::LoadSwitch() {}
+
 // Sequential
 void CApplication::OnFrame()
 {
     Engine.Event.OnFrame();
-
-    if (g_pGameLevel)
-        g_pGameLevel->SoundEvent_Dispatch();
 }
 
 void CApplication::Level_Append(pcstr folder)
