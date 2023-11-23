@@ -309,7 +309,7 @@ CRenderTarget::CRenderTarget()
         for (u32 i = 0; i < HW.BackBufferCount; i++)
         {
             string32 temp;
-            xr_sprintf(temp, "%s%d", r2_RT_base, i);
+            xr_sprintf(temp, "%s%u", r2_RT_base, i);
             rt_Base[i].create(temp, w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
         }
         rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
