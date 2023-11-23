@@ -139,22 +139,17 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
                 desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
             }
         }
-#else
-        UNUSED(flags);
 #endif
 
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSurface));
-        // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT)); // TODO: DX11: check if texture is created?
-#ifdef DEBUG
-        Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, desc.Format, SampleCount);
-#endif // DEBUG
     }
-    HW.stats_manager.increment_stats_rtarget(pSurface);
 
 #ifdef DEBUG
     if (pSurface)
     {
+        HW.stats_manager.increment_stats_rtarget(pSurface);
         pSurface->SetPrivateData(WKPDID_D3DDebugObjectName, cName.size(), cName.c_str());
+        Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, desc.Format, SampleCount);
     }
 #endif
 
@@ -163,7 +158,6 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     {
         D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc{};
 
-        ViewDesc.Format = DXGI_FORMAT_UNKNOWN;
         if (SampleCount <= 1)
         {
             ViewDesc.ViewDimension = n_slices > 1 ? D3D_DSV_DIMENSION_TEXTURE2DARRAY : D3D_DSV_DIMENSION_TEXTURE2D;
@@ -222,7 +216,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
                 ViewDesc.Texture2DMSArray.FirstArraySlice = idx;
             }
             CHK_DX(HW.pDevice->CreateDepthStencilView(pSurface, &ViewDesc, &dsv_per_slice[idx]));
-#if DEBUG
+#ifdef DEBUG
             {
                 char name[128];
                 xr_sprintf(name, "%s:s%d", Name, idx);

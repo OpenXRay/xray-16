@@ -537,7 +537,7 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     vis_data& vis = pVisual->vis;
 
     // Check frustum visibility and calculate distance to visual's center
-    EFC_Visible VIS = view.testSAABB(vis.sphere.P, vis.sphere.R, vis.box.data(), planes);
+    const EFC_Visible VIS = view.testSAABB(vis.sphere.P, vis.sphere.R, vis.box.data(), planes);
     if (fcvNone == VIS)
         return;
 
@@ -549,7 +549,7 @@ void R_dsgraph_structure::add_static(dxRender_Visual* pVisual, const CFrustum& v
     {
     case MT_PARTICLE_GROUP:
     {
-        // Xottab_DUTY: for dynamic objects we need matrixб
+        // Xottab_DUTY: for dynamic objects we need matrix,
         // which is nullptr, when we use add_Static
         Log("Dynamic particles added via static procedure. Please, contact Xottab_DUTY and tell him about the issue.");
         NODEFAULT;
