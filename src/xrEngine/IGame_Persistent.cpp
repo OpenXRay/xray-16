@@ -37,7 +37,6 @@ IGame_Persistent::IGame_Persistent()
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this);
 
-    m_pMainMenu = nullptr;
     PerlinNoise1D = xr_new<CPerlinNoise1D>(Random.randI(0, 0xFFFF));
     PerlinNoise1D->SetOctaves(2);
     PerlinNoise1D->SetAmplitude(0.66666f);

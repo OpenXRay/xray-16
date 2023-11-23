@@ -147,7 +147,7 @@ public:
     CEnvironment& Environment() { return *pEnvironment; };
     void Prefetch();
 #endif
-    IMainMenu* m_pMainMenu;
+    IMainMenu* m_pMainMenu{};
     static bool IsMainMenuActive();
     static bool MainMenuActiveOrLevelNotExist();
 
