@@ -653,6 +653,9 @@
     <ClCompile Include="editor_weather.cpp">
       <Filter>editor</Filter>
     </ClCompile>
+    <ClCompile Include="IGame_Persistent_Effects.cpp">
+      <Filter>Game API\Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ClientServer.txt" />
