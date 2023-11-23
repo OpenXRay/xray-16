@@ -73,7 +73,7 @@ void try_change_current_entity()
 
     typedef xr_vector<ISpatial*> OBJECTS;
     OBJECTS ISpatialResult;
-    g_SpatialSpace->q_frustum(ISpatialResult, 0, STYPE_COLLIDEABLE, frustum);
+    g_pGamePersistent->SpatialSpace.q_frustum(ISpatialResult, 0, STYPE_COLLIDEABLE, frustum);
 
     float maxlen = 1000.0f;
     CCustomMonster* nearest_agent = 0;

@@ -775,7 +775,7 @@ void R_dsgraph_structure::build_subspace()
     if (collect_dynamic_any)
     {
         // Traverse object database
-        g_SpatialSpace->q_frustum(lstRenderables, o.spatial_traverse_flags, o.spatial_types, o.view_frustum);
+        g_pGamePersistent->SpatialSpace.q_frustum(lstRenderables, o.spatial_traverse_flags, o.spatial_types, o.view_frustum);
 
         if (o.spatial_traverse_flags & ISpatial_DB::O_ORDERED) // this should be inside of query functions
         {

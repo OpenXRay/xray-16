@@ -4,6 +4,7 @@
 #include "xr_object.h"
 #include "xr_collide_form.h"
 #include "IGame_Level.h"
+#include "IGame_Persistent.h"
 #include "xrCDB/Intersect.hpp"
 
 namespace Feel
@@ -96,7 +97,7 @@ void Vision::feel_vision_query(Fmatrix& mFull, Fvector& P)
 
     // Traverse object database
     r_spatial.clear();
-    g_SpatialSpace->q_frustum(r_spatial, 0, STYPE_VISIBLEFORAI, Frustum);
+    g_pGamePersistent->SpatialSpace.q_frustum(r_spatial, 0, STYPE_VISIBLEFORAI, Frustum);
 
     // Determine visibility for dynamic part of scene
     seen.clear();
@@ -223,7 +224,7 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
             }
             // Log("Vis",feel_params.vis);
             r_spatial.clear();
-            g_SpatialSpace->q_ray(r_spatial, 0, STYPE_VISIBLEFORAI, P, D, f);
+            g_pGamePersistent->SpatialSpace.q_ray(r_spatial, 0, STYPE_VISIBLEFORAI, P, D, f);
 
             RD.flags = CDB::OPT_ONLYFIRST;
 

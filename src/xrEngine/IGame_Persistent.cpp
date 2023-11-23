@@ -167,6 +167,9 @@ void IGame_Persistent::OnGameEnd()
 
 void IGame_Persistent::OnFrame()
 {
+    SpatialSpace.update();
+    SpatialSpacePhysic.update();
+
 #ifndef _EDITOR
     if (!Device.Paused() || Device.dwPrecacheFrame)
     {

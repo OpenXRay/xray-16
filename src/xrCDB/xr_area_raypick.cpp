@@ -36,7 +36,7 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
         u32 d_flags =
             STYPE_COLLIDEABLE | ((tgt & rqtObstacle) ? STYPE_OBSTACLE : 0) | ((tgt & rqtShape) ? STYPE_SHAPE : 0);
         // traverse object database
-        g_SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
+        SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
         // Determine visibility for dynamic part of scene
         for (auto spatial : r_spatial)
         {
@@ -132,7 +132,7 @@ bool CObjectSpace::_RayPick(
         // traverse object database
         u32 d_flags =
             STYPE_COLLIDEABLE | ((tgt & rqtObstacle) ? STYPE_OBSTACLE : 0) | ((tgt & rqtShape) ? STYPE_SHAPE : 0);
-        g_SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
+        SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
         // Determine visibility for dynamic part of scene
 #ifdef DEBUG
         if (bDebug())
@@ -206,7 +206,7 @@ bool CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_de
     if (R.tgt & d_mask)
     {
         // Traverse object database
-        g_SpatialSpace->q_ray(r_spatial, 0, d_flags, R.start, R.dir, R.range);
+        SpatialSpace->q_ray(r_spatial, 0, d_flags, R.start, R.dir, R.range);
         for (auto& p_spatial : r_spatial)
         {
             IGameObject* collidable = p_spatial->dcast_GameObject();
@@ -286,7 +286,7 @@ bool CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_de
         if (R.tgt & d_mask)
         {
             // Traverse object database
-            g_SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
+            SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
             for (auto& p_spatial : r_spatial)
             {
                 IGameObject* collidable = p_spatial->dcast_GameObject();
@@ -392,7 +392,7 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
             if (d_rd.range > EPS)
             {
                 // Traverse object database
-                g_SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
+                SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
                 // Determine visibility for dynamic part of scene
                 for (auto& p_spatial : r_spatial)
                 {

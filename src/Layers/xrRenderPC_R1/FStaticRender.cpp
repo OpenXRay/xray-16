@@ -551,7 +551,7 @@ void CRender::Calculate()
         // Traverse object database
         if (psDeviceFlags.test(rsDrawDynamic))
         {
-            g_SpatialSpace->q_frustum(
+            g_pGamePersistent->SpatialSpace.q_frustum(
                 dsgraph.lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)

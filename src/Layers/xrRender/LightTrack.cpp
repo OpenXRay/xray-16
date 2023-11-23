@@ -453,9 +453,9 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
 
         static xr_vector<ISpatial*> lstSpatial;
 #if RENDER != R_R1
-        g_SpatialSpace->q_box(lstSpatial, 0, STYPE_LIGHTSOURCEHEMI, position, bb_size);
+        g_pGamePersistent->SpatialSpace.q_box(lstSpatial, 0, STYPE_LIGHTSOURCEHEMI, position, bb_size);
 #else
-        g_SpatialSpace->q_box(lstSpatial, 0, STYPE_LIGHTSOURCE, position, bb_size);
+        g_pGamePersistent->SpatialSpace.q_box(lstSpatial, 0, STYPE_LIGHTSOURCE, position, bb_size);
 #endif
         for (u32 o_it = 0; o_it < lstSpatial.size(); o_it++)
         {

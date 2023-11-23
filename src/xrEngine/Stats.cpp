@@ -75,6 +75,7 @@ static void DumpTaskManagerStatistics(IGameFont& font, IPerformanceAlert* alert)
     finishedPrev = finished;
 }
 
+// XXX: move to IGame_Persistent
 static void DumpSpatialStatistics(IGameFont& font, IPerformanceAlert* alert, ISpatial_DB& db, float engineTotal)
 {
 #ifdef DEBUG
@@ -129,8 +130,8 @@ void CStats::Show()
         {
             g_pGamePersistent->DumpStatistics(font, alertPtr);
         }
-        DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
-        DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
+        DumpSpatialStatistics(font, alertPtr, g_pGamePersistent->SpatialSpace, engineTotal);
+        DumpSpatialStatistics(font, alertPtr, g_pGamePersistent->SpatialSpacePhysic, engineTotal);
         font.OutSet(200, 0);
         GEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();

@@ -469,7 +469,7 @@ void dx113DFluidRenderer::CalculateLighting(const dx113DFluidData& FluidData, Fo
     box.getradius(size);
 
     // Traverse object database
-    g_SpatialSpace->q_box(m_lstRenderables,
+    g_pGamePersistent->SpatialSpace.q_box(m_lstRenderables,
         0, // ISpatial_DB::O_ORDERED,
         STYPE_LIGHTSOURCE, center, size);
 
