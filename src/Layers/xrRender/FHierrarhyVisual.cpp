@@ -20,8 +20,8 @@ FHierrarhyVisual::~FHierrarhyVisual()
 {
     if (!bDontDelete)
     {
-        for (u32 i = 0; i < children.size(); i++)
-            GEnv.Render->model_Delete((IRenderVisual*&)children[i]);
+        for (auto& child : children)
+            RImplementation.model_Delete((IRenderVisual*&)child, false);
     }
     children.clear();
 }
