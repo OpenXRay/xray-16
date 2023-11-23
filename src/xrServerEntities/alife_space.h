@@ -152,11 +152,12 @@ enum ECombatType
     eCombatTypeDummy = u32(-1),
 };
 
+// ability to attach addons
 enum EWeaponAddonStatus
 {
-    eAddonDisabled = 0,
-    eAddonPermanent = 1,
-    eAddonAttachable = 2
+    eAddonDisabled = 0,  // can't attach
+    eAddonPermanent = 1, // always attached, already
+    eAddonAttachable = 2 // can attach/detach
 };
 
 EHitType g_tfString2HitType(LPCSTR caHitType);
