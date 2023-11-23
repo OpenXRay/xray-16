@@ -146,6 +146,13 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kCUSTOM14",                  int(kCUSTOM14)),
                 value("kCUSTOM15",                  int(kCUSTOM15)),
 
+                value("kPDA_TAB1",                  int(kPDA_TAB1)),
+                value("kPDA_TAB2",                  int(kPDA_TAB2)),
+                value("kPDA_TAB3",                  int(kPDA_TAB3)),
+                value("kPDA_TAB4",                  int(kPDA_TAB4)),
+                value("kPDA_TAB5",                  int(kPDA_TAB5)),
+                value("kPDA_TAB6",                  int(kPDA_TAB6)),
+
                 value("kKICK",                      int(kKICK)),
 
                 value("kEDITOR",                    int(kEDITOR)),

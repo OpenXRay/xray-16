@@ -124,6 +124,13 @@ enum EGameActions : u32
     kCUSTOM14,
     kCUSTOM15,
 
+    kPDA_TAB1,
+    kPDA_TAB2,
+    kPDA_TAB3,
+    kPDA_TAB4,
+    kPDA_TAB5,
+    kPDA_TAB6,
+
     kKICK, // alpet: kick dynamic objects
 
     kEDITOR,
