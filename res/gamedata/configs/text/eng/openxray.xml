@@ -48,7 +48,7 @@
 	<string id="ui_mm_loadingstages">
 		<text>Show loading stages</text>
 	</string>
-	<string id="renderer_gl">
+	<string id="renderer_rgl">
 		<text>Enhanced full dyn. lighting (OpenGL)</text>
 	</string>
 	<string id="ui_mm_window_mode">

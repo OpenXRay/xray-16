@@ -45,7 +45,7 @@
 	<string id="ui_mm_loadingstages">
 		<text>Postêp wczytywania</text>
 	</string>
-	<string id="renderer_gl">
+	<string id="renderer_rgl">
 		<text>Rozsz. pe³ne oœw. dynam. (OpenGL)</text>
 	</string>
 	<string id="ui_mm_window_mode">
