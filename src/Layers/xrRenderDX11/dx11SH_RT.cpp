@@ -296,7 +296,7 @@ void CRT::set_slice_write(u32 context_id, int slice)
 
 
 void CRT::reset_begin() { destroy(); }
-void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt, sampleCount, { dwFlags }); }
+void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt, sampleCount, n_slices, { dwFlags }); }
 
 void CRT::resolve_into(CRT& destination) const // TODO: this should be moved into backend
 {
