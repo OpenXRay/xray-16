@@ -173,8 +173,8 @@ void CPHDestroyable::Load(CInifile* ini, LPCSTR section)
         if (data.Data.size() > 0)
             m_flags.set(fl_destroyable, true);
         for (const auto& I : data.Data)
-            if (I.first.size())
-                m_destroyed_obj_visual_names.push_back(I.first);
+            if (I.name.size())
+                m_destroyed_obj_visual_names.push_back(I.name);
     }
 }
 void CPHDestroyable::Load(LPCSTR section)

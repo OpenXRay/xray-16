@@ -42,12 +42,12 @@ void setup_location_types_section(GameGraph::TERRAIN_VECTOR& m_vertex_types, CIn
     GameGraph::STerrainPlace terrain_mask;
     terrain_mask.tMask.resize(GameGraph::LOCATION_TYPE_COUNT);
 
-    CInifile::Sect& sect = ini->r_section(section);
+    const CInifile::Sect& sect = ini->r_section(section);
     auto I = sect.Data.cbegin();
     auto E = sect.Data.cend();
     for (; I != E; ++I)
     {
-        pcstr S = *(*I).first;
+        pcstr S = *(*I).name;
         string16 I2;
         u32 N = _GetItemCount(S);
 

@@ -53,11 +53,11 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
         const auto processAssociation = [&](const CInifile::Item& item)
         {
             if (listTHM)
-                Msg("\t\t%s = %s", item.first.c_str(), item.second.c_str());
+                Msg("\t\t%s = %s", item.name.c_str(), item.value.c_str());
 
             lock.Enter();
-            texture_desc& desc = m_texture_details[item.first];
-            cl_dt_scaler*& dts = m_detail_scalers[item.first];
+            texture_desc& desc = m_texture_details[item.name];
+            cl_dt_scaler*& dts = m_detail_scalers[item.name];
             lock.Leave();
 
             if (desc.m_assoc)
@@ -68,19 +68,19 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
             string_path T;
             float s;
 
-            const int res = sscanf(*item.second, "%[^,],%f", T, &s);
-            R_ASSERT4(res == 2, "Bad texture association", item.first.c_str(), fname);
+            const int res = sscanf(*item.value, "%[^,],%f", T, &s);
+            R_ASSERT4(res == 2, "Bad texture association", item.name.c_str(), fname);
             desc.m_assoc->detail_name = T;
             if (dts)
                 dts->scale = s;
             else
                 dts = xr_new<cl_dt_scaler>(s);
 
-            if (strstr(item.second.c_str(), "usage[diffuse_or_bump]"))
+            if (strstr(item.value.c_str(), "usage[diffuse_or_bump]"))
                 desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail | texture_assoc::flBumpDetail);
-            else if (strstr(item.second.c_str(), "usage[bump]"))
+            else if (strstr(item.value.c_str(), "usage[bump]"))
                 desc.m_assoc->usage.set(texture_assoc::flBumpDetail);
-            else if (strstr(item.second.c_str(), "usage[diffuse]"))
+            else if (strstr(item.value.c_str(), "usage[diffuse]"))
                 desc.m_assoc->usage.set(texture_assoc::flDiffuseDetail);
         };
         xr_parallel_for_each(data.Data, processAssociation);
@@ -97,10 +97,10 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
         const auto processSpecification = [&](const CInifile::Item& item)
         {
             if (listTHM)
-                Msg("\t\t%s = %s", item.first.c_str(), item.second.c_str());
+                Msg("\t\t%s = %s", item.name.c_str(), item.value.c_str());
 
             lock.Enter();
-            texture_desc& desc = m_texture_details[item.first];
+            texture_desc& desc = m_texture_details[item.name];
             lock.Leave();
 
             if (desc.m_spec)
@@ -110,8 +110,8 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 
             string_path bmode;
             const int res =
-                    sscanf(item.second.c_str(), "bump_mode[%[^]]], material[%f]", bmode, &desc.m_spec->m_material);
-            R_ASSERT4(res == 2, "Bad texture specification", item.first.c_str(), fname);
+                    sscanf(item.value.c_str(), "bump_mode[%[^]]], material[%f]", bmode, &desc.m_spec->m_material);
+            R_ASSERT4(res == 2, "Bad texture specification", item.name.c_str(), fname);
             if ((bmode[0] == 'u') && (bmode[1] == 's') && (bmode[2] == 'e') && (bmode[3] == ':'))
             {
                 // bump-map specified

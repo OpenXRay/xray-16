@@ -45,7 +45,7 @@ protected:
     virtual bool is_on_ground() { return true; }
 private:
     void reload_foot_bones();
-    void load_foot_bones(CInifile::Sect& data);
+    void load_foot_bones(const CInifile::Sect& data);
 
     float get_blend_time();
 };

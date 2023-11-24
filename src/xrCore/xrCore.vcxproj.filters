@@ -118,6 +118,9 @@
     <Filter Include="Threading\Util">
       <UniqueIdentifier>{14c94737-f2c7-482d-9033-775a3da068cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Parsing">
+      <UniqueIdentifier>{3116121d-205f-4de2-be5a-da1dbf9919e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -326,6 +329,9 @@
     </ClCompile>
     <ClCompile Include="_cylinder.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="ParsingUtils.cpp">
+      <Filter>Parsing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -703,6 +709,9 @@
     </ClInclude>
     <ClInclude Include="Threading\ParallelForEach.hpp">
       <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="ParsingUtils.hpp">
+      <Filter>Parsing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

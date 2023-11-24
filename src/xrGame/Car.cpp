@@ -949,17 +949,17 @@ void CCar::Init()
         for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
         {
             const CInifile::Item& item = *I;
-            u16 index = pKinematics->LL_BoneID(*item.first);
-            R_ASSERT3(index != BI_NONE, "Wrong bone name", *item.first);
+            u16 index = pKinematics->LL_BoneID(*item.name);
+            R_ASSERT3(index != BI_NONE, "Wrong bone name", *item.name);
             xr_map<u16, SWheel>::iterator i = m_wheels_map.find(index);
 
             if (i != m_wheels_map.end())
-                i->second.CDamagableHealthItem::Init(float(atof(*item.second)), 2);
+                i->second.CDamagableHealthItem::Init(float(atof(*item.value)), 2);
             else
             {
                 xr_map<u16, SDoor>::iterator i = m_doors.find(index);
-                R_ASSERT3(i != m_doors.end(), "only wheel and doors bones allowed for damage defs", *item.first);
-                i->second.CDamagableHealthItem::Init(float(atof(*item.second)), 1);
+                R_ASSERT3(i != m_doors.end(), "only wheel and doors bones allowed for damage defs", *item.name);
+                i->second.CDamagableHealthItem::Init(float(atof(*item.value)), 1);
             }
         }
     }

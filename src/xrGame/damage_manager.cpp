@@ -74,25 +74,25 @@ void CDamageManager::load_section(LPCSTR section, CInifile const* ini)
 {
     string32 buffer;
     IKinematics* kinematics = smart_cast<IKinematics*>(m_object->Visual());
-    CInifile::Sect& damages = ini->r_section(section);
+    const CInifile::Sect& damages = ini->r_section(section);
     for (const auto & i : damages.Data)
     {
-        if (xr_strcmp(*i.first, "default"))
+        if (xr_strcmp(*i.name, "default"))
         { // read all except default line
             VERIFY(m_object);
-            int bone = kinematics->LL_BoneID(i.first);
-            R_ASSERT2(BI_NONE != bone, *i.first);
+            int bone = kinematics->LL_BoneID(i.name);
+            R_ASSERT2(BI_NONE != bone, *i.name);
             CBoneInstance& bone_instance = kinematics->LL_GetBoneInstance(u16(bone));
-            bone_instance.set_param(0, (float)atof(_GetItem(*i.second, 0, buffer)));
-            bone_instance.set_param(1, (float)atoi(_GetItem(*i.second, 1, buffer)));
-            bone_instance.set_param(2, (float)atof(_GetItem(*i.second, 2, buffer)));
-            if (_GetItemCount(*i.second) < 4)
+            bone_instance.set_param(0, (float)atof(_GetItem(*i.value, 0, buffer)));
+            bone_instance.set_param(1, (float)atoi(_GetItem(*i.value, 1, buffer)));
+            bone_instance.set_param(2, (float)atof(_GetItem(*i.value, 2, buffer)));
+            if (_GetItemCount(*i.value) < 4)
             {
-                bone_instance.set_param(3, (float)atof(_GetItem(*i.second, 0, buffer)));
+                bone_instance.set_param(3, (float)atof(_GetItem(*i.value, 0, buffer)));
             }
             else
             {
-                bone_instance.set_param(3, (float)atof(_GetItem(*i.second, 3, buffer)));
+                bone_instance.set_param(3, (float)atof(_GetItem(*i.value, 3, buffer)));
             }
             if (0 == bone && (fis_zero(bone_instance.get_param(0)) || fis_zero(bone_instance.get_param(2))))
             {

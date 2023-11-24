@@ -182,7 +182,7 @@ bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*
         auto it = S.Data.cbegin(), end = S.Data.cend();
         for (; it != end; ++it)
         {
-            shared_str map_name = it->first;
+            shared_str map_name = it->name;
             xr_strlwr(map_name);
             R_ASSERT2(m_GameMaps.end() == m_GameMaps.find(map_name), "Duplicate level name not allowed");
 

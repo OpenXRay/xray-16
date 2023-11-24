@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: UIRankingWnd.cpp
-//	Created 	: 17.01.2008
-//	Author		: Evgeniy Sokolov
-//	Description : UI Ranking window class implementation
+//  Module      : UIRankingWnd.cpp
+//  Created     : 17.01.2008
+//  Author      : Evgeniy Sokolov
+//  Description : UI Ranking window class implementation
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
@@ -156,10 +156,10 @@ bool CUIRankingWnd::Init()
         {
             node = xml.NavigateToNode("fraction_list", 0);
             xml.SetLocalRoot(node);
-            CInifile::Sect& faction_section = pSettings->r_section(fract_section);
+            const CInifile::Sect& faction_section = pSettings->r_section(fract_section);
             for (const auto& item : faction_section.Data)
             {
-                add_faction(xml, item.first);
+                add_faction(xml, item.name);
             }
             node = xml.NavigateToNode("fraction_list", 0);
             xml.SetLocalRoot(stored_root);
@@ -188,7 +188,7 @@ bool CUIRankingWnd::Init()
         {
             const auto& achievs_section = pSettings->r_section(section);
             for (const auto& item : achievs_section.Data)
-                add_achievement(xml, item.first);
+                add_achievement(xml, item.name);
         }
     }
     xml.SetLocalRoot(stored_root);

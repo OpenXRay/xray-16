@@ -131,11 +131,9 @@ void InitSettings()
     CInifile::allow_include_func_t includeFilter;
     includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
 
-    InitConfig(pSettings, "system.ltx");
-    InitConfig(pSettingsAuth, "system.ltx", true, true, true, false, 0, includeFilter);
     InitConfig(pSettingsOpenXRay, "openxray.ltx", false, true, true, false);
-    InitConfig(pGameIni, "game.ltx");
 
+    // Determine game mode
     if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
         set_shoc_mode();
     else if (strstr(Core.Params, "-cs"))
@@ -156,6 +154,13 @@ void InitSettings()
         else if (xr_strcmpi("unlock", gameMode) == 0)
             set_free_mode();
     }
+
+    ltx_multiline_values_enabled =
+        pSettingsOpenXRay->read_if_exists<bool>("compatibility", "ltx_multiline_values", !ShadowOfChernobylMode);
+
+    InitConfig(pSettings, "system.ltx");
+    InitConfig(pSettingsAuth, "system.ltx", true, true, true, false, 0, includeFilter);
+    InitConfig(pGameIni, "game.ltx");
 }
 
 void InitConsole()

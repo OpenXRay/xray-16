@@ -346,6 +346,14 @@ target_sources_grouped(
 
 target_sources_grouped(
     TARGET xrCore
+    NAME "Parsing"
+    FILES
+    ParsingUtils.cpp
+    ParsingUtils.hpp
+)
+
+target_sources_grouped(
+    TARGET xrCore
     NAME "PCH"
     FILES
     stdafx.cpp

@@ -320,7 +320,7 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
         W.w_string(buff);
         for (const auto& it : S.Data)
         {
-            xr_sprintf(buff, "%s = %s", it.first.c_str(), it.second.c_str());
+            xr_sprintf(buff, "%s = %s", it.name.c_str(), it.value.c_str());
             W.w_string(buff);
         }
         W.seek(0);
@@ -470,15 +470,15 @@ bool xrCompressor::IsFolderAccepted(const CInifile& ltx, LPCSTR path, bool& recu
         const auto& ef_sect = ltx.r_section("exclude_folders");
         for (const auto& it : ef_sect.Data)
         {
-            recurse = CInifile::isBool(it.second.c_str());
+            recurse = CInifile::isBool(it.value.c_str());
             if (recurse)
             {
-                if (path == strstr(path, it.first.c_str()))
+                if (path == strstr(path, it.name.c_str()))
                     return false;
             }
             else
             {
-                if (0 == xr_strcmp(path, it.first.c_str()))
+                if (0 == xr_strcmp(path, it.name.c_str()))
                     return false;
             }
         }
@@ -501,11 +501,11 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
         const CInifile::Sect& if_sect = ltx.r_section("include_folders");
         for (const auto& it : if_sect.Data)
         {
-            const BOOL ifRecurse = CInifile::isBool(it.second.c_str());
+            const BOOL ifRecurse = CInifile::isBool(it.value.c_str());
             const u32 folder_mask = FS_ListFolders | (ifRecurse ? 0 : FS_RootOnly);
 
             string_path path;
-            const LPCSTR _path = 0 == xr_strcmp(it.first.c_str(), ".\\") ? "" : it.first.c_str();
+            const LPCSTR _path = 0 == xr_strcmp(it.name.c_str(), ".\\") ? "" : it.name.c_str();
             xr_strcpy(path, _path);
             const size_t path_len = xr_strlen(path);
             if ((0 != path_len) && (path[path_len - 1] != '\\'))
@@ -556,7 +556,7 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
     {
         const CInifile::Sect& if_sect = ltx.r_section("include_files");
         for (const auto& it : if_sect.Data)
-            files_list->push_back(xr_strdup(it.first.c_str()));
+            files_list->push_back(xr_strdup(it.name.c_str()));
     }
 
     PerformWork();

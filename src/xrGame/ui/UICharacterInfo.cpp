@@ -385,12 +385,12 @@ bool CUICharacterInfo::ignore_community(shared_str const& check_community)
     if (!pSettings->section_exist(comm_section_str))
         return false;
 
-    CInifile::Sect& faction_section = pSettings->r_section(comm_section_str);
+    const CInifile::Sect& faction_section = pSettings->r_section(comm_section_str);
     auto ib = faction_section.Data.begin();
     auto ie = faction_section.Data.end();
     for (; ib != ie; ++ib)
     {
-        if (check_community == (*ib).first)
+        if (check_community == (*ib).name)
         {
             return true;
         }

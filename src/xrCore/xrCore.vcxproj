@@ -80,6 +80,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Memory\xrMemory_align.cpp" />
     <ClCompile Include="NET_utils.cpp" />
     <ClCompile Include="os_clipboard.cpp" />
+    <ClCompile Include="ParsingUtils.cpp" />
     <ClCompile Include="PostProcess\PostProcess.cpp" />
     <ClCompile Include="PostProcess\PPInfo.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -184,6 +185,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="Memory\xrMemory_align.h" />
     <ClInclude Include="net_utils.h" />
     <ClInclude Include="os_clipboard.h" />
+    <ClInclude Include="ParsingUtils.hpp" />
     <ClInclude Include="PostProcess\PostProcess.hpp" />
     <ClInclude Include="PostProcess\PPInfo.hpp" />
     <ClInclude Include="resource.h" />

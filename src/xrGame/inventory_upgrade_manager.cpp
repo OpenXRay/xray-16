@@ -177,7 +177,7 @@ public:
 
         const auto it = std::find_if(ib, ie, [&](const CInifile::Item& item)
         {
-            return item.first == item_id;
+            return item.name == item_id;
         });
 
         return it != ie;
@@ -226,12 +226,12 @@ void Manager::load_all_properties()
         pSettings->section_exist(properties_section), make_string("Section [%s] does not exist !", properties_section));
     VERIFY2(pSettings->line_count(properties_section), make_string("Section [%s] is empty !", properties_section));
 
-    CInifile::Sect& inv_section = pSettings->r_section(properties_section);
+    const CInifile::Sect& inv_section = pSettings->r_section(properties_section);
     auto ib = inv_section.Data.begin();
     auto ie = inv_section.Data.end();
     for (; ib != ie; ++ib)
     {
-        shared_str property_id((*ib).first);
+        shared_str property_id((*ib).name);
         add_property(property_id);
     }
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "XMLDocument.hpp"
+#include "ParsingUtils.hpp"
 
 pcstr UI_PATH = UI_PATH_DEFAULT;
 pcstr UI_PATH_WITH_DELIMITER = UI_PATH_DEFAULT_WITH_DELIMITER;
@@ -10,61 +11,6 @@ XMLDocument::XMLDocument() : m_xml_file_name(), m_root(nullptr), m_pLocalRoot(nu
 XMLDocument::~XMLDocument() { ClearInternal(); }
 
 void XMLDocument::ClearInternal() { m_Doc.Clear(); }
-
-enum class ParseIncludeResult
-{
-    Success,   /// There is a valid #include and 'out_include_name' returns the filename
-    Error,     /// There is a #include but there is some problem
-    NoInclude, /// There is no #include on this line
-};
-
-// Given a string of the form: '#include "filename"' we return the filename in 'out_include_name'
-ParseIncludeResult ParseInclude(pstr string, pcstr& out_include_name)
-{
-    // Skip any whitespace characters
-    while (*string != '\0' && std::isblank(*string))
-    {
-        ++string;
-    }
-
-    // Check for #include
-    static constexpr pcstr IncludeTag = "#include";
-    if (std::strncmp(string, IncludeTag, 8) != 0)
-        return ParseIncludeResult::NoInclude;
-
-    string += 8;
-
-    // Skip any whitespace characters
-    while (*string != '\0' && std::isblank(*string))
-        ++string;
-
-    // Check that after the tag there is a quote
-    if (*string != '\"')
-        return ParseIncludeResult::Error;
-
-    // Mark the start of the include name
-    ++string;
-    out_include_name = string;
-
-    while (*string != '\0' && *string != '\"')
-        ++string;
-
-    // Check for unterminated or empty include name
-    if (*string == '\0' || out_include_name == string)
-        return ParseIncludeResult::Error;
-
-    // Check for unreasonably long include names
-    const size_t size = string - out_include_name;
-    if (size > 1024)
-        return ParseIncludeResult::Error;
-
-    // NOTE(Andre): Yes this might look scary but it's perfectly fine. Since the include name is already in the string
-    // we are parsing and its not used afterwards we simply replace the closing quote with a null byte and we have a
-    // valid c-string pointed to by 'out_include_name' and safe ourselves the need to copy the string.
-    *string = '\0';
-
-    return ParseIncludeResult::Success;
-}
 
 void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml, bool fatal, u8 include_depth)
 {

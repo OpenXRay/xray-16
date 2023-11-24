@@ -6,15 +6,15 @@ extern pcstr _list_names[];
 
 void CItemMgr::Load(const shared_str& sect_cost)
 {
-    CInifile::Sect& sect = pSettings->r_section(sect_cost);
+    const CInifile::Sect& sect = pSettings->r_section(sect_cost);
 
     u32 idx = 0;
     for (auto it = sect.Data.cbegin(); it != sect.Data.cend(); ++it, ++idx)
     {
-        _i& val = m_items[it->first];
+        _i& val = m_items[it->name];
         val.slot_idx = 0xff;
         int c = sscanf(
-            it->second.c_str(), "%d,%d,%d,%d,%d", &val.cost[0], &val.cost[1], &val.cost[2], &val.cost[3], &val.cost[4]);
+            it->value.c_str(), "%d,%d,%d,%d,%d", &val.cost[0], &val.cost[1], &val.cost[2], &val.cost[3], &val.cost[4]);
         VERIFY(c > 0);
 
         while (c < _RANK_COUNT)
