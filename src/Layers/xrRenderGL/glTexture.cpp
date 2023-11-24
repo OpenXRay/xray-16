@@ -60,15 +60,15 @@ u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 
 GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 {
+    ret_msize = 0;
+    R_ASSERT1_CURE(fRName && fRName[0], true, { return 0; });
+
     GLuint pTexture = 0;
     string_path fn;
     size_t img_size = 0;
     int img_loaded_lod = 0;
     gli::gl::format fmt;
     u32 mip_cnt = u32(-1);
-    // validation
-    R_ASSERT(fRName);
-    R_ASSERT(fRName[0]);
 
     bool dummyTextureExist;
 

@@ -274,6 +274,9 @@ IC u32 it_height_rev_base(u32 d, u32 s) {   return  color_rgba  (
 */
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
+    ret_msize = 0;
+    R_ASSERT1_CURE(fRName && fRName[0], true, { return nullptr; });
+
     DirectX::TexMetadata IMG;
     DirectX::ScratchImage texture;
     ID3DBaseTexture* pTexture2D = NULL;
@@ -282,10 +285,6 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     int img_loaded_lod = 0;
     u32 mip_cnt = u32(-1);
     bool dummyTextureExist;
-
-    // validation
-    R_ASSERT(fRName);
-    R_ASSERT(fRName[0]);
 
     // make file name
     string_path fname;
