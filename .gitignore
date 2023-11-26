@@ -12,7 +12,7 @@ cmake_install.cmake
 cmake-build-*
 install_manifest.txt
 bin/
-build/
+[bB]uild*/
 intermediate/
 intermediate_plugs/
 lib/
