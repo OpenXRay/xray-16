@@ -417,6 +417,7 @@ target_link_libraries(xrPhysics
 target_compile_definitions(xrPhysics
     PRIVATE
     XRPHYSICS_EXPORTS
+    PURE_DYNAMIC_CAST
 )
 
 set_target_properties(xrPhysics PROPERTIES

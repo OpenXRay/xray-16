@@ -159,6 +159,7 @@ endif()
 target_compile_definitions(xrUICore
     PRIVATE
     XRUICORE_EXPORTS
+    PURE_DYNAMIC_CAST
 )
 
 set_target_properties(xrUICore PROPERTIES

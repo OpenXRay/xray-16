@@ -89,6 +89,9 @@ if (STATIC_BUILD)
 endif()
 message(STATUS "STATIC_BUILD: ${STATIC_BUILD}")
 
+option(CMAKE_UNITY_BUILD "Use unity build" OFF)
+message(STATUS "CMAKE_UNITY_BUILD: ${CMAKE_UNITY_BUILD}")
+
 find_program(CCACHE_FOUND ccache)
 if (CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)

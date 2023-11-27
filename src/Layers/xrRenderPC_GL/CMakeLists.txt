@@ -415,6 +415,7 @@ target_compile_definitions(xrRender_GL
     PRIVATE
     XRRENDER_GL_EXPORTS
     USE_OGL
+    PURE_DYNAMIC_CAST
 )
 
 set_target_properties(xrRender_GL PROPERTIES

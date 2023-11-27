@@ -455,6 +455,7 @@ target_link_libraries(xrEngine
 target_compile_definitions(xrEngine
     PRIVATE
     ENGINE_BUILD
+    PURE_DYNAMIC_CAST
 )
 
 set_target_properties(xrEngine PROPERTIES
