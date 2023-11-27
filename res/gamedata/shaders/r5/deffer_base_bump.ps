@@ -14,16 +14,27 @@ f_deffer main ( p_bumped I )
 	// hemi,sun,material
 	float 	ms	= xmaterial		;
 #ifdef USE_LM_HEMI
-//	float4	lm 	= tex2D			(s_hemi, I.lmh);
 	float4	lm 	= s_hemi.Sample( smp_rtlinear, I.lmh);
-//	float 	h  	= dot			(lm.rgb,1.h/3.h);
 	float 	h  	= get_hemi(lm);
 # ifdef USE_R2_STATIC_SUN
-//		 	ms 	= lm.w;
 			ms 	= get_sun(lm);
 # endif
 #else
+/*
+//#if defined(SKIN_0) || defined(SKIN_1)|| defined(SKIN_2)|| defined(SKIN_3)|| defined(SKIN_4) //&& !defined(SKIN_NONE)
+#ifdef SKIN_4
+//#if defined(SKIN_3) || defined(SKIN_4)
+//#ifndef SKIN_NONE
+	//  Hemi cube lighting
+	float3	Nw	= mul(m_inv_V, Ne);
+	float3  hc_pos	= hemi_cube_pos_faces.xyz;
+	float3	hc_neg	= hemi_cube_neg_faces.xyz;
+	float3  hc_mixed = (Nw < 0) ? hc_neg : hc_pos;
+	float	hemi_val = saturate(dot(hc_mixed, abs(Nw)));
+	float 	h	= hemi_val	;
+#else*/
 	float 	h	= I.position.w	;
+//#endif
 # ifdef USE_R2_STATIC_SUN
 		 	ms	= I.tcdh.w		;
 # endif

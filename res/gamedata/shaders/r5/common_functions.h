@@ -1,6 +1,8 @@
 #ifndef	common_functions_h_included
 #define	common_functions_h_included
 
+#include "srgb.h"
+
 //	contrast function
 float Contrast(float Input, float ContrastPower)
 {
@@ -12,31 +14,72 @@ float Contrast(float Input, float ContrastPower)
      return Output;
 }
 
-void tonemap( out float4 low, out float4 high, float3 rgb, float scale)
+float3 vibrance(float3 img, float val )
 {
-	rgb		=	rgb*scale;
-
-	const float fWhiteIntensity = 1.7;
-
-	const float fWhiteIntensitySQR = fWhiteIntensity*fWhiteIntensity;
-
-//	low		=	(rgb/(rgb + 1)).xyzz;
-	low		=	( (rgb*(1+rgb/fWhiteIntensitySQR)) / (rgb+1) ).xyzz;
-
-	high	=	rgb.xyzz/def_hdr;	// 8x dynamic range
-
-/*
-	rgb		=	rgb*scale;
-
-	low		=	rgb.xyzz;
-	high	=	low/def_hdr;	// 8x dynamic range
-*/
+    float luminance = dot( float3( img.rgb ), LUMINANCE_VECTOR );
+    return float3( lerp( luminance, float3( img.rgb ), val ));
 }
 
-float4 combine_bloom( float3  low, float4 high)	
+void        tonemap (out float4 low, out float4 high, float3 rgb, float scale)
 {
-        return float4( low + high*high.a, 1.h );
+	rgb =    	SRGBToLinear(rgb);
+        rgb     =      	rgb*scale       ;
+	rgb =    	LinearTosRGB(rgb);
+
+	const float fWhiteIntensity = 11.2;
+
+	low =   float4(tonemap_sRGB(rgb, fWhiteIntensity ), 0);
+	high = 	float4(rgb/def_hdr, 0);
 }
+
+void		tonemap_hipri (out float4 low, out float4 high, float3 rgb, float scale)
+{
+	tonemap (low, high, rgb, scale);
+}
+
+float3 compute_colored_ao(float ao, float3 albedo)
+{ //https://www.activision.com/cdn/research/s2016_pbs_activision_occlusion.pptx
+    float3 a = 2.0404 * albedo - 0.3324;
+    float3 b = -4.7951 * albedo + 0.6417;
+    float3 c = 2.7552 * albedo + 0.6903;
+
+    return max(ao, ((ao * a + b) * ao + c) * ao);
+}
+//CUSTOM
+float3 blend_soft(float3 a, float3 b)
+{
+	//return 1.0 - (1.0 - a) * (1.0 - b);
+	
+	//gamma correct and inverse tonemap to add bloom
+	a = SRGBToLinear(a); //post tonemap render
+	a = a / max(0.004, 1-a); //inverse tonemap
+	//a = a / max(0.001, 1-a); //inverse tonemap
+	b = SRGBToLinear(b); //bloom
+
+	//constrast reduction of ACES output
+	float Contrast_Amount = 0.7;
+	const float mid = 0.18;
+	a = pow(a, Contrast_Amount) * mid/pow(mid,Contrast_Amount);
+	
+	ACES_LMT(b); //color grading bloom
+	a += b; //bloom add
+
+	//Boost the contrast to match ACES RRT
+	float Contrast_Boost = 1.42857;
+	a = pow(a, Contrast_Boost) * mid/pow(mid,Contrast_Boost);
+	
+	a = a / (1+a) ; //tonemap
+	
+	a = LinearTosRGB(a);
+	return a;
+}
+
+float4 combine_bloom(float3 low, float4 high)    
+{
+	//return	float4(low + high*high.a, 1); //add
+	high.rgb  *= high.a;
+	return	float4(blend_soft(low.rgb, high.rgb),1); //screen
+}	
 
 float calc_fogging( float4 w_pos )      
 {
@@ -45,7 +88,7 @@ float calc_fogging( float4 w_pos )
 
 float2 unpack_tc_base( float2 tc, float du, float dv )
 {
-		return (tc.xy + float2	(du,dv))*(32.f/32768.f); //!Increase from 32bit to 64bit floating point
+		return (tc.xy + float2	(du,dv))*(32.0/32768.0); //!Increase from 32bit to 64bit floating point
 }
 
 float3 calc_sun_r1( float3 norm_w )    
@@ -63,10 +106,10 @@ float3 calc_model_lq_lighting( float3 norm_w )
 	return L_material.x*calc_model_hemi_r1(norm_w) + L_ambient + L_material.y*calc_sun_r1(norm_w);
 }
 
-float3 	unpack_normal( float3 v )	{ return 2*v-1; }
-float3 	unpack_bx2( float3 v )	{ return 2*v-1; }
-float3 	unpack_bx4( float3 v )	{ return 4*v-2; } //!reduce the amount of stretching from 4*v-2 and increase precision
-float2 	unpack_tc_lmap( float2 tc )	{ return tc*(1.f/32768.f);	} // [-1  .. +1 ] 
+float3 	unpack_normal( float3 v )	{ return 2.0*v-1.0; }
+float3 	unpack_bx2( float3 v )	{ return 2.0*v-1.0; }
+float3 	unpack_bx4( float3 v )	{ return 4.0*v-2.0; } //!reduce the amount of stretching from 4*v-2 and increase precision
+float2 	unpack_tc_lmap( float2 tc )	{ return tc*(1.0/32768.0);	} // [-1  .. +1 ] 
 float4	unpack_color( float4 c ) { return c.bgra; }
 float4	unpack_D3DCOLOR( float4 c ) { return c.bgra; }
 float3	unpack_D3DCOLOR( float3 c ) { return c.bgr; }
@@ -105,237 +148,95 @@ float3	calc_reflection( float3 pos_w, float3 norm_w )
     return reflect(normalize(pos_w-eye_position), norm_w);
 }
 
-#define USABLE_BIT_1                uint(0x00002000)
-#define USABLE_BIT_2                uint(0x00004000)
-#define USABLE_BIT_3                uint(0x00008000)
-#define USABLE_BIT_4                uint(0x00010000)
-#define USABLE_BIT_5                uint(0x00020000)
-#define USABLE_BIT_6                uint(0x00040000)
-#define USABLE_BIT_7                uint(0x00080000)
-#define USABLE_BIT_8                uint(0x00100000)
-#define USABLE_BIT_9                uint(0x00200000)
-#define USABLE_BIT_10               uint(0x00400000)
-#define USABLE_BIT_11               uint(0x00800000)   // At least two of those four bit flags must be mutually exclusive (i.e. all 4 bits must not be set together)
-#define USABLE_BIT_12               uint(0x01000000)   // This is because setting 0x47800000 sets all 5 FP16 exponent bits to 1 which means infinity
-#define USABLE_BIT_13               uint(0x02000000)   // This will be translated to a +/-MAX_FLOAT in the FP16 render target (0xFBFF/0x7BFF), overwriting the 
-#define USABLE_BIT_14               uint(0x04000000)   // mantissa bits where other bit flags are stored.
-#define USABLE_BIT_15               uint(0x80000000)
-#define MUST_BE_SET                 uint(0x40000000)   // This flag *must* be stored in the floating-point representation of the bit flag to store
-
-/*
-float2 gbuf_pack_normal( float3 norm )
+float4 screen_to_proj(float2 screen, float z)
 {
-   float2 res;
-
-   res = 0.5 * ( norm.xy + float2( 1, 1 ) ) ;
-   res.x *= ( norm.z < 0 ? -1.0 : 1.0 );
-
-   return res;
+	float4 proj;
+	proj.w = 1.0;
+	proj.z = z;
+	proj.x = screen.x*2 - proj.w;
+	proj.y = -screen.y*2 + proj.w;
+	return proj;
 }
 
-float3 gbuf_unpack_normal( float2 norm )
+
+float4 convert_to_screen_space(float4 proj)
 {
-   float3 res;
-
-   res.xy = ( 2.0 * abs( norm ) ) - float2(1,1);
-
-   res.z = ( norm.x < 0 ? -1.0 : 1.0 ) * sqrt( abs( 1 - res.x * res.x - res.y * res.y ) );
-
-   return res;
-}
-*/
-
-// Holger Gruen AMD - I change normal packing and unpacking to make sure N.z is accessible without ALU cost
-// this help the HDAO compute shader to run more efficiently
-float2 gbuf_pack_normal( float3 norm )
-{
-   float2 res;
-
-   res.x  = norm.z;
-   res.y  = 0.5f * ( norm.x + 1.0f ) ;
-   res.y *= ( norm.y < 0.0f ? -1.0f : 1.0f );
-
-   return res;
+	float4 screen;
+	screen.x = (proj.x + proj.w)*0.5;
+	screen.y = (proj.w - proj.y)*0.5;
+	screen.z = proj.z;
+	screen.w = proj.w;
+	return screen;
 }
 
-float3 gbuf_unpack_normal( float2 norm )
+float4 proj_to_screen(float4 proj)
 {
-   float3 res;
-
-   res.z  = norm.x;
-   res.x  = ( 2.0f * abs( norm.y ) ) - 1.0f;
-   res.y = ( norm.y < 0 ? -1.0 : 1.0 ) * sqrt( abs( 1 - res.x * res.x - res.z * res.z ) );
-
-   return res;
+	float4 screen = proj;
+	screen.x = (proj.x + proj.w);
+	screen.y = (proj.w - proj.y);
+	screen.xy *= 0.5;
+	return screen;
 }
 
-float gbuf_pack_hemi_mtl( float hemi, float mtl )
+float normalize_depth(float depth)
 {
-   uint packed_mtl = uint( ( mtl / 1.333333333 ) * 31.0 );
-//   uint packed = ( MUST_BE_SET + ( uint( hemi * 255.0 ) << 13 ) + ( ( packed_mtl & uint( 31 ) ) << 21 ) );
-	//	Clamp hemi max value
-	uint packed = ( MUST_BE_SET + ( uint( saturate(hemi) * 255.9 ) << 13 ) + ( ( packed_mtl & uint( 31 ) ) << 21 ) );
-
-   if( ( packed & USABLE_BIT_13 ) == 0 )
-      packed |= USABLE_BIT_14;
-
-   if( packed_mtl & uint( 16 ) )
-      packed |= USABLE_BIT_15;
-
-   return asfloat( packed );
+	return (saturate(depth/100));
 }
 
-float gbuf_unpack_hemi( float mtl_hemi )
+#ifndef SKY_WITH_DEPTH
+float is_sky(float depth)
 {
-//   return float( ( asuint( mtl_hemi ) >> 13 ) & uint(255) ) * (1.0/255.0);
-	return float( ( asuint( mtl_hemi ) >> 13 ) & uint(255) ) * (1.0/254.8);
+	return step(depth, SKY_EPS);
 }
-
-float gbuf_unpack_mtl( float mtl_hemi )
+float is_not_sky(float depth)
 {
-   uint packed       = asuint( mtl_hemi );
-   uint packed_hemi  = ( ( packed >> 21 ) & uint(15) ) + ( ( packed & USABLE_BIT_15 ) == 0 ? 0 : 16 );
-   return float( packed_hemi ) * (1.0/31.0) * 1.333333333;
+	return step(SKY_EPS, depth);
 }
-
-#ifndef EXTEND_F_DEFFER
-f_deffer pack_gbuffer( float4 norm, float4 pos, float4 col )
 #else
-f_deffer pack_gbuffer( float4 norm, float4 pos, float4 col, uint imask )
-#endif
+float is_sky(float depth)
 {
-	f_deffer res;
-
-#ifndef GBUFFER_OPTIMIZATION
-	res.position	= pos;
-	res.Ne			= norm;
-	res.C			   = col;
-#else
-	res.position	= float4( gbuf_pack_normal( norm ), pos.z, gbuf_pack_hemi_mtl( norm.w, pos.w ) );
-	res.C			   = col;
+	return step(abs(depth - SKY_DEPTH), SKY_EPS);
+}
+float is_not_sky(float depth)
+{
+	return step(SKY_EPS, abs(depth - SKY_DEPTH));
+}
 #endif
 
-#ifdef EXTEND_F_DEFFER
-   res.mask = imask;
-#endif
-
-	return res;
-}
-
-#ifdef GBUFFER_OPTIMIZATION
-gbuffer_data gbuffer_load_data( float2 tc : TEXCOORD, float2 pos2d, int iSample )
+float hash(float2 intro)
 {
-	gbuffer_data gbd;
-
-	gbd.P = float3(0,0,0);
-	gbd.hemi = 0;
-	gbd.mtl = 0;
-	gbd.C = 0;
-	gbd.N = float3(0,0,0);
-
-#ifndef USE_MSAA
-	float4 P	= s_position.Sample( smp_nofilter, tc );
-#else
-	float4 P	= s_position.Load( int3( pos2d, 0 ), iSample );
-#endif
-
-	// 3d view space pos reconstruction math
-	// center of the plane (0,0) or (0.5,0.5) at distance 1 is eyepoint(0,0,0) + lookat (assuming |lookat| ==1
-	// left/right = (0,0,1) -/+ tan(fHorzFOV/2) * (1,0,0 ) 
-	// top/bottom = (0,0,1) +/- tan(fVertFOV/2) * (0,1,0 )
-	// lefttop		= ( -tan(fHorzFOV/2),  tan(fVertFOV/2), 1 )
-	// righttop		= (  tan(fHorzFOV/2),  tan(fVertFOV/2), 1 )
-	// leftbottom   = ( -tan(fHorzFOV/2), -tan(fVertFOV/2), 1 )
-	// rightbottom	= (  tan(fHorzFOV/2), -tan(fVertFOV/2), 1 )
-	gbd.P  = float3( P.z * ( pos2d * pos_decompression_params.zw - pos_decompression_params.xy ), P.z );
-
-	// reconstruct N
-	gbd.N = gbuf_unpack_normal( P.xy );
-
-	// reconstruct material
-	gbd.mtl	= gbuf_unpack_mtl( P.w );
-
-   // reconstruct hemi
-   gbd.hemi = gbuf_unpack_hemi( P.w );
-
-#ifndef USE_MSAA
-   float4	C	= s_diffuse.Sample( smp_nofilter, tc );
-#else
-   float4	C	= s_diffuse.Load( int3( pos2d, 0 ), iSample );
-#endif
-
-	gbd.C		= C.xyz;
-	gbd.gloss	= C.w;
-
-	return gbd;
+return frac(1.0e4 * sin(17.0*intro.x + 0.1*intro.y) * (0.1 + abs(sin(13.0*intro.y + intro.x))));
 }
 
-gbuffer_data gbuffer_load_data( float2 tc : TEXCOORD, float2 pos2d )
+float hash3D(float3 intro)
 {
-   return gbuffer_load_data( tc, pos2d, 0 );
+return hash(float2(hash(intro.xy),intro.z));
 }
 
-gbuffer_data gbuffer_load_data_offset( float2 tc : TEXCOORD, float2 OffsetTC : TEXCOORD, float2 pos2d )
+float hash12(float2 p)
 {
-	float2  delta	  = ( ( OffsetTC - tc ) * pos_decompression_params2.xy );
-
-	return gbuffer_load_data( OffsetTC, pos2d + delta, 0 );
+	float3 p3  = frac(float3(p.xyx) * .1031);
+    p3 += dot(p3, p3.yzx + 19.19);
+    return frac((p3.x + p3.y) * p3.z);
 }
 
-gbuffer_data gbuffer_load_data_offset( float2 tc : TEXCOORD, float2 OffsetTC : TEXCOORD, float2 pos2d, uint iSample )
+float2 hash22(float2 p)
 {
-   float2  delta	  = ( ( OffsetTC - tc ) * pos_decompression_params2.xy );
-
-   return gbuffer_load_data( OffsetTC, pos2d + delta, iSample );
+	float3 p3 = frac(float3(p.xyx) * float3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yzx+19.19);
+    return frac((p3.xx+p3.yz)*p3.zy);
 }
 
-#else // GBUFFER_OPTIMIZATION
-gbuffer_data gbuffer_load_data( float2 tc : TEXCOORD, uint iSample )
+float rand(float n)
 {
-	gbuffer_data gbd;
-
-#ifndef USE_MSAA
-	float4 P	= s_position.Sample( smp_nofilter, tc );
-#else
-   float4 P	= s_position.Load( int3( tc * pos_decompression_params2.xy, 0 ), iSample );
-#endif
-
-	gbd.P		= P.xyz;
-	gbd.mtl		= P.w;
-
-#ifndef USE_MSAA
-	float4 N	= s_normal.Sample( smp_nofilter, tc );
-#else
-	float4 N	= s_normal.Load( int3( tc * pos_decompression_params2.xy, 0 ), iSample );
-#endif
-
-	gbd.N		= N.xyz;
-	gbd.hemi	= N.w;
-
-#ifndef USE_MSAA
-	float4	C	= s_diffuse.Sample(  smp_nofilter, tc );
-#else
-	float4	C	= s_diffuse.Load( int3( tc * pos_decompression_params2.xy, 0 ), iSample );
-#endif
-
-
-	gbd.C		= C.xyz;
-	gbd.gloss	= C.w;
-
-	return gbd;
+    return frac(cos(n)*343.42);
 }
 
-gbuffer_data gbuffer_load_data( float2 tc : TEXCOORD  )
+float generic_noise(float2 tc)
 {
-   return gbuffer_load_data( tc, 0 );
+    return frac(sin(dot(tc, float2(12.0, 78.0) + (timers.x) )) * 43758.0)*0.25f; 
 }
 
-gbuffer_data gbuffer_load_data_offset( float2 tc : TEXCOORD, float2 OffsetTC : TEXCOORD, uint iSample )
-{
-   return gbuffer_load_data( OffsetTC, iSample );
-}
-
-#endif // GBUFFER_OPTIMIZATION
 
 //////////////////////////////////////////////////////////////////////////
 //	Aplha to coverage code

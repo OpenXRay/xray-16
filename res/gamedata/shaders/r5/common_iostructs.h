@@ -87,7 +87,6 @@ struct	p_TL2uv
 	float2 	Tex0	: TEXCOORD0;
 	float2	Tex1	: TEXCOORD1;
 	float4	Color	: COLOR;
-//	float4 	HPos	: SV_Position;	// Clip-space position 	(for rasterization)
 };
 ////////////////////////////////////////////////////////////////
 //	postpr
@@ -146,7 +145,6 @@ struct	p_build
 	float2	Tex1	: TEXCOORD1;
 	float2 	Tex2	: TEXCOORD2;
 	float2	Tex3	: TEXCOORD3;
-//	float4 	HPos	: SV_Position;	// Clip-space position 	(for rasterization)
 };
 ////////////////////////////////////////////////////////////////
 //	filter	(bloom_filter)
@@ -186,7 +184,6 @@ struct	p_filter
 	float4	Tex5	: TEXCOORD5;
 	float4 	Tex6	: TEXCOORD6;
 	float4	Tex7	: TEXCOORD7;
-//	float4 	HPos	: SV_Position;	// Clip-space position 	(for rasterization)
 };
 
 ////////////////////////////////////////////////////////////////
@@ -224,7 +221,6 @@ struct	p_aa_AA
 	float2	Tex4	:TEXCOORD4;
 	float4	Tex5	:TEXCOORD5;
 	float4	Tex6	:TEXCOORD6;
-//	float4 	HPos	:SV_Position;	// Clip-space position 	(for rasterization)
 };
 
 struct	p_aa_AA_sun
@@ -235,7 +231,6 @@ struct	p_aa_AA_sun
 	float2	RT		:TEXCOORD3;
 	float2	LB		:TEXCOORD4;
 	float2	RB		:TEXCOORD5;
-//	float4 	HPos	:SV_Position;	// Clip-space position 	(for rasterization)
 };
 
 ////////////////////////////////////////////////////////////////
@@ -266,7 +261,6 @@ struct 	p_volume
 #ifdef 	USE_SJITTER
 	float4 	tcJ		:TEXCOORD1;
 #endif
-//	float4 	hpos	:SV_Position;	// Clip-space position 	(for rasterization)
 };
 ////////////////////////////////////////////////////////////////
 //	Static
@@ -279,7 +273,6 @@ struct         v_static
 #ifdef	USE_LM_HEMI
 	int2	lmh		:TEXCOORD1;	// (lmu,lmv)
 #endif
-//	float4	color	:COLOR0;	// (r,g,b,dir-occlusion)	//	Swizzle before use!!!
 	float4	P		:POSITION;	// (float,float,float,1)
 };
 
@@ -297,39 +290,6 @@ struct	v_static_color
 };
 
 ////////////////////////////////////////////////////////////////
-//	defer
-#ifndef GBUFFER_OPTIMIZATION
-struct                  f_deffer        		
-{
-	float4	position: SV_Target0;        // px,py,pz, m-id
-	float4	Ne		  : SV_Target1;        // nx,ny,nz, hemi
-	float4	C		  : SV_Target2;        // r, g, b,  gloss
-#ifdef EXTEND_F_DEFFER
-   uint     mask    : SV_COVERAGE;
-#endif
-};
-#else
-struct                  f_deffer        		
-{
-	float4	position: SV_Target0;        // xy=encoded normal, z = pz, w = encoded(m-id,hemi)
-	float4	C		  : SV_Target1;        // r, g, b,  gloss
-#ifdef EXTEND_F_DEFFER
-   uint     mask    : SV_COVERAGE;
-#endif
-};
-#endif
-
-struct					gbuffer_data
-{
-	float3  P; // position.( mtl or sun )
-	float   mtl; // material id
-	float3  N; // normal
-	float   hemi; // AO
-	float3  C;
-	float   gloss;
-};
-
-////////////////////////////////////////////////////////////////
 //	Defer bumped
 struct v2p_bumped
 {
@@ -342,6 +302,7 @@ struct v2p_bumped
 	float3	M1		: TEXCOORD2;	// nmap 2 eye - 1
 	float3	M2		: TEXCOORD3;	// nmap 2 eye - 2
 	float3	M3		: TEXCOORD4;	// nmap 2 eye - 3
+	float4	RDrops	: TEXCOORD7;	// SSS Update 17 - HUD raindrops
 #ifdef USE_TDETAIL
 	float2	tcdbump	: TEXCOORD5;	// d-bump
 #endif
@@ -362,6 +323,7 @@ struct p_bumped
 	float3	M1		: TEXCOORD2;	// nmap 2 eye - 1
 	float3	M2		: TEXCOORD3;	// nmap 2 eye - 2
 	float3	M3		: TEXCOORD4;	// nmap 2 eye - 3
+	float4	RDrops	: TEXCOORD7;	// SSS Update 17 - HUD raindrops
 #ifdef USE_TDETAIL
 	float2	tcdbump	: TEXCOORD5;	// d-bump
 #endif
@@ -380,6 +342,7 @@ struct	v2p_flat
 #endif
 	float4	position: TEXCOORD1;	// position + hemi
 	float3	N		: TEXCOORD2;	// Eye-space normal        (for lighting)
+	float4	RDrops	: TEXCOORD7;	// SSS Update 17 - HUD raindrops
 #ifdef USE_TDETAIL
 	float2	tcdbump	: TEXCOORD3;	// d-bump
 #endif
@@ -398,6 +361,7 @@ struct	p_flat
 #endif
 	float4	position: TEXCOORD1;	// position + hemi
 	float3	N		: TEXCOORD2;	// Eye-space normal        (for lighting)
+	float4	RDrops	: TEXCOORD7;	// SSS Update 17 - HUD raindrops
 #ifdef USE_TDETAIL
 	float2	tcdbump	: TEXCOORD3;	// d-bump
 #endif
@@ -464,6 +428,34 @@ struct        v_detail
 {
         float4      pos                : POSITION;                // (float,float,float,1)
         int4        misc        : TEXCOORD0;        // (u(Q),v(Q),frac,matrix-id)
+};
+////////for screenspace transformation
+struct p_screen
+{
+        float4          hpos 	: SV_Position;
+        float2          tc0		: TEXCOORD0;        // Texture coordinates         (for sampling maps)
+};
+
+struct	v2p_screen
+{
+	float2 tc0 : TEXCOORD0;
+#ifdef SM_2_0
+	float4 HPos : POSITION;	// Clip-space position 	(for rasterization)
+#else
+	float4 HPos : POSITIONT;  	// Clip-space position 	(for rasterization)
+#endif
+};
+//////for fucking sunshafts kurwa
+struct	v_ssss
+{
+	float4 P : POSITIONT;
+	float2 tc0	: TEXCOORD0;
+};
+
+struct	v2p_ssss
+{
+	float2 tc0 : TEXCOORD0;
+	float4 HPos : SV_Position;	// Clip-space position 	(for rasterization)
 };
 
 #endif	//	common_iostructs_h_included

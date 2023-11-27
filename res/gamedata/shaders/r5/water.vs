@@ -9,19 +9,18 @@ struct        v_vert
 	float4	T		: TANGENT;
 	float4	B		: BINORMAL;
 	float4	color	: COLOR0;		// (r,g,b,dir-occlusion)
-//	float2	uv		: TEXCOORD0;	// (u0,v0)
 	int2	uv		: TEXCOORD0;	// (u0,v0)
 };
 
 struct   vf
 {
 	float2	tbase	: TEXCOORD0;	// base
-	float2	tnorm0	: TEXCOORD1;	// nm0
-	float2	tnorm1	: TEXCOORD2;	// nm1
+	float4	tnorm0	: TEXCOORD1;	// nm0
+	float3	position_w	: TEXCOORD2;	// nm1
 	float3	M1		: TEXCOORD3;
 	float3	M2		: TEXCOORD4;
 	float3	M3		: TEXCOORD5;
-	float3	v2point	: TEXCOORD6;
+	float3	v2point_w	: TEXCOORD6;
 #ifdef	USE_SOFT_WATER
 #ifdef	NEED_SOFT_WATER
 	float4	tctexgen: TEXCOORD7;
@@ -43,14 +42,15 @@ vf main (v_vert v)
 
         vf                 o;
 
-        float4         P         = v.P        ;                // world
-        float3         NN         = unpack_normal        (v.N)        ;
-                P         = watermove        (P)        ;
+        float4 P = v.P;                // world
+		o.position_w = P.xyz;
+		
+		P = watermove(P);
 
-        o.v2point        = P-eye_position        ;
-        o.tbase                = unpack_tc_base        (v.uv,v.T.w,v.B.w);                // copy tc
-        o.tnorm0        = watermove_tc                 (o.tbase*W_DISTORT_BASE_TILE_0, P.xz, W_DISTORT_AMP_0);
-        o.tnorm1        = watermove_tc                 (o.tbase*W_DISTORT_BASE_TILE_1, P.xz, W_DISTORT_AMP_1);
+        o.v2point_w = P-eye_position;
+        o.tbase = unpack_tc_base(v.uv,v.T.w,v.B.w);                // copy tc
+        o.tnorm0.xy = watermove_tc(o.tbase*W_DISTORT_BASE_TILE_0, P.xz, W_DISTORT_AMP_0);
+        o.tnorm0.zw = watermove_tc(o.tbase*W_DISTORT_BASE_TILE_1, P.xz, W_DISTORT_AMP_1);
 
 
         // Calculate the 3x3 transform from tangent space to eye-space
@@ -86,7 +86,6 @@ vf main (v_vert v)
 
         o.hpos                 = mul                        (m_VP, P);                        // xform, input in world coords
 		o.fog       = saturate( calc_fogging  (v.P));
-		//o.fog		*= o.fog;
 
 		o.c0		= float4		(L_final,1);
 

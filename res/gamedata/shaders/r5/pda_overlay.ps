@@ -1,0 +1,84 @@
+#include "common.h"
+#include "screenspace_hud_raindrops.h"
+
+struct 	v2p
+{
+ 	float2 tc0		: TEXCOORD0;	//main tc for screen
+	float3 RDrops	: TEXCOORD1;	//Raindrops
+  	float4 c0		: COLOR0;		//unused shit mb vertex shader idk
+};
+
+
+//intensity and frequency of flickering
+#define SCREEN_FLICKERING float2(0.0255,42.0)
+
+//clamping for scale of glitchness
+#define SCREEN_GLITCH_LIMIT float2(0.1, 0.40)
+
+//thats a "offset" of channels etc
+#define SCREEN_RGB_TCX float3(0.1,0.2,0.3)
+#define SCREEN_RGB_TCY float3(0.4,0.3,0.2)
+
+//multipliers for intensity etc
+#define SCREEN_RGB_RAND float3(0.33,0.66,0.99)
+
+//just multiplier for rand intensity
+#define SCREEN_RAND_TIME float(1.0)
+
+Texture2D s_pdascreen;
+float4 pda_params;
+
+float3 glitch(float3 screen, float2 tc)
+{
+    if ((tc.x - rand(timers.x*SCREEN_RAND_TIME) * noise(tc) ) < clamp(SCREEN_GLITCH_LIMIT.x,sin(4.*noise(tc)),SCREEN_GLITCH_LIMIT.y)) 
+    {
+        float randori_first = rand(sin(timers.x*SCREEN_RGB_RAND.x));
+        screen.x *= s_pdascreen.Sample(smp_base, float2(tc.x-SCREEN_RGB_TCX.x, tc.y+SCREEN_RGB_TCY.x)).z*randori_first;
+        
+        float randori_second = rand(sin(timers.x*SCREEN_RGB_RAND.y));
+        screen.y *= s_pdascreen.Sample(smp_base, float2(tc.x-SCREEN_RGB_TCX.y, tc.y+SCREEN_RGB_TCY.y)).y*randori_second;
+        
+        float randori_third = rand(sin(timers.x*SCREEN_RGB_RAND.z));
+        screen.z *= s_pdascreen.Sample(smp_base, float2(tc.x-SCREEN_RGB_TCX.z, tc.y+SCREEN_RGB_TCY.z)).x*randori_third;
+        
+        screen += SCREEN_FLICKERING.x * sin(timers.x*SCREEN_FLICKERING.y);    
+    }
+
+	return screen;
+} 
+
+float4 main( v2p I ): SV_Target
+{
+	// HUD Rain drops - SSS Update 17
+	// https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders/
+
+	float4 drops = 0; // xy = Normal | z = Overall str | w = reflection str
+	float extra_col = 0;
+	if (ssfx_hud_drops_1.y > 0)
+	{
+		// Calc droplets
+		float4 Layer0 = s_hud_rain.Sample(smp_base, (I.tc0 + float2(0, -ssfx_hud_drops_1.x * 0.01f)) * float2(1.5f, 0.75f)); // Big drops
+		float4 Layer1 = s_hud_rain.Sample(smp_base, I.tc0 * float2(5.0f, 3.0f)); // Small drops [ Static ]
+
+		// Process animation
+		float3 result = ssfx_process_drops(Layer0, 0.1f, 0.2f) + ssfx_process_drops(Layer1, 0.2f, 1.0f);
+		result.xy = clamp(result.xy, -1.0f, 1.0f);
+
+		// Only apply to facing up surfaces [ World Y+ ]
+		result.xyz *= saturate(I.RDrops.y);
+
+		// Intensity from script ( Cover + Rain intensity )
+		result.xyz *= ssfx_hud_drops_1.y;
+
+		// Refraction
+		I.tc0.xy = I.tc0.xy - result.xy * 0.4f;
+
+		// Add a small amount of white.
+		extra_col = saturate(Layer0.x + Layer1.x) * result.z * 0.25f;
+	}
+
+	float4 col = s_pdascreen.Sample(smp_base, I.tc0) + extra_col;
+
+	col.rgb = lerp(col.rgb, glitch(col.rgb, I.tc0), pda_params.y);
+	return float4(col.rgb, pda_params.x) * pda_params.z;
+}

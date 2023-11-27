@@ -1,0 +1,129 @@
+/*
+				/////////////////
+			Gasmask overlay shader			
+				/////////////////
+				Author: LVutner
+				/////////////////	
+				Credits: ZHC (visor reflection)
+				/////////////////
+
+
+				/////////////////
+				Anomaly Team 2020
+				/////////////////
+	////////////////////////////////////////////////
+	Do not copy or redistribute without permission.
+	////////////////////////////////////////////////
+*/
+
+#include "common.h"
+#include "gasmask_common.h"
+
+float visor_ratio(float s)
+{
+    float ratio = screen_res.y / screen_res.x; // 0.75 for 4:3 (normalscreen) and 0.625 for 16:10 (widescreen) resolution
+    return (s - 0.5) * ratio + 0.5;
+}
+
+float3 visor_reflection(float3 image, float2 tc)
+{
+    float4 final = (0.0, 0.0, 0.0, 0.0);
+    float2 center = float2(0.5, 0.5);
+
+    float x = length(float2(tc.x, visor_ratio(tc.y)) - center);
+
+    if (x < GM_VIS_RADIUS)
+        return image;
+    else
+    {
+        float p = saturate((x / GM_VIS_RADIUS - 1.0) * 2.0);
+
+        for (int i = 0; i < GM_VIS_NUM; i++)
+        {
+            float N = 1.0 - p / 0.6 + 0.4 * (i / (GM_VIS_NUM - 1.0)) * p;
+            float2 m = (center - tc) * -N + center;
+            final += s_image.SampleLevel(smp_rtlinear, m,0);
+        }
+        final /= GM_VIS_NUM;
+		
+		float3 reflected = (image + GM_VIS_INTENSITY * final) / (1.0 + GM_VIS_INTENSITY);	
+		return reflected;		
+	}
+} 
+
+float4 main(p_screen I) : SV_Target
+{
+	//Sample gasmask texture
+	float4 gasmask_tex;
+
+	if (mask_control.x == 1)
+	{	
+		gasmask_tex = s_mask_nm_1.Sample(smp_nofilter,I.tc0);
+	}
+	else if (mask_control.x == 2)
+	{
+		gasmask_tex = s_mask_nm_2.Sample(smp_nofilter,I.tc0);
+	}
+	else if (mask_control.x == 3)	
+	{
+		gasmask_tex = s_mask_nm_3.Sample(smp_nofilter,I.tc0);
+	}
+	else if (mask_control.x == 4)	
+	{
+		gasmask_tex = s_mask_nm_4.Sample(smp_nofilter,I.tc0);
+	}
+	else if (mask_control.x == 5)	
+	{
+		gasmask_tex = s_mask_nm_5.Sample(smp_nofilter,I.tc0);
+	}	
+	else if (mask_control.x == 6)	
+	{
+		gasmask_tex = s_mask_nm_6.Sample(smp_nofilter,I.tc0);
+	}
+	else if (mask_control.x == 7)	
+	{
+		gasmask_tex = s_mask_nm_7.Sample(smp_nofilter,I.tc0);
+	}
+	else if (mask_control.x == 8)	
+	{
+		gasmask_tex = s_mask_nm_8.Sample(smp_nofilter,I.tc0);
+	}	
+	else if (mask_control.x == 9)	
+	{
+		gasmask_tex = s_mask_nm_9.Sample(smp_nofilter,I.tc0);
+	}
+	else if (mask_control.x == 10)	
+	{
+		gasmask_tex = s_mask_nm_10.Sample(smp_nofilter,I.tc0);
+	}
+
+	//Prepare refracted texcoord
+    float4 refraction = float4(1.0, 1.0, 1.0, 1.0) + gasmask_tex.xyxy * GM_DIST_INT;	
+    float4 refr_tc = float4(I.tc0.xy, 1.0, 1.0);
+    refr_tc *= refraction;
+    refr_tc.xy /= refr_tc.w;
+	
+	//Sample scene with refracted texcoord
+	float3 image = s_image.Sample(smp_nofilter, refr_tc.xy).xyz;
+
+	//Mix gasmask cracks with image
+	image += (gasmask_tex.w * image) * GM_DIFF_INT;
+	
+	//Add glass reflection on top
+	if (mask_control.z == 1)
+	{	
+		//Prepare aspect-ratio correct TC for attenuation
+		float2 vig_tc = I.tc0.xy;
+	    vig_tc -= 0.5;
+		vig_tc.x *= screen_res.x / screen_res.y;
+		vig_tc += 0.5;	
+		
+		//Get refl attenuation
+		float refl_att = smoothstep(0.8, 1.0, distance(vig_tc, float2(0.5, 0.5)));
+		
+		image = lerp(image, visor_reflection(image, refr_tc.xy), refl_att);
+	}
+	
+	//Output
+	return float4(image, 1.0);
+} 

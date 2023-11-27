@@ -368,8 +368,8 @@ static const int2 g_i2NormalLoadPattern[NUM_NORMAL_LOADS] =
 //=================================================================================================================================
 float ValleyAngle( uint2 u2ScreenCoord )
 {
-	float3 f3N1;
-	float3 f3N2;
+	float3 f3N1 = float3(0.0f, 0.0f, 0.0f);
+	float3 f3N2 = float3(0.0f, 0.0f, 0.0f);
 	float fDot;
 	float fSummedDot = 0.0f;
 	int2 i2MirrorPattern;
