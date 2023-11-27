@@ -1,1 +1,0 @@
-#define SSFX_ENHANCED_SHADERS
