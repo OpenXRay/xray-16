@@ -79,10 +79,12 @@ else()
     set(CCOPT_OPT_LEVEL "-O2")
 endif()
 
+set(CCOPT "${CMAKE_C_FLAGS} ${CCOPT_OPT_LEVEL}")
+
 if (USE_ADDRESS_SANITIZER)
-    set(CCOPT "${CCOPT_OPT_LEVEL} -fno-stack-protector")
+    set(CCOPT "${CCOPT} -fno-stack-protector")
 else()
-    set(CCOPT "${CCOPT_OPT_LEVEL} -fomit-frame-pointer -fno-stack-protector")
+    set(CCOPT "${CCOPT} -fomit-frame-pointer -fno-stack-protector")
 endif()
 
 set(CCOPT "${CCOPT} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -U_FORTIFY_SOURCE")
@@ -137,7 +139,7 @@ set(CCOPTIONS "${CCOPT};${XCFLAGS}")
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
 
 execute_process(
-    COMMAND ${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS} ${CCOPTIONS} -E lj_arch.h -dM
+    COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h -dM
     WORKING_DIRECTORY "${LUAJIT_DIR}"
     OUTPUT_VARIABLE TESTARCH_OUTPUT
     ERROR_VARIABLE TESTARCH_ERROR
