@@ -851,9 +851,6 @@
     <ClCompile Include="..\xrRender\SH_Matrix.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\SH_Texture.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\Shader.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
@@ -1017,6 +1014,9 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX9\dx9r_constants.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX9\dx9SH_Texture.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
   </ItemGroup>
