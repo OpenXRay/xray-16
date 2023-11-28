@@ -418,9 +418,7 @@ public:
     u32 get_dx_level() override { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
     pcstr getShaderPath() override
     {
-        if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
-            return o.new_shader_support ? "r5\\" : "r3\\";
-        return "r3\\";
+        return o.new_shader_support ? "r5\\" : "r3\\";
     }
 #elif defined(USE_OGL)
     BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::OpenGL; }
@@ -431,6 +429,7 @@ public:
 #endif
 
     // Loading / Unloading
+    void OnDeviceCreate(pcstr shName) override;
     void create() override;
     void destroy() override;
     void reset_begin() override;

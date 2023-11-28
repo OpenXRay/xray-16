@@ -209,6 +209,33 @@ static bool must_enable_old_cascades()
     return exist;
 }
 
+void CRender::OnDeviceCreate(pcstr shName)
+{
+    o.new_shader_support = 0;
+    o.ssfx_rain = 0;
+    o.ssfx_blood = 0;
+    o.ssfx_branches = 0;
+    o.ssfx_hud_raindrops = 0;
+
+#if defined(USE_DX11)
+    o.new_shader_support = HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT);
+    // Ascii's Screen Space Shaders - Check if SSS shaders exist
+    string_path fn;
+    o.ssfx_rain = FS.exist(fn, "$game_shaders$", "r3\\effects_rain_splash", ".ps") ? 1 : 0;
+    o.ssfx_blood = FS.exist(fn, "$game_shaders$", "r3\\effects_wallmark_blood", ".ps") ? 1 : 0;
+    o.ssfx_branches = FS.exist(fn, "$game_shaders$", "r3\\deffer_tree_branch_bump-hq", ".vs") ? 1 : 0;
+    o.ssfx_hud_raindrops = FS.exist(fn, "$game_shaders$", "r3\\deffer_base_hud_bump", ".ps") ? 1 : 0;
+
+    Msg("- NEW SHADER SUPPORT ENABLED %i", o.new_shader_support);
+    Msg("- SSS HUD RAINDROPS SHADER INSTALLED %i", o.ssfx_hud_raindrops);
+    Msg("- SSS RAIN SHADER INSTALLED %i", o.ssfx_rain);
+    Msg("- SSS BLOOD SHADER INSTALLED %i", o.ssfx_blood);
+    Msg("- SSS BRANCHES SHADER INSTALLED %i", o.ssfx_branches);
+#endif
+
+    D3DXRenderBase::OnDeviceCreate(shName);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -579,22 +606,6 @@ void CRender::create()
             }
         }
     }
-#endif
-
-    o.new_shader_support = false;
-#if defined(USE_DX11)
-    o.new_shader_support = HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT);
-    // Ascii's Screen Space Shaders - Check if SSS shaders exist
-    string_path fn;
-    o.ssfx_rain = FS.exist(fn, "$game_shaders$", "r3\\effects_rain_splash", ".ps") ? 1 : 0;
-    o.ssfx_blood = FS.exist(fn, "$game_shaders$", "r3\\effects_wallmark_blood", ".ps") ? 1 : 0;
-    o.ssfx_branches = FS.exist(fn, "$game_shaders$", "r3\\deffer_tree_branch_bump-hq", ".vs") ? 1 : 0;
-    o.ssfx_hud_raindrops = FS.exist(fn, "$game_shaders$", "r3\\deffer_base_hud_bump", ".ps") ? 1 : 0;
-
-    Msg("- SSS HUD RAINDROPS SHADER INSTALLED %i", o.ssfx_hud_raindrops);
-    Msg("- SSS RAIN SHADER INSTALLED %i", o.ssfx_rain);
-    Msg("- SSS BLOOD SHADER INSTALLED %i", o.ssfx_blood);
-    Msg("- SSS BRANCHES SHADER INSTALLED %i", o.ssfx_branches);
 #endif
 
     // constants
