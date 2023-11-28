@@ -852,29 +852,6 @@ public:
 #   endif // MASTER_GOLD
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
-class CCC_new_shader_support : public CCC_Mask
-{
-public:
-    CCC_new_shader_support(pcstr N, Flags32* V, u32 M) : CCC_Mask(N, V, M) { ; };
-    void Execute(LPCSTR args) override
-    {
-#if RENDER == R_R4
-        if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
-        {
-            CCC_Mask::Execute(args);
-        }
-        else
-        {
-            args = "off";
-            CCC_Mask::Execute(args);
-        }
-#else
-        args = "off";
-        CCC_Mask::Execute(args);
-#endif
-    }
-};
-
 //-----------------------------------------------------------------------
 void xrRender_initconsole()
 {
@@ -1112,7 +1089,7 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r3_water_refl", &ps_r_water_reflection, qwater_reflection_quality_token);
     CMD3(CCC_Mask, "r3_water_refl_half_depth", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_HALF_DEPTH);
     CMD3(CCC_Mask, "r3_water_refl_jitter", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_JITTER);
-    CMD3(CCC_new_shader_support, "r4_new_shader_support", &ps_r2_ls_flags_ext, R4FLAGEXT_NEW_SHADER_SUPPORT);
+    CMD3(CCC_Mask, "r4_new_shader_support", &ps_r2_ls_flags_ext, R4FLAGEXT_NEW_SHADER_SUPPORT);
 
     //CMD3(CCC_Mask, "r3_msaa", &ps_r2_ls_flags, R3FLAG_MSAA);
     CMD3(CCC_Token, "r3_msaa", &ps_r3_msaa, qmsaa_token);

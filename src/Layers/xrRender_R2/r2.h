@@ -273,6 +273,8 @@ public:
 
         float forcegloss_v;
 
+        // Yohji - New shader support
+        u32 new_shader_support : 1;
         // Ascii - Screen Space Shaders
         u32 ssfx_branches : 1;
         u32 ssfx_blood : 1;
@@ -414,10 +416,10 @@ public:
 #elif defined(USE_DX11)
     BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D11; }
     u32 get_dx_level() override { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
-    pcstr getShaderPath() override 
+    pcstr getShaderPath() override
     {
         if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
-            return ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT) ? "r5\\" : "r3\\";
+            return o.new_shader_support ? "r5\\" : "r3\\";
         return "r3\\";
     }
 #elif defined(USE_OGL)
