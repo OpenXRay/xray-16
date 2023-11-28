@@ -24,7 +24,7 @@ SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (),
             .def("profile_name", +[](CSE_ALifeTraderAbstract* ta) { return ta->character_profile().c_str(); })
             .def("set_profile_name", +[](CSE_ALifeTraderAbstract* ta, const pcstr str) { ta->set_character_profile(str); })
             .def("character_name", +[](CSE_ALifeTraderAbstract* ta) { return ta->m_character_name.c_str(); })
-            .def("set_character_name", +[](CSE_ALifeTraderAbstract* ta, const pcstr str) { return ta->m_character_name = str; })
+            .def("set_character_name", +[](CSE_ALifeTraderAbstract* ta, const pcstr str) { ta->m_character_name = str; })
             .def("rank", &CSE_ALifeTraderAbstract::Rank)
             .def("set_rank", &CSE_ALifeTraderAbstract::SetRank)
             .def("reputation", &CSE_ALifeTraderAbstract::Reputation)
