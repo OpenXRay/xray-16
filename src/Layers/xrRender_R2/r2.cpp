@@ -583,7 +583,7 @@ void CRender::create()
 
     o.new_shader_support = false;
 #if defined(USE_DX11)
-    o.new_shader_support = ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT);
+    o.new_shader_support = HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT);
     // Ascii's Screen Space Shaders - Check if SSS shaders exist
     string_path fn;
     o.ssfx_rain = FS.exist(fn, "$game_shaders$", "r3\\effects_rain_splash", ".ps") ? 1 : 0;
