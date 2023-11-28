@@ -272,7 +272,7 @@ IC u32 it_height_rev_base(u32 d, u32 s) {   return  color_rgba  (
     (color_get_R(s)+color_get_G(s)+color_get_B(s))/3    );  // height
 }
 */
-ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
+BaseTextureHandle CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
     ret_msize = 0;
     R_ASSERT1_CURE(fRName && fRName[0], true, { return nullptr; });

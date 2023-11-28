@@ -47,9 +47,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
 
     RImplementation.Resources->Evict();
 
-    target = (SampleCount > 1) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-    glGenTextures(1, &pRT);
-    CHK_GL(glBindTexture(target, pRT));
+    pSurface = XR_GL_TEXTURE_BASE::create((SampleCount > 1) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D);
+    CHK_GL(glBindTexture(pSurface->type, pSurface->handle));
     if (SampleCount > 1)
         CHK_GL(glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, SampleCount, glTextureUtils::ConvertTextureFormat(fmt), w,
         h, GL_FALSE));
@@ -57,7 +56,9 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, glTextureUtils::ConvertTextureFormat(fmt), w, h));
 
     pTexture = RImplementation.Resources->_CreateTexture(Name);
-    pTexture->surface_set(target, pRT);
+    pTexture->surface_set(pSurface);
+
+    pRT = pSurface->handle;
 
     // OpenGL doesn't differentiate between color and depth targets
     pZRT = pRT;
@@ -67,7 +68,7 @@ void CRT::destroy()
 {
     if (pTexture._get())
     {
-        pTexture->surface_set(target, 0);
+        pTexture->surface_set(nullptr);
         pTexture = nullptr;
     }
     CHK_GL(glDeleteTextures(1, &pRT));

@@ -241,6 +241,7 @@
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
     <ClInclude Include="..\xrRenderGL\CommonTypes.h" />
+    <ClInclude Include="..\xrRenderGL\gl_resources.h" />
     <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h" />
     <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h" />
     <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h" />

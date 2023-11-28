@@ -20,6 +20,7 @@
 #include <SDL_opengl_glext.h>
 
 #include "Layers/xrRenderGL/CommonTypes.h"
+#include "Layers/xrRenderGL/gl_resources.h"
 
 #include "Layers/xrRenderGL/glHW.h"
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"

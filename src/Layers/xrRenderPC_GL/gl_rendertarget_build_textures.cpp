@@ -50,12 +50,12 @@ void CRenderTarget::build_textures()
         fedisableexcept(FE_UNDERFLOW | FE_INEXACT); // XXX: I really want to see a better solution
 #endif
         // Surface
-        glGenTextures(1, &t_material_surf);
-        CHK_GL(glBindTexture(GL_TEXTURE_3D, t_material_surf));
-        CHK_GL(glTexStorage3D(GL_TEXTURE_3D, 1, GL_RG8, TEX_material_LdotN, TEX_material_LdotH, TEX_material_Count)
+        t_material_surf = XR_GL_TEXTURE_BASE::create(GL_TEXTURE_3D);
+        CHK_GL(glBindTexture(t_material_surf->type, t_material_surf->handle));
+        CHK_GL(glTexStorage3D(t_material_surf->type, 1, GL_RG8, TEX_material_LdotN, TEX_material_LdotH, TEX_material_Count)
         );
         t_material = RImplementation.Resources->_CreateTexture(r2_material);
-        t_material->surface_set(GL_TEXTURE_3D, t_material_surf);
+        t_material->surface_set(t_material_surf);
 
         // Fill it (addr: x=dot(L,N),y=dot(L,H))
         static constexpr u32 RowPitch = TEX_material_LdotN * 2;
@@ -127,7 +127,10 @@ void CRenderTarget::build_textures()
     // Build noise table
     if (true)
     {
-        glGenTextures(TEX_jitter_count, t_noise_surf);
+        for (int i = 0; i < TEX_jitter_count; ++i)
+        {
+            t_noise_surf[i] = XR_GL_TEXTURE_BASE::create(GL_TEXTURE_2D);
+        }
 
         static const int sampleSize = 4;
         u32 tempData[TEX_jitter_count][TEX_jitter * TEX_jitter];
@@ -137,10 +140,10 @@ void CRenderTarget::build_textures()
         {
             string_path name;
             xr_sprintf(name, "%s%d", r2_jitter, it1);
-            CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it1]));
-            CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TEX_jitter, TEX_jitter));
+            CHK_GL(glBindTexture(t_noise_surf[it1]->type, t_noise_surf[it1]->handle));
+            CHK_GL(glTexStorage2D(t_noise_surf[it1]->type, 1, GL_RGBA8, TEX_jitter, TEX_jitter));
             t_noise[it1] = RImplementation.Resources->_CreateTexture(name);
-            t_noise[it1]->surface_set(GL_TEXTURE_2D, t_noise_surf[it1]);
+            t_noise[it1]->surface_set(t_noise_surf[it1]);
         }
 
         // Fill it,
@@ -161,8 +164,8 @@ void CRenderTarget::build_textures()
         u32 it3 = 0;
         while (it3 < TEX_jitter_count - 1)
         {
-            CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it3]));
-            CHK_GL(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TEX_jitter, TEX_jitter, GL_RGBA, GL_UNSIGNED_BYTE,
+            CHK_GL(glBindTexture(t_noise_surf[it3]->type, t_noise_surf[it3]->handle));
+            CHK_GL(glTexSubImage2D(t_noise_surf[it3]->type, 0, 0, 0, TEX_jitter, TEX_jitter, GL_RGBA, GL_UNSIGNED_BYTE,
                 tempData[it3]));
             it3++;
         }
@@ -173,10 +176,10 @@ void CRenderTarget::build_textures()
         int it = TEX_jitter_count - 1;
         string_path name;
         xr_sprintf(name, "%s%d", r2_jitter, it);
-        CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it]));
-        CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, TEX_jitter, TEX_jitter));
+        CHK_GL(glBindTexture(t_noise_surf[it]->type, t_noise_surf[it]->handle));
+        CHK_GL(glTexStorage2D(t_noise_surf[it]->type, 1, GL_RGBA32F, TEX_jitter, TEX_jitter));
         t_noise[it] = RImplementation.Resources->_CreateTexture(name);
-        t_noise[it]->surface_set(GL_TEXTURE_2D, t_noise_surf[it]);
+        t_noise[it]->surface_set(t_noise_surf[it]);
 
         // Fill it,
         static const int HBAOPitch = TEX_jitter * sampleSize * sizeof(float);
@@ -204,23 +207,23 @@ void CRenderTarget::build_textures()
                 //generate_hbao_jitter	(data,TEX_jitter*TEX_jitter);
             }
         }
-        CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf[it3]));
-        CHK_GL(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TEX_jitter, TEX_jitter, GL_RGBA, GL_FLOAT, tempDataHBAO));
+        CHK_GL(glBindTexture(t_noise_surf[it3]->type, t_noise_surf[it3]->handle));
+        CHK_GL(glTexSubImage2D(t_noise_surf[it3]->type, 0, 0, 0, TEX_jitter, TEX_jitter, GL_RGBA, GL_FLOAT, tempDataHBAO));
 
 
         //	Create noise mipped
         {
             //	Autogen mipmaps
-            glGenTextures(1, &t_noise_surf_mipped);
-            CHK_GL(glBindTexture(GL_TEXTURE_2D, t_noise_surf_mipped));
-            CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, TEX_jitter, TEX_jitter));
+            t_noise_surf_mipped = XR_GL_TEXTURE_BASE::create(GL_TEXTURE_2D);
+            CHK_GL(glBindTexture(t_noise_surf_mipped->type, t_noise_surf_mipped->handle));
+            CHK_GL(glTexStorage2D(t_noise_surf_mipped->type, 1, GL_RGBA8, TEX_jitter, TEX_jitter));
             t_noise_mipped = RImplementation.Resources->_CreateTexture(r2_jitter_mipped);
-            t_noise_mipped->surface_set(GL_TEXTURE_2D, t_noise_surf_mipped);
+            t_noise_mipped->surface_set(t_noise_surf_mipped);
 
             //	Update texture. Generate mips.
-            glBindTexture(GL_TEXTURE_2D, t_noise_surf_mipped);
-            CHK_GL(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TEX_jitter, TEX_jitter, GL_RGBA, GL_UNSIGNED_BYTE, tempData[0]));
-            CHK_GL(glGenerateMipmap(GL_TEXTURE_2D));
+            glBindTexture(t_noise_surf_mipped->type, t_noise_surf_mipped->handle);
+            CHK_GL(glTexSubImage2D(t_noise_surf_mipped->type, 0, 0, 0, TEX_jitter, TEX_jitter, GL_RGBA, GL_UNSIGNED_BYTE, tempData[0]));
+            CHK_GL(glGenerateMipmap(t_noise_surf_mipped->type));
         }
     }
 }

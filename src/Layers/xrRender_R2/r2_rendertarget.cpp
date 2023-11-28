@@ -858,24 +858,21 @@ CRenderTarget::~CRenderTarget()
     glDeleteTextures(1, &t_ss_async);
 
     // Textures
-    t_material->surface_set(GL_TEXTURE_3D, 0);
-    glDeleteTextures(1, &t_material_surf);
+    t_material->surface_set(nullptr);
     t_material.destroy();
 
-    t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
-    t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
+    t_LUM_src->surface_set(nullptr);
+    t_LUM_dest->surface_set(nullptr);
     t_LUM_src.destroy();
     t_LUM_dest.destroy();
 
     // Jitter
     for (u32 it = 0; it < TEX_jitter_count; it++)
     {
-        t_noise[it]->surface_set(GL_TEXTURE_2D, 0);
+        t_noise[it]->surface_set(nullptr);
     }
-    glDeleteTextures(TEX_jitter_count, t_noise_surf);
 
-    t_noise_mipped->surface_set(GL_TEXTURE_2D, 0);
-    glDeleteTextures(1, &t_noise_surf_mipped);
+    t_noise_mipped->surface_set(nullptr);
 #else
 #   error No graphics API selected or enabled!
 #endif

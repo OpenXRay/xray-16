@@ -57,6 +57,9 @@ using ID3DState = glState;
 
 using unused_t = int[0];
 
+struct XR_GL_TEXTURE_BASE;
+using Texture2DHandle = XR_GL_TEXTURE_BASE*;
+using BaseTextureHandle = XR_GL_TEXTURE_BASE*;
 using IndexBufferHandle = GLuint;
 using VertexBufferHandle = GLuint;
 using ConstantBufferHandle = GLuint;

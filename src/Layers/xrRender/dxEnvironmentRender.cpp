@@ -163,28 +163,26 @@ void dxEnvironmentRender::lerp(CEnvDescriptorMixer& currentEnv, IEnvDescriptorRe
     //. Setup skybox textures, somewhat ugly
     auto e0 = sky_r_textures[0].second->surface_get();
     auto e1 = sky_r_textures[1].second->surface_get();
-#ifdef USE_OGL
-    tsky0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
-    tsky1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
-#else // USE_OGL
     tsky0->surface_set(e0);
     _RELEASE(e0);
     tsky1->surface_set(e1);
     _RELEASE(e1);
-#endif // USE_OGL
 
     const bool menu_pp = g_pGamePersistent->OnRenderPPUI_query();
-    e0 = menu_pp ? 0 : pA->sky_texture_env->surface_get();
-    e1 = menu_pp ? 0 : pB->sky_texture_env->surface_get();
-#   ifdef USE_OGL
-    t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
-    t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
-#   else // USE_OGL
-    t_envmap_0->surface_set(e0);
-    _RELEASE(e0);
-    t_envmap_1->surface_set(e1);
-    _RELEASE(e1);
-#   endif // USE_OGL
+    if (menu_pp)
+    {
+        t_envmap_0->surface_set(nullptr);
+        t_envmap_1->surface_set(nullptr);
+    }
+    else
+    {
+        e0 = pA->sky_texture_env->surface_get();
+        e1 = pB->sky_texture_env->surface_get();
+        t_envmap_0->surface_set(e0);
+        _RELEASE(e0);
+        t_envmap_1->surface_set(e1);
+        _RELEASE(e1);
+    }
 
     // ******************** Environment params (setting)
 #if defined(USE_DX9)
@@ -369,21 +367,11 @@ void dxEnvironmentRender::OnDeviceDestroy()
     sky_r_textures.clear();
     clouds_r_textures.clear();
 
-#if defined(USE_DX9) || defined(USE_DX11)
     tsky0->surface_set(nullptr);
     tsky1->surface_set(nullptr);
     t_envmap_0->surface_set(nullptr);
     t_envmap_1->surface_set(nullptr);
     tonemap->surface_set(nullptr);
-#elif defined(USE_OGL)
-    tsky0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-    tsky1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-    t_envmap_0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-    t_envmap_1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-    tonemap->surface_set(GL_TEXTURE_CUBE_MAP, 0);
-#else
-#   error No graphics API slected or defined!
-#endif
 
     sh_2sky.destroy();
     sh_2geom.destroy();

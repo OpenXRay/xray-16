@@ -81,12 +81,12 @@ public:
     GLuint t_ss_async; // 32bit		(r,g,b,a) is situated in the system memory
 
     // Textures
-    GLuint t_material_surf;
+    BaseTextureHandle t_material_surf;
     ref_texture t_material;
 
-    GLuint t_noise_surf[TEX_jitter_count];
+    BaseTextureHandle t_noise_surf[TEX_jitter_count];
     ref_texture t_noise[TEX_jitter_count];
-    GLuint t_noise_surf_mipped;
+    BaseTextureHandle t_noise_surf_mipped;
     ref_texture t_noise_mipped;
 
     ref_texture t_base;

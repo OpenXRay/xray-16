@@ -39,7 +39,7 @@ CTexture::~CTexture()
     RImplementation.Resources->_DeleteTexture(this);
 }
 
-void CTexture::surface_set(ID3DBaseTexture* surf)
+void CTexture::surface_set(BaseTextureHandle surf)
 {
 #if 0//def DEBUG
     string_path msg_buff;
@@ -142,13 +142,6 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
             CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
         }
     }
-}
-
-ID3DBaseTexture* CTexture::surface_get() const
-{
-    if (pSurface)
-        pSurface->AddRef();
-    return pSurface;
 }
 
 void CTexture::PostLoad()

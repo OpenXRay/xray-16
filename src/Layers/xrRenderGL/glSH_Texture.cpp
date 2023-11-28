@@ -22,12 +22,9 @@ void resptrcode_texture::create(LPCSTR _name)
 //////////////////////////////////////////////////////////////////////
 CTexture::CTexture()
 {
-    pSurface = 0;
     pBuffer = 0;
     pAVI = nullptr;
     pTheora = nullptr;
-    desc = GL_TEXTURE_2D;
-    desc_cache = 0;
     seqMSPF = 0;
     flags.MemoryUsage = 0;
     flags.bLoaded = false;
@@ -44,15 +41,14 @@ CTexture::~CTexture()
     RImplementation.Resources->_DeleteTexture(this);
 }
 
-void CTexture::surface_set(GLenum target, GLuint surf)
+void CTexture::surface_set(BaseTextureHandle surf)
 {
-    desc = target;
-    pSurface = surf;
-}
+    if (surf)
+        surf->AddRef();
 
-GLuint CTexture::surface_get() const
-{
-    return pSurface;
+    _RELEASE(pSurface);
+
+    pSurface = surf;
 }
 
 void CTexture::PostLoad()
@@ -74,7 +70,7 @@ void CTexture::apply_load(CBackend& cmd_list, u32 dwStage)
 void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
 {
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
-    CHK_GL(glBindTexture(desc, pSurface));
+    CHK_GL(glBindTexture(pSurface->type, pSurface->handle));
 
     if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual))
     {
@@ -91,7 +87,7 @@ void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
         int _pos = 0;
         pTheora->DecompressFrame(pBits, 0, _pos);
         CHK_GL(glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER));
-        CHK_GL(glTexSubImage2D(desc, 0, 0, 0, _w, _h, GL_BGRA, GL_UNSIGNED_BYTE, nullptr));
+        CHK_GL(glTexSubImage2D(pSurface->type, 0, 0, 0, _w, _h, GL_BGRA, GL_UNSIGNED_BYTE, nullptr));
 
         // Unmap the buffer to restore normal texture functionality
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
@@ -101,7 +97,7 @@ void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
 void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage) const
 {
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
-    CHK_GL(glBindTexture(desc, pSurface));
+    CHK_GL(glBindTexture(pSurface->type, pSurface->handle));
 
 #ifdef XR_PLATFORM_WINDOWS // TODO
     if (pAVI->NeedUpdate())
@@ -109,7 +105,7 @@ void CTexture::apply_avi(CBackend& cmd_list, u32 dwStage) const
         // AVI
         u8* ptr{};
         pAVI->GetFrame(&ptr);
-        CHK_GL(glTexSubImage2D(desc, 0, 0, 0, m_width, m_height,
+        CHK_GL(glTexSubImage2D(pSurface->type, 0, 0, 0, m_width, m_height,
             GL_RGBA, GL_UNSIGNED_BYTE, ptr));
     }
 #endif
@@ -133,13 +129,13 @@ void CTexture::apply_seq(CBackend& cmd_list, u32 dwStage)
     }
 
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
-    CHK_GL(glBindTexture(desc, pSurface));
+    CHK_GL(glBindTexture(pSurface->type, pSurface->handle));
 };
 
 void CTexture::apply_normal(CBackend& cmd_list, u32 dwStage) const
 {
     CHK_GL(glActiveTexture(GL_TEXTURE0 + dwStage));
-    CHK_GL(glBindTexture(desc, pSurface));
+    CHK_GL(glBindTexture(pSurface->type, pSurface->handle));
 };
 
 void CTexture::Preload()
@@ -151,19 +147,27 @@ void CTexture::Preload()
 void CTexture::Load()
 {
     flags.bLoaded = true;
-    desc_cache = 0;
+    desc_cache = nullptr;
     if (pSurface) return;
 
     flags.bUser = false;
     flags.MemoryUsage = 0;
     if (nullptr == *cName)
         return;
-    if (0 == xr_stricmp(*cName, "$null")) return;
+
     // we need to check only the beginning of the string,
     // so let's use strncmp instead of strstr.
     if (0 == strncmp(cName.c_str(), "$user$", sizeof("$user$") - 1))
     {
         flags.bUser = true;
+    }
+
+    if ((0 == xr_stricmp(*cName, "$null")) || flags.bUser)
+    {
+        pSurface = xr_new<XR_GL_TEXTURE_BASE>();
+        pSurface->type = GL_TEXTURE_2D;
+        pSurface->handle = 0;
+        pSurface->AddRef();
         return;
     }
 
@@ -197,18 +201,16 @@ void CTexture::Load()
             CHK_GL(glBufferData(GL_PIXEL_UNPACK_BUFFER, flags.MemoryUsage, nullptr, GL_STREAM_DRAW));
             glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
-            glGenTextures(1, &pTexture);
-            glBindTexture(GL_TEXTURE_2D, pTexture);
-            CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, _w, _h));
+            pSurface = XR_GL_TEXTURE_BASE::create(GL_TEXTURE_2D);
+            glBindTexture(pSurface->type, pSurface->handle);
+            CHK_GL(glTexStorage2D(pSurface->type, 1, GL_RGBA8, _w, _h));
 
-            pSurface = pTexture;
-            desc = GL_TEXTURE_2D;
             GLenum err = glGetError();
             if (err != GL_NO_ERROR)
             {
                 Msg("Invalid video stream: 0x%x", err);
                 xr_delete(pTheora);
-                pSurface = 0;
+                _RELEASE(pSurface);
             }
         }
     }
@@ -233,18 +235,15 @@ void CTexture::Load()
             CHK_GL(glBufferData(GL_PIXEL_UNPACK_BUFFER, flags.MemoryUsage, nullptr, GL_STREAM_DRAW));
 
             // Now create texture to copy PBO into
-            GLuint pTexture = 0;
-            glGenTextures(1, &pTexture);
-            glBindTexture(GL_TEXTURE_2D, pTexture);
-            CHK_GL(glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, pAVI->m_dwWidth, pAVI->m_dwHeight));
+            pSurface = XR_GL_TEXTURE_BASE::create(GL_TEXTURE_2D);
+            glBindTexture(pSurface->type, pSurface->handle);
+            CHK_GL(glTexStorage2D(pSurface->type, 1, GL_RGBA8, pAVI->m_dwWidth, pAVI->m_dwHeight));
 
-            pSurface = pTexture;
-            desc = GL_TEXTURE_2D;
             if (glGetError() != GL_NO_ERROR)
             {
                 FATAL("Invalid video stream");
                 xr_delete(pAVI);
-                pSurface = 0;
+                _RELEASE(pSurface);
             }
         }
 #endif
@@ -273,8 +272,8 @@ void CTexture::Load()
             {
                 // Load another texture
                 u32 mem = 0;
-                pSurface = RImplementation.texture_load(buffer, mem, desc);
-                if (pSurface)
+                pSurface = RImplementation.texture_load(buffer, mem);
+                if (pSurface->is_valid())
                 {
                     // pSurface->SetPriority	(PRIORITY_LOW);
                     seqDATA.push_back(pSurface);
@@ -282,17 +281,17 @@ void CTexture::Load()
                 }
             }
         }
-        pSurface = 0;
+        pSurface = nullptr;
         FS.r_close(_fs);
     }
     else
     {
         // Normal texture
         u32 mem = 0;
-        pSurface = RImplementation.texture_load(*cName, mem, desc);
+        pSurface = RImplementation.texture_load(*cName, mem);
 
         // Calc memory usage and preload into vid-mem
-        if (pSurface)
+        if (pSurface && pSurface->is_valid())
         {
             // pSurface->SetPriority	(PRIORITY_NORMAL);
             flags.MemoryUsage = mem;
@@ -304,22 +303,23 @@ void CTexture::Load()
 
 void CTexture::Unload()
 {
-#ifdef DEBUG
-    string_path				msg_buff;
-    sprintf_s(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface ID=%d", cName.c_str(), pSurface);
-#endif // DEBUG
-
-    //.	if (flags.bLoaded)		Msg		("* Unloaded: %s",cName.c_str());
+    if (!flags.bLoaded)
+    {
+        return;
+    }
 
     flags.bLoaded = FALSE;
     if (!seqDATA.empty())
     {
-        CHK_GL(glDeleteTextures(seqDATA.size(), seqDATA.data()));
+        for (auto& tex_handle : seqDATA)
+        {
+            tex_handle->Release();
+        }
         seqDATA.clear();
-        pSurface = 0;
+        pSurface = nullptr; // the pointer is actually a copy of pointer to one of seqDATA elems which is freed already
     }
 
-    CHK_GL(glDeleteTextures(1, &pSurface));
+    _RELEASE(pSurface);
     CHK_GL(glDeleteBuffers(1, &pBuffer));
 
 #ifdef XR_PLATFORM_WINDOWS
@@ -333,11 +333,12 @@ void CTexture::Unload()
 void CTexture::desc_update()
 {
     desc_cache = pSurface;
-    if (pSurface && (GL_TEXTURE_2D == desc || GL_TEXTURE_2D_MULTISAMPLE == desc))
+    if (pSurface->is_valid()
+        && (GL_TEXTURE_2D == pSurface->type || GL_TEXTURE_2D_MULTISAMPLE == pSurface->type))
     {
-        glBindTexture(desc, pSurface);
-        CHK_GL(glGetTexLevelParameteriv(desc, 0, GL_TEXTURE_WIDTH, &m_width));
-        CHK_GL(glGetTexLevelParameteriv(desc, 0, GL_TEXTURE_HEIGHT, &m_height));
+        glBindTexture(pSurface->type, pSurface->handle);
+        CHK_GL(glGetTexLevelParameteriv(pSurface->type, 0, GL_TEXTURE_WIDTH, &m_width));
+        CHK_GL(glGetTexLevelParameteriv(pSurface->type, 0, GL_TEXTURE_HEIGHT, &m_height));
     }
 }
 

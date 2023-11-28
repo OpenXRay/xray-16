@@ -28,8 +28,8 @@ public:
     void resolve_into(CRT& destination) const; // only RTs with same format supported
 
 public:
+    Texture2DHandle pSurface{};
 #if defined(USE_DX9) || (USE_DX11)
-    ID3DTexture2D* pSurface{};
     ID3DRenderTargetView* pRT{};
 #   if defined(USE_DX11)
     ID3DDepthStencilView* pZRT[R__NUM_CONTEXTS]{};
@@ -40,7 +40,6 @@ public:
 #elif defined(USE_OGL)
     GLuint pRT{};
     GLuint pZRT{};
-    GLenum target{};
 #else
 #   error No graphics API selected or enabled!
 #endif

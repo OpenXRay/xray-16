@@ -37,6 +37,8 @@ struct D3D_VIEWPORT : D3DVIEWPORT9
 
 using unused_t = int[0];
 
+using Texture2DHandle = IDirect3DTexture9*;
+using BaseTextureHandle = IDirect3DBaseTexture9*;
 using VertexBufferHandle = ID3DVertexBuffer*;
 using IndexBufferHandle = ID3DIndexBuffer*;
 using ConstantBufferHandle = unused_t;

@@ -269,6 +269,8 @@ struct D3D_VIEWPORT : D3D11_VIEWPORT
     {}
 };
 
+using Texture2DHandle       = ID3D11Texture2D*;
+using BaseTextureHandle     = ID3D11Resource*;
 using VertexBufferHandle    = ID3D11Buffer*;
 using IndexBufferHandle     = ID3D11Buffer*;
 using ConstantBufferHandle  = ID3D11Buffer*;

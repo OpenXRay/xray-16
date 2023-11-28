@@ -87,15 +87,13 @@ public:
     void Unload();
     // void Apply(u32 dwStage);
 
-#if defined(USE_DX9) || defined(USE_DX11)
-    void surface_set(ID3DBaseTexture* surf);
-    [[nodiscard]] ID3DBaseTexture* surface_get() const;
-#elif defined(USE_OGL)
-    void surface_set(GLenum target, GLuint surf);
-    [[nodiscard]] GLuint surface_get() const;
-#else
-#   error No graphics API selected or enabled!
-#endif
+    void surface_set(BaseTextureHandle surf);
+    [[nodiscard]] BaseTextureHandle surface_get() const
+    {
+        if (pSurface)
+            pSurface->AddRef();
+        return pSurface;
+    }
 
     [[nodiscard]] BOOL isUser() const
     {
@@ -173,26 +171,17 @@ public: //	Public class members (must be encapsulated further)
 
 private:
 #if defined(USE_DX9) || defined(USE_DX11)
-    ID3DBaseTexture* pSurface{};
     ID3DBaseTexture* pTempSurface{};
-    // Sequence data
-    xr_vector<ID3DBaseTexture*> seqDATA;
 
     // Description
     u32 m_width;
     u32 m_height;
-    ID3DBaseTexture* desc_cache;
     D3D_TEXTURE2D_DESC desc;
 #elif defined(USE_OGL)
-    GLuint pSurface;
     GLuint pBuffer;
-    // Sequence data
-    xr_vector<GLuint> seqDATA;
     // Description
     GLint m_width;
     GLint m_height;
-    GLuint desc_cache;
-    GLenum desc;
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -204,6 +193,9 @@ private:
     // Sequence view data
     xr_vector<ID3DShaderResourceView*> m_seqSRView;
 #endif
+    BaseTextureHandle pSurface{};
+    BaseTextureHandle desc_cache{};
+    xr_vector<BaseTextureHandle> seqDATA{};
 };
 
 struct resptrcode_texture : public resptr_base<CTexture>

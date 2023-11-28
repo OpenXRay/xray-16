@@ -45,8 +45,8 @@ void CRenderTarget::phase_combine()
     //*** exposure-pipeline
     u32 gpu_id = Device.dwFrame % HW.Caps.iGPUNum;
     {
-        t_LUM_src->surface_set(GL_TEXTURE_2D, rt_LUM_pool[gpu_id * 2 + 0]->pRT);
-        t_LUM_dest->surface_set(GL_TEXTURE_2D, rt_LUM_pool[gpu_id * 2 + 1]->pRT);
+        t_LUM_src->surface_set(rt_LUM_pool[gpu_id * 2 + 0]->pSurface);
+        t_LUM_dest->surface_set(rt_LUM_pool[gpu_id * 2 + 1]->pSurface);
     }
 
     if (RImplementation.o.ssao_hdao)
@@ -440,8 +440,8 @@ void CRenderTarget::phase_combine()
     //*** exposure-pipeline-clear
     {
         std::swap(rt_LUM_pool[gpu_id * 2 + 0], rt_LUM_pool[gpu_id * 2 + 1]);
-        t_LUM_src->surface_set(GL_TEXTURE_2D, 0);
-        t_LUM_dest->surface_set(GL_TEXTURE_2D, 0);
+        t_LUM_src->surface_set(nullptr);
+        t_LUM_dest->surface_set(nullptr);
     }
 
 #ifdef DEBUG

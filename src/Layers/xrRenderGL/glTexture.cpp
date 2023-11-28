@@ -58,12 +58,12 @@ u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
     return iFloor(res);
 }
 
-GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
+BaseTextureHandle CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
     ret_msize = 0;
-    R_ASSERT1_CURE(fRName && fRName[0], true, { return 0; });
+    R_ASSERT1_CURE(fRName && fRName[0], true, { return {}; });
 
-    GLuint pTexture = 0;
+    BaseTextureHandle pTexture;
     string_path fn;
     size_t img_size = 0;
     int img_loaded_lod = 0;
@@ -93,7 +93,7 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
     if (!ShadowOfChernobylMode)
         R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
     if (!dummyTextureExist)
-        return 0;
+        return {};
 
 #endif
 
@@ -113,16 +113,15 @@ _DDS:
         gli::gl GL(gli::gl::PROFILE_GL33);
 
         gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
-        GLenum target = GL.translate(texture.target());
+        pTexture = XR_GL_TEXTURE_BASE::create(GL.translate(texture.target()));
 
-        glGenTextures(1, &pTexture);
-        glBindTexture(target, pTexture);
+        glBindTexture(pTexture->type, pTexture->handle);
 
-        glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
+        glTexParameteri(pTexture->type, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(pTexture->type, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(texture.levels() - 1));
 
         if (gli::gl::EXTERNAL_RED != format.External) // skip for proper greyscale-alpha font textures
-            glTexParameteriv(target, GL_TEXTURE_SWIZZLE_RGBA, &format.Swizzles[gli::SWIZZLE_RED]);
+            glTexParameteriv(pTexture->type, GL_TEXTURE_SWIZZLE_RGBA, &format.Swizzles[gli::SWIZZLE_RED]);
 
         glm::tvec3<GLsizei> const tex_extent(texture.extent());
 
@@ -131,7 +130,7 @@ _DDS:
         {
         case gli::TARGET_2D:
         case gli::TARGET_CUBE:
-            glTexStorage2D(target, static_cast<GLint>(texture.levels()), format.Internal,
+            glTexStorage2D(pTexture->type, static_cast<GLint>(texture.levels()), format.Internal,
                            tex_extent.x, tex_extent.y);
             err = glGetError();
             if (err != GL_NO_ERROR)
@@ -142,7 +141,7 @@ _DDS:
             break;
         case gli::TARGET_3D:
         case gli::TARGET_CUBE_ARRAY:
-            glTexStorage3D(target, static_cast<GLint>(texture.levels()), format.Internal,
+            glTexStorage3D(pTexture->type, static_cast<GLint>(texture.levels()), format.Internal,
                            tex_extent.x, tex_extent.y, tex_extent.z);
             err = glGetError();
             if (err != GL_NO_ERROR)
@@ -165,7 +164,7 @@ _DDS:
                     glm::tvec3<GLsizei> const tex_level_extent(texture.extent(level));
                     GLenum sub_target = gli::is_target_cube(texture.target())
                              ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face)
-                             : target;
+                             : pTexture->type;
 
                     switch (texture.target())
                     {
@@ -206,7 +205,7 @@ _DDS:
                     {
                         if (gli::is_compressed(texture.format()))
                         {
-                            glCompressedTexSubImage3D(target, static_cast<GLint>(level),
+                            glCompressedTexSubImage3D(pTexture->type, static_cast<GLint>(level),
                                         0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
                                         format.Internal, static_cast<GLsizei>(texture.size(level)),
                                         texture.data(layer, face, level));
@@ -219,7 +218,7 @@ _DDS:
                         }
                         else
                         {
-                            glTexSubImage3D(target, static_cast<GLint>(level),
+                            glTexSubImage3D(pTexture->type, static_cast<GLint>(level),
                                         0, 0, 0, tex_level_extent.x, tex_level_extent.y, tex_level_extent.z,
                                         format.External, format.Type,
                                         texture.data(layer, face, level));
@@ -243,7 +242,6 @@ _DDS:
         FS.r_close(S);
 
         xr_strlwr(fn);
-        ret_desc = target;
         img_loaded_lod = is_target_cube(texture.target()) ? img_loaded_lod : get_texture_load_lod(fn);
         ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
         return pTexture;

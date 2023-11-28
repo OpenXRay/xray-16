@@ -432,13 +432,7 @@ public:
     void level_Load(IReader*) override;
     void level_Unload() override;
 
-#if defined(USE_DX9) || defined(USE_DX11)
-    ID3DBaseTexture* texture_load(pcstr fname, u32& msize);
-#elif defined(USE_OGL)
-    GLuint           texture_load(pcstr fname, u32& msize, GLenum& ret_desc);
-#else
-#   error No graphics API selected or enabled!
-#endif
+    BaseTextureHandle texture_load(pcstr fname, u32& msize);
 
     HRESULT shader_compile(pcstr name, IReader* fs,
         pcstr pFunctionName, pcstr pTarget, u32 Flags, void*& result) override;
