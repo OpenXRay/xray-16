@@ -27,8 +27,9 @@ SCRIPT_EXPORT(CMapLocation, (),
             //.def(constructor<>())
             .def("HintEnabled", &CMapLocation::HintEnabled)
             .def("GetHint", &CMapLocation::GetHint)
-            .def("SetHint", +[](CMapLocation* self, LPCSTR hint) {
-              self->SetHint(hint);
+            .def("SetHint", +[](CMapLocation* self, pcstr hint)
+            {
+                self->SetHint(hint);
             })
             .def("PointerEnabled", &CMapLocation::PointerEnabled)
             .def("EnablePointer", &CMapLocation::EnablePointer)
@@ -41,8 +42,9 @@ SCRIPT_EXPORT(CMapLocation, (),
             .def("SpotEnabled", &CMapLocation::SpotEnabled)
             .def("EnableSpot", &CMapLocation::EnableSpot)
             .def("DisableSpot", &CMapLocation::DisableSpot)
-            .def("GetLevelName", +[](CMapLocation* self) {
-              return self->GetLevelName().c_str();
+            .def("GetLevelName", +[](CMapLocation* self)
+            {
+                return self->GetLevelName().c_str();
             })
             .def("GetPosition", &CMapLocation::GetPosition)
             .def("ObjectID", &CMapLocation::ObjectID)

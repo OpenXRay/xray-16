@@ -108,8 +108,9 @@ SCRIPT_EXPORT(CScriptMovementAction, (),
             .def("move", &CScriptMovementAction::SetMovementType)
             .def("path", &CScriptMovementAction::SetPathType)
             .def("object", &CScriptMovementAction::SetObjectToGo)
-            .def("patrol", +[](CScriptMovementAction* self, const CPatrolPath* path, LPCSTR path_name) {
-              self->SetPatrolPath(path, path_name);
+            .def("patrol", +[](CScriptMovementAction* self, const CPatrolPath* path, pcstr path_name)
+            {
+                self->SetPatrolPath(path, path_name);
             })
             .def("position", &CScriptMovementAction::SetPosition)
             .def("input", &CScriptMovementAction::SetInputKeys)
