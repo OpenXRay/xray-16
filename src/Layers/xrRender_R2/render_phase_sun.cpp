@@ -231,8 +231,8 @@ void render_sun::calculate()
             Fvector cam_proj = Device.vCameraPosition;
             const float align_aim_step_coef = 4.f;
             cam_proj.set(floorf(cam_proj.x / align_aim_step_coef) + align_aim_step_coef / 2,
-                floorf(cam_proj.y / align_aim_step_coef) + align_aim_step_coef / 2,
-                floorf(cam_proj.z / align_aim_step_coef) + align_aim_step_coef / 2);
+                          floorf(cam_proj.y / align_aim_step_coef) + align_aim_step_coef / 2,
+                          floorf(cam_proj.z / align_aim_step_coef) + align_aim_step_coef / 2);
             cam_proj.mul(align_aim_step_coef);
             Fvector cam_pixel = wform(cull_xform[cascade_ind], cam_proj);
             cam_pixel = wform(m_viewport, cam_pixel);
