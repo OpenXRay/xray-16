@@ -36,6 +36,7 @@ public:
         u32 forceskinw : 1; // config
         u32 no_detail_textures : 1; // config
         u32 ffp : 1; // don't use shaders, only fixed-function pipeline or software processing
+        u32 new_shader_support : 1; // always disabled for r1
     } o;
 
 public:
@@ -105,6 +106,7 @@ public:
     virtual u32 get_dx_level() override { return 0x00090000; }
     virtual bool is_sun_static() override { return true; }
     // Loading / Unloading
+    virtual void OnDeviceCreate(pcstr shName) override;
     virtual void create() override;
     virtual void destroy() override;
     virtual void reset_begin() override;

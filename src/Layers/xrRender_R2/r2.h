@@ -275,11 +275,6 @@ public:
 
         // Yohji - New shader support
         u32 new_shader_support : 1;
-        // Ascii - Screen Space Shaders
-        u32 ssfx_branches : 1;
-        u32 ssfx_blood : 1;
-        u32 ssfx_rain : 1;
-        u32 ssfx_hud_raindrops : 1;
     } o;
 
     struct RenderR2Statistics
