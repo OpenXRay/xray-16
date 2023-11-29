@@ -290,16 +290,10 @@ ENGINE_API void Startup()
             pApp->SetLoadingScreen(xr_new<TextLoadingScreen>());
 #endif
     });
-    const auto& createSpatialSpace = TaskScheduler->AddTask("CreateSpatialSpace()", [](Task&, void*)
-    {
-        g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
-        g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
-    });
 
     Device.Create();
     TaskScheduler->Wait(createLightAnim);
     TaskScheduler->Wait(createApplication);
-    TaskScheduler->Wait(createSpatialSpace);
 
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
     R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
@@ -310,8 +304,6 @@ ENGINE_API void Startup()
     Device.Run();
 
     // Destroy APP
-    xr_delete(g_SpatialSpacePhysic);
-    xr_delete(g_SpatialSpace);
     DEL_INSTANCE(g_pGamePersistent);
     xr_delete(pApp);
     Engine.Event.Dump();

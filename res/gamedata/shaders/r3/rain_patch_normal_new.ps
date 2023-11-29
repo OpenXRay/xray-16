@@ -105,10 +105,10 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 	//deltaY *= 0.05;
 
 	//float s	= shadow_rain( PS, WorldP.xz*2 + float2(deltaX, deltaY) );
-	float s	= shadow_rain(PS, WorldP.xz);
+	float s	= shadow_rain( PS, WorldP.xz*2 );
 
 	//	Apply distance falloff
-	float	fAtten = 1 - smoothstep( 10, 30, length( _P.xyz ));
+	float	fAtten = 1 - smoothstep( RainFallof.x, RainFallof.y, length( _P.xyz ));
 	s	*= fAtten*fAtten;
 
 	//	Apply rain density
@@ -161,7 +161,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 	
 	//return float4(water.xyz,1); // holger
 
-	_N += 0.01 * water.xyz;
+	_N += water.xyz;
 
 	_N = normalize(_N);
 

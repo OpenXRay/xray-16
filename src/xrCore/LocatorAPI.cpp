@@ -339,14 +339,14 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
 
     while (true)
     {
-        read_byte = ::read(fd, &dwType, 4);
+        read_byte = _read(fd, &dwType, 4);
         if (read_byte == -1)
             return nullptr;
         else if (read_byte == 0)
             return nullptr;
 
         u32 tempSize = 0;
-        read_byte = ::read(fd, &tempSize, 4);
+        read_byte = _read(fd, &tempSize, 4);
         dwSize = tempSize;
         if (read_byte == -1)
             return nullptr;
@@ -356,7 +356,7 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
         if ((dwType & ~CFS_CompressMark) == ID)
         {
             u8* src_data = xr_alloc<u8>(dwSize);
-            read_byte = ::read(fd, src_data, dwSize);
+            read_byte = _read(fd, src_data, dwSize);
 
             VERIFY(read_byte == dwSize);
             if (dwType & CFS_CompressMark)
@@ -569,21 +569,6 @@ void CLocatorAPI::unload_archive(CLocatorAPI::archive& A)
         }
     }
     A.close();
-}
-
-bool CLocatorAPI::load_all_unloaded_archives()
-{
-    bool res = false;
-    for (auto& archive : m_archives)
-    {
-        if (!archive.hSrcFile)
-        {
-            LoadArchive(archive);
-            res = true;
-        }
-    }
-
-    return res;
 }
 
 bool ignore_name(const char* _name)

@@ -17,6 +17,7 @@ ENGINE_API IGame_Level* g_pGameLevel = NULL;
 extern bool g_bLoaded;
 
 IGame_Level::IGame_Level()
+    : ObjectSpace(&g_pGamePersistent->SpatialSpace)
 {
     m_pCameras = xr_new<CCameraManager>(true);
     g_pGameLevel = this;
@@ -114,8 +115,11 @@ bool IGame_Level::Load(u32 dwNum)
     // CForms
     g_pGamePersistent->SetLoadStageTitle("st_loading_cform");
     g_pGamePersistent->LoadTitle();
+
     ObjectSpace.Load(build_callback, serialize_callback, deserialize_callback);
-    // GEnv.Sound->set_geometry_occ ( &Static );
+    g_pGamePersistent->SpatialSpace.initialize(ObjectSpace.GetBoundingVolume());
+    g_pGamePersistent->SpatialSpacePhysic.initialize(ObjectSpace.GetBoundingVolume());
+
     GEnv.Sound->set_geometry_occ(ObjectSpace.GetStaticModel());
     GEnv.Sound->set_handler(_sound_event);
 
@@ -180,6 +184,8 @@ void IGame_Level::OnRender()
 
 void IGame_Level::OnFrame()
 {
+    SoundEvent_Dispatch();
+
     // Log ("- level:on-frame: ",u32(Device.dwFrame));
     // if (_abs(Device.fTimeDelta)<EPS_S) return;
 
@@ -283,7 +289,7 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
 
     // Query objects
     Fvector bb_size = {range, range, range};
-    g_SpatialSpace->q_box(snd_ER, 0, STYPE_REACTTOSOUND, snd_position, bb_size);
+    g_pGamePersistent->SpatialSpace.q_box(snd_ER, 0, STYPE_REACTTOSOUND, snd_position, bb_size);
 
     // Iterate
     for (auto& it : snd_ER)

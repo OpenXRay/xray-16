@@ -83,7 +83,7 @@ void CObjectSpace::BoxQuery	(collide::rq_results& r_dest, const Fbox& B, const F
     if (flags&clQUERY_DYNAMIC)
     {
         // Traverse object database
-        g_SpatialSpace->q_box	(r_spatial,0,STYPE_COLLIDEABLE,bc,bd);
+        g_pGamePersistent->SpatialSpace.q_box	(r_spatial,0,STYPE_COLLIDEABLE,bc,bd);
 
         // Determine visibility for dynamic part of scene
         for (u32 o_it=0; o_it<r_spatial.size(); o_it++)

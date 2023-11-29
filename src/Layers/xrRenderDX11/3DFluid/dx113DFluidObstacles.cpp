@@ -183,7 +183,7 @@ void dx113DFluidObstacles::ProcessDynamicObstacles(
     box.getradius(size);
 
     // Traverse object database
-    g_SpatialSpace->q_box(m_lstRenderables,
+    g_pGamePersistent->SpatialSpace.q_box(m_lstRenderables,
         0, // ISpatial_DB::O_ORDERED,
         STYPE_RENDERABLE, center, size);
 

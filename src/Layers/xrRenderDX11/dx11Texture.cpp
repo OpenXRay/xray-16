@@ -95,9 +95,8 @@ IC void Reduce(int& w, int& h, int& l, int& skip)
         h = 1;
 }
 
-IC void Reduce(size_t& w, size_t& h, size_t& l, int skip, bool compressed)
+IC void Reduce(size_t& w, size_t& h, size_t& l, int skip)
 {
-    const size_t min_size = compressed ? 4 : 1;
     while ((l > 1) && skip)
     {
         w /= 2;
@@ -106,10 +105,10 @@ IC void Reduce(size_t& w, size_t& h, size_t& l, int skip, bool compressed)
 
         skip--;
     }
-    if (w < min_size)
-        w = min_size;
-    if (h < min_size)
-        h = min_size;
+    if (w < 1)
+        w = 1;
+    if (h < 1)
+        h = 1;
 }
 
 /*
@@ -275,6 +274,9 @@ IC u32 it_height_rev_base(u32 d, u32 s) {   return  color_rgba  (
 */
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
+    ret_msize = 0;
+    R_ASSERT1_CURE(fRName && fRName[0], true, { return nullptr; });
+
     DirectX::TexMetadata IMG;
     DirectX::ScratchImage texture;
     ID3DBaseTexture* pTexture2D = NULL;
@@ -283,10 +285,6 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     int img_loaded_lod = 0;
     u32 mip_cnt = u32(-1);
     bool dummyTextureExist;
-
-    // validation
-    R_ASSERT(fRName);
-    R_ASSERT(fRName[0]);
 
     // make file name
     string_path fname;
@@ -324,16 +322,7 @@ _DDS:
 #endif // DEBUG
     R_ASSERT(S);
 
-    R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_NONE, &IMG, texture), fn);
-    const bool compressed = DirectX::IsCompressed(IMG.format);
-
-    // DirectX requires compressed texture size to be
-    // a multiple of 4. Make sure to meet this requirement.
-    if (compressed)
-    {
-        IMG.width = (IMG.width + 3u) & ~0x3u;
-        IMG.height = (IMG.height + 3u) & ~0x3u;
-    }
+    R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_PERMISSIVE, &IMG, texture), fn);
 
     // Check for LMAP and compress if needed
     xr_strlwr(fn);
@@ -344,8 +333,16 @@ _DDS:
     if (img_loaded_lod && !IMG.IsCubemap())
     {
         const auto old_mipmap_cnt = IMG.mipLevels;
-        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod, compressed);
+        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod);
         mip_lod = old_mipmap_cnt - IMG.mipLevels;
+    }
+
+    // DirectX requires compressed texture size to be
+    // a multiple of 4. Make sure to meet this requirement.
+    if (DirectX::IsCompressed(IMG.format))
+    {
+        IMG.width = (IMG.width + 3u) & ~0x3u;
+        IMG.height = (IMG.height + 3u) & ~0x3u;
     }
 
     R_CHK2(CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,

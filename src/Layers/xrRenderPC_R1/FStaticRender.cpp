@@ -54,6 +54,12 @@ ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cd
 #endif
 }
 
+void CRender::OnDeviceCreate(pcstr shName)
+{
+    o.new_shader_support = 0;
+    D3DXRenderBase::OnDeviceCreate(shName);
+}
+
 //////////////////////////////////////////////////////////////////////////
 void CRender::create()
 {
@@ -551,7 +557,7 @@ void CRender::Calculate()
         // Traverse object database
         if (psDeviceFlags.test(rsDrawDynamic))
         {
-            g_SpatialSpace->q_frustum(
+            g_pGamePersistent->SpatialSpace.q_frustum(
                 dsgraph.lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
             // Exact sorting order (front-to-back)

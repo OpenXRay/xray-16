@@ -3,7 +3,7 @@
 
 static constexpr float RSQRTDIV2 = 0.70710678118654752440084436210485f;
 
-light::light() : SpatialBase(g_SpatialSpace)
+light::light() : SpatialBase(g_pGamePersistent->SpatialSpace)
 {
     spatial.type = STYPE_LIGHTSOURCE;
     flags.type = POINT;

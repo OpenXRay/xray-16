@@ -55,7 +55,7 @@ extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 static const float base_spu_epsP = 0.05f;
 static const float base_spu_epsR = 0.05f;
 
-CGameObject::CGameObject() : SpatialBase(g_SpatialSpace), scriptBinder(this)
+CGameObject::CGameObject() : SpatialBase(g_pGamePersistent->SpatialSpace), scriptBinder(this)
 {
     dwFrame_AsCrow = u32(-1);
     Props.storage = 0;

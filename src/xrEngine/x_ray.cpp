@@ -283,14 +283,11 @@ void CApplication::LoadStage(bool draw /*= true*/)
 }
 
 void CApplication::LoadSwitch() {}
+
 // Sequential
 void CApplication::OnFrame()
 {
     Engine.Event.OnFrame();
-    g_SpatialSpace->update();
-    g_SpatialSpacePhysic->update();
-    if (g_pGameLevel)
-        g_pGameLevel->SoundEvent_Dispatch();
 }
 
 void CApplication::Level_Append(pcstr folder)
@@ -454,15 +451,6 @@ CInifile* CApplication::GetArchiveHeader(pcstr name, pcstr ver)
         }
     }
     return nullptr;
-}
-
-void CApplication::LoadAllArchives()
-{
-    if (FS.load_all_unloaded_archives())
-    {
-        Level_Scan();
-        g_pGamePersistent->OnAssetsChanged();
-    }
 }
 
 void CApplication::load_draw_internal()

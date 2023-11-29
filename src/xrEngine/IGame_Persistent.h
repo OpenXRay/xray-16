@@ -3,9 +3,14 @@
 #define IGame_PersistentH
 
 #include "xrServerEntities/gametype_chooser.h"
+
 #include "xrCommon/xr_set.h"
 #include "xrCommon/xr_vector.h"
+
 #include "xrCore/xr_trims.h"
+
+#include "xrCDB/ISpatial.h"
+
 #include "pure.h"
 #ifndef _EDITOR
 #include "Environment.h"
@@ -132,13 +137,17 @@ public:
     virtual void PreStart(pcstr op);
     virtual void Start(pcstr op);
     virtual void Disconnect();
+
+    ISpatial_DB SpatialSpace      { "Spatial obj"  };
+    ISpatial_DB SpatialSpacePhysic{ "Spatial phys" };
+
 #ifndef _EDITOR
     IGame_ObjectPool ObjectPool;
     CEnvironment* pEnvironment;
     CEnvironment& Environment() { return *pEnvironment; };
     void Prefetch();
 #endif
-    IMainMenu* m_pMainMenu;
+    IMainMenu* m_pMainMenu{};
     static bool IsMainMenuActive();
     static bool MainMenuActiveOrLevelNotExist();
 

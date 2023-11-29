@@ -151,6 +151,7 @@
     <ClCompile Include="IGame_Level_check_textures.cpp" />
     <ClCompile Include="IGame_ObjectPool.cpp" />
     <ClCompile Include="IGame_Persistent.cpp" />
+    <ClCompile Include="IGame_Persistent_Effects.cpp" />
     <ClCompile Include="IInputReceiver.cpp" />
     <ClCompile Include="IRenderable.cpp" />
     <ClCompile Include="ISheduled.cpp" />

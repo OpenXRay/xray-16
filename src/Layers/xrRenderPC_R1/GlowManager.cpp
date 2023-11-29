@@ -16,7 +16,7 @@
 #define MAX_GlowsDist2 float(MAX_GlowsDist1 * MAX_GlowsDist1)
 
 //////////////////////////////////////////////////////////////////////
-CGlow::CGlow() : SpatialBase(g_SpatialSpace)
+CGlow::CGlow() : SpatialBase(g_pGamePersistent->SpatialSpace)
 {
     flags.bActive = false;
     position.set(0, 0, 0);
