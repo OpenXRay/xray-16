@@ -46,7 +46,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
 #if defined(USE_DX9) || defined(USE_DX11)
     using namespace DirectX;
 
-    r_aabb_ssa result = {0};
+    r_aabb_ssa result = {};
     float area = float(_sqr(rt_dimensions));
 
     auto& dsgraph = RImplementation.get_imm_context();

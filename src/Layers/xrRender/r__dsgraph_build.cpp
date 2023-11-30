@@ -37,14 +37,12 @@ ICF float CalcSSA(float& distSQ, Fvector& C, float R)
 
 void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVisual, Fmatrix& xform, Fvector& Center)
 {
-    CRender& RI = RImplementation;
-
     if (pVisual->vis.marker[context_id] == marker)
         return;
     pVisual->vis.marker[context_id] = marker;
 
 #if RENDER == R_R1
-    if (RI.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))
+    if (RImplementation.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))
         return;
     pVisual->vis.accept_frame = Device.dwFrame;
 #endif
@@ -94,7 +92,7 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
 
 // Shadows registering
 #if RENDER == R_R1
-    RI.L_Shadows->add_element(_MatrixItem{ SSA, root, pVisual, xform });
+    RImplementation.L_Shadows->add_element(_MatrixItem{ SSA, root, pVisual, xform });
 #endif
     if (root && root->renderable_Invisible())
         return;
@@ -152,14 +150,12 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
 
 void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
 {
-    CRender& RI = RImplementation;
-
     if (pVisual->vis.marker[context_id] == marker)
         return;
     pVisual->vis.marker[context_id] = marker;
 
 #if RENDER == R_R1
-    if (RI.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))
+    if (RImplementation.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))
         return;
     pVisual->vis.accept_frame = Device.dwFrame;
 #endif
@@ -663,13 +659,13 @@ void R_dsgraph_structure::load(const xr_vector<CSector::level_sector_data_t>& se
     Sectors.resize(sectors_count);
     Portals.resize(portals_count);
 
-    for (int idx = 0; idx < portals_count; ++idx)
+    for (auto idx = 0u; idx < portals_count; ++idx)
     {
         auto* portal = xr_new<CPortal>();
         Portals[idx] = portal;
     }
 
-    for (int idx = 0; idx < sectors_count; ++idx)
+    for (auto idx = 0u; idx < sectors_count; ++idx)
     {
         auto* sector = xr_new<CSector>();
 
@@ -678,7 +674,7 @@ void R_dsgraph_structure::load(const xr_vector<CSector::level_sector_data_t>& se
         Sectors[idx] = sector;
     }
 
-    for (int idx = 0; idx < portals_count; ++idx)
+    for (auto idx = 0u; idx < portals_count; ++idx)
     {
         auto* portal = static_cast<CPortal*>(Portals[idx]);
 
@@ -740,11 +736,10 @@ void R_dsgraph_structure::build_subspace()
             dxRender_Visual* root = sector->root();
             //VERIFY(root->getType() == MT_HIERRARHY);
 
-            const auto &children = static_cast<FHierrarhyVisual*>(root)->children;
-
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
 #if 0
+                const auto &children = static_cast<FHierrarhyVisual*>(root)->children;
                 const auto traverse_children = [&, this](const TaskRange<size_t>& range)
                 {
                     for (size_t id = range.cbegin(); id != range.cend(); ++id)

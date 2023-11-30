@@ -178,7 +178,7 @@ IC void Dequantize(CKey& K, const CBlend& BD, const CMotion& M)
     }
 }
 
-IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLENDED], int b_count)
+IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLENDED], u16 b_count)
 {
     VERIFY(MAX_BLENDED >= b_count);
     switch (b_count)
@@ -394,7 +394,7 @@ IC void MixAdd(CKey& Result, const CKey* R, const float* BA, int b_count)
     MixinAdd(Result, R, BA, b_count);
 }
 IC void process_single_channel(
-    CKey& Result, const animation::channel_def& /*ch*/, const CKey* R, const CBlend* const BA[MAX_BLENDED], int b_count)
+    CKey& Result, const animation::channel_def& /*ch*/, const CKey* R, const CBlend* const BA[MAX_BLENDED], u16 b_count)
 {
     MixInterlerp(Result, R, BA, b_count);
     VERIFY(_valid(Result.T));

@@ -20,13 +20,15 @@ using namespace DirectX;
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/matrix_access.hpp"
 
-static void XRVec3TransformCoordArray(glm::vec3* out, const glm::vec3* in, const glm::mat4& matrix, unsigned int elements)
+[[maybe_unused]]
+inline void XRVec3TransformCoordArray(glm::vec3* out, const glm::vec3* in, const glm::mat4& matrix, unsigned int elements)
 {
     for (unsigned int i = 0; i < elements; ++i)
         out[i] = glm::vec3(glm::translate(matrix, in[i]) * glm::vec4(1.f,1.f,1.f,1.f));
 }
 
-static void XRMatrixOrthoOffCenterLH(Fmatrix* pout, float l, float r, float b, float t, float zn, float zf)
+[[maybe_unused]]
+inline void XRMatrixOrthoOffCenterLH(Fmatrix* pout, float l, float r, float b, float t, float zn, float zf)
 {
     pout->identity();
     pout->m[0][0] = 2.0f / (r - l);

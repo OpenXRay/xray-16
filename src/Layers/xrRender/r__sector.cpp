@@ -97,7 +97,7 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     // calc sphere
     Fbox BB;
     BB.invalidate();
-    for (int v = 0; v < vcnt; v++)
+    for (auto v = 0u; v < vcnt; v++)
         BB.modify(V[v]);
     BB.getsphere(S.P, S.R);
 
@@ -112,7 +112,7 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
 
     FPU::m64r();
     u32 _cnt = 0;
-    for (int i = 2; i < vcnt; i++)
+    for (auto i = 2u; i < vcnt; i++)
     {
         T.mknormal_non_normalized(poly[0], poly[i - 1], poly[i]);
         float m = T.magnitude();
@@ -138,7 +138,7 @@ void CSector::setup(const level_sector_data_t& data, const xr_vector<CPortal*> &
     // Assign portal polygons
     const auto num_portals = data.portals_id.size();
     m_portals.resize(num_portals);
-    for (int idx = 0; idx < num_portals; ++idx)
+    for (auto idx = 0u; idx < num_portals; ++idx)
     {
         const auto ID = data.portals_id[idx];
         m_portals[idx] = portals[ID];

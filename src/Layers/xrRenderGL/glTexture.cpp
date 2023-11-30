@@ -67,7 +67,6 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
     string_path fn;
     size_t img_size = 0;
     int img_loaded_lod = 0;
-    gli::gl::format fmt;
     u32 mip_cnt = u32(-1);
 
     bool dummyTextureExist;

@@ -139,7 +139,6 @@ void occRasterizer::on_dbg_render()
             {
                 Fvector quad, left_top, right_bottom, box_center, box_r;
                 quad.set((float)j - occ_dim_0 / 2.f, -((float)i - occ_dim_0 / 2.f), (float)bufDepth_0[i][j] / occQ_s32);
-                Device.mProject;
 
                 float z = -Device.mProject._43 / (float)(Device.mProject._33 - quad.z);
                 left_top.set(quad.x * z / Device.mProject._11 / (occ_dim_0 / 2.f),

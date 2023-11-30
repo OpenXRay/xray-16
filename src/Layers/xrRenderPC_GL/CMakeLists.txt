@@ -396,6 +396,10 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/src/Layers/xrRender
     ${CMAKE_SOURCE_DIR}/src/Include/xrRender
     ${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2
+)
+
+target_include_directories(${PROJECT_NAME}
+    SYSTEM PRIVATE
     ${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh
     ${CMAKE_SOURCE_DIR}/Externals/luabind
     ${CMAKE_SOURCE_DIR}/Externals/gli

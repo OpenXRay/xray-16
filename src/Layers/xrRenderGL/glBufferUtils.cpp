@@ -138,7 +138,7 @@ void IterVertexDeclaration(const VertexElement* dxdecl, F&& callback)
         if (desc.Stream == 0xFF)
             break;
 
-        GLuint location = VertexUsageList[desc.Usage];
+        GLint location = VertexUsageList[desc.Usage];
         GLint size = VertexSizeList[desc.Type];
         GLenum type = VertexTypeList[desc.Type];
         GLboolean normalized = VertexNormalizedList[desc.Type];
