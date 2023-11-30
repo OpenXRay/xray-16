@@ -93,7 +93,7 @@ source_group("Source" FILES ${SOURCE_SRC})
 source_group("Target" FILES ${TARGET_SRC})
 source_group("Target\\OpenAL" FILES ${TARGET_OPENAL_SRC})
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE}
     ${CACHE_SRC}
     ${CORE_SRC}
     ${CORE_OPENAL_SRC}

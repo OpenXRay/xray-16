@@ -84,7 +84,7 @@ source_group("ScriptCallbackEx" FILES ${SCRIPT_CALLBACK_EX_SRC})
 source_group("Thread" FILES ${THREAD_SRC})
 source_group("Thread\\StackTracker" FILES ${THREAD_STACK_TRACKER_SRC})
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE}
     ${DEBUG_SRC}
     ${ENGINE_SRC}
     ${EXPORT_SRC}
@@ -112,6 +112,7 @@ target_link_libraries(${PROJECT_NAME}
     xrCore
     xrLuaFix
     xrLuabind
+    $<$<BOOL:${STATIC_BUILD}>:xrGame>
     ${LUA_LIBRARIES}
 )
 

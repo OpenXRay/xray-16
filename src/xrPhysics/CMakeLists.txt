@@ -349,11 +349,7 @@ set(SRC_FILES
     ${DAMAGE_RECEIVER}
 )
 
-if (STATIC_BUILD)
-    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
-else()
-    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
-endif()
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE} ${SRC_FILES})
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE

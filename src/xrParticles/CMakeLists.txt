@@ -25,7 +25,7 @@ set(PARTICLE_API_SRC
 source_group("Kernel" FILES ${KERNEL_SRC})
 source_group("ParticleAPI" FILES ${PARTICLE_API_SRC})
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE}
     ${KERNEL_SRC}
     ${PARTICLE_API_SRC}
 )

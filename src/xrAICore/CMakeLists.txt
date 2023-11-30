@@ -224,7 +224,7 @@ source_group("AI\\Navigation\\PatrolPath\\PatrolPoint" FILES ${AI_NAVIGATION_PAT
 source_group("AI\\Navigation\\PatrolPath\\Storage" FILES ${AI_NAVIGATION_PATROL_PATH_STORAGE})
 source_group("Kernel" FILES ${KERNEL_SRC})
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE}
     ${AI_SRC}
     ${AI_COMPONENTS_PROBLEM_SOLVER_SRC}
     ${AI_COMPONENTS_PROBLEM_SOLVER_CONDITION_STATE_SRC}

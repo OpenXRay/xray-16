@@ -78,8 +78,9 @@ namespace ScriptExportDetails                                                   
             __pragma(warning(push)) __pragma(warning(disable : 4003)) static const char* const id##_Deps[] = {    \
                 nullptr, SCRIPT_INHERIT(NOOP dependencies)};                                                      \
             __pragma(warning(pop)) __pragma(optimize("s", on)) static void id##_ScriptExport(lua_State* luaState) \
-                __VA_ARGS__ static const ScriptExporter::Node id##_ScriptExporterNode(                            \
-                    #id, sizeof(id##_Deps) / sizeof(*id##_Deps) - 1, id##_Deps + 1, id##_ScriptExport);           \
+                __VA_ARGS__                                                                                       \
+            extern const ScriptExporter::Node id##_ScriptExporterNode(                                            \
+                #id, sizeof(id##_Deps) / sizeof(*id##_Deps) - 1, id##_Deps + 1, id##_ScriptExport);               \
         \
 }                                                                                                      \
     \
@@ -100,7 +101,7 @@ namespace ScriptExportDetails                                                   
             {                                                                                                     \
                 func(luaState);                                                                                   \
             }                                                                                                     \
-            static const ScriptExporter::Node id##_ScriptExporterNode(                                            \
+            extern const ScriptExporter::Node id##_ScriptExporterNode(                                            \
                 #id, sizeof(id##_Deps) / sizeof(*id##_Deps) - 1, id##_Deps + 1, id##_ScriptExport);               \
         \
 }                                                                                                      \

@@ -403,7 +403,7 @@ if (PROJECT_PLATFORM_ARM OR PROJECT_PLATFORM_ARM64)
   list(REMOVE_ITEM SRC_FILES "Math/PLC_SSE.hpp")
 endif()
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+add_library(${PROJECT_NAME} ${LIBS_LINK_TYPE} ${SRC_FILES})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

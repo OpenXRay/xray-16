@@ -225,6 +225,8 @@ void CRender::OnDeviceCreate(pcstr shName)
 // Just two static storage
 void CRender::create()
 {
+    HWOCC.initialize();
+
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345678);
 
     m_skinning = -1;
