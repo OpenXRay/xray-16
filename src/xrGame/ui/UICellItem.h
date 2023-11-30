@@ -42,8 +42,13 @@ protected:
     CUIStatic* m_text;
     CUIStatic* m_upgrade;
     Fvector2 m_upgrade_pos;
+    CUIStatic* m_custom_text;
+    Fvector2 m_custom_text_pos;
+    CUIStatic* m_custom_mark;
+    Fvector2 m_custom_mark_pos;
 
     virtual void UpdateItemText();
+    void UpdateCustomMarksAndText();
     void init();
 
 public:
@@ -88,6 +93,8 @@ public:
     bool m_select_armament;
     bool m_cur_mark;
     bool m_has_upgrade;
+    bool m_with_custom_text;
+    bool m_with_custom_mark;
 };
 
 class CUIDragItem final : public CUIWindow, public pureRender, public pureFrame

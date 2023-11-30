@@ -109,6 +109,7 @@
     <ClInclude Include="ui_debug.h" />
     <ClInclude Include="ui_styles.h" />
     <ClInclude Include="ui_base.h" />
+    <ClInclude Include="UIFontDefines.h" />
     <ClInclude Include="ui_defs.h" />
     <ClInclude Include="Windows\UIFrameLineWnd.h" />
     <ClInclude Include="Windows\UIFrameWindow.h" />

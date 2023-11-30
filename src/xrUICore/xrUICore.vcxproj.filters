@@ -330,6 +330,7 @@
     <ClInclude Include="uiabstract.h" />
     <ClInclude Include="UIMessages.h" />
     <ClInclude Include="ui_base.h" />
+    <ClInclude Include="UIFontDefines.h" />
     <ClInclude Include="Options\UIOptionsItem.h">
       <Filter>Options</Filter>
     </ClInclude>

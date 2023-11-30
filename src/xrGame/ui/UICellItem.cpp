@@ -27,6 +27,8 @@ CUICellItem::CUICellItem()
     //-	m_mark				= NULL;
     m_upgrade = NULL;
     m_pConditionState = NULL;
+    m_custom_text = NULL;
+    m_custom_mark = NULL;
     m_drawn_frame = 0;
     SetAccelerator(0);
     m_b_destroy_childs = true;
@@ -34,6 +36,8 @@ CUICellItem::CUICellItem()
     m_select_armament = false;
     m_cur_mark = false;
     m_has_upgrade = false;
+    m_with_custom_text = false;
+    m_with_custom_mark = false;
 
     init();
 }
@@ -79,6 +83,26 @@ void CUICellItem::init()
 
     if (m_pConditionState)
         m_pConditionState->Show(true);
+    
+    if (uiXml.NavigateToNode("cell_item_custom_text", 0))
+    {
+        m_custom_text = xr_new<CUIStatic>("CustomText");
+        m_custom_text->SetAutoDelete(true);
+        AttachChild(m_custom_text);
+        CUIXmlInit::InitStatic(uiXml, "cell_item_custom_text", 0, m_custom_text);
+        m_custom_text_pos = m_custom_text->GetWndPos();
+        m_custom_text->Show(false);
+    }
+
+    if (uiXml.NavigateToNode("cell_item_custom_mark", 0))
+    {
+        m_custom_mark = xr_new<CUIStatic>("CustomMark");
+        m_custom_mark->SetAutoDelete(true);
+        AttachChild(m_custom_mark);
+        CUIXmlInit::InitStatic(uiXml, "cell_item_custom_mark", 0, m_custom_mark);
+        m_custom_mark_pos = m_custom_mark->GetWndPos();
+        m_custom_mark->Show(false);
+    }
 }
 
 void CUICellItem::Draw()
@@ -132,6 +156,74 @@ void CUICellItem::Update()
         }
         m_upgrade->Show(m_has_upgrade);
     }
+    UpdateCustomMarksAndText();
+}
+
+void CUICellItem::UpdateCustomMarksAndText()
+{
+    PIItem item = (PIItem)m_pData;
+    if (item)
+    {
+        m_with_custom_text = item->m_custom_text != nullptr;
+        m_with_custom_mark = item->m_custom_mark;
+        if (m_with_custom_text && m_custom_text)
+        {
+            Fvector2 pos;
+            pos.set(m_custom_text_pos);
+            Fvector2 size = GetWndSize();
+            Fvector2 up_size = m_custom_text->GetWndSize();
+            pos.x = size.x - up_size.x - 4.0f; // making pos at right-end of cell
+            pos.y = size.y - up_size.y - 4.0f; // making pos at bottom-end of cell
+            m_custom_text->SetWndPos(pos);
+            m_custom_text->TextItemControl()->SetTextST(*item->m_custom_text);
+
+            if (item->m_custom_text_clr_inv != 0)
+            {
+                m_custom_text->TextItemControl()->SetTextColor(item->m_custom_text_clr_inv);
+            }
+            if (item->m_custom_text_font != nullptr)
+            {
+                m_custom_text->TextItemControl()->SetFont(item->m_custom_text_font);
+            }
+
+            m_custom_text->TextItemControl()->m_TextOffset = item->m_custom_text_offset;
+        }
+    }
+    if (m_with_custom_mark && m_custom_mark)
+    {
+        Fvector2 pos;
+        pos.set(m_custom_mark_pos);
+        Fvector2 size = GetWndSize();
+        Fvector2 up_size = m_custom_mark->GetWndSize();
+        pos.x = size.x - up_size.x - 4.0f; // making pos at right-end of cell
+        pos.y = size.y - up_size.y - 4.0f; // making pos at bottom-end of cell
+        m_custom_mark->SetWndPos(pos);
+
+        if (item->m_custom_mark_size.x > 0.f && item->m_custom_mark_size.y > 0.f)
+        {
+            m_custom_mark->SetWndSize(item->m_custom_mark_size);
+        }
+        else if (item->m_custom_mark_size.x < 0.f || item->m_custom_mark_size.y < 0.f)
+        {
+            R_ASSERT("item_custom_mark_size < 0.f || item_custom_mark_size < 0.f");
+        }
+
+        if (item->m_custom_mark_texture != nullptr)
+        {
+            m_custom_mark->InitTextureEx(item->m_custom_mark_texture.c_str());
+        }
+
+        if (item->m_custom_mark_clr != 0)
+        {
+            m_custom_mark->SetTextureColor(item->m_custom_mark_clr);
+        }
+
+        m_custom_mark->SetTextureOffset(item->m_custom_mark_offset.x, item->m_custom_mark_offset.y);
+    }
+    if (m_custom_text)
+        m_custom_text->Show(m_with_custom_text);
+    if (m_custom_mark)
+        m_custom_mark->Show(m_with_custom_mark);
 }
 
 bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)

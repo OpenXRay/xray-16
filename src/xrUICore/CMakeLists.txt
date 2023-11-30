@@ -9,6 +9,7 @@ set(SRC_FILES
     "ui_debug.h"
     "ui_defs.h"
     "ui_styles.cpp"
+    "UIFontDefines.h"
     "ui_styles.h"
     "uiabstract.h"
     "UIMessages.h"
