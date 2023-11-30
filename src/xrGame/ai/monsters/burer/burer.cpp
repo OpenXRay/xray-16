@@ -395,7 +395,7 @@ void CBurer::UpdateGraviObject()
         sound_gravi_wave.set_position(snd_pos);
     }
     else
-        GEnv.Sound->play_at_pos(sound_gravi_wave, 0, snd_pos);
+        sound_gravi_wave.play_at_pos(0, snd_pos);
 }
 
 void CBurer::UpdateCL()

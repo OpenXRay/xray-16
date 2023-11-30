@@ -889,7 +889,7 @@ void CActor::Die(IGameObject* who)
 
     if (!GEnv.isDedicatedServer)
     {
-        GEnv.Sound->play_at_pos(sndDie[Random.randI(SND_DIE_COUNT)], this, Position());
+        sndDie[Random.randI(SND_DIE_COUNT)].play_at_pos(this, Position());
 
         m_HeavyBreathSnd.stop();
         m_BloodSnd.stop();
