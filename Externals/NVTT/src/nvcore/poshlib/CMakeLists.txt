@@ -1,6 +1,6 @@
-set(SRC_FILES
-    "posh.c"
-    "posh.h"
-)
+add_library(posh STATIC)
 
-add_library(posh STATIC ${SRC_FILES})
+target_sources(posh PRIVATE
+    posh.c
+    posh.h
+)

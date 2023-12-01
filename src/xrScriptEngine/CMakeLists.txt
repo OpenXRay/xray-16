@@ -1,138 +1,142 @@
-project(xrScriptEngine)
+add_library(xrScriptEngine SHARED)
 
-set(DEBUG_SRC
-    "mslotutils.h"
-    "script_callStack.cpp"
-    "script_callStack.hpp"
-    "script_debugger.cpp"
-    "script_debugger.hpp"
-    "script_debugger_messages.hpp"
-    "script_debugger_threads.cpp"
-    "script_debugger_threads.hpp"
-    "script_lua_helper.cpp"
-    "script_lua_helper.hpp"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "Debug"
+    FILES
+    mslotutils.h
+    script_callStack.cpp
+    script_callStack.hpp
+    script_debugger.cpp
+    script_debugger.hpp
+    script_debugger_messages.hpp
+    script_debugger_threads.cpp
+    script_debugger_threads.hpp
+    script_lua_helper.cpp
+    script_lua_helper.hpp
 )
 
-set(ENGINE_SRC
-    "BindingsDumper.cpp"
-    "BindingsDumper.hpp"
-    "Functor.hpp"
-    "script_engine.cpp"
-    "script_engine.hpp"
-    "script_space_forward.hpp"
-    "ScriptEngineScript.cpp"
-    "ScriptEngineScript.hpp"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "Engine"
+    FILES
+    BindingsDumper.cpp
+    BindingsDumper.hpp
+    Functor.hpp
+    script_engine.cpp
+    script_engine.hpp
+    script_space_forward.hpp
+    ScriptEngineScript.cpp
+    ScriptEngineScript.hpp
 )
 
-set(EXPORT_SRC
-    "ScriptExporter.cpp"
-    "ScriptExporter.hpp"
-    "ScriptExportMacros.hpp"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "Export"
+    FILES
+    ScriptExporter.cpp
+    ScriptExporter.hpp
+    ScriptExportMacros.hpp
 )
 
-set(KERNEL_SRC
-    "DebugMacros.hpp"
-    "pch.cpp"
-    "pch.hpp"
-    "ScriptEngineConfig.hpp"
-    "xrScriptEngine.cpp"
-    "xrScriptEngine.hpp"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "Kernel"
+    FILES
+    DebugMacros.hpp
+    pch.cpp
+    pch.hpp
+    ScriptEngineConfig.hpp
+    xrScriptEngine.cpp
+    xrScriptEngine.hpp
 )
 
-set(LUA_STUDIO_SRC
-    "LuaStudio/Config.hpp"
-    "LuaStudio/Defines.hpp"
-    "LuaStudio/LuaStudio.cpp"
-    "LuaStudio/LuaStudio.hpp"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "LuaStudio"
+    FILES
+    LuaStudio/Config.hpp
+    LuaStudio/Defines.hpp
+    LuaStudio/LuaStudio.cpp
+    LuaStudio/LuaStudio.hpp
 )
 
-set(LUA_STUDIO_BACKEND_SRC
-    "LuaStudio/Backend/Backend.hpp"
-    "LuaStudio/Backend/Engine.hpp"
-    "LuaStudio/Backend/Interfaces.hpp"
-    "LuaStudio/Backend/LibraryLinkage.hpp"
-    "LuaStudio/Backend/World.hpp"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "LuaStudio\\Backend"
+    FILES
+    LuaStudio/Backend/Backend.hpp
+    LuaStudio/Backend/Engine.hpp
+    LuaStudio/Backend/Interfaces.hpp
+    LuaStudio/Backend/LibraryLinkage.hpp
+    LuaStudio/Backend/World.hpp
 )
 
-set(PROCESS_SRC
-    "script_process.cpp"
-    "script_process.hpp"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "Process"
+    FILES
+    script_process.cpp
+    script_process.hpp
 )
 
-set(SCRIPT_CALLBACK_EX_SRC
-    "script_callback_ex.h"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "ScriptCallbackEx"
+    FILES
+    script_callback_ex.h
 )
 
-set(THREAD_SRC
-    "script_thread.cpp"
-    "script_thread.hpp"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "Thread"
+    FILES
+    script_thread.cpp
+    script_thread.hpp
 )
 
-set(THREAD_STACK_TRACKER_SRC
-    "script_stack_tracker.cpp"
-    "script_stack_tracker.hpp"
+target_sources_grouped(
+    TARGET xrScriptEngine
+    NAME "Thread\\StackTracker"
+    FILES
+    script_stack_tracker.cpp
+    script_stack_tracker.hpp
 )
 
-source_group("Debug" FILES ${DEBUG_SRC})
-source_group("Engine" FILES ${ENGINE_SRC})
-source_group("Export" FILES ${EXPORT_SRC})
-source_group("Kernel" FILES ${KERNEL_SRC})
-source_group("LuaStudio" FILES ${LUA_STUDIO_SRC})
-source_group("LuaStudio\\Backend" FILES ${LUA_STUDIO_BACKEND_SRC})
-source_group("Process" FILES ${PROCESS_SRC})
-source_group("ScriptCallbackEx" FILES ${SCRIPT_CALLBACK_EX_SRC})
-source_group("Thread" FILES ${THREAD_SRC})
-source_group("Thread\\StackTracker" FILES ${THREAD_STACK_TRACKER_SRC})
-
-add_library(${PROJECT_NAME} SHARED
-    ${DEBUG_SRC}
-    ${ENGINE_SRC}
-    ${EXPORT_SRC}
-    ${KERNEL_SRC}
-    ${LUA_STUDIO_SRC}
-    ${LUA_STUDIO_BACKEND_SRC}
-    ${PROCESS_SRC}
-    ${SCRIPT_CALLBACK_EX_SRC}
-    ${THREAD_SRC}
-    ${THREAD_STACK_TRACKER_SRC}
-)
-
-target_include_directories(${PROJECT_NAME}
+target_include_directories(xrScriptEngine
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/Externals/xrLuaFix
-    ${CMAKE_SOURCE_DIR}/Externals/luabind
-    ${SDL2_INCLUDE_DIRS}
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/Externals"
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(xrScriptEngine
+    PUBLIC
+    xrLuabind
+
     PRIVATE
     xrAPI
     xrCore
     xrLuaFix
-    xrLuabind
-    ${LUA_LIBRARIES}
 )
 
-target_compile_definitions(${PROJECT_NAME}
+target_compile_definitions(xrScriptEngine
     PRIVATE
-    -DXRSCRIPTENGINE_EXPORTS
+    XRSCRIPTENGINE_EXPORTS
     # Uncomment next string for debug script engine
-    #-DCONFIG_SCRIPT_ENGINE_LOG_EXPORTS
-    #-DCONFIG_SCRIPT_ENGINE_LOG_SKIPPED_EXPORTS
+    #CONFIG_SCRIPT_ENGINE_LOG_EXPORTS
+    #CONFIG_SCRIPT_ENGINE_LOG_SKIPPED_EXPORTS
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(xrScriptEngine PROPERTIES
     PREFIX ""
 )
 
-target_precompile_headers(${PROJECT_NAME}
+target_precompile_headers(xrScriptEngine
     PRIVATE
-    "pch.hpp"
+    pch.hpp
 )
 
-install(TARGETS ${PROJECT_NAME} LIBRARY
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+install(TARGETS xrScriptEngine LIBRARY
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

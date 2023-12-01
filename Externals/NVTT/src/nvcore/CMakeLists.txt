@@ -1,62 +1,59 @@
-project(nvcore)
+option(NVCORE_SHARED "Build nvcore as shared library" OFF)
 
-set(NVCORE_SHARED OFF)
-
-# XXX: check if poshlib is needed?
 add_subdirectory(poshlib)
 
-set(SRC_FILES
-    "nvcore.h"
-    "Ptr.h"
-    "BitArray.h"
-    "Memory.h"
-    "Memory.cpp"
-    "Debug.h"
-    "Debug.cpp"
-    "Containers.h"
-    "StrLib.h"
-    "StrLib.cpp"
-    "Stream.h"
-    "StdStream.h"
-    "TextReader.h"
-    "TextReader.cpp"
-    "TextWriter.h"
-    "TextWriter.cpp"
-    "Radix.h"
-    "Radix.cpp"
-    "Library.h"
-    "Library.cpp"
-)
-
-group_sources(SRC_FILES)
-
 if (NVCORE_SHARED)
-    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
-else()
-    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
-endif()
+    add_library(nvcore SHARED)
 
-target_include_directories(${PROJECT_NAME}
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/Externals/NVTT/src
-    ${CMAKE_SOURCE_DIR}/Externals/NVTT/include
-)
-
-target_compile_definitions(${PROJECT_NAME}
-    PRIVATE
-    -DNVCORE_EXPORTS
-    $<$<BOOL:${NVCORE_SHARED}>:-DNVCORE_SHARED=1>
-)
-
-if (UNIX)
-    target_link_libraries(${PROJECT_NAME}
+    target_compile_definitions(nvcore
         PRIVATE
-        ${CMAKE_DL_LIBS} # XXX: why?
+        NVCORE_SHARED
     )
+else()
+    add_library(nvcore STATIC)
 endif()
 
-install(TARGETS ${PROJECT_NAME} LIBRARY
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+target_sources(nvcore
+    PRIVATE
+    nvcore.h
+    Ptr.h
+    BitArray.h
+    Memory.h
+    Memory.cpp
+    Debug.h
+    Debug.cpp
+    Containers.h
+    StrLib.h
+    StrLib.cpp
+    Stream.h
+    StdStream.h
+    TextReader.h
+    TextReader.cpp
+    TextWriter.h
+    TextWriter.cpp
+    Radix.h
+    Radix.cpp
+    Library.h
+    Library.cpp
+)
+
+target_include_directories(nvcore
+    PUBLIC
+    "${CMAKE_SOURCE_DIR}/Externals/NVTT/src"
+    "${CMAKE_SOURCE_DIR}/Externals/NVTT/include"
+)
+
+target_compile_definitions(nvcore
+    PRIVATE
+    NVCORE_EXPORTS
+    HAVE_EXECINFO_H
+    HAVE_SIGNAL_H
+)
+
+set_target_properties(nvcore PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
+install(TARGETS nvcore LIBRARY
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

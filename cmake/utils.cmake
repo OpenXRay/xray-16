@@ -1,28 +1,30 @@
-# XXX: remove add_dir macro after Externals/GameSpy cmake refactoring
-macro(add_dir DIRS)
-    foreach (dir ${DIRS})
-        message("adding  ${dir} to ${PROJECT_NAME}")
-        include_directories(${dir})
-        file(GLOB ${dir}__INCLUDES_H ${dir} ${dir}/*.h)
-        file(GLOB ${dir}__INCLUDES_HPP ${dir} ${dir}/*.hpp)
-        list(APPEND ${PROJECT_NAME}__INCLUDES ${${dir}__INCLUDES_H} ${${dir}__INCLUDES_HPP})
-        file(GLOB ${dir}__SOURCES_CPP ${dir} ${dir}/*.cpp ${dir}/*.cxx)
-        file(GLOB ${dir}__SOURCES_C ${dir} ${dir}/*.c)
-        list(APPEND ${PROJECT_NAME}__SOURCES ${${dir}__SOURCES_C} ${${dir}__SOURCES_CPP})
-    endforeach()
-endmacro()
+function(target_sources_grouped)
+    cmake_parse_arguments(
+        PARSED_ARGS
+        ""
+        "TARGET;NAME;SCOPE"
+        "FILES"
+        ${ARGN}
+    )
 
-macro(group_sources SRC_FILES)
-    foreach(source IN LISTS SRC_FILES)
-        get_filename_component(source_path "${source}" PATH)
-        string(REPLACE "/" "\\" source_path_msvc "${source_path}")
-        source_group("${source_path_msvc}" FILES "${source}")
-    endforeach()
-endmacro()
+    if(NOT PARSED_ARGS_TARGET)
+        message(FATAL_ERROR "You must provide a target name")
+    endif()
 
-# ------------------------------------------
+    if(NOT PARSED_ARGS_NAME)
+        message(FATAL_ERROR "You must provide a source group name")
+    endif()
+
+    if(NOT PARSED_ARGS_SCOPE)
+        set(PARSED_ARGS_SCOPE PRIVATE)
+    endif()
+
+    target_sources(${PARSED_ARGS_TARGET} ${PARSED_ARGS_SCOPE} ${PARSED_ARGS_FILES})
+
+    source_group(${PARSED_ARGS_NAME} FILES ${PARSED_ARGS_FILES})
+endfunction()
+
 # Detect arch type ( x86 or x64 )
-# ------------------------------------------
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ARCH_TYPE x64)
 else (CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -55,4 +57,67 @@ if (UNIX)
     endif()
 endif()
 
-include(${PROJECT_SOURCE_DIR}/cmake/packaging.cmake)
+function(set_git_info)
+    execute_process(COMMAND git rev-parse --verify HEAD
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        OUTPUT_VARIABLE GIT_SHA1
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    message(STATUS "git commit: ${GIT_SHA1}")
+
+    execute_process(COMMAND git rev-parse --abbrev-ref HEAD
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        OUTPUT_VARIABLE GIT_BRANCH
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    message(STATUS "git branch: ${GIT_BRANCH}")
+endfunction()
+
+include(packaging)
+
+function(xr_install tgt)
+    if (NOT MSVC)
+        install(TARGETS ${tgt} DESTINATION "."
+            PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE # chmod 755
+        )
+    else()
+        install(TARGETS ${tgt}
+            CONFIGURATIONS Debug
+            RUNTIME DESTINATION Debug/
+            LIBRARY DESTINATION Debug/
+        )
+        install(FILES $<TARGET_PDB_FILE:${tgt}>
+            CONFIGURATIONS Debug
+            DESTINATION Debug/
+        )
+        install(TARGETS ${tgt}
+            CONFIGURATIONS Release
+            RUNTIME DESTINATION Release/
+            LIBRARY DESTINATION Release/
+        )
+    endif()
+endfunction()
+
+# Use only if install defined outside target directory(like luabind, for example)
+function(xr_install_file tgt)
+    if (NOT MSVC)
+        install(FILES $<TARGET_FILE:${tgt}> DESTINATION "."
+            PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE # chmod 755
+        )
+    else()
+        install($<TARGET_FILE:${tgt}>
+            CONFIGURATIONS Debug
+            RUNTIME DESTINATION Debug/
+        )
+        install(FILES $<TARGET_PDB_FILE:${tgt}>
+            CONFIGURATIONS Debug
+            DESTINATION Debug/
+        )
+        install($<TARGET_FILE:${tgt}>
+           CONFIGURATIONS Release
+           RUNTIME DESTINATION Release/
+        )
+    endif()
+endfunction()
