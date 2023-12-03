@@ -17,7 +17,7 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
         extern ENGINE_API float psHUD_FOV;
         Pold = Device.mProject;
         FTold = Device.mFullTransform;
-        Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
+        Device.mProject.build_projection(deg2rad(psHUD_FOV), Device.fASPECT,
             VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
         Device.mFullTransform.mul(Device.mProject, Device.mView);
