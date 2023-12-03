@@ -702,8 +702,8 @@ public:
 
     const xr_token* GetToken() noexcept override
     {
-        tokens = snd_devices_token;
-        return inherited::GetToken();
+        tokens = Engine.Sound.GetDevicesList().data();
+        return tokens;
     }
 
     virtual void Save(IWriter* F)

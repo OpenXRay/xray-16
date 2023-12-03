@@ -64,7 +64,7 @@ protected:
     void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) override;
 
 public:
-    CSoundRender_CoreA();
+    CSoundRender_CoreA(CSoundManager& p);
 
     void _initialize_devices_list() override;
     void _initialize() override;
