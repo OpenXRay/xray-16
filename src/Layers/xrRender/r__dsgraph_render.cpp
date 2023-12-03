@@ -165,7 +165,7 @@ public:
 
         Fmatrix prj_new;
         prj_new.build_projection(deg2rad(g_hud_fov), Device.fASPECT,
-            VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
+            HUD_VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
         cmd_list.set_xform_project(prj_new);
 
         RImplementation.rmNear(cmd_list);
