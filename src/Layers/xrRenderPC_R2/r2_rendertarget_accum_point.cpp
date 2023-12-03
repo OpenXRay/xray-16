@@ -14,10 +14,10 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
 
     if (L->flags.bHudMode)
     {
-        extern ENGINE_API float psHUD_FOV;
+        extern ENGINE_API float g_hud_fov;
         Pold = Device.mProject;
         FTold = Device.mFullTransform;
-        Device.mProject.build_projection(deg2rad(psHUD_FOV), Device.fASPECT,
+        Device.mProject.build_projection(deg2rad(g_hud_fov), Device.fASPECT,
             VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
         Device.mFullTransform.mul(Device.mProject, Device.mView);
