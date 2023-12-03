@@ -791,7 +791,7 @@ public:
 };
 
 ENGINE_API float g_fov = 67.5f;
-ENGINE_API float g_hud_fov = 67.5f;
+ENGINE_API float g_hud_fov = 25.7831f;
 
 // extern int psSkeletonUpdate;
 extern int rsDVB_Size;
