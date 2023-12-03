@@ -86,7 +86,7 @@
     <ClCompile Include="guids.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="sound.cpp">
+    <ClCompile Include="Sound.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">

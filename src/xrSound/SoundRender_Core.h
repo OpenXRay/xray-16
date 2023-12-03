@@ -78,11 +78,12 @@ public:
 
 public:
     CSoundRender_Core();
-    virtual ~CSoundRender_Core();
+    ~CSoundRender_Core() override;
 
     // General
-    void _initialize() override = 0;
-    void _clear() override = 0;
+    virtual void _initialize_devices_list() = 0;
+    virtual void _initialize() = 0;
+    virtual void _clear() = 0;
     void _restart() override;
 
     // Sound interface

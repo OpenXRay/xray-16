@@ -13,6 +13,7 @@
 #include "EngineAPI.h"
 #include "EventAPI.h"
 #include "xrSheduler.h"
+#include "xrSound/Sound.h"
 
 // TODO: this should be in render configuration
 #define R__NUM_SUN_CASCADES         (3u) // csm/s.ligts
@@ -27,6 +28,7 @@ public:
     CEngineAPI External;
     CEventAPI Event;
     CSheduler Sheduler;
+    CSoundManager Sound;
 
     void Initialize();
     void Destroy();

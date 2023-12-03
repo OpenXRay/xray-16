@@ -75,4 +75,3 @@ public:
 
     const Fvector& listener_position() override { return Listener.position; }
 };
-extern CSoundRender_CoreA* SoundRenderA;

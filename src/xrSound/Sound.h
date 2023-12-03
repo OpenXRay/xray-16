@@ -203,10 +203,6 @@ namespace CDB
 /// definition (Sound Manager Interface)
 class XRSOUND_API XR_NOVTABLE ISoundManager
 {
-    virtual void _initialize_devices_list() = 0;
-    virtual void _initialize() = 0;
-    virtual void _clear() = 0;
-
 protected:
     friend class ref_sound_data;
     virtual bool _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) = 0;
@@ -214,9 +210,6 @@ protected:
 
 public:
     virtual ~ISoundManager() = default;
-    static void _create_devices_list();
-    static void _create();
-    static void _destroy();
 
     virtual void _restart() = 0;
     virtual bool i_locked() = 0;
@@ -258,6 +251,14 @@ public:
     virtual void refresh_sources() = 0;
     virtual void set_environment(u32 id, CSound_environment** dst_env) = 0;
     virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env) = 0;
+};
+
+class XRSOUND_API CSoundManager
+{
+public:
+    void CreateDevicesList();
+    void Create();
+    void Destroy();
 };
 
 class CSound_UserDataVisitor;
