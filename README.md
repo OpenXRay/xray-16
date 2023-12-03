@@ -95,7 +95,10 @@ of all the original source code and S.T.A.L.K.E.R. franchise. However, they know
 You may provide financial support for this project by donating via different ways:
 * [Boosty](https://boosty.to/openxray) – a large part of the team is located in Russia, if you have an ability to donate through Boosty, please use it, since we don't have an ability to withdraw funds from services like Patreon, etc. to our local Russian banking cards/accounts.
 * [GitHub Sponsors](https://github.com/sponsors/OpenXRay), [Patreon](https://patreon.com/openxray), [Open Collective](https://opencollective.com/openxray) – funds raised from these services will be used to support our developers outside of Russia, and also we may use them to pay for paid services on GitHub, AppVeyor, etc.
-* Bitcoin wallet: 363ZUoWcQe9fDvRPK9Kee2YuPdyhSFQpr2
+* BTC: 363ZUoWcQe9fDvRPK9Kee2YuPdyhSFQpr2
+* ETH: 0x45a4fe8566e76946591e1eeabf190aa09b1cdb66
+* TRX: TGx7QAhTPsRcwnb4mwCtNDU7NF6kuoACpt
+* Please, contact @xottab_duty in [our Discord](discord.gg/sjRMQwv) if you would like to use another cryptocurrency.
 
 Thank you for your support!
 

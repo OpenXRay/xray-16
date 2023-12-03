@@ -134,22 +134,8 @@ void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size)
     VERIFY(file_size != 0);
     void* buffer = xr_malloc(file_size);
 
-#ifdef XR_PLATFORM_LINUX
-    size_t total_r_bytes = 0;
-    do
-    {
-        const ssize_t r_bytes =
-            _read(file_handle, reinterpret_cast<u8*>(buffer) + total_r_bytes, file_size - total_r_bytes);
-        R_ASSERT3(r_bytes > 0, "Can't read from file : ", file_name);
-
-        total_r_bytes += r_bytes;
-    } while (total_r_bytes < file_size);
-#elif defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
-    int total_r_bytes = _read(file_handle, buffer, file_size);
-#else
-#   error Select or add implementation for your platform
-#endif
-    R_ASSERT3(total_r_bytes == file_size, "Can't read from file : ", file_name);
+    const ssize_t r_bytes = _read(file_handle, buffer, file_size);
+    R_ASSERT3(r_bytes > 0 && static_cast<size_t>(r_bytes) == file_size, "Can't read from file : ", file_name);
 
     // file_size = r_bytes;
 

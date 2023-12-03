@@ -52,8 +52,5 @@ BOOL xrRender_test_hw()
         return FALSE;
     }
 
-    if (!GLEW_ARB_framebuffer_object)
-        return FALSE;
-
     return TRUE;
 }

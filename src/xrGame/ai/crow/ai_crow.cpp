@@ -381,7 +381,7 @@ void CAI_Crow::shedule_Update(u32 DT)
         {
             fIdleSoundTime = fIdleSoundDelta + fIdleSoundDelta * Random.randF(-0.5f, 0.5f);
             // if (st_current==eFlyIdle)
-            GEnv.Sound->play_at_pos(m_Sounds.m_idle.GetRandom(), H_Root(), Position());
+            m_Sounds.m_idle.GetRandom().play_at_pos(H_Root(), Position());
         }
         fIdleSoundTime -= fDT;
     }

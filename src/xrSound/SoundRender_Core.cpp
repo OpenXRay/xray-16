@@ -34,14 +34,14 @@ XRSOUND_API u32 psSoundPrecacheAll = 1;
 
 CSoundRender_Core* SoundRender = nullptr;
 
-CSoundRender_Core::CSoundRender_Core()
+CSoundRender_Core::CSoundRender_Core(CSoundManager& p)
+    : Parent(p)
 {
     bPresent = false;
     bUserEnvironment = false;
     geom_MODEL = nullptr;
     geom_ENV = nullptr;
     geom_SOM = nullptr;
-    s_environment = nullptr;
     Handler = nullptr;
     s_targets_pu = 0;
     s_emitters_u = 0;
@@ -68,9 +68,6 @@ void CSoundRender_Core::_initialize()
     Timer.Start();
     TimerPersistent.Start();
 
-    // load environment
-    env_load();
-
     bPresent = true;
 
     // Cache
@@ -86,7 +83,6 @@ void CSoundRender_Core::_clear()
 {
     bReady = false;
     cache.destroy();
-    env_unload();
 
     // remove sources
     for (auto& kv : s_sources)
@@ -118,31 +114,6 @@ int CSoundRender_Core::pause_emitters(bool val)
         static_cast<CSoundRender_Emitter*>(emit)->pause(val, val ? m_iPauseCounter : m_iPauseCounter + 1);
 
     return m_iPauseCounter;
-}
-
-void CSoundRender_Core::env_load()
-{
-    // Load environment
-    string_path fn;
-    if (FS.exist(fn, "$game_data$", SNDENV_FILENAME))
-    {
-        s_environment = xr_new<SoundEnvironment_LIB>();
-        s_environment->Load(fn);
-    }
-
-    // Load geometry
-
-    // Associate geometry
-}
-
-void CSoundRender_Core::env_unload()
-{
-    // Unload
-    if (s_environment)
-        s_environment->Unload();
-    xr_delete(s_environment);
-
-    // Unload geometry
 }
 
 void CSoundRender_Core::_restart()
@@ -205,7 +176,8 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
     xr_delete(geom_ENV);
     if (nullptr == I)
         return;
-    if (nullptr == s_environment)
+    const auto envLib = Parent.get_env_library();
+    if (!envLib)
         return;
 
     // Associate names
@@ -215,7 +187,7 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
     {
         string256 n;
         names->r_stringZ(n, sizeof(n));
-        int id = s_environment->GetID(n);
+        int id = envLib->GetID(n);
         R_ASSERT(id >= 0);
         ids.push_back((u16)id);
     }
@@ -431,6 +403,8 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
         geom_DB.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, dir, 1000.f);
         if (geom_DB.r_count())
         {
+            const auto envLib = Parent.get_env_library();
+
             CDB::RESULT* r = geom_DB.r_begin();
             CDB::TRI* T = geom_ENV->get_tris() + r->id;
             Fvector* V = geom_ENV->get_verts();
@@ -440,10 +414,10 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
             if (dot < 0)
             {
                 u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0); //	front face
-                return s_environment->Get(id_front);
+                return envLib->Get(id_front);
             }
             u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16); //	back face
-            return s_environment->Get(id_back);
+            return envLib->Get(id_back);
         }
         identity.set_identity();
         return &identity;
@@ -502,10 +476,11 @@ void CSoundRender_Core::set_user_env(CSound_environment* E)
 
 void CSoundRender_Core::refresh_env_library()
 {
-    env_unload();
-    env_load();
+    Parent.env_unload();
+    Parent.env_load();
     env_apply();
 }
+
 void CSoundRender_Core::refresh_sources()
 {
     for (auto& emit : s_emitters)
@@ -517,6 +492,7 @@ void CSoundRender_Core::refresh_sources()
         s->load(*s->fname);
     }
 }
+
 void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound_environment** dst_env)
 {
     // XXX: old SDK functionality

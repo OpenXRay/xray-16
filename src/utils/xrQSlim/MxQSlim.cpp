@@ -63,7 +63,8 @@ void MxQSlim::collect_quadrics()
         case MX_WEIGHT_AREA:
         case MX_WEIGHT_AREA_AVG:
             Q *= Q.area();
-        // no break: fallthrough
+            [[fallthrough]];
+
         default:
             quadrics(f[0]) += Q;
             quadrics(f[1]) += Q;

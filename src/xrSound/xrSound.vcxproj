@@ -52,7 +52,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="OpenALDeviceList.cpp" />
-    <ClCompile Include="sound.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundRender_Cache.cpp" />
     <ClCompile Include="SoundRender_Core.cpp" />
     <ClCompile Include="SoundRender_CoreA.cpp" />

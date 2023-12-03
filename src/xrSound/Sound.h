@@ -4,6 +4,7 @@
 #include "xrCore/_flags.h"
 #include "xrCore/xr_resource.h"
 #include "xrCore/_vector3d.h"
+#include "xrCore/xr_token.h"
 #include "xrCommon/xr_vector.h" // DEFINE_VECTOR
 
 #ifdef XRAY_STATIC_BUILD
@@ -49,7 +50,6 @@ XRSOUND_API extern Flags32 psSoundFlags;
 XRSOUND_API extern int psSoundTargets;
 XRSOUND_API extern int psSoundCacheSizeMB;
 XRSOUND_API extern u32 psSoundPrecacheAll;
-XRSOUND_API extern xr_token* snd_devices_token;
 XRSOUND_API extern u32 snd_device_id;
 
 // Flags
@@ -203,10 +203,6 @@ namespace CDB
 /// definition (Sound Manager Interface)
 class XRSOUND_API XR_NOVTABLE ISoundManager
 {
-    virtual void _initialize_devices_list() = 0;
-    virtual void _initialize() = 0;
-    virtual void _clear() = 0;
-
 protected:
     friend class ref_sound_data;
     virtual bool _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) = 0;
@@ -214,9 +210,6 @@ protected:
 
 public:
     virtual ~ISoundManager() = default;
-    static void _create_devices_list();
-    static void _create();
-    static void _destroy();
 
     virtual void _restart() = 0;
     virtual bool i_locked() = 0;
@@ -252,7 +245,6 @@ public:
     virtual void object_relcase(IGameObject* obj) = 0;
     virtual const Fvector& listener_position() = 0;
 
-    virtual SoundEnvironment_LIB* get_env_library() = 0;
     virtual void refresh_env_library() = 0;
     virtual void set_user_env(CSound_environment* E) = 0;
     virtual void refresh_sources() = 0;
@@ -260,6 +252,24 @@ public:
     virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env) = 0;
 
     virtual bool is_enabled() const = 0;
+};
+
+class XRSOUND_API CSoundManager
+{
+    xr_vector<xr_token> soundDevices;
+
+    SoundEnvironment_LIB* soundEnvironment{};
+
+public:
+    void  CreateDevicesList();
+    auto& GetDevicesList() { return soundDevices; }
+
+    void Create();
+    void Destroy();
+
+    SoundEnvironment_LIB* get_env_library() const;
+    void env_load();
+    void env_unload();
 };
 
 class CSound_UserDataVisitor;

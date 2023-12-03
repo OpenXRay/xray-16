@@ -2,28 +2,64 @@
 
 #include "SoundRender_CoreA.h"
 
-XRSOUND_API xr_token* snd_devices_token = nullptr;
 XRSOUND_API u32 snd_device_id = u32(-1);
 
-void ISoundManager::_create_devices_list()
+void CSoundManager::CreateDevicesList()
 {
-    SoundRenderA = xr_new<CSoundRender_CoreA>();
-    SoundRender = SoundRenderA;
-    GEnv.Sound = SoundRender;
+    SoundRender = xr_new<CSoundRender_CoreA>(*this);
     SoundRender->bPresent = strstr(Core.Params, "-nosound") == nullptr;
     if (SoundRender->bPresent)
-        GEnv.Sound->_initialize_devices_list();
+        SoundRender->_initialize_devices_list();
+    else
+        soundDevices.emplace_back("null", -1);
+
+    GEnv.Sound = SoundRender;
 }
 
-void ISoundManager::_create()
+void CSoundManager::Create()
 {
     if (SoundRender->bPresent)
-        GEnv.Sound->_initialize();
+    {
+        env_load();
+        SoundRender->_initialize();
+    }
 }
 
-void ISoundManager::_destroy()
+void CSoundManager::Destroy()
 {
-    GEnv.Sound->_clear();
-    xr_delete(SoundRender);
     GEnv.Sound = nullptr;
+
+    SoundRender->_clear();
+    xr_delete(SoundRender);
+
+    env_unload();
+
+    for (auto& token : soundDevices)
+    {
+        pstr tokenName = const_cast<pstr>(token.name);
+        xr_free(tokenName);
+    }
+    soundDevices.clear();
+}
+
+void CSoundManager::env_load()
+{
+    string_path fn;
+    if (FS.exist(fn, "$game_data$", SNDENV_FILENAME))
+    {
+        soundEnvironment = xr_new<SoundEnvironment_LIB>();
+        soundEnvironment->Load(fn);
+    }
+}
+
+void CSoundManager::env_unload()
+{
+    if (soundEnvironment)
+        soundEnvironment->Unload();
+    xr_delete(soundEnvironment);
+}
+
+SoundEnvironment_LIB* CSoundManager::get_env_library() const
+{
+    return soundEnvironment;
 }

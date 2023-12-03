@@ -32,6 +32,8 @@ protected:
     SoundStatistics Stats;
 
 public:
+    CSoundManager& Parent;
+
     using event = std::pair<ref_sound_data_ptr, float>;
     xr_vector<event> s_events;
 
@@ -67,7 +69,6 @@ protected:
     xr_vector<CSoundRender_Target*> s_targets;
     xr_vector<CSoundRender_Target*> s_targets_defer;
     u32 s_targets_pu; // parameters update
-    SoundEnvironment_LIB* s_environment;
     CSoundRender_Environment s_user_environment;
     CSoundRender_Effects* m_effects{};
 
@@ -79,12 +80,13 @@ public:
     u32 cache_bytes_per_line;
 
 public:
-    CSoundRender_Core();
-    virtual ~CSoundRender_Core();
+    CSoundRender_Core(CSoundManager& p);
+    ~CSoundRender_Core() override;
 
     // General
-    void _initialize() override = 0;
-    void _clear() override = 0;
+    virtual void _initialize_devices_list() = 0;
+    virtual void _initialize() = 0;
+    virtual void _clear() = 0;
     void _restart() override;
 
     // Sound interface
@@ -124,7 +126,6 @@ public:
     //	virtual const Fvector&				listener_position		( )=0;
     virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) = 0;
 
-    virtual SoundEnvironment_LIB* get_env_library() { return s_environment; }
     virtual void refresh_env_library();
     virtual void set_user_env(CSound_environment* E);
     virtual void refresh_sources();
@@ -149,9 +150,6 @@ public:
     float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) override;
     float get_occlusion(Fvector& P, float R, Fvector* occ) override;
     CSoundRender_Environment* get_environment(const Fvector& P);
-
-    void env_load();
-    void env_unload();
     void env_apply();
 };
 

@@ -1,12 +1,18 @@
-project(xrParticles)
+add_library(xrParticles SHARED)
 
-set(KERNEL_SRC
+target_sources_grouped(
+    TARGET xrParticles
+    NAME "Kernel"
+    FILES
     "psystem.h"
     "stdafx.h"
     "stdafx.cpp"
 )
 
-set(PARTICLE_API_SRC
+target_sources_grouped(
+    TARGET xrParticles
+    NAME "ParticleAPI"
+    FILES
     "noise.cpp"
     "noise.h"
     "particle_actions.cpp"
@@ -22,41 +28,32 @@ set(PARTICLE_API_SRC
     "particle_manager.h"
 )
 
-source_group("Kernel" FILES ${KERNEL_SRC})
-source_group("ParticleAPI" FILES ${PARTICLE_API_SRC})
-
-add_library(${PROJECT_NAME} SHARED
-    ${KERNEL_SRC}
-    ${PARTICLE_API_SRC}
-)
-
-target_include_directories(${PROJECT_NAME}
+target_include_directories(xrParticles
     PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
+    "${CMAKE_SOURCE_DIR}/src"
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(xrParticles
     PRIVATE
     xrCore
     xrMiscMath
     xrEngine
 )
 
-target_compile_definitions(${PROJECT_NAME}
+target_compile_definitions(xrParticles
     PRIVATE
-    -DXR_PARTICLES_EXPORTS
+    XR_PARTICLES_EXPORTS
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(xrParticles PROPERTIES
     PREFIX ""
 )
 
-target_precompile_headers(${PROJECT_NAME}
+target_precompile_headers(xrParticles
     PRIVATE
-    "stdafx.h"
+    stdafx.h
 )
 
-install(TARGETS ${PROJECT_NAME} LIBRARY
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+install(TARGETS xrParticles LIBRARY
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

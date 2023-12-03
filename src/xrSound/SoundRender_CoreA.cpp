@@ -7,9 +7,8 @@
 #include "SoundRender_EffectsA_EAX.h"
 #include "SoundRender_EffectsA_EFX.h"
 
-CSoundRender_CoreA* SoundRenderA = nullptr;
-
-CSoundRender_CoreA::CSoundRender_CoreA() : CSoundRender_Core()
+CSoundRender_CoreA::CSoundRender_CoreA(CSoundManager& p)
+    : CSoundRender_Core(p)
 {
     pDevice = nullptr;
     pDeviceList = nullptr;

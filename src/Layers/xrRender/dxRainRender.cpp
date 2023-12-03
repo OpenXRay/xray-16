@@ -35,7 +35,7 @@ dxRainRender::dxRainRender()
     hGeom_Drops.create(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 
 #if defined(USE_DX11)
-    if (RImplementation.o.ssfx_rain)
+    if (RImplementation.o.new_shader_support)
         SH_Splash.create("effects\\rain_splash", "fx\\fx_rain");
 #endif
 
@@ -59,7 +59,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
 
     // SSS Rain shader is available
 #if defined(USE_DX11)
-    if (RImplementation.o.ssfx_rain)
+    if (RImplementation.o.new_shader_support)
     {
         _drop_len = ps_ssfx_rain_1.x;
         _drop_width = ps_ssfx_rain_1.y;
@@ -169,7 +169,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
         // Build line
         Fvector& pos_head = one.P;
         Fvector pos_trail;
-        if (ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT))
+        if (RImplementation.o.new_shader_support)
             pos_trail.mad(pos_head, one.D, -_drop_len * factor_visual);
         else
             pos_trail.mad(pos_head, one.D, -drop_length * factor_visual);
@@ -192,7 +192,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
         camDir.sub(sC, vEye);
         camDir.normalize();
         lineTop.crossproduct(camDir, lineD);
-        float w = ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT) ? _drop_width : drop_width;
+        float w = RImplementation.o.new_shader_support ? _drop_width : drop_width;
         u32 s = one.uv_set;
         P.mad(pos_trail, lineTop, -w);
         verts->set(P, u_rain_color, UV[s][0].x, UV[s][0].y);
@@ -232,7 +232,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
     {
         float dt = Device.fTimeDelta;
         _IndexStream& _IS = RImplementation.Index;
-        if (ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT))
+        if (RImplementation.o.new_shader_support)
         {
             RCache.set_Shader(_splash_SH);
             RCache.set_c(s_shader_setup, ps_ssfx_rain_3); // Alpha, Refraction
