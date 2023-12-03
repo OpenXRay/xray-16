@@ -477,7 +477,7 @@ ICF void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const
 #error Specify your platform explicitly
 #endif // defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 
-extern ENGINE_API float psHUD_FOV;
+extern ENGINE_API float g_hud_fov;
 
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 ICF void magnitude_sse(Fvector& vec, float& res) // XXX: move this to Fvector class
@@ -673,7 +673,7 @@ void CParticleEffect::Render(CBackend& cmd_list, float, bool use_fast_geo)
                 Fmatrix FTold = Device.mFullTransform;
                 if (GetHudMode())
                 {
-                    Device.mProject.build_projection(deg2rad(psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
+                    Device.mProject.build_projection(deg2rad(g_hud_fov), Device.fASPECT, HUD_VIEWPORT_NEAR,
                         g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
                     Device.mFullTransform.mul(Device.mProject, Device.mView);
@@ -721,7 +721,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
     FillSprite_fpu(pv, pos, dir, lt, rb, r1, r2, clr, _sin(angle), _cos(angle));
 }
 
-extern ENGINE_API float psHUD_FOV;
+extern ENGINE_API float g_hud_fov;
 void CParticleEffect::Render(float, bool)
 {
     u32 dwOffset, dwCount;
@@ -841,7 +841,7 @@ void CParticleEffect::Render(float, bool)
                 Fmatrix FTold = Device.mFullTransform;
                 if (GetHudMode())
                 {
-                    Device.mProject.build_projection(deg2rad(psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
+                    Device.mProject.build_projection(deg2rad(g_hud_fov), Device.fASPECT, HUD_VIEWPORT_NEAR,
                         g_pGamePersistent->Environment().CurrentEnv.far_plane);
 
                     Device.mFullTransform.mul(Device.mProject, Device.mView);
