@@ -25,7 +25,7 @@
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenAL32.lib;phonon.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers Condition="'$(Platform)'=='Win32'" />
     </Link>
   </ItemDefinitionGroup>
@@ -89,6 +89,9 @@
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\OpenAL32.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\phonon.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
   </ItemGroup>
