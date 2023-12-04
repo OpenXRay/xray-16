@@ -90,14 +90,14 @@ bool CLevel::Load_GameSpecific_After()
         if (FS.exist(fn_game, "$level$", "level.snd_env"))
         {
             IReader* F = FS.r_open(fn_game);
-            GEnv.Sound->set_geometry_env(F);
+            Sound->set_geometry_env(F);
             FS.r_close(F);
         }
         // loading SOM
         if (FS.exist(fn_game, "$level$", "level.som"))
         {
             IReader* F = FS.r_open(fn_game);
-            GEnv.Sound->set_geometry_som(F);
+            Sound->set_geometry_som(F);
             FS.r_close(F);
         }
 

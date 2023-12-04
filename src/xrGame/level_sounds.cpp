@@ -34,7 +34,7 @@ void SStaticSound::Update(u32 game_time, u32 global_time)
         if (0 == m_Source._feedback())
         {
             Fvector occ[3];
-            const float occluder_volume = GEnv.Sound->get_occlusion(m_Position, .2f, occ);
+            const float occluder_volume = g_pGameLevel->Sound->get_occlusion(m_Position, .2f, occ);
             const float vol = m_Volume * occluder_volume;
 
             if ((0 == m_PauseTime.x) && (0 == m_PauseTime.y))

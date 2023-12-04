@@ -44,10 +44,16 @@ IGame_Persistent::IGame_Persistent()
     pEnvironment = xr_new<CEnvironment>();
 
     m_pGShaderConstants = xr_new<ShadersExternalData>(); //--#SM+#--
+
+    m_pSound = GEnv.Sound->create_scene();
+    DefaultSoundScene = m_pSound;
 }
 
 IGame_Persistent::~IGame_Persistent()
 {
+    GEnv.Sound->destroy_scene(m_pSound);
+    DefaultSoundScene = nullptr;
+
     xr_delete(PerlinNoise1D);
     Device.seqFrame.Remove(this);
     Device.seqAppStart.Remove(this);

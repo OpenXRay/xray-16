@@ -24,6 +24,7 @@ constexpr pcstr SNDENV_FILENAME = "sEnvironment.xr";
 class IGameObject;
 class CSound;
 struct resptrcode_sound;
+class ISoundScene;
 class XRSOUND_API CSound_params;
 class XRSOUND_API CSound_source;
 class XRSOUND_API CSound_emitter;
@@ -51,6 +52,8 @@ XRSOUND_API extern int psSoundTargets;
 XRSOUND_API extern int psSoundCacheSizeMB;
 XRSOUND_API extern u32 psSoundPrecacheAll;
 XRSOUND_API extern u32 snd_device_id;
+
+XRSOUND_API extern ISoundScene* DefaultSoundScene;
 
 // Flags
 enum : u32
@@ -200,6 +203,40 @@ namespace CDB
     class MODEL;
 }
 
+class XRSOUND_API XR_NOVTABLE ISoundScene
+{
+protected:
+    friend struct resptrcode_sound;
+
+public:
+    virtual ~ISoundScene() = 0;
+
+    virtual void play(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f) = 0;
+    virtual void play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f) = 0;
+    virtual void play_no_feedback(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr,
+        float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr) = 0;
+
+    virtual void stop_emitters() const = 0;
+    virtual int pause_emitters(bool pauseState) = 0;
+
+    virtual void set_handler(sound_event* E) = 0;
+    virtual void set_geometry_env(IReader* I) = 0;
+    virtual void set_geometry_som(IReader* I) = 0;
+    virtual void set_geometry_occ(CDB::MODEL* M) = 0;
+
+    virtual void set_user_env(CSound_environment* E) = 0;
+    virtual void set_environment(u32 id, CSound_environment** dst_env) = 0;
+    virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env) = 0;
+    virtual CSound_environment* get_environment(const Fvector& P) = 0;
+
+    virtual float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) = 0;
+    virtual float get_occlusion(Fvector& P, float R, Fvector* occ) = 0;
+
+    virtual void object_relcase(IGameObject* obj) = 0;
+};
+
+inline ISoundScene::~ISoundScene() = default;
+
 /// definition (Sound Manager Interface)
 class XRSOUND_API XR_NOVTABLE ISoundManager
 {
@@ -212,13 +249,11 @@ protected:
 
     virtual void attach_tail(CSound& S, pcstr fName) = 0;
 
-    virtual void play(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f) = 0;
-    virtual void play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f) = 0;
-    virtual void play_no_feedback(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr,
-        float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr) = 0;
-
 public:
     virtual ~ISoundManager() = default;
+
+    virtual ISoundScene* create_scene() = 0;
+    virtual void destroy_scene(ISoundScene*&) = 0;
 
     virtual void _restart() = 0;
     virtual bool i_locked() = 0;
@@ -226,29 +261,18 @@ public:
     virtual void prefetch() = 0;
 
     virtual void stop_emitters() = 0;
-    virtual int pause_emitters(bool val) = 0;
+    virtual int pause_emitters(bool pauseState) = 0;
 
     virtual void set_master_volume(float f = 1.f) = 0;
-    virtual void set_geometry_env(IReader* I) = 0;
-    virtual void set_geometry_som(IReader* I) = 0;
-    virtual void set_geometry_occ(CDB::MODEL* M) = 0;
-    virtual void set_handler(sound_event* E) = 0;
 
     virtual void update(const Fvector& P, const Fvector& D, const Fvector& N) = 0;
     virtual void statistic(CSound_stats* s0, CSound_stats_ext* s1) = 0;
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) = 0;
 
-    virtual float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) = 0;
-    virtual float get_occlusion(Fvector& P, float R, Fvector* occ) = 0;
-
-    virtual void object_relcase(IGameObject* obj) = 0;
     virtual const Fvector& listener_position() = 0;
 
     virtual void refresh_env_library() = 0;
-    virtual void set_user_env(CSound_environment* E) = 0;
     virtual void refresh_sources() = 0;
-    virtual void set_environment(u32 id, CSound_environment** dst_env) = 0;
-    virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env) = 0;
 };
 
 class XRSOUND_API CSoundManager
@@ -331,7 +355,6 @@ struct resptrcode_sound : public resptr_base<CSound>
     [[nodiscard]]
     ICF CSound_UserDataPtr _g_userdata() const { VERIFY(p_); return p_ ? p_->g_userdata : nullptr; }
 
-
     bool create(pcstr name, esound_type sound_type, int game_type, bool replaceWithNoSound = true)
     {
         VerSndUnlocked();
@@ -369,20 +392,26 @@ struct resptrcode_sound : public resptr_base<CSound>
 
     void play(IGameObject* O, u32 flags = 0, float delay = 0.f)
     {
+        if (!p_ || !DefaultSoundScene)
+            return;
         VerSndUnlocked();
-        GEnv.Sound->play(static_cast<ref_sound&>(*this), O, flags, delay);
+        DefaultSoundScene->play(static_cast<ref_sound&>(*this), O, flags, delay);
     }
 
     void play_at_pos(IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f)
     {
+        if (!p_ || !DefaultSoundScene)
+            return;
         VerSndUnlocked();
-        GEnv.Sound->play_at_pos(static_cast<ref_sound&>(*this), O, pos, flags, delay);
+        DefaultSoundScene->play_at_pos(static_cast<ref_sound&>(*this), O, pos, flags, delay);
     }
 
     void play_no_feedback(IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr, float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr)
     {
+        if (!p_ || !DefaultSoundScene)
+            return;
         VerSndUnlocked();
-        GEnv.Sound->play_no_feedback(static_cast<ref_sound&>(*this), O, flags, delay, pos, vol, freq, range);
+        DefaultSoundScene->play_no_feedback(static_cast<ref_sound&>(*this), O, flags, delay, pos, vol, freq, range);
     }
 
     ICF void stop()                           const { VerSndUnlocked(); if (_feedback()) _feedback()->stop(false); }

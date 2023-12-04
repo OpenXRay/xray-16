@@ -149,6 +149,7 @@ target_link_libraries(xrUICore
     xrMiscMath
     xrImGui
     xrCore
+    xrSound
 )
 
 if (WIN32)

@@ -34,6 +34,9 @@
     <Filter Include="Effects\OpenAL">
       <UniqueIdentifier>{d66ed9a4-3e7a-471f-9b63-7596368b6f66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{764beefb-01ae-4d1b-9504-a66144a44420}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sound.h">
@@ -80,6 +83,9 @@
     </ClInclude>
     <ClInclude Include="SoundRender_EffectsA_EFX.h">
       <Filter>Effects\OpenAL</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundRender_Scene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +151,9 @@
     </ClCompile>
     <ClCompile Include="SoundRender_EffectsA_EFX.cpp">
       <Filter>Effects\OpenAL</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundRender_Scene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

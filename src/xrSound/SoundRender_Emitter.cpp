@@ -2,6 +2,7 @@
 
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Core.h"
+#include "SoundRender_Scene.h"
 #include "SoundRender_Source.h"
 #include "SoundRender_TargetA.h"
 
@@ -33,7 +34,8 @@ void CSoundRender_Emitter::set_time(float t)
     fTimeToRewind = t;
 }
 
-CSoundRender_Emitter::CSoundRender_Emitter()
+CSoundRender_Emitter::CSoundRender_Emitter(CSoundRender_Scene* s)
+    : scene(s)
 {
 #ifdef DEBUG
     static u32 incrementalID = 0;
@@ -78,11 +80,13 @@ void CSoundRender_Emitter::Event_ReleaseOwner()
     if (!owner_data)
         return;
 
-    for (u32 it = 0; it < SoundRender->s_events.size(); it++)
+    auto& events = scene->get_events();
+
+    for (u32 it = 0; it < events.size(); it++)
     {
-        if (owner_data == SoundRender->s_events[it].first)
+        if (owner_data == events[it].first)
         {
-            SoundRender->s_events.erase(SoundRender->s_events.begin() + it);
+            events.erase(events.begin() + it);
             it--;
         }
     }
@@ -91,24 +95,24 @@ void CSoundRender_Emitter::Event_ReleaseOwner()
 void CSoundRender_Emitter::Event_Propagade()
 {
     fTimeToPropagade += ::Random.randF(s_f_def_event_pulse - 0.030f, s_f_def_event_pulse + 0.030f);
-    if (!(owner_data))
+    if (!owner_data)
         return;
-    if (0 == owner_data->g_type)
+    if (!owner_data->g_type)
         return;
-    if (0 == owner_data->g_object)
+    if (!owner_data->g_object)
         return;
-    if (0 == SoundRender->Handler)
+    if (!scene->get_events_handler())
         return;
 
     VERIFY(_valid(p_source.volume));
     // Calculate range
-    float clip = p_source.max_ai_distance * p_source.volume;
-    float range = std::min(p_source.max_ai_distance, clip);
+    const float clip = p_source.max_ai_distance * p_source.volume;
+    const float range = std::min(p_source.max_ai_distance, clip);
     if (range < 0.1f)
         return;
 
     // Inform objects
-    SoundRender->s_events.emplace_back(owner_data, range);
+    scene->get_events().emplace_back(owner_data, range);
 }
 
 void CSoundRender_Emitter::switch_to_2D()
@@ -117,7 +121,11 @@ void CSoundRender_Emitter::switch_to_2D()
     set_priority(100.f);
 }
 
-void CSoundRender_Emitter::switch_to_3D() { b2D = false; }
+void CSoundRender_Emitter::switch_to_3D()
+{
+    b2D = false;
+}
+
 u32 CSoundRender_Emitter::play_time()
 {
     if (m_current_state == stPlaying || m_current_state == stPlayingLooped || m_current_state == stSimulating ||

@@ -147,6 +147,7 @@ public:
     CEnvironment& Environment() { return *pEnvironment; };
     void Prefetch();
 #endif
+    ISoundScene* m_pSound{};
     IMainMenu* m_pMainMenu{};
     static bool IsMainMenuActive();
     static bool MainMenuActiveOrLevelNotExist();

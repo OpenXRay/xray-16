@@ -75,6 +75,8 @@ protected:
     xr_vector<ISpatial*> snd_ER;
 
 public:
+    ISoundScene* Sound{};
+
     CObjectList Objects;
     CObjectSpace ObjectSpace;
     CCameraManager& Cameras() { return *m_pCameras; };

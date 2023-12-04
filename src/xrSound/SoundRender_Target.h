@@ -28,8 +28,8 @@ public:
     CSoundRender_Target();
     virtual ~CSoundRender_Target();
 
-    CSoundRender_Emitter* get_emitter() { return m_pEmitter; }
-    bool get_Rendering() { return rendering; }
+    CSoundRender_Emitter* get_emitter() const { return m_pEmitter; }
+    bool get_Rendering() const { return rendering; }
     virtual bool _initialize() = 0;
     virtual void _destroy() = 0;
     virtual void _restart() = 0;

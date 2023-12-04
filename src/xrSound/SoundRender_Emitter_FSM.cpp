@@ -49,11 +49,11 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         fTimeToStop = fTime + (get_length_sec() / p_source.freq); //--#SM+#--
         fTimeToPropagade = fTime;
         fade_volume = 1.f;
-        occluder_volume = SoundRender->get_occlusion(p_source.position, .2f, occluder);
+        occluder_volume = scene->get_occlusion(p_source.position, .2f, occluder);
         smooth_volume = p_source.base_volume * p_source.volume *
             (owner_data->s_type == st_Effect ? psSoundVEffects * psSoundVFactor : psSoundVMusic) *
             (b2D ? 1.f : occluder_volume);
-        e_current = e_target = *SoundRender->get_environment(p_source.position);
+        e_current = e_target = *(CSoundRender_Environment*)scene->get_environment(p_source.position);
         if (update_culling(dt))
         {
             m_current_state = stPlaying;
@@ -77,11 +77,11 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         fTimeToStop = TIME_TO_STOP_INFINITE;
         fTimeToPropagade = fTime;
         fade_volume = 1.f;
-        occluder_volume = SoundRender->get_occlusion(p_source.position, .2f, occluder);
+        occluder_volume = scene->get_occlusion(p_source.position, .2f, occluder);
         smooth_volume = p_source.base_volume * p_source.volume *
             (owner_data->s_type == st_Effect ? psSoundVEffects * psSoundVFactor : psSoundVMusic) *
             (b2D ? 1.f : occluder_volume);
-        e_current = e_target = *SoundRender->get_environment(p_source.position);
+        e_current = e_target = *(CSoundRender_Environment*)scene->get_environment(p_source.position);
         if (update_culling(dt))
         {
             m_current_state = stPlayingLooped;
@@ -140,7 +140,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         }
         else
         {
-            u32 ptr = calc_cursor(fTimeStarted, fTime, get_length_sec(), p_source.freq, source()->m_wformat); //--#SM+#--
+            const u32 ptr = calc_cursor(fTimeStarted, fTime, get_length_sec(), p_source.freq, source()->m_wformat); //--#SM+#--
             set_cursor(ptr);
 
             if (update_culling(dt))
@@ -193,7 +193,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         {
             // switch to: PLAY
             m_current_state = stPlayingLooped; // switch state
-            u32 ptr = calc_cursor(fTimeStarted, fTime, get_length_sec(), p_source.freq, source()->m_wformat); //--#SM+#--
+            const u32 ptr = calc_cursor(fTimeStarted, fTime, get_length_sec(), p_source.freq, source()->m_wformat); //--#SM+#--
             set_cursor(ptr);
 
             SoundRender->i_start(this);
@@ -213,13 +213,13 @@ void CSoundRender_Emitter::update(float fTime, float dt)
     case stSimulatingLooped:
         if (fTimeToRewind > 0.0f)
         {
-            float fLength = get_length_sec();
-            bool bLooped = (fTimeToStop == 0xffffffff);
+            const float fLength = get_length_sec();
+            const bool bLooped = (fTimeToStop == 0xffffffff);
 
             R_ASSERT2(fLength >= fTimeToRewind, "set_time: target time is bigger than length of sound");
 
-            float fRemainingTime = (fLength - fTimeToRewind) / p_source.freq;
-            float fPastTime = fTimeToRewind / p_source.freq;
+            const float fRemainingTime = (fLength - fTimeToRewind) / p_source.freq;
+            const float fPastTime = fTimeToRewind / p_source.freq;
 
             fTimeStarted = fTime - fPastTime;
             fTimeToPropagade = fTimeStarted; //--> For AI events
@@ -242,7 +242,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
                 fTimeToStop = fTime + fRemainingTime;
             }
 
-            u32 ptr = calc_cursor(fTimeStarted, fTime, fLength, p_source.freq, source()->m_wformat);
+            const u32 ptr = calc_cursor(fTimeStarted, fTime, fLength, p_source.freq, source()->m_wformat);
             set_cursor(ptr);
 
             fTimeToRewind = 0.0f;
@@ -275,8 +275,8 @@ void CSoundRender_Emitter::update(float fTime, float dt)
 
 IC void volume_lerp(float& c, float t, float s, float dt)
 {
-    float diff = t - c;
-    float diff_a = _abs(diff);
+    const float diff = t - c;
+    const float diff_a = _abs(diff);
     if (diff_a < EPS_S)
         return;
     float mot = s * dt;
@@ -309,7 +309,7 @@ bool CSoundRender_Emitter::update_culling(float dt)
         // Calc attenuated volume
         float att = p_source.min_distance / (psSoundRolloff * dist);
         clamp(att, 0.f, 1.f);
-        float fade_scale =
+        const float fade_scale =
             bStopping || (att * p_source.base_volume * p_source.volume *
                                  (owner_data->s_type == st_Effect ? psSoundVEffects * psSoundVFactor : psSoundVMusic) <
                              psSoundCull) ?
@@ -318,9 +318,9 @@ bool CSoundRender_Emitter::update_culling(float dt)
         fade_volume += dt * 10.f * fade_scale;
 
         // Update occlusion
-        float occ = (owner_data->g_type == SOUND_TYPE_WORLD_AMBIENT) ?
+        const float occ = (owner_data->g_type == SOUND_TYPE_WORLD_AMBIENT) ?
             1.0f :
-            SoundRender->get_occlusion(p_source.position, .2f, occluder);
+            scene->get_occlusion(p_source.position, .2f, occluder);
         volume_lerp(occluder_volume, occ, 1.f, dt);
         clamp(occluder_volume, 0.f, 1.f);
 
@@ -352,11 +352,10 @@ bool CSoundRender_Emitter::update_culling(float dt)
     // --- else check availability of resources
     if (target)
         return TRUE;
-    else
-        return SoundRender->i_allow_play(this);
+    return SoundRender->i_allow_play(this);
 }
 
-float CSoundRender_Emitter::priority()
+float CSoundRender_Emitter::priority() const
 {
     float dist = SoundRender->listener_position().distance_to(p_source.position);
     float att = p_source.min_distance / (psSoundRolloff * dist);
@@ -368,7 +367,7 @@ void CSoundRender_Emitter::update_environment(float dt)
 {
     if (bMoved)
     {
-        e_target = *SoundRender->get_environment(p_source.position);
+        e_target = *(CSoundRender_Environment*)scene->get_environment(p_source.position);
         // Cribbledirge: updates the velocity of the sound.
         p_source.update_velocity(dt);
     }
