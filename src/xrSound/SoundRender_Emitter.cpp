@@ -12,7 +12,11 @@ extern float psSoundVEffects;
 
 void CSoundRender_Emitter::set_position(const Fvector& pos)
 {
-    if (source()->channels_num() == 1)
+    if (source()->channels_num() == 1
+#ifdef USE_PHONON
+        || m_ipl_source
+#endif
+        )
         p_source.position = pos;
     else
         p_source.position.set(0, 0, 0);
@@ -43,10 +47,24 @@ CSoundRender_Emitter::CSoundRender_Emitter(CSoundRender_Scene* s)
       fade_volume(1.f),
       m_current_state(stStopped),
       bMoved(true),
-      marker(0xabababab) {}
+      marker(0xabababab)
+{
+#ifdef USE_PHONON
+    if (const auto simulator = scene->ipl_simulator())
+    {
+        IPLSourceSettings sourceSettings{ IPL_SIMULATIONFLAGS_DIRECT };
+        iplSourceCreate(simulator, &sourceSettings, &m_ipl_source);
+    }
+#endif
+}
 
 CSoundRender_Emitter::~CSoundRender_Emitter()
 {
+#ifdef USE_PHONON
+    if (m_ipl_source)
+        iplSourceRelease(&m_ipl_source);
+#endif
+
     // try to release dependencies, events, for example
     Event_ReleaseOwner();
     wait_prefill();
@@ -143,7 +161,7 @@ void CSoundRender_Emitter::move_cursor(int offset)
     set_cursor(get_cursor(true) + offset);
 }
 
-void CSoundRender_Emitter::fill_data(void* dest, u32 offset, u32 size) const
+void CSoundRender_Emitter::fill_data(void* dest, u32 offset, u32 size)
 {
     source()->decompress(dest, offset, size, ovf);
 }
@@ -237,6 +255,25 @@ std::pair<u8*, size_t> CSoundRender_Emitter::obtain_block()
     if (current_block >= sdef_target_count_prefill)
         current_block = 0;
     --filled_blocks;
+#ifdef USE_PHONON
+    if (psSoundFlags.test(ss_EFX) && scene->ipl_scene_mesh() && !is_2D())
+    {
+        const auto context = SoundRender->ipl_context();
+
+        IPLSimulationOutputs outputs{};
+        outputs.direct.flags = static_cast<IPLDirectEffectFlags>(
+            IPL_DIRECTEFFECTFLAGS_APPLYAIRABSORPTION |
+            IPL_DIRECTEFFECTFLAGS_APPLYDIRECTIVITY |
+            IPL_DIRECTEFFECTFLAGS_APPLYOCCLUSION |
+            IPL_DIRECTEFFECTFLAGS_APPLYTRANSMISSION
+            );
+        iplSourceGetOutputs(m_ipl_source, IPL_SIMULATIONFLAGS_DIRECT, &outputs);
+
+        iplAudioBufferDeinterleave(context, (float*)result.first, &ipl_buffers.direct_input);
+        iplDirectEffectApply(ipl_effects.direct, &outputs.direct, &ipl_buffers.direct_input, &ipl_buffers.direct_output);
+        iplAudioBufferInterleave(context, &ipl_buffers.direct_output, (float*)result.first);
+    }
+#endif
     return std::move(result);
 }
 

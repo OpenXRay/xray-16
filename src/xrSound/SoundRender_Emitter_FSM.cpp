@@ -283,6 +283,51 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         owner_data->feedback = 0;
         owner_data = 0;
     }
+
+#ifdef USE_PHONON
+    if (m_ipl_source && !bStopping)
+    {
+        const auto& listener = SoundRender->listener_params();
+
+        const IPLCoordinateSpace3 sourceCoordinates
+        {
+            reinterpret_cast<const IPLVector3&>(listener.orientation[2]),
+            reinterpret_cast<const IPLVector3&>(listener.orientation[1]),
+            reinterpret_cast<const IPLVector3&>(listener.orientation[0]),
+            reinterpret_cast<const IPLVector3&>(p_source.position)
+        };
+        IPLSimulationInputs inputs
+        {
+            /*.flags                        =*/ IPL_SIMULATIONFLAGS_DIRECT,
+            /*.directFlags                  =*/ static_cast<IPLDirectSimulationFlags>(
+                                                    IPL_DIRECTSIMULATIONFLAGS_AIRABSORPTION |
+                                                    IPL_DIRECTSIMULATIONFLAGS_DIRECTIVITY |
+                                                    IPL_DIRECTSIMULATIONFLAGS_OCCLUSION |
+                                                    IPL_DIRECTSIMULATIONFLAGS_TRANSMISSION),
+            /*.source                       =*/ sourceCoordinates,
+            /*.distanceAttenuationModel     =*/ {},
+            /*.airAbsorptionModel           =*/ {},
+            /*.directivity                  =*/ {},
+            /*.occlusionType                =*/ IPL_OCCLUSIONTYPE_VOLUMETRIC,
+            /*.occlusionRadius              =*/ p_source.max_distance,
+            /*.numOcclusionSamples          =*/ 16,
+            /*.reverbScale                  =*/ { 1.0f, 1.0f, 1.0f },
+            /*.hybridReverbTransitionTime   =*/ 1.0f,
+            /*.hybridReverbOverlapPercent   =*/ 0.25f,
+            /*.baked                        =*/ IPL_FALSE,
+            /*.bakedDataIdentifier          =*/ {},
+            /*.pathingProbes                =*/ nullptr/*scene->ipl_scene_probes*/,
+            /*.visRadius                    =*/ 1.0f,
+            /*.visThreshold                 =*/ 0.1f,
+            /*.visRange                     =*/ p_source.max_distance,
+            /*.pathingOrder                 =*/ 1,
+            /*.enableValidation             =*/ IPL_FALSE,
+            /*.findAlternatePaths           =*/ IPL_FALSE,
+            /*.numTransmissionRays          =*/ 2,
+        };
+        iplSourceSetInputs(m_ipl_source, IPL_SIMULATIONFLAGS_DIRECT, &inputs);
+    }
+#endif
 }
 
 IC void volume_lerp(float& c, float t, float s, float dt)

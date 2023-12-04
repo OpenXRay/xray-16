@@ -37,15 +37,52 @@ void CSoundRender_Emitter::start(const ref_sound& _owner, u32 flags, float delay
     bStopping = FALSE;
     bRewind = FALSE;
 
+    const auto data_info = source()->data_info();
+
     // Calc storage
     for (auto& buf : temp_buf)
-        buf.resize(source()->data_info().bytesPerBuffer);
+        buf.resize(data_info.bytesPerBuffer);
 
     ovf = source()->open();
+
+#ifdef USE_PHONON
+    if (const auto simulator = scene->ipl_simulator())
+    {
+        iplSourceAdd(m_ipl_source, simulator);
+
+        const auto context = SoundRender->ipl_context();
+        auto& settings = source()->ipl_audio_settings();
+
+        IPLDirectEffectSettings direct{ data_info.channels };
+        iplDirectEffectCreate(context, &settings, &direct, &ipl_effects.direct);
+
+        IPLReflectionEffectSettings refl{ IPL_REFLECTIONEFFECTTYPE_CONVOLUTION, settings.frameSize * 2, 4 };
+        iplReflectionEffectCreate(context, &settings, &refl, &ipl_effects.reflection);
+
+        IPLPathEffectSettings path{ 1, IPL_TRUE, {}, SoundRender->ipl_hrtf() };
+        iplPathEffectCreate(context, &settings, &path, &ipl_effects.path);
+
+        iplAudioBufferAllocate(context, data_info.channels, settings.frameSize, &ipl_buffers.direct_input);
+        iplAudioBufferAllocate(context, data_info.channels, settings.frameSize, &ipl_buffers.direct_output);
+    }
+#endif
 }
 
 void CSoundRender_Emitter::i_stop()
 {
+#ifdef USE_PHONON
+    if (const auto context = SoundRender->ipl_context())
+    {
+        iplSourceRemove(m_ipl_source, scene->ipl_simulator());
+
+        iplDirectEffectRelease(&ipl_effects.direct);
+        iplReflectionEffectRelease(&ipl_effects.reflection);
+        iplPathEffectRelease(&ipl_effects.path);
+
+        iplAudioBufferFree(context, &ipl_buffers.direct_output);
+        iplAudioBufferFree(context, &ipl_buffers.direct_input);
+    }
+#endif
     bRewind = FALSE;
     if (target)
         stop_target();

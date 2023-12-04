@@ -8,6 +8,47 @@
 #include "SoundRender_Scene.h"
 #include "SoundRender_Emitter.h"
 
+CSoundRender_Scene::CSoundRender_Scene()
+{
+#ifdef USE_PHONON
+    if (const auto context = SoundRender->ipl_context())
+    {
+        IPLSceneSettings sceneSettings
+        {
+            IPL_SCENETYPE_DEFAULT,
+            nullptr, nullptr, nullptr, nullptr,
+            this,
+            nullptr, nullptr
+        };
+        iplSceneCreate(context, &sceneSettings, &m_ipl_scene);
+
+        const auto [samplingRate, frameSize] = SoundRender->ipl_settings();
+
+        IPLSimulationSettings simulationSettings
+        {
+            IPL_SIMULATIONFLAGS_DIRECT,
+            IPL_SCENETYPE_DEFAULT,
+            IPL_REFLECTIONEFFECTTYPE_CONVOLUTION,
+            128,
+            4096,
+            32,
+            2.0f,
+            1,
+            8,
+            2,
+            5,
+            32,
+            samplingRate, frameSize,
+            nullptr, nullptr, nullptr,
+        };
+        iplSimulatorCreate(context, &simulationSettings, &m_ipl_simulator);
+
+        iplSimulatorSetScene(m_ipl_simulator, m_ipl_scene);
+        iplSimulatorCommit(m_ipl_simulator);
+    }
+#endif
+}
+
 CSoundRender_Scene::~CSoundRender_Scene()
 {
     ZoneScoped;
@@ -21,6 +62,13 @@ CSoundRender_Scene::~CSoundRender_Scene()
     for (auto& emit : s_emitters)
         xr_delete(emit);
     s_emitters.clear();
+
+#ifdef USE_PHONON
+    if (m_ipl_simulator)
+        iplSimulatorRelease(&m_ipl_simulator);
+    if (m_ipl_scene)
+        iplSceneRelease(&m_ipl_scene);
+#endif
 }
 
 void CSoundRender_Scene::stop_emitters() const
@@ -45,6 +93,55 @@ void CSoundRender_Scene::set_handler(sound_event* E) { sound_event_handler = E; 
 void CSoundRender_Scene::set_geometry_occ(CDB::MODEL* M, const Fbox& /*aabb*/)
 {
     geom_MODEL = M;
+
+#ifdef USE_PHONON
+    if (m_ipl_scene_mesh)
+    {
+        iplStaticMeshRemove(m_ipl_scene_mesh, m_ipl_scene);
+        iplStaticMeshRelease(&m_ipl_scene_mesh);
+    }
+    if (M && m_ipl_scene)
+    {
+        const auto tris = M->get_tris();
+        const auto tris_count = M->get_tris_count();
+
+        const auto verts = M->get_verts();
+        const auto verts_count = M->get_verts_count();
+
+        auto* temp_tris = xr_alloc<IPLTriangle>(tris_count);
+        auto* temp_mat_idx = xr_alloc<IPLint32>(tris_count);
+
+        // XXX: replace xr_vector with small_buffer and buffer_vector. But upgrade buffer_vector to match C++17 std::vector first.
+        xr_vector<IPLMaterial> materials;
+        materials.reserve(GMLib.CountMaterial());
+
+        for (const SGameMtl* material : GMLib.Materials())
+        {
+            materials.emplace_back(reinterpret_cast<const IPLMaterial&>(material->Acoustics));
+        }
+
+        for (int i = 0; i < tris_count; ++i)
+        {
+            temp_tris[i] = reinterpret_cast<IPLTriangle&>(tris[i].verts);
+            temp_mat_idx[i] = tris[i].material;
+        }
+
+        IPLStaticMeshSettings staticMeshSettings
+        {
+            verts_count, tris_count, static_cast<IPLint32>(materials.size()),
+            reinterpret_cast<IPLVector3*>(verts), temp_tris,
+            temp_mat_idx, materials.data()
+        };
+
+        iplStaticMeshCreate(m_ipl_scene, &staticMeshSettings, &m_ipl_scene_mesh);
+        xr_free(temp_mat_idx);
+        xr_free(temp_tris);
+
+        iplStaticMeshAdd(m_ipl_scene_mesh, m_ipl_scene);
+    }
+    if (m_ipl_scene)
+        iplSceneCommit(m_ipl_scene);
+#endif
 }
 
 void CSoundRender_Scene::set_geometry_som(IReader* I)
@@ -170,6 +267,13 @@ CSoundRender_Emitter* CSoundRender_Scene::i_play(ref_sound& S, u32 flags, float 
 void CSoundRender_Scene::update()
 {
     ZoneScoped;
+#ifdef USE_PHONON
+    if (m_ipl_simulator)
+    {
+        iplSimulatorCommit(m_ipl_simulator);
+        iplSimulatorRunDirect(m_ipl_simulator);
+    }
+#endif
 
     s_events_prev_count = s_events.size();
 
@@ -268,9 +372,16 @@ float CSoundRender_Scene::get_occlusion(const Fvector& P, float R, Fvector* occ)
                 occ[1].set(V[T.verts[1]]);
                 occ[2].set(V[T.verts[2]]);
 
-                const SGameMtl* mtl = GMLib.GetMaterialByIdx(T.material);
-                const float occlusion = fis_zero(mtl->fSndOcclusionFactor) ? 0.1f : mtl->fSndOcclusionFactor;
-                occ_value = psSoundOcclusionScale * occlusion;
+#ifdef USE_PHONON
+                if (m_ipl_scene_mesh)
+                    occ_value = psSoundOcclusionScale;
+                else
+#endif
+                {
+                    const SGameMtl* mtl = GMLib.GetMaterialByIdx(T.material);
+                    const float occlusion = fis_zero(mtl->fSndOcclusionFactor) ? 0.1f : mtl->fSndOcclusionFactor;
+                    occ_value = psSoundOcclusionScale * occlusion;
+                }
             }
         }
     }

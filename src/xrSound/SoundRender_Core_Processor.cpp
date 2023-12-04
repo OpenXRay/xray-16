@@ -30,6 +30,9 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
     }
     s_emitters_u++;
 
+    // update listener
+    update_listener(P, D, N, R, fTimer_Delta);
+
     const auto update_emitter = [this](CSoundRender_Emitter* emitter)
     {
         const bool ignore = emitter->bIgnoringTimeFactor;
@@ -68,9 +71,6 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
             }
         }
     }
-
-    // update listener
-    update_listener(P, D, N, R, fTimer_Delta);
 
     // Events
     for (CSoundRender_Scene* scene : m_scenes)

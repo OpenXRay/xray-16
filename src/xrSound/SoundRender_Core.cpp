@@ -45,12 +45,84 @@ void CSoundRender_Core::_initialize()
 
     bPresent = true;
 
+#ifdef USE_PHONON
+    if (supports_float_pcm && psSoundFlags.test(ss_UseFloat32) && psSoundFlags.test(ss_EFX))
+    {
+        IPLSIMDLevel simdLevel = IPL_SIMDLEVEL_SSE2;
+        if (CPU::HasAVX512F)
+            simdLevel = IPL_SIMDLEVEL_AVX512;
+        else if (CPU::HasAVX2)
+            simdLevel = IPL_SIMDLEVEL_AVX2;
+        else if (CPU::HasAVX)
+            simdLevel = IPL_SIMDLEVEL_AVX;
+        else if (CPU::HasSSE42)
+            simdLevel = IPL_SIMDLEVEL_SSE4;
+
+        const IPLContextFlags flags
+        {
+            strstr(Core.Params, "-steamaudio_validate")
+                ? IPL_CONTEXTFLAGS_VALIDATION
+                : IPLContextFlags{}
+        };
+
+        IPLContextSettings contextSettings
+        {
+            STEAMAUDIO_VERSION,
+            [](IPLLogLevel level, const char* message)
+            {
+                // These warnings are incorrect, values are correct.
+                if (0 == xr_strcmp(message, "Warning: setInputs: invalid IPLfloat32: (&inputs->directivity)->dipoleWeight = 0.000000\n"))
+                    return;
+                if (0 == xr_strcmp(message, "Warning: apply: invalid IPLTransmissionType: params->flags = 31\n"))
+                    return;
+
+                char mark = '\0';
+                switch (level)
+                {
+                case IPL_LOGLEVEL_INFO:    mark = '*'; break;
+                case IPL_LOGLEVEL_WARNING: mark = '~'; break;
+                case IPL_LOGLEVEL_ERROR:   mark = '!'; break;
+                case IPL_LOGLEVEL_DEBUG:   mark = '#'; break;
+                }
+                Msg("%c SOUND: SteamAudio: %s", mark, message);
+            },
+            [](IPLsize size, IPLsize alignment)
+            {
+                return Memory.mem_alloc(size, alignment);
+            },
+            [](void* memoryBlock)
+            {
+                Memory.mem_free(memoryBlock);
+            },
+            simdLevel,
+            flags,
+        };
+
+        iplContextCreate(&contextSettings, &m_ipl_context);
+        IPLHRTFSettings hrtfSettings
+        {
+            IPL_HRTFTYPE_DEFAULT,
+            nullptr, nullptr, 0,
+            1.0f, IPL_HRTFNORMTYPE_NONE
+        };
+
+        m_ipl_settings = { 48000, 19200 };
+        iplHRTFCreate(m_ipl_context, &m_ipl_settings, &hrtfSettings, &m_ipl_hrtf);
+    }
+#endif
     bReady = true;
 }
 
 void CSoundRender_Core::_clear()
 {
     bReady = false;
+
+#ifdef USE_PHONON
+    if (m_ipl_hrtf)
+        iplHRTFRelease(&m_ipl_hrtf);
+    if (m_ipl_context)
+        iplContextRelease(&m_ipl_context);
+#endif
 
     // remove sources
     for (auto& kv : s_sources)
@@ -186,6 +258,31 @@ void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, cons
 
     if (!psSoundFlags.test(ss_EFX) || !bListenerMoved)
         return;
+
+#ifdef USE_PHONON
+    if (m_ipl_context)
+    {
+        const IPLCoordinateSpace3 listenerCoordinates
+        {
+            reinterpret_cast<const IPLVector3&>(R),
+            reinterpret_cast<const IPLVector3&>(N),
+            reinterpret_cast<const IPLVector3&>(D),
+            reinterpret_cast<const IPLVector3&>(P)
+        }; // the world-space position and orientation of the listener
+
+        IPLSimulationSharedInputs sharedInputs
+        {
+            listenerCoordinates,
+            64, 8,
+            2.0f, 1,
+            1.0f,
+            nullptr, nullptr
+        };
+
+        for (const auto scene : m_scenes)
+            iplSimulatorSetSharedInputs(scene->ipl_simulator(), IPL_SIMULATIONFLAGS_DIRECT, &sharedInputs);
+    }
+#endif
 
     bListenerMoved = false;
 }
