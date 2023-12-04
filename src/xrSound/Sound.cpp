@@ -14,7 +14,7 @@ void CSoundManager::CreateDevicesList()
         SoundRender->_initialize_devices_list();
 
     if (!SoundRender->bPresent)
-        soundDevices.emplace_back("null", -1);
+        soundDevices.emplace_back(nullptr, -1);
 
     GEnv.Sound = SoundRender;
 }
