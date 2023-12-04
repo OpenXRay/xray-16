@@ -409,10 +409,10 @@ void CActor::Load(LPCSTR section)
             }
         }
 
-        GEnv.Sound->create(sndDie[0], strconcat(buf, *cName(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        GEnv.Sound->create(sndDie[1], strconcat(buf, *cName(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        GEnv.Sound->create(sndDie[2], strconcat(buf, *cName(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        GEnv.Sound->create(sndDie[3], strconcat(buf, *cName(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[0].create(strconcat(buf, *cName(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[1].create(strconcat(buf, *cName(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[2].create(strconcat(buf, *cName(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[3].create(strconcat(buf, *cName(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
 
         m_HeavyBreathSnd.create(
             pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);

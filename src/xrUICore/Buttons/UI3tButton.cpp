@@ -34,8 +34,8 @@ void CUI3tButton::OnFocusReceive()
     PlaySoundH();
 }
 
-void CUI3tButton::InitSoundH(LPCSTR sound_file) { GEnv.Sound->create(m_sound_h, sound_file, st_Effect, sg_SourceType); }
-void CUI3tButton::InitSoundT(LPCSTR sound_file) { GEnv.Sound->create(m_sound_t, sound_file, st_Effect, sg_SourceType); }
+void CUI3tButton::InitSoundH(LPCSTR sound_file) { m_sound_h.create(sound_file, st_Effect, sg_SourceType); }
+void CUI3tButton::InitSoundT(LPCSTR sound_file) { m_sound_t.create(sound_file, st_Effect, sg_SourceType); }
 void CUI3tButton::PlaySoundT()
 {
     if (m_sound_t._handle())
