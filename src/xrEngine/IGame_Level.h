@@ -87,7 +87,7 @@ public: // deferred sound events
     struct _esound_delegate
     {
         Feel::Sound* dest;
-        ref_sound_data_ptr source;
+        ref_sound source;
         float power;
     };
     xr_vector<_esound_delegate> snd_Events;
@@ -129,7 +129,7 @@ public:
     void SetEntity(IGameObject* O); // { pCurrentEntity=pCurrentViewEntity=O; }
     void SetViewEntity(IGameObject* O); // { pCurrentViewEntity=O; }
 
-    void SoundEvent_Register(ref_sound_data_ptr S, float range);
+    void SoundEvent_Register(const ref_sound& S, float range);
     void SoundEvent_Dispatch();
     void SoundEvent_OnDestDestroy(Feel::Sound*);
 

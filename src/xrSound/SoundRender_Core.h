@@ -22,9 +22,6 @@ private:
     volatile bool isLocked;
 
 protected:
-    bool _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) override;
-    void _destroy_data(ref_sound_data& S) override;
-
     bool bListenerMoved;
 
     CSoundRender_Environment e_current;
@@ -34,7 +31,7 @@ protected:
 public:
     CSoundManager& Parent;
 
-    using event = std::pair<ref_sound_data_ptr, float>;
+    using event = std::pair<ref_sound, float>;
     xr_vector<event> s_events;
 
     bool bPresent;
@@ -89,11 +86,10 @@ public:
 
     // Sound interface
     void verify_refsound(ref_sound& S);
-    bool create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) override;
-    void attach_tail(ref_sound& S, pcstr fName) override;
+    CSound* create(pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) override;
+    void attach_tail(CSound& S, pcstr fName) override;
 
-    void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) override;
-    void destroy(ref_sound& S) override;
+    void destroy(CSound& S) override;
 
     void prefetch() override
     {
@@ -109,6 +105,7 @@ public:
     void play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f) override;
     void play_no_feedback(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr,
                           float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr) override;
+
     void set_master_volume(float f) override = 0;
     void set_geometry_env(IReader* I) override;
     void set_geometry_som(IReader* I) override;
@@ -137,7 +134,7 @@ public:
     void i_create_all_sources();
 
     void i_destroy_source(CSoundRender_Source* S);
-    CSoundRender_Emitter* i_play(ref_sound* S, u32 flags, float delay);
+    CSoundRender_Emitter* i_play(const ref_sound& S, u32 flags, float delay);
     void i_start(CSoundRender_Emitter* E);
     void i_stop(CSoundRender_Emitter* E);
     void i_rewind(CSoundRender_Emitter* E);

@@ -71,11 +71,6 @@ void IGame_Level::net_Stop()
 
 //-------------------------------------------------------------------------------------------
 // extern CStatTimer tscreate;
-void _sound_event(const ref_sound_data_ptr& S, float range)
-{
-    if (g_pGameLevel && S && S->feedback)
-        g_pGameLevel->SoundEvent_Register(S, range);
-}
 
 static void build_callback(Fvector* V, int Vcnt, CDB::TRI* T, int Tcnt, void* params)
 {
@@ -121,7 +116,11 @@ bool IGame_Level::Load(u32 dwNum)
     g_pGamePersistent->SpatialSpacePhysic.initialize(ObjectSpace.GetBoundingVolume());
 
     GEnv.Sound->set_geometry_occ(ObjectSpace.GetStaticModel());
-    GEnv.Sound->set_handler(_sound_event);
+    GEnv.Sound->set_handler([](const ref_sound& S, float range)
+    {
+        if (g_pGameLevel && S && S->feedback)
+            g_pGameLevel->SoundEvent_Register(S, range);
+    });
 
     pApp->LoadSwitch();
 
@@ -258,7 +257,7 @@ void IGame_Level::SetViewEntity(IGameObject* O)
     pCurrentViewEntity = O;
 }
 
-void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
+void IGame_Level::SoundEvent_Register(const ref_sound& S, float range)
 {
     if (!g_bLoaded)
         return;

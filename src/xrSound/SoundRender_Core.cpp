@@ -225,20 +225,40 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
     xr_free(_data);
 }
 
-bool CSoundRender_Core::create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound /*= true*/)
+CSound* CSoundRender_Core::create(pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound /*= true*/)
 {
     if (!bPresent)
-        return S._handle() != nullptr;
+        return nullptr;
 
-    S._p = xr_new<ref_sound_data>(fName, sound_type, game_type, replaceWithNoSound);
+    CSound_source* handle{};
 
-    if (S._handle() == nullptr && !replaceWithNoSound)
-        S._p = nullptr; // no reason to keep it
+    string_path fn;
+    xr_strcpy(fn, fName);
+    if (strext(fn))
+        *strext(fn) = 0;
+    const bool found = i_create_source(handle, fn, replaceWithNoSound);
+    const bool handleAvailable = found || replaceWithNoSound;
 
-    return S._handle() != nullptr;
+    if (!handleAvailable)
+        return nullptr;
+
+    auto* snd = xr_new<CSound>();
+
+    snd->handle = handle;
+
+    snd->g_type = game_type;
+    if (game_type == sg_SourceType && handleAvailable)
+        snd->g_type = snd->handle->game_type();
+
+    snd->s_type = sound_type;
+
+    snd->dwBytesTotal = handleAvailable ? snd->handle->bytes_total() : 0;
+    snd->fTimeTotal = handleAvailable ? snd->handle->length_sec() : 0.f;
+
+    return snd;
 }
 
-void CSoundRender_Core::attach_tail(ref_sound& S, pcstr fName)
+void CSoundRender_Core::attach_tail(CSound& snd, pcstr fName)
 {
     if (!bPresent)
         return;
@@ -246,50 +266,36 @@ void CSoundRender_Core::attach_tail(ref_sound& S, pcstr fName)
     xr_strcpy(fn, fName);
     if (strext(fn))
         *strext(fn) = 0;
-    if (S._p->fn_attached[0].size() && S._p->fn_attached[1].size())
+    if (!snd.fn_attached[0].empty() && !snd.fn_attached[1].empty())
     {
-#ifdef DEBUG
-        Msg("! 2 file already in queue [%s][%s]", S._p->fn_attached[0].c_str(), S._p->fn_attached[1].c_str());
-#endif // #ifdef DEBUG
+#ifndef MASTER_GOLD
+        Msg("! 2 file already in queue [%s][%s]", snd.fn_attached[0].c_str(), snd.fn_attached[1].c_str());
+#endif
         return;
     }
 
-    u32 idx = S._p->fn_attached[0].size() ? 1 : 0;
+    const u32 idx = snd.fn_attached[0].empty() ? 0 : 1;
 
-    S._p->fn_attached[idx] = fn;
+    snd.fn_attached[idx] = fn;
 
     CSoundRender_Source* s = i_create_source(fn);
-    S._p->dwBytesTotal += s->bytes_total();
-    S._p->fTimeTotal += s->length_sec();
-    if (S._feedback())
-        ((CSoundRender_Emitter*)S._feedback())->fTimeToStop += s->length_sec();
+    snd.dwBytesTotal += s->bytes_total();
+    snd.fTimeTotal += s->length_sec();
+    if (snd.feedback)
+        ((CSoundRender_Emitter*)snd.feedback)->fTimeToStop += s->length_sec();
 
     i_destroy_source(s);
 }
 
-void CSoundRender_Core::clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type)
-{
-    if (!bPresent)
-        return;
-    S._p = xr_new<ref_sound_data>();
-    S._p->handle = from._p->handle;
-    S._p->dwBytesTotal = from._p->dwBytesTotal;
-    S._p->fTimeTotal = from._p->fTimeTotal;
-    S._p->fn_attached[0] = from._p->fn_attached[0];
-    S._p->fn_attached[1] = from._p->fn_attached[1];
-    S._p->g_type = (game_type == sg_SourceType) ? S._p->handle->game_type() : game_type;
-    S._p->s_type = sound_type;
-}
-
 void CSoundRender_Core::play(ref_sound& S, IGameObject* O, u32 flags, float delay)
 {
-    if (!bPresent || nullptr == S._handle())
+    if (!bPresent || !S._handle())
         return;
-    S._p->g_object = O;
+    S->g_object = O;
     if (S._feedback())
         ((CSoundRender_Emitter*)S._feedback())->rewind();
     else
-        i_play(&S, flags, delay);
+        i_play(S, flags, delay);
 
     if (flags & sm_2D || S._handle()->channels_num() == 2)
         S._feedback()->switch_to_2D();
@@ -300,19 +306,19 @@ void CSoundRender_Core::play(ref_sound& S, IGameObject* O, u32 flags, float dela
 void CSoundRender_Core::play_no_feedback(
     ref_sound& S, IGameObject* O, u32 flags, float delay, Fvector* pos, float* vol, float* freq, Fvector2* range)
 {
-    if (!bPresent || nullptr == S._handle())
+    if (!bPresent || !S._handle())
         return;
-    ref_sound_data_ptr orig = S._p;
-    S._p = xr_new<ref_sound_data>();
-    S._p->handle = orig->handle;
-    S._p->g_type = orig->g_type;
-    S._p->g_object = O;
-    S._p->dwBytesTotal = orig->dwBytesTotal;
-    S._p->fTimeTotal = orig->fTimeTotal;
-    S._p->fn_attached[0] = orig->fn_attached[0];
-    S._p->fn_attached[1] = orig->fn_attached[1];
+    const ref_sound orig = S;
+    S._set(xr_new<CSound>());
+    S->handle = orig->handle;
+    S->g_type = orig->g_type;
+    S->g_object = O;
+    S->dwBytesTotal = orig->dwBytesTotal;
+    S->fTimeTotal = orig->fTimeTotal;
+    S->fn_attached[0] = orig->fn_attached[0];
+    S->fn_attached[1] = orig->fn_attached[1];
 
-    i_play(&S, flags, delay);
+    i_play(S, flags, delay);
 
     if (flags & sm_2D || S._handle()->channels_num() == 2)
         S._feedback()->switch_to_2D();
@@ -325,18 +331,18 @@ void CSoundRender_Core::play_no_feedback(
         S._feedback()->set_range((*range)[0], (*range)[1]);
     if (vol)
         S._feedback()->set_volume(*vol);
-    S._p = orig;
+    S = orig;
 }
 
 void CSoundRender_Core::play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags, float delay)
 {
-    if (!bPresent || nullptr == S._handle())
+    if (!bPresent || !S._handle())
         return;
-    S._p->g_object = O;
+    S->g_object = O;
     if (S._feedback())
         ((CSoundRender_Emitter*)S._feedback())->rewind();
     else
-        i_play(&S, flags, delay);
+        i_play(S, flags, delay);
 
     S._feedback()->set_position(pos);
 
@@ -346,46 +352,14 @@ void CSoundRender_Core::play_at_pos(ref_sound& S, IGameObject* O, const Fvector&
     S._feedback()->set_ignore_time_factor(flags & sm_IgnoreTimeFactor);
 }
 
-void CSoundRender_Core::destroy(ref_sound& S)
+void CSoundRender_Core::destroy(CSound& S)
 {
-    if (S._feedback())
+    if (auto* emitter = (CSoundRender_Emitter*)S.feedback)
     {
-        CSoundRender_Emitter* E = (CSoundRender_Emitter*)S._feedback();
-        E->stop(false);
+        emitter->stop(false);
+        VERIFY(S.feedback == nullptr);
     }
-    S._p = nullptr;
-}
-
-bool CSoundRender_Core::_create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound /*= true*/)
-{
-    string_path fn;
-    xr_strcpy(fn, fName);
-    if (strext(fn))
-        *strext(fn) = 0;
-    const bool found = i_create_source(S.handle, fn, replaceWithNoSound);
-    const bool handleAvailable = found || replaceWithNoSound;
-    S.g_type = game_type;
-    if (game_type == sg_SourceType && handleAvailable)
-        S.g_type = S.handle->game_type();
-    S.s_type = sound_type;
-    S.feedback = nullptr;
-    S.g_object = nullptr;
-    S.g_userdata = nullptr;
-    S.dwBytesTotal = handleAvailable ? S.handle->bytes_total() : 0;
-    S.fTimeTotal = handleAvailable ? S.handle->length_sec() : 0.f;
-    return found;
-}
-
-void CSoundRender_Core::_destroy_data(ref_sound_data& S)
-{
-    if (S.feedback)
-    {
-        CSoundRender_Emitter* E = (CSoundRender_Emitter*)S.feedback;
-        E->stop(false);
-    }
-    R_ASSERT(nullptr == S.feedback);
     i_destroy_source((CSoundRender_Source*)S.handle);
-
     S.handle = nullptr;
 }
 

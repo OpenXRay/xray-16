@@ -9,13 +9,12 @@
 #include "SoundRender_Target.h"
 #include "SoundRender_Source.h"
 
-CSoundRender_Emitter* CSoundRender_Core::i_play(ref_sound* S, u32 flags, float delay)
+CSoundRender_Emitter* CSoundRender_Core::i_play(const ref_sound& S, u32 flags, float delay)
 {
-    VERIFY(S->_p->feedback == 0);
-    CSoundRender_Emitter* E = xr_new<CSoundRender_Emitter>();
-    S->_p->feedback = E;
+    VERIFY(S._get()->feedback == nullptr);
+    CSoundRender_Emitter* E = s_emitters.emplace_back(xr_new<CSoundRender_Emitter>());
+    S._get()->feedback = E;
     E->start(S, flags, delay);
-    s_emitters.push_back(E);
     return E;
 }
 

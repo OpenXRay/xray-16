@@ -5,14 +5,14 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
 
-void CSoundRender_Emitter::start(ref_sound* _owner, u32 flags, float delay)
+void CSoundRender_Emitter::start(const ref_sound& _owner, u32 flags, float delay)
 {
     const bool _loop = flags & sm_Looped;
     bIgnoringTimeFactor = flags & sm_IgnoreTimeFactor;
     starting_delay = delay;
 
     VERIFY(_owner);
-    owner_data = _owner->_p;
+    owner_data = _owner;
     VERIFY(owner_data);
     //	source					= (CSoundRender_Source*)owner_data->handle;
     p_source.position.set(0, 0, 0);

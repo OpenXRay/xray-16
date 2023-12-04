@@ -34,7 +34,7 @@ public:
     static constexpr float TIME_TO_STOP_INFINITE = static_cast<float>(0xffffffff);
 
     CSoundRender_Target* target;
-    ref_sound_data_ptr owner_data;
+    ref_sound owner_data;
 
     [[nodiscard]]
     CSoundRender_Source* source() const { return (CSoundRender_Source*)owner_data->handle; }
@@ -108,7 +108,7 @@ public:
     void fill_data(u8* ptr, u32 offset, u32 size);
 
     float priority();
-    void start(ref_sound* _owner, u32 flags, float delay);
+    void start(const ref_sound& _owner, u32 flags, float delay);
     void cancel(); // manager forces out of rendering
     void update(float time, float dt);
     bool update_culling(float dt);

@@ -22,8 +22,8 @@ constexpr pcstr SNDENV_FILENAME = "sEnvironment.xr";
 
 // refs
 class IGameObject;
-class ref_sound;
-class ref_sound_data;
+class CSound;
+struct resptrcode_sound;
 class XRSOUND_API CSound_params;
 class XRSOUND_API CSound_source;
 class XRSOUND_API CSound_emitter;
@@ -190,10 +190,10 @@ public:
     u32 _events;
 };
 
-typedef resptr_core<ref_sound_data, resptr_base<ref_sound_data>> ref_sound_data_ptr;
+using ref_sound = resptr_core<CSound, resptrcode_sound>;
 
 /// definition (Sound Callback)
-typedef void sound_event(const ref_sound_data_ptr& S, float range);
+typedef void sound_event(const ref_sound& S, float range);
 
 namespace CDB
 {
@@ -204,9 +204,18 @@ namespace CDB
 class XRSOUND_API XR_NOVTABLE ISoundManager
 {
 protected:
-    friend class ref_sound_data;
-    virtual bool _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) = 0;
-    virtual void _destroy_data(ref_sound_data& S) = 0;
+    friend class CSound;
+    friend struct resptrcode_sound;
+
+    virtual CSound* create(pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) = 0;
+    virtual void destroy(CSound& S) = 0;
+
+    virtual void attach_tail(CSound& S, pcstr fName) = 0;
+
+    virtual void play(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f) = 0;
+    virtual void play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f) = 0;
+    virtual void play_no_feedback(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr,
+        float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr) = 0;
 
 public:
     virtual ~ISoundManager() = default;
@@ -214,20 +223,10 @@ public:
     virtual void _restart() = 0;
     virtual bool i_locked() = 0;
 
-    virtual bool create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) = 0;
-    virtual void attach_tail(ref_sound& S, pcstr fName) = 0;
-    virtual void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) = 0;
-    virtual void destroy(ref_sound& S) = 0;
-
     virtual void prefetch() = 0;
 
     virtual void stop_emitters() = 0;
     virtual int pause_emitters(bool val) = 0;
-
-    virtual void play(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f) = 0;
-    virtual void play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f) = 0;
-    virtual void play_no_feedback(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr,
-        float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr) = 0;
 
     virtual void set_master_volume(float f = 1.f) = 0;
     virtual void set_geometry_env(IReader* I) = 0;
@@ -284,36 +283,27 @@ public:
 
 using CSound_UserDataPtr = resptr_core<CSound_UserData, resptr_base<CSound_UserData>>;
 
-class ref_sound_data : public xr_resource
+class CSound : public xr_resource
 {
 public:
     //shared_str nm;
-    CSound_source* handle; //!< Pointer to wave-source interface
-    CSound_emitter* feedback; //!< Pointer to emitter, automatically clears on emitter-stop
-    esound_type s_type;
-    int g_type; //!< Sound type, usually for AI
-    IGameObject* g_object; //!< Game object that emits ref_sound
-    CSound_UserDataPtr g_userdata;
+    CSound_source* handle{}; //!< Pointer to wave-source interface
+    CSound_emitter* feedback{}; //!< Pointer to emitter, automatically clears on emitter-stop
+
+    esound_type s_type{ st_Effect };
+    int g_type{}; //!< Sound type, usually for AI
+
+    IGameObject* g_object{}; //!< Game object that emits ref_sound
+    CSound_UserDataPtr g_userdata{};
     shared_str fn_attached[2];
 
-    u32 dwBytesTotal;
-    float fTimeTotal;
+    u32 dwBytesTotal{};
+    float fTimeTotal{};
 
-    ref_sound_data() noexcept
-        : handle(0), feedback(0), s_type(st_Effect), g_type(0), g_object(0), dwBytesTotal(0), fTimeTotal(0)
-    {
-    }
-
-    ref_sound_data(pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true)
-    {
-        GEnv.Sound->_create_data(*this, fName, sound_type, game_type, replaceWithNoSound);
-    }
-
-    virtual ~ref_sound_data() { GEnv.Sound->_destroy_data(*this); }
+    ~CSound() override { GEnv.Sound->destroy(*this); }
     float get_length_sec() const { return fTimeTotal; }
 };
 
-inline void VerSndUnlocked() { VERIFY(!GEnv.Sound->i_locked()); }
 /*! \class ref_sound
 \brief Sound source + control
 
@@ -321,63 +311,101 @@ The main class representing source/emitter interface
 This class in fact just hides internals and redirect calls to
 specific sub-systems
 */
-class ref_sound
+struct resptrcode_sound : public resptr_base<CSound>
 {
-public:
-    ref_sound_data_ptr _p;
+    [[nodiscard]]
+    ICF CSound_source*     _handle()     const { return p_ ? p_->handle   : nullptr; }
 
-    ref_sound() = default;
-    ~ref_sound() = default;
+    [[nodiscard]]
+    ICF CSound_emitter*    _feedback()   const { return p_ ? p_->feedback : nullptr; }
 
-    CSound_source*     _handle() const { return _p ? _p->handle   : nullptr; }
-    CSound_emitter*    _feedback() const { return _p ? _p->feedback : nullptr; }
-    IGameObject*       _g_object()   { VERIFY(_p); return _p->g_object;   }
-    int                _g_type()     { VERIFY(_p); return _p->g_type;     }
-    esound_type        _sound_type() { VERIFY(_p); return _p->s_type;     }
-    CSound_UserDataPtr _g_userdata() { VERIFY(_p); return _p->g_userdata; }
+    [[nodiscard]]
+    ICF IGameObject*       _g_object()   const { VERIFY(p_); return p_ ? p_->g_object : nullptr; }
+
+    [[nodiscard]]
+    ICF int                _g_type()     const { VERIFY(p_); return p_ ? p_->g_type : 0; }
+
+    [[nodiscard]]
+    ICF esound_type        _sound_type() const { VERIFY(p_); return p_ ? p_->s_type : st_Effect; }
+
+    [[nodiscard]]
+    ICF CSound_UserDataPtr _g_userdata() const { VERIFY(p_); return p_ ? p_->g_userdata : nullptr; }
+
 
     bool create(pcstr name, esound_type sound_type, int game_type, bool replaceWithNoSound = true)
-    { VerSndUnlocked(); return GEnv.Sound->create(*this, name, sound_type, game_type, replaceWithNoSound); }
-
-    void attach_tail(pcstr name)
-    { VerSndUnlocked(); GEnv.Sound->attach_tail(*this, name); }
-
-    void clone(const ref_sound& from, esound_type sound_type, int game_type)
-    { VerSndUnlocked(); GEnv.Sound->clone(*this, from, sound_type, game_type); }
-
-    void destroy()
-    { VerSndUnlocked(); GEnv.Sound->destroy(*this); }
-
-    void play(IGameObject* O, u32 flags = 0, float delay = 0.f)
-    { VerSndUnlocked(); GEnv.Sound->play(*this, O, flags, delay); }
-
-    void play_at_pos(IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f)
-    { VerSndUnlocked(); GEnv.Sound->play_at_pos(*this, O, pos, flags, delay); }
-
-    void play_no_feedback(IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr, float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr)
-    { VerSndUnlocked(); GEnv.Sound->play_no_feedback(*this, O, flags, delay, pos, vol, freq, range); }
-
-    void stop()                           { VerSndUnlocked(); if (_feedback()) _feedback()->stop(false); }
-    void stop_deferred()                  { VerSndUnlocked(); if (_feedback()) _feedback()->stop(true ); }
-
-    void set_position(const Fvector& pos) { VerSndUnlocked(); if (_feedback()) _feedback()->set_position(pos); }
-    void set_frequency(float freq)        { VerSndUnlocked(); if (_feedback()) _feedback()->set_frequency(freq); }
-    void set_range(float min, float max)  { VerSndUnlocked(); if (_feedback()) _feedback()->set_range(min, max); }
-    void set_volume(float vol)            { VerSndUnlocked(); if (_feedback()) _feedback()->set_volume(vol); }
-    void set_priority(float p)            { VerSndUnlocked(); if (_feedback()) _feedback()->set_priority(p); }
-    void set_time(float t)                { VerSndUnlocked(); if (_feedback()) _feedback()->set_time(t); }; //--#SM+#--
-
-    const CSound_params* get_params()
     {
         VerSndUnlocked();
-        return _feedback() ? _feedback()->get_params() : 0;
+        _set(GEnv.Sound->create(name, sound_type, game_type, replaceWithNoSound));
+        return _get();
     }
 
-    void set_params(CSound_params* p)
+    ICF void destroy()
     {
         VerSndUnlocked();
-        CSound_emitter* const feedback = _feedback();
-        if (feedback)
+        _set(nullptr);
+    }
+
+    void attach_tail(pcstr name) const
+    {
+        VerSndUnlocked();
+        if (!p_)
+            return;
+        GEnv.Sound->attach_tail(*p_, name);
+    }
+
+    void clone(const ref_sound& from, esound_type sound_type, int game_type)
+    {
+        if (!from._get())
+            return;
+        _set(xr_new<CSound>());
+        p_->handle = from->handle;
+        p_->dwBytesTotal = from->dwBytesTotal;
+        p_->fTimeTotal = from->fTimeTotal;
+        p_->fn_attached[0] = from->fn_attached[0];
+        p_->fn_attached[1] = from->fn_attached[1];
+        p_->g_type = (game_type == sg_SourceType) ? p_->handle->game_type() : game_type;
+        p_->s_type = sound_type;
+    }
+
+    void play(IGameObject* O, u32 flags = 0, float delay = 0.f)
+    {
+        VerSndUnlocked();
+        GEnv.Sound->play(static_cast<ref_sound&>(*this), O, flags, delay);
+    }
+
+    void play_at_pos(IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f)
+    {
+        VerSndUnlocked();
+        GEnv.Sound->play_at_pos(static_cast<ref_sound&>(*this), O, pos, flags, delay);
+    }
+
+    void play_no_feedback(IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr, float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr)
+    {
+        VerSndUnlocked();
+        GEnv.Sound->play_no_feedback(static_cast<ref_sound&>(*this), O, flags, delay, pos, vol, freq, range);
+    }
+
+    ICF void stop()                           const { VerSndUnlocked(); if (_feedback()) _feedback()->stop(false); }
+    ICF void stop_deferred()                  const { VerSndUnlocked(); if (_feedback()) _feedback()->stop(true ); }
+
+    ICF void set_position(const Fvector& pos) const { VerSndUnlocked(); if (_feedback()) _feedback()->set_position(pos); }
+    ICF void set_frequency(float freq)        const { VerSndUnlocked(); if (_feedback()) _feedback()->set_frequency(freq); }
+    ICF void set_range(float min, float max)  const { VerSndUnlocked(); if (_feedback()) _feedback()->set_range(min, max); }
+    ICF void set_volume(float vol)            const { VerSndUnlocked(); if (_feedback()) _feedback()->set_volume(vol); }
+    ICF void set_priority(float p)            const { VerSndUnlocked(); if (_feedback()) _feedback()->set_priority(p); }
+    ICF void set_time(float t)                const { VerSndUnlocked(); if (_feedback()) _feedback()->set_time(t); }; //--#SM+#--
+
+    [[nodiscard]]
+    ICF const CSound_params* get_params() const
+    {
+        VerSndUnlocked();
+        return _feedback() ? _feedback()->get_params() : nullptr;
+    }
+
+    void set_params(CSound_params* p) const
+    {
+        VerSndUnlocked();
+        if (CSound_emitter* const feedback = _feedback())
         {
             feedback->set_position(p->position);
             feedback->set_frequency(p->freq);
@@ -386,7 +414,13 @@ public:
         }
     }
 
-    float get_length_sec() const { return _p ? _p->get_length_sec() : 0.0f; }
+    [[nodiscard]]
+    ICF float get_length_sec() const { return p_ ? p_->get_length_sec() : 0.0f; }
+
+    IC static void VerSndUnlocked()
+    {
+        VERIFY(!GEnv.Sound->i_locked());
+    }
 };
 
 class XRSOUND_API CSound_stats_ext
