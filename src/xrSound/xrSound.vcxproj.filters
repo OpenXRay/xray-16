@@ -114,5 +114,6 @@
   <ItemGroup>
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\soft_oal.dll" />
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\OpenAL32.dll" />
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\phonon.dll" />
   </ItemGroup>
 </Project>
