@@ -50,12 +50,71 @@ void CSoundRender_Core::_initialize()
 
     bPresent = true;
 
+#ifdef USE_PHONON
+    IPLSIMDLevel simdLevel = IPL_SIMDLEVEL_SSE2;
+    if (CPU::HasAVX512F)
+        simdLevel = IPL_SIMDLEVEL_AVX512;
+    else if (CPU::HasAVX2)
+        simdLevel = IPL_SIMDLEVEL_AVX2;
+    else if (CPU::HasAVX)
+        simdLevel = IPL_SIMDLEVEL_AVX;
+    else if (CPU::HasSSE41)
+        simdLevel = IPL_SIMDLEVEL_SSE4;
+
+    IPLContextSettings contextSettings
+    {
+        STEAMAUDIO_VERSION,
+
+        [](IPLLogLevel level, const char* message)
+        {
+            char mark = '\0';
+            switch (level)
+            {
+            case IPL_LOGLEVEL_INFO:    mark = '*'; break;
+            case IPL_LOGLEVEL_WARNING: mark = '~'; break;
+            case IPL_LOGLEVEL_ERROR:   mark = '!'; break;
+            case IPL_LOGLEVEL_DEBUG:   mark = '#'; break;
+            }
+            Msg("%c SOUND: SteamAudio: %s", message);
+        },
+
+        [](IPLsize size, IPLsize alignment)
+        {
+            return Memory.mem_alloc(size, alignment);
+        },
+
+        [](void* memoryBlock)
+        {
+            Memory.mem_free(memoryBlock);
+        },
+
+        simdLevel
+    };
+
+    iplContextCreate(&contextSettings, &ipl_context);
+
+    IPLHRTFSettings hrtfSettings
+    {
+        IPL_HRTFTYPE_DEFAULT,
+        nullptr, nullptr, 0,
+        1.0f, IPL_HRTFNORMTYPE_NONE
+    };
+
+    IPLAudioSettings audioSettings{ 44100, 1024 };
+
+    iplHRTFCreate(ipl_context, &audioSettings, &hrtfSettings, &ipl_hrtf);
+#endif
     bReady = true;
 }
 
 void CSoundRender_Core::_clear()
 {
     bReady = false;
+
+#ifdef USE_PHONON
+    iplHRTFRelease(&ipl_hrtf);
+    iplContextRelease(&ipl_context);
+#endif
 
     // remove sources
     for (auto& kv : s_sources)

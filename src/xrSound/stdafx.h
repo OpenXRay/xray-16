@@ -9,6 +9,11 @@
 
 #include "Sound.h"
 
+#if __has_include(<phonon.h>)
+#   include <phonon.h>
+#   define USE_PHONON
+#endif
+
 #if defined(XR_PLATFORM_WINDOWS)
 // mmreg.h
 #define NOMMIDS
