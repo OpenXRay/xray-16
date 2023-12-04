@@ -220,13 +220,6 @@ void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, cons
     m_effects->commit();
 }
 
-void CSoundRender_Core::refresh_env_library()
-{
-    Parent.env_unload();
-    Parent.env_load();
-    env_apply();
-}
-
 void CSoundRender_Core::refresh_sources()
 {
     stop_emitters();

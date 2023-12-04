@@ -153,12 +153,10 @@ void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
 
 u32 CSoundRender_Emitter::get_bytes_total() const
 {
-    u32 res = owner_data->dwBytesTotal;
-    return res;
+    return owner_data->dwBytesTotal;
 }
 
 float CSoundRender_Emitter::get_length_sec() const
 {
-    float res = owner_data->get_length_sec();
-    return res;
+    return owner_data->fTimeTotal;
 }

@@ -101,7 +101,6 @@ public:
     //	virtual const Fvector&				listener_position		( )=0;
     virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) = 0;
 
-    void refresh_env_library() override;
     void refresh_sources() override;
 
 public:

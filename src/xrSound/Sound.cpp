@@ -73,3 +73,10 @@ SoundEnvironment_LIB* CSoundManager::get_env_library() const
 {
     return soundEnvironment;
 }
+
+void CSoundManager::refresh_env_library()
+{
+    env_unload();
+    env_load();
+    SoundRender->env_apply();
+}

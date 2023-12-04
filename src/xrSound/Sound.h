@@ -22,7 +22,7 @@ constexpr pcstr SNDENV_FILENAME = "sEnvironment.xr";
 
 // refs
 class IGameObject;
-class CSound;
+struct CSound;
 struct resptrcode_sound;
 class ISoundScene;
 class XRSOUND_API CSound_params;
@@ -241,7 +241,7 @@ inline ISoundScene::~ISoundScene() = default;
 class XRSOUND_API XR_NOVTABLE ISoundManager
 {
 protected:
-    friend class CSound;
+    friend struct CSound;
     friend struct resptrcode_sound;
 
     virtual CSound* create(pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) = 0;
@@ -271,7 +271,6 @@ public:
 
     virtual const Fvector& listener_position() = 0;
 
-    virtual void refresh_env_library() = 0;
     virtual void refresh_sources() = 0;
 };
 
@@ -288,11 +287,13 @@ public:
     void Create();
     void Destroy();
 
+    [[nodiscard]]
     bool IsSoundEnabled() const;
 
-    SoundEnvironment_LIB* get_env_library() const;
     void env_load();
     void env_unload();
+    void refresh_env_library();
+    SoundEnvironment_LIB* get_env_library() const;
 };
 
 class CSound_UserDataVisitor;
@@ -307,7 +308,7 @@ public:
 
 using CSound_UserDataPtr = resptr_core<CSound_UserData, resptr_base<CSound_UserData>>;
 
-class CSound : public xr_resource
+struct CSound : public xr_resource
 {
 public:
     //shared_str nm;
@@ -323,9 +324,6 @@ public:
 
     u32 dwBytesTotal{};
     float fTimeTotal{};
-
-    ~CSound() override { GEnv.Sound->destroy(*this); }
-    float get_length_sec() const { return fTimeTotal; }
 };
 
 /*! \class ref_sound
@@ -355,7 +353,7 @@ struct resptrcode_sound : public resptr_base<CSound>
     [[nodiscard]]
     ICF CSound_UserDataPtr _g_userdata() const { VERIFY(p_); return p_ ? p_->g_userdata : nullptr; }
 
-    bool create(pcstr name, esound_type sound_type, int game_type, bool replaceWithNoSound = true)
+    ICF bool create(pcstr name, esound_type sound_type, int game_type, bool replaceWithNoSound = true)
     {
         VerSndUnlocked();
         _set(GEnv.Sound->create(name, sound_type, game_type, replaceWithNoSound));
@@ -364,11 +362,14 @@ struct resptrcode_sound : public resptr_base<CSound>
 
     ICF void destroy()
     {
+        if (!p_)
+            return;
         VerSndUnlocked();
+        GEnv.Sound->destroy(*p_);
         _set(nullptr);
     }
 
-    void attach_tail(pcstr name) const
+    ICF void attach_tail(pcstr name) const
     {
         VerSndUnlocked();
         if (!p_)
@@ -390,7 +391,7 @@ struct resptrcode_sound : public resptr_base<CSound>
         p_->s_type = sound_type;
     }
 
-    void play(IGameObject* O, u32 flags = 0, float delay = 0.f)
+    ICF void play(IGameObject* O, u32 flags = 0, float delay = 0.f)
     {
         if (!p_ || !DefaultSoundScene)
             return;
@@ -398,7 +399,7 @@ struct resptrcode_sound : public resptr_base<CSound>
         DefaultSoundScene->play(static_cast<ref_sound&>(*this), O, flags, delay);
     }
 
-    void play_at_pos(IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f)
+    ICF void play_at_pos(IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f)
     {
         if (!p_ || !DefaultSoundScene)
             return;
@@ -406,7 +407,7 @@ struct resptrcode_sound : public resptr_base<CSound>
         DefaultSoundScene->play_at_pos(static_cast<ref_sound&>(*this), O, pos, flags, delay);
     }
 
-    void play_no_feedback(IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr, float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr)
+    ICF void play_no_feedback(IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr, float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr)
     {
         if (!p_ || !DefaultSoundScene)
             return;
@@ -431,7 +432,7 @@ struct resptrcode_sound : public resptr_base<CSound>
         return _feedback() ? _feedback()->get_params() : nullptr;
     }
 
-    void set_params(CSound_params* p) const
+    ICF void set_params(CSound_params* p) const
     {
         VerSndUnlocked();
         if (CSound_emitter* const feedback = _feedback())
@@ -444,9 +445,9 @@ struct resptrcode_sound : public resptr_base<CSound>
     }
 
     [[nodiscard]]
-    ICF float get_length_sec() const { return p_ ? p_->get_length_sec() : 0.0f; }
+    ICF float get_length_sec() const { return p_ ? p_->fTimeTotal : 0.0f; }
 
-    IC static void VerSndUnlocked()
+    static void VerSndUnlocked()
     {
         VERIFY(!GEnv.Sound->i_locked());
     }
