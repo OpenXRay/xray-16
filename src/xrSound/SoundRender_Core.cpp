@@ -258,13 +258,13 @@ void CSoundRender_Core::attach_tail(ref_sound& S, pcstr fName)
 
     S._p->fn_attached[idx] = fn;
 
-    CSoundRender_Source* s = SoundRender->i_create_source(fn);
+    CSoundRender_Source* s = i_create_source(fn);
     S._p->dwBytesTotal += s->bytes_total();
     S._p->fTimeTotal += s->length_sec();
     if (S._feedback())
         ((CSoundRender_Emitter*)S._feedback())->fTimeToStop += s->length_sec();
 
-    SoundRender->i_destroy_source(s);
+    i_destroy_source(s);
 }
 
 void CSoundRender_Core::clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type)
@@ -362,7 +362,7 @@ bool CSoundRender_Core::_create_data(ref_sound_data& S, pcstr fName, esound_type
     xr_strcpy(fn, fName);
     if (strext(fn))
         *strext(fn) = 0;
-    const bool found = SoundRender->i_create_source(S.handle, fn, replaceWithNoSound);
+    const bool found = i_create_source(S.handle, fn, replaceWithNoSound);
     const bool handleAvailable = found || replaceWithNoSound;
     S.g_type = game_type;
     if (game_type == sg_SourceType && handleAvailable)
@@ -384,7 +384,7 @@ void CSoundRender_Core::_destroy_data(ref_sound_data& S)
         E->stop(false);
     }
     R_ASSERT(nullptr == S.feedback);
-    SoundRender->i_destroy_source((CSoundRender_Source*)S.handle);
+    i_destroy_source((CSoundRender_Source*)S.handle);
 
     S.handle = nullptr;
 }
