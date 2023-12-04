@@ -23,14 +23,21 @@ void CSoundRender_CoreA::_initialize_devices_list()
 
     if (0 == pDeviceList->GetNumDevices())
     {
-        CHECK_OR_EXIT(0, "OpenAL: Can't create sound device.");
+        Log("! SOUND: OpenAL: No sound devices found.");
+        bPresent = false;
         xr_delete(pDeviceList);
     }
+    bPresent = true;
 }
 
 void CSoundRender_CoreA::_initialize()
 {
-    R_ASSERT2(pDeviceList, "Incorrect initialization order. Call _initialize_devices_list() first.");
+    if (!pDeviceList)
+    {
+        VERIFY2(pDeviceList, "Probably incorrect initialization order. Make sure to call _initialize_devices_list() first.");
+        bPresent = false;
+        return;
+    }
 
     pDeviceList->SelectBestDevice();
     R_ASSERT(snd_device_id >= 0 && snd_device_id < pDeviceList->GetNumDevices());
@@ -38,10 +45,10 @@ void CSoundRender_CoreA::_initialize()
 
     // OpenAL device
     pDevice = alcOpenDevice(deviceDesc.name);
-    if (pDevice == nullptr)
+    if (!pDevice)
     {
-        CHECK_OR_EXIT(0, "SOUND: OpenAL: Failed to create device.");
-        bPresent = FALSE;
+        Log("! SOUND: OpenAL: Failed to create device.");
+        bPresent = false;
         return;
     }
 
@@ -50,9 +57,9 @@ void CSoundRender_CoreA::_initialize()
 
     // Create context
     pContext = alcCreateContext(pDevice, nullptr);
-    if (nullptr == pContext)
+    if (!pContext)
     {
-        CHECK_OR_EXIT(0, "SOUND: OpenAL: Failed to create context.");
+        Log("! SOUND: OpenAL: Failed to create context.");
         bPresent = FALSE;
         alcCloseDevice(pDevice);
         pDevice = nullptr;

@@ -265,6 +265,8 @@ public:
     void Create();
     void Destroy();
 
+    bool IsSoundEnabled() const;
+
     SoundEnvironment_LIB* get_env_library() const;
     void env_load();
     void env_unload();

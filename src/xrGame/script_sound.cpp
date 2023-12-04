@@ -16,7 +16,7 @@
 
 CScriptSound::CScriptSound(LPCSTR caSoundName, ESoundTypes sound_type)
 {
-    m_bIsNoSound = strstr(Core.Params, "-nosound");
+    m_bIsNoSound = !Engine.Sound.IsSoundEnabled();
     m_caSoundToPlay = caSoundName;
     string_path l_caFileName;
     VERIFY(GEnv.Sound);

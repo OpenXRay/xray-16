@@ -150,7 +150,7 @@ bool CUISequencer::Start(LPCSTR tutor_name)
     if (snd_name && snd_name[0])
     {
         m_global_sound.create(snd_name, st_Effect, sg_Undefined);
-        VERIFY(m_global_sound._handle() || strstr(Core.Params, "-nosound"));
+        VERIFY(m_global_sound._handle() || !Engine.Sound.IsSoundEnabled());
     }
     m_start_lua_function = uiXml.Read("function_on_start", 0, "");
     m_stop_lua_function = uiXml.Read("function_on_stop", 0, "");
