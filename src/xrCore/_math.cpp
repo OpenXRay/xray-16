@@ -184,7 +184,26 @@ void initialize()
 
 namespace CPU
 {
-XRCORE_API bool HasSSE = SDL_HasSSE();
+XRCORE_API bool HasSSE     = SDL_HasSSE();
+XRCORE_API bool HasSSE41   = SDL_HasSSE41();
+
+#if SDL_VERSION_ATLEAST(2, 0, 6)
+XRCORE_API bool HasAVX     = SDL_HasAVX();
+#else
+XRCORE_API bool HasAVX     = false();
+#endif
+
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+XRCORE_API bool HasAVX2    = SDL_HasAVX2();
+#else
+XRCORE_API bool HasAVX2    = false;
+#endif
+
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+XRCORE_API bool HasAVX512F = SDL_HasAVX512F();
+#else
+XRCORE_API bool HasAVX512F = false;
+#endif
 
 XRCORE_API u64 qpc_freq = SDL_GetPerformanceFrequency();
 
@@ -224,16 +243,32 @@ void _initialize_cpu()
             }
         }
     };
+
+    // x86
     listFeature("RDTSC",   SDL_HasRDTSC());
     listFeature("MMX",     SDL_HasMMX());
     listFeature("3DNow!",  SDL_Has3DNow());
     listFeature("SSE",     SDL_HasSSE());
-    listFeature("AVX",     SDL_HasAVX());
+    listFeature("SSE2",    SDL_HasSSE2());
+    listFeature("SSE3",    SDL_HasSSE3());
+    listFeature("SSE41",   SDL_HasSSE41());
+    listFeature("SSE42",   SDL_HasSSE42());
+    listFeature("AVX",     CPU::HasAVX);
+    listFeature("AVX2",    CPU::HasAVX2);
+    listFeature("AVX512F", CPU::HasAVX512F);
+
+    // Other architectures
+    listFeature("AltiVec", SDL_HasAltiVec());
 #if SDL_VERSION_ATLEAST(2, 0, 12)
     listFeature("ARMSIMD", SDL_HasARMSIMD());
 #endif
+#if SDL_VERSION_ATLEAST(2, 0, 6)
     listFeature("NEON",    SDL_HasNEON());
-    listFeature("AltiVec", SDL_HasAltiVec());
+#endif
+#if SDL_VERSION_ATLEAST(2, 24, 0)
+    listFeature("LSX",     SDL_HasLSX());
+    listFeature("LASX",    SDL_HasLASX());
+#endif
 
     Msg("* CPU features: %s", features);
     Msg("* CPU threads: %d", std::thread::hardware_concurrency());
