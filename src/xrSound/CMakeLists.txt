@@ -67,6 +67,14 @@ target_sources_grouped(
 
 target_sources_grouped(
     TARGET xrSound
+    NAME "Scene"
+    FILES
+    SoundRender_Scene.cpp
+    SoundRender_Scene.h
+)
+
+target_sources_grouped(
+    TARGET xrSound
     NAME "Kernel"
     FILES
     guids.cpp
