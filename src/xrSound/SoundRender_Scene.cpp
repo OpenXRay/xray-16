@@ -268,19 +268,18 @@ float CSoundRender_Scene::get_occlusion_to(const Fvector& hear_pt, const Fvector
     return occ_value;
 }
 
-float CSoundRender_Scene::get_occlusion(Fvector& P, float R, Fvector* occ)
+float CSoundRender_Scene::get_occlusion(const Fvector& P, float R, Fvector* occ)
 {
     float occ_value = 1.f;
 
     // Calculate RAY params
     const Fvector base = SoundRender->listener_position();
     Fvector pos, dir;
-    float range;
     pos.random_dir();
     pos.mul(R);
     pos.add(P);
     dir.sub(pos, base);
-    range = dir.magnitude();
+    const float range = dir.magnitude();
     dir.div(range);
 
     if (nullptr != geom_MODEL)

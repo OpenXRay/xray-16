@@ -230,7 +230,7 @@ public:
     virtual CSound_environment* get_environment(const Fvector& P) = 0;
 
     virtual float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) = 0;
-    virtual float get_occlusion(Fvector& P, float R, Fvector* occ) = 0;
+    virtual float get_occlusion(const Fvector& P, float R, Fvector* occ) = 0;
 
     virtual void object_relcase(IGameObject* obj) = 0;
 };

@@ -29,7 +29,7 @@ public:
         float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr) override;
 
     float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) override;
-    float get_occlusion(Fvector& P, float R, Fvector* occ) override;
+    float get_occlusion(const Fvector& P, float R, Fvector* occ) override;
 
     void object_relcase(IGameObject* obj) override;
 
