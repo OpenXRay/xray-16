@@ -300,7 +300,7 @@ void CGamePersistent::WeathersUpdate()
                     snd.play_at_pos(nullptr, pos);
 
 #ifdef DEBUG
-                    if (!snd._handle() && !GEnv.Sound->is_enabled())
+                    if (!snd._handle() && !Engine.Sound.IsSoundEnabled())
                         continue;
 #endif // DEBUG
 

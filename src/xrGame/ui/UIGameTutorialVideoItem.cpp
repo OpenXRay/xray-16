@@ -116,7 +116,7 @@ void CUISequenceVideoItem::Load(CUIXml* xml, int idx)
             m_sound[0] = one;
         }
 
-        VERIFY(m_sound[0]._handle() || !GEnv.Sound->is_enabled());
+        VERIFY(m_sound[0]._handle() || !Engine.Sound.IsSoundEnabled());
     }
 
     xml->SetLocalRoot(_stored_root);

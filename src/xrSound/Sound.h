@@ -250,8 +250,6 @@ public:
     virtual void refresh_sources() = 0;
     virtual void set_environment(u32 id, CSound_environment** dst_env) = 0;
     virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env) = 0;
-
-    virtual bool is_enabled() const = 0;
 };
 
 class XRSOUND_API CSoundManager
@@ -266,6 +264,8 @@ public:
 
     void Create();
     void Destroy();
+
+    bool IsSoundEnabled() const;
 
     SoundEnvironment_LIB* get_env_library() const;
     void env_load();

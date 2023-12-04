@@ -41,8 +41,6 @@ public:
     bool bUserEnvironment;
     bool bReady;
 
-    [[nodiscard]] bool is_enabled() const override;
-
     CTimer Timer;
     CTimer TimerPersistent; // time-factor is always 1.0f
     float fTimer_Value;

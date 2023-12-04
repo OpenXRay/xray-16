@@ -6,11 +6,14 @@ XRSOUND_API u32 snd_device_id = u32(-1);
 
 void CSoundManager::CreateDevicesList()
 {
+    static bool noSound = strstr(Core.Params, "-nosound");
+
     SoundRender = xr_new<CSoundRender_CoreA>(*this);
-    SoundRender->bPresent = strstr(Core.Params, "-nosound") == nullptr;
-    if (SoundRender->bPresent)
+
+    if (!noSound)
         SoundRender->_initialize_devices_list();
-    else
+
+    if (!SoundRender->bPresent)
         soundDevices.emplace_back("null", -1);
 
     GEnv.Sound = SoundRender;
@@ -40,6 +43,11 @@ void CSoundManager::Destroy()
         xr_free(tokenName);
     }
     soundDevices.clear();
+}
+
+bool CSoundManager::IsSoundEnabled() const
+{
+    return SoundRender && SoundRender->bPresent;
 }
 
 void CSoundManager::env_load()

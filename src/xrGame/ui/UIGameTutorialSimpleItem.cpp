@@ -59,7 +59,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     if (m_snd_name && m_snd_name[0])
     {
         m_sound.create(m_snd_name, st_Effect, sg_Undefined);
-        VERIFY(m_sound._handle() || !GEnv.Sound->is_enabled());
+        VERIFY(m_sound._handle() || !Engine.Sound.IsSoundEnabled());
     }
     m_time_length = xml->ReadFlt("length_sec", 0, 0);
     m_desired_cursor_pos.x = xml->ReadAttribFlt("cursor_pos", 0, "x", 0);
