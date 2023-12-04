@@ -334,9 +334,6 @@ bool CInventoryItem::net_Spawn(CSE_Abstract* DC)
     if (!pSE_InventoryItem)
         return TRUE;
 
-    //!!!
-    m_fCondition = pSE_InventoryItem->m_fCondition;
-
     if (GameID() != eGameIDSingle)
         object().processing_activate();
 
