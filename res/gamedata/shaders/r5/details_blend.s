@@ -13,6 +13,7 @@ function normal		(shader, t_base, t_second, t_detail)
 	shader:dx10texture("s_base",	t_base)
 	shader:dx10texture("s_bump",	"levels\\" .. opt:getLevel() .. "\\" .. t_base.."_bump")
 	shader:dx10texture("s_bumpX",	t_base.."_bump#")
+	shader:dx10texture("array",	"$details$array")
 	
 	shader:dx10sampler("smp_base")	
 end

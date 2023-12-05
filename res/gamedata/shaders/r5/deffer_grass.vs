@@ -7,17 +7,41 @@ float4 benders_setup;
 float4 consts; // {1/quant,1/quant,diffusescale,ambient}
 float4 wave; // cx,cy,cz,tm
 float4 dir2D; 
-float4 array[61*4];
+#if INSTANCED_DETAILS
+Texture1D<float4> array;
+#else
+//tbuffer DetailsData
+//{
+	uniform float4 		array[61*4];
+//}
+#endif
 
+#if INSTANCED_DETAILS
+v2p_bumped 	main (v_detail v, uint instance_id : SV_InstanceID)
+#else
 v2p_bumped 	main (v_detail v)
+#endif
 {
 	v2p_bumped 		O;
 	// index
+
+#if INSTANCED_DETAILS
+	int 	i 	= instance_id * 2;
+
+	float4 a0 = array.Load(int2(i, 0), 0);
+	float4 a1 = array.Load(int2(i, 0), 1);
+
+	float4  m0 	= float4(a0.y,    0, -a0.x, a1.x);
+	float4  m1 	= float4(   0, a1.w,     0, a1.y);
+	float4  m2 	= float4(a0.x,    0,  a0.y, a1.z);
+	float4  c0 	= a0.zzzw;
+#else
 	int 	i 	= v.misc.w;
 	float4  m0 	= array[i+0];
 	float4  m1 	= array[i+1];
 	float4  m2 	= array[i+2];
 	float4  c0 	= array[i+3];
+#endif
 
 	// Transform pos to world coords
 	float4 pos;

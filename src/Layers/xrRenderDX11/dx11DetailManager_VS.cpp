@@ -346,6 +346,23 @@ void CDetailManager::draw_instances(
     c_ambient.set(desc.ambient.x, desc.ambient.y, desc.ambient.z);
     c_hemi.set(desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z);
 
+    static shared_str strConsts("consts");
+    static shared_str strWave("wave");
+    static shared_str strDir2D("dir2D");
+    static shared_str strArray("array");
+    static shared_str strXForm("xform");
+    static shared_str strPos("benders_pos");
+    static shared_str strGrassSetup("benders_setup");
+
+    // Grass benders data
+    IGame_Persistent::grass_data& GData = g_pGamePersistent->grass_shader_data;
+    Fvector4 player_pos = { 0, 0, 0, 0 };
+    int BendersQty = _min(16, (int)(ps_ssfx_grass_interactive.y + 1));
+
+    // Add Player?
+    if (ps_ssfx_grass_interactive.x > 0)
+        player_pos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, -1);
+
     // Iterate
     for (u32 O = 0; O < objects.size(); O++)
     {
@@ -364,6 +381,30 @@ void CDetailManager::draw_instances(
                 cmd_list.set_c(strWave, wave);
                 cmd_list.set_c(strDir2D, wind);
                 cmd_list.set_c(strXForm, Device.mFullTransform);
+
+                if (ps_ssfx_grass_interactive.y > 0)
+                {
+                    cmd_list.set_c(strGrassSetup, ps_ssfx_int_grass_params_1);
+
+                    Fvector4* c_grass{};
+                    {
+                        void* GrassData;
+                        cmd_list.get_ConstantDirect(strPos, BendersQty * sizeof(Fvector4), &GrassData, 0, 0);
+                        c_grass = (Fvector4*)GrassData;
+                    }
+
+                    if (c_grass)
+                    {
+                        c_grass[0].set(player_pos);
+                        c_grass[16].set(0.0f, -99.0f, 0.0f, 1.0f);
+
+                        for (int Bend = 1; Bend < BendersQty; Bend++)
+                        {
+                            c_grass[Bend].set(GData.pos[Bend].x, GData.pos[Bend].y, GData.pos[Bend].z, GData.radius_curr[Bend]);
+                            c_grass[Bend + 16].set(GData.dir[Bend].x, GData.dir[Bend].y, GData.dir[Bend].z, GData.str[Bend]);
+                        }
+                    }
+                }
 
                 Fvector4* c_storage = upload_buffer[cmd_list.context_id];
 
