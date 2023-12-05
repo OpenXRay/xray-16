@@ -15,6 +15,30 @@ void CSoundRender_Emitter::set_position(const Fvector& pos)
     else
         p_source.update_position({});
 
+#ifdef USE_PHONON
+    const IPLCoordinateSpace3 sourceCoordinates
+    {
+        { 1, 0, 0 },
+        { 0, 1, 0 },
+        { 0, 0, 1 },
+        reinterpret_cast<const IPLVector3&>(pos)
+    };
+
+    IPLSimulationInputs inputs{};
+    inputs.flags = IPL_SIMULATIONFLAGS_DIRECT;
+    inputs.directFlags = static_cast<IPLDirectSimulationFlags>(
+        IPL_DIRECTSIMULATIONFLAGS_DISTANCEATTENUATION |
+        IPL_DIRECTSIMULATIONFLAGS_AIRABSORPTION |
+        IPL_DIRECTSIMULATIONFLAGS_DIRECTIVITY |
+        IPL_DIRECTSIMULATIONFLAGS_OCCLUSION |
+        IPL_DIRECTSIMULATIONFLAGS_TRANSMISSION
+    );
+    inputs.source = sourceCoordinates;
+    inputs.occlusionType = IPL_OCCLUSIONTYPE_RAYCAST;
+
+    iplSourceSetInputs(ipl_source, IPL_SIMULATIONFLAGS_DIRECT, &inputs);
+#endif
+
     bMoved = true;
 }
 
@@ -41,10 +65,27 @@ CSoundRender_Emitter::CSoundRender_Emitter(CSoundRender_Scene* s)
       fade_volume(1.f),
       m_current_state(stStopped),
       bMoved(true),
-      marker(0xabababab) {}
+      marker(0xabababab)
+{
+#ifdef USE_PHONON
+    IPLSourceSettings sourceSettings{ IPL_SIMULATIONFLAGS_DIRECT }; // this enables occlusion/transmission simulator for this source
+    iplSourceCreate(scene->ipl_simulator, &sourceSettings, &ipl_source);
+    iplSourceAdd(ipl_source, scene->ipl_simulator);
+
+    iplSimulatorCommit(scene->ipl_simulator);
+#endif
+
+}
 
 CSoundRender_Emitter::~CSoundRender_Emitter()
 {
+#ifdef USE_PHONON
+    iplSourceRemove(ipl_source, scene->ipl_simulator);
+    iplSourceRelease(&ipl_source);
+
+    iplSimulatorCommit(scene->ipl_simulator);
+#endif
+
     // try to release dependencies, events, for example
     Event_ReleaseOwner();
 }

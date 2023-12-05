@@ -50,6 +50,7 @@ protected:
     xr_vector<CSoundRender_Target*> s_targets_defer;
     u32 s_targets_pu; // parameters update
 
+public:
 #ifdef USE_PHONON
     IPLContext ipl_context{};
     IPLHRTF ipl_hrtf{};

@@ -8,6 +8,42 @@
 #include "SoundRender_Scene.h"
 #include "SoundRender_Emitter.h"
 
+CSoundRender_Scene::CSoundRender_Scene()
+{
+#ifdef USE_PHONON
+    IPLSceneSettings sceneSettings
+    {
+        IPL_SCENETYPE_DEFAULT,
+        nullptr, nullptr, nullptr, nullptr,
+        this,
+        nullptr, nullptr
+    };
+    iplSceneCreate(SoundRender->ipl_context, &sceneSettings, &ipl_scene);
+
+    IPLSimulationSettings simulationSettings
+    {
+        IPL_SIMULATIONFLAGS_DIRECT,
+        IPL_SCENETYPE_DEFAULT,
+        IPL_REFLECTIONEFFECTTYPE_CONVOLUTION,
+        128,
+        4096,
+        32,
+        2.0f,
+        1,
+        8,
+        2,
+        5,
+        32,
+        44100, 1024,
+        nullptr, nullptr, nullptr,
+    };
+    iplSimulatorCreate(SoundRender->ipl_context, &simulationSettings, &ipl_simulator);
+
+    iplSimulatorSetScene(ipl_simulator, ipl_scene);
+    iplSimulatorCommit(ipl_simulator);
+#endif
+}
+
 CSoundRender_Scene::~CSoundRender_Scene()
 {
     stop_emitters();
@@ -19,6 +55,11 @@ CSoundRender_Scene::~CSoundRender_Scene()
     for (auto& emit : s_emitters)
         xr_delete(emit);
     s_emitters.clear();
+
+#ifdef USE_PHONON
+    iplSimulatorRelease(&ipl_simulator);
+    iplSceneRelease(&ipl_scene);
+#endif
 }
 
 void CSoundRender_Scene::stop_emitters() const
@@ -173,6 +214,10 @@ void CSoundRender_Scene::update()
         sound_event_handler(sound, range);
 
     s_events.clear();
+
+#ifdef USE_PHONON
+    iplSimulatorRunDirect(ipl_simulator);
+#endif
 }
 
 void CSoundRender_Scene::object_relcase(IGameObject* obj)
