@@ -248,16 +248,6 @@ void CDetailManager::draw_instances(
 
                         float scale = Instance.scale_calculated;
 
-                        // Sort of fade using the scale
-                        // fade_distance == -1 use light_position to define "fade", anything else uses fade_distance
-                        if (fade_distance <= -1)
-                            scale *= 1.0f - Instance.position.distance_to_xz_sqr(light_position) * 0.005f;
-                        else if (Instance.distance > fade_distance)
-                            scale *= 1.0f - abs(Instance.distance - fade_distance) * 0.005f;
-
-                        if (scale <= 0)
-                            break;
-
                         Fmatrix& M = Instance.mRotY;
 
                         c_storage[base + 0].set(M._13 * scale, M._11 * scale, Instance.c_hemi, Instance.c_sun);

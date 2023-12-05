@@ -122,7 +122,7 @@ public:
     };
 
     typedef xr_vector<xr_vector<SlotItemVec*>> vis_list;
-    typedef svector<CDetail*, dm_max_objects> DetailVec;
+    typedef xr_vector<CDetail*> DetailVec;
     typedef DetailVec::iterator DetailIt;
     typedef poolSS<SlotItem, 4096> PSS;
 
