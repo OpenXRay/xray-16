@@ -16,7 +16,10 @@ CSoundRender_Source::CSoundRender_Source()
 }
 
 CSoundRender_Source::~CSoundRender_Source() { unload(); }
-bool ov_error(int res)
+
+namespace
+{
+bool ov_can_continue_read(long res)
 {
     switch (res)
     {
@@ -47,27 +50,19 @@ bool ov_error(int res)
     }
     return false;
 }
+}
 
 void CSoundRender_Source::i_decompress_fr(OggVorbis_File* ovf, char* _dest, u32 left)
 {
     int current_section;
-    long TotalRet = 0, ret;
+    long TotalRet = 0;
 
     // Read loop
-    while (TotalRet < (long)left)
+    while (TotalRet < static_cast<long>(left))
     {
-        ret = ov_read(ovf, _dest + TotalRet, left - TotalRet, 0, 2, 1, &current_section);
-        // BUG: ov_read can return negative value indicating an error, making this loop infinite
-        // if end of file or read limit exceeded
-        if (ret == 0)
+        const auto ret = ov_read(ovf, _dest + TotalRet, left - TotalRet, 0, 2, 1, &current_section);
+        if (ret <= 0 && !ov_can_continue_read(ret))
             break;
-        else if (ret < 0) // Error in bitstream
-        {
-            //
-        }
-        else
-        {
-            TotalRet += ret;
-        }
+        TotalRet += ret;
     }
 }
