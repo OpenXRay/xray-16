@@ -598,9 +598,9 @@ protected:
     shared_str m_action_param;
     bool ParseControlString(LPCSTR args_string)
     {
-        string16 action_name;
+        char action_name[17];
         action_name[0] = 0;
-        string32 param_name;
+        char param_name[33];
         param_name[0] = 0;
 
         sscanf(args_string, "%16s %32s", action_name, param_name);
