@@ -133,7 +133,7 @@ XRCORE_API void log_vminfo()
 {
     size_t w_free, w_reserved, w_committed;
     vminfo(&w_free, &w_reserved, &w_committed);
-    Msg("* [ %s ]: free[%d K], reserved[%d K], committed[%d K]", SDL_GetPlatform(), w_free / 1024, w_reserved / 1024, w_committed / 1024);
+    Msg("* [ %s ]: free[%zu K], reserved[%zu K], committed[%zu K]", SDL_GetPlatform(), w_free / 1024, w_reserved / 1024, w_committed / 1024);
 }
 
 size_t xrMemory::mem_usage()

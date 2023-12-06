@@ -146,7 +146,7 @@ void configs_dumper::write_configs()
     string16 tmp_strbuff;
     for (active_objects_t::size_type i = 0; i < aobjs_count; ++i)
     {
-        xr_sprintf(tmp_strbuff, "%d", i + 1);
+        xr_sprintf(tmp_strbuff, "%zu", i + 1);
         m_active_params.dump(active_objects[i], tmp_strbuff, active_params_dumper);
     }
     active_params_dumper.save_as(m_dump_result);
