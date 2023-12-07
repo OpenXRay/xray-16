@@ -7,25 +7,17 @@ struct ALDeviceDesc
     string256 name = { 0 };
     int minor_ver;
     int major_ver;
-    union ESndProps
+    struct ESndProps
     {
-        struct
-        {
-            u16 selected : 1;
-            u16 eax : 3;
-            u16 efx : 1;
-
-            u16 unused : 9;
-        };
-        u16 storage;
+        bool selected : 1;
     };
-    ESndProps props;
+
+    ESndProps props{};
     ALDeviceDesc(pcstr nm, int mn, int mj)
     {
         xr_strcpy(name, nm);
         minor_ver = mn;
         major_ver = mj;
-        props.storage = 0;
     }
 };
 

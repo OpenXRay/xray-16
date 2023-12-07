@@ -6,12 +6,6 @@
 #include "SoundRender_Source.h"
 #include "SoundRender_Emitter.h"
 
-// XXX: old SDK functionality
-//#if defined(XR_PLATFORM_WINDOWS)
-//#define OPENAL
-//#include <eax/eax.h>
-//#endif
-
 XRSOUND_API Flags32 psSoundFlags =
 {
     ss_Hardware | ss_EFX
@@ -193,7 +187,7 @@ void CSoundRender_Core::env_apply()
 
 void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
 {
-    if (!psSoundFlags.test(ss_EFX) || !m_effects)
+    if (!psSoundFlags.test(ss_EFX))
         return;
 
     // Update effects
@@ -204,9 +198,6 @@ void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, cons
     }
 
     e_current.lerp(e_current, e_target, fTimer_Delta);
-
-    m_effects->set_listener(e_current);
-    m_effects->commit();
 }
 
 void CSoundRender_Core::refresh_sources()

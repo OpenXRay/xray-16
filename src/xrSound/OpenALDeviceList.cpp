@@ -63,17 +63,6 @@ void ALDeviceList::IterateAndAddDevicesString(pcstr devices)
                     alcGetIntegerv(device, ALC_MINOR_VERSION, sizeof(int), &minor);
 
                     auto& addedDevice = m_devices.emplace_back(actualDeviceName, minor, major);
-
-                    if (alIsExtensionPresent("EAX5.0"))
-                        addedDevice.props.eax = 5;
-                    else if (alIsExtensionPresent("EAX4.0"))
-                        addedDevice.props.eax = 4;
-                    else if (alIsExtensionPresent("EAX3.0"))
-                        addedDevice.props.eax = 3;
-                    else if (alIsExtensionPresent("EAX2.0"))
-                        addedDevice.props.eax = 2;
-
-                    addedDevice.props.efx = alcIsExtensionPresent(device, "ALC_EXT_EFX") == AL_TRUE;
                 }
                 alcDestroyContext(context);
             }
@@ -164,9 +153,8 @@ void ALDeviceList::Enumerate()
         for (u32 j = 0; j < GetNumDevices(); j++)
         {
             GetDeviceVersion(j, &majorVersion, &minorVersion);
-            Msg("%d. %s, Spec Version %d.%d %s eax[%d] efx[%s]", j + 1, GetDeviceName(j), majorVersion,
-                minorVersion, xr_stricmp(GetDeviceName(j), m_defaultDeviceName) == 0 ? "(default)" : "",
-                GetDeviceDesc(j).props.eax, GetDeviceDesc(j).props.efx ? "yes" : "no");
+            Msg("%d. %s, Spec Version %d.%d %s", j + 1, GetDeviceName(j), majorVersion,
+                minorVersion, xr_stricmp(GetDeviceName(j), m_defaultDeviceName) == 0 ? "(default)" : "");
         }
 #endif
     }

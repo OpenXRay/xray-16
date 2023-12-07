@@ -4,8 +4,6 @@
 #include "SoundRender_CoreA.h"
 #include "SoundRender_TargetA.h"
 #include "OpenALDeviceList.h"
-#include "SoundRender_EffectsA_EAX.h"
-#include "SoundRender_EffectsA_EFX.h"
 
 CSoundRender_CoreA::CSoundRender_CoreA(CSoundManager& p)
     : CSoundRender_Core(p)
@@ -85,39 +83,13 @@ void CSoundRender_CoreA::_initialize()
 
     supports_float_pcm &= psSoundFlags.test(ss_UseFloat32);
 
-    auto auxSlot = ALuint(-1);
-#if defined(XR_HAS_EAX)
-    // Check for EAX extension
-    if (deviceDesc.props.eax && !m_effects)
-    {
-        m_effects = xr_new<CSoundRender_EffectsA_EAX>();
-        if (!m_effects->initialized())
-        {
-            Log("SOUND: OpenAL: Failed to initialize EAX.");
-            xr_delete(m_effects);
-        }
-    }
-#elif defined(XR_HAS_EFX)
-    // Check for EFX extension
-    if (deviceDesc.props.efx && !m_effects)
-    {
-        m_effects = xr_new<CSoundRender_EffectsA_EFX>();
-        if (m_effects->initialized())
-            auxSlot = ((CSoundRender_EffectsA_EFX*)m_effects)->get_slot();
-        else
-        {
-            Log("SOUND: OpenAL: Failed to initialize EFX.");
-            xr_delete(m_effects);
-        }
-    }
-#endif
     inherited::_initialize();
 
     // Pre-create targets
     CSoundRender_Target* T = nullptr;
     for (u32 tit = 0; tit < u32(psSoundTargets); tit++)
     {
-        T = xr_new<CSoundRender_TargetA>(auxSlot);
+        T = xr_new<CSoundRender_TargetA>();
         if (T->_initialize())
         {
             s_targets.emplace_back(T);
@@ -141,7 +113,6 @@ void CSoundRender_CoreA::set_master_volume(float f)
 void CSoundRender_CoreA::_clear()
 {
     inherited::_clear();
-    xr_delete(m_effects);
     // remove targets
     for (auto& T : s_targets)
     {
