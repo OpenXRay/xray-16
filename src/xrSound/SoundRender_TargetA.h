@@ -20,7 +20,7 @@ class CSoundRender_TargetA : public CSoundRender_Target
     void submit_all_buffers() const;
 
 public:
-    CSoundRender_TargetA();
+    CSoundRender_TargetA() = default;
 
     bool _initialize() override;
     void _destroy() override;

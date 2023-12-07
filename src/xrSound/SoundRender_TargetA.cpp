@@ -4,10 +4,6 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
 
-CSoundRender_TargetA::CSoundRender_TargetA()
-{
-}
-
 bool CSoundRender_TargetA::_initialize()
 {
     A_CHK(alGenBuffers(sdef_target_count_submit, pBuffers));

@@ -4,7 +4,6 @@
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
-#include "SoundRender_Effects.h"
 #include "SoundRender_Scene.h"
 
 class CSoundRender_Core : public ISoundManager
@@ -75,8 +74,6 @@ protected:
 
     u32 s_emitters_u; // emitter update marker
     xr_vector<CSoundRender_Target*> s_targets;
-
-    CSoundRender_Effects* m_effects{};
 
 public:
     bool supports_float_pcm{};

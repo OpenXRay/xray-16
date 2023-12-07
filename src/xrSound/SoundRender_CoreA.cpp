@@ -4,7 +4,6 @@
 #include "SoundRender_CoreA.h"
 #include "SoundRender_TargetA.h"
 #include "OpenALDeviceList.h"
-#include "SoundRender_EffectsA_EAX.h"
 
 CSoundRender_CoreA::CSoundRender_CoreA(CSoundManager& p)
     : CSoundRender_Core(p)
@@ -86,18 +85,6 @@ void CSoundRender_CoreA::_initialize()
 
     supports_float_pcm &= psSoundFlags.test(ss_UseFloat32);
 
-#if defined(XR_HAS_EAX)
-    // Check for EAX extension
-    if (deviceDesc.props.eax && !m_effects)
-    {
-        m_effects = xr_new<CSoundRender_EffectsA_EAX>();
-        if (!m_effects->initialized())
-        {
-            Log("SOUND: OpenAL: Failed to initialize EAX.");
-            xr_delete(m_effects);
-        }
-    }
-#endif
     inherited::_initialize();
 
     // Pre-create targets
@@ -128,7 +115,6 @@ void CSoundRender_CoreA::set_master_volume(float f)
 void CSoundRender_CoreA::_clear()
 {
     inherited::_clear();
-    xr_delete(m_effects);
     // remove targets
     for (auto& T : s_targets)
     {

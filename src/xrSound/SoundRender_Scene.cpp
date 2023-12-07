@@ -407,38 +407,9 @@ CSound_environment* CSoundRender_Scene::get_environment(const Fvector& P)
 
 void CSoundRender_Scene::set_environment_size(CSound_environment* src_env, CSound_environment** dst_env)
 {
-    // XXX: old SDK functionality
-    /*if (bEAX)
-    {
-        CSoundRender_Environment* SE = static_cast<CSoundRender_Environment*>(src_env);
-        CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
-#if defined(XR_PLATFORM_WINDOWS)
-        // set environment
-        i_eax_set(&DSPROPSETID_EAX_ListenerProperties,
-            DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &SE->EnvironmentSize,
-            sizeof(SE->EnvironmentSize));
-        i_eax_listener_set(SE);
-        i_eax_commit_setting();
-        i_eax_set(&DSPROPSETID_EAX_ListenerProperties,
-            DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &DE->EnvironmentSize,
-            sizeof(DE->EnvironmentSize));
-        i_eax_listener_get(DE);
-#endif
-    }*/
 }
 
 
 void CSoundRender_Scene::set_environment(u32 id, CSound_environment** dst_env)
 {
-    // XXX: old SDK functionality
-    /*if (bEAX)
-    {
-        CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
-#if defined(XR_PLATFORM_WINDOWS)
-        // set environment
-        i_eax_set(&DSPROPSETID_EAX_ListenerProperties,
-            DSPROPERTY_EAXLISTENER_IMMEDIATE | DSPROPERTY_EAXLISTENER_ENVIRONMENTSIZE, &id, sizeof(id));
-        i_eax_listener_get(DE);
-#endif
-    }*/
 }
