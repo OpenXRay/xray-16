@@ -17,7 +17,6 @@
 #   endif
 #endif
 
-constexpr pcstr SNDENV_FILENAME = "sEnvironment.xr";
 #define OGG_COMMENT_VERSION 0x0003
 
 // refs
@@ -29,8 +28,6 @@ class XRSOUND_API CSound_params;
 class XRSOUND_API CSound_source;
 class XRSOUND_API CSound_emitter;
 class XRSOUND_API CSound_stream_interface;
-class XRSOUND_API CSound_environment;
-class XRSOUND_API SoundEnvironment_LIB; // editor only ref
 class XRSOUND_API CSound_stats_ext;
 struct xr_token;
 class IReader;
@@ -105,10 +102,6 @@ public:
 };
 
 inline CSound_source::~CSound_source() = default;
-
-/// definition (Sound Source)
-class XRSOUND_API CSound_environment
-{};
 
 /// definition (Sound Params)
 class XRSOUND_API CSound_params
@@ -221,14 +214,8 @@ public:
     virtual int pause_emitters(bool pauseState) = 0;
 
     virtual void set_handler(sound_event* E) = 0;
-    virtual void set_geometry_env(IReader* I) = 0;
     virtual void set_geometry_som(IReader* I) = 0;
     virtual void set_geometry_occ(CDB::MODEL* M, const Fbox& aabb) = 0;
-
-    virtual void set_user_env(CSound_environment* E) = 0;
-    virtual void set_environment(u32 id, CSound_environment** dst_env) = 0;
-    virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env) = 0;
-    virtual CSound_environment* get_environment(const Fvector& P) = 0;
 
     virtual float get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion = 0.2f) = 0;
     virtual float get_occlusion(const Fvector& P, float R, Fvector* occ) = 0;
@@ -279,8 +266,6 @@ class XRSOUND_API CSoundManager
 {
     xr_vector<xr_token> soundDevices;
 
-    SoundEnvironment_LIB* soundEnvironment{};
-
 public:
     void  CreateDevicesList();
     auto& GetDevicesList() { return soundDevices; }
@@ -290,11 +275,6 @@ public:
 
     [[nodiscard]]
     bool IsSoundEnabled() const;
-
-    void env_load();
-    void env_unload();
-    void refresh_env_library();
-    SoundEnvironment_LIB* get_env_library() const;
 };
 
 class CSound_UserDataVisitor;

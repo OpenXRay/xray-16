@@ -53,7 +53,6 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         smooth_volume = p_source.base_volume * p_source.volume *
             (owner_data->s_type == st_Effect ? psSoundVEffects * psSoundVFactor : psSoundVMusic) *
             (b2D ? 1.f : occluder_volume);
-        e_current = e_target = *(CSoundRender_Environment*)scene->get_environment(p_source.position);
         if (update_culling(dt))
         {
             m_current_state = stPlaying;
@@ -81,7 +80,6 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         smooth_volume = p_source.base_volume * p_source.volume *
             (owner_data->s_type == st_Effect ? psSoundVEffects * psSoundVFactor : psSoundVMusic) *
             (b2D ? 1.f : occluder_volume);
-        e_current = e_target = *(CSoundRender_Environment*)scene->get_environment(p_source.position);
         if (update_culling(dt))
         {
             m_current_state = stPlayingLooped;
@@ -367,9 +365,6 @@ void CSoundRender_Emitter::update_environment(float dt)
 {
     if (bMoved)
     {
-        e_target = *(CSoundRender_Environment*)scene->get_environment(p_source.position);
-        // Cribbledirge: updates the velocity of the sound.
         p_source.update_velocity(dt);
     }
-    e_current.lerp(e_current, e_target, dt);
 }

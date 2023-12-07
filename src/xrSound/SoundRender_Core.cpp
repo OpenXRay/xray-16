@@ -34,8 +34,6 @@ CSoundRender_Core::CSoundRender_Core(CSoundManager& p)
     bPresent = false;
     s_targets_pu = 0;
     s_emitters_u = 0;
-    e_current.set_identity();
-    e_target.set_identity();
     bListenerMoved = false;
     bReady = false;
     isLocked = false;
@@ -187,17 +185,10 @@ void CSoundRender_Core::env_apply()
 
 void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
 {
-    if (!psSoundFlags.test(ss_EFX))
+    if (!psSoundFlags.test(ss_EFX) || !bListenerMoved)
         return;
 
-    // Update effects
-    if (bListenerMoved)
-    {
-        bListenerMoved = false;
-        e_target = *(CSoundRender_Environment*)DefaultSoundScene->get_environment(P);
-    }
-
-    e_current.lerp(e_current, e_target, fTimer_Delta);
+    bListenerMoved = false;
 }
 
 void CSoundRender_Core::refresh_sources()

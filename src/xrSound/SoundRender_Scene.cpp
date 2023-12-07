@@ -14,15 +14,11 @@ CSoundRender_Scene::~CSoundRender_Scene()
 
     set_geometry_occ(nullptr, {});
     set_geometry_som(nullptr);
-    set_geometry_env(nullptr);
 
     // remove emitters
     for (auto& emit : s_emitters)
         xr_delete(emit);
     s_emitters.clear();
-
-    xr_delete(geom_ENV);
-    xr_delete(geom_SOM);
 }
 
 void CSoundRender_Scene::stop_emitters() const
@@ -93,60 +89,6 @@ void CSoundRender_Scene::set_geometry_som(IReader* I)
     // Create AABB-tree
     geom_SOM = xr_new<CDB::MODEL>();
     geom_SOM->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
-}
-
-void CSoundRender_Scene::set_geometry_env(IReader* I)
-{
-    xr_delete(geom_ENV);
-    if (nullptr == I)
-        return;
-    const auto envLib = SoundRender->Parent.get_env_library();
-    if (!envLib)
-        return;
-
-    // Associate names
-    xr_vector<u16> ids;
-    IReader* names = I->open_chunk(0);
-    while (!names->eof())
-    {
-        string256 n;
-        names->r_stringZ(n, sizeof(n));
-        const int id = envLib->GetID(n);
-        R_ASSERT(id >= 0);
-        ids.push_back((u16)id);
-    }
-    names->close();
-
-    // Load geometry
-    IReader* geom_ch = I->open_chunk(1);
-
-    u8* _data = (u8*)xr_malloc(geom_ch->length());
-
-    memcpy(_data, geom_ch->pointer(), geom_ch->length());
-
-    IReader* geom = xr_new<IReader>(_data, geom_ch->length(), 0);
-
-    hdrCFORM H;
-    geom->r(&H, sizeof(hdrCFORM));
-    Fvector* verts = (Fvector*)geom->pointer();
-    CDB::TRI* tris = (CDB::TRI*)(verts + H.vertcount);
-    for (u32 it = 0; it < H.facecount; it++)
-    {
-        CDB::TRI* T = tris + it;
-        const u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0); //	front face
-        const u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16); //	back face
-        R_ASSERT(id_front < (u16)ids.size());
-        R_ASSERT(id_back < (u16)ids.size());
-        T->dummy = u32(ids[id_back] << 16) | u32(ids[id_front]);
-    }
-    geom_ENV = xr_new<CDB::MODEL>();
-    geom_ENV->build(verts, H.vertcount, tris, H.facecount);
-#ifdef _EDITOR // XXX: may be we are interested in applying env in the game build too?
-    env_apply();
-#endif
-    geom_ch->close();
-    geom->close();
-    xr_free(_data);
 }
 
 void CSoundRender_Scene::play(ref_sound& S, IGameObject* O, u32 flags, float delay)
@@ -337,67 +279,4 @@ float CSoundRender_Scene::get_occlusion(const Fvector& P, float R, Fvector* occ)
         }
     }
     return occ_value;
-}
-
-void CSoundRender_Scene::set_user_env(CSound_environment* E)
-{
-    if (0 == E && !bUserEnvironment)
-        return;
-
-    if (E)
-    {
-        s_user_environment = *((CSoundRender_Environment*)E);
-        bUserEnvironment = true;
-    }
-    else
-    {
-        bUserEnvironment = false;
-    }
-    SoundRender->env_apply();
-}
-
-CSound_environment* CSoundRender_Scene::get_environment(const Fvector& P)
-{
-    static CSoundRender_Environment identity;
-
-    if (bUserEnvironment)
-    {
-        return &s_user_environment;
-    }
-    if (geom_ENV)
-    {
-        constexpr Fvector dir = { 0, -1, 0 };
-        geom_DB.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, dir, 1000.f);
-        if (geom_DB.r_count())
-        {
-            const auto envLib = SoundRender->Parent.get_env_library();
-
-            const CDB::RESULT* r = geom_DB.r_begin();
-            const CDB::TRI* T = geom_ENV->get_tris() + r->id;
-            const Fvector* V = geom_ENV->get_verts();
-            Fvector tri_norm;
-            tri_norm.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
-            const float dot = dir.dotproduct(tri_norm);
-            if (dot < 0)
-            {
-                const u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0); //	front face
-                return envLib->Get(id_front);
-            }
-            const u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16); //	back face
-            return envLib->Get(id_back);
-        }
-        identity.set_identity();
-        return &identity;
-    }
-    identity.set_identity();
-    return &identity;
-}
-
-void CSoundRender_Scene::set_environment_size(CSound_environment* src_env, CSound_environment** dst_env)
-{
-}
-
-
-void CSoundRender_Scene::set_environment(u32 id, CSound_environment** dst_env)
-{
 }

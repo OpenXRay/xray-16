@@ -3,7 +3,6 @@
 #include "xrCore/_std_extensions.h"
 
 #include "SoundRender.h"
-#include "SoundRender_Environment.h"
 #include "SoundRender_Scene.h"
 
 class CSoundRender_Emitter final : public CSound_emitter
@@ -52,8 +51,6 @@ public:
     u32 m_stream_cursor{};
     u32 m_cur_handle_cursor{};
     CSound_params p_source;
-    CSoundRender_Environment e_current;
-    CSoundRender_Environment e_target;
 
     int iPaused{};
     bool bMoved;

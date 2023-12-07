@@ -36,7 +36,6 @@
     <ClInclude Include="SoundRender_Core.h" />
     <ClInclude Include="SoundRender_CoreA.h" />
     <ClInclude Include="SoundRender_Emitter.h" />
-    <ClInclude Include="SoundRender_Environment.h" />
     <ClInclude Include="SoundRender_Scene.h" />
     <ClInclude Include="SoundRender_Source.h" />
     <ClInclude Include="SoundRender_Target.h" />
@@ -54,7 +53,6 @@
     <ClCompile Include="SoundRender_Emitter.cpp" />
     <ClCompile Include="SoundRender_Emitter_FSM.cpp" />
     <ClCompile Include="SoundRender_Emitter_StartStop.cpp" />
-    <ClCompile Include="SoundRender_Environment.cpp" />
     <ClCompile Include="SoundRender_Scene.cpp" />
     <ClCompile Include="SoundRender_Source.cpp" />
     <ClCompile Include="SoundRender_Target.cpp" />
