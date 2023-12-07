@@ -39,6 +39,7 @@ public:
 public:
 #ifdef USE_PHONON
     IPLScene ipl_scene{};
+    IPLStaticMesh ipl_scene_mesh{};
     IPLSimulator ipl_simulator{};
 #endif
 
