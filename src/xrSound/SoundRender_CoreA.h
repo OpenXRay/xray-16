@@ -4,6 +4,7 @@
 
 #include <al.h>
 #include <alc.h>
+#include <alext.h>
 
 #ifdef DEBUG
 #define A_CHK(expr)                                             \

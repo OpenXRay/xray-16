@@ -52,17 +52,38 @@ bool ov_can_continue_read(long res)
 }
 }
 
-void CSoundRender_Source::i_decompress_fr(OggVorbis_File* ovf, char* _dest, u32 left)
+void CSoundRender_Source::i_decompress(OggVorbis_File* ovf, char* _dest, u32 size) const
 {
-    int current_section;
     long TotalRet = 0;
 
     // Read loop
-    while (TotalRet < static_cast<long>(left))
+    while (TotalRet < static_cast<long>(size))
     {
-        const auto ret = ov_read(ovf, _dest + TotalRet, left - TotalRet, 0, 2, 1, &current_section);
+        const auto ret = ov_read(ovf, _dest + TotalRet, size - TotalRet, 0, 2, 1, nullptr);
         if (ret <= 0 && !ov_can_continue_read(ret))
             break;
         TotalRet += ret;
+    }
+}
+
+void CSoundRender_Source::i_decompress(OggVorbis_File* ovf, float* _dest, u32 size) const
+{
+    s32 left = s32(size / m_wformat.nBlockAlign);
+    while (left)
+    {
+        float** pcm;
+        long samples = ov_read_float(ovf, &pcm, left, nullptr);
+
+        if (samples <= 0 && !ov_can_continue_read(samples))
+            break;
+
+        if (samples > left)
+            samples = left;
+
+        for (long j = 0; j < samples; j++)
+            for (long i = 0; i < m_wformat.nChannels; i++)
+                *_dest++ = pcm[i][j];
+
+        left -= samples;
     }
 }

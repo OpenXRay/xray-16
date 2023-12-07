@@ -59,7 +59,7 @@ void CSoundRender_Core::_initialize()
     bPresent = true;
 
     // Cache
-    cache_bytes_per_line = (sdef_target_block / 8) * 276400 / 1000;
+    cache_bytes_per_line = (sdef_target_block / 8) * 352800 / 1000;
     cache.initialize(psSoundCacheSizeMB * 1024, cache_bytes_per_line);
 
     bReady = true;

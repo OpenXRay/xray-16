@@ -80,6 +80,11 @@ void CSoundRender_CoreA::_initialize()
     A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&orient[0].x));
     A_CHK(alListenerf(AL_GAIN, 1.f));
 
+#if AL_EXT_float32
+    supports_float_pcm = alIsExtensionPresent("AL_EXT_FLOAT32")  // first is OpenAL Soft,
+                      || alIsExtensionPresent("AL_EXT_float32"); // second is macOS
+#endif
+
     auto auxSlot = ALuint(-1);
 #if defined(XR_HAS_EAX)
     // Check for EAX extension
