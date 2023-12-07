@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SoundRender_Environment.h"
-
 class CSoundRender_Emitter;
 
 class CSoundRender_Scene final : public ISoundScene
@@ -13,15 +11,8 @@ public:
     int pause_emitters(bool pauseState) override;
 
     void set_handler(sound_event* E) override;
-
-    void set_geometry_env(IReader* I) override;
     void set_geometry_som(IReader* I) override;
     void set_geometry_occ(CDB::MODEL* M, const Fbox& aabb) override;
-
-    void set_user_env(CSound_environment* E) override;
-    void set_environment(u32 id, CSound_environment** dst_env) override;
-    void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env) override;
-    CSound_environment* get_environment(const Fvector& P) override;
 
     void play(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f) override;
     void play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f) override;
@@ -57,10 +48,6 @@ private:
     CDB::COLLIDER geom_DB;
     CDB::MODEL* geom_SOM{};
     CDB::MODEL* geom_MODEL{};
-    CDB::MODEL* geom_ENV{};
-
-    bool bUserEnvironment{};
-    CSoundRender_Environment s_user_environment;
 
     int m_iPauseCounter{ 1 };
 };

@@ -22,9 +22,6 @@
     <Filter Include="Target\OpenAL">
       <UniqueIdentifier>{78af2929-abf7-471a-ad73-84c55ce54450}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Environment">
-      <UniqueIdentifier>{ea9d1124-af1e-471f-a0a0-d2d77275a8ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{764beefb-01ae-4d1b-9504-a66144a44420}</UniqueIdentifier>
     </Filter>
@@ -59,9 +56,6 @@
     </ClInclude>
     <ClInclude Include="SoundRender_TargetA.h">
       <Filter>Target\OpenAL</Filter>
-    </ClInclude>
-    <ClInclude Include="SoundRender_Environment.h">
-      <Filter>Environment</Filter>
     </ClInclude>
     <ClInclude Include="SoundRender_Scene.h">
       <Filter>Scene</Filter>
@@ -109,9 +103,6 @@
     </ClCompile>
     <ClCompile Include="SoundRender_TargetA.cpp">
       <Filter>Target\OpenAL</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundRender_Environment.cpp">
-      <Filter>Environment</Filter>
     </ClCompile>
     <ClCompile Include="SoundRender_Scene.cpp">
       <Filter>Scene</Filter>

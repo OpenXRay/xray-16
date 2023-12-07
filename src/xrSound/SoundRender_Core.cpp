@@ -30,8 +30,6 @@ CSoundRender_Core::CSoundRender_Core(CSoundManager& p)
 {
     bPresent = false;
     s_emitters_u = 0;
-    e_current.set_identity();
-    e_target.set_identity();
     bReady = false;
     isLocked = false;
     fTimer_Value = Timer.GetElapsed_sec();
@@ -186,17 +184,10 @@ void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, cons
     Listener.orientation[1] = N;
     Listener.orientation[2] = R;
 
-    if (!psSoundFlags.test(ss_EFX))
+    if (!psSoundFlags.test(ss_EFX) || !bListenerMoved)
         return;
 
-    // Update effects
-    if (bListenerMoved)
-    {
-        bListenerMoved = false;
-        e_target = *(CSoundRender_Environment*)DefaultSoundScene->get_environment(P);
-    }
-
-    e_current.lerp(e_current, e_target, fTimer_Delta);
+    bListenerMoved = false;
 }
 
 void CSoundRender_Core::refresh_sources()
