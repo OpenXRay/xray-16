@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xr_types.h"
+#include <thread>
 
 namespace FPU
 {
@@ -22,6 +23,11 @@ XRCORE_API extern u32 qpc_counter;
 XRCORE_API extern u64 QPC() noexcept;
 
 XRCORE_API u32 GetTicks();
+
+// GermanAizek: This implementation supports both conventional single-cpu PC configurations
+//              and multi-cpu system on NUMA (Non-uniform_memory_access) architecture
+XRCORE_API size_t GetThreadsCounts() noexcept;
+XRCORE_API void setThreadAffinityAllGroupCores(HANDLE handle) noexcept;
 }
 
 extern XRCORE_API void _initialize_cpu();

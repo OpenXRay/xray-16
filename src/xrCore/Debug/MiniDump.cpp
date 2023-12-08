@@ -126,6 +126,7 @@ WriteMiniDumpResult __stdcall WriteMiniDumpW(
     if ((HANDLE)-1 != hThread)
     {
         // The thread is running.  Block until the thread ends.
+        CPU::setThreadAffinityAllGroupCores(hThread);
         WaitForSingleObject(hThread, INFINITE);
         CloseHandle(hThread);
     }

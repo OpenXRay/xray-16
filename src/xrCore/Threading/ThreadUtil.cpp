@@ -84,6 +84,7 @@ bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist)
         return false;
     }
 
+    CPU::setThreadAffinityAllGroupCores(threadHandle);
     ResumeThread(threadHandle);
     return true;
 }

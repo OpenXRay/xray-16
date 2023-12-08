@@ -201,6 +201,68 @@ XRCORE_API u32 GetTicks()
 {
     return SDL_GetTicks();
 }
+
+XRCORE_API size_t GetThreadsCounts() noexcept
+{
+#if defined(XR_PLATFORM_WINDOWS)
+    DWORD length = 0; 
+    const auto single_cpu_concurrency = []() noexcept -> size_t
+    {
+        return std::thread::hardware_concurrency();
+    };
+    if (GetLogicalProcessorInformationEx(RelationAll, nullptr, &length) != FALSE)
+    {
+        return single_cpu_concurrency();
+    }
+    if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+    {
+        return single_cpu_concurrency();
+    }
+    std::unique_ptr<void, void (*)(void*)> buffer(std::malloc(length), std::free);
+    if (!buffer)
+    {
+        return single_cpu_concurrency();
+    }
+    auto* mem = reinterpret_cast<unsigned char*>(buffer.get());
+    if (GetLogicalProcessorInformationEx(
+            RelationAll, reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(mem), &length) == false)
+    {
+        return single_cpu_concurrency();
+    }
+    DWORD i = 0;
+    size_t concurrency = 0;
+    while (i < length)
+    {
+        const auto* proc = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(mem + i);
+        if (proc->Relationship == RelationProcessorCore)
+        {
+            for (WORD group = 0; group < proc->Processor.GroupCount; ++group)
+            {
+                for (KAFFINITY mask = proc->Processor.GroupMask[group].Mask; mask != 0; mask >>= 1)
+                {
+                    concurrency += mask & 1;
+                }
+            }
+        }
+        i += proc->Size;
+    }
+    return concurrency;
+#else
+    return std::thread::hardware_concurrency();
+#endif
+}
+
+XRCORE_API void setThreadAffinityAllGroupCores(HANDLE handle) noexcept
+{
+#if defined(XR_PLATFORM_WINDOWS)
+    const auto threads = GetThreadsCounts();
+    if (threads >= 64 && *(DWORD*)(0x7FFE0000 + 0x260) <= 19045 /* Windows 10 22H2 */)
+    {
+        SetThreadAffinityMask(handle, (1 << threads) - 1);
+    }
+#endif
+}
+
 } // namespace CPU
 
 bool g_initialize_cpu_called = false;
@@ -236,7 +298,7 @@ void _initialize_cpu()
     listFeature("AltiVec", SDL_HasAltiVec());
 
     Msg("* CPU features: %s", features);
-    Msg("* CPU threads: %d", std::thread::hardware_concurrency());
+    Msg("* CPU threads: %d", CPU::GetThreadsCounts());
 
     CPU::HasSSE = SDL_HasSSE(); // just in case, not sure if needed
 
