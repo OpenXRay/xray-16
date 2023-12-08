@@ -16,6 +16,7 @@ add_subdirectory(OPCODE)
 add_subdirectory(ode)
 #add_subdirectory(NVTT)
 add_subdirectory(imgui-proj)
+add_subdirectory(doctest EXCLUDE_FROM_ALL)
 
 if (NOT TARGET xrLuabind)
     message(FATAL_ERROR
