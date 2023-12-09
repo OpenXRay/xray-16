@@ -20,3 +20,4 @@ extern Flags32 g_mt_config;
 #define mtLevelSounds (1 << 7)
 #define mtALife (1 << 8)
 #define mtMap (1 << 9)
+#define mtServer (1 << 10)

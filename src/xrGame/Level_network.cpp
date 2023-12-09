@@ -21,6 +21,7 @@
 #include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/PhysicsCommon.h"
+#include "mt_config.h"
 
 const int max_objects_size = 2 * 1024;
 const int max_objects_size_in_save = 8 * 1024;
@@ -328,7 +329,10 @@ void CLevel::net_Update()
     }
     // If server - perform server-update
     if (Server && OnServer())
-        Server->Update();
+        if (g_mt_config.test(mtServer))
+            Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(Server, &xrServer::Update));
+        else
+            Server->Update();
 }
 
 struct _NetworkProcessor : public pureFrame
