@@ -2100,8 +2100,8 @@ Global
 		{2C419512-6EEE-4707-BC51-2E834855552E}.Mixed|x86.Build.0 = Mixed|Win32
 		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM.ActiveCfg = Release Master Gold|ARM
 		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM.Build.0 = Release Master Gold|ARM
-		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM64.ActiveCfg = Release Master Gold|x64
-		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM64.Build.0 = Release Master Gold|x64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM64.ActiveCfg = Release Master Gold|ARM64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM64.Build.0 = Release Master Gold|ARM64
 		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|x64.ActiveCfg = Release Master Gold|x64
 		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|x64.Build.0 = Release Master Gold|x64
 		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|x86.ActiveCfg = Release Master Gold|Win32
