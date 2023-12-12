@@ -44,8 +44,7 @@ target_link_libraries(xrGameMtlLib
 
 target_compile_definitions(xrGameMtlLib
     PRIVATE
-    ENGINE_BUILD
-    PURE_DYNAMIC_CAST
+    XRMTL_LIB_EXPORTS
 )
 
 set_target_properties(xrGameMtlLib PROPERTIES
