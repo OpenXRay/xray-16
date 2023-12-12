@@ -13,7 +13,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "PHCollideValidator.h"
 #include "xrCore/Animation/Bone.hpp"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 
 #include "ExtendedGeom.h"
 #include "PHElement.h"

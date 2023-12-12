@@ -124,9 +124,6 @@
     <Filter Include="OpenAutomate">
       <UniqueIdentifier>{fe56b488-34f8-4632-9f5e-7805f761b338}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game API\MaterialSystem">
-      <UniqueIdentifier>{59004dc1-5e77-4968-8321-6290b1ab9d3a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game API\Level">
       <UniqueIdentifier>{6e4e4f2d-02fc-4141-9ae3-ca29550fc16d}</UniqueIdentifier>
     </Filter>
@@ -344,9 +341,6 @@
     </ClInclude>
     <ClInclude Include="xrSASH.h">
       <Filter>OpenAutomate</Filter>
-    </ClInclude>
-    <ClInclude Include="GameMtlLib.h">
-      <Filter>Game API\MaterialSystem</Filter>
     </ClInclude>
     <ClInclude Include="IGameFont.hpp">
       <Filter>Render\Font output</Filter>
@@ -583,12 +577,6 @@
     </ClCompile>
     <ClCompile Include="xrSASH.cpp">
       <Filter>OpenAutomate</Filter>
-    </ClCompile>
-    <ClCompile Include="GameMtlLib.cpp">
-      <Filter>Game API\MaterialSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="GameMtlLib_Engine.cpp">
-      <Filter>Game API\MaterialSystem</Filter>
     </ClCompile>
     <ClCompile Include="IGame_Level.cpp">
       <Filter>Game API\Level</Filter>

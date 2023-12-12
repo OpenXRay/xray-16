@@ -8,7 +8,7 @@
 #include "xrPhysics/console_vars.h"
 #include "xrPhysics/PHWorld.h"
 #include "xrCDB/xr_area.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 #ifdef DEBUG
 #include "xrPhysics/debug_output.h"
 #endif

@@ -9,7 +9,7 @@
 #include "MathUtilsOde.h"
 #include "IPhysicsShellHolder.h"
 #include "PHCharacter.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 
 namespace detail::movement_box
 {

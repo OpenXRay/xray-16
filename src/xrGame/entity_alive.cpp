@@ -3,7 +3,7 @@
 #include "InventoryOwner.h"
 #include "Inventory.h"
 #include "xrPhysics/PhysicsShell.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 #include "PHMovementControl.h"
 #include "Wound.h"
 #include "xrMessages.h"

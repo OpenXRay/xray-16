@@ -7,7 +7,7 @@
 #include "IPhysicsShellHolder.h"
 
 #include "xrCDB/Intersect.hpp"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 
 #include "tri-colliderknoopc/__aabb_tri.h"
 #include "ode/ode/src/util.h"

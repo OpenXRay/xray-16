@@ -19,7 +19,7 @@
 #include "Level.h"
 #include "Level_Bullet_Manager.h"
 #include "xrMessages.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 
 #ifdef DEBUG
 #include "xrEngine/StatGraph.h"

@@ -6,7 +6,7 @@
 #include "character_info.h"
 #include "xrEngine/xr_level_controller.h"
 #include "CustomZone.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 #include "ui/UIMainIngameWnd.h"
 #include "UIGameCustom.h"
 #include "Grenade.h"

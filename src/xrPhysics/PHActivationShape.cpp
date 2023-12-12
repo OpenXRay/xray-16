@@ -8,7 +8,7 @@
 #include "ExtendedGeom.h"
 #include "SpaceUtils.h"
 #include "MathUtils.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 
 #include "PHWorld.h"
 #include "ode/ode/src/util.h"

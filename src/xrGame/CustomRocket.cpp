@@ -13,7 +13,7 @@
 
 #include "Level.h"
 #include "xrMessages.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 
 #include "Include/xrRender/RenderVisual.h"
 

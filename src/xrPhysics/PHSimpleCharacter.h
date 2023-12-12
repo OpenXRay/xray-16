@@ -4,7 +4,7 @@
 #include "MathUtils.h"
 #include "ElevatorState.h"
 #include "IColisiondamageInfo.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrGameMtlLib/GameMtlLib.h"
 #include "xrCDB/xr_collide_defs.h"
 
 namespace ALife
