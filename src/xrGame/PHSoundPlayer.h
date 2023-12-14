@@ -1,5 +1,5 @@
 #pragma once
-#include "xrGameMtlLib/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 
 class CPhysicsShellHolder;
 

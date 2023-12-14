@@ -15,7 +15,7 @@
 #include "xrPhysics/IPHWorld.h"
 
 #include "detail_path_manager.h"
-#include "xrGameMtlLib/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "xrEngine/xr_object.h"
 #include "CaptureBoneCallback.h"
 #include "Level.h"

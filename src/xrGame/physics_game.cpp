@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "ParticlesObject.h"
-#include "xrGameMtlLib/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "Level.h"
 #include "GamePersistent.h"
 #include "xrPhysics/ExtendedGeom.h"

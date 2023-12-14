@@ -2,7 +2,7 @@
 #include "GamePersistent.h"
 #include "xrCore/FMesh.hpp"
 #include "xrEngine/XR_IOConsole.h"
-#include "xrGameMtlLib/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/profiler.h"
 #include "MainMenu.h"

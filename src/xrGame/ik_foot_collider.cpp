@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "ik_foot_collider.h"
 
-#include "xrGameMtlLib/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "xrCDB/Intersect.hpp"
 #include "Include/xrRender/Kinematics.h"
 

@@ -6,7 +6,7 @@
 #include "StdAfx.h"
 #include "Level_Bullet_Manager.h"
 #include "Entity.h"
-#include "xrGameMtlLib/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "Level.h"
 #include "GamePersistent.h"
 #include "game_cl_base.h"
