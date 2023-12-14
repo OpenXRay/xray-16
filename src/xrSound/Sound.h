@@ -324,6 +324,8 @@ public:
 
     u32 dwBytesTotal{};
     float fTimeTotal{};
+
+    ~CSound() override { GEnv.Sound->destroy(*this); }
 };
 
 /*! \class ref_sound
@@ -362,10 +364,6 @@ struct resptrcode_sound : public resptr_base<CSound>
 
     ICF void destroy()
     {
-        if (!p_)
-            return;
-        VerSndUnlocked();
-        GEnv.Sound->destroy(*p_);
         _set(nullptr);
     }
 
