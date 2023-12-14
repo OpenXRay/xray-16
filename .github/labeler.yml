@@ -11,6 +11,9 @@ External (3rd party):
 Game assets:
 - res/**/*
 
+Infrastructure:
+- .github/**/*
+
 Physics:
 - src/xrPhysics/**/*
 
