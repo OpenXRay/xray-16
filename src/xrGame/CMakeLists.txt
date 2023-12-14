@@ -2625,6 +2625,7 @@ target_link_libraries(xrGame
     PRIVATE
     xrCore
     xrEngine
+    xrMaterialSystem
     xrMiscMath
     xrImGui
     xrAPI

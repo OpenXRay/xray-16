@@ -407,6 +407,7 @@ target_link_libraries(xrPhysics
     PRIVATE
     xrCore
     xrEngine
+    xrMaterialSystem
     xrMiscMath
     xrScriptEngine
     xrAPI
