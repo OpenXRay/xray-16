@@ -2,20 +2,12 @@ add_library(xrMaterialSystem SHARED)
 
 target_sources_grouped(
     TARGET xrMaterialSystem
-    NAME "Engine\\Game API\\MaterialSystem"
+    NAME "Kernel"
     FILES
     GameMtlLib.cpp
     GameMtlLib.h
     GameMtlLib_Engine.cpp
 )
-
-# XXX: This is only used in utils, should be moved somewhere to utils
-#target_sources_grouped(
-#    TARGET xrMaterialSystem
-#    NAME ""
-#    FILES
-#    xrLoadSurface.cpp
-#)
 
 target_include_directories(xrMaterialSystem
     PRIVATE
@@ -28,6 +20,7 @@ target_link_libraries(xrMaterialSystem
     xrMiscMath
 
     PRIVATE
+    xrAPI
     xrCore
 )
 

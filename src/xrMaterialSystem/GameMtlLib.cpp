@@ -3,9 +3,6 @@
 #include "Common/FSMacros.hpp"
 
 CGameMtlLibrary GMLib;
-#ifdef _EDITOR
-CGameMtlLibrary* PGMLib = nullptr;
-#endif
 
 #ifdef DEBUG
 const char* SGameMtlPair::dbg_Name()

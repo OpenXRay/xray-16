@@ -1,15 +1,18 @@
 #pragma once
 
-#include <algorithm>
-
 #include "xrCore/xrstring.h"
 #include "xrCore/_flags.h"
 #include "xrCommon/xr_vector.h"
-#include "Common/Platform.hpp"
 
-// fwd. decl.
-class IReader;
-class IWriter;
+#include "xrSound/Sound.h"
+#include "Include/xrRender/WallMarkArray.h"
+#include "Include/xrRender/RenderFactory.h"
+
+#ifdef XRMTL_LIB_EXPORTS
+#define MTL_EXPORT_API XR_EXPORT
+#else
+#define MTL_EXPORT_API XR_IMPORT
+#endif
 
 #define GAMEMTL_CURRENT_VERSION 0x0001
 
@@ -39,27 +42,12 @@ class IWriter;
 
 #define GAMEMTL_NONE_ID u32(-1)
 #define GAMEMTL_NONE_IDX u16(-1)
-#define GAMEMTL_FILENAME "gamemtl.xr"
 
-#ifndef GM_NON_GAME
-#if defined(_EDITOR) || defined(_MAX_PLUGIN) || defined(_LW_SHADER) || defined(_MAYA_PLUGIN)
-#define GM_NON_GAME
-#endif
-#endif
+constexpr pcstr GAMEMTL_FILENAME = "gamemtl.xr";
 
-#ifdef XRMTL_LIB_EXPORTS
-#define MTL_EXPORT_API XR_EXPORT
-#else
-#define MTL_EXPORT_API XR_IMPORT
-#endif
-
-#ifndef GM_NON_GAME
-#include "xrSound/Sound.h"
-#include "Include/xrRender/WallMarkArray.h"
-#include "Include/xrRender/RenderFactory.h"
-#endif
-
-// XXX: Place at least CGameMtlLibrary in a static lib or something? It currently gets instantiated a measurable amount of times.
+// fwd. decl.
+class IReader;
+class IWriter;
 
 struct MTL_EXPORT_API SGameMtl
 {
@@ -169,19 +157,12 @@ public:
     Flags32 OwnProps;
 
 public:
-#ifdef GM_NON_GAME
-    shared_str BreakingSounds;
-    shared_str StepSounds;
-    shared_str CollideSounds;
-    shared_str CollideParticles;
-    shared_str CollideMarks;
-#else
     xr_vector<ref_sound> BreakingSounds;
     xr_vector<ref_sound> StepSounds;
     xr_vector<ref_sound> CollideSounds;
     xr_vector<shared_str> CollideParticles;
     FactoryPtr<IWallMarkArray> CollideMarks;
-#endif
+
 public:
     SGameMtlPair(CGameMtlLibrary* owner)
     {
@@ -193,6 +174,7 @@ public:
         OwnProps.one();
     }
     ~SGameMtlPair();
+
     int GetMtl0() const { return mtl0; }
     int GetMtl1() const { return mtl1; }
     int GetID() const { return ID; }
@@ -211,6 +193,7 @@ public:
 #ifdef DEBUG
     const char* dbg_Name();
 #endif
+
 #ifdef _EDITOR
     PropValue* propBreakingSounds;
     PropValue* propStepSounds;
@@ -308,6 +291,7 @@ public:
     GameMtlIt FirstMaterial() { return materials.begin(); }
     GameMtlIt LastMaterial() { return materials.end(); }
     u32 CountMaterial() const { return materials.size(); }
+
 #ifdef EDITOR
     SGameMtl* AppendMaterial(SGameMtl* parent);
     void RemoveMaterial(pcstr name);
@@ -329,6 +313,7 @@ public:
     SGameMtlPair* GetMaterialPair(int mtl0, int mtl1);
     SGameMtlPair* GetMaterialPair(const char* name);
 #endif
+
     // game
     SGameMtlPair* GetMaterialPairByIndices(u16 i0, u16 i1) const
     {
