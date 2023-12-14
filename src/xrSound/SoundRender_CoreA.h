@@ -4,7 +4,16 @@
 
 #include <al.h>
 #include <alc.h>
+
+#if __has_include(<alext.h>)
 #include <alext.h>
+#endif
+
+#ifndef AL_EXT_float32
+#define AL_EXT_float32 1
+#define AL_FORMAT_MONO_FLOAT32                   0x10010
+#define AL_FORMAT_STEREO_FLOAT32                 0x10011
+#endif
 
 #ifdef DEBUG
 #define A_CHK(expr)                                             \

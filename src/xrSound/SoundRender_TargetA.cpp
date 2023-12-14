@@ -212,11 +212,9 @@ void CSoundRender_TargetA::fill_block(ALuint BufferID)
     const bool mono = wvf.nChannels == 1;
 
     ALuint format;
-#if AL_EXT_float32
     if (wvf.wFormatTag == WAVE_FORMAT_IEEE_FLOAT)
         format = mono ? AL_FORMAT_MONO_FLOAT32 : AL_FORMAT_STEREO_FLOAT32;
     else
-#endif
     {
         format = mono ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
     }
