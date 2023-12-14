@@ -5,7 +5,6 @@
 
 #include "IPhysicsShellHolder.h"
 
-#include "xrGameMtlLib/GameMtlLib.h"
 
 // const float JUMP_HIGHT=0.5;
 const float JUMP_UP_VELOCITY = 6.0f; // 5.6f;

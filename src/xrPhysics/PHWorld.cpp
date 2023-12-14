@@ -7,7 +7,6 @@
 #include "ExtendedGeom.h"
 #include "dRayMotions.h"
 #include "PHCollideValidator.h"
-#include "xrGameMtlLib/GameMtlLib.h"
 #include "xrEngine/device.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
