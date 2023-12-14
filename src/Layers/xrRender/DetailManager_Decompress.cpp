@@ -2,6 +2,8 @@
 #pragma hdrstop
 #include "DetailManager.h"
 #include "xrCDB/Intersect.hpp"
+#include "xrMaterialSystem/GameMtlLib.h"
+
 #ifdef _EDITOR
 #include "scene.h"
 #include "sceneobject.h"
@@ -65,8 +67,6 @@ static void draw_obb(const Fmatrix& matrix, const u32& color)
 bool det_render_debug = false;
 #endif
 #endif
-
-#include "xrEngine/GameMtlLib.h"
 
 //#define		DBG_SWITCHOFF_RANDOMIZE
 void CDetailManager::cache_Decompress(Slot* S)

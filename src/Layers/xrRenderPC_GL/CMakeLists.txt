@@ -404,6 +404,7 @@ target_link_libraries(xrRender_GL
     xrCDB
     xrCore
     xrEngine
+    xrMaterialSystem
     xrParticles
     xrScriptEngine
     xrImGui

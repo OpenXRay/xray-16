@@ -206,15 +206,6 @@ target_sources_grouped(
 
 target_sources_grouped(
     TARGET xrEngine
-    NAME "Engine\\Game API\\MaterialSystem"
-    FILES
-    GameMtlLib.cpp
-    GameMtlLib.h
-    GameMtlLib_Engine.cpp
-)
-
-target_sources_grouped(
-    TARGET xrEngine
     NAME "Engine\\Game API\\Objects"
     FILES
     IGame_ObjectPool.cpp

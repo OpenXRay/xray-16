@@ -3,7 +3,6 @@
 #include "ActorCameraCollision.h"
 
 #include "xrEngine/CameraBase.h"
-#include "xrEngine/GameMtlLib.h"
 
 #include "PHShell.h"
 #include "matrix_utils.h"

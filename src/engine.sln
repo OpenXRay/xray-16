@@ -199,6 +199,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrLuaFix", "..\Externals\xr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DiscordGameSDK", "..\Externals\DiscordGameSDK\DiscordGameSDK.vcxproj", "{CFF9F0DD-C2FC-424C-800B-BFBA35003932}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrMaterialSystem", "xrMaterialSystem\xrMaterialSystem.vcxproj", "{2C419512-6EEE-4707-BC51-2E834855552E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -2060,6 +2062,38 @@ Global
 		{CFF9F0DD-C2FC-424C-800B-BFBA35003932}.Release|x64.Build.0 = Release|x64
 		{CFF9F0DD-C2FC-424C-800B-BFBA35003932}.Release|x86.ActiveCfg = Release|Win32
 		{CFF9F0DD-C2FC-424C-800B-BFBA35003932}.Release|x86.Build.0 = Release|Win32
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Debug|ARM.ActiveCfg = Debug|ARM
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Debug|ARM.Build.0 = Debug|ARM
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Debug|ARM64.Build.0 = Debug|ARM64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Debug|x64.ActiveCfg = Debug|x64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Debug|x64.Build.0 = Debug|x64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Debug|x86.ActiveCfg = Debug|Win32
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Debug|x86.Build.0 = Debug|Win32
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Mixed|ARM.ActiveCfg = Mixed|ARM
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Mixed|ARM.Build.0 = Mixed|ARM
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Mixed|ARM64.ActiveCfg = Mixed|ARM64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Mixed|ARM64.Build.0 = Mixed|ARM64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Mixed|x64.ActiveCfg = Mixed|x64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Mixed|x64.Build.0 = Mixed|x64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Mixed|x86.ActiveCfg = Mixed|Win32
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Mixed|x86.Build.0 = Mixed|Win32
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM.ActiveCfg = Release Master Gold|ARM
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM.Build.0 = Release Master Gold|ARM
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM64.ActiveCfg = Release Master Gold|ARM64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|ARM64.Build.0 = Release Master Gold|ARM64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|x64.ActiveCfg = Release Master Gold|x64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|x64.Build.0 = Release Master Gold|x64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|x86.ActiveCfg = Release Master Gold|Win32
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release Master Gold|x86.Build.0 = Release Master Gold|Win32
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release|ARM.ActiveCfg = Release|ARM
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release|ARM.Build.0 = Release|ARM
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release|ARM64.ActiveCfg = Release|ARM64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release|ARM64.Build.0 = Release|ARM64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release|x64.ActiveCfg = Release|x64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release|x64.Build.0 = Release|x64
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release|x86.ActiveCfg = Release|Win32
+		{2C419512-6EEE-4707-BC51-2E834855552E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

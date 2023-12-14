@@ -3,8 +3,8 @@
 #include "ExtendedGeom.h"
 #include "tri-colliderknoopc/dTriList.h"
 #include "PhysicsCommon.h"
-#include "xrEngine/GameMtlLib.h"
 #include "MathUtilsOde.h"
+
 void CPHContactBodyEffector::Init(dBodyID body, const dContact& contact, SGameMtl* material)
 {
     CPHBaseBodyEffector::Init(body);

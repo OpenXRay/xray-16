@@ -12,7 +12,7 @@
 
 #include "xrCDB/xrCDB.h"
 #include "xrSound/Sound.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "xrCore/_std_extensions.h"
 
 #include "xrPhysics.h"
