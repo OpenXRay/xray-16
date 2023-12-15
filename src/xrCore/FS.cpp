@@ -98,7 +98,7 @@ bool file_handle_internal(pcstr file_name, size_t& size, int& hFile)
     size = filelength(hFile);
     return (true);
 }
-#else // EDITOR
+#else // _EDITOR
 static int open_internal(pcstr fn, int& handle)
 {
 #if defined(XR_PLATFORM_WINDOWS)
@@ -127,7 +127,7 @@ bool file_handle_internal(pcstr file_name, size_t& size, int& file_handle)
     size = _filelength(file_handle);
     return (true);
 }
-#endif // EDITOR
+#endif // _EDITOR
 
 void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size)
 {

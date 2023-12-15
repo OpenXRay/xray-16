@@ -292,7 +292,7 @@ public:
     GameMtlIt LastMaterial() { return materials.end(); }
     u32 CountMaterial() const { return materials.size(); }
 
-#ifdef EDITOR
+#ifdef _EDITOR
     SGameMtl* AppendMaterial(SGameMtl* parent);
     void RemoveMaterial(pcstr name);
     void CopyMtlPairs(SGameMtl* src, SGameMtl* dst);
@@ -312,7 +312,7 @@ public:
     SGameMtlPair* GetMaterialPair(int id);
     SGameMtlPair* GetMaterialPair(int mtl0, int mtl1);
     SGameMtlPair* GetMaterialPair(const char* name);
-#endif
+#endif // _EDITOR
 
     // game
     SGameMtlPair* GetMaterialPairByIndices(u16 i0, u16 i1) const
