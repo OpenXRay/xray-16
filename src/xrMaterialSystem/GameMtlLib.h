@@ -191,7 +191,7 @@ public:
     void Save(IWriter& fs);
     void Load(IReader& fs);
 #ifdef DEBUG
-    const char* dbg_Name();
+    const char* dbg_Name() const;
 #endif
 
 #ifdef _EDITOR

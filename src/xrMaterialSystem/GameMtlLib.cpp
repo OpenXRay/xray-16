@@ -5,11 +5,11 @@
 CGameMtlLibrary GMLib;
 
 #ifdef DEBUG
-const char* SGameMtlPair::dbg_Name()
+const char* SGameMtlPair::dbg_Name() const
 {
     static string256 nm;
-    SGameMtl* M0 = GMLib.GetMaterialByID(GetMtl0());
-    SGameMtl* M1 = GMLib.GetMaterialByID(GetMtl1());
+    const SGameMtl* M0 = GMLib.GetMaterialByID(GetMtl0());
+    const SGameMtl* M1 = GMLib.GetMaterialByID(GetMtl1());
     xr_sprintf(nm, sizeof(nm), "Pair: %s - %s", *M0->m_Name, *M1->m_Name);
     return nm;
 }
@@ -79,7 +79,7 @@ void CGameMtlLibrary::Load()
     IReader& fs = *F;
 
     R_ASSERT(fs.find_chunk(GAMEMTLS_CHUNK_VERSION));
-    u16 version = fs.r_u16();
+    const u16 version = fs.r_u16();
     if (GAMEMTL_CURRENT_VERSION != version)
     {
         Log("CGameMtlLibrary: invalid version. Library can't load.");
@@ -102,9 +102,8 @@ void CGameMtlLibrary::Load()
         u32 count;
         for (IReader* O = OBJ->open_chunk_iterator(count); O; O = OBJ->open_chunk_iterator(count, O))
         {
-            SGameMtl* M = xr_new<SGameMtl>();
+            SGameMtl* M = materials.emplace_back(xr_new<SGameMtl>());
             M->Load(*O);
-            materials.push_back(M);
         }
         OBJ->close();
     }
@@ -115,18 +114,17 @@ void CGameMtlLibrary::Load()
         u32 count;
         for (IReader* O = OBJ->open_chunk_iterator(count); O; O = OBJ->open_chunk_iterator(count, O))
         {
-            SGameMtlPair* M = xr_new<SGameMtlPair>(this);
+            SGameMtlPair* M = material_pairs.emplace_back(xr_new<SGameMtlPair>(this));
             M->Load(*O);
-            material_pairs.push_back(M);
         }
         OBJ->close();
     }
-    u32 mtlCount = materials.size();
+    const u32 mtlCount = materials.size();
     material_pairs_rt.resize(mtlCount * mtlCount, 0);
-    for (auto& mtlPair : material_pairs)
+    for (const auto& mtlPair : material_pairs)
     {
-        int idx0 = GetMaterialIdx(mtlPair->mtl0) * mtlCount + GetMaterialIdx(mtlPair->mtl1);
-        int idx1 = GetMaterialIdx(mtlPair->mtl1) * mtlCount + GetMaterialIdx(mtlPair->mtl0);
+        const int idx0 = GetMaterialIdx(mtlPair->mtl0) * mtlCount + GetMaterialIdx(mtlPair->mtl1);
+        const int idx1 = GetMaterialIdx(mtlPair->mtl1) * mtlCount + GetMaterialIdx(mtlPair->mtl0);
         material_pairs_rt[idx0] = mtlPair;
         material_pairs_rt[idx1] = mtlPair;
     }
