@@ -29,7 +29,3 @@
 #include "Sound.h"
 
 #include "xrCore/xr_resource.h"
-
-#ifdef _EDITOR
-#include "utils/ETools/ETools.h"
-#endif

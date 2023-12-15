@@ -39,16 +39,8 @@ public:
     void rescan_path_cb();
 };
 
-#ifdef _EDITOR
-namespace std
-{
-struct _finddata_t;
-};
-#define _FINDDATA_T std::_finddata_t
-#else
 struct _finddata64i32_t;
 #define _FINDDATA_T _finddata64i32_t
-#endif
 
 struct XRCORE_API FS_File
 {

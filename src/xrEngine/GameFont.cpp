@@ -4,9 +4,7 @@
 #include "GameFont.h"
 #include "xr_level_controller.h"
 #include "xrCore/Text/StringConversion.hpp"
-#ifndef _EDITOR
 #include "Render.h"
-#endif
 
 extern ENGINE_API bool g_bRendering;
 ENGINE_API Fvector2 g_current_font_scale = {1.0f, 1.0f};

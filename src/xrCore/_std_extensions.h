@@ -28,36 +28,6 @@
 #undef max
 #endif
 
-#if 0//def _EDITOR
-IC char* strncpy_s(char* strDestination, size_t sizeInBytes, const char* strSource, size_t count)
-{
-    return strncpy(strDestination, strSource, count);
-}
-
-IC char* xr_strcpy(char* strDestination, size_t sizeInBytes, const char* strSource)
-{
-    return strcpy(strDestination, strSource);
-}
-
-IC char* xr_strcpy(char* strDestination, const char* strSource) { return strcpy(strDestination, strSource); }
-IC char* _strlwr_s(char* strDestination, size_t sizeInBytes) { return xr_strlwr(strDestination); }
-IC char* xr_strcat(char* strDestination, size_t sizeInBytes, const char* strSource)
-{
-    return strncat(strDestination, strSource, sizeInBytes);
-}
-
-IC char* xr_strcat(char* strDestination, const char* strSource) { return strcat(strDestination, strSource); }
-IC int xr_sprintf(char* dest, size_t sizeOfBuffer, const char* format, ...)
-{
-    va_list mark;
-    va_start(mark, format);
-    int sz = _vsnprintf(dest, sizeOfBuffer, format, mark);
-    dest[sizeOfBuffer - 1] = 0;
-    va_end(mark);
-    return sz;
-}
-#endif // _EDITOR
-
 // generic
 template <class T>
 IC T _min(T a, T b)
@@ -167,7 +137,6 @@ IC s64 _max(s64 x, s64 y) { return x - ((x - y) & ((x - y) >> (sizeof(s64) * 8 -
 IC char* strext(const char* S) { return (char*)strrchr(S, '.'); }
 IC size_t xr_strlen(const char* S) { return strlen(S); }
 
-//#ifndef _EDITOR
 #ifndef MASTER_GOLD
 
 inline int xr_strcpy(pstr destination, size_t const destination_size, LPCSTR source)
@@ -251,7 +220,6 @@ inline int xr_strcat(char(&destination)[count], LPCSTR source)
 {
     return xr_strcat(destination, count, source);
 }
-//#endif // #ifndef _EDITOR
 
 inline void MemFill32(void* dst, u32 value, size_t dstSize)
 {
