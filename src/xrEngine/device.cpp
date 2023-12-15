@@ -122,7 +122,7 @@ void CRenderDevice::RenderEnd(void)
 }
 
 #include "IGame_Level.h"
-void CRenderDevice::PreCache(u32 amount, bool draw_loadscreen, bool wait_user_input)
+void CRenderDevice::PreCache(u32 amount, bool wait_user_input)
 {
     if (GEnv.isDedicatedServer)
         amount = 0;
@@ -139,7 +139,7 @@ void CRenderDevice::PreCache(u32 amount, bool draw_loadscreen, bool wait_user_in
         precache_light->set_range(5.0f);
         precache_light->set_active(true);
     }
-    if (amount && draw_loadscreen && !load_screen_renderer.IsActive())
+    if (amount && !load_screen_renderer.IsActive())
     {
         load_screen_renderer.Start(wait_user_input);
     }

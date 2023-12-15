@@ -169,7 +169,7 @@ public:
     // Scene control
     void ProcessFrame();
 
-    void PreCache(u32 amount, bool draw_loadscreen, bool wait_user_input);
+    void PreCache(u32 amount, bool wait_user_input);
 
     bool BeforeFrame();
     void FrameMove();

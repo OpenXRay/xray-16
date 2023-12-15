@@ -47,5 +47,4 @@ void CRenderDevice::Create()
         m_editor.OnDeviceCreate();
     Statistic->OnDeviceCreate();
     dwFrame = 0;
-    PreCache(0, false, false);
 }

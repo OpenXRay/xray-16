@@ -316,7 +316,7 @@ void CMainMenu::Activate(bool bActivate)
             Device.Reset();
 #else
             // Do only a precache for Debug and Mixed
-            Device.PreCache(20, true, false);
+            Device.PreCache(20, false);
 #endif
         }
     }
