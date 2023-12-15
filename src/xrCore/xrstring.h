@@ -5,17 +5,7 @@
 #include "xr_types.h"
 #include "xrMemory.h"
 
-#define BREAK_AT_STRCMP
-#ifndef DEBUG
-#undef BREAK_AT_STRCMP
-#endif
-#ifdef _EDITOR
-#undef BREAK_AT_STRCMP
-#endif
-
-#ifndef BREAK_AT_STRCMP
-#include <string.h>
-#endif
+#include <cstring>
 
 #pragma pack(push, 4)
 #pragma warning(push)
@@ -184,14 +174,6 @@ public:
     }
 };
 
-#ifdef BREAK_AT_STRCMP
-XRCORE_API int xr_strcmp(const char* S1, const char* S2);
-#else
-inline int xr_strcmp(const char* S1, const char* S2)
-{
-    return (int)strcmp(S1, S2);
-}
-#endif
 
 template<>
 struct std::hash<shared_str>
@@ -218,6 +200,12 @@ IC bool operator>(shared_str const& a, shared_str const& b) { return a._get() > 
 // externally visible standard functionality
 IC void swap(shared_str& lhs, shared_str& rhs) noexcept { lhs.swap(rhs); }
 IC size_t xr_strlen(const shared_str& a) noexcept { return a.size(); }
+
+ICF int xr_strcmp(const char* S1, const char* S2)
+{
+    return strcmp(S1, S2);
+}
+
 IC int xr_strcmp(const shared_str& a, const char* b) noexcept { return xr_strcmp(*a, b); }
 IC int xr_strcmp(const char* a, const shared_str& b) noexcept { return xr_strcmp(a, *b); }
 IC int xr_strcmp(const shared_str& a, const shared_str& b) noexcept
