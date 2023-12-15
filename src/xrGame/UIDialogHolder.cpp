@@ -225,7 +225,7 @@ void CDialogHolder::OnFrame()
 {
     m_b_in_update = true;
 
-    if (GetUICursor().IsVisible() && pInput->IsCurrentInputTypeController())
+    if (!GEnv.isDedicatedServer && GetUICursor().IsVisible() && pInput->IsCurrentInputTypeController())
         GetUICursor().UpdateAutohideTiming();
 
     CUIDialogWnd* wnd = TopInputReceiver();
