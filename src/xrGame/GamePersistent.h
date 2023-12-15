@@ -83,7 +83,6 @@ public:
     virtual void UpdateGameType();
 
     virtual void RegisterModel(IRenderVisual* V);
-    virtual float MtlTransparent(u32 mtl_idx);
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     virtual bool OnRenderPPUI_query();

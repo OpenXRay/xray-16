@@ -11,6 +11,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "xrCDB/Intersect.hpp"
 #include "Common/object_broker.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 
 #ifdef _EDITOR
 #include "ui_toolscustom.h"
@@ -223,12 +224,15 @@ IC bool material_callback(collide::rq_result& result, LPVOID params)
         vis = 0.f;
         IKinematics* K = PKinematics(result.O->GetRenderData().visual);
         if (K && (result.element > 0))
-            vis = g_pGamePersistent->MtlTransparent(K->LL_GetData(u16(result.element)).game_mtl_idx);
+        {
+            const auto& bone_data = K->LL_GetData(u16(result.element));
+            vis = GMLib.GetMaterialByIdx(bone_data.game_mtl_idx)->fVisTransparencyFactor;
+        }
     }
     else
     {
         CDB::TRI* T = g_pGameLevel->ObjectSpace.GetStaticTris() + result.element;
-        vis = g_pGamePersistent->MtlTransparent(T->material);
+        vis = GMLib.GetMaterialByIdx(T->material)->fVisTransparencyFactor;
         if (fis_zero(vis))
         {
             Fvector* V = g_pGameLevel->ObjectSpace.GetStaticVerts();

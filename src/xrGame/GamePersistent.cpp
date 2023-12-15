@@ -749,10 +749,6 @@ void CGamePersistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 #endif
 }
 
-float CGamePersistent::MtlTransparent(u32 mtl_idx)
-{
-    return GMLib.GetMaterialByIdx((u16)mtl_idx)->fVisTransparencyFactor;
-}
 static BOOL bRestorePause = FALSE;
 static BOOL bEntryFlag = TRUE;
 

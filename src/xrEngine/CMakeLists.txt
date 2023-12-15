@@ -433,6 +433,7 @@ target_link_libraries(xrEngine
     PRIVATE
     xrAPI
     xrCDB
+    xrMaterialSystem
     xrCore
     xrSound
     xrScriptEngine

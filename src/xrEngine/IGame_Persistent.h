@@ -184,14 +184,6 @@ public:
     {
     }
 #endif
-    virtual float MtlTransparent(u32 mtl_idx)
-#ifndef _EDITOR
-        = 0;
-#else
-    {
-        return 1.f;
-    }
-#endif
 
     IGame_Persistent();
     virtual ~IGame_Persistent();
