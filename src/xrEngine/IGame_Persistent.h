@@ -177,14 +177,6 @@ public:
     virtual void OnSectorChanged(IRender_Sector::sector_id_t /*sector*/) {};
     virtual void OnAssetsChanged();
 
-    virtual void RegisterModel(IRenderVisual* V)
-#ifndef _EDITOR
-        = 0;
-#else
-    {
-    }
-#endif
-
     IGame_Persistent();
     virtual ~IGame_Persistent();
 
