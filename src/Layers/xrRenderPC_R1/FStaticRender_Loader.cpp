@@ -13,7 +13,7 @@ void CRender::level_Load(IReader* fs)
     R_ASSERT(!b_loaded);
 
     // Begin
-    pApp->LoadBegin();
+    g_pGamePersistent->LoadBegin();
     Resources->DeferredLoad(TRUE);
     IReader* chunk;
 
@@ -94,7 +94,7 @@ void CRender::level_Load(IReader* fs)
     LoadLights(fs);
 
     // End
-    pApp->LoadEnd();
+    g_pGamePersistent->LoadEnd();
     b_loaded = TRUE;
 }
 

@@ -22,7 +22,6 @@
 
 #include "xrEngine/xrSASH.h"
 #include "ai_space.h"
-#include "xrScriptEngine/script_engine.hpp"
 
 #include "holder_custom.h"
 #include "game_cl_base.h"
@@ -32,7 +31,6 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 #include "xrEngine/xr_input.h"
-#include "xrEngine/x_ray.h"
 #include "ui/UILoadingScreen.h"
 #include "AnselManager.h"
 #include "xrCore/Threading/TaskManager.hpp"
@@ -130,11 +128,12 @@ void CGamePersistent::OnAppStart()
 
     GEnv.UI = xr_new<UICore>();
     m_pMainMenu = xr_new<CMainMenu>();
+    if (GEnv.isDedicatedServer)
+        m_pLoadingScreen = xr_new<NullLoadingScreen>();
+    else
+        m_pLoadingScreen = xr_new<UILoadingScreen>();
 
     inherited::OnAppStart();
-
-    if (!GEnv.isDedicatedServer)
-        pApp->SetLoadingScreen(xr_new<UILoadingScreen>());
 
 #ifdef XR_PLATFORM_WINDOWS
     ansel = xr_new<AnselManager>();
@@ -152,7 +151,7 @@ void CGamePersistent::OnAppEnd()
     if (m_pMainMenu->IsActive())
         m_pMainMenu->Activate(false);
 
-    pApp->DestroyLoadingScreen();
+    xr_delete(m_pLoadingScreen);
     xr_delete(m_pMainMenu);
     xr_delete(GEnv.UI);
 
@@ -689,7 +688,7 @@ void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
         xr_free(saved_name);
         return;
     }
-    else if (E == eDemoStart)
+    if (E == eDemoStart)
     {
         string256 cmd;
         pstr demo = pstr(P1);
@@ -697,7 +696,9 @@ void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
         Console->Execute(cmd);
         xr_free(demo);
         uTime2Change = Device.TimerAsync() + u32(P2) * 1000;
+        return;
     }
+    inherited::OnEvent(E, P1, P2);
 }
 
 void CGamePersistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
@@ -770,57 +771,6 @@ void CGamePersistent::OnRenderPPUI_main()
 }
 
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }
-
-#include "xrEngine/x_ray.h"
-void CGamePersistent::LoadTitle(pcstr ls_title, bool change_tip, shared_str map_name)
-{
-    if (ls_title)
-    {
-        string256 buff;
-        xr_sprintf(buff, "%s%s", StringTable().translate(ls_title).c_str(), "...");
-        pApp->LoadTitle(buff);
-    }
-    else if (!change_tip)
-        pApp->LoadTitle("");
-
-    if (change_tip)
-    {
-        bool noTips = false;
-        string512 buff;
-        u8 tip_num;
-        luabind::functor<u8> m_functor;
-        const bool is_single = !xr_strcmp(m_game_params.m_game_type, "single");
-        if (is_single)
-        {
-            if (GEnv.ScriptEngine->functor("loadscreen.get_tip_number", m_functor))
-                tip_num = m_functor(map_name.c_str());
-            else
-                noTips = true;
-        }
-        else
-        {
-            if (GEnv.ScriptEngine->functor("loadscreen.get_mp_tip_number", m_functor))
-                tip_num = m_functor(map_name.c_str());
-            else
-                noTips = true;
-        }
-        if (noTips)
-            return;
-
-        xr_sprintf(buff, "%s%d:", StringTable().translate("ls_tip_number").c_str(), tip_num);
-        shared_str tmp = buff;
-
-        if (is_single)
-            xr_sprintf(buff, "ls_tip_%d", tip_num);
-        else
-            xr_sprintf(buff, "ls_mp_tip_%d", tip_num);
-
-        pApp->LoadTitleInt(
-            StringTable().translate("ls_header").c_str(), tmp.c_str(), StringTable().translate(buff).c_str());
-    }
-
-    pApp->LoadStage();
-}
 
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }
 void CGamePersistent::SetPickableEffectorDOF(bool bSet)

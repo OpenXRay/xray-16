@@ -12,7 +12,7 @@
 
 bool is_device_paused(CRenderDevice* d) { return !!Device.Paused(); }
 void set_device_paused(CRenderDevice* d, bool b) { Device.Pause(b, TRUE, FALSE, "set_device_paused_script"); }
-bool is_app_ready() { return pApp->IsLoaded(); }
+bool is_app_ready() { return g_pGamePersistent->IsLoaded(); }
 u32 time_global(const CRenderDevice* self)
 {
     THROW(self);

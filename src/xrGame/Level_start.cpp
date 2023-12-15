@@ -26,7 +26,7 @@ bool CLevel::net_Start(const char* op_server, const char* op_client)
 {
     net_start_result_total = TRUE;
 
-    pApp->LoadBegin();
+    g_pGamePersistent->LoadBegin();
 
     string64 player_name;
     GetPlayerName_FromRegistry(player_name, sizeof(player_name));
@@ -125,7 +125,7 @@ bool CLevel::net_start1()
             if (!GEnv.isDedicatedServer)
                 g_pGamePersistent->LoadTitle(nullptr, true, map_data.m_name);
 
-            int id = pApp->Level_ID(map_data.m_name.c_str(), l_ver.c_str(), true);
+            const int id = g_pGamePersistent->Level_ID(map_data.m_name.c_str(), l_ver.c_str(), true);
 
             if (id < 0)
             {
@@ -243,7 +243,7 @@ bool CLevel::net_start6()
     BulletManager().Clear();
     BulletManager().Load();
 
-    pApp->LoadEnd();
+    g_pGamePersistent->LoadEnd();
 
     if (net_start_result_total)
     {

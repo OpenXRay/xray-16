@@ -92,7 +92,7 @@ static bool deserialize_callback(IReader& reader)
 bool IGame_Level::Load(u32 dwNum)
 {
     // Initialize level data
-    pApp->Level_Set(dwNum);
+    g_pGamePersistent->Level_Set(dwNum);
     string_path temp;
     if (!FS.exist(temp, "$level$", "level.ltx"))
         xrDebug::Fatal(DEBUG_INFO, "Can't find level configuration file '%s'.", temp);
@@ -121,8 +121,6 @@ bool IGame_Level::Load(u32 dwNum)
         if (g_pGameLevel && S && S->feedback)
             g_pGameLevel->SoundEvent_Register(S, range);
     });
-
-    pApp->LoadSwitch();
 
     // Render-level Load
     GEnv.Render->level_Load(LL_Stream);

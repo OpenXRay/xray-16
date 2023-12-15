@@ -282,18 +282,10 @@ ENGINE_API void Startup()
         LALib.OnCreate();
     });
 
-    const auto& createApplication = TaskScheduler->AddTask("CreateApplication()", [](Task&, void*)
-    {
-        pApp = xr_new<CApplication>();
-#ifdef XR_PLATFORM_WINDOWS // XXX: Remove this macro check
-        if (GEnv.isDedicatedServer)
-            pApp->SetLoadingScreen(xr_new<TextLoadingScreen>());
-#endif
-    });
+    pApp = xr_new<CApplication>();
 
     Device.Create();
     TaskScheduler->Wait(createLightAnim);
-    TaskScheduler->Wait(createApplication);
 
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
     R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());

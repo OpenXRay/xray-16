@@ -18,7 +18,7 @@ LPCSTR xrServer::get_map_download_url(LPCSTR level_name, LPCSTR level_version)
 {
     R_ASSERT(level_name && level_version);
     LPCSTR ret_url = "";
-    CInifile* level_ini = pApp->GetArchiveHeader(level_name, level_version);
+    CInifile* level_ini = g_pGamePersistent->GetArchiveHeader(level_name, level_version);
     if (!level_ini)
     {
         if (!IsGameTypeSingle())

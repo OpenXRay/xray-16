@@ -189,7 +189,7 @@ bool CRenderDevice::BeforeFrame()
     {
         if (g_loading_events.front()())
             g_loading_events.pop_front();
-        pApp->LoadDraw();
+        g_pGamePersistent->LoadDraw();
         return false;
     }
 
@@ -627,8 +627,8 @@ void CLoadScreenRenderer::Start(bool b_user_input)
     m_registered = true;
     m_need_user_input = b_user_input;
 
-    pApp->ShowLoadingScreen(true);
-    pApp->LoadBegin();
+    g_pGamePersistent->ShowLoadingScreen(true);
+    g_pGamePersistent->LoadBegin();
 }
 
 void CLoadScreenRenderer::Stop()
@@ -641,16 +641,16 @@ void CLoadScreenRenderer::Stop()
     m_registered = false;
     m_need_user_input = false;
 
-    pApp->ShowLoadingScreen(false);
-    pApp->LoadEnd();
+    g_pGamePersistent->ShowLoadingScreen(false);
+    g_pGamePersistent->LoadEnd();
 }
 
 void CLoadScreenRenderer::OnFrame()
 {
-    pApp->LoadStage(false);
+    g_pGamePersistent->LoadStage(false);
 }
 
 void CLoadScreenRenderer::OnRender()
 {
-    pApp->load_draw_internal();
+    g_pGamePersistent->load_draw_internal();
 }
