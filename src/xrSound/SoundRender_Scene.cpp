@@ -12,6 +12,10 @@ CSoundRender_Scene::~CSoundRender_Scene()
 {
     stop_emitters();
 
+    set_geometry_occ(nullptr);
+    set_geometry_som(nullptr);
+    set_geometry_env(nullptr);
+
     // remove emitters
     for (auto& emit : s_emitters)
         xr_delete(emit);
