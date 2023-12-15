@@ -486,7 +486,7 @@ void CGamePersistent::OnFrame()
 {
     if (Device.dwPrecacheFrame == 5 && m_intro_event.empty())
     {
-        SetLoadStageTitle();
+        LoadTitle();
         m_intro_event.bind(this, &CGamePersistent::game_loaded);
     }
 
@@ -772,9 +772,17 @@ void CGamePersistent::OnRenderPPUI_main()
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }
 
 #include "xrEngine/x_ray.h"
-void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
+void CGamePersistent::LoadTitle(pcstr ls_title, bool change_tip, shared_str map_name)
 {
-    pApp->LoadStage();
+    if (ls_title)
+    {
+        string256 buff;
+        xr_sprintf(buff, "%s%s", StringTable().translate(ls_title).c_str(), "...");
+        pApp->LoadTitle(buff);
+    }
+    else if (!change_tip)
+        pApp->LoadTitle("");
+
     if (change_tip)
     {
         bool noTips = false;
@@ -810,18 +818,8 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
         pApp->LoadTitleInt(
             StringTable().translate("ls_header").c_str(), tmp.c_str(), StringTable().translate(buff).c_str());
     }
-}
 
-void CGamePersistent::SetLoadStageTitle(pcstr ls_title)
-{
-    string256 buff;
-    if (ls_title)
-    {
-        xr_sprintf(buff, "%s%s", StringTable().translate(ls_title).c_str(), "...");
-        pApp->SetLoadStageTitle(buff);
-    }
-    else
-        pApp->SetLoadStageTitle("");
+    pApp->LoadStage();
 }
 
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }

@@ -185,11 +185,10 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
     }
 
     string512 temp;
-    strconcat(sizeof(temp), temp, StringTable().translate("st_loading_saved_game").c_str(),
+    strconcat(temp, StringTable().translate("st_loading_saved_game").c_str(),
         " \"", save_name, gameSaveExtension, "\"");
 
-    g_pGamePersistent->SetLoadStageTitle(temp);
-    g_pGamePersistent->LoadTitle();
+    g_pGamePersistent->LoadTitle(temp);
 
     unload();
     reload(m_section);

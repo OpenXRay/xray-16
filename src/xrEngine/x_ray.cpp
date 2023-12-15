@@ -249,7 +249,7 @@ void CApplication::LoadDraw()
     Device.RenderEnd();
 }
 
-void CApplication::SetLoadStageTitle(pcstr _ls_title)
+void CApplication::LoadTitle(pcstr _ls_title)
 {
     loadingScreen->SetStageTitle(_ls_title);
 }

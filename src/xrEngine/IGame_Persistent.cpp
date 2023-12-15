@@ -125,8 +125,7 @@ void IGame_Persistent::Disconnect()
 void IGame_Persistent::OnGameStart()
 {
 #ifndef _EDITOR
-    SetLoadStageTitle("st_prefetching_objects");
-    LoadTitle();
+    LoadTitle("st_prefetching_objects");
     if (!strstr(Core.Params, "-noprefetch"))
         Prefetch();
 #endif

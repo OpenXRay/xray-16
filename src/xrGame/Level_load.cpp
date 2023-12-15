@@ -15,8 +15,7 @@
 bool CLevel::Load_GameSpecific_Before()
 {
     // AI space
-    g_pGamePersistent->SetLoadStageTitle("st_loading_ai_objects");
-    g_pGamePersistent->LoadTitle();
+    g_pGamePersistent->LoadTitle("st_loading_ai_objects");
     string_path fn_game;
 
     if (GamePersistent().GameType() == eGameIDSingle && !ai().get_alife() && FS.exist(fn_game, "$level$", "level.ai") &&

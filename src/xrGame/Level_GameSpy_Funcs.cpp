@@ -30,6 +30,5 @@ void CLevel::OnGameSpyChallenge(NET_Packet* P)
     newP.w_stringZ(ResponseStr);
     Send(newP, net_flags(TRUE, TRUE, TRUE, TRUE));
 
-    g_pGamePersistent->SetLoadStageTitle("st_validating_cdkey");
-    g_pGamePersistent->LoadTitle();
+    g_pGamePersistent->LoadTitle("st_validating_cdkey");
 };

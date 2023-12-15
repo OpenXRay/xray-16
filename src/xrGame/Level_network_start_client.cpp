@@ -32,14 +32,12 @@ bool CLevel::net_start_client1()
         *strchr(name_of_server, '/') = 0;
 
     // Startup client
-
     string256 temp;
     xr_sprintf(temp, "%s %s",
                StringTable().translate("st_client_connecting_to").c_str(),
                name_of_server);
 
-    pApp->SetLoadStageTitle(temp);
-    pApp->LoadStage();
+    g_pGamePersistent->LoadTitle(temp);
     return true;
 }
 
@@ -128,8 +126,7 @@ bool CLevel::net_start_client4()
     if (connected_to_server)
     {
         // Begin spawn
-        g_pGamePersistent->SetLoadStageTitle("st_client_spawning");
-        g_pGamePersistent->LoadTitle();
+        g_pGamePersistent->LoadTitle("st_client_spawning");
 
         // Send physics to single or multithreaded mode
 
@@ -211,8 +208,7 @@ bool CLevel::net_start_client5()
         // Textures
         if (!GEnv.isDedicatedServer)
         {
-            g_pGamePersistent->SetLoadStageTitle("st_loading_textures");
-            g_pGamePersistent->LoadTitle();
+            g_pGamePersistent->LoadTitle("st_loading_textures");
             GEnv.Render->DeferredLoad(FALSE);
             GEnv.Render->ResourcesDeferredUpload();
             LL_CheckTextures();
@@ -255,8 +251,7 @@ bool CLevel::net_start_client6()
             }
         }
 
-        g_pGamePersistent->SetLoadStageTitle("st_client_synchronising");
-        g_pGamePersistent->LoadTitle();
+        g_pGamePersistent->LoadTitle("st_client_synchronising");
         Device.PreCache(60, true, true);
         net_start_result_total = TRUE;
     }

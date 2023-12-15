@@ -48,12 +48,11 @@ public:
     // Loading
     void LoadBegin();
     void LoadEnd();
+    void LoadTitle(pcstr ls_title);
     void LoadTitleInt(pcstr str1, pcstr str2, pcstr str3);
     void LoadStage(bool draw = true);
     void LoadSwitch();
     void LoadDraw();
-
-    void SetLoadStageTitle(pcstr ls_title);
 
     virtual void OnEvent(EVENT E, u64 P1, u64 P2);
 
