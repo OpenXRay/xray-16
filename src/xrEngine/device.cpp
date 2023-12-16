@@ -1,31 +1,19 @@
 #include "stdafx.h"
-#include "xrCDB/Frustum.h"
 
-#include "x_ray.h"
 #include "Render.h"
 
 #include "xrCore/FS_impl.h"
 #include "xrCore/Threading/TaskManager.hpp"
+#include "xrScriptEngine/ScriptExporter.hpp"
 
 #include "xrSASH.h"
-#include "IGame_Persistent.h"
-#include "xrScriptEngine/ScriptExporter.hpp"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 
-#include <thread>
+#include "IGame_Level.h"
+#include "IGame_Persistent.h"
 
 #include <SDL.h>
-
-// mmsystem.h
-#if defined(XR_PLATFORM_WINDOWS)
-#define MMNOSOUND
-#define MMNOMIDI
-#define MMNOAUX
-#define MMNOMIXER
-#define MMNOJOY
-#include <mmsystem.h>
-#endif
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -146,7 +134,6 @@ void CRenderDevice::RenderEnd(void)
     mProjectSaved = mProject;
 }
 
-#include "IGame_Level.h"
 void CRenderDevice::PreCache(u32 amount, bool wait_user_input)
 {
     if (GEnv.isDedicatedServer)
@@ -526,7 +513,6 @@ void CRenderDevice::FrameMove()
 }
 
 ENGINE_API bool bShowPauseString = true;
-#include "IGame_Persistent.h"
 
 void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, [[maybe_unused]] pcstr reason)
 {
