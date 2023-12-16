@@ -29,6 +29,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AccessibilityShortcuts.hpp" />
     <ClInclude Include="CameraBase.h" />
     <ClInclude Include="CameraDefs.h" />
     <ClInclude Include="CameraManager.h" />
@@ -84,7 +85,6 @@
     <ClInclude Include="pure_relcase.h" />
     <ClInclude Include="Rain.h" />
     <ClInclude Include="Render.h" />
-    <ClInclude Include="splash.h" />
     <ClInclude Include="ShadersExternalData.h" />
     <ClInclude Include="StatGraph.h" />
     <ClInclude Include="Stats.h" />
@@ -168,7 +168,6 @@
     <ClCompile Include="pure_relcase.cpp" />
     <ClCompile Include="Rain.cpp" />
     <ClCompile Include="Render.cpp" />
-    <ClCompile Include="splash.cpp" />
     <ClCompile Include="StatGraph.cpp" />
     <ClCompile Include="Stats.cpp" />
     <ClCompile Include="stdafx.cpp">

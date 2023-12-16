@@ -354,9 +354,6 @@
     <ClInclude Include="profiler_inline.h">
       <Filter>General\Profiler</Filter>
     </ClInclude>
-    <ClInclude Include="splash.h">
-      <Filter>General</Filter>
-    </ClInclude>
     <ClInclude Include="vis_object_data.h">
       <Filter>Render\Visibility</Filter>
     </ClInclude>
@@ -398,6 +395,9 @@
     </ClInclude>
     <ClInclude Include="editor_helper.h">
       <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="AccessibilityShortcuts.hpp">
+      <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -589,9 +589,6 @@
     </ClCompile>
     <ClCompile Include="profiler.cpp">
       <Filter>General\Profiler</Filter>
-    </ClCompile>
-    <ClCompile Include="splash.cpp">
-      <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="device.cpp">
       <Filter>Render\Device</Filter>

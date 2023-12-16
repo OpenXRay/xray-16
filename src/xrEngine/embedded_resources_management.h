@@ -37,7 +37,6 @@ inline HANDLE ExtractImage(int idx, UINT type)
         type, 0, 0, LR_CREATEDIBSECTION);
 }
 
-
 inline SDL_Surface* CreateSurfaceFromBitmap(HBITMAP bitmapHandle)
 {
     BITMAP bitmap;

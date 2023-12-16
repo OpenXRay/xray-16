@@ -12,7 +12,6 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
-#include "splash.h"
 
 #include <thread>
 
@@ -430,7 +429,6 @@ void CRenderDevice::Run()
     // Pre start
     seqAppStart.Process();
 
-    splash::hide();
     SDL_HideWindow(m_sdlWnd); // workaround for SDL bug
     UpdateWindowProps();
     SDL_ShowWindow(m_sdlWnd);
