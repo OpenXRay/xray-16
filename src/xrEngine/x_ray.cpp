@@ -37,6 +37,8 @@
 // global variables
 constexpr u32 SPLASH_FRAMERATE = 30;
 
+constexpr size_t MAX_WINDOW_EVENTS = 32;
+
 ENGINE_API CInifile* pGameIni = nullptr;
 ENGINE_API bool CallOfPripyatMode = false;
 ENGINE_API bool ClearSkyMode = false;
@@ -357,8 +359,74 @@ int CApplication::Run()
 #endif
 
     // Main cycle
-    HideSplash();
     Device.Run();
+    HideSplash();
+
+    while (!SDL_QuitRequested()) // SDL_PumpEvents is here
+    {
+        bool canCallActivate = false;
+        bool shouldActivate = false;
+
+        SDL_Event events[MAX_WINDOW_EVENTS];
+        const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
+            SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+
+        for (int i = 0; i < count; ++i)
+        {
+            const SDL_Event event = events[i];
+
+            switch (event.type)
+            {
+            case SDL_WINDOWEVENT:
+            {
+                switch (event.window.event)
+                {
+                case SDL_WINDOWEVENT_SHOWN:
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                case SDL_WINDOWEVENT_RESTORED:
+                case SDL_WINDOWEVENT_MAXIMIZED:
+                    canCallActivate = true;
+                    shouldActivate = true;
+                    continue;
+
+                case SDL_WINDOWEVENT_HIDDEN:
+                case SDL_WINDOWEVENT_FOCUS_LOST:
+                case SDL_WINDOWEVENT_MINIMIZED:
+                    canCallActivate = true;
+                    shouldActivate = false;
+                    continue;
+
+                case SDL_WINDOWEVENT_ENTER:
+                    SDL_ShowCursor(SDL_FALSE);
+                    continue;
+
+                case SDL_WINDOWEVENT_LEAVE:
+                    SDL_ShowCursor(SDL_TRUE);
+                    continue;
+
+                case SDL_WINDOWEVENT_CLOSE:
+                    Engine.Event.Defer("KERNEL:disconnect");
+                    Engine.Event.Defer("KERNEL:quit");
+                    continue;
+                } // switch (event.window.event)
+            }
+            } // switch (event.type)
+
+            // Only process event in Device
+            // if it wasn't processed in the switch above
+            Device.ProcessEvent(event);
+        } // for (int i = 0; i < count; ++i)
+
+        // Workaround for screen blinking when there's too much timeouts
+        if (canCallActivate)
+        {
+            Device.OnWindowActivate(shouldActivate);
+        }
+
+        Device.ProcessFrame();
+    } // while (!SDL_QuitRequested())
+
+    Device.Shutdown();
 
     return 0;
 }

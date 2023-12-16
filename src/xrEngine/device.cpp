@@ -23,8 +23,6 @@ ENGINE_API bool g_bRendering = false;
 int ps_fps_limit = 501;
 int ps_fps_limit_in_menu = 60;
 
-constexpr size_t MAX_WINDOW_EVENTS = 32;
-
 bool g_bLoaded = false;
 ref_light precache_light = 0;
 
@@ -298,128 +296,77 @@ void CRenderDevice::ProcessFrame()
         Sleep(1);
 }
 
-void CRenderDevice::message_loop()
+void CRenderDevice::ProcessEvent(const SDL_Event& event)
 {
-    while (!SDL_QuitRequested()) // SDL_PumpEvents is here
+    switch (event.type)
     {
-        bool canCallActivate = false;
-        bool shouldActivate = false;
-
-        SDL_Event events[MAX_WINDOW_EVENTS];
-        const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
-            SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
-
-        for (int i = 0; i < count; ++i)
-        {
-            const SDL_Event event = events[i];
-
-            switch (event.type)
-            {
 #if SDL_VERSION_ATLEAST(2, 0, 9)
-            case SDL_DISPLAYEVENT:
-            {
-                switch (event.display.type)
-                {
-                case SDL_DISPLAYEVENT_ORIENTATION:
+    case SDL_DISPLAYEVENT:
+    {
+        switch (event.display.type)
+        {
+        case SDL_DISPLAYEVENT_ORIENTATION:
 #if SDL_VERSION_ATLEAST(2, 0, 14)
-                case SDL_DISPLAYEVENT_CONNECTED:
-                case SDL_DISPLAYEVENT_DISCONNECTED:
+        case SDL_DISPLAYEVENT_CONNECTED:
+        case SDL_DISPLAYEVENT_DISCONNECTED:
 #endif
-                    CleanupVideoModes();
-                    FillVideoModes();
+            CleanupVideoModes();
+            FillVideoModes();
 #if SDL_VERSION_ATLEAST(2, 0, 14)
-                    if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
+            if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
 #else
                     if (event.display.display == psDeviceMode.Monitor)
 #endif
-                        Reset();
-                    else
-                        UpdateWindowProps();
-                    break;
-                } // switch (event.display.type)
-                break;
-            }
+                Reset();
+            else
+                UpdateWindowProps();
+            break;
+        } // switch (event.display.type)
+        break;
+    }
 #endif
-            case SDL_WINDOWEVENT:
-            {
-                switch (event.window.event)
-                {
-                case SDL_WINDOWEVENT_MOVED:
-                {
-                    UpdateWindowRects();
+    case SDL_WINDOWEVENT:
+    {
+        switch (event.window.event)
+        {
+        case SDL_WINDOWEVENT_MOVED:
+        {
+            UpdateWindowRects();
 #if !SDL_VERSION_ATLEAST(2, 0, 18) // without SDL_WINDOWEVENT_DISPLAY_CHANGED, let's detect monitor change ourselves
                     const int display = SDL_GetWindowDisplayIndex(m_sdlWnd);
                     if (display != -1)
                         psDeviceMode.Monitor = display;
 #endif
-                    break;
-                }
-
-#if SDL_VERSION_ATLEAST(2, 0, 18)
-                case SDL_WINDOWEVENT_DISPLAY_CHANGED:
-                    psDeviceMode.Monitor = event.window.data1;
-                    break;
-#endif
-
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
-                {
-                    if (psDeviceMode.WindowStyle != rsFullscreen)
-                    {
-                        if (static_cast<int>(psDeviceMode.Width) == event.window.data1 &&
-                            static_cast<int>(psDeviceMode.Height) == event.window.data2)
-                            break; // we don't need to reset device if resolution wasn't really changed
-
-                        psDeviceMode.Width = event.window.data1;
-                        psDeviceMode.Height = event.window.data2;
-
-                        Reset();
-                    }
-                    else
-                        UpdateWindowRects();
-
-                    break;
-                }
-
-                case SDL_WINDOWEVENT_SHOWN:
-                case SDL_WINDOWEVENT_FOCUS_GAINED:
-                case SDL_WINDOWEVENT_RESTORED:
-                case SDL_WINDOWEVENT_MAXIMIZED:
-                    canCallActivate = true;
-                    shouldActivate = true;
-                    break;
-
-                case SDL_WINDOWEVENT_HIDDEN:
-                case SDL_WINDOWEVENT_FOCUS_LOST:
-                case SDL_WINDOWEVENT_MINIMIZED:
-                    canCallActivate = true;
-                    shouldActivate = false;
-                    break;
-
-                case SDL_WINDOWEVENT_ENTER:
-                    SDL_ShowCursor(SDL_FALSE);
-                    break;
-
-                case SDL_WINDOWEVENT_LEAVE:
-                    SDL_ShowCursor(SDL_TRUE);
-                    break;
-
-                case SDL_WINDOWEVENT_CLOSE:
-                    Engine.Event.Defer("KERNEL:disconnect");
-                    Engine.Event.Defer("KERNEL:quit");
-                    break;
-                } // switch (event.window.event)
-            }
-            } // switch (event.type)
-        } // for (int i = 0; i < count; ++i)
-
-        // Workaround for screen blinking when there's too much timeouts
-        if (canCallActivate)
-        {
-            OnWindowActivate(shouldActivate);
+            break;
         }
 
-        ProcessFrame();
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+        case SDL_WINDOWEVENT_DISPLAY_CHANGED:
+            psDeviceMode.Monitor = event.window.data1;
+            break;
+#endif
+
+        case SDL_WINDOWEVENT_SIZE_CHANGED:
+        {
+            if (psDeviceMode.WindowStyle != rsFullscreen)
+            {
+                if (static_cast<int>(psDeviceMode.Width) == event.window.data1 &&
+                    static_cast<int>(psDeviceMode.Height) == event.window.data2)
+                    break; // we don't need to reset device if resolution wasn't really changed
+
+                psDeviceMode.Width = event.window.data1;
+                psDeviceMode.Height = event.window.data2;
+
+                Reset();
+            }
+            else
+                UpdateWindowRects();
+
+            break;
+        }
+        } // switch (event.window.event)
     }
+    } // switch (event.type)
 }
 
 void CRenderDevice::Run()
@@ -448,10 +395,10 @@ void CRenderDevice::Run()
     SDL_RaiseWindow(m_sdlWnd);
     if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
         SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+}
 
-    // Message cycle
-    message_loop();
-
+void CRenderDevice::Shutdown()
+{
     // Stop Balance-Thread
     mt_bMustExit = true;
 
