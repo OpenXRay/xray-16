@@ -227,22 +227,26 @@ CApplication::CApplication(pcstr commandLine)
     discord::Core::Create(DISCORD_APP_ID, discord::CreateFlags::NoRequireDiscord, &m_discord_core);
 
 #   ifndef MASTER_GOLD
-    const auto level = xrDebug::DebuggerIsPresent() ? discord::LogLevel::Debug : discord::LogLevel::Info;
-    m_discord_core->SetLogHook(level, [](discord::LogLevel level, pcstr message)
+    if (m_discord_core)
     {
-        switch (level)
+        const auto level = xrDebug::DebuggerIsPresent() ? discord::LogLevel::Debug : discord::LogLevel::Info;
+        m_discord_core->SetLogHook(level, [](discord::LogLevel level, pcstr message)
         {
-        case discord::LogLevel::Error: Log("!", message); break;
-        case discord::LogLevel::Warn:  Log("~", message); break;
-        case discord::LogLevel::Info:  Log("*", message); break;
-        case discord::LogLevel::Debug: Log("#", message); break;
-        }
-    });
+            switch (level)
+            {
+            case discord::LogLevel::Error: Log("!", message); break;
+            case discord::LogLevel::Warn:  Log("~", message); break;
+            case discord::LogLevel::Info:  Log("*", message); break;
+            case discord::LogLevel::Debug: Log("#", message); break;
+            }
+        });
+    }
 #   endif
 
     discord::Activity activity{};
     activity.SetType(discord::ActivityType::Playing);
     activity.SetApplicationId(DISCORD_APP_ID);
+    if (m_discord_core)
     {
         std::lock_guard guard{ m_discord_lock };
         m_discord_core->ActivityManager().UpdateActivity(activity, nullptr);
@@ -319,6 +323,7 @@ CApplication::CApplication(pcstr commandLine)
 #ifdef USE_DISCORD_INTEGRATION
     const std::locale locale("");
     activity.SetDetails(StringToUTF8(Core.ApplicationTitle, locale).c_str());
+    if (m_discord_core)
     {
         std::lock_guard guard{ m_discord_lock };
         m_discord_core->ActivityManager().UpdateActivity(activity, nullptr);
@@ -477,7 +482,8 @@ int CApplication::Run()
         Device.ProcessFrame();
 
 #ifdef USE_DISCORD_INTEGRATION
-        m_discord_core->RunCallbacks();
+        if (m_discord_core)
+            m_discord_core->RunCallbacks();
 #endif
     } // while (!SDL_QuitRequested())
 
@@ -545,6 +551,7 @@ void CApplication::SplashProc()
             SDL_UpdateWindowSurface(m_window);
 
 #ifdef USE_DISCORD_INTEGRATION
+            if (m_discord_core)
             {
                 std::lock_guard guard{ m_discord_lock };
                 m_discord_core->RunCallbacks();
