@@ -12,7 +12,8 @@ inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
     const size_t size = pitch * source->h;
 
     // XXX: don't alloc at all, flip surface in-place
-    auto original = static_cast<u8*>(xr_malloc(size));
+    auto ptr = static_cast<u8*>(xr_malloc(size));
+    auto original = ptr;
 
     CopyMemory(original, source->pixels, size);
 
@@ -25,7 +26,7 @@ inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
         flipped -= pitch;
     }
 
-    xr_free(original);
+    xr_free(ptr);
     return source;
 }
 
