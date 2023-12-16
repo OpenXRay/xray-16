@@ -51,8 +51,12 @@ struct TipString
     IC bool operator==(shared_str const& tips_text) { return (text == tips_text); }
 };
 
-class ENGINE_API CConsole : public pureRender, public pureFrame,
-                            public CUIResetNotifier, public IUserConfigHandler
+class ENGINE_API CConsole :
+    public pureRender,
+    public pureFrame,
+    public IEventReceiver,
+    public CUIResetNotifier,
+    public IUserConfigHandler
 {
 public:
     struct str_pred
@@ -89,6 +93,8 @@ protected:
     bool m_disable_tips;
 
 private:
+    EVENT eConsole;
+
     int lastBindedKeys[bindtypes_count]{};
 
     vecHistory m_cmd_history;
@@ -114,6 +120,7 @@ public:
 
     virtual void OnRender();
     virtual void OnFrame();
+    virtual void OnEvent(EVENT E, u64 P1, u64 P2) override;
 
     void OnUIReset() override;
 

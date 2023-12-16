@@ -25,7 +25,6 @@
 class ENGINE_API CEngine final : public pureFrame, public IEventReceiver
 {
     EVENT eQuit;
-    EVENT eConsole;
 
 public:
     // DLL api stuff

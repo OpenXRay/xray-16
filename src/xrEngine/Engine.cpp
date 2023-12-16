@@ -61,11 +61,8 @@ void CEngine::Initialize(void)
     msCreate("game");
 #endif
 
-    // events
     eQuit = Event.Handler_Attach("KERNEL:quit", this);
-    eConsole = Event.Handler_Attach("KERNEL:console", this);
 
-    // Register us
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 1000);
 
     if (psDeviceFlags.test(mtSound))
@@ -86,9 +83,7 @@ void CEngine::Destroy()
     External.Destroy();
     Event._destroy();
 
-    // events
     Event.Handler_Detach(eQuit, this);
-    Event.Handler_Detach(eConsole, this);
 
     Device.seqFrameMT.Remove(&SoundProcessor);
     Device.seqFrame.Remove(&SoundProcessor);
@@ -106,12 +101,6 @@ void CEngine::OnEvent(EVENT E, u64 P1, u64 P2)
 
         SDL_Event quit = { SDL_QUIT };
         SDL_PushEvent(&quit);
-    }
-    else if (E == eConsole)
-    {
-        pstr command = (pstr)P1;
-        Console->ExecuteCommand(command, false);
-        xr_free(command);
     }
 }
 
