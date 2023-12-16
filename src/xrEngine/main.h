@@ -1,8 +1,5 @@
 #pragma once
 
-ENGINE_API void InitEngine();
-ENGINE_API void destroyEngine();
-
 ENGINE_API void InitSettings();
 ENGINE_API void destroySettings();
 

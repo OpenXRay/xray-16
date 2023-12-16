@@ -44,14 +44,6 @@ bool CheckBenchmark();
 void RunBenchmark(pcstr name);
 }
 
-ENGINE_API void InitEngine()
-{
-    Engine.Initialize();
-    Device.Initialize();
-
-    Console->OnDeviceInitialize();
-}
-
 namespace
 {
 struct PathIncludePred
@@ -197,46 +189,10 @@ ENGINE_API void destroyConsole()
     xr_delete(Console);
 }
 
-ENGINE_API void destroyEngine()
-{
-    Device.Destroy();
-    Engine.Destroy();
-}
-
 void execUserScript()
 {
     Console->Execute("default_controls");
     Console->ExecuteScript(Console->ConfigFile);
-}
-
-void CheckAndSetupRenderer()
-{
-    if (GEnv.isDedicatedServer)
-    {
-        Console->Execute("renderer renderer_r1");
-        return;
-    }
-
-    if (strstr(Core.Params, "-rgl"))
-        Console->Execute("renderer renderer_rgl");
-    else if (strstr(Core.Params, "-r4"))
-        Console->Execute("renderer renderer_r4");
-    else if (strstr(Core.Params, "-r3"))
-        Console->Execute("renderer renderer_r3");
-    else if (strstr(Core.Params, "-r2.5"))
-        Console->Execute("renderer renderer_r2.5");
-    else if (strstr(Core.Params, "-r2a"))
-        Console->Execute("renderer renderer_r2a");
-    else if (strstr(Core.Params, "-r2"))
-        Console->Execute("renderer renderer_r2");
-    else if (strstr(Core.Params, "-r1"))
-        Console->Execute("renderer renderer_r1");
-    else
-    {
-        CCC_LoadCFG_custom cmd("renderer ");
-        cmd.Execute(Console->ConfigFile);
-        renderer_allow_override = true;
-    }
 }
 
 void slowdownthread(void*)
@@ -245,7 +201,7 @@ void slowdownthread(void*)
     {
         if (Device.GetStats().fFPS < 30)
             Sleep(1);
-        if (Device.mt_bMustExit || !pSettings || !Console || !pInput || !pApp)
+        if (Device.mt_bMustExit || !pSettings || !Console || !pInput)
             return;
     }
 }
@@ -282,8 +238,6 @@ ENGINE_API void Startup()
         LALib.OnCreate();
     });
 
-    pApp = xr_new<CApplication>();
-
     Device.Create();
     TaskScheduler->Wait(createLightAnim);
 
@@ -297,7 +251,6 @@ ENGINE_API void Startup()
 
     // Destroy APP
     DEL_INSTANCE(g_pGamePersistent);
-    xr_delete(pApp);
     Engine.Event.Dump();
 
     // Destroying
@@ -313,7 +266,6 @@ ENGINE_API void Startup()
         Console->Destroy();
 
     Device.CleanupVideoModes();
-    destroyEngine();
     destroySound();
 }
 
@@ -338,16 +290,19 @@ ENGINE_API int RunApplication()
     InitInput();
     InitConsole();
 
-    Engine.External.CreateRendererList();
-    CheckAndSetupRenderer();
+    Engine.Initialize();
+    Device.Initialize();
 
-    Engine.External.Initialize();
-    InitEngine();
+    Console->OnDeviceInitialize();
 
-    if (CheckBenchmark())
-        return 0;
+    //if (CheckBenchmark())
+    //    return 0;
 
     Startup();
+
+    Device.Destroy();
+    Engine.Destroy();
+
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
     {
@@ -413,8 +368,8 @@ void RunBenchmark(pcstr name)
         xr_strlwr(Core.Params);
         InitInput();
         Engine.External.Initialize();
-        if (i)
-            InitEngine();
+        //if (i)
+        //    InitEngine();
         xr_strcpy(Console->ConfigFile, "user.ltx");
         if (strstr(Core.Params, "-ltx "))
         {

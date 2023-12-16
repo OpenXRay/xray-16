@@ -453,7 +453,7 @@ void xrSASH::TryInitEngine(bool bNoRun)
 {
     if (m_bReinitEngine)
     {
-        InitEngine();
+        //InitEngine();
         // It was destroyed on previous exit
         Console->Initialize();
     }
@@ -520,7 +520,7 @@ void xrSASH::ReleaseEngine()
     Console->Destroy();
     Device.CleanupVideoModes();
     destroySound();
-    destroyEngine();
+    //destroyEngine();
 }
 
 #ifdef XR_PLATFORM_WINDOWS

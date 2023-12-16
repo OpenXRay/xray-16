@@ -6,21 +6,15 @@ class ENGINE_API CGameFont;
 class ILoadingScreen;
 
 // definition
-class ENGINE_API CApplication : public pureFrame, public IEventReceiver
+class ENGINE_API CApplication final
 {
-    EVENT eQuit;
-    EVENT eConsole;
 
 public:
-    void OnEvent(EVENT E, u64 P1, u64 P2) override;
-
     // Other
     CApplication();
-    virtual ~CApplication();
-
-    virtual void OnFrame();
+    ~CApplication();
 };
 
-extern ENGINE_API CApplication* pApp;
+extern ENGINE_API CApplication Application;
 
 #endif //__XR_BASE_H__

@@ -140,7 +140,6 @@ void CEngineAPI::Destroy(void)
     hGame = nullptr;
 
     renderers.clear();
-    Engine.Event._destroy();
     XRC.r_clear_compact();
 }
 
