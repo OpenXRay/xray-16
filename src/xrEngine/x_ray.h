@@ -17,7 +17,7 @@ class ENGINE_API CApplication final
     xr_vector<SDL_Surface*> m_surfaces;
 
 private:
-    static void SplashProc(void* self_ptr);
+    void SplashProc();
 
     void ShowSplash(bool topmost);
     void HideSplash();

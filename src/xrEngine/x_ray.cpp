@@ -459,43 +459,46 @@ void CApplication::ShowSplash(bool topmost)
     SDL_ShowWindow(m_window);
     SDL_UpdateWindowSurface(m_window);
 
-    Threading::SpawnThread(SplashProc, "X-Ray Splash Thread", 0, this);
+    Threading::SpawnThread(+[](void* self_ptr)
+    {
+        auto& self = *static_cast<CApplication*>(self_ptr);
+        self.SplashProc();
+    }, "X-Ray Splash Thread", 0, this);
 
     while (!m_thread_operational)
         SDL_PumpEvents();
     SDL_PumpEvents();
 }
 
-void CApplication::SplashProc(void* self_ptr)
+void CApplication::SplashProc()
 {
-    auto& self = *static_cast<CApplication*>(self_ptr);
-    self.m_thread_operational = true;
+    m_thread_operational = true;
 
     while (true)
     {
-        if (self.m_should_exit.Wait(SPLASH_FRAMERATE))
+        if (m_should_exit.Wait(SPLASH_FRAMERATE))
             break;
 
-        if (self.m_surfaces.size() > 1)
+        if (m_surfaces.size() > 1)
         {
-            if (self.m_current_surface_idx >= self.m_surfaces.size())
-                self.m_current_surface_idx = 0;
+            if (m_current_surface_idx >= m_surfaces.size())
+                m_current_surface_idx = 0;
 
-            const auto current = SDL_GetWindowSurface(self.m_window);
-            const auto next = self.m_surfaces[self.m_current_surface_idx++]; // It's important to have postfix increment!
+            const auto current = SDL_GetWindowSurface(m_window);
+            const auto next = m_surfaces[m_current_surface_idx++]; // It's important to have postfix increment!
             SDL_BlitSurface(next, nullptr, current, nullptr);
-            SDL_UpdateWindowSurface(self.m_window);
+            SDL_UpdateWindowSurface(m_window);
         }
     }
 
-    for (SDL_Surface* surface : self.m_surfaces)
+    for (SDL_Surface* surface : m_surfaces)
         SDL_FreeSurface(surface);
-    self.m_surfaces.clear();
+    m_surfaces.clear();
 
-    SDL_DestroyWindow(self.m_window);
-    self.m_window = nullptr;
+    SDL_DestroyWindow(m_window);
+    m_window = nullptr;
 
-    self.m_thread_operational = false;
+    m_thread_operational = false;
 }
 
 void CApplication::HideSplash()
