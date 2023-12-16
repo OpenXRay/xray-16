@@ -195,29 +195,6 @@ void execUserScript()
     Console->ExecuteScript(Console->ConfigFile);
 }
 
-void slowdownthread(void*)
-{
-    for (;;)
-    {
-        if (Device.GetStats().fFPS < 30)
-            Sleep(1);
-        if (Device.mt_bMustExit || !pSettings || !Console || !pInput)
-            return;
-    }
-}
-void CheckPrivilegySlowdown()
-{
-#ifdef DEBUG
-    if (strstr(Core.Params, "-slowdown"))
-        Threading::SpawnThread(slowdownthread, "slowdown", 0, 0);
-    if (strstr(Core.Params, "-slowdown2x"))
-    {
-        Threading::SpawnThread(slowdownthread, "slowdown", 0, 0);
-        Threading::SpawnThread(slowdownthread, "slowdown", 0, 0);
-    }
-#endif
-}
-
 ENGINE_API void Startup()
 {
     InitSoundDeviceList();

@@ -68,7 +68,33 @@ bool CRenderDevice::RenderBegin()
 }
 
 void CRenderDevice::Clear() { GEnv.Render->Clear(); }
-extern void CheckPrivilegySlowdown();
+
+namespace
+{
+void CheckPrivilegySlowdown()
+{
+#ifndef MASTER_GOLD
+    const auto slowdownthread = +[](void*)
+    {
+        for (;;)
+        {
+            if (Device.GetStats().fFPS < 30)
+                Sleep(1);
+            if (Device.mt_bMustExit || !pSettings || !Console || !pInput)
+                return;
+        }
+    };
+
+    if (strstr(Core.Params, "-slowdown"))
+        Threading::SpawnThread(slowdownthread, "slowdown", 0, nullptr);
+    if (strstr(Core.Params, "-slowdown2x"))
+    {
+        Threading::SpawnThread(slowdownthread, "slowdown", 0, nullptr);
+        Threading::SpawnThread(slowdownthread, "slowdown", 0, nullptr);
+    }
+#endif
+}
+}
 
 void CRenderDevice::RenderEnd(void)
 {
