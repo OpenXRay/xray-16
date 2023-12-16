@@ -129,9 +129,9 @@ void CStats::Show()
         if (g_pGamePersistent)
         {
             g_pGamePersistent->DumpStatistics(font, alertPtr);
+            DumpSpatialStatistics(font, alertPtr, g_pGamePersistent->SpatialSpace, engineTotal);
+            DumpSpatialStatistics(font, alertPtr, g_pGamePersistent->SpatialSpacePhysic, engineTotal);
         }
-        DumpSpatialStatistics(font, alertPtr, g_pGamePersistent->SpatialSpace, engineTotal);
-        DumpSpatialStatistics(font, alertPtr, g_pGamePersistent->SpatialSpacePhysic, engineTotal);
         font.OutSet(200, 0);
         GEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();
