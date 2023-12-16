@@ -9,7 +9,6 @@
 
 #include "x_ray.h"
 
-#include "AccessibilityShortcuts.hpp"
 #include "embedded_resources_management.h"
 
 #include "xrCore/Threading/TaskManager.hpp"
@@ -22,6 +21,7 @@
 #include "xrSASH.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
+#include "AccessibilityShortcuts.hpp"
 #include "Text_Console.h"
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #define CTextConsole CConsole

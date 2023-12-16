@@ -232,14 +232,12 @@ target_sources_grouped(
     TARGET xrEngine
     NAME "General"
     FILES
+    AccessibilityShortcuts.hpp
     defines.cpp
     defines.h
     embedded_resources_management.h
     main.cpp
-    main.h
     mp_logging.h
-    splash.cpp
-    splash.h
     stdafx.cpp
     stdafx.h
     x_ray.cpp

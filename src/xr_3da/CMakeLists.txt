@@ -1,11 +1,8 @@
 add_executable(xr_3da)
 
 target_sources(xr_3da PRIVATE
-    AccessibilityShortcuts.hpp
     entry_point.cpp
-    resource.h
     stdafx.h
-    stdafx.cpp
 )
 
 set_property(
