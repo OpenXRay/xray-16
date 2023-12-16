@@ -184,8 +184,9 @@ public:
     ILoadingScreen* m_pLoadingScreen{};
     ISoundScene* m_pSound{};
     IMainMenu* m_pMainMenu{};
-    static bool IsMainMenuActive();
-    static bool MainMenuActiveOrLevelNotExist();
+
+    bool IsMainMenuActive() const;
+    bool MainMenuActiveOrLevelNotExist() const;
 
     ParticleStatistics stats;
 

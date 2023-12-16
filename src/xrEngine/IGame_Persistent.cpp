@@ -22,17 +22,6 @@
 
 ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
 
-//ECO_RENDER add
-bool IGame_Persistent::IsMainMenuActive()
-{
-    return g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive();
-}
-
-bool IGame_Persistent::MainMenuActiveOrLevelNotExist()
-{
-    return !g_pGameLevel || g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive();
-}
-
 IGame_Persistent::IGame_Persistent()
 {
     eStart = Engine.Event.Handler_Attach("KERNEL:start", this);
@@ -622,6 +611,17 @@ void IGame_Persistent::destroy_particles(const bool& all_particles)
 
     VERIFY(ps_needtoplay.empty() && ps_destroy.empty() && (!all_particles || ps_active.empty()));
 #endif
+}
+
+//ECO_RENDER add
+bool IGame_Persistent::IsMainMenuActive() const
+{
+    return m_pMainMenu && m_pMainMenu->IsActive();
+}
+
+bool IGame_Persistent::MainMenuActiveOrLevelNotExist() const
+{
+    return !g_pGameLevel || IsMainMenuActive();
 }
 
 void IGame_Persistent::OnAssetsChanged()

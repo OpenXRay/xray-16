@@ -166,7 +166,7 @@ void CRender::reset_end()
 
 void CRender::BeforeRender()
 {
-    if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
+    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
 
     ProcessHOMTask = &TaskScheduler->AddTask("MT-HOM", { &HOM, &CHOM::MT_RENDER });
@@ -175,7 +175,7 @@ void CRender::BeforeRender()
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
-    if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
+    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
     if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
