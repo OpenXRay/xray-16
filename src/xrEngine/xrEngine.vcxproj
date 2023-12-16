@@ -245,6 +245,9 @@
     <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
       <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(xrExternals)DiscordGameSDK\DiscordGameSDK.vcxproj">
+      <Project>{cff9f0dd-c2fc-424c-800b-bfba35003932}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />

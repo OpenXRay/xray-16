@@ -28,6 +28,15 @@
 #pragma todo("Implement text console or it's alternative")
 #endif
 
+#ifdef XR_PLATFORM_WINDOWS
+#include <locale>
+
+#include "DiscordGameSDK/discord.h"
+#define USE_DISCORD_INTEGRATION
+
+#include "xrCore/Text/StringConversion.hpp"
+#endif
+
 //#define PROFILE_TASK_SYSTEM
 
 #ifdef PROFILE_TASK_SYSTEM
@@ -38,6 +47,10 @@
 constexpr u32 SPLASH_FRAMERATE = 30;
 
 constexpr size_t MAX_WINDOW_EVENTS = 32;
+
+#ifdef USE_DISCORD_INTEGRATION
+constexpr discord::ClientId DISCORD_APP_ID = 421286728695939072;
+#endif
 
 ENGINE_API CInifile* pGameIni = nullptr;
 ENGINE_API bool CallOfPripyatMode = false;
@@ -210,6 +223,32 @@ CApplication::CApplication(pcstr commandLine)
         shortcuts.Disable();
 #endif
 
+#ifdef USE_DISCORD_INTEGRATION
+    discord::Core::Create(DISCORD_APP_ID, discord::CreateFlags::NoRequireDiscord, &m_discord_core);
+
+#   ifndef MASTER_GOLD
+    const auto level = xrDebug::DebuggerIsPresent() ? discord::LogLevel::Debug : discord::LogLevel::Info;
+    m_discord_core->SetLogHook(level, [](discord::LogLevel level, pcstr message)
+    {
+        switch (level)
+        {
+        case discord::LogLevel::Error: Log("!", message); break;
+        case discord::LogLevel::Warn:  Log("~", message); break;
+        case discord::LogLevel::Info:  Log("*", message); break;
+        case discord::LogLevel::Debug: Log("#", message); break;
+        }
+    });
+#   endif
+
+    discord::Activity activity{};
+    activity.SetType(discord::ActivityType::Playing);
+    activity.SetApplicationId(DISCORD_APP_ID);
+    {
+        std::lock_guard guard{ m_discord_lock };
+        m_discord_core->ActivityManager().UpdateActivity(activity, nullptr);
+    }
+#endif
+
     if (!strstr(commandLine, "-nosplash"))
     {
         const bool topmost = !strstr(commandLine, "-splashnotop");
@@ -277,6 +316,14 @@ CApplication::CApplication(pcstr commandLine)
     Device.Initialize();
 
     Console->OnDeviceInitialize();
+#ifdef USE_DISCORD_INTEGRATION
+    const std::locale locale("");
+    activity.SetDetails(StringToUTF8(Core.ApplicationTitle, locale).c_str());
+    {
+        std::lock_guard guard{ m_discord_lock };
+        m_discord_core->ActivityManager().UpdateActivity(activity, nullptr);
+    }
+#endif
 
     //if (CheckBenchmark())
     //    return 0;
@@ -332,6 +379,10 @@ CApplication::~CApplication()
 
     Device.Destroy();
     Engine.Destroy();
+
+#ifdef USE_DISCORD_INTEGRATION
+    discord::Core::Destroy(&m_discord_core);
+#endif
 
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
@@ -424,6 +475,10 @@ int CApplication::Run()
         }
 
         Device.ProcessFrame();
+
+#ifdef USE_DISCORD_INTEGRATION
+        m_discord_core->RunCallbacks();
+#endif
     } // while (!SDL_QuitRequested())
 
     Device.Shutdown();
@@ -488,6 +543,13 @@ void CApplication::SplashProc()
             const auto next = m_surfaces[m_current_surface_idx++]; // It's important to have postfix increment!
             SDL_BlitSurface(next, nullptr, current, nullptr);
             SDL_UpdateWindowSurface(m_window);
+
+#ifdef USE_DISCORD_INTEGRATION
+            {
+                std::lock_guard guard{ m_discord_lock };
+                m_discord_core->RunCallbacks();
+            }
+#endif
         }
     }
 

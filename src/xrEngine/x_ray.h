@@ -1,10 +1,17 @@
 #ifndef __X_RAY_H__
 #define __X_RAY_H__
 
+#include <mutex>
+
 #include "xrCore/Threading/Event.hpp"
 
 struct SDL_Window;
 struct SDL_Surface;
+
+namespace discord
+{
+class Core;
+}
 
 // definition
 class ENGINE_API CApplication final
@@ -15,6 +22,10 @@ class ENGINE_API CApplication final
 
     size_t m_current_surface_idx{};
     xr_vector<SDL_Surface*> m_surfaces;
+
+private:
+    std::mutex m_discord_lock;
+    discord::Core* m_discord_core{};
 
 private:
     void SplashProc();
