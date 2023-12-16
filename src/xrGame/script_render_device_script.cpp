@@ -8,7 +8,6 @@
 
 #include "pch_script.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-#include "xrEngine/x_ray.h"
 
 bool is_device_paused(CRenderDevice* d) { return !!Device.Paused(); }
 void set_device_paused(CRenderDevice* d, bool b) { Device.Pause(b, TRUE, FALSE, "set_device_paused_script"); }

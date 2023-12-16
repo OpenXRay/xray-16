@@ -8,7 +8,6 @@
 #include "game_cl_artefacthunt.h"
 #include "game_cl_single.h"
 #include "MainMenu.h"
-#include "xrEngine/x_ray.h"
 #include "file_transfer.h"
 #include "screenshot_server.h"
 #include "xrNetServer/NET_AuthCheck.h"

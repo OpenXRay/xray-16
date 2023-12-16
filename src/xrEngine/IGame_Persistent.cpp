@@ -11,7 +11,6 @@
 
 #ifndef _EDITOR
 #include "Environment.h"
-#include "x_ray.h"
 #include "IGame_Level.h"
 #include "XR_IOConsole.h"
 #include "Render.h"

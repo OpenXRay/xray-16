@@ -6,7 +6,6 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "Level.h"
 #include "game_cl_base.h"
-#include "xrEngine/x_ray.h"
 #include "xrMaterialSystem/GameMtlLib.h"
 #include "xrPhysics/PhysicsCommon.h"
 #include "level_sounds.h"

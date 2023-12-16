@@ -3,7 +3,6 @@
 #include "xr_collide_form.h"
 #include "xr_object.h"
 #include "xrCDB/xr_area.h"
-#include "x_ray.h"
 #include "Common/LevelStructure.hpp"
 #include "xrCore/FMesh.hpp"
 #include "xrCDB/Frustum.h"

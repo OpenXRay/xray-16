@@ -8,7 +8,6 @@
 #include "Common/object_broker.h"
 #include "GamePersistent.h"
 #include "xrServer.h"
-#include "xrEngine/x_ray.h"
 
 game_sv_Single::game_sv_Single()
 {

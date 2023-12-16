@@ -71,7 +71,6 @@
     <ClInclude Include="LightAnimLibrary.h" />
     <ClInclude Include="line_editor.h" />
     <ClInclude Include="line_edit_control.h" />
-    <ClInclude Include="main.h" />
     <ClInclude Include="mp_logging.h" />
     <ClInclude Include="ObjectAnimator.h" />
     <ClInclude Include="ObjectDump.h" />

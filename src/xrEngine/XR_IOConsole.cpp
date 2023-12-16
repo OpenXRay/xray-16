@@ -8,7 +8,6 @@
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
 
-#include "x_ray.h"
 #include "xr_input.h"
 #include "xr_ioc_cmd.h"
 #include "GameFont.h"

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "IGame_Level.h"
 
-#include "x_ray.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
 #include "xrSASH.h"

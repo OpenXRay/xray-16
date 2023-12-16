@@ -12,7 +12,6 @@
 #include "Effector.h"
 #include "EffectorPP.h"
 
-#include "x_ray.h"
 #include "GameFont.h"
 #include "Render.h"
 

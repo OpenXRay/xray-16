@@ -18,7 +18,6 @@
 #include "xrServer.h"
 #include "Level.h"
 #include "xrAICore/Navigation/graph_engine.h"
-#include "xrEngine/x_ray.h"
 #include "restriction_space.h"
 #include "xrEngine/profiler.h"
 #include "mt_config.h"

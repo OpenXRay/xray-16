@@ -9,9 +9,24 @@
 
 #include "x_ray.h"
 
-#include "main.h"
 #include "AccessibilityShortcuts.hpp"
 #include "embedded_resources_management.h"
+
+#include "xrCore/Threading/TaskManager.hpp"
+#include "xrNetServer/NET_AuthCheck.h"
+
+#include "std_classes.h"
+#include "IGame_Persistent.h"
+#include "LightAnimLibrary.h"
+#include "XR_IOConsole.h"
+#include "xrSASH.h"
+
+#if defined(XR_PLATFORM_WINDOWS)
+#include "Text_Console.h"
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#define CTextConsole CConsole
+#pragma todo("Implement text console or it's alternative")
+#endif
 
 //#define PROFILE_TASK_SYSTEM
 
@@ -19,7 +34,168 @@
 #include "xrCore/Threading/ParallelForEach.hpp"
 #endif
 
+// global variables
 constexpr u32 SPLASH_FRAMERATE = 30;
+
+ENGINE_API CInifile* pGameIni = nullptr;
+ENGINE_API bool CallOfPripyatMode = false;
+ENGINE_API bool ClearSkyMode = false;
+ENGINE_API bool ShadowOfChernobylMode = false;
+
+ENGINE_API string512 g_sLaunchOnExit_params;
+ENGINE_API string512 g_sLaunchOnExit_app;
+ENGINE_API string_path g_sLaunchWorkingFolder;
+
+namespace
+{
+struct PathIncludePred
+{
+private:
+    const xr_auth_strings_t* ignored;
+
+public:
+    explicit PathIncludePred(const xr_auth_strings_t* ignoredPaths) : ignored(ignoredPaths) {}
+    bool IsIncluded(pcstr path)
+    {
+        if (!ignored)
+            return true;
+
+        return allow_to_include_path(*ignored, path);
+    }
+};
+}
+
+template <typename T>
+void InitConfig(T& config, pcstr name, bool fatal = true,
+    bool readOnly = true, bool loadAtStart = true, bool saveAtEnd = true,
+    u32 sectCount = 0, const CInifile::allow_include_func_t& allowIncludeFunc = nullptr)
+{
+    string_path fname;
+    FS.update_path(fname, "$game_config$", name);
+    config = xr_new<CInifile>(fname, readOnly, loadAtStart, saveAtEnd, sectCount, allowIncludeFunc);
+
+    CHECK_OR_EXIT(config->section_count() || !fatal,
+        make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
+}
+
+// XXX: make it more fancy
+// некрасиво слишком
+void set_shoc_mode()
+{
+    CallOfPripyatMode = false;
+    ShadowOfChernobylMode = true;
+    ClearSkyMode = false;
+}
+
+void set_cs_mode()
+{
+    CallOfPripyatMode = false;
+    ShadowOfChernobylMode = false;
+    ClearSkyMode = true;
+}
+
+void set_cop_mode()
+{
+    CallOfPripyatMode = true;
+    ShadowOfChernobylMode = false;
+    ClearSkyMode = false;
+}
+
+void set_free_mode()
+{
+    CallOfPripyatMode = false;
+    ShadowOfChernobylMode = false;
+    ClearSkyMode = false;
+}
+
+void InitSettings()
+{
+    xr_auth_strings_t ignoredPaths, checkedPaths;
+    fill_auth_check_params(ignoredPaths, checkedPaths); //TODO port xrNetServer to Linux
+    PathIncludePred includePred(&ignoredPaths);
+    CInifile::allow_include_func_t includeFilter;
+    includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
+
+    InitConfig(pSettings, "system.ltx");
+    InitConfig(pSettingsAuth, "system.ltx", true, true, true, false, 0, includeFilter);
+    InitConfig(pSettingsOpenXRay, "openxray.ltx", false, true, true, false);
+    InitConfig(pGameIni, "game.ltx");
+
+    if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+        set_shoc_mode();
+    else if (strstr(Core.Params, "-cs"))
+        set_cs_mode();
+    else if (strstr(Core.Params, "-cop"))
+        set_cop_mode();
+    else if (strstr(Core.Params, "-unlock_game_mode"))
+        set_free_mode();
+    else
+    {
+        pcstr gameMode = READ_IF_EXISTS(pSettingsOpenXRay, r_string, "compatibility", "game_mode", "cop");
+        if (xr_strcmpi("cop", gameMode) == 0)
+            set_cop_mode();
+        else if (xr_strcmpi("cs", gameMode) == 0)
+            set_cs_mode();
+        else if (xr_strcmpi("shoc", gameMode) == 0 || xr_strcmpi("soc", gameMode) == 0)
+            set_shoc_mode();
+        else if (xr_strcmpi("unlock", gameMode) == 0)
+            set_free_mode();
+    }
+}
+
+void InitConsole()
+{
+    if (GEnv.isDedicatedServer)
+        Console = xr_new<CTextConsole>();
+    else
+        Console = xr_new<CConsole>();
+
+    Console->Initialize();
+    xr_strcpy(Console->ConfigFile, "user.ltx");
+    if (strstr(Core.Params, "-ltx "))
+    {
+        string64 c_name;
+        sscanf(strstr(Core.Params, "-ltx ") + strlen("-ltx "), "%[^ ] ", c_name);
+        xr_strcpy(Console->ConfigFile, c_name);
+    }
+}
+
+void InitInput()
+{
+    bool captureInput = !strstr(Core.Params, "-i");
+    pInput = xr_new<CInput>(captureInput);
+}
+
+void destroyInput() { xr_delete(pInput); }
+void InitSoundDeviceList() { Engine.Sound.CreateDevicesList(); }
+void InitSound() { Engine.Sound.Create(); }
+void destroySound() { Engine.Sound.Destroy(); }
+void destroySettings()
+{
+    auto s = const_cast<CInifile**>(&pSettings);
+    xr_delete(*s);
+
+    auto sa = const_cast<CInifile**>(&pSettingsAuth);
+    xr_delete(*sa);
+
+    auto so = const_cast<CInifile**>(&pSettingsOpenXRay);
+    xr_delete(*so);
+
+    xr_delete(pGameIni);
+}
+
+void destroyConsole()
+{
+    Console->Execute("cfg_save");
+    Console->Destroy();
+    xr_delete(Console);
+}
+
+void execUserScript()
+{
+    Console->Execute("default_controls");
+    Console->ExecuteScript(Console->ConfigFile);
+}
 
 CApplication::CApplication(pcstr commandLine)
 {
@@ -75,11 +251,101 @@ CApplication::CApplication(pcstr commandLine)
     }
     Msg("Time min: %f microseconds", float(min) / 1000.f);
     Msg("Time average: %f microseconds", float(average) / float(iterations));
+
+    return;
 #endif
+    *g_sLaunchOnExit_app = 0;
+    *g_sLaunchOnExit_params = 0;
+
+    InitSettings();
+    // Adjust player & computer name for Asian
+    if (pSettings->line_exist("string_table", "no_native_input"))
+    {
+        xr_strcpy(Core.UserName, sizeof(Core.UserName), "Player");
+        xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
+    }
+
+    FPU::m24r();
+
+    Device.FillVideoModes();
+    InitInput();
+    InitConsole();
+
+    Engine.Initialize();
+    Device.Initialize();
+
+    Console->OnDeviceInitialize();
+
+    //if (CheckBenchmark())
+    //    return 0;
+
+    InitSoundDeviceList();
+    execUserScript();
+    InitSound();
+
+    // ...command line for auto start
+    pcstr startArgs = strstr(Core.Params, "-start ");
+    if (startArgs)
+        Console->Execute(startArgs + 1);
+    pcstr loadArgs = strstr(Core.Params, "-load ");
+    if (loadArgs)
+        Console->Execute(loadArgs + 1);
+
+    // Initialize APP
+    const auto& createLightAnim = TaskScheduler->AddTask("LALib.OnCreate()", [](Task&, void*)
+    {
+        LALib.OnCreate();
+    });
+
+    Device.Create();
+    TaskScheduler->Wait(createLightAnim);
+
+    g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
+    R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
+    if (!g_pGamePersistent)
+        Console->Show();
 }
 
 CApplication::~CApplication()
 {
+#ifndef PROFILE_TASK_SYSTEM
+    // Destroy APP
+    DEL_INSTANCE(g_pGamePersistent);
+    Engine.Event.Dump();
+
+    // Destroying
+    destroyInput();
+    if (!g_bBenchmark && !g_SASH.IsRunning())
+        destroySettings();
+
+    LALib.OnDestroy();
+
+    if (!g_bBenchmark && !g_SASH.IsRunning())
+        destroyConsole();
+    else
+        Console->Destroy();
+
+    Device.CleanupVideoModes();
+    destroySound();
+
+    Device.Destroy();
+    Engine.Destroy();
+
+    // check for need to execute something external
+    if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
+    {
+#if defined(XR_PLATFORM_WINDOWS)
+        // CreateProcess need to return results to next two structures
+        STARTUPINFO si = {};
+        si.cb = sizeof(si);
+        PROCESS_INFORMATION pi = {};
+        // We use CreateProcess to setup working folder
+        pcstr tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
+        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
+#endif
+    }
+#endif // PROFILE_TASK_SYSTEM
+
     Core._destroy();
     SDL_Quit();
 }
@@ -89,8 +355,12 @@ int CApplication::Run()
 #ifdef PROFILE_TASK_SYSTEM
     return 0;
 #endif
+
+    // Main cycle
     HideSplash();
-    return RunApplication();
+    Device.Run();
+
+    return 0;
 }
 
 void CApplication::ShowSplash(bool topmost)

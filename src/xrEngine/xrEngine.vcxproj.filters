@@ -360,9 +360,6 @@
     <ClInclude Include="ShadersExternalData.h">
       <Filter>Render\Visibility</Filter>
     </ClInclude>
-    <ClInclude Include="main.h">
-      <Filter>General</Filter>
-    </ClInclude>
     <ClInclude Include="ILoadingScreen.h">
       <Filter>Interfaces\ILoadingScreen</Filter>
     </ClInclude>

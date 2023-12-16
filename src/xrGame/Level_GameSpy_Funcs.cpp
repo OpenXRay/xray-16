@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "Level.h"
 #include "xrMessages.h"
-#include "xrEngine/x_ray.h"
 #include "xrGameSpy/GameSpy_GCD_Client.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "ui/UICDkey.h"

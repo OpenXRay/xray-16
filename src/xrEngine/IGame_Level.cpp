@@ -2,8 +2,6 @@
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
 
-#include "x_ray.h"
-#include "std_classes.h"
 #include "CustomHUD.h"
 #include "Render.h"
 #include "GameFont.h"

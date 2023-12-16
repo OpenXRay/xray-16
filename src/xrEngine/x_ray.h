@@ -1,6 +1,11 @@
 #ifndef __X_RAY_H__
 #define __X_RAY_H__
 
+#include "xrCore/Threading/Event.hpp"
+
+struct SDL_Window;
+struct SDL_Surface;
+
 // definition
 class ENGINE_API CApplication final
 {
@@ -24,6 +29,5 @@ public:
 
     int Run();
 };
-
 
 #endif //__XR_BASE_H__

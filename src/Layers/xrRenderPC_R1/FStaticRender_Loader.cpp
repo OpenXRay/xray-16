@@ -3,7 +3,6 @@
 #include "xrCore/FMesh.hpp"
 #include "Common/LevelStructure.hpp"
 #include "Common/OGF_GContainer_Vertices.hpp"
-#include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
 
