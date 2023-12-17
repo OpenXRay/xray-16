@@ -154,19 +154,6 @@ typedef unsigned long long int ULARGE_INTEGER;
 
 typedef wchar_t WCHAR;
 
-#define WAVE_FORMAT_PCM        0x0001
-#define WAVE_FORMAT_IEEE_FLOAT 0x0003
-
-typedef struct {
-    WORD  wFormatTag;
-    WORD  nChannels;
-    DWORD nSamplesPerSec;
-    DWORD nAvgBytesPerSec;
-    WORD  nBlockAlign;
-    WORD  wBitsPerSample;
-    WORD  cbSize;
-} WAVEFORMATEX, *LPWAVEFORMATEX;
-
 typedef struct tagSTICKYKEYS
 {
     DWORD   cbSize;
