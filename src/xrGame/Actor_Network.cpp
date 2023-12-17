@@ -2019,7 +2019,7 @@ void CActor::OnPlayHeadShotParticle(NET_Packet P)
     ps = CParticlesObject::Create(m_sHeadShotParticle.c_str(), TRUE);
 
     ps->UpdateParent(pos, Fvector().set(0.f, 0.f, 0.f));
-    GamePersistent().ps_needtoplay.push_back(ps);
+    Level().ps_needtoplay.push_back(ps);
 };
 
 void CActor::OnCriticalWoundHealthLoss()

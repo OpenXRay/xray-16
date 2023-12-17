@@ -104,7 +104,7 @@ void CLevel::remove_objects()
         client_spawn_manager().clear();
     }
 
-    g_pGamePersistent->destroy_particles(false);
+    DestroyParticles(false);
 
     //.	xr_delete									(m_seniority_hierarchy_holder);
     //.	m_seniority_hierarchy_holder				= new CSeniorityHierarchyHolder();

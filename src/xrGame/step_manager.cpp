@@ -219,7 +219,7 @@ void CStepManager::update(bool b_hud_view)
                 pos.c.set(get_foot_position(ELegType(i)));
 
                 ps->UpdateParent(pos, Fvector().set(0.f, 0.f, 0.f));
-                GamePersistent().ps_needtoplay.push_back(ps);
+                Level().ps_needtoplay.push_back(ps);
             }
 
             // Play Camera FXs

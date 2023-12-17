@@ -59,7 +59,7 @@ public:
         pos.c.set(*((Fvector*)c.pos));
 
         ps->UpdateParent(pos, zero_vel);
-        GamePersistent().ps_needtoplay.push_back(ps);
+        Level().ps_needtoplay.push_back(ps);
     };
     virtual bool obsolete() const { return false; }
 };

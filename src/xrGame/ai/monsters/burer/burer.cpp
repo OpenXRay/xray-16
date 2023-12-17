@@ -455,7 +455,7 @@ void CBurer::Hit(SHit* pHDS)
         CParticlesObject* ps = CParticlesObject::Create(particle_fire_shield, TRUE);
 
         ps->UpdateParent(pos, Fvector().set(0.f, 0.f, 0.f));
-        GamePersistent().ps_needtoplay.push_back(ps);
+        Level().ps_needtoplay.push_back(ps);
     }
     else if (!m_shield_active)
     {

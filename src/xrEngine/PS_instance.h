@@ -9,7 +9,7 @@
 
 class ENGINE_API CPS_Instance : public SpatialBase, public ScheduledBase, public RenderableBase
 {
-    friend class IGame_Persistent;
+    friend class IGame_Level;
 
 private:
     bool m_destroy_on_game_load;

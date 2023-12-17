@@ -14,7 +14,6 @@
 #include "IGame_Level.h"
 #include "XR_IOConsole.h"
 #include "Render.h"
-#include "PS_instance.h"
 #include "CustomHUD.h"
 #include "perlin.h"
 #endif
@@ -350,17 +349,9 @@ void IGame_Persistent::Start(pcstr op)
     }
     else
         UpdateGameType();
-
-    VERIFY(ps_destroy.empty());
 }
 
-void IGame_Persistent::Disconnect()
-{
-#ifndef _EDITOR
-    // clear "need to play" particles
-    destroy_particles(true);
-#endif
-}
+void IGame_Persistent::Disconnect() {}
 
 void IGame_Persistent::OnGameStart()
 {
@@ -546,69 +537,6 @@ void IGame_Persistent::OnFrame()
         UpdateHudRaindrops();
         UpdateRainGloss();
     }
-
-    stats.Starting = ps_needtoplay.size();
-    stats.Active = ps_active.size();
-    stats.Destroying = ps_destroy.size();
-    // Play req particle systems
-    while (ps_needtoplay.size())
-    {
-        CPS_Instance* psi = ps_needtoplay.back();
-        ps_needtoplay.pop_back();
-        psi->Play(false);
-    }
-    // Destroy inactive particle systems
-    while (ps_destroy.size())
-    {
-        // u32 cnt = ps_destroy.size();
-        CPS_Instance* psi = ps_destroy.back();
-        VERIFY(psi);
-        if (psi->Locked())
-        {
-            Log("--locked");
-            break;
-        }
-        ps_destroy.pop_back();
-        psi->PSI_internal_delete();
-    }
-#endif
-}
-
-void IGame_Persistent::destroy_particles(const bool& all_particles)
-{
-#ifndef _EDITOR
-    ps_needtoplay.clear();
-
-    while (ps_destroy.size())
-    {
-        CPS_Instance* psi = ps_destroy.back();
-        VERIFY(psi);
-        VERIFY(!psi->Locked());
-        ps_destroy.pop_back();
-        psi->PSI_internal_delete();
-    }
-
-    // delete active particles
-    if (all_particles)
-    {
-        for (; !ps_active.empty();)
-            (*ps_active.begin())->PSI_internal_delete();
-    }
-    else
-    {
-        u32 active_size = ps_active.size();
-        CPS_Instance** I = (CPS_Instance**)xr_alloca(active_size * sizeof(CPS_Instance*));
-        std::copy(ps_active.begin(), ps_active.end(), I);
-
-        CPS_Instance** E = std::remove_if(I, I + active_size, [](CPS_Instance* const& object)
-        {
-            return (!object->destroy_on_game_load());
-        });
-        for (; I != E; ++I)
-            (*I)->PSI_internal_delete();
-    }
-
-    VERIFY(ps_needtoplay.empty() && ps_destroy.empty() && (!all_particles || ps_active.empty()));
 #endif
 }
 
@@ -630,13 +558,4 @@ void IGame_Persistent::OnAssetsChanged()
 #endif
 }
 
-void IGame_Persistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
-{
-    // XXX: move to particle engine
-    stats.FrameEnd();
-    font.OutNext("Particles:");
-    font.OutNext("- starting:   %u", stats.Starting);
-    font.OutNext("- active:     %u", stats.Active);
-    font.OutNext("- destroying: %u", stats.Destroying);
-    stats.FrameStart();
-}
+void IGame_Persistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert) {}
