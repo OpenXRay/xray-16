@@ -149,7 +149,7 @@ void CBulletManager::PlayExplodePS(const Fmatrix& xf)
     shared_str const& ps_name = m_ExplodeParticles[Random.randI(0, m_ExplodeParticles.size())];
     CParticlesObject* const ps = CParticlesObject::Create(*ps_name, TRUE);
     ps->UpdateParent(xf, zero_vel);
-    Level().ps_needtoplay.push_back(ps);
+    GamePersistent().ps_needtoplay.push_back(ps);
 }
 
 void CBulletManager::PlayWhineSound(SBullet* bullet, IGameObject* object, const Fvector& pos)

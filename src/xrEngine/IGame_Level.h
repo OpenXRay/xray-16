@@ -16,7 +16,6 @@ class ENGINE_API CCameraManager;
 class ENGINE_API CCursor;
 class ENGINE_API CCustomHUD;
 class ENGINE_API ISpatial;
-class ENGINE_API CPS_Instance;
 namespace Feel
 {
 class ENGINE_API Sound;
@@ -75,30 +74,6 @@ protected:
     // temporary
     xr_vector<ISpatial*> snd_ER;
 
-    struct ParticleStatistics
-    {
-        u32 Starting;
-        u32 Active;
-        u32 Destroying;
-
-        ParticleStatistics() { FrameStart(); }
-        void FrameStart()
-        {
-            Starting = 0;
-            Active = 0;
-            Destroying = 0;
-        }
-
-        void FrameEnd() {}
-    };
-
-    ParticleStatistics particles_stats;
-
-public:
-    xr_set<CPS_Instance*> ps_active;
-    xr_vector<CPS_Instance*> ps_destroy;
-    xr_vector<CPS_Instance*> ps_needtoplay;
-
 public:
     ISoundScene* Sound{};
 
@@ -146,8 +121,6 @@ public:
 
     [[nodiscard]] bool WorldRendered() const { return m_world_rendered; }
     void WorldRendered(bool rendered) { m_world_rendered = rendered; }
-
-    void DestroyParticles(bool all_particles);
 
     virtual shared_str OpenDemoFile(const char* demo_file_name) = 0;
     virtual void net_StartPlayDemo() = 0;

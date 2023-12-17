@@ -249,7 +249,7 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
             CParticlesObject* ps = CParticlesObject::Create(ps_name, TRUE);
 
             ps->UpdateParent(pos, zero_vel);
-            Level().ps_needtoplay.push_back(ps);
+            GamePersistent().ps_needtoplay.push_back(ps);
         }
 
         if (bullet->flags.explosive && bStatic)

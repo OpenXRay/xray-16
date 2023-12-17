@@ -9,7 +9,6 @@
 #include "CameraManager.h"
 #include "xr_object.h"
 #include "Feel_Sound.h"
-#include "PS_instance.h"
 
 ENGINE_API IGame_Level* g_pGameLevel = NULL;
 extern bool g_bLoaded;
@@ -55,9 +54,6 @@ IGame_Level::~IGame_Level()
         GEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
 
     Msg("* [ D3D ]: textures[%d K]", (m_base + m_lmaps) / 1024);
-
-    // clear "need to play" particles
-    DestroyParticles(true);
 }
 
 void IGame_Level::net_Stop()
@@ -206,83 +202,9 @@ void IGame_Level::OnFrame()
             Sounds_Random[id].set_range(10, 200);
         }
     }
-
-    particles_stats.Starting = ps_needtoplay.size();
-    particles_stats.Active = ps_active.size();
-    particles_stats.Destroying = ps_destroy.size();
-
-    // Play req particle systems
-    while (!ps_needtoplay.empty())
-    {
-        CPS_Instance* psi = ps_needtoplay.back();
-        ps_needtoplay.pop_back();
-        psi->Play(false);
-    }
-
-    // Destroy inactive particle systems
-    while (!ps_destroy.empty())
-    {
-        CPS_Instance* psi = ps_destroy.back();
-        VERIFY(psi);
-        if (psi->Locked())
-        {
-            VERIFY2(false, "Try to delete particle system instance, but it's locked!");
-            break;
-        }
-        ps_destroy.pop_back();
-        psi->PSI_internal_delete();
-    }
 }
 
-void IGame_Level::DestroyParticles(bool all_particles)
-{
-#ifndef _EDITOR
-    ps_needtoplay.clear();
-
-    while (ps_destroy.size())
-    {
-        CPS_Instance* psi = ps_destroy.back();
-        VERIFY(psi);
-        VERIFY(!psi->Locked());
-        ps_destroy.pop_back();
-        psi->PSI_internal_delete();
-    }
-
-    // delete active particles
-    if (all_particles)
-    {
-        for (; !ps_active.empty();)
-            (*ps_active.begin())->PSI_internal_delete();
-    }
-    else
-    {
-        u32 active_size = ps_active.size();
-        CPS_Instance** I = (CPS_Instance**)xr_alloca(active_size * sizeof(CPS_Instance*));
-        std::copy(ps_active.begin(), ps_active.end(), I);
-
-        CPS_Instance** E = std::remove_if(I, I + active_size, [](CPS_Instance* const& object)
-        {
-            return (!object->destroy_on_game_load());
-        });
-        for (; I != E; ++I)
-            (*I)->PSI_internal_delete();
-    }
-
-    VERIFY(ps_needtoplay.empty() && ps_destroy.empty() && (!all_particles || ps_active.empty()));
-#endif
-}
-
-void IGame_Level::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
-{
-    particles_stats.FrameEnd();
-    font.OutNext("Particles:");
-    font.OutNext("- starting:   %u", particles_stats.Starting);
-    font.OutNext("- active:     %u", particles_stats.Active);
-    font.OutNext("- destroying: %u", particles_stats.Destroying);
-    particles_stats.FrameStart();
-
-    Objects.DumpStatistics(font, alert);
-}
+void IGame_Level::DumpStatistics(IGameFont& font, IPerformanceAlert* alert) { Objects.DumpStatistics(font, alert); }
 // ==================================================================================================
 
 void CServerInfo::AddItem(pcstr name_, pcstr value_, u32 color_)

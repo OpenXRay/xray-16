@@ -22,6 +22,7 @@
 class IRenderVisual;
 class ILoadingScreen;
 class IMainMenu;
+class ENGINE_API CPS_Instance;
 //-----------------------------------------------------------------------------------------------------------
 class ENGINE_API IGame_Persistent :
 #ifndef _EDITOR
@@ -35,6 +36,22 @@ class ENGINE_API IGame_Persistent :
     public IEventReceiver
 {
 public:
+    struct ParticleStatistics
+    {
+        u32 Starting;
+        u32 Active;
+        u32 Destroying;
+
+        ParticleStatistics() { FrameStart(); }
+        void FrameStart()
+        {
+            Starting = 0;
+            Active = 0;
+            Destroying = 0;
+        }
+
+        void FrameEnd() {}
+    };
     union params
     {
         struct
@@ -64,6 +81,11 @@ public:
         }
     };
     params m_game_params;
+
+public:
+    xr_set<CPS_Instance*> ps_active;
+    xr_vector<CPS_Instance*> ps_destroy;
+    xr_vector<CPS_Instance*> ps_needtoplay;
 
 public:
     enum GrassBenders_Anim
@@ -109,6 +131,9 @@ public:
     bool IsActorInHideout() const;
     void UpdateHudRaindrops() const;
     void UpdateRainGloss() const;
+
+public:
+    void destroy_particles(const bool& all_particles);
 
 private:
     EVENT eStart;
@@ -163,8 +188,11 @@ public:
     bool IsMainMenuActive() const;
     bool MainMenuActiveOrLevelNotExist() const;
 
+    ParticleStatistics stats;
+
     ShadersExternalData* m_pGShaderConstants; //--#SM+#--
 
+    const ParticleStatistics& GetStats() { return stats; }
     virtual bool OnRenderPPUI_query() { return false; }; // should return true if we want to have second function called
     virtual void OnRenderPPUI_main(){};
     virtual void OnRenderPPUI_PP(){};
