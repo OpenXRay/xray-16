@@ -119,7 +119,7 @@ public:
             messages.pop_back();
 
         if (messages.empty())
-            messages.clear();
+            messages.shrink_to_fit();
 
         changed = false;
     }
