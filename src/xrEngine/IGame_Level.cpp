@@ -9,7 +9,6 @@
 #include "CameraManager.h"
 #include "xr_object.h"
 #include "Feel_Sound.h"
-#include "xrServerEntities/smart_cast.h"
 
 ENGINE_API IGame_Level* g_pGameLevel = NULL;
 extern bool g_bLoaded;
