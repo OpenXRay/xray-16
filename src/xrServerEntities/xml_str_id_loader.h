@@ -41,8 +41,8 @@ protected:
     static LPCSTR tag_name;
 
 public:
-    CXML_IdToIndex();
-    virtual ~CXML_IdToIndex();
+    CXML_IdToIndex() = default;
+    virtual ~CXML_IdToIndex() = default;
 
     static void InitInternal(bool crashOnFail = true, bool ignoreMissingEndTagError = false);
 
@@ -73,10 +73,6 @@ LPCSTR CSXML_IdToIndex::file_str = NULL;
 TEMPLATE_SPECIALIZATION
 LPCSTR CSXML_IdToIndex::tag_name = NULL;
 
-TEMPLATE_SPECIALIZATION
-CSXML_IdToIndex::CXML_IdToIndex() {}
-TEMPLATE_SPECIALIZATION
-CSXML_IdToIndex::~CXML_IdToIndex() {}
 TEMPLATE_SPECIALIZATION
 const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_assert)
 {
