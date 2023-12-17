@@ -47,55 +47,32 @@
 
 #include "xrEngine/xr_level_controller.h"
 
-CGamePersistent::CGamePersistent(void)
+CGamePersistent::CGamePersistent()
 {
-    m_bPickableDOF = false;
     m_game_params.m_e_game_type = eGameIDNoGame;
-    ambient_effect_next_time = 0;
-    ambient_effect_stop_time = 0;
-    ambient_particles = nullptr;
-
-    ambient_effect_wind_start = 0.f;
-    ambient_effect_wind_in_time = 0.f;
-    ambient_effect_wind_end = 0.f;
-    ambient_effect_wind_out_time = 0.f;
-    ambient_effect_wind_on = false;
 
     ambient_sound_next_time.reserve(32);
 
-    m_pMainMenu = nullptr;
-    m_intro = nullptr;
     m_intro_event.bind(this, &CGamePersistent::start_logo_intro);
-#ifdef DEBUG
-    m_frame_counter = 0;
-    m_last_stats_frame = u32(-2);
-#endif
 
-    const bool bDemoMode = (0 != strstr(Core.Params, "-demomode "));
-    if (bDemoMode)
+    if ((0 != strstr(Core.Params, "-demomode ")))
     {
         string256 fname;
-        LPCSTR name = strstr(Core.Params, "-demomode ") + 10;
+        cpcstr name = strstr(Core.Params, "-demomode ") + 10;
         sscanf(name, "%s", fname);
         R_ASSERT2(fname[0], "Missing filename for 'demomode'");
         Msg("- playing in demo mode '%s'", fname);
         pDemoFile = FS.r_open(fname);
         Device.seqFrame.Add(this);
         eDemoStart = Engine.Event.Handler_Attach("GAME:demo", this);
-        uTime2Change = 0;
-    }
-    else
-    {
-        pDemoFile = NULL;
-        eDemoStart = NULL;
     }
 
     eQuickLoad = Engine.Event.Handler_Attach("Game:QuickLoad", this);
-    Fvector3* DofValue = Console->GetFVectorPtr("r2_dof");
+    const Fvector3* DofValue = Console->GetFVectorPtr("r2_dof");
     SetBaseDof(*DofValue);
 }
 
-CGamePersistent::~CGamePersistent(void)
+CGamePersistent::~CGamePersistent()
 {
     FS.r_close(pDemoFile);
     Device.seqFrame.Remove(this);

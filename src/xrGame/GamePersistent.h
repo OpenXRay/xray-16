@@ -19,22 +19,22 @@ protected:
 
 private:
     // ambient particles
-    CParticlesObject* ambient_particles;
+    CParticlesObject* ambient_particles{};
     AssociativeVector<size_t, u32> ambient_sound_next_time; // max snd channels
-    u32 ambient_effect_next_time;
-    u32 ambient_effect_stop_time;
+    u32 ambient_effect_next_time{};
+    u32 ambient_effect_stop_time{};
 
-    float ambient_effect_wind_start;
-    float ambient_effect_wind_in_time;
-    float ambient_effect_wind_end;
-    float ambient_effect_wind_out_time;
-    bool ambient_effect_wind_on;
+    float ambient_effect_wind_start{};
+    float ambient_effect_wind_in_time{};
+    float ambient_effect_wind_end{};
+    float ambient_effect_wind_out_time{};
+    bool ambient_effect_wind_on{};
 
-    bool m_bPickableDOF;
+    bool m_bPickableDOF{};
 
-    AnselManager* ansel;
+    AnselManager* ansel{};
 
-    CUISequencer* m_intro;
+    CUISequencer* m_intro{};
     EVENT eQuickLoad;
     Fvector m_dof[4]; // 0-dest 1-current 2-from 3-original
 
@@ -50,17 +50,17 @@ private:
     void update_game_intro();
 
 #ifdef DEBUG
-    u32 m_frame_counter;
-    u32 m_last_stats_frame;
+    u32 m_frame_counter{};
+    u32 m_last_stats_frame{ u32(-2) };
 #endif
 
     void WeathersUpdate();
     void UpdateDof();
 
 public:
-    IReader* pDemoFile;
-    u32 uTime2Change;
-    EVENT eDemoStart;
+    IReader* pDemoFile{};
+    u32 uTime2Change{};
+    EVENT eDemoStart{};
 
     CGamePersistent();
     virtual ~CGamePersistent();
