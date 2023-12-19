@@ -33,6 +33,8 @@ private:
     void ShowSplash(bool topmost);
     void HideSplash();
 
+    void UpdateDiscordStatus();
+
 public:
     // Other
     CApplication(pcstr commandLine);
