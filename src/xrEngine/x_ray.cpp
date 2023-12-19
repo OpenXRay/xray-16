@@ -246,6 +246,8 @@ CApplication::CApplication(pcstr commandLine)
     discord::Activity activity{};
     activity.SetType(discord::ActivityType::Playing);
     activity.SetApplicationId(DISCORD_APP_ID);
+    activity.SetState("Starting engine...");
+    activity.GetAssets().SetLargeImage("logo");
     if (m_discord_core)
     {
         std::lock_guard guard{ m_discord_lock };
@@ -322,7 +324,7 @@ CApplication::CApplication(pcstr commandLine)
     Console->OnDeviceInitialize();
 #ifdef USE_DISCORD_INTEGRATION
     const std::locale locale("");
-    activity.SetDetails(StringToUTF8(Core.ApplicationTitle, locale).c_str());
+    activity.SetState(StringToUTF8(Core.ApplicationTitle, locale).c_str());
     if (m_discord_core)
     {
         std::lock_guard guard{ m_discord_lock };
