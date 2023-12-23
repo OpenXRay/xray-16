@@ -31,6 +31,7 @@ target_sources_grouped(
 target_include_directories(xrParticles
     PRIVATE
     "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/Externals"
 )
 
 target_link_libraries(xrParticles

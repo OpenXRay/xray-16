@@ -437,6 +437,7 @@ target_include_directories(xrCore
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/Externals"
     "${CMAKE_SOURCE_DIR}/Externals/mimalloc/include"
 )
 
