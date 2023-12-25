@@ -290,6 +290,9 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     string_path fname;
     xr_strcpy(fname, fRName); //. andy if (strext(fname)) *strext(fname)=0;
     fix_texture_name(fname);
+
+    bool force_srgb = !strstr(fname, "_bump");
+
     IReader* S = NULL;
     if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump"))
         goto _BUMP_from_base;
@@ -323,6 +326,11 @@ _DDS:
     R_ASSERT(S);
 
     R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_PERMISSIVE, &IMG, texture), fn);
+    R_CHK2(
+        DirectX::CreateDDSTextureFromMemoryEx(HW.pDevice, reinterpret_cast<uint8_t*>(S->pointer()), S->length(), 0,
+               D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, 0, force_srgb ? DirectX::DDS_LOADER_FORCE_SRGB : DirectX::DDS_LOADER_DEFAULT,
+               &pTexture2D, nullptr),
+        fn);
 
     // Check for LMAP and compress if needed
     xr_strlwr(fn);
@@ -349,6 +357,10 @@ _DDS:
         D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
         &pTexture2D), fn
     );
+    R_CHK2(DirectX::CreateDDSTextureFromMemoryEx(HW.pDevice, reinterpret_cast<uint8_t*>(S->pointer()), S->length(), 0, D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, 0,
+               force_srgb ? DirectX::DDS_LOADER_FORCE_SRGB : DirectX::DDS_LOADER_DEFAULT, &pTexture2D, nullptr),
+        fn);
+
     FS.r_close(S);
 
     // OK

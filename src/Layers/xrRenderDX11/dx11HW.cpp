@@ -333,7 +333,8 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     {
         //DXGI_FORMAT_R16G16B16A16_FLOAT,
         //DXGI_FORMAT_R10G10B10A2_UNORM,
-        DXGI_FORMAT_R8G8B8A8_UNORM,
+        DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+        //DXGI_FORMAT_R8G8B8A8_UNORM,
     };
 
     // Select back-buffer format

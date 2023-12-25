@@ -327,7 +327,7 @@ CRenderTarget::CRenderTarget()
         if (options.mrtmixdepth)
         {
             // NV50
-            rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8, SampleCount);
+            rt_Color.create(r2_RT_albedo, w, h, (D3DFORMAT)666, SampleCount);
             rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
         }
         else
@@ -358,10 +358,10 @@ CRenderTarget::CRenderTarget()
         }
 
         // generic(LDR) RTs
-        rt_Generic_0.create(r2_RT_generic0, w, h, D3DFMT_A8R8G8B8, 1);
-        rt_Generic_1.create(r2_RT_generic1, w, h, D3DFMT_A8R8G8B8, 1);
+        rt_Generic_0.create(r2_RT_generic0, w, h, (D3DFORMAT)666, 1);
+        rt_Generic_1.create(r2_RT_generic1, w, h, (D3DFORMAT)666, 1);
 #if defined(USE_DX11) || defined(USE_OGL)
-        rt_Generic.create(r2_RT_generic, w, h, D3DFMT_A8R8G8B8, 1);
+        rt_Generic.create(r2_RT_generic, w, h, (D3DFORMAT)666, 1);
 #endif
         if (!options.msaa)
         {
@@ -370,8 +370,8 @@ CRenderTarget::CRenderTarget()
         }
         else
         {
-            rt_Generic_0_r.create(r2_RT_generic0_r, w, h, D3DFMT_A8R8G8B8, SampleCount);
-            rt_Generic_1_r.create(r2_RT_generic1_r, w, h, D3DFMT_A8R8G8B8, SampleCount);
+            rt_Generic_0_r.create(r2_RT_generic0_r, w, h, (D3DFORMAT)666, SampleCount);
+            rt_Generic_1_r.create(r2_RT_generic1_r, w, h, (D3DFORMAT)666, SampleCount);
         }
         //	Igor: for volumetric lights
         // rt_Generic_2.create			(r2_RT_generic2,w,h,D3DFMT_A8R8G8B8		);
