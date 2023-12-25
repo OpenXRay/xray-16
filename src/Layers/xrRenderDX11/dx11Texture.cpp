@@ -291,7 +291,13 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     xr_strcpy(fname, fRName); //. andy if (strext(fname)) *strext(fname)=0;
     fix_texture_name(fname);
 
-    bool force_srgb = !strstr(fname, "_bump");
+    bool force_srgb = 
+        !strstr(fname, "_bump")
+        && !strstr(fname, "_mask") 
+        && !strstr(fname, "_dudv")
+        && !strstr(fname, "water_normal")
+        && !strstr(fname, "internal_")
+        && !strstr(fname, "ui_magnifier2");
 
     IReader* S = NULL;
     if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump"))
