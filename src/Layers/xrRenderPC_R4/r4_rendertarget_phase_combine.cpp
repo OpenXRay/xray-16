@@ -223,9 +223,9 @@ void CRenderTarget::phase_combine()
         RCache.set_Geometry(g_combine);
 
         RCache.set_c("m_v2w", Device.mInvView);
-        RCache.set_c("L_ambient", srgbToLinear(ambclr));
+        RCache.set_c("L_ambient", ambclr);
 
-        RCache.set_c("Ldynamic_color", srgbToLinear(sunclr));
+        RCache.set_c("Ldynamic_color", sunclr);
         RCache.set_c("Ldynamic_dir", sundir);
 
         RCache.set_c("env_color", srgbToLinear(envclr));
