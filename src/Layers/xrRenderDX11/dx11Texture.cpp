@@ -297,6 +297,11 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
         && !strstr(fname, "_dudv")
         && !strstr(fname, "water_normal")
         && !strstr(fname, "internal_")
+
+        && !strstr(fname, "_lm.") // terrain lightmaps (level/*/terrain/)
+        && !strstr(fname, "level_lods_nm") // level lods normal map (level/*/)
+        && !strstr(fname, "lmap#") // level light maps (level/*/)
+
         && !strstr(fname, "ui_magnifier2");
 
     IReader* S = NULL;
