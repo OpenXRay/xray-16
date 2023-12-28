@@ -40,8 +40,8 @@ void CRenderDevice::Initialize()
             title = "S.T.A.L.K.E.R.: Clear Sky";
         }
 
-        title = READ_IF_EXISTS(pSettingsOpenXRay, r_string,
-            "window", "title", title);
+        title = READ_IF_EXISTS(pSettingsOpenXRay, r_string_wb,
+            "window", "title", title).c_str();
 
         xr_strcpy(Core.ApplicationTitle, title);
 
