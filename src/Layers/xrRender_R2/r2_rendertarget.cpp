@@ -631,7 +631,7 @@ CRenderTarget::CRenderTarget()
 
     // BLOOM
     {
-        D3DFORMAT fmt = D3DFMT_A8R8G8B8; // D3DFMT_X8R8G8B8;
+        D3DFORMAT fmt = (D3DFORMAT)666; // D3DFMT_X8R8G8B8;
         u32 w = BLOOM_size_X, h = BLOOM_size_Y;
         constexpr u32 fvf_build = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);
