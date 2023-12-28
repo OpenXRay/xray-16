@@ -58,7 +58,6 @@ Make sure to visit our [wiki](https://github.com/OpenXRay/xray-16/wiki).
 |---|---|---|---|---|---|
 |AppVeyor|Windows, Ubuntu|MSVC, GCC|Debug, Mixed, Release, Release Master Gold|x64, x86|[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/16mp39v0d7fts6yf?svg=true)](https://ci.appveyor.com/project/OpenXRay/xray-16)|
 |GitHub Actions|Windows, Ubuntu, Alpine Linux, macOS|MSVC, GCC, Clang|Debug, Mixed, Release, Release Master Gold|x64, x86|[![GitHub Actions Build Status](https://github.com/OpenXRay/xray-16/actions/workflows/cibuild.yml/badge.svg)](https://github.com/OpenXRay/xray-16/actions/workflows/cibuild.yml)
-|Travis|Ubuntu|GCC|Debug, Release|ARM64|[![Travis Build Status](https://api.travis-ci.com/OpenXRay/xray-16.svg?branch=dev)](https://app.travis-ci.com/github/OpenXRay/xray-16)|
 
 ## Contributing
 All contributions are more than welcomed. There are several ways how you can contribute:
