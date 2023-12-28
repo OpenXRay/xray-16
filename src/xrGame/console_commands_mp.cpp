@@ -598,12 +598,10 @@ protected:
     shared_str m_action_param;
     bool ParseControlString(LPCSTR args_string)
     {
-        string16 action_name;
-        action_name[0] = 0;
-        string32 param_name;
-        param_name[0] = 0;
+        string32 action_name{};
+        string64 param_name{};
 
-        sscanf(args_string, "%16s %32s", action_name, param_name);
+        sscanf(args_string, "%31s %63s", action_name, param_name); // 31/63 instead of 32/64 because we reserve space for null character
         m_action_param = param_name;
 
         if (!xr_strcmp(action_name, "roundstart"))
