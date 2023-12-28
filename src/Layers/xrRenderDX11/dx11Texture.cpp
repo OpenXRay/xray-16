@@ -292,7 +292,8 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     fix_texture_name(fname);
 
     bool force_srgb =
-        !strstr(fname, "_bump")
+        o.linear_space_rendering
+        && !strstr(fname, "_bump")
         && !strstr(fname, "_mask")
         && !strstr(fname, "_dudv")
         && !strstr(fname, "water_normal")

@@ -559,6 +559,7 @@ void CRender::create()
     o.tessellation =
         HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
     o.support_rt_arrays = true;
+    o.linear_space_rendering = (ps_r3_rendering_space == 1);
 #else
     o.support_rt_arrays = false;
 #endif

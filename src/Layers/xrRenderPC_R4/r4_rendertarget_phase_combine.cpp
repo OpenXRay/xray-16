@@ -5,18 +5,6 @@
 
 #define STENCIL_CULL 0
 
-namespace
-{
-
-float srgbToLinear(float c) { return std::pow(c, 2.2f); }
-
-Fvector4 srgbToLinear(const Fvector4 c)
-{
-    return Fvector4{srgbToLinear(c.x), srgbToLinear(c.y), srgbToLinear(c.z), c.w};
-}
-
-} // namespace
-
 void CRenderTarget::DoAsyncScreenshot()
 {
     //	Igor: screenshot will not have postprocess applied.
@@ -228,8 +216,8 @@ void CRenderTarget::phase_combine()
         RCache.set_c("Ldynamic_color", sunclr);
         RCache.set_c("Ldynamic_dir", sundir);
 
-        RCache.set_c("env_color", srgbToLinear(envclr));
-        RCache.set_c("fog_color", srgbToLinear(fogclr));
+        RCache.set_c("env_color", toLinearSpace(envclr));
+        RCache.set_c("fog_color", toLinearSpace(fogclr));
 
         RCache.set_c("ssao_noise_tile_factor", fSSAONoise);
         RCache.set_c("ssao_kernel_size", fSSAOKernelSize);

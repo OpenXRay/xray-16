@@ -261,6 +261,8 @@ CRenderTarget::CRenderTarget()
     const u32 SampleCount  = options.msaa ? options.msaa_samples : 1u;
     const u32 BoundSamples = options.msaa_opt ? 1u : options.msaa_samples;
 
+    const D3DFORMAT mainColorFormat = options.linear_space_rendering ? D3DFMT_HACK_R8G8B8A8_UNORM_SRGB : D3DFMT_A8R8G8B8;
+
 #ifdef DEBUG
     Msg("MSAA samples = %d", SampleCount);
     if (options.msaa_opt)
@@ -327,7 +329,7 @@ CRenderTarget::CRenderTarget()
         if (options.mrtmixdepth)
         {
             // NV50
-            rt_Color.create(r2_RT_albedo, w, h, (D3DFORMAT)666, SampleCount);
+            rt_Color.create(r2_RT_albedo, w, h, mainColorFormat, SampleCount);
             rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount);
         }
         else
@@ -358,10 +360,10 @@ CRenderTarget::CRenderTarget()
         }
 
         // generic(LDR) RTs
-        rt_Generic_0.create(r2_RT_generic0, w, h, (D3DFORMAT)666, 1);
-        rt_Generic_1.create(r2_RT_generic1, w, h, (D3DFORMAT)666, 1);
+        rt_Generic_0.create(r2_RT_generic0, w, h, mainColorFormat, 1);
+        rt_Generic_1.create(r2_RT_generic1, w, h, mainColorFormat, 1);
 #if defined(USE_DX11) || defined(USE_OGL)
-        rt_Generic.create(r2_RT_generic, w, h, (D3DFORMAT)666, 1);
+        rt_Generic.create(r2_RT_generic, w, h, mainColorFormat, 1);
 #endif
         if (!options.msaa)
         {
@@ -370,8 +372,8 @@ CRenderTarget::CRenderTarget()
         }
         else
         {
-            rt_Generic_0_r.create(r2_RT_generic0_r, w, h, (D3DFORMAT)666, SampleCount);
-            rt_Generic_1_r.create(r2_RT_generic1_r, w, h, (D3DFORMAT)666, SampleCount);
+            rt_Generic_0_r.create(r2_RT_generic0_r, w, h, mainColorFormat, SampleCount);
+            rt_Generic_1_r.create(r2_RT_generic1_r, w, h, mainColorFormat, SampleCount);
         }
         //	Igor: for volumetric lights
         // rt_Generic_2.create			(r2_RT_generic2,w,h,D3DFMT_A8R8G8B8		);
@@ -631,7 +633,7 @@ CRenderTarget::CRenderTarget()
 
     // BLOOM
     {
-        D3DFORMAT fmt = (D3DFORMAT)666; // D3DFMT_X8R8G8B8;
+        D3DFORMAT fmt = mainColorFormat;
         u32 w = BLOOM_size_X, h = BLOOM_size_Y;
         constexpr u32 fvf_build = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
             D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);

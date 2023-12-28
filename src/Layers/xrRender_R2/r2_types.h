@@ -151,3 +151,5 @@ IC float u_diffuse2s(Fvector3& c)
 {
     return u_diffuse2s(c.x, c.y, c.z);
 }
+
+#define D3DFMT_HACK_R8G8B8A8_UNORM_SRGB ((D3DFORMAT)666)
