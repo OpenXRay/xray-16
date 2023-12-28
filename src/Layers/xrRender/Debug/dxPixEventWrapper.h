@@ -5,8 +5,8 @@
 #   define PIX_EVENT_CTX(C,Name) do { } while (false)
 #else
 #if defined(USE_DX9) || defined(USE_DX11)
-#   define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(RCache,L#Name)
-#   define PIX_EVENT_CTX(C,Name) dxPixEventWrapper pixEvent##Name(C,L#Name)
+#   define PIX_EVENT(Name) dxPixEventWrapper pixEvent##Name(RCache,L ## #Name)
+#   define PIX_EVENT_CTX(C,Name) dxPixEventWrapper pixEvent##Name(C,L ## #Name)
 
 class dxPixEventWrapper
 {
