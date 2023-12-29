@@ -417,8 +417,8 @@ int CApplication::Run()
 #endif
 
     // Main cycle
-    Device.Run();
     HideSplash();
+    Device.Run();
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
