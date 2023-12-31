@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows:
+  windows:
     name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (msvc)
     runs-on: windows-latest
     strategy:
@@ -67,7 +67,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: gh release upload --clobber latest-nightly (get-item res/*.*.7z)
 
-  build-ubuntu:
+  ubuntu:
     name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
     runs-on: ubuntu-latest
     strategy:
@@ -132,7 +132,7 @@ jobs:
         name: openxray_1.6.02_${{ matrix.Configuration }}_${{ matrix.Platform }}_(github-${{ matrix.CC }}-${{ github.run_number }}).deb
         path: build/openxray_1.6.02_*.deb
 
-  build-alpine:
+  alpine:
     name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }} (gcc)
     runs-on: ubuntu-latest
     strategy:
@@ -171,7 +171,7 @@ jobs:
       shell: alpine.sh {0}
       run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
 
-  build-macos:
+  macos:
     name: macOS ${{ matrix.Configuration }} ${{ matrix.Platform }}
     runs-on: macos-latest
     strategy:
