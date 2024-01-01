@@ -157,3 +157,58 @@ jobs:
 
     - name: Run CMake Build
       run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(sysctl -n hw.ncpu || echo 4)
+
+  bsd:
+    name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }}
+    runs-on: macos-latest
+    env:
+      CFLAGS: "-w"
+      CXXFLAGS: "-w"
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+        - { name: FreeBSD, os: freebsd, os-version: 13.2, arch: x86_64,
+            install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 glew lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
+          }
+        #- { name: OpenBSD, os: openbsd, os-version: 7.4,  arch: x86_64,
+        #    install-cmd: "sudo pkg_add cmake SDL2 glew lzo2 jpeg openal libogg libtheora libvorbis",
+        #  }
+        #- { name: NetBSD,  os: netbsd,  os-version: 9.3,  arch: x86_64,
+        #    install-cmd: "sudo pkgin -y install cmake SDL2 glew lzo libjpeg-turbo openal-soft libogg libtheora libvorbis && export CC=gcc-13 && export CXX=g++-13",
+        #  }
+        configuration: [Debug, Release]
+
+    steps:
+    - uses: actions/checkout@main
+      with:
+        submodules: recursive
+
+    - name: Setup ${{ matrix.platform.name }} and packages
+      uses: cross-platform-actions/action@v0.22.0
+      with:
+        operating_system: ${{ matrix.platform.os }}
+        architecture: ${{ matrix.platform.arch }}
+        version: ${{ matrix.platform.os-version }}
+        shutdown_vm: false
+        sync_files: runner-to-vm
+        run: ${{ matrix.platform.install-cmd }}
+
+    - name: Run CMake
+      uses: cross-platform-actions/action@v0.22.0
+      with:
+        operating_system: ${{ matrix.platform.os }}
+        architecture: ${{ matrix.platform.arch }}
+        version: ${{ matrix.platform.os-version }}
+        shutdown_vm: false
+        sync_files: false
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+
+    - name: Run CMake Build
+      uses: cross-platform-actions/action@v0.22.0
+      with:
+        operating_system: ${{ matrix.platform.os }}
+        architecture: ${{ matrix.platform.arch }}
+        version: ${{ matrix.platform.os-version }}
+        sync_files: vm-to-runner
+        run: cmake --build build --config ${{ matrix.Configuration }} --parallel 3
