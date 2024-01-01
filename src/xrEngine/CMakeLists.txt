@@ -438,7 +438,7 @@ target_link_libraries(xrEngine
     xrNetServer
     xrImGui
     ${OPENAL_LIBRARY}
-    ${OGG_LIBRARIES}
+    Ogg::Ogg
     Theora::Theora
 )
 

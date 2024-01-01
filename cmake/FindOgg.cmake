@@ -28,7 +28,6 @@
 # A user may set ``OGGDIR`` environment to a ogg installation root
 # to tell this module where to look.
 
-
 set(_OGG_SEARCHES)
 
 # Search OGGDIR first when is set.
@@ -47,7 +46,7 @@ set(OGG_NAMES ogg libogg)
 set(OGG_NAMES_DEBUG oggd ogg_D oggD ogg_D)
 
 foreach(search ${_OGG_SEARCHES})
-  find_path(OGG_INCLUDE_DIR NAMES ogg.h ${${search}} PATH_SUFFIXES ogg)
+  find_path(OGG_INCLUDE_DIR NAMES ogg/ogg.h ${${search}} PATH_SUFFIXES include)
 endforeach()
 
 # Allow OGG_LIBRARY to be set manually, as the location of the
