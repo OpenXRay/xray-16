@@ -87,9 +87,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Deinit Crypto++
-      run: git submodule deinit Externals/cryptopp
-
     - name: Install packages
       run: |
           sudo apt-get update -qq
@@ -146,10 +143,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Deinit Crypto++
-      run: |
-        git submodule deinit Externals/cryptopp
-
     - name: Install latest stable Alpine Linux
       uses: jirutka/setup-alpine@master
       with:
@@ -183,9 +176,6 @@ jobs:
     - uses: actions/checkout@main
       with:
         submodules: recursive
-
-    - name: Deinit Crypto++
-      run: git submodule deinit Externals/cryptopp
 
     - name: Install packages
       run: |
