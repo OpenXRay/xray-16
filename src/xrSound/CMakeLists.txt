@@ -132,10 +132,7 @@ target_include_directories(xrSound
     PRIVATE
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/src/xrEngine"
-    "${CMAKE_SOURCE_DIR}/Externals/libvorbis/include"
-    "${CMAKE_SOURCE_DIR}/Externals/libogg/include"
     "${OPENAL_INCLUDE_DIR}"
-    "${OGG_INCLUDE_DIRS}"
 )
 
 target_link_libraries(xrSound
@@ -146,7 +143,7 @@ target_link_libraries(xrSound
     xrCDB
     xrMaterialSystem
     ${OPENAL_LIBRARY}
-    ${OGG_LIBRARIES}
+    Ogg::Ogg
     Vorbis::Vorbis
     Vorbis::VorbisFile
 )
