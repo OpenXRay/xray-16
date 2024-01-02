@@ -4,6 +4,8 @@ else()
     add_library(xrODE SHARED)
 endif()
 
+add_library(xrODE::xrODE ALIAS xrODE)
+
 target_sources(xrODE PRIVATE
     ode/src/array.cpp
     ode/src/array.h
@@ -85,6 +87,9 @@ target_sources(xrODE PRIVATE
 )
 
 target_include_directories(xrODE
+    #PUBLIC
+    #"${CMAKE_SOURCE_DIR}/Externals/ode/include"
+
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )

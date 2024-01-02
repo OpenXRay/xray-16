@@ -1,0 +1,168 @@
+add_library(bugtrap_bugtrap SHARED)
+
+add_library(BugTrap::BugTrap ALIAS bugtrap_bugtrap)
+
+target_include_directories(bugtrap_bugtrap
+    PRIVATE
+    #../BugTrap/include
+    ../zlib
+    ../zlib/include
+    ../zlib/contrib/minizip
+    "${CMAKE_BINARY_DIR}/Externals/zlib"
+)
+
+target_compile_definitions(bugtrap_bugtrap
+    PUBLIC
+    _USRDLL
+    BUGTRAP_EXPORTS
+    WIN64
+    _WINDOWS
+
+)
+
+target_link_libraries(bugtrap_bugtrap
+    PRIVATE
+    zlib::zlib
+    ws2_32.lib
+    comctl32.lib
+    shlwapi.lib
+    version.lib
+    wininet.lib
+    vfw32.lib
+)
+
+target_link_options(bugtrap_bugtrap
+    PRIVATE 
+    /DEF:../BugTrap/source/Client/BugTrap.def
+    nothrownew.obj
+)
+
+#TODO add unity build
+
+target_sources(bugtrap_bugtrap
+    PRIVATE
+    ../BugTrap/source/Client/AboutDlg.cpp
+    ../BugTrap/source/Client/AboutDlg.h
+    ../BugTrap/source/Client/AnimProgressBar.cpp
+    ../BugTrap/source/Client/AnimProgressBar.h
+    ../BugTrap/source/Client/Array.h
+    ../BugTrap/source/Client/AssemblyInfo.cpp
+    ../BugTrap/source/Client/BTAtlWindow.h
+    ../BugTrap/source/Client/BTMfcWindow.h
+    ../BugTrap/source/Client/BTTrace.h
+    ../BugTrap/source/Client/BaseStream.h
+    ../BugTrap/source/Client/Buffer.h
+    ../BugTrap/source/Client/BugTrap.cpp
+    ../BugTrap/source/Client/BugTrap.h
+    ../BugTrap/source/Client/BugTrapNet.cpp
+    ../BugTrap/source/Client/BugTrapNet.h
+    ../BugTrap/source/Client/BugTrapUI.cpp
+    ../BugTrap/source/Client/BugTrapUI.h
+    ../BugTrap/source/Client/BugTrapUtils.cpp
+    ../BugTrap/source/Client/BugTrapUtils.h
+    ../BugTrap/source/Client/CMapi.cpp
+    ../BugTrap/source/Client/CMapi.h
+    ../BugTrap/source/Client/ColHelper.cpp
+    ../BugTrap/source/Client/ColHelper.h
+    ../BugTrap/source/Client/DescribeErrorDlg.cpp
+    ../BugTrap/source/Client/DescribeErrorDlg.h
+    ../BugTrap/source/Client/Encoding.cpp
+    ../BugTrap/source/Client/Encoding.h
+    ../BugTrap/source/Client/EnumProcess.cpp
+    ../BugTrap/source/Client/EnumProcess.h
+    ../BugTrap/source/Client/FileStream.cpp
+    ../BugTrap/source/Client/FileStream.h
+    ../BugTrap/source/Client/Globals.cpp
+    ../BugTrap/source/Client/Globals.h
+    ../BugTrap/source/Client/Hash.h
+    ../BugTrap/source/Client/HexView.cpp
+    ../BugTrap/source/Client/HexView.h
+    ../BugTrap/source/Client/HyperLink.cpp
+    ../BugTrap/source/Client/HyperLink.h
+    ../BugTrap/source/Client/ImageView.cpp
+    ../BugTrap/source/Client/ImageView.h
+    ../BugTrap/source/Client/InMemLogFile.cpp
+    ../BugTrap/source/Client/InMemLogFile.h
+    ../BugTrap/source/Client/InputStream.cpp
+    ../BugTrap/source/Client/InputStream.h
+    ../BugTrap/source/Client/InterfacePtr.h
+    ../BugTrap/source/Client/LayoutManager.cpp
+    ../BugTrap/source/Client/LayoutManager.h
+    ../BugTrap/source/Client/LeakWatcher.h
+    ../BugTrap/source/Client/List.h
+    ../BugTrap/source/Client/LogFile.cpp
+    ../BugTrap/source/Client/LogFile.h
+    ../BugTrap/source/Client/LogLink.h
+    ../BugTrap/source/Client/LogStream.cpp
+    ../BugTrap/source/Client/LogStream.h
+    ../BugTrap/source/Client/MachineInfoDlg.cpp
+    ../BugTrap/source/Client/MachineInfoDlg.h
+    ../BugTrap/source/Client/MachineStateDlg.cpp
+    ../BugTrap/source/Client/MachineStateDlg.h
+    ../BugTrap/source/Client/MainDlg.cpp
+    ../BugTrap/source/Client/MainDlg.h
+    ../BugTrap/source/Client/MemStream.cpp
+    ../BugTrap/source/Client/MemStream.h
+    ../BugTrap/source/Client/ModuleImportTable.cpp
+    ../BugTrap/source/Client/ModuleImportTable.h
+    ../BugTrap/source/Client/NetThunks.cpp
+    ../BugTrap/source/Client/NetThunks.h
+    ../BugTrap/source/Client/OutputStream.cpp
+    ../BugTrap/source/Client/OutputStream.h
+    ../BugTrap/source/Client/PreviewDlg.cpp
+    ../BugTrap/source/Client/PreviewDlg.h
+    ../BugTrap/source/Client/ResManager.cpp
+    ../BugTrap/source/Client/ResManager.h
+    ../BugTrap/source/Client/SendMailDlg.cpp
+    ../BugTrap/source/Client/SendMailDlg.h
+    ../BugTrap/source/Client/SimpleDlg.cpp
+    ../BugTrap/source/Client/SimpleDlg.h
+    ../BugTrap/source/Client/SmartPtr.h
+    ../BugTrap/source/Client/Splitter.cpp
+    ../BugTrap/source/Client/Splitter.h
+    ../BugTrap/source/Client/StrHolder.cpp
+    ../BugTrap/source/Client/StrHolder.h
+    ../BugTrap/source/Client/StrStream.cpp
+    ../BugTrap/source/Client/StrStream.h
+    ../BugTrap/source/Client/Stream.h
+    ../BugTrap/source/Client/SymEngine.cpp
+    ../BugTrap/source/Client/SymEngine.h
+    ../BugTrap/source/Client/SymEngineNet.cpp
+    ../BugTrap/source/Client/SymEngineNet.h
+    ../BugTrap/source/Client/TextFormat.cpp
+    ../BugTrap/source/Client/TextFormat.h
+    ../BugTrap/source/Client/TextLogFile.cpp
+    ../BugTrap/source/Client/TextLogFile.h
+    ../BugTrap/source/Client/TextView.cpp
+    ../BugTrap/source/Client/TextView.h
+    ../BugTrap/source/Client/ThemeXP.cpp
+    ../BugTrap/source/Client/ThemeXP.h
+    ../BugTrap/source/Client/TransferProgressDlg.cpp
+    ../BugTrap/source/Client/TransferProgressDlg.h
+    ../BugTrap/source/Client/VersionInfo.h
+    ../BugTrap/source/Client/VersionInfoString.h
+    ../BugTrap/source/Client/WaitCursor.cpp
+    ../BugTrap/source/Client/WaitCursor.h
+    ../BugTrap/source/Client/WaitDlg.cpp
+    ../BugTrap/source/Client/WaitDlg.h
+    ../BugTrap/source/Client/XmlLogFile.cpp
+    ../BugTrap/source/Client/XmlLogFile.h
+    ../BugTrap/source/Client/XmlReader.cpp
+    ../BugTrap/source/Client/XmlReader.h
+    ../BugTrap/source/Client/XmlWriter.cpp
+    ../BugTrap/source/Client/XmlWriter.h
+    ../BugTrap/source/Client/resource.h
+    ../BugTrap/source/Client/stdafx.cpp
+    ../BugTrap/source/Client/stdafx.h
+
+    ../BugTrap/source/Client/res/Bug.ico
+    ../BugTrap/source/Client/res/CheckMark.bmp
+    ../BugTrap/source/Client/res/ImageToolbar.bmp
+    ../BugTrap/source/Client/res/SortArrows.bmp
+
+    ../BugTrap/source/Client/BugTrap.def
+    ../BugTrap/source/Client/res/KeyPair.snk
+    ../BugTrap/source/Client/res/Upload.avi
+
+    ../BugTrap/source/Client/BugTrap.rc
+)

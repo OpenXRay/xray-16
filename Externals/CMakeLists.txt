@@ -11,6 +11,12 @@ add_subdirectory(OPCODE)
 add_subdirectory(ode)
 add_subdirectory(imgui-proj)
 
+if (OS_WINDOWS)
+    add_subdirectory(BugTrap-proj)
+    add_subdirectory(zlib-proj)
+    add_subdirectory(DiscordGameSDK)
+endif()
+
 if (NOT TARGET xrLuabind)
     message(FATAL_ERROR
         "You probably have downloaded OpenXRay sources as ZIP archive, you can't do that. Use git to clone the repository.\n"

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.23)
 
 message(STATUS "CMAKE_VERSION: ${CMAKE_VERSION}")
 
@@ -8,6 +8,7 @@ cmake_policy(SET CMP0095 NEW)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(utils)
+
 calculate_xray_build_id(XRAY_BUILD_ID)
 
 project(OpenXRay
@@ -17,6 +18,23 @@ project(OpenXRay
     HOMEPAGE_URL "https://github.com/OpenXRay/xray-16"
     LANGUAGES CXX C
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(OS_LINUX TRUE)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(OS_MACOS TRUE)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(OS_WINDOWS TRUE)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" OR CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+    set(OS_BSD TRUE)
+else()
+    message(FATAL_ERROR "Unsupported CMAKE_SYSTEM_NAME \"${CMAKE_SYSTEM_NAME}\"")
+endif()
+
+if(OS_WINDOWS)
+    # Set it this way so cmake/windows will be used first
+    set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/windows;${CMAKE_MODULE_PATH}")
+endif()
 
 message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}")
 
@@ -149,11 +167,18 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
     endif()
 endif()
 
-add_compile_options(-Wno-attributes)
-if (APPLE)
-    add_compile_options(-Wl,-undefined,error)
-else()
-    add_compile_options(-Wl,--no-undefined)
+if (NOT OS_WINDOWS)
+    add_compile_options(-Wno-attributes)
+    if (APPLE)
+        add_compile_options(-Wl,-undefined,error)
+    else()
+        add_compile_options(-Wl,--no-undefined)
+    endif()
+endif()
+
+if (MASTER_GOLD AND OS_WINDOWS)
+    add_compile_definitions(_HAS_EXCEPTIONS=0)
+    string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 endif()
 
 # TODO test
@@ -206,10 +231,12 @@ elseif (PROJECT_PLATFORM_PPC)
     )
     add_compile_definitions(NO_WARN_X86_INTRINSICS)
 else()
-    add_compile_options(
-        -mfpmath=sse
-        -msse3
-    )
+    if (NOT OS_WINDOWS)
+        add_compile_options(
+            -mfpmath=sse
+            -msse3
+        )
+    endif()
 endif()
 
 if (XRAY_LINKER)
@@ -221,7 +248,10 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         DEBUG
         MIXED
     )
-    add_compile_options(-Og)
+
+    if(NOT OS_WINDOWS)
+        add_compile_options(-Og)
+    endif()
 endif()
 
 add_compile_definitions(
@@ -229,7 +259,34 @@ add_compile_definitions(
     _CPPUNWIND
 )
 
-if (NOT WIN32)
+if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(ARCH_TYPE x64)
+else (CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(ARCH_TYPE x86)
+endif()
+
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/sdk")
+list(APPEND CMAKE_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/sdk/libraries/${ARCH_TYPE}")
+
+# TODO move
+if(OS_WINDOWS)
+    set(SDL2_DIR "${CMAKE_SOURCE_DIR}/sdk/cmake")
+endif()
+
+find_package(SDL2 REQUIRED CONFIG)
+find_package(mimalloc)
+
+if(NOT TARGET mimalloc::mimalloc)
+    add_library(mimalloc::mimalloc ALIAS mimalloc)
+endif()
+
+if (OS_WINDOWS)
+    find_package(DbgHelp)
+    find_package(DXSDK)
+    find_package(EAX)
+    find_package(FaultRep)
+    find_package(JPEG)
+else()
     find_package(SDL2 2.0.18 REQUIRED)
     # Fix to support older SDL2
     # https://github.com/OpenXRay/xray-16/issues/1595
@@ -241,14 +298,21 @@ if (NOT WIN32)
             INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
         )
     endif()
-    find_package(OpenAL REQUIRED)
+
+    find_package(OpenGL REQUIRED)
+    find_package(GLEW REQUIRED)
     find_package(JPEG)
-    find_package(Ogg REQUIRED)
-    find_package(Vorbis REQUIRED)
-    find_package(Theora REQUIRED)
-    find_package(LZO REQUIRED)
-    find_package(mimalloc NAMES mimalloc2 mimalloc2.0 mimalloc)
 endif()
+
+find_package(Ogg REQUIRED)
+find_package(OpenAL)
+find_package(LZO REQUIRED)
+find_package(Theora REQUIRED)
+find_package(Vorbis REQUIRED)
+
+option(XRAY_USE_LUAJIT "Use LuaJIT" ON)
+
+add_subdirectory(Externals)
 
 # Memory allocator option
 if (mimalloc_FOUND)
@@ -258,38 +322,44 @@ else()
 endif()
 set_property(CACHE MEMORY_ALLOCATOR PROPERTY STRINGS "mimalloc" "standard")
 
-if (MEMORY_ALLOCATOR STREQUAL "mimalloc" AND NOT mimalloc_FOUND)
+if (MEMORY_ALLOCATOR STREQUAL "mimalloc" AND NOT (mimalloc_FOUND OR TARGET mimalloc::mimalloc))
     message(FATAL_ERROR "mimalloc allocator requested but not found. Please, install mimalloc package or select standard allocator.")
 endif()
 
 message("Using ${MEMORY_ALLOCATOR} memory allocator")
 
-option(XRAY_USE_LUAJIT "Use LuaJIT" ON)
+if (OS_WINDOWS)
+    add_compile_options(
+        /nologo
+    )
 
-add_subdirectory(Externals)
-
-add_compile_options(
-    -Wall
-    #-Werror
-    -Wextra
-    #-pedantic
-    -Wno-unknown-pragmas
-    -Wno-strict-aliasing
-    -Wno-parentheses
-    -Wno-unused-label
-    -Wno-unused-parameter
-    -Wno-switch
-    #-Wno-padded
-    #-Wno-c++98-compat
-    #-Wno-c++98-compat-pedantic
-    #-Wno-c++11-compat
-    #-Wno-c++11-compat-pedantic
-    #-Wno-c++14-compat
-    #-Wno-c++14-compat-pedantic
-    #-Wno-newline-eof
-    $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
-    $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
-)
+    add_link_options(
+        /nologo
+    )
+else()
+    add_compile_options(
+        -Wall
+        #-Werror
+        -Wextra
+        #-pedantic
+        -Wno-unknown-pragmas
+        -Wno-strict-aliasing
+        -Wno-parentheses
+        -Wno-unused-label
+        -Wno-unused-parameter
+        -Wno-switch
+        #-Wno-padded
+        #-Wno-c++98-compat
+        #-Wno-c++98-compat-pedantic
+        #-Wno-c++11-compat
+        #-Wno-c++11-compat-pedantic
+        #-Wno-c++14-compat
+        #-Wno-c++14-compat-pedantic
+        #-Wno-newline-eof
+        $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
+        $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
+    )
+endif()
 
 add_subdirectory(src)
 add_subdirectory(res)

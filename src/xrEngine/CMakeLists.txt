@@ -1,8 +1,10 @@
 add_library(xrEngine SHARED)
 
+add_library(xrEngine::xrEngine ALIAS xrEngine)
+
 target_sources_grouped(
     TARGET xrEngine
-    NAME "editor"
+    NAME "Editor"
     FILES
     editor_base.cpp
     editor_base.h
@@ -349,14 +351,16 @@ target_sources_grouped(
     xrTheora_Surface.h
 )
 
-#target_sources_grouped(
-#    TARGET xrEngine
-#    NAME "Render\\Execution & 3D\\TextConsole"
-#    FILES
-#    Text_Console.cpp
-#    Text_Console.h
-#    Text_Console_WndProc.cpp
-#)
+if(OS_WINDOWS)
+    target_sources_grouped(
+        TARGET xrEngine
+        NAME "Render\\Execution & 3D\\TextConsole"
+        FILES
+        Text_Console.cpp
+        Text_Console.h
+        Text_Console_WndProc.cpp
+    )
+endif()
 
 target_sources_grouped(
     TARGET xrEngine
@@ -407,6 +411,16 @@ target_sources_grouped(
 #    xrLoadSurface.cpp
 #)
 
+target_sources_grouped(
+    TARGET xrEngine
+    NAME "General"
+    FILES
+    ClientServer.txt
+    "Effects description.txt"
+    features.txt
+    TODO.txt
+)
+
 target_include_directories(xrEngine
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -428,14 +442,24 @@ target_link_libraries(xrEngine
     xrScriptEngine
     xrNetServer
     xrImGui
-    ${OPENAL_LIBRARY}
+    OpenAL::OpenAL
     Ogg::Ogg
     Theora::Theora
+    SDL2::SDL2
+    $<$<PLATFORM_ID:Windows>:DiscordGameSDK::DiscordGameSDK>
 )
+
+if (OS_WINDOWS)
+    target_link_libraries(xrEngine
+        PUBLIC
+        $<$<PLATFORM_ID:Windows>:DiscordGameSDK::DiscordGameSDK>
+    )
+endif()
 
 target_compile_definitions(xrEngine
     PRIVATE
     ENGINE_BUILD
+    INGAME_EDITOR
     PURE_DYNAMIC_CAST
 )
 
