@@ -1,0 +1,26 @@
+find_path(EAX_INCLUDE_DIR
+    NAMES eax.h
+    PATHS "${CMAKE_SOURCE_DIR}/sdk/include/eax"
+    NO_DEFAULT_PATH
+)
+
+find_file(EAX_LIBRARY
+    NAMES eax.dll
+	PATHS "${CMAKE_SOURCE_DIR}/sdk/binaries"
+    NO_CACHE
+    NO_DEFAULT_PATH
+    REQUIRED
+)
+
+mark_as_advanced(
+    EAX_INCLUDE_DIR
+    EAX_LIBRARY
+)
+
+add_library(EAX_EAX STATIC IMPORTED GLOBAL)
+add_library(EAX::EAX ALIAS EAX_EAX)
+
+set_target_properties(EAX_EAX PROPERTIES
+    IMPORTED_LOCATION "${EAX_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${EAX_INCLUDE_DIR}"
+)

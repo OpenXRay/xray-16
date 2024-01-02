@@ -8,6 +8,7 @@
 
 # exclude binaries and temporary files
 CMakeCache.txt
+CMakeSettings.json
 cmake_install.cmake
 cmake-build-*
 install_manifest.txt

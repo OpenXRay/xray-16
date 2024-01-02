@@ -25,6 +25,7 @@ target_include_directories(xrRenderPC_R4
     PRIVATE
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
 )
 
 target_link_libraries(xrRenderPC_R4
@@ -36,11 +37,15 @@ target_link_libraries(xrRenderPC_R4
     xrScriptEngine
     xrAPI
     xrMiscMath
+    xrImGui
+    DXSDK::D3D9
 )
 
 target_compile_definitions(xrRenderPC_R4
     PRIVATE
     XRRENDER_R4_EXPORTS
+    _USRDLL
+    USE_DX11
 )
 
 set_target_properties(xrRenderPC_R4 PROPERTIES

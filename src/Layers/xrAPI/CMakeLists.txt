@@ -14,6 +14,7 @@ target_include_directories(xrAPI
 target_compile_definitions(xrAPI
     PRIVATE
     XRAPI_EXPORTS
+    _USRDLL
 )
 
 set_target_properties(xrAPI PROPERTIES

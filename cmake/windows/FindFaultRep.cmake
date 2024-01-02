@@ -1,0 +1,21 @@
+find_path(FAULTREP_INCLUDE_DIR
+    NAMES errorrep.h
+    PATH_SUFFIXES include
+)
+
+find_library(FAULTREP_LIBRARY
+    NAMES faultrep
+)
+
+mark_as_advanced(
+    FAULTREP_INCLUDE_DIR
+    FAULTREP_LIBRARY
+)
+#DXSDK::D3D9
+add_library(WinAPI_FAULTREP STATIC IMPORTED GLOBAL)
+add_library(WinAPI::FaultRep ALIAS WinAPI_FAULTREP)
+
+set_target_properties(WinAPI_FAULTREP PROPERTIES
+    IMPORTED_LOCATION "${FAULTREP_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${FAULTREP_INCLUDE_DIR}"
+)

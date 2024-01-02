@@ -18,6 +18,8 @@ if (UNIX)
     # as it uses debian core.
     find_file(DEBIAN_FOUND debian_version debconf.conf PATHS /etc)
 
+    mark_as_advanced(FEDORA_FOUND REDHAT_FOUND CENTOS_FOUND DEBIAN_FOUND)
+
     # --------------------------------------------------
     # Uninstall target
     # --------------------------------------------------

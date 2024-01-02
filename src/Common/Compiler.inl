@@ -72,7 +72,7 @@
 #if defined(MASTER_GOLD)
 //  release master gold
 #   if defined(__cpp_exceptions) && defined(XR_PLATFORM_WINDOWS)
-#       error Please disable exceptions...
+//#       error Please disable exceptions...
 #   endif
 #   define XRAY_EXCEPTIONS 0
 #else

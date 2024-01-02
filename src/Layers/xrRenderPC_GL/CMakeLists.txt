@@ -1,3 +1,9 @@
+find_package(OpenGL REQUIRED)
+
+# TODO check it
+#set(GLEW_USE_STATIC_LIBS TRUE)
+#find_package(GLEW REQUIRED)
+
 add_library(xrRender_GL SHARED)
 
 target_sources(xrRender_GL PRIVATE
