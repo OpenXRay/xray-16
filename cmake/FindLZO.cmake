@@ -31,8 +31,6 @@ endif()
 set(_lzo_SEARCH_DIRS
   ${LZO_ROOT_DIR}
   /usr/local
-  /sw # Fink
-  /opt/local # DarwinPorts
 )
 
 find_path(LZO_INCLUDE_DIR lzo/lzo1x.h
