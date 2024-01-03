@@ -6,7 +6,13 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
-#if DEBUG
+#if defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#   ifndef MASTER_GOLD
+#       define USE_RENDERDOC
+#   endif
+#endif
+
+#ifdef USE_RENDERDOC
 #include <renderdoc/renderdoc_app.h>
 RENDERDOC_API_1_0_0* g_renderdoc_api;
 #endif
@@ -151,7 +157,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 
 void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-#if defined(DEBUG) && defined(USE_DX11)
+#if defined(USE_RENDERDOC) && defined(USE_DX11)
     if (!g_renderdoc_api)
     {
         HMODULE hModule = GetModuleHandleA("renderdoc.dll");
