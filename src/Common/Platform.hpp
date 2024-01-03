@@ -6,7 +6,7 @@
 #elif defined(__linux__)
 #   define XR_PLATFORM_LINUX
 #   define _XRAY_PLATFORM_MARKER "Linux"
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
 #   define XR_PLATFORM_BSD
 #   define _XRAY_PLATFORM_MARKER "BSD"
 #elif defined(__APPLE__)
