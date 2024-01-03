@@ -179,6 +179,7 @@ jobs:
   bsd:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }}
     runs-on: macos-latest
+    timeout-minutes: 30
     env:
       CFLAGS: "-w"
       CXXFLAGS: "-w"
