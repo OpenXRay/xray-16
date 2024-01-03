@@ -120,11 +120,6 @@ void xrCore::PrintBuildInfo()
     buildUniqueId   = MACRO_TO_STRING(APPVEYOR_BUILD_ID);
     buildId         = MACRO_TO_STRING(APPVEYOR_BUILD_VERSION);
     builder         = MACRO_TO_STRING(APPVEYOR_ACCOUNT_NAME);
-#   elif defined(TRAVIS)
-    name            = "Travis";
-    buildUniqueId   = MACRO_TO_STRING(TRAVIS_BUILD_ID);
-    buildId         = MACRO_TO_STRING(TRAVIS_BUILD_NUMBER);
-    builder         = MACRO_TO_STRING(TRAVIS_REPO_SLUG);
 #   elif defined(GITHUB_ACTIONS)
     name            = "GitHub Actions";
     buildUniqueId   = MACRO_TO_STRING(GITHUB_RUN_ID);
