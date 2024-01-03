@@ -71,13 +71,13 @@ jobs:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc || 'gcc' }})
     runs-on: ubuntu-latest
 
+    container: ${{ matrix.platform.container || '' }}
+
     defaults:
       run:
         shell: ${{ matrix.platform.shell || 'bash -e {0}' }}
 
     env:
-      CC:  ${{ matrix.platform.cc  || 'gcc' }}
-      CXX: ${{ matrix.platform.cxx || 'g++' }}
       CFLAGS: "-w"
       CXXFLAGS: "-w"
 
@@ -85,10 +85,13 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Ubuntu, arch: x86_64, cc: gcc,   cxx: g++, }
-        - { name: Ubuntu, arch: x86_64, cc: clang, cxx: clang++, }
+        - { name: Ubuntu, arch: amd64,   cc: gcc,   cxx: g++, }
+        - { name: Ubuntu, arch: amd64,   cc: clang, cxx: clang++, }
+        #- { name: Ubuntu, arch: arm64,   container: 'dockcross/linux-arm64', }
+        #- { name: Ubuntu, arch: ppc64el, container: 'dockcross/linux-ppc64le:latest', }
         - { name: Alpine, arch: x86_64, shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
         - { name: Alpine, arch: x86,    shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        #- { name: Haiku,  arch: x86_64, container: 'haiku/cross-compiler:x86_64-r1beta4', cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, }
 
         configuration: [Debug, Release]
 
@@ -104,8 +107,23 @@ jobs:
     - name: Install Ubuntu packages
       if: ${{ matrix.platform.name == 'Ubuntu' }}
       run: |
+          sudo dpkg --add-architecture ${{ matrix.platform.arch }}
           sudo apt-get update -qq
-          sudo apt-get install -qq -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev
+          sudo apt-get install -qq -y \
+              libsdl2-dev:${{ matrix.platform.arch }} \
+              libglew-dev:${{ matrix.platform.arch }} \
+              liblzo2-dev:${{ matrix.platform.arch }} \
+              libjpeg-dev:${{ matrix.platform.arch }} \
+              libopenal-dev:${{ matrix.platform.arch }} \
+              libogg-dev:${{ matrix.platform.arch }} \
+              libtheora-dev:${{ matrix.platform.arch }} \
+              libvorbis-dev:${{ matrix.platform.arch }}
+
+    - name: Set environment variables
+      if: ${{ matrix.platform.cc != '' }}
+      run: |
+        echo "CC=${{ matrix.platform.cc }}" >> $GITHUB_ENV
+        echo "CXX=${{ matrix.platform.cxx }}" >> $GITHUB_ENV
 
     - uses: actions/checkout@main
       with:
@@ -131,7 +149,7 @@ jobs:
       if: ${{ steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
-        name: openxray_1.6.02_${{ matrix.configuration }}_${{ matrix.platform.arch }}_(github-${{ env.CC }}-${{ github.run_number }}).deb
+        name: openxray_1.6.02_${{ matrix.configuration }}_${{ matrix.platform.arch }}_(github-${{ matrix.platform.cc }}-${{ github.run_number }}).deb
         path: build/openxray_1.6.02_*.deb
 
   macos:
