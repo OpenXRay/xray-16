@@ -189,11 +189,11 @@ jobs:
         - { name: FreeBSD, os: freebsd, os-version: 13.2, arch: x86_64,
             install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 glew lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
           }
-        #- { name: OpenBSD, os: openbsd, os-version: 7.4,  arch: x86_64,
-        #    install-cmd: "sudo pkg_add cmake SDL2 glew lzo2 jpeg openal libogg libtheora libvorbis",
-        #  }
+        - { name: OpenBSD, os: openbsd, os-version: 7.4,  arch: x86_64,
+            install-cmd: "sudo pkg_add cmake SDL2 glew lzo2 jpeg openal libogg libtheora libvorbis",
+          }
         #- { name: NetBSD,  os: netbsd,  os-version: 9.3,  arch: x86_64,
-        #    install-cmd: "sudo pkgin -y install cmake SDL2 glew lzo libjpeg-turbo openal-soft libogg libtheora libvorbis && export CC=gcc-13 && export CXX=g++-13",
+        #    install-cmd: "sudo pkgin -y install cmake SDL2 glew lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
         #  }
         configuration: [Debug, Release]
 
@@ -208,6 +208,7 @@ jobs:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
+        environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: runner-to-vm
         run: ${{ matrix.platform.install-cmd }}
@@ -218,6 +219,7 @@ jobs:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
+        environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
@@ -228,6 +230,7 @@ jobs:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
+        environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
         run: cmake --build build --config ${{ matrix.Configuration }} --parallel 3
