@@ -176,7 +176,7 @@ void initialize()
 #if defined(XR_PLATFORM_WINDOWS)
     _clearfp();
 #elif defined(USE_BSD_FP)
-    std::ignore = fpresetsticky(FP_X_INV | |FP_X_DNML | FP_X_DZ | FP_X_OFL | FP_X_UFL | FP_X_IMP | FP_X_STK);
+    std::ignore = fpresetsticky(FP_X_INV | FP_X_DNML | FP_X_DZ | FP_X_OFL | FP_X_UFL | FP_X_IMP | FP_X_STK);
 #else
     std::ignore = std::feclearexcept(FE_ALL_EXCEPT);
 #endif
