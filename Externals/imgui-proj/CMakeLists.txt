@@ -23,10 +23,12 @@ target_include_directories(xrImGui
     "${IMGUI_DIR}"
 )
 
-target_link_libraries(xrImGui
-    PRIVATE
-    dl
-)
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT WIN32)
+    target_link_libraries(xrImGui
+        PRIVATE
+        $<$<NOT:$<PLATFORM_ID:OpenBSD>>:dl>
+    )
+endif()
 
 target_compile_definitions(xrImGui
     PRIVATE

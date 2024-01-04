@@ -45,7 +45,10 @@ elseif (APPLE)
     option(LUA_USE_DLOPEN "Use dynamic linker to load modules." ON)
 else()
     option(LUA_USE_POSIX "Use POSIX functionality." ON)
-    option(LUA_USE_DLOPEN "Use dynamic linker to load modules." ON)
+
+    if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD") # OpenBSD has dlopen as a part of libc
+        option(LUA_USE_DLOPEN "Use dynamic linker to load modules." ON)
+    endif()
 endif()
 
 # TODO: check if we need luaconf.h
