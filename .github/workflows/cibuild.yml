@@ -242,6 +242,7 @@ jobs:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
+        environment_variables: CFLAGS CXXFLAGS
         # sync back is disabled due to:
         # 1) VM stalls during the process
         # 2) we don't output artifacts anyway
