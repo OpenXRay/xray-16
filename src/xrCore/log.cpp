@@ -131,30 +131,57 @@ void Log(const char* msg, const char* dop)
     Log(buf);
 }
 
-void Log(const char* msg, u32 dop)
-{
-    const u32 buffer_size = (xr_strlen(msg) + 1 + 10 + 1) * sizeof(char);
-    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
-
-    xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
-    Log(buf);
-}
-
-void Log(const char* msg, u64 dop)
-{
-    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
-    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
-
-    xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
-    Log(buf);
-}
-
 void Log(const char* msg, int dop)
 {
     const u32 buffer_size = (xr_strlen(msg) + 1 + 11 + 1) * sizeof(char);
     pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
 
     xr_sprintf(buf, buffer_size, "%s %i", msg, dop);
+    Log(buf);
+}
+
+void Log(const char* msg, unsigned int dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 10 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %u", msg, dop);
+    Log(buf);
+}
+
+void Log(const char* msg, long dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %li", msg, dop);
+    Log(buf);
+}
+
+void Log(const char* msg, unsigned long dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %lu", msg, dop);
+    Log(buf);
+}
+
+void Log(const char* msg, long long dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %lli", msg, dop);
+    Log(buf);
+}
+
+void Log(const char* msg, unsigned long long dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %llu", msg, dop);
     Log(buf);
 }
 

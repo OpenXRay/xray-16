@@ -23,19 +23,15 @@ IC xr_string __cdecl make_xrstr(pcstr format, ...)
 
 IC xr_string __cdecl make_xrstr(bool b) { return b ? "+" : "-"; }
 IC xr_string __cdecl make_xrstr(float f) { return make_xrstr("%f", f); }
-IC xr_string __cdecl make_xrstr(s32 d) { return make_xrstr("%i", d); }
-IC xr_string __cdecl make_xrstr(u32 d) { return make_xrstr("%u", d); }
-IC xr_string __cdecl make_xrstr(s64 d) { return make_xrstr("%i", d); }
-IC xr_string __cdecl make_xrstr(u64 d) { return make_xrstr("%u", d); }
-#ifdef XR_PLATFORM_APPLE
-ICF xr_string __cdecl make_xrstr(size_t d)
-{
-    if constexpr (sizeof(size_t) == sizeof(u32))
-        return make_xrstr(static_cast<u32>(d));
-    else
-        return make_xrstr(static_cast<u64>(d));
-}
-#endif
+
+IC xr_string __cdecl make_xrstr(int d) { return make_xrstr("%i", d); }
+IC xr_string __cdecl make_xrstr(unsigned int d) { return make_xrstr("%u", d); }
+
+IC xr_string __cdecl make_xrstr(long d) { return make_xrstr("%li", d); }
+IC xr_string __cdecl make_xrstr(unsigned long d) { return make_xrstr("%lu", d); }
+
+IC xr_string __cdecl make_xrstr(long long d) { return make_xrstr("%lli", d); }
+IC xr_string __cdecl make_xrstr(unsigned long long d) { return make_xrstr("%llu", d); }
 
 IC xr_string __cdecl make_xrstr(Fvector3 v) { return make_xrstr("[%f][%f][%f]", v.x, v.y, v.z); }
 IC xr_string __cdecl make_xrstr(const xr_string& s) { return s; }
