@@ -41,7 +41,8 @@ inline float fClamp(float x, float lo, float hi)
 inline int fmod(int x, int size) { return x % size; }
 inline __int64 fmod(__int64 x, __int64 size) { return x % size; }
 inline unsigned __int64 fmod(unsigned __int64 x, unsigned __int64 size) { return x % size; }
-inline float __cdecl fmod(float _X, float _Y) { return fmodf(_X, _Y); }
+inline float __cdecl fmod(float x, float y) { return fmodf(x, y); }
+
 // calcMaxMipmap
 //  calculates max # of mipmap levels for given texture size
 inline size_t calcMaxMipmap(size_t w, size_t h)
@@ -381,11 +382,6 @@ public:
         u = _a;
     }
 };
-
-#define _R 0
-#define _G 1
-#define _B 2
-#define _A 3
 
 class fpPixel
 {

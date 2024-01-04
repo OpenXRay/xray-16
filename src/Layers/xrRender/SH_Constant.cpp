@@ -33,22 +33,22 @@ void CConstant::Calculate()
         return;
 
     float t = Device.fTimeGlobal;
-    set_float(_R.Calculate(t), _G.Calculate(t), _B.Calculate(t), _A.Calculate(t));
+    set_float(R.Calculate(t), G.Calculate(t), B.Calculate(t), A.Calculate(t));
 }
 
 void CConstant::Load(IReader* fs)
 {
     dwMode = modeWaveForm;
-    fs->r(&_R, sizeof(WaveForm));
-    fs->r(&_G, sizeof(WaveForm));
-    fs->r(&_B, sizeof(WaveForm));
-    fs->r(&_A, sizeof(WaveForm));
+    fs->r(&R, sizeof(WaveForm));
+    fs->r(&G, sizeof(WaveForm));
+    fs->r(&B, sizeof(WaveForm));
+    fs->r(&A, sizeof(WaveForm));
 }
 
 void CConstant::Save(IWriter* fs)
 {
-    fs->w(&_R, sizeof(WaveForm));
-    fs->w(&_G, sizeof(WaveForm));
-    fs->w(&_B, sizeof(WaveForm));
-    fs->w(&_A, sizeof(WaveForm));
+    fs->w(&R, sizeof(WaveForm));
+    fs->w(&G, sizeof(WaveForm));
+    fs->w(&B, sizeof(WaveForm));
+    fs->w(&A, sizeof(WaveForm));
 }

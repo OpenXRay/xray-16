@@ -192,16 +192,16 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
     Resources->Evict();
     // Vertex buffers
     {
-        xr_vector<VertexDeclarator>& _DC = alternative ? xDC : nDC;
-        xr_vector<VertexStagingBuffer>& _VB = alternative ? xVB : nVB;
+        xr_vector<VertexDeclarator>& decls = alternative ? xDC : nDC;
+        xr_vector<VertexStagingBuffer>& vbuffers = alternative ? xVB : nVB;
 
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
         R_ASSERT2(fs, "Could not load geometry. File 'level.geom?' corrupted.");
 
         const u32 count = fs->r_u32();
-        _DC.resize(count);
-        _VB.resize(count);
+        decls.resize(count);
+        vbuffers.resize(count);
 
         constexpr size_t buffer_size = (MAXD3DDECLLENGTH + 1) * sizeof(VertexElement);
         for (u32 i = 0; i < count; i++)
@@ -212,8 +212,8 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             fs->advance(-(int)buffer_size);
 
             const u32 dcl_len = GetDeclLength(dcl) + 1;
-            _DC[i].resize(dcl_len);
-            fs->r(_DC[i].begin(), dcl_len * sizeof(VertexElement));
+            decls[i].resize(dcl_len);
+            fs->r(decls[i].begin(), dcl_len * sizeof(VertexElement));
 
             // count, size
             const u32 vCount = fs->r_u32();
@@ -225,10 +225,10 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             // Create and fill
             //  TODO: DX11: Check fragmentation.
             //  Check if buffer is less then 2048 kb
-            _VB[i].Create(vCount * vSize);
-            u8* pData = static_cast<u8*>(_VB[i].Map());
+            vbuffers[i].Create(vCount * vSize);
+            u8* pData = static_cast<u8*>(vbuffers[i].Map());
             fs->r(pData, vCount * vSize);
-            _VB[i].Unmap(true); // upload vertex data
+            vbuffers[i].Unmap(true); // upload vertex data
 
             //			fs->advance			(vCount*vSize);
         }
@@ -237,11 +237,11 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
     // Index buffers
     {
-        xr_vector<IndexStagingBuffer>& _IB = alternative ? xIB : nIB;
+        xr_vector<IndexStagingBuffer>& ibuffers = alternative ? xIB : nIB;
 
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         const u32 count = fs->r_u32();
-        _IB.resize(count);
+        ibuffers.resize(count);
         for (u32 i = 0; i < count; i++)
         {
             const u32 iCount = fs->r_u32();
@@ -252,10 +252,10 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             // Create and fill
             //  TODO: DX11: Check fragmentation.
             //  Check if buffer is less then 2048 kb
-            _IB[i].Create(iCount * 2);
-            u8* pData = static_cast<u8*>(_IB[i].Map());
+            ibuffers[i].Create(iCount * 2);
+            u8* pData = static_cast<u8*>(ibuffers[i].Map());
             fs->r(pData, iCount * 2);
-            _IB[i].Unmap(true); // upload index data
+            ibuffers[i].Unmap(true); // upload index data
 
             //			fs().advance		(iCount*2);
         }

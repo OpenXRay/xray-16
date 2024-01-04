@@ -56,25 +56,25 @@ void xrMU_Model::Load(IReader& F, u32 version)
 
 _face* xrMU_Model::create_face(_vertex* v0, _vertex* v1, _vertex* v2, b_face& B)
 {
-    _face* _F = mu_faces_pool().create();
-    _F->dwMaterial = u16(B.dwMaterial);
-    _F->dwMaterialGame = B.dwMaterialGame;
+    _face* face = mu_faces_pool().create();
+    face->dwMaterial = u16(B.dwMaterial);
+    face->dwMaterialGame = B.dwMaterialGame;
     R_ASSERT(B.dwMaterialGame < 65536);
 
     // Vertices and adjacement info
-    _F->SetVertex(0, v0);
-    _F->SetVertex(1, v1);
-    _F->SetVertex(2, v2);
+    face->SetVertex(0, v0);
+    face->SetVertex(1, v1);
+    face->SetVertex(2, v2);
 
     // tc
-    _F->tc[0] = B.t[0];
-    _F->tc[1] = B.t[1];
-    _F->tc[2] = B.t[2];
-    _F->CalcNormal();
+    face->tc[0] = B.t[0];
+    face->tc[1] = B.t[1];
+    face->tc[2] = B.t[2];
+    face->CalcNormal();
 
     // register
-    m_faces.push_back(_F);
-    return _F;
+    m_faces.push_back(face);
+    return face;
 }
 
 _face* xrMU_Model::load_create_face(Fvector& P1, Fvector& P2, Fvector& P3, b_face& B)
@@ -84,11 +84,11 @@ _face* xrMU_Model::load_create_face(Fvector& P1, Fvector& P2, Fvector& P3, b_fac
 
 _vertex* xrMU_Model::create_vertex(Fvector& P)
 {
-    _vertex* _V = mu_vertices_pool().create();
-    _V->P = P;
-    _V->N.set(0, 0, 0);
-    m_vertices.push_back(_V);
-    return _V;
+    _vertex* vertex = mu_vertices_pool().create();
+    vertex->P = P;
+    vertex->N.set(0, 0, 0);
+    m_vertices.push_back(vertex);
+    return vertex;
 }
 
 _vertex* xrMU_Model::load_create_vertex(Fvector& P)

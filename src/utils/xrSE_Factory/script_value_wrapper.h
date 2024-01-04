@@ -10,26 +10,26 @@
 
 #include "script_value.h"
 
-template <typename _type>
+template <typename T>
 class CScriptValueWrapperImpl : public CScriptValue
 {
 private:
     typedef CScriptValue inherited;
 
 protected:
-    _type m_value;
+    T m_value;
 
 public:
     IC CScriptValueWrapperImpl(luabind::object object, LPCSTR name);
     virtual void assign();
-    virtual _type* value();
+    virtual T* value();
 };
 
-template <typename _type>
-class CScriptValueWrapper : public CScriptValueWrapperImpl<_type>
+template <typename T>
+class CScriptValueWrapper : public CScriptValueWrapperImpl<T>
 {
 private:
-    typedef CScriptValueWrapperImpl<_type> inherited;
+    typedef CScriptValueWrapperImpl<T> inherited;
 
 public:
     IC CScriptValueWrapper(luabind::object object, LPCSTR name);

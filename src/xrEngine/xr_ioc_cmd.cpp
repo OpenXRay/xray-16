@@ -124,12 +124,12 @@ public:
         for (it = Console->Commands.begin(); it != Console->Commands.end(); ++it)
         {
             IConsole_Command& C = *(it->second);
-            TStatus _S;
-            C.GetStatus(_S);
-            TInfo _I;
-            C.Info(_I);
+            TStatus status;
+            C.GetStatus(status);
+            TInfo info;
+            C.Info(info);
 
-            Msg("%-20s (%-10s) --- %s", C.Name(), _S, _I);
+            Msg("%-20s (%-10s) --- %s", C.Name(), status, info);
         }
         Log("Key: Ctrl + A         === Select all ");
         Log("Key: Ctrl + C         === Copy to clipboard ");

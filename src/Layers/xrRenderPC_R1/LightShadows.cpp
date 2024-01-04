@@ -256,14 +256,14 @@ void CLightShadows::calculate()
                         break;
                     Lpos.y += .01f; //. hack to avoid light-in-the-center-of-object
                 }
-                float _R = C.O->GetRenderData().visual->getVisData().sphere.R + 0.1f;
-                // Msg	("* o-r: %f",_R);
-                if (_dist < _R)
+                const float radius = C.O->GetRenderData().visual->getVisData().sphere.R + 0.1f;
+                // Msg	("* o-r: %f", radius);
+                if (_dist < radius)
                 {
                     Fvector Ldir;
                     Ldir.sub(C.C, Lpos);
                     Ldir.normalize();
-                    Lpos.mad(Lpos, Ldir, _dist - _R);
+                    Lpos.mad(Lpos, Ldir, _dist - radius);
                     // Msg	("* moving lpos");
                 }
             }

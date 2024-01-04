@@ -49,16 +49,16 @@ public:
 
     void InitProgressBar(Fvector2 pos, Fvector2 size, EOrientMode mode);
 
-    void SetRange(float _Min, float _Max)
+    void SetRange(float min, float max)
     {
-        m_MinPos = _Min;
-        m_MaxPos = _Max;
+        m_MinPos = min;
+        m_MaxPos = max;
         UpdateProgressBar();
     }
     float GetRange_min() { return m_MinPos; }
     float GetRange_max() { return m_MaxPos; }
 
-    void SetProgressPos(float _Pos);
+    void SetProgressPos(float pos);
     void ForceSetProgressPos(float pos);
     float GetProgressPos() { return m_ProgressPos.y; }
 

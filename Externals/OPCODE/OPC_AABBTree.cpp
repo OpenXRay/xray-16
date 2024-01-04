@@ -164,7 +164,7 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
         // Find the largest axis to split along
         Point Extents;
         mBV.GetExtents(Extents); // Box extents
-        udword Axis = Extents.LargestAxis(); // Index of largest axis
+        const udword Axis = (udword)Extents.LargestAxis(); // Index of largest axis
 
         // Split along the axis
         NbPos = Split(Axis, builder);
@@ -201,7 +201,7 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
         Vars /= float(mNbPrimitives - 1);
 
         // Choose axis with greatest variance
-        udword Axis = Vars.LargestAxis();
+        const udword Axis = (udword)Vars.LargestAxis();
 
         // Split along the axis
         NbPos = Split(Axis, builder);

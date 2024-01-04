@@ -37,13 +37,13 @@ class adopt_dx10sampler
     u32 m_SI; // Sampler index
 
 public:
-    adopt_dx10sampler(CBlender_Compile* C, u32 SamplerIndex) : m_pC(C), m_SI(SamplerIndex)
+    adopt_dx10sampler(CBlender_Compile* compiler, u32 SamplerIndex) : m_pC(compiler), m_SI(SamplerIndex)
     {
         if (u32(-1) == m_SI)
             m_pC = nullptr;
     }
 
-    adopt_dx10sampler(const adopt_dx10sampler& _C) : m_pC(_C.m_pC), m_SI(_C.m_SI)
+    adopt_dx10sampler(const adopt_dx10sampler& other) : m_pC(other.m_pC), m_SI(other.m_SI)
     {
         if (u32(-1) == m_SI)
             m_pC = nullptr;
@@ -56,13 +56,13 @@ class adopt_sampler
     u32 stage; // Sampler index
 
 public:
-    adopt_sampler(CBlender_Compile* _C, u32 _stage) : C(_C), stage(_stage)
+    adopt_sampler(CBlender_Compile* compiler, u32 _stage) : C(compiler), stage(_stage)
     {
         if (u32(-1) == stage)
             C = nullptr;
     }
 
-    adopt_sampler(const adopt_sampler& _C) : C(_C.C), stage(_C.stage)
+    adopt_sampler(const adopt_sampler& other) : C(other.C), stage(other.stage)
     {
         if (u32(-1) == stage)
             C = nullptr;
@@ -206,8 +206,8 @@ class adopt_compiler
     }
 
 public:
-    adopt_compiler(CBlender_Compile* _C, bool& bFirstPass) : C(_C), m_bFirstPass(bFirstPass) { m_bFirstPass = true; }
-    adopt_compiler(const adopt_compiler& _C) : C(_C.C), m_bFirstPass(_C.m_bFirstPass) {}
+    adopt_compiler(CBlender_Compile* compiler, bool& bFirstPass) : C(compiler), m_bFirstPass(bFirstPass) { m_bFirstPass = true; }
+    adopt_compiler(const adopt_compiler& other) : C(other.C), m_bFirstPass(other.m_bFirstPass) {}
     adopt_compiler& _options(int P, bool S)
     {
         C->SetParams(P, S);
@@ -245,7 +245,7 @@ public:
         C->PassSET_LightFog(FALSE, _fog);
         return *this;
     }
-    adopt_compiler& _ZB(bool _test, bool _write)
+    adopt_compiler& _zbuffer(bool _test, bool _write)
     {
         C->PassSET_ZB(_test, _write);
         return *this;
@@ -377,7 +377,7 @@ void CResourceManager::LS_Load()
                 .def("distort",                &adopt_compiler::_o_distort,  return_reference_to<1>())
                 .def("wmark",                  &adopt_compiler::_o_wmark,    return_reference_to<1>())
                 .def("fog",                    &adopt_compiler::_fog,        return_reference_to<1>())
-                .def("zb",                     &adopt_compiler::_ZB,         return_reference_to<1>())
+                .def("zb",                     &adopt_compiler::_zbuffer,         return_reference_to<1>())
                 .def("blend",                  &adopt_compiler::_blend,      return_reference_to<1>())
                 .def("aref",                   &adopt_compiler::_aref,       return_reference_to<1>())
                 //	For compatibility only

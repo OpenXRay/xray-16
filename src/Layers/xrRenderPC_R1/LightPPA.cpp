@@ -31,11 +31,11 @@ void cl_light_PR::setup(CBackend& cmd_list, R_constant* C)
     else
         RCache.set_c(C, P.x, P.y, P.z, 1.f / R);
 }
-void cl_light_C::setup(CBackend& cmd_list, R_constant* C)
+void cl_light_C::setup(CBackend& cmd_list, R_constant* constant)
 {
-    Fcolor _C = RImplementation.r1_dlight_light->color;
-    _C.mul_rgb(RImplementation.r1_dlight_scale);
-    RCache.set_c(C, _C.r, _C.g, _C.b, 1.f);
+    Fcolor color = RImplementation.r1_dlight_light->color;
+    color.mul_rgb(RImplementation.r1_dlight_scale);
+    RCache.set_c(constant, color.r, color.g, color.b, 1.f);
 }
 void cl_light_XFORM::setup(CBackend& cmd_list, R_constant* C) { RCache.set_c(C, RImplementation.r1_dlight_tcgen); }
 //////////////////////////////////////////////////////////////////////////

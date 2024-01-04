@@ -8,26 +8,26 @@
 
 #pragma once
 
-template <typename _type>
-IC CScriptValueWrapperImpl<_type>::CScriptValueWrapperImpl(luabind::object object, LPCSTR name)
+template <typename T>
+IC CScriptValueWrapperImpl<T>::CScriptValueWrapperImpl(luabind::object object, LPCSTR name)
     : inherited(object, name)
 {
-    m_value = luabind::object_cast<_type>(object[name]);
+    m_value = luabind::object_cast<T>(object[name]);
 }
 
-template <typename _type>
-IC void CScriptValueWrapperImpl<_type>::assign()
+template <typename T>
+IC void CScriptValueWrapperImpl<T>::assign()
 {
     m_object[*m_name] = m_value;
 }
 
-template <typename _type>
-IC _type* CScriptValueWrapperImpl<_type>::value()
+template <typename T>
+IC T* CScriptValueWrapperImpl<T>::value()
 {
     return (&m_value);
 }
 
-template <typename _type>
-IC CScriptValueWrapper<_type>::CScriptValueWrapper(luabind::object object, LPCSTR name) : inherited(object, name)
+template <typename T>
+IC CScriptValueWrapper<T>::CScriptValueWrapper(luabind::object object, LPCSTR name) : inherited(object, name)
 {
 }
