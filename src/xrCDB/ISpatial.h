@@ -171,8 +171,8 @@ public:
     xr_vector<ISpatial*> items; // own items
 
     void _init(ISpatial_NODE* _parent);
-    void _remove(ISpatial* _S);
-    void _insert(ISpatial* _S);
+    void _remove(ISpatial* S);
+    void _insert(ISpatial* S);
     bool _empty()
     {
         return items.empty() &&

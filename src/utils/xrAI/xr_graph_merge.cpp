@@ -388,12 +388,12 @@ public:
 
 void read_levels(CInifile* Ini, xr_set<CLevelInfo>& levels, bool rebuild_graph, xr_vector<LPCSTR>* needed_levels)
 {
-    LPCSTR _N, V;
+    pcstr field_name, field_value;
     string_path caFileName, file_name;
-    for (u32 k = 0; Ini->r_line("levels", k, &_N, &V); k++)
+    for (u32 k = 0; Ini->r_line("levels", k, &field_name, &field_value); k++)
     {
         string256 N;
-        xr_strcpy(N, _N);
+        xr_strcpy(N, field_name);
         xr_strlwr(N);
 
         if (!Ini->section_exist(N))
@@ -421,9 +421,9 @@ void read_levels(CInifile* Ini, xr_set<CLevelInfo>& levels, bool rebuild_graph, 
         }
 
         u8 id = Ini->r_u8(N, "id");
-        auto _S = Ini->r_string(N, "name");
+        cpcstr level_name = Ini->r_string(N, "name");
         string256 S;
-        xr_strcpy(S, _S);
+        xr_strcpy(S, level_name);
         xr_strlwr(S);
 
         if (needed_levels)

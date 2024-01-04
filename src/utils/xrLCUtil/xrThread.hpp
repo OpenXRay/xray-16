@@ -20,10 +20,10 @@ public:
     volatile float thPerformance;
     volatile BOOL thDestroyOnComplete;
 
-    CThread(u32 _ID, LogFunc log)
+    CThread(u32 id, LogFunc log)
     {
         this->log = log ? log : StubLog;
-        thID = _ID;
+        thID = id;
         thProgress = 0;
         thCompleted = FALSE;
         thMessages = TRUE;

@@ -101,11 +101,11 @@ ICF void CBackend::set_States(SState* _state)
     }
 }
 
-IC void CBackend::set_Matrices(SMatrixList* _M)
+IC void CBackend::set_Matrices(SMatrixList* matrix_list)
 {
-    if (M != _M)
+    if (M != matrix_list)
     {
-        M = _M;
+        M = matrix_list;
         if (M)
         {
             for (u32 it = 0; it < M->size(); it++)

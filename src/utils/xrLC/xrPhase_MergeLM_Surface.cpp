@@ -135,7 +135,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
 BOOL _rect_place(L_rect& r, lm_layer* D)
 {
     L_rect R;
-    int _X;
+    int X_;
     u8* temp_surf;
 
     // Normal
@@ -146,37 +146,37 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
         {
             temp_surf = surface + _Y * c_LMAP_size;
             // accelerated part
-            for (_X = 0; _X < x_max - 8;)
+            for (X_ = 0; X_ < x_max - 8;)
             {
 #ifdef _M_X64
-                __m128i init = _mm_set1_epi64x(*(temp_surf + _X));
+                __m128i init = _mm_set1_epi64x(*(temp_surf + X_));
                 __m128i m64_cmp = _mm_cmpeq_epi8(init, _mm_setzero_si128());
                 __m128i m64_cmp_low = _mm_move_epi64(m64_cmp);
                 __m128i m64_work = _mm_sad_epu8(m64_cmp_low, _mm_setzero_si128());
 
                 if (!_mm_cvtsi128_si32(m64_work)) {
-                    _X += 8;
+                    X_ += 8;
                     continue;
                 }
 #else
-                __m64 m64_cmp = _mm_cmpeq_pi8(*(__m64*)(temp_surf + _X), _mm_setzero_si64());
+                __m64 m64_cmp = _mm_cmpeq_pi8(*(__m64*)(temp_surf + X_), _mm_setzero_si64());
                 __m64 m64_work = _mm_sad_pu8(m64_cmp, _mm_setzero_si64());
 
                 if (!_mm_cvtsi64_si32(m64_work))
                 {
-                    _X += 8;
+                    X_ += 8;
                     continue;
                 }
 #endif
-                if (temp_surf[_X])
+                if (temp_surf[X_])
                 {
-                    _X++;
+                    X_++;
                     continue;
                 }
 
-                R.init(_X, _Y, _X + r.b.x, _Y + r.b.y);
+                R.init(X_, _Y, X_ + r.b.x, _Y + r.b.y);
 
-                _X++;
+                X_++;
 
                 if (Place_Perpixel(R, D, FALSE))
                 {
@@ -189,11 +189,11 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 }
             }
             // remainder part
-            for (; _X < x_max; _X++)
+            for (; X_ < x_max; X_++)
             {
-                if (temp_surf[_X])
+                if (temp_surf[X_])
                     continue;
-                R.init(_X, _Y, _X + r.b.x, _Y + r.b.y);
+                R.init(X_, _Y, X_ + r.b.x, _Y + r.b.y);
                 if (Place_Perpixel(R, D, FALSE))
                 {
                     _rect_register(R, D, FALSE);
@@ -215,37 +215,37 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
         {
             temp_surf = surface + _Y * c_LMAP_size;
             // accelerated part
-            for (_X = 0; _X < x_max - 8;)
+            for (X_ = 0; X_ < x_max - 8;)
             {
 #ifdef _M_X64
-                __m128i init = _mm_set1_epi64x(*(temp_surf + _X));
+                __m128i init = _mm_set1_epi64x(*(temp_surf + X_));
                 __m128i m64_cmp = _mm_cmpeq_epi8(init, _mm_setzero_si128());
                 __m128i m64_cmp_low = _mm_move_epi64(m64_cmp);
                 __m128i m64_work = _mm_sad_epu8(m64_cmp_low, _mm_setzero_si128());
 
                 if (!_mm_cvtsi128_si32(m64_work)) {
-                    _X += 8;
+                    X_ += 8;
                     continue;
                 }
 #else
-                __m64 m64_cmp = _mm_cmpeq_pi8(*(__m64*)(temp_surf + _X), _mm_setzero_si64());
+                __m64 m64_cmp = _mm_cmpeq_pi8(*(__m64*)(temp_surf + X_), _mm_setzero_si64());
                 __m64 m64_work = _mm_sad_pu8(m64_cmp, _mm_setzero_si64());
 
                 if (!_mm_cvtsi64_si32(m64_work))
                 {
-                    _X += 8;
+                    X_ += 8;
                     continue;
                 }
 #endif
-                if (temp_surf[_X])
+                if (temp_surf[X_])
                 {
-                    _X++;
+                    X_++;
                     continue;
                 }
 
-                R.init(_X, _Y, _X + r.b.y, _Y + r.b.x);
+                R.init(X_, _Y, X_ + r.b.y, _Y + r.b.x);
 
-                _X++;
+                X_++;
 
                 if (Place_Perpixel(R, D, TRUE))
                 {
@@ -258,11 +258,11 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 }
             }
             // remainder part
-            for (; _X < x_max; _X++)
+            for (; X_ < x_max; X_++)
             {
-                if (temp_surf[_X])
+                if (temp_surf[X_])
                     continue;
-                R.init(_X, _Y, _X + r.b.y, _Y + r.b.x);
+                R.init(X_, _Y, X_ + r.b.y, _Y + r.b.x);
                 if (Place_Perpixel(R, D, TRUE))
                 {
                     _rect_register(R, D, TRUE);

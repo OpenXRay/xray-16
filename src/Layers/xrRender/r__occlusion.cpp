@@ -12,7 +12,7 @@ void R_occlusion::occq_create(u32 limit)
     fids.reserve(limit);
     for (u32 it = 0; it < limit; it++)
     {
-        _Q q;
+        Query q;
         q.order = it;
         if (FAILED(CreateQuery(&q.Q, D3D_QUERY_OCCLUSION)))
             break;
@@ -131,7 +131,7 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
         RImplementation.BasicStats.OcclusionCulled++;
 
     // insert into pool (sorting in decreasing order)
-    _Q& Q = used[ID];
+    Query& Q = used[ID];
     if (pool.empty())
         pool.push_back(Q);
     else

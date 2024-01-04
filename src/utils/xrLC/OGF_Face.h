@@ -95,10 +95,10 @@ struct OGF_Base
     Fvector C;
     float R;
 
-    OGF_Base(int _Level)
+    OGF_Base(int level)
     {
         bbox.invalidate();
-        iLevel = _Level;
+        iLevel = level;
         bConnected = FALSE;
         Sector = 0xffff;
     }
@@ -242,7 +242,7 @@ struct OGF_Node : public OGF_Base
 {
     xr_vector<u32> chields;
 
-    OGF_Node(int _L, u16 _Sector) : OGF_Base(_L) { Sector = _Sector; }
+    OGF_Node(int level, u16 _Sector) : OGF_Base(level) { Sector = _Sector; }
     void AddChield(u32 ID)
     {
         chields.push_back(ID);
@@ -261,7 +261,7 @@ struct OGF_Node : public OGF_Base
 
 struct OGF_LOD : public OGF_Node
 {
-    OGF_LOD(int _L, u16 _Sector) : OGF_Node(_L, _Sector){};
+    OGF_LOD(int level, u16 _Sector) : OGF_Node(level, _Sector){};
 
     struct _vertex
     {

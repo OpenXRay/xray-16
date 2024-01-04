@@ -260,12 +260,12 @@ float CSoundRender_Scene::get_occlusion_to(const Fvector& hear_pt, const Fvector
 
         geom_DB.ray_query(CDB::OPT_CULL, geom_SOM, hear_pt, dir, range);
         const auto r_cnt = geom_DB.r_count();
-        CDB::RESULT* _B = geom_DB.r_begin();
+        CDB::RESULT* begin = geom_DB.r_begin();
         if (0 != r_cnt)
         {
             for (size_t k = 0; k < r_cnt; k++)
             {
-                CDB::RESULT* R = _B + k;
+                CDB::RESULT* R = begin + k;
                 occ_value *= *reinterpret_cast<float*>(&R->dummy);
             }
         }
@@ -291,9 +291,9 @@ float CSoundRender_Scene::get_occlusion(const Fvector& P, float R, Fvector* occ)
     {
         bool bNeedFullTest = true;
         // 1. Check cached polygon
-        float _u, _v, _range;
-        if (CDB::TestRayTri(base, dir, occ, _u, _v, _range, true))
-            if (_range > 0 && _range < range)
+        float u, v, test_range;
+        if (CDB::TestRayTri(base, dir, occ, u, v, test_range, true))
+            if (test_range > 0 && test_range < range)
             {
                 occ_value = psSoundOcclusionScale;
                 bNeedFullTest = false;
@@ -322,12 +322,12 @@ float CSoundRender_Scene::get_occlusion(const Fvector& P, float R, Fvector* occ)
     {
         geom_DB.ray_query(CDB::OPT_CULL, geom_SOM, base, dir, range);
         const auto r_cnt = geom_DB.r_count();
-        CDB::RESULT* _B = geom_DB.r_begin();
+        CDB::RESULT* begin = geom_DB.r_begin();
         if (0 != r_cnt)
         {
             for (size_t k = 0; k < r_cnt; k++)
             {
-                CDB::RESULT* R2 = _B + k;
+                CDB::RESULT* R2 = begin + k;
                 occ_value *= *reinterpret_cast<float*>(&R2->dummy);
             }
         }

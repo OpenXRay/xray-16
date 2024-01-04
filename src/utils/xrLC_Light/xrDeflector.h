@@ -31,9 +31,9 @@ public:
     ~CDeflector();
     static CDeflector* read_create();
 
-    void OA_SetNormal(Fvector& _N)
+    void OA_SetNormal(const Fvector& n)
     {
-        normal.set(_N);
+        normal.set(n);
         normal.normalize();
         VERIFY(_valid(normal));
     }

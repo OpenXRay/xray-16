@@ -15,7 +15,7 @@ constexpr u32 occq_size = 2 * 768 * R__NUM_PARALLEL_CONTEXTS; // // queue for oc
 class R_occlusion
 {
 private:
-    struct _Q
+    struct Query
     {
         u32 order;
 #if defined(USE_DX9) || defined(USE_DX11)
@@ -30,8 +30,8 @@ private:
     static const u32 iInvalidHandle = 0xFFFFFFFF;
 
     BOOL enabled; //
-    xr_vector<_Q> pool; // sorted (max ... min), insertions are usually at the end
-    xr_vector<_Q> used; // id's are generated from this and it is cleared from back only
+    xr_vector<Query> pool; // sorted (max ... min), insertions are usually at the end
+    xr_vector<Query> used; // id's are generated from this and it is cleared from back only
     xr_vector<u32> fids; // free id's
 
     Lock render_lock{};

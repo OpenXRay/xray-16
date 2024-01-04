@@ -47,20 +47,20 @@ void CResourceManager::reset_end()
     {
         for (u32 _it = 0; _it < v_geoms.size(); _it++)
         {
-            SGeometry* _G = v_geoms[_it];
-            if (_G->vb == RImplementation.Vertex.old_pVB)
-                _G->vb = RImplementation.Vertex.Buffer();
+            SGeometry* geom = v_geoms[_it];
+            if (geom->vb == RImplementation.Vertex.old_pVB)
+                geom->vb = RImplementation.Vertex.Buffer();
 
             // Here we may recover the buffer using one of
             // RCache's index buffers.
             // Do not remove else.
-            if (_G->ib == RImplementation.Index.old_pIB)
+            if (geom->ib == RImplementation.Index.old_pIB)
             {
-                _G->ib = RImplementation.Index.Buffer();
+                geom->ib = RImplementation.Index.Buffer();
             }
-            else if (_G->ib == RImplementation.old_QuadIB)
+            else if (geom->ib == RImplementation.old_QuadIB)
             {
-                _G->ib = RImplementation.QuadIB;
+                geom->ib = RImplementation.QuadIB;
             }
         }
     }

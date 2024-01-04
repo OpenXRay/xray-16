@@ -11,26 +11,20 @@ template <class T> struct _matrix; typedef _matrix<float> Fmatrix;
 #define VPUSH(a) ((a).x), ((a).y), ((a).z)
 
 void XRCORE_API __cdecl Msg(LPCSTR format, ...);
-void XRCORE_API Log(LPCSTR msg);
+
 void XRCORE_API Log(LPCSTR msg);
 void XRCORE_API Log(LPCSTR msg, LPCSTR dop);
-void XRCORE_API Log(LPCSTR msg, u32 dop);
-void XRCORE_API Log(LPCSTR msg, u64 dop);
 void XRCORE_API Log(LPCSTR msg, int dop);
+void XRCORE_API Log(LPCSTR msg, unsigned int dop);
+void XRCORE_API Log(LPCSTR msg, long dop);
+void XRCORE_API Log(LPCSTR msg, unsigned long dop);
+void XRCORE_API Log(LPCSTR msg, long long dop);
+void XRCORE_API Log(LPCSTR msg, unsigned long long dop);
 void XRCORE_API Log(LPCSTR msg, float dop);
 void XRCORE_API Log(LPCSTR msg, const Fvector& dop);
 void XRCORE_API Log(LPCSTR msg, const Fmatrix& dop);
-void XRCORE_API LogWinErr(LPCSTR msg, long err_code);
 
-#ifdef XR_PLATFORM_APPLE
-ICF void Log(pcstr msg, size_t dop)
-{
-    if constexpr (sizeof(size_t) == sizeof(u32))
-        return Log(msg, static_cast<u32>(dop));
-    else
-        return Log(msg, static_cast<u64>(dop));
-}
-#endif
+void XRCORE_API LogWinErr(LPCSTR msg, long err_code);
 
 struct LogCallback
 {

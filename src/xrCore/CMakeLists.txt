@@ -449,11 +449,17 @@ target_link_libraries(xrCore
 
     PRIVATE
     xrMiscMath
-    dl
     $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
     $<$<BOOL:${JPEG_FOUND}>:JPEG::JPEG>
     LZO::LZO
 )
+
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT WIN32)
+    target_link_libraries(xrCore
+        PRIVATE
+        dl
+    )
+endif()
 
 target_compile_definitions(xrCore
     PRIVATE

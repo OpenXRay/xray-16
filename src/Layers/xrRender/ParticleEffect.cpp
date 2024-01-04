@@ -358,24 +358,24 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvec
 {
     m_sprite_section.Enter();
 
-    __m128 Vr, Vt, _T, _R, _pos, _zz, _sa, _ca, a, b, c, d;
+    __m128 Vr, Vt, T_, R_, _pos, _zz, _sa, _ca, a, b, c, d;
 
     _sa = _mm_set1_ps(sina);
     _ca = _mm_set1_ps(cosa);
 
-    _T = _mm_load_ss((float*)&T.x);
-    _T = _mm_loadh_pi(_T, (__m64*)&T.y);
+    T_ = _mm_load_ss((float*)&T.x);
+    T_ = _mm_loadh_pi(T_, (__m64*)&T.y);
 
-    _R = _mm_load_ss((float*)&R.x);
-    _R = _mm_loadh_pi(_R, (__m64*)&R.y);
+    R_ = _mm_load_ss((float*)&R.x);
+    R_ = _mm_loadh_pi(R_, (__m64*)&R.y);
 
     _pos = _mm_load_ss((float*)&pos.x);
     _pos = _mm_loadh_pi(_pos, (__m64*)&pos.y);
 
     _zz = _mm_setzero_ps();
 
-    Vr = _mm_mul_ps(_mm_set1_ps(r1), _mm_add_ps(_mm_mul_ps(_T, _sa), _mm_mul_ps(_R, _ca)));
-    Vt = _mm_mul_ps(_mm_set1_ps(r2), _mm_sub_ps(_mm_mul_ps(_T, _ca), _mm_mul_ps(_R, _sa)));
+    Vr = _mm_mul_ps(_mm_set1_ps(r1), _mm_add_ps(_mm_mul_ps(T_, _sa), _mm_mul_ps(R_, _ca)));
+    Vt = _mm_mul_ps(_mm_set1_ps(r2), _mm_sub_ps(_mm_mul_ps(T_, _ca), _mm_mul_ps(R_, _sa)));
 
     a = _mm_sub_ps(Vt, Vr);
     b = _mm_add_ps(Vt, Vr);

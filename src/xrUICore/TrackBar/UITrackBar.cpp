@@ -260,30 +260,29 @@ void CUITrackBar::UpdatePosRelativeToMouse()
     else if (fpos > window_width - btn_width / 2)
         fpos = window_width - btn_width / 2;
 
-    float __fval;
-    float __fmax = (m_b_is_float) ? m_f_max : (float)m_i_max;
-    float __fmin = (m_b_is_float) ? m_f_min : (float)m_i_min;
-    float __fstep = (m_b_is_float) ? m_f_step : (float)m_i_step;
+    const float fmax = (m_b_is_float) ? m_f_max : (float)m_i_max;
+    const float fmin = (m_b_is_float) ? m_f_min : (float)m_i_min;
+    const float fstep = (m_b_is_float) ? m_f_step : (float)m_i_step;
 
-    __fval = (__fmax - __fmin) * (fpos - btn_width / 2) / (window_width - btn_width) + __fmin;
+    float fval = (fmax - fmin) * (fpos - btn_width / 2) / (window_width - btn_width) + fmin;
 
-    float _d = (__fval - __fmin);
+    const float d = (fval - fmin);
 
-    float _v = _d / __fstep;
-    int _vi = iFloor(_v);
-    float _vf = __fstep * _vi;
+    const float val = d / fstep;
+    const int vi = iFloor(val);
+    float vf = fstep * vi;
 
-    if (_d - _vf > __fstep / 2.0f)
-        _vf += __fstep;
+    if (d - vf > fstep / 2.0f)
+        vf += fstep;
 
-    __fval = __fmin + _vf;
+    fval = fmin + vf;
 
-    clamp(__fval, __fmin, __fmax);
+    clamp(fval, fmin, fmax);
 
     if (m_b_is_float)
-        m_f_val = __fval;
+        m_f_val = fval;
     else
-        m_i_val = iFloor(__fval);
+        m_i_val = iFloor(fval);
 
     bool b_ch = false;
     if (m_b_is_float)
@@ -320,11 +319,11 @@ void CUITrackBar::UpdatePos()
     float free_space = window_width - btn_width;
     Fvector2 pos = m_pSlider->GetWndPos();
 
-    float __fval = (m_b_is_float) ? m_f_val : (float)m_i_val;
-    float __fmax = (m_b_is_float) ? m_f_max : (float)m_i_max;
-    float __fmin = (m_b_is_float) ? m_f_min : (float)m_i_min;
+    const float fval = (m_b_is_float) ? m_f_val : (float)m_i_val;
+    const float fmax = (m_b_is_float) ? m_f_max : (float)m_i_max;
+    const float fmin = (m_b_is_float) ? m_f_min : (float)m_i_min;
 
-    pos.x = (__fval - __fmin) * free_space / (__fmax - __fmin);
+    pos.x = (fval - fmin) * free_space / (fmax - fmin);
     if (GetInvert())
         pos.x = free_space - pos.x;
 

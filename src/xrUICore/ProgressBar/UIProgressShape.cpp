@@ -29,13 +29,13 @@ void CUIProgressShape::SetPos(int pos, int max)
 }
 
 void CUIProgressShape::SetTextVisible(bool b) { m_bText = b; }
-void _make_rot_pos(Fvector2& pt, float sin_a, float cos_a, float R1, float R2)
+void make_rot_pos(Fvector2& pt, float sin_a, float cos_a, float R1, float R2)
 {
     pt.x = -R1 * sin_a;
     pt.y = -R2 * cos_a;
 }
 
-void _make_rot_tex(Fvector2& pt, float src, float sin_a, float cos_a)
+void make_rot_tex(Fvector2& pt, float src, float sin_a, float cos_a)
 {
     pt.x = src * sin_a;
     pt.y = src * cos_a;
@@ -120,8 +120,8 @@ void CUIProgressShape::Draw()
     start_tex_pt.set(0.0f, -radius_tex);
     prev_tex_pt = start_tex_pt;
 
-    _make_rot_tex(prev_pos_pt, start_pos_pt.y, sin_a, cos_a);
-    _make_rot_tex(prev_tex_pt, start_tex_pt.y, sin_a, cos_a);
+    make_rot_tex(prev_pos_pt, start_pos_pt.y, sin_a, cos_a);
+    make_rot_tex(prev_tex_pt, start_tex_pt.y, sin_a, cos_a);
 
     float angle_range = PI_MUL_2;
     if (m_bClockwise)
@@ -158,8 +158,8 @@ void CUIProgressShape::Draw()
         sin_a = _sin(curr_angle);
         cos_a = _cos(curr_angle);
 
-        _make_rot_tex(prev_pos_pt, start_pos_pt.y, sin_a, cos_a);
-        _make_rot_tex(prev_tex_pt, start_tex_pt.y, sin_a, cos_a);
+        make_rot_tex(prev_pos_pt, start_pos_pt.y, sin_a, cos_a);
+        make_rot_tex(prev_tex_pt, start_tex_pt.y, sin_a, cos_a);
 
         tp.set(prev_pos_pt);
         tp.add(center_pos);
