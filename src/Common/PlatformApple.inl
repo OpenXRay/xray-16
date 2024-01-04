@@ -62,7 +62,6 @@
 
 #define GetCurrentProcessId getpid
 #define GetCurrentThreadId pthread_self
-static int pthread_setname_np(pthread_t /*threadId*/, const char* name) { return pthread_setname_np(name); }
 
 inline void Sleep(int ms)
 {

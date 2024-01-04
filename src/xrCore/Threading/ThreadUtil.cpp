@@ -2,7 +2,27 @@
 #include "ThreadUtil.h"
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
-#include <pthread.h>
+#   include <pthread.h>
+
+#   if defined(XR_PLATFORM_OPENBSD) || (defined(XR_PLATFORM_FREEBSD) && __FreeBSD_version < 1201519)
+#   include <pthread_np.h>
+
+static int pthread_setname_np(pthread_t threadId, const char* name)
+{
+    pthread_set_name_np(threadId, name);
+    return 0;
+}
+#   elif defined(XR_PLATFORM_NETBSD)
+static int pthread_setname_np(pthread_t threadId, const char* name)
+{
+    return pthread_setname_np(threadId, "%s", name);
+}
+#   elif defined(XR_PLATFORM_APPLE)
+static int pthread_setname_np(pthread_t /*threadId*/, const char* name)
+{
+    return pthread_setname_np(name);
+}
+#   endif
 #endif
 
 namespace Threading
