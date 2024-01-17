@@ -27,37 +27,38 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
     IReader reader((void*)ini_string, xr_strlen(ini_string));
     CInifile ini(&reader, FS.get_path("$game_config$")->m_Path);
 #pragma warning(pop)
-
     // Alundaio: This will spawn a single random section listed in [spawn_loadout]
     // No need to spawn ammo, this will automatically spawn 1 box for weapon and if ammo_type is specified it will spawn that type
     // count is used only for ammo boxes (ie wpn_pm = 3) will spawn 3 boxes, not 3 wpn_pm
     // Usage: to create random weapon loadouts
-    static constexpr cpcstr LOADOUT_SECTION = "spawn_loadout";
-    if (ini.section_exist(LOADOUT_SECTION))
+    u8 loadout_index = 1;
+    LPCSTR loadout_section = "spawn_loadout";
+
+    while (ini.section_exist(loadout_section))
     {
         pcstr itmSection, V;
-        xr_vector<u32> OnlyOne;
+        xr_vector<u32> spawn_loadouts;
 
         pcstr lname = ai().game_graph().header().level(ai().game_graph().vertex(m_tGraphID)->level_id()).name().c_str();
 
-        for (u32 k = 0; ini.r_line(LOADOUT_SECTION, k, &itmSection, &V); k++)
+        for (u32 k = 0; ini.r_line(loadout_section, k, &itmSection, &V); k++)
         {
             // If level=<lname> then only spawn items if object on that level
             if (strstr(V, "level=") != nullptr)
             {
                 if (strstr(V, lname) != nullptr)
-                    OnlyOne.push_back(k);
+                    spawn_loadouts.push_back(k);
             }
             else
             {
-                OnlyOne.push_back(k);
+                spawn_loadouts.push_back(k);
             }
         }
 
-        if (!OnlyOne.empty())
+        if (!spawn_loadouts.empty())
         {
-            s32 sel = Random.randI(0, OnlyOne.size());
-            if (ini.r_line(LOADOUT_SECTION, OnlyOne.at(sel), &itmSection, &V))
+            s32 sel = Random.randI(0, spawn_loadouts.size());
+            if (ini.r_line(loadout_section, spawn_loadouts.at(sel), &itmSection, &V))
             {
                 VERIFY(xr_strlen(itmSection));
                 if (pSettings->section_exist(itmSection))
@@ -87,7 +88,6 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         if (nullptr != strstr(V, "ammo_type="))
                             i_ammo_type = atoi(strstr(V, "ammo_type=") + 10);
                     }
-
 
                     CSE_Abstract* E = alife().spawn_item(itmSection, o_Position, m_tNodeID, m_tGraphID, ID);
                     CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(E);
@@ -122,8 +122,12 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                 }
             }
         }
+
+        loadout_index += 1;
+        string32 buf;
+        loadout_section = strconcat(sizeof(buf), buf, "spawn_loadout", std::to_string(loadout_index).c_str());
     }
-    //-Alundaio
+    // -Alundaio
 
     if (ini.section_exist("spawn"))
     {
@@ -133,7 +137,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
         {
             VERIFY(xr_strlen(N));
 
-            if (pSettings->section_exist(N)) //Alundaio: verify item section exists!
+            if (pSettings->section_exist(N)) // Alundaio: verify item section exists!
             {
                 float f_cond = 1.0f;
                 bool bScope = false;
@@ -166,7 +170,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                     if (randF(1.f) < p)
                     {
                         CSE_Abstract* E = alife().spawn_item(N, o_Position, m_tNodeID, m_tGraphID, ID);
-                        //подсоединить аддоны к оружию, если включены соответствующие флажки
+                        // подсоединить аддоны к оружию, если включены соответствующие флажки
                         CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(E);
                         if (W)
                         {
