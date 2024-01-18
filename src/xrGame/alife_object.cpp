@@ -129,7 +129,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 
         loadout_index += 1;
         string32 buf;
-        loadout_section = strconcat(sizeof(buf), buf, "spawn_loadout", std::to_string(loadout_index).c_str());
+        xr_sprintf(loadout_section, "spawn_loadout%d", loadout_index);
     }
     // -Alundaio
 
