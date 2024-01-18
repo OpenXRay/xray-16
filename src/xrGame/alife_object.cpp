@@ -29,7 +29,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 #pragma warning(pop)
 
     u8 loadout_index = 1;
-    LPCSTR loadout_section = "spawn_loadout";
+    string32 loadout_section = "spawn_loadout";
 
     // Alundaio: This will spawn a single random section listed in [spawn_loadout].
     // No need to spawn ammo, this will automatically spawn 1 box for weapon and if ammo_type is specified it will spawn that type.
@@ -138,7 +138,6 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
         }
 
         loadout_index += 1;
-        string32 buf;
         xr_sprintf(loadout_section, "spawn_loadout%d", loadout_index);
     }
     // -Alundaio
