@@ -64,11 +64,11 @@ void FLOD::Load(LPCSTR name, IReader* data, u32 dwFlags)
     // lod correction
     Fvector3 S;
     vis.box.getradius(S);
-    float r = vis.sphere.R;
+    const float r = vis.sphere.R;
     std::sort(&S.x, &S.x + 3);
-    float a = S.y;
-    float Sf = 4.f * (0.5f * (r * r * asin(a / r) + a * _sqrt(r * r - a * a)));
-    float Ss = M_PI * r * r;
+    const float a = S.y;
+    const float Sf = 4.f * (0.5f * (r * r * asin(a / r) + a * _sqrt(r * r - a * a)));
+    const float Ss = M_PI * r * r;
     lod_factor = Sf / Ss;
 }
 void FLOD::Copy(dxRender_Visual* pFrom)

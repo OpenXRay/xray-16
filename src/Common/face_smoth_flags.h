@@ -6,7 +6,7 @@ enum
 };
 
 IC bool is_backface(u32 face_flags) { return !!(face_flags & backface_flag); }
-IC void set_backface(u32& face_flags, bool value)
+[[maybe_unused]] IC void set_backface(u32& face_flags, bool value)
 {
     if (value)
         face_flags |= backface_flag;
@@ -30,7 +30,7 @@ IC bool is_soft_edge(u32 face_flags, u16 edge_index)
     return !(face_flags & (1 << edge_index));
 }
 
-IC void set_soft_edge(u32& face_flags, u16 edge_index, bool value)
+[[maybe_unused]] IC void set_soft_edge(u32& face_flags, u16 edge_index, bool value)
 {
     edge_index = convert_edge_index(face_flags, edge_index);
     VERIFY(edge_index >= 0 && edge_index <= 2);
@@ -40,7 +40,7 @@ IC void set_soft_edge(u32& face_flags, u16 edge_index, bool value)
         face_flags |= (1 << edge_index);
 }
 
-IC bool do_connect_faces_by_faces_edge_flags(u32 start_face_flags, u32 test_face_flags,
+[[maybe_unused]] IC bool do_connect_faces_by_faces_edge_flags(u32 start_face_flags, u32 test_face_flags,
     u16 start_common_edge_idx, u16 test_common_edge_idx)
 {
     bool start_edge_back = is_backface(start_face_flags);

@@ -5,24 +5,24 @@
 
 enum EPointType : u32
 {
-    ptRPoint = 0,
-    ptEnvMod,
-    ptSpawnPoint,
-    ptMaxType,
+    ptRPoint                  = 0,
+    ptEnvMod     [[maybe_unused]],
+    ptSpawnPoint [[maybe_unused]],
+    ptMaxType    [[maybe_unused]],
 };
 
 enum EWayType : u32
 {
-    wtPatrolPath = 0,
-    wtMaxType,
+    wtPatrolPath             = 0,
+    wtMaxType   [[maybe_unused]],
 };
 
 enum ERPpointType
 { // [0..255]
-    rptActorSpawn = 0,
+    rptActorSpawn            = 0,
     rptArtefactSpawn,
     rptItemSpawn,
-    rptLast = 0xff
+    rptLast [[maybe_unused]] = 0xff
 };
 
 enum EEnvModUsedParams

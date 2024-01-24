@@ -8,9 +8,9 @@ struct Flight
 {
     enum class Type : u32
     {
-        Point       = 1,
-        Spot        = 2,
-        Directional = 3,
+        Point                 = 1,
+        Spot [[maybe_unused]] = 2,
+        Directional           = 3,
     };
 
 public:
@@ -22,9 +22,9 @@ public:
     Fvector direction; /* Direction in world space */
     float range; /* Cutoff range */
     float falloff; /* Falloff */
-    float attenuation0; /* Constant attenuation */
-    float attenuation1; /* Linear attenuation */
-    float attenuation2; /* Quadratic attenuation */
+    [[maybe_unused]] float attenuation0; /* Constant attenuation */
+    [[maybe_unused]] float attenuation1; /* Linear attenuation */
+    [[maybe_unused]] float attenuation2; /* Quadratic attenuation */
     float theta; /* Inner angle of spotlight cone */
     float phi; /* Outer angle of spotlight cone */
 
@@ -62,8 +62,8 @@ struct Fmaterial
 public:
     Fcolor diffuse; /* Diffuse color RGBA */
     Fcolor ambient; /* Ambient color RGB */
-    Fcolor specular; /* Specular 'shininess' */
-    Fcolor emissive; /* Emissive color RGB */
+    [[maybe_unused]] Fcolor specular; /* Specular 'shininess' */
+    [[maybe_unused]] Fcolor emissive; /* Emissive color RGB */
     float power; /* Sharpness if specular highlight */
 
     IC void set(float r, float g, float b)

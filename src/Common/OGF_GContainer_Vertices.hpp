@@ -43,7 +43,7 @@ inline s16 s16_tc_lmap(float uv) // [-1 .. +1]
     return s16(t);
 }
 
-constexpr D3DVERTEXELEMENT9 r1_decl_lmap[] = // 12+4+4+4+4+4 = 32
+[[maybe_unused]] static constexpr D3DVERTEXELEMENT9 r1_decl_lmap[] = // 12+4+4+4+4+4 = 32
 {
     { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
     { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
@@ -54,7 +54,7 @@ constexpr D3DVERTEXELEMENT9 r1_decl_lmap[] = // 12+4+4+4+4+4 = 32
     D3DDECL_END()
 };
 
-constexpr D3DVERTEXELEMENT9 r1_decl_lmap_unpacked[] = // 12+4+8+8 = 32
+[[maybe_unused]] static constexpr D3DVERTEXELEMENT9 r1_decl_lmap_unpacked[] = // 12+4+8+8 = 32
 {
     { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
     { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
@@ -63,7 +63,7 @@ constexpr D3DVERTEXELEMENT9 r1_decl_lmap_unpacked[] = // 12+4+8+8 = 32
     D3DDECL_END()
 };
 
-constexpr D3DVERTEXELEMENT9 r1_decl_vert[] = // 12+4+4+4+4+4 = 32
+[[maybe_unused]] static constexpr D3DVERTEXELEMENT9 r1_decl_vert[] = // 12+4+4+4+4+4 = 32
 {
     { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
     { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
@@ -74,7 +74,7 @@ constexpr D3DVERTEXELEMENT9 r1_decl_vert[] = // 12+4+4+4+4+4 = 32
     D3DDECL_END()
 };
 
-constexpr D3DVERTEXELEMENT9 r1_decl_vert_unpacked[] = // 12+4+4+8 = 28
+[[maybe_unused]] static constexpr D3DVERTEXELEMENT9 r1_decl_vert_unpacked[] = // 12+4+4+8 = 28
 {
     { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
     { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
@@ -83,13 +83,13 @@ constexpr D3DVERTEXELEMENT9 r1_decl_vert_unpacked[] = // 12+4+4+8 = 28
     D3DDECL_END()
 };
 
-constexpr D3DVERTEXELEMENT9 x_decl_vert[] = // 12
+[[maybe_unused]] static constexpr D3DVERTEXELEMENT9 x_decl_vert[] = // 12
 {
     { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
     D3DDECL_END()
 };
 
-constexpr D3DVERTEXELEMENT9 mu_model_decl[] = // 12+4+4+4+8 = 32
+[[maybe_unused]] static constexpr D3DVERTEXELEMENT9 mu_model_decl[] = // 12+4+4+4+8 = 32
 {
     { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
     { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
@@ -99,7 +99,7 @@ constexpr D3DVERTEXELEMENT9 mu_model_decl[] = // 12+4+4+4+8 = 32
     D3DDECL_END()
 };
 
-constexpr D3DVERTEXELEMENT9 mu_model_decl_unpacked[] = // 12+4+4+8 = 28
+[[maybe_unused]] static constexpr D3DVERTEXELEMENT9 mu_model_decl_unpacked[] = // 12+4+4+8 = 28
 {
     { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
     { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
@@ -108,7 +108,7 @@ constexpr D3DVERTEXELEMENT9 mu_model_decl_unpacked[] = // 12+4+4+8 = 28
     D3DDECL_END()
 };
 #pragma pack(push, 1)
-struct x_vert
+struct [[maybe_unused]] x_vert
 {
     Fvector3 P;
     x_vert(Fvector3 _P) { P = _P; }
@@ -143,7 +143,7 @@ struct r1v_lmap
 #endif // LEVEL_COMPILER
 };
 
-struct r1v_lmap_unpacked
+struct [[maybe_unused]] r1v_lmap_unpacked
 {
     Fvector3 P;
     u32 N;
@@ -200,7 +200,7 @@ struct r1v_vert
 #endif // XRLC_LIGHT_EXPORTS
 };
 
-struct r1v_vert_unpacked
+struct [[maybe_unused]] r1v_vert_unpacked
 {
     Fvector3 P;
     u32 N;
@@ -236,7 +236,7 @@ struct mu_model_vert
     _vector4<s16> misc;
 };
 
-struct mu_model_vert_unpacked
+struct [[maybe_unused]] mu_model_vert_unpacked
 {
     Fvector3 P;
     u32 N;

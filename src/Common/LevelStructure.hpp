@@ -7,16 +7,16 @@ constexpr cpcstr LEVEL_GRAPH_NAME = "level.ai";
 
 enum fsL_Chunks : u32
 {
-    fsL_HEADER = 1, //*
-    fsL_SHADERS = 2, //*
-    fsL_VISUALS = 3, //*
-    fsL_PORTALS = 4, //* - Portal polygons
-    fsL_LIGHT_DYNAMIC = 6, //*
-    fsL_GLOWS = 7, //* - All glows inside level
-    fsL_SECTORS = 8, //* - All sectors on level
-    fsL_VB = 9, //* - Static geometry
-    fsL_IB = 10, //*
-    fsL_SWIS = 11, //* - collapse info, usually for trees
+    fsL_HEADER                  = 1, //*
+    fsL_SHADERS                 = 2, //*
+    fsL_VISUALS                 = 3, //*
+    fsL_PORTALS                 = 4, //* - Portal polygons
+    fsL_LIGHT_DYNAMIC           = 6, //*
+    fsL_GLOWS  [[maybe_unused]] = 7, //* - All glows inside level
+    fsL_SECTORS                 = 8, //* - All sectors on level
+    fsL_VB                      = 9, //* - Static geometry
+    fsL_IB                      = 10, //*
+    fsL_SWIS                    = 11, //* - collapse info, usually for trees
 };
 
 enum fsESectorChunks : u32
@@ -33,16 +33,16 @@ enum fsSLS_Chunks : u32
 
 enum EBuildQuality : u16
 {
-    ebqDraft = 0,
-    ebqHigh = 1,
-    ebqCustom = 2,
+    ebqDraft  [[maybe_unused]] = 0,
+    ebqHigh   [[maybe_unused]] = 1,
+    ebqCustom [[maybe_unused]] = 2,
 };
 
 #pragma pack(push, 8)
 struct hdrLEVEL
 {
     u16 XRLC_version;
-    u16 XRLC_quality;
+    [[maybe_unused]] u16 XRLC_quality;
 };
 
 struct hdrCFORM
@@ -53,7 +53,7 @@ struct hdrCFORM
     Fbox aabb;
 };
 
-struct hdrNODES2
+struct [[maybe_unused]] hdrNODES2
 {
     u32 version;
     u32 count;
@@ -95,9 +95,9 @@ class NodePosition4
 
 public:
     // xz-coordinates are packed into 3 bytes
-    static constexpr u32 MAX_XZ = (1 << 24) - 1;
+    [[maybe_unused]] static constexpr u32 MAX_XZ = (1 << 24) - 1;
     // y-coordinate is packed into 2 bytes
-    static constexpr u32 MAX_Y = (1 << 16) - 1;
+    [[maybe_unused]] static constexpr u32 MAX_Y = (1 << 16) - 1;
 
     [[nodiscard]]
     ICF u32 xz() const { return ((*((u32*)data)) & 0x00ffffff); }
@@ -130,11 +130,11 @@ public:
     // xz-coordinates are packed into 4 bytes
     static constexpr u32 MAX_XZ = std::numeric_limits<u32>::max();
     // y-coordinate is packed into 2 bytes
-    static constexpr u32 MAX_Y = std::numeric_limits<u16>::max();
+    [[maybe_unused]] static constexpr u32 MAX_Y = std::numeric_limits<u16>::max();
 
     NodePosition12() = default;
 
-    explicit NodePosition12(const NodePosition4& old)
+    [[maybe_unused]] explicit NodePosition12(const NodePosition4& old)
         : m_xz(old.xz()), m_y(old.y()) {}
 
     NodePosition12& operator=(const NodePosition4& old)
@@ -552,7 +552,7 @@ using NodePosition   = NodePosition12;
 #endif
 using NodeCompressed = NodeCompressed13;
 
-const u32 XRCL_CURRENT_VERSION = 18; // input
+[[maybe_unused]] const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
 const u32 CFORM_CURRENT_VERSION = 4;
 

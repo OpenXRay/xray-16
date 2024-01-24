@@ -55,7 +55,7 @@ struct v_clouds
         intensity = _i;
     }
 };
-const u32 v_clouds_fvf = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR;
+constexpr u32 v_clouds_fvf = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR;
 #pragma pack(pop)
 
 class CBlender_skybox : public IBlender
@@ -133,11 +133,13 @@ void dxEnvironmentRender::Clear()
 {
     std::pair<u32, ref_texture> zero = std::make_pair(u32(0), ref_texture(nullptr));
     sky_r_textures.clear();
+    sky_r_textures.reserve(3);
     sky_r_textures.push_back(zero);
     sky_r_textures.push_back(zero);
     sky_r_textures.push_back(zero);
 
     clouds_r_textures.clear();
+    clouds_r_textures.reserve(3);
     clouds_r_textures.push_back(zero);
     clouds_r_textures.push_back(zero);
     clouds_r_textures.push_back(zero);
