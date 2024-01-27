@@ -37,6 +37,8 @@ xr_unique_ptr<TaskManager> TaskScheduler;
 
 static constexpr size_t OTHER_THREADS_COUNT = 1; // Primary thread
 
+static thread_local CRandom random{};
+
 static u32 ttapi_dwFastIter = 0;
 
 class TaskStorageSize
@@ -67,7 +69,7 @@ static constexpr size_t TASK_STORAGE_MASK = TASK_STORAGE_SIZE - 1;
 class FallbackTaskAllocator
 {
     std::atomic_size_t m_allocated{};
-    Task               m_storage[TASK_STORAGE_SIZE];
+    Task               m_storage[TASK_STORAGE_SIZE]{};
 
 public:
     Task* allocate()
@@ -88,7 +90,7 @@ public:
 class TaskAllocator
 {
     size_t m_allocated{};
-    Task   m_storage[TASK_STORAGE_SIZE];
+    Task   m_storage[TASK_STORAGE_SIZE]{};
 
 public:
     Task* allocate()
@@ -264,7 +266,7 @@ void TaskManager::SetThreadStatus(bool active)
         activeWorkersCount.fetch_sub(1, std::memory_order_relaxed);
 }
 
-void TaskManager::WakeUpIfNeeded()
+void TaskManager::WakeUpIfNeeded() const
 {
     const auto overall = workersCount.load(std::memory_order_relaxed);
     const auto active = activeWorkersCount.load(std::memory_order_relaxed);
@@ -324,7 +326,7 @@ void TaskManager::TaskWorkerStart()
     }
     steal:
     {
-        task = TryToSteal(&s_tl_worker);
+        task = TryToSteal();
         if (task)
             goto execute;
     }
@@ -370,7 +372,7 @@ void TaskManager::TaskWorkerStart()
     s_tl_worker.event.Wait(); // prevent crash when other thread tries to steal
 }
 
-Task* TaskManager::TryToSteal(TaskWorker* thief)
+Task* TaskManager::TryToSteal() const
 {
     const auto count = workersCount.load(std::memory_order_relaxed);
     if (count == 1)
@@ -380,13 +382,18 @@ Task* TaskManager::TryToSteal(TaskWorker* thief)
         return nullptr; // thread itself
     }
 
-    TaskWorker* other = workers[random.randI(count)];
-    if (other != thief)
+
+    int steal_attempts = 3;
+    while (--steal_attempts >= 0)
     {
-        auto* task = other->steal();
-        if (!other->empty() && other->sleeps.load(std::memory_order_relaxed))
-            other->event.Set(); // Wake up, you have work to do!
-        return task;
+        TaskWorker* other = workers[random.randI(count)];
+        if (other != &s_tl_worker)
+        {
+            auto* task = other->steal();
+            if (!other->empty() && other->sleeps.load(std::memory_order_relaxed))
+                other->event.Set(); // Wake up, you have work to do!
+            return task;
+        }
     }
     return nullptr;
 }
@@ -423,7 +430,7 @@ void TaskManager::IncrementTaskJobsCounter(Task& parent)
     VERIFY2(prev != std::numeric_limits<decltype(prev)>::max(), "Max jobs overflow. (too much children)");
 }
 
-void TaskManager::PushTask(Task& task)
+void TaskManager::PushTask(Task& task) const
 {
     s_tl_worker.push(&task);
     WakeUpIfNeeded();
@@ -461,7 +468,7 @@ bool TaskManager::ExecuteOneTask()
 
     Task* task = s_tl_worker.pop();
     if (!task)
-        task = TryToSteal(&s_tl_worker);
+        task = TryToSteal();
 
     if (task)
     {
@@ -545,7 +552,7 @@ void TaskManager::GetStats(size_t& allocated, size_t& allocatedWithFallback, siz
     finished += s_main_thread_worker->finishedTasks;
 
     ScopeLock scope(&workersLock);
-    for (TaskWorker* worker : workers)
+    for (const TaskWorker* worker : workers)
     {
         allocated += worker->allocatedTasks;
         pushed += worker->pushedTasks;
