@@ -86,10 +86,11 @@ void CSpaceRestrictionShape::fill_shape(const CCF_Shape::shape_def& shape)
     std::mutex mergeMutex;
 
     auto [begin, end] = graph.get_range(start, dest);
-    xr_parallel_for(TaskRange(begin, end), [this, &mergeMutex, &graph] (const auto& range) {
+    xr_parallel_for(TaskRange(begin, end), [this, &mergeMutex, &graph] (const auto& range)
+    {
         xr_vector<u32> m_border_chunk;
         m_border_chunk.reserve(range.size());
-        for (auto &vertex : range)
+        for (const auto& vertex : range)
         {
             if (inside(graph.vertex_id(&vertex), true) &&
                 !inside(graph.vertex_id(&vertex), false))
@@ -103,10 +104,11 @@ void CSpaceRestrictionShape::fill_shape(const CCF_Shape::shape_def& shape)
     });
 
 #ifdef DEBUG
-    xr_parallel_for(TaskRange(begin, end), [this, &mergeMutex, &graph] (const auto& range) {
+    xr_parallel_for(TaskRange(begin, end), [this, &mergeMutex, &graph] (const auto& range)
+    {
         xr_vector<u32> m_test_storage_chunk;
         m_test_storage_chunk.reserve(range.size());
-        for (auto &vertex : range)
+        for (const auto& vertex : range)
         {
             if (inside(graph.vertex_id(&vertex), false))
                 m_test_storage_chunk.push_back(graph.vertex_id(&vertex));

@@ -43,6 +43,7 @@ void CRender::render_lights(light_Package& LP)
         }
     }
 
+    // 2. refactor
     {
         xr_vector<light*>& source = LP.v_shadowed;
         xr_vector<light*> refactored;
@@ -129,14 +130,14 @@ void CRender::render_lights(light_Package& LP)
         }
     };
 
-    const auto& flush_lights = [] (CRender& render, xr_vector<task_data_t>& lights_queue)
+    const auto& flush_lights = [] (xr_vector<task_data_t>& lights_queue)
     {
         for (const auto& [L, task, batch_id] : lights_queue)
         {
             VERIFY(task);
             TaskScheduler->Wait(*task);
 
-            auto& dsgraph = render.get_context(batch_id);
+            auto& dsgraph = RImplementation.get_context(batch_id);
 
             const bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
             const bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
@@ -145,27 +146,27 @@ void CRender::render_lights(light_Package& LP)
             {
                 PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHT);
 
-                render.Stats.s_merged++;
+                RImplementation.Stats.s_merged++;
                 L_spot_s.push_back(L);
-                render.Target->phase_smap_spot(dsgraph.cmd_list, L);
+                RImplementation.Target->phase_smap_spot(dsgraph.cmd_list, L);
                 dsgraph.cmd_list.set_xform_world(Fidentity);
                 dsgraph.cmd_list.set_xform_view(L->X.S.view);
                 dsgraph.cmd_list.set_xform_project(L->X.S.project);
                 dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
                 {
-                    if (check_grass_shadow(L, render.ViewBase))
+                    if (check_grass_shadow(L, RImplementation.ViewBase))
                     {
-                        render.Details->fade_distance = -1; // Use light position to calc "fade"
-                        render.Details->light_position.set(L->position);
-                        render.Details->Render(dsgraph.cmd_list);
+                        RImplementation.Details->fade_distance = -1; // Use light position to calc "fade"
+                        RImplementation.Details->light_position.set(L->position);
+                        RImplementation.Details->Render(dsgraph.cmd_list);
                     }
                 }
                 L->X.S.transluent = FALSE;
                 if (bSpecial)
                 {
                     L->X.S.transluent = TRUE;
-                    render.Target->phase_smap_spot_tsh(dsgraph.cmd_list, L);
+                    RImplementation.Target->phase_smap_spot_tsh(dsgraph.cmd_list, L);
                     PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHTS_RENDER_GRAPH);
                     dsgraph.render_graph(1); // normal level, secondary priority
                     PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHTS_RENDER_SORTED);
@@ -174,7 +175,7 @@ void CRender::render_lights(light_Package& LP)
             }
             else
             {
-                render.Stats.s_finalclip++;
+                RImplementation.Stats.s_finalclip++;
             }
 
             L->svis[batch_id].end(); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
@@ -206,7 +207,7 @@ void CRender::render_lights(light_Package& LP)
             if (batch_id == R_dsgraph_structure::INVALID_CONTEXT_ID)
             {
                 VERIFY(!lights_queue.empty());
-                flush_lights(*this, lights_queue);
+                flush_lights(lights_queue);
                 continue;
             }
 
@@ -228,7 +229,7 @@ void CRender::render_lights(light_Package& LP)
             }
             lights_queue.emplace_back(data);
         }
-        flush_lights(*this, lights_queue); // in case if something left
+        flush_lights(lights_queue); // in case if something left
 
         cmd_list.Invalidate();
 
