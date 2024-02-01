@@ -67,9 +67,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: gh release upload --clobber latest-nightly (get-item res/*.*.7z)
 
-  linux:
-    name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc || 'gcc' }})
-    runs-on: ubuntu-latest
+  cmake:
+    name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc || 'unknown compiler' }})
+    runs-on: ${{ matrix.platform.os }}
 
     container: ${{ matrix.platform.container || '' }}
 
@@ -85,18 +85,20 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Ubuntu, arch: amd64,   cc: gcc,   cxx: g++, }
-        - { name: Ubuntu, arch: amd64,   cc: clang, cxx: clang++, }
-        #- { name: Ubuntu, arch: arm64,   container: 'dockcross/linux-arm64', }
-        #- { name: Ubuntu, arch: ppc64el, container: 'dockcross/linux-ppc64le:latest', }
-        - { name: Alpine, arch: x86_64, shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
-        - { name: Alpine, arch: x86,    shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
-        #- { name: Haiku,  arch: x86_64, container: 'haiku/cross-compiler:x86_64-r1beta4', cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, }
+        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: gcc,   cxx: g++, }
+        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: clang, cxx: clang++, }
+        #- { name: Ubuntu, os: ubuntu-latest, arch: arm64,   cc: gcc,   cxx: g++, container: 'dockcross/linux-arm64', }
+        #- { name: Ubuntu, os: ubuntu-latest, arch: ppc64el, cc: gcc,   cxx: g++, container: 'dockcross/linux-ppc64le:latest', }
+        - { name: Alpine, os: ubuntu-latest, arch: x86_64,  cc: gcc,   cxx: g++, shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        - { name: Alpine, os: ubuntu-latest, arch: x86,     cc: gcc,   cxx: g++, shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        #- { name: Haiku,  os: ubuntu-latest, arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
+        - { name: macOS,  os: macos-13,      arch: x86_64,  cc: clang, cxx: clang++, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
+        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, cxx: clang++, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0" }
 
         configuration: [Debug, Release]
 
     steps:
-    - name: Install latest stable Alpine Linux
+    - name: Install latest stable Alpine Linux and packages
       if: ${{ matrix.platform.name == 'Alpine' }}
       uses: jirutka/setup-alpine@master
       with:
@@ -119,6 +121,12 @@ jobs:
               libtheora-dev:${{ matrix.platform.arch }} \
               libvorbis-dev:${{ matrix.platform.arch }}
 
+    - name: Install macOS packages
+      if: ${{ matrix.platform.name == 'macOS' }}
+      run: |
+          brew update
+          brew install sdl2 glew lzo libogg libvorbis theora
+
     - name: Set environment variables
       if: ${{ matrix.platform.cc != '' }}
       run: |
@@ -134,7 +142,7 @@ jobs:
 
     - name: Run CMake Build
       id: cmake-build
-      run: cmake --build build --config ${{ matrix.configuration }} --parallel $(nproc || echo 4)
+      run: cmake --build build --config ${{ matrix.configuration }} --parallel $(nproc || sysctl -n hw.ncpu || echo 4)
 
     - name: Make package
       if: ${{ steps.cmake-build.outcome == 'success' && matrix.platform.name == 'Ubuntu' }}
@@ -151,30 +159,6 @@ jobs:
       with:
         name: openxray_1.6.02_${{ matrix.configuration }}_${{ matrix.platform.arch }}_(github-${{ matrix.platform.cc }}-${{ github.run_number }}).deb
         path: build/openxray_1.6.02_*.deb
-
-  macos:
-    name: macOS ${{ matrix.Configuration }} ${{ matrix.Platform }}
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        Configuration: [Debug, Release]
-
-    steps:
-    - uses: actions/checkout@main
-      with:
-        submodules: recursive
-
-    - name: Install packages
-      run: |
-          brew update
-          brew install sdl2 glew lzo libogg libvorbis theora
-
-    - name: Run CMake
-      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
-
-    - name: Run CMake Build
-      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(sysctl -n hw.ncpu || echo 4)
 
   bsd:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }}

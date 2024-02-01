@@ -60,6 +60,7 @@ set(LUA_INIT "LUA_INIT" CACHE STRING "Environment variable for initial script")
 
 if (APPLE)
     set(ENV{SDKROOT} ${CMAKE_OSX_SYSROOT})
+    set(ENV{MACOSX_DEPLOYMENT_TARGET} ${CMAKE_OSX_DEPLOYMENT_TARGET})
 endif()
 
 # Clean unnecessary files in LuaJIT source directory
@@ -345,6 +346,7 @@ if (NOT PROJECT_PLATFORM_E2K)
             -B${MINILUA_BINARY_DIR}
             -G${CMAKE_GENERATOR}
             -S${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/minilua
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
             -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
             -DCMAKE_BUILD_TYPE=Release
             -DLUAJIT_DIR=${LUAJIT_DIR}
