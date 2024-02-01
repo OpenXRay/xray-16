@@ -32,7 +32,8 @@ void CRender::render_lights(light_Package& LP)
             L->vis_update();
             if (!L->vis.visible)
             {
-                source.erase(source.begin() + it);
+                std::swap(source[it], source.back());
+                source.pop_back();
                 it--;
             }
             else
@@ -42,25 +43,26 @@ void CRender::render_lights(light_Package& LP)
         }
     }
 
-    // 2. refactor - infact we could go from the backside and sort in ascending order
     {
         xr_vector<light*>& source = LP.v_shadowed;
         xr_vector<light*> refactored;
         refactored.reserve(source.size());
         const size_t total = source.size();
 
+        std::sort(source.begin(), source.end(), [](light* l1, light* l2)
+        {
+            const u32 a0 = l1->X.S.size;
+            const u32 a1 = l2->X.S.size;
+            return a0 < a1; // ascending order
+        });
+        
         for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
             LP_smap_pool.initialize(RImplementation.o.smapsize);
-            std::sort(source.begin(), source.end(), [](light* l1, light* l2)
+            for (auto &L : source)
             {
-                const u32 a0 = l1->X.S.size;
-                const u32 a1 = l2->X.S.size;
-                return a0 > a1; // reverse -> descending
-            });
-            for (size_t test = 0; test < source.size(); ++test)
-            {
-                light* L = source[test];
+                if (!L)
+                    continue;
                 SMAP_Rect R{};
                 if (LP_smap_pool.push(R, L->X.S.size))
                 {
@@ -69,14 +71,12 @@ void CRender::render_lights(light_Package& LP)
                     L->X.S.posY = R.min.y;
                     L->vis.smap_ID = smap_ID;
                     refactored.push_back(L);
-                    source.erase(source.begin() + test);
-                    --test;
+                    L = nullptr;
                 }
             }
         }
 
         // save (lights are popped from back)
-        std::reverse(refactored.begin(), refactored.end());
         LP.v_shadowed = std::move(refactored);
     }
 
@@ -129,14 +129,14 @@ void CRender::render_lights(light_Package& LP)
         }
     };
 
-    const auto& flush_lights = [&]()
+    const auto& flush_lights = [] (CRender& render, xr_vector<task_data_t>& lights_queue)
     {
         for (const auto& [L, task, batch_id] : lights_queue)
         {
             VERIFY(task);
             TaskScheduler->Wait(*task);
 
-            auto& dsgraph = get_context(batch_id);
+            auto& dsgraph = render.get_context(batch_id);
 
             const bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
             const bool bSpecial = !dsgraph.mapNormalPasses[1][0].empty() || !dsgraph.mapMatrixPasses[1][0].empty() ||
@@ -145,27 +145,27 @@ void CRender::render_lights(light_Package& LP)
             {
                 PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHT);
 
-                Stats.s_merged++;
+                render.Stats.s_merged++;
                 L_spot_s.push_back(L);
-                Target->phase_smap_spot(dsgraph.cmd_list, L);
+                render.Target->phase_smap_spot(dsgraph.cmd_list, L);
                 dsgraph.cmd_list.set_xform_world(Fidentity);
                 dsgraph.cmd_list.set_xform_view(L->X.S.view);
                 dsgraph.cmd_list.set_xform_project(L->X.S.project);
                 dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
                 {
-                    if (check_grass_shadow(L, ViewBase))
+                    if (check_grass_shadow(L, render.ViewBase))
                     {
-                        Details->fade_distance = -1; // Use light position to calc "fade"
-                        Details->light_position.set(L->position);
-                        Details->Render(dsgraph.cmd_list);
+                        render.Details->fade_distance = -1; // Use light position to calc "fade"
+                        render.Details->light_position.set(L->position);
+                        render.Details->Render(dsgraph.cmd_list);
                     }
                 }
                 L->X.S.transluent = FALSE;
                 if (bSpecial)
                 {
                     L->X.S.transluent = TRUE;
-                    Target->phase_smap_spot_tsh(dsgraph.cmd_list, L);
+                    render.Target->phase_smap_spot_tsh(dsgraph.cmd_list, L);
                     PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHTS_RENDER_GRAPH);
                     dsgraph.render_graph(1); // normal level, secondary priority
                     PIX_EVENT_CTX(dsgraph.cmd_list, SHADOWED_LIGHTS_RENDER_SORTED);
@@ -174,7 +174,7 @@ void CRender::render_lights(light_Package& LP)
             }
             else
             {
-                Stats.s_finalclip++;
+                render.Stats.s_finalclip++;
             }
 
             L->svis[batch_id].end(); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
@@ -206,7 +206,7 @@ void CRender::render_lights(light_Package& LP)
             if (batch_id == R_dsgraph_structure::INVALID_CONTEXT_ID)
             {
                 VERIFY(!lights_queue.empty());
-                flush_lights();
+                flush_lights(*this, lights_queue);
                 continue;
             }
 
@@ -228,7 +228,7 @@ void CRender::render_lights(light_Package& LP)
             }
             lights_queue.emplace_back(data);
         }
-        flush_lights(); // in case if something left
+        flush_lights(*this, lights_queue); // in case if something left
 
         cmd_list.Invalidate();
 
