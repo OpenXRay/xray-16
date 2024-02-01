@@ -206,21 +206,7 @@ else()
     )
 endif()
 
-option(XRAY_USE_DEFAULT_LINKER "Don't select linker, use system default." OFF)
-
-if (NOT XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER AND NOT APPLE) # XXX: check if we can remove this check for Apple
-    include(CheckCXXCompilerFlag)
-    check_cxx_compiler_flag("-fuse-ld=gold" GOLD_LINKER_AVAILABLE)
-    check_cxx_compiler_flag("-fuse-ld=lld" LLD_LINKER_AVAILABLE)
-
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND LLD_LINKER_AVAILABLE)
-        set(XRAY_LINKER "lld" CACHE STRING "" FORCE)
-    elseif (GOLD_LINKER_AVAILABLE)
-        set(XRAY_LINKER "gold" CACHE STRING "" FORCE)
-    endif()
-endif()
-
-if (XRAY_LINKER AND NOT XRAY_USE_DEFAULT_LINKER)
+if (XRAY_LINKER)
     add_link_options(-fuse-ld=${XRAY_LINKER})
 endif()
 
