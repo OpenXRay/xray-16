@@ -443,8 +443,7 @@ void CLevel::OnFrame()
         if (g_mt_config.test(mtMap))
         {
             R_ASSERT(m_map_manager);
-            Device.seqParallel.push_back(
-                fastdelegate::FastDelegate0<>(m_map_manager, &CMapManager::Update));
+            Device.seqParallel.emplace_back(m_map_manager, &CMapManager::Update);
         }
         else
             MapManager().Update();

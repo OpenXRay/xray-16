@@ -572,6 +572,14 @@ template <typename P>
 IC void CLevelGraph::iterate_vertices(
     const Fvector& min_position, const Fvector& max_position, const P& predicate) const
 {
+    auto [I, E] = get_range(min_position, max_position);
+
+    for (; I != E; ++I)
+        predicate(*I);
+}
+
+IC std::pair<CLevelGraph::CLevelVertex *, CLevelGraph::CLevelVertex *> CLevelGraph::get_range(const Fvector& min_position, const Fvector& max_position) const
+{
     const auto begin = m_nodes->begin(), end = m_nodes->end();
 
     CLevelVertex *I, *E;
@@ -591,8 +599,7 @@ IC void CLevelGraph::iterate_vertices(
     else
         E = end;
 
-    for (; I != E; ++I)
-        predicate(*I);
+    return {I, E};
 }
 
 IC u32 CLevelGraph::max_x() const { return (m_max_x); }
