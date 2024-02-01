@@ -76,7 +76,7 @@ void CCoverManager::compute_static_cover()
     xr_delete(m_covers);
     
     const CLevelGraph& graph = ai().level_graph();
-    const LevelGraph::CHeader &levelGraphHeader = graph.header();
+    const LevelGraph::CHeader& levelGraphHeader = graph.header();
     const u32 levelVertexCount = levelGraphHeader.vertex_count();
 
     m_covers = xr_new<CPointQuadTree>(levelGraphHeader.box(), levelGraphHeader.cell_size() * .5f, 8 * 65536, 4 * 65536);
@@ -107,7 +107,7 @@ void CCoverManager::compute_static_cover()
             }
         }
     });
-    for (auto &p : quadTreeStaticStorage)
+    for (auto& p : quadTreeStaticStorage)
         if (p.has_value())
             m_covers->insert(&p.value());
 

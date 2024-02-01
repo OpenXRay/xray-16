@@ -59,7 +59,7 @@ void CRender::render_lights(light_Package& LP)
         for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
             LP_smap_pool.initialize(RImplementation.o.smapsize);
-            for (auto &L : source)
+            for (auto& L : source)
             {
                 if (!L)
                     continue;
