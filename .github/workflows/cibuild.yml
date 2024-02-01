@@ -86,7 +86,7 @@ jobs:
       matrix:
         platform:
         - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: gcc,   cxx: g++, }
-        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: clang, cxx: clang++, }
+        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: clang, cxx: clang++, flags: "-DXRAY_LINKER=lld", }
         #- { name: Ubuntu, os: ubuntu-latest, arch: arm64,   cc: gcc,   cxx: g++, container: 'dockcross/linux-arm64', }
         #- { name: Ubuntu, os: ubuntu-latest, arch: ppc64el, cc: gcc,   cxx: g++, container: 'dockcross/linux-ppc64le:latest', }
         - { name: Alpine, os: ubuntu-latest, arch: x86_64,  cc: gcc,   cxx: g++, shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
