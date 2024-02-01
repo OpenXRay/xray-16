@@ -85,15 +85,18 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: gcc,   cxx: g++, }
+        # cc is always set for the correct naming of the job.
+        # Both cc and cxx should be set if we want to change the compiler.
+        # You may also want to set XRAY_LINKER when changing the compiler.
+        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: gcc, }
         - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: clang, cxx: clang++, flags: "-DXRAY_LINKER=lld", }
-        #- { name: Ubuntu, os: ubuntu-latest, arch: arm64,   cc: gcc,   cxx: g++, container: 'dockcross/linux-arm64', }
-        #- { name: Ubuntu, os: ubuntu-latest, arch: ppc64el, cc: gcc,   cxx: g++, container: 'dockcross/linux-ppc64le:latest', }
-        - { name: Alpine, os: ubuntu-latest, arch: x86_64,  cc: gcc,   cxx: g++, shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
-        - { name: Alpine, os: ubuntu-latest, arch: x86,     cc: gcc,   cxx: g++, shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        #- { name: Ubuntu, os: ubuntu-latest, arch: arm64,   cc: gcc,   container: 'dockcross/linux-arm64', }
+        #- { name: Ubuntu, os: ubuntu-latest, arch: ppc64el, cc: gcc,   container: 'dockcross/linux-ppc64le:latest', }
+        - { name: Alpine, os: ubuntu-latest, arch: x86_64,  cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        - { name: Alpine, os: ubuntu-latest, arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
         #- { name: Haiku,  os: ubuntu-latest, arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
-        - { name: macOS,  os: macos-13,      arch: x86_64,  cc: clang, cxx: clang++, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
-        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, cxx: clang++, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0" }
+        - { name: macOS,  os: macos-13,      arch: x86_64,  cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
+        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0" }
 
         configuration: [Debug, Release]
 
@@ -128,7 +131,7 @@ jobs:
           brew install sdl2 glew lzo libogg libvorbis theora
 
     - name: Set environment variables
-      if: ${{ matrix.platform.cc != '' }}
+      if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
       run: |
         echo "CC=${{ matrix.platform.cc }}" >> $GITHUB_ENV
         echo "CXX=${{ matrix.platform.cxx }}" >> $GITHUB_ENV
