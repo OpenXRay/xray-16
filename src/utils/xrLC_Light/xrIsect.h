@@ -43,7 +43,7 @@
 #define LI_INTERSECT 1
 #define LI_EQUAL 2
 
-__forceinline int lines_intersect(float x1, float y1, /* First line segment */
+ICF int lines_intersect(float x1, float y1, /* First line segment */
     float x2, float y2,
 
     float x3, float y3, /* Second line segment */

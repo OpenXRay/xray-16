@@ -8,15 +8,6 @@
 
 #pragma once
 
-// DECLSPEC_NOVTABLE macro
-#ifndef DECLSPEC_NOVTABLE
-#if (XR_COMPILER_MSVC >= 1100) && defined(__cplusplus)
-#define DECLSPEC_NOVTABLE __declspec(novtable)
-#else // #if (XR_COMPILER_MSVC >= 1100) && defined(__cplusplus)
-#define DECLSPEC_NOVTABLE
-#endif // #if (XR_COMPILER_MSVC >= 1100) && defined(__cplusplus)
-#endif // #ifndef DECLSPEC_NOVTABLE
-
 // CS_STRING_CONCAT macro
 #if defined(CS_STRING_CONCAT) || defined(CS_STRING_CONCAT_HELPER)
 STATIC_CHECK(false, CS_STRING_CONCAT_or_CS_STRING_CONCAT_HELPER_or_CS_STRING_CONCAT4_macro_already_defined);

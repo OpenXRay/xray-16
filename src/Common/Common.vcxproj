@@ -54,6 +54,7 @@
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="Compiler.inl" />
     <ClInclude Include="Config.hpp" />
+    <ClInclude Include="d3d9compat.hpp" />
     <ClInclude Include="face_smoth_flags.h" />
     <ClInclude Include="FSMacros.hpp" />
     <ClInclude Include="GUID.hpp" />

@@ -16,7 +16,7 @@ namespace lua_studio
 {
 struct engine;
 
-struct DECLSPEC_NOVTABLE world
+struct XR_NOVTABLE world
 {
     virtual void CS_LUA_STUDIO_BACKEND_CALL add(lua_State* state) = 0;
     virtual void CS_LUA_STUDIO_BACKEND_CALL remove(lua_State* state) = 0;

@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+#ifdef XR_PLATFORM_BSD
+#include <fenv.h> // XXX: needed for workaround below
+#endif
+
 static void generate_jitter(u32* dest, u32 elem_count)
 {
     const int cmax = 8;

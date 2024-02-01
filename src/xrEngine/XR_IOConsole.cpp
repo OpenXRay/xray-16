@@ -105,8 +105,6 @@ void CConsole::Initialize()
     pFont = NULL;
     pFont2 = NULL;
 
-    m_mouse_pos.x = 0;
-    m_mouse_pos.y = 0;
     m_last_cmd = NULL;
 
     m_cmd_history.reserve(m_cmd_history_max + 2);
@@ -615,7 +613,7 @@ void CConsole::Show()
     }
     bVisible = true;
 
-    SDL_GetGlobalMouseState((int *) &m_mouse_pos.x, (int *) &m_mouse_pos.y); // Replace with SDL_GetMouseState in case retrieve window-relative coordinates
+    SDL_GetGlobalMouseState(&m_mouse_pos.x, &m_mouse_pos.y); // Replace with SDL_GetMouseState in case retrieve window-relative coordinates
 
     ec().clear_states();
     scroll_delta = 0;

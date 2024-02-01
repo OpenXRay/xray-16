@@ -642,7 +642,7 @@ public:
 
         string_path S, S1;
         S[0] = 0;
-        strncpy_s(S, sizeof(S), args, _MAX_PATH - 1);
+        strncpy_s(S, sizeof(S), args, MAX_PATH - 1);
 
 #ifdef DEBUG
         CTimer timer;
@@ -710,7 +710,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         string_path saved_game;
-        strncpy_s(saved_game, sizeof(saved_game), args, _MAX_PATH - 1);
+        strncpy_s(saved_game, sizeof(saved_game), args, MAX_PATH - 1);
 
         if (!ai().get_alife())
         {
@@ -790,7 +790,7 @@ public:
         string_path saved_game = "";
         if (args)
         {
-            strncpy_s(saved_game, sizeof(saved_game), args, _MAX_PATH - 1);
+            strncpy_s(saved_game, sizeof(saved_game), args, MAX_PATH - 1);
         }
 
         if (*saved_game)

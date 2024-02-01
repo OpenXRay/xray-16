@@ -215,7 +215,7 @@ private:
 public:
     CollectorPacked(const Fbox& bb, int apx_vertices = 5000, int apx_faces = 5000);
 
-    //		__declspec(noinline) CollectorPacked &operator=	(const CollectorPacked &object)
+    //		ICN CollectorPacked &operator=	(const CollectorPacked &object)
     //		{
     //			verts
     //		}
