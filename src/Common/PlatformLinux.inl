@@ -26,7 +26,6 @@
 
 #define _LINUX // for GameSpy
 
-#define _MAX_PATH PATH_MAX + 1
 #define MAX_PATH PATH_MAX + 1
 
 #define WINAPI
@@ -40,24 +39,8 @@
 #define __stdcall
 #define __fastcall
 
-//#define __declspec
-#define __forceinline FORCE_INLINE
 #define __pragma(...) _Pragma(#__VA_ARGS__)
-#define __declspec(x)
 #define CALLBACK
-#define TEXT(x) strdup(x)
-
-/*
-inline char* _strlwr_l(char* str, locale_t loc)
-{
-//TODO
-}
-
-inline char* _strupr_l(char* str, locale_t loc)
-{
-//TODO
-}
-*/
 
 #define __except(X) catch(X)
 
@@ -152,30 +135,6 @@ typedef unsigned int UINT;
 typedef long long int LARGE_INTEGER;
 typedef unsigned long long int ULARGE_INTEGER;
 
-typedef wchar_t WCHAR;
-
-typedef struct tagSTICKYKEYS
-{
-    DWORD   cbSize;
-    DWORD   dwFlags;
-} STICKYKEYS, *LPSTICKYKEYS;
-
-typedef struct tagFILTERKEYS
-{
-    UINT   cbSize;
-    DWORD  dwFlags;
-    DWORD  iWaitMSec;
-    DWORD  iDelayMSec;
-    DWORD  iRepeatMSec;
-    DWORD  iBounceMSec;
-} FILTERKEYS, *LPFILTERKEYS;
-
-typedef struct tagTOGGLEKEYS
-{
-    DWORD   cbSize;
-    DWORD   dwFlags;
-} TOGGLEKEYS, *LPTOGGLEKEYS;
-
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
 
@@ -187,7 +146,7 @@ typedef int64_t LONG_PTR;
 typedef int INT_PTR;
 typedef unsigned int UINT_PTR;
 typedef long LONG_PTR;
-#endif // defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
+#endif
 
 typedef void* HANDLE;
 typedef void* HMODULE;
@@ -216,7 +175,6 @@ typedef struct tagPOINT {
     long y;
 } POINT, *PPOINT, *LPPOINT;
 
-#define DWORD_PTR UINT_PTR
 #define WM_USER 0x0400
 
 #define TRUE true

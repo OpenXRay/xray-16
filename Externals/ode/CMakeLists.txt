@@ -98,7 +98,6 @@ target_compile_definitions(xrODE
     PRIVATE
     LINUX
     __cdecl=
-    __forceinline=inline
 )
 
 if (MASTER_GOLD)

@@ -16,6 +16,8 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
         Log(message, id);
 }
 
+static_assert(std::is_same_v<decltype(&OnDebugCallback), GLDEBUGPROC>);
+
 void UpdateVSync()
 {
     if (psDeviceFlags.test(rsVSync))

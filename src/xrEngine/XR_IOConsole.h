@@ -89,7 +89,7 @@ protected:
 
     FactoryPtr<IUIShader>* m_hShader_back{};
 
-    POINT m_mouse_pos;
+    Ivector2 m_mouse_pos{};
     bool m_disable_tips;
 
 private:

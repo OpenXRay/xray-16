@@ -23,13 +23,9 @@
 #include <dirent.h>
 #include <utime.h>
 #include <ctime>
-#include <fenv.h>
-
-#pragma STDC FENV_ACCESS ON
 
 #define _LINUX // for GameSpy
 
-#define _MAX_PATH PATH_MAX + 1
 #define MAX_PATH PATH_MAX + 1
 
 #define WINAPI
@@ -37,30 +33,17 @@
 #define _copysign copysign
 
 #define _cdecl //__attribute__((cdecl))
-#define _stdcall //__attribute__((stdcall))
 #define _fastcall //__attribute__((fastcall))
 
 #define __cdecl
 #define __stdcall
 
-//#define __declspec
-#define __forceinline FORCE_INLINE
 #define __pragma(...) _Pragma(#__VA_ARGS__)
-#define __declspec(x)
 #define CALLBACK
-#define TEXT(x) strdup(x)
-
-
-
-#define VOID void
-#define HKL void*
-#define ActivateKeyboardLayout(x, y) {}
-#define ScreenToClient(hwnd, p) {}
 
 #define __except(X) catch(X)
 
 #define GetCurrentProcessId getpid
-#define GetCurrentThreadId pthread_self
 
 inline void Sleep(int ms)
 {
@@ -130,9 +113,10 @@ inline int GetExceptionCode()
     return 0;
 }
 
+inline void convert_path_separators(char * path);
+
 #include <inttypes.h>
 typedef int32_t BOOL;
-typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 typedef int32_t LONG;
@@ -146,47 +130,14 @@ typedef char* PSTR;
 typedef char* LPTSTR;
 typedef const char* LPCSTR;
 typedef const char* LPCTSTR;
-typedef unsigned char* LPBYTE;
 typedef unsigned int UINT;
-typedef int INT;
-typedef unsigned long ULONG;
-typedef unsigned long* ULONG_PTR;
 typedef long long int LARGE_INTEGER;
 typedef unsigned long long int ULARGE_INTEGER;
-
-typedef unsigned short* LPWORD;
-typedef unsigned long* LPDWORD;
-typedef const void* LPCVOID;
-typedef long long int* PLARGE_INTEGER;
-
-typedef wchar_t WCHAR;
-
-typedef struct tagSTICKYKEYS
-{
-    DWORD   cbSize;
-    DWORD   dwFlags;
-} STICKYKEYS, *LPSTICKYKEYS;
-
-typedef struct tagFILTERKEYS
-{
-    UINT   cbSize;
-    DWORD  dwFlags;
-    DWORD  iWaitMSec;
-    DWORD  iDelayMSec;
-    DWORD  iRepeatMSec;
-    DWORD  iBounceMSec;
-} FILTERKEYS, *LPFILTERKEYS;
-
-typedef struct tagTOGGLEKEYS
-{
-    DWORD   cbSize;
-    DWORD   dwFlags;
-} TOGGLEKEYS, *LPTOGGLEKEYS;
 
 typedef struct _EXCEPTION_POINTERS {
 } EXCEPTION_POINTERS, *PEXCEPTION_POINTERS;
 
-#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64)
+#if defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
 typedef int64_t INT_PTR;
 typedef uint64_t UINT_PTR;
 typedef int64_t LONG_PTR;
@@ -194,7 +145,7 @@ typedef int64_t LONG_PTR;
 typedef int INT_PTR;
 typedef unsigned int UINT_PTR;
 typedef long LONG_PTR;
-#endif // XR_ARCHITECTURE_X64
+#endif
 
 typedef void* HANDLE;
 typedef void* HMODULE;
@@ -208,11 +159,8 @@ typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 typedef long HRESULT;
 typedef long LRESULT;
-typedef long _W64;
 typedef void* HWND;
 typedef void* HDC;
-typedef float FLOAT;
-typedef unsigned char UINT8;
 
 typedef struct _RECT {
     long left;
@@ -226,7 +174,6 @@ typedef struct tagPOINT {
     long y;
 } POINT, *PPOINT, *LPPOINT;
 
-#define DWORD_PTR UINT_PTR
 #define WM_USER 0x0400
 
 #define TRUE true
@@ -289,7 +236,7 @@ inline int strcpy_s(char *dest, size_t num, const char *source)
     return ERANGE;
 }
 
-template <std::size_t num>
+template <size_t num>
 inline int strcpy_s(char (&dest)[num], const char *source) { return strcpy_s(dest, num, source); }
 
 inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t num)
@@ -329,7 +276,7 @@ inline int strncpy_s(char * dest, size_t dst_size, const char * source, size_t n
     return EINVAL;
 }
 
-template <std::size_t dst_sz>
+template <size_t dst_sz>
 inline int strncpy_s(char (&dest)[dst_sz], const char * source, size_t num) { return strncpy_s(dest, dst_sz, source, num); }
 
 inline int strcat_s(char * dest, size_t num, const char * source)
@@ -403,7 +350,6 @@ inline int vsnprintf_s(char* buffer, size_t size, size_t, const char* format, va
 #define wcsicmp _wcsicmp
 #define _wcsicmp wcscmp
 #define _tempnam tempnam
-#define _unlink unlink
 #define _access access
 #define _open open
 #define _close close
@@ -418,10 +364,17 @@ inline int _filelength(int fd)
     return file_info.st_size;
 }
 #define _fdopen fdopen
-#define _rmdir rmdir
+inline int _rmdir(const char *path)
+{
+    char* conv_fn = strdup(path);
+    convert_path_separators(conv_fn);
+    int result = rmdir(conv_fn);
+    free(conv_fn);
+    return result;
+}
 #define _write write
 #define _strupr strupr
-#define _read read
+#define _read xr_read
 #define _set_new_handler std::set_new_handler
 #define _finite isfinite
 inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
@@ -440,7 +393,7 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 #define ZeroMemory(p, sz) memset((p), 0, (sz))
 #define CopyMemory(d, s, n) memcpy(d, s, n)
 
-#define RGB(r,g,b) ( ((DWORD)(BYTE)r)|((DWORD)((BYTE)g)<<8)|((DWORD)((BYTE)b)<<16) )
+#define RGB(r,g,b) ( ((DWORD)(uint8_t)r)|((DWORD)((uint8_t)g)<<8)|((DWORD)((uint8_t)b)<<16) )
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 #define S_OK 0x00000000
@@ -451,9 +404,6 @@ inline int _mkdir(const char *dir) { return mkdir(dir, S_IRWXU); }
 #define _MAX_DIR	256
 #define _MAX_FNAME	256
 #define _MAX_EXT	256
-
-#define SEM_FAILCRITICALERRORS 1
-#define SetErrorMode(x) {}
 
 typedef DWORD           FOURCC;
 
@@ -468,7 +418,13 @@ typedef void *HIC;
 
 inline BOOL SwitchToThread() { return (0 == sched_yield()); }
 
-#define xr_fs_strlwr(str) str
+template <typename T>
+decltype(auto) do_nothing(const T& obj)
+{
+    return obj;
+}
+
+#define xr_fs_strlwr(str) do_nothing(str)
 #define xr_fs_nostrlwr(str) xr_strlwr(str)
 
 /// For backward compability of FS, for real filesystem delimiter set to back
@@ -482,10 +438,43 @@ inline void convert_path_separators(char * path)
     while (char* sep = strchr(path, '\\')) *sep = '/';
 }
 
-#define xr_unlink unlink
+inline int xr_unlink(const char *path)
+{
+    char* conv_fn = strdup(path);
+    convert_path_separators(conv_fn);
+    int result = unlink(conv_fn);
+    free(conv_fn);
+    return result;
+}
 
 inline tm* localtime_safe(const time_t *time, struct tm* result){ return localtime_r(time, result); }
 
 #define xr_strerror(errno, buffer, bufferSize) strerror_r(errno, buffer, sizeof(buffer))
 
 using xrpid_t = pid_t;
+
+// This is a drop-in replacement for calls to linux 'read' function. We use this because unlike other OSes
+// Linux 'read' function can return less then the requested number of bytes and might need to be called multiple times.
+// Apart from this, it behaves exactly as you would expect and matches the other OSes implementation.
+// See also: https://www.man7.org/linux/man-pages/man2/read.2.html
+inline ssize_t xr_read(int file_handle, void *buffer, size_t count)
+{
+    ssize_t total_r_bytes = 0;
+    do
+    {
+        const ssize_t r_bytes =
+            read(file_handle, reinterpret_cast<unsigned char*>(buffer) + total_r_bytes, count - total_r_bytes);
+
+        // Check for error
+        if (r_bytes == -1)
+            return -1;
+
+        // Check for EOF otherwise we would loop indefinitely
+        if (r_bytes == 0)
+            return total_r_bytes;
+
+        total_r_bytes += r_bytes;
+    } while (static_cast<size_t>(total_r_bytes) < count);
+
+    return total_r_bytes;
+}
