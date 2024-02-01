@@ -253,6 +253,9 @@
     <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord_game_sdk.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
