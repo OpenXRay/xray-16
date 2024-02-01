@@ -94,6 +94,7 @@ jobs:
         #- { name: Ubuntu, os: ubuntu-latest, arch: ppc64el, cc: gcc,   container: 'dockcross/linux-ppc64le:latest', }
         - { name: Alpine, os: ubuntu-latest, arch: x86_64,  cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
         - { name: Alpine, os: ubuntu-latest, arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        - { name: Fedora, os: ubuntu-latest, arch: x86_64,  cc: gcc,   container: 'fedora:latest', }
         #- { name: Haiku,  os: ubuntu-latest, arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
         - { name: macOS,  os: macos-13,      arch: x86_64,  cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
         - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0" }
@@ -129,6 +130,10 @@ jobs:
       run: |
           brew update
           brew install sdl2 glew lzo libogg libvorbis theora
+
+    - name: Install Fedora packages
+      if: ${{ matrix.platform.name == 'Fedora' }}
+      run: dnf install -y git gcc gcc-c++ cmake SDL2-devel glew-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
 
     - name: Set environment variables
       if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
