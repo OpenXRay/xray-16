@@ -37,8 +37,6 @@ xr_unique_ptr<TaskManager> TaskScheduler;
 
 static constexpr size_t OTHER_THREADS_COUNT = 1; // Primary thread
 
-static thread_local CRandom random{};
-
 static u32 ttapi_dwFastIter = 0;
 
 class TaskStorageSize
@@ -69,7 +67,7 @@ static constexpr size_t TASK_STORAGE_MASK = TASK_STORAGE_SIZE - 1;
 class FallbackTaskAllocator
 {
     std::atomic_size_t m_allocated{};
-    Task               m_storage[TASK_STORAGE_SIZE]{};
+    Task               m_storage[TASK_STORAGE_SIZE];
 
 public:
     Task* allocate()
@@ -90,7 +88,7 @@ public:
 class TaskAllocator
 {
     size_t m_allocated{};
-    Task   m_storage[TASK_STORAGE_SIZE]{};
+    Task   m_storage[TASK_STORAGE_SIZE];
 
 public:
     Task* allocate()
@@ -168,6 +166,7 @@ public:
     std::atomic_bool sleeps{};
     Event event;
     size_t id;
+    CRandom random;
 } static thread_local s_tl_worker;
 
 static TaskWorker* s_main_thread_worker = nullptr;
@@ -293,6 +292,7 @@ void TaskManager::TaskWorkerStart()
         ScopeLock scope(&workersLock);
         workers.emplace_back(&s_tl_worker);
         s_tl_worker.id = workers.size();
+        s_tl_worker.random = CRandom(static_cast<s32>(s_tl_worker.id));
     }
     workersCount.fetch_add(1, std::memory_order_release);
     activeWorkersCount.fetch_add(1, std::memory_order_relaxed);
@@ -382,11 +382,10 @@ Task* TaskManager::TryToSteal() const
         return nullptr; // thread itself
     }
 
-
     int steal_attempts = 3;
     while (--steal_attempts >= 0)
     {
-        TaskWorker* other = workers[random.randI(count)];
+        TaskWorker* other = workers[s_tl_worker.random.randI(count)];
         if (other != &s_tl_worker)
         {
             auto* task = other->steal();

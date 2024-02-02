@@ -22,6 +22,7 @@ class TaskWorker;
 
 class XRCORE_API TaskManager final
 {
+private:
     xr_vector<TaskWorker*> workers;
     Lock workersLock;
 
@@ -30,6 +31,7 @@ class XRCORE_API TaskManager final
 
     std::atomic_bool shouldStop{};
 
+private:
     ICN void TaskWorkerStart();
 
     [[nodiscard]] Task* TryToSteal() const;
@@ -40,6 +42,7 @@ class XRCORE_API TaskManager final
     [[nodiscard]] ICF static Task* AllocateTask();
     static void ICF IncrementTaskJobsCounter(Task& parent);
 
+private:
     void SetThreadStatus(bool active);
     void WakeUpIfNeeded() const;
 
@@ -47,6 +50,7 @@ public:
     TaskManager();
     ~TaskManager();
 
+public:
     // TaskFunc is at the end for fancy in-place lambdas
     // Create a task, but don't run it yet
     [[nodiscard]] static Task& CreateTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
@@ -70,10 +74,12 @@ public:
     Task& AddTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
     Task& AddTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
+public:
     void Wait(const Task& task);
     void WaitForChildren(const Task& task);
     bool ExecuteOneTask();
 
+public:
     [[nodiscard]] size_t GetWorkersCount() const;
     [[nodiscard]] size_t GetActiveWorkersCount() const;
     [[nodiscard]] static size_t GetCurrentWorkerID();
