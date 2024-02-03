@@ -117,17 +117,23 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
             _RELEASE(srv_all);
             CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_all));
 
-            if (desc.SampleDesc.Count <= 1)
-                ViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
-            else
-                ViewDesc.Texture2DMSArray.ArraySize = desc.ArraySize;
-            
             srv_per_slice.resize(desc.ArraySize);
-            for (auto &x : srv_per_slice)
-                _RELEASE(x);
+            for (u32 id = 0; id < desc.ArraySize; ++id)
+            {
+                _RELEASE(srv_per_slice[id]);
 
-            CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, srv_per_slice.data()));
-
+                if (desc.SampleDesc.Count <= 1)
+                {
+                    ViewDesc.Texture2DArray.ArraySize = 1;
+                    ViewDesc.Texture2DArray.FirstArraySlice = id;
+                }
+                else
+                {
+                    ViewDesc.Texture2DMSArray.ArraySize = 1;
+                    ViewDesc.Texture2DMSArray.FirstArraySlice = id;
+                }
+                CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_per_slice[id]));
+            }
             set_slice(-1);
         }
         else

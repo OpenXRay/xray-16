@@ -74,7 +74,7 @@ void CCoverManager::compute_static_cover()
 {
     clear();
     xr_delete(m_covers);
-    
+
     const CLevelGraph& graph = ai().level_graph();
     const LevelGraph::CHeader& levelGraphHeader = graph.header();
     const u32 levelVertexCount = levelGraphHeader.vertex_count();
@@ -85,7 +85,7 @@ void CCoverManager::compute_static_cover()
     static xr_vector<std::optional<CCoverPoint>> quadTreeStaticStorage;
     quadTreeStaticStorage.resize(levelVertexCount);
     m_temp.resize(levelVertexCount);
-    
+
     xr_parallel_for(TaskRange<u32>(0, levelVertexCount), [&](const TaskRange<u32>& range)
     {
         for (u32 i = range.begin(); i != range.end(); ++i)
@@ -96,7 +96,7 @@ void CCoverManager::compute_static_cover()
             const CLevelGraph::CLevelVertex& vertex = *graph.vertex(i);
             const int highCover = vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3); 
             const int lowCover = vertex.low_cover(0) + vertex.low_cover(1) + vertex.low_cover(2) + vertex.low_cover(3); 
-            
+
             if (highCover || lowCover)
             {
                 m_temp[i] = edge_vertex(i);
