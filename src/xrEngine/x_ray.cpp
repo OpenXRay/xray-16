@@ -481,7 +481,9 @@ int CApplication::Run()
             Device.OnWindowActivate(shouldActivate);
         }
 
-        Device.ProcessFrame();
+#pragma message("need to rework:")
+        if (Device.b_is_InFocus)
+            Device.ProcessFrame();
 
         UpdateDiscordStatus();
     } // while (!SDL_QuitRequested())
