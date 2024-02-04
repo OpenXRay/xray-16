@@ -133,7 +133,7 @@ jobs:
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
-      run: dnf install -y git gcc gcc-c++ cmake SDL2-devel glew-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
+      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel glew-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
 
     - name: Set environment variables
       if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
@@ -153,20 +153,20 @@ jobs:
       run: cmake --build build --config ${{ matrix.configuration }} --parallel $(nproc || sysctl -n hw.ncpu || echo 4)
 
     - name: Make package
-      if: ${{ steps.cmake-build.outcome == 'success' && matrix.platform.name == 'Ubuntu' }}
+      if: ${{ steps.cmake-build.outcome == 'success' }}
       id: make-package
-      working-directory: build
       #continue-on-error: true
+      working-directory: build
       run: |
-        make -j $(nproc || echo 4) package
-        file openxray_1.6.02_*.deb
+          cpack -B artifacts -C ${{ matrix.configuration }} -DCPACK_THREADS=$(nproc || sysctl -n hw.ncpu || echo 4)
+          file artifacts/openxray*.*
 
     - name: Upload OpenXRay artifact
       if: ${{ steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
-        name: openxray_1.6.02_${{ matrix.configuration }}_${{ matrix.platform.arch }}_(github-${{ matrix.platform.cc }}-${{ github.run_number }}).deb
-        path: build/openxray_1.6.02_*.deb
+        name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc }})
+        path: build/artifacts/openxray*.*
 
   bsd:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }}

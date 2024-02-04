@@ -2,7 +2,16 @@ cmake_minimum_required(VERSION 3.22)
 
 message(STATUS "CMAKE_VERSION: ${CMAKE_VERSION}")
 
-project(OpenXRay)
+cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0095 NEW)
+
+project(OpenXRay
+    DESCRIPTION "OpenXRay is an improved version of the X-Ray Engine, \
+    the game engine used in the world-famous S.T.A.L.K.E.R. game series by GSC Game World."
+    VERSION 1.6.02
+    HOMEPAGE_URL "https://github.com/OpenXRay/xray-16"
+    LANGUAGES CXX C
+)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -43,22 +52,8 @@ if (DISABLE_PORTABLE_MODE)
     add_compile_definitions(DISABLE_PORTABLE_MODE)
 endif()
 
-if (NOT DEFINED ALLOW_RPATH)
-    set(ALLOW_RPATH TRUE)
-endif()
-
-if (ALLOW_RPATH)
-    # Set the shared object search path for the installation
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_FULL_LIBDIR}")
-
-    # Set the shared object search path for the build tree
-    # On Linux/BSD we can use $ORIGIN to search for modules next to the executable
-    if (NOT APPLE)
-        set(CMAKE_BUILD_RPATH $ORIGIN)
-    else()
-        set(CMAKE_BUILD_RPATH "${COMPILE_OUTPUT_FOLDER}")
-    endif()
-endif()
+set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
+set(CMAKE_MACOSX_RPATH TRUE)
 
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
