@@ -83,6 +83,8 @@ void CSoundRender_CoreA::_initialize()
     supports_float_pcm = alIsExtensionPresent("AL_EXT_FLOAT32")  // first is OpenAL Soft,
                       || alIsExtensionPresent("AL_EXT_float32"); // second is macOS
 
+    supports_float_pcm &= psSoundFlags.test(ss_UseFloat32);
+
     auto auxSlot = ALuint(-1);
 #if defined(XR_HAS_EAX)
     // Check for EAX extension

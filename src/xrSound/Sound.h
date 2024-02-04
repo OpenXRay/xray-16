@@ -60,6 +60,7 @@ enum : u32
 {
     ss_Hardware = 1ul << 1ul, //!< Use hardware mixing only
     ss_EFX = 1ul << 2ul, //!< Use efx
+    ss_UseFloat32 = 1ul << 3ul, //!< Use 32-bit float sound instead of 16-bit
 };
 
 enum : u32

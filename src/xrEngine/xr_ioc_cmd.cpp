@@ -901,6 +901,7 @@ void CCC_Register()
     CMD1(CCC_SND_Restart, "snd_restart");
     CMD3(CCC_Mask, "snd_acceleration", &psSoundFlags, ss_Hardware);
     CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EFX);
+    CMD3(CCC_Mask, "snd_use_float32", &psSoundFlags, ss_UseFloat32);
     CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 4, 256);
     CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 4, 64);
     CMD3(CCC_Token, "snd_precache_all", &psSoundPrecacheAll, snd_precache_all_token);
