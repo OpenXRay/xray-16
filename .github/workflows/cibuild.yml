@@ -97,7 +97,7 @@ jobs:
         - { name: Fedora, os: ubuntu-latest, arch: x86_64,  cc: gcc,   container: 'fedora:latest', }
         #- { name: Haiku,  os: ubuntu-latest, arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
         - { name: macOS,  os: macos-13,      arch: x86_64,  cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
-        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0" }
+        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0", threads: 3 }
 
         configuration: [Debug, Release]
 
@@ -150,7 +150,7 @@ jobs:
 
     - name: Run CMake Build
       id: cmake-build
-      run: cmake --build build --config ${{ matrix.configuration }} --parallel $(nproc || sysctl -n hw.ncpu || echo 4)
+      run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }}
 
     - name: Make package
       if: ${{ steps.cmake-build.outcome == 'success' }}
@@ -158,7 +158,7 @@ jobs:
       #continue-on-error: true
       working-directory: build
       run: |
-          cpack -B artifacts -C ${{ matrix.configuration }} -DCPACK_THREADS=$(nproc || sysctl -n hw.ncpu || echo 4)
+          cpack -B artifacts -C ${{ matrix.configuration }} -DCPACK_THREADS=${{ matrix.platform.threads || 4 }}
           file artifacts/openxray*.*
 
     - name: Upload OpenXRay artifact
