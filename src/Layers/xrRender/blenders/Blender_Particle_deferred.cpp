@@ -94,7 +94,7 @@ void CBlender_Particle::Compile(CBlender_Compile& C)
             C.r_Pass("particle", "particle", FALSE, TRUE, FALSE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_ONE, TRUE, 0);
             break; // ALPHA-ADD
         };
-#if RENDER == R_R3 || RENDER == R_R4
+#if RENDER == R_R3 || RENDER == R_R4 || RENDER == R_R5
         {
             C.r_dx11Texture("s_base", C.L_textures[0]);
             u32 hSampler = C.r_dx11Sampler("smp_base");
@@ -139,7 +139,7 @@ void CBlender_Particle::Compile(CBlender_Compile& C)
                 TRUE, 0);
             break; // ALPHA-ADD
         };
-#if RENDER == R_R3 || RENDER == R_R4
+#if RENDER == R_R3 || RENDER == R_R4 || RENDER == R_R5
         {
             C.r_dx11Texture("s_base", C.L_textures[0]);
             u32 hSampler = C.r_dx11Sampler("smp_base");

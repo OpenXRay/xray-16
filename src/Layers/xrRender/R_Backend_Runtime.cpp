@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
 #include <DirectXMath.h>
 #endif
 
@@ -68,7 +68,7 @@ void CBackend::Invalidate()
     ps = 0;
     vs = 0;
     DX11_ONLY(gs = NULL);
-#ifdef USE_DX11
+#if defined (USE_DX11) || defined(USE_DX12)
     hs = 0;
     ds = 0;
     cs = 0;
@@ -98,7 +98,7 @@ void CBackend::Invalidate()
     // transform setting handlers should be unmapped too.
     xforms.unmap();
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     m_pInputLayout = NULL;
     m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
     m_bChangedRTorZB = false;
@@ -172,7 +172,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
     // Enable them
     u32 e_mask = (1 << count) - 1;
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, e_mask));
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     // TODO: DX11: Implement in the corresponding vertex shaders
     // Use this to set up location, were shader setup code will get data
     // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
@@ -194,7 +194,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask
     {
 #if defined(USE_DX9)
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, FALSE));
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     // TODO: DX11: Implement in the corresponding vertex shaders
     // Use this to set up location, were shader setup code will get data
     // VERIFY(!"CBackend::set_ClipPlanes not implemented!");
@@ -218,7 +218,7 @@ void CBackend::set_Textures(STextureList* textures_list)
     // If resources weren't set at all we should clear from resource #0.
     int _last_ps = -1;
     int _last_vs = -1;
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     int _last_gs = -1;
     int _last_hs = -1;
     int _last_ds = -1;
@@ -255,7 +255,7 @@ void CBackend::set_Textures(STextureList* textures_list)
             }
         }
         else
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         if (load_id < CTexture::rstGeometry)
 #endif
         {
@@ -279,7 +279,7 @@ void CBackend::set_Textures(STextureList* textures_list)
                 }
             }
         }
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         else if (load_id < CTexture::rstHull)
         {
             // Set up pixel shader resources
@@ -384,7 +384,7 @@ void CBackend::set_Textures(STextureList* textures_list)
         textures_ps[_last_ps] = nullptr;
 #if defined(USE_DX9)
         CHK_DX(HW.pDevice->SetTexture(_last_ps, NULL));
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
         // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         // HW.pDevice->PSSetShaderResources(_last_ps, 1, &pRes);
@@ -409,7 +409,7 @@ void CBackend::set_Textures(STextureList* textures_list)
         textures_vs[_last_vs] = nullptr;
 #if defined(USE_DX9)
         CHK_DX(HW.pDevice->SetTexture(_last_vs + CTexture::rstVertex, NULL));
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
         // TODO: DX11: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
         // HW.pDevice->VSSetShaderResources(_last_vs, 1, &pRes);
@@ -426,7 +426,7 @@ void CBackend::set_Textures(STextureList* textures_list)
 #endif
     }
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     // clear remaining stages (VS)
     for (++_last_gs; _last_gs < CTexture::mtMaxGeometryShaderTextures; _last_gs++)
     {
@@ -534,7 +534,7 @@ void CBackend::SetupStates()
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGTABLEMODE, D3DFOG_NONE));
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGVERTEXMODE, D3DFOG_LINEAR));
     }
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     SSManager.SetMaxAnisotropy(ps_r__tf_Anisotropic);
     SSManager.SetMipLODBias(ps_r__tf_Mipbias);
 #elif defined(USE_OGL)
@@ -548,7 +548,7 @@ void CBackend::SetupStates()
 // Device dependance
 void CBackend::OnDeviceCreate()
 {
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     HW.get_context(context_id)->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), reinterpret_cast<void**>(&pAnnotation));
 #endif
 
@@ -564,12 +564,12 @@ void CBackend::OnDeviceDestroy()
     // Debug Draw
     DestroyDebugDraw();
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     //  Destroy state managers
     StateManager.Reset();
 #endif
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     _RELEASE(pAnnotation);
 #endif
 }
@@ -586,7 +586,7 @@ void CBackend::apply_lmaterial()
     VERIFY(RC_dest_sampler == C->destination);
 #if defined(USE_DX9)
     VERIFY(RC_sampler == C->type);
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     VERIFY(RC_dx11texture == C->type);
 #elif defined(USE_OGL)
     VERIFY(RC_sampler == C->type);

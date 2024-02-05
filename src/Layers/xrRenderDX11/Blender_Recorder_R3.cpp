@@ -154,7 +154,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     dest.ps = ps;
     dest.vs = vs;
     dest.gs = gs;
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     dest.hs = RImplementation.Resources->_CreateHS("null");
     dest.ds = RImplementation.Resources->_CreateDS("null");
     dest.cs = RImplementation.Resources->_CreateCS("null");
@@ -171,7 +171,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     }
 }
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
 void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest,
     BOOL bZwrite, BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {

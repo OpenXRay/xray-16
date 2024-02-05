@@ -22,7 +22,7 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
     P->ps = proto.ps;
     P->vs = proto.vs;
     P->gs = proto.gs;
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     P->hs = proto.hs;
     P->ds = proto.ds;
     P->cs = proto.cs;
@@ -123,7 +123,7 @@ void CResourceManager::_DeletePS(const SPS* ps) { DestroyShader(ps); }
 SGS* CResourceManager::_CreateGS(LPCSTR Name) { return CreateShader<SGS>(Name); }
 void CResourceManager::_DeleteGS(const SGS* GS) { DestroyShader(GS); }
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
 SHS* CResourceManager::_CreateHS(LPCSTR Name) { return CreateShader<SHS>(Name); }
 void CResourceManager::_DeleteHS(const SHS* HS) { DestroyShader(HS); }
 

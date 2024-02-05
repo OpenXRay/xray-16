@@ -142,7 +142,7 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
             }
             else // checked Holger
             {
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(shader_msaa[i]->E[_id]);
@@ -196,7 +196,7 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
             }
             else // checked Holger
             {
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);

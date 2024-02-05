@@ -181,7 +181,7 @@ struct ShaderTypeTraits<SVS>
 #else
 #if defined(USE_DX9)
     using LinkageType = void*;
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     using LinkageType = ID3D11ClassLinkage*;
 #endif
     using HWShaderType = ID3DVertexShader*;
@@ -226,7 +226,7 @@ struct ShaderTypeTraits<SVS>
 #if defined(USE_DX9)
         res = HW.pDevice->CreateVertexShader(buffer, &sh);
         UNUSED(linkage, name);
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
         res = HW.pDevice->CreateVertexShader(buffer, size, linkage, &sh);
         UNUSED(name);
 #elif defined(USE_OGL)
@@ -257,7 +257,7 @@ struct ShaderTypeTraits<SPS>
 #else
 #if defined(USE_DX9)
     using LinkageType = void*;
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     using LinkageType = ID3D11ClassLinkage*;
 #endif
     using HWShaderType = ID3DPixelShader*;
@@ -316,7 +316,7 @@ struct ShaderTypeTraits<SPS>
 #if defined(USE_DX9)
         res = HW.pDevice->CreatePixelShader(buffer, &sh);
         UNUSED(linkage, name);
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
         res = HW.pDevice->CreatePixelShader(buffer, size, linkage, &sh);
         UNUSED(name);
 #elif defined(USE_OGL)
@@ -334,13 +334,13 @@ struct ShaderTypeTraits<SPS>
     static inline u32 GetShaderDest() { return RC_dest_pixel; }
 };
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
 template <>
 struct ShaderTypeTraits<SGS>
 {
     using MapType = CResourceManager::map_GS;
 
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     using LinkageType = ID3D11ClassLinkage*;
     using HWShaderType = ID3DGeometryShader*;
     using BufferType = DWORD const*;
@@ -358,7 +358,7 @@ struct ShaderTypeTraits<SGS>
 
     static inline const char* GetCompilationTarget()
     {
-#   ifdef USE_DX11
+#if defined (USE_DX11) || defined(USE_DX12)
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
@@ -367,11 +367,18 @@ struct ShaderTypeTraits<SGS>
             return "gs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
-#       ifdef HAS_DX11_3
+#if defined(USE_DX12)
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
-#       endif
+        case D3D_FEATURE_LEVEL_12_2: 
+            return "gs_5_1";
+#elif defined(USE_DX11) && defined(HAS_DX11_3)
+        case D3D_FEATURE_LEVEL_12_0:
+        case D3D_FEATURE_LEVEL_12_1:
             return "gs_5_0";
+#else 
+            return "gs_5_0";
+#endif // 
         }
 #   endif // USE_DX11
         NODEFAULT;
@@ -389,7 +396,7 @@ struct ShaderTypeTraits<SGS>
     {
         ResultType res{};
 
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         res = HW.pDevice->CreateGeometryShader(buffer, size, linkage, &sh);
         UNUSED(name);
 #   elif defined(USE_OGL)
@@ -412,7 +419,7 @@ struct ShaderTypeTraits<SHS>
 {
     using MapType = CResourceManager::map_HS;
 
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     using LinkageType = ID3D11ClassLinkage*;
     using HWShaderType = ID3D11HullShader*;
     using BufferType = DWORD const*;
@@ -430,7 +437,12 @@ struct ShaderTypeTraits<SHS>
 
     static inline const char* GetCompilationTarget()
     {
+#if  defined(USE_DX12)
+        return "hs_5_1";
+#else 
         return "hs_5_0";
+#endif 
+
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
@@ -444,7 +456,7 @@ struct ShaderTypeTraits<SHS>
     {
         ResultType res{};
 
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         res = HW.pDevice->CreateHullShader(buffer, size, linkage, &sh);
         UNUSED(name);
 #   elif defined(USE_OGL)
@@ -467,7 +479,7 @@ struct ShaderTypeTraits<SDS>
 {
     using MapType = CResourceManager::map_DS;
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     using LinkageType = ID3D11ClassLinkage*;
     using HWShaderType = ID3D11DomainShader*;
     using BufferType = DWORD const*;
@@ -485,7 +497,11 @@ struct ShaderTypeTraits<SDS>
 
     static inline const char* GetCompilationTarget()
     {
+#if defined(USE_DX12)
+        return "ds_5_1";
+#else
         return "ds_5_0";
+#endif 
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)
@@ -499,7 +515,7 @@ struct ShaderTypeTraits<SDS>
     {
         ResultType res{};
 
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         res = HW.pDevice->CreateDomainShader(buffer, size, linkage, &sh);
         UNUSED(name);
 #   elif defined(USE_OGL)
@@ -522,7 +538,7 @@ struct ShaderTypeTraits<SCS>
 {
     using MapType = CResourceManager::map_CS;
 
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     using LinkageType = ID3D11ClassLinkage*;
     using HWShaderType = ID3D11ComputeShader*;
     using BufferType = DWORD const*;
@@ -540,7 +556,7 @@ struct ShaderTypeTraits<SCS>
 
     static inline const char* GetCompilationTarget()
     {
-#   ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         switch (HW.FeatureLevel)
         {
         case D3D_FEATURE_LEVEL_10_0:
@@ -549,11 +565,18 @@ struct ShaderTypeTraits<SCS>
             return "cs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
-#       ifdef HAS_DX11_3
+#if defined(USE_DX12)
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
-#       endif
+        case D3D_FEATURE_LEVEL_12_2: 
+            return "cs_5_1";
+#elif defined(USE_DX11) && defined(HAS_DX11_3)
+        case D3D_FEATURE_LEVEL_12_0:
+        case D3D_FEATURE_LEVEL_12_1:
             return "cs_5_0";
+#else 
+            return "cs_5_0";
+#endif // 
         }
 #   endif // USE_DX11
 
@@ -571,7 +594,7 @@ struct ShaderTypeTraits<SCS>
     {
         ResultType res{};
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         res = HW.pDevice->CreateComputeShader(buffer, size, linkage, &sh);
         UNUSED(name);
 #elif defined(USE_OGL)
@@ -602,7 +625,7 @@ inline CResourceManager::map_VS& CResourceManager::GetShaderMap()
     return m_vs;
 }
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
 template <>
 inline CResourceManager::map_GS& CResourceManager::GetShaderMap()
 {

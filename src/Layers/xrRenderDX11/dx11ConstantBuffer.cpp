@@ -93,7 +93,7 @@ void dx11ConstantBuffer::Flush(u32 context_id)
     if (m_bChanged)
     {
         void* pData;
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         D3D11_MAPPED_SUBRESOURCE pSubRes;
         CHK_DX(HW.get_context(context_id)->Map(m_pBuffer, 0, D3D_MAP_WRITE_DISCARD, 0, &pSubRes));
         pData = pSubRes.pData;
@@ -103,7 +103,7 @@ void dx11ConstantBuffer::Flush(u32 context_id)
         VERIFY(pData);
         VERIFY(m_pBufferData);
         CopyMemory(pData, m_pBufferData, m_uiBufferSize);
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         HW.get_context(context_id)->Unmap(m_pBuffer, 0);
 #else
         m_pBuffer->Unmap();

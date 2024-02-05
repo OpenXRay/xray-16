@@ -43,7 +43,7 @@ void R_sync_point::End()
     q_sync_count = (q_sync_count + 1) % HW.Caps.iGPUNum;
     CHK_GL(glDeleteSync((GLsync)q_sync_point[q_sync_count]));
 }
-#elif defined(USE_DX9) || defined(USE_DX11)
+#elif defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
 void R_sync_point::Create()
 {
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)

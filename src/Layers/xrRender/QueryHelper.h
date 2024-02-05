@@ -3,7 +3,7 @@
 #pragma once
 
 //	Interface
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
 IC HRESULT CreateQuery(ID3DQuery** ppQuery);
 IC HRESULT GetData(ID3DQuery* pQuery, void* pData, u32 DataSize);
 IC HRESULT BeginQuery(ID3DQuery* pQuery);
@@ -38,7 +38,7 @@ IC HRESULT ReleaseQuery(ID3DQuery* pQuery)
     return S_OK;
 }
 
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
 
 IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3D_QUERY type)
 {

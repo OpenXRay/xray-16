@@ -6,6 +6,8 @@
 #include <backends/imgui_impl_dx9.h>
 #elif defined(USE_DX11)
 #include <backends/imgui_impl_dx11.h>
+#elif defined(USE_DX12)
+#include <backends/imgui_impl_dx12.h>
 #elif defined(USE_OGL)
 #include <backends/imgui_impl_opengl3.h>
 #endif
@@ -42,12 +44,18 @@ void dxImGuiRender::SetState(ImDrawData* data)
     ctx->RSSetState(bd->pRasterizerState);*/
 }
 
+#if defined(USE_DX12)
+#include "Layers/xrRenderPC_R5/DX12/CryDX12.hpp"
+#endif
+
 void dxImGuiRender::Frame()
 {
 #if defined(USE_DX9)
     ImGui_ImplDX9_NewFrame();
 #elif defined(USE_DX11)
     ImGui_ImplDX11_NewFrame();
+#elif defined(USE_DX12)
+    ImGui_ImplDX12_NewFrame();
 #elif defined(USE_OGL)
     ImGui_ImplOpenGL3_NewFrame();
 #endif
@@ -59,6 +67,10 @@ void dxImGuiRender::Render(ImDrawData* data)
     ImGui_ImplDX9_RenderDrawData(data);
 #elif defined(USE_DX11)
     ImGui_ImplDX11_RenderDrawData(data);
+#elif defined(USE_DX12)
+    CCryDX12Device* cry_device = dynamic_cast<CCryDX12Device*>(HW.pDevice);
+    R_ASSERT(cry_device);
+    ImGui_ImplDX12_RenderDrawData(data, cry_device->GetDeviceContext()->GetCoreGraphicsCommandList()->GetD3D12CommandList());
 #elif defined(USE_OGL)
     ImGui_ImplOpenGL3_RenderDrawData(data);
 #endif
@@ -82,6 +94,19 @@ void dxImGuiRender::OnDeviceCreate(ImGuiContext* context)
     ImGui_ImplDX9_Init(HW.pDevice);
 #elif defined(USE_DX11)
     ImGui_ImplDX11_Init(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
+#elif defined(USE_DX12)
+    CCryDX12Device* cry_device = dynamic_cast<CCryDX12Device*>(HW.pDevice);
+    R_ASSERT(cry_device);
+    ID3D12Device* device = cry_device->GetD3D12Device();
+    DX12::Device* dx12_device = cry_device->GetDX12Device();
+    DX12::DescriptorBlock dx12_desc_block =
+        dx12_device->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2);
+    DX12::DescriptorHeap* dx12_heap = dx12_desc_block.GetDescriptorHeap();
+    ImGui_ImplDX12_Init(cry_device->GetD3D12Device(), 2, DXGI_FORMAT_R8G8B8A8_UNORM,
+        dx12_heap->GetD3D12DescriptorHeap(), 
+        dx12_heap->GetD3D12DescriptorHeap()->GetCPUDescriptorHandleForHeapStart(),
+        dx12_heap->GetD3D12DescriptorHeap()->GetGPUDescriptorHandleForHeapStart()
+    );
 #elif defined(USE_OGL)
     ImGui_ImplOpenGL3_Init();
 #endif
@@ -92,6 +117,8 @@ void dxImGuiRender::OnDeviceDestroy()
     ImGui_ImplDX9_Shutdown();
 #elif defined(USE_DX11)
     ImGui_ImplDX11_Shutdown();
+#elif defined(USE_DX12)
+    ImGui_ImplDX12_Shutdown();
 #elif defined(USE_OGL)
     ImGui_ImplOpenGL3_Shutdown();
 #endif
@@ -103,6 +130,8 @@ void dxImGuiRender::OnDeviceResetBegin()
     ImGui_ImplDX9_InvalidateDeviceObjects();
 #elif defined(USE_DX11)
     ImGui_ImplDX11_InvalidateDeviceObjects();
+#elif defined(USE_DX12)
+    ImGui_ImplDX12_InvalidateDeviceObjects();
 #elif defined(USE_OGL)
     ImGui_ImplOpenGL3_DestroyDeviceObjects();
 #endif
@@ -114,6 +143,8 @@ void dxImGuiRender::OnDeviceResetEnd()
     ImGui_ImplDX9_CreateDeviceObjects();
 #elif defined(USE_DX11)
     ImGui_ImplDX11_CreateDeviceObjects();
+#elif defined(USE_DX12)
+    ImGui_ImplDX12_CreateDeviceObjects();
 #elif defined(USE_OGL)
     ImGui_ImplOpenGL3_CreateDeviceObjects();
 #endif

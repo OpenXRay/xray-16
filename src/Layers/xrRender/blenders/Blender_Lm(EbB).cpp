@@ -235,7 +235,7 @@ void CBlender_LmEbB::CompileProgrammable(CBlender_Compile& C) const
             C.r_Pass("lmapE", "lmapE", TRUE, TRUE, FALSE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, 0);
         else
             C.r_Pass("lmapE", "lmapE", TRUE);
-#if RENDER == R_R3 || RENDER == R_R4
+#if RENDER == R_R3 || RENDER == R_R4 || RENDER == R_R5
         C.r_dx11Texture("s_base", C.L_textures[0]);
         C.r_dx11Sampler("smp_base");
         C.r_dx11Texture("s_lmap", C.L_textures[1]);

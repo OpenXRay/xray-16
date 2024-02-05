@@ -6,7 +6,7 @@
 
 #if defined(USE_DX9)
 #include "Layers/xrRenderDX9/dx9r_constants_cache.h"
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
 #include "Layers/xrRenderDX11/dx11r_constants_cache.h"
 #elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glr_constants_cache.h"

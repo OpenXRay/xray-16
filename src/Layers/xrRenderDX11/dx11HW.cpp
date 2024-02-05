@@ -32,7 +32,8 @@ void CHW::OnAppActivate()
     if (m_pSwapChain && !m_ChainDesc.Windowed)
     {
         ShowWindow(m_ChainDesc.OutputWindow, SW_RESTORE);
-        m_pSwapChain->SetFullscreenState(ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle == rsFullscreen : false, NULL);
+        m_pSwapChain->SetFullscreenState(
+            ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle == rsFullscreen : false, NULL);
     }
 }
 
@@ -52,17 +53,29 @@ void CHW::OnAppDeactivate()
 void CHW::CreateD3D()
 {
     hDXGI = XRay::LoadModule("dxgi");
+
+#if defined(USE_DX12)
+    hD3D = XRay::LoadModule("d3d12");
+#else
     hD3D = XRay::LoadModule("d3d11");
+#endif // defined(USE_DX12)
+
     if (!hD3D->IsLoaded() || !hDXGI->IsLoaded())
     {
         Valid = false;
         return;
     }
 
+#if defined(USE_DX12)
     // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
-    const auto createDXGIFactory = static_cast<decltype(&CreateDXGIFactory1)>(hDXGI->GetProcAddress("CreateDXGIFactory1"));
+    DX12CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&m_pFactory));
+#else
+    // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
+    const auto createDXGIFactory =
+        static_cast<decltype(&CreateDXGIFactory1)>(hDXGI->GetProcAddress("CreateDXGIFactory1"));
     if (createDXGIFactory)
         createDXGIFactory(__uuidof(IDXGIFactory1), (void**)(&m_pFactory));
+#endif
 
     if (m_pFactory)
         m_pFactory->EnumAdapters1(0, &m_pAdapter);
@@ -82,7 +95,11 @@ void CHW::DestroyD3D()
     // To make it work with DXVK, etc.
     hD3D->Close();
     hDXGI->Close();
+#if defined(USE_DX12)
+    if (auto hModule = GetModuleHandleA("d3d12.dll"))
+#else
     if (auto hModule = GetModuleHandleA("d3d11.dll"))
+#endif
         FreeLibrary(hModule);
     if (auto hModule = GetModuleHandleA("dxgi.dll"))
         FreeLibrary(hModule);
@@ -115,38 +132,33 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     HRESULT R;
 
-    D3D_FEATURE_LEVEL featureLevels[] =
-    {
+#if defined(USE_DX12)
+    D3D_FEATURE_LEVEL featureLevels[] = {D3D_FEATURE_LEVEL_12_2, D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0};
+#else
+    D3D_FEATURE_LEVEL featureLevels[] = {
 #ifdef HAS_DX11_3
-        D3D_FEATURE_LEVEL_12_1,
-        D3D_FEATURE_LEVEL_12_0,
+        D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0,
 #endif
-        D3D_FEATURE_LEVEL_11_1,
-        D3D_FEATURE_LEVEL_11_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0
-    };
+        D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0};
 
-    D3D_FEATURE_LEVEL featureLevels2[] =
-    {
-        D3D_FEATURE_LEVEL_11_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0
-    };
+    D3D_FEATURE_LEVEL featureLevels2[] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0};
 
-    D3D_FEATURE_LEVEL featureLevels3[] =
-    {
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0
-    };
+    D3D_FEATURE_LEVEL featureLevels3[] = {D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0};
+#endif
 
     auto& pContext = d3d_contexts_pool[CHW::IMM_CTX_ID];
 
-    const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
-    {
-        static const auto d3d11CreateDevice = static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
-        return d3d11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
-            nullptr, createDeviceFlags, level, levels,
+#if defined(USE_DX12)
+    const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels) {
+        return DX12CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN, nullptr, createDeviceFlags, level, levels,
+            D3D12_SDK_VERSION, reinterpret_cast<ID3D11Device **>(&pDevice), &FeatureLevel, reinterpret_cast<ID3D11DeviceContext**>(& pContext));
+    };
+    R = createDevice(featureLevels, std::size(featureLevels));
+#else
+    const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels) {
+        static const auto d3d11CreateDevice =
+            static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
+        return d3d11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN, nullptr, createDeviceFlags, level, levels,
             D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
     };
 
@@ -158,9 +170,21 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         if (FAILED(R))
             R = createDevice(featureLevels2, std::size(featureLevels2));
     }
+#endif
 
     if (SUCCEEDED(R))
     {
+#if defined(USE_DX12)
+        D3DCompile = &::D3DCompile;
+        ComputeShadersSupported = true;
+
+        D3D11_FEATURE_DATA_D3D11_OPTIONS options;
+        pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS2, &options, sizeof(options));
+
+        DoublePrecisionFloatShaderOps = true;
+        SAD4ShaderInstructions = options.SAD4ShaderInstructions;
+        ExtendedDoublesShaderInstructions = options.ExtendedDoublesShaderInstructions;
+#else
         pContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&pContext1));
 #ifdef HAS_DX11_3
         pDevice->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&pDevice3));
@@ -183,8 +207,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
             }
 
             D3D11_FEATURE_DATA_D3D10_X_HARDWARE_OPTIONS data;
-            pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS,
-                &data, sizeof(data));
+            pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D10_X_HARDWARE_OPTIONS, &data, sizeof(data));
             ComputeShadersSupported = data.ComputeShaders_Plus_RawAndStructuredBuffers_Via_Shader_4_x;
         }
         D3D11_FEATURE_DATA_D3D11_OPTIONS options;
@@ -196,6 +219,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         DoublePrecisionFloatShaderOps = doubles.DoublePrecisionFloatShaderOps;
         SAD4ShaderInstructions = options.SAD4ShaderInstructions;
         ExtendedDoublesShaderInstructions = options.ExtendedDoublesShaderInstructions;
+#endif
     }
 
     if (FAILED(R))
@@ -206,7 +230,8 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         // Fatal error! Cannot create rendering device AT STARTUP !!!
         Msg("Failed to initialize graphics hardware.\n"
             "Please try to restart the game.\n"
-            "CreateDevice returned 0x%08x", R);
+            "CreateDevice returned 0x%08x",
+            R);
         xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
     }
 
@@ -215,7 +240,11 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     // Create deferred contexts
     for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
     {
+#if defined(USE_DX12)
+        R = pDevice->CreateDeferredContext(0, reinterpret_cast<ID3D11DeviceContext**>(&d3d_contexts_pool[id]));
+#else 
         R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
+#endif
         VERIFY(SUCCEEDED(R));
     }
 
@@ -231,16 +260,20 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const HWND hwnd = info.info.win.window;
 
+#if defined(USE_DX12)
+    if (!CreateSwapChain(hwnd))
+        Valid = false;
+#else
     if (!CreateSwapChain2(hwnd))
     {
         if (!CreateSwapChain(hwnd))
             Valid = false;
     }
+#endif
 
     // Select depth-stencil format
-    constexpr DXGI_FORMAT formats[] =
-    {
-        //DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
+    constexpr DXGI_FORMAT formats[] = {
+        // DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
         DXGI_FORMAT_D24_UNORM_S8_UINT,
     };
     const DXGI_FORMAT selectedFormat = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats);
@@ -270,11 +303,13 @@ bool CHW::CreateSwapChain(HWND hwnd)
     sd.BufferDesc.Width = Device.dwWidth;
     sd.BufferDesc.Height = Device.dwHeight;
 
+    sd.BufferDesc.RefreshRate.Numerator = 0;
+    sd.BufferDesc.RefreshRate.Denominator = 0;
+
     //  TODO: DX11: implement dynamic format selection
-    constexpr DXGI_FORMAT formats[] =
-    {
-        //DXGI_FORMAT_R16G16B16A16_FLOAT, // Do we even need this?
-        //DXGI_FORMAT_R10G10B10A2_UNORM, // D3DX11SaveTextureToMemory fails on this format
+    constexpr DXGI_FORMAT formats[] = {
+        // DXGI_FORMAT_R16G16B16A16_FLOAT, // Do we even need this?
+        // DXGI_FORMAT_R10G10B10A2_UNORM, // D3DX11SaveTextureToMemory fails on this format
         DXGI_FORMAT_R8G8B8A8_UNORM,
     };
 
@@ -283,7 +318,12 @@ bool CHW::CreateSwapChain(HWND hwnd)
     Caps.fTarget = dx11TextureUtils::ConvertTextureFormat(sd.BufferDesc.Format);
 
     // Buffering
+#if defined(USE_DX12)
+    BackBufferCount = 2;
+#else 
     BackBufferCount = 1;
+#endif
+
     sd.BufferCount = BackBufferCount;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
@@ -299,18 +339,32 @@ bool CHW::CreateSwapChain(HWND hwnd)
        XXX: Fix this windoze stuff!!!
     */
     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
     sd.OutputWindow = hwnd;
-
     sd.Windowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
 
     //  Additional set up
+#if defined(USE_DX12)
+    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+#else 
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+#endif 
 
+#if defined(USE_DX11)
     const auto hr = m_pFactory->CreateSwapChain(pDevice, &sd, &m_pSwapChain);
+#else 
+    const auto hr = m_pFactory->CreateSwapChain(pDevice, &sd, reinterpret_cast<IDXGISwapChain**>(& m_pSwapChain));
+#endif 
+
+#if defined(USE_DX12)
+    m_pSwapChain->SetMaximumFrameLatency(1);
+    if (ThisInstanceIsGlobal())
+        Device.PresentationFinished = m_pSwapChain->GetFrameLatencyWaitableObject();
+#endif
+
     return SUCCEEDED(hr);
 }
 
+#if defined(USE_DX11)
 bool CHW::CreateSwapChain2(HWND hwnd)
 {
     if (strstr(Core.Params, "-no_dx11_2"))
@@ -329,10 +383,9 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     desc.Width = Device.dwWidth;
     desc.Height = Device.dwHeight;
 
-    constexpr DXGI_FORMAT formats[] =
-    {
-        //DXGI_FORMAT_R16G16B16A16_FLOAT,
-        //DXGI_FORMAT_R10G10B10A2_UNORM,
+    constexpr DXGI_FORMAT formats[] = {
+        // DXGI_FORMAT_R16G16B16A16_FLOAT,
+        // DXGI_FORMAT_R10G10B10A2_UNORM,
         DXGI_FORMAT_R8G8B8A8_UNORM,
     };
 
@@ -350,7 +403,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     desc.SampleDesc.Quality = 0;
 
     // Windoze
-    //desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // XXX: tearing glitches with flip presentation model
+    // desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // XXX: tearing glitches with flip presentation model
     desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     desc.Scaling = DXGI_SCALING_STRETCH;
 
@@ -361,8 +414,8 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     IDXGISwapChain1* swapchain{};
-    const HRESULT result = pFactory2->CreateSwapChainForHwnd(pDevice, hwnd, &desc,
-        fulldesc.Windowed ? nullptr : &fulldesc, nullptr, &swapchain);
+    const HRESULT result = pFactory2->CreateSwapChainForHwnd(
+        pDevice, hwnd, &desc, fulldesc.Windowed ? nullptr : &fulldesc, nullptr, &swapchain);
     _RELEASE(pFactory2);
 
     if (FAILED(result))
@@ -387,11 +440,9 @@ bool CHW::CreateSwapChain2(HWND hwnd)
 
     return false;
 }
+#endif
 
-bool CHW::ThisInstanceIsGlobal() const
-{
-    return this == &HW;
-}
+bool CHW::ThisInstanceIsGlobal() const { return this == &HW; }
 
 void CHW::DestroyDevice()
 {
@@ -405,22 +456,30 @@ void CHW::DestroyDevice()
     //  Must switch to windowed mode to release swap chain
     if (!m_ChainDesc.Windowed && m_pSwapChain)
         m_pSwapChain->SetFullscreenState(FALSE, NULL);
+#if defined(USE_DX11)
 #ifdef HAS_DX11_2
     _RELEASE(m_pSwapChain2);
 #endif
+#endif
     _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
     _RELEASE(m_pSwapChain);
-
+  
+#if defined(USE_DX11)
     _RELEASE(pContext1);
+#endif
+
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         _SHOW_REF("refCount:pContext", d3d_contexts_pool[id]);
         _RELEASE(d3d_contexts_pool[id]);
     }
 
+#if defined(USE_DX11)
 #ifdef HAS_DX11_3
     _RELEASE(pDevice3);
 #endif
+#endif
+
     _SHOW_REF("refCount:pDevice:", pDevice);
     _RELEASE(pDevice);
     DestroyD3D();
@@ -438,16 +497,11 @@ void CHW::Reset()
     DXGI_MODE_DESC& desc = m_ChainDesc.BufferDesc;
     desc.Width = Device.dwWidth;
     desc.Height = Device.dwHeight;
-
     CHK_DX(m_pSwapChain->ResizeTarget(&desc));
-    CHK_DX(m_pSwapChain->ResizeBuffers(
-        cd.BufferCount, desc.Width, desc.Height, desc.Format, cd.Flags));
+    CHK_DX(m_pSwapChain->ResizeBuffers(cd.BufferCount, desc.Width, desc.Height, desc.Format, cd.Flags));
 }
 
-void CHW::SetPrimaryAttributes(u32& /*windowFlags*/)
-{
-
-}
+void CHW::SetPrimaryAttributes(u32& /*windowFlags*/) {}
 
 bool CHW::CheckFormatSupport(const DXGI_FORMAT format, const u32 feature) const
 {
@@ -477,26 +531,31 @@ bool CHW::UsingFlipPresentationModel() const
 #ifdef HAS_DXGI1_4
         || m_ChainDesc.SwapEffect == DXGI_SWAP_EFFECT_FLIP_DISCARD
 #endif
-    ;
+        ;
 }
 
 std::pair<u32, u32> CHW::GetSurfaceSize() const
 {
-    return
-    {
-        m_ChainDesc.BufferDesc.Width,
-        m_ChainDesc.BufferDesc.Height
-    };
+    return {m_ChainDesc.BufferDesc.Width, m_ChainDesc.BufferDesc.Height};
 }
 
-void CHW::BeginScene() { }
-void CHW::EndScene() { }
+void CHW::BeginScene() {}
+void CHW::EndScene() {}
 
 void CHW::Present()
 {
     const bool bUseVSync = psDeviceMode.WindowStyle == rsFullscreen &&
         psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX11
+
+#if defined(USE_DX12)
+    WaitForSingleObjectEx(Device.PresentationFinished.GetHandle(),
+        1000, // 1 second timeout (shouldn't ever occur)
+        true);
+#endif
+
     m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
+
+#if defined(USE_DX11)
 #ifdef HAS_DX11_2
     if (m_pSwapChain2 && UsingFlipPresentationModel())
     {
@@ -507,7 +566,20 @@ void CHW::Present()
             m_pSwapChain2->SetSourceSize(UINT(Device.dwWidth * 0.7f), UINT(Device.dwHeight * 0.7f));
     }
 #endif
+#else
+    if (UsingFlipPresentationModel())
+    {
+        const float fps = Device.GetStats().fFPS;
+        if (fps < 30)
+            m_pSwapChain->SetSourceSize(UINT(Device.dwWidth * 0.85f), UINT(Device.dwHeight * 0.85f));
+        else if (fps < 15)
+            m_pSwapChain->SetSourceSize(UINT(Device.dwWidth * 0.7f), UINT(Device.dwHeight * 0.7f));
+    }
+#endif
+    
+#if !defined(USE_DX12)
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
+#endif
 }
 
 DeviceState CHW::GetDeviceState() const
@@ -517,8 +589,7 @@ DeviceState CHW::GetDeviceState() const
     switch (result)
     {
         // Check if the device is ready to be reset
-    case DXGI_ERROR_DEVICE_RESET:
-        return DeviceState::NeedReset;
+    case DXGI_ERROR_DEVICE_RESET: return DeviceState::NeedReset;
     }
 
     return DeviceState::Normal;

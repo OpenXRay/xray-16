@@ -38,11 +38,11 @@ public:
     //	DX10 cut DEFINE_MAP_PRED(const char*,CRTC*,			map_RTC,		map_RTCIt,			str_pred);
     using map_VS = xr_map<const char*, SVS*, str_pred>;
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     using map_GS = xr_map<const char*, SGS*, str_pred>;
 #endif
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     using map_HS = xr_map<const char*, SHS*, str_pred>;
     using map_DS = xr_map<const char*, SDS*, str_pred>;
     using map_CS = xr_map<const char*, SCS*, str_pred>;
@@ -65,11 +65,11 @@ private:
     map_VS m_vs;
     map_PS m_ps;
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     map_GS m_gs;
 #endif
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     map_DS m_ds;
     map_HS m_hs;
     map_CS m_cs;
@@ -85,7 +85,7 @@ private:
     xr_vector<SGeometry*> v_geoms;
     xr_vector<R_constant_table*> v_constant_tables;
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     xr_vector<dx11ConstantBuffer*> v_constant_buffer[R__NUM_CONTEXTS];
     xr_vector<SInputSignature*> v_input_signature;
 #endif
@@ -117,6 +117,7 @@ private:
     void LS_Unload();
 
 public:
+
     // Miscelaneous
     void _ParseList(sh_list& dest, LPCSTR names);
     IBlender* _GetBlender(LPCSTR Name);
@@ -151,7 +152,7 @@ public:
     R_constant_table* _CreateConstantTable(R_constant_table& C);
     void _DeleteConstantTable(const R_constant_table* C);
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     dx11ConstantBuffer* _CreateConstantBuffer(u32 context_id, ID3DShaderReflectionConstantBuffer* pTable);
     void _DeleteConstantBuffer(u32 context_id, const dx11ConstantBuffer* pBuffer);
 
@@ -159,7 +160,11 @@ public:
     void _DeleteInputSignature(const SInputSignature* pSignature);
 #endif
 
+#if defined(USE_DX12)
+    CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {}, Fcolor color = {0.0f, 0.0f, 0.0f, 0.0f});
+#else 
     CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
+#endif 
     void _DeleteRT(const CRT* RT);
 
 //	DX10 cut CRTC*							_CreateRTC			(LPCSTR Name, u32 size,	D3DFORMAT f);
@@ -171,12 +176,12 @@ public:
     void _DeletePP(const SPP* p);
 #endif
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     SGS* _CreateGS(LPCSTR Name);
     void _DeleteGS(const SGS* GS);
 #endif
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     SHS* _CreateHS(LPCSTR Name);
     void _DeleteHS(const SHS* HS);
 

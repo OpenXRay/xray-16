@@ -51,7 +51,7 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
     destroy();
 
     Resources->OnDeviceDestroy(bKeepTextures);
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.OnDeviceDestroy();
@@ -76,13 +76,12 @@ void D3DXRenderBase::Destroy()
 
 void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
+#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12))
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif // DEBUG
 
     reset_begin();
     Memory.mem_compact();
-
     HW.Reset();
 
     std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
@@ -98,7 +97,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     Resources->Dump(true);
 #endif
 
-#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
+#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12))
     _SHOW_REF("*ref +CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif
 }
@@ -111,7 +110,7 @@ void D3DXRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 void D3DXRenderBase::SetupStates()
 {
     HW.Caps.Update();
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.SetupStates();
@@ -131,7 +130,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 
     CreateQuadIB();
 
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.context_id = id;
@@ -157,7 +156,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 
 void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-#if defined(USE_RENDERDOC) && defined(USE_DX11)
+#if defined(USE_RENDERDOC) && (defined(USE_DX11) || defined(USE_DX12))
     if (!g_renderdoc_api)
     {
         HMODULE hModule = GetModuleHandleA("renderdoc.dll");
@@ -257,7 +256,7 @@ u32 D3DXRenderBase::GetCacheStatPolys()
 void D3DXRenderBase::Begin()
 {
     HW.BeginScene();
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.OnFrameBegin();
@@ -290,7 +289,7 @@ void D3DXRenderBase::End()
 {
     if (HW.Caps.SceneMode)
         overdrawEnd();
- #if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.OnFrameEnd();
@@ -318,7 +317,7 @@ void D3DXRenderBase::ClearTarget()
 
 void D3DXRenderBase::SetCacheXform(Fmatrix& mView, Fmatrix& mProject)
 {
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.set_xform_view(mView);

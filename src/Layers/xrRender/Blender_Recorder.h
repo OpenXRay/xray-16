@@ -34,7 +34,7 @@ public:
     CSimulator RS;
     IBlender* BT;
     ShaderElement* SH;
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     enum
     {
         NO_TESS = 0,
@@ -120,7 +120,7 @@ public:
     void i_Filter_Mip(u32 s, u32 f);
     void i_Filter_Mag(u32 s, u32 f);
     void i_Filter_Aniso(u32 s, u32 f);
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     void i_dx11FilterAnizo(u32 s, BOOL value);
 #endif
     void i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag);
@@ -131,11 +131,11 @@ public:
         D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE, u32 aRef = 0);
 
     void r_Constant(LPCSTR name, R_constant_setup* s);
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     void r_Pass(LPCSTR vs, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE,
         BOOL bABlend = FALSE, D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE,
         u32 aRef = 0);
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     void r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE,
         BOOL bZwrite = TRUE, BOOL bABlend = FALSE, D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO,
         BOOL aTest = FALSE, u32 aRef = 0);
@@ -147,7 +147,7 @@ public:
     void r_CullMode(D3DCULL Mode);
 #endif // !USE_DX9
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     void r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);
     void r_dx11Texture(LPCSTR ResourceName, shared_str texture, bool recursive = false)
     {

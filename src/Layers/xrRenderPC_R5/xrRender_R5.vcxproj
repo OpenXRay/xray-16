@@ -1,0 +1,594 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configurations.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AA33ACCF-B579-49A2-9CC9-BC9B579283DA}</ProjectGuid>
+    <RootNamespace>xrRender_R4</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configuration.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Configuration">
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\xray.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USRDLL;XRRENDER_R5_EXPORTS;USE_DX12;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;nvapi$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\xrRender\DebugRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\DebugShader.h" />
+    <ClInclude Include="..\..\Include\xrRender\DrawUtils.h" />
+    <ClInclude Include="..\..\Include\xrRender\EnvironmentRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\FactoryPtr.h" />
+    <ClInclude Include="..\..\Include\xrRender\FontRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\ImGuiRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\Kinematics.h" />
+    <ClInclude Include="..\..\Include\xrRender\KinematicsAnimated.h" />
+    <ClInclude Include="..\..\Include\xrRender\LensFlareRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\ObjectSpaceRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\ParticleCustom.h" />
+    <ClInclude Include="..\..\Include\xrRender\RainRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\RenderDetailModel.h" />
+    <ClInclude Include="..\..\Include\xrRender\RenderFactory.h" />
+    <ClInclude Include="..\..\Include\xrRender\RenderVisual.h" />
+    <ClInclude Include="..\..\Include\xrRender\StatGraphRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\ThunderboltDescRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\ThunderboltRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\UIRender.h" />
+    <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h" />
+    <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
+    <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidData.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h" />
+    <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Blur.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_dof.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_gasmask_drops.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_gasmask_dudv.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_nightvision.h" />
+    <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11HW.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11R_Backend_Runtime.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11r_constants_cache.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11StateUtils.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11TextureUtils.h" />
+    <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11State.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCache.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateCacheImpl.h" />
+    <ClInclude Include="..\xrRenderDX11\StateManager\dx11StateManager.h" />
+    <ClInclude Include="..\xrRenderDX11\CommonTypes.h" />
+    <ClInclude Include="..\xrRender\Animation.h" />
+    <ClInclude Include="..\xrRender\Blender.h" />
+    <ClInclude Include="..\xrRender\Blender_CLSID.h" />
+    <ClInclude Include="..\xrRender\Blender_Recorder.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_BmmD.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_detail_still.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Editor_Selection.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Editor_Wire.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Lm(EbB).h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Model_EbB.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Particle.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Screen_SET.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_tree.h" />
+    <ClInclude Include="..\xrRender\BufferUtils.h" />
+    <ClInclude Include="..\xrRender\ColorMapManager.h" />
+    <ClInclude Include="..\xrRender\D3DUtils.h" />
+    <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
+    <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h" />
+    <ClInclude Include="..\xrRender\DetailFormat.h" />
+    <ClInclude Include="..\xrRender\DetailManager.h" />
+    <ClInclude Include="..\xrRender\DetailModel.h" />
+    <ClInclude Include="..\xrRender\du_box.h" />
+    <ClInclude Include="..\xrRender\du_cone.h" />
+    <ClInclude Include="..\xrRender\du_cylinder.h" />
+    <ClInclude Include="..\xrRender\du_sphere.h" />
+    <ClInclude Include="..\xrRender\du_sphere_part.h" />
+    <ClInclude Include="..\xrRender\dxDebugRender.h" />
+    <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
+    <ClInclude Include="..\xrRender\dxFontRender.h" />
+    <ClInclude Include="..\xrRender\dxImGuiRender.h" />
+    <ClInclude Include="..\xrRender\dxLensFlareRender.h" />
+    <ClInclude Include="..\xrRender\dxObjectSpaceRender.h" />
+    <ClInclude Include="..\xrRender\dxParticleCustom.h" />
+    <ClInclude Include="..\xrRender\dxRainRender.h" />
+    <ClInclude Include="..\xrRender\dxRenderFactory.h" />
+    <ClInclude Include="..\xrRender\dxStatGraphRender.h" />
+    <ClInclude Include="..\xrRender\dxThunderboltDescRender.h" />
+    <ClInclude Include="..\xrRender\dxThunderboltRender.h" />
+    <ClInclude Include="..\xrRender\dxUIRender.h" />
+    <ClInclude Include="..\xrRender\dxUISequenceVideoItem.h" />
+    <ClInclude Include="..\xrRender\dxUIShader.h" />
+    <ClInclude Include="..\xrRender\dxWallMarkArray.h" />
+    <ClInclude Include="..\xrRender\ETextureParams.h" />
+    <ClInclude Include="..\xrRender\FBasicVisual.h" />
+    <ClInclude Include="..\xrRender\FHierrarhyVisual.h" />
+    <ClInclude Include="..\xrRender\FLOD.h" />
+    <ClInclude Include="..\xrRender\FProgressive.h" />
+    <ClInclude Include="..\xrRender\FSkinned.h" />
+    <ClInclude Include="..\xrRender\FSkinnedTypes.h" />
+    <ClInclude Include="..\xrRender\FTreeVisual.h" />
+    <ClInclude Include="..\xrRender\FVF.h" />
+    <ClInclude Include="..\xrRender\FVisual.h" />
+    <ClInclude Include="..\xrRender\HOM.h" />
+    <ClInclude Include="..\xrRender\HWCaps.h" />
+    <ClInclude Include="..\xrRender\IRenderDetailModel.h" />
+    <ClInclude Include="..\xrRender\KinematicsAddBoneTransform.hpp" />
+    <ClInclude Include="..\xrRender\light.h" />
+    <ClInclude Include="..\xrRender\LightTrack.h" />
+    <ClInclude Include="..\xrRender\Light_DB.h" />
+    <ClInclude Include="..\xrRender\Light_Package.h" />
+    <ClInclude Include="..\xrRender\ModelPool.h" />
+    <ClInclude Include="..\xrRender\NvTriStrip.h" />
+    <ClInclude Include="..\xrRender\NvTriStripObjects.h" />
+    <ClInclude Include="..\xrRender\occRasterizer.h" />
+    <ClInclude Include="..\xrRender\ParticleEffect.h" />
+    <ClInclude Include="..\xrRender\ParticleEffectDef.h" />
+    <ClInclude Include="..\xrRender\ParticleGroup.h" />
+    <ClInclude Include="..\xrRender\PSLibrary.h" />
+    <ClInclude Include="..\xrRender\QueryHelper.h" />
+    <ClInclude Include="..\xrRender\ResourceManager.h" />
+    <ClInclude Include="..\xrRender\R_Backend.h" />
+    <ClInclude Include="..\xrRender\R_Backend_hemi.h" />
+    <ClInclude Include="..\xrRender\R_Backend_Runtime.h" />
+    <ClInclude Include="..\xrRender\R_Backend_tree.h" />
+    <ClInclude Include="..\xrRender\R_Backend_xform.h" />
+    <ClInclude Include="..\xrRender\r_constants.h" />
+    <ClInclude Include="..\xrRender\r_constants_cache.h" />
+    <ClInclude Include="..\xrRender\R_DStreams.h" />
+    <ClInclude Include="..\xrRender\r_sun_cascades.h" />
+    <ClInclude Include="..\xrRender\r__dsgraph_structure.h" />
+    <ClInclude Include="..\xrRender\r__dsgraph_types.h" />
+    <ClInclude Include="..\xrRender\r__occlusion.h" />
+    <ClInclude Include="..\xrRender\r__pixel_calculator.h" />
+    <ClInclude Include="..\xrRender\r__sector.h" />
+    <ClInclude Include="..\xrRender\r__sync_point.h" />
+    <ClInclude Include="..\xrRender\Shader.h" />
+    <ClInclude Include="..\xrRender\ShaderResourceTraits.h" />
+    <ClInclude Include="..\xrRender\SH_Atomic.h" />
+    <ClInclude Include="..\xrRender\SH_Constant.h" />
+    <ClInclude Include="..\xrRender\SH_Matrix.h" />
+    <ClInclude Include="..\xrRender\SH_RT.h" />
+    <ClInclude Include="..\xrRender\SH_Texture.h" />
+    <ClInclude Include="..\xrRender\SkeletonAnimated.h" />
+    <ClInclude Include="..\xrRender\SkeletonCustom.h" />
+    <ClInclude Include="..\xrRender\SkeletonX.h" />
+    <ClInclude Include="..\xrRender\SkeletonXSkinXW.h" />
+    <ClInclude Include="..\xrRender\stats_manager.h" />
+    <ClInclude Include="..\xrRender\TextureDescrManager.h" />
+    <ClInclude Include="..\xrRender\tss.h" />
+    <ClInclude Include="..\xrRender\tss_def.h" />
+    <ClInclude Include="..\xrRender\blenders\uber_deffer.h" />
+    <ClInclude Include="..\xrRender\Utils\dxHashHelper.h" />
+    <ClInclude Include="..\xrRender\VertexCache.h" />
+    <ClInclude Include="..\xrRender\WallmarksEngine.h" />
+    <ClInclude Include="..\xrRender\xrRender_console.h" />
+    <ClInclude Include="..\xrRender\xrStripify.h" />
+    <ClInclude Include="..\xrRender\xr_effgamma.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_bloom_build.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_combine.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_deffer_aref.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_deffer_flat.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_deffer_model.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_light_direct.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_light_mask.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_light_occq.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_light_point.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_light_reflected.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_light_spot.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_luminance.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_ssao.h" />
+    <ClInclude Include="..\xrRender_R2\r2.h" />
+    <ClInclude Include="..\xrRender_R2\r2_rendertarget_wallmarks.h" />
+    <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h" />
+    <ClInclude Include="..\xrRender_R2\r2_types.h" />
+    <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h" />
+    <ClInclude Include="ComputeShader.h" />
+    <ClInclude Include="CSCompiler.h" />
+    <ClInclude Include="..\xrRender\blenders\dx11HDAOCSBlender.h" />
+    <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h" />
+    <ClInclude Include="..\xrRender\light_gi.h" />
+    <ClInclude Include="..\xrRender\Light_Render_Direct.h" />
+    <ClInclude Include="..\xrRender\light_smapvis.h" />
+    <ClInclude Include="DX12\API\DX12AsyncCommandQueue.hpp" />
+    <ClInclude Include="DX12\API\DX12.hpp" />
+    <ClInclude Include="DX12\API\DX12CommandList.hpp" />
+    <ClInclude Include="DX12\API\DX12CommandListFence.hpp" />
+    <ClInclude Include="DX12\API\DX12DescriptorHeap.hpp" />
+    <ClInclude Include="DX12\API\DX12Device.hpp" />
+    <ClInclude Include="DX12\API\DX12PSO.hpp" />
+    <ClInclude Include="DX12\API\DX12QueryHeap.hpp" />
+    <ClInclude Include="DX12\API\DX12Resource.hpp" />
+    <ClInclude Include="DX12\API\DX12ResourceBarrierCache.h" />
+    <ClInclude Include="DX12\API\DX12RootSignature.hpp" />
+    <ClInclude Include="DX12\API\DX12SamplerState.hpp" />
+    <ClInclude Include="DX12\API\DX12Shader.hpp" />
+    <ClInclude Include="DX12\API\DX12SwapChain.hpp" />
+    <ClInclude Include="DX12\API\DX12TimerHeap.h" />
+    <ClInclude Include="DX12\API\DX12View.hpp" />
+    <ClInclude Include="DX12\CCryDX12Object.hpp" />
+    <ClInclude Include="DX12\CryDX12.hpp" />
+    <ClInclude Include="DX12\CryDX12Guid.hpp" />
+    <ClInclude Include="DX12\CryDX12Legacy.hpp" />
+    <ClInclude Include="DX12\Device\CCryDX12Device.hpp" />
+    <ClInclude Include="DX12\Device\CCryDX12DeviceChild.hpp" />
+    <ClInclude Include="DX12\Device\CCryDX12DeviceContext.hpp" />
+    <ClInclude Include="DX12\GI\CCryDX12GIFactory.hpp" />
+    <ClInclude Include="DX12\GI\CCryDX12SwapChain.hpp" />
+    <ClInclude Include="DX12\Misc\SCryDX11PipelineState.hpp" />
+    <ClInclude Include="DX12\Resource\CCryDX12Asynchronous.hpp" />
+    <ClInclude Include="DX12\Resource\CCryDX12Resource.hpp" />
+    <ClInclude Include="DX12\Resource\CCryDX12View.hpp" />
+    <ClInclude Include="DX12\Resource\Misc\CCryDX12Buffer.hpp" />
+    <ClInclude Include="DX12\Resource\Misc\CCryDX12InputLayout.hpp" />
+    <ClInclude Include="DX12\Resource\Misc\CCryDX12Query.hpp" />
+    <ClInclude Include="DX12\Resource\Misc\CCryDX12Shader.hpp" />
+    <ClInclude Include="DX12\Resource\State\CCryDX12BlendState.hpp" />
+    <ClInclude Include="DX12\Resource\State\CCryDX12DepthStencilState.hpp" />
+    <ClInclude Include="DX12\Resource\State\CCryDX12RasterizerState.hpp" />
+    <ClInclude Include="DX12\Resource\State\CCryDX12SamplerState.hpp" />
+    <ClInclude Include="DX12\Resource\Texture\CCryDX12Texture1D.hpp" />
+    <ClInclude Include="DX12\Resource\Texture\CCryDX12Texture2D.hpp" />
+    <ClInclude Include="DX12\Resource\Texture\CCryDX12Texture3D.hpp" />
+    <ClInclude Include="DX12\Resource\View\CCryDX12DepthStencilView.hpp" />
+    <ClInclude Include="DX12\Resource\View\CCryDX12RenderTargetView.hpp" />
+    <ClInclude Include="DX12\Resource\View\CCryDX12ShaderResourceView.hpp" />
+    <ClInclude Include="DX12\Resource\View\CCryDX12UnorderedAccessView.hpp" />
+    <ClInclude Include="r5_rendertarget.h" />
+    <ClInclude Include="R_Backend_LOD.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidData.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidGrid.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidManager.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp" />
+    <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp" />
+    <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Blur.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_dof.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_gasmask_drops.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_gasmask_dudv.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_nightvision.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_tree_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx11RainBlender.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11BufferUtils.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11HW.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Resources.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ResourceManager_Scripting.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11r_constants.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11r_constants_cache.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11SH_RT.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11SH_Texture.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11StateUtils.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11Texture.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11TextureUtils.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx11MSAABlender.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11SamplerStateCache.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11ShaderResourceStateCache.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11State.cpp" />
+    <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateManager.cpp" />
+    <ClCompile Include="..\xrRender\Animation.cpp" />
+    <ClCompile Include="..\xrRender\Blender.cpp" />
+    <ClCompile Include="..\xrRender\Blender_Recorder.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Editor_Selection.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Editor_Wire.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Lm(EbB).cpp" />
+    <ClCompile Include="..\xrRender\Blender_Recorder_R2.cpp" />
+    <ClCompile Include="..\xrRender\Blender_Recorder_StandartBinding.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Screen_SET.cpp" />
+    <ClCompile Include="..\xrRender\ColorMapManager.cpp" />
+    <ClCompile Include="..\xrRender\D3DUtils.cpp" />
+    <ClCompile Include="..\xrRender\D3DXRenderBase.cpp" />
+    <ClCompile Include="..\xrRender\DetailManager.cpp" />
+    <ClCompile Include="..\xrRender\DetailManager_CACHE.cpp" />
+    <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp" />
+    <ClCompile Include="..\xrRender\DetailManager_soft.cpp" />
+    <ClCompile Include="..\xrRender\DetailManager_VS.cpp" />
+    <ClCompile Include="..\xrRender\DetailModel.cpp" />
+    <ClCompile Include="..\xrRender\du_box.cpp" />
+    <ClCompile Include="..\xrRender\du_cone.cpp" />
+    <ClCompile Include="..\xrRender\du_cylinder.cpp" />
+    <ClCompile Include="..\xrRender\du_sphere.cpp" />
+    <ClCompile Include="..\xrRender\du_sphere_part.cpp" />
+    <ClCompile Include="..\xrRender\dxDebugRender.cpp" />
+    <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
+    <ClCompile Include="..\xrRender\dxFontRender.cpp" />
+    <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
+    <ClCompile Include="..\xrRender\dxLensFlareRender.cpp" />
+    <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp" />
+    <ClCompile Include="..\xrRender\dxParticleCustom.cpp" />
+    <ClCompile Include="..\xrRender\dxRainRender.cpp" />
+    <ClCompile Include="..\xrRender\dxRenderFactory.cpp" />
+    <ClCompile Include="..\xrRender\dxStatGraphRender.cpp" />
+    <ClCompile Include="..\xrRender\dxThunderboltDescRender.cpp" />
+    <ClCompile Include="..\xrRender\dxThunderboltRender.cpp" />
+    <ClCompile Include="..\xrRender\dxUIRender.cpp" />
+    <ClCompile Include="..\xrRender\dxUISequenceVideoItem.cpp" />
+    <ClCompile Include="..\xrRender\dxUIShader.cpp" />
+    <ClCompile Include="..\xrRender\dxWallMarkArray.cpp" />
+    <ClCompile Include="..\xrRender\ETextureParams.cpp" />
+    <ClCompile Include="..\xrRender\FBasicVisual.cpp" />
+    <ClCompile Include="..\xrRender\FHierrarhyVisual.cpp" />
+    <ClCompile Include="..\xrRender\FLOD.cpp" />
+    <ClCompile Include="..\xrRender\FProgressive.cpp" />
+    <ClCompile Include="..\xrRender\FSkinned.cpp" />
+    <ClCompile Include="..\xrRender\FTreeVisual.cpp" />
+    <ClCompile Include="..\xrRender\FVisual.cpp" />
+    <ClCompile Include="..\xrRender\HOM.cpp" />
+    <ClCompile Include="..\xrRender\light.cpp" />
+    <ClCompile Include="..\xrRender\LightTrack.cpp" />
+    <ClCompile Include="..\xrRender\Light_DB.cpp" />
+    <ClCompile Include="..\xrRender\Light_Package.cpp" />
+    <ClCompile Include="..\xrRender\ModelPool.cpp" />
+    <ClCompile Include="..\xrRender\NvTriStrip.cpp" />
+    <ClCompile Include="..\xrRender\NvTriStripObjects.cpp" />
+    <ClCompile Include="..\xrRender\occRasterizer.cpp" />
+    <ClCompile Include="..\xrRender\occRasterizer_core.cpp" />
+    <ClCompile Include="..\xrRender\ParticleEffect.cpp" />
+    <ClCompile Include="..\xrRender\ParticleEffectDef.cpp" />
+    <ClCompile Include="..\xrRender\ParticleGroup.cpp" />
+    <ClCompile Include="..\xrRender\PSLibrary.cpp" />
+    <ClCompile Include="..\xrRender\rendertarget_phase_blur.cpp" />
+    <ClCompile Include="..\xrRender\rendertarget_phase_dof.cpp" />
+    <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_drops.cpp" />
+    <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_dudv.cpp" />
+    <ClCompile Include="..\xrRender\rendertarget_phase_nightvision.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager_Loader.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager_Reset.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager_Resources.cpp" />
+    <ClCompile Include="..\xrRender\R_Backend.cpp" />
+    <ClCompile Include="..\xrRender\R_Backend_DBG.cpp" />
+    <ClCompile Include="..\xrRender\R_Backend_hemi.cpp" />
+    <ClCompile Include="..\xrRender\R_Backend_Runtime.cpp" />
+    <ClCompile Include="..\xrRender\R_Backend_tree.cpp" />
+    <ClCompile Include="..\xrRender\R_Backend_xform.cpp" />
+    <ClCompile Include="..\xrRender\r_constants.cpp" />
+    <ClCompile Include="..\xrRender\R_DStreams.cpp" />
+    <ClCompile Include="..\xrRender\r__dsgraph_build.cpp" />
+    <ClCompile Include="..\xrRender\r__dsgraph_render.cpp" />
+    <ClCompile Include="..\xrRender\r__dsgraph_render_lods.cpp" />
+    <ClCompile Include="..\xrRender\r__occlusion.cpp" />
+    <ClCompile Include="..\xrRender\r__pixel_calculator.cpp" />
+    <ClCompile Include="..\xrRender\r__screenshot.cpp" />
+    <ClCompile Include="..\xrRender\r__sector.cpp" />
+    <ClCompile Include="..\xrRender\r__sector_detect.cpp" />
+    <ClCompile Include="..\xrRender\r__sector_traversal.cpp" />
+    <ClCompile Include="..\xrRender\r__sync_point.cpp" />
+    <ClCompile Include="..\xrRender\Shader.cpp" />
+    <ClCompile Include="..\xrRender\SH_Atomic.cpp" />
+    <ClCompile Include="..\xrRender\SH_Constant.cpp" />
+    <ClCompile Include="..\xrRender\SH_Matrix.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonAnimated.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonCustom.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonRigid.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonX.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_CPP.cpp" />
+    <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp" />
+    <ClCompile Include="..\xrRender\stats_manager.cpp" />
+    <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
+    <ClCompile Include="..\xrRender\tss_def.cpp" />
+    <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp" />
+    <ClCompile Include="..\xrRender\Utils\dxHashHelper.cpp" />
+    <ClCompile Include="..\xrRender\VertexCache.cpp" />
+    <ClCompile Include="..\xrRender\WallmarksEngine.cpp" />
+    <ClCompile Include="..\xrRender\xrRender_console.cpp" />
+    <ClCompile Include="..\xrRender\xrStripify.cpp" />
+    <ClCompile Include="..\xrRender\xr_effgamma.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_bloom_build.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_combine.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_deffer_aref.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_deffer_flat.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_deffer_model.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_light_direct.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_light_mask.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_light_occq.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_light_point.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_light_reflected.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_light_spot.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_luminance.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_ssao.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_blenders.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_loader.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_omnipart_geom.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_point_geom.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_reflected.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_accum_spot_geom.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_draw_volume.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_enable_scissor.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_accumulator.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_bloom.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_luminance.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_PP.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_rendertarget_phase_smap_S.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_R_calculate.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_R_lights.cpp" />
+    <ClCompile Include="..\xrRender_R2\r2_R_render.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_point.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_accum_spot.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_create_minmaxSM.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_draw_rain.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_mark_msaa_edges.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_occq.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_scene.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_smap_D.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_rendertarget_phase_ssao.cpp" />
+    <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp" />
+    <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp" />
+    <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp" />
+    <ClCompile Include="ComputeShader.cpp" />
+    <ClCompile Include="CSCompiler.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx11HDAOCSBlender.cpp" />
+    <ClCompile Include="..\xrRender\blenders\dx11MinMaxSMBlender.cpp" />
+    <ClCompile Include="..\xrRender\light_GI.cpp" />
+    <ClCompile Include="..\xrRender\Light_Render_Direct.cpp" />
+    <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp" />
+    <ClCompile Include="..\xrRender\light_smapvis.cpp" />
+    <ClCompile Include="..\xrRender\light_vis.cpp" />
+    <ClCompile Include="DX12\API\DX12AsyncCommandQueue.cpp" />
+    <ClCompile Include="DX12\API\DX12.cpp" />
+    <ClCompile Include="DX12\API\DX12CommandList.cpp" />
+    <ClCompile Include="DX12\API\DX12CommandListFence.cpp" />
+    <ClCompile Include="DX12\API\DX12DescriptorHeap.cpp" />
+    <ClCompile Include="DX12\API\DX12Device.cpp" />
+    <ClCompile Include="DX12\API\DX12PSO.cpp" />
+    <ClCompile Include="DX12\API\DX12QueryHeap.cpp" />
+    <ClCompile Include="DX12\API\DX12Resource.cpp" />
+    <ClCompile Include="DX12\API\DX12ResourceBarrierCache.cpp" />
+    <ClCompile Include="DX12\API\DX12RootSignature.cpp" />
+    <ClCompile Include="DX12\API\DX12SamplerState.cpp" />
+    <ClCompile Include="DX12\API\DX12Shader.cpp" />
+    <ClCompile Include="DX12\API\DX12SwapChain.cpp" />
+    <ClCompile Include="DX12\API\DX12TimerHeap.cpp" />
+    <ClCompile Include="DX12\API\DX12View.cpp" />
+    <ClCompile Include="DX12\CCryDX12Object.cpp" />
+    <ClCompile Include="DX12\CryDX12.cpp" />
+    <ClCompile Include="DX12\Device\CCryDX12Device.cpp" />
+    <ClCompile Include="DX12\Device\CCryDX12DeviceChild.cpp" />
+    <ClCompile Include="DX12\Device\CCryDX12DeviceContext.cpp" />
+    <ClCompile Include="DX12\GI\CCryDX12GIFactory.cpp" />
+    <ClCompile Include="DX12\GI\CCryDX12SwapChain.cpp" />
+    <ClCompile Include="DX12\Misc\SCryDX11PipelineState.cpp" />
+    <ClCompile Include="DX12\Resource\CCryDX12Asynchronous.cpp" />
+    <ClCompile Include="DX12\Resource\CCryDX12Resource.cpp" />
+    <ClCompile Include="DX12\Resource\CCryDX12View.cpp" />
+    <ClCompile Include="DX12\Resource\Misc\CCryDX12Buffer.cpp" />
+    <ClCompile Include="DX12\Resource\Misc\CCryDX12InputLayout.cpp" />
+    <ClCompile Include="DX12\Resource\Misc\CCryDX12Query.cpp" />
+    <ClCompile Include="DX12\Resource\Misc\CCryDX12Shader.cpp" />
+    <ClCompile Include="DX12\Resource\State\CCryDX12BlendState.cpp" />
+    <ClCompile Include="DX12\Resource\State\CCryDX12DepthStencilState.cpp" />
+    <ClCompile Include="DX12\Resource\State\CCryDX12RasterizerState.cpp" />
+    <ClCompile Include="DX12\Resource\State\CCryDX12SamplerState.cpp" />
+    <ClCompile Include="DX12\Resource\Texture\CCryDX12Texture1D.cpp" />
+    <ClCompile Include="DX12\Resource\Texture\CCryDX12Texture2D.cpp" />
+    <ClCompile Include="DX12\Resource\Texture\CCryDX12Texture3D.cpp" />
+    <ClCompile Include="DX12\Resource\View\CCryDX12DepthStencilView.cpp" />
+    <ClCompile Include="DX12\Resource\View\CCryDX12RenderTargetView.cpp" />
+    <ClCompile Include="DX12\Resource\View\CCryDX12ShaderResourceView.cpp" />
+    <ClCompile Include="DX12\Resource\View\CCryDX12UnorderedAccessView.cpp" />
+    <ClCompile Include="r5_rendertarget_build_textures.cpp" />
+    <ClCompile Include="r5_rendertarget_u_set_rt.cpp" />
+    <ClCompile Include="r2_test_hw.cpp" />
+    <ClCompile Include="r5_rendertarget_accum_direct.cpp" />
+    <ClCompile Include="r5_rendertarget_phase_combine.cpp" />
+    <ClCompile Include="r5_rendertarget_phase_hdao.cpp" />
+    <ClCompile Include="r5_shaders.cpp" />
+    <ClCompile Include="R_Backend_LOD.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="xrRender_R5.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
+      <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrParticles\xrParticles.vcxproj">
+      <Project>{94a1c366-3d19-48e6-8170-4adc2e70df97}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrScriptEngine\xrScriptEngine.vcxproj">
+      <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
+      <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
+      <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">
+      <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)luabind.vcxproj">
+      <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)LuaJIT-proj\LuaJIT.vcxproj">
+      <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)oalib.vcxproj">
+      <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\imgui.vcxproj">
+      <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
+      <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="$(WindowsSdkDir)Redist\D3D\$(PlatformShortName)\d3dcompiler_47.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\..\packages\directxmath.2022.12.12.1\build\native\directxmath.targets" Condition="Exists('..\..\packages\directxmath.2022.12.12.1\build\native\directxmath.targets')" />
+    <Import Project="..\..\packages\directxtex_desktop_2019.2023.10.31.1\build\native\directxtex_desktop_2019.targets" Condition="Exists('..\..\packages\directxtex_desktop_2019.2023.10.31.1\build\native\directxtex_desktop_2019.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\directxmath.2022.12.12.1\build\native\directxmath.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\directxmath.2022.12.12.1\build\native\directxmath.targets'))" />
+    <Error Condition="!Exists('..\..\packages\directxtex_desktop_2019.2023.10.31.1\build\native\directxtex_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\directxtex_desktop_2019.2023.10.31.1\build\native\directxtex_desktop_2019.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets'))" />
+  </Target>
+</Project>

@@ -7,9 +7,7 @@
 
 #include <SDL.h>
 
-class CHW
-    : public pureAppActivate,
-      public pureAppDeactivate
+class CHW : public pureAppActivate, public pureAppDeactivate
 {
 public:
     CHW();
@@ -48,32 +46,50 @@ public:
 
 private:
     bool CreateSwapChain(HWND hwnd);
+#if defined(USE_DX11)
     bool CreateSwapChain2(HWND hwnd);
-
+#endif
     bool ThisInstanceIsGlobal() const;
 
 public:
+
+#if defined(USE_DX12)
+    ICF ID3D11DeviceContext1* get_context(u32 context_id)
+    {
+        VERIFY(context_id < R__NUM_CONTEXTS);
+        return d3d_contexts_pool[context_id];
+    }
+#else 
     ICF ID3DDeviceContext* get_context(u32 context_id)
     {
         VERIFY(context_id < R__NUM_CONTEXTS);
         return d3d_contexts_pool[context_id];
     }
+#endif 
 
 public:
     static constexpr auto IMM_CTX_ID = R__NUM_PARALLEL_CONTEXTS;
 
     CHWCaps Caps;
 
-    u32 BackBufferCount{};
-    u32 CurrentBackBuffer{};
-
+    u32 BackBufferCount = 0;
+#if defined(USE_DX11) 
+    u32 CurrentBackBuffer = 0;
+#endif
     ID3DDevice* pDevice = nullptr; // render device
 
     D3D_DRIVER_TYPE m_DriverType;
 
+#if defined(USE_DX12)
+    IDXGIFactory4* m_pFactory = nullptr;
+    IDXGIAdapter1* m_pAdapter = nullptr; // pD3D equivalent
+    IDXGISwapChain3* m_pSwapChain = nullptr;
+#else 
     IDXGIFactory1* m_pFactory = nullptr;
     IDXGIAdapter1* m_pAdapter = nullptr; // pD3D equivalent
     IDXGISwapChain* m_pSwapChain = nullptr;
+#endif
+
     D3D_FEATURE_LEVEL FeatureLevel;
     bool Valid = true;
     bool ComputeShadersSupported;
@@ -81,8 +97,13 @@ public:
     bool SAD4ShaderInstructions;
     bool ExtendedDoublesShaderInstructions;
 
+#if defined(USE_DX12)
+    ID3D11DeviceContext1* d3d_contexts_pool[R__NUM_CONTEXTS]{};
+#else
     ID3DDeviceContext* d3d_contexts_pool[R__NUM_CONTEXTS]{};
+#endif 
 
+#if defined(USE_DX11)   
     bool DX10Only = false;
 #ifdef HAS_DX11_2
     IDXGISwapChain2* m_pSwapChain2 = nullptr;
@@ -91,6 +112,15 @@ public:
     ID3D11Device3* pDevice3 = nullptr;
 #endif
     ID3D11DeviceContext1* pContext1 = nullptr;
+#endif
+
+    IC u32 GetCurrentBackBufferIndex() const { 
+#if defined(USE_DX11)   
+        return CurrentBackBuffer;
+#else
+        return m_pSwapChain->GetCurrentBackBufferIndex();
+#endif
+    }
 
     using D3DCompileFunc = decltype(&D3DCompile);
     D3DCompileFunc D3DCompile = nullptr;

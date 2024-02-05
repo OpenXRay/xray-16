@@ -24,7 +24,8 @@ constexpr pcstr RENDER_LIBRARIES[] =
 #if defined(XR_PLATFORM_WINDOWS)
     r1_library,
     "xrRender_R2",
-    "xrRender_R4",
+    "xrRender_R4", 
+    "xrRender_R5",
 #endif
     gl_library
 };

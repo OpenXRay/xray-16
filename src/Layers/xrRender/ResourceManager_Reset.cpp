@@ -130,11 +130,11 @@ void CResourceManager::Dump(bool bBrief)
     Msg("* RM_Dump: ps        : %d", m_ps.size());
     if (!bBrief)
         mdump(m_ps);
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     Msg("* RM_Dump: gs        : %d", m_gs.size());
     if (!bBrief)
         mdump(m_gs);
-#    ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     Msg("* RM_Dump: cs        : %d", m_cs.size());
     if (!bBrief)
         mdump(m_cs);

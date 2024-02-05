@@ -8,7 +8,7 @@ void CRenderTarget::mark_msaa_edges()
 
     // Fill vertex buffer
     FVF::TL2uv* pv = (FVF::TL2uv*)RImplementation.Vertex.Lock(4, g_combine_2UV->vb_stride, Offset);
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     pv->set(-1, -1,   0, d_W, C, 0, 1, 0, 0);
     pv++;
     pv->set(-1,  1, d_Z, d_W, C, 0, 0, 0, 0);
@@ -30,7 +30,7 @@ void CRenderTarget::mark_msaa_edges()
 #   error No graphics API selected or enabled!
 #endif
     RImplementation.Vertex.Unlock(4, g_combine_2UV->vb_stride);
-#if defined(USE_DX11) // XXX: remove this difference
+#if defined(USE_DX11) || defined(USE_DX12) // XXX: remove this difference
     u_setrt(RCache, nullptr, nullptr, nullptr, rt_MSAADepth);
 #elif defined(USE_OGL)
     u_setrt(RCache, Device.dwWidth, Device.dwHeight, 0, 0, 0, rt_MSAADepth->pZRT);

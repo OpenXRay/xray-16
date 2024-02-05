@@ -29,7 +29,7 @@
 ///////////////////////////////////////////////////////////////////////
 //  SVS
 SVS::SVS() : sh(0)
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 //  ,signature(0)
 #endif
 {}
@@ -38,13 +38,13 @@ SVS::~SVS()
 {
     RImplementation.Resources->_DeleteVS(this);
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     // XXX: check just in case
     //_RELEASE(signature);
     //	Now it is release automatically
 #endif
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     _RELEASE(sh);
 #elif defined(USE_OGL)
     if (HW.SeparateShaderObjectsSupported)
@@ -60,7 +60,7 @@ SVS::~SVS()
 // SPS
 SPS::~SPS()
 {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     _RELEASE(sh);
 #elif defined(USE_OGL)
     if (HW.SeparateShaderObjectsSupported)
@@ -74,12 +74,12 @@ SPS::~SPS()
     RImplementation.Resources->_DeletePS(this);
 }
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
 ///////////////////////////////////////////////////////////////////////
 // SGS
 SGS::~SGS()
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
     if (HW.SeparateShaderObjectsSupported)
@@ -95,7 +95,7 @@ SGS::~SGS()
 
 SHS::~SHS()
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
     if (HW.SeparateShaderObjectsSupported)
@@ -111,7 +111,7 @@ SHS::~SHS()
 
 SDS::~SDS()
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
     if (HW.SeparateShaderObjectsSupported)
@@ -125,7 +125,7 @@ SDS::~SDS()
 
 SCS::~SCS()
 {
-#    if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     _RELEASE(sh);
 #    elif defined(USE_OGL)
     if (HW.SeparateShaderObjectsSupported)
@@ -153,7 +153,7 @@ SPP::~SPP()
 #endif // USE_OGL
 
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 ///////////////////////////////////////////////////////////////////////
 //	SInputSignature
 SInputSignature::SInputSignature(ID3DBlob* pBlob)
@@ -186,7 +186,7 @@ SDeclaration::~SDeclaration()
     //	Release vertex layout
 #ifdef USE_OGL
     glDeleteVertexArrays(1, &dcl);
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
     iLayout = vs_to_layout.begin();
     for (; iLayout != vs_to_layout.end(); ++iLayout)

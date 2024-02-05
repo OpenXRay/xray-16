@@ -128,7 +128,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
         bUseSteepParallax = true;
     }
 */
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     TessMethod = 0;
 #endif
 
@@ -210,16 +210,16 @@ void CBlender_Compile::PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs /*= nullp
         dest.ps = RImplementation.Resources->_CreatePS(_ps);
         ctable.merge(&dest.ps->constants);
         u32 flags = 0;
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         if (dest.ps->constants.dx9compatibility)
             flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 #endif
         dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
         ctable.merge(&dest.vs->constants);
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
         dest.gs = RImplementation.Resources->_CreateGS(_gs);
         ctable.merge(&dest.gs->constants);
-#   ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         dest.hs = RImplementation.Resources->_CreateHS(_hs);
         dest.ds = RImplementation.Resources->_CreateDS(_ds);
         ctable.merge(&dest.hs->constants);
@@ -254,7 +254,7 @@ void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
     RS.SetRS(D3DRS_SRCBLEND, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLEND, bABlend ? abDST : D3DBLEND_ZERO);
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     //	Since in our engine D3DRS_SEPARATEALPHABLENDENABLE state is
     //	always set to false and in DirectX 10 blend functions for
     //	color and alpha are always independent, assign blend options for
