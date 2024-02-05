@@ -232,7 +232,7 @@ jobs:
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
-        run: cmake --build build --config ${{ matrix.Configuration }} --parallel 3
+        run: cmake --build build --config ${{ matrix.Configuration }} --parallel 4
 
     - name: Finalize
       uses: cross-platform-actions/action@v0.22.0
