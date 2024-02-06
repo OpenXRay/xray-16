@@ -332,7 +332,7 @@ void motions_container::dump()
         sz += it->second->mem_usage();
         Msg("#%3d: [%3d/%5d Kb] - %s", k, it->second->m_dwReference, it->second->mem_usage() / 1024, it->first.c_str());
     }
-    Msg("--- items: %d, mem usage: %d Kb ", container.size(), sz / 1024);
+    Msg("--- items: %zu, mem usage: %zu Kb ", container.size(), sz / 1024);
     Log("--- motion container --- end.");
 }
 
