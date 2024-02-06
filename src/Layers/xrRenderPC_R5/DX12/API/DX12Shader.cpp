@@ -232,4 +232,106 @@ namespace DX12
         result->m_BindingHash = MakeHash(result->m_Bindings);
         return result;
     }
+
+    Shader* Shader::CreateFromD3D12(Device* device, const D3D12_SHADER_BYTECODE& byteCode)
+    {
+        ID3D12ShaderReflection* shaderReflection = NULL;
+
+        // Reflect shader internals
+        if (S_OK !=
+            D3DReflect(byteCode.pShaderBytecode, byteCode.BytecodeLength, IID_ID3D12ShaderReflection,
+                (void**)&shaderReflection))
+        {
+            DX12_ASSERT(0, "Could not do a shader reflection!");
+            return NULL;
+        }
+
+        D3D12_SHADER_DESC desc12;
+        shaderReflection->GetDesc(&desc12);
+
+        Shader* result = DX12::PassAddRef(new Shader(device));
+        result->m_Bytecode = byteCode;
+
+        for (UINT i = 0; i < desc12.BoundResources; ++i)
+        {
+            D3D12_SHADER_INPUT_BIND_DESC bindDesc12;
+            shaderReflection->GetResourceBindingDesc(i, &bindDesc12);
+
+            bool bBindPointUsed = true;
+            bool bBindingSharable = bindDesc12.BindPoint == eConstantBufferShaderSlot_PerMaterial ||
+                bindDesc12.BindPoint == eConstantBufferShaderSlot_PerPass ||
+                bindDesc12.BindPoint == eConstantBufferShaderSlot_PerView ||
+                bindDesc12.BindPoint == eConstantBufferShaderSlot_PerFrame;
+
+            bool bBindingMergeable = bindDesc12.BindPoint > eConstantBufferShaderSlot_PerInstanceLegacy;
+
+            switch (bindDesc12.Type)
+            {
+            case D3D10_SIT_CBUFFER:
+                DX12_ASSERT(bindDesc12.BindCount == 1, "Arrays of ConstantBuffers are not allowed!");
+
+                if (bindDesc12.BindCount == 1)
+                {
+                    ID3D12ShaderReflectionConstantBuffer* constantBuffer =
+                        shaderReflection->GetConstantBufferByName(bindDesc12.Name);
+                    D3D12_SHADER_BUFFER_DESC constantBufferDesc;
+                    UINT variableUsedCount = 0;
+
+                    constantBuffer->GetDesc(&constantBufferDesc);
+                    for (UINT j = 0; j < constantBufferDesc.Variables; j++)
+                    {
+                        ID3D12ShaderReflectionVariable* variable = constantBuffer->GetVariableByIndex(j);
+                        D3D12_SHADER_VARIABLE_DESC variableDesc;
+                        variable->GetDesc(&variableDesc);
+
+                        variableUsedCount += (variableDesc.uFlags & D3D10_SVF_USED);
+                    }
+
+                    bBindPointUsed = (variableUsedCount > 0);
+                }
+
+                // We need separate descriptor tables for dynamic CB's
+                AppendResourceToRanges(result->m_Bindings.m_ConstantBuffers, bindDesc12.BindPoint, bindDesc12.BindCount,
+                    static_cast<UINT8>(bindDesc12.Type), static_cast<UINT8>(bindDesc12.Dimension), bBindPointUsed,
+                    bBindingSharable, bBindingMergeable);
+                break;
+
+            // ID3D12Device::CreateGraphicsPipelineState: SRV or UAV root descriptors can only be Raw or Structured
+            // buffers.
+            case D3D10_SIT_TEXTURE:
+            case D3D10_SIT_TBUFFER:
+                AppendResourceToRanges(result->m_Bindings.m_InputResources, bindDesc12.BindPoint, bindDesc12.BindCount,
+                    static_cast<UINT8>(bindDesc12.Type), static_cast<UINT8>(bindDesc12.Dimension));
+                break;
+            case D3D11_SIT_STRUCTURED:
+            case D3D11_SIT_BYTEADDRESS:
+                AppendResourceToRanges(result->m_Bindings.m_InputResources, bindDesc12.BindPoint, bindDesc12.BindCount,
+                    static_cast<UINT8>(bindDesc12.Type), static_cast<UINT8>(bindDesc12.Dimension), bBindPointUsed);
+                break;
+
+            case D3D11_SIT_UAV_RWTYPED:
+                AppendResourceToRanges(result->m_Bindings.m_OutputResources, bindDesc12.BindPoint, bindDesc12.BindCount,
+                    static_cast<UINT8>(bindDesc12.Type), static_cast<UINT8>(bindDesc12.Dimension));
+                break;
+            case D3D11_SIT_UAV_RWSTRUCTURED:
+            case D3D11_SIT_UAV_RWSTRUCTURED_WITH_COUNTER:
+            case D3D11_SIT_UAV_RWBYTEADDRESS:
+            case D3D11_SIT_UAV_APPEND_STRUCTURED:
+            case D3D11_SIT_UAV_CONSUME_STRUCTURED:
+                AppendResourceToRanges(result->m_Bindings.m_OutputResources, bindDesc12.BindPoint, bindDesc12.BindCount,
+                    static_cast<UINT8>(bindDesc12.Type), static_cast<UINT8>(bindDesc12.Dimension), bBindPointUsed);
+                break;
+
+            case D3D10_SIT_SAMPLER:
+                DX12_ASSERT(bindDesc12.BindCount == 1, "Arrays of SamplerStates are not allowed!");
+                AppendResourceToRanges(result->m_Bindings.m_Samplers, bindDesc12.BindPoint, bindDesc12.BindCount,
+                    static_cast<UINT8>(bindDesc12.Type), static_cast<UINT8>(bindDesc12.Dimension));
+                break;
+            }
+        }
+
+        result->m_BindingHash = MakeHash(result->m_Bindings);
+        return result;
+    }
+
 }

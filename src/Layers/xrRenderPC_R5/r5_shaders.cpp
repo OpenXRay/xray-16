@@ -519,7 +519,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         renderer = "r5" DELIMITER;
     else
     {
-        renderer = "r4_level9" DELIMITER;
+        renderer = "r5_level9" DELIMITER;
         R_ASSERT(!"Feature levels lower than 12.0 are unsupported");
     }
 

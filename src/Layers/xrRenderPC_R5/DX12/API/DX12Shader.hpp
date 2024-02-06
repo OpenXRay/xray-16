@@ -148,6 +148,8 @@ namespace DX12
     public:
         // Create new shader using DX11 reflection interface
         static Shader* CreateFromD3D11(Device* device, const D3D12_SHADER_BYTECODE& byteCode);
+        // Create new shader using DX11 reflection interface
+        static Shader* CreateFromD3D12(Device* device, const D3D12_SHADER_BYTECODE& byteCode);
 
         Shader(Device* device);
 
