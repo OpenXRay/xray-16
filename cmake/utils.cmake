@@ -113,5 +113,3 @@ function(calculate_xray_build_id output)
     # Set requested variable
     set(${output} ${build_id} PARENT_SCOPE)
 endfunction()
-
-include(packaging)

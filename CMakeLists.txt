@@ -5,13 +5,19 @@ message(STATUS "CMAKE_VERSION: ${CMAKE_VERSION}")
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0095 NEW)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+include(utils)
+calculate_xray_build_id(XRAY_BUILD_ID)
+
 project(OpenXRay
     DESCRIPTION "OpenXRay is an improved version of the X-Ray Engine, \
-    the game engine used in the world-famous S.T.A.L.K.E.R. game series by GSC Game World."
-    VERSION 1.6.02
+                the game engine used in the world-famous S.T.A.L.K.E.R. game series by GSC Game World."
+    VERSION 1.6.02.${XRAY_BUILD_ID}
     HOMEPAGE_URL "https://github.com/OpenXRay/xray-16"
     LANGUAGES CXX C
 )
+message(STATUS "CMAKE_PROJECT_VERSION: ${}")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -33,13 +39,7 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 include(GNUInstallDirs)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-include(utils)
-
-calculate_xray_build_id(XRAY_BUILD_ID)
-message(STATUS "XRAY_BUILD_ID: ${XRAY_BUILD_ID}")
+include(packaging)
 
 set_git_info()
 
