@@ -37,7 +37,7 @@ extern int g_nPrintDX12;
 namespace RendererDX12
 {
 const int CV_r_D3D12SubmissionThread = 0;
-const bool CV_r_EnableDebugLayer = false;
+const bool CV_r_EnableDebugLayer = true;
 }; // namespace RendererDX12
 
 #define DX12_NOT_IMPLEMENTED R_ASSERT2(0, "Not implemented!");
