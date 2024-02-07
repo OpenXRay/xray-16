@@ -75,4 +75,43 @@ function(set_git_info)
     message(STATUS "git branch: ${GIT_BRANCH}")
 endfunction()
 
+function(calculate_xray_build_id output)
+    set(XRAY_START_DAY   31)
+    set(XRAY_START_MONTH 1)
+    set(XRAY_START_YEAR  1999)
+
+    set(DAYS_IN_MONTH 0 31 28 31 30 31 30 31 31 30 31 30 31) # first is dummy
+
+    # Acquire timestamp in "date month year" format
+    string(TIMESTAMP current_date "%d %m %Y")
+
+    # Transform string into a list, then extract 3 separate variables
+    string(REPLACE " " ";" current_date_list ${current_date})
+    list(GET current_date_list 0 CURRENT_DATE_DAY)
+    list(GET current_date_list 1 CURRENT_DATE_MONTH)
+    list(GET current_date_list 2 CURRENT_DATE_YEAR)
+
+    # Calculate XRAY build ID
+    math(EXPR build_id "(${CURRENT_DATE_YEAR} - ${XRAY_START_YEAR}) * 365 + ${CURRENT_DATE_DAY} - ${XRAY_START_DAY}")
+
+    set(it 1)
+    while(it LESS CURRENT_DATE_MONTH)
+        list(GET DAYS_IN_MONTH ${it} days)
+        math(EXPR build_id "${build_id} + ${days}")
+
+        math(EXPR it "${it} + 1")
+    endwhile()
+
+    set(it 1)
+    while(it LESS XRAY_START_MONTH)
+        list(GET DAYS_IN_MONTH ${it} days)
+        math(EXPR build_id "${build_id} - ${days}")
+
+        math(EXPR it "${it} + 1")
+    endwhile()
+
+    # Set requested variable
+    set(${output} ${build_id} PARENT_SCOPE)
+endfunction()
+
 include(packaging)

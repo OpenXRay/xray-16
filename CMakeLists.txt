@@ -38,6 +38,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(utils)
 
+calculate_xray_build_id(XRAY_BUILD_ID)
+message(STATUS "XRAY_BUILD_ID: ${XRAY_BUILD_ID}")
+
 set_git_info()
 
 # Output all libraries and executable to one folder
