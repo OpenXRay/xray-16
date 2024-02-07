@@ -548,9 +548,9 @@ void CHW::Present()
         psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX11
 
 #if defined(USE_DX12)
-    //WaitForSingleObjectEx(Device.PresentationFinished.GetHandle(),
-    //    1000, // 1 second timeout (shouldn't ever occur)
-    //    true);
+    WaitForSingleObjectEx(Device.PresentationFinished.GetHandle(),
+        1000, // 1 second timeout (shouldn't ever occur)
+        true);
 #endif
 
     m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);

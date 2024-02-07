@@ -258,9 +258,9 @@ void CRenderTarget::build_textures()
         //	Create noise mipped
         {
             //	Autogen mipmaps
-            ID3DBaseTexture* t_noise_surf_mipped = NULL;
-            DirectX::ScratchImage mippedNoise = {};
-            DirectX::Image img = {
+            ID3DTexture2D* t_noise_surf_mipped = NULL;
+            DirectX::ScratchImage mippedNoise;
+            DirectX::Image img{
                 /*.width      =*/TEX_jitter,
                 /*.height     =*/TEX_jitter,
                 /*.format     =*/desc.Format,
@@ -273,8 +273,12 @@ void CRenderTarget::build_textures()
             // WIC produces bad texture, non-WIC gives 100% identical texture as from D3DX11FilterTexture
             GenerateMipMaps(img, DirectX::TEX_FILTER_POINT | DirectX::TEX_FILTER_FORCE_NON_WIC, 0, mippedNoise);
 
-            R_CHK(CreateTexture(HW.pDevice, mippedNoise.GetImages(), mippedNoise.GetImageCount(),
-                mippedNoise.GetMetadata(), &t_noise_surf_mipped));
+            //R_CHK(CreateTexture(HW.pDevice, mippedNoise.GetImages(), mippedNoise.GetImageCount(),
+            //    mippedNoise.GetMetadata(), (ID3D11Resource**)&t_noise_surf_mipped));
+
+            R_CHK(CreateTextureEx(HW.pDevice, mippedNoise.GetImages(), mippedNoise.GetImageCount(),
+                mippedNoise.GetMetadata(), D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, 0,
+                DirectX::CREATETEX_DEFAULT, (ID3D11Resource**)&t_noise_surf_mipped));
 
             t_noise_mipped = RImplementation.Resources->_CreateTexture(r2_jitter_mipped);
             t_noise_mipped->surface_set(t_noise_surf_mipped);

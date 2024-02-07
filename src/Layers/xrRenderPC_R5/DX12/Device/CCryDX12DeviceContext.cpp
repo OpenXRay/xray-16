@@ -2516,6 +2516,8 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::ClearState()
  
    IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED);
    
+   ResetCachedState();
+
    CSSetShader(NULL, NULL, 0);
    DSSetShader(NULL, NULL, 0);
    GSSetShader(NULL, NULL, 0); 
@@ -2530,8 +2532,9 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::ClearState()
 
    OMSetBlendState(NULL, NULL, 0);
    OMSetDepthStencilState(NULL, 0);
-
-   SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC, m_CmdFenceSet.GetCurrentValues());
+ 
+   SubmitAllCommands(true);
+   WaitForIdle();
 }
 
 void STDMETHODCALLTYPE CCryDX12DeviceContext::Flush()
@@ -2558,8 +2561,7 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::ExecuteCommandList(
     _In_  BOOL RestoreContextState)
 {
     DX12_FUNC_LOG
-    //R_ASSERT(!IsDeferred(), "Only immediate context can execute command list");
-    DX12_NOT_IMPLEMENTED
+        DX12_NOT_IMPLEMENTED
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12DeviceContext::FinishCommandList(
@@ -2567,8 +2569,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12DeviceContext::FinishCommandList(
     _Out_opt_  ID3D11CommandList** ppCommandList)
 {
     DX12_FUNC_LOG
-    DX12_NOT_IMPLEMENTED
-    //R_ASSERT(IsDeferred(), "Only deferred context can record command list");
+        DX12_NOT_IMPLEMENTED
     return E_FAIL;
 }
 
