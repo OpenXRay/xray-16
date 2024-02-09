@@ -118,10 +118,7 @@ public:
     virtual void Reset();
     void ResetAll();
 
-    virtual void SetFont(CGameFont* pFont)
-    {
-        UNUSED(pFont);
-    }
+    virtual void SetFont(CGameFont* /*pFont*/) {}
 
     virtual CGameFont* GetFont()
     {

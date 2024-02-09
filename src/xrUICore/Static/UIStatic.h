@@ -43,15 +43,21 @@ public:
     virtual pcstr GetText() const { return const_cast<CUIStatic*>(this)->TextItemControl()->GetText(); }
     virtual void SetText(pcstr txt) { TextItemControl()->SetText(txt); }
     virtual void SetTextST(pcstr txt) { TextItemControl()->SetTextST(txt); }
+    void SetFont(CGameFont* F) override { TextItemControl()->SetFont(F); }
+    CGameFont* GetFont() override { return TextItemControl()->GetFont(); }
 
-    u32 GetTextColor()
-    {
-        return TextItemControl()->GetTextColor();
-    }
+    u32 GetTextColor() { return TextItemControl()->GetTextColor(); }
+    void SetTextColor(u32 color) { TextItemControl()->SetTextColor(color); }
 
-    void SetTextColor(u32 color)
+    void SetTextComplexMode(bool mode = true) { TextItemControl()->SetTextComplexMode(mode); }
+    void SetTextAlignment(ETextAlignment al) { TextItemControl()->SetTextAlignment(al); }
+    void SetVTextAlignment(EVTextAlignment al) { TextItemControl()->SetVTextAlignment(al); }
+    void SetEllipsis(bool mode) { TextItemControl()->SetEllipsis(mode); }
+    void SetCutWordsMode(bool mode) { TextItemControl()->SetCutWordsMode(mode); }
+    void SetTextOffset(float x, float y)
     {
-        TextItemControl()->SetTextColor(color);
+        TextItemControl()->m_TextOffset.x = x;
+        TextItemControl()->m_TextOffset.y = y;
     }
 
     virtual void SetTextX(float text_x) { TextItemControl()->m_TextOffset.x = text_x; }
@@ -96,7 +102,6 @@ public:
     CUIStaticItem& GetUIStaticItem() { return m_UIStaticItem; }
     void SetStretchTexture(bool stretch_texture) { m_bStretchTexture = stretch_texture; }
     bool GetStretchTexture() { return m_bStretchTexture; }
-    void SetEllipsis(int pos, int indent) { TextItemControl()->SetEllipsis(pos != 0); }
     void SetHeading(float f) { m_fHeading = f; };
     float GetHeading() { return m_fHeading; }
     bool Heading() { return m_bHeading; }
@@ -125,44 +130,4 @@ protected:
 public:
     CUILines* TextItemControl();
     shared_str m_stat_hint_text;
-};
-
-class XRUICORE_API CUITextWnd final : public CUIWindow, public CUILightAnimColorConrollerImpl
-{
-    typedef CUIWindow inherited;
-    CUILines m_lines;
-
-public:
-    CUITextWnd();
-
-    virtual void Draw();
-    virtual void Update();
-
-    void AdjustHeightToText();
-    void AdjustWidthToText();
-
-    void SetText(LPCSTR txt) { TextItemControl().SetText(txt); }
-    void SetTextST(LPCSTR txt) { TextItemControl().SetTextST(txt); }
-    LPCSTR GetText() { return TextItemControl().GetText(); }
-    void SetFont(CGameFont* F) { TextItemControl().SetFont(F); }
-    CGameFont* GetFont() { return TextItemControl().GetFont(); }
-    void SetTextColor(u32 color) { TextItemControl().SetTextColor(color); }
-    u32 GetTextColor() { return TextItemControl().GetTextColor(); }
-    void SetTextComplexMode(bool mode = true) { TextItemControl().SetTextComplexMode(mode); }
-    void SetTextAlignment(ETextAlignment al) { TextItemControl().SetTextAlignment(al); }
-    void SetVTextAlignment(EVTextAlignment al) { TextItemControl().SetVTextAlignment(al); }
-    void SetEllipsis(bool mode) { TextItemControl().SetEllipsis(mode); }
-    void SetCutWordsMode(bool mode) { TextItemControl().SetCutWordsMode(mode); }
-    void SetTextOffset(float x, float y)
-    {
-        TextItemControl().m_TextOffset.x = x;
-        TextItemControl().m_TextOffset.y = y;
-    }
-
-    virtual void ColorAnimationSetTextColor(u32 color, bool only_alpha);
-
-    CUILines& TextItemControl() { return m_lines; }
-
-    pcstr GetDebugType() override { return "CUITextWnd"; }
-    void FillDebugInfo() override;
 };

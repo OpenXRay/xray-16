@@ -135,13 +135,13 @@ bool CUIXmlInitBase::InitOptionsItem(CUIXml& xml_doc, LPCSTR path, int index, CU
     return false;
 }
 
-bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd, bool fatal /*= true*/)
+bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd, bool fatal /*= true*/, bool textWnd /*= false*/)
 {
     if (!InitWindow(xml_doc, path, index, pWnd, fatal))
         return false;
 
     string256 buf;
-    InitText(xml_doc, strconcat(sizeof(buf), buf, path, ":text"), index, pWnd);
+    InitText(xml_doc, strconcat(sizeof(buf), buf, path, ":text"), index, pWnd->TextItemControl());
     InitTexture(xml_doc, path, index, pWnd);
     InitTextureOffset(xml_doc, path, index, pWnd);
 
@@ -167,7 +167,7 @@ bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStat
         flags |= LA_CYCLIC;
     if (flag_alpha)
         flags |= LA_ONLYALPHA;
-    if (flag_text)
+    if (flag_text || textWnd)
         flags |= LA_TEXTCOLOR;
     if (flag_texture)
         flags |= LA_TEXTURECOLOR;
@@ -185,38 +185,16 @@ bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStat
 
     pWnd->m_stat_hint_text = xml_doc.ReadAttrib(path, index, "hint", "");
 
+    if (textWnd)
+    {
+        strconcat(sizeof(buf), buf, path, ":texture");
+        R_ASSERT3(nullptr == xml_doc.NavigateToNode(buf, index), xml_doc.m_xml_file_name, buf);
+
+        R_ASSERT2(pWnd->GetChildWndList().empty(),
+            "CUITextWnd should have no children. "
+            "Use InitStatic from Lua, if you want your UI element to have children.");
+    }
     return true;
-}
-
-bool CUIXmlInitBase::InitTextWnd(CUIXml& xml_doc, LPCSTR path, int index, CUITextWnd* pWnd, bool fatal /*= true*/)
-{
-    if (!InitWindow(xml_doc, path, index, pWnd, fatal))
-        return false;
-
-    string256 buf;
-    InitText(xml_doc, strconcat(sizeof(buf), buf, path, ":text"), index, &pWnd->TextItemControl());
-
-    LPCSTR str_flag = xml_doc.ReadAttrib(path, index, "light_anim", "");
-    int flag_cyclic = xml_doc.ReadAttribInt(path, index, "la_cyclic", 1);
-    int flag_alpha = xml_doc.ReadAttribInt(path, index, "la_alpha", 0);
-
-    u8 flags = LA_TEXTCOLOR;
-    if (flag_cyclic)
-        flags |= LA_CYCLIC;
-    if (flag_alpha)
-        flags |= LA_ONLYALPHA;
-    pWnd->SetColorAnimation(str_flag, flags);
-
-    bool bComplexMode = xml_doc.ReadAttribInt(path, index, "complex_mode", 0) ? true : false;
-    if (bComplexMode)
-        pWnd->SetTextComplexMode(bComplexMode);
-
-    strconcat(sizeof(buf), buf, path, ":texture");
-    R_ASSERT3(NULL == xml_doc.NavigateToNode(buf, index), xml_doc.m_xml_file_name, buf);
-
-    R_ASSERT(pWnd->GetChildWndList().size() == 0);
-    return true;
-
 }
 
 bool CUIXmlInitBase::InitCheck(CUIXml& xml_doc, LPCSTR path, int index, CUICheckButton* pWnd, bool fatal /*= true*/)
@@ -290,14 +268,6 @@ bool CUIXmlInitBase::InitSpin(CUIXml& xml_doc, LPCSTR path, int index, CUICustom
     return true;
 }
 
-bool CUIXmlInitBase::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd)
-{
-    if (!xml_doc.NavigateToNode(path, index))
-        return false;
-
-    return InitText(xml_doc, path, index, pWnd->TextItemControl());
-}
-
 bool CUIXmlInitBase::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUILines* pLines)
 {
     if (!xml_doc.NavigateToNode(path, index))
@@ -366,7 +336,7 @@ bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, LPCSTR path, int index, CUI3t
     pWnd->InitButton(pWnd->GetWndPos(), pWnd->GetWndSize());
 
     string256 buf;
-    InitText(xml_doc, strconcat(sizeof(buf), buf, path, ":text"), index, pWnd);
+    InitText(xml_doc, strconcat(sizeof(buf), buf, path, ":text"), index, pWnd->TextItemControl());
     u32 color;
 
     strconcat(sizeof(buf), buf, path, ":text_color:e");
@@ -1200,8 +1170,8 @@ bool CUIXmlInitBase::InitScrollView(CUIXml& xml_doc, LPCSTR path, int index, CUI
 
     for (int i = 0; i < tabsCount; ++i)
     {
-        CUITextWnd* newText = xr_new<CUITextWnd>();
-        InitText(xml_doc, "text", i, &newText->TextItemControl());
+        auto* newText = xr_new<CUIStatic>("Text");
+        InitText(xml_doc, "text", i, newText->TextItemControl());
         newText->SetTextComplexMode(true);
         newText->SetWidth(pWnd->GetDesiredChildWidth());
         newText->AdjustHeightToText();

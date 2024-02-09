@@ -39,8 +39,8 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 
             .def("TextControl", &CUIStatic::TextItemControl)
 
-            .def("SetText",   (void (CUIStatic::*)(LPCSTR)) (&CUIStatic::SetText))
-            .def("SetTextST", (void (CUIStatic::*)(LPCSTR)) (&CUIStatic::SetTextST))
+            .def("SetText",   &CUIStatic::SetText)
+            .def("SetTextST", &CUIStatic::SetTextST)
 
             .def("GetText", &CUIStatic::GetText)
 
@@ -52,10 +52,21 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
             .def("SetColor", &CUIStatic::SetColor)
             .def("GetColor", &CUIStatic::GetColor)
 
+            .def("SetFont", &CUIStatic::SetFont)
+            .def("GetFont", &CUIStatic::GetFont)
+
             .def("SetTextColor", +[](CUIStatic* self, int a, int r, int g, int b)
             {
                 self->SetTextColor(color_argb(a, r, g, b));
             })
+            .def("GetTextColor", &CUIStatic::GetTextColor)
+            .def("SetTextComplexMode", &CUIStatic::SetTextComplexMode)
+            .def("SetTextAlignment", &CUIStatic::SetTextAlignment)
+            .def("SetVTextAlignment", &CUIStatic::SetVTextAlignment)
+
+            .def("AdjustHeightToText", &CUIStatic::AdjustHeightToText)
+            .def("AdjustWidthToText", &CUIStatic::AdjustWidthToText)
+            .def("SetTextOffset", &CUIStatic::SetTextOffset)
 
             .def("Init", +[](CUIStatic* self, float x, float y, float width, float height)
             {
@@ -73,6 +84,9 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
             .def("InitTexture", +[](CUIStatic* self, pcstr texture) { self->InitTexture(texture); })
             .def("InitTextureEx", &CUIStatic::InitTextureEx)
             .def("InitTextureEx", +[](CUIStatic* self, pcstr texture, pcstr shader) { self->InitTextureEx(texture, shader); })
+
+            .def("SetTextureColor", &CUIStatic::SetTextureColor)
+            .def("GetTextureColor", &CUIStatic::GetTextureColor)
 
             .def("SetTextureOffset", &CUIStatic::SetTextureOffset)
 
@@ -103,34 +117,14 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 
             //.def("GetClipperState", &CUIStatic::GetClipperState)
 
-            .def("SetElipsis", &CUIStatic::SetEllipsis),
+            .def("SetEllipsis", &CUIStatic::SetEllipsis)
+            .def("SetElipsis",  &CUIStatic::SetEllipsis)
+            .def("SetElipsis", +[](CUIStatic* self, int mode, int indent)
+            {
+                self->SetEllipsis(mode != 0);
+            }),
 
         class_<CUIStaticScript, CUIStatic>("CUIStatic")
             .def(constructor<>())
-    ];
-});
-
-SCRIPT_EXPORT(CUITextWnd, (CUIWindow),
-{
-    using namespace luabind;
-
-    module(luaState)
-    [
-        class_<CUITextWnd, CUIWindow>("CUITextWnd")
-            .def(constructor<>())
-            .def("AdjustHeightToText", &CUITextWnd::AdjustHeightToText)
-            .def("AdjustWidthToText", &CUITextWnd::AdjustWidthToText)
-            .def("SetText", &CUITextWnd::SetText)
-            .def("SetTextST", &CUITextWnd::SetTextST)
-            .def("GetText", &CUITextWnd::GetText)
-            .def("SetFont", &CUITextWnd::SetFont)
-            .def("GetFont", &CUITextWnd::GetFont)
-            .def("SetTextColor", &CUITextWnd::SetTextColor)
-            .def("GetTextColor", &CUITextWnd::GetTextColor)
-            .def("SetTextComplexMode", &CUITextWnd::SetTextComplexMode)
-            .def("SetTextAlignment", &CUITextWnd::SetTextAlignment)
-            .def("SetVTextAlignment", &CUITextWnd::SetVTextAlignment)
-            .def("SetEllipsis", &CUITextWnd::SetEllipsis)
-            .def("SetTextOffset", &CUITextWnd::SetTextOffset)
     ];
 });
