@@ -52,7 +52,10 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
             .def("SetColor", &CUIStatic::SetColor)
             .def("GetColor", &CUIStatic::GetColor)
 
-            .def("SetTextColor", &CUIStatic::SetTextColor_script)
+            .def("SetTextColor", +[](CUIStatic* self, int a, int r, int g, int b)
+            {
+                self->SetTextColor(color_argb(a, r, g, b));
+            })
 
             .def("Init", +[](CUIStatic* self, float x, float y, float width, float height)
             {
@@ -82,8 +85,15 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
             .def("SetStretchTexture", &CUIStatic::SetStretchTexture)
             .def("GetStretchTexture", &CUIStatic::GetStretchTexture)
 
-            .def("SetTextAlign", &CUIStatic::SetTextAlign_script)
-            .def("GetTextAlign", &CUIStatic::GetTextAlign_script)
+            .def("SetTextAlign", +[](CUIStatic* self, u32 align)
+            {
+                self->TextItemControl()->SetTextAlignment(static_cast<CGameFont::EAligment>(align));
+                self->TextItemControl()->GetFont()->SetAligment(static_cast<CGameFont::EAligment>(align));
+            })
+            .def("GetTextAlign", +[](CUIStatic* self) -> u32
+            {
+                return static_cast<u32>(self->TextItemControl()->GetTextAlignment());
+            })
 
             .def("SetHeading", &CUIStatic::SetHeading)
             .def("GetHeading", &CUIStatic::GetHeading)

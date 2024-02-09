@@ -54,22 +54,6 @@ public:
         TextItemControl()->SetTextColor(color);
     }
 
-    void SetTextColor_script(int a, int r, int g, int b)
-    {
-        TextItemControl()->SetTextColor(color_argb(a, r, g, b));
-    }
-
-    u32 GetTextAlign_script()
-    {
-        return static_cast<u32>(TextItemControl()->GetTextAlignment());
-    }
-
-    void SetTextAlign_script(u32 align)
-    {
-        TextItemControl()->SetTextAlignment((CGameFont::EAligment)align);
-        TextItemControl()->GetFont()->SetAligment((CGameFont::EAligment)align);
-    }
-
     virtual void SetTextX(float text_x) { TextItemControl()->m_TextOffset.x = text_x; }
     virtual void SetTextY(float text_y) { TextItemControl()->m_TextOffset.y = text_y; }
     virtual float GetTextX() { return TextItemControl()->m_TextOffset.x; }
