@@ -32,15 +32,15 @@ void CUIGameTDM::Init(int stage)
         m_pUITeamSelectWnd = xr_new<CUISpawnWnd>();
         m_team1_icon = xr_new<CUIStatic>("Team 1 icon");
         m_team2_icon = xr_new<CUIStatic>("Team 2 icon");
-        m_team1_score = xr_new<CUITextWnd>();
+        m_team1_score = xr_new<CUIStatic>("Team 1 score");
         m_team1_score->SetAutoDelete(true);
-        m_team2_score = xr_new<CUITextWnd>();
+        m_team2_score = xr_new<CUIStatic>("Team 2 score");
         m_team2_score->SetAutoDelete(true);
-        m_buy_msg_caption = xr_new<CUITextWnd>();
+        m_buy_msg_caption = xr_new<CUIStatic>("Buy message caption");
         m_buy_msg_caption->SetAutoDelete(true);
 
         inherited::Init(stage);
-        CUIXmlInit::InitTextWnd(*MsgConfig, "mp_tdm_buy", 0, m_buy_msg_caption);
+        CUIXmlInit::InitStatic(*MsgConfig, "mp_tdm_buy", 0, m_buy_msg_caption);
     }
     if (stage == 1)
     { // unique
@@ -52,9 +52,9 @@ void CUIGameTDM::Init(int stage)
         CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
         CUIXmlInit::InitStatic(uiXml, "team1_icon", 0, m_team1_icon);
         CUIXmlInit::InitStatic(uiXml, "team2_icon", 0, m_team2_icon);
-        CUIXmlInit::InitTextWnd(uiXml, "team1_score", 0, m_team1_score);
-        CUIXmlInit::InitTextWnd(uiXml, "team2_score", 0, m_team2_score);
-        CUIXmlInit::InitTextWnd(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
+        CUIXmlInit::InitStatic(uiXml, "team1_score", 0, m_team1_score);
+        CUIXmlInit::InitStatic(uiXml, "team2_score", 0, m_team2_score);
+        CUIXmlInit::InitStatic(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
 
         m_pMoneyIndicator->InitFromXML(uiXml);
         m_pRankIndicator->InitFromXml(uiXml);

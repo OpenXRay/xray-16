@@ -157,7 +157,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
         pUIBio->Clear();
         if (chInfo.Bio().size())
         {
-            CUITextWnd* pItem = xr_new<CUITextWnd>();
+            auto* pItem = xr_new<CUIStatic>("Biography");
             pItem->SetWidth(pUIBio->GetDesiredChildWidth());
             pItem->SetText(chInfo.Bio().c_str());
             pItem->AdjustHeightToText();

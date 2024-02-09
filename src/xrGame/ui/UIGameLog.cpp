@@ -19,9 +19,9 @@ CUIGameLog::CUIGameLog()
     m_pFont = NULL;
 }
 
-CUITextWnd* CUIGameLog::AddLogMessage(LPCSTR msg)
+CUIStatic* CUIGameLog::AddLogMessage(LPCSTR msg)
 {
-    CUITextWnd* pItem = NULL;
+    CUIStatic* pItem{};
     ADD_TEXT_TO_VIEW3(msg, pItem, this);
     pItem->SetFont(m_pFont);
     pItem->SetTextColor(txt_color);
@@ -57,7 +57,7 @@ void CUIGameLog::AddChatMessage(LPCSTR msg, LPCSTR author)
 
     _TrimRight(fullLine);
 
-    CUITextWnd* pItem = xr_new<CUITextWnd>();
+    auto* pItem = xr_new<CUIStatic>("Chat message");
     pItem->SetTextComplexMode(true);
     pItem->SetText(fullLine);
     pItem->SetCutWordsMode(true);

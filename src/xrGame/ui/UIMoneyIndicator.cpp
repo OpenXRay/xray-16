@@ -22,8 +22,8 @@ void CUIMoneyIndicator::InitFromXML(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "money_wnd", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "money_wnd:money_indicator", 0, &m_back);
-    CUIXmlInit::InitTextWnd(xml_doc, "money_wnd:money_indicator:total_money", 0, &m_money_amount);
-    CUIXmlInit::InitTextWnd(xml_doc, "money_wnd:money_change", 0, &m_money_change);
+    CUIXmlInit::InitStatic(xml_doc, "money_wnd:money_indicator:total_money", 0, &m_money_amount);
+    CUIXmlInit::InitStatic(xml_doc, "money_wnd:money_change", 0, &m_money_change);
     CUIXmlInit::InitScrollView(xml_doc, "money_wnd:money_bonus_list", 0, m_pBonusMoney);
     CGameFont* pF;
     u32 color;

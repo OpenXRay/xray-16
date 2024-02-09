@@ -3,7 +3,6 @@
 
 class CUIXml;
 class CUIStatic;
-class CUITextWnd;
 class UIHint;
 class CUIScrollView;
 
@@ -13,8 +12,8 @@ class CUIAchievements final : public CUIWindow
 
 private:
     CUIScrollView* m_parent{};
-    CUITextWnd* m_name{};
-    CUITextWnd* m_descr{};
+    CUIStatic* m_name{};
+    CUIStatic* m_descr{};
     CUIStatic* m_icon{};
     UIHint* m_hint{};
     string128 m_functor_str;

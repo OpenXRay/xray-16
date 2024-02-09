@@ -35,7 +35,7 @@ CUIServerInfo::CUIServerInfo()
     AttachChild(m_text_desc);
     m_text_desc->SetAutoDelete(true);
 
-    m_text_body = xr_new<CUITextWnd>();
+    m_text_body = xr_new<CUIStatic>("Text body");
     // m_text_desc->AttachChild		(m_text_body);
     // m_text_body->SetAutoDelete		(true);
 
@@ -63,7 +63,7 @@ void CUIServerInfo::Init()
     CUIXmlInit::InitScrollView(xml_doc, "server_info:text_desc", 0, m_text_desc);
     CUIXmlInit::InitStatic(xml_doc, "server_info:image", 0, m_image);
 
-    CUIXmlInit::InitTextWnd(xml_doc, "server_info:text_body", 0, m_text_body);
+    CUIXmlInit::InitStatic(xml_doc, "server_info:text_body", 0, m_text_body);
     m_text_body->SetTextComplexMode(true);
     m_text_body->SetWidth(m_text_desc->GetDesiredChildWidth());
     m_text_desc->AddWindow(m_text_body, true);

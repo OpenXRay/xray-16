@@ -5,7 +5,6 @@
 
 class CUIXml;
 class CUIStatic;
-class CUITextWnd;
 class CUIListBox;
 class CUI3tButton;
 
@@ -14,7 +13,7 @@ class CUIMpChangeMapAdm final : public CUIWindow, public CUIWndCallback
     typedef CUIWindow inherited;
     CUIStatic* map_pic;
     CUIStatic* map_frame;
-    CUITextWnd* map_version;
+    CUIStatic* map_version;
     CUIListBox* lst;
     CUI3tButton* btn_ok;
 

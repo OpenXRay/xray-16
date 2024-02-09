@@ -83,7 +83,7 @@ void CUIMpTradeWnd::UpdateMoneyIndicator()
         // update preset money
         for (u32 i = _preset_idx_last; i <= _preset_idx_3; ++i)
         {
-            CUITextWnd* st = m_static_preset_money[i];
+            auto* st = m_static_preset_money[i];
             _cost = GetPresetCost((ETradePreset)i);
             xr_sprintf(buff, "%d", _cost);
             st->SetText(buff);

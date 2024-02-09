@@ -3,7 +3,6 @@
 #include "UIDialogWnd.h"
 
 class CUIStatic;
-class CUITextWnd;
 class CUI3tButton;
 class CUIFrameWindow;
 class CUIListBox;
@@ -28,10 +27,10 @@ protected:
     void FillUpList();
 
     CUIStatic* bkgrnd;
-    CUITextWnd* header;
+    CUIStatic* header;
     CUIStatic* map_pic;
     CUIStatic* map_frame;
-    CUITextWnd* map_version;
+    CUIStatic* map_version;
     CUIFrameWindow* frame;
     CUIFrameWindow* lst_back;
     CUIListBox* lst;

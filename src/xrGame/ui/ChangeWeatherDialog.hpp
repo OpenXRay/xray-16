@@ -3,7 +3,6 @@
 #include "UIDialogWnd.h"
 
 class CUIStatic;
-class CUITextWnd;
 class CUI3tButton;
 class CUIKickPlayer;
 class CUIChangeMap;
@@ -15,10 +14,10 @@ protected:
     struct NamedButton
     {
         CUI3tButton* Button;
-        CUITextWnd* Text;
+        CUIStatic* Text;
     };
 
-    CUITextWnd* Header;
+    CUIStatic* Header;
     CUIStatic* Background;
     CUI3tButton* CancelButton;
 

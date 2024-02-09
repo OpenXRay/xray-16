@@ -47,7 +47,7 @@ void CUIDebugFonts::FillUpList()
     for (; it != it_e; ++it)
     {
         CGameFont* F = *(*it);
-        CUITextWnd* pItem = xr_new<CUITextWnd>();
+        auto* pItem = xr_new<CUIStatic>("Item");
         pItem->SetWndPos(pos);
         pItem->SetWndSize(sz);
 #ifdef DEBUG

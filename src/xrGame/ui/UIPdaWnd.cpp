@@ -81,7 +81,7 @@ void CUIPdaWnd::Init()
     UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this);
     m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this);
     m_caption_const = (m_caption->GetText());
-    m_clock = UIHelper::CreateTextWnd(uiXml, "clock_wnd", this, false);
+    m_clock = UIHelper::CreateStatic(uiXml, "clock_wnd", this, false);
 
     if (uiXml.NavigateToNode("anim_static")) // XXX: Replace with UIHelper
     {
@@ -201,8 +201,7 @@ void CUIPdaWnd::Update()
 
     if (m_clock)
     {
-        m_clock->TextItemControl().SetText(
-            GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+        m_clock->SetText(GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
     }
 
     if (pUILogsWnd)

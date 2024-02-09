@@ -21,14 +21,14 @@ void CUIPdaMsgListItem::InitPdaMsgListItem(const Fvector2& size)
     AttachChild(&UIIcon);
     CUIXmlInit::InitStatic(uiXml, "icon_static", 0, &UIIcon);
 
-    if (CUIXmlInit::InitTextWnd(uiXml, "time_static", 0, &UITimeText, false))
+    if (CUIXmlInit::InitStatic(uiXml, "time_static", 0, &UITimeText, false))
         AttachChild(&UITimeText);
 
-    if (CUIXmlInit::InitTextWnd(uiXml, "caption_static", 0, &UICaptionText, false))
+    if (CUIXmlInit::InitStatic(uiXml, "caption_static", 0, &UICaptionText, false))
         AttachChild(&UICaptionText);
 
-    if (CUIXmlInit::InitTextWnd(uiXml, "msg_static", 0, &UIMsgText, false) ||
-        CUIXmlInit::InitTextWnd(uiXml, "text_static", 0, &UIMsgText, false))
+    if (CUIXmlInit::InitStatic(uiXml, "msg_static", 0, &UIMsgText, false) ||
+        CUIXmlInit::InitStatic(uiXml, "text_static", 0, &UIMsgText, false))
     {
         AttachChild(&UIMsgText);
     }

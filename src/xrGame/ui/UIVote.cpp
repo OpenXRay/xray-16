@@ -16,13 +16,13 @@ CUIVote::CUIVote() : CUIDialogWnd(CUIVote::GetDebugType())
     bkgrnd = xr_new<CUIStatic>("Background");
     bkgrnd->SetAutoDelete(true);
     AttachChild(bkgrnd);
-    msg = xr_new<CUITextWnd>();
+    msg = xr_new<CUIStatic>("Message");
     msg->SetAutoDelete(true);
     AttachChild(msg);
 
     for (int i = 0; i < 3; i++)
     {
-        cap[i] = xr_new<CUITextWnd>();
+        cap[i] = xr_new<CUIStatic>("Caption");
         cap[i]->SetAutoDelete(true);
         AttachChild(cap[i]);
         //		frame[i]		= new CUIFrameWindow();	frame[i]->SetAutoDelete(true);	AttachChild(frame[i]);
@@ -50,14 +50,14 @@ void CUIVote::Init()
     xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "voting_category.xml");
     CUIXmlInit::InitWindow(xml_doc, "vote", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "vote:background", 0, bkgrnd);
-    CUIXmlInit::InitTextWnd(xml_doc, "vote:msg", 0, msg);
+    CUIXmlInit::InitStatic(xml_doc, "vote:msg", 0, msg);
 
     string256 path;
 
     for (int i = 0; i < 3; i++)
     {
         xr_sprintf(path, "vote:list_cap_%d", i + 1);
-        CUIXmlInit::InitTextWnd(xml_doc, path, 0, cap[i]);
+        CUIXmlInit::InitStatic(xml_doc, path, 0, cap[i]);
         //		xr_sprintf						(path, "vote:list_back_%d", i+1);
         //		CUIXmlInit::InitFrameWindow		(xml_doc, path, 0, frame[i]);
         xr_sprintf(path, "vote:list_%d", i + 1);

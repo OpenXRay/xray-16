@@ -26,7 +26,6 @@ CUISpeechMenu::CUISpeechMenu(LPCSTR section_name)
 void CUISpeechMenu::InitList(LPCSTR section_name)
 {
     R_ASSERT2(pSettings->section_exist(section_name), section_name);
-    CUITextWnd* pItem = NULL;
 
     string64 phrase;
     string256 str;
@@ -39,6 +38,7 @@ void CUISpeechMenu::InitList(LPCSTR section_name)
             _GetItem(s, 0, phrase);
             xr_sprintf(str, "%d. %s", i + 1, StringTable().translate(phrase).c_str());
 
+            CUIStatic* pItem{};
             ADD_TEXT_TO_VIEW3(str, pItem, m_pList);
             pItem->SetFont(m_pFont);
             pItem->SetTextColor(m_text_color);

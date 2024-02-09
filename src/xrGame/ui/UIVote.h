@@ -3,7 +3,6 @@
 #include "UIDialogWnd.h"
 
 class CUIStatic;
-class CUITextWnd;
 class CUI3tButton;
 class CUIListBox;
 class CUIFrameWindow;
@@ -24,8 +23,8 @@ public:
     pcstr GetDebugType() override { return "CUIVote"; }
 
 protected:
-    CUITextWnd* msg;
-    CUITextWnd* cap[3];
+    CUIStatic* msg;
+    CUIStatic* cap[3];
     CUIFrameWindow* frame[3];
     CUIListBox* list[3];
 

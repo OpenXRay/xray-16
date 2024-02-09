@@ -51,19 +51,19 @@ void CUIGameDM::Init(int stage)
         m_pMoneyIndicator->SetAutoDelete(true);
         m_pRankIndicator = xr_new<CUIRankIndicator>();
         m_pRankIndicator->SetAutoDelete(true);
-        m_pFragLimitIndicator = xr_new<CUITextWnd>();
+        m_pFragLimitIndicator = xr_new<CUIStatic>("Frag limit indicator");
         m_pFragLimitIndicator->SetAutoDelete(true);
 
         inherited::Init(stage);
-        m_time_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_timelimit", Window);
-        m_spectrmode_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_spetatormode", Window);
-        m_spectator_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_spectator", Window);
-        m_pressjump_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_pressjump", Window);
-        m_pressbuy_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_pressbuy", Window);
-        m_round_result_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_round_result", Window);
-        m_force_respawn_time_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_force_respawn_time", Window);
-        m_demo_play_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_demo_play", Window);
-        m_warm_up_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_warm_up", Window);
+        m_time_caption = UIHelper::CreateStatic(*MsgConfig, "mp_timelimit", Window);
+        m_spectrmode_caption = UIHelper::CreateStatic(*MsgConfig, "mp_spetatormode", Window);
+        m_spectator_caption = UIHelper::CreateStatic(*MsgConfig, "mp_spectator", Window);
+        m_pressjump_caption = UIHelper::CreateStatic(*MsgConfig, "mp_pressjump", Window);
+        m_pressbuy_caption = UIHelper::CreateStatic(*MsgConfig, "mp_pressbuy", Window);
+        m_round_result_caption = UIHelper::CreateStatic(*MsgConfig, "mp_round_result", Window);
+        m_force_respawn_time_caption = UIHelper::CreateStatic(*MsgConfig, "mp_force_respawn_time", Window);
+        m_demo_play_caption = UIHelper::CreateStatic(*MsgConfig, "mp_demo_play", Window);
+        m_warm_up_caption = UIHelper::CreateStatic(*MsgConfig, "mp_warm_up", Window);
     }
     if (stage == 1)
     { // unique
@@ -73,7 +73,7 @@ void CUIGameDM::Init(int stage)
         CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
         m_pMoneyIndicator->InitFromXML(uiXml);
         m_pRankIndicator->InitFromXml(uiXml);
-        CUIXmlInit::InitTextWnd(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
+        CUIXmlInit::InitStatic(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
     }
     if (stage == 2)
     { // after

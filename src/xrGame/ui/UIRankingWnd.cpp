@@ -105,15 +105,15 @@ bool CUIRankingWnd::Init()
     m_actor_ch_info->InitCharacterInfo(&xml, "actor_ch_info");
 
     m_icon_overlay = UIHelper::CreateFrameWindow(xml, "actor_icon_over", this, false);
-    m_money_caption = UIHelper::CreateTextWnd(xml, "money_caption", this);
-    m_money_value = UIHelper::CreateTextWnd(xml, "money_value", this);
+    m_money_caption = UIHelper::CreateStatic(xml, "money_caption", this);
+    m_money_value = UIHelper::CreateStatic(xml, "money_value", this);
 
     m_money_caption->AdjustWidthToText();
     pos = m_money_caption->GetWndPos();
     pos.x += m_money_caption->GetWndSize().x + 10.0f;
     m_money_value->SetWndPos(pos);
 
-    m_center_caption = UIHelper::CreateTextWnd(xml, "center_caption", this);
+    m_center_caption = UIHelper::CreateStatic(xml, "center_caption", this);
     m_faction_static = UIHelper::CreateStatic(xml, "fraction_static", this, false);
     m_faction_line1 = UIHelper::CreateFrameLine(xml, "fraction_line1", this, false);
     m_faction_line2 = UIHelper::CreateFrameLine(xml, "fraction_line2", this, false);
@@ -127,16 +127,16 @@ bool CUIRankingWnd::Init()
 
     for (u8 i = 0; i < m_stat_count; ++i)
     {
-        m_stat_caption[i] = xr_new<CUITextWnd>();
+        m_stat_caption[i] = xr_new<CUIStatic>("Caption");
         AttachChild(m_stat_caption[i]);
         m_stat_caption[i]->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(xml, "stat", i, m_stat_caption[i]);
+        CUIXmlInit::InitStatic(xml, "stat", i, m_stat_caption[i]);
         m_stat_caption[i]->AdjustWidthToText();
 
-        m_stat_info[i] = xr_new<CUITextWnd>();
+        m_stat_info[i] = xr_new<CUIStatic>("Info");
         AttachChild(m_stat_info[i]);
         m_stat_info[i]->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(xml, "stat", i, m_stat_info[i]);
+        CUIXmlInit::InitStatic(xml, "stat", i, m_stat_info[i]);
 
         m_stat_info[i]->SetTextColor(value_color);
 

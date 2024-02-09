@@ -18,7 +18,7 @@ private:
     CUIStatic m_compass{ "Compass" };
     CUIWindow m_clipFrame{ "Clip frame" };
     CUIStatic m_Counter{ "Counter" };
-    CUITextWnd m_Counter_text{};
+    CUIStatic m_Counter_text{ "Counter text" };
     CUIStatic* m_clock_wnd{};
     CUIStatic* m_pointerDistanceText{};
 
