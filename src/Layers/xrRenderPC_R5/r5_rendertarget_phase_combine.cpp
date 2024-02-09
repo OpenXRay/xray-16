@@ -24,9 +24,9 @@ void CRenderTarget::DoAsyncScreenshot()
 
         // HW.pDevice->CopyResource( t_ss_async, pTex );
         ID3DTexture2D* pBuffer = NULL;
-        hr = HW.m_pSwapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (LPVOID*)&pBuffer);
+        hr = HW.m_pSwapChain->GetBuffer(HW.GetCurrentBackBufferIndex(), __uuidof(ID3DTexture2D), (LPVOID*)&pBuffer);
         HW.get_context(CHW::IMM_CTX_ID)->CopyResource(t_ss_async, pBuffer);
-
+        SAFE_RELEASE(pBuffer);
         RImplementation.m_bMakeAsyncSS = false;
     }
 }

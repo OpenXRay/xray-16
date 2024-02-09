@@ -408,3 +408,8 @@ public:
     void dbg_addplane(Fplane& /*P0*/, u32 /*c*/) {}
 #endif
 };
+
+namespace DirectX { class ScratchImage; }
+
+HRESULT CaptureTextureInDX12(_In_ ID3D11Device* pDevice, _In_ ID3D11DeviceContext* pContext,
+    _In_ ID3D11Resource* pSource, _Out_ DirectX::ScratchImage& result);

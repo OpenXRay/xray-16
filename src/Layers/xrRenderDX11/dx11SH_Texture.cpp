@@ -383,7 +383,7 @@ void CTexture::Load()
             desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
             desc.CPUAccessFlags = D3D_CPU_ACCESS_WRITE;
             desc.MiscFlags = 0;
-            HRESULT hrr = HW.pDevice->CreateTexture2D(&desc, 0, &pTexture);
+            HRESULT hrr = HW.pDevice->CreateTexture2D(&desc, NULL, &pTexture);
 
             pSurface = pTexture;
             if (FAILED(hrr))
@@ -432,7 +432,7 @@ void CTexture::Load()
             desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
             desc.CPUAccessFlags = D3D_CPU_ACCESS_WRITE;
             desc.MiscFlags = 0;
-            HRESULT hrr = HW.pDevice->CreateTexture2D(&desc, 0, &pTexture);
+            HRESULT hrr = HW.pDevice->CreateTexture2D(&desc, NULL, &pTexture);
 
             pSurface = pTexture;
             if (FAILED(hrr))

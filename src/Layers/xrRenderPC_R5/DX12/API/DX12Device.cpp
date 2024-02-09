@@ -40,11 +40,11 @@ namespace DX12
                 debugInterface1->SetEnableSynchronizedCommandQueueValidation(true);
             }
 #endif
-
         }
 
         D3D_FEATURE_LEVEL level;
         HRESULT hr =
+            (D3D12CreateDevice(pAdapter, level = D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&pDevice12)) == S_OK) ||
             (D3D12CreateDevice(pAdapter, level = D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&pDevice12)) == S_OK) ||
             (D3D12CreateDevice(pAdapter, level = D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&pDevice12)) == S_OK) ||
             //      (D3D12CreateDevice(pAdapter, level = D3D_FEATURE_LEVEL_11_3, IID_PPV_ARGS(&pDevice12)) == S_OK) ||

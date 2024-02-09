@@ -371,7 +371,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateGeometryShaderWithStreamOutput(
     _Out_opt_  ID3D11GeometryShader** ppGeometryShader)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::CreatePixelShader(
@@ -422,7 +422,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateClassLinkage(
     _Out_  ID3D11ClassLinkage** ppLinkage)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateBlendState(
@@ -488,7 +488,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CreatePredicate(
     _Out_opt_  ID3D11Predicate** ppPredicate)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateCounter(
@@ -496,7 +496,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateCounter(
     _Out_opt_  ID3D11Counter** ppCounter)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateDeferredContext(
@@ -510,7 +510,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateDeferredContext(
         *ppDeferredContext = CCryDX12DeviceContext::Create(this, true);
         return S_OK;
     }
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::OpenSharedResource(
@@ -519,7 +519,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::OpenSharedResource(
     _Out_opt_  void** ppResource)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::CheckFormatSupport(
@@ -545,7 +545,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CheckMultisampleQualityLevels(
     _Out_  UINT* pNumQualityLevels)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 void STDMETHODCALLTYPE CCryDX12Device::CheckCounterInfo(
@@ -566,7 +566,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CheckCounter(
     _Inout_opt_  UINT* pDescriptionLength)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::CheckFeatureSupport(
@@ -659,7 +659,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::GetPrivateData(
     _Out_writes_bytes_opt_(*pDataSize)  void* pData)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::SetPrivateData(
@@ -668,7 +668,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::SetPrivateData(
     _In_reads_bytes_opt_(DataSize)  const void* pData)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::SetPrivateDataInterface(
@@ -676,7 +676,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::SetPrivateDataInterface(
     _In_opt_  const IUnknown* pData)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 D3D_FEATURE_LEVEL STDMETHODCALLTYPE CCryDX12Device::GetFeatureLevel()
@@ -694,7 +694,7 @@ UINT STDMETHODCALLTYPE CCryDX12Device::GetCreationFlags()
 HRESULT STDMETHODCALLTYPE CCryDX12Device::GetDeviceRemovedReason()
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 void STDMETHODCALLTYPE CCryDX12Device::GetImmediateContext(
@@ -712,7 +712,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::SetExceptionMode(
     UINT RaiseFlags)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 UINT STDMETHODCALLTYPE CCryDX12Device::GetExceptionMode()

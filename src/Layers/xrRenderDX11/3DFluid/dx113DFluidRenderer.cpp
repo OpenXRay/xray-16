@@ -203,6 +203,8 @@ void dx113DFluidRenderer::CreateJitterTexture()
     desc.MiscFlags = 0;
 
     D3D_SUBRESOURCE_DATA dataDesc;
+    ZeroMemory(&dataDesc, sizeof(D3D_SUBRESOURCE_DATA));
+
     dataDesc.pSysMem = data;
     dataDesc.SysMemPitch = 256;
 
@@ -259,6 +261,8 @@ void dx113DFluidRenderer::CreateHHGGTexture()
     desc.MiscFlags = 0;
 
     D3D_SUBRESOURCE_DATA dataDesc;
+    ZeroMemory(&dataDesc, sizeof(D3D_SUBRESOURCE_DATA));
+
     dataDesc.pSysMem = converted;
     dataDesc.SysMemPitch = sizeof(converted);
 

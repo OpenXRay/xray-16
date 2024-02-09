@@ -651,8 +651,7 @@ void CCryDX12DeviceContext::ResumeDirectCommandQueue()
 }
 
 void CCryDX12DeviceContext::CeaseCopyCommandQueue(bool wait)
-{
-    
+{  
     R_ASSERT2(m_CopyCommandList != nullptr, "CommandList hasn't been allocated!");
 
     m_CopyCommandList->End();
@@ -660,8 +659,7 @@ void CCryDX12DeviceContext::CeaseCopyCommandQueue(bool wait)
 }
 
 void CCryDX12DeviceContext::ResumeCopyCommandQueue()
-{
-    
+{  
     R_ASSERT2(m_CopyCommandList == nullptr, "CommandList hasn't been submitted!");
     m_CopyListPool.AcquireCommandList(m_CopyCommandList);
 
@@ -669,15 +667,13 @@ void CCryDX12DeviceContext::ResumeCopyCommandQueue()
 }
 
 void CCryDX12DeviceContext::CeaseAllCommandQueues(bool wait)
-{
-    
+{  
     CeaseDirectCommandQueue(wait);
     CeaseCopyCommandQueue(wait);
 }
 
 void CCryDX12DeviceContext::ResumeAllCommandQueues()
-{
-    
+{  
     ResumeDirectCommandQueue();
     ResumeCopyCommandQueue();
 }
@@ -685,8 +681,7 @@ void CCryDX12DeviceContext::ResumeAllCommandQueues()
 void CCryDX12DeviceContext::SubmitDirectCommands(bool wait)
 {
     if (m_DirectCommandList->IsUtilized())
-    {
-        
+    {     
         CeaseDirectCommandQueue(wait);
         ResumeDirectCommandQueue();
     }
@@ -695,8 +690,7 @@ void CCryDX12DeviceContext::SubmitDirectCommands(bool wait)
 void CCryDX12DeviceContext::SubmitCopyCommands(bool wait)
 {
     if (m_CopyCommandList->IsUtilized())
-    {
-        
+    {      
         CeaseCopyCommandQueue(wait);
         ResumeCopyCommandQueue();
     }
@@ -767,8 +761,7 @@ void CCryDX12DeviceContext::SubmitAllCommands(bool wait, const std::atomic<u64>(
 }
 
 void CCryDX12DeviceContext::Finish(DX12::SwapChain* pDX12SwapChain)
-{
-    
+{ 
     m_DirectCommandList->PresentRenderTargetView(pDX12SwapChain);
 
     SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC, m_CmdFenceSet.GetCurrentValues());
@@ -924,7 +917,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12DeviceContext::GetPrivateData(
     _Out_writes_bytes_opt_(*pDataSize)  void* pData)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12DeviceContext::SetPrivateData(
@@ -933,7 +926,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12DeviceContext::SetPrivateData(
     _In_reads_bytes_opt_(DataSize)  const void* pData)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12DeviceContext::SetPrivateDataInterface(
@@ -941,7 +934,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12DeviceContext::SetPrivateDataInterface(
     _In_opt_  const IUnknown* pData)
 {
     DX12_FUNC_LOG
-    return -1;
+    return E_NOTIMPL;
 }
 
 #pragma endregion

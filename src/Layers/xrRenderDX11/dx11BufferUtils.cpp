@@ -29,6 +29,8 @@ static HRESULT CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, u32 dataSi
     desc.MiscFlags      = 0;
 
     D3D_SUBRESOURCE_DATA subData;
+    ZeroMemory(&subData, sizeof(D3D_SUBRESOURCE_DATA));
+
     subData.pSysMem = pData;
 
     HRESULT res = HW.pDevice->CreateBuffer(

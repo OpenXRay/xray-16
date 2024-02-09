@@ -34,6 +34,9 @@ void CHW::OnAppActivate()
         ShowWindow(m_ChainDesc.OutputWindow, SW_RESTORE);
         m_pSwapChain->SetFullscreenState(
             ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle == rsFullscreen : false, NULL);
+#if defined(USE_DX12)
+        m_pSwapChain->ResizeTarget(&m_ChainDesc.BufferDesc);
+#endif
     }
 }
 
@@ -356,9 +359,9 @@ bool CHW::CreateSwapChain(HWND hwnd)
 #endif 
 
 #if defined(USE_DX12)
-    m_pSwapChain->SetMaximumFrameLatency(1);
-    if (ThisInstanceIsGlobal())
-        Device.PresentationFinished = m_pSwapChain->GetFrameLatencyWaitableObject();
+    m_pSwapChain->SetMaximumFrameLatency(BackBufferCount);
+    //if (ThisInstanceIsGlobal())
+    //    Device.PresentationFinished = m_pSwapChain->GetFrameLatencyWaitableObject();
 #endif
 
     return SUCCEEDED(hr);
