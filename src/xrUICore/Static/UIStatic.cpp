@@ -106,9 +106,8 @@ void CUIStatic::DrawTexture()
             {
                 if (m_UIStaticItem.GetFixedLTWhileHeading())
                 {
-                    float t1, t2;
-                    t1 = rect.width();
-                    t2 = rect.height();
+                    const float t1 = rect.width();
+                    const float t2 = rect.height();
                     rect.y2 = rect.y1 + t1;
                     rect.x2 = rect.x1 + t2;
                 }
@@ -117,20 +116,17 @@ void CUIStatic::DrawTexture()
         }
         else
         {
-            Frect r = {0.0f, 0.0f, m_UIStaticItem.GetTextureRect().width(), m_UIStaticItem.GetTextureRect().height()};
+            const Frect r = { 0.0f, 0.0f, m_UIStaticItem.GetTextureRect().width(), m_UIStaticItem.GetTextureRect().height() };
 
+            if (Heading())
             {
-                if (Heading())
-                {
-                    float t1, t2;
-                    t1 = rect.width();
-                    t2 = rect.height();
-                    rect.y2 = rect.y1 + t1;
-                    rect.x2 = rect.x1 + t2;
-                }
-
-                m_UIStaticItem.SetSize(Fvector2().set(r.width(), r.height()));
+                const float t1 = rect.width();
+                const float t2 = rect.height();
+                rect.y2 = rect.y1 + t1;
+                rect.x2 = rect.x1 + t2;
             }
+
+            m_UIStaticItem.SetSize(Fvector2().set(r.width(), r.height()));
         }
 
         if (Heading())
