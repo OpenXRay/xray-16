@@ -10,6 +10,7 @@
 CUICheckButton::CUICheckButton()
 {
     TextItemControl()->SetTextAlignment(CGameFont::alLeft);
+    SetButtonAsSwitch(true);
     m_pDependControl = NULL;
 }
 
@@ -59,14 +60,6 @@ void CUICheckButton::InitTexture2(LPCSTR texture_name)
     CUI3tButton::InitTexture(texture_name); // "ui_checker"
     Frect r = m_background->Get(S_Enabled)->GetStaticItem()->GetTextureRect();
     TextItemControl()->m_TextOffset.x = TextItemControl()->m_TextOffset.x + r.width();
-}
-
-void CUICheckButton::OnFocusLost()
-{
-    if (m_eButtonState == BUTTON_PUSHED && pInput->iGetAsyncKeyState(MOUSE_1))
-        return;
-
-    inherited::OnFocusLost();
 }
 
 void CUICheckButton::OnFocusReceive() { inherited::OnFocusReceive(); }

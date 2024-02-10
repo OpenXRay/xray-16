@@ -23,7 +23,6 @@ public:
     virtual bool IsChangedOptValue() const; // backup!=current
 
     virtual void OnFocusReceive();
-    virtual void OnFocusLost();
     virtual void Show(bool status);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual bool OnMouseDown(int mouse_btn);
