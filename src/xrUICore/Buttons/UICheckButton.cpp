@@ -14,7 +14,6 @@ CUICheckButton::CUICheckButton()
     m_pDependControl = NULL;
 }
 
-CUICheckButton::~CUICheckButton() {}
 void CUICheckButton::SetDependControl(CUIWindow* pWnd) { m_pDependControl = pWnd; }
 void CUICheckButton::Update()
 {
@@ -62,8 +61,6 @@ void CUICheckButton::InitTexture2(LPCSTR texture_name)
     TextItemControl()->m_TextOffset.x = TextItemControl()->m_TextOffset.x + r.width();
 }
 
-void CUICheckButton::OnFocusReceive() { inherited::OnFocusReceive(); }
-void CUICheckButton::Show(bool status) { inherited::Show(status); }
 bool CUICheckButton::OnMouseDown(int mouse_btn)
 {
     if (mouse_btn == MOUSE_1)

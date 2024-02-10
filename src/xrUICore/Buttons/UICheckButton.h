@@ -11,7 +11,6 @@ class XRUICORE_API CUICheckButton final : public CUI3tButton, public CUIOptionsI
 
 public:
     CUICheckButton();
-    virtual ~CUICheckButton();
 
     virtual void Update();
 
@@ -22,8 +21,6 @@ public:
     virtual void UndoOptValue(); // backup->current
     virtual bool IsChangedOptValue() const; // backup!=current
 
-    virtual void OnFocusReceive();
-    virtual void Show(bool status);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual bool OnMouseDown(int mouse_btn);
 
