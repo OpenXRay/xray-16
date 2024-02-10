@@ -44,10 +44,11 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 
             .def("GetText", &CUIStatic::GetText)
 
-            .def("SetTextX", &CUIStatic::SetTextX)
-            .def("SetTextY", &CUIStatic::SetTextY)
-            .def("GetTextX", &CUIStatic::GetTextX)
-            .def("GetTextY", &CUIStatic::GetTextY)
+            .def("SetTextOffset", &CUIStatic::SetTextOffset)
+            .def("SetTextX", +[](CUIStatic* self, float x) { self->TextItemControl()->m_TextOffset.x = x; })
+            .def("SetTextY", +[](CUIStatic* self, float y) { self->TextItemControl()->m_TextOffset.y = y; })
+            .def("GetTextX", +[](CUIStatic* self) { return self->TextItemControl()->m_TextOffset.x; })
+            .def("GetTextY", +[](CUIStatic* self) { return self->TextItemControl()->m_TextOffset.y; })
 
             .def("SetColor", &CUIStatic::SetColor)
             .def("GetColor", &CUIStatic::GetColor)
@@ -66,7 +67,6 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
 
             .def("AdjustHeightToText", &CUIStatic::AdjustHeightToText)
             .def("AdjustWidthToText", &CUIStatic::AdjustWidthToText)
-            .def("SetTextOffset", &CUIStatic::SetTextOffset)
 
             .def("Init", +[](CUIStatic* self, float x, float y, float width, float height)
             {

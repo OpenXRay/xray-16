@@ -60,11 +60,6 @@ public:
         TextItemControl()->m_TextOffset.y = y;
     }
 
-    virtual void SetTextX(float text_x) { TextItemControl()->m_TextOffset.x = text_x; }
-    virtual void SetTextY(float text_y) { TextItemControl()->m_TextOffset.y = text_y; }
-    virtual float GetTextX() { return TextItemControl()->m_TextOffset.x; }
-    virtual float GetTextY() { return TextItemControl()->m_TextOffset.y; }
-
     virtual void SetColor(u32 color) { m_UIStaticItem.SetColor(color); }
     virtual u32 GetColor() const { return m_UIStaticItem.GetColor(); }
 

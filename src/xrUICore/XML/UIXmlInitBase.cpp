@@ -307,10 +307,10 @@ bool CUIXmlInitBase::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUILines*
     pLines->SetTextComplexMode(xml_doc.ReadAttribInt(path, index, "complex_mode", 0) ? true : false);
 
     // Text coordinates
-    float text_x = xml_doc.ReadAttribFlt(path, index, "x", 0);
-    float text_y = xml_doc.ReadAttribFlt(path, index, "y", 0);
+    const float text_x = xml_doc.ReadAttribFlt(path, index, "x", 0.0f);
+    const float text_y = xml_doc.ReadAttribFlt(path, index, "y", 0.0f);
 
-    pLines->m_TextOffset.set(text_x, text_y);
+    pLines->m_TextOffset.add({ text_x, text_y });
 
     shared_str text = xml_doc.Read(path, index, NULL);
     if (text.size())
