@@ -85,10 +85,10 @@ void CUIPdaWnd::Init()
 
     if (uiXml.NavigateToNode("anim_static")) // XXX: Replace with UIHelper
     {
-        m_anim_static = xr_new<CUIAnimatedStatic>();
-        AttachChild(m_anim_static);
-        m_anim_static->SetAutoDelete(true);
-        CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, m_anim_static);
+        auto* anim_static = xr_new<CUIAnimatedStatic>();
+        AttachChild(anim_static);
+        anim_static->SetAutoDelete(true);
+        CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, anim_static);
     }
 
     m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
