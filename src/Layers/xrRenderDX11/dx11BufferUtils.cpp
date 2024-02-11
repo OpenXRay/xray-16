@@ -22,11 +22,23 @@ static HRESULT CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, u32 dataSi
     bool bDynamic, D3D_BIND_FLAG bufferType)
 {
     D3D_BUFFER_DESC desc;
+    ZeroMemory(&desc, sizeof(D3D_BUFFER_DESC));
+
     desc.ByteWidth      = dataSize;
     desc.Usage          = bDynamic ? D3D_USAGE_DYNAMIC : D3D_USAGE_DEFAULT;
-    desc.BindFlags      = bufferType;
+   
+    if (bufferType != D3D11_USAGE_STAGING)
+    {
+        desc.BindFlags = bufferType;
+    }
+   
     desc.CPUAccessFlags = bDynamic ? D3D_CPU_ACCESS_WRITE : 0;
     desc.MiscFlags      = 0;
+
+    if (bufferType & D3D11_BIND_UNORDERED_ACCESS)
+    {
+        desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    }
 
     D3D_SUBRESOURCE_DATA subData;
     ZeroMemory(&subData, sizeof(D3D_SUBRESOURCE_DATA));

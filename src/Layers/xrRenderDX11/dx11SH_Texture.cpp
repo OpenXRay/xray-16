@@ -61,7 +61,8 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
         pSurface->GetType(&type);
         if (D3D_RESOURCE_DIMENSION_TEXTURE2D == type)
         {
-            D3D_SHADER_RESOURCE_VIEW_DESC ViewDesc{};
+            D3D_SHADER_RESOURCE_VIEW_DESC ViewDesc;
+            ZeroMemory(&ViewDesc, sizeof(D3D_SHADER_RESOURCE_VIEW_DESC));
 
             if (desc.MiscFlags & D3D_RESOURCE_MISC_TEXTURECUBE)
             {
@@ -372,6 +373,8 @@ void CTexture::Load()
             //			HRESULT hrr = HW.pDevice->CreateTexture(
             //				_w, _h, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture, NULL );
             D3D_TEXTURE2D_DESC desc;
+            ZeroMemory(&desc, sizeof(D3D_TEXTURE2D_DESC));
+
             desc.Width = _w;
             desc.Height = _h;
             desc.MipLevels = 1;
@@ -391,7 +394,7 @@ void CTexture::Load()
                 FATAL("Invalid video stream");
                 R_CHK(hrr);
                 xr_delete(pTheora);
-                pSurface = 0;
+                pSurface = NULL;
                 m_pSRView = 0;
             }
             else
@@ -421,6 +424,8 @@ void CTexture::Load()
             //	&pTexture,NULL
             //	);
             D3D_TEXTURE2D_DESC desc;
+            ZeroMemory(&desc, sizeof(D3D_TEXTURE2D_DESC));
+
             desc.Width = pAVI->m_dwWidth;
             desc.Height = pAVI->m_dwHeight;
             desc.MipLevels = 1;
@@ -440,12 +445,12 @@ void CTexture::Load()
                 FATAL("Invalid video stream");
                 R_CHK(hrr);
                 xr_delete(pAVI);
-                pSurface = 0;
-                m_pSRView = 0;
+                pSurface = NULL;
+                m_pSRView = NULL;
             }
             else
             {
-                CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, 0, &m_pSRView));
+                CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
             }
         }
     }
@@ -484,7 +489,7 @@ void CTexture::Load()
                 }
             }
         }
-        pSurface = 0;
+        pSurface = NULL;
         FS.r_close(_fs);
     }
     else
@@ -514,6 +519,10 @@ void CTexture::Load()
 
 void CTexture::Unload()
 {
+#if defined(USE_DX12)
+    _RELEASE(m_pSRView);
+#endif
+
 #ifdef DEBUG
     string_path msg_buff;
     xr_sprintf(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface RefCount =", cName.c_str());
@@ -532,7 +541,7 @@ void CTexture::Unload()
         }
         seqDATA.clear();
         m_seqSRView.clear();
-        pSurface = 0;
+        pSurface = NULL;
     }
 
     _RELEASE(pSurface);
@@ -541,7 +550,6 @@ void CTexture::Unload()
     {
         _RELEASE(srv);
     }
-
 
     xr_delete(pAVI);
     xr_delete(pTheora);

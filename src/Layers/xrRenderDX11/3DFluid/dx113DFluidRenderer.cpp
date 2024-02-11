@@ -189,6 +189,8 @@ void dx113DFluidRenderer::CreateJitterTexture()
     }
 
     D3D_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(D3D_TEXTURE2D_DESC));
+
     desc.Width = 256;
     desc.Height = 256;
     desc.MipLevels = 1;
@@ -251,6 +253,8 @@ void dx113DFluidRenderer::CreateHHGGTexture()
     PackedVector::XMConvertFloatToHalfStream(converted, sizeof(PackedVector::HALF), data, sizeof(float), std::size(data));
 
     D3D_TEXTURE1D_DESC desc;
+    ZeroMemory(&desc, sizeof(D3D_TEXTURE1D_DESC));
+
     desc.Width = iNumSamples;
     desc.MipLevels = 1;
     desc.ArraySize = 1;

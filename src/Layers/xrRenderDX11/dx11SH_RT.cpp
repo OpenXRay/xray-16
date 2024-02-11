@@ -106,7 +106,9 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     RImplementation.Resources->Evict();
 
     // Create the render target texture
-    D3D_TEXTURE2D_DESC desc{};
+    D3D_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(D3D_TEXTURE2D_DESC));
+
     if (pSurface)
         pSurface->GetDesc(&desc);
     else
@@ -165,7 +167,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     // OK
     if (useAsDepth)
     {
-        D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc{};
+        D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc;
+        ZeroMemory(&ViewDesc, sizeof(D3D_DEPTH_STENCIL_VIEW_DESC));
 
         if (SampleCount <= 1)
         {

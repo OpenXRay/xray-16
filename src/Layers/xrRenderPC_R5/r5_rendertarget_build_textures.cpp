@@ -651,6 +651,8 @@ void CRenderTarget::build_textures()
     // Texture for async sreenshots
     {
         D3D_TEXTURE2D_DESC desc;
+        ZeroMemory(&desc, sizeof(D3D_TEXTURE2D_DESC));
+
         desc.Width = Device.dwWidth;
         desc.Height = Device.dwHeight;
         desc.MipLevels = 1;
@@ -676,6 +678,8 @@ void CRenderTarget::build_textures()
         u16 tempData[TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count] = {};
 
         D3D_TEXTURE3D_DESC desc;
+        ZeroMemory(&desc, sizeof(D3D_TEXTURE3D_DESC));
+
         desc.Width = TEX_material_LdotN;
         desc.Height = TEX_material_LdotH;
         desc.Depth = TEX_material_Count;
@@ -762,6 +766,8 @@ void CRenderTarget::build_textures()
         static const int sampleSize = 4;
 
         D3D_TEXTURE2D_DESC desc;
+        ZeroMemory(&desc, sizeof(D3D_TEXTURE2D_DESC));
+
         desc.Width = TEX_jitter;
         desc.Height = TEX_jitter;
         desc.MipLevels = 1;
@@ -823,6 +829,8 @@ void CRenderTarget::build_textures()
 
         // generate HBAO jitter texture (last)
         D3D_TEXTURE2D_DESC descHBAO;
+        ZeroMemory(&descHBAO, sizeof(D3D_TEXTURE2D_DESC));
+
         descHBAO.Width = TEX_jitter;
         descHBAO.Height = TEX_jitter;
         descHBAO.MipLevels = 1;
