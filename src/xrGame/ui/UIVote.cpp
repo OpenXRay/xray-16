@@ -5,6 +5,7 @@
 #include "xrUICore/ListBox/UIListBox.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
 #include "UIXmlInit.h"
+#include "UIHelper.h"
 #include "Level.h"
 #include "game_cl_base.h"
 #include "game_cl_teamdeathmatch.h"
@@ -12,61 +13,30 @@
 
 CUIVote::CUIVote() : CUIDialogWnd(CUIVote::GetDebugType())
 {
-    m_prev_upd_time = 0;
-    bkgrnd = xr_new<CUIStatic>("Background");
-    bkgrnd->SetAutoDelete(true);
-    AttachChild(bkgrnd);
-    msg = xr_new<CUIStatic>("Message");
-    msg->SetAutoDelete(true);
-    AttachChild(msg);
-
-    for (int i = 0; i < 3; i++)
-    {
-        cap[i] = xr_new<CUIStatic>("Caption");
-        cap[i]->SetAutoDelete(true);
-        AttachChild(cap[i]);
-        //		frame[i]		= new CUIFrameWindow();	frame[i]->SetAutoDelete(true);	AttachChild(frame[i]);
-        list[i] = xr_new<CUIListBox>();
-        list[i]->SetAutoDelete(true);
-        AttachChild(list[i]);
-    }
-
-    btn_yes = xr_new<CUI3tButton>();
-    btn_yes->SetAutoDelete(true);
-    AttachChild(btn_yes);
-    btn_no = xr_new<CUI3tButton>();
-    btn_no->SetAutoDelete(true);
-    AttachChild(btn_no);
-    btn_cancel = xr_new<CUI3tButton>();
-    btn_cancel->SetAutoDelete(true);
-    AttachChild(btn_cancel);
-
-    Init();
-}
-
-void CUIVote::Init()
-{
     CUIXml xml_doc;
     xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "voting_category.xml");
+
     CUIXmlInit::InitWindow(xml_doc, "vote", 0, this);
-    CUIXmlInit::InitStatic(xml_doc, "vote:background", 0, bkgrnd);
-    CUIXmlInit::InitStatic(xml_doc, "vote:msg", 0, msg);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "vote:background", this);
+    msg         = UIHelper::CreateStatic(xml_doc, "vote:msg", this);
 
     string256 path;
 
     for (int i = 0; i < 3; i++)
     {
         xr_sprintf(path, "vote:list_cap_%d", i + 1);
-        CUIXmlInit::InitStatic(xml_doc, path, 0, cap[i]);
-        //		xr_sprintf						(path, "vote:list_back_%d", i+1);
-        //		CUIXmlInit::InitFrameWindow		(xml_doc, path, 0, frame[i]);
+        std::ignore = UIHelper::CreateStatic(xml_doc, path, this);
+
+        //xr_sprintf(path, "vote:list_back_%d", i + 1);
+        //std::ignore = UIHelper::CreateFrameWindow(xml_doc, path, this);
+
         xr_sprintf(path, "vote:list_%d", i + 1);
-        CUIXmlInit::InitListBox(xml_doc, path, 0, list[i]);
+        list[i] = UIHelper::CreateListBox(xml_doc, path, this);
     }
 
-    CUIXmlInit::Init3tButton(xml_doc, "vote:btn_yes", 0, btn_yes);
-    CUIXmlInit::Init3tButton(xml_doc, "vote:btn_no", 0, btn_no);
-    CUIXmlInit::Init3tButton(xml_doc, "vote:btn_cancel", 0, btn_cancel);
+    btn_yes    = UIHelper::Create3tButton(xml_doc, "vote:btn_yes", this);
+    btn_no     = UIHelper::Create3tButton(xml_doc, "vote:btn_no", this);
+    btn_cancel = UIHelper::Create3tButton(xml_doc, "vote:btn_cancel", this);
 }
 
 void CUIVote::SetVoting(LPCSTR txt) { msg->SetText(txt); }

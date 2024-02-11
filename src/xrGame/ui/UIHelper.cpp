@@ -241,6 +241,25 @@ CUICheckButton* UIHelper::CreateCheck(CUIXml& xml, LPCSTR ui_path, CUIWindow* pa
     return ui;
 }
 
+CUIListBox* UIHelper::CreateListBox(CUIXml& xml, pcstr ui_path, CUIWindow* parent, bool critical)
+{
+    // If it's not critical element, then don't crash if it doesn't exist
+    if (!critical && !xml.NavigateToNode(ui_path, 0))
+        return nullptr;
+
+    auto ui = xr_new<CUIListBox>();
+    if (!CUIXmlInit::InitListBox(xml, ui_path, 0, ui, critical) && !critical)
+    {
+        xr_delete(ui);
+    }
+    if (ui && parent)
+    {
+        parent->AttachChild(ui);
+        ui->SetAutoDelete(true);
+    }
+    return ui;
+}
+
 UIHint* UIHelper::CreateHint(CUIXml& xml, LPCSTR ui_path /*, CUIWindow* parent*/, bool critical)
 {
     // If it's not critical element, then don't crash if it doesn't exist
