@@ -18,6 +18,7 @@ CUIVote::CUIVote() : CUIDialogWnd(CUIVote::GetDebugType())
 
     CUIXmlInit::InitWindow(xml_doc, "vote", 0, this);
     std::ignore = UIHelper::CreateStatic(xml_doc, "vote:background", this);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "vote:msg_back", this, false);
     msg         = UIHelper::CreateStatic(xml_doc, "vote:msg", this);
 
     string256 path;
@@ -27,8 +28,8 @@ CUIVote::CUIVote() : CUIDialogWnd(CUIVote::GetDebugType())
         xr_sprintf(path, "vote:list_cap_%d", i + 1);
         std::ignore = UIHelper::CreateStatic(xml_doc, path, this);
 
-        //xr_sprintf(path, "vote:list_back_%d", i + 1);
-        //std::ignore = UIHelper::CreateFrameWindow(xml_doc, path, this);
+        xr_sprintf(path, "vote:list_back_%d", i + 1);
+        std::ignore = UIHelper::CreateFrameWindow(xml_doc, path, this, false);
 
         xr_sprintf(path, "vote:list_%d", i + 1);
         list[i] = UIHelper::CreateListBox(xml_doc, path, this);
