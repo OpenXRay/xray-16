@@ -233,19 +233,3 @@ jobs:
         shutdown_vm: false
         sync_files: false
         run: cmake --build build --config ${{ matrix.Configuration }} --parallel 4
-
-    - name: Finalize
-      uses: cross-platform-actions/action@v0.22.0
-      with:
-        operating_system: ${{ matrix.platform.os }}
-        architecture: ${{ matrix.platform.arch }}
-        version: ${{ matrix.platform.os-version }}
-        cpu_count: 4
-        memory: 8G
-        environment_variables: CFLAGS CXXFLAGS
-        shutdown_vm: false
-        # sync back is disabled due to:
-        # 1) VM stalls during the process
-        # 2) we don't output artifacts anyway
-        sync_files: false #vm-to-runner
-        run: rm -rf build # reduce amount of files to copy back from VM
