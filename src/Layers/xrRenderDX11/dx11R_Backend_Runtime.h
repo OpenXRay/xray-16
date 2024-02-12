@@ -534,7 +534,7 @@ IC void CBackend::ApplyVertexLayout()
 
     if (it == decl->vs_to_layout.end())
     {
-        ID3DInputLayout* pLayout;
+        ID3DInputLayout* pLayout = NULL;
 
         CHK_DX(HW.pDevice->CreateInputLayout(&decl->dx11_dcl_code[0], decl->dx11_dcl_code.size() - 1,
             m_pInputSignature->GetBufferPointer(), m_pInputSignature->GetBufferSize(), &pLayout));
@@ -677,7 +677,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
                 VERIFY("Invalid enumeration");
         }
 
-        ID3DBuffer* tempBuffer[MaxCBuffers];
+        ID3DBuffer* tempBuffer[MaxCBuffers] = {};
 
         u32 uiMin;
         u32 uiMax;
@@ -812,8 +812,10 @@ ICF void CBackend::ApplyRTandZB()
 {
     if (m_bChangedRTorZB)
     {
+        unsigned int numView = 0;
+        for (auto i = 0; i < (sizeof(pRT) / sizeof(pRT[0])); i++) if (pRT[i]) numView++; 
         m_bChangedRTorZB = false;
-        HW.get_context(context_id)->OMSetRenderTargets(sizeof(pRT) / sizeof(pRT[0]), pRT, pZB);
+        HW.get_context(context_id)->OMSetRenderTargets(numView, pRT, pZB);
     }
 }
 
