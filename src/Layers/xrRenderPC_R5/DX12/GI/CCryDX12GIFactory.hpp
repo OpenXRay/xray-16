@@ -68,29 +68,29 @@ public:
 
     virtual HRESULT STDMETHODCALLTYPE CreateSwapChainForHwnd(
         /* [annotation][in] */
-        _In_  IUnknown* pDevice,
+        _In_ IUnknown* pDevice,
         /* [annotation][in] */
-        _In_  HWND hWnd,
+        _In_ HWND hWnd,
         /* [annotation][in] */
-        _In_  const DXGI_SWAP_CHAIN_DESC1* pDesc,
+        _In_ const DXGI_SWAP_CHAIN_DESC1* pDesc,
         /* [annotation][in] */
-        _In_opt_  const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc,
+        _In_opt_ const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc,
         /* [annotation][in] */
-        _In_opt_  IDXGIOutput* pRestrictToOutput,
+        _In_opt_ IDXGIOutput* pRestrictToOutput,
         /* [annotation][out] */
-        _COM_Outptr_  IDXGISwapChain1** ppSwapChain) final { abort(); return S_OK; }
+        _COM_Outptr_ IDXGISwapChain1** ppSwapChain) final;
 
     virtual HRESULT STDMETHODCALLTYPE CreateSwapChainForCoreWindow(
         /* [annotation][in] */
-        _In_  IUnknown* pDevice,
+        _In_ IUnknown* pDevice,
         /* [annotation][in] */
-        _In_  IUnknown* pWindow,
+        _In_ IUnknown* pWindow,
         /* [annotation][in] */
-        _In_  const DXGI_SWAP_CHAIN_DESC1* pDesc,
+        _In_ const DXGI_SWAP_CHAIN_DESC1* pDesc,
         /* [annotation][in] */
-        _In_opt_  IDXGIOutput* pRestrictToOutput,
+        _In_opt_ IDXGIOutput* pRestrictToOutput,
         /* [annotation][out] */
-        _COM_Outptr_  IDXGISwapChain1** ppSwapChain) final { abort(); return S_OK; }
+        _COM_Outptr_ IDXGISwapChain1** ppSwapChain) final;
 
     virtual HRESULT STDMETHODCALLTYPE GetSharedResourceAdapterLuid(
         /* [annotation] */

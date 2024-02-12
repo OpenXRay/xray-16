@@ -88,3 +88,22 @@ BOOL STDMETHODCALLTYPE CCryDX12GIFactory::IsCurrent()
     DX12_FUNC_LOG
     return m_pDXGIFactory4->IsCurrent();
 }
+
+#pragma region /* IDXGIFactory2 implementation */
+
+HRESULT STDMETHODCALLTYPE CCryDX12GIFactory::CreateSwapChainForHwnd(IUnknown* pDevice, HWND hWnd,
+    const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc,
+    IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain)
+{
+    DX12_FUNC_LOG
+    *ppSwapChain = CCryDX12SwapChain::Create(static_cast<CCryDX12Device*>(pDevice), m_pDXGIFactory4, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput);
+    return ppSwapChain ? S_OK : E_FAIL;
+}
+
+HRESULT STDMETHODCALLTYPE CCryDX12GIFactory::CreateSwapChainForCoreWindow(IUnknown* pDevice, IUnknown* pWindow,
+    const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain)
+{
+    DX12_FUNC_LOG
+    *ppSwapChain = CCryDX12SwapChain::Create(static_cast<CCryDX12Device*>(pDevice), m_pDXGIFactory4, pWindow, pDesc, pRestrictToOutput);
+    return ppSwapChain ? S_OK : E_FAIL;
+}

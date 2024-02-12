@@ -26,7 +26,10 @@ namespace DX12
     class SwapChain : public ReferenceCounted
     {
     public:
+       
         static SwapChain* Create(CommandList* pDevice, IDXGIFactory4* factory, DXGI_SWAP_CHAIN_DESC* pDesc);
+        static SwapChain* Create(CommandList* pDevice, IDXGIFactory4* factory, HWND hWnd, const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput);
+        static SwapChain* Create(CommandList* pDevice, IDXGIFactory4* factory, IUnknown* pWindow, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput);
 
     protected:
         SwapChain(CommandList* pDevice, IDXGISwapChain3* dxgiSwapChain, DXGI_SWAP_CHAIN_DESC* pDesc);

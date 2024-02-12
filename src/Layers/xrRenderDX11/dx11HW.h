@@ -46,9 +46,13 @@ public:
 
 private:
     bool CreateSwapChain(HWND hwnd);
+
 #if defined(USE_DX11)
-    bool CreateSwapChain2(HWND hwnd);
+    bool CreateSwapChainOnDX11_2(HWND hwnd);
+#else
+    bool CreateSwapChainOnDX12(HWND hwnd);
 #endif
+
     bool ThisInstanceIsGlobal() const;
 
 public:

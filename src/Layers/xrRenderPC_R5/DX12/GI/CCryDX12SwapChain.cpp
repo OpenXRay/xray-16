@@ -30,10 +30,29 @@
 #pragma comment(lib, "dwmapi.lib")
 #endif
 
-CCryDX12SwapChain* CCryDX12SwapChain::Create(CCryDX12Device* device, IDXGIFactory4* factory, DXGI_SWAP_CHAIN_DESC* pDesc)
+CCryDX12SwapChain* CCryDX12SwapChain::Create(
+    CCryDX12Device* device, IDXGIFactory4* factory, DXGI_SWAP_CHAIN_DESC* pDesc)
 {
     CCryDX12DeviceContext* deviceContext = device->GetDeviceContext();
     DX12::SwapChain* swapChain = DX12::SwapChain::Create(deviceContext->GetCoreGraphicsCommandList(), factory, pDesc);
+
+    return DX12::PassAddRef(new CCryDX12SwapChain(device, swapChain));
+}
+
+CCryDX12SwapChain* CCryDX12SwapChain::Create(
+    CCryDX12Device* device, IDXGIFactory4* factory, HWND hWnd, const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput)
+{
+    CCryDX12DeviceContext* deviceContext = device->GetDeviceContext();
+    DX12::SwapChain* swapChain = DX12::SwapChain::Create(deviceContext->GetCoreGraphicsCommandList(), factory, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput);
+
+    return DX12::PassAddRef(new CCryDX12SwapChain(device, swapChain));
+}
+
+CCryDX12SwapChain* CCryDX12SwapChain::Create(
+    CCryDX12Device* device, IDXGIFactory4* factory, IUnknown* pWindow, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput)
+{
+    CCryDX12DeviceContext* deviceContext = device->GetDeviceContext();
+    DX12::SwapChain* swapChain = DX12::SwapChain::Create(deviceContext->GetCoreGraphicsCommandList(), factory, pWindow, pDesc, pRestrictToOutput);
 
     return DX12::PassAddRef(new CCryDX12SwapChain(device, swapChain));
 }

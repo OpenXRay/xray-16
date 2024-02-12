@@ -86,6 +86,8 @@ void CHW::CreateD3D()
     Valid = m_pAdapter;
 }
 
+#include <dxgidebug.h>
+
 void CHW::DestroyD3D()
 {
     _SHOW_REF("refCount:m_pAdapter", m_pAdapter);
@@ -264,10 +266,13 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     const HWND hwnd = info.info.win.window;
 
 #if defined(USE_DX12)
-    if (!CreateSwapChain(hwnd))
-        Valid = false;
+    if (!CreateSwapChainOnDX12(hwnd))
+    {
+        if (!CreateSwapChain(hwnd))
+            Valid = false;
+    }
 #else
-    if (!CreateSwapChain2(hwnd))
+    if (!CreateSwapChainOnDX11_2(hwnd))
     {
         if (!CreateSwapChain(hwnd))
             Valid = false;
@@ -315,6 +320,9 @@ bool CHW::CreateSwapChain(HWND hwnd)
         // DXGI_FORMAT_R10G10B10A2_UNORM, // D3DX11SaveTextureToMemory fails on this format
         DXGI_FORMAT_R8G8B8A8_UNORM,
     };
+
+    sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+    sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
     // Select back-buffer format
     sd.BufferDesc.Format = SelectFormat(D3D_FORMAT_SUPPORT_DISPLAY, formats);
@@ -368,7 +376,7 @@ bool CHW::CreateSwapChain(HWND hwnd)
 }
 
 #if defined(USE_DX11)
-bool CHW::CreateSwapChain2(HWND hwnd)
+bool CHW::CreateSwapChainOnDX11_2(HWND hwnd)
 {
     if (strstr(Core.Params, "-no_dx11_2"))
         return false;
@@ -443,6 +451,64 @@ bool CHW::CreateSwapChain2(HWND hwnd)
 
     return false;
 }
+#else
+bool CHW::CreateSwapChainOnDX12(HWND hwnd) 
+{
+    // Set up the presentation parameters
+    DXGI_SWAP_CHAIN_DESC1 desc;
+    ZeroMemory(&desc, sizeof(DXGI_SWAP_CHAIN_DESC1));
+
+    // Back buffer
+    desc.Width = Device.dwWidth;
+    desc.Height = Device.dwHeight;
+
+    constexpr DXGI_FORMAT formats[] = {
+        // DXGI_FORMAT_R16G16B16A16_FLOAT,
+        // DXGI_FORMAT_R10G10B10A2_UNORM,
+        DXGI_FORMAT_R8G8B8A8_UNORM,
+    };
+
+    // Select back-buffer format
+    desc.Format = SelectFormat(D3D11_FORMAT_SUPPORT_DISPLAY, formats);
+    Caps.fTarget = dx11TextureUtils::ConvertTextureFormat(desc.Format);
+
+    // Buffering
+    BackBufferCount = 2; // For DXGI_SWAP_EFFECT_FLIP_DISCARD we need at least two
+    
+    desc.BufferCount = BackBufferCount;
+    desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+
+    // Multisample
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+
+    // Windoze
+    // desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // XXX: tearing glitches with flip presentation model
+    desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+    desc.Scaling = DXGI_SCALING_STRETCH;
+
+    DXGI_SWAP_CHAIN_FULLSCREEN_DESC fulldesc;
+    ZeroMemory(&fulldesc, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
+
+    fulldesc.Windowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
+
+    // Additional setup
+    desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+
+    const HRESULT result = m_pFactory->CreateSwapChainForHwnd(
+        pDevice, hwnd, &desc, fulldesc.Windowed ? nullptr : &fulldesc, nullptr, reinterpret_cast<IDXGISwapChain1**>(&m_pSwapChain));
+
+    if (FAILED(result))
+        return false;
+
+    if (FAILED(m_pSwapChain->GetDesc(&m_ChainDesc))) {
+        _RELEASE(m_pSwapChain);
+        return false;
+    }
+  
+    m_pSwapChain->SetMaximumFrameLatency(BackBufferCount);
+    return true;
+}
 #endif
 
 bool CHW::ThisInstanceIsGlobal() const { return this == &HW; }
@@ -485,6 +551,18 @@ void CHW::DestroyDevice()
 
     _SHOW_REF("refCount:pDevice:", pDevice);
     _RELEASE(pDevice);
+
+#if DEBUG
+#if USE_DX12
+	typedef HRESULT(__stdcall * fPtr)(const IID&, void**);
+    HMODULE hDll = GetModuleHandleW(L"dxgidebug.dll");
+    fPtr DXGIGetDebugInterface = (fPtr)GetProcAddress(hDll, "DXGIGetDebugInterface");
+    IDXGIDebug* pDxgiDebug;
+    DXGIGetDebugInterface(__uuidof(IDXGIDebug), (void**)&pDxgiDebug);
+    pDxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+#endif
+#endif
+
     DestroyD3D();
 }
 

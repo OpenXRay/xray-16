@@ -27,7 +27,8 @@ namespace DX12
         // If discard isn't implemented/supported/fails, try the newer swap-types
         // - flip_discard is win 10
         // - flip_sequentially is win 8
-        HRESULT hr;
+        HRESULT hr = S_OK;
+
         if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
         {
             pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
@@ -53,6 +54,108 @@ namespace DX12
             if (hr == S_OK && dxgiSwapChain3)
             {
                 return DX12::PassAddRef(new SwapChain(commandList, dxgiSwapChain3, pDesc));
+            }
+        }
+
+        return nullptr;
+    }
+
+    SwapChain* SwapChain::Create(CommandList* commandList, IDXGIFactory4* pFactory, HWND hWnd,
+        const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc,
+        IDXGIOutput* pRestrictToOutput)
+    {
+        IDXGISwapChain1* dxgiSwapChain1 = NULL;
+        IDXGISwapChain3* dxgiSwapChain3 = NULL;
+        ID3D12CommandQueue* commandQueue = commandList->GetD3D12CommandQueue();
+
+        // If discard isn't implemented/supported/fails, try the newer swap-types
+        // - flip_discard is win 10
+        // - flip_sequentially is win 8
+        HRESULT hr = S_OK;
+        
+        if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
+        {
+            DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
+            desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+            desc1.BufferCount = std::max(2U, pDesc->BufferCount);
+
+            hr = pFactory->CreateSwapChainForHwnd(commandQueue, hWnd, &desc1, pFullscreenDesc, pRestrictToOutput, &dxgiSwapChain1);
+        }
+        else if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
+        {
+            DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
+
+            desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+            desc1.BufferCount = std::max(2U, pDesc->BufferCount);   
+
+            hr = pFactory->CreateSwapChainForHwnd(commandQueue, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput, &dxgiSwapChain1);
+        }
+        else
+        {
+            hr = pFactory->CreateSwapChainForHwnd(commandQueue, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput, &dxgiSwapChain1);
+        }
+
+        if (hr == S_OK && dxgiSwapChain1)
+        {
+            hr = dxgiSwapChain1->QueryInterface(IID_PPV_ARGS(&dxgiSwapChain3));
+            dxgiSwapChain1->Release();
+
+            if (hr == S_OK && dxgiSwapChain3)
+            {
+                DXGI_SWAP_CHAIN_DESC desc;
+                dxgiSwapChain3->GetDesc(&desc);
+                return DX12::PassAddRef(new SwapChain(commandList, dxgiSwapChain3, &desc));
+            }
+        }
+
+        return nullptr;
+    }
+
+    SwapChain* SwapChain::Create(CommandList* commandList, IDXGIFactory4* pFactory, IUnknown* pWindow,
+        const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput)
+    {
+        IDXGISwapChain1* dxgiSwapChain1 = NULL;
+        IDXGISwapChain3* dxgiSwapChain3 = NULL;
+        ID3D12CommandQueue* commandQueue = commandList->GetD3D12CommandQueue();
+
+        // If discard isn't implemented/supported/fails, try the newer swap-types
+        // - flip_discard is win 10
+        // - flip_sequentially is win 8
+        HRESULT hr = S_OK;
+
+        if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
+        {
+            DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
+
+            desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+            desc1.BufferCount = std::max(2U, pDesc->BufferCount);
+           
+            hr = pFactory->CreateSwapChainForCoreWindow(commandQueue, pWindow, pDesc, pRestrictToOutput, &dxgiSwapChain1);
+        }
+        else if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
+        {
+            DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
+
+            desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+            desc1.BufferCount = std::max(2U, pDesc->BufferCount);
+           
+            hr = pFactory->CreateSwapChainForCoreWindow(commandQueue, pWindow, pDesc, pRestrictToOutput, &dxgiSwapChain1);
+        }
+        else
+        {
+            hr = pFactory->CreateSwapChainForCoreWindow(commandQueue, pWindow, pDesc, pRestrictToOutput, &dxgiSwapChain1);
+        }
+
+        if (hr == S_OK && dxgiSwapChain1)
+        {
+            hr = dxgiSwapChain1->QueryInterface(IID_PPV_ARGS(&dxgiSwapChain3));
+            dxgiSwapChain1->Release();
+
+            if (hr == S_OK && dxgiSwapChain3)
+            {
+                DXGI_SWAP_CHAIN_DESC desc;
+                dxgiSwapChain3->GetDesc(&desc);
+                return DX12::PassAddRef(new SwapChain(commandList, dxgiSwapChain3, &desc));
             }
         }
 
