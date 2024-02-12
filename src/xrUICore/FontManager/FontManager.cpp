@@ -4,8 +4,6 @@
 
 CFontManager::CFontManager()
 {
-    Device.seqDeviceReset.Add(this, REG_PRIORITY_HIGH);
-
     m_all_fonts.push_back(&pFontMedium); // used cpp
     m_all_fonts.push_back(&pFontDI); // used cpp
     m_all_fonts.push_back(&pFontArial14); // used xml
@@ -84,7 +82,6 @@ void CFontManager::InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
 
 CFontManager::~CFontManager()
 {
-    Device.seqDeviceReset.Remove(this);
     FONTS_VEC_IT it = m_all_fonts.begin();
     FONTS_VEC_IT it_e = m_all_fonts.end();
     for (; it != it_e; ++it)
@@ -98,4 +95,9 @@ void CFontManager::Render()
     for (; it != it_e; ++it)
         (**it)->OnRender();
 }
-void CFontManager::OnDeviceReset() { InitializeFonts(); }
+
+void CFontManager::OnUIReset()
+{
+    // XXX: memory leak, font aren't being deallocated
+    InitializeFonts();
+}
