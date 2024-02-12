@@ -61,28 +61,24 @@ void dxImGuiRender::Frame()
 #endif
 }
 
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
 void dxImGuiRender::Render(ImDrawData* data)
 {
 #if defined(USE_DX9)
     ImGui_ImplDX9_RenderDrawData(data);
 #elif defined(USE_DX11)
     ImGui_ImplDX11_RenderDrawData(data);
-#elif defined(USE_DX12)
-    CCryDX12Device* cry_device = dynamic_cast<CCryDX12Device*>(HW.pDevice);
-    R_ASSERT(cry_device);
-    CCryDX12DeviceContext *cry_device_context = cry_device->GetDeviceContext();
-    R_ASSERT(cry_device_context);
-    DX12::CommandList* cmdList = cry_device_context->GetCoreGraphicsCommandList();
-    R_ASSERT(cmdList);
-
-    //DX12::ResourceView* rtv = DX12_EXTRACT_DX12VIEW(RImplementation.Target->get_base_rt());
-    //D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtv->GetDescriptorHandle();
-
-    //cmdList->GetD3D12CommandList()->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
-    //cmdList->GetD3D12CommandList()->SetDescriptorHeaps(1, &m_pDescriptorHeap);
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList->GetD3D12CommandList());
-    //cmdList->SetResourceAndSamplerStateHeaps();
-
+#elif defined(USE_DX12)       
+    ID3D12DescriptorHeap* heaps[] = { m_descriptorHeap };
+    DX12::ResourceView* rtv = DX12_EXTRACT_DX12VIEW(RImplementation.Target->get_base_rt()); 
+    D3D12_CPU_DESCRIPTOR_HANDLE handle = rtv->GetDescriptorHandle();
+    m_cmdList->Reset(m_cmdAlloc, nullptr);
+    m_cmdList->ClearRenderTargetView(handle, (float*)&clear_color, 0, NULL);
+    m_cmdList->OMSetRenderTargets(1, &handle, FALSE, NULL);
+    m_cmdList->SetDescriptorHeaps(1, heaps);
+    ImGui_ImplDX12_RenderDrawData(data, m_cmdList);
+    R_ASSERT(SUCCEEDED(m_cmdList->Close()));
 #elif defined(USE_OGL)
     ImGui_ImplOpenGL3_RenderDrawData(data);
 #endif
@@ -108,24 +104,45 @@ void dxImGuiRender::OnDeviceCreate(ImGuiContext* context)
 #elif defined(USE_DX11)
     ImGui_ImplDX11_Init(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
 #elif defined(USE_DX12)
-    CCryDX12Device* cry_device = dynamic_cast<CCryDX12Device*>(HW.pDevice);
-    R_ASSERT(cry_device);
-    ID3D12Device* device = cry_device->GetD3D12Device();
 
-    CCryDX12DeviceContext* cry_device_context = cry_device->GetDeviceContext();
-    R_ASSERT(cry_device_context);
+    CCryDX12Device* pDevice = reinterpret_cast<CCryDX12Device*>(HW.pDevice);
+  
+    D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
+    descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    descriptorImGuiRender.NumDescriptors = HW.BackBufferCount;
+    descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
-    DX12::Device* dx12_device = cry_device->GetDX12Device();
-    DX12::DescriptorBlock dx12_desc_block =
-        dx12_device->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, HW.BackBufferCount);
-    m_pDescriptorHeap = dx12_desc_block.GetDescriptorHeap()->GetD3D12DescriptorHeap();
-    dx12_desc_block.Reset();
-    DX12::ResourceView* rtv = DX12_EXTRACT_DX12VIEW(RImplementation.Target->get_base_rt());
-    ImGui_ImplDX12_Init(cry_device->GetD3D12Device(), HW.BackBufferCount, rtv->GetSRVDesc().Format,
-        m_pDescriptorHeap, 
-        dx12_desc_block.GetHandleOffsetCPU(0), 
-        dx12_desc_block.GetHandleOffsetGPU(0)
+    HRESULT hr = S_OK;
+  
+    // Create Descriptor Heap IMGUI render
+    ID3D12DescriptorHeap* descriptorHeap = NULL;
+    hr = pDevice->GetD3D12Device()->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&descriptorHeap));  
+    R_ASSERT(SUCCEEDED(hr));
+    m_descriptorHeap = descriptorHeap;
+    descriptorHeap->Release();
+
+    ID3D12CommandAllocator* cmdAlloc = NULL;
+    hr = pDevice->GetD3D12Device()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
+    R_ASSERT(SUCCEEDED(hr));
+    m_cmdAlloc = cmdAlloc;
+    cmdAlloc->Release();
+
+    ID3D12GraphicsCommandList* cmdList = NULL;
+    hr = pDevice->GetD3D12Device()->CreateCommandList(
+        0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_cmdAlloc, nullptr, IID_PPV_ARGS(&cmdList));
+    R_ASSERT(SUCCEEDED(hr));
+    m_cmdList = cmdList;
+    cmdList->Release();
+
+    DX12::ResourceView* rtv = DX12_EXTRACT_DX12VIEW(RImplementation.Target->get_base_rt()); 
+
+    ImGui_ImplDX12_Init(pDevice->GetD3D12Device(), HW.BackBufferCount, rtv->GetSRVDesc().Format,
+        m_descriptorHeap, 
+        m_descriptorHeap->GetCPUDescriptorHandleForHeapStart(), 
+        m_descriptorHeap->GetGPUDescriptorHandleForHeapStart()
     );
+
+    R_ASSERT(SUCCEEDED(m_cmdList->Close()));
 
 #elif defined(USE_OGL)
     ImGui_ImplOpenGL3_Init();
