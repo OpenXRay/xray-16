@@ -2,7 +2,6 @@
 
 #include "Common/LevelStructure.hpp"
 #include "xrCDB/Intersect.hpp"
-#include "xrMaterialSystem/GameMtlLib.h"
 
 #include "SoundRender_Core.h"
 #include "SoundRender_Scene.h"
@@ -311,10 +310,7 @@ float CSoundRender_Scene::get_occlusion(const Fvector& P, float R, Fvector* occ)
                 occ[0].set(V[T.verts[0]]);
                 occ[1].set(V[T.verts[1]]);
                 occ[2].set(V[T.verts[2]]);
-
-                const SGameMtl* mtl = GMLib.GetMaterialByIdx(T.material);
-                const float occlusion = fis_zero(mtl->fSndOcclusionFactor) ? 0.1f : mtl->fSndOcclusionFactor;
-                occ_value = psSoundOcclusionScale * occlusion;
+                occ_value = psSoundOcclusionScale;
             }
         }
     }

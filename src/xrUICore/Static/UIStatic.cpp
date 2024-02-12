@@ -106,9 +106,8 @@ void CUIStatic::DrawTexture()
             {
                 if (m_UIStaticItem.GetFixedLTWhileHeading())
                 {
-                    float t1, t2;
-                    t1 = rect.width();
-                    t2 = rect.height();
+                    const float t1 = rect.width();
+                    const float t2 = rect.height();
                     rect.y2 = rect.y1 + t1;
                     rect.x2 = rect.x1 + t2;
                 }
@@ -117,20 +116,17 @@ void CUIStatic::DrawTexture()
         }
         else
         {
-            Frect r = {0.0f, 0.0f, m_UIStaticItem.GetTextureRect().width(), m_UIStaticItem.GetTextureRect().height()};
+            const Frect r = { 0.0f, 0.0f, m_UIStaticItem.GetTextureRect().width(), m_UIStaticItem.GetTextureRect().height() };
 
+            if (Heading())
             {
-                if (Heading())
-                {
-                    float t1, t2;
-                    t1 = rect.width();
-                    t2 = rect.height();
-                    rect.y2 = rect.y1 + t1;
-                    rect.x2 = rect.x1 + t2;
-                }
-
-                m_UIStaticItem.SetSize(Fvector2().set(r.width(), r.height()));
+                const float t1 = rect.width();
+                const float t2 = rect.height();
+                rect.y2 = rect.y1 + t1;
+                rect.x2 = rect.x1 + t2;
             }
+
+            m_UIStaticItem.SetSize(Fvector2().set(r.width(), r.height()));
         }
 
         if (Heading())
@@ -245,7 +241,7 @@ void CUIStatic::ColorAnimationSetTextureColor(u32 color, bool only_alpha)
 
 void CUIStatic::ColorAnimationSetTextColor(u32 color, bool only_alpha)
 {
-    TextItemControl()->SetTextColor((only_alpha) ? subst_alpha(TextItemControl()->GetTextColor(), color) : color);
+    SetTextColor((only_alpha) ? subst_alpha(GetTextColor(), color) : color);
 }
 
 void CUIStatic::FillDebugInfo()
@@ -274,56 +270,4 @@ void CUIStatic::OnFocusLost()
 
     if (g_statHint->Owner() == this)
         g_statHint->Discard();
-}
-
-//-------------------------------------
-CUITextWnd::CUITextWnd() : CUIWindow("CUITextWnd") {}
-
-void CUITextWnd::AdjustHeightToText()
-{
-    if (!fsimilar(TextItemControl().m_wndSize.x, GetWidth()))
-    {
-        TextItemControl().m_wndSize.x = GetWidth();
-        TextItemControl().ParseText(true);
-    }
-    SetHeight(TextItemControl().GetVisibleHeight());
-}
-
-void CUITextWnd::AdjustWidthToText()
-{
-    float _len = TextItemControl().GetFont()->SizeOf_(TextItemControl().GetText());
-    UI().ClientToScreenScaledWidth(_len);
-    SetWidth(_len);
-}
-
-void CUITextWnd::Draw()
-{
-    if (!fsimilar(TextItemControl().m_wndSize.x, m_wndSize.x) || !fsimilar(TextItemControl().m_wndSize.y, m_wndSize.y))
-    {
-        TextItemControl().m_wndSize = m_wndSize;
-        TextItemControl().ParseText(true);
-    }
-
-    Fvector2 p;
-    GetAbsolutePos(p);
-    TextItemControl().Draw(p.x, p.y);
-}
-
-void CUITextWnd::Update()
-{
-    R_ASSERT(GetChildWndList().size() == 0);
-    UpdateColorAnimation();
-    inherited::Update();
-}
-
-void CUITextWnd::ColorAnimationSetTextColor(u32 color, bool only_alpha)
-{
-    SetTextColor((only_alpha) ? subst_alpha(GetTextColor(), color) : color);
-}
-
-void CUITextWnd::FillDebugInfo()
-{
-#ifndef MASTER_GOLD
-
-#endif
 }

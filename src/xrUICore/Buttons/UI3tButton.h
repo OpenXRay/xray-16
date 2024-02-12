@@ -10,7 +10,6 @@ class XRUICORE_API CUI3tButton : public CUIButton
     //.	using CUIButton::SetTextColor;
 public:
     CUI3tButton();
-    virtual ~CUI3tButton();
     // appearance
 
     virtual void InitButton(Fvector2 pos, Fvector2 size);
@@ -26,13 +25,10 @@ public:
 
     virtual void OnClick();
     virtual void OnFocusReceive();
-    virtual void OnFocusLost();
 
     virtual void DrawTexture();
     virtual void Update();
     virtual void Draw();
-
-    virtual bool OnMouseDown(int mouse_btn);
 
     pcstr GetDebugType() override { return "CUI3tButton"; }
 

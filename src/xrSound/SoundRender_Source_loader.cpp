@@ -6,7 +6,7 @@
 //SEEK_SET 0 File beginning
 //SEEK_CUR 1 Current file pointer position
 //SEEK_END 2 End-of-file
-int ov_seek_func(void* datasource, s64 offset, int whence)
+int ov_seek_func(void* datasource, ogg_int64_t offset, int whence)
 {
     switch (whence)
     {

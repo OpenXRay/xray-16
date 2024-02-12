@@ -15,7 +15,6 @@
 #include "alife_registry_wrappers.h"
 #include "UIHelper.h"
 
-
 CUITalkDialogWnd::CUITalkDialogWnd()
     : CUIWindow("CUITalkDialogWnd"),
       m_uiXml(nullptr),
@@ -363,7 +362,7 @@ CUIQuestionItem::CUIQuestionItem(CUIXml* xml_doc, LPCSTR path)
     AddCallback(m_text, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUIQuestionItem::OnTextClicked));
 
     strconcat(sizeof(str), str, path, ":num_text");
-    m_num_text = UIHelper::CreateTextWnd(*xml_doc, str, this, false);
+    m_num_text = UIHelper::CreateStatic(*xml_doc, str, this, false);
 }
 
 void CUIQuestionItem::Init(LPCSTR val, LPCSTR text)
@@ -391,10 +390,10 @@ CUIAnswerItem::CUIAnswerItem(CUIXml* xml_doc, LPCSTR path)
     string512 str;
 
     strconcat(sizeof(str), str, path, ":content_text");
-    m_text = UIHelper::CreateTextWnd(*xml_doc, str, this);
+    m_text = UIHelper::CreateStatic(*xml_doc, str, this);
 
     strconcat(sizeof(str), str, path, ":name_caption");
-    m_name = UIHelper::CreateTextWnd(*xml_doc, str, this);
+    m_name = UIHelper::CreateStatic(*xml_doc, str, this);
 
     SetAutoDelete(true);
 }

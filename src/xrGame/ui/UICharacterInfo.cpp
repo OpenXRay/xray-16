@@ -44,6 +44,14 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
     if (!m_icons[eIcon])
         Init_IconInfoItem(*xml_doc, "icon_static", eIcon);
 
+    m_original_color = m_icons[eIcon] ? m_icons[eIcon]->GetTextureColor() : color_xrgb(255, 255, 255);
+
+    m_deadbody_color = color_argb(160, 160, 160, 160);
+    if (xml_doc->NavigateToNode("icon:deadbody", 0))
+    {
+        m_deadbody_color = CUIXmlInit::GetColor(*xml_doc, "icon:deadbody", 0, m_deadbody_color);
+    }
+
     Init_IconInfoItem(*xml_doc, "icon_over", eIconOver);
 
     Init_IconInfoItem(*xml_doc, "rank_icon", eRankIcon);
@@ -54,13 +62,6 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 
     Init_IconInfoItem(*xml_doc, "commumity_big_icon", eCommunityBigIcon);
     Init_IconInfoItem(*xml_doc, "commumity_big_icon_over", eCommunityBigIconOver);
-
-    VERIFY(m_icons[eIcon]);
-    m_deadbody_color = color_argb(160, 160, 160, 160);
-    if (xml_doc->NavigateToNode("icon:deadbody", 0))
-    {
-        m_deadbody_color = CUIXmlInit::GetColor(*xml_doc, "icon:deadbody", 0, m_deadbody_color);
-    }
 
     // ----------------------------
     Init_StrInfoItem(*xml_doc, "name_caption", eNameCaption);
@@ -157,7 +158,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
         pUIBio->Clear();
         if (chInfo.Bio().size())
         {
-            CUITextWnd* pItem = xr_new<CUITextWnd>();
+            auto* pItem = xr_new<CUIStatic>("Biography");
             pItem->SetWidth(pUIBio->GetDesiredChildWidth());
             pItem->SetText(chInfo.Bio().c_str());
             pItem->AdjustHeightToText();
@@ -328,13 +329,12 @@ void CUICharacterInfo::Update()
 
         if (m_icons[eIcon])
         {
-            CSE_ALifeCreatureAbstract* pCreature = smart_cast<CSE_ALifeCreatureAbstract*>(T);
-            if (pCreature)
+            if (const auto* creature = smart_cast<CSE_ALifeCreatureAbstract*>(T))
             {
-                if (pCreature->g_Alive())
-                    m_icons[eIcon]->SetTextureColor(color_argb(255, 255, 255, 160));
+                if (creature->g_Alive())
+                    m_icons[eIcon]->SetTextureColor(m_original_color);
                 else
-                    m_icons[eIcon]->SetTextureColor(color_argb(255, 255, 160, 160));
+                    m_icons[eIcon]->SetTextureColor(m_deadbody_color);
             }
         }
     }

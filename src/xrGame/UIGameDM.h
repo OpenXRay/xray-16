@@ -11,7 +11,6 @@ class CUIRankIndicator;
 class UIVoteStatusWnd;
 class CUIMapDesc;
 class UITeamPanels;
-class CUITextWnd;
 
 class CUIGameDM : public UIGameMP
 {
@@ -27,19 +26,19 @@ protected:
 
     UITeamPanels* m_pTeamPanels;
 
-    CUITextWnd* m_time_caption;
-    CUITextWnd* m_spectrmode_caption;
-    CUITextWnd* m_spectator_caption;
-    CUITextWnd* m_pressjump_caption;
-    CUITextWnd* m_pressbuy_caption;
-    CUITextWnd* m_round_result_caption;
-    CUITextWnd* m_force_respawn_time_caption;
-    CUITextWnd* m_demo_play_caption;
-    CUITextWnd* m_warm_up_caption;
+    CUIStatic* m_time_caption;
+    CUIStatic* m_spectrmode_caption;
+    CUIStatic* m_spectator_caption;
+    CUIStatic* m_pressjump_caption;
+    CUIStatic* m_pressbuy_caption;
+    CUIStatic* m_round_result_caption;
+    CUIStatic* m_force_respawn_time_caption;
+    CUIStatic* m_demo_play_caption;
+    CUIStatic* m_warm_up_caption;
 
     CUIMoneyIndicator* m_pMoneyIndicator;
     CUIRankIndicator* m_pRankIndicator;
-    CUITextWnd* m_pFragLimitIndicator;
+    CUIStatic* m_pFragLimitIndicator;
     UIVoteStatusWnd* m_voteStatusWnd;
 
 public:

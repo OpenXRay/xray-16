@@ -379,7 +379,7 @@ void InventoryUtilities::UpdateWeight(CUIStatic& wnd, CInventoryOwner* pInvOwner
 
 //////////////////////////////////////////////////////////////////////////
 
-void InventoryUtilities::UpdateWeightStr(CUITextWnd& wnd, CUITextWnd& wnd_max, CInventoryOwner* pInvOwner)
+void InventoryUtilities::UpdateWeightStr(CUIStatic& wnd, CUIStatic& wnd_max, CInventoryOwner* pInvOwner)
 {
     R_ASSERT(pInvOwner);
     string128 buf;

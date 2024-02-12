@@ -1,13 +1,13 @@
 #pragma once
 #include "xrUICore/Windows/UIFrameWindow.h"
 
-class CUITextWnd;
+class CUIStatic;
 
 class XRUICORE_API CUIButtonHint final : public CUIFrameWindow
 {
     CUIWindow* m_ownerWnd;
 
-    CUITextWnd* m_text;
+    CUIStatic* m_text;
     bool m_enabledOnFrame;
 
 public:

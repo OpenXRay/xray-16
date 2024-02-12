@@ -31,10 +31,10 @@ class CUIRankingWnd final : public CUIWindow, public CUIWndCallback
 
     CUICharacterInfo* m_actor_ch_info;
 
-    CUITextWnd* m_money_caption;
-    CUITextWnd* m_money_value;
+    CUIStatic* m_money_caption;
+    CUIStatic* m_money_value;
 
-    CUITextWnd* m_center_caption;
+    CUIStatic* m_center_caption;
     CUIStatic* m_faction_static;
     CUIFrameLineWnd* m_faction_line1;
     CUIFrameLineWnd* m_faction_line2;
@@ -59,8 +59,8 @@ class CUIRankingWnd final : public CUIWindow, public CUIWndCallback
     {
         max_stat_info = 15
     };
-    CUITextWnd* m_stat_caption[max_stat_info];
-    CUITextWnd* m_stat_info[max_stat_info];
+    CUIStatic* m_stat_caption[max_stat_info];
+    CUIStatic* m_stat_info[max_stat_info];
 
     u32 m_delay;
     u32 m_previous_time;

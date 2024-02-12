@@ -11,7 +11,6 @@
 
 class CUIXml;
 class CUIStatic;
-class CUITextWnd;
 class CUIProgressBar;
 class CActor;
 
@@ -19,14 +18,14 @@ class CUIRankFaction final : public CUIWindow
 {
     FactionState m_faction_state;
 
-    CUITextWnd* m_sn;
-    CUITextWnd* m_name;
+    CUIStatic* m_sn;
+    CUIStatic* m_name;
     CUIStatic* m_icon;
     CUIStatic* m_icon_over;
-    CUITextWnd* m_location_static;
-    CUITextWnd* m_location_value;
-    CUITextWnd* m_power_static;
-    CUITextWnd* m_power_value;
+    CUIStatic* m_location_static;
+    CUIStatic* m_location_value;
+    CUIStatic* m_power_static;
+    CUIStatic* m_power_value;
 
     CUIProgressBar* m_relation_minus;
     CUIProgressBar* m_relation_center_minus;
@@ -36,8 +35,8 @@ class CUIRankFaction final : public CUIWindow
     CUIStatic* m_origin_static;
     CUIStatic* m_border_minus;
     CUIStatic* m_border_plus;
-    CUITextWnd* m_enemy_static;
-    CUITextWnd* m_frined_static;
+    CUIStatic* m_enemy_static;
+    CUIStatic* m_frined_static;
 
     CUIStatic* m_rating_up;
     CUIStatic* m_rating_down;

@@ -699,10 +699,8 @@ void xrDebug::SetupExceptionHandler()
 
     if (strstr(commandLine, "-full_memory_dump"))
         minidumpFlags |= MiniDumpWithFullMemory | MiniDumpIgnoreInaccessibleMemory;
-#ifdef MASTER_GOLD
-    else if (!strstr(commandLine, "-detailed_minidump"))
-        minidumpFlags |= MiniDumpFilterMemory;
-#endif
+    else if (strstr(commandLine, "-detailed_minidump"))
+        minidumpFlags |= MiniDumpWithIndirectlyReferencedMemory;
 
     BT_SetDumpType(minidumpFlags);
     //BT_SetSupportEMail("cop-crash-report@stalker-game.com");

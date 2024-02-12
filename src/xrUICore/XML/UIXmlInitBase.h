@@ -31,7 +31,6 @@ class CUIDragDropListEx;
 class CUIComboBox;
 class CUITrackBar;
 class CUILines;
-class CUITextWnd;
 class CGameFont;
 
 class XRUICORE_API CUIXmlInitBase
@@ -46,11 +45,9 @@ public:
     static bool InitTextFrameLine(CUIXml& xml_doc, LPCSTR path, int index, CUITextFrameLineWnd* pWnd, bool fatal = true);
     static bool InitCustomEdit(CUIXml& xml_doc, LPCSTR paht, int index, CUICustomEdit* pWnd, bool fatal = true);
     static bool InitEditBox(CUIXml& xml_doc, LPCSTR paht, int index, CUIEditBox* pWnd, bool fatal = true);
-    static bool InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd, bool fatal = true);
-    static bool InitTextWnd(CUIXml& xml_doc, LPCSTR path, int index, CUITextWnd* pWnd, bool fatal = true);
+    static bool InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd, bool fatal = true, bool textWnd = false);
     static bool InitCheck(CUIXml& xml_doc, LPCSTR path, int index, CUICheckButton* pWnd, bool fatal = true);
     static bool InitSpin(CUIXml& xml_doc, LPCSTR path, int index, CUICustomSpin* pWnd, bool fatal = true);
-    static bool InitText(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd);
     static bool InitText(CUIXml& xml_doc, LPCSTR path, int index, CUILines* pLines);
     static bool Init3tButton(CUIXml& xml_doc, LPCSTR path, int index, CUI3tButton* pWnd, bool fatal = true);
     static bool InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CUIProgressBar* pWnd, bool fatal = true);

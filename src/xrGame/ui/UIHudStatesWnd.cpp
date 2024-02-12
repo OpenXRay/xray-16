@@ -144,12 +144,12 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     m_ui_weapon_sign_ammo = UIHelper::CreateStatic(xml, "static_ammo", weaponsParent, false);
     //m_ui_weapon_sign_ammo->SetEllipsis( CUIStatic::eepEnd, 2 );
 
-    m_ui_weapon_cur_ammo = UIHelper::CreateTextWnd(xml, "static_cur_ammo", this, false);
-    m_ui_weapon_fmj_ammo = UIHelper::CreateTextWnd(xml, "static_fmj_ammo", this, false);
-    m_ui_weapon_ap_ammo = UIHelper::CreateTextWnd(xml, "static_ap_ammo", this, false);
-    m_ui_weapon_third_ammo = UIHelper::CreateTextWnd(xml, "static_third_ammo", this, false); //Alundaio: Option to display a third ammo type
-    m_fire_mode = UIHelper::CreateTextWnd(xml, "static_fire_mode", this);
-    m_ui_grenade = UIHelper::CreateTextWnd(xml, "static_grenade", this, false);
+    m_ui_weapon_cur_ammo = UIHelper::CreateStatic(xml, "static_cur_ammo", this, false);
+    m_ui_weapon_fmj_ammo = UIHelper::CreateStatic(xml, "static_fmj_ammo", this, false);
+    m_ui_weapon_ap_ammo = UIHelper::CreateStatic(xml, "static_ap_ammo", this, false);
+    m_ui_weapon_third_ammo = UIHelper::CreateStatic(xml, "static_third_ammo", this, false); //Alundaio: Option to display a third ammo type
+    m_fire_mode = UIHelper::CreateStatic(xml, "static_fire_mode", this);
+    m_ui_grenade = UIHelper::CreateStatic(xml, "static_grenade", this, false);
 
     m_ui_weapon_icon = UIHelper::CreateStatic(xml, "static_wpn_icon", weaponsParent);
     m_ui_weapon_icon->SetShader(InventoryUtilities::GetEquipmentIconsShader());

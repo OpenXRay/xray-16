@@ -54,6 +54,7 @@ protected:
     };
     CUIStatic* m_icons[eMaxCaption]{};
     shared_str m_texture_name;
+    u32 m_original_color;
     u32 m_deadbody_color;
 
 public:

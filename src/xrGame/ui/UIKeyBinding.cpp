@@ -139,18 +139,17 @@ void CUIKeyBinding::OnKeyMapChanged()
 void CUIKeyBinding::CheckStructure(CUIXml& xml_doc)
 {
     bool first = true;
-    CUITextWnd* item = nullptr;
 
     for (int i = 0; true; ++i)
     {
-        LPCSTR action_name = actions[i].action_name;
-        if (action_name)
+        if (cpcstr action_name = actions[i].action_name)
         {
             if (!IsActionExist(action_name, xml_doc))
             {
+                CUIStatic* item = nullptr;
                 if (first)
                 {
-                    item = xr_new<CUITextWnd>();
+                    item = xr_new<CUIStatic>("First action");
                     item->SetWndPos(Fvector2().set(0, 0));
                     item->SetWndSize(Fvector2().set(m_scroll_wnd->GetWndSize().x, 20.0f));
                     item->SetText("NEXT ITEMS NOT DESCRIBED IN COMMAND DESC LIST");
@@ -159,7 +158,7 @@ void CUIKeyBinding::CheckStructure(CUIXml& xml_doc)
                     m_scroll_wnd->AddWindow(item, true);
                 }
 
-                item = xr_new<CUITextWnd>();
+                item = xr_new<CUIStatic>(action_name);
                 item->SetWndPos(Fvector2().set(0, 0));
                 item->SetWndSize(Fvector2().set(m_scroll_wnd->GetWndSize().x, 20.0f));
                 item->SetText(action_name);

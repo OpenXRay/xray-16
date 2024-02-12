@@ -5,7 +5,6 @@
 #include "actor_defs.h"
 
 class CUIStatic;
-class CUITextWnd;
 class CUIProgressBar;
 class CUIProgressShape;
 class CUIXml;
@@ -30,12 +29,12 @@ private:
     xr_map<ALife::EInfluenceType, CUIStatic*> m_resist_back;
     xr_map<ALife::EInfluenceType, CUIStatic*> m_indik;
 
-    CUITextWnd* m_ui_weapon_cur_ammo;
-    CUITextWnd* m_ui_weapon_fmj_ammo;
-    CUITextWnd* m_ui_weapon_ap_ammo;
-    CUITextWnd* m_ui_weapon_third_ammo; //Alundaio
-    CUITextWnd* m_fire_mode;
-    CUITextWnd* m_ui_grenade;
+    CUIStatic* m_ui_weapon_cur_ammo;
+    CUIStatic* m_ui_weapon_fmj_ammo;
+    CUIStatic* m_ui_weapon_ap_ammo;
+    CUIStatic* m_ui_weapon_third_ammo; //Alundaio
+    CUIStatic* m_fire_mode;
+    CUIStatic* m_ui_grenade;
     II_BriefInfo m_item_info;
 
     CUIStatic* m_ui_weapon_sign_ammo;

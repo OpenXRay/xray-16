@@ -53,11 +53,11 @@ void UIPlayerItem::InitTextParams(CUIXml& uiXml)
         if (!text_param_node)
             break;
         LPCSTR param_name = uiXml.ReadAttrib(text_param_node, "name", "param_name_not_set_in_name_attribute");
-        CUITextWnd* temp_static = xr_new<CUITextWnd>();
+        auto* temp_static = xr_new<CUIStatic>("Text param");
         VERIFY(temp_static);
         this->AttachChild(temp_static);
         temp_static->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(uiXml, TEXTPARAM_NODE_NAME, i, temp_static);
+        CUIXmlInit::InitStatic(uiXml, TEXTPARAM_NODE_NAME, i, temp_static);
         m_text_params.emplace(shared_str(param_name), temp_static);
     }
 }
@@ -85,8 +85,8 @@ void UIPlayerItem::InitIconParams(CUIXml& uiXml)
 void UIPlayerItem::UpdateTextParams(game_PlayerState const* ps)
 {
     buffer_vector<char> value_store(xr_alloca(512), 512, 512, char(0));
-    TMapStrToUIText::iterator ie = m_text_params.end();
-    for (TMapStrToUIText::iterator i = m_text_params.begin(); i != ie; ++i)
+    const auto ie = m_text_params.end();
+    for (auto i = m_text_params.begin(); i != ie; ++i)
     {
         VERIFY(i->second);
         GetTextParamValue(ps, i->first, value_store);
@@ -98,8 +98,8 @@ void UIPlayerItem::UpdateTextParams(game_PlayerState const* ps)
 void UIPlayerItem::UpdateIconParams(game_PlayerState const* ps)
 {
     buffer_vector<char> value_store(xr_alloca(512), 512, 512, char(0));
-    TMapStrToUIStatic::iterator ie = m_icon_params.end();
-    for (TMapStrToUIStatic::iterator i = m_icon_params.begin(); i != ie; ++i)
+    const auto ie = m_icon_params.end();
+    for (auto i = m_icon_params.begin(); i != ie; ++i)
     {
         VERIFY(i->second);
         GetIconParamValue(ps, i->first, value_store);

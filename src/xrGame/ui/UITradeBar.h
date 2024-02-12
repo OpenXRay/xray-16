@@ -2,9 +2,9 @@
 
 class CUITradeBar final : public CUIStatic
 {
-    CUITextWnd* m_TradeCaption{};
-    CUITextWnd* m_TradePrice{};
-    CUITextWnd* m_TradeWeightMax{};
+    CUIStatic* m_TradeCaption{};
+    CUIStatic* m_TradePrice{};
+    CUIStatic* m_TradeWeightMax{};
 
 public:
     CUITradeBar() : CUIStatic("Trade Bar") {}

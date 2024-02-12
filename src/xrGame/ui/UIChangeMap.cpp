@@ -22,7 +22,7 @@ CUIChangeMap::CUIChangeMap() : CUIDialogWnd(CUIChangeMap::GetDebugType())
     bkgrnd->SetAutoDelete(true);
     AttachChild(bkgrnd);
 
-    header = xr_new<CUITextWnd>();
+    header = xr_new<CUIStatic>("Header");
     header->SetAutoDelete(true);
     AttachChild(header);
 
@@ -34,7 +34,7 @@ CUIChangeMap::CUIChangeMap() : CUIDialogWnd(CUIChangeMap::GetDebugType())
     map_frame->SetAutoDelete(true);
     AttachChild(map_frame);
 
-    map_version = xr_new<CUITextWnd>();
+    map_version = xr_new<CUIStatic>("Map version");
     map_version->SetAutoDelete(true);
     AttachChild(map_version);
 
@@ -62,10 +62,10 @@ CUIChangeMap::CUIChangeMap() : CUIDialogWnd(CUIChangeMap::GetDebugType())
 void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "change_map", 0, this);
-    CUIXmlInit::InitTextWnd(xml_doc, "change_map:header", 0, header);
+    CUIXmlInit::InitStatic(xml_doc, "change_map:header", 0, header);
     CUIXmlInit::InitStatic(xml_doc, "change_map:background", 0, bkgrnd);
     CUIXmlInit::InitStatic(xml_doc, "change_map:map_frame", 0, map_frame);
-    CUIXmlInit::InitTextWnd(xml_doc, "change_map:map_ver_txt", 0, map_version);
+    CUIXmlInit::InitStatic(xml_doc, "change_map:map_ver_txt", 0, map_version);
     CUIXmlInit::InitStatic(xml_doc, "change_map:map_pic", 0, map_pic);
     //	CUIXmlInit::InitFrameWindow			(xml_doc,			"change_map:list_back", 0, lst_back);
     //	CUIXmlInit::InitFrameWindow			(xml_doc,			"change_map:frame", 0, frame);

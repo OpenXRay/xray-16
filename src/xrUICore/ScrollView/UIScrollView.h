@@ -89,7 +89,7 @@ public:
 };
 
 #define ADD_TEXT_TO_VIEW3(txt, st, view)              \
-    st = xr_new<CUITextWnd>();                            \
+    st = xr_new<CUIStatic>("Text");                   \
     st->SetFont(UI().Font().pFontLetterica16Russian); \
     st->SetText(txt);                                 \
     st->SetTextComplexMode(true);                     \
@@ -98,5 +98,5 @@ public:
     view->AddWindow(st, true)
 
 #define ADD_TEXT_TO_VIEW2(txt, view) \
-    CUITextWnd* pSt;                 \
+    CUIStatic* pSt;                 \
     ADD_TEXT_TO_VIEW3(txt, pSt, view)

@@ -15,12 +15,11 @@ CUIButtonHint::CUIButtonHint()
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "hint_item.xml");
     CUIXmlInitBase::InitFrameWindow(uiXml, "button_hint", 0, this);
 
-    m_text = xr_new<CUITextWnd>();
+    m_text = xr_new<CUIStatic>("Text");
     m_text->SetAutoDelete(true);
     CUIWindow::AttachChild(m_text);
-    CUIXmlInitBase::InitTextWnd(uiXml, "button_hint:description", 0, m_text);
+    CUIXmlInitBase::InitStatic(uiXml, "button_hint:description", 0, m_text);
 }
-
 
 void CUIButtonHint::OnRender()
 {

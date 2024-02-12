@@ -97,7 +97,7 @@ jobs:
         - { name: Fedora, os: ubuntu-latest, arch: x86_64,  cc: gcc,   container: 'fedora:latest', }
         #- { name: Haiku,  os: ubuntu-latest, arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
         - { name: macOS,  os: macos-13,      arch: x86_64,  cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
-        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0" }
+        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0", threads: 3 }
 
         configuration: [Debug, Release]
 
@@ -133,7 +133,7 @@ jobs:
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
-      run: dnf install -y git gcc gcc-c++ cmake SDL2-devel glew-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
+      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel glew-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
 
     - name: Set environment variables
       if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
@@ -150,28 +150,28 @@ jobs:
 
     - name: Run CMake Build
       id: cmake-build
-      run: cmake --build build --config ${{ matrix.configuration }} --parallel $(nproc || sysctl -n hw.ncpu || echo 4)
+      run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }}
 
     - name: Make package
-      if: ${{ steps.cmake-build.outcome == 'success' && matrix.platform.name == 'Ubuntu' }}
+      if: ${{ steps.cmake-build.outcome == 'success' }}
       id: make-package
-      working-directory: build
       #continue-on-error: true
+      working-directory: build
       run: |
-        make -j $(nproc || echo 4) package
-        file openxray_1.6.02_*.deb
+          cpack -B artifacts -C ${{ matrix.configuration }} -DCPACK_THREADS=${{ matrix.platform.threads || 4 }}
+          file artifacts/openxray*.*
 
     - name: Upload OpenXRay artifact
       if: ${{ steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
-        name: openxray_1.6.02_${{ matrix.configuration }}_${{ matrix.platform.arch }}_(github-${{ matrix.platform.cc }}-${{ github.run_number }}).deb
-        path: build/openxray_1.6.02_*.deb
+        name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc }} github-${{ github.run_number }})
+        path: build/artifacts/openxray*.*
 
   bsd:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }}
-    runs-on: macos-latest
-    timeout-minutes: 45
+    runs-on: macos-13 # macOS 13 runner has 4 CPUs
+    timeout-minutes: 35
     env:
       CFLAGS: "-w"
       CXXFLAGS: "-w"
@@ -201,6 +201,8 @@ jobs:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
+        cpu_count: 4
+        memory: 8G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: runner-to-vm
@@ -212,6 +214,8 @@ jobs:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
+        cpu_count: 4
+        memory: 8G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
@@ -223,20 +227,9 @@ jobs:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
+        cpu_count: 4
+        memory: 8G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
-        run: cmake --build build --config ${{ matrix.Configuration }} --parallel 3
-
-    - name: Finalize
-      uses: cross-platform-actions/action@v0.22.0
-      with:
-        operating_system: ${{ matrix.platform.os }}
-        architecture: ${{ matrix.platform.arch }}
-        version: ${{ matrix.platform.os-version }}
-        environment_variables: CFLAGS CXXFLAGS
-        # sync back is disabled due to:
-        # 1) VM stalls during the process
-        # 2) we don't output artifacts anyway
-        sync_files: false #vm-to-runner
-        run: rm -rf build # reduce amount of files to copy back from VM
+        run: cmake --build build --config ${{ matrix.Configuration }} --parallel 4

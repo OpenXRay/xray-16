@@ -141,7 +141,6 @@ target_link_libraries(xrSound
     xrMiscMath
     xrAPI
     xrCDB
-    xrMaterialSystem
     ${OPENAL_LIBRARY}
     Ogg::Ogg
     Vorbis::Vorbis

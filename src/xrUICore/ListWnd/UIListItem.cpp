@@ -28,7 +28,7 @@ void CUIListItem::InitListItem(Fvector2 pos, Fvector2 size)
 void CUIListItem::InitTexture(pcstr tex_name)
 {
     CUIButton::InitTexture(tex_name);
-    SetTextX(m_UIStaticItem.GetTextureRect().width());
+    TextItemControl()->m_TextOffset.x = m_UIStaticItem.GetTextureRect().width();
 }
 
 /*

@@ -31,32 +31,6 @@ else (CMAKE_SIZEOF_VOID_P EQUAL 4)
     set(ARCH_TYPE x86)
 endif()
 
-# Unix system configuration
-if (UNIX)
-    # Try to find specific OS files to determine type of linux distribution
-    find_file(FEDORA_FOUND fedora-release PATHS /etc)
-    find_file(REDHAT_FOUND redhat-release inittab.RH PATHS /etc)
-    find_file(CENTOS_FOUND centos-release PATHS /etc)
-    # If we found debian then we don't need to check further for ubuntu
-    # as it uses debian core.
-    find_file(DEBIAN_FOUND debian_version debconf.conf PATHS /etc)
-
-    # --------------------------------------------------
-    # Uninstall target
-    # --------------------------------------------------
-    # To clean system folder from libraries and binaries
-    # that was installed with `sudo make install`
-    # just run `sudo make uninstall`
-    if (NOT TARGET uninstall)
-        configure_file(
-                "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-                IMMEDIATE @ONLY)
-
-        add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-    endif()
-endif()
-
 function(set_git_info)
     execute_process(COMMAND git rev-parse --verify HEAD
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -75,49 +49,41 @@ function(set_git_info)
     message(STATUS "git branch: ${GIT_BRANCH}")
 endfunction()
 
-include(packaging)
+function(calculate_xray_build_id output)
+    set(XRAY_START_DAY   31)
+    set(XRAY_START_MONTH 1)
+    set(XRAY_START_YEAR  1999)
 
-function(xr_install tgt)
-    if (NOT MSVC)
-        install(TARGETS ${tgt} DESTINATION "."
-            PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE # chmod 755
-        )
-    else()
-        install(TARGETS ${tgt}
-            CONFIGURATIONS Debug
-            RUNTIME DESTINATION Debug/
-            LIBRARY DESTINATION Debug/
-        )
-        install(FILES $<TARGET_PDB_FILE:${tgt}>
-            CONFIGURATIONS Debug
-            DESTINATION Debug/
-        )
-        install(TARGETS ${tgt}
-            CONFIGURATIONS Release
-            RUNTIME DESTINATION Release/
-            LIBRARY DESTINATION Release/
-        )
-    endif()
-endfunction()
+    set(DAYS_IN_MONTH 0 31 28 31 30 31 30 31 31 30 31 30 31) # first is dummy
 
-# Use only if install defined outside target directory(like luabind, for example)
-function(xr_install_file tgt)
-    if (NOT MSVC)
-        install(FILES $<TARGET_FILE:${tgt}> DESTINATION "."
-            PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE # chmod 755
-        )
-    else()
-        install($<TARGET_FILE:${tgt}>
-            CONFIGURATIONS Debug
-            RUNTIME DESTINATION Debug/
-        )
-        install(FILES $<TARGET_PDB_FILE:${tgt}>
-            CONFIGURATIONS Debug
-            DESTINATION Debug/
-        )
-        install($<TARGET_FILE:${tgt}>
-           CONFIGURATIONS Release
-           RUNTIME DESTINATION Release/
-        )
-    endif()
+    # Acquire timestamp in "date month year" format
+    string(TIMESTAMP current_date "%d %m %Y")
+
+    # Transform string into a list, then extract 3 separate variables
+    string(REPLACE " " ";" current_date_list ${current_date})
+    list(GET current_date_list 0 CURRENT_DATE_DAY)
+    list(GET current_date_list 1 CURRENT_DATE_MONTH)
+    list(GET current_date_list 2 CURRENT_DATE_YEAR)
+
+    # Calculate XRAY build ID
+    math(EXPR build_id "(${CURRENT_DATE_YEAR} - ${XRAY_START_YEAR}) * 365 + ${CURRENT_DATE_DAY} - ${XRAY_START_DAY}")
+
+    set(it 1)
+    while(it LESS CURRENT_DATE_MONTH)
+        list(GET DAYS_IN_MONTH ${it} days)
+        math(EXPR build_id "${build_id} + ${days}")
+
+        math(EXPR it "${it} + 1")
+    endwhile()
+
+    set(it 1)
+    while(it LESS XRAY_START_MONTH)
+        list(GET DAYS_IN_MONTH ${it} days)
+        math(EXPR build_id "${build_id} - ${days}")
+
+        math(EXPR it "${it} + 1")
+    endwhile()
+
+    # Set requested variable
+    set(${output} ${build_id} PARENT_SCOPE)
 endfunction()

@@ -18,16 +18,16 @@ void CUINewsItemWnd::Init(CUIXml& uiXml, LPCSTR start_from)
     uiXml.SetLocalRoot(node);
 
     m_UIImage = UIHelper::CreateStatic(uiXml, "image", this);
-    m_UICaption = UIHelper::CreateTextWnd(uiXml, "caption_static", this, false); // no caption tag in SOC
+    m_UICaption = UIHelper::CreateStatic(uiXml, "caption_static", this, false); // no caption tag in SOC
 
-    m_UIText = UIHelper::CreateTextWnd(uiXml, "text_static", this, false);
-    m_UIDate = UIHelper::CreateTextWnd(uiXml, "date_static", this, false);
+    m_UIText = UIHelper::CreateStatic(uiXml, "text_static", this, false);
+    m_UIDate = UIHelper::CreateStatic(uiXml, "date_static", this, false);
 
     // SOC
     if (!m_UIText)
-        m_UIText = UIHelper::CreateTextWnd(uiXml, "text_cont", this, false);
+        m_UIText = UIHelper::CreateStatic(uiXml, "text_cont", this, false);
     if (!m_UIDate)
-        m_UIDate = UIHelper::CreateTextWnd(uiXml, "date_text_cont", this, false);
+        m_UIDate = UIHelper::CreateStatic(uiXml, "date_text_cont", this, false);
 
     uiXml.SetLocalRoot(stored_root);
 }

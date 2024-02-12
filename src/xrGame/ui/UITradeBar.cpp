@@ -12,12 +12,12 @@ void CUITradeBar::init_from_xml(CUIXml& uiXml, pcstr path)
 
     if (!CallOfPripyatMode)
     {
-        CUITextWnd* m_TradeCaption = UIHelper::CreateTextWnd(uiXml, "trade_caption", this, false);
+        m_TradeCaption = UIHelper::CreateStatic(uiXml, "trade_caption", this, false);
         if (m_TradeCaption)
             m_TradeCaption->AdjustWidthToText();
     }
-    m_TradePrice = UIHelper::CreateTextWnd(uiXml, "trade_price", this);
-    m_TradeWeightMax = UIHelper::CreateTextWnd(uiXml, "trade_weight_max", this);
+    m_TradePrice = UIHelper::CreateStatic(uiXml, "trade_price", this);
+    m_TradeWeightMax = UIHelper::CreateStatic(uiXml, "trade_weight_max", this);
 
     uiXml.SetLocalRoot(stored_root);
 }

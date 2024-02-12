@@ -19,15 +19,12 @@ CUI3tButton::CUI3tButton()
     m_frameline_mode = false;
 }
 
-CUI3tButton::~CUI3tButton() {}
 void CUI3tButton::OnClick()
 {
     CUIButton::OnClick();
     PlaySoundT();
 }
 
-bool CUI3tButton::OnMouseDown(int mouse_btn) { return CUIButton::OnMouseDown(mouse_btn); }
-void CUI3tButton::OnFocusLost() { inherited::OnFocusLost(); }
 void CUI3tButton::OnFocusReceive()
 {
     inherited::OnFocusReceive();

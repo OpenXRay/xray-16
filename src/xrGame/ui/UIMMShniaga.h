@@ -2,7 +2,6 @@
 #include "xrUICore/Windows/UIWindow.h"
 
 class CUIStatic;
-class CUITextWnd;
 class CUIXml;
 class CUIScrollView;
 class CMMSound;
@@ -59,7 +58,7 @@ protected:
     void ProcessEvent(EVENT ev);
 
     bool IsButton(CUIWindow* st);
-    void CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCSTR path, bool required = true);
+    void CreateList(xr_vector<CUIStatic*>& lst, CUIXml& xml_doc, LPCSTR path, bool required = true);
     void ShowMain();
     void ShowNewGame();
     void ShowNetworkGame();
@@ -80,9 +79,9 @@ protected:
     float m_mag_pos;
     float m_offset;
 
-    xr_vector<CUITextWnd*> m_buttons;
-    xr_vector<CUITextWnd*> m_buttons_new;
-    xr_vector<CUITextWnd*> m_buttons_new_network;
+    xr_vector<CUIStatic*> m_buttons;
+    xr_vector<CUIStatic*> m_buttons_new;
+    xr_vector<CUIStatic*> m_buttons_new_network;
 
     int m_selected_btn;
     enum_page_id m_page;

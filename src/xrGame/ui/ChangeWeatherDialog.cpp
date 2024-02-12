@@ -15,7 +15,7 @@ ButtonListDialog::ButtonListDialog(pcstr window_name)
     Background = xr_new<CUIStatic>("Background");
     Background->SetAutoDelete(true);
     AttachChild(Background);
-    Header = xr_new<CUITextWnd>();
+    Header = xr_new<CUIStatic>("Header");
     Header->SetAutoDelete(true);
     AttachChild(Header);
     CancelButton = xr_new<CUI3tButton>();
@@ -32,7 +32,7 @@ void ButtonListDialog::Initialize(int buttonCount)
         btn.Button = xr_new<CUI3tButton>();
         btn.Button->SetAutoDelete(true);
         AttachChild(btn.Button);
-        btn.Text = xr_new<CUITextWnd>();
+        btn.Text = xr_new<CUIStatic>("Text");
         btn.Text->SetAutoDelete(true);
         AttachChild(btn.Text);
         buttons.push_back(btn);
@@ -81,7 +81,7 @@ void ButtonListDialog::SendMessage(CUIWindow* wnd, s16 msg, void* data /*= nullp
 void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
 {
     CUIXmlInit::InitWindow(xmlDoc, "change_weather", 0, this);
-    CUIXmlInit::InitTextWnd(xmlDoc, "change_weather:header", 0, Header);
+    CUIXmlInit::InitStatic(xmlDoc, "change_weather:header", 0, Header);
     CUIXmlInit::InitStatic(xmlDoc, "change_weather:background", 0, Background);
     CUIXmlInit::Init3tButton(xmlDoc, "change_weather:btn_cancel", 0, CancelButton);
     auto& gameWeathers = gMapListHelper.GetGameWeathers();
@@ -96,7 +96,7 @@ void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
         xr_sprintf(path, "change_weather:btn_%d", i+1);
         CUIXmlInit::Init3tButton(xmlDoc, path, 0, GetButton(i).Button);
         xr_sprintf(path, "change_weather:txt_%d", i+1);
-        CUIXmlInit::InitTextWnd(xmlDoc, path, 0, GetButton(i).Text);
+        CUIXmlInit::InitStatic(xmlDoc, path, 0, GetButton(i).Text);
     }
     Log("! Weathers name sorted by alphabet !");
     weathers[0].Name = gameWeathers[0].Name;
@@ -120,7 +120,7 @@ void ChangeWeatherDialog::OnButtonClick(int i)
 void ChangeGameTypeDialog::InitChangeGameType(CUIXml& xmlDoc)
 {
     CUIXmlInit::InitWindow(xmlDoc, "change_gametype", 0, this);
-    CUIXmlInit::InitTextWnd(xmlDoc, "change_gametype:header", 0, Header);
+    CUIXmlInit::InitStatic(xmlDoc, "change_gametype:header", 0, Header);
     CUIXmlInit::InitStatic(xmlDoc, "change_gametype:background", 0, Background);
     CUIXmlInit::Init3tButton(xmlDoc, "change_gametype:btn_cancel", 0, CancelButton);
     // XXX nitrocaster: get it from somewhere
@@ -133,7 +133,7 @@ void ChangeGameTypeDialog::InitChangeGameType(CUIXml& xmlDoc)
         xr_sprintf(path, "change_gametype:btn_%d", i + 1);
         CUIXmlInit::Init3tButton(xmlDoc, path, 0, GetButton(i).Button);
         xr_sprintf(path, "change_gametype:txt_%d", i + 1);
-        CUIXmlInit::InitTextWnd(xmlDoc, path, 0, GetButton(i).Text);
+        CUIXmlInit::InitStatic(xmlDoc, path, 0, GetButton(i).Text);
         gameTypes[i] = xmlDoc.ReadAttrib(path, 0, "id");
     }
 }

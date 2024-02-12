@@ -7,8 +7,6 @@
 class CUIStatic;
 class CUIScrollView;
 class CUI3tButton;
-class CUI3tButton;
-class CUITextWnd;
 
 class CUIServerInfo final : public CUIDialogWnd, public CUIWndCallback
 {
@@ -37,7 +35,7 @@ private:
     CUIStatic* m_caption;
     CUIStatic* m_background;
     CUIScrollView* m_text_desc;
-    CUITextWnd* m_text_body;
+    CUIStatic* m_text_body;
     CUIStatic* m_image;
     CUI3tButton* m_btn_spectator;
     CUI3tButton* m_btn_next;

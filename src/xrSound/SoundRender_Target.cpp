@@ -68,7 +68,7 @@ void CSoundRender_Target::fill_parameters()
     //    pEmitter->set_position(SoundRender->listener_position());
 }
 
-extern int ov_seek_func(void* datasource, s64 offset, int whence);
+extern int ov_seek_func(void* datasource, ogg_int64_t offset, int whence);
 extern size_t ov_read_func(void* ptr, size_t size, size_t nmemb, void* datasource);
 extern int ov_close_func(void* datasource);
 extern long ov_tell_func(void* datasource);
