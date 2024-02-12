@@ -125,6 +125,10 @@ jobs:
               libtheora-dev:${{ matrix.platform.arch }} \
               libvorbis-dev:${{ matrix.platform.arch }}
 
+    - name: Downgrade CMake package on Ubuntu
+      if: ${{ matrix.platform.name == 'Ubuntu' }}
+      run: sudo apt-get install -qq -y cmake=3.22.1-1ubuntu1.22.04.1
+
     - name: Install macOS packages
       if: ${{ matrix.platform.name == 'macOS' }}
       run: |
