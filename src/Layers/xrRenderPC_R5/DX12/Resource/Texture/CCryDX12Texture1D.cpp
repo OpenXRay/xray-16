@@ -76,17 +76,21 @@ CCryDX12Texture1D* CCryDX12Texture1D::Create(CCryDX12Device* pDevice, const FLOA
     D3D12_CLEAR_VALUE clearValue = DX12::GetDXGIFormatClearValue(desc12.Format, (pDesc->BindFlags & D3D11_BIND_DEPTH_STENCIL) != 0);
     bool allowClearValue = desc12.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER;
 
-    if (pDesc->Usage == D3D11_USAGE_IMMUTABLE)
+    if (pDesc->Usage == D3D11_USAGE_DEFAULT)
     {
-        resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
+        resourceUsage = D3D12_RESOURCE_STATE_COMMON;
     }
-    else if (pDesc->Usage == D3D11_USAGE_STAGING)
+    else if (pDesc->Usage == D3D11_USAGE_IMMUTABLE)
     {
         resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
     }
     else if (pDesc->Usage == D3D11_USAGE_DYNAMIC)
     {
         resourceUsage = D3D12_RESOURCE_STATE_GENERIC_READ;
+    }
+    else if (pDesc->Usage == D3D11_USAGE_STAGING)
+    {
+        resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
     }
 
     if (pDesc->CPUAccessFlags != 0)

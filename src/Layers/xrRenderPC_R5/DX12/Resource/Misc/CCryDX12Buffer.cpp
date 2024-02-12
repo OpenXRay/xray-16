@@ -82,20 +82,25 @@ CCryDX12Buffer* CCryDX12Buffer::Create(CCryDX12Device* pDevice, const D3D11_BUFF
         pInitialData = &sInitialData;
     }
 
-    if (pDesc->Usage == D3D11_USAGE_IMMUTABLE)
+    if (pDesc->Usage == D3D11_USAGE_DEFAULT)
     {
         heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-        resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
+        resourceUsage = D3D12_RESOURCE_STATE_COMMON;
     }
-    else if (pDesc->Usage == D3D11_USAGE_STAGING)
+    else if (pDesc->Usage == D3D11_USAGE_IMMUTABLE)
     {
-        heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK);
+        heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
         resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
     }
     else if (pDesc->Usage == D3D11_USAGE_DYNAMIC)
     {
         heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
         resourceUsage = D3D12_RESOURCE_STATE_GENERIC_READ;
+    }
+    else if (pDesc->Usage == D3D11_USAGE_STAGING)
+    {
+        heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK);
+        resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
     }
 
     if (pDesc->CPUAccessFlags != 0)
