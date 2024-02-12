@@ -316,7 +316,12 @@ SCRIPT_EXPORT(EnumUIMessages, (),
             value("WINDOW_LBUTTON_DB_CLICK", int(WINDOW_LBUTTON_DB_CLICK)),
             value("WINDOW_KEY_PRESSED", int(WINDOW_KEY_PRESSED)),
             value("WINDOW_KEY_RELEASED", int(WINDOW_KEY_RELEASED)),
+            value("WINDOW_MOUSE_CAPTURE_LOST", int(WINDOW_MOUSE_CAPTURE_LOST)),
             value("WINDOW_KEYBOARD_CAPTURE_LOST", int(WINDOW_KEYBOARD_CAPTURE_LOST)),
+
+            // Legacy SOC/CS events
+            value("STATIC_FOCUS_RECEIVED", int(WINDOW_FOCUS_RECEIVED)),
+            value("STATIC_FOCUS_LOST",     int(WINDOW_FOCUS_LOST)),
 
             // CUIButton
             value("BUTTON_CLICKED", int(BUTTON_CLICKED)),
