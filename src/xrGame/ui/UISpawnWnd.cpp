@@ -9,65 +9,25 @@
 #include "xrEngine/xr_level_controller.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "UIGameCustom.h"
+#include "UIHelper.h"
 
 CUISpawnWnd::CUISpawnWnd()
-    : CUIDialogWnd(CUISpawnWnd::GetDebugType()), m_iCurTeam(0)
-{
-    m_pBackground = xr_new<CUIStatic>("Background");
-    AttachChild(m_pBackground);
-    m_pCaption = xr_new<CUIStatic>("Caption");
-    AttachChild(m_pCaption);
-    m_pImage1 = xr_new<CUIStatix>();
-    AttachChild(m_pImage1);
-    m_pImage2 = xr_new<CUIStatix>();
-    AttachChild(m_pImage2);
-
-    m_pFrames[0] = xr_new<CUIStatic>("Frame 0");
-    AttachChild(m_pFrames[0]);
-    m_pFrames[1] = xr_new<CUIStatic>("Frame 1");
-    AttachChild(m_pFrames[1]);
-    //	m_pFrames[2]	= new CUIStatic("Frame 2");	AttachChild(m_pFrames[2]);
-
-    m_pTextDesc = xr_new<CUIScrollView>();
-    AttachChild(m_pTextDesc);
-
-    m_pBtnAutoSelect = xr_new<CUI3tButton>();
-    AttachChild(m_pBtnAutoSelect);
-    m_pBtnSpectator = xr_new<CUI3tButton>();
-    AttachChild(m_pBtnSpectator);
-    m_pBtnBack = xr_new<CUI3tButton>();
-    AttachChild(m_pBtnBack);
-
-    Init();
-}
-
-CUISpawnWnd::~CUISpawnWnd()
-{
-    xr_delete(m_pCaption);
-    xr_delete(m_pBackground);
-    xr_delete(m_pFrames[0]);
-    xr_delete(m_pFrames[1]);
-    //	xr_delete(m_pFrames[2]);
-    xr_delete(m_pImage1);
-    xr_delete(m_pImage2);
-    xr_delete(m_pTextDesc);
-    xr_delete(m_pBtnAutoSelect);
-    xr_delete(m_pBtnSpectator);
-    xr_delete(m_pBtnBack);
-}
-
-void CUISpawnWnd::Init()
+    : CUIDialogWnd(CUISpawnWnd::GetDebugType()),
+      m_pImage1{ xr_new<CUIStatix>() },
+      m_pImage2{ xr_new<CUIStatix>() }
 {
     CUIXml xml_doc;
     xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "spawn.xml");
 
     CUIXmlInit::InitWindow(xml_doc, "team_selector", 0, this);
-    CUIXmlInit::InitStatic(xml_doc, "team_selector:caption", 0, m_pCaption);
-    CUIXmlInit::InitStatic(xml_doc, "team_selector:background", 0, m_pBackground);
-    CUIXmlInit::InitStatic(xml_doc, "team_selector:image_frames_tl", 0, m_pFrames[0]);
-    CUIXmlInit::InitStatic(xml_doc, "team_selector:image_frames_tr", 0, m_pFrames[1]);
-    //	CUIXmlInit::InitStatic(xml_doc,"team_selector:image_frames_bottom",	0,	m_pFrames[2]);
-    CUIXmlInit::InitScrollView(xml_doc, "team_selector:text_desc", 0, m_pTextDesc);
+
+    std::ignore = UIHelper::CreateStatic(xml_doc, "team_selector:background", this);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "team_selector:caption", this);
+
+    AttachChild(m_pImage1);
+    AttachChild(m_pImage2);
+    m_pImage1->SetAutoDelete(true);
+    m_pImage2->SetAutoDelete(true);
 
     CUIXmlInit::InitStatic(xml_doc, "team_selector:image_0", 0, m_pImage1);
     // m_pImage1->SetStretchTexture(true);
@@ -75,9 +35,14 @@ void CUISpawnWnd::Init()
     // m_pImage2->SetStretchTexture(true);
     // InitTeamLogo();
 
-    CUIXmlInit::Init3tButton(xml_doc, "team_selector:btn_spectator", 0, m_pBtnSpectator);
-    CUIXmlInit::Init3tButton(xml_doc, "team_selector:btn_autoselect", 0, m_pBtnAutoSelect);
-    CUIXmlInit::Init3tButton(xml_doc, "team_selector:btn_back", 0, m_pBtnBack);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "team_selector:image_frames_tl", this);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "team_selector:image_frames_tr", this);
+    //	std::ignore = UIHelper::CreateStatic(xml_doc, "team_selector:image_frames_bottom", this);
+    std::ignore = UIHelper::CreateScrollView(xml_doc, "team_selector:text_desc", this);
+
+    m_pBtnAutoSelect = UIHelper::Create3tButton(xml_doc, "team_selector:btn_autoselect", this);
+    m_pBtnSpectator  = UIHelper::Create3tButton(xml_doc, "team_selector:btn_spectator", this);
+    m_pBtnBack       = UIHelper::Create3tButton(xml_doc, "team_selector:btn_back", this);
 }
 
 void CUISpawnWnd::InitTeamLogo()
