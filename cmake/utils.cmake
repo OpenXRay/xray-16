@@ -24,13 +24,6 @@ function(target_sources_grouped)
     source_group(${PARSED_ARGS_NAME} FILES ${PARSED_ARGS_FILES})
 endfunction()
 
-# Detect arch type ( x86 or x64 )
-if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(ARCH_TYPE x64)
-else (CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(ARCH_TYPE x86)
-endif()
-
 function(set_git_info)
     execute_process(COMMAND git rev-parse --verify HEAD
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"

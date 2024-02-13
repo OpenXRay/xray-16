@@ -17,7 +17,18 @@ project(OpenXRay
     HOMEPAGE_URL "https://github.com/OpenXRay/xray-16"
     LANGUAGES CXX C
 )
-message(STATUS "CMAKE_PROJECT_VERSION: ${}")
+
+# Detect arch type ( x86 or x64 )
+if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(ARCH_TYPE x64)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(ARCH_TYPE x86)
+else()
+    set(ARCH_TYPE unknown)
+endif()
+message(STATUS "Arch type: ${ARCH_TYPE}")
+
+message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
