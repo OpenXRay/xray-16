@@ -37,7 +37,7 @@ CUISpawnWnd::CUISpawnWnd()
 
     std::ignore = UIHelper::CreateStatic(xml_doc, "team_selector:image_frames_tl", this);
     std::ignore = UIHelper::CreateStatic(xml_doc, "team_selector:image_frames_tr", this);
-    //	std::ignore = UIHelper::CreateStatic(xml_doc, "team_selector:image_frames_bottom", this);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "team_selector:image_frames_bottom", this, false);
     std::ignore = UIHelper::CreateScrollView(xml_doc, "team_selector:text_desc", this);
 
     m_pBtnAutoSelect = UIHelper::Create3tButton(xml_doc, "team_selector:btn_autoselect", this);
