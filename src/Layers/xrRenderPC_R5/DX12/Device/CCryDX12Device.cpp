@@ -70,6 +70,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateBuffer(
     _In_opt_  const D3D11_SUBRESOURCE_DATA* pInitialData,
     _Out_opt_  ID3D11Buffer** ppBuffer)
 {
+    DX12_FUNC_LOG
     
     *ppBuffer = CCryDX12Buffer::Create(this, pDesc, pInitialData);
     return *ppBuffer ? S_OK : E_FAIL;

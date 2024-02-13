@@ -126,12 +126,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::Present(
     m_Device->GetDeviceContext()->Finish(m_SwapChain);
 
     DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
-    HRESULT hr = m_SwapChain->Present(SyncInterval, Flags);
-    if (hr == S_OK)
-    {
-        m_Device->GetDeviceContext()->WaitForIdle();
-    }
-    return hr;
+    return m_SwapChain->Present(SyncInterval, Flags);
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetBuffer(
@@ -256,13 +251,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::Present1(
     m_Device->GetDeviceContext()->Finish(m_SwapChain);
 
     DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
-  
-    HRESULT hr = m_SwapChain->Present1(SyncInterval, Flags, pPresentParameters);
-    if (hr == S_OK)
-    {
-        m_Device->GetDeviceContext()->WaitForIdle();
-    }
-    return hr;
+    return m_SwapChain->Present1(SyncInterval, Flags, pPresentParameters);
 }
 
 /* IDXGISwapChain2 implementation */

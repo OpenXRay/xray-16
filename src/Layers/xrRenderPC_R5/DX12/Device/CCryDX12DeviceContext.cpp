@@ -629,8 +629,7 @@ void CCryDX12DeviceContext::DebugPrintResources(DX12::CommandMode commandMode)
 }
 
 void CCryDX12DeviceContext::CeaseDirectCommandQueue(bool wait)
-{
-    
+{   
     R_ASSERT2(m_DirectCommandList != nullptr, "CommandList hasn't been allocated!");
     R_ASSERT2(m_OutstandingQueries == 0, "Flushing command list with outstanding queries!");
 
@@ -764,7 +763,7 @@ void CCryDX12DeviceContext::Finish(DX12::SwapChain* pDX12SwapChain)
 { 
     m_DirectCommandList->PresentRenderTargetView(pDX12SwapChain);
 
-    SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC, m_CmdFenceSet.GetCurrentValues());
+    SubmitAllCommands(true, m_CmdFenceSet.GetCurrentValues());
 
     // Release resource after pass fence and FRAME_FENCE_LATENCY later
     m_pDX12Device->FlushReleaseHeap(DX12::Device::ResourceReleasePolicy::Deferred);
@@ -2517,14 +2516,14 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::ClearState()
    VSSetShader(NULL, NULL, 0);
 
    RSSetViewports(0, NULL);
+   RSSetState(NULL);
    RSSetScissorRects(0, NULL);
 
    OMSetRenderTargets(0, NULL, NULL);
-
    OMSetBlendState(NULL, NULL, 0);
    OMSetDepthStencilState(NULL, 0);
 
-   SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC, m_CmdFenceSet.GetCurrentValues());
+   //m_DirectCommandList->ClearState();
 }
 
 void STDMETHODCALLTYPE CCryDX12DeviceContext::Flush()

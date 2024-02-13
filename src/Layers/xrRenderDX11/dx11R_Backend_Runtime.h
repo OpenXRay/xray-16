@@ -838,14 +838,18 @@ IC void CBackend::get_ConstantDirect(const shared_str& n, size_t DataSize, void*
 
 IC void CBackend::gpu_mark_begin(const wchar_t* name)
 {
-#ifdef USE_DX11
+#if USE_DX12
+    reinterpret_cast<CCryDX12DeviceContext*>(HW.get_context(CHW::IMM_CTX_ID))->PushMarker(name);
+#elif USE_DX11
     pAnnotation->BeginEvent(name);
 #endif // USE_DX11
 }
 
 IC void CBackend::gpu_mark_end()
 {
-#ifdef USE_DX11
+#if USE_DX12
+    reinterpret_cast<CCryDX12DeviceContext *>(HW.get_context(CHW::IMM_CTX_ID))->PopMarker();
+#elif USE_DX11
     pAnnotation->EndEvent();
 #endif // USE_DX11
 }

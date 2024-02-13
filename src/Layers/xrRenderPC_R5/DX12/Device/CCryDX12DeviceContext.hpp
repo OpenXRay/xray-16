@@ -752,7 +752,7 @@ public:
 
     void ResetCachedState();
 
-    void PushMarker(const char* name)
+    void PushMarker(const wchar_t* name)
     {
         PIXBeginEvent(m_DirectCommandList->GetD3D12CommandList(), 0, name);
     }

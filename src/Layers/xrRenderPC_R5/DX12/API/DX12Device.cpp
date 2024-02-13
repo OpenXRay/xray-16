@@ -203,11 +203,23 @@ namespace DX12
         m_NullUAV = CacheUnorderedAccessView(&UAVDesc, nullptr);
 
         D3D12_SAMPLER_DESC SamplerDesc = {};
+       
+#if 0
         SamplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
         SamplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
         SamplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
         SamplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
         SamplerDesc.Filter = D3D12_FILTER_COMPARISON_ANISOTROPIC;
+#else
+        SamplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        SamplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        SamplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+        SamplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+        SamplerDesc.Filter = D3D12_FILTER_ANISOTROPIC;
+#endif
+        SamplerDesc.MinLOD = 0;
+        SamplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
+
         m_NullSampler = CacheSampler(&SamplerDesc);
     }
 
