@@ -29,14 +29,14 @@ public:
     pcstr GetDebugType() override { return "CUIProgressShape"; }
 
 protected:
-    bool m_bClockwise;
-    u32 m_sectorCount;
-    float m_stage;
-    CUIStatic* m_pTexture;
-    CUIStatic* m_pBackground;
-    bool m_bText;
-    bool m_blend;
+    bool m_bClockwise{ true };
+    u32 m_sectorCount{ 8 };
+    float m_stage{};
+    CUIStatic* m_pTexture{};
+    CUIStatic* m_pBackground{};
+    bool m_bText{};
+    bool m_blend{ true };
 
-    float m_angle_begin;
-    float m_angle_end;
+    float m_angle_begin{};
+    float m_angle_end{ PI_MUL_2 };
 };

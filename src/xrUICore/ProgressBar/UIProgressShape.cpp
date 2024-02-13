@@ -3,16 +3,7 @@
 #include "Include/xrRender/UIShader.h"
 #include "Include/xrRender/UIRender.h"
 
-CUIProgressShape::CUIProgressShape() : CUIStatic("CUIProgressShape")
-{
-    m_pBackground = nullptr;
-    m_pTexture = nullptr;
-    m_bText = false;
-    m_blend = true;
-    m_angle_begin = 0.0f;
-    m_angle_end = PI_MUL_2;
-    m_stage = 0.f;
-};
+CUIProgressShape::CUIProgressShape() : CUIStatic("CUIProgressShape") {}
 
 void CUIProgressShape::SetPos(float pos) { m_stage = pos; }
 void CUIProgressShape::SetPos(int pos, int max)
@@ -20,11 +11,9 @@ void CUIProgressShape::SetPos(int pos, int max)
     m_stage = float(pos) / float(max);
     if (m_bText)
     {
-        string256 _buff;
-        if (m_pTexture)
-            m_pTexture->SetText(xr_itoa(pos, _buff, 10));
-        else
-            TextItemControl()->SetText(xr_itoa(pos, _buff, 10));
+        CUIStatic* origin = m_pTexture ? m_pTexture : this;
+        string256 buff;
+        origin->SetText(xr_itoa(pos, buff, 10));
     }
 }
 
@@ -61,18 +50,14 @@ void CUIProgressShape::Draw()
     if (m_pBackground)
         m_pBackground->Draw();
 
+    CUIStatic* origin = m_pTexture ? m_pTexture : this;
+
     if (m_bText)
     {
-        if (m_pTexture)
-            m_pTexture->DrawText();
-        else
-            DrawText();
+        origin->DrawText();
     }
 
-    if (m_pTexture)
-        GEnv.UIRender->SetShader(*m_pTexture->GetShader());
-    else
-        GEnv.UIRender->SetShader(*GetShader());
+    GEnv.UIRender->SetShader(*origin->GetShader());
 
     Fvector2 tsize;
     GEnv.UIRender->GetActiveTextureResolution(tsize);
@@ -80,21 +65,14 @@ void CUIProgressShape::Draw()
     GEnv.UIRender->StartPrimitive(m_sectorCount * 3, IUIRender::ptTriList, UI().m_currentPointType);
 
     Frect pos_rect;
-    if (m_pTexture)
-        m_pTexture->GetAbsoluteRect(pos_rect);
-    else
-        GetAbsoluteRect(pos_rect);
+    origin->GetAbsoluteRect(pos_rect);
     UI().ClientToScreenScaled(pos_rect.lt, pos_rect.x1, pos_rect.y1);
     UI().ClientToScreenScaled(pos_rect.rb, pos_rect.x2, pos_rect.y2);
 
     Fvector2 center_pos;
     pos_rect.getcenter(center_pos);
 
-    Frect tex_rect;
-    if (m_pTexture)
-        tex_rect = m_pTexture->GetUIStaticItem().GetTextureRect();
-    else
-        tex_rect = GetUIStaticItem().GetTextureRect();
+    Frect tex_rect = origin->GetUIStaticItem().GetTextureRect();
 
     tex_rect.lt.x /= tsize.x;
     tex_rect.lt.y /= tsize.y;

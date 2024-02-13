@@ -1,3 +1,11 @@
+// File:		UIPdaKillMessage.h
+// Description:	HUD message about player death. Implementation of visual behavior
+// Created:		10.03.2005
+// Author:		Serge Vynnychenko
+// Mail:		narrator@gsc-game.kiev.ua
+//
+// Copyright 2005 GSC GameWorld
+
 #pragma once
 
 #include "KillMessageStruct.h"
