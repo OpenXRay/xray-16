@@ -44,6 +44,7 @@ namespace DX12
         {
             args.pCommandQueue->Wait(pFences[CMDQUEUE_COPY    ], FenceValues[CMDQUEUE_COPY    ]);
         }
+      
         if (FenceValues[CMDQUEUE_GRAPHICS])
         {
             args.pCommandQueue->Wait(pFences[CMDQUEUE_GRAPHICS], FenceValues[CMDQUEUE_GRAPHICS]);
@@ -64,6 +65,11 @@ namespace DX12
         m_pCmdListPool = nullptr;
     }
 
+    bool AsyncCommandQueue::IsSynchronous()
+    {
+        return ps_r2_ls_flags_ext.test(R5FLAGEXT_SUBMISSION_THREAD);
+    }
+
     void AsyncCommandQueue::Init(CommandListPool* pCommandListPool)
     {
         m_pCmdListPool = pCommandListPool;
@@ -71,13 +77,9 @@ namespace DX12
         m_QueuedTasksCounter = 0;
         m_bStopRequested = false;
 
-        if (RendererDX12::CV_r_D3D12SubmissionThread == 0)
-            return;
-
-        m_asyncThread = std::thread([this] { ThreadEntry(); });
-        m_asyncThread.detach();
+        m_thread_task = std::thread([this] { ThreadEntry(); });
+        m_thread_task.detach();
     }
-
 
     void AsyncCommandQueue::ExecuteCommandLists(UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists)
     {
@@ -142,24 +144,40 @@ namespace DX12
     }
 
     void AsyncCommandQueue::Flush(UINT64 lowerBoundFenceValue)
-    {
-        if (lowerBoundFenceValue != (~0ULL))
+    {       
+        if (IsSynchronous())
         {
-            while (m_QueuedTasksCounter > 0)
-            {
-                if (lowerBoundFenceValue <= m_pCmdListPool->GetLastCompletedFenceValue())
-                {
-                    break;
-                }
+            std::unique_lock lk(m_mutex_for_flush);
+            m_cv_for_flush.wait(lk, [this, lowerBoundFenceValue] {
+                return (m_QueuedTasksCounter == 0 && lowerBoundFenceValue == (~0ULL)) ||
+                    (m_QueuedTasksCounter == 0 && lowerBoundFenceValue != (~0ULL) &&
+                        lowerBoundFenceValue > m_pCmdListPool->GetLastCompletedFenceValue());
+            });
 
-                std::this_thread::sleep_for(std::chrono::seconds(0));
-            }
+            // Manual unlocking is done before notifying, to avoid waking up
+            // the waiting thread only to block again (see notify_one for details)
+            lk.unlock();
         }
         else
         {
-            while (m_QueuedTasksCounter > 0)
+            if (lowerBoundFenceValue != (~0ULL))
             {
-                std::this_thread::sleep_for(std::chrono::seconds(0));
+                while (m_QueuedTasksCounter > 0)
+                {
+                    if (lowerBoundFenceValue <= m_pCmdListPool->GetLastCompletedFenceValue())
+                    {
+                        break;
+                    }
+
+                    std::this_thread::sleep_for(std::chrono::seconds(0));
+                }
+            }
+            else
+            {
+                while (m_QueuedTasksCounter > 0)
+                {
+                    std::this_thread::sleep_for(std::chrono::seconds(0));
+                }
             }
         }
     }
@@ -176,13 +194,10 @@ namespace DX12
         while (true)
         {
             // Wait until main() sends data
-            std::unique_lock lk(m_mutex);
-            m_cv.wait(lk, [this, &task] { return m_bStopRequested || m_TaskQueue.dequeue(task); });
+            std::unique_lock lk(m_mutex_task);
+            m_cv_task.wait(lk, [this] { return m_TaskQueue.is_dequeue() || m_bStopRequested; });
 
-            if (m_bStopRequested)
-                break;
-
-            do
+            while (m_TaskQueue.dequeue(task))
             {
                 switch (task.type)
                 {
@@ -192,8 +207,15 @@ namespace DX12
                 case eTT_WaitForFence: task.Process<SWaitForFence>(GetTaskArg()); break;
                 case eTT_WaitForFences: task.Process<SWaitForFences>(GetTaskArg()); break;
                 }
+                
                 InterlockedDecrement((volatile LONG*)&m_QueuedTasksCounter);
-            } while (m_TaskQueue.dequeue(task));
+            };
+
+            if (m_bStopRequested)
+                break;
+
+            std::lock_guard lk_2(m_mutex_for_flush);
+            m_cv_for_flush.notify_one();
 
             // Manual unlocking is done before notifying, to avoid waking up
             // the waiting thread only to block again (see notify_one for details)

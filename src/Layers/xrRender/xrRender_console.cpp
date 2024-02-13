@@ -189,6 +189,9 @@ Flags32 ps_r2_ls_flags = {R2FLAG_SUN
 
 Flags32 ps_r2_ls_flags_ext = {
     /*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA | R2FLAGEXT_ENABLE_TESSELLATION | R3FLAGEXT_SSR_HALF_DEPTH |
+#if RENDER == R5 
+    R5FLAGEXT_SUBMISSION_THREAD ||
+#endif
     R3FLAGEXT_SSR_JITTER};
 
 float ps_r2_df_parallax_h = 0.02f;
@@ -1090,6 +1093,10 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r3_water_refl_half_depth", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_HALF_DEPTH);
     CMD3(CCC_Mask, "r3_water_refl_jitter", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_JITTER);
     CMD3(CCC_Mask, "r4_new_shader_support", &ps_r2_ls_flags_ext, R4FLAGEXT_NEW_SHADER_SUPPORT);
+
+#if (RENDER == R_R5)
+    CMD3(CCC_Mask, "r5_D3D12SubmissionThread", &ps_r2_ls_flags_ext, R5FLAGEXT_SUBMISSION_THREAD);
+#endif
 
     //CMD3(CCC_Mask, "r3_msaa", &ps_r2_ls_flags, R3FLAG_MSAA);
     CMD3(CCC_Token, "r3_msaa", &ps_r3_msaa, qmsaa_token);

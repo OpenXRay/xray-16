@@ -96,6 +96,12 @@ namespace concqueue
             return true;
         }
 
+        bool is_dequeue() const {
+            buffer_node_t* tail = _tail.load(std::memory_order_relaxed);
+            buffer_node_t* next = tail->next.load(std::memory_order_acquire);
+            return next != NULL;
+        }
+
 
     private:
 

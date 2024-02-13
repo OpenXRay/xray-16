@@ -34,18 +34,14 @@ namespace DX12
         AsyncCommandQueue();
         ~AsyncCommandQueue();
 
-        template<typename TaskType>
-        static bool IsSynchronous()
-        {
-            return RendererDX12::CV_r_D3D12SubmissionThread == 0;
-        }
+        static bool IsSynchronous();
 
         void Init(CommandListPool* pCommandListPool);
         void Flush(UINT64 lowerBoundFenceValue = ~0ULL);
         void SignalStop() { 
-            std::lock_guard lk(m_mutex);
+            std::lock_guard lk(m_mutex_task);
             m_bStopRequested = true;
-            m_cv.notify_one();
+            m_cv_task.notify_all();
         }
 
         void ResetCommandList(CommandList* pCommandList);
@@ -129,17 +125,16 @@ namespace DX12
             }
         };
 
-        STaskArgs GetTaskArg();
+        IC STaskArgs GetTaskArg();
 
         template<typename TaskType>
         void AddTask(SSubmissionTask& task)
         {
-            if (RendererDX12::CV_r_D3D12SubmissionThread)
+            if (IsSynchronous())
             {
-                std::lock_guard lk(m_mutex);
-                InterlockedIncrement((volatile LONG*)&m_QueuedTasksCounter);
-                m_TaskQueue.enqueue(task);
-                m_cv.notify_one();
+                std::lock_guard lk(m_mutex_task);
+                InterlockedIncrement((volatile LONG*)&m_QueuedTasksCounter); m_TaskQueue.enqueue(task);
+                m_cv_task.notify_all();
             }
             else
             {
@@ -154,9 +149,9 @@ namespace DX12
         volatile int m_QueuedTasksCounter;
         volatile bool m_bStopRequested;
 
-        std::mutex m_mutex;
-        std::condition_variable m_cv;
-        std::thread m_asyncThread;
+        std::mutex m_mutex_task, m_mutex_for_flush;
+        std::condition_variable m_cv_task, m_cv_for_flush;
+        std::thread m_thread_task;
 
         CommandListPool* m_pCmdListPool;
         ConcQueue<UnboundMPSC, SSubmissionTask> m_TaskQueue;

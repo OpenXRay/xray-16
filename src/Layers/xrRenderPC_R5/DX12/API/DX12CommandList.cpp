@@ -721,8 +721,6 @@ namespace DX12
         TrackResourceRTVUsage(inputView.GetDX12Resource());
         FlushBarriers();
 
-        D3D12_CLEAR_VALUE clearValue = { DXGI_FORMAT_R32G32B32A32_FLOAT, {rgba[0], rgba[1], rgba[2], rgba[3]}};
-
         m_CommandList->ClearRenderTargetView(inputView.GetDescriptorHandle(), rgba, NumRects, pRect);
         m_Commands += CLCOUNT_CLEAR;
     }
