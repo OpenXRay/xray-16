@@ -18,16 +18,6 @@ project(OpenXRay
     LANGUAGES CXX C
 )
 
-# Detect arch type ( x86 or x64 )
-if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(ARCH_TYPE x64)
-elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(ARCH_TYPE x86)
-else()
-    set(ARCH_TYPE unknown)
-endif()
-message(STATUS "Arch type: ${ARCH_TYPE}")
-
 message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}")
 
 set(CMAKE_CXX_STANDARD 17)
@@ -55,7 +45,7 @@ include(packaging)
 set_git_info()
 
 # Output all libraries and executable to one folder
-set(COMPILE_OUTPUT_FOLDER "${CMAKE_SOURCE_DIR}/bin/${ARCH_TYPE}/${CMAKE_BUILD_TYPE}")
+set(COMPILE_OUTPUT_FOLDER "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_PROCESSOR}/${CMAKE_BUILD_TYPE}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
