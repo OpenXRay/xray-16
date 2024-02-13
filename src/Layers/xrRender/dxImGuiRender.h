@@ -5,13 +5,6 @@
 class dxImGuiRender final : public IImGuiRender
 {
     void SetState(ImDrawData* data);
-
-#if defined(USE_DX12)
-    _smart_ptr<ID3D12DescriptorHeap> m_descriptorHeap;
-    _smart_ptr<ID3D12CommandAllocator> m_cmdAlloc;
-    _smart_ptr<ID3D12GraphicsCommandList> m_cmdList;
-#endif
-
 public:
     void Copy(IImGuiRender& _in) override;
 
