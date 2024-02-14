@@ -71,7 +71,7 @@ void CRenderTarget::phase_combine()
     {
         // Clear to zero
         RCache.ClearRT(rt_Generic_0_r, {});
-        RCache.ClearRT(rt_Generic_1_r, {});
+        RCache.ClearRT(rt_Generic_1_r, color_rgba(127, 127, 0, 127));
         u_setrt(RCache, rt_Generic_0_r, rt_Generic_1_r, nullptr, rt_MSAADepth);
     }
     RCache.set_CullMode(CULL_NONE);

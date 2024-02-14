@@ -60,8 +60,7 @@ public:
 #if defined(USE_DX12)
     ICF ID3D11DeviceContext1* get_context(u32 context_id)
     {
-        VERIFY(context_id < R__NUM_CONTEXTS);
-        return d3d_contexts_pool[context_id];
+        return pDeviceContext;
     }
 #else 
     ICF ID3DDeviceContext* get_context(u32 context_id)
@@ -102,7 +101,7 @@ public:
     bool ExtendedDoublesShaderInstructions;
 
 #if defined(USE_DX12)
-    ID3D11DeviceContext1* d3d_contexts_pool[R__NUM_CONTEXTS]{};
+    ID3D11DeviceContext1* pDeviceContext = nullptr;
 #else
     ID3DDeviceContext* d3d_contexts_pool[R__NUM_CONTEXTS]{};
 #endif 

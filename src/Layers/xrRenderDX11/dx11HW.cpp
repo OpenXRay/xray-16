@@ -151,15 +151,14 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     D3D_FEATURE_LEVEL featureLevels3[] = {D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0};
 #endif
 
-    auto& pContext = d3d_contexts_pool[CHW::IMM_CTX_ID];
-
 #if defined(USE_DX12)
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels) {
         return DX12CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN, nullptr, createDeviceFlags, level, levels,
-            D3D12_SDK_VERSION, reinterpret_cast<ID3D11Device **>(&pDevice), &FeatureLevel, reinterpret_cast<ID3D11DeviceContext**>(& pContext));
+            D3D12_SDK_VERSION, reinterpret_cast<ID3D11Device **>(&pDevice), &FeatureLevel, reinterpret_cast<ID3D11DeviceContext**>(& pDeviceContext));
     };
     R = createDevice(featureLevels, std::size(featureLevels));
 #else
+    auto& pContext = d3d_contexts_pool[CHW::IMM_CTX_ID];
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels) {
         static const auto d3d11CreateDevice =
             static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
@@ -242,16 +241,14 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     _SHOW_REF("* CREATE: DeviceREF:", pDevice);
 
+#if defined(USE_DX11)
     // Create deferred contexts
     for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
     {
-#if defined(USE_DX12)
-        R = pDevice->CreateDeferredContext(0, reinterpret_cast<ID3D11DeviceContext**>(&d3d_contexts_pool[id]));
-#else 
         R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
-#endif
         VERIFY(SUCCEEDED(R));
     }
+#endif
 
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
@@ -537,11 +534,16 @@ void CHW::DestroyDevice()
     _RELEASE(pContext1);
 #endif
 
+#if defined(USE_DX12)
+    _SHOW_REF("refCount:pContext", pDeviceContext);
+    _RELEASE(pDeviceContext);
+#else
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         _SHOW_REF("refCount:pContext", d3d_contexts_pool[id]);
         _RELEASE(d3d_contexts_pool[id]);
     }
+#endif
 
 #if defined(USE_DX11)
 #ifdef HAS_DX11_3

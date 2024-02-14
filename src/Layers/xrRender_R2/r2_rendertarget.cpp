@@ -312,12 +312,19 @@ CRenderTarget::CRenderTarget(bool reset)
             xr_sprintf(temp, "%s%u", r2_RT_base, i);
             rt_Base[i].create(temp, w, h, HW.Caps.fTarget, 1, { CRT::CreateBase });
         }
-        rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, { CRT::CreateBase });
-
+#if  defined(USE_DX12)
+        rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, {CRT::CreateBase}, Fcolor(1, 0, 0, 0));
+#else
+        rt_Base_Depth.create(r2_RT_base_depth, w, h, HW.Caps.fDepth, 1, {CRT::CreateBase});
+#endif
         if (!options.msaa)
             rt_MSAADepth = rt_Base_Depth;
         else
+#if defined(USE_DX12)
+            rt_MSAADepth.create(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount, {}, Fcolor(1, 0, 0, 0));
+#else
             rt_MSAADepth.create(r2_RT_MSAAdepth, w, h, D3DFMT_D24S8, SampleCount);
+#endif
 
         rt_Position.create(r2_RT_P, w, h, D3DFMT_A16B16G16R16F, SampleCount);
         if (!options.gbuffer_opt)
@@ -463,12 +470,16 @@ CRenderTarget::CRenderTarget(bool reset)
         // otherwise - create texture with specified HW_smap_FORMAT
         const auto num_slices = RImplementation.o.support_rt_arrays ? R__NUM_SUN_CASCADES : 1;
 #if defined(USE_DX12)
-        rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, num_slices, flags, {0.0f, 0.0f, 0.0f, 1.0f});
+        rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, num_slices, flags, Fcolor(1, 0, 0, 0));
 #else 
         rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, num_slices, flags);
 #endif 
 #if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
+#if defined(USE_DX12)
+        rt_smap_rain.create(r2_RT_smap_rain, options.rain_smapsize, options.rain_smapsize, depth_format, 1, {}, Fcolor(1, 0, 0, 0));
+#else
         rt_smap_rain.create(r2_RT_smap_rain, options.rain_smapsize, options.rain_smapsize, depth_format);
+#endif
         if (options.minmax_sm)
         {
             rt_smap_depth_minmax.create(r2_RT_smap_depth_minmax, smapsize / 4, smapsize / 4, D3DFMT_R32F);
