@@ -175,11 +175,6 @@ void CUIMMShniaga::CreateList(xr_vector<CUIStatic*>& lst, CUIXml& xml_doc, LPCST
         st->SetFont(pF);
         st->SetTextComplexMode(false);
         st->SetTextST(xml_doc.ReadAttrib("btn", i, "caption"));
-
-        //		float font_height			= st->GetFont()->GetHeight();
-        //		UI().ClientToScreenScaledHeight(font_height);
-
-        //.		st->SetTextOffset			(0, (button_height-font_height)/2.0f);
         st->SetTextColor(color);
         st->SetTextAlignment(CGameFont::alCenter);
         st->SetVTextAlignment(valCenter);

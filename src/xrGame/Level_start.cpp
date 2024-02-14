@@ -248,10 +248,17 @@ bool CLevel::net_start6()
     {
         if (strstr(Core.Params, "-$"))
         {
-            string256 buf, cmd, param;
-            sscanf(strstr(Core.Params, "-$") + 2, "%[^ ] %[^ ] ", cmd, param);
-            strconcat(sizeof(buf), buf, cmd, " ", param);
-            Console->Execute(buf);
+            string256 buf{}, cmd{}, param{};
+            const int result = sscanf(strstr(Core.Params, "-$") + 2, "%[^ ] %[^ ] ", cmd, param);
+            if (result == 2)
+            {
+                strconcat(buf, cmd, " ", param);
+                Console->Execute(buf);
+            }
+            else
+            {
+                Log("! The key '-$' is not being used correctly. Correct format: -$ <command> <param>");
+            }
         }
     }
     else

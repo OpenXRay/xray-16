@@ -16,9 +16,7 @@ class CUISpawnWnd final : public CUIDialogWnd
 
 public:
     CUISpawnWnd();
-    ~CUISpawnWnd() override;
 
-    virtual void Init();
     void SendMessage(CUIWindow* pWnd, s16 msg, void* pData) override;
     bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
     void SetVisibleForBtn(ETEAMMENU_BTN btn, bool state);
@@ -38,15 +36,11 @@ protected:
     //	void	SetCallbackFunc (ButtonClickCallback pFunc);
 
 protected:
-    CUIStatic* m_pCaption;
-    CUIStatic* m_pBackground;
-    CUIStatic* m_pFrames[2];
-    CUIScrollView* m_pTextDesc;
     CUIStatix* m_pImage1;
     CUIStatix* m_pImage2;
     CUI3tButton* m_pBtnAutoSelect;
     CUI3tButton* m_pBtnSpectator;
     CUI3tButton* m_pBtnBack;
 
-    int m_iCurTeam;
+    int m_iCurTeam{};
 };

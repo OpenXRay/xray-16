@@ -214,8 +214,7 @@ public:
         CCC_Token::Execute(args);
         StringTable().ReloadLanguage();
 
-        if (g_pGamePersistent && g_pGamePersistent->IsMainMenuActive())
-            MainMenu()->OnUIReset();
+        Device.seqUIReset.Process();
 
         if (!g_pGameLevel)
             return;
