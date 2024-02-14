@@ -878,15 +878,15 @@ void CCryDX12DeviceContext::ResolveOcclusion(DX12::CommandList* pCmdList, UINT i
                 m_OcclusionMemory = nullptr;
             }
 
-            pCmdList->ResolveQueryData(m_OcclusionHeap, D3D12_QUERY_TYPE_OCCLUSION, 0, m_OcclusionHeap.GetCapacity(), m_OcclusionDownloadBuffer, 0);
+            pCmdList->ResolveQueryData(m_OcclusionHeap, D3D12_QUERY_TYPE_OCCLUSION, 0, std::min(index, m_OcclusionHeap.GetCapacity()), m_OcclusionDownloadBuffer, 0);
 
             // Resources on D3D12_HEAP_TYPE_READBACK heaps do not support persistent map.
-            const D3D12_RANGE sFullRead = { 0, sizeof(UINT64) * m_OcclusionHeap.GetCapacity() };
+            const D3D12_RANGE sFullRead = {0, sizeof(UINT64) * std::min(index, m_OcclusionHeap.GetCapacity())};
             m_OcclusionDownloadBuffer->Map(0, &sFullRead, &m_OcclusionMemory);
             m_OcclusionMapValid = true;
         }
 
-        memcpy(mem, (char*)m_OcclusionMemory + index * 8, 8);
+        memcpy(mem, (char*)m_OcclusionMemory + index * sizeof(UINT64), sizeof(UINT64));
     }
 }
 
