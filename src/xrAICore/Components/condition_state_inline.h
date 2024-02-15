@@ -39,7 +39,7 @@ TEMPLATE_SPECIALIZATION
 IC void CConditionStateAbstract::add_condition(const _world_property& condition)
 {
     typename xr_vector<_world_property>::iterator I = std::lower_bound(m_conditions.begin(), m_conditions.end(), condition);
-    THROW((I == m_conditions.end()) || ((*I).condition() != condition.condition()));
+    VERIFY((I == m_conditions.end()) || ((*I).condition() != condition.condition()));
     m_conditions.insert(I, condition);
     m_hash ^= condition.hash_value();
 }
@@ -49,7 +49,7 @@ IC void CConditionStateAbstract::remove_condition(const typename _world_property
 {
     typename xr_vector<_world_property>::iterator I = std::lower_bound(
         m_conditions.begin(), m_conditions.end(), _world_property(condition, typename _world_property::value_type(0)));
-    THROW((I != m_conditions.end()) && ((*I).condition() == condition));
+    VERIFY((I != m_conditions.end()) && ((*I).condition() == condition));
     m_hash ^= (*I).hash_value();
     m_conditions.erase(I);
 }
