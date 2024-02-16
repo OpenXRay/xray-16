@@ -137,6 +137,10 @@ namespace DX12
         ResetStateTracking(CommandModeGraphics);
     }
 
+#if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
+    BOOL CommandList::s_DepthBoundsTestSupported = false;
+#endif
+
     CommandList::~CommandList()
     {
     }
@@ -186,6 +190,38 @@ namespace DX12
 
             m_CommandList = pCmdList;
             pCmdList->Release();
+
+            if (m_eListType == D3D12_COMMAND_LIST_TYPE_COPY)
+            {
+#if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
+                m_CommandList1 = nullptr;
+#endif
+#if NTDDI_WIN10_RS3 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS3)
+                m_CommandList2 = nullptr;
+#endif
+            }
+            else
+            {
+                // Creator's Update
+#if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
+                ID3D12GraphicsCommandList1* pCmdList1 = nullptr;
+                pCmdList->QueryInterface(__uuidof(ID3D12GraphicsCommandList1), (void**)&pCmdList1);
+                if (m_CommandList1 = pCmdList1)
+                    pCmdList1->Release();
+
+                D3D12_FEATURE_DATA_D3D12_OPTIONS2 Options2;
+                if (GetDevice()->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS2, &Options2, sizeof(Options2)) == S_OK)
+                    s_DepthBoundsTestSupported = Options2.DepthBoundsTestSupported;
+#endif
+
+                    // Fall Creator's Update
+#if NTDDI_WIN10_RS3 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS3)
+                ID3D12GraphicsCommandList2* pCmdList2 = nullptr;
+                pCmdList->QueryInterface(__uuidof(ID3D12GraphicsCommandList2), (void**)&pCmdList2);
+                if (m_CommandList2 = pCmdList2)
+                    pCmdList2->Release();
+#endif
+            }
 
 #if DX12_GPU_PROFILE_MODE != DX12_GPU_PROFILE_MODE_OFF
             m_Timers.Init(TimerCountMax);

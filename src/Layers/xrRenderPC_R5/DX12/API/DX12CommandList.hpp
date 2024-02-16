@@ -526,6 +526,17 @@ namespace DX12
             m_Commands += CLCOUNT_SETSTATE;
         }
 
+        inline void SetDepthBounds(float fMin, float fMax)
+        {
+#if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
+            if (m_CommandList && s_DepthBoundsTestSupported)
+            {
+                m_CommandList1->OMSetDepthBounds(fMin, fMax);
+                m_Commands += CLCOUNT_SETSTATE;
+            }
+#endif
+        }
+
         inline void SetStencilRef(UINT Ref)
         {
             m_CommandList->OMSetStencilRef(Ref);
@@ -558,6 +569,10 @@ namespace DX12
         CommandList(CommandListPool& pPool);
         CommandListPool& m_rPool;
 
+#if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
+        static BOOL s_DepthBoundsTestSupported;
+#endif
+
         void ResetStateTracking(CommandMode commandMode);
         void BindDepthStencilView(const ResourceView& dsv);
         void BindRenderTargetView(const ResourceView& rtv);
@@ -567,6 +582,12 @@ namespace DX12
 
         ID3D12Device* m_pD3D12Device;
         _smart_ptr<ID3D12GraphicsCommandList> m_CommandList;
+#if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
+        _smart_ptr<ID3D12GraphicsCommandList1> m_CommandList1; // Creator's Update
+#endif
+#if NTDDI_WIN10_RS3 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS3)
+        _smart_ptr<ID3D12GraphicsCommandList2> m_CommandList2; // Fall Creator's Update
+#endif
         _smart_ptr<ID3D12CommandAllocator> m_pCmdAllocator;
         _smart_ptr<ID3D12CommandQueue> m_pCmdQueue;
         std::atomic<u64> m_UsedFenceValues[CMDTYPE_NUM][CMDQUEUE_NUM];
