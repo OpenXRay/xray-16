@@ -61,7 +61,7 @@ namespace DX12
         {
             // Check if the swapchain is ready to accept another frame
             HANDLE frameLatencyWaitableObject = pSwapChain->GetFrameLatencyWaitableObject();
-            //result = WaitForSingleObjectEx(frameLatencyWaitableObject, 500, TRUE);
+            result = WaitForSingleObjectEx(frameLatencyWaitableObject, 0, TRUE);
         }
 
         if (Desc->Windowed && (Desc->Flags & DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING) && !(Flags & DXGI_PRESENT_TEST))

@@ -19,7 +19,8 @@
 #define DX12_GPU_PROFILE_MODE_OFF       0       // Turn off profiling
 #define DX12_GPU_PROFILE_MODE_BASIC     1       // Profiles command list lifetime
 #define DX12_GPU_PROFILE_MODE_DETAIL    2       // Profiles draw call state changes
-#define DX12_GPU_PROFILE_MODE DX12_GPU_PROFILE_MODE_OFF
+
+#define DX12_GPU_PROFILE_MODE  DX12_GPU_PROFILE_MODE_OFF
 
 namespace DX12
 {

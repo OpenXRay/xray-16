@@ -70,7 +70,7 @@ namespace DX12
 
     void TimerHeap::End(CommandList& commandList)
     {
-        commandList.ResolveQueryData(m_TimestampHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0, m_TimestampHeap.GetCapacity(), m_TimestampDownloadBuffer, 0);
+        commandList.ResolveQueryData(m_TimestampHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0, TimerHandle(m_Timers.size()) * 2, m_TimestampDownloadBuffer, 0);
     }
 
     TimerHandle TimerHeap::BeginTimer(CommandList& commandList, const char* name)

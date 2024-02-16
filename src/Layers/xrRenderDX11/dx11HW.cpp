@@ -663,13 +663,16 @@ void CHW::Present()
 
 DeviceState CHW::GetDeviceState() const
 {
+#if defined(USE_DX11)
     const auto result = m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
 
     switch (result)
     {
         // Check if the device is ready to be reset
-    case DXGI_ERROR_DEVICE_RESET: return DeviceState::NeedReset;
+        case DXGI_ERROR_DEVICE_RESET:
+            return DeviceState::NeedReset;
     }
+#endif
 
     return DeviceState::Normal;
 }

@@ -24,6 +24,27 @@ namespace DX12
         IDXGISwapChain3* dxgiSwapChain3 = NULL;
         ID3D12CommandQueue* commandQueue = commandList->GetD3D12CommandQueue();
 
+#ifdef __dxgi1_5_h__
+        BOOL bAllowTearing = FALSE;
+        {
+            IDXGIFactory5* pFactory5 = nullptr;
+            if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
+                S_OK ==
+                    pFactory5->CheckFeatureSupport(
+                        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
+            {
+                pFactory5->Release();
+            }
+
+            if (bAllowTearing)
+            {
+                pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+            }
+        }
+#else
+        BOOL bAllowTearing = FALSE;
+#endif
+
 	// If discard isn't implemented/supported/fails, try the newer swap-types
 #if defined(__dxgi1_4_h__) || defined(__d3d11_x_h__)
         if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
@@ -42,26 +63,6 @@ namespace DX12
 #endif
 #endif    
         HRESULT hr = pFactory->CreateSwapChain(commandQueue, pDesc, &dxgiSwapChain);
-
-#ifdef __dxgi1_5_h__
-        BOOL bAllowTearing = FALSE;
-        {
-            IDXGIFactory5* pFactory5 = nullptr;
-            if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
-                S_OK ==
-                    pFactory5->CheckFeatureSupport(
-                        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
-            {
-            }
-
-            if (bAllowTearing)
-            {
-                pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-            }
-        }
-#else
-        BOOL bAllowTearing = FALSE;
-#endif
         
         if (hr == S_OK && dxgiSwapChain)
         {
@@ -87,6 +88,27 @@ namespace DX12
         
         DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
 
+#ifdef __dxgi1_5_h__
+        BOOL bAllowTearing = FALSE;
+        {
+            IDXGIFactory5* pFactory5 = nullptr;
+            if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
+                S_OK ==
+                    pFactory5->CheckFeatureSupport(
+                        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
+            {
+                pFactory5->Release();
+            }
+
+            if (bAllowTearing)
+            {
+                desc1.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+            }
+        }
+#else
+        BOOL bAllowTearing = FALSE;
+#endif
+
         // If discard isn't implemented/supported/fails, try the newer swap-types
 #if defined(__dxgi1_4_h__) || defined(__d3d11_x_h__)
         if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
@@ -103,27 +125,8 @@ namespace DX12
         }
 #endif
 #endif
+
         HRESULT hr = pFactory->CreateSwapChainForHwnd(commandQueue, hWnd, &desc1, pFullscreenDesc, pRestrictToOutput, &dxgiSwapChain1);
-
-#ifdef __dxgi1_5_h__
-        BOOL bAllowTearing = FALSE;
-        {
-            IDXGIFactory5* pFactory5 = nullptr;
-            if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
-                S_OK ==
-                    pFactory5->CheckFeatureSupport(
-                        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
-            {
-            }
-
-            if (bAllowTearing)
-            {
-                desc1.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-            }
-        }
-#else
-        BOOL bAllowTearing = FALSE;
-#endif
 
         if (hr == S_OK && dxgiSwapChain1)
         {
@@ -155,6 +158,27 @@ namespace DX12
         ID3D12CommandQueue* commandQueue = commandList->GetD3D12CommandQueue();
 
         DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
+
+#ifdef __dxgi1_5_h__
+        BOOL bAllowTearing = FALSE;
+        {
+            IDXGIFactory5* pFactory5 = nullptr;
+            if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
+                S_OK ==
+                    pFactory5->CheckFeatureSupport(
+                        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
+            {
+                pFactory5->Release();
+            }
+
+            if (bAllowTearing)
+            {
+                desc1.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+            }
+        }
+#else
+        BOOL bAllowTearing = FALSE;
+#endif
     
         // If discard isn't implemented/supported/fails, try the newer swap-types
 #if defined(__dxgi1_4_h__) || defined(__d3d11_x_h__)
@@ -173,26 +197,6 @@ namespace DX12
 #endif
 
         HRESULT hr = pFactory->CreateSwapChainForCoreWindow(commandQueue, pWindow, &desc1, pRestrictToOutput, &dxgiSwapChain1);
-
-#ifdef __dxgi1_5_h__
-        BOOL bAllowTearing = FALSE;
-        {
-            IDXGIFactory5* pFactory5 = nullptr;
-            if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
-                S_OK ==
-                    pFactory5->CheckFeatureSupport(
-                        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
-            {
-            }
-
-            if (bAllowTearing)
-            {
-                desc1.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-            }
-        }
-#else
-        BOOL bAllowTearing = FALSE;
-#endif
 
         if (hr == S_OK && dxgiSwapChain1)
         {
@@ -220,6 +224,8 @@ namespace DX12
 
     SwapChain::SwapChain(CommandList* commandList, IDXGISwapChain3* dxgiSwapChain, DXGI_SWAP_CHAIN_DESC* pDesc)
         : ReferenceCounted()
+        , m_bChangedBackBufferIndex(true)
+        , m_nCurrentBackBufferIndex(0)
         , m_CommandList(commandList)
         , m_AsyncQueue(commandList->GetCommandListPool().GetAsyncCommandQueue())
     {
@@ -260,7 +266,6 @@ namespace DX12
     HRESULT SwapChain::ResizeTarget(const DXGI_MODE_DESC* pNewTargetParameters)
     {
         m_bChangedBackBufferIndex = true;
-
         return m_NativeSwapChain->ResizeTarget(pNewTargetParameters);
     }
 
@@ -268,7 +273,6 @@ namespace DX12
         UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
     {
         m_bChangedBackBufferIndex = true;
-
         m_NativeSwapChain->GetDesc(&m_Desc);
 
         // DXGI ERROR: IDXGISwapChain::ResizeBuffers: Cannot add or remove the DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING flag

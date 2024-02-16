@@ -124,28 +124,33 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::Present(
 {  
     DX12_FUNC_LOG
 
-    UINT Buffer = m_SwapChain->GetCurrentBackBufferIndex();
-    DX12::Resource& dx12Resource = m_SwapChain->GetBackBuffer(Buffer);
-
-    if (m_BackBuffers[Buffer])
+    if (!(Flags & DXGI_PRESENT_TEST))
     {
-        // HACK: transfer state from "outside" CResource to "inside" CResource
-        dx12Resource.SetCurrentState(m_BackBuffers[Buffer]->GetDX12Resource().GetCurrentState());
-        dx12Resource.SetAnnouncedState(m_BackBuffers[Buffer]->GetDX12Resource().GetAnnouncedState());
+        UINT Buffer = m_SwapChain->GetCurrentBackBufferIndex();
+        DX12::Resource& dx12Resource = m_SwapChain->GetBackBuffer(Buffer);
+
+        if (m_BackBuffers[Buffer])
+        {
+            // HACK: transfer state from "outside" CResource to "inside" CResource
+            dx12Resource.SetCurrentState(m_BackBuffers[Buffer]->GetDX12Resource().GetCurrentState());
+            dx12Resource.SetAnnouncedState(m_BackBuffers[Buffer]->GetDX12Resource().GetAnnouncedState());
+        }
+
+        m_Device->GetDeviceContext()->Finish(m_SwapChain);
+
+        if (m_BackBuffers[Buffer])
+        {
+            // HACK: transfer state from "inside" CResource to "outside" CResource
+            m_BackBuffers[Buffer]->GetDX12Resource().SetCurrentState(dx12Resource.GetCurrentState());
+            m_BackBuffers[Buffer]->GetDX12Resource().SetAnnouncedState(dx12Resource.GetAnnouncedState());
+        }
+
+        DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
+        m_SwapChain->Present(SyncInterval, Flags);
+        return m_SwapChain->GetLastPresentReturnValue();
     }
 
-    m_Device->GetDeviceContext()->Finish(m_SwapChain);
-
-    if (m_BackBuffers[Buffer])
-    {
-        // HACK: transfer state from "inside" CResource to "outside" CResource
-        m_BackBuffers[Buffer]->GetDX12Resource().SetCurrentState(dx12Resource.GetCurrentState());
-        m_BackBuffers[Buffer]->GetDX12Resource().SetAnnouncedState(dx12Resource.GetAnnouncedState());
-    }
-
-    DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
-    m_SwapChain->Present(SyncInterval, Flags);
-    return m_SwapChain->GetLastPresentReturnValue();
+    return m_SwapChain->GetDXGISwapChain()->Present(SyncInterval, Flags);
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetBuffer(
@@ -257,28 +262,32 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::Present1(
 {
     DX12_FUNC_LOG
 
-    UINT Buffer = m_SwapChain->GetCurrentBackBufferIndex();
-    DX12::Resource& dx12Resource = m_SwapChain->GetBackBuffer(Buffer);
-
-    if (m_BackBuffers[Buffer])
+    if (!(Flags & DXGI_PRESENT_TEST))
     {
-        // HACK: transfer state from "outside" CResource to "inside" CResource
-        dx12Resource.SetCurrentState(m_BackBuffers[Buffer]->GetDX12Resource().GetCurrentState());
-        dx12Resource.SetAnnouncedState(m_BackBuffers[Buffer]->GetDX12Resource().GetAnnouncedState());
+        UINT Buffer = m_SwapChain->GetCurrentBackBufferIndex();
+        DX12::Resource& dx12Resource = m_SwapChain->GetBackBuffer(Buffer);
+
+        if (m_BackBuffers[Buffer])
+        {
+            // HACK: transfer state from "outside" CResource to "inside" CResource
+            dx12Resource.SetCurrentState(m_BackBuffers[Buffer]->GetDX12Resource().GetCurrentState());
+            dx12Resource.SetAnnouncedState(m_BackBuffers[Buffer]->GetDX12Resource().GetAnnouncedState());
+        }
+
+        m_Device->GetDeviceContext()->Finish(m_SwapChain);
+
+        if (m_BackBuffers[Buffer])
+        {
+            // HACK: transfer state from "inside" CResource to "outside" CResource
+            m_BackBuffers[Buffer]->GetDX12Resource().SetCurrentState(dx12Resource.GetCurrentState());
+            m_BackBuffers[Buffer]->GetDX12Resource().SetAnnouncedState(dx12Resource.GetAnnouncedState());
+        }
+
+        DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
+        m_SwapChain->Present1(SyncInterval, Flags, pPresentParameters);
+        return m_SwapChain->GetLastPresentReturnValue();
     }
-
-    m_Device->GetDeviceContext()->Finish(m_SwapChain);
-
-    if (m_BackBuffers[Buffer])
-    {
-        // HACK: transfer state from "inside" CResource to "outside" CResource
-        m_BackBuffers[Buffer]->GetDX12Resource().SetCurrentState(dx12Resource.GetCurrentState());
-        m_BackBuffers[Buffer]->GetDX12Resource().SetAnnouncedState(dx12Resource.GetAnnouncedState());
-    }
-
-    DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
-    m_SwapChain->Present1(SyncInterval, Flags, pPresentParameters);
-    return m_SwapChain->GetLastPresentReturnValue();
+    return m_SwapChain->GetDXGISwapChain()->Present1(SyncInterval, Flags, pPresentParameters);
 }
 
 /* IDXGISwapChain2 implementation */
