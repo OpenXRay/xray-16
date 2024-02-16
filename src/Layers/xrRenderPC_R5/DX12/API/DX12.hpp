@@ -37,9 +37,9 @@ extern int g_nPrintDX12;
 namespace RendererDX12
 {
 #if DEBUG
-    const bool CV_r_EnableDebugLayer = true;
+    const int CV_r_EnableDebugLayer = 2;
 #else 
-    const bool CV_r_EnableDebugLayer = false;
+    const int CV_r_EnableDebugLayer = 0;
 #endif
 }; // namespace RendererDX12
 

@@ -38,12 +38,16 @@ namespace DX12
 
         void Init(CommandListPool* pCommandListPool);
         void Flush(UINT64 lowerBoundFenceValue = ~0ULL);
-        void SignalStop() { 
-            std::lock_guard lk(m_mutex_task);
+        void FlushNextPresent();
+        void SignalStop() 
+        { 
             m_bStopRequested = true;
-            m_cv_task.notify_all();
         }
 
+        // Equates to the number of pending Present() calls
+        int GetQueuedFramesCount() const { return m_QueuedFramesCounter; }
+
+        void Present(IDXGISwapChain3* pSwapChain, HRESULT* pPresentResult, UINT SyncInterval, UINT Flags, const DXGI_SWAP_CHAIN_DESC& Desc, UINT bufferIndex);
         void ResetCommandList(CommandList* pCommandList);
         void ExecuteCommandLists(UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists);
         void Signal(ID3D12Fence* pFence, const UINT64 Value);
@@ -55,6 +59,7 @@ namespace DX12
         {
             eTT_ExecuteCommandList,
             eTT_ResetCommandList,
+            eTT_PresentBackbuffer,
             eTT_SignalFence,
             eTT_WaitForFence,
             eTT_WaitForFences
@@ -62,7 +67,7 @@ namespace DX12
 
         struct STaskArgs
         {
-            ID3D12CommandQueue* pCommandQueue;
+            CommandListPool* pCommandListPool;
             volatile int* QueueFramesCounter;
         };
 
@@ -104,6 +109,17 @@ namespace DX12
             void Process(const STaskArgs& args);
         };
 
+        struct SPresentBackbuffer
+        {
+            IDXGISwapChain3* pSwapChain;
+            HRESULT* pPresentResult;
+            UINT SyncInterval;
+            UINT Flags;
+            const DXGI_SWAP_CHAIN_DESC* Desc;
+
+            void Process(const STaskArgs& args);
+        };
+
         struct SSubmissionTask
         {
             eTaskType type;
@@ -115,6 +131,7 @@ namespace DX12
                 SWaitForFences WaitForFences;
                 SExecuteCommandlist ExecuteCommandList;
                 SResetCommandlist ResetCommandList;
+                SPresentBackbuffer PresentBackbuffer;
             } Data;
 
             template<typename TaskType>
@@ -132,9 +149,8 @@ namespace DX12
         {
             if (IsSynchronous())
             {
-                std::lock_guard lk(m_mutex_task);
-                InterlockedIncrement((volatile LONG*)&m_QueuedTasksCounter); m_TaskQueue.enqueue(task);
-                m_cv_task.notify_all();
+                m_TaskQueue.enqueue(task);
+                m_TaskEvent.Release();
             }
             else
             {
@@ -146,14 +162,13 @@ namespace DX12
         void ThreadEntry();
 
         volatile int m_QueuedFramesCounter;
-        volatile int m_QueuedTasksCounter;
         volatile bool m_bStopRequested;
+        volatile bool m_bSleeping;
 
-        std::mutex m_mutex_task, m_mutex_for_flush;
-        std::condition_variable m_cv_task, m_cv_for_flush;
-        std::thread m_thread_task;
+        static const int MAX_FRAMES_GPU_LAG = 1; // Maximum number of frames GPU can lag behind CPU. TODO: tie to cvar
 
         CommandListPool* m_pCmdListPool;
         ConcQueue<UnboundMPSC, SSubmissionTask> m_TaskQueue;
+        CryFastSemaphore m_TaskEvent;
     };
 };

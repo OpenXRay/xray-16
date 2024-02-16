@@ -80,6 +80,16 @@ namespace DX12
             return m_nPoolFenceId;
         }
 
+        inline void SetSignalledFenceValue(const UINT64 fenceValue)
+        {
+            return m_rCmdFences.SetSignalledValue(fenceValue, m_nPoolFenceId);
+        }
+
+        inline UINT64 GetSignalledFenceValue() 
+        { 
+            return m_rCmdFences.GetSignalledValue(m_nPoolFenceId);
+        }
+
         inline void SetSubmittedFenceValue(const UINT64 fenceValue)
         {
             return m_rCmdFences.SetSubmittedValue(fenceValue, m_nPoolFenceId);

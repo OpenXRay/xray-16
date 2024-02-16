@@ -24,28 +24,45 @@ namespace DX12
         IDXGISwapChain3* dxgiSwapChain3 = NULL;
         ID3D12CommandQueue* commandQueue = commandList->GetD3D12CommandQueue();
 
-        // If discard isn't implemented/supported/fails, try the newer swap-types
-        // - flip_discard is win 10
-        // - flip_sequentially is win 8
-        HRESULT hr = S_OK;
-
-        if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
+	// If discard isn't implemented/supported/fails, try the newer swap-types
+#if defined(__dxgi1_4_h__) || defined(__d3d11_x_h__)
+        if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
         {
-            pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-            pDesc->BufferCount = std::max(2U, pDesc->BufferCount);
-            hr = pFactory->CreateSwapChain(commandQueue, pDesc, &dxgiSwapChain);
-        }
-        else if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
-        {
+            // - flip_sequentially is win 8
             pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
             pDesc->BufferCount = std::max(2U, pDesc->BufferCount);
-            hr = pFactory->CreateSwapChain(commandQueue, pDesc, &dxgiSwapChain);
         }
-        else
+#ifdef __dxgi1_4_h__
+        else if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
         {
-            hr = pFactory->CreateSwapChain(commandQueue, pDesc, &dxgiSwapChain);
+            // - flip_discard is win 10
+            pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+            pDesc->BufferCount = std::max(2U, pDesc->BufferCount);
         }
+#endif
+#endif    
+        HRESULT hr = pFactory->CreateSwapChain(commandQueue, pDesc, &dxgiSwapChain);
 
+#ifdef __dxgi1_5_h__
+        BOOL bAllowTearing = FALSE;
+        {
+            IDXGIFactory5* pFactory5 = nullptr;
+            if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
+                S_OK ==
+                    pFactory5->CheckFeatureSupport(
+                        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
+            {
+            }
+
+            if (bAllowTearing)
+            {
+                pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+            }
+        }
+#else
+        BOOL bAllowTearing = FALSE;
+#endif
+        
         if (hr == S_OK && dxgiSwapChain)
         {
             hr = dxgiSwapChain->QueryInterface(IID_PPV_ARGS(&dxgiSwapChain3));
@@ -67,33 +84,46 @@ namespace DX12
         IDXGISwapChain1* dxgiSwapChain1 = NULL;
         IDXGISwapChain3* dxgiSwapChain3 = NULL;
         ID3D12CommandQueue* commandQueue = commandList->GetD3D12CommandQueue();
+        
+        DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
 
         // If discard isn't implemented/supported/fails, try the newer swap-types
-        // - flip_discard is win 10
-        // - flip_sequentially is win 8
-        HRESULT hr = S_OK;
-        
+#if defined(__dxgi1_4_h__) || defined(__d3d11_x_h__)
         if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
         {
-            DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
             desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
             desc1.BufferCount = std::max(2U, pDesc->BufferCount);
-
-            hr = pFactory->CreateSwapChainForHwnd(commandQueue, hWnd, &desc1, pFullscreenDesc, pRestrictToOutput, &dxgiSwapChain1);
         }
+#ifdef __dxgi1_4_h__
         else if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
         {
-            DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
-
             desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
             desc1.BufferCount = std::max(2U, pDesc->BufferCount);   
 
-            hr = pFactory->CreateSwapChainForHwnd(commandQueue, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput, &dxgiSwapChain1);
         }
-        else
+#endif
+#endif
+        HRESULT hr = pFactory->CreateSwapChainForHwnd(commandQueue, hWnd, &desc1, pFullscreenDesc, pRestrictToOutput, &dxgiSwapChain1);
+
+#ifdef __dxgi1_5_h__
+        BOOL bAllowTearing = FALSE;
         {
-            hr = pFactory->CreateSwapChainForHwnd(commandQueue, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput, &dxgiSwapChain1);
+            IDXGIFactory5* pFactory5 = nullptr;
+            if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
+                S_OK ==
+                    pFactory5->CheckFeatureSupport(
+                        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
+            {
+            }
+
+            if (bAllowTearing)
+            {
+                desc1.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+            }
         }
+#else
+        BOOL bAllowTearing = FALSE;
+#endif
 
         if (hr == S_OK && dxgiSwapChain1)
         {
@@ -104,6 +134,12 @@ namespace DX12
             {
                 DXGI_SWAP_CHAIN_DESC desc;
                 dxgiSwapChain3->GetDesc(&desc);
+                if (bAllowTearing)
+                {
+                    desc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+                }
+                desc.BufferCount = desc1.BufferCount;
+                desc.SwapEffect = desc1.SwapEffect;
                 return DX12::PassAddRef(new SwapChain(commandList, dxgiSwapChain3, &desc));
             }
         }
@@ -118,33 +154,45 @@ namespace DX12
         IDXGISwapChain3* dxgiSwapChain3 = NULL;
         ID3D12CommandQueue* commandQueue = commandList->GetD3D12CommandQueue();
 
+        DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
+    
         // If discard isn't implemented/supported/fails, try the newer swap-types
-        // - flip_discard is win 10
-        // - flip_sequentially is win 8
-        HRESULT hr = S_OK;
-
+#if defined(__dxgi1_4_h__) || defined(__d3d11_x_h__)
         if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
         {
-            DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
-
             desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
             desc1.BufferCount = std::max(2U, pDesc->BufferCount);
-           
-            hr = pFactory->CreateSwapChainForCoreWindow(commandQueue, pWindow, pDesc, pRestrictToOutput, &dxgiSwapChain1);
         }
+#ifdef __dxgi1_4_h__
         else if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
         {
-            DXGI_SWAP_CHAIN_DESC1 desc1 = *pDesc;
-
             desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
             desc1.BufferCount = std::max(2U, pDesc->BufferCount);
-           
-            hr = pFactory->CreateSwapChainForCoreWindow(commandQueue, pWindow, pDesc, pRestrictToOutput, &dxgiSwapChain1);
         }
-        else
+#endif
+#endif
+
+        HRESULT hr = pFactory->CreateSwapChainForCoreWindow(commandQueue, pWindow, &desc1, pRestrictToOutput, &dxgiSwapChain1);
+
+#ifdef __dxgi1_5_h__
+        BOOL bAllowTearing = FALSE;
         {
-            hr = pFactory->CreateSwapChainForCoreWindow(commandQueue, pWindow, pDesc, pRestrictToOutput, &dxgiSwapChain1);
+            IDXGIFactory5* pFactory5 = nullptr;
+            if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
+                S_OK ==
+                    pFactory5->CheckFeatureSupport(
+                        DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
+            {
+            }
+
+            if (bAllowTearing)
+            {
+                desc1.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+            }
         }
+#else
+        BOOL bAllowTearing = FALSE;
+#endif
 
         if (hr == S_OK && dxgiSwapChain1)
         {
@@ -155,6 +203,12 @@ namespace DX12
             {
                 DXGI_SWAP_CHAIN_DESC desc;
                 dxgiSwapChain3->GetDesc(&desc);
+                if (bAllowTearing)
+                {
+                    desc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+                }
+                desc.BufferCount = desc1.BufferCount;
+                desc.SwapEffect = desc1.SwapEffect;
                 return DX12::PassAddRef(new SwapChain(commandList, dxgiSwapChain3, &desc));
             }
         }
@@ -188,21 +242,47 @@ namespace DX12
         ForfeitBuffers();
     }
 
-    HRESULT SwapChain::Present(u32 SyncInterval, u32 Flags)
+    void SwapChain::Present(u32 SyncInterval, u32 Flags)
     {
-        m_AsyncQueue.Flush();
-
-        HRESULT hr = m_NativeSwapChain->Present(SyncInterval, Flags);
-        return hr;
+        m_AsyncQueue.Present(
+            m_NativeSwapChain, &m_PresentResult, SyncInterval, Flags, m_Desc, GetCurrentBackBufferIndex());
+        m_bChangedBackBufferIndex = true;
     }
 
-    HRESULT SwapChain::Present1(u32 SyncInterval, u32 Flags, 
+    void SwapChain::Present1(u32 SyncInterval, u32 Flags, 
         const DXGI_PRESENT_PARAMETERS* pPresentParameters)
     {
-        m_AsyncQueue.Flush();
+        m_AsyncQueue.Present(
+            m_NativeSwapChain, &m_PresentResult, SyncInterval, Flags, m_Desc, GetCurrentBackBufferIndex());
+        m_bChangedBackBufferIndex = true;
+    }
 
-        HRESULT hr = m_NativeSwapChain->Present1(SyncInterval, Flags, pPresentParameters);
-        return hr;
+    HRESULT SwapChain::ResizeTarget(const DXGI_MODE_DESC* pNewTargetParameters)
+    {
+        m_bChangedBackBufferIndex = true;
+
+        return m_NativeSwapChain->ResizeTarget(pNewTargetParameters);
+    }
+
+    HRESULT SwapChain::ResizeBuffers(
+        UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+    {
+        m_bChangedBackBufferIndex = true;
+
+        m_NativeSwapChain->GetDesc(&m_Desc);
+
+        // DXGI ERROR: IDXGISwapChain::ResizeBuffers: Cannot add or remove the DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING flag
+        // using ResizeBuffers.
+        m_Desc.BufferCount = BufferCount ? BufferCount : m_Desc.BufferCount;
+        m_Desc.BufferDesc.Width = Width ? Width : m_Desc.BufferDesc.Width;
+        m_Desc.BufferDesc.Height = Height ? Height : m_Desc.BufferDesc.Height;
+        m_Desc.BufferDesc.Format = NewFormat != DXGI_FORMAT_UNKNOWN ? NewFormat : m_Desc.BufferDesc.Format;
+#ifdef __dxgi1_3_h__
+        m_Desc.Flags = (m_Desc.Flags & DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING) |
+            (SwapChainFlags & ~DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
+#endif
+        return m_NativeSwapChain->ResizeBuffers(m_Desc.BufferCount, m_Desc.BufferDesc.Width, m_Desc.BufferDesc.Height,
+            m_Desc.BufferDesc.Format, m_Desc.Flags);
     }
 
     void SwapChain::AcquireBuffers(std::vector<Resource*>&& buffers)

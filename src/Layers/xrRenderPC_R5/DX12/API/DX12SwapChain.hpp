@@ -48,6 +48,7 @@ namespace DX12
             R_ASSERT2(resource, "null backbuffer");
             return *resource;
         }
+       
         inline Resource& GetCurrentBackBuffer()
         {
             Resource* resource = m_BackBuffers[m_NativeSwapChain->GetCurrentBackBufferIndex()];
@@ -65,9 +66,25 @@ namespace DX12
             return m_BackBufferViews[m_NativeSwapChain->GetCurrentBackBufferIndex()];
         }
 
+        inline bool IsPresentScheduled() const { 
+            return m_AsyncQueue.GetQueuedFramesCount() > 0;
+        }
+
         inline u32 GetCurrentBackBufferIndex() const
         {
-            return m_NativeSwapChain->GetCurrentBackBufferIndex();
+            if (!m_bChangedBackBufferIndex)
+                return m_nCurrentBackBufferIndex;
+
+            m_AsyncQueue.FlushNextPresent();
+            DX12_ASSERT(!IsPresentScheduled(), "Flush didn't dry out all outstanding Present() calls!");
+#if CRY_PLATFORM_DURANGO
+            m_nCurrentBackBufferIndex = 0;
+#else
+            m_nCurrentBackBufferIndex = m_NativeSwapChain->GetCurrentBackBufferIndex();
+#endif
+            m_bChangedBackBufferIndex = false;
+
+            return m_nCurrentBackBufferIndex;
         }
 
         inline const DXGI_SWAP_CHAIN_DESC& GetDesc() const
@@ -75,9 +92,19 @@ namespace DX12
             return m_Desc;
         }
 
-        HRESULT Present(u32 SyncInterval, u32 Flags);
+        void Present(u32 SyncInterval, u32 Flags);
+        void Present1(u32 SyncInterval, u32 Flags, const DXGI_PRESENT_PARAMETERS* pPresentParameters);
 
-        HRESULT Present1(u32 SyncInterval, u32 Flags, const DXGI_PRESENT_PARAMETERS* pPresentParameters);
+        IC HRESULT SetFullscreenState(BOOL Fullscreen, IDXGIOutput* pTarget)
+        {
+            m_Desc.Windowed = !Fullscreen;
+            return m_NativeSwapChain->SetFullscreenState(Fullscreen, pTarget);
+        }
+
+        HRESULT GetLastPresentReturnValue() { return m_PresentResult; }
+
+        HRESULT ResizeTarget(const DXGI_MODE_DESC* pNewTargetParameters);
+        HRESULT ResizeBuffers(UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 
     private:
         friend class CCryDX12SwapChain;
@@ -88,7 +115,10 @@ namespace DX12
         CommandList* m_CommandList;
 
         DXGI_SWAP_CHAIN_DESC m_Desc;
+        mutable bool m_bChangedBackBufferIndex;
+        mutable UINT m_nCurrentBackBufferIndex;
 
+        HRESULT m_PresentResult;
         _smart_ptr<IDXGISwapChain3> m_NativeSwapChain;
 
         std::vector<Resource*> m_BackBuffers;

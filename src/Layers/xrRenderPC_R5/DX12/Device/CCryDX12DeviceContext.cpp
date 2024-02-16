@@ -235,7 +235,7 @@ bool CCryDX12DeviceContext::PreparePSO(DX12::CommandMode commandMode)
 
     if (state.m_StateFlags & EPSPB_PipelineState)
     {
-        //if (newPipelineState != m_CurrentPSO)
+        if (newPipelineState != m_CurrentPSO)
         {
 #ifdef DX12_STATS
             m_NumPSOs += 1;
@@ -244,7 +244,7 @@ bool CCryDX12DeviceContext::PreparePSO(DX12::CommandMode commandMode)
             m_CurrentPSO = newPipelineState;
         }
 
-        //if (newRootSignature != m_CurrentRootSignature[commandMode])
+        if (newRootSignature != m_CurrentRootSignature[commandMode])
         {
 #ifdef DX12_STATS
             m_NumRootSignatures += 1;
@@ -2507,6 +2507,7 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::ClearState()
    DX12_FUNC_LOG
  
    IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED);
+   IASetInputLayout(NULL);
    
    CSSetShader(NULL, NULL, 0);
    DSSetShader(NULL, NULL, 0);
@@ -2522,8 +2523,6 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::ClearState()
    OMSetRenderTargets(0, NULL, NULL);
    OMSetBlendState(NULL, NULL, 0);
    OMSetDepthStencilState(NULL, 0);
-
-   //m_DirectCommandList->ClearState();
 }
 
 void STDMETHODCALLTYPE CCryDX12DeviceContext::Flush()

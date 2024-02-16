@@ -20,7 +20,7 @@ namespace DX12
 {
     void AsyncCommandQueue::SExecuteCommandlist::Process(const STaskArgs& args)
     {
-        args.pCommandQueue->ExecuteCommandLists(1, &pCommandList);
+        args.pCommandListPool->GetD3D12CommandQueue()->ExecuteCommandLists(1, &pCommandList);
     }
 
     void AsyncCommandQueue::SResetCommandlist::Process(const STaskArgs& args)
@@ -30,31 +30,61 @@ namespace DX12
 
     void AsyncCommandQueue::SSignalFence::Process(const STaskArgs& args)
     {
-        args.pCommandQueue->Signal(pFence, FenceValue);
+        args.pCommandListPool->GetD3D12CommandQueue()->Signal(pFence, FenceValue);
+        args.pCommandListPool->SetSignalledFenceValue(FenceValue);
     }
 
     void AsyncCommandQueue::SWaitForFence::Process(const STaskArgs& args)
     {
-        args.pCommandQueue->Wait(pFence, FenceValue);
+        args.pCommandListPool->GetD3D12CommandQueue()-> Wait(pFence, FenceValue);
     }
 
     void AsyncCommandQueue::SWaitForFences::Process(const STaskArgs& args)
     {
         if (FenceValues[CMDQUEUE_COPY    ])
         {
-            args.pCommandQueue->Wait(pFences[CMDQUEUE_COPY    ], FenceValues[CMDQUEUE_COPY    ]);
+            args.pCommandListPool->GetD3D12CommandQueue()->Wait(pFences[CMDQUEUE_COPY], FenceValues[CMDQUEUE_COPY]);
         }
       
         if (FenceValues[CMDQUEUE_GRAPHICS])
         {
-            args.pCommandQueue->Wait(pFences[CMDQUEUE_GRAPHICS], FenceValues[CMDQUEUE_GRAPHICS]);
+           args.pCommandListPool->GetD3D12CommandQueue()->Wait(pFences[CMDQUEUE_GRAPHICS], FenceValues[CMDQUEUE_GRAPHICS]);
         }
+    }
+
+    void AsyncCommandQueue::SPresentBackbuffer::Process(const STaskArgs& args)
+    {
+        DWORD result = STATUS_WAIT_0;
+
+#ifdef __dxgi1_3_h__
+        if (Desc->Flags & DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT)
+        {
+            // Check if the swapchain is ready to accept another frame
+            HANDLE frameLatencyWaitableObject = pSwapChain->GetFrameLatencyWaitableObject();
+            //result = WaitForSingleObjectEx(frameLatencyWaitableObject, 500, TRUE);
+        }
+
+        if (Desc->Windowed && (Desc->Flags & DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING) && !(Flags & DXGI_PRESENT_TEST))
+        {
+            Flags |= DXGI_PRESENT_ALLOW_TEARING;
+            SyncInterval = 0;
+        }
+#endif
+
+        if (result == WAIT_OBJECT_0)
+        {
+            *pPresentResult = pSwapChain->Present(SyncInterval, Flags);
+        }
+
+        InterlockedDecrement((volatile LONG*)args.QueueFramesCounter);
     }
 
     AsyncCommandQueue::AsyncCommandQueue()
         : m_pCmdListPool(NULL)
         , m_QueuedFramesCounter(0)
         , m_bStopRequested(false)
+        , m_bSleeping(false)
+        , m_TaskEvent(INT_MAX, 0)
     {
     }
 
@@ -62,6 +92,8 @@ namespace DX12
     {
         SignalStop();
         Flush();
+        m_TaskEvent.Release();
+
         m_pCmdListPool = nullptr;
     }
 
@@ -74,11 +106,16 @@ namespace DX12
     {
         m_pCmdListPool = pCommandListPool;
         m_QueuedFramesCounter = 0;
-        m_QueuedTasksCounter = 0;
         m_bStopRequested = false;
+        m_bSleeping = true;
 
-        m_thread_task = std::thread([this] { ThreadEntry(); });
-        m_thread_task.detach();
+        Threading::SpawnThread(
+            [](void* this_ptr) {
+                AsyncCommandQueue& self = *static_cast<AsyncCommandQueue*>(this_ptr);
+                self.ThreadEntry();
+            },
+            "DX12 AsyncCommandQueue", 0, this
+        );
     }
 
     void AsyncCommandQueue::ExecuteCommandLists(UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists)
@@ -143,59 +180,73 @@ namespace DX12
         AddTask<SWaitForFences>(task);
     }
 
+    void AsyncCommandQueue::Present(IDXGISwapChain3* pSwapChain, HRESULT* pPresentResult, UINT SyncInterval,
+        UINT Flags, const DXGI_SWAP_CHAIN_DESC& Desc, UINT bufferIndex)
+    {
+        InterlockedIncrement((volatile LONG*)&m_QueuedFramesCounter);
+
+        SSubmissionTask task;
+        ZeroMemory(&task, sizeof(SSubmissionTask));
+
+        task.type = eTT_PresentBackbuffer;
+        task.Data.PresentBackbuffer.pSwapChain = pSwapChain;
+        task.Data.PresentBackbuffer.pPresentResult = pPresentResult;
+        task.Data.PresentBackbuffer.Flags = Flags;
+        task.Data.PresentBackbuffer.Desc = &Desc;
+        task.Data.PresentBackbuffer.SyncInterval = SyncInterval;
+
+        AddTask<SPresentBackbuffer>(task);
+
+        {
+            while (m_QueuedFramesCounter > MAX_FRAMES_GPU_LAG)
+            {
+                SwitchToThread();
+            }
+        }
+    }
+
     void AsyncCommandQueue::Flush(UINT64 lowerBoundFenceValue)
     {       
-        if (IsSynchronous())
+        if (lowerBoundFenceValue != (~0ULL))
         {
-            std::unique_lock lk(m_mutex_for_flush);
-            m_cv_for_flush.wait(lk, [this, lowerBoundFenceValue] {
-                return (m_QueuedTasksCounter == 0 && lowerBoundFenceValue == (~0ULL)) ||
-                    (m_QueuedTasksCounter == 0 && lowerBoundFenceValue != (~0ULL) &&
-                        lowerBoundFenceValue > m_pCmdListPool->GetLastCompletedFenceValue());
-            });
-
-            // Manual unlocking is done before notifying, to avoid waking up
-            // the waiting thread only to block again (see notify_one for details)
-            lk.unlock();
+            while (lowerBoundFenceValue > m_pCmdListPool->GetSignalledFenceValue())
+            {
+                SwitchToThread();
+            }
         }
         else
         {
-            if (lowerBoundFenceValue != (~0ULL))
+            while (!m_bSleeping)
             {
-                while (m_QueuedTasksCounter > 0)
-                {
-                    if (lowerBoundFenceValue <= m_pCmdListPool->GetLastCompletedFenceValue())
-                    {
-                        break;
-                    }
-
-                    std::this_thread::sleep_for(std::chrono::seconds(0));
-                }
+                SwitchToThread();
             }
-            else
+        }
+    }
+
+    void AsyncCommandQueue::FlushNextPresent()
+    {
+        const int numQueuedFrames = m_QueuedFramesCounter;
+        if (numQueuedFrames > 0)
+        {
+            while (numQueuedFrames == m_QueuedFramesCounter)
             {
-                while (m_QueuedTasksCounter > 0)
-                {
-                    std::this_thread::sleep_for(std::chrono::seconds(0));
-                }
+                SwitchToThread();
             }
         }
     }
 
     AsyncCommandQueue::STaskArgs AsyncCommandQueue::GetTaskArg()
     {
-        return {m_pCmdListPool->GetD3D12CommandQueue(), &m_QueuedFramesCounter};
+        return {m_pCmdListPool, &m_QueuedFramesCounter};
     }
 
     void AsyncCommandQueue::ThreadEntry()
     {
         SSubmissionTask task;
 
-        while (true)
+        while (!m_bStopRequested)
         {
-            // Wait until main() sends data
-            std::unique_lock lk(m_mutex_task);
-            m_cv_task.wait(lk, [this] { return m_TaskQueue.is_dequeue() || m_bStopRequested; });
+            m_TaskEvent.Acquire();
 
             while (m_TaskQueue.dequeue(task))
             {
@@ -206,20 +257,9 @@ namespace DX12
                 case eTT_SignalFence: task.Process<SSignalFence>(GetTaskArg()); break;
                 case eTT_WaitForFence: task.Process<SWaitForFence>(GetTaskArg()); break;
                 case eTT_WaitForFences: task.Process<SWaitForFences>(GetTaskArg()); break;
-                }
-                
-                InterlockedDecrement((volatile LONG*)&m_QueuedTasksCounter);
+                case eTT_PresentBackbuffer: task.Process<SPresentBackbuffer>(GetTaskArg()); break;
+                }              
             };
-
-            if (m_bStopRequested)
-                break;
-
-            std::lock_guard lk_2(m_mutex_for_flush);
-            m_cv_for_flush.notify_one();
-
-            // Manual unlocking is done before notifying, to avoid waking up
-            // the waiting thread only to block again (see notify_one for details)
-            lk.unlock();
         }
     }
 }

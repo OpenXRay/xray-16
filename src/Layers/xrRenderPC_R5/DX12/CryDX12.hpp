@@ -33,6 +33,9 @@ typedef CCryDX12SwapChain       DXGISwapChain;
 typedef CCryDX12Device          D3DDevice;
 typedef CCryDX12DeviceContext   D3DDeviceContext;
 
+HRESULT WINAPI D3DReflectDXILorDXBC(_In_reads_bytes_(SrcDataSize) LPCVOID pSrcData, _In_ SIZE_T SrcDataSize,
+    _In_ REFIID pInterface, _Out_ void** ppReflector);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 HRESULT WINAPI DX12CreateDXGIFactory1(REFIID riid, void** ppFactory);

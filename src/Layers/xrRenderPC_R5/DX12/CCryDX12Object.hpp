@@ -22,38 +22,12 @@
     typedef _smart_ptr<const Class> ConstPtr;    \
     typedef InterfaceType Super;                     \
     typedef InterfaceType Interface;                 \
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) \
-    {                                                                               \
-        if (riid == __uuidof(Super))                                                \
-        {                                                                           \
-            if (ppvObject)                                                          \
-            {                                                                       \
-                *reinterpret_cast<Super**>(ppvObject) = static_cast<Super*>(this);  \
-                static_cast<Super*>(this)->AddRef();                                \
-            }                                                                       \
-           return S_OK;                                                             \
-        }                                                                           \
-        return E_NOINTERFACE;                                                       \
-    }                                                                               \
 
 #define DX12_OBJECT(DerivedType, SuperType)       \
     typedef DerivedType Class;                    \
     typedef _smart_ptr<Class> Ptr;            \
     typedef _smart_ptr<const Class> ConstPtr; \
     typedef SuperType Super;                      \
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) \
-    {                                                                               \
-        if (riid == __uuidof(DerivedType))                                          \
-        {                                                                           \
-            if (ppvObject)                                                          \
-            {                                                                       \
-                *reinterpret_cast<DerivedType**>(ppvObject) = static_cast<DerivedType*>(this);    \
-                static_cast<DerivedType*>(this)->AddRef();                          \
-            }                                                                       \
-           return S_OK;                                                             \
-        }                                                                           \
-        return Super::QueryInterface(riid, ppvObject);                              \
-    }                                                                               \
 
 #include "CryDX12Guid.hpp"
 
@@ -113,6 +87,22 @@ public:
         return RefCount;
     }
 
+    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) final
+    {
+        if ((riid == __uuidof(T)) || (riid == __uuidof(ID3D11Device)) || (riid == __uuidof(ID3D11DeviceContext)))
+        {
+            if (ppvObject)
+            {
+                *reinterpret_cast<T**>(ppvObject) = static_cast<T*>(this);
+                static_cast<T*>(this)->AddRef();
+            }
+
+            return S_OK;
+        }
+
+        return E_NOINTERFACE;
+    }
+
     #pragma endregion
 
 private:
@@ -154,6 +144,27 @@ public:
         }
 
         return RefCount;
+    }
+
+    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) final
+    {
+        if ((riid == __uuidof(T)) ||
+            (riid == __uuidof(IDXGIDevice) && __uuidof(IDXGIDevice3) == __uuidof(T)) ||
+            (riid == __uuidof(IDXGIFactory) && __uuidof(IDXGIFactory4) == __uuidof(T)) ||
+            (riid == __uuidof(IDXGIAdapter) && __uuidof(IDXGIAdapter3) == __uuidof(T)) ||
+            (riid == __uuidof(IDXGIOutput) && __uuidof(IDXGIOutput4) == __uuidof(T)) ||
+            (riid == __uuidof(IDXGISwapChain) && __uuidof(IDXGISwapChain3) == __uuidof(T)))
+        {
+            if (ppvObject)
+            {
+                *reinterpret_cast<T**>(ppvObject) = static_cast<T*>(this);
+                static_cast<T*>(this)->AddRef();
+            }
+
+            return S_OK;
+        }
+
+        return E_NOINTERFACE;
     }
 
     #pragma endregion

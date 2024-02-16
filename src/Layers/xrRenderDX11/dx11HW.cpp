@@ -365,8 +365,6 @@ bool CHW::CreateSwapChain(HWND hwnd)
 
 #if defined(USE_DX12)
     m_pSwapChain->SetMaximumFrameLatency(BackBufferCount);
-    //if (ThisInstanceIsGlobal())
-    //    Device.PresentationFinished = m_pSwapChain->GetFrameLatencyWaitableObject();
 #endif
 
     return SUCCEEDED(hr);
@@ -482,7 +480,11 @@ bool CHW::CreateSwapChainOnDX12(HWND hwnd)
     // Windoze
     // desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // XXX: tearing glitches with flip presentation model
     desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+    // DXGI_SCALING_NONE is supported starting with Windows 8
     desc.Scaling = DXGI_SCALING_STRETCH;
+#endif
 
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC fulldesc;
     ZeroMemory(&fulldesc, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
@@ -629,12 +631,6 @@ void CHW::Present()
 {
     const bool bUseVSync = psDeviceMode.WindowStyle == rsFullscreen &&
         psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX11
-
-#if defined(USE_DX12)
-    //WaitForSingleObjectEx(Device.PresentationFinished.GetHandle(),
-    //    1000, // 1 second timeout (shouldn't ever occur)
-    //    true);
-#endif
 
     m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
 

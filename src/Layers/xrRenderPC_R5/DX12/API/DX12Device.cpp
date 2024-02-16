@@ -24,22 +24,30 @@ namespace DX12
     {
         ID3D12Device* pDevice12 = NULL;
 
-        if (RendererDX12::CV_r_EnableDebugLayer)
+#if USE_DXC
+        HRESULT res = D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr);
+        DX12_ASSERT(res == S_OK, "Enabling experimental features for D3D12 Device didn't work!");
+#endif
+
+	if (RendererDX12::CV_r_EnableDebugLayer)
         {
-            ID3D12Debug* debugInterface;
+            ID3D12Debug* debugInterface = nullptr;
             if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
             {
                 debugInterface->EnableDebugLayer();
+
+                if (RendererDX12::CV_r_EnableDebugLayer == 2)
+                {
+                    // Enable DX12 GBV as well
+                    ID3D12Debug1* spDebugController1;
+                    if (SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&spDebugController1))))
+                    {
+                        spDebugController1->SetEnableGPUBasedValidation(true);
+                        spDebugController1->SetEnableSynchronizedCommandQueueValidation(true);
+                        spDebugController1->Release();
+                    }
+                }
             }
-// ID3D12Debug1 is only available after windows 10 anniversary update or windows sdk 14393
-#ifdef __ID3D12Debug1_INTERFACE_DEFINED__
-            ID3D12Debug1* debugInterface1;
-            if (SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&debugInterface1))))
-            {
-                debugInterface1->SetEnableGPUBasedValidation(true);
-                debugInterface1->SetEnableSynchronizedCommandQueueValidation(true);
-            }
-#endif
         }
 
         D3D_FEATURE_LEVEL level;
@@ -85,6 +93,9 @@ namespace DX12
         , m_RenderTargetDescriptorCache(this)
         , m_GlobalDescriptorHeaps
         {
+#ifdef __d3d12_x_h__
+            { this },
+#endif
             { this },
             { this },
             { this },
@@ -99,6 +110,21 @@ namespace DX12
         , m_NullUAV{}
         , m_NullSampler{}
     {
+        // Anniversary Update
+#if NTDDI_WIN10_RS1 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS1)
+        ID3D12Device1* pDevice1 = nullptr;
+        m_Device->QueryInterface(__uuidof(ID3D12Device1), (void**)&pDevice1);
+        if (m_Device1 = pDevice1)
+            pDevice1->Release();
+#endif
+            // Creator's Update
+#if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
+        ID3D12Device2* pDevice2 = nullptr;
+        m_Device->QueryInterface(__uuidof(ID3D12Device2), (void**)&pDevice2);
+        if (m_Device2 = pDevice2)
+            pDevice2->Release();
+#endif
+
         // These objects are reference counted, but didn't heap allocate them. We assume ownership.
         {
             m_SamplerCache.AddRef();

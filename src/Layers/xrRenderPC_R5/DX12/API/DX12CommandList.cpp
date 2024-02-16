@@ -317,10 +317,8 @@ namespace DX12
     {
         if (m_CurrentPipelineState != pso)
         {
-            m_CurrentPipelineState = pso;
-        }
-        {
             DX12_COMMANDLIST_TIMER_DETAIL("SetPipelineState");
+            m_CurrentPipelineState = pso;
             m_CommandList->SetPipelineState(pso->GetD3D12PipelineState());
             m_Commands += CLCOUNT_SETIO;
         }
@@ -331,9 +329,6 @@ namespace DX12
         if (m_CurrentRootSignature[commandMode] != rootSignature)
         {
             m_CurrentRootSignature[commandMode] = rootSignature;
-        }
-
-        {
             if (rootSignature)
             {
                 ResetStateTracking(commandMode);

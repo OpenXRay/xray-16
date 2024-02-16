@@ -123,10 +123,29 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::Present(
     UINT Flags)
 {  
     DX12_FUNC_LOG
+
+    UINT Buffer = m_SwapChain->GetCurrentBackBufferIndex();
+    DX12::Resource& dx12Resource = m_SwapChain->GetBackBuffer(Buffer);
+
+    if (m_BackBuffers[Buffer])
+    {
+        // HACK: transfer state from "outside" CResource to "inside" CResource
+        dx12Resource.SetCurrentState(m_BackBuffers[Buffer]->GetDX12Resource().GetCurrentState());
+        dx12Resource.SetAnnouncedState(m_BackBuffers[Buffer]->GetDX12Resource().GetAnnouncedState());
+    }
+
     m_Device->GetDeviceContext()->Finish(m_SwapChain);
 
+    if (m_BackBuffers[Buffer])
+    {
+        // HACK: transfer state from "inside" CResource to "outside" CResource
+        m_BackBuffers[Buffer]->GetDX12Resource().SetCurrentState(dx12Resource.GetCurrentState());
+        m_BackBuffers[Buffer]->GetDX12Resource().SetAnnouncedState(dx12Resource.GetAnnouncedState());
+    }
+
     DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
-    return m_SwapChain->Present(SyncInterval, Flags);
+    m_SwapChain->Present(SyncInterval, Flags);
+    return m_SwapChain->GetLastPresentReturnValue();
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetBuffer(
@@ -157,7 +176,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::SetFullscreenState(
 {
     DX12_FUNC_LOG
     m_Device->GetDeviceContext()->SubmitAllCommands(true);
-    return m_SwapChain->GetDXGISwapChain()->SetFullscreenState(Fullscreen, pTarget);
+    return m_SwapChain->SetFullscreenState(Fullscreen, pTarget);
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetFullscreenState(
@@ -194,7 +213,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::ResizeBuffers(
 
     m_Device->GetDX12Device()->FlushReleaseHeap(DX12::Device::ResourceReleasePolicy::Immediate);
 
-    HRESULT res = m_SwapChain->GetDXGISwapChain()->ResizeBuffers(BufferCount, Width, Height, NewFormat, SwapChainFlags);
+    HRESULT res = m_SwapChain->ResizeBuffers(BufferCount, Width, Height, NewFormat, SwapChainFlags);
     if (res == S_OK)
     {
         AcquireBuffers();
@@ -207,17 +226,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::ResizeTarget(
     _In_  const DXGI_MODE_DESC* pNewTargetParameters)
 {
     DX12_FUNC_LOG
-
-    //ID3D11RenderTargetView* views[8] = {};
-   
-    //m_Device->GetDeviceContext()->OMSetRenderTargets(8, views, nullptr);
-    //m_Device->GetDeviceContext()->SubmitAllCommands(true);
-    //m_Device->GetDeviceContext()->WaitForIdle();
-
-    //ForfeitBuffers();
-
-    HRESULT hr = m_SwapChain->GetDXGISwapChain()->ResizeTarget(pNewTargetParameters);
-    return hr;
+    return m_SwapChain->ResizeTarget(pNewTargetParameters);
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetContainingOutput(
@@ -248,10 +257,28 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::Present1(
 {
     DX12_FUNC_LOG
 
+    UINT Buffer = m_SwapChain->GetCurrentBackBufferIndex();
+    DX12::Resource& dx12Resource = m_SwapChain->GetBackBuffer(Buffer);
+
+    if (m_BackBuffers[Buffer])
+    {
+        // HACK: transfer state from "outside" CResource to "inside" CResource
+        dx12Resource.SetCurrentState(m_BackBuffers[Buffer]->GetDX12Resource().GetCurrentState());
+        dx12Resource.SetAnnouncedState(m_BackBuffers[Buffer]->GetDX12Resource().GetAnnouncedState());
+    }
+
     m_Device->GetDeviceContext()->Finish(m_SwapChain);
 
+    if (m_BackBuffers[Buffer])
+    {
+        // HACK: transfer state from "inside" CResource to "outside" CResource
+        m_BackBuffers[Buffer]->GetDX12Resource().SetCurrentState(dx12Resource.GetCurrentState());
+        m_BackBuffers[Buffer]->GetDX12Resource().SetAnnouncedState(dx12Resource.GetAnnouncedState());
+    }
+
     DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
-    return m_SwapChain->Present1(SyncInterval, Flags, pPresentParameters);
+    m_SwapChain->Present1(SyncInterval, Flags, pPresentParameters);
+    return m_SwapChain->GetLastPresentReturnValue();
 }
 
 /* IDXGISwapChain2 implementation */

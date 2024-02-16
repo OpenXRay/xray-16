@@ -113,6 +113,59 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//! Platform independent wrapper for a counting semaphore.
+class CrySemaphore
+{
+public:
+    CrySemaphore(int nMaximumCount, int nInitialCount = 0)
+    {
+        m_Semaphore = (void*)CreateSemaphore(NULL, nInitialCount, nMaximumCount, NULL);
+    }
+    ~CrySemaphore() { CloseHandle((HANDLE)m_Semaphore); }
+    void Acquire() { WaitForSingleObject((HANDLE)m_Semaphore, INFINITE); }
+    void Release() { ReleaseSemaphore((HANDLE)m_Semaphore, 1, NULL); }
+
+private:
+    void* m_Semaphore;
+};
+
+//////////////////////////////////////////////////////////////////////////
+//! Platform independent wrapper for a counting semaphore
+//! except that this version uses C-A-S only until a blocking call is needed.
+//! -> No kernel call if there are object in the semaphore.
+class CryFastSemaphore
+{
+public:
+    CryFastSemaphore(int nMaximumCount, int nInitialCount = 0) : m_Semaphore(nMaximumCount), m_nCounter(nInitialCount)
+    {
+    }
+
+    ~CryFastSemaphore() {}
+
+    void Acquire()
+    {
+        // if the count would have been 0 or below, go to kernel semaphore
+        if (InterlockedDecrement((volatile LONG*)&m_nCounter) < 0)
+        {
+            m_Semaphore.Acquire();
+        }
+    }
+
+    void Release()
+    {
+        // wake up kernel semaphore if we have waiter
+        if (InterlockedIncrement((volatile LONG*)&m_nCounter) <= 0)
+        {
+            m_Semaphore.Release();
+        }
+    }
+
+private:
+    CrySemaphore m_Semaphore;
+    volatile int m_nCounter;
+};
+
+//////////////////////////////////////////////////////////////////////////
 //! CryAutoCriticalSection implements a helper class to automatically.
 //! lock critical section in constructor and release on destructor.
 template <class LockClass>

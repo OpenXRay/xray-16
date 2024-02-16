@@ -41,6 +41,23 @@ namespace DX12
             return m_Device;
         }
 
+#if NTDDI_WIN10_RS1 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS1)
+        inline ID3D12Device1* GetD3D12Device1() const // Anniversary Update
+        { 
+            return /*PassAddRef*/ (m_Device1); 
+        } 
+#endif
+#if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
+        inline ID3D12Device2* GetD3D12Device2() const // Creator's Update
+        { 
+            return /*PassAddRef*/ (m_Device2); 
+        } 
+#endif
+        HRESULT CheckFeatureSupport(D3D12_FEATURE Feature, void* pFeatureSupportData, UINT FeatureSupportDataSize)
+        {
+            return m_Device->CheckFeatureSupport(Feature, pFeatureSupportData, FeatureSupportDataSize);
+        }
+
         inline PipelineStateCache& GetPSOCache()
         {
             return m_PipelineStateCache;
@@ -114,6 +131,13 @@ namespace DX12
         Device(ID3D12Device* d3d12Device);
 
         _smart_ptr<ID3D12Device> m_Device;
+
+#if NTDDI_WIN10_RS1 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS1)
+        _smart_ptr<ID3D12Device1> m_Device1; // Anniversary Update
+#endif
+#if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
+        _smart_ptr<ID3D12Device2> m_Device2; // Creator's Update
+#endif
 
         PipelineStateCache m_PipelineStateCache;
         RootSignatureCache m_RootSignatureCache;

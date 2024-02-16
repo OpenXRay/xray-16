@@ -69,12 +69,10 @@ namespace DX12
     CommandListFenceSet::CommandListFenceSet(Device* device)
         : m_pDevice(device)
     {
-        m_LastCompletedValues[CMDQUEUE_COPY    ] =
-            m_LastCompletedValues[CMDQUEUE_GRAPHICS] = 0;
-        m_SubmittedValues[CMDQUEUE_COPY] =
-            m_SubmittedValues[CMDQUEUE_GRAPHICS] = 0;
-        m_CurrentValues[CMDQUEUE_COPY    ] =
-            m_CurrentValues[CMDQUEUE_GRAPHICS] = 0;
+        m_LastCompletedValues[CMDQUEUE_COPY    ] = m_LastCompletedValues[CMDQUEUE_GRAPHICS] = 0;
+        m_SubmittedValues[CMDQUEUE_COPY] = m_SubmittedValues[CMDQUEUE_GRAPHICS] = 0;
+        m_SignalledValues[CMDQUEUE_GRAPHICS] = m_SignalledValues[CMDQUEUE_COPY] = 0;
+        m_CurrentValues[CMDQUEUE_COPY    ] = m_CurrentValues[CMDQUEUE_GRAPHICS] = 0;
     }
 
     //---------------------------------------------------------------------------------------------------------------------
