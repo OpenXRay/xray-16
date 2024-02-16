@@ -289,7 +289,7 @@ void D3DXRenderBase::End()
 {
     if (HW.Caps.SceneMode)
         overdrawEnd();
-#if RENDER == R_R4 || RENDER == R_R5
+#if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.OnFrameEnd();

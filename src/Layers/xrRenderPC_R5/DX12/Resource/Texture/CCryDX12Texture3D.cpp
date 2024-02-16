@@ -48,6 +48,11 @@ CCryDX12Texture3D* CCryDX12Texture3D::Create(CCryDX12Device* pDevice, CCryDX12Sw
         desc11.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
     }
 
+    if (!(desc12.Flags & D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE))
+    {
+        desc11.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+    }
+
     CCryDX12Texture3D* result = DX12::PassAddRef(new CCryDX12Texture3D(pDevice, desc11, pResource, D3D12_RESOURCE_STATE_RENDER_TARGET, CD3DX12_RESOURCE_DESC(desc12), NULL));
     result->GetDX12Resource().SetDX12SwapChain(pSwapChain->GetDX12SwapChain());
 
@@ -73,7 +78,7 @@ CCryDX12Texture3D* CCryDX12Texture3D::Create(CCryDX12Device* pDevice, const FLOA
     D3D12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     D3D12_RESOURCE_STATES resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
     D3D12_CLEAR_VALUE clearValue = DX12::GetDXGIFormatClearValue(desc12.Format, (pDesc->BindFlags & D3D11_BIND_DEPTH_STENCIL) != 0);
-    bool allowClearValue = desc12.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER;
+    bool allowClearValue = !!(pDesc->BindFlags & (D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_RENDER_TARGET));
 
     if (pDesc->Usage == D3D11_USAGE_DEFAULT)
     {
@@ -125,26 +130,29 @@ CCryDX12Texture3D* CCryDX12Texture3D::Create(CCryDX12Device* pDevice, const FLOA
         }
     }
 
+	if (pDesc->BindFlags & D3D11_BIND_SHADER_RESOURCE)
+        resourceUsage = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+    if (pDesc->BindFlags & (D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_CONSTANT_BUFFER))
+        resourceUsage = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+    if (pDesc->BindFlags & D3D11_BIND_INDEX_BUFFER)
+        resourceUsage = D3D12_RESOURCE_STATE_INDEX_BUFFER;
     if (pDesc->BindFlags & D3D11_BIND_UNORDERED_ACCESS)
-    {
+        resourceUsage = D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
         desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-        //allowClearValue = true;
-        resourceUsage = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-    }
-
     if (pDesc->BindFlags & D3D11_BIND_DEPTH_STENCIL)
-    {
-        desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-        allowClearValue = true;
-        resourceUsage = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-    }
-
+        resourceUsage = D3D12_RESOURCE_STATE_DEPTH_WRITE, desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     if (pDesc->BindFlags & D3D11_BIND_RENDER_TARGET)
-    {
-        desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-        allowClearValue = true;
-        resourceUsage = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    }
+        resourceUsage = D3D12_RESOURCE_STATE_RENDER_TARGET, desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+    if (!(pDesc->BindFlags & D3D11_BIND_SHADER_RESOURCE))
+        desc12.Flags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
+
+    // Certain heaps are restricted to certain D3D12_RESOURCE_STATES states, and cannot be changed.
+    // D3D12_HEAP_TYPE_UPLOAD requires D3D12_RESOURCE_STATE_GENERIC_READ.
+    if (heapProperties.Type == D3D12_HEAP_TYPE_UPLOAD)
+        resourceUsage = D3D12_RESOURCE_STATE_GENERIC_READ;
+    else if (heapProperties.Type == D3D12_HEAP_TYPE_READBACK)
+        resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
 
     ID3D12Resource* resource = NULL;
 

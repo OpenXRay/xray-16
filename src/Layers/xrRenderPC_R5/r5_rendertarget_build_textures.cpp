@@ -661,7 +661,7 @@ void CRenderTarget::build_textures()
         desc.SampleDesc.Quality = 0;
         desc.Format = DXGI_FORMAT_R8G8B8A8_SNORM;
         desc.Usage = D3D_USAGE_STAGING;
-        desc.BindFlags = 0;
+        desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
         desc.CPUAccessFlags = D3D_CPU_ACCESS_READ;
         desc.MiscFlags = 0;
 

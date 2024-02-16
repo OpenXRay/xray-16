@@ -388,8 +388,9 @@ namespace DX12
         _COM_Outptr_opt_  void** ppvResource,
         ResourceStates& resourceStates)
     {
-        
-
+        static CryCriticalSectionNonRecursive csThreadSafeScope;
+        CryAutoLock<CryCriticalSectionNonRecursive> lThreadSafeScope(csThreadSafeScope);
+       
         struct
         {
             D3D12_HEAP_FLAGS sHeapFlags;
@@ -434,6 +435,9 @@ namespace DX12
 
     void Device::FlushReleaseHeap(ResourceReleasePolicy releasePolicy)
     {
+        static CryCriticalSectionNonRecursive csThreadSafeScope;
+        CryAutoLock<CryCriticalSectionNonRecursive> lThreadSafeScope(csThreadSafeScope);
+
         const u32 RESOURCE_RECYCLE_LATENCY = 8;
         const u32 RESOURCE_RELEASE_LATENCY = 32;
         {
@@ -473,6 +477,9 @@ namespace DX12
 
     void Device::ReleaseLater(ID3D12Resource* object, D3D12_RESOURCE_STATES currentState, D3D12_RESOURCE_STATES announcedState)
     {
+        static CryCriticalSectionNonRecursive csThreadSafeScope;
+        CryAutoLock<CryCriticalSectionNonRecursive> lThreadSafeScope(csThreadSafeScope);
+
         if (object)
         {
             struct
@@ -511,6 +518,9 @@ namespace DX12
 
     DescriptorBlock Device::GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE eType, u32 size)
     {
+        static CryCriticalSectionNonRecursive csThreadSafeScope;
+        CryAutoLock<CryCriticalSectionNonRecursive> lThreadSafeScope(csThreadSafeScope);
+
         if (DX12_GLOBALHEAP_TYPES & (1 << eType))
         {
             R_ASSERT2(m_GlobalDescriptorHeaps[eType].GetCapacity() - m_GlobalDescriptorHeaps[eType].GetCursor() >= size, "Exceeded capacity");
