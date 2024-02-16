@@ -58,6 +58,17 @@ function(calculate_xray_build_id output)
     list(GET current_date_list 1 CURRENT_DATE_MONTH)
     list(GET current_date_list 2 CURRENT_DATE_YEAR)
 
+    # Check if current date is before the start date
+    # See issue#1611
+    if( (CURRENT_DATE_YEAR LESS XRAY_START_YEAR)
+        OR ( (CURRENT_DATE_YEAR EQUAL XRAY_START_YEAR)
+            AND (CURRENT_DATE_MONTH LESS XRAY_START_MONTH)
+            OR ( (CURRENT_DATE_MONTH EQUAL XRAY_START_MONTH)
+                AND (CURRENT_DATE_DAY LESS XRAY_START_DAY) ) ) )
+        set(${output} 0 PARENT_SCOPE)
+        return()
+    endif()
+
     # Calculate XRAY build ID
     math(EXPR build_id "(${CURRENT_DATE_YEAR} - ${XRAY_START_YEAR}) * 365 + ${CURRENT_DATE_DAY} - ${XRAY_START_DAY}")
 
