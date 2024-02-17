@@ -496,7 +496,15 @@ void CHW::Present()
 {
     const bool bUseVSync = psDeviceMode.WindowStyle == rsFullscreen &&
         psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX11
-    m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
+
+    switch (m_pSwapChain->Present(bUseVSync ? 1 : 0, 0))
+    {
+    case DXGI_STATUS_OCCLUDED:
+    case DXGI_ERROR_DEVICE_REMOVED:
+        doPresentTest = true;
+        break;
+    }
+
 #ifdef HAS_DX11_2
     if (m_pSwapChain2 && UsingFlipPresentationModel())
     {
@@ -510,15 +518,28 @@ void CHW::Present()
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
-DeviceState CHW::GetDeviceState() const
+DeviceState CHW::GetDeviceState()
 {
-    const auto result = m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
-
-    switch (result)
+    if (doPresentTest)
     {
-        // Check if the device is ready to be reset
-    case DXGI_ERROR_DEVICE_RESET:
-        return DeviceState::NeedReset;
+        switch (m_pSwapChain->Present(0, DXGI_PRESENT_TEST))
+        {
+        case S_OK:
+            doPresentTest = false;
+            break;
+
+        case DXGI_STATUS_OCCLUDED:
+            // Do not render until we become visible again
+            return DeviceState::Lost;
+
+        case DXGI_ERROR_DEVICE_RESET:
+            return DeviceState::NeedReset;
+
+        case DXGI_ERROR_DEVICE_REMOVED:
+            FATAL("Graphics driver was updated or GPU was physically removed from computer.\n"
+                  "Please, restart the game.");
+            break;
+        }
     }
 
     return DeviceState::Normal;
