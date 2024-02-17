@@ -224,9 +224,8 @@ namespace DX12
             }
 
 #if DX12_GPU_PROFILE_MODE != DX12_GPU_PROFILE_MODE_OFF
-            m_Timers.Init(TimerCountMax);
+            m_Timers.Init(eCmdListType, TimerCountMax);
 #endif
-
             IsInitialized(true);
         }
 
@@ -311,10 +310,16 @@ namespace DX12
     {
 #if DX12_GPU_PROFILE_MODE != DX12_GPU_PROFILE_MODE_OFF
         m_Timers.ReadbackTimers();
-
         for (const Timer& timer : m_Timers.GetTimers())
         {
-            EBUS_QUEUE_EVENT(Debug::EventTraceDrillerBus, RecordSlice, timer.m_Name, EventTrace::GpuDetailCategory, EventTrace::GpuDetailThreadId, timer.m_Timestamp, timer.m_Duration);
+            if (m_eListType == D3D12_COMMAND_LIST_TYPE::D3D12_COMMAND_LIST_TYPE_COPY)
+            {
+                Msg("* Timer from copy list '%s', timestamp %llu, duration %d", timer.m_Name, timer.m_Timestamp, timer.m_Duration);
+            }
+            else
+            {
+                Msg("* Timer '%s', timestamp %llu, duration %d", timer.m_Name, timer.m_Timestamp, timer.m_Duration);
+            }
         }
 #endif
     }
@@ -1031,65 +1036,6 @@ namespace DX12
         m_Commands += CLCOUNT_DISCARD;
     }
 
-    void CommandList::QueueTransitionBarrier(Resource& resource, D3D12_RESOURCE_STATES finalState)
-    {
-        if (resource.IsOffCard())
-        {
-            if (finalState != D3D12_RESOURCE_STATE_COMMON)
-            {
-                finalState = resource.GetRequiredResourceState();
-            }
-        }
-
-        D3D12_RESOURCE_STATES currentState = resource.GetCurrentState();
-        D3D12_RESOURCE_STATES announcedState = resource.GetAnnouncedState();
-        bool bFinishedSplit = false;
-
-        // Finish a split barrier.
-        if (announcedState != static_cast<D3D12_RESOURCE_STATES>(-1))
-        {
-            m_Commands += CLCOUNT_BARRIER;
-
-            //AZ_Printf("DX12", "QueueTransitionBarrier: Split END %p %s -> %s", resource.GetD3D12Resource(), StateToString(currentState), StateToString(announcedState));
-
-            D3D12_RESOURCE_TRANSITION_BARRIER transition;
-            transition.pResource = resource.GetD3D12Resource();
-            transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-            transition.StateBefore = currentState;
-            transition.StateAfter = announcedState;
-            m_BarrierCache.EnqueueTransition(m_CommandList, D3D12_RESOURCE_BARRIER_FLAG_END_ONLY, transition);
-
-            resource.SetAnnouncedState(static_cast<D3D12_RESOURCE_STATES>(-1));
-            currentState = announcedState;
-            resource.SetCurrentState(currentState);
-            bFinishedSplit = true;
-        }
-
-        // Now check if we still need to transition to final state.
-        if (currentState != finalState)
-        {
-            //AZ_Printf("DX12", "QueueTransitionBarrier: Transition %p %s -> %s", resource.GetD3D12Resource(), StateToString(currentState), StateToString(finalState));
-
-            m_Commands += CLCOUNT_BARRIER;
-
-            D3D12_RESOURCE_TRANSITION_BARRIER transition;
-            transition.pResource = resource.GetD3D12Resource();
-            transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-            transition.StateBefore = currentState;
-            transition.StateAfter = finalState;
-            m_BarrierCache.EnqueueTransition(m_CommandList, D3D12_RESOURCE_BARRIER_FLAG_NONE, transition);
-
-            resource.SetCurrentState(finalState);
-        }
-
-        // Only need UAV barrier if we didn't do a split transition here.
-        else if (finalState == D3D12_RESOURCE_STATE_UNORDERED_ACCESS && !bFinishedSplit)
-        {
-            QueueUAVBarrier(resource);
-        }
-    }
-
-
     void CommandList::QueueTransitionBarrierBegin(Resource& resource, D3D12_RESOURCE_STATES finalState)
     {
         if (resource.IsOffCard())
@@ -1126,10 +1072,69 @@ namespace DX12
         }
     }
 
+    void CommandList::QueueTransitionBarrier(Resource& resource, D3D12_RESOURCE_STATES finalState)
+    {
+        if (resource.IsOffCard())
+        {
+            if (finalState != D3D12_RESOURCE_STATE_COMMON)
+            {
+                finalState = resource.GetRequiredResourceState();
+            }
+        }
+
+        D3D12_RESOURCE_STATES currentState = resource.GetCurrentState();
+        D3D12_RESOURCE_STATES announcedState = resource.GetAnnouncedState();
+        bool bFinishedSplit = false;
+
+        // Finish a split barrier.
+        if (announcedState != static_cast<D3D12_RESOURCE_STATES>(-1))
+        {
+            m_Commands += CLCOUNT_BARRIER;
+
+            // AZ_Printf("DX12", "QueueTransitionBarrier: Split END %p %s -> %s", resource.GetD3D12Resource(),
+            // StateToString(currentState), StateToString(announcedState));
+
+            D3D12_RESOURCE_TRANSITION_BARRIER transition;
+            transition.pResource = resource.GetD3D12Resource();
+            transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+            transition.StateBefore = currentState;
+            transition.StateAfter = announcedState;
+            m_BarrierCache.EnqueueTransition(m_CommandList, D3D12_RESOURCE_BARRIER_FLAG_END_ONLY, transition);
+
+            resource.SetAnnouncedState(static_cast<D3D12_RESOURCE_STATES>(-1));
+            currentState = announcedState;
+            resource.SetCurrentState(currentState);
+            bFinishedSplit = true;
+        }
+
+        // Now check if we still need to transition to final state.
+        if (currentState != finalState)
+        {
+            // AZ_Printf("DX12", "QueueTransitionBarrier: Transition %p %s -> %s", resource.GetD3D12Resource(),
+            // StateToString(currentState), StateToString(finalState));
+
+            m_Commands += CLCOUNT_BARRIER;
+
+            D3D12_RESOURCE_TRANSITION_BARRIER transition;
+            transition.pResource = resource.GetD3D12Resource();
+            transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+            transition.StateBefore = currentState;
+            transition.StateAfter = finalState;
+            m_BarrierCache.EnqueueTransition(m_CommandList, D3D12_RESOURCE_BARRIER_FLAG_NONE, transition);
+
+            resource.SetCurrentState(finalState);
+        }
+
+        // Only need UAV barrier if we didn't do a split transition here.
+        else if (finalState == D3D12_RESOURCE_STATE_UNORDERED_ACCESS && !bFinishedSplit)
+        {
+            QueueUAVBarrier(resource);
+        }
+    }
+
     void CommandList::QueueUAVBarrier(Resource& resource)
     {
         m_Commands += CLCOUNT_BARRIER;
-
         m_BarrierCache.EnqueueUAV(m_CommandList, resource);
     }
 
@@ -1275,12 +1280,14 @@ namespace DX12
             m_FreeCommandLists.pop_front();
         }
 
+        UINT64 nextFenceValue = GetCurrentFenceValue() + 1;
+
         // Increment fence value on allocation, this has the effect that
         // acquired CommandLists need to be submitted in-order to prevent
         // dead-locking
-        SetCurrentFenceValue(GetCurrentFenceValue() + 1);
+        SetCurrentFenceValue(nextFenceValue);
+        result->Init(nextFenceValue);
 
-        result->Init(GetCurrentFenceValue());
         m_LiveCommandLists.push_back(result);
 
 #ifdef DX12_STATS
