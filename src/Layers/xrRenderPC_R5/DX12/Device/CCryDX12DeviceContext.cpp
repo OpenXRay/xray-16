@@ -763,7 +763,7 @@ void CCryDX12DeviceContext::Finish(DX12::SwapChain* pDX12SwapChain)
 { 
     m_DirectCommandList->PresentRenderTargetView(pDX12SwapChain);
 
-    SubmitAllCommands(true, m_CmdFenceSet.GetCurrentValues());
+    SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC, m_CmdFenceSet.GetCurrentValues());
 
     // Release resource after pass fence and FRAME_FENCE_LATENCY later
     m_pDX12Device->FlushReleaseHeap(DX12::Device::ResourceReleasePolicy::Deferred);

@@ -20,7 +20,7 @@
 #define DX12_GPU_PROFILE_MODE_BASIC     1       // Profiles command list lifetime
 #define DX12_GPU_PROFILE_MODE_DETAIL    2       // Profiles draw call state changes
 
-#define DX12_GPU_PROFILE_MODE  DX12_GPU_PROFILE_MODE_OFF
+#define DX12_GPU_PROFILE_MODE DX12_GPU_PROFILE_MODE_OFF
 
 namespace DX12
 {
@@ -40,7 +40,7 @@ namespace DX12
     public:
         TimerHeap(Device& device);
 
-        void Init(u32 timerCountMax);
+        void Init(D3D12_COMMAND_LIST_TYPE cmdListType, u32 timerCountMax);
         void Shutdown();
 
         void Begin();

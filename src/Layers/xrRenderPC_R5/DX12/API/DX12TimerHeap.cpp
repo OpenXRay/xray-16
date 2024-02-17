@@ -23,13 +23,13 @@ namespace DX12
         , m_TimestampHeap{ &device }
     {}
 
-    void TimerHeap::Init(u32 timerCountMax)
+    void TimerHeap::Init(D3D12_COMMAND_LIST_TYPE cmdListType, u32 timerCountMax)
     {
         Shutdown();
 
         D3D12_QUERY_HEAP_DESC m_Desc;
         m_Desc.NodeMask = 1;
-        m_Desc.Type = D3D12_QUERY_HEAP_TYPE_TIMESTAMP;
+        m_Desc.Type = cmdListType != D3D12_COMMAND_LIST_TYPE::D3D12_COMMAND_LIST_TYPE_COPY ? D3D12_QUERY_HEAP_TYPE_TIMESTAMP : D3D12_QUERY_HEAP_TYPE_COPY_QUEUE_TIMESTAMP;
         m_Desc.Count = timerCountMax * 2;
 
         Device& device = *m_TimestampHeap.GetDevice();
