@@ -8,7 +8,6 @@ skip_branch_with_pr: true
 
 image:
 - Visual Studio 2022
-- Ubuntu
 
 configuration:
 - Debug
@@ -24,65 +23,8 @@ branches:
   except:
     - dependabot/*
 
-matrix:
-  exclude:
-    - image: Ubuntu
-      platform: x86
-    - image: Ubuntu
-      configuration: Mixed
-    - image: Ubuntu
-      configuration: Release Master Gold
-
 cache:
 - src/packages -> **/packages.config
-
-for:
--
-  matrix:
-    only:
-      - image: Visual Studio 2022
-
-  before_build:
-    - git submodule update --init --recursive
-    - nuget restore src\engine.sln
-
-  build:
-    project: src/engine.sln
-    parallel: true
-    verbosity: minimal
-
-  after_build:
-    - cmd: misc/windows/xr_pack_build.cmd "%CONFIGURATION%" "%PLATFORM%"
-
-  artifacts:
-    - path: res/OpenXRay.*.7z
-      name: OpenXRay.*.7z
-    - path: res/Symbols.*.7z
-      name: Symbols.*.7z
-    - path: res/Utils.*.7z
-      name: Utils.*.7z
--
-  matrix:
-    only:
-      - image: Ubuntu
-
-  before_build:
-    - sudo apt-get update
-    - sudo apt-get install -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev libopenal-dev libogg-dev libtheora-dev libvorbis-dev
-    - git submodule update --init --recursive
-
-  build_script:
-    - ${CXX} --version
-    - cmake --version
-    - export core_count=$(nproc || echo 4) && echo core_count = $core_count
-    - CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION
-    - cmake --build build --config $BUILD_CONFIGURATION --parallel $core_count
-    - cpack -B artifacts -C $BUILD_CONFIGURATION -DCPACK_THREADS=$core_count
-    - file openxray_1.6.02_*.deb
-
-  artifacts:
-    - path: bin/openxray_1.6.02_*.deb
-      name: openxray_1.6.02_*.deb
 
 test: off
 
