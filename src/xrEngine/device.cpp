@@ -161,9 +161,9 @@ void CRenderDevice::CalcFrameStats()
     do
     {
         // calc FPS & TPS
-        if (fTimeDelta <= EPS_S)
+        if (fTimeDeltaReal <= EPS_S)
             break;
-        const float fps = 1.f / fTimeDelta;
+        const float fps = 1.f / fTimeDeltaReal;
         // if (Engine.External.tune_enabled) vtune.update (fps);
         constexpr float fOne = 0.3f;
         constexpr float fInv = 1.0f - fOne;
@@ -413,6 +413,12 @@ void CRenderDevice::FrameMove()
     dwFrame++;
     Core.dwFrame = dwFrame;
     dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
+
+    fTimeDeltaReal = Timer.GetElapsed_sec();
+    if (!_valid(fTimeDeltaReal))
+        fTimeDeltaReal = EPS_S + EPS_S;
+    Timer.Start(); // previous frame
+
     if (psDeviceFlags.test(rsConstantFPS))
     {
         // 20ms = 50fps
@@ -428,20 +434,14 @@ void CRenderDevice::FrameMove()
     }
     else
     {
-        // Timer
-        const float fPreviousFrameTime = Timer.GetElapsed_sec();
-        Timer.Start(); // previous frame
-        fTimeDelta =
-            0.1f * fTimeDelta + 0.9f * fPreviousFrameTime; // smooth random system activity - worst case ~7% error
-        // fTimeDelta = 0.7f * fTimeDelta + 0.3f*fPreviousFrameTime; // smooth random system activity
-        if (fTimeDelta > .1f)
-            fTimeDelta = .1f; // limit to 15fps minimum
-        if (fTimeDelta <= 0.f)
-            fTimeDelta = EPS_S + EPS_S; // limit to 15fps minimum
         if (Paused())
             fTimeDelta = 0.0f;
-        // u64 qTime = TimerGlobal.GetElapsed_clk();
-        fTimeGlobal = TimerGlobal.GetElapsed_sec(); // float(qTime)*CPU::cycles2seconds;
+        else
+        {
+            fTimeDelta = 0.1f * fTimeDelta + 0.9f * fTimeDeltaReal; // smooth random system activity - worst case ~7% error
+            clamp(fTimeDelta, EPS_S + EPS_S, .1f); // limit to 10fps minimum
+        }
+        fTimeGlobal = TimerGlobal.GetElapsed_sec();
         const u32 _old_global = dwTimeGlobal;
         dwTimeGlobal = TimerGlobal.GetElapsed_ms();
         dwTimeDelta = dwTimeGlobal - _old_global;
