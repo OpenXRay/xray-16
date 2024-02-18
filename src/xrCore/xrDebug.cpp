@@ -56,7 +56,7 @@
 #       include <sys/ptrace.h>
 #       define PTRACE_AVAILABLE
 
-#       ifdef defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
+#       if defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
 #           define PTRACE_TRACEME PT_TRACE_ME
 #           define PTRACE_DETACH PT_DETACH
 #       endif
