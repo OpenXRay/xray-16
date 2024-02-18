@@ -1076,7 +1076,7 @@ void IPureClient::net_Syncronize()
     net_DeltaArray.clear();
     Threading::SpawnThread([](void* P)
     {
-        SetThreadPriority(Threading::GetCurrentThreadHandle(), THREAD_PRIORITY_TIME_CRITICAL);
+        Threading::SetCurrentThreadPriorityLevel(Threading::priority_level::time_critical);
         IPureClient* C = static_cast<IPureClient*>(P);
         C->Sync_Thread();
     }, "network-time-sync", 0, this);

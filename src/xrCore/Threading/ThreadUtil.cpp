@@ -30,8 +30,6 @@ namespace Threading
 #if defined(XR_PLATFORM_WINDOWS)
 ThreadId GetCurrThreadId() { return GetCurrentThreadId(); }
 
-ThreadHandle GetCurrentThreadHandle() { return GetCurrentThread(); }
-
 bool ThreadIdsAreEqual(ThreadId left, ThreadId right) { return left == right; }
 
 void SetThreadNameImpl(DWORD threadId, pcstr name)
@@ -70,6 +68,69 @@ void SetThreadNameImpl(DWORD threadId, pcstr name)
 void SetCurrentThreadName(pcstr name)
 {
     SetThreadNameImpl(-1, name);
+}
+
+priority_level GetCurrentThreadPriorityLevel()
+{
+    switch (GetThreadPriority(GetCurrentThread()))
+    {
+    case THREAD_PRIORITY_IDLE:          return priority_level::idle;
+    case THREAD_PRIORITY_LOWEST:        return priority_level::lowest;
+    case THREAD_PRIORITY_BELOW_NORMAL:  return priority_level::below_normal;
+    default: [[fallthrough]]
+    case THREAD_PRIORITY_NORMAL:        return priority_level::normal;
+    case THREAD_PRIORITY_ABOVE_NORMAL:  return priority_level::above_normal;
+    case THREAD_PRIORITY_HIGHEST:       return priority_level::highest;
+    case THREAD_PRIORITY_TIME_CRITICAL: return priority_level::time_critical;
+
+    }
+}
+
+priority_class GetCurrentProcessPriorityClass()
+{
+   switch (GetPriorityClass(GetCurrentProcess()))
+   {
+   case IDLE_PRIORITY_CLASS:         return priority_class::idle;
+   case BELOW_NORMAL_PRIORITY_CLASS: return priority_class::below_normal;
+   default: [[fallthrough]]
+   case NORMAL_PRIORITY_CLASS:       return priority_class::normal;
+   case ABOVE_NORMAL_PRIORITY_CLASS: return priority_class::above_normal;
+   case HIGH_PRIORITY_CLASS:         return priority_class::high;
+   case REALTIME_PRIORITY_CLASS:     return priority_class::realtime;
+   }
+}
+
+void SetCurrentThreadPriorityLevel(priority_level prio)
+{
+    int nPriority;
+    switch (prio)
+    {
+    case priority_level::idle:          nPriority = THREAD_PRIORITY_IDLE; break;
+    case priority_level::lowest:        nPriority = THREAD_PRIORITY_LOWEST; break;
+    case priority_level::below_normal:  nPriority = THREAD_PRIORITY_BELOW_NORMAL; break;
+    default: [[fallthrough]]
+    case priority_level::normal:        nPriority = THREAD_PRIORITY_NORMAL; break;
+    case priority_level::above_normal:  nPriority = THREAD_PRIORITY_ABOVE_NORMAL; break;
+    case priority_level::highest:       nPriority = THREAD_PRIORITY_HIGHEST; break;
+    case priority_level::time_critical: nPriority = THREAD_PRIORITY_TIME_CRITICAL; break;
+    }
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+}
+
+void SetCurrentProcessPriorityClass(priority_class cls)
+{
+    DWORD dwPriorityClass;
+    switch (cls)
+    {
+    case priority_class::idle:         dwPriorityClass = IDLE_PRIORITY_CLASS; break;
+    case priority_class::below_normal: dwPriorityClass = BELOW_NORMAL_PRIORITY_CLASS; break;
+    default: [[fallthrough]]
+    case priority_class::normal:       dwPriorityClass = NORMAL_PRIORITY_CLASS; break;
+    case priority_class::above_normal: dwPriorityClass = ABOVE_NORMAL_PRIORITY_CLASS; break;
+    case priority_class::high:         dwPriorityClass = HIGH_PRIORITY_CLASS; break;
+    case priority_class::realtime:     dwPriorityClass = REALTIME_PRIORITY_CLASS; break;
+    }
+    SetPriorityClass(GetCurrentProcess(), dwPriorityClass);
 }
 
 u32 __stdcall ThreadEntry(void* params)
@@ -121,8 +182,6 @@ void CloseThreadHandle(ThreadHandle& threadHandle)
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 ThreadId GetCurrThreadId() { return pthread_self(); }
 
-ThreadHandle GetCurrentThreadHandle() { return pthread_self(); }
-
 bool ThreadIdsAreEqual(ThreadId left, ThreadId right) { return !!pthread_equal(left, right); }
 
 void SetCurrentThreadName(pcstr name)
@@ -131,6 +190,26 @@ void SetCurrentThreadName(pcstr name)
     {
         Msg("SetCurrentThreadName: failed to set thread name to '%s'. Errno: '%d'", name, error);
     }
+}
+
+priority_level GetCurrentThreadPriorityLevel()
+{
+    return priority_level::normal;
+}
+
+priority_class GetCurrentProcessPriorityClass()
+{
+    return priority_class::normal;
+}
+
+void SetCurrentThreadPriorityLevel(priority_level prio)
+{
+
+}
+
+void SetCurrentProcessPriorityClass(priority_class cls)
+{
+
 }
 
 void* __cdecl ThreadEntry(void* params)
