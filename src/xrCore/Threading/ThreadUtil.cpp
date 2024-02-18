@@ -77,12 +77,11 @@ priority_level GetCurrentThreadPriorityLevel()
     case THREAD_PRIORITY_IDLE:          return priority_level::idle;
     case THREAD_PRIORITY_LOWEST:        return priority_level::lowest;
     case THREAD_PRIORITY_BELOW_NORMAL:  return priority_level::below_normal;
-    default: [[fallthrough]]
+    default: [[fallthrough]];
     case THREAD_PRIORITY_NORMAL:        return priority_level::normal;
     case THREAD_PRIORITY_ABOVE_NORMAL:  return priority_level::above_normal;
     case THREAD_PRIORITY_HIGHEST:       return priority_level::highest;
     case THREAD_PRIORITY_TIME_CRITICAL: return priority_level::time_critical;
-
     }
 }
 
@@ -92,7 +91,7 @@ priority_class GetCurrentProcessPriorityClass()
    {
    case IDLE_PRIORITY_CLASS:         return priority_class::idle;
    case BELOW_NORMAL_PRIORITY_CLASS: return priority_class::below_normal;
-   default: [[fallthrough]]
+   default: [[fallthrough]];
    case NORMAL_PRIORITY_CLASS:       return priority_class::normal;
    case ABOVE_NORMAL_PRIORITY_CLASS: return priority_class::above_normal;
    case HIGH_PRIORITY_CLASS:         return priority_class::high;
@@ -108,7 +107,7 @@ void SetCurrentThreadPriorityLevel(priority_level prio)
     case priority_level::idle:          nPriority = THREAD_PRIORITY_IDLE; break;
     case priority_level::lowest:        nPriority = THREAD_PRIORITY_LOWEST; break;
     case priority_level::below_normal:  nPriority = THREAD_PRIORITY_BELOW_NORMAL; break;
-    default: [[fallthrough]]
+    default: [[fallthrough]];
     case priority_level::normal:        nPriority = THREAD_PRIORITY_NORMAL; break;
     case priority_level::above_normal:  nPriority = THREAD_PRIORITY_ABOVE_NORMAL; break;
     case priority_level::highest:       nPriority = THREAD_PRIORITY_HIGHEST; break;
@@ -124,7 +123,7 @@ void SetCurrentProcessPriorityClass(priority_class cls)
     {
     case priority_class::idle:         dwPriorityClass = IDLE_PRIORITY_CLASS; break;
     case priority_class::below_normal: dwPriorityClass = BELOW_NORMAL_PRIORITY_CLASS; break;
-    default: [[fallthrough]]
+    default: [[fallthrough]];
     case priority_class::normal:       dwPriorityClass = NORMAL_PRIORITY_CLASS; break;
     case priority_class::above_normal: dwPriorityClass = ABOVE_NORMAL_PRIORITY_CLASS; break;
     case priority_class::high:         dwPriorityClass = HIGH_PRIORITY_CLASS; break;
