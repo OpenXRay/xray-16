@@ -169,13 +169,7 @@ Lock xrDebug::failLock(MUTEX_PROFILE_ID(xrDebug::Backend));
 Lock xrDebug::failLock;
 #endif
 
-#if defined(XR_PLATFORM_WINDOWS)
 void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, fileName); }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
-void xrDebug::SetBugReportFile(const char* fileName) { xr_strcpy(BugReportFile, 0, fileName); }
-#else
-#   error Select or add implementation for your platform
-#endif
 
 #if defined(XR_PLATFORM_WINDOWS)
 bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr)
