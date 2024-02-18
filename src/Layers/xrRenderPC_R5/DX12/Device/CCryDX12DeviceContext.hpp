@@ -748,7 +748,7 @@ public:
         return S_OK;
     }
 
-    void WaitForIdle();
+    void WaitForIdle(UINT64 fenceValue = 1);
 
     void ResetCachedState();
 

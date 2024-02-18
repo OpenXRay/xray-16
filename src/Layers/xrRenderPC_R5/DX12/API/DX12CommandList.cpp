@@ -23,82 +23,74 @@ namespace DX12
 {
     const char* StateToString(D3D12_RESOURCE_STATES state)
     {
-        static int buf = 0;
-        static char str[2][512], *ret;
+        static std::string str_buf;
 
-        ret = str[buf ^= 1];
-        *ret = '\0';
-
-        if (!state)
+        if (state == D3D12_RESOURCE_STATE_COMMON || state == D3D12_RESOURCE_STATE_PRESENT)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " Common/Present");
-            return ret;
+            return " Common/Present";
         }
-
-        if ((state & D3D12_RESOURCE_STATE_GENERIC_READ) == D3D12_RESOURCE_STATE_GENERIC_READ)
+        else if((state & D3D12_RESOURCE_STATE_GENERIC_READ) == D3D12_RESOURCE_STATE_GENERIC_READ)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " Generic Read");
-            return ret;
+            return " Generic Read";
         }
-
-        if (state & D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER)
+        else if(state & D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " V/C Buffer");
+            return " V/C Buffer";
         }
-        if (state & D3D12_RESOURCE_STATE_INDEX_BUFFER)
+        else if (state & D3D12_RESOURCE_STATE_INDEX_BUFFER)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " I Buffer");
+            return " I Buffer";
         }
-        if (state & D3D12_RESOURCE_STATE_RENDER_TARGET)
+        else if(state & D3D12_RESOURCE_STATE_RENDER_TARGET)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " RT");
+            return " RT";
         }
-        if (state & D3D12_RESOURCE_STATE_UNORDERED_ACCESS)
+        else if(state & D3D12_RESOURCE_STATE_UNORDERED_ACCESS)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " UA");
+            return " UA";
         }
-        if (state & D3D12_RESOURCE_STATE_DEPTH_WRITE)
+        else if(state & D3D12_RESOURCE_STATE_DEPTH_WRITE)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " DepthW");
+            return " DepthW";
         }
-        if (state & D3D12_RESOURCE_STATE_DEPTH_READ)
+        else if(state & D3D12_RESOURCE_STATE_DEPTH_READ)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " DepthR");
+            return " DepthR";
         }
-        if (state & D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE)
+        else if(state & D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " NoPixelR");
+            return " NoPixelR";
         }
-        if (state & D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
+        else if(state & D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " PixelR");
+            return " PixelR";
         }
-        if (state & D3D12_RESOURCE_STATE_STREAM_OUT)
+        else if(state & D3D12_RESOURCE_STATE_STREAM_OUT)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " Stream Out");
+            return " Stream Out";
         }
-        if (state & D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT)
+        else if(state & D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " Indirect Arg");
+            return " Indirect Arg";
         }
-        if (state & D3D12_RESOURCE_STATE_COPY_DEST)
+        else if(state & D3D12_RESOURCE_STATE_COPY_DEST)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " CopyD");
+            return " CopyD";
         }
-        if (state & D3D12_RESOURCE_STATE_COPY_SOURCE)
+        else if(state & D3D12_RESOURCE_STATE_COPY_SOURCE)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " CopyS");
+            return " CopyS";
         }
-        if (state & D3D12_RESOURCE_STATE_RESOLVE_DEST)
+        else if(state & D3D12_RESOURCE_STATE_RESOLVE_DEST)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " ResolveD");
+            return " ResolveD";
         }
-        if (state & D3D12_RESOURCE_STATE_RESOLVE_SOURCE)
+        else if(state & D3D12_RESOURCE_STATE_RESOLVE_SOURCE)
         {
-            strcat_s(ret, DX12_ARRAY_SIZE(ret), " ResolveS");
+            return " ResolveS";
         }
 
-        return ret;
+        return "";
     }
 
     CommandList::CommandList(CommandListPool& pool)
@@ -1057,9 +1049,9 @@ namespace DX12
         if (stateInitial != finalState && stateAnnounced != finalState)
         {
             m_Commands += CLCOUNT_BARRIER;
-
-            //AZ_Printf("DX12", "QueueTransitionBarrierBegin: Split Barrier BEGIN %p %s -> %s", resource.GetD3D12Resource(), StateToString(stateInitial), StateToString(finalState));
-
+#if DEBUG_BARRIER
+            Msg("QueueTransitionBarrierBegin: Split Barrier BEGIN %p %s -> %s", resource.GetD3D12Resource(), StateToString(stateInitial), StateToString(finalState));
+#endif // DEBUG
             D3D12_RESOURCE_TRANSITION_BARRIER transition;
             transition.pResource = resource.GetD3D12Resource();
             transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -1090,10 +1082,9 @@ namespace DX12
         if (announcedState != static_cast<D3D12_RESOURCE_STATES>(-1))
         {
             m_Commands += CLCOUNT_BARRIER;
-
-            // AZ_Printf("DX12", "QueueTransitionBarrier: Split END %p %s -> %s", resource.GetD3D12Resource(),
-            // StateToString(currentState), StateToString(announcedState));
-
+#if DEBUG_BARRIER
+            Msg("QueueTransitionBarrier: Split END %p %s -> %s", resource.GetD3D12Resource(), StateToString(currentState), StateToString(announcedState));
+#endif
             D3D12_RESOURCE_TRANSITION_BARRIER transition;
             transition.pResource = resource.GetD3D12Resource();
             transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -1110,9 +1101,9 @@ namespace DX12
         // Now check if we still need to transition to final state.
         if (currentState != finalState)
         {
-            // AZ_Printf("DX12", "QueueTransitionBarrier: Transition %p %s -> %s", resource.GetD3D12Resource(),
-            // StateToString(currentState), StateToString(finalState));
-
+#if DEBUG_BARRIER
+            Msg("QueueTransitionBarrier: Transition %p %s -> %s", resource.GetD3D12Resource(), StateToString(currentState), StateToString(finalState));
+#endif
             m_Commands += CLCOUNT_BARRIER;
 
             D3D12_RESOURCE_TRANSITION_BARRIER transition;

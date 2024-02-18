@@ -890,14 +890,14 @@ void CCryDX12DeviceContext::ResolveOcclusion(DX12::CommandList* pCmdList, UINT i
     }
 }
 
-void CCryDX12DeviceContext::WaitForIdle()
+void CCryDX12DeviceContext::WaitForIdle(UINT64 fenceValue)
 {
     DX12::CommandListFence fence(m_pDX12Device);
     fence.Init();
 
-    m_DirectListPool.GetD3D12CommandQueue()->Signal(fence.GetFence(), 1);
+    m_DirectListPool.GetD3D12CommandQueue()->Signal(fence.GetFence(), fenceValue);
 
-    fence.WaitForFence(1);
+    fence.WaitForFence(fenceValue);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1687,7 +1687,7 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::DrawIndexedInstancedIndirect(
     _In_  UINT AlignedByteOffsetForArgs)
 {
     DX12_FUNC_LOG
-    DX12_ASSERT(false, "unimplemented");
+    DX12_NOT_IMPLEMENTED;
 }
 
 void STDMETHODCALLTYPE CCryDX12DeviceContext::DrawInstancedIndirect(
@@ -1695,7 +1695,7 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::DrawInstancedIndirect(
     _In_  UINT AlignedByteOffsetForArgs)
 {
     DX12_FUNC_LOG
-    DX12_ASSERT(false, "unimplemented");
+    DX12_NOT_IMPLEMENTED;
 }
 
 void STDMETHODCALLTYPE CCryDX12DeviceContext::Dispatch(
@@ -1721,7 +1721,7 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::DispatchIndirect(
     _In_  UINT AlignedByteOffsetForArgs)
 {
     DX12_FUNC_LOG
-    DX12_ASSERT(false, "unimplemented");
+    DX12_NOT_IMPLEMENTED;
 }
 
 void STDMETHODCALLTYPE CCryDX12DeviceContext::RSSetState(
