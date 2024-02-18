@@ -428,7 +428,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
-#elif BACKTRACE_AVAILABLE
+#elif defined(BACKTRACE_AVAILABLE)
     void* array[20];
     int nptrs = backtrace(array, 20); // get void*'s for all entries on the stack
     char** strings = backtrace_symbols(array, nptrs);
