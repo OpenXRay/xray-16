@@ -108,7 +108,7 @@ void CRenderDevice::RenderEnd(void)
             CheckPrivilegySlowdown();
             if (g_pGamePersistent->GameType() == 1 && !psDeviceFlags.test(rsAlwaysActive)) // haCk
             {
-                Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
+                const Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
                 if ((flags & SDL_WINDOW_INPUT_FOCUS) == 0)
                     Pause(true, true, true, "application start");
             }
@@ -163,14 +163,14 @@ void CRenderDevice::CalcFrameStats()
         // calc FPS & TPS
         if (fTimeDelta <= EPS_S)
             break;
-        float fps = 1.f / fTimeDelta;
+        const float fps = 1.f / fTimeDelta;
         // if (Engine.External.tune_enabled) vtune.update (fps);
-        float fOne = 0.3f;
-        float fInv = 1.0f - fOne;
+        constexpr float fOne = 0.3f;
+        constexpr float fInv = 1.0f - fOne;
         stats.fFPS = fInv * stats.fFPS + fOne * fps;
         if (stats.RenderTotal.result > EPS_S)
         {
-            u32 renderedPolys = GEnv.Render->GetCacheStatPolys();
+            const u32 renderedPolys = GEnv.Render->GetCacheStatPolys();
             stats.fTPS = fInv * stats.fTPS + fOne * float(renderedPolys) / (stats.RenderTotal.result * 1000.f);
             stats.fRFPS = fInv * stats.fRFPS + fOne * 1000.f / stats.RenderTotal.result;
         }
@@ -214,8 +214,8 @@ void CRenderDevice::BeforeRender()
     // Precache
     if (dwPrecacheFrame)
     {
-        float factor = float(dwPrecacheFrame) / float(dwPrecacheTotal);
-        float angle = PI_MUL_2 * factor;
+        const float factor = float(dwPrecacheFrame) / float(dwPrecacheTotal);
+        const float angle = PI_MUL_2 * factor;
         vCameraDirection.set(_sin(angle), 0, _cos(angle));
         vCameraDirection.normalize();
         vCameraTop.set(0, 1, 0);
@@ -378,11 +378,11 @@ void CRenderDevice::Run()
     dwTimeGlobal = 0;
     Timer_MM_Delta = 0;
     {
-        u32 time_mm = CPU::GetTicks();
+        const u32 time_mm = CPU::GetTicks();
         while (CPU::GetTicks() == time_mm)
             ; // wait for next tick
-        u32 time_system = CPU::GetTicks();
-        u32 time_local = TimerAsync();
+        const u32 time_system = CPU::GetTicks();
+        const u32 time_local = TimerAsync();
         Timer_MM_Delta = time_system - time_local;
     }
 
@@ -429,7 +429,7 @@ void CRenderDevice::FrameMove()
     else
     {
         // Timer
-        float fPreviousFrameTime = Timer.GetElapsed_sec();
+        const float fPreviousFrameTime = Timer.GetElapsed_sec();
         Timer.Start(); // previous frame
         fTimeDelta =
             0.1f * fTimeDelta + 0.9f * fPreviousFrameTime; // smooth random system activity - worst case ~7% error
@@ -442,7 +442,7 @@ void CRenderDevice::FrameMove()
             fTimeDelta = 0.0f;
         // u64 qTime = TimerGlobal.GetElapsed_clk();
         fTimeGlobal = TimerGlobal.GetElapsed_sec(); // float(qTime)*CPU::cycles2seconds;
-        u32 _old_global = dwTimeGlobal;
+        const u32 _old_global = dwTimeGlobal;
         dwTimeGlobal = TimerGlobal.GetElapsed_ms();
         dwTimeDelta = dwTimeGlobal - _old_global;
     }
