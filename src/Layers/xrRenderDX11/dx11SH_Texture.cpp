@@ -229,8 +229,6 @@ void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
         rect.right = pTheora->Width(true);
         rect.bottom = pTheora->Height(true);
 
-        u32 _w = pTheora->Width(false);
-
 // R_CHK				(T2D->LockRect(0,&R,&rect,0));
 
 #if defined(USE_DX11) || defined(USE_DX12)
@@ -238,8 +236,10 @@ void CTexture::apply_theora(CBackend& cmd_list, u32 dwStage)
 #else
         R_CHK(T2D->Map(0, D3D_MAP_WRITE_DISCARD, 0, &mapData));
 #endif
+        u32 _w = mapData.RowPitch / 4; // pTheora->Width(false);
         // R_ASSERT			(R.Pitch == int(pTheora->Width(false)*4));
-        R_ASSERT(mapData.RowPitch == int(pTheora->Width(false) * 4));
+        //R_ASSERT(mapData.RowPitch == int(pTheora->Width(false) * 4));
+        R_ASSERT(mapData.RowPitch != 0);
         int _pos = 0;
         pTheora->DecompressFrame((u32*)mapData.pData, _w - rect.right, _pos);
         VERIFY(u32(_pos) == rect.bottom * _w);
