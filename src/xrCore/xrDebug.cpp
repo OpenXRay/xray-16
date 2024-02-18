@@ -6,23 +6,7 @@
 #include "log.h"
 #include "Threading/ScopeLock.hpp"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#include "Debug/dxerr.h"
-#include "Debug/MiniDump.h"
-#endif
-
 #include <SDL.h>
-
-#ifdef XR_PLATFORM_WINDOWS
-#   define USE_BUG_TRAP
-static BOOL bException = FALSE;
-#endif
-
-#ifdef USE_BUG_TRAP
-#   include <BugTrap/source/Client/BugTrap.h>
-#else
-#   include <exception>
-#endif
 
 #include <csignal>
 
@@ -30,34 +14,7 @@ static BOOL bException = FALSE;
 #   include <direct.h>
 #   include <new.h> // for _set_new_mode
 #   include <errorrep.h> // ReportFault
-#elif defined(XR_PLATFORM_LINUX)
-#   include <sys/user.h>
-#   include <sys/ptrace.h>
-#   include <cxxabi.h>
-#   include <dlfcn.h>
-#   if __has_include(<execinfo.h>)
-#       include <execinfo.h>
-#   endif
-#elif defined(XR_PLATFORM_APPLE)
-#   include <sys/types.h>
-#   include <sys/ptrace.h>
-#   define PTRACE_TRACEME PT_TRACE_ME
-#   define PTRACE_DETACH PT_DETACH
-#elif defined(XR_PLATFORM_BSD)
-#   include <sys/types.h>
-#   include <sys/ptrace.h>
-#   include <execinfo.h>
-#   include <cxxabi.h>
-#   include <dlfcn.h>
-#   define PTRACE_TRACEME PT_TRACE_ME
-#   define PTRACE_DETACH PT_DETACH
-#endif
 
-#ifdef DEBUG
-#define USE_OWN_ERROR_MESSAGE_WINDOW
-#endif
-
-#if defined(XR_PLATFORM_WINDOWS)
 #   if defined(XR_ARCHITECTURE_X86)
 #       define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
 #   elif defined(XR_ARCHITECTURE_X64)
@@ -71,7 +28,44 @@ static BOOL bException = FALSE;
 #   else
 #       error CPU architecture is not supported.
 #   endif
-#endif // XR_PLATFORM_WINDOWS
+
+#   define USE_BUG_TRAP
+#   ifdef USE_BUG_TRAP
+#       include <BugTrap/source/Client/BugTrap.h>
+#   else
+#       include <exception>
+#   endif
+
+#   include "Debug/dxerr.h"
+#   include "Debug/MiniDump.h"
+#endif
+
+#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
+#   if __has_include(<execinfo.h>)
+#       include <execinfo.h>
+#       define BACKTRACE_AVAILABLE
+
+#       if __has_include(<cxxabi.h>)
+#           include <cxxabi.h>
+#           include <dlfcn.h>
+#           define CXXABI_AVAILABLE
+#       endif
+#   endif
+
+#   if __has_include(<sys/ptrace.h>)
+#       include <sys/ptrace.h>
+#       define PTRACE_AVAILABLE
+
+#       ifdef defined(XR_PLATFORM_APPLE) || defined(XR_PLATFORM_BSD)
+#           define PTRACE_TRACEME PT_TRACE_ME
+#           define PTRACE_DETACH PT_DETACH
+#       endif
+#   endif
+#endif
+
+#ifdef DEBUG
+#   define USE_OWN_ERROR_MESSAGE_WINDOW
+#endif
 
 constexpr SDL_MessageBoxButtonData buttons[] =
 {
@@ -434,10 +428,10 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
-#elif defined(XR_PLATFORM_LINUX) && __has_include(<execinfo.h>) || defined(XR_PLATFORM_BSD)
-    void *array[20];
-    int nptrs = backtrace(array, 20);     // get void*'s for all entries on the stack
-    char **strings = backtrace_symbols(array, nptrs);
+#elif BACKTRACE_AVAILABLE
+    void* array[20];
+    int nptrs = backtrace(array, 20); // get void*'s for all entries on the stack
+    char** strings = backtrace_symbols(array, nptrs);
 
     if (strings)
     {
@@ -447,6 +441,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         {
             char* functionName = strings[i];
 
+#   ifdef CXXABI_AVAILABLE
             Dl_info info;
 
             if (dladdr(array[i], &info))
@@ -461,6 +456,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
                     }
                 }
             }
+#   endif
             Log(functionName);
 #   ifdef USE_OWN_ERROR_MESSAGE_WINDOW
             buffer += xr_sprintf(buffer, bufferSize, "%s\n", functionName);
@@ -736,10 +732,12 @@ bool xrDebug::DebuggerIsPresent()
 {
 #ifdef XR_PLATFORM_WINDOWS
     return IsDebuggerPresent();
-#else
+#elif defined(PTRACE_AVAILABLE)
     if (ptrace(PTRACE_TRACEME, 0, 0, 0) == -1)
         return true;
     ptrace(PTRACE_DETACH, 0, 0, 0);
+    return false;
+#else
     return false;
 #endif
 }
