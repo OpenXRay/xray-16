@@ -32,8 +32,9 @@ endif()
 
 if (CMAKE_VERSION VERSION_EQUAL "3.28.2" AND CMAKE_UNITY_BUILD)
     # https://gitlab.kitware.com/cmake/cmake/-/issues/25650
-    message(WARNING "Precompiled headers are broken when Unity build is enabled in CMake 3.28.2. Please, update to CMake 3.28.3 or downgrade to 3.28.1.")
-    set(CMAKE_DISABLE_PRECOMPILE_HEADERS ON)
+    message(WARNING "In CMake 3.28.2, precompiled headers are broken when Unity build is enabled. This breaks project from compiling. \
+                     Please, update to CMake 3.28.3 or downgrade to 3.28.1.")
+    set(CMAKE_UNITY_BUILD OFF)
 endif()
 
 if (NOT CMAKE_BUILD_TYPE)
