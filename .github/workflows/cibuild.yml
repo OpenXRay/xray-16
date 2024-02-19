@@ -8,6 +8,162 @@ on:
   workflow_dispatch:
 
 jobs:
+  windows:
+    name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (msvc)
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        Configuration: [Debug, Mixed, Release, Release Master Gold]
+        Platform: [x64, x86]
+    steps:
+    - uses: actions/checkout@main
+      with:
+        submodules: recursive
+
+    - uses: microsoft/setup-msbuild@main
+
+    - uses: nuget/setup-nuget@main
+
+    - name: Restore NuGet packages
+      run: nuget restore src\engine.sln
+
+    - name: Build
+      working-directory: src
+      run: msbuild /m /p:Configuration="${{ matrix.Configuration }}" /p:Platform="${{ matrix.Platform }}" engine.sln
+
+    - name: Prepare artifacts
+      shell: cmd
+      run: misc/windows/xr_pack_build.cmd "${{ matrix.Configuration }}" "${{ matrix.Platform }}"
+
+    - name: Upload OpenXRay artifact
+      uses: actions/upload-artifact@main
+      with:
+        name: OpenXRay.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
+        path: res/OpenXRay.*.7z
+
+    - name: Upload Symbols
+      uses: actions/upload-artifact@main
+      with:
+        name: Symbols.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
+        path: res/Symbols.*.7z
+
+    - name: Upload Utils
+      uses: actions/upload-artifact@main
+      with:
+        name: Utils.${{ matrix.Configuration }} ${{ matrix.Platform }} (github-${{ github.run_number }}).7z
+        path: res/Utils.*.7z
+
+    - name: Update latest-nightly tag
+      uses: EndBug/latest-tag@latest
+      if: github.ref_name == 'dev'
+      id: update-latest-nightly-tag
+      with:
+        ref: latest-nightly
+
+    - name: Publish latest nightly build
+      if: ${{ steps.update-latest-nightly-tag.outcome == 'success' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh release upload --clobber latest-nightly (get-item res/*.*.7z)
+
+  cmake:
+    name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc || 'unknown compiler' }})
+    runs-on: ${{ matrix.platform.os }}
+
+    container: ${{ matrix.platform.container || '' }}
+
+    defaults:
+      run:
+        shell: ${{ matrix.platform.shell || 'bash -e {0}' }}
+
+    env:
+      CFLAGS: "-w"
+      CXXFLAGS: "-w"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+        # cc is always set for the correct naming of the job.
+        # Both cc and cxx should be set if we want to change the compiler.
+        # You may also want to set XRAY_LINKER when changing the compiler.
+        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: gcc, }
+        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: clang, cxx: clang++, flags: "-DXRAY_LINKER=lld", }
+        #- { name: Ubuntu, os: ubuntu-latest, arch: arm64,   cc: gcc,   container: 'dockcross/linux-arm64', }
+        #- { name: Ubuntu, os: ubuntu-latest, arch: ppc64el, cc: gcc,   container: 'dockcross/linux-ppc64le:latest', }
+        - { name: Alpine, os: ubuntu-latest, arch: x86_64,  cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        - { name: Alpine, os: ubuntu-latest, arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        - { name: Fedora, os: ubuntu-latest, arch: x86_64,  cc: gcc,   container: 'fedora:latest', }
+        #- { name: Haiku,  os: ubuntu-latest, arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
+        - { name: macOS,  os: macos-13,      arch: x86_64,  cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
+        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0", threads: 3 }
+
+        configuration: [Debug, Release]
+
+    steps:
+    - name: Install latest stable Alpine Linux and packages
+      if: ${{ matrix.platform.name == 'Alpine' }}
+      uses: jirutka/setup-alpine@master
+      with:
+        arch: ${{ matrix.platform.arch }}
+        branch: 'latest-stable'
+        packages: build-base cmake git mold sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
+
+    - name: Install Ubuntu packages
+      if: ${{ matrix.platform.name == 'Ubuntu' }}
+      run: |
+          sudo dpkg --add-architecture ${{ matrix.platform.arch }}
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y \
+              libsdl2-dev:${{ matrix.platform.arch }} \
+              libglew-dev:${{ matrix.platform.arch }} \
+              liblzo2-dev:${{ matrix.platform.arch }} \
+              libjpeg-dev:${{ matrix.platform.arch }} \
+              libopenal-dev:${{ matrix.platform.arch }} \
+              libogg-dev:${{ matrix.platform.arch }} \
+              libtheora-dev:${{ matrix.platform.arch }} \
+              libvorbis-dev:${{ matrix.platform.arch }}
+    - name: Install macOS packages
+      if: ${{ matrix.platform.name == 'macOS' }}
+      run: |
+          brew update
+          brew install sdl2 glew lzo libogg libvorbis theora
+    - name: Install Fedora packages
+      if: ${{ matrix.platform.name == 'Fedora' }}
+      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel glew-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
+
+    - name: Set environment variables
+      if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
+      run: |
+        echo "CC=${{ matrix.platform.cc }}" >> $GITHUB_ENV
+        echo "CXX=${{ matrix.platform.cxx }}" >> $GITHUB_ENV
+    - uses: actions/checkout@main
+      with:
+        submodules: recursive
+
+    - name: Run CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON ${{ matrix.platform.flags }}
+
+    - name: Run CMake Build
+      id: cmake-build
+      run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }}
+
+    - name: Make package
+      if: ${{ steps.cmake-build.outcome == 'success' }}
+      id: make-package
+      #continue-on-error: true
+      working-directory: build
+      run: |
+          cpack -B artifacts -C ${{ matrix.configuration }} -DCPACK_THREADS=${{ matrix.platform.threads || 4 }}
+          file artifacts/openxray*.*
+    - name: Upload OpenXRay artifact
+      if: ${{ steps.make-package.outcome == 'success' }}
+      uses: actions/upload-artifact@main
+      with:
+        name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc }} github-${{ github.run_number }})
+        path: build/artifacts/openxray*.*
+
   bsd:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }}
     runs-on: ubuntu-latest
