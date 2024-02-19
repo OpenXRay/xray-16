@@ -124,11 +124,13 @@ jobs:
               libogg-dev:${{ matrix.platform.arch }} \
               libtheora-dev:${{ matrix.platform.arch }} \
               libvorbis-dev:${{ matrix.platform.arch }}
+
     - name: Install macOS packages
       if: ${{ matrix.platform.name == 'macOS' }}
       run: |
           brew update
           brew install sdl2 glew lzo libogg libvorbis theora
+
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
       run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel glew-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
@@ -138,6 +140,7 @@ jobs:
       run: |
         echo "CC=${{ matrix.platform.cc }}" >> $GITHUB_ENV
         echo "CXX=${{ matrix.platform.cxx }}" >> $GITHUB_ENV
+
     - uses: actions/checkout@main
       with:
         submodules: recursive
@@ -157,6 +160,7 @@ jobs:
       run: |
           cpack -B artifacts -C ${{ matrix.configuration }} -DCPACK_THREADS=${{ matrix.platform.threads || 4 }}
           file artifacts/openxray*.*
+
     - name: Upload OpenXRay artifact
       if: ${{ steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@main
