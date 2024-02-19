@@ -170,7 +170,7 @@ jobs:
 
   bsd:
     name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }}
-    runs-on: macos-13 # macOS 13 runner has 4 CPUs
+    runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
       CFLAGS: "-w"
@@ -179,7 +179,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: FreeBSD, os: freebsd, os-version: 13.2, arch: x86_64,
+        - { name: FreeBSD, os: freebsd, os-version: '14.0', arch: x86_64,
             install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 glew lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
           }
         - { name: OpenBSD, os: openbsd, os-version: 7.4,  arch: x86_64,
@@ -202,7 +202,7 @@ jobs:
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
         cpu_count: 4
-        memory: 8G
+        memory: 13G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: runner-to-vm
@@ -215,7 +215,7 @@ jobs:
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
         cpu_count: 4
-        memory: 8G
+        memory: 13G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
@@ -228,7 +228,7 @@ jobs:
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
         cpu_count: 4
-        memory: 8G
+        memory: 13G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
