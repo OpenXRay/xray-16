@@ -202,7 +202,7 @@ jobs:
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
         cpu_count: 4
-        memory: 8G
+        memory: 13G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: runner-to-vm
@@ -215,7 +215,7 @@ jobs:
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
         cpu_count: 4
-        memory: 8G
+        memory: 13G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
@@ -228,7 +228,7 @@ jobs:
         architecture: ${{ matrix.platform.arch }}
         version: ${{ matrix.platform.os-version }}
         cpu_count: 4
-        memory: 8G
+        memory: 13G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
