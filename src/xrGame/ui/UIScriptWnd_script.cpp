@@ -4,6 +4,10 @@
 
 #include "xrUICore/ListWnd/UIListWnd.h"
 #include "xrUICore/TabControl/UITabControl.h"
+#include "xrUICore/Buttons/UICheckButton.h"
+#include "xrUICore/Buttons/UIRadioButton.h"
+#include "xrUICore/MessageBox/UIMessageBox.h"
+#include "xrUICore/PropertiesBox/UIPropertiesBox.h"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
@@ -206,13 +210,24 @@ SCRIPT_EXPORT(CUIDialogWndEx, (CUIDialogWnd, IFactoryObject),
     [
         class_<CUIDialogWndEx, luabind::bases<CUIDialogWnd, IFactoryObject>, luabind::default_holder, WrapType>("CUIScriptWnd")
             .def(constructor<>())
-            .def("AddCallback",     &BaseType::AddCallback)
-            .def("Register",        (void (BaseType::*)(CUIWindow*, pcstr)) & BaseType::Register)
+
+            .def("AddCallback",     (void(BaseType::*)(pcstr, s16, const luabind::functor<void>&)) &BaseType::AddCallback)
+            .def("AddCallback",     (void(BaseType::*)(pcstr, s16, const luabind::functor<void>&, const luabind::object&)) &BaseType::AddCallback)
+
+            .def("Register",        (void (BaseType::*)(CUIWindow*)) &BaseType::Register)
+            .def("Register",        (void (BaseType::*)(CUIWindow*, pcstr)) &BaseType::Register)
+
             .def("OnKeyboard",      &BaseType::OnKeyboardAction, &WrapType::OnKeyboard_static)
             .def("Update",          &BaseType::Update, &WrapType::Update_static)
             .def("Dispatch",        &BaseType::Dispatch, &WrapType::Dispatch_static)
             .def("Load",            &BaseType::Load)
 
+            .def("GetButton",       &BaseType::GetControl<CUIButton>)
+            .def("GetMessageBox",   &BaseType::GetControl<CUIMessageBox>)
+            .def("GetPropertiesBox",&BaseType::GetControl<CUIPropertiesBox>)
+            .def("GetCheckButton",  &BaseType::GetControl<CUICheckButton>)
+            .def("GetRadioButton",  &BaseType::GetControl<CUIRadioButton>)
+            // .def("GetRadioGroup",   &BaseType::GetControl<CUIRadioGroup>)
             .def("GetStatic",       &BaseType::GetControl<CUIStatic>)
             .def("GetEditBox",      &BaseType::GetControl<CUIEditBox>)
             .def("GetDialogWnd",    &BaseType::GetControl<CUIDialogWnd>)
