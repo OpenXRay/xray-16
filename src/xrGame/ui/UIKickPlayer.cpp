@@ -55,7 +55,7 @@ void CUIKickPlayer::Init_internal(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "kick_ban", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "kick_ban:background", 0, bkgrnd);
-    //	CUIXmlInit::InitFrameWindow	(xml_doc, "kick_ban:list_back",		0, lst_back);
+    CUIXmlInit::InitFrameWindow(xml_doc, "kick_ban:list_back", 0, lst_back, false);
     CUIXmlInit::InitListBox(xml_doc, "kick_ban:list", 0, m_ui_players_list);
     CUIXmlInit::Init3tButton(xml_doc, "kick_ban:btn_ok", 0, btn_ok);
     CUIXmlInit::Init3tButton(xml_doc, "kick_ban:btn_cancel", 0, btn_cancel);
