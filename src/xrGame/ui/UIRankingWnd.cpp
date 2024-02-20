@@ -85,6 +85,17 @@ bool CUIRankingWnd::Init()
     AttachChild(m_actor_ch_info);
     m_actor_ch_info->InitCharacterInfo(&xml, "actor_ch_info");
 
+    auto* community = m_actor_ch_info->GetIcon(CUICharacterInfo::eCommunity);
+    auto* communityCaption = m_actor_ch_info->GetIcon(CUICharacterInfo::eCommunityCaption);
+
+    if (community && communityCaption)
+    {
+        communityCaption->AdjustWidthToText();
+        pos = community->GetWndPos();
+        pos.x = communityCaption->GetWndPos().x + communityCaption->GetWndSize().x + 10.0f;
+        community->SetWndPos(pos);
+    }
+
     std::ignore = UIHelper::CreateFrameWindow(xml, "actor_icon_over", this, false);
     auto* money_caption = UIHelper::CreateStatic(xml, "money_caption", this);
     m_money_value = UIHelper::CreateStatic(xml, "money_value", this);
