@@ -17,17 +17,7 @@ class CUICharacterInfo final : public CUIWindow
 private:
     typedef CUIWindow inherited;
 
-protected:
-    void SetRelation(ALife::ERelationType relation, CHARACTER_GOODWILL goodwill);
-    void ResetAllStrings();
-    void UpdateRelation();
-    bool hasOwner() { return (m_ownerID != u16(-1)); }
-
-    // Biography
-    CUIScrollView* pUIBio{};
-    bool m_bForceUpdate{};
-    u16 m_ownerID{ u16(-1) };
-
+public:
     enum UIItemType
     {
         eIcon = 0,
@@ -52,6 +42,18 @@ protected:
 
         eMaxCaption
     };
+
+protected:
+    void SetRelation(ALife::ERelationType relation, CHARACTER_GOODWILL goodwill);
+    void ResetAllStrings();
+    void UpdateRelation();
+    bool hasOwner() { return (m_ownerID != u16(-1)); }
+
+    // Biography
+    CUIScrollView* pUIBio{};
+    bool m_bForceUpdate{};
+    u16 m_ownerID{ u16(-1) };
+
     CUIStatic* m_icons[eMaxCaption]{};
     shared_str m_texture_name;
     u32 m_original_color;
@@ -73,6 +75,7 @@ public:
     virtual void Update();
 
     u16 OwnerID() const { return m_ownerID; }
+
     CUIStatic& UIIcon() const
     {
         VERIFY(m_icons[eIcon]);
@@ -92,6 +95,10 @@ public:
     {
         VERIFY(m_icons[eCommunityCaption]);
         return *m_icons[eCommunityCaption];
+    }
+    CUIStatic* GetIcon(UIItemType icon) const
+    {
+        return m_icons[icon];
     }
 
     const shared_str& IconName() const { return m_texture_name; }
