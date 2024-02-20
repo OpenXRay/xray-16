@@ -105,7 +105,7 @@ bool CUILogsWnd::Init()
     CUIXmlInit::InitWindow(m_uiXml, "main_wnd", 0, this);
 
     m_background = UIHelper::CreateFrameWindow(m_uiXml, "background", this, false);
-    if (m_background)
+    if (!m_background)
         m_background2 = UIHelper::CreateFrameLine(m_uiXml, "background", this, false);
     m_center_background = UIHelper::CreateFrameWindow(m_uiXml, "center_background", this, false);
 
