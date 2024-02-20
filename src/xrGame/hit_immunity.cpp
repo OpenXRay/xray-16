@@ -12,7 +12,6 @@ CHitImmunity::CHitImmunity()
         m_HitImmunityKoefs[i] = 1.0f;
 }
 
-CHitImmunity::~CHitImmunity() {}
 void CHitImmunity::LoadImmunities(const char* imm_sect, const CInifile* ini)
 {
     R_ASSERT2(ini->section_exist(imm_sect), imm_sect);

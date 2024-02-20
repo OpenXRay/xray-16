@@ -116,7 +116,7 @@ void CUIZoneMap::Render()
 
 void CUIZoneMap::Update()
 {
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    const auto* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!pActor)
         return;
 
@@ -125,10 +125,9 @@ void CUIZoneMap::Update()
         string16 text_str;
         xr_strcpy(text_str, sizeof(text_str), "");
 
-        CPda* pda = pActor->GetPDA();
-        if (pda)
+        if (CPda* pda = pActor->GetPDA())
         {
-            u32 cn = pda->ActiveContactsNum();
+            const u32 cn = pda->ActiveContactsNum();
             if (cn > 0)
             {
                 xr_sprintf(text_str, sizeof(text_str), "%d", cn);
@@ -144,8 +143,7 @@ void CUIZoneMap::Update()
 
     if (m_clock_wnd)
     {
-        m_clock_wnd->TextItemControl()->SetText(
-            InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+        m_clock_wnd->SetText(GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
     }
 }
 
@@ -178,6 +176,7 @@ void CUIZoneMap::UpdateRadar(Fvector pos)
 
 bool CUIZoneMap::ZoomIn() { return true; }
 bool CUIZoneMap::ZoomOut() { return true; }
+
 void CUIZoneMap::SetupCurrentMap()
 {
     m_activeMap->Initialize(Level().name(), "hud" DELIMITER "default");
@@ -189,7 +188,7 @@ void CUIZoneMap::SetupCurrentMap()
     Fvector2 wnd_size;
     float zoom_factor = float(m_clipFrame.GetWidth()) / 100.0f;
 
-    LPCSTR ln = Level().name().c_str();
+    cpcstr ln = Level().name().c_str();
     if (pGameIni->section_exist(ln))
     {
         if (pGameIni->line_exist(ln, "minimap_zoom"))

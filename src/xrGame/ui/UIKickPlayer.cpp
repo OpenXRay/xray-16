@@ -16,7 +16,6 @@
 CUIKickPlayer::CUIKickPlayer()
     : CUIDialogWnd(CUIKickPlayer::GetDebugType())
 {
-    m_prev_upd_time = 0;
     bkgrnd = xr_new<CUIStatic>("Background");
     bkgrnd->SetAutoDelete(true);
     AttachChild(bkgrnd);
@@ -50,8 +49,6 @@ CUIKickPlayer::CUIKickPlayer()
     m_ban_sec_label = xr_new<CUIStatic>("Ban time label");
     m_ban_sec_label->SetAutoDelete(true);
     AttachChild(m_ban_sec_label);
-
-    mode = MODE_KICK;
 }
 
 void CUIKickPlayer::Init_internal(CUIXml& xml_doc)
@@ -98,7 +95,7 @@ void CUIKickPlayer::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     if (LIST_ITEM_SELECT == msg && pWnd == m_ui_players_list)
     {
-        CUIListBoxItem* itm = smart_cast<CUIListBoxItem*>(m_ui_players_list->GetSelected());
+        auto* itm = smart_cast<CUIListBoxItem*>(m_ui_players_list->GetSelected());
         m_selected_item_text = itm->GetText();
     }
     else if (BUTTON_CLICKED == msg)
@@ -112,8 +109,7 @@ void CUIKickPlayer::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void CUIKickPlayer::OnBtnOk()
 {
-    CUIListBoxItem* item = smart_cast<CUIListBoxItem*>(m_ui_players_list->GetSelected());
-    if (item)
+    if (auto* item = smart_cast<CUIListBoxItem*>(m_ui_players_list->GetSelected()))
     {
         string512 command;
         switch (mode)
@@ -126,14 +122,10 @@ void CUIKickPlayer::OnBtnOk()
         Console->Execute(command);
         HideDialog();
     }
-    else
-        return;
 }
 
 void CUIKickPlayer::OnBtnCancel() { HideDialog(); }
 IC bool DM_Compare_Players(game_PlayerState* v1, game_PlayerState* v2);
-
-using ItemVec = xr_vector<game_PlayerState*>;
 
 void CUIKickPlayer::Update()
 {
@@ -146,20 +138,16 @@ void CUIKickPlayer::Update()
 
     const game_cl_GameState::PLAYERS_MAP& items = Game().players;
 
-    game_cl_GameState::PLAYERS_MAP_CIT I = items.begin();
-    game_cl_GameState::PLAYERS_MAP_CIT E = items.end();
-
     bool bNeedRefresh = false;
     bool bHasSelected = false;
 
-    xr_vector<game_PlayerState*>::iterator fit; //, fite;
-    for (; I != E; ++I)
+    //, fite;
+    for (auto [cliend_id, pI] : items)
     {
-        game_PlayerState* pI = I->second;
-        if (m_selected_item_text.size() && !xr_stricmp(pI->getName(), m_selected_item_text.c_str()))
+        if (!m_selected_item_text.empty() && !xr_stricmp(pI->getName(), m_selected_item_text.c_str()))
             bHasSelected = true;
 
-        fit = std::find(m_current_set.begin(), m_current_set.end(), pI);
+        const auto fit = std::find(m_current_set.begin(), m_current_set.end(), pI);
         if (fit == m_current_set.end())
             bNeedRefresh = true;
         else if (xr_stricmp((*fit)->getName(), pI->getName()))
@@ -170,13 +158,11 @@ void CUIKickPlayer::Update()
 
     if (bNeedRefresh)
     {
-        I = items.begin();
         m_ui_players_list->Clear();
         m_current_set.clear();
 
-        for (; I != E; ++I)
+        for (auto [cliend_id, p] : items)
         {
-            game_PlayerState* p = I->second;
             m_current_set.push_back(p);
             m_ui_players_list->AddTextItem(p->getName());
         }

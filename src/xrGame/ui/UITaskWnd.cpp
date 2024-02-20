@@ -20,19 +20,7 @@
 #include "Actor.h"
 #include "xrUICore/Buttons/UICheckButton.h"
 
-CUITaskWnd::CUITaskWnd(UIHint* hint)
-    : CUIWindow("CUITaskWnd"),
-      m_background(nullptr), m_background2(nullptr),
-      m_center_background(nullptr), m_right_bottom_background(nullptr),
-      m_task_split(nullptr), m_pMapWnd(nullptr),
-      m_pStoryLineTaskItem(nullptr), m_pSecondaryTaskItem(nullptr),
-      m_BtnTaskListWnd(nullptr), m_second_task_index(nullptr),
-      m_devider(nullptr), m_actual_frame(0),
-      m_btn_focus(nullptr), m_btn_focus2(nullptr),
-      m_task_wnd(nullptr), m_task_wnd_show(false),
-      m_map_legend_wnd(nullptr), hint_wnd(hint)
-{
-}
+CUITaskWnd::CUITaskWnd(UIHint* hint) : CUIWindow("CUITaskWnd"), hint_wnd(hint) {}
 
 CUITaskWnd::~CUITaskWnd() { delete_data(m_pMapWnd); }
 
@@ -46,10 +34,10 @@ bool CUITaskWnd::Init()
 
     CUIXmlInit::InitWindow(xml, "main_wnd", 0, this);
 
-    m_background = UIHelper::CreateFrameWindow(xml, "background", this, false);
-    m_background2 = UIHelper::CreateFrameLine(xml, "background", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml, "background", this, false);
+    std::ignore = UIHelper::CreateFrameLine(xml, "background", this, false);
 
-    m_task_split = UIHelper::CreateFrameLine(xml, "task_split", this, false);
+    std::ignore = UIHelper::CreateFrameLine(xml, "task_split", this, false);
 
     AttachChild(&m_filters);
     m_filters.SetMessageTarget(this);
@@ -61,7 +49,7 @@ bool CUITaskWnd::Init()
     AttachChild(m_pMapWnd);
 
     m_center_background = UIHelper::CreateStatic(xml, "center_background", this);
-    m_devider = UIHelper::CreateStatic(xml, "line_devider", this, false);
+    std::ignore = UIHelper::CreateStatic(xml, "line_devider", this, false);
 
     m_pStoryLineTaskItem = xr_new<CUITaskItem>();
     m_pStoryLineTaskItem->Init(xml, "storyline_task_item");
@@ -94,8 +82,8 @@ bool CUITaskWnd::Init()
         //m_btn_focus2->set_hint_wnd(hint_wnd);
     }
 
-    m_BtnTaskListWnd = UIHelper::Create3tButton(xml, "btn_second_task", this);
-    AddCallback(m_BtnTaskListWnd, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowTaskListWnd));
+    auto* btnTaskListWnd = UIHelper::Create3tButton(xml, "btn_second_task", this);
+    AddCallback(btnTaskListWnd, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowTaskListWnd));
 
     m_second_task_index = UIHelper::CreateStatic(xml, "second_task_index", this, false);
 
@@ -229,14 +217,14 @@ void CUITaskWnd::ReloadTaskInfo()
         m_pSecondaryTaskItem->InitTask(additionalTask);
     }
 
-    if (!storyTask || (storyTask->m_map_object_id == u16(-1) || storyTask->m_map_location.size() == 0))
+    if (!storyTask || (storyTask->m_map_object_id == u16(-1) || storyTask->m_map_location.empty()))
         m_btn_focus->Show(false);
     else
         m_btn_focus->Show(true);
 
     if (m_btn_focus2)
     {
-        if (!additionalTask || (additionalTask->m_map_object_id == u16(-1) || additionalTask->m_map_location.size() == 0))
+        if (!additionalTask || (additionalTask->m_map_object_id == u16(-1) || additionalTask->m_map_location.empty()))
             m_btn_focus2->Show(false);
         else
             m_btn_focus2->Show(true);
@@ -329,8 +317,6 @@ void CUITaskWnd::Show(bool status)
     }
 }
 
-void CUITaskWnd::OnNextTaskClicked() {}
-void CUITaskWnd::OnPrevTaskClicked() {}
 void CUITaskWnd::OnShowTaskListWnd(CUIWindow* w, void* d)
 {
     m_task_wnd_show = !m_task_wnd_show;
@@ -343,7 +329,7 @@ void CUITaskWnd::Show_TaskListWnd(bool status)
     m_task_wnd_show = status;
 }
 
-void CUITaskWnd::TaskSetTargetMap(CGameTask* task)
+void CUITaskWnd::TaskSetTargetMap(CGameTask* task) const
 {
     if (!task || !IsSecondaryTasksEnabled())
     {
@@ -398,9 +384,7 @@ void CUITaskWnd::ShowMapLegend(bool status) const { m_map_legend_wnd->Show(statu
 void CUITaskWnd::Switch_ShowMapLegend() const { m_map_legend_wnd->Show(!m_map_legend_wnd->IsShown()); }
 
 // --------------------------------------------------------------------------------------------------
-CUITaskItem::CUITaskItem()
-    : CUIWindow("CUITaskItem"),
-      m_owner(nullptr), show_hint_can(false), show_hint(false), m_hint_wt(500) {}
+CUITaskItem::CUITaskItem() : CUIWindow("CUITaskItem"), m_hint_wt(500) {}
 
 void CUITaskItem::Init(CUIXml& uiXml, LPCSTR path)
 {
@@ -410,7 +394,7 @@ void CUITaskItem::Init(CUIXml& uiXml, LPCSTR path)
     const auto init = [&](pcstr name, bool critical = true)
     {
         string256 buff;
-        strconcat(sizeof(buff), buff, path, ":", name);
+        strconcat(buff, path, ":", name);
         m_info[name] = UIHelper::CreateStatic(uiXml, buff, this, critical);
     };
 

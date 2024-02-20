@@ -84,8 +84,7 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 
 void CUICharacterInfo::Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type)
 {
-    CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false);
-    if (item)
+    if (CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false))
     {
         m_icons[type] = item;
     }
@@ -93,10 +92,8 @@ void CUICharacterInfo::Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItem
 
 void CUICharacterInfo::Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type)
 {
-    CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false);
-    if (item)
+    if (CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false))
     {
-        //.		item->ClipperOn();
         item->Show(true);
         m_icons[type] = item;
     }
@@ -115,8 +112,8 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, cpcstr xml
 void CUICharacterInfo::InitCharacterInfo(CUIXml* xml_doc, LPCSTR node_str)
 {
     Fvector2 pos, size;
-    XML_NODE stored_root = xml_doc->GetLocalRoot();
-    XML_NODE ch_node = xml_doc->NavigateToNode(node_str, 0);
+    const XML_NODE stored_root = xml_doc->GetLocalRoot();
+    const XML_NODE ch_node = xml_doc->NavigateToNode(node_str, 0);
     xml_doc->SetLocalRoot(ch_node);
     pos.x = xml_doc->ReadAttribFlt(ch_node, "x");
     pos.y = xml_doc->ReadAttribFlt(ch_node, "y");
@@ -156,7 +153,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
     if (pUIBio && pUIBio->IsEnabled())
     {
         pUIBio->Clear();
-        if (chInfo.Bio().size())
+        if (!chInfo.Bio().empty())
         {
             auto* pItem = xr_new<CUIStatic>("Biography");
             pItem->SetWidth(pUIBio->GetDesiredChildWidth());
@@ -167,7 +164,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
     }
 
     shared_str const& comm_id = chInfo.Community().id();
-    LPCSTR community0 = comm_id.c_str();
+    cpcstr community0 = comm_id.c_str();
     string64 community1;
     xr_strcpy(community1, sizeof(community1), community0);
     xr_strcat(community1, sizeof(community1), "_icon");

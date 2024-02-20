@@ -19,19 +19,19 @@ protected:
         eItemsSelectabe = (1 << 3),
         eInverseDir = (1 << 4) /*,eMultiSelect=(1<<5)*/
     };
-    CUIScrollBar* m_VScrollBar;
-    CUIWindow* m_pad;
+    CUIScrollBar* m_VScrollBar{};
+    CUIWindow* m_pad{};
 
-    float m_rightIndent;
-    float m_leftIndent;
-    float m_upIndent;
-    float m_downIndent;
+    float m_rightIndent{};
+    float m_leftIndent{};
+    float m_upIndent{};
+    float m_downIndent{};
 
-    float m_vertInterval;
+    float m_vertInterval{};
 
-    Flags16 m_flags;
+    Flags16 m_flags{};
     shared_str m_scrollbar_profile;
-    Ivector2 m_visible_rgn;
+    Ivector2 m_visible_rgn{ -1, -1 };
 
     virtual void RecalcSize();
     void UpdateScroll();
@@ -56,8 +56,8 @@ public:
     void Clear();
     void ScrollToBegin();
     void ScrollToEnd();
-    bool GetVertFlip() { return !!m_flags.test(eVertFlip); }
-    bool Empty() { return m_pad->GetChildWndList().empty(); }
+    bool GetVertFlip() const { return !!m_flags.test(eVertFlip); }
+    bool Empty() const { return m_pad->GetChildWndList().empty(); }
 
     [[nodiscard]]
     u32 GetSize() const;
@@ -65,21 +65,21 @@ public:
     WINDOW_LIST& Items() { return m_pad->GetChildWndList(); }
     CUIWindow* GetItem(u32 idx);
     void SetFixedScrollBar(bool b);
-    float GetDesiredChildWidth();
+    float GetDesiredChildWidth() const;
     virtual void SetSelected(CUIWindow*);
     CUIWindow* GetSelected();
     Fvector2 GetPadSize();
     void ForceUpdate();
-    int GetMinScrollPos();
-    int GetMaxScrollPos();
-    int GetCurrentScrollPos();
+    int GetMinScrollPos() const;
+    int GetMaxScrollPos() const;
+    int GetCurrentScrollPos() const;
     void SetScrollPos(int value);
     void SetScrollBarProfile(LPCSTR profile);
-    IC bool NeedShowScrollBar(); // no comment
-    float GetHorizIndent(); // left + right indent
-    float GetVertIndent(); // top + bottom indent
+    IC bool NeedShowScrollBar() const; // no comment
+    float GetHorizIndent() const; // left + right indent
+    float GetVertIndent() const; // top + bottom indent
     void UpdateChildrenLenght(); // set default width for all children
-    float Scroll2ViewV(); // calculate scale for scroll position
+    float Scroll2ViewV() const; // calculate scale for scroll position
     CUIScrollBar* ScrollBar() { return m_VScrollBar; }
 
     pcstr GetDebugType() override { return "CUIScrollView"; }
