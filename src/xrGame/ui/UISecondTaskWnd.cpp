@@ -147,6 +147,8 @@ void UITaskListWnd::UpdateList()
 
         if (!task || task->GetTaskState() != eTaskStateInProgress)
             continue;
+        if (m_show_only_secondary_tasks && task->GetTaskType() == eTaskTypeStoryline)
+            continue;
 
         auto* item = xr_new<UITaskListWndItem>();
         if (item->init_task(task, this))

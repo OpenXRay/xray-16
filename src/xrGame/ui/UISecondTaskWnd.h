@@ -43,6 +43,8 @@ public:
     virtual void Update();
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
+    void ShowOnlySecondaryTasks(bool mode) { m_show_only_secondary_tasks = mode; }
+
     void UpdateList();
 
     pcstr GetDebugType() override { return "UITaskListWnd"; }
@@ -63,7 +65,7 @@ private: // m_
     CUI3tButton* m_bt_close{};
 
     float m_orig_h{};
-
+    bool m_show_only_secondary_tasks{};
 }; // class UITaskListWnd
 
 // -------------------------------------------------------------------------------------------------
