@@ -96,7 +96,6 @@ bool CUITaskWnd::Init()
     m_pMapWnd->AttachChild(m_task_wnd);
     m_task_wnd->SetMessageTarget(this);
     m_task_wnd->Show(false);
-    m_task_wnd_show = false;
 
     m_map_legend_wnd = xr_new<UIMapLegend>();
     m_map_legend_wnd->SetAutoDelete(true);
@@ -309,25 +308,17 @@ void CUITaskWnd::Show(bool status)
     if (status)
     {
         ReloadTaskInfo();
-        m_task_wnd->Show(m_task_wnd_show);
-    }
-    else
-    {
-        //m_task_wnd_show = false;
-        m_task_wnd->Show(false);
     }
 }
 
-void CUITaskWnd::OnShowTaskListWnd(CUIWindow* w, void* d)
+void CUITaskWnd::OnShowTaskListWnd(CUIWindow* w, void* d) const
 {
-    m_task_wnd_show = !m_task_wnd_show;
     m_task_wnd->Show(!m_task_wnd->IsShown());
 }
 
-void CUITaskWnd::Show_TaskListWnd(bool status)
+void CUITaskWnd::Show_TaskListWnd(bool status) const
 {
     m_task_wnd->Show(status);
-    m_task_wnd_show = status;
 }
 
 void CUITaskWnd::TaskSetTargetMap(CGameTask* task) const

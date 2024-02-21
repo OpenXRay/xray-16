@@ -18,7 +18,6 @@
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/ScrollBar/UIFixedScrollBar.h"
 #include "xrUICore/Hint/UIHint.h"
-#include "UITaskWnd.h"
 #include "GameTaskDefs.h"
 #include "GameTask.h"
 #include "map_location.h"
@@ -126,9 +125,7 @@ void UITaskListWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void UITaskListWnd::OnBtnClose(CUIWindow* w, void* d)
 {
-    if (auto* wnd = smart_cast<CUITaskWnd*>(GetParent()->GetParent()))
-        wnd->Show_TaskListWnd(false);
-    //	Show( false );
+    Show(false);
     m_bt_close->SetButtonState(CUIButton::BUTTON_NORMAL);
 }
 

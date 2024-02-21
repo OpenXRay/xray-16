@@ -39,7 +39,6 @@ private:
     CUIMapFilters m_filters;
 
     UITaskListWnd* m_task_wnd{};
-    bool m_task_wnd_show{};
     UIMapLegend* m_map_legend_wnd{};
 
 public:
@@ -62,7 +61,7 @@ public:
     void ReloadTaskInfo();
     void ShowMapLegend(bool status) const;
     void Switch_ShowMapLegend() const;
-    void Show_TaskListWnd(bool status);
+    void Show_TaskListWnd(bool status) const;
 
     [[nodiscard]]
     bool IsTreasuresEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::Treasures); }
@@ -82,7 +81,7 @@ private:
     void TaskSetTargetMap(CGameTask* task) const;
     void TaskShowMapSpot(CGameTask* task, bool show) const;
 
-    void OnShowTaskListWnd(CUIWindow* w, void* d);
+    void OnShowTaskListWnd(CUIWindow* w, void* d) const;
     void OnTask1DbClicked(CUIWindow*, void*);
     void OnTask2DbClicked(CUIWindow*, void*);
 };
