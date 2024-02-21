@@ -24,7 +24,7 @@ void CUIZoneMap::Init(bool motionIconAttached)
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "zone_map.xml");
 
     CUIXmlInit::InitStatic(uiXml, "minimap:background", 0, &m_background);
-    CUIXmlInit::InitWindow(uiXml, "minimap:level_frame", 0, &m_clipFrame);
+    CUIXmlInit::InitStatic(uiXml, "minimap:level_frame", 0, &m_clipFrame);
     CUIXmlInit::InitStatic(uiXml, "minimap:center", 0, &m_center);
 
     m_clock_wnd = UIHelper::CreateStatic(uiXml, "minimap:clock_wnd", &m_background, false);

@@ -3,7 +3,7 @@
 #include "xrUICore/Static/UIStatic.h"
 
 class CActor;
-class CUICustomMap;
+class CUIMiniMap;
 
 class CUIZoneMap
 {
@@ -11,12 +11,12 @@ public:
     bool visible{ true };
 
 private:
-    CUICustomMap* m_activeMap{};
+    CUIMiniMap* m_activeMap{};
 
     CUIStatic m_background{ "Background" };
     CUIStatic m_center{ "Center" };
     CUIStatic m_compass{ "Compass" };
-    CUIWindow m_clipFrame{ "Clip frame" };
+    CUIStatic m_clipFrame{ "Clip frame" };
     CUIStatic m_Counter{ "Counter" };
     CUIStatic m_Counter_text{ "Counter text" };
     CUIStatic* m_clock_wnd{};
