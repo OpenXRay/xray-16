@@ -54,8 +54,16 @@ void CUIEditBox::SaveBackUpOptValue()
 
 void CUIEditBox::UndoOptValue()
 {
-    SetText(m_opt_backup_value.c_str());
+    cpcstr backup = m_opt_backup_value ? m_opt_backup_value.c_str() : GetOptStringValue();
+    SetText(backup);
     CUIOptionsItem::UndoOptValue();
 }
 
-bool CUIEditBox::IsChangedOptValue() const { return 0 != xr_strcmp(m_opt_backup_value.c_str(), GetText()); }
+bool CUIEditBox::IsChangedOptValue() const
+{
+    cpcstr current = GetText();
+    cpcstr backup = m_opt_backup_value ? m_opt_backup_value.c_str() : GetOptStringValue();
+    if (!current || !backup)
+        return false;
+    return 0 != xr_strcmp(current, backup);
+}
