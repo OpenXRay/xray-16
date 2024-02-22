@@ -22,8 +22,8 @@ struct CUIDebugState
 {
     CUIDebuggable* selected{};
     mutable CUIDebuggable* newSelected{};
-    bool drawWndRects{};
-    bool coloredRects{};
+    bool drawWndRects{ true };
+    bool coloredRects{ true };
 
     void select(CUIDebuggable* debuggable) const
     {
