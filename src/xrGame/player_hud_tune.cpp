@@ -233,14 +233,16 @@ void player_hud::tune(Ivector _values)
 
         float _curr_dr = _delta_rot;
 
-        u8 idx = m_attached_items[hud_adj_item_idx]->m_parent_hud_item->GetCurrentHudOffsetIdx();
+        attachable_hud_item* hi = m_attached_items[hud_adj_item_idx];
+        if (!hi)
+            return;
+
+        u8 idx = hi->m_parent_hud_item->GetCurrentHudOffsetIdx();
         if (idx)
             _curr_dr /= 20.0f;
 
-        Fvector& pos_ = (idx != 0) ? m_attached_items[hud_adj_item_idx]->hands_offset_pos() :
-                                     m_attached_items[hud_adj_item_idx]->hands_attach_pos();
-        Fvector& rot_ = (idx != 0) ? m_attached_items[hud_adj_item_idx]->hands_offset_rot() :
-                                     m_attached_items[hud_adj_item_idx]->hands_attach_rot();
+        Fvector& pos_ = (idx != 0) ? hi->hands_offset_pos() : hi->hands_attach_pos();
+        Fvector& rot_ = (idx != 0) ? hi->hands_offset_rot() : hi->hands_attach_rot();
 
         if (hud_adj_mode == 1)
         {
@@ -269,21 +271,21 @@ void player_hud::tune(Ivector _values)
         {
             if (idx == 0)
             {
-                Msg("[%s]", m_attached_items[hud_adj_item_idx]->m_sect_name.c_str());
+                Msg("[%s]", hi->m_sect_name.c_str());
                 Msg("hands_position%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
                 Msg("hands_orientation%s			= %f,%f,%f", (is_16x9) ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
                 Log("-----------");
             }
             else if (idx == 1)
             {
-                Msg("[%s]", m_attached_items[hud_adj_item_idx]->m_sect_name.c_str());
+                Msg("[%s]", hi->m_sect_name.c_str());
                 Msg("aim_hud_offset_pos%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
                 Msg("aim_hud_offset_rot%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
                 Log("-----------");
             }
             else if (idx == 2)
             {
-                Msg("[%s]", m_attached_items[hud_adj_item_idx]->m_sect_name.c_str());
+                Msg("[%s]", hi->m_sect_name.c_str());
                 Msg("gl_hud_offset_pos%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
                 Msg("gl_hud_offset_rot%s				= %f,%f,%f", (is_16x9) ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
                 Log("-----------");
