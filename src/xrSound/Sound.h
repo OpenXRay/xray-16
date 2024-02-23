@@ -37,6 +37,8 @@ class IReader;
 template <class T>
 struct _vector2;
 using Fvector2 = _vector2<float>;
+struct Fbox3;
+using Fbox = Fbox3;
 
 XRSOUND_API extern u32 psSoundModel;
 XRSOUND_API extern float psSoundVEffects;
@@ -221,7 +223,7 @@ public:
     virtual void set_handler(sound_event* E) = 0;
     virtual void set_geometry_env(IReader* I) = 0;
     virtual void set_geometry_som(IReader* I) = 0;
-    virtual void set_geometry_occ(CDB::MODEL* M) = 0;
+    virtual void set_geometry_occ(CDB::MODEL* M, const Fbox& aabb) = 0;
 
     virtual void set_user_env(CSound_environment* E) = 0;
     virtual void set_environment(u32 id, CSound_environment** dst_env) = 0;

@@ -12,7 +12,7 @@ CSoundRender_Scene::~CSoundRender_Scene()
 {
     stop_emitters();
 
-    set_geometry_occ(nullptr);
+    set_geometry_occ(nullptr, {});
     set_geometry_som(nullptr);
     set_geometry_env(nullptr);
 
@@ -44,7 +44,11 @@ int CSoundRender_Scene::pause_emitters(bool pauseState)
 
 void CSoundRender_Scene::set_handler(sound_event* E) { sound_event_handler = E; }
 
-void CSoundRender_Scene::set_geometry_occ(CDB::MODEL* M) { geom_MODEL = M; }
+void CSoundRender_Scene::set_geometry_occ(CDB::MODEL* M, const Fbox& /*aabb*/)
+{
+    xr_delete(M);
+    geom_MODEL = M;
+}
 
 void CSoundRender_Scene::set_geometry_som(IReader* I)
 {
