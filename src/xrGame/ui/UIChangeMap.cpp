@@ -23,8 +23,8 @@ void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
     map_pic     = UIHelper::CreateStatic(xml_doc, "change_map:map_pic", this);
     std::ignore = UIHelper::CreateStatic(xml_doc, "change_map:map_frame", this);
     map_version = UIHelper::CreateStatic(xml_doc, "change_map:map_ver_txt", this);
-    // std::ignore = UIHelper::CreateFrameWindow(xml_doc, "change_map:frame", this);
-    // std::ignore = UIHelper::CreateFrameWindow(xml_doc, "change_map:list_back", this);
+    std::ignore = UIHelper::CreateFrameWindow(xml_doc, "change_map:frame", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml_doc, "change_map:list_back", this, false);
     lst         = UIHelper::CreateListBox(xml_doc, "change_map:list", this);
     btn_ok      = UIHelper::Create3tButton(xml_doc, "change_map:btn_ok", this);
     btn_cancel  = UIHelper::Create3tButton(xml_doc, "change_map:btn_cancel", this);
