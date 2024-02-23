@@ -25,7 +25,7 @@ bool CUIEditBox::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= true*
         AttachChild(m_frameLine);
         m_frameLine->SetAutoDelete(true);
     }
-    const bool result = m_frameLine->InitTexture(texture, shader, fatal);
+    const bool result = m_frameLine->InitTextureEx(texture, shader, fatal);
     m_frameLine->SetWndPos(Fvector2().set(0, 0));
     m_frameLine->SetWndSize(GetWndSize());
     return result;

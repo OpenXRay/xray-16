@@ -77,7 +77,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         cpcstr texture = xml_doc.Read(_path, 0, nullptr);
         R_ASSERT(texture);
 
-        if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
+        if (!m_FrameBackground->InitTexture(texture, false))
         {
             tempBackground = xr_new<CUIStatic>("temporary background");
             tempBackground->SetWndRect(GetWndRect());
@@ -114,7 +114,7 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         cpcstr texture = xml_doc.Read(_path, 0, nullptr);
         R_ASSERT(texture);
 
-        if (!m_FrameBackground->InitTexture(texture, "hud" DELIMITER "default", false))
+        if (!m_FrameBackground->InitTexture(texture, false))
         {
             tempBackground = xr_new<CUIStatic>("temporary background");
             tempBackground->SetWndRect(GetWndRect());

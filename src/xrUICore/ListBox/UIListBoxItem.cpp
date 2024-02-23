@@ -27,7 +27,7 @@ void CUIListBoxItem::OnFocusReceive()
     GetMessageTarget()->SendMessage(this, LIST_ITEM_FOCUS_RECEIVED);
 }
 
-void CUIListBoxItem::InitDefault() { InitTexture("ui_listline", "hud" DELIMITER "default"); }
+void CUIListBoxItem::InitDefault() { InitTexture("ui_listline"); }
 void CUIListBoxItem::SetFont(CGameFont* F) { m_text->SetFont(F); }
 CGameFont* CUIListBoxItem::GetFont() { return (m_text) ? m_text->GetFont() : NULL; }
 bool CUIListBoxItem::OnMouseDown(int mouse_btn)

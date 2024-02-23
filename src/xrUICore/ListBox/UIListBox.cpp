@@ -55,7 +55,7 @@ CUIListBoxItem* CUIListBox::AddItem()
     item->SetWidth(GetDesiredChildWidth());
 
     if (m_selection_texture.size())
-        item->InitTexture(m_selection_texture.c_str(), "hud" DELIMITER "default");
+        item->InitTexture(m_selection_texture.c_str());
     else
         item->InitDefault();
 
@@ -72,7 +72,7 @@ void CUIListBox::AddExistingItem(CUIListBoxItem* item)
     item->SetWidth(GetDesiredChildWidth());
 
     if (m_selection_texture.size())
-        item->InitTexture(m_selection_texture.c_str(), "hud" DELIMITER "default");
+        item->InitTexture(m_selection_texture.c_str());
     else
         item->InitDefault();
 
