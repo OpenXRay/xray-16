@@ -2,13 +2,16 @@
 #include "xrUICore/Windows/UIFrameWindow.h"
 
 class CUIStatic;
+class CUIFrameLineWnd;
 
 class XRUICORE_API CUIButtonHint final : public CUIFrameWindow
 {
-    CUIWindow* m_ownerWnd;
+    CUIWindow* m_ownerWnd{};
 
     CUIStatic* m_text;
-    bool m_enabledOnFrame;
+    CUIFrameLineWnd* m_border{};
+
+    bool m_enabledOnFrame{};
 
 public:
     CUIButtonHint();
