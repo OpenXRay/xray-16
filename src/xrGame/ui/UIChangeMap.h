@@ -26,17 +26,12 @@ public:
 protected:
     void FillUpList();
 
-    CUIStatic* bkgrnd;
-    CUIStatic* header;
-    CUIStatic* map_pic;
-    CUIStatic* map_frame;
-    CUIStatic* map_version;
-    CUIFrameWindow* frame;
-    CUIFrameWindow* lst_back;
-    CUIListBox* lst;
+    CUIStatic* map_pic{};
+    CUIStatic* map_version{};
+    CUIListBox* lst{};
 
-    CUI3tButton* btn_ok;
-    CUI3tButton* btn_cancel;
+    CUI3tButton* btn_ok{};
+    CUI3tButton* btn_cancel{};
 
-    u32 m_prev_upd_time;
+    u32 m_prev_upd_time{};
 };
