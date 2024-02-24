@@ -142,9 +142,6 @@
     <Filter Include="Game API\Level Controller\KeyBindings">
       <UniqueIdentifier>{88084f61-660e-4bb7-ab64-5fd27a09d18a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Render\Device">
-      <UniqueIdentifier>{e4d34774-3a5b-468f-9400-12c702636fa1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="editor">
       <UniqueIdentifier>{9edc9b50-4fb3-495e-b1c7-692a6947715f}</UniqueIdentifier>
     </Filter>
@@ -363,21 +360,6 @@
     <ClInclude Include="ILoadingScreen.h">
       <Filter>Interfaces\ILoadingScreen</Filter>
     </ClInclude>
-    <ClInclude Include="device.h">
-      <Filter>Render\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="IPerformanceAlert.hpp">
-      <Filter>Render\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="PerformanceAlert.hpp">
-      <Filter>Render\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="StatGraph.h">
-      <Filter>Render\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="Stats.h">
-      <Filter>Render\Device</Filter>
-    </ClInclude>
     <ClInclude Include="StringTable\StringTable.h">
       <Filter>Game API\StringTable</Filter>
     </ClInclude>
@@ -395,6 +377,21 @@
     </ClInclude>
     <ClInclude Include="AccessibilityShortcuts.hpp">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="device.h">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClInclude>
+    <ClInclude Include="StatGraph.h">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Stats.h">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClInclude>
+    <ClInclude Include="IPerformanceAlert.hpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClInclude>
+    <ClInclude Include="PerformanceAlert.hpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -587,35 +584,8 @@
     <ClCompile Include="profiler.cpp">
       <Filter>General\Profiler</Filter>
     </ClCompile>
-    <ClCompile Include="device.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_create.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_destroy.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_Initialize.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_overdraw.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="PerformanceAlert.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="StatGraph.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Stats.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
     <ClCompile Include="StringTable\StringTable.cpp">
       <Filter>Game API\StringTable</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_mode.cpp">
-      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="xr_level_controller.cpp">
       <Filter>Game API\Level Controller</Filter>
@@ -637,6 +607,33 @@
     </ClCompile>
     <ClCompile Include="IGame_Persistent_Effects.cpp">
       <Filter>Game API\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="device.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_create.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_destroy.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_Initialize.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_mode.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_overdraw.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="StatGraph.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Stats.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="PerformanceAlert.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -319,7 +319,7 @@ target_sources_grouped(
 
 target_sources_grouped(
     TARGET xrEngine
-    NAME "Render\\Device"
+    NAME "Render\\Execution & 3D"
     FILES
     device.cpp
     device.h
