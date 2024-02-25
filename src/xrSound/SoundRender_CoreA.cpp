@@ -120,7 +120,7 @@ void CSoundRender_CoreA::_initialize()
         T = xr_new<CSoundRender_TargetA>(auxSlot);
         if (T->_initialize())
         {
-            s_targets.push_back(T);
+            s_targets.emplace_back(T);
         }
         else
         {
@@ -143,13 +143,12 @@ void CSoundRender_CoreA::_clear()
     inherited::_clear();
     xr_delete(m_effects);
     // remove targets
-    CSoundRender_Target* T = nullptr;
-    for (auto& sr_target : s_targets)
+    for (auto& T : s_targets)
     {
-        T = sr_target;
         T->_destroy();
         xr_delete(T);
     }
+    s_targets.clear();
     // Reset the current context to NULL.
     alcMakeContextCurrent(nullptr);
     // Release the context and the device.
