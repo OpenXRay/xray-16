@@ -45,7 +45,7 @@ void CSoundRender_Cache::move2top(cache_line* line)
     VERIFY(c_end->next == NULL);
 }
 
-bool CSoundRender_Cache::request(cache_cat& cat, u32 id)
+bool CSoundRender_Cache::request(const cache_cat& cat, u32 id)
 {
     // 1. check if cached version available
     id %= cat.size;

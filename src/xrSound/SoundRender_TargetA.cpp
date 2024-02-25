@@ -27,7 +27,7 @@ bool CSoundRender_TargetA::_initialize()
     // initialize buffer
     A_CHK(alGenBuffers(sdef_target_count, pBuffers));
     alGenSources(1, &pSource);
-    ALenum error = alGetError();
+    const ALenum error = alGetError();
     if (AL_NO_ERROR == error)
     {
         A_CHK(alSourcei(pSource, AL_LOOPING, AL_FALSE));
@@ -70,7 +70,7 @@ void CSoundRender_TargetA::start(CSoundRender_Emitter* E)
 
 void CSoundRender_TargetA::render()
 {
-    for (ALuint pBuffer : pBuffers)
+    for (const ALuint pBuffer : pBuffers)
         fill_block(pBuffer);
 
     A_CHK(alSourceQueueBuffers(pSource, sdef_target_count, pBuffers));
@@ -96,7 +96,7 @@ void CSoundRender_TargetA::rewind()
 
     A_CHK(alSourceStop(pSource));
     A_CHK(alSourcei(pSource, AL_BUFFER, 0));
-    for (ALuint pBuffer : pBuffers)
+    for (const ALuint pBuffer : pBuffers)
         fill_block(pBuffer);
     A_CHK(alSourceQueueBuffers(pSource, sdef_target_count, pBuffers));
     A_CHK(alSourcePlay(pSource));

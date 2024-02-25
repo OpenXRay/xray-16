@@ -28,7 +28,7 @@ struct cache_cat // cache allocation table
     u16* table; // page-table
     u32 size; // in pages
 };
-#define CAT_FREE 0xffff
+constexpr u16 CAT_FREE = 0xffff;
 //////////////////////////////////////////////////////////////////////////
 class CSoundRender_Cache
 {
@@ -39,6 +39,7 @@ class CSoundRender_Cache
     u32 _total; // bytes total (heap)
     u32 _line; // line size (bytes)
     u32 _count; // number of lines
+
 public:
     u32 _stat_hit;
     u32 _stat_miss;
@@ -47,16 +48,21 @@ private:
     void move2top(cache_line* line); // move one line to TOP-priority
     void disconnect(); // disconnect from CATs
     void format(); // format structure (like filesystem)
+
 public:
-    bool request(cache_cat& cat, u32 id); // TRUE=need to fill, FALSE=cached info avail
+    bool request(const cache_cat& cat, u32 id); // TRUE=need to fill, FALSE=cached info avail
     void purge(); // discard all contents of cache
 
-    void* get_dataptr(cache_cat& cat, u32 id)
+    [[nodiscard]]
+    void* get_dataptr(const cache_cat& cat, u32 id) const
     {
         id %= cat.size;
         return c_storage[cat.table[id]].data;
-    } //.
+    }
+
+    [[nodiscard]]
     u32 get_linesize() const { return _line; }
+
     void cat_create(cache_cat& cat, u32 bytes);
     void cat_destroy(cache_cat& cat);
 
