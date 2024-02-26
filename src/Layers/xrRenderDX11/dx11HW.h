@@ -33,7 +33,7 @@ public:
         return SelectFormat(feature, formats, count);
     }
     bool UsingFlipPresentationModel() const;
-    DeviceState GetDeviceState() const;
+    DeviceState GetDeviceState();
 
 public:
     void BeginScene();
@@ -133,6 +133,7 @@ public:
 #endif
 private:
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
+    bool doPresentTest{};
     XRay::Module hD3DCompiler;
     XRay::Module hDXGI;
     XRay::Module hD3D;

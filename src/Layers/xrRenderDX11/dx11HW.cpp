@@ -55,23 +55,21 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateD3D()
 {
+#if defined(USE_DX11)
+    
     hDXGI = XRay::LoadModule("dxgi");
-
-#if defined(USE_DX12)
-    hD3D = XRay::LoadModule("d3d12");
-#else
     hD3D = XRay::LoadModule("d3d11");
-#endif // defined(USE_DX12)
 
     if (!hD3D->IsLoaded() || !hDXGI->IsLoaded())
     {
         Valid = false;
         return;
     }
+#endif // defined(USE_DX11)
 
 #if defined(USE_DX12)
     // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
-    DX12CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&m_pFactory));
+    DX12CreateDXGIFactory(__uuidof(IDXGIFactory4), (void**)(&m_pFactory));
 #else
     // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
     const auto createDXGIFactory =
@@ -96,18 +94,17 @@ void CHW::DestroyD3D()
     _SHOW_REF("refCount:m_pFactory", m_pFactory);
     _RELEASE(m_pFactory);
 
+#if defined(USE_DX11)
     // Manually close and unload additional DLLs
     // To make it work with DXVK, etc.
     hD3D->Close();
     hDXGI->Close();
-#if defined(USE_DX12)
-    if (auto hModule = GetModuleHandleA("d3d12.dll"))
-#else
+
     if (auto hModule = GetModuleHandleA("d3d11.dll"))
-#endif
         FreeLibrary(hModule);
     if (auto hModule = GetModuleHandleA("dxgi.dll"))
         FreeLibrary(hModule);
+#endif
 }
 
 void CHW::CreateDevice(SDL_Window* sdlWnd)
@@ -348,7 +345,7 @@ bool CHW::CreateSwapChain(HWND hwnd)
     */
     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     sd.OutputWindow = hwnd;
-    sd.Windowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
+    sd.Windowed = TRUE;
 
     //  Additional set up
 #if defined(USE_DX12)
@@ -364,7 +361,7 @@ bool CHW::CreateSwapChain(HWND hwnd)
 #endif 
 
 #if defined(USE_DX12)
-    m_pSwapChain->SetMaximumFrameLatency(BackBufferCount);
+    m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
 #endif
 
     return SUCCEEDED(hr);
@@ -414,7 +411,7 @@ bool CHW::CreateSwapChainOnDX11_2(HWND hwnd)
     desc.Scaling = DXGI_SCALING_STRETCH;
 
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC fulldesc{};
-    fulldesc.Windowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
+    fulldesc.Windowed = TRUE;
 
     // Additional setup
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -489,7 +486,7 @@ bool CHW::CreateSwapChainOnDX12(HWND hwnd)
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC fulldesc;
     ZeroMemory(&fulldesc, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
 
-    fulldesc.Windowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
+    fulldesc.Windowed = TRUE;
 
     // Additional setup
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
@@ -505,7 +502,7 @@ bool CHW::CreateSwapChainOnDX12(HWND hwnd)
         return false;
     }
   
-    m_pSwapChain->SetMaximumFrameLatency(BackBufferCount);
+    m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
     return true;
 }
 #endif
@@ -632,7 +629,13 @@ void CHW::Present()
     const bool bUseVSync = psDeviceMode.WindowStyle == rsFullscreen &&
         psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX11
 
-    m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
+    switch (m_pSwapChain->Present(bUseVSync ? 1 : 0, 0))
+    {
+    case DXGI_STATUS_OCCLUDED:
+    case DXGI_ERROR_DEVICE_REMOVED: 
+        doPresentTest = true;
+        break;
+    }
 
 #if defined(USE_DX11)
 #ifdef HAS_DX11_2
@@ -661,18 +664,29 @@ void CHW::Present()
 #endif
 }
 
-DeviceState CHW::GetDeviceState() const
+DeviceState CHW::GetDeviceState()
 {
-#if defined(USE_DX11)
-    const auto result = m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
-
-    switch (result)
+    if (doPresentTest)
     {
-        // Check if the device is ready to be reset
+        switch (m_pSwapChain->Present(0, DXGI_PRESENT_TEST))
+        {
+        case S_OK: doPresentTest = false; 
+            break;
+
+        case DXGI_STATUS_OCCLUDED:
+            // Do not render until we become visible again
+            return DeviceState::Lost;
+
         case DXGI_ERROR_DEVICE_RESET:
             return DeviceState::NeedReset;
+
+        case DXGI_ERROR_DEVICE_REMOVED:
+            FATAL(
+                "Graphics driver was updated or GPU was physically removed from computer.\n"
+                "Please, restart the game.");
+            break;
+        }
     }
-#endif
 
     return DeviceState::Normal;
 }

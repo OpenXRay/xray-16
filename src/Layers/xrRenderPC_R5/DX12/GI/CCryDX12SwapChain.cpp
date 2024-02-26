@@ -108,8 +108,7 @@ void CCryDX12SwapChain::ForfeitBuffers()
 
 /* IDXGIDeviceSubObject implementation */
 
-HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetDevice(
-    _In_  REFIID riid,
+HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetDevice(_In_  REFIID riid, 
     _Out_  void** ppDevice)
 {
     DX12_FUNC_LOG
@@ -121,36 +120,17 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetDevice(
 HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::Present(
     UINT SyncInterval,
     UINT Flags)
-{  
+{
     DX12_FUNC_LOG
 
     if (!(Flags & DXGI_PRESENT_TEST))
     {
-        UINT Buffer = m_SwapChain->GetCurrentBackBufferIndex();
-        DX12::Resource& dx12Resource = m_SwapChain->GetBackBuffer(Buffer);
-
-        if (m_BackBuffers[Buffer])
-        {
-            // HACK: transfer state from "outside" CResource to "inside" CResource
-            dx12Resource.SetCurrentState(m_BackBuffers[Buffer]->GetDX12Resource().GetCurrentState());
-            dx12Resource.SetAnnouncedState(m_BackBuffers[Buffer]->GetDX12Resource().GetAnnouncedState());
-        }
-
         m_Device->GetDeviceContext()->Finish(m_SwapChain);
-
-        if (m_BackBuffers[Buffer])
-        {
-            // HACK: transfer state from "inside" CResource to "outside" CResource
-            m_BackBuffers[Buffer]->GetDX12Resource().SetCurrentState(dx12Resource.GetCurrentState());
-            m_BackBuffers[Buffer]->GetDX12Resource().SetAnnouncedState(dx12Resource.GetAnnouncedState());
-        }
-
-        DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
-        m_SwapChain->Present(SyncInterval, Flags);
-        return m_SwapChain->GetLastPresentReturnValue();
     }
 
-    return m_SwapChain->GetDXGISwapChain()->Present(SyncInterval, Flags);
+    DXGI_PRESENT_PARAMETERS dxgiParameters = {};
+    DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
+    return m_SwapChain->Present(SyncInterval, Flags, &dxgiParameters);
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetBuffer(
@@ -168,16 +148,14 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetBuffer(
     }
     else
     {
-        DX12_ASSERT(0, "Not implemented!");
+        DX12_NOT_IMPLEMENTED;
         return E_NOTIMPL;
     }
 
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::SetFullscreenState(
-    BOOL Fullscreen,
-    _In_opt_  IDXGIOutput* pTarget)
+HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::SetFullscreenState(BOOL Fullscreen, _In_opt_ IDXGIOutput* pTarget)
 {
     DX12_FUNC_LOG
     m_Device->GetDeviceContext()->SubmitAllCommands(true);
@@ -200,16 +178,16 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetDesc(
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::ResizeBuffers(
-    UINT BufferCount,
+    UINT BufferCount, 
     UINT Width,
-    UINT Height,
+    UINT Height, 
     DXGI_FORMAT NewFormat,
     UINT SwapChainFlags)
 {
     DX12_FUNC_LOG
 
     ID3D11RenderTargetView* views[8] = {};
-    
+
     m_Device->GetDeviceContext()->OMSetRenderTargets(8, views, nullptr);
     m_Device->GetDeviceContext()->SubmitAllCommands(true);
     m_Device->GetDeviceContext()->WaitForIdle();
@@ -218,7 +196,14 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::ResizeBuffers(
 
     m_Device->GetDX12Device()->FlushReleaseHeap(DX12::Device::ResourceReleasePolicy::Immediate);
 
-    HRESULT res = m_SwapChain->ResizeBuffers(BufferCount, Width, Height, NewFormat, SwapChainFlags);
+    // Buffers created using ResizeBuffers1 with a non-null pCreationNodeMask array are visible to all nodes.
+    std::vector<UINT> createNodeMasks(m_BackBuffers.size(), 0x1);
+    std::vector<IUnknown*> presentCommandQueues(
+        m_BackBuffers.size(), m_Device->GetDeviceContext()->GetCoreGraphicsCommandList()->GetD3D12CommandQueue());
+
+    HRESULT res = m_SwapChain->ResizeBuffers(
+        BufferCount, Width, Height, NewFormat, SwapChainFlags, &createNodeMasks[0], &presentCommandQueues[0]);
+
     if (res == S_OK)
     {
         AcquireBuffers();
@@ -264,30 +249,11 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::Present1(
 
     if (!(Flags & DXGI_PRESENT_TEST))
     {
-        UINT Buffer = m_SwapChain->GetCurrentBackBufferIndex();
-        DX12::Resource& dx12Resource = m_SwapChain->GetBackBuffer(Buffer);
-
-        if (m_BackBuffers[Buffer])
-        {
-            // HACK: transfer state from "outside" CResource to "inside" CResource
-            dx12Resource.SetCurrentState(m_BackBuffers[Buffer]->GetDX12Resource().GetCurrentState());
-            dx12Resource.SetAnnouncedState(m_BackBuffers[Buffer]->GetDX12Resource().GetAnnouncedState());
-        }
-
         m_Device->GetDeviceContext()->Finish(m_SwapChain);
-
-        if (m_BackBuffers[Buffer])
-        {
-            // HACK: transfer state from "inside" CResource to "outside" CResource
-            m_BackBuffers[Buffer]->GetDX12Resource().SetCurrentState(dx12Resource.GetCurrentState());
-            m_BackBuffers[Buffer]->GetDX12Resource().SetAnnouncedState(dx12Resource.GetAnnouncedState());
-        }
-
-        DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
-        m_SwapChain->Present1(SyncInterval, Flags, pPresentParameters);
-        return m_SwapChain->GetLastPresentReturnValue();
     }
-    return m_SwapChain->GetDXGISwapChain()->Present1(SyncInterval, Flags, pPresentParameters);
+
+    DX12_LOG("------------------------------------------------ PRESENT ------------------------------------------------");
+    return m_SwapChain->Present(SyncInterval, Flags, pPresentParameters);
 }
 
 /* IDXGISwapChain2 implementation */
@@ -316,7 +282,8 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::ResizeBuffers1(UINT BufferCount, UI
 
     m_Device->GetDX12Device()->FlushReleaseHeap(DX12::Device::ResourceReleasePolicy::Immediate);
 
-    HRESULT res = m_SwapChain->GetDXGISwapChain()->ResizeBuffers1(BufferCount, Width, Height, NewFormat, SwapChainFlags, pCreationNodeMask, ppPresentQueue);
+    HRESULT res = m_SwapChain->ResizeBuffers(
+        BufferCount, Width, Height, NewFormat, SwapChainFlags, pCreationNodeMask, ppPresentQueue);
     if (res == S_OK)
     {
         AcquireBuffers();

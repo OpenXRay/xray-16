@@ -38,7 +38,7 @@ HRESULT WINAPI D3DReflectDXILorDXBC(_In_reads_bytes_(SrcDataSize) LPCVOID pSrcDa
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HRESULT WINAPI DX12CreateDXGIFactory1(REFIID riid, void** ppFactory);
+HRESULT WINAPI DX12CreateDXGIFactory(REFIID riid, void** ppFactory);
 
 HRESULT WINAPI DX12CreateDevice(
     IDXGIAdapter* pAdapter,

@@ -20,10 +20,12 @@
 #ifdef WIN32
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+#if USE_DXC
 #pragma comment(lib, "dxcompiler.lib")
 #endif
+#endif
 
-HRESULT WINAPI DX12CreateDXGIFactory1(REFIID riid, void** ppFactory)
+HRESULT WINAPI DX12CreateDXGIFactory(REFIID riid, void** ppFactory)
 {
     *ppFactory = CCryDX12GIFactory::Create();
     return *ppFactory ? 0 : -1;

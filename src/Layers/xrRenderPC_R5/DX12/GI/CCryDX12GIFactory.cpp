@@ -23,7 +23,11 @@ CCryDX12GIFactory* CCryDX12GIFactory::Create()
 {
     IDXGIFactory4* pDXGIFactory4 = NULL;
 
-    if (S_OK != CreateDXGIFactory1(IID_PPV_ARGS(&pDXGIFactory4)))
+#if DEBUG
+    if (S_OK != CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&pDXGIFactory4)))
+#else
+    if (S_OK != CreateDXGIFactory2(0, IID_PPV_ARGS(&pDXGIFactory4)))
+#endif
     {
         DX12_ASSERT("Failed to create underlying DXGI factory!");
         return NULL;

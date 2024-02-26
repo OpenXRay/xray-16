@@ -23,107 +23,84 @@
 
 namespace DX12
 {
-    class SwapChain : public ReferenceCounted
+class SwapChain : public ReferenceCounted
+{
+public:
+
+    static SwapChain* Create(CommandList* pDevice, IDXGIFactory4* factory, DXGI_SWAP_CHAIN_DESC* pDesc);
+    static SwapChain* Create(CommandList* pDevice, IDXGIFactory4* factory, HWND hWnd, const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput);
+    static SwapChain* Create(CommandList* pDevice, IDXGIFactory4* factory, IUnknown* pWindow, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput);
+
+protected:
+    SwapChain(CommandList* pDevice, IDXGISwapChain3* dxgiSwapChain, DXGI_SWAP_CHAIN_DESC* pDesc);
+
+    virtual ~SwapChain();
+
+public:
+    inline IDXGISwapChain3* GetDXGISwapChain() const
+    { 
+        return m_NativeSwapChain;
+    }
+
+    inline Resource& GetBackBuffer(u32 index)
     {
-    public:
-       
-        static SwapChain* Create(CommandList* pDevice, IDXGIFactory4* factory, DXGI_SWAP_CHAIN_DESC* pDesc);
-        static SwapChain* Create(CommandList* pDevice, IDXGIFactory4* factory, HWND hWnd, const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput);
-        static SwapChain* Create(CommandList* pDevice, IDXGIFactory4* factory, IUnknown* pWindow, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput);
+        Resource* resource = m_BackBuffers[index];
+        R_ASSERT2(resource, "null backbuffer");
+        return *resource;
+    }
 
-    protected:
-        SwapChain(CommandList* pDevice, IDXGISwapChain3* dxgiSwapChain, DXGI_SWAP_CHAIN_DESC* pDesc);
+    inline Resource& GetCurrentBackBuffer()
+    {
+        Resource* resource = m_BackBuffers[m_NativeSwapChain->GetCurrentBackBufferIndex()];
+        R_ASSERT2(resource, "Resource is null");
+        return *resource;
+    }
 
-        virtual ~SwapChain();
+    inline ResourceView& GetBackBufferView(u32 index)
+    {
+        return m_BackBufferViews[index];
+    }
 
-    public:
-        inline IDXGISwapChain3* GetDXGISwapChain() const
-        {
-            return m_NativeSwapChain;
-        }
+    inline ResourceView& GetCurrentBackBufferView()
+    {
+        return m_BackBufferViews[m_NativeSwapChain->GetCurrentBackBufferIndex()];
+    }
 
-        inline Resource& GetBackBuffer(u32 index)
-        {
-            Resource* resource = m_BackBuffers[index];
-            R_ASSERT2(resource, "null backbuffer");
-            return *resource;
-        }
-       
-        inline Resource& GetCurrentBackBuffer()
-        {
-            Resource* resource = m_BackBuffers[m_NativeSwapChain->GetCurrentBackBufferIndex()];
-            R_ASSERT2(resource, "Resource is null");
-            return *resource;
-        }
+    inline u32 GetCurrentBackBufferIndex() const
+    {
+        return m_NativeSwapChain->GetCurrentBackBufferIndex();
+    }
 
-        inline ResourceView& GetBackBufferView(u32 index)
-        {
-            return m_BackBufferViews[index];
-        }
+    inline const DXGI_SWAP_CHAIN_DESC& GetDesc() const 
+    {
+        return m_Desc; 
+    }
 
-        inline ResourceView& GetCurrentBackBufferView()
-        {
-            return m_BackBufferViews[m_NativeSwapChain->GetCurrentBackBufferIndex()];
-        }
+    HRESULT Present(u32 SyncInterval, u32 Flags, const DXGI_PRESENT_PARAMETERS* pPresentParameters = NULL);
 
-        inline bool IsPresentScheduled() const { 
-            return m_AsyncQueue.GetQueuedFramesCount() > 0;
-        }
+    IC HRESULT SetFullscreenState(BOOL Fullscreen, IDXGIOutput* pTarget)
+    {
+        m_Desc.Windowed = !Fullscreen;
+        return m_NativeSwapChain->SetFullscreenState(Fullscreen, pTarget);
+    }
 
-        inline u32 GetCurrentBackBufferIndex() const
-        {
-            if (!m_bChangedBackBufferIndex)
-                return m_nCurrentBackBufferIndex;
+    HRESULT ResizeTarget(const DXGI_MODE_DESC* pNewTargetParameters);
+    HRESULT ResizeBuffers(UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags, const UINT* pCreationNodeMask = NULL, IUnknown* const* ppPresentQueue = NULL);
 
-            m_AsyncQueue.FlushNextPresent();
-            DX12_ASSERT(!IsPresentScheduled(), "Flush didn't dry out all outstanding Present() calls!");
-#if CRY_PLATFORM_DURANGO
-            m_nCurrentBackBufferIndex = 0;
-#else
-            m_nCurrentBackBufferIndex = m_NativeSwapChain->GetCurrentBackBufferIndex();
-#endif
-            m_bChangedBackBufferIndex = false;
+private:
+    friend class CCryDX12SwapChain;
+    void AcquireBuffers(std::vector<Resource*>&& resource);
+    void ForfeitBuffers();
 
-            return m_nCurrentBackBufferIndex;
-        }
+    AsyncCommandQueue& m_AsyncQueue;
+    CommandList* m_CommandList;
 
-        inline const DXGI_SWAP_CHAIN_DESC& GetDesc() const
-        {
-            return m_Desc;
-        }
+    DXGI_SWAP_CHAIN_DESC m_Desc;
 
-        void Present(u32 SyncInterval, u32 Flags);
-        void Present1(u32 SyncInterval, u32 Flags, const DXGI_PRESENT_PARAMETERS* pPresentParameters);
+    _smart_ptr<IDXGISwapChain3> m_NativeSwapChain;
 
-        IC HRESULT SetFullscreenState(BOOL Fullscreen, IDXGIOutput* pTarget)
-        {
-            m_Desc.Windowed = !Fullscreen;
-            return m_NativeSwapChain->SetFullscreenState(Fullscreen, pTarget);
-        }
-
-        HRESULT GetLastPresentReturnValue() { return m_PresentResult; }
-
-        HRESULT ResizeTarget(const DXGI_MODE_DESC* pNewTargetParameters);
-        HRESULT ResizeBuffers(UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
-
-    private:
-        friend class CCryDX12SwapChain;
-        void AcquireBuffers(std::vector<Resource*>&& resource);
-        void ForfeitBuffers();
-
-        AsyncCommandQueue& m_AsyncQueue;
-        CommandList* m_CommandList;
-
-        DXGI_SWAP_CHAIN_DESC m_Desc;
-        mutable bool m_bChangedBackBufferIndex;
-        mutable UINT m_nCurrentBackBufferIndex;
-
-        HRESULT m_PresentResult;
-        _smart_ptr<IDXGISwapChain3> m_NativeSwapChain;
-
-        std::vector<Resource*> m_BackBuffers;
-        std::vector<ResourceView> m_BackBufferViews;
-    };
-}
-
+    std::vector<Resource*> m_BackBuffers;
+    std::vector<ResourceView> m_BackBufferViews;
+};
+} 
 #endif // __DX12SWAPCHAIN__

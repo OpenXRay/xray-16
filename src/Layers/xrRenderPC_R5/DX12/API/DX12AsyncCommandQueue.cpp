@@ -52,33 +52,6 @@ namespace DX12
         }
     }
 
-    void AsyncCommandQueue::SPresentBackbuffer::Process(const STaskArgs& args)
-    {
-        DWORD result = STATUS_WAIT_0;
-
-#ifdef __dxgi1_3_h__
-        if (Desc->Flags & DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT)
-        {
-            // Check if the swapchain is ready to accept another frame
-            HANDLE frameLatencyWaitableObject = pSwapChain->GetFrameLatencyWaitableObject();
-            result = WaitForSingleObjectEx(frameLatencyWaitableObject, 0, TRUE);
-        }
-
-        if (Desc->Windowed && (Desc->Flags & DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING) && !(Flags & DXGI_PRESENT_TEST))
-        {
-            Flags |= DXGI_PRESENT_ALLOW_TEARING;
-            SyncInterval = 0;
-        }
-#endif
-
-        if (result == WAIT_OBJECT_0)
-        {
-            *pPresentResult = pSwapChain->Present(SyncInterval, Flags);
-        }
-
-        InterlockedDecrement((volatile LONG*)args.QueueFramesCounter);
-    }
-
     AsyncCommandQueue::AsyncCommandQueue()
         : m_pCmdListPool(NULL)
         , m_QueuedFramesCounter(0)
@@ -180,31 +153,6 @@ namespace DX12
         AddTask<SWaitForFences>(task);
     }
 
-    void AsyncCommandQueue::Present(IDXGISwapChain3* pSwapChain, HRESULT* pPresentResult, UINT SyncInterval,
-        UINT Flags, const DXGI_SWAP_CHAIN_DESC& Desc, UINT bufferIndex)
-    {
-        InterlockedIncrement((volatile LONG*)&m_QueuedFramesCounter);
-
-        SSubmissionTask task;
-        ZeroMemory(&task, sizeof(SSubmissionTask));
-
-        task.type = eTT_PresentBackbuffer;
-        task.Data.PresentBackbuffer.pSwapChain = pSwapChain;
-        task.Data.PresentBackbuffer.pPresentResult = pPresentResult;
-        task.Data.PresentBackbuffer.Flags = Flags;
-        task.Data.PresentBackbuffer.Desc = &Desc;
-        task.Data.PresentBackbuffer.SyncInterval = SyncInterval;
-
-        AddTask<SPresentBackbuffer>(task);
-
-        {
-            while (m_QueuedFramesCounter > MAX_FRAMES_GPU_LAG)
-            {
-                SwitchToThread();
-            }
-        }
-    }
-
     void AsyncCommandQueue::Flush(UINT64 lowerBoundFenceValue)
     {       
         if (lowerBoundFenceValue != (~0ULL))
@@ -217,18 +165,6 @@ namespace DX12
         else
         {
             while (!m_bSleeping)
-            {
-                SwitchToThread();
-            }
-        }
-    }
-
-    void AsyncCommandQueue::FlushNextPresent()
-    {
-        const int numQueuedFrames = m_QueuedFramesCounter;
-        if (numQueuedFrames > 0)
-        {
-            while (numQueuedFrames == m_QueuedFramesCounter)
             {
                 SwitchToThread();
             }
@@ -257,7 +193,6 @@ namespace DX12
                 case eTT_SignalFence: task.Process<SSignalFence>(GetTaskArg()); break;
                 case eTT_WaitForFence: task.Process<SWaitForFence>(GetTaskArg()); break;
                 case eTT_WaitForFences: task.Process<SWaitForFences>(GetTaskArg()); break;
-                case eTT_PresentBackbuffer: task.Process<SPresentBackbuffer>(GetTaskArg()); break;
                 }              
             };
         }

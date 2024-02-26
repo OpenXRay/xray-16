@@ -38,7 +38,6 @@ namespace DX12
 
         void Init(CommandListPool* pCommandListPool);
         void Flush(UINT64 lowerBoundFenceValue = ~0ULL);
-        void FlushNextPresent();
         void SignalStop() 
         { 
             m_bStopRequested = true;
@@ -47,7 +46,6 @@ namespace DX12
         // Equates to the number of pending Present() calls
         int GetQueuedFramesCount() const { return m_QueuedFramesCounter; }
 
-        void Present(IDXGISwapChain3* pSwapChain, HRESULT* pPresentResult, UINT SyncInterval, UINT Flags, const DXGI_SWAP_CHAIN_DESC& Desc, UINT bufferIndex);
         void ResetCommandList(CommandList* pCommandList);
         void ExecuteCommandLists(UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists);
         void Signal(ID3D12Fence* pFence, const UINT64 Value);
@@ -109,17 +107,6 @@ namespace DX12
             void Process(const STaskArgs& args);
         };
 
-        struct SPresentBackbuffer
-        {
-            IDXGISwapChain3* pSwapChain;
-            HRESULT* pPresentResult;
-            UINT SyncInterval;
-            UINT Flags;
-            const DXGI_SWAP_CHAIN_DESC* Desc;
-
-            void Process(const STaskArgs& args);
-        };
-
         struct SSubmissionTask
         {
             eTaskType type;
@@ -131,7 +118,6 @@ namespace DX12
                 SWaitForFences WaitForFences;
                 SExecuteCommandlist ExecuteCommandList;
                 SResetCommandlist ResetCommandList;
-                SPresentBackbuffer PresentBackbuffer;
             } Data;
 
             template<typename TaskType>
