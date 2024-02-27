@@ -572,7 +572,8 @@ bool CActor::net_Spawn(CSE_Abstract* DC)
     m_current_torso.invalidate();
     m_current_head.invalidate();
     //-------------------------------------
-    //  ,
+    // инициализация реестров, используемых актером
+    encyclopedia_registry->registry().init(ID());
     game_news_registry->registry().init(ID());
 
     if (!CInventoryOwner::net_Spawn(DC))
