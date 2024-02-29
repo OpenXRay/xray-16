@@ -538,7 +538,11 @@ public:
 
     ICF void submit()
     {
-#if defined(USE_DX11) 
+#if defined(USE_DX12)
+#if USE_DX12_DEFERRED_CONTEXT
+        HW.get_context(context_id)->Flush();
+#endif
+#elif defined(USE_DX11) 
         VERIFY(context_id != CHW::IMM_CTX_ID);
         ID3D11CommandList* pCommandList{ nullptr };
         CHK_DX(HW.get_context(context_id)->FinishCommandList(false, &pCommandList));

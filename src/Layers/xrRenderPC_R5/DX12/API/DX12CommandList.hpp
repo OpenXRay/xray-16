@@ -368,12 +368,9 @@ namespace DX12
             return m_State == CLSTATE_CLEARING;
         }
 
-        void ClearState() 
+        void ClearState(const DX12::PipelineState* pipeline) 
         {
-            if (m_CurrentPipelineState != NULL)
-            {
-                m_CommandList->ClearState(m_CurrentPipelineState->GetD3D12PipelineState());
-            }
+            m_CommandList->ClearState(pipeline->GetD3D12PipelineState());
         }
 
         void SetPipelineState(const PipelineState* pso);

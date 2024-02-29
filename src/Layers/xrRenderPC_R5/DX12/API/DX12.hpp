@@ -44,7 +44,14 @@ namespace RendererDX12
 }; // namespace RendererDX12
 
 #define DX12_NOT_IMPLEMENTED R_ASSERT2(0, "Not implemented!");
+
+#ifdef DEBUG
+#define GFX_DEBUG
+#endif
+
+#ifdef GFX_DEBUG
 #define DX12_STATS
+#endif
 
 #ifndef NDEBUG
 
@@ -71,10 +78,6 @@ if (g_nPrintDX12)           \
 #ifndef DX12_ARRAY_SIZE
 /// Return an array size for static arrays.
 #define DX12_ARRAY_SIZE(__a) (sizeof(__a) / sizeof(__a[0]))
-#endif
-
-#ifdef DEBUG
-#define GFX_DEBUG
 #endif
 
 #define DX12_GPU_VIRTUAL_ADDRESS_NULL 0ULL

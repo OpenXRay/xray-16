@@ -100,7 +100,7 @@ public:
     }
 
     void Finish(DX12::SwapChain* pDX12SwapChain);
-
+    
     #pragma region /* ID3D11DeviceChild implementation */
 
     virtual void STDMETHODCALLTYPE GetDevice(
@@ -867,6 +867,8 @@ private:
 #ifdef DX12_STATS
     size_t m_NumMapDiscardSkips;
     size_t m_NumMapDiscards;
+    size_t m_NumCopyDiscardSkips;
+    size_t m_NumCopyDiscards;
 
     size_t m_NumCommandListOverflows;
     size_t m_NumCommandListSplits;

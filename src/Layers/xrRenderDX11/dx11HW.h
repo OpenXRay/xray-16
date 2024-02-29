@@ -7,6 +7,10 @@
 
 #include <SDL.h>
 
+#if USE_DX12
+#define USE_DX12_DEFERRED_CONTEXT 0
+#endif
+
 class CHW : public pureAppActivate, public pureAppDeactivate
 {
 public:
@@ -60,10 +64,15 @@ public:
 #if defined(USE_DX12)
     ICF ID3D11DeviceContext1* get_context(u32 context_id)
     {
-        return pDeviceContext;
+        VERIFY(context_id < R__NUM_CONTEXTS);
+#if USE_DX12_DEFERRED_CONTEXT
+        return d3d_contexts_pool[context_id];
+#else
+        return d3d_contexts_pool[CHW::IMM_CTX_ID];
+#endif
     }
 #else 
-    ICF ID3DDeviceContext* get_context(u32 context_id)
+    ICF ID3D11DeviceContext* get_context(u32 context_id)
     {
         VERIFY(context_id < R__NUM_CONTEXTS);
         return d3d_contexts_pool[context_id];
@@ -79,7 +88,12 @@ public:
 #if defined(USE_DX11) 
     u32 CurrentBackBuffer = 0;
 #endif
-    ID3DDevice* pDevice = nullptr; // render device
+
+#if defined(USE_DX12)
+    ID3D11Device1* pDevice = nullptr; // render device
+#else
+    ID3D11Device* pDevice = nullptr; // render device
+#endif
 
     D3D_DRIVER_TYPE m_DriverType;
 
@@ -101,9 +115,9 @@ public:
     bool ExtendedDoublesShaderInstructions;
 
 #if defined(USE_DX12)
-    ID3D11DeviceContext1* pDeviceContext = nullptr;
+    ID3D11DeviceContext1* d3d_contexts_pool[R__NUM_CONTEXTS]{};
 #else
-    ID3DDeviceContext* d3d_contexts_pool[R__NUM_CONTEXTS]{};
+    ID3D11DeviceContext* d3d_contexts_pool[R__NUM_CONTEXTS]{};
 #endif 
 
 #if defined(USE_DX11)   

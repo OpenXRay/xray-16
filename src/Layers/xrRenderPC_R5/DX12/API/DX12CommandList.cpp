@@ -17,7 +17,11 @@
 #include "DX12/Device/CCryDX12DeviceContext.hpp"
 #include "DX12/GI/CCryDX12SwapChain.hpp"
 
-#include <thread>
+#if DEBUG 
+#define DEBUG_BARRIER 1
+#else 
+#define DEBUG_BARRIER 0
+#endif
 
 namespace DX12
 {
@@ -112,16 +116,16 @@ namespace DX12
         , m_DescriptorHeaps
         {
             {
-                GetDevice()->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024)
+                GetDevice()->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2048)
             },
             {
-                GetDevice()->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 1024)
+                GetDevice()->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 2048)
             },
             {
-                GetDevice()->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1024)
+                GetDevice()->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2048)
             },
             {
-                GetDevice()->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1024)
+                GetDevice()->GetGlobalDescriptorBlock(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 2048)
             }
         }
     {
@@ -531,18 +535,16 @@ namespace DX12
 
         if (resourceView)
         {
-            Resource& resource = resourceView->GetDX12Resource();
-
             if (INVALID_CPU_DESCRIPTOR_HANDLE != resourceView->GetDescriptorHandle())
             {
                 m_pD3D12Device->CopyDescriptorsSimple(1, dstHandle, resourceView->GetDescriptorHandle(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
             }
             else
             {
-                m_pD3D12Device->CreateUnorderedAccessView(resource.GetD3D12Resource(), nullptr, resourceView->HasDesc() ? &(resourceView->GetUAVDesc()) : NULL, dstHandle);
+                m_pD3D12Device->CreateUnorderedAccessView(resourceView->GetD3D12Resource(), nullptr, resourceView->HasDesc() ? &(resourceView->GetUAVDesc()) : NULL, dstHandle);
             }
 
-            TrackResourceUAVUsage(resource);
+            TrackResourceUAVUsage(resourceView->GetDX12Resource());
         }
         else
         {
@@ -556,8 +558,7 @@ namespace DX12
 
         if (resourceView)
         {
-            Resource& resource = resourceView->GetDX12Resource();
-            DX12_ASSERT(resource.GetD3D12Resource(), "No resource to create SRV from!");
+            DX12_ASSERT(resourceView->GetD3D12Resource(), "No resource to create SRV from!");
 
             if (INVALID_CPU_DESCRIPTOR_HANDLE != resourceView->GetDescriptorHandle())
             {
@@ -565,10 +566,10 @@ namespace DX12
             }
             else
             {
-                m_pD3D12Device->CreateShaderResourceView(resource.GetD3D12Resource(), &resourceView->GetSRVDesc(), dstHandle);
+                m_pD3D12Device->CreateShaderResourceView(resourceView->GetD3D12Resource(), &resourceView->GetSRVDesc(), dstHandle);
             }
 
-            TrackResourceSRVUsage(resource);
+            TrackResourceSRVUsage(resourceView->GetDX12Resource());
         }
         else
         {

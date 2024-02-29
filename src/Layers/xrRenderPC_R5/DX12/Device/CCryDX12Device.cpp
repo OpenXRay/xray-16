@@ -511,6 +511,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateDeferredContext(
         *ppDeferredContext = CCryDX12DeviceContext::Create(this, true);
         return S_OK;
     }
+   
     return E_NOTIMPL;
 }
 
@@ -631,7 +632,6 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CheckFeatureSupport(
             return E_INVALIDARG;
         }
 
-
         D3D12_FEATURE_DATA_ARCHITECTURE dx12FeatureDataArchitecture;
         dx12FeatureDataArchitecture.NodeIndex = 0;
         result = m_pDevice->GetD3D12Device()->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &dx12FeatureDataArchitecture, sizeof(dx12FeatureDataArchitecture));
@@ -744,8 +744,14 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateDeferredContext1(
     _COM_Outptr_opt_  ID3D11DeviceContext1** ppDeferredContext)
 {
     DX12_FUNC_LOG
-        DX12_NOT_IMPLEMENTED
-    return E_FAIL;
+
+    if (ppDeferredContext)
+    {
+        *ppDeferredContext = CCryDX12DeviceContext::Create(this, true);
+        return S_OK;
+    }
+  
+    return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE CCryDX12Device::CreateBlendState1(

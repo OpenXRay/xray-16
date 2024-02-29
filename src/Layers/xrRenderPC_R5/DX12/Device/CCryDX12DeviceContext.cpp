@@ -774,6 +774,8 @@ void CCryDX12DeviceContext::Finish(DX12::SwapChain* pDX12SwapChain)
 #ifdef DX12_STATS
     m_NumMapDiscardSkips = 0;
     m_NumMapDiscards = 0;
+    m_NumCopyDiscardSkips = 0;
+    m_NumCopyDiscards = 0;
 
     m_NumCommandListOverflows = 0;
     m_NumCommandListSplits = 0;
@@ -2528,7 +2530,6 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::ClearState()
 void STDMETHODCALLTYPE CCryDX12DeviceContext::Flush()
 {
     DX12_FUNC_LOG
-
     SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC, m_CmdFenceSet.GetCurrentValues());
 }
 
@@ -2592,23 +2593,27 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::CopySubresourceRegion1(
     DX12::CommandList*     pCmdList     = bDirect ? m_DirectCommandList : m_CopyCommandList;
 
     // TODO: move into the command-list function
-    UINT64 maxFenceValues[CMDQUEUE_NUM];
     switch (CopyFlags)
     {
-    case D3D11_COPY_NO_OVERWRITE:
-        // If the resource is currently used, the flag lied!
-        R_ASSERT2(!dstResource.IsUsed(rCmdListPool), "Destination resource is in use for non-discard copy!");
+    case D3D11_COPY_DISCARD:
+        DX12_LOG("Using D3D11_COPY_DISCARD on old ID3D12Resource: %p",
+            DX12_EXTRACT_D3D12RESOURCE(pDstResource));
 
-        SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC,
-            srcResource.GetFenceValues(CMDTYPE_WRITE),
-            rCmdListPool.GetFenceID());
+#ifdef DX12_STATS
+        m_NumCopyDiscardSkips += !dstResource.IsUsed(rCmdListPool);
+        m_NumCopyDiscards++;
+#endif // DX12_STATS
+
+        // If the resource is not currently used, we do not need to discard the memory
+        if (dstResource.IsUsed(rCmdListPool))
+        {
+            dstResource.MapDiscard(pCmdList);
+        }
+
+        DX12_LOG("New ID3D12Resource: %p", DX12_EXTRACT_D3D12RESOURCE(pDstResource));
         break;
-    default:
-        SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC, DX12::MaxFenceValues(
-            srcResource.GetFenceValues(CMDTYPE_WRITE),
-            dstResource.GetFenceValues(CMDTYPE_ANY),
-            maxFenceValues),
-            rCmdListPool.GetFenceID());
+    case D3D11_COPY_NO_OVERWRITE:
+
 
         // Block the GPU-thread until the resource is safe to be updated (unlike Map() we stage the copy and don't need to block the CPU)
         break;
@@ -2670,19 +2675,24 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::CopyResource1(
     UINT64 maxFenceValues[CMDQUEUE_NUM];
     switch (CopyFlags)
     {
-    case D3D11_COPY_NO_OVERWRITE:
-        // If the resource is currently used, the flag lied!
-        R_ASSERT2(!dstResource.IsUsed(rCmdListPool), "Destination resource is in use for non-discard copy!");
-        SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC,
-            srcResource.GetFenceValues(CMDTYPE_WRITE),
-            rCmdListPool.GetFenceID());
+    case D3D11_COPY_DISCARD:
+        DX12_LOG("Using D3D11_COPY_DISCARD on old ID3D12Resource: %p",
+            DX12_EXTRACT_D3D12RESOURCE(pDstResource));
+
+#ifdef DX12_STATS
+        m_NumCopyDiscardSkips += !dstResource.IsUsed(rCmdListPool);
+        m_NumCopyDiscards++;
+#endif // DX12_STATS
+
+        // If the resource is not currently used, we do not need to discard the memory
+        if (dstResource.IsUsed(rCmdListPool))
+        {
+            dstResource.MapDiscard(pCmdList);
+        }
+
+        DX12_LOG("New ID3D12Resource: %p", DX12_EXTRACT_D3D12RESOURCE(pDstResource));
         break;
-    default:
-        SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC, DX12::MaxFenceValues(
-            srcResource.GetFenceValues(CMDTYPE_WRITE),
-            dstResource.GetFenceValues(CMDTYPE_ANY),
-            maxFenceValues),
-            rCmdListPool.GetFenceID());
+    case D3D11_COPY_NO_OVERWRITE:
 
         // Block the GPU-thread until the resource is safe to be updated (unlike Map() we stage the update and don't need to block the CPU)
         break;
@@ -2735,13 +2745,24 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::UpdateSubresource1(
     // TODO: move into the command-list function
     switch (CopyFlags)
     {
-    case D3D11_COPY_NO_OVERWRITE:
-        // If the resource is currently used, the flag lied!
-        R_ASSERT2(!resource.IsUsed(rCmdListPool), "Destination resource is in use for non-discard copy!");
+    case D3D11_COPY_DISCARD:
+        DX12_LOG("Using D3D11_COPY_DISCARD on old ID3D12Resource: %p",
+            DX12_EXTRACT_D3D12RESOURCE(pDstResource));
+
+#ifdef DX12_STATS
+        m_NumCopyDiscardSkips += !resource.IsUsed(rCmdListPool);
+        m_NumCopyDiscards++;
+#endif // DX12_STATS
+
+        // If the resource is not currently used, we do not need to discard the memory
+        if (resource.IsUsed(rCmdListPool))
+        {
+            resource.MapDiscard(pCmdList);
+        }
+
+        DX12_LOG("New ID3D12Resource: %p", DX12_EXTRACT_D3D12RESOURCE(pDstResource));
         break;
     default:
-        SubmitAllCommands(DX12_SUBMISSION_MODE == DX12_SUBMISSION_SYNC, resource.GetFenceValues(CMDTYPE_ANY), rCmdListPool.GetFenceID());
-
         // Block the GPU-thread until the resource is safe to be updated (unlike Map() we stage the update and don't need to block the CPU)
         break;
     }
