@@ -26,6 +26,32 @@ branches:
 cache:
 - src/packages -> **/packages.config
 
+for:
+-
+  matrix:
+    only:
+      - image: Visual Studio 2022
+
+  before_build:
+    - git submodule update --init --recursive
+    - nuget restore src\engine.sln
+
+  build:
+    project: src/engine.sln
+    parallel: true
+    verbosity: minimal
+
+  after_build:
+    - cmd: misc/windows/xr_pack_build.cmd "%CONFIGURATION%" "%PLATFORM%"
+
+  artifacts:
+    - path: res/OpenXRay.*.7z
+      name: OpenXRay.*.7z
+    - path: res/Symbols.*.7z
+      name: Symbols.*.7z
+    - path: res/Utils.*.7z
+      name: Utils.*.7z
+
 test: off
 
 deploy:
