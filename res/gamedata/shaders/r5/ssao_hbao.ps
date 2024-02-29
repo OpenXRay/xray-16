@@ -10,8 +10,6 @@ float4 calc_hbao(float z, float3 N, float2 tc0, float4 pos2d)
 //cbuffer PixelGlobalShaderData_s : register(b0)
 //{
 
-uniform	float4		screen_res;
-
 #define g_Resolution screen_res.xy
 #define g_InvResolution screen_res.zw
 

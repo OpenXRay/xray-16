@@ -172,25 +172,19 @@ static TaskWorker* s_main_thread_worker = nullptr;
 
 class ThreadPriorityHelper
 {
-#ifdef XR_PLATFORM_WINDOWS
-    DWORD m_priority;
+    Threading::priority_class m_priority;
 
 public:
     ThreadPriorityHelper()
-        : m_priority(GetPriorityClass(GetCurrentProcess()))
+        : m_priority(Threading::GetCurrentProcessPriorityClass())
     {
-        SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+        Threading::SetCurrentProcessPriorityClass(Threading::priority_class::realtime);
     }
 
     ~ThreadPriorityHelper()
     {
-        SetPriorityClass(GetCurrentProcess(), m_priority);
+        Threading::SetCurrentProcessPriorityClass(m_priority);
     }
-#else
-    // XXX: add other platforms
-public:
-    ThreadPriorityHelper() = default;
-#endif
 };
 
 // Get fast spin-loop timings

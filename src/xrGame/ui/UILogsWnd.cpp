@@ -26,17 +26,11 @@
 #include "xrEngine/xr_input.h"
 #include "date_time.h"
 
-#define PDA_LOGS_XML "pda_logs.xml"
+constexpr pcstr PDA_LOGS_XML = "pda_logs.xml";
 
 u64 constexpr day2ms = u64(24 * 60 * 60 * 1000);
 
-CUILogsWnd::CUILogsWnd() : CUIWindow(CUILogsWnd::GetDebugType())
-{
-    m_list = nullptr;
-    m_actor_ch_info = nullptr;
-    m_previous_time = Device.dwTimeGlobal;
-    m_selected_period = 0;
-}
+CUILogsWnd::CUILogsWnd() : CUIWindow(CUILogsWnd::GetDebugType()), m_previous_time(Device.dwTimeGlobal) {}
 
 CUILogsWnd::~CUILogsWnd()
 {
@@ -104,10 +98,11 @@ bool CUILogsWnd::Init()
 
     CUIXmlInit::InitWindow(m_uiXml, "main_wnd", 0, this);
 
-    m_background = UIHelper::CreateFrameWindow(m_uiXml, "background", this, false);
-    if (m_background)
-        m_background2 = UIHelper::CreateFrameLine(m_uiXml, "background", this, false);
-    m_center_background = UIHelper::CreateFrameWindow(m_uiXml, "center_background", this, false);
+    if (!UIHelper::CreateFrameWindow(m_uiXml, "background", this, false))
+        std::ignore = UIHelper::CreateFrameLine(m_uiXml, "background", this, false);
+
+    if (!UIHelper::CreateFrameWindow(m_uiXml, "center_background", this, false))
+        std::ignore = UIHelper::CreateStatic(m_uiXml, "center_background", this, false);
 
     if (m_uiXml.NavigateToNode("actor_ch_info"))
     {
@@ -117,14 +112,12 @@ bool CUILogsWnd::Init()
         m_actor_ch_info->InitCharacterInfo(&m_uiXml, "actor_ch_info");
     }
 
-    if (!m_center_background)
-        m_center_background2 = UIHelper::CreateStatic(m_uiXml, "center_background", this, false);
-    m_center_caption = UIHelper::CreateStatic(m_uiXml, "center_caption", this);
+    auto* center_caption = UIHelper::CreateStatic(m_uiXml, "center_caption", this);
 
     string256 buf;
-    xr_strcpy(buf, sizeof(buf), m_center_caption->GetText());
-    xr_strcat(buf, sizeof(buf), StringTable().translate("ui_logs_center_caption").c_str());
-    m_center_caption->SetText(buf);
+    xr_strcpy(buf, center_caption->GetText());
+    xr_strcat(buf, StringTable().translate("ui_logs_center_caption").c_str());
+    center_caption->SetText(buf);
 
     CUIFixedScrollBar* tmp_scroll = xr_new<CUIFixedScrollBar>();
     m_list = xr_new<CUIScrollView>(tmp_scroll);

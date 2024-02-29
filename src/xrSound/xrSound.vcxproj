@@ -95,6 +95,9 @@
     <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">
       <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
+      <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\soft_oal.dll">

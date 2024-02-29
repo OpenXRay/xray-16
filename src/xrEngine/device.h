@@ -121,6 +121,7 @@ private:
 public:
     // Engine flow-control
     float fTimeDelta{};
+    float fTimeDeltaReal{};
     float fTimeGlobal{};
     u32 dwTimeDelta{};
     u32 dwTimeGlobal{};

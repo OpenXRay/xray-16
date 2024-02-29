@@ -12,16 +12,17 @@ private:
 
 protected:
     CUI3tButton* m_ScrollBox;
-    Ivector2 m_ScrollBoxOffset;
+    Ivector2 m_ScrollBoxOffset{};
 
     void UpdateScrollBar() override;
     void ClampByViewRect() override;
-    void SetPosScrollFromView(float view_pos, float view_width, float view_offs) override;
+    void SetPosScrollFromView(float view_pos, float view_size, float view_offs) override;
 
 public:
     CUIFixedScrollBar();
-    ~CUIFixedScrollBar() override;
+
     virtual bool InitScrollBar(Fvector2 pos, bool horizontal, cpcstr profile = "pda");
+
     void SetWidth(float /*width*/) override {}
     void SetHeight(float /*height*/) override {}
     void Draw() override { inherited::Draw(); }

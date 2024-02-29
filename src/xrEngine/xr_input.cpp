@@ -434,25 +434,29 @@ void CInput::ControllerUpdate()
     checkAxis(XR_CONTROLLER_AXIS_TRIGGER_RIGHT, controllerAxisState[5], 0,                      controllerAxisStatePrev[5], 0);
 }
 
-bool KbdKeyToButtonName(const int dik, xr_string& name)
+bool KbdKeyToButtonName(const int dik, xr_string& result)
 {
     static std::locale locale("");
 
     if (dik >= 0)
     {
-        name = StringFromUTF8(SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik)), locale);
-        return true;
+        cpcstr name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik));
+        if (name && name[0])
+        {
+            result = StringFromUTF8(name, locale);
+            return true;
+        }
     }
 
     return false;
 }
 
-bool OtherDevicesKeyToButtonName(const int btn, xr_string& name)
+bool OtherDevicesKeyToButtonName(const int btn, xr_string& /*result*/)
 {
     if (btn > CInput::COUNT_KB_BUTTONS)
     {
         // XXX: Not implemented
-        return false; // true;
+        return false;
     }
 
     return false;

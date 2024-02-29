@@ -7,7 +7,6 @@
 
 #include "pch_script.h"
 #include "UIRankingWnd.h"
-#include "xrUICore/ScrollBar/UIFixedScrollBar.h"
 #include "UIXmlInit.h"
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
@@ -28,26 +27,8 @@
 
 CUIRankingWnd::CUIRankingWnd()
     : CUIWindow("CUIRankingWnd"),
-      m_background(nullptr), m_background2(nullptr),
-      m_center_background(nullptr), m_down_background(nullptr),
-      m_icon_overlay(nullptr), m_money_caption(nullptr),
-      m_money_value(nullptr), m_center_caption(nullptr),
-      m_faction_static(nullptr), m_faction_line1(nullptr),
-      m_faction_line2(nullptr), m_factions_list(nullptr),
-      m_achievements(nullptr), m_achievements_background(nullptr),
-      m_monster_background(nullptr), m_monster_over(nullptr),
-      m_favorite_weapon_ramka(nullptr), m_favorite_weapon_over(nullptr),
-      m_monster_icon_back(nullptr), m_monster_icon(nullptr),
-      m_favorite_weapon_bckgrnd(nullptr), m_favorite_weapon_icon(nullptr),
-      m_stat_caption{}, m_stat_info{}, m_stat_count(0)
-{
-    m_actor_ch_info = nullptr;
-    m_previous_time = Device.dwTimeGlobal;
-    m_delay = 3000;
-    m_last_monster_icon_back = "";
-    m_last_monster_icon = "";
-    m_last_weapon_icon = "";
-}
+      m_delay(3000), m_previous_time(Device.dwTimeGlobal), m_stat_count(0),
+      m_last_monster_icon_back(""), m_last_monster_icon(""), m_last_weapon_icon("") {}
 
 CUIRankingWnd::~CUIRankingWnd()
 {
@@ -93,37 +74,49 @@ bool CUIRankingWnd::Init()
     CUIXmlInit::InitWindow(xml, "main_wnd", 0, this);
     m_delay = (u32)xml.ReadAttribInt("main_wnd", 0, "delay", 3000);
 
-    m_background = UIHelper::CreateFrameWindow(xml, "background", this, false);
-    if (!m_background)
-        m_background2 = UIHelper::CreateFrameLine(xml, "background", this, false);
-    m_center_background = UIHelper::CreateStatic(xml, "center_background", this, false);
-    m_down_background = UIHelper::CreateFrameWindow(xml, "down_background", this, false);
+    if (!UIHelper::CreateFrameWindow(xml, "background", this, false))
+        std::ignore = UIHelper::CreateFrameLine(xml, "background", this, false);
+
+    std::ignore = UIHelper::CreateStatic(xml, "center_background", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml, "down_background", this, false);
 
     m_actor_ch_info = xr_new<CUICharacterInfo>();
     m_actor_ch_info->SetAutoDelete(true);
     AttachChild(m_actor_ch_info);
     m_actor_ch_info->InitCharacterInfo(&xml, "actor_ch_info");
 
-    m_icon_overlay = UIHelper::CreateFrameWindow(xml, "actor_icon_over", this, false);
-    m_money_caption = UIHelper::CreateStatic(xml, "money_caption", this);
+    auto* community = m_actor_ch_info->GetIcon(CUICharacterInfo::eCommunity);
+    auto* communityCaption = m_actor_ch_info->GetIcon(CUICharacterInfo::eCommunityCaption);
+
+    if (community && communityCaption)
+    {
+        communityCaption->AdjustWidthToText();
+        pos = community->GetWndPos();
+        pos.x = communityCaption->GetWndPos().x + communityCaption->GetWndSize().x + 10.0f;
+        community->SetWndPos(pos);
+    }
+
+    std::ignore = UIHelper::CreateFrameWindow(xml, "actor_icon_over", this, false);
+    auto* money_caption = UIHelper::CreateStatic(xml, "money_caption", this);
     m_money_value = UIHelper::CreateStatic(xml, "money_value", this);
 
-    m_money_caption->AdjustWidthToText();
-    pos = m_money_caption->GetWndPos();
-    pos.x += m_money_caption->GetWndSize().x + 10.0f;
+    money_caption->AdjustWidthToText();
+    pos = money_caption->GetWndPos();
+    pos.x += money_caption->GetWndSize().x + 10.0f;
     m_money_value->SetWndPos(pos);
 
-    m_center_caption = UIHelper::CreateStatic(xml, "center_caption", this);
-    m_faction_static = UIHelper::CreateStatic(xml, "fraction_static", this, false);
-    m_faction_line1 = UIHelper::CreateFrameLine(xml, "fraction_line1", this, false);
-    m_faction_line2 = UIHelper::CreateFrameLine(xml, "fraction_line2", this, false);
+    auto* center_caption = UIHelper::CreateStatic(xml, "center_caption", this);
+
+    std::ignore = UIHelper::CreateStatic   (xml, "fraction_static", this, false);
+    std::ignore = UIHelper::CreateFrameLine(xml, "fraction_line1", this, false);
+    std::ignore = UIHelper::CreateFrameLine(xml, "fraction_line2", this, false);
 
     XML_NODE stored_root = xml.GetLocalRoot();
     XML_NODE node = xml.NavigateToNode("stat_info", 0);
     xml.SetLocalRoot(node);
 
     m_stat_count = (u32)xml.GetNodesNum(node, "stat");
-    u32 value_color = CUIXmlInit::GetColor(xml, "value", 0, 0xFFffffff);
+    const u32 value_color = CUIXmlInit::GetColor(xml, "value", 0, 0xFFffffff);
 
     for (u8 i = 0; i < m_stat_count; ++i)
     {
@@ -147,9 +140,9 @@ bool CUIRankingWnd::Init()
     xml.SetLocalRoot(stored_root);
 
     string256 buf;
-    xr_strcpy(buf, sizeof(buf), m_center_caption->GetText());
-    xr_strcat(buf, sizeof(buf), StringTable().translate("ui_ranking_center_caption").c_str());
-    m_center_caption->SetText(buf);
+    xr_strcpy(buf, center_caption->GetText());
+    xr_strcat(buf, StringTable().translate("ui_ranking_center_caption").c_str());
+    center_caption->SetText(buf);
 
     m_factions_list = UIHelper::CreateScrollView(xml, "fraction_list", this, false);
     if (m_factions_list)
@@ -157,7 +150,7 @@ bool CUIRankingWnd::Init()
         m_factions_list->SetWindowName("---fraction_list");
         m_factions_list->m_sort_function = fastdelegate::MakeDelegate(this, &CUIRankingWnd::SortingLessFunction);
 
-        pcstr fract_section = "pda_rank_communities";
+        cpcstr fract_section = "pda_rank_communities";
 
         if (pSettings->section_exist(fract_section))
         {
@@ -175,25 +168,25 @@ bool CUIRankingWnd::Init()
 
     m_monster_icon_back = UIHelper::CreateStatic(xml, "monster_icon_back", this, false);
     m_monster_icon = UIHelper::CreateStatic(xml, "monster_icon", this, false);
-    m_monster_background = UIHelper::CreateFrameWindow(xml, "monster_background", this, false);
-    m_monster_over = UIHelper::CreateFrameWindow(xml, "monster_over", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml, "monster_background", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml, "monster_over", this, false);
 
-    m_favorite_weapon_bckgrnd = UIHelper::CreateStatic(xml, "favorite_weapon_back", this, false);
+    std::ignore = UIHelper::CreateStatic(xml, "favorite_weapon_back", this, false);
     m_favorite_weapon_icon = UIHelper::CreateStatic(xml, "favorite_weapon_icon", this, false);
-    m_favorite_weapon_ramka = UIHelper::CreateFrameWindow(xml, "favorite_weapon_ramka", this, false);
-    m_favorite_weapon_over = UIHelper::CreateFrameWindow(xml, "favorite_weapon_over", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml, "favorite_weapon_ramka", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml, "favorite_weapon_over", this, false);
 
-    m_achievements_background = UIHelper::CreateFrameWindow(xml, "achievements_background", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml, "achievements_background", this, false);
     m_achievements = UIHelper::CreateScrollView(xml, "achievements_wnd", this, false);
     if (m_achievements)
     {
         m_achievements->SetWindowName("achievements_list");
 
-        pcstr section = "achievements";
+        cpcstr section = "achievements";
 
         if (pSettings->section_exist(section))
         {
-            CInifile::Sect& achievs_section = pSettings->r_section(section);
+            const auto& achievs_section = pSettings->r_section(section);
             for (const auto& item : achievs_section.Data)
                 add_achievement(xml, item.first);
         }
@@ -252,8 +245,7 @@ void CUIRankingWnd::update_info()
     bool force_rating = false;
     for (u8 i = 0; i < m_factions_list->GetSize(); ++i)
     {
-        CUIRankFaction* ui_faction = smart_cast<CUIRankFaction*>(m_factions_list->GetItem(i));
-        if (ui_faction)
+        if (const auto* ui_faction = smart_cast<CUIRankFaction*>(m_factions_list->GetItem(i)))
         {
             if (ui_faction->get_cur_sn() != i + 1)
             {
@@ -265,8 +257,7 @@ void CUIRankingWnd::update_info()
 
     for (u8 i = 0; i < m_factions_list->GetSize(); ++i)
     {
-        CUIRankFaction* ui_faction = smart_cast<CUIRankFaction*>(m_factions_list->GetItem(i));
-        if (ui_faction)
+        if (auto* ui_faction = smart_cast<CUIRankFaction*>(m_factions_list->GetItem(i)))
         {
             ui_faction->update_info(i + 1);
             ui_faction->rating(i + 1, force_rating);
@@ -295,13 +286,13 @@ void CUIRankingWnd::get_statistic()
     m_stat_info[0]->SetTextColor(color_rgba(170, 170, 170, 255));
     m_stat_info[0]->SetText(buf);
 
-    luabind::functor<LPCSTR> funct;
+    luabind::functor<pcstr> funct;
     if (!GEnv.ScriptEngine->functor("pda.get_stat", funct))
         return;
 
     for (u8 i = 1; i < m_stat_count; ++i)
     {
-        LPCSTR str = funct(i);
+        cpcstr str = funct(i);
         m_stat_info[i]->SetTextColor(color_rgba(170, 170, 170, 255));
         m_stat_info[i]->SetTextST(str);
     }
@@ -350,7 +341,7 @@ void CUIRankingWnd::get_favorite_weapon()
     luabind::functor<pcstr> functor;
     if(!GEnv.ScriptEngine->functor("pda.get_favorite_weapon", functor))
         return;
-    pcstr str = functor();
+    cpcstr str = functor();
 
     if (!xr_strcmp(str, ""))
         return;

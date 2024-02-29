@@ -624,6 +624,8 @@ ENGINE_API float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 ENGINE_API float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 ENGINE_API int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
+int ps_disable_lens_flare = 1;
+
 class CCC_renderer : public CCC_Token
 {
     typedef CCC_Token inherited;
@@ -978,4 +980,6 @@ void CCC_Register()
 #endif
 
     CMD4(CCC_Vector3, "ssfx_wetness_multiplier", &ssfx_wetness_multiplier, Fvector3({ 0.1f, 0.1f, 0.0f} ), Fvector3({ 20.0f, 20.0f, 0.0f }));
+
+    CMD4(CCC_Integer, "disable_lens_flare", &ps_disable_lens_flare, 0, 1);
 };

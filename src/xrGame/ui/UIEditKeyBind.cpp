@@ -4,6 +4,7 @@
 #include "xrEngine/xr_level_controller.h"
 #include "Common/object_broker.h"
 #include "xrEngine/XR_IOConsole.h"
+#include "xrUICore/XML/UITextureMaster.h"
 
 CUIEditKeyBind::CUIEditKeyBind(bool primary, bool isGamepadBinds /*= false*/)
     : CUIStatic("CUIEditKeyBind")
@@ -64,7 +65,14 @@ void CUIEditKeyBind::InitKeyBind(Fvector2 pos, Fvector2 size)
 {
     CUIStatic::SetWndPos(pos);
     CUIStatic::SetWndSize(size);
-    InitTexture("ui_listline2");
+
+    if (CUITextureMaster::ItemExist("ui_listline2")) // cop
+        InitTexture("ui_listline2");
+    else if (CUITextureMaster::ItemExist("ui_options_string")) // soc
+        InitTexture("ui_options_string");
+    else if (CUITextureMaster::ItemExist("ui_options_string_back")) // cs (exists in soc also, that's why it's last)
+        InitTexture("ui_options_string_back");
+
     TextItemControl()->SetFont(UI().Font().pFontLetterica16Russian);
     SetStretchTexture(true);
     SetEditMode(false);

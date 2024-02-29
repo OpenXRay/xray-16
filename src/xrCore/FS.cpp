@@ -120,8 +120,8 @@ void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size)
     VERIFY(file_size != 0);
     void* buffer = xr_malloc(file_size);
 
-    const ssize_t r_bytes = _read(file_handle, buffer, file_size);
-    R_ASSERT3(r_bytes > 0 && static_cast<size_t>(r_bytes) == file_size, "Can't read from file : ", file_name);
+    const auto r_bytes = _read(file_handle, buffer, file_size);
+    R_ASSERT3(file_size == static_cast<size_t>(r_bytes), "Can't read from file : ", file_name);
 
     // file_size = r_bytes;
 

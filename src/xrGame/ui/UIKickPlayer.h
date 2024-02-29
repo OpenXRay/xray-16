@@ -32,7 +32,7 @@ protected:
 
     void Init_internal(CUIXml& xml_doc);
 
-    E_MODE mode;
+    E_MODE mode{ MODE_KICK };
 
     CUIStatic* bkgrnd;
     CUIStatic* header;
@@ -44,7 +44,7 @@ protected:
     CUI3tButton* btn_ok;
     CUI3tButton* btn_cancel;
 
-    u32 m_prev_upd_time;
+    u32 m_prev_upd_time{};
 
     shared_str m_selected_item_text;
     xr_vector<game_PlayerState*> m_current_set;

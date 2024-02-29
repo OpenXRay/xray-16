@@ -633,7 +633,7 @@ void CHW::Present()
     switch (m_pSwapChain->Present(bUseVSync ? 1 : 0, 0))
     {
     case DXGI_STATUS_OCCLUDED:
-    case DXGI_ERROR_DEVICE_REMOVED: 
+    case DXGI_ERROR_DEVICE_REMOVED:
         doPresentTest = true;
         break;
     }
@@ -671,7 +671,9 @@ DeviceState CHW::GetDeviceState()
     {
         switch (m_pSwapChain->Present(0, DXGI_PRESENT_TEST))
         {
-        case S_OK: doPresentTest = false; 
+        case S_OK:
+            doPresentTest = false;
+
             break;
 
         case DXGI_STATUS_OCCLUDED:
@@ -682,9 +684,10 @@ DeviceState CHW::GetDeviceState()
             return DeviceState::NeedReset;
 
         case DXGI_ERROR_DEVICE_REMOVED:
-            FATAL(
-                "Graphics driver was updated or GPU was physically removed from computer.\n"
-                "Please, restart the game.");
+
+            FATAL("Graphics driver was updated or GPU was physically removed from computer.\n"
+                  "Please, restart the game.");
+
             break;
         }
     }

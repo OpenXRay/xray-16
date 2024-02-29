@@ -32,33 +32,27 @@ class CUILogsWnd final : public CUIWindow, public CUIWndCallback
 private:
     typedef CUIWindow inherited;
 
-    CUIFrameWindow* m_background;
-    CUIFrameLineWnd* m_background2;
-    CUIFrameWindow* m_center_background;
-    CUIStatic* m_center_background2;
+    CUICharacterInfo* m_actor_ch_info{};
 
-    CUIStatic* m_center_caption;
-    CUICharacterInfo* m_actor_ch_info;
+    CUICheckButton* m_filter_news{};
+    CUICheckButton* m_filter_talk{};
 
-    CUICheckButton* m_filter_news;
-    CUICheckButton* m_filter_talk;
+    CUIStatic* m_date_caption{};
+    CUIStatic* m_date{};
 
-    CUIStatic* m_date_caption;
-    CUIStatic* m_date;
+    CUIStatic* m_period_caption{};
+    CUIStatic* m_period{};
 
-    CUIStatic* m_period_caption;
-    CUIStatic* m_period;
+    ALife::_TIME_ID m_start_game_time{};
+    ALife::_TIME_ID m_selected_period{};
 
-    ALife::_TIME_ID m_start_game_time;
-    ALife::_TIME_ID m_selected_period;
+    CUI3tButton* m_prev_period{};
+    CUI3tButton* m_next_period{};
+    bool m_ctrl_press{};
 
-    CUI3tButton* m_prev_period;
-    CUI3tButton* m_next_period;
-    bool m_ctrl_press;
-
-    CUIScrollView* m_list;
+    CUIScrollView* m_list{};
     u32 m_previous_time;
-    bool m_need_reload;
+    bool m_need_reload{};
     WINDOW_LIST m_items_cache;
     WINDOW_LIST m_items_ready;
     xr_vector<u32> m_news_in_queue;

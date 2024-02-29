@@ -1,10 +1,10 @@
 [SourceExplorer.ignore]
 .git/
-*.suo
 bin/
-intermediate/
-lib/
+build/
 src/_CppDependOut
+*.suo
+.hash_cache.txt
 
 [SearchableFiles.include]
 *.cpp
