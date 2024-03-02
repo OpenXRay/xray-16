@@ -156,7 +156,7 @@ void COMotion::DeleteKey(float t) const
     envs[ctRotationB]->DeleteKey(t);
 }
 
-int COMotion::KeyCount() const { return envs[ctPositionX]->keys.size(); }
+size_t COMotion::KeyCount() const { return envs[ctPositionX]->keys.size(); }
 
 void COMotion::FindNearestKey(float t, float& mn, float& mx, float eps) const
 {
