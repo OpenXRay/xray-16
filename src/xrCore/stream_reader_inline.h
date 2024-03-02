@@ -33,7 +33,7 @@ IC intptr_t CStreamReader::elapsed() const
 }
 
 IC const size_t& CStreamReader::length() const { return m_file_size; }
-IC void CStreamReader::seek(const int& offset) { advance(offset - tell()); }
+IC void CStreamReader::seek(const int& offset) { advance(offset - static_cast<int>(tell())); }
 IC size_t CStreamReader::tell() const
 {
     VERIFY(m_current_pointer >= m_start_pointer);
