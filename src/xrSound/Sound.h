@@ -189,8 +189,6 @@ class XRSOUND_API CSound_stats
 public:
     u32 _rendered;
     u32 _simulated;
-    u32 _cache_hits;
-    u32 _cache_misses;
     u32 _events;
 };
 
