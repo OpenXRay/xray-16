@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <vorbis/vorbisfile.h>
 
 class XRSOUND_API CSoundRender_Source final : public CSound_source
@@ -10,6 +12,7 @@ public:
 
     OggVorbis_File ovf{};
     IReader* wave{};
+    std::mutex read_lock;
 
     float fTimeTotal;
     u32 dwBytesTotal;
