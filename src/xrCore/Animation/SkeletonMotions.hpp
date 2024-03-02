@@ -177,7 +177,7 @@ public:
     xr_vector<u32> bones;
     CPartDef() : Name(0){};
 
-    [[nodiscard]] 
+    [[nodiscard]]
     u64 mem_usage() const { return sizeof(*this) + bones.size() * sizeof(bones[0]) + sizeof(Name); }
 };
 class XRCORE_API CPartition
