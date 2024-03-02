@@ -103,7 +103,7 @@ public:
     void set_time(float t) override; //--#SM+#--
     const CSound_params* get_params() override { return &p_source; }
     void fill_block(void* ptr, u32 size);
-    void fill_data(u8* ptr, u32 offset, u32 size) const;
+    void fill_data(void* dest, u32 offset, u32 size) const;
 
     float priority() const;
     void start(const ref_sound& _owner, u32 flags, float delay);

@@ -4,7 +4,6 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Scene.h"
 #include "SoundRender_Source.h"
-#include "SoundRender_TargetA.h"
 
 extern u32 psSoundModel;
 extern float psSoundVEffects;
@@ -124,9 +123,6 @@ void CSoundRender_Emitter::set_cursor(u32 p)
             owner_data->fn_attached[0] = owner_data->fn_attached[1];
             owner_data->fn_attached[1] = "";
             m_cur_handle_cursor = get_cursor(true);
-
-            if (target)
-                ((CSoundRender_TargetA*)target)->source_changed();
         }
     }
 }
@@ -144,9 +140,9 @@ void CSoundRender_Emitter::move_cursor(int offset)
     set_cursor(get_cursor(true) + offset);
 }
 
-void CSoundRender_Emitter::fill_data(u8* _dest, u32 offset, u32 size) const
+void CSoundRender_Emitter::fill_data(void* dest, u32 offset, u32 size) const
 {
-    source()->decompress(_dest, offset, size, target->get_data());
+    source()->decompress(dest, offset, size);
 }
 
 void CSoundRender_Emitter::fill_block(void* ptr, u32 size)

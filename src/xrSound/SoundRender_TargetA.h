@@ -31,5 +31,4 @@ public:
     void stop() override;
     void update() override;
     void fill_parameters() override;
-    void source_changed();
 };
