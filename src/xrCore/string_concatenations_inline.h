@@ -58,10 +58,10 @@ public:
     }
 
 private:
-    static const u32 MAX_CONCAT_RESULT_SIZE = static_cast<u32>(512 * 1024);
-    static const u32 MAX_ITEM_COUNT = static_cast<u32>(6);
+    static const size_t MAX_CONCAT_RESULT_SIZE = static_cast<size_t>(512 * 1024);
+    static const size_t MAX_ITEM_COUNT = static_cast<size_t>(6);
 
-    template <u32 index>
+    template <size_t index>
     struct helper
     {
         static size_t get_length(pcstr string) { return string ? xr_strlen(string) : 0; }
@@ -85,7 +85,7 @@ private:
     using StringPair = std::pair<pcstr, size_t>;
 
     StringPair m_strings[MAX_ITEM_COUNT];
-    u32 m_count;
+    size_t m_count;
 };
 
 void XRCORE_API check_stack_overflow(u32 stack_increment);

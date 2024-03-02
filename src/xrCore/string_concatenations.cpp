@@ -16,13 +16,14 @@ namespace detail
 {
 namespace strconcat_error
 {
-void process(u32 const index, u32 const count, pcstr* strings)
+void process(size_t const index, size_t const count, pcstr* strings)
 {
-    u32 const max_string_size = 1024;
+    constexpr size_t max_string_size = 1024;
+    // XXX: Why stack allocation?
     pstr temp = (pstr)xr_alloca((count * (max_string_size + 4) + 1) * sizeof(**strings));
     pstr k = temp;
     *k++ = '[';
-    for (u32 i = 0; i < count; ++i)
+    for (size_t i = 0; i < count; ++i)
     {
         for (pcstr j = strings[i], e = j + max_string_size; *j && j < e; ++k, ++j)
             *k = *j;
@@ -42,8 +43,8 @@ void process(u32 const index, u32 const count, pcstr* strings)
         DEBUG_INFO, make_string("buffer overflow: cannot concatenate strings(%d):\r\n%s", index, temp).c_str());
 }
 
-template <u32 count>
-static inline void process(pstr& i, pcstr e, u32 const index, pcstr (&strings)[count])
+template <size_t count>
+static inline void process(pstr& i, pcstr e, size_t const index, pcstr (&strings)[count])
 {
     VERIFY(i <= e);
     VERIFY(index < count);
@@ -91,25 +92,28 @@ void check_stack_overflow(u32 stack_increment)
 
 void string_tupples::error_process() const
 {
+    constexpr auto npos = std::numeric_limits<size_t>::max();
+
     pcstr strings[MAX_ITEM_COUNT];
+    size_t part_size = 0;
+    size_t overrun_string_index = npos;
 
-    u32 part_size = 0;
-    u32 overrun_string_index = (u32)-1;
-    for (u32 i = 0; i < m_count; ++i)
+    for (size_t i = 0; i < m_count; ++i)
     {
-        strings[i] = m_strings[i].first;
+        const auto [str, size] = m_strings[i];
 
-        if (overrun_string_index == (u32)-1)
+        strings[i] = str;
+        part_size += size;
+
+        if (part_size > MAX_CONCAT_RESULT_SIZE)
         {
-            part_size += m_strings[i].second;
-            if (part_size > MAX_CONCAT_RESULT_SIZE)
-            {
-                overrun_string_index = i;
-            }
+            overrun_string_index = i;
+            // No need to continue, index has been found
+            break;
         }
     }
-    VERIFY(overrun_string_index != -1);
 
+    VERIFY(overrun_string_index != npos);
     strconcat_error::process(overrun_string_index, m_count, strings);
 }
 

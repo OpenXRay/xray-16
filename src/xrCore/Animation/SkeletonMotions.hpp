@@ -178,7 +178,7 @@ public:
     CPartDef() : Name(0){};
 
     [[nodiscard]]
-    u32 mem_usage() const { return sizeof(*this) + bones.size() * sizeof(u32) + sizeof(Name); }
+    u64 mem_usage() const { return sizeof(*this) + bones.size() * sizeof(bones[0]) + sizeof(Name); }
 };
 class XRCORE_API CPartition
 {
@@ -188,7 +188,7 @@ public:
     IC CPartDef& operator[](u16 id) { return P[id]; }
     IC const CPartDef& part(u16 id) const { return P[id]; }
     [[nodiscard]] u16 part_id(const shared_str& name) const;
-    [[nodiscard]] u32 mem_usage() const { return P[0].mem_usage() * MAX_PARTS; }
+    [[nodiscard]] u64 mem_usage() const { return P[0].mem_usage() * MAX_PARTS; }
     void load(IKinematics* V, pcstr model_name);
 
     [[nodiscard]] u8 count() const
@@ -217,9 +217,9 @@ struct XRCORE_API motions_value
     BOOL load(pcstr N, IReader* data, vecBones* bones);
     MotionVec* bone_motions(shared_str bone_name);
 
-    u32 mem_usage()
+    u64 mem_usage()
     {
-        u32 sz = sizeof(*this) + m_motion_map.size() * 6 + m_partition.mem_usage();
+        u64 sz = sizeof(*this) + m_motion_map.size() * 6 + m_partition.mem_usage();
         for (auto it = m_mdefs.begin(); it != m_mdefs.end(); ++it)
             sz += it->mem_usage();
         for (auto bm_it = m_motions.begin(); bm_it != m_motions.end(); ++bm_it)

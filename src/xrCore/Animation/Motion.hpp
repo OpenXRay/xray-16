@@ -119,7 +119,7 @@ public:
     void CreateKey(float t, const Fvector& P, const Fvector& R) const;
     void DeleteKey(float t) const;
     void NormalizeKeys();
-    int KeyCount() const;
+    size_t KeyCount() const;
     CEnvelope* Envelope(EChannelType et = ctPositionX) { return envs[et]; }
     BOOL ScaleKeys(float from_time, float to_time, float scale_factor) const;
     BOOL NormalizeKeys(float from_time, float to_time, float speed);
