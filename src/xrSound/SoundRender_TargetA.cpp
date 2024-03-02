@@ -10,21 +10,11 @@
 
 xr_vector<u8> g_target_temp_data;
 
-CSoundRender_TargetA::CSoundRender_TargetA(ALuint slot) : CSoundRender_Target()
-{
-    cache_gain = 0.f;
-    cache_pitch = 1.f;
-    pSource = 0;
-    pAuxSlot = slot;
-    buf_block = 0;
-}
-
-CSoundRender_TargetA::~CSoundRender_TargetA() {}
+CSoundRender_TargetA::CSoundRender_TargetA(ALuint slot)
+    : pAuxSlot(slot) {}
 
 bool CSoundRender_TargetA::_initialize()
 {
-    inherited::_initialize();
-    // initialize buffer
     A_CHK(alGenBuffers(sdef_target_count, pBuffers));
     alGenSources(1, &pSource);
     const ALenum error = alGetError();

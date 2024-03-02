@@ -35,38 +35,14 @@ void CSoundRender_Emitter::set_time(float t)
 }
 
 CSoundRender_Emitter::CSoundRender_Emitter(CSoundRender_Scene* s)
-    : scene(s)
-{
-#ifdef DEBUG
-    static u32 incrementalID = 0;
-    dbg_ID = ++incrementalID;
-#endif
-    target = nullptr;
-    //source = nullptr;
-    owner_data = nullptr;
-    smooth_volume = 1.f;
-    occluder_volume = 1.f;
-    fade_volume = 1.f;
-    occluder[0].set(0, 0, 0);
-    occluder[1].set(0, 0, 0);
-    occluder[2].set(0, 0, 0);
-    m_current_state = stStopped;
-    set_cursor(0);
-    bMoved = true;
-    b2D = false;
-    bStopping = false;
-    bRewind = false;
-    bIgnoringTimeFactor = false;
-    iPaused = 0;
-    fTimeStarted = 0.0f;
-    fTimeToStop = 0.0f;
-    fTimeToPropagade = 0.0f;
-    fTimeToRewind = 0.0f; //--#SM+#--
-    marker = 0xabababab;
-    starting_delay = 0.f;
-    priority_scale = 1.f;
-    m_cur_handle_cursor = 0;
-}
+    : scene(s),
+      priority_scale(1.f),
+      smooth_volume(1.f),
+      occluder_volume(1.f),
+      fade_volume(1.f),
+      m_current_state(stStopped),
+      bMoved(true),
+      marker(0xabababab) {}
 
 CSoundRender_Emitter::~CSoundRender_Emitter()
 {

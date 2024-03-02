@@ -8,18 +8,18 @@ class CSoundRender_TargetA : public CSoundRender_Target
     using inherited = CSoundRender_Target;
 
     // OpenAL
-    ALuint pSource;
-    ALuint pBuffers[sdef_target_count];
+    ALuint pSource{};
+    ALuint pBuffers[sdef_target_count]{};
     ALuint pAuxSlot; // EFX
-    float cache_gain;
-    float cache_pitch;
 
-    ALuint buf_block;
+    float cache_gain{};
+    float cache_pitch{ 1.0f };
+
+    ALuint buf_block{};
     void fill_block(ALuint BufferID);
 
 public:
     CSoundRender_TargetA(ALuint slot);
-    virtual ~CSoundRender_TargetA();
 
     bool _initialize() override;
     void _destroy() override;
