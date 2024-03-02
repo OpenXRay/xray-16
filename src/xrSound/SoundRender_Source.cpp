@@ -10,7 +10,6 @@ CSoundRender_Source::CSoundRender_Source()
     m_fMaxAIDist = 300.f;
     m_fBaseVolume = 1.f;
     m_uGameType = 0;
-    fname = nullptr;
 }
 
 CSoundRender_Source::~CSoundRender_Source() { unload(); }
