@@ -12,7 +12,7 @@ public:
     float fTimeTotal;
     u32 dwBytesTotal;
 
-    WAVEFORMATEX m_wformat; //= SoundRender->wfm;
+    WAVEFORMATEX m_wformat;
 
     float m_fBaseVolume;
     float m_fMinDist;

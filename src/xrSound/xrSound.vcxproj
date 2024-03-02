@@ -63,11 +63,9 @@
     <ClCompile Include="SoundRender_Emitter.cpp" />
     <ClCompile Include="SoundRender_Emitter_FSM.cpp" />
     <ClCompile Include="SoundRender_Emitter_StartStop.cpp" />
-    <ClCompile Include="SoundRender_Emitter_streamer.cpp" />
     <ClCompile Include="SoundRender_Environment.cpp" />
     <ClCompile Include="SoundRender_Scene.cpp" />
     <ClCompile Include="SoundRender_Source.cpp" />
-    <ClCompile Include="SoundRender_Source_loader.cpp" />
     <ClCompile Include="SoundRender_Target.cpp" />
     <ClCompile Include="SoundRender_TargetA.cpp" />
     <ClCompile Include="stdafx.cpp">
