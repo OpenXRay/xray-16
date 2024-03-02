@@ -1,13 +1,15 @@
 #pragma once
 
-// refs
-struct OggVorbis_File;
+#include <vorbis/vorbisfile.h>
 
 class XRSOUND_API CSoundRender_Source final : public CSound_source
 {
 public:
     shared_str pname;
     shared_str fname;
+
+    OggVorbis_File ovf{};
+    IReader* wave{};
 
     float fTimeTotal;
     u32 dwBytesTotal;
@@ -21,8 +23,8 @@ public:
     u32 m_uGameType;
 
 private:
-    void i_decompress(OggVorbis_File* ovf, char* dest, u32 size) const;
-    void i_decompress(OggVorbis_File* ovf, float* dest, u32 size) const;
+    void i_decompress(char* dest, u32 size);
+    void i_decompress(float* dest, u32 size);
 
     bool LoadWave(pcstr name, bool crashOnError);
 
@@ -32,7 +34,11 @@ public:
 
     bool load(pcstr name, bool replaceWithNoSound = true, bool crashOnError = true);
     void unload();
-    void decompress(void* dest, u32 byte_offset, u32 size, OggVorbis_File* ovf) const;
+
+    void attach();
+    void detach();
+
+    void decompress(void* dest, u32 byte_offset, u32 size);
 
     [[nodiscard]] float length_sec() const override { return fTimeTotal; }
     [[nodiscard]] u32 game_type() const override { return m_uGameType; }

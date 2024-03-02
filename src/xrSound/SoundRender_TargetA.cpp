@@ -212,8 +212,3 @@ void CSoundRender_TargetA::fill_block(ALuint BufferID)
     A_CHK(alBufferData(
         BufferID, format, &g_target_temp_data.front(), buf_block, m_pEmitter->source()->m_wformat.nSamplesPerSec));
 }
-void CSoundRender_TargetA::source_changed()
-{
-    detach();
-    attach();
-}

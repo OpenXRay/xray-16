@@ -11,22 +11,9 @@ protected:
 public:
     float priority{};
 
-protected:
-    OggVorbis_File ovf{};
-    IReader* wave{};
-    void attach();
-    void detach();
-
 public:
-    OggVorbis_File* get_data()
-    {
-        if (!wave)
-            attach();
-        return &ovf;
-    }
-
     CSoundRender_Target() = default;
-    virtual ~CSoundRender_Target();
+    virtual ~CSoundRender_Target() = default;
 
     CSoundRender_Emitter* get_emitter() const { return m_pEmitter; }
     bool get_Rendering() const { return rendering; }
