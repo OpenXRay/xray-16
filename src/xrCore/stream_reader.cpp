@@ -137,7 +137,7 @@ CStreamReader* CStreamReader::open_chunk(const size_t& chunk_id)
 }
 
 #include "FS_impl.h"
-u32 CStreamReader::find_chunk(u32 ID, bool* bCompressed) { return inherited::find_chunk(ID, bCompressed); }
+size_t CStreamReader::find_chunk(u32 ID, bool* bCompressed) { return inherited::find_chunk(ID, bCompressed); }
 void CStreamReader::r_stringZ(shared_str& dest)
 {
     char* dest_str = nullptr;
