@@ -51,6 +51,8 @@ bool ov_can_continue_read(long res)
 
 void CSoundRender_Source::decompress(void* dest, u32 byte_offset, u32 size)
 {
+    std::lock_guard guard{ read_lock };
+
     if (!wave)
         attach();
 

@@ -5,6 +5,11 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
 
+CSoundRender_Target::CSoundRender_Target()
+{
+    buffers_to_prefill.reserve(sdef_target_count);
+}
+
 void CSoundRender_Target::start(CSoundRender_Emitter* E)
 {
     R_ASSERT(E);
@@ -44,4 +49,11 @@ void CSoundRender_Target::fill_block(size_t idx)
 {
     R_ASSERT(m_pEmitter);
     m_pEmitter->fill_block(temp_buf[idx].data(), buf_block);
+}
+
+void CSoundRender_Target::prefill_block(Task&, void*)
+{
+    for (const size_t idx : buffers_to_prefill)
+        fill_block(idx);
+    buffers_to_prefill.clear();
 }

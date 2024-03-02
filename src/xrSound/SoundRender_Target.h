@@ -2,6 +2,8 @@
 
 #include "SoundRender.h"
 
+class Task;
+
 class CSoundRender_Target
 {
 protected:
@@ -12,11 +14,14 @@ protected:
     xr_vector<u8> temp_buf[sdef_target_count];
     void fill_block(size_t idx);
 
+    xr_vector<size_t> buffers_to_prefill;
+    void prefill_block(Task&, void*);
+
 public:
     float priority{};
 
 public:
-    CSoundRender_Target() = default;
+    CSoundRender_Target();
     virtual ~CSoundRender_Target() = default;
 
     CSoundRender_Emitter* get_emitter() const { return m_pEmitter; }
