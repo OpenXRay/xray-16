@@ -3,7 +3,6 @@
 #include "xrCommon/xr_unordered_map.h"
 
 #include "SoundRender.h"
-#include "SoundRender_Cache.h"
 #include "SoundRender_Environment.h"
 #include "SoundRender_Effects.h"
 #include "SoundRender_Scene.h"
@@ -59,10 +58,6 @@ protected:
 
 public:
     bool supports_float_pcm{};
-
-    // Cache
-    CSoundRender_Cache cache;
-    u32 cache_bytes_per_line;
 
 public:
     CSoundRender_Core(CSoundManager& p);

@@ -11,8 +11,6 @@ CSoundRender_Source::CSoundRender_Source()
     m_fBaseVolume = 1.f;
     m_uGameType = 0;
     fname = nullptr;
-    CAT.table = nullptr;
-    CAT.size = 0;
 }
 
 CSoundRender_Source::~CSoundRender_Source() { unload(); }

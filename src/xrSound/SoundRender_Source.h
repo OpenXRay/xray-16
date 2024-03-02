@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SoundRender_Cache.h"
-
 // refs
 struct OggVorbis_File;
 
@@ -10,7 +8,6 @@ class XRSOUND_API CSoundRender_Source final : public CSound_source
 public:
     shared_str pname;
     shared_str fname;
-    cache_cat CAT;
 
     float fTimeTotal;
     u32 dwBytesTotal;
@@ -35,7 +32,7 @@ public:
 
     bool load(pcstr name, bool replaceWithNoSound = true, bool crashOnError = true);
     void unload();
-    void decompress(u32 line, OggVorbis_File* ovf);
+    void decompress(void* dest, u32 byte_offset, u32 size, OggVorbis_File* ovf) const;
 
     [[nodiscard]] float length_sec() const override { return fTimeTotal; }
     [[nodiscard]] u32 game_type() const override { return m_uGameType; }

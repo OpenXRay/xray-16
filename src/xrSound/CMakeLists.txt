@@ -2,14 +2,6 @@ add_library(xrSound SHARED)
 
 target_sources_grouped(
     TARGET xrSound
-    NAME "Cache"
-    FILES
-    SoundRender_Cache.cpp
-    SoundRender_Cache.h
-)
-
-target_sources_grouped(
-    TARGET xrSound
     NAME "Core"
     FILES
     SoundRender_Core.cpp

@@ -31,26 +31,21 @@ long ov_tell_func(void* datasource)
     return static_cast<long>(file->tell());
 }
 
-void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
+void CSoundRender_Source::decompress(void* dest, u32 byte_offset, u32 size, OggVorbis_File* ovf) const
 {
     VERIFY(ovf);
-    // decompression of one cache-line
-    u32 line_size = SoundRender->cache.get_linesize();
-    u32 buf_offs = (line * line_size) / (m_wformat.wBitsPerSample / 8) / m_wformat.nChannels;
-    u32 left_file = dwBytesTotal - buf_offs;
-    u32 left = (u32)std::min(left_file, line_size);
 
     // seek
-    u32 cur_pos = u32(ov_pcm_tell(ovf));
-    if (cur_pos != buf_offs)
-        ov_pcm_seek(ovf, buf_offs);
+    const auto sample_offset = ogg_int64_t(byte_offset / m_wformat.nBlockAlign);
+    const u32 cur_pos = u32(ov_pcm_tell(ovf));
+    if (cur_pos != sample_offset)
+        ov_pcm_seek(ovf, sample_offset);
 
     // decompress
-    const auto dest = SoundRender->cache.get_dataptr(CAT, line);
     if (m_wformat.wFormatTag == WAVE_FORMAT_IEEE_FLOAT)
-        i_decompress(ovf, static_cast<float*>(dest), left);
+        i_decompress(ovf, static_cast<float*>(dest), size);
     else
-        i_decompress(ovf, static_cast<char*>(dest), left);
+        i_decompress(ovf, static_cast<char*>(dest), size);
 }
 
 bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
@@ -72,21 +67,10 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
         FS.r_close(wave);
         return false;
     });
-    R_ASSERT3_CURE(ovi->rate == 44100, "Invalid source rate:", pName, !crashOnError,
-    {
-        ov_clear(&ovf);
-        FS.r_close(wave);
-        return false;
-    });
-
-#ifdef DEBUG
-    if (ovi->channels == 2)
-        Msg("stereo sound source [%s]", pName);
-#endif
 
     ZeroMemory(&m_wformat, sizeof(WAVEFORMATEX));
 
-    m_wformat.nSamplesPerSec = (ovi->rate); // 44100;
+    m_wformat.nSamplesPerSec = ovi->rate;
     m_wformat.nChannels = u16(ovi->channels);
 
     if (SoundRender->supports_float_pcm)
@@ -105,7 +89,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
 
     s64 pcm_total = ov_pcm_total(&ovf, -1);
     dwBytesTotal = u32(pcm_total * m_wformat.nBlockAlign);
-    fTimeTotal = s_f_def_source_footer + dwBytesTotal / float(m_wformat.nAvgBytesPerSec);
+    fTimeTotal = dwBytesTotal / float(m_wformat.nAvgBytesPerSec);
 
     vorbis_comment* ovm = ov_comment(&ovf, -1);
     if (ovm->comments)
@@ -191,7 +175,6 @@ bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/, b
     {
         if (!LoadWave(fn, crashOnError))
             return false;
-        SoundRender->cache.cat_create(CAT, dwBytesTotal);
     }
 
     return soundExist;
@@ -199,7 +182,6 @@ bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/, b
 
 void CSoundRender_Source::unload()
 {
-    SoundRender->cache.cat_destroy(CAT);
     fTimeTotal = 0.0f;
     dwBytesTotal = 0;
 }
