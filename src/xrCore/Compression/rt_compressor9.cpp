@@ -10,7 +10,7 @@
 thread_local HEAP_ALLOC(rtc9_wrkmem, LZO1X_999_MEM_COMPRESS);
 
 static u8* _LZO_Dictionary = nullptr;
-static u32 _LZO_DictionarySize = 0;
+static lzo_uint _LZO_DictionarySize = 0;
 
 //------------------------------------------------------------------------------
 
