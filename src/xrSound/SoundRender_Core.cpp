@@ -61,8 +61,6 @@ void CSoundRender_Core::_initialize()
     bReady = true;
 }
 
-extern xr_vector<u8> g_target_temp_data;
-
 void CSoundRender_Core::_clear()
 {
     bReady = false;
@@ -73,8 +71,6 @@ void CSoundRender_Core::_clear()
         xr_delete(kv.second);
     }
     s_sources.clear();
-
-    g_target_temp_data.clear();
 }
 
 ISoundScene* CSoundRender_Core::create_scene()

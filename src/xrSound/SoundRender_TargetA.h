@@ -15,8 +15,8 @@ class CSoundRender_TargetA : public CSoundRender_Target
     float cache_gain{};
     float cache_pitch{ 1.0f };
 
-    ALuint buf_block{};
-    void fill_block(ALuint BufferID);
+    size_t get_block_id(ALuint BufferID) const;
+    void submit_buffer(ALuint BufferID, const void* data) const;
 
 public:
     CSoundRender_TargetA(ALuint slot);
@@ -25,7 +25,6 @@ public:
     void _destroy() override;
     void _restart() override;
 
-    void start(CSoundRender_Emitter* E) override;
     void render() override;
     void rewind() override;
     void stop() override;
