@@ -119,13 +119,7 @@
     <ClCompile Include="SoundRender_Emitter_StartStop.cpp">
       <Filter>Emitter</Filter>
     </ClCompile>
-    <ClCompile Include="SoundRender_Emitter_streamer.cpp">
-      <Filter>Emitter</Filter>
-    </ClCompile>
     <ClCompile Include="SoundRender_Source.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundRender_Source_loader.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="SoundRender_Target.cpp">

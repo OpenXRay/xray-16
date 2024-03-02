@@ -46,7 +46,6 @@ target_sources_grouped(
     SoundRender_Emitter.h
     SoundRender_Emitter_FSM.cpp
     SoundRender_Emitter_StartStop.cpp
-    SoundRender_Emitter_streamer.cpp
 )
 
 target_sources_grouped(
@@ -83,7 +82,6 @@ target_sources_grouped(
     FILES
     SoundRender_Source.cpp
     SoundRender_Source.h
-    SoundRender_Source_loader.cpp
 )
 
 target_sources_grouped(
