@@ -271,7 +271,7 @@ const CLocatorAPI::file* CLocatorAPI::Register(
 IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bool shouldDecrypt = false)
 {
     u32 dwType = INVALID_SET_FILE_POINTER;
-    size_t dwSize = 0;
+    u32 dwSize = 0;
     DWORD read_byte;
     u32 pt = SetFilePointer(ptr, 0, nullptr, FILE_BEGIN);
     VERIFY(pt != INVALID_SET_FILE_POINTER);
@@ -1388,7 +1388,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
         end = A.size;
     const size_t sz = end - start;
 #if defined(XR_PLATFORM_WINDOWS)
-    u8* ptr = (u8*)MapViewOfFile(A.hSrcMap, FILE_MAP_READ, 0, start, sz);
+    u8* ptr = (u8*)MapViewOfFile(A.hSrcMap, FILE_MAP_READ, 0, static_cast<DWORD>(start), sz);
     VERIFY3(ptr, "cannot create file mapping on file", fname);
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     u8* ptr = (u8*)::mmap(NULL, sz, PROT_READ, MAP_SHARED, A.hSrcFile, start);
