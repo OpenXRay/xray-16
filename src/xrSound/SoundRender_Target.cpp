@@ -7,35 +7,7 @@
 
 CSoundRender_Target::CSoundRender_Target()
 {
-    m_pEmitter = nullptr;
-    rendering = false;
-    wave = nullptr;
-}
-
-CSoundRender_Target::~CSoundRender_Target() { VERIFY(wave == 0); }
-
-bool CSoundRender_Target::_initialize()
-{
-    /*
-    // Calc format
-    wfx.wFormatTag			= WAVE_FORMAT_PCM;
-    wfx.nChannels			= 2; //1;
-    wfx.nSamplesPerSec		= SoundRender->wfm.nSamplesPerSec;
-    wfx.wBitsPerSample		= 16;
-    wfx.nBlockAlign			= wfx.nChannels * wfx.wBitsPerSample / 8;
-    wfx.nAvgBytesPerSec		= wfx.nSamplesPerSec * wfx.nBlockAlign;
-    wfx.cbSize				= 0;
-    */
-    /*
-    wfx.wFormatTag = WAVE_FORMAT_PCM;
-    wfx.nChannels = 2;
-    wfx.wBitsPerSample = 16;
-    wfx.nBlockAlign = 4;
-    wfx.nSamplesPerSec = 44100;
-    wfx.nAvgBytesPerSec = 176400;
-    wfx.cbSize = 0;
-    */
-    return true;
+    buffers_to_prefill.reserve(sdef_target_count);
 }
 
 void CSoundRender_Target::start(CSoundRender_Emitter* E)
@@ -48,13 +20,18 @@ void CSoundRender_Target::start(CSoundRender_Emitter* E)
     // 5. Deferred-play-signal (emitter-exist, rendering-false)
     m_pEmitter = E;
     rendering = false;
-    //attach();
+    //m_pEmitter->source()->attach();
+
+    // Calc storage
+    buf_block = sdef_target_block * E->source()->m_wformat.nAvgBytesPerSec / 1000;
+    for (auto& buf : temp_buf)
+        buf.resize(buf_block);
 }
 
 void CSoundRender_Target::render() { rendering = true; }
 void CSoundRender_Target::stop()
 {
-    detach();
+    m_pEmitter->source()->detach();
     m_pEmitter = nullptr;
     rendering = false;
 }
@@ -68,27 +45,15 @@ void CSoundRender_Target::fill_parameters()
     //    pEmitter->set_position(SoundRender->listener_position());
 }
 
-extern int ov_seek_func(void* datasource, ogg_int64_t offset, int whence);
-extern size_t ov_read_func(void* ptr, size_t size, size_t nmemb, void* datasource);
-extern int ov_close_func(void* datasource);
-extern long ov_tell_func(void* datasource);
-
-void CSoundRender_Target::attach()
+void CSoundRender_Target::fill_block(size_t idx)
 {
-    VERIFY(0 == wave);
-    VERIFY(m_pEmitter);
-    ov_callbacks ovc = {ov_read_func, ov_seek_func, ov_close_func, ov_tell_func};
-    wave = FS.r_open(m_pEmitter->source()->pname.c_str());
-    R_ASSERT3(wave && wave->length(), "Can't open wave file:", m_pEmitter->source()->pname.c_str());
-    ov_open_callbacks(wave, &ovf, nullptr, 0, ovc);
-    VERIFY(0 != wave);
+    R_ASSERT(m_pEmitter);
+    m_pEmitter->fill_block(temp_buf[idx].data(), buf_block);
 }
 
-void CSoundRender_Target::detach()
+void CSoundRender_Target::prefill_block(Task&, void*)
 {
-    if (wave)
-    {
-        ov_clear(&ovf);
-        FS.r_close(wave);
-    }
+    for (const size_t idx : buffers_to_prefill)
+        fill_block(idx);
+    buffers_to_prefill.clear();
 }

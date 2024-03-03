@@ -9,9 +9,6 @@
 
 #include "Sound.h"
 
-#include <vorbis/codec.h>
-#include <vorbis/vorbisfile.h>
-
 #if defined(XR_PLATFORM_WINDOWS)
 // mmreg.h
 #define NOMMIDS

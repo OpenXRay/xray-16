@@ -1,21 +1,23 @@
 #pragma once
 
-#include "SoundRender_Cache.h"
+#include <mutex>
 
-// refs
-struct OggVorbis_File;
+#include <vorbis/vorbisfile.h>
 
 class XRSOUND_API CSoundRender_Source final : public CSound_source
 {
 public:
     shared_str pname;
     shared_str fname;
-    cache_cat CAT;
+
+    OggVorbis_File ovf{};
+    IReader* wave{};
+    std::mutex read_lock;
 
     float fTimeTotal;
     u32 dwBytesTotal;
 
-    WAVEFORMATEX m_wformat; //= SoundRender->wfm;
+    WAVEFORMATEX m_wformat;
 
     float m_fBaseVolume;
     float m_fMinDist;
@@ -24,8 +26,8 @@ public:
     u32 m_uGameType;
 
 private:
-    void i_decompress(OggVorbis_File* ovf, char* dest, u32 size) const;
-    void i_decompress(OggVorbis_File* ovf, float* dest, u32 size) const;
+    void i_decompress(char* dest, u32 size);
+    void i_decompress(float* dest, u32 size);
 
     bool LoadWave(pcstr name, bool crashOnError);
 
@@ -35,7 +37,11 @@ public:
 
     bool load(pcstr name, bool replaceWithNoSound = true, bool crashOnError = true);
     void unload();
-    void decompress(u32 line, OggVorbis_File* ovf);
+
+    void attach();
+    void detach();
+
+    void decompress(void* dest, u32 byte_offset, u32 size);
 
     [[nodiscard]] float length_sec() const override { return fTimeTotal; }
     [[nodiscard]] u32 game_type() const override { return m_uGameType; }

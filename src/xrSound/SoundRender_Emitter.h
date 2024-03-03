@@ -8,8 +8,6 @@
 
 class CSoundRender_Emitter final : public CSound_emitter
 {
-    float starting_delay;
-
 public:
     enum State : u32
     {
@@ -29,10 +27,6 @@ public:
     };
 
 public:
-#ifdef DEBUG
-    u32 dbg_ID;
-#endif
-
     static constexpr float TIME_TO_STOP_INFINITE = static_cast<float>(0xffffffff);
 
     CSoundRender_Target* target{};
@@ -47,29 +41,30 @@ public:
     [[nodiscard]]
     float get_length_sec() const;
 
+    float starting_delay{};
     float priority_scale;
     float smooth_volume;
     float occluder_volume; // USER
     float fade_volume;
-    Fvector occluder[3];
+    Fvector occluder[3]{};
 
     State m_current_state;
-    u32 m_stream_cursor;
-    u32 m_cur_handle_cursor;
+    u32 m_stream_cursor{};
+    u32 m_cur_handle_cursor{};
     CSound_params p_source;
     CSoundRender_Environment e_current;
     CSoundRender_Environment e_target;
 
-    int iPaused;
+    int iPaused{};
     bool bMoved;
-    bool b2D;
-    bool bStopping;
-    bool bRewind;
-    bool bIgnoringTimeFactor;
-    float fTimeStarted; // time of "Start"
-    float fTimeToStop; // time to "Stop"
-    float fTimeToPropagade;
-    float fTimeToRewind; // --#SM+#--
+    bool b2D{};
+    bool bStopping{};
+    bool bRewind{};
+    bool bIgnoringTimeFactor{};
+    float fTimeStarted{}; // time of "Start"
+    float fTimeToStop{}; // time to "Stop"
+    float fTimeToPropagade{};
+    float fTimeToRewind{}; // --#SM+#--
 
     u32 marker;
     void i_stop();
@@ -108,7 +103,7 @@ public:
     void set_time(float t) override; //--#SM+#--
     const CSound_params* get_params() override { return &p_source; }
     void fill_block(void* ptr, u32 size);
-    void fill_data(u8* ptr, u32 offset, u32 size);
+    void fill_data(void* dest, u32 offset, u32 size) const;
 
     float priority() const;
     void start(const ref_sound& _owner, u32 flags, float delay);

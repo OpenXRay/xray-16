@@ -146,7 +146,7 @@ void xrServer::SendConnectResult(IClient* CL, u8 res, u8 res1, pcstr ResultStr)
     if (!res) // need disconnect
     {
 #ifdef MP_LOGGING
-        Msg("* Server disconnecting client, resaon: %s", ResultStr);
+        Msg("* Server disconnecting client, reason: %s", ResultStr);
 #endif
         Flush_Clients_Buffers();
         DisconnectClient(CL, ResultStr);

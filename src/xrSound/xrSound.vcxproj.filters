@@ -25,9 +25,6 @@
     <Filter Include="Environment">
       <UniqueIdentifier>{ea9d1124-af1e-471f-a0a0-d2d77275a8ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Cache">
-      <UniqueIdentifier>{9143e5b9-296c-4d3e-8424-83f75457dfa9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Effects">
       <UniqueIdentifier>{cc264c98-2f74-4a25-8885-d8a019b936dd}</UniqueIdentifier>
     </Filter>
@@ -71,9 +68,6 @@
     </ClInclude>
     <ClInclude Include="SoundRender_Environment.h">
       <Filter>Environment</Filter>
-    </ClInclude>
-    <ClInclude Include="SoundRender_Cache.h">
-      <Filter>Cache</Filter>
     </ClInclude>
     <ClInclude Include="SoundRender_Effects.h">
       <Filter>Effects</Filter>
@@ -125,13 +119,7 @@
     <ClCompile Include="SoundRender_Emitter_StartStop.cpp">
       <Filter>Emitter</Filter>
     </ClCompile>
-    <ClCompile Include="SoundRender_Emitter_streamer.cpp">
-      <Filter>Emitter</Filter>
-    </ClCompile>
     <ClCompile Include="SoundRender_Source.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundRender_Source_loader.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="SoundRender_Target.cpp">
@@ -142,9 +130,6 @@
     </ClCompile>
     <ClCompile Include="SoundRender_Environment.cpp">
       <Filter>Environment</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundRender_Cache.cpp">
-      <Filter>Cache</Filter>
     </ClCompile>
     <ClCompile Include="SoundRender_EffectsA_EAX.cpp">
       <Filter>Effects\OpenAL</Filter>

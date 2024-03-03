@@ -58,19 +58,12 @@ void CSoundRender_Core::_initialize()
 
     bPresent = true;
 
-    // Cache
-    cache_bytes_per_line = (sdef_target_block / 8) * 352800 / 1000;
-    cache.initialize(psSoundCacheSizeMB * 1024, cache_bytes_per_line);
-
     bReady = true;
 }
-
-extern xr_vector<u8> g_target_temp_data;
 
 void CSoundRender_Core::_clear()
 {
     bReady = false;
-    cache.destroy();
 
     // remove sources
     for (auto& kv : s_sources)
@@ -78,8 +71,6 @@ void CSoundRender_Core::_clear()
         xr_delete(kv.second);
     }
     s_sources.clear();
-
-    g_target_temp_data.clear();
 }
 
 ISoundScene* CSoundRender_Core::create_scene()
@@ -109,8 +100,6 @@ int CSoundRender_Core::pause_emitters(bool pauseState)
 
 void CSoundRender_Core::_restart()
 {
-    cache.destroy();
-    cache.initialize(psSoundCacheSizeMB * 1024, cache_bytes_per_line);
     env_apply();
 }
 
