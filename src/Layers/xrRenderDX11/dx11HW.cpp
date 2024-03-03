@@ -179,9 +179,12 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         ComputeShadersSupported = true;
 
         D3D11_FEATURE_DATA_D3D11_OPTIONS options;
-        pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS2, &options, sizeof(options));
+        pDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &options, sizeof(options));
 
-        DoublePrecisionFloatShaderOps = true;
+        D3D11_FEATURE_DATA_DOUBLES doubles;
+        pDevice->CheckFeatureSupport(D3D11_FEATURE_DOUBLES, &doubles, sizeof(doubles));
+
+        DoublePrecisionFloatShaderOps = doubles.DoublePrecisionFloatShaderOps;
         SAD4ShaderInstructions = options.SAD4ShaderInstructions;
         ExtendedDoublesShaderInstructions = options.ExtendedDoublesShaderInstructions;
 #else

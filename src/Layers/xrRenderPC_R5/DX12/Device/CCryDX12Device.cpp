@@ -580,13 +580,78 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CheckFeatureSupport(
 
     switch (Feature)
     {
+    case D3D11_FEATURE_D3D11_OPTIONS:
+    {
+        D3D11_FEATURE_DATA_D3D11_OPTIONS* dx11FeatureDataOptions = static_cast<D3D11_FEATURE_DATA_D3D11_OPTIONS*>(pFeatureSupportData);
+        HRESULT result;
+
+        D3D12_FEATURE_DATA_D3D12_OPTIONS dx12FeatureDataOptions;
+        result = m_pDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dx12FeatureDataOptions, sizeof(dx12FeatureDataOptions));
+        if (result == S_OK)
+        {
+            dx11FeatureDataOptions->OutputMergerLogicOp = 1;
+            dx11FeatureDataOptions->UAVOnlyRenderingForcedSampleCount = 1;
+            dx11FeatureDataOptions->DiscardAPIsSeenByDriver = 1;
+            dx11FeatureDataOptions->FlagsForUpdateAndCopySeenByDriver = 1;
+            dx11FeatureDataOptions->ClearView = 1;
+            dx11FeatureDataOptions->CopyWithOverlap = 1;
+            dx11FeatureDataOptions->ConstantBufferPartialUpdate = 1;
+            dx11FeatureDataOptions->ConstantBufferOffsetting = 1;
+            dx11FeatureDataOptions->MapNoOverwriteOnDynamicConstantBuffer = 1;
+            dx11FeatureDataOptions->MapNoOverwriteOnDynamicBufferSRV = 1;
+            dx11FeatureDataOptions->MultisampleRTVWithForcedSampleCountOne = 1;
+            dx11FeatureDataOptions->SAD4ShaderInstructions = 1;
+            dx11FeatureDataOptions->ExtendedDoublesShaderInstructions = 1;
+            dx11FeatureDataOptions->ExtendedResourceSharing = 1;
+        }
+        else
+        {
+            return E_INVALIDARG;
+        }
+        break;
+    }
+    case D3D11_FEATURE_D3D11_OPTIONS1: 
+    {
+        D3D11_FEATURE_DATA_D3D11_OPTIONS1* dx11FeatureDataOptions1 = static_cast<D3D11_FEATURE_DATA_D3D11_OPTIONS1*>(pFeatureSupportData);
+        HRESULT result;
+
+        D3D12_FEATURE_DATA_D3D12_OPTIONS dx12FeatureDataOptions;
+        result = m_pDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dx12FeatureDataOptions, sizeof(dx12FeatureDataOptions));
+        if (result == S_OK)
+        {
+            switch (dx12FeatureDataOptions.TiledResourcesTier)
+            {
+            case D3D12_TILED_RESOURCES_TIER_NOT_SUPPORTED:
+                dx11FeatureDataOptions1->TiledResourcesTier = D3D11_TILED_RESOURCES_NOT_SUPPORTED;
+                break;
+            case D3D12_TILED_RESOURCES_TIER_1:
+                dx11FeatureDataOptions1->TiledResourcesTier = D3D11_TILED_RESOURCES_TIER_1;
+                break;
+            case D3D12_TILED_RESOURCES_TIER_2:
+                dx11FeatureDataOptions1->TiledResourcesTier = D3D11_TILED_RESOURCES_TIER_2;
+                break;
+            case D3D12_TILED_RESOURCES_TIER_3:
+                dx11FeatureDataOptions1->TiledResourcesTier = D3D11_TILED_RESOURCES_TIER_3;
+                break;
+            }
+
+            dx11FeatureDataOptions1->MinMaxFiltering = 1;
+            dx11FeatureDataOptions1->ClearViewAlsoSupportsDepthOnlyFormats = 1;
+            dx11FeatureDataOptions1->MapOnDefaultBuffers = 1;
+        }
+        else
+        {
+            return E_INVALIDARG;
+        }
+        break;
+    }
     case D3D11_FEATURE_D3D11_OPTIONS2:
     {
         D3D11_FEATURE_DATA_D3D11_OPTIONS2* dx11FeatureDataOptions2 = static_cast<D3D11_FEATURE_DATA_D3D11_OPTIONS2*>(pFeatureSupportData);
         HRESULT result;
 
         D3D12_FEATURE_DATA_D3D12_OPTIONS dx12FeatureDataOptions;
-        result = m_pDevice->GetD3D12Device()->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dx12FeatureDataOptions, sizeof(dx12FeatureDataOptions));
+        result = m_pDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dx12FeatureDataOptions, sizeof(dx12FeatureDataOptions));
         if (result == S_OK)
         {
             dx11FeatureDataOptions2->PSSpecifiedStencilRefSupported = dx12FeatureDataOptions.PSSpecifiedStencilRefSupported;
@@ -634,7 +699,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CheckFeatureSupport(
 
         D3D12_FEATURE_DATA_ARCHITECTURE dx12FeatureDataArchitecture;
         dx12FeatureDataArchitecture.NodeIndex = 0;
-        result = m_pDevice->GetD3D12Device()->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &dx12FeatureDataArchitecture, sizeof(dx12FeatureDataArchitecture));
+        result = m_pDevice->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &dx12FeatureDataArchitecture, sizeof(dx12FeatureDataArchitecture));
         if (result == S_OK)
         {
             dx11FeatureDataOptions2->UnifiedMemoryArchitecture = dx12FeatureDataArchitecture.UMA;
@@ -644,6 +709,23 @@ HRESULT STDMETHODCALLTYPE CCryDX12Device::CheckFeatureSupport(
             return E_INVALIDARG;
         }
 
+        break;
+    }
+    case D3D11_FEATURE_DOUBLES:
+    { 
+        D3D11_FEATURE_DATA_DOUBLES* dx11FeatureDataDoubles = static_cast<D3D11_FEATURE_DATA_DOUBLES*>(pFeatureSupportData);
+        HRESULT result;
+
+        D3D12_FEATURE_DATA_D3D12_OPTIONS dx12FeatureDataOptions;
+        result = m_pDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &dx12FeatureDataOptions, sizeof(dx12FeatureDataOptions));
+        if (result == S_OK)
+        {
+            dx11FeatureDataDoubles->DoublePrecisionFloatShaderOps = dx12FeatureDataOptions.DoublePrecisionFloatShaderOps;
+        }
+        else
+        {
+            return E_INVALIDARG;
+        }
         break;
     }
     default:
