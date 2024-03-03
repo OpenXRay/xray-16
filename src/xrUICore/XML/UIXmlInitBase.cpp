@@ -1032,35 +1032,26 @@ void CUIXmlInitBase::ApplyAlign(float& x, float& y, u32 align)
 
 //////////////////////////////////////////////////////////////////////////
 
-// source: https://stackoverflow.com/questions/650162/why-cant-the-switch-statement-be-applied-to-strings
-constexpr uint32_t hash(const std::string_view data) noexcept
-{
-    uint32_t hash = 5385;
-    for (const auto& e : data)
-        hash = ((hash << 5) + hash) + e;
-    return hash;
-}
-
 bool CUIXmlInitBase::InitAlignment(const CUIXml& xml_doc, const char* path, int index, float& x, float& y, CUIWindow* pWnd)
 {
     // Alignment: top: "t", right: "r", bottom: "b", left: "l", center: "c"
     const xr_string wnd_alignment = xml_doc.ReadAttrib(path, index, "alignment", "");
 
-    switch (hash(wnd_alignment.c_str()))
+    switch (strhash(wnd_alignment))
     {
-    case hash("r"):
+    case "r"_hash:
         pWnd->SetAlignment(waRight);
         break;
-    case hash("l"):
+    case "l"_hash:
         pWnd->SetAlignment(waLeft);
         break;
-    case hash("t"):
+    case "t"_hash:
         pWnd->SetAlignment(waTop);
         break;
-    case hash("b"):
+    case "b"_hash:
         pWnd->SetAlignment(waBottom);
         break;
-    case hash("c"):
+    case "c"_hash:
         pWnd->SetAlignment(waCenter);
         break;
     default:
@@ -1072,17 +1063,17 @@ bool CUIXmlInitBase::InitAlignment(const CUIXml& xml_doc, const char* path, int 
 
     bool result = false;
 
-    switch (hash(alignStr))
+    switch (strhash(alignStr))
     {
-    case hash("r"):
+    case "r"_hash:
         x = ApplyAlignX(x, alRight);
         result = true;
         break;
-    case hash("b"):
+    case "b"_hash:
         y = ApplyAlignY(y, alBottom);
         result = true;
         break;
-    case hash("c"):
+    case "c"_hash:
         ApplyAlign(x, y, alCenter);
         result = true;
         break;
