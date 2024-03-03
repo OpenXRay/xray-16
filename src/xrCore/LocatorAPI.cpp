@@ -418,7 +418,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
             alias_name[0] = 0;
             R_ASSERT2(*read_path.c_str() == '$', read_path.c_str());
 
-            int count = sscanf(read_path.c_str(), "%[^\\]s", alias_name);
+            int count = xr_sscanf(read_path.c_str(), "%[^\\]s", alias_name);
             R_ASSERT2(count == 1, read_path.c_str());
 
             FS_Path* root = nullptr;
@@ -1030,7 +1030,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     if (strstr(Core.Params, "-overlaypath"))
     {
         string1024 c_newAppPathRoot;
-        sscanf(strstr(Core.Params, "-overlaypath ") + 13, "%[^ ] ", c_newAppPathRoot);
+        xr_sscanf(strstr(Core.Params, "-overlaypath ") + 13, "%[^ ] ", c_newAppPathRoot);
         FS_Path* pLogsPath = get_path("$logs$");
         FS_Path* pAppdataPath = get_path("$app_data_root$");
 
