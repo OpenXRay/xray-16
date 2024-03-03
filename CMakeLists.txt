@@ -149,11 +149,13 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
     endif()
 endif()
 
-add_compile_options(-Wno-attributes)
-if (APPLE)
-    add_compile_options(-Wl,-undefined,error)
-else()
-    add_compile_options(-Wl,--no-undefined)
+if (NOT MSVC)
+    add_compile_options(-Wno-attributes)
+    if (APPLE)
+        add_compile_options(-Wl,-undefined,error)
+    else()
+        add_compile_options(-Wl,--no-undefined)
+    endif()
 endif()
 
 # TODO test
@@ -229,6 +231,10 @@ add_compile_definitions(
     _CPPUNWIND
 )
 
+include(restoreFromNuget)
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    restore_from_nuget()
+endif()
 if (NOT WIN32)
     find_package(SDL2 REQUIRED)
     find_package(OpenGL REQUIRED)
@@ -263,28 +269,36 @@ option(XRAY_USE_LUAJIT "Use LuaJIT" ON)
 
 add_subdirectory(Externals)
 
-add_compile_options(
-    -Wall
-    #-Werror
-    -Wextra
-    #-pedantic
-    -Wno-unknown-pragmas
-    -Wno-strict-aliasing
-    -Wno-parentheses
-    -Wno-unused-label
-    -Wno-unused-parameter
-    -Wno-switch
-    #-Wno-padded
-    #-Wno-c++98-compat
-    #-Wno-c++98-compat-pedantic
-    #-Wno-c++11-compat
-    #-Wno-c++11-compat-pedantic
-    #-Wno-c++14-compat
-    #-Wno-c++14-compat-pedantic
-    #-Wno-newline-eof
-    $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
-    $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
-)
+if (MSVC)
+    add_compile_options(
+        /EHa-
+        /EHsc-
+        /EHs-
+        )
+else()
+    add_compile_options(
+        -Wall
+        #-Werror
+        -Wextra
+        #-pedantic
+        -Wno-unknown-pragmas
+        -Wno-strict-aliasing
+        -Wno-parentheses
+        -Wno-unused-label
+        -Wno-unused-parameter
+        -Wno-switch
+        #-Wno-padded
+        #-Wno-c++98-compat
+        #-Wno-c++98-compat-pedantic
+        #-Wno-c++11-compat
+        #-Wno-c++11-compat-pedantic
+        #-Wno-c++14-compat
+        #-Wno-c++14-compat-pedantic
+        #-Wno-newline-eof
+        $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
+        $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
+    )
+endif()
 
 add_subdirectory(src)
 add_subdirectory(res)

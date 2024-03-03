@@ -185,6 +185,7 @@ target_link_libraries(xrLC_Light
     xrCDB
     zlib
     xrLCUtil
+    Microsoft::DXSDK::D3DX
 )
 
 target_compile_definitions(xrLC_Light
