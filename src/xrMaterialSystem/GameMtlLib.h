@@ -122,7 +122,7 @@ public:
     }
     void Load(IReader& fs);
     void Save(IWriter& fs);
-    int GetID() { return ID; }
+    int GetID() const { return ID; }
 #ifdef _EDITOR
     void FillProp(PropItemVec& values, ListItem* owner);
 #endif
@@ -246,7 +246,7 @@ public:
         auto pred = [&](const SGameMtl* mtl) { return !xr_strcmpi(mtl->m_Name.c_str(), name); };
         return std::find_if(materials.begin(), materials.end(), pred);
     }
-    GameMtlIt GetMaterialIt(shared_str& name)
+    GameMtlIt GetMaterialIt(const shared_str& name)
     {
         auto pred = [&](const SGameMtl* mtl) { return mtl->m_Name.equal(name); };
         return std::find_if(materials.begin(), materials.end(), pred);
@@ -258,38 +258,40 @@ public:
     }
     u32 GetMaterialID(pcstr name)
     {
-        auto it = GetMaterialIt(name);
+        const auto it = GetMaterialIt(name);
         return it == materials.end() ? GAMEMTL_NONE_ID : (*it)->ID;
     }
     SGameMtl* GetMaterial(pcstr name)
     {
-        auto it = GetMaterialIt(name);
-        return materials.end() != it ? *it : 0;
+        const auto it = GetMaterialIt(name);
+        return materials.end() != it ? *it : nullptr;
     }
     SGameMtl* GetMaterialByID(s32 id)
     {
-        auto it = GetMaterialItByID(id);
+        const auto it = GetMaterialItByID(id);
         return it != materials.end() ? *it : nullptr;
     }
     u16 GetMaterialIdx(int ID)
     {
-        auto it = GetMaterialItByID(ID);
+        const auto it = GetMaterialItByID(ID);
         VERIFY(materials.end() != it);
         return u16(it - materials.begin());
     }
     u16 GetMaterialIdx(pcstr name)
     {
-        auto it = GetMaterialIt(name);
+        const auto it = GetMaterialIt(name);
         VERIFY(materials.end() != it);
         return u16(it - materials.begin());
     }
-    SGameMtl* GetMaterialByIdx(u16 idx)
+    SGameMtl* GetMaterialByIdx(u16 idx) const
     {
         VERIFY(idx < (u16)materials.size());
         return materials[idx];
     }
+
     GameMtlIt FirstMaterial() { return materials.begin(); }
     GameMtlIt LastMaterial() { return materials.end(); }
+
     u32 CountMaterial() const { return materials.size(); }
 
 #ifdef _EDITOR
@@ -317,13 +319,14 @@ public:
     // game
     SGameMtlPair* GetMaterialPairByIndices(u16 i0, u16 i1) const
     {
-        u32 mtlCount = materials.size();
+        const u32 mtlCount = materials.size();
         R_ASSERT(i0 < mtlCount && i1 < mtlCount);
         return material_pairs_rt[i1 * mtlCount + i0];
     }
 
     GameMtlPairIt FirstMaterialPair() { return material_pairs.begin(); }
     GameMtlPairIt LastMaterialPair() { return material_pairs.end(); }
+
     // IO routines
     void Load();
     bool Save();
