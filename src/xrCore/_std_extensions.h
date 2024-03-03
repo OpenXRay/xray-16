@@ -229,6 +229,17 @@ inline void MemFill32(void* dst, u32 value, size_t dstSize)
         *ptr++ = value;
 }
 
+// source: https://stackoverflow.com/a/46711735
+constexpr u32 strhash(const std::string_view data) noexcept
+{
+    uint32_t hash = 5385;
+    for (const auto& e : data)
+        hash = ((hash << 5) + hash) + e;
+    return hash;
+}
+
+constexpr u32 operator""_hash(char const* p, size_t size) { return strhash({ p, size }); }
+
 XRCORE_API char* timestamp(string64& dest);
 
 extern XRCORE_API u32 crc32(const void* P, u32 len);
