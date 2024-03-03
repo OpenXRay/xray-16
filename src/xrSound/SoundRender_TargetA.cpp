@@ -18,6 +18,14 @@ bool CSoundRender_TargetA::_initialize()
         A_CHK(alSourcef(pSource, AL_MAX_GAIN, 1.f));
         A_CHK(alSourcef(pSource, AL_GAIN, cache_gain));
         A_CHK(alSourcef(pSource, AL_PITCH, cache_pitch));
+
+#ifdef USE_PHONON
+        for (const ALuint pBuffer : pBuffers)
+        {
+            alBufferi(pBuffer, AL_AMBISONIC_LAYOUT_SOFT, AL_ACN_SOFT);
+            alBufferi(pBuffer, AL_AMBISONIC_SCALING_SOFT, AL_N3D_SOFT);
+        }
+#endif
         return true;
     }
     Msg("! sound: OpenAL: Can't create source. Error: %s.", static_cast<pcstr>(alGetString(error)));
@@ -36,6 +44,47 @@ void CSoundRender_TargetA::_restart()
 {
     _destroy();
     _initialize();
+}
+
+void CSoundRender_TargetA::start(CSoundRender_Emitter* E)
+{
+    inherited::start(E);
+
+    // Calc storage
+    buf_block = E->target_buffer_size;
+    g_target_temp_data.resize(buf_block);
+
+    const auto wvf = E->source()->m_wformat;
+    const auto blockAlign = wvf.wBitsPerSample / 8 * 4/*wvf.nChannels*/;
+    const auto avgBytesPerSec = wvf.nSamplesPerSec * blockAlign;
+
+    g_target_temp_data2.resize(sdef_target_block * avgBytesPerSec / 1000);
+
+#ifdef USE_PHONON
+    iplAudioBufferFree(SoundRender->ipl_context, &ipl_buffer_input);
+    iplAudioBufferFree(SoundRender->ipl_context, &ipl_buffer_output);
+    iplAudioBufferFree(SoundRender->ipl_context, &ipl_buffer_ambi);
+    iplAudioBufferFree(SoundRender->ipl_context, &ipl_buffer_mono);
+    iplAmbisonicsDecodeEffectRelease(&ipl_decode);
+
+    const IPLint32 samples_per_buf_block = E->ipl_settings.frameSize;
+
+    iplAudioBufferAllocate(SoundRender->ipl_context, wvf.nChannels, samples_per_buf_block,
+        &ipl_buffer_input);
+    iplAudioBufferAllocate(SoundRender->ipl_context, wvf.nChannels, samples_per_buf_block,
+        &ipl_buffer_output);
+    iplAudioBufferAllocate(SoundRender->ipl_context, 1, samples_per_buf_block, &ipl_buffer_mono);
+    iplAudioBufferAllocate(SoundRender->ipl_context, 2, samples_per_buf_block, &ipl_buffer_stereo);
+    iplAudioBufferAllocate(SoundRender->ipl_context, 4, samples_per_buf_block, &ipl_buffer_ambi);
+
+    IPLAmbisonicsDecodeEffectSettings effectSettings
+    {
+        { IPL_SPEAKERLAYOUTTYPE_STEREO, {}, {} },
+        SoundRender->ipl_hrtf, 1
+    };
+
+    iplAmbisonicsDecodeEffectCreate(SoundRender->ipl_context, &E->ipl_settings, &effectSettings, &ipl_decode);
+#endif
 }
 
 void CSoundRender_TargetA::render()
@@ -205,6 +254,56 @@ void CSoundRender_TargetA::submit_buffer(ALuint BufferID, const void* data) cons
 
     const auto& wvf = m_pEmitter->source()->m_wformat;
     const bool mono = wvf.nChannels == 1;
+
+#ifdef USE_PHONON
+    if (psSoundFlags.test(ss_EFX) && m_pEmitter->scene->ipl_scene_mesh && !m_pEmitter->is_2D())
+    {
+        IPLSimulationOutputs outputs{};
+        iplSourceGetOutputs(m_pEmitter->ipl_source,
+            static_cast<IPLSimulationFlags>(IPL_SIMULATIONFLAGS_DIRECT | IPL_SIMULATIONFLAGS_REFLECTIONS),
+            &outputs);
+
+        iplAudioBufferDeinterleave(SoundRender->ipl_context, (float*)g_target_temp_data.data(), &ipl_buffer_input);
+
+        iplDirectEffectApply(m_pEmitter->ipl_effects.direct, &outputs.direct, &ipl_buffer_input, &ipl_buffer_output);
+
+        const IPLCoordinateSpace3 listenerCoordinates
+        {
+            { 1, 0, 0 },
+            { 0, 1, 0 },
+            { 0, 0, 1 },
+            reinterpret_cast<const IPLVector3&>(SoundRender->listener_position())
+        }; // the world-space position and orientation of the listener
+
+        //outputs.pathing.order = 1;
+        //outputs.pathing.binaural = IPL_TRUE;
+        //outputs.pathing.hrtf = SoundRender->ipl_hrtf;
+        //outputs.pathing.listener = listenerCoordinates;
+
+        if (!mono)
+            iplAudioBufferDownmix(SoundRender->ipl_context, &ipl_buffer_output, &ipl_buffer_mono);
+
+        //iplPathEffectApply(ipl_path_effect, &outputs.pathing, mono ? &ipl_buffer_output : &ipl_buffer_mono, &ipl_buffer_ambi);
+
+        iplReflectionEffectApply(m_pEmitter->ipl_effects.reflection,
+            &outputs.reflections,
+            mono ? &ipl_buffer_output : &ipl_buffer_mono, &ipl_buffer_ambi,
+            nullptr);
+
+        IPLAmbisonicsDecodeEffectParams params
+        {
+            1, SoundRender->ipl_hrtf, listenerCoordinates, IPL_TRUE
+        };
+
+        iplAmbisonicsDecodeEffectApply(ipl_decode, &params, &ipl_buffer_ambi, &ipl_buffer_stereo);
+        if (mono)
+            iplAudioBufferDownmix(SoundRender->ipl_context, &ipl_buffer_stereo, &ipl_buffer_mono);
+
+        iplAudioBufferMix(SoundRender->ipl_context, mono ? &ipl_buffer_mono : &ipl_buffer_stereo, &ipl_buffer_output);
+
+        iplAudioBufferInterleave(SoundRender->ipl_context, &ipl_buffer_output, (float*)g_target_temp_data.data());
+    }
+#endif
 
     ALuint format;
     if (wvf.wFormatTag == WAVE_FORMAT_IEEE_FLOAT)

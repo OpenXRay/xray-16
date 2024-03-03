@@ -34,6 +34,22 @@ void CSoundRender_Emitter::start(const ref_sound& _owner, u32 flags, float delay
     }
     bStopping = FALSE;
     bRewind = FALSE;
+
+    const auto wvf = source()->m_wformat;
+    target_buffer_size = sdef_target_block * wvf.nAvgBytesPerSec / 1000;
+
+#ifdef USE_PHONON
+    ipl_settings = IPLAudioSettings{ s32(wvf.nSamplesPerSec), target_buffer_size / wvf.nBlockAlign };
+
+    IPLDirectEffectSettings direct{ wvf.nChannels };
+    iplDirectEffectCreate(SoundRender->ipl_context, &ipl_settings, &direct, &ipl_effects.direct);
+
+    IPLReflectionEffectSettings refl{ IPL_REFLECTIONEFFECTTYPE_CONVOLUTION, ipl_settings.frameSize * 2, 4 };
+    iplReflectionEffectCreate(SoundRender->ipl_context, &ipl_settings, &refl, &ipl_effects.reflection);
+
+    IPLPathEffectSettings path{ 1, IPL_FALSE, {}, SoundRender->ipl_hrtf };
+    iplPathEffectCreate(SoundRender->ipl_context, &ipl_settings, &path, &ipl_effects.path);
+#endif
 }
 
 void CSoundRender_Emitter::i_stop()
@@ -49,6 +65,13 @@ void CSoundRender_Emitter::i_stop()
         owner_data = NULL;
     }
     m_current_state = stStopped;
+
+#ifdef USE_PHONON
+    ipl_settings = {};
+    iplDirectEffectRelease(&ipl_effects.direct);
+    iplReflectionEffectRelease(&ipl_effects.reflection);
+    iplPathEffectRelease(&ipl_effects.path);
+#endif
 }
 
 void CSoundRender_Emitter::stop(bool isDeffered)

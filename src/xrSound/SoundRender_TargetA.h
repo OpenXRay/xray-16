@@ -17,6 +17,15 @@ class CSoundRender_TargetA : public CSoundRender_Target
     size_t get_block_id(ALuint BufferID) const;
     void submit_buffer(ALuint BufferID, const void* data) const;
 
+#ifdef USE_PHONON
+    IPLAudioBuffer ipl_buffer_input{};
+    IPLAudioBuffer ipl_buffer_output{};
+    IPLAudioBuffer ipl_buffer_ambi{};
+    IPLAudioBuffer ipl_buffer_mono{};
+    IPLAudioBuffer ipl_buffer_stereo{};
+    IPLAmbisonicsDecodeEffect ipl_decode{};
+#endif
+
 public:
     CSoundRender_TargetA() = default;
 

@@ -40,6 +40,7 @@ public:
 #ifdef USE_PHONON
     IPLScene ipl_scene{};
     IPLStaticMesh ipl_scene_mesh{};
+    IPLProbeBatch ipl_scene_probes{};
     IPLSimulator ipl_simulator{};
 #endif
 

@@ -83,6 +83,8 @@ void CSoundRender_CoreA::_initialize()
 
     supports_float_pcm &= psSoundFlags.test(ss_UseFloat32);
 
+    const bool bformat_ex = alIsExtensionPresent("AL_SOFT_bformat_ex");
+
     inherited::_initialize();
 
     // Pre-create targets

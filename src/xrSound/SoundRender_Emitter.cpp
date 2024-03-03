@@ -25,7 +25,7 @@ void CSoundRender_Emitter::set_position(const Fvector& pos)
     };
 
     IPLSimulationInputs inputs{};
-    inputs.flags = IPL_SIMULATIONFLAGS_DIRECT;
+    inputs.flags = static_cast<IPLSimulationFlags>(IPL_SIMULATIONFLAGS_DIRECT | IPL_SIMULATIONFLAGS_REFLECTIONS);
     inputs.directFlags = static_cast<IPLDirectSimulationFlags>(
         IPL_DIRECTSIMULATIONFLAGS_DISTANCEATTENUATION |
         IPL_DIRECTSIMULATIONFLAGS_AIRABSORPTION |
@@ -35,8 +35,21 @@ void CSoundRender_Emitter::set_position(const Fvector& pos)
     );
     inputs.source = sourceCoordinates;
     inputs.occlusionType = IPL_OCCLUSIONTYPE_RAYCAST;
+    inputs.distanceAttenuationModel = {};
+    inputs.airAbsorptionModel = {};
+    inputs.directivity = {};
+    inputs.occlusionType = {};
+    inputs.baked = IPL_TRUE;
+    inputs.bakedDataIdentifier = { IPL_BAKEDDATATYPE_REFLECTIONS, IPL_BAKEDDATAVARIATION_REVERB, {} };
+    //inputs.pathingProbes = scene->ipl_scene_probes;
+    inputs.pathingOrder = 1;
+    iplSourceSetInputs(ipl_source,
+        static_cast<IPLSimulationFlags>(IPL_SIMULATIONFLAGS_DIRECT | IPL_SIMULATIONFLAGS_REFLECTIONS),
+        &inputs);
 
-    iplSourceSetInputs(ipl_source, IPL_SIMULATIONFLAGS_DIRECT, &inputs);
+    iplSourceAdd(ipl_source, scene->ipl_simulator);
+
+    iplSimulatorCommit(scene->ipl_simulator);
 #endif
 
     bMoved = true;
@@ -68,11 +81,12 @@ CSoundRender_Emitter::CSoundRender_Emitter(CSoundRender_Scene* s)
       marker(0xabababab)
 {
 #ifdef USE_PHONON
-    IPLSourceSettings sourceSettings{ IPL_SIMULATIONFLAGS_DIRECT }; // this enables occlusion/transmission simulator for this source
+    IPLSourceSettings sourceSettings
+    {
+        // this enables occlusion/transmission simulator for this source
+        static_cast<IPLSimulationFlags>(IPL_SIMULATIONFLAGS_DIRECT | IPL_SIMULATIONFLAGS_REFLECTIONS)
+    };
     iplSourceCreate(scene->ipl_simulator, &sourceSettings, &ipl_source);
-    iplSourceAdd(ipl_source, scene->ipl_simulator);
-
-    iplSimulatorCommit(scene->ipl_simulator);
 #endif
 
 }
@@ -80,6 +94,10 @@ CSoundRender_Emitter::CSoundRender_Emitter(CSoundRender_Scene* s)
 CSoundRender_Emitter::~CSoundRender_Emitter()
 {
 #ifdef USE_PHONON
+    iplDirectEffectRelease(&ipl_effects.direct);
+    iplReflectionEffectRelease(&ipl_effects.reflection);
+    iplPathEffectRelease(&ipl_effects.path);
+
     iplSourceRemove(ipl_source, scene->ipl_simulator);
     iplSourceRelease(&ipl_source);
 

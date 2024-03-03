@@ -88,7 +88,9 @@ void CSoundRender_Core::_initialize()
             Memory.mem_free(memoryBlock);
         },
 
-        simdLevel
+        simdLevel,
+
+        IPL_CONTEXTFLAGS_VALIDATION
     };
 
     iplContextCreate(&contextSettings, &ipl_context);
@@ -100,7 +102,7 @@ void CSoundRender_Core::_initialize()
         1.0f, IPL_HRTFNORMTYPE_NONE
     };
 
-    IPLAudioSettings audioSettings{ 44100, 1024 };
+    IPLAudioSettings audioSettings{ 44100, 2205 };
 
     iplHRTFCreate(ipl_context, &audioSettings, &hrtfSettings, &ipl_hrtf);
 #endif
@@ -259,14 +261,18 @@ void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, cons
     IPLSimulationSharedInputs sharedInputs
     {
         listenerCoordinates,
-        4096, 16,
+        4, 4,
         2.0f, 1,
         1.0f,
         nullptr, nullptr
     };
 
     for (const auto scene : m_scenes)
-        iplSimulatorSetSharedInputs(scene->ipl_simulator, IPL_SIMULATIONFLAGS_DIRECT, &sharedInputs);
+    {
+        iplSimulatorSetSharedInputs(scene->ipl_simulator,
+            static_cast<IPLSimulationFlags>(IPL_SIMULATIONFLAGS_DIRECT | IPL_SIMULATIONFLAGS_REFLECTIONS),
+            &sharedInputs);
+    }
 #endif
 
     bListenerMoved = false;

@@ -30,11 +30,22 @@ public:
 
     CSoundRender_Target* target{};
     CSoundRender_Scene* scene{};
+
 #ifdef USE_PHONON
     IPLSource ipl_source{};
+    IPLAudioSettings ipl_settings{};
+
+    struct
+    {
+        IPLDirectEffect direct{};
+        IPLReflectionEffect reflection{};
+        IPLPathEffect path{};
+    } ipl_effects{};
 #endif
 
     ref_sound owner_data;
+
+    s32 target_buffer_size{};
 
     [[nodiscard]]
     CSoundRender_Source* source() const { return (CSoundRender_Source*)owner_data->handle; }
