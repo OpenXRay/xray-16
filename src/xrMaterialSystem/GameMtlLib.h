@@ -56,7 +56,7 @@ struct MTL_EXPORT_API SGameMtl
 protected:
     int ID; // auto number
 public:
-    enum
+    enum : u32
     {
         flBreakable = (1ul << 0ul),
         // flShootable = (1ul<<1ul),
