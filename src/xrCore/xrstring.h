@@ -238,4 +238,13 @@ IC void xr_strlwr(shared_str& src)
     }
 }
 
+IC int xr_sscanf(const char* buffer, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    int result = vsscanf(buffer, format, args);
+    va_end(args);
+    return result;
+}
+
 #pragma pack(pop)
