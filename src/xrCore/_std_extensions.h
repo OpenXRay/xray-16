@@ -5,6 +5,9 @@
 #include <math.h>
 #include <float.h>
 #include <stdio.h>
+
+#include <string_view>
+
 #include "xrCommon/math_funcs_inline.h"
 //#include "xr_token.h"
 
