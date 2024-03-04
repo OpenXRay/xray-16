@@ -209,7 +209,7 @@ void CEnvelope::LoadA(IReader& F)
             keys[i] = xr_new<st_Key>();
             st_Key& K = *keys[i];
             F.r_string(buf, sizeof(buf));
-            int cnt = xr_sscanf(
+            int cnt = sscanf(
                 buf, "Key %f %f %f %f %f %f %f %f %f", f + 0, f + 1, f + 2, f + 3, f + 4, f + 5, f + 6, f + 7, f + 8);
             R_ASSERT(cnt == 9);
             K.value = f[0];
@@ -236,7 +236,7 @@ void CEnvelope::LoadA(IReader& F)
         }
         // behavior <pre> <post>
         F.r_string(buf, sizeof(buf));
-        int cnt = xr_sscanf(buf, "Behaviors %d %d", &behavior[0], &behavior[1]);
+        int cnt = sscanf(buf, "Behaviors %d %d", &behavior[0], &behavior[1]);
         R_ASSERT(cnt == 2);
     }
 }

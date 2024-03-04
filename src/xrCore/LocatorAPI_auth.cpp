@@ -102,7 +102,7 @@ void CLocatorAPI::auth_runtime(void* params)
     else
     {
         string64 c_auth_code;
-        xr_sscanf(strstr(Core.Params, "asdf ") + 5, "%[^ ] ", c_auth_code);
+        sscanf(strstr(Core.Params, "asdf ") + 5, "%[^ ] ", c_auth_code);
         m_auth_code = atoll(c_auth_code);
     }
 #endif // DEBUG

@@ -829,7 +829,7 @@ Fcolor CInifile::r_fcolor(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     Fcolor V = {0, 0, 0, 0};
-    xr_sscanf(C, "%f,%f,%f,%f", &V.r, &V.g, &V.b, &V.a);
+    sscanf(C, "%f,%f,%f,%f", &V.r, &V.g, &V.b, &V.a);
     return V;
 }
 
@@ -837,7 +837,7 @@ u32 CInifile::r_color(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     u32 r = 0, g = 0, b = 0, a = 255;
-    xr_sscanf(C, "%u,%u,%u,%u", &r, &g, &b, &a);
+    sscanf(C, "%u,%u,%u,%u", &r, &g, &b, &a);
     return color_rgba(r, g, b, a);
 }
 
@@ -845,7 +845,7 @@ Ivector2 CInifile::r_ivector2(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     Ivector2 V = {0, 0};
-    xr_sscanf(C, "%d,%d", &V.x, &V.y);
+    sscanf(C, "%d,%d", &V.x, &V.y);
     return V;
 }
 
@@ -853,7 +853,7 @@ Ivector3 CInifile::r_ivector3(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     Ivector V = {0, 0, 0};
-    xr_sscanf(C, "%d,%d,%d", &V.x, &V.y, &V.z);
+    sscanf(C, "%d,%d,%d", &V.x, &V.y, &V.z);
     return V;
 }
 
@@ -861,7 +861,7 @@ Ivector4 CInifile::r_ivector4(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     Ivector4 V = {0, 0, 0, 0};
-    xr_sscanf(C, "%d,%d,%d,%d", &V.x, &V.y, &V.z, &V.w);
+    sscanf(C, "%d,%d,%d,%d", &V.x, &V.y, &V.z, &V.w);
     return V;
 }
 
@@ -869,7 +869,7 @@ Fvector2 CInifile::r_fvector2(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     Fvector2 V = {0.f, 0.f};
-    xr_sscanf(C, "%f,%f", &V.x, &V.y);
+    sscanf(C, "%f,%f", &V.x, &V.y);
     return V;
 }
 
@@ -877,7 +877,7 @@ Fvector3 CInifile::r_fvector3(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     Fvector3 V = {0.f, 0.f, 0.f};
-    xr_sscanf(C, "%f,%f,%f", &V.x, &V.y, &V.z);
+    sscanf(C, "%f,%f,%f", &V.x, &V.y, &V.z);
     return V;
 }
 
@@ -885,7 +885,7 @@ Fvector4 CInifile::r_fvector4(pcstr S, pcstr L) const
 {
     pcstr C = r_string(S, L);
     Fvector4 V = {0.f, 0.f, 0.f, 0.f};
-    xr_sscanf(C, "%f,%f,%f,%f", &V.x, &V.y, &V.z, &V.w);
+    sscanf(C, "%f,%f,%f,%f", &V.x, &V.y, &V.z, &V.w);
     return V;
 }
 
@@ -1205,7 +1205,7 @@ template<>
 XRCORE_API bool CInifile::try_read(Ivector4& outValue, pcstr section, pcstr line) const
 {
     pcstr C = r_string(section, line);
-    return 4 == xr_sscanf(C, "%d,%d,%d,%d", &outValue.x, &outValue.y, &outValue.z, &outValue.w);
+    return 4 == sscanf(C, "%d,%d,%d,%d", &outValue.x, &outValue.y, &outValue.z, &outValue.w);
 }
 
 template<>
@@ -1218,7 +1218,7 @@ template<>
 XRCORE_API bool CInifile::try_read(Fvector2& outValue, pcstr section, pcstr line) const
 {
     pcstr C = r_string(section, line);
-    return 2 == xr_sscanf(C, "%f,%f", &outValue.x, &outValue.y);
+    return 2 == sscanf(C, "%f,%f", &outValue.x, &outValue.y);
 }
 
 template<>

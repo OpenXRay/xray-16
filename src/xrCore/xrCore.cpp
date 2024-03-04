@@ -88,7 +88,7 @@ void xrCore::CalculateBuildId()
     string16 month;
     string256 buffer;
     xr_strcpy(buffer, buildDate);
-    xr_sscanf(buffer, "%s %d %d", month, &days, &years);
+    sscanf(buffer, "%s %d %d", month, &days, &years);
     for (int i = 0; i < 12; i++)
     {
         if (xr_stricmp(monthId[i], month))
@@ -198,7 +198,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         if (strstr(Params, "-wf"))
         {
             string_path c_name;
-            xr_sscanf(strstr(Core.Params, "-wf ") + 4, "%[^ ] ", c_name);
+            sscanf(strstr(Core.Params, "-wf ") + 4, "%[^ ] ", c_name);
             SetCurrentDirectory(c_name);
         }
 #endif
