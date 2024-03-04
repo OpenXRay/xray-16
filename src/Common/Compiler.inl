@@ -26,6 +26,8 @@
 #endif
 
 #elif defined(_MSC_VER)
+// XXX: Disables MSVC warnings on unsafe C library functions. Should be removed later.
+#define _CRT_SECURE_NO_WARNINGS
 #include <intrin.h> // for __debugbreak
 
 #define NO_INLINE               __declspec(noinline)
