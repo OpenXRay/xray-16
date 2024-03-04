@@ -30,6 +30,7 @@ constexpr u32 GAMEMTL_CHUNK_DESC          = 0x1005;
 constexpr u32 GAMEMTL_CHUNK_INJURIOUS     = 0x1006;
 constexpr u32 GAMEMTL_CHUNK_DENSITY       = 0x1007;
 constexpr u32 GAMEMTL_CHUNK_FACTORS_MP    = 0x1008;
+constexpr u32 GAMEMTL_CHUNK_ACOUSTICS     = 0x1009;
 
 constexpr u32 GAMEMTLPAIR_CHUNK_PAIR      = 0x1000;
 //constexpr u32 GAMEMTLPAIR_CHUNK_FLOTATION = 0x1001; // obsolete
@@ -97,6 +98,15 @@ public:
     float fVisTransparencyFactor; // 0.f - 1.f (1.f-полностью прозрачный)
     float fSndOcclusionFactor; // 0.f - 1.f (1.f-полностью слышен)
     float fDensityFactor;
+
+    struct MtlAcoustics
+    {
+        float fAbsorption[3];
+        float fScattering;
+        float fTransmission[3];
+    };
+    MtlAcoustics Acoustics{};
+    bool bHasAcousticsParams{};
 
 public:
     SGameMtl()
