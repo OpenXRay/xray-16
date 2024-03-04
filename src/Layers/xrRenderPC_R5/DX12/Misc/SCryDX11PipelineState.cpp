@@ -277,7 +277,7 @@ void SCryDX11ShaderStageState::DebugPrint()
             {
                 if (ShaderResourceViews.Get(i))
                 {
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                     DX12_LOG("  %2d: %p %p [%s, %s, %s] %s", i,
                         ShaderResourceViews.Get(i),
                         ShaderResourceViews.Get(i)->GetD3D12Resource(),
@@ -308,7 +308,7 @@ void SCryDX11ShaderStageState::DebugPrint()
             {
                 if (UnorderedAccessViews.Get(i))
                 {
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                     DX12_LOG("  %2d: %p %p [%s, %s, %s] %s", i,
                         UnorderedAccessViews.Get(i),
                         UnorderedAccessViews.Get(i)->GetD3D12Resource(),

@@ -7,10 +7,6 @@
 
 #include <SDL.h>
 
-#if USE_DX12
-#define USE_DX12_DEFERRED_CONTEXT 0
-#endif
-
 class CHW : public pureAppActivate, public pureAppDeactivate
 {
 public:
@@ -65,7 +61,7 @@ public:
     ICF ID3D11DeviceContext1* get_context(u32 context_id)
     {
         VERIFY(context_id < R__NUM_CONTEXTS);
-#if USE_DX12_DEFERRED_CONTEXT
+#if DX12_DEFERRED_CONTEXT
         return d3d_contexts_pool[context_id];
 #else
         return d3d_contexts_pool[CHW::IMM_CTX_ID];

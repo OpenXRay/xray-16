@@ -63,7 +63,7 @@ namespace DX12
 
     Resource::~Resource()
     {
-        auto refCount = m_pD3D12Resource->AddRef();
+        m_pD3D12Resource->AddRef();
         GetDevice()->ReleaseLater(m_pD3D12Resource, GetCurrentState(), GetAnnouncedState());
     }
 

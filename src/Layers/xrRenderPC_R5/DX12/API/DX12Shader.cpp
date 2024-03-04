@@ -77,7 +77,7 @@ namespace DX12
                     // Can we join new range with an existing one?
                     if (r.m_ShaderRegister + r.m_Count == shaderRegister)
                     {
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                         for (size_t j = 0; j < count; ++j)
                         {
                             r.m_Types[r.m_Count + j] = type;

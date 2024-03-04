@@ -240,7 +240,7 @@ namespace DX12
                     bindingLayout.ShaderStage = shaderStage;
                     bindingLayout.ShaderSlot = shaderRegister;
 
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                     bindingLayout.DescriptorOffset = descriptorEnd;
 #endif
 
@@ -291,7 +291,7 @@ namespace DX12
                     bindingLayout.ViewType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
                     bindingLayout.ShaderStage = shaderStage;
                     bindingLayout.ShaderSlot = shaderRegister;
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                     bindingLayout.DescriptorOffset = descriptorEnd;
 #endif
                     m_TableResources.push_back(bindingLayout);
@@ -341,7 +341,7 @@ namespace DX12
                     bindingLayout.ViewType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
                     bindingLayout.ShaderStage = shaderStage;
                     bindingLayout.ShaderSlot = shaderRegister;
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                     bindingLayout.DescriptorOffset = descriptorEnd;
 #endif
                     m_TableResources.push_back(bindingLayout);
@@ -397,7 +397,7 @@ namespace DX12
                     bindingLayout.ViewType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
                     bindingLayout.ShaderStage = shaderStage;
                     bindingLayout.ShaderSlot = shaderRegister;
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                     bindingLayout.DescriptorOffset = currentSamplers;
 #endif
                     m_Samplers.push_back(bindingLayout);

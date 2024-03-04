@@ -84,7 +84,7 @@ namespace DX12
         // this means that any constant buffer that's reflected gets placed into a root constant buffer parameter.
         u8 m_bMergeable : 1;
 
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
         u8 m_Types[56];
         u8 m_Dimensions[56];
 #endif
@@ -111,7 +111,7 @@ namespace DX12
             , m_bShared(bShared)
             , m_bMergeable(bMergeable)
         {
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
             for (u32 i = 0; i < count; ++i)
             {
                 m_Types[i] = type;

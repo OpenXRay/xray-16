@@ -29,8 +29,8 @@ public:
     DX12_OBJECT(CCryDX12SwapChain, CCryDX12GIObject<IDXGISwapChain3>);
 
     static CCryDX12SwapChain* Create(CCryDX12Device* device, IDXGIFactory4* factory, DXGI_SWAP_CHAIN_DESC* pDesc);
-    static CCryDX12SwapChain* Create(CCryDX12Device* device, IDXGIFactory4* factory, HWND hWnd, const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput);
-    static CCryDX12SwapChain* Create(CCryDX12Device* device, IDXGIFactory4* factory, IUnknown* pWindow, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput);
+    static CCryDX12SwapChain* CreateForHwnd(CCryDX12Device* device, IDXGIFactory4* factory, HWND hWnd, const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput);
+    static CCryDX12SwapChain* CreateForCoreWindow(CCryDX12Device* device, IDXGIFactory4* factory, IUnknown* pWindow, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput);
 
     virtual ~CCryDX12SwapChain();
 

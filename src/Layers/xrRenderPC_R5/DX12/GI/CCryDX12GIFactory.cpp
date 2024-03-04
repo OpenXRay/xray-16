@@ -100,7 +100,7 @@ HRESULT STDMETHODCALLTYPE CCryDX12GIFactory::CreateSwapChainForHwnd(IUnknown* pD
     IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain)
 {
     DX12_FUNC_LOG
-    *ppSwapChain = CCryDX12SwapChain::Create(static_cast<CCryDX12Device*>(pDevice), m_pDXGIFactory4, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput);
+    *ppSwapChain = CCryDX12SwapChain::CreateForHwnd(static_cast<CCryDX12Device*>(pDevice), m_pDXGIFactory4, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput);
     return ppSwapChain ? S_OK : E_FAIL;
 }
 
@@ -108,6 +108,6 @@ HRESULT STDMETHODCALLTYPE CCryDX12GIFactory::CreateSwapChainForCoreWindow(IUnkno
     const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput, IDXGISwapChain1** ppSwapChain)
 {
     DX12_FUNC_LOG
-    *ppSwapChain = CCryDX12SwapChain::Create(static_cast<CCryDX12Device*>(pDevice), m_pDXGIFactory4, pWindow, pDesc, pRestrictToOutput);
+    *ppSwapChain = CCryDX12SwapChain::CreateForCoreWindow(static_cast<CCryDX12Device*>(pDevice), m_pDXGIFactory4, pWindow, pDesc, pRestrictToOutput);
     return ppSwapChain ? S_OK : E_FAIL;
 }

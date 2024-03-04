@@ -20,7 +20,7 @@
 #ifdef WIN32
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
-#if USE_DXC
+#if DX12_USE_DXC
 #pragma comment(lib, "dxcompiler.lib")
 #endif
 #endif
@@ -61,7 +61,7 @@ HRESULT WINAPI DX12CreateDevice(
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-#if USE_DXC
+#if DX12_USE_DXC
 #include <atlconv.h>
 #include <atlcomcli.h>
 using namespace ATL;

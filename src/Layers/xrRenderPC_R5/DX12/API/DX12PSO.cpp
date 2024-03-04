@@ -25,8 +25,7 @@ namespace DX12
     }
 
     bool GraphicsPipelineState::Init(const InitParams& params)
-    {
-        
+    {     
         m_Desc = params.desc;
         m_Desc.pRootSignature = params.rootSignature->GetD3D12RootSignature();
 

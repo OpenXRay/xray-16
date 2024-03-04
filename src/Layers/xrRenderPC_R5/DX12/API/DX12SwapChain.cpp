@@ -78,7 +78,7 @@ SwapChain* SwapChain::Create(
     return nullptr;
 }
 
-SwapChain* SwapChain::Create(CommandList* commandList, IDXGIFactory4* pFactory, HWND hWnd,
+SwapChain* SwapChain::CreateForHwnd(CommandList* commandList, IDXGIFactory4* pFactory, HWND hWnd,
     const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc,
     IDXGIOutput* pRestrictToOutput)
 {
@@ -149,7 +149,7 @@ SwapChain* SwapChain::Create(CommandList* commandList, IDXGIFactory4* pFactory, 
     return nullptr;
 }
 
-SwapChain* SwapChain::Create(CommandList* commandList, IDXGIFactory4* pFactory, IUnknown* pWindow,
+SwapChain* SwapChain::CreateForCoreWindow(CommandList* commandList, IDXGIFactory4* pFactory, IUnknown* pWindow,
     const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput)
 {
     IDXGISwapChain1* dxgiSwapChain1 = NULL;
@@ -247,22 +247,26 @@ SwapChain::~SwapChain()
 
 HRESULT SwapChain::Present(u32 SyncInterval, u32 Flags, const DXGI_PRESENT_PARAMETERS* pPresentParameters)
 {
-    DWORD result = STATUS_WAIT_0;
+    HRESULT result = STATUS_WAIT_0;
 
 #ifdef __dxgi1_3_h__
     if (m_Desc.Flags & DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT)
     {
         // Check if the swapchain is ready to accept another frame
         HANDLE frameLatencyWaitableObject = m_NativeSwapChain->GetFrameLatencyWaitableObject();
-        result = WaitForSingleObjectEx(frameLatencyWaitableObject, 0, TRUE);
+        result = WaitForSingleObjectEx(frameLatencyWaitableObject, INFINITE, TRUE);
     }
-
+#endif
+#ifdef __dxgi1_5_h__
     if (m_Desc.Windowed && (m_Desc.Flags & DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING) && !(Flags & DXGI_PRESENT_TEST))
     {
         Flags |= DXGI_PRESENT_ALLOW_TEARING;
         SyncInterval = 0;
     }
 #endif
+
+    m_AsyncQueue.Flush();
+
     if (result == WAIT_OBJECT_0)
     {
         if (pPresentParameters != NULL)
@@ -274,6 +278,11 @@ HRESULT SwapChain::Present(u32 SyncInterval, u32 Flags, const DXGI_PRESENT_PARAM
     }
 
     return result;
+}
+
+HANDLE SwapChain::GetFrameLatencyWaitableObject() 
+{
+    return m_NativeSwapChain->GetFrameLatencyWaitableObject(); 
 }
 
 HRESULT SwapChain::ResizeTarget(const DXGI_MODE_DESC* pNewTargetParameters)
@@ -292,7 +301,7 @@ HRESULT SwapChain::ResizeBuffers(UINT BufferCount, UINT Width, UINT Height, DXGI
     m_Desc.BufferDesc.Width = Width ? Width : m_Desc.BufferDesc.Width;
     m_Desc.BufferDesc.Height = Height ? Height : m_Desc.BufferDesc.Height;
     m_Desc.BufferDesc.Format = NewFormat != DXGI_FORMAT_UNKNOWN ? NewFormat : m_Desc.BufferDesc.Format;
-#ifdef __dxgi1_3_h__
+#ifdef __dxgi1_5_h__
     m_Desc.Flags =
         (m_Desc.Flags & DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING) | (SwapChainFlags & ~DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 #endif

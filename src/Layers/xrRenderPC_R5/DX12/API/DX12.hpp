@@ -12,19 +12,10 @@
 // Original file Copyright Crytek GMBH or its affiliates, used under license.
 #pragma once
 
-#include <d3d11.h>
-#include <d3d11_1.h>
-#include <dxgi1_2.h>
-
-#include <d3d12.h>
-//#include <d3dx12.h>
-#include <dxgi1_4.h>
-
-#include "DX12/Includes/d3dx12.h"
-
 #include "DX12/Includes/concqueue.hpp"
 #include "DX12/Includes/critical_section.h"
 #include "DX12/Includes/crc32.h"
+#include "DX12/Includes/d3dx12.h"
 #include "DX12/Includes/fasthash.inl"
 #include "DX12/Includes/smartptr.h"
 #include "DX12/Includes/range.h"
@@ -32,28 +23,18 @@
 
 #include <atomic>
 
-extern int g_nPrintDX12;
-
-namespace RendererDX12
-{
-#if DEBUG
-    const int CV_r_EnableDebugLayer = 2;
-#else 
-    const int CV_r_EnableDebugLayer = 0;
-#endif
-}; // namespace RendererDX12
-
-#define DX12_NOT_IMPLEMENTED R_ASSERT2(0, "Not implemented!");
-
 #ifdef DEBUG
-#define GFX_DEBUG
-#endif
-
-#ifdef GFX_DEBUG
+#define DX12_ENABLE_DEBUG_LAYER 2 // Recommend 2
+#define DX12_DEBUG_BARRIER 0 // Recommend 1
+#define DX12_GFX_DEBUG
 #define DX12_STATS
 #endif
 
+#define DX12_USE_DXC 0 // Shader model 6.0 or 5.1
+#define DX12_DEFERRED_CONTEXT 0 // Recommend 0
+
 #ifndef NDEBUG
+extern int g_nPrintDX12;
 
 #define DX12_FUNC_LOG do {                              \
         if (g_nPrintDX12)                               \
@@ -74,6 +55,8 @@ if (g_nPrintDX12)           \
 #define DX12_ERROR(...) do { } while (0)
 #define DX12_ASSERT(cond, ...) 
 #endif
+
+#define DX12_NOT_IMPLEMENTED R_ASSERT2(0, "Not implemented!");
 
 #ifndef DX12_ARRAY_SIZE
 /// Return an array size for static arrays.

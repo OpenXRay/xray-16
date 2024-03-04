@@ -24,7 +24,7 @@ namespace DX12
         D3D12_DESCRIPTOR_RANGE_TYPE ViewType;
         EShaderStage ShaderStage;
         uint8_t ShaderSlot;
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
         uint8_t DescriptorOffset;
 #endif // !NDEBUG
     };

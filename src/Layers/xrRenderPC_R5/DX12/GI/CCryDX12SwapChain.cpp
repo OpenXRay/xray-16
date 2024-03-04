@@ -39,20 +39,20 @@ CCryDX12SwapChain* CCryDX12SwapChain::Create(
     return DX12::PassAddRef(new CCryDX12SwapChain(device, swapChain));
 }
 
-CCryDX12SwapChain* CCryDX12SwapChain::Create(
+CCryDX12SwapChain* CCryDX12SwapChain::CreateForHwnd(
     CCryDX12Device* device, IDXGIFactory4* factory, HWND hWnd, const DXGI_SWAP_CHAIN_DESC1* pDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* pFullscreenDesc, IDXGIOutput* pRestrictToOutput)
 {
     CCryDX12DeviceContext* deviceContext = device->GetDeviceContext();
-    DX12::SwapChain* swapChain = DX12::SwapChain::Create(deviceContext->GetCoreGraphicsCommandList(), factory, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput);
+    DX12::SwapChain* swapChain = DX12::SwapChain::CreateForHwnd(deviceContext->GetCoreGraphicsCommandList(), factory, hWnd, pDesc, pFullscreenDesc, pRestrictToOutput);
 
     return DX12::PassAddRef(new CCryDX12SwapChain(device, swapChain));
 }
 
-CCryDX12SwapChain* CCryDX12SwapChain::Create(
+CCryDX12SwapChain* CCryDX12SwapChain::CreateForCoreWindow(
     CCryDX12Device* device, IDXGIFactory4* factory, IUnknown* pWindow, const DXGI_SWAP_CHAIN_DESC1* pDesc, IDXGIOutput* pRestrictToOutput)
 {
     CCryDX12DeviceContext* deviceContext = device->GetDeviceContext();
-    DX12::SwapChain* swapChain = DX12::SwapChain::Create(deviceContext->GetCoreGraphicsCommandList(), factory, pWindow, pDesc, pRestrictToOutput);
+    DX12::SwapChain* swapChain = DX12::SwapChain::CreateForCoreWindow(deviceContext->GetCoreGraphicsCommandList(), factory, pWindow, pDesc, pRestrictToOutput);
 
     return DX12::PassAddRef(new CCryDX12SwapChain(device, swapChain));
 }
@@ -158,7 +158,6 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::GetBuffer(
 HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::SetFullscreenState(BOOL Fullscreen, _In_opt_ IDXGIOutput* pTarget)
 {
     DX12_FUNC_LOG
-    m_Device->GetDeviceContext()->SubmitAllCommands(true);
     return m_SwapChain->SetFullscreenState(Fullscreen, pTarget);
 }
 
@@ -197,12 +196,12 @@ HRESULT STDMETHODCALLTYPE CCryDX12SwapChain::ResizeBuffers(
     m_Device->GetDX12Device()->FlushReleaseHeap(DX12::Device::ResourceReleasePolicy::Immediate);
 
     // Buffers created using ResizeBuffers1 with a non-null pCreationNodeMask array are visible to all nodes.
-    std::vector<UINT> createNodeMasks(m_BackBuffers.size(), 0x1);
+    std::vector<UINT> createNodeMasks(BufferCount, 0x1);
     std::vector<IUnknown*> presentCommandQueues(
-        m_BackBuffers.size(), m_Device->GetDeviceContext()->GetCoreGraphicsCommandList()->GetD3D12CommandQueue());
+        BufferCount, m_Device->GetDeviceContext()->GetCoreGraphicsCommandList()->GetD3D12CommandQueue());
 
     HRESULT res = m_SwapChain->ResizeBuffers(
-        BufferCount, Width, Height, NewFormat, SwapChainFlags, &createNodeMasks[0], &presentCommandQueues[0]);
+        BufferCount, Width, Height, NewFormat, SwapChainFlags, createNodeMasks.data(), presentCommandQueues.data());
 
     if (res == S_OK)
     {

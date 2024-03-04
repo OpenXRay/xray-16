@@ -172,7 +172,7 @@ CCryDX12Texture3D* CCryDX12Texture3D::Create(CCryDX12Device* pDevice, const FLOA
     auto result = DX12::PassAddRef(new CCryDX12Texture3D(pDevice, *pDesc, resource, resourceUsage, CD3DX12_RESOURCE_DESC(resource->GetDesc()), pInitialData, desc12.MipLevels));
     resource->Release();
 
-#if !defined(RELEASE) || defined(GFX_DEBUG)
+#if !defined(RELEASE) || defined(DX12_GFX_DEBUG)
     resource->SetPrivateData(WKPDID_D3DDebugClearValue, sizeof(clearValue), &clearValue);
 #endif
 

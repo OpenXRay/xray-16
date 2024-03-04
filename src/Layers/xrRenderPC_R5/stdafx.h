@@ -13,14 +13,16 @@
 #ifdef _DEBUG
 #define D3D_DEBUG_INFO
 #endif
-#include <D3D9.h>
+#include <d3d9.h>
 
-#include <D3D11.h>
-#include <D3DCompiler.h>
+#include <d3d11.h>
+#include <d3d11_1.h>
+#include <d3d12.h>
+#include <d3dcompiler.h>
 
 #if __has_include(<dxgi1_3.h>)
-#include <dxgi1_4.h>
-#define HAS_DXGI1_4
+#include <dxgi1_3.h>
+#define HAS_DXGI1_3
 #endif
 
 #if __has_include(<dxgi1_4.h>)
@@ -33,19 +35,7 @@
 #define HAS_DXGI1_5
 #endif
 
-#if __has_include(<d3d11_2.h>)
-#include <d3d11_2.h>
-#define HAS_DX11_2
-#endif
-
-#if __has_include(<d3d11_3.h>)
-#include <d3d11_3.h>
-#define HAS_DX11_3
-#endif
-
-#if defined(USE_DX12)
 #include "DX12/CryDX12.hpp"
-#endif
 
 #include "Layers/xrRenderDX11/CommonTypes.h"
 

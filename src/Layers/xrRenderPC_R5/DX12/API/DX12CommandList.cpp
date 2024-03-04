@@ -17,12 +17,6 @@
 #include "DX12/Device/CCryDX12DeviceContext.hpp"
 #include "DX12/GI/CCryDX12SwapChain.hpp"
 
-#if DEBUG 
-#define DEBUG_BARRIER 1
-#else 
-#define DEBUG_BARRIER 0
-#endif
-
 namespace DX12
 {
     const char* StateToString(D3D12_RESOURCE_STATES state)
@@ -202,7 +196,7 @@ namespace DX12
 #if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
                 ID3D12GraphicsCommandList1* pCmdList1 = nullptr;
                 pCmdList->QueryInterface(__uuidof(ID3D12GraphicsCommandList1), (void**)&pCmdList1);
-                if (m_CommandList1 = pCmdList1)
+                if (m_CommandList1 == pCmdList1)
                     pCmdList1->Release();
 
                 D3D12_FEATURE_DATA_D3D12_OPTIONS2 Options2;
@@ -214,7 +208,7 @@ namespace DX12
 #if NTDDI_WIN10_RS3 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS3)
                 ID3D12GraphicsCommandList2* pCmdList2 = nullptr;
                 pCmdList->QueryInterface(__uuidof(ID3D12GraphicsCommandList2), (void**)&pCmdList2);
-                if (m_CommandList2 = pCmdList2)
+                if (m_CommandList2 == pCmdList2)
                     pCmdList2->Release();
 #endif
             }
@@ -1050,7 +1044,7 @@ namespace DX12
         if (stateInitial != finalState && stateAnnounced != finalState)
         {
             m_Commands += CLCOUNT_BARRIER;
-#if DEBUG_BARRIER
+#if DX12_DEBUG_BARRIER
             Msg("QueueTransitionBarrierBegin: Split Barrier BEGIN %p %s -> %s", resource.GetD3D12Resource(), StateToString(stateInitial), StateToString(finalState));
 #endif // DEBUG
             D3D12_RESOURCE_TRANSITION_BARRIER transition;
@@ -1083,7 +1077,7 @@ namespace DX12
         if (announcedState != static_cast<D3D12_RESOURCE_STATES>(-1))
         {
             m_Commands += CLCOUNT_BARRIER;
-#if DEBUG_BARRIER
+#if DX12_DEBUG_BARRIER
             Msg("QueueTransitionBarrier: Split END %p %s -> %s", resource.GetD3D12Resource(), StateToString(currentState), StateToString(announcedState));
 #endif
             D3D12_RESOURCE_TRANSITION_BARRIER transition;
@@ -1102,7 +1096,7 @@ namespace DX12
         // Now check if we still need to transition to final state.
         if (currentState != finalState)
         {
-#if DEBUG_BARRIER
+#if DX12_DEBUG_BARRIER
             Msg("QueueTransitionBarrier: Transition %p %s -> %s", resource.GetD3D12Resource(), StateToString(currentState), StateToString(finalState));
 #endif
             m_Commands += CLCOUNT_BARRIER;
@@ -1190,8 +1184,6 @@ namespace DX12
 
             m_pCmdQueue = pCmdQueue;
             pCmdQueue->Release();
-
-            //EBUS_EVENT(Debug::EventTraceDrillerSetupBus, SetThreadName, EventTrace::GpuDetailThreadId, EventTrace::GpuDetailName);
         }
 
         m_AsyncCommandQueue.Init(this);

@@ -18,183 +18,187 @@
 
 namespace DX12
 {
-    void AsyncCommandQueue::SExecuteCommandlist::Process(const STaskArgs& args)
+void AsyncCommandQueue::SExecuteCommandlist::Process(const STaskArgs& args)
+{
+    args.pCommandListPool->GetD3D12CommandQueue()->ExecuteCommandLists(1, &pCommandList);
+}
+
+void AsyncCommandQueue::SResetCommandlist::Process(const STaskArgs& args)
+{
+    pCommandList->Reset();
+}
+
+void AsyncCommandQueue::SSignalFence::Process(const STaskArgs& args)
+{
+    args.pCommandListPool->GetD3D12CommandQueue()->Signal(pFence, FenceValue);
+    args.pCommandListPool->SetSignalledFenceValue(FenceValue);
+}
+
+void AsyncCommandQueue::SWaitForFence::Process(const STaskArgs& args)
+{
+    args.pCommandListPool->GetD3D12CommandQueue()->Wait(pFence, FenceValue);
+}
+
+void AsyncCommandQueue::SWaitForFences::Process(const STaskArgs& args)
+{
+    if (FenceValues[CMDQUEUE_COPY])
     {
-        args.pCommandListPool->GetD3D12CommandQueue()->ExecuteCommandLists(1, &pCommandList);
+        args.pCommandListPool->GetD3D12CommandQueue()->Wait(pFences[CMDQUEUE_COPY], FenceValues[CMDQUEUE_COPY]);
     }
-
-    void AsyncCommandQueue::SResetCommandlist::Process(const STaskArgs& args)
+    
+    if (FenceValues[CMDQUEUE_GRAPHICS])
     {
-        pCommandList->Reset();
+        args.pCommandListPool->GetD3D12CommandQueue()->Wait(pFences[CMDQUEUE_GRAPHICS], FenceValues[CMDQUEUE_GRAPHICS]);
     }
+}
 
-    void AsyncCommandQueue::SSignalFence::Process(const STaskArgs& args)
-    {
-        args.pCommandListPool->GetD3D12CommandQueue()->Signal(pFence, FenceValue);
-        args.pCommandListPool->SetSignalledFenceValue(FenceValue);
-    }
+AsyncCommandQueue::AsyncCommandQueue() 
+    : m_pCmdListPool(NULL)
+    , m_QueuedFramesCounter(0)
+    , m_bStopRequested(false) 
+{
+    m_Semaphore = (void*)CreateSemaphore(NULL, 0, INT_MAX, NULL);
+}
 
-    void AsyncCommandQueue::SWaitForFence::Process(const STaskArgs& args)
-    {
-        args.pCommandListPool->GetD3D12CommandQueue()-> Wait(pFence, FenceValue);
-    }
+AsyncCommandQueue::~AsyncCommandQueue()
+{
+    SignalStop();
+    Flush();
 
-    void AsyncCommandQueue::SWaitForFences::Process(const STaskArgs& args)
-    {
-        if (FenceValues[CMDQUEUE_COPY    ])
-        {
-            args.pCommandListPool->GetD3D12CommandQueue()->Wait(pFences[CMDQUEUE_COPY], FenceValues[CMDQUEUE_COPY]);
-        }
-      
-        if (FenceValues[CMDQUEUE_GRAPHICS])
-        {
-           args.pCommandListPool->GetD3D12CommandQueue()->Wait(pFences[CMDQUEUE_GRAPHICS], FenceValues[CMDQUEUE_GRAPHICS]);
-        }
-    }
+    CloseHandle((HANDLE)m_Semaphore);
+}
 
-    AsyncCommandQueue::AsyncCommandQueue()
-        : m_pCmdListPool(NULL)
-        , m_QueuedFramesCounter(0)
-        , m_bStopRequested(false)
-        , m_bSleeping(false)
-        , m_TaskEvent(INT_MAX, 0)
-    {
-    }
+bool AsyncCommandQueue::IsSynchronous()
+{
+    return ps_r2_ls_flags_ext.test(R5FLAGEXT_SUBMISSION_THREAD);
+}
 
-    AsyncCommandQueue::~AsyncCommandQueue()
-    {
-        SignalStop();
-        Flush();
-        m_TaskEvent.Release();
+bool AsyncCommandQueue::Init(CommandListPool* pCommandListPool)
+{
+    m_pCmdListPool = pCommandListPool;
+    m_QueuedFramesCounter = 0;
+    m_QueuedTasksCounter = 0;
+    m_bStopRequested = false;
 
-        m_pCmdListPool = nullptr;
-    }
+    return Threading::SpawnThread(
+        [](void* this_ptr) {
+            AsyncCommandQueue& self = *static_cast<AsyncCommandQueue*>(this_ptr);
+            self.ThreadEntry();
+        },
+        "DX12 AsyncCommandQueue", 0, this
+    );
+}
 
-    bool AsyncCommandQueue::IsSynchronous()
-    {
-        return ps_r2_ls_flags_ext.test(R5FLAGEXT_SUBMISSION_THREAD);
-    }
-
-    void AsyncCommandQueue::Init(CommandListPool* pCommandListPool)
-    {
-        m_pCmdListPool = pCommandListPool;
-        m_QueuedFramesCounter = 0;
-        m_bStopRequested = false;
-        m_bSleeping = true;
-
-        Threading::SpawnThread(
-            [](void* this_ptr) {
-                AsyncCommandQueue& self = *static_cast<AsyncCommandQueue*>(this_ptr);
-                self.ThreadEntry();
-            },
-            "DX12 AsyncCommandQueue", 0, this
-        );
-    }
-
-    void AsyncCommandQueue::ExecuteCommandLists(UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists)
-    {
-        for (int i = 0; i < NumCommandLists; ++i)
-        {
-            SSubmissionTask task;
-            ZeroMemory(&task, sizeof(SSubmissionTask));
-
-            task.type = eTT_ExecuteCommandList;
-            task.Data.ExecuteCommandList.pCommandList = ppCommandLists[i];
-
-            AddTask<SExecuteCommandlist>(task);
-        }
-    }
-
-    void AsyncCommandQueue::ResetCommandList(CommandList* pCommandList)
+void AsyncCommandQueue::ExecuteCommandLists(UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists)
+{
+    for (int i = 0; i < NumCommandLists; ++i)
     {
         SSubmissionTask task;
         ZeroMemory(&task, sizeof(SSubmissionTask));
 
-        task.type = eTT_ResetCommandList;
-        task.Data.ResetCommandList.pCommandList = pCommandList;
+        task.type = eTT_ExecuteCommandList;
+        task.Data.ExecuteCommandList.pCommandList = ppCommandLists[i];
 
-        AddTask<SResetCommandlist>(task);
+        AddTask<SExecuteCommandlist>(task);
     }
+}
 
-    void AsyncCommandQueue::Signal(ID3D12Fence* pFence, const UINT64 FenceValue)
+void AsyncCommandQueue::ResetCommandList(CommandList* pCommandList)
+{
+    SSubmissionTask task;
+    ZeroMemory(&task, sizeof(SSubmissionTask));
+
+    task.type = eTT_ResetCommandList;
+    task.Data.ResetCommandList.pCommandList = pCommandList;
+
+    AddTask<SResetCommandlist>(task);
+}
+
+void AsyncCommandQueue::Signal(ID3D12Fence* pFence, const UINT64 FenceValue)
+{
+    SSubmissionTask task;
+    ZeroMemory(&task, sizeof(SSubmissionTask));
+
+    task.type = eTT_SignalFence;
+    task.Data.SignalFence.pFence = pFence;
+    task.Data.SignalFence.FenceValue = FenceValue;
+
+    AddTask<SSignalFence>(task);
+}
+
+void AsyncCommandQueue::Wait(ID3D12Fence* pFence, const UINT64 FenceValue)
+{
+    SSubmissionTask task;
+    ZeroMemory(&task, sizeof(SSubmissionTask));
+
+    task.type = eTT_WaitForFence;
+    task.Data.WaitForFence.pFence = pFence;
+    task.Data.WaitForFence.FenceValue = FenceValue;
+
+    AddTask<SWaitForFence>(task);
+}
+
+void AsyncCommandQueue::Wait(ID3D12Fence** pFences, const UINT64 (&FenceValues)[CMDQUEUE_NUM])
+{
+    SSubmissionTask task;
+    ZeroMemory(&task, sizeof(SSubmissionTask));
+
+    task.type = eTT_WaitForFences;
+    task.Data.WaitForFences.pFences = pFences;
+    task.Data.WaitForFences.FenceValues[CMDQUEUE_COPY] = FenceValues[CMDQUEUE_COPY];
+    task.Data.WaitForFences.FenceValues[CMDQUEUE_GRAPHICS] = FenceValues[CMDQUEUE_GRAPHICS];
+
+    AddTask<SWaitForFences>(task);
+}
+
+void AsyncCommandQueue::Flush(UINT64 lowerBoundFenceValue)
+{
+    if (lowerBoundFenceValue != (~0ULL))
     {
-        SSubmissionTask task;
-        ZeroMemory(&task, sizeof(SSubmissionTask));
-
-        task.type = eTT_SignalFence;
-        task.Data.SignalFence.pFence = pFence;
-        task.Data.SignalFence.FenceValue = FenceValue;
-
-        AddTask<SSignalFence>(task);
-    }
-
-    void AsyncCommandQueue::Wait(ID3D12Fence* pFence, const UINT64 FenceValue)
-    {
-        SSubmissionTask task;
-        ZeroMemory(&task, sizeof(SSubmissionTask));
-
-        task.type = eTT_WaitForFence;
-        task.Data.WaitForFence.pFence = pFence;
-        task.Data.WaitForFence.FenceValue = FenceValue;
-
-        AddTask<SWaitForFence>(task);
-    }
-
-    void AsyncCommandQueue::Wait(ID3D12Fence** pFences, const UINT64 (&FenceValues)[CMDQUEUE_NUM])
-    {
-        SSubmissionTask task;
-        ZeroMemory(&task, sizeof(SSubmissionTask));
-
-        task.type = eTT_WaitForFences;
-        task.Data.WaitForFences.pFences = pFences;
-        task.Data.WaitForFences.FenceValues[CMDQUEUE_COPY    ] = FenceValues[CMDQUEUE_COPY    ];
-        task.Data.WaitForFences.FenceValues[CMDQUEUE_GRAPHICS] = FenceValues[CMDQUEUE_GRAPHICS];
-
-        AddTask<SWaitForFences>(task);
-    }
-
-    void AsyncCommandQueue::Flush(UINT64 lowerBoundFenceValue)
-    {       
-        if (lowerBoundFenceValue != (~0ULL))
+        while (m_QueuedTasksCounter > 0)
         {
-            while (lowerBoundFenceValue > m_pCmdListPool->GetSignalledFenceValue())
+            if (lowerBoundFenceValue <= m_pCmdListPool->GetLastCompletedFenceValue())
             {
-                SwitchToThread();
+                break;
+            }
+
+            SwitchToThread();
+        }
+    }
+    else
+    {
+        while (m_QueuedTasksCounter > 0)
+        {
+            SwitchToThread();
+        }
+    }
+}
+
+void AsyncCommandQueue::ThreadEntry()
+{
+    while (!m_bStopRequested)
+    {
+        SSubmissionTask task;
+
+        // if the count would have been 0 or below, go to kernel semaphore
+        if (InterlockedDecrement((volatile LONG*)&m_QueuedTasksCounter) < 0)
+        {
+            WaitForSingleObject((HANDLE)m_Semaphore, INFINITE);
+        }
+
+        STaskArgs taskArgs = {m_pCmdListPool, &m_QueuedFramesCounter};
+
+        while (m_TaskQueue.dequeue(task))
+        {
+            switch (task.type)
+            {
+            case eTT_ExecuteCommandList: task.Process<SExecuteCommandlist>(taskArgs); break;
+            case eTT_ResetCommandList: task.Process<SResetCommandlist>(taskArgs); break;
+            case eTT_SignalFence: task.Process<SSignalFence>(taskArgs); break;
+            case eTT_WaitForFence: task.Process<SWaitForFence>(taskArgs); break;
+            case eTT_WaitForFences: task.Process<SWaitForFences>(taskArgs); break;
             }
         }
-        else
-        {
-            while (!m_bSleeping)
-            {
-                SwitchToThread();
-            }
-        }
     }
-
-    AsyncCommandQueue::STaskArgs AsyncCommandQueue::GetTaskArg()
-    {
-        return {m_pCmdListPool, &m_QueuedFramesCounter};
-    }
-
-    void AsyncCommandQueue::ThreadEntry()
-    {
-        SSubmissionTask task;
-
-        while (!m_bStopRequested)
-        {
-            m_TaskEvent.Acquire();
-
-            while (m_TaskQueue.dequeue(task))
-            {
-                switch (task.type)
-                {
-                case eTT_ExecuteCommandList: task.Process<SExecuteCommandlist>(GetTaskArg()); break;
-                case eTT_ResetCommandList: task.Process<SResetCommandlist>(GetTaskArg()); break;
-                case eTT_SignalFence: task.Process<SSignalFence>(GetTaskArg()); break;
-                case eTT_WaitForFence: task.Process<SWaitForFence>(GetTaskArg()); break;
-                case eTT_WaitForFences: task.Process<SWaitForFences>(GetTaskArg()); break;
-                }              
-            };
-        }
-    }
+}
 }

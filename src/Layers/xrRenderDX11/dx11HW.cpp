@@ -244,7 +244,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
     {
 #if defined(USE_DX12)
-#if USE_DX12_DEFERRED_CONTEXT
+#if DX12_DEFERRED_CONTEXT
         R = pDevice->CreateDeferredContext1(0, &d3d_contexts_pool[id]);
 #endif
 #else
@@ -354,20 +354,20 @@ bool CHW::CreateSwapChain(HWND hwnd)
     sd.Windowed = TRUE;
 
     //  Additional set up
-#if defined(USE_DX12)
-    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
-#else 
+//#if defined(USE_DX12)
+//    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+//#else 
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-#endif 
+//#endif 
 
 #if defined(USE_DX11)
     const auto hr = m_pFactory->CreateSwapChain(pDevice, &sd, &m_pSwapChain);
 #else 
-    const auto hr = m_pFactory->CreateSwapChain(pDevice, &sd, reinterpret_cast<IDXGISwapChain**>(& m_pSwapChain));
+    const auto hr = m_pFactory->CreateSwapChain(pDevice, &sd, reinterpret_cast<IDXGISwapChain**>(&m_pSwapChain));
 #endif 
 
 #if defined(USE_DX12)
-    m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
+    //m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
 #endif
 
     return SUCCEEDED(hr);
@@ -484,18 +484,13 @@ bool CHW::CreateSwapChainOnDX12(HWND hwnd)
     // desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // XXX: tearing glitches with flip presentation model
     desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-    // DXGI_SCALING_NONE is supported starting with Windows 8
-    desc.Scaling = DXGI_SCALING_STRETCH;
-#endif
-
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC fulldesc;
     ZeroMemory(&fulldesc, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
 
     fulldesc.Windowed = TRUE;
 
     // Additional setup
-    desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+    desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     const HRESULT result = m_pFactory->CreateSwapChainForHwnd(
         pDevice, hwnd, &desc, fulldesc.Windowed ? nullptr : &fulldesc, nullptr, reinterpret_cast<IDXGISwapChain1**>(&m_pSwapChain));

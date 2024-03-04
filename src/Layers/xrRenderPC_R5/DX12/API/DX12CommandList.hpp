@@ -80,14 +80,14 @@ namespace DX12
             return m_nPoolFenceId;
         }
 
-        inline void SetSignalledFenceValue(const UINT64 fenceValue)
+        inline void SetSignalledFenceValue(const UINT64 fenceValue) 
         {
             return m_rCmdFences.SetSignalledValue(fenceValue, m_nPoolFenceId);
         }
 
         inline UINT64 GetSignalledFenceValue() 
-        { 
-            return m_rCmdFences.GetSignalledValue(m_nPoolFenceId);
+        {
+            return m_rCmdFences.GetSignalledValue(m_nPoolFenceId); 
         }
 
         inline void SetSubmittedFenceValue(const UINT64 fenceValue)
@@ -162,8 +162,7 @@ namespace DX12
         }
 
         inline void WaitForFenceOnCPU(const std::atomic<u64> (&fenceValues)[CMDQUEUE_NUM]) const
-        {
-            
+        {     
             UINT64 fenceValuesCopied[CMDQUEUE_NUM];
 
             fenceValuesCopied[CMDQUEUE_COPY    ] = fenceValues[CMDQUEUE_COPY    ];

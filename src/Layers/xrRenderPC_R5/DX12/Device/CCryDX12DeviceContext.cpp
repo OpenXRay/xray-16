@@ -136,13 +136,13 @@ CCryDX12DeviceContext::CCryDX12DeviceContext(CCryDX12Device* pDevice, bool isDef
     m_TimestampMapValid = false;
     m_OcclusionMapValid = false;
 
-    m_CmdFenceSet.Init();
-
     m_DirectListPool.Init();
     m_CopyListPool.Init(D3D12_COMMAND_LIST_TYPE_COPY);
 
     m_DirectListPool.AcquireCommandList(m_DirectCommandList);
     m_CopyListPool.AcquireCommandList(m_CopyCommandList);
+
+    m_CmdFenceSet.Init();
 
     m_DirectCommandList->Begin();
     m_DirectCommandList->SetResourceAndSamplerStateHeaps();
@@ -415,7 +415,7 @@ void CCryDX12DeviceContext::BindResources(DX12::CommandMode commandMode)
             {
                 CCryDX12Buffer* buffer = stage.ConstantBufferViews.Get(resourceBinding.ShaderSlot);
                 _range_t<UINT> bindRange = stage.ConstBufferBindRange.Get(resourceBinding.ShaderSlot);
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                 DX12_ASSERT(resourceDescriptorOffset == resourceBinding.DescriptorOffset, "ConstantBuffer offset has shifted: resource mapping invalid!");
 #endif
                 m_DirectCommandList->WriteConstantBufferDescriptor(buffer ? &buffer->GetDX12View() : nullptr, resourceDescriptorOffset++, bindRange.start, bindRange.Length());
@@ -424,7 +424,7 @@ void CCryDX12DeviceContext::BindResources(DX12::CommandMode commandMode)
             case D3D12_DESCRIPTOR_RANGE_TYPE_SRV:
             {
                 CCryDX12ShaderResourceView* resource = stage.ShaderResourceViews.Get(resourceBinding.ShaderSlot);
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                 DX12_ASSERT(resourceDescriptorOffset == resourceBinding.DescriptorOffset, "ShaderResourceView offset has shifted: resource mapping invalid!");
 #endif
                 m_DirectCommandList->WriteShaderResourceDescriptor(resource ? &resource->GetDX12View() : nullptr, resourceDescriptorOffset++);
@@ -433,7 +433,7 @@ void CCryDX12DeviceContext::BindResources(DX12::CommandMode commandMode)
             case D3D12_DESCRIPTOR_RANGE_TYPE_UAV:
             {
                 CCryDX12UnorderedAccessView* resource = stage.UnorderedAccessViews.Get(resourceBinding.ShaderSlot);
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                 DX12_ASSERT(resourceDescriptorOffset == resourceBinding.DescriptorOffset, "UnorderedAccessView offset has shifted: resource mapping invalid!");
 #endif
                 m_DirectCommandList->WriteUnorderedAccessDescriptor(resource ? &resource->GetDX12View() : nullptr, resourceDescriptorOffset++);
@@ -449,7 +449,7 @@ void CCryDX12DeviceContext::BindResources(DX12::CommandMode commandMode)
                 auto& stage = state.Stages[constantBufferBinding.ShaderStage];
 
                 CCryDX12Buffer* buffer = stage.ConstantBufferViews.Get(constantBufferBinding.ShaderSlot);
-                _range_t<UINT> bindRange = stage.ConstBufferBindRange.Get(constantBufferBinding.ShaderSlot);
+                const _range_t<UINT> &bindRange = stage.ConstBufferBindRange.Get(constantBufferBinding.ShaderSlot);
 
                 D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = { 0ull };
                 if (buffer)
@@ -470,7 +470,7 @@ void CCryDX12DeviceContext::BindResources(DX12::CommandMode commandMode)
             DX12_ASSERT(samplerBinding.ViewType == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, "");
             {
                 CCryDX12SamplerState* sampler = state.Stages[i].SamplerState.Get(samplerBinding.ShaderSlot);
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
                 DX12_ASSERT(samplerDescriptorOffset == samplerBinding.DescriptorOffset, "Sampler offset has shifted: resource mapping invalid!");
 #endif
                 m_DirectCommandList->WriteSamplerStateDescriptor(sampler ? &sampler->GetDX12SamplerState() : nullptr, samplerDescriptorOffset++);
@@ -548,7 +548,7 @@ void CCryDX12DeviceContext::DebugPrintResources(DX12::CommandMode commandMode)
         {
             CCryDX12Buffer* buffer = state.Stages[i].ConstantBufferViews.Get(resourceBinding.ShaderSlot);
             auto bindRange = state.Stages[i].ConstBufferBindRange.Get(resourceBinding.ShaderSlot);
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
             R_ASSERT2(buffer, "ConstantBuffer is required by the PSO but has not been set!");
             R_ASSERT2(resourceDescriptorOffset == resourceBinding.DescriptorOffset, "ConstantBuffer offset has shifted: resource mapping invalid!");
 #endif
@@ -567,7 +567,7 @@ void CCryDX12DeviceContext::DebugPrintResources(DX12::CommandMode commandMode)
         else if (resourceBinding.ViewType == D3D12_DESCRIPTOR_RANGE_TYPE_SRV)
         {
             CCryDX12ShaderResourceView* resource = state.Stages[i].ShaderResourceViews.Get(resourceBinding.ShaderSlot);
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
             R_ASSERT2(resource, "ShaderResourceView is required by the PSO but has not been set!");
             R_ASSERT2(resourceDescriptorOffset == resourceBinding.DescriptorOffset, "ShaderResourceView offset has shifted: resource mapping invalid!");
 #endif
@@ -586,7 +586,7 @@ void CCryDX12DeviceContext::DebugPrintResources(DX12::CommandMode commandMode)
         else if (resourceBinding.ViewType == D3D12_DESCRIPTOR_RANGE_TYPE_UAV)
         {
             CCryDX12UnorderedAccessView* resource = state.Stages[i].UnorderedAccessViews.Get(resourceBinding.ShaderSlot);
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
             R_ASSERT2(resource, "UnorderedAccessView is required by the PSO but has not been set!");
             R_ASSERT2(resourceDescriptorOffset == resourceBinding.DescriptorOffset, "UnorderedAccessView offset has shifted: resource mapping invalid!");
 #endif
@@ -611,7 +611,7 @@ void CCryDX12DeviceContext::DebugPrintResources(DX12::CommandMode commandMode)
         R_ASSERT2(samplerBinding.ViewType == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, "");
         {
             CCryDX12SamplerState* sampler = state.Stages[i].SamplerState.Get(samplerBinding.ShaderSlot);
-#ifdef GFX_DEBUG
+#ifdef DX12_GFX_DEBUG
             R_ASSERT2(sampler, "Sampler is required by the PSO but has not been set!");
             R_ASSERT2(samplerDescriptorOffset == samplerBinding.DescriptorOffset, "Sampler offset has shifted: resource mapping invalid!");
 #endif

@@ -24,31 +24,28 @@ namespace DX12
     {
         ID3D12Device* pDevice12 = NULL;
 
-#if USE_DXC
+#if DX12_USE_DXC
         HRESULT res = D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr);
         DX12_ASSERT(res == S_OK, "Enabling experimental features for D3D12 Device didn't work!");
 #endif
 
-	if (RendererDX12::CV_r_EnableDebugLayer)
+#if DX12_ENABLE_DEBUG_LAYER > 0
+        ID3D12Debug* debugInterface = nullptr;
+        if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
         {
-            ID3D12Debug* debugInterface = nullptr;
-            if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
+            debugInterface->EnableDebugLayer();
+#if DX12_ENABLE_DEBUG_LAYER > 1
+            // Enable DX12 GBV as well
+            ID3D12Debug1* spDebugController1;
+            if (SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&spDebugController1))))
             {
-                debugInterface->EnableDebugLayer();
-
-                if (RendererDX12::CV_r_EnableDebugLayer == 2)
-                {
-                    // Enable DX12 GBV as well
-                    ID3D12Debug1* spDebugController1;
-                    if (SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&spDebugController1))))
-                    {
-                        spDebugController1->SetEnableGPUBasedValidation(true);
-                        spDebugController1->SetEnableSynchronizedCommandQueueValidation(true);
-                        spDebugController1->Release();
-                    }
-                }
+                spDebugController1->SetEnableGPUBasedValidation(true);
+                spDebugController1->SetEnableSynchronizedCommandQueueValidation(true);
+                spDebugController1->Release();
             }
+#endif
         }
+#endif
 
         D3D_FEATURE_LEVEL level;
         HRESULT hr =
