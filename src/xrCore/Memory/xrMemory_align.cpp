@@ -80,26 +80,31 @@ void* __stdcall xr_aligned_malloc(size_t size, size_t alignment)
 
 void* __stdcall xr_aligned_offset_malloc(size_t size, size_t align, size_t offset)
 {
-    uintptr_t ptr, retptr, gap;
-
     if (!IS_2_POW_N(align))
     {
         errno = EINVAL;
-        return NULL;
+        return nullptr;
     }
+
     if (offset >= size && offset != 0)
         size = offset + 1;
 
     align = (align > PTR_SZ ? align : PTR_SZ) - 1;
 
     /* gap = number of bytes needed to round up offset to align with PTR_SZ*/
-    gap = (0 - offset) & (PTR_SZ - 1);
+    uintptr_t gap = (0 - offset) & (PTR_SZ - 1);
+    uintptr_t aligned_addr = PTR_SZ + gap + align;
+    uintptr_t aligned_size = aligned_addr + size;
 
-    if ((ptr = (uintptr_t)malloc(PTR_SZ + gap + align + size)) == (uintptr_t)NULL)
-        return NULL;
+    void* ptr = malloc(aligned_size);
+    if (ptr == nullptr)
+        return nullptr;
 
-    retptr = ((ptr + PTR_SZ + gap + align + offset) & ~align) - offset;
-    ((uintptr_t*)(retptr - gap))[-1] = ptr;
+    uintptr_t retptr = reinterpret_cast<uintptr_t>(ptr) + aligned_addr + offset;
+    retptr &= ~align;
+    retptr -= offset;
+
+    ((uintptr_t*)(retptr - gap))[-1] = reinterpret_cast<uintptr_t>(ptr);
 
     return (void*)retptr;
 }
@@ -264,34 +269,32 @@ void* __stdcall xr_aligned_offset_realloc(void* memblock, size_t size, size_t al
 
 void __stdcall xr_aligned_free(void* memblock)
 {
-    uintptr_t ptr;
-
-    if (memblock == NULL)
+    if (memblock == nullptr)
         return;
 
-    ptr = (uintptr_t)memblock;
+    auto ptr = reinterpret_cast<uintptr_t>(memblock);
 
     /* ptr points to the pointer to starting of the memory block */
-    ptr = (ptr & ~(PTR_SZ - 1)) - PTR_SZ;
+    ptr &= ~(PTR_SZ - 1);
+    ptr -= PTR_SZ;
 
     /* ptr is the pointer to the start of memory block*/
-    ptr = *((uintptr_t*)ptr);
-    free((void*)ptr);
+    auto sPtr = reinterpret_cast<uintptr_t*>(ptr);
+    free(reinterpret_cast<void*>(*sPtr));
 }
 
 size_t __stdcall xr_aligned_msize(void* memblock)
 {
-    uintptr_t ptr;
-
-    if (memblock == NULL)
+    if (memblock == nullptr)
         return 0;
 
-    ptr = (uintptr_t)memblock;
+    auto ptr = reinterpret_cast<uintptr_t>(memblock);
 
     /* ptr points to the pointer to starting of the memory block */
-    ptr = (ptr & ~(PTR_SZ - 1)) - PTR_SZ;
+    ptr &= ~(PTR_SZ - 1);
+    ptr -= PTR_SZ;
 
     /* ptr is the pointer to the start of memory block*/
-    ptr = *((uintptr_t*)ptr);
-    return _msize((void*)ptr);
+    auto sPtr = reinterpret_cast<uintptr_t*>(ptr);
+    return _msize(reinterpret_cast<void*>(*sPtr));
 }
