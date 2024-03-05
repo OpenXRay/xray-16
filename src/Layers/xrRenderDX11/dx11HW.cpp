@@ -105,6 +105,17 @@ void CHW::DestroyD3D()
     if (auto hModule = GetModuleHandleA("dxgi.dll"))
         FreeLibrary(hModule);
 #endif
+
+#if DEBUG
+#if USE_DX12
+    typedef HRESULT(__stdcall * fPtr)(const IID&, void**);
+    HMODULE hDll = GetModuleHandleW(L"dxgidebug.dll");
+    fPtr DXGIGetDebugInterface = (fPtr)GetProcAddress(hDll, "DXGIGetDebugInterface");
+    IDXGIDebug* pDxgiDebug;
+    DXGIGetDebugInterface(__uuidof(IDXGIDebug), (void**)&pDxgiDebug);
+    pDxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+#endif
+#endif
 }
 
 void CHW::CreateDevice(SDL_Window* sdlWnd)
@@ -367,7 +378,10 @@ bool CHW::CreateSwapChain(HWND hwnd)
 #endif 
 
 #if defined(USE_DX12)
-    //m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
+    if (sd.Flags & DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT)
+    {
+        m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
+    }
 #endif
 
     return SUCCEEDED(hr);
@@ -503,7 +517,11 @@ bool CHW::CreateSwapChainOnDX12(HWND hwnd)
         return false;
     }
   
-    m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
+    if (desc.Flags & DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT)
+    {
+        m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
+    }
+    
     return true;
 }
 #endif
@@ -551,17 +569,6 @@ void CHW::DestroyDevice()
 
     _SHOW_REF("refCount:pDevice:", pDevice);
     _RELEASE(pDevice);
-
-#if DEBUG
-#if USE_DX12
-	typedef HRESULT(__stdcall * fPtr)(const IID&, void**);
-    HMODULE hDll = GetModuleHandleW(L"dxgidebug.dll");
-    fPtr DXGIGetDebugInterface = (fPtr)GetProcAddress(hDll, "DXGIGetDebugInterface");
-    IDXGIDebug* pDxgiDebug;
-    DXGIGetDebugInterface(__uuidof(IDXGIDebug), (void**)&pDxgiDebug);
-    pDxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-#endif
-#endif
 
     DestroyD3D();
 }

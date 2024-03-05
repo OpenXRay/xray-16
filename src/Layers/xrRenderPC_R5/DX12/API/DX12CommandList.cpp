@@ -196,8 +196,9 @@ namespace DX12
 #if NTDDI_WIN10_RS2 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS2)
                 ID3D12GraphicsCommandList1* pCmdList1 = nullptr;
                 pCmdList->QueryInterface(__uuidof(ID3D12GraphicsCommandList1), (void**)&pCmdList1);
-                if (m_CommandList1 == pCmdList1)
-                    pCmdList1->Release();
+               
+                m_CommandList1 = pCmdList1;
+                pCmdList1->Release();
 
                 D3D12_FEATURE_DATA_D3D12_OPTIONS2 Options2;
                 if (GetDevice()->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS2, &Options2, sizeof(Options2)) == S_OK)
@@ -208,8 +209,9 @@ namespace DX12
 #if NTDDI_WIN10_RS3 && (WDK_NTDDI_VERSION >= NTDDI_WIN10_RS3)
                 ID3D12GraphicsCommandList2* pCmdList2 = nullptr;
                 pCmdList->QueryInterface(__uuidof(ID3D12GraphicsCommandList2), (void**)&pCmdList2);
-                if (m_CommandList2 == pCmdList2)
-                    pCmdList2->Release();
+              
+                m_CommandList2 = pCmdList2;
+                pCmdList2->Release();
 #endif
             }
 
@@ -276,7 +278,7 @@ namespace DX12
             MaxFenceValue(m_UsedFenceValues[CMDTYPE_ANY][CMDQUEUE_COPY    ], std::max(m_UsedFenceValues[CMDTYPE_READ][CMDQUEUE_COPY    ], m_UsedFenceValues[CMDTYPE_WRITE][CMDQUEUE_COPY    ]));
             MaxFenceValue(m_UsedFenceValues[CMDTYPE_ANY][CMDQUEUE_GRAPHICS], std::max(m_UsedFenceValues[CMDTYPE_READ][CMDQUEUE_GRAPHICS], m_UsedFenceValues[CMDTYPE_WRITE][CMDQUEUE_GRAPHICS]));
 #endif
-
+            
             m_rPool.WaitForFenceOnGPU(m_UsedFenceValues[CMDTYPE_ANY]);
 
             // Then inject the Execute() which is possibly blocked by the Wait()
@@ -285,7 +287,7 @@ namespace DX12
         }
 
         // Inject the signal of the utilized fence to unblock code which picked up the fence of the command-list (even if it doesn't have contents)
-        m_rPool.SetSubmittedFenceValue(SignalFenceOnGPU());
+        m_rPool.SetSubmittedFenceValue(SignalFenceOnGPU());      
         m_State = CLSTATE_SUBMITTED;
     }
 

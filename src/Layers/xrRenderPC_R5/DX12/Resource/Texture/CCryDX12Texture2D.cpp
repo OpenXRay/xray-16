@@ -85,21 +85,17 @@ CCryDX12Texture2D* CCryDX12Texture2D::Create(CCryDX12Device* pDevice, const FLOA
     D3D12_CLEAR_VALUE clearValue = DX12::GetDXGIFormatClearValue(desc12.Format, (pDesc->BindFlags & D3D11_BIND_DEPTH_STENCIL) != 0);
     bool allowClearValue = !!(pDesc->BindFlags & (D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_RENDER_TARGET));
 
-    if (pDesc->Usage == D3D11_USAGE_DEFAULT)
+    if (pDesc->Usage == D3D11_USAGE_IMMUTABLE)
     {
-        resourceUsage = D3D12_RESOURCE_STATE_COMMON;
+        resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
     }
-    else if (pDesc->Usage == D3D11_USAGE_IMMUTABLE)
+    else if (pDesc->Usage == D3D11_USAGE_STAGING)
     {
         resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
     }
     else if (pDesc->Usage == D3D11_USAGE_DYNAMIC)
     {
         resourceUsage = D3D12_RESOURCE_STATE_GENERIC_READ;
-    }
-    else if (pDesc->Usage == D3D11_USAGE_STAGING)
-    {
-        resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
     }
 
     if (pDesc->CPUAccessFlags != 0)
@@ -123,7 +119,7 @@ CCryDX12Texture2D* CCryDX12Texture2D::Create(CCryDX12Device* pDevice, const FLOA
     {
         if (pDesc->BindFlags & D3D11_BIND_DEPTH_STENCIL)
         {
-            clearValue.DepthStencil.Depth   = FLOAT(cClearValue[0]);
+            clearValue.DepthStencil.Depth = FLOAT(cClearValue[0]);
             clearValue.DepthStencil.Stencil = UINT8(cClearValue[1]);
         }
         else
@@ -135,29 +131,23 @@ CCryDX12Texture2D* CCryDX12Texture2D::Create(CCryDX12Device* pDevice, const FLOA
         }
     }
 
-	if (pDesc->BindFlags & D3D11_BIND_SHADER_RESOURCE)
-        resourceUsage = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-    if (pDesc->BindFlags & (D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_CONSTANT_BUFFER))
-        resourceUsage = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-    if (pDesc->BindFlags & D3D11_BIND_INDEX_BUFFER)
-        resourceUsage = D3D12_RESOURCE_STATE_INDEX_BUFFER;
     if (pDesc->BindFlags & D3D11_BIND_UNORDERED_ACCESS)
-        resourceUsage = D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+    {
         desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+        resourceUsage = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+    }
+
     if (pDesc->BindFlags & D3D11_BIND_DEPTH_STENCIL)
-        resourceUsage = D3D12_RESOURCE_STATE_DEPTH_WRITE, desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+    {
+        desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+        resourceUsage = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+    }
+
     if (pDesc->BindFlags & D3D11_BIND_RENDER_TARGET)
-        resourceUsage = D3D12_RESOURCE_STATE_RENDER_TARGET, desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
-    if (!(pDesc->BindFlags & D3D11_BIND_SHADER_RESOURCE))
-        desc12.Flags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
-
-    // Certain heaps are restricted to certain D3D12_RESOURCE_STATES states, and cannot be changed.
-    // D3D12_HEAP_TYPE_UPLOAD requires D3D12_RESOURCE_STATE_GENERIC_READ.
-    if (heapProperties.Type == D3D12_HEAP_TYPE_UPLOAD)
-        resourceUsage = D3D12_RESOURCE_STATE_GENERIC_READ;
-    else if (heapProperties.Type == D3D12_HEAP_TYPE_READBACK)
-        resourceUsage = D3D12_RESOURCE_STATE_COPY_DEST;
+    {
+        desc12.Flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+        resourceUsage = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    }
 
     ID3D12Resource* resource = NULL;
 
@@ -186,7 +176,9 @@ CCryDX12Texture2D* CCryDX12Texture2D::Create(CCryDX12Device* pDevice, const FLOA
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CCryDX12Texture2D::CCryDX12Texture2D(CCryDX12Device* pDevice, const D3D11_TEXTURE2D_DESC& desc11, ID3D12Resource* pResource, D3D12_RESOURCE_STATES eInitialState, const CD3DX12_RESOURCE_DESC& desc12, const D3D11_SUBRESOURCE_DATA* pInitialData, size_t numInitialData)
+CCryDX12Texture2D::CCryDX12Texture2D(CCryDX12Device* pDevice, const D3D11_TEXTURE2D_DESC& desc11,
+    ID3D12Resource* pResource, D3D12_RESOURCE_STATES eInitialState, const CD3DX12_RESOURCE_DESC& desc12,
+    const D3D11_SUBRESOURCE_DATA* pInitialData, size_t numInitialData)
     : Super(pDevice, pResource, eInitialState, desc12, pInitialData, numInitialData)
     , m_Desc11(desc11)
 {
@@ -194,4 +186,17 @@ CCryDX12Texture2D::CCryDX12Texture2D(CCryDX12Device* pDevice, const D3D11_TEXTUR
 
 CCryDX12Texture2D::~CCryDX12Texture2D()
 {
+}
+
+CCryDX12Buffer* CCryDX12Texture2D::AcquireUploadBuffer() 
+{
+    if (m_UploadBuffer)
+    {
+        return m_UploadBuffer;
+    }
+
+    CCryDX12Buffer* resource = nullptr;
+    GetDevice()->CreateStagingResource(this, (ID3D11Resource**)&resource, true);
+    m_UploadBuffer.attach(resource);
+    return m_UploadBuffer.get();
 }

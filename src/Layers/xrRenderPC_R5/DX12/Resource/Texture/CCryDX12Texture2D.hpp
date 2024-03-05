@@ -61,24 +61,14 @@ public:
 
     #pragma endregion
 
-    void AttachStagingResource(ID3D11Resource* pResource) {
-        m_pStagingResource = pResource;
-    }
-
-    bool GetStagingResource(ID3D11Resource** pResource) {
-        *pResource = m_pStagingResource.get();
-        if (*pResource != NULL)
-            (*pResource)->AddRef();
-        m_pStagingResource.reset(); 
-        return *pResource != NULL;
-    }
+    CCryDX12Buffer* AcquireUploadBuffer();
 
 protected:
     CCryDX12Texture2D(CCryDX12Device* pDevice, const D3D11_TEXTURE2D_DESC& desc11, ID3D12Resource* pResource, D3D12_RESOURCE_STATES eInitialState, const CD3DX12_RESOURCE_DESC& desc12, const D3D11_SUBRESOURCE_DATA* pInitialData = NULL, size_t numInitialData = 0);
 
 private:
     D3D11_TEXTURE2D_DESC m_Desc11;
-    _smart_ptr<ID3D11Resource> m_pStagingResource;
+    _smart_ptr<CCryDX12Buffer> m_UploadBuffer;
 };
 
 #endif // __CCRYDX12TEXTURE2D__

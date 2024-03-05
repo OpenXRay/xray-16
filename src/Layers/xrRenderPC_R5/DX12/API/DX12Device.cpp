@@ -36,14 +36,15 @@ namespace DX12
             debugInterface->EnableDebugLayer();
 #if DX12_ENABLE_DEBUG_LAYER > 1
             // Enable DX12 GBV as well
-            ID3D12Debug1* spDebugController1;
-            if (SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&spDebugController1))))
+            ID3D12Debug1* debugInterface1 = nullptr;
+            if (SUCCEEDED(debugInterface->QueryInterface(IID_PPV_ARGS(&debugInterface1))))
             {
-                spDebugController1->SetEnableGPUBasedValidation(true);
-                spDebugController1->SetEnableSynchronizedCommandQueueValidation(true);
-                spDebugController1->Release();
+                debugInterface1->SetEnableGPUBasedValidation(true);
+                debugInterface1->SetEnableSynchronizedCommandQueueValidation(true);
+                debugInterface1->Release();
             }
 #endif
+            debugInterface->Release();
         }
 #endif
 

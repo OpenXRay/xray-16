@@ -72,6 +72,7 @@ public:
     _I& operator*() const { return *p; }
     _I* operator->(void) const { return p; }
     _I* get() const { return p; }
+    _I** get_address_of() { return &p; }
     _smart_ptr& operator=(_I* newp)
     {
         if (newp)

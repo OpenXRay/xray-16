@@ -28,11 +28,9 @@ SwapChain* SwapChain::Create(
     BOOL bAllowTearing = FALSE;
     {
         IDXGIFactory5* pFactory5 = nullptr;
-        if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
-            S_OK ==
-                pFactory5->CheckFeatureSupport(
-                    DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
+        if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)))
         {
+            pFactory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing));
             pFactory5->Release();
         }
 
@@ -92,11 +90,9 @@ SwapChain* SwapChain::CreateForHwnd(CommandList* commandList, IDXGIFactory4* pFa
     BOOL bAllowTearing = FALSE;
     {
         IDXGIFactory5* pFactory5 = nullptr;
-        if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
-            S_OK ==
-                pFactory5->CheckFeatureSupport(
-                    DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
+        if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)))
         {
+            pFactory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing));
             pFactory5->Release();
         }
 
@@ -162,11 +158,9 @@ SwapChain* SwapChain::CreateForCoreWindow(CommandList* commandList, IDXGIFactory
     BOOL bAllowTearing = FALSE;
     {
         IDXGIFactory5* pFactory5 = nullptr;
-        if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)) &&
-            S_OK ==
-                pFactory5->CheckFeatureSupport(
-                    DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing)))
+        if (S_OK == pFactory->QueryInterface(IID_PPV_ARGS(&pFactory5)))
         {
+            pFactory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &bAllowTearing, sizeof(bAllowTearing));
             pFactory5->Release();
         }
 

@@ -166,6 +166,8 @@ CCryDX12DeviceContext::~CCryDX12DeviceContext()
         m_OcclusionDownloadBuffer->Unmap(0, &sNoWrite);
     }
 
+    WaitForIdle();
+
     m_TimestampDownloadBuffer->Release();
     m_OcclusionDownloadBuffer->Release();
 }
@@ -895,11 +897,12 @@ void CCryDX12DeviceContext::ResolveOcclusion(DX12::CommandList* pCmdList, UINT i
 void CCryDX12DeviceContext::WaitForIdle(UINT64 fenceValue)
 {
     DX12::CommandListFence fence(m_pDX12Device);
-    fence.Init();
 
-    m_DirectListPool.GetD3D12CommandQueue()->Signal(fence.GetFence(), fenceValue);
-
-    fence.WaitForFence(fenceValue);
+    if (fence.Init())
+    {
+        m_DirectListPool.GetD3D12CommandQueue()->Signal(fence.GetFence(), fenceValue);
+        fence.WaitForFence(fenceValue);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1061,10 +1064,10 @@ HRESULT STDMETHODCALLTYPE CCryDX12DeviceContext::Map(
         D3D12_RESOURCE_DESC textureDesc = resource.GetDesc();
         if (textureDesc.Dimension == D3D12_RESOURCE_DIMENSION::D3D12_RESOURCE_DIMENSION_TEXTURE2D)
         {
-            Microsoft::WRL::ComPtr<ID3D11Resource> pStagingResource;
-            HRESULT hr = m_pDevice->CreateStagingResource(pResource, pStagingResource.GetAddressOf(), TRUE);
-            hr = hr == S_OK && CopyStagingResource(pStagingResource.Get(), pResource, Subresource, TRUE);
-            hr = hr == S_OK && MapStagingResource(pResource, pStagingResource.Get(), Subresource, TRUE, &pMappedResource->pData,
+            CCryDX12Texture2D* textureBuffer = DX12_EXTRACT_TEXTURE2D(pResource);
+            CCryDX12Buffer* uploadBuffer = textureBuffer->AcquireUploadBuffer();
+            HRESULT hr = CopyStagingResource(uploadBuffer, pResource, Subresource, TRUE);
+            hr = hr == S_OK && MapStagingResource(pResource, uploadBuffer, Subresource, TRUE, &pMappedResource->pData,
                     &pMappedResource->RowPitch); 
 
             if (S_OK != hr)
@@ -1073,8 +1076,6 @@ HRESULT STDMETHODCALLTYPE CCryDX12DeviceContext::Map(
                 return hr;
             }
 
-            CCryDX12Texture2D* dx12Tex2dResource = DX12_EXTRACT_TEXTURE2D(pResource);
-            dx12Tex2dResource->AttachStagingResource(pStagingResource.Get());
             return hr;
         }
 
@@ -1163,14 +1164,10 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::Unmap(
         D3D12_RESOURCE_DESC textureDesc = resource.GetDesc();
         if (textureDesc.Dimension == D3D12_RESOURCE_DIMENSION::D3D12_RESOURCE_DIMENSION_TEXTURE2D)
         {
-            CCryDX12Texture2D* dx12Tex2dResource = DX12_EXTRACT_TEXTURE2D(pResource);
-            Microsoft::WRL::ComPtr<ID3D11Resource> pStagingResource;
-            if (dx12Tex2dResource->GetStagingResource(pStagingResource.GetAddressOf()))
-            {
-                UnmapStagingResource(pStagingResource.Get(), TRUE);
-                m_pDevice->ReleaseStagingResource(pStagingResource.Get()); 
-                return;
-            }
+            CCryDX12Texture2D* textureBuffer = DX12_EXTRACT_TEXTURE2D(pResource);
+            CCryDX12Buffer* uploadBuffer = textureBuffer->AcquireUploadBuffer();
+            UnmapStagingResource(uploadBuffer, TRUE);
+            return;
         }
     }
 

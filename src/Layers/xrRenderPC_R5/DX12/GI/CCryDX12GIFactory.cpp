@@ -21,10 +21,9 @@
 
 CCryDX12GIFactory* CCryDX12GIFactory::Create()
 {
-    IDXGIFactory4* pDXGIFactory4 = NULL;
-
+    _smart_ptr<IDXGIFactory4> dxgiFactory4;
 #if DEBUG
-    if (S_OK != CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&pDXGIFactory4)))
+    if (S_OK != CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(dxgiFactory4.get_address_of())))
 #else
     if (S_OK != CreateDXGIFactory2(0, IID_PPV_ARGS(&pDXGIFactory4)))
 #endif
@@ -32,8 +31,7 @@ CCryDX12GIFactory* CCryDX12GIFactory::Create()
         DX12_ASSERT("Failed to create underlying DXGI factory!");
         return NULL;
     }
-
-    return DX12::PassAddRef(new CCryDX12GIFactory(pDXGIFactory4));
+    return DX12::PassAddRef(new CCryDX12GIFactory(dxgiFactory4.get()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +40,7 @@ CCryDX12GIFactory::CCryDX12GIFactory(IDXGIFactory4* pDXGIFactory4)
     : Super()
     , m_pDXGIFactory4(pDXGIFactory4)
 {
-    DX12_FUNC_LOG
+    DX12_FUNC_LOG 
 }
 
 CCryDX12GIFactory::~CCryDX12GIFactory()
