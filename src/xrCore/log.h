@@ -10,21 +10,21 @@ template <class T> struct _matrix; typedef _matrix<float> Fmatrix;
 
 #define VPUSH(a) ((a).x), ((a).y), ((a).z)
 
-void XRCORE_API __cdecl Msg(LPCSTR format, ...);
+void XRCORE_API __cdecl Msg(pcstr format, ...);
 
-void XRCORE_API Log(LPCSTR msg);
-void XRCORE_API Log(LPCSTR msg, LPCSTR dop);
-void XRCORE_API Log(LPCSTR msg, int dop);
-void XRCORE_API Log(LPCSTR msg, unsigned int dop);
-void XRCORE_API Log(LPCSTR msg, long dop);
-void XRCORE_API Log(LPCSTR msg, unsigned long dop);
-void XRCORE_API Log(LPCSTR msg, long long dop);
-void XRCORE_API Log(LPCSTR msg, unsigned long long dop);
-void XRCORE_API Log(LPCSTR msg, float dop);
-void XRCORE_API Log(LPCSTR msg, const Fvector& dop);
-void XRCORE_API Log(LPCSTR msg, const Fmatrix& dop);
+void XRCORE_API Log(pcstr msg);
+void XRCORE_API Log(pcstr msg, pcstr dop);
+void XRCORE_API Log(pcstr msg, int dop);
+void XRCORE_API Log(pcstr msg, unsigned int dop);
+void XRCORE_API Log(pcstr msg, long dop);
+void XRCORE_API Log(pcstr msg, unsigned long dop);
+void XRCORE_API Log(pcstr msg, long long dop);
+void XRCORE_API Log(pcstr msg, unsigned long long dop);
+void XRCORE_API Log(pcstr msg, float dop);
+void XRCORE_API Log(pcstr msg, const Fvector& dop);
+void XRCORE_API Log(pcstr msg, const Fmatrix& dop);
 
-void XRCORE_API LogWinErr(LPCSTR msg, long err_code);
+void XRCORE_API LogWinErr(pcstr msg, long err_code);
 
 struct LogCallback
 {
@@ -40,12 +40,12 @@ struct LogCallback
 };
 
 LogCallback XRCORE_API SetLogCB(const LogCallback& cb);
-void XRCORE_API CreateLog(BOOL no_log = FALSE);
+void XRCORE_API CreateLog(bool no_log = false);
 void InitLog();
 void CloseLog();
 void XRCORE_API FlushLog();
 
 extern XRCORE_API xr_vector<xr_string> LogFile;
-extern XRCORE_API BOOL LogExecCB;
+extern XRCORE_API bool LogExecCB;
 
 #endif

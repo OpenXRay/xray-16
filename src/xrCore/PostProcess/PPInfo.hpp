@@ -80,5 +80,5 @@ struct XRCORE_API SPPInfo
     void normalize();
     SPPInfo();
     SPPInfo& lerp(const SPPInfo& def, const SPPInfo& to, float factor);
-    void validate(LPCSTR str);
+    void validate(pcstr str);
 };

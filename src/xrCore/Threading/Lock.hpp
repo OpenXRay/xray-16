@@ -4,7 +4,7 @@
 #include "Common/Noncopyable.hpp"
 
 #ifdef CONFIG_PROFILE_LOCKS
-typedef void (*add_profile_portion_callback)(LPCSTR id, const u64& time);
+typedef void (*add_profile_portion_callback)(pcstr id, const u64& time);
 void XRCORE_API set_add_profile_portion(add_profile_portion_callback callback);
 
 #define MUTEX_PROFILE_PREFIX_ID #mutexes /
