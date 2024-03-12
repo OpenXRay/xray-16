@@ -13,9 +13,16 @@ protected:
     u32 buf_block{};
     xr_vector<u8> temp_buf[sdef_target_count];
     void fill_block(size_t idx);
+    void fill_all_blocks();
 
     xr_vector<size_t> buffers_to_prefill;
-    void prefill_block(Task&, void*);
+    void prefill_blocks(Task&, void*);
+    void prefill_all_blocks(Task&, void*);
+
+    std::atomic<Task*> prefill_task{};
+    void wait_prefill() const;
+    void dispatch_prefill();
+    void dispatch_prefill_all();
 
 public:
     float priority{};

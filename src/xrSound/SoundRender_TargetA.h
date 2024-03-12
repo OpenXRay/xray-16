@@ -17,6 +17,7 @@ class CSoundRender_TargetA : public CSoundRender_Target
 
     size_t get_block_id(ALuint BufferID) const;
     void submit_buffer(ALuint BufferID, const void* data) const;
+    void submit_all_buffers() const;
 
 public:
     CSoundRender_TargetA(ALuint slot);
