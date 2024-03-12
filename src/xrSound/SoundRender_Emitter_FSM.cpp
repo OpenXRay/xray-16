@@ -107,16 +107,16 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         if (fTime >= fTimeToStop)
         {
             // STOP
-            m_current_state = stStopped;
             SoundRender->i_stop(this);
+            m_current_state = stStopped;
         }
         else
         {
             if (!update_culling(dt))
             {
                 // switch to: SIMULATE
-                m_current_state = stSimulating; // switch state
                 SoundRender->i_stop(this);
+                m_current_state = stSimulating;
             }
             else
             {
