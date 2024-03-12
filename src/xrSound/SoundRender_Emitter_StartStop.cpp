@@ -62,14 +62,6 @@ void CSoundRender_Emitter::stop(bool isDeffered)
 void CSoundRender_Emitter::rewind()
 {
     bStopping = FALSE;
-
-    const float fTime = bIgnoringTimeFactor ? SoundRender->TimerPersistent.GetElapsed_sec() : SoundRender->Timer.GetElapsed_sec();
-    float fDiff = fTime - fTimeStarted;
-    fTimeStarted += fDiff;
-    fTimeToStop += fDiff;
-    fTimeToPropagade = fTime;
-
-    set_cursor(0);
     bRewind = TRUE;
 }
 

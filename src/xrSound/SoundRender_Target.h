@@ -20,9 +20,11 @@ protected:
     void prefill_all_blocks(Task&, void*);
 
     std::atomic<Task*> prefill_task{};
-    void wait_prefill() const;
     void dispatch_prefill();
     void dispatch_prefill_all();
+
+public:
+    void wait_prefill() const;
 
 public:
     float priority{};
@@ -35,7 +37,7 @@ public:
     bool get_Rendering() const { return rendering; }
 
     virtual bool _initialize() = 0;
-    virtual void _destroy() = 0;
+    virtual void _destroy();
     virtual void _restart() = 0;
 
     virtual void start(CSoundRender_Emitter* E);

@@ -4,6 +4,7 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
+#include "SoundRender_Target.h"
 
 XRSOUND_API extern float psSoundCull;
 
@@ -27,6 +28,16 @@ void CSoundRender_Emitter::update(float fTime, float dt)
 
     if (bRewind)
     {
+        if (target)
+            target->wait_prefill();
+
+        const float time = bIgnoringTimeFactor ? SoundRender->TimerPersistent.GetElapsed_sec() : SoundRender->Timer.GetElapsed_sec();
+        const float diff = time - fTimeStarted;
+        fTimeStarted += diff;
+        fTimeToStop += diff;
+        fTimeToPropagade = time;
+
+        set_cursor(0);
         if (target)
             SoundRender->i_rewind(this);
         bRewind = FALSE;

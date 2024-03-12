@@ -35,7 +35,7 @@ bool CSoundRender_TargetA::_initialize()
 
 void CSoundRender_TargetA::_destroy()
 {
-    wait_prefill();
+    CSoundRender_Target::_destroy();
     // clean up target
     if (alIsSource(pSource))
         alDeleteSources(1, &pSource);
@@ -69,7 +69,6 @@ void CSoundRender_TargetA::stop()
         A_CHK(alSourcei(pSource, AL_BUFFER, 0));
         A_CHK(alSourcei(pSource, AL_SOURCE_RELATIVE, TRUE));
     }
-    wait_prefill();
     inherited::stop();
 }
 
@@ -80,7 +79,6 @@ void CSoundRender_TargetA::rewind()
     A_CHK(alSourceStop(pSource));
     A_CHK(alSourcei(pSource, AL_BUFFER, 0));
 
-    wait_prefill();
     fill_all_blocks();
     submit_all_buffers();
 
@@ -105,8 +103,6 @@ void CSoundRender_TargetA::update()
         Msg("! %s:: source state check failed (0x%d)", __FUNCTION__, error);
         return;
     }
-
-    wait_prefill();
 
     while (processed > 0)
     {

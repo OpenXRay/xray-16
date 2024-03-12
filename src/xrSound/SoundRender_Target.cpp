@@ -11,6 +11,11 @@ CSoundRender_Target::CSoundRender_Target()
     buffers_to_prefill.reserve(sdef_target_count);
 }
 
+void CSoundRender_Target::_destroy()
+{
+    wait_prefill();
+}
+
 void CSoundRender_Target::start(CSoundRender_Emitter* E)
 {
     R_ASSERT(E);
@@ -37,13 +42,23 @@ void CSoundRender_Target::render()
 
 void CSoundRender_Target::stop()
 {
+    wait_prefill();
     m_pEmitter->source()->detach();
     m_pEmitter = nullptr;
     rendering = false;
 }
 
-void CSoundRender_Target::rewind() { R_ASSERT(rendering); }
-void CSoundRender_Target::update() { R_ASSERT(m_pEmitter); }
+void CSoundRender_Target::rewind()
+{
+    R_ASSERT(rendering);
+}
+
+void CSoundRender_Target::update()
+{
+    R_ASSERT(m_pEmitter);
+    wait_prefill();
+}
+
 void CSoundRender_Target::fill_parameters()
 {
     VERIFY(m_pEmitter);
