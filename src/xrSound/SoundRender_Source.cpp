@@ -51,10 +51,10 @@ bool ov_can_continue_read(long res)
 
 void CSoundRender_Source::decompress(void* dest, u32 byte_offset, u32 size)
 {
-    std::lock_guard guard{ read_lock };
-
     if (!wave)
         attach();
+
+    std::lock_guard guard{ read_lock };
 
     // seek
     const auto sample_offset = ogg_int64_t(byte_offset / m_wformat.nBlockAlign);
@@ -145,21 +145,28 @@ constexpr ov_callbacks g_ov_callbacks =
 
 void CSoundRender_Source::attach()
 {
-    VERIFY(0 == wave);
-    if (wave)
-        return;
-    wave = FS.r_open(pname.c_str());
-    R_ASSERT3(wave && wave->length(), "Can't open wave file:", pname.c_str());
-    ov_open_callbacks(wave, &ovf, nullptr, 0, g_ov_callbacks);
+    std::lock_guard guard{ read_lock };
+    ++refs;
+    VERIFY(refs > 0);
+    if (refs == 1)
+    {
+        wave = FS.r_open(pname.c_str());
+        R_ASSERT3(wave && wave->length(), "Can't open wave file:", pname.c_str());
+        ov_open_callbacks(wave, &ovf, nullptr, 0, g_ov_callbacks);
+    }
 }
 
 void CSoundRender_Source::detach()
 {
-    if (wave)
+    std::lock_guard guard{ read_lock };
+    --refs;
+    if (refs == 0)
     {
         ov_clear(&ovf);
         FS.r_close(wave);
     }
+    if (refs < 0)
+        refs = 0;
 }
 
 bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)

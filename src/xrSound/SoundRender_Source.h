@@ -12,6 +12,7 @@ public:
 
     OggVorbis_File ovf{};
     IReader* wave{};
+    int refs{};
     std::mutex read_lock;
 
     float fTimeTotal;
