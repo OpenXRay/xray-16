@@ -4,6 +4,24 @@
 
 #include <vorbis/vorbisfile.h>
 
+enum class SoundFormat
+{
+    Unknown,
+    PCM,
+    Float32,
+};
+
+struct SoundSourceInfo
+{
+    SoundFormat format{};
+    u16         channels{};       // number of channels (i.e. mono, stereo...)
+    u32         samplesPerSec{};  // sample rate
+    u32         avgBytesPerSec{}; // for buffer estimation
+    u16         blockAlign{};     // block size of data
+    u16         bitsPerSample{};  // number of bits per sample of mono data
+    u32         bytesPerBuffer{}; // target buffer size
+};
+
 class XRSOUND_API CSoundRender_Source final : public CSound_source
 {
 public:
@@ -18,7 +36,7 @@ public:
     float fTimeTotal;
     u32 dwBytesTotal;
 
-    WAVEFORMATEX m_wformat;
+    SoundSourceInfo m_info{};
 
     float m_fBaseVolume;
     float m_fMinDist;
@@ -48,6 +66,6 @@ public:
     [[nodiscard]] u32 game_type() const override { return m_uGameType; }
     [[nodiscard]] pcstr file_name() const override { return *fname; }
     [[nodiscard]] float base_volume() const { return m_fBaseVolume; }
-    [[nodiscard]] u16 channels_num() const override { return m_wformat.nChannels; }
+    [[nodiscard]] u16 channels_num() const override { return m_info.channels; }
     [[nodiscard]] u32 bytes_total() const override { return dwBytesTotal; }
 };

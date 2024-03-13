@@ -29,9 +29,8 @@ void CSoundRender_Target::start(CSoundRender_Emitter* E)
     //m_pEmitter->source()->attach();
 
     // Calc storage
-    buf_block = sdef_target_block * E->source()->m_wformat.nAvgBytesPerSec / 1000;
     for (auto& buf : temp_buf)
-        buf.resize(buf_block);
+        buf.resize(E->source()->m_info.bytesPerBuffer);
 }
 
 void CSoundRender_Target::render()
@@ -69,7 +68,7 @@ void CSoundRender_Target::fill_parameters()
 void CSoundRender_Target::fill_block(size_t idx)
 {
     R_ASSERT(m_pEmitter);
-    m_pEmitter->fill_block(temp_buf[idx].data(), buf_block);
+    m_pEmitter->fill_block(temp_buf[idx].data(), temp_buf[idx].size());
 }
 
 void CSoundRender_Target::fill_all_blocks()

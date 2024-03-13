@@ -10,7 +10,6 @@ protected:
     CSoundRender_Emitter* m_pEmitter{};
     bool rendering{};
 
-    u32 buf_block{};
     xr_vector<u8> temp_buf[sdef_target_count];
     void fill_block(size_t idx);
     void fill_all_blocks();

@@ -110,7 +110,7 @@ void CSoundRender_TargetA::update()
         A_CHK(alSourceUnqueueBuffers(pSource, 1, &BufferID));
 
         const auto id = get_block_id(BufferID);
-        submit_buffer(BufferID, temp_buf[id].data());
+        submit_buffer(BufferID, temp_buf[id].data(), temp_buf[id].size());
 
         A_CHK(alSourceQueueBuffers(pSource, 1, &BufferID));
         processed--;
@@ -201,26 +201,26 @@ size_t CSoundRender_TargetA::get_block_id(ALuint BufferID) const
     return it - std::begin(pBuffers);
 }
 
-void CSoundRender_TargetA::submit_buffer(ALuint BufferID, const void* data) const
+void CSoundRender_TargetA::submit_buffer(ALuint BufferID, const void* data, size_t dataSize) const
 {
     R_ASSERT(m_pEmitter);
 
-    const auto& wvf = m_pEmitter->source()->m_wformat;
-    const bool mono = wvf.nChannels == 1;
+    const auto& info = m_pEmitter->source()->m_info;
+    const bool mono = info.channels == 1;
 
     ALuint format;
-    if (wvf.wFormatTag == WAVE_FORMAT_IEEE_FLOAT)
+    if (info.format == SoundFormat::Float32)
         format = mono ? AL_FORMAT_MONO_FLOAT32 : AL_FORMAT_STEREO_FLOAT32;
     else
     {
         format = mono ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
     }
 
-    A_CHK(alBufferData(BufferID, format, data, buf_block, m_pEmitter->source()->m_wformat.nSamplesPerSec));
+    A_CHK(alBufferData(BufferID, format, data, dataSize, info.samplesPerSec));
 }
 
 void CSoundRender_TargetA::submit_all_buffers() const
 {
     for (size_t i = 0; i < sdef_target_count; ++i)
-        submit_buffer(pBuffers[i], temp_buf[i].data());
+        submit_buffer(pBuffers[i], temp_buf[i].data(), temp_buf[i].size());
 }
