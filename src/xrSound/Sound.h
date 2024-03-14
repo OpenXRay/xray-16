@@ -48,7 +48,6 @@ XRSOUND_API extern float psSoundRolloff;
 XRSOUND_API extern float psSoundOcclusionScale;
 XRSOUND_API extern float psSoundVelocityAlpha; // Cribbledirge: Alpha value for moving average.
 XRSOUND_API extern float psSoundTimeFactor; //--#SM+#--
-XRSOUND_API extern float psSoundLinearFadeFactor; //--#SM+#--
 XRSOUND_API extern Flags32 psSoundFlags;
 XRSOUND_API extern int psSoundTargets;
 XRSOUND_API extern int psSoundCacheSizeMB;
