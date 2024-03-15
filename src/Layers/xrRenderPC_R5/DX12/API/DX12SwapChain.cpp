@@ -39,27 +39,22 @@ SwapChain* SwapChain::Create(
             pDesc->Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
         }
     }
-#else
-    BOOL bAllowTearing = FALSE;
 #endif
 
     // If discard isn't implemented/supported/fails, try the newer swap-types
-#if defined(__dxgi1_4_h__) || defined(__d3d11_x_h__)
     if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
     {
         // - flip_sequentially is win 8
         pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
         pDesc->BufferCount = std::max(2U, pDesc->BufferCount);
     }
-#ifdef __dxgi1_4_h__
     else if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
     {
         // - flip_discard is win 10
         pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         pDesc->BufferCount = std::max(2U, pDesc->BufferCount);
     }
-#endif
-#endif
+
     HRESULT hr = pFactory->CreateSwapChain(commandQueue, pDesc, &dxgiSwapChain);
 
     if (hr == S_OK && dxgiSwapChain)
@@ -106,20 +101,16 @@ SwapChain* SwapChain::CreateForHwnd(CommandList* commandList, IDXGIFactory4* pFa
 #endif
 
     // If discard isn't implemented/supported/fails, try the newer swap-types
-#if defined(__dxgi1_4_h__) || defined(__d3d11_x_h__)
     if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
     {
         desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         desc1.BufferCount = std::max(2U, pDesc->BufferCount);
     }
-#ifdef __dxgi1_4_h__
     else if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
     {
         desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
         desc1.BufferCount = std::max(2U, pDesc->BufferCount);
     }
-#endif
-#endif
 
     HRESULT hr = pFactory->CreateSwapChainForHwnd(commandQueue, hWnd, &desc1, pFullscreenDesc, pRestrictToOutput, &dxgiSwapChain1);
 
@@ -174,20 +165,16 @@ SwapChain* SwapChain::CreateForCoreWindow(CommandList* commandList, IDXGIFactory
 #endif
 
     // If discard isn't implemented/supported/fails, try the newer swap-types
-#if defined(__dxgi1_4_h__) || defined(__d3d11_x_h__)
     if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_DISCARD)
     {
         desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         desc1.BufferCount = std::max(2U, pDesc->BufferCount);
     }
-#ifdef __dxgi1_4_h__
     else if (pDesc->SwapEffect == DXGI_SWAP_EFFECT_SEQUENTIAL)
     {
         desc1.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
         desc1.BufferCount = std::max(2U, pDesc->BufferCount);
     }
-#endif
-#endif
 
     HRESULT hr = pFactory->CreateSwapChainForCoreWindow(commandQueue, pWindow, &desc1, pRestrictToOutput, &dxgiSwapChain1);
 

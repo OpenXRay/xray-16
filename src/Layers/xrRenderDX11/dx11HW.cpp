@@ -9,6 +9,10 @@
 
 CHW HW;
 
+#if USE_DX12
+#define FRAME_LATENCY_WAITABLE_OBJECT 0
+#endif
+
 CHW::CHW()
 {
     if (!ThisInstanceIsGlobal())
@@ -308,6 +312,14 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     }
     Caps.fDepth = dx11TextureUtils::ConvertTextureFormat(selectedFormat);
 
+#if USE_DX12
+    m_constant_allocator.Initialize();
+    for (u32 q = 0; q < PoolConfig::POOL_FRAME_QUERY_COUNT; q++)
+    {
+        CreateFence(m_frameQuery[q]);
+    }
+#endif
+
     const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
 }
@@ -365,11 +377,11 @@ bool CHW::CreateSwapChain(HWND hwnd)
     sd.Windowed = TRUE;
 
     //  Additional set up
-//#if defined(USE_DX12)
-//    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
-//#else 
+#if FRAME_LATENCY_WAITABLE_OBJECT == 1
+    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+#else 
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-//#endif 
+#endif 
 
 #if defined(USE_DX11)
     const auto hr = m_pFactory->CreateSwapChain(pDevice, &sd, &m_pSwapChain);
@@ -377,7 +389,7 @@ bool CHW::CreateSwapChain(HWND hwnd)
     const auto hr = m_pFactory->CreateSwapChain(pDevice, &sd, reinterpret_cast<IDXGISwapChain**>(&m_pSwapChain));
 #endif 
 
-#if defined(USE_DX12)
+#if FRAME_LATENCY_WAITABLE_OBJECT == 1
     if (sd.Flags & DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT)
     {
         m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
@@ -504,7 +516,11 @@ bool CHW::CreateSwapChainOnDX12(HWND hwnd)
     fulldesc.Windowed = TRUE;
 
     // Additional setup
+#if FRAME_LATENCY_WAITABLE_OBJECT == 1
+    desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+#else
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+#endif 
 
     const HRESULT result = m_pFactory->CreateSwapChainForHwnd(
         pDevice, hwnd, &desc, fulldesc.Windowed ? nullptr : &fulldesc, nullptr, reinterpret_cast<IDXGISwapChain1**>(&m_pSwapChain));
@@ -517,10 +533,12 @@ bool CHW::CreateSwapChainOnDX12(HWND hwnd)
         return false;
     }
   
+#if FRAME_LATENCY_WAITABLE_OBJECT == 1
     if (desc.Flags & DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT)
     {
         m_pSwapChain->SetMaximumFrameLatency(BackBufferCount - 1);
     }
+#endif
     
     return true;
 }
@@ -545,6 +563,7 @@ void CHW::DestroyDevice()
     _RELEASE(m_pSwapChain2);
 #endif
 #endif
+
     _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
     _RELEASE(m_pSwapChain);
   
@@ -565,6 +584,18 @@ void CHW::DestroyDevice()
 #ifdef HAS_DX11_3
     _RELEASE(pDevice3);
 #endif
+#endif
+   
+#if USE_DX12
+    m_constant_allocator.Shutdown();
+    for (u32 q = 0; q < PoolConfig::POOL_FRAME_QUERY_COUNT; q++)
+    {
+        if (ReleaseFence(m_frameQuery[q]) != S_OK)
+        {
+            Msg("Initialize: could not releasefence");
+        }
+        m_frameQuery[q] = u64();
+    }
 #endif
 
     _SHOW_REF("refCount:pDevice:", pDevice);
@@ -627,8 +658,19 @@ std::pair<u32, u32> CHW::GetSurfaceSize() const
     return {m_ChainDesc.BufferDesc.Width, m_ChainDesc.BufferDesc.Height};
 }
 
-void CHW::BeginScene() {}
-void CHW::EndScene() {}
+void CHW::BeginScene() 
+{
+#if USE_DX12 
+    m_constant_allocator.Update(m_frame_id, m_frameQuery[m_frame_id]);
+#endif
+}
+
+void CHW::EndScene() 
+{
+#if USE_DX12
+    IssueFence(m_frameQuery[m_frame_id]);
+#endif
+}
 
 void CHW::Present()
 {
@@ -654,7 +696,7 @@ void CHW::Present()
             m_pSwapChain2->SetSourceSize(UINT(Device.dwWidth * 0.7f), UINT(Device.dwHeight * 0.7f));
     }
 #endif
-#else
+#else   
     if (UsingFlipPresentationModel())
     {
         const float fps = Device.GetStats().fFPS;
@@ -664,10 +706,15 @@ void CHW::Present()
             m_pSwapChain->SetSourceSize(UINT(Device.dwWidth * 0.7f), UINT(Device.dwHeight * 0.7f));
     }
 #endif
+
+#if USE_DX12
+    m_constant_allocator.ReleaseEmptyBanks();
+    m_frame_id = (m_frame_id + 1) % POOL_FRAME_QUERY_COUNT;
+#endif
     
 #if !defined(USE_DX12)
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
-#endif
+#endif 
 }
 
 DeviceState CHW::GetDeviceState()

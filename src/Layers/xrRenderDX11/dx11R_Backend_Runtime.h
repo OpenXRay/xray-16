@@ -240,7 +240,11 @@ ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
         // const UINT *pStrides,
         // const UINT *pOffsets
         u32 iOffset = 0;
+#if USE_DX12_CRY_TYPES
+        HW.get_context(context_id)->IASetVertexBuffers(0, 1, reinterpret_cast<ID3D11Buffer* const*>(&vb), &_vb_stride, &iOffset);
+#else
         HW.get_context(context_id)->IASetVertexBuffers(0, 1, &vb, &_vb_stride, &iOffset);
+#endif
     }
 }
 
@@ -536,8 +540,13 @@ IC void CBackend::ApplyVertexLayout()
     {
         ID3DInputLayout* pLayout = NULL;
 
+#if USE_DX12_CRY_TYPES
+        CHK_DX(HW.pDevice->CreateInputLayout(&decl->dx11_dcl_code[0], decl->dx11_dcl_code.size() - 1,
+            m_pInputSignature->GetBufferPointer(), m_pInputSignature->GetBufferSize(), reinterpret_cast<ID3D11InputLayout **>(&pLayout)));
+#else
         CHK_DX(HW.pDevice->CreateInputLayout(&decl->dx11_dcl_code[0], decl->dx11_dcl_code.size() - 1,
             m_pInputSignature->GetBufferPointer(), m_pInputSignature->GetBufferSize(), &pLayout));
+#endif
 
         it = decl->vs_to_layout.insert(std::pair<ID3DBlob*, ID3DInputLayout*>(m_pInputSignature, pLayout)).first;
     }
@@ -676,7 +685,8 @@ IC void CBackend::set_Constants(R_constant_table* C)
             else
                 VERIFY("Invalid enumeration");
         }
-
+    
+#if !defined(USE_DX12)
         ID3DBuffer* tempBuffer[MaxCBuffers] = {};
 
         u32 uiMin;
@@ -766,6 +776,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
             }
             HW.get_context(context_id)->CSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
         }
+#endif
         /*
         for (int i=0; i<MaxCBuffers; ++i)
         {
@@ -812,10 +823,18 @@ ICF void CBackend::ApplyRTandZB()
 {
     if (m_bChangedRTorZB)
     {
+#if USE_DX12
         unsigned int numView = 0;
         for (auto i = 0; i < (sizeof(pRT) / sizeof(pRT[0])); i++) if (pRT[i]) numView++; 
-        m_bChangedRTorZB = false;
+#if USE_DX12_CRY_TYPES
+        HW.get_context(context_id)->OMSetRenderTargets(numView, reinterpret_cast<ID3D11RenderTargetView* const*>(pRT), pZB);
+#else
         HW.get_context(context_id)->OMSetRenderTargets(numView, pRT, pZB);
+#endif
+#else
+        HW.get_context(context_id)->OMSetRenderTargets(sizeof(pRT) / sizeof(pRT[0]), pRT, pZB);
+#endif
+        m_bChangedRTorZB = false;
     }
 }
 

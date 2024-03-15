@@ -35,18 +35,18 @@ namespace DX12
         Shader* shaders[] = { ps, vs, hs, ds, gs };
         EShaderStage shaderStages[] = { ESS_Pixel, ESS_Vertex, ESS_Hull, ESS_Domain, ESS_Geometry };
 
-        //for (size_t stageIdx = 0; stageIdx < DX12_ARRAY_SIZE(shaders); ++stageIdx)
-        //{
-        //    if (shaders[stageIdx])
-        //    {
-        //        u32 parameterCount = m_NumRootParameters;
-        //        AppendRootConstantBuffers(shaders[stageIdx], shaderStages[stageIdx]);
-        //        if (parameterCount != m_NumRootParameters)
-        //        {
-        //            m_ShaderStageAccess |= BIT(shaderStages[stageIdx]);
-        //        }
-        //    }
-        //}
+        for (size_t stageIdx = 0; stageIdx < DX12_ARRAY_SIZE(shaders); ++stageIdx)
+        {
+            if (shaders[stageIdx])
+            {
+                u32 parameterCount = m_NumRootParameters;
+                AppendRootConstantBuffers(shaders[stageIdx], shaderStages[stageIdx]);
+                if (parameterCount != m_NumRootParameters)
+                {
+                    m_ShaderStageAccess |= BIT(shaderStages[stageIdx]);
+                }
+            }
+        }
 
         for (size_t stageIdx = 0; stageIdx < DX12_ARRAY_SIZE(shaders); ++stageIdx)
         {
@@ -223,10 +223,10 @@ namespace DX12
                 u32 rangeBegin = range.m_ShaderRegister;
                 u32 rangeEnd = range.m_ShaderRegister + range.m_Count;
 
-                //if (IsRootConstantBuffer(range))
-                //{
-                //    continue;
-                //}
+                if (IsRootConstantBuffer(range))
+                {
+                    continue;
+                }
 
                 // Setup the configuration of the descriptor table range (a number of CBVs in this case)
                 m_DescRanges[rangeCursorEnd++].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, range.m_Count, range.m_ShaderRegister);

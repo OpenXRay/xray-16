@@ -65,6 +65,27 @@
 #include "r2.h"
 #include "r5_rendertarget.h"
 
+IC uint32_t NextPower2(uint32_t n)
+{
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n++;
+    return n;
+}
+
+IC uint32_t IntegerLog2(uint32_t x)
+{ 
+    DWORD result = 32 ^ 31; // assumes result is unmodified if _BitScanReverse returns 0
+    _BitScanReverse(&result, x);
+    result ^= 31; // needed because the index is from LSB (whereas all other implementations are from MSB)
+
+    return 31 - result;
+}
+
 IC void jitter(CBlender_Compile& C)
 {
     //	C.r_Sampler	("jitter0",	JITTER(0), true, D3DTADDRESS_WRAP, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);

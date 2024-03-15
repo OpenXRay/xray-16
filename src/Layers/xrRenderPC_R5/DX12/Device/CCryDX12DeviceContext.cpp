@@ -2593,8 +2593,7 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::CopySubresourceRegion1(
     switch (CopyFlags)
     {
     case D3D11_COPY_DISCARD:
-        DX12_LOG("Using D3D11_COPY_DISCARD on old ID3D12Resource: %p",
-            DX12_EXTRACT_D3D12RESOURCE(pDstResource));
+        DX12_LOG("Using D3D11_COPY_DISCARD on old ID3D12Resource: %p", DX12_EXTRACT_D3D12RESOURCE(pDstResource));
 
 #ifdef DX12_STATS
         m_NumCopyDiscardSkips += !dstResource.IsUsed(rCmdListPool);
@@ -2610,8 +2609,6 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::CopySubresourceRegion1(
         DX12_LOG("New ID3D12Resource: %p", DX12_EXTRACT_D3D12RESOURCE(pDstResource));
         break;
     case D3D11_COPY_NO_OVERWRITE:
-
-
         // Block the GPU-thread until the resource is safe to be updated (unlike Map() we stage the copy and don't need to block the CPU)
         break;
     }
@@ -2729,7 +2726,6 @@ void STDMETHODCALLTYPE CCryDX12DeviceContext::UpdateSubresource1(
 {
     DX12_FUNC_LOG
     
-
     ICryDX12Resource* dx12Resource = DX12_EXTRACT_ICRYDX12RESOURCE(pDstResource);
     DX12::Resource& resource = dx12Resource->GetDX12Resource();
 

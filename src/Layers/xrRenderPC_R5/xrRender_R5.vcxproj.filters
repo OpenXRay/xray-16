@@ -903,6 +903,9 @@
     <ClInclude Include="DX12\Resource\View\CCryDX12UnorderedAccessView.hpp">
       <Filter>Kernel\DX12\Resource\View</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantAllocator.h">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1663,6 +1666,9 @@
     </ClCompile>
     <ClCompile Include="DX12\Resource\View\CCryDX12DepthStencilView.cpp">
       <Filter>Kernel\DX12\Resource\View</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dx11ConstantAllocator.cpp">
+      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

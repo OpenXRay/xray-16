@@ -277,8 +277,7 @@ namespace DX12
 #else
             MaxFenceValue(m_UsedFenceValues[CMDTYPE_ANY][CMDQUEUE_COPY    ], std::max(m_UsedFenceValues[CMDTYPE_READ][CMDQUEUE_COPY    ], m_UsedFenceValues[CMDTYPE_WRITE][CMDQUEUE_COPY    ]));
             MaxFenceValue(m_UsedFenceValues[CMDTYPE_ANY][CMDQUEUE_GRAPHICS], std::max(m_UsedFenceValues[CMDTYPE_READ][CMDQUEUE_GRAPHICS], m_UsedFenceValues[CMDTYPE_WRITE][CMDQUEUE_GRAPHICS]));
-#endif
-            
+#endif      
             m_rPool.WaitForFenceOnGPU(m_UsedFenceValues[CMDTYPE_ANY]);
 
             // Then inject the Execute() which is possibly blocked by the Wait()

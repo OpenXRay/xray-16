@@ -202,7 +202,7 @@ namespace DX12
 
             fenceValuesMasked[CMDQUEUE_COPY    ] = fenceValues[CMDQUEUE_COPY    ];
             fenceValuesMasked[CMDQUEUE_GRAPHICS] = fenceValues[CMDQUEUE_GRAPHICS];
-            //fenceValuesMasked[m_nPoolFenceId   ] = 0;
+            fenceValuesMasked[m_nPoolFenceId   ] = 0;
 
             return m_rCmdFences.IsCompleted(fenceValuesMasked);
         }

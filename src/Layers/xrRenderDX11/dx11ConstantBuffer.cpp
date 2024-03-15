@@ -3,6 +3,39 @@
 
 #include "Layers/xrRender/BufferUtils.h"
 
+#if defined (XR_PLATFORM_WINDOWS)
+#define USE_CPU_SSE
+#endif
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+static inline bool CopyData(void* dst, const void* src, size_t size)
+{
+    bool requires_flush = true;
+#if defined(USE_CPU_SSE)
+    if ((((uintptr_t)dst | (uintptr_t)src | size) & 0xf) == 0u)
+    {
+        __m128* d = (__m128*)dst;
+        const __m128* s = (const __m128*)src;
+        const __m128* e = (const __m128*)src + (size >> 4);
+        while (s < e)
+        {
+            _mm_stream_ps((float*)(d++), _mm_load_ps((const float*)(s++)));
+        }
+        _mm_sfence();
+        requires_flush = false;
+    }
+    else
+#endif
+    {
+        memcpy(dst, src, size);
+    }
+   
+    return requires_flush;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+
 dx11ConstantBuffer::~dx11ConstantBuffer()
 {
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
@@ -10,19 +43,36 @@ dx11ConstantBuffer::~dx11ConstantBuffer()
         RImplementation.Resources->_DeleteConstantBuffer(id, this);
     }
     //	Flush();
-    _RELEASE(m_pBuffer);
-    xr_free(m_pBufferData);
+#if defined(USE_DX12)
+    HW.DeallocateConstantBuffer(this);
+#else
+    _RELEASE(m_buffer);
+#endif
+    xr_free(m_bufferData);
 }
 
-dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable) : m_bChanged(true)
+dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable)
+    : 
+    m_buffer(nullptr),
+#if defined(USE_DX12)
+    m_base_ptr(nullptr), 
+    m_allocator(nullptr), 
+    m_offset(0), 
+    m_size(0),
+#endif
+    m_bufferChanged(true)
 {
     D3D_SHADER_BUFFER_DESC Desc;
 
     CHK_DX(pTable->GetDesc(&Desc));
 
-    m_strBufferName._set(Desc.Name);
-    m_eBufferType = Desc.Type;
-    m_uiBufferSize = Desc.Size;
+    m_bufferName._set(Desc.Name);
+    m_bufferType = Desc.Type;
+    m_bufferSize = Desc.Size;
+
+#if defined(USE_DX12)
+    m_size = (Desc.Size + 255) & ~255;
+#endif
 
     //	Fill member list with variable descriptions
     m_MembersList.resize(Desc.Variables);
@@ -46,25 +96,31 @@ dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
 
     m_uiMembersCRC = crc32(&m_MembersList[0], Desc.Variables * sizeof(m_MembersList[0]));
 
-    R_CHK(BufferUtils::CreateConstantBuffer(&m_pBuffer, Desc.Size));
-    VERIFY(m_pBuffer);
-    m_pBufferData = xr_malloc(Desc.Size);
-    VERIFY(m_pBufferData);
+#if !defined(USE_DX12)
+    R_CHK(BufferUtils::CreateConstantBuffer(&m_buffer, Desc.Size));
+    VERIFY(m_buffer);
+#endif
+
+    m_bufferData = xr_malloc(Desc.Size);
+    VERIFY(m_bufferData);
+    ZeroMemory(m_bufferData, Desc.Size);
 
 #ifdef DEBUG
-    if (m_pBuffer)
+#if !defined(USE_DX12)
+    if (m_buffer)
     {
-        m_pBuffer->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(Desc.Name), Desc.Name);
+        m_buffer->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(Desc.Name), Desc.Name);
     }
+#endif
 #endif
 }
 
 bool dx11ConstantBuffer::Similar(dx11ConstantBuffer& _in)
 {
-    if (m_strBufferName._get() != _in.m_strBufferName._get())
+    if (m_bufferName._get() != _in.m_bufferName._get())
         return false;
 
-    if (m_eBufferType != _in.m_eBufferType)
+    if (m_bufferType != _in.m_bufferType)
         return false;
 
     if (m_uiMembersCRC != _in.m_uiMembersCRC)
@@ -89,25 +145,28 @@ bool dx11ConstantBuffer::Similar(dx11ConstantBuffer& _in)
 }
 
 void dx11ConstantBuffer::Flush(u32 context_id)
-{
-    if (m_bChanged)
+{   
+    if (m_bufferChanged)
     {
-        void* pData;
-#if defined(USE_DX11) || defined(USE_DX12)
+        void* pData = nullptr;
+#if defined(USE_DX12)
+        pData = HW.AllocateConstantBuffer(this);
+#elif defined(USE_DX11) 
         D3D11_MAPPED_SUBRESOURCE pSubRes;
-        CHK_DX(HW.get_context(context_id)->Map(m_pBuffer, 0, D3D_MAP_WRITE_DISCARD, 0, &pSubRes));
+        CHK_DX(HW.get_context(context_id)->Map(m_buffer, 0, D3D_MAP_WRITE_DISCARD, 0, &pSubRes));
         pData = pSubRes.pData;
 #else
-        CHK_DX(m_pBuffer->Map(D3D_MAP_WRITE_DISCARD, 0, &pData));
+        CHK_DX(m_buffer->Map(D3D_MAP_WRITE_DISCARD, 0, &pData));
 #endif
         VERIFY(pData);
-        VERIFY(m_pBufferData);
-        CopyMemory(pData, m_pBufferData, m_uiBufferSize);
-#if defined(USE_DX11) || defined(USE_DX12)
-        HW.get_context(context_id)->Unmap(m_pBuffer, 0);
+        VERIFY(m_bufferData);
+        CopyData(pData, m_bufferData, m_bufferSize);
+#if defined(USE_DX12)
+#elif defined(USE_DX11)
+        HW.get_context(context_id)->Unmap(m_buffer, 0);
 #else
-        m_pBuffer->Unmap();
+        m_buffer->Unmap();
 #endif
-        m_bChanged = false;
+        m_bufferChanged = false;
     }
 }
