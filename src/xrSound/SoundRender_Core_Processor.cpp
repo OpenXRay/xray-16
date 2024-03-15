@@ -87,6 +87,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
             // Has emmitter, maybe just not started rendering
             if (T->get_Rendering())
             {
+                T->fill_parameters();
                 T->update();
             }
             else
