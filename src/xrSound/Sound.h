@@ -46,7 +46,6 @@ XRSOUND_API extern float psSoundVFactor;
 XRSOUND_API extern float psSoundVMusic;
 XRSOUND_API extern float psSoundRolloff;
 XRSOUND_API extern float psSoundOcclusionScale;
-XRSOUND_API extern float psSoundVelocityAlpha; // Cribbledirge: Alpha value for moving average.
 XRSOUND_API extern float psSoundTimeFactor; //--#SM+#--
 XRSOUND_API extern Flags32 psSoundFlags;
 XRSOUND_API extern int psSoundTargets;
@@ -113,48 +112,13 @@ class XRSOUND_API CSound_environment
 class XRSOUND_API CSound_params
 {
 public:
-    Fvector position{};
-    Fvector velocity{};  // Cribbledirge.  Added for doppler effect.
-    Fvector curVelocity{};  // Current velocity.
-    Fvector prevVelocity{};  // Previous velocity.
-    Fvector accVelocity{};  // Velocity accumulator (for moving average).
+    Fvector position;
     float base_volume;
     float volume;
     float freq;
     float min_distance;
     float max_distance;
     float max_ai_distance;
-
-    // Functions added by Cribbledirge for doppler effect.
-    void update_position(const Fvector& newPosition)
-    {
-        // If the position has been set already, start getting a moving average of the velocity.
-        if (set)
-        {
-            prevVelocity.set(accVelocity);
-            curVelocity.sub(newPosition, position);
-            accVelocity.set(curVelocity.mul(psSoundVelocityAlpha).add(prevVelocity.mul(1.f - psSoundVelocityAlpha)));
-        }
-        else
-        {
-            set = true;
-        }
-        position.set(newPosition);
-    }
-
-    void update_velocity(const float dt)
-    {
-        velocity.set(accVelocity).div(dt);
-    }
-
-private:
-    // A variable in place to determine if the position has been set.  This is to prevent artifacts when
-    // the position jumps from its initial position of zero to something greatly different.  This is a big
-    // issue in moving average calculation.  We want the velocity to always start at zero for when the sound
-    // was initiated, or else things will sound really really weird.
-    bool set{};
-
-    // End Cribbledirge.
 };
 
 /// definition (Sound Interface)

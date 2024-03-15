@@ -11,9 +11,9 @@ extern float psSoundVEffects;
 void CSoundRender_Emitter::set_position(const Fvector& pos)
 {
     if (source()->channels_num() == 1)
-        p_source.update_position(pos);
+        p_source.position = pos;
     else
-        p_source.update_position({});
+        p_source.position.set(0, 0, 0);
 
     bMoved = true;
 }
