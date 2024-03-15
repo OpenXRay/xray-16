@@ -22,8 +22,31 @@ protected:
 private:
     volatile bool isLocked;
 
+public:
+    struct SListener
+    {
+        Fvector position;
+        Fvector orientation[3];
+
+        [[nodiscard]]
+        SListener ToRHS() const
+        {
+            return
+            {
+                { position.x, position.y, -position.z },
+                {
+                    { orientation[0].x, orientation[0].y, -orientation[0].z },
+                    { orientation[1].x, orientation[1].y, -orientation[1].z },
+                    { orientation[2].x, orientation[2].y, -orientation[2].z },
+                },
+            };
+        }
+    };
+
 protected:
-    bool bListenerMoved;
+    SListener Listener;
+
+    bool bListenerMoved{};
 
     CSoundRender_Environment e_current;
     CSoundRender_Environment e_target;
@@ -95,8 +118,9 @@ public:
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     // listener
-    //	virtual const Fvector&				listener_position		( )=0;
-    virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt) = 0;
+    const auto& listener_params() const { return Listener; }
+    const Fvector& listener_position() override { return Listener.position; }
+    virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt);
 
     void refresh_sources() override;
 

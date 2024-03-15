@@ -163,15 +163,9 @@ void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, con
 {
     inherited::update_listener(P, D, N, R, dt);
 
-    if (!Listener.position.similar(P))
-    {
-        Listener.position.set(P);
-        bListenerMoved = TRUE;
-    }
-    Listener.orientation[0].set(D.x, D.y, -D.z);
-    Listener.orientation[1].set(N.x, N.y, -N.z);
+    const auto listener = Listener.ToRHS();
 
-    A_CHK(alListener3f(AL_POSITION, Listener.position.x, Listener.position.y, -Listener.position.z));
+    A_CHK(alListener3f(AL_POSITION, listener.position.x, listener.position.y, listener.position.z));
     A_CHK(alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f));
-    A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&Listener.orientation[0].x));
+    A_CHK(alListenerfv(AL_ORIENTATION, &listener.orientation[0].x));
 }
