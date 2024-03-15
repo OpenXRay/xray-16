@@ -90,13 +90,13 @@ public:
 
     void set_master_volume(float f) override = 0;
 
-    void update(const Fvector& P, const Fvector& D, const Fvector& N) override;
+    void update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R) override;
     void statistic(CSound_stats* dest, CSound_stats_ext* ext) override;
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     // listener
     //	virtual const Fvector&				listener_position		( )=0;
-    virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) = 0;
+    virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt) = 0;
 
     void refresh_sources() override;
 

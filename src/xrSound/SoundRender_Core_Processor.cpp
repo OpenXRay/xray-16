@@ -9,7 +9,7 @@
 #include "SoundRender_Target.h"
 #include "SoundRender_Source.h"
 
-void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector& N)
+void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R)
 {
     if (0 == bReady)
         return;
@@ -104,7 +104,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
     }
 
     // update listener
-    update_listener(P, D, N, fTimer_Delta);
+    update_listener(P, D, N, R, fTimer_Delta);
 
     // Start rendering of pending targets
     if (!s_targets_defer.empty())

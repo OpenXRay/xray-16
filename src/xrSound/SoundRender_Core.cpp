@@ -189,7 +189,7 @@ void CSoundRender_Core::env_apply()
     bListenerMoved = true;
 }
 
-void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
+void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt)
 {
     if (!psSoundFlags.test(ss_EFX) || !m_effects)
         return;

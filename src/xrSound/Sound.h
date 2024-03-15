@@ -229,7 +229,7 @@ public:
 
     virtual void set_master_volume(float f = 1.f) = 0;
 
-    virtual void update(const Fvector& P, const Fvector& D, const Fvector& N) = 0;
+    virtual void update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R) = 0;
     virtual void statistic(CSound_stats* s0, CSound_stats_ext* s1) = 0;
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) = 0;
 

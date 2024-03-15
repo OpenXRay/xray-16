@@ -159,9 +159,9 @@ void CSoundRender_CoreA::_clear()
     xr_delete(pDeviceList);
 }
 
-void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
+void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt)
 {
-    inherited::update_listener(P, D, N, dt);
+    inherited::update_listener(P, D, N, R, dt);
 
     if (!Listener.position.similar(P))
     {

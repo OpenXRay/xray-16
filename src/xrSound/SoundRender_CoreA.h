@@ -67,7 +67,7 @@ class CSoundRender_CoreA : public CSoundRender_Core
     SListener Listener;
 
 protected:
-    void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) override;
+    void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt) override;
 
 public:
     CSoundRender_CoreA(CSoundManager& p);
