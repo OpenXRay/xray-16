@@ -27,7 +27,7 @@ bool is_enough_address_space_available() { return true; }
 
 int get_texture_load_lod(LPCSTR fn)
 {
-    CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
+    const CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
     auto it_ = sect.Data.cbegin();
     auto it_e_ = sect.Data.cend();
 
@@ -38,7 +38,7 @@ int get_texture_load_lod(LPCSTR fn)
 
     for (; it != it_e; ++it)
     {
-        if (strstr(fn, it->first.c_str()))
+        if (strstr(fn, it->name.c_str()))
         {
             if (psTextureLOD < 1)
             {

@@ -52,13 +52,13 @@ void CPartition::load(IKinematics* V, LPCSTR model_name)
         for (; it != it_e; ++it)
         {
             const CInifile::Item& I = *it;
-            if (I.first == part_name)
+            if (I.name == part_name)
             {
-                P[i].Name = I.second;
+                P[i].Name = I.value;
             }
             else
             {
-                u32 bid = V->LL_BoneID(I.first.c_str());
+                u32 bid = V->LL_BoneID(I.name.c_str());
                 P[i].bones.push_back(bid);
             }
         }

@@ -77,16 +77,16 @@ IC void CTradeParameters::process(_action_type type, CInifile& ini_file, const s
     auto E = S.Data.cend();
     for (; I != E; ++I)
     {
-        if (!(*I).second.size())
+        if (!(*I).value.size())
         {
-            _action.disable((*I).first);
+            _action.disable((*I).name);
             continue;
         }
 
         string256 temp0, temp1;
-        THROW3(_GetItemCount(*(*I).second) == 2, "Invalid parameters in section", *section);
-        _action.enable((*I).first, CTradeFactors((float)atof(_GetItem(*(*I).second, 0, temp0)),
-                                       (float)atof(_GetItem(*(*I).second, 1, temp1))));
+        THROW3(_GetItemCount(*(*I).value) == 2, "Invalid parameters in section", *section);
+        _action.enable((*I).name, CTradeFactors((float)atof(_GetItem(*(*I).value, 0, temp0)),
+                                       (float)atof(_GetItem(*(*I).value, 1, temp1))));
     }
 }
 

@@ -96,22 +96,22 @@ typename CSIni_Table::ITEM_TABLE& CSIni_Table::table()
     m_pTable->resize(table_size);
 
     string64 buffer;
-    CInifile::Sect& table_ini = pSettings->r_section(table_sect);
+    const CInifile::Sect& table_ini = pSettings->r_section(table_sect);
 
     R_ASSERT3(table_ini.Data.size() == table_size, "wrong size for table in section", table_sect);
 
     for (auto i = table_ini.Data.cbegin(); table_ini.Data.cend() != i; ++i)
     {
         typename T_INI_LOADER::index_type cur_index =
-            T_INI_LOADER::IdToIndex((*i).first, type_max<typename T_INI_LOADER::index_type>);
+            T_INI_LOADER::IdToIndex((*i).name, type_max<typename T_INI_LOADER::index_type>);
 
         if (type_max<typename T_INI_LOADER::index_type> == cur_index)
-            xrDebug::Fatal(DEBUG_INFO, "wrong community %s in section [%s]", (*i).first.c_str(), table_sect);
+            xrDebug::Fatal(DEBUG_INFO, "wrong community %s in section [%s]", (*i).name.c_str(), table_sect);
 
         (*m_pTable)[cur_index].resize(cur_table_width);
         for (size_t j = 0; j < cur_table_width; j++)
         {
-            (*m_pTable)[cur_index][j] = convert(_GetItem(*(*i).second, (int)j, buffer));
+            (*m_pTable)[cur_index][j] = convert(_GetItem(*(*i).value, (int)j, buffer));
         }
     }
 

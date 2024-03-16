@@ -89,17 +89,17 @@ LPCSTR configs_verifyer::get_section_diff(CInifile::Sect* sect_ptr, CInifile& ac
 
     for (auto cit = sect_ptr->Data.cbegin(), ciet = sect_ptr->Data.cend(); cit != ciet; ++cit)
     {
-        shared_str const& tmp_value = cit->second;
+        shared_str const& tmp_value = cit->value;
         shared_str real_value;
         if (tmp_active_param)
         {
-            if (active_params.line_exist(sect_ptr->Name.c_str(), cit->first))
+            if (active_params.line_exist(sect_ptr->Name.c_str(), cit->name))
             {
-                real_value = active_params.r_string(sect_ptr->Name.c_str(), cit->first.c_str());
+                real_value = active_params.r_string(sect_ptr->Name.c_str(), cit->name.c_str());
                 if (tmp_value != real_value)
                 {
                     pcstr tmp_key_str = nullptr;
-                    STRCONCAT(tmp_key_str, sect_ptr->Name.c_str(), "::", cit->first.c_str());
+                    STRCONCAT(tmp_key_str, sect_ptr->Name.c_str(), "::", cit->name.c_str());
                     STRCONCAT(diff_str, tmp_key_str, " = ", tmp_value.c_str(), ",right = ", real_value.c_str());
                     strncpy_s(dst_diff, diff_str, sizeof(dst_diff) - 1);
                     dst_diff[sizeof(dst_diff) - 1] = 0;
@@ -108,18 +108,18 @@ LPCSTR configs_verifyer::get_section_diff(CInifile::Sect* sect_ptr, CInifile& ac
                 continue;
             }
         }
-        if (!pSettings->line_exist(sect_ptr->Name, cit->first))
+        if (!pSettings->line_exist(sect_ptr->Name, cit->name))
         {
-            STRCONCAT(diff_str, "line ", sect_ptr->Name.c_str(), "::", cit->first.c_str(), " not found");
+            STRCONCAT(diff_str, "line ", sect_ptr->Name.c_str(), "::", cit->name.c_str(), " not found");
             strncpy_s(dst_diff, diff_str, sizeof(dst_diff) - 1);
             dst_diff[sizeof(dst_diff) - 1] = 0;
             return dst_diff;
         }
-        real_value = pSettings->r_string(sect_ptr->Name.c_str(), cit->first.c_str());
+        real_value = pSettings->r_string(sect_ptr->Name.c_str(), cit->name.c_str());
         if (tmp_value != real_value)
         {
             pcstr tmp_key_str = nullptr;
-            STRCONCAT(tmp_key_str, sect_ptr->Name.c_str(), "::", cit->first.c_str());
+            STRCONCAT(tmp_key_str, sect_ptr->Name.c_str(), "::", cit->name.c_str());
             STRCONCAT(diff_str, tmp_key_str, " = ", tmp_value.c_str(), ",right = ", real_value.c_str());
             strncpy_s(dst_diff, diff_str, sizeof(dst_diff) - 1);
             dst_diff[sizeof(dst_diff) - 1] = 0;

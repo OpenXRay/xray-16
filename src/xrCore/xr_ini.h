@@ -15,7 +15,6 @@
 constexpr pcstr OPENXRAY_INI_SECTION = "openxray";
 
 // refs
-class CInifile;
 struct xr_token;
 class IReader;
 
@@ -24,17 +23,8 @@ class XRCORE_API CInifile
 public:
     struct XRCORE_API Item
     {
-        shared_str first;
-        shared_str second;
-        //#ifdef DEBUG
-        // shared_str comment;
-        //#endif
-        Item()
-            : first(nullptr), second(nullptr)
-              //#ifdef DEBUG
-              // , comment(0)
-              //#endif
-              {};
+        shared_str name = nullptr;
+        shared_str value = nullptr;
     };
 
     using Items = xr_vector<Item>;
@@ -44,7 +34,7 @@ public:
         shared_str Name;
         Items Data;
 
-        bool line_exist(pcstr line, pcstr* value = nullptr);
+        [[nodiscard]] bool line_exist(pcstr line_name, pcstr* value = nullptr);
     };
 
     using Root = xr_vector<Sect*>;
@@ -53,10 +43,7 @@ public:
 
     static CInifile* Create(pcstr fileName, bool readOnly = true);
     static void Destroy(CInifile*);
-    static bool isBool(pcstr str)
-    {
-        return xr_strcmp(str, "on") == 0 || xr_strcmp(str, "yes") == 0 || xr_strcmp(str, "true") == 0 || xr_strcmp(str, "1") == 0;
-    }
+    static bool isBool(pcstr str);
 
 private:
     enum
@@ -69,195 +56,235 @@ private:
     string_path m_file_name;
     Root DATA;
 
-    void Load(IReader* F, pcstr path, allow_include_func_t allow_include_func = nullptr);
+    void Load(IReader* reader, pcstr path, allow_include_func_t allow_include_func, u8 include_depth);
+
+    bool insert_new_section(Sect* section);
+
+    [[nodiscard]] Sect& unchecked_read_section(pcstr section_name);
+    [[nodiscard]] const Sect& unchecked_read_section(pcstr section_name) const;
 
 public:
-    CInifile(IReader* F, pcstr path = nullptr, allow_include_func_t allow_include_func = nullptr);
+    CInifile(IReader* reader, pcstr path = nullptr, allow_include_func_t allow_include_func = nullptr);
 
     CInifile(pcstr fileName, bool readOnly = true,
              bool loadAtStart = true, bool saveAtEnd = true,
              u32 sect_count = 0, allow_include_func_t allow_include_func = nullptr);
 
     virtual ~CInifile();
+
     bool save_as(pcstr new_fname = nullptr);
     void save_as(IWriter& writer, bool bcheck = false) const;
-    void set_override_names(bool b) noexcept { m_flags.set(eOverrideNames, b); }
-    void save_at_end(bool b) noexcept { m_flags.set(eSaveAtEnd, b); }
-    pcstr fname() const /*noexcept*/ { return m_file_name; };
-    Sect& r_section(pcstr S) const;
-    Sect& r_section(const shared_str& S) const;
-    bool line_exist(pcstr S, pcstr L)const;
-    bool line_exist(const shared_str& S, const shared_str& L)const;
-    u32 line_count(pcstr S) const;
-    u32 line_count(const shared_str& S) const;
-    u32 section_count() const;
-    bool section_exist(pcstr S) const;
-    bool section_exist(const shared_str& S) const;
-    Root& sections() { return DATA; }
-    Root const& sections() const { return DATA; }
+    void set_override_names(bool value) noexcept;
+    void save_at_end(bool value) noexcept;
+    void set_readonly(bool value) /*noexcept*/;
+
+    [[nodiscard]] Sect& r_section(pcstr section_name);
+    [[nodiscard]] const Sect& r_section(pcstr section_name) const;
+    [[nodiscard]] Sect& r_section(const shared_str& section_name);
+    [[nodiscard]] const Sect& r_section(const shared_str& section_name) const;
+
+    [[nodiscard]] pcstr fname() const /*noexcept*/;
+    [[nodiscard]] bool line_exist(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] bool line_exist(const shared_str& section_name, const shared_str& line_name) const;
+    [[nodiscard]] u32 line_count(pcstr section_name) const;
+    [[nodiscard]] u32 line_count(const shared_str& section_name) const;
+    [[nodiscard]] u32 section_count() const;
+    [[nodiscard]] bool section_exist(pcstr section_name) const;
+    [[nodiscard]] bool section_exist(const shared_str& section_name) const;
+    [[nodiscard]] Root& sections();
+    [[nodiscard]] const Root& sections() const;
 
     // Generic reading templated functions
     template<typename T>
-    T read(pcstr section, pcstr line) const;
+    [[nodiscard]] T read(pcstr section_name, pcstr line_name) const;
 
     template<typename T>
-    T read(const shared_str& section, pcstr line) const
+    [[nodiscard]] T read(const shared_str& section_name, pcstr line_name) const
     {
-        return read<T>(section.c_str(), line);
+        VERIFY(line_name);
+
+        return read<T>(section_name.c_str(), line_name);
     }
 
     template<typename T>
-    bool try_read(T& outValue, pcstr section, pcstr line) const;
+    bool try_read(T& out_value, pcstr section_name, pcstr line_name) const;
 
     template<typename T>
-    bool try_read(T& outValue, const shared_str& section, pcstr line) const
+    bool try_read(T& out_value, const shared_str& section_name, pcstr line_name) const
     {
-        return try_read<T>(outValue, section.c_str(), line);
+        VERIFY(line_name);
+
+        return try_read<T>(out_value, section_name.c_str(), line_name);
     }
+
+    [[nodiscard]] Sect* try_read_section(pcstr section_name);
+    [[nodiscard]] const Sect* try_read_section(pcstr section_name) const;
 
     // Returns value if it exist, or returns default value
     template<typename T>
-    T read_if_exists(pcstr section, pcstr line, T defaultValue) const
+    T read_if_exists(pcstr section_name, pcstr line_name, T default_value) const
     {
-        if (line_exist(section, line))
+        VERIFY(section_name);
+        VERIFY(line_name);
+
+        if (line_exist(section_name, line_name))
         {
-            return read<T>(section, line);
+            return read<T>(section_name, line_name);
         }
-        return defaultValue;
+
+        return default_value;
     }
 
     template<typename T>
-    T read_if_exists(const shared_str& section, pcstr line, T defaultValue) const
+    T read_if_exists(const shared_str& section_name, pcstr line_name, T default_value) const
     {
-        return read_if_exists<T>(section.c_str(), line, defaultValue);
+        return read_if_exists<T>(section_name.c_str(), line_name, default_value);
     }
 
     // Returns true if value is exist and assigns it or returns false
     template<typename T>
-    bool read_if_exists(T& outValue, pcstr section, pcstr line) const
+    bool read_if_exists(T& out_value, pcstr section_name, pcstr line_name) const
     {
-        if (line_exist(section, line))
+        VERIFY(section_name);
+        VERIFY(line_name);
+
+        if (line_exist(section_name, line_name))
         {
-            outValue = read<T>(section, line);
+            out_value = read<T>(section_name, line_name);
             return true;
         }
+
         return false;
     }
 
     template<typename T>
-    bool read_if_exists(T& outValue, const shared_str& section, pcstr line) const
+    bool read_if_exists(T& out_value, const shared_str& section_name, pcstr line_name) const
     {
-        return read_if_exists(outValue, section.c_str(), line);
+        return read_if_exists(out_value, section_name.c_str(), line_name);
     }
 
     // Returns true if value or fallback value exist, crashes otherwise
     template<typename T>
-    bool read_if_exists(T& outValue, pcstr section, pcstr line, pcstr line2, bool at_least_one = false) const
+    bool read_if_exists(
+        T& out_value, pcstr section_name, pcstr line_name, pcstr line2_name, bool at_least_one = false) const
     {
-        if (line_exist(section, line))
+        VERIFY(section_name);
+        VERIFY(line_name);
+        VERIFY(line2_name);
+
+        if (line_exist(section_name, line_name))
         {
-            outValue = read<T>(section, line);
+            out_value = read<T>(section_name, line_name);
             return true;
         }
-        if (line_exist(section, line2))
+
+        if (line_exist(section_name, line2_name))
         {
-            outValue = read<T>(section, line2);
+            out_value = read<T>(section_name, line2_name);
             return true;
         }
+
         if (at_least_one)
-            outValue = read<T>(section, line); // provoke crash
+            xrDebug::Fatal(DEBUG_INFO, "! Ini File[%s]: Can't find line '%s' or '%s' in section '%s'", m_file_name, line_name, line2_name, section_name);
+
         return false;
     }
 
     template<typename T>
-    bool read_if_exists(T& outValue, const shared_str& section, pcstr line, pcstr line2, bool at_least_one = false) const
+    bool read_if_exists(T& out_value, const shared_str& section_name, pcstr line_name, pcstr line2_name,
+        bool at_least_one = false) const
     {
-        return read_if_exists(outValue, section.c_str(), line, line2, at_least_one);
+        return read_if_exists(out_value, section_name.c_str(), line_name, line2_name, at_least_one);
     }
 
     template<typename T>
-    bool try_read_if_exists(T& outValue, pcstr section, pcstr line) const
+    bool try_read_if_exists(T& out_value, pcstr section_name, pcstr line_name) const
     {
-        if (line_exist(section, line))
+        VERIFY(section_name);
+        VERIFY(line_name);
+
+        if (line_exist(section_name, line_name))
         {
-            return try_read<T>(outValue, section, line);
+            return try_read<T>(out_value, section_name, line_name);
         }
+
         return false;
     }
 
     template<typename T>
-    bool try_read_if_exists(T& outValue, const shared_str& section, pcstr line) const
+    bool try_read_if_exists(T& out_value, const shared_str& section_name, pcstr line_name) const
     {
-        return try_read_if_exists(outValue, section.c_str(), line);
+        return try_read_if_exists(out_value, section_name.c_str(), line_name);
     }
 
     // Generic reading functions
-    CLASS_ID r_clsid(pcstr S, pcstr L) const;
-    CLASS_ID r_clsid(const shared_str& S, pcstr L) const { return r_clsid(*S, L); }
-    pcstr r_string(pcstr S, pcstr L) const; // Left quotes in place
-    pcstr r_string(const shared_str& S, pcstr L) const { return r_string(*S, L); } // Left quotes in place
-    shared_str r_string_wb(pcstr S, pcstr L) const; // Remove quotes
-    shared_str r_string_wb(const shared_str& S, pcstr L) const { return r_string_wb(*S, L); } // Remove quotes
-    u8 r_u8(pcstr S, pcstr L) const;
-    u8 r_u8(const shared_str& S, pcstr L) const { return r_u8(*S, L); }
-    u16 r_u16(pcstr S, pcstr L) const;
-    u16 r_u16(const shared_str& S, pcstr L) const { return r_u16(*S, L); }
-    u32 r_u32(pcstr S, pcstr L) const;
-    u32 r_u32(const shared_str& S, pcstr L) const { return r_u32(*S, L); }
-    u64 r_u64(pcstr S, pcstr L) const;
-    s8 r_s8(pcstr S, pcstr L) const;
-    s8 r_s8(const shared_str& S, pcstr L) const { return r_s8(*S, L); }
-    s16 r_s16(pcstr S, pcstr L) const;
-    s16 r_s16(const shared_str& S, pcstr L) const { return r_s16(*S, L); }
-    s32 r_s32(pcstr S, pcstr L) const;
-    s32 r_s32(const shared_str& S, pcstr L) const { return r_s32(*S, L); }
-    s64 r_s64(pcstr S, pcstr L) const;
-    float r_float(pcstr S, pcstr L) const;
-    float r_float(const shared_str& S, pcstr L) const { return r_float(*S, L); }
-    Fcolor r_fcolor(pcstr S, pcstr L) const;
-    Fcolor r_fcolor(const shared_str& S, pcstr L) const { return r_fcolor(*S, L); }
-    u32 r_color(pcstr S, pcstr L) const;
-    u32 r_color(const shared_str& S, pcstr L) const { return r_color(*S, L); }
-    Ivector2 r_ivector2(pcstr S, pcstr L) const;
-    Ivector2 r_ivector2(const shared_str& S, pcstr L) const { return r_ivector2(*S, L); }
-    Ivector3 r_ivector3(pcstr S, pcstr L) const;
-    Ivector3 r_ivector3(const shared_str& S, pcstr L) const { return r_ivector3(*S, L); }
-    Ivector4 r_ivector4(pcstr S, pcstr L) const;
-    Ivector4 r_ivector4(const shared_str& S, pcstr L) const { return r_ivector4(*S, L); }
-    Fvector2 r_fvector2(pcstr S, pcstr L) const;
-    Fvector2 r_fvector2(const shared_str& S, pcstr L) const { return r_fvector2(*S, L); }
-    Fvector3 r_fvector3(pcstr S, pcstr L) const;
-    Fvector3 r_fvector3(const shared_str& S, pcstr L) const { return r_fvector3(*S, L); }
-    Fvector4 r_fvector4(pcstr S, pcstr L) const;
-    Fvector4 r_fvector4(const shared_str& S, pcstr L) const { return r_fvector4(*S, L); }
-    bool r_bool(pcstr S, pcstr L) const;
-    bool r_bool(const shared_str& S, pcstr L) const { return r_bool(*S, L); }
-    int r_token(pcstr S, pcstr L, const xr_token* token_list) const;
-    bool r_line(pcstr S, int L, pcstr* N, pcstr* V) const;
-    bool r_line(const shared_str& S, int L, pcstr* N, pcstr* V) const;
+    [[nodiscard]] CLASS_ID r_clsid(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] CLASS_ID r_clsid(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] pcstr r_string(pcstr section_name, pcstr line_name) const; // Left quotes in place
+    [[nodiscard]] pcstr r_string(const shared_str& section_name, pcstr line_name) const; // Left quotes in place
+    [[nodiscard]] shared_str r_string_wb(pcstr section_name, pcstr line_name) const; // Remove quotes
+    [[nodiscard]] shared_str r_string_wb(const shared_str& section_name, pcstr line_name) const; // Remove quotes
+    [[nodiscard]] u8 r_u8(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] u8 r_u8(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] u16 r_u16(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] u16 r_u16(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] u32 r_u32(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] u32 r_u32(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] u64 r_u64(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] u64 r_u64(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] s8 r_s8(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] s8 r_s8(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] s16 r_s16(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] s16 r_s16(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] s32 r_s32(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] s32 r_s32(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] s64 r_s64(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] s64 r_s64(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] float r_float(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] float r_float(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] Fcolor r_fcolor(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] Fcolor r_fcolor(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] u32 r_color(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] u32 r_color(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] Ivector2 r_ivector2(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] Ivector2 r_ivector2(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] Ivector3 r_ivector3(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] Ivector3 r_ivector3(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] Ivector4 r_ivector4(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] Ivector4 r_ivector4(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] Fvector2 r_fvector2(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] Fvector2 r_fvector2(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] Fvector3 r_fvector3(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] Fvector3 r_fvector3(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] Fvector4 r_fvector4(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] Fvector4 r_fvector4(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] bool r_bool(pcstr section_name, pcstr line_name) const;
+    [[nodiscard]] bool r_bool(const shared_str& section_name, pcstr line_name) const;
+    [[nodiscard]] int r_token(pcstr section_name, pcstr line_name, const xr_token* token_list) const;
+    bool r_line(pcstr section_name, int line_number, pcstr* name_out, pcstr* value_out) const;
+    bool r_line(const shared_str& section_name, int line_number, pcstr* name_out, pcstr* value_out) const;
 
-    void w_string(pcstr S, pcstr L, pcstr V, pcstr comment = nullptr);
-    void w_u8(pcstr S, pcstr L, u8 V, pcstr comment = nullptr);
-    void w_u16(pcstr S, pcstr L, u16 V, pcstr comment = nullptr);
-    void w_u32(pcstr S, pcstr L, u32 V, pcstr comment = nullptr);
-    void w_u64(pcstr S, pcstr L, u64 V, pcstr comment = nullptr);
-    void w_s64(pcstr S, pcstr L, s64 V, pcstr comment = nullptr);
-    void w_s8(pcstr S, pcstr L, s8 V, pcstr comment = nullptr);
-    void w_s16(pcstr S, pcstr L, s16 V, pcstr comment = nullptr);
-    void w_s32(pcstr S, pcstr L, s32 V, pcstr comment = nullptr);
-    void w_float(pcstr S, pcstr L, float V, pcstr comment = nullptr);
-    void w_fcolor(pcstr S, pcstr L, const Fcolor& V, pcstr comment = nullptr);
-    void w_color(pcstr S, pcstr L, u32 V, pcstr comment = nullptr);
-    void w_ivector2(pcstr S, pcstr L, const Ivector2& V, pcstr comment = nullptr);
-    void w_ivector3(pcstr S, pcstr L, const Ivector3& V, pcstr comment = nullptr);
-    void w_ivector4(pcstr S, pcstr L, const Ivector4& V, pcstr comment = nullptr);
-    void w_fvector2(pcstr S, pcstr L, const Fvector2& V, pcstr comment = nullptr);
-    void w_fvector3(pcstr S, pcstr L, const Fvector3& V, pcstr comment = nullptr);
-    void w_fvector4(pcstr S, pcstr L, const Fvector4& V, pcstr comment = nullptr);
-    void w_bool(pcstr S, pcstr L, bool V, pcstr comment = nullptr);
+    void w_string(pcstr section_name, pcstr line_name, pcstr value, pcstr comment = nullptr);
+    void w_u8(pcstr section_name, pcstr line_name, u8 value, pcstr comment = nullptr);
+    void w_u16(pcstr section_name, pcstr line_name, u16 value, pcstr comment = nullptr);
+    void w_u32(pcstr section_name, pcstr line_name, u32 value, pcstr comment = nullptr);
+    void w_u64(pcstr section_name, pcstr line_name, u64 value, pcstr comment = nullptr);
+    void w_s8(pcstr section_name, pcstr line_name, s8 value, pcstr comment = nullptr);
+    void w_s16(pcstr section_name, pcstr line_name, s16 value, pcstr comment = nullptr);
+    void w_s32(pcstr section_name, pcstr line_name, s32 value, pcstr comment = nullptr);
+    void w_s64(pcstr section_name, pcstr line_name, s64 value, pcstr comment = nullptr);
+    void w_float(pcstr section_name, pcstr line_name, float value, pcstr comment = nullptr);
+    void w_fcolor(pcstr section_name, pcstr line_name, const Fcolor& value, pcstr comment = nullptr);
+    void w_color(pcstr section_name, pcstr line_name, u32 value, pcstr comment = nullptr);
+    void w_ivector2(pcstr section_name, pcstr line_name, const Ivector2& value, pcstr comment = nullptr);
+    void w_ivector3(pcstr section_name, pcstr line_name, const Ivector3& value, pcstr comment = nullptr);
+    void w_ivector4(pcstr section_name, pcstr line_name, const Ivector4& value, pcstr comment = nullptr);
+    void w_fvector2(pcstr section_name, pcstr line_name, const Fvector2& value, pcstr comment = nullptr);
+    void w_fvector3(pcstr section_name, pcstr line_name, const Fvector3& value, pcstr comment = nullptr);
+    void w_fvector4(pcstr section_name, pcstr line_name, const Fvector4& value, pcstr comment = nullptr);
+    void w_bool(pcstr section_name, pcstr line_name, bool value, pcstr comment = nullptr);
 
-    void remove_line(pcstr S, pcstr L);
-    void set_readonly(bool b);
+    void remove_line(pcstr section_name, pcstr line_name);
 };
 
 #define READ_IF_EXISTS(ltx, method, section, name, default_value) \
@@ -267,5 +294,7 @@ public:
 extern XRCORE_API CInifile const* pSettings;
 extern XRCORE_API CInifile const* pSettingsAuth;
 extern XRCORE_API CInifile const* pSettingsOpenXRay;
+
+extern XRCORE_API bool ltx_multiline_values_enabled;
 
 #endif //__XR_INI_H__

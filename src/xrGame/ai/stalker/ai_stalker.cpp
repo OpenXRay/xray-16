@@ -1240,11 +1240,11 @@ void CAI_Stalker::fill_bones_body_parts(LPCSTR bone_id, const ECriticalWoundType
     IKinematics* kinematics = smart_cast<IKinematics*>(Visual());
     VERIFY(kinematics);
 
-    CInifile::Sect& body_part_section = pSettings->r_section(body_part_section_id);
+    const CInifile::Sect& body_part_section = pSettings->r_section(body_part_section_id);
     auto I = body_part_section.Data.cbegin();
     auto E = body_part_section.Data.cend();
     for (; I != E; ++I)
-        m_bones_body_parts.emplace(kinematics->LL_BoneID((*I).first), u32(wound_type));
+        m_bones_body_parts.emplace(kinematics->LL_BoneID((*I).name), u32(wound_type));
 }
 
 void CAI_Stalker::on_before_change_team()

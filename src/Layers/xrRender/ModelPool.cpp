@@ -425,7 +425,7 @@ void CModelPool::Prefetch()
     for (auto I = sect.Data.cbegin(); I != sect.Data.cend(); ++I)
     {
         const CInifile::Item& item = *I;
-        dxRender_Visual* V = Create(item.first.c_str());
+        dxRender_Visual* V = Create(item.name.c_str());
         Delete(V, FALSE);
     }
     Logging(TRUE);

@@ -158,7 +158,7 @@ bool UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
     VERIFY2(pSettings->line_count(properties_section), make_string("Section [%s] is empty !", properties_section));
     shared_str property_id;
 
-    CInifile::Sect& inv_section = pSettings->r_section(properties_section);
+    const CInifile::Sect& inv_section = pSettings->r_section(properties_section);
     auto ib = inv_section.Data.begin();
     auto ie = inv_section.Data.end();
     for (; ib != ie; ++ib)
@@ -166,7 +166,7 @@ bool UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
         UIProperty* ui_property = xr_new<UIProperty>(); // load one time !!
         ui_property->init_from_xml(ui_xml);
 
-        property_id._set((*ib).first);
+        property_id._set((*ib).name);
         if (!ui_property->init_property(property_id))
         {
             Msg("! Invalid property <%s> in inventory upgrade manager!", property_id.c_str());

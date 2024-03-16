@@ -102,12 +102,12 @@ bool CLevel::Load_GameSpecific_After()
         // loading random (around player) sounds
         if (pSettings->section_exist("sounds_random"))
         {
-            CInifile::Sect& S = pSettings->r_section("sounds_random");
+            const CInifile::Sect& S = pSettings->r_section("sounds_random");
             Sounds_Random.reserve(S.Data.size());
             for (auto I = S.Data.cbegin(); S.Data.cend() != I; ++I)
             {
                 Sounds_Random.push_back(ref_sound());
-                Sounds_Random.back().create(*I->first, st_Effect, sg_SourceType);
+                Sounds_Random.back().create(*I->name, st_Effect, sg_SourceType);
             }
             Sounds_Random_dwNextTime = Device.TimerAsync() + 50000;
             Sounds_Random_Enabled = FALSE;

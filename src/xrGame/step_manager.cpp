@@ -267,22 +267,22 @@ Fvector CStepManager::get_foot_position(ELegType leg_type)
     return global_transform.c;
 }
 
-void CStepManager::load_foot_bones(CInifile::Sect& data)
+void CStepManager::load_foot_bones(const CInifile::Sect& data)
 {
     for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
     {
         const CInifile::Item& item = *I;
 
-        u16 index = smart_cast<IKinematics*>(m_object->Visual())->LL_BoneID(*item.second);
-        VERIFY3(index != BI_NONE, "foot bone not found", *item.second);
+        u16 index = smart_cast<IKinematics*>(m_object->Visual())->LL_BoneID(*item.value);
+        VERIFY3(index != BI_NONE, "foot bone not found", *item.value);
 
-        if (xr_strcmp(*item.first, "front_left") == 0)
+        if (xr_strcmp(*item.name, "front_left") == 0)
             m_foot_bones[eFrontLeft] = index;
-        else if (xr_strcmp(*item.first, "front_right") == 0)
+        else if (xr_strcmp(*item.name, "front_right") == 0)
             m_foot_bones[eFrontRight] = index;
-        else if (xr_strcmp(*item.first, "back_right") == 0)
+        else if (xr_strcmp(*item.name, "back_right") == 0)
             m_foot_bones[eBackRight] = index;
-        else if (xr_strcmp(*item.first, "back_left") == 0)
+        else if (xr_strcmp(*item.name, "back_left") == 0)
             m_foot_bones[eBackLeft] = index;
     }
 }

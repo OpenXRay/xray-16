@@ -22,9 +22,9 @@ void CContextMenu::Load(CInifile* INI, LPCSTR SECT)
         char Event[128], Param[128];
         Event[0] = 0;
         Param[0] = 0;
-        sscanf(*I->second, "%[^,],%s", Event, Param);
+        sscanf(*I->value, "%[^,],%s", Event, Param);
         MenuItem Item;
-        Item.Name = xr_strdup(*I->first);
+        Item.Name = xr_strdup(*I->name);
         Item.Event = Engine.Event.Create(Event);
         Item.Param = xr_strdup(Param);
         Items.push_back(Item);
