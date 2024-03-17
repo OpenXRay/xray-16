@@ -301,6 +301,8 @@ public:
     GameMtlIt FirstMaterial() { return materials.begin(); }
     GameMtlIt LastMaterial() { return materials.end(); }
 
+    const auto& Materials() const { return materials; }
+
     u32 CountMaterial() const { return materials.size(); }
 
 #ifdef _EDITOR
