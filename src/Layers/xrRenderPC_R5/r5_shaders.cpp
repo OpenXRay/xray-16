@@ -29,7 +29,12 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
 #endif
 
     ID3DShaderReflection* pReflection = 0;
+
+#if USE_DX12
+    _hr = D3DReflectDXILorDXBC(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+#else
     _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+#endif
 
     if (SUCCEEDED(_hr) && pReflection)
     {
@@ -572,6 +577,11 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         includer Includer;
         LPD3DBLOB pShaderBuf = NULL;
         LPD3DBLOB pErrorBuf = NULL;
+
+#if defined(USE_DX12)
+        _result = D3DCompileDXILorDXBC(fs->pointer(), fs->length(), "", options.data(), &Includer,
+            pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
+#else
         _result = HW.D3DCompile(fs->pointer(), fs->length(), "", options.data(),
             &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
 
@@ -586,6 +596,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
                     &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
             }
         }
+#endif
 
         if (SUCCEEDED(_result))
         {

@@ -33,6 +33,10 @@ typedef CCryDX12SwapChain       DXGISwapChain;
 typedef CCryDX12Device          D3DDevice;
 typedef CCryDX12DeviceContext   D3DDeviceContext;
 
+HRESULT WINAPI D3DCompileDXILorDXBC(LPCVOID pSrcData, SIZE_T SrcDataSize, LPCSTR pSourceName,
+    const D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR pEntrypoint, LPCSTR pTarget, UINT Flags1,
+    UINT Flags2, ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs);
+
 HRESULT WINAPI D3DReflectDXILorDXBC(_In_reads_bytes_(SrcDataSize) LPCVOID pSrcData, _In_ SIZE_T SrcDataSize,
     _In_ REFIID pInterface, _Out_ void** ppReflector);
 

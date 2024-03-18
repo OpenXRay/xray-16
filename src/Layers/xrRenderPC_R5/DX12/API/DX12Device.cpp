@@ -24,11 +24,6 @@ namespace DX12
     {
         ID3D12Device* pDevice12 = NULL;
 
-#if DX12_USE_DXC
-        HRESULT res = D3D12EnableExperimentalFeatures(1, &D3D12ExperimentalShaderModels, nullptr, nullptr);
-        DX12_ASSERT(res == S_OK, "Enabling experimental features for D3D12 Device didn't work!");
-#endif
-
 #if DX12_ENABLE_DEBUG_LAYER > 0
         ID3D12Debug* debugInterface = nullptr;
         if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
@@ -69,11 +64,19 @@ namespace DX12
             return NULL;
         }
 
+#if DX12_USE_DXC == 1
+        D3D12_FEATURE_DATA_SHADER_MODEL shaderModel = {D3D_SHADER_MODEL_6_0};
+        if (FAILED(pDevice12->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel))))
+        {
+            DX12_ASSERT(0, "Shader Model 6.0 is not supported!");
+        }
+#endif // DX12_USE_DXC
+
         if (pFeatureLevel)
         {
             *pFeatureLevel = level;
         }
-
+     
         Device* result = new Device(pDevice12);
         pDevice12->Release();
 

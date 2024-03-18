@@ -572,6 +572,12 @@
     <CopyFileToFolders Include="$(WindowsSdkDir)Redist\D3D\$(PlatformShortName)\d3dcompiler_47.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="C:\Program Files (x86)\Windows Kits\10\Redist\D3D\x64\dxcompiler.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="C:\Program Files (x86)\Windows Kits\10\Redist\D3D\x64\dxil.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

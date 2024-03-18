@@ -84,7 +84,6 @@ using namespace ATL;
 
 namespace hlsl
 {
-
 #define DXIL_FOURCC(ch0, ch1, ch2, ch3)                                                                                \
     ((uint32_t)(uint8_t)(ch0) | (uint32_t)(uint8_t)(ch1) << 8 | (uint32_t)(uint8_t)(ch2) << 16 |                       \
         (uint32_t)(uint8_t)(ch3) << 24)
@@ -131,6 +130,62 @@ HRESULT CreateContainerReflection(IDxcContainerReflection** ppReflection)
 {
     return DxcCreateInstance(CLSID_DxcContainerReflection, __uuidof(IDxcContainerReflection), (void**)ppReflection);
 }
+
+class IncludeHandler : public IDxcIncludeHandler
+{
+    std::string ConvertToChar(LPCWSTR pFilename) const
+    {
+        std::wstring wide_path(pFilename);
+        std::string path;
+        std::transform(wide_path.begin(), wide_path.end(), 
+            std::back_inserter(path), [](wchar_t c)     
+            { 
+                return (char)c;
+            }
+        );
+
+        path.replace(0, 2, "");
+        return path;
+    }
+
+public:
+    
+    IncludeHandler(ID3DInclude* include) : 
+        m_includer(include)
+    {
+    }
+
+    HRESULT QueryInterface(REFIID iid, void** ppvObject) override { return S_OK; }
+    ULONG AddRef() override { return 1; }
+    ULONG Release() override { return 1; }
+
+    HRESULT STDMETHODCALLTYPE LoadSource(LPCWSTR pFilename, IDxcBlob** ppIncludeSource) override
+    {
+        uint32_t pBytes = 0;
+        LPCVOID ppData = nullptr; 
+        HRESULT hr = m_includer->Open(D3D10_INCLUDE_TYPE::D3D_INCLUDE_SYSTEM, ConvertToChar(pFilename).c_str(), NULL, &ppData, &pBytes);
+        if (hr == S_OK)
+        {
+            IDxcLibrary* library = nullptr;
+            IDxcBlobEncoding* source = nullptr;
+            CreateLibrary(&library);
+            auto res = library->CreateBlobWithEncodingOnHeapCopy(ppData, pBytes, CP_UTF8, &source);
+            m_includer->Close(ppData);
+            if (res != S_OK)
+            {
+                return res;
+            }
+            *ppIncludeSource = source;
+            return S_OK;
+        }
+
+        return m_dxcDefaultIncludeHandler->LoadSource(pFilename, ppIncludeSource);
+    }
+
+private:
+    _smart_ptr<IDxcIncludeHandler> m_dxcDefaultIncludeHandler;
+    ID3DInclude* m_includer;
+};
 
 HRESULT CompileFromBlob(IDxcBlobEncoding* pSource, LPCWSTR pSourceName, const D3D_SHADER_MACRO* pDefines,
     IDxcIncludeHandler* pInclude, LPCSTR pEntrypoint, LPCSTR pTarget, UINT Flags1, UINT Flags2, ID3DBlob** ppCode,
@@ -196,10 +251,11 @@ HRESULT CompileFromBlob(IDxcBlobEncoding* pSource, LPCWSTR pSourceName, const D3
             }
         }
         // Currently, /Od turns off too many optimization passes, causing incorrect DXIL to be generated.
-        // Re-enable once /Od is implemented properly:
-        // if(Flags1 & D3DCOMPILE_SKIP_OPTIMIZATION) arguments.push_back(L"/Od");
-        if (Flags1 & D3DCOMPILE_DEBUG)
-            arguments.push_back(L"/Zi");
+        // Re-enable once /Od is implemented properly:       
+        // if(Flags1 & D3DCOMPILE_SKIP_OPTIMIZATION) 
+        //  arguments.push_back(L"/Od");
+        // if (Flags1 & D3DCOMPILE_DEBUG)
+        //  arguments.push_back(L"/Zi");
         if (Flags1 & D3DCOMPILE_PACK_MATRIX_ROW_MAJOR)
             arguments.push_back(L"/Zpr");
         if (Flags1 & D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR)
@@ -209,7 +265,8 @@ HRESULT CompileFromBlob(IDxcBlobEncoding* pSource, LPCWSTR pSourceName, const D3
         if (Flags1 & D3DCOMPILE_PREFER_FLOW_CONTROL)
             arguments.push_back(L"/Gfp");
         // We don't implement this:
-        // if(Flags1 & D3DCOMPILE_PARTIAL_PRECISION) arguments.push_back(L"/Gpp");
+        // if(Flags1 & D3DCOMPILE_PARTIAL_PRECISION) 
+        //  arguments.push_back(L"/Gpp");    
         if (Flags1 & D3DCOMPILE_RESOURCES_MAY_ALIAS)
             arguments.push_back(L"/res_may_alias");
 
@@ -261,7 +318,7 @@ HRESULT WINAPI BridgeD3DCompile(LPCVOID pSrcData, SIZE_T SrcDataSize, LPCSTR pSo
     }
     else if (pInclude)
     {
-        return E_INVALIDARG;
+        includeHandler = new IncludeHandler(pInclude);
     }
 
     try
@@ -380,12 +437,28 @@ HRESULT WINAPI BridgeReadFileToBlob(_In_ LPCWSTR pFileName, _Out_ ID3DBlob** ppC
     return S_OK;
 }
 
+HRESULT WINAPI D3DCompileDXILorDXBC(LPCVOID pSrcData, SIZE_T SrcDataSize, LPCSTR pSourceName,
+    const D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR pEntrypoint, LPCSTR pTarget, UINT Flags1,
+    UINT Flags2, ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs)
+{
+    return BridgeD3DCompile(pSrcData, SrcDataSize, pSourceName, pDefines, pInclude, pEntrypoint, pTarget, Flags1,
+        Flags2, ppCode, ppErrorMsgs);
+}
+
 HRESULT WINAPI D3DReflectDXILorDXBC(_In_reads_bytes_(SrcDataSize) LPCVOID pSrcData, _In_ SIZE_T SrcDataSize,
     _In_ REFIID pInterface, _Out_ void** ppReflector)
 {
     return BridgeD3DReflect(pSrcData, SrcDataSize, IID_ID3D12ShaderReflection, ppReflector);
 }
 #else
+HRESULT WINAPI D3DCompileDXILorDXBC(LPCVOID pSrcData, SIZE_T SrcDataSize, LPCSTR pSourceName,
+    const D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR pEntrypoint, LPCSTR pTarget, UINT Flags1,
+    UINT Flags2, ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs)
+{
+    return D3DCompile(pSrcData, SrcDataSize, pSourceName, pDefines, pInclude, pEntrypoint, pTarget, Flags1, Flags2,
+        ppCode, ppErrorMsgs);
+}
+
 HRESULT WINAPI D3DReflectDXILorDXBC(_In_reads_bytes_(SrcDataSize) LPCVOID pSrcData, _In_ SIZE_T SrcDataSize,
     _In_ REFIID pInterface, _Out_ void** ppReflector)
 {

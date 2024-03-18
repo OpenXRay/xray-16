@@ -1681,5 +1681,11 @@
     <CopyFileToFolders Include="$(WindowsSdkDir)Redist\D3D\$(PlatformShortName)\d3dcompiler_47.dll">
       <Filter>Kernel</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="C:\Program Files (x86)\Windows Kits\10\Redist\D3D\x64\dxcompiler.dll">
+      <Filter>Kernel</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="C:\Program Files (x86)\Windows Kits\10\Redist\D3D\x64\dxil.dll">
+      <Filter>Kernel</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
