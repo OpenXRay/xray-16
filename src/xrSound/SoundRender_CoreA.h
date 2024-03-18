@@ -58,20 +58,8 @@ class CSoundRender_CoreA : public CSoundRender_Core
     ALCcontext* pContext;
     ALDeviceList* pDeviceList;
 
-    struct SListener
-    {
-        Fvector position{};
-        Fvector velocity{};
-        Fvector curVelocity{};
-        Fvector prevVelocity{};
-        Fvector accVelocity{};
-        Fvector orientation[2]{};
-    };
-
-    SListener Listener;
-
 protected:
-    void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) override;
+    void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt) override;
 
 public:
     CSoundRender_CoreA(CSoundManager& p);
@@ -83,5 +71,4 @@ public:
 
     void set_master_volume(float f) override;
 
-    const Fvector& listener_position() override { return Listener.position; }
 };

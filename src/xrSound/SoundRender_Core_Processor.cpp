@@ -9,7 +9,7 @@
 #include "SoundRender_Target.h"
 #include "SoundRender_Source.h"
 
-void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector& N)
+void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R)
 {
     if (0 == bReady)
         return;
@@ -87,6 +87,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
             // Has emmitter, maybe just not started rendering
             if (T->get_Rendering())
             {
+                T->fill_parameters();
                 T->update();
             }
             else
@@ -103,7 +104,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
     }
 
     // update listener
-    update_listener(P, D, N, fTimer_Delta);
+    update_listener(P, D, N, R, fTimer_Delta);
 
     // Start rendering of pending targets
     if (!s_targets_defer.empty())
@@ -139,9 +140,6 @@ void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
             dest->_simulated += scene->get_emitters().size();
             dest->_events += scene->get_prev_events_count();
         }
-        dest->_cache_hits = cache._stat_hit;
-        dest->_cache_misses = cache._stat_miss;
-        cache.stats_clear();
     }
     if (ext)
     {
@@ -183,6 +181,5 @@ void CSoundRender_Core::DumpStatistics(IGameFont& font, IPerformanceAlert* alert
     font.OutNext("Rendered:     %d", sndStat._rendered);
     font.OutNext("Simulated:    %d", sndStat._simulated);
     font.OutNext("Events:       %d", sndStat._events);
-    font.OutNext("Hits/misses:  %d/%d", sndStat._cache_hits, sndStat._cache_misses);
     Stats.FrameStart();
 }

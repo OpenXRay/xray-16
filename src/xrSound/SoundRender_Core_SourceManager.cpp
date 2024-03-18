@@ -60,6 +60,7 @@ CSoundRender_Source* CSoundRender_Core::i_create_source(pcstr name, bool replace
 void CSoundRender_Core::i_destroy_source(CSoundRender_Source* S)
 {
     // No actual destroy at all
+    S->detach();
 }
 
 void CSoundRender_Core::i_create_all_sources()

@@ -37,6 +37,8 @@ class IReader;
 template <class T>
 struct _vector2;
 using Fvector2 = _vector2<float>;
+struct Fbox3;
+using Fbox = Fbox3;
 
 XRSOUND_API extern u32 psSoundModel;
 XRSOUND_API extern float psSoundVEffects;
@@ -44,9 +46,7 @@ XRSOUND_API extern float psSoundVFactor;
 XRSOUND_API extern float psSoundVMusic;
 XRSOUND_API extern float psSoundRolloff;
 XRSOUND_API extern float psSoundOcclusionScale;
-XRSOUND_API extern float psSoundVelocityAlpha; // Cribbledirge: Alpha value for moving average.
 XRSOUND_API extern float psSoundTimeFactor; //--#SM+#--
-XRSOUND_API extern float psSoundLinearFadeFactor; //--#SM+#--
 XRSOUND_API extern Flags32 psSoundFlags;
 XRSOUND_API extern int psSoundTargets;
 XRSOUND_API extern int psSoundCacheSizeMB;
@@ -112,48 +112,13 @@ class XRSOUND_API CSound_environment
 class XRSOUND_API CSound_params
 {
 public:
-    Fvector position{};
-    Fvector velocity{};  // Cribbledirge.  Added for doppler effect.
-    Fvector curVelocity{};  // Current velocity.
-    Fvector prevVelocity{};  // Previous velocity.
-    Fvector accVelocity{};  // Velocity accumulator (for moving average).
+    Fvector position;
     float base_volume;
     float volume;
     float freq;
     float min_distance;
     float max_distance;
     float max_ai_distance;
-
-    // Functions added by Cribbledirge for doppler effect.
-    void update_position(const Fvector& newPosition)
-    {
-        // If the position has been set already, start getting a moving average of the velocity.
-        if (set)
-        {
-            prevVelocity.set(accVelocity);
-            curVelocity.sub(newPosition, position);
-            accVelocity.set(curVelocity.mul(psSoundVelocityAlpha).add(prevVelocity.mul(1.f - psSoundVelocityAlpha)));
-        }
-        else
-        {
-            set = true;
-        }
-        position.set(newPosition);
-    }
-
-    void update_velocity(const float dt)
-    {
-        velocity.set(accVelocity).div(dt);
-    }
-
-private:
-    // A variable in place to determine if the position has been set.  This is to prevent artifacts when
-    // the position jumps from its initial position of zero to something greatly different.  This is a big
-    // issue in moving average calculation.  We want the velocity to always start at zero for when the sound
-    // was initiated, or else things will sound really really weird.
-    bool set{};
-
-    // End Cribbledirge.
 };
 
 /// definition (Sound Interface)
@@ -189,8 +154,6 @@ class XRSOUND_API CSound_stats
 public:
     u32 _rendered;
     u32 _simulated;
-    u32 _cache_hits;
-    u32 _cache_misses;
     u32 _events;
 };
 
@@ -223,7 +186,7 @@ public:
     virtual void set_handler(sound_event* E) = 0;
     virtual void set_geometry_env(IReader* I) = 0;
     virtual void set_geometry_som(IReader* I) = 0;
-    virtual void set_geometry_occ(CDB::MODEL* M) = 0;
+    virtual void set_geometry_occ(CDB::MODEL* M, const Fbox& aabb) = 0;
 
     virtual void set_user_env(CSound_environment* E) = 0;
     virtual void set_environment(u32 id, CSound_environment** dst_env) = 0;
@@ -266,7 +229,7 @@ public:
 
     virtual void set_master_volume(float f = 1.f) = 0;
 
-    virtual void update(const Fvector& P, const Fvector& D, const Fvector& N) = 0;
+    virtual void update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R) = 0;
     virtual void statistic(CSound_stats* s0, CSound_stats_ext* s1) = 0;
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) = 0;
 

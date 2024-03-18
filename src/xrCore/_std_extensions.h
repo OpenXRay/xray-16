@@ -5,6 +5,9 @@
 #include <math.h>
 #include <float.h>
 #include <stdio.h>
+
+#include <string_view>
+
 #include "xrCommon/math_funcs_inline.h"
 //#include "xr_token.h"
 
@@ -228,6 +231,17 @@ inline void MemFill32(void* dst, u32 value, size_t dstSize)
     while (ptr != end)
         *ptr++ = value;
 }
+
+// source: https://stackoverflow.com/a/46711735
+constexpr u32 strhash(const std::string_view data) noexcept
+{
+    uint32_t hash = 5385;
+    for (const auto& e : data)
+        hash = ((hash << 5) + hash) + e;
+    return hash;
+}
+
+constexpr u32 operator""_hash(char const* p, size_t size) { return strhash({ p, size }); }
 
 XRCORE_API char* timestamp(string64& dest);
 

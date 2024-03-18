@@ -104,10 +104,9 @@ bool CLevel::Load_GameSpecific_After()
         {
             CInifile::Sect& S = pSettings->r_section("sounds_random");
             Sounds_Random.reserve(S.Data.size());
-            for (auto I = S.Data.cbegin(); S.Data.cend() != I; ++I)
+            for (const auto& I : S.Data)
             {
-                Sounds_Random.push_back(ref_sound());
-                Sounds_Random.back().create(*I->first, st_Effect, sg_SourceType);
+                Sounds_Random.emplace_back().create(I.first.c_str(), st_Effect, sg_SourceType);
             }
             Sounds_Random_dwNextTime = Device.TimerAsync() + 50000;
             Sounds_Random_Enabled = FALSE;
@@ -190,7 +189,7 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
     ID_INDEX_PAIRS translator;
     translator.reserve(GMLib.CountMaterial());
     u16 default_id = (u16)GMLib.GetMaterialIdx("default");
-    translator.push_back(translation_pair(u32(-1), default_id));
+    translator.emplace_back(u32(-1), default_id);
 
     u16 index = 0, static_mtl_count = 1;
     int max_ID = 0;
@@ -200,7 +199,7 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
         if (!(*I)->Flags.test(SGameMtl::flDynamic))
         {
             ++static_mtl_count;
-            translator.push_back(translation_pair((*I)->GetID(), index));
+            translator.emplace_back((*I)->GetID(), index);
             if ((*I)->GetID() > max_static_ID)
                 max_static_ID = (*I)->GetID();
         }
@@ -216,11 +215,11 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
         CDB::TRI* E = tris + count;
         for (; I != E; ++I)
         {
-            ID_INDEX_PAIRS::iterator i = std::find(translator.begin(), translator.end(), (u16)(*I).material);
+            const auto i = std::find(translator.cbegin(), translator.cend(), (u16)(*I).material);
             if (i != translator.end())
             {
                 (*I).material = (*i).m_index;
-                SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
+                const SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
                 (*I).suppress_shadows = mtl->Flags.is(SGameMtl::flSuppressShadows);
                 (*I).suppress_wm = mtl->Flags.is(SGameMtl::flSuppressWallmarks);
                 continue;
@@ -237,11 +236,11 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
         CDB::TRI* E = tris + count;
         for (; I != E; ++I)
         {
-            ID_INDEX_PAIRS::iterator i = std::lower_bound(translator.begin(), translator.end(), (u16)(*I).material);
-            if ((i != translator.end()) && ((*i).m_id == (*I).material))
+            const auto i = std::lower_bound(translator.cbegin(), translator.cend(), (u16)(*I).material);
+            if ((i != translator.cend()) && ((*i).m_id == (*I).material))
             {
                 (*I).material = (*i).m_index;
-                SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
+                const SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
                 (*I).suppress_shadows = mtl->Flags.is(SGameMtl::flSuppressShadows);
                 (*I).suppress_wm = mtl->Flags.is(SGameMtl::flSuppressWallmarks);
                 continue;

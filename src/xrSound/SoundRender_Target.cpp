@@ -4,38 +4,16 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
+#include "xrCore/Threading/TaskManager.hpp"
 
 CSoundRender_Target::CSoundRender_Target()
 {
-    m_pEmitter = nullptr;
-    rendering = false;
-    wave = nullptr;
+    buffers_to_prefill.reserve(sdef_target_count);
 }
 
-CSoundRender_Target::~CSoundRender_Target() { VERIFY(wave == 0); }
-
-bool CSoundRender_Target::_initialize()
+void CSoundRender_Target::_destroy()
 {
-    /*
-    // Calc format
-    wfx.wFormatTag			= WAVE_FORMAT_PCM;
-    wfx.nChannels			= 2; //1;
-    wfx.nSamplesPerSec		= SoundRender->wfm.nSamplesPerSec;
-    wfx.wBitsPerSample		= 16;
-    wfx.nBlockAlign			= wfx.nChannels * wfx.wBitsPerSample / 8;
-    wfx.nAvgBytesPerSec		= wfx.nSamplesPerSec * wfx.nBlockAlign;
-    wfx.cbSize				= 0;
-    */
-    /*
-    wfx.wFormatTag = WAVE_FORMAT_PCM;
-    wfx.nChannels = 2;
-    wfx.wBitsPerSample = 16;
-    wfx.nBlockAlign = 4;
-    wfx.nSamplesPerSec = 44100;
-    wfx.nAvgBytesPerSec = 176400;
-    wfx.cbSize = 0;
-    */
-    return true;
+    wait_prefill();
 }
 
 void CSoundRender_Target::start(CSoundRender_Emitter* E)
@@ -48,19 +26,38 @@ void CSoundRender_Target::start(CSoundRender_Emitter* E)
     // 5. Deferred-play-signal (emitter-exist, rendering-false)
     m_pEmitter = E;
     rendering = false;
-    //attach();
+    //m_pEmitter->source()->attach();
+
+    // Calc storage
+    for (auto& buf : temp_buf)
+        buf.resize(E->source()->m_info.bytesPerBuffer);
 }
 
-void CSoundRender_Target::render() { rendering = true; }
+void CSoundRender_Target::render()
+{
+    VERIFY(!rendering);
+    rendering = true;
+}
+
 void CSoundRender_Target::stop()
 {
-    detach();
+    wait_prefill();
+    m_pEmitter->source()->detach();
     m_pEmitter = nullptr;
     rendering = false;
 }
 
-void CSoundRender_Target::rewind() { R_ASSERT(rendering); }
-void CSoundRender_Target::update() { R_ASSERT(m_pEmitter); }
+void CSoundRender_Target::rewind()
+{
+    R_ASSERT(rendering);
+}
+
+void CSoundRender_Target::update()
+{
+    R_ASSERT(m_pEmitter);
+    wait_prefill();
+}
+
 void CSoundRender_Target::fill_parameters()
 {
     VERIFY(m_pEmitter);
@@ -68,27 +65,48 @@ void CSoundRender_Target::fill_parameters()
     //    pEmitter->set_position(SoundRender->listener_position());
 }
 
-extern int ov_seek_func(void* datasource, ogg_int64_t offset, int whence);
-extern size_t ov_read_func(void* ptr, size_t size, size_t nmemb, void* datasource);
-extern int ov_close_func(void* datasource);
-extern long ov_tell_func(void* datasource);
-
-void CSoundRender_Target::attach()
+void CSoundRender_Target::fill_block(size_t idx)
 {
-    VERIFY(0 == wave);
-    VERIFY(m_pEmitter);
-    ov_callbacks ovc = {ov_read_func, ov_seek_func, ov_close_func, ov_tell_func};
-    wave = FS.r_open(m_pEmitter->source()->pname.c_str());
-    R_ASSERT3(wave && wave->length(), "Can't open wave file:", m_pEmitter->source()->pname.c_str());
-    ov_open_callbacks(wave, &ovf, nullptr, 0, ovc);
-    VERIFY(0 != wave);
+    R_ASSERT(m_pEmitter);
+    m_pEmitter->fill_block(temp_buf[idx].data(), temp_buf[idx].size());
 }
 
-void CSoundRender_Target::detach()
+void CSoundRender_Target::fill_all_blocks()
 {
-    if (wave)
-    {
-        ov_clear(&ovf);
-        FS.r_close(wave);
-    }
+    for (size_t i = 0; i < sdef_target_count; ++i)
+        fill_block(i);
+}
+
+void CSoundRender_Target::prefill_blocks(Task&, void*)
+{
+    for (const size_t idx : buffers_to_prefill)
+        fill_block(idx);
+    buffers_to_prefill.clear();
+    prefill_task.store(nullptr, std::memory_order_release);
+}
+
+void CSoundRender_Target::prefill_all_blocks(Task&, void*)
+{
+    fill_all_blocks();
+    prefill_task.store(nullptr, std::memory_order_release);
+}
+
+void CSoundRender_Target::wait_prefill() const
+{
+    if (const auto task = prefill_task.load(std::memory_order_relaxed))
+        TaskScheduler->Wait(*task);
+}
+
+void CSoundRender_Target::dispatch_prefill()
+{
+    wait_prefill();
+    const auto task = &TaskScheduler->AddTask("CSoundRender_Target::dispatch_prefill()", { this, &CSoundRender_Target::prefill_blocks });
+    prefill_task.store(task, std::memory_order_release);
+}
+
+void CSoundRender_Target::dispatch_prefill_all()
+{
+    wait_prefill();
+    const auto task = &TaskScheduler->AddTask("CSoundRender_Target::dispatch_prefill_all()", { this, &CSoundRender_Target::prefill_all_blocks });
+    prefill_task.store(task, std::memory_order_release);
 }

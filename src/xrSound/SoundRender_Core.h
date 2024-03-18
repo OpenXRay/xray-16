@@ -3,7 +3,6 @@
 #include "xrCommon/xr_unordered_map.h"
 
 #include "SoundRender.h"
-#include "SoundRender_Cache.h"
 #include "SoundRender_Environment.h"
 #include "SoundRender_Effects.h"
 #include "SoundRender_Scene.h"
@@ -23,8 +22,31 @@ protected:
 private:
     volatile bool isLocked;
 
+public:
+    struct SListener
+    {
+        Fvector position;
+        Fvector orientation[3];
+
+        [[nodiscard]]
+        SListener ToRHS() const
+        {
+            return
+            {
+                { position.x, position.y, -position.z },
+                {
+                    { orientation[0].x, orientation[0].y, -orientation[0].z },
+                    { orientation[1].x, orientation[1].y, -orientation[1].z },
+                    { orientation[2].x, orientation[2].y, -orientation[2].z },
+                },
+            };
+        }
+    };
+
 protected:
-    bool bListenerMoved;
+    SListener Listener;
+
+    bool bListenerMoved{};
 
     CSoundRender_Environment e_current;
     CSoundRender_Environment e_target;
@@ -60,10 +82,6 @@ protected:
 public:
     bool supports_float_pcm{};
 
-    // Cache
-    CSoundRender_Cache cache;
-    u32 cache_bytes_per_line;
-
 public:
     CSoundRender_Core(CSoundManager& p);
 
@@ -95,13 +113,14 @@ public:
 
     void set_master_volume(float f) override = 0;
 
-    void update(const Fvector& P, const Fvector& D, const Fvector& N) override;
+    void update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R) override;
     void statistic(CSound_stats* dest, CSound_stats_ext* ext) override;
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     // listener
-    //	virtual const Fvector&				listener_position		( )=0;
-    virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) = 0;
+    const auto& listener_params() const { return Listener; }
+    const Fvector& listener_position() override { return Listener.position; }
+    virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt);
 
     void refresh_sources() override;
 

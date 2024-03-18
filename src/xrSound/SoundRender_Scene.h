@@ -16,7 +16,7 @@ public:
 
     void set_geometry_env(IReader* I) override;
     void set_geometry_som(IReader* I) override;
-    void set_geometry_occ(CDB::MODEL* M) override;
+    void set_geometry_occ(CDB::MODEL* M, const Fbox& aabb) override;
 
     void set_user_env(CSound_environment* E) override;
     void set_environment(u32 id, CSound_environment** dst_env) override;

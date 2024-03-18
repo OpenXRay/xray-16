@@ -112,7 +112,7 @@ bool IGame_Level::Load(u32 dwNum)
     g_pGamePersistent->SpatialSpace.initialize(ObjectSpace.GetBoundingVolume());
     g_pGamePersistent->SpatialSpacePhysic.initialize(ObjectSpace.GetBoundingVolume());
 
-    Sound->set_geometry_occ(ObjectSpace.GetStaticModel());
+    Sound->set_geometry_occ(ObjectSpace.GetStaticModel(), ObjectSpace.GetBoundingVolume());
     Sound->set_handler([](const ref_sound& S, float range)
     {
         if (g_pGameLevel && S && S->feedback)

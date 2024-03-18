@@ -19,9 +19,7 @@ XRSOUND_API Flags32 psSoundFlags =
 
 XRSOUND_API int psSoundTargets = 32;
 XRSOUND_API float psSoundOcclusionScale = 0.5f;
-XRSOUND_API float psSoundVelocityAlpha = 0.05f;
 XRSOUND_API float psSoundTimeFactor = 1.0f;
-XRSOUND_API float psSoundLinearFadeFactor = 0.4f; //--#SM+#--
 XRSOUND_API float psSoundCull = 0.01f;
 XRSOUND_API float psSoundRolloff = 0.75f;
 XRSOUND_API u32 psSoundModel = 0;
@@ -42,7 +40,6 @@ CSoundRender_Core::CSoundRender_Core(CSoundManager& p)
     s_emitters_u = 0;
     e_current.set_identity();
     e_target.set_identity();
-    bListenerMoved = false;
     bReady = false;
     isLocked = false;
     fTimer_Value = Timer.GetElapsed_sec();
@@ -58,19 +55,12 @@ void CSoundRender_Core::_initialize()
 
     bPresent = true;
 
-    // Cache
-    cache_bytes_per_line = (sdef_target_block / 8) * 352800 / 1000;
-    cache.initialize(psSoundCacheSizeMB * 1024, cache_bytes_per_line);
-
     bReady = true;
 }
-
-extern xr_vector<u8> g_target_temp_data;
 
 void CSoundRender_Core::_clear()
 {
     bReady = false;
-    cache.destroy();
 
     // remove sources
     for (auto& kv : s_sources)
@@ -78,8 +68,6 @@ void CSoundRender_Core::_clear()
         xr_delete(kv.second);
     }
     s_sources.clear();
-
-    g_target_temp_data.clear();
 }
 
 ISoundScene* CSoundRender_Core::create_scene()
@@ -109,8 +97,6 @@ int CSoundRender_Core::pause_emitters(bool pauseState)
 
 void CSoundRender_Core::_restart()
 {
-    cache.destroy();
-    cache.initialize(psSoundCacheSizeMB * 1024, cache_bytes_per_line);
     env_apply();
 }
 
@@ -202,8 +188,17 @@ void CSoundRender_Core::env_apply()
     bListenerMoved = true;
 }
 
-void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
+void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt)
 {
+    if (!Listener.position.similar(P))
+    {
+        Listener.position = P;
+        bListenerMoved = true;
+    }
+    Listener.orientation[0] = D;
+    Listener.orientation[1] = N;
+    Listener.orientation[2] = R;
+
     if (!psSoundFlags.test(ss_EFX) || !m_effects)
         return;
 

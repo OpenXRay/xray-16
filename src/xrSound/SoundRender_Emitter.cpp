@@ -4,7 +4,6 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Scene.h"
 #include "SoundRender_Source.h"
-#include "SoundRender_TargetA.h"
 
 extern u32 psSoundModel;
 extern float psSoundVEffects;
@@ -12,9 +11,9 @@ extern float psSoundVEffects;
 void CSoundRender_Emitter::set_position(const Fvector& pos)
 {
     if (source()->channels_num() == 1)
-        p_source.update_position(pos);
+        p_source.position = pos;
     else
-        p_source.update_position({});
+        p_source.position.set(0, 0, 0);
 
     bMoved = true;
 }
@@ -35,38 +34,14 @@ void CSoundRender_Emitter::set_time(float t)
 }
 
 CSoundRender_Emitter::CSoundRender_Emitter(CSoundRender_Scene* s)
-    : scene(s)
-{
-#ifdef DEBUG
-    static u32 incrementalID = 0;
-    dbg_ID = ++incrementalID;
-#endif
-    target = nullptr;
-    //source = nullptr;
-    owner_data = nullptr;
-    smooth_volume = 1.f;
-    occluder_volume = 1.f;
-    fade_volume = 1.f;
-    occluder[0].set(0, 0, 0);
-    occluder[1].set(0, 0, 0);
-    occluder[2].set(0, 0, 0);
-    m_current_state = stStopped;
-    set_cursor(0);
-    bMoved = true;
-    b2D = false;
-    bStopping = false;
-    bRewind = false;
-    bIgnoringTimeFactor = false;
-    iPaused = 0;
-    fTimeStarted = 0.0f;
-    fTimeToStop = 0.0f;
-    fTimeToPropagade = 0.0f;
-    fTimeToRewind = 0.0f; //--#SM+#--
-    marker = 0xabababab;
-    starting_delay = 0.f;
-    priority_scale = 1.f;
-    m_cur_handle_cursor = 0;
-}
+    : scene(s),
+      priority_scale(1.f),
+      smooth_volume(1.f),
+      occluder_volume(1.f),
+      fade_volume(1.f),
+      m_current_state(stStopped),
+      bMoved(true),
+      marker(0xabababab) {}
 
 CSoundRender_Emitter::~CSoundRender_Emitter()
 {
@@ -134,7 +109,6 @@ u32 CSoundRender_Emitter::play_time()
     return 0;
 }
 
-#include "SoundRender_Source.h" // XXX: remove maybe
 void CSoundRender_Emitter::set_cursor(u32 p)
 {
     m_stream_cursor = p;
@@ -149,9 +123,6 @@ void CSoundRender_Emitter::set_cursor(u32 p)
             owner_data->fn_attached[0] = owner_data->fn_attached[1];
             owner_data->fn_attached[1] = "";
             m_cur_handle_cursor = get_cursor(true);
-
-            if (target)
-                ((CSoundRender_TargetA*)target)->source_changed();
         }
     }
 }
@@ -164,4 +135,101 @@ u32 CSoundRender_Emitter::get_cursor(bool b_absolute) const
     return m_stream_cursor - m_cur_handle_cursor;
 }
 
-void CSoundRender_Emitter::move_cursor(int offset) { set_cursor(get_cursor(true) + offset); }
+void CSoundRender_Emitter::move_cursor(int offset)
+{
+    set_cursor(get_cursor(true) + offset);
+}
+
+void CSoundRender_Emitter::fill_data(void* dest, u32 offset, u32 size) const
+{
+    source()->decompress(dest, offset, size);
+}
+
+void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
+{
+    // Msg			("stream: %10s - [%X]:%d, p=%d, t=%d",*source->fname,ptr,size,position,source->dwBytesTotal);
+    u8* dest = (u8*)(ptr);
+    const u32 dwBytesTotal = get_bytes_total();
+
+    if ((get_cursor(true) + size) > dwBytesTotal)
+    {
+        // We are reaching the end of data, what to do?
+        switch (m_current_state)
+        {
+        case stPlaying:
+        { // Fill as much data as we can, zeroing remainder
+            if (get_cursor(true) >= dwBytesTotal)
+            {
+                // ??? We requested the block after remainder - just zero
+                memset(dest, 0, size);
+            }
+            else
+            {
+                // Calculate remainder
+                const u32 sz_data = dwBytesTotal - get_cursor(true);
+                const u32 sz_zero = (get_cursor(true) + size) - dwBytesTotal;
+                VERIFY(size == (sz_data + sz_zero));
+                fill_data(dest, get_cursor(false), sz_data);
+                memset(dest + sz_data, 0, sz_zero);
+            }
+            move_cursor(size);
+        }
+        break;
+        case stPlayingLooped:
+        {
+            u32 hw_position = 0;
+            do
+            {
+                u32 sz_data = dwBytesTotal - get_cursor(true);
+                const u32 sz_write = std::min(size - hw_position, sz_data);
+                fill_data(dest + hw_position, get_cursor(true), sz_write);
+                hw_position += sz_write;
+                move_cursor(sz_write);
+                set_cursor(get_cursor(true) % dwBytesTotal);
+            } while (0 != (size - hw_position));
+        }
+        break;
+        default: FATAL("SOUND: Invalid emitter state"); break;
+        }
+    }
+    else
+    {
+        const u32 bt_handle = ((CSoundRender_Source*)owner_data->handle)->dwBytesTotal;
+        if (get_cursor(true) + size > m_cur_handle_cursor + bt_handle)
+        {
+            R_ASSERT(owner_data->fn_attached[0].size());
+
+            u32 rem = 0;
+            if ((m_cur_handle_cursor + bt_handle) > get_cursor(true))
+            {
+                rem = (m_cur_handle_cursor + bt_handle) - get_cursor(true);
+
+#ifdef DEBUG
+                Msg("reminder from prev source %d", rem);
+#endif // #ifdef DEBUG
+                fill_data(dest, get_cursor(false), rem);
+                move_cursor(rem);
+            }
+#ifdef DEBUG
+            Msg("recurce from next source %d", size - rem);
+#endif // #ifdef DEBUG
+            fill_block(dest + rem, size - rem);
+        }
+        else
+        {
+            // Everything OK, just stream
+            fill_data(dest, get_cursor(false), size);
+            move_cursor(size);
+        }
+    }
+}
+
+u32 CSoundRender_Emitter::get_bytes_total() const
+{
+    return owner_data->dwBytesTotal;
+}
+
+float CSoundRender_Emitter::get_length_sec() const
+{
+    return owner_data->fTimeTotal;
+}
