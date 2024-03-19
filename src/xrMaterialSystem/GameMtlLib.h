@@ -136,8 +136,6 @@ public:
     void FillProp(PropItemVec& values, ListItem* owner);
 #endif
 };
-using GameMtlVec = xr_vector<SGameMtl*>;
-using GameMtlIt = GameMtlVec::iterator;
 
 struct MTL_EXPORT_API SGameMtlPair
 {
@@ -230,7 +228,7 @@ private:
     int material_index;
     int material_pair_index;
 
-    GameMtlVec materials;
+    xr_vector<SGameMtl*> materials;
     GameMtlPairVec material_pairs;
     GameMtlPairVec material_pairs_rt;
 
@@ -250,17 +248,17 @@ public:
         material_pairs.clear();
     }
 
-    GameMtlIt GetMaterialIt(pcstr name)
+    auto GetMaterialIt(pcstr name)
     {
         auto pred = [&](const SGameMtl* mtl) { return !xr_strcmpi(mtl->m_Name.c_str(), name); };
         return std::find_if(materials.begin(), materials.end(), pred);
     }
-    GameMtlIt GetMaterialIt(const shared_str& name)
+    auto GetMaterialIt(const shared_str& name)
     {
         auto pred = [&](const SGameMtl* mtl) { return mtl->m_Name.equal(name); };
         return std::find_if(materials.begin(), materials.end(), pred);
     }
-    GameMtlIt GetMaterialItByID(int id)
+    auto GetMaterialItByID(int id)
     {
         auto pred = [&](const SGameMtl* mtl) { return mtl->ID == id; };
         return std::find_if(materials.begin(), materials.end(), pred);
@@ -298,8 +296,8 @@ public:
         return materials[idx];
     }
 
-    GameMtlIt FirstMaterial() { return materials.begin(); }
-    GameMtlIt LastMaterial() { return materials.end(); }
+    auto FirstMaterial() { return materials.begin(); }
+    auto LastMaterial() { return materials.end(); }
 
     const auto& Materials() const { return materials; }
 

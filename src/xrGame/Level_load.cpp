@@ -194,7 +194,7 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
     u16 index = 0, static_mtl_count = 1;
     int max_ID = 0;
     int max_static_ID = 0;
-    for (GameMtlIt I = GMLib.FirstMaterial(); GMLib.LastMaterial() != I; ++I, ++index)
+    for (auto I = GMLib.FirstMaterial(); GMLib.LastMaterial() != I; ++I, ++index)
     {
         if (!(*I)->Flags.test(SGameMtl::flDynamic))
         {
