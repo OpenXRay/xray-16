@@ -36,7 +36,6 @@ CSoundRender_Core::CSoundRender_Core(CSoundManager& p)
     : Parent(p)
 {
     bPresent = false;
-    s_targets_pu = 0;
     s_emitters_u = 0;
     e_current.set_identity();
     e_target.set_identity();

@@ -12,11 +12,12 @@ class CSoundRender_Core : public ISoundManager
 protected:
     struct SoundStatistics
     {
-        CStatTimer Update; // total time taken by sound subsystem (accurate only in single-threaded mode)
+        CStatTimer Update;
+        CStatTimer Render;
 
         SoundStatistics() { FrameStart(); }
-        void FrameStart() { Update.FrameStart(); }
-        void FrameEnd() { Update.FrameEnd(); }
+        void FrameStart() { Update.FrameStart(); Render.FrameStart(); }
+        void FrameEnd() { Update.FrameEnd(); Render.FrameEnd(); }
     };
 
 private:
@@ -74,8 +75,6 @@ protected:
 
     u32 s_emitters_u; // emitter update marker
     xr_vector<CSoundRender_Target*> s_targets;
-    xr_vector<CSoundRender_Target*> s_targets_defer;
-    u32 s_targets_pu; // parameters update
 
     CSoundRender_Effects* m_effects{};
 
@@ -114,6 +113,7 @@ public:
     void set_master_volume(float f) override = 0;
 
     void update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R) override;
+    void render() override;
     void statistic(CSound_stats* dest, CSound_stats_ext* ext) override;
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 

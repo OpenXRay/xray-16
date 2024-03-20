@@ -9,14 +9,21 @@
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
 
-struct _SoundProcessor final : public pureFrame
+struct SoundProcessor final : public pureFrame
 {
     void OnFrame() override
     {
-        // Msg ("------------- sound: %d [%3.2f,%3.2f,%3.2f]",u32(Device.dwFrame),VPUSH(Device.vCameraPosition));
         GEnv.Sound->update(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop, Device.vCameraRight);
     }
-} SoundProcessor;
+} g_sound_processor;
+
+struct SoundRenderer final : public pureFrame
+{
+    void OnFrame() override
+    {
+        GEnv.Sound->render();
+    }
+} g_sound_renderer;
 
 CEngine Engine;
 
@@ -65,10 +72,8 @@ void CEngine::Initialize(void)
 
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 1000);
 
-    if (psDeviceFlags.test(mtSound))
-        Device.seqFrameMT.Add(&SoundProcessor);
-    else
-        Device.seqFrame.Add(&SoundProcessor);
+    Device.seqFrame.Add(&g_sound_processor, REG_PRIORITY_NORMAL - 1000); // Place it after Level update
+    Device.seqFrameMT.Add(&g_sound_renderer);
 
     External.CreateRendererList();
     CheckAndSetupRenderer();
@@ -85,8 +90,8 @@ void CEngine::Destroy()
 
     Event.Handler_Detach(eQuit, this);
 
-    Device.seqFrameMT.Remove(&SoundProcessor);
-    Device.seqFrame.Remove(&SoundProcessor);
+    Device.seqFrameMT.Remove(&g_sound_processor);
+    Device.seqFrame.Remove(&g_sound_processor);
     Device.seqFrame.Remove(this);
 }
 
