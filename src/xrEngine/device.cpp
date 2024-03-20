@@ -66,7 +66,7 @@ void CheckPrivilegySlowdown()
         {
             if (Device.GetStats().fFPS < 30)
                 Sleep(1);
-            if (Device.mt_bMustExit || !pSettings || !Console || !pInput)
+            if (Device.mt_bMustExit.load(std::memory_order_acquire) || !pSettings || !Console || !pInput)
                 return;
         }
     };
@@ -253,12 +253,22 @@ void CRenderDevice::DoRender()
     stats.RenderTotal.accum = renderTotalReal.accum;
 }
 
-void CRenderDevice::ProcessParallelSequence(Task&, void*)
+void CRenderDevice::SecondaryThreadProc()
 {
-    for (u32 pit = 0; pit < seqParallel.size(); pit++)
-        seqParallel[pit]();
-    seqParallel.clear();
-    seqFrameMT.Process();
+    while (!mt_bMustExit.load(std::memory_order_acquire))
+    {
+        if (executeSecondaryTasks.load(std::memory_order_acquire))
+        {
+            for (u32 pit = 0; pit < seqParallel.size(); pit++)
+                seqParallel[pit]();
+            seqParallel.clear();
+            seqFrameMT.Process();
+            executeSecondaryTasks.store(false, std::memory_order_relaxed);
+            secondaryTasksExecuted.store(true, std::memory_order_release);
+        }
+        TaskScheduler->ExecuteOneTask();
+    }
+    secondaryThreadFinished.store(true, std::memory_order_release);
 }
 
 void CRenderDevice::ProcessFrame()
@@ -272,7 +282,7 @@ void CRenderDevice::ProcessFrame()
 
     BeforeRender();
 
-    const auto& processSeqParallel = TaskScheduler->AddTask("Secondary Thread Proc", { this, &CRenderDevice::ProcessParallelSequence });
+    executeSecondaryTasks.store(true, std::memory_order_release);
 
     DoRender();
 
@@ -290,7 +300,10 @@ void CRenderDevice::ProcessFrame()
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);
 
-    TaskScheduler->Wait(processSeqParallel);
+    while (!secondaryTasksExecuted.load(std::memory_order_acquire))
+        TaskScheduler->ExecuteOneTask();
+
+    secondaryTasksExecuted.store(false, std::memory_order_relaxed);
 
     if (!b_is_Active)
         Sleep(1);
@@ -400,7 +413,9 @@ void CRenderDevice::Run()
 void CRenderDevice::Shutdown()
 {
     // Stop Balance-Thread
-    mt_bMustExit = true;
+    mt_bMustExit.store(true, std::memory_order_release);
+    while (!secondaryThreadFinished.load(std::memory_order_acquire))
+        SDL_PumpEvents();
 
     seqAppEnd.Process();
 }

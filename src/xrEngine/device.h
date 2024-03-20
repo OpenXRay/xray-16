@@ -164,7 +164,7 @@ public:
     bool Paused();
 
 private:
-    void ProcessParallelSequence(Task&, void*);
+    void SecondaryThreadProc();
 
 public:
     // Scene control
@@ -230,10 +230,13 @@ public:
         return (Timer.time_factor());
     }
 
+private:
+    std::atomic_bool executeSecondaryTasks{}, secondaryTasksExecuted{}, secondaryThreadFinished{};
+
 public:
     // Multi-threading
     Event PresentationFinished = nullptr;
-    volatile bool mt_bMustExit{};
+    std::atomic_bool mt_bMustExit{};
 
     static constexpr u32 MaximalWaitTime = 16; // ms
 
