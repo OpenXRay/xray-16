@@ -31,12 +31,15 @@ void CSoundRender_Target::start(CSoundRender_Emitter* E)
     // Calc storage
     for (auto& buf : temp_buf)
         buf.resize(E->source()->m_info.bytesPerBuffer);
+
+    dispatch_prefill_all();
 }
 
 void CSoundRender_Target::render()
 {
     VERIFY(!rendering);
     rendering = true;
+    wait_prefill();
 }
 
 void CSoundRender_Target::stop()

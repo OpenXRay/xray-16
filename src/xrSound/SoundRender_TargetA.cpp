@@ -50,13 +50,12 @@ void CSoundRender_TargetA::_restart()
 
 void CSoundRender_TargetA::render()
 {
-    fill_all_blocks();
+    inherited::render();
+
     submit_all_buffers();
 
     A_CHK(alSourceQueueBuffers(pSource, sdef_target_count, pBuffers));
     A_CHK(alSourcePlay(pSource));
-
-    inherited::render();
 
     dispatch_prefill_all();
 }
