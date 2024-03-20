@@ -609,8 +609,6 @@ void CWeapon::net_Export(NET_Packet& P)
 {
     inherited::net_Export(P);
 
-    P.w_float_q8(GetCondition(), 0.0f, 1.0f);
-
     u8 need_upd = IsUpdating() ? 1 : 0;
     P.w_u8(need_upd);
     P.w_u16(u16(iAmmoElapsed));
@@ -623,10 +621,6 @@ void CWeapon::net_Export(NET_Packet& P)
 void CWeapon::net_Import(NET_Packet& P)
 {
     inherited::net_Import(P);
-
-    float _cond;
-    P.r_float_q8(_cond, 0.0f, 1.0f);
-    SetCondition(_cond);
 
     u8 flags = 0;
     P.r_u8(flags);

@@ -181,6 +181,7 @@ void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet& tNetPacket)
         }
     }
     tNetPacket.w_u8(1); // not freezed - doesn't mean anything...
+    tNetPacket.w_float_q8(m_fCondition, 0.0f, 1.0f);
 };
 
 void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
@@ -302,6 +303,8 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
 #endif
         freezed = true;
     }
+
+     tNetPacket.r_float_q8(m_fCondition, 0.0f, 1.0f);
 };
 
 #ifndef MASTER_GOLD
@@ -526,7 +529,6 @@ void CSE_ALifeItemWeapon::UPDATE_Read(NET_Packet& tNetPacket)
 {
     inherited::UPDATE_Read(tNetPacket);
 
-    tNetPacket.r_float_q8(m_fCondition, 0.0f, 1.0f);
     tNetPacket.r_u8(wpn_flags);
     tNetPacket.r_u16(a_elapsed);
     tNetPacket.r_u8(m_addon_flags.flags);
@@ -540,7 +542,6 @@ void CSE_ALifeItemWeapon::UPDATE_Write(NET_Packet& tNetPacket)
 {
     inherited::UPDATE_Write(tNetPacket);
 
-    tNetPacket.w_float_q8(m_fCondition, 0.0f, 1.0f);
     tNetPacket.w_u8(wpn_flags);
     tNetPacket.w_u16(a_elapsed);
     tNetPacket.w_u8(m_addon_flags.get());
@@ -1012,13 +1013,11 @@ void CSE_ALifeItemCustomOutfit::STATE_Write(NET_Packet& tNetPacket) { inherited:
 void CSE_ALifeItemCustomOutfit::UPDATE_Read(NET_Packet& tNetPacket)
 {
     inherited::UPDATE_Read(tNetPacket);
-    tNetPacket.r_float_q8(m_fCondition, 0.0f, 1.0f);
 }
 
 void CSE_ALifeItemCustomOutfit::UPDATE_Write(NET_Packet& tNetPacket)
 {
     inherited::UPDATE_Write(tNetPacket);
-    tNetPacket.w_float_q8(m_fCondition, 0.0f, 1.0f);
 }
 
 #ifndef MASTER_GOLD
@@ -1036,13 +1035,11 @@ void CSE_ALifeItemHelmet::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE
 void CSE_ALifeItemHelmet::UPDATE_Read(NET_Packet& tNetPacket)
 {
     inherited::UPDATE_Read(tNetPacket);
-    tNetPacket.r_float_q8(m_fCondition, 0.0f, 1.0f);
 }
 
 void CSE_ALifeItemHelmet::UPDATE_Write(NET_Packet& tNetPacket)
 {
     inherited::UPDATE_Write(tNetPacket);
-    tNetPacket.w_float_q8(m_fCondition, 0.0f, 1.0f);
 }
 
 #ifndef MASTER_GOLD
