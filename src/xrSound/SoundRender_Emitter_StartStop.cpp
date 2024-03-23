@@ -86,13 +86,13 @@ void CSoundRender_Emitter::cancel()
     {
     case stPlaying:
         // switch to: SIMULATE
-        m_current_state = stSimulating; // switch state
         SoundRender->i_stop(this);
+        m_current_state = stSimulating; // switch state
         break;
     case stPlayingLooped:
         // switch to: SIMULATE
-        m_current_state = stSimulatingLooped; // switch state
         SoundRender->i_stop(this);
+        m_current_state = stSimulatingLooped; // switch state
         break;
     default: FATAL("Non playing ref_sound forced out of render queue"); break;
     }

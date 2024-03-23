@@ -184,8 +184,8 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         if (!update_culling(dt))
         {
             // switch to: SIMULATE
-            m_current_state = stSimulatingLooped; // switch state
             SoundRender->i_stop(this);
+            m_current_state = stSimulatingLooped; // switch state
         }
         else
         {
