@@ -18,7 +18,7 @@ u32 g_file_mapped_count = 0;
 typedef xr_map<u32, std::pair<u32, shared_str>> FILE_MAPPINGS;
 FILE_MAPPINGS g_file_mappings;
 
-void register_file_mapping(void* address, const u32& size, LPCSTR file_name)
+void register_file_mapping(void* address, const u32& size, pcstr file_name)
 {
     FILE_MAPPINGS::const_iterator I = g_file_mappings.find(*(u32*)&address);
     VERIFY(I == g_file_mappings.end());
@@ -199,7 +199,7 @@ void CMemoryWriter::w(const void* ptr, size_t count)
 }
 
 // static const u32 mb_sz = 0x1000000;
-bool CMemoryWriter::save_to(LPCSTR fn) const
+bool CMemoryWriter::save_to(pcstr fn) const
 {
     IWriter* F = FS.w_open(fn);
     if (F)

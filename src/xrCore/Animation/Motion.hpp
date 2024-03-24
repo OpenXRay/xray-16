@@ -40,7 +40,7 @@ struct st_BoneMotion
         m_Flags.zero();
         ZeroMemory(envs, sizeof(CEnvelope*) * ctMaxChannel);
     }
-    void SetName(LPCSTR nm) { name = nm; }
+    void SetName(pcstr nm) { name = nm; }
 };
 // vector по костям
 using BoneMotionVec = xr_vector<st_BoneMotion>;
@@ -76,7 +76,7 @@ public:
         }
         name = tmp;
     }
-    LPCSTR Name() { return name.c_str(); }
+    pcstr Name() { return name.c_str(); }
     int FrameStart() { return iFrameStart; }
     int FrameEnd() { return iFrameEnd; }
     float FPS() { return fFPS; }

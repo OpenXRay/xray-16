@@ -13,4 +13,4 @@ using CLASS_ID = u64;
 #define MK_CLSID_INV(a, b, c, d, e, f, g, h) MK_CLSID(h, g, f, e, d, c, b, a)
 
 extern XRCORE_API void CLSID2TEXT(CLASS_ID id, pstr text);
-extern XRCORE_API CLASS_ID TEXT2CLSID(LPCSTR text);
+extern XRCORE_API CLASS_ID TEXT2CLSID(pcstr text);

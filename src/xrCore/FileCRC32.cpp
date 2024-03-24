@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FileCRC32.h"
 
-void getFileCrc32(IReader* F, LPCSTR filePath, u32& outCrc, bool parseIncludes)
+void getFileCrc32(IReader* F, pcstr filePath, u32& outCrc, bool parseIncludes)
 {
     outCrc = crc32(F->pointer(), F->length(), outCrc);
     string4096 str;
@@ -31,7 +31,7 @@ void getFileCrc32(IReader* F, LPCSTR filePath, u32& outCrc, bool parseIncludes)
     }
 }
 
-void addFileCrc32(IReader* F, LPCSTR filePath, u32& outCrc, bool parseIncludes)
+void addFileCrc32(IReader* F, pcstr filePath, u32& outCrc, bool parseIncludes)
 {
     u32 fileCrc = 0;
     getFileCrc32(F, filePath, fileCrc, parseIncludes);

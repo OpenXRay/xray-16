@@ -142,17 +142,17 @@ IC size_t xr_strlen(const char* S) { return strlen(S); }
 
 #ifndef MASTER_GOLD
 
-inline int xr_strcpy(pstr destination, size_t const destination_size, LPCSTR source)
+inline int xr_strcpy(pstr destination, size_t const destination_size, pcstr source)
 {
     return strcpy_s(destination, destination_size, source);
 }
 
-inline int xr_strcat(pstr destination, size_t const buffer_size, LPCSTR source)
+inline int xr_strcat(pstr destination, size_t const buffer_size, pcstr source)
 {
     return strcat_s(destination, buffer_size, source);
 }
 
-inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, pcstr format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
@@ -162,7 +162,7 @@ inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR
 }
 
 template <size_t count>
-inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(char (&destination)[count], pcstr format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
@@ -172,12 +172,12 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 }
 #else // #ifndef MASTER_GOLD
 
-inline int xr_strcpy(pstr destination, size_t const destination_size, LPCSTR source)
+inline int xr_strcpy(pstr destination, size_t const destination_size, pcstr source)
 {
     return strncpy_s(destination, destination_size, source, destination_size);
 }
 
-inline int xr_strcat(pstr destination, size_t const buffer_size, LPCSTR source)
+inline int xr_strcat(pstr destination, size_t const buffer_size, pcstr source)
 {
     size_t const destination_length = xr_strlen(destination);
     pstr i = destination + destination_length;
@@ -185,14 +185,14 @@ inline int xr_strcat(pstr destination, size_t const buffer_size, LPCSTR source)
     if (i > e)
         return 0;
 
-    for (LPCSTR j = source; *j && (i != e); ++i, ++j)
+    for (pcstr j = source; *j && (i != e); ++i, ++j)
         *i = *j;
 
     *i = 0;
     return 0;
 }
 
-inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, pcstr format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
@@ -202,7 +202,7 @@ inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR
 }
 
 template <int count>
-inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(char (&destination)[count], pcstr format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
@@ -213,13 +213,13 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 #endif // #ifndef MASTER_GOLD
 
 template <size_t count>
-inline int xr_strcpy(char(&destination)[count], LPCSTR source)
+inline int xr_strcpy(char (&destination)[count], pcstr source)
 {
     return xr_strcpy(destination, count, source);
 }
 
 template <size_t count>
-inline int xr_strcat(char(&destination)[count], LPCSTR source)
+inline int xr_strcat(char (&destination)[count], pcstr source)
 {
     return xr_strcat(destination, count, source);
 }
