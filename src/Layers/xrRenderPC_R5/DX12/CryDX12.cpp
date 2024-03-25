@@ -64,6 +64,7 @@ HRESULT WINAPI DX12CreateDevice(
 #if DX12_USE_DXC
 #include <atlconv.h>
 #include <atlcomcli.h>
+
 using namespace ATL;
 
 #define DXC_FAILED(hr) (((HRESULT)(hr)) < 0)
@@ -80,7 +81,7 @@ using namespace ATL;
             return E_FAIL;                                                                                             \
     }
 
-#include "Includes/dxc/dxcapi.h"
+#include <dxcapi.h>
 
 namespace hlsl
 {
