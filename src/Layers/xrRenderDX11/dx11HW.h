@@ -5,7 +5,7 @@
 #include "Layers/xrRender/HWCaps.h"
 #include "Layers/xrRender/stats_manager.h"
 
-#if USE_DX12
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
 #include "dx11ConstantAllocator.h"
 #endif
 
@@ -62,7 +62,21 @@ private:
 public:
 
 #if defined(USE_DX12)
-    ICF ID3DDeviceContext* get_context(u32 context_id)
+ID3D12Device* GetDevice() const 
+{
+    CCryDX12Device* cryDevice =
+        reinterpret_cast<CCryDX12Device*>(pDevice); 
+    return cryDevice->GetD3D12Device();
+}
+#else 
+ID3D11Device* GetDevice() const 
+{
+    return pDevice;
+}
+#endif
+
+#if defined(USE_DX12)
+ICF ID3DDeviceContext* get_context(u32 context_id = IMM_CTX_ID) const
     {
         VERIFY(context_id < R__NUM_CONTEXTS);
 #if DX12_DEFERRED_CONTEXT
@@ -72,7 +86,7 @@ public:
 #endif
     }
 #else 
-    ICF ID3D11DeviceContext* get_context(u32 context_id)
+    ICF ID3D11DeviceContext* get_context(u32 context_id = IMM_CTX_ID) const
     {
         VERIFY(context_id < R__NUM_CONTEXTS);
         return d3d_contexts_pool[context_id];
@@ -80,10 +94,40 @@ public:
 #endif 
 
 #if defined(USE_DX12)
+    ICF ID3D12GraphicsCommandList* get_d3d12_context(u32 context_id = IMM_CTX_ID) const 
+    {
+        ID3D11DeviceContext *pDeviceContext = get_context(context_id);
+        R_ASSERT(pDeviceContext);
+        return get_d3d12_context(pDeviceContext);
+    }
+
+    ICF ID3D12GraphicsCommandList* get_d3d12_context(ID3D11DeviceContext *pContext) const 
+    {
+        CCryDX12DeviceContext* pDeviceContext = 
+            reinterpret_cast<CCryDX12DeviceContext*>(pContext);
+        R_ASSERT(pDeviceContext);
+        return pDeviceContext->GetCoreGraphicsCommandList()->GetD3D12CommandList();
+    }
+#endif
+
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     ICF HRESULT CreateFence(u64& query)
     {
+        HRESULT hr = S_FALSE;
+#if defined(USE_DX12)
         query = reinterpret_cast<u64>(new UINT64);
-        HRESULT hr = query ? S_OK : S_FALSE;
+        hr = query ? S_OK : S_FALSE;
+#else
+        D3D11_QUERY_DESC QDesc;
+        QDesc.Query = D3D11_QUERY_EVENT;
+        QDesc.MiscFlags = 0;
+        ID3DQuery* d3d_query;
+        hr = pDevice->CreateQuery(&QDesc, &d3d_query);
+        if (hr == S_OK)
+        {
+            query = reinterpret_cast<u64>(d3d_query);
+        }
+#endif
         if (!FAILED(hr))
         {
             IssueFence(query);
@@ -94,13 +138,24 @@ public:
     ICF HRESULT ReleaseFence(u64 query)
     {
         HRESULT hr = S_FALSE;
+#if defined(USE_DX12)
         delete reinterpret_cast<UINT64*>(query);
+#else
+        ID3DQuery* d3d_query = reinterpret_cast<ID3DQuery*>(query);
+        if (d3d_query)
+        {
+            d3d_query->Release();
+            d3d_query = nullptr;
+        }
+#endif
         hr = S_OK;
         return hr;
     }
 
     ICF HRESULT IssueFence(u64 query)
     {
+        HRESULT hr = S_FALSE;
+#if defined(USE_DX12)
         UINT64* handle = reinterpret_cast<UINT64*>(query);
         if (handle)
         {
@@ -108,21 +163,30 @@ public:
                 reinterpret_cast<CCryDX12DeviceContext*>(d3d_contexts_pool[CHW::IMM_CTX_ID]);    
             R_ASSERT(pDeviceContext);
             *handle = pDeviceContext->InsertFence();
-            return S_OK;
+            hr = S_OK;
         }
-
-        return S_FALSE;
+#else
+        ID3DQuery* d3d_query = reinterpret_cast<ID3DQuery*>(query);
+        if (d3d_query)
+        {
+            d3d_contexts_pool[CHW::IMM_CTX_ID]->End(d3d_query);
+            hr = S_OK;
+        }
+#endif
+        return hr;
     }
 
     ICF HRESULT SyncFence(u64 query, bool block = true)
     { 
+        HRESULT hr = S_FALSE;
+#if defined(USE_DX12)
         UINT64* handle = reinterpret_cast<UINT64*>(query);
         if (handle)
         {
             auto pDeviceContext = 
                 reinterpret_cast<CCryDX12DeviceContext *>(d3d_contexts_pool[CHW::IMM_CTX_ID]);    
             R_ASSERT(pDeviceContext);     
-            HRESULT hr = pDeviceContext->TestForFence(*handle);
+            hr = pDeviceContext->TestForFence(*handle);
             if (hr != S_OK)
             {
                 if (block)
@@ -132,7 +196,20 @@ public:
             }
             return hr;
         }
-        return S_FALSE;
+#else 
+        ID3DQuery* d3d_query = reinterpret_cast<ID3DQuery*>(query);
+        if (d3d_query)
+        {
+            BOOL bQuery = false;
+            do
+            {
+                hr = d3d_contexts_pool[CHW::IMM_CTX_ID]->GetData(
+                    d3d_query, (void*)&bQuery, sizeof(BOOL), D3D11_ASYNC_GETDATA_DONOTFLUSH);
+
+            } while (block && hr != S_OK);
+        }
+#endif
+        return hr;
     }
 #endif
 public:
@@ -185,7 +262,7 @@ public:
 #endif
     }
 
-#if USE_DX12
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     template <class T>
     ICF void* AllocateConstantBuffer(T* buffer)
     {
@@ -226,7 +303,7 @@ private:
     u32 CurrentBackBuffer = 0;
 #endif
 
-#if USE_DX12
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     u64 m_frameQuery[PoolConfig::POOL_FRAME_QUERY_COUNT];
     u32 m_frame_id = 0;
     dx11ConstantBufferAllocator m_constant_allocator;

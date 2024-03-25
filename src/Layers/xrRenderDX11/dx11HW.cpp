@@ -298,7 +298,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     constexpr DXGI_FORMAT formats[] = {
         // DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
         DXGI_FORMAT_D24_UNORM_S8_UINT,
-    };
+    };  
     const DXGI_FORMAT selectedFormat = SelectFormat(D3D_FORMAT_SUPPORT_DEPTH_STENCIL, formats);
     if (selectedFormat == DXGI_FORMAT_UNKNOWN)
     {
@@ -309,10 +309,10 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
             "failed to select depth-stencil format.\n"
             "Please try to restart the game.");
         xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
-    }
+    }  
     Caps.fDepth = dx11TextureUtils::ConvertTextureFormat(selectedFormat);
 
-#if USE_DX12
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     m_constant_allocator.Initialize();
     for (u32 q = 0; q < PoolConfig::POOL_FRAME_QUERY_COUNT; q++)
     {
@@ -586,7 +586,7 @@ void CHW::DestroyDevice()
 #endif
 #endif
    
-#if USE_DX12
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     m_constant_allocator.Shutdown();
     for (u32 q = 0; q < PoolConfig::POOL_FRAME_QUERY_COUNT; q++)
     {
@@ -658,16 +658,16 @@ std::pair<u32, u32> CHW::GetSurfaceSize() const
     return {m_ChainDesc.BufferDesc.Width, m_ChainDesc.BufferDesc.Height};
 }
 
-void CHW::BeginScene() 
+void CHW::BeginScene()
 {
-#if USE_DX12 
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     m_constant_allocator.Update(m_frame_id, m_frameQuery[m_frame_id]);
 #endif
 }
 
 void CHW::EndScene() 
 {
-#if USE_DX12
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     IssueFence(m_frameQuery[m_frame_id]);
 #endif
 }
@@ -707,7 +707,7 @@ void CHW::Present()
     }
 #endif
 
-#if USE_DX12
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     m_constant_allocator.ReleaseEmptyBanks();
     m_frame_id = (m_frame_id + 1) % POOL_FRAME_QUERY_COUNT;
 #endif

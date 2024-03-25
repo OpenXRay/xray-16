@@ -43,7 +43,7 @@ dx11ConstantBuffer::~dx11ConstantBuffer()
         RImplementation.Resources->_DeleteConstantBuffer(id, this);
     }
     //	Flush();
-#if defined(USE_DX12)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     HW.DeallocateConstantBuffer(this);
 #else
     _RELEASE(m_buffer);
@@ -54,7 +54,7 @@ dx11ConstantBuffer::~dx11ConstantBuffer()
 dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable)
     : 
     m_buffer(nullptr),
-#if defined(USE_DX12)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     m_base_ptr(nullptr), 
     m_allocator(nullptr), 
     m_offset(0), 
@@ -70,7 +70,7 @@ dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
     m_bufferType = Desc.Type;
     m_bufferSize = Desc.Size;
 
-#if defined(USE_DX12)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     m_size = (Desc.Size + 255) & ~255;
 #endif
 
@@ -96,7 +96,7 @@ dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
 
     m_uiMembersCRC = crc32(&m_MembersList[0], Desc.Variables * sizeof(m_MembersList[0]));
 
-#if !defined(USE_DX12)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS == 0
     R_CHK(BufferUtils::CreateConstantBuffer(&m_buffer, Desc.Size));
     VERIFY(m_buffer);
 #endif
@@ -106,7 +106,7 @@ dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
     ZeroMemory(m_bufferData, Desc.Size);
 
 #ifdef DEBUG
-#if !defined(USE_DX12)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS == 0
     if (m_buffer)
     {
         m_buffer->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(Desc.Name), Desc.Name);
@@ -149,9 +149,9 @@ void dx11ConstantBuffer::Flush(u32 context_id)
     if (m_bufferChanged)
     {
         void* pData = nullptr;
-#if defined(USE_DX12)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
         pData = HW.AllocateConstantBuffer(this);
-#elif defined(USE_DX11) 
+#elif defined(USE_DX12) || defined(USE_DX11) 
         D3D11_MAPPED_SUBRESOURCE pSubRes;
         CHK_DX(HW.get_context(context_id)->Map(m_buffer, 0, D3D_MAP_WRITE_DISCARD, 0, &pSubRes));
         pData = pSubRes.pData;
@@ -161,8 +161,8 @@ void dx11ConstantBuffer::Flush(u32 context_id)
         VERIFY(pData);
         VERIFY(m_bufferData);
         CopyData(pData, m_bufferData, m_bufferSize);
-#if defined(USE_DX12)
-#elif defined(USE_DX11)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
+#elif defined(USE_DX12) || defined(USE_DX11) 
         HW.get_context(context_id)->Unmap(m_buffer, 0);
 #else
         m_buffer->Unmap();

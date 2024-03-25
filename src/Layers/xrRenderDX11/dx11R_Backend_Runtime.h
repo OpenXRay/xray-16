@@ -686,7 +686,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
                 VERIFY("Invalid enumeration");
         }
     
-#if !defined(USE_DX12)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS == 0
         ID3DBuffer* tempBuffer[MaxCBuffers] = {};
 
         u32 uiMin;

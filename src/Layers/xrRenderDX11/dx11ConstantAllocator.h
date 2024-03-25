@@ -30,7 +30,13 @@ struct PartitionAllocator
     ~PartitionAllocator()
     {
         //R_ASSERT(m_partition == 0);
-        SAFE_RELEASE(m_buffer); 
+        
+        //SAFE_RELEASE(m_buffer); 
+        if (m_buffer)
+        {
+            m_buffer->Release();
+            m_buffer = nullptr;
+        }
     }
 
     ID3DBuffer* buffer() const { return m_buffer; }
@@ -58,7 +64,8 @@ struct PartitionAllocator
     }
 };
 
-#if USE_DX12
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
+
 enum PoolConfig
 {
     POOL_STAGING_COUNT = 1,
@@ -106,4 +113,5 @@ public:
 };
 
 #endif
+
 #endif

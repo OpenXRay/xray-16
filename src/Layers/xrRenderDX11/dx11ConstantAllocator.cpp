@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dx11ConstantAllocator.h"
 
-#if USE_DX12
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS 
 
 #define r_constantbuffer_banksize 4
 #define r_constantbuffer_watermark 64
@@ -9,7 +9,11 @@
 static void ExtractBasePointer(ID3DBuffer* buffer, uint8_t*& base_ptr)
 {
     D3D11_MAPPED_SUBRESOURCE mappedResource = {};
+#if USE_DX12
     HRESULT hr = HW.get_context(CHW::IMM_CTX_ID)->Map(buffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &mappedResource);
+#else
+    HRESULT hr = HW.get_context(CHW::IMM_CTX_ID)->Map(buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+#endif
     if (hr != S_OK)
     {
         R_ASSERT2(0, "Could not create constant buffer resource!");

@@ -35,17 +35,17 @@
 #define HAS_DXGI1_5
 #endif
 
+//always enable in dx12 mode
+#define CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS 1
+
 #include "DX12/CryDX12.hpp"
 
 #include "Layers/xrRenderDX11/CommonTypes.h"
-
 #include "Layers/xrRenderDX11/dx11HW.h"
 
 #include "Layers/xrRender/Shader.h"
-
 #include "Layers/xrRender/R_Backend.h"
 #include "Layers/xrRender/R_Backend_Runtime.h"
-
 #include "Layers/xrRender/Blender.h"
 #include "Layers/xrRender/Blender_CLSID.h"
 

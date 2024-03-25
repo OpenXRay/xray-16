@@ -20,7 +20,7 @@ public:
         return m_buffer; 
     }
 
-#if defined(USE_DX12) 
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     bool IsUsedBuffer() const 
     { 
         return m_base_ptr != nullptr; 
@@ -28,12 +28,12 @@ public:
 
     u32 GetBufferNum() const
     {
-        return m_offset / DX12::CONSTANT_BUFFER_ELEMENT_SIZE;
+        return m_offset / 16U;
     }
     
     u32 GetBufferSize() const 
     { 
-        return m_size / DX12::CONSTANT_BUFFER_ELEMENT_SIZE;
+        return m_size / 16U;
     }
 
     void *GetBufferCPUPtr() const
@@ -74,7 +74,7 @@ private:
     u32 m_bufferSize; //	Cache buffer size for debug validation
     void* m_bufferData;
    
-#if defined(USE_DX12)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     void* m_allocator;
     void* m_base_ptr;
     u32 m_offset, m_size; 

@@ -94,7 +94,7 @@ void R_constants::flush_cache()
             cmd_list.m_aComputeConstants[i]->Flush(context_id);
     }
 
-#if defined(USE_DX12)
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
     ID3DBuffer* tempBuffer[CBackend::MaxCBuffers] = {};
     std::vector<u32> tempBufferNum(CBackend::MaxCBuffers);
     std::vector<u32> tempBufferSize(CBackend::MaxCBuffers);
@@ -122,7 +122,11 @@ void R_constants::flush_cache()
       
         if (hasConstantBuffer)
         {
+#if USE_DX11
+            HW.pContext1->PSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
             HW.get_context(context_id)->PSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
         }
     }
 
@@ -149,7 +153,11 @@ void R_constants::flush_cache()
         
         if (hasConstantBuffer)
         {
+#if USE_DX11
+            HW.pContext1->VSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
             HW.get_context(context_id)->VSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
         }
     }
 
@@ -176,7 +184,11 @@ void R_constants::flush_cache()
       
         if (hasConstantBuffer)     
         {
+#if USE_DX11
+            HW.pContext1->GSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
             HW.get_context(context_id)->GSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
         }
     }
 
@@ -203,7 +215,11 @@ void R_constants::flush_cache()
        
         if (hasConstantBuffer)
         {
+#if USE_DX11
+            HW.pContext1->HSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
             HW.get_context(context_id)->HSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
         }
     }
 
@@ -230,7 +246,11 @@ void R_constants::flush_cache()
        
         if (hasConstantBuffer)
         {
+#if USE_DX11
+            HW.pContext1->DSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
             HW.get_context(context_id)->DSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
         }
     }
 
@@ -257,7 +277,11 @@ void R_constants::flush_cache()
         
         if (hasConstantBuffer)
         {
+#if USE_DX11
+            HW.pContext1->CSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
             HW.get_context(context_id)->CSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
         }
     }
 #endif

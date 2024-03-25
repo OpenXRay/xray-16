@@ -13,14 +13,19 @@
 #ifdef _DEBUG
 #define D3D_DEBUG_INFO
 #endif
-#include <D3D9.h>
+#include <d3d9.h>
 
-#include <D3D11.h>
-#include <D3DCompiler.h>
+#include <d3d11.h>
+#include <d3dcompiler.h>
 
 #if __has_include(<dxgi1_4.h>)
 #include <dxgi1_4.h>
 #define HAS_DXGI1_4
+#endif
+
+#if __has_include(<d3d11_1.h>)
+#include <d3d11_1.h>
+#define HAS_DX11_1
 #endif
 
 #if __has_include(<d3d11_2.h>)
@@ -33,12 +38,16 @@
 #define HAS_DX11_3
 #endif
 
-#include "Layers/xrRenderDX11/CommonTypes.h"
+#ifdef HAS_DX11_1
+#define CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS 1
+#else 
+#define CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS 0
+#endif
 
+#include "Layers/xrRenderDX11/CommonTypes.h"
 #include "Layers/xrRenderDX11/dx11HW.h"
 
 #include "Layers/xrRender/Shader.h"
-
 #include "Layers/xrRender/R_Backend.h"
 #include "Layers/xrRender/R_Backend_Runtime.h"
 
@@ -60,6 +69,27 @@
 
 #include "r2.h"
 #include "r4_rendertarget.h"
+
+IC uint32_t NextPower2(uint32_t n)
+{
+    n--;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n++;
+    return n;
+}
+
+IC uint32_t IntegerLog2(uint32_t x)
+{
+    DWORD result = 32 ^ 31; // assumes result is unmodified if _BitScanReverse returns 0
+    _BitScanReverse(&result, x);
+    result ^= 31; // needed because the index is from LSB (whereas all other implementations are from MSB)
+
+    return 31 - result;
+}
 
 IC void jitter(CBlender_Compile& C)
 {
