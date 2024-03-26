@@ -216,8 +216,8 @@ void CRenderTarget::phase_combine()
         RCache.set_c("Ldynamic_color", sunclr);
         RCache.set_c("Ldynamic_dir", sundir);
 
-        RCache.set_c("env_color", envclr);
-        RCache.set_c("fog_color", fogclr);
+        RCache.set_c("env_color", toLinearSpace(envclr));
+        RCache.set_c("fog_color", toLinearSpace(fogclr));
 
         RCache.set_c("ssao_noise_tile_factor", fSSAONoise);
         RCache.set_c("ssao_kernel_size", fSSAOKernelSize);

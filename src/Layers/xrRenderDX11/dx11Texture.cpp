@@ -290,6 +290,21 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     string_path fname;
     xr_strcpy(fname, fRName); //. andy if (strext(fname)) *strext(fname)=0;
     fix_texture_name(fname);
+
+    bool force_srgb =
+        o.linear_space_rendering
+        && !strstr(fname, "_bump")
+        && !strstr(fname, "_mask")
+        && !strstr(fname, "_dudv")
+        && !strstr(fname, "water_normal")
+        && !strstr(fname, "internal_")
+
+        && !strstr(fname, "_lm.") // terrain lightmaps (level/*/terrain/)
+        && !strstr(fname, "level_lods_nm") // level lods normal map (level/*/)
+        && !strstr(fname, "lmap#") // level light maps (level/*/)
+
+        && !strstr(fname, "ui_magnifier2");
+
     IReader* S = NULL;
     if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump"))
         goto _BUMP_from_base;
@@ -346,9 +361,13 @@ _DDS:
     }
 
     R_CHK2(CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,
-        D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
+        D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, force_srgb ? DirectX::CREATETEX_FORCE_SRGB : DirectX::CREATETEX_DEFAULT,
         &pTexture2D), fn
     );
+    /*R_CHK2(DirectX::CreateDDSTextureFromMemoryEx(HW.pDevice, reinterpret_cast<uint8_t*>(S->pointer()), S->length(), 0, D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, 0,
+               force_srgb ? DirectX::DDS_LOADER_FORCE_SRGB : DirectX::DDS_LOADER_DEFAULT, &pTexture2D, nullptr),
+        fn);*/
+
     FS.r_close(S);
 
     // OK

@@ -22,6 +22,18 @@ const int max_particles = 1000;
 const int particles_cache = 400;
 const float particles_time = .3f;
 
+namespace
+{
+
+float srgbToLinear(float c) { return std::pow(c, 2.2f); }
+
+Fvector3 srgbToLinear(const Fvector3 c)
+{
+    return Fvector3{srgbToLinear(c.x), srgbToLinear(c.y), srgbToLinear(c.z)};
+}
+
+} // namespace
+
 dxRainRender::dxRainRender()
 {
     IReader* F = FS.r_open("$game_meshes$", "dm" DELIMITER "rain.dm");
@@ -84,7 +96,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
 
     // visual
     const float factor_visual = factor / 2.f + .5f;
-    const Fvector3 f_rain_color = g_pGamePersistent->Environment().CurrentEnv.rain_color;
+    const Fvector3 f_rain_color = srgbToLinear(g_pGamePersistent->Environment().CurrentEnv.rain_color);
     const u32 u_rain_color = color_rgba_f(f_rain_color.x, f_rain_color.y, f_rain_color.z, factor_visual);
 
     const float b_radius_wrap_sqr = _sqr((source_radius + .5f));

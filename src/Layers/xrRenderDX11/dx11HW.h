@@ -104,6 +104,7 @@ private:
     XRay::Module hD3DCompiler;
     XRay::Module hDXGI;
     XRay::Module hD3D;
+    DXGI_FORMAT selectBackBufferFormat() const;
 };
 
 extern ECORE_API CHW HW;

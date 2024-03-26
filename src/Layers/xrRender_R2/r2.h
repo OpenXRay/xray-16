@@ -275,6 +275,8 @@ public:
 
         // Yohji - New shader support
         u32 new_shader_support : 1;
+
+        u32 linear_space_rendering : 1;
     } o;
 
     struct RenderR2Statistics
