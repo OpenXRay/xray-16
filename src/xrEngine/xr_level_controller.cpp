@@ -127,6 +127,19 @@ game_action actions[] =
     { "quick_load",             kQUICK_LOAD,                _sp },
     { "alife_command",          kALIFE_CMD,                 _sp },
 
+    { "numpad0",                kNUMPAD0,                   _sp },
+    { "insert",                 kINSERT,                    _sp },
+    { "numpad1",                kNUMPAD1,                   _sp },
+    { "numpad2",                kNUMPAD2,                   _sp },
+    { "numpad3",                kNUMPAD3,                   _sp },
+    { "numpad4",                kNUMPAD4,                   _sp },
+    { "numpad5",                kNUMPAD5,                   _sp },
+    { "numpad6",                kNUMPAD6,                   _sp },
+    { "numpad7",                kNUMPAD7,                   _sp },
+    { "numpad8",                kNUMPAD8,                   _sp },
+    { "numpad9",                kNUMPAD9,                   _sp },
+    { "numpad_enter",           kNUMPADENTER,              _sp },
+
     { "custom1",                kCUSTOM1,                   _sp },
     { "custom2",                kCUSTOM2,                   _sp },
     { "custom3",                kCUSTOM3,                   _sp },
@@ -142,6 +155,13 @@ game_action actions[] =
     { "custom13",               kCUSTOM13,                  _sp },
     { "custom14",               kCUSTOM14,                  _sp },
     { "custom15",               kCUSTOM15,                  _sp },
+
+    { "pda_tab1",               kPDA_TAB1,                  _sp },
+    { "pda_tab2",               kPDA_TAB2,                  _sp },
+    { "pda_tab3",               kPDA_TAB3,                  _sp },
+    { "pda_tab4",               kPDA_TAB4,                  _sp },
+    { "pda_tab5",               kPDA_TAB5,                  _sp },
+    { "pda_tab6",               kPDA_TAB6,                  _sp },
 
     { "kick",                   kKICK,                      _sp },
 
