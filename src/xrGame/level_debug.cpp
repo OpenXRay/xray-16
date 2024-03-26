@@ -89,7 +89,7 @@ CLevelDebug::CObjectInfo& CLevelDebug::object_info(IGameObject* obj, LPCSTR clas
         else
         {
             CObjectInfo* new_info = xr_new<CObjectInfo>();
-            obj_it->second.insert(std::make_pair(class_name, new_info));
+            obj_it->second.emplace(class_name, new_info);
             return (*(new_info));
         }
     }
@@ -98,8 +98,8 @@ CLevelDebug::CObjectInfo& CLevelDebug::object_info(IGameObject* obj, LPCSTR clas
         CLASS_INFO_MAP temp_map;
 
         CObjectInfo* new_info = xr_new<CObjectInfo>();
-        temp_map.insert(std::make_pair(class_name, new_info));
-        m_objects_info.insert(std::make_pair(obj, temp_map));
+        temp_map.emplace(class_name, new_info);
+        m_objects_info.emplace(obj, temp_map);
 
         return (*(new_info));
     }
@@ -117,7 +117,7 @@ CLevelDebug::CTextInfo& CLevelDebug::text(void* class_ptr, LPCSTR class_name)
     else
     {
         CTextInfo* new_info = xr_new<CTextInfo>();
-        m_text_info.insert(std::make_pair(key, new_info));
+        m_text_info.emplace(key, new_info);
         return (*(new_info));
     }
 }
@@ -134,7 +134,7 @@ CLevelDebug::CLevelInfo& CLevelDebug::level_info(void* class_ptr, LPCSTR class_n
     else
     {
         CLevelInfo* new_info = xr_new<CLevelInfo>();
-        m_level_info.insert(std::make_pair(key, new_info));
+        m_level_info.emplace(key, new_info);
         return (*(new_info));
     }
 }

@@ -80,7 +80,7 @@ CSE_Abstract* xrServer::Process_spawn(
         Phantom->ID = PerformIDgen(0xffff);
         Phantom->ID_Phantom = Phantom->ID; // Self-linked to avoid phantom-breeding
         Phantom->owner = NULL;
-        entities.insert(std::make_pair(Phantom->ID, Phantom));
+        entities.emplace(Phantom->ID, Phantom);
 
         Phantom->s_flags.set(M_SPAWN_OBJECT_PHANTOM, TRUE);
 
@@ -88,7 +88,7 @@ CSE_Abstract* xrServer::Process_spawn(
         E->ID = PerformIDgen(E->ID);
         E->ID_Phantom = Phantom->ID;
         E->owner = CL;
-        entities.insert(std::make_pair(E->ID, E));
+        entities.emplace(E->ID, E);
     }
     else
     {
@@ -98,7 +98,7 @@ CSE_Abstract* xrServer::Process_spawn(
             E->ID = PerformIDgen(0xffff);
             E->owner = CL; //		= SelectBestClientToMigrateTo	(E);
             E->s_flags.set(M_SPAWN_OBJECT_PHANTOM, FALSE);
-            entities.insert(std::make_pair(E->ID, E));
+            entities.emplace(E->ID, E);
         }
         else
         {
@@ -112,7 +112,7 @@ CSE_Abstract* xrServer::Process_spawn(
             }
             E->ID = PerformIDgen(E->ID);
             E->owner = CL;
-            entities.insert(std::make_pair(E->ID, E));
+            entities.emplace(E->ID, E);
         }
     }
 

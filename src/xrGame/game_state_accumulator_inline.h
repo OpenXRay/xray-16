@@ -7,5 +7,5 @@ void game_state_accumulator::init_acpv_list()
 
     player_state_param* tmp_obj_inst = xr_new<typename TypeListElement::Head::value_type>(this);
 
-    m_accumulative_values.insert(std::make_pair(TypeListElement::Head::value_id, tmp_obj_inst));
+    m_accumulative_values.emplace(TypeListElement::Head::value_id, tmp_obj_inst);
 }

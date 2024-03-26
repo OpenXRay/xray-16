@@ -160,7 +160,7 @@ void add_animation(
         return;
     }
 
-    g_animation_stats.insert(std::make_pair(query, animation_stats(visual_id, 1, just_started ? 1 : 0)));
+    g_animation_stats.emplace(query, animation_stats(visual_id, 1, just_started ? 1 : 0));
 }
 
 void add_blend(const shared_str& animation_id, const shared_str& animation_set_id, const shared_str& visual_id,
@@ -179,7 +179,7 @@ void add_blend(const shared_str& animation_id, const shared_str& animation_set_i
         return;
     }
 
-    g_blend_stats.insert(std::make_pair(query, 1));
+    g_blend_stats.emplace(query, 1);
 }
 
 void add_animation_stats(const shared_str& animation_id, const shared_str& animation_set_id,

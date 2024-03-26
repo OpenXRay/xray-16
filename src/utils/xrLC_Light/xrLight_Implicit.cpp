@@ -196,7 +196,7 @@ void ImplicitLightingExec(BOOL b_net)
             ImplicitDeflector ImpD;
             ImpD.texture = T;
             ImpD.faces.push_back(F);
-            calculator.insert(std::make_pair(Tid, ImpD));
+            calculator.emplace(Tid, ImpD);
             not_clear.push_back(Tid);
         }
         else

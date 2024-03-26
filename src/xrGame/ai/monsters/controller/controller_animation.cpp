@@ -162,7 +162,7 @@ void CControllerAnimation::add_path_rotation(ELegsActionType action, float angle
     {
         PATH_ROTATIONS_VEC vec;
         vec.push_back(rot);
-        m_path_rotations.insert(std::make_pair(action, vec));
+        m_path_rotations.emplace(action, vec);
     }
     else
     {

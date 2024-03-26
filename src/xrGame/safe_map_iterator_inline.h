@@ -38,7 +38,7 @@ IC void CSSafeMapIterator::add(const _key_type& id, _data_type* value, bool no_a
 
     bool addition = m_objects.empty();
 
-    m_objects.insert(std::make_pair(id, value));
+    m_objects.emplace(id, value);
 
     if (addition)
         m_next_iterator = m_objects.begin();

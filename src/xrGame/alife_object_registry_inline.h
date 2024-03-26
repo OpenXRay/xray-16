@@ -18,7 +18,7 @@ IC void CALifeObjectRegistry::add(CSE_ALifeDynamicObject* object)
             "Object with the specified ID is already presented in the Object Registry!");
     }
 
-    m_objects.insert(std::make_pair(object->ID, object));
+    m_objects.emplace(object->ID, object);
 }
 
 IC void CALifeObjectRegistry::remove(const ALife::_OBJECT_ID& id, bool no_assert)

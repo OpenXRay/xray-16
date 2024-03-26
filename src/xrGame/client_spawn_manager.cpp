@@ -49,19 +49,19 @@ void CClientSpawnManager::add(
         return;
     }
 
-    REQUEST_REGISTRY::iterator I = m_registry.find(requesting_id);
+    auto I = m_registry.find(requesting_id);
     if (I == m_registry.end())
     {
         REQUESTED_REGISTRY registry;
-        registry.insert(std::make_pair(requested_id, spawn_callback));
-        m_registry.insert(std::make_pair(requesting_id, registry));
+        registry.emplace(requested_id, spawn_callback);
+        m_registry.emplace(requesting_id, registry);
         return;
     }
 
-    REQUESTED_REGISTRY::iterator J = (*I).second.find(requested_id);
+    auto J = (*I).second.find(requested_id);
     if (J == (*I).second.end())
     {
-        (*I).second.insert(std::make_pair(requested_id, spawn_callback));
+        (*I).second.emplace(requested_id, spawn_callback);
         return;
     }
 
@@ -71,7 +71,7 @@ void CClientSpawnManager::add(
 void CClientSpawnManager::remove(
     REQUESTED_REGISTRY& registry, ALife::_OBJECT_ID requesting_id, ALife::_OBJECT_ID requested_id, bool no_warning)
 {
-    REQUESTED_REGISTRY::iterator I = registry.find(requested_id);
+    auto I = registry.find(requested_id);
     if (I == registry.end())
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,

@@ -32,7 +32,7 @@ void CControlMovementBase::load(LPCSTR section)
 
     // add idle velocity
     SVelocityParam velocity_param;
-    m_velocities.insert(std::make_pair(eVelocityParameterIdle, velocity_param));
+    m_velocities.emplace(eVelocityParameterIdle, velocity_param);
     m_man->path_builder().detail().add_velocity(
         eVelocityParameterIdle, CDetailPathManager::STravelParams(velocity_param.velocity.linear,
                                     velocity_param.velocity.angular_path, velocity_param.velocity.angular_real));
@@ -43,7 +43,7 @@ void CControlMovementBase::load_velocity(LPCSTR section, LPCSTR line, u32 veloci
     SVelocityParam velocity_param;
     if (pSettings->line_exist(section, line))
         velocity_param.Load(section, line);
-    m_velocities.insert(std::make_pair(velocity_id, velocity_param));
+    m_velocities.emplace(velocity_id, velocity_param);
 
     m_man->path_builder().detail().add_velocity(
         velocity_id, CDetailPathManager::STravelParams(velocity_param.velocity.linear,

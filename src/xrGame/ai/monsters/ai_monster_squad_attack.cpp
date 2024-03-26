@@ -28,7 +28,7 @@ void CMonsterSquad::ProcessAttack()
             else
             {
                 m_temp_entities.push_back(it_goal->first);
-                m_enemy_map.insert(std::make_pair(goal.entity, m_temp_entities));
+                m_enemy_map.emplace(goal.entity, m_temp_entities);
             }
         }
     }
@@ -88,7 +88,7 @@ void CMonsterSquad::set_rat_squad_index(const CEntity* m_enemy)
             else
             {
                 m_entities.push_back(it_goal->first);
-                m_enemy_maps.insert(std::make_pair(m_enemy, m_entities));
+                m_enemy_maps.emplace(m_enemy, m_entities);
             }
         }
     }
@@ -134,7 +134,7 @@ void CMonsterSquad::set_squad_index(const CEntity* m_enemy)
             else
             {
                 m_entities.push_back(it_goal->first);
-                m_enemy_maps.insert(std::make_pair(m_enemy, m_entities));
+                m_enemy_maps.emplace(m_enemy, m_entities);
             }
         }
     }

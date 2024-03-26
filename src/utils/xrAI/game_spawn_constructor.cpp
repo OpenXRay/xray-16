@@ -209,7 +209,7 @@ void CGameSpawnConstructor::add_story_object(ALife::_STORY_ID id, CSE_ALifeDynam
         VERIFY3(I == m_story_objects.end(), "There are several objects which has the same unique story ID, level ", level_name);
     }
 
-    m_story_objects.insert(std::make_pair(id, object));
+    m_story_objects.emplace(id, object);
 }
 
 void CGameSpawnConstructor::add_object(CSE_Abstract* object)

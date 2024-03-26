@@ -8,7 +8,7 @@ void CMonsterEventManager::add_delegate(EEventType event, typeEvent delegate)
     auto it = m_event_storage.find(event);
     if (it == m_event_storage.end())
     {
-        auto res = m_event_storage.insert(std::make_pair(event, EVENT_VECTOR()));
+        auto res = m_event_storage.emplace(event, EVENT_VECTOR());
         it = res.first;
     }
 

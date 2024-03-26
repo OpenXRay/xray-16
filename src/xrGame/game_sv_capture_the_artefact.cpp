@@ -979,7 +979,7 @@ void game_sv_CaptureTheArtefact::LoadTeamData(ETeam eteam, const shared_str& caS
     //-------------------------------------------------------------
     TeamList.push_back(NewTeam);
     TEAM_DATA_LIST::size_type newTeamId = TeamList.size() - 1;
-    teams.insert(std::make_pair(eteam, MyTeam(newTeamId, 0, caSection, artefactName)));
+    teams.emplace(eteam, MyTeam(newTeamId, 0, caSection, artefactName));
 };
 
 #define CTA_ANOMALY_SET_BASE_NAME "cta_game_anomaly_sets"
@@ -1583,7 +1583,7 @@ void game_sv_CaptureTheArtefact::ProcessPlayerDeath(game_PlayerState* playerStat
         if (buyer_iter != m_dead_buyers.end())
             buyer_iter->second = 0;
         else
-            m_dead_buyers.insert(std::make_pair(l_pC->ID, 0));
+            m_dead_buyers.emplace(l_pC->ID, 0);
     }
     TeamsMap::iterator te = teams.end();
     TeamsMap::iterator childArtefactTeam = std::find_if(
@@ -2445,7 +2445,7 @@ void game_sv_CaptureTheArtefact::OnPostCreate(u16 id_who)
 
     TGIDCPair id_pair = std::make_pair(id_who, u8(0));
 
-    m_AnomalyIds.insert(std::make_pair(zone_name, id_pair));
+    m_AnomalyIds.emplace(zone_name, id_pair);
 }
 
 void game_sv_CaptureTheArtefact::ReadOptions(shared_str& options)

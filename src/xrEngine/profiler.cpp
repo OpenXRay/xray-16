@@ -93,11 +93,11 @@ void CProfiler::setup_timer			(pcstr timer_id, const u64 &timer_time, const u32 
 			*j					= 0;
 			TIMERS::iterator	m = m_timers.find(m_temp);
 			if (m == m_timers.end())
-				m_timers.insert	(std::make_pair(shared_str(m_temp),CProfileStats()));
+                m_timers.emplace(shared_str(m_temp),CProfileStats());
 			*j					= '/';
 			k					= j + 1;
 		}
-		i						= m_timers.insert(std::make_pair(shared_str(timer_id),CProfileStats())).first;
+        i						= m_timers.emplace(shared_str(timer_id),CProfileStats()).first;
 
 		CProfileStats			&current = (*i).second;
 		current.m_min_time		= _time;

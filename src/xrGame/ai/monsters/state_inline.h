@@ -132,7 +132,7 @@ CStateAbstract* CStateAbstract::get_state(u32 state_id)
 }
 
 TEMPLATE_SPECIALIZATION
-void CStateAbstract::add_state(u32 state_id, CSState* s) { substates.insert(std::make_pair(state_id, s)); }
+void CStateAbstract::add_state(u32 state_id, CSState* s) { substates.emplace(state_id, s); }
 TEMPLATE_SPECIALIZATION
 void CStateAbstract::free_mem()
 {

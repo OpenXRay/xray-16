@@ -16,12 +16,12 @@ void CMonsterSquad::RegisterMember(CEntity* pE)
 {
     // Добавить цель
     SMemberGoal G;
-    m_goals.insert(std::make_pair(pE, G));
+    m_goals.emplace(pE, G);
 
     // Добавить команду
     SSquadCommand C;
     C.type = SC_NONE;
-    m_commands.insert(std::make_pair(pE, C));
+    m_commands.emplace(pE, C);
 
     // установить лидера
     if (!leader)

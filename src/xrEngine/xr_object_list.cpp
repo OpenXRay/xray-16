@@ -348,7 +348,7 @@ void CObjectList::net_Register(IGameObject* O)
     R_ASSERT(O->ID() < 0xffff);
 
     map_NETID[O->ID()] = O;
-    //. map_NETID.insert(std::make_pair(O->ID(),O));
+    //. map_NETID.emplace(O->ID(),O);
     // Msg ("-------------------------------- Register: %s",O->cName());
 }
 

@@ -595,7 +595,7 @@ CMotionDef* CControlAnimationBase::get_motion_def(SAnimItem* it, u32 index)
 
 void CControlAnimationBase::AddAnimTranslation(const MotionID& motion, LPCSTR str)
 {
-    m_anim_motion_map.insert(std::make_pair(motion, str));
+    m_anim_motion_map.emplace(motion, str);
 }
 shared_str CControlAnimationBase::GetAnimTranslation(const MotionID& motion)
 {

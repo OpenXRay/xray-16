@@ -22,7 +22,7 @@ void register_file_mapping(void* address, const u32& size, LPCSTR file_name)
 {
     FILE_MAPPINGS::const_iterator I = g_file_mappings.find(*(u32*)&address);
     VERIFY(I == g_file_mappings.end());
-    g_file_mappings.insert(std::make_pair(*(u32*)&address, std::make_pair(size, shared_str(file_name))));
+    g_file_mappings.emplace(*(u32*)&address, std::make_pair(size, shared_str(file_name)));
 
     // Msg ("++register_file_mapping(%2d): [0x%08x]%s", g_file_mapped_count + 1, *((u32*)&address), file_name);
 

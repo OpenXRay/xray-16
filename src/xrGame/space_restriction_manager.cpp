@@ -179,7 +179,7 @@ CSpaceRestrictionManager::CRestrictionPtr CSpaceRestrictionManager::restriction(
         return ((*I).second);
 
     CSpaceRestriction* client_restriction = xr_new<CSpaceRestriction>(this, out_restrictors, in_restrictors);
-    m_space_restrictions.insert(std::make_pair(space_restrictions, client_restriction));
+    m_space_restrictions.emplace(space_restrictions, client_restriction);
     return (client_restriction);
 }
 

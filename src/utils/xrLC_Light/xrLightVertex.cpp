@@ -53,7 +53,7 @@ void g_trans_register_internal(Vertex* V)
     }
 
     // Register
-    mapVertIt ins = g_trans->insert(std::make_pair(key, vecVertex()));
+    mapVertIt ins = g_trans->emplace(key, vecVertex());
     ins->second.reserve(32);
     ins->second.push_back(V);
 }

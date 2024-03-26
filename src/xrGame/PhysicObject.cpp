@@ -478,7 +478,7 @@ DEFINE_MAP_PRED	(LPCSTR,	CPhysicsJoint*,	JOINT_P_MAP,	JOINT_P_PAIR_IT,	pred_str)
 
 JOINT_P_MAP			*l_tpJointMap = new JOINT_P_MAP();
 
-l_tpJointMap->insert(std::make_pair(bone_name,joint*));
+l_tpJointMap->emplace(bone_name,joint*);
 JOINT_P_PAIR_IT		I = l_tpJointMap->find(bone_name);
 if (l_tpJointMap->end()!=I){
 //bone_name is found and is an pair_iterator

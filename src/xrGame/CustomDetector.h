@@ -85,7 +85,7 @@ public:
             {
                 shared_str item_sect = pSettings->r_string(sect, temp);
 
-                m_TypesMap.insert(std::make_pair(item_sect, ITEM_TYPE()));
+                m_TypesMap.emplace(item_sect, ITEM_TYPE());
                 ITEM_TYPE& item_type = m_TypesMap[item_sect];
 
                 xr_sprintf(temp, "%s_freq_%d", prefix, i);

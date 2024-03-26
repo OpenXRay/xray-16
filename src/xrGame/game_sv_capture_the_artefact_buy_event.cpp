@@ -35,7 +35,7 @@ void game_sv_CaptureTheArtefact::OnPlayerBuyFinished(ClientID id_who, NET_Packet
         if (buyer_iter != m_dead_buyers.end())
             buyer_iter->second = 1;
         else
-            m_dead_buyers.insert(std::make_pair(id_who, 1));
+            m_dead_buyers.emplace(id_who, 1);
     }
     else
     {
