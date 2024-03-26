@@ -3,7 +3,8 @@
 
 namespace mp_anticheat
 {
-static pcstr important_sections[] = {"mp_actor", "mp_actor_damage", "mp_actor_immunities", "mp_actor_condition",
+static constexpr pcstr important_sections[] = {"mp_actor", "mp_actor_damage", "mp_actor_immunities",
+    "mp_actor_condition",
     "rank_base", "rank_0", "rank_1", "rank_2", "rank_3", "rank_4", "deathmatch_gamedata", "deathmatch_team0",
     "teamdeathmatch_team1", "teamdeathmatch_team2", "artefacthunt_gamedata", "artefacthunt_team1", "artefacthunt_team2",
     "capturetheartefact_gamedata", "capturetheartefact_team1", "capturetheartefact_team2", "deathmatch_base_cost",
@@ -14,19 +15,21 @@ mp_config_sections::mp_config_sections() : m_tmp_dumper(NULL, FALSE, FALSE, FALS
     u32 gcount = pSettings->line_count("mp_item_groups");
     LPCSTR line;
     LPCSTR name;
+    m_mp_sections.reserve(gcount + std::size(important_sections));
     for (u32 i = 0; i < gcount; ++i)
     {
         pSettings->r_line("mp_item_groups", i, &name, &line);
         u32 itmcount = _GetItemCount(line);
         string256 tmp_single_item;
+        m_mp_sections.reserve(itmcount);
         for (u32 j = 0; j < itmcount; ++j)
         {
             m_mp_sections.push_back(_GetItem(line, j, tmp_single_item));
         }
     }
-    for (int i = 0; i < (sizeof(important_sections) / sizeof(char*)); ++i)
+    for (cpcstr important_section : important_sections)
     {
-        m_mp_sections.push_back(shared_str(important_sections[i]));
+        m_mp_sections.emplace_back(important_section);
     }
     m_current_dump_sect = m_mp_sections.end();
 }

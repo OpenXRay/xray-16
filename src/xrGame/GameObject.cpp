@@ -710,7 +710,8 @@ void CGameObject::spawn_supplies()
     bool bSilencer = false;
     bool bLauncher = false;
 
-    for (u32 k = 0, j; spawn_ini()->r_line("spawn", k, &N, &V); k++)
+    u32 k = 0, j;
+    while (spawn_ini()->r_line("spawn", k, &N, &V))
     {
         VERIFY(xr_strlen(N));
         if (pSettings->section_exist(N)) //Alundaio: Validate section exists
@@ -766,6 +767,7 @@ void CGameObject::spawn_supplies()
                 }
             }
         }
+        ++k;
     }
 }
 

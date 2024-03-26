@@ -734,9 +734,10 @@ void CControlAnimationBase::AA_reload(LPCSTR section)
     SAAParam anim;
     LPCSTR anim_name, val;
 
-    IKinematicsAnimated* skel_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    auto* skel_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
 
-    for (u32 i = 0; pSettings->r_line(section, i, &anim_name, &val); ++i)
+    u32 i = 0; 
+    while (pSettings->r_line(section, i, &anim_name, &val))
     {
         anim.motion = skel_animated->LL_MotionID(anim_name);
         if (!anim.motion.valid())
@@ -748,12 +749,15 @@ void CControlAnimationBase::AA_reload(LPCSTR section)
             LPCSTR compound_section = val;
             LPCSTR unused_line_name;
 
-            for (u32 k = 0; pSettings->r_line(compound_section, k, &unused_line_name, &val); ++k)
+            u32 k = 0;
+            m_attack_anims.reserve(pSettings->line_count(compound_section));
+            while (pSettings->r_line(compound_section, k, &unused_line_name, &val))
             {
                 parse_anim_params(val, anim);
 
                 m_attack_anims.push_back(anim);
                 m_man->animation().add_anim_event(anim.motion, anim.time, CControlAnimation::eAnimationHit);
+                ++k;
             }
         }
         else
@@ -763,6 +767,7 @@ void CControlAnimationBase::AA_reload(LPCSTR section)
             m_attack_anims.push_back(anim);
             m_man->animation().add_anim_event(anim.motion, anim.time, CControlAnimation::eAnimationHit);
         }
+        ++i;
     }
 }
 

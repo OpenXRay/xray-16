@@ -141,7 +141,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     {
         SVS* _vs = xr_new<SVS>();
         _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
+        m_vs.emplace(_vs->set_name(name), _vs);
         if (0 == xr_stricmp(_name, "null"))
         {
             _vs->vs = NULL;
@@ -262,7 +262,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
     {
         SPS* _ps = xr_new<SPS>();
         _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
+        m_ps.emplace(_ps->set_name(name), _ps);
         if (0 == xr_stricmp(name, "null"))
         {
             _ps->ps = NULL;

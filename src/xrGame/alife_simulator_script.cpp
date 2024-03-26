@@ -76,10 +76,10 @@ void generate_story_ids(STORY_PAIRS& result, _id_type INVALID_ID, LPCSTR section
 
     const CInifile* Ini = pGameIni;
 
-    LPCSTR N, V;
-    u32 k = 0;
     R_ASSERT(Ini->section_exist(section_name));
 
+    LPCSTR N, V;
+    u32 k = 0;
     result.reserve(Ini->line_count(section_name) + 1);
     while (Ini->r_line(section_name, k, &N, &V))
     {

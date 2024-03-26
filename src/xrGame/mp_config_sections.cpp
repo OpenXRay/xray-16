@@ -15,6 +15,7 @@ mp_config_sections::mp_config_sections() : m_tmp_dumper(NULL, FALSE, FALSE, FALS
     u32 gcount = pSettings->line_count("mp_item_groups");
     LPCSTR line;
     LPCSTR name;
+    m_mp_sections.reserve(gcount + std::size(important_sections));
     for (u32 i = 0; i < gcount; ++i)
     {
         pSettings->r_line("mp_item_groups", i, &name, &line);

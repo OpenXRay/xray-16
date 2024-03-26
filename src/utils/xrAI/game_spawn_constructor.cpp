@@ -47,7 +47,7 @@ IC shared_str CGameSpawnConstructor::actor_level_name()
         *game_graph().header().level(game_graph().vertex(m_actor->m_tGraphID)->level_id()).name(), ".spawn"));
 }
 
-extern void read_levels(CInifile* ini, xr_set<CLevelInfo>& m_levels, bool rebuild_graph, xr_vector<LPCSTR>*);
+extern void read_levels(CInifile* ini, xr_unordered_set<CLevelInfo>& m_levels, bool rebuild_graph, xr_vector<LPCSTR>*);
 void fill_needed_levels(pstr levels, xr_vector<LPCSTR>& result);
 
 void CGameSpawnConstructor::load_spawns(LPCSTR name, bool no_separator_check)
@@ -79,6 +79,7 @@ void CGameSpawnConstructor::load_spawns(LPCSTR name, bool no_separator_check)
 
     // load levels
     GameGraph::SLevel level;
+    m_level_spawns.reserve(m_levels.size());
     for (const auto &i : m_levels)
     {
         level.m_offset = i.m_offset;

@@ -936,12 +936,13 @@ void CEnvironment::load_weather_effects()
         pcstr weatherName, weatherSection, envSection;
         if (pSettings->r_line("weather_effects", weatherIdx, &weatherName, &weatherSection))
         {
+            const u32 envCount = pSettings->line_count(weatherSection);
             EnvVec& env = WeatherFXs[weatherName];
+            env.reserve(envCount + 2);
             env.soc_style = true;
             env.emplace_back(create_descriptor("00:00:00", nullptr));
             env.back()->dont_save = true;
 
-            const u32 envCount = pSettings->line_count(weatherSection);
             pcstr executionTime;
             for (u32 envIdx = 0; envIdx < envCount; ++envIdx)
             {

@@ -1,9 +1,13 @@
 #pragma once
 #include <set>
+#include <unordered_set>
 #include "xr_allocator.h"
 
 template <typename K, class P = std::less<K>, typename allocator = xr_allocator<K>>
 using xr_set = std::set<K, P, allocator>;
+
+template <typename K, class P = std::less<K>, typename allocator = xr_allocator<K>>
+using xr_unordered_set = std::unordered_set<K, P, allocator>;
 
 template <typename K, class P = std::less<K>, typename allocator = xr_allocator<K>>
 using xr_multiset = std::multiset<K, P, allocator>;

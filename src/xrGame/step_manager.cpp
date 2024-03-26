@@ -53,7 +53,9 @@ void CStepManager::reload(LPCSTR section)
             m_object->cName().c_str(), m_object->cNameVisual().c_str(), section, anim_section);
 #endif
 
-    for (u32 i = 0; pSettings->r_line(anim_section, i, &anim_name, &val); ++i)
+    u32 i = 0;
+    m_steps_map.reserve(pSettings->line_count(anim_section));
+    while (pSettings->r_line(anim_section, i, &anim_name, &val))
     {
         _GetItem(val, 0, cur_elem);
 
@@ -94,6 +96,7 @@ void CStepManager::reload(LPCSTR section)
         }
 #endif
         m_steps_map.emplace(motion_id, param);
+        ++i;
     }
 
 #ifdef DEBUG

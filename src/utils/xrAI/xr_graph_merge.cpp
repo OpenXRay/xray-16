@@ -44,13 +44,15 @@ public:
 u32 dwfGetIDByLevelName(CInifile* Ini, LPCSTR caLevelName)
 {
     LPCSTR N, V;
-    for (u32 k = 0; Ini->r_line("levels", k, &N, &V); k++)
+    u32 k = 0; 
+    while (Ini->r_line("levels", k, &N, &V))
     {
         R_ASSERT3(Ini->section_exist(N), "Fill section properly!", N);
         R_ASSERT3(Ini->line_exist(N, "caption"), "Fill section properly!", N);
         R_ASSERT3(Ini->line_exist(N, "id"), "Fill section properly!", N);
         if (!xr_strcmp(Ini->r_string_wb(N, "caption"), caLevelName))
             return (Ini->r_u32(N, "id"));
+        ++k;
     }
     return (u32(-1));
 }
@@ -386,11 +388,13 @@ public:
     CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild);
 };
 
-void read_levels(CInifile* Ini, xr_set<CLevelInfo>& levels, bool rebuild_graph, xr_vector<LPCSTR>* needed_levels)
+void read_levels(CInifile* Ini, xr_unordered_set<CLevelInfo>& levels, bool rebuild_graph, xr_vector<LPCSTR>* needed_levels)
 {
     pcstr field_name, field_value;
     string_path caFileName, file_name;
-    for (u32 k = 0; Ini->r_line("levels", k, &field_name, &field_value); k++)
+    u32 k = 0;
+    levels.reserve(Ini->line_count("levels"));
+    while (Ini->r_line("levels", k, &field_name, &field_value))
     {
         string256 N;
         xr_strcpy(N, field_name);
@@ -491,6 +495,7 @@ void read_levels(CInifile* Ini, xr_set<CLevelInfo>& levels, bool rebuild_graph, 
         }
 
         levels.insert(CLevelInfo(id, S, Ini->r_fvector3(N, "offset"), N));
+        ++k;
     }
 }
 
@@ -544,7 +549,7 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
     LEVEL_POINT_STORAGE l_tpLevelPoints;
     l_tpLevelPoints.clear();
 
-    xr_set<CLevelInfo> levels;
+    xr_unordered_set<CLevelInfo> levels;
     xr_vector<LPCSTR> needed_levels;
     string4096 levels_string;
     xr_strcpy(levels_string, name);

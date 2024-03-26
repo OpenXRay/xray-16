@@ -175,6 +175,7 @@ bool CHelicopter::net_Spawn(CSE_Abstract* DC)
         LPCSTR name;
         LPCSTR value;
         s16 boneID;
+        m_hitBones.reserve(lc);
         for (int i = 0; i < lc; ++i)
         {
             pUserData->r_line(s, i, &name, &value);

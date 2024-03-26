@@ -1371,6 +1371,7 @@ void game_cl_mp::LoadBonuses()
         return;
     m_pBonusList.clear();
     u32 BonusCount = pSettings->line_count("mp_bonus_money");
+    m_pBonusList.reserve(BonusCount);
     for (u32 i = 0; i < BonusCount; i++)
     {
         LPCSTR line, name;

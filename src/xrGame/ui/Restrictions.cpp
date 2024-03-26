@@ -61,7 +61,7 @@ void CRestrictions::InitGroups()
     for (u32 i = 0; i < c; ++i)
     {
         pSettings->r_line("mp_item_groups", i, &name, &line);
-        AddGroup(name, line);
+        AddGroup(name, line, c);
     }
 
     // try to find restrictions in every rank
@@ -119,7 +119,7 @@ bool CRestrictions::IsAvailable(const shared_str& itm)
     return (_r <= m_rank);
 }
 
-void CRestrictions::AddGroup(LPCSTR group, LPCSTR lst)
+void CRestrictions::AddGroup(LPCSTR group, LPCSTR lst, u32 multiplier)
 { // private
     VERIFY(m_bInited);
 
@@ -128,6 +128,7 @@ void CRestrictions::AddGroup(LPCSTR group, LPCSTR lst)
     group_items& _new = m_goups[group];
     string256 singleItem;
     u32 count = _GetItemCount(lst);
+    _new.reserve(count * multiplier);
     for (u32 j = 0; j < count; ++j)
     {
         _GetItem(lst, j, singleItem);

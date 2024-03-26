@@ -33,7 +33,7 @@ protected:
     void Dump() const;
 
 private:
-    void AddGroup(LPCSTR group, LPCSTR lst);
+    void AddGroup(LPCSTR group, LPCSTR lst, u32 multiplier = 1);
     bool IsGroupExist(const shared_str& group) const;
     void AddRestriction4rank(u32 rank, const shared_str& lst);
     RESTR GetRestr(const shared_str& item);
