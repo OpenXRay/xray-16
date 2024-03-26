@@ -361,7 +361,7 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
     {
         m_f_time_affected += one;
 
-        for (size_t i = 0; i < sizeof(hits) / sizeof(hits[0]); ++i)
+        for (size_t i = 0; i < std::size(hits); ++i)
         {
             float damage = hits[i].value;
             ALife::EHitType type = hits[i].type;

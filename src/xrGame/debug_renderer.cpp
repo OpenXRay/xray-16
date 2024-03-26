@@ -30,7 +30,7 @@ void CDebugRenderer::draw_obb(const Fmatrix& matrix, const u32& color)
 
     u16 aabb_id[12 * 2] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 1, 5, 2, 6, 3, 7, 0, 4};
 
-    add_lines(aabb, sizeof(aabb) / sizeof(Fvector), &aabb_id[0], sizeof(aabb_id) / (2 * sizeof(u16)), color);
+    add_lines(aabb, std::size(aabb), &aabb_id[0], sizeof(aabb_id) / (2 * sizeof(u16)), color);
 }
 
 void CDebugRenderer::draw_obb(const Fmatrix& matrix, const Fvector& half_size, const u32& color)
@@ -45,7 +45,7 @@ void CDebugRenderer::draw_obb(const Fmatrix& matrix, const Fvector& half_size, c
 
 void CDebugRenderer::draw_ellipse(const Fmatrix& matrix, const u32& color)
 {
-    float vertices[114 * 3] = {0.0000f, 0.0000f, 1.0000f, 0.0000f, 0.3827f, 0.9239f, -0.1464f, 0.3536f, 0.9239f,
+    static constexpr float vertices[114 * 3] = {0.0000f, 0.0000f, 1.0000f, 0.0000f, 0.3827f, 0.9239f, -0.1464f, 0.3536f, 0.9239f,
         -0.2706f, 0.2706f, 0.9239f, -0.3536f, 0.1464f, 0.9239f, -0.3827f, 0.0000f, 0.9239f, -0.3536f, -0.1464f, 0.9239f,
         -0.2706f, -0.2706f, 0.9239f, -0.1464f, -0.3536f, 0.9239f, 0.0000f, -0.3827f, 0.9239f, 0.1464f, -0.3536f,
         0.9239f, 0.2706f, -0.2706f, 0.9239f, 0.3536f, -0.1464f, 0.9239f, 0.3827f, 0.0000f, 0.9239f, 0.3536f, 0.1464f,
@@ -76,7 +76,7 @@ void CDebugRenderer::draw_ellipse(const Fmatrix& matrix, const u32& color)
         -0.9239f, 0.2706f, -0.2706f, -0.9239f, 0.3536f, -0.1464f, -0.9239f, 0.3827f, 0.0000f, -0.9239f, 0.3536f,
         0.1464f, -0.9239f, 0.2706f, 0.2706f, -0.9239f, 0.1464f, 0.3536f, -0.9239f, 0.0000f, 0.0000f, -1.0000f};
 
-    u16 pairs[] = {0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 15, 0,
+    static constexpr u16 pairs[] = {0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 15, 0,
         16, 1, 2, 1, 17, 1, 18, 2, 3, 2, 18, 2, 19, 3, 4, 3, 19, 3, 20, 4, 5, 4, 20, 4, 21, 5, 6, 5, 21, 5, 22, 6, 7, 6,
         22, 6, 23, 7, 8, 7, 23, 7, 24, 8, 9, 8, 24, 8, 25, 9, 10, 9, 25, 9, 26, 10, 11, 10, 26, 10, 27, 11, 12, 11, 27,
         11, 28, 12, 13, 12, 28, 12, 29, 13, 14, 13, 29, 13, 30, 14, 15, 14, 30, 14, 31, 15, 16, 15, 31, 15, 32, 16, 1,
@@ -110,13 +110,13 @@ void CDebugRenderer::draw_ellipse(const Fmatrix& matrix, const u32& color)
         96, 112, 97, 112, 111, 113, 97, 113, 98, 113, 99, 113, 100, 113, 101, 113, 102, 113, 103, 113, 104, 113, 105,
         113, 106, 113, 107, 113, 108, 113, 109, 113, 110, 113, 111, 113, 112};
 
-    int count = sizeof(vertices) / (sizeof(float));
+    constexpr int count = std::size(vertices);
     Fvector* I = (Fvector*)vertices;
     Fvector* E = (Fvector*)(vertices + count);
     for (; I != E; ++I)
         matrix.transform_tiny(*I, Fvector().set(*I));
 
-    add_lines((Fvector*)&vertices[0], sizeof(vertices) / sizeof(Fvector), &pairs[0], sizeof(pairs) / (2 * sizeof(u16)),
+    add_lines((Fvector*)&vertices[0], std::size(vertices), &pairs[0], sizeof(pairs) / (2 * sizeof(u16)),
         color);
 }
 #endif // DEBUG

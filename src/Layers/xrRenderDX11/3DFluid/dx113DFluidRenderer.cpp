@@ -122,7 +122,7 @@ void dx113DFluidRenderer::DestroyShaders()
 
 void dx113DFluidRenderer::CreateGridBox()
 {
-    VsInput vertices[] =
+    static constexpr VsInput vertices[] =
     {
         { 0, 0, 0 },
         { 0, 0, 1 },
@@ -133,7 +133,7 @@ void dx113DFluidRenderer::CreateGridBox()
         { 1, 1, 0 },
         { 1, 1, 1 },
     };
-    m_iGridBoxVertNum = sizeof(vertices) / sizeof(vertices[0]);
+    m_iGridBoxVertNum = std::size(vertices);
 
     m_pGridBoxVertexBuffer.Create(sizeof(vertices));
     u8* pData = static_cast<u8*>(m_pGridBoxVertexBuffer.Map());
@@ -141,9 +141,9 @@ void dx113DFluidRenderer::CreateGridBox()
     m_pGridBoxVertexBuffer.Unmap(true);
 
     // Create index buffer
-    u16 indices[] = {
+    static constexpr u16 indices[] = {
         0, 4, 1, 1, 4, 5, 0, 1, 2, 2, 1, 3, 4, 6, 5, 6, 7, 5, 2, 3, 6, 3, 7, 6, 1, 5, 3, 3, 5, 7, 0, 2, 4, 2, 6, 4};
-    m_iGridBoxFaceNum = (sizeof(indices) / sizeof(indices[0])) / 3;
+    m_iGridBoxFaceNum = std::size(indices) / 3;
 
     m_pGridBoxIndexBuffer.Create(sizeof(indices));
     pData = static_cast<u8*>(m_pGridBoxIndexBuffer.Map());
@@ -151,7 +151,7 @@ void dx113DFluidRenderer::CreateGridBox()
     m_pGridBoxIndexBuffer.Unmap(true);
 
     // Define the input layout
-    static D3DVERTEXELEMENT9 layout[] = {
+    static constexpr D3DVERTEXELEMENT9 layout[] = {
         {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, D3DDECL_END()};
 
     // Create the input layout
@@ -161,11 +161,11 @@ void dx113DFluidRenderer::CreateGridBox()
 void dx113DFluidRenderer::CreateScreenQuad()
 {
     // Create our quad input layout
-    static D3DVERTEXELEMENT9 quadlayout[] = {
+    static constexpr D3DVERTEXELEMENT9 quadlayout[] = {
         {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, D3DDECL_END()};
 
     // Create a screen quad for all render to texture operations
-    VsInput svQuad[4]
+    static constexpr VsInput svQuad[4]
     {
         { -1.0f,  1.0f, 0.0f },
         {  1.0f,  1.0f, 0.0f },

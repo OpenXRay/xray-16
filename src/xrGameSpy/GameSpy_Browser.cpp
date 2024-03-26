@@ -137,9 +137,9 @@ void CGameSpy_Browser::Clear()
 void CGameSpy_Browser::RefreshListInternet(const char* FilterStr)
 {
     m_refresh_lock.Enter();
-    static const u8 targetFields[] = {HOSTNAME_KEY, HOSTPORT_KEY, NUMPLAYERS_KEY, MAXPLAYERS_KEY, MAPNAME_KEY,
+    static constexpr u8 targetFields[] = {HOSTNAME_KEY, HOSTPORT_KEY, NUMPLAYERS_KEY, MAXPLAYERS_KEY, MAPNAME_KEY,
         GAMETYPE_KEY, GAMEVER_KEY, PASSWORD_KEY, G_USER_PASSWORD_KEY, DEDICATED_KEY, GAMETYPE_NAME_KEY};
-    const int fieldCount = sizeof(targetFields) / sizeof(targetFields[0]);
+    constexpr int fieldCount = std::size(targetFields);
     SBError error =
         ServerBrowserUpdateA(m_pGSBrowser, onUpdate ? SBTrue : SBFalse, SBFalse, targetFields, fieldCount, FilterStr);
     m_bShowCMSErr = (error != sbe_noerror);

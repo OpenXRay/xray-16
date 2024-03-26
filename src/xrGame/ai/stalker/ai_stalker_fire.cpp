@@ -1052,8 +1052,8 @@ void CAI_Stalker::update_throw_params()
     }
 #endif
 
-    static float const distances[] = {30.f, 40.f, 50.f, 60.f};
-    VERIFY(g_SingleGameDifficulty < sizeof(distances) / sizeof(distances[0]));
+    static constexpr float distances[] = {30.f, 40.f, 50.f, 60.f};
+    VERIFY(g_SingleGameDifficulty < std::size(distances));
     float const max_distance = distances[g_SingleGameDifficulty];
 
     // computing velocity with minimum magnitude

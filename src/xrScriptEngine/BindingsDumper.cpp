@@ -362,11 +362,11 @@ void BindingsDumper::PrintNamespace(luabind::object& namesp)
 
 BindingsDumper::BindingsDumper()
 {
-    std::pair<const char*, const char*> subst[] = {{"__add", "operator+"}, {"__sub", "operator-"},
+    static constexpr std::pair<const char*, const char*> subst[] = {{"__add", "operator+"}, {"__sub", "operator-"},
         {"__mul", "operator*"}, {"__div", "operator/"}, {"__pow", "operator^"}, {"__lt", "operator<"},
         {"__le", "operator<="}, {"__gt", "operator>"}, {"__ge", "operator>="}, {"__eq", "operator=="},
         {"__tostring", "operator string"}};
-    const u32 substCount = sizeof(subst) / sizeof(*subst);
+    constexpr u32 substCount = std::size(subst);
     for (u32 i = 0; i < substCount; i++)
         operatorSubst.insert(subst[i]);
 }

@@ -207,7 +207,7 @@ void euler_extract2(const EulerTableEntry& E, const Matrix R, float f1[3], float
 
 inline EulerTableEntry* euler_entry(int euler_type)
 {
-    if (euler_type < 0 || euler_type >= static_cast<int>((sizeof(EulerTable) / sizeof(EulerTable[0]))))
+    if (euler_type < 0 || euler_type >= static_cast<int>(std::size(EulerTable)))
     {
         fprintf(stderr, "bad euler entry %d detected\n", euler_type);
         exit(0);

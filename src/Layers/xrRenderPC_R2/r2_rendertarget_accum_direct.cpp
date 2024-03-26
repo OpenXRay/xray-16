@@ -412,11 +412,11 @@ void CRenderTarget::accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmat
         // Fill vertex buffer
         u32 i_offset;
         {
-            u16* pib = RImplementation.Index.Lock(sizeof(accum_direct::facetable) / sizeof(u16), i_offset);
+            u16* pib = RImplementation.Index.Lock(std::size(accum_direct::facetable), i_offset);
             CopyMemory(pib, &accum_direct::facetable, sizeof(accum_direct::facetable));
-            RImplementation.Index.Unlock(sizeof(accum_direct::facetable) / sizeof(u16));
+            RImplementation.Index.Unlock(std::size(accum_direct::facetable));
             // corners
-            u32 ver_count = sizeof(accum_direct::corners) / sizeof(Fvector3);
+            constexpr u32 ver_count = std::size(accum_direct::corners);
             FVF::L* pv = (FVF::L*)RImplementation.Vertex.Lock(ver_count, g_combine_cuboid.stride(), Offset);
 
             Fmatrix inv_XDcombine;

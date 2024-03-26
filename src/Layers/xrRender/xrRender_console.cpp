@@ -718,7 +718,7 @@ public:
         if (v < ps_r2_dof.y + 0.1f)
         {
             char pBuf[256];
-            _snprintf(pBuf, sizeof(pBuf) / sizeof(pBuf[0]), "float value greater or equal to r2_dof_focus+0.1");
+            _snprintf(pBuf, std::size(pBuf), "float value greater or equal to r2_dof_focus+0.1");
             Msg("~ Invalid syntax in call to '%s'", cName);
             Msg("~ Valid arguments: %s", pBuf);
             Console->Execute("r2_dof_focus");
@@ -746,7 +746,7 @@ public:
         if (v > ps_r2_dof.y - 0.1f)
         {
             char pBuf[256];
-            _snprintf(pBuf, sizeof(pBuf) / sizeof(pBuf[0]), "float value less or equal to r2_dof_focus-0.1");
+            _snprintf(pBuf, std::size(pBuf), "float value less or equal to r2_dof_focus-0.1");
             Msg("~ Invalid syntax in call to '%s'", cName);
             Msg("~ Valid arguments: %s", pBuf);
             Console->Execute("r2_dof_focus");
@@ -774,7 +774,7 @@ public:
         if (v > ps_r2_dof.z - 0.1f)
         {
             char pBuf[256];
-            _snprintf(pBuf, sizeof(pBuf) / sizeof(pBuf[0]), "float value less or equal to r2_dof_far-0.1");
+            _snprintf(pBuf, std::size(pBuf), "float value less or equal to r2_dof_far-0.1");
             Msg("~ Invalid syntax in call to '%s'", cName);
             Msg("~ Valid arguments: %s", pBuf);
             Console->Execute("r2_dof_far");
@@ -782,7 +782,7 @@ public:
         else if (v < ps_r2_dof.x + 0.1f)
         {
             char pBuf[256];
-            _snprintf(pBuf, sizeof(pBuf) / sizeof(pBuf[0]), "float value greater or equal to r2_dof_far-0.1");
+            _snprintf(pBuf, std::size(pBuf), "float value greater or equal to r2_dof_far-0.1");
             Msg("~ Invalid syntax in call to '%s'", cName);
             Msg("~ Valid arguments: %s", pBuf);
             Console->Execute("r2_dof_near");

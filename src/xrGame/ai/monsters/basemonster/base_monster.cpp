@@ -210,7 +210,7 @@ bool accessible_epsilon(CBaseMonster* const object, Fvector const pos, float eps
     Fvector const offsets[] = {Fvector().set(0.f, 0.f, 0.f), Fvector().set(-epsilon, 0.f, 0.f),
         Fvector().set(+epsilon, 0.f, 0.f), Fvector().set(0.f, 0.f, -epsilon), Fvector().set(0.f, 0.f, +epsilon)};
 
-    for (u32 i = 0; i < sizeof(offsets) / sizeof(offsets[0]); ++i)
+    for (u32 i = 0; i < std::size(offsets); ++i)
     {
         if (object->movement().restrictions().accessible(pos + offsets[i]))
             return true;

@@ -746,7 +746,7 @@ void CActor::OnNextWeaponSlot()
     if (ActiveSlot == NO_ACTIVE_SLOT)
         ActiveSlot = KNIFE_SLOT;
 
-    u32 NumSlotsToCheck = sizeof(SlotsToCheck) / sizeof(SlotsToCheck[0]);
+    constexpr u32 NumSlotsToCheck = std::size(SlotsToCheck);
 
     u32 CurSlot = 0;
     for (; CurSlot < NumSlotsToCheck; CurSlot++)
@@ -782,7 +782,7 @@ void CActor::OnPrevWeaponSlot()
     if (ActiveSlot == NO_ACTIVE_SLOT)
         ActiveSlot = KNIFE_SLOT;
 
-    u32 NumSlotsToCheck = sizeof(SlotsToCheck) / sizeof(SlotsToCheck[0]);
+    constexpr u32 NumSlotsToCheck = std::size(SlotsToCheck);
     u32 CurSlot = 0;
 
     for (; CurSlot < NumSlotsToCheck; CurSlot++)

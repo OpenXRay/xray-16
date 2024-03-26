@@ -152,7 +152,7 @@ void CUIMpTradeWnd::DeleteHelperItems()
 {
     int lists[] = {e_medkit, e_granade, e_rifle_ammo, e_pistol_ammo};
 
-    for (int i = 0; i < static_cast<int>(sizeof(lists) / sizeof(lists[0])); ++i)
+    for (int i = 0; i < static_cast<int>(std::size(lists)); ++i)
     {
         DeleteHelperItems(m_list[lists[i]]);
     }
@@ -198,7 +198,7 @@ void CUIMpTradeWnd::UpdateHelperItems()
 
     int lists[] = {e_medkit, e_granade, e_rifle_ammo, e_pistol_ammo};
 
-    for (int i = 0; i < static_cast<int>(sizeof(lists) / sizeof(lists[0])); ++i)
+    for (int i = 0; i < static_cast<int>(std::size(lists)); ++i)
     {
         CreateHelperItems(m_list[lists[i]]);
     }

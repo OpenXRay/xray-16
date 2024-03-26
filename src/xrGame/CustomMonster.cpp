@@ -1245,7 +1245,7 @@ void CCustomMonster::OnRender()
         Level().debug_renderer().draw_line(Fidentity, traj_start, traj_start + z_normal, color_xrgb(128, 255, 128));
         Level().debug_renderer().draw_line(Fidentity, traj_end, traj_end - z_normal, color_xrgb(128, 255, 128));
 
-        for (u32 i = 0; i < sizeof(z_offs) / sizeof(z_offs[0]); ++i)
+        for (u32 i = 0; i < std::size(z_offs); ++i)
             Level().debug_renderer().draw_line(
                 Fidentity, traj_start + z_offs[i], traj_end + z_offs[i], color_xrgb(255, 255, 128));
 
@@ -1263,7 +1263,7 @@ void CCustomMonster::OnRender()
         Level().debug_renderer().draw_line(Fidentity, hor_start, hor_start + x_normal, color_xrgb(128, 255, 128));
         Level().debug_renderer().draw_line(Fidentity, hor_end, hor_end - x_normal, color_xrgb(128, 255, 128));
 
-        for (u32 i = 0; i < sizeof(x_offs) / sizeof(x_offs[0]); ++i)
+        for (u32 i = 0; i < std::size(x_offs); ++i)
             Level().debug_renderer().draw_line(
                 Fidentity, hor_start + x_offs[i], hor_end + x_offs[i], color_xrgb(255, 255, 128));
 
@@ -1281,7 +1281,7 @@ void CCustomMonster::OnRender()
         Level().debug_renderer().draw_line(Fidentity, ver_start, ver_start + y_normal, color_xrgb(128, 255, 128));
         Level().debug_renderer().draw_line(Fidentity, ver_end, ver_end - y_normal, color_xrgb(128, 255, 128));
 
-        for (u32 i = 0; i < sizeof(y_offs) / sizeof(y_offs[0]); ++i)
+        for (u32 i = 0; i < std::size(y_offs); ++i)
             Level().debug_renderer().draw_line(
                 Fidentity, ver_start + y_offs[i], ver_end + y_offs[i], color_xrgb(255, 255, 128));
 

@@ -45,7 +45,7 @@ void player_state_avenger::OnPlayerKilled(
         return;
 
     shared_str team_players_store[MAX_PLAYERS_COUNT];
-    need_revenge tmp_predicate(team_players_store, sizeof(team_players_store) / sizeof(shared_str));
+    need_revenge tmp_predicate(team_players_store, std::size(team_players_store));
     tmp_predicate.m_killer_name = tmp_victim->getName();
 
     player_spawn_times_t::const_iterator tmp_spawn_time = m_player_spawns.find(tmp_predicate.m_killer_name);

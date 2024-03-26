@@ -258,7 +258,7 @@ IC D3D_PRIMITIVE_TOPOLOGY TranslateTopology(D3DPRIMITIVETYPE T)
         D3D_PRIMITIVE_TOPOLOGY_UNDEFINED, // D3DPT_TRIANGLEFAN = 6,
     };
 
-    VERIFY(T < sizeof(translateTable) / sizeof(translateTable[0]));
+    VERIFY(T < std::size(translateTable));
     VERIFY(T >= 0);
 
     D3D_PRIMITIVE_TOPOLOGY result = translateTable[T];
@@ -804,7 +804,7 @@ ICF void CBackend::ApplyRTandZB()
     if (m_bChangedRTorZB)
     {
         m_bChangedRTorZB = false;
-        HW.get_context(context_id)->OMSetRenderTargets(sizeof(pRT) / sizeof(pRT[0]), pRT, pZB);
+        HW.get_context(context_id)->OMSetRenderTargets(std::size(pRT), pRT, pZB);
     }
 }
 

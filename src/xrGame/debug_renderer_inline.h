@@ -15,7 +15,7 @@ IC void CDebugRenderer::draw_line(
     Fvector vertices[2] = {vertex0, vertex1};
     u16 indices[2] = {0, 1};
     add_lines(
-        &vertices[0], sizeof(vertices) / sizeof(Fvector), &indices[0], sizeof(indices) / (2 * sizeof(u16)), color);
+        &vertices[0], std::size(vertices), &indices[0], sizeof(indices) / (2 * sizeof(u16)), color);
 }
 
 IC void CDebugRenderer::draw_aabb(const Fvector& center, const float& half_radius_x, const float& half_radius_y,

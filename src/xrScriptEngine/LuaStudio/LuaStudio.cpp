@@ -91,7 +91,7 @@ int engine::lua_type(lua_State* L, int idx) { return ::lua_type(L, idx); }
 const char* engine::lua_typename(lua_State* L, int t) { return ::lua_typename(L, t); }
 lua_Debug* engine::lua_debug_create()
 {
-    VERIFY(m_instance_count < sizeof(m_instances) / sizeof(m_instances[0]));
+    VERIFY(m_instance_count < std::size(m_instances));
     return &m_instances[m_instance_count++];
 }
 

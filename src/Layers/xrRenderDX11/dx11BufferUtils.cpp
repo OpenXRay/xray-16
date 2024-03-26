@@ -93,7 +93,7 @@ VertexFormatPairs VertexFormatList[] = {{D3DDECLTYPE_FLOAT1, DXGI_FORMAT_R32_FLO
 
 DXGI_FORMAT ConvertVertexFormat(D3DDECLTYPE dx9FMT)
 {
-    size_t arrayLength = sizeof(VertexFormatList) / sizeof(VertexFormatList[0]);
+    constexpr size_t arrayLength = std::size(VertexFormatList);
     for (size_t i = 0; i < arrayLength; ++i)
     {
         if (VertexFormatList[i].m_dx9FMT == dx9FMT)
@@ -129,7 +129,7 @@ VertexSemanticPairs VertexSemanticList[] = {
 
 LPCSTR ConvertSemantic(D3DDECLUSAGE Semantic)
 {
-    size_t arrayLength = sizeof(VertexSemanticList) / sizeof(VertexSemanticList[0]);
+    constexpr size_t arrayLength = std::size(VertexSemanticList);
     for (size_t i = 0; i < arrayLength; ++i)
     {
         if (VertexSemanticList[i].m_dx9Semantic == Semantic)

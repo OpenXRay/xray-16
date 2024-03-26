@@ -114,7 +114,7 @@ TextureFormatPairs TextureFormatList[] = {
 
 DXGI_FORMAT ConvertTextureFormat(D3DFORMAT dx9FMT)
 {
-    int arrayLength = sizeof(TextureFormatList) / sizeof(TextureFormatList[0]);
+    constexpr int arrayLength = std::size(TextureFormatList);
     for (int i = 0; i < arrayLength; ++i)
     {
         if (TextureFormatList[i].m_dx9FMT == dx9FMT)
@@ -127,7 +127,7 @@ DXGI_FORMAT ConvertTextureFormat(D3DFORMAT dx9FMT)
 
 D3DFORMAT ConvertTextureFormat(DXGI_FORMAT dx11FMT)
 {
-    int arrayLength = sizeof(TextureFormatList) / sizeof(TextureFormatList[0]);
+    constexpr int arrayLength = std::size(TextureFormatList);
     for (int i = 0; i < arrayLength; ++i)
     {
         if (TextureFormatList[i].m_dx11FMT == dx11FMT)

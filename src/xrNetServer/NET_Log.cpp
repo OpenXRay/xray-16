@@ -73,7 +73,7 @@ void INetLog::FlushLog()
         for (xr_vector<SLogPacket>::iterator it = m_aLogPackets.begin(); it != m_aLogPackets.end(); it++)
         {
             SLogPacket* pLPacket = &(*it);
-            if (pLPacket->m_u16Type >= sizeof(PacketName) / sizeof(PacketName[0]))
+            if (pLPacket->m_u16Type >= std::size(PacketName))
                 fprintf(m_pLogFile, "%s %10u %10u %10u\n", pLPacket->m_bIsIn ? "In:" : "Out:", pLPacket->m_u32Time,
                     pLPacket->m_u16Type, pLPacket->m_u32Size);
             else

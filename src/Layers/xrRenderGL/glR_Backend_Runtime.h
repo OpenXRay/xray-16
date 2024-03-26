@@ -286,7 +286,7 @@ IC GLenum TranslateTopology(D3DPRIMITIVETYPE T)
         GL_TRIANGLE_FAN, //	D3DPT_TRIANGLEFAN = 6,
     };
 
-    VERIFY(T<sizeof(translateTable) / sizeof(translateTable[0]));
+    VERIFY(T<std::size(translateTable));
     VERIFY(T >= 0);
 
     const GLenum result = translateTable[T];

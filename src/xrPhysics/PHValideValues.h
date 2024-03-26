@@ -83,13 +83,13 @@ public:
     IC void create(dBodyID b)
     {
         R_ASSERT(dBodyStateValide(b));
-        std::copy_n(dBodyGetRotation(b), sizeof(rotation) / sizeof(dReal), rotation);
+        std::copy_n(dBodyGetRotation(b), std::size(rotation), rotation);
         new_state(b);
     }
     IC void set_rotation(const dMatrix3 r)
     {
         VERIFY(sizeof(rotation) == sizeof(dMatrix3));
-        std::copy_n(r, sizeof(rotation) / sizeof(dReal), rotation);
+        std::copy_n(r, std::size(rotation), rotation);
     }
     IC void new_state(dBodyID b)
     {
