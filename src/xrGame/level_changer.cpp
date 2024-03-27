@@ -37,6 +37,7 @@ void CLevelChanger::net_Destroy()
 
 bool CLevelChanger::net_Spawn(CSE_Abstract* DC)
 {
+    condWork = true;
     m_entrance_time = 0;
     m_b_enabled = true;
     m_invite_str = DEF_INVITATION;
@@ -104,8 +105,25 @@ void CLevelChanger::shedule_Update(u32 dt)
 }
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
+bool has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, LPCSTR info_id);
 void CLevelChanger::feel_touch_new(IGameObject* tpObject)
 {
+    if (m_ini_file && m_ini_file->section_exist("cond"))
+    {
+        LPCSTR p_name = m_ini_file->r_string("cond", "infop");
+        if (!has_info(ai().get_alife(), Actor()->ID(), p_name))
+        {
+            if (m_ini_file->read_if_exists<bool>("cond", "move", false))
+            {
+                Fvector p, r;
+                if (get_reject_pos(p, r))
+                    Actor()->MoveActor(p, r);
+            }
+            condWork = false;
+            return;
+        }
+    }
+
     CActor* l_tpActor = smart_cast<CActor*>(tpObject);
     VERIFY(l_tpActor);
     if (!l_tpActor->g_Alive())
@@ -168,7 +186,7 @@ bool CLevelChanger::feel_touch_contact(IGameObject* object)
 
 void CLevelChanger::update_actor_invitation()
 {
-    if (m_bSilentMode)
+    if ((m_bSilentMode) || (!condWork))
         return;
     xr_vector<IGameObject*>::iterator it = feel_touch.begin();
     xr_vector<IGameObject*>::iterator it_e = feel_touch.end();
