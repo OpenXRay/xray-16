@@ -272,12 +272,10 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #endif // _EDITOR
 
 // TODO Add proper check for CMake Windows build
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#if !defined(XR_PLATFORM_WINDOWS)
         if (xr_stricmp(ApplicationPath, CMAKE_INSTALL_FULL_DATAROOTDIR) != 0)
             flags |= CLocatorAPI::flScanAppRoot;
 #endif
-
-
 
 #ifndef _EDITOR
 #ifndef ELocatorAPIH
