@@ -11,7 +11,7 @@
 
 #if defined(USE_DX9)
 #include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
 #include "Layers/xrRenderDX11/dx11R_Backend_Runtime.h"
 #elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glR_Backend_Runtime.h"
@@ -60,7 +60,7 @@ IC void CBackend::set_xform_project(const Fmatrix& M) { xforms.set_P(M); }
 IC const Fmatrix& CBackend::get_xform_world() { return xforms.get_W(); }
 IC const Fmatrix& CBackend::get_xform_view() { return xforms.get_V(); }
 IC const Fmatrix& CBackend::get_xform_project() { return xforms.get_P(); }
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
 IC ID3DRenderTargetView* CBackend::get_RT(u32 ID)
 #elif defined(USE_OGL)
 IC GLuint CBackend::get_RT(u32 ID)
@@ -73,7 +73,7 @@ IC GLuint CBackend::get_RT(u32 ID)
     return pRT[ID];
 }
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
 IC ID3DDepthStencilView* CBackend::get_ZB()
 #elif defined(USE_OGL)
 IC GLuint CBackend::get_ZB()
@@ -93,7 +93,7 @@ ICF void CBackend::set_States(SState* _state)
         PGO(Msg("PGO:state_block"));
         stat.states++;
         state = _state->state;
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         state->Apply(*this);
 #else
         state->Apply();
@@ -134,7 +134,7 @@ IC void CBackend::set_Pass(SPass* P)
     {
         set_PS(P->ps);
         set_VS(P->vs);
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         set_GS(P->gs);
         set_HS(P->hs);
         set_DS(P->ds);

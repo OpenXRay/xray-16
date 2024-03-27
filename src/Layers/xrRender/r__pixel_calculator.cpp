@@ -3,7 +3,7 @@
 #include "r__pixel_calculator.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
-#if defined(USE_DX9) || defined(USE_DX11)// XXX: support pixel calculator on OpenGL
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12) // XXX: support pixel calculator on OpenGL
 #   include <DirectXMath.h>
 #endif
 
@@ -15,7 +15,7 @@ void r_pixel_calculator::begin()
     zb.create("$user$pixel_calculator_zb", rt_dimensions, rt_dimensions, HW.Caps.fDepth, 1, { CRT::CreateSurface });
 
     RCache.set_RT(rt->pRT);
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     RCache.set_ZB(zb->pZRT[RCache.context_id]);
 #elif defined(USE_DX9) || defined(USE_OGL)
     RCache.set_ZB(zb->pRT);
@@ -35,7 +35,7 @@ void r_pixel_calculator::end()
     rt = nullptr;
 }
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
 // +X, -X, +Y, -Y, +Z, -Z
 extern Fvector cmNorm[6];
 extern Fvector cmDir [6];
@@ -43,7 +43,7 @@ extern Fvector cmDir [6];
 
 r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
 {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     using namespace DirectX;
 
     r_aabb_ssa result = {0};

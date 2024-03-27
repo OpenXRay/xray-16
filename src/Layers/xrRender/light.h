@@ -3,7 +3,7 @@
 
 #include "xrCDB/ISpatial.h"
 
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
+#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_R5) || (RENDER == R_GL)
 #include "Light_Package.h"
 #include "light_smapvis.h"
 #include "light_gi.h"
@@ -55,7 +55,7 @@ public:
     ref_shader s_point;
     ref_shader s_volumetric;
 
-#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
+#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_R5) || (RENDER == R_GL)
     ref_shader s_spot_msaa[8];
     ref_shader s_point_msaa[8];
     ref_shader s_volumetric_msaa[8];
@@ -157,7 +157,7 @@ public:
     IRender_Light* dcast_Light() override { return this; }
     vis_data& get_homdata();
 
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
+#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_R5) || (RENDER == R_GL)
     void gi_generate();
     void xform_calc();
     void vis_prepare(CBackend& cmd_list);

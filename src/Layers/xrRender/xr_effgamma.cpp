@@ -23,7 +23,7 @@ void CGammaControl::GenLUT(u16* r, u16* g, u16* b, u16 count) const
     }
 }
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 void CGammaControl::GenLUT(const DXGI_GAMMA_CONTROL_CAPABILITIES& GC, DXGI_GAMMA_CONTROL& G) const
 {
     constexpr DXGI_RGB Offset = { 0, 0, 0 };
@@ -64,7 +64,7 @@ void CGammaControl::Update() const
         HW.pDevice->SetGammaRamp(0, D3DSGR_NO_CALIBRATION, &G);
         return;
     }
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     if (HW.pDevice)
     {
         DXGI_GAMMA_CONTROL_CAPABILITIES GC;

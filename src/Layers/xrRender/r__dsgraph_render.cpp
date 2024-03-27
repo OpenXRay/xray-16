@@ -62,7 +62,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
                 for (const auto& item : items)
                 {
                     const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
                     cmd_list.LOD.set_LOD(LOD);
 #endif
                     // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
@@ -106,7 +106,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
                     cmd_list.apply_lmaterial();
 
                     const float LOD = calcLOD(item.ssa, item.pVisual->vis.sphere.R);
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
                     cmd_list.LOD.set_LOD(LOD);
 #endif
                     // --#SM+#-- Обновляем шейдерные данные модели [update shader values for this model]
@@ -267,7 +267,7 @@ void R_dsgraph_structure::render_hud_ui()
     cmd_list.set_RT(0, 2);
     auto zb = RImplementation.Target->rt_Base_Depth;
 
-#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
+#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_R5) || (RENDER == R_GL)
     if (RImplementation.o.msaa)
         zb = RImplementation.Target->rt_MSAADepth;
 #endif

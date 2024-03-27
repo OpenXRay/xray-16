@@ -15,7 +15,7 @@ LPCSTR CBlender_nightvision::getComment()
 void CBlender_nightvision::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     switch (C.iElement)
     {
     case 0: //Dummy shader - because IDK what gonna happen when r2_nightvision will be 0

@@ -91,7 +91,7 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
         break;
     }
 #else
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     C.TessMethod = oTessellation.IDselected;
 #endif
 
@@ -117,7 +117,7 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
         // else							C.r_Pass	("shadow_direct_base","shadow_direct_base",FALSE);
 #if RENDER == R_R3
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);
-#elif RENDER == R_R4
+#elif RENDER == R_R4 || RENDER == R_R5
         uber_shadow(C, "base");
 #endif
         // C.r_Sampler		("s_base",C.L_textures[0]);

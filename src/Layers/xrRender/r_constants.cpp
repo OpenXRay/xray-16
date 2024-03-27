@@ -91,7 +91,7 @@ void R_constant_table::merge(R_constant_table* T)
             C->vs = src->vs;
 #ifndef USE_DX9
             C->gs = src->gs;
-#   if defined(USE_DX11)
+#   if defined(USE_DX11) || defined(USE_DX12)
             C->hs = src->hs;
             C->ds = src->ds;
             C->cs = src->cs;
@@ -131,7 +131,7 @@ void R_constant_table::merge(R_constant_table* T)
         });
     }
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     //	TODO:	DX11:	Implement merge with validity check
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
@@ -148,7 +148,7 @@ void R_constant_table::clear()
     for (u32 it = 0; it < table.size(); it++)
         table[it] = 0; //.g_constant_allocator.destroy(table[it]);
     table.clear();
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         m_CBTable[id].clear();

@@ -18,7 +18,7 @@ LPCSTR CBlender_Blur::getComment()
     return "INTERNAL: blur";
 }
 
-#if RENDER != R_R4
+#if RENDER != R_R4 && RENDER != R_R5
 void CBlender_Blur::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

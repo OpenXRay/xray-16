@@ -70,6 +70,7 @@
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ConstantAllocator.h" />
     <ClInclude Include="..\xrRender\blenders\Blender_Blur.h" />
     <ClInclude Include="..\xrRender\blenders\blender_dof.h" />
     <ClInclude Include="..\xrRender\blenders\blender_gasmask_drops.h" />
@@ -237,6 +238,7 @@
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp" />
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp" />
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ConstantAllocator.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Blur.cpp" />

@@ -14,7 +14,7 @@ void dxWallMarkArray::AppendMark(LPCSTR s_textures)
 {
     ref_shader s;
     LPCSTR sh_name = "effects" DELIMITER "wallmark";
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     if (RImplementation.o.new_shader_support)
     {
         // Use the blood shader for any texture with the name wm_blood_*

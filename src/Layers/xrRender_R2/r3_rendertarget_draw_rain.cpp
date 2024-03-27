@@ -55,7 +55,7 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
         float view_dimY = float(RainSetup.X.D[0].maxX - RainSetup.X.D[0].minX) / smapsize;
         float view_sx = float(RainSetup.X.D[0].minX) / smapsize;
         float view_sy = float(RainSetup.X.D[0].minY) / smapsize;
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         Fmatrix m_TexelAdjust =
         {
             view_dimX / 2.f, 0.0f, 0.0f, 0.0f,
@@ -162,7 +162,7 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
 
         // Fill vertex buffer
         FVF::TL2uv* pv = (FVF::TL2uv*)RImplementation.Vertex.Lock(3, g_combine_2UV->vb_stride, Offset);
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         pv->set(-1, -1, d_Z, d_W, C, 0, 1, 0, scale_X);
         pv++;
         pv->set(-1, 3, d_Z, d_W, C, 0, -1, 0, -scale_X);
@@ -275,7 +275,7 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
             }
             else
             {
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_rain_msaa[i]->E[0]);
@@ -339,7 +339,7 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
             }
             else
             {
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_rain_msaa[i]->E[1]);
@@ -387,7 +387,7 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
             }
             else
             {
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_rain_msaa[i]->E[2]);

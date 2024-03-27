@@ -4,7 +4,7 @@
 
 #include "tss_def.h"
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
 enum XRDX11SAMPLERSTATETYPE
 {
     XRDX11SAMP_ANISOTROPICFILTER = 256,

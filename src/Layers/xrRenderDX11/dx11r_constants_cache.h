@@ -36,7 +36,7 @@ public:
         {
             set<BT_GeometryBuffer>(C, C->gs, std::forward<Args>(args)...);
         } //  a_vertex.b_dirty=TRUE;		}
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         if (C->destination & RC_dest_hull)
         {
             set<BT_HullBuffer>(C, C->hs, std::forward<Args>(args)...);
@@ -76,7 +76,7 @@ public:
         {
             seta<BT_GeometryBuffer>(C, C->gs, e, std::forward<Args>(args)...);
         } //  a_vertex.b_dirty=TRUE;	}
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         if (C->destination & RC_dest_hull)
         {
             seta<BT_HullBuffer>(C, C->hs, e, std::forward<Args>(args)...);

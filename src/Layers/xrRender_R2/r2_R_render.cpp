@@ -44,7 +44,7 @@ void CRender::RenderMenu()
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
     FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
     pv++;
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -76,7 +76,7 @@ void CRender::Render()
 
     g_r = 1;
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     rmNormal(RCache);
 #endif
 
@@ -87,7 +87,7 @@ void CRender::Render()
     // if (!(g_pGameLevel && g_hud) || bMenu)
     if (!g_pGameLevel || bMenu)
     {
-#if defined(USE_DX11) || defined(USE_OGL) // XXX: probably we can just enable this on DX9 too
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL) // XXX: probably we can just enable this on DX9 too
         Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
 #endif
         return;
@@ -199,7 +199,7 @@ void CRender::Render()
     LP_pending.clear();
     if (o.msaa)
     {
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         dsgraph.cmd_list.set_ZB(Target->rt_MSAADepth->pZRT[dsgraph.cmd_list.context_id]);
 #elif defined(USE_OGL)
         dsgraph.cmd_list.set_ZB(Target->rt_MSAADepth->pZRT);
@@ -316,7 +316,7 @@ void CRender::Render()
         Lights_LastFrame.clear();
     }
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     // full screen pass to mark msaa-edge pixels in highest stencil bit
     if (o.msaa)
     {
@@ -348,7 +348,7 @@ void CRender::Render()
 #if defined(USE_DX9)
         RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
             D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
         if (!o.msaa)
         {
             dsgraph.cmd_list.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,

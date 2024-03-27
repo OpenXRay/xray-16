@@ -93,6 +93,198 @@ void R_constants::flush_cache()
         if (cmd_list.m_aComputeConstants[i])
             cmd_list.m_aComputeConstants[i]->Flush(context_id);
     }
+
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS
+    ID3DBuffer* tempBuffer[CBackend::MaxCBuffers] = {};
+    std::vector<u32> tempBufferNum(CBackend::MaxCBuffers);
+    std::vector<u32> tempBufferSize(CBackend::MaxCBuffers);
+    u32 uiMin = 0, uiMax = 0;
+    {
+        bool hasConstantBuffer = false;
+        
+        for (u32 i = uiMin; i < CBackend::MaxCBuffers; ++i)
+        {
+            if (cmd_list.m_aPixelConstants[i])
+            {
+                tempBuffer[i] = cmd_list.m_aPixelConstants[i]->GetBuffer();
+                tempBufferNum[i] = cmd_list.m_aPixelConstants[i]->GetBufferNum();
+                tempBufferSize[i] = cmd_list.m_aPixelConstants[i]->GetBufferSize();
+                if (!hasConstantBuffer)
+                    uiMin = i;
+                hasConstantBuffer = true; 
+                uiMax = i + 1;
+            }
+            else
+            {
+                tempBuffer[i] = nullptr;
+            }
+        }
+      
+        if (hasConstantBuffer)
+        {
+#if USE_DX11
+            HW.pContext1->PSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
+            HW.get_context(context_id)->PSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
+        }
+    }
+
+    {
+        bool hasConstantBuffer = false;
+
+        for (u32 i = uiMin; i < CBackend::MaxCBuffers; ++i)
+        {
+            if (cmd_list.m_aVertexConstants[i])
+            {
+                tempBuffer[i] = cmd_list.m_aVertexConstants[i]->GetBuffer();
+                tempBufferNum[i] = cmd_list.m_aVertexConstants[i]->GetBufferNum();
+                tempBufferSize[i] = cmd_list.m_aVertexConstants[i]->GetBufferSize();
+                if (!hasConstantBuffer)
+                    uiMin = i;
+                hasConstantBuffer = true; 
+                uiMax = i + 1;
+            }
+            else
+            {
+                tempBuffer[i] = nullptr;
+            }
+        }
+        
+        if (hasConstantBuffer)
+        {
+#if USE_DX11
+            HW.pContext1->VSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
+            HW.get_context(context_id)->VSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
+        }
+    }
+
+    {
+        bool hasConstantBuffer = false;
+
+        for (u32 i = uiMin; i < CBackend::MaxCBuffers; ++i)
+        {
+            if (cmd_list.m_aGeometryConstants[i])
+            {
+                tempBuffer[i] = cmd_list.m_aGeometryConstants[i]->GetBuffer();
+                tempBufferNum[i] = cmd_list.m_aGeometryConstants[i]->GetBufferNum();
+                tempBufferSize[i] = cmd_list.m_aGeometryConstants[i]->GetBufferSize();
+                if (!hasConstantBuffer)
+                    uiMin = i;
+                hasConstantBuffer = true; 
+                uiMax = i + 1;
+            }
+            else
+            {
+                tempBuffer[i] = nullptr;
+            }
+        }
+      
+        if (hasConstantBuffer)     
+        {
+#if USE_DX11
+            HW.pContext1->GSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
+            HW.get_context(context_id)->GSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
+        }
+    }
+
+    {
+        bool hasConstantBuffer = false;
+
+        for (u32 i = uiMin; i < CBackend::MaxCBuffers; ++i)
+        {
+            if (cmd_list.m_aHullConstants[i])
+            {
+                tempBuffer[i] = cmd_list.m_aHullConstants[i]->GetBuffer();
+                tempBufferNum[i] = cmd_list.m_aHullConstants[i]->GetBufferNum();
+                tempBufferSize[i] = cmd_list.m_aHullConstants[i]->GetBufferSize();
+                if (!hasConstantBuffer)
+                    uiMin = i;
+                hasConstantBuffer = true;
+                uiMax = i + 1;
+            }
+            else
+            {
+                tempBuffer[i] = nullptr;
+            }
+        }
+       
+        if (hasConstantBuffer)
+        {
+#if USE_DX11
+            HW.pContext1->HSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
+            HW.get_context(context_id)->HSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
+        }
+    }
+
+    {
+        bool hasConstantBuffer = false;
+
+        for (u32 i = 0; i < CBackend::MaxCBuffers; ++i)
+        {
+            if (cmd_list.m_aDomainConstants[i])
+            {
+                tempBuffer[i] = cmd_list.m_aDomainConstants[i]->GetBuffer();
+                tempBufferNum[i] = cmd_list.m_aDomainConstants[i]->GetBufferNum();
+                tempBufferSize[i] = cmd_list.m_aDomainConstants[i]->GetBufferSize();
+                if (!hasConstantBuffer)
+                    uiMin = i;
+                hasConstantBuffer = true;
+                uiMax = i + 1;
+            }
+            else
+            {
+                tempBuffer[i] = nullptr;
+            }
+        }
+       
+        if (hasConstantBuffer)
+        {
+#if USE_DX11
+            HW.pContext1->DSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
+            HW.get_context(context_id)->DSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
+        }
+    }
+
+    {
+        bool hasConstantBuffer = false;
+
+        for (u32 i = 0; i < CBackend::MaxCBuffers; ++i)
+        {
+            if (cmd_list.m_aComputeConstants[i])
+            {
+                tempBuffer[i] = cmd_list.m_aComputeConstants[i]->GetBuffer();
+                tempBufferNum[i] = cmd_list.m_aComputeConstants[i]->GetBufferNum();
+                tempBufferSize[i] = cmd_list.m_aComputeConstants[i]->GetBufferSize();
+                if (!hasConstantBuffer)
+                    uiMin = i;
+                hasConstantBuffer = true;
+                uiMax = i + 1;
+            }
+            else
+            {
+                tempBuffer[i] = nullptr;
+            }
+        }
+        
+        if (hasConstantBuffer)
+        {
+#if USE_DX11
+            HW.pContext1->CSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#else
+            HW.get_context(context_id)->CSSetConstantBuffers1(uiMin, uiMax - uiMin, &tempBuffer[uiMin], tempBufferNum.data(), tempBufferSize.data());
+#endif
+        }
+    }
+#endif
 }
 
 /*

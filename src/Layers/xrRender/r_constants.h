@@ -4,7 +4,7 @@
 
 #include "xrCore/xr_resource.h"
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #endif
 
@@ -76,7 +76,7 @@ struct ECORE_API R_constant_load
     u16 index; // linear index (pixel)
     u16 cls; // element class
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     R_constant_load() : index(u16(-1)), cls(u16(-1)) {};
 #elif defined(USE_OGL)
     GLuint location;
@@ -89,7 +89,7 @@ struct ECORE_API R_constant_load
 
     BOOL equal(R_constant_load& C)
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
         return (index == C.index) && (cls == C.cls);
 #elif defined(USE_OGL)
         return (index == C.index) && (cls == C.cls) && (location == C.location) && (program == C.program);
@@ -109,7 +109,7 @@ struct ECORE_API R_constant : public xr_resource
     R_constant_load vs;
 #ifndef USE_DX9
     R_constant_load gs;
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     R_constant_load hs;
     R_constant_load ds;
     R_constant_load cs;
@@ -134,7 +134,7 @@ struct ECORE_API R_constant : public xr_resource
         case RC_dest_sampler: return samp;
 #ifndef USE_DX9
         case RC_dest_geometry: return gs;
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         case RC_dest_hull: return hs;
         case RC_dest_domain: return ds;
         case RC_dest_compute: return cs;
@@ -155,9 +155,9 @@ struct ECORE_API R_constant : public xr_resource
             && destination == C.destination
             && ps.equal(C.ps)
             && vs.equal(C.vs)
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
             && gs.equal(C.gs)
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
             && hs.equal(C.hs)
             && ds.equal(C.ds)
             && cs.equal(C.cs)
@@ -189,7 +189,7 @@ public:
     typedef xr_vector<ref_constant> c_table;
     c_table table;
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     typedef std::pair<u32, ref_cbuffer> cb_table_record;
     typedef xr_vector<cb_table_record> cb_table;
     cb_table m_CBTable[R__NUM_CONTEXTS];
@@ -198,7 +198,7 @@ public:
 private:
     void fatal(LPCSTR s);
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     BOOL parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination);
     BOOL parseResources(ID3DShaderReflection* pReflection, int ResNum, u32 destination);
 #endif
@@ -220,7 +220,7 @@ private:
 };
 typedef resptr_core<R_constant_table, resptr_base<R_constant_table>> ref_ctable;
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 #include "../xrRenderDX11/dx11ConstantBuffer_impl.h"
 #endif
 

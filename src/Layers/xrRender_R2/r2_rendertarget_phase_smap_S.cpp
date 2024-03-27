@@ -11,7 +11,7 @@ void CRenderTarget::phase_smap_spot_clear(CBackend& cmd_list)
     );
     cmd_list.ClearZB(rt_smap_depth, 1.0f);
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     HW.get_context(CHW::IMM_CTX_ID)->ClearState();
 #endif
 }
@@ -74,7 +74,7 @@ void CRenderTarget::phase_smap_spot_tsh(CBackend& cmd_list, light* L)
         p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
         FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
         pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);

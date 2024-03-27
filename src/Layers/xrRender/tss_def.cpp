@@ -28,7 +28,7 @@ void SimulatorStates::record(ID3DState*& state)
         }
     }
     CHK_DX(HW.pDevice->EndStateBlock(&state));
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     // VERIFY(!"SimulatorStates::record not implemented!");
     state = ID3DState::Create(*this);
 #elif defined(USE_OGL)
@@ -120,7 +120,7 @@ BOOL SimulatorStates::equal(SimulatorStates& S)
 
 void SimulatorStates::clear() { States.clear(); }
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 #include "Layers/xrRenderDX11/dx11StateUtils.h"
 
 void SimulatorStates::UpdateState(dx11State& state) const

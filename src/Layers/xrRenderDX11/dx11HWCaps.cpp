@@ -84,6 +84,9 @@ u32 GetATIGpuNum()
 
     D3D_FEATURE_LEVEL featureLevels[] =
     {
+#if defined(USE_DX12)
+        D3D_FEATURE_LEVEL_12_0,
+#endif
         D3D_FEATURE_LEVEL_11_0,
         D3D_FEATURE_LEVEL_10_1,
         D3D_FEATURE_LEVEL_10_0
@@ -158,6 +161,7 @@ void CHWCaps::Update()
         break;
     case D3D_FEATURE_LEVEL_11_0:
     case D3D_FEATURE_LEVEL_11_1:
+#if USE_DX11
 #ifdef HAS_DX11_3
     case D3D_FEATURE_LEVEL_12_0:
     case D3D_FEATURE_LEVEL_12_1:
@@ -165,6 +169,14 @@ void CHWCaps::Update()
         geometry_profile = "vs_5_0";
         geometry_major = 5;
         geometry_minor = 0;
+#else
+    case D3D_FEATURE_LEVEL_12_0:
+    case D3D_FEATURE_LEVEL_12_1:
+    case D3D_FEATURE_LEVEL_12_2:
+        geometry_profile = "vs_5_1";
+        geometry_major = 5;
+        geometry_minor = 1;
+#endif
         break;
     default: NODEFAULT;
     }
@@ -193,6 +205,7 @@ void CHWCaps::Update()
         break;
     case D3D_FEATURE_LEVEL_11_0:
     case D3D_FEATURE_LEVEL_11_1:
+#if USE_DX11
 #ifdef HAS_DX11_3
     case D3D_FEATURE_LEVEL_12_0:
     case D3D_FEATURE_LEVEL_12_1:
@@ -200,6 +213,14 @@ void CHWCaps::Update()
         raster_profile = "ps_5_0";
         raster_major = 5;
         raster_minor = 0;
+#else
+    case D3D_FEATURE_LEVEL_12_0:
+    case D3D_FEATURE_LEVEL_12_1:
+    case D3D_FEATURE_LEVEL_12_2:
+        raster_profile = "ps_5_1";
+        raster_major = 5;
+        raster_minor = 1;
+#endif
         break;
     default: NODEFAULT;
     }

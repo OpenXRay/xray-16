@@ -9,7 +9,7 @@
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
 #endif
 
@@ -65,7 +65,7 @@ static class cl_parallax : public R_constant_setup
     }
 } binder_parallax;
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 static class cl_LOD : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.LOD.set_LOD(C); }
@@ -76,7 +76,7 @@ static class cl_pos_decompress_params : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
         const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
         const float HorzTan = -VertTan / Device.fASPECT;
 #elif defined(USE_OGL)
@@ -130,13 +130,13 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     }
 } binder_sun_shafts_intensity;
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
 static class cl_alpha_ref : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
     {
         // TODO: OGL: Implement AlphaRef.
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         cmd_list.StateManager.BindAlphaRef(C);
 #   endif
     }
@@ -213,7 +213,7 @@ void CRender::OnDeviceCreate(pcstr shName)
 {
     o.new_shader_support = 0;
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     o.new_shader_support = HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT);
     Msg("- NEW SHADER SUPPORT ENABLED %i", o.new_shader_support);
 #endif
@@ -243,7 +243,7 @@ void CRender::create()
 #ifdef USE_DX9
     D3DFORMAT nullrt = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
     o.nullrt = HW.support(nullrt, D3DRTYPE_SURFACE, D3DUSAGE_RENDERTARGET);
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     o.nullrt = false;
 #else
 #   error No graphics API selected or enabled!
@@ -314,7 +314,7 @@ void CRender::create()
     o.HW_smap_FETCH4 = FALSE;
 #ifdef USE_DX9
     o.HW_smap = HW.support(D3DFMT_D24X8, D3DRTYPE_TEXTURE, D3DUSAGE_DEPTHSTENCIL);
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     o.HW_smap = true;
 #else
 #   error No graphics API selected or enabled!
@@ -322,7 +322,7 @@ void CRender::create()
     o.HW_smap_PCF = o.HW_smap;
     if (o.HW_smap)
     {
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         //	For ATI it's much faster on DX11 to use D32F format
         if (HW.Caps.id_vendor == 0x1002)
             o.HW_smap_FORMAT = D3DFMT_D32F_LOCKABLE;
@@ -352,7 +352,7 @@ void CRender::create()
 #ifdef USE_DX9
     o.fp16_filter = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_FILTER);
     o.fp16_blend = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING);
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     o.fp16_filter = true;
     o.fp16_blend = true;
 #else
@@ -398,7 +398,7 @@ void CRender::create()
     // nv-dbt
 #ifdef USE_DX9
     o.nvdbt = HW.support((D3DFORMAT)MAKEFOURCC('N', 'V', 'D', 'B'), D3DRTYPE_SURFACE, 0);
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     o.nvdbt = false;
 #else
 #   error No graphics API selected or enabled!
@@ -438,8 +438,8 @@ void CRender::create()
     //.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
     o.sunstatic = ps_r2_sun_static;
     o.advancedpp = ps_r2_advanced_pp;
-#if defined(USE_DX11) || defined(USE_OGL)
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12)
     o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
 #   elif defined(USE_OGL)
     // TODO: OGL: temporary disabled, need to fix it
@@ -460,10 +460,10 @@ void CRender::create()
     o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
 #   if defined(USE_DX9)
     o.ssao_hdao = false;
-#   elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && (ps_r_ssao != 0);
     o.ssao_ultra = HW.ComputeShadersSupported && ssao_hdao_cs_shaders_exist();
 #   endif
@@ -482,7 +482,7 @@ void CRender::create()
         o.ssao_opt_data = false;
         o.ssao_hbao = false;
     }
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
     o.hbao_vectorized = false;
     if (o.ssao_hdao)
@@ -495,8 +495,8 @@ void CRender::create()
     }
 #endif // USE_DX9
 
-#if defined(USE_DX11) || defined(USE_OGL)
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12)
     o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.dx11_sm4_1 = o.dx11_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
 #   elif defined(USE_OGL)
@@ -506,7 +506,7 @@ void CRender::create()
 #   endif
 
     //	MSAA option dependencies
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     o.msaa = !!ps_r3_msaa;
     o.msaa_samples = (1 << ps_r3_msaa);
 
@@ -555,7 +555,7 @@ void CRender::create()
     o.minmax_sm = ps_r3_minmax_sm;
     o.minmax_sm_screenarea_threshold = 1600 * 1200;
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     o.tessellation =
         HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R2FLAGEXT_ENABLE_TESSELLATION);
     o.support_rt_arrays = true;
@@ -599,9 +599,9 @@ void CRender::create()
     Resources->RegisterConstantSetup("sun_shafts_intensity", &binder_sun_shafts_intensity);
     Resources->RegisterConstantSetup("pos_decompression_params", &binder_pos_decompress_params);
     Resources->RegisterConstantSetup("pos_decompression_params2", &binder_pos_decompress_params2);
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     Resources->RegisterConstantSetup("m_AlphaRef", &binder_alpha_ref);
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     Resources->RegisterConstantSetup("triLOD", &binder_LOD);
 #   endif
 #endif
@@ -614,13 +614,13 @@ void CRender::create()
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     rmNormal(RCache);
 #endif
     q_sync_point.Create();
 
     //	TODO: OGL: Implement FluidManager.
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     FluidManager.Initialize(70, 70, 70);
     //	FluidManager.Initialize( 100, 100, 100 );
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
@@ -630,7 +630,7 @@ void CRender::create()
 void CRender::destroy()
 {
     m_bMakeAsyncSS = false;
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     FluidManager.Destroy();
 #endif
     q_sync_point.Destroy();
@@ -694,7 +694,7 @@ void CRender::reset_end()
     q_sync_point.Create();
     HWOCC.occq_create(occq_size);
 
-    Target = xr_new<CRenderTarget>();
+    Target = xr_new<CRenderTarget>(true);
 
     //AVO: let's reload details while changed details options on vid_restart
     if (b_loaded && (dm_current_size != dm_size ||
@@ -706,7 +706,7 @@ void CRender::reset_end()
     }
     //-AVO
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 #endif
 

@@ -23,7 +23,7 @@ IC void CBackend::set_RT(ID3DRenderTargetView* RT, u32 ID)
         // HW.pDevice->OMSetRenderTargets(sizeof(pRT)/sizeof(pRT[0]), pRT, pZB);
         //  Reset all RT's here to allow RT to be bounded as input
         if (!m_bChangedRTorZB)
-            HW.get_context(context_id)->OMSetRenderTargets(0, 0, 0);
+            HW.get_context(context_id)->OMSetRenderTargets(0, NULL, NULL);
 
         m_bChangedRTorZB = true;
     }
@@ -40,7 +40,7 @@ IC void CBackend::set_ZB(ID3DDepthStencilView* ZB)
         // HW.pDevice->OMSetRenderTargets(sizeof(pRT)/sizeof(pRT[0]), pRT, pZB);
         //  Reset all RT's here to allow RT to be bounded as input
         if (!m_bChangedRTorZB)
-            HW.get_context(context_id)->OMSetRenderTargets(0, 0, 0);
+            HW.get_context(context_id)->OMSetRenderTargets(0, NULL, NULL);
         m_bChangedRTorZB = true;
     }
 }
@@ -62,13 +62,17 @@ IC void CBackend::ClearZB(ID3DDepthStencilView* zb, float depth, u8 stencil)
 
 IC bool CBackend::ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, size_t numRects, const Irect* rects)
 {
-#ifdef USE_DX11
+#if defined(USE_DX11) 
     if (HW.pContext1)
     {
         HW.pContext1->ClearView(rt, reinterpret_cast<const FLOAT*>(&color),
             reinterpret_cast<const D3D_RECT*>(rects), numRects);
         return true;
     }
+#elif defined(USE_DX12)
+    HW.get_context(context_id)->ClearView(
+        rt, reinterpret_cast<const FLOAT*>(&color), reinterpret_cast<const D3D_RECT*>(rects), numRects);
+    return true;
 #else
     UNUSED(numRects);
     UNUSED(rects);
@@ -79,7 +83,7 @@ IC bool CBackend::ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, siz
 
 IC bool CBackend::ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numRects, const Irect* rects)
 {
-#ifdef USE_DX11
+#if defined(USE_DX11) 
     if (HW.pContext1)
     {
         Fcolor color = { depth, depth, depth, depth };
@@ -87,6 +91,11 @@ IC bool CBackend::ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numR
             reinterpret_cast<const D3D_RECT*>(rects), numRects);
         return true;
     }
+#elif defined(USE_DX12)
+    Fcolor color = {depth, depth, depth, depth};
+    HW.get_context(context_id)->ClearView(zb, reinterpret_cast<FLOAT*>(&color), 
+        reinterpret_cast<const D3D_RECT*>(rects), numRects);
+    return true;
 #else
     UNUSED(numRects);
     UNUSED(rects);
@@ -112,7 +121,7 @@ ICF void CBackend::set_PS(ID3DPixelShader* _ps, LPCSTR _n)
         PGO(Msg("PGO:Pshader:%x", _ps));
         stat.ps++;
         ps = _ps;
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         HW.get_context(context_id)->PSSetShader(ps, 0, 0);
 #else
         HW.pContext->PSSetShader(ps);
@@ -131,7 +140,7 @@ ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
         PGO(Msg("PGO:Gshader:%x", _ps));
         stat.gs++;
         gs = _gs;
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         HW.get_context(context_id)->GSSetShader(gs, 0, 0);
 #else
         HW.pContext->GSSetShader(gs);
@@ -143,7 +152,7 @@ ICF void CBackend::set_GS(ID3DGeometryShader* _gs, LPCSTR _n)
     }
 }
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
 ICF void CBackend::set_HS(ID3D11HullShader* _hs, LPCSTR _n)
 {
     if (hs != _hs)
@@ -199,7 +208,7 @@ ICF void CBackend::set_VS(ID3DVertexShader* _vs, LPCSTR _n)
         PGO(Msg("PGO:Vshader:%x", _vs));
         stat.vs++;
         vs = _vs;
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         HW.get_context(context_id)->VSSetShader(vs, 0, 0);
 #else
         HW.pContext->VSSetShader(vs);
@@ -231,7 +240,11 @@ ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
         // const UINT *pStrides,
         // const UINT *pOffsets
         u32 iOffset = 0;
+#if USE_DX12_CRY_TYPES
+        HW.get_context(context_id)->IASetVertexBuffers(0, 1, reinterpret_cast<ID3D11Buffer* const*>(&vb), &_vb_stride, &iOffset);
+#else
         HW.get_context(context_id)->IASetVertexBuffers(0, 1, &vb, &_vb_stride, &iOffset);
+#endif
     }
 }
 
@@ -293,7 +306,7 @@ IC void CBackend::ApplyPrimitieTopology(D3D_PRIMITIVE_TOPOLOGY Topology)
     }
 }
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
 IC void CBackend::Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ)
 {
     stat.compute.calls++;
@@ -319,7 +332,7 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, 
     u32 iIndexCount = GetIndexCount(T, PC);
 
 //!!! HACK !!!
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     if (hs != 0 || ds != 0)
     {
         R_ASSERT(Topology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -525,10 +538,15 @@ IC void CBackend::ApplyVertexLayout()
 
     if (it == decl->vs_to_layout.end())
     {
-        ID3DInputLayout* pLayout;
+        ID3DInputLayout* pLayout = NULL;
 
+#if USE_DX12_CRY_TYPES
+        CHK_DX(HW.pDevice->CreateInputLayout(&decl->dx11_dcl_code[0], decl->dx11_dcl_code.size() - 1,
+            m_pInputSignature->GetBufferPointer(), m_pInputSignature->GetBufferSize(), reinterpret_cast<ID3D11InputLayout **>(&pLayout)));
+#else
         CHK_DX(HW.pDevice->CreateInputLayout(&decl->dx11_dcl_code[0], decl->dx11_dcl_code.size() - 1,
             m_pInputSignature->GetBufferPointer(), m_pInputSignature->GetBufferSize(), &pLayout));
+#endif
 
         it = decl->vs_to_layout.insert(std::pair<ID3DBlob*, ID3DInputLayout*>(m_pInputSignature, pLayout)).first;
     }
@@ -583,7 +601,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
     xforms.unmap();
     hemi.unmap();
     tree.unmap();
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     LOD.unmap();
 #endif
     StateManager.UnmapConstants();
@@ -597,7 +615,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
         ref_cbuffer aPixelConstants[MaxCBuffers];
         ref_cbuffer aVertexConstants[MaxCBuffers];
         ref_cbuffer aGeometryConstants[MaxCBuffers];
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         ref_cbuffer aHullConstants[MaxCBuffers];
         ref_cbuffer aDomainConstants[MaxCBuffers];
         ref_cbuffer aComputeConstants[MaxCBuffers];
@@ -609,7 +627,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
             aVertexConstants[i] = m_aVertexConstants[i];
             aGeometryConstants[i] = m_aGeometryConstants[i];
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
             aHullConstants[i] = m_aHullConstants[i];
             aDomainConstants[i] = m_aDomainConstants[i];
             aComputeConstants[i] = m_aComputeConstants[i];
@@ -619,7 +637,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
             m_aVertexConstants[i] = 0;
             m_aGeometryConstants[i] = 0;
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
             m_aHullConstants[i] = 0;
             m_aDomainConstants[i] = 0;
             m_aComputeConstants[i] = 0;
@@ -647,7 +665,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
                 VERIFY((uiBufferIndex & CB_BufferIndexMask) < MaxCBuffers);
                 m_aGeometryConstants[uiBufferIndex & CB_BufferIndexMask] = it->second;
             }
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
             else if ((uiBufferIndex & CB_BufferTypeMask) == CB_BufferHullShader)
             {
                 VERIFY((uiBufferIndex & CB_BufferIndexMask) < MaxCBuffers);
@@ -667,8 +685,9 @@ IC void CBackend::set_Constants(R_constant_table* C)
             else
                 VERIFY("Invalid enumeration");
         }
-
-        ID3DBuffer* tempBuffer[MaxCBuffers];
+    
+#if CONSTANT_BUFFER_ENABLE_DIRECT_ACCESS == 0
+        ID3DBuffer* tempBuffer[MaxCBuffers] = {};
 
         u32 uiMin;
         u32 uiMax;
@@ -757,6 +776,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
             }
             HW.get_context(context_id)->CSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
         }
+#endif
         /*
         for (int i=0; i<MaxCBuffers; ++i)
         {
@@ -803,8 +823,18 @@ ICF void CBackend::ApplyRTandZB()
 {
     if (m_bChangedRTorZB)
     {
-        m_bChangedRTorZB = false;
+#if USE_DX12
+        unsigned int numView = 0;
+        for (auto i = 0; i < (sizeof(pRT) / sizeof(pRT[0])); i++) if (pRT[i]) numView++; 
+#if USE_DX12_CRY_TYPES
+        HW.get_context(context_id)->OMSetRenderTargets(numView, reinterpret_cast<ID3D11RenderTargetView* const*>(pRT), pZB);
+#else
+        HW.get_context(context_id)->OMSetRenderTargets(numView, pRT, pZB);
+#endif
+#else
         HW.get_context(context_id)->OMSetRenderTargets(sizeof(pRT) / sizeof(pRT[0]), pRT, pZB);
+#endif
+        m_bChangedRTorZB = false;
     }
 }
 
@@ -827,12 +857,20 @@ IC void CBackend::get_ConstantDirect(const shared_str& n, size_t DataSize, void*
 
 IC void CBackend::gpu_mark_begin(const wchar_t* name)
 {
+#if USE_DX12
+    reinterpret_cast<CCryDX12DeviceContext*>(HW.get_context(CHW::IMM_CTX_ID))->PushMarker(name);
+#elif USE_DX11
     pAnnotation->BeginEvent(name);
+#endif // USE_DX11
 }
 
 IC void CBackend::gpu_mark_end()
 {
+#if USE_DX12
+    reinterpret_cast<CCryDX12DeviceContext *>(HW.get_context(CHW::IMM_CTX_ID))->PopMarker();
+#elif USE_DX11
     pAnnotation->EndEvent();
+#endif // USE_DX11
 }
 
 IC void CBackend::set_pass_targets(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& zb)

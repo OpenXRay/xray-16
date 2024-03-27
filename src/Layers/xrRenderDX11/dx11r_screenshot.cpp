@@ -23,7 +23,11 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
 
     // Load source texture
     DirectX::ScratchImage image;
+#if defined(USE_DX12)
+    if (FAILED(CaptureTextureInDX12(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, image)))
+#else
     if (FAILED(CaptureTexture(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID), pSrcTexture, image)))
+#endif
     {
         Log("! Failed to make a screenshot: couldn't capture texture");
         _RELEASE(pSrcTexture);

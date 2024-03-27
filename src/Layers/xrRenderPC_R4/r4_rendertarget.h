@@ -224,7 +224,7 @@ private:
     bool m_bHasActiveVolumetric;
 
 public:
-    CRenderTarget();
+    CRenderTarget(bool reset = false);
     ~CRenderTarget() override;
 
     void build_textures();
@@ -239,7 +239,7 @@ public:
     void accum_volumetric_geom_create();
     void accum_volumetric_geom_destroy();
 
-    ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
+    ID3DRenderTargetView* get_base_rt() { return rt_Base[HW.GetCurrentBackBufferIndex()]->pRT; }
     ID3DDepthStencilView* get_base_zb() { return rt_Base_Depth->pZRT[CHW::IMM_CTX_ID]; }
 
     void u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb);

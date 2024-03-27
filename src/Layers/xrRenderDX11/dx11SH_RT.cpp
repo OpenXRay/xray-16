@@ -12,7 +12,11 @@ CRT::~CRT()
     RImplementation.Resources->_DeleteRT(this);
 }
 
+#if defined(USE_DX12)
+void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= {}*/, Fcolor color)
+#else 
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
+#endif
 {
     if (pSurface)
         return;
@@ -102,7 +106,9 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     RImplementation.Resources->Evict();
 
     // Create the render target texture
-    D3D_TEXTURE2D_DESC desc{};
+    D3D_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(D3D_TEXTURE2D_DESC));
+
     if (pSurface)
         pSurface->GetDesc(&desc);
     else
@@ -128,7 +134,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
             }
         }
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         if (flags.test(CreateUAV))
         {
             dwFlags |= CreateUAV;
@@ -141,7 +147,12 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
         }
 #endif
 
+#if defined(USE_DX12)
+        const FLOAT cClearValue[4] = {color.r, color.g, color.b, color.a};
+        CHK_DX(reinterpret_cast<CCryDX12Device*>(HW.pDevice)->CreateTexture2D(&desc, cClearValue, NULL, &pSurface));
+#else 
         CHK_DX(HW.pDevice->CreateTexture2D(&desc, NULL, &pSurface));
+#endif
     }
 
 #ifdef DEBUG
@@ -156,7 +167,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     // OK
     if (useAsDepth)
     {
-        D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc{};
+        D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc;
+        ZeroMemory(&ViewDesc, sizeof(D3D_DEPTH_STENCIL_VIEW_DESC));
 
         if (SampleCount <= 1)
         {
@@ -232,7 +244,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     else
         CHK_DX(HW.pDevice->CreateRenderTargetView(pSurface, 0, &pRT));
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     if (desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS)
     {
         D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc{};
@@ -271,7 +283,7 @@ void CRT::destroy()
 
     HW.stats_manager.decrement_stats_rtarget(pSurface);
     _RELEASE(pSurface);
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     _RELEASE(pUAView);
 #endif
 }
@@ -303,10 +315,17 @@ void CRT::resolve_into(CRT& destination) const // TODO: this should be moved int
     _RELEASE(destSurf);
 }
 
+#if defined(USE_DX12)
+void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= 0*/, Fcolor color)
+{
+    _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, slices_num, flags, color));
+}
+#else
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= 0*/)
 {
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, slices_num, flags));
 }
+#endif 
 
 //////////////////////////////////////////////////////////////////////////
 /*	DX10 cut

@@ -80,7 +80,7 @@ private:
     void calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0, Fvector2& l1);
 
 public:
-    CRenderTarget();
+    CRenderTarget(bool reset = false);
 
     void Begin();
     void End();

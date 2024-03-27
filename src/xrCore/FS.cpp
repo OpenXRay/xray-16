@@ -114,6 +114,9 @@ bool file_handle_internal(pcstr file_name, size_t& size, int& file_handle)
 
 void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size)
 {
+    if (file_size == 0)
+        return NULL;
+
     VERIFY(file_size != 0);
     void* buffer = xr_malloc(file_size);
 

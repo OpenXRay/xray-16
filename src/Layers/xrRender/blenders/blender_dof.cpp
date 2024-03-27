@@ -15,7 +15,7 @@ LPCSTR CBlender_dof::getComment()
 void CBlender_dof::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     switch (C.iElement)
     {
     case 0:

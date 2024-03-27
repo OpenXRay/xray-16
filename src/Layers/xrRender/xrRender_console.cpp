@@ -56,7 +56,7 @@ const xr_token qsmapsize_token[] =
     { "3072", 3072 },
     { "3584", 3584 },
     { "4096", 4096 },
-#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if values more than 8192 are supported on OpenGL
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL) // XXX: check if values more than 8192 are supported on OpenGL
     { "5120", 5120 },
     { "6144", 6144 },
     { "7168", 7168 },
@@ -81,14 +81,14 @@ const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st
 
 u32 ps_r_ssao = 3;
 const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     {"st_opt_ultra", 4},
 #endif
     {nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; // = 0;
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
-#if defined(USE_DX11) // TODO: OGL: fix ultra and extreme settings
+#if defined(USE_DX11) || defined(USE_DX12) // TODO: OGL: fix ultra and extreme settings
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
 #endif // !USE_DX9
     {nullptr, 0}};
@@ -189,6 +189,9 @@ Flags32 ps_r2_ls_flags = {R2FLAG_SUN
 
 Flags32 ps_r2_ls_flags_ext = {
     /*R2FLAGEXT_SSAO_OPT_DATA |*/ R2FLAGEXT_SSAO_HALF_DATA | R2FLAGEXT_ENABLE_TESSELLATION | R3FLAGEXT_SSR_HALF_DEPTH |
+#if RENDER == R5 
+    R5FLAGEXT_SUBMISSION_THREAD ||
+#endif
     R3FLAGEXT_SSR_JITTER};
 
 float ps_r2_df_parallax_h = 0.02f;
@@ -329,7 +332,7 @@ float ps_r2_gloss_min = 0.0f;
 #include "xrEngine/XR_IOConsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 #include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
 #endif
 
@@ -368,7 +371,7 @@ class CCC_tf_Aniso : public CCC_Integer
 public:
     void apply()
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
         if (nullptr == HW.pDevice)
             return;
 #endif
@@ -377,7 +380,7 @@ public:
 #if defined(USE_DX9)
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
         SSManager.SetMaxAnisotropy(val);
 #elif defined(USE_OGL)
         // OGL: don't set aniso here because it will be updated after vid restart
@@ -402,7 +405,7 @@ class CCC_tf_MipBias : public CCC_Float
 public:
     void apply()
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
         if (nullptr == HW.pDevice)
             return;
 #endif
@@ -410,7 +413,7 @@ public:
 #if defined(USE_DX9)
         for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
             CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
         SSManager.SetMipLODBias(*value);
 #endif
     }
@@ -621,7 +624,7 @@ public:
     virtual void Execute(LPCSTR /*args*/)
     {
         // TODO: OGL: Implement memory usage statistics.
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
         u32 m_base = 0;
         u32 c_base = 0;
         u32 m_lmaps = 0;
@@ -838,7 +841,7 @@ public:
 #endif
 
 //  Allow real-time fog config reload
-#if (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_R5)
 #   ifndef MASTER_GOLD
 
 #   include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
@@ -1091,6 +1094,10 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r3_water_refl_jitter", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_JITTER);
     CMD3(CCC_Mask, "r4_new_shader_support", &ps_r2_ls_flags_ext, R4FLAGEXT_NEW_SHADER_SUPPORT);
 
+#if (RENDER == R_R5)
+    CMD3(CCC_Mask, "r5_D3D12SubmissionThread", &ps_r2_ls_flags_ext, R5FLAGEXT_SUBMISSION_THREAD);
+#endif
+
     //CMD3(CCC_Mask, "r3_msaa", &ps_r2_ls_flags, R3FLAG_MSAA);
     CMD3(CCC_Token, "r3_msaa", &ps_r3_msaa, qmsaa_token);
     //CMD3(CCC_Mask, "r3_msaa_hybrid", &ps_r2_ls_flags, R3FLAG_MSAA_HYBRID);
@@ -1102,7 +1109,7 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r3_minmax_sm", &ps_r3_minmax_sm, qminmax_sm_token);
 
 //  Allow real-time fog config reload
-#if (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_R5)
 #   ifndef MASTER_GOLD
     CMD1(CCC_Fog_Reload, "r3_fog_reload");
 #   endif
@@ -1119,7 +1126,7 @@ void xrRender_initconsole()
     //CMD3(CCC_Mask, "r2_sun_ignore_portals", &ps_r2_ls_flags, R2FLAG_SUN_IGNORE_PORTALS);
 
     CMD4(CCC_Integer, "r2_mt_calculate",    &ps_r2_mt_calculate, 0, 1);
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
 #endif
 

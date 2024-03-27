@@ -18,7 +18,7 @@ private:
     struct Query
     {
         u32 order;
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
         ID3DQuery* Q;
 #elif defined(USE_OGL)
         GLuint Q;
@@ -36,7 +36,7 @@ private:
 
     Lock render_lock{};
 public:
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     typedef u64 occq_result;
 #elif defined(USE_DX9) || defined(USE_OGL)
     typedef u32 occq_result;

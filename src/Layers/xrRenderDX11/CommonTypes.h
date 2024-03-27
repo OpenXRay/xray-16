@@ -23,6 +23,30 @@ using D3D_INPUT_ELEMENT_DESC        = D3D11_INPUT_ELEMENT_DESC;
 
 using D3D_RECT                      = D3D11_RECT;
 
+#if USE_DX12_CRY_TYPES
+using ID3DRasterizerState           = ID3D11RasterizerState;
+using ID3DDepthStencilState         = ID3D11DepthStencilState;
+using ID3DBlendState                = ID3D11BlendState;
+using ID3DSamplerState              = ID3D11SamplerState;
+using ID3DBuffer                    = ID3D11Buffer; //CryDX12Buffer
+using ID3DVertexBuffer              = ID3D11Buffer; //CryDX12Buffer
+using ID3DIndexBuffer               = ID3D11Buffer; //CryDX12Buffer
+using ID3DInputLayout               = ID3D11InputLayout;
+using ID3DVertexShader              = ID3D11VertexShader;
+using ID3DGeometryShader            = ID3D11GeometryShader;
+using ID3DPixelShader               = ID3D11PixelShader;
+using ID3DTexture1D                 = ID3D11Texture1D;
+using ID3DTexture2D                 = ID3D11Texture2D;
+using ID3DTexture3D                 = ID3D11Texture3D;
+using ID3DBaseTexture               = ID3D11Resource;
+using ID3DResource                  = ID3D11Resource;
+using ID3DRenderTargetView          = ID3D11RenderTargetView; //CryDX12RenderTargetView
+using ID3DDepthStencilView          = ID3D11DepthStencilView; //CryDX12DepthStencilView
+using ID3DShaderResourceView        = ID3D11ShaderResourceView; //CryDX12ShaderResourceView
+using ID3DQuery                     = ID3D11Query; //CryDX12Query
+using ID3DDevice                    = CCryDX12Device;
+using ID3DDeviceContext             = CCryDX12DeviceContext;
+#else
 using ID3DRasterizerState           = ID3D11RasterizerState;
 using ID3DDepthStencilState         = ID3D11DepthStencilState;
 using ID3DBlendState                = ID3D11BlendState;
@@ -43,8 +67,14 @@ using ID3DRenderTargetView          = ID3D11RenderTargetView;
 using ID3DDepthStencilView          = ID3D11DepthStencilView;
 using ID3DShaderResourceView        = ID3D11ShaderResourceView;
 using ID3DQuery                     = ID3D11Query;
+#if USE_DX12
+using ID3DDevice                    = ID3D11Device1;
+using ID3DDeviceContext             = ID3D11DeviceContext1;
+#else
 using ID3DDevice                    = ID3D11Device;
 using ID3DDeviceContext             = ID3D11DeviceContext;
+#endif
+#endif
 
 constexpr auto D3D_COMMONSHADER_SAMPLER_SLOT_COUNT = D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT;
 
@@ -238,18 +268,33 @@ constexpr auto D3D_UAV_DIMENSION_TEXTURE2D      = D3D11_UAV_DIMENSION_TEXTURE2D;
 constexpr auto D3D_UAV_DIMENSION_TEXTURE2DARRAY = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
 constexpr auto D3D_UAV_DIMENSION_TEXTURE3D      = D3D11_UAV_DIMENSION_TEXTURE3D;
 
-using D3D_SHADER_DESC                           = D3D11_SHADER_DESC;
-using D3D_SHADER_BUFFER_DESC                    = D3D11_SHADER_BUFFER_DESC;
-using D3D_SHADER_VARIABLE_DESC                  = D3D11_SHADER_VARIABLE_DESC;
-using D3D_SHADER_INPUT_BIND_DESC                = D3D11_SHADER_INPUT_BIND_DESC;
-using D3D_SHADER_TYPE_DESC                      = D3D11_SHADER_TYPE_DESC;
+#if USE_DX12
+using D3D_SHADER_DESC                           = D3D12_SHADER_DESC;
+using D3D_SHADER_BUFFER_DESC                    = D3D12_SHADER_BUFFER_DESC;
+using D3D_SHADER_VARIABLE_DESC                  = D3D12_SHADER_VARIABLE_DESC;
+using D3D_SHADER_INPUT_BIND_DESC                = D3D12_SHADER_INPUT_BIND_DESC;
+using D3D_SHADER_TYPE_DESC                      = D3D12_SHADER_TYPE_DESC;
 
-using ID3DShaderReflection                      = ID3D11ShaderReflection;
-using ID3DShaderReflectionConstantBuffer        = ID3D11ShaderReflectionConstantBuffer;
-using ID3DShaderReflectionVariable              = ID3D11ShaderReflectionVariable;
-using ID3DShaderReflectionType                  = ID3D11ShaderReflectionType;
+using ID3DShaderReflection                      = ID3D12ShaderReflection;
+using ID3DShaderReflectionConstantBuffer        = ID3D12ShaderReflectionConstantBuffer;
+using ID3DShaderReflectionVariable              = ID3D12ShaderReflectionVariable;
+using ID3DShaderReflectionType                  = ID3D12ShaderReflectionType;
+
+#define IID_ID3DShaderReflection IID_ID3D12ShaderReflection
+#else
+using D3D_SHADER_DESC = D3D11_SHADER_DESC;
+using D3D_SHADER_BUFFER_DESC = D3D11_SHADER_BUFFER_DESC;
+using D3D_SHADER_VARIABLE_DESC = D3D11_SHADER_VARIABLE_DESC;
+using D3D_SHADER_INPUT_BIND_DESC = D3D11_SHADER_INPUT_BIND_DESC;
+using D3D_SHADER_TYPE_DESC = D3D11_SHADER_TYPE_DESC;
+
+using ID3DShaderReflection = ID3D11ShaderReflection;
+using ID3DShaderReflectionConstantBuffer = ID3D11ShaderReflectionConstantBuffer;
+using ID3DShaderReflectionVariable = ID3D11ShaderReflectionVariable;
+using ID3DShaderReflectionType = ID3D11ShaderReflectionType;
 
 #define IID_ID3DShaderReflection IID_ID3D11ShaderReflection
+#endif
 
 using ID3DState = dx11State;
 #define DX11_ONLY(expr) expr
@@ -269,10 +314,17 @@ struct D3D_VIEWPORT : D3D11_VIEWPORT
     {}
 };
 
+#if USE_DX12_CRY_TYPES
 using VertexBufferHandle    = ID3D11Buffer*;
 using IndexBufferHandle     = ID3D11Buffer*;
 using ConstantBufferHandle  = ID3D11Buffer*;
 using HostBufferHandle      = void*;
+#else
+using VertexBufferHandle    = ID3D11Buffer*;
+using IndexBufferHandle     = ID3D11Buffer*;
+using ConstantBufferHandle  = ID3D11Buffer*;
+using HostBufferHandle      = void*;
+#endif
 
 using VertexElement         = D3DVERTEXELEMENT9;
 using InputElementDesc      = D3D11_INPUT_ELEMENT_DESC;

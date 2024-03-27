@@ -139,7 +139,7 @@ void dxUIRender::FlushLineList()
 */
 void dxUIRender::SetScissor(Irect* rect)
 {
-#if (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_R5)
     RCache.set_Scissor(rect);
     RCache.StateManager.OverrideScissoring(rect ? true : false, TRUE);
 #else //	(RENDER == R_R3) || (RENDER == R_R4)

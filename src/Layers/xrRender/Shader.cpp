@@ -48,10 +48,10 @@ bool SPass::equal(const SPass& other) const
         return false;
     if (vs != other.vs)
         return false;
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     if (gs != other.gs)
         return false;
-#    ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12) 
     if (hs != other.hs)
         return false;
     if (ds != other.ds)

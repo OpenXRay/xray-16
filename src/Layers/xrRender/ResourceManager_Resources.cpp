@@ -96,7 +96,11 @@ void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
     Msg("! ERROR: Failed to find compiled constant-table");
 }
 
+#if defined(USE_DX12)
+CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, u32 slices_num /*=1*/, Flags32 flags /*= {}*/, Fcolor color)
+#else
 CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
+#endif 
 {
     R_ASSERT(Name && Name[0] && w && h);
 
@@ -111,7 +115,11 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sam
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_rtargets.emplace(RT->set_name(Name), RT);
         if (Device.b_is_Ready)
+#if defined(USE_DX12)
+            RT->create(Name, w, h, f, sampleCount, slices_num, flags, color);
+#else 
             RT->create(Name, w, h, f, sampleCount, slices_num, flags);
+#endif 
         return RT;
     }
 }
