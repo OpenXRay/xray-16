@@ -40,8 +40,8 @@ private:
 public:
     trivial_encryptor();
 
-    void encode(pcvoid source, const u32& source_size, pvoid destination, key_flag what = key_flag::worldwide);
-    void decode(pcvoid source, const u32& source_size, pvoid destination, key_flag what = key_flag::worldwide);
+    void encode(pcvoid source, const size_t& source_size, pvoid destination, key_flag what = key_flag::worldwide);
+    void decode(pcvoid source, const size_t& source_size, pvoid destination, key_flag what = key_flag::worldwide);
 };
 
 extern XRCORE_API trivial_encryptor g_trivial_encryptor;

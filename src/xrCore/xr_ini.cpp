@@ -492,7 +492,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
                 VERIFY2(m_flags.test(eReadOnly), "Allow for readonly mode only.");
                 inherited_names += 2;
                 u32 cnt = _GetItemCount(inherited_names);
-                u32 total_count = 0;
+                size_t total_count = 0;
                 u32 k = 0;
                 for (k = 0; k < cnt; ++k)
                 {
@@ -691,21 +691,21 @@ bool CInifile::line_exist(pcstr S, pcstr L) const
     return A != I.Data.end() && xr_strcmp(*A->first, L) == 0;
 }
 
-u32 CInifile::line_count(pcstr Sname) const
+size_t CInifile::line_count(pcstr Sname) const
 {
     Sect& S = r_section(Sname);
-    u32 C = 0;
+    size_t C = 0;
     for (const auto& item : S.Data)
         if (*item.first)
             C++;
     return C;
 }
 
-u32 CInifile::section_count() const { return DATA.size(); }
+size_t CInifile::section_count() const { return DATA.size(); }
 //--------------------------------------------------------------------------------------
 CInifile::Sect& CInifile::r_section(const shared_str& S) const { return r_section(*S); }
 bool CInifile::line_exist(const shared_str& S, const shared_str& L)const { return line_exist(*S, *L); }
-u32 CInifile::line_count(const shared_str& S) const { return line_count(*S); }
+size_t CInifile::line_count(const shared_str& S) const { return line_count(*S); }
 bool CInifile::section_exist(const shared_str& S) const { return section_exist(*S); }
 //--------------------------------------------------------------------------------------
 // Read functions
@@ -757,7 +757,7 @@ shared_str CInifile::r_string_wb(pcstr S, pcstr L) const
 
     string4096 _original;
     xr_strcpy(_original, sizeof _original, _base);
-    u32 _len = xr_strlen(_original);
+    size_t _len = xr_strlen(_original);
     if (0 == _len)
         return shared_str("");
     if ('"' == _original[_len - 1])

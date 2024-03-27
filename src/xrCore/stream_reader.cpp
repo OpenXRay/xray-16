@@ -58,7 +58,7 @@ void CStreamReader::map(const size_t& new_offset)
     m_current_window_size = end_offset - start_offset;
 #if defined(XR_PLATFORM_WINDOWS)
     m_current_map_view_of_file =
-        static_cast<u8*>(MapViewOfFile(m_file_mapping_handle, FILE_MAP_READ, 0, start_offset, m_current_window_size));
+        static_cast<u8*>(MapViewOfFile(m_file_mapping_handle, FILE_MAP_READ, 0, static_cast<DWORD>(start_offset), m_current_window_size));
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     m_current_map_view_of_file =
         static_cast<u8*>(::mmap(NULL, m_current_window_size, PROT_READ, MAP_SHARED, m_file_mapping_handle, start_offset));

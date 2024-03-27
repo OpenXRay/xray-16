@@ -59,7 +59,7 @@ void trivial_encryptor::initialize(key_flag what)
         m_alphabet_back[m_alphabet[i]] = (type)i;
 }
 
-void trivial_encryptor::encode(pcvoid source, const u32& source_size, pvoid destination, key_flag what /*= key_flag::worldwide*/)
+void trivial_encryptor::encode(pcvoid source, const size_t& source_size, pvoid destination, key_flag what /*= key_flag::worldwide*/)
 {
     if (what != m_current_key)
     {
@@ -75,7 +75,7 @@ void trivial_encryptor::encode(pcvoid source, const u32& source_size, pvoid dest
         *J = m_alphabet[*I] ^ type(temp.random(alphabet_size) & 0xff);
 }
 
-void trivial_encryptor::decode(pcvoid source, const u32& source_size, pvoid destination, key_flag what /*= key_flag::worldwide*/)
+void trivial_encryptor::decode(pcvoid source, const size_t& source_size, pvoid destination, key_flag what /*= key_flag::worldwide*/)
 {
     if (what != m_current_key)
     {

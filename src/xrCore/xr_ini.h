@@ -88,9 +88,9 @@ public:
     Sect& r_section(const shared_str& S) const;
     bool line_exist(pcstr S, pcstr L)const;
     bool line_exist(const shared_str& S, const shared_str& L)const;
-    u32 line_count(pcstr S) const;
-    u32 line_count(const shared_str& S) const;
-    u32 section_count() const;
+    size_t line_count(pcstr S) const;
+    size_t line_count(const shared_str& S) const;
+    size_t section_count() const;
     bool section_exist(pcstr S) const;
     bool section_exist(const shared_str& S) const;
     Root& sections() { return DATA; }
