@@ -32,7 +32,7 @@
 // {2,3,4}D say, and we want *zero* space overhead.  No length fields,
 // no vtables, just N numerical values.
 //
-template <class T, unsigned int N>
+template <class T, u32 N>
 class MxVBlock
 {
 private:
@@ -41,7 +41,7 @@ private:
 protected:
     inline void copy(const MxVBlock<T, N>& v)
     {
-        for (unsigned int i = 0; i < N; i++)
+        for (u32 i = 0; i < N; i++)
             elt[i] = v.elt[i];
     }
 
@@ -49,13 +49,13 @@ public:
     MxVBlock() {}
     MxVBlock(const MxVBlock<T, N>& v) { mxv_set(elt, v, N); }
     MxVBlock(const T* v) { mxv_set(elt, v, N); }
-    inline unsigned int dim() const { return N; }
-    T& operator()(unsigned int i)
+    inline u32 dim() const { return N; }
+    T& operator()(u32 i)
     {
         VERIFY(i < N);
         return elt[i];
     }
-    T operator()(unsigned int i) const
+    T operator()(u32 i) const
     {
         VERIFY(i < N);
         return elt[i];
@@ -149,7 +149,7 @@ public:
 class MxVector : public MxBlock<double>
 {
 public:
-    MxVector(unsigned int n) : MxBlock<double>(n) { mxv_set(*this, 0.0, dim()); }
+    MxVector(u32 n) : MxBlock<double>(n) { mxv_set(*this, 0.0, dim()); }
     MxVector(const MxVector& v) : MxBlock<double>(v.length()) { copy(v); }
     MxVector& operator=(const MxVector& v)
     {
@@ -162,7 +162,7 @@ public:
         return *this;
     }
 
-    unsigned int dim() const { return length(); }
+    u32 dim() const { return length(); }
     MxVector& operator+=(const MxVector& v)
     {
         mxv_addinto(*this, v, dim());

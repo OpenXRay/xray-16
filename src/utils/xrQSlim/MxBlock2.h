@@ -20,22 +20,23 @@ template <class T>
 class MxBlock2 : public MxBlock<T>
 {
 private:
-    int W, H;
+    u32 W;
+    u32 H;
 
 protected:
     MxBlock2() {}
 public:
-    MxBlock2(int w, int h) : MxBlock<T>(w * h)
+    MxBlock2(u32 w, u32 h) : MxBlock<T>(w * h)
     {
         W = w;
         H = h;
     }
 
-    T& operator()(int i, int j) { return (*this)[j * W + i]; }
-    const T& operator()(int i, int j) const { return (*this)[j * W + i]; }
-    int width() const { return W; }
-    int height() const { return H; }
-    void resize(int w, int h)
+    T& operator()(u32 i, u32 j) { return (*this)[j * W + i]; }
+    const T& operator()(u32 i, u32 j) const { return (*this)[j * W + i]; }
+    u32 width() const { return W; }
+    u32 height() const { return H; }
+    void resize(u32 w, u32 h)
     {
         W = w;
         H = h;

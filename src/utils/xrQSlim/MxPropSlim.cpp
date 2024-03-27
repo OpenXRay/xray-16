@@ -43,9 +43,9 @@ void MxPropSlim::consider_normals(bool will)
     D = compute_dimension(m);
 }
 
-unsigned int MxPropSlim::compute_dimension(MxStdModel* m)
+u32 MxPropSlim::compute_dimension(MxStdModel* m)
 {
-    unsigned int d = 3;
+    u32 d = 3;
 
     if (use_color)
         d += 3;
@@ -66,7 +66,7 @@ void MxPropSlim::pack_to_vector(MxVertexID id, MxVector& v)
     v[1] = m->vertex(id)[1];
     v[2] = m->vertex(id)[2];
 
-    unsigned int i = 3;
+    u32 i = 3;
     if (use_color)
     {
         v[i++] = m->color(id).R();
@@ -86,7 +86,7 @@ void MxPropSlim::pack_to_vector(MxVertexID id, MxVector& v)
     }
 }
 
-void MxPropSlim::pack_prop_to_vector(MxVertexID id, MxVector& v, unsigned int target)
+void MxPropSlim::pack_prop_to_vector(MxVertexID id, MxVector& v, u32 target)
 {
     if (target == 0)
     {
@@ -96,7 +96,7 @@ void MxPropSlim::pack_prop_to_vector(MxVertexID id, MxVector& v, unsigned int ta
         return;
     }
 
-    unsigned int i = 3;
+    u32 i = 3;
     target--;
 
     if (use_color)
@@ -151,7 +151,7 @@ void MxPropSlim::unpack_from_vector(MxVertexID id, MxVector& v)
     m->vertex(id)[1] = (float)v[1];
     m->vertex(id)[2] = (float)v[2];
 
-    unsigned int i = 3;
+    u32 i = 3;
     if (use_color)
     {
         CLAMP(v[i], 0, 1);
@@ -176,7 +176,7 @@ void MxPropSlim::unpack_from_vector(MxVertexID id, MxVector& v)
     }
 }
 
-void MxPropSlim::unpack_prop_from_vector(MxVertexID id, MxVector& v, unsigned int target)
+void MxPropSlim::unpack_prop_from_vector(MxVertexID id, MxVector& v, u32 target)
 {
     if (target == 0)
     {
@@ -186,7 +186,7 @@ void MxPropSlim::unpack_prop_from_vector(MxVertexID id, MxVector& v, unsigned in
         return;
     }
 
-    unsigned int i = 3;
+    u32 i = 3;
     target--;
 
     if (use_color)
@@ -225,9 +225,9 @@ void MxPropSlim::unpack_prop_from_vector(MxVertexID id, MxVector& v, unsigned in
     }
 }
 
-unsigned int MxPropSlim::prop_count()
+u32 MxPropSlim::prop_count()
 {
-    unsigned int i = 1;
+    u32 i = 1;
 
     if (use_color)
         i++;
@@ -251,7 +251,7 @@ void MxPropSlim::compute_face_quadric(MxFaceID i, MxQuadric& Q)
     {
         Q.clear();
 
-        for (unsigned int p = 0; p < prop_count(); p++)
+        for (u32 p = 0; p < prop_count(); p++)
         {
             v1 = 0.0;
             v2 = 0.0;
@@ -281,7 +281,7 @@ void MxPropSlim::compute_face_quadric(MxFaceID i, MxQuadric& Q)
 
 void MxPropSlim::collect_quadrics()
 {
-    for (unsigned int j = 0; j < quadric_count(); j++)
+    for (u32 j = 0; j < quadric_count(); j++)
         __quadrics[j] = xr_new<MxQuadric>(dim());
 
     for (MxFaceID i = 0; i < m->face_count(); i++)
@@ -317,20 +317,19 @@ void MxPropSlim::initialize()
     is_initialized = true;
 }
 
-unsigned int MxPropSlim::check_local_validity(unsigned int v, const float* vnew)
+u32 MxPropSlim::check_local_validity(u32 v, const float* vnew)
 {
     const MxFaceList& N = m->neighbors(v);
-    unsigned int nfailed = 0;
-    unsigned int i;
+    u32 nfailed = 0;
 
-    for (i = 0; i < (unsigned int)N.length(); i++)
+    for (u32 i = 0; i < N.length(); i++)
     {
         if (m->face_mark(N[i]) == 1)
         {
             MxFace& f = m->face(N[i]);
-            unsigned int k = f.find_vertex(v);
-            unsigned int x = f[(k + 1) % 3];
-            unsigned int y = f[(k + 2) % 3];
+            u32 k = f.find_vertex(v);
+            u32 x = f[(k + 1) % 3];
+            u32 y = f[(k + 2) % 3];
 
             float d_yx[3], d_vx[3], d_vnew[3], f_n[3], n[3];
             mxv_sub(d_yx, m->vertex(y), m->vertex(x), 3); // d_yx = y-x
@@ -350,17 +349,17 @@ unsigned int MxPropSlim::check_local_validity(unsigned int v, const float* vnew)
     return nfailed;
 }
 
-double MxPropSlim::check_local_compactness(unsigned int v, const float* vnew)
+double MxPropSlim::check_local_compactness(u32 v, const float* vnew)
 {
     const MxFaceList& N = m->neighbors(v);
     double c_min = 1.0;
 
-    for (unsigned int i = 0; i < (unsigned int)N.length(); i++)
+    for (u32 i = 0; i < N.length(); i++)
         if (m->face_mark(N[i]) == 1)
         {
             const MxFace& f = m->face(N[i]);
             Vec3 f_after[3];
-            for (unsigned int j = 0; j < 3; j++)
+            for (u32 j = 0; j < 3; j++)
                 f_after[j] = (f[j] == v) ? Vec3(vnew) : Vec3(m->vertex(f[j]));
 
             double c = triangle_compactness(f_after[0], f_after[1], f_after[2]);
@@ -374,18 +373,18 @@ double MxPropSlim::check_local_compactness(unsigned int v, const float* vnew)
 
 void MxPropSlim::apply_mesh_penalties(edge_info* info)
 {
-    unsigned int i;
+    u32 i;
 
     const MxFaceList& N1 = m->neighbors(info->v1);
     const MxFaceList& N2 = m->neighbors(info->v2);
 
     // Set up the face marks as the check_xxx() functions expect.
     //
-    for (i = 0; i < (unsigned int)N2.length(); i++)
+    for (i = 0; i < N2.length(); i++)
         m->face_mark(N2[i], 0);
-    for (i = 0; i < (unsigned int)N1.length(); i++)
+    for (i = 0; i < N1.length(); i++)
         m->face_mark(N1[i], 1);
-    for (i = 0; i < (unsigned int)N2.length(); i++)
+    for (i = 0; i < N2.length(); i++)
         m->face_mark(N2[i], m->face_mark(N2[i]) + 1);
 
     double base_error = info->heap_key();
@@ -393,7 +392,7 @@ void MxPropSlim::apply_mesh_penalties(edge_info* info)
 
     // Check for excess over degree bounds.
     //
-    unsigned int max_degree = std::max(N1.length(), N2.length());
+    u32 max_degree = std::max(N1.length(), N2.length());
     if (max_degree > vertex_degree_limit)
         bias += (max_degree - vertex_degree_limit) * meshing_penalty * 0.001f;
 
@@ -404,7 +403,7 @@ void MxPropSlim::apply_mesh_penalties(edge_info* info)
     vnew[1] = (float)info->target[1];
     vnew[2] = (float)info->target[2];
 
-    unsigned int nfailed = 0;
+    u32 nfailed = 0;
     nfailed += check_local_validity(info->v1, vnew);
     nfailed += check_local_validity(info->v2, vnew);
     if (nfailed)
@@ -485,7 +484,7 @@ void MxPropSlim::compute_target_placement(edge_info* info)
     info->heap_key(float(-e_min));
 }
 
-bool MxPropSlim::decimate(unsigned int target, float max_error, void* cb_params)
+bool MxPropSlim::decimate(u32 target, float max_error, void* cb_params)
 {
     MxPairContraction conx;
 
@@ -576,7 +575,7 @@ void MxPropSlim::discontinuity_constraint(MxVertexID i, MxVertexID j, MxFaceID f
 
 void MxPropSlim::discontinuity_constraint(MxVertexID i, MxVertexID j, const MxFaceList& faces)
 {
-    for (unsigned int f = 0; f < (unsigned int)faces.length(); f++)
+    for (u32 f = 0; f < faces.length(); f++)
         discontinuity_constraint(i, j, faces[f]);
 }
 
@@ -595,7 +594,7 @@ void MxPropSlim::apply_contraction(const MxPairContraction& conx, edge_info* inf
 
     // Must update edge_info here so that the meshing penalties
     // will be computed with respect to the new mesh rather than the old
-    for (unsigned int i = 0; i < (unsigned int)edge_links(conx.v1).length(); i++)
+    for (u32 i = 0; i < edge_links(conx.v1).length(); i++)
         compute_edge_info(edge_links(conx.v1)[i]);
 }
 
@@ -614,7 +613,7 @@ void MxPropSlim::collect_edges()
         star.reset();
         m->collect_vertex_star(i, star);
 
-        for (unsigned int j = 0; j < (unsigned int)star.length(); j++)
+        for (u32 j = 0; j < star.length(); j++)
             if (i < star(j)) // Only add particular edge once
                 create_edge(i, star(j));
     }
@@ -630,7 +629,7 @@ void MxPropSlim::constrain_boundaries()
         star.reset();
         m->collect_vertex_star(i, star);
 
-        for (unsigned int j = 0; j < (unsigned int)star.length(); j++)
+        for (u32 j = 0; j < star.length(); j++)
         {
             if (i < star(j))
             {
@@ -673,12 +672,11 @@ void MxPropSlim::finalize_edge_update(edge_info* info)
 void MxPropSlim::update_pre_contract(const MxPairContraction& conx)
 {
     MxVertexID v1 = conx.v1, v2 = conx.v2;
-    unsigned int i, j;
 
     star.reset();
     m->collect_vertex_star(v1, star);
 
-    for (i = 0; i < (unsigned int)edge_links(v2).length(); i++)
+    for (u32 i = 0; i < edge_links(v2).length(); i++)
     {
         edge_info* e = edge_links(v2)(i);
         MxVertexID u = (e->v1 == v2) ? e->v2 : e->v1;
@@ -688,6 +686,7 @@ void MxPropSlim::update_pre_contract(const MxPairContraction& conx)
         if (u == v1 || varray_find(star, u))
         {
             // This is a useless link --- kill it
+            u32 j;
             [[maybe_unused]] bool found = varray_find(edge_links(u), e, &j);
             VERIFY(found);
             edge_links(u).remove(j);
