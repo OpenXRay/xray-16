@@ -100,7 +100,8 @@ Flags32 psActorFlags =
     AF_AUTOPICKUP |
     AF_RUN_BACKWARD |
     AF_IMPORTANT_SAVE |
-    AF_MULTI_ITEM_PICKUP
+    AF_MULTI_ITEM_PICKUP | 
+    AF_FIRST_PERSON_BODY
 };
 int psActorSleepTime = 1;
 
@@ -245,6 +246,9 @@ CActor::~CActor()
     //Alundaio: For car
     xr_delete(m_vehicle_anims);
     //-Alundaio
+
+    if (m_firstPersonBody)
+        xr_delete(m_firstPersonBody);
 }
 
 void CActor::reinit()
@@ -465,6 +469,19 @@ void CActor::Load(LPCSTR section)
     m_sInventoryBoxUseAction = "inventory_box_use";
     //---------------------------------------------------------------------
     m_sHeadShotParticle = READ_IF_EXISTS(pSettings, r_string, section, "HeadShotParticle", 0);
+
+    // initialize bones for first person body
+    m_firstPersonBodyBonesToHide =
+    {
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_head"), true },
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_l_clavicle"), true },
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_r_clavicle"), true },
+    };
+
+    m_firstPersonBodyBonesToIgnoreAnims =
+    {
+        { Visual()->dcast_PKinematics()->LL_BoneID("bip01_head"), false},
+    };
 }
 
 void CActor::PHHit(SHit& H) { m_pPhysics_support->in_Hit(H, false); }
@@ -814,6 +831,9 @@ void CActor::Die(IGameObject* who)
 #ifdef DEBUG
     Msg("--- Actor [%s] dies !", this->Name());
 #endif // #ifdef DEBUG
+    m_timeOfDeath = Device.dwTimeGlobal;
+    m_fpDeathCamOfffsetTime = m_timeOfDeath + 1000;
+
     inherited::Die(who);
 
     if (OnServer())
@@ -1586,6 +1606,110 @@ bool CActor::renderable_ShadowGenerate()
         return FALSE;
 
     return inherited::renderable_ShadowGenerate();
+}
+
+bool CActor::FirstPersonBodyEnabled()
+{
+    return psActorFlags.test(AF_FIRST_PERSON_BODY) && cam_active == eacFirstEye;
+}
+
+bool CActor::FirstPersonBodyActive() 
+{
+    return m_firstPersonBody;
+}
+
+void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
+{
+    ScopeLock lock{ &render_lock };
+    IKinematics* realBodyK = Visual()->dcast_PKinematics();
+
+    m_firstPersonCameraXform.set(XFORM());
+    m_firstPersonCameraXform.mulB_43(realBodyK->LL_GetTransform(m_head));
+
+    if (!FirstPersonBodyEnabled())
+        return;
+
+    if (!m_firstPersonBody) // initialize first person body if necessary
+    {
+        m_firstPersonBody = GEnv.Render->model_Duplicate(Visual());
+        g_SetAnimation(mstate_real, true); // Yohji: hacky way to reset anim state / bones when our visual changes
+        return;
+    }
+
+    IKinematics* kinematics = m_firstPersonBody->dcast_PKinematics();
+    m_firstPersonBodyXform = XFORM();
+
+    // Add body to render
+    GEnv.Render->add_Visual(context_id, root, m_firstPersonBody, m_firstPersonBodyXform);
+    m_firstPersonBody->getVisData().hom_frame = Device.dwFrame;
+
+    PIItem pItem = inventory().ActiveItem();
+    bool noItemEquipped = 0 == pItem;
+
+    // On death or unarmed, show arms
+    if (!g_Alive() || noItemEquipped)
+    {
+        m_firstPersonBodyBonesToHide[m_l_clavicle] = false;
+        m_firstPersonBodyBonesToHide[m_r_clavicle] = false;
+
+        for (auto [boneId, vis] : m_firstPersonBodyBonesToIgnoreAnims)
+        {
+            m_firstPersonBodyBonesToIgnoreAnims[boneId] = false;
+        }
+    }
+    else
+    {
+        m_firstPersonBodyBonesToHide[m_l_clavicle] = true;
+        m_firstPersonBodyBonesToHide[m_r_clavicle] = true;
+
+        for (auto [boneId, vis] : m_firstPersonBodyBonesToIgnoreAnims)
+        {
+            m_firstPersonBodyBonesToIgnoreAnims[boneId] = true;
+        }
+    }
+
+    // Copy transforms from actual body visual, excluding hidden bones and bones we don't want to animate
+    const u16 bones_count = kinematics->LL_BoneCount();
+    for (u16 i = 0; i < bones_count; ++i)
+    {
+        if (m_firstPersonBodyBonesToIgnoreAnims.find(i) != m_firstPersonBodyBonesToIgnoreAnims.end() && m_firstPersonBodyBonesToIgnoreAnims[i])
+            continue;
+        if (m_firstPersonBodyBonesToHide.find(i) != m_firstPersonBodyBonesToHide.end() && m_firstPersonBodyBonesToHide[i])
+            continue;
+
+        kinematics->LL_GetTransform(i).set(realBodyK->LL_GetTransform(i));
+        kinematics->LL_GetTransform_R(i).set(realBodyK->LL_GetTransform_R(i));
+    }
+
+    // Hide/show bones AFTER copying transforms so we update all child bones properly
+    for (auto [boneId, hide] : m_firstPersonBodyBonesToHide)
+    {
+        kinematics->LL_SetBoneVisible(boneId, hide ? FALSE : TRUE, TRUE);
+    }
+
+#ifdef DEBUG
+    string1024 text;
+    CGameFont* F = UI().Font().pFontArial14;
+    F->SetAligment(CGameFont::alLeft);
+    F->OutSetI(-.9, 0);
+    F->SetColor(color_rgba(255, 0, 0, 255));
+    xr_sprintf(text, "first person body position [%3.3f %3.3f %3.3f]", m_firstPersonBodyXform.c.x, m_firstPersonBodyXform.c.y, m_firstPersonBodyXform.c.z);
+    F->OutNext(text);
+    xr_sprintf(text, "first person body direction [%3.3f %3.3f %3.3f]", m_firstPersonBodyXform.k.x, m_firstPersonBodyXform.k.y, m_firstPersonBodyXform.k.z);
+    F->OutNext(text);
+    xr_sprintf(text, "m_firstPersonCameraXform pos [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.c.x, m_firstPersonCameraXform.c.y, m_firstPersonCameraXform.c.z);
+    F->OutNext(text);
+    xr_sprintf(text, "m_firstPersonCameraXform dir [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.k.x, m_firstPersonCameraXform.k.y, m_firstPersonCameraXform.k.z);
+    F->OutNext(text);
+    xr_sprintf(text, "m_firstPersonCameraXform norm [%3.3f %3.3f %3.3f]", m_firstPersonCameraXform.i.x, m_firstPersonCameraXform.i.y, m_firstPersonCameraXform.i.z);
+    F->OutNext(text);
+    xr_sprintf(text, "cameras[eacFirstEye] vPosition [%3.3f %3.3f %3.3f]", cameras[eacFirstEye]->vPosition.x, cameras[eacFirstEye]->vPosition.y, cameras[eacFirstEye]->vPosition.z);
+    F->OutNext(text);
+    xr_sprintf(text, "cameras[eacFirstEye] vDirection [%3.3f %3.3f %3.3f]", cameras[eacFirstEye]->vDirection.x, cameras[eacFirstEye]->vDirection.y, cameras[eacFirstEye]->vDirection.z);
+    F->OutNext(text);
+    xr_sprintf(text, "cameras[eacFirstEye] vNormal [%3.3f %3.3f %3.3f]", cameras[eacFirstEye]->vNormal.x, cameras[eacFirstEye]->vNormal.y, cameras[eacFirstEye]->vNormal.z);
+    F->OutNext(text);
+#endif // DEBUG
 }
 
 void CActor::g_PerformDrop()

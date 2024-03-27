@@ -57,7 +57,7 @@ public:
         float fFAR_Dest, u32 flags);
     void UpdateFromCamera(const CCameraBase* C);
 
-    void ApplyDevice();
+    void ApplyDevice(float override_fnear = 0.0f);
     static void ResetPP();
 
     CCameraManager(bool bApplyOnUpdate);

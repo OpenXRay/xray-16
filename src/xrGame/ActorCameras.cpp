@@ -24,6 +24,9 @@
 #include "xrPhysics/ActorCameraCollision.h"
 #include "IKLimbsController.h"
 #include "GamePersistent.h"
+#include "Actor.h"
+
+extern Fvector g_first_person_cam_offset;
 
 void CActor::cam_Set(EActorCameras style)
 {
@@ -318,7 +321,6 @@ void CActor::cam_Update(float dt, float fFOV)
     }
 
     Fvector point = { 0, CurrentHeight + current_ik_cam_shift, 0 };
-
     Fvector dangle = {0, 0, 0};
     Fmatrix xform;
     xform.setXYZ(0, r_torso.yaw, 0);
@@ -360,6 +362,16 @@ void CActor::cam_Update(float dt, float fFOV)
 
     CCameraBase* C = cam_Active();
 
+    if (FirstPersonBodyActive()) // update camera position with offset for first person body
+    {
+        Fvector camdir = { cam_Active()->Direction().x, 0.f, cam_Active()->Direction().z }; // Ignore y axis
+        point = m_firstPersonCameraXform.c;
+        point.y += g_first_person_cam_offset.y;
+        point.add(camdir.normalize().mul(g_first_person_cam_offset.z));
+        _viewport_near = VIEWPORT_NEAR * .1f; // .02f
+        Visual()->dcast_PKinematics()->CalculateBones(true);
+    }
+
     C->Update(point, dangle);
     C->f_fov = fFOV;
 
@@ -368,10 +380,21 @@ void CActor::cam_Update(float dt, float fFOV)
         cameras[eacFirstEye]->Update(point, dangle);
         cameras[eacFirstEye]->f_fov = fFOV;
     }
-    if (Level().CurrentEntity() == this)
+    
+    if (FirstPersonBodyActive() && !g_Alive()) // override camera position / direction for first person body on death
     {
-        collide_camera(*cameras[eacFirstEye], _viewport_near, this);
+        float timeScalar = Device.dwTimeGlobal > m_fpDeathCamOfffsetTime ? 1.0f : (float)(1000 - (m_fpDeathCamOfffsetTime - Device.dwTimeGlobal)) / 1000.f;
+        Fvector fpDeathPos;
+        fpDeathPos.set(m_firstPersonCameraXform.c);
+        fpDeathPos.mad(m_firstPersonCameraXform.i, .15f);
+
+        cameras[eacFirstEye]->vDirection.lerp(cameras[eacFirstEye]->vDirection, m_firstPersonCameraXform.k, timeScalar);
+        cameras[eacFirstEye]->vNormal.lerp(cameras[eacFirstEye]->vNormal, m_firstPersonCameraXform.i, timeScalar);
+        cameras[eacFirstEye]->vPosition.lerp(cameras[eacFirstEye]->vPosition, fpDeathPos, timeScalar);
     }
+    if (!FirstPersonBodyActive() && Level().CurrentEntity() == this)
+        collide_camera(*cameras[eacFirstEye], _viewport_near, this);
+
     if (psActorFlags.test(AF_PSP))
     {
         Cameras().UpdateFromCamera(C);
@@ -398,7 +421,7 @@ void CActor::cam_Update(float dt, float fFOV)
         const bool allow = !Level().Cameras().GetCamEffector(cefDemo) && !Level().Cameras().GetCamEffector(cefAnsel);
         if (eacFirstEye == cam_active && allow)
         {
-            Cameras().ApplyDevice();
+            Cameras().ApplyDevice(_viewport_near);
         }
     }
 }
