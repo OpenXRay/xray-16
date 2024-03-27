@@ -24,7 +24,7 @@ function(target_sources_grouped)
     source_group(${PARSED_ARGS_NAME} FILES ${PARSED_ARGS_FILES})
 endfunction()
 
-function(set_git_info)
+macro(set_git_info)
     execute_process(COMMAND git rev-parse --verify HEAD
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         OUTPUT_VARIABLE GIT_SHA1
@@ -40,7 +40,7 @@ function(set_git_info)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     message(STATUS "git branch: ${GIT_BRANCH}")
-endfunction()
+endmacro()
 
 function(calculate_xray_build_id output)
     set(XRAY_START_DAY   31)
