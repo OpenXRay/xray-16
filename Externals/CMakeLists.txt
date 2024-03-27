@@ -1,7 +1,8 @@
 if (XRAY_USE_LUAJIT)
     add_subdirectory(LuaJIT-proj)
 else()
-    find_package(Lua51 REQUIRED)
+    # TODO: Add Lua51 package
+    # find_package(Lua51 REQUIRED)
 endif()
 
 add_subdirectory(xrLuaFix)
