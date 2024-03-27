@@ -12,6 +12,7 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "space_restrictor.h"
 #include "xrAICore/Navigation/graph_engine.h"
+#include "xrCore/Threading/ParallelFor.hpp"
 
 struct CBorderMergePredicate
 {
@@ -79,10 +80,45 @@ void CSpaceRestrictionShape::fill_shape(const CCF_Shape::shape_def& shape)
     }
     default: NODEFAULT;
     }
-    ai().level_graph().iterate_vertices(start, dest, CBorderMergePredicate(this));
+
+    CLevelGraph& graph = ai().level_graph();
+
+    std::mutex mergeMutex;
+
+    auto [begin, end] = graph.get_range(start, dest);
+    xr_parallel_for(TaskRange(begin, end), [this, &mergeMutex, &graph] (const auto& range)
+    {
+        xr_vector<u32> m_border_chunk;
+        m_border_chunk.reserve(range.size());
+        for (const auto& vertex : range)
+        {
+            if (inside(graph.vertex_id(&vertex), true) &&
+                !inside(graph.vertex_id(&vertex), false))
+                m_border_chunk.push_back(graph.vertex_id(&vertex));
+        }
+        std::lock_guard lock(mergeMutex);
+        if (m_border.capacity() < m_border.size() + m_border_chunk.size())
+            m_border.reserve(m_border.size() + m_border_chunk.size());
+        for (auto x : m_border_chunk)
+            m_border.push_back(x);
+    });
 
 #ifdef DEBUG
-    ai().level_graph().iterate_vertices(start, dest, CShapeTestPredicate(this));
+    xr_parallel_for(TaskRange(begin, end), [this, &mergeMutex, &graph] (const auto& range)
+    {
+        xr_vector<u32> m_test_storage_chunk;
+        m_test_storage_chunk.reserve(range.size());
+        for (const auto& vertex : range)
+        {
+            if (inside(graph.vertex_id(&vertex), false))
+                m_test_storage_chunk.push_back(graph.vertex_id(&vertex));
+        }
+        std::lock_guard lock(mergeMutex);
+        if (m_test_storage.capacity() < m_test_storage.size() + m_test_storage_chunk.size())
+            m_test_storage.reserve(m_test_storage.size() + m_test_storage_chunk.size());
+        for (auto x : m_test_storage_chunk)
+            m_test_storage.push_back(x);
+    });
 #endif
 }
 

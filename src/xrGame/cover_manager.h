@@ -44,7 +44,9 @@ public:
 
 protected:
     CPointQuadTree* m_covers;
-    xr_vector<bool> m_temp;
+    // vector<bool> is not applicable for `m_temp`
+    // since it is filled in parallel_for (https://timsong-cpp.github.io/cppwp/container.requirements.dataraces).
+    xr_vector<int> m_temp;
     mutable PointVector m_nearest;
 
 private:
