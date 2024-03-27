@@ -66,3 +66,51 @@ jobs:
             git diff --color=always --minimal
             exit 1
           fi
+
+  clang-format:
+    runs-on: ubuntu-latest
+
+    env:
+      LLVM_VERSION: 18
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install clang-format
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh ${{ env.LLVM_VERSION }}
+          rm -rf llvm.sh
+          sudo apt install clang-format-${{ env.LLVM_VERSION }}
+          git config --global clangFormat.binary "clang-format-${{ env.LLVM_VERSION }}"
+
+      - name: Fix formatting (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        continue-on-error: true
+        run: git clang-format-${{ env.LLVM_VERSION }} ${{ github.event.pull_request.base.sha }} --verbose
+
+      - name: Fix formatting (push)
+        if: ${{ github.event_name == 'push' }}
+        continue-on-error: true
+        run: git clang-format-${{ env.LLVM_VERSION }} HEAD~1 --verbose
+
+      - name: Ignore changes in external code
+        run: |
+          git restore ./Externals
+          git restore ./res
+          git restore ./sdk
+          git restore ./src/utils/mp_gpprof_server/libraries
+
+      - name: Report result
+        run: |
+          if [ -z "$(git status -s)" ]; then
+            echo Everything seems to be in order
+          else
+            echo Formatting problems found!
+            git diff --color=always --minimal
+            exit 1
+          fi
