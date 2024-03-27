@@ -57,7 +57,7 @@ struct Fbox2
     auto& invalidate()
     {
         min.set(type_max<float>, type_max<float>);
-        max.set(type_min<float>, type_min<float>);
+        max.set(type_lowest<float>, type_lowest<float>);
         return *this;
     }
 

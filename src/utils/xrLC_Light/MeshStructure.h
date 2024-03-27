@@ -198,7 +198,7 @@ public:
         t2.sub(v2, v1);
         dN.crossproduct(t1, t2);
         double mag = dN.magnitude();
-        if (mag < dbl_zero)
+        if (mag < dbl_min)
         {
             Failure();
             Dvector Nabs;

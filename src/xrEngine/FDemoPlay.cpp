@@ -114,7 +114,7 @@ void CDemoPlay::stat_Stop()
 
     // min/max/average
     rfps_min = flt_max;
-    rfps_max = flt_min;
+    rfps_max = flt_lowest;
     rfps_middlepoint = 0;
 
     // Filtered FPS

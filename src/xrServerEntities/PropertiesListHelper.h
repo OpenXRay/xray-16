@@ -84,9 +84,9 @@ public:
         PropItemVec& items, shared_str key, float* val, float mn = 0.f, float mx = 86400.f);
     virtual ShortcutValue* CreateShortcut(PropItemVec& items, shared_str key, xr_shortcut* val);
 
-    virtual FloatValue* CreateAngle(PropItemVec& items, shared_str key, float* val, float mn = flt_min,
+    virtual FloatValue* CreateAngle(PropItemVec& items, shared_str key, float* val, float mn = flt_lowest,
         float mx = flt_max, float inc = 0.01f, int decim = 2);
-    virtual VectorValue* CreateAngle3(PropItemVec& items, shared_str key, Fvector* val, float mn = flt_min,
+    virtual VectorValue* CreateAngle3(PropItemVec& items, shared_str key, Fvector* val, float mn = flt_lowest,
         float mx = flt_max, float inc = 0.01f, int decim = 2);
     virtual RTextValue* CreateName(PropItemVec& items, shared_str key, shared_str* val, ListItem* owner);
     virtual RTextValue* CreateNameCB(PropItemVec& items, shared_str key, shared_str* val,

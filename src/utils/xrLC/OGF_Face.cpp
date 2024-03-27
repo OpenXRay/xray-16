@@ -210,7 +210,7 @@ void OGF::Optimize()
                 // 1. Calc bounds
                 Fvector2 Tmin,Tmax;
                 Tmin.set(flt_max,flt_max);
-                Tmax.set(flt_min,flt_min);
+                Tmax.set(flt_lowest,flt_lowest);
                 for (size_t j=0; j<x_vertices.size(); j++)			{
                     x_vertex& V = x_vertices[j];
                     //Tmin.min	(V.UV);
@@ -291,7 +291,7 @@ void OGF::Optimize()
         {
             Fvector2 Tmin, Tmax;
             Tmin.set(flt_max, flt_max);
-            Tmax.set(flt_min, flt_min);
+            Tmax.set(flt_lowest, flt_lowest);
             for (size_t j = 0; j < selection.size(); j++)
             {
                 OGF_Vertex& V = data.vertices[selection[j]];

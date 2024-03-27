@@ -29,10 +29,13 @@ template <typename T>
 constexpr auto type_max = std::numeric_limits<T>::max();
 
 template <typename T>
-constexpr auto type_min = -std::numeric_limits<T>::max();
+constexpr auto type_lowest = std::numeric_limits<T>::lowest();
 
 template <typename T>
-constexpr auto type_zero = std::numeric_limits<T>::min();
+constexpr auto type_min = std::numeric_limits<T>::min();
+
+template <typename T>
+constexpr auto type_zero = T(0);
 
 template <typename T>
 constexpr auto type_epsilon = std::numeric_limits<T>::epsilon();
@@ -43,16 +46,18 @@ constexpr int int_zero = type_zero<int>;
 
 constexpr float flt_max = type_max<float>;
 constexpr float flt_min = type_min<float>;
+constexpr float flt_lowest = type_lowest<float>;
 constexpr float flt_zero = type_zero<float>;
 constexpr float flt_eps = type_epsilon<float>;
 
 #undef FLT_MAX
 #undef FLT_MIN
 #define FLT_MAX flt_max
-#define FLT_MIN flt_min
+#define FLT_MIN flt_lowest
 
 constexpr double dbl_max = type_max<double>;
 constexpr double dbl_min = type_min<double>;
+constexpr double dbl_lowest = type_lowest<double>;
 constexpr double dbl_zero = type_zero<double>;
 constexpr double dbl_eps = type_epsilon<double>;
 
