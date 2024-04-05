@@ -4,10 +4,11 @@
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
+#include "SoundRender_Target.h"
 
 XRSOUND_API extern float psSoundCull;
 
-inline u32 calc_cursor(const float& fTimeStarted, float& fTime, const float& fTimeTotal, const float& fFreq, const WAVEFORMATEX& wfx) //--#SM+#--
+inline u32 calc_cursor(const float& fTimeStarted, float& fTime, const float& fTimeTotal, const float& fFreq, const SoundSourceInfo& info) //--#SM+#--
 {
     if (fTime < fTimeStarted)
         fTime = fTimeStarted; // Андрюха посоветовал, ассерт что ниже вылетел из за паузы как то хитро
@@ -16,8 +17,8 @@ inline u32 calc_cursor(const float& fTimeStarted, float& fTime, const float& fTi
     {
         fTime -= fTimeTotal / fFreq;
     }
-    u32 curr_sample_num = iFloor((fTime - fTimeStarted) * fFreq * wfx.nSamplesPerSec);
-    return curr_sample_num * (wfx.wBitsPerSample / 8) * wfx.nChannels;
+    const u32 curr_sample_num = iFloor((fTime - fTimeStarted) * fFreq * info.samplesPerSec);
+    return curr_sample_num * (info.bitsPerSample / 8) * info.channels;
 }
 
 void CSoundRender_Emitter::update(float fTime, float dt)
@@ -27,6 +28,16 @@ void CSoundRender_Emitter::update(float fTime, float dt)
 
     if (bRewind)
     {
+        if (target)
+            target->wait_prefill();
+
+        const float time = bIgnoringTimeFactor ? SoundRender->TimerPersistent.GetElapsed_sec() : SoundRender->Timer.GetElapsed_sec();
+        const float diff = time - fTimeStarted;
+        fTimeStarted += diff;
+        fTimeToStop += diff;
+        fTimeToPropagade = time;
+
+        set_cursor(0);
         if (target)
             SoundRender->i_rewind(this);
         bRewind = FALSE;
@@ -107,16 +118,16 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         if (fTime >= fTimeToStop)
         {
             // STOP
-            m_current_state = stStopped;
             SoundRender->i_stop(this);
+            m_current_state = stStopped;
         }
         else
         {
             if (!update_culling(dt))
             {
                 // switch to: SIMULATE
-                m_current_state = stSimulating; // switch state
                 SoundRender->i_stop(this);
+                m_current_state = stSimulating;
             }
             else
             {
@@ -140,7 +151,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         }
         else
         {
-            const u32 ptr = calc_cursor(fTimeStarted, fTime, get_length_sec(), p_source.freq, source()->m_wformat); //--#SM+#--
+            const u32 ptr = calc_cursor(fTimeStarted, fTime, get_length_sec(), p_source.freq, source()->m_info); //--#SM+#--
             set_cursor(ptr);
 
             if (update_culling(dt))
@@ -151,7 +162,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
                                 u32 ptr						= calc_cursor(	fTimeStarted,
                                                                             fTime,
                                                                             get_length_sec(),
-                                                                            source()->m_wformat);
+                                                                            source()->m_info);
                                 set_cursor					(ptr);
                 */
                 SoundRender->i_start(this);
@@ -173,8 +184,8 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         if (!update_culling(dt))
         {
             // switch to: SIMULATE
-            m_current_state = stSimulatingLooped; // switch state
             SoundRender->i_stop(this);
+            m_current_state = stSimulatingLooped; // switch state
         }
         else
         {
@@ -193,7 +204,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         {
             // switch to: PLAY
             m_current_state = stPlayingLooped; // switch state
-            const u32 ptr = calc_cursor(fTimeStarted, fTime, get_length_sec(), p_source.freq, source()->m_wformat); //--#SM+#--
+            const u32 ptr = calc_cursor(fTimeStarted, fTime, get_length_sec(), p_source.freq, source()->m_info); //--#SM+#--
             set_cursor(ptr);
 
             SoundRender->i_start(this);
@@ -242,7 +253,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
                 fTimeToStop = fTime + fRemainingTime;
             }
 
-            const u32 ptr = calc_cursor(fTimeStarted, fTime, fLength, p_source.freq, source()->m_wformat);
+            const u32 ptr = calc_cursor(fTimeStarted, fTime, fLength, p_source.freq, source()->m_info);
             set_cursor(ptr);
 
             fTimeToRewind = 0.0f;
@@ -289,8 +300,6 @@ IC void volume_lerp(float& c, float t, float s, float dt)
 
 bool CSoundRender_Emitter::update_culling(float dt)
 {
-    float fAttFactor = 1.0f; //--#SM+#--
-
     if (b2D)
     {
         occluder_volume = 1.f;
@@ -323,30 +332,15 @@ bool CSoundRender_Emitter::update_culling(float dt)
             scene->get_occlusion(p_source.position, .2f, occluder);
         volume_lerp(occluder_volume, occ, 1.f, dt);
         clamp(occluder_volume, 0.f, 1.f);
-
-        // Calc linear fade --#SM+#--
-        // https://www.desmos.com/calculator/lojovfugle
-        const float fMinDistDiff = dist - p_source.min_distance;
-        if (fMinDistDiff > 0.0f)
-        {
-            const float fMaxDistDiff = p_source.max_distance - p_source.min_distance;
-            fAttFactor = pow(1.0f - (fMinDistDiff / fMaxDistDiff), psSoundLinearFadeFactor);
-        }
     }
     clamp(fade_volume, 0.f, 1.f);
-
     // Update smoothing
     smooth_volume = .9f * smooth_volume +
         .1f * (p_source.base_volume * p_source.volume *
                   (owner_data->s_type == st_Effect ? psSoundVEffects * psSoundVFactor : psSoundVMusic) *
                   occluder_volume * fade_volume);
-
-    // Add linear fade --#SM+#--
-    smooth_volume *= fAttFactor;
-
     if (smooth_volume < psSoundCull)
         return FALSE; // allow volume to go up
-
     // Here we has enought "PRIORITY" to be soundable
     // If we are playing already, return OK
     // --- else check availability of resources
@@ -366,10 +360,6 @@ float CSoundRender_Emitter::priority() const
 void CSoundRender_Emitter::update_environment(float dt)
 {
     if (bMoved)
-    {
         e_target = *(CSoundRender_Environment*)scene->get_environment(p_source.position);
-        // Cribbledirge: updates the velocity of the sound.
-        p_source.update_velocity(dt);
-    }
     e_current.lerp(e_current, e_target, dt);
 }

@@ -19,9 +19,7 @@ XRSOUND_API Flags32 psSoundFlags =
 
 XRSOUND_API int psSoundTargets = 32;
 XRSOUND_API float psSoundOcclusionScale = 0.5f;
-XRSOUND_API float psSoundVelocityAlpha = 0.05f;
 XRSOUND_API float psSoundTimeFactor = 1.0f;
-XRSOUND_API float psSoundLinearFadeFactor = 0.4f; //--#SM+#--
 XRSOUND_API float psSoundCull = 0.01f;
 XRSOUND_API float psSoundRolloff = 0.75f;
 XRSOUND_API u32 psSoundModel = 0;
@@ -38,11 +36,9 @@ CSoundRender_Core::CSoundRender_Core(CSoundManager& p)
     : Parent(p)
 {
     bPresent = false;
-    s_targets_pu = 0;
     s_emitters_u = 0;
     e_current.set_identity();
     e_target.set_identity();
-    bListenerMoved = false;
     bReady = false;
     isLocked = false;
     fTimer_Value = Timer.GetElapsed_sec();
@@ -191,8 +187,17 @@ void CSoundRender_Core::env_apply()
     bListenerMoved = true;
 }
 
-void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
+void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt)
 {
+    if (!Listener.position.similar(P))
+    {
+        Listener.position = P;
+        bListenerMoved = true;
+    }
+    Listener.orientation[0] = D;
+    Listener.orientation[1] = N;
+    Listener.orientation[2] = R;
+
     if (!psSoundFlags.test(ss_EFX) || !m_effects)
         return;
 

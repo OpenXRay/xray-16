@@ -62,8 +62,8 @@ static u32 init_counter = 0;
 void SDLLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message);
 
 const pcstr xrCore::buildDate = __DATE__;
-const pcstr xrCore::buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
-const pcstr xrCore::buildBranch = MACRO_TO_STRING(GIT_INFO_CURRENT_BRANCH);
+const pcstr xrCore::buildCommit = GIT_INFO_CURRENT_COMMIT;
+const pcstr xrCore::buildBranch = GIT_INFO_CURRENT_BRANCH;
 
 xrCore::xrCore()
     : ApplicationName{}, ApplicationPath{},
@@ -117,14 +117,14 @@ void xrCore::PrintBuildInfo()
 #if defined(CI)
 #   if defined(APPVEYOR)
     name            = "AppVeyor";
-    buildUniqueId   = MACRO_TO_STRING(APPVEYOR_BUILD_ID);
-    buildId         = MACRO_TO_STRING(APPVEYOR_BUILD_VERSION);
-    builder         = MACRO_TO_STRING(APPVEYOR_ACCOUNT_NAME);
+    buildUniqueId   = APPVEYOR_BUILD_ID;
+    buildId         = APPVEYOR_BUILD_VERSION;
+    builder         = APPVEYOR_ACCOUNT_NAME;
 #   elif defined(GITHUB_ACTIONS)
     name            = "GitHub Actions";
-    buildUniqueId   = MACRO_TO_STRING(GITHUB_RUN_ID);
-    buildId         = MACRO_TO_STRING(GITHUB_RUN_NUMBER);
-    builder         = MACRO_TO_STRING(GITHUB_REPOSITORY);
+    buildUniqueId   = GITHUB_RUN_ID;
+    buildId         = GITHUB_RUN_NUMBER;
+    builder         = GITHUB_REPOSITORY;
 #else
 #   pragma TODO("PrintBuildInfo for other CIs")
     name            = "CI";
@@ -271,8 +271,11 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         flags &= ~CLocatorAPI::flCacheFiles;
 #endif // _EDITOR
 
-        if (xr_stricmp(ApplicationPath, MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR)) != 0)
+// TODO Add proper check for CMake Windows build
+#if !defined(XR_PLATFORM_WINDOWS)
+        if (xr_stricmp(ApplicationPath, CMAKE_INSTALL_FULL_DATAROOTDIR) != 0)
             flags |= CLocatorAPI::flScanAppRoot;
+#endif
 
 #ifndef _EDITOR
 #ifndef ELocatorAPIH

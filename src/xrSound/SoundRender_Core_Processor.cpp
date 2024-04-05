@@ -9,7 +9,7 @@
 #include "SoundRender_Target.h"
 #include "SoundRender_Source.h"
 
-void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector& N)
+void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R)
 {
     if (0 == bReady)
         return;
@@ -76,41 +76,9 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
             }
         }
     }
-    // Get currently rendering emitters
-    s_targets_defer.clear();
-    s_targets_pu++;
-
-    for (CSoundRender_Target* T : s_targets)
-    {
-        if (T->get_emitter())
-        {
-            // Has emmitter, maybe just not started rendering
-            if (T->get_Rendering())
-            {
-                T->update();
-            }
-            else
-                s_targets_defer.push_back(T);
-        }
-    }
-
-    // Commit parameters from pending targets
-    if (!s_targets_defer.empty())
-    {
-        s_targets_defer.erase(std::unique(s_targets_defer.begin(), s_targets_defer.end()), s_targets_defer.end());
-        for (CSoundRender_Target* target : s_targets_defer)
-            target->fill_parameters();
-    }
 
     // update listener
-    update_listener(P, D, N, fTimer_Delta);
-
-    // Start rendering of pending targets
-    if (!s_targets_defer.empty())
-    {
-        for (CSoundRender_Target* target : s_targets_defer)
-            target->render();
-    }
+    update_listener(P, D, N, R, fTimer_Delta);
 
     // Events
     for (CSoundRender_Scene* scene : m_scenes)
@@ -118,6 +86,27 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
 
     isLocked = false;
     Stats.Update.End();
+}
+
+void CSoundRender_Core::render()
+{
+    isLocked = true;
+    Stats.Render.Begin();
+
+    for (CSoundRender_Target* T : s_targets)
+    {
+        if (T->get_emitter())
+        {
+            T->fill_parameters();
+            if (T->get_Rendering())
+                T->update();
+            else
+                T->render();
+        }
+    }
+
+    Stats.Render.End();
+    isLocked = false;
 }
 
 void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
@@ -177,6 +166,7 @@ void CSoundRender_Core::DumpStatistics(IGameFont& font, IPerformanceAlert* alert
     CSound_stats sndStat;
     statistic(&sndStat, nullptr);
     font.OutNext("*** SOUND:    %2.2fms", Stats.Update.result);
+    font.OutNext("    RENDER:   %2.2fms", Stats.Render.result);
     font.OutNext("Rendered:     %d", sndStat._rendered);
     font.OutNext("Simulated:    %d", sndStat._simulated);
     font.OutNext("Events:       %d", sndStat._events);

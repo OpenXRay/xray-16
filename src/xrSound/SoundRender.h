@@ -10,7 +10,7 @@ class CSoundRender_Target;
 class CSoundRender_Environment;
 class SoundEnvironment_LIB;
 
-const u32 sdef_target_count = 3; //
+const u32 sdef_target_count = 5; //
 const u32 sdef_target_block = 400; // ms
 const u32 sdef_target_size = sdef_target_count * sdef_target_block; // ms
 const u32 sdef_env_version = 4; // current version of env-def

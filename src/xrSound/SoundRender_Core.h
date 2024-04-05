@@ -12,18 +12,42 @@ class CSoundRender_Core : public ISoundManager
 protected:
     struct SoundStatistics
     {
-        CStatTimer Update; // total time taken by sound subsystem (accurate only in single-threaded mode)
+        CStatTimer Update;
+        CStatTimer Render;
 
         SoundStatistics() { FrameStart(); }
-        void FrameStart() { Update.FrameStart(); }
-        void FrameEnd() { Update.FrameEnd(); }
+        void FrameStart() { Update.FrameStart(); Render.FrameStart(); }
+        void FrameEnd() { Update.FrameEnd(); Render.FrameEnd(); }
     };
 
 private:
     volatile bool isLocked;
 
+public:
+    struct SListener
+    {
+        Fvector position;
+        Fvector orientation[3];
+
+        [[nodiscard]]
+        SListener ToRHS() const
+        {
+            return
+            {
+                { position.x, position.y, -position.z },
+                {
+                    { orientation[0].x, orientation[0].y, -orientation[0].z },
+                    { orientation[1].x, orientation[1].y, -orientation[1].z },
+                    { orientation[2].x, orientation[2].y, -orientation[2].z },
+                },
+            };
+        }
+    };
+
 protected:
-    bool bListenerMoved;
+    SListener Listener;
+
+    bool bListenerMoved{};
 
     CSoundRender_Environment e_current;
     CSoundRender_Environment e_target;
@@ -51,8 +75,6 @@ protected:
 
     u32 s_emitters_u; // emitter update marker
     xr_vector<CSoundRender_Target*> s_targets;
-    xr_vector<CSoundRender_Target*> s_targets_defer;
-    u32 s_targets_pu; // parameters update
 
     CSoundRender_Effects* m_effects{};
 
@@ -90,13 +112,15 @@ public:
 
     void set_master_volume(float f) override = 0;
 
-    void update(const Fvector& P, const Fvector& D, const Fvector& N) override;
+    void update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R) override;
+    void render() override;
     void statistic(CSound_stats* dest, CSound_stats_ext* ext) override;
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     // listener
-    //	virtual const Fvector&				listener_position		( )=0;
-    virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) = 0;
+    const auto& listener_params() const { return Listener; }
+    const Fvector& listener_position() override { return Listener.position; }
+    virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt);
 
     void refresh_sources() override;
 

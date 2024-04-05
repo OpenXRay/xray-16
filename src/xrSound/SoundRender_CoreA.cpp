@@ -159,25 +159,13 @@ void CSoundRender_CoreA::_clear()
     xr_delete(pDeviceList);
 }
 
-void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
+void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt)
 {
-    inherited::update_listener(P, D, N, dt);
+    inherited::update_listener(P, D, N, R, dt);
 
-    // Use exponential moving average for a nice smooth doppler effect.
-    Listener.prevVelocity.set(Listener.accVelocity);
-    Listener.curVelocity.sub(P, Listener.position);
-    Listener.accVelocity.set(Listener.curVelocity.mul(psSoundVelocityAlpha).add(Listener.prevVelocity.mul(1.f - psSoundVelocityAlpha)));
-    Listener.prevVelocity.set(Listener.accVelocity).div(dt);
+    const auto listener = Listener.ToRHS();
 
-    if (!Listener.position.similar(P))
-    {
-        Listener.position.set(P);
-        bListenerMoved = TRUE;
-    }
-    Listener.orientation[0].set(D.x, D.y, -D.z);
-    Listener.orientation[1].set(N.x, N.y, -N.z);
-
-    A_CHK(alListener3f(AL_POSITION, Listener.position.x, Listener.position.y, -Listener.position.z));
-    A_CHK(alListener3f(AL_VELOCITY, Listener.prevVelocity.x, Listener.prevVelocity.y, -Listener.prevVelocity.z));
-    A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&Listener.orientation[0].x));
+    A_CHK(alListener3f(AL_POSITION, listener.position.x, listener.position.y, listener.position.z));
+    A_CHK(alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f));
+    A_CHK(alListenerfv(AL_ORIENTATION, &listener.orientation[0].x));
 }

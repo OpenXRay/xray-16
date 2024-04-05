@@ -62,14 +62,6 @@ void CSoundRender_Emitter::stop(bool isDeffered)
 void CSoundRender_Emitter::rewind()
 {
     bStopping = FALSE;
-
-    const float fTime = bIgnoringTimeFactor ? SoundRender->TimerPersistent.GetElapsed_sec() : SoundRender->Timer.GetElapsed_sec();
-    float fDiff = fTime - fTimeStarted;
-    fTimeStarted += fDiff;
-    fTimeToStop += fDiff;
-    fTimeToPropagade = fTime;
-
-    set_cursor(0);
     bRewind = TRUE;
 }
 
@@ -94,13 +86,13 @@ void CSoundRender_Emitter::cancel()
     {
     case stPlaying:
         // switch to: SIMULATE
-        m_current_state = stSimulating; // switch state
         SoundRender->i_stop(this);
+        m_current_state = stSimulating; // switch state
         break;
     case stPlayingLooped:
         // switch to: SIMULATE
-        m_current_state = stSimulatingLooped; // switch state
         SoundRender->i_stop(this);
+        m_current_state = stSimulatingLooped; // switch state
         break;
     default: FATAL("Non playing ref_sound forced out of render queue"); break;
     }

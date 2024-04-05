@@ -845,7 +845,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
              * I propose adding shaders from <CMAKE_INSTALL_FULL_DATAROOTDIR>/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
              * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
             chdir(pref_path);
-            static constexpr pcstr install_dir = MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR);
+            static constexpr pcstr install_dir = CMAKE_INSTALL_FULL_DATAROOTDIR;
             string_path tmp, tmp_link;
             xr_sprintf(tmp, "%sfsgame.ltx", pref_path);
             struct stat statbuf;

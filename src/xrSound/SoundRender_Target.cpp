@@ -4,10 +4,16 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
+#include "xrCore/Threading/TaskManager.hpp"
 
 CSoundRender_Target::CSoundRender_Target()
 {
     buffers_to_prefill.reserve(sdef_target_count);
+}
+
+void CSoundRender_Target::_destroy()
+{
+    wait_prefill();
 }
 
 void CSoundRender_Target::start(CSoundRender_Emitter* E)
@@ -23,21 +29,38 @@ void CSoundRender_Target::start(CSoundRender_Emitter* E)
     //m_pEmitter->source()->attach();
 
     // Calc storage
-    buf_block = sdef_target_block * E->source()->m_wformat.nAvgBytesPerSec / 1000;
     for (auto& buf : temp_buf)
-        buf.resize(buf_block);
+        buf.resize(E->source()->m_info.bytesPerBuffer);
+
+    dispatch_prefill_all();
 }
 
-void CSoundRender_Target::render() { rendering = true; }
+void CSoundRender_Target::render()
+{
+    VERIFY(!rendering);
+    rendering = true;
+    wait_prefill();
+}
+
 void CSoundRender_Target::stop()
 {
+    wait_prefill();
     m_pEmitter->source()->detach();
     m_pEmitter = nullptr;
     rendering = false;
 }
 
-void CSoundRender_Target::rewind() { R_ASSERT(rendering); }
-void CSoundRender_Target::update() { R_ASSERT(m_pEmitter); }
+void CSoundRender_Target::rewind()
+{
+    R_ASSERT(rendering);
+}
+
+void CSoundRender_Target::update()
+{
+    R_ASSERT(m_pEmitter);
+    wait_prefill();
+}
+
 void CSoundRender_Target::fill_parameters()
 {
     VERIFY(m_pEmitter);
@@ -48,12 +71,45 @@ void CSoundRender_Target::fill_parameters()
 void CSoundRender_Target::fill_block(size_t idx)
 {
     R_ASSERT(m_pEmitter);
-    m_pEmitter->fill_block(temp_buf[idx].data(), buf_block);
+    m_pEmitter->fill_block(temp_buf[idx].data(), temp_buf[idx].size());
 }
 
-void CSoundRender_Target::prefill_block(Task&, void*)
+void CSoundRender_Target::fill_all_blocks()
+{
+    for (size_t i = 0; i < sdef_target_count; ++i)
+        fill_block(i);
+}
+
+void CSoundRender_Target::prefill_blocks(Task&, void*)
 {
     for (const size_t idx : buffers_to_prefill)
         fill_block(idx);
     buffers_to_prefill.clear();
+    prefill_task.store(nullptr, std::memory_order_release);
+}
+
+void CSoundRender_Target::prefill_all_blocks(Task&, void*)
+{
+    fill_all_blocks();
+    prefill_task.store(nullptr, std::memory_order_release);
+}
+
+void CSoundRender_Target::wait_prefill() const
+{
+    if (const auto task = prefill_task.load(std::memory_order_relaxed))
+        TaskScheduler->Wait(*task);
+}
+
+void CSoundRender_Target::dispatch_prefill()
+{
+    wait_prefill();
+    const auto task = &TaskScheduler->AddTask("CSoundRender_Target::dispatch_prefill()", { this, &CSoundRender_Target::prefill_blocks });
+    prefill_task.store(task, std::memory_order_release);
+}
+
+void CSoundRender_Target::dispatch_prefill_all()
+{
+    wait_prefill();
+    const auto task = &TaskScheduler->AddTask("CSoundRender_Target::dispatch_prefill_all()", { this, &CSoundRender_Target::prefill_all_blocks });
+    prefill_task.store(task, std::memory_order_release);
 }
