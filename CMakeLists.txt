@@ -231,6 +231,16 @@ add_compile_definitions(
 
 if (NOT WIN32)
     find_package(SDL2 REQUIRED)
+    # Fix to support older SDL2
+    # https://github.com/OpenXRay/xray-16/issues/1595
+    if (NOT TARGET SDL2::SDL2 AND DEFINED SDL2_LIBRARIES)
+        add_library(SDL2::SDL2 UNKNOWN IMPORTED)
+        set_target_properties(
+            SDL2::SDL2 PROPERTIES
+            IMPORTED_LOCATION "${SDL2_LIBRARIES}"
+            INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
+        )
+    endif()
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
     find_package(OpenAL REQUIRED)
