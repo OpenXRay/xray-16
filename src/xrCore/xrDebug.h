@@ -102,7 +102,7 @@ public:
     static void SetUserConfigHandler(IUserConfigHandler* handler) { userConfigHandler = handler; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
     static void SetOutOfMemoryCallback(OutOfMemoryCallbackFunc cb) { OutOfMemoryCallback = cb; }
-    static const char* ErrorToString(long code);
+    static pcstr ErrorToString(long code);
     static void SetBugReportFile(const char* fileName);
     static void GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
                            const char* desc, const char* arg1 = nullptr, const char* arg2 = nullptr);
@@ -140,7 +140,7 @@ private:
 
 // forward declaration
 // Definition is in xrCore/_std_extensions.h
-inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR format_string, ...);
+inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, pcstr format_string, ...);
 
 // for debug purposes only
 template<typename... Args>

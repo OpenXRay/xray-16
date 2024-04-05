@@ -189,7 +189,7 @@ public:
     IC const CPartDef& part(u16 id) const { return P[id]; }
     [[nodiscard]] u16 part_id(const shared_str& name) const;
     [[nodiscard]] u32 mem_usage() const { return P[0].mem_usage() * MAX_PARTS; }
-    void load(IKinematics* V, LPCSTR model_name);
+    void load(IKinematics* V, pcstr model_name);
 
     [[nodiscard]] u8 count() const
     {
@@ -214,7 +214,7 @@ struct XRCORE_API motions_value
 
     shared_str m_id;
 
-    BOOL load(LPCSTR N, IReader* data, vecBones* bones);
+    BOOL load(pcstr N, IReader* data, vecBones* bones);
     MotionVec* bone_motions(shared_str bone_name);
 
     u32 mem_usage()

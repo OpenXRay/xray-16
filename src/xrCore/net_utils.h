@@ -33,7 +33,7 @@ struct XRCORE_API IIniFileStream
     virtual void __stdcall w_s16(s16 a) = 0;
     virtual void __stdcall w_u8(u8 a) = 0;
     virtual void __stdcall w_s8(s8 a) = 0;
-    virtual void __stdcall w_stringZ(LPCSTR S) = 0;
+    virtual void __stdcall w_stringZ(pcstr S) = 0;
 
     virtual void __stdcall r_vec3(Fvector&) = 0;
     virtual void __stdcall r_vec4(Fvector4&) = 0;
