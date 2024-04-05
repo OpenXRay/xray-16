@@ -69,19 +69,18 @@ void SanitizeString(pcstr str)
 {
     pstr mut_str = const_cast<pstr>(str);
 
-    while(*mut_str != '\0')
+    while (*mut_str != '\0')
     {
         switch (*mut_str)
         {
-            case '\\':
-            case '/':
-            case ',':
-            case '.':
-                *mut_str = '_';
-                [[fallthrough]];
-
-            default:
-                ++mut_str;
+        case '\\':
+        case '/':
+        case ',':
+        case '.':
+            *mut_str = '_';
+            [[fallthrough]];
+        default:
+            ++mut_str;
         }
     }
 }
@@ -245,7 +244,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         if (pw)
         {
             strncpy(UserName, pw->pw_gecos, sizeof(UserName) - 1);
-            if(UserName[0] == '\0')
+            if (UserName[0] == '\0')
                 strncpy(UserName, pw->pw_name, sizeof(UserName) - 1);
         }
         else
