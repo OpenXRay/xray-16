@@ -239,9 +239,9 @@ add_compile_definitions(
 
 if (NOT WIN32)
     find_package(SDL2 REQUIRED)
-    # ref: issue-1595
     # Fix to support older SDL2
-    if(NOT TARGET SDL2::SDL2 AND DEFINED SDL2_LIBRARIES)
+    # https://github.com/OpenXRay/xray-16/issues/1595
+    if (NOT TARGET SDL2::SDL2 AND DEFINED SDL2_LIBRARIES)
         add_library(SDL2::SDL2 UNKNOWN IMPORTED)
         set_target_properties(
             SDL2::SDL2 PROPERTIES
