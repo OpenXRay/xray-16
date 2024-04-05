@@ -31,15 +31,15 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
         dest.ps = RImplementation.Resources->_CreatePS(_ps);
         ctable.merge(&dest.ps->constants);
         u32 flags = 0;
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         if (dest.ps->constants.dx9compatibility)
             flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 #endif
         dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
         ctable.merge(&dest.vs->constants);
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
         dest.gs = RImplementation.Resources->_CreateGS("null");
-#    ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         dest.hs = RImplementation.Resources->_CreateHS("null");
         dest.ds = RImplementation.Resources->_CreateDS("null");
         dest.cs = RImplementation.Resources->_CreateCS("null");
@@ -142,7 +142,7 @@ u32 CBlender_Compile::r_Sampler(
     dwStage = i_Sampler(_name);
     if (u32(-1) != dwStage)
     {
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         r_dx11Texture(_name, texture, true);
 #elif defined(USE_DX9) || defined(USE_OGL)
         i_Texture(dwStage, texture);

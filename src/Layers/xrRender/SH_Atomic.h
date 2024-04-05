@@ -5,7 +5,7 @@
 #include "xrCore/xr_resource.h"
 #include "tss_def.h"
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
 #elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glState.h"
@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////////
 // Atomic resources
 //////////////////////////////////////////////////////////////////////////
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 struct ECORE_API SInputSignature : public xr_resource_flagged
 {
     ID3DBlob* signature;
@@ -28,7 +28,7 @@ typedef resptr_core<SInputSignature, resptr_base<SInputSignature>> ref_input_sig
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SVS : public xr_resource_named
 {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     ID3DVertexShader* sh;
 #elif defined(USE_OGL)
     GLuint sh;
@@ -36,7 +36,7 @@ struct ECORE_API SVS : public xr_resource_named
 #   error No graphics API selected or enabled!
 #endif
     R_constant_table constants;
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ref_input_sign signature;
 #endif
     SVS();
@@ -47,7 +47,7 @@ typedef resptr_core<SVS, resptr_base<SVS>> ref_vs;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SPS : public xr_resource_named
 {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     ID3DPixelShader* sh;
 #elif defined(USE_OGL)
     GLuint sh;
@@ -59,11 +59,11 @@ struct ECORE_API SPS : public xr_resource_named
 };
 typedef resptr_core<SPS, resptr_base<SPS>> ref_ps;
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SGS : public xr_resource_named
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ID3DGeometryShader* sh;
 #   elif defined(USE_OGL)
     GLuint sh;
@@ -77,7 +77,7 @@ typedef resptr_core<SGS, resptr_base<SGS>> ref_gs;
 
 struct ECORE_API SHS : public xr_resource_named
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 	ID3D11HullShader* sh;
 #   elif defined(USE_OGL)
     GLuint sh;
@@ -91,7 +91,7 @@ typedef resptr_core<SHS, resptr_base<SHS>> ref_hs;
 
 struct ECORE_API SDS : public xr_resource_named
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ID3D11DomainShader* sh;
 #   elif defined(USE_OGL)
     GLuint sh;
@@ -105,7 +105,7 @@ typedef resptr_core<SDS, resptr_base<SDS>> ref_ds;
 
 struct ECORE_API SCS : public xr_resource_named
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ID3D11ComputeShader* sh;
 #   elif defined(USE_OGL)
     GLuint sh;
@@ -150,7 +150,7 @@ struct ECORE_API SDeclaration : public xr_resource_flagged
 #if defined(USE_DX9) //	Don't need it: use ID3DInputLayout instead
     //	which is per ( declaration, VS input layout) pair
     IDirect3DVertexDeclaration9* dcl;
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     //	Maps input signature to input layout
     xr_map<ID3DBlob*, ID3DInputLayout*> vs_to_layout;
     xr_vector<D3D_INPUT_ELEMENT_DESC> dx11_dcl_code;

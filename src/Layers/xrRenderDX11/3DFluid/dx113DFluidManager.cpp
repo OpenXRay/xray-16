@@ -104,6 +104,8 @@ void dx113DFluidManager::Initialize(int width, int height, int depth)
     InitShaders();
 
     D3D_TEXTURE3D_DESC desc;
+    ZeroMemory(&desc, sizeof(D3D_TEXTURE3D_DESC));
+
     desc.BindFlags = D3D_BIND_SHADER_RESOURCE | D3D_BIND_RENDER_TARGET;
     desc.CPUAccessFlags = 0;
     desc.MipLevels = 1;
@@ -114,7 +116,8 @@ void dx113DFluidManager::Initialize(int width, int height, int depth)
     desc.Depth = depth;
 
     D3D_SHADER_RESOURCE_VIEW_DESC SRVDesc;
-    ZeroMemory(&SRVDesc, sizeof(SRVDesc));
+    ZeroMemory(&SRVDesc, sizeof(D3D_SHADER_RESOURCE_VIEW_DESC));
+
     SRVDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE3D;
     SRVDesc.Texture3D.MipLevels = 1;
     SRVDesc.Texture3D.MostDetailedMip = 0;
@@ -225,6 +228,8 @@ void dx113DFluidManager::CreateRTTextureAndViews(size_t rtIndex, D3D_TEXTURE3D_D
     CHK_DX(HW.pDevice->CreateTexture3D(&TexDesc, NULL, &pRT));
     // Create the render target view
     D3D_RENDER_TARGET_VIEW_DESC DescRT;
+    ZeroMemory(&DescRT, sizeof(D3D_RENDER_TARGET_VIEW_DESC)); 
+
     DescRT.Format = TexDesc.Format;
     DescRT.ViewDimension = D3D_RTV_DIMENSION_TEXTURE3D;
     DescRT.Texture3D.FirstWSlice = 0;

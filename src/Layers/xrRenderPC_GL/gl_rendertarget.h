@@ -210,7 +210,7 @@ private:
     bool m_bHasActiveVolumetric;
 
 public:
-    CRenderTarget();
+    CRenderTarget(bool reset = false);
     ~CRenderTarget() override;
 
     void build_textures();

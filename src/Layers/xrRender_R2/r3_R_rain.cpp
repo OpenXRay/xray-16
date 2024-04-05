@@ -6,7 +6,7 @@
 #include "xrEngine/IRenderable.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 #include "DirectXMath.h"
 using namespace DirectX;
 #elif defined(USE_OGL)
@@ -86,7 +86,7 @@ void render_rain::calculate()
 
         ex_project.build_projection(deg2rad(Device.fFOV /* * Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, fRainFar);
         ex_full.mul(ex_project, Device.mView);
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&ex_full_inverse),
             XMMatrixInverse(nullptr, XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&ex_full))));
 #elif defined(USE_OGL)
@@ -200,7 +200,7 @@ void render_rain::calculate()
         bb.vMin.y = -fBoundingSphereRadius + vRectOffset.z;
         bb.vMax.y = fBoundingSphereRadius + vRectOffset.z;
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&mdir_Project),
             XMMatrixOrthographicOffCenterLH(
                 bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
@@ -225,7 +225,7 @@ void render_rain::calculate()
         // build viewport xform
         float view_dim = float(limit);
         float fTexelOffs = .5f / RImplementation.o.rain_smapsize;
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         Fmatrix m_viewport =
         {
             view_dim / 2.f, 0.0f, 0.0f, 0.0f,

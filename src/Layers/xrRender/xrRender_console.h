@@ -215,6 +215,8 @@ enum
     R3FLAGEXT_SSR_HALF_DEPTH = (1 << 10),
     R3FLAGEXT_SSR_JITTER = (1 << 11),
     R4FLAGEXT_NEW_SHADER_SUPPORT = (1 << 12),
+
+    R5FLAGEXT_SUBMISSION_THREAD = (1 << 13),
 };
 
 extern void xrRender_initconsole();

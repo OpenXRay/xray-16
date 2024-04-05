@@ -44,7 +44,7 @@ static void ApplyTexgen(CBackend& cmd_list, const Fmatrix& mVP)
         0.0f, 0.0f, 1.0f, 0.0f,
         0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
     };
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     Fmatrix mTexelAdjust =
     {
         0.5f, 0.0f, 0.0f, 0.0f,

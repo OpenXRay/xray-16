@@ -173,8 +173,11 @@ void ide::OnFrame()
 
 void ide::OnRender()
 {
-    ImGui::Render();
-    m_render->Render(ImGui::GetDrawData());
+    if (m_state != visible_state::hidden)
+    {
+        ImGui::Render();
+        m_render->Render(ImGui::GetDrawData());
+    }
 }
 
 void ide::ShowMain()

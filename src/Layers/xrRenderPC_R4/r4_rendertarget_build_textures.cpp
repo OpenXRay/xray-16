@@ -44,7 +44,7 @@ void CRenderTarget::build_textures()
         desc.CPUAccessFlags = D3D_CPU_ACCESS_READ;
         desc.MiscFlags = 0;
 
-        R_CHK(HW.pDevice->CreateTexture2D(&desc, 0, &t_ss_async));
+        R_CHK(HW.pDevice->CreateTexture2D(&desc, NULL, &t_ss_async));
     }
     // Build material(s)
     {

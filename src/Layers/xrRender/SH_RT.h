@@ -16,7 +16,11 @@ public:
 
     CRT() = default;
     ~CRT();
+#if defined(USE_DX12)
+    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {}, Fcolor color = {0.0f, 0.0f, 0.0f, 1.0f});
+#else 
     void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
+#endif 
     void destroy();
     void reset_begin();
     void reset_end();
@@ -28,10 +32,10 @@ public:
     void resolve_into(CRT& destination) const; // only RTs with same format supported
 
 public:
-#if defined(USE_DX9) || (USE_DX11)
+#if defined(USE_DX9) || (USE_DX11) || defined(USE_DX12)
     ID3DTexture2D* pSurface{};
     ID3DRenderTargetView* pRT{};
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ID3DDepthStencilView* pZRT[R__NUM_CONTEXTS]{};
     ID3DDepthStencilView* dsv_all{};
     xr_vector<ID3DDepthStencilView*> dsv_per_slice;
@@ -58,11 +62,19 @@ public:
 
 struct resptrcode_crt : public resptr_base<CRT>
 {
+#if defined(USE_DX12)
+    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {}, Fcolor color = {0.0f, 0.0f, 0.0f, 0.0f})
+    {
+        create(Name, w, h, f, SampleCount, 1, flags, color);
+    }
+    void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, u32 slices_num, Flags32 flags, Fcolor color);
+#else 
     void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, Flags32 flags = {})
     {
         create(Name, w, h, f, SampleCount, 1, flags);
     }
     void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, u32 slices_num, Flags32 flags);
+#endif
     void destroy() { _set(nullptr); }
 };
 typedef resptr_core<CRT, resptrcode_crt> ref_rt;

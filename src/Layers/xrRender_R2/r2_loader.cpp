@@ -7,7 +7,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrCore/stream_reader.h"
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 #include "Layers/xrRender/FHierrarhyVisual.h"
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidVolume.h"
 #endif
@@ -84,7 +84,7 @@ void CRender::level_Load(IReader* fs)
     g_pGamePersistent->LoadTitle("st_loading_sectors_portals");
     LoadSectors(fs);
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     // 3D Fluid
     Load3DFluid();
 #endif
@@ -449,7 +449,7 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
     }
 }
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 void CRender::Load3DFluid()
 {
     // if (strstr(Core.Params,"-no_volumetric_fog"))

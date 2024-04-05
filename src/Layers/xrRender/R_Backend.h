@@ -17,8 +17,13 @@
 #include "R_Backend_hemi.h"
 #include "R_Backend_tree.h"
 
-#ifdef USE_DX11
+#if defined(USE_DX11) 
 #include "Layers/xrRenderPC_R4/r_backend_lod.h"
+#elif defined(USE_DX12)
+#include "Layers/xrRenderPC_R5/r_backend_lod.h"
+#endif
+
+#if defined(USE_DX11) || defined(USE_DX12)
 #include "Layers/xrRenderDX11/StateManager/dx11StateManager.h"
 #include "Layers/xrRenderDX11/StateManager/dx11ShaderResourceStateCache.h"
 #include "Layers/xrRenderDX11/StateManager/dx11StateCache.h"
@@ -71,11 +76,11 @@ public:
     R_xforms xforms;
     R_hemi hemi;
     R_tree tree;
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
     R_LOD LOD;
 #endif
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ref_cbuffer m_aVertexConstants[MaxCBuffers];
     ref_cbuffer m_aPixelConstants[MaxCBuffers];
 
@@ -93,7 +98,10 @@ public:
 #endif
 private:
     // Render-targets
-#if defined(USE_DX9) || defined (USE_DX11)
+#if defined(USE_DX12)
+    ID3DRenderTargetView* pRT[8];
+    ID3DDepthStencilView* pZB;
+#elif defined(USE_DX9) || defined(USE_DX11) 
     ID3DRenderTargetView* pRT[4];
     ID3DDepthStencilView* pZB;
 #elif defined(USE_OGL)
@@ -119,7 +127,7 @@ private:
 #if defined(USE_DX9)
     ID3DPixelShader* ps;
     ID3DVertexShader* vs;
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     ID3DPixelShader* ps;
     ID3DVertexShader* vs;
     ID3DGeometryShader* gs;
@@ -140,7 +148,7 @@ private:
     LPCSTR vs_name;
 #ifndef USE_DX9
     LPCSTR gs_name;
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     LPCSTR hs_name;
     LPCSTR ds_name;
     LPCSTR cs_name;
@@ -177,7 +185,7 @@ private:
     CTexture* textures_vs[CTexture::mtMaxVertexShaderTextures]; // 4 vs
 #ifndef USE_DX9
     CTexture* textures_gs[CTexture::mtMaxGeometryShaderTextures]; // 4 vs
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     CTexture* textures_hs[CTexture::mtMaxHullShaderTextures]; // 4 vs
     CTexture* textures_ds[CTexture::mtMaxDomainShaderTextures]; // 4 vs
     CTexture* textures_cs[CTexture::mtMaxComputeShaderTextures]; // 4 vs
@@ -237,7 +245,7 @@ public:
 
         if (stage < CTexture::rstGeometry)
             return textures_vs[stage - CTexture::rstVertex];
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         if (stage < CTexture::rstHull)
             return textures_gs[stage - CTexture::rstGeometry];
 
@@ -263,7 +271,7 @@ public:
 #if defined(USE_DX9)
     R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
     R_constant_array& get_ConstantCache_Pixel() { return constants.a_pixel; }
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     IC void get_ConstantDirect(const shared_str& n, size_t DataSize, void** pVData, void** pGData, void** pPData);
 #endif
 
@@ -283,7 +291,7 @@ public:
 
     IC void set_pass_targets(const ref_rt& mrt0, const ref_rt& mrt1, const ref_rt& mrt2, const ref_rt& zb);
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     IC void set_RT(ID3DRenderTargetView* RT, u32 ID = 0);
     IC void set_ZB(ID3DDepthStencilView* ZB);
     IC ID3DRenderTargetView* get_RT(u32 ID = 0);
@@ -299,7 +307,7 @@ public:
 #   error No graphics API selected or enabled!
 #endif
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     IC void ClearRT(ID3DRenderTargetView* rt, const Fcolor& color);
 
     IC void ClearZB(ID3DDepthStencilView* zb, float depth);
@@ -332,7 +340,7 @@ public:
     {
         return ClearZBRect(zb->pRT, depth, numRects, rects);
     }
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT[context_id], depth); }
     ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT[context_id], depth, stencil); }
     ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
@@ -367,7 +375,7 @@ public:
     ICF void set_Format(SDeclaration* _decl);
 
 private:
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     ICF void set_PS(ID3DPixelShader* _ps, LPCSTR _n = nullptr);
 #elif defined(USE_OGL)
     ICF void set_PS(GLuint _ps, LPCSTR _n = 0);
@@ -380,7 +388,7 @@ private:
 #ifndef USE_DX9
     ICF void set_GS(ref_gs& _gs) { set_GS(_gs->sh, _gs->cName.c_str()); }
 
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ICF void set_GS(ID3DGeometryShader* _gs, LPCSTR _n = nullptr);
 
     ICF void set_HS(ID3D11HullShader* _hs, LPCSTR _n = nullptr);
@@ -398,11 +406,11 @@ private:
 
     ICF void set_VS(ref_vs& _vs);
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ICF void set_VS(SVS* _vs);
 #endif
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     ICF void set_VS(ID3DVertexShader* _vs, LPCSTR _n = nullptr);
 #elif defined(USE_OGL)
     ICF void set_VS(GLuint _vs, LPCSTR _n = 0);
@@ -411,7 +419,7 @@ private:
 #endif
 
 public:
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ICF void set_CS(ID3D11ComputeShader* _cs, LPCSTR _n = nullptr);
     ICF void set_CS(ref_cs& _cs) { set_CS(_cs->sh, _cs->cName.c_str()); }
     ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
@@ -420,7 +428,7 @@ public:
 public:
 #if defined(USE_DX9) || defined(USE_OGL)
     ICF bool is_TessEnabled() { return false; }
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     ICF bool is_TessEnabled();
 #else
 #   error No graphics API selected or enabled!
@@ -530,7 +538,11 @@ public:
 
     ICF void submit()
     {
-#ifdef USE_DX11
+#if defined(USE_DX12)
+#if USE_DX12_DEFERRED_CONTEXT
+        HW.get_context(context_id)->Flush();
+#endif
+#elif defined(USE_DX11) 
         VERIFY(context_id != CHW::IMM_CTX_ID);
         ID3D11CommandList* pCommandList{ nullptr };
         CHK_DX(HW.get_context(context_id)->FinishCommandList(false, &pCommandList));
@@ -580,7 +592,7 @@ public:
         : xforms(*this)
         , tree(*this)
         , hemi(*this)
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
         , LOD(*this)
         , constants(*this)
         , StateManager(*this)
@@ -600,7 +612,7 @@ private:
     ref_geom vs_TL;
 #endif
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
 private:
     //	DirectX 11+ internal functionality
     // void CreateConstantBuffers();
@@ -612,7 +624,10 @@ private:
 
 private:
     ID3DBlob* m_pInputSignature{ nullptr };
+
+#if defined(USE_DX11)
     ID3DUserDefinedAnnotation* pAnnotation{ nullptr };
+#endif
 
     bool m_bChangedRTorZB;
 

@@ -19,14 +19,14 @@ public:
         mtMaxPixelShaderTextures
         + mtMaxVertexShaderTextures
     };
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     enum	MaxTextures
     {
         //	Actually these values are 128
         mtMaxPixelShaderTextures = 16,
         mtMaxVertexShaderTextures = 4,
         mtMaxGeometryShaderTextures = 16,
-#	ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         mtMaxHullShaderTextures = 16,
         mtMaxDomainShaderTextures = 16,
         mtMaxComputeShaderTextures = 16,
@@ -35,7 +35,7 @@ public:
         mtMaxPixelShaderTextures
         + mtMaxVertexShaderTextures
         + mtMaxGeometryShaderTextures
-#	ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_DX12)
         + mtMaxHullShaderTextures
         + mtMaxDomainShaderTextures
         + mtMaxComputeShaderTextures
@@ -45,7 +45,7 @@ public:
 #   error No graphics API selected or enabled!
 #endif
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     //	Since DX11 allows up to 128 unique textures,
     //	distance between enum values should be at leas 128
     enum ResourceShaderType //	Don't change this since it's hardware-dependent
@@ -87,7 +87,7 @@ public:
     void Unload();
     // void Apply(u32 dwStage);
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     void surface_set(ID3DBaseTexture* surf);
     [[nodiscard]] ID3DBaseTexture* surface_get() const;
 #elif defined(USE_OGL)
@@ -123,7 +123,7 @@ public:
     CTexture();
     virtual ~CTexture();
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ID3DShaderResourceView* get_SRView() { return m_pSRView; }
 #endif
 
@@ -140,7 +140,7 @@ private:
     }
 
     void desc_update();
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     void Apply(CBackend& cmd_list, u32 dwStage) const;
     D3D_USAGE GetUsage();
 #endif
@@ -172,7 +172,7 @@ public: //	Public class members (must be encapsulated further)
     int last_slice{ -1 };
 
 private:
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     ID3DBaseTexture* pSurface{};
     ID3DBaseTexture* pTempSurface{};
     // Sequence data
@@ -197,7 +197,7 @@ private:
 #   error No graphics API selected or enabled!
 #endif
 
-#if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
     ID3DShaderResourceView* m_pSRView{ nullptr };
     ID3DShaderResourceView* srv_all{ nullptr };
     xr_vector<ID3DShaderResourceView*> srv_per_slice;

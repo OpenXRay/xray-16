@@ -32,6 +32,7 @@
 #define R_R2 2
 #define R_R3 3
 #define R_R4 4
+#define R_R5 5
 #define RENDER R_R2
 
 #include "Common/_d3d_extensions.h"

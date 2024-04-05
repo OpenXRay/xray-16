@@ -5,7 +5,6 @@
 class dxImGuiRender final : public IImGuiRender
 {
     void SetState(ImDrawData* data);
-
 public:
     void Copy(IImGuiRender& _in) override;
 

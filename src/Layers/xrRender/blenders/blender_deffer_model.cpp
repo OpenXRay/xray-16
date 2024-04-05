@@ -252,7 +252,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
 
         bool bUseATOC = (bAref && (RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC));
 
-#if RENDER == R_R4
+#if RENDER == R_R4 || RENDER == R_R5
         C.TessMethod = oTessellation.IDselected;
 #endif
 

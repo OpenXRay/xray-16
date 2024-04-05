@@ -408,13 +408,14 @@ public:
     BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D9; }
     u32 get_dx_level() override { return 0x00090000; }
     pcstr getShaderPath() override { return "r2\\"; }
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) 
     BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D11; }
     u32 get_dx_level() override { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
-    pcstr getShaderPath() override
-    {
-        return o.new_shader_support ? "r5\\" : "r3\\";
-    }
+    pcstr getShaderPath() override{ return o.new_shader_support ? "r5\\" : "r3\\"; }
+#elif defined(USE_DX12)
+    BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D12; }
+    u32 get_dx_level() override { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
+    pcstr getShaderPath() override { return o.new_shader_support ? "r5\\" : "r3\\"; }
 #elif defined(USE_OGL)
     BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::OpenGL; }
     u32 get_dx_level() override { return /*HW.pDevice1?0x000A0001:*/0x000A0000; }
@@ -433,7 +434,7 @@ public:
     void level_Load(IReader*) override;
     void level_Unload() override;
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
     ID3DBaseTexture* texture_load(pcstr fname, u32& msize);
 #elif defined(USE_OGL)
     GLuint           texture_load(pcstr fname, u32& msize, GLenum& ret_desc);
@@ -523,7 +524,7 @@ public:
 
 #if defined(USE_DX9)
     // nothing
-#elif defined(USE_DX11)
+#elif defined(USE_DX11) || defined(USE_DX12)
     void addShaderOption(pcstr name, pcstr value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
 

@@ -6,7 +6,7 @@
 
 #include "xrEngine/IGame_Persistent.h"
 
-CRenderTarget::CRenderTarget()
+CRenderTarget::CRenderTarget(bool reset)
     : im_noise_time(1.f / 100.0f),
       param_noise_scale(1.f),
       param_noise_fps(25.f),

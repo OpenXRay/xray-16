@@ -21,7 +21,7 @@ void CRenderTarget::phase_accumulator(CBackend& cmd_list)
         // dwLightMarkerID						= 5;					// start from 5, increment in 2 units
         reset_light_marker(cmd_list);
 
-#ifdef USE_DX11
+#if defined (USE_DX11) || defined(USE_DX12)
         //	Igor: AMD bug workaround. Should be fixed in 8.7 catalyst
         //	Need for MSAA to work correctly.
         if (RImplementation.o.msaa)
@@ -49,7 +49,7 @@ void CRenderTarget::phase_accumulator(CBackend& cmd_list)
         cmd_list.set_ColorWriteEnable();
     }
 
-#if defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
     //	Restore viewport after shadow map rendering
     RImplementation.rmNormal(cmd_list);
 #endif

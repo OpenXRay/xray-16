@@ -31,7 +31,7 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
         float _h = float(Device.dwHeight);
         float o_w = (.5f / _w);
         float o_h = (.5f / _h);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12)
         Fmatrix m_TexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
@@ -75,7 +75,7 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
 #ifdef USE_DX9
         RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
         draw_volume(cmd_list, L);
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
         if (!RImplementation.o.msaa)
         {
             cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
@@ -100,7 +100,7 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
             }
             else // checked Holger
             {
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Shader(s_accum_reflected_msaa[i]);
@@ -129,7 +129,7 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
         cmd_list.set_c("m_texgen", m_Texgen);
 #ifdef USE_DX9
         draw_volume(cmd_list, L);
-#elif defined(USE_DX11) || defined(USE_OGL)
+#elif defined(USE_DX11) || defined(USE_DX12) || defined(USE_OGL)
         if (!RImplementation.o.msaa)
         {
             // per pixel
@@ -150,7 +150,7 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
             }
             else // checked holger
             {
-#   if defined(USE_DX11)
+#if defined(USE_DX11) || defined(USE_DX12)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
@@ -163,7 +163,7 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #   endif // USE_DX11
             }
-#   if defined(USE_DX9) || defined(USE_DX11) // XXX: not sure why this is needed. Just preserving original behaviour
+#   if defined(USE_DX9) || defined(USE_DX11) || defined(USE_DX12) // XXX: not sure why this is needed. Just preserving original behaviour
             cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
 #   endif // !USE_OGL
         }
