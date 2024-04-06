@@ -105,6 +105,7 @@ SCRIPT_EXPORT(SServerFilters, (),
             .def_readwrite("with_pass", &SServerFilters::with_pass)
             .def_readwrite("without_pass", &SServerFilters::without_pass)
             .def_readwrite("without_ff", &SServerFilters::without_ff)
+            .property     ("with_battleye", +[] { return false; })
             .def_readwrite("listen_servers", &SServerFilters::listen_servers)
     ];
 });
