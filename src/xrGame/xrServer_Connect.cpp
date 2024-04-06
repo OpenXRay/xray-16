@@ -164,15 +164,15 @@ void xrServer::ProcessClientDigest(xrClientData* xrCL, NET_Packet* P)
     {
         R_ASSERT2(tmp_client != GetServerClient(), "can't disconnect server client");
         Msg("--- Client [%s] tried to connect - rejecting connection (he is banned by %s) ...",
-            tmp_client->m_cAddress.to_string().c_str(), admin_name.size() ? admin_name.c_str() : "Server");
-        pstr message_to_user;
-        if (admin_name.size())
+            tmp_client->m_cAddress.to_string().c_str(), admin_name.empty() ? "Server" : admin_name.c_str());
+        pcstr message_to_user;
+        if (admin_name.empty())
         {
-            STRCONCAT(message_to_user, "mp_you_have_been_banned_by ", admin_name.c_str());
+            message_to_user = StringTable().translate("mp_you_have_been_banned_by_server").c_str();
         }
         else
         {
-            STRCONCAT(message_to_user, "");
+            STRCONCAT(message_to_user, StringTable().translate("mp_you_have_been_banned_by").c_str(), " ", admin_name.c_str());
         }
         SendConnectResult(tmp_client, 0, ecr_have_been_banned, message_to_user);
         return;
