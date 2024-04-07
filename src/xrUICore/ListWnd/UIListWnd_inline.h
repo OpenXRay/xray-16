@@ -30,7 +30,6 @@ bool CUIListWnd::AddItem(const char* str, const float shift, void* pData,
     return AddItem<Element>(pItem, insertBeforeIdx);
 }
 
-
 template <class Element>
 bool CUIListWnd::AddItem(Element* pItem, int insertBeforeIdx)
 {
@@ -41,7 +40,6 @@ bool CUIListWnd::AddItem(Element* pItem, int insertBeforeIdx)
                                            ? GetHeight() - GetItemsCount() * m_iItemHeight - m_iItemHeight
                                            : GetItemsCount() * m_iItemHeight),
                         Fvector2().set(m_iItemWidth, m_iItemHeight));
-
 
     //добавление в конец или начало списка
     if (-1 == insertBeforeIdx)

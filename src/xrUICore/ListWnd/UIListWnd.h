@@ -19,6 +19,7 @@ private:
 
     shared_str m_scrollbar_profile;
     void DrawActiveBackFrame(const Frect& rect, CUIListItem* itm);
+
 public:
     CUIListWnd();
     virtual ~CUIListWnd();

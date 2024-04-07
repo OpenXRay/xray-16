@@ -2357,19 +2357,10 @@ target_sources(xrGame PRIVATE
     ui/UIKickPlayer.h
     ui/UILabel.cpp
     ui/UILabel.h
-    #ui/UIListBox_script.cpp
     #ui/UIListItemAdv.cpp
     #ui/UIListItemAdv.h
-    #ui/UIListItemEx.cpp
-    #ui/UIListItemEx.h
-    #ui/UIListItem.cpp
-    #ui/UIListItem.h
     ui/UIListItemServer.cpp
     ui/UIListItemServer.h
-    #ui/UIListWnd.cpp
-    #ui/UIListWnd.h
-    #ui/UIListWnd_inline.h
-    #ui/UIListWnd_script.cpp
     ui/UILoadingScreen.cpp
     ui/UILoadingScreen.h
     ui/UILoadingScreenHardcoded.h
