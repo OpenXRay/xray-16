@@ -30,7 +30,7 @@ void CSoundRender_Target::start(CSoundRender_Emitter* E)
 
     // Calc storage
     for (auto& buf : temp_buf)
-        buf.resize(E->source()->m_info.bytesPerBuffer);
+        buf.resize(E->source()->data_info().bytesPerBuffer);
 
     dispatch_prefill_all();
 }

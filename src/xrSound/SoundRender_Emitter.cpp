@@ -115,7 +115,7 @@ void CSoundRender_Emitter::set_cursor(u32 p)
 
     if (owner_data._get() && owner_data->fn_attached[0].size())
     {
-        u32 bt = ((CSoundRender_Source*)owner_data->handle)->dwBytesTotal;
+        u32 bt = ((CSoundRender_Source*)owner_data->handle)->bytes_total();
         if (m_stream_cursor >= m_cur_handle_cursor + bt)
         {
             SoundRender->i_destroy_source((CSoundRender_Source*)owner_data->handle);
@@ -194,7 +194,7 @@ void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
     }
     else
     {
-        const u32 bt_handle = ((CSoundRender_Source*)owner_data->handle)->dwBytesTotal;
+        const u32 bt_handle = ((CSoundRender_Source*)owner_data->handle)->bytes_total();
         if (get_cursor(true) + size > m_cur_handle_cursor + bt_handle)
         {
             R_ASSERT(owner_data->fn_attached[0].size());

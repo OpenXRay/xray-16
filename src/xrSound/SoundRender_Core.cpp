@@ -222,6 +222,6 @@ void CSoundRender_Core::refresh_sources()
     {
         CSoundRender_Source* s = kv.second;
         s->unload();
-        s->load(*s->fname);
+        s->load(s->file_name());
     }
 }

@@ -14,14 +14,15 @@ void CSoundRender_Emitter::start(const ref_sound& _owner, u32 flags, float delay
     VERIFY(_owner);
     owner_data = _owner;
     VERIFY(owner_data);
-    //	source					= (CSoundRender_Source*)owner_data->handle;
     p_source.position.set(0, 0, 0);
-    p_source.min_distance = source()->m_fMinDist; // DS3D_DEFAULTMINDISTANCE;
-    p_source.max_distance = source()->m_fMaxDist; // 300.f;
-    p_source.base_volume = source()->m_fBaseVolume; // 1.f
-    p_source.volume = 1.f; // 1.f
+
+    const auto info = source()->info();
+    p_source.min_distance = info.minDist;
+    p_source.max_distance = info.maxDist;
+    p_source.base_volume = info.baseVolume;
+    p_source.volume = 1.f;
     p_source.freq = 1.f;
-    p_source.max_ai_distance = source()->m_fMaxAIDist; // 300.f;
+    p_source.max_ai_distance = info.maxAIDist;
 
     if (fis_zero(delay, EPS_L))
     {

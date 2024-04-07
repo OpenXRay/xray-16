@@ -200,7 +200,7 @@ void CSoundRender_TargetA::submit_buffer(ALuint BufferID, const void* data, size
 {
     R_ASSERT(m_pEmitter);
 
-    const auto& info = m_pEmitter->source()->m_info;
+    const auto& info = m_pEmitter->source()->data_info();
     const bool mono = info.channels == 1;
 
     ALuint format;

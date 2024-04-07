@@ -3,15 +3,6 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 
-CSoundRender_Source::CSoundRender_Source()
-{
-    m_fMinDist = 1.f;
-    m_fMaxDist = 300.f;
-    m_fMaxAIDist = 300.f;
-    m_fBaseVolume = 1.f;
-    m_uGameType = 0;
-}
-
 CSoundRender_Source::~CSoundRender_Source() { unload(); }
 
 namespace
@@ -57,13 +48,13 @@ void CSoundRender_Source::decompress(void* dest, u32 byte_offset, u32 size)
     std::lock_guard guard{ read_lock };
 
     // seek
-    const auto sample_offset = ogg_int64_t(byte_offset / m_info.blockAlign);
+    const auto sample_offset = ogg_int64_t(byte_offset / m_data_info.blockAlign);
     const u32 cur_pos = u32(ov_pcm_tell(&ovf));
     if (cur_pos != sample_offset)
         ov_pcm_seek(&ovf, sample_offset);
 
     // decompress
-    if (m_info.format == SoundFormat::Float32)
+    if (m_data_info.format == SoundFormat::Float32)
         i_decompress(static_cast<float*>(dest), size);
     else
         i_decompress(static_cast<char*>(dest), size);
@@ -85,7 +76,7 @@ void CSoundRender_Source::i_decompress(char* _dest, u32 size)
 
 void CSoundRender_Source::i_decompress(float* _dest, u32 size)
 {
-    s32 left = s32(size / m_info.blockAlign);
+    s32 left = s32(size / m_data_info.blockAlign);
     while (left)
     {
         float** pcm;
@@ -98,7 +89,7 @@ void CSoundRender_Source::i_decompress(float* _dest, u32 size)
             samples = left;
 
         for (long j = 0; j < samples; j++)
-            for (long i = 0; i < m_info.channels; i++)
+            for (long i = 0; i < m_data_info.channels; i++)
                 *_dest++ = pcm[i][j];
 
         left -= samples;
@@ -184,29 +175,31 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
         return false;
     });
 
-    m_info = {};
+    m_data_info = {};
 
-    m_info.samplesPerSec = ovi->rate;
-    m_info.channels = u16(ovi->channels);
+    m_data_info.samplesPerSec = ovi->rate;
+    m_data_info.channels = u16(ovi->channels);
 
     if (SoundRender->supports_float_pcm)
     {
-        m_info.format = SoundFormat::Float32;
-        m_info.bitsPerSample = 32;
+        m_data_info.format = SoundFormat::Float32;
+        m_data_info.bitsPerSample = 32;
     }
     else
     {
-        m_info.format = SoundFormat::PCM;
-        m_info.bitsPerSample = 16;
+        m_data_info.format = SoundFormat::PCM;
+        m_data_info.bitsPerSample = 16;
     }
 
-    m_info.blockAlign = m_info.bitsPerSample / 8 * m_info.channels;
-    m_info.avgBytesPerSec = m_info.samplesPerSec * m_info.blockAlign;
-    m_info.bytesPerBuffer = sdef_target_block * m_info.avgBytesPerSec / 1000;
+    m_data_info.blockAlign = m_data_info.bitsPerSample / 8 * m_data_info.channels;
+    m_data_info.avgBytesPerSec = m_data_info.samplesPerSec * m_data_info.blockAlign;
+    m_data_info.bytesPerBuffer = sdef_target_block * m_data_info.avgBytesPerSec / 1000;
 
     const s64 pcm_total = ov_pcm_total(&ovf, -1);
-    dwBytesTotal = u32(pcm_total * m_info.blockAlign);
-    fTimeTotal = dwBytesTotal / float(m_info.avgBytesPerSec);
+    dwBytesTotal = u32(pcm_total * m_data_info.blockAlign);
+    fTimeTotal = dwBytesTotal / float(m_data_info.avgBytesPerSec);
+
+    m_info = {};
 
     const vorbis_comment* ovm = ov_comment(&ovf, -1);
     if (ovm->comments)
@@ -215,27 +208,27 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
         const u32 vers = F.r_u32();
         if (vers == 0x0001)
         {
-            m_fMinDist = F.r_float();
-            m_fMaxDist = F.r_float();
-            m_fBaseVolume = 1.f;
-            m_uGameType = F.r_u32();
-            m_fMaxAIDist = m_fMaxDist;
+            m_info.minDist = F.r_float();
+            m_info.maxDist = F.r_float();
+            m_info.baseVolume = 1.f;
+            m_info.gameType = F.r_u32();
+            m_info.maxAIDist = m_info.maxDist;
         }
         else if (vers == 0x0002)
         {
-            m_fMinDist = F.r_float();
-            m_fMaxDist = F.r_float();
-            m_fBaseVolume = F.r_float();
-            m_uGameType = F.r_u32();
-            m_fMaxAIDist = m_fMaxDist;
+            m_info.minDist = F.r_float();
+            m_info.maxDist = F.r_float();
+            m_info.baseVolume = F.r_float();
+            m_info.gameType = F.r_u32();
+            m_info.maxAIDist = m_info.maxDist;
         }
         else if (vers == OGG_COMMENT_VERSION)
         {
-            m_fMinDist = F.r_float();
-            m_fMaxDist = F.r_float();
-            m_fBaseVolume = F.r_float();
-            m_uGameType = F.r_u32();
-            m_fMaxAIDist = F.r_float();
+            m_info.minDist = F.r_float();
+            m_info.maxDist = F.r_float();
+            m_info.baseVolume = F.r_float();
+            m_info.gameType = F.r_u32();
+            m_info.maxAIDist = F.r_float();
         }
         else
         {
@@ -251,7 +244,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
 #endif
     }
 
-    R_ASSERT3_CURE(m_fMaxAIDist >= 0.1f && m_fMaxDist >= 0.1f, "Invalid max distance.", pName, !crashOnError,
+    R_ASSERT3_CURE(m_info.maxAIDist >= 0.1f && m_info.maxDist >= 0.1f, "Invalid max distance.", pName, !crashOnError,
     {
         detach();
         return false;

@@ -143,7 +143,7 @@ void CSoundRender_Core::statistic(CSound_stats* dest, CSound_stats_ext* ext)
                 item.volume = emitter->smooth_volume;
                 if (emitter->owner_data)
                 {
-                    item.name = emitter->source()->fname;
+                    item.name = emitter->source()->file_name();
                     item.game_object = emitter->owner_data->g_object;
                     item.game_type = emitter->owner_data->g_type;
                     item.type = emitter->owner_data->s_type;
