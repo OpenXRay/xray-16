@@ -43,34 +43,26 @@ CStats::~CStats()
 
 static void DumpTaskManagerStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
-    size_t allocated{}, allocatedWithFallback{}, pushed{}, finished{};
-    TaskScheduler->GetStats(allocated, allocatedWithFallback, pushed, finished);
+    size_t allocated{}, pushed{}, finished{};
+    TaskScheduler->GetStats(allocated, pushed, finished);
 
     static size_t allocatedPrev{};
-    static size_t allocatedWithFallbackPrev{};
     static size_t pushedPrev{};
     static size_t finishedPrev{};
 
     font.OutNext("Task scheduler:    ");
     font.OutNext("- threads:       %zu", TaskScheduler->GetWorkersCount());
-    font.OutNext("  - active:      %zu", TaskScheduler->GetActiveWorkersCount());
     font.OutNext("- tasks:           ");
     font.OutNext("  - total:         ");
     font.OutNext("    - allocated: %zu", allocated);
-    font.OutNext("      - fallback:%zu", allocatedWithFallback);
     font.OutNext("    - pushed:    %zu", pushed);
     font.OutNext("    - finished:  %zu", finished);
     font.OutNext("  - this frame:    ");
     font.OutNext("    - allocated: %zu", allocated - allocatedPrev);
-    font.OutNext("      - fallback:%zu", allocatedWithFallback - allocatedWithFallbackPrev);
     font.OutNext("    - pushed     %zu", pushed - pushedPrev);
     font.OutNext("    - finished:  %zu", finished - finishedPrev);
 
-    if (allocatedWithFallback != allocatedWithFallbackPrev)
-        alert->Print(font, "Task scheduler overload!");
-
     allocatedPrev = allocated;
-    allocatedWithFallbackPrev = allocatedWithFallback;
     pushedPrev = pushed;
     finishedPrev = finished;
 }

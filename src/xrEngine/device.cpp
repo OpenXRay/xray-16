@@ -255,6 +255,7 @@ void CRenderDevice::DoRender()
 
 void CRenderDevice::SecondaryThreadProc()
 {
+    TaskScheduler->RegisterThisThreadAsWorker();
     while (!mt_bMustExit.load(std::memory_order_acquire))
     {
         if (executeSecondaryTasks.load(std::memory_order_acquire))
@@ -268,6 +269,7 @@ void CRenderDevice::SecondaryThreadProc()
         }
         TaskScheduler->ExecuteOneTask();
     }
+    TaskScheduler->UnregisterThisThreadAsWorker();
     secondaryThreadFinished.store(true, std::memory_order_release);
 }
 

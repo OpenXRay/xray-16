@@ -15,6 +15,8 @@
 */
 #pragma once
 
+#include <mutex>
+
 #include "Event.hpp"
 #include "Task.hpp"
 
@@ -24,11 +26,9 @@ class XRCORE_API TaskManager final
 {
 private:
     xr_vector<TaskWorker*> workers;
-    Lock workersLock;
+    std::mutex workersLock;
 
     std::atomic_size_t workersCount{};
-    std::atomic_size_t activeWorkersCount{};
-
     std::atomic_bool shouldStop{};
 
 private:
@@ -41,10 +41,6 @@ private:
 
     [[nodiscard]] ICF static Task* AllocateTask();
     static void ICF IncrementTaskJobsCounter(Task& parent);
-
-private:
-    void SetThreadStatus(bool active);
-    void WakeUpIfNeeded() const;
 
 public:
     TaskManager();
@@ -61,29 +57,30 @@ public:
     [[nodiscard]] static Task& CreateTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
     // Run task in parallel
-    void PushTask(Task& task) const;
+    static void PushTask(Task& task);
 
     // Run task immediately in this thread
     static void RunTask(Task& task);
 
     // Shortcut: create a task and run it immediately
-    Task& AddTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
-    Task& AddTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    static Task& AddTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    static Task& AddTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
     // Shortcut: create task and run it immediately
-    Task& AddTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
-    Task& AddTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    static Task& AddTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
+    static Task& AddTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
 public:
-    void Wait(const Task& task);
-    void WaitForChildren(const Task& task);
-    bool ExecuteOneTask();
+    void RegisterThisThreadAsWorker();
+    void UnregisterThisThreadAsWorker();
+    void Wait(const Task& task) const;
+    void WaitForChildren(const Task& task) const;
+    bool ExecuteOneTask() const;
 
 public:
     [[nodiscard]] size_t GetWorkersCount() const;
-    [[nodiscard]] size_t GetActiveWorkersCount() const;
     [[nodiscard]] static size_t GetCurrentWorkerID();
-    void GetStats(size_t& allocated, size_t& allocatedWithFallback, size_t& pushed, size_t& finished);
+    void GetStats(size_t& allocated, size_t& pushed, size_t& finished);
 };
 
 extern XRCORE_API xr_unique_ptr<TaskManager> TaskScheduler;
