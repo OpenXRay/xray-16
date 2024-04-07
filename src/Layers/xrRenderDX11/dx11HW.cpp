@@ -505,16 +505,6 @@ void CHW::Present()
         break;
     }
 
-#ifdef HAS_DX11_2
-    if (m_pSwapChain2 && UsingFlipPresentationModel())
-    {
-        const float fps = Device.GetStats().fFPS;
-        if (fps < 30)
-            m_pSwapChain2->SetSourceSize(UINT(Device.dwWidth * 0.85f), UINT(Device.dwHeight * 0.85f));
-        else if (fps < 15)
-            m_pSwapChain2->SetSourceSize(UINT(Device.dwWidth * 0.7f), UINT(Device.dwHeight * 0.7f));
-    }
-#endif
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
 }
 
