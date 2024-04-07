@@ -166,7 +166,7 @@ public:
     std::atomic_bool sleeps{};
     Event event;
     size_t id;
-    CRandom random;
+    CRandom random{ s32(std::intptr_t(this)) };
 } static thread_local s_tl_worker;
 
 static TaskWorker* s_main_thread_worker = nullptr;
@@ -292,7 +292,6 @@ void TaskManager::TaskWorkerStart()
         ScopeLock scope(&workersLock);
         workers.emplace_back(&s_tl_worker);
         s_tl_worker.id = workers.size();
-        s_tl_worker.random = CRandom(static_cast<s32>(s_tl_worker.id));
     }
     workersCount.fetch_add(1, std::memory_order_release);
     activeWorkersCount.fetch_add(1, std::memory_order_relaxed);
@@ -383,16 +382,17 @@ Task* TaskManager::TryToSteal() const
     }
 
     int steal_attempts = 3;
-    while (--steal_attempts >= 0)
+    while (steal_attempts > 0)
     {
         TaskWorker* other = workers[s_tl_worker.random.randI(count)];
-        if (other != &s_tl_worker)
-        {
-            auto* task = other->steal();
-            if (!other->empty() && other->sleeps.load(std::memory_order_relaxed))
-                other->event.Set(); // Wake up, you have work to do!
+        if (other == &s_tl_worker)
+            continue;
+        auto* task = other->steal();
+        if (!other->empty() && other->sleeps.load(std::memory_order_relaxed))
+            other->event.Set(); // Wake up, you have work to do!
+        if (task)
             return task;
-        }
+        --steal_attempts;
     }
     return nullptr;
 }
