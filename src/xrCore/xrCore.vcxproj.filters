@@ -327,6 +327,9 @@
     <ClCompile Include="_cylinder.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Math\fast_lc16.cpp">
+      <Filter>Math\RNG</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -703,6 +706,9 @@
     </ClInclude>
     <ClInclude Include="Threading\ParallelForEach.hpp">
       <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\fast_lc16.hpp">
+      <Filter>Math\RNG</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -23,6 +23,10 @@
 #include <thread>
 #include <SDL_events.h>
 
+#include "Math/fast_lc16.hpp"
+
+#include <random>
+
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <immintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
@@ -136,8 +140,10 @@ struct TaskWorkerStats
 class TaskWorker : public TaskQueue, public TaskWorkerStats
 {
 public:
+    using rng_t  =   random::fast_lc16;
+
     Event            event;
-    CRandom          random{ s32(std::intptr_t(this)) };
+    rng_t            random{ this };
     size_t           id    { size_t(-1) };
     std::atomic_bool sleeps{ true };
 
@@ -312,12 +318,13 @@ void TaskManager::TaskWorkerStart()
 
 Task* TaskManager::TryToSteal() const
 {
-    const auto count = workers.size();
+    std::uniform_int_distribution<u16> dist{ 0, static_cast<u16>(workers.size() - 1) };
 
     int steal_attempts = 5;
     while (steal_attempts > 0)
     {
-        TaskWorker* other = workers[s_tl_worker.random.randI(count)];
+        const auto idx = dist(s_tl_worker.random);
+        TaskWorker* other = workers[idx];
         if (other == &s_tl_worker)
             continue;
         if (auto* task = other->steal())

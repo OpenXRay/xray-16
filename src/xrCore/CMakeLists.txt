@@ -305,6 +305,8 @@ target_sources_grouped(
     TARGET xrCore
     NAME "Math\\RNG"
     FILES
+    Math/fast_lc16.cpp
+    Math/fast_lc16.hpp
     Math/Random32.hpp
 )
 

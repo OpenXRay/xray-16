@@ -55,6 +55,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Compression\ppmd_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor9.cpp" />
+    <ClCompile Include="Math\fast_lc16.cpp" />
     <ClCompile Include="Media\ImageJPEG.cpp" />
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="Crypto\trivial_encryptor.cpp" />
@@ -177,6 +178,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="LocatorAPI_defs.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="lzhuf.h" />
+    <ClInclude Include="Math\fast_lc16.hpp" />
     <ClInclude Include="Math\Random32.hpp" />
     <ClInclude Include="math_constants.h" />
     <ClInclude Include="Media\Image.hpp" />
