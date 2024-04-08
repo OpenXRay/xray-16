@@ -65,6 +65,9 @@ public:
 
     void decompress(void* dest, u32 byte_offset, u32 size);
 
+    [[nodiscard]] const auto& data_info() const { return m_data_info; }
+    [[nodiscard]] const auto&      info() const { return m_info; }
+
     [[nodiscard]] pcstr file_name() const override { return fname.c_str(); }
 
     [[nodiscard]] float length_sec() const override { return fTimeTotal; }
@@ -72,7 +75,4 @@ public:
 
     [[nodiscard]] u16 channels_num() const override { return data_info().channels; }
     [[nodiscard]] u32 game_type() const override { return info().gameType; }
-
-    [[nodiscard]] const auto& data_info() const { return m_data_info; }
-    [[nodiscard]] const auto&      info() const { return m_info; }
 };
