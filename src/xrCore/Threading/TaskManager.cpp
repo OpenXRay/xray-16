@@ -140,10 +140,8 @@ struct TaskWorkerStats
 class TaskWorker : public TaskQueue, public TaskWorkerStats
 {
 public:
-    using rng_t  =   random::fast_lc16;
-
     Event            event;
-    rng_t            random{ this };
+    fast_lc16        random{ this };
     size_t           id    { size_t(-1) };
     std::atomic_bool sleeps{};
 

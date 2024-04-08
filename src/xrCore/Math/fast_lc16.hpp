@@ -7,8 +7,6 @@
 ///////////////////////////////////////////////////////////////////////////
 #pragma once
 
-namespace random
-{
 //! A fast random number generator.
 /** Uses linear congruential method. */
 class fast_lc16 final
@@ -89,4 +87,3 @@ public:
         return std::numeric_limits< result_type >::max ( );
     }
 };
-} // namespace random
