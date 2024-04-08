@@ -145,7 +145,7 @@ public:
     Event            event;
     rng_t            random{ this };
     size_t           id    { size_t(-1) };
-    std::atomic_bool sleeps{ true };
+    std::atomic_bool sleeps{};
 
     void WakeUpIfNeeded()
     {
@@ -153,8 +153,6 @@ public:
             event.Set(); // Wake up, we have work to do!
     }
 } static thread_local s_tl_worker;
-
-static TaskWorker* s_main_thread_worker = nullptr;
 
 class ThreadPriorityHelper
 {
@@ -195,9 +193,10 @@ void CalcIterations()
 
 TaskManager::TaskManager()
 {
+    CalcIterations();
+
     workers.reserve(std::thread::hardware_concurrency());
 
-    s_main_thread_worker = &s_tl_worker;
     RegisterThisThreadAsWorker();
 
     const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
@@ -205,39 +204,41 @@ TaskManager::TaskManager()
     {
         Threading::SpawnThread([](void* this_ptr)
         {
-            TaskManager& self = *static_cast<TaskManager*>(this_ptr);
-            self.TaskWorkerStart();
+            const auto self = static_cast<TaskManager*>(this_ptr);
+            self->TaskWorkerStart();
         }, "Task Worker", 0, this);
     }
-    CalcIterations();
-    while (threads != workersCount.load(std::memory_order_consume))
-    {
-        Sleep(2);
-    }
-    for (TaskWorker* worker : workers)
-        worker->event.Set();
 }
 
 TaskManager::~TaskManager()
 {
     shouldStop.store(true, std::memory_order_release);
+
+    // Finish all pending tasks
+    while (Task* t = s_tl_worker.pop())
+    {
+        ExecuteTask(*t);
+    }
+
+    UnregisterThisThreadAsWorker();
     {
         std::lock_guard guard{ workersLock };
         for (TaskWorker* worker : workers)
             worker->event.Set();
     }
-    while (workersCount.load(std::memory_order_consume))
+    while (activeWorkersCount.load(std::memory_order_acquire) || workers.size())
     {
         Sleep(2);
     }
-    for (TaskWorker* worker : workers)
-        worker->event.Set();
-
-    s_main_thread_worker = nullptr;
+    // Capture the last worker that might still be finishing
+    std::lock_guard guard{ workersLock };
 }
 
 void TaskManager::RegisterThisThreadAsWorker()
 {
+    R_ASSERT2(workers.size() < std::thread::hardware_concurrency(),
+        "You must change OTHER_THREADS_COUNT if you want to register more custom threads.");
+
     std::lock_guard guard{ workersLock };
     s_tl_worker.id = workers.size();
     workers.emplace_back(&s_tl_worker);
@@ -246,15 +247,33 @@ void TaskManager::RegisterThisThreadAsWorker()
 void TaskManager::UnregisterThisThreadAsWorker()
 {
     std::lock_guard guard{ workersLock };
+
+    shouldPause.store(true, std::memory_order_release);
+    while (activeWorkersCount.load(std::memory_order_relaxed))
+        Sleep(2);
+
     s_tl_worker.id = size_t(-1);
-    workers.emplace_back(&s_tl_worker);
+
+    const auto it = std::find(workers.begin(), workers.end(), &s_tl_worker);
+    if (it != workers.end())
+        workers.erase(it);
+
+    shouldPause.store(false, std::memory_order_release);
+}
+
+void TaskManager::SetThreadStatus(bool active)
+{
+    s_tl_worker.sleeps.store(!active, std::memory_order_relaxed);
+    if (active)
+        activeWorkersCount.fetch_add(1, std::memory_order_relaxed);
+    else
+        activeWorkersCount.fetch_sub(1, std::memory_order_relaxed);
 }
 
 void TaskManager::TaskWorkerStart()
 {
     RegisterThisThreadAsWorker();
-    workersCount.fetch_add(1, std::memory_order_release);
-    s_tl_worker.event.Wait();
+    SetThreadStatus(true);
 
     const u32 fastIterations = ttapi_dwFastIter;
 
@@ -262,48 +281,51 @@ void TaskManager::TaskWorkerStart()
     Task* task;
     while (true)
     {
-        goto check_own_queue;
+        goto get_task;
 
     execute:
     {
         ExecuteTask(*task);
         iteration = 0;
     }
-    check_own_queue:
+    get_task:
     {
+        if (shouldStop.load(std::memory_order_consume))
+            break;
+        if (shouldPause.load(std::memory_order_consume))
+            goto wait;
+
         task = s_tl_worker.pop();
-        if (task)
-            goto execute;
-    }
-    //steal:
-    {
-        task = TryToSteal();
+        if (!task)
+            task = TryToSteal();
+
         if (task)
             goto execute;
     }
     //count_spins:
     {
-        if (shouldStop.load(std::memory_order_consume))
-            break;
-
         ++iteration;
         if (iteration < fastIterations)
         {
             _mm_pause();
-            goto check_own_queue;
+            goto get_task;
         }
     }
-    //wait:
+    wait:
     {
-        s_tl_worker.sleeps.store(true, std::memory_order_relaxed);
+        SetThreadStatus(false);
+        do
         {
             s_tl_worker.event.Wait(1);
-        }
-        s_tl_worker.sleeps.store(false, std::memory_order_relaxed);
+        } while (shouldPause.load(std::memory_order_consume));
+        SetThreadStatus(true);
+
         iteration = 0;
-        goto check_own_queue;
+        goto get_task;
     }
     } // while (true)
+
+    SetThreadStatus(false);
 
     // Finish all pending tasks
     while (Task* t = s_tl_worker.pop())
@@ -312,8 +334,7 @@ void TaskManager::TaskWorkerStart()
     }
 
     // Prepare to exit
-    workersCount.fetch_sub(1, std::memory_order_release);
-    s_tl_worker.event.Wait(); // prevent crash when other thread tries to steal
+    UnregisterThisThreadAsWorker();
 }
 
 Task* TaskManager::TryToSteal() const
@@ -385,7 +406,7 @@ void TaskManager::Wait(const Task& task) const
     while (!task.IsFinished())
     {
         ExecuteOneTask();
-        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+        if (s_tl_worker.id == 0 && xrDebug::ProcessingFailure())
             SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
@@ -395,7 +416,7 @@ void TaskManager::WaitForChildren(const Task& task) const
     while (!task.HasChildren())
     {
         ExecuteOneTask();
-        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+        if (s_tl_worker.id == 0 && xrDebug::ProcessingFailure())
             SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }

@@ -28,7 +28,9 @@ private:
     xr_vector<TaskWorker*> workers;
     std::mutex workersLock;
 
-    std::atomic_size_t workersCount{};
+    std::atomic_size_t activeWorkersCount{};
+
+    std::atomic_bool shouldPause{};
     std::atomic_bool shouldStop{};
 
 private:
@@ -41,6 +43,8 @@ private:
 
     [[nodiscard]] ICF static Task* AllocateTask();
     static void ICF IncrementTaskJobsCounter(Task& parent);
+
+    void SetThreadStatus(bool active);
 
 public:
     TaskManager();
