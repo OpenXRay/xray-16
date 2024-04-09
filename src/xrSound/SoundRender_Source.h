@@ -24,11 +24,11 @@ struct SoundDataInfo
 
 struct SoundSourceInfo
 {
-    float baseVolume;
-    float minDist;
-    float maxDist;
-    float maxAIDist;
-    u32   gameType;
+    float baseVolume{ 1.0f };
+    float minDist   { 1.0f };
+    float maxDist   { 300.0f };
+    float maxAIDist { 300.0f };
+    u32   gameType  {};
 };
 
 class XRSOUND_API CSoundRender_Source final : public CSound_source
