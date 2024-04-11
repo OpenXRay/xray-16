@@ -613,8 +613,6 @@ void CConsole::Show()
     }
     bVisible = true;
 
-    SDL_GetGlobalMouseState(&m_mouse_pos.x, &m_mouse_pos.y); // Replace with SDL_GetMouseState in case retrieve window-relative coordinates
-
     ec().clear_states();
     scroll_delta = 0;
     reset_cmd_history_idx();
@@ -644,11 +642,6 @@ void CConsole::Hide()
 
     // if ( g_pGameLevel ||
     // ( g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive() ))
-
-    if (pInput->IsExclusiveMode())
-    {
-        SDL_WarpMouseGlobal(m_mouse_pos.x, m_mouse_pos.y); // Replace with SDL_WarpMouseInWindow in case set window-relative coordinates
-    }
 
     bVisible = false;
     reset_selected_tip();
