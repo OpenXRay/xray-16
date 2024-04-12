@@ -182,7 +182,7 @@ jobs:
         - { name: FreeBSD, os: freebsd, os-version: '14.0', arch: x86_64,
             install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 glew lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
           }
-        - { name: OpenBSD, os: openbsd, os-version: 7.4,  arch: x86_64,
+        - { name: OpenBSD, os: openbsd, os-version: 7.5,  arch: x86_64,
             install-cmd: "sudo pkg_add cmake SDL2 glew lzo2 jpeg openal libogg libtheora libvorbis",
           }
         #- { name: NetBSD,  os: netbsd,  os-version: 9.3,  arch: x86_64,
@@ -196,7 +196,7 @@ jobs:
         submodules: recursive
 
     - name: Setup ${{ matrix.platform.name }} and packages
-      uses: cross-platform-actions/action@v0.23.0
+      uses: cross-platform-actions/action@v0.24.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
@@ -209,7 +209,7 @@ jobs:
         run: ${{ matrix.platform.install-cmd }}
 
     - name: Run CMake
-      uses: cross-platform-actions/action@v0.23.0
+      uses: cross-platform-actions/action@v0.24.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
@@ -222,7 +222,7 @@ jobs:
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
 
     - name: Run CMake Build
-      uses: cross-platform-actions/action@v0.23.0
+      uses: cross-platform-actions/action@v0.24.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
