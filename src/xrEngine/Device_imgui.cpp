@@ -42,7 +42,7 @@ void CRenderDevice::InitializeImGui()
     {
         if (data->WantVisible)
         {
-            const SDL_Rect r
+            /*const*/ SDL_Rect r // this is not const because older versions of SDL accept non-const rect
             {
                 /*.x =*/ (int)(data->InputPos.x - viewport->Pos.x),
                 /*.y =*/ (int)(data->InputPos.y - viewport->Pos.y + data->InputLineHeight),
