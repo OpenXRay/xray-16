@@ -148,6 +148,8 @@ public:
     const xr_token* GetXRToken(pcstr cmd) const;
     Fvector GetFVector(pcstr cmd) const;
     Fvector* GetFVectorPtr(pcstr cmd) const;
+    Fvector4 GetFVector4(pcstr cmd) const;
+    Fvector4* GetFVector4Ptr(pcstr cmd) const;
     IConsole_Command* GetCommand(pcstr cmd) const;
 
 protected:

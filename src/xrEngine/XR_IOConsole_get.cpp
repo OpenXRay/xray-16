@@ -115,3 +115,24 @@ Fvector CConsole::GetFVector(pcstr cmd) const
     }
     return Fvector().set(0.0f, 0.0f, 0.0f);
 }
+
+Fvector4* CConsole::GetFVector4Ptr(pcstr cmd) const
+{
+    IConsole_Command* cc = GetCommand(cmd);
+    CCC_Vector4* cf = dynamic_cast<CCC_Vector4*>(cc);
+    if (cf)
+    {
+        return cf->GetValuePtr();
+    }
+    return NULL;
+}
+
+Fvector4 CConsole::GetFVector4(pcstr cmd) const
+{
+    Fvector4* pV = GetFVector4Ptr(cmd);
+    if (pV)
+    {
+        return *pV;
+    }
+    return Fvector4().set(0.0f, 0.0f, 0.0f, 0.0f);
+}
