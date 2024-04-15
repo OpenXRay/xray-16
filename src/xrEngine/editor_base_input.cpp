@@ -7,7 +7,7 @@ namespace
 {
 bool mouse_can_use_global_state()
 {
-#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
+#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE && defined(IMGUI_ENABLE_VIEWPORTS)
     cpcstr sdl_backend = SDL_GetCurrentVideoDriver();
 
     // Check and store if we are on a SDL backend that supports global mouse position
@@ -39,7 +39,9 @@ void ide::InitBackend()
     {
         // We can create multi-viewports on the Platform side (optional)
         io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;
+#ifndef XR_PLATFORM_APPLE
         m_imgui_backend.mouse_can_report_hovered_viewport = true;
+#endif
     }
 
     // Clipboard functionality
@@ -144,11 +146,13 @@ void ide::UpdateMouseData()
         io.BackendFlags &= ~ImGuiBackendFlags_HasMouseHoveredViewport;
 
     // We forward mouse input when hovered or captured (via SDL_MOUSEMOTION) or when focused (below)
-#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
+#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE && defined(IMGUI_ENABLE_VIEWPORTS)
     SDL_CaptureMouse(anyMouseButtonPressed ? SDL_TRUE : SDL_FALSE);
-#endif
     SDL_Window* focused_window = SDL_GetKeyboardFocus();
     const bool is_app_focused = focused_window && (Device.m_sdlWnd == focused_window || ImGui::FindViewportByPlatformHandle(focused_window));
+#else
+    const bool is_app_focused = (SDL_GetWindowFlags(Device.m_sdlWnd) & SDL_WINDOW_INPUT_FOCUS) != 0;
+#endif
 
     if (is_app_focused)
     {

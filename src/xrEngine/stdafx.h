@@ -12,6 +12,10 @@
 #endif // #ifndef INGAME_EDITOR
 #endif // #ifndef NDEBUG
 
+#ifdef XR_PLATFORM_WINDOWS
+#   define IMGUI_ENABLE_VIEWPORTS
+#endif
+
 #include "xrCore/xrCore.h"
 #include "xrCore/_std_extensions.h"
 

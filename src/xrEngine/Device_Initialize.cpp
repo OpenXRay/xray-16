@@ -7,7 +7,9 @@
 #include "xrCore/ModuleLookup.hpp"
 
 #include <SDL.h>
-#include <SDL_syswm.h>
+#ifdef IMGUI_ENABLE_VIEWPORTS
+#   include <SDL_syswm.h>
+#endif
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
 
@@ -76,6 +78,7 @@ void CRenderDevice::Initialize()
         ExtractAndSetWindowIcon(m_sdlWnd, icon);
     }
 
+#ifdef IMGUI_ENABLE_VIEWPORTS
     // Register main window handle (which is owned by the main application, not by us)
     // This is mostly for consistency, so that our code can use same logic for main and secondary viewports.
     {
@@ -94,6 +97,7 @@ void CRenderDevice::Initialize()
 #endif
         }
     }
+#endif
 
     if (!GEnv.isDedicatedServer)
     {

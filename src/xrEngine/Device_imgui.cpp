@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
-#include <SDL_syswm.h>
+#ifdef IMGUI_ENABLE_VIEWPORTS
+#   include <SDL_syswm.h>
+#endif
 
 void CRenderDevice::InitializeImGui()
 {
@@ -24,7 +26,6 @@ void CRenderDevice::InitializeImGui()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard |
                       ImGuiConfigFlags_NavEnableGamepad |
                       ImGuiConfigFlags_NavEnableSetMousePos |
-                      ImGuiConfigFlags_ViewportsEnable |
                       ImGuiConfigFlags_DockingEnable;
 
     string_path fName;
@@ -52,6 +53,7 @@ void CRenderDevice::InitializeImGui()
         }
     };
 
+#ifdef IMGUI_ENABLE_VIEWPORTS
     // Register platform interface (will be coupled with a renderer interface)
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
 
@@ -195,8 +197,12 @@ void CRenderDevice::InitializeImGui()
         SDL_SetWindowOpacity(vd->Window, alpha);
     };
 #endif
+#endif // IMGUI_ENABLE_VIEWPORTS
 
     editor().InitBackend();
+
+    if (io.BackendFlags & ImGuiBackendFlags_PlatformHasViewports)
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 }
 
 void CRenderDevice::DestroyImGui()
@@ -208,7 +214,9 @@ void CRenderDevice::DestroyImGui()
     GEnv.RenderFactory->DestroyImGuiRender(m_imgui_render);
     m_imgui_render = nullptr;
 
+#ifdef IMGUI_ENABLE_VIEWPORTS
     ImGui::DestroyPlatformWindows();
+#endif
     editor().ShutdownBackend();
 
     ImGuiIO& io = ImGui::GetIO();
