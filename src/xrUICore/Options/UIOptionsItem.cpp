@@ -83,6 +83,30 @@ const xr_token* CUIOptionsItem::GetOptToken() const
     return Console->GetXRToken(m_entry.c_str());
 }
 
+Fvector3 CUIOptionsItem::GetOptVector3Value() const
+{
+    return Console->GetFVector(m_entry.c_str());
+}
+
+void CUIOptionsItem::SaveOptVector3Value(Fvector3 val) const
+{
+    string512 command;
+    xr_sprintf(command, "%s %f %f %f", m_entry.c_str(), val.x, val.y, val.z);
+    Console->Execute(command);
+}
+
+Fvector4 CUIOptionsItem::GetOptVector4Value() const
+{
+    return Console->GetFVector4(m_entry.c_str());
+}
+
+void CUIOptionsItem::SaveOptVector4Value(Fvector4 val) const
+{
+    string512 command;
+    xr_sprintf(command, "%s %f %f %f", m_entry.c_str(), val.x, val.y, val.z, val.w);
+    Console->Execute(command);
+}
+
 void CUIOptionsItem::SaveOptValue()
 {
     if (!IsChangedOptValue())

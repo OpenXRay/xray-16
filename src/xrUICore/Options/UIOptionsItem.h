@@ -51,6 +51,12 @@ protected:
     pcstr GetOptTokenValue() const;
     const xr_token* GetOptToken() const;
 
+    Fvector3 GetOptVector3Value() const;
+    void SaveOptVector3Value(Fvector3 val) const;
+
+    Fvector4 GetOptVector4Value() const;
+    void SaveOptVector4Value(Fvector4 val) const;
+
     shared_str m_entry;
     ESystemDepends m_dep;
 
