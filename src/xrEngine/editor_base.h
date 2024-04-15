@@ -9,8 +9,6 @@
 
 namespace xray::editor
 {
-struct ide_backend;
-
 class XR_NOVTABLE ENGINE_API ide_tool : public pureFrame
 {
     bool is_opened{};
@@ -26,7 +24,6 @@ public:
 };
 
 class ENGINE_API ide final :
-    public pureRender,
     public pureFrame,
     public pureAppActivate,
     public pureAppDeactivate,
@@ -48,26 +45,22 @@ public:
     ide();
     ~ide() override;
 
+    void InitBackend();
+    void ShutdownBackend();
+
+    void ProcessEvent(const SDL_Event& event);
+
     [[nodiscard]]
     bool is_shown() const;
 
-public:
-    void UpdateWindowProps();
-
-    void OnDeviceCreate();
-    void OnDeviceDestroy();
-    void OnDeviceResetBegin() const;
-    void OnDeviceResetEnd() const;
-
+    [[nodiscard]]
+    auto GetState() const { return m_state; }
     void SetState(visible_state state);
     void SwitchToNextState();
-
-    auto GetImGuiContext() const { return m_context; }
 
 public:
     // Interface implementations
     void OnFrame() override;
-    void OnRender() override;
 
     void OnAppActivate() override;
     void OnAppDeactivate() override;
@@ -99,28 +92,32 @@ private:
     ImGuiWindowFlags get_default_window_flags() const;
 
 private:
-    void InitBackend();
-    void ShutdownBackend();
-
-private:
     void ShowMain();
     void ShowWeatherEditor();
 
     void RegisterTool(ide_tool* tool);
     void UnregisterTool(const ide_tool* tool);
 
+    void UpdateMouseCursor();
+    void UpdateMouseData();
     void UpdateTextInput(bool force_disable = false);
 
 private:
-    CTimer m_timer;
-    IImGuiRender* m_render{};
-    ImGuiContext* m_context{};
-    ide_backend* m_backend_data{};
-
-    visible_state m_state;
-    bool m_show_weather_editor; // to be refactored
+    visible_state m_state{};
+    bool m_show_weather_editor{}; // to be refactored
     bool m_text_input_enabled{};
 
     xr_vector<ide_tool*> m_tools;
+
+    struct ImGuiBackend
+    {
+        char* clipboard_text_data{};
+        SDL_Cursor* mouse_cursors[ImGuiMouseCursor_COUNT]{};
+        SDL_Cursor* last_cursor{};
+        Uint32      mouse_window_id{};
+        int         mouse_last_leave_frame{};
+        bool        mouse_can_report_hovered_viewport{};
+    };
+    ImGuiBackend m_imgui_backend{};
 };
 } // namespace xray::editor

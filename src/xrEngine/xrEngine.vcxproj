@@ -121,6 +121,7 @@
     <ClCompile Include="device.cpp" />
     <ClCompile Include="Device_create.cpp" />
     <ClCompile Include="Device_destroy.cpp" />
+    <ClCompile Include="Device_imgui.cpp" />
     <ClCompile Include="Device_Initialize.cpp" />
     <ClCompile Include="Device_mode.cpp" />
     <ClCompile Include="Device_overdraw.cpp" />

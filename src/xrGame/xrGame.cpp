@@ -62,7 +62,7 @@ extern "C"
             xr_free(ptr);
         }
         );
-        ImGui::SetCurrentContext(Device.editor().GetImGuiContext());
+        ImGui::SetCurrentContext(Device.GetImGuiContext());
     }
 
     XR_EXPORT void finalize_library()

@@ -520,14 +520,37 @@ void CInput::iGetAsyncScrollPos(Ivector2& p) const
     p = { mouseAxisState[2], mouseAxisState[3] };
 }
 
-void CInput::iGetAsyncMousePos(Ivector2& p) const
+bool CInput::iGetAsyncMousePos(Ivector2& p, bool global /*= false*/) const
 {
+    if (global)
+    {
+#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
+        SDL_GetGlobalMouseState(&p.x, &p.y);
+        return true;
+#endif
+        // if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE unavailable
+        // fallback to SDL_GetMouseState
+        // but report false
+    }
     SDL_GetMouseState(&p.x, &p.y);
+    return !global;
 }
 
-void CInput::iSetMousePos(const Ivector2& p) const
+bool CInput::iSetMousePos(const Ivector2& p, bool global /*= false*/) const
 {
+    if (global)
+    {
+#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
+        SDL_WarpMouseGlobal(p.x, p.y);
+        return true;
+#endif
+        // if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE unavailable
+        // fallback to SDL_WarpMouseInWindow
+        // but report false
+    }
+
     SDL_WarpMouseInWindow(Device.m_sdlWnd, p.x, p.y);
+    return !global;
 }
 
 void CInput::GrabInput(const bool grab)

@@ -25,6 +25,37 @@ void FillResolutionsForMonitor(const int monitorID)
     vid_mode_token[monitorID].emplace_back(nullptr, -1);
 }
 
+void FillImGuiMonitorData(const int monitorID)
+{
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+
+    // Warning: the validity of monitor DPI information on Windows
+    // depends on the application DPI awareness settings,
+    // which generally needs to be set in the manifest or at runtime.
+    ImGuiPlatformMonitor monitor;
+    SDL_Rect r;
+    SDL_GetDisplayBounds(monitorID, &r);
+    monitor.MainPos = monitor.WorkPos = ImVec2((float)r.x, (float)r.y);
+    monitor.MainSize = monitor.WorkSize = ImVec2((float)r.w, (float)r.h);
+
+#if SDL_VERSION_ATLEAST(2, 0, 5)
+    SDL_GetDisplayUsableBounds(monitorID, &r);
+    monitor.WorkPos = ImVec2((float)r.x, (float)r.y);
+    monitor.WorkSize = ImVec2((float)r.w, (float)r.h);
+#endif
+
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+    // FIXME-VIEWPORT: On MacOS SDL reports actual monitor DPI scale, ignoring OS configuration. We may want to set
+    //  DpiScale to cocoa_window.backingScaleFactor here.
+    float dpi = 0.0f;
+    if (!SDL_GetDisplayDPI(monitorID, &dpi, nullptr, nullptr))
+        monitor.DpiScale = dpi / 96.0f;
+#endif
+
+    monitor.PlatformHandle = (void*)(intptr_t)monitorID;
+    platform_io.Monitors.push_back(monitor);
+}
+
 void CRenderDevice::FillVideoModes()
 {
     const int displayCount = SDL_GetNumVideoDisplays();
@@ -37,6 +68,7 @@ void CRenderDevice::FillVideoModes()
         vid_monitor_token.emplace_back(xr_strdup(buf), i);
 
         FillResolutionsForMonitor(i);
+        FillImGuiMonitorData(i);
     }
     vid_monitor_token.emplace_back(nullptr, -1);
 }
@@ -60,6 +92,8 @@ void CRenderDevice::CleanupVideoModes()
         xr_free(tokenName);
     }
     vid_monitor_token.clear();
+
+    ImGui::GetPlatformIO().Monitors.resize(0);
 }
 
 void CRenderDevice::SetWindowDraggable(bool draggable)
@@ -117,7 +151,10 @@ void CRenderDevice::UpdateWindowProps()
     UpdateWindowRects();
     SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
 
-    editor().UpdateWindowProps();
+    ImGuiIO& io = ImGui::GetIO();
+
+    io.DisplaySize = { static_cast<float>(psDeviceMode.Width), static_cast<float>(psDeviceMode.Height) };
+    io.DisplayFramebufferScale = ImVec2{ float(dwWidth / m_rcWindowClient.w), float(dwHeight / m_rcWindowClient.h) };
 }
 
 void CRenderDevice::UpdateWindowRects()

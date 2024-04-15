@@ -325,6 +325,7 @@ target_sources_grouped(
     device.h
     Device_create.cpp
     Device_destroy.cpp
+    Device_imgui.cpp
     Device_Initialize.cpp
     Device_mode.cpp
     Device_overdraw.cpp

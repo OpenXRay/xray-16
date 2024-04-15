@@ -78,6 +78,9 @@ void dxImGuiRender::OnDeviceCreate(ImGuiContext* context)
     );
     ImGui::SetCurrentContext(context);
 
+    ImGuiIO& io = ImGui::GetIO();
+    io.BackendRendererName = "xrRender";
+
 #if defined(USE_DX9)
     ImGui_ImplDX9_Init(HW.pDevice);
 #elif defined(USE_DX11)

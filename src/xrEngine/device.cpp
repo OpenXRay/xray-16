@@ -26,6 +26,8 @@ int ps_fps_limit_in_menu = 60;
 bool g_bLoaded = false;
 ref_light precache_light = 0;
 
+using namespace xray;
+
 bool CRenderDevice::RenderBegin()
 {
     if (GEnv.isDedicatedServer)
@@ -246,6 +248,16 @@ void CRenderDevice::DoRender()
 
         CalcFrameStats();
         Statistic->Show();
+
+        ImGui::Render();
+        m_imgui_render->Render(ImGui::GetDrawData());
+        // Update and Render additional Platform Windows
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+        }
+
         RenderEnd(); // Present goes here
     }
     renderTotalReal.End();
@@ -330,7 +342,7 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 #if SDL_VERSION_ATLEAST(2, 0, 14)
             if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
 #else
-                    if (event.display.display == psDeviceMode.Monitor)
+            if (event.display.display == psDeviceMode.Monitor)
 #endif
                 Reset();
             else
@@ -342,16 +354,28 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 #endif
     case SDL_WINDOWEVENT:
     {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (!window)
+            break;
+        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window);
+        if (!viewport)
+            break;
+
         switch (event.window.event)
         {
         case SDL_WINDOWEVENT_MOVED:
         {
-            UpdateWindowRects();
+            if (window == m_sdlWnd)
+            {
+                UpdateWindowRects();
 #if !SDL_VERSION_ATLEAST(2, 0, 18) // without SDL_WINDOWEVENT_DISPLAY_CHANGED, let's detect monitor change ourselves
-                    const int display = SDL_GetWindowDisplayIndex(m_sdlWnd);
-                    if (display != -1)
-                        psDeviceMode.Monitor = display;
+                const int display = SDL_GetWindowDisplayIndex(window);
+                if (display != -1)
+                    psDeviceMode.Monitor = display;
 #endif
+            }
+            if (viewport)
+                viewport->PlatformRequestMove = true;
             break;
         }
 
@@ -360,6 +384,11 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
             psDeviceMode.Monitor = event.window.data1;
             break;
 #endif
+
+        case SDL_WINDOWEVENT_RESIZED:
+            if (viewport)
+                viewport->PlatformRequestResize = true;
+            break;
 
         case SDL_WINDOWEVENT_SIZE_CHANGED:
         {
@@ -379,9 +408,24 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 
             break;
         }
+
+        case SDL_WINDOWEVENT_CLOSE:
+        {
+            if (viewport)
+                viewport->PlatformRequestClose = true;
+
+            if (window == m_sdlWnd)
+            {
+                Engine.Event.Defer("KERNEL:disconnect");
+                Engine.Event.Defer("KERNEL:quit");
+            }
+            break;
+        }
         } // switch (event.window.event)
     }
     } // switch (event.type)
+
+    editor().ProcessEvent(event);
 }
 
 void CRenderDevice::Run()
@@ -463,17 +507,26 @@ void CRenderDevice::FrameMove()
         dwTimeGlobal = TimerGlobal.GetElapsed_ms();
         dwTimeDelta = dwTimeGlobal - _old_global;
     }
+    ImGui::GetIO().DeltaTime = fTimeDeltaReal;
+
+    m_imgui_render->Frame();
+    ImGui::NewFrame();
+
     // Frame move
     stats.EngineTotal.FrameStart();
     stats.EngineTotal.Begin();
     // TODO: HACK to test loading screen.
     // if(!g_bLoaded)
+
     seqFrame.Process();
+
     g_bLoaded = true;
     // else
     // seqFrame.Process(rp_Frame);
     stats.EngineTotal.End();
     stats.EngineTotal.FrameEnd();
+
+    ImGui::EndFrame();
 }
 
 ENGINE_API bool bShowPauseString = true;
@@ -531,8 +584,20 @@ void CRenderDevice::Pause(bool bOn, bool bTimer, bool bSound, [[maybe_unused]] p
 
 bool CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 
-void CRenderDevice::OnWindowActivate(bool activated)
+void CRenderDevice::OnWindowActivate(SDL_Window* window, bool activated)
 {
+    if (editor().GetState() == editor::ide::visible_state::full)
+    {
+        if (window != m_sdlWnd)
+        {
+            if (activated)
+                editor().OnAppActivate();
+            else
+                editor().OnAppDeactivate();
+        }
+        return;
+    }
+
     if (!GEnv.isDedicatedServer && activated)
         pInput->GrabInput(true);
     else

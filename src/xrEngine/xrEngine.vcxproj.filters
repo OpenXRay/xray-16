@@ -617,6 +617,9 @@
     <ClCompile Include="Device_destroy.cpp">
       <Filter>Render\Execution &amp; 3D</Filter>
     </ClCompile>
+    <ClCompile Include="Device_imgui.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
     <ClCompile Include="Device_Initialize.cpp">
       <Filter>Render\Execution &amp; 3D</Filter>
     </ClCompile>

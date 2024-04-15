@@ -200,13 +200,16 @@ public:
     void Shutdown();
 
     void ProcessEvent(const SDL_Event& event);
-    void OnWindowActivate(bool activated);
+    void OnWindowActivate(SDL_Window* window, bool activated);
 
     void UpdateWindowProps();
     void UpdateWindowRects();
     void SelectResolution(bool windowed);
 
     void Initialize();
+
+    void InitializeImGui();
+    void DestroyImGui();
 
     void FillVideoModes();
     void CleanupVideoModes();
@@ -275,8 +278,38 @@ public:
     [[nodiscard]]
     auto editor_mode() const { return m_editor.is_shown(); }
 
+    [[nodiscard]]
+    auto GetImGuiContext() const { return m_imgui_context; }
+
+public:
+    struct ImGuiViewportData
+    {
+        SDL_Window* Window;
+        bool        WindowOwned;
+
+        ImGuiViewportData(SDL_Window* window) : Window(window), WindowOwned(false) {}
+
+        ImGuiViewportData(ImVec2 pos, ImVec2 size, Uint32 flags)
+        {
+            Window = SDL_CreateWindow("ImGui Viewport (no title yet)",
+                (int)pos.x, (int)pos.y, (int)size.x, (int)size.y, flags);
+            WindowOwned = true;
+        }
+
+        ~ImGuiViewportData()
+        {
+            if (Window && WindowOwned)
+            {
+                SDL_DestroyWindow(Window);
+            }
+        }
+    };
+
 private:
     xray::editor::ide m_editor;
+
+    ImGuiContext* m_imgui_context{};
+    IImGuiRender* m_imgui_render{};
 };
 
 extern ENGINE_API CRenderDevice Device;

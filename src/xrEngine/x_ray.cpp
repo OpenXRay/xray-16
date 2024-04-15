@@ -314,6 +314,7 @@ CApplication::CApplication(pcstr commandLine)
 
     FPU::m24r();
 
+    Device.InitializeImGui();
     Device.FillVideoModes();
     InitInput();
     InitConsole();
@@ -382,6 +383,7 @@ CApplication::~CApplication()
         Console->Destroy();
 
     Device.CleanupVideoModes();
+    Device.DestroyImGui();
     destroySound();
 
     Device.Destroy();
@@ -437,34 +439,33 @@ int CApplication::Run()
             {
             case SDL_WINDOWEVENT:
             {
+                const auto window = SDL_GetWindowFromID(event.window.windowID);
+
                 switch (event.window.event)
                 {
                 case SDL_WINDOWEVENT_SHOWN:
                 case SDL_WINDOWEVENT_FOCUS_GAINED:
                 case SDL_WINDOWEVENT_RESTORED:
                 case SDL_WINDOWEVENT_MAXIMIZED:
-                    canCallActivate = true;
-                    shouldActivate = true;
+                    if (window != Device.m_sdlWnd)
+                        Device.OnWindowActivate(window, true);
+                    else
+                    {
+                        canCallActivate = true;
+                        shouldActivate = true;
+                    }
                     continue;
 
                 case SDL_WINDOWEVENT_HIDDEN:
                 case SDL_WINDOWEVENT_FOCUS_LOST:
                 case SDL_WINDOWEVENT_MINIMIZED:
-                    canCallActivate = true;
-                    shouldActivate = false;
-                    continue;
-
-                case SDL_WINDOWEVENT_ENTER:
-                    SDL_ShowCursor(SDL_FALSE);
-                    continue;
-
-                case SDL_WINDOWEVENT_LEAVE:
-                    SDL_ShowCursor(SDL_TRUE);
-                    continue;
-
-                case SDL_WINDOWEVENT_CLOSE:
-                    Engine.Event.Defer("KERNEL:disconnect");
-                    Engine.Event.Defer("KERNEL:quit");
+                    if (window != Device.m_sdlWnd)
+                        Device.OnWindowActivate(window, false);
+                    else
+                    {
+                        canCallActivate = true;
+                        shouldActivate = false;
+                    }
                     continue;
                 } // switch (event.window.event)
             }
@@ -478,7 +479,7 @@ int CApplication::Run()
         // Workaround for screen blinking when there's too much timeouts
         if (canCallActivate)
         {
-            Device.OnWindowActivate(shouldActivate);
+            Device.OnWindowActivate(Device.m_sdlWnd, shouldActivate);
         }
 
         Device.ProcessFrame();
