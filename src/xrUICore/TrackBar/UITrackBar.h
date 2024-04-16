@@ -42,7 +42,6 @@ public:
     CUIStatic* m_static; // value
     CUIStatic* m_label; // label
     shared_str m_static_format;
-
 protected:
     void UpdatePos();
     void UpdatePosRelativeToMouse();

@@ -16,6 +16,13 @@ public:
         SDT_INVALID_DATA_TYPE
     };
 
+    struct ChildTrackBarData {
+        int isInverted;
+        float min;
+        float max;
+        float step;
+    };
+
     CUIMultiTrackBar();
     // CUIOptionsItem
     virtual void SetCurrentOptValue(); // opt->current
@@ -29,7 +36,7 @@ public:
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnMessage(LPCSTR message);
     // CUIWindow
-    void InitTrackBar(Fvector2 pos, Fvector2 size);
+    void InitTrackBars(Fvector2 pos, Fvector2 size, xr_vector<ChildTrackBarData>& trackBarData);
     virtual void Enable(bool status);
     void SetInvert(bool v) { m_b_invert = v; }
     bool GetInvert() const { return m_b_invert; };

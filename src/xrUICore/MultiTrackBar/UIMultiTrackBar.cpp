@@ -55,7 +55,7 @@ bool CUIMultiTrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return didAction;
 }
 
-void CUIMultiTrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
+void CUIMultiTrackBar::InitTrackBars(Fvector2 pos, Fvector2 size, xr_vector<CUIMultiTrackBar::ChildTrackBarData>& trackBarData)
 {
     auto dataType = GetSaveDataType();
     Fvector4 initialData = GetOptVector4Value();
@@ -77,6 +77,14 @@ void CUIMultiTrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
         AttachChild(slider);
         slider->SetAutoDelete(true);
         m_pSliders->emplace_back(slider);
+
+        auto sliderData = trackBarData[i];
+
+        slider->SetType(true); // hardcoded to float for now
+        slider->SetInvert(!!sliderData.isInverted);
+        slider->SetStep(sliderData.step);
+        slider->SetOptFBounds(sliderData.min, sliderData.max);
+        slider->SetBoundReady(true);
 
         Fvector2 newPos;
         newPos.set(0.f, i * GetHeight());
