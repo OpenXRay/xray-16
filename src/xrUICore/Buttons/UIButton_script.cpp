@@ -5,6 +5,7 @@
 #include "SpinBox/UISpinNum.h"
 #include "SpinBox/UISpinText.h"
 #include "TrackBar/UITrackBar.h"
+#include "MultiTrackBar/UIMultiTrackBar.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow),
@@ -63,5 +64,15 @@ SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow),
             .def("GetFValue", &CUITrackBar::GetFValue)
             .def("SetOptIBounds", &CUITrackBar::SetOptIBounds)
             .def("SetOptFBounds", &CUITrackBar::SetOptFBounds)
-            .def("SetCurrentValue", &CUITrackBar::SetCurrentOptValue)];
+            .def("SetCurrentValue", &CUITrackBar::SetCurrentOptValue),
+
+        class_<CUIMultiTrackBar, CUIWindow>("CUIMultiTrackBar")
+            .def(constructor<>())
+            .def("GetCheck", &CUIMultiTrackBar::GetCheck)
+            .def("SetCheck", &CUIMultiTrackBar::SetCheck)
+            .def("GetIValue", &CUIMultiTrackBar::GetIValue)
+            .def("GetFValue", &CUIMultiTrackBar::GetFValue)
+            .def("SetOptIBounds", &CUIMultiTrackBar::SetOptIBounds)
+            .def("SetOptFBounds", &CUIMultiTrackBar::SetOptFBounds)
+            .def("SetCurrentValue", &CUIMultiTrackBar::SetCurrentOptValue)]; 
 });

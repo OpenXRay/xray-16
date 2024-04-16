@@ -13,6 +13,7 @@
 #include "ListBox/UIListBox.h"
 #include "ComboBox/UIComboBox.h"
 #include "TrackBar/UITrackBar.h"
+#include "MultiTrackBar/UIMultiTrackBar.h"
 
 #include "UITextureMaster.h"
 #include "Lines/UILines.h"
@@ -1249,6 +1250,60 @@ bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, pcstr path, int index, CUITra
     pWnd->SetStep(step);
     const float displayModifier = xml_doc.ReadAttribFlt(path, index, "display_modifier", 1.f);
     pWnd->SetDisplayModifier(displayModifier);
+
+    if (!is_integer)
+    {
+        const float fmin = xml_doc.ReadAttribFlt(path, index, "min", 0.0f);
+        const float fmax = xml_doc.ReadAttribFlt(path, index, "max", 0.0f);
+
+        if (fmin != fmax)
+        {
+            pWnd->SetOptFBounds(fmin, fmax);
+            pWnd->SetBoundReady(true);
+        }
+    }
+    else
+    {
+        const int imin = xml_doc.ReadAttribInt(path, index, "min", 0);
+        const int imax = xml_doc.ReadAttribInt(path, index, "max", 0);
+
+        if (imin != imax)
+        {
+            pWnd->SetOptIBounds(imin, imax);
+            pWnd->SetBoundReady(true);
+        }
+    }
+
+    string512 buf;
+    strconcat(buf, path, ":output_wnd");
+    if (xml_doc.NavigateToNode(buf, index))
+    {
+        InitStatic(xml_doc, buf, index, pWnd->m_static);
+        pWnd->m_static_format = xml_doc.ReadAttrib(buf, index, "format", nullptr);
+        pWnd->m_static->Enable(true);
+    }
+
+    return true;
+}
+
+bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, CUIMultiTrackBar* pWnd, bool fatal /*= true*/)
+{
+    if (!InitWindow(xml_doc, path, 0, pWnd, fatal))
+        return false;
+
+    const int is_integer = xml_doc.ReadAttribInt(path, index, "is_integer", 0);
+    pWnd->SetType(!is_integer);
+
+    const int invert = xml_doc.ReadAttribInt(path, index, "invert", 0);
+    pWnd->SetInvert(!!invert);
+    const float step = xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
+    pWnd->SetStep(step);
+
+    const int childCount = xml_doc.ReadAttribInt(path, index, "child_count", 0);
+    pWnd->SetChildCount(childCount);
+
+    pWnd->InitTrackBar(pWnd->GetWndPos(), pWnd->GetWndSize());
+    InitOptionsItem(xml_doc, path, 0, pWnd);
 
     if (!is_integer)
     {
