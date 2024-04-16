@@ -29,6 +29,7 @@ class CUIScrollView;
 class CUIListWnd;
 class CUIListBox;
 class CUIProgressBar;
+class CUIMultiTrackBar;
 
 class CScriptXmlInit
 {
@@ -56,6 +57,7 @@ public:
     CUIVersionList* InitVerList(LPCSTR path, CUIWindow* parent);
     CUIMapInfo* InitMapInfo(LPCSTR path, CUIWindow* parent);
     CUITrackBar* InitTrackBar(LPCSTR path, CUIWindow* parent);
+    CUIMultiTrackBar* InitMultiTrackBar(LPCSTR path, CUIWindow* parent);
     CUIEditBox* InitCDkey(LPCSTR path, CUIWindow* parent);
     CUIEditBox* InitMPPlayerName(LPCSTR path, CUIWindow* parent);
     CUIMMShniaga* InitMMShniaga(LPCSTR path, CUIWindow* parent);

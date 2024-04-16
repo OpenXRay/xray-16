@@ -58,10 +58,11 @@ function actor_binder:net_spawn(data)
 	self.already_jumped = false
 	self.loaded = false
 	benchmark.main()							          --' Distemper 06.2008 --
-	ssfx_001_mcm.on_game_start()
-	ssfx_interactive_grass.on_game_start()
-	ssfx_shadow_cascades.on_game_start()
-	ssfx_weapons_dof.on_game_start()
+	
+	--ssfx_001_mcm.on_game_start()
+	--ssfx_interactive_grass.on_game_start()
+	--ssfx_shadow_cascades.on_game_start()
+	--ssfx_weapons_dof.on_game_start()
 	return true
 end
 ----------------------------------------------------------------------------------------------------------------------

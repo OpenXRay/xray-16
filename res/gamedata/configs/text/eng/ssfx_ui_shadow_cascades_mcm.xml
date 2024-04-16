@@ -1,0 +1,86 @@
+<!--
+- @ Version: SCREEN SPACE SHADERS - UPDATE 15
+- @ Description: Shadow Cascades - MCM strings
+- @ Author: https://www.moddb.com/members/ascii1457
+- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+-->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<string_table>
+
+	<!-- Button -->
+	<string id="ui_mcm_ssfx_module_shw_cascades">
+		<text>Shadow Cascades</text>
+	</string>
+
+	<!-- Shadow Cascades Settings -->
+	<string id="ui_mcm_ssfx_module_shw_cascades_title">
+		<text>Shadow Cascades Settings</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_shw_cascades_size_1_mcm">
+		<text>Near cascades size</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_shw_cascades_size_1_mcm_desc">
+		<text>Try to use a lower size value to improve the quality of your sun shadows.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_shw_cascades_size_2_mcm">
+		<text>Mid cascades size</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_shw_cascades_size_2_mcm_desc">
+		<text>Try to use a lower size value to improve the quality of your sun shadows.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_shw_cascades_size_3_mcm">
+		<text>Far cascades size</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_shw_cascades_size_3_mcm_desc">
+		<text>This cascade define the final rendering distance of your sun shadows. Lower values will improve performance, higher values will improve your distant shadows at the cost of performance.</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_shw_cascades_grass_shw_quality_mcm">
+		<text>Grass shadows quality</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_shw_cascades_grass_shw_quality_mcm_desc">
+		<text>[ LOW ] Grass shadows only render in the NEAR cascade. Default ANOMALY behavior. [ MEDIUM ] Grass will cast shadows in the NEAR and MID cascade. [ HIGH ] Grass shadows will be rendered in all cascades and sun volumetric rays. [ ULTRA ] All lights will cast grass shadows.</text>
+	</string>
+	
+	<string id="ui_mcm_lst_shw_cascades_low">
+		<text>Low ( ANOMALY Default )</text>
+	</string>
+	
+	<string id="ui_mcm_lst_shw_cascades_medium">
+		<text>Medium</text>
+	</string>
+
+	<string id="ui_mcm_lst_shw_cascades_high">
+		<text>High</text>
+	</string>
+	
+	<string id="ui_mcm_lst_shw_cascades_ultra">
+		<text>Ultra ( Big performance hit )</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_shw_cascades_grass_shw_distance_mcm">
+		<text>Grass shadows distance ( Sun )</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_shw_cascades_grass_shw_distance_mcm_desc">
+		<text>This value adjust the rendering distance of sun grass shadows. The value is porcentual to your grass rendering distance. Lower values will improve performance.</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_shw_cascades_grass_shw_nondir_maxdistance_mcm">
+		<text>Grass shadows max distance</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_shw_cascades_grass_shw_nondir_maxdistance_mcm_desc">
+		<text>[ ULTRA QUALITY ONLY ] This value adjust the rendering distance of grass shadows for non-directional lights. Lower values will improve performance, but you might notice when the shadows stop being rendered.</text>
+	</string>
+	
+</string_table>

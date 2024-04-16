@@ -76,6 +76,9 @@
     <Filter Include="ListWnd">
       <UniqueIdentifier>{5170a7a3-bd65-4f09-a9e4-74a6ec9e587c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MultiTrackBar">
+      <UniqueIdentifier>{3aa5ca40-4798-4a76-8ecc-a22f3c70660b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arrow\ui_arrow.cpp">
@@ -276,6 +279,9 @@
     </ClCompile>
     <ClCompile Include="ui_styles.cpp" />
     <ClCompile Include="ui_debug.cpp" />
+    <ClCompile Include="MultiTrackBar\UIMultiTrackBar.cpp">
+      <Filter>MultiTrackBar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arrow\ui_arrow.h">
@@ -458,6 +464,9 @@
     </ClInclude>
     <ClInclude Include="ui_styles.h" />
     <ClInclude Include="ui_debug.h" />
+    <ClInclude Include="MultiTrackBar\UIMultiTrackBar.h">
+      <Filter>MultiTrackBar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
