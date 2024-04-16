@@ -33,6 +33,7 @@ public:
     float GetFValue() { return m_f_val; }
     void SetDisplayModifier(float v) { m_display_modifier = v; }
     float GetDisplayModifier() { return m_display_modifier ; }
+    void SetFValue(float value) { m_f_val = value; }
     void SetOptIBounds(int imin, int imax);
     void SetOptFBounds(float fmin, float fmax);
 
@@ -72,4 +73,6 @@ protected:
             int m_i_opt_backup_value;
         };
     };
+
+    friend class CUIMultiTrackBar;
 };

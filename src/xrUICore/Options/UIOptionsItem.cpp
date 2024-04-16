@@ -91,7 +91,7 @@ Fvector3 CUIOptionsItem::GetOptVector3Value() const
 void CUIOptionsItem::SaveOptVector3Value(Fvector3 val) const
 {
     string512 command;
-    xr_sprintf(command, "%s %f %f %f", m_entry.c_str(), val.x, val.y, val.z);
+    xr_sprintf(command, "%s %f, %f, %f", m_entry.c_str(), val.x, val.y, val.z);
     Console->Execute(command);
 }
 
@@ -103,7 +103,7 @@ Fvector4 CUIOptionsItem::GetOptVector4Value() const
 void CUIOptionsItem::SaveOptVector4Value(Fvector4 val) const
 {
     string512 command;
-    xr_sprintf(command, "%s %f %f %f %f", m_entry.c_str(), val.x, val.y, val.z, val.w);
+    xr_sprintf(command, "%s %f, %f, %f, %f", m_entry.c_str(), val.x, val.y, val.z, val.w);
     Console->Execute(command);
 }
 

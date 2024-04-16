@@ -1302,6 +1302,24 @@ bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, C
     const int childCount = xml_doc.ReadAttribInt(path, index, "child_count", 0);
     pWnd->SetChildCount(childCount);
 
+    const int saveDataType = xml_doc.ReadAttribInt(path, index, "save_data_type", childCount);
+    if (saveDataType == 3)
+    {
+        pWnd->SetSaveDataType(CUIMultiTrackBar::SDT_Fvector3);
+    }
+    else if (saveDataType == 4)
+    {
+        pWnd->SetSaveDataType(CUIMultiTrackBar::SDT_Fvector4);
+    }
+    else
+    {
+        pWnd->SetSaveDataType(CUIMultiTrackBar::SDT_INVALID_DATA_TYPE);
+    }
+
+    cpcstr entry = xml_doc.ReadAttrib(path, index, "entry");
+    cpcstr group = xml_doc.ReadAttrib(path, index, "group");
+    pWnd->AssignProps(entry, group);
+
     pWnd->InitTrackBar(pWnd->GetWndPos(), pWnd->GetWndSize());
     InitOptionsItem(xml_doc, path, 0, pWnd);
 
@@ -1328,13 +1346,34 @@ bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, C
         }
     }
 
-    string512 buf;
-    strconcat(buf, path, ":output_wnd");
-    if (xml_doc.NavigateToNode(buf, index))
+    xr_vector<pcstr> mapping = { "x", "y", "z", "w" };
+    for (int i = 0; i < childCount; i++)
     {
-        InitStatic(xml_doc, buf, index, pWnd->m_static);
-        pWnd->m_static_format = xml_doc.ReadAttrib(buf, index, "format", nullptr);
-        pWnd->m_static->Enable(true);
+        auto trackBar = pWnd->GetTrackBarAtIdx(i);
+        string128 min, max, step, isInt, invert;
+        xr_sprintf(min, "%s_%s", mapping[i], "min");
+        xr_sprintf(max, "%s_%s", mapping[i], "max");
+        xr_sprintf(step, "%s_%s", mapping[i], "step");
+        xr_sprintf(invert, "%s_%s", mapping[i], "invert");
+        const int is_invert = xml_doc.ReadAttribInt(path, index, invert, 0);
+        const float fmin = xml_doc.ReadAttribFlt(path, index, min, 0.0f);
+        const float fmax = xml_doc.ReadAttribFlt(path, index, max, 0.0f);
+        const float fstep = xml_doc.ReadAttribFlt(path, index, step, 0.0f);
+
+        trackBar->SetType(true); // hardcoded to float for now
+        trackBar->SetInvert(!!is_invert);
+        trackBar->SetStep(fstep);
+        trackBar->SetOptFBounds(fmin, fmax);
+        trackBar->SetBoundReady(true);
+
+        string512 buf;
+        strconcat(buf, path, ":output_wnd");
+        if (xml_doc.NavigateToNode(buf, index))
+        {
+            InitStatic(xml_doc, buf, index, trackBar->m_static);
+            trackBar->m_static_format = xml_doc.ReadAttrib(buf, index, "format", nullptr);
+            trackBar->m_static->Enable(true);
+        }
     }
 
     return true;

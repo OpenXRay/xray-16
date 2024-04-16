@@ -9,6 +9,13 @@ class CUITrackBar;
 class XRUICORE_API CUIMultiTrackBar final : public CUI_IB_FrameLineWnd, public CUIOptionsItem
 {
 public:
+    enum SaveDataTypes
+    {
+        SDT_Fvector3,
+        SDT_Fvector4,
+        SDT_INVALID_DATA_TYPE
+    };
+
     CUIMultiTrackBar();
     // CUIOptionsItem
     virtual void SetCurrentOptValue(); // opt->current
@@ -32,15 +39,26 @@ public:
     bool GetCheck();
     void SetCheck(bool b);
     int GetIValue() { return m_i_val; }
-    float GetFValue() { return m_f_val; }
+    Fvector4 GetFValue() { return m_f_val; }
     void SetOptIBounds(int imin, int imax);
     void SetOptFBounds(float fmin, float fmax);
     void SetChildCount(int count) { childCount = count; }
+    SaveDataTypes GetSaveDataType() { return saveDataType; }
+    void SetSaveDataType(SaveDataTypes type)
+    {  
+        saveDataType = type;
+        Msg("Yohji debug - set save data type %d", saveDataType);
+    }
 
     pcstr GetDebugType() override { return "CUIMultiTrackBar"; }
 
     CUIStatic* m_static;
     shared_str m_static_format;
+
+    CUITrackBar* GetTrackBarAtIdx(int idx)
+    {
+        return m_pSliders->at(idx);
+    }
 
 protected:
     void UpdatePos();
@@ -53,16 +71,14 @@ protected:
     bool m_b_bound_already_set;
 
     int childCount;
+    SaveDataTypes saveDataType{ SDT_INVALID_DATA_TYPE };
 
     union
     {
         struct
         {
-            float m_f_val;
-            float m_f_max;
-            float m_f_min;
-            float m_f_step;
-            float m_f_opt_backup_value;
+            Fvector4 m_f_val;
+            Fvector4 m_f_opt_backup_value;
         };
         struct
         {

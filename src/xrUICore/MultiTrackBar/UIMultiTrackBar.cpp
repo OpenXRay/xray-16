@@ -20,9 +20,11 @@ constexpr pcstr SLIDER_BUTTON_TEXTURE = "ui_slider_button";
 constexpr pcstr SLIDER_BUTTON_TEXTURE_E = "ui_slider_button_e";
 
 CUIMultiTrackBar::CUIMultiTrackBar()
-    : m_b_invert(false), m_b_is_float(true), m_b_bound_already_set(false), m_f_val(0), m_f_max(1), m_f_min(0),
-    m_f_step(0.01f), m_f_opt_backup_value(0)
+    : m_b_invert(false), m_b_is_float(true), m_b_bound_already_set(false)
 {
+    Fvector4 zero{ 0.f, 0.f, 0.f, 0.f };
+    m_f_val = zero;
+    m_f_opt_backup_value = zero;
     m_pSliders = xr_new<xr_vector<CUITrackBar*>>();
 
     m_static = xr_new<CUIStatic>("Value as text");
@@ -39,9 +41,15 @@ bool CUIMultiTrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
 
     bool didAction = false;
 
-    for (auto slider : *m_pSliders)
+    for (int i = 0; i < childCount; i++)
     {
+        auto slider = GetTrackBarAtIdx(i);
         didAction = slider->OnMouseAction(x, y, mouse_action);
+    }
+
+    if (didAction)
+    {
+        SetCurrentOptValue();
     }
 
     return didAction;
@@ -49,6 +57,20 @@ bool CUIMultiTrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
 
 void CUIMultiTrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
 {
+    auto dataType = GetSaveDataType();
+    Fvector4 initialData = GetOptVector4Value();
+    Fvector3 initialData2 = GetOptVector3Value();
+
+    Msg("Yohji debug - checking data 1 %s %3.3f %3.3f %3.3f %3.3f", m_entry.c_str(), initialData.x, initialData.y, initialData.z, initialData.w);
+    Msg("Yohji debug - checking data 1 %s %3.3f %3.3f %3.3f", m_entry.c_str(), initialData2.x, initialData2.y, initialData2.z);
+
+
+    if (dataType == SDT_Fvector3)
+        initialData = { initialData2.x, initialData2.y, initialData2.z, 0.f};
+
+    m_f_opt_backup_value = initialData;
+    m_f_val = initialData;
+
     for (int i = 0; i < childCount; i++)
     {
         auto slider = xr_new<CUITrackBar>();
@@ -59,6 +81,13 @@ void CUIMultiTrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
         Fvector2 newPos;
         newPos.set(0.f, i * GetHeight());
         slider->InitTrackBar(newPos, size);
+
+        auto value = m_f_val[i];
+        slider->SetFValue(m_f_val[i]);
+        slider->UpdatePos();
+        slider->OnChangedOptValue();
+
+        Msg("Yohji debug - checking data 3 in slider %s %3.3f", m_entry.c_str(), slider->GetFValue());
     }
 
     m_wndSize = { m_wndSize.x, m_wndSize.y * childCount };
@@ -87,61 +116,47 @@ void CUIMultiTrackBar::Update()
 
 void CUIMultiTrackBar::SetCurrentOptValue()
 {
-    if (m_b_is_float)
+    for (int i = 0; i < childCount; i++)
     {
-        float fake_min, fake_max;
-        if (!m_b_bound_already_set)
-            GetOptFloatValue(m_f_val, m_f_min, m_f_max);
-        else
-            GetOptFloatValue(m_f_val, fake_min, fake_max);
+        auto slider = GetTrackBarAtIdx(i);
+        m_f_val[i] = slider->GetFValue();
     }
-    else
-    {
-        int fake_min, fake_max;
-        if (!m_b_bound_already_set)
-            GetOptIntegerValue(m_i_val, m_i_min, m_i_max);
-        else
-            GetOptIntegerValue(m_i_val, fake_min, fake_max);
-    }
+
+    Msg("Yohji debug - Set entry %s to value %3.3f %3.3f %3.3f %3.3f", m_entry.c_str(), m_f_val.x, m_f_val.y, m_f_val.z, m_f_val.w);
 
     UpdatePos();
 }
 
 void CUIMultiTrackBar::SaveOptValue()
 {
-    CUIOptionsItem::SaveOptValue();
-    if (m_b_is_float)
-        SaveOptFloatValue(m_f_val);
-    else
-        SaveOptIntegerValue(m_i_val);
+    auto dataType = GetSaveDataType();
+    switch (dataType)
+    {
+    case SDT_Fvector3:
+        SaveOptVector3Value(Fvector3{ m_f_val.x, m_f_val.y, m_f_val.z });
+        break;
+    case SDT_Fvector4:
+        SaveOptVector4Value(m_f_val);
+        break;
+    }
+
+    Msg("Yohji debug - Save entry %s to value %3.3f %3.3f %3.3f %3.3f", m_entry.c_str(), m_f_val.x, m_f_val.y, m_f_val.z, m_f_val.w);
 }
 
 bool CUIMultiTrackBar::IsChangedOptValue() const
 {
-    if (m_b_is_float)
-    {
-        return !fsimilar(m_f_opt_backup_value, m_f_val);
-    }
-    else
-    {
-        return (m_i_opt_backup_value != m_i_val);
-    }
+    bool isChanged = !fsimilar(m_f_opt_backup_value.x, m_f_val.x) || !fsimilar(m_f_opt_backup_value.y, m_f_val.y) || !fsimilar(m_f_opt_backup_value.z, m_f_val.z);
+    return isChanged;
 }
 
 void CUIMultiTrackBar::SaveBackUpOptValue()
 {
-    if (m_b_is_float)
-        m_f_opt_backup_value = m_f_val;
-    else
-        m_i_opt_backup_value = m_i_val;
+    m_f_opt_backup_value = m_f_val;
 }
 
 void CUIMultiTrackBar::UndoOptValue()
 {
-    if (m_b_is_float)
-        m_f_val = m_f_opt_backup_value;
-    else
-        m_i_val = m_i_opt_backup_value;
+    m_f_val = m_f_opt_backup_value;
 
     UpdatePos();
     CUIOptionsItem::UndoOptValue();
@@ -149,10 +164,6 @@ void CUIMultiTrackBar::UndoOptValue()
 
 void CUIMultiTrackBar::SetStep(float step)
 {
-    if (m_b_is_float)
-        m_f_step = step;
-    else
-        m_i_step = iFloor(step);
 }
 
 void CUIMultiTrackBar::Enable(bool status)
@@ -171,66 +182,6 @@ void CUIMultiTrackBar::UpdatePosRelativeToMouse()
     if (m_pSliders->empty())
         return;
 
-    float _bkf = 0.0f;
-    int _bki = 0;
-    if (m_b_is_float)
-    {
-        _bkf = m_f_val;
-    }
-    else
-    {
-        _bki = m_i_val;
-    }
-
-    float btn_width = m_pSliders->front()->GetWidth();
-    float window_width = GetWidth();
-    float fpos = cursor_pos.x;
-
-    if (GetInvert())
-        fpos = window_width - fpos;
-
-    if (fpos < btn_width / 2)
-        fpos = btn_width / 2;
-    else if (fpos > window_width - btn_width / 2)
-        fpos = window_width - btn_width / 2;
-
-    const float fmax = (m_b_is_float) ? m_f_max : (float)m_i_max;
-    const float fmin = (m_b_is_float) ? m_f_min : (float)m_i_min;
-    const float fstep = (m_b_is_float) ? m_f_step : (float)m_i_step;
-
-    float fval = (fmax - fmin) * (fpos - btn_width / 2) / (window_width - btn_width) + fmin;
-
-    const float d = (fval - fmin);
-
-    const float val = d / fstep;
-    const int vi = iFloor(val);
-    float vf = fstep * vi;
-
-    if (d - vf > fstep / 2.0f)
-        vf += fstep;
-
-    fval = fmin + vf;
-
-    clamp(fval, fmin, fmax);
-
-    if (m_b_is_float)
-        m_f_val = fval;
-    else
-        m_i_val = iFloor(fval);
-
-    bool b_ch = false;
-    if (m_b_is_float)
-    {
-        b_ch = !fsimilar(_bkf, m_f_val);
-    }
-    else
-    {
-        b_ch = (_bki != m_i_val);
-    }
-
-    if (b_ch)
-        GetMessageTarget()->SendMessage(this, BUTTON_CLICKED, NULL);
-
     UpdatePos();
     OnChangedOptValue();
 }
@@ -240,56 +191,18 @@ void CUIMultiTrackBar::UpdatePos()
     if (m_pSliders->empty())
         return;
 
-#ifdef DEBUG
-
-    if (m_b_is_float)
-        R_ASSERT2(
-            m_f_val >= m_f_min && m_f_val <= m_f_max, "CUIMultiTrackBar::UpdatePos() - m_val >= m_min && m_val <= m_max");
-    else
-        R_ASSERT2(
-            m_i_val >= m_i_min && m_i_val <= m_i_max, "CUIMultiTrackBar::UpdatePos() - m_val >= m_min && m_val <= m_max");
-
-#endif
-
-    float btn_width = m_pSliders->front()->GetWidth();
-    float window_width = GetWidth();
-    float free_space = window_width - btn_width;
-    Fvector2 pos = m_pSliders->front()->GetWndPos();
-
-    const float fval = (m_b_is_float) ? m_f_val : (float)m_i_val;
-    const float fmax = (m_b_is_float) ? m_f_max : (float)m_i_max;
-    const float fmin = (m_b_is_float) ? m_f_min : (float)m_i_min;
-
-    pos.x = (fval - fmin) * free_space / (fmax - fmin);
-    if (GetInvert())
-        pos.x = free_space - pos.x;
-
-    m_pSliders->front()->SetWndPos(pos);
-
-    if (m_static->IsEnabled())
-    {
-        string256 buff;
-        if (m_b_is_float)
-        {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%.1f" : m_static_format.c_str()), m_f_val);
-        }
-        else
-        {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%d" : m_static_format.c_str()), m_i_val);
-        }
-        m_static->TextItemControl()->SetTextST(buff);
-    }
 }
 
 void CUIMultiTrackBar::OnMessage(LPCSTR message)
 {
     if (0 == xr_strcmp(message, "set_default_value"))
     {
-        if (m_b_is_float)
-            m_f_val = m_f_min + (m_f_max - m_f_min) / 2.0f;
-        else
-            m_i_val = m_i_min + iFloor((m_i_max - m_i_min) / 2.0f);
-
+        for (int i = 0; i < childCount; i++)
+        {
+            auto slider = GetTrackBarAtIdx(i);
+            slider->SetFValue(m_f_val[i]);
+            slider->UpdatePos();
+        }
         UpdatePos();
     }
 }
@@ -308,22 +221,8 @@ void CUIMultiTrackBar::SetCheck(bool b)
 
 void CUIMultiTrackBar::SetOptIBounds(int imin, int imax)
 {
-    m_i_min = imin;
-    m_i_max = imax;
-    if (m_i_val < m_i_min || m_i_val > m_i_max)
-    {
-        clamp(m_i_val, m_i_min, m_i_max);
-        OnChangedOptValue();
-    }
 }
 
 void CUIMultiTrackBar::SetOptFBounds(float fmin, float fmax)
 {
-    m_f_min = fmin;
-    m_f_max = fmax;
-    if (m_f_val < m_f_min || m_f_val > m_f_max)
-    {
-        clamp(m_f_val, m_f_min, m_f_max);
-        OnChangedOptValue();
-    }
 }
