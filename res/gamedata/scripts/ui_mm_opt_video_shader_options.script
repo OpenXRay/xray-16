@@ -1,0 +1,66 @@
+class "opt_video_shader_options" (CUIWindow)
+function opt_video_shader_options:__init() super()
+end
+
+function opt_video_shader_options:__finalize()
+end
+
+function all_modes(render_id)
+	return true
+end
+
+function opt_video_shader_options:InitControls(x, y, xml, handler)
+	local ctl
+    local _st
+
+    self.scroll_v = xml:InitScrollView("video_shader_options:scroll_v", self)
+
+    self:SetWndPos(vector2():set(x,y))
+    self:SetWndSize(vector2():set(738,416))
+    self:SetAutoDelete(true)
+
+	-- Flora Fixes Module
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_florafixes_2", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_florafixes_1", self.scroll_v)
+
+	-- Interactive Grass Module
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_grass_interactive", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_int_grass_params_1", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_int_grass_params_2", self.scroll_v)
+
+	-- Rain Module
+	-- Main
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_rain_1", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_rain_2", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_rain_3", self.scroll_v)
+
+	-- Footsteps
+	-- TODO implement rain footsteps logic
+	-- HUD
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_hud_rain_1", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_hud_rain_2", self.scroll_v)
+
+	-- Shadow Cascades Module
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_shadow_cascades", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_grass_shadows", self.scroll_v)
+
+	-- Wpn DOF Module
+	-- TODO add engine logic to support custom DOF values, this is disabled for now
+	-- xml:InitMultiTrackBar("video_shader_options:track_ssfx_wpn_dof_1", self.scroll_v)
+	-- xml:InitMultiTrackBar("video_shader_options:track_ssfx_wpn_dof_2", self.scroll_v)
+
+	-- Gloss module
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_gloss", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_specular", self.scroll_v)
+
+	-- Wet Surfaces
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_wetness_3", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_wetness_1", self.scroll_v)
+	xml:InitMultiTrackBar("video_shader_options:track_ssfx_wetness_2", self.scroll_v)
+    
+	btn = xml:Init3tButton("video_shader_options:btn_to_simply", self)
+	handler:Register(btn, "btn_shader_options_quit")
+
+	btn = xml:Init3tButton("video_shader_options:btn_default_shaders", self)
+	handler:Register(btn, "btn_default_shaders")
+end

@@ -1,0 +1,72 @@
+<!--
+- @ Version: SCREEN SPACE SHADERS - UPDATE 18
+- @ Description: Flora Fixes - MCM strings
+- @ Author: https://www.moddb.com/members/ascii1457
+- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+-->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<string_table>
+
+	<!-- Button -->
+	<string id="ui_mcm_ssfx_module_florafixes">
+		<text>Flora Fixes</text>
+	</string>
+
+	<!-- Flora Fixes Title -->
+	<string id="ui_mcm_ssfx_module_florafixes_title">
+		<text>Flora Fixes &amp; Improvements - Settings</text>
+	</string>
+
+	<!-- Flora Fixes Settings -->
+	<string id="ui_mcm_ssfx_module_florafixes_sss_int_mcm">
+		<text>SubSurface Scattering Intensity</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_sss_int_mcm_desc">
+		<text>Intensity of the flora SubSurface Scattering.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_sss_color_mcm">
+		<text>SubSurface Scattering Color</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_sss_color_mcm_desc">
+		<text>How much sun color is added to the flora SubSurface Scattering. 1.0 is 100% sun color.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_grass_specular_mcm">
+		<text>Grass Specular</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_grass_specular_mcm_desc">
+		<text>Specular value when the grass is dry. Be careful when adjusting the value, try with small changes and check the result.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_grass_specular_wet_mcm">
+		<text>Wet Grass Specular</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_grass_specular_wet_mcm_desc">
+		<text>Specular value when the grass is wet. Be careful when adjusting the value, try with small changes and check the result.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_trees_specular_mcm">
+		<text>Trees/Bushes Specular</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_trees_specular_mcm_desc">
+		<text>Specular when trees and bushes are dry. Be careful when adjusting the value, try with small changes and check the result.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_trees_specular_wet_mcm">
+		<text>Wet Trees/Bushes Specular</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_florafixes_trees_specular_mcm_desc">
+		<text>Specular when trees and bushes are wet. Be careful when adjusting the value, try with small changes and check the result.</text>
+	</string>
+
+
+</string_table>

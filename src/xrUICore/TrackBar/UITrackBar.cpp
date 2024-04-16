@@ -34,6 +34,10 @@ CUITrackBar::CUITrackBar()
     m_label->SetAutoDelete(true);
 
     m_b_mouse_capturer = false;
+
+    m_display_modifier = 1.f;
+    m_display_order = 1;
+    m_display_label = nullptr;
 }
 
 bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)

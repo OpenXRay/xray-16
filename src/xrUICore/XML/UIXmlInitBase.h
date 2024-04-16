@@ -30,6 +30,7 @@ class CUIListBox;
 class CUIDragDropListEx;
 class CUIComboBox;
 class CUITrackBar;
+class CUIMultiTrackBar;
 class CUILines;
 class CGameFont;
 
@@ -66,6 +67,7 @@ public:
     static bool InitListBox(CUIXml& xml_doc, pcstr path, int index, CUIListBox* pWnd, bool fatal = true);
     static bool InitComboBox(CUIXml& xml_doc, pcstr path, int index, CUIComboBox* pWnd);
     static bool InitTrackBar(CUIXml& xml_doc, pcstr path, int index, CUITrackBar* pWnd, bool fatal = true);
+    static bool InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, CUIMultiTrackBar* pWnd, bool fatal = true);
     static Frect GetFRect(const CUIXml& xml_doc, pcstr path, int index);
     static u32 GetColor(const CUIXml& xml_doc, pcstr path, int index, u32 def_clr);
 

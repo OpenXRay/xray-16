@@ -159,4 +159,41 @@
 	<string id="spa">
 		<text>Spanish</text>
 	</string>
+	<string id="ui_mm_shader_options">
+		<text>Shader Options</text>
+	</string>
+	<string id="ui_mm_simply_shader_opts">
+		<text>Back to Basic Settings</text>
+	</string>
+
+	<string id="ui_mm_shader_options_default">
+		<text>Default</text>
+	</string>
+
+
+	<string id="ui_mm_ssfx_shadow_cascades">
+		<text>Shadow Cascades Settings</text>
+	</string>
+	<string id="ui_mm_ssfx_shadow_cascades_x">
+		<text>Near cascades size</text>
+	</string>
+	<string id="ui_mm_ssfx_shadow_cascades_y">
+		<text>Mid cascades size</text>
+	</string>
+	<string id="ui_mm_ssfx_shadow_cascades_z">
+		<text>Far cascades size</text>
+	</string>
+
+	<string id="ui_mm_ssfx_grass_shadows">
+		<text>Grass shadows Settings</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_x">
+		<text>Grass shadows quality</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_y">
+		<text>Grass shadows distance ( Sun )</text>
+	</string>
+	<string id="ui_mm_ssfx_grass_shadows_z">
+		<text>Grass shadows max distance</text>
+	</string>	
 </string_table>

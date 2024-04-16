@@ -31,6 +31,16 @@ public:
     void SetCheck(bool b);
     int GetIValue() { return m_i_val; }
     float GetFValue() { return m_f_val; }
+    void SetDisplayModifier(float v) { m_display_modifier = v; }
+    float GetDisplayModifier() { return m_display_modifier ; }
+    void SetDisplayOrder(int v) { m_display_order = v; }
+    int GetDisplayOrder() { return m_display_order; }
+    void SetOrder(int v) { m_order = v; }
+    int GetOrder() { return m_order; }
+    void SetDisplayLabel(pcstr s) { m_display_label = s; }
+    pcstr GetDisplayLabel() { return m_display_label; }
+
+    void SetFValue(float value) { m_f_val = value; }
     void SetOptIBounds(int imin, int imax);
     void SetOptFBounds(float fmin, float fmax);
 
@@ -39,7 +49,6 @@ public:
     CUIStatic* m_static; // value
     CUIStatic* m_label; // label
     shared_str m_static_format;
-
 protected:
     void UpdatePos();
     void UpdatePosRelativeToMouse();
@@ -49,6 +58,10 @@ protected:
     bool m_b_is_float;
     bool m_b_mouse_capturer;
     bool m_b_bound_already_set;
+    float m_display_modifier;
+    int m_display_order;
+    int m_order;
+    pcstr m_display_label;
 
     union
     {
@@ -69,4 +82,6 @@ protected:
             int m_i_opt_backup_value;
         };
     };
+
+    friend class CUIMultiTrackBar;
 };

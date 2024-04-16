@@ -85,6 +85,7 @@
     <ClInclude Include="ListWnd\UIListWnd.h" />
     <ClInclude Include="ListWnd\UIListWnd_inline.h" />
     <ClInclude Include="MessageBox\UIMessageBox.h" />
+    <ClInclude Include="MultiTrackBar\UIMultiTrackBar.h" />
     <ClInclude Include="Options\UIOptionsItem.h" />
     <ClInclude Include="Options\UIOptionsManager.h" />
     <ClInclude Include="Options\UIOptionsManagerScript.h" />
@@ -153,6 +154,7 @@
     <ClCompile Include="ListWnd\UIListWnd_script.cpp" />
     <ClCompile Include="MessageBox\UIMessageBox.cpp" />
     <ClCompile Include="MessageBox\UIMessageBox_script.cpp" />
+    <ClCompile Include="MultiTrackBar\UIMultiTrackBar.cpp" />
     <ClCompile Include="Options\UIOptionsItem.cpp" />
     <ClCompile Include="Options\UIOptionsManager.cpp" />
     <ClCompile Include="Options\UIOptionsManagerScript.cpp" />

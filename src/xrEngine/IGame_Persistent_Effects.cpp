@@ -347,7 +347,6 @@ void IGame_Persistent::UpdateHudRaindrops() const
     const float ssfx_hud_raindrops_extragloss = ssfx_default_settings.extra_gloss;
     const float val_density = 0.15f * (3.5f - ssfx_hud_raindrops_density); // 0.5 ~3.0
     const float val_texsize = 2.0f - ssfx_hud_raindrops_size;
-    ps_ssfx_hud_drops_2.set(val_density, val_texsize, ssfx_hud_raindrops_extragloss, ssfx_hud_raindrops_gloss);
     static float drops_int{}, drops_anim{};
     const float Rain_factor = g_pGamePersistent->pEnvironment->CurrentEnv.rain_density;
     const float delta_time = Device.fTimeDelta;
@@ -376,6 +375,7 @@ void IGame_Persistent::UpdateHudRaindrops() const
         drops_anim = 0.f;
     // Update shader data
     ps_ssfx_hud_drops_1.set(drops_anim, drops_int, ssfx_hud_raindrops_refle, ssfx_hud_raindrops_refra);
+    ps_ssfx_hud_drops_2.set(val_density, val_texsize, ssfx_hud_raindrops_extragloss, ssfx_hud_raindrops_gloss);
 }
 
 void IGame_Persistent::UpdateRainGloss() const
@@ -385,15 +385,15 @@ void IGame_Persistent::UpdateRainGloss() const
         bool auto_gloss{ true }; // Automatic adjustment of gloss based on wetness.
         float auto_gloss_max{ 1.0f }; // Value to control the maximum value of gloss when full wetness is reached. ( 0 = 0% | 1 = 100% )
 
-        float ripples_size{ 1.5f };
-        float ripples_speed{ 1.4f };
-        float ripples_min_speed{ 0.7f };
-        float ripples_intensity{ 1.25f };
+        float ripples_size{ ps_ssfx_wetsurfaces_1_cfg.x };
+        float ripples_speed{ ps_ssfx_wetsurfaces_1_cfg.y };
+        float ripples_min_speed{ ps_ssfx_wetsurfaces_1_cfg.z };
+        float ripples_intensity{ ps_ssfx_wetsurfaces_1_cfg.w };
 
-        float waterfall_size{ 1.2 };
-        float waterfall_speed{ 1.5f };
-        float waterfall_min_speed{ 0.2f };
-        float waterfall_intensity{ 0.35f };
+        float waterfall_size{ ps_ssfx_wetsurfaces_2_cfg.x };
+        float waterfall_speed{ ps_ssfx_wetsurfaces_2_cfg.y };
+        float waterfall_min_speed{ ps_ssfx_wetsurfaces_2_cfg.z };
+        float waterfall_intensity{ ps_ssfx_wetsurfaces_2_cfg.w };
 
         int cover_res{ 1 }; // Resolution of the rain cover rendering.(0 Low ~5 High)
         float cover_distance{ 30.f }; // Distance of the rain cover rendering.Higher values are more performance expensive.

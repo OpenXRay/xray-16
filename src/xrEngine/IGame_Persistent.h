@@ -280,6 +280,8 @@ extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
 
 extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
 extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1_cfg;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2_cfg;
 extern ENGINE_API float ps_ssfx_gloss_factor;
 extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
 extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
