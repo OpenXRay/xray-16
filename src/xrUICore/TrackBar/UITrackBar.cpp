@@ -34,6 +34,8 @@ CUITrackBar::CUITrackBar()
     m_label->SetAutoDelete(true);
 
     m_b_mouse_capturer = false;
+
+    m_display_modifier = 1.f;
 }
 
 bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
@@ -340,11 +342,11 @@ void CUITrackBar::UpdatePos()
         string256 buff;
         if (m_b_is_float)
         {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%.1f" : m_static_format.c_str()), m_f_val);
+            xr_sprintf(buff, (m_static_format == nullptr ? "%.1f" : m_static_format.c_str()), m_f_val * GetDisplayModifier());
         }
         else
         {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%d" : m_static_format.c_str()), m_i_val);
+            xr_sprintf(buff, (m_static_format == nullptr ? "%d" : m_static_format.c_str()), m_i_val * GetDisplayModifier());
         }
         m_static->TextItemControl()->SetTextST(buff);
     }

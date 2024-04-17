@@ -1247,6 +1247,8 @@ bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, pcstr path, int index, CUITra
     pWnd->SetInvert(!!invert);
     const float step = xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
     pWnd->SetStep(step);
+    const float displayModifier = xml_doc.ReadAttribFlt(path, index, "display_modifier", 1.f);
+    pWnd->SetDisplayModifier(displayModifier);
 
     if (!is_integer)
     {

@@ -31,6 +31,8 @@ public:
     void SetCheck(bool b);
     int GetIValue() { return m_i_val; }
     float GetFValue() { return m_f_val; }
+    void SetDisplayModifier(float v) { m_display_modifier = v; }
+    float GetDisplayModifier() { return m_display_modifier ; }
     void SetOptIBounds(int imin, int imax);
     void SetOptFBounds(float fmin, float fmax);
 
@@ -49,6 +51,7 @@ protected:
     bool m_b_is_float;
     bool m_b_mouse_capturer;
     bool m_b_bound_already_set;
+    float m_display_modifier;
 
     union
     {
