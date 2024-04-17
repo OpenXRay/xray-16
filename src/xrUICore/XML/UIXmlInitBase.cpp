@@ -1338,14 +1338,21 @@ bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, C
         trackBarData[i] = { is_invert, fmin, fmax, fstep };
     }
 
+    string512 buf;
+    xr_sprintf(buf, "%s%s", path, ":title");
+    if (xml_doc.NavigateToNode(buf, index))
+    {
+        InitStatic(xml_doc, buf, index, pWnd->m_static);
+        pWnd->m_static->Enable(true);
+    }
+
     pWnd->InitTrackBars(pWnd->GetWndPos(), pWnd->GetWndSize(), trackBarData);
     InitOptionsItem(xml_doc, path, 0, pWnd);
 
     for (int i = 0; i < childCount; i++)
     {
         auto trackBar = pWnd->GetTrackBarAtIdx(i);
-        string512 buf;
-        strconcat(buf, path, ":output_wnd");
+        xr_sprintf(buf, "%s%s", path, ":output_wnd");
         if (xml_doc.NavigateToNode(buf, index))
         {
             InitStatic(xml_doc, buf, index, trackBar->m_static);

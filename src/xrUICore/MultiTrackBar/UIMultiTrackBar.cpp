@@ -61,15 +61,13 @@ void CUIMultiTrackBar::InitTrackBars(Fvector2 pos, Fvector2 size, xr_vector<CUIM
     Fvector4 initialData = GetOptVector4Value();
     Fvector3 initialData2 = GetOptVector3Value();
 
-    Msg("Yohji debug - checking data 1 %s %3.3f %3.3f %3.3f %3.3f", m_entry.c_str(), initialData.x, initialData.y, initialData.z, initialData.w);
-    Msg("Yohji debug - checking data 1 %s %3.3f %3.3f %3.3f", m_entry.c_str(), initialData2.x, initialData2.y, initialData2.z);
-
-
     if (dataType == SDT_Fvector3)
         initialData = { initialData2.x, initialData2.y, initialData2.z, 0.f};
 
     m_f_opt_backup_value = initialData;
     m_f_val = initialData;
+
+    int titleRow = m_static->IsEnabled();
 
     for (int i = 0; i < childCount; i++)
     {
@@ -87,18 +85,24 @@ void CUIMultiTrackBar::InitTrackBars(Fvector2 pos, Fvector2 size, xr_vector<CUIM
         slider->SetBoundReady(true);
 
         Fvector2 newPos;
-        newPos.set(0.f, i * GetHeight());
+        newPos.set(0.f, (i + titleRow) * GetHeight());
         slider->InitTrackBar(newPos, size);
 
         auto value = m_f_val[i];
         slider->SetFValue(m_f_val[i]);
         slider->UpdatePos();
         slider->OnChangedOptValue();
-
-        Msg("Yohji debug - checking data 3 in slider %s %3.3f", m_entry.c_str(), slider->GetFValue());
     }
 
-    m_wndSize = { m_wndSize.x, m_wndSize.y * childCount };
+    int rowCount = childCount;
+    if (titleRow)
+        rowCount += 1;
+
+#ifdef DEBUG
+    Msg("UI DEBUG - final size of MultiTrackBar %s = %3.3f", m_entry.c_str(), m_wndSize.y * rowCount);
+#endif
+
+    m_wndSize = { m_wndSize.x, m_wndSize.y * rowCount };
 }
 
 void CUIMultiTrackBar::Draw()
@@ -109,6 +113,8 @@ void CUIMultiTrackBar::Draw()
         m_pSlider->Draw();
         m_pSlider->m_static->Draw();
     }
+
+    m_static->Draw();
 }
 
 void CUIMultiTrackBar::Update()
@@ -129,8 +135,6 @@ void CUIMultiTrackBar::SetCurrentOptValue()
         auto slider = GetTrackBarAtIdx(i);
         m_f_val[i] = slider->GetFValue();
     }
-
-    Msg("Yohji debug - Set entry %s to value %3.3f %3.3f %3.3f %3.3f", m_entry.c_str(), m_f_val.x, m_f_val.y, m_f_val.z, m_f_val.w);
 
     UpdatePos();
 }
