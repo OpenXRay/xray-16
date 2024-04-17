@@ -68,11 +68,6 @@ SCRIPT_EXPORT(CUIButton, (CUIStatic, CUIWindow),
 
         class_<CUIMultiTrackBar, CUIWindow>("CUIMultiTrackBar")
             .def(constructor<>())
-            .def("GetCheck", &CUIMultiTrackBar::GetCheck)
-            .def("SetCheck", &CUIMultiTrackBar::SetCheck)
-            .def("GetIValue", &CUIMultiTrackBar::GetIValue)
-            .def("GetFValue", &CUIMultiTrackBar::GetFValue)
-            .def("SetOptIBounds", &CUIMultiTrackBar::SetOptIBounds)
-            .def("SetOptFBounds", &CUIMultiTrackBar::SetOptFBounds)
+            .def("GetValue", &CUIMultiTrackBar::GetValue)
             .def("SetCurrentValue", &CUIMultiTrackBar::SetCurrentOptValue)]; 
 });

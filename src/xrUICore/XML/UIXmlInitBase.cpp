@@ -1291,13 +1291,20 @@ bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, C
     if (!InitWindow(xml_doc, path, 0, pWnd, fatal))
         return false;
 
-    const int is_integer = xml_doc.ReadAttribInt(path, index, "is_integer", 0);
-    pWnd->SetType(!is_integer);
+    const int def_is_integer = xml_doc.ReadAttribInt(path, index, "is_integer", 0);
+    pWnd->SetType(!def_is_integer);
 
-    const int invert = xml_doc.ReadAttribInt(path, index, "invert", 0);
-    pWnd->SetInvert(!!invert);
-    const float step = xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
-    pWnd->SetStep(step);
+    const int def_invert = xml_doc.ReadAttribInt(path, index, "invert", 0);
+    pWnd->SetDefaultInvert(!!def_invert);
+
+    const float def_step = xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
+    pWnd->SetDefaultStep(def_step);
+
+    const float def_min = xml_doc.ReadAttribFlt(path, index, "min", 0.1f);
+    pWnd->SetDefaultMin(def_min);
+
+    const float def_max = xml_doc.ReadAttribFlt(path, index, "max", 0.1f);
+    pWnd->SetDefaultMax(def_max);
 
     const int childCount = xml_doc.ReadAttribInt(path, index, "child_count", 0);
     pWnd->SetChildCount(childCount);
@@ -1330,10 +1337,10 @@ bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, C
         xr_sprintf(max, "%s_%s", mapping[i], "max");
         xr_sprintf(step, "%s_%s", mapping[i], "step");
         xr_sprintf(invert, "%s_%s", mapping[i], "invert");
-        const int is_invert = xml_doc.ReadAttribInt(path, index, invert, 0);
-        const float fmin = xml_doc.ReadAttribFlt(path, index, min, 0.0f);
-        const float fmax = xml_doc.ReadAttribFlt(path, index, max, 0.0f);
-        const float fstep = xml_doc.ReadAttribFlt(path, index, step, 0.0f);
+        const int is_invert = xml_doc.ReadAttribInt(path, index, invert, def_invert);
+        const float fmin = xml_doc.ReadAttribFlt(path, index, min, def_min);
+        const float fmax = xml_doc.ReadAttribFlt(path, index, max, def_max);
+        const float fstep = xml_doc.ReadAttribFlt(path, index, step, def_step);
 
         trackBarData[i] = { is_invert, fmin, fmax, fstep };
     }

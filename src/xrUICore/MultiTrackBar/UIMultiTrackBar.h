@@ -38,18 +38,24 @@ public:
     // CUIWindow
     void InitTrackBars(Fvector2 pos, Fvector2 size, xr_vector<ChildTrackBarData>& trackBarData);
     virtual void Enable(bool status);
-    void SetInvert(bool v) { m_b_invert = v; }
-    bool GetInvert() const { return m_b_invert; };
-    void SetStep(float step);
+
+    void SetDefaultInvert(bool v) { m_b_invert = v; }
+    bool GetDefaultInvert() const { return m_b_invert; };
+
+    void SetDefaultMin(float v) { m_default_min = v; }
+    float GetDefaultMin() const { return m_default_min; };
+    void SetDefaultMax(float v) { m_default_max = v; }
+    float GetDefaultMax() const { return m_default_max; };
+
+    void SetDefaultStep(float step) { m_default_step = step; }
+    float GetDefaultStep() { return m_default_step; }
+
     void SetType(bool b_float) { m_b_is_float = b_float; };
     void SetBoundReady(bool b_ready) { m_b_bound_already_set = b_ready; };
-    bool GetCheck();
-    void SetCheck(bool b);
-    int GetIValue() { return m_i_val; }
-    Fvector4 GetFValue() { return m_f_val; }
-    void SetOptIBounds(int imin, int imax);
-    void SetOptFBounds(float fmin, float fmax);
+
+    Fvector4 GetValue() { return m_f_val; }
     void SetChildCount(int count) { childCount = count; }
+
     SaveDataTypes GetSaveDataType() { return saveDataType; }
     void SetSaveDataType(SaveDataTypes type)
     {  
@@ -68,9 +74,6 @@ public:
     }
 
 protected:
-    void UpdatePos();
-    void UpdatePosRelativeToMouse();
-
     xr_vector<CUITrackBar*>* m_pSliders{};
     bool m_b_invert;
     bool m_b_is_float;
@@ -80,20 +83,9 @@ protected:
     int childCount;
     SaveDataTypes saveDataType{ SDT_INVALID_DATA_TYPE };
 
-    union
-    {
-        struct
-        {
-            Fvector4 m_f_val;
-            Fvector4 m_f_opt_backup_value;
-        };
-        struct
-        {
-            int m_i_val;
-            int m_i_max;
-            int m_i_min;
-            int m_i_step;
-            int m_i_opt_backup_value;
-        };
-    };
+    float m_default_step;
+    float m_default_min;
+    float m_default_max;
+    Fvector4 m_f_val;
+    Fvector4 m_f_opt_backup_value;
 };

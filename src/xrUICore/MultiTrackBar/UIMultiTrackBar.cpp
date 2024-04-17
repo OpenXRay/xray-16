@@ -135,8 +135,6 @@ void CUIMultiTrackBar::SetCurrentOptValue()
         auto slider = GetTrackBarAtIdx(i);
         m_f_val[i] = slider->GetFValue();
     }
-
-    UpdatePos();
 }
 
 void CUIMultiTrackBar::SaveOptValue()
@@ -169,13 +167,7 @@ void CUIMultiTrackBar::SaveBackUpOptValue()
 void CUIMultiTrackBar::UndoOptValue()
 {
     m_f_val = m_f_opt_backup_value;
-
-    UpdatePos();
     CUIOptionsItem::UndoOptValue();
-}
-
-void CUIMultiTrackBar::SetStep(float step)
-{
 }
 
 void CUIMultiTrackBar::Enable(bool status)
@@ -189,22 +181,6 @@ void CUIMultiTrackBar::Enable(bool status)
     }
 }
 
-void CUIMultiTrackBar::UpdatePosRelativeToMouse()
-{
-    if (m_pSliders->empty())
-        return;
-
-    UpdatePos();
-    OnChangedOptValue();
-}
-
-void CUIMultiTrackBar::UpdatePos()
-{
-    if (m_pSliders->empty())
-        return;
-
-}
-
 void CUIMultiTrackBar::OnMessage(LPCSTR message)
 {
     if (0 == xr_strcmp(message, "set_default_value"))
@@ -215,26 +191,5 @@ void CUIMultiTrackBar::OnMessage(LPCSTR message)
             slider->SetFValue(m_f_val[i]);
             slider->UpdatePos();
         }
-        UpdatePos();
     }
-}
-
-bool CUIMultiTrackBar::GetCheck()
-{
-    VERIFY(!m_b_is_float);
-    return !!m_i_val;
-}
-
-void CUIMultiTrackBar::SetCheck(bool b)
-{
-    VERIFY(!m_b_is_float);
-    m_i_val = (b) ? m_i_max : m_i_min;
-}
-
-void CUIMultiTrackBar::SetOptIBounds(int imin, int imax)
-{
-}
-
-void CUIMultiTrackBar::SetOptFBounds(float fmin, float fmax)
-{
 }
