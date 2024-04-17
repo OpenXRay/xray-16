@@ -1361,6 +1361,13 @@ bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, C
             trackBar->m_static->Enable(true);
             trackBar->UpdatePos();
         }
+        xr_sprintf(buf, "%s%s%s", path, ":cap_", mapping[i]);
+        if (xml_doc.NavigateToNode(buf, index))
+        {
+            InitStatic(xml_doc, buf, index, trackBar->m_label);
+            trackBar->m_label->Enable(true);
+            trackBar->UpdatePos();
+        }
     }
 
     return true;
