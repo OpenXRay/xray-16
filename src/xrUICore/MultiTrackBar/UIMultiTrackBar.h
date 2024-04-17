@@ -73,6 +73,11 @@ public:
         return m_pSliders->at(idx);
     }
 
+    void UpdatePos();
+
+    void SetDisplayModifier(float v) { m_default_display_modifier = v; }
+    float GetDisplayModifier() { return m_default_display_modifier; }
+
 protected:
     xr_vector<CUITrackBar*>* m_pSliders{};
     bool m_b_invert;
@@ -86,6 +91,7 @@ protected:
     float m_default_step;
     float m_default_min;
     float m_default_max;
+    float m_default_display_modifier{ 1.f };
     Fvector4 m_f_val;
     Fvector4 m_f_opt_backup_value;
 };

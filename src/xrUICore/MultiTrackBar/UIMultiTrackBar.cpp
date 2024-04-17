@@ -33,6 +33,8 @@ CUIMultiTrackBar::CUIMultiTrackBar()
     m_static->SetAutoDelete(true);
 
     m_b_mouse_capturer = false;
+
+    m_default_display_modifier = 1.f;
 }
 
 bool CUIMultiTrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
@@ -191,5 +193,14 @@ void CUIMultiTrackBar::OnMessage(LPCSTR message)
             slider->SetFValue(m_f_val[i]);
             slider->UpdatePos();
         }
+    }
+}
+
+void CUIMultiTrackBar::UpdatePos()
+{
+    for (int i = 0; i < childCount; i++)
+    {
+        auto slider = GetTrackBarAtIdx(i);
+        slider->UpdatePos();
     }
 }

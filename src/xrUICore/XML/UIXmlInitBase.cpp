@@ -1309,6 +1309,9 @@ bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, C
     const int childCount = xml_doc.ReadAttribInt(path, index, "child_count", 0);
     pWnd->SetChildCount(childCount);
 
+    const float defDisplayModifier = xml_doc.ReadAttribFlt(path, index, "display_modifier", 1.f);
+    pWnd->SetDisplayModifier(defDisplayModifier);
+
     const int saveDataType = xml_doc.ReadAttribInt(path, index, "save_data_type", childCount);
     if (saveDataType == 3)
     {
@@ -1366,14 +1369,14 @@ bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, C
             const pcstr default_format = xml_doc.ReadAttrib(buf, index, "format", nullptr);
             trackBar->m_static_format = default_format;
             trackBar->m_static->Enable(true);
-            trackBar->UpdatePos();
+            pWnd->UpdatePos();
         }
         xr_sprintf(buf, "%s%s%s", path, ":cap_", mapping[i]);
         if (xml_doc.NavigateToNode(buf, index))
         {
             InitStatic(xml_doc, buf, index, trackBar->m_label);
             trackBar->m_label->Enable(true);
-            trackBar->UpdatePos();
+            pWnd->UpdatePos();
         }
     }
 
