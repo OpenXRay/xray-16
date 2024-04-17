@@ -36,7 +36,8 @@ public:
 
     pcstr GetDebugType() override { return "CUITrackBar"; }
 
-    CUIStatic* m_static;
+    CUIStatic* m_static; // value
+    CUIStatic* m_label; // label
     shared_str m_static_format;
 
 protected:
