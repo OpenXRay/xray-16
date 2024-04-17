@@ -1,0 +1,27 @@
+class "opt_video_shader_options" (CUIWindow)
+function opt_video_shader_options:__init() super()
+end
+
+function opt_video_shader_options:__finalize()
+end
+
+function all_modes(render_id)
+	return true
+end
+
+function opt_video_shader_options:InitControls(x, y, xml, handler)
+	local ctl
+    local _st
+
+	self:SetWndPos(vector2():set(x,y))
+	self:SetWndSize(vector2():set(738,416))
+	self:SetAutoDelete(true)
+
+	xml:InitMultiTrackBar				("video_shader_options:track_ssfx_shadow_cascades",		self)
+	xml:InitMultiTrackBar				("video_shader_options:track_ssfx_grass_shadows",		self)
+	xml:InitMultiTrackBar				("video_shader_options:track_ssfx_rain_1",		self)
+	xml:InitMultiTrackBar				("video_shader_options:track_ssfx_rain_2",		self)
+    
+	btn = xml:Init3tButton("video_shader_options:btn_to_simply", self)
+	handler:Register(btn, "btn_shader_options_quit")
+end

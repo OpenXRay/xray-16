@@ -167,14 +167,21 @@
           <track_brightness x="140" y="247" width="188" height="16">
             <options_item entry="rs_c_brightness" group="mm_opt_video" depend="runtime"/>
         </track_brightness>
-
         <btn_advanced x="270" y="322" width="86" height="24" stretch="1">
             <text r="170" g="170" b="170" align="c" font="letterica16">ui_mm_advanced</text>
+            <texture>ui_inGame2_button</texture>
+            <text_color>
+                <e r="210" g="210" b="210"/>
+            </text_color>
+        </btn_advanced>
+        
+        <btn_shader_options x="150" y="322" width="86" height="24" stretch="1">
+            <text r="170" g="170" b="170" align="c" font="letterica16">ui_mm_shader_options</text>
             <texture>ui_inGame2_button</texture>
 			<text_color>
 				<e r="210" g="210" b="210"/>
 			</text_color>
-        </btn_advanced>
+        </btn_shader_options>
     </tab_video>
 
     <video_adv>
@@ -534,6 +541,8 @@
 			</text_color>
         </btn_to_simply>
     </video_adv>
+
+    #include "ui\ui_mm_shader_options_16.xml"
 
     <tab_sound>
         <cap_mastervolume x="12" y="3" width="108" height="24">

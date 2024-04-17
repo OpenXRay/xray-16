@@ -1,0 +1,113 @@
+<video_shader_options>
+    <scroll_view x="-4" y="0" width="360" height="320"
+    right_ident="0" left_ident="0" top_indent="0" bottom_indent="0"
+    vert_interval="0" always_show_scroll="0"/>
+    <templ_item width="375" height="25"/>
+
+    <track_ssfx_shadow_cascades x="144" y="0" width="160" height="20" min="10.0" max="30.0" step="1.0" 
+        child_count="3" entry="ssfx_shadow_cascades" group="mm_opt_video_shader_options"
+        x_label="" x_min="10.0" x_max="30.0" x_step="1.0"
+        y_label="" y_min="40.0" y_max="110.0" y_step="1.0"
+        z_label="" z_min="120.0" z_max="300.0" z_step="1.0"
+    >
+        <title x="-160" y="0" width="160" height="20">
+            <text x="16" r="170" g="170" b="170" font="letterica18" align="l" vert_align="c">ui_mm_ssfx_shadow_cascades</text>
+        </title>
+        <cap_x x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_shadow_cascades_x</text>
+        </cap_x>
+        <cap_y x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_shadow_cascades_y</text>
+        </cap_y>
+        <cap_z x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_shadow_cascades_z</text>
+        </cap_z>
+        <output_wnd x="165" y="0" width="20" height="20" format="%.0f">
+            <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
+        </output_wnd>
+    </track_ssfx_shadow_cascades>
+
+    <track_ssfx_grass_shadows x="144" y="80" width="160" height="20" min="10.0" max="30.0" step="1.0" 
+        child_count="3" entry="ssfx_grass_shadows" group="mm_opt_video_shader_options" save_data_type="4"
+        x_label="" x_min="0.0" x_max="3.0" x_step="1.0"
+        y_label="" y_min="0.0" y_max="1" y_step="0.01" y_display_scale="100.0"
+        z_label="" z_min="10.0" z_max="50.0" z_step="1.0">
+        <title x="-160" y="0" width="160" height="20">
+            <text x="16" r="170" g="170" b="170" font="letterica18" align="l" vert_align="c">ui_mm_ssfx_grass_shadows</text>
+        </title>
+        <cap_x x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_grass_shadows_x</text>
+        </cap_x>
+        <cap_y x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_grass_shadows_y</text>
+        </cap_y>
+        <cap_z x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_grass_shadows_z</text>
+        </cap_z>
+        <output_wnd x="165" y="0" width="20" height="20" format="%.0f">
+            <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
+        </output_wnd>
+    </track_ssfx_grass_shadows>
+
+    <track_ssfx_rain_1 x="144" y="160" width="160" height="20" min="10.0" max="30.0" step="1.0" 
+        child_count="4" entry="ssfx_rain_1" group="mm_opt_video_shader_options"
+        x_label="" x_min="1.0" x_max="30.0" x_step="1.0"
+        y_label="" y_min="40.0" y_max="110.0" y_step="1.0"
+        z_label="" z_min="120.0" z_max="300.0" z_step="1.0"
+        w_label="" w_min="120.0" w_max="300.0" w_step="1.0"
+    >
+        <title x="-160" y="0" width="160" height="20">
+            <text x="16" r="170" g="170" b="170" font="letterica18" align="l" vert_align="c">ui_mm_ssfx_rain_1</text>
+        </title>
+        <cap_x x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_rain_1_x</text>
+        </cap_x>
+        <cap_y x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_rain_1_y</text>
+        </cap_y>
+        <cap_z x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_rain_1_z</text>
+        </cap_z>
+        <cap_w x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_rain_1_w</text>
+        </cap_w>
+        <output_wnd x="165" y="0" width="20" height="20" format="%.0f">
+            <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
+        </output_wnd>
+    </track_ssfx_rain_1>
+
+    <track_ssfx_rain_2 x="144" y="260" width="160" height="20" min="10.0" max="30.0" step="1.0" 
+        child_count="4" entry="ssfx_rain_2" group="mm_opt_video_shader_options"
+        x_label="" x_min="1.0" x_max="30.0" x_step="1.0"
+        y_label="" y_min="40.0" y_max="110.0" y_step="1.0"
+        z_label="" z_min="120.0" z_max="300.0" z_step="1.0"
+        w_label="" w_min="120.0" w_max="300.0" w_step="1.0"
+    >
+        <title x="-160" y="0" width="160" height="20">
+            <text x="16" r="170" g="170" b="170" font="letterica18" align="l" vert_align="c">ui_mm_ssfx_rain_2</text>
+        </title>
+        <cap_x x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_rain_2_x</text>
+        </cap_x>
+        <cap_y x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_rain_2_y</text>
+        </cap_y>
+        <cap_z x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_rain_2_z</text>
+        </cap_z>
+        <cap_w x="-64" y="0" width="50" height="20">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_ssfx_rain_2_w</text>
+        </cap_w>
+        <output_wnd x="165" y="0" width="20" height="20" format="%.0f">
+            <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
+        </output_wnd>
+    </track_ssfx_rain_2>
+
+    <btn_to_simply x="270" y="322" width="86" height="24" stretch="1">
+        <text align="c" font="letterica16">ui_mm_simply_shader_opts</text>
+        <texture>ui_inGame2_button</texture>
+        <text_color>
+            <e r="210" g="210" b="210"/>
+        </text_color>
+    </btn_to_simply>
+</video_shader_options>

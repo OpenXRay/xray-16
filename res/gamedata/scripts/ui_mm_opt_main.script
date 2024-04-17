@@ -59,6 +59,12 @@ function options_dialog:InitControls()
 	self.dlg_video_adv:Show		(false)
 	self.dialog:AttachChild		(self.dlg_video_adv)
 	xml:InitWindow				("tab_size", 0, self.dlg_video_adv)
+
+	self.dlg_video_shader_options = ui_mm_opt_video_shader_options.opt_video_shader_options()
+	self.dlg_video_shader_options:InitControls(0,0, xml, self)
+	self.dlg_video_shader_options:Show		(false)
+	self.dialog:AttachChild		(self.dlg_video_shader_options)
+	xml:InitWindow				("tab_size", 0, self.dlg_video_shader_options)
 	
 	self.dlg_controls_gpad		= ui_mm_opt_controls_gpad.opt_controls_gpad()
 	self.dlg_controls_gpad:InitControls(0,0, xml, self)
@@ -87,7 +93,6 @@ function options_dialog:InitControls()
 	self.download_progress		= xml:InitProgressBar	("progress_download", self)
 	self.btn_cancel_download	= xml:Init3tButton		("btn_cancel_download", self)
 	self:Register				(self.btn_cancel_download, "btn_cancel_download")
-
 end
 
 function options_dialog:SetCurrentValues()
@@ -101,6 +106,9 @@ function options_dialog:SetCurrentValues()
 
 	opt:SetCurrentValues("mm_opt_video_adv")
 	opt:SaveBackupValues("mm_opt_video_adv")
+
+	opt:SetCurrentValues("mm_opt_video_shader_options")
+	opt:SaveBackupValues("mm_opt_video_shader_options")
 
 	opt:SetCurrentValues("mm_opt_gameplay")
 	opt:SaveBackupValues("mm_opt_gameplay")
@@ -195,6 +203,11 @@ function options_dialog:InitCallBacks()
 	self:AddCallback("btn_keyboard_controls", ui_events.BUTTON_CLICKED,	self.OnBtnKbdControls,		self)
 	self:AddCallback("btn_gpad_default",	ui_events.BUTTON_CLICKED,	self.OnBtnGpadDefault,		self)
 
+	self:AddCallback("btn_shader_options", ui_events.BUTTON_CLICKED, self.OnShaderOptionsSelected, self)
+	self:AddCallback("btn_shader_options_quit",	ui_events.BUTTON_CLICKED,	self.OnShaderOptionsQuit,		self)
+
+
+
 	self:AddCallback("mb",					ui_events.MESSAGE_BOX_YES_CLICKED, self.OnApplyChanges, self)
 	self:AddCallback("mb",					ui_events.MESSAGE_BOX_NO_CLICKED, self.OnDiscardChanges,self)
 --	self:AddCallback("trb_ssample",			ui_events.BUTTON_CLICKED,	self.UpdateDependControls,	self)
@@ -219,11 +232,13 @@ end
 function options_dialog:OnPresetChanged()
 	local opt					= COptionsManager()
 	opt:SetCurrentValues		("mm_opt_video_adv")
+	opt:SetCurrentValues("mm_opt_video_shader_options")
 end
 
 function options_dialog:OnShaderPresetChanged()
 	local opt					= COptionsManager()
 	opt:SetCurrentValues		("mm_opt_video_adv")
+	opt:SetCurrentValues("mm_opt_video_shader_options")
 
     local current_preset = self.combo_shader_preset:CurrentID()
     self.combo_color_grading_preset:Enable(current_preset ~= 0)
@@ -232,6 +247,7 @@ end
 function options_dialog:OnBtnDefGraph()
 	local opt = COptionsManager()
 	opt:SendMessage2Group("mm_opt_video","set_default_value")
+	opt:SendMessage2Group("mm_opt_video_shader_options","set_default_value")
 end
 
 function options_dialog:OnBtnDefSound()
@@ -256,6 +272,8 @@ function options_dialog:OnBtnAccept()
 	--opt:SaveValues("mm_opt_controls_adv")
 	opt:SaveValues("key_binding_gamepad")
 
+	opt:SaveValues("mm_opt_video_shader_options")
+
 	if opt:NeedVidRestart() then
 		_G.b_discard_settings_shown = true
 		self.message_box:InitMessageBox("message_box_yes_no")
@@ -275,6 +293,7 @@ function options_dialog:OnBtnCancel()
 	opt:UndoGroup			("mm_opt_video_preset")
 	opt:UndoGroup			("mm_opt_video")
 	opt:UndoGroup			("mm_opt_video_adv")
+	opt:UndoGroup("mm_opt_video_shader_options")
 	opt:UndoGroup			("mm_opt_sound")
 	opt:OptionsPostAccept	()
 
@@ -290,6 +309,8 @@ function options_dialog:OnTabChange()
 	self.dlg_controls:Show	(false)
 	self.dlg_video_adv:Show	(false)
 	self.dlg_controls_gpad:Show(false)
+	self.dlg_video_shader_options:Show(false)
+
 
 	local ids = self.tab:GetActiveId()
 	if ids == "video" then
@@ -456,4 +477,14 @@ function options_dialog:OnMenuReloaded()
 	    self.message_box:SetText(string.format("%s %d% s", game.translate_string("ui_mm_confirm_changes"), 15, game.translate_string("mp_si_sec")))
 	    self.message_box:ShowDialog(true)
 	end
+end
+
+function options_dialog:OnShaderOptionsSelected()
+	self.dlg_video:Show		(false)
+	self.dlg_video_shader_options:Show(true)
+end
+
+function options_dialog:OnShaderOptionsQuit()
+	self.dlg_video:Show		(true)
+	self.dlg_video_shader_options:Show(false)
 end
