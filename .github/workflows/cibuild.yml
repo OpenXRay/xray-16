@@ -182,12 +182,12 @@ jobs:
         - { name: FreeBSD, os: freebsd, os-version: '14.0', arch: x86_64,
             install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 glew lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
           }
-        - { name: OpenBSD, os: openbsd, os-version: 7.5,  arch: x86_64,
+        - { name: OpenBSD, os: openbsd, os-version: '7.5',  arch: x86_64,
             install-cmd: "sudo pkg_add cmake SDL2 glew lzo2 jpeg openal libogg libtheora libvorbis",
           }
-        #- { name: NetBSD,  os: netbsd,  os-version: 9.3,  arch: x86_64,
-        #    install-cmd: "sudo pkgin -y install cmake SDL2 glew lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
-        #  }
+        - { name: NetBSD,  os: netbsd,  os-version: '10.0',  arch: x86_64,
+            install-cmd: "sudo pkgin -y install cmake SDL2 glew lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
+          }
         configuration: [Debug, Release]
 
     steps:

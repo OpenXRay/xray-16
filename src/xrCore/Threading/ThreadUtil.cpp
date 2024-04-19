@@ -15,7 +15,7 @@ static int pthread_setname_np(pthread_t threadId, const char* name)
 #   elif defined(XR_PLATFORM_NETBSD)
 static int pthread_setname_np(pthread_t threadId, const char* name)
 {
-    return pthread_setname_np(threadId, "%s", name);
+    return pthread_setname_np(threadId, "%s", const_cast<char*>(name));
 }
 #   elif defined(XR_PLATFORM_APPLE)
 static int pthread_setname_np(pthread_t /*threadId*/, const char* name)

@@ -33,10 +33,10 @@
 #define _copysign copysign
 
 #define _cdecl //__attribute__((cdecl))
-#define _fastcall //__attribute__((fastcall))
 
-#define __cdecl
+#define __cdecl _cdecl
 #define __stdcall
+#define __fastcall
 
 #define __pragma(...) _Pragma(#__VA_ARGS__)
 #define CALLBACK
