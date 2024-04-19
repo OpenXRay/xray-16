@@ -23,7 +23,7 @@ target_include_directories(xrImGui
     "${IMGUI_DIR}"
 )
 
-if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT WIN32)
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL "NetBSD" AND NOT WIN32)
     target_link_libraries(xrImGui
         PRIVATE
         $<$<NOT:$<PLATFORM_ID:OpenBSD>>:dl>

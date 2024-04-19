@@ -46,7 +46,10 @@ elseif (APPLE)
 else()
     option(LUA_USE_POSIX "Use POSIX functionality." ON)
 
-    if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD") # OpenBSD has dlopen as a part of libc
+    # OpenBSD has dl as a part of libc
+    # NetBSD includes dl functions automatically
+    if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+        # This option only links dl and doesn't change anything other from that.
         option(LUA_USE_DLOPEN "Use dynamic linker to load modules." ON)
     endif()
 endif()
