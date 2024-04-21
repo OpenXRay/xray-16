@@ -3,7 +3,7 @@
 
 #include "QueryHelper.h"
 
-R_occlusion::R_occlusion(void) { enabled = strstr(Core.Params, "-no_occq") ? FALSE : TRUE; }
+R_occlusion::R_occlusion(void) { enabled = strstr(Core.Params, "-no_occq") ? false : true; }
 R_occlusion::~R_occlusion(void) { occq_destroy(); }
 void R_occlusion::occq_create(u32 limit)
 {
@@ -16,22 +16,16 @@ void R_occlusion::occq_create(u32 limit)
         q.order = it;
         if (FAILED(CreateQuery(&q.Q, D3D_QUERY_OCCLUSION)))
             break;
-        pool.push_back(q);
+        pool.emplace_back(std::move(q));
     }
     std::reverse(pool.begin(), pool.end());
 }
 void R_occlusion::occq_destroy()
 {
-    while (!used.empty())
-    {
-        ReleaseQuery(used.back().Q);
-        used.pop_back();
-    }
-    while (!pool.empty())
-    {
-        ReleaseQuery(pool.back().Q);
-        pool.pop_back();
-    }
+    for (const auto& q : used)
+        ReleaseQuery(q.Q);
+    for (const auto& q : pool)
+        ReleaseQuery(q.Q);
     used.clear();
     pool.clear();
     fids.clear();
@@ -58,12 +52,12 @@ u32 R_occlusion::occq_begin(u32& ID)
     {
         ID = fids.back();
         fids.pop_back();
-        used[ID] = pool.back();
+        used[ID] = std::move(pool.back());
     }
     else
     {
-        ID = used.size();
-        used.push_back(pool.back());
+        ID = static_cast<u32>(used.size());
+        used.emplace_back(std::move(pool.back()));
     }
     pool.pop_back();
     CHK_DX(BeginQuery(used[ID].Q));
@@ -122,18 +116,18 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
     // insert into pool (sorting in decreasing order)
     Query& Q = used[ID];
     if (pool.empty())
-        pool.push_back(Q);
+        pool.emplace_back(Q);
     else
     {
         int it = int(pool.size()) - 1;
         while ((it >= 0) && (pool[it].order < Q.order))
             it--;
-        pool.insert(pool.begin() + it + 1, Q);
+        pool.emplace(pool.begin() + it + 1, std::move(Q));
     }
 
     // remove from used and shrink as nesessary
     used[ID].Q = 0;
-    fids.push_back(ID);
+    fids.emplace_back(ID);
     ID = 0;
     return fragments;
 }
