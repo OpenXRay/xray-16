@@ -34,6 +34,7 @@
 #include "ZoneCampfire.h"
 #include "PhysicObject.h"
 #include "Artefact.h"
+#include "level_changer.h"
 
 /*
     New luabind makes incorrect casts in this case. He makes casts only to 'true derived class'.
@@ -403,6 +404,17 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("actor_look_at_point", &CScriptGameObject::ActorLookAtPoint)
         .def("enable_level_changer", &CScriptGameObject::enable_level_changer)
         .def("is_level_changer_enabled", &CScriptGameObject::is_level_changer_enabled)
+        .def("enable_silent_level_changer", [](const CScriptGameObject* self, bool silent)
+        {
+            if (auto* lch = smart_cast<CLevelChanger*>(&self->object()))
+                lch->EnableSilentMode(silent);
+        })
+        .def("is_level_changer_silent", [](const CScriptGameObject* self)
+        {
+            if (const auto* lch = smart_cast<CLevelChanger*>(&self->object()))
+                return lch->IsSilentModeEnabled();
+            return false;
+        })
 
         .def("set_level_changer_invitation", &CScriptGameObject::set_level_changer_invitation)
         .def("start_particles", &CScriptGameObject::start_particles)
