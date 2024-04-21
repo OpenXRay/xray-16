@@ -68,10 +68,7 @@ u32 R_occlusion::occq_begin(u32& ID)
         used.push_back(pool.back());
     }
     pool.pop_back();
-    // CHK_DX					(used[ID].Q->Issue	(D3DISSUE_BEGIN));
     CHK_DX(BeginQuery(used[ID].Q));
-
-    // Msg				("begin: [%2d] - %d", used[ID].order, ID);
 
     return used[ID].order;
 }
@@ -86,8 +83,6 @@ void R_occlusion::occq_end(u32& ID)
     if (ID == iInvalidHandle)
         return;
 
-    // Msg				("end  : [%2d] - %d", used[ID].order, ID);
-    // CHK_DX			(used[ID].Q->Issue	(D3DISSUE_END));
     CHK_DX(EndQuery(used[ID].Q));
 }
 R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
@@ -103,12 +98,9 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
 
     occq_result fragments = 0;
     HRESULT hr;
-    // CHK_DX		(used[ID].Q->GetData(&fragments,sizeof(fragments),D3DGETDATA_FLUSH));
-    // Msg			("get  : [%2d] - %d => %d", used[ID].order, ID, fragments);
     CTimer T;
     T.Start();
     RImplementation.BasicStats.Wait.Begin();
-    // while	((hr=used[ID].Q->GetData(&fragments,sizeof(fragments),D3DGETDATA_FLUSH))==S_FALSE) {
     VERIFY2(ID < used.size(), make_string("_Pos = %d, size() = %d ", ID, used.size()));
     while ((hr = GetData(used[ID].Q, &fragments, sizeof(fragments))) == S_FALSE)
     {
