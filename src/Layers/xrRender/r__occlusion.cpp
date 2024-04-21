@@ -41,10 +41,22 @@ u32 R_occlusion::occq_begin(u32& ID)
     //	Igor: prevent release crash if we issue too many queries
     if (pool.empty())
     {
-        if ((Device.dwFrame % 40) == 0)
-            Msg(" RENDER [Warning]: Too many occlusion queries were issued (>%u)!!!", used.size());
-        ID = iInvalidHandle;
-        return 0;
+        const auto sz = used.size();
+        Query q;
+        q.order = static_cast<u32>(sz);
+        if (FAILED(CreateQuery(&q.Q, D3D_QUERY_OCCLUSION)))
+        {
+            if ((Device.dwFrame % 40) == 0)
+                Msg(" RENDER [Warning]: Too many occlusion queries were issued (>%zu)!!!", sz);
+            ID = iInvalidHandle;
+            return 0;
+        }
+        if (sz == used.capacity())
+        {
+            used.reserve(sz + occq_size_base);
+            pool.reserve(sz + occq_size_base);
+        }
+        pool.emplace(pool.begin(), std::move(q));
     }
 
     RImplementation.BasicStats.OcclusionQueries++;
