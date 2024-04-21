@@ -48,7 +48,7 @@ u32 R_occlusion::occq_begin(u32& ID)
     if (pool.empty())
     {
         if ((Device.dwFrame % 40) == 0)
-            Msg(" RENDER [Warning]: Too many occlusion queries were issued(>%u)!!!", pool.size());
+            Msg(" RENDER [Warning]: Too many occlusion queries were issued (>%u)!!!", used.size());
         ID = iInvalidHandle;
         return 0;
     }
