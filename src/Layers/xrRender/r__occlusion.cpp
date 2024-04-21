@@ -33,12 +33,11 @@ void R_occlusion::occq_destroy()
 
 u32 R_occlusion::occq_begin(u32& ID)
 {
-    ScopeLock lock{ &render_lock };
-
     if (!enabled)
         return 0;
 
-    //	Igor: prevent release crash if we issue too many queries
+    ScopeLock lock{ &render_lock };
+
     if (pool.empty())
     {
         const auto sz = used.size();
@@ -78,27 +77,19 @@ u32 R_occlusion::occq_begin(u32& ID)
 }
 void R_occlusion::occq_end(u32& ID)
 {
+    if (!enabled || ID == iInvalidHandle)
+        return;
+
     ScopeLock lock{ &render_lock };
-
-    if (!enabled)
-        return;
-
-    //	Igor: prevent release crash if we issue too many queries
-    if (ID == iInvalidHandle)
-        return;
 
     CHK_DX(EndQuery(used[ID].Q));
 }
 R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
 {
-    ScopeLock lock{ &render_lock };
-
-    if (!enabled)
+    if (!enabled || ID == iInvalidHandle)
         return 0xffffffff;
 
-    //	Igor: prevent release crash if we issue too many queries
-    if (ID == iInvalidHandle)
-        return 0xFFFFFFFF;
+    ScopeLock lock{ &render_lock };
 
     occq_result fragments = 0;
     HRESULT hr;
