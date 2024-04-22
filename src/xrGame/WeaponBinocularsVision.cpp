@@ -89,7 +89,7 @@ void SBinocVisibleObj::Update()
 
     Fmatrix xform;
     xform.mul(Device.mFullTransform, m_object->XFORM());
-    Fvector2 mn = {flt_max, flt_max}, mx = {flt_min, flt_min};
+    Fvector2 mn = {flt_max, flt_max}, mx = {flt_lowest, flt_lowest};
 
     for (u32 k = 0; k < 8; ++k)
     {

@@ -147,7 +147,7 @@ void CSpaceRestrictorWrapper::fill_shape(const CShapeData::shape_def& shape)
             Fvector().set(-.5f, +.5f, -.5f), Fvector().set(-.5f, +.5f, +.5f), Fvector().set(+.5f, -.5f, -.5f),
             Fvector().set(+.5f, -.5f, +.5f), Fvector().set(+.5f, +.5f, -.5f), Fvector().set(+.5f, +.5f, +.5f)};
         start = Fvector().set(flt_max, flt_max, flt_max);
-        dest = Fvector().set(flt_min, flt_min, flt_min);
+        dest = Fvector().set(flt_lowest, flt_lowest, flt_lowest);
         Fmatrix Q;
         Q.mul_43(m_xform, shape.data.box);
         Fvector temp;

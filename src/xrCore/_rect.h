@@ -70,8 +70,8 @@ public:
     {
         lt.x = type_max<T>;
         lt.y = type_max<T>;
-        rb.x = type_min<T>;
-        rb.y = type_min<T>;
+        rb.x = type_lowest<T>;
+        rb.y = type_lowest<T>;
         return *this;
     };
     IC bool valide() { return lt.x1 < rb.x && lt.y < rb.y; }

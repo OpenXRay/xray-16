@@ -493,7 +493,7 @@ LPCSTR Manager::get_upgrade_by_index(CInventoryItem& item, Ivector2 const& index
 bool Manager::compute_range(LPCSTR parameter, float& low, float& high)
 {
     low = flt_max;
-    high = flt_min;
+    high = flt_lowest;
 
     Roots_type::iterator ib = m_roots.begin();
     Roots_type::iterator ie = m_roots.end();
@@ -509,7 +509,7 @@ bool Manager::compute_range(LPCSTR parameter, float& low, float& high)
         compute_range_section(((*uib).second)->section(), parameter, low, high);
     }
 
-    return (low != flt_max) && (high != flt_min);
+    return (low != flt_max) && (high != flt_lowest);
 }
 
 void Manager::compute_range_section(LPCSTR section, LPCSTR parameter, float& low, float& high)

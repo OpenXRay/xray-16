@@ -315,7 +315,7 @@ _vector3<T>& _vector3<T>::normalize_safe()
 template <typename T>
 _vector3<T>& _vector3<T>::normalize(const _vector3<T>& v)
 {
-	VERIFY((v.x*v.x + v.y*v.y + v.z*v.z) > flt_zero);
+	VERIFY((v.x*v.x + v.y*v.y + v.z*v.z) > flt_min);
 	T mag = _sqrt(1 / (v.x*v.x + v.y*v.y + v.z*v.z));
 	x = v.x*mag;
 	y = v.y*mag;

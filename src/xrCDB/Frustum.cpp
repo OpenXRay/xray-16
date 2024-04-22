@@ -307,7 +307,7 @@ void CFrustum::SimplifyPoly_AABB(sPoly* poly, Fplane& plane)
     // Project and find extents
     Fvector2 min, max;
     min.set(flt_max, flt_max);
-    max.set(flt_min, flt_min);
+    max.set(flt_lowest, flt_lowest);
     for (auto& v : *poly)
     {
         Fvector2 tmp;
