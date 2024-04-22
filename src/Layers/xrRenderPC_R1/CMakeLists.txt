@@ -3,7 +3,6 @@ add_library(xrRenderPC_R1 SHARED)
 target_sources(xrRenderPC_R1 PRIVATE
     FStaticRender_Blenders.cpp
     FStaticRender.cpp
-    FStaticRender_DetectSector.cpp
     FStaticRender.h
     FStaticRender_Loader.cpp
     FStaticRender_RenderTarget.cpp
