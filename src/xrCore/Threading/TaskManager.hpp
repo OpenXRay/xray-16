@@ -77,9 +77,12 @@ public:
 public:
     void RegisterThisThreadAsWorker();
     void UnregisterThisThreadAsWorker();
+
     void Wait(const Task& task) const;
     void WaitForChildren(const Task& task) const;
     bool ExecuteOneTask() const;
+
+    void Pause(bool pause) { shouldPause.store(pause, std::memory_order_release); }
 
 public:
     [[nodiscard]] size_t GetWorkersCount() const;

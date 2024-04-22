@@ -619,6 +619,7 @@ void CRenderDevice::OnWindowActivate(SDL_Window* window, bool activated)
         b_is_InFocus = activated;
         if (b_is_InFocus)
         {
+            TaskScheduler->Pause(false);
             seqAppActivate.Process();
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
         }
@@ -626,6 +627,7 @@ void CRenderDevice::OnWindowActivate(SDL_Window* window, bool activated)
         {
             app_inactive_time_start = TimerMM.GetElapsed_ms();
             seqAppDeactivate.Process();
+            TaskScheduler->Pause(true);
         }
     }
 }
