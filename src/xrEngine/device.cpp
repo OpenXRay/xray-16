@@ -233,6 +233,16 @@ void CRenderDevice::BeforeRender()
     GEnv.Render->SetCacheXform(mView, mProject);
 }
 
+static void UpdateViewports()
+{
+    // Update and Render additional Platform Windows
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+    }
+}
+
 void CRenderDevice::DoRender()
 {
     if (GEnv.isDedicatedServer)
@@ -251,14 +261,13 @@ void CRenderDevice::DoRender()
 
         ImGui::Render();
         m_imgui_render->Render(ImGui::GetDrawData());
-        // Update and Render additional Platform Windows
-        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-        }
+        UpdateViewports();
 
         RenderEnd(); // Present goes here
+    }
+    else
+    {
+        UpdateViewports();
     }
     renderTotalReal.End();
     renderTotalReal.FrameEnd();
