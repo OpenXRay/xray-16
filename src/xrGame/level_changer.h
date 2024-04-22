@@ -45,7 +45,7 @@ public:
     bool IsLevelChangerEnabled() const { return m_b_enabled; }
     void EnableSilentMode(bool silent) { m_bSilentMode = silent; }
     bool IsSilentModeEnabled() const { return m_bSilentMode; }
-    void SetLEvelChangerInvitationStr(LPCSTR str) { m_invite_str = str; }
+    void SetLevelChangerInvitationStr(LPCSTR str) { m_invite_str = str; }
     // serialization
     virtual bool net_SaveRelevant();
     virtual void save(NET_Packet& output_packet);
