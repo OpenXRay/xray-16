@@ -403,29 +403,29 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
 
         .def("actor_look_at_point", &CScriptGameObject::ActorLookAtPoint)
 
-        .def("enable_level_changer", [](const CScriptGameObject* self, bool enable)
+        .def("enable_level_changer", +[](const CScriptGameObject* self, bool enable)
         {
             if (auto* lch = smart_cast<CLevelChanger*>(&self->object()))
                 lch->EnableLevelChanger(enable);
         })
-        .def("is_level_changer_enabled", [](const CScriptGameObject* self)
+        .def("is_level_changer_enabled", +[](const CScriptGameObject* self)
         {
             if (const auto* lch = smart_cast<CLevelChanger*>(&self->object()))
                 return lch->IsLevelChangerEnabled();
             return false;
         })
-        .def("enable_silent_level_changer", [](const CScriptGameObject* self, bool silent)
+        .def("enable_silent_level_changer", +[](const CScriptGameObject* self, bool silent)
         {
             if (auto* lch = smart_cast<CLevelChanger*>(&self->object()))
                 lch->EnableSilentMode(silent);
         })
-        .def("is_level_changer_silent", [](const CScriptGameObject* self)
+        .def("is_level_changer_silent", +[](const CScriptGameObject* self)
         {
             if (const auto* lch = smart_cast<CLevelChanger*>(&self->object()))
                 return lch->IsSilentModeEnabled();
             return false;
         })
-        .def("set_level_changer_invitation", [](const CScriptGameObject* self, pcstr invitation)
+        .def("set_level_changer_invitation", +[](const CScriptGameObject* self, pcstr invitation)
         {
             if (auto* lch = smart_cast<CLevelChanger*>(&self->object()))
                 lch->SetLevelChangerInvitationStr(invitation);
