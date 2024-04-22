@@ -1163,6 +1163,9 @@
     <ClInclude Include="..\xrRender\xr_effgamma.h">
       <Filter>Refactored\Execution &amp; 3D\Gamma</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\utils\xrLC_Light\R_light.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />

@@ -14,7 +14,6 @@ endif()
 add_subdirectory(GameSpy)
 add_subdirectory(OPCODE)
 add_subdirectory(ode)
-#add_subdirectory(NVTT)
 add_subdirectory(imgui-proj)
 
 if (NOT TARGET xrLuabind)

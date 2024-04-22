@@ -31,9 +31,6 @@
 [submodule "Externals/OpenAutomate"]
 	path = Externals/OpenAutomate
 	url = https://github.com/OpenXRay/OpenAutomate.git
-[submodule "Externals/FreeMagic"]
-	path = Externals/FreeMagic
-	url = https://github.com/OpenXRay/FreeMagic.git
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git

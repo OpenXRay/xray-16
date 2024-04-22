@@ -741,6 +741,9 @@
     <ClInclude Include="..\xrRender\blenders\blender_gasmask_drops.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\utils\xrLC_Light\R_light.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

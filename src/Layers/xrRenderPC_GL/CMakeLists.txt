@@ -383,6 +383,7 @@ target_sources(xrRender_GL PRIVATE
     ../../Include/xrRender/UISequenceVideoItem.h
     ../../Include/xrRender/UIShader.h
     ../../Include/xrRender/WallMarkArray.h
+    ../../utils/xrLC_Light/R_light.h
 )
 
 target_include_directories(xrRender_GL

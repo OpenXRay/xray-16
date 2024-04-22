@@ -606,6 +606,9 @@
     <ClInclude Include="..\xrRenderDX9\dx9shader_utils.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\utils\xrLC_Light\R_light.h">
+      <Filter>Lights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
