@@ -113,13 +113,16 @@ void CLevelChanger::feel_touch_new(IGameObject* tpObject)
 
     if (m_bSilentMode)
     {
-        NET_Packet p;
-        p.w_begin(M_CHANGE_LEVEL);
-        p.w(&m_game_vertex_id, sizeof(m_game_vertex_id));
-        p.w(&m_level_vertex_id, sizeof(m_level_vertex_id));
-        p.w_vec3(m_position);
-        p.w_vec3(m_angles);
-        Level().Send(p, net_flags(TRUE));
+        if (m_b_enabled)
+        {
+            NET_Packet p;
+            p.w_begin(M_CHANGE_LEVEL);
+            p.w(&m_game_vertex_id, sizeof(m_game_vertex_id));
+            p.w(&m_level_vertex_id, sizeof(m_level_vertex_id));
+            p.w_vec3(m_position);
+            p.w_vec3(m_angles);
+            Level().Send(p, net_flags(TRUE));
+        }
         return;
     }
     Fvector p, r;
