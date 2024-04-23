@@ -520,11 +520,7 @@ void CApplication::ShowSplash(bool topmost)
     SDL_ShowWindow(m_window);
     SDL_UpdateWindowSurface(m_window);
 
-    Threading::SpawnThread(+[](void* self_ptr)
-    {
-        auto& self = *static_cast<CApplication*>(self_ptr);
-        self.SplashProc();
-    }, "X-Ray Splash Thread", 0, this);
+    Threading::SpawnThread("Splash Thread", &CApplication::SplashProc, this);
 
     while (!m_thread_operational)
         SDL_PumpEvents();

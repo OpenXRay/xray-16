@@ -248,8 +248,33 @@ void screenshot_manager::process_screenshot(bool singlecore)
     }
     m_make_start_event = CreateEvent(NULL, FALSE, TRUE, NULL);
     m_make_done_event = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+    Threading::SpawnThread("screenshot_maker", [this]
+    {
+        u32 wait_result = WaitForSingleObject(m_make_start_event, INFINITE);
+        while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
+        {
+            if (!is_active())
+                break;
+            timer_begin("preparing image");
+            prepare_image();
+            timer_end();
+            timer_begin("making jpeg");
+            make_jpeg_file();
+            timer_end();
+            timer_begin("signing jpeg data");
+            sign_jpeg_file();
+            timer_end();
+            timer_begin("compressing_image");
+            compress_image();
+            timer_end();
+            SetEvent(m_make_done_event);
+            wait_result = WaitForSingleObject(m_make_start_event, INFINITE);
+        }
+        SetEvent(m_make_done_event);
+
+    });
 #endif
-    Threading::SpawnThread(&screenshot_manager::screenshot_maker_thread, "screenshot_maker", 0, this);
 }
 void screenshot_manager::jpeg_compress_cb(long progress)
 {
@@ -261,34 +286,6 @@ void screenshot_manager::jpeg_compress_cb(long progress)
         if (!SwitchToThread())
             Sleep(10);
     }
-}
-
-void screenshot_manager::screenshot_maker_thread(void* arg_ptr)
-{
-#ifdef XR_PLATFORM_WINDOWS // FIXME!!
-    screenshot_manager* this_ptr = static_cast<screenshot_manager*>(arg_ptr);
-    u32 wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
-    while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
-    {
-        if (!this_ptr->is_active())
-            break;
-        this_ptr->timer_begin("preparing image");
-        this_ptr->prepare_image();
-        this_ptr->timer_end();
-        this_ptr->timer_begin("making jpeg");
-        this_ptr->make_jpeg_file();
-        this_ptr->timer_end();
-        this_ptr->timer_begin("signing jpeg data");
-        this_ptr->sign_jpeg_file();
-        this_ptr->timer_end();
-        this_ptr->timer_begin("compressing_image");
-        this_ptr->compress_image();
-        this_ptr->timer_end();
-        SetEvent(this_ptr->m_make_done_event);
-        wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
-    }
-    SetEvent(this_ptr->m_make_done_event);
-#endif
 }
 
 void screenshot_manager::realloc_compress_buffer(u32 need_size)

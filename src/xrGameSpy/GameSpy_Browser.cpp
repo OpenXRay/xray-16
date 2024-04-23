@@ -148,17 +148,6 @@ void CGameSpy_Browser::RefreshListInternet(const char* FilterStr)
     m_refresh_lock.Leave();
 }
 
-struct RefreshData
-{
-    CGameSpy_Browser* pGSBrowser;
-    string4096 FilterStr;
-
-    RefreshData(CGameSpy_Browser* browser, pcstr filter) : pGSBrowser(browser)
-    {
-        xr_strcpy(FilterStr, filter);
-    }
-};
-
 GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* FilterStr)
 {
     if (!m_pGSBrowser)
@@ -178,15 +167,13 @@ GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* Filter
         m_refresh_lock.Enter();
         m_refresh_lock.Leave();
 
-        RefreshData* pRData = xr_new<RefreshData>(this, FilterStr);
         m_bTryingToConnectToMasterServer = true;
 
-        Threading::SpawnThread([](void* inData)
+        xr_string filter{ FilterStr };
+        Threading::SpawnThread("GS Internet Refresh", [this, filter]
         {
-            RefreshData* pRData = (RefreshData*)inData;
-            pRData->pGSBrowser->RefreshListInternet(pRData->FilterStr);
-            xr_delete(pRData);
-        }, "GS Internet Refresh", 0, pRData);
+            RefreshListInternet(filter.c_str());
+        });
 
         return GSUpdateStatus::ConnectingToMaster;
     }

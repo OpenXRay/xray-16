@@ -200,11 +200,7 @@ TaskManager::TaskManager()
     const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
     for (u32 i = 0; i < threads; ++i)
     {
-        Threading::SpawnThread([](void* this_ptr)
-        {
-            const auto self = static_cast<TaskManager*>(this_ptr);
-            self->TaskWorkerStart();
-        }, "Task Worker", 0, this);
+        Threading::SpawnThread("Task Worker", &TaskManager::TaskWorkerStart, this);
     }
 }
 

@@ -62,7 +62,7 @@ namespace
 void CheckPrivilegySlowdown()
 {
 #ifndef MASTER_GOLD
-    const auto slowdownthread = +[](void*)
+    const auto slowdownthread = []
     {
         for (;;)
         {
@@ -74,11 +74,11 @@ void CheckPrivilegySlowdown()
     };
 
     if (strstr(Core.Params, "-slowdown"))
-        Threading::SpawnThread(slowdownthread, "slowdown", 0, nullptr);
+        Threading::SpawnThread("slowdown", slowdownthread);
     if (strstr(Core.Params, "-slowdown2x"))
     {
-        Threading::SpawnThread(slowdownthread, "slowdown", 0, nullptr);
-        Threading::SpawnThread(slowdownthread, "slowdown", 0, nullptr);
+        Threading::SpawnThread("slowdown", slowdownthread);
+        Threading::SpawnThread("slowdown", slowdownthread);
     }
 #endif
 }

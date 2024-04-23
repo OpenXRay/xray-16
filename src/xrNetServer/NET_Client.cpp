@@ -1074,12 +1074,11 @@ void IPureClient::net_Syncronize()
 {
     net_Syncronised = false;
     net_DeltaArray.clear();
-    Threading::SpawnThread([](void* P)
+
+    Threading::SpawnThread( "network-time-sync", [this]
     {
-        Threading::SetCurrentThreadPriorityLevel(Threading::priority_level::time_critical);
-        IPureClient* C = static_cast<IPureClient*>(P);
-        C->Sync_Thread();
-    }, "network-time-sync", 0, this);
+        Sync_Thread();
+    });
 }
 
 void IPureClient::ClearStatistic()

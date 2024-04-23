@@ -80,11 +80,11 @@ CBulletManager::CBulletManager()
 #if 0 // def CONFIG_PROFILE_LOCKS
     : m_Lock(MUTEX_PROFILE_ID(CBulletManager))
 #ifdef DEBUG
-        ,m_thread_id(Threading::GetCurrThreadId())
+        ,m_thread_id(std::this_thread::get_id())
 #endif // #ifdef DEBUG
 #else // #ifdef CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
-    : m_thread_id(Threading::GetCurrThreadId())
+    : m_thread_id(std::this_thread::get_id())
 #endif // #ifdef DEBUG
 #endif // #ifdef CONFIG_PROFILE_LOCKS
 {
@@ -180,7 +180,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     // Uncomment below if you will change the behaviour
     // if (!g_mt_config.test(mtBullets))
 #ifdef DEBUG
-    VERIFY(Threading::ThreadIdsAreEqual(m_thread_id, Threading::GetCurrThreadId()));
+    VERIFY(m_thread_id == std::this_thread::get_id());
 #endif
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
@@ -203,7 +203,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
 void CBulletManager::UpdateWorkload()
 {
 #ifdef DEBUG
-    VERIFY(g_mt_config.test(mtBullets) || Threading::ThreadIdsAreEqual(m_thread_id, Threading::GetCurrThreadId()));
+    VERIFY(g_mt_config.test(mtBullets) || m_thread_id == std::this_thread::get_id());
 #endif
 
     rq_storage.r_clear();
