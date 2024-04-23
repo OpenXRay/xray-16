@@ -156,6 +156,12 @@ void SetCurrentProcessPriorityClass(priority_class cls)
 
 }
 #else
-#   error Add threading code for your platform
+void SetCurrentThreadName(cpcstr name) {}
+
+priority_level GetCurrentThreadPriorityLevel() { return priority_level::normal; }
+priority_class GetCurrentProcessPriorityClass() { return priority_class::normal; }
+
+void SetCurrentThreadPriorityLevel(priority_level prio) {}
+void SetCurrentProcessPriorityClass(priority_class cls) {}
 #endif
 } // namespace Threading
