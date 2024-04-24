@@ -93,14 +93,14 @@ class TaskQueue
 public:
     void push(Task* task)
     {
-        const auto task_pos = m_tail_pos.fetch_add(1, std::memory_order_relaxed);
-        VERIFY2(task_pos - m_head_pos.load(std::memory_order_relaxed) < TASK_STORAGE_SIZE, "Task queue overflow");
+        const auto task_pos = m_tail_pos.fetch_add(1, std::memory_order_acq_rel);
+        VERIFY2(task_pos - m_head_pos.load(std::memory_order_acquire) < TASK_STORAGE_SIZE, "Task queue overflow");
         m_storage[task_pos & TASK_STORAGE_MASK] = task;
     }
 
     Task* pop()
     {
-        size_t head_pos = m_head_pos.load(std::memory_order_relaxed);
+        size_t head_pos = m_head_pos.load(std::memory_order_acquire);
         Task* task = m_storage[head_pos & TASK_STORAGE_MASK];
         if (!task)
             return nullptr;
