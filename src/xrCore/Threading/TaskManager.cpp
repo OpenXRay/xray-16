@@ -272,16 +272,8 @@ void TaskManager::TaskWorkerStart()
     const u32 fastIterations = ttapi_dwFastIter;
 
     u32 iteration = 0;
-    Task* task;
     while (true)
     {
-        goto get_task;
-
-    execute:
-    {
-        ExecuteTask(*task);
-        iteration = 0;
-    }
     get_task:
     {
         if (shouldStop.load(std::memory_order_consume))
@@ -289,12 +281,16 @@ void TaskManager::TaskWorkerStart()
         if (shouldPause.load(std::memory_order_consume))
             goto wait;
 
-        task = s_tl_worker.pop();
+        Task* task = s_tl_worker.pop();
         if (!task)
             task = TryToSteal();
 
         if (task)
-            goto execute;
+        {
+            ExecuteTask(*task);
+            iteration = 0;
+            goto get_task;
+        }
     }
     //count_spins:
     {
