@@ -1075,7 +1075,7 @@ void IPureClient::net_Syncronize()
     net_Syncronised = false;
     net_DeltaArray.clear();
 
-    Threading::SpawnThread( "network-time-sync", [this]
+    Threading::SpawnThread("network-time-sync", [this]
     {
         Sync_Thread();
     });
