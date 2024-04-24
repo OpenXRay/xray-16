@@ -198,9 +198,10 @@ TaskManager::TaskManager()
     RegisterThisThreadAsWorker();
 
     const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
+    workerThreads.reserve(threads);
     for (u32 i = 0; i < threads; ++i)
     {
-        Threading::SpawnThread("Task Worker", &TaskManager::TaskWorkerStart, this);
+        workerThreads.emplace_back(Threading::RunThread("Task Worker", &TaskManager::TaskWorkerStart, this));
     }
 }
 
@@ -220,12 +221,11 @@ TaskManager::~TaskManager()
         for (TaskWorker* worker : workers)
             worker->event.Set();
     }
-    while (activeWorkersCount.load(std::memory_order_acquire) || workers.size())
+    for (auto& thread : workerThreads)
     {
-        Sleep(2);
+        if (thread.joinable())
+            thread.join();
     }
-    // Capture the last worker that might still be finishing
-    std::lock_guard guard{ workersLock };
 }
 
 void TaskManager::RegisterThisThreadAsWorker()

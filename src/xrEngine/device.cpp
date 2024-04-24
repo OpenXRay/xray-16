@@ -291,7 +291,6 @@ void CRenderDevice::SecondaryThreadProc()
         TaskScheduler->ExecuteOneTask();
     }
     TaskScheduler->UnregisterThisThreadAsWorker();
-    secondaryThreadFinished.store(true, std::memory_order_release);
 }
 
 void CRenderDevice::ProcessFrame()
@@ -469,8 +468,7 @@ void CRenderDevice::Shutdown()
 {
     // Stop Balance-Thread
     mt_bMustExit.store(true, std::memory_order_release);
-    while (!secondaryThreadFinished.load(std::memory_order_acquire))
-        SDL_PumpEvents();
+    secondaryThread.join();
 
     seqAppEnd.Process();
 }

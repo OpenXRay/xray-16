@@ -520,17 +520,12 @@ void CApplication::ShowSplash(bool topmost)
     SDL_ShowWindow(m_window);
     SDL_UpdateWindowSurface(m_window);
 
-    Threading::SpawnThread("Splash Thread", &CApplication::SplashProc, this);
-
-    while (!m_thread_operational)
-        SDL_PumpEvents();
+    m_splash_thread = Threading::RunThread("Splash Thread", &CApplication::SplashProc, this);
     SDL_PumpEvents();
 }
 
 void CApplication::SplashProc()
 {
-    m_thread_operational = true;
-
     while (true)
     {
         if (m_should_exit.Wait(SPLASH_FRAMERATE))
@@ -548,15 +543,6 @@ void CApplication::SplashProc()
         }
         UpdateDiscordStatus();
     }
-
-    for (SDL_Surface* surface : m_surfaces)
-        SDL_FreeSurface(surface);
-    m_surfaces.clear();
-
-    SDL_DestroyWindow(m_window);
-    m_window = nullptr;
-
-    m_thread_operational = false;
 }
 
 void CApplication::HideSplash()
@@ -565,11 +551,14 @@ void CApplication::HideSplash()
         return;
 
     m_should_exit.Set();
-    while (m_thread_operational)
-    {
-        SDL_PumpEvents();
-        SwitchToThread();
-    }
+    m_splash_thread.join();
+
+    SDL_DestroyWindow(m_window);
+    m_window = nullptr;
+
+    for (SDL_Surface* surface : m_surfaces)
+        SDL_FreeSurface(surface);
+    m_surfaces.clear();
 }
 
 void CApplication::UpdateDiscordStatus()

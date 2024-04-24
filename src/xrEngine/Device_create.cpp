@@ -21,7 +21,7 @@ void CRenderDevice::Create()
     if (b_is_Ready)
         return; // prevent double call
 
-    Threading::SpawnThread("Secondary thread", &CRenderDevice::SecondaryThreadProc, this);
+    secondaryThread = Threading::RunThread("Secondary thread", &CRenderDevice::SecondaryThreadProc, this);
 
     Statistic = xr_new<CStats>();
     Log("Starting RENDER device...");
