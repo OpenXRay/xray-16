@@ -18,7 +18,7 @@ void CSoundRender_Target::_destroy()
 
 void CSoundRender_Target::start(CSoundRender_Emitter* E)
 {
-    R_ASSERT(E);
+    R_ASSERT1_CURE(E, true, { return; });
 
     // *** Initial buffer startup ***
     // 1. Fill parameters
@@ -52,12 +52,12 @@ void CSoundRender_Target::stop()
 
 void CSoundRender_Target::rewind()
 {
-    R_ASSERT(rendering);
+    VERIFY(rendering);
 }
 
 void CSoundRender_Target::update()
 {
-    R_ASSERT(m_pEmitter);
+    R_ASSERT1_CURE(m_pEmitter, true, { return; });
     wait_prefill();
 }
 
@@ -70,7 +70,7 @@ void CSoundRender_Target::fill_parameters()
 
 void CSoundRender_Target::fill_block(size_t idx)
 {
-    R_ASSERT(m_pEmitter);
+    R_ASSERT1_CURE(m_pEmitter, true, { return; });
     m_pEmitter->fill_block(temp_buf[idx].data(), temp_buf[idx].size());
 }
 

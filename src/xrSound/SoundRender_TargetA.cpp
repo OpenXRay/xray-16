@@ -198,7 +198,7 @@ size_t CSoundRender_TargetA::get_block_id(ALuint BufferID) const
 
 void CSoundRender_TargetA::submit_buffer(ALuint BufferID, const void* data, size_t dataSize) const
 {
-    R_ASSERT(m_pEmitter);
+    R_ASSERT1_CURE(m_pEmitter, true, { return; });
 
     const auto& info = m_pEmitter->source()->data_info();
     const bool mono = info.channels == 1;
