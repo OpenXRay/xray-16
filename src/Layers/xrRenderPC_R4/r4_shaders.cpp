@@ -418,6 +418,10 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     // Minmax SM
     appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
 
+    // Linear space rendering if 1, or gamma space if 0
+    appendShaderOption(o.linear_space_rendering, "LINEAR_SPACE_RENDERING", "1");
+
+
     // Ascii's Screen Space Shaders - SSS preprocessor stuff
     if (ps_ssfx_rain_1.w > 0)
     {

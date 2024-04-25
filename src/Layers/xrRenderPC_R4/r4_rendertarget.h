@@ -359,6 +359,8 @@ public:
 
     void DoAsyncScreenshot();
 
+
+
 #ifdef DEBUG
     void dbg_addline(const Fvector& P0, const Fvector& P1, u32 c)
     {
@@ -407,4 +409,13 @@ public:
     void dbg_addline(Fvector& /*P0*/, Fvector& /*P1*/, u32 /*c*/) {}
     void dbg_addplane(Fplane& /*P0*/, u32 /*c*/) {}
 #endif
+private:
+    float toLinearSpace(float c) {
+        return RImplementation.o.linear_space_rendering ? std::pow(c, 2.2f) : c;
+    }
+
+    Fvector4 toLinearSpace(const Fvector4& c)
+    {
+        return Fvector4{toLinearSpace(c.x), toLinearSpace(c.y), toLinearSpace(c.z), c.w};
+    }
 };
