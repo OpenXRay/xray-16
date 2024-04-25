@@ -6,7 +6,6 @@
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-#include "xrSASH.h"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 
@@ -19,6 +18,9 @@ ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
 ENGINE_API bool g_bRendering = false;
+
+ENGINE_API bool g_bBenchmark = false;
+string512 g_sBenchmarkName;
 
 int ps_fps_limit = 501;
 int ps_fps_limit_in_menu = 60;
@@ -62,7 +64,7 @@ namespace
 void CheckPrivilegySlowdown()
 {
 #ifndef MASTER_GOLD
-    const auto slowdownthread = +[](void*)
+    const auto slowdownthread = []
     {
         for (;;)
         {
@@ -74,11 +76,11 @@ void CheckPrivilegySlowdown()
     };
 
     if (strstr(Core.Params, "-slowdown"))
-        Threading::SpawnThread(slowdownthread, "slowdown", 0, nullptr);
+        Threading::SpawnThread("slowdown", slowdownthread);
     if (strstr(Core.Params, "-slowdown2x"))
     {
-        Threading::SpawnThread(slowdownthread, "slowdown", 0, nullptr);
-        Threading::SpawnThread(slowdownthread, "slowdown", 0, nullptr);
+        Threading::SpawnThread("slowdown", slowdownthread);
+        Threading::SpawnThread("slowdown", slowdownthread);
     }
 #endif
 }
@@ -116,12 +118,8 @@ void CRenderDevice::RenderEnd(void)
             }
         }
     }
-    g_bRendering = false;
     // end scene
-    // Present goes here, so call OA Frame end.
-    if (g_SASH.IsBenchmarkRunning())
-        g_SASH.DisplayFrame(fTimeGlobal);
-
+    g_bRendering = false;
     GEnv.Render->End();
 
     vCameraPositionSaved = vCameraPosition;
@@ -204,9 +202,6 @@ bool CRenderDevice::BeforeFrame()
         g_pGamePersistent->LoadDraw();
         return false;
     }
-
-    if (!dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
-        g_SASH.StartBenchmark();
 
     return true;
 }
@@ -295,7 +290,6 @@ void CRenderDevice::SecondaryThreadProc()
         TaskScheduler->ExecuteOneTask();
     }
     TaskScheduler->UnregisterThisThreadAsWorker();
-    secondaryThreadFinished.store(true, std::memory_order_release);
 }
 
 void CRenderDevice::ProcessFrame()
@@ -477,8 +471,7 @@ void CRenderDevice::Shutdown()
 {
     // Stop Balance-Thread
     mt_bMustExit.store(true, std::memory_order_release);
-    while (!secondaryThreadFinished.load(std::memory_order_acquire))
-        SDL_PumpEvents();
+    secondaryThread.join();
 
     seqAppEnd.Process();
 }

@@ -234,6 +234,7 @@ public:
     }
 
 private:
+    std::thread secondaryThread;
     std::atomic_bool executeSecondaryTasks{}, secondaryTasksExecuted{}, secondaryThreadFinished{};
 
 public:

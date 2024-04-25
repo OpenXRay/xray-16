@@ -230,7 +230,29 @@ void configs_dumper::dump_config(complete_callback_t complete_cb)
     }
     m_make_start_event = CreateEvent(NULL, FALSE, TRUE, NULL);
     m_make_done_event = CreateEvent(NULL, FALSE, FALSE, NULL);
-    Threading::SpawnThread(&configs_dumper::dumper_thread, "configs_dumper", 0, this);
+
+    Threading::SpawnThread("configs_dumper", [this]
+    {
+        u32 wait_result = WaitForSingleObject(m_make_start_event, INFINITE);
+        while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
+        {
+            if (!is_active())
+                break; // error
+            timer_begin("writing configs");
+            write_configs();
+            timer_end();
+            timer_begin("signing configs");
+            sign_configs();
+            timer_end();
+            timer_begin("compressing data");
+            compress_configs();
+            timer_end();
+            SetEvent(m_make_done_event);
+            wait_result = WaitForSingleObject(m_make_start_event, INFINITE);
+        }
+        SetEvent(m_make_done_event);
+    });
+
     Engine.Sheduler.Register(this, TRUE);
 #endif
 }
@@ -245,31 +267,6 @@ void configs_dumper::compress_configs()
     }
     m_buffer_for_compress_size = ppmd_compress_mt(
         m_buffer_for_compress, m_buffer_for_compress_capacity, m_dump_result.pointer(), m_dump_result.size(), ts_cb);
-}
-
-void configs_dumper::dumper_thread(void* my_ptr)
-{
-#ifdef XR_PLATFORM_WINDOWS // XXX: use Event class, enable on other platforms
-    configs_dumper* this_ptr = static_cast<configs_dumper*>(my_ptr);
-    u32 wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
-    while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
-    {
-        if (!this_ptr->is_active())
-            break; // error
-        this_ptr->timer_begin("writing configs");
-        this_ptr->write_configs();
-        this_ptr->timer_end();
-        this_ptr->timer_begin("signing configs");
-        this_ptr->sign_configs();
-        this_ptr->timer_end();
-        this_ptr->timer_begin("compressing data");
-        this_ptr->compress_configs();
-        this_ptr->timer_end();
-        SetEvent(this_ptr->m_make_done_event);
-        wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
-    }
-    SetEvent(this_ptr->m_make_done_event);
-#endif
 }
 
 void configs_dumper::yield_cb(long progress)

@@ -17,8 +17,8 @@ class Core;
 class ENGINE_API CApplication final
 {
     SDL_Window* m_window{};
+    std::thread m_splash_thread;
     Event m_should_exit;
-    bool m_thread_operational{};
 
     size_t m_current_surface_idx{};
     xr_vector<SDL_Surface*> m_surfaces;

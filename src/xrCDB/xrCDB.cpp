@@ -49,29 +49,6 @@ void MODEL::syncronize_impl() const
 	C->Leave();
 }
 
-struct BTHREAD_params
-{
-    MODEL* M;
-    Fvector* V;
-    int Vcnt;
-    TRI* T;
-    int Tcnt;
-    build_callback* BC;
-    void* BCP;
-};
-
-void MODEL::build_thread(void* params)
-{
-    _initialize_cpu_thread();
-    FPU::m64r();
-    BTHREAD_params P = *((BTHREAD_params*)params);
-    P.M->pcs->Enter();
-    P.M->build_internal(P.V, P.Vcnt, P.T, P.Tcnt, P.BC, P.BCP);
-    P.M->status = S_READY;
-    P.M->pcs->Leave();
-    // Msg						("* xrCDB: cform build completed, memory usage: %d K",P.M->memory()/1024);
-}
-
 void MODEL::build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, void* bcp)
 {
     R_ASSERT(S_INIT == status);
@@ -86,8 +63,16 @@ void MODEL::build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, vo
     }
     else
     {
-        BTHREAD_params P = {this, V, Vcnt, T, Tcnt, bc, bcp};
-        Threading::SpawnThread(build_thread, "CDB-construction", 0, &P);
+        Threading::SpawnThread("CDB-construction", [&, this]
+        {
+            ScopeLock lock{ pcs };
+            FPU::m64r();
+            build_internal(V, Vcnt, T, Tcnt, bc, bcp);
+            status = S_READY;
+            FPU::m24r();
+            // Msg("* xrCDB: cform build completed, memory usage: %d K", memory() / 1024);
+        });
+
         while (S_INIT == status)
         {
             if (status != S_INIT)

@@ -18,7 +18,6 @@
 #include "IGame_Persistent.h"
 #include "LightAnimLibrary.h"
 #include "XR_IOConsole.h"
-#include "xrSASH.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "AccessibilityShortcuts.hpp"
@@ -333,9 +332,6 @@ CApplication::CApplication(pcstr commandLine)
     }
 #endif
 
-    //if (CheckBenchmark())
-    //    return 0;
-
     InitSoundDeviceList();
     execUserScript();
     InitSound();
@@ -372,15 +368,11 @@ CApplication::~CApplication()
 
     // Destroying
     destroyInput();
-    if (!g_bBenchmark && !g_SASH.IsRunning())
-        destroySettings();
+    destroySettings();
 
     LALib.OnDestroy();
 
-    if (!g_bBenchmark && !g_SASH.IsRunning())
-        destroyConsole();
-    else
-        Console->Destroy();
+    destroyConsole();
 
     Device.CleanupVideoModes();
     Device.DestroyImGui();
@@ -520,21 +512,12 @@ void CApplication::ShowSplash(bool topmost)
     SDL_ShowWindow(m_window);
     SDL_UpdateWindowSurface(m_window);
 
-    Threading::SpawnThread(+[](void* self_ptr)
-    {
-        auto& self = *static_cast<CApplication*>(self_ptr);
-        self.SplashProc();
-    }, "X-Ray Splash Thread", 0, this);
-
-    while (!m_thread_operational)
-        SDL_PumpEvents();
+    m_splash_thread = Threading::RunThread("Splash Thread", &CApplication::SplashProc, this);
     SDL_PumpEvents();
 }
 
 void CApplication::SplashProc()
 {
-    m_thread_operational = true;
-
     while (true)
     {
         if (m_should_exit.Wait(SPLASH_FRAMERATE))
@@ -552,15 +535,6 @@ void CApplication::SplashProc()
         }
         UpdateDiscordStatus();
     }
-
-    for (SDL_Surface* surface : m_surfaces)
-        SDL_FreeSurface(surface);
-    m_surfaces.clear();
-
-    SDL_DestroyWindow(m_window);
-    m_window = nullptr;
-
-    m_thread_operational = false;
 }
 
 void CApplication::HideSplash()
@@ -569,11 +543,14 @@ void CApplication::HideSplash()
         return;
 
     m_should_exit.Set();
-    while (m_thread_operational)
-    {
-        SDL_PumpEvents();
-        SwitchToThread();
-    }
+    m_splash_thread.join();
+
+    SDL_DestroyWindow(m_window);
+    m_window = nullptr;
+
+    for (SDL_Surface* surface : m_surfaces)
+        SDL_FreeSurface(surface);
+    m_surfaces.clear();
 }
 
 void CApplication::UpdateDiscordStatus()

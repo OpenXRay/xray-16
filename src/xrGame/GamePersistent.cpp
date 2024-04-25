@@ -20,7 +20,6 @@
 
 #include "xrUICore/XML/UITextureMaster.h"
 
-#include "xrEngine/xrSASH.h"
 #include "ai_space.h"
 
 #include "holder_custom.h"
@@ -364,7 +363,7 @@ void CGamePersistent::WeathersUpdate()
 
 bool allow_intro()
 {
-    if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
+    if ((0 != strstr(Core.Params, "-nointro")))
         return false;
 
     return true;

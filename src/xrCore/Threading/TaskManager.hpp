@@ -26,6 +26,7 @@ class XRCORE_API TaskManager final
 {
 private:
     xr_vector<TaskWorker*> workers;
+    xr_vector<std::thread> workerThreads;
     std::mutex workersLock;
 
     std::atomic_size_t activeWorkersCount{};

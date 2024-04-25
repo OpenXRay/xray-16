@@ -29,11 +29,6 @@
 #include <al.h>
 #include <alc.h>
 
-#ifdef XR_PLATFORM_WINDOWS
-constexpr pcstr AL_GENERIC_HARDWARE = "Generic Hardware";
-constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";
-#endif
-
 ALDeviceList::ALDeviceList()
 {
     snd_device_id = (u32)-1;
@@ -123,6 +118,9 @@ void ALDeviceList::Enumerate()
         // This makes 3D-sound processing unusable on cheap AC'97 codecs
         // Also we assume that if "Generic Hardware" exists, than "Generic Software" is also exists
         // Maybe wrong
+
+        constexpr pcstr AL_GENERIC_HARDWARE = "Generic Hardware";
+        constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";
 
         if (0 == xr_stricmp(m_defaultDeviceName, AL_GENERIC_HARDWARE))
         {

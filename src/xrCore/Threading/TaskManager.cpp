@@ -93,14 +93,14 @@ class TaskQueue
 public:
     void push(Task* task)
     {
-        const auto task_pos = m_tail_pos.fetch_add(1, std::memory_order_relaxed);
-        VERIFY2(task_pos - m_head_pos.load(std::memory_order_relaxed) < TASK_STORAGE_SIZE, "Task queue overflow");
+        const auto task_pos = m_tail_pos.fetch_add(1, std::memory_order_acq_rel);
+        VERIFY2(task_pos - m_head_pos.load(std::memory_order_acquire) < TASK_STORAGE_SIZE, "Task queue overflow");
         m_storage[task_pos & TASK_STORAGE_MASK] = task;
     }
 
     Task* pop()
     {
-        size_t head_pos = m_head_pos.load(std::memory_order_relaxed);
+        size_t head_pos = m_head_pos.load(std::memory_order_acquire);
         Task* task = m_storage[head_pos & TASK_STORAGE_MASK];
         if (!task)
             return nullptr;
@@ -198,13 +198,10 @@ TaskManager::TaskManager()
     RegisterThisThreadAsWorker();
 
     const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
+    workerThreads.reserve(threads);
     for (u32 i = 0; i < threads; ++i)
     {
-        Threading::SpawnThread([](void* this_ptr)
-        {
-            const auto self = static_cast<TaskManager*>(this_ptr);
-            self->TaskWorkerStart();
-        }, "Task Worker", 0, this);
+        workerThreads.emplace_back(Threading::RunThread("Task Worker", &TaskManager::TaskWorkerStart, this));
     }
 }
 
@@ -224,12 +221,11 @@ TaskManager::~TaskManager()
         for (TaskWorker* worker : workers)
             worker->event.Set();
     }
-    while (activeWorkersCount.load(std::memory_order_acquire) || workers.size())
+    for (auto& thread : workerThreads)
     {
-        Sleep(2);
+        if (thread.joinable())
+            thread.join();
     }
-    // Capture the last worker that might still be finishing
-    std::lock_guard guard{ workersLock };
 }
 
 void TaskManager::RegisterThisThreadAsWorker()
@@ -276,16 +272,8 @@ void TaskManager::TaskWorkerStart()
     const u32 fastIterations = ttapi_dwFastIter;
 
     u32 iteration = 0;
-    Task* task;
     while (true)
     {
-        goto get_task;
-
-    execute:
-    {
-        ExecuteTask(*task);
-        iteration = 0;
-    }
     get_task:
     {
         if (shouldStop.load(std::memory_order_consume))
@@ -293,12 +281,16 @@ void TaskManager::TaskWorkerStart()
         if (shouldPause.load(std::memory_order_consume))
             goto wait;
 
-        task = s_tl_worker.pop();
+        Task* task = s_tl_worker.pop();
         if (!task)
             task = TryToSteal();
 
         if (task)
-            goto execute;
+        {
+            ExecuteTask(*task);
+            iteration = 0;
+            goto get_task;
+        }
     }
     //count_spins:
     {

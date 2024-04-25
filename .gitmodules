@@ -28,9 +28,6 @@
 [submodule "Externals/cryptopp"]
 	path = Externals/cryptopp
 	url = https://github.com/weidai11/cryptopp.git
-[submodule "Externals/OpenAutomate"]
-	path = Externals/OpenAutomate
-	url = https://github.com/OpenXRay/OpenAutomate.git
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git

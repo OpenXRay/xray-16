@@ -18,23 +18,21 @@ class PlayersMonitor
     bool now_iterating_in_net_players;
     bool now_iterating_in_net_players_disconn;
 #ifdef DEBUG
-    Threading::ThreadId iterator_thread_id;
+    std::thread::id iterator_thread_id;
 #endif
+
 public:
     PlayersMonitor()
     {
         now_iterating_in_net_players = false;
         now_iterating_in_net_players_disconn = false;
-#ifdef DEBUG
-        iterator_thread_id = 0;
-#endif
     }
 #ifdef DEBUG
     bool IsCurrentThreadIteratingOnClients() const
     {
         if (now_iterating_in_net_players || now_iterating_in_net_players_disconn)
         {
-            if (Threading::ThreadIdsAreEqual(iterator_thread_id, Threading::GetCurrThreadId()))
+            if (iterator_thread_id == std::this_thread::get_id())
             {
                 return true;
             }
@@ -51,7 +49,7 @@ public:
         //	make_string("-S- Entered to csPlayers [%d]", Threading::GetCurrThreadId()).c_str());
         now_iterating_in_net_players = true;
 #ifdef DEBUG
-        iterator_thread_id = Threading::GetCurrThreadId();
+        iterator_thread_id = std::this_thread::get_id();
 #endif
         for (players_collection_t::iterator i = net_Players.begin(), ie = net_Players.end(); i != ie; ++i)
         {
@@ -71,7 +69,7 @@ public:
         //	make_string("-S- Entered to csPlayers [%d]", Threading::GetCurrThreadId()).c_str());
         now_iterating_in_net_players = true;
 #ifdef DEBUG
-        iterator_thread_id = Threading::GetCurrThreadId();
+        iterator_thread_id = std::this_thread::get_id();
 #endif
         for (players_collection_t::iterator i = net_Players.begin(), ie = net_Players.end(); i != ie; ++i)
         {
@@ -93,7 +91,7 @@ public:
         //	make_string("-S- Entered to csPlayers [%d]", Threading::GetCurrThreadId()).c_str());
         now_iterating_in_net_players = true;
 #ifdef DEBUG
-        iterator_thread_id = Threading::GetCurrThreadId();
+        iterator_thread_id = std::this_thread::get_id();
 #endif
         players_collection_t::iterator players_endi = net_Players.end();
         players_collection_t::iterator temp_iter = std::find_if(net_Players.begin(), players_endi, predicate);
@@ -120,7 +118,7 @@ public:
         VERIFY(!now_iterating_in_net_players);
         now_iterating_in_net_players = true;
 #ifdef DEBUG
-        iterator_thread_id = Threading::GetCurrThreadId();
+        iterator_thread_id = std::this_thread::get_id();
 #endif
         players_collection_t::iterator client_iter = std::find_if(net_Players.begin(), net_Players.end(), predicate);
         IClient* ret_client = nullptr;
@@ -173,7 +171,7 @@ public:
         //LogStackTrace(make_string("-S- Entered to csPlayers [%d]", Threading::GetCurrThreadId()).c_str());
         now_iterating_in_net_players_disconn = true;
 #ifdef DEBUG
-        iterator_thread_id = Threading::GetCurrThreadId();
+        iterator_thread_id = std::this_thread::get_id();
 #endif
         std::for_each(net_Players_disconnected.begin(), net_Players_disconnected.end(), functor);
         now_iterating_in_net_players_disconn = false;
@@ -190,7 +188,7 @@ public:
         VERIFY(!now_iterating_in_net_players_disconn);
         now_iterating_in_net_players_disconn = true;
 #ifdef DEBUG
-        iterator_thread_id = Threading::GetCurrThreadId();
+        iterator_thread_id = std::this_thread::get_id();
 #endif
         players_collection_t::iterator client_iter = std::find_if(
             net_Players_disconnected.begin(),
@@ -217,7 +215,7 @@ public:
         //	make_string("-S- Entered to csPlayers [%d]", Threading::GetCurrThreadId()).c_str());
         now_iterating_in_net_players_disconn = true;
 #ifdef DEBUG
-        iterator_thread_id = Threading::GetCurrThreadId();
+        iterator_thread_id = std::this_thread::get_id();
 #endif
         players_collection_t::iterator client_iter = std::find_if(
             net_Players_disconnected.begin(),
