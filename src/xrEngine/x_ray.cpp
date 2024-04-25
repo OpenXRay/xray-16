@@ -18,7 +18,6 @@
 #include "IGame_Persistent.h"
 #include "LightAnimLibrary.h"
 #include "XR_IOConsole.h"
-#include "xrSASH.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "AccessibilityShortcuts.hpp"
@@ -333,9 +332,6 @@ CApplication::CApplication(pcstr commandLine)
     }
 #endif
 
-    //if (CheckBenchmark())
-    //    return 0;
-
     InitSoundDeviceList();
     execUserScript();
     InitSound();
@@ -372,15 +368,11 @@ CApplication::~CApplication()
 
     // Destroying
     destroyInput();
-    if (!g_bBenchmark && !g_SASH.IsRunning())
-        destroySettings();
+    destroySettings();
 
     LALib.OnDestroy();
 
-    if (!g_bBenchmark && !g_SASH.IsRunning())
-        destroyConsole();
-    else
-        Console->Destroy();
+    destroyConsole();
 
     Device.CleanupVideoModes();
     Device.DestroyImGui();

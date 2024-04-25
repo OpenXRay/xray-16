@@ -121,9 +121,6 @@
     <Filter Include="Engine\text_editor\edit_actions">
       <UniqueIdentifier>{e23b35a1-652e-47bb-8941-1653504cd776}</UniqueIdentifier>
     </Filter>
-    <Filter Include="OpenAutomate">
-      <UniqueIdentifier>{fe56b488-34f8-4632-9f5e-7805f761b338}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game API\Level">
       <UniqueIdentifier>{6e4e4f2d-02fc-4141-9ae3-ca29550fc16d}</UniqueIdentifier>
     </Filter>
@@ -336,9 +333,6 @@
     <ClInclude Include="edit_actions.h">
       <Filter>Engine\text_editor\edit_actions</Filter>
     </ClInclude>
-    <ClInclude Include="xrSASH.h">
-      <Filter>OpenAutomate</Filter>
-    </ClInclude>
     <ClInclude Include="IGameFont.hpp">
       <Filter>Render\Font output</Filter>
     </ClInclude>
@@ -402,9 +396,6 @@
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="x_ray.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="IInputReceiver.cpp">
@@ -568,9 +559,6 @@
     </ClCompile>
     <ClCompile Include="edit_actions.cpp">
       <Filter>Engine\text_editor\edit_actions</Filter>
-    </ClCompile>
-    <ClCompile Include="xrSASH.cpp">
-      <Filter>OpenAutomate</Filter>
     </ClCompile>
     <ClCompile Include="IGame_Level.cpp">
       <Filter>Game API\Level</Filter>

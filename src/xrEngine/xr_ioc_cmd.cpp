@@ -3,7 +3,6 @@
 
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
-#include "xrSASH.h"
 
 #include "CameraManager.h"
 #include "Environment.h"
@@ -28,9 +27,6 @@ void IConsole_Command::InvalidSyntax()
     Info(I);
     Msg("~ Invalid syntax in call to '%s'", cName);
     Msg("~ Valid arguments: %s", I);
-
-    g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
-    g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
 }
 
 //-----------------------------------------------------------------------

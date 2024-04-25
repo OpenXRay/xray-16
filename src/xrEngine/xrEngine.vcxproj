@@ -98,7 +98,6 @@
     <ClInclude Include="WaveForm.h" />
     <ClInclude Include="xrHemisphere.h" />
     <ClInclude Include="xrImage_Resampler.h" />
-    <ClInclude Include="xrSASH.h" />
     <ClInclude Include="xrSheduler.h" />
     <ClInclude Include="xrTheora_Stream.h" />
     <ClInclude Include="xrTheora_Surface.h" />
@@ -180,7 +179,6 @@
     <ClCompile Include="tntQAVI.cpp" />
     <ClCompile Include="xrHemisphere.cpp" />
     <ClCompile Include="xrImage_Resampler.cpp" />
-    <ClCompile Include="xrSASH.cpp" />
     <ClCompile Include="xrSheduler.cpp" />
     <ClCompile Include="xrTheora_Stream.cpp" />
     <ClCompile Include="xrTheora_Surface.cpp" />
@@ -195,7 +193,6 @@
     <ClCompile Include="xr_ioc_cmd.cpp" />
     <ClCompile Include="xr_object_list.cpp" />
     <ClCompile Include="x_ray.cpp" />
-    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ClientServer.txt" />
@@ -227,9 +224,6 @@
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(xrExternals)oalib.vcxproj">
-      <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>

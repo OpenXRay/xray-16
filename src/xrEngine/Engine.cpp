@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "Engine.h"
 
-#include "xrSASH.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
 
@@ -101,8 +100,6 @@ void CEngine::OnEvent(EVENT E, u64 P1, u64 P2)
     {
         if (pInput != nullptr)
             pInput->GrabInput(false);
-
-        g_SASH.EndBenchmark();
 
         SDL_Event quit = { SDL_QUIT };
         SDL_PushEvent(&quit);

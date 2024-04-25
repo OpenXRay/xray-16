@@ -236,7 +236,6 @@ target_sources_grouped(
     defines.cpp
     defines.h
     embedded_resources_management.h
-    main.cpp
     mp_logging.h
     stdafx.cpp
     stdafx.h
@@ -307,14 +306,6 @@ target_sources_grouped(
     ISheduled.h
     xrSheduler.cpp
     xrSheduler.h
-)
-
-target_sources_grouped(
-    TARGET xrEngine
-    NAME "OpenAutomate"
-    FILES
-    xrSASH.cpp
-    xrSASH.h
 )
 
 target_sources_grouped(

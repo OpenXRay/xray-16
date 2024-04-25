@@ -6,7 +6,6 @@
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-#include "xrSASH.h"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 
@@ -19,6 +18,9 @@ ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 
 ENGINE_API bool g_bRendering = false;
+
+ENGINE_API bool g_bBenchmark = false;
+string512 g_sBenchmarkName;
 
 int ps_fps_limit = 501;
 int ps_fps_limit_in_menu = 60;
@@ -116,12 +118,8 @@ void CRenderDevice::RenderEnd(void)
             }
         }
     }
-    g_bRendering = false;
     // end scene
-    // Present goes here, so call OA Frame end.
-    if (g_SASH.IsBenchmarkRunning())
-        g_SASH.DisplayFrame(fTimeGlobal);
-
+    g_bRendering = false;
     GEnv.Render->End();
 
     vCameraPositionSaved = vCameraPosition;
@@ -204,9 +202,6 @@ bool CRenderDevice::BeforeFrame()
         g_pGamePersistent->LoadDraw();
         return false;
     }
-
-    if (!dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
-        g_SASH.StartBenchmark();
 
     return true;
 }
