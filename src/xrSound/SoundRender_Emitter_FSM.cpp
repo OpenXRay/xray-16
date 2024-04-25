@@ -308,7 +308,7 @@ bool CSoundRender_Emitter::update_culling(float dt)
     else
     {
         // Check range
-        float dist = SoundRender->listener_position().distance_to(p_source.position);
+        const float dist = SoundRender->listener_position().distance_to(p_source.position);
         if (dist > p_source.max_distance)
         {
             smooth_volume = 0;
@@ -351,7 +351,7 @@ bool CSoundRender_Emitter::update_culling(float dt)
 
 float CSoundRender_Emitter::priority() const
 {
-    float dist = SoundRender->listener_position().distance_to(p_source.position);
+    const float dist = SoundRender->listener_position().distance_to(p_source.position);
     float att = p_source.min_distance / (psSoundRolloff * dist);
     clamp(att, 0.f, 1.f);
     return smooth_volume * att * priority_scale;

@@ -5,7 +5,7 @@
 #include "SoundRender_Target.h"
 #include "SoundRender_Source.h"
 
-void CSoundRender_Core::i_start(CSoundRender_Emitter* E)
+void CSoundRender_Core::i_start(CSoundRender_Emitter* E) const
 {
     R_ASSERT(E);
 
@@ -13,7 +13,7 @@ void CSoundRender_Core::i_start(CSoundRender_Emitter* E)
     float Ptest = E->priority();
     float Ptarget = flt_max;
     CSoundRender_Target* T = nullptr;
-    for (auto Ttest : s_targets)
+    for (const auto Ttest : s_targets)
     {
         if (Ttest->priority < Ptarget)
         {
@@ -49,11 +49,11 @@ void CSoundRender_Core::i_rewind(CSoundRender_Emitter* E)
     E->target->rewind();
 }
 
-bool CSoundRender_Core::i_allow_play(CSoundRender_Emitter* E)
+bool CSoundRender_Core::i_allow_play(const CSoundRender_Emitter* E)
 {
     // Search available target
-    float Ptest = E->priority();
-    return std::any_of(s_targets.begin(), s_targets.end(), [Ptest](CSoundRender_Target* target)
+    const float Ptest = E->priority();
+    return std::any_of(s_targets.begin(), s_targets.end(), [Ptest](const CSoundRender_Target* target)
     {
         return target->priority < Ptest;
     });
