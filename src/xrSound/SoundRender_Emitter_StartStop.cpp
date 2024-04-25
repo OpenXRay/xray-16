@@ -4,6 +4,7 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
+#include "SoundRender_Target.h"
 
 void CSoundRender_Emitter::start(const ref_sound& _owner, u32 flags, float delay)
 {
@@ -41,7 +42,7 @@ void CSoundRender_Emitter::i_stop()
 {
     bRewind = FALSE;
     if (target)
-        SoundRender->i_stop(this);
+        stop_target();
     if (owner_data)
     {
         Event_ReleaseOwner();
@@ -86,15 +87,20 @@ void CSoundRender_Emitter::cancel()
     switch (m_current_state)
     {
     case stPlaying:
-        // switch to: SIMULATE
-        SoundRender->i_stop(this);
-        m_current_state = stSimulating; // switch state
+        stop_target();
+        m_current_state = stSimulating;
         break;
     case stPlayingLooped:
-        // switch to: SIMULATE
-        SoundRender->i_stop(this);
-        m_current_state = stSimulatingLooped; // switch state
+        stop_target();
+        m_current_state = stSimulatingLooped;
         break;
     default: VERIFY2(false, "Non playing ref_sound forced out of render queue"); break;
     }
+}
+
+void CSoundRender_Emitter::stop_target()
+{
+    R_ASSERT1_CURE(target, true, { return; });
+    target->stop();
+    target = nullptr;
 }

@@ -39,7 +39,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
 
         set_cursor(0);
         if (target)
-            SoundRender->i_rewind(this);
+            target->rewind();
         bRewind = FALSE;
     }
 
@@ -107,7 +107,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         {
             if (target)
             {
-                SoundRender->i_stop(this);
+                stop_target();
                 m_current_state = stSimulating;
             }
             fTimeStarted += dt;
@@ -118,7 +118,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         if (fTime >= fTimeToStop)
         {
             // STOP
-            SoundRender->i_stop(this);
+            stop_target();
             m_current_state = stStopped;
         }
         else
@@ -126,7 +126,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
             if (!update_culling(dt))
             {
                 // switch to: SIMULATE
-                SoundRender->i_stop(this);
+                stop_target();
                 m_current_state = stSimulating;
             }
             else
@@ -174,7 +174,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         {
             if (target)
             {
-                SoundRender->i_stop(this);
+                stop_target();
                 m_current_state = stSimulatingLooped;
             }
             fTimeStarted += dt;
@@ -184,7 +184,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         if (!update_culling(dt))
         {
             // switch to: SIMULATE
-            SoundRender->i_stop(this);
+            stop_target();
             m_current_state = stSimulatingLooped; // switch state
         }
         else

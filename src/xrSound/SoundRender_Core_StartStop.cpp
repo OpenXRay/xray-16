@@ -32,23 +32,6 @@ void CSoundRender_Core::i_start(CSoundRender_Emitter* E) const
     T->priority = Ptest;
 }
 
-void CSoundRender_Core::i_stop(CSoundRender_Emitter* E)
-{
-    // Msg("- %10s : %3d[%1.4f] : %s", "i_stop", E->dbg_ID, E->priority(), E->source->fname);
-    R_ASSERT(E);
-    R_ASSERT(E == E->target->get_emitter());
-    E->target->stop();
-    E->target = nullptr;
-}
-
-void CSoundRender_Core::i_rewind(CSoundRender_Emitter* E)
-{
-    // Msg("- %10s : %3d[%1.4f] : %s", "i_rewind", E->dbg_ID, E->priority(), E->source->fname);
-    R_ASSERT(E);
-    R_ASSERT(E == E->target->get_emitter());
-    E->target->rewind();
-}
-
 bool CSoundRender_Core::i_allow_play(const CSoundRender_Emitter* E)
 {
     // Search available target

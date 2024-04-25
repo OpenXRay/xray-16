@@ -121,4 +121,7 @@ public:
 
     CSoundRender_Emitter(CSoundRender_Scene* s);
     ~CSoundRender_Emitter() override;
+
+private:
+    void stop_target();
 };

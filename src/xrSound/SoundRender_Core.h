@@ -132,8 +132,6 @@ public:
 
     void i_destroy_source(CSoundRender_Source* S);
     void i_start(CSoundRender_Emitter* E) const;
-    void i_stop(CSoundRender_Emitter* E);
-    void i_rewind(CSoundRender_Emitter* E);
     bool i_allow_play(const CSoundRender_Emitter* E);
     bool i_locked() override { return isLocked; }
 
