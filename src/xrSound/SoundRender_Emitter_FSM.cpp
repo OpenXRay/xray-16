@@ -345,7 +345,10 @@ bool CSoundRender_Emitter::update_culling(float dt)
     // If we are playing already, return OK
     // --- else check availability of resources
     if (target)
+    {
+        target->set_priority(priority());
         return TRUE;
+    }
     return SoundRender->i_allow_play(this);
 }
 

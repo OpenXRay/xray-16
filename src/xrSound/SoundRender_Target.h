@@ -9,6 +9,7 @@ class CSoundRender_Target
 protected:
     CSoundRender_Emitter* m_pEmitter{};
     bool rendering{};
+    float priority{ -1 };
 
     xr_vector<u8> temp_buf[sdef_target_count];
     void fill_block(size_t idx);
@@ -21,12 +22,6 @@ protected:
     std::atomic<Task*> prefill_task{};
     void dispatch_prefill();
     void dispatch_prefill_all();
-
-public:
-    void wait_prefill() const;
-
-public:
-    float priority{};
 
 public:
     CSoundRender_Target();
@@ -45,4 +40,9 @@ public:
     virtual void stop();
     virtual void update();
     virtual void fill_parameters();
+
+    ICF auto get_priority() const { return priority; }
+    ICF void set_priority(const float p) { priority = p; }
+
+    void wait_prefill() const;
 };

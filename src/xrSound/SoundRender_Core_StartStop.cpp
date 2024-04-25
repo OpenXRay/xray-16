@@ -10,15 +10,14 @@ void CSoundRender_Core::i_start(CSoundRender_Emitter* E) const
     R_ASSERT1_CURE(E, true, { return; });
 
     // Search lowest-priority target
-    float Ptest = E->priority();
     float Ptarget = flt_max;
     CSoundRender_Target* T = nullptr;
     for (const auto Ttest : s_targets)
     {
-        if (Ttest->priority < Ptarget)
+        if (Ttest->get_priority() < Ptarget)
         {
             T = Ttest;
-            Ptarget = Ttest->priority;
+            Ptarget = Ttest->get_priority();
         }
     }
 
@@ -29,7 +28,6 @@ void CSoundRender_Core::i_start(CSoundRender_Emitter* E) const
     // Associate
     E->target = T;
     E->target->start(E);
-    T->priority = Ptest;
 }
 
 bool CSoundRender_Core::i_allow_play(const CSoundRender_Emitter* E)
@@ -38,6 +36,6 @@ bool CSoundRender_Core::i_allow_play(const CSoundRender_Emitter* E)
     const float Ptest = E->priority();
     return std::any_of(s_targets.begin(), s_targets.end(), [Ptest](const CSoundRender_Target* target)
     {
-        return target->priority < Ptest;
+        return target->get_priority() < Ptest;
     });
 }
