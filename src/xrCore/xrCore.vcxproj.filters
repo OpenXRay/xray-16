@@ -118,6 +118,9 @@
     <Filter Include="Threading\Util">
       <UniqueIdentifier>{14c94737-f2c7-482d-9033-775a3da068cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Profiler">
+      <UniqueIdentifier>{ea7e41e5-3ae4-44a3-8b2a-21337befa3c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -329,6 +332,9 @@
     </ClCompile>
     <ClCompile Include="Math\fast_lc16.cpp">
       <Filter>Math\RNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Externals\tracy\public\TracyClient.cpp">
+      <Filter>Profiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)lzo\include;$(xrSdkDir)include\mimalloc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID="$(APPVEYOR_BUILD_ID)";APPVEYOR_BUILD_VERSION="$(APPVEYOR_BUILD_VERSION)";APPVEYOR_ACCOUNT_NAME="$(APPVEYOR_ACCOUNT_NAME)";GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID="$(GITHUB_RUN_ID)";GITHUB_RUN_NUMBER="$(GITHUB_RUN_NUMBER)";GITHUB_REPOSITORY="$(GITHUB_REPOSITORY)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID="$(APPVEYOR_BUILD_ID)";APPVEYOR_BUILD_VERSION="$(APPVEYOR_BUILD_VERSION)";APPVEYOR_ACCOUNT_NAME="$(APPVEYOR_ACCOUNT_NAME)";GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID="$(GITHUB_RUN_ID)";GITHUB_RUN_NUMBER="$(GITHUB_RUN_NUMBER)";GITHUB_REPOSITORY="$(GITHUB_REPOSITORY)";TRACY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>DbgHelp.lib;FaultRep.lib;jpeg-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -41,6 +41,9 @@ call .GitInfo.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Externals\tracy\public\TracyClient.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Animation\Bone.cpp" />
     <ClCompile Include="Animation\BoneEditor.cpp" />
     <ClCompile Include="Animation\Envelope.cpp" />

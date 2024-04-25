@@ -212,6 +212,9 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     _SHOW_REF("* CREATE: DeviceREF:", pDevice);
 
+    // Register immediate context in profiler
+    profiler_ctx = TracyD3D11Context(pDevice, pContext);
+
     // Create deferred contexts
     for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
     {
@@ -411,6 +414,8 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
     _RELEASE(m_pSwapChain);
 
+    TracyD3D11Destroy(profiler_ctx);
+
     _RELEASE(pContext1);
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
@@ -506,6 +511,8 @@ void CHW::Present()
     }
 
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
+
+    TracyD3D11Collect(profiler_ctx);
 }
 
 DeviceState CHW::GetDeviceState()
