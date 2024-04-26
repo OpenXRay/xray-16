@@ -183,7 +183,6 @@ CLocatorAPI::CLocatorAPI() :
 CLocatorAPI::~CLocatorAPI()
 {
     VERIFY(0 == m_iLockRescan);
-    _dump_open_files(1);
     xr_delete(m_auth_lock);
 }
 
@@ -1052,8 +1051,6 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
 
 void CLocatorAPI::_destroy()
 {
-    CloseLog();
-
     for (auto& it : m_files)
     {
         auto str = pstr(it.name);
@@ -1075,6 +1072,9 @@ void CLocatorAPI::_destroy()
         it.close();
     }
     m_archives.clear();
+
+    _dump_open_files(1);
+    CloseLog();
 }
 
 const CLocatorAPI::file* CLocatorAPI::GetFileDesc(pcstr path)
