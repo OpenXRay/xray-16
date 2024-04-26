@@ -327,8 +327,8 @@ void xrCore::_destroy()
     {
         FS._destroy();
         EFS._destroy();
-        xr_FS.reset();
-        xr_EFS.reset();
+        xr_FS = nullptr;
+        xr_EFS = nullptr;
 
         if (trained_model)
         {
