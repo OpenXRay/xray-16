@@ -58,7 +58,7 @@ struct Fcolor
 {
     float r, g, b, a;
 
-    constexpr Fcolor() noexcept = default;
+    Fcolor() noexcept = default;
 
     constexpr Fcolor(float _r, float _g, float _b, float _a) noexcept
         : r(_r), g(_g), b(_b), a(_a) {}
