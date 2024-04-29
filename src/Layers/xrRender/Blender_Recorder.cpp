@@ -226,7 +226,7 @@ void CBlender_Compile::PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs /*= nullp
         ctable.merge(&dest.ds->constants);
         dest.cs = RImplementation.Resources->_CreateCS("null");
 #   endif
-#endif // !USE_DX9
+#endif // defined(USE_DX11) || defined(USE_OGL)
     }
 #if defined(USE_OGL)
     RImplementation.Resources->_LinkPP(dest);
@@ -261,7 +261,7 @@ void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
     //	alpha in DX11 identical to color.
     RS.SetRS(D3DRS_SRCBLENDALPHA, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3DBLEND_ZERO);
-#endif // !USE_DX9
+#endif
 }
 void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
 {

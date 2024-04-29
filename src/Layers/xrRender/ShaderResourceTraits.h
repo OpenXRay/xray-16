@@ -1,9 +1,6 @@
 #pragma once
 
 #include "ResourceManager.h"
-#ifdef USE_DX9
-#   include "Layers/xrRenderDX9/dx9shader_utils.h"
-#endif
 
 #ifdef USE_OGL
 static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
@@ -178,15 +175,13 @@ struct ShaderTypeTraits<SVS>
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<char, GLuint>;
-#else
-#if defined(USE_DX9)
-    using LinkageType = void*;
 #elif defined(USE_DX11)
     using LinkageType = ID3D11ClassLinkage*;
-#endif
     using HWShaderType = ID3DVertexShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
+#else
+#   error No graphics API selected or enabled!
 #endif
 
     static inline const char* GetShaderExt() { return ".vs"; }
@@ -223,10 +218,7 @@ struct ShaderTypeTraits<SVS>
     {
         ResultType res{};
 
-#if defined(USE_DX9)
-        res = HW.pDevice->CreateVertexShader(buffer, &sh);
-        UNUSED(linkage, name);
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
         res = HW.pDevice->CreateVertexShader(buffer, size, linkage, &sh);
         UNUSED(name);
 #elif defined(USE_OGL)
@@ -254,15 +246,13 @@ struct ShaderTypeTraits<SPS>
     using HWShaderType = GLuint;
     using BufferType = pcstr*;
     using ResultType = std::pair<char, GLuint>;
-#else
-#if defined(USE_DX9)
-    using LinkageType = void*;
 #elif defined(USE_DX11)
     using LinkageType = ID3D11ClassLinkage*;
-#endif
     using HWShaderType = ID3DPixelShader*;
     using BufferType = DWORD const*;
     using ResultType = HRESULT;
+#else
+#   error No graphics API selected or enabled!
 #endif
 
     static inline const char* GetShaderExt() { return ".ps"; }
@@ -313,10 +303,7 @@ struct ShaderTypeTraits<SPS>
     {
         ResultType res{};
 
-#if defined(USE_DX9)
-        res = HW.pDevice->CreatePixelShader(buffer, &sh);
-        UNUSED(linkage, name);
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
         res = HW.pDevice->CreatePixelShader(buffer, size, linkage, &sh);
         UNUSED(name);
 #elif defined(USE_OGL)

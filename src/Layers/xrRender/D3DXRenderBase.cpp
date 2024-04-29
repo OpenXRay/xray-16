@@ -76,7 +76,7 @@ void D3DXRenderBase::Destroy()
 
 void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
+#if defined(DEBUG) && defined(USE_DX11)
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif // DEBUG
 
@@ -98,7 +98,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     Resources->Dump(true);
 #endif
 
-#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
+#if defined(DEBUG) && defined(USE_DX11)
     _SHOW_REF("*ref +CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif
 }

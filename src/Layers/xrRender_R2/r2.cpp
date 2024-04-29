@@ -76,7 +76,7 @@ static class cl_pos_decompress_params : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
         const float HorzTan = -VertTan / Device.fASPECT;
 #elif defined(USE_OGL)
@@ -228,9 +228,7 @@ void CRender::create()
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345678);
 
     m_skinning = -1;
-#ifndef USE_DX9
     m_MSAASample = -1;
-#endif
     m_SMAPSize = ps_r2_smapsize;
 
     // hardware
@@ -240,14 +238,8 @@ void CRender::create()
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
     // Check for NULL render target support
-#ifdef USE_DX9
-    D3DFORMAT nullrt = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
-    o.nullrt = HW.support(nullrt, D3DRTYPE_SURFACE, D3DUSAGE_RENDERTARGET);
-#elif defined(USE_DX11) || defined(USE_OGL)
     o.nullrt = false;
-#else
-#   error No graphics API selected or enabled!
-#endif
+
     /*
     if (o.nullrt)		{
     Msg				("* NULLRT supported and used");
@@ -312,14 +304,9 @@ void CRender::create()
 
     // SMAP / DST
     o.HW_smap_FETCH4 = FALSE;
-#ifdef USE_DX9
-    o.HW_smap = HW.support(D3DFMT_D24X8, D3DRTYPE_TEXTURE, D3DUSAGE_DEPTHSTENCIL);
-#elif defined(USE_DX11) || defined(USE_OGL)
     o.HW_smap = true;
-#else
-#   error No graphics API selected or enabled!
-#endif
     o.HW_smap_PCF = o.HW_smap;
+
     if (o.HW_smap)
     {
 #if defined(USE_DX11)
@@ -334,30 +321,8 @@ void CRender::create()
         Msg("* HWDST/PCF supported and used");
     }
 
-#ifdef USE_DX9
-    // search for ATI formats
-    if (!o.HW_smap && (0 == strstr(Core.Params, "-nodf24")))
-    {
-        o.HW_smap = HW.support((D3DFORMAT)(MAKEFOURCC('D', 'F', '2', '4')), D3DRTYPE_TEXTURE, D3DUSAGE_DEPTHSTENCIL);
-        if (o.HW_smap)
-        {
-            o.HW_smap_FORMAT = MAKEFOURCC('D', 'F', '2', '4');
-            o.HW_smap_PCF = FALSE;
-            o.HW_smap_FETCH4 = TRUE;
-        }
-        Msg("* DF24/F4 supported and used [%X]", o.HW_smap_FORMAT);
-    }
-#endif
-
-#ifdef USE_DX9
-    o.fp16_filter = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_FILTER);
-    o.fp16_blend = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING);
-#elif defined(USE_DX11) || defined(USE_OGL)
     o.fp16_filter = true;
     o.fp16_blend = true;
-#else
-#   error No graphics API selected or enabled!
-#endif
 
     // emulate ATI-R4xx series
     if (strstr(Core.Params, "-r4xx"))
@@ -382,27 +347,12 @@ void CRender::create()
     // if hardware support early stencil (>= GF 8xxx) stencil reset trick only
     // slows down.
     o.nvstencil = FALSE;
-#ifdef USE_DX9
-    if ((HW.Caps.id_vendor == 0x10DE) && (HW.Caps.id_device >= 0x40))
-    {
-        // o.nvstencil = HW.support	((D3DFORMAT)MAKEFOURCC('R','A','W','Z'), D3DRTYPE_SURFACE, 0);
-        // o.nvstencil = TRUE;
-        o.nvstencil = (S_OK ==
-            HW.pD3D->CheckDeviceFormat(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, 0, D3DRTYPE_TEXTURE,
-                (D3DFORMAT MAKEFOURCC('R', 'A', 'W', 'Z'))));
-    }
-#endif
     if (strstr(Core.Params, "-nonvs"))
         o.nvstencil = FALSE;
 
     // nv-dbt
-#ifdef USE_DX9
-    o.nvdbt = HW.support((D3DFORMAT)MAKEFOURCC('N', 'V', 'D', 'B'), D3DRTYPE_SURFACE, 0);
-#elif defined(USE_DX11) || defined(USE_OGL)
     o.nvdbt = false;
-#else
-#   error No graphics API selected or enabled!
-#endif
+
     if (o.nvdbt)
         Msg("* NV-DBT supported and used");
 
@@ -460,13 +410,9 @@ void CRender::create()
     o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);
-#if defined(USE_DX9) || defined(USE_DX11)
-#   if defined(USE_DX9)
-    o.ssao_hdao = false;
-#   elif defined(USE_DX11)
+#if defined(USE_DX11)
     o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && (ps_r_ssao != 0);
     o.ssao_ultra = HW.ComputeShadersSupported && ssao_hdao_cs_shaders_exist();
-#   endif
     o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && (ps_r_ssao != 0);
 #elif defined(USE_OGL)
     // TODO: OGL: temporary disabled HBAO/HDAO, need to fix it
@@ -476,13 +422,7 @@ void CRender::create()
 #   error No graphics API selected or enabled!
 #endif
 
-#ifdef USE_DX9
-    if ((HW.Caps.id_vendor == 0x1002) && (HW.Caps.id_device <= 0x72FF))
-    {
-        o.ssao_opt_data = false;
-        o.ssao_hbao = false;
-    }
-#elif defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11) || defined(USE_OGL)
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
     o.hbao_vectorized = false;
     if (o.ssao_hdao)
@@ -493,7 +433,7 @@ void CRender::create()
             o.hbao_vectorized = true;
         o.ssao_opt_data = true;
     }
-#endif // USE_DX9
+#endif // defined(USE_DX11) || defined(USE_OGL)
 
 #if defined(USE_DX11) || defined(USE_OGL)
 #   if defined(USE_DX11)

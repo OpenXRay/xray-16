@@ -28,7 +28,7 @@ typedef resptr_core<SInputSignature, resptr_base<SInputSignature>> ref_input_sig
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SVS : public xr_resource_named
 {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     ID3DVertexShader* sh;
 #elif defined(USE_OGL)
     GLuint sh;
@@ -47,7 +47,7 @@ typedef resptr_core<SVS, resptr_base<SVS>> ref_vs;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SPS : public xr_resource_named
 {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     ID3DPixelShader* sh;
 #elif defined(USE_OGL)
     GLuint sh;
@@ -147,10 +147,7 @@ typedef resptr_core<SState, resptr_base<SState>> ref_state;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SDeclaration : public xr_resource_flagged
 {
-#if defined(USE_DX9) //	Don't need it: use ID3DInputLayout instead
-    //	which is per ( declaration, VS input layout) pair
-    IDirect3DVertexDeclaration9* dcl;
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
     //	Maps input signature to input layout
     xr_map<ID3DBlob*, ID3DInputLayout*> vs_to_layout;
     xr_vector<D3D_INPUT_ELEMENT_DESC> dx11_dcl_code;

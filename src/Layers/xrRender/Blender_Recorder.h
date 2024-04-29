@@ -145,7 +145,7 @@ public:
         u32 Fail = D3DSTENCILOP_KEEP, u32 Pass = D3DSTENCILOP_KEEP, u32 ZFail = D3DSTENCILOP_KEEP);
     void r_StencilRef(u32 Ref);
     void r_CullMode(D3DCULL Mode);
-#endif // !USE_DX9
+#endif // defined(USE_DX11) || defined(USE_OGL)
 
 #if defined(USE_DX11)
     void r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);

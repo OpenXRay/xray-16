@@ -404,11 +404,7 @@ public:
     GenerationLevel GetGeneration() const override { return IRender::GENERATION_R2; }
     bool is_sun_static() override { return o.sunstatic; }
 
-#if defined(USE_DX9)
-    BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D9; }
-    u32 get_dx_level() override { return 0x00090000; }
-    pcstr getShaderPath() override { return "r2\\"; }
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
     BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D11; }
     u32 get_dx_level() override { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
     pcstr getShaderPath() override
@@ -433,7 +429,7 @@ public:
     void level_Load(IReader*) override;
     void level_Unload() override;
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     ID3DBaseTexture* texture_load(pcstr fname, u32& msize);
 #elif defined(USE_OGL)
     GLuint           texture_load(pcstr fname, u32& msize, GLenum& ret_desc);
@@ -521,25 +517,18 @@ public:
     CRender();
     ~CRender() override;
 
-#if defined(USE_DX9)
-    // nothing
-#elif defined(USE_DX11)
     void addShaderOption(pcstr name, pcstr value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
 
 private:
+#if defined(USE_DX11)
     xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
 #elif defined(USE_OGL)
-    void addShaderOption(pcstr name, pcstr value);
-    void clearAllShaderOptions() { m_ShaderOptions.clear(); }
-
-private:
     xr_string m_ShaderOptions;
 #else
 #   error No graphics API selected or enabled!
 #endif
 
-private:
     IRender_Sector::sector_id_t largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
 };
 

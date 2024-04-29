@@ -364,7 +364,7 @@ void CResourceManager::DeferredUpload()
     if (!Device.b_is_Ready)
         return;
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
 #elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
@@ -379,7 +379,7 @@ void CResourceManager::DeferredUnload()
     if (!Device.b_is_Ready)
         return;
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
 #elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)

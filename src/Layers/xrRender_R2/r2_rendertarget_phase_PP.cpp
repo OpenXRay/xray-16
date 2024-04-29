@@ -5,10 +5,10 @@ void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
     R_constant* C = RCache.get_c(c_snoise)._get(); // get texture
     VERIFY2(C, "s_noise texture in noise shader should be set");
     VERIFY(RC_dest_sampler == C->destination);
-#if defined(USE_DX9) || defined(USE_OGL)
-    VERIFY(RC_sampler == C->type);
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
     VERIFY(RC_dx11texture == C->type);
+#elif defined(USE_OGL)
+    VERIFY(RC_sampler == C->type);
 #else
 #   error Select correct check for your graphics API
 #endif
@@ -157,7 +157,7 @@ void CRenderTarget::phase_pp()
     // Fill vertex buffer
     float du = ps_r1_pps_u, dv = ps_r1_pps_v;
     TL_2c3uv* pv = (TL_2c3uv*)RImplementation.Vertex.Lock(4, g_postprocess.stride(), Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     pv->set(du + 0, dv + float(_h), p_color, p_gray, r0.x, r1.y, l0.x, l1.y, n0.x, n1.y);
     pv++;
     pv->set(du + 0, dv + 0, p_color, p_gray, r0.x, r0.y, l0.x, l0.y, n0.x, n0.y);
@@ -177,7 +177,7 @@ void CRenderTarget::phase_pp()
     pv++;
 #else
 #   error No graphics API selected or enabled!
-#endif // USE_DX9 || USE_DX11
+#endif
     RImplementation.Vertex.Unlock(4, g_postprocess.stride());
 
     // Actual rendering

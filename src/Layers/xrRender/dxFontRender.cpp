@@ -187,11 +187,6 @@ inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL
         //float tv = (l.y / owner.vTS.y) + (0.5f / owner.vTS.y);
         float tu = (l.x / owner.vTS.x);
         float tv = (l.y / owner.vTS.y);
-#ifdef USE_DX9
-        //  Make half pixel offset for 1 to 1 mapping
-        tu += (0.5f / owner.vTS.x);
-        tv += (0.5f / owner.vTS.y);
-#endif // USE_DX9
 
         v->set(X, Y2, clr2, tu, tv + owner.fTCHeight);
         v++;

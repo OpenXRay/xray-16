@@ -76,7 +76,7 @@ struct ECORE_API R_constant_load
     u16 index; // linear index (pixel)
     u16 cls; // element class
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     R_constant_load() : index(u16(-1)), cls(u16(-1)) {};
 #elif defined(USE_OGL)
     GLuint location;
@@ -89,7 +89,7 @@ struct ECORE_API R_constant_load
 
     BOOL equal(R_constant_load& C)
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         return (index == C.index) && (cls == C.cls);
 #elif defined(USE_OGL)
         return (index == C.index) && (cls == C.cls) && (location == C.location) && (program == C.program);
@@ -107,15 +107,12 @@ struct ECORE_API R_constant : public xr_resource
 
     R_constant_load ps;
     R_constant_load vs;
-#ifndef USE_DX9
     R_constant_load gs;
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     R_constant_load hs;
     R_constant_load ds;
     R_constant_load cs;
-#   endif
-#endif
-#ifdef USE_OGL
+#elif defined(USE_OGL)
     R_constant_load pp;
 #endif
 
@@ -132,15 +129,12 @@ struct ECORE_API R_constant : public xr_resource
         case RC_dest_vertex: return vs;
         case RC_dest_pixel: return ps;
         case RC_dest_sampler: return samp;
-#ifndef USE_DX9
         case RC_dest_geometry: return gs;
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
         case RC_dest_hull: return hs;
         case RC_dest_domain: return ds;
         case RC_dest_compute: return cs;
-#   endif
-#endif
-#ifdef USE_OGL
+#elif defined(USE_OGL)
         case RC_dest_all: return pp;
 #endif
         default: FATAL("invalid enumeration for shader");

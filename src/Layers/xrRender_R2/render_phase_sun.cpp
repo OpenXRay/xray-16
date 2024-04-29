@@ -160,17 +160,10 @@ void render_sun::calculate()
         XRMatrixOrthoOffCenterLH(&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
             map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/1.41421f * map_size);
 #else
-#ifdef USE_DX9
-        XMStoreFloat4x4((XMFLOAT4X4*)&mdir_Project, XMMatrixOrthographicOffCenterLH(
-            -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
-            map_size * 0.5f, 0.1f, dist + map_size)
-        );
-#else
         XMStoreFloat4x4((XMFLOAT4X4*)&mdir_Project, XMMatrixOrthographicOffCenterLH(
             -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
             map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/ 1.41421f * map_size)
         );
-#endif
 #endif
         //////////////////////////////////////////////////////////////////////////
         // snap view-position to pixel

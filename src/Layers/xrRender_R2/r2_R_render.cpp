@@ -44,7 +44,7 @@ void CRender::RenderMenu()
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
     FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
     pv++;
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -316,7 +316,6 @@ void CRender::Render()
         Lights_LastFrame.clear();
     }
 
-#if defined(USE_DX11) || defined(USE_OGL)
     // full screen pass to mark msaa-edge pixels in highest stencil bit
     if (o.msaa)
     {
@@ -325,7 +324,6 @@ void CRender::Render()
     }
 
     r_rain.sync();
-#endif // !USE_DX9
 
     // Directional light - fucking sun
     {
@@ -345,10 +343,6 @@ void CRender::Render()
         dsgraph.cmd_list.set_xform_project(Device.mProject);
         dsgraph.cmd_list.set_xform_view(Device.mView);
         // Stencil - write 0x1 at pixel pos -
-#if defined(USE_DX9)
-        RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
-            D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-#elif defined(USE_DX11) || defined(USE_OGL)
         if (!o.msaa)
         {
             dsgraph.cmd_list.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
@@ -359,7 +353,6 @@ void CRender::Render()
             dsgraph.cmd_list.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0x7f,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         }
-#endif // USE_DX9
         dsgraph.cmd_list.set_CullMode(CULL_CCW);
         dsgraph.cmd_list.set_ColorWriteEnable();
         dsgraph.render_emissive();

@@ -16,16 +16,12 @@ extern xr_vector<xr_token> VidQualityToken;
 
 constexpr pcstr GET_RENDERER_MODULE_FUNC = "GetRendererModule";
 
-constexpr pcstr r1_library     = "xrRender_R1";
+constexpr pcstr r4_library     = "xrRender_R4";
 constexpr pcstr gl_library     = "xrRender_GL";
 
 constexpr pcstr RENDER_LIBRARIES[] =
 {
-#if defined(XR_PLATFORM_WINDOWS)
-    r1_library,
-    "xrRender_R2",
-    "xrRender_R4",
-#endif
+    r4_library,
     gl_library
 };
 
@@ -175,7 +171,7 @@ void CEngineAPI::CreateRendererList()
     if (GEnv.isDedicatedServer)
     {
 #if defined(XR_PLATFORM_WINDOWS)
-        R_ASSERT2(loadLibrary(r1_library), "Dedicated server needs xrRender_R1 to work");
+        R_ASSERT2(loadLibrary(r4_library), "Dedicated server needs xrRender_R1 to work");
 #else
         R_ASSERT2(loadLibrary(gl_library), "Dedicated server needs xrRender_GL to work");
 #endif
@@ -184,7 +180,7 @@ void CEngineAPI::CreateRendererList()
     {
         for (pcstr library : RENDER_LIBRARIES)
         {
-            if (loadLibrary(library) && library != r1_library)
+            if (loadLibrary(library) && library != r4_library)
                 r2_available = true;
         }
     }

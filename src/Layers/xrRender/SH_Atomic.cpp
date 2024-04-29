@@ -44,7 +44,7 @@ SVS::~SVS()
     //	Now it is release automatically
 #endif
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     _RELEASE(sh);
 #elif defined(USE_OGL)
     if (HW.SeparateShaderObjectsSupported)
@@ -60,7 +60,7 @@ SVS::~SVS()
 // SPS
 SPS::~SPS()
 {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     _RELEASE(sh);
 #elif defined(USE_OGL)
     if (HW.SeparateShaderObjectsSupported)
@@ -194,8 +194,6 @@ SDeclaration::~SDeclaration()
         //	Release vertex layout
         _RELEASE(iLayout->second);
     }
-#elif defined(USE_DX9)// USE_DX9
-    _RELEASE(dcl);
 #else
 #   error No graphics API selected or enabled!
 #endif

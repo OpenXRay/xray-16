@@ -18,7 +18,7 @@ class R_occlusion
 private:
     struct Query
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         ID3DQuery* Q;
 #elif defined(USE_OGL)
         GLuint Q;
@@ -39,7 +39,7 @@ private:
 public:
 #if defined(USE_DX11)
     typedef u64 occq_result;
-#elif defined(USE_DX9) || defined(USE_OGL)
+#elif defined(USE_OGL)
     typedef u32 occq_result;
 #else
 #   error No graphics API selected or enabled!
