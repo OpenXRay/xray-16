@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "options": {
     "env": {
-      "LD_LIBRARY_PATH": "${workspaceFolder}/bin/x86_64/Debug:${workspaceFolder}/bin/x86_64/Mixed:${workspaceFolder}/bin/x86_64/Release"
+      "LD_LIBRARY_PATH": "${workspaceFolder}/bin/x86_64/Debug:${workspaceFolder}/bin/x86_64/Mixed:${workspaceFolder}/bin/x86_64/Release:${workspaceFolder}/bin/x86_64/RelWithDebInfo"
     }
   },
   "tasks": [
