@@ -25,8 +25,6 @@ constexpr pcstr RENDER_LIBRARIES[] =
     gl_library
 };
 
-static bool r2_available = false;
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -178,10 +176,9 @@ void CEngineAPI::CreateRendererList()
     }
     else
     {
-        for (pcstr library : RENDER_LIBRARIES)
+        for (cpcstr library : RENDER_LIBRARIES)
         {
-            if (loadLibrary(library) && library != r4_library)
-                r2_available = true;
+            loadLibrary(library);
         }
     }
 
@@ -230,6 +227,6 @@ SCRIPT_EXPORT(CheckRendererSupport, (),
     using namespace luabind;
     module(luaState)
     [
-        def("xrRender_test_r2_hw", +[](){ return r2_available; })
+        def("xrRender_test_r2_hw", +[](){ return true; })
     ];
 });
