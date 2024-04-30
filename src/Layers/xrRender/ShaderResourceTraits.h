@@ -321,7 +321,6 @@ struct ShaderTypeTraits<SPS>
     static inline u32 GetShaderDest() { return RC_dest_pixel; }
 };
 
-#if defined(USE_DX11) || defined(USE_OGL)
 template <>
 struct ShaderTypeTraits<SGS>
 {
@@ -575,7 +574,6 @@ struct ShaderTypeTraits<SCS>
 
     static inline u32 GetShaderDest() { return RC_dest_compute; }
 };
-#endif
 
 template <>
 inline CResourceManager::map_PS& CResourceManager::GetShaderMap()
@@ -589,7 +587,6 @@ inline CResourceManager::map_VS& CResourceManager::GetShaderMap()
     return m_vs;
 }
 
-#if defined(USE_DX11) || defined(USE_OGL)
 template <>
 inline CResourceManager::map_GS& CResourceManager::GetShaderMap()
 {
@@ -613,7 +610,6 @@ inline CResourceManager::map_CS& CResourceManager::GetShaderMap()
 {
     return m_cs;
 }
-#endif // USE_DX11 || USE_OGL
 
 template <typename T>
 T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32 flags /*= 0*/)

@@ -578,11 +578,8 @@ private:
     void InitializeDebugDraw();
     void DestroyDebugDraw();
 
-    // DX9 doesn't need this
-#ifndef USE_DX9
     ref_geom vs_L;
     ref_geom vs_TL;
-#endif
 
 #if defined(USE_DX11)
 private:

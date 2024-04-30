@@ -49,10 +49,8 @@ void CRenderTarget::phase_accumulator(CBackend& cmd_list)
         cmd_list.set_ColorWriteEnable();
     }
 
-#if defined(USE_DX11) || defined(USE_OGL)
     //	Restore viewport after shadow map rendering
     RImplementation.rmNormal(cmd_list);
-#endif
 }
 
 void CRenderTarget::phase_vol_accumulator(CBackend& cmd_list)

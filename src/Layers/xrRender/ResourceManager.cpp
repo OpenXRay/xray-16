@@ -462,9 +462,6 @@ void CResourceManager::_DumpMemoryUsage()
 void CResourceManager::Evict()
 {
     // TODO: DX11: check if we really need this method
-#ifdef USE_DX9
-    CHK_DX(HW.pDevice->EvictManagedResources());
-#endif
 }
 /*
 BOOL	CResourceManager::_GetDetailTexture(LPCSTR Name,LPCSTR& T, R_constant_setup* &CS)

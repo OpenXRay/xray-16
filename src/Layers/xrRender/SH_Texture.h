@@ -10,31 +10,27 @@ class ENGINE_API CTheoraSurface;
 class ECORE_API CTexture : public xr_resource_named
 {
 public:
-#if defined(USE_DX11) || defined(USE_OGL)
     enum	MaxTextures
     {
         //	Actually these values are 128
         mtMaxPixelShaderTextures = 16,
         mtMaxVertexShaderTextures = 4,
         mtMaxGeometryShaderTextures = 16,
-#	ifdef USE_DX11
+#ifdef USE_DX11
         mtMaxHullShaderTextures = 16,
         mtMaxDomainShaderTextures = 16,
         mtMaxComputeShaderTextures = 16,
-#	endif
+#endif
         mtMaxCombinedShaderTextures =
         mtMaxPixelShaderTextures
         + mtMaxVertexShaderTextures
         + mtMaxGeometryShaderTextures
-#	ifdef USE_DX11
+#ifdef USE_DX11
         + mtMaxHullShaderTextures
         + mtMaxDomainShaderTextures
         + mtMaxComputeShaderTextures
-#	endif
-    };
-#else
-#   error No graphics API selected or enabled!
 #endif
+    };
 
 #if defined(USE_DX11)
     //	Since DX11 allows up to 128 unique textures,

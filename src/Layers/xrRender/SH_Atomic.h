@@ -59,17 +59,16 @@ struct ECORE_API SPS : public xr_resource_named
 };
 typedef resptr_core<SPS, resptr_base<SPS>> ref_ps;
 
-#if defined(USE_DX11) || defined(USE_OGL)
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SGS : public xr_resource_named
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     ID3DGeometryShader* sh;
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     GLuint sh;
-#   else
-#       error No graphics API selected or enabled!
-#   endif
+#else
+#   error No graphics API selected or enabled!
+#endif
     R_constant_table constants;
     ~SGS();
 };
@@ -77,12 +76,12 @@ typedef resptr_core<SGS, resptr_base<SGS>> ref_gs;
 
 struct ECORE_API SHS : public xr_resource_named
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
 	ID3D11HullShader* sh;
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     GLuint sh;
-#   else
-#       error No graphics API selected or enabled!
+#else
+#   error No graphics API selected or enabled!
 #endif
     R_constant_table constants;
     ~SHS();
@@ -91,12 +90,12 @@ typedef resptr_core<SHS, resptr_base<SHS>> ref_hs;
 
 struct ECORE_API SDS : public xr_resource_named
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     ID3D11DomainShader* sh;
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     GLuint sh;
-#   else
-#       error No graphics API selected or enabled!
+#else
+#   error No graphics API selected or enabled!
 #endif
     R_constant_table constants;
     ~SDS();
@@ -105,19 +104,17 @@ typedef resptr_core<SDS, resptr_base<SDS>> ref_ds;
 
 struct ECORE_API SCS : public xr_resource_named
 {
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     ID3D11ComputeShader* sh;
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     GLuint sh;
-#   else
-#       error No graphics API selected or enabled!
+#else
+#   error No graphics API selected or enabled!
 #endif
     R_constant_table constants;
     ~SCS();
 };
 typedef resptr_core<SCS, resptr_base<SCS>> ref_cs;
-
-#endif // USE_DX11 || USE_OGL
 
 #if defined(USE_OGL)
 struct ECORE_API SPP : public xr_resource_named

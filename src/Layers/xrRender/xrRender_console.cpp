@@ -55,8 +55,7 @@ const xr_token qsmapsize_token[] =
     { "2560", 2560 },
     { "3072", 3072 },
     { "3584", 3584 },
-    { "4096", 4096 },
-#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if values more than 8192 are supported on OpenGL
+    { "4096", 4096 }, // XXX: runtime check for maximum smap-size on OpenGL
     { "5120", 5120 },
     { "6144", 6144 },
     { "7168", 7168 },
@@ -69,7 +68,6 @@ const xr_token qsmapsize_token[] =
     { "14336", 14336 },
     { "15360", 15360 },
     { "16384", 16384 },
-#endif // !USE_DX9
     { nullptr, 0 }
 };
 
@@ -81,10 +79,8 @@ const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st
 
 u32 ps_r_ssao = 3;
 const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
-#if defined(USE_DX11) || defined(USE_OGL)
     {"st_opt_ultra", 4},
-#endif
-    {nullptr, 0}};
+{nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; // = 0;
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},

@@ -143,7 +143,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
     return;
 #else
 #   error No graphics API selected or enabled!
-#endif // defined(USE_DX11) || defined(USE_OGL)
+#endif
 }
 
 #ifndef DEDICATED_SREVER

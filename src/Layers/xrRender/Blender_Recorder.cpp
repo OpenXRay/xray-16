@@ -216,17 +216,15 @@ void CBlender_Compile::PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs /*= nullp
 #endif
         dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
         ctable.merge(&dest.vs->constants);
-#if defined(USE_DX11) || defined(USE_OGL)
         dest.gs = RImplementation.Resources->_CreateGS(_gs);
         ctable.merge(&dest.gs->constants);
-#   ifdef USE_DX11
+#ifdef USE_DX11
         dest.hs = RImplementation.Resources->_CreateHS(_hs);
         dest.ds = RImplementation.Resources->_CreateDS(_ds);
         ctable.merge(&dest.hs->constants);
         ctable.merge(&dest.ds->constants);
         dest.cs = RImplementation.Resources->_CreateCS("null");
-#   endif
-#endif // defined(USE_DX11) || defined(USE_OGL)
+#endif
     }
 #if defined(USE_OGL)
     RImplementation.Resources->_LinkPP(dest);
@@ -254,14 +252,13 @@ void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
     RS.SetRS(D3DRS_SRCBLEND, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLEND, bABlend ? abDST : D3DBLEND_ZERO);
 
-#if defined(USE_DX11) || defined(USE_OGL)
     //	Since in our engine D3DRS_SEPARATEALPHABLENDENABLE state is
     //	always set to false and in DirectX 10 blend functions for
     //	color and alpha are always independent, assign blend options for
     //	alpha in DX11 identical to color.
+    // XXX: do we want to change this behaviour?
     RS.SetRS(D3DRS_SRCBLENDALPHA, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3DBLEND_ZERO);
-#endif
 }
 void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
 {

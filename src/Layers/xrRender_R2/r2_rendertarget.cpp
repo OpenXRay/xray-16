@@ -11,14 +11,12 @@
 #include "Layers/xrRender/blenders/blender_luminance.h"
 #include "Layers/xrRender/blenders/blender_ssao.h"
 
-#if defined(USE_DX11) || defined(USE_OGL)
-#   include "Layers/xrRender/blenders/dx11MSAABlender.h"
-#   include "Layers/xrRender/blenders/dx11RainBlender.h"
+#include "Layers/xrRender/blenders/dx11MSAABlender.h"
+#include "Layers/xrRender/blenders/dx11RainBlender.h"
 
-#   include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
-#   if defined(USE_DX11)
-#       include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
-#   endif
+#include "Layers/xrRender/blenders/dx11MinMaxSMBlender.h"
+#if defined(USE_DX11)
+#    include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
 #endif
 
 //Anomaly blenders
@@ -245,7 +243,6 @@ CRenderTarget::CRenderTarget()
     // Blenders
     b_accum_spot = xr_new<CBlender_accum_spot>();
 
-#if defined(USE_DX11) || defined(USE_OGL)
     if (options.msaa)
     {
         for (u32 i = 0; i < BoundSamples; ++i)
@@ -254,7 +251,6 @@ CRenderTarget::CRenderTarget()
             b_accum_volumetric_msaa[i] = xr_new<CBlender_accum_volumetric_msaa>("ISAMPLE", SAMPLE_DEFS[i]);
         }
     }
-#endif // USE_DX11 || USE_OGL
 
     // NORMAL
     {
@@ -408,7 +404,6 @@ CRenderTarget::CRenderTarget()
         // otherwise - create texture with specified HW_smap_FORMAT
         const auto num_slices = RImplementation.o.support_rt_arrays ? R__NUM_SUN_CASCADES : 1;
         rt_smap_depth.create(r2_RT_smap_depth, smapsize, smapsize, depth_format, 1, num_slices, flags);
-#if defined(USE_DX11) || defined(USE_OGL)
         rt_smap_rain.create(r2_RT_smap_rain, options.rain_smapsize, options.rain_smapsize, depth_format);
         if (options.minmax_sm)
         {
@@ -416,7 +411,6 @@ CRenderTarget::CRenderTarget()
             CBlender_createminmax b_create_minmax;
             s_create_minmax_sm.create(&b_create_minmax, "null");
         }
-#endif
 
         // Accum mask
         {
@@ -444,7 +438,6 @@ CRenderTarget::CRenderTarget()
         }
 
         // Accum direct/mask MSAA
-#if defined(USE_DX11) || defined(USE_OGL)
         if (options.msaa)
         {
             for (u32 i = 0; i < BoundSamples; ++i)
@@ -455,7 +448,6 @@ CRenderTarget::CRenderTarget()
                 s_accum_mask_msaa[i].create(&b_accum_mask_msaa, "r2" DELIMITER "accum_direct");
             }
         }
-#endif
 
         // Accum volumetric
         if (options.advancedpp)
@@ -463,7 +455,6 @@ CRenderTarget::CRenderTarget()
             s_accum_direct_volumetric.create("accum_volumetric_sun_nomsaa");
             manually_assign_texture(s_accum_direct_volumetric, "s_smap", smapTarget);
 
-#if defined(USE_DX11) || defined(USE_OGL)
             if (options.minmax_sm)
             {
                 s_accum_direct_volumetric_minmax.create("accum_volumetric_sun_nomsaa_minmax");
@@ -488,14 +479,12 @@ CRenderTarget::CRenderTarget()
                     manually_assign_texture(s_accum_direct_volumetric_msaa[i], "s_smap", smapTarget);
                 }
             }
-#endif // USE_DX11 || USE_OGL
         }
     }
 
     // RAIN
     // TODO: DX11: Create resources only when DX11 rain is enabled.
     // Or make DX11 rain switch dynamic?
-#if defined(USE_DX11) || defined(USE_OGL)
     {
         CBlender_rain b_rain;
         s_rain.create(&b_rain, "null");
@@ -521,15 +510,12 @@ CRenderTarget::CRenderTarget()
             }
         }
     }
-#endif // USE_DX11 || USE_OGL
 
-#if defined(USE_DX11) || defined(USE_OGL)
     if (options.msaa)
     {
         CBlender_msaa b_msaa;
         s_mark_msaa_edges.create(&b_msaa, "null");
     }
-#endif
 
     // POINT
     {
@@ -561,7 +547,6 @@ CRenderTarget::CRenderTarget()
     {
         CBlender_accum_reflected b_accum_reflected;
         s_accum_reflected.create(&b_accum_reflected, "r2" DELIMITER "accum_refl");
-#if defined(USE_DX11) || defined(USE_OGL)
         if (options.msaa)
         {
             for (u32 i = 0; i < BoundSamples; ++i)
@@ -570,7 +555,6 @@ CRenderTarget::CRenderTarget()
                 s_accum_reflected_msaa[i].create(&b_accum_reflected_msaa, "null");
             }
         }
-#endif // USE_DX11 || USE_OGL
     }
 
     // BLOOM
@@ -601,11 +585,9 @@ CRenderTarget::CRenderTarget()
         f_bloom_factor = 0.5f;
     }
 
-#if defined(USE_DX11) || defined(USE_OGL)
     // Check if SSAO Ultra is allowed
     if (ps_r_ssao_mode != 2 /*hdao*/ || !options.ssao_ultra)
         ps_r_ssao = _min(ps_r_ssao, 3);
-#endif
 
     // HBAO
     if (options.ssao_opt_data)
@@ -793,7 +775,6 @@ CRenderTarget::~CRenderTarget()
 
     // Blenders
     xr_delete(b_accum_spot);
-#if defined(USE_DX11) || defined(USE_OGL)
     if (RImplementation.o.msaa)
     {
         const u32 bound = RImplementation.o.msaa_opt ? 1 : RImplementation.o.msaa_samples;
@@ -804,7 +785,6 @@ CRenderTarget::~CRenderTarget()
             xr_delete(b_accum_volumetric_msaa[i]);
         }
     }
-#endif
 }
 
 void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)
@@ -861,7 +841,6 @@ bool CRenderTarget::need_to_render_sunshafts()
     return true;
 }
 
-#if defined(USE_DX11) || defined(USE_OGL)
 bool CRenderTarget::use_minmax_sm_this_frame()
 {
     switch (RImplementation.o.minmax_sm)
@@ -881,4 +860,3 @@ bool CRenderTarget::use_minmax_sm_this_frame()
     default: return false;
     }
 }
-#endif

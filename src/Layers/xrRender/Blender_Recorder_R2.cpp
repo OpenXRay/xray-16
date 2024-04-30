@@ -37,14 +37,12 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
 #endif
         dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
         ctable.merge(&dest.vs->constants);
-#if defined(USE_DX11) || defined(USE_OGL)
         dest.gs = RImplementation.Resources->_CreateGS("null");
-#    ifdef USE_DX11
+#ifdef USE_DX11
         dest.hs = RImplementation.Resources->_CreateHS("null");
         dest.ds = RImplementation.Resources->_CreateDS("null");
         dest.cs = RImplementation.Resources->_CreateCS("null");
-#    endif
-#endif // defined(USE_DX11) || defined(USE_OGL)
+#endif
     }
 #if defined(USE_OGL)
     RImplementation.Resources->_LinkPP(dest);

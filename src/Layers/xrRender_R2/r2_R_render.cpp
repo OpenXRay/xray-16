@@ -76,9 +76,7 @@ void CRender::Render()
 
     g_r = 1;
 
-#if defined(USE_DX11) || defined(USE_OGL)
     rmNormal(RCache);
-#endif
 
     IMainMenu* pMainMenu = g_pGamePersistent ? g_pGamePersistent->m_pMainMenu : 0;
     bool bMenu = pMainMenu ? pMainMenu->CanSkipSceneRendering() : false;
@@ -87,9 +85,7 @@ void CRender::Render()
     // if (!(g_pGameLevel && g_hud) || bMenu)
     if (!g_pGameLevel || bMenu)
     {
-#if defined(USE_DX11) || defined(USE_OGL) // XXX: probably we can just enable this on DX9 too
         Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
-#endif
         return;
     }
 

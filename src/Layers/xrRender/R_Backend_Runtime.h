@@ -83,20 +83,14 @@ IC GLuint CBackend::get_ZB()
 }
 ICF void CBackend::set_States(SState* _state)
 {
-//	DX11 Manages states using it's own algorithm. Don't mess with it.
-#ifdef USE_DX9
-    if (state != _state->state)
-#endif
-    {
-        PGO(Msg("PGO:state_block"));
-        stat.states++;
-        state = _state->state;
+    PGO(Msg("PGO:state_block"));
+    stat.states++;
+    state = _state->state;
 #if defined(USE_DX11)
-        state->Apply(*this);
+    state->Apply(*this);
 #else
         state->Apply();
 #endif
-    }
 }
 
 IC void CBackend::set_Matrices(SMatrixList* matrix_list)

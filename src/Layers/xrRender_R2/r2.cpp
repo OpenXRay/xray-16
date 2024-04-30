@@ -130,7 +130,6 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     }
 } binder_sun_shafts_intensity;
 
-#if defined(USE_DX11) || defined(USE_OGL)
 static class cl_alpha_ref : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
@@ -141,7 +140,6 @@ static class cl_alpha_ref : public R_constant_setup
 #   endif
     }
 } binder_alpha_ref;
-#endif
 
 // Defined in ResourceManager.cpp
 IReader* open_shader(pcstr shader);
@@ -150,14 +148,7 @@ IReader* open_shader(pcstr shader);
 static bool must_enable_old_cascades()
 {
     bool oldCascades = false;
-#if RENDER == R_R2
-    {
-        // Check for new cascades support on R2
-        IReader* accumSunNearCascade = open_shader("accum_sun_cascade.ps");
-        oldCascades = !accumSunNearCascade;
-        FS.r_close(accumSunNearCascade);
-    }
-#elif RENDER != R_R1
+#if RENDER != R_R1
     {
         IReader* accumSunNear = open_shader("accum_sun_near.ps");
         R_ASSERT3(accumSunNear, "Can't open shader", "accum_sun_near.ps");
@@ -388,13 +379,11 @@ void CRender::create()
     //.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
     o.sunstatic = ps_r2_sun_static;
     o.advancedpp = ps_r2_advanced_pp;
-#if defined(USE_DX11) || defined(USE_OGL)
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     // TODO: OGL: temporary disabled, need to fix it
     o.volumetricfog = false;
-#   endif
 #endif
     o.sjitter = (strstr(Core.Params, "-sjitter")) ? TRUE : FALSE;
     o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
@@ -422,7 +411,6 @@ void CRender::create()
 #   error No graphics API selected or enabled!
 #endif
 
-#if defined(USE_DX11) || defined(USE_OGL)
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
     o.hbao_vectorized = false;
     if (o.ssao_hdao)
@@ -433,20 +421,18 @@ void CRender::create()
             o.hbao_vectorized = true;
         o.ssao_opt_data = true;
     }
-#endif // defined(USE_DX11) || defined(USE_OGL)
 
-#if defined(USE_DX11) || defined(USE_OGL)
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.dx11_sm4_1 = o.dx11_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     o.dx11_sm4_1 = true;
 #else
 #   error No graphics API selected or enabled!
-#   endif
+#endif
 
     //	MSAA option dependencies
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     o.msaa = !!ps_r3_msaa;
     o.msaa_samples = (1 << ps_r3_msaa);
 
@@ -457,7 +443,7 @@ void CRender::create()
     // o.msaa_hybrid	= ps_r2_ls_flags.test(R3FLAG_MSAA_HYBRID);
     o.msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.msaa_hybrid &= !o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     // TODO: OGL: temporary disabled, need to fix it
     o.msaa = false;
     o.msaa_samples = 0;
@@ -465,7 +451,7 @@ void CRender::create()
     o.msaa_hybrid = false;
 #else
 #   error No graphics API selected or enabled!
-#   endif
+#endif
     //	Allow alpha test MSAA for DX10.0
 
     // o.msaa_alphatest= ps_r2_ls_flags.test((u32)R3FLAG_MSAA_ALPHATEST);
@@ -531,7 +517,6 @@ void CRender::create()
             }
         }
     }
-#endif
 
     // constants
     Resources->RegisterConstantSetup("parallax", &binder_parallax);
@@ -539,11 +524,9 @@ void CRender::create()
     Resources->RegisterConstantSetup("sun_shafts_intensity", &binder_sun_shafts_intensity);
     Resources->RegisterConstantSetup("pos_decompression_params", &binder_pos_decompress_params);
     Resources->RegisterConstantSetup("pos_decompression_params2", &binder_pos_decompress_params2);
-#if defined(USE_DX11) || defined(USE_OGL)
     Resources->RegisterConstantSetup("m_AlphaRef", &binder_alpha_ref);
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     Resources->RegisterConstantSetup("triLOD", &binder_LOD);
-#   endif
 #endif
 
     m_bMakeAsyncSS = false;
@@ -554,9 +537,7 @@ void CRender::create()
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
 
-#if defined(USE_DX11) || defined(USE_OGL)
     rmNormal(RCache);
-#endif
     q_sync_point.Create();
 
     //	TODO: OGL: Implement FluidManager.

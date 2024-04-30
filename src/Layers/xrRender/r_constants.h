@@ -149,16 +149,13 @@ struct ECORE_API R_constant : public xr_resource
             && destination == C.destination
             && ps.equal(C.ps)
             && vs.equal(C.vs)
-#if defined(USE_DX11) || defined(USE_OGL)
             && gs.equal(C.gs)
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
             && hs.equal(C.hs)
             && ds.equal(C.ds)
             && cs.equal(C.cs)
-#   endif
-#   if defined(USE_OGL)
+#elif defined(USE_OGL)
             && pp.equal(C.pp)
-#   endif
 #endif
             && samp.equal(C.samp)
             && handler == C.handler;
