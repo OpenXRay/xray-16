@@ -15,10 +15,7 @@
         "cwd": "${workspaceFolder}"
       },
       "command": "rm",
-      "args": [
-        "-rf",
-        "bin"
-      ],
+      "args": ["-rf", "bin"],
       "problemMatcher": []
     },
     {
@@ -28,10 +25,7 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "args": [
-        "-p",
-        "bin"
-      ]
+      "args": ["-p", "bin"]
     },
     {
       "label": "Configure",
@@ -40,9 +34,7 @@
         "cwd": "${workspaceFolder}/bin"
       },
       "command": "cmake .. -DCMAKE_BUILD_TYPE=${input:buildType}",
-      "dependsOn": [
-        "mkdir"
-      ],
+      "dependsOn": ["mkdir"],
       "problemMatcher": []
     },
     {
@@ -52,9 +44,7 @@
         "cwd": "${workspaceFolder}/bin"
       },
       "command": "cmake --build . -j${CPU_COUNT}",
-      "dependsOn": [
-        "Configure"
-      ]
+      "dependsOn": ["Configure"]
     },
     {
       "label": "Run SoC",
@@ -63,9 +53,6 @@
         "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
       },
       "command": "./xr_3da -soc -nointro -fsltx ${SOC_LTX_FILE_PATH}",
-      "dependsOn": [
-        "Compile"
-      ],
       "problemMatcher": []
     },
     {
@@ -75,9 +62,6 @@
         "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
       },
       "command": "./xr_3da -cs -nointro -fsltx ${CS_LTX_FILE_PATH}",
-      "dependsOn": [
-        "Compile"
-      ],
       "problemMatcher": []
     },
     {
@@ -87,23 +71,15 @@
         "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
       },
       "command": "./xr_3da -nointro -fsltx ${COP_LTX_FILE_PATH}",
-      "dependsOn": [
-        "Compile"
-      ],
       "problemMatcher": []
-    },
+    }
   ],
   "inputs": [
     {
       "id": "buildType",
       "type": "pickString",
       "description": "choose build type:",
-      "options": [
-        "Debug",
-        "Release",
-        "MinSizeRel",
-        "RelWithDebInfo"
-      ],
+      "options": ["Debug", "Release", "MinSizeRel", "RelWithDebInfo"],
       "default": "Debug"
     }
   ]
