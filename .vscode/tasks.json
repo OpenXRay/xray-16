@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "options": {
     "env": {
-      "LD_LIBRARY_PATH": "${workspaceFolder}/bin/x64/Debug:${workspaceFolder}/bin/x64/Mixed:${workspaceFolder}/bin/x64/Release"
+      "LD_LIBRARY_PATH": "${workspaceFolder}/bin/x86_64/Debug:${workspaceFolder}/bin/x86_64/Mixed:${workspaceFolder}/bin/x86_64/Release"
     }
   },
   "tasks": [
@@ -50,7 +50,7 @@
       "label": "Run SoC",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
+        "cwd": "${workspaceFolder}/bin/x86_64/${input:buildType}"
       },
       "command": "./xr_3da -soc -nointro -fsltx ${SOC_LTX_FILE_PATH}",
       "problemMatcher": []
@@ -59,7 +59,7 @@
       "label": "Run CS",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
+        "cwd": "${workspaceFolder}/bin/x86_64/${input:buildType}"
       },
       "command": "./xr_3da -cs -nointro -fsltx ${CS_LTX_FILE_PATH}",
       "problemMatcher": []
@@ -68,7 +68,7 @@
       "label": "Run CoP",
       "type": "shell",
       "options": {
-        "cwd": "${workspaceFolder}/bin/x64/${input:buildType}"
+        "cwd": "${workspaceFolder}/bin/x86_64/${input:buildType}"
       },
       "command": "./xr_3da -nointro -fsltx ${COP_LTX_FILE_PATH}",
       "problemMatcher": []
