@@ -16,20 +16,12 @@ extern xr_vector<xr_token> VidQualityToken;
 
 constexpr pcstr GET_RENDERER_MODULE_FUNC = "GetRendererModule";
 
-constexpr pcstr r1_library     = "xrRender_R1";
-constexpr pcstr gl_library     = "xrRender_GL";
+constexpr pcstr r1_library = "xrRender_R1";
 
 constexpr pcstr RENDER_LIBRARIES[] =
 {
-#if defined(XR_PLATFORM_WINDOWS)
     r1_library,
-    "xrRender_R2",
-    "xrRender_R4",
-#endif
-    gl_library
 };
-
-static bool r2_available = false;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -174,18 +166,13 @@ void CEngineAPI::CreateRendererList()
 
     if (GEnv.isDedicatedServer)
     {
-#if defined(XR_PLATFORM_WINDOWS)
         R_ASSERT2(loadLibrary(r1_library), "Dedicated server needs xrRender_R1 to work");
-#else
-        R_ASSERT2(loadLibrary(gl_library), "Dedicated server needs xrRender_GL to work");
-#endif
     }
     else
     {
         for (pcstr library : RENDER_LIBRARIES)
         {
-            if (loadLibrary(library) && library != r1_library)
-                r2_available = true;
+            loadLibrary(library);
         }
     }
 
@@ -234,6 +221,6 @@ SCRIPT_EXPORT(CheckRendererSupport, (),
     using namespace luabind;
     module(luaState)
     [
-        def("xrRender_test_r2_hw", +[](){ return r2_available; })
+        def("xrRender_test_r2_hw", +[](){ return false; })
     ];
 });

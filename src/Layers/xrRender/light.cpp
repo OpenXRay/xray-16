@@ -27,80 +27,14 @@ light::light() : SpatialBase(g_pGamePersistent->SpatialSpace)
 
     frame_render = 0;
 
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    ZeroMemory(omnipart, sizeof(omnipart));
-    s_spot = nullptr;
-    s_point = nullptr;
-    vis.frame2test = 0; // xffffffff;
-    vis.query_id = 0;
-    vis.query_order = 0;
-    vis.visible = true;
-    vis.pending = false;
-    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
-        svis[id].id = id;
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 }
 
 light::~light()
 {
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    for (auto& f : omnipart)
-        xr_delete(f);
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
     set_active(false);
-
-// remove from Lights_LastFrame
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    for (auto& p_light : RImplementation.Lights_LastFrame)
-        if (this == p_light)
-            p_light = nullptr;
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 }
 
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-void light::set_texture(LPCSTR name)
-{
-    if ((nullptr == name) || (0 == name[0]))
-    {
-        // default shaders
-        s_spot.destroy();
-        s_point.destroy();
-        s_volumetric.destroy();
-        return;
-    }
-
-#pragma todo("Only shadowed spot implements projective texture")
-    string256 temp;
-
-    strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name);
-    // strconcat(sizeof(temp),temp,"_nomsaa",name);
-    s_spot.create(RImplementation.Target->b_accum_spot, temp, name);
-
-#if (RENDER != R_R3) && (RENDER != R_R4) && (RENDER != R_GL)
-    s_volumetric.create("accum_volumetric", name);
-#else //    (RENDER!=R_R3) && (RENDER!=R_R4) && (RENDER!=R_GL)
-    s_volumetric.create("accum_volumetric_nomsaa", name);
-    if (RImplementation.o.msaa)
-    {
-        u32 bound = 1;
-        if (!RImplementation.o.msaa_opt)
-            bound = RImplementation.o.msaa_samples;
-
-        for (u32 i = 0; i < bound; ++i)
-        {
-            s_spot_msaa[i].create(RImplementation.Target->b_accum_spot_msaa[i],
-                strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_spot_", name), name);
-            s_volumetric_msaa[i].create(RImplementation.Target->b_accum_volumetric_msaa[i],
-                strconcat(sizeof(temp), temp, "r2" DELIMITER "accum_volumetric_", name), name);
-        }
-    }
-#endif // (RENDER!=R_R3) || (RENDER!=R_R4) || (RENDER!=R_GL)
-}
-#endif
-
-#if RENDER == R_R1
 void light::set_texture(LPCSTR name) {}
-#endif
 
 void light::set_active(bool a)
 {
@@ -208,13 +142,6 @@ void light::spatial_move()
 
     // update spatial DB
     SpatialBase::spatial_move();
-
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-    if (flags.bActive)
-        gi_generate();
-    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
-        svis[id].invalidate();
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER == R_GL)
 }
 
 vis_data& light::get_homdata()
@@ -228,176 +155,6 @@ vis_data& light::get_homdata()
 
 Fvector light::spatial_sector_point() { return position; }
 //////////////////////////////////////////////////////////////////////////
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-// Xforms
-void light::xform_calc()
-{
-    if (Device.dwFrame == m_xform_frame)
-        return;
-    m_xform_frame = Device.dwFrame;
-
-    // build final rotation / translation
-    Fvector L_dir, L_up, L_right;
-
-    // dir
-    L_dir.set(direction);
-    float l_dir_m = L_dir.magnitude();
-    if (_valid(l_dir_m) && l_dir_m > EPS_S)
-        L_dir.div(l_dir_m);
-    else
-        L_dir.set(0, 0, 1);
-
-    // R&N
-    if (right.square_magnitude() > EPS)
-    {
-        // use specified 'up' and 'right', just enshure ortho-normalization
-        L_right.set(right);
-        L_right.normalize();
-        L_up.crossproduct(L_dir, L_right);
-        L_up.normalize();
-        L_right.crossproduct(L_up, L_dir);
-        L_right.normalize();
-    }
-    else
-    {
-        // auto find 'up' and 'right' vectors
-        L_up.set(0, 1, 0);
-        if (_abs(L_up.dotproduct(L_dir)) > .99f)
-            L_up.set(0, 0, 1);
-        L_right.crossproduct(L_up, L_dir);
-        L_right.normalize();
-        L_up.crossproduct(L_dir, L_right);
-        L_up.normalize();
-    }
-
-    // matrix
-    Fmatrix mR;
-    mR.i = L_right;
-    mR._14 = 0;
-    mR.j = L_up;
-    mR._24 = 0;
-    mR.k = L_dir;
-    mR._34 = 0;
-    mR.c = position;
-    mR._44 = 1;
-
-    // switch
-    switch (flags.type)
-    {
-    case IRender_Light::REFLECTED:
-    case IRender_Light::POINT:
-    {
-        // scale of identity sphere
-        float L_R = range;
-        Fmatrix mScale;
-        mScale.scale(L_R, L_R, L_R);
-        m_xform.mul_43(mR, mScale);
-    }
-    break;
-    case IRender_Light::SPOT:
-    {
-        // scale to account range and angle
-        float s = 2.f * range * tanf(cone / 2.f);
-        Fmatrix mScale;
-        mScale.scale(s, s, range); // make range and radius
-        m_xform.mul_43(mR, mScale);
-    }
-    break;
-    case IRender_Light::OMNIPART:
-    {
-        float L_R = 2 * range; // volume is half-radius
-        Fmatrix mScale;
-        mScale.scale(L_R, L_R, L_R);
-        m_xform.mul_43(mR, mScale);
-    }
-    break;
-    default: m_xform.identity(); break;
-    }
-}
-
-//                           +X,                -X,                +Y,                 -Y,                +Z,                -Z
-Fvector cmNorm[6] = { { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, -1.f }, { 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f }, { 0.f, 1.f, 0.f } };
-Fvector cmDir [6] = { { 1.f, 0.f, 0.f }, {-1.f, 0.f, 0.f }, { 0.f, 1.f,  0.f }, { 0.f,-1.f, 0.f }, { 0.f, 0.f, 1.f }, { 0.f, 0.f,-1.f } };
-
-void light::Export(light_Package& package)
-{
-    if (flags.bShadow)
-    {
-        switch (flags.type)
-        {
-        case IRender_Light::POINT:
-        {
-            // tough: create/update 6 shadowed lights
-            if (nullptr == omnipart[0])
-                for (auto& p_light : omnipart)
-                    p_light = xr_new<light>();
-            for (int f = 0; f < 6; f++)
-            {
-                light* L = omnipart[f];
-                Fvector R;
-                R.crossproduct(cmNorm[f], cmDir[f]);
-                L->set_type(IRender_Light::OMNIPART);
-                L->set_shadow(true);
-                L->set_position(position);
-                L->set_rotation(cmDir[f], R);
-                L->set_cone(PI_DIV_2);
-                L->set_range(range);
-                L->set_virtual_size(virtual_size);
-                L->set_color(color);
-                L->spatial.sector_id = spatial.sector_id; //. dangerous?
-                L->s_spot = s_spot;
-                L->s_point = s_point;
-
-// Holger - do we need to export msaa stuff as well ?
-#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
-                if (RImplementation.o.msaa)
-                {
-                    int bound = 1;
-
-                    if (!RImplementation.o.msaa_opt)
-                        bound = RImplementation.o.msaa_samples;
-
-                    for (int i = 0; i < bound; ++i)
-                    {
-                        L->s_point_msaa[i] = s_point_msaa[i];
-                        L->s_spot_msaa[i] = s_spot_msaa[i];
-                        // L->s_volumetric_msaa[i] = s_volumetric_msaa[i];
-                    }
-                }
-#endif // (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
-
-                //  Igor: add volumetric support
-                L->set_volumetric(flags.bVolumetric);
-                L->set_volumetric_quality(m_volumetric_quality);
-                L->set_volumetric_intensity(m_volumetric_intensity);
-                L->set_volumetric_distance(m_volumetric_distance);
-
-                package.v_shadowed.push_back(L);
-            }
-        }
-        break;
-        case IRender_Light::SPOT: package.v_shadowed.push_back(this); break;
-        }
-    }
-    else
-    {
-        switch (flags.type)
-        {
-        case IRender_Light::POINT: package.v_point.push_back(this); break;
-        case IRender_Light::SPOT: package.v_spot.push_back(this); break;
-        }
-    }
-}
-
-void light::set_attenuation_params(float a0, float a1, float a2, float fo)
-{
-    attenuation0 = a0;
-    attenuation1 = a1;
-    attenuation2 = a2;
-    falloff = fo;
-}
-
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 extern float ps_r2_slight_fade;
