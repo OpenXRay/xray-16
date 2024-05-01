@@ -288,7 +288,7 @@ CApplication::CApplication(pcstr commandLine)
         sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
     }
 
-    Core.Initialize("OpenXRay", commandLine, nullptr, true, *fsgame ? fsgame : nullptr);
+    Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
 
 #ifdef PROFILE_TASK_SYSTEM
     const auto task = [](const TaskRange<int>&){};

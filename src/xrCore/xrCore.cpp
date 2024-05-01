@@ -171,7 +171,7 @@ void xrCore::PrintBuildInfo()
     Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
 }
 
-void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
+void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs, pcstr fs_fname, bool plugin)
 {
     ZoneScoped;
     Threading::SetCurrentThreadName("Primary thread");
@@ -317,7 +317,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         FS._initialize(flags, nullptr, fs_fname);
         EFS._initialize();
     }
-    SetLogCB(cb);
     init_counter++;
 }
 
