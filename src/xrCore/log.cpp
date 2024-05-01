@@ -23,18 +23,17 @@ IWriter* LogWriter = nullptr;
 
 void FlushLog()
 {
-    if (!no_log)
-    {
-        logCS.Enter();
-        if (LogWriter)
-            LogWriter->flush();
-        logCS.Leave();
-    }
+    if (no_log)
+        return;
+
+    ScopeLock scope{ &logCS };
+    if (LogWriter)
+        LogWriter->flush();
 }
 
 void AddOne(pcstr split)
 {
-    logCS.Enter();
+    ScopeLock scope{ &logCS };
 
     OutputDebugString(split);
     OutputDebugString("\n");
@@ -52,8 +51,6 @@ void AddOne(pcstr split)
         if (ForceFlushLog)
             FlushLog();
     }
-
-    logCS.Leave();
 }
 
 void Log(pcstr s)
@@ -198,6 +195,7 @@ void Log(pcstr msg, const Fmatrix& dop)
 void LogWinErr(pcstr msg, long err_code) { Msg("%s: %s", msg, xrDebug::ErrorToString(err_code)); }
 LogCallback SetLogCB(const LogCallback& cb)
 {
+    ScopeLock scope{ &logCS };
     const LogCallback result = LogCB;
     LogCB = cb;
     return (result);
@@ -214,28 +212,26 @@ void CreateLog(bool nl)
     strconcat(sizeof(log_file_name), log_file_name, Core.ApplicationName, "_", Core.UserName, ".log");
     if (FS.path_exist("$logs$"))
         FS.update_path(logFName, "$logs$", log_file_name);
-    if (!no_log)
+
+    if (no_log)
+        return;
+
+    // Alun: Backup existing log
+    const xr_string backup_logFName = EFS.ChangeFileExt(logFName, ".bkp");
+    FS.file_rename(logFName, backup_logFName.c_str(), true);
+    //-Alun
+
+    if (const auto w = FS.w_open(logFName))
     {
-        // Alun: Backup existing log
-        const xr_string backup_logFName = EFS.ChangeFileExt(logFName, ".bkp");
-        FS.file_rename(logFName, backup_logFName.c_str(), true);
-        //-Alun
-
-        LogWriter = FS.w_open(logFName);
-        if (LogWriter == nullptr)
-        {
-#if defined(XR_PLATFORM_WINDOWS)
-            MessageBox(nullptr, "Can't create log file.", "Error", MB_ICONERROR);
-#endif
-            abort();
-        }
-
         for (u32 it = 0; it < LogFile.size(); it++)
         {
-            pcstr s = LogFile[it].c_str();
-            LogWriter->w_printf("%s\r\n", s ? s : "");
+            cpcstr s = LogFile[it].c_str();
+            w->w_printf("%s\r\n", s ? s : "");
         }
-        LogWriter->flush();
+        w->flush();
+
+        ScopeLock scope{ &logCS };
+        LogWriter = w;
     }
 
     if (strstr(Core.Params, "-force_flushlog"))
@@ -246,6 +242,8 @@ void CloseLog(void)
 {
     ZoneScoped;
     FlushLog();
+
+    ScopeLock scope{ &logCS };
     if (LogWriter)
         FS.w_close(LogWriter);
 
