@@ -31,7 +31,6 @@ CStats::CStats()
 {
     statsFont = nullptr;
     fpsFont = nullptr;
-    fMem_calls = 0;
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
 }
 
@@ -91,12 +90,6 @@ void CStats::Show()
     gTestTimer2.FrameEnd();
     gTestTimer3.FrameEnd();
 
-    float memCalls = float(Memory.stat_calls);
-    if (memCalls > fMem_calls)
-        fMem_calls = memCalls;
-    else
-        fMem_calls = 0.9f * fMem_calls + 0.1f * memCalls;
-    Memory.stat_calls = 0;
     if (GEnv.isDedicatedServer)
         return;
     auto& font = *statsFont;
@@ -113,7 +106,6 @@ void CStats::Show()
         font.OutNext("Mapped:       %d", g_file_mapped_memory);
 #endif
         Device.DumpStatistics(font, alertPtr);
-        font.OutNext("Memory:       %2.2f", fMem_calls);
         if (g_pGameLevel)
             g_pGameLevel->DumpStatistics(font, alertPtr);
         Engine.Sheduler.DumpStatistics(font, alertPtr);

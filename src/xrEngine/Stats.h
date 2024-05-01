@@ -18,7 +18,6 @@ private:
     CGameFont* statsFont;
     CGameFont* fpsFont;
     xr_unique_ptr<CStatGraph> fpsGraph;
-    float fMem_calls;
     xr_vector<shared_str> errors;
 
 public:

@@ -11,8 +11,6 @@ public:
     void _initialize();
     void _destroy();
 
-    u32 stat_calls;
-
 public:
     size_t mem_usage();
     void   mem_compact();
