@@ -320,6 +320,11 @@ void CRenderDevice::ProcessFrame()
 
     DoRender();
 
+    while (!secondaryTasksExecuted.load(std::memory_order_acquire))
+        TaskScheduler->ExecuteOneTask();
+
+    secondaryTasksExecuted.store(false, std::memory_order_relaxed);
+
     const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
     const u64 frameTime = frameEndTime - frameStartTime;
 
@@ -334,10 +339,6 @@ void CRenderDevice::ProcessFrame()
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);
 
-    while (!secondaryTasksExecuted.load(std::memory_order_acquire))
-        TaskScheduler->ExecuteOneTask();
-
-    secondaryTasksExecuted.store(false, std::memory_order_relaxed);
 
     if (!b_is_Active)
         Sleep(1);
