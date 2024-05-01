@@ -273,8 +273,6 @@ void CRenderDevice::DoRender()
 
 void CRenderDevice::SecondaryThreadProc()
 {
-    tracy::SetThreadName("SecondaryThread");
-
     TaskScheduler->RegisterThisThreadAsWorker();
     while (!mt_bMustExit.load(std::memory_order_acquire))
     {
