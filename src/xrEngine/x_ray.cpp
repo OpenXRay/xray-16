@@ -534,13 +534,9 @@ void CApplication::ShowSplash(bool topmost)
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
 #endif
 
-    SDL_Surface* surface = m_surfaces.front();
+    const SDL_Surface* surface = m_surfaces.front();
     m_window = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, surface->w, surface->h, flags);
-
-    const auto current = SDL_GetWindowSurface(m_window);
-    SDL_BlitSurface(surface, nullptr, current, nullptr);
     SDL_ShowWindow(m_window);
-    SDL_UpdateWindowSurface(m_window);
 
     m_splash_thread = Threading::RunThread("Splash Thread", &CApplication::SplashProc, this);
     SDL_PumpEvents();
@@ -548,23 +544,22 @@ void CApplication::ShowSplash(bool topmost)
 
 void CApplication::SplashProc()
 {
-    while (true)
+    do
     {
-        if (m_should_exit.Wait(SPLASH_FRAMERATE))
-            break;
-
-        if (m_surfaces.size() > 1)
+        if (m_surfaces.size() > 1 || m_current_surface_idx == size_t(-1))
         {
             if (m_current_surface_idx >= m_surfaces.size())
                 m_current_surface_idx = 0;
 
+            ZoneScopedN("Update splash image");
             const auto current = SDL_GetWindowSurface(m_window);
             const auto next = m_surfaces[m_current_surface_idx++]; // It's important to have postfix increment!
             SDL_BlitSurface(next, nullptr, current, nullptr);
             SDL_UpdateWindowSurface(m_window);
+            //SDL_PumpEvents();
         }
         UpdateDiscordStatus();
-    }
+    } while (!m_should_exit.Wait(SPLASH_FRAMERATE));
 }
 
 void CApplication::HideSplash()
