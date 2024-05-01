@@ -174,7 +174,6 @@ void xrCore::PrintBuildInfo()
 void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs, pcstr fs_fname, bool plugin)
 {
     ZoneScoped;
-    Threading::SetCurrentThreadName("Primary thread");
     xr_strcpy(ApplicationName, _ApplicationName);
     PrintBuildInfo();
 

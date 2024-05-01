@@ -223,6 +223,7 @@ constexpr pcstr APPLICATION_SHUTDOWN = "Application shutdown";
 
 CApplication::CApplication(pcstr commandLine)
 {
+    Threading::SetCurrentThreadName("Primary thread");
     FrameMarkStart(APPLICATION_STARTUP);
 
     xrDebug::Initialize(commandLine);
