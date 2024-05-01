@@ -33,7 +33,7 @@
 #define HAS_DX11_3
 #endif
 
-#include <tracy/public/tracy/TracyD3D11.hpp>
+#include <tracy/TracyD3D11.hpp>
 
 #include "Layers/xrRenderDX11/CommonTypes.h"
 
