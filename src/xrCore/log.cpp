@@ -20,7 +20,6 @@ LogCallback LogCB = nullptr;
 
 bool ForceFlushLog = false;
 IWriter* LogWriter = nullptr;
-//size_t CachedLog = 0;
 
 void FlushLog()
 {
@@ -29,7 +28,6 @@ void FlushLog()
         logCS.Enter();
         if (LogWriter)
             LogWriter->flush();
-        //CachedLog = 0;
         logCS.Leave();
     }
 }
@@ -49,29 +47,10 @@ void AddOne(pcstr split)
 
     if (LogWriter)
     {
-#ifdef USE_LOG_TIMING
-        char buf[64];
-        char curTime[64];
-
-        auto now = std::chrono::system_clock::now();
-        auto time = std::chrono::system_clock::to_time_t(now);
-        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) -
-            std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
-
-        std::strftime(buf, sizeof(buf), "%H:%M:%S", std::localtime(&time));
-        int len = xr_sprintf(curTime, 64, "[%s.%03lld] ", buf, ms.count());
-
-        LogWriter->w_printf("%s%s\r\n", curTime, split);
-        CachedLog += len;
-#else
         LogWriter->w_printf("%s\r\n", split);
-#endif
-        //CachedLog += xr_strlen(split) + 2;
 
-        if (ForceFlushLog /*|| CachedLog >= 32768*/)
+        if (ForceFlushLog)
             FlushLog();
-
-        //-RvP
     }
 
     logCS.Leave();
@@ -251,21 +230,10 @@ void CreateLog(bool nl)
             abort();
         }
 
-#ifdef USE_LOG_TIMING
-        time_t t = time(nullptr);
-        tm* ti = localtime(&t);
-        char buf[64];
-        strftime(buf, 64, "[%x %X]\t", ti);
-#endif
-
         for (u32 it = 0; it < LogFile.size(); it++)
         {
             pcstr s = LogFile[it].c_str();
-#ifdef USE_LOG_TIMING
-            LogWriter->w_printf("%s%s\r\n", buf, s ? s : "");
-#else
             LogWriter->w_printf("%s\r\n", s ? s : "");
-#endif
         }
         LogWriter->flush();
     }
