@@ -44,7 +44,9 @@ template <typename Invocable, typename... Args>
         [name](Invocable&& invocable2, Args&&... args2)
         {
             SetCurrentThreadName(name);
+#ifdef TRACY_ENABLE
             tracy::SetThreadName(name);
+#endif
             _initialize_cpu_thread();
             std::invoke(std::move(invocable2), std::move(args2)...);
         },
