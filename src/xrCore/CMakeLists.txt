@@ -436,6 +436,9 @@ target_sources_grouped(
 )
 
 target_include_directories(xrCore
+    PUBLIC
+    "${CMAKE_SOURCE_DIR}/Externals/tracy/public"
+
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"

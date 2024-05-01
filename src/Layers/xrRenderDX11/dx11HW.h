@@ -98,6 +98,7 @@ public:
 #if !defined(_MAYA_EXPORT)
     stats_manager stats_manager;
 #endif
+    TracyD3D11Ctx profiler_ctx{}; // TODO: this should be one per d3d11 context
 private:
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; // DevPP equivalent
     bool doPresentTest{};

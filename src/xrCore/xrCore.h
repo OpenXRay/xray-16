@@ -28,8 +28,11 @@
 #      define XRCORE_API XR_EXPORT
 #   else
 #      define XRCORE_API XR_IMPORT
+#      define TRACY_IMPORTS
 #   endif
 #endif
+
+#include <tracy/Tracy.hpp>
 
 #include "xrDebug.h"
 //#include "vector.h"

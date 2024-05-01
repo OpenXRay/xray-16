@@ -240,6 +240,8 @@ static void UpdateViewports()
 
 void CRenderDevice::DoRender()
 {
+    ZoneScoped;
+
     if (GEnv.isDedicatedServer)
         return;
 
@@ -290,6 +292,8 @@ void CRenderDevice::SecondaryThreadProc()
 
 void CRenderDevice::ProcessFrame()
 {
+    ZoneScoped;
+
     if (!BeforeFrame())
         return;
 
@@ -324,6 +328,8 @@ void CRenderDevice::ProcessFrame()
 
     if (!b_is_Active)
         Sleep(1);
+
+    FrameMark;
 }
 
 void CRenderDevice::ProcessEvent(const SDL_Event& event)
