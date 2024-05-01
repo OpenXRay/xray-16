@@ -21,6 +21,8 @@
 #include "xrLuaFix/xrLuaFix.h"
 #include "luabind/class_info.hpp"
 
+#include <tracy/TracyLua.hpp>
+
 Flags32 g_LuaDebug;
 
 #define SCRIPT_GLOBAL_NAMESPACE "_G"
@@ -984,6 +986,8 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #endif
 
     luaopen_xrluafix(lua());
+
+    tracy::LuaRegister(lua());
 
     // Game scripts doesn't call randomize but use random
     // So, we should randomize in the engine.
