@@ -297,6 +297,10 @@ void render_rain::render()
 {
     if (o.active)
     {
+#if defined(USE_DX11)
+        TracyD3D11Zone(HW.profiler_ctx, "render_rain::render");
+#endif
+
         auto& dsgraph = RImplementation.get_context(context_id);
 
         // Render shadow-map
@@ -320,6 +324,9 @@ void render_rain::flush()
 {
     if (o.active)
     {
+#if defined(USE_DX11)
+    TracyD3D11Zone(HW.profiler_ctx, "render_rain::flush - submit and release");
+#endif
         auto& dsgraph = RImplementation.get_context(context_id);
 
         dsgraph.cmd_list.submit();
@@ -327,6 +334,11 @@ void render_rain::flush()
     }
 
     auto& cmd_list_imm = RImplementation.get_imm_context().cmd_list;
+
+#if defined(USE_DX11)
+    TracyD3D11Zone(HW.profiler_ctx, "render_rain::flush - accumulate");
+#endif
+
     cmd_list_imm.Invalidate();
 
     // Restore XForms
