@@ -8,6 +8,7 @@
 
 inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
 {
+    ZoneScoped;
     const size_t pitch = source->pitch;
     const size_t size = pitch * source->h;
 
@@ -33,12 +34,14 @@ inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
 #ifdef XR_PLATFORM_WINDOWS
 inline HANDLE ExtractImage(int idx, UINT type)
 {
+    ZoneScoped;
     return LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(idx),
         type, 0, 0, LR_CREATEDIBSECTION);
 }
 
 inline SDL_Surface* CreateSurfaceFromBitmap(HBITMAP bitmapHandle)
 {
+    ZoneScoped;
     BITMAP bitmap;
     const int bitmapSize = GetObject(bitmapHandle, sizeof(BITMAP), &bitmap);
 
@@ -80,6 +83,8 @@ inline SDL_Surface* ExtractBitmap(int idx)
 
 inline xr_vector<SDL_Surface*> ExtractSplashScreen()
 {
+    ZoneScoped;
+
     // XXX: that's the place, where splash frames can be added
     // Animated splash screen!
     SDL_Surface* surface = ExtractBitmap(IDB_SPLASH);
@@ -92,6 +97,8 @@ inline xr_vector<SDL_Surface*> ExtractSplashScreen()
 
 inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
 {
+    ZoneScoped;
+
     const HICON icon = (HICON)ExtractImage(iconIdx, IMAGE_ICON);
 
     SDL_SysWMinfo info;
@@ -105,6 +112,8 @@ inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
 #else
 inline xr_vector<SDL_Surface*> ExtractSplashScreen()
 {
+    ZoneScoped;
+
     // You need to place logo.bmp beside fsgame.ltx
     SDL_Surface* surface = SDL_LoadBMP("logo.bmp");
 
@@ -116,6 +125,7 @@ inline xr_vector<SDL_Surface*> ExtractSplashScreen()
 
 inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
 {
+    ZoneScoped;
     SDL_Surface* surface = nullptr;
     switch (iconIdx)
     {

@@ -14,6 +14,8 @@
 
 void CRender::level_Load(IReader* fs)
 {
+    ZoneScoped;
+
     R_ASSERT(g_pGameLevel);
     R_ASSERT(!b_loaded);
 
@@ -25,6 +27,7 @@ void CRender::level_Load(IReader* fs)
     // Shaders
     g_pGamePersistent->LoadTitle("st_loading_shaders");
     {
+        ZoneScopedN("Load shaders");
         chunk = fs->open_chunk(fsL_SHADERS);
         R_ASSERT2(chunk, "Level doesn't builded correctly.");
         u32 count = chunk->r_u32();
@@ -105,6 +108,8 @@ void CRender::level_Load(IReader* fs)
 
 void CRender::level_Unload()
 {
+    ZoneScoped;
+
     if (!g_pGameLevel)
         return;
     if (!b_loaded)
@@ -188,10 +193,13 @@ void CRender::level_Unload()
 
 void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 {
+    ZoneScoped;
+
     R_ASSERT2(base_fs, "Could not load geometry. File not found.");
     Resources->Evict();
     // Vertex buffers
     {
+        ZoneScopedN("Load VBs");
         xr_vector<VertexDeclarator>& decls = alternative ? xDC : nDC;
         xr_vector<VertexStagingBuffer>& vbuffers = alternative ? xVB : nVB;
 
@@ -237,6 +245,7 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
     // Index buffers
     {
+        ZoneScopedN("Load IBs");
         xr_vector<IndexStagingBuffer>& ibuffers = alternative ? xIB : nIB;
 
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
@@ -268,6 +277,8 @@ void CRender::LoadVisuals(IReader* fs)
     u32 index = 0;
     IReader* chunk = nullptr;
 
+    ZoneScoped;
+
     while ((chunk = fs->open_chunk(index)) != 0)
     {
         ogf_header H;
@@ -284,6 +295,7 @@ void CRender::LoadVisuals(IReader* fs)
 
 void CRender::LoadLights(IReader* fs)
 {
+    ZoneScoped;
     // lights
     Lights.Load(fs);
     Lights.LoadHemi();
@@ -291,6 +303,8 @@ void CRender::LoadLights(IReader* fs)
 
 void CRender::LoadSectors(IReader* fs)
 {
+    ZoneScoped;
+
     // allocate memory for portals
     const u32 size = fs->find_chunk(fsL_PORTALS);
     R_ASSERT(0 == size % sizeof(CPortal::level_portal_data_t));
@@ -309,6 +323,7 @@ void CRender::LoadSectors(IReader* fs)
         if (!P)
             break;
 
+        ZoneScopedN("Load sector");
         auto& sector_data = sectors_data.emplace_back();
         {
             u32 size = P->find_chunk(fsP_Portals);
@@ -344,6 +359,8 @@ void CRender::LoadSectors(IReader* fs)
     // load portals
     if (portals_count)
     {
+        ZoneScopedN("Load portals");
+
         bool do_rebuild = true;
         const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
         const bool checkCrc32 = !strstr(Core.Params, "-skip_cdb_cache_crc32_check");
@@ -374,6 +391,7 @@ void CRender::LoadSectors(IReader* fs)
         fs->find_chunk(fsL_PORTALS);
         for (u32 i = 0; i < portals_count; i++)
         {
+            ZoneScopedN("Build portal from chunk");
             auto &P = portals_data[i];
             fs->r(&P, sizeof(P));
 
@@ -421,6 +439,8 @@ void CRender::LoadSectors(IReader* fs)
 
 void CRender::LoadSWIs(CStreamReader* base_fs)
 {
+    ZoneScoped;
+
     // allocate memory for portals
     if (base_fs->find_chunk(fsL_SWIS))
     {
@@ -452,6 +472,8 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
 #if defined(USE_DX11)
 void CRender::Load3DFluid()
 {
+    ZoneScoped;
+
     // if (strstr(Core.Params,"-no_volumetric_fog"))
     if (!o.volumetricfog)
         return;

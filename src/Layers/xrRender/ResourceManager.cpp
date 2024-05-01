@@ -364,6 +364,8 @@ void CResourceManager::DeferredUpload()
     if (!Device.b_is_Ready)
         return;
 
+    ZoneScoped;
+
 #if defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
 #elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
@@ -378,6 +380,8 @@ void CResourceManager::DeferredUnload()
 {
     if (!Device.b_is_Ready)
         return;
+
+    ZoneScoped;
 
 #if defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });

@@ -417,6 +417,8 @@ void CEnvironment::lerp()
 
 void CEnvironment::OnFrame()
 {
+    ZoneScoped;
+
     if (!g_pGameLevel)
         return;
 

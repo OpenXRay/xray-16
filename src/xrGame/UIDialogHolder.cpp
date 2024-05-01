@@ -139,6 +139,8 @@ void CDialogHolder::RemoveDialogToRender(CUIWindow* pDialog)
 
 void CDialogHolder::DoRenderDialogs()
 {
+    ZoneScoped;
+
     xr_vector<dlgItem>::iterator it = m_dialogsToRender.begin();
     for (; it != m_dialogsToRender.end(); ++it)
     {
@@ -223,6 +225,8 @@ void CDialogHolder::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 
 void CDialogHolder::OnFrame()
 {
+    ZoneScoped;
+
     m_b_in_update = true;
 
     if (!GEnv.isDedicatedServer && GetUICursor().IsVisible() && pInput->IsCurrentInputTypeController())

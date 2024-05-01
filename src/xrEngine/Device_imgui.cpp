@@ -9,6 +9,8 @@ void CRenderDevice::InitializeImGui()
     if (m_imgui_context)
         return;
 
+    ZoneScoped;
+
     ImGui::SetAllocatorFunctions(
         [](size_t size, void* /*user_data*/)
         {
@@ -209,6 +211,8 @@ void CRenderDevice::DestroyImGui()
 {
     if (!m_imgui_context)
         return;
+
+    ZoneScoped;
 
     m_imgui_render->OnDeviceDestroy();
     GEnv.RenderFactory->DestroyImGuiRender(m_imgui_render);

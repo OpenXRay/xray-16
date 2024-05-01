@@ -98,6 +98,8 @@ BOOL CDetailManager::cache_Validate()
 
 void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view, int limit)
 {
+    ZoneScoped;
+
     bool bNeedMegaUpdate = (cache_cx != v_x) || (cache_cz != v_z);
     // ***** Cache shift
     while (cache_cx != v_x)

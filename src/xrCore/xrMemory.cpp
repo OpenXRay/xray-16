@@ -91,6 +91,7 @@ bool shared_str_initialized = false;
 
 void xrMemory::_initialize()
 {
+    ZoneScoped;
     g_pStringContainer = xr_new<str_container>();
     shared_str_initialized = true;
     g_pSharedMemoryContainer = xr_new<smem_container>();
@@ -98,6 +99,7 @@ void xrMemory::_initialize()
 
 void xrMemory::_destroy()
 {
+    ZoneScoped;
     xr_delete(g_pSharedMemoryContainer);
     xr_delete(g_pStringContainer);
 }

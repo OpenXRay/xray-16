@@ -173,6 +173,7 @@ void xrCore::PrintBuildInfo()
 
 void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
+    ZoneScoped;
     Threading::SetCurrentThreadName("Primary thread");
     xr_strcpy(ApplicationName, _ApplicationName);
     PrintBuildInfo();
@@ -325,6 +326,7 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
+        ZoneScoped;
         FS._destroy();
         EFS._destroy();
         xr_FS = nullptr;

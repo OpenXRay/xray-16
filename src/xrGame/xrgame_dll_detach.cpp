@@ -35,6 +35,8 @@ extern void InitHudSoundSettings();
 #include "xrEngine/IGame_Persistent.h"
 void init_game_globals()
 {
+    ZoneScoped;
+
     InitHudSoundSettings();
     if (!GEnv.isDedicatedServer)
     {
@@ -52,6 +54,8 @@ void init_game_globals()
 
 void clean_game_globals()
 {
+    ZoneScoped;
+
     // destroy ai space
     xr_delete(g_ai_space);
     // destroy object factory

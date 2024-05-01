@@ -35,6 +35,8 @@ constexpr size_t MAX_CONTROLLER_EVENTS = 64;
 
 CInput::CInput(const bool exclusive)
 {
+    ZoneScoped;
+
     exclusiveInput = exclusive;
 
     Log("Starting INPUT device...");
@@ -69,6 +71,8 @@ CInput::CInput(const bool exclusive)
 
 CInput::~CInput()
 {
+    ZoneScoped;
+
     GrabInput(false);
 
     for (auto& controller : controllers)
@@ -121,6 +125,8 @@ void CInput::SetCurrentInputType(InputType type)
 
 void CInput::MouseUpdate()
 {
+    ZoneScoped;
+
     // Mouse2 is a middle button in SDL,
     // but in X-Ray this is a right button
     constexpr int RemapIdx[] = { 0, 2, 1, 3, 4 };
@@ -197,6 +203,8 @@ void CInput::MouseUpdate()
 
 void CInput::KeyUpdate()
 {
+    ZoneScoped;
+
     SDL_Event events[MAX_KEYBOARD_EVENTS];
     const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS,
         SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED);
@@ -273,6 +281,8 @@ void CInput::KeyUpdate()
 
 void CInput::ControllerUpdate()
 {
+    ZoneScoped;
+
     constexpr int ControllerButtonToKey[] =
     {
         XR_CONTROLLER_BUTTON_A,
@@ -677,6 +687,8 @@ void CInput::OnAppDeactivate(void)
 
 void CInput::OnFrame(void)
 {
+    ZoneScoped;
+
     if (AltF4Pressed)
         return;
 

@@ -294,6 +294,8 @@ void CLensFlare::OnFrame(const CEnvDescriptorMixer& currentEnv, float time_facto
     if (!g_pGameLevel)
         return;
 #endif
+    ZoneScoped;
+
     dwFrame = Device.dwFrame;
 
     R_ASSERT(_valid(currentEnv.sun_dir));

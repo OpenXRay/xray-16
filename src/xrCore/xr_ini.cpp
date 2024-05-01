@@ -365,6 +365,8 @@ CInifile::CInifile(pcstr fileName, bool readOnly, bool loadAtStart, bool saveAtE
 
 CInifile::~CInifile()
 {
+    ZoneScoped;
+
     if (!m_flags.test(eReadOnly) && m_flags.test(eSaveAtEnd) && !save_as())
         Log("!Can't save inifile:", m_file_name);
 
@@ -400,6 +402,8 @@ IC bool is_empty_line_now(IReader* F)
 
 void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_func)
 {
+    ZoneScoped;
+
     R_ASSERT(F);
     Sect* Current = nullptr;
     string4096 str;

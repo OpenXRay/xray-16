@@ -232,6 +232,7 @@ Fvector light::spatial_sector_point() { return position; }
 // Xforms
 void light::xform_calc()
 {
+    ZoneScoped;
     if (Device.dwFrame == m_xform_frame)
         return;
     m_xform_frame = Device.dwFrame;

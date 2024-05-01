@@ -48,6 +48,8 @@ void ide::OnAppEnd()
 
 void ide::OnFrame()
 {
+    ZoneScoped;
+
     switch (m_state)
     {
     case visible_state::full:

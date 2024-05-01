@@ -196,6 +196,8 @@ void ELightAnimLibrary::OnCreate() { Load(); }
 void ELightAnimLibrary::OnDestroy() { Unload(); }
 void ELightAnimLibrary::Unload()
 {
+    ZoneScoped;
+
     for (auto& la : Items)
         xr_delete(la);
     Items.clear();
@@ -203,6 +205,8 @@ void ELightAnimLibrary::Unload()
 
 void ELightAnimLibrary::Load()
 {
+    ZoneScoped;
+
     string_path fn;
     FS.update_path(fn, _game_data_, "lanims.xr");
     IReader* fs = FS.r_open(fn);
@@ -239,6 +243,8 @@ void ELightAnimLibrary::Load()
 
 void ELightAnimLibrary::Save()
 {
+    ZoneScoped;
+
     CMemoryWriter F;
     F.open_chunk(CHUNK_VERSION);
     F.w_u16(LANIM_VERSION);

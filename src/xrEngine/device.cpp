@@ -35,6 +35,8 @@ bool CRenderDevice::RenderBegin()
     if (GEnv.isDedicatedServer)
         return true;
 
+    ZoneScoped;
+
     switch (GEnv.Render->GetDeviceState())
     {
     case DeviceState::Normal: break;
@@ -91,6 +93,7 @@ void CRenderDevice::RenderEnd(void)
     if (GEnv.isDedicatedServer)
         return;
 
+    ZoneScoped;
     if (dwPrecacheFrame)
     {
         GEnv.Sound->set_master_volume(0.f);
@@ -184,6 +187,8 @@ ENGINE_API xr_list<LOADING_EVENT> g_loading_events;
 
 bool CRenderDevice::BeforeFrame()
 {
+    ZoneScoped;
+
     if (!b_is_Ready)
     {
         Sleep(100);
@@ -208,6 +213,8 @@ bool CRenderDevice::BeforeFrame()
 
 void CRenderDevice::BeforeRender()
 {
+    ZoneScoped;
+
     // Precache
     if (dwPrecacheFrame)
     {
@@ -240,18 +247,20 @@ static void UpdateViewports()
 
 void CRenderDevice::DoRender()
 {
-    ZoneScoped;
-
     if (GEnv.isDedicatedServer)
         return;
+
+    ZoneScoped;
 
     CStatTimer renderTotalReal;
     renderTotalReal.FrameStart();
     renderTotalReal.Begin();
     if (b_is_Active && RenderBegin())
     {
-        // all rendering is done here
-        seqRender.Process();
+        {
+            ZoneScopedN("Render process");
+            seqRender.Process(); // all rendering is done here
+        }
 
         CalcFrameStats();
         Statistic->Show();
@@ -271,6 +280,8 @@ void CRenderDevice::DoRender()
     stats.RenderTotal.accum = renderTotalReal.accum;
 }
 
+constexpr pcstr SECONDARY_THREAD_MARK = "Secondary thread";
+
 void CRenderDevice::SecondaryThreadProc()
 {
     TaskScheduler->RegisterThisThreadAsWorker();
@@ -278,12 +289,14 @@ void CRenderDevice::SecondaryThreadProc()
     {
         if (executeSecondaryTasks.load(std::memory_order_acquire))
         {
+            FrameMarkStart(SECONDARY_THREAD_MARK);
             for (u32 pit = 0; pit < seqParallel.size(); pit++)
                 seqParallel[pit]();
             seqParallel.clear();
             seqFrameMT.Process();
             executeSecondaryTasks.store(false, std::memory_order_relaxed);
             secondaryTasksExecuted.store(true, std::memory_order_release);
+            FrameMarkEnd(SECONDARY_THREAD_MARK);
         }
         TaskScheduler->ExecuteOneTask();
     }
@@ -328,12 +341,12 @@ void CRenderDevice::ProcessFrame()
 
     if (!b_is_Active)
         Sleep(1);
-
-    FrameMark;
 }
 
 void CRenderDevice::ProcessEvent(const SDL_Event& event)
 {
+    ZoneScoped;
+
     switch (event.type)
     {
 #if SDL_VERSION_ATLEAST(2, 0, 9)
@@ -439,6 +452,8 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 
 void CRenderDevice::Run()
 {
+    ZoneScoped;
+
     g_bLoaded = false;
     Log("Starting engine...");
 
@@ -479,6 +494,8 @@ u32 app_inactive_time_start = 0;
 
 void CRenderDevice::FrameMove()
 {
+    ZoneScoped;
+
     dwFrame++;
     Core.dwFrame = dwFrame;
     dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
@@ -594,6 +611,8 @@ bool CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 
 void CRenderDevice::OnWindowActivate(SDL_Window* window, bool activated)
 {
+    ZoneScoped;
+
     if (editor().GetState() == editor::ide::visible_state::full)
     {
         if (window != m_sdlWnd)

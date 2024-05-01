@@ -57,6 +57,8 @@ static bool SimmulateNetworkLag()
 
 void CLevel::ClientReceive()
 {
+    ZoneScoped;
+
     m_dwRPC = 0;
     m_dwRPS = 0;
 

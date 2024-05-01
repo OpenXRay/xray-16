@@ -74,6 +74,8 @@ CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
 
 CMainMenu::CMainMenu()
 {
+    ZoneScoped;
+
     class CResetEventCb : public CEventNotifierCallbackWithCid
     {
         CMainMenu* m_mainmenu;
@@ -170,6 +172,8 @@ CMainMenu::CMainMenu()
 
 CMainMenu::~CMainMenu()
 {
+    ZoneScoped;
+
     Device.seqFrame.Remove(this);
 
     xr_delete(g_btnHint);
@@ -494,6 +498,8 @@ bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGame
 
 void CMainMenu::OnRender()
 {
+    ZoneScoped;
+
     if (m_Flags.test(flGameSaveScreenshot))
         return;
 
@@ -549,6 +555,8 @@ void CMainMenu::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 // pureFrame
 void CMainMenu::OnFrame()
 {
+    ZoneScoped;
+
     if (m_Flags.test(flNeedChangeCapture))
     {
         m_Flags.set(flNeedChangeCapture, FALSE);

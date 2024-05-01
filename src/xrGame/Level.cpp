@@ -74,6 +74,8 @@ CLevel::CLevel()
       DemoCS(MUTEX_PROFILE_ID(DemoCS))
 #endif
 {
+    ZoneScoped;
+
     g_bDebugEvents = strstr(Core.Params, "-debug_ge") != nullptr;
     game_events = xr_new<NET_Queue_Event>();
     eChangeRP = Engine.Event.Handler_Attach("LEVEL:ChangeRP", this);
@@ -112,6 +114,8 @@ CLevel::CLevel()
 
 CLevel::~CLevel()
 {
+    ZoneScoped;
+
     xr_delete(g_player_hud);
     xr_delete(pHUD);
     delete_data(hud_zones_list);
@@ -245,6 +249,8 @@ bool g_bDebugEvents = false;
 
 void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 {
+    ZoneScoped;
+
     // Msg("--- event[%d] for [%d]",type,dest);
     IGameObject* O = Objects.net_Find(dest);
     if (0 == O)
@@ -304,6 +310,8 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 
 void CLevel::ProcessGameEvents()
 {
+    ZoneScoped;
+
     // Game events
     {
         NET_Packet P;
@@ -403,6 +411,8 @@ void CLevel::MakeReconnect()
 
 void CLevel::OnFrame()
 {
+    ZoneScoped;
+
 #ifdef DEBUG
     DBG_RenderUpdate();
 #endif
@@ -578,7 +588,13 @@ void CLevel::OnFrame()
 }
 
 int psLUA_GCSTEP = 100; // 10
-void CLevel::script_gc() { lua_gc(GEnv.ScriptEngine->lua(), LUA_GCSTEP, psLUA_GCSTEP); }
+
+void CLevel::script_gc()
+{
+    ZoneScoped;
+    lua_gc(GEnv.ScriptEngine->lua(), LUA_GCSTEP, psLUA_GCSTEP);
+}
+
 #ifdef DEBUG_PRECISE_PATH
 void test_precise_path();
 #endif
@@ -589,6 +605,8 @@ extern Flags32 dbg_net_Draw_Flags;
 
 void CLevel::OnRender()
 {
+    ZoneScoped;
+
     GEnv.Render->BeforeWorldRender();	//--#SM+#-- +SecondVP+
 
 #ifdef DEBUG
@@ -723,6 +741,8 @@ void CLevel::OnRender()
 
 void CLevel::OnEvent(EVENT E, u64 P1, u64 /**P2**/)
 {
+    ZoneScoped;
+
     if (E == eEntitySpawn)
     {
         char Name[128];
@@ -821,6 +841,8 @@ void CLevel::RemoveObject_From_4CrPr(CGameObject* pObj)
 
 void CLevel::make_NetCorrectionPrediction()
 {
+    ZoneScoped;
+
     m_bNeed_CrPr = false;
     m_bIn_CrPr = true;
     u64 NumPhSteps = physics_world()->StepsNum();

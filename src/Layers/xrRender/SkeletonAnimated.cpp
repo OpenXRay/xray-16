@@ -599,6 +599,9 @@ void CKinematicsAnimated::UpdateTracks()
     _DBG_SINGLE_USE_MARKER;
     if (Update_LastTime == Device.dwTimeGlobal)
         return;
+
+    ZoneScoped;
+
     u32 DT = Device.dwTimeGlobal - Update_LastTime;
     if (DT > 66)
         DT = 66;

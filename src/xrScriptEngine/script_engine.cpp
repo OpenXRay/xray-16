@@ -108,6 +108,7 @@ string4096 CScriptEngine::g_ca_stdout;
 
 void CScriptEngine::reinit()
 {
+    ZoneScoped;
     stateMapLock.Enter();
     stateMap.reserve(32); // 32 lua states should be enough
     stateMapLock.Leave();
@@ -930,6 +931,8 @@ struct luajit
 
 void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 {
+    ZoneScoped;
+
 #ifdef USE_LUA_STUDIO
     bool lua_studio_connected = !!m_lua_studio_world;
     if (lua_studio_connected)

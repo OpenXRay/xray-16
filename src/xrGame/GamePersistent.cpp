@@ -48,6 +48,8 @@
 
 CGamePersistent::CGamePersistent()
 {
+    ZoneScoped;
+
     m_game_params.m_e_game_type = eGameIDNoGame;
 
     ambient_sound_next_time.reserve(32);
@@ -73,6 +75,8 @@ CGamePersistent::CGamePersistent()
 
 CGamePersistent::~CGamePersistent()
 {
+    ZoneScoped;
+
     FS.r_close(pDemoFile);
     Device.seqFrame.Remove(this);
     Engine.Event.Handler_Detach(eDemoStart, this);
@@ -89,6 +93,8 @@ extern void init_game_globals();
 
 void CGamePersistent::OnAppStart()
 {
+    ZoneScoped;
+
     // load game materials
     GMLib.Load(); // XXX: not ready to be loaded in parallel. Crashes on Linux, rare crashes on Windows and bugs with water became mercury on Windows.
 
@@ -207,6 +213,8 @@ void CGamePersistent::OnGameEnd()
 
 void CGamePersistent::WeathersUpdate()
 {
+    ZoneScoped;
+
     if (g_pGameLevel && !GEnv.isDedicatedServer)
     {
         CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
@@ -459,6 +467,8 @@ extern CUISequencer* g_tutorial2;
 
 void CGamePersistent::OnFrame()
 {
+    ZoneScoped;
+
     if (Device.dwPrecacheFrame == 5 && m_intro_event.empty())
     {
         LoadTitle();
@@ -637,6 +647,8 @@ void CGamePersistent::OnFrame()
 
 void CGamePersistent::OnEvent(EVENT E, u64 P1, u64 P2)
 {
+    ZoneScoped;
+
     if (E == eQuickLoad)
     {
         if (Device.Paused())

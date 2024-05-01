@@ -326,6 +326,8 @@ GetFrame
 */
 bool CAviPlayerCustom::GetFrame(u8** pDest)
 {
+    ZoneScoped;
+
     R_ASSERT(pDest);
 
     u32 dwCurrFrame;

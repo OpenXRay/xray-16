@@ -9,6 +9,8 @@
 static const u32 r_buffer_size = 131072; // 128 Kb
 void CLevel::CalculateLevelCrc32()
 {
+    ZoneScoped;
+
     void* read_buffer = xr_alloca(r_buffer_size);
     Msg("* calculating checksum of level.geom");
     CStreamReader* geom = FS.rs_open("$level$", "level.geom");
@@ -32,6 +34,8 @@ void CLevel::CalculateLevelCrc32()
 bool CLevel::IsChecksumsEqual(u32 check_sum) const { return check_sum == map_data.m_level_geom_crc32; }
 bool CLevel::synchronize_map_data()
 {
+    ZoneScoped;
+
     if (!OnClient() && !IsDemoSave())
     {
         deny_m_spawn = FALSE;
@@ -82,6 +86,8 @@ bool CLevel::synchronize_map_data()
 
 bool CLevel::synchronize_client()
 {
+    ZoneScoped;
+
     //---------------------------------------------------------------------------
     if (!sended_request_connection_data)
     {

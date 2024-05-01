@@ -82,6 +82,8 @@ void CDetailManager::SSwingValue::lerp(const SSwingValue& A, const SSwingValue& 
 // XXX stats: add to statistics
 CDetailManager::CDetailManager() : xrc("detail manager")
 {
+    ZoneScoped;
+
     dtFS = nullptr;
     dtSlots = nullptr;
     soft_Geom = nullptr;
@@ -124,6 +126,8 @@ CDetailManager::CDetailManager() : xrc("detail manager")
 
 CDetailManager::~CDetailManager()
 {
+    ZoneScoped;
+
     for (u32 i = 0; i < dm_cache_size; ++i)
         cache_pool[i].~Slot();
     xr_free(cache_pool);
@@ -154,6 +158,8 @@ void dump(CDetailManager::vis_list& lst)
 */
 void CDetailManager::Load()
 {
+    ZoneScoped;
+
     // Open file stream
     if (!FS.exist("$level$", "level.details"))
     {
@@ -219,6 +225,7 @@ void CDetailManager::Load()
 #endif
 void CDetailManager::Unload()
 {
+    ZoneScoped;
     if (UseVS())
         hw_Unload();
     else
@@ -241,6 +248,8 @@ extern ECORE_API float r_ssaDISCARD;
 
 void CDetailManager::UpdateVisibleM()
 {
+    ZoneScoped;
+
     for (int i = 0; i != 3; ++i)
         for (auto& vis : m_visibles[i])
             vis.clear();
@@ -429,6 +438,8 @@ void CDetailManager::MT_CALC()
     if (!psDeviceFlags.is(rsDrawDetails))
         return;
 #endif
+
+    ZoneScoped;
 
     EYE = Device.vCameraPosition;
 

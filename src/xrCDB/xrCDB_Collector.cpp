@@ -87,6 +87,7 @@ struct edge
 
 void Collector::calc_adjacency(xr_vector<u32>& dest) const
 {
+    ZoneScoped;
 #if 1
     const auto edge_count = faces.size() * 3;
 

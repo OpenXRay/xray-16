@@ -20,6 +20,8 @@ bool CLevel::net_Start_client(const char* options) { return false; }
 
 bool CLevel::net_start_client1()
 {
+    ZoneScoped;
+
     g_pGamePersistent->LoadBegin();
     // name_of_server
     string64 name_of_server = "";
@@ -44,6 +46,8 @@ bool CLevel::net_start_client1()
 
 bool CLevel::net_start_client2()
 {
+    ZoneScoped;
+
     if (psNET_direct_connect)
     {
         Server->create_direct_client();
@@ -62,6 +66,7 @@ bool CLevel::net_start_client2()
 }
 void rescan_mp_archives()
 {
+    ZoneScoped;
     FS_Path* mp_archs_path = FS.get_path("$game_arch_mp$");
     FS.rescan_path(mp_archs_path->m_Path, mp_archs_path->m_Flags.is(FS_Path::flRecurse));
 }
@@ -70,6 +75,8 @@ bool CLevel::net_start_client3()
 {
     if (connected_to_server)
     {
+        ZoneScoped;
+
         LPCSTR level_name = NULL;
         LPCSTR level_ver = NULL;
         LPCSTR download_url = NULL;
@@ -124,6 +131,8 @@ bool CLevel::net_start_client4()
 {
     if (connected_to_server)
     {
+        ZoneScoped;
+
         // Begin spawn
         g_pGamePersistent->LoadTitle("st_client_spawning");
 
@@ -202,6 +211,8 @@ bool CLevel::net_start_client5()
 {
     if (connected_to_server)
     {
+        ZoneScoped;
+
         // HUD
 
         // Textures
@@ -222,6 +233,8 @@ bool CLevel::net_start_client6()
 {
     if (connected_to_server)
     {
+        ZoneScoped;
+
         // Sync
         if (!synchronize_map_data())
             return false;

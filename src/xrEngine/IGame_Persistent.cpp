@@ -23,6 +23,8 @@ ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
 
 IGame_Persistent::IGame_Persistent()
 {
+    ZoneScoped;
+
     eStart = Engine.Event.Handler_Attach("KERNEL:start", this);
     eStartLoad = Engine.Event.Handler_Attach("KERNEL:load", this);
     eDisconnect = Engine.Event.Handler_Attach("KERNEL:disconnect", this);
@@ -48,6 +50,8 @@ IGame_Persistent::IGame_Persistent()
 
 IGame_Persistent::~IGame_Persistent()
 {
+    ZoneScoped;
+
     GEnv.Sound->destroy_scene(m_pSound);
     DefaultSoundScene = nullptr;
 
@@ -74,6 +78,8 @@ void IGame_Persistent::OnAppDeactivate() {}
 
 void IGame_Persistent::OnAppStart()
 {
+    ZoneScoped;
+
 #ifndef _EDITOR
     Environment().load();
 #endif
@@ -83,6 +89,8 @@ void IGame_Persistent::OnAppStart()
 
 void IGame_Persistent::OnAppEnd()
 {
+    ZoneScoped;
+
 #ifndef _EDITOR
     Environment().unload();
 #endif
@@ -98,6 +106,7 @@ void IGame_Persistent::OnAppEnd()
 
 void IGame_Persistent::Level_Append(pcstr folder)
 {
+    ZoneScoped;
     string_path N1, N2, N3, N4;
 
     strconcat(N1, folder, "level");
@@ -116,6 +125,8 @@ void IGame_Persistent::Level_Append(pcstr folder)
 
 void IGame_Persistent::Level_Scan()
 {
+    ZoneScoped;
+
     for (auto& level : Levels)
     {
         xr_free(level.folder);
@@ -163,6 +174,8 @@ bool set_logo_path(string_path& path, pcstr levelName, int count = -1)
 
 void IGame_Persistent::Level_Set(u32 id)
 {
+    ZoneScoped;
+
     if (id >= Levels.size())
         return;
     FS.get_path("$level$")->_set(Levels[id].folder);
@@ -197,6 +210,8 @@ void IGame_Persistent::Level_Set(u32 id)
 
 int IGame_Persistent::Level_ID(pcstr name, pcstr ver, bool bSet)
 {
+    ZoneScoped;
+
     int result = -1;
     bool arch_res = false;
 
@@ -255,6 +270,8 @@ CInifile* IGame_Persistent::GetArchiveHeader(pcstr name, pcstr ver)
 
 void IGame_Persistent::OnEvent(EVENT E, u64 P1, u64 P2)
 {
+    ZoneScoped;
+
     if (E == eStart)
     {
         pstr op_server = pstr(P1);
@@ -326,6 +343,8 @@ void IGame_Persistent::OnEvent(EVENT E, u64 P1, u64 P2)
 
 void IGame_Persistent::PreStart(pcstr op)
 {
+    ZoneScoped;
+
     string256 prev_type;
     params new_game_params;
     xr_strcpy(prev_type, m_game_params.m_game_type);
@@ -339,6 +358,8 @@ void IGame_Persistent::PreStart(pcstr op)
 }
 void IGame_Persistent::Start(pcstr op)
 {
+    ZoneScoped;
+
     string256 prev_type;
     xr_strcpy(prev_type, m_game_params.m_game_type);
     m_game_params.parse_cmd_line(op);
@@ -356,6 +377,7 @@ void IGame_Persistent::Start(pcstr op)
 
 void IGame_Persistent::Disconnect()
 {
+    ZoneScoped;
 #ifndef _EDITOR
     // clear "need to play" particles
     destroy_particles(true);
@@ -364,6 +386,7 @@ void IGame_Persistent::Disconnect()
 
 void IGame_Persistent::OnGameStart()
 {
+    ZoneScoped;
 #ifndef _EDITOR
     LoadTitle("st_prefetching_objects");
     if (!strstr(Core.Params, "-noprefetch"))
@@ -374,6 +397,8 @@ void IGame_Persistent::OnGameStart()
 #ifndef _EDITOR
 void IGame_Persistent::Prefetch()
 {
+    ZoneScoped;
+
     // prefetch game objects & models
     CTimer timer;
     timer.Start();
@@ -403,6 +428,8 @@ void IGame_Persistent::Prefetch()
 
 void IGame_Persistent::OnGameEnd()
 {
+    ZoneScoped;
+
 #ifndef _EDITOR
     ObjectPool.clear();
     GEnv.Render->models_Clear(true);
@@ -434,6 +461,8 @@ void IGame_Persistent::LoadEnd()
 
 void IGame_Persistent::LoadTitle(pcstr ls_title, bool change_tip, shared_str map_name)
 {
+    ZoneScoped;
+
     if (ls_title)
     {
         string256 buff;
@@ -445,6 +474,8 @@ void IGame_Persistent::LoadTitle(pcstr ls_title, bool change_tip, shared_str map
 
     if (change_tip)
     {
+        ZoneScopedN("Change tip");
+
         bool noTips = false;
         string512 buff;
         u8 tip_num;
@@ -536,6 +567,8 @@ void IGame_Persistent::ShowLoadingScreen(bool show) const
 
 void IGame_Persistent::OnFrame()
 {
+    ZoneScoped;
+
     SpatialSpace.update();
     SpatialSpacePhysic.update();
 
@@ -576,6 +609,8 @@ void IGame_Persistent::OnFrame()
 
 void IGame_Persistent::destroy_particles(const bool& all_particles)
 {
+    ZoneScoped;
+
 #ifndef _EDITOR
     ps_needtoplay.clear();
 

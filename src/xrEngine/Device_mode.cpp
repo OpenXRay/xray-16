@@ -58,6 +58,8 @@ void FillImGuiMonitorData(const int monitorID)
 
 void CRenderDevice::FillVideoModes()
 {
+    ZoneScoped;
+
     const int displayCount = SDL_GetNumVideoDisplays();
     R_ASSERT3(displayCount > 0, "Failed to find display", SDL_GetError());
 
@@ -75,6 +77,8 @@ void CRenderDevice::FillVideoModes()
 
 void CRenderDevice::CleanupVideoModes()
 {
+    ZoneScoped;
+
     for (auto& [monitor_id, tokens] : vid_mode_token)
     {
         for (auto& token : tokens)
@@ -110,6 +114,8 @@ void CRenderDevice::SetWindowDraggable(bool draggable)
 
 void CRenderDevice::UpdateWindowProps()
 {
+    ZoneScoped;
+
     const bool windowed = psDeviceMode.WindowStyle != rsFullscreen;
     SelectResolution(windowed);
 

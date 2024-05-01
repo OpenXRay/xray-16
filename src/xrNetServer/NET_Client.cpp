@@ -658,6 +658,8 @@ bool IPureClient::Connect(pcstr options)
 
 void IPureClient::Disconnect()
 {
+    ZoneScoped;
+
     if (NET)
         NET->Close(0);
 

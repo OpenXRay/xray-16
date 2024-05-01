@@ -191,6 +191,7 @@ void CalcIterations()
 
 TaskManager::TaskManager()
 {
+    ZoneScoped;
     CalcIterations();
 
     workers.reserve(std::thread::hardware_concurrency());
@@ -207,6 +208,7 @@ TaskManager::TaskManager()
 
 TaskManager::~TaskManager()
 {
+    ZoneScoped;
     shouldStop.store(true, std::memory_order_release);
 
     // Finish all pending tasks
@@ -230,6 +232,7 @@ TaskManager::~TaskManager()
 
 void TaskManager::RegisterThisThreadAsWorker()
 {
+    ZoneScoped;
     R_ASSERT2(workers.size() < std::thread::hardware_concurrency(),
         "You must change OTHER_THREADS_COUNT if you want to register more custom threads.");
 
@@ -240,6 +243,7 @@ void TaskManager::RegisterThisThreadAsWorker()
 
 void TaskManager::UnregisterThisThreadAsWorker()
 {
+    ZoneScoped;
     std::lock_guard guard{ workersLock };
 
     shouldPause.store(true, std::memory_order_release);
@@ -393,6 +397,7 @@ void TaskManager::RunTask(Task& task)
 
 void TaskManager::Wait(const Task& task) const
 {
+    ZoneScoped;
     while (!task.IsFinished())
     {
         ExecuteOneTask();
@@ -403,6 +408,7 @@ void TaskManager::Wait(const Task& task) const
 
 void TaskManager::WaitForChildren(const Task& task) const
 {
+    ZoneScoped;
     while (!task.HasChildren())
     {
         ExecuteOneTask();

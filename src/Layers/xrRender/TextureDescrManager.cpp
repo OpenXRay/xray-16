@@ -28,6 +28,8 @@ void fix_texture_thm_name(pstr fn)
 
 void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 {
+    ZoneScoped;
+
     string_path fname;
     FS.update_path(fname, initial, "textures.ltx");
 
@@ -124,6 +126,8 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 
 void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
 {
+    ZoneScoped;
+
     FS_FileSet flist;
     FS.file_list(flist, initial, FS_ListFiles, "*.thm");
 
@@ -216,6 +220,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
 
 void CTextureDescrMngr::Load()
 {
+    ZoneScoped;
 #ifndef MASTER_GOLD
     CTimer timer;
     timer.Start();
@@ -236,6 +241,7 @@ void CTextureDescrMngr::Load()
 
 void CTextureDescrMngr::UnLoad()
 {
+    ZoneScoped;
     for (auto& it : m_texture_details)
     {
         xr_delete(it.second.m_assoc);
@@ -246,6 +252,8 @@ void CTextureDescrMngr::UnLoad()
 
 CTextureDescrMngr::~CTextureDescrMngr()
 {
+    ZoneScoped;
+
     for (auto& it : m_detail_scalers)
         xr_delete(it.second);
 

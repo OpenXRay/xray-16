@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC void CDebugRenderer::render() { GEnv.DRender->Render(); }
+IC void CDebugRenderer::render() { ZoneScoped; GEnv.DRender->Render(); }
 IC void CDebugRenderer::draw_line(
     const Fmatrix& matrix, const Fvector& vertex0, const Fvector& vertex1, const u32& color)
 {

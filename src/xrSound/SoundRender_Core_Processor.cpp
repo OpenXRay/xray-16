@@ -11,6 +11,8 @@
 
 void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R)
 {
+    ZoneScoped;
+
     if (0 == bReady)
         return;
     Stats.Update.Begin();
@@ -80,6 +82,8 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
 
 void CSoundRender_Core::render()
 {
+    ZoneScoped;
+
     isLocked = true;
     Stats.Render.Begin();
 

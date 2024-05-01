@@ -88,6 +88,7 @@ void AISpaceBase::patrol_path_storage_raw(IReader& stream)
 {
     if (GEnv.isDedicatedServer)
         return;
+    ZoneScoped;
     xr_delete(m_patrol_path_storage);
     m_patrol_path_storage = xr_new<CPatrolPathStorage>();
     m_patrol_path_storage->load_raw(get_level_graph(), get_cross_table(), get_game_graph(), stream);
@@ -97,6 +98,7 @@ void AISpaceBase::patrol_path_storage(IReader& stream)
 {
     if (GEnv.isDedicatedServer)
         return;
+    ZoneScoped;
     xr_delete(m_patrol_path_storage);
     m_patrol_path_storage = xr_new<CPatrolPathStorage>();
     m_patrol_path_storage->load(stream);

@@ -351,6 +351,7 @@ void ISpatial_DB::q_ray(
 {
     using namespace Spatial;
 
+    ZoneScoped;
     ScopeLock scope(&cs);
     Stats.Query.Begin();
     q_result = &R;

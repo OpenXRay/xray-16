@@ -51,6 +51,8 @@ void MODEL::syncronize_impl() const
 
 void MODEL::build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, void* bcp)
 {
+    ZoneScoped;
+
     R_ASSERT(S_INIT == status);
     R_ASSERT((Vcnt >= 4) && (Tcnt >= 2));
 
@@ -84,6 +86,8 @@ void MODEL::build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, vo
 
 void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, void* bcp)
 {
+    ZoneScoped;
+
     // verts
     verts_count = Vcnt;
     verts = xr_alloc<Fvector>(verts_count);
@@ -155,6 +159,8 @@ u32 MODEL::memory()
 
 bool MODEL::serialize(pcstr fileName, serialize_callback callback /*= nullptr*/) const
 {
+    ZoneScoped;
+
     IWriter* wstream = FS.w_open(fileName);
     if (!wstream)
         return false;
@@ -184,6 +190,8 @@ bool MODEL::serialize(pcstr fileName, serialize_callback callback /*= nullptr*/)
 
 bool MODEL::deserialize(pcstr fileName, bool checkCrc32 /*= true*/, deserialize_callback callback /*= nullptr*/)
 {
+    ZoneScoped;
+
     IReader* rstream = FS.r_open(fileName);
     if (!rstream)
         return false;

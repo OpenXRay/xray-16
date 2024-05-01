@@ -228,6 +228,7 @@ pcstr log_name() { return (log_file_name); }
 
 void CreateLog(bool nl)
 {
+    ZoneScoped;
     LogFile.reserve(1000);
 
     no_log = nl;
@@ -275,6 +276,7 @@ void CreateLog(bool nl)
 
 void CloseLog(void)
 {
+    ZoneScoped;
     FlushLog();
     if (LogWriter)
         FS.w_close(LogWriter);

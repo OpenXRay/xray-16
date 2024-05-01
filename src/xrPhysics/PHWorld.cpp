@@ -44,6 +44,7 @@ IPHWorld* physics_world() { return ph_world; }
 void create_physics_world(
     bool mt, CObjectSpace* os, CObjectList* lo) // IPHWorldUpdateCallbck &commander,
 {
+    ZoneScoped;
     ph_world = xr_new<CPHWorld>(); //&commander
     VERIFY(os);
     //		VERIFY( lo );
@@ -52,6 +53,7 @@ void create_physics_world(
 
 void destroy_physics_world()
 {
+    ZoneScoped;
     ph_world->Destroy();
     xr_delete(ph_world);
 }
@@ -131,6 +133,8 @@ void CPHWorld::SetStep(float s)
 }
 void CPHWorld::Create(bool mt, CObjectSpace* os, CObjectList* lo)
 {
+    ZoneScoped;
+
     LoadParams();
     dWorldID phWorld = 0;
     m_object_space = os;
@@ -184,6 +188,8 @@ dVector3 center			=	{level_center.x,0.f,level_center.z};
 
 void CPHWorld::Destroy()
 {
+    ZoneScoped;
+
     r_spatial.clear();
     // xr_delete(m_commander);
     Mesh.Destroy();
@@ -213,6 +219,7 @@ void CPHWorld::SetGravity(float g)
 
 void CPHWorld::OnFrame()
 {
+    ZoneScoped;
     stats.FrameStart();
 // Msg									("------------- physics: %d / %d",u32(Device.dwFrame),u32(m_steps_num));
 //calculate the flight of bullets

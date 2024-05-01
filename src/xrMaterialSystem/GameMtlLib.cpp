@@ -157,6 +157,8 @@ CGameMtlLibrary::CGameMtlLibrary()
 
 void CGameMtlLibrary::Load()
 {
+    ZoneScoped;
+
     string_path name;
     if (!FS.exist(name, _game_data_, GAMEMTL_FILENAME))
     {

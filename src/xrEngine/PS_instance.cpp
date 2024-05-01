@@ -36,6 +36,8 @@ CPS_Instance::~CPS_Instance()
 //----------------------------------------------------
 void CPS_Instance::shedule_Update(u32 dt)
 {
+    ZoneScoped;
+
     if (renderable.pROS)
         GEnv.Render->ros_destroy(renderable.pROS); //. particles doesn't need ROS
 

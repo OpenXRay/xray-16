@@ -252,6 +252,9 @@ void CUIGameCustom::Load()
 {
     if (!g_pGameLevel)
         return;
+
+    ZoneScoped;
+
     R_ASSERT(!MsgConfig);
     MsgConfig = xr_new<CUIXml>();
     MsgConfig->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_custom_msgs.xml");

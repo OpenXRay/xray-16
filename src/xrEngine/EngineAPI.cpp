@@ -151,6 +151,8 @@ void CEngineAPI::CreateRendererList()
     if (!VidQualityToken.empty())
         return;
 
+    ZoneScoped;
+
     const auto loadLibrary = [&](pcstr library) -> bool
     {
         auto handle = XRay::LoadModule(library);

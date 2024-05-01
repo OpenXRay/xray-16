@@ -232,6 +232,8 @@ bool g_initialize_cpu_called = false;
 //------------------------------------------------------------------------------------
 void _initialize_cpu()
 {
+    ZoneScoped;
+
     // General CPU identification
     string256 features{};
 

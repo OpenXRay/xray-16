@@ -23,6 +23,8 @@ shared_str CLevel::OpenDemoFile(const char* demo_file_name)
 void CLevel::net_StartPlayDemo() { net_Start(m_demo_server_options.c_str(), "localhost"); }
 bool CLevel::net_Start(const char* op_server, const char* op_client)
 {
+    ZoneScoped;
+
     net_start_result_total = TRUE;
 
     g_pGamePersistent->LoadBegin();
@@ -98,6 +100,8 @@ shared_str level_version(const shared_str& server_options);
 shared_str level_name(const shared_str& server_options);
 bool CLevel::net_start1()
 {
+    ZoneScoped;
+
     // Start client and server if need it
     if (m_caServerOptions.size())
     {
@@ -142,6 +146,7 @@ bool CLevel::net_start2()
 {
     if (net_start_result_total && m_caServerOptions.size())
     {
+        ZoneScoped;
         GameDescriptionData game_descr;
         if ((m_connect_server_err = Server->Connect(m_caServerOptions, game_descr)) != xrServer::ErrNoError)
         {
@@ -161,6 +166,9 @@ bool CLevel::net_start3()
 {
     if (!net_start_result_total)
         return true;
+
+    ZoneScoped;
+
     // add server port if don't have one in options
     if (!strstr(m_caClientOptions.c_str(), "port=") && Server)
     {
@@ -208,6 +216,7 @@ bool CLevel::net_start4()
     if (!net_start_result_total)
         return true;
 
+    ZoneScoped;
     g_loading_events.pop_front();
 
     g_loading_events.push_front(LOADING_EVENT(this, &CLevel::net_start_client6));
@@ -224,6 +233,7 @@ bool CLevel::net_start5()
 {
     if (net_start_result_total)
     {
+        ZoneScoped;
         NET_Packet NP;
         NP.w_begin(M_CLIENTREADY);
         Game().local_player->net_Export(NP, TRUE);
@@ -238,6 +248,8 @@ bool CLevel::net_start5()
 }
 bool CLevel::net_start6()
 {
+    ZoneScoped;
+
     // init bullet manager
     BulletManager().Clear();
     BulletManager().Load();
@@ -331,6 +343,8 @@ bool CLevel::net_start6()
 
 void CLevel::InitializeClientGame(NET_Packet& P)
 {
+    ZoneScoped;
+
     string256 game_type_name;
     P.r_stringZ(game_type_name);
     if (game && !xr_strcmp(game_type_name, game->type_name()))

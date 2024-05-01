@@ -32,6 +32,8 @@ void CSoundRender_CoreA::_initialize_devices_list()
 
 void CSoundRender_CoreA::_initialize()
 {
+    ZoneScoped;
+
     if (!pDeviceList)
     {
         VERIFY2(pDeviceList, "Probably incorrect initialization order. Make sure to call _initialize_devices_list() first.");

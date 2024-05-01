@@ -317,6 +317,8 @@ void CSheduler::Pop()
 
 void CSheduler::ProcessStep()
 {
+    ZoneScoped;
+
     // Normal priority
     const u32 dwTime = Device.dwTimeGlobal;
 
@@ -422,6 +424,8 @@ void CSheduler::ProcessStep()
 
 void CSheduler::Update()
 {
+    ZoneScoped;
+
     // Initialize
     stats.Update.Begin();
     cycles_start = CPU::QPC();

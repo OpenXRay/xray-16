@@ -63,6 +63,7 @@ extern void msCreate(pcstr name);
 
 void CEngine::Initialize(void)
 {
+    ZoneScoped;
 #ifdef DEBUG
     msCreate("game");
 #endif
@@ -83,6 +84,8 @@ void CEngine::Initialize(void)
 
 void CEngine::Destroy()
 {
+    ZoneScoped;
+
     Sheduler.Destroy();
     External.Destroy();
     Event._destroy();

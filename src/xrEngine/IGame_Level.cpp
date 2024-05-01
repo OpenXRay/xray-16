@@ -16,6 +16,8 @@ extern bool g_bLoaded;
 IGame_Level::IGame_Level()
     : ObjectSpace(&g_pGamePersistent->SpatialSpace)
 {
+    ZoneScoped;
+
     m_pCameras = xr_new<CCameraManager>(true);
     g_pGameLevel = this;
     pLevel = NULL;
@@ -31,6 +33,8 @@ IGame_Level::IGame_Level()
 
 IGame_Level::~IGame_Level()
 {
+    ZoneScoped;
+
     if (strstr(Core.Params, "-nes_texture_storing"))
         GEnv.Render->ResourcesStoreNecessaryTextures();
     xr_delete(pLevel);
@@ -58,6 +62,8 @@ IGame_Level::~IGame_Level()
 
 void IGame_Level::net_Stop()
 {
+    ZoneScoped;
+
     // XXX: why update 6 times?
     for (int i = 0; i < 6; i++)
         Objects.Update(false);
@@ -88,6 +94,8 @@ static bool deserialize_callback(IReader& reader)
 
 bool IGame_Level::Load(u32 dwNum)
 {
+    ZoneScoped;
+
     // Initialize level data
     g_pGamePersistent->Level_Set(dwNum);
     string_path temp;
@@ -147,6 +155,8 @@ bool IGame_Level::Load(u32 dwNum)
 int psNET_DedicatedSleep = 5;
 void IGame_Level::OnRender()
 {
+    ZoneScoped;
+
     if (GEnv.isDedicatedServer)
     {
         Sleep(psNET_DedicatedSleep);
@@ -155,21 +165,9 @@ void IGame_Level::OnRender()
 
     // if (_abs(Device.fTimeDelta)<EPS_S) return;
 
-#ifdef _GPA_ENABLED
-    TAL_ID rtID = TAL_MakeID(1, Core.dwFrame, 0);
-    TAL_CreateID(rtID);
-    TAL_BeginNamedVirtualTaskWithID("GameRenderFrame", rtID);
-    TAL_Parami("Frame#", Device.dwFrame);
-    TAL_EndVirtualTask();
-#endif // _GPA_ENABLED
-
     // Level render, only when no client output required
     GEnv.Render->Calculate();
     GEnv.Render->Render();
-
-#ifdef _GPA_ENABLED
-    TAL_RetireID(rtID);
-#endif // _GPA_ENABLED
 
     // Font
     // pApp->pFontSystem->SetSizeI(0.023f);
@@ -178,6 +176,8 @@ void IGame_Level::OnRender()
 
 void IGame_Level::OnFrame()
 {
+    ZoneScoped;
+
     SoundEvent_Dispatch();
 
     // Log ("- level:on-frame: ",u32(Device.dwFrame));
@@ -322,6 +322,7 @@ void IGame_Level::SoundEvent_Register(const ref_sound& S, float range)
 
 void IGame_Level::SoundEvent_Dispatch()
 {
+    ZoneScoped;
     while (!snd_Events.empty())
     {
         _esound_delegate& D = snd_Events.back();

@@ -7,6 +7,8 @@ void CRenderDevice::Destroy()
 {
     if (!b_is_Ready)
         return;
+
+    ZoneScoped;
     Log("Destroying Render...");
     b_is_Ready = false;
     Statistic->OnDeviceDestroy();
@@ -29,6 +31,8 @@ void CRenderDevice::Destroy()
 
 void CRenderDevice::Reset(bool precache /*= true*/)
 {
+    ZoneScoped;
+
     const auto dwWidth_before = dwWidth;
     const auto dwHeight_before = dwHeight;
     pInput->GrabInput(false);

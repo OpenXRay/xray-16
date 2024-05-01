@@ -188,6 +188,8 @@ void CEnvAmbient::destroy()
 void CEnvAmbient::load(
     const CInifile& ambients_config, const CInifile& sound_channels_config, const CInifile& effects_config, const shared_str& sect)
 {
+    ZoneScoped;
+
     m_ambients_config_filename = ambients_config.fname();
     m_load_section = sect;
     string_path tmp;
@@ -302,6 +304,8 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
 
 void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcstr section /*= nullptr*/)
 {
+    ZoneScoped;
+
     const bool old_style               = section;
 
     cpcstr ambient_name                = old_style ? "env_ambient"   : "ambient";
@@ -421,6 +425,8 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
 {
     if (dont_save)
         return;
+
+    ZoneScoped;
 
     const bool old_style               = section;
 
@@ -730,6 +736,8 @@ CEnvAmbient* CEnvironment::AppendEnvAmb(const shared_str& sect, CInifile const* 
 
 void CEnvironment::mods_load()
 {
+    ZoneScoped;
+
     Modifiers.clear();
     string_path path;
     if (FS.exist(path, "$level$", "level.env_mod"))
@@ -761,6 +769,8 @@ void CEnvironment::mods_load()
 void CEnvironment::mods_unload() { Modifiers.clear(); }
 void CEnvironment::load_level_specific_ambients()
 {
+    ZoneScoped;
+
     const shared_str level_name = g_pGameLevel->name();
 
     string_path path;
@@ -819,6 +829,8 @@ void CEnvironment::load_weathers()
 {
     if (!WeatherCycles.empty())
         return;
+
+    ZoneScoped;
 
     FS_FileSet weathers;
     FS.file_list(weathers, "$game_weathers$", FS_ListFiles, "*.ltx");
@@ -891,6 +903,8 @@ void CEnvironment::load_weather_effects()
 {
     if (!WeatherFXs.empty())
         return;
+
+    ZoneScoped;
 
     FS_FileSet weathersEffects;
     FS.file_list(weathersEffects, "$game_weather_effects$", FS_ListFiles, "*.ltx");
@@ -967,6 +981,8 @@ void CEnvironment::load_weather_effects()
 
 void CEnvironment::load()
 {
+    ZoneScoped;
+
     if (!eff_Rain)
         eff_Rain = xr_new<CEffect_Rain>();
     if (!eff_LensFlare)
@@ -980,6 +996,8 @@ void CEnvironment::load()
 
 void CEnvironment::unload()
 {
+    ZoneScoped;
+
     // clear weathers
     for (auto& cycle : WeatherCycles)
         for (auto& env : cycle.second)
@@ -1011,6 +1029,7 @@ void CEnvironment::unload()
 
 void CEnvironment::ED_Reload()
 {
+    ZoneScoped;
     unload();
     load();
     OnFrame();
@@ -1018,6 +1037,8 @@ void CEnvironment::ED_Reload()
 
 void CEnvironment::save() const
 {
+    ZoneScoped;
+
     string_path environment_config_path;
     FS.update_path(environment_config_path, "$game_config$", "weathers\\environment.ltx");
 
@@ -1031,6 +1052,8 @@ void CEnvironment::save() const
 
 void CEnvironment::save_weathers(CInifile* environment_config /*= nullptr*/) const
 {
+    ZoneScoped;
+
     string_path weathers_path;
     if (!FS.update_path(weathers_path, "$game_weathers$", "", false))
         FS.update_path(weathers_path, "$game_config$", "environment\\weathers");
@@ -1080,6 +1103,8 @@ void CEnvironment::save_weathers(CInifile* environment_config /*= nullptr*/) con
 
 void CEnvironment::save_weather_effects(CInifile* environment_config /*= nullptr*/) const
 {
+    ZoneScoped;
+
     string_path effects_path;
     if (!FS.update_path(effects_path, "$game_weather_effects$", "", false))
         FS.update_path(effects_path, "$game_config$", "environment\\weather_effects");

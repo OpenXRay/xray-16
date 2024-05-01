@@ -39,6 +39,7 @@ void SetSDLSettings(pcstr title)
 
 void CRenderDevice::Initialize()
 {
+    ZoneScoped;
     Log("Initializing Engine...");
     TimerGlobal.Start();
     TimerMM.Start();

@@ -20,6 +20,8 @@
 
 void CUIZoneMap::Init(bool motionIconAttached)
 {
+    ZoneScoped;
+
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "zone_map.xml");
 

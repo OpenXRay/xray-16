@@ -189,6 +189,8 @@
 
 void CObjectFactory::register_classes()
 {
+    ZoneScoped;
+
 #ifndef NO_XR_GAME
     // client entities
     add<CLevel>(CLSID_GAME_LEVEL, "level");

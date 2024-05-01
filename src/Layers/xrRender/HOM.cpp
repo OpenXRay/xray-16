@@ -57,6 +57,8 @@ void CHOM::Load()
     if (strstr(Core.Params, "-no_hom") )
         return;
 
+    ZoneScoped;
+
     // Find and open file
     string_path fName;
     FS.update_path(fName, "$level$", "level.hom");
@@ -145,6 +147,7 @@ void CHOM::Load()
 
 void CHOM::Unload()
 {
+    ZoneScoped;
     xr_delete(m_pModel);
     xr_free(m_pTris);
     bEnabled = FALSE;
@@ -152,6 +155,8 @@ void CHOM::Unload()
 
 void CHOM::Render_DB(CFrustum& base)
 {
+    ZoneScoped;
+
     // Update projection matrices on every frame to ensure valid HOM culling
     float view_dim = occ_dim_0;
 #if defined(USE_DX11)
@@ -253,6 +258,7 @@ void CHOM::Render(CFrustum& base)
     if (!bEnabled)
         return;
 
+    ZoneScoped;
     stats.Total.Begin();
     Raster.clear();
     Render_DB(base);

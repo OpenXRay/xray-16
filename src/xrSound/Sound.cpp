@@ -8,6 +8,8 @@ ISoundScene* DefaultSoundScene{};
 
 void CSoundManager::CreateDevicesList()
 {
+    ZoneScoped;
+
     static bool noSound = strstr(Core.Params, "-nosound");
 
     SoundRender = xr_new<CSoundRender_CoreA>(*this);
@@ -23,6 +25,8 @@ void CSoundManager::CreateDevicesList()
 
 void CSoundManager::Create()
 {
+    ZoneScoped;
+
     if (SoundRender->bPresent)
     {
         env_load();
@@ -32,6 +36,8 @@ void CSoundManager::Create()
 
 void CSoundManager::Destroy()
 {
+    ZoneScoped;
+
     GEnv.Sound = nullptr;
 
     SoundRender->_clear();

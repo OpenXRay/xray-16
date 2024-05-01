@@ -68,6 +68,8 @@ void render_rain::init()
 //////////////////////////////////////////////////////////////////////////
 void render_rain::calculate()
 {
+    ZoneScoped;
+
     // static const float	source_offset		= 40.f;
 
     static const float source_offset = 10000.f;

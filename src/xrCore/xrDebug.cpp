@@ -938,6 +938,7 @@ void xrDebug::OnThreadSpawn()
 
 void xrDebug::Initialize(pcstr commandLine)
 {
+    ZoneScoped;
     *BugReportFile = 0;
     OnThreadSpawn();
     SetupExceptionHandler();

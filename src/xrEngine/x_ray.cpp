@@ -124,6 +124,8 @@ void set_free_mode()
 
 void InitSettings()
 {
+    ZoneScoped;
+
     xr_auth_strings_t ignoredPaths, checkedPaths;
     fill_auth_check_params(ignoredPaths, checkedPaths); //TODO port xrNetServer to Linux
     PathIncludePred includePred(&ignoredPaths);
@@ -159,6 +161,8 @@ void InitSettings()
 
 void InitConsole()
 {
+    ZoneScoped;
+
     if (GEnv.isDedicatedServer)
         Console = xr_new<CTextConsole>();
     else
@@ -186,6 +190,7 @@ void InitSound() { Engine.Sound.Create(); }
 void destroySound() { Engine.Sound.Destroy(); }
 void destroySettings()
 {
+    ZoneScoped;
     auto s = const_cast<CInifile**>(&pSettings);
     xr_delete(*s);
 
@@ -200,6 +205,7 @@ void destroySettings()
 
 void destroyConsole()
 {
+    ZoneScoped;
     Console->Execute("cfg_save");
     Console->Destroy();
     xr_delete(Console);
@@ -207,14 +213,23 @@ void destroyConsole()
 
 void execUserScript()
 {
+    ZoneScoped;
     Console->Execute("default_controls");
     Console->ExecuteScript(Console->ConfigFile);
 }
 
+constexpr pcstr APPLICATION_STARTUP = "Application startup";
+constexpr pcstr APPLICATION_SHUTDOWN = "Application shutdown";
+
 CApplication::CApplication(pcstr commandLine)
 {
+    FrameMarkStart(APPLICATION_STARTUP);
+
     xrDebug::Initialize(commandLine);
-    R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
+    {
+        ZoneScopedN("SDL_Init");
+        R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
+    }
 
 #ifdef XR_PLATFORM_WINDOWS
     AccessibilityShortcuts shortcuts;
@@ -223,34 +238,37 @@ CApplication::CApplication(pcstr commandLine)
 #endif
 
 #ifdef USE_DISCORD_INTEGRATION
-    discord::Core::Create(DISCORD_APP_ID, discord::CreateFlags::NoRequireDiscord, &m_discord_core);
+    discord::Activity activity{};
+    {
+        ZoneScopedN("Init Discord");
+        discord::Core::Create(DISCORD_APP_ID, discord::CreateFlags::NoRequireDiscord, &m_discord_core);
 
 #   ifndef MASTER_GOLD
-    if (m_discord_core)
-    {
-        const auto level = xrDebug::DebuggerIsPresent() ? discord::LogLevel::Debug : discord::LogLevel::Info;
-        m_discord_core->SetLogHook(level, [](discord::LogLevel level, pcstr message)
+        if (m_discord_core)
         {
-            switch (level)
+            const auto level = xrDebug::DebuggerIsPresent() ? discord::LogLevel::Debug : discord::LogLevel::Info;
+            m_discord_core->SetLogHook(level, [](discord::LogLevel level, pcstr message)
             {
-            case discord::LogLevel::Error: Log("!", message); break;
-            case discord::LogLevel::Warn:  Log("~", message); break;
-            case discord::LogLevel::Info:  Log("*", message); break;
-            case discord::LogLevel::Debug: Log("#", message); break;
-            }
-        });
-    }
+                switch (level)
+                {
+                case discord::LogLevel::Error: Log("!", message); break;
+                case discord::LogLevel::Warn:  Log("~", message); break;
+                case discord::LogLevel::Info:  Log("*", message); break;
+                case discord::LogLevel::Debug: Log("#", message); break;
+                }
+            });
+        }
 #   endif
 
-    discord::Activity activity{};
-    activity.SetType(discord::ActivityType::Playing);
-    activity.SetApplicationId(DISCORD_APP_ID);
-    activity.SetState("Starting engine...");
-    activity.GetAssets().SetLargeImage("logo");
-    if (m_discord_core)
-    {
-        std::lock_guard guard{ m_discord_lock };
-        m_discord_core->ActivityManager().UpdateActivity(activity, nullptr);
+        activity.SetType(discord::ActivityType::Playing);
+        activity.SetApplicationId(DISCORD_APP_ID);
+        activity.SetState("Starting engine...");
+        activity.GetAssets().SetLargeImage("logo");
+        if (m_discord_core)
+        {
+            std::lock_guard guard{ m_discord_lock };
+            m_discord_core->ActivityManager().UpdateActivity(activity, nullptr);
+        }
     }
 #endif
 
@@ -322,6 +340,7 @@ CApplication::CApplication(pcstr commandLine)
     Device.Initialize();
 
     Console->OnDeviceInitialize();
+
 #ifdef USE_DISCORD_INTEGRATION
     const std::locale locale("");
     activity.SetState(StringToUTF8(Core.ApplicationTitle, locale).c_str());
@@ -357,10 +376,14 @@ CApplication::CApplication(pcstr commandLine)
     R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
     if (!g_pGamePersistent)
         Console->Show();
+
+    FrameMarkEnd(APPLICATION_STARTUP);
 }
 
 CApplication::~CApplication()
 {
+    FrameMarkStart(APPLICATION_SHUTDOWN);
+
 #ifndef PROFILE_TASK_SYSTEM
     // Destroy APP
     DEL_INSTANCE(g_pGamePersistent);
@@ -401,7 +424,11 @@ CApplication::~CApplication()
 #endif // PROFILE_TASK_SYSTEM
 
     Core._destroy();
-    SDL_Quit();
+    {
+        ZoneScopedN("SDL_Quit");
+        SDL_Quit();
+    }
+    FrameMarkEnd(APPLICATION_SHUTDOWN);
 }
 
 int CApplication::Run()
@@ -409,13 +436,13 @@ int CApplication::Run()
 #ifdef PROFILE_TASK_SYSTEM
     return 0;
 #endif
-
-    // Main cycle
     HideSplash();
     Device.Run();
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
+        ZoneScopedN("Main cycle");
+
         bool canCallActivate = false;
         bool shouldActivate = false;
 
@@ -477,6 +504,7 @@ int CApplication::Run()
         Device.ProcessFrame();
 
         UpdateDiscordStatus();
+        FrameMarkNamed("Primary thread");
     } // while (!SDL_QuitRequested())
 
     Device.Shutdown();
@@ -488,6 +516,8 @@ void CApplication::ShowSplash(bool topmost)
 {
     if (m_window)
         return;
+
+    ZoneScoped;
 
     m_surfaces = std::move(ExtractSplashScreen());
 
@@ -542,6 +572,8 @@ void CApplication::HideSplash()
     if (!m_window)
         return;
 
+    ZoneScoped;
+
     m_should_exit.Set();
     m_splash_thread.join();
 
@@ -559,6 +591,7 @@ void CApplication::UpdateDiscordStatus()
     if (!m_discord_core)
         return;
 
+    ZoneScoped;
     std::lock_guard guard{ m_discord_lock };
     m_discord_core->RunCallbacks();
 #endif

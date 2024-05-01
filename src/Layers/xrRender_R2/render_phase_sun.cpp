@@ -61,6 +61,8 @@ void render_sun::init()
 
 void render_sun::calculate()
 {
+    ZoneScoped;
+
     need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
     last_cascade_chain_mode = m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain;
     if (need_to_render_sunshafts)

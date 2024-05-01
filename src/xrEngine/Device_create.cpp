@@ -21,6 +21,7 @@ void CRenderDevice::Create()
     if (b_is_Ready)
         return; // prevent double call
 
+    ZoneScoped;
     secondaryThread = Threading::RunThread("Secondary thread", &CRenderDevice::SecondaryThreadProc, this);
 
     Statistic = xr_new<CStats>();

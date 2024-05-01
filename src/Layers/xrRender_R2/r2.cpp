@@ -640,6 +640,8 @@ void CRender::reset_end()
 
 void CRender::BeforeRender()
 {
+    ZoneScoped;
+
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
 
@@ -648,6 +650,8 @@ void CRender::BeforeRender()
 
 void CRender::OnFrame()
 {
+    ZoneScoped;
+
     Models->DeleteQueue();
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;

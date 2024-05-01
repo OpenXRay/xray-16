@@ -45,6 +45,7 @@ void CSoundRender_Source::decompress(void* dest, u32 byte_offset, u32 size)
     if (!wave)
         attach();
 
+    ZoneScoped;
     std::lock_guard guard{ read_lock };
 
     // seek
@@ -162,6 +163,8 @@ void CSoundRender_Source::detach()
 
 bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
 {
+    ZoneScoped;
+
     pname = pName;
 
     attach();

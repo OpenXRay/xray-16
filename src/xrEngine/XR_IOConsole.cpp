@@ -100,6 +100,8 @@ CConsole::CConsole()
 
 void CConsole::Initialize()
 {
+    ZoneScoped;
+
     scroll_delta = 0;
     bVisible = false;
     pFont = NULL;
@@ -138,6 +140,8 @@ CConsole::~CConsole()
 
 void CConsole::Destroy()
 {
+    ZoneScoped;
+
     xr_delete(pFont);
     xr_delete(pFont2);
     Commands.clear();
@@ -156,6 +160,8 @@ void CConsole::RemoveCommand(IConsole_Command* cc)
 
 void CConsole::OnFrame()
 {
+    ZoneScoped;
+
     m_editor->on_frame();
 
     if (Device.dwFrame % 10 == 0)
@@ -219,6 +225,8 @@ void CConsole::OnUIReset()
 
 void CConsole::OnRender()
 {
+    ZoneScoped;
+
     if (!bVisible)
     {
         return;

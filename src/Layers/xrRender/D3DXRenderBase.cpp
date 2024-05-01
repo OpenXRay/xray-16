@@ -339,6 +339,7 @@ bool D3DXRenderBase::HWSupportsShaderYUV2RGB()
 
 void D3DXRenderBase::OnAssetsChanged()
 {
+    ZoneScoped;
     Resources->m_textures_description.UnLoad();
     Resources->m_textures_description.Load();
 }

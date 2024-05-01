@@ -10,6 +10,8 @@
 
 CSoundRender_Scene::~CSoundRender_Scene()
 {
+    ZoneScoped;
+
     stop_emitters();
 
     set_geometry_occ(nullptr, {});
@@ -51,6 +53,8 @@ void CSoundRender_Scene::set_geometry_occ(CDB::MODEL* M, const Fbox& /*aabb*/)
 
 void CSoundRender_Scene::set_geometry_som(IReader* I)
 {
+    ZoneScoped;
+
     xr_delete(geom_SOM);
     if (nullptr == I)
         return;
@@ -96,6 +100,8 @@ void CSoundRender_Scene::set_geometry_som(IReader* I)
 
 void CSoundRender_Scene::set_geometry_env(IReader* I)
 {
+    ZoneScoped;
+
     xr_delete(geom_ENV);
     if (nullptr == I)
         return;
@@ -224,6 +230,8 @@ CSoundRender_Emitter* CSoundRender_Scene::i_play(ref_sound& S, u32 flags, float 
 
 void CSoundRender_Scene::update()
 {
+    ZoneScoped;
+
     s_events_prev_count = s_events.size();
 
     for (auto& [sound, range] : s_events)
@@ -234,6 +242,8 @@ void CSoundRender_Scene::update()
 
 void CSoundRender_Scene::object_relcase(IGameObject* obj)
 {
+    ZoneScoped;
+
     if (obj)
     {
         for (const auto& emit : s_emitters)
@@ -248,6 +258,8 @@ void CSoundRender_Scene::object_relcase(IGameObject* obj)
 
 float CSoundRender_Scene::get_occlusion_to(const Fvector& hear_pt, const Fvector& snd_pt, float dispersion)
 {
+    ZoneScoped;
+
     float occ_value = 1.f;
 
     if (nullptr != geom_SOM)
@@ -278,6 +290,8 @@ float CSoundRender_Scene::get_occlusion_to(const Fvector& hear_pt, const Fvector
 
 float CSoundRender_Scene::get_occlusion(const Fvector& P, float R, Fvector* occ)
 {
+    ZoneScoped;
+
     float occ_value = 1.f;
 
     // Calculate RAY params

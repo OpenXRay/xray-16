@@ -293,6 +293,8 @@ void CUISequencer::Stop()
 
 void CUISequencer::OnFrame()
 {
+    ZoneScoped;
+
     if (!Device.b_is_Active)
         return;
     if (!IsActive())
@@ -323,6 +325,8 @@ void CUISequencer::OnFrame()
 
 void CUISequencer::OnRender()
 {
+    ZoneScoped;
+
     if (m_UIWindow->IsShown())
         m_UIWindow->Draw();
 

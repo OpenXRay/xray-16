@@ -71,6 +71,8 @@ CUIMainIngameWnd::~CUIMainIngameWnd()
 
 void CUIMainIngameWnd::Init()
 {
+    ZoneScoped;
+
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, MAININGAME_XML);
 
@@ -259,6 +261,8 @@ void CUIMainIngameWnd::Init()
 float UIStaticDiskIO_start_time = 0.0f;
 void CUIMainIngameWnd::Draw()
 {
+    ZoneScoped;
+
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
 
     // show IO icon
@@ -312,6 +316,8 @@ void CUIMainIngameWnd::SetMPChatLog(CUIWindow* pChat, CUIWindow* pLog)
 
 void CUIMainIngameWnd::Update()
 {
+    ZoneScoped;
+
     CUIWindow::Update();
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
 
@@ -499,6 +505,8 @@ void CUIMainIngameWnd::SetFlashIconState_(EFlashingIcons type, bool enable)
 
 void CUIMainIngameWnd::InitFlashingIcons(CUIXml* node)
 {
+    ZoneScoped;
+
     const char* const flashingIconNodeName = "flashing_icon";
     int staticsCount = node->GetNodesNum("", 0, flashingIconNodeName);
 
@@ -602,6 +610,7 @@ void CUIMainIngameWnd::UpdatePickUpItem()
 
 void CUIMainIngameWnd::OnConnected()
 {
+    ZoneScoped;
     UIZoneMap->SetupCurrentMap();
     if (m_ui_hud_states)
     {
@@ -612,6 +621,7 @@ void CUIMainIngameWnd::OnConnected()
 void CUIMainIngameWnd::OnSectorChanged(IRender_Sector::sector_id_t sector) { UIZoneMap->OnSectorChanged(sector); }
 void CUIMainIngameWnd::reset_ui()
 {
+    ZoneScoped;
     m_pPickUpItem = NULL;
     UIMotionIcon->ResetVisibility();
     if (m_ui_hud_states)

@@ -147,6 +147,8 @@ void CSoundRender_Emitter::fill_data(void* dest, u32 offset, u32 size) const
 
 void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
 {
+    ZoneScoped;
+
     // Msg			("stream: %10s - [%X]:%d, p=%d, t=%d",*source->fname,ptr,size,position,source->dwBytesTotal);
     u8* dest = (u8*)(ptr);
     const u32 dwBytesTotal = get_bytes_total();
