@@ -76,6 +76,8 @@ void CRenderDevice::Initialize()
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
         xrDebug::SetWindowHandler(this);
         ExtractAndSetWindowIcon(m_sdlWnd, icon);
+
+        TracySetProgramName(title);
     }
 
 #ifdef IMGUI_ENABLE_VIEWPORTS
