@@ -180,51 +180,70 @@ void xrMemory::mem_compact()
 
 void* xrMemory::mem_alloc(size_t size)
 {
-    return xr_internal_malloc(size);
+    const auto result = xr_internal_malloc(size);
+    //TracyAlloc(result, size);
+    return result;
 }
 
 void* xrMemory::mem_alloc(size_t size, size_t alignment)
 {
-    return xr_internal_malloc_aligned(size, alignment);
+    const auto result = xr_internal_malloc_aligned(size, alignment);
+    //TracyAlloc(result, size);
+    return result;
 }
 
 void* xrMemory::mem_alloc(size_t size, const std::nothrow_t&) noexcept
 {
-    return xr_internal_malloc_nothrow(size);
+    const auto result = xr_internal_malloc_nothrow(size);
+    //TracyAlloc(result, size);
+    return result;
 }
 
 void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&) noexcept
 {
-    return xr_internal_malloc_nothrow_aligned(size, alignment);
+    const auto result = xr_internal_malloc_nothrow_aligned(size, alignment);
+    //TracyAlloc(result, size);
+    return result;
 }
 
 void* xrMemory::small_alloc(size_t size) noexcept
 {
-    return xr_internal_small_alloc(size);
+    const auto result = xr_internal_small_alloc(size);
+    //TracyAllocN(result, size, "small alloc");
+    return result;
 }
 
 void xrMemory::small_free(void* ptr) noexcept
 {
+    //TracyFree(ptr);
     xr_internal_small_free(ptr);
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size)
 {
-    return xr_internal_realloc(ptr, size);
+    //TracyFree(ptr);
+    const auto result = xr_internal_realloc(ptr, size);
+    //TracyAllocN(result, size, "realloc");
+    return result;
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size, size_t alignment)
 {
-    return xr_internal_realloc_aligned(ptr, size, alignment);
+    //TracyFree(ptr);
+    const auto result = xr_internal_realloc_aligned(ptr, size, alignment);
+    //TracyAllocN(result, size, "realloc");
+    return result;
 }
 
 void xrMemory::mem_free(void* ptr)
 {
+    //TracyFree(ptr);
     xr_internal_free(ptr);
 }
 
 void xrMemory::mem_free(void* ptr, size_t alignment)
 {
+    //TracyFree(ptr);
     xr_internal_free_aligned(ptr, alignment);
 }
 
