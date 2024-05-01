@@ -32,7 +32,7 @@
 #   endif
 #endif
 
-#include <tracy/public/tracy/Tracy.hpp>
+#include <tracy/Tracy.hpp>
 
 #include "xrDebug.h"
 //#include "vector.h"
