@@ -180,16 +180,14 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
     if (0 == init_counter)
     {
         PluginMode = plugin;
-        // Init COM so we can use CoCreateInstance
-        // HRESULT co_res =
         if (commandLine)
             Params = xr_strdup(commandLine);
         else
             Params = xr_strdup("");
 
-        CoInitializeMultithreaded();
-
 #if defined(XR_PLATFORM_WINDOWS)
+        CoInitializeEx(nullptr, COINIT_MULTITHREADED); // needed for OpenAL initialization
+
         string_path fn, dr, di;
 
         // application path
@@ -339,15 +337,10 @@ void xrCore::_destroy()
         TaskScheduler = nullptr;
         xr_free(Params);
         Memory._destroy();
-    }
-}
-
-void xrCore::CoInitializeMultithreaded() const
-{
-#if defined(XR_PLATFORM_WINDOWS)
-    if (!strstr(Params, "-weather"))
-        CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+#ifdef XR_PLATFORM_WINDOWS
+        CoUninitialize();
 #endif
+    }
 }
 
 #if defined(XR_PLATFORM_WINDOWS)

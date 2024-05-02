@@ -131,8 +131,6 @@ public:
     static pcstr GetBuildCommit() { return buildCommit; }
     static pcstr GetBuildBranch() { return buildBranch; }
 
-    void CoInitializeMultithreaded() const;
-
 private:
     void CalculateBuildId();
     void PrintBuildInfo();
