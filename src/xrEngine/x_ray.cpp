@@ -36,12 +36,6 @@
 #include "xrCore/Text/StringConversion.hpp"
 #endif
 
-//#define PROFILE_TASK_SYSTEM
-
-#ifdef PROFILE_TASK_SYSTEM
-#include "xrCore/Threading/ParallelForEach.hpp"
-#endif
-
 // global variables
 constexpr size_t MAX_WINDOW_EVENTS = 32;
 
@@ -264,9 +258,7 @@ CApplication::CApplication(pcstr commandLine)
     if (!strstr(commandLine, "-nosplash"))
     {
         const bool topmost = !strstr(commandLine, "-splashnotop");
-#ifndef PROFILE_TASK_SYSTEM
         ShowSplash(topmost);
-#endif
     }
 
     pcstr fsltx = "-fsltx ";
@@ -278,35 +270,6 @@ CApplication::CApplication(pcstr commandLine)
     }
 
     Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
-
-#ifdef PROFILE_TASK_SYSTEM
-    const auto task = [](const TaskRange<int>&){};
-
-    constexpr int task_count = 1048576;
-    constexpr int iterations = 250;
-    u64 results[iterations];
-
-    CTimer timer;
-    for (int i = 0; i < iterations; ++i)
-    {
-        timer.Start();
-        xr_parallel_for(TaskRange(0, task_count, 1), task);
-        results[i] = timer.GetElapsed_ns();
-    }
-
-    u64 min = std::numeric_limits<u64>::max();
-    u64 average{};
-    for (int i = 0; i < iterations; ++i)
-    {
-        min = std::min(min, results[i]);
-        average += results[i] / 1000;
-        Log("Time:", results[i]);
-    }
-    Msg("Time min: %f microseconds", float(min) / 1000.f);
-    Msg("Time average: %f microseconds", float(average) / float(iterations));
-
-    return;
-#endif
 
     const auto& inputTask = TaskScheduler->AddTask([](Task&, void*)
     {
@@ -391,7 +354,6 @@ CApplication::~CApplication()
 {
     FrameMarkStart(APPLICATION_SHUTDOWN);
 
-#ifndef PROFILE_TASK_SYSTEM
     // Destroy APP
     DEL_INSTANCE(g_pGamePersistent);
     Engine.Event.Dump();
@@ -428,7 +390,6 @@ CApplication::~CApplication()
         CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
 #endif
     }
-#endif // PROFILE_TASK_SYSTEM
 
     Core._destroy();
     {
@@ -440,9 +401,6 @@ CApplication::~CApplication()
 
 int CApplication::Run()
 {
-#ifdef PROFILE_TASK_SYSTEM
-    return 0;
-#endif
     HideSplash();
     Device.Run();
 
