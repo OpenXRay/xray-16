@@ -377,15 +377,12 @@ CApplication::CApplication(pcstr commandLine)
 
     Device.Create();
     TaskScheduler->Wait(createLightAnim);
+    TaskScheduler->Wait(createSoundDevicesList);
 
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
     R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
     if (!g_pGamePersistent)
         Console->Show();
-
-    // Wait for tasks just for sanity,
-    // e.g. in case of singlethreaded CPU
-    TaskScheduler->Wait(createSoundDevicesList);
 
     FrameMarkEnd(APPLICATION_STARTUP);
 }
