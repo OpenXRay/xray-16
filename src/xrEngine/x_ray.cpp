@@ -563,6 +563,8 @@ void CApplication::SplashProc()
     do
     {
         UpdateDiscordStatus();
+        if (TaskScheduler)
+            TaskScheduler->ExecuteOneTask();
     } while (!m_should_exit.Wait(SPLASH_FRAMERATE));
 }
 
