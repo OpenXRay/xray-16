@@ -48,9 +48,9 @@ ENGINE_API bool CallOfPripyatMode = false;
 ENGINE_API bool ClearSkyMode = false;
 ENGINE_API bool ShadowOfChernobylMode = false;
 
-ENGINE_API string512 g_sLaunchOnExit_params;
-ENGINE_API string512 g_sLaunchOnExit_app;
-ENGINE_API string_path g_sLaunchWorkingFolder;
+ENGINE_API string512 g_sLaunchOnExit_params{};
+ENGINE_API string512 g_sLaunchOnExit_app{};
+ENGINE_API string_path g_sLaunchWorkingFolder{};
 
 namespace
 {
@@ -302,9 +302,6 @@ CApplication::CApplication(pcstr commandLine)
     {
         Engine.External.CreateRendererList();
     });
-
-    *g_sLaunchOnExit_app = 0;
-    *g_sLaunchOnExit_params = 0;
 
     InitSettings();
     // Adjust player & computer name for Asian
