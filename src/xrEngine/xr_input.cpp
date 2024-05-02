@@ -52,7 +52,6 @@ CInput::CInput(const bool exclusive)
     //===================== Dummy pack
     iCapture(&dummyController);
 
-    SDL_StopTextInput(); // sanity
     SDL_SetHint(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, "1"); // We need to handle it manually
 
     Device.seqAppActivate.Add(this);

@@ -178,16 +178,6 @@ void InitConsole()
     }
 }
 
-void InitInput()
-{
-    bool captureInput = !strstr(Core.Params, "-i");
-    pInput = xr_new<CInput>(captureInput);
-}
-
-void destroyInput() { xr_delete(pInput); }
-void InitSoundDeviceList() { Engine.Sound.CreateDevicesList(); }
-void InitSound() { Engine.Sound.Create(); }
-void destroySound() { Engine.Sound.Destroy(); }
 void destroySettings()
 {
     ZoneScoped;
@@ -319,6 +309,18 @@ CApplication::CApplication(pcstr commandLine)
 
     return;
 #endif
+
+    const auto& inputTask = TaskScheduler->AddTask("InitInput", [](Task&, void*)
+    {
+        const bool captureInput = !strstr(Core.Params, "-i");
+        pInput = xr_new<CInput>(captureInput);
+    });
+
+    const auto& createSoundDevicesList = TaskScheduler->AddTask("CSoundManager::CreateDevicesList()", [](Task&, void*)
+    {
+        Engine.Sound.CreateDevicesList();
+    });
+
     *g_sLaunchOnExit_app = 0;
     *g_sLaunchOnExit_params = 0;
 
@@ -334,7 +336,7 @@ CApplication::CApplication(pcstr commandLine)
 
     Device.InitializeImGui();
     Device.FillVideoModes();
-    InitInput();
+    TaskScheduler->Wait(inputTask);
     InitConsole();
 
     Engine.Initialize();
@@ -352,9 +354,8 @@ CApplication::CApplication(pcstr commandLine)
     }
 #endif
 
-    InitSoundDeviceList();
     execUserScript();
-    InitSound();
+    Engine.Sound.Create();
 
     // ...command line for auto start
     pcstr startArgs = strstr(Core.Params, "-start ");
@@ -378,6 +379,10 @@ CApplication::CApplication(pcstr commandLine)
     if (!g_pGamePersistent)
         Console->Show();
 
+    // Wait for tasks just for sanity,
+    // e.g. in case of singlethreaded CPU
+    TaskScheduler->Wait(createSoundDevicesList);
+
     FrameMarkEnd(APPLICATION_STARTUP);
 }
 
@@ -391,7 +396,7 @@ CApplication::~CApplication()
     Engine.Event.Dump();
 
     // Destroying
-    destroyInput();
+    xr_delete(pInput);
     destroySettings();
 
     LALib.OnDestroy();
@@ -400,7 +405,7 @@ CApplication::~CApplication()
 
     Device.CleanupVideoModes();
     Device.DestroyImGui();
-    destroySound();
+    Engine.Sound.Destroy();
 
     Device.Destroy();
     Engine.Destroy();
