@@ -563,8 +563,6 @@ void CApplication::SplashProc()
     while (!m_should_exit.load(std::memory_order_acquire))
     {
         UpdateDiscordStatus();
-        if (TaskScheduler)
-            TaskScheduler->ExecuteOneTask();
         Sleep(SPLASH_FRAMERATE);
     }
 }
