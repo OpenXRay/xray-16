@@ -531,11 +531,10 @@ void CApplication::ShowSplash(bool topmost)
 
     ZoneScoped;
 
-    m_surfaces = std::move(ExtractSplashScreen());
-
-    if (m_surfaces.empty())
+    m_surface = std::move(ExtractSplashScreen());
+    if (!m_surface)
     {
-        Log("! Couldn't create surface from image:", SDL_GetError());
+        Log("~ Couldn't create surface from image:", SDL_GetError());
         return;
     }
 
@@ -546,8 +545,7 @@ void CApplication::ShowSplash(bool topmost)
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
 #endif
 
-    const SDL_Surface* surface = m_surfaces.front();
-    m_window = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, surface->w, surface->h, flags);
+    m_window = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_surface->w, m_surface->h, flags);
     SDL_ShowWindow(m_window);
 
     m_splash_thread = Threading::RunThread("Splash Thread", &CApplication::SplashProc, this);
@@ -556,20 +554,14 @@ void CApplication::ShowSplash(bool topmost)
 
 void CApplication::SplashProc()
 {
+    {
+        ZoneScopedN("Update splash image");
+        const auto current = SDL_GetWindowSurface(m_window);
+        SDL_BlitSurface(m_surface, nullptr, current, nullptr);
+        SDL_UpdateWindowSurface(m_window);
+    }
     do
     {
-        if (m_surfaces.size() > 1 || m_current_surface_idx == size_t(-1))
-        {
-            if (m_current_surface_idx >= m_surfaces.size())
-                m_current_surface_idx = 0;
-
-            ZoneScopedN("Update splash image");
-            const auto current = SDL_GetWindowSurface(m_window);
-            const auto next = m_surfaces[m_current_surface_idx++]; // It's important to have postfix increment!
-            SDL_BlitSurface(next, nullptr, current, nullptr);
-            SDL_UpdateWindowSurface(m_window);
-            //SDL_PumpEvents();
-        }
         UpdateDiscordStatus();
     } while (!m_should_exit.Wait(SPLASH_FRAMERATE));
 }
@@ -587,9 +579,7 @@ void CApplication::HideSplash()
     SDL_DestroyWindow(m_window);
     m_window = nullptr;
 
-    for (SDL_Surface* surface : m_surfaces)
-        SDL_FreeSurface(surface);
-    m_surfaces.clear();
+    SDL_FreeSurface(m_surface);
 }
 
 void CApplication::UpdateDiscordStatus()

@@ -20,8 +20,7 @@ class ENGINE_API CApplication final
     std::thread m_splash_thread;
     Event m_should_exit;
 
-    size_t m_current_surface_idx{ size_t(-1) };
-    xr_vector<SDL_Surface*> m_surfaces;
+    SDL_Surface* m_surface;
 
 private:
     std::mutex m_discord_lock;

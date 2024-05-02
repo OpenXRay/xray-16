@@ -81,18 +81,10 @@ inline SDL_Surface* ExtractBitmap(int idx)
     return CreateSurfaceFromBitmap(bitmap);
 }
 
-inline xr_vector<SDL_Surface*> ExtractSplashScreen()
+inline SDL_Surface* ExtractSplashScreen()
 {
     ZoneScoped;
-
-    // XXX: that's the place, where splash frames can be added
-    // Animated splash screen!
-    SDL_Surface* surface = ExtractBitmap(IDB_SPLASH);
-
-    if (surface)
-        return { surface };
-
-    return {};
+    return ExtractBitmap(IDB_SPLASH);
 }
 
 inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
@@ -110,17 +102,12 @@ inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
     SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
 }
 #else
-inline xr_vector<SDL_Surface*> ExtractSplashScreen()
+inline SDL_Surface* ExtractSplashScreen()
 {
     ZoneScoped;
 
     // You need to place logo.bmp beside fsgame.ltx
-    SDL_Surface* surface = SDL_LoadBMP("logo.bmp");
-
-    if (surface)
-        return { surface };
-
-    return {};
+    return SDL_LoadBMP("logo.bmp");
 }
 
 inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
