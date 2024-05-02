@@ -9,6 +9,7 @@
 
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/xr_token.h"
+#include "xrCore/Threading/ParallelForEach.hpp"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
@@ -193,34 +194,31 @@ void CEngineAPI::CreateRendererList()
     }
 
     int modeIndex{};
-    const auto obtainModes = [&](RendererModule* module)
+    const auto obtainModes = [&](const RendererDesc& desc)
     {
-        if (module)
+        if (!desc.module)
+            return;
+
+        const auto& modes = desc.module->ObtainSupportedModes();
+        for (pcstr mode : modes)
         {
-            const auto& modes = module->ObtainSupportedModes();
-            for (pcstr mode : modes)
+            const auto it = std::find_if(renderModes.begin(), renderModes.end(), [&](auto& pair)
             {
-                const auto it = std::find_if(renderModes.begin(), renderModes.end(), [&](auto& pair)
-                {
-                    return 0 == xr_strcmp(mode, pair.first.c_str());
-                });
-                string256 temp;
-                if (it != renderModes.end())
-                {
-                    xr_sprintf(temp, "%s__dup%d", mode, modeIndex);
-                    mode = temp;
-                }
-                shared_str copiedMode = mode;
-                renderModes[copiedMode] = module;
-                VidQualityToken.emplace_back(copiedMode.c_str(), modeIndex++); // It's important to have postfix increment!
+                return 0 == xr_strcmp(mode, pair.first.c_str());
+            });
+            string256 temp;
+            if (it != renderModes.end())
+            {
+                xr_sprintf(temp, "%s__dup%d", mode, modeIndex);
+                mode = temp;
             }
+            shared_str copiedMode = mode;
+            renderModes[copiedMode] = desc.module;
+            VidQualityToken.emplace_back(copiedMode.c_str(), modeIndex++); // It's important to have postfix increment!
         }
     };
 
-    for (RendererDesc& desc : renderers)
-    {
-        obtainModes(desc.module);
-    }
+    xr_parallel_for_each(renderers, obtainModes);
 
     auto& modes = VidQualityToken;
     Msg("Available render modes[%d]:", modes.size());
