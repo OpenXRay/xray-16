@@ -82,6 +82,7 @@ void CMapLocationRegistry::save(IWriter& stream)
 
 CMapManager::CMapManager()
 {
+    m_uiSpotXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "map_spots.xml");
     m_locations_wrapper = xr_new<CMapLocationWrapper>();
     m_locations_wrapper->registry().init(1);
     m_locations = NULL;
@@ -91,6 +92,7 @@ CMapManager::~CMapManager()
 {
     delete_data(m_deffered_destroy_queue); // from prev frame
     delete_data(m_locations_wrapper);
+    m_uiSpotXml.ClearInternal();
 }
 
 CMapLocation* CMapManager::AddMapLocation(const shared_str& spot_type, u16 id)
@@ -138,6 +140,8 @@ void CMapManager::Destroy(CMapLocation* ml) { m_deffered_destroy_queue.push_back
 
 void CMapManager::OnUIReset()
 {
+    m_uiSpotXml.ClearInternal();
+    m_uiSpotXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "map_spots.xml");
     for (const SLocationKey& locationKey : Locations())
     {
         locationKey.location->LoadSpot(locationKey.spot_type.c_str());

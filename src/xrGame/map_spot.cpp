@@ -23,32 +23,32 @@ CMapSpot::CMapSpot(CMapLocation* ml) : CUIStatic("Map Spot"), m_map_location(ml)
     m_scale_bounds.set(-1.0f, -1.0f);
 }
 
-void CMapSpot::Load(CUIXml* xml, LPCSTR path)
+void CMapSpot::Load(CUIXml& xml, LPCSTR path)
 {
-    CUIXmlInit::InitStatic(*xml, path, 0, this);
+    CUIXmlInit::InitStatic(xml, path, 0, this);
     if (!Heading())
     {
         SetWidth(GetWidth() * UI().get_current_kx());
         SetStretchTexture(true);
     }
 
-    int i = xml->ReadAttribInt(path, 0, "scale", 0);
+    int i = xml.ReadAttribInt(path, 0, "scale", 0);
     m_bScale = (i == 1);
-    m_scale_bounds.x = xml->ReadAttribFlt(path, 0, "scale_min", -1.0f);
+    m_scale_bounds.x = xml.ReadAttribFlt(path, 0, "scale_min", -1.0f);
     if (m_bScale)
     {
-        m_scale_bounds.y = xml->ReadAttribFlt(path, 0, "scale_max", -1.0f);
+        m_scale_bounds.y = xml.ReadAttribFlt(path, 0, "scale_max", -1.0f);
         R_ASSERT2((m_scale_bounds.x > 0 && m_scale_bounds.y > 0) || ShadowOfChernobylMode, path);
     }
-    m_location_level = xml->ReadAttribInt(path, 0, "location_level", 0);
+    m_location_level = xml.ReadAttribInt(path, 0, "location_level", 0);
 
     m_originSize = GetWndSize();
 
     string512 str;
     strconcat(sizeof(str), str, path, ":static_border");
-    if (xml->NavigateToNode(str))
+    if (xml.NavigateToNode(str))
     {
-        m_border_static = UIHelper::CreateStatic(*xml, str, this);
+        m_border_static = UIHelper::CreateStatic(xml, str, this);
         m_border_static->Show(false);
         if (!Heading())
         {
@@ -120,7 +120,7 @@ LPCSTR CMapSpotPointer::GetHint() { return NULL; }
 //////////////////////////////////////////////////
 CMiniMapSpot::CMiniMapSpot(CMapLocation* ml) : inherited(ml) {}
 CMiniMapSpot::~CMiniMapSpot() {}
-void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
+void CMiniMapSpot::Load(CUIXml& xml, LPCSTR path)
 {
     inherited::Load(xml, path);
 
@@ -129,23 +129,23 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     Frect base_rect;
     base_rect.x1 = 0;
     base_rect.y1 = 0;
-    base_rect.x2 = xml->ReadAttribFlt(path, 0, "width", 0);
-    base_rect.y2 = xml->ReadAttribFlt(path, 0, "height", 0);
+    base_rect.x2 = xml.ReadAttribFlt(path, 0, "width", 0);
+    base_rect.y2 = xml.ReadAttribFlt(path, 0, "height", 0);
 
     Frect _stored_rect = m_UIStaticItem.GetTextureRect();
 
     strconcat(sizeof(buf), buf, path, ":texture_above");
-    XML_NODE n = xml->NavigateToNode(buf, 0);
+    XML_NODE n = xml.NavigateToNode(buf, 0);
     if (n)
     {
-        LPCSTR texture = xml->Read(buf, 0, NULL);
+        LPCSTR texture = xml.Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
         if (strchr(texture, _DELIMITER))
         {
-            float x = xml->ReadAttribFlt(buf, 0, "x", base_rect.x1);
-            float y = xml->ReadAttribFlt(buf, 0, "y", base_rect.y1);
-            float width = xml->ReadAttribFlt(buf, 0, "width", base_rect.width());
-            float height = xml->ReadAttribFlt(buf, 0, "height", base_rect.height());
+            float x = xml.ReadAttribFlt(buf, 0, "x", base_rect.x1);
+            float y = xml.ReadAttribFlt(buf, 0, "y", base_rect.y1);
+            float width = xml.ReadAttribFlt(buf, 0, "width", base_rect.width());
+            float height = xml.ReadAttribFlt(buf, 0, "height", base_rect.height());
             m_tex_rect_above.set(x, y, x + width, y + height);
         }
         else
@@ -155,17 +155,17 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     }
 
     strconcat(sizeof(buf), buf, path, ":texture_below");
-    n = xml->NavigateToNode(buf, 0);
+    n = xml.NavigateToNode(buf, 0);
     if (n)
     {
-        LPCSTR texture = xml->Read(buf, 0, NULL);
+        LPCSTR texture = xml.Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
         if (strchr(texture, _DELIMITER))
         {
-            float x = xml->ReadAttribFlt(buf, 0, "x", base_rect.x1);
-            float y = xml->ReadAttribFlt(buf, 0, "y", base_rect.y1);
-            float width = xml->ReadAttribFlt(buf, 0, "width", base_rect.width());
-            float height = xml->ReadAttribFlt(buf, 0, "height", base_rect.height());
+            float x = xml.ReadAttribFlt(buf, 0, "x", base_rect.x1);
+            float y = xml.ReadAttribFlt(buf, 0, "y", base_rect.y1);
+            float width = xml.ReadAttribFlt(buf, 0, "width", base_rect.width());
+            float height = xml.ReadAttribFlt(buf, 0, "height", base_rect.height());
             m_tex_rect_below.set(x, y, x + width, y + height);
         }
         else
@@ -174,17 +174,17 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
         m_icon_below = m_UIStaticItem.GetShader();
     }
     strconcat(sizeof(buf), buf, path, ":texture");
-    n = xml->NavigateToNode(buf, 0);
+    n = xml.NavigateToNode(buf, 0);
     if (n)
     {
-        LPCSTR texture = xml->Read(buf, 0, NULL);
+        LPCSTR texture = xml.Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
         if (strchr(texture, _DELIMITER))
         {
-            float x = xml->ReadAttribFlt(buf, 0, "x", base_rect.x1);
-            float y = xml->ReadAttribFlt(buf, 0, "y", base_rect.y1);
-            float width = xml->ReadAttribFlt(buf, 0, "width", base_rect.width());
-            float height = xml->ReadAttribFlt(buf, 0, "height", base_rect.height());
+            float x = xml.ReadAttribFlt(buf, 0, "x", base_rect.x1);
+            float y = xml.ReadAttribFlt(buf, 0, "y", base_rect.y1);
+            float width = xml.ReadAttribFlt(buf, 0, "width", base_rect.width());
+            float height = xml.ReadAttribFlt(buf, 0, "height", base_rect.height());
             m_tex_rect_normal.set(x, y, x + width, y + height);
         }
         else
@@ -259,20 +259,20 @@ CUIStaticOrig* CComplexMapSpot::CreateStaticOrig(CUIXml& xml, LPCSTR ui_path)
     return ui;
 }
 
-void CComplexMapSpot::Load(CUIXml* xml, LPCSTR path) // complex_spot_template
+void CComplexMapSpot::Load(CUIXml& xml, LPCSTR path) // complex_spot_template
 {
     inherited::Load(xml, path);
 
-    XML_NODE stored_root = xml->GetLocalRoot();
-    XML_NODE node = xml->NavigateToNode(path, 0);
-    xml->SetLocalRoot(node);
+    XML_NODE stored_root = xml.GetLocalRoot();
+    XML_NODE node = xml.NavigateToNode(path, 0);
+    xml.SetLocalRoot(node);
 
-    m_left_icon = CreateStaticOrig(*xml, "left_icon");
-    m_right_icon = CreateStaticOrig(*xml, "right_icon");
-    m_top_icon = CreateStaticOrig(*xml, "top_icon");
-    m_timer = CreateStaticOrig(*xml, "timer");
+    m_left_icon = CreateStaticOrig(xml, "left_icon");
+    m_right_icon = CreateStaticOrig(xml, "right_icon");
+    m_top_icon = CreateStaticOrig(xml, "top_icon");
+    m_timer = CreateStaticOrig(xml, "timer");
 
-    xml->SetLocalRoot(stored_root);
+    xml.SetLocalRoot(stored_root);
 }
 
 void CComplexMapSpot::SetTimerFinish(ALife::_TIME_ID time) // ms

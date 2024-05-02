@@ -28,43 +28,6 @@
 #include "ActorHelmet.h"
 #include "Inventory.h"
 
-static class CUISpotXmlManager : public CUIResetNotifier, public pureAppEnd
-{
-    CUIXml m_xml;
-    bool m_loaded{};
-
-public:
-    void Load()
-    {
-        if (m_loaded)
-            return;
-        m_loaded = m_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "map_spots.xml");
-    }
-
-    void OnAppEnd() override
-    {
-        m_xml.ClearInternal();
-        m_loaded = false;
-    }
-
-    void OnUIReset() override
-    {
-        OnAppEnd();
-        if (g_pGameLevel)
-            Load();
-    }
-
-    operator CUIXml*()
-    {
-        return &m_xml;
-    }
-
-    CUIXml* operator->()
-    {
-        return &m_xml;
-    }
-} g_uiSpotXml;
-
 CMapLocation::CMapLocation(pcstr type, u16 object_id)
     : m_objectID(object_id),
       m_owner_se_object(ai().get_alife() ? ai().alife().objects().object(m_objectID, true) : nullptr)
@@ -100,68 +63,68 @@ void CMapLocation::destroy()
 
 void CMapLocation::LoadSpot(pcstr type)
 {
-    g_uiSpotXml.Load();
+    auto& uiXml = CMapManager::m_uiSpotXml;
 
     string512 path_base, path;
     xr_strcpy(path_base, type);
-    R_ASSERT3(g_uiSpotXml->NavigateToNode(path_base, 0), "XML node not found in file map_spots.xml", path_base);
-    pcstr s = g_uiSpotXml->ReadAttrib(path_base, 0, "hint", "no hint");
+    R_ASSERT3(uiXml.NavigateToNode(path_base, 0), "XML node not found in file map_spots.xml", path_base);
+    pcstr s = uiXml.ReadAttrib(path_base, 0, "hint", "no hint");
     SetHint(s);
 
-    s = g_uiSpotXml->ReadAttrib(path_base, 0, "store", nullptr);
+    s = uiXml.ReadAttrib(path_base, 0, "store", nullptr);
     if (s)
     {
         m_flags.set(eSerailizable, true);
     }
 
-    s = g_uiSpotXml->ReadAttrib(path_base, 0, "no_offline", nullptr);
+    s = uiXml.ReadAttrib(path_base, 0, "no_offline", nullptr);
     if (s)
     {
         m_flags.set(eHideInOffline, true);
     }
 
-    m_ttl = g_uiSpotXml->ReadAttribInt(path_base, 0, "ttl", 0);
+    m_ttl = uiXml.ReadAttribInt(path_base, 0, "ttl", 0);
     if (m_ttl > 0)
     {
         m_flags.set(eTTL, true);
         UpdateTTL();
     }
 
-    s = g_uiSpotXml->ReadAttrib(path_base, 0, "pos_to_actor", nullptr);
+    s = uiXml.ReadAttrib(path_base, 0, "pos_to_actor", nullptr);
     if (s)
     {
         m_flags.set(ePosToActor, true);
     }
 
     strconcat(path, path_base, ":level_map");
-    XML_NODE node = g_uiSpotXml->NavigateToNode(path, 0);
+    XML_NODE node = uiXml.NavigateToNode(path, 0);
     if (node)
     {
-        pcstr str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
+        pcstr str = uiXml.ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
             if (!m_level_spot)
             {
                 m_level_spot = xr_new<CMapSpot>(this);
             }
-            m_level_spot->Load(g_uiSpotXml, str);
+            m_level_spot->Load(uiXml, str);
         }
         else
         {
             xr_delete(m_level_spot);
         }
 
-        m_spot_border_names[0] = g_uiSpotXml->ReadAttrib(path, 0, "spot_a", "level_map_spot_border");
-        m_spot_border_names[1] = g_uiSpotXml->ReadAttrib(path, 0, "spot_na", "");
+        m_spot_border_names[0] = uiXml.ReadAttrib(path, 0, "spot_a", "level_map_spot_border");
+        m_spot_border_names[1] = uiXml.ReadAttrib(path, 0, "spot_na", "");
 
-        str = g_uiSpotXml->ReadAttrib(path, 0, "pointer", "");
+        str = uiXml.ReadAttrib(path, 0, "pointer", "");
         if (xr_strlen(str))
         {
             if (!m_level_spot_pointer)
             {
                 m_level_spot_pointer = xr_new<CMapSpotPointer>(this);
             }
-            m_level_spot_pointer->Load(g_uiSpotXml, str);
+            m_level_spot_pointer->Load(uiXml, str);
         }
         else
         {
@@ -175,33 +138,33 @@ void CMapLocation::LoadSpot(pcstr type)
     }
 
     strconcat(path, path_base, ":mini_map");
-    node = g_uiSpotXml->NavigateToNode(path, 0);
+    node = uiXml.NavigateToNode(path, 0);
     if (node)
     {
-        pcstr str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
+        pcstr str = uiXml.ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
             if (!m_minimap_spot)
             {
                 m_minimap_spot = xr_new<CMiniMapSpot>(this);
             }
-            m_minimap_spot->Load(g_uiSpotXml, str);
+            m_minimap_spot->Load(uiXml, str);
         }
         else
         {
             xr_delete(m_minimap_spot);
         }
-        m_spot_border_names[2] = g_uiSpotXml->ReadAttrib(path, 0, "spot_a", "mini_map_spot_border");
-        m_spot_border_names[3] = g_uiSpotXml->ReadAttrib(path, 0, "spot_na", "");
+        m_spot_border_names[2] = uiXml.ReadAttrib(path, 0, "spot_a", "mini_map_spot_border");
+        m_spot_border_names[3] = uiXml.ReadAttrib(path, 0, "spot_na", "");
 
-        str = g_uiSpotXml->ReadAttrib(path, 0, "pointer", "");
+        str = uiXml.ReadAttrib(path, 0, "pointer", "");
         if (xr_strlen(str))
         {
             if (!m_minimap_spot_pointer)
             {
                 m_minimap_spot_pointer = xr_new<CMapSpotPointer>(this);
             }
-            m_minimap_spot_pointer->Load(g_uiSpotXml, str);
+            m_minimap_spot_pointer->Load(uiXml, str);
         }
         else
         {
@@ -215,33 +178,33 @@ void CMapLocation::LoadSpot(pcstr type)
     }
 
     strconcat(path, path_base, ":complex_spot");
-    node = g_uiSpotXml->NavigateToNode(path, 0);
+    node = uiXml.NavigateToNode(path, 0);
     if (node)
     {
-        pcstr str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
+        pcstr str = uiXml.ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
             if (!m_complex_spot)
             {
                 m_complex_spot = xr_new<CComplexMapSpot>(this);
             }
-            m_complex_spot->Load(g_uiSpotXml, str);
+            m_complex_spot->Load(uiXml, str);
         }
         else
         {
             xr_delete(m_complex_spot);
         }
-        m_spot_border_names[4] = g_uiSpotXml->ReadAttrib(path, 0, "spot_a", "complex_map_spot_border");
-        m_spot_border_names[5] = g_uiSpotXml->ReadAttrib(path, 0, "spot_na", "");
+        m_spot_border_names[4] = uiXml.ReadAttrib(path, 0, "spot_a", "complex_map_spot_border");
+        m_spot_border_names[5] = uiXml.ReadAttrib(path, 0, "spot_na", "");
 
-        str = g_uiSpotXml->ReadAttrib(path, 0, "pointer", "");
+        str = uiXml.ReadAttrib(path, 0, "pointer", "");
         if (xr_strlen(str))
         {
             if (!m_complex_spot_pointer)
             {
                 m_complex_spot_pointer = xr_new<CMapSpotPointer>(this);
             }
-            m_complex_spot_pointer->Load(g_uiSpotXml, str);
+            m_complex_spot_pointer->Load(uiXml, str);
         }
         else
         {
@@ -735,6 +698,7 @@ CMapSpotPointer* CMapLocation::GetSpotPointer(CMapSpot* sp)
 CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
 {
     R_ASSERT(sp);
+    auto& uiXml = CMapManager::m_uiSpotXml;
     if (PointerEnabled())
     {
         if (sp == m_level_spot)
@@ -742,7 +706,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
             if (NULL == m_level_map_spot_border)
             {
                 m_level_map_spot_border = xr_new<CMapSpot>(this);
-                m_level_map_spot_border->Load(g_uiSpotXml, m_spot_border_names[0].c_str());
+                m_level_map_spot_border->Load(uiXml, m_spot_border_names[0].c_str());
             }
             return m_level_map_spot_border;
         }
@@ -751,7 +715,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
             if (NULL == m_mini_map_spot_border)
             {
                 m_mini_map_spot_border = xr_new<CMapSpot>(this);
-                m_mini_map_spot_border->Load(g_uiSpotXml, m_spot_border_names[2].c_str());
+                m_mini_map_spot_border->Load(uiXml, m_spot_border_names[2].c_str());
             }
             return m_mini_map_spot_border;
         }
@@ -760,7 +724,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
             if (NULL == m_complex_spot_border)
             {
                 m_complex_spot_border = xr_new<CMapSpot>(this);
-                m_complex_spot_border->Load(g_uiSpotXml, m_spot_border_names[4].c_str());
+                m_complex_spot_border->Load(uiXml, m_spot_border_names[4].c_str());
             }
             return m_complex_spot_border;
         }
@@ -772,7 +736,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
             if (NULL == m_level_map_spot_border_na && m_spot_border_names[1].size())
             {
                 m_level_map_spot_border_na = xr_new<CMapSpot>(this);
-                m_level_map_spot_border_na->Load(g_uiSpotXml, m_spot_border_names[1].c_str());
+                m_level_map_spot_border_na->Load(uiXml, m_spot_border_names[1].c_str());
             }
             return m_level_map_spot_border_na;
         }
@@ -781,7 +745,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
             if (NULL == m_mini_map_spot_border_na && m_spot_border_names[3].size())
             {
                 m_mini_map_spot_border_na = xr_new<CMapSpot>(this);
-                m_mini_map_spot_border_na->Load(g_uiSpotXml, m_spot_border_names[3].c_str());
+                m_mini_map_spot_border_na->Load(uiXml, m_spot_border_names[3].c_str());
             }
             return m_mini_map_spot_border_na;
         }
@@ -790,7 +754,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
             if (NULL == m_complex_spot_border_na && m_spot_border_names[5].size())
             {
                 m_complex_spot_border_na = xr_new<CMapSpot>(this);
-                m_complex_spot_border_na->Load(g_uiSpotXml, m_spot_border_names[5].c_str());
+                m_complex_spot_border_na->Load(uiXml, m_spot_border_names[5].c_str());
             }
             return m_complex_spot_border_na;
         }
