@@ -24,12 +24,6 @@ public:
         {
             return FALSE;
         }
-        // Check if shaders are available
-        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
-        {
-            Log("~ No shaders found for xrRender_R4");
-            return FALSE;
-        }
         return xrRender_test_hw();
     }
 
@@ -57,6 +51,17 @@ public:
             modes.emplace_back(RENDERER_R4_MODE); // order matters: R3 should be first, R4 should be second.
         }
         return modes;
+    }
+
+    bool CheckGameRequirements() override
+    {
+        // Check if shaders are available
+        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
+        {
+            Log("~ No shaders found for xrRender_R4");
+            return false;
+        }
+        return true;
     }
 
     void SetupEnv(pcstr mode) override

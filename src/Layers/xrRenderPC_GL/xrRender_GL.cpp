@@ -18,12 +18,6 @@ public:
         {
             return false;
         }
-        // Check if shaders are available
-        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
-        {
-            Log("~ No shaders found for OpenGL");
-            return false;
-        }
         return xrRender_test_hw();
     }
 
@@ -36,6 +30,17 @@ public:
             modes.emplace_back(RENDERER_RGL_MODE);
         }
         return modes;
+    }
+
+    bool CheckGameRequirements() override
+    {
+        // Check if shaders are available
+        if (!FS.exist("$game_shaders$", RImplementation.getShaderPath()))
+        {
+            Log("~ No shaders found for OpenGL");
+            return false;
+        }
+        return true;
     }
 
     void CheckModeConsistency(pcstr mode) const

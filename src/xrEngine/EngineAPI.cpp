@@ -59,37 +59,37 @@ bool is_enough_address_space_available()
 #endif
 }
 
-pcstr CEngineAPI::SelectRenderer()
+void CEngineAPI::SelectRenderer()
 {
     ZoneScoped;
 
-    cpcstr selected_mode = Console->GetString("renderer");
+    // User has some renderer selected
+    // Find it and check if we can use it
+    pcstr selected_mode = Console->GetString("renderer");
     const auto it = renderModes.find(selected_mode);
     if (it != renderModes.end())
     {
-        selectedRenderer = it->second;
+        if (it->second->CheckGameRequirements())
+            selectedRenderer = it->second;
     }
-    return selected_mode;
-}
 
-void CEngineAPI::InitializeRenderers()
-{
-    ZoneScoped;
-
-    pcstr selected_mode = SelectRenderer();
-
-    if (selectedRenderer == nullptr
-        && VidQualityToken[0].id != -1)
+    // Renderer is either fully unsupported (hardware)
+    // or we don't comply with it requirements (e.g. shaders missing)
+    if (!selectedRenderer)
     {
-        // if engine failed to load renderer
-        // but there is at least one available
-        // then try again
-        string64 buf;
-        xr_sprintf(buf, "renderer %s", VidQualityToken[0].name);
-        Console->Execute(buf);
-
-        // Second attempt
-        selected_mode = SelectRenderer();
+        // Select any suitable
+        for (const auto& [mode, renderer] : renderModes)
+        {
+            if (renderer->CheckGameRequirements())
+            {
+                selectedRenderer = renderer;
+                selected_mode = mode.c_str();
+                string64 buf;
+                xr_sprintf(buf, "renderer %s", selected_mode);
+                Console->Execute(buf);
+                break;
+            }
+        }
     }
 
     // Ask current renderer to setup GEnv
@@ -103,7 +103,7 @@ void CEngineAPI::Initialize(void)
 {
     ZoneScoped;
 
-    InitializeRenderers();
+    SelectRenderer();
 
     hGame = XRay::LoadModule("xrGame");
     if (!CanSkipGameModuleLoading())

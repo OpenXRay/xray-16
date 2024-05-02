@@ -44,6 +44,7 @@ class XR_NOVTABLE RendererModule
 public:
     virtual ~RendererModule() = default;
     virtual const xr_vector<pcstr>& ObtainSupportedModes() = 0;
+    virtual bool CheckGameRequirements() = 0;
     virtual void SetupEnv(pcstr mode) = 0;
 };
 
@@ -77,8 +78,7 @@ public:
 
     void Initialize();
 
-    void InitializeRenderers();
-    pcstr SelectRenderer();
+    void SelectRenderer();
     void CloseUnusedLibraries();
 
     void Destroy();
