@@ -219,13 +219,21 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     _SHOW_REF("* CREATE: DeviceREF:", pDevice);
 
     // Register immediate context in profiler
-    profiler_ctx = TracyD3D11Context(pDevice, pContext);
+    if (ThisInstanceIsGlobal())
+    {
+        ZoneScopedN("TracyD3D11Context");
+        profiler_ctx = TracyD3D11Context(pDevice, pContext);
+    }
 
     // Create deferred contexts
-    for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
+    if (ThisInstanceIsGlobal())
     {
-        R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
-        VERIFY(SUCCEEDED(R));
+        ZoneScopedN("Create deferred contexts");
+        for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
+        {
+            R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
+            VERIFY(SUCCEEDED(R));
+        }
     }
 
     SDL_SysWMinfo info;
@@ -424,7 +432,8 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
     _RELEASE(m_pSwapChain);
 
-    TracyD3D11Destroy(profiler_ctx);
+    if (profiler_ctx)
+        TracyD3D11Destroy(profiler_ctx);
 
     _RELEASE(pContext1);
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
