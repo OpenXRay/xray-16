@@ -344,8 +344,8 @@ CApplication::CApplication(pcstr commandLine)
     TaskScheduler->Wait(inputTask);
     InitConsole();
 
-    Engine.Initialize();
     TaskScheduler->Wait(createRendererList);
+    Engine.Initialize();
     Device.Initialize();
 
     Console->OnDeviceInitialize();
