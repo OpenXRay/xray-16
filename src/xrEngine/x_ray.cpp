@@ -118,16 +118,7 @@ void InitSettings()
 {
     ZoneScoped;
 
-    xr_auth_strings_t ignoredPaths, checkedPaths;
-    fill_auth_check_params(ignoredPaths, checkedPaths); //TODO port xrNetServer to Linux
-    PathIncludePred includePred(&ignoredPaths);
-    CInifile::allow_include_func_t includeFilter;
-    includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
-
-    InitConfig(pSettings, "system.ltx");
-    InitConfig(pSettingsAuth, "system.ltx", true, true, true, false, 0, includeFilter);
     InitConfig(pSettingsOpenXRay, "openxray.ltx", false, true, true, false);
-    InitConfig(pGameIni, "game.ltx");
 
     if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
         set_shoc_mode();
@@ -149,6 +140,31 @@ void InitSettings()
         else if (xr_strcmpi("unlock", gameMode) == 0)
             set_free_mode();
     }
+
+    const auto& initSettings = TaskScheduler->AddTask([](Task&, void*)
+    {
+        InitConfig(pSettings, "system.ltx");
+    });
+
+    const auto& initSettingsAuth = TaskScheduler->AddTask([](Task&, void*)
+    {
+        xr_auth_strings_t ignoredPaths, checkedPaths;
+        fill_auth_check_params(ignoredPaths, checkedPaths);
+        PathIncludePred includePred(&ignoredPaths);
+        CInifile::allow_include_func_t includeFilter;
+        includeFilter.bind(&includePred, &PathIncludePred::IsIncluded);
+
+        InitConfig(pSettingsAuth, "system.ltx", true, true, true, false, 0, includeFilter);
+    });
+
+    const auto& initGameSettings = TaskScheduler->AddTask([](Task&, void*)
+    {
+        InitConfig(pGameIni, "game.ltx");
+    });
+
+    TaskScheduler->Wait(initSettings);
+    TaskScheduler->Wait(initSettingsAuth);
+    TaskScheduler->Wait(initGameSettings);
 }
 
 void InitConsole()
