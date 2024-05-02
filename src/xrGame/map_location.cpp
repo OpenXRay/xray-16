@@ -65,42 +65,21 @@ public:
     }
 } g_uiSpotXml;
 
-CMapLocation::CMapLocation(LPCSTR type, u16 object_id)
+CMapLocation::CMapLocation(pcstr type, u16 object_id)
+    : m_objectID(object_id),
+      m_owner_se_object(ai().get_alife() ? ai().alife().objects().object(m_objectID, true) : nullptr)
 {
     m_flags.zero();
+    m_flags.set(eHintEnabled, true);
 
-    m_level_spot = NULL;
-    m_level_spot_pointer = NULL;
-    m_minimap_spot = NULL;
-    m_minimap_spot_pointer = NULL;
-    m_complex_spot = NULL;
-    m_complex_spot_pointer = NULL;
-
-    m_level_map_spot_border = NULL;
-    m_mini_map_spot_border = NULL;
-    m_complex_spot_border = NULL;
-
-    m_level_map_spot_border_na = NULL;
-    m_mini_map_spot_border_na = NULL;
-    m_complex_spot_border_na = NULL;
-
-    m_objectID = object_id;
-    m_actual_time = 0;
-    m_owner_se_object = (ai().get_alife()) ? ai().alife().objects().object(m_objectID, true) : NULL;
-    m_flags.set(eHintEnabled, TRUE);
     LoadSpot(type);
-
     DisablePointer();
-
     EnableSpot();
-    m_cached.m_Position.set(10000, 10000);
-    m_cached.m_updatedFrame = u32(-1);
-    m_cached.m_graphID = GameGraph::_GRAPH_ID(-1);
+
     if (!IsGameTypeSingle())
         m_cached.m_LevelName = Level().name();
 }
 
-CMapLocation::~CMapLocation() {}
 void CMapLocation::destroy()
 {
     delete_data(m_level_spot);
@@ -119,46 +98,46 @@ void CMapLocation::destroy()
     delete_data(m_complex_spot_border_na);
 }
 
-void CMapLocation::LoadSpot(LPCSTR type)
+void CMapLocation::LoadSpot(pcstr type)
 {
     g_uiSpotXml.Load();
 
     string512 path_base, path;
     xr_strcpy(path_base, type);
     R_ASSERT3(g_uiSpotXml->NavigateToNode(path_base, 0), "XML node not found in file map_spots.xml", path_base);
-    LPCSTR s = g_uiSpotXml->ReadAttrib(path_base, 0, "hint", "no hint");
+    pcstr s = g_uiSpotXml->ReadAttrib(path_base, 0, "hint", "no hint");
     SetHint(s);
 
-    s = g_uiSpotXml->ReadAttrib(path_base, 0, "store", NULL);
+    s = g_uiSpotXml->ReadAttrib(path_base, 0, "store", nullptr);
     if (s)
     {
-        m_flags.set(eSerailizable, TRUE);
+        m_flags.set(eSerailizable, true);
     }
 
-    s = g_uiSpotXml->ReadAttrib(path_base, 0, "no_offline", NULL);
+    s = g_uiSpotXml->ReadAttrib(path_base, 0, "no_offline", nullptr);
     if (s)
     {
-        m_flags.set(eHideInOffline, TRUE);
+        m_flags.set(eHideInOffline, true);
     }
 
     m_ttl = g_uiSpotXml->ReadAttribInt(path_base, 0, "ttl", 0);
     if (m_ttl > 0)
     {
-        m_flags.set(eTTL, TRUE);
+        m_flags.set(eTTL, true);
         UpdateTTL();
     }
 
-    s = g_uiSpotXml->ReadAttrib(path_base, 0, "pos_to_actor", NULL);
+    s = g_uiSpotXml->ReadAttrib(path_base, 0, "pos_to_actor", nullptr);
     if (s)
     {
-        m_flags.set(ePosToActor, TRUE);
+        m_flags.set(ePosToActor, true);
     }
 
-    strconcat(sizeof(path), path, path_base, ":level_map");
+    strconcat(path, path_base, ":level_map");
     XML_NODE node = g_uiSpotXml->NavigateToNode(path, 0);
     if (node)
     {
-        LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
+        pcstr str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
             if (!m_level_spot)
@@ -195,11 +174,11 @@ void CMapLocation::LoadSpot(LPCSTR type)
         xr_delete(m_level_spot_pointer);
     }
 
-    strconcat(sizeof(path), path, path_base, ":mini_map");
+    strconcat(path, path_base, ":mini_map");
     node = g_uiSpotXml->NavigateToNode(path, 0);
     if (node)
     {
-        LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
+        pcstr str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
             if (!m_minimap_spot)
@@ -235,11 +214,11 @@ void CMapLocation::LoadSpot(LPCSTR type)
         xr_delete(m_minimap_spot_pointer);
     }
 
-    strconcat(sizeof(path), path, path_base, ":complex_spot");
+    strconcat(path, path_base, ":complex_spot");
     node = g_uiSpotXml->NavigateToNode(path, 0);
     if (node)
     {
-        LPCSTR str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
+        pcstr str = g_uiSpotXml->ReadAttrib(path, 0, "spot", "");
         if (xr_strlen(str))
         {
             if (!m_complex_spot)
@@ -275,7 +254,7 @@ void CMapLocation::LoadSpot(LPCSTR type)
         xr_delete(m_complex_spot_pointer);
     }
 
-    if (m_minimap_spot == NULL && m_level_spot == NULL && m_complex_spot == NULL)
+    if (m_minimap_spot == nullptr && m_level_spot == nullptr && m_complex_spot == nullptr)
     {
         DisableSpot();
     }
@@ -721,11 +700,11 @@ void CMapLocation::SetHint(const shared_str& hint)
     m_hint = hint;
 };
 
-LPCSTR CMapLocation::GetHint()
+pcstr CMapLocation::GetHint() const
 {
     if (!HintEnabled())
     {
-        return NULL;
+        return nullptr;
     }
     return StringTable().translate(m_hint).c_str();
 };
@@ -835,7 +814,6 @@ CRelationMapLocation::CRelationMapLocation(const shared_str& type, u16 object_id
     m_b_levelmap_visible = true;
 }
 
-CRelationMapLocation::~CRelationMapLocation() {}
 xr_vector<CMapLocation*> find_locations_res;
 
 bool CRelationMapLocation::Update()
