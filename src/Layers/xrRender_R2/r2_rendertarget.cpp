@@ -206,6 +206,8 @@ void manually_assign_texture(ref_shader& shader, pcstr textureName, pcstr render
 
 CRenderTarget::CRenderTarget()
 {
+    ZoneScoped;
+
     static constexpr pcstr SAMPLE_DEFS[] = { "0", "1", "2", "3", "4", "5", "6", "7" };
 
     const auto& options = RImplementation.o;

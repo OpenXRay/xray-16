@@ -2052,6 +2052,8 @@ public:
 
 void register_mp_console_commands()
 {
+    ZoneScoped;
+
     CMD1(CCC_Restart, "g_restart");
     CMD1(CCC_RestartFast, "g_restart_fast");
     CMD1(CCC_Kill, "g_kill");

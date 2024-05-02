@@ -268,6 +268,8 @@ IReader* open_shader(pcstr shader)
 
 void CResourceManager::CompatibilityCheck()
 {
+    ZoneScoped;
+
     // Check Shoker HQ Geometry Fix support
     {
         IReader* skinh = open_shader("skin.h");

@@ -2010,6 +2010,8 @@ public:
 
 void CCC_RegisterCommands()
 {
+    ZoneScoped;
+
     // options
     g_OptConCom.Init();
 

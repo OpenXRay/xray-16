@@ -35,6 +35,8 @@ public:
 
     const xr_vector<pcstr>& ObtainSupportedModes() override
     {
+        ZoneScoped;
+
         const BOOL result = CheckCanAddMode();
         if (result != FALSE)
         {
@@ -59,6 +61,8 @@ public:
 
     void SetupEnv(pcstr mode) override
     {
+        ZoneScoped;
+
         ps_r2_sun_static = false;
 
         switch (strhash(mode))

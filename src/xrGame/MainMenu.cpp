@@ -172,8 +172,6 @@ CMainMenu::CMainMenu()
 
 CMainMenu::~CMainMenu()
 {
-    ZoneScoped;
-
     Device.seqFrame.Remove(this);
 
     xr_delete(g_btnHint);

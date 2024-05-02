@@ -7,6 +7,7 @@ R_occlusion::R_occlusion(void) { enabled = strstr(Core.Params, "-no_occq") ? fal
 R_occlusion::~R_occlusion(void) { occq_destroy(); }
 void R_occlusion::occq_create(u32 limit)
 {
+    ZoneScoped;
     pool.reserve(limit);
     used.reserve(limit);
     fids.reserve(limit);

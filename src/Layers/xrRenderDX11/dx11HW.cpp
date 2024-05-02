@@ -51,6 +51,8 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateD3D()
 {
+    ZoneScoped;
+
     hDXGI = XRay::LoadModule("dxgi");
     hD3D = XRay::LoadModule("d3d11");
     if (!hD3D->IsLoaded() || !hDXGI->IsLoaded())
@@ -90,6 +92,8 @@ void CHW::DestroyD3D()
 
 void CHW::CreateDevice(SDL_Window* sdlWnd)
 {
+    ZoneScoped;
+
     CreateD3D();
     if (!Valid)
         return;
@@ -144,6 +148,8 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
+        ZoneScopedN("Create device");
+
         static const auto d3d11CreateDevice = static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
         return d3d11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
             nullptr, createDeviceFlags, level, levels,
@@ -265,6 +271,8 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
 bool CHW::CreateSwapChain(HWND hwnd)
 {
+    ZoneScoped;
+
     // Set up the presentation parameters
     DXGI_SWAP_CHAIN_DESC& sd = m_ChainDesc;
     ZeroMemory(&sd, sizeof(sd));
@@ -318,6 +326,8 @@ bool CHW::CreateSwapChain2(HWND hwnd)
 {
     if (strstr(Core.Params, "-no_dx11_2"))
         return false;
+
+    ZoneScoped;
 
 #ifdef HAS_DX11_2
     IDXGIFactory2* pFactory2{};
@@ -436,6 +446,7 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset()
 {
+    ZoneScoped;
     DXGI_SWAP_CHAIN_DESC& cd = m_ChainDesc;
     const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
     cd.Windowed = bWindowed;

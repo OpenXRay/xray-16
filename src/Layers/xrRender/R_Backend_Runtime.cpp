@@ -454,6 +454,8 @@ void CBackend::SetupStates()
 // Device dependance
 void CBackend::OnDeviceCreate()
 {
+    ZoneScoped;
+
 #if defined(USE_DX11)
     HW.get_context(context_id)->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), reinterpret_cast<void**>(&pAnnotation));
 #endif

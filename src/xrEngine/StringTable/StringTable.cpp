@@ -45,6 +45,8 @@ void CStringTable::Init()
     if (pData)
         return;
 
+    ZoneScoped;
+
     pData = xr_make_unique<STRING_TABLE_DATA>();
 
     FillLanguageToken();
@@ -72,6 +74,8 @@ void CStringTable::Init()
 
 void CStringTable::FillLanguageToken()
 {
+    ZoneScoped;
+
     languagesToken.clear();
 
     string_path path;
@@ -187,6 +191,8 @@ xr_token* CStringTable::GetLanguagesToken() const { return languagesToken.data()
 
 void CStringTable::Load(LPCSTR xml_file_full)
 {
+    ZoneScoped;
+
     XMLDocument uiXml;
     string_path _s;
     strconcat(sizeof(_s), _s, "text" DELIMITER, pData->m_sLanguage.c_str());

@@ -54,8 +54,6 @@ void init_game_globals()
 
 void clean_game_globals()
 {
-    ZoneScoped;
-
     // destroy ai space
     xr_delete(g_ai_space);
     // destroy object factory

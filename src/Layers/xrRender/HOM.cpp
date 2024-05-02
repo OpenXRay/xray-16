@@ -93,6 +93,7 @@ void CHOM::Load()
 
     xr_parallel_for(TaskRange<size_t>(0, CL.getTS()), [&](const TaskRange<size_t>& range)
     {
+        ZoneScopedN("Process triangles");
         for (size_t it = range.begin(); it != range.end(); ++it)
         {
             const CDB::TRI& clT = CL.getT()[it];

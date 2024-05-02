@@ -52,6 +52,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
     if (!Device.b_is_Ready)
         return;
 
+    ZoneScoped;
     string256 name;
 
 #ifndef _EDITOR
@@ -63,6 +64,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
     fs = F->open_chunk(0);
     if (fs)
     {
+        ZoneScopedN("Load constants");
         while (!fs->eof())
         {
             fs->r_stringZ(name, sizeof(name));
@@ -76,6 +78,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
     fs = F->open_chunk(1);
     if (fs)
     {
+        ZoneScopedN("Load matrices");
         while (!fs->eof())
         {
             fs->r_stringZ(name, sizeof(name));
@@ -89,6 +92,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
     fs = F->open_chunk(2);
     if (fs)
     {
+        ZoneScopedN("Load blenders");
         IReader* chunk = nullptr;
         int chunk_id = 0;
 
@@ -125,6 +129,8 @@ void CResourceManager::OnDeviceCreate(IReader* F)
 
 void CResourceManager::OnDeviceCreate(LPCSTR shName)
 {
+    ZoneScoped;
+
 #ifdef _EDITOR
     if (!FS.exist(shName))
         return;

@@ -60,6 +60,8 @@ bool is_enough_address_space_available()
 
 pcstr CEngineAPI::SelectRenderer()
 {
+    ZoneScoped;
+
     cpcstr selected_mode = Console->GetString("renderer");
     const auto it = renderModes.find(selected_mode);
     if (it != renderModes.end())
@@ -71,6 +73,8 @@ pcstr CEngineAPI::SelectRenderer()
 
 void CEngineAPI::InitializeRenderers()
 {
+    ZoneScoped;
+
     pcstr selected_mode = SelectRenderer();
 
     if (selectedRenderer == nullptr
@@ -96,6 +100,8 @@ void CEngineAPI::InitializeRenderers()
 
 void CEngineAPI::Initialize(void)
 {
+    ZoneScoped;
+
     InitializeRenderers();
 
     hGame = XRay::LoadModule("xrGame");
@@ -123,6 +129,7 @@ void CEngineAPI::Initialize(void)
 
 void CEngineAPI::Destroy(void)
 {
+    ZoneScoped;
     if (pFinalizeGame)
         pFinalizeGame();
 
@@ -139,6 +146,7 @@ void CEngineAPI::Destroy(void)
 
 void CEngineAPI::CloseUnusedLibraries()
 {
+    ZoneScoped;
     for (RendererDesc& desc : renderers)
     {
         if (desc.module != selectedRenderer)

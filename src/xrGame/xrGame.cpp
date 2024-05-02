@@ -38,6 +38,8 @@ extern "C"
 
     XR_EXPORT void initialize_library()
     {
+        ZoneScoped;
+
         g_fTimeFactor = pSettings->r_float("alife", "time_factor"); // XXX: find a better place
 
         // Fill ui style token

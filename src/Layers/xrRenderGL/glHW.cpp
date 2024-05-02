@@ -72,6 +72,8 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateDevice(SDL_Window* hWnd)
 {
+    ZoneScoped;
+
     m_window = hWnd;
 
     R_ASSERT(m_window);
@@ -184,6 +186,8 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset()
 {
+    ZoneScoped;
+
     CHK_GL(glDeleteFramebuffers(1, &pFB));
     UpdateViews();
     UpdateVSync();

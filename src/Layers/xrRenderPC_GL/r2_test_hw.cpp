@@ -8,6 +8,7 @@ class sdl_window_test_helper
 public:
     sdl_window_test_helper()
     {
+        ZoneScoped;
         u32 flags{};
         HW.SetPrimaryAttributes(flags);
         m_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | flags);
@@ -40,12 +41,18 @@ public:
 
 BOOL xrRender_test_hw()
 {
+    ZoneScoped;
+
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
     if (!windowTest.successful())
         return FALSE;
 
-    GLenum err = glewInit();
+    GLenum err;
+    {
+        ZoneScopedN("glewInit()");
+        err = glewInit();
+    }
     if (GLEW_OK != err)
     {
         Log("~ Could not initialize glew:", (pcstr)glewGetErrorString(err));

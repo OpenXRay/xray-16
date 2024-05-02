@@ -843,6 +843,8 @@ public:
 //-----------------------------------------------------------------------
 void xrRender_initconsole()
 {
+    ZoneScoped;
+
     CMD3(CCC_Preset, "_preset", &ps_Preset, qpreset_token);
     CMD3(CCC_Shader_Preset, "_shader_preset", &ps_ShaderPreset, qshader_preset_token);
     CMD3(CCC_ColorGrading_Preset, "_colorgrading_preset", &ps_ColorGradingPreset, qcolorgrading_preset_token);

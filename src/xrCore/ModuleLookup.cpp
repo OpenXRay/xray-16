@@ -24,6 +24,8 @@ ModuleHandle::~ModuleHandle()
 
 void* ModuleHandle::Open(pcstr moduleName)
 {
+    ZoneScoped;
+
     if (IsLoaded())
         Close();
 
@@ -64,6 +66,8 @@ void* ModuleHandle::Open(pcstr moduleName)
 
 void ModuleHandle::Close()
 {
+    ZoneScoped;
+
     if (dontUnload || !handle)
         return;
 

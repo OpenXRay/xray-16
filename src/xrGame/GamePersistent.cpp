@@ -151,6 +151,8 @@ void CGamePersistent::OnAppEnd()
 void CGamePersistent::Start(LPCSTR op) { inherited::Start(op); }
 void CGamePersistent::Disconnect()
 {
+    ZoneScoped;
+
     // destroy ambient particles
     CParticlesObject::Destroy(ambient_particles);
 

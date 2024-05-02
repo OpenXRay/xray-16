@@ -54,6 +54,7 @@ void CTextureDescrMngr::LoadLTX(pcstr initial, bool listTHM)
 
         const auto processAssociation = [&](const CInifile::Item& item)
         {
+            ZoneScopedN("Process association");
             if (listTHM)
                 Msg("\t\t%s = %s", item.first.c_str(), item.second.c_str());
 
@@ -145,6 +146,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
     Lock lock;
     const auto processFile = [&](const FS_File& it)
     {
+        ZoneScopedN("Process file");
         // Alundaio: Print list of *.thm to find bad .thms!
         if (listTHM)
             Log("\t", it.name.c_str());
@@ -241,7 +243,6 @@ void CTextureDescrMngr::Load()
 
 void CTextureDescrMngr::UnLoad()
 {
-    ZoneScoped;
     for (auto& it : m_texture_details)
     {
         xr_delete(it.second.m_assoc);

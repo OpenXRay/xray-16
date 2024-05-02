@@ -65,6 +65,7 @@ void CSoundRender_Core::i_destroy_source(CSoundRender_Source* S)
 
 void CSoundRender_Core::i_create_all_sources()
 {
+    ZoneScoped;
 #ifndef MASTER_GOLD
     CTimer T;
     T.Start();
@@ -75,6 +76,7 @@ void CSoundRender_Core::i_create_all_sources()
 
     const auto processFile = [&](const FS_File& file)
     {
+        ZoneScopedN("Process file");
         string256 id;
         xr_strcpy(id, file.name.c_str());
 

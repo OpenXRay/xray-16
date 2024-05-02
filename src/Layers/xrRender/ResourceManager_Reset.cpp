@@ -10,6 +10,7 @@
 
 void CResourceManager::reset_begin()
 {
+    ZoneScoped;
     // destroy state-blocks
     for (SState* sstate : v_states)
         _RELEASE(sstate->state);
@@ -33,6 +34,7 @@ bool cmp_rt(const CRT* A, const CRT* B) { return A->_order < B->_order; }
 
 void CResourceManager::reset_end()
 {
+    ZoneScoped;
     // create RDStreams
     RImplementation.Vertex.reset_end();
     RImplementation.Index.reset_end();

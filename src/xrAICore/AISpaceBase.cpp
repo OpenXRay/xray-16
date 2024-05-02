@@ -16,6 +16,7 @@ AISpaceBase::~AISpaceBase()
 
 void AISpaceBase::Load(const char* levelName)
 {
+    ZoneScoped;
     const CGameGraph::SLevel& currentLevel = game_graph().header().level(levelName);
     m_level_graph = xr_new<CLevelGraph>();
     game_graph().set_current_level(currentLevel.id());
