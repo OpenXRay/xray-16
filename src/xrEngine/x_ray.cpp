@@ -43,8 +43,6 @@
 #endif
 
 // global variables
-constexpr u32 SPLASH_FRAMERATE = 30;
-
 constexpr size_t MAX_WINDOW_EVENTS = 32;
 
 #ifdef USE_DISCORD_INTEGRATION
@@ -552,6 +550,8 @@ void CApplication::ShowSplash(bool topmost)
     SDL_PumpEvents();
 }
 
+constexpr u32 SPLASH_FRAMERATE = 30;
+
 void CApplication::SplashProc()
 {
     {
@@ -560,12 +560,13 @@ void CApplication::SplashProc()
         SDL_BlitSurface(m_surface, nullptr, current, nullptr);
         SDL_UpdateWindowSurface(m_window);
     }
-    do
+    while (!m_should_exit.load(std::memory_order_acquire))
     {
         UpdateDiscordStatus();
         if (TaskScheduler)
             TaskScheduler->ExecuteOneTask();
-    } while (!m_should_exit.Wait(SPLASH_FRAMERATE));
+        Sleep(SPLASH_FRAMERATE);
+    }
 }
 
 void CApplication::HideSplash()
@@ -575,7 +576,7 @@ void CApplication::HideSplash()
 
     ZoneScoped;
 
-    m_should_exit.Set();
+    m_should_exit.store(true, std::memory_order_release);
     m_splash_thread.join();
 
     SDL_DestroyWindow(m_window);

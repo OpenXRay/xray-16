@@ -18,7 +18,7 @@ class ENGINE_API CApplication final
 {
     SDL_Window* m_window{};
     std::thread m_splash_thread;
-    Event m_should_exit;
+    std::atomic_bool m_should_exit;
 
     SDL_Surface* m_surface;
 
