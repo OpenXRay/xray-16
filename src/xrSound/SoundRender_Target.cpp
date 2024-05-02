@@ -105,13 +105,13 @@ void CSoundRender_Target::wait_prefill() const
 void CSoundRender_Target::dispatch_prefill()
 {
     wait_prefill();
-    const auto task = &TaskScheduler->AddTask("CSoundRender_Target::dispatch_prefill()", { this, &CSoundRender_Target::prefill_blocks });
+    const auto task = &TaskScheduler->AddTask({ this, &CSoundRender_Target::prefill_blocks });
     prefill_task.store(task, std::memory_order_release);
 }
 
 void CSoundRender_Target::dispatch_prefill_all()
 {
     wait_prefill();
-    const auto task = &TaskScheduler->AddTask("CSoundRender_Target::dispatch_prefill_all()", { this, &CSoundRender_Target::prefill_all_blocks });
+    const auto task = &TaskScheduler->AddTask({ this, &CSoundRender_Target::prefill_all_blocks });
     prefill_task.store(task, std::memory_order_release);
 }

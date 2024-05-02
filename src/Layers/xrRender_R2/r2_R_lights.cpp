@@ -111,6 +111,7 @@ void CRender::render_lights(light_Package& LP)
 
     const auto &calc_lights = [](Task &, void* data)
     {
+        ZoneScopedN("calc lights");
         const auto* task_data = static_cast<task_data_t*>(data);
         auto& dsgraph = RImplementation.get_context(task_data->batch_id);
         {
@@ -131,6 +132,7 @@ void CRender::render_lights(light_Package& LP)
 
     const auto& flush_lights = [&]()
     {
+        ZoneScopedN("flush lights");
         for (const auto& [L, task, batch_id] : lights_queue)
         {
             VERIFY(task);
@@ -217,7 +219,7 @@ void CRender::render_lights(light_Package& LP)
             task_data_t data;
             data.batch_id = batch_id;
             data.L = L;
-            data.task = &TaskScheduler->CreateTask("slight_calc", calc_lights, sizeof(data), (void*)&data);
+            data.task = &TaskScheduler->CreateTask(calc_lights, sizeof(data), (void*)&data);
             if (o.mt_calculate)
             {
                 TaskScheduler->PushTask(*data.task);

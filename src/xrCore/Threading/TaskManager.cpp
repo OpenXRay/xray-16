@@ -431,52 +431,52 @@ bool TaskManager::ExecuteOneTask() const
     return false;
 }
 
-Task& TaskManager::CreateTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
+Task& TaskManager::CreateTask(const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
-    return *new (AllocateTask()) Task(name, taskFunc, data, dataSize);
+    return *new (AllocateTask()) Task(taskFunc, data, dataSize);
 }
 
-Task& TaskManager::CreateTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
+Task& TaskManager::CreateTask(const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
-    return *new (AllocateTask()) Task(name, taskFunc, onFinishCallback, data, dataSize);
+    return *new (AllocateTask()) Task(taskFunc, onFinishCallback, data, dataSize);
 }
 
-Task& TaskManager::CreateTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
+Task& TaskManager::CreateTask(Task& parent, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
     IncrementTaskJobsCounter(parent);
-    return *new (AllocateTask()) Task(name, taskFunc, data, dataSize, &parent);
+    return *new (AllocateTask()) Task(taskFunc, data, dataSize, &parent);
 }
 
-Task& TaskManager::CreateTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
+Task& TaskManager::CreateTask(Task& parent, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
     IncrementTaskJobsCounter(parent);
-    return *new (AllocateTask()) Task(name, taskFunc, onFinishCallback, data, dataSize, &parent);
+    return *new (AllocateTask()) Task(taskFunc, onFinishCallback, data, dataSize, &parent);
 }
 
-Task& TaskManager::AddTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
+Task& TaskManager::AddTask(const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
-    auto& task = CreateTask(name, taskFunc, dataSize, data);
+    auto& task = CreateTask(taskFunc, dataSize, data);
     PushTask(task);
     return task;
 }
 
-Task& TaskManager::AddTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
+Task& TaskManager::AddTask(const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
-    auto& task = CreateTask(name, onFinishCallback, taskFunc, dataSize, data);
+    auto& task = CreateTask(onFinishCallback, taskFunc, dataSize, data);
     PushTask(task);
     return task;
 }
 
-Task& TaskManager::AddTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
+Task& TaskManager::AddTask(Task& parent, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
-    auto& task = CreateTask(parent, name, taskFunc, dataSize, data);
+    auto& task = CreateTask(parent, taskFunc, dataSize, data);
     PushTask(task);
     return task;
 }
 
-Task& TaskManager::AddTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
+Task& TaskManager::AddTask(Task& parent, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
-    auto& task = CreateTask(parent, name, onFinishCallback, taskFunc, dataSize, data);
+    auto& task = CreateTask(parent, onFinishCallback, taskFunc, dataSize, data);
     PushTask(task);
     return task;
 }

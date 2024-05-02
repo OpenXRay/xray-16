@@ -645,7 +645,7 @@ void CRender::BeforeRender()
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
 
-    ProcessHOMTask = &TaskScheduler->AddTask("MT-HOM", { &HOM, &CHOM::MT_RENDER });
+    ProcessHOMTask = &TaskScheduler->AddTask({ &HOM, &CHOM::MT_RENDER });
 }
 
 void CRender::OnFrame()

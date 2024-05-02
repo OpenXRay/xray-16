@@ -310,13 +310,13 @@ CApplication::CApplication(pcstr commandLine)
     return;
 #endif
 
-    const auto& inputTask = TaskScheduler->AddTask("InitInput", [](Task&, void*)
+    const auto& inputTask = TaskScheduler->AddTask([](Task&, void*)
     {
         const bool captureInput = !strstr(Core.Params, "-i");
         pInput = xr_new<CInput>(captureInput);
     });
 
-    const auto& createSoundDevicesList = TaskScheduler->AddTask("CSoundManager::CreateDevicesList()", [](Task&, void*)
+    const auto& createSoundDevicesList = TaskScheduler->AddTask([](Task&, void*)
     {
         Engine.Sound.CreateDevicesList();
     });
@@ -366,7 +366,7 @@ CApplication::CApplication(pcstr commandLine)
         Console->Execute(loadArgs + 1);
 
     // Initialize APP
-    const auto& createLightAnim = TaskScheduler->AddTask("LALib.OnCreate()", [](Task&, void*)
+    const auto& createLightAnim = TaskScheduler->AddTask([](Task&, void*)
     {
         LALib.OnCreate();
     });

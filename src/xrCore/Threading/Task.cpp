@@ -17,14 +17,14 @@
 
 #include "Task.hpp"
 
-Task::Data::Data(pcstr name, const TaskFunc& task, Task* parent)
-    : task_func(task), on_finish_callback(nullptr), name(name), parent(parent), jobs(1) {}
+Task::Data::Data(const TaskFunc& task, Task* parent)
+    : task_func(task), on_finish_callback(nullptr), parent(parent), jobs(1) {}
 
-Task::Data::Data(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent)
-    : task_func(task), on_finish_callback(onFinishCallback), name(name), parent(parent), jobs(1) {}
+Task::Data::Data(const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent)
+    : task_func(task), on_finish_callback(onFinishCallback), parent(parent), jobs(1) {}
 
-Task::Task(pcstr name, const TaskFunc& task, void* data, size_t dataSize, Task* parent /*= nullptr*/)
-    : m_data(name, task, parent)
+Task::Task(const TaskFunc& task, void* data, size_t dataSize, Task* parent /*= nullptr*/)
+    : m_data(task, parent)
 {
     VERIFY2(dataSize <= sizeof(m_user_data), "Cannot fit your data in the task");
     if (data && dataSize)
@@ -33,8 +33,8 @@ Task::Task(pcstr name, const TaskFunc& task, void* data, size_t dataSize, Task* 
     }
 }
 
-Task::Task(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent /*= nullptr*/)
-    : m_data(name, task, onFinishCallback, parent)
+Task::Task(const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent /*= nullptr*/)
+    : m_data(task, onFinishCallback, parent)
 {
     VERIFY2(dataSize <= sizeof(m_user_data), "Cannot fit your data in the task");
     if (data && dataSize)

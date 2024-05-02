@@ -50,26 +50,27 @@ private:
     {
         TaskFunc            task_func{};
         OnFinishFunc        on_finish_callback{};
-        pcstr               name{};
         Task*               parent{};
         std::atomic_int16_t jobs{}; // at least 1 (task itself), zero means task is done.
 
         Data() = default;
-        Data(pcstr name, const TaskFunc& task, Task* parent);
-        Data(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent);
+        Data(const TaskFunc& task, Task* parent);
+        Data(const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent);
     } m_data;
 
-    u8 m_user_data[TASK_SIZE - sizeof(m_data)];
+    static constexpr size_t USER_DATA_SIZE = TASK_SIZE - sizeof(m_data);
+
+    std::byte m_user_data[USER_DATA_SIZE];
 
 private:
     // Used by TaskAllocator as Task initial state
     Task() = default;
 
     // Will just execute
-    Task(pcstr name, const TaskFunc& task, void* data, size_t dataSize, Task* parent = nullptr);
+    Task(const TaskFunc& task, void* data, size_t dataSize, Task* parent = nullptr);
 
     // Will execute and call back
-    Task(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent = nullptr);
+    Task(const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent = nullptr);
 
 public:
     static constexpr size_t GetAvailableDataStorageSize()

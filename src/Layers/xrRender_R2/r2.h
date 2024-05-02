@@ -44,7 +44,7 @@ struct i_render_phase
         if (!o.active)
             return;
 
-        main_task = &TaskScheduler->CreateTask("phase_calculate", { this, &i_render_phase::calculate_task });
+        main_task = &TaskScheduler->CreateTask({ this, &i_render_phase::calculate_task });
 
         if (o.mt_calc_enabled)
         {
@@ -84,7 +84,7 @@ struct i_render_phase
 
         if (o.mt_draw_enabled)
         {
-            draw_task = &TaskScheduler->AddTask(*main_task, "phase_render", { this, &i_render_phase::render_task });
+            draw_task = &TaskScheduler->AddTask(*main_task, { this, &i_render_phase::render_task });
         }
     }
 

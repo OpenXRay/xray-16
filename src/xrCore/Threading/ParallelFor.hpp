@@ -135,7 +135,7 @@ public:
     {
         TaskData taskData{ range, function };
 
-        auto& task = TaskScheduler->AddTask(__FUNCTION__, task_func, sizeof(TaskData), &taskData);
+        auto& task = TaskScheduler->AddTask(task_func, sizeof(TaskData), &taskData);
         if (wait)
             TaskScheduler->Wait(task);
         return task;
@@ -146,7 +146,7 @@ public:
     {
         TaskData taskData{ range, function };
 
-        auto& task = TaskScheduler->AddTask(__FUNCTION__, callback, task_func, sizeof(TaskData), &taskData);
+        auto& task = TaskScheduler->AddTask(callback, task_func, sizeof(TaskData), &taskData);
         if (wait)
             TaskScheduler->Wait(task);
         return task;
@@ -161,8 +161,8 @@ private:
         if (range.is_splittable())
         {
             TaskData leftData{ TaskRange(range, SplitTaskRange()), data.function };
-            TaskScheduler->AddTask(thisTask, __FUNCTION__, task_func, sizeof(TaskData), &leftData);
-            TaskScheduler->AddTask(thisTask, __FUNCTION__, task_func, sizeof(TaskData), &data);
+            TaskScheduler->AddTask(thisTask, task_func, sizeof(TaskData), &leftData);
+            TaskScheduler->AddTask(thisTask, task_func, sizeof(TaskData), &data);
         }
         else
         {

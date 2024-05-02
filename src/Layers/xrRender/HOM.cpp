@@ -268,6 +268,7 @@ void CHOM::Render(CFrustum& base)
 
 void CHOM::MT_RENDER(Task& /*thisTask*/, void* /*data*/)
 {
+    ZoneScoped;
     CFrustum ViewBase;
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
     Enable();
