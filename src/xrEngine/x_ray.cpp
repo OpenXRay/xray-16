@@ -335,6 +335,7 @@ CApplication::CApplication(pcstr commandLine)
 #endif
 
     execUserScript();
+    TaskScheduler->Wait(createSoundDevicesList);
     Engine.Sound.Create();
 
     // ...command line for auto start
@@ -353,7 +354,6 @@ CApplication::CApplication(pcstr commandLine)
 
     Device.Create();
     TaskScheduler->Wait(createLightAnim);
-    TaskScheduler->Wait(createSoundDevicesList);
 
     g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
     R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
