@@ -321,6 +321,11 @@ CApplication::CApplication(pcstr commandLine)
         Engine.Sound.CreateDevicesList();
     });
 
+    const auto& createRendererList = TaskScheduler->AddTask([](Task&, void*)
+    {
+        Engine.External.CreateRendererList();
+    });
+
     *g_sLaunchOnExit_app = 0;
     *g_sLaunchOnExit_params = 0;
 
@@ -340,6 +345,7 @@ CApplication::CApplication(pcstr commandLine)
     InitConsole();
 
     Engine.Initialize();
+    TaskScheduler->Wait(createRendererList);
     Device.Initialize();
 
     Console->OnDeviceInitialize();
