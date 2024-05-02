@@ -285,23 +285,23 @@ CApplication::CApplication(pcstr commandLine)
         sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
     }
 
-    Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
-
-    const auto& inputTask = TaskScheduler->AddTask([](Task&, void*)
+    const auto& inputTask = TaskManager::AddTask([](Task&, void*)
     {
         const bool captureInput = !strstr(Core.Params, "-i");
         pInput = xr_new<CInput>(captureInput);
     });
 
-    const auto& createSoundDevicesList = TaskScheduler->AddTask([](Task&, void*)
+    const auto& createSoundDevicesList = TaskManager::AddTask([](Task&, void*)
     {
         Engine.Sound.CreateDevicesList();
     });
 
-    const auto& createRendererList = TaskScheduler->AddTask([](Task&, void*)
+    const auto& createRendererList = TaskManager::AddTask([](Task&, void*)
     {
         Engine.External.CreateRendererList();
     });
+
+    Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
 
     InitSettings();
     // Adjust player & computer name for Asian
