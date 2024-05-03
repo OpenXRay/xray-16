@@ -83,6 +83,16 @@ CGamePersistent::~CGamePersistent()
     Engine.Event.Handler_Detach(eQuickLoad, this);
 }
 
+IGame_Level* CGamePersistent::CreateLevel()
+{
+    return xr_new<CLevel>();
+}
+
+void CGamePersistent::DestroyLevel(IGame_Level* lvl)
+{
+    xr_delete(lvl);
+}
+
 void CGamePersistent::PreStart(LPCSTR op)
 {
     inherited::PreStart(op);

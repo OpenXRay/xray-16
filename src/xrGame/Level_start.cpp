@@ -279,7 +279,7 @@ bool CLevel::net_start6()
 
         if (m_connect_server_err == xrServer::ErrConnect && !psNET_direct_connect && !GEnv.isDedicatedServer)
         {
-            DEL_INSTANCE(g_pGameLevel);
+            g_pGamePersistent->DestroyLevel(g_pGameLevel); // XXX: level destroying itself!!!
             Console->Execute("main_menu on");
 
             MainMenu()->SwitchToMultiplayerMenu();
@@ -295,7 +295,7 @@ bool CLevel::net_start6()
             STRCONCAT(level_id_string, StringTable().translate("st_level"), ":", map_data.m_name.c_str(), "(", tmp_map_ver, "). ");
             STRCONCAT(dialog_string, level_id_string, StringTable().translate("ui_st_map_not_found"));
 
-            DEL_INSTANCE(g_pGameLevel);
+            g_pGamePersistent->DestroyLevel(g_pGameLevel); // XXX: level destroying itself!!!
             Console->Execute("main_menu on");
 
             if (!GEnv.isDedicatedServer)
@@ -314,8 +314,8 @@ bool CLevel::net_start6()
             STRCONCAT(level_id_string, StringTable().translate("st_level"), ":", map_data.m_name.c_str(), "(", tmp_map_ver, "). ");
             STRCONCAT(dialog_string, level_id_string, StringTable().translate("ui_st_map_data_corrupted"));
 
-            g_pGameLevel->net_Stop();
-            DEL_INSTANCE(g_pGameLevel);
+            net_Stop();
+            g_pGamePersistent->DestroyLevel(g_pGameLevel); // XXX: level destroying itself!!!
             Console->Execute("main_menu on");
             if (!GEnv.isDedicatedServer)
             {
@@ -325,7 +325,7 @@ bool CLevel::net_start6()
         }
         else
         {
-            DEL_INSTANCE(g_pGameLevel);
+            g_pGamePersistent->DestroyLevel(g_pGameLevel); // XXX: level destroying itself!!!
             Console->Execute("main_menu on");
         }
 

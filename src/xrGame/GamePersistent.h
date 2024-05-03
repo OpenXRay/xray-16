@@ -63,7 +63,10 @@ public:
     EVENT eDemoStart{};
 
     CGamePersistent();
-    virtual ~CGamePersistent();
+    ~CGamePersistent() override;
+
+    IGame_Level* CreateLevel() override;
+    void         DestroyLevel(IGame_Level* lvl) override;
 
     void PreStart(LPCSTR op) override;
     virtual void Start(LPCSTR op);

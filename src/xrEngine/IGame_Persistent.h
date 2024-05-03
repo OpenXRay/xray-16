@@ -19,6 +19,7 @@
 #endif
 #include "ShadersExternalData.h" //--#SM+#--
 
+class IGame_Level;
 class IRenderVisual;
 class ILoadingScreen;
 class IMainMenu;
@@ -168,6 +169,9 @@ public:
     static CInifile* GetArchiveHeader(pcstr name, pcstr ver);
 
 public:
+    virtual IGame_Level* CreateLevel() { return nullptr; }
+    virtual void         DestroyLevel(IGame_Level* lvl) { VERIFY(lvl == nullptr); }
+
     virtual void PreStart(pcstr op);
     virtual void Start(pcstr op);
     virtual void Disconnect();

@@ -283,7 +283,7 @@ void IGame_Persistent::OnEvent(EVENT E, u64 P1, u64 P2)
         //-----------------------------------------------------------
         PreStart(op_server);
         //-----------------------------------------------------------
-        g_pGameLevel = dynamic_cast<IGame_Level*>(NEW_INSTANCE(CLSID_GAME_LEVEL));
+        g_pGameLevel = CreateLevel();
         R_ASSERT(g_pGameLevel);
         LoadBegin();
         Start(op_server);
@@ -302,7 +302,7 @@ void IGame_Persistent::OnEvent(EVENT E, u64 P1, u64 P2)
             const bool show = Console->bVisible;
             Console->Hide();
             g_pGameLevel->net_Stop();
-            DEL_INSTANCE(g_pGameLevel);
+            DestroyLevel(g_pGameLevel);
             if (show)
                 Console->Show();
 
@@ -324,7 +324,7 @@ void IGame_Persistent::OnEvent(EVENT E, u64 P1, u64 P2)
         Console->Hide();
         Device.Reset(false);
 
-        g_pGameLevel = dynamic_cast<IGame_Level*>(NEW_INSTANCE(CLSID_GAME_LEVEL));
+        g_pGameLevel = CreateLevel();
         VERIFY(g_pGameLevel);
         const shared_str server_options = g_pGameLevel->OpenDemoFile(demo_file);
 

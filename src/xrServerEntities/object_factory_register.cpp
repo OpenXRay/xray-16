@@ -193,7 +193,6 @@ void CObjectFactory::register_classes()
 
 #ifndef NO_XR_GAME
     // client entities
-    add<CLevel>(CLSID_GAME_LEVEL, "level");
     add<CGamePersistent>(CLSID_GAME_PERSISTANT, "game");
     // Server Game type
     add<game_sv_Single>(CLSID_SV_GAME_SINGLE, "game_sv_single");
