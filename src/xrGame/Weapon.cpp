@@ -33,7 +33,7 @@
 
 BOOL b_toggle_weapon_aim = FALSE;
 
-static class CUIWpnScopeXmlManager : public CUIResetNotifier, public pureAppEnd
+static class CUIWpnScopeXmlManager : public pureUIReset, public pureAppEnd
 {
     CUIXml m_xml;
     bool m_loaded{};
@@ -44,12 +44,14 @@ public:
         if (m_loaded)
             return;
         m_loaded = m_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
+        Device.seqUIReset.Add(this);
     }
 
-    void OnAppEnd()
+    void OnAppEnd() override
     {
         m_xml.ClearInternal();
         m_loaded = false;
+        Device.seqUIReset.Remove(this);
     }
 
     void OnUIReset() override
