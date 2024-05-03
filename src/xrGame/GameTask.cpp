@@ -16,11 +16,10 @@
 #include "alife_registry_wrappers.h"
 #include "alife_simulator.h"
 #include "alife_story_registry.h"
+#include "GametaskManager.h"
 #include "game_object_space.h"
 #include "Common/object_broker.h"
 #include "xrUICore/XML/UITextureMaster.h"
-
-CUIXml* g_gameTaskXml = nullptr;
 
 ALife::_STORY_ID story_id(cpcstr story_id)
 {
@@ -77,24 +76,20 @@ CGameTask::CGameTask(const TASK_ID& id)
 void CGameTask::Load(const TASK_ID& id)
 {
     m_ID = id;
-    static bool successfulLoading = false;
-    if (!g_gameTaskXml)
+
+    auto& gameTaskXml = CGameTaskManager::m_gameTaskXml; // not multithread friendly
+    if (gameTaskXml.IsErrored())
     {
-        g_gameTaskXml = new CUIXml();
-        successfulLoading = g_gameTaskXml->Load(CONFIG_PATH, "gameplay", "game_tasks.xml", false);
-    }
-    if (!successfulLoading)
-    {
-        Msg("Trying to load task [%s], but failed to load gameplay/game_tasks.xml", m_ID.c_str());
+        Msg("! Trying to load task [%s], but failed to load gameplay/game_tasks.xml", m_ID.c_str());
         return;
     }
 
-    const XML_NODE task_node = g_gameTaskXml->NavigateToNodeWithAttribute("game_task", "id", *id);
+    const XML_NODE task_node = gameTaskXml.NavigateToNodeWithAttribute("game_task", "id", *id);
 
     THROW3(task_node, "game task id = ", id.c_str());
-    g_gameTaskXml->SetLocalRoot(task_node);
-    m_Title = g_gameTaskXml->Read(g_gameTaskXml->GetLocalRoot(), "title", 0, nullptr);
-    m_priority = g_gameTaskXml->ReadAttribInt(g_gameTaskXml->GetLocalRoot(), "prio", -1);
+    gameTaskXml.SetLocalRoot(task_node);
+    m_Title = gameTaskXml.Read(gameTaskXml.GetLocalRoot(), "title", 0, nullptr);
+    m_priority = gameTaskXml.ReadAttribInt(gameTaskXml.GetLocalRoot(), "prio", -1);
 
 #ifdef DEBUG
     if (m_priority == u32(-1))
@@ -103,35 +98,35 @@ void CGameTask::Load(const TASK_ID& id)
     }
 #endif
 
-    const int tag_num = g_gameTaskXml->GetNodesNum(g_gameTaskXml->GetLocalRoot(), "objective");
+    const int tag_num = gameTaskXml.GetNodesNum(gameTaskXml.GetLocalRoot(), "objective");
     m_Objectives.clear();
     for (int i = 0; i < tag_num; i++)
     {
-        const XML_NODE l_root = g_gameTaskXml->NavigateToNode("objective", i);
-        g_gameTaskXml->SetLocalRoot(l_root);
+        const XML_NODE l_root = gameTaskXml.NavigateToNode("objective", i);
+        gameTaskXml.SetLocalRoot(l_root);
 
         SGameTaskObjective& objective = (i == ROOT_TASK_OBJECTIVE)
                                         ? *this
                                         : m_Objectives.emplace_back(this, i);
 
         //.
-        pcstr tag_text = g_gameTaskXml->Read(l_root, "text", 0, nullptr);
+        pcstr tag_text = gameTaskXml.Read(l_root, "text", 0, nullptr);
         objective.m_Description = tag_text;
 
         //.
-        tag_text = g_gameTaskXml->Read(l_root, "article", 0, nullptr);
+        tag_text = gameTaskXml.Read(l_root, "article", 0, nullptr);
         if (tag_text)
             objective.m_article_id = tag_text;
 
         //.
-        tag_text = g_gameTaskXml->ReadAttrib(l_root, "key", nullptr);
+        tag_text = gameTaskXml.ReadAttrib(l_root, "key", nullptr);
         if (tag_text)
             objective.m_article_key = tag_text;
 
         //.
         if (i == ROOT_TASK_OBJECTIVE)
         {
-            objective.m_icon_texture_name = g_gameTaskXml->Read(g_gameTaskXml->GetLocalRoot(), "icon", 0, nullptr);
+            objective.m_icon_texture_name = gameTaskXml.Read(gameTaskXml.GetLocalRoot(), "icon", 0, nullptr);
             if (objective.m_icon_texture_name.size() &&
                 0 != xr_stricmp(*objective.m_icon_texture_name, "ui\\ui_icons_task"))
             {
@@ -141,19 +136,19 @@ void CGameTask::Load(const TASK_ID& id)
             }
             else if (objective.m_icon_texture_name.size())
             {
-                objective.m_icon_rect.x1 = g_gameTaskXml->ReadAttribFlt(l_root, "icon", 0, "x");
-                objective.m_icon_rect.y1 = g_gameTaskXml->ReadAttribFlt(l_root, "icon", 0, "y");
-                objective.m_icon_rect.x2 = g_gameTaskXml->ReadAttribFlt(l_root, "icon", 0, "width");
-                objective.m_icon_rect.y2 = g_gameTaskXml->ReadAttribFlt(l_root, "icon", 0, "height");
+                objective.m_icon_rect.x1 = gameTaskXml.ReadAttribFlt(l_root, "icon", 0, "x");
+                objective.m_icon_rect.y1 = gameTaskXml.ReadAttribFlt(l_root, "icon", 0, "y");
+                objective.m_icon_rect.x2 = gameTaskXml.ReadAttribFlt(l_root, "icon", 0, "width");
+                objective.m_icon_rect.y2 = gameTaskXml.ReadAttribFlt(l_root, "icon", 0, "height");
             }
         }
         //.
-        objective.m_map_location = g_gameTaskXml->Read(l_root, "map_location_type", 0, nullptr);
+        objective.m_map_location = gameTaskXml.Read(l_root, "map_location_type", 0, nullptr);
 
-        cpcstr object_story_id = g_gameTaskXml->Read(l_root, "object_story_id", 0, nullptr);
+        cpcstr object_story_id = gameTaskXml.Read(l_root, "object_story_id", 0, nullptr);
 
         //*
-        objective.m_def_location_enabled = !g_gameTaskXml->ReadInt(l_root, "map_location_hidden", 0, 0);
+        objective.m_def_location_enabled = !gameTaskXml.ReadInt(l_root, "map_location_hidden", 0, 0);
 
         [[maybe_unused]] const bool b1 = (0 == objective.m_map_location.size());
         [[maybe_unused]] const bool b2 = (nullptr == object_story_id);
@@ -164,7 +159,7 @@ void CGameTask::Load(const TASK_ID& id)
         objective.m_map_object_id = u16(-1);
 
         //.
-        objective.m_map_hint = g_gameTaskXml->ReadAttrib(l_root, "map_location_type", 0, "hint", nullptr);
+        objective.m_map_hint = gameTaskXml.ReadAttrib(l_root, "map_location_type", 0, "hint", nullptr);
 
         if (object_story_id)
         {
@@ -174,53 +169,53 @@ void CGameTask::Load(const TASK_ID& id)
 
         //------infoportion_complete
         {
-            const int info_num = g_gameTaskXml->GetNodesNum(l_root, "infoportion_complete");
+            const int info_num = gameTaskXml.GetNodesNum(l_root, "infoportion_complete");
             objective.m_completeInfos.resize(info_num);
 
             for (int j = 0; j < info_num; ++j)
             {
-                objective.m_completeInfos[j] = g_gameTaskXml->Read(l_root, "infoportion_complete", j, nullptr);
+                objective.m_completeInfos[j] = gameTaskXml.Read(l_root, "infoportion_complete", j, nullptr);
             }
         }
 
         //------infoportion_fail
         {
-            const int info_num = g_gameTaskXml->GetNodesNum(l_root, "infoportion_fail");
+            const int info_num = gameTaskXml.GetNodesNum(l_root, "infoportion_fail");
             objective.m_failInfos.resize(info_num);
 
             for (int j = 0; j < info_num; ++j)
             {
-                objective.m_failInfos[j] = g_gameTaskXml->Read(l_root, "infoportion_fail", j, nullptr);
+                objective.m_failInfos[j] = gameTaskXml.Read(l_root, "infoportion_fail", j, nullptr);
             }
         }
 
         //------infoportion_set_complete
         {
-            const int info_num = g_gameTaskXml->GetNodesNum(l_root, "infoportion_set_complete");
+            const int info_num = gameTaskXml.GetNodesNum(l_root, "infoportion_set_complete");
             objective.m_infos_on_complete.resize(info_num);
             for (int j = 0; j < info_num; ++j)
             {
-                objective.m_infos_on_complete[j] = g_gameTaskXml->Read(l_root, "infoportion_set_complete", j, nullptr);
+                objective.m_infos_on_complete[j] = gameTaskXml.Read(l_root, "infoportion_set_complete", j, nullptr);
             }
         }
 
         //------infoportion_set_fail
         {
-            const int info_num = g_gameTaskXml->GetNodesNum(l_root, "infoportion_set_fail");
+            const int info_num = gameTaskXml.GetNodesNum(l_root, "infoportion_set_fail");
             objective.m_infos_on_fail.resize(info_num);
             for (int j = 0; j < info_num; ++j)
             {
-                objective.m_infos_on_fail[j] = g_gameTaskXml->Read(l_root, "infoportion_set_fail", j, nullptr);
+                objective.m_infos_on_fail[j] = gameTaskXml.Read(l_root, "infoportion_set_fail", j, nullptr);
             }
         }
 
         //------function_complete
         {
-            const int info_num = g_gameTaskXml->GetNodesNum(l_root, "function_complete");
+            const int info_num = gameTaskXml.GetNodesNum(l_root, "function_complete");
             objective.m_complete_lua_functions.resize(info_num);
             for (int j = 0; j < info_num; ++j)
             {
-                cpcstr str = g_gameTaskXml->Read(l_root, "function_complete", j, nullptr);
+                cpcstr str = gameTaskXml.Read(l_root, "function_complete", j, nullptr);
                 [[maybe_unused]] const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_complete_lua_functions[j]);
                 THROW3(functor_exists, "Cannot find script function described in task objective  ", str);
             }
@@ -228,11 +223,11 @@ void CGameTask::Load(const TASK_ID& id)
 
         //------function_fail
         {
-            const int info_num = g_gameTaskXml->GetNodesNum(l_root, "function_fail");
+            const int info_num = gameTaskXml.GetNodesNum(l_root, "function_fail");
             objective.m_fail_lua_functions.resize(info_num);
             for (int j = 0; j < info_num; ++j)
             {
-                cpcstr str = g_gameTaskXml->Read(l_root, "function_fail", j, nullptr);
+                cpcstr str = gameTaskXml.Read(l_root, "function_fail", j, nullptr);
                 [[maybe_unused]] const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_fail_lua_functions[j]);
                 THROW3(functor_exists, "Cannot find script function described in task objective  ", str);
             }
@@ -240,11 +235,11 @@ void CGameTask::Load(const TASK_ID& id)
 
         //------function_on_complete
         {
-            const int info_num = g_gameTaskXml->GetNodesNum(l_root, "function_call_complete");
+            const int info_num = gameTaskXml.GetNodesNum(l_root, "function_call_complete");
             objective.m_lua_functions_on_complete.resize(info_num);
             for (int i = 0; i < info_num; ++i)
             {
-                cpcstr str = g_gameTaskXml->Read(l_root, "function_call_complete", i, nullptr);
+                cpcstr str = gameTaskXml.Read(l_root, "function_call_complete", i, nullptr);
                 [[maybe_unused]] const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_lua_functions_on_complete[i]);
                 THROW3(functor_exists, "Cannot find script function described in task objective  ", str);
             }
@@ -252,19 +247,19 @@ void CGameTask::Load(const TASK_ID& id)
 
         //------function_on_fail
         {
-            const int info_num = g_gameTaskXml->GetNodesNum(l_root, "function_call_fail");
+            const int info_num = gameTaskXml.GetNodesNum(l_root, "function_call_fail");
             objective.m_lua_functions_on_fail.resize(info_num);
             for (int j = 0; j < info_num; ++j)
             {
-                cpcstr str = g_gameTaskXml->Read(l_root, "function_call_fail", j, nullptr);
+                cpcstr str = gameTaskXml.Read(l_root, "function_call_fail", j, nullptr);
                 [[maybe_unused]] const bool functor_exists = GEnv.ScriptEngine->functor(str, objective.m_lua_functions_on_fail[j]);
                 THROW3(functor_exists, "Cannot find script function described in task objective  ", str);
             }
         }
 
-        g_gameTaskXml->SetLocalRoot(task_node);
+        gameTaskXml.SetLocalRoot(task_node);
     }
-    g_gameTaskXml->SetLocalRoot(g_gameTaskXml->GetRoot());
+    gameTaskXml.SetLocalRoot(gameTaskXml.GetRoot());
 }
 
 void SGameTaskObjective::SetTaskState(ETaskState state)
