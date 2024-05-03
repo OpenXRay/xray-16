@@ -201,6 +201,16 @@ bool XMLDocument::Set(pcstr text, bool fatal)
     return true;
 }
 
+bool XMLDocument::IsErrored() const
+{
+    return m_Doc.Error();
+}
+
+pcstr XMLDocument::GetErrorDesc() const
+{
+    return m_Doc.ErrorDesc();
+}
+
 XML_NODE XMLDocument::NavigateToNode(CONST_XML_NODE start_node, pcstr path, const size_t node_index) const
 {
     R_ASSERT3(start_node && path, "NavigateToNode failed in XML file ", m_xml_file_name);

@@ -34,6 +34,9 @@ public:
     // Set XML directly. Doesn't support #include directive
     bool Set(pcstr text, bool fatal = true);
 
+    bool IsErrored() const;
+    pcstr GetErrorDesc() const;
+
     //чтение элементов
     pcstr Read(pcstr path, const size_t index, pcstr default_str_val) const;
     pcstr Read(CONST_XML_NODE start_node, pcstr path, const size_t index, pcstr default_str_val) const;
