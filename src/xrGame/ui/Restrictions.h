@@ -13,8 +13,8 @@ typedef struct
 class CRestrictions
 {
 public:
-    CRestrictions();
-    ~CRestrictions();
+    CRestrictions() = default;
+    ~CRestrictions() = default;
 
     void InitGroups();
     const u32 GetRank() const { return m_rank; }
@@ -38,8 +38,8 @@ private:
     void AddRestriction4rank(u32 rank, const shared_str& lst);
     RESTR GetRestr(const shared_str& item);
 
-    u32 m_rank;
-    bool m_bInited;
+    u32 m_rank{};
+    bool m_bInited{};
 
     using group_items = xr_vector<shared_str>;
     using Groups = xr_map<shared_str, group_items>;

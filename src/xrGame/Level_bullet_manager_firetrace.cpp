@@ -364,7 +364,7 @@ void CBulletManager::DynamicObjectHit(CBulletManager::_event& E)
 }
 
 #ifdef DEBUG
-xr_vector<Fvector> g_hit[3]; // XXX: can cause crash on launch (if build statically) and exit
+xr_vector<Fvector> g_hit[3];
 #endif
 
 extern void random_dir(Fvector& tgt_dir, const Fvector& src_dir, float dispersion);

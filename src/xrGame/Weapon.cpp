@@ -31,6 +31,10 @@
 #define WEAPON_REMOVE_TIME 60000
 #define ROTATION_TIME 0.25f
 
+constexpr pcstr WPN_SCOPE = "wpn_scope";
+constexpr pcstr WPN_SILENCER = "wpn_silencer";
+constexpr pcstr WPN_GRENADE_LAUNCHER = "wpn_launcher";
+
 BOOL b_toggle_weapon_aim = FALSE;
 
 static class CUIWpnScopeXmlManager : public pureUIReset, public pureAppEnd
@@ -1278,12 +1282,15 @@ bool CWeapon::IsSilencerAttached() const
 bool CWeapon::GrenadeLauncherAttachable() { return (ALife::eAddonAttachable == m_eGrenadeLauncherStatus); }
 bool CWeapon::ScopeAttachable() { return (ALife::eAddonAttachable == m_eScopeStatus); }
 bool CWeapon::SilencerAttachable() { return (ALife::eAddonAttachable == m_eSilencerStatus); }
-shared_str wpn_scope = "wpn_scope";
-shared_str wpn_silencer = "wpn_silencer";
-shared_str wpn_grenade_launcher = "wpn_launcher";
+
 
 void CWeapon::UpdateHUDAddonsVisibility()
-{ // actor only
+{
+    static shared_str wpn_scope = WPN_SCOPE;
+    static shared_str wpn_silencer = WPN_SILENCER;
+    static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
+
+    // actor only
     if (!GetHUDmode())
         return;
 
@@ -1326,6 +1333,10 @@ void CWeapon::UpdateHUDAddonsVisibility()
 
 void CWeapon::UpdateAddonsVisibility()
 {
+    static shared_str wpn_scope = WPN_SCOPE;
+    static shared_str wpn_silencer = WPN_SILENCER;
+    static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
+
     IKinematics* pWeaponVisual = smart_cast<IKinematics*>(Visual());
     R_ASSERT(pWeaponVisual);
 

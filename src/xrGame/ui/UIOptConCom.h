@@ -2,12 +2,12 @@
 
 class CUIOptConCom
 {
-private:
-    string64 reinforcementType;
+    string64 reinforcementType{};
 
 public:
+    CUIOptConCom() = default;
+
     void Init();
-    CUIOptConCom();
 
 protected:
     enum
@@ -25,14 +25,14 @@ protected:
         fl_wo_ff = (1 << 4),
         fl_listen = (1 << 5),
     };
-    int m_iMaxPlayers;
-    Flags32 m_uNetSrvParams;
-    Flags32 m_uNetFilter;
-    u32 m_curGameMode;
-    string64 m_playerName;
-    string64 m_serverName;
-    int m_iNetConSpectator;
-    float m_fNetWeatherRate;
+    int m_iMaxPlayers{};
+    Flags32 m_uNetSrvParams{};
+    Flags32 m_uNetFilter{};
+    u32 m_curGameMode{};
+    string64 m_playerName{};
+    string64 m_serverName{};
+    int m_iNetConSpectator{};
+    float m_fNetWeatherRate{};
 
     void ReadPlayerNameFromRegistry();
     void WritePlayerNameToRegistry();
