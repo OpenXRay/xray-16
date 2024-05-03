@@ -4,27 +4,36 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+
 #include "EngineAPI.h"
 #include "XR_IOConsole.h"
 
-#include "xrCore/ModuleLookup.hpp"
 #include "xrCore/xr_token.h"
+#include "xrCore/ModuleLookup.hpp"
 #include "xrCore/Threading/ParallelForEach.hpp"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
+
+#include <array>
 
 extern xr_vector<xr_token> VidQualityToken;
 
 constexpr pcstr GET_RENDERER_MODULE_FUNC = "GetRendererModule";
 
-constexpr pcstr r4_library     = "xrRender_R4";
-constexpr pcstr gl_library     = "xrRender_GL";
+using GetRendererModule = RendererModule*();
 
-constexpr pcstr RENDER_LIBRARIES[] =
+struct RendererDesc
 {
-    r4_library,
-    gl_library
+    pcstr libraryName;
+    XRay::Module handle;
+    RendererModule* module;
 };
+
+std::array<RendererDesc, 2> g_render_modules =
+{{
+    { "xrRender_R4", nullptr, nullptr },
+    { "xrRender_GL", nullptr, nullptr },
+}};
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -99,56 +108,40 @@ void CEngineAPI::SelectRenderer()
     Log("Selected renderer:", selected_mode);
 }
 
-void CEngineAPI::Initialize(void)
+void CEngineAPI::Initialize(GameModule* game)
 {
     ZoneScoped;
 
     SelectRenderer();
 
-    hGame = XRay::LoadModule("xrGame");
     if (!CanSkipGameModuleLoading())
     {
-        R_ASSERT2(hGame->IsLoaded(), "! Game DLL raised exception during loading or there is no game DLL at all");
-
-        pCreate = (Factory_Create*)hGame->GetProcAddress("xrFactory_Create");
+        gameModule = game;
+        gameModule->initialize(pCreate, pDestroy);
         R_ASSERT(pCreate);
-
-        pDestroy = (Factory_Destroy*)hGame->GetProcAddress("xrFactory_Destroy");
         R_ASSERT(pDestroy);
-
-        pInitializeGame = (InitializeGameLibraryProc)hGame->GetProcAddress("initialize_library");
-        R_ASSERT(pInitializeGame);
-
-        pFinalizeGame = (FinalizeGameLibraryProc)hGame->GetProcAddress("finalize_library");
-        R_ASSERT(pFinalizeGame);
-
-        pInitializeGame();
     }
 
     CloseUnusedLibraries();
 }
 
-void CEngineAPI::Destroy(void)
+void CEngineAPI::Destroy()
 {
     ZoneScoped;
-    if (pFinalizeGame)
-        pFinalizeGame();
 
-    pInitializeGame = nullptr;
-    pFinalizeGame = nullptr;
+    if (gameModule)
+        gameModule->finalize();
+
     pCreate = nullptr;
     pDestroy = nullptr;
 
-    hGame = nullptr;
-
-    renderers.clear();
     XRC.r_clear_compact();
 }
 
 void CEngineAPI::CloseUnusedLibraries()
 {
     ZoneScoped;
-    for (RendererDesc& desc : renderers)
+    for (RendererDesc& desc : g_render_modules)
     {
         if (desc.module != selectedRenderer)
             desc.handle = nullptr;
@@ -162,35 +155,29 @@ void CEngineAPI::CreateRendererList()
 
     ZoneScoped;
 
-    const auto loadLibrary = [&](pcstr library) -> bool
+    const auto loadLibrary = [&](RendererDesc& desc) -> bool
     {
-        auto handle = XRay::LoadModule(library);
+        auto handle = XRay::LoadModule(desc.libraryName);
         if (!handle->IsLoaded())
             return false;
 
-        const auto getModule = (GetRendererModule)handle->GetProcAddress(GET_RENDERER_MODULE_FUNC);
+        const auto getModule = reinterpret_cast<GetRendererModule*>(handle->GetProcAddress(GET_RENDERER_MODULE_FUNC));
         RendererModule* module = getModule ? getModule() : nullptr;
         if (!module)
             return false;
 
-        renderers.emplace_back(RendererDesc({ library, std::move(handle), module }));
+        desc.handle = std::move(handle);
+        desc.module = module;
         return true;
     };
 
     if (GEnv.isDedicatedServer)
     {
-#if defined(XR_PLATFORM_WINDOWS)
-        R_ASSERT2(loadLibrary(r4_library), "Dedicated server needs xrRender_R1 to work");
-#else
-        R_ASSERT2(loadLibrary(gl_library), "Dedicated server needs xrRender_GL to work");
-#endif
+        R_ASSERT2(loadLibrary(g_render_modules[0]), "Dedicated server needs xrRender to work");
     }
     else
     {
-        for (cpcstr library : RENDER_LIBRARIES)
-        {
-            loadLibrary(library);
-        }
+        std::for_each(std::begin(g_render_modules), std::end(g_render_modules), loadLibrary);
     }
 
     std::mutex mutex;
@@ -221,7 +208,7 @@ void CEngineAPI::CreateRendererList()
         }
     };
 
-    xr_parallel_for_each(renderers, obtainModes);
+    xr_parallel_for_each(g_render_modules, obtainModes);
 
     auto& modes = VidQualityToken;
     Msg("Available render modes[%d]:", modes.size());

@@ -21,6 +21,7 @@ target_link_libraries(xr_3da
     xrCore
     xrAPI
     xrEngine
+    xrGame
 )
 
 set_target_properties(xr_3da PROPERTIES

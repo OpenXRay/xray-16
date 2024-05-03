@@ -3,7 +3,7 @@
 
 #include <mutex>
 
-#include "xrCore/Threading/Event.hpp"
+#include "xrEngine/Engine.h"
 
 struct SDL_Window;
 struct SDL_Surface;
@@ -36,7 +36,7 @@ private:
 
 public:
     // Other
-    CApplication(pcstr commandLine);
+    CApplication(pcstr commandLine, GameModule* game);
     ~CApplication();
 
     int Run();

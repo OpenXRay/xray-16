@@ -61,7 +61,7 @@ void CheckAndSetupRenderer()
 
 extern void msCreate(pcstr name);
 
-void CEngine::Initialize(void)
+void CEngine::Initialize(GameModule* game)
 {
     ZoneScoped;
 #ifdef DEBUG
@@ -77,7 +77,7 @@ void CEngine::Initialize(void)
 
     CheckAndSetupRenderer();
 
-    External.Initialize();
+    External.Initialize(game);
     Sheduler.Initialize();
 }
 

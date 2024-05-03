@@ -1682,6 +1682,7 @@ target_sources(xrGame PRIVATE
     xrClientsPool.cpp
     xrClientsPool.h
     xrGame.cpp
+    xrGame.h
     xrgame_dll_detach.cpp
     xrGameSpy_GameSpyFuncs.cpp
     xrGameSpyServer_callbacks.cpp

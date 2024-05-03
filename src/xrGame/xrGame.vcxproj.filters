@@ -6501,6 +6501,9 @@
     <ClInclude Include="ui\UIMapFilters.h">
       <Filter>UI\Common\PDA\Tasks</Filter>
     </ClInclude>
+    <ClInclude Include="xrGame.h">
+      <Filter>Core\Server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">

@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
+#include "xrGame.h"
 
 #include "object_factory.h"
 
@@ -15,6 +16,8 @@
 
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "xrUICore/ui_styles.h"
+
+xrGameModule xrGame;
 
 void CCC_RegisterCommands();
 
@@ -35,10 +38,14 @@ XR_EXPORT IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid)
 }
 
 XR_EXPORT void __cdecl xrFactory_Destroy(IFactoryObject* O) { xr_delete(O); }
+}
 
-XR_EXPORT void initialize_library()
+void xrGameModule::initialize(Factory_Create*& pCreate, Factory_Destroy*& pDestroy)
 {
     ZoneScoped;
+
+    pCreate = &xrFactory_Create;
+    pDestroy = &xrFactory_Destroy;
 
     g_fTimeFactor = pSettings->r_float("alife", "time_factor"); // XXX: find a better place
 
@@ -67,7 +74,7 @@ XR_EXPORT void initialize_library()
     ImGui::SetCurrentContext(Device.GetImGuiContext());
 }
 
-XR_EXPORT void finalize_library()
+void xrGameModule::finalize()
 {
     xr_delete(UIStyles);
     StringTable().Destroy();
@@ -76,5 +83,4 @@ XR_EXPORT void finalize_library()
 #ifdef DEBUG
     xr_delete(g_profiler);
 #endif
-}
 }

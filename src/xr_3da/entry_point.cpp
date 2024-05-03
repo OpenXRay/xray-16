@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "xrEngine/x_ray.h"
+#include "xrGame/xrGame.h"
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <unistd.h>
@@ -24,7 +25,7 @@ int entry_point(pcstr commandLine)
     if (strstr(commandLine, "-dedicated"))
         GEnv.isDedicatedServer = true;
 
-    CApplication app{ commandLine };
+    CApplication app{ commandLine, &xrGame };
 
     return app.Run();
 }

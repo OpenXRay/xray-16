@@ -219,7 +219,7 @@ void execUserScript()
 constexpr pcstr APPLICATION_STARTUP = "Application startup";
 constexpr pcstr APPLICATION_SHUTDOWN = "Application shutdown";
 
-CApplication::CApplication(pcstr commandLine)
+CApplication::CApplication(pcstr commandLine, GameModule* game)
 {
     Threading::SetCurrentThreadName("Primary thread");
     FrameMarkStart(APPLICATION_STARTUP);
@@ -319,7 +319,7 @@ CApplication::CApplication(pcstr commandLine)
     InitConsole();
 
     TaskScheduler->Wait(createRendererList);
-    Engine.Initialize();
+    Engine.Initialize(game);
     Device.Initialize();
 
     Console->OnDeviceInitialize();
