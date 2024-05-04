@@ -19,7 +19,6 @@
 // client entities includes
 #ifndef NO_XR_GAME
 #include "xrEngine/std_classes.h"
-#include "Level.h"
 #include "GamePersistent.h"
 #include "Actor.h"
 #include "Spectator.h"

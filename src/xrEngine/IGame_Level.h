@@ -52,8 +52,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------------------------------------
-class ENGINE_API IGame_Level : public FactoryObjectBase,
-                               public IInputReceiver,
+class ENGINE_API IGame_Level : public IInputReceiver,
                                public pureRender,
                                public pureFrame,
                                public IEventReceiver
