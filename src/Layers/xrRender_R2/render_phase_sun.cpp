@@ -316,7 +316,7 @@ void render_sun::render()
         for (u32 cascade_ind = range.begin(); cascade_ind != range.end(); ++cascade_ind)
         {
 #if defined(USE_DX11)
-            TracyD3D11Zone(HW.profiler_ctx, "render_sun::render_cascade");
+            //TracyD3D11Zone(HW.profiler_ctx, "render_sun::render_cascade");
 #endif
 
             auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
@@ -399,7 +399,7 @@ void render_sun::flush()
 void render_sun::accumulate_cascade(u32 cascade_ind)
 {
 #if defined(USE_DX11)
-    TracyD3D11Zone(HW.profiler_ctx, "render_sun::accumulate_cascade");
+    //TracyD3D11Zone(HW.profiler_ctx, "render_sun::accumulate_cascade");
 #endif
 
     auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
