@@ -303,9 +303,6 @@
     <ClInclude Include="pure.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="std_classes.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="XR_IOConsole.h">
       <Filter>Engine\Console</Filter>
     </ClInclude>

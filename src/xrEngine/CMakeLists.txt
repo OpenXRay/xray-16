@@ -19,7 +19,6 @@ target_sources_grouped(
     Properties.h
     pure.cpp
     pure.h
-    std_classes.h
 )
 
 target_sources_grouped(

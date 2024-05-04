@@ -88,7 +88,6 @@
     <ClInclude Include="StatGraph.h" />
     <ClInclude Include="Stats.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="std_classes.h" />
     <ClInclude Include="StringTable\StringTable.h" />
     <ClInclude Include="Text_Console.h" />
     <ClInclude Include="thunderbolt.h" />

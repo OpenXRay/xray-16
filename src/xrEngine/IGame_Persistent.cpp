@@ -5,7 +5,6 @@
 #include "GameFont.h"
 #include "ILoadingScreen.h"
 #include "PerformanceAlert.hpp"
-#include "std_classes.h"
 #include "StringTable/StringTable.h"
 #include "xrScriptEngine/script_engine.hpp"
 
