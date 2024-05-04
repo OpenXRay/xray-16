@@ -22,10 +22,9 @@ XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress 
 
 int entry_point(pcstr commandLine)
 {
-    if (strstr(commandLine, "-dedicated"))
-        GEnv.isDedicatedServer = true;
+    auto* game = strstr(commandLine, "-nogame") ? nullptr : &xrGame;
 
-    CApplication app{ commandLine, &xrGame };
+    CApplication app{ commandLine, game };
 
     return app.Run();
 }

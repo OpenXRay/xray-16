@@ -114,7 +114,7 @@ void CEngineAPI::Initialize(GameModule* game)
 
     SelectRenderer();
 
-    if (!CanSkipGameModuleLoading())
+    if (game)
     {
         gameModule = game;
         gameModule->initialize(pCreate, pDestroy);

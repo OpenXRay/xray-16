@@ -57,7 +57,7 @@ class ENGINE_API CEngineAPI
 {
     xr_map<shared_str, RendererModule*> renderModes;
 
-    GameModule* gameModule;
+    GameModule* gameModule{};
     RendererModule* selectedRenderer{};
 
     void SelectRenderer();
@@ -74,8 +74,6 @@ public:
     void CreateRendererList();
     void Initialize(GameModule* game);
     void Destroy();
-
-    bool CanSkipGameModuleLoading() const { return !!strstr(Core.Params, "-nogame"); }
 };
 
 ENGINE_API bool is_enough_address_space_available();

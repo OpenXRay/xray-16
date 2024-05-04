@@ -224,6 +224,9 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
     Threading::SetCurrentThreadName("Primary thread");
     FrameMarkStart(APPLICATION_STARTUP);
 
+    if (strstr(commandLine, "-dedicated"))
+        GEnv.isDedicatedServer = true;
+
     xrDebug::Initialize(commandLine);
     {
         ZoneScopedN("SDL_Init");
@@ -355,8 +358,11 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
     Device.Create();
     TaskScheduler->Wait(createLightAnim);
 
-    g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
-    R_ASSERT(g_pGamePersistent || Engine.External.CanSkipGameModuleLoading());
+    if (game)
+    {
+        g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
+        R_ASSERT(g_pGamePersistent);
+    }
     if (!g_pGamePersistent)
         Console->Show();
 
