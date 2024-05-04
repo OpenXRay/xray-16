@@ -9,6 +9,7 @@
 #include "StdAfx.h"
 #include "xrGame.h"
 
+#include "GamePersistent.h"
 #include "object_factory.h"
 
 #include "xrEngine/xr_level_controller.h"
@@ -83,4 +84,15 @@ void xrGameModule::finalize()
 #ifdef DEBUG
     xr_delete(g_profiler);
 #endif
+}
+
+IGame_Persistent* xrGameModule::create_persistent()
+{
+    object_factory(); // XXX: remove this call
+    return xr_new<CGamePersistent>();
+}
+
+void xrGameModule::destroy_persistent(IGame_Persistent* persistent)
+{
+    xr_delete(persistent);
 }

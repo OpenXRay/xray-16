@@ -8,6 +8,8 @@
 #include "xrEngine/Engine.h"
 #include "xrCore/clsid.h"
 
+class IGame_Persistent;
+
 class XR_NOVTABLE IFactoryObject
 {
 public:
@@ -42,6 +44,8 @@ public:
     virtual ~GameModule() = default;
     virtual void initialize(Factory_Create*& pCreate, Factory_Destroy*& pDestroy) = 0;
     virtual void finalize() = 0;
+    virtual IGame_Persistent* create_persistent() = 0;
+    virtual void destroy_persistent(IGame_Persistent* persistent) = 0;
 };
 
 class XR_NOVTABLE RendererModule

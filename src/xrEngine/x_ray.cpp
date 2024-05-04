@@ -14,7 +14,6 @@
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrNetServer/NET_AuthCheck.h"
 
-#include "std_classes.h"
 #include "IGame_Persistent.h"
 #include "LightAnimLibrary.h"
 #include "XR_IOConsole.h"
@@ -360,7 +359,8 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
 
     if (game)
     {
-        g_pGamePersistent = dynamic_cast<IGame_Persistent*>(NEW_INSTANCE(CLSID_GAME_PERSISTANT));
+        m_game_module = game;
+        g_pGamePersistent = game->create_persistent();
         R_ASSERT(g_pGamePersistent);
     }
     if (!g_pGamePersistent)
@@ -374,7 +374,9 @@ CApplication::~CApplication()
     FrameMarkStart(APPLICATION_SHUTDOWN);
 
     // Destroy APP
-    DEL_INSTANCE(g_pGamePersistent);
+    if (m_game_module)
+        m_game_module->destroy_persistent(g_pGamePersistent);
+
     Engine.Event.Dump();
 
     // Destroying

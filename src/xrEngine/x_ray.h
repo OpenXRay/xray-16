@@ -27,6 +27,9 @@ private:
     discord::Core* m_discord_core{};
 
 private:
+    GameModule* m_game_module{};
+
+private:
     void SplashProc();
 
     void ShowSplash(bool topmost);

@@ -24,6 +24,8 @@ class xrGameModule final : public GameModule
 public:
     void initialize(Factory_Create*& pCreate, Factory_Destroy*& pDestroy) override;
     void finalize() override;
+    IGame_Persistent* create_persistent() override;
+    void destroy_persistent(IGame_Persistent* persistent) override;
 };
 
 extern XRGAME_API xrGameModule xrGame;
