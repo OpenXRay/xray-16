@@ -16,9 +16,9 @@ class xr_jpeg_error_mgr final : public jpeg_error_mgr
     jmp_buf setjmp_buffer; // for return to caller
 
 public:
-    xr_jpeg_error_mgr(jpeg_compress_struct& cinfo)
+    explicit xr_jpeg_error_mgr(jpeg_compress_struct& info)
     {
-        cinfo.err = jpeg_std_error(this);
+        info.err = jpeg_std_error(this);
         this->error_exit = on_error_exit;
     }
 
@@ -28,12 +28,12 @@ public:
     }
 
 private:
-    static void on_error_exit(j_common_ptr cinfo)
+    static void on_error_exit(j_common_ptr info)
     {
-        auto& self = *reinterpret_cast<xr_jpeg_error_mgr*>(cinfo->err);
+        auto& self = *reinterpret_cast<xr_jpeg_error_mgr*>(info->err);
 
         char buffer[JMSG_LENGTH_MAX];
-        self.format_message(cinfo, buffer);
+        self.format_message(info, buffer);
         Msg("! JPEG fail: %s", buffer);
 
         longjmp(self.setjmp_buffer, 1);
@@ -48,7 +48,7 @@ class xr_jpeg_destination_mgr final : public jpeg_destination_mgr
     IWriter& m_writer;
 
 public:
-    xr_jpeg_destination_mgr(jpeg_compress_struct& cinfo, IWriter& writer) : m_writer(writer)
+    xr_jpeg_destination_mgr(jpeg_compress_struct& info, IWriter& writer) : m_writer(writer)
     {
         next_output_byte = nullptr;
         free_in_buffer = 0;
@@ -57,20 +57,20 @@ public:
         empty_output_buffer = write_buffer;
         term_destination = finalize_destination;
 
-        cinfo.dest = this;
+        info.dest = this;
     }
 
 private:
-    static void initialize_destination(j_compress_ptr cinfo)
+    static void initialize_destination(j_compress_ptr info)
     {
-        auto& self = *reinterpret_cast<xr_jpeg_destination_mgr*>(cinfo->dest);
+        auto& self = *reinterpret_cast<xr_jpeg_destination_mgr*>(info->dest);
         self.next_output_byte = self.m_buffer;
         self.free_in_buffer = OUT_BUFFER_SIZE;
     }
 
-    static boolean write_buffer(j_compress_ptr cinfo)
+    static boolean write_buffer(j_compress_ptr info)
     {
-        auto& self = *reinterpret_cast<xr_jpeg_destination_mgr*>(cinfo->dest);
+        auto& self = *reinterpret_cast<xr_jpeg_destination_mgr*>(info->dest);
 
         self.m_writer.w(self.m_buffer, OUT_BUFFER_SIZE);
 
@@ -80,9 +80,9 @@ private:
         return TRUE;
     }
 
-    static void finalize_destination(j_compress_ptr cinfo)
+    static void finalize_destination(j_compress_ptr info)
     {
-        auto& self = *reinterpret_cast<xr_jpeg_destination_mgr*>(cinfo->dest);
+        const auto& self = *reinterpret_cast<xr_jpeg_destination_mgr*>(info->dest);
 
         const size_t data_left = OUT_BUFFER_SIZE - self.free_in_buffer;
 
@@ -106,47 +106,47 @@ bool Image::SaveJPEG(IWriter& writer, int quality, bool invert /*= false*/)
     }
 
 #ifdef JPEGLIB_H
-    jpeg_compress_struct cinfo;
-    xr_jpeg_error_mgr jerr(cinfo);
+    jpeg_compress_struct info;
+    xr_jpeg_error_mgr jerr(info);
 
     // Setup error handling
     if (setjmp(jerr.get_jmp_buffer()))
     {
         // If we get here, the JPEG code has signaled an error.
-        jpeg_destroy_compress(&cinfo);
+        jpeg_destroy_compress(&info);
         return false;
     }
 
     /* Now we can initialize the JPEG compression object. */
-    jpeg_create_compress(&cinfo);
-    xr_jpeg_destination_mgr cdest(cinfo, writer);
+    jpeg_create_compress(&info);
+    xr_jpeg_destination_mgr cdest(info, writer);
     {
-        cinfo.image_width = width;
-        cinfo.image_height = height;
-        cinfo.input_components = 3;
-        cinfo.in_color_space = JCS_RGB;
+        info.image_width = width;
+        info.image_height = height;
+        info.input_components = 3;
+        info.in_color_space = JCS_RGB;
 
-        jpeg_set_defaults(&cinfo);
-        jpeg_set_quality(&cinfo, quality, TRUE);
+        jpeg_set_defaults(&info);
+        jpeg_set_quality(&info, quality, TRUE);
 
-        jpeg_start_compress(&cinfo, TRUE);
+        jpeg_start_compress(&info, TRUE);
         {
             JSAMPLE* image_data = static_cast<JSAMPLE*>(data);
             const auto row_stride = width * 3; /* JSAMPLEs per row in image_buffer */
 
-            while (cinfo.next_scanline < cinfo.image_height)
+            while (info.next_scanline < info.image_height)
             {
-                const auto scanline = invert ? cinfo.image_height - 1 - cinfo.next_scanline : cinfo.next_scanline;
+                const auto scanline = invert ? info.image_height - 1 - info.next_scanline : info.next_scanline;
                 auto row_pointer = &image_data[scanline * row_stride];
-                (void)jpeg_write_scanlines(&cinfo, &row_pointer, 1);
+                (void)jpeg_write_scanlines(&info, &row_pointer, 1);
             }
         }
-        jpeg_finish_compress(&cinfo);
+        jpeg_finish_compress(&info);
     }
-    jpeg_destroy_compress(&cinfo);
+    jpeg_destroy_compress(&info);
     return true;
 #else
-    Msg("~ %s: Engine was build without libjpeg.", __FUNCTION__);
+    Msg("~ %s: Engine was built without libjpeg.", __FUNCTION__);
     return false;
 #endif // JPEGLIB_H
 }
