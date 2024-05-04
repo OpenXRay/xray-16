@@ -1,9 +1,7 @@
 usr/lib/*/xrRender_GL.so
 usr/lib/*/xrCDB.so
-usr/lib/*/xrLuabind.so
 usr/lib/*/xrAICore.so
 usr/lib/*/xrAPI.so
-usr/lib/*/xrLuajit.so
 usr/lib/*/xrScriptEngine.so
 usr/lib/*/xrEngine.so
 usr/lib/*/xrCore.so
@@ -12,6 +10,9 @@ usr/lib/*/xrSound.so
 usr/lib/*/xrGame.so
 usr/lib/*/xrUICore.so
 usr/lib/*/xrParticles.so
+usr/lib/*/xrLuaJIT.so
+usr/lib/*/xrLuabind.so
+usr/lib/*/xrMaterialSystem.so
 usr/games/xr_3da
 usr/share/applications/openxray_cop.desktop
 usr/share/applications/openxray_soc.desktop
