@@ -425,8 +425,6 @@ int CApplication::Run()
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
-        ZoneScopedN("Main cycle");
-
         bool canCallActivate = false;
         bool shouldActivate = false;
 
