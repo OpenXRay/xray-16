@@ -89,8 +89,9 @@ private:
 public:
     xrDebug() = delete;
     static void Initialize(pcstr commandLine);
-    static void Destroy();
+    static void Finalize();
     static void OnThreadSpawn();
+    static void OnThreadExit();
     static void OnFilesystemInitialized();
 
     static bool DebuggerIsPresent();

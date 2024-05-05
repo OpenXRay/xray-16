@@ -32,8 +32,6 @@
 #   define USE_BUG_TRAP
 #   ifdef USE_BUG_TRAP
 #       include <BugTrap/source/Client/BugTrap.h>
-#   else
-#       include <exception>
 #   endif
 
 #   include "Debug/dxerr.h"
@@ -840,7 +838,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 
 #ifndef USE_BUG_TRAP
 [[noreturn]]
-void _terminate()
+void xr_terminate()
 {
 #if defined(XR_PLATFORM_WINDOWS)
     if (strstr(GetCommandLine(), "-silent_error_mode"))
@@ -890,50 +888,50 @@ static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* 
 }
 #endif
 
-#if defined(XR_PLATFORM_WINDOWS)
-static void pure_call_handler() { handler_base("pure virtual function call"); }
-#endif
-
-#ifdef XRAY_USE_EXCEPTIONS
-static void unexpected_handler() { handler_base("unexpected program termination"); }
-#endif
-
-static void abort_handler(int signal) { handler_base("application is aborting"); }
-static void floating_point_handler(int signal) { handler_base("floating point error"); }
-static void illegal_instruction_handler(int signal) { handler_base("illegal instruction"); }
-static void segmentation_fault_handler(int signal) { handler_base("segmentation fault"); }
-static void termination_handler(int signal) { handler_base("termination with exit code 3"); }
-
 void xrDebug::OnThreadSpawn()
 {
+    std::signal(SIGINT,  nullptr);
+    std::signal(SIGILL,  +[](int signal) { handler_base("illegal instruction"); });
+    std::signal(SIGFPE,  +[](int signal) { handler_base("floating point error"); });
+    std::signal(SIGSEGV, +[](int signal) { handler_base("segmentation fault"); });
+    std::signal(SIGABRT, +[](int signal) { handler_base("application is aborting"); });
+    std::signal(SIGTERM, +[](int signal) { handler_base("termination with exit code 3"); });
+
 #if defined(XR_PLATFORM_WINDOWS)
 #ifdef USE_BUG_TRAP
     BT_SetTerminate();
-#else
-    // std::set_terminate(_terminate);
 #endif
+    std::signal(SIGABRT_COMPAT, +[](int signal) { handler_base("application is aborting"); });
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
-    std::signal(SIGABRT, abort_handler);
-    std::signal(SIGABRT_COMPAT, abort_handler);
-    std::signal(SIGFPE, floating_point_handler);
-    std::signal(SIGILL, illegal_instruction_handler);
-    std::signal(SIGINT, 0);
-    std::signal(SIGTERM, termination_handler);
     _set_invalid_parameter_handler(&invalid_parameter_handler);
     _set_new_mode(1);
     _set_new_handler(&out_of_memory_handler);
-    _set_purecall_handler(&pure_call_handler);
-#if 0 // should be if we use exceptions
-    std::set_unexpected(_terminate);
+    _set_purecall_handler(+[] { handler_base("pure virtual function call"); });
+#else
+    std::set_terminate(xr_terminate);
 #endif
-#else //XR_PLATFORM_WINDOWS
-    std::signal(SIGABRT, abort_handler);
-    std::signal(SIGFPE, floating_point_handler);
-    std::signal(SIGILL, illegal_instruction_handler);
-    std::signal(SIGINT, 0);
-    std::signal(SIGTERM, termination_handler);
-    std::signal(SIGSEGV, segmentation_fault_handler);
+}
+
+void xrDebug::OnThreadExit()
+{
+    std::signal(SIGINT,  nullptr);
+    std::signal(SIGILL,  nullptr);
+    std::signal(SIGFPE,  nullptr);
+    std::signal(SIGSEGV, nullptr);
+    std::signal(SIGABRT, nullptr);
+    std::signal(SIGTERM, nullptr);
+
+#if defined(XR_PLATFORM_WINDOWS)
+    std::signal(SIGABRT_COMPAT, nullptr);
+    _set_abort_behavior(0, 0);
+    _set_invalid_parameter_handler(nullptr);
+    _set_new_mode(1);
+    _set_new_handler(nullptr);
+    _set_purecall_handler(nullptr);
+#else
+    std::set_terminate(nullptr);
 #endif
+
 }
 
 void xrDebug::Initialize(pcstr commandLine)
@@ -945,11 +943,21 @@ void xrDebug::Initialize(pcstr commandLine)
     SDL_SetAssertionHandler(SDLAssertionHandler, nullptr);
     // exception handler to all "unhandled" exceptions
 #if defined(XR_PLATFORM_WINDOWS)
-    PrevFilter = ::SetUnhandledExceptionFilter(UnhandledFilter);
+    PrevFilter = SetUnhandledExceptionFilter(UnhandledFilter);
 #endif
 #ifdef DEBUG
     ShowErrorMessage = true;
 #else
     ShowErrorMessage = commandLine ? !!strstr(commandLine, "-show_error_window") : false;
 #endif
+}
+
+void xrDebug::Finalize()
+{
+    OnThreadExit();
+    SDL_SetAssertionHandler(nullptr, nullptr);
+#if defined(XR_PLATFORM_WINDOWS)
+    SetUnhandledExceptionFilter(nullptr);
+#endif
+    ShowErrorMessage = false;
 }

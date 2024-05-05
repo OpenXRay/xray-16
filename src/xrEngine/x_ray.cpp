@@ -417,6 +417,8 @@ CApplication::~CApplication()
         ZoneScopedN("SDL_Quit");
         SDL_Quit();
     }
+
+    xrDebug::Finalize();
     FrameMarkEnd(APPLICATION_SHUTDOWN);
 }
 
