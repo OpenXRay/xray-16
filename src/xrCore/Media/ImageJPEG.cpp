@@ -22,6 +22,12 @@ public:
         this->error_exit = on_error_exit;
     }
 
+    explicit xr_jpeg_error_mgr(jpeg_decompress_struct& info)
+    {
+        info.err = jpeg_std_error(this);
+        this->error_exit = on_error_exit;
+    }
+
     auto get_jmp_buffer()
     {
         return setjmp_buffer;
@@ -94,6 +100,65 @@ private:
 };
 #endif // JPEGLIB_H
 
+bool Image::OpenJPEG(const IReader& reader)
+{
+    return OpenJPEG(static_cast<u8*>(reader.pointer()), static_cast<unsigned long>(reader.elapsed()));
+}
+
+bool Image::OpenJPEG(const u8* dataPtr, u32 dataSize)
+{
+#ifdef JPEGLIB_H
+    jpeg_decompress_struct info;
+    xr_jpeg_error_mgr jerr(info);
+
+    // Setup error handling
+    if (setjmp(jerr.get_jmp_buffer()))
+    {
+        // If we get here, the JPEG code has signaled an error.
+        jpeg_destroy_decompress(&info);
+        return false;
+    }
+
+    jpeg_create_decompress(&info);
+    {
+        jpeg_mem_src(&info, dataPtr, dataSize);
+        jpeg_read_header(&info, true);
+
+        width  = info.image_width;
+        height = info.image_height;
+        channelCount = info.num_components;
+
+        switch (channelCount)
+        {
+        case 3: format = ImageDataFormat::RGB8; break;
+        case 4: format = ImageDataFormat::RGBA8; break;
+        }
+
+        info.out_color_space = JCS_RGB;
+
+        jpeg_start_decompress(&info);
+        {
+            const auto size = width * height * channelCount;
+            data = xr_malloc(size);
+            ownsData = true;
+
+            JSAMPROW buf[1];
+
+            while (info.output_scanline < info.output_height)
+            {
+                buf[0] = JSAMPROW(&((u8*)data)[channelCount * info.output_width * info.output_scanline]);
+                jpeg_read_scanlines(&info, buf, 1);
+            }
+        }
+        jpeg_finish_decompress(&info);
+    }
+    jpeg_destroy_decompress(&info);
+    return true;
+#else
+    Msg("~ %s: Engine was built without libjpeg.", __FUNCTION__);
+    return false;
+#endif
+}
 
 bool Image::SaveJPEG(IWriter& writer, int quality, bool invert /*= false*/)
 {

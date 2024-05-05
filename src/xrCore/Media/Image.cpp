@@ -10,6 +10,12 @@ Image::Image(u32 w, u32 h, void* dataPtr, ImageDataFormat fmt)
       channelCount(format == ImageDataFormat::RGB8 ? 3 : 4),
       width(w), height(h), data(dataPtr) {}
 
+Image::~Image()
+{
+    if (ownsData)
+        xr_free(data);
+}
+
 void Image::SaveTGA(const char* name, ImageDataFormat format, bool align)
 {
     FILE* file = std::fopen(name, "wb");
