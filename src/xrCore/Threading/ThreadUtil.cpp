@@ -28,42 +28,45 @@ static int pthread_setname_np(pthread_t /*threadId*/, const char* name)
 namespace Threading
 {
 #if defined(XR_PLATFORM_WINDOWS)
-void SetThreadNameImpl(DWORD threadId, pcstr name)
+void SetThreadNameImpl(pcstr name)
 {
-    const DWORD MSVC_EXCEPTION = 0x406D1388;
+    string256 fullName;
+    strconcat(fullName, "X-Ray ", name);
 
-    struct SThreadNameInfo
+    using SetThreadDescriptionProc = decltype(&SetThreadDescription);
+    static auto kernelHandle = GetModuleHandleA("kernel32.dll");
+    static auto setThreadDescription = reinterpret_cast<SetThreadDescriptionProc>(GetProcAddress(kernelHandle, "SetThreadDescription"));
+
+    if (setThreadDescription)
     {
-        DWORD dwType;
-        LPCSTR szName;
-        DWORD dwThreadID;
-        DWORD dwFlags;
-    };
+        wchar_t buf[256];
+        mbstowcs(buf, fullName, 256);
 
-    constexpr char namePrefix[] = "X-Ray ";
-    constexpr auto namePrefixSize = std::size(namePrefix); // includes null-character intentionally
-    auto fullNameSize = xr_strlen(name) + namePrefixSize;
-    auto fullName = static_cast<pstr>(xr_alloca(fullNameSize));
-    strconcat(fullNameSize, fullName, namePrefix, name);
-
-    SThreadNameInfo info;
-    info.dwType = 0x1000;
-    info.szName = fullName;
-    info.dwThreadID = threadId;
-    info.dwFlags = 0;
-
-    __try
-    {
-        RaiseException(MSVC_EXCEPTION, 0, sizeof(info) / sizeof(DWORD), (ULONG_PTR*)&info);
+        setThreadDescription(GetCurrentThread(), buf);
     }
-    __except (EXCEPTION_CONTINUE_EXECUTION)
+    else __try
     {
+        constexpr DWORD MSVC_EXCEPTION = 0x406D1388;
+
+        struct SThreadNameInfo
+        {
+            DWORD  dwType{ 0x1000 };
+            LPCSTR szName{};
+            DWORD  dwThreadID{ DWORD(-1) };
+            DWORD  dwFlags{};
+        };
+
+        SThreadNameInfo info;
+        info.szName = fullName;
+
+        RaiseException(MSVC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
     }
+    __except (EXCEPTION_CONTINUE_EXECUTION) {}
 }
 
 void SetCurrentThreadName(cpcstr name)
 {
-    SetThreadNameImpl(-1, name);
+    SetThreadNameImpl(name);
 #ifdef TRACY_ENABLE
     tracy::SetThreadName(name);
 #endif
