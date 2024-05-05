@@ -313,8 +313,6 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
         xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
     }
 
-    FPU::m24r();
-
     Device.InitializeImGui();
     Device.FillVideoModes();
     TaskScheduler->Wait(inputTask);

@@ -53,7 +53,6 @@ bool CRenderDevice::RenderBegin()
     default: R_ASSERT(0);
     }
     GEnv.Render->Begin();
-    FPU::m24r();
     g_bRendering = true;
 
     return true;

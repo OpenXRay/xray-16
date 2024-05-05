@@ -1,36 +1,5 @@
 #include "stdafx.h"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#   include <float.h> // _controlfp
-#   if defined(_M_FP_PRECISE)
-#       pragma fenv_access(on)
-#   endif
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
-// XXX: check if these includes needed
-#include <pthread.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <chrono>
-#include <stdint.h>
-
-// It's reasonable to use special functions only if we have precision control.
-
-#   if __has_include(<fpu_control.h>) && defined(XR_ARCHITECTURE_X86)
-//  Check for _FPU_EXTENDED, _FPU_DOUBLE, _FPU_SINGLE macros availability here:
-//  https://elixir.bootlin.com/glibc/glibc-2.38.9000/A/ident/_FPU_SETCW
-#       include <fpu_control.h>
-#       define USE_GLIBC_FPU_CONTROL
-
-#   elif defined(XR_PLATFORM_FREEBSD)
-//  Check for fpsetprec availability
-#       include <ieeefp.h>
-#       define USE_BSD_FP
-#   endif
-
-#   include <cfenv>
-#   pragma STDC FENV_ACCESS on
-#endif
-
 #include <thread>
 #include <SDL.h>
 
@@ -38,154 +7,6 @@
 XRCORE_API Fmatrix Fidentity;
 XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
-
-/*
-Функции управления точностью вычислений с плавающей точкой.
-Более подробную информацию можно получить здесь:
-https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/control87-controlfp-control87-2
-Число 24, 53 и 64 - определяют ограничение точности в битах.
-Наличие 'r' - включает округление результатов.
-Реально в движке используются только m24r и m64r. И один раз m64 - возможно ошибка?
-*/
-namespace FPU
-{
-XRCORE_API void m24()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifdef XR_ARCHITECTURE_X86
-    _controlfp(_PC_24, MCW_PC);
-#   endif
-    _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(USE_GLIBC_FPU_CONTROL)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE;
-    _FPU_SETCW(fpu_cw);
-#elif defined(USE_BSD_FP)
-    fpsetround(FP_RZ);
-    fpsetprec(FP_PS);
-#else
-    std::fesetround(FE_TOWARDZERO);
-#endif
-}
-
-XRCORE_API void m24r()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifdef XR_ARCHITECTURE_X86
-    _controlfp(_PC_24, MCW_PC);
-#   endif
-    _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(USE_GLIBC_FPU_CONTROL)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE | _FPU_RC_NEAREST;
-    _FPU_SETCW(fpu_cw);
-#elif defined(USE_BSD_FP)
-    fpsetround(FP_RN);
-    fpsetprec(FP_PS);
-#else
-    std::fesetround(FE_TONEAREST);
-#endif
-}
-
-XRCORE_API void m53()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifdef XR_ARCHITECTURE_X86
-    _controlfp(_PC_53, MCW_PC);
-#   endif
-    _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(USE_GLIBC_FPU_CONTROL)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE;
-    _FPU_SETCW(fpu_cw);
-#elif defined(USE_BSD_FP)
-    fpsetround(FP_RZ);
-    fpsetprec(FP_PD);
-#else
-    std::fesetround(FE_TOWARDZERO);
-#endif
-}
-
-XRCORE_API void m53r()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifdef XR_ARCHITECTURE_X86
-    _controlfp(_PC_53, MCW_PC);
-#   endif
-    _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(USE_GLIBC_FPU_CONTROL)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE | _FPU_RC_NEAREST;
-    _FPU_SETCW(fpu_cw);
-#elif defined(USE_BSD_FP)
-    fpsetround(FP_RN);
-    fpsetprec(FP_PD);
-#else
-    std::fesetround(FE_TONEAREST);
-#endif
-}
-
-XRCORE_API void m64()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifdef XR_ARCHITECTURE_X86
-    _controlfp(_PC_64, MCW_PC);
-#   endif
-    _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(USE_GLIBC_FPU_CONTROL)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED;
-    _FPU_SETCW(fpu_cw);
-#elif defined(USE_BSD_FP)
-    fpsetround(FP_RZ);
-    fpsetprec(FP_PE);
-#else
-    std::fesetround(FE_TOWARDZERO);
-#endif
-}
-
-XRCORE_API void m64r()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#ifdef XR_ARCHITECTURE_X86
-    _controlfp(_PC_64, MCW_PC);
-#endif
-    _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(USE_GLIBC_FPU_CONTROL)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED | _FPU_RC_NEAREST;
-    _FPU_SETCW(fpu_cw);
-#elif defined(USE_BSD_FP)
-    fpsetround(FP_RN);
-    fpsetprec(FP_PE);
-#else
-    std::fesetround(FE_TONEAREST);
-#endif
-}
-
-void initialize()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-    _clearfp();
-#else
-    std::ignore = std::feclearexcept(FE_ALL_EXCEPT);
-#endif
-
-    // По-умолчанию для плагинов экспорта из 3D-редакторов включена высокая точность вычислений с плавающей точкой
-    if (Core.PluginMode)
-        m64r();
-    else
-        m24r();
-
-    ::Random.seed(u32(CPU::QPC() % (s64(1) << s32(32))));
-}
-};
 
 namespace CPU
 {
@@ -226,8 +47,6 @@ XRCORE_API u32 GetTicks()
     return SDL_GetTicks();
 }
 } // namespace CPU
-
-bool g_initialize_cpu_called = false;
 
 //------------------------------------------------------------------------------------
 void _initialize_cpu()
@@ -285,11 +104,11 @@ void _initialize_cpu()
     Log("");
     Fidentity.identity(); // Identity matrix
     Didentity.identity(); // Identity matrix
-    pvInitializeStatics(); // Lookup table for compressed normals
-    FPU::initialize();
-    _initialize_cpu_thread();
+    Random.seed(u32(CPU::QPC() % (s64(1) << s32(32))));
 
-    g_initialize_cpu_called = true;
+    pvInitializeStatics(); // Lookup table for compressed normals
+
+    _initialize_cpu_thread();
 }
 
 // per-thread initialization
@@ -306,12 +125,6 @@ extern void __cdecl _terminate();
 void _initialize_cpu_thread()
 {
     xrDebug::OnThreadSpawn();
-
-    // По-умолчанию для плагинов экспорта из 3D-редакторов включена высокая точность вычислений с плавающей точкой
-    if (Core.PluginMode)
-        FPU::m64r();
-    else
-        FPU::m24r();
 
     if (SDL_HasSSE())
     {

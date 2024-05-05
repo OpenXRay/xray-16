@@ -118,8 +118,6 @@ void render_sun::calculate()
     {
         cull_planes.clear();
 
-        FPU::m64r();
-
         //******************************* Need to be placed after cuboid built **************************
         // COP - 100 km away
         cull_COP[cascade_ind].mad(Device.vCameraPosition, sun->direction, -tweak_COP_initial_offs);
@@ -268,7 +266,6 @@ void render_sun::calculate()
         sun->X.D[cascade_ind].combine = cull_xform[cascade_ind];
 
         // full-xform
-        FPU::m24r();
     }
 
     const auto process_cascade = [&, this](const TaskRange<u32>& range)

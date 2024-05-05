@@ -316,7 +316,6 @@ void render_sun_old::render_sun() const
     Fvector3 cull_COP;
     Fmatrix cull_xform;
     {
-        FPU::m64r();
         // Lets begin from base frustum
         Fmatrix fullxform_inv;
         XMStoreFloat4x4((XMFLOAT4X4*)&fullxform_inv, ex_full_inverse);
@@ -376,7 +375,6 @@ void render_sun_old::render_sun() const
 
         // full-xform
         cull_xform.mul(mdir_Project, mdir_View);
-        FPU::m24r();
     }
 
     // Begin SMAP-render
@@ -421,7 +419,6 @@ void render_sun_old::render_sun() const
     float m_fTSM_Delta = ps_r2_sun_tsm_projection;
 
     // Compute REAL sheared xform based on receivers/casters information
-    FPU::m64r();
     if (_abs(m_fCosGamma) < 0.99f && ps_r2_ls_flags.test(R2FLAG_SUN_TSM))
     {
         //  get the near and the far plane (points) in eye space.
@@ -597,13 +594,10 @@ void render_sun_old::render_sun() const
     {
         m_LightViewProj = XMLoadFloat4x4((XMFLOAT4X4*)(&cull_xform));
     }
-    FPU::m24r();
 
     // perform "refit" or "focusing" on relevant
     if (ps_r2_ls_flags.test(R2FLAG_SUN_FOCUS))
     {
-        FPU::m64r();
-
         // create clipper
         DumbClipper view_clipper;
         Fmatrix xform;
@@ -688,7 +682,6 @@ void render_sun_old::render_sun() const
             -2.f * boxX / boxWidth, -2.f * boxY / boxHeight, 0.f, 1.f);
         m_LightViewProj = XMMatrixMultiply(m_LightViewProj, trapezoidUnitCube);
         // D3DXMatrixMultiply( &trapezoid_space, &trapezoid_space, &trapezoidUnitCube );
-        FPU::m24r();
     }
 
     // Finalize & Cleanup
@@ -757,7 +750,6 @@ void render_sun_old::render_sun_near()
     Fvector3 cull_COP;
     Fmatrix cull_xform;
     {
-        FPU::m64r();
         // Lets begin from base frustum
         Fmatrix fullxform_inv;
         XMStoreFloat4x4((XMFLOAT4X4*)&fullxform_inv, ex_full_inverse);
@@ -901,7 +893,6 @@ void render_sun_old::render_sun_near()
         sun->X.D[0].combine = cull_xform;
 
         // full-xform
-        FPU::m24r();
     }
 
     // Begin SMAP-render

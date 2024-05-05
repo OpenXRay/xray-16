@@ -68,10 +68,8 @@ void MODEL::build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, vo
         Threading::SpawnThread("CDB-construction", [&, this]
         {
             ScopeLock lock{ pcs };
-            FPU::m64r();
             build_internal(V, Vcnt, T, Tcnt, bc, bcp);
             status = S_READY;
-            FPU::m24r();
             // Msg("* xrCDB: cform build completed, memory usage: %d K", memory() / 1024);
         });
 

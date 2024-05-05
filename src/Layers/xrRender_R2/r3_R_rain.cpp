@@ -116,7 +116,6 @@ void render_rain::calculate()
     Fvector3 cull_COP;
     Fmatrix cull_xform;
     {
-        FPU::m64r();
         // Lets begin from base frustum
         Fmatrix fullxform_inv = ex_full_inverse;
 #ifdef _DEBUG
@@ -271,7 +270,6 @@ void render_rain::calculate()
         RainLight.X.D[0].maxY = limit;
 
         // full-xform
-        FPU::m24r();
     }
 
     // Begin SMAP-render
