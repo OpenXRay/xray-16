@@ -32,8 +32,7 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
 
         glReadPixels(0, 0, Device.dwWidth, Device.dwHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
 
-        Image img;
-        img.Create(u16(Device.dwWidth), u16(Device.dwHeight), pixels.data(), ImageDataFormat::RGB8);
+        Image img{ Device.dwWidth, Device.dwHeight, pixels.data(), ImageDataFormat::RGB8 };
         if (!img.SaveJPEG(*fs, 100, true))
             Log("! Failed to make a screenshot.");
 

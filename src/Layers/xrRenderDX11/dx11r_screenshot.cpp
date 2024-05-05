@@ -126,8 +126,7 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
 
         if (IWriter* fs = FS.w_open("$screenshots$", buf))
         {
-            XRay::Media::Image img;
-            img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, XRay::Media::ImageDataFormat::RGBA8);
+            XRay::Media::Image img{ Device.dwHeight, Device.dwHeight, data, XRay::Media::ImageDataFormat::RGBA8 };
             img.SaveTGA(*fs, true);
             FS.w_close(fs);
         }

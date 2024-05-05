@@ -5,15 +5,10 @@
 
 using namespace XRay::Media;
 
-Image& Image::Create(u16 width, u16 height, void* data, ImageDataFormat format)
-{
-    this->width = width;
-    this->height = height;
-    this->data = data;
-    this->format = format;
-    channelCount = format == ImageDataFormat::RGB8 ? 3 : 4;
-    return *this;
-}
+Image::Image(u32 w, u32 h, void* dataPtr, ImageDataFormat fmt)
+    : format(fmt),
+      channelCount(format == ImageDataFormat::RGB8 ? 3 : 4),
+      width(w), height(h), data(dataPtr) {}
 
 void Image::SaveTGA(const char* name, ImageDataFormat format, bool align)
 {

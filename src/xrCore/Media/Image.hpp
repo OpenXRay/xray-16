@@ -34,16 +34,16 @@ private:
     };
 #pragma pack(pop)
 
-    ImageDataFormat format;
-    int channelCount;
-    u16 width, height;
-    void* data;
+    ImageDataFormat format{};
+    int channelCount{};
+    u32 width{}, height{};
+    void* data{};
 
 public:
     Image() = default;
+    Image(u32 w, u32 h, void* dataPtr, ImageDataFormat fmt);
     ~Image() = default;
 
-    Image& Create(u16 width, u16 height, void* data, ImageDataFormat format);
 
     void SaveTGA(IWriter& writer, bool align);
     void SaveTGA(IWriter& writer, ImageDataFormat format, bool align);
