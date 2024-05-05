@@ -157,6 +157,9 @@ bool Image::SaveJPEG(IWriter& writer, int quality, bool invert /*= false*/)
     jpeg_destroy_compress(&info);
     return true;
 #else
+    std::ignore = writer;
+    std::ignore = invert;
+
     Msg("~ %s: Engine was built without libjpeg.", __FUNCTION__);
     return false;
 #endif // JPEGLIB_H
