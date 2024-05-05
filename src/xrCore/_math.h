@@ -5,7 +5,8 @@
 namespace CPU
 {
 XRCORE_API extern bool HasSSE;
-XRCORE_API extern bool HasSSE41;
+XRCORE_API extern bool HasSSE2;
+XRCORE_API extern bool HasSSE42;
 XRCORE_API extern bool HasAVX;
 XRCORE_API extern bool HasAVX2;
 XRCORE_API extern bool HasAVX512F;

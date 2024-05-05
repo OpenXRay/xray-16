@@ -11,7 +11,8 @@ XRCORE_API CRandom Random;
 namespace CPU
 {
 XRCORE_API bool HasSSE     = SDL_HasSSE();
-XRCORE_API bool HasSSE41   = SDL_HasSSE41();
+XRCORE_API bool HasSSE2    = SDL_HasSSE2();
+XRCORE_API bool HasSSE42   = SDL_HasSSE42();
 
 #if SDL_VERSION_ATLEAST(2, 0, 6)
 XRCORE_API bool HasAVX     = SDL_HasAVX();
@@ -75,10 +76,10 @@ void _initialize_cpu()
     listFeature("MMX",     SDL_HasMMX());
     listFeature("3DNow!",  SDL_Has3DNow());
     listFeature("SSE",     SDL_HasSSE());
-    listFeature("SSE2",    SDL_HasSSE2());
+    listFeature("SSE2",    CPU::HasSSE2);
     listFeature("SSE3",    SDL_HasSSE3());
     listFeature("SSE41",   SDL_HasSSE41());
-    listFeature("SSE42",   SDL_HasSSE42());
+    listFeature("SSE42",   CPU::HasSSE42);
     listFeature("AVX",     CPU::HasAVX);
     listFeature("AVX2",    CPU::HasAVX2);
     listFeature("AVX512F", CPU::HasAVX512F);
@@ -98,8 +99,6 @@ void _initialize_cpu()
 
     Msg("* CPU features: %s", features);
     Msg("* CPU threads: %d", std::thread::hardware_concurrency());
-
-    CPU::HasSSE = SDL_HasSSE(); // just in case, not sure if needed
 
     Log("");
     Fidentity.identity(); // Identity matrix
@@ -126,7 +125,7 @@ void _initialize_cpu_thread()
 {
     xrDebug::OnThreadSpawn();
 
-    if (SDL_HasSSE())
+    if (CPU::HasSSE)
     {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
