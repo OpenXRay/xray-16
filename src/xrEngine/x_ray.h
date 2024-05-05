@@ -35,6 +35,7 @@ private:
     void ShowSplash(bool topmost);
     void HideSplash();
 
+    void InitializeDiscord();
     void UpdateDiscordStatus();
 
 public:
