@@ -179,6 +179,10 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 
     if (0 == init_counter)
     {
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+        R_ASSERT2(CPU::HasSSE2, "Your CPU must support SSE2.");
+#endif
+
         PluginMode = plugin;
         if (commandLine)
             Params = xr_strdup(commandLine);
@@ -269,9 +273,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
         SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
-        R_ASSERT(SDL_HasSSE());
-#endif
         TaskScheduler = xr_make_unique<TaskManager>();
         // xrDebug::Initialize ();
 
