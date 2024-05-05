@@ -2600,7 +2600,6 @@ target_include_directories(xrGame
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/src/xrServerEntities"
-    "$<$<BOOL:${USE_CXIMAGE}>:${CMAKE_SOURCE_DIR}/Externals/cximage>"
     "${CMAKE_SOURCE_DIR}/Externals/GameSpy/src"
     "${CMAKE_SOURCE_DIR}/Externals/ode/include"
     "${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc"
@@ -2619,7 +2618,6 @@ target_link_libraries(xrGame
     xrUICore
     xrSound
     xrScriptEngine
-    $<$<BOOL:${USE_CXIMAGE}>:cximage>
     xrGameSpy
     xrCDB
     xrPhysics

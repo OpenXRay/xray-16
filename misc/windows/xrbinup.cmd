@@ -86,10 +86,6 @@ if %platform%==Win32 (
 if %platform%==Win64 (
   call :COPY_FILE amd_ags_x64.dll
 )
-rem CxImage is compiled as DLLs only in debug configuration
-if %cfg%==Debug (
-  call :COPY_FILE CxImage.dll
-)
 call :COPY_FILE LuaJIT.dll
 call :COPY_FILE luabind.dll
 call :COPY_FILE ODE.dll

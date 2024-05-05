@@ -6,11 +6,6 @@ endif()
 
 add_subdirectory(xrLuaFix)
 add_subdirectory(luabind)
-
-if (USE_CXIMAGE)
-    add_subdirectory(cximage)
-endif()
-
 add_subdirectory(GameSpy)
 add_subdirectory(OPCODE)
 add_subdirectory(ode)
