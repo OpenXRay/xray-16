@@ -279,14 +279,6 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
         ShowSplash(topmost);
     }
 
-    pcstr fsltx = "-fsltx ";
-    string_path fsgame = "";
-    if (strstr(commandLine, fsltx))
-    {
-        const size_t sz = xr_strlen(fsltx);
-        sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
-    }
-
     const auto& inputTask = TaskManager::AddTask([](Task&, void*)
     {
         const bool captureInput = !strstr(Core.Params, "-i");
@@ -302,6 +294,14 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
     {
         Engine.External.CreateRendererList();
     });
+
+    pcstr fsltx = "-fsltx ";
+    string_path fsgame = "";
+    if (strstr(commandLine, fsltx))
+    {
+        const size_t sz = xr_strlen(fsltx);
+        sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
+    }
 
     Core.Initialize("OpenXRay", commandLine, true, *fsgame ? fsgame : nullptr);
 
