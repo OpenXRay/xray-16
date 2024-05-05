@@ -92,7 +92,7 @@ IGame_Persistent* xrGameModule::create_persistent()
     return xr_new<CGamePersistent>();
 }
 
-void xrGameModule::destroy_persistent(IGame_Persistent* persistent)
+void xrGameModule::destroy_persistent(IGame_Persistent*& persistent)
 {
     xr_delete(persistent);
 }
