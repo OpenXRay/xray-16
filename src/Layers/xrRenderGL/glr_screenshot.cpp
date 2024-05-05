@@ -48,9 +48,3 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
         VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
     }
 }
-
-void CRender::ScreenshotAsyncEnd(CMemoryWriter &memory_writer)
-{
-    // TODO: OGL: Implement screenshot feature.
-    VERIFY(!"CRender::ScreenshotAsyncEnd not implemented.");
-}

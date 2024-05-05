@@ -525,9 +525,6 @@
     <ClCompile Include="gl_rendertarget_phase_combine.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\r__screenshot.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Blender</Filter>
     </ClCompile>

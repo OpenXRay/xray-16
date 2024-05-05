@@ -1202,6 +1202,8 @@ void xrServer::KickCheaters()
 
 void xrServer::MakeScreenshot(ClientID const& admin_id, ClientID const& cheater_id)
 {
+    Log("~ Server screenshot request is not supported.");
+    return;
     if ((cheater_id == SV_Client->ID) && GEnv.isDedicatedServer)
     {
         return;

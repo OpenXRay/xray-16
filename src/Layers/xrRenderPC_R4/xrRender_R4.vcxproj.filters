@@ -779,9 +779,6 @@
     <ClCompile Include="..\xrRender\r__pixel_calculator.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\r__screenshot.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\DetailManager.cpp">
       <Filter>Details</Filter>
     </ClCompile>

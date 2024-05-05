@@ -169,7 +169,6 @@ target_sources(xrRender_GL PRIVATE
     ../xrRender/r__occlusion.h
     ../xrRender/r__pixel_calculator.cpp
     ../xrRender/r__pixel_calculator.h
-    ../xrRender/r__screenshot.cpp
     ../xrRender/r__sector.cpp
     ../xrRender/r__sector.h
     ../xrRender/r__sector_detect.cpp

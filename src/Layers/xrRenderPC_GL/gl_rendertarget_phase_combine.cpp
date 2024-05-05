@@ -5,31 +5,6 @@
 
 #define STENCIL_CULL 0
 
-void CRenderTarget::DoAsyncScreenshot()
-{
-    //	Igor: screenshot will not have postprocess applied.
-    //	TODO: fix that later
-    if (RImplementation.m_bMakeAsyncSS)
-    {
-        //	HACK: unbind RT. CopyResourcess needs src and targetr to be unbound.
-        // u_setrt				( Device.dwWidth,Device.dwHeight,get_base_rt(),nullptr,nullptr,get_base_zb());
-
-        // ID3DTexture2D *pTex = 0;
-        // if (RImplementation.o.msaa)
-        //	pTex = rt_Generic->pSurface;
-        // else
-        //	pTex = rt_Color->pSurface;
-
-
-        //HW.pDevice->CopyResource( t_ss_async, pTex );
-        glBindTexture(GL_TEXTURE_2D, t_ss_async);
-        CHK_GL(glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, Device.dwWidth, Device.dwHeight, 0));
-
-
-        RImplementation.m_bMakeAsyncSS = false;
-    }
-}
-
 float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
 
 void CRenderTarget::phase_combine()
@@ -296,7 +271,7 @@ void CRenderTarget::phase_combine()
 
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
-    BOOL PP_Complex = u_need_PP() || (BOOL)RImplementation.m_bMakeAsyncSS;
+    BOOL PP_Complex = u_need_PP();
     if (_menu_pp)
         PP_Complex = FALSE;
 

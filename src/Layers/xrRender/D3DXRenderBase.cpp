@@ -289,8 +289,6 @@ void D3DXRenderBase::Clear()
     }
 }
 
-void DoAsyncScreenshot();
-
 void D3DXRenderBase::End()
 {
     if (HW.Caps.SceneMode)
@@ -303,7 +301,6 @@ void D3DXRenderBase::End()
 #else
     RCache.OnFrameEnd();
 #endif
-    DoAsyncScreenshot();
 
     // we're done with rendering
     cleanup_contexts();

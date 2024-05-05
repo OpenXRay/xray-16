@@ -1128,14 +1128,8 @@ target_sources(xrGame PRIVATE
     ScientificOutfit.h
     Scope.cpp
     Scope.h
-    screenshot_manager.cpp
-    screenshot_manager.h
-    screenshots_common.cpp
-    screenshots_common.h
     screenshot_server.cpp
     screenshot_server.h
-    screenshots_writer.cpp
-    screenshots_writer.h
     script_abstract_action.h
     script_action_condition.h
     script_action_condition_inline.h

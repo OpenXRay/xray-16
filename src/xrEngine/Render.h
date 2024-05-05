@@ -364,8 +364,6 @@ public:
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
 
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) = 0;
-    virtual void ScreenshotAsyncBegin() = 0;
-    virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
 
     // Render mode
     virtual void rmNear(CBackend& cmd_list) = 0;

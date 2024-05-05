@@ -30,24 +30,6 @@ static void generate_jitter(u32* dest, u32 elem_count)
 }
 void CRenderTarget::build_textures()
 {
-    // Texture for async sreenshots
-    /* TODO: OGL: Implement screenshots
-    {
-        D3D_TEXTURE2D_DESC desc;
-        desc.Width = Device.dwWidth;
-        desc.Height = Device.dwHeight;
-        desc.MipLevels = 1;
-        desc.ArraySize = 1;
-        desc.SampleDesc.Count = 1;
-        desc.SampleDesc.Quality = 0;
-        desc.Format = DXGI_FORMAT_R8G8B8A8_SNORM;
-        desc.Usage = D3D_USAGE_STAGING;
-        desc.BindFlags = 0;
-        desc.CPUAccessFlags = D3D_CPU_ACCESS_READ;
-        desc.MiscFlags = 0;
-
-        R_CHK(HW.pDevice->CreateTexture2D(&desc, 0, &t_ss_async));
-    }*/
     // Build material(s)
     {
 #ifdef XR_PLATFORM_BSD

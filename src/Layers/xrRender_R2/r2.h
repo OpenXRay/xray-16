@@ -344,7 +344,6 @@ public:
 
     R_sync_point q_sync_point;
 
-    bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset{}; // Determines weather the frame is the first after resetting device.
 
 private:
@@ -496,8 +495,6 @@ public:
     void RenderMenu() override;
 
     void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) override;
-    void ScreenshotAsyncBegin() override;
-    void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) override;
     void OnFrame() override;
 
     void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Procedure is called before world render and post-effects

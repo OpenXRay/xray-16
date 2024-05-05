@@ -1038,9 +1038,6 @@
     <ClInclude Include="saved_game_wrapper_inline.h" />
     <ClInclude Include="ScientificOutfit.h" />
     <ClInclude Include="Scope.h" />
-    <ClInclude Include="screenshots_common.h" />
-    <ClInclude Include="screenshots_writer.h" />
-    <ClInclude Include="screenshot_manager.h" />
     <ClInclude Include="screenshot_server.h" />
     <ClInclude Include="ScriptXMLInit.h" />
     <ClInclude Include="script_abstract_action.h" />
@@ -2720,9 +2717,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="screenshots_common.cpp" />
-    <ClCompile Include="screenshots_writer.cpp" />
-    <ClCompile Include="screenshot_manager.cpp" />
     <ClCompile Include="screenshot_server.cpp" />
     <ClCompile Include="ScriptXMLInit.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>

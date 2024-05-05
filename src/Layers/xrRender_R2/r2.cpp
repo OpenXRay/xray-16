@@ -531,8 +531,6 @@ void CRender::create()
     Resources->RegisterConstantSetup("triLOD", &binder_LOD);
 #endif
 
-    m_bMakeAsyncSS = false;
-
     Target = xr_new<CRenderTarget>(); // Main target
 
     Models = xr_new<CModelPool>();
@@ -552,7 +550,6 @@ void CRender::create()
 
 void CRender::destroy()
 {
-    m_bMakeAsyncSS = false;
 #if defined(USE_DX11)
     FluidManager.Destroy();
 #endif

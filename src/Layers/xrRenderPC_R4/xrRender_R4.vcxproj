@@ -353,7 +353,6 @@
     <ClCompile Include="..\xrRender\r__dsgraph_render_lods.cpp" />
     <ClCompile Include="..\xrRender\r__occlusion.cpp" />
     <ClCompile Include="..\xrRender\r__pixel_calculator.cpp" />
-    <ClCompile Include="..\xrRender\r__screenshot.cpp" />
     <ClCompile Include="..\xrRender\r__sector.cpp" />
     <ClCompile Include="..\xrRender\r__sector_detect.cpp" />
     <ClCompile Include="..\xrRender\r__sector_traversal.cpp" />
