@@ -167,7 +167,7 @@ public:
 
 public:
     virtual IGame_Level* CreateLevel() { return nullptr; }
-    virtual void         DestroyLevel(IGame_Level* lvl) { VERIFY(lvl == nullptr); }
+    virtual void         DestroyLevel(IGame_Level*& lvl) { VERIFY(lvl == nullptr); }
 
     virtual void PreStart(pcstr op);
     virtual void Start(pcstr op);

@@ -88,7 +88,7 @@ IGame_Level* CGamePersistent::CreateLevel()
     return xr_new<CLevel>();
 }
 
-void CGamePersistent::DestroyLevel(IGame_Level* lvl)
+void CGamePersistent::DestroyLevel(IGame_Level*& lvl)
 {
     xr_delete(lvl);
 }
