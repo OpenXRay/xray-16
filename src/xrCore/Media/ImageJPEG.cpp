@@ -99,13 +99,15 @@ bool Image::SaveJPEG(IWriter& writer, int quality, bool invert /*= false*/)
 {
     clamp(quality, 0, 100);
 
-    if (format == ImageDataFormat::RGBA8)
+#ifdef JPEGLIB_H
+#   if !defined(JCS_EXTENSIONS) && !defined(JCS_ALPHA_EXTENSIONS)
+    if (format != ImageDataFormat::RGB8)
     {
         Msg("! %s: Unsupported data format", __FUNCTION__);
         return false;
     }
+#   endif
 
-#ifdef JPEGLIB_H
     jpeg_compress_struct info;
     xr_jpeg_error_mgr jerr(info);
 
@@ -123,8 +125,17 @@ bool Image::SaveJPEG(IWriter& writer, int quality, bool invert /*= false*/)
     {
         info.image_width = width;
         info.image_height = height;
-        info.input_components = 3;
-        info.in_color_space = JCS_RGB;
+        info.input_components = channelCount;
+
+        switch (channelCount)
+        {
+        default:
+        case 3: info.in_color_space = JCS_RGB; break;
+
+#   if defined(JCS_EXTENSIONS) && defined(JCS_ALPHA_EXTENSIONS)
+        case 4: info.in_color_space = JCS_EXT_RGBA; break;
+#   endif
+        }
 
         jpeg_set_defaults(&info);
         jpeg_set_quality(&info, quality, TRUE);
@@ -132,7 +143,7 @@ bool Image::SaveJPEG(IWriter& writer, int quality, bool invert /*= false*/)
         jpeg_start_compress(&info, TRUE);
         {
             JSAMPLE* image_data = static_cast<JSAMPLE*>(data);
-            const auto row_stride = width * 3; /* JSAMPLEs per row in image_buffer */
+            const auto row_stride = width * channelCount; /* JSAMPLEs per row in image_buffer */
 
             while (info.next_scanline < info.image_height)
             {
