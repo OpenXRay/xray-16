@@ -121,7 +121,9 @@ bool Image::OpenJPEG(const u8* dataPtr, u32 dataSize)
 
     jpeg_create_decompress(&info);
     {
-        jpeg_mem_src(&info, dataPtr, dataSize);
+        // don't remove const_cast,
+        // it's needed to fix compilation on older version of libjpeg
+        jpeg_mem_src(&info, const_cast<u8*>(dataPtr), dataSize);
         jpeg_read_header(&info, true);
 
         width  = info.image_width;
