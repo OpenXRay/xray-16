@@ -107,11 +107,8 @@ void CSoundRender_Emitter::update(float fTime, float dt)
     case stPlaying:
         if (iPaused)
         {
-            if (target)
-            {
-                stop_target();
-                m_current_state = stSimulating;
-            }
+            stop_target();
+            m_current_state = stSimulating;
             fTimeStarted += dt;
             fTimeToStop += dt;
             fTimeToPropagade += dt;
@@ -174,11 +171,8 @@ void CSoundRender_Emitter::update(float fTime, float dt)
     case stPlayingLooped:
         if (iPaused)
         {
-            if (target)
-            {
-                stop_target();
-                m_current_state = stSimulatingLooped;
-            }
+            stop_target();
+            m_current_state = stSimulatingLooped;
             fTimeStarted += dt;
             fTimeToPropagade += dt;
             break;
