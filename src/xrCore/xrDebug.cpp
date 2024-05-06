@@ -893,7 +893,9 @@ void xrDebug::OnThreadSpawn()
     std::signal(SIGINT,  nullptr);
     std::signal(SIGILL,  +[](int signal) { handler_base("illegal instruction"); });
     std::signal(SIGFPE,  +[](int signal) { handler_base("floating point error"); });
+#ifdef DEBUG
     std::signal(SIGSEGV, +[](int signal) { handler_base("segmentation fault"); });
+#endif
     std::signal(SIGABRT, +[](int signal) { handler_base("application is aborting"); });
     std::signal(SIGTERM, +[](int signal) { handler_base("termination with exit code 3"); });
 
