@@ -922,6 +922,7 @@ void xrDebug::OnThreadExit()
     std::signal(SIGSEGV, nullptr);
     std::signal(SIGABRT, nullptr);
     std::signal(SIGTERM, nullptr);
+    std::set_terminate(nullptr);
 
 #if defined(XR_PLATFORM_WINDOWS)
     std::signal(SIGABRT_COMPAT, nullptr);
@@ -930,10 +931,7 @@ void xrDebug::OnThreadExit()
     _set_new_mode(1);
     _set_new_handler(nullptr);
     _set_purecall_handler(nullptr);
-#else
-    std::set_terminate(nullptr);
 #endif
-
 }
 
 void xrDebug::Initialize(pcstr commandLine)
