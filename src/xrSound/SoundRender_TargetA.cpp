@@ -138,28 +138,21 @@ void CSoundRender_TargetA::update()
 
 void CSoundRender_TargetA::fill_parameters()
 {
-    [[maybe_unused]] CSoundRender_Emitter* SE = m_pEmitter;
-    VERIFY(SE);
-
+    R_ASSERT1_CURE(m_pEmitter, true, { return; });
     inherited::fill_parameters();
 
     // 3D params
-    VERIFY2(m_pEmitter, SE->source()->file_name());
     A_CHK(alSourcef(pSource, AL_REFERENCE_DISTANCE, m_pEmitter->p_source.min_distance));
 
-    VERIFY2(m_pEmitter, SE->source()->file_name());
     A_CHK(alSourcef(pSource, AL_MAX_DISTANCE, m_pEmitter->p_source.max_distance));
 
-    VERIFY2(m_pEmitter, SE->source()->file_name());
     A_CHK(alSource3f(pSource, AL_POSITION, m_pEmitter->p_source.position.x, m_pEmitter->p_source.position.y,
         -m_pEmitter->p_source.position.z));
 
-    VERIFY2(m_pEmitter, SE->source()->file_name());
     A_CHK(alSourcei(pSource, AL_SOURCE_RELATIVE, m_pEmitter->b2D));
 
     A_CHK(alSourcef(pSource, AL_ROLLOFF_FACTOR, psSoundRolloff));
 
-    VERIFY2(m_pEmitter, SE->source()->file_name());
     float _gain = m_pEmitter->smooth_volume;
     clamp(_gain, EPS_S, 1.f);
     if (!fsimilar(_gain, cache_gain, 0.01f))
@@ -167,8 +160,6 @@ void CSoundRender_TargetA::fill_parameters()
         cache_gain = _gain;
         A_CHK(alSourcef(pSource, AL_GAIN, _gain));
     }
-
-    VERIFY2(m_pEmitter, SE->source()->file_name());
 
     float _pitch = m_pEmitter->p_source.freq;
     if (!m_pEmitter->bIgnoringTimeFactor)
@@ -180,7 +171,6 @@ void CSoundRender_TargetA::fill_parameters()
         cache_pitch = _pitch;
         A_CHK(alSourcef(pSource, AL_PITCH, _pitch));
     }
-    VERIFY2(m_pEmitter, SE->source()->file_name());
 }
 
 size_t CSoundRender_TargetA::get_block_id(ALuint BufferID) const
