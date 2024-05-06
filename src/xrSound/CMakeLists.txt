@@ -34,8 +34,6 @@ target_sources_grouped(
     FILES
     SoundRender_EffectsA_EAX.cpp
     SoundRender_EffectsA_EAX.h
-    SoundRender_EffectsA_EFX.cpp
-    SoundRender_EffectsA_EFX.h
 )
 
 target_sources_grouped(
