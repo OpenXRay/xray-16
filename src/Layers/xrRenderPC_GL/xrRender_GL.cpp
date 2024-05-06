@@ -65,6 +65,20 @@ public:
 #endif
         xrRender_initconsole();
     }
+
+    void ClearEnv() override
+    {
+        modes.clear();
+
+        if (GEnv.Render == &RImplementation)
+        {
+            GEnv.Render = nullptr;
+            GEnv.RenderFactory = nullptr;
+            GEnv.DU = nullptr;
+            GEnv.UIRender = nullptr;
+            GEnv.DRender = nullptr;
+        }
+    }
 } static s_rgl_module;
 
 extern "C"

@@ -101,8 +101,10 @@ void CEngineAPI::SelectRenderer()
         }
     }
 
-    // Ask current renderer to setup GEnv
+    CloseUnusedLibraries();
     R_ASSERT2(selectedRenderer, "Can't setup renderer");
+
+    // Ask current renderer to setup GEnv
     selectedRenderer->SetupEnv(selected_mode);
 
     Log("Selected renderer:", selected_mode);
@@ -121,8 +123,6 @@ void CEngineAPI::Initialize(GameModule* game)
         R_ASSERT(pCreate);
         R_ASSERT(pDestroy);
     }
-
-    CloseUnusedLibraries();
 }
 
 void CEngineAPI::Destroy()
@@ -132,19 +132,28 @@ void CEngineAPI::Destroy()
     if (gameModule)
         gameModule->finalize();
 
+    selectedRenderer = nullptr;
+    CloseUnusedLibraries();
+
     pCreate = nullptr;
     pDestroy = nullptr;
 
     XRC.r_clear_compact();
 }
 
-void CEngineAPI::CloseUnusedLibraries()
+void CEngineAPI::CloseUnusedLibraries() const
 {
     ZoneScoped;
-    for (RendererDesc& desc : g_render_modules)
+    for (auto& [_, handle, module] : g_render_modules)
     {
-        if (desc.module != selectedRenderer)
-            desc.handle = nullptr;
+        if (!handle)
+            continue;
+        if (module == selectedRenderer)
+            continue;
+
+        module->ClearEnv();
+        module = nullptr;
+        handle = nullptr;
     }
 }
 

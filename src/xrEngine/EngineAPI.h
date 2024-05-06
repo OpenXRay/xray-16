@@ -55,6 +55,7 @@ public:
     virtual const xr_vector<pcstr>& ObtainSupportedModes() = 0;
     virtual bool CheckGameRequirements() = 0;
     virtual void SetupEnv(pcstr mode) = 0;
+    virtual void ClearEnv() = 0;
 };
 
 class ENGINE_API CEngineAPI
@@ -65,7 +66,7 @@ class ENGINE_API CEngineAPI
     RendererModule* selectedRenderer{};
 
     void SelectRenderer();
-    void CloseUnusedLibraries();
+    void CloseUnusedLibraries() const;
 
 public:
     Factory_Create*  pCreate;
