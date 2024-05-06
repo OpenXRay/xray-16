@@ -142,16 +142,14 @@ void CSoundRender_TargetA::fill_parameters()
     inherited::fill_parameters();
 
     // 3D params
-    A_CHK(alSourcef(pSource, AL_REFERENCE_DISTANCE, m_pEmitter->p_source.min_distance));
+    const auto& src = m_pEmitter->p_source;
+    const auto& pos = src.position;
 
-    A_CHK(alSourcef(pSource, AL_MAX_DISTANCE, m_pEmitter->p_source.max_distance));
-
-    A_CHK(alSource3f(pSource, AL_POSITION, m_pEmitter->p_source.position.x, m_pEmitter->p_source.position.y,
-        -m_pEmitter->p_source.position.z));
-
-    A_CHK(alSourcei(pSource, AL_SOURCE_RELATIVE, m_pEmitter->b2D));
-
-    A_CHK(alSourcef(pSource, AL_ROLLOFF_FACTOR, psSoundRolloff));
+    A_CHK(alSourcef (pSource, AL_REFERENCE_DISTANCE, src.min_distance));
+    A_CHK(alSourcef (pSource, AL_MAX_DISTANCE,       src.max_distance));
+    A_CHK(alSource3f(pSource, AL_POSITION,           pos.x, pos.y, -pos.z));
+    A_CHK(alSourcei (pSource, AL_SOURCE_RELATIVE,    m_pEmitter->b2D));
+    A_CHK(alSourcef (pSource, AL_ROLLOFF_FACTOR,     psSoundRolloff));
 
     float _gain = m_pEmitter->smooth_volume;
     clamp(_gain, EPS_S, 1.f);
@@ -161,7 +159,7 @@ void CSoundRender_TargetA::fill_parameters()
         A_CHK(alSourcef(pSource, AL_GAIN, _gain));
     }
 
-    float _pitch = m_pEmitter->p_source.freq;
+    float _pitch = src.freq;
     if (!m_pEmitter->bIgnoringTimeFactor)
         _pitch *= psSoundTimeFactor; //--#SM+#-- Correct sound "speed" by time factor
     clamp(_pitch, EPS_L, 100.f); //--#SM+#-- Increase sound frequency (speed) limit
