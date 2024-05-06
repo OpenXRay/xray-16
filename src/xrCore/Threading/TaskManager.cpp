@@ -193,17 +193,6 @@ TaskManager::TaskManager()
 {
     ZoneScoped;
     CalcIterations();
-
-    workers.reserve(std::thread::hardware_concurrency());
-
-    RegisterThisThreadAsWorker();
-
-    const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
-    workerThreads.reserve(threads);
-    for (u32 i = 0; i < threads; ++i)
-    {
-        workerThreads.emplace_back(Threading::RunThread("Task Worker", &TaskManager::TaskWorkerStart, this));
-    }
 }
 
 TaskManager::~TaskManager()
@@ -227,6 +216,20 @@ TaskManager::~TaskManager()
     {
         if (thread.joinable())
             thread.join();
+    }
+}
+
+void TaskManager::MakeThreads()
+{
+    workers.reserve(std::thread::hardware_concurrency());
+
+    RegisterThisThreadAsWorker();
+
+    const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
+    workerThreads.reserve(threads);
+    for (u32 i = 0; i < threads; ++i)
+    {
+        workerThreads.emplace_back(Threading::RunThread("Task Worker", &TaskManager::TaskWorkerStart, this));
     }
 }
 
