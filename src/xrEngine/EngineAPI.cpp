@@ -211,8 +211,8 @@ void CEngineAPI::CreateRendererList()
                 mode = temp;
             }
             shared_str copiedMode = mode;
-            renderModes[copiedMode] = desc.module;
             std::lock_guard guard{ mutex };
+            renderModes[copiedMode] = desc.module;
             VidQualityToken.emplace_back(copiedMode.c_str(), modeIndex++); // It's important to have postfix increment!
         }
     };
