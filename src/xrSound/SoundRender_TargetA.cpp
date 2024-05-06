@@ -41,6 +41,21 @@ void CSoundRender_TargetA::_restart()
     _initialize();
 }
 
+void CSoundRender_TargetA::start(CSoundRender_Emitter* E)
+{
+    inherited::start(E);
+
+    const auto& info = m_pEmitter->source()->data_info();
+    const bool mono = info.channels == 1;
+
+    if (info.format == SoundFormat::Float32)
+        dataFormat = mono ? AL_FORMAT_MONO_FLOAT32 : AL_FORMAT_STEREO_FLOAT32;
+    else
+        dataFormat = mono ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+
+    sampleRate = info.samplesPerSec;
+}
+
 void CSoundRender_TargetA::render()
 {
     inherited::render();
@@ -180,19 +195,7 @@ size_t CSoundRender_TargetA::get_block_id(ALuint BufferID) const
 void CSoundRender_TargetA::submit_buffer(ALuint BufferID, const void* data, size_t dataSize) const
 {
     R_ASSERT1_CURE(m_pEmitter, true, { return; });
-
-    const auto& info = m_pEmitter->source()->data_info();
-    const bool mono = info.channels == 1;
-
-    ALuint format;
-    if (info.format == SoundFormat::Float32)
-        format = mono ? AL_FORMAT_MONO_FLOAT32 : AL_FORMAT_STEREO_FLOAT32;
-    else
-    {
-        format = mono ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
-    }
-
-    A_CHK(alBufferData(BufferID, format, data, dataSize, info.samplesPerSec));
+    A_CHK(alBufferData(BufferID, dataFormat, data, dataSize, sampleRate));
 }
 
 void CSoundRender_TargetA::submit_all_buffers() const
