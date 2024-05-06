@@ -214,7 +214,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
         break;
     }
 
-	//--#SM+# Begin--
+    //--#SM+# Begin--
     // hard rewind
     switch (m_current_state)
     {
