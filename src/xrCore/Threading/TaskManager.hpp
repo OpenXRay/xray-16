@@ -78,7 +78,7 @@ public:
 public:
     void RegisterThisThreadAsWorker();
     void UnregisterThisThreadAsWorker();
-    void MakeThreads();
+    void SpawnThreads();
 
     void Wait(const Task& task) const;
     void WaitForChildren(const Task& task) const;

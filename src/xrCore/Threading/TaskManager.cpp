@@ -219,7 +219,7 @@ TaskManager::~TaskManager()
     }
 }
 
-void TaskManager::MakeThreads()
+void TaskManager::SpawnThreads()
 {
     workers.reserve(std::thread::hardware_concurrency());
 
