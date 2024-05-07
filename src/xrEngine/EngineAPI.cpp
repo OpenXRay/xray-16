@@ -31,7 +31,9 @@ struct RendererDesc
 
 std::array<RendererDesc, 2> g_render_modules =
 {{
+#ifdef XR_PLATFORM_WINDOWS
     { "xrRender_R4", nullptr, nullptr },
+#endif
     { "xrRender_GL", nullptr, nullptr },
 }};
 
@@ -164,7 +166,9 @@ void CEngineAPI::CreateRendererList()
 
     ZoneScoped;
 
-    const auto loadLibrary = [&](RendererDesc& desc) -> bool
+    int modeIndex{};
+    std::mutex mutex;
+    const auto loadRenderer = [&](RendererDesc& desc) -> bool
     {
         auto handle = XRay::LoadModule(desc.libraryName);
         if (!handle->IsLoaded())
@@ -175,29 +179,14 @@ void CEngineAPI::CreateRendererList()
         if (!module)
             return false;
 
+        const auto& modes = module->ObtainSupportedModes(); // Performs HW tests, may take time
+        if (modes.empty())
+            return false;
+
         desc.handle = std::move(handle);
         desc.module = module;
-        return true;
-    };
 
-    if (GEnv.isDedicatedServer)
-    {
-        R_ASSERT2(loadLibrary(g_render_modules[0]), "Dedicated server needs xrRender to work");
-    }
-    else
-    {
-        std::for_each(std::begin(g_render_modules), std::end(g_render_modules), loadLibrary);
-    }
-
-    std::mutex mutex;
-
-    int modeIndex{};
-    const auto obtainModes = [&](const RendererDesc& desc)
-    {
-        if (!desc.module)
-            return;
-
-        const auto& modes = desc.module->ObtainSupportedModes();
+        std::lock_guard guard{ mutex };
         for (pcstr mode : modes)
         {
             const auto it = std::find_if(renderModes.begin(), renderModes.end(), [&](auto& pair)
@@ -211,13 +200,25 @@ void CEngineAPI::CreateRendererList()
                 mode = temp;
             }
             shared_str copiedMode = mode;
-            std::lock_guard guard{ mutex };
             renderModes[copiedMode] = desc.module;
             VidQualityToken.emplace_back(copiedMode.c_str(), modeIndex++); // It's important to have postfix increment!
         }
+
+        return true;
     };
 
-    xr_parallel_for_each(g_render_modules, obtainModes);
+    if (GEnv.isDedicatedServer)
+    {
+        R_ASSERT2(loadRenderer(g_render_modules[0]), "Dedicated server needs xrRender to work");
+    }
+    else
+    {
+#ifdef XR_PLATFORM_WINDOWS
+        xr_parallel_for_each(g_render_modules, loadRenderer);
+#else
+        std::for_each(std::begin(g_render_modules), std::end(g_render_modules), loadRenderer);
+#endif
+    }
 
     auto& modes = VidQualityToken;
     Msg("Available render modes[%d]:", modes.size());
