@@ -50,6 +50,7 @@ private:
 public:
     TaskManager();
     ~TaskManager();
+    void SpawnThreads();
 
 public:
     // TaskFunc is at the end for fancy in-place lambdas
@@ -78,7 +79,6 @@ public:
 public:
     void RegisterThisThreadAsWorker();
     void UnregisterThisThreadAsWorker();
-    void SpawnThreads();
 
     void Wait(const Task& task) const;
     void WaitForChildren(const Task& task) const;
