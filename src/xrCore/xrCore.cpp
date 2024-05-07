@@ -274,6 +274,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
         TaskScheduler = xr_make_unique<TaskManager>();
+        TaskScheduler->SpawnThreads();
         // xrDebug::Initialize ();
 
         rtc_initialize();

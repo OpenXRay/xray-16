@@ -192,14 +192,18 @@ void CalcIterations()
 TaskManager::TaskManager()
 {
     ZoneScoped;
+    workers.reserve(std::thread::hardware_concurrency());
+    RegisterThisThreadAsWorker();
+}
+
+void TaskManager::SpawnThreads()
+{
+    ZoneScoped;
     CalcIterations();
 
-    workers.reserve(std::thread::hardware_concurrency());
-
-    RegisterThisThreadAsWorker();
-
-    const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
+    const u32 threads = workers.capacity() - OTHER_THREADS_COUNT;
     workerThreads.reserve(threads);
+
     for (u32 i = 0; i < threads; ++i)
     {
         workerThreads.emplace_back(Threading::RunThread("Task Worker", &TaskManager::TaskWorkerStart, this));

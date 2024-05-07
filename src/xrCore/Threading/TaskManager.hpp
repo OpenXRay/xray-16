@@ -50,6 +50,7 @@ private:
 public:
     TaskManager();
     ~TaskManager();
+    void SpawnThreads();
 
 public:
     // TaskFunc is at the end for fancy in-place lambdas
