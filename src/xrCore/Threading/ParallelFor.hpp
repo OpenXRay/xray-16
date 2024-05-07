@@ -37,7 +37,8 @@ public:
 
 public:
     constexpr TaskRange() = default;
-    constexpr TaskRange(T begin, T end) : m_begin(begin), m_end(end), m_grain(size() / TaskScheduler->GetWorkersCount())
+    constexpr TaskRange(T begin, T end) : m_begin(begin), m_end(end),
+        m_grain(size() / (TaskScheduler ? TaskScheduler->GetWorkersCount() : std::thread::hardware_concurrency()))
     {
         if (m_grain <= 0)
             m_grain = 1;
@@ -135,9 +136,14 @@ public:
     {
         TaskData taskData{ range, function };
 
-        auto& task = TaskScheduler->AddTask(task_func, sizeof(TaskData), &taskData);
+        auto& task = TaskManager::AddTask(task_func, sizeof(TaskData), &taskData);
         if (wait)
-            TaskScheduler->Wait(task);
+        {
+            VERIFY2(TaskScheduler, "Task scheduler is not yet created. "
+                "You should explicitly state that you know this by setting 'wait' param to false.");
+            if (TaskScheduler)
+                TaskScheduler->Wait(task);
+        }
         return task;
     }
 
@@ -146,9 +152,14 @@ public:
     {
         TaskData taskData{ range, function };
 
-        auto& task = TaskScheduler->AddTask(callback, task_func, sizeof(TaskData), &taskData);
+        auto& task = TaskManager::AddTask(callback, task_func, sizeof(TaskData), &taskData);
         if (wait)
-            TaskScheduler->Wait(task);
+        {
+            VERIFY2(TaskScheduler, "Task scheduler is not yet created. "
+                "You should explicitly state that you know this by setting 'wait' param to false.");
+            if (TaskScheduler)
+                TaskScheduler->Wait(task);
+        }
         return task;
     }
 
@@ -161,8 +172,8 @@ private:
         if (range.is_splittable())
         {
             TaskData leftData{ TaskRange(range, SplitTaskRange()), data.function };
-            TaskScheduler->AddTask(thisTask, task_func, sizeof(TaskData), &leftData);
-            TaskScheduler->AddTask(thisTask, task_func, sizeof(TaskData), &data);
+            TaskManager::AddTask(thisTask, task_func, sizeof(TaskData), &leftData);
+            TaskManager::AddTask(thisTask, task_func, sizeof(TaskData), &data);
         }
         else
         {
