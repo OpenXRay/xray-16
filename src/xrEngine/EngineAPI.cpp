@@ -166,7 +166,6 @@ void CEngineAPI::CreateRendererList()
 
     ZoneScoped;
 
-    int modeIndex{};
     std::mutex mutex;
     const auto loadRenderer = [&](RendererDesc& desc) -> bool
     {
@@ -187,21 +186,18 @@ void CEngineAPI::CreateRendererList()
         desc.module = module;
 
         std::lock_guard guard{ mutex };
-        for (pcstr mode : modes)
+        for (auto [mode, modeIndex] : modes)
         {
-            const auto it = std::find_if(renderModes.begin(), renderModes.end(), [&](auto& pair)
-            {
-                return 0 == xr_strcmp(mode, pair.first.c_str());
-            });
-            string256 temp;
+            const auto it = renderModes.find(mode);
             if (it != renderModes.end())
             {
-                xr_sprintf(temp, "%s__dup%d", mode, modeIndex);
-                mode = temp;
+                VERIFY3(false, "Renderer mode duplicate. Skipping.", mode);
+                continue;
             }
+            // mode string will be freed after library unloading, copy.
             shared_str copiedMode = mode;
             renderModes[copiedMode] = desc.module;
-            VidQualityToken.emplace_back(copiedMode.c_str(), modeIndex++); // It's important to have postfix increment!
+            VidQualityToken.emplace_back(copiedMode.c_str(), modeIndex);
         }
 
         return true;

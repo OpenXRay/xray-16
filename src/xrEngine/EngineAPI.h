@@ -52,7 +52,7 @@ class XR_NOVTABLE RendererModule
 {
 public:
     virtual ~RendererModule() = default;
-    virtual const xr_vector<pcstr>& ObtainSupportedModes() = 0;
+    virtual const xr_vector<std::pair<pcstr, int>>& ObtainSupportedModes() = 0;
     virtual bool CheckGameRequirements() = 0;
     virtual void SetupEnv(pcstr mode) = 0;
     virtual void ClearEnv() = 0;
