@@ -18,10 +18,10 @@ Build-Depends:
  liblzo2-dev,
  libjpeg-dev,
  libncurses5-dev,
- gcc-10,
+ gcc-14,
  libpcre3-dev,
  libsdl2-dev,
- g++-10,
+ g++-14,
  debhelper,
 Build-Conflicts:
  libmimalloc-dev,
