@@ -28,7 +28,6 @@ bool CSoundRender_TargetA::_initialize()
 
 void CSoundRender_TargetA::_destroy()
 {
-    CSoundRender_Target::_destroy();
     // clean up target
     if (alIsSource(pSource))
         alDeleteSources(1, &pSource);
@@ -64,8 +63,6 @@ void CSoundRender_TargetA::render()
 
     A_CHK(alSourceQueueBuffers(pSource, sdef_target_count, pBuffers));
     A_CHK(alSourcePlay(pSource));
-
-    dispatch_prefill_all();
 }
 
 void CSoundRender_TargetA::stop()
@@ -86,13 +83,10 @@ void CSoundRender_TargetA::rewind()
     A_CHK(alSourceStop(pSource));
     A_CHK(alSourcei(pSource, AL_BUFFER, 0));
 
-    fill_all_blocks();
     submit_all_buffers();
 
     A_CHK(alSourceQueueBuffers(pSource, sdef_target_count, pBuffers));
     A_CHK(alSourcePlay(pSource));
-
-    dispatch_prefill_all();
 }
 
 void CSoundRender_TargetA::update()
@@ -116,8 +110,7 @@ void CSoundRender_TargetA::update()
         ALuint BufferID;
         A_CHK(alSourceUnqueueBuffers(pSource, 1, &BufferID));
 
-        const auto id = get_block_id(BufferID);
-        submit_buffer(BufferID, temp_buf[id].data(), temp_buf[id].size());
+        submit_buffer(BufferID);
 
         A_CHK(alSourceQueueBuffers(pSource, 1, &BufferID));
         processed--;
@@ -126,11 +119,7 @@ void CSoundRender_TargetA::update()
             Msg("! %s:: buffering data failed (0x%d)", __FUNCTION__, error);
             return;
         }
-        buffers_to_prefill.emplace_back(id);
     }
-
-    if (!buffers_to_prefill.empty())
-        dispatch_prefill();
 
     /* Make sure the source hasn't underrun */
     if (state != AL_PLAYING && state != AL_PAUSED)
@@ -186,20 +175,15 @@ void CSoundRender_TargetA::fill_parameters()
     }
 }
 
-size_t CSoundRender_TargetA::get_block_id(ALuint BufferID) const
-{
-    const auto it = std::find(std::begin(pBuffers), std::end(pBuffers), BufferID);
-    return it - std::begin(pBuffers);
-}
-
-void CSoundRender_TargetA::submit_buffer(ALuint BufferID, const void* data, size_t dataSize) const
+void CSoundRender_TargetA::submit_buffer(ALuint BufferID) const
 {
     R_ASSERT1_CURE(m_pEmitter, true, { return; });
-    A_CHK(alBufferData(BufferID, dataFormat, data, dataSize, sampleRate));
+    const auto [data, dataSize] = m_pEmitter->obtain_block();
+    A_CHK(alBufferData(BufferID, dataFormat, data, static_cast<ALsizei>(dataSize), sampleRate));
 }
 
 void CSoundRender_TargetA::submit_all_buffers() const
 {
-    for (size_t i = 0; i < sdef_target_count; ++i)
-        submit_buffer(pBuffers[i], temp_buf[i].data(), temp_buf[i].size());
+    for (const auto buffer : pBuffers)
+        submit_buffer(buffer);
 }

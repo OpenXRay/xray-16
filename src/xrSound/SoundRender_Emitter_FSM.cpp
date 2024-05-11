@@ -30,8 +30,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
 
     if (bRewind)
     {
-        if (target)
-            target->wait_prefill();
+        wait_prefill();
 
         const float time = bIgnoringTimeFactor ? SoundRender->TimerPersistent.GetElapsed_sec() : SoundRender->Timer.GetElapsed_sec();
         const float diff = time - fTimeStarted;
@@ -41,7 +40,11 @@ void CSoundRender_Emitter::update(float fTime, float dt)
 
         set_cursor(0);
         if (target)
+        {
+            fill_all_blocks();
             target->rewind();
+            dispatch_prefill();
+        }
         bRewind = FALSE;
     }
 
@@ -72,6 +75,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
             m_current_state = stPlaying;
             set_cursor(0);
             SoundRender->i_start(this);
+            dispatch_prefill();
         }
         else
             m_current_state = stSimulating;
@@ -100,6 +104,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
             m_current_state = stPlayingLooped;
             set_cursor(0);
             SoundRender->i_start(this);
+            dispatch_prefill();
         }
         else
             m_current_state = stSimulatingLooped;
@@ -165,6 +170,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
                                 set_cursor					(ptr);
                 */
                 SoundRender->i_start(this);
+                dispatch_prefill();
             }
         }
         break;
@@ -204,6 +210,7 @@ void CSoundRender_Emitter::update(float fTime, float dt)
             set_cursor(ptr);
 
             SoundRender->i_start(this);
+            dispatch_prefill();
         }
         break;
     }
@@ -361,4 +368,14 @@ void CSoundRender_Emitter::update_environment(float dt)
     if (bMoved)
         e_target = *(CSoundRender_Environment*)scene->get_environment(p_source.position);
     e_current.lerp(e_current, e_target, dt);
+}
+
+void CSoundRender_Emitter::render()
+{
+    target->fill_parameters();
+    if (target->get_Rendering())
+        target->update();
+    else
+        target->render();
+    dispatch_prefill();
 }

@@ -5,6 +5,8 @@
 #include "SoundRender_Scene.h"
 #include "SoundRender_Source.h"
 
+#include "xrCore/Threading/TaskManager.hpp"
+
 extern u32 psSoundModel;
 extern float psSoundVEffects;
 
@@ -47,6 +49,7 @@ CSoundRender_Emitter::~CSoundRender_Emitter()
 {
     // try to release dependencies, events, for example
     Event_ReleaseOwner();
+    wait_prefill();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -224,6 +227,57 @@ void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
             move_cursor(size);
         }
     }
+}
+
+std::pair<u8*, size_t> CSoundRender_Emitter::obtain_block()
+{
+    wait_prefill();
+    const std::pair result = { temp_buf[current_block].data(), temp_buf[current_block].size() };
+    ++current_block;
+    if (current_block >= sdef_target_count)
+        current_block = 0;
+    --filled_blocks;
+    return std::move(result);
+}
+
+void CSoundRender_Emitter::fill_all_blocks()
+{
+    current_block = 0;
+    for (size_t i = 0; i < sdef_target_count; ++i)
+        fill_block(temp_buf[i].data(), temp_buf[i].size());
+    filled_blocks = sdef_target_count;
+}
+
+void CSoundRender_Emitter::prefill_blocks(Task&, void*)
+{
+    size_t next_block_to_fill = (current_block + filled_blocks) % sdef_target_count;
+
+    while (filled_blocks < sdef_target_count)
+    {
+        auto& block = temp_buf[next_block_to_fill];
+
+        fill_block(block.data(), block.size());
+
+        next_block_to_fill = (next_block_to_fill + 1) % sdef_target_count;
+        filled_blocks++;
+    }
+
+    prefill_task.store(nullptr, std::memory_order_release);
+}
+
+void CSoundRender_Emitter::dispatch_prefill()
+{
+    wait_prefill();
+    if (filled_blocks >= sdef_target_count)
+        return;
+    const auto task = &TaskScheduler->AddTask({ this, &CSoundRender_Emitter::prefill_blocks });
+    prefill_task.store(task, std::memory_order_release);
+}
+
+void CSoundRender_Emitter::wait_prefill() const
+{
+    if (const auto task = prefill_task.load(std::memory_order_acquire))
+        TaskScheduler->Wait(*task);
 }
 
 u32 CSoundRender_Emitter::get_bytes_total() const

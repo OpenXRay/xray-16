@@ -6,6 +6,8 @@
 #include "SoundRender_Environment.h"
 #include "SoundRender_Scene.h"
 
+class Task;
+
 class CSoundRender_Emitter final : public CSound_emitter
 {
 public:
@@ -74,6 +76,22 @@ public:
     void set_cursor(u32 p);
     void move_cursor(int offset);
 
+private:
+    xr_vector<u8> temp_buf[sdef_target_count];
+    std::atomic<Task*> prefill_task{};
+
+    size_t current_block{};
+    int filled_blocks{};
+
+    void fill_block(void* ptr, u32 size);
+    void fill_data(void* dest, u32 offset, u32 size) const;
+
+    void fill_all_blocks();
+    void prefill_blocks(Task&, void*);
+    void dispatch_prefill();
+
+    void wait_prefill() const;
+
 public:
     void Event_Propagade();
     void Event_ReleaseOwner();
@@ -102,13 +120,14 @@ public:
     void set_priority(float p) override { priority_scale = p; }
     void set_time(float t) override; //--#SM+#--
     const CSound_params* get_params() override { return &p_source; }
-    void fill_block(void* ptr, u32 size);
-    void fill_data(void* dest, u32 offset, u32 size) const;
+
+    std::pair<u8*, size_t> obtain_block();
 
     float priority() const;
     void start(const ref_sound& _owner, u32 flags, float delay);
     void cancel(); // manager forces out of rendering
     void update(float time, float dt);
+    void render();
     bool update_culling(float dt);
     void update_environment(float dt);
     void rewind();
