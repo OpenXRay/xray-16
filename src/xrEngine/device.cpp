@@ -320,7 +320,10 @@ void CRenderDevice::ProcessFrame()
     DoRender();
 
     while (!secondaryTasksExecuted.load(std::memory_order_acquire))
+    {
+        SDL_PumpEvents();
         TaskScheduler->ExecuteOneTask();
+    }
 
     secondaryTasksExecuted.store(false, std::memory_order_relaxed);
 
