@@ -450,7 +450,7 @@ target_link_libraries(xrCore
     PUBLIC
     pthread
     $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
-    SDL2::SDL2
+    SDL3::SDL3
 
     PRIVATE
     xrMiscMath

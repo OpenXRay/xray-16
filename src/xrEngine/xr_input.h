@@ -2,12 +2,10 @@
 
 #include <bitset>
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
-#if SDL_VERSION_ATLEAST(2,0,4) && !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS) && !defined(__amigaos4__)
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) && !(defined(SDL_PLATFORM_APPLE) && TARGET_OS_IOS) && !defined(__amigaos4__)
 #   define SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE 1
-#else
-#   define SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE 0
 #endif
 
 DECLARE_MESSAGE(KeyMapChanged);
@@ -87,7 +85,7 @@ public:
     enum
     {
         COUNT_MOUSE_AXIS = 4,
-        COUNT_CONTROLLER_AXIS = SDL_CONTROLLER_AXIS_MAX
+        COUNT_CONTROLLER_AXIS = SDL_GAMEPAD_AXIS_MAX
     };
 
     enum
@@ -115,7 +113,7 @@ private:
 
     xr_vector<IInputReceiver*> cbStack;
 
-    xr_vector<SDL_GameController*> controllers;
+    xr_vector<SDL_Gamepad*> controllers;
 
     InputType currentInputType{ KeyboardMouse };
 

@@ -10,7 +10,7 @@
 
 #include "xrCore/Debug/dxerr.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <WINSOCK2.H>
 #include <Ws2tcpip.h>

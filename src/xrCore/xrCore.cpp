@@ -17,7 +17,7 @@
 #include "xrCore/_std_extensions.h"
 #include "Threading/TaskManager.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #if __has_include(".GitInfo.hpp")
 #include ".GitInfo.hpp"
@@ -270,7 +270,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 
         Memory._initialize();
 
-        SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
+        SDL_SetLogOutputFunction(SDLLogOutput, nullptr);
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
         TaskScheduler = xr_make_unique<TaskManager>();

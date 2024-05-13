@@ -194,8 +194,8 @@ typedef dirent DirEntryType;
 #define O_SEQUENTIAL 0
 #define SH_DENYWR 0
 
-#if __has_include(<SDL_stdinc.h>)
-#include <SDL_stdinc.h>
+#if __has_include(<SDL3/SDL_stdinc.h>)
+#include <SDL3/SDL_stdinc.h>
 #define itoa SDL_itoa
 #define _itoa_s SDL_itoa
 #else

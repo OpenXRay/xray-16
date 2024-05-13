@@ -12,7 +12,7 @@
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -306,104 +306,87 @@ void CRenderDevice::ProcessFrame()
 void CRenderDevice::ProcessEvent(const SDL_Event& event)
 {
     ZoneScoped;
+    SDL_Window* window = nullptr;
+    ImGuiViewport* viewport = nullptr;
 
     switch (event.type)
     {
-#if SDL_VERSION_ATLEAST(2, 0, 9)
-    case SDL_DISPLAYEVENT:
-    {
-        switch (event.display.type)
-        {
-        case SDL_DISPLAYEVENT_ORIENTATION:
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-        case SDL_DISPLAYEVENT_CONNECTED:
-        case SDL_DISPLAYEVENT_DISCONNECTED:
-#endif
-            CleanupVideoModes();
-            FillVideoModes();
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-            if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
-#else
-            if (event.display.display == psDeviceMode.Monitor)
-#endif
-                Reset();
-            else
-                UpdateWindowProps();
-            break;
-        } // switch (event.display.type)
+    case SDL_EVENT_DISPLAY_ORIENTATION:
+    case SDL_EVENT_DISPLAY_ADDED:
+    case SDL_EVENT_DISPLAY_REMOVED:
+        CleanupVideoModes();
+        FillVideoModes();
+        if (event.display.displayID == psDeviceMode.Monitor && event.display.type != SDL_EVENT_DISPLAY_ADDED)
+            Reset();
+        else
+            UpdateWindowProps();
         break;
-    }
-#endif
-    case SDL_WINDOWEVENT:
+    case SDL_EVENT_WINDOW_MOVED:
     {
-        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        window = SDL_GetWindowFromID(event.window.windowID);
         if (!window)
             break;
-        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window);
+        viewport = ImGui::FindViewportByPlatformHandle(window);
+        if (!viewport)
+            break;
+        if (window == m_sdlWnd)
+        {
+            UpdateWindowRects();
+            const int display = SDL_GetDisplayForWindow(window);
+            if (display != -1)
+                psDeviceMode.Monitor = display;
+        }
+        if (viewport)
+            viewport->PlatformRequestMove = true;
+        break;
+    }
+    case SDL_EVENT_WINDOW_DISPLAY_CHANGED:
+        psDeviceMode.Monitor = event.window.data1;
+        break;
+    case SDL_EVENT_WINDOW_RESIZED:
+        window = SDL_GetWindowFromID(event.window.windowID);
+        if (!window)
+            break;
+        viewport = ImGui::FindViewportByPlatformHandle(window);
+        if (!viewport)
+            break;
+        viewport->PlatformRequestResize = true;
+        break;
+    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+    {
+        if (psDeviceMode.WindowStyle != rsFullscreen)
+        {
+            if (static_cast<int>(psDeviceMode.Width) == event.window.data1 &&
+                static_cast<int>(psDeviceMode.Height) == event.window.data2)
+                break; // we don't need to reset device if resolution wasn't really changed
+
+            psDeviceMode.Width = event.window.data1;
+            psDeviceMode.Height = event.window.data2;
+
+            Reset();
+        }
+        else
+            UpdateWindowRects();
+
+        break;
+    }
+    case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+    {
+        window = SDL_GetWindowFromID(event.window.windowID);
+        if (!window)
+            break;
+        viewport = ImGui::FindViewportByPlatformHandle(window);
         if (!viewport)
             break;
 
-        switch (event.window.event)
+        viewport->PlatformRequestClose = true;
+
+        if (window == m_sdlWnd)
         {
-        case SDL_WINDOWEVENT_MOVED:
-        {
-            if (window == m_sdlWnd)
-            {
-                UpdateWindowRects();
-#if !SDL_VERSION_ATLEAST(2, 0, 18) // without SDL_WINDOWEVENT_DISPLAY_CHANGED, let's detect monitor change ourselves
-                const int display = SDL_GetWindowDisplayIndex(window);
-                if (display != -1)
-                    psDeviceMode.Monitor = display;
-#endif
-            }
-            if (viewport)
-                viewport->PlatformRequestMove = true;
-            break;
+            Engine.Event.Defer("KERNEL:disconnect");
+            Engine.Event.Defer("KERNEL:quit");
         }
-
-#if SDL_VERSION_ATLEAST(2, 0, 18)
-        case SDL_WINDOWEVENT_DISPLAY_CHANGED:
-            psDeviceMode.Monitor = event.window.data1;
-            break;
-#endif
-
-        case SDL_WINDOWEVENT_RESIZED:
-            if (viewport)
-                viewport->PlatformRequestResize = true;
-            break;
-
-        case SDL_WINDOWEVENT_SIZE_CHANGED:
-        {
-            if (psDeviceMode.WindowStyle != rsFullscreen)
-            {
-                if (static_cast<int>(psDeviceMode.Width) == event.window.data1 &&
-                    static_cast<int>(psDeviceMode.Height) == event.window.data2)
-                    break; // we don't need to reset device if resolution wasn't really changed
-
-                psDeviceMode.Width = event.window.data1;
-                psDeviceMode.Height = event.window.data2;
-
-                Reset();
-            }
-            else
-                UpdateWindowRects();
-
-            break;
-        }
-
-        case SDL_WINDOWEVENT_CLOSE:
-        {
-            if (viewport)
-                viewport->PlatformRequestClose = true;
-
-            if (window == m_sdlWnd)
-            {
-                Engine.Event.Defer("KERNEL:disconnect");
-                Engine.Event.Defer("KERNEL:quit");
-            }
-            break;
-        }
-        } // switch (event.window.event)
+        break;
     }
     } // switch (event.type)
 

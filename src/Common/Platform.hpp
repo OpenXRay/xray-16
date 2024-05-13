@@ -23,7 +23,7 @@
 #   else
 #       define _XRAY_PLATFORM_MARKER "*BSD"
 #   endif
-#elif defined(__APPLE__)
+#elif defined(SDL_PLATFORM_APPLE)
 #   define XR_PLATFORM_APPLE
 #   define _XRAY_PLATFORM_MARKER "Apple"
 #else

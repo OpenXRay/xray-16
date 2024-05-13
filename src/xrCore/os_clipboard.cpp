@@ -13,7 +13,7 @@
 #include "os_clipboard.h"
 #include "Text/StringConversion.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <locale>
 

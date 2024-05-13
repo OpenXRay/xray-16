@@ -3,7 +3,7 @@
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD)
 #include <dlfcn.h>
 #else
-#include <SDL_loadso.h>
+#include <SDL3/SDL_loadso.h>
 #endif
 
 #include "ModuleLookup.hpp"

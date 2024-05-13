@@ -79,11 +79,15 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     R_ASSERT(m_window);
 
     // Choose the closest pixel format
-    SDL_DisplayMode mode;
-    SDL_GetWindowDisplayMode(m_window, &mode);
-    mode.format = SDL_PIXELFORMAT_RGBA8888;
-    // Apply the pixel format to the device context
-    SDL_SetWindowDisplayMode(m_window, &mode);
+    const SDL_DisplayMode* c_mode;
+    c_mode = SDL_GetWindowFullscreenMode(m_window);
+    if(c_mode)
+    {
+        SDL_DisplayMode mode = *c_mode;
+        mode.format = SDL_PIXELFORMAT_RGBA8888;
+        // Apply the pixel format to the device context
+        SDL_SetWindowFullscreenMode(m_window, &mode);
+    }
 
     // Create the context
     m_context = SDL_GL_CreateContext(m_window);
@@ -102,7 +106,17 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     {
         const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL;
 
-        m_helper_window = SDL_CreateWindow("OpenXRay OpenGL helper window", 0, 0, 1, 1, flags);
+        SDL_PropertiesID props = SDL_CreateProperties();
+        SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, "OpenXRay OpenGL helper window");
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, 0);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, 0);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, 1);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, 1);
+        SDL_SetNumberProperty(props, "flags", flags);
+
+        m_helper_window = SDL_CreateWindowWithProperties(props);
+        SDL_DestroyProperties(props);
+
         R_ASSERT3(m_helper_window, "Cannot create helper window for OpenGL", SDL_GetError());
 
         SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
@@ -126,16 +140,17 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     // This is essential for complete OpenGL 4.1 load on mac
     glewExperimental = GL_TRUE;
 #endif
+#if 1
     GLenum err = glewInit();
-    if (GLEW_OK != err)
+    if (GLEW_OK != err && GLEW_ERROR_NO_GLX_DISPLAY != err)
     {
         Log("! Could not initialize glew:", (pcstr)glewGetErrorString(err));
         return;
     }
-
+#endif
     UpdateVSync();
 
-#ifdef DEBUG
+#if 1
     if (GLEW_KHR_debug)  // NOTE: this extension is only available starting with OpenGL 4.3
     {
         CHK_GL(glEnable(GL_DEBUG_OUTPUT));

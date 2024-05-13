@@ -52,7 +52,7 @@ CInput::CInput(const bool exclusive)
     //===================== Dummy pack
     iCapture(&dummyController);
 
-    SDL_SetHint(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, "1"); // We need to handle it manually
+    SDL_SetHint(SDL_HINT_WINDOWS_CLOSE_ON_ALT_F4, "0"); // We need to handle it manually
 
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this, REG_PRIORITY_HIGH);
@@ -61,10 +61,15 @@ CInput::CInput(const bool exclusive)
     if (strstr(Core.Params, "-no_gamepad"))
         return;
 
-    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
+    if (SDL_InitSubSystem(SDL_INIT_GAMEPAD) == 0)
     {
-        for (int i = 0; i < SDL_NumJoysticks(); ++i)
-            OpenController(i);
+        int num_joysticks;
+        SDL_JoystickID *joysticks = SDL_GetJoysticks(&num_joysticks);
+        if (joysticks) {
+            for (int i = 0; i < num_joysticks; ++i)
+                OpenController(i);
+        }
+        SDL_free(joysticks);
     }
 }
 
@@ -75,8 +80,8 @@ CInput::~CInput()
     GrabInput(false);
 
     for (auto& controller : controllers)
-        SDL_GameControllerClose(controller);
-    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+        SDL_CloseGamepad(controller);
+    SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
 
     Device.seqFrame.Remove(this);
     Device.seqAppDeactivate.Remove(this);
@@ -85,26 +90,22 @@ CInput::~CInput()
 
 void CInput::OpenController(int idx)
 {
-    if (!SDL_IsGameController(idx))
+    if (!SDL_IsGamepad(idx))
         return;
 
-    const auto controller = SDL_GameControllerOpen(idx);
+    const auto controller = SDL_OpenGamepad(idx);
     if (!controller)
         return;
 
-#if SDL_VERSION_ATLEAST(2, 0, 14)
     if (psControllerEnableSensors.test(1))
-        SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
-#endif
+        SDL_SetGamepadSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
     controllers.emplace_back(controller);
 }
 
 void CInput::EnableControllerSensors(bool enable)
 {
-#if SDL_VERSION_ATLEAST(2, 0, 14)
     for (auto controller : controllers)
-        SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, enable ? SDL_TRUE : SDL_FALSE);
-#endif
+        SDL_SetGamepadSensorEnabled(controller, SDL_SENSOR_GYRO, enable ? SDL_TRUE : SDL_FALSE);
 }
 
 //-----------------------------------------------------------------------
@@ -142,7 +143,7 @@ void CInput::MouseUpdate()
     SDL_Event events[MAX_MOUSE_EVENTS];
     SDL_PumpEvents();
     const auto count = SDL_PeepEvents(events, MAX_MOUSE_EVENTS,
-        SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
+        SDL_GETEVENT, SDL_EVENT_MOUSE_MOTION, SDL_EVENT_MOUSE_WHEEL);
 
     if (count)
         SetCurrentInputType(KeyboardMouse);
@@ -153,7 +154,7 @@ void CInput::MouseUpdate()
 
         switch (event.type)
         {
-        case SDL_MOUSEMOTION:
+        case SDL_EVENT_MOUSE_MOTION:
             mouseMoved = true;
             offs[0] += event.motion.xrel;
             offs[1] += event.motion.yrel;
@@ -161,21 +162,21 @@ void CInput::MouseUpdate()
             mouseAxisState[1] = event.motion.y;
             break;
 
-        case SDL_MOUSEBUTTONDOWN:
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
         {
             const auto idx = RemapIdx[event.button.button - 1];
             mouseState[idx] = true;
             cbStack.back()->IR_OnMousePress(IdxToKey[idx]);
             break;
         }
-        case SDL_MOUSEBUTTONUP:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
         {
             const auto idx = RemapIdx[event.button.button - 1];
             mouseState[idx] = false;
             cbStack.back()->IR_OnMouseRelease(IdxToKey[idx]);
             break;
         }
-        case SDL_MOUSEWHEEL:
+        case SDL_EVENT_MOUSE_WHEEL:
             mouseMoved = true;
             offs[2] += event.wheel.x;
             offs[3] += event.wheel.y;
@@ -206,7 +207,7 @@ void CInput::KeyUpdate()
 
     SDL_Event events[MAX_KEYBOARD_EVENTS];
     const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS,
-        SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED);
+        SDL_GETEVENT, SDL_EVENT_KEY_DOWN, SDL_EVENT_KEYMAP_CHANGED);
 
     // Let iGetAsyncKeyState work correctly during this frame immediately
     for (int i = 0; i < count; ++i)
@@ -215,13 +216,13 @@ void CInput::KeyUpdate()
 
         switch (event.type)
         {
-        case SDL_KEYDOWN:
+        case SDL_EVENT_KEY_DOWN:
             if (event.key.repeat)
                 continue;
             keyboardState[event.key.keysym.scancode] = true;
             break;
 
-        case SDL_KEYUP:
+        case SDL_EVENT_KEY_UP:
             keyboardState[event.key.keysym.scancode] = false;
             break;
         }
@@ -251,23 +252,23 @@ void CInput::KeyUpdate()
 
         switch (event.type)
         {
-        case SDL_KEYDOWN:
+        case SDL_EVENT_KEY_DOWN:
             if (event.key.repeat)
                 continue;
             cbStack.back()->IR_OnKeyboardPress(event.key.keysym.scancode);
             break;
 
-        case SDL_KEYUP:
+        case SDL_EVENT_KEY_UP:
             cbStack.back()->IR_OnKeyboardRelease(event.key.keysym.scancode);
             break;
 
-        case SDL_TEXTINPUT:
+        case SDL_EVENT_TEXT_INPUT:
             if (cnt != textInputCounter)
                 continue; // if input target changed, skip this frame
             cbStack.back()->IR_OnTextInput(event.text.text);
             break;
 
-        case SDL_KEYMAPCHANGED:
+        case SDL_EVENT_KEYMAP_CHANGED:
             seqKeyMapChanged.Process();
             break;
         }
@@ -309,7 +310,7 @@ void CInput::ControllerUpdate()
 
     SDL_Event events[MAX_CONTROLLER_EVENTS];
     auto count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
-        SDL_GETEVENT, SDL_CONTROLLERDEVICEADDED, SDL_CONTROLLERDEVICEADDED);
+        SDL_GETEVENT, SDL_EVENT_GAMEPAD_ADDED, SDL_EVENT_GAMEPAD_ADDED);
 
     for (int i = 0; i < count; ++i)
     {
@@ -326,14 +327,10 @@ void CInput::ControllerUpdate()
     decltype(controllerAxisState) controllerAxisStatePrev;
     CopyMemory(controllerAxisStatePrev, controllerAxisState, sizeof(controllerAxisState));
 
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-    constexpr SDL_EventType MAX_EVENT = SDL_CONTROLLERSENSORUPDATE;
-#else
-    constexpr SDL_EventType MAX_EVENT = SDL_CONTROLLERDEVICEREMAPPED;
-#endif
+    constexpr SDL_EventType MAX_EVENT = SDL_EVENT_GAMEPAD_SENSOR_UPDATE;
 
     count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
-        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, MAX_EVENT);
+        SDL_GETEVENT, SDL_EVENT_GAMEPAD_AXIS_MOTION, MAX_EVENT);
 
     for (int i = 0; i < count; ++i)
     {
@@ -341,75 +338,73 @@ void CInput::ControllerUpdate()
 
         switch (event.type)
         {
-        case SDL_CONTROLLERAXISMOTION:
+        case SDL_EVENT_GAMEPAD_AXIS_MOTION:
         {
-            if (event.caxis.axis >= COUNT_CONTROLLER_AXIS)
+            if (event.jaxis.axis >= COUNT_CONTROLLER_AXIS)
                 break; // SDL added new axis, not supported by engine yet
 
-            if (last_input_controller != event.caxis.which) // don't write if don't really need to
-                last_input_controller = event.caxis.which;
+            if (last_input_controller != event.jaxis.which) // don't write if don't really need to
+                last_input_controller = event.jaxis.which;
 
-            if (std::abs(event.caxis.value) < controllerDeadZone)
-                controllerAxisState[event.caxis.axis] = 0;
+            if (std::abs(event.jaxis.value) < controllerDeadZone)
+                controllerAxisState[event.jaxis.axis] = 0;
             else
             {
-                controllerAxisState[event.caxis.axis] = event.caxis.value;
+                controllerAxisState[event.jaxis.axis] = event.jaxis.value;
                 SetCurrentInputType(Controller);
             }
             break;
         }
 
-        case SDL_CONTROLLERBUTTONDOWN:
-            if (event.cbutton.button >= XR_CONTROLLER_BUTTON_COUNT)
+        case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+            if (event.button.button >= XR_CONTROLLER_BUTTON_COUNT)
                 break; // SDL added new button, not supported by engine yet
 
-            if (last_input_controller != event.cbutton.which) // don't write if don't really need to
-                last_input_controller = event.cbutton.which;
+            if (last_input_controller != event.button.which) // don't write if don't really need to
+                last_input_controller = event.button.which;
             SetCurrentInputType(Controller);
 
-            controllerState[event.cbutton.button] = true;
-            cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.cbutton.button], 1.f, 0.f);
+            controllerState[event.button.button] = true;
+            cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.button.button], 1.f, 0.f);
             break;
 
-        case SDL_CONTROLLERBUTTONUP:
-            if (event.cbutton.button >= XR_CONTROLLER_BUTTON_COUNT)
+        case SDL_EVENT_GAMEPAD_BUTTON_UP:
+            if (event.button.button >= XR_CONTROLLER_BUTTON_COUNT)
                 break; // SDL added new button, not supported by engine yet
 
-            if (last_input_controller != event.cbutton.which) // don't write if don't really need to
-                last_input_controller = event.cbutton.which;
+            if (last_input_controller != event.button.which) // don't write if don't really need to
+                last_input_controller = event.button.which;
             SetCurrentInputType(Controller);
 
-            controllerState[event.cbutton.button] = false;
-            cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.cbutton.button], 0.f, 0.f);
+            controllerState[event.button.button] = false;
+            cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.button.button], 0.f, 0.f);
             break;
 
-        case SDL_CONTROLLERDEVICEADDED:
+        case SDL_EVENT_GAMEPAD_ADDED:
             OpenController(event.cdevice.which);
             break;
 
-        case SDL_CONTROLLERDEVICEREMOVED:
+        case SDL_EVENT_GAMEPAD_REMOVED:
         {
-            const auto controller = SDL_GameControllerFromInstanceID(event.cdevice.which);
+            const auto controller = SDL_GetGamepadFromInstanceID(event.cdevice.which);
             const auto it = std::find(controllers.begin(), controllers.end(), controller);
             if (it != controllers.end())
                 controllers.erase(it);
             break;
         }
 
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-        case SDL_CONTROLLERSENSORUPDATE:
+        case SDL_EVENT_GAMEPAD_SENSOR_UPDATE:
         {
-            if (last_input_controller != event.csensor.which) // only use data from the recently used controller
+            if (last_input_controller != event.gsensor.which) // only use data from the recently used controller
                 break;
-            if (event.csensor.sensor != SDL_SENSOR_GYRO)
+            if (event.gsensor.sensor != SDL_SENSOR_GYRO)
                 break;
 
-            const auto gyro = Fvector { -event.csensor.data[1], -event.csensor.data[0], -event.csensor.data[2] };
+            const auto gyro = Fvector { -event.gsensor.data[1], -event.gsensor.data[0], -event.gsensor.data[2] };
             if (!gyro.similar(Fvector{ 0.f, 0.f, 0.f }, psControllerSensorDeadZone))
                 cbStack.back()->IR_OnControllerAttitudeChange(gyro);
             break;
         }
-#endif
         } // switch (event.type)
     }
 
@@ -510,13 +505,13 @@ bool CInput::iGetAsyncKeyState(const int key)
         switch (static_cast<EControllerAxis>(key))
         {
         case XR_CONTROLLER_AXIS_LEFT:
-            return controllerAxisState[SDL_CONTROLLER_AXIS_LEFTX] || controllerAxisState[SDL_CONTROLLER_AXIS_LEFTY];
+            return controllerAxisState[SDL_GAMEPAD_AXIS_LEFTX] || controllerAxisState[SDL_GAMEPAD_AXIS_LEFTY];
         case XR_CONTROLLER_AXIS_RIGHT:
-            return controllerAxisState[SDL_CONTROLLER_AXIS_RIGHTX] || controllerAxisState[SDL_CONTROLLER_AXIS_RIGHTY];
+            return controllerAxisState[SDL_GAMEPAD_AXIS_RIGHTX] || controllerAxisState[SDL_GAMEPAD_AXIS_RIGHTY];
         case XR_CONTROLLER_AXIS_TRIGGER_LEFT:
-            return controllerAxisState[SDL_CONTROLLER_AXIS_TRIGGERLEFT];
+            return controllerAxisState[SDL_GAMEPAD_AXIS_LEFT_TRIGGER];
         case XR_CONTROLLER_AXIS_TRIGGER_RIGHT:
-            return controllerAxisState[SDL_CONTROLLER_AXIS_TRIGGERRIGHT];
+            return controllerAxisState[SDL_GAMEPAD_AXIS_RIGHT_TRIGGER];
         }
     }
 
@@ -531,17 +526,22 @@ void CInput::iGetAsyncScrollPos(Ivector2& p) const
 
 bool CInput::iGetAsyncMousePos(Ivector2& p, bool global /*= false*/) const
 {
+    float x, y;
     if (global)
     {
 #if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
-        SDL_GetGlobalMouseState(&p.x, &p.y);
+        SDL_GetGlobalMouseState(&x, &y);
+        p.x = static_cast<int>(x);
+        p.y = static_cast<int>(y);
         return true;
 #endif
         // if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE unavailable
         // fallback to SDL_GetMouseState
         // but report false
     }
-    SDL_GetMouseState(&p.x, &p.y);
+    SDL_GetMouseState(&x, &y);
+    p.x = static_cast<int>(x);
+    p.y = static_cast<int>(y);
     return !global;
 }
 
@@ -565,7 +565,14 @@ bool CInput::iSetMousePos(const Ivector2& p, bool global /*= false*/) const
 void CInput::GrabInput(const bool grab)
 {
     // Self descriptive
-    SDL_ShowCursor(grab ? SDL_FALSE : SDL_TRUE);
+    if(grab)
+    {
+        SDL_HideCursor();
+    }
+    else
+    {
+        SDL_ShowCursor();
+    }
 
     // Clip cursor to the current window
     // If SDL_HINT_GRAB_KEYBOARD is set then the keyboard will be grabbed too
@@ -592,7 +599,7 @@ void CInput::EnableTextInput()
         SDL_StartTextInput();
 
     SDL_PumpEvents();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    SDL_FlushEvents(SDL_EVENT_TEXT_EDITING, SDL_EVENT_TEXT_INPUT);
 }
 
 void CInput::DisableTextInput()
@@ -605,7 +612,7 @@ void CInput::DisableTextInput()
         SDL_StopTextInput();
 
     SDL_PumpEvents();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    SDL_FlushEvents(SDL_EVENT_TEXT_EDITING, SDL_EVENT_TEXT_INPUT);
 }
 
 bool CInput::IsTextInputEnabled() const
@@ -734,7 +741,6 @@ bool CInput::IsExclusiveMode() const
 
 void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
 {
-#if SDL_VERSION_ATLEAST(2, 0, 9)
     const u16 s1_rumble = iFloor(u16(-1) * clampr(s1, 0.0f, 1.0f));
     const u16 s2_rumble = iFloor(u16(-1) * clampr(s2, 0.0f, 1.0f));
     const u32 duration_ms = duration < 0.f ? 0 : iFloor(duration * 1000.f);
@@ -745,25 +751,22 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
     {
         if (last_input_controller != -1)
         {
-            const auto controller = SDL_GameControllerFromInstanceID(last_input_controller);
-            SDL_GameControllerRumble(controller, s1_rumble, s2_rumble, duration_ms);
+            const auto controller = SDL_GetGamepadFromInstanceID(last_input_controller);
+            SDL_RumbleGamepad(controller, s1_rumble, s2_rumble, duration_ms);
         }
         break;
     }
 
     case FeedbackTriggers:
     {
-#if SDL_VERSION_ATLEAST(2, 0, 14)
         if (last_input_controller != -1)
         {
-            const auto controller = SDL_GameControllerFromInstanceID(last_input_controller);
-            SDL_GameControllerRumbleTriggers(controller, s1_rumble, s2_rumble, duration_ms);
+            const auto controller = SDL_GetGamepadFromInstanceID(last_input_controller);
+            SDL_RumbleGamepadTriggers(controller, s1_rumble, s2_rumble, duration_ms);
         }
         break;
-#endif
     }
 
     default: NODEFAULT;
     }
-#endif
 }

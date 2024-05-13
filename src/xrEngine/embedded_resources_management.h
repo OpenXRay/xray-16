@@ -3,7 +3,7 @@
 #include "xr_3da/resource.h"
 
 #ifdef XR_PLATFORM_WINDOWS
-#   include <SDL_syswm.h>
+#   include <SDL3/SDL_syswm.h>
 #endif
 
 inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
@@ -66,7 +66,7 @@ inline SDL_Surface* CreateSurfaceFromBitmap(HBITMAP bitmapHandle)
 
     if (!surface->pixels)
     {
-        SDL_FreeSurface(surface);
+        SDL_DestroySurface(surface);
         return nullptr;
     }
 

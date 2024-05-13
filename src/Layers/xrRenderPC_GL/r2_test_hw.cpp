@@ -11,7 +11,16 @@ public:
         ZoneScoped;
         u32 flags{};
         HW.SetPrimaryAttributes(flags);
-        m_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | flags);
+        SDL_PropertiesID props = SDL_CreateProperties();
+        SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, "TestOpenGLWindow");
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, 0);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, 0);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, 1);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, 1);
+        SDL_SetNumberProperty(props, "flags", SDL_WINDOW_HIDDEN | flags);
+        m_window = SDL_CreateWindowWithProperties(props);
+        SDL_DestroyProperties(props);
+
         if (!m_window)
         {
             Log("~ Cannot create helper window for OpenGL:", SDL_GetError());
@@ -47,17 +56,17 @@ BOOL xrRender_test_hw()
     const sdl_window_test_helper windowTest;
     if (!windowTest.successful())
         return FALSE;
-
+#if 1
     GLenum err;
     {
         ZoneScopedN("glewInit()");
         err = glewInit();
     }
-    if (GLEW_OK != err)
+    if (GLEW_OK != err && GLEW_ERROR_NO_GLX_DISPLAY != err)
     {
         Log("~ Could not initialize glew:", (pcstr)glewGetErrorString(err));
         return FALSE;
     }
-
+#endif
     return TRUE;
 }

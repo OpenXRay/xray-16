@@ -6,9 +6,9 @@
 #include "PerformanceAlert.hpp"
 #include "xrCore/ModuleLookup.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #ifdef IMGUI_ENABLE_VIEWPORTS
-#   include <SDL_syswm.h>
+#   include <SDL3/SDL_syswm.h>
 #endif
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
@@ -45,7 +45,7 @@ void CRenderDevice::Initialize()
     TimerMM.Start();
 
     {
-        Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
+        Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN |
             SDL_WINDOW_RESIZABLE;
 
         GEnv.Render->ObtainRequiredWindowFlags(flags);
@@ -70,7 +70,15 @@ void CRenderDevice::Initialize()
         xr_strcpy(Core.ApplicationTitle, title);
         SetSDLSettings(title);
 
-        m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
+        SDL_PropertiesID props = SDL_CreateProperties();
+        SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, 0);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, 0);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, 640);
+        SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, 480);
+        SDL_SetNumberProperty(props, "flags", flags);
+        m_sdlWnd = SDL_CreateWindowWithProperties(props);
+        SDL_DestroyProperties(props);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
 
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
@@ -93,9 +101,9 @@ void CRenderDevice::Initialize()
         SDL_VERSION(&info.version);
         if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
         {
-#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+#if defined(SDL_VIDEO_DRIVER_WINDOWS /* SDL_VIDEO_DRIVER_WINDOWS has been removed in SDL3 */)
             main_viewport->PlatformHandleRaw = (void*)info.info.win.window;
-#elif defined(__APPLE__) && defined(SDL_VIDEO_DRIVER_COCOA)
+#elif defined(SDL_PLATFORM_APPLE) && defined(SDL_VIDEO_DRIVER_COCOA /* SDL_VIDEO_DRIVER_COCOA has been removed in SDL3 */)
             main_viewport->PlatformHandleRaw = (void*)info.info.cocoa.window;
 #endif
         }

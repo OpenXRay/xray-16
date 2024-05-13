@@ -379,50 +379,45 @@ int CApplication::Run()
 
         SDL_Event events[MAX_WINDOW_EVENTS];
         const int count = SDL_PeepEvents(events, MAX_WINDOW_EVENTS,
-            SDL_GETEVENT, SDL_WINDOWEVENT, SDL_WINDOWEVENT);
+            SDL_GETEVENT, SDL_EVENT_WINDOW_FIRST, SDL_EVENT_WINDOW_LAST);
 
         for (int i = 0; i < count; ++i)
         {
             const SDL_Event event = events[i];
 
-            switch (event.type)
-            {
-            case SDL_WINDOWEVENT:
-            {
                 const auto window = SDL_GetWindowFromID(event.window.windowID);
 
-                switch (event.window.event)
+            switch (event.type)
+            {
+            case SDL_EVENT_WINDOW_SHOWN:
+            case SDL_EVENT_WINDOW_FOCUS_GAINED:
+            case SDL_EVENT_WINDOW_RESTORED:
+            case SDL_EVENT_WINDOW_MAXIMIZED:
+                if (window != Device.m_sdlWnd)
+                    Device.OnWindowActivate(window, true);
+                else
                 {
-                case SDL_WINDOWEVENT_SHOWN:
-                case SDL_WINDOWEVENT_FOCUS_GAINED:
-                case SDL_WINDOWEVENT_RESTORED:
-                case SDL_WINDOWEVENT_MAXIMIZED:
-                    if (window != Device.m_sdlWnd)
-                        Device.OnWindowActivate(window, true);
-                    else
-                    {
-                        canCallActivate = true;
-                        shouldActivate = true;
-                    }
-                    continue;
+                    canCallActivate = true;
+                    shouldActivate = true;
+                }
+                continue;
 
-                case SDL_WINDOWEVENT_HIDDEN:
-                case SDL_WINDOWEVENT_FOCUS_LOST:
-                case SDL_WINDOWEVENT_MINIMIZED:
-                    if (window != Device.m_sdlWnd)
-                        Device.OnWindowActivate(window, false);
-                    else
-                    {
-                        canCallActivate = true;
-                        shouldActivate = false;
-                    }
-                    continue;
-                } // switch (event.window.event)
-            }
-            } // switch (event.type)
+            case SDL_EVENT_WINDOW_HIDDEN:
+            case SDL_EVENT_WINDOW_FOCUS_LOST:
+            case SDL_EVENT_WINDOW_MINIMIZED:
+                if (window != Device.m_sdlWnd)
+                    Device.OnWindowActivate(window, false);
+                else
+                {
+                    canCallActivate = true;
+                    shouldActivate = false;
+                }
+                continue;
 
-            // Only process event in Device
-            // if it wasn't processed in the switch above
+        } // switch (event.type)
+
+        // Only process event in Device
+        // if it wasn't processed in the switch above
             Device.ProcessEvent(event);
         } // for (int i = 0; i < count; ++i)
 
@@ -459,12 +454,19 @@ void CApplication::ShowSplash(bool topmost)
 
     Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
 
-#if SDL_VERSION_ATLEAST(2,0,5)
     if (topmost)
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
-#endif
 
-    m_window = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_surface->w, m_surface->h, flags);
+    SDL_PropertiesID props = SDL_CreateProperties();
+    SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, "OpenXRay");
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, SDL_WINDOWPOS_CENTERED_DISPLAY(0));
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, SDL_WINDOWPOS_CENTERED_DISPLAY(0));
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, m_surface->w);
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, m_surface->h);
+    SDL_SetNumberProperty(props, "flags", flags);
+    m_window = SDL_CreateWindowWithProperties(props);
+    SDL_DestroyProperties(props);
+
     SDL_ShowWindow(m_window);
 
     m_splash_thread = Threading::RunThread("Splash Thread", &CApplication::SplashProc, this);
@@ -501,7 +503,7 @@ void CApplication::HideSplash()
     SDL_DestroyWindow(m_window);
     m_window = nullptr;
 
-    SDL_FreeSurface(m_surface);
+    SDL_DestroySurface(m_surface);
 }
 
 void CApplication::InitializeDiscord()

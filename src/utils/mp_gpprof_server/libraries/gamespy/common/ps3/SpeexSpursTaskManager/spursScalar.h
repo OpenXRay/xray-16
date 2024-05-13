@@ -40,7 +40,7 @@ subject to the following restrictions:
 /*
 /// older compilers (gcc 3.x) and Sun needs double version of sqrt etc.
 /// exclude Apple Intel (i's assumed to be a Macbook or new Intel Dual Core Processor)
-#if defined (__sun) || defined (__sun__) || defined (__sparc) || (defined (__APPLE__) && ! defined (__i386__))
+#if defined (__sun) || defined (__sun__) || defined (__sparc) || (defined (SDL_PLATFORM_APPLE) && ! defined (__i386__))
 //use slow double float precision operation on those platforms
 #ifndef BT_USE_DOUBLE_PRECISION
 #define BT_FORCE_DOUBLE_FUNCTIONS

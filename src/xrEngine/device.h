@@ -23,7 +23,7 @@
 #include "Include/xrRender/FactoryPtr.h"
 #include "Render.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 // refs
 class Task;
@@ -287,8 +287,16 @@ public:
 
         ImGuiViewportData(ImVec2 pos, ImVec2 size, Uint32 flags)
         {
-            Window = SDL_CreateWindow("ImGui Viewport (no title yet)",
-                (int)pos.x, (int)pos.y, (int)size.x, (int)size.y, flags);
+            SDL_PropertiesID props = SDL_CreateProperties();
+            SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, "ImGui Viewport (no title yet)");
+            SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, (int)pos.x);
+            SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, (int)pos.y);
+            SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, (int)size.x);
+            SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, (int)size.y);
+            SDL_SetNumberProperty(props, "flags", flags);
+
+            Window = SDL_CreateWindowWithProperties(props);
+            SDL_DestroyProperties(props);
             WindowOwned = true;
         }
 

@@ -18,6 +18,6 @@
 #undef min
 #undef max
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "xrCore/xrCore.h"

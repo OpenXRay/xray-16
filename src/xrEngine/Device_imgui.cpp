@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #ifdef IMGUI_ENABLE_VIEWPORTS
-#   include <SDL_syswm.h>
+#   include <SDL3/SDL_syswm.h>
 #endif
 
 void CRenderDevice::InitializeImGui()
@@ -64,17 +64,15 @@ void CRenderDevice::InitializeImGui()
         Uint32 sdl_flags{};
         GEnv.Render->ObtainRequiredWindowFlags(sdl_flags);
 
-        //sdl_flags |= SDL_GetWindowFlags(bd->Window) & SDL_WINDOW_ALLOW_HIGHDPI; // XXX: high DPI
+        //sdl_flags |= SDL_GetWindowFlags(bd->Window) & SDL_WINDOW_HIGH_PIXEL_DENSITY; // XXX: high DPI
         sdl_flags |= SDL_WINDOW_HIDDEN;
         sdl_flags |= (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? SDL_WINDOW_BORDERLESS : 0;
         sdl_flags |= (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? 0 : SDL_WINDOW_RESIZABLE;
 #if !defined(XR_PLATFORM_WINDOWS)
         // See SDL hack in ImGui_ImplSDL2_ShowWindow().
-        sdl_flags |= (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon) ? SDL_WINDOW_SKIP_TASKBAR : 0;
+        sdl_flags |= (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon) ? SDL_WINDOW_UTILITY : 0;
 #endif
-#if SDL_VERSION_ATLEAST(2, 0, 5)
         sdl_flags |= (viewport->Flags & ImGuiViewportFlags_TopMost) ? SDL_WINDOW_ALWAYS_ON_TOP : 0;
-#endif
 
         const auto vd = IM_NEW(ImGuiViewportData)
         {
@@ -89,9 +87,9 @@ void CRenderDevice::InitializeImGui()
         SDL_VERSION(&info.version);
         if (SDL_GetWindowWMInfo(vd->Window, &info))
         {
-#if defined(XR_PLATFORM_WINDOWS) && defined(SDL_VIDEO_DRIVER_WINDOWS)
+#if defined(XR_PLATFORM_WINDOWS) && defined(SDL_VIDEO_DRIVER_WINDOWS /* SDL_VIDEO_DRIVER_WINDOWS has been removed in SDL3 */)
             viewport->PlatformHandleRaw = info.info.win.window;
-#elif defined(__APPLE__) && defined(SDL_VIDEO_DRIVER_COCOA)
+#elif defined(SDL_PLATFORM_APPLE) && defined(SDL_VIDEO_DRIVER_COCOA /* SDL_VIDEO_DRIVER_COCOA has been removed in SDL3 */)
             viewport->PlatformHandleRaw = (void*)info.info.cocoa.window;
 #endif
         }
@@ -121,7 +119,7 @@ void CRenderDevice::InitializeImGui()
         const HWND hwnd = static_cast<HWND>(viewport->PlatformHandleRaw);
 
         // SDL hack: Hide icon from task bar
-        // Note: SDL 2.0.6+ has a SDL_WINDOW_SKIP_TASKBAR flag which is supported under Windows but the way it create the window breaks our seamless transition.
+        // Note: SDL 2.0.6+ has a SDL_WINDOW_UTILITY flag which is supported under Windows but the way it create the window breaks our seamless transition.
         if (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon)
         {
             LONG ex_style = ::GetWindowLong(hwnd, GWL_EXSTYLE);
@@ -192,13 +190,11 @@ void CRenderDevice::InitializeImGui()
         SDL_SetWindowTitle(vd->Window, title);
     };
 
-#if SDL_VERSION_ATLEAST(2, 0, 5)
     platform_io.Platform_SetWindowAlpha = [](ImGuiViewport* viewport, float alpha)
     {
         const auto vd = static_cast<ImGuiViewportData*>(viewport->PlatformUserData);
         SDL_SetWindowOpacity(vd->Window, alpha);
     };
-#endif
 #endif // IMGUI_ENABLE_VIEWPORTS
 
     editor().InitBackend();

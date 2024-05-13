@@ -16,7 +16,7 @@
 
 #include "edit_actions.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <locale>
 
@@ -112,7 +112,7 @@ void line_edit_control::update_key_states()
     set_key_state(ks_RCtrl, pInput->iGetAsyncKeyState(SDL_SCANCODE_RCTRL));
     set_key_state(ks_LAlt, pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT));
     set_key_state(ks_RAlt, pInput->iGetAsyncKeyState(SDL_SCANCODE_RALT));
-    set_key_state(ks_CapsLock, SDL_GetModState() & KMOD_CAPS);
+    set_key_state(ks_CapsLock, SDL_GetModState() & SDL_KMOD_CAPS);
 }
 
 void line_edit_control::clear_states()

@@ -19,7 +19,7 @@
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include "xrstring.h" // XXX: remove
-#include <SDL.h> // XXX: remove
+#include <SDL3/SDL.h> // XXX: remove
 #include <glob.h>
 #endif
 
