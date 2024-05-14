@@ -29,6 +29,7 @@ private:
     xr_vector<std::thread> workerThreads;
     std::mutex workersLock;
 
+    inline static std::condition_variable newWorkArrived;
     std::atomic_size_t activeWorkersCount{};
 
     std::atomic_bool shouldPause{};

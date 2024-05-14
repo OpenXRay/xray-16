@@ -41,8 +41,6 @@ xr_unique_ptr<TaskManager> TaskScheduler;
 
 static constexpr size_t OTHER_THREADS_COUNT = 2; // Primary and Secondary thread
 
-static u32 ttapi_dwFastIter = 0;
-
 class TaskStorageSize
 {
     template <int E, typename Dummy = void> // XXX: remove Dummy workaround when gcc will finally match the standard
@@ -140,54 +138,11 @@ struct TaskWorkerStats
 class TaskWorker : public TaskQueue, public TaskWorkerStats
 {
 public:
-    Event            event;
+    std::mutex       mutex;
     fast_lc16        random{ this };
     size_t           id    { size_t(-1) };
-    std::atomic_bool sleeps{};
-
-    void WakeUpIfNeeded()
-    {
-        if (!empty() && sleeps.load(std::memory_order_relaxed))
-            event.Set(); // Wake up, we have work to do!
-    }
 } static thread_local s_tl_worker;
 
-class ThreadPriorityHelper
-{
-    Threading::priority_class m_priority;
-
-public:
-    ThreadPriorityHelper()
-        : m_priority(Threading::GetCurrentProcessPriorityClass())
-    {
-        Threading::SetCurrentProcessPriorityClass(Threading::priority_class::realtime);
-    }
-
-    ~ThreadPriorityHelper()
-    {
-        Threading::SetCurrentProcessPriorityClass(m_priority);
-    }
-};
-
-// Get fast spin-loop timings
-void CalcIterations()
-{
-    [[maybe_unused]] ThreadPriorityHelper priority;
-
-    volatile bool dummy = false;
-    const u64 frequency = CPU::qpc_freq;
-    const u32 iterations = 100000000; // approximately 1 second
-    const u64 start = CPU::QPC();
-    for (u32 i = 0; i < iterations; ++i)
-    {
-        if (dummy)
-            break;
-        _mm_pause();
-    }
-    const u64 end = CPU::QPC();
-    // We want 1/50000 (0.02ms) fast spin-loop
-    ttapi_dwFastIter = u32((iterations * frequency) / ((end - start) * 50000));
-}
 
 TaskManager::TaskManager()
 {
@@ -199,7 +154,6 @@ TaskManager::TaskManager()
 void TaskManager::SpawnThreads()
 {
     ZoneScoped;
-    CalcIterations();
 
     const u32 threads = workers.capacity() - OTHER_THREADS_COUNT;
     workerThreads.reserve(threads);
@@ -222,11 +176,7 @@ TaskManager::~TaskManager()
     }
 
     UnregisterThisThreadAsWorker();
-    {
-        std::lock_guard guard{ workersLock };
-        for (TaskWorker* worker : workers)
-            worker->event.Set();
-    }
+    newWorkArrived.notify_all();
     for (auto& thread : workerThreads)
     {
         if (thread.joinable())
@@ -265,7 +215,6 @@ void TaskManager::UnregisterThisThreadAsWorker()
 
 void TaskManager::SetThreadStatus(bool active)
 {
-    s_tl_worker.sleeps.store(!active, std::memory_order_relaxed);
     if (active)
         activeWorkersCount.fetch_add(1, std::memory_order_relaxed);
     else
@@ -277,50 +226,27 @@ void TaskManager::TaskWorkerStart()
     RegisterThisThreadAsWorker();
     SetThreadStatus(true);
 
-    const u32 fastIterations = ttapi_dwFastIter;
-
-    u32 iteration = 0;
     while (true)
-    {
-    get_task:
     {
         if (shouldStop.load(std::memory_order_consume))
             break;
-        if (shouldPause.load(std::memory_order_consume))
-            goto wait;
 
-        Task* task = s_tl_worker.pop();
-        if (!task)
-            task = TryToSteal();
+        if (!shouldPause.load(std::memory_order_consume))
+        {
+            if (ExecuteOneTask())
+                continue;
+        }
 
-        if (task)
-        {
-            ExecuteTask(*task);
-            iteration = 0;
-            goto get_task;
-        }
-    }
-    //count_spins:
-    {
-        ++iteration;
-        if (iteration < fastIterations)
-        {
-            _mm_pause();
-            goto get_task;
-        }
-    }
-    wait:
-    {
         SetThreadStatus(false);
-        do
         {
-            s_tl_worker.event.Wait(1);
-        } while (shouldPause.load(std::memory_order_consume));
+            std::unique_lock lck(s_tl_worker.mutex);
+            newWorkArrived.wait(lck, [&]
+            {
+                // spurious unlocks allowed
+                return !shouldPause.load(std::memory_order_consume);
+            });
+        }
         SetThreadStatus(true);
-
-        iteration = 0;
-        goto get_task;
-    }
     } // while (true)
 
     SetThreadStatus(false);
@@ -348,7 +274,8 @@ Task* TaskManager::TryToSteal() const
             continue;
         if (auto* task = other->steal())
         {
-            other->WakeUpIfNeeded();
+            if (!other->empty())
+                newWorkArrived.notify_all();
             return task;
         }
         --steal_attempts;
@@ -391,6 +318,7 @@ void TaskManager::IncrementTaskJobsCounter(Task& parent)
 void TaskManager::PushTask(Task& task)
 {
     s_tl_worker.push(&task);
+    newWorkArrived.notify_one();
     ++s_tl_worker.pushedTasks;
 }
 
@@ -424,6 +352,10 @@ void TaskManager::WaitForChildren(const Task& task) const
 bool TaskManager::ExecuteOneTask() const
 {
     Task* task = s_tl_worker.pop();
+
+    if (!task)
+        task = workers[0]->steal();
+
     if (!task)
         task = TryToSteal();
 
