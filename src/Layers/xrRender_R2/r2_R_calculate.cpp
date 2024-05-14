@@ -122,10 +122,6 @@ void CRender::Calculate()
         Lights.add_light(L);
     }
 
-
-    // Frustum
-    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-
     TaskScheduler->Wait(*ProcessHOMTask);
 
     r_main.init();

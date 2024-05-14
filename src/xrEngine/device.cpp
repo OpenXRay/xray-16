@@ -210,8 +210,12 @@ bool CRenderDevice::BeforeFrame()
     return true;
 }
 
-void CRenderDevice::BeforeRender()
+void CRenderDevice::OnCameraUpdated()
 {
+    static u32 frame{ u32(-1) };
+    if (frame == dwFrame)
+        return;
+
     ZoneScoped;
 
     // Precache
@@ -230,8 +234,10 @@ void CRenderDevice::BeforeRender()
     mInvView.invert(mView);
     mFullTransform.mul(mProject, mView);
     mInvFullTransform.invert_44(mFullTransform);
-    GEnv.Render->BeforeRender();
+    GEnv.Render->OnCameraUpdated();
     GEnv.Render->SetCacheXform(mView, mProject);
+
+    frame = dwFrame;
 }
 
 static void UpdateViewports()
@@ -313,7 +319,7 @@ void CRenderDevice::ProcessFrame()
 
     FrameMove();
 
-    BeforeRender();
+    OnCameraUpdated();
 
     executeSecondaryTasks.store(true, std::memory_order_release);
 

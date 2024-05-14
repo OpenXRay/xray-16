@@ -639,9 +639,12 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
-void CRender::BeforeRender()
+void CRender::OnCameraUpdated()
 {
     ZoneScoped;
+
+    // Frustum
+    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;

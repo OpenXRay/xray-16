@@ -488,7 +488,7 @@ public:
     bool occ_visible(sPoly& P) override;
 
     // Main
-    void BeforeRender() override;
+    void OnCameraUpdated() override;
 
     void Calculate() override;
     void Render() override;

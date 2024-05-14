@@ -1145,6 +1145,8 @@ void CActor::UpdateCL()
 
     cam_Update(float(Device.dwTimeDelta) / 1000.0f, currentFOV());
 
+    Device.OnCameraUpdated();
+
     if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
     {
         psHUD_Flags.set(HUD_CROSSHAIR_RT2, true);

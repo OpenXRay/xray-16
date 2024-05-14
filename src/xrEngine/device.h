@@ -175,7 +175,7 @@ public:
     bool BeforeFrame();
     void FrameMove();
 
-    void BeforeRender();
+    void OnCameraUpdated();
     void DoRender();
     bool RenderBegin();
     void Clear();
