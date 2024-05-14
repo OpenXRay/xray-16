@@ -890,32 +890,36 @@ static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* 
 
 void xrDebug::OnThreadSpawn()
 {
+#ifndef __SANITIZE_ADDRESS__
     std::signal(SIGINT,  nullptr);
     std::signal(SIGILL,  +[](int signal) { handler_base("illegal instruction"); });
     std::signal(SIGFPE,  +[](int signal) { handler_base("floating point error"); });
-#ifdef DEBUG
+#   ifdef DEBUG
     std::signal(SIGSEGV, +[](int signal) { handler_base("segmentation fault"); });
-#endif
+#   endif
     std::signal(SIGABRT, +[](int signal) { handler_base("application is aborting"); });
     std::signal(SIGTERM, +[](int signal) { handler_base("termination with exit code 3"); });
 
-#if defined(XR_PLATFORM_WINDOWS)
-#ifdef USE_BUG_TRAP
-    BT_SetTerminate();
-#endif
+#   if defined(XR_PLATFORM_WINDOWS)
     std::signal(SIGABRT_COMPAT, +[](int signal) { handler_base("application is aborting"); });
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
     _set_invalid_parameter_handler(&invalid_parameter_handler);
     _set_new_mode(1);
     _set_new_handler(&out_of_memory_handler);
     _set_purecall_handler(+[] { handler_base("pure virtual function call"); });
-#else
+#   endif
+
+#   ifdef USE_BUG_TRAP
+    BT_SetTerminate();
+#   else
     std::set_terminate(xr_terminate);
+#   endif
 #endif
 }
 
 void xrDebug::OnThreadExit()
 {
+#ifndef __SANITIZE_ADDRESS__
     std::signal(SIGINT,  nullptr);
     std::signal(SIGILL,  nullptr);
     std::signal(SIGFPE,  nullptr);
@@ -924,13 +928,14 @@ void xrDebug::OnThreadExit()
     std::signal(SIGTERM, nullptr);
     std::set_terminate(nullptr);
 
-#if defined(XR_PLATFORM_WINDOWS)
+#   if defined(XR_PLATFORM_WINDOWS)
     std::signal(SIGABRT_COMPAT, nullptr);
     _set_abort_behavior(0, 0);
     _set_invalid_parameter_handler(nullptr);
     _set_new_mode(1);
     _set_new_handler(nullptr);
     _set_purecall_handler(nullptr);
+#   endif
 #endif
 }
 
