@@ -50,6 +50,9 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
         _resetstkoflw();
         FATAL("stack overflow");
     }
+    if (!xrDebug::DebuggerIsPresent())
+        std::terminate(); // XXX: temporary to hide crashes on shutdown that make engine process hang
+
     return result;
 }
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
