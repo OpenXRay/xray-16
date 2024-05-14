@@ -88,14 +88,9 @@ public:
         return m_data.jobs.load(std::memory_order_relaxed);
     }
 
-    bool HasChildren() const
-    {
-        return GetJobsCount() > 1;
-    }
-
     bool IsFinished() const
     {
-        return 0 == m_data.jobs.load(std::memory_order_relaxed);
+        return GetJobsCount() == 0;
     }
 
 private:

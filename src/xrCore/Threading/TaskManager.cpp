@@ -338,17 +338,6 @@ void TaskManager::Wait(const Task& task) const
     }
 }
 
-void TaskManager::WaitForChildren(const Task& task) const
-{
-    ZoneScoped;
-    while (!task.HasChildren())
-    {
-        ExecuteOneTask();
-        if (s_tl_worker.id == 0 && xrDebug::ProcessingFailure())
-            SDL_PumpEvents(); // Necessary to prevent dead locks
-    }
-}
-
 bool TaskManager::ExecuteOneTask() const
 {
     Task* task = s_tl_worker.pop();
