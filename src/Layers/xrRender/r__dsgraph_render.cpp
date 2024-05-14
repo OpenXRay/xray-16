@@ -42,6 +42,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
     // Sorting by SSA and changes minimizations
     // Render several passes
     {
+        ZoneScopedN("dsgraph_render_static");
         PIX_EVENT_CTX(cmd_list, dsgraph_render_static);
 
         for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
@@ -83,6 +84,7 @@ void R_dsgraph_structure::render_graph(u32 _priority)
     // Sorting by SSA and changes minimizations
     // Render several passes
     {
+        ZoneScopedN("dsgraph_render_dynamic");
         PIX_EVENT_CTX(cmd_list, dsgraph_render_dynamic);
 
         for (u32 iPass = 0; iPass < SHADER_PASSES_MAX; ++iPass)
@@ -237,6 +239,7 @@ ICF void sort_back_to_front_render_and_clean(u32 context_id, T& vec)
 // HUD render
 void R_dsgraph_structure::render_hud()
 {
+    ZoneScoped;
     PIX_EVENT_CTX(cmd_list, dsgraph_render_hud);
 
     if (!mapHUD.empty())
@@ -253,6 +256,7 @@ void R_dsgraph_structure::render_hud()
 
 void R_dsgraph_structure::render_hud_ui()
 {
+    ZoneScoped;
     CCustomHUD* levelHud = g_pGameLevel->pHUD;
     VERIFY(levelHud && levelHud->RenderActiveItemUIQuery());
 
@@ -284,6 +288,7 @@ void R_dsgraph_structure::render_hud_ui()
 // strict-sorted render
 void R_dsgraph_structure::render_sorted()
 {
+    ZoneScoped;
     PIX_EVENT_CTX(cmd_list, dsgraph_render_sorted);
 
     sort_back_to_front_render_and_clean(context_id, mapSorted);
@@ -300,6 +305,7 @@ void R_dsgraph_structure::render_sorted()
 void R_dsgraph_structure::render_emissive()
 {
 #if RENDER != R_R1
+    ZoneScoped;
     PIX_EVENT_CTX(cmd_list, dsgraph_render_emissive);
 
     sort_front_to_back_render_and_clean(context_id, mapEmissive);
@@ -317,6 +323,7 @@ void R_dsgraph_structure::render_emissive()
 void R_dsgraph_structure::render_wmarks()
 {
 #if RENDER != R_R1
+    ZoneScoped;
     PIX_EVENT(dsgraph_render_wmarks);
 
     sort_front_to_back_render_and_clean(context_id, mapWmark);
@@ -327,6 +334,7 @@ void R_dsgraph_structure::render_wmarks()
 // strict-sorted render
 void R_dsgraph_structure::render_distort()
 {
+    ZoneScoped;
     PIX_EVENT(dsgraph_render_distort);
 
     sort_back_to_front_render_and_clean(context_id, mapDistort);

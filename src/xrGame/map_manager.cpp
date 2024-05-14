@@ -237,6 +237,7 @@ void CMapManager::GetMapLocations(const shared_str& spot_type, u16 id, xr_vector
 
 void CMapManager::Update()
 {
+    ZoneScoped;
     delete_data(m_deffered_destroy_queue); // from prev frame
 
     auto it = Locations().begin();

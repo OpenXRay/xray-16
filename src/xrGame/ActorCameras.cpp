@@ -284,6 +284,8 @@ void CActor::cam_Update(float dt, float fFOV)
     if (m_holder)
         return;
 
+    ZoneScoped;
+
     if ((mstate_real & mcClimb) && (cam_active != eacFreeLook))
         camUpdateLadder(dt);
     on_weapon_shot_update();

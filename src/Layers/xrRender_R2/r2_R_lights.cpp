@@ -20,6 +20,8 @@ bool check_grass_shadow(light* L, CFrustum VB)
 
 void CRender::render_lights(light_Package& LP)
 {
+    ZoneScoped;
+
     //////////////////////////////////////////////////////////////////////////
     // Refactor order based on ability to pack shadow-maps
     // 1. calculate area + sort in descending order

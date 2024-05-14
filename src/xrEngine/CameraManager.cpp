@@ -169,6 +169,7 @@ void CCameraManager::UpdateFromCamera(const CCameraBase* C)
 void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest,
     float fFAR_Dest, u32 flags)
 {
+    ZoneScoped;
 #ifdef DEBUG
     if (!Device.Paused())
     {
@@ -313,6 +314,7 @@ void CCameraManager::UpdatePPEffectors()
 
 void CCameraManager::ApplyDevice()
 {
+    ZoneScoped;
     // Device params
     Device.mView.build_camera_dir(m_cam_info.p, m_cam_info.d, m_cam_info.n);
 

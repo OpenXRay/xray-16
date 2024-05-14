@@ -75,6 +75,7 @@ void CRender::RenderMenu()
 extern u32 g_r;
 void CRender::Render()
 {
+    ZoneScoped;
 #if defined(USE_DX11)
     TracyD3D11Zone(HW.profiler_ctx, "Render");
 #endif
@@ -386,6 +387,7 @@ void CRender::Render()
 
 void CRender::render_forward()
 {
+    ZoneScoped;
     auto& dsgraph = get_imm_context();
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)

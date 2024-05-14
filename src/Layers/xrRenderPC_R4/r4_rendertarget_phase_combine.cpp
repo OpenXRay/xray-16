@@ -9,6 +9,7 @@ float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
 
 void CRenderTarget::phase_combine()
 {
+    ZoneScoped;
     PIX_EVENT(phase_combine);
 
     //	TODO: DX11: Remove half pixel offset

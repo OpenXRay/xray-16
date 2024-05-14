@@ -402,6 +402,8 @@ void CDetailManager::Render(CBackend& cmd_list)
         return;
 #endif
 
+    ZoneScoped;
+
     // MT
     MT_SYNC();
 
