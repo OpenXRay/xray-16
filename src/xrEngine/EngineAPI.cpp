@@ -29,13 +29,13 @@ struct RendererDesc
     RendererModule* module;
 };
 
-std::array<RendererDesc, 2> g_render_modules =
-{{
+RendererDesc g_render_modules[] =
+{
 #ifdef XR_PLATFORM_WINDOWS
     { "xrRender_R4", nullptr, nullptr },
 #endif
     { "xrRender_GL", nullptr, nullptr },
-}};
+};
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
