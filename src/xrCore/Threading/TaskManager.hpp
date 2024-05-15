@@ -15,10 +15,11 @@
 */
 #pragma once
 
-#include <mutex>
-
-#include "Event.hpp"
 #include "Task.hpp"
+
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
 
 class TaskWorker;
 
