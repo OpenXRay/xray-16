@@ -164,7 +164,7 @@ public:
     bool Paused();
 
 private:
-    void SecondaryThreadProc();
+    void ProcessParallelSequence(Task&, void*);
 
 public:
     // Scene control
@@ -232,10 +232,6 @@ public:
         VERIFY(Timer.time_factor() == TimerGlobal.time_factor());
         return (Timer.time_factor());
     }
-
-private:
-    std::thread secondaryThread;
-    std::atomic_bool executeSecondaryTasks{}, secondaryTasksExecuted{}, secondaryThreadFinished{};
 
 public:
     // Multi-threading

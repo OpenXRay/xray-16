@@ -39,7 +39,7 @@
 
 xr_unique_ptr<TaskManager> TaskScheduler;
 
-static constexpr size_t OTHER_THREADS_COUNT = 2; // Primary and Secondary thread
+static constexpr size_t OTHER_THREADS_COUNT = 1; // Primary and Secondary thread
 
 class TaskStorageSize
 {
