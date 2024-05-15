@@ -225,18 +225,10 @@ public:
     void Render(CBackend& cmd_list);
 
     /// MT stuff
-    Lock MT;
-    volatile u32 m_frame_calc;
-    volatile u32 m_frame_rendered;
+    Task* m_calc_task{};
 
-    void MT_CALC();
-    ICF void MT_SYNC()
-    {
-        if (m_frame_calc == Device.dwFrame)
-            return;
-
-        MT_CALC();
-    }
+    void MT_CALC(Task&, void*);
+    void DispatchMTCalc();
 
     CDetailManager();
     virtual ~CDetailManager();

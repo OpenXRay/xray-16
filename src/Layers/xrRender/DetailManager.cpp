@@ -17,6 +17,9 @@
 #else
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
+
+#include "xrCore/Threading/TaskManager.hpp"
+
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
@@ -404,8 +407,7 @@ void CDetailManager::Render(CBackend& cmd_list)
 
     ZoneScoped;
 
-    // MT
-    MT_SYNC();
+    TaskScheduler->Wait(*m_calc_task);
 
     RImplementation.BasicStats.DetailRender.Begin();
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 1.0f; //--#SM+#-- Флаг начала рендера травы [begin of grass render]
@@ -427,10 +429,9 @@ void CDetailManager::Render(CBackend& cmd_list)
 
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]
     RImplementation.BasicStats.DetailRender.End();
-    m_frame_rendered = Device.dwFrame;
 }
 
-void CDetailManager::MT_CALC()
+void CDetailManager::MT_CALC(Task&, void*)
 {
 #ifndef _EDITOR
     if (nullptr == RImplementation.Details)
@@ -445,21 +446,19 @@ void CDetailManager::MT_CALC()
 
     EYE = Device.vCameraPosition;
 
-    MT.Enter();
-    if (m_frame_calc != Device.dwFrame)
-        if ((m_frame_rendered + 1) == Device.dwFrame) // already rendered
-        {
-            int s_x = iFloor(EYE.x / dm_slot_size + .5f);
-            int s_z = iFloor(EYE.z / dm_slot_size + .5f);
+    const int s_x = iFloor(EYE.x / dm_slot_size + .5f);
+    const int s_z = iFloor(EYE.z / dm_slot_size + .5f);
 
-            RImplementation.BasicStats.DetailCache.Begin();
-            cache_Update(s_x, s_z, EYE, dm_max_decompress);
-            RImplementation.BasicStats.DetailCache.End();
+    RImplementation.BasicStats.DetailCache.Begin();
+    cache_Update(s_x, s_z, EYE, dm_max_decompress);
+    RImplementation.BasicStats.DetailCache.End();
 
-            UpdateVisibleM();
-            m_frame_calc = Device.dwFrame;
-        }
-    MT.Leave();
+    UpdateVisibleM();
+}
+
+void CDetailManager::DispatchMTCalc()
+{
+    m_calc_task = &TaskScheduler->AddTask({ this, &CDetailManager::MT_CALC });
 }
 
 void CDetailManager::details_clear()

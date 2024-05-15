@@ -650,6 +650,8 @@ void CRender::OnCameraUpdated()
         return;
 
     ProcessHOMTask = &TaskScheduler->AddTask({ &HOM, &CHOM::MT_RENDER });
+    if (Details)
+        Details->DispatchMTCalc();
 }
 
 void CRender::OnFrame()
@@ -657,14 +659,9 @@ void CRender::OnFrame()
     ZoneScoped;
 
     Models->DeleteQueue();
+
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
-    if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
-    {
-        // MT-details (@front)
-        Device.seqParallel.insert(
-            Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
-    }
 
     if (Details)
         g_pGamePersistent->GrassBendersUpdateAnimations();
