@@ -42,20 +42,17 @@ class XRCORE_API Task final : Noncopyable
 
 public:
     using TaskFunc      = fastdelegate::FastDelegate<void(Task&, void*)>;
-    using OnFinishFunc  = fastdelegate::FastDelegate<void(const Task&, void*)>;
 
 private:
     // ordered from biggest to smallest
     struct Data
     {
         TaskFunc            task_func{};
-        OnFinishFunc        on_finish_callback{};
         Task*               parent{};
         std::atomic_int16_t jobs{}; // at least 1 (task itself), zero means task is done.
 
         Data() = default;
         Data(const TaskFunc& task, Task* parent);
-        Data(const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent);
     } m_data;
 
     static constexpr size_t USER_DATA_SIZE = TASK_SIZE - sizeof(m_data);
@@ -68,9 +65,6 @@ private:
 
     // Will just execute
     Task(const TaskFunc& task, void* data, size_t dataSize, Task* parent = nullptr);
-
-    // Will execute and call back
-    Task(const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent = nullptr);
 
 public:
     static constexpr size_t GetAvailableDataStorageSize()
@@ -96,5 +90,4 @@ public:
 private:
     // Called by TaskManager
     void Execute();
-    void Finish();
 };

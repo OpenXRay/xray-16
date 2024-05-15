@@ -41,7 +41,6 @@ private:
     [[nodiscard]] Task* TryToSteal() const;
 
     static void ExecuteTask(Task& task);
-    static void FinalizeTask(Task& task);
 
     [[nodiscard]] ICF static Task* AllocateTask();
     static void ICF IncrementTaskJobsCounter(Task& parent);
@@ -57,11 +56,9 @@ public:
     // TaskFunc is at the end for fancy in-place lambdas
     // Create a task, but don't run it yet
     [[nodiscard]] static Task& CreateTask(const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
-    [[nodiscard]] static Task& CreateTask(const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
     // Create a task as child, but don't run it yet
     [[nodiscard]] static Task& CreateTask(Task& parent, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
-    [[nodiscard]] static Task& CreateTask(Task& parent, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
     // Run task in parallel
     static void PushTask(Task& task);
@@ -71,11 +68,9 @@ public:
 
     // Shortcut: create a task and run it immediately
     static Task& AddTask(const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
-    static Task& AddTask(const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
     // Shortcut: create task and run it immediately
     static Task& AddTask(Task& parent, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
-    static Task& AddTask(Task& parent, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize = 0, void* data = nullptr);
 
 public:
     void RegisterThisThreadAsWorker();

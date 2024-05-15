@@ -18,10 +18,7 @@
 #include "Task.hpp"
 
 Task::Data::Data(const TaskFunc& task, Task* parent)
-    : task_func(task), on_finish_callback(nullptr), parent(parent), jobs(1) {}
-
-Task::Data::Data(const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent)
-    : task_func(task), on_finish_callback(onFinishCallback), parent(parent), jobs(1) {}
+    : task_func(task), parent(parent), jobs(1) {}
 
 Task::Task(const TaskFunc& task, void* data, size_t dataSize, Task* parent /*= nullptr*/)
     : m_data(task, parent)
@@ -33,23 +30,7 @@ Task::Task(const TaskFunc& task, void* data, size_t dataSize, Task* parent /*= n
     }
 }
 
-Task::Task(const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent /*= nullptr*/)
-    : m_data(task, onFinishCallback, parent)
-{
-    VERIFY2(dataSize <= sizeof(m_user_data), "Cannot fit your data in the task");
-    if (data && dataSize)
-    {
-        CopyMemory(m_user_data, data, std::min(dataSize, sizeof(m_user_data)));
-    }
-}
-
 void Task::Execute()
 {
     m_data.task_func(*this, m_user_data);
-}
-
-void Task::Finish()
-{
-    if (m_data.on_finish_callback)
-        m_data.on_finish_callback(*this, m_user_data);
 }

@@ -22,10 +22,10 @@ namespace details
 class ParallelForEachTask
 {
 public:
-    template <typename Iterator, typename Function, typename ThirdArgument>
-    static decltype(auto) Run(Iterator begin, Iterator end, ThirdArgument thirdArgument, const Function& function)
+    template <typename Iterator, typename Function>
+    static decltype(auto) Run(Iterator begin, Iterator end, bool wait, const Function& function)
     {
-        return xr_parallel_for(TaskRange(begin, end), thirdArgument, [&](TaskRange<Iterator>& range)
+        return xr_parallel_for(TaskRange(begin, end), wait, [&](TaskRange<Iterator>& range)
         {
             for (auto& it : range)
             {
@@ -48,11 +48,4 @@ template <typename Range, typename Function>
 decltype(auto) xr_parallel_for_each(Range& range, const Function& function)
 {
     return details::ParallelForEachTask::Run(std::begin(range), std::end(range), true, function);
-}
-
-// User has a callback, he is responsible for waiting on the task finish (due to task management system limitation)
-template <typename Range, typename Function>
-decltype(auto) xr_parallel_for_each(Range& range, const Task::OnFinishFunc& callback, const Function& function)
-{
-    return details::ParallelForEachTask::Run(std::begin(range), std::end(range), callback, function);
 }

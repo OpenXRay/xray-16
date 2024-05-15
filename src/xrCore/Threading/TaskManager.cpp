@@ -286,16 +286,12 @@ Task* TaskManager::TryToSteal() const
 void TaskManager::ExecuteTask(Task& task)
 {
     task.Execute();
-    FinalizeTask(task);
-}
 
-void TaskManager::FinalizeTask(Task& task)
-{
+    // Finalize
     for (Task* it = &task; ; it = it->m_data.parent)
     {
         const auto unfinishedJobs = it->m_data.jobs.fetch_sub(1, std::memory_order_acq_rel) - 1; // fetch_sub returns previous value
         VERIFY2(unfinishedJobs >= 0, "The same task was executed two times.");
-        it->Finish();
         if (unfinishedJobs || !it->m_data.parent)
             break;
     }
@@ -361,21 +357,10 @@ Task& TaskManager::CreateTask(const Task::TaskFunc& taskFunc, size_t dataSize /*
     return *new (AllocateTask()) Task(taskFunc, data, dataSize);
 }
 
-Task& TaskManager::CreateTask(const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    return *new (AllocateTask()) Task(taskFunc, onFinishCallback, data, dataSize);
-}
-
 Task& TaskManager::CreateTask(Task& parent, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
     IncrementTaskJobsCounter(parent);
     return *new (AllocateTask()) Task(taskFunc, data, dataSize, &parent);
-}
-
-Task& TaskManager::CreateTask(Task& parent, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    IncrementTaskJobsCounter(parent);
-    return *new (AllocateTask()) Task(taskFunc, onFinishCallback, data, dataSize, &parent);
 }
 
 Task& TaskManager::AddTask(const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
@@ -385,23 +370,9 @@ Task& TaskManager::AddTask(const Task::TaskFunc& taskFunc, size_t dataSize /*= 0
     return task;
 }
 
-Task& TaskManager::AddTask(const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    auto& task = CreateTask(onFinishCallback, taskFunc, dataSize, data);
-    PushTask(task);
-    return task;
-}
-
 Task& TaskManager::AddTask(Task& parent, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
 {
     auto& task = CreateTask(parent, taskFunc, dataSize, data);
-    PushTask(task);
-    return task;
-}
-
-Task& TaskManager::AddTask(Task& parent, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    auto& task = CreateTask(parent, onFinishCallback, taskFunc, dataSize, data);
     PushTask(task);
     return task;
 }

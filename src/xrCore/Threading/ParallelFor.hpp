@@ -147,22 +147,6 @@ public:
         return task;
     }
 
-    // Doesn't wait until done
-    static decltype(auto) Run(const Range& range, bool wait, const Task::OnFinishFunc& callback, const Function& function)
-    {
-        TaskData taskData{ range, function };
-
-        auto& task = TaskManager::AddTask(callback, task_func, sizeof(TaskData), &taskData);
-        if (wait)
-        {
-            VERIFY2(TaskScheduler, "Task scheduler is not yet created. "
-                "You should explicitly state that you know this by setting 'wait' param to false.");
-            if (TaskScheduler)
-                TaskScheduler->Wait(task);
-        }
-        return task;
-    }
-
 private:
     static void task_func(Task& thisTask, void* data_ptr)
     {
@@ -204,15 +188,3 @@ decltype(auto) xr_parallel_for(const Range& range, const Function& function)
     return details::ParallelForTask<Range, Function>::Run(range, true, function);
 }
 
-template <typename Range, typename Function>
-decltype(auto) xr_parallel_for(const Range& range, bool wait, const Task::OnFinishFunc& callback, const Function& function)
-{
-    return details::ParallelForTask<Range, Function>::Run(range, wait, callback, function);
-}
-
-// Caller thread will wait on the task finish
-template <typename Range, typename Function>
-decltype(auto) xr_parallel_for(const Range& range, const Task::OnFinishFunc& callback, const Function& function)
-{
-    return details::ParallelForTask<Range, Function>::Run(range, true, callback, function);
-}
