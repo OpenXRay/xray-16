@@ -60,33 +60,6 @@ bool CRenderDevice::RenderBegin()
 
 void CRenderDevice::Clear() { GEnv.Render->Clear(); }
 
-namespace
-{
-void CheckPrivilegySlowdown()
-{
-#ifndef MASTER_GOLD
-    const auto slowdownthread = []
-    {
-        for (;;)
-        {
-            if (Device.GetStats().fFPS < 30)
-                Sleep(1);
-            if (Device.mt_bMustExit.load(std::memory_order_acquire) || !pSettings || !Console || !pInput)
-                return;
-        }
-    };
-
-    if (strstr(Core.Params, "-slowdown"))
-        Threading::SpawnThread("slowdown", slowdownthread);
-    if (strstr(Core.Params, "-slowdown2x"))
-    {
-        Threading::SpawnThread("slowdown", slowdownthread);
-        Threading::SpawnThread("slowdown", slowdownthread);
-    }
-#endif
-}
-}
-
 void CRenderDevice::RenderEnd(void)
 {
     if (GEnv.isDedicatedServer)
@@ -111,7 +84,6 @@ void CRenderDevice::RenderEnd(void)
             Msg("* MEMORY USAGE: %d K", Memory.mem_usage() / 1024);
             Msg("* End of synchronization A[%d] R[%d]", b_is_Active, b_is_Ready);
             FIND_CHUNK_COUNTER_FLUSH();
-            CheckPrivilegySlowdown();
             if (g_pGamePersistent->GameType() == 1 && !psDeviceFlags.test(rsAlwaysActive)) // haCk
             {
                 const Uint32 flags = SDL_GetWindowFlags(m_sdlWnd);
@@ -470,9 +442,6 @@ void CRenderDevice::Run()
 
 void CRenderDevice::Shutdown()
 {
-    // Stop Balance-Thread
-    mt_bMustExit.store(true, std::memory_order_release);
-
     seqAppEnd.Process();
 }
 

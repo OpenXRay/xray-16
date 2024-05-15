@@ -236,7 +236,6 @@ public:
 public:
     // Multi-threading
     Event PresentationFinished = nullptr;
-    std::atomic_bool mt_bMustExit{};
 
     static constexpr u32 MaximalWaitTime = 16; // ms
 
