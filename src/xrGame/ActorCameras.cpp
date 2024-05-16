@@ -279,12 +279,25 @@ float ik_cam_shift_tolerance = 0.2f;
 float ik_cam_shift_speed = 0.01f;
 float ik_cam_shift_interpolation = 4.f;
 
+ENGINE_API extern float g_hud_fov;
+ENGINE_API extern float g_hud_fov_def;
+
 void CActor::cam_Update(float dt, float fFOV)
 {
     if (m_holder)
         return;
 
     ZoneScoped;
+
+    // HUD FOV Update
+    const float fovChangeSpeed = 10.f * Device.fTimeDelta;
+    if (this == Level().CurrentControlEntity())
+    {
+        if (fsimilar(g_hud_fov, g_hud_fov_def))
+            g_hud_fov = g_hud_fov_def;
+        else
+            g_hud_fov = angle_lerp(g_hud_fov, g_hud_fov_def, fovChangeSpeed);
+    }
 
     if ((mstate_real & mcClimb) && (cam_active != eacFreeLook))
         camUpdateLadder(dt);
