@@ -307,7 +307,7 @@ Task* TaskManager::AllocateTask()
 void TaskManager::IncrementTaskJobsCounter(Task& parent)
 {
     VERIFY2(parent.m_data.jobs.load(std::memory_order_relaxed) > 0, "Adding child task to a parent that has already finished.");
-    [[maybe_unused]] const auto prev = parent.m_data.jobs.fetch_add(1, std::memory_order_relaxed);
+    [[maybe_unused]] const auto prev = parent.m_data.jobs.fetch_add(1, std::memory_order_acq_rel);
     VERIFY2(prev != std::numeric_limits<decltype(prev)>::max(), "Max jobs overflow. (too much children)");
 }
 
