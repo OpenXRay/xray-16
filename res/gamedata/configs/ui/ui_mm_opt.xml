@@ -172,6 +172,14 @@
 				<e r="210" g="210" b="210"/>
 			</text_color>
         </btn_advanced>
+
+        <btn_shader_options x="210" y="322" width="108" height="24" stretch="1">
+            <text r="170" g="170" b="170" align="c" font="letterica16">ui_mm_shader_options</text>
+            <texture>ui_inGame2_button</texture>
+            <text_color>
+                <e r="210" g="210" b="210"/>
+            </text_color>
+        </btn_shader_options>
     </tab_video>
 
     <video_adv>
@@ -531,6 +539,8 @@
 			</text_color>
         </btn_to_simply>
     </video_adv>
+
+    #include "ui\ui_mm_shader_options.xml"
 
     <tab_sound>
         <cap_mastervolume x="15" y="3" width="135" height="24">
