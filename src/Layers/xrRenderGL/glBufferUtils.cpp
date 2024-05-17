@@ -162,14 +162,14 @@ void SetVertexDeclaration(const VertexElement* dxdecl)
     });
 }
 
-void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
+void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl, bool GLARBvertexattribbindingSupported)
 {
     RCache.set_Format(decl);
     IterVertexDeclaration(dxdecl,
-    [](GLuint location, GLint size, GLenum type, GLboolean normalized, GLuint offset, GLuint stream)
+    [&GLARBvertexattribbindingSupported](GLuint location, GLint size, GLenum type, GLboolean normalized, GLuint offset, GLuint stream)
     {
         CHK_GL(glEnableVertexAttribArray(location));
-        if (GLEW_ARB_vertex_attrib_binding)
+        if (GLARBvertexattribbindingSupported)
         {
             CHK_GL(glVertexAttribFormat(location, size, type, normalized, offset));
             CHK_GL(glVertexAttribBinding(location, stream));

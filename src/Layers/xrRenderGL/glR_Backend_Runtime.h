@@ -248,7 +248,7 @@ ICF void CBackend::set_Vertices(GLuint _vb, u32 _vb_stride)
         vb = _vb;
         vb_stride = _vb_stride;
 
-        if (GLEW_ARB_vertex_attrib_binding)
+        if (HW.GLARBvertexattribbindingSupported)
         {
             CHK_GL(glBindVertexBuffer(0, vb, 0, vb_stride));
         }

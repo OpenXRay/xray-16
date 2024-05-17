@@ -61,7 +61,7 @@ inline std::pair<char, GLuint> GLCompileShader(pcstr* buffer, size_t size, pcstr
 
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    if (GLEW_VERSION_4_3)
+    if (epoxy_gl_version() >= 43)
         CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
     if (HW.ShaderBinarySupported)
@@ -93,7 +93,7 @@ inline std::pair<char, GLuint> GLUseBinary(pcstr* buffer, size_t size, const GLe
 
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    if (GLEW_VERSION_4_3)
+    if (epoxy_gl_version() >= 43)
         CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     CHK_GL(glProgramParameteri(program, GL_PROGRAM_SEPARABLE, (GLint)GL_TRUE));
 
@@ -118,7 +118,7 @@ static GLuint GLLinkMonolithicProgram(pcstr name, GLuint ps, GLuint vs, GLuint g
 {
     const GLuint program = glCreateProgram();
     R_ASSERT(program);
-    if (GLEW_VERSION_4_3)
+    if (epoxy_gl_version() >= 43)
         CHK_GL(glObjectLabel(GL_PROGRAM, program, -1, name));
     // XXX: support caching for monolithic programs
     //if (HW.ShaderBinarySupported)

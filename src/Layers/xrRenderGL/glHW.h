@@ -64,6 +64,9 @@ public:
     bool SeparateShaderObjectsSupported;
     bool ShaderBinarySupported;
     bool ComputeShadersSupported;
+    bool GLKHRdebugSupported;
+    bool GLARBtexturefloatSuppoted;
+    bool GLARBvertexattribbindingSupported;
 };
 
 extern ECORE_API CHW HW;

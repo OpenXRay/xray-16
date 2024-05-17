@@ -108,7 +108,7 @@ jobs:
       with:
         arch: ${{ matrix.platform.arch }}
         branch: 'latest-stable'
-        packages: build-base cmake git mold sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
+        packages: build-base cmake git mold sdl2-dev libepoxy-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
 
     - name: Install Ubuntu packages
       if: ${{ matrix.platform.name == 'Ubuntu' }}
@@ -117,7 +117,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq -y \
               libsdl2-dev:${{ matrix.platform.arch }} \
-              libglew-dev:${{ matrix.platform.arch }} \
+              libepoxy-dev:${{ matrix.platform.arch }} \
               liblzo2-dev:${{ matrix.platform.arch }} \
               libjpeg-dev:${{ matrix.platform.arch }} \
               libopenal-dev:${{ matrix.platform.arch }} \
@@ -129,11 +129,11 @@ jobs:
       if: ${{ matrix.platform.name == 'macOS' }}
       run: |
           brew update
-          brew install sdl2 glew lzo libogg libvorbis theora
+          brew install sdl2 libepoxy lzo libogg libvorbis theora
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
-      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel glew-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
+      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel libepoxy-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
 
     - name: Set environment variables
       if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
@@ -180,13 +180,13 @@ jobs:
       matrix:
         platform:
         - { name: FreeBSD, os: freebsd, os-version: '14.0', arch: x86_64,
-            install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 glew lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
+            install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 libepoxy lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
           }
         - { name: OpenBSD, os: openbsd, os-version: '7.5',  arch: x86_64,
-            install-cmd: "sudo pkg_add cmake SDL2 glew lzo2 jpeg openal libogg libtheora libvorbis",
+            install-cmd: "sudo pkg_add cmake SDL2 libepoxy lzo2 jpeg openal libogg libtheora libvorbis",
           }
         - { name: NetBSD,  os: netbsd,  os-version: '10.0',  arch: x86_64,
-            install-cmd: "sudo pkgin -y install cmake SDL2 glew lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
+            install-cmd: "sudo pkgin -y install cmake SDL2 libepoxy lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
           }
         configuration: [Debug, Release]
 

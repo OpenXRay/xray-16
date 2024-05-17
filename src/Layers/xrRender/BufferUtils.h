@@ -16,7 +16,7 @@ inline bool dcl_equal(const VertexElement* a, const VertexElement* b)
 
 struct SDeclaration;
 
-void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl);
+void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl, bool GLARBvertexattribbindingSupported);
 void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<InputElementDesc>& declOut);
 
 #ifdef USE_OGL

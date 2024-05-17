@@ -48,7 +48,7 @@ SDeclaration* CResourceManager::_CreateDecl(const D3DVERTEXELEMENT9* dcl)
 
     u32 dcl_size = GetDeclLength(dcl) + 1;
     D->dcl_code.assign(dcl, dcl + dcl_size);
-    ConvertVertexDeclaration(dcl, D);
+    ConvertVertexDeclaration(dcl, D, HW.GLARBvertexattribbindingSupported);
     D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return D;

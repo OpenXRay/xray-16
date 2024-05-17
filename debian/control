@@ -5,7 +5,7 @@ Maintainer: lya Orlov <eagleivg@mail.ru>
 Build-Depends:
  cmake,
  build-essential,
- libglew-dev,
+ libepoxy-dev,
  libegl1-mesa-dev,
  libgles2-mesa-dev,
  libopenal-dev,

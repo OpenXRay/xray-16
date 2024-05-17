@@ -30,6 +30,8 @@ glState::glState()
     m_pBlendState.ColorMask = 0xF;
 
     m_uiMipLODBias = FLT_MAX;
+
+    GLEXTtexturefilteranisotropicSupported =  epoxy_has_gl_extension("GL_EXT_texture_filter_anisotropic");
 }
 
 glState* glState::Create()
@@ -256,7 +258,7 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
         CHK_GL(glSamplerParameteri(m_samplerArray[stage], GL_TEXTURE_MAX_LEVEL, value));
         break;
     case D3DSAMP_MAXANISOTROPY: /* DWORD maximum anisotropy */
-        if (GLEW_EXT_texture_filter_anisotropic)
+        if (GLEXTtexturefilteranisotropicSupported)
             CHK_GL(glSamplerParameteri(m_samplerArray[stage], GL_TEXTURE_MAX_ANISOTROPY_EXT, value));
         break;
     case XRDX11SAMP_COMPARISONFILTER:

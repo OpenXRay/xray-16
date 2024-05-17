@@ -36,6 +36,7 @@ private:
     D3D_DEPTH_STENCIL_STATE m_pDepthStencilState;
     D3D_BLEND_STATE m_pBlendState;
     float m_uiMipLODBias;
+    bool GLEXTtexturefilteranisotropicSupported;
 
     GLuint m_samplerArray[CTexture::mtMaxCombinedShaderTextures];
 

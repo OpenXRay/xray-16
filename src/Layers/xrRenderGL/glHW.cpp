@@ -5,6 +5,7 @@
 #pragma hdrstop
 
 #include "glHW.h"
+#include <epoxy/gl.h>
 #include "xrEngine/XR_IOConsole.h"
 
 CHW HW;
@@ -81,8 +82,8 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     // Choose the closest pixel format
     SDL_DisplayMode mode;
     SDL_GetWindowDisplayMode(m_window, &mode);
-    mode.format = SDL_PIXELFORMAT_RGBA8888;
-    // Apply the pixel format to the device context
+        mode.format = SDL_PIXELFORMAT_RGBA8888;
+        // Apply the pixel format to the device context
     SDL_SetWindowDisplayMode(m_window, &mode);
 
     // Create the context
@@ -103,6 +104,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL;
 
         m_helper_window = SDL_CreateWindow("OpenXRay OpenGL helper window", 0, 0, 1, 1, flags);
+
         R_ASSERT3(m_helper_window, "Cannot create helper window for OpenGL", SDL_GetError());
 
         SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
@@ -121,22 +123,12 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
-    // Initialize OpenGL Extension Wrangler
-#ifdef XR_PLATFORM_APPLE
-    // This is essential for complete OpenGL 4.1 load on mac
-    glewExperimental = GL_TRUE;
-#endif
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        Log("! Could not initialize glew:", (pcstr)glewGetErrorString(err));
-        return;
-    }
-
     UpdateVSync();
 
+    GLKHRdebugSupported = epoxy_has_gl_extension("GL_KHR_debug");
+
 #ifdef DEBUG
-    if (GLEW_KHR_debug)  // NOTE: this extension is only available starting with OpenGL 4.3
+    if (GLKHRdebugSupported)  // NOTE: this extension is only available starting with OpenGL 4.3
     {
         CHK_GL(glEnable(GL_DEBUG_OUTPUT));
         CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
@@ -159,9 +151,10 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     Msg("* GPU OpenGL shading language version: %s", ShadingVersion);
     Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
-    SeparateShaderObjectsSupported = GLEW_ARB_separate_shader_objects;
-    ShaderBinarySupported = GLEW_ARB_get_program_binary;
+    SeparateShaderObjectsSupported = GL_ARB_separate_shader_objects;
+    ShaderBinarySupported = GL_ARB_get_program_binary;
     ComputeShadersSupported = false; // XXX: Implement compute shaders support
+    GLARBvertexattribbindingSupported = epoxy_has_gl_extension("GL_ARB_vertex_attrib_binding");
 
     Caps.fTarget = D3DFMT_A8R8G8B8;
     Caps.fDepth = D3DFMT_D24S8;
@@ -295,12 +288,12 @@ bool CHW::ThisInstanceIsGlobal() const
 
 void CHW::BeginPixEvent(pcstr name) const
 {
-    if (GLEW_KHR_debug)
+    if (GLKHRdebugSupported)
         glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name);
 }
 
 void CHW::EndPixEvent() const
 {
-    if (GLEW_KHR_debug)
+    if (GLKHRdebugSupported)
         glPopDebugGroup();
 }

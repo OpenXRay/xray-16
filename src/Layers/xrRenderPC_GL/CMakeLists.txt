@@ -396,6 +396,7 @@ target_include_directories(xrRender_GL
     "${CMAKE_SOURCE_DIR}/Externals"
     "${CMAKE_SOURCE_DIR}/Externals/gli"
     "${CMAKE_SOURCE_DIR}/Externals/gli/external"
+    "${epoxy_INCLUDE_DIR}"
 )
 
 target_link_libraries(xrRender_GL
@@ -408,8 +409,7 @@ target_link_libraries(xrRender_GL
     xrParticles
     xrScriptEngine
     xrImGui
-    OpenGL::GL
-    GLEW::GLEW
+    "${epoxy_LIBRARY}"
 )
 
 target_compile_definitions(xrRender_GL
