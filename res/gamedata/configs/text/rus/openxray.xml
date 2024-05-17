@@ -165,4 +165,13 @@
 	<string id="spa">
 		<text>Испанский (Spanish)</text>
 	</string>
+	<string id="ui_mm_shader_options">
+	    <text>Настройки Шейдеров</text>
+	</string>
+	<string id="ui_mm_simply_shader_opts">
+	    <text>Базовые</text>
+	</string>
+	<string id="ui_mm_shader_options_default">
+	    <text>По умолчанию</text>
+	</string>
 </string_table>
