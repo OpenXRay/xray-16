@@ -1,0 +1,136 @@
+<!--
+- @ Version: SCREEN SPACE SHADERS - UPDATE 16
+- @ Description: Interactive Grass - MCM RUS strings
+- @ Author: https://www.moddb.com/members/ascii1457
+- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+-
+- Thanks to Freaky_Mouse for the translation.
+-->
+
+<?xml version="1.0" encoding="windows-1251"?>
+
+<string_table>
+
+	<!-- Button -->
+	<string id="ui_mcm_ssfx_module_inter_grass">
+		<text>Коллизия травы</text>
+	</string>
+
+	<!-- Interactive Grass Settings -->
+	<string id="ui_mcm_ssfx_module_inter_grass_title">
+		<text>Настройки коллизии травы</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_enable_mcm">
+		<text>Включено</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_enable_mcm_desc">
+		<text>[ТРЕБУЕТСЯ ПЕРЕЗАПУСК] Включение/выключение коллизии.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_max_entities_mcm">
+		<text>Максимальное кол-во срабатываний</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_max_entities_mcm_desc">
+		<text>[ТРЕБУЕТСЯ ПЕРЕЗАПУСК] Максимальное кол-во единовременных срабатываний. Выше значение – больше нагрузка на систему.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_max_distance_mcm">
+		<text>Максимальная дистанция</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_max_distance_mcm_desc">
+		<text>Максимальное расстояние срабатывания.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_enable_player_mcm">
+		<text>Распространяется на игрока</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_enable_player_mcm_desc">
+		<text>Включить/Выключить реакцию травы на игрока.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_enable_mutants_mcm">
+		<text>Ударная Волна от мутантов.</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_enable_mutants_mcm_desc">
+		<text>Включить/Выключить реакцию травы на топот псевдогиганта или способности бюрера.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_radius_mcm">
+		<text>Радиус изгиба</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_radius_mcm_desc">
+		<text>Настройка радиуса изгиба травы, когда по ней ходит игрок.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_horizontal_str_mcm">
+		<text>Горизонтальная интенсивность</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_horizontal_str_mcm_desc">
+		<text>Настройка горизонтальной деформации тра?вы при столкновении с игроком.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_vertical_str_mcm">
+		<text>Вертикальная интенсивность.</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_vertical_str_mcm_desc">
+		<text>Настройка вертикальной деформации травы при столкновении с игроком.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_explosions_str_mcm">
+		<text>Интенсивность реакции на взрывы</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_explosions_str_mcm_desc">
+		<text>Настройка общей интенсивности реакции травы на взрывы/волны от ударов мутантов.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_explosions_speed_mcm">
+		<text>Скорость распространения</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_explosions_speed_mcm_desc">
+		<text>Настройка скорости распространения ударной волны по траве.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_shooting_str_mcm">
+		<text>Реакция на выстрел</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_shooting_str_mcm_desc">
+		<text>Интенсивность реакции травы на выстрелы.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_shooting_range_mcm">
+		<text>Расстояние от выстрела</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_shooting_range_mcm_desc">
+		<text>Расстояние реагирования травы на выстрел.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_enable_anomalies_mcm">
+		<text>Интерактивные аномалии</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_enable_anomalies_mcm_desc">
+		<text>Включает/Выключает взаимодействие травы с аномалиями.</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_inter_grass_anomalies_distance_mcm">
+		<text>Максимальная дистанция срабатывания</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_inter_grass_anomalies_distance_mcm_desc">
+		<text>Дальность срабатывания влияния аномалий на траву.</text>
+	</string>
+
+</string_table>
