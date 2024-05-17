@@ -189,7 +189,7 @@ void CUIMultiTrackBar::SaveOptValue()
 
 bool CUIMultiTrackBar::IsChangedOptValue() const
 {
-    bool isChanged = !fsimilar(m_f_opt_backup_value.x, m_f_val.x) || !fsimilar(m_f_opt_backup_value.y, m_f_val.y) || !fsimilar(m_f_opt_backup_value.z, m_f_val.z);
+    bool isChanged = !fsimilar(m_f_opt_backup_value.x, m_f_val.x) || !fsimilar(m_f_opt_backup_value.y, m_f_val.y) || !fsimilar(m_f_opt_backup_value.z, m_f_val.z) || !fsimilar(m_f_opt_backup_value.w, m_f_val.w);
     return isChanged;
 }
 
