@@ -175,7 +175,7 @@
             </text_color>
         </btn_advanced>
         
-        <btn_shader_options x="150" y="322" width="86" height="24" stretch="1">
+        <btn_shader_options x="180" y="322" width="86" height="24" stretch="1">
             <text r="170" g="170" b="170" align="c" font="letterica16">ui_mm_shader_options</text>
             <texture>ui_inGame2_button</texture>
 			<text_color>

@@ -52,11 +52,11 @@
 
 -->
 <video_shader_options>
-    <scroll_v x="-4" y="0" width="360" height="320"
+    <scroll_v x="-4" y="0" width="450" height="320"
     right_ident="144" left_ident="0" top_indent="0" bottom_indent="0"
     vert_interval="0" always_show_scroll="0"/>
 
-    <track_ssfx_florafixes_2 x="0" y="0" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_florafixes_2 x="40" y="0" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="2" entry="ssfx_florafixes_2" group="mm_opt_video_shader_options" save_data_type="4"
         x_min="0.0" x_max="10.0" x_step="0.1" x_default="2.62" x_format="%.1f"
         y_min="0.0" y_max="1.0" y_step="0.01" y_default="1.0" y_format="%.2f"
@@ -70,11 +70,11 @@
         <cap_y x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_florafixes_sss_color_mcm</text>
         </cap_y>
-        <output_wnd x="165" y="0" width="20" height="20">
+        <output_wnd x="205" y="0" width="20" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_florafixes_2>
-    <track_ssfx_florafixes_1 x="0" y="0" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_florafixes_1 x="40" y="0" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_florafixes_1" group="mm_opt_video_shader_options"
         x_min="0.0" x_max="1.0" x_step="0.01" x_default="0.16"
         y_min="0.0" y_max="1.0" y_step="0.01" y_default="0.18"
@@ -93,12 +93,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_florafixes_trees_specular_wet_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_florafixes_1>
 
-    <track_ssfx_grass_interactive x="0" y="160" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_grass_interactive x="40" y="160" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_grass_interactive" group="mm_opt_video_shader_options"
         x_label="ui_mcm_ssfx_module_inter_grass_enable_player_mcm" x_min="0.0" x_max="1.0" x_step="1.0" x_default="1.0" x_order="2"
         y_label="ui_mcm_ssfx_module_inter_grass_max_entities_mcm" y_min="1.0" y_max="15.0" y_step="1.0" y_default="8.0" y_order="0"
@@ -120,12 +120,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c"/>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.1f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.1f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_grass_interactive>
 
-    <track_ssfx_int_grass_params_1 x="0" y="160" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_int_grass_params_1 x="40" y="160" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_int_grass_params_1" group="mm_opt_video_shader_options"
 		x_min="0.5" x_max="2.5" x_step="0.1" x_default="1.0"
         y_min="0.5" y_max="2.5" y_step="0.1" y_default="1.0"
@@ -144,12 +144,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_inter_grass_anomalies_distance_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.1f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.1f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_int_grass_params_1>
 
-    <track_ssfx_int_grass_params_2 x="0" y="160" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_int_grass_params_2 x="40" y="160" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_int_grass_params_2" group="mm_opt_video_shader_options"
         x_min="0.0" x_max="2.0" x_step="0.05" x_default="1.0"
         y_min="1.0" y_max="20.0" y_step="1.0" y_default="5.0"
@@ -168,12 +168,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_inter_grass_shooting_range_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.1f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.1f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_int_grass_params_2>
 
-    <track_ssfx_shadow_cascades x="0" y="0" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_shadow_cascades x="40" y="0" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="3" entry="ssfx_shadow_cascades" group="mm_opt_video_shader_options"
         x_min="10.0" x_max="30.0" x_step="1.0" x_default="20.0"
         y_min="40.0" y_max="110.0" y_step="1.0" y_default="60.0"
@@ -191,12 +191,12 @@
         <cap_z x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_shw_cascades_size_3_mcm</text>
         </cap_z>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.1f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.1f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_shadow_cascades>
 
-    <track_ssfx_grass_shadows x="0" y="80" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_grass_shadows x="40" y="80" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="3" entry="ssfx_grass_shadows" group="mm_opt_video_shader_options" save_data_type="4"
         x_min="0.0" x_max="3.0" x_step="1.0" x_default="0.0"
         y_min="0.0" y_max="1" y_step="0.01" y_display_scale="100.0" y_default="0.35"
@@ -211,12 +211,12 @@
         <cap_z x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_shw_cascades_grass_shw_nondir_maxdistance_mcm</text>
         </cap_z>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.1f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.1f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_grass_shadows>
 
-    <track_ssfx_rain_1 x="0" y="160" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_rain_1 x="40" y="160" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_rain_1" group="mm_opt_video_shader_options"
         x_min="0.1" x_max="5.0" x_step="0.1" x_default="2.0"
         y_min="0.01" y_max="0.5" y_step="0.01" y_display_scale="100.0" y_default="0.1"
@@ -238,12 +238,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_rain_module_ssfx_rain_main_quality_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_rain_1>
 
-    <track_ssfx_rain_2 x="0" y="260" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_rain_2 x="40" y="260" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_rain_2" group="mm_opt_video_shader_options"
         x_min="0.0" x_max="1.0" x_step="0.01" x_default="0.5"
         y_min="0.0" y_max="1.0" y_step="0.01" y_default="0.2"
@@ -262,12 +262,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_rain_module_ssfx_rain_main_reflection_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_rain_2>
 
-    <track_ssfx_rain_3 x="0" y="260" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_rain_3 x="40" y="260" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="2" entry="ssfx_rain_3" group="mm_opt_video_shader_options" save_data_type="4"
         x_min="0.0" x_max="1.0" x_step="0.01" x_default="0.5"
         y_min="0.0" y_max="10.0" y_step="0.1" y_default="1.0"
@@ -278,12 +278,12 @@
         <cap_y x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_rain_module_ssfx_rain_main_splash_refraction_mcm</text>
         </cap_y>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_rain_3>
 
-    <track_ssfx_hud_rain_1 x="0" y="160" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_hud_rain_1 x="40" y="160" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_hud_drops_params_1" group="mm_opt_video_shader_options"
         x_min="0.5" x_max="3.0" x_step="0.01" x_default="2.0"
         y_min="0.5" y_max="1.5" y_step="0.01" y_default="1.0"
@@ -305,12 +305,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_rain_module_ssfx_rain_hud_raindrops_animation_speed_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_hud_rain_1>
 
-    <track_ssfx_hud_rain_2 x="0" y="160" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_hud_rain_2 x="40" y="160" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_hud_drops_params_2" group="mm_opt_video_shader_options"
         x_min="0.5" x_max="2.0" x_step="0.1" x_default="1.1"
         y_min="0.5" y_max="2.0" y_step="0.1" y_default="1.0"
@@ -329,13 +329,13 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_rain_module_ssfx_rain_hud_raindrops_gloss_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_hud_rain_2>
 
      <!-- TODO add engine logic to support custom DOF values, dof options are disabled for now -->
-    <track_ssfx_wpn_dof_1 x="0" y="260" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_wpn_dof_1 x="40" y="260" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_wpn_dof_1" group="mm_opt_video_shader_options"
         x_min="0.0" x_max="0.3" x_step="0.01" x_default="0.1"
         y_min="0.0" y_max="1.3" y_step="0.01" y_default="0.25"
@@ -357,12 +357,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_wpn_dof_edgeblur_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_wpn_dof_1>
 
-    <track_ssfx_wpn_dof_2 x="0" y="260" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_wpn_dof_2 x="40" y="260" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_wpn_dof_2" group="mm_opt_video_shader_options"
         x_min="0.0" x_max="0.3" x_step="0.01" x_default="0.15"
         y_min="0.0" y_max="1.3" y_step="0.01" y_default="0.25"
@@ -381,12 +381,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_wpn_dof_aim_edgeblur_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_wpn_dof_2>
 
-    <track_ssfx_gloss x="0" y="260" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_gloss x="40" y="260" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="2" entry="ssfx_gloss_minmax" group="mm_opt_video_shader_options" save_data_type="3"
         x_min="0.01" x_max="1.0" x_step="0.01" x_default="0.6"
         y_min="0.01" y_max="1.0" y_step="0.01" y_default="0.92"
@@ -400,12 +400,12 @@
         <cap_y x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_wetness_ssfx_gloss_max_gloss_mcm</text>
         </cap_y>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_gloss>
 
-    <track_ssfx_specular x="0" y="260" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_specular x="40" y="260" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="2" entry="ssfx_lightsetup_1" group="mm_opt_video_shader_options" save_data_type="4"
         x_min="0.01" x_max="1.0" x_step="0.01" x_default="0.6"
         y_min="0.01" y_max="1.0" y_step="0.01" y_default="0.6"
@@ -416,12 +416,12 @@
         <cap_y x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_wetness_ssfx_gloss_specular_color_mcm</text>
         </cap_y>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_specular>
 
-    <track_ssfx_wetness_3 x="0" y="260" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_wetness_3 x="40" y="260" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="2" entry="ssfx_wetness_multiplier" group="mm_opt_video_shader_options" save_data_type="3"
         x_min="0.1" x_max="20.0" x_step="0.1" x_default="1.0"
         y_min="0.1" y_max="20.0" y_step="0.1" y_default="0.4"
@@ -435,12 +435,12 @@
         <cap_y x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_dry_speed_mcm</text>
         </cap_y>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_wetness_3>
 
-    <track_ssfx_wetness_1 x="0" y="260" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_wetness_1 x="40" y="260" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_wetsurfaces_1" group="mm_opt_video_shader_options"
         x_min="0.01" x_max="1.9" x_step="0.01" x_default="1.5"
         y_min="0.01" y_max="2.0" y_step="0.01" y_default="1.4"
@@ -459,12 +459,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_ripples_intensity_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_wetness_1>
 
-    <track_ssfx_wetness_2 x="0" y="260" width="300" height="20" min="10.0" max="30.0" step="1.0" 
+    <track_ssfx_wetness_2 x="40" y="260" width="400" height="20" min="10.0" max="30.0" step="1.0" 
         child_count="4" entry="ssfx_wetsurfaces_2" group="mm_opt_video_shader_options"
         x_min="0.01" x_max="2.0" x_step="0.01" x_default="1.2"
         y_min="0.01" y_max="2.0" y_step="0.01" y_default="1.5"
@@ -483,12 +483,12 @@
         <cap_w x="-64" y="0" width="50" height="20">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_waterfall_intensity_mcm</text>
         </cap_w>
-        <output_wnd x="165" y="0" width="20" height="20" format="%.2f">
+        <output_wnd x="205" y="0" width="20" height="20" format="%.2f">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">0</text>
         </output_wnd>
     </track_ssfx_wetness_2>
 
-    <btn_to_simply x="270" y="322" width="86" height="24" stretch="1">
+    <btn_to_simply x="318" y="322" width="128" height="24">
         <text align="c" font="letterica16">ui_mm_simply_shader_opts</text>
         <texture>ui_inGame2_button</texture>
         <text_color>
@@ -496,7 +496,7 @@
         </text_color>
     </btn_to_simply>
 
-    <btn_default_shaders x="180" y="322" width="86" height="24" stretch="1">
+    <btn_default_shaders x="200" y="322" width="108" height="24" stretch="1">
         <text align="c" font="letterica16">ui_mm_shader_options_default</text>
         <texture>ui_inGame2_button</texture>
         <text_color>
