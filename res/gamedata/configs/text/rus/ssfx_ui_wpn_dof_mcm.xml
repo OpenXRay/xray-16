@@ -1,0 +1,75 @@
+<!--
+- @ Version: SCREEN SPACE SHADERS - UPDATE 15
+- @ Description: Weapons DOF - MCM RU strings
+- @ Author: https://www.moddb.com/members/ascii1457
+- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+-->
+<?xml version="1.0" encoding="windows-1251"?>
+
+<string_table>
+
+	<!-- Button -->
+	<string id="ui_mcm_ssfx_module_wpn_dof">
+		<text>Глубина резкости оружия</text>
+	</string>
+	
+	<!-- DOF Settings -->
+	<string id="ui_mcm_ssfx_module_wpn_dof_title">
+		<text>Настройки глубины резкости оружия</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_aim_fadestart_mcm">
+		<text>Точка начала размытия [прицеливание]</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_aim_fadelen_mcm">
+		<text>Величина размытия [прицеливание]</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_aim_blur_mcm">
+		<text>Интенсивность размытия [прицеливание] (0-отключено)</text>
+	</string>
+
+	<string id="ui_mcm_ssfx_module_wpn_dof_aim_edgeblur_mcm">
+		<text>Периферйное размытие [прицеливание] (0-отключено)</text>
+	</string>
+
+
+	<string id="ui_mcm_ssfx_module_wpn_dof_fadestart_mcm">
+		<text>Точка начала размытия</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_fadelen_mcm">
+		<text>Величина размытия</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_blur_mcm">
+		<text>Интенсивность размытия (0-отключено)</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_edgeblur_mcm">
+		<text>Периферийное размытие (0-отключено)</text>
+	</string>
+
+
+	<string id="ui_mcm_ssfx_module_wpn_dof_reloading_mcm">
+		<text>Глубина резкости при перезарядке</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_pda_mcm">
+		<text>Глубина резкости при использовании КПК</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_inventory_mcm">
+		<text>Глубина резкости при открытии инвентаря</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_fdda_mcm">
+		<text>Глубина резкости при анимации использования предметов (FDDA)</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_wpn_dof_looting_mutant_mcm">
+		<text>Глубина резкости при свежевании</text>
+	</string>
+	
+</string_table>

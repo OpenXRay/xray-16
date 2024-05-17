@@ -1,0 +1,138 @@
+<!--
+- @ Version: SCREEN SPACE SHADERS - UPDATE 18
+- @ Description: Wet Surfaces - MCM RUS strings
+- @ Author: https://www.moddb.com/members/ascii1457
+- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+-->
+<?xml version="1.0" encoding="windows-1251"?>
+
+<string_table>
+
+	<!-- Wet Surfaces Title -->
+	<string id="ui_mcm_ssfx_module_wet_surf_title">
+		<text>Wet Surfaces - Settings</text>
+	</string>
+	
+	<!-- Намокание поверхностей - настройки -->
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_buildup_speed_mcm">
+		<text>Скорость намокания</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_buildup_speed_mcm_desc">
+		<text>Настройка скорости проявления эффекта намокания и появления луж</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_dry_speed_mcm">
+		<text>Скорость высыхания</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_dry_speed_mcm_desc">
+		<text>Настройка скорости высыхания. Чем выше показатель - тем быстрее пропадет эффект намокания и лужи</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_ripples_size_mcm">
+		<text>Рябь от дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_ripples_size_mcm_desc">
+		<text>Размер ряби от капель дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_ripples_speed_mcm">
+		<text>Скорость ряби</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_ripples_speed_mcm_desc">
+		<text>Настройка скорости анимации ряби на воде/лужах. Прямая зависимость от силы дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_ripples_min_speed_mcm">
+		<text>Минимальная скорость анимации</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_ripples_min_speed_mcm_desc">
+		<text>Настройка минимального показателя скорости анимации ряби от капель</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_ripples_intensity_mcm">
+		<text>Интенсивность ряби</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_ripples_intensity_mcm_desc">
+		<text>Настройка интенсивности отображения ряби от капель дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_waterfall_size_mcm">
+		<text>Размер капли дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_waterfall_size_mcm_desc">
+		<text>Чем выше показатель - тем больше размер капли</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_waterfall_speed_mcm">
+		<text>Скорость дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_waterfall_speed_mcm_desc">
+		<text>Настройка скорости падения капли дождя. Имеет зависимость от базового показателя в конфиге погоды</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_waterfall_min_speed_mcm">
+		<text>Минимальная скорость падения капель</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_waterfall_min_speed_mcm_desc">
+		<text>Ниже этого показателя скорость опускаться не будет</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_waterfall_intensity_mcm">
+		<text>Интенсивность дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_waterfall_intensity_mcm_desc">
+		<text>Общая интенсивность эффекта дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_cover_res_mcm">
+		<text>Качество эффекта дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_cover_res_mcm_desc">
+		<text>Общее разрешение падающих капель и брызг при попадании на землю. Чем выше показатель - тем выразительнее дождь, но больше нагрузка на систему</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_cover_distance_mcm">
+		<text>Дистанция прорисовки дождя</text>
+	</string>
+	
+	<string id="ui_mcm_ssfx_module_ssfx_wetness_ssfx_wet_surf_cover_distance_mcm_desc">
+		<text>Насколько далеко дождь будет рендериться. Выше показатель - больше нагрузка на систему</text>
+	</string>
+	
+	<!-- Resolution Combobox -->
+	<string id="ui_mcm_lst_ssfx_cover_64">
+		<text>64</text>
+	</string>
+	
+	<string id="ui_mcm_lst_ssfx_cover_128">
+		<text>128 ( рекомендовано )</text>
+	</string>
+	
+	<string id="ui_mcm_lst_ssfx_cover_256">
+		<text>256</text>
+	</string>
+	
+	<string id="ui_mcm_lst_ssfx_cover_512">
+		<text>512</text>
+	</string>
+	
+	<string id="ui_mcm_lst_ssfx_cover_1024">
+		<text>1024</text>
+	</string>
+	
+	<string id="ui_mcm_lst_ssfx_cover_2048">
+		<text>2048</text>
+	</string>
+
+</string_table>
