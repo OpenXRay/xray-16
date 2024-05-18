@@ -34,7 +34,8 @@ void CRender::render_lights(light_Package& LP)
             L->vis_update();
             if (!L->vis.visible)
             {
-                source.erase(source.begin() + it);
+                std::swap(source[it], source.back());
+                source.pop_back();
                 it--;
             }
             else
@@ -44,25 +45,27 @@ void CRender::render_lights(light_Package& LP)
         }
     }
 
-    // 2. refactor - infact we could go from the backside and sort in ascending order
+    // 2. refactor
     {
         xr_vector<light*>& source = LP.v_shadowed;
         xr_vector<light*> refactored;
         refactored.reserve(source.size());
         const size_t total = source.size();
 
+        std::sort(source.begin(), source.end(), [](light* l1, light* l2)
+        {
+            const u32 a0 = l1->X.S.size;
+            const u32 a1 = l2->X.S.size;
+            return a0 < a1; // ascending order
+        });
+        
         for (u16 smap_ID = 0; refactored.size() != total; ++smap_ID)
         {
             LP_smap_pool.initialize(RImplementation.o.smapsize);
-            std::sort(source.begin(), source.end(), [](light* l1, light* l2)
+            for (auto& L : source)
             {
-                const u32 a0 = l1->X.S.size;
-                const u32 a1 = l2->X.S.size;
-                return a0 > a1; // reverse -> descending
-            });
-            for (size_t test = 0; test < source.size(); ++test)
-            {
-                light* L = source[test];
+                if (!L)
+                    continue;
                 SMAP_Rect R{};
                 if (LP_smap_pool.push(R, L->X.S.size))
                 {
@@ -71,14 +74,12 @@ void CRender::render_lights(light_Package& LP)
                     L->X.S.posY = R.min.y;
                     L->vis.smap_ID = smap_ID;
                     refactored.push_back(L);
-                    source.erase(source.begin() + test);
-                    --test;
+                    L = nullptr;
                 }
             }
         }
 
         // save (lights are popped from back)
-        std::reverse(refactored.begin(), refactored.end());
         LP.v_shadowed = std::move(refactored);
     }
 
@@ -132,7 +133,7 @@ void CRender::render_lights(light_Package& LP)
         }
     };
 
-    const auto& flush_lights = [&]()
+    const auto& flush_lights = [this] (xr_vector<task_data_t>& lights_queue)
     {
         ZoneScopedN("flush lights");
         for (const auto& [L, task, batch_id] : lights_queue)
@@ -182,7 +183,7 @@ void CRender::render_lights(light_Package& LP)
             }
 
             L->svis[batch_id].end(); // NOTE(DX11): occqs are fetched here, this should be done on the imm context only
-            RImplementation.release_context(batch_id);
+            release_context(batch_id);
         }
 
         lights_queue.clear();
@@ -210,7 +211,7 @@ void CRender::render_lights(light_Package& LP)
             if (batch_id == R_dsgraph_structure::INVALID_CONTEXT_ID)
             {
                 VERIFY(!lights_queue.empty());
-                flush_lights();
+                flush_lights(lights_queue);
                 continue;
             }
 
@@ -232,7 +233,7 @@ void CRender::render_lights(light_Package& LP)
             }
             lights_queue.emplace_back(data);
         }
-        flush_lights(); // in case if something left
+        flush_lights(lights_queue); // in case if something left
 
         cmd_list.Invalidate();
 

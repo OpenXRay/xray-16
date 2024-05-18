@@ -100,7 +100,14 @@ void CSpaceRestrictor::net_Destroy()
 bool CSpaceRestrictor::inside(const Fsphere& sphere) const
 {
     if (!actual())
-        prepare();
+    {
+        static std::mutex prepareMutex;
+        std::lock_guard lock(prepareMutex);
+
+        // Double-checked locking
+        if (!actual())
+            prepare();
+    }
 
     if (!m_selfbounds.intersect(sphere))
         return (false);

@@ -75,38 +75,43 @@ void CCoverManager::compute_static_cover()
     ZoneScoped;
     clear();
     xr_delete(m_covers);
-    m_covers = xr_new<CPointQuadTree>(
-        ai().level_graph().header().box(), ai().level_graph().header().cell_size() * .5f, 8 * 65536, 4 * 65536);
-    m_temp.resize(ai().level_graph().header().vertex_count());
 
     const CLevelGraph& graph = ai().level_graph();
-    const u32 levelVertexCount = ai().level_graph().header().vertex_count();
+    const LevelGraph::CHeader& levelGraphHeader = graph.header();
+    const u32 levelVertexCount = levelGraphHeader.vertex_count();
+
+    m_covers = xr_new<CPointQuadTree>(levelGraphHeader.box(), levelGraphHeader.cell_size() * .5f, 8 * 65536, 4 * 65536);
+
+    // avoiding extra allocations with a static storage for m_covers
+    static xr_vector<std::optional<CCoverPoint>> quadTreeStaticStorage;
+    quadTreeStaticStorage.resize(levelVertexCount);
+    m_temp.resize(levelVertexCount);
 
     xr_parallel_for(TaskRange<u32>(0, levelVertexCount), [&](const TaskRange<u32>& range)
     {
         ZoneScopedN("Process vertices");
         for (u32 i = range.begin(); i != range.end(); ++i)
         {
-            const CLevelGraph::CLevelVertex& vertex = *graph.vertex(i);
-            if (vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3))
-            {
-                m_temp[i] = edge_vertex(i);
-                continue;
-            }
-
-            if (vertex.low_cover(0) + vertex.low_cover(1) + vertex.low_cover(2) + vertex.low_cover(3))
-            {
-                m_temp[i] = edge_vertex(i);
-                continue;
-            }
-
             m_temp[i] = false;
+            quadTreeStaticStorage[i] = std::nullopt;
+
+            const CLevelGraph::CLevelVertex& vertex = *graph.vertex(i);
+            const int highCover = vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3); 
+            const int lowCover = vertex.low_cover(0) + vertex.low_cover(1) + vertex.low_cover(2) + vertex.low_cover(3); 
+
+            if (highCover || lowCover)
+            {
+                m_temp[i] = edge_vertex(i);
+                if (m_temp[i] && critical_cover(i))
+                {
+                    quadTreeStaticStorage[i] = CCoverPoint(graph.vertex_position(graph.vertex(i)), i);
+                }
+            }
         }
     });
-
-    for (u32 i = 0; i < levelVertexCount; ++i)
-        if (m_temp[i] && critical_cover(i))
-            m_covers->insert(xr_new<CCoverPoint>(ai().level_graph().vertex_position(ai().level_graph().vertex(i)), i));
+    for (auto& p : quadTreeStaticStorage)
+        if (p.has_value())
+            m_covers->insert(&p.value());
 
     VERIFY(!m_smart_covers_storage);
     m_smart_covers_storage = xr_new<smart_cover::storage>();
