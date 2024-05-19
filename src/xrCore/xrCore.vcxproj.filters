@@ -309,9 +309,6 @@
     <ClCompile Include="Crypto\trivial_encryptor.cpp">
       <Filter>Crypto</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\Task.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Threading\TaskManager.cpp">
       <Filter>Threading</Filter>
     </ClCompile>

@@ -112,10 +112,7 @@ void CGamePersistent::OnAppStart()
 #ifndef XR_PLATFORM_WINDOWS
     init_game_globals();
 #else
-    const auto& initializeGlobals = TaskScheduler->AddTask([](Task&, void*)
-    {
-        init_game_globals();
-    });
+    const auto& initializeGlobals = TaskScheduler->AddTask(init_game_globals);
 #endif
 
     GEnv.UI = xr_new<UICore>();

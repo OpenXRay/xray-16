@@ -17,9 +17,9 @@
 
 #include "ParallelFor.hpp"
 
-namespace details
+namespace detail
 {
-class ParallelForEachTask
+class ParallelForEach
 {
 public:
     template <typename Iterator, typename Function>
@@ -34,18 +34,18 @@ public:
         });
     }
 };
-} // namespace details
+} // namespace detail
 
 // User can specify if he wants caller thread to wait on the task finish
 template <typename Range, typename Function>
 decltype(auto) xr_parallel_for_each(Range& range, bool wait, const Function& function)
 {
-    return details::ParallelForEachTask::Run(std::begin(range), std::end(range), wait, function);
+    return detail::ParallelForEach::Run(std::begin(range), std::end(range), wait, function);
 }
 
 // Caller thread will wait on the task finish
 template <typename Range, typename Function>
 decltype(auto) xr_parallel_for_each(Range& range, const Function& function)
 {
-    return details::ParallelForEachTask::Run(std::begin(range), std::end(range), true, function);
+    return detail::ParallelForEach::Run(std::begin(range), std::end(range), true, function);
 }

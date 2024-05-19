@@ -228,19 +228,19 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
         ShowSplash(topmost);
     }
 
-    const auto& inputTask = TaskManager::AddTask([](Task&, void*)
+    const auto& inputTask = TaskManager::AddTask([]
     {
         const bool captureInput = !strstr(Core.Params, "-i");
         pInput = xr_new<CInput>(captureInput);
     });
 
-    const auto& createSoundDevicesList = TaskManager::AddTask([](Task&, void*)
+    const auto& createSoundDevicesList = TaskManager::AddTask([]
     {
         Engine.Sound.CreateDevicesList();
     });
 
 #ifdef XR_PLATFORM_WINDOWS
-    const auto& createRendererList = TaskManager::AddTask([](Task&, void*)
+    const auto& createRendererList = TaskManager::AddTask([]
     {
         Engine.External.CreateRendererList();
     });
@@ -294,7 +294,7 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
         Console->Execute(loadArgs + 1);
 
     // Initialize APP
-    const auto& createLightAnim = TaskScheduler->AddTask([](Task&, void*)
+    const auto& createLightAnim = TaskScheduler->AddTask([]
     {
         LALib.OnCreate();
     });

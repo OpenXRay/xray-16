@@ -248,29 +248,29 @@ void CSoundRender_Emitter::fill_all_blocks()
     filled_blocks = sdef_target_count;
 }
 
-void CSoundRender_Emitter::prefill_blocks(Task&, void*)
-{
-    size_t next_block_to_fill = (current_block + filled_blocks) % sdef_target_count;
-
-    while (filled_blocks < sdef_target_count)
-    {
-        auto& block = temp_buf[next_block_to_fill];
-
-        fill_block(block.data(), block.size());
-
-        next_block_to_fill = (next_block_to_fill + 1) % sdef_target_count;
-        filled_blocks++;
-    }
-
-    prefill_task.store(nullptr, std::memory_order_release);
-}
-
 void CSoundRender_Emitter::dispatch_prefill()
 {
     wait_prefill();
     if (filled_blocks >= sdef_target_count)
         return;
-    const auto task = &TaskScheduler->AddTask({ this, &CSoundRender_Emitter::prefill_blocks });
+
+    const auto task = &TaskScheduler->AddTask([this]
+    {
+        size_t next_block_to_fill = (current_block + filled_blocks) % sdef_target_count;
+
+        while (filled_blocks < sdef_target_count)
+        {
+            auto& block = temp_buf[next_block_to_fill];
+
+            fill_block(block.data(), block.size());
+
+            next_block_to_fill = (next_block_to_fill + 1) % sdef_target_count;
+            filled_blocks++;
+        }
+
+        prefill_task.store(nullptr, std::memory_order_release);
+    });
+
     prefill_task.store(task, std::memory_order_release);
 }
 

@@ -649,7 +649,7 @@ void CRender::OnCameraUpdated()
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
 
-    ProcessHOMTask = &TaskScheduler->AddTask({ &HOM, &CHOM::MT_RENDER });
+    ProcessHOMTask = &HOM.DispatchMTRender();
     if (Details)
         Details->DispatchMTCalc();
 }

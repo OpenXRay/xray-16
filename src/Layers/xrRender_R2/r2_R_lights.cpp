@@ -111,27 +111,6 @@ void CRender::render_lights(light_Package& LP)
     static xr_vector<task_data_t> lights_queue{};
     lights_queue.reserve(R__NUM_SUN_CASCADES);
 
-    const auto &calc_lights = [](Task &, void* data)
-    {
-        ZoneScopedN("calc lights");
-        const auto* task_data = static_cast<task_data_t*>(data);
-        auto& dsgraph = RImplementation.get_context(task_data->batch_id);
-        {
-            auto* L = task_data->L;
-
-            L->svis[task_data->batch_id].begin();
-
-            dsgraph.o.phase = PHASE_SMAP;
-            dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-            dsgraph.o.sector_id = L->spatial.sector_id;
-            dsgraph.o.view_pos = L->position;
-            dsgraph.o.xform = L->X.S.combine;
-            dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
-
-            dsgraph.build_subspace();
-        }
-    };
-
     const auto& flush_lights = [&]()
     {
         ZoneScopedN("flush lights");
@@ -217,11 +196,32 @@ void CRender::render_lights(light_Package& LP)
             source.pop_back();
             Lights_LastFrame.push_back(L);
 
-            // calculate
             task_data_t data;
+
+            const auto& calc_lights = [&data]
+            {
+                ZoneScopedN("calc lights");
+                auto& dsgraph = RImplementation.get_context(data.batch_id);
+                {
+                    auto* L = data.L;
+
+                    L->svis[data.batch_id].begin();
+
+                    dsgraph.o.phase = PHASE_SMAP;
+                    dsgraph.r_pmask(true, RImplementation.o.Tshadows);
+                    dsgraph.o.sector_id = L->spatial.sector_id;
+                    dsgraph.o.view_pos = L->position;
+                    dsgraph.o.xform = L->X.S.combine;
+                    dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+
+                    dsgraph.build_subspace();
+                }
+            };
+
+            // calculate
             data.batch_id = batch_id;
             data.L = L;
-            data.task = &TaskScheduler->CreateTask(calc_lights, sizeof(data), (void*)&data);
+            data.task = &TaskScheduler->CreateTask(calc_lights);
             if (o.mt_calculate)
             {
                 TaskScheduler->PushTask(*data.task);

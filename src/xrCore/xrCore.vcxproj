@@ -95,7 +95,6 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Threading\Event.cpp" />
     <ClCompile Include="Threading\ScopeLock.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
-    <ClCompile Include="Threading\Task.cpp" />
     <ClCompile Include="Threading\TaskManager.cpp" />
     <ClCompile Include="Threading\ThreadUtil.cpp" />
     <ClCompile Include="XML\tinystr.cpp" />

@@ -227,7 +227,6 @@ public:
     /// MT stuff
     Task* m_calc_task{};
 
-    void MT_CALC(Task&, void*);
     void DispatchMTCalc();
 
     CDetailManager();

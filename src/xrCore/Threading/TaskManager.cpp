@@ -72,7 +72,7 @@ class TaskAllocator
     Task   m_storage[TASK_STORAGE_SIZE];
 
 public:
-    Task* allocate()
+    Task* allocate() noexcept
     {
         Task* task = &m_storage[m_allocated++ & TASK_STORAGE_MASK];
         VERIFY(task->IsFinished());
@@ -89,14 +89,14 @@ class TaskQueue
     Task*               m_storage[TASK_STORAGE_SIZE]{};
 
 public:
-    void push(Task* task)
+    void push(Task* task) noexcept
     {
         const auto task_pos = m_tail_pos.fetch_add(1, std::memory_order_acq_rel);
         VERIFY2(task_pos - m_head_pos.load(std::memory_order_acquire) < TASK_STORAGE_SIZE, "Task queue overflow");
         m_storage[task_pos & TASK_STORAGE_MASK] = task;
     }
 
-    Task* pop()
+    Task* pop() noexcept
     {
         size_t head_pos = m_head_pos.load(std::memory_order_acquire);
         Task* task = m_storage[head_pos & TASK_STORAGE_MASK];
@@ -112,17 +112,17 @@ public:
         return nullptr;
     }
 
-    Task* steal()
+    Task* steal() noexcept
     {
         return pop();
     }
 
-    size_t size() const
+    size_t size() const noexcept
     {
         return m_head_pos - m_tail_pos;
     }
 
-    bool empty() const
+    bool empty() const noexcept
     {
         return size() == 0;
     }
@@ -142,7 +142,6 @@ public:
     fast_lc16        random{ this };
     size_t           id    { size_t(-1) };
 } static thread_local s_tl_worker;
-
 
 TaskManager::TaskManager()
 {
@@ -213,7 +212,7 @@ void TaskManager::UnregisterThisThreadAsWorker()
     shouldPause.store(false, std::memory_order_release);
 }
 
-void TaskManager::SetThreadStatus(bool active)
+void TaskManager::SetThreadStatus(bool active) noexcept
 {
     if (active)
         activeWorkersCount.fetch_add(1, std::memory_order_relaxed);
@@ -283,39 +282,23 @@ Task* TaskManager::TryToSteal() const
     return nullptr;
 }
 
-void TaskManager::ExecuteTask(Task& task)
-{
-    task.Execute();
-
-    // Finalize
-    for (Task* it = &task; ; it = it->m_data.parent)
-    {
-        const auto unfinishedJobs = it->m_data.jobs.fetch_sub(1, std::memory_order_acq_rel) - 1; // fetch_sub returns previous value
-        VERIFY2(unfinishedJobs >= 0, "The same task was executed two times.");
-        if (unfinishedJobs || !it->m_data.parent)
-            break;
-    }
-    ++s_tl_worker.finishedTasks;
-}
-
-Task* TaskManager::AllocateTask()
+Task* TaskManager::AllocateTask() noexcept
 {
     ++s_tl_worker.allocatedTasks;
     return s_tl_allocator.allocate();
 }
 
-void TaskManager::IncrementTaskJobsCounter(Task& parent)
-{
-    VERIFY2(parent.m_data.jobs.load(std::memory_order_relaxed) > 0, "Adding child task to a parent that has already finished.");
-    [[maybe_unused]] const auto prev = parent.m_data.jobs.fetch_add(1, std::memory_order_acq_rel);
-    VERIFY2(prev != std::numeric_limits<decltype(prev)>::max(), "Max jobs overflow. (too much children)");
-}
-
-void TaskManager::PushTask(Task& task)
+void TaskManager::PushTask(Task& task) noexcept
 {
     s_tl_worker.push(&task);
     newWorkArrived.notify_one();
     ++s_tl_worker.pushedTasks;
+}
+
+void TaskManager::ExecuteTask(Task& task)
+{
+    task();
+    ++s_tl_worker.finishedTasks;
 }
 
 void TaskManager::RunTask(Task& task)
@@ -352,37 +335,12 @@ bool TaskManager::ExecuteOneTask() const
     return false;
 }
 
-Task& TaskManager::CreateTask(const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    return *new (AllocateTask()) Task(taskFunc, data, dataSize);
-}
-
-Task& TaskManager::CreateTask(Task& parent, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    IncrementTaskJobsCounter(parent);
-    return *new (AllocateTask()) Task(taskFunc, data, dataSize, &parent);
-}
-
-Task& TaskManager::AddTask(const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    auto& task = CreateTask(taskFunc, dataSize, data);
-    PushTask(task);
-    return task;
-}
-
-Task& TaskManager::AddTask(Task& parent, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    auto& task = CreateTask(parent, taskFunc, dataSize, data);
-    PushTask(task);
-    return task;
-}
-
-size_t TaskManager::GetWorkersCount() const
+size_t TaskManager::GetWorkersCount() const noexcept
 {
     return workers.size();
 }
 
-size_t TaskManager::GetCurrentWorkerID()
+size_t TaskManager::GetCurrentWorkerID() noexcept
 {
     return s_tl_worker.id;
 }

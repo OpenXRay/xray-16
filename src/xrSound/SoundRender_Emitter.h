@@ -87,7 +87,6 @@ private:
     void fill_data(void* dest, u32 offset, u32 size) const;
 
     void fill_all_blocks();
-    void prefill_blocks(Task&, void*);
     void dispatch_prefill();
 
     void wait_prefill() const;

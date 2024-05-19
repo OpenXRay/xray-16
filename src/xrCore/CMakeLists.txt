@@ -401,7 +401,6 @@ target_sources_grouped(
     Threading/ParallelForEach.hpp
     Threading/ScopeLock.cpp
     Threading/ScopeLock.hpp
-    Threading/Task.cpp
     Threading/Task.hpp
     Threading/TaskManager.cpp
     Threading/TaskManager.hpp

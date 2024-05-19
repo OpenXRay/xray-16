@@ -163,9 +163,6 @@ public:
     void Pause(bool bOn, bool bTimer, bool bSound, pcstr reason);
     bool Paused();
 
-private:
-    void ProcessParallelSequence(Task&, void*);
-
 public:
     // Scene control
     void ProcessFrame();

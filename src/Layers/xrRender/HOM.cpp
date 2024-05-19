@@ -267,13 +267,16 @@ void CHOM::Render(CFrustum& base)
     stats.Total.End();
 }
 
-void CHOM::MT_RENDER(Task& /*thisTask*/, void* /*data*/)
+Task& CHOM::DispatchMTRender()
 {
-    ZoneScoped;
-    CFrustum ViewBase;
-    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-    Enable();
-    Render(ViewBase);
+    return TaskManager::AddTask([this]
+    {
+        ZoneScoped;
+        CFrustum ViewBase;
+        ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+        Enable();
+        Render(ViewBase);
+    });
 }
 
 ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, float _x, float _y, float _z)

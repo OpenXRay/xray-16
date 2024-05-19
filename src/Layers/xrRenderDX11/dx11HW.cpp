@@ -221,10 +221,10 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     // Register immediate context in profiler
     if (ThisInstanceIsGlobal())
     {
-        TaskScheduler->AddTask([](Task&, void*)
+        TaskScheduler->AddTask([this]
         {
             ZoneScopedN("TracyD3D11Context");
-            HW.profiler_ctx = TracyD3D11Context(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
+            profiler_ctx = TracyD3D11Context(pDevice, get_context(CHW::IMM_CTX_ID));
         });
     }
 

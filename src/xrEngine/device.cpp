@@ -257,15 +257,6 @@ void CRenderDevice::DoRender()
     stats.RenderTotal.accum = renderTotalReal.accum;
 }
 
-void CRenderDevice::ProcessParallelSequence(Task&, void*)
-{
-    ZoneScoped;
-    for (u32 pit = 0; pit < seqParallel.size(); pit++)
-        seqParallel[pit]();
-    seqParallel.clear();
-    seqFrameMT.Process();
-}
-
 void CRenderDevice::ProcessFrame()
 {
     ZoneScoped;
@@ -279,7 +270,14 @@ void CRenderDevice::ProcessFrame()
 
     OnCameraUpdated();
 
-    const auto& processSeqParallel = TaskScheduler->AddTask({ this, &CRenderDevice::ProcessParallelSequence });
+    const auto& processSeqParallel = TaskScheduler->AddTask([this]
+    {
+        ZoneScopedN("ProcessParallelSequence");
+        for (u32 pit = 0; pit < seqParallel.size(); pit++)
+            seqParallel[pit]();
+        seqParallel.clear();
+        seqFrameMT.Process();
+    });
 
     DoRender();
 

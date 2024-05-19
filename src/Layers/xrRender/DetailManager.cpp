@@ -431,34 +431,32 @@ void CDetailManager::Render(CBackend& cmd_list)
     RImplementation.BasicStats.DetailRender.End();
 }
 
-void CDetailManager::MT_CALC(Task&, void*)
-{
-#ifndef _EDITOR
-    if (nullptr == RImplementation.Details)
-        return; // possibly deleted
-    if (nullptr == dtFS)
-        return;
-    if (!psDeviceFlags.is(rsDrawDetails))
-        return;
-#endif
-
-    ZoneScoped;
-
-    EYE = Device.vCameraPosition;
-
-    const int s_x = iFloor(EYE.x / dm_slot_size + .5f);
-    const int s_z = iFloor(EYE.z / dm_slot_size + .5f);
-
-    RImplementation.BasicStats.DetailCache.Begin();
-    cache_Update(s_x, s_z, EYE, dm_max_decompress);
-    RImplementation.BasicStats.DetailCache.End();
-
-    UpdateVisibleM();
-}
-
 void CDetailManager::DispatchMTCalc()
 {
-    m_calc_task = &TaskScheduler->AddTask({ this, &CDetailManager::MT_CALC });
+    m_calc_task = &TaskScheduler->AddTask([this]
+    {
+#ifndef _EDITOR
+        if (nullptr == RImplementation.Details)
+            return; // possibly deleted
+        if (nullptr == dtFS)
+            return;
+        if (!psDeviceFlags.is(rsDrawDetails))
+            return;
+#endif
+
+        ZoneScoped;
+
+        EYE = Device.vCameraPosition;
+
+        const int s_x = iFloor(EYE.x / dm_slot_size + .5f);
+        const int s_z = iFloor(EYE.z / dm_slot_size + .5f);
+
+        RImplementation.BasicStats.DetailCache.Begin();
+        cache_Update(s_x, s_z, EYE, dm_max_decompress);
+        RImplementation.BasicStats.DetailCache.End();
+
+        UpdateVisibleM();
+    });
 }
 
 void CDetailManager::details_clear()
