@@ -104,9 +104,9 @@ void CRender::render_lights(light_Package& LP)
 
     struct task_data_t
     {
-        light* L;
-        Task* task;
-        u32 batch_id;
+        light* L{};
+        Task* task{};
+        u32 batch_id{};
     };
     static xr_vector<task_data_t> lights_queue{};
     lights_queue.reserve(R__NUM_SUN_CASCADES);
@@ -196,9 +196,11 @@ void CRender::render_lights(light_Package& LP)
             source.pop_back();
             Lights_LastFrame.push_back(L);
 
-            task_data_t data;
+            task_data_t data{};
+            data.batch_id = batch_id;
+            data.L = L;
 
-            const auto& calc_lights = [&data]
+            const auto& calc_lights = [data]
             {
                 ZoneScopedN("calc lights");
                 auto& dsgraph = RImplementation.get_context(data.batch_id);
@@ -219,8 +221,6 @@ void CRender::render_lights(light_Package& LP)
             };
 
             // calculate
-            data.batch_id = batch_id;
-            data.L = L;
             data.task = &TaskScheduler->CreateTask(calc_lights);
             if (o.mt_calculate)
             {
