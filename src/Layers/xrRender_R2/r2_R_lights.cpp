@@ -116,8 +116,8 @@ void CRender::render_lights(light_Package& LP)
         ZoneScopedN("flush lights");
         for (const auto& [L, task, batch_id] : lights_queue)
         {
-            VERIFY(task);
-            TaskScheduler->Wait(*task);
+            if (task)
+                TaskScheduler->Wait(*task);
 
             auto& dsgraph = get_context(batch_id);
 
@@ -221,14 +221,13 @@ void CRender::render_lights(light_Package& LP)
             };
 
             // calculate
-            data.task = &TaskScheduler->CreateTask(calc_lights);
             if (o.mt_calculate)
             {
-                TaskScheduler->PushTask(*data.task);
+                data.task = &TaskScheduler->AddTask(calc_lights);
             }
             else
             {
-                TaskScheduler->RunTask(*data.task);
+                calc_lights();
             }
             lights_queue.emplace_back(data);
         }
