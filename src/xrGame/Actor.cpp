@@ -1772,14 +1772,14 @@ void CActor::ForceTransformAndDirection(const Fmatrix& m)
     cam_Active()->Set(-xyz.x, -xyz.y, -xyz.z);
 }
 
-//ENGINE_API extern float psHUD_FOV;
+//ENGINE_API extern float g_hud_fov;
 float CActor::Radius() const
 {
     float R = inherited::Radius();
     CWeapon* W = smart_cast<CWeapon*>(inventory().ActiveItem());
     if (W)
         R += W->Radius();
-    //if (HUDview()) R *= 1.f/psHUD_FOV;
+    //if (HUDview()) R *= 1.f/g_hud_fov;
     return R;
 }
 

@@ -13,6 +13,7 @@
 #include "ListBox/UIListBox.h"
 #include "ComboBox/UIComboBox.h"
 #include "TrackBar/UITrackBar.h"
+#include "MultiTrackBar/UIMultiTrackBar.h"
 
 #include "UITextureMaster.h"
 #include "Lines/UILines.h"
@@ -1247,6 +1248,8 @@ bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, pcstr path, int index, CUITra
     pWnd->SetInvert(!!invert);
     const float step = xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
     pWnd->SetStep(step);
+    const float displayModifier = xml_doc.ReadAttribFlt(path, index, "display_scale", 1.f);
+    pWnd->SetDisplayModifier(displayModifier);
 
     if (!is_integer)
     {
@@ -1278,6 +1281,119 @@ bool CUIXmlInitBase::InitTrackBar(CUIXml& xml_doc, pcstr path, int index, CUITra
         InitStatic(xml_doc, buf, index, pWnd->m_static);
         pWnd->m_static_format = xml_doc.ReadAttrib(buf, index, "format", nullptr);
         pWnd->m_static->Enable(true);
+    }
+
+    return true;
+}
+
+bool CUIXmlInitBase::InitMultiTrackBar(CUIXml& xml_doc, pcstr path, int index, CUIMultiTrackBar* pWnd, bool fatal /*= true*/)
+{
+    if (!InitWindow(xml_doc, path, 0, pWnd, fatal))
+        return false;
+
+    const int def_is_integer = xml_doc.ReadAttribInt(path, index, "is_integer", 0);
+    pWnd->SetType(!def_is_integer);
+
+    const int def_invert = xml_doc.ReadAttribInt(path, index, "invert", 0);
+    pWnd->SetDefaultInvert(!!def_invert);
+
+    const float def_step = xml_doc.ReadAttribFlt(path, index, "step", 0.1f);
+    pWnd->SetDefaultStep(def_step);
+
+    const float def_min = xml_doc.ReadAttribFlt(path, index, "min", 0.1f);
+    pWnd->SetDefaultMin(def_min);
+
+    const float def_max = xml_doc.ReadAttribFlt(path, index, "max", 0.1f);
+    pWnd->SetDefaultMax(def_max);
+
+    const int childCount = xml_doc.ReadAttribInt(path, index, "child_count", 0);
+    pWnd->SetChildCount(childCount);
+
+    const float defDisplayModifier = xml_doc.ReadAttribFlt(path, index, "display_scale", 1.f);
+    pWnd->SetDisplayModifier(defDisplayModifier);
+
+    const int saveDataType = xml_doc.ReadAttribInt(path, index, "save_data_type", childCount);
+    if (saveDataType == 3)
+    {
+        pWnd->SetSaveDataType(CUIMultiTrackBar::SDT_Fvector3);
+    }
+    else if (saveDataType == 4)
+    {
+        pWnd->SetSaveDataType(CUIMultiTrackBar::SDT_Fvector4);
+    }
+    else
+    {
+        pWnd->SetSaveDataType(CUIMultiTrackBar::SDT_INVALID_DATA_TYPE);
+    }
+
+    cpcstr entry = xml_doc.ReadAttrib(path, index, "entry");
+    cpcstr group = xml_doc.ReadAttrib(path, index, "group");
+    pWnd->AssignProps(entry, group);
+
+    xr_vector<pcstr> mapping = { "x", "y", "z", "w" };
+    xr_vector<CUIMultiTrackBar::ChildTrackBarData> trackBarData;
+    trackBarData.reserve(childCount);
+    for (int i = 0; i < childCount; i++)
+    {
+        string128 min, max, step, isInt, invert, order, label, displayScale, defaultValue;
+        xr_sprintf(min, "%s_%s", mapping[i], "min");
+        xr_sprintf(max, "%s_%s", mapping[i], "max");
+        xr_sprintf(step, "%s_%s", mapping[i], "step");
+        xr_sprintf(invert, "%s_%s", mapping[i], "invert");
+        xr_sprintf(order, "%s_%s", mapping[i], "order");
+        xr_sprintf(label, "%s_%s", mapping[i], "label");
+        xr_sprintf(displayScale, "%s_%s", mapping[i], "display_scale");
+        xr_sprintf(defaultValue, "%s_%s", mapping[i], "default");
+
+        const int is_invert = xml_doc.ReadAttribInt(path, index, invert, def_invert);
+        const float fmin = xml_doc.ReadAttribFlt(path, index, min, def_min);
+        const float fmax = xml_doc.ReadAttribFlt(path, index, max, def_max);
+        const float fstep = xml_doc.ReadAttribFlt(path, index, step, def_step);
+        const int displayOrder = xml_doc.ReadAttribInt(path, index, order, i);
+        const pcstr displayLabel = xml_doc.ReadAttrib(path, index, label, nullptr);
+        const float fDisplayScale = xml_doc.ReadAttribFlt(path, index, displayScale, defDisplayModifier);
+        const float fDefaultValue = xml_doc.ReadAttribFlt(path, index, defaultValue, fmin);
+
+        trackBarData[i] = { is_invert, fmin, fmax, fstep, displayOrder, displayLabel, fDisplayScale, fDefaultValue };
+    }
+
+    string512 buf;
+    xr_sprintf(buf, "%s%s", path, ":title");
+    if (xml_doc.NavigateToNode(buf, index))
+    {
+        InitStatic(xml_doc, buf, index, pWnd->m_static);
+        pWnd->m_static->Enable(true);
+    }
+
+    pWnd->InitTrackBars(pWnd->GetWndPos(), pWnd->GetWndSize(), trackBarData);
+    InitOptionsItem(xml_doc, path, 0, pWnd);
+
+    for (int i = 0; i < childCount; i++)
+    {
+        auto trackBar = pWnd->GetTrackBarAtIdx(i);
+        xr_sprintf(buf, "%s%s", path, ":output_wnd");
+        if (xml_doc.NavigateToNode(buf, index))
+        {
+            const pcstr default_format = xml_doc.ReadAttrib(buf, index, "format", nullptr);
+            string128 format;
+            xr_sprintf(format, "%s_%s", mapping[i], "format");
+
+            InitStatic(xml_doc, buf, index, trackBar->m_static);
+            trackBar->m_static_format = xml_doc.ReadAttrib(path, index, format, default_format);
+            trackBar->m_static->Enable(true);
+            pWnd->UpdatePos();
+        }
+        xr_sprintf(buf, "%s%s%s", path, ":cap_", mapping[i]);
+        if (xml_doc.NavigateToNode(buf, index))
+        {
+            InitStatic(xml_doc, buf, index, trackBar->m_label);
+
+            if (trackBar->GetDisplayLabel())
+                trackBar->m_label->SetText(StringTable().translate(trackBar->GetDisplayLabel()).c_str());
+
+            trackBar->m_label->Enable(true);
+            pWnd->UpdatePos();
+        }
     }
 
     return true;

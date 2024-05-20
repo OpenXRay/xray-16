@@ -167,14 +167,21 @@
           <track_brightness x="140" y="247" width="188" height="16">
             <options_item entry="rs_c_brightness" group="mm_opt_video" depend="runtime"/>
         </track_brightness>
-
         <btn_advanced x="270" y="322" width="86" height="24" stretch="1">
             <text r="170" g="170" b="170" align="c" font="letterica16">ui_mm_advanced</text>
+            <texture>ui_inGame2_button</texture>
+            <text_color>
+                <e r="210" g="210" b="210"/>
+            </text_color>
+        </btn_advanced>
+        
+        <btn_shader_options x="180" y="322" width="86" height="24" stretch="1">
+            <text r="170" g="170" b="170" align="c" font="letterica16">ui_mm_shader_options</text>
             <texture>ui_inGame2_button</texture>
 			<text_color>
 				<e r="210" g="210" b="210"/>
 			</text_color>
-        </btn_advanced>
+        </btn_shader_options>
     </tab_video>
 
     <video_adv>
@@ -535,6 +542,8 @@
         </btn_to_simply>
     </video_adv>
 
+    #include "ui\ui_mm_shader_options_16.xml"
+
     <tab_sound>
         <cap_mastervolume x="12" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_master_volume</text>
@@ -632,6 +641,16 @@
 				<text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">0</text>
 			</output_wnd>
 		</track_fov>
+        
+        <cap_hud_fov x="16" y="3" width="108" height="24">
+            <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_hud_fov</text>
+        </cap_hud_fov>
+        <track_hud_fov x="144" y="5" width="160" height="20" min="30.0" max="60.0" step="1.0">
+            <options_item entry="hud_fov" group="mm_opt_gameplay"/>
+            <output_wnd x="165" y="0" width="20" height="20" format="%.1f">
+                <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">0</text>
+            </output_wnd>
+        </track_hud_fov>
 
         <cap_check_crosshair x="16" y="3" width="108" height="24">
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_show_crosshair</text>

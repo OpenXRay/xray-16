@@ -28,7 +28,16 @@ CUITrackBar::CUITrackBar()
     AttachChild(m_static);
     m_static->SetAutoDelete(true);
 
+    m_label = xr_new<CUIStatic>("Value as text 2");
+    m_label->Enable(false);
+    AttachChild(m_label);
+    m_label->SetAutoDelete(true);
+
     m_b_mouse_capturer = false;
+
+    m_display_modifier = 1.f;
+    m_display_order = 1;
+    m_display_label = nullptr;
 }
 
 bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
@@ -145,6 +154,7 @@ void CUITrackBar::Draw()
     CUI_IB_FrameLineWnd::Draw();
     m_pSlider->Draw();
     m_static->Draw();
+    m_label->Draw();
 }
 
 void CUITrackBar::Update()

@@ -276,8 +276,8 @@ extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
 extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
 extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
 extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1_cfg;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2_cfg;
 extern ENGINE_API int ps_ssfx_is_underground;
 extern ENGINE_API int ps_ssfx_gloss_method;
 extern ENGINE_API float ps_ssfx_gloss_factor;
@@ -1152,8 +1152,8 @@ void xrRender_initconsole()
 
     CMD4(CCC_Vector4, "ssfx_florafixes_1", &ps_ssfx_florafixes_1, Fvector4().set(0.0, 0.0, 0.0, 0.0), Fvector4().set(1.0, 1.0, 1.0, 1.0));
     CMD4(CCC_Vector4, "ssfx_florafixes_2", &ps_ssfx_florafixes_2, Fvector4().set(0.0, 0.0, 0.0, 0.0), Fvector4().set(10.0, 1.0, 1.0, 1.0));
-    CMD4(CCC_Vector4, "ssfx_wetsurfaces_1", &ps_ssfx_wetsurfaces_1, Fvector4().set(0.01, 0.01, 0.01, 0.01), Fvector4().set(2.0, 2.0, 2.0, 2.0));
-    CMD4(CCC_Vector4, "ssfx_wetsurfaces_2", &ps_ssfx_wetsurfaces_2, Fvector4().set(0.01, 0.01, 0.01, 0.01), Fvector4().set(2.0, 2.0, 2.0, 2.0));
+    CMD4(CCC_Vector4, "ssfx_wetsurfaces_1", &ps_ssfx_wetsurfaces_1_cfg, Fvector4().set(0.01, 0.01, 0.01, 0.01), Fvector4().set(2.0, 2.0, 2.0, 2.0));
+    CMD4(CCC_Vector4, "ssfx_wetsurfaces_2", &ps_ssfx_wetsurfaces_2_cfg, Fvector4().set(0.01, 0.01, 0.01, 0.01), Fvector4().set(2.0, 2.0, 2.0, 2.0));
     CMD4(CCC_Integer, "ssfx_is_underground", &ps_ssfx_is_underground, 0, 1);
     CMD4(CCC_Integer, "ssfx_gloss_method", &ps_ssfx_gloss_method, 0, 1);
     CMD4(CCC_Vector3, "ssfx_gloss_minmax", &ps_ssfx_gloss_minmax, Fvector3().set(0, 0, 0), Fvector3().set(1.0, 1.0, 1.0));

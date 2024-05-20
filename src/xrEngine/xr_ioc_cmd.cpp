@@ -608,6 +608,8 @@ ENGINE_API Fvector4 ps_ssfx_wpn_dof_1 = { .0f, .0f, .0f, .0f };
 ENGINE_API Fvector4 ps_ssfx_wpn_dof_2 = { 0.15f, .0f, .0f, .0f };
 ENGINE_API Fvector4 ps_ssfx_florafixes_1 = { 0.3f, 0.21f, 0.3f, 0.21f }; // Flora fixes 1
 ENGINE_API Fvector4 ps_ssfx_florafixes_2 = { 2.0f, 1.0f, 0.0f, 0.0f }; // Flora fixes 2
+ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1_cfg = { 1.0f, 1.0f, 1.0f, 1.0f }; // Wet surfaces 1
+ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2_cfg = { 1.0f, 1.0f, 1.0f, 1.0f }; // Wet surfaces 2
 ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1 = { 1.0f, 1.0f, 1.0f, 1.0f }; // Wet surfaces 1
 ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2 = { 1.0f, 1.0f, 1.0f, 1.0f }; // Wet surfaces 2
 ENGINE_API int ps_ssfx_is_underground = 0;
@@ -788,7 +790,8 @@ public:
 };
 
 ENGINE_API float g_fov = 67.5f;
-ENGINE_API float psHUD_FOV = 0.45f;
+ENGINE_API float g_hud_fov_def = 25.7831f;
+ENGINE_API float g_hud_fov = g_hud_fov_def;
 
 // extern int psSkeletonUpdate;
 extern int rsDVB_Size;

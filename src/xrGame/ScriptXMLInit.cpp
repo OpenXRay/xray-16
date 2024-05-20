@@ -17,6 +17,7 @@
 #include "xrUICore/Static/UIAnimatedStatic.h"
 #include "ui/UISleepStatic.h"
 #include "xrUICore/TrackBar/UITrackBar.h"
+#include "xrUICore/MultiTrackBar/UIMultiTrackBar.h"
 #include "ui/UICDkey.h"
 #include "ui/UIMapInfo.h"
 #include "ui/UIMMShniaga.h"
@@ -243,6 +244,14 @@ CUITrackBar* CScriptXmlInit::InitTrackBar(LPCSTR path, CUIWindow* parent)
     return pWnd;
 }
 
+CUIMultiTrackBar* CScriptXmlInit::InitMultiTrackBar(LPCSTR path, CUIWindow* parent)
+{
+    CUIMultiTrackBar* pWnd = xr_new<CUIMultiTrackBar>();
+    CUIXmlInit::InitMultiTrackBar(m_xml, path, 0, pWnd);
+    _attach_child(pWnd, parent);
+    return pWnd;
+}
+
 CUIProgressBar* CScriptXmlInit::InitProgressBar(LPCSTR path, CUIWindow* parent)
 {
     CUIProgressBar* pWnd = xr_new<CUIProgressBar>();
@@ -300,6 +309,7 @@ SCRIPT_EXPORT(CScriptXmlInit, (),
             .def("InitVerList", &CScriptXmlInit::InitVerList)
             .def("InitMapInfo", &CScriptXmlInit::InitMapInfo)
             .def("InitTrackBar", &CScriptXmlInit::InitTrackBar)
+            .def("InitMultiTrackBar", &CScriptXmlInit::InitMultiTrackBar)
             .def("InitCDkey", &CScriptXmlInit::InitCDkey)
             .def("InitMPPlayerName", &CScriptXmlInit::InitMPPlayerName)
             .def("InitKeyBinding", &CScriptXmlInit::InitKeyBinding)

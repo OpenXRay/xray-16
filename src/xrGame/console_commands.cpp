@@ -73,7 +73,7 @@ extern u64 g_qwStartGameTime;
 extern u64 g_qwEStartGameTime;
 
 ENGINE_API
-extern float psHUD_FOV;
+extern float g_hud_fov_def;
 extern float psSqueezeVelocity;
 extern int psLUA_GCSTEP;
 extern int g_auto_ammo_unload;
@@ -2061,7 +2061,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "hud_crosshair_dist", &psHUD_Flags, HUD_CROSSHAIR_DIST);
     CMD3(CCC_Mask, "hud_left_handed", &psHUD_Flags, HUD_LEFT_HANDED);
 
-    CMD4(CCC_Float, "hud_fov", &psHUD_FOV, 0.1f, 1.0f);
+    CMD4(CCC_Float, "hud_fov", &g_hud_fov_def, 5.0f, 180.f);
     CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
 
     // Demo
