@@ -134,7 +134,12 @@ void CInput::MouseUpdate()
     static_assert(std::size(IdxToKey) == COUNT_MOUSE_BUTTONS);
 
     bool mouseMoved = false;
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+    int offs[2]{};
+    float scroll[2]{};
+#else
     int offs[COUNT_MOUSE_AXIS]{};
+#endif
     const auto mousePrev = mouseState;
     mouseAxisState[2] = 0;
     mouseAxisState[3] = 0;
@@ -177,8 +182,13 @@ void CInput::MouseUpdate()
         }
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+            scroll[0] += event.wheel.preciseX;
+            scroll[1] += event.wheel.preciseY;
+#else
             offs[2] += event.wheel.x;
             offs[3] += event.wheel.y;
+#endif
             mouseAxisState[2] += event.wheel.x;
             mouseAxisState[3] += event.wheel.y;
             break;
@@ -195,8 +205,13 @@ void CInput::MouseUpdate()
     {
         if (offs[0] || offs[1])
             cbStack.back()->IR_OnMouseMove(offs[0], offs[1]);
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+        if (!fis_zero(scroll[0]) || !fis_zero(scroll[1]))
+            cbStack.back()->IR_OnMouseWheel(scroll[0], scroll[1]);
+#else
         if (offs[2] || offs[3])
             cbStack.back()->IR_OnMouseWheel(offs[2], offs[3]);
+#endif
     }
 }
 

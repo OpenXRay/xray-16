@@ -74,7 +74,7 @@ public:
     void IR_OnMousePress(int key) override;
     void IR_OnMouseRelease(int key) override;
     void IR_OnMouseHold(int key) override;
-    void IR_OnMouseWheel(int x, int y) override;
+    void IR_OnMouseWheel(float x, float y) override;
     void IR_OnMouseMove(int x, int y) override;
 
     void IR_OnKeyboardPress(int key) override;

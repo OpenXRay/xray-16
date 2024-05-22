@@ -211,11 +211,11 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
 }
 
-void CActor::IR_OnMouseWheel(int x, int y)
+void CActor::IR_OnMouseWheel(float x, float y)
 {
     if (hud_adj_mode)
     {
-        g_player_hud->tune(Ivector().set(0, 0, y));
+        g_player_hud->tune({ 0, 0, static_cast<int>(std::round(y)) });
         return;
     }
 

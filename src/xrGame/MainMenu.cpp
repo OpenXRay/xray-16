@@ -445,7 +445,7 @@ void CMainMenu::IR_OnTextInput(pcstr text)
     CDialogHolder::IR_UIOnTextInput(text);
 }
 
-void CMainMenu::IR_OnMouseWheel(int x, int y)
+void CMainMenu::IR_OnMouseWheel(float x, float y)
 {
     if (!IsActive())
         return;

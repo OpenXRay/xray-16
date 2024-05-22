@@ -399,7 +399,7 @@ void CUISequencer::IR_OnKeyboardHold(int dik)
         m_pStoredInputReceiver->IR_OnKeyboardHold(dik);
 }
 
-void CUISequencer::IR_OnMouseWheel(int x, int y)
+void CUISequencer::IR_OnMouseWheel(float x, float y)
 {
     if (!GrabInput() && m_pStoredInputReceiver)
         m_pStoredInputReceiver->IR_OnMouseWheel(x, y);

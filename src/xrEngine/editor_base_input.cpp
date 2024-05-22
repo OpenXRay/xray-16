@@ -275,10 +275,10 @@ void ide::IR_OnMouseHold(int /*key*/)
     // ImGui handles hold state on its own
 }
 
-void ide::IR_OnMouseWheel(int x, int y)
+void ide::IR_OnMouseWheel(float x, float y)
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.AddMouseWheelEvent(static_cast<float>(x), static_cast<float>(y));
+    io.AddMouseWheelEvent(x, y);
 }
 
 void ide::IR_OnMouseMove(int /*x*/, int /*y*/)

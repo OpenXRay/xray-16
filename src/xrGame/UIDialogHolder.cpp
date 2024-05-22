@@ -377,15 +377,13 @@ bool CDialogHolder::IR_UIOnKeyboardHold(int dik)
     return true;
 }
 
-bool CDialogHolder::IR_UIOnMouseWheel(int x, int y)
+bool CDialogHolder::IR_UIOnMouseWheel(float x, float y)
 {
     CUIDialogWnd* TIR = TopInputReceiver();
     if (!TIR)
         return false;
     if (!TIR->IR_process())
         return false;
-
-    Fvector2 pos = GetUICursor().GetCursorPosition();
 
     // Vertical scroll is in higher priority
     EUIMessages wheelMessage;
@@ -398,6 +396,7 @@ bool CDialogHolder::IR_UIOnMouseWheel(int x, int y)
     else
         wheelMessage = WINDOW_MOUSE_WHEEL_LEFT;
 
+    const Fvector2 pos = GetUICursor().GetCursorPosition();
     TIR->OnMouseAction(pos.x, pos.y, wheelMessage);
     return true;
 }
