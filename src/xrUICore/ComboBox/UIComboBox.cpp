@@ -9,6 +9,8 @@
 
 CUIComboBox::CUIComboBox() : CUIWindow("CUIComboBox")
 {
+    m_bFocusValuable = true;
+
     AttachChild(&m_frameLine);
     AttachChild(&m_text);
 

@@ -4,6 +4,7 @@
 #include "xrCore/_flags.h"
 #include "xrEngine/pure.h"
 #include "xrUICore/ui_debug.h"
+#include "xrUICore/ui_focus.h"
 
 #include <SDL.h>
 
@@ -32,7 +33,7 @@ public:
     Flags8 m_flags;
 };
 
-class CDialogHolder : public pureFrame, public CUIDebuggable
+class CDialogHolder : public pureFrame, public CUIDebuggable, public CUIFocusSystem
 {
     // dialogs
     xr_vector<recvItem> m_input_receivers;

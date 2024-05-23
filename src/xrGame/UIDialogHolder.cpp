@@ -55,6 +55,7 @@ void CDialogHolder::StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
             CurrentGameUI()->ShowGameIndicators(false);
         }
     }
+    SetFocused(nullptr);
     pDialog->SetHolder(this);
 
     if (pDialog->NeedCursor())
@@ -303,6 +304,25 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
             return (false);
         }
     }
+
+    /*if (const auto focused = GetFocused())
+    {
+        CUIWindow* target{};
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE_LEFT:  target = FindClosestFocusable(focused, FocusDirection::Left); break;
+        case kUI_MOVE_RIGHT: target = FindClosestFocusable(focused, FocusDirection::Right); break;
+        case kUI_MOVE_UP:    target = FindClosestFocusable(focused, FocusDirection::Up); break;
+        case kUI_MOVE_DOWN:  target = FindClosestFocusable(focused, FocusDirection::Down); break;
+        }
+
+        if (target)
+        {
+            SetFocused(target);
+            GetUICursor().WarpToWindow(target, true);
+        }
+    }*/
+
     return true;
 }
 
@@ -444,13 +464,7 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_PRESSED))
         return true;
 
-    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
-    {
-        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
-        Fvector2 cPos = GetUICursor().GetCursorPosition();
-        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
-    }
-    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    if (!TIR->StopAnyMove() && g_pGameLevel)
     {
         IGameObject* O = Level().CurrentEntity();
         if (O)
@@ -510,13 +524,7 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_HOLD))
         return true;
 
-    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
-    {
-        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
-        Fvector2 cPos = GetUICursor().GetCursorPosition();
-        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
-    }
-    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    if (!TIR->StopAnyMove() && g_pGameLevel)
     {
         IGameObject* O = Level().CurrentEntity();
         if (O)

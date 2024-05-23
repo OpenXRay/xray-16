@@ -9,6 +9,7 @@
 #include "ScrollView/UIScrollView.h"
 #include "Hint/UIHint.h"
 #include "Cursor/UICursor.h"
+#include "ui_focus.h"
 #include "ui_styles.h"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
@@ -66,6 +67,34 @@ SCRIPT_EXPORT(UIStyleManager, (),
             .def("ResetUI", &UIStyleManager::Reset),
 
         def("GetUIStyleManager", +[] { return UIStyles; })
+    ];
+});
+
+SCRIPT_EXPORT(CUIFocusSystem, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
+    module(luaState)
+    [
+        class_<FocusDirection>("FocusDirection")
+            .enum_("direction")
+            [
+                value("Same",       (int)FocusDirection::Same),
+                value("Up",         (int)FocusDirection::Up),
+                value("Down",       (int)FocusDirection::Down),
+                value("Left",       (int)FocusDirection::Left),
+                value("Right",      (int)FocusDirection::Right),
+                value("UpperLeft",  (int)FocusDirection::UpperLeft),
+                value("UpperRight", (int)FocusDirection::UpperRight),
+                value("LowerLeft",  (int)FocusDirection::LowerLeft),
+                value("LowerRight", (int)FocusDirection::LowerRight)
+            ],
+        class_<CUIFocusSystem>("CUIFocusSystem")
+            .def("RegisterFocusable", &CUIFocusSystem::RegisterFocusable)
+            .def("UnregisterFocusable", &CUIFocusSystem::UnregisterFocusable)
+            .def("IsRegistered", &CUIFocusSystem::IsRegistered)
+            .def("FindClosestFocusable", &CUIFocusSystem::FindClosestFocusable)
     ];
 });
 
@@ -183,6 +212,8 @@ SCRIPT_EXPORT(CUIWindow, (),
 
             .def("SetFont", &CUIWindow::SetFont)
             .def("GetFont", &CUIWindow::GetFont)
+
+            .def("GetCurrentFocusSystem", &CUIWindow::GetCurrentFocusSystem)
 
             .def("WindowName", +[](CUIWindow* self) -> pcstr { return self->WindowName().c_str(); })
             .def("SetWindowName", &CUIWindow::SetWindowName),

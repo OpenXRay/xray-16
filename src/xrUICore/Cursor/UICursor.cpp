@@ -49,6 +49,7 @@ void CUICursor::Show()
 
 void CUICursor::Hide()
 {
+    return;
     bVisible = false;
     m_become_visible_time = 0;
     m_pause_autohide = false;

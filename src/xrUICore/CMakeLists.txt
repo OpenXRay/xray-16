@@ -8,6 +8,8 @@ target_sources(xrUICore PRIVATE
     ui_debug.cpp
     ui_debug.h
     ui_defs.h
+    ui_focus.cpp
+    ui_focus.h
     ui_styles.cpp
     ui_styles.h
     uiabstract.h
