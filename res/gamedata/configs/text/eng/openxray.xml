@@ -159,6 +159,9 @@
 	<string id="spa">
 		<text>Spanish</text>
 	</string>
+	<string id="ui_mm_hud_fov">
+		<text>HUD Field of View</text>
+	</string>
 	<string id="ui_mm_shader_options">
 		<text>Shader Options</text>
 	</string>

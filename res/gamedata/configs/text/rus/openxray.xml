@@ -165,6 +165,9 @@
 	<string id="spa">
 		<text>Испанский (Spanish)</text>
 	</string>
+	<string id="ui_mm_hud_fov">
+		<text>Поле зрения HUD</text>
+	</string>
 	<string id="ui_mm_shader_options">
 	    <text>Настройки Шейдеров</text>
 	</string>
