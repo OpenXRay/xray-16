@@ -341,14 +341,15 @@ void CUITrackBar::UpdatePos()
 
     if (m_static->IsEnabled())
     {
+        float displayModifier = GetDisplayModifier();
         string256 buff;
         if (m_b_is_float)
         {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%.1f" : m_static_format.c_str()), m_f_val);
+            xr_sprintf(buff, (m_static_format == nullptr ? "%.1f" : m_static_format.c_str()), m_f_val * displayModifier);
         }
         else
         {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%d" : m_static_format.c_str()), m_i_val);
+            xr_sprintf(buff, (m_static_format == nullptr ? "%d" : m_static_format.c_str()), m_i_val * displayModifier);
         }
         m_static->TextItemControl()->SetTextST(buff);
     }
