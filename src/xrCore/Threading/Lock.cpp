@@ -70,7 +70,7 @@ Lock::~Lock() { xr_delete(impl); }
 void Lock::Enter()
 {
     impl->Lock();
-    ++lockCounter;
+    lockCounter.fetch_add(1, std::memory_order_acq_rel);
 }
 #endif // CONFIG_PROFILE_LOCKS
 
@@ -78,14 +78,14 @@ bool Lock::TryEnter()
 {
     const bool locked = impl->TryLock();
     if (locked)
-        ++lockCounter;
+        lockCounter.fetch_add(1, std::memory_order_acq_rel);
     return locked;
 }
 
 void Lock::Leave()
 {
     impl->Unlock();
-    --lockCounter;
+    lockCounter.fetch_sub(1, std::memory_order_acq_rel);
 }
 
 #ifdef DEBUG
