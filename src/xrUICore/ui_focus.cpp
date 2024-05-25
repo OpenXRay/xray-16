@@ -34,7 +34,7 @@ float euclidean_distance(const CUIWindow* from, const CUIWindow* to)
     const Fvector2 centerA = { aX + aWidth / 2.0f, aY + aHeight / 2.0f };
     const Fvector2 centerB = { bX + bWidth / 2.0f, bY + bHeight / 2.0f };
 
-    return std::sqrtf(std::powf(centerB.x - centerA.x, 2) + std::powf(centerB.y - centerA.y, 2));
+    return sqrtf(powf(centerB.x - centerA.x, 2) + powf(centerB.y - centerA.y, 2));
 }
 }
 
