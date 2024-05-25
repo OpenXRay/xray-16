@@ -19,6 +19,8 @@ limitations under the License.
 #include "ui_focus.h"
 #include "Windows/UIWindow.h"
 
+#include <cmath>
+
 namespace
 {
 float euclidean_distance(const CUIWindow* from, const CUIWindow* to)
