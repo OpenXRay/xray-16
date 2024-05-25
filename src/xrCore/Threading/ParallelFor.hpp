@@ -145,6 +145,19 @@ public:
         return task;
     }
 
+    static decltype(auto) Run(Task& parent, const Range& range, bool wait, const Function& function)
+    {
+        auto& task = TaskManager::AddTask(parent, Functor{ range, function });
+        if (wait)
+        {
+            VERIFY2(TaskScheduler, "Task scheduler is not yet created. "
+                "You should explicitly state that you know this by setting 'wait' param to false.");
+            if (TaskScheduler)
+                TaskScheduler->Wait(task);
+        }
+        return task;
+    }
+
 private:
     struct Functor
     {
@@ -182,3 +195,16 @@ decltype(auto) xr_parallel_for(const Range& range, const Function& function)
     return detail::ParallelFor<Range, Function>::Run(range, true, function);
 }
 
+// User can specify if he wants caller thread to wait on the task finish
+template <typename Range, typename Function>
+decltype(auto) xr_parallel_for(Task& parent, const Range& range, bool wait, const Function& function)
+{
+    return detail::ParallelFor<Range, Function>::Run(parent, range, wait, function);
+}
+
+// Caller thread will wait on the task finish
+template <typename Range, typename Function>
+decltype(auto) xr_parallel_for(Task& parent, const Range& range, const Function& function)
+{
+    return detail::ParallelFor<Range, Function>::Run(parent, range, true, function);
+}
