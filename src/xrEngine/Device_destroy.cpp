@@ -46,9 +46,7 @@ void CRenderDevice::Reset(bool precache /*= true*/)
 
     m_imgui_render->OnDeviceResetEnd();
 
-    // Update window props again for DX9 renderer
-    if (GEnv.Render->GetBackendAPI() == IRender::BackendAPI::D3D9) // XXX: I don't remember why this hack is needed, thus, I'm not sure if it is needed at all
-        UpdateWindowProps(); // hack
+    UpdateWindowProps(); // hack
 
     SetupStates();
 

@@ -130,7 +130,15 @@ void CRenderDevice::UpdateWindowProps()
         SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
     }
 
-    SDL_SetWindowSize(m_sdlWnd, psDeviceMode.Width, psDeviceMode.Height);
+    if (psDeviceMode.WindowStyle != rsFullscreenBorderless)
+        SDL_SetWindowSize(m_sdlWnd, psDeviceMode.Width, psDeviceMode.Height);
+    else
+    {
+        SDL_DisplayMode current;
+        SDL_GetCurrentDisplayMode(psDeviceMode.Monitor, &current);
+
+        SDL_SetWindowSize(m_sdlWnd, current.w, current.h);
+    }
 
     if (windowed)
     {
@@ -154,8 +162,8 @@ void CRenderDevice::UpdateWindowProps()
         SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
     }
 
+    SDL_PumpEvents();
     UpdateWindowRects();
-    SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
 
     ImGuiIO& io = ImGui::GetIO();
 

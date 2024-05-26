@@ -366,14 +366,16 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 #endif
 
         case SDL_WINDOWEVENT_RESIZED:
-            if (viewport)
-                viewport->PlatformRequestResize = true;
+            if (window == m_sdlWnd)
+                UpdateWindowRects();
             break;
 
         case SDL_WINDOWEVENT_SIZE_CHANGED:
         {
-            if (psDeviceMode.WindowStyle != rsFullscreen)
+            if (window == m_sdlWnd)
             {
+                UpdateWindowRects();
+
                 if (static_cast<int>(psDeviceMode.Width) == event.window.data1 &&
                     static_cast<int>(psDeviceMode.Height) == event.window.data2)
                     break; // we don't need to reset device if resolution wasn't really changed
@@ -383,8 +385,8 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 
                 Reset();
             }
-            else
-                UpdateWindowRects();
+            if (viewport)
+                viewport->PlatformRequestResize = true;
 
             break;
         }
