@@ -59,8 +59,8 @@ function(calculate_xray_build_id output)
     list(GET current_date_list 2 CURRENT_DATE_YEAR)
 
     # Check if current date is before the start date
-    # See issue#1611
-    if( (CURRENT_DATE_YEAR LESS XRAY_START_YEAR)
+    # See https://github.com/OpenXRay/xray-16/issues/1611
+    if ( (CURRENT_DATE_YEAR LESS XRAY_START_YEAR)
         OR ( (CURRENT_DATE_YEAR EQUAL XRAY_START_YEAR)
             AND (CURRENT_DATE_MONTH LESS XRAY_START_MONTH)
             OR ( (CURRENT_DATE_MONTH EQUAL XRAY_START_MONTH)
