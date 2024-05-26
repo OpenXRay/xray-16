@@ -242,7 +242,7 @@ void TaskManager::TaskWorkerStart()
             } while (shouldPause.load(std::memory_order_consume));
         }
         SetThreadStatus(true);
-    } // while (true)
+    }
 
     SetThreadStatus(false);
 
