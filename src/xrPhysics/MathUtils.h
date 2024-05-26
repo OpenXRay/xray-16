@@ -10,8 +10,7 @@
 #endif
 constexpr float phInfinity = std::numeric_limits<float>::infinity();
 
-template <class T> struct _quaternion;
-typedef _quaternion<float> Fquaternion;
+struct Fquaternion;
 
 IC float* cast_fp(Fvector& fv) { return (float*)(&fv); }
 IC const float* cast_fp(const Fvector& fv) { return (const float*)(&fv); }

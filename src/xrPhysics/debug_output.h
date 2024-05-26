@@ -7,8 +7,7 @@
 // fwd. decl.
 template <class T> struct _vector3;
 using Fvector = _vector3<float>;
-template <class T> struct _matrix;
-using Fmatrix = _matrix<float>;
+struct Fmatrix;
 
 namespace CDB
 {

@@ -6,7 +6,7 @@
 
 // fwd. decl.
 template <class T> struct _vector3; typedef _vector3<float> Fvector;
-template <class T> struct _matrix; typedef _matrix<float> Fmatrix;
+struct Fmatrix;
 
 #define VPUSH(a) ((a).x), ((a).y), ((a).z)
 

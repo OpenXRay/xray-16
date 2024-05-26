@@ -5,7 +5,6 @@
 
 // Initialized on startup
 XRCORE_API Fmatrix Fidentity;
-XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
 namespace CPU
@@ -102,7 +101,6 @@ void _initialize_cpu()
 
     Log("");
     Fidentity.identity(); // Identity matrix
-    Didentity.identity(); // Identity matrix
     Random.seed(u32(CPU::QPC() % (s64(1) << s32(32))));
 
     pvInitializeStatics(); // Lookup table for compressed normals

@@ -589,98 +589,56 @@ _vector3<T>& _vector3<T>::mknormal(const _vector3<T>& p0, const _vector3<T>& p1,
 };
 
 
-// instantiations of the previous methods, for float and double
+// instantiations of the previous methods, for float
 
 template Fvector& Fvector::set_length(Fvector::TYPE l);
-template Dvector& Dvector::set_length(Dvector::TYPE l);
 template Fvector& Fvector::align();
-template Dvector& Dvector::align();
 template Fvector& Fvector::squeeze(Fvector::TYPE Epsilon);
-template Dvector& Dvector::squeeze(Dvector::TYPE Epsilon);
 template Fvector& Fvector::clamp(const Fvector& min, const Fvector& max);
-template Dvector& Dvector::clamp(const Dvector& min, const Dvector& max);
 template Fvector& Fvector::clamp(const Fvector& _v);
-template Dvector& Dvector::clamp(const Dvector& _v);
 template Fvector& Fvector::inertion(const Fvector& p, Fvector::TYPE v);
-template Dvector& Dvector::inertion(const Dvector& p, Dvector::TYPE v);
 template Fvector& Fvector::average(const Fvector& p);
-template Dvector& Dvector::average(const Dvector& p);
 template Fvector& Fvector::average(const Fvector& p1, const Fvector& p2);
-template Dvector& Dvector::average(const Dvector& p1, const Dvector& p2);
 template Fvector& Fvector::lerp(const Fvector& p1, const Fvector& p2, Fvector::TYPE t);
-template Dvector& Dvector::lerp(const Dvector& p1, const Dvector& p2, Dvector::TYPE t);
 template Fvector& Fvector::mad(const Fvector& d, Fvector::TYPE m);
-template Dvector& Dvector::mad(const Dvector& d, Dvector::TYPE m);
 template Fvector& Fvector::mad(const Fvector& p, const Fvector& d, Fvector::TYPE m);
-template Dvector& Dvector::mad(const Dvector& p, const Dvector& d, Dvector::TYPE m);
 template Fvector& Fvector::mad(const Fvector& d, const Fvector& s);
-template Dvector& Dvector::mad(const Dvector& d, const Dvector& s);
 template Fvector& Fvector::mad(const Fvector& p, const Fvector& d, const Fvector& s);
-template Dvector& Dvector::mad(const Dvector& p, const Dvector& d, const Dvector& s);
 
 template Fvector::TYPE Fvector::square_magnitude() const;
-template Dvector::TYPE Dvector::square_magnitude() const;
 template Fvector::TYPE Fvector::magnitude() const;
-template Dvector::TYPE Dvector::magnitude() const;
 template Fvector::TYPE Fvector::normalize_magn();
-template Dvector::TYPE Dvector::normalize_magn();
 
 template Fvector& Fvector::normalize();
-template Dvector& Dvector::normalize();
 template Fvector& Fvector::normalize_safe();
-template Dvector& Dvector::normalize_safe();
 template Fvector& Fvector::normalize(const Fvector& v);
-template Dvector& Dvector::normalize(const Dvector& v);
 template Fvector& Fvector::normalize_safe(const Fvector& v);
-template Dvector& Dvector::normalize_safe(const Dvector& v);
 template Fvector& Fvector::random_dir(CRandom& R);
-template Dvector& Dvector::random_dir(CRandom& R);
 template Fvector& Fvector::random_dir(const Fvector& ConeAxis, float ConeAngle, CRandom& R);
-template Dvector& Dvector::random_dir(const Dvector& ConeAxis, float ConeAngle, CRandom& R);
 template Fvector& Fvector::random_point(const Fvector& BoxSize, CRandom& R);
-template Dvector& Dvector::random_point(const Dvector& BoxSize, CRandom& R);
 template Fvector& Fvector::random_point(Fvector::TYPE r, CRandom& R);
-template Dvector& Dvector::random_point(Dvector::TYPE r, CRandom& R);
 template Fvector& Fvector::crossproduct(const Fvector& v1, const Fvector& v2);
-template Dvector& Dvector::crossproduct(const Dvector& v1, const Dvector& v2);
 
 template Fvector::TYPE Fvector::distance_to_xz(const Fvector& v) const;
-template Dvector::TYPE Dvector::distance_to_xz(const Dvector& v) const;
 template Fvector::TYPE Fvector::distance_to_xz_sqr(const Fvector& v) const;
-template Dvector::TYPE Dvector::distance_to_xz_sqr(const Dvector& v) const;
 template Fvector::TYPE Fvector::distance_to_sqr(const Fvector& v) const;
-template Dvector::TYPE Dvector::distance_to_sqr(const Dvector& v) const;
 template Fvector::TYPE Fvector::distance_to(const Fvector& v) const;
-template Dvector::TYPE Dvector::distance_to(const Dvector& v) const;
 
 template Fvector& Fvector::from_bary(const Fvector& V1, const Fvector& V2, const Fvector& V3, Fvector::TYPE u, Fvector::TYPE v, Fvector::TYPE w);
-template Dvector& Dvector::from_bary(const Dvector& V1, const Dvector& V2, const Dvector& V3, Dvector::TYPE u, Dvector::TYPE v, Dvector::TYPE w);
 template Fvector& Fvector::from_bary(const Fvector& V1, const Fvector& V2, const Fvector& V3, const Fvector& B);
-template Dvector& Dvector::from_bary(const Dvector& V1, const Dvector& V2, const Dvector& V3, const Dvector& B);
 template Fvector& Fvector::from_bary4(const Fvector& V1, const Fvector& V2, const Fvector& V3, const Fvector& V4, Fvector::TYPE u, Fvector::TYPE v, Fvector::TYPE w, Fvector::TYPE t);
-template Dvector& Dvector::from_bary4(const Dvector& V1, const Dvector& V2, const Dvector& V3, const Dvector& V4, Dvector::TYPE u, Dvector::TYPE v, Dvector::TYPE w, Dvector::TYPE t);
 
 template Fvector& Fvector::mknormal_non_normalized(const Fvector& p0, const Fvector& p1, const Fvector& p2);
-template Dvector& Dvector::mknormal_non_normalized(const Dvector& p0, const Dvector& p1, const Dvector& p2);
 template Fvector& Fvector::mknormal(const Fvector& p0, const Fvector& p1, const Fvector& p2);
-template Dvector& Dvector::mknormal(const Dvector& p0, const Dvector& p1, const Dvector& p2);
 
 template Fvector& Fvector::setHP(Fvector::TYPE h, Fvector::TYPE p);
-template Dvector& Dvector::setHP(Dvector::TYPE h, Dvector::TYPE p);
 template void Fvector::getHP(Fvector::TYPE& h, Fvector::TYPE& p) const;
-template void Dvector::getHP(Dvector::TYPE& h, Dvector::TYPE& p) const;
 template float Fvector::getH() const;
-template float Dvector::getH() const;
 template float Fvector::getP() const;
-template float Dvector::getP() const;
 
 template Fvector& Fvector::reflect(const Fvector& dir, const Fvector& norm);
-template Dvector& Dvector::reflect(const Dvector& dir, const Dvector& norm);
 template Fvector& Fvector::slide(const Fvector& dir, const Fvector& norm);
-template Dvector& Dvector::slide(const Dvector& dir, const Dvector& norm);
 
 template void Fvector::generate_orthonormal_basis(const Fvector& dir, Fvector& up, Fvector& right);
-template void Dvector::generate_orthonormal_basis(const Dvector& dir, Dvector& up, Dvector& right);
 template void Fvector::generate_orthonormal_basis_normalized(Fvector& dir, Fvector& up, Fvector& right);
-template void Dvector::generate_orthonormal_basis_normalized(Dvector& dir, Dvector& up, Dvector& right);
 

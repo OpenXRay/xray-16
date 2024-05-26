@@ -31,8 +31,8 @@ struct dMass;
 struct SAllDDOParams;
 struct Fcylinder;
 struct Fsphere;
-template <class T> struct _obb; typedef _obb<float> Fobb;
-template <class T> struct _quaternion;  typedef _quaternion<float> Fquaternion;
+struct Fobb;
+struct Fquaternion;
 
 enum motion_history_state
 {
