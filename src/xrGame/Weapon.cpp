@@ -42,25 +42,36 @@ static class CUIWpnScopeXmlManager : public pureUIReset, public pureAppEnd
     CUIXml m_xml;
     bool m_loaded{};
 
-public:
     void Load()
+    {
+        m_loaded = m_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
+    }
+
+    void Clear()
+    {
+        m_xml.ClearInternal();
+        m_loaded = false;
+    }
+
+public:
+    void Init()
     {
         if (m_loaded)
             return;
-        m_loaded = m_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
+
+        Load();
         Device.seqUIReset.Add(this);
     }
 
     void OnAppEnd() override
     {
-        m_xml.ClearInternal();
-        m_loaded = false;
+        Clear();
         Device.seqUIReset.Remove(this);
     }
 
     void OnUIReset() override
     {
-        OnAppEnd();
+        Clear();
         if (g_pGameLevel)
             Load();
     }
@@ -525,7 +536,7 @@ void CWeapon::LoadScope(const shared_str& section)
 {
     if (ShadowOfChernobylMode) // XXX: temporary check for SOC mode, to be removed
         return;
-    pWpnScopeXml.Load();
+    pWpnScopeXml.Init();
     R_ASSERT(m_UIScope);
     CUIXmlInit::InitWindow(*pWpnScopeXml, section.c_str(), 0, m_UIScope);
 }
