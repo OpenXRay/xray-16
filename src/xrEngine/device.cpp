@@ -436,8 +436,6 @@ void CRenderDevice::Run()
     UpdateWindowProps();
     SDL_ShowWindow(m_sdlWnd);
     SDL_RaiseWindow(m_sdlWnd);
-    if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
-        SDL_SetWindowPosition(m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
 void CRenderDevice::Shutdown()

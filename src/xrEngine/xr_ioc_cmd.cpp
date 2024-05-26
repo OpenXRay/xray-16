@@ -754,16 +754,6 @@ public:
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "hide console"); }
 };
 
-class CCC_CenterScreen : public IConsole_Command
-{
-public:
-    CCC_CenterScreen(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
-    void Execute(pcstr args) override
-    {
-        SDL_SetWindowPosition(Device.m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    }
-};
-
 class CCC_ControllerSensorEnable final : public CCC_Mask
 {
 public:
@@ -936,8 +926,6 @@ void CCC_Register()
     // Camera
     CMD2(CCC_Float, "cam_inert", &psCamInert);
     CMD2(CCC_Float, "cam_slide_inert", &psCamSlideInert);
-
-    CMD1(CCC_CenterScreen, "center_screen");
 
     CMD1(CCC_renderer, "renderer");
 
