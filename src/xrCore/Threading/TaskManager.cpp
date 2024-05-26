@@ -225,11 +225,8 @@ void TaskManager::TaskWorkerStart()
     RegisterThisThreadAsWorker();
     SetThreadStatus(true);
 
-    while (true)
+    while (!shouldStop.load(std::memory_order_consume))
     {
-        if (shouldStop.load(std::memory_order_consume))
-            break;
-
         if (!shouldPause.load(std::memory_order_consume))
         {
             if (ExecuteOneTask())
