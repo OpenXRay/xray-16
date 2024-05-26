@@ -239,11 +239,10 @@ void TaskManager::TaskWorkerStart()
         SetThreadStatus(false);
         {
             std::unique_lock lck(s_tl_worker.mutex);
-            newWorkArrived.wait(lck, [&]
+            do
             {
-                // spurious unlocks allowed
-                return !shouldPause.load(std::memory_order_consume);
-            });
+                newWorkArrived.wait(lck); // spurious wakeups allowed
+            } while (shouldPause.load(std::memory_order_consume));
         }
         SetThreadStatus(true);
     } // while (true)
