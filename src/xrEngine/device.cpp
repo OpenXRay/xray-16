@@ -307,23 +307,16 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
 
     switch (event.type)
     {
-#if SDL_VERSION_ATLEAST(2, 0, 9)
     case SDL_DISPLAYEVENT:
     {
         switch (event.display.type)
         {
         case SDL_DISPLAYEVENT_ORIENTATION:
-#if SDL_VERSION_ATLEAST(2, 0, 14)
         case SDL_DISPLAYEVENT_CONNECTED:
         case SDL_DISPLAYEVENT_DISCONNECTED:
-#endif
             CleanupVideoModes();
             FillVideoModes();
-#if SDL_VERSION_ATLEAST(2, 0, 14)
             if (event.display.display == psDeviceMode.Monitor && event.display.type != SDL_DISPLAYEVENT_CONNECTED)
-#else
-            if (event.display.display == psDeviceMode.Monitor)
-#endif
                 Reset();
             else
                 UpdateWindowProps();
@@ -331,7 +324,6 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
         } // switch (event.display.type)
         break;
     }
-#endif
     case SDL_WINDOWEVENT:
     {
         const auto window = SDL_GetWindowFromID(event.window.windowID);
@@ -348,22 +340,15 @@ void CRenderDevice::ProcessEvent(const SDL_Event& event)
             if (window == m_sdlWnd)
             {
                 UpdateWindowRects();
-#if !SDL_VERSION_ATLEAST(2, 0, 18) // without SDL_WINDOWEVENT_DISPLAY_CHANGED, let's detect monitor change ourselves
-                const int display = SDL_GetWindowDisplayIndex(window);
-                if (display != -1)
-                    psDeviceMode.Monitor = display;
-#endif
             }
             if (viewport)
                 viewport->PlatformRequestMove = true;
             break;
         }
 
-#if SDL_VERSION_ATLEAST(2, 0, 18)
         case SDL_WINDOWEVENT_DISPLAY_CHANGED:
             psDeviceMode.Monitor = event.window.data1;
             break;
-#endif
 
         case SDL_WINDOWEVENT_RESIZED:
             if (window == m_sdlWnd)

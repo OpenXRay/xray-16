@@ -13,23 +13,11 @@ XRCORE_API bool HasSSE     = SDL_HasSSE();
 XRCORE_API bool HasSSE2    = SDL_HasSSE2();
 XRCORE_API bool HasSSE42   = SDL_HasSSE42();
 
-#if SDL_VERSION_ATLEAST(2, 0, 6)
 XRCORE_API bool HasAVX     = SDL_HasAVX();
-#else
-XRCORE_API bool HasAVX     = false();
-#endif
 
-#if SDL_VERSION_ATLEAST(2, 0, 9)
 XRCORE_API bool HasAVX2    = SDL_HasAVX2();
-#else
-XRCORE_API bool HasAVX2    = false;
-#endif
 
-#if SDL_VERSION_ATLEAST(2, 0, 9)
 XRCORE_API bool HasAVX512F = SDL_HasAVX512F();
-#else
-XRCORE_API bool HasAVX512F = false;
-#endif
 
 XRCORE_API u64 qpc_freq = SDL_GetPerformanceFrequency();
 
@@ -85,12 +73,8 @@ void _initialize_cpu()
 
     // Other architectures
     listFeature("AltiVec", SDL_HasAltiVec());
-#if SDL_VERSION_ATLEAST(2, 0, 12)
     listFeature("ARMSIMD", SDL_HasARMSIMD());
-#endif
-#if SDL_VERSION_ATLEAST(2, 0, 6)
     listFeature("NEON",    SDL_HasNEON());
-#endif
 #if SDL_VERSION_ATLEAST(2, 24, 0)
     listFeature("LSX",     SDL_HasLSX());
     listFeature("LASX",    SDL_HasLASX());
