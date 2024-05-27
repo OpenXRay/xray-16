@@ -92,19 +92,15 @@ void CInput::OpenController(int idx)
     if (!controller)
         return;
 
-#if SDL_VERSION_ATLEAST(2, 0, 14)
     if (psControllerEnableSensors.test(1))
         SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
-#endif
     controllers.emplace_back(controller);
 }
 
 void CInput::EnableControllerSensors(bool enable)
 {
-#if SDL_VERSION_ATLEAST(2, 0, 14)
     for (auto controller : controllers)
         SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, enable ? SDL_TRUE : SDL_FALSE);
-#endif
 }
 
 //-----------------------------------------------------------------------
@@ -134,12 +130,8 @@ void CInput::MouseUpdate()
     static_assert(std::size(IdxToKey) == COUNT_MOUSE_BUTTONS);
 
     bool mouseMoved = false;
-#if SDL_VERSION_ATLEAST(2, 0, 18)
     int offs[2]{};
     float scroll[2]{};
-#else
-    int offs[COUNT_MOUSE_AXIS]{};
-#endif
     const auto mousePrev = mouseState;
     mouseAxisState[2] = 0;
     mouseAxisState[3] = 0;
@@ -182,13 +174,8 @@ void CInput::MouseUpdate()
         }
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
-#if SDL_VERSION_ATLEAST(2, 0, 18)
             scroll[0] += event.wheel.preciseX;
             scroll[1] += event.wheel.preciseY;
-#else
-            offs[2] += event.wheel.x;
-            offs[3] += event.wheel.y;
-#endif
             mouseAxisState[2] += event.wheel.x;
             mouseAxisState[3] += event.wheel.y;
             break;
@@ -205,13 +192,9 @@ void CInput::MouseUpdate()
     {
         if (offs[0] || offs[1])
             cbStack.back()->IR_OnMouseMove(offs[0], offs[1]);
-#if SDL_VERSION_ATLEAST(2, 0, 18)
+
         if (!fis_zero(scroll[0]) || !fis_zero(scroll[1]))
             cbStack.back()->IR_OnMouseWheel(scroll[0], scroll[1]);
-#else
-        if (offs[2] || offs[3])
-            cbStack.back()->IR_OnMouseWheel(offs[2], offs[3]);
-#endif
     }
 }
 
@@ -341,11 +324,7 @@ void CInput::ControllerUpdate()
     decltype(controllerAxisState) controllerAxisStatePrev;
     CopyMemory(controllerAxisStatePrev, controllerAxisState, sizeof(controllerAxisState));
 
-#if SDL_VERSION_ATLEAST(2, 0, 14)
     constexpr SDL_EventType MAX_EVENT = SDL_CONTROLLERSENSORUPDATE;
-#else
-    constexpr SDL_EventType MAX_EVENT = SDL_CONTROLLERDEVICEREMAPPED;
-#endif
 
     count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
         SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, MAX_EVENT);
@@ -411,7 +390,6 @@ void CInput::ControllerUpdate()
             break;
         }
 
-#if SDL_VERSION_ATLEAST(2, 0, 14)
         case SDL_CONTROLLERSENSORUPDATE:
         {
             if (last_input_controller != event.csensor.which) // only use data from the recently used controller
@@ -424,7 +402,6 @@ void CInput::ControllerUpdate()
                 cbStack.back()->IR_OnControllerAttitudeChange(gyro);
             break;
         }
-#endif
         } // switch (event.type)
     }
 
@@ -749,7 +726,6 @@ bool CInput::IsExclusiveMode() const
 
 void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
 {
-#if SDL_VERSION_ATLEAST(2, 0, 9)
     const u16 s1_rumble = iFloor(u16(-1) * clampr(s1, 0.0f, 1.0f));
     const u16 s2_rumble = iFloor(u16(-1) * clampr(s2, 0.0f, 1.0f));
     const u32 duration_ms = duration < 0.f ? 0 : iFloor(duration * 1000.f);
@@ -768,17 +744,14 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
 
     case FeedbackTriggers:
     {
-#if SDL_VERSION_ATLEAST(2, 0, 14)
         if (last_input_controller != -1)
         {
             const auto controller = SDL_GameControllerFromInstanceID(last_input_controller);
             SDL_GameControllerRumbleTriggers(controller, s1_rumble, s2_rumble, duration_ms);
         }
         break;
-#endif
     }
 
     default: NODEFAULT;
     }
-#endif
 }

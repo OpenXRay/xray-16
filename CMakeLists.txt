@@ -230,7 +230,7 @@ add_compile_definitions(
 )
 
 if (NOT WIN32)
-    find_package(SDL2 REQUIRED)
+    find_package(SDL2 2.0.18 REQUIRED)
     # Fix to support older SDL2
     # https://github.com/OpenXRay/xray-16/issues/1595
     if (NOT TARGET SDL2::SDL2 AND DEFINED SDL2_LIBRARIES)

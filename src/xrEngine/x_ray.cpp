@@ -459,10 +459,8 @@ void CApplication::ShowSplash(bool topmost)
 
     Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN;
 
-#if SDL_VERSION_ATLEAST(2,0,5)
     if (topmost)
         flags |= SDL_WINDOW_ALWAYS_ON_TOP;
-#endif
 
     m_window = SDL_CreateWindow("OpenXRay", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_surface->w, m_surface->h, flags);
     SDL_ShowWindow(m_window);
