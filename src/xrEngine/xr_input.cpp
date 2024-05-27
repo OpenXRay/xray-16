@@ -94,8 +94,8 @@ void CInput::OpenController(int idx)
 
     if (psControllerEnableSensors.test(1))
         SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
-    controllers.emplace_back(controller);
 
+    controllers.emplace_back(controller);
 }
 
 void CInput::EnableControllerSensors(bool enable)
