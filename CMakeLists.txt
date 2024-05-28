@@ -241,8 +241,6 @@ if (NOT WIN32)
             INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
         )
     endif()
-    find_package(OpenGL REQUIRED)
-    find_package(GLEW REQUIRED)
     find_package(OpenAL REQUIRED)
     find_package(JPEG)
     find_package(Ogg REQUIRED)

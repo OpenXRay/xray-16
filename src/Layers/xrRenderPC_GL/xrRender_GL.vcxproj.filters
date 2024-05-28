@@ -169,6 +169,12 @@
     <Filter Include="Interface implementations\ImGuiRender">
       <UniqueIdentifier>{24b98c00-6a2d-4e26-bdc2-316324ee4025}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Refactored\HW\glad">
+      <UniqueIdentifier>{00d25eb4-7ecd-4265-b321-908e1d027222}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Refactored\HW\KHR">
+      <UniqueIdentifier>{4e37e39a-262e-4e88-8fcd-d4b403e1ee7e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -699,6 +705,9 @@
     <ClCompile Include="..\xrRender\xr_effgamma.cpp">
       <Filter>Refactored\Execution &amp; 3D\Gamma</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\sdk\include\glad\gl.c">
+      <Filter>Refactored\HW\glad</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1162,6 +1171,12 @@
     </ClInclude>
     <ClInclude Include="..\..\utils\xrLC_Light\R_light.h">
       <Filter>Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdk\include\glad\gl.h">
+      <Filter>Refactored\HW\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\sdk\include\KHR\khrplatform.h">
+      <Filter>Refactored\HW\KHR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

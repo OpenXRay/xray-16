@@ -48,14 +48,16 @@ BOOL xrRender_test_hw()
     if (!windowTest.successful())
         return FALSE;
 
-    GLenum err;
+    int version;
     {
-        ZoneScopedN("glewInit()");
-        err = glewInit();
+        ZoneScopedN("gladLoadGL");
+        version = gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress);
     }
-    if (GLEW_OK != err)
+    if (version == 0)
     {
-        Log("~ Could not initialize glew:", (pcstr)glewGetErrorString(err));
+        Log("~ Could not initialize GLAD.");
+        if (auto err = SDL_GetError())
+            Log("SDL Error:", err);
         return FALSE;
     }
 

@@ -47,7 +47,7 @@ SVS::~SVS()
 #if defined(USE_DX11)
     _RELEASE(sh);
 #elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -63,7 +63,7 @@ SPS::~SPS()
 #if defined(USE_DX11)
     _RELEASE(sh);
 #elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -81,7 +81,7 @@ SGS::~SGS()
 #   if defined(USE_DX11)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -97,7 +97,7 @@ SHS::~SHS()
 #   if defined(USE_DX11)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -113,7 +113,7 @@ SDS::~SDS()
 #   if defined(USE_DX11)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -127,7 +127,7 @@ SCS::~SCS()
 #    if defined(USE_DX11)
     _RELEASE(sh);
 #    elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -141,7 +141,7 @@ SCS::~SCS()
 #if defined(USE_OGL)
 SPP::~SPP()
 {
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgramPipelines(1, &pp));
     else
         CHK_GL(glDeleteProgram(pp));

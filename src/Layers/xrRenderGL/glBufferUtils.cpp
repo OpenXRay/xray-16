@@ -169,7 +169,7 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl)
     [](GLuint location, GLint size, GLenum type, GLboolean normalized, GLuint offset, GLuint stream)
     {
         CHK_GL(glEnableVertexAttribArray(location));
-        if (GLEW_ARB_vertex_attrib_binding)
+        if (GLAD_GL_ARB_vertex_attrib_binding)
         {
             CHK_GL(glVertexAttribFormat(location, size, type, normalized, offset));
             CHK_GL(glVertexAttribBinding(location, stream));
