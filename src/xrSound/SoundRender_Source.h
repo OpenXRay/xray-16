@@ -57,7 +57,7 @@ public:
     CSoundRender_Source() = default;
     ~CSoundRender_Source() override;
 
-    bool load(pcstr name, bool replaceWithNoSound = true);
+    bool load(pcstr name);
     void unload();
 
     void attach();

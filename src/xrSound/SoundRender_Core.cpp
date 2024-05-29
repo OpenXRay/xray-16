@@ -98,21 +98,18 @@ void CSoundRender_Core::_restart()
     env_apply();
 }
 
-CSound* CSoundRender_Core::create(pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound /*= true*/)
+CSound* CSoundRender_Core::create(pcstr fName, esound_type sound_type, int game_type)
 {
     if (!bPresent)
         return nullptr;
-
-    CSound_source* handle{};
 
     string_path fn;
     xr_strcpy(fn, fName);
     if (strext(fn))
         *strext(fn) = 0;
-    const bool found = i_create_source(handle, fn, replaceWithNoSound);
-    const bool handleAvailable = found || replaceWithNoSound;
 
-    if (!handleAvailable)
+    CSoundRender_Source* handle = i_create_source(fn);
+    if (!handle)
         return nullptr;
 
     auto* snd = xr_new<CSound>();
@@ -120,13 +117,13 @@ CSound* CSoundRender_Core::create(pcstr fName, esound_type sound_type, int game_
     snd->handle = handle;
 
     snd->g_type = game_type;
-    if (game_type == sg_SourceType && handleAvailable)
+    if (game_type == sg_SourceType)
         snd->g_type = snd->handle->game_type();
 
     snd->s_type = sound_type;
 
-    snd->dwBytesTotal = handleAvailable ? snd->handle->bytes_total() : 0;
-    snd->fTimeTotal = handleAvailable ? snd->handle->length_sec() : 0.f;
+    snd->dwBytesTotal = snd->handle->bytes_total();
+    snd->fTimeTotal = snd->handle->length_sec();
 
     return snd;
 }

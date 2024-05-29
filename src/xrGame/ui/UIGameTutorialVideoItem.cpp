@@ -94,26 +94,13 @@ void CUISequenceVideoItem::Load(CUIXml* xml, int idx)
 
     if (snd_name && snd_name[0])
     {
-        string_path _l, _r;
-        strconcat(sizeof(_l), _l, snd_name, "_l");
-        strconcat(sizeof(_r), _r, snd_name, "_r");
-
-        bool found[channels_count + 1];
-        ref_sound separated[channels_count];
-        found[0] = separated[0].create(_l, st_Effect, sg_Undefined, false);
-        found[1] = separated[1].create(_r, st_Effect, sg_Undefined, false);
-
-        ref_sound one;
-        found[channels_count] = one.create(snd_name, st_Effect, sg_Undefined, !(found[0] && found[1]));
-
-        if (!found[channels_count] && found[0] && found[1])
+        if (!m_sound[0].create(snd_name, st_Effect, sg_Undefined))
         {
-            m_sound[0] = separated[0];
-            m_sound[1] = separated[1];
-        }
-        else
-        {
-            m_sound[0] = one;
+            string_path left, right;
+            strconcat(left, snd_name, "_l");
+            strconcat(right, snd_name, "_r");
+            m_sound[0].create(left, st_Effect, sg_Undefined);
+            m_sound[1].create(right, st_Effect, sg_Undefined);
         }
 
         VERIFY(m_sound[0]._handle() || !Engine.Sound.IsSoundEnabled());

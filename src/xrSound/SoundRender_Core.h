@@ -95,7 +95,7 @@ public:
     void _restart() override;
 
     // Sound interface
-    CSound* create(pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) override;
+    CSound* create(pcstr fName, esound_type sound_type, int game_type) override;
     void attach_tail(CSound& S, pcstr fName) override;
 
     void destroy(CSound& S) override;
@@ -118,9 +118,7 @@ public:
     void refresh_sources() override;
 
 public:
-    bool i_create_source(CSound_source*& result, pcstr name, bool replaceWithNoSound = true);
-    bool i_create_source(CSoundRender_Source*& result, pcstr name, bool replaceWithNoSound = true);
-    CSoundRender_Source* i_create_source(pcstr name, bool replaceWithNoSound = true);
+    CSoundRender_Source* i_create_source(pcstr name);
 
     void i_destroy_source(CSoundRender_Source* S);
     void i_start(CSoundRender_Emitter* E) const;

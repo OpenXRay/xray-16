@@ -257,7 +257,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName)
     return true;
 }
 
-bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
+bool CSoundRender_Source::load(pcstr name)
 {
     string_path fn, N;
     xr_strcpy(N, name);
@@ -270,25 +270,27 @@ bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
 
     fname = N;
 
-    strconcat(sizeof(fn), fn, N, ".ogg");
+    strconcat(fn, N, ".ogg");
     if (!FS.exist("$level$", fn))
         FS.update_path(fn, "$game_sounds$", fn);
 
-    bool soundExist = FS.exist(fn);
-    if (!soundExist && replaceWithNoSound)
+#ifndef MASTER_GOLD
+    if (!FS.exist(fn))
     {
-        Msg("! Can't find sound '%s'", name);
+        Msg("~ %s: Can't find sound '%s'", __FUNCTION__, name);
+#   ifdef _EDITOR
         FS.update_path(fn, "$game_sounds$", "$no_sound.ogg");
-        soundExist = FS.exist(fn);
+#   endif
     }
+#endif
 
-    if (soundExist)
+    if (FS.exist(fn))
     {
-        if (!LoadWave(fn))
-            return false;
+        if (LoadWave(fn))
+            return true;
     }
 
-    return soundExist;
+    return false;
 }
 
 void CSoundRender_Source::unload()

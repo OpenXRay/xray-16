@@ -207,7 +207,7 @@ protected:
     friend struct CSound;
     friend struct resptrcode_sound;
 
-    virtual CSound* create(pcstr fName, esound_type sound_type, int game_type, bool replaceWithNoSound = true) = 0;
+    virtual CSound* create(pcstr fName, esound_type sound_type, int game_type) = 0;
     virtual void destroy(CSound& S) = 0;
 
     virtual void attach_tail(CSound& S, pcstr fName) = 0;
@@ -317,10 +317,10 @@ struct resptrcode_sound : public resptr_base<CSound>
     [[nodiscard]]
     ICF CSound_UserDataPtr _g_userdata() const { VERIFY(p_); return p_ ? p_->g_userdata : nullptr; }
 
-    ICF bool create(pcstr name, esound_type sound_type, int game_type, bool replaceWithNoSound = true)
+    ICF bool create(pcstr name, esound_type sound_type, int game_type)
     {
         VerSndUnlocked();
-        _set(GEnv.Sound->create(name, sound_type, game_type, replaceWithNoSound));
+        _set(GEnv.Sound->create(name, sound_type, game_type));
         return _get();
     }
 
