@@ -45,14 +45,13 @@ private:
     // ordered from biggest to smallest
     struct Data
     {
+        CallFunc*           call;
         Task*               parent;
-        CallFunc*           m_call;
         std::atomic_int16_t jobs; // at least 1 (task itself), zero means task is done.
-        bool                contains_result;
 
         Data() = default;
         Data(CallFunc* call, Task* parent)
-            : parent(parent), m_call(call), jobs(1), contains_result(false) {}
+            : call(call), parent(parent), jobs(1) {}
     };
 
     static constexpr size_t USER_DATA_SIZE = TASK_SIZE - sizeof(Data);
@@ -60,7 +59,10 @@ private:
     std::byte m_user_data[USER_DATA_SIZE];
     Data      m_data;
 
-    template <typename Invokable, bool TaskAware = std::is_invocable_v<Invokable, Task&>>
+    template <typename Invokable,
+        bool TaskAware = std::is_invocable_v<Invokable, Task&>,
+        typename HasResult = void
+    >
     struct Dispatcher
     {
         static constexpr bool task_unaware = std::is_invocable_v<Invokable>;
@@ -71,7 +73,7 @@ private:
     };
 
     template <typename Invokable>
-    struct Dispatcher<Invokable, true>
+    struct Dispatcher<Invokable, true, std::enable_if_t<std::is_same_v<void, std::invoke_result_t<Invokable, Task&>>>>
     {
         static void Call(Task& task)
         {
@@ -83,7 +85,7 @@ private:
     };
 
     template <typename Invokable>
-    struct Dispatcher<Invokable, false>
+    struct Dispatcher<Invokable, false, std::enable_if_t<std::is_same_v<void, std::invoke_result_t<Invokable>>>>
     {
         static void Call(Task& task)
         {
@@ -91,6 +93,33 @@ private:
             obj();
             if constexpr (!std::is_trivially_copyable_v<Invokable>)
                 obj.~Invokable();
+        }
+    };
+
+    template <typename Invokable>
+    struct Dispatcher<Invokable, true, std::enable_if_t<!std::is_same_v<void, std::invoke_result_t<Invokable, Task&>>>>
+    {
+        static void Call(Task& task)
+        {
+            auto& obj = *reinterpret_cast<Invokable*>(task.m_user_data);
+            auto result = std::move(obj(task));
+            if constexpr (!std::is_trivially_copyable_v<Invokable>)
+                obj.~Invokable();
+            ::new (task.m_user_data) decltype(result)(std::move(result));
+        }
+    };
+
+    template <typename Invokable>
+    struct Dispatcher<Invokable, false, std::enable_if_t<!std::is_same_v<void, std::invoke_result_t<Invokable>>>>
+    {
+        static void Call(Task& task)
+        {
+            auto& obj = *reinterpret_cast<Invokable*>(task.m_user_data);
+            auto result = std::move(obj());
+            if constexpr (!std::is_trivially_copyable_v<Invokable>)
+                obj.~Invokable();
+
+            ::new (task.m_user_data) decltype(result)(std::move(result));
         }
     };
 
@@ -139,7 +168,9 @@ public:
     [[nodiscard]]
     const T* GetData() const noexcept
     {
-        return static_cast<T*>(m_user_data);
+        if (!IsFinished())
+            return nullptr;
+        return reinterpret_cast<const T*>(m_user_data);
     }
 
     [[nodiscard]]
@@ -158,7 +189,7 @@ private:
     // Called by TaskManager
     void operator()()
     {
-        m_data.m_call(*this);
+        m_data.call(*this);
 
         for (Task* it = this; ; it = it->m_data.parent)
         {
@@ -169,3 +200,5 @@ private:
         }
     }
 };
+
+static_assert(sizeof(Task) == TASK_SIZE);
