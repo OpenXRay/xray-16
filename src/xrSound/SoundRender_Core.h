@@ -100,13 +100,6 @@ public:
 
     void destroy(CSound& S) override;
 
-    void prefetch() override
-    {
-        if (!bPresent)
-            return;
-        i_create_all_sources();
-    }
-
     void stop_emitters() override;
     int pause_emitters(bool pauseState) override;
 
@@ -128,7 +121,6 @@ public:
     bool i_create_source(CSound_source*& result, pcstr name, bool replaceWithNoSound = true);
     bool i_create_source(CSoundRender_Source*& result, pcstr name, bool replaceWithNoSound = true);
     CSoundRender_Source* i_create_source(pcstr name, bool replaceWithNoSound = true);
-    void i_create_all_sources();
 
     void i_destroy_source(CSoundRender_Source* S);
     void i_start(CSoundRender_Emitter* E) const;

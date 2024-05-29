@@ -3,8 +3,6 @@
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 
-#include "xrCore/Threading/ParallelForEach.hpp"
-
 bool CSoundRender_Core::i_create_source(CSound_source*& result, pcstr name, bool replaceWithNoSound /*= true*/)
 {
     CSoundRender_Source* source = nullptr;
@@ -61,51 +59,4 @@ void CSoundRender_Core::i_destroy_source(CSoundRender_Source* S)
 {
     // No actual destroy at all
     S->detach();
-}
-
-void CSoundRender_Core::i_create_all_sources()
-{
-    ZoneScoped;
-#ifndef MASTER_GOLD
-    CTimer T;
-    T.Start();
-    const size_t sizeBefore = s_sources.size();
-#endif
-    FS_FileSet flist;
-    FS.file_list(flist, "$game_sounds$", FS_ListFiles, "*.ogg");
-
-    const auto processFile = [&](const FS_File& file)
-    {
-        ZoneScopedN("Process file");
-        string256 id;
-        xr_strcpy(id, file.name.c_str());
-
-        xr_strlwr(id);
-        if (strext(id))
-            *strext(id) = 0;
-
-        {
-            ScopeLock scope(&s_sources_lock);
-            const auto it = s_sources.find(id);
-            if (it != s_sources.end())
-                return;
-        }
-
-        CSoundRender_Source* S = xr_new<CSoundRender_Source>();
-        if (!S->load(id, false, false))
-        {
-            xr_delete(S);
-            return;
-        }
-
-        ScopeLock scope(&s_sources_lock);
-        s_sources.insert({ id, S });
-    };
-
-    xr_parallel_for_each(flist, processFile);
-
-#ifndef MASTER_GOLD
-    Msg("Finished creating %d sound sources. Duration: %d ms",
-        s_sources.size() - sizeBefore, T.GetElapsed_ms());
-#endif
 }

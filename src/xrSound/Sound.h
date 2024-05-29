@@ -50,7 +50,6 @@ XRSOUND_API extern float psSoundTimeFactor; //--#SM+#--
 XRSOUND_API extern Flags32 psSoundFlags;
 XRSOUND_API extern int psSoundTargets;
 XRSOUND_API extern int psSoundCacheSizeMB;
-XRSOUND_API extern u32 psSoundPrecacheAll;
 XRSOUND_API extern u32 snd_device_id;
 
 XRSOUND_API extern ISoundScene* DefaultSoundScene;
@@ -221,8 +220,6 @@ public:
 
     virtual void _restart() = 0;
     virtual bool i_locked() = 0;
-
-    virtual void prefetch() = 0;
 
     virtual void stop_emitters() = 0;
     virtual int pause_emitters(bool pauseState) = 0;

@@ -51,13 +51,13 @@ private:
     void i_decompress(char* dest, u32 size);
     void i_decompress(float* dest, u32 size);
 
-    bool LoadWave(pcstr name, bool crashOnError);
+    bool LoadWave(pcstr name);
 
 public:
     CSoundRender_Source() = default;
     ~CSoundRender_Source() override;
 
-    bool load(pcstr name, bool replaceWithNoSound = true, bool crashOnError = true);
+    bool load(pcstr name, bool replaceWithNoSound = true);
     void unload();
 
     void attach();

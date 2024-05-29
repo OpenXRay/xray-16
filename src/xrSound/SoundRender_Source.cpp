@@ -161,7 +161,7 @@ void CSoundRender_Source::detach()
         refs = 0;
 }
 
-bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
+bool CSoundRender_Source::LoadWave(pcstr pName)
 {
     ZoneScoped;
 
@@ -172,7 +172,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
     const vorbis_info* ovi = ov_info(&ovf, -1);
 
     // verify
-    R_ASSERT3_CURE(ovi, "Invalid source info:", pName, !crashOnError,
+    R_ASSERT3_CURE(ovi, "Invalid source info:", pName, true,
     {
         detach();
         return false;
@@ -247,7 +247,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
 #endif
     }
 
-    R_ASSERT3_CURE(m_info.maxAIDist >= 0.1f && m_info.maxDist >= 0.1f, "Invalid max distance.", pName, !crashOnError,
+    R_ASSERT3_CURE(m_info.maxAIDist >= 0.1f && m_info.maxDist >= 0.1f, "Invalid max distance.", pName, true,
     {
         detach();
         return false;
@@ -257,7 +257,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName, bool crashOnError)
     return true;
 }
 
-bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/, bool crashOnError /*= true*/)
+bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/)
 {
     string_path fn, N;
     xr_strcpy(N, name);
@@ -284,7 +284,7 @@ bool CSoundRender_Source::load(pcstr name, bool replaceWithNoSound /*= true*/, b
 
     if (soundExist)
     {
-        if (!LoadWave(fn, crashOnError))
+        if (!LoadWave(fn))
             return false;
     }
 
