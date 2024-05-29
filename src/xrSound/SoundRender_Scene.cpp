@@ -176,8 +176,7 @@ void CSoundRender_Scene::play_no_feedback(
     if (!SoundRender->bPresent || !S._handle())
         return;
     const ref_sound orig = S;
-    S._set(xr_new<CSound>());
-    S->handle = orig->handle;
+    S._set(xr_new<CSound>(orig->handle));
     S->g_type = orig->g_type;
     S->g_object = O;
     S->dwBytesTotal = orig->dwBytesTotal;

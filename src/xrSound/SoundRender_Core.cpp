@@ -112,9 +112,7 @@ CSound* CSoundRender_Core::create(pcstr fName, esound_type sound_type, int game_
     if (!handle)
         return nullptr;
 
-    auto* snd = xr_new<CSound>();
-
-    snd->handle = handle;
+    auto* snd = xr_new<CSound>(handle);
 
     snd->g_type = game_type;
     if (game_type == sg_SourceType)

@@ -270,7 +270,7 @@ public:
 
 using CSound_UserDataPtr = resptr_core<CSound_UserData, resptr_base<CSound_UserData>>;
 
-struct CSound : public xr_resource
+struct CSound final : public xr_resource
 {
 public:
     //shared_str nm;
@@ -287,6 +287,7 @@ public:
     u32 dwBytesTotal{};
     float fTimeTotal{};
 
+    CSound(CSound_source* src) : handle(src) { VERIFY(src); }
     ~CSound() override { GEnv.Sound->destroy(*this); }
 };
 
@@ -341,8 +342,7 @@ struct resptrcode_sound : public resptr_base<CSound>
     {
         if (!from._get())
             return;
-        _set(xr_new<CSound>());
-        p_->handle = from->handle;
+        _set(xr_new<CSound>(from->handle));
         p_->dwBytesTotal = from->dwBytesTotal;
         p_->fTimeTotal = from->fTimeTotal;
         p_->fn_attached[0] = from->fn_attached[0];
