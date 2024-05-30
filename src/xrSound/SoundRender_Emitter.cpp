@@ -145,7 +145,7 @@ void CSoundRender_Emitter::move_cursor(int offset)
 
 void CSoundRender_Emitter::fill_data(void* dest, u32 offset, u32 size) const
 {
-    source()->decompress(dest, offset, size);
+    source()->decompress(dest, offset, size, ovf);
 }
 
 void CSoundRender_Emitter::fill_block(void* ptr, u32 size)

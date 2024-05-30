@@ -15,7 +15,6 @@ void CSoundRender_Target::start(CSoundRender_Emitter* E)
     m_pEmitter = E;
     priority = E->priority();
     rendering = false;
-    //m_pEmitter->source()->attach();
 }
 
 void CSoundRender_Target::render()
@@ -26,7 +25,6 @@ void CSoundRender_Target::render()
 
 void CSoundRender_Target::stop()
 {
-    m_pEmitter->source()->detach();
     m_pEmitter = nullptr;
     rendering = false;
     priority = -1;

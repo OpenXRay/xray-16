@@ -6,6 +6,8 @@
 #include "SoundRender_Environment.h"
 #include "SoundRender_Scene.h"
 
+struct OggVorbis_File;
+
 class Task;
 
 class CSoundRender_Emitter final : public CSound_emitter
@@ -77,6 +79,8 @@ public:
     void move_cursor(int offset);
 
 private:
+    OggVorbis_File* ovf{};
+
     xr_vector<u8> temp_buf[sdef_target_count];
     std::atomic<Task*> prefill_task{};
 

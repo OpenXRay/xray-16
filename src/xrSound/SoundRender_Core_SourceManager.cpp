@@ -41,5 +41,4 @@ CSoundRender_Source* CSoundRender_Core::i_create_source(pcstr name)
 void CSoundRender_Core::i_destroy_source(CSoundRender_Source* S)
 {
     // No actual destroy at all
-    S->detach();
 }
