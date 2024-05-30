@@ -99,6 +99,9 @@ private:
     template <typename Invokable>
     struct Dispatcher<Invokable, true, std::enable_if_t<!std::is_same_v<void, std::invoke_result_t<Invokable, Task&>>>>
     {
+        static_assert(sizeof(std::invoke_result_t<Invokable>) <= USER_DATA_SIZE,
+            "Not enough storage to save result of your function. Try to reduce its size.");
+
         static void Call(Task& task)
         {
             auto& obj = *reinterpret_cast<Invokable*>(task.m_user_data);
@@ -112,13 +115,15 @@ private:
     template <typename Invokable>
     struct Dispatcher<Invokable, false, std::enable_if_t<!std::is_same_v<void, std::invoke_result_t<Invokable>>>>
     {
+        static_assert(sizeof(std::invoke_result_t<Invokable>) <= USER_DATA_SIZE,
+            "Not enough storage to save result of your function. Try to reduce its size.");
+
         static void Call(Task& task)
         {
             auto& obj = *reinterpret_cast<Invokable*>(task.m_user_data);
             auto result = std::move(obj());
             if constexpr (!std::is_trivially_copyable_v<Invokable>)
                 obj.~Invokable();
-
             ::new (task.m_user_data) decltype(result)(std::move(result));
         }
     };
