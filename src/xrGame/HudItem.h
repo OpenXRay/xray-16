@@ -93,6 +93,9 @@ public:
     virtual bool Action(u16 cmd, u32 flags) { return false; }
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd);
 
+    virtual void TransformPosFromWorldToHud(Fvector& worldPos);
+    virtual void TransformDirFromWorldToHud(Fvector& worldDir);
+
     virtual u8 GetCurrentHudOffsetIdx() { return 0; }
     BOOL GetHUDmode();
     IC BOOL IsPending() const { return !!m_huditem_flags.test(fl_pending); }
