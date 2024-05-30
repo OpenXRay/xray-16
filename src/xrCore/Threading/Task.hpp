@@ -48,6 +48,7 @@ private:
         CallFunc*           call;
         Task*               parent;
         std::atomic_int16_t jobs; // at least 1 (task itself), zero means task is done.
+        std::atomic_bool    has_result{};
 
         Data() = default;
         Data(CallFunc* call, Task* parent)
@@ -109,6 +110,7 @@ private:
             if constexpr (!std::is_trivially_copyable_v<Invokable>)
                 obj.~Invokable();
             ::new (task.m_user_data) decltype(result)(std::move(result));
+            task.m_data.has_result.store(true, std::memory_order_release);
         }
     };
 
@@ -125,6 +127,7 @@ private:
             if constexpr (!std::is_trivially_copyable_v<Invokable>)
                 obj.~Invokable();
             ::new (task.m_user_data) decltype(result)(std::move(result));
+            task.m_data.has_result.store(true, std::memory_order_release);
         }
     };
 
@@ -173,7 +176,7 @@ public:
     [[nodiscard]]
     const T* GetData() const noexcept
     {
-        if (!IsFinished())
+        if (!m_data.has_result.load(std::memory_order_consume))
             return nullptr;
         return reinterpret_cast<const T*>(m_user_data);
     }
