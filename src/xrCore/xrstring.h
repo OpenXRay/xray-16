@@ -58,73 +58,92 @@ XRCORE_API extern str_container* g_pStringContainer;
 //////////////////////////////////////////////////////////////////////////
 class shared_str
 {
-    str_value* p_;
+    str_value* p_{};
 
 protected:
     // ref-counting
-    void _dec()
+    void _dec() noexcept
     {
-        if (0 == p_)
+        if (nullptr == p_)
             return;
         p_->dwReference--;
         if (0 == p_->dwReference)
-            p_ = 0;
+            p_ = nullptr;
     }
 
 public:
     void _set(pcstr rhs)
     {
         str_value* v = g_pStringContainer->dock(rhs);
-        if (0 != v)
+        if (nullptr != v)
             v->dwReference++;
         _dec();
         p_ = v;
     }
-    void _set(shared_str const& rhs)
+    void _set(shared_str const& rhs) noexcept
     {
         str_value* v = rhs.p_;
-        if (0 != v)
+        if (nullptr != v)
             v->dwReference++;
         _dec();
         p_ = v;
     }
-    // void _set (shared_str const &rhs) { str_value* v = g_pStringContainer->dock(rhs.c_str()); if (0!=v)
-    // v->dwReference++; _dec(); p_ = v; }
+    void _set(nullptr_t) noexcept
+    {
+        _dec();
+        p_ = nullptr;
+    }
 
     [[nodiscard]]
     const str_value* _get() const { return p_; }
 
 public:
     // construction
-    shared_str() { p_ = 0; }
+    shared_str() = default;
     shared_str(pcstr rhs)
     {
-        p_ = 0;
+        p_ = nullptr;
         _set(rhs);
     }
-    shared_str(shared_str const& rhs)
+    shared_str(shared_str const& rhs) noexcept
     {
-        p_ = 0;
+        p_ = nullptr;
         _set(rhs);
+    }
+    shared_str(shared_str&& rhs) noexcept
+        : p_(rhs.p_)
+    {
+        rhs.p_ = nullptr;
     }
     ~shared_str() { _dec(); }
     // assignment & accessors
     shared_str& operator=(pcstr rhs)
     {
         _set(rhs);
-        return (shared_str&)*this;
+        return *this;
     }
-    shared_str& operator=(shared_str const& rhs)
+    shared_str& operator=(shared_str const& rhs) noexcept
     {
         _set(rhs);
-        return (shared_str&)*this;
+        return *this;
+    }
+    shared_str& operator=(shared_str&& rhs) noexcept
+    {
+        p_ = rhs.p_;
+        rhs.p_ = nullptr;
+        return *this;
+    }
+    shared_str& operator=(nullptr_t) noexcept
+    {
+        _set(nullptr);
+        return *this;
     }
     // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use
     [[nodiscard]]
-    pcstr operator*() const { return p_ ? p_->value : 0; }
+    pcstr operator*() const { return p_ ? p_->value : nullptr; }
 
     [[nodiscard]]
-    bool operator!() const { return p_ == 0; }
+    bool operator!() const { return p_ == nullptr; }
 
     [[nodiscard]]
     char operator[](size_t id) { return p_->value[id]; }
@@ -132,7 +151,7 @@ public:
     char operator[](size_t id) const { return p_->value[id]; }
 
     [[nodiscard]]
-    pcstr c_str() const { return p_ ? p_->value : 0; }
+    pcstr c_str() const { return p_ ? p_->value : nullptr; }
 
     // misc func
     [[nodiscard]]
