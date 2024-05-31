@@ -7,23 +7,11 @@
 SSpecificCharacterData::SSpecificCharacterData()
 {
     m_sGameName.clear();
-    m_sBioText = NULL;
     m_sVisual.clear();
     m_sSupplySpawn.clear();
     m_sNpcConfigSect.clear();
 
-    m_StartDialog = NULL;
     m_ActorDialogs.clear();
-
-    m_Rank = NO_RANK;
-    m_Reputation = NO_REPUTATION;
-
-    m_bNoRandom = false;
-    m_bDefaultForCommunity = false;
-    m_fPanic_threshold = 0.0f;
-    m_fHitProbabilityFactor = 1.f;
-    m_crouch_type = 0;
-    m_upgrade_mechanic = false;
 }
 
 SSpecificCharacterData::~SSpecificCharacterData() {}
@@ -86,7 +74,7 @@ void CSpecificCharacter::load_shared(LPCSTR)
         data()->m_StartDialog = start_dialog;
     }
     else
-        data()->m_StartDialog = NULL;
+        data()->m_StartDialog = nullptr;
 
     int dialogs_num = pXML->GetNodesNum(pXML->GetLocalRoot(), "actor_dialog");
     data()->m_ActorDialogs.clear();

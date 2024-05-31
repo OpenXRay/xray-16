@@ -40,7 +40,7 @@ protected:
 
 protected:
     u32 m_ef_equipment_type;
-    u32 m_artefact_count;
+    u32 m_artefact_count{};
 
 public:
     float m_fPowerLoss;

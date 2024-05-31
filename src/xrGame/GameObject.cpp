@@ -154,7 +154,7 @@ void CGameObject::cNameVisual_set(shared_str N)
     else
     {
         GEnv.Render->model_Delete(renderable.visual);
-        NameVisual = 0;
+        NameVisual = nullptr;
     }
     OnChangeVisual();
 }
@@ -1531,6 +1531,6 @@ bool CGameObject::use(IGameObject* obj)
 
 LPCSTR CGameObject::tip_text() { return *m_sTipText; }
 void CGameObject::set_tip_text(LPCSTR new_text) { m_sTipText = new_text; }
-void CGameObject::set_tip_text_default() { m_sTipText = NULL; }
+void CGameObject::set_tip_text_default() { m_sTipText = nullptr; }
 bool CGameObject::nonscript_usable() { return m_bNonscriptUsable; }
 void CGameObject::set_nonscript_usable(bool usable) { m_bNonscriptUsable = usable; }

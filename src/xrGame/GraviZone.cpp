@@ -10,8 +10,8 @@
 #include "Level.h"
 #include "CharacterPhysicsSupport.h"
 
-CBaseGraviZone::CBaseGraviZone(void) { m_dwTeleTime = 0; }
-CBaseGraviZone::~CBaseGraviZone(void) {}
+CBaseGraviZone::CBaseGraviZone() {}
+
 void CBaseGraviZone::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -28,12 +28,12 @@ void CBaseGraviZone::Load(LPCSTR section)
     if (pSettings->line_exist(section, "tele_particles_big"))
         m_sTeleParticlesBig = pSettings->r_string(section, "tele_particles_big");
     else
-        m_sTeleParticlesBig = NULL;
+        m_sTeleParticlesBig = nullptr;
 
     if (pSettings->line_exist(section, "tele_particles_small"))
         m_sTeleParticlesSmall = pSettings->r_string(section, "tele_particles_small");
     else
-        m_sTeleParticlesSmall = NULL;
+        m_sTeleParticlesSmall = nullptr;
 }
 
 bool CBaseGraviZone::net_Spawn(CSE_Abstract* DC) { return inherited::net_Spawn(DC); }

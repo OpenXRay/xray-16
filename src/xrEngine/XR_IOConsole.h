@@ -82,10 +82,10 @@ public:
     };
 
 protected:
-    int scroll_delta;
+    int scroll_delta{};
 
-    CGameFont* pFont;
-    CGameFont* pFont2;
+    CGameFont* pFont{};
+    CGameFont* pFont2{};
 
     FactoryPtr<IUIShader>* m_hShader_back{};
 
@@ -103,11 +103,11 @@ private:
 
     vecTips m_temp_tips;
     vecTipsEx m_tips;
-    u32 m_tips_mode;
+    u32 m_tips_mode{};
     shared_str m_cur_cmd;
     int m_select_tip;
     int m_start_tip;
-    u32 m_prev_length_str;
+    u32 m_prev_length_str{};
 
 public:
     CConsole();
@@ -126,7 +126,7 @@ public:
     pcstr GetUserConfigFileName() override { return ConfigFile; }
 
     string64 ConfigFile;
-    bool bVisible;
+    bool bVisible{};
     vecCMD Commands;
 
     void AddCommand(IConsole_Command* cc);

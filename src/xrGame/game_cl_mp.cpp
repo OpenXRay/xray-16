@@ -853,7 +853,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
     KMS.m_victim.m_name = pPlayer->getName();
     KMS.m_victim.m_color = Color_Teams_u32[ModifyTeam(pPlayer->team) + 1];
 
-    KMS.m_killer.m_name = NULL;
+    KMS.m_killer.m_name = nullptr;
     KMS.m_killer.m_color = color_rgba(255, 255, 255, 255);
 
     switch (KillType)
@@ -997,7 +997,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         // suicide
         if (KilledID == KillerID)
         {
-            KMS.m_victim.m_name = NULL;
+            KMS.m_victim.m_name = nullptr;
 
             KMS.m_ext_info.m_shader = GetKillEventIconsShader();
             KMS.m_ext_info.m_rect.x1 = 32;
