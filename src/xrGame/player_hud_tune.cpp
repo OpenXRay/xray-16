@@ -11,6 +11,7 @@
 #include "xrUICore/ui_base.h"
 #include "debug_renderer.h"
 #include "xrEngine/GameFont.h"
+#include "player_hud_tune.h"
 
 u32 hud_adj_mode = 0;
 u32 hud_adj_item_idx = 0;
@@ -18,6 +19,289 @@ u32 hud_adj_item_idx = 0;
 
 float _delta_pos = 0.0005f;
 float _delta_rot = 0.05f;
+extern ENGINE_API float psHUD_FOV;
+
+CHudTuner::CHudTuner()
+{
+    ImGui::SetCurrentContext(Device.GetImGuiContext());
+    paused = fsimilar(Device.time_factor(), EPS);
+}
+
+void CHudTuner::SetDefaultValues()
+{
+    if (current_hud_item)
+    {
+        curr_hand_pos = current_hud_item->m_measures.m_hands_attach[0];
+        curr_hand_rot = current_hud_item->m_measures.m_hands_attach[1];
+        curr_hand_pos_offset = current_hud_item->m_measures.m_hands_offset[0][0];
+        curr_hand_rot_offset = current_hud_item->m_measures.m_hands_offset[1][0];
+        curr_hand_pos_offset_aim = current_hud_item->m_measures.m_hands_offset[0][1];
+        curr_hand_rot_offset_aim = current_hud_item->m_measures.m_hands_offset[1][1];
+        curr_hand_pos_offset_gl = current_hud_item->m_measures.m_hands_offset[0][2];
+        curr_hand_rot_offset_gl = current_hud_item->m_measures.m_hands_offset[1][2];
+        curr_item_attach_pos_offset = current_hud_item->m_measures.m_item_attach[0];
+        curr_item_attach_rot_offset = current_hud_item->m_measures.m_item_attach[1];
+        curr_fire_point_offset = current_hud_item->m_measures.m_fire_point_offset;
+        curr_fire_point_2_offset = current_hud_item->m_measures.m_fire_point2_offset;
+        curr_shell_point_offset = current_hud_item->m_measures.m_shell_point_offset;
+    }
+    else
+    {
+        Fvector zero = { 0, 0, 0 };
+        curr_hand_pos = zero;
+        curr_hand_rot = zero;
+        new_hand_pos_offset = curr_hand_pos_offset = zero;
+        new_hand_rot_offset = curr_hand_rot_offset = zero;
+        new_hand_pos_offset_aim = curr_hand_pos_offset_aim = zero;
+        new_hand_rot_offset_aim = curr_hand_rot_offset_aim = zero;
+        new_hand_pos_offset_gl = curr_hand_pos_offset_gl = zero;
+        new_hand_rot_offset_gl = curr_hand_rot_offset_gl = zero;
+        new_item_attach_pos_offset = curr_item_attach_pos_offset = zero;
+        new_item_attach_rot_offset = curr_item_attach_rot_offset = zero;
+        new_fire_point_offset = curr_fire_point_offset = zero;
+        new_fire_point_2_offset = curr_fire_point_2_offset = zero;
+        new_shell_point_offset = curr_shell_point_offset = zero;
+    }
+}
+
+void CHudTuner::ResetToDefaultValues()
+{
+    new_hand_pos = curr_hand_pos;
+    new_hand_rot = curr_hand_rot;
+    new_hand_pos_offset = curr_hand_pos_offset;
+    new_hand_rot_offset = curr_hand_rot_offset;
+    new_hand_pos_offset_aim = curr_hand_pos_offset_aim;
+    new_hand_rot_offset_aim = curr_hand_rot_offset_aim;
+    new_hand_pos_offset_gl = curr_hand_pos_offset_gl;
+    new_hand_rot_offset_gl = curr_hand_rot_offset_gl;
+    new_item_attach_pos_offset = curr_item_attach_pos_offset;
+    new_item_attach_rot_offset = curr_item_attach_rot_offset;
+    new_fire_point_offset = curr_fire_point_offset;
+    new_fire_point_2_offset = curr_fire_point_2_offset;
+    new_shell_point_offset = curr_shell_point_offset;
+}
+
+void CHudTuner::UpdateValues()
+{
+    if (current_hud_item)
+    {
+        current_hud_item->m_measures.m_hands_offset[0][0] = new_hand_pos_offset;
+        current_hud_item->m_measures.m_hands_offset[1][0] = new_hand_rot_offset;
+        current_hud_item->m_measures.m_hands_offset[0][1] = new_hand_pos_offset_aim;
+        current_hud_item->m_measures.m_hands_offset[1][1] = new_hand_rot_offset_aim;
+        current_hud_item->m_measures.m_hands_offset[0][2] = new_hand_pos_offset_gl;
+        current_hud_item->m_measures.m_hands_offset[1][2] = new_hand_rot_offset_gl;
+        current_hud_item->m_measures.m_item_attach[0] = new_item_attach_pos_offset;
+        current_hud_item->m_measures.m_item_attach[1] = new_item_attach_rot_offset;
+        current_hud_item->m_measures.m_fire_point_offset = new_fire_point_offset;
+        current_hud_item->m_measures.m_fire_point2_offset = new_fire_point_2_offset;
+        current_hud_item->m_measures.m_shell_point_offset = new_shell_point_offset;
+
+        u8 idx = current_hud_item->m_parent_hud_item->GetCurrentHudOffsetIdx();
+        new_hand_pos.set(curr_hand_pos);
+        new_hand_rot.set(curr_hand_rot);
+        new_hand_pos.add(current_hud_item->m_measures.m_hands_offset[0][0]);
+        new_hand_rot.add(current_hud_item->m_measures.m_hands_offset[1][0]);
+
+        current_hud_item->m_measures.m_hands_attach[0] = new_hand_pos;
+        current_hud_item->m_measures.m_hands_attach[1] = new_hand_rot;
+    }
+}
+
+void CHudTuner::OnFrame()
+{
+#ifndef MASTER_GOLD
+    if (!get_open_state())
+        return;
+
+    if (!g_player_hud)
+        return;
+
+    auto hud_item = g_player_hud->attached_item(current_hud_idx);
+    if (current_hud_item != hud_item)
+    {
+        current_hud_item = hud_item;
+        SetDefaultValues();
+        ResetToDefaultValues();
+    }
+
+    if (ImGui::Begin(tool_name(), &get_open_state(), get_default_window_flags()))
+    {
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::RadioButton("Pause", paused))
+            {
+                paused = !paused;
+                float time_factor = 1.f;
+                if (paused)
+                {
+                    time_factor = EPS;
+                }
+                Device.time_factor(time_factor);
+            }
+
+            ImGui::EndMenuBar();
+        }
+
+        if (ImGui::CollapsingHeader("Main Settings", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            if (ImGui::BeginCombo("Hud Item Mode", hud_item_mode[current_hud_idx]))
+            {
+                for (const auto& [idx, value] : hud_item_mode)
+                {
+                    if (ImGui::Selectable(value, current_hud_idx == idx))
+                    {
+                        current_hud_idx = idx;
+                    }
+                }
+                ImGui::EndCombo();
+            }
+
+            ImGui::LabelText("Current item", "%s", hud_item ? hud_item->m_sect_name.c_str() : "none");
+
+            ImGui::SliderFloat("HUD FOV", &psHUD_FOV, 0.1f, 1.0f);
+
+            ImGui::NewLine();
+
+            ImGui::SliderFloat("Position step", &_delta_pos, 0.0000001f, 0.001f, "%.7f");
+            ImGui::SliderFloat("Rotation step", &_delta_rot, 0.000001f, 0.1f, "%.6f");
+
+            ImGui::DragFloat3(hud_adj_modes[HUD_POS], (float*)&new_hand_pos_offset, _delta_pos, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[HUD_ROT], (float*)&new_hand_rot_offset, _delta_rot, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[HUD_POS_AIM], (float*)&new_hand_pos_offset_aim, _delta_pos, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[HUD_ROT_AIM], (float*)&new_hand_rot_offset_aim, _delta_rot, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[HUD_POS_GL], (float*)&new_hand_pos_offset_gl, _delta_pos, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[HUD_ROT_GL], (float*)&new_hand_rot_offset_gl, _delta_rot, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[ITEM_POS], (float*)&new_item_attach_pos_offset, _delta_pos, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[ITEM_ROT], (float*)&new_item_attach_rot_offset, _delta_rot, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[FIRE_POINT], (float*)&new_fire_point_offset, _delta_pos, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[FIRE_POINT_2], (float*)&new_fire_point_2_offset, _delta_pos, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[SHELL_POINT], (float*)&new_shell_point_offset, _delta_pos, 0.f, 0.f, "%.7f");
+
+            UpdateValues();
+
+            string128 selectable;
+
+            if (current_hud_item)
+            {
+                bool is_16x9 = UI().is_widescreen();
+                shared_str m_sect_name = current_hud_item->m_sect_name;
+
+                ImGuiIO& io = ImGui::GetIO();
+
+                if (ImGui::Button("Copy formatted values to clipboard"))
+                {
+                    ImGui::LogToClipboard();
+                    xr_sprintf(selectable, "[%s]\n", m_sect_name.c_str());
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "item_position = %f,%f,%f\n", new_item_attach_pos_offset.x, new_item_attach_pos_offset.y, new_item_attach_pos_offset.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "item_orientation = %f,%f,%f\n", new_item_attach_rot_offset.x, new_item_attach_rot_offset.y, new_item_attach_rot_offset.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "fire_point = %f,%f,%f\n", new_fire_point_offset.x, new_fire_point_offset.y, new_fire_point_offset.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "fire_point = %f,%f,%f\n", new_fire_point_2_offset.x, new_fire_point_2_offset.y, new_fire_point_2_offset.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "shell_point = %f,%f,%f\n", new_shell_point_offset.x, new_shell_point_offset.y, new_shell_point_offset.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "hands_position%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_hand_pos.x, new_hand_pos.y, new_hand_pos.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "hands_orientation%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_hand_rot.x, new_hand_rot.y, new_hand_rot.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "aim_hud_offset_pos%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_hand_pos_offset_aim.x, new_hand_pos_offset_aim.y, new_hand_pos_offset_aim.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "aim_hud_offset_rot%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_hand_rot_offset_aim.x, new_hand_rot_offset_aim.y, new_hand_rot_offset_aim.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "gl_hud_offset_pos%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_hand_pos_offset_gl.x, new_hand_pos_offset_gl.y, new_hand_pos_offset_gl.z);
+                    ImGui::LogText(selectable);
+                    xr_sprintf(selectable, "gl_hud_offset_rot%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_hand_rot_offset_gl.x, new_hand_rot_offset_gl.y, new_hand_rot_offset_gl.z);
+                    ImGui::LogText(selectable);
+                    ImGui::LogFinish();
+                }
+
+                ImGui::NewLine();
+
+#ifdef DEBUG
+                firedeps fd;
+                current_hud_item->setup_firedeps(fd);
+                collide::rq_result& RQ = HUD().GetCurrentRayQuery();
+
+                CDebugRenderer& render = Level().debug_renderer();
+
+                ImGui::SliderFloat("Debug Point Size", &debug_point_size, 0.00005f, 1.f, "%.5f");
+                if (ImGui::RadioButton("Draw Fire Point", draw_fp)) { draw_fp = !draw_fp; }; ImGui::SameLine();
+                if (ImGui::RadioButton("Draw Fire Point (GL)", draw_fp2)) { draw_fp2 = !draw_fp2; } ImGui::SameLine();
+                if (ImGui::RadioButton("Draw Fire Direction", draw_fd)) { draw_fd = !draw_fd; }
+                if (ImGui::RadioButton("Draw Fire Direction (GL)", draw_fd2)) { draw_fd2 = !draw_fd2; } ImGui::SameLine();
+                if (ImGui::RadioButton("Draw Shell Point", draw_sp)) { draw_sp = !draw_sp; }
+
+                if (draw_fp)
+                {
+                    Fvector point;
+                    point.set(fd.vLastFP);
+                    current_hud_item->m_parent_hud_item->TransformPosFromWorldToHud(point);
+                    render.draw_aabb(point, debug_point_size, debug_point_size, debug_point_size, color_xrgb(255, 0, 0));
+                }
+                
+                if (draw_fp2)
+                {
+                    Fvector point;
+                    point.set(fd.vLastFP2);
+                    current_hud_item->m_parent_hud_item->TransformPosFromWorldToHud(point);
+                    render.draw_aabb(point, debug_point_size, debug_point_size, debug_point_size, color_xrgb(255, 0, 0));
+                }
+
+                if (draw_fd)
+                {
+                    Fvector point;
+                    Fvector dir;
+                    point.set(fd.vLastFP);
+                    dir.set(fd.vLastFD);
+                    current_hud_item->m_parent_hud_item->TransformPosFromWorldToHud(point);
+                    current_hud_item->m_parent_hud_item->TransformDirFromWorldToHud(dir);
+
+                    Fvector parallelPoint;
+                    parallelPoint.set(point);
+                    parallelPoint.mad(dir, RQ.range);
+                    render.draw_aabb(parallelPoint, debug_point_size, debug_point_size, debug_point_size, color_xrgb(255, 0, 0));
+                    render.draw_line(Fidentity, point, parallelPoint, color_xrgb(255, 0, 0));
+                }
+
+                if (draw_fd2)
+                {
+                    Fvector point;
+                    Fvector dir;
+                    point.set(fd.vLastFP2);
+                    dir.set(fd.vLastFD);
+                    current_hud_item->m_parent_hud_item->TransformPosFromWorldToHud(point);
+                    current_hud_item->m_parent_hud_item->TransformDirFromWorldToHud(dir);
+
+                    Fvector parallelPoint;
+                    parallelPoint.set(point);
+                    parallelPoint.mad(dir, RQ.range);
+                    render.draw_aabb(parallelPoint, debug_point_size, debug_point_size, debug_point_size, color_xrgb(255, 0, 0));
+                    render.draw_line(Fidentity, point, parallelPoint, color_xrgb(255, 0, 0));
+                }
+
+                if (draw_sp)
+                {
+                    Fvector point;
+                    point.set(fd.vLastSP);
+                    current_hud_item->m_parent_hud_item->TransformPosFromWorldToHud(point);
+                    render.draw_aabb(point, debug_point_size, debug_point_size, debug_point_size, color_xrgb(255, 0, 0));
+                }
+#endif // DEBUG
+            }
+
+            if (ImGui::Button("Reset to default values"))
+            {
+                ResetToDefaultValues();
+            }
+        }
+    }
+    ImGui::End();
+#endif
+}
 
 bool is_attachable_item_tuning_mode()
 {
@@ -150,10 +434,8 @@ void attachable_hud_item::tune(Ivector values)
         if ((values.x) || (values.y) || (values.z))
         {
             Msg("[%s]", m_sect_name.c_str());
-            Msg("item_position				= %f,%f,%f", m_measures.m_item_attach[0].x, m_measures.m_item_attach[0].y,
-                m_measures.m_item_attach[0].z);
-            Msg("item_orientation			= %f,%f,%f", m_measures.m_item_attach[1].x, m_measures.m_item_attach[1].y,
-                m_measures.m_item_attach[1].z);
+            Msg("item_position				= %f,%f,%f", m_measures.m_item_attach[0].x, m_measures.m_item_attach[0].y, m_measures.m_item_attach[0].z);
+            Msg("item_orientation			= %f,%f,%f", m_measures.m_item_attach[1].x, m_measures.m_item_attach[1].y, m_measures.m_item_attach[1].z);
             Log("-----------");
         }
     }
@@ -182,12 +464,9 @@ void attachable_hud_item::tune(Ivector values)
         if ((values.x) || (values.y) || (values.z))
         {
             Msg("[%s]", m_sect_name.c_str());
-            Msg("fire_point				= %f,%f,%f", m_measures.m_fire_point_offset.x, m_measures.m_fire_point_offset.y,
-                m_measures.m_fire_point_offset.z);
-            Msg("fire_point2			= %f,%f,%f", m_measures.m_fire_point2_offset.x,
-                m_measures.m_fire_point2_offset.y, m_measures.m_fire_point2_offset.z);
-            Msg("shell_point			= %f,%f,%f", m_measures.m_shell_point_offset.x,
-                m_measures.m_shell_point_offset.y, m_measures.m_shell_point_offset.z);
+            Msg("fire_point				= %f,%f,%f", m_measures.m_fire_point_offset.x, m_measures.m_fire_point_offset.y, m_measures.m_fire_point_offset.z);
+            Msg("fire_point2			= %f,%f,%f", m_measures.m_fire_point2_offset.x, m_measures.m_fire_point2_offset.y, m_measures.m_fire_point2_offset.z);
+            Msg("shell_point			= %f,%f,%f", m_measures.m_shell_point_offset.x, m_measures.m_shell_point_offset.y, m_measures.m_shell_point_offset.z);
             Log("-----------");
         }
     }

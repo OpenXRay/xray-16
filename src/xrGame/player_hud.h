@@ -45,6 +45,7 @@ struct hud_item_measures
 
     Fvector m_item_attach[2]; // pos,rot
 
+    int overriding_hud_idx = -1;
     Fvector m_hands_offset[2][3]; // pos,rot/ normal,aim,GL
 
     u16 m_fire_bone;

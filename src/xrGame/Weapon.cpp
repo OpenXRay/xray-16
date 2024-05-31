@@ -1708,8 +1708,6 @@ void CWeapon::UpdateHudAdditonal(Fmatrix& trans)
     if (!pActor)
         return;
 
-    if ((IsZoomed() && m_zoom_params.m_fZoomRotationFactor <= 1.f) ||
-        (!IsZoomed() && m_zoom_params.m_fZoomRotationFactor > 0.f))
     {
         u8 idx = GetCurrentHudOffsetIdx();
         //		if(idx==0)					return;

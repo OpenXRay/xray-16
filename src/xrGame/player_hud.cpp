@@ -7,6 +7,7 @@
 #include "static_cast_checked.hpp"
 #include "ActorEffector.h"
 #include "WeaponMagazinedWGrenade.h" // XXX: move somewhere
+#include "GamePersistent.h"
 
 extern u32 hud_adj_mode;
 player_hud* g_player_hud = nullptr;
@@ -131,7 +132,7 @@ void attachable_hud_item::update(bool bForce)
         reload_measures();
     }
 
-    if (hud_adj_mode > 0)
+    if (GamePersistent().GetHudTuner().get_open_state())
         m_measures.update(m_attach_offset);
 
     m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform);
