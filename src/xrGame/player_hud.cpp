@@ -9,7 +9,6 @@
 #include "WeaponMagazinedWGrenade.h" // XXX: move somewhere
 #include "GamePersistent.h"
 
-extern u32 hud_adj_mode;
 player_hud* g_player_hud = nullptr;
 extern ENGINE_API shared_str current_player_hud_sect;
 // clang-format off
@@ -200,7 +199,6 @@ bool attachable_hud_item::need_renderable() const { return m_parent_hud_item->ne
 void attachable_hud_item::render(u32 context_id, IRenderable* root)
 {
     GEnv.Render->add_Visual(context_id, root, m_model->dcast_RenderVisual(), m_item_transform);
-    debug_draw_firedeps();
     m_parent_hud_item->render_hud_mode();
 }
 

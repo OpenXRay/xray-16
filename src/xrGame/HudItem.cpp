@@ -75,7 +75,6 @@ void CHudItem::renderable_Render(u32 context_id, IRenderable* root)
         if (!object().H_Parent() || (!_hud_render && !IsHidden()))
         {
             on_renderable_Render(context_id, root);
-            debug_draw_firedeps();
         }
         else if (object().H_Parent())
         {

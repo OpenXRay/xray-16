@@ -181,7 +181,6 @@ public:
     }
     IC u32 animation_slot() { return m_animation_slot; }
     virtual void on_renderable_Render(u32 context_id, IRenderable* root) = 0;
-    virtual void debug_draw_firedeps(){};
 
     virtual CHudItem* cast_hud_item() { return this; }
     void PlayAnimIdleMovingCrouch(); //AVO: new crouch idle animation
