@@ -22,20 +22,16 @@ CSoundRender_Source* CSoundRender_Core::i_create_source(pcstr name)
     }
 
     // Load a _new one
-    CSoundRender_Source* S = xr_new<CSoundRender_Source>();
-
-    if (!S->load(id))
-    {
-        // XXX: Make CSoundRender_Source movable and make allocation only if S->load succeeded.
-        xr_delete(S);
-    }
-    else
+    CSoundRender_Source source;
+    if (source.load(id))
     {
         ScopeLock scope(&s_sources_lock);
-        s_sources.insert({ id, S });
+        CSoundRender_Source* S = xr_new<CSoundRender_Source>(std::move(source));
+        s_sources.emplace(id, S);
+        return S;
     }
 
-    return S;
+    return nullptr;
 }
 
 void CSoundRender_Core::i_destroy_source(CSoundRender_Source* S)

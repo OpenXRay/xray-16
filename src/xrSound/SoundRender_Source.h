@@ -47,8 +47,14 @@ private:
     bool LoadWave(pcstr name);
 
 public:
-    CSoundRender_Source() = default;
+    CSoundRender_Source() noexcept = default;
     ~CSoundRender_Source() override;
+
+    CSoundRender_Source(const CSoundRender_Source&) = delete;
+    CSoundRender_Source(CSoundRender_Source&&) noexcept = default;
+
+    CSoundRender_Source& operator=(const CSoundRender_Source&) = delete;
+    CSoundRender_Source& operator=(CSoundRender_Source&&) noexcept = default;
 
     bool load(pcstr name);
     void unload();
