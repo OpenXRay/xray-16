@@ -234,7 +234,7 @@ std::pair<u8*, size_t> CSoundRender_Emitter::obtain_block()
     wait_prefill();
     const std::pair result = { temp_buf[current_block].data(), temp_buf[current_block].size() };
     ++current_block;
-    if (current_block >= sdef_target_count)
+    if (current_block >= sdef_target_count_prefill)
         current_block = 0;
     --filled_blocks;
     return std::move(result);
@@ -243,28 +243,28 @@ std::pair<u8*, size_t> CSoundRender_Emitter::obtain_block()
 void CSoundRender_Emitter::fill_all_blocks()
 {
     current_block = 0;
-    for (size_t i = 0; i < sdef_target_count; ++i)
+    for (size_t i = 0; i < sdef_target_count_prefill; ++i)
         fill_block(temp_buf[i].data(), temp_buf[i].size());
-    filled_blocks = sdef_target_count;
+    filled_blocks = sdef_target_count_prefill;
 }
 
 void CSoundRender_Emitter::dispatch_prefill()
 {
     wait_prefill();
-    if (filled_blocks >= sdef_target_count)
+    if (filled_blocks >= sdef_target_count_prefill)
         return;
 
     const auto task = &TaskScheduler->AddTask([this]
     {
-        size_t next_block_to_fill = (current_block + filled_blocks) % sdef_target_count;
+        size_t next_block_to_fill = (current_block + filled_blocks) % sdef_target_count_prefill;
 
-        while (filled_blocks < sdef_target_count)
+        while (filled_blocks < sdef_target_count_prefill)
         {
             auto& block = temp_buf[next_block_to_fill];
 
             fill_block(block.data(), block.size());
 
-            next_block_to_fill = (next_block_to_fill + 1) % sdef_target_count;
+            next_block_to_fill = (next_block_to_fill + 1) % sdef_target_count_prefill;
             filled_blocks++;
         }
 

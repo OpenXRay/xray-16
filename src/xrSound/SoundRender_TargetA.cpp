@@ -10,7 +10,7 @@ CSoundRender_TargetA::CSoundRender_TargetA()
 
 bool CSoundRender_TargetA::_initialize()
 {
-    A_CHK(alGenBuffers(sdef_target_count, pBuffers));
+    A_CHK(alGenBuffers(sdef_target_count_submit, pBuffers));
     alGenSources(1, &pSource);
     const ALenum error = alGetError();
     if (AL_NO_ERROR == error)
@@ -31,7 +31,7 @@ void CSoundRender_TargetA::_destroy()
     // clean up target
     if (alIsSource(pSource))
         alDeleteSources(1, &pSource);
-    A_CHK(alDeleteBuffers(sdef_target_count, pBuffers));
+    A_CHK(alDeleteBuffers(sdef_target_count_submit, pBuffers));
 }
 
 void CSoundRender_TargetA::_restart()
@@ -61,7 +61,7 @@ void CSoundRender_TargetA::render()
 
     submit_all_buffers();
 
-    A_CHK(alSourceQueueBuffers(pSource, sdef_target_count, pBuffers));
+    A_CHK(alSourceQueueBuffers(pSource, sdef_target_count_submit, pBuffers));
     A_CHK(alSourcePlay(pSource));
 }
 
@@ -85,7 +85,7 @@ void CSoundRender_TargetA::rewind()
 
     submit_all_buffers();
 
-    A_CHK(alSourceQueueBuffers(pSource, sdef_target_count, pBuffers));
+    A_CHK(alSourceQueueBuffers(pSource, sdef_target_count_submit, pBuffers));
     A_CHK(alSourcePlay(pSource));
 }
 

@@ -81,7 +81,7 @@ public:
 private:
     OggVorbis_File* ovf{};
 
-    xr_vector<u8> temp_buf[sdef_target_count];
+    xr_vector<u8> temp_buf[sdef_target_count_prefill];
     std::atomic<Task*> prefill_task{};
 
     size_t current_block{};
