@@ -184,7 +184,7 @@ void CHudTuner::OnFrame()
                 ImGui::SliderFloat("Debug Point Size", &debug_point_size, 0.00005f, 1.f, "%.5f");
                 if (ImGui::RadioButton("Draw Fire Point", draw_fp)) { draw_fp = !draw_fp; }; ImGui::SameLine();
                 if (ImGui::RadioButton("Draw Fire Point (GL)", draw_fp2)) { draw_fp2 = !draw_fp2; } ImGui::SameLine();
-                if (ImGui::RadioButton("Draw Fire Direction", draw_fd)) { draw_fd = !draw_fd; }
+                if (ImGui::RadioButton("Draw Fire Direction", draw_fd)) { draw_fd = !draw_fd; } ImGui::SameLine();
                 if (ImGui::RadioButton("Draw Fire Direction (GL)", draw_fd2)) { draw_fd2 = !draw_fd2; } ImGui::SameLine();
                 if (ImGui::RadioButton("Draw Shell Point", draw_sp)) { draw_sp = !draw_sp; }
 
@@ -249,6 +249,34 @@ void CHudTuner::OnFrame()
             if (ImGui::Button("Reset to default values"))
             {
                 ResetToDefaultValues();
+            }
+        }
+
+        if (current_hud_item && ImGui::CollapsingHeader("Bone and Animation Debugging", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            IKinematics* ik = current_hud_item->m_model;
+            ImGui::Text("Bone Count = %i", ik->LL_BoneCount());
+            ImGui::Text("Root Bone = %s", ik->LL_BoneName_dbg(ik->LL_GetBoneRoot()));
+
+            for (const auto& [bone_name, bone_id] : *ik->LL_Bones())
+            {
+                if (bone_id == ik->LL_GetBoneRoot())
+                    continue;
+
+                bool visible = ik->LL_GetBoneVisible(bone_id);
+                if (ImGui::RadioButton(bone_name.c_str(), visible)) { visible = !visible; }; ImGui::SameLine();
+                ik->LL_SetBoneVisible(bone_id, visible, FALSE);
+            }
+
+            ImGui::NewLine();
+
+            for (const auto& [anim_name, motion] : current_hud_item->m_hand_motions.m_anims)
+            {
+                if (ImGui::Button(anim_name.c_str()))
+                {
+                    current_hud_item->m_parent_hud_item->PlayHUDMotion_noCB(anim_name, false);
+                };
+                ImGui::SameLine();
             }
         }
     }

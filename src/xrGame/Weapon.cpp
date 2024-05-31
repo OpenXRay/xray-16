@@ -1297,6 +1297,8 @@ bool CWeapon::SilencerAttachable() { return (ALife::eAddonAttachable == m_eSilen
 
 void CWeapon::UpdateHUDAddonsVisibility()
 {
+    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
+        return;
     static shared_str wpn_scope = WPN_SCOPE;
     static shared_str wpn_silencer = WPN_SILENCER;
     static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
@@ -1344,6 +1346,9 @@ void CWeapon::UpdateHUDAddonsVisibility()
 
 void CWeapon::UpdateAddonsVisibility()
 {
+    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
+        return;
+
     static shared_str wpn_scope = WPN_SCOPE;
     static shared_str wpn_silencer = WPN_SILENCER;
     static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;

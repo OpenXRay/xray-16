@@ -71,4 +71,6 @@ private:
 
     hud_item_measures curr_measures{};
     hud_item_measures new_measures{};
+
+    xr_map<u32, bool> bone_map;
 };
