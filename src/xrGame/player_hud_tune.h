@@ -1,5 +1,7 @@
 #pragma once
 
+#include "player_hud.h"
+
 class CHudTuner final : public xray::editor::ide_tool
 {
 public:
@@ -11,7 +13,6 @@ public:
 private:
     pcstr tool_name() override { return "Hud Tuner"; }
 
-    void SetDefaultValues();
     void ResetToDefaultValues();
     void UpdateValues();
 
@@ -68,31 +69,6 @@ private:
     attachable_hud_item* current_hud_item{};
     hud_item_idx current_hud_idx{ MAIN_ITEM };
 
-    Fvector curr_hand_pos{};
-    Fvector curr_hand_rot{};
-    Fvector curr_hand_pos_offset{};
-    Fvector curr_hand_rot_offset{};
-    Fvector curr_hand_pos_offset_aim{};
-    Fvector curr_hand_rot_offset_aim{};
-    Fvector curr_hand_pos_offset_gl{};
-    Fvector curr_hand_rot_offset_gl{};
-    Fvector curr_item_attach_pos_offset{};
-    Fvector curr_item_attach_rot_offset{};
-    Fvector curr_fire_point_offset{};
-    Fvector curr_fire_point_2_offset{};
-    Fvector curr_shell_point_offset{};
-
-    Fvector new_hand_pos{};
-    Fvector new_hand_rot{};
-    Fvector new_hand_pos_offset{};
-    Fvector new_hand_rot_offset{};
-    Fvector new_hand_pos_offset_aim{};
-    Fvector new_hand_rot_offset_aim{};
-    Fvector new_hand_pos_offset_gl{};
-    Fvector new_hand_rot_offset_gl{};
-    Fvector new_item_attach_pos_offset{};
-    Fvector new_item_attach_rot_offset{};
-    Fvector new_fire_point_offset{};
-    Fvector new_fire_point_2_offset{};
-    Fvector new_shell_point_offset{};
+    hud_item_measures curr_measures{};
+    hud_item_measures new_measures{};
 };

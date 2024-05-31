@@ -878,7 +878,7 @@ void CWeapon::UpdateCL()
         CActor* pActor = smart_cast<CActor*>(H_Parent());
         if (pActor && !pActor->AnyMove() && this == pActor->inventory().ActiveItem())
         {
-            if (!GamePersistent().GetHudTuner().get_open_state() && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000) &&
+            if (!((GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())) && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000) &&
                 !IsZoomed() && g_player_hud->attached_item(1) == nullptr)
             {
                 if (AllowBore())

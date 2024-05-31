@@ -57,6 +57,7 @@ public:
     auto GetState() const { return m_state; }
     void SetState(visible_state state);
     void SwitchToNextState();
+    bool IsActiveState() const { return m_state == visible_state::full; }
 
 public:
     // Interface implementations

@@ -36,7 +36,7 @@ bool g_bAutoClearCrouch = true;
 
 void CActor::IR_OnKeyboardPress(int cmd)
 {
-    if (GamePersistent().GetHudTuner().get_open_state())
+    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
         return;
 
     if (Remote())
@@ -212,7 +212,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
 
 void CActor::IR_OnMouseWheel(float x, float y)
 {
-    if (GamePersistent().GetHudTuner().get_open_state())
+    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
         return;
     
     if (inventory().Action((y > 0) ? (u16)kWPN_ZOOM_INC : (u16)kWPN_ZOOM_DEC, CMD_START))
@@ -226,7 +226,7 @@ void CActor::IR_OnMouseWheel(float x, float y)
 
 void CActor::IR_OnKeyboardRelease(int cmd)
 {
-    if (GamePersistent().GetHudTuner().get_open_state())
+    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
         return;
 
     if (Remote())
@@ -268,7 +268,7 @@ void CActor::IR_OnKeyboardRelease(int cmd)
 
 void CActor::IR_OnKeyboardHold(int cmd)
 {
-    if (GamePersistent().GetHudTuner().get_open_state())
+    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
         return;
 
     if (Remote() || !g_Alive())
@@ -348,7 +348,7 @@ void CActor::OnAxisMove(float x, float y, float scale, bool invert)
 
 void CActor::IR_OnMouseMove(int dx, int dy)
 {
-    if (GamePersistent().GetHudTuner().get_open_state())
+    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
         return;
 
     PIItem iitem = inventory().ActiveItem();

@@ -131,7 +131,7 @@ void attachable_hud_item::update(bool bForce)
         reload_measures();
     }
 
-    if (GamePersistent().GetHudTuner().get_open_state())
+    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
         m_measures.update(m_attach_offset);
 
     m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform);
