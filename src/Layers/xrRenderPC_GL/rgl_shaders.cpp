@@ -503,7 +503,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     u32 fileCrc = 0;
     string_path filename, full_path{};
     strconcat(sizeof(filename), filename, "gl" DELIMITER, name, ".", extension, DELIMITER, sh_name.c_str());
-    if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_get_program_binary && GLAD_GL_ARB_separate_shader_objects)
     {
         string_path file;
         strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename);
@@ -517,7 +517,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     GLuint program = 0;
-    if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported && FS.exist(full_path))
+    if (GLAD_GL_ARB_get_program_binary && GLAD_GL_ARB_separate_shader_objects && FS.exist(full_path))
     {
         IReader* file = FS.r_open(full_path);
         if (file->length() > 8)
@@ -564,7 +564,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         // Compile the shader from sources
         program = create_shader(pTarget, sources.get(), sources.length(), filename, result, nullptr);
 
-        if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported && program)
+        if (GLAD_GL_ARB_get_program_binary && GLAD_GL_ARB_separate_shader_objects && program)
         {
             GLint binaryLength{};
             GLenum binaryFormat{};

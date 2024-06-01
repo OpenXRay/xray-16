@@ -219,7 +219,7 @@ ICF void CBackend::set_PP(GLuint _pp, pcstr _n)
     {
 #ifdef RBackend_PGO
         string_path name;
-        if (HW.SeparateShaderObjectsSupported)
+        if (GLAD_GL_ARB_separate_shader_objects)
             glGetObjectLabel(GL_PROGRAM_PIPELINE, _pp, sizeof(name), nullptr, name)
         else
             glGetObjectLabel(GL_PROGRAM, _pp, sizeof(name), nullptr, name)
@@ -227,7 +227,7 @@ ICF void CBackend::set_PP(GLuint _pp, pcstr _n)
         PGO(Msg("PGO:PPshader:%d,%s", _pp, _n ? _n : name));
         stat.pp++;
         pp = _pp;
-        if (HW.SeparateShaderObjectsSupported)
+        if (GLAD_GL_ARB_separate_shader_objects)
             CHK_GL(glBindProgramPipeline(pp));
         else
             CHK_GL(glUseProgram(pp));
@@ -248,7 +248,7 @@ ICF void CBackend::set_Vertices(GLuint _vb, u32 _vb_stride)
         vb = _vb;
         vb_stride = _vb_stride;
 
-        if (GLEW_ARB_vertex_attrib_binding)
+        if (GLAD_GL_ARB_vertex_attrib_binding)
         {
             CHK_GL(glBindVertexBuffer(0, vb, 0, vb_stride));
         }

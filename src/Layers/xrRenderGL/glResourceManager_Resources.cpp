@@ -105,7 +105,7 @@ bool CResourceManager::_LinkPP(SPass& pass)
     if (pp.pp)
         return true;
 
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         pp.pp = GLGeneratePipeline(pp.cName.c_str(), pass.ps->sh, pass.vs->sh, pass.gs->sh);
     else
     {
