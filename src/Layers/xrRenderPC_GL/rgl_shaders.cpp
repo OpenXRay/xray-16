@@ -88,6 +88,11 @@ class shader_options_holder
     string512 m_options[128];
 
 public:
+    void add(cpcstr string)
+    {
+        strconcat(m_options[pos++], string, "\n");
+    }
+
     void add(cpcstr name, cpcstr value)
     {
         // It's important to have postfix increment!
@@ -191,15 +196,10 @@ private:
     void apply_options(shader_options_holder& options)
     {
         // Compile sources list
-        const size_t head_lines = 2; // "#version" line + name_comment line
+        constexpr size_t head_lines = 1; // name_comment line
         m_sources_lines = m_source.size() + options.size() + head_lines;
         m_sources = xr_alloc<pcstr>(m_sources_lines);
-#ifdef DEBUG
-        m_sources[0] = "#version 410\n#pragma optimize (off)\n";
-#else
-        m_sources[0] = "#version 410\n";
-#endif
-        m_sources[1] = m_name_comment;
+        m_sources[0] = m_name_comment;
 
         // Make define lines
         for (size_t i = 0; i < options.size(); ++i)
@@ -237,6 +237,18 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
         sh_name.append(option);
     };
+
+    options.add("#version 410");
+
+#ifdef DEBUG
+    options.add("#pragma optimize (off)");
+    sh_name.append(0u);
+#else
+    options.add("#pragma optimize (on)");
+    sh_name.append(1u);
+#endif
+
+    options.add("#extension GL_ARB_separate_shader_objects : enable");
 
     // Shadow map size
     {
@@ -482,9 +494,6 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         sh_name.append(static_cast<u32>(0)); // DX10_1_ATOC   off
         sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
     }
-
-    // Don't mix optimized and unoptimized shaders
-    sh_name.append(static_cast<u32>(shader_sources_manager::optimized()));
 
     // finish
     options.finish();
