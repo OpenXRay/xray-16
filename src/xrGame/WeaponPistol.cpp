@@ -68,7 +68,14 @@ void CWeaponPistol::PlayAnimIdle()
 
     if (iAmmoElapsed == 0)
     {
-        PlayHUDMotion("anm_idle_empty", "anim_empty", TRUE, NULL, GetState());
+        if (IsZoomed())
+        {
+            PlayAnimAim();
+        }
+        else
+        {
+            PlayHUDMotion("anm_idle_empty", "anim_empty", TRUE, NULL, GetState());
+        }
     }
     else
     {
