@@ -222,6 +222,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     string32 c_sun_shafts;
     string32 c_ssao;
     string32 c_sun_quality;
+    string32 c_isample;
     string32 c_water_reflection;
 
     // TODO: OGL: Implement these parameters.
@@ -436,17 +437,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             appendShaderOption(o.msaa_samples, "MSAA_SAMPLES", samples);
         }
 
-        {
-            static char def[2];
-            if (m_MSAASample < 0)
-                def[0] = '0';
-            else
-                def[0] = '0' + char(m_MSAASample);
-
-            def[1] = 0;
-            options.add("ISAMPLE", def);
-            sh_name.append(static_cast<u32>(0));
-        }
+        xr_sprintf(c_isample, "uint(%d)", m_MSAASample);
+        options.add("ISAMPLE", c_isample);
+        sh_name.append(static_cast<u32>(0));
 
         appendShaderOption(o.msaa_opt, "MSAA_OPTIMIZATION", "1");
 
