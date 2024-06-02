@@ -27,6 +27,7 @@
 #include "Torch.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrCore/xr_token.h"
+#include "GamePersistent.h"
 
 #define WEAPON_REMOVE_TIME 60000
 #define ROTATION_TIME 0.25f
@@ -857,7 +858,6 @@ void CWeapon::OnH_B_Chield()
     m_set_next_ammoType_on_reload = undefined_ammo_type;
 }
 
-extern u32 hud_adj_mode;
 bool CWeapon::AllowBore() { return true; }
 void CWeapon::UpdateCL()
 {
@@ -878,7 +878,7 @@ void CWeapon::UpdateCL()
         CActor* pActor = smart_cast<CActor*>(H_Parent());
         if (pActor && !pActor->AnyMove() && this == pActor->inventory().ActiveItem())
         {
-            if (hud_adj_mode == 0 && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000) &&
+            if (!GamePersistent().GetHudTuner().is_active() && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000) &&
                 !IsZoomed() && g_player_hud->attached_item(1) == nullptr)
             {
                 if (AllowBore())
@@ -1297,6 +1297,8 @@ bool CWeapon::SilencerAttachable() { return (ALife::eAddonAttachable == m_eSilen
 
 void CWeapon::UpdateHUDAddonsVisibility()
 {
+    if (GamePersistent().GetHudTuner().is_active())
+        return;
     static shared_str wpn_scope = WPN_SCOPE;
     static shared_str wpn_silencer = WPN_SILENCER;
     static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
@@ -1344,6 +1346,9 @@ void CWeapon::UpdateHUDAddonsVisibility()
 
 void CWeapon::UpdateAddonsVisibility()
 {
+    if (GamePersistent().GetHudTuner().is_active())
+        return;
+
     static shared_str wpn_scope = WPN_SCOPE;
     static shared_str wpn_silencer = WPN_SILENCER;
     static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
@@ -1892,27 +1897,6 @@ BOOL CWeapon::ParentIsActor()
         return FALSE;
 
     return EA->cast_actor() != nullptr;
-}
-
-extern u32 hud_adj_mode;
-
-void CWeapon::debug_draw_firedeps()
-{
-#ifdef DEBUG
-    if (hud_adj_mode == 5 || hud_adj_mode == 6 || hud_adj_mode == 7)
-    {
-        CDebugRenderer& render = Level().debug_renderer();
-
-        if (hud_adj_mode == 5)
-            render.draw_aabb(get_LastFP(), 0.005f, 0.005f, 0.005f, color_xrgb(255, 0, 0));
-
-        if (hud_adj_mode == 6)
-            render.draw_aabb(get_LastFP2(), 0.005f, 0.005f, 0.005f, color_xrgb(0, 0, 255));
-
-        if (hud_adj_mode == 7)
-            render.draw_aabb(get_LastSP(), 0.005f, 0.005f, 0.005f, color_xrgb(0, 255, 0));
-    }
-#endif // DEBUG
 }
 
 const float& CWeapon::hit_probability() const

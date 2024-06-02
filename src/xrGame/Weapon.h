@@ -311,7 +311,6 @@ public:
         return m_current_firedeps.m_FireParticlesXForm;
     }
     virtual void ForceUpdateFireParticles();
-    virtual void debug_draw_firedeps();
 
 protected:
     virtual void SetDefaults();

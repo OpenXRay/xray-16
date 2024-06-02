@@ -6492,6 +6492,9 @@
     <ClInclude Include="xrGame.h">
       <Filter>Core\Server</Filter>
     </ClInclude>
+    <ClInclude Include="player_hud_tune.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\HudItem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">

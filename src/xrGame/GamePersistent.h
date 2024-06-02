@@ -3,6 +3,7 @@
 #pragma once
 
 #include "xrEngine/IGame_Persistent.h"
+#include "player_hud_tune.h"
 
 class Task;
 class CMainMenu;
@@ -39,6 +40,9 @@ private:
     Fvector m_dof[4]; // 0-dest 1-current 2-from 3-original
 
     fastdelegate::FastDelegate0<> m_intro_event;
+
+    // hud tuner
+    CHudTuner m_hudTuner;
 
     void start_logo_intro();
     void update_logo_intro();
@@ -101,6 +105,8 @@ public:
     virtual void SetBaseDof(const Fvector3& dof);
     virtual void OnSectorChanged(IRender_Sector::sector_id_t sector);
     virtual void OnAssetsChanged();
+
+    CHudTuner GetHudTuner() { return m_hudTuner; }
 };
 
 IC CGamePersistent& GamePersistent() { return *((CGamePersistent*)g_pGamePersistent); }

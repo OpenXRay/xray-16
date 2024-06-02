@@ -20,6 +20,9 @@ public:
     virtual pcstr tool_name() = 0;
 
     bool& get_open_state() { return is_opened; }
+    bool is_open() const { return is_opened; }
+    virtual bool is_active() const { return is_opened; }
+
     ImGuiWindowFlags get_default_window_flags() const;
 };
 
@@ -57,6 +60,7 @@ public:
     auto GetState() const { return m_state; }
     void SetState(visible_state state);
     void SwitchToNextState();
+    bool IsActiveState() const { return m_state == visible_state::full; }
 
 public:
     // Interface implementations
