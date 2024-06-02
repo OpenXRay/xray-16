@@ -21,6 +21,11 @@ CHudTuner::CHudTuner()
     paused = fsimilar(Device.time_factor(), EPS);
 }
 
+bool CHudTuner::is_active() const
+{
+    return is_open() && Device.editor().IsActiveState();
+}
+
 void CHudTuner::ResetToDefaultValues()
 {
     if (current_hud_item)

@@ -878,7 +878,7 @@ void CWeapon::UpdateCL()
         CActor* pActor = smart_cast<CActor*>(H_Parent());
         if (pActor && !pActor->AnyMove() && this == pActor->inventory().ActiveItem())
         {
-            if (!((GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())) && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000) &&
+            if (!GamePersistent().GetHudTuner().is_active() && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000) &&
                 !IsZoomed() && g_player_hud->attached_item(1) == nullptr)
             {
                 if (AllowBore())
@@ -1297,7 +1297,7 @@ bool CWeapon::SilencerAttachable() { return (ALife::eAddonAttachable == m_eSilen
 
 void CWeapon::UpdateHUDAddonsVisibility()
 {
-    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
+    if (GamePersistent().GetHudTuner().is_active())
         return;
     static shared_str wpn_scope = WPN_SCOPE;
     static shared_str wpn_silencer = WPN_SILENCER;
@@ -1346,7 +1346,7 @@ void CWeapon::UpdateHUDAddonsVisibility()
 
 void CWeapon::UpdateAddonsVisibility()
 {
-    if (GamePersistent().GetHudTuner().get_open_state() && Device.editor().IsActiveState())
+    if (GamePersistent().GetHudTuner().is_active())
         return;
 
     static shared_str wpn_scope = WPN_SCOPE;

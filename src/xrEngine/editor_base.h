@@ -20,6 +20,9 @@ public:
     virtual pcstr tool_name() = 0;
 
     bool& get_open_state() { return is_opened; }
+    bool is_open() const { return is_opened; }
+    virtual bool is_active() const { return is_opened; }
+
     ImGuiWindowFlags get_default_window_flags() const;
 };
 

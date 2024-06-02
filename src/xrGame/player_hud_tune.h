@@ -7,8 +7,7 @@ class CHudTuner final : public xray::editor::ide_tool
 public:
     CHudTuner();
     void OnFrame() override;
-
-    void OnAppDeactivate();
+    bool is_active() const override;
 
 private:
     pcstr tool_name() override { return "Hud Tuner"; }
@@ -71,6 +70,4 @@ private:
 
     hud_item_measures curr_measures{};
     hud_item_measures new_measures{};
-
-    xr_map<u32, bool> bone_map;
 };
