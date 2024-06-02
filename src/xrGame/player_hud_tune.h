@@ -42,17 +42,17 @@ private:
     };
     xr_map<hud_adj_mode_keys, pcstr> hud_adj_modes =
     {
-        {HUD_POS, "Hud Position (Default)"},
-        {HUD_ROT, "Hud Rotation (Default)"},
-        {HUD_POS_AIM, "Hud Position (Aiming)"},
-        {HUD_ROT_AIM, "Hud Rotation (Aiming)"},
-        {HUD_POS_GL, "Hud Position (GL)"},
-        {HUD_ROT_GL, "Hud Rotation (GL)"},
-        {ITEM_POS, "Item Position"},
-        {ITEM_ROT, "Item Rotation"},
-        {FIRE_POINT, "Fire Point"},
-        {FIRE_POINT_2, "Fire Point 2"},
-        {SHELL_POINT, "Shell Point"},
+        { HUD_POS, "Hud Position (Default)" },
+        { HUD_ROT, "Hud Rotation (Default)" },
+        { HUD_POS_AIM, "Hud Position (Aiming)" },
+        { HUD_ROT_AIM, "Hud Rotation (Aiming)" },
+        { HUD_POS_GL, "Hud Position (GL)" },
+        { HUD_ROT_GL, "Hud Rotation (GL)" },
+        { ITEM_POS, "Item Position" },
+        { ITEM_ROT, "Item Rotation" },
+        { FIRE_POINT, "Fire Point" },
+        { FIRE_POINT_2, "Fire Point 2" },
+        { SHELL_POINT, "Shell Point" },
     };
 
     bool paused{};

@@ -1005,6 +1005,7 @@ target_sources(xrGame PRIVATE
     player_hud.cpp
     player_hud.h
     player_hud_tune.cpp
+    player_hud_tune.h
     player_name_modifyer.cpp
     player_name_modifyer.h
     player_spot_params.cpp
