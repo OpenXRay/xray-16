@@ -113,14 +113,8 @@ class shader_sources_manager
     pcstr* m_sources{};
     size_t m_sources_lines{};
     xr_vector<pstr> m_source, m_includes;
-    string512 m_name_comment;
 
 public:
-    explicit shader_sources_manager(cpcstr name)
-    {
-        strconcat(m_name_comment, "// ", name, "\n");
-    }
-
     ~shader_sources_manager()
     {
         // Free string resources
@@ -133,15 +127,6 @@ public:
 
     [[nodiscard]] auto get() const { return m_sources; }
     [[nodiscard]] auto length() const { return m_sources_lines; }
-
-    [[nodiscard]] static constexpr bool optimized()
-    {
-#ifdef DEBUG
-        return false;
-#else
-        return true;
-#endif
-    }
 
     void compile(IReader* file, shader_options_holder& options)
     {
@@ -196,17 +181,15 @@ private:
     void apply_options(shader_options_holder& options)
     {
         // Compile sources list
-        constexpr size_t head_lines = 1; // name_comment line
-        m_sources_lines = m_source.size() + options.size() + head_lines;
+        m_sources_lines = m_source.size() + options.size();
         m_sources = xr_alloc<pcstr>(m_sources_lines);
-        m_sources[0] = m_name_comment;
 
         // Make define lines
         for (size_t i = 0; i < options.size(); ++i)
         {
-            m_sources[head_lines + i] = options[i];
+            m_sources[i] = options[i];
         }
-        CopyMemory(m_sources + head_lines + options.size(), m_source.data(), m_source.size() * sizeof(pstr));
+        CopyMemory(m_sources + options.size(), m_source.data(), m_source.size() * sizeof(pstr));
     }
 };
 
@@ -217,6 +200,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     shader_name_holder sh_name;
 
     // Don't move these variables to lower scope!
+    string64 c_name;
     string32 c_smapsize;
     string32 c_gloss;
     string32 c_sun_shafts;
@@ -249,6 +233,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 #endif
 
     options.add("#extension GL_ARB_separate_shader_objects : enable");
+
+    xr_sprintf(c_name, "// %s.%s", name, pTarget);
+    options.add(c_name);
 
     // Shadow map size
     {
@@ -560,7 +547,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         Log("- Compile shader:", filename);
 #endif
         // Compile sources list
-        shader_sources_manager sources(name);
+        shader_sources_manager sources;
         sources.compile(fs, options);
 
         // Compile the shader from sources
