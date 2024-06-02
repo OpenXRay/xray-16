@@ -88,7 +88,7 @@ public:
         _dec();
         p_ = v;
     }
-    void _set(nullptr_t) noexcept
+    void _set(std::nullptr_t) noexcept
     {
         _dec();
         p_ = nullptr;
@@ -133,7 +133,7 @@ public:
         rhs.p_ = nullptr;
         return *this;
     }
-    shared_str& operator=(nullptr_t) noexcept
+    shared_str& operator=(std::nullptr_t) noexcept
     {
         _set(nullptr);
         return *this;
