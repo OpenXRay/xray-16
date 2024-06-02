@@ -434,7 +434,6 @@ extern ENGINE_API float psHUD_FOV;
 void CHudItem::TransformPosFromWorldToHud(Fvector& worldPos)
 {
     CActor* actor = smart_cast<CActor*>(object().H_Parent());
-    
     Fmatrix mView;
     mView.set(Device.mView);
     if (GetHUDmode() && actor)

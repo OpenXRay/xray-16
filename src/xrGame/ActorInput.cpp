@@ -214,7 +214,6 @@ void CActor::IR_OnMouseWheel(float x, float y)
 {
     if (GamePersistent().GetHudTuner().is_active())
         return;
-    
     if (inventory().Action((y > 0) ? (u16)kWPN_ZOOM_INC : (u16)kWPN_ZOOM_DEC, CMD_START))
         return;
 
