@@ -76,6 +76,12 @@ void CHudTuner::OnFrame()
     if (!g_player_hud)
         return;
 
+    auto CalcColumnCount = [](float columnWidth) -> int {
+        float windowWidth = ImGui::GetWindowWidth();
+        int columnCount = _max(1, static_cast<int>(windowWidth / columnWidth));
+        return columnCount;
+    };
+
     auto hud_item = g_player_hud->attached_item(current_hud_idx);
     if (current_hud_item != hud_item)
     {
@@ -187,11 +193,21 @@ void CHudTuner::OnFrame()
                 CDebugRenderer& render = Level().debug_renderer();
 
                 ImGui::SliderFloat("Debug Point Size", &debug_point_size, 0.00005f, 1.f, "%.5f");
-                if (ImGui::RadioButton("Draw Fire Point", draw_fp)) { draw_fp = !draw_fp; }; ImGui::SameLine();
-                if (ImGui::RadioButton("Draw Fire Point (GL)", draw_fp2)) { draw_fp2 = !draw_fp2; } ImGui::SameLine();
-                if (ImGui::RadioButton("Draw Fire Direction", draw_fd)) { draw_fd = !draw_fd; } ImGui::SameLine();
-                if (ImGui::RadioButton("Draw Fire Direction (GL)", draw_fd2)) { draw_fd2 = !draw_fd2; } ImGui::SameLine();
-                if (ImGui::RadioButton("Draw Shell Point", draw_sp)) { draw_sp = !draw_sp; }
+
+                if (ImGui::BeginTable("Show Debug Widgets", CalcColumnCount(210.f)))
+                {
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Fire Point", draw_fp)) { draw_fp = !draw_fp; };
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Fire Point (GL)", draw_fp2)) { draw_fp2 = !draw_fp2; }
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Fire Direction", draw_fd)) { draw_fd = !draw_fd; }
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Fire Direction (GL)", draw_fd2)) { draw_fd2 = !draw_fd2; }
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Shell Point", draw_sp)) { draw_sp = !draw_sp; }
+                    ImGui::EndTable();
+                }
 
                 if (draw_fp)
                 {
@@ -257,31 +273,41 @@ void CHudTuner::OnFrame()
             }
         }
 
+        ImGui::NewLine();
+
         if (current_hud_item && ImGui::CollapsingHeader("Bone and Animation Debugging", ImGuiTreeNodeFlags_DefaultOpen))
         {
             IKinematics* ik = current_hud_item->m_model;
             ImGui::Text("Bone Count = %i", ik->LL_BoneCount());
             ImGui::Text("Root Bone = %s", ik->LL_BoneName_dbg(ik->LL_GetBoneRoot()));
 
-            for (const auto& [bone_name, bone_id] : *ik->LL_Bones())
+            if (ImGui::BeginTable("Bone Visibility", CalcColumnCount(125.f)))
             {
-                if (bone_id == ik->LL_GetBoneRoot())
-                    continue;
+                for (const auto& [bone_name, bone_id] : *ik->LL_Bones())
+                {
+                    if (bone_id == ik->LL_GetBoneRoot())
+                        continue;
 
-                bool visible = ik->LL_GetBoneVisible(bone_id);
-                if (ImGui::RadioButton(bone_name.c_str(), visible)) { visible = !visible; }; ImGui::SameLine();
-                ik->LL_SetBoneVisible(bone_id, visible, FALSE);
+                    ImGui::TableNextColumn();
+                    bool visible = ik->LL_GetBoneVisible(bone_id);
+                    if (ImGui::RadioButton(bone_name.c_str(), visible)) { visible = !visible; }
+                    ik->LL_SetBoneVisible(bone_id, visible, FALSE);
+                }
+                ImGui::EndTable();
             }
 
             ImGui::NewLine();
-
-            for (const auto& [anim_name, motion] : current_hud_item->m_hand_motions.m_anims)
+            if (ImGui::BeginTable("Animations", CalcColumnCount(125.f)))
             {
-                if (ImGui::Button(anim_name.c_str()))
+                for (const auto& [anim_name, motion] : current_hud_item->m_hand_motions.m_anims)
                 {
-                    current_hud_item->m_parent_hud_item->PlayHUDMotion_noCB(anim_name, false);
-                };
-                ImGui::SameLine();
+                    ImGui::TableNextColumn();
+                    if (ImGui::Button(anim_name.c_str()))
+                    {
+                        current_hud_item->m_parent_hud_item->PlayHUDMotion_noCB(anim_name, false);
+                    };
+                }
+                ImGui::EndTable();
             }
         }
     }
