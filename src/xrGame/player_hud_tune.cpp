@@ -279,7 +279,7 @@ void CHudTuner::OnFrame()
         {
             IKinematics* ik = current_hud_item->m_model;
             ImGui::Text("Bone Count = %i", ik->LL_BoneCount());
-            ImGui::Text("Root Bone = %s", ik->LL_BoneName_dbg(ik->LL_GetBoneRoot()));
+            ImGui::Text("Root Bone = %s, ID: %i", ik->LL_BoneName_dbg(ik->LL_GetBoneRoot()), ik->LL_GetBoneRoot());
 
             if (ImGui::BeginTable("Bone Visibility", CalcColumnCount(125.f)))
             {
@@ -290,7 +290,11 @@ void CHudTuner::OnFrame()
 
                     ImGui::TableNextColumn();
                     bool visible = ik->LL_GetBoneVisible(bone_id);
-                    if (ImGui::RadioButton(bone_name.c_str(), visible)) { visible = !visible; }
+                    if (ImGui::RadioButton(bone_name.c_str(), visible)) { visible = !visible; };
+                    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+                    {
+                        ImGui::SetTooltip("Bone Name = %s, ID: %i", bone_name.c_str(), bone_id);
+                    }
                     ik->LL_SetBoneVisible(bone_id, visible, FALSE);
                 }
                 ImGui::EndTable();
@@ -305,7 +309,11 @@ void CHudTuner::OnFrame()
                     if (ImGui::Button(anim_name.c_str()))
                     {
                         current_hud_item->m_parent_hud_item->PlayHUDMotion_noCB(anim_name, false);
-                    };
+                    }
+                    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+                    {
+                        ImGui::SetTooltip("%s = %s, %s", anim_name.c_str(), motion.m_base_name.c_str(), motion.m_additional_name.c_str());
+                    }
                 }
                 ImGui::EndTable();
             }
