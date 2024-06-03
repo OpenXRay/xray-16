@@ -58,11 +58,6 @@ void CHudTuner::UpdateValues()
 {
     if (current_hud_item)
     {
-        new_measures.m_hands_attach[0].set(curr_measures.m_hands_attach[0]);
-        new_measures.m_hands_attach[1].set(curr_measures.m_hands_attach[1]);
-        new_measures.m_hands_attach[0].add(new_measures.m_hands_offset[0][0]);
-        new_measures.m_hands_attach[1].add(new_measures.m_hands_offset[1][0]);
-
         current_hud_item->m_measures = new_measures;
     }
 }
@@ -130,8 +125,8 @@ void CHudTuner::OnFrame()
             ImGui::SliderFloat("Position step", &_delta_pos, 0.0000001f, 0.001f, "%.7f");
             ImGui::SliderFloat("Rotation step", &_delta_rot, 0.000001f, 0.1f, "%.6f");
 
-            ImGui::DragFloat3(hud_adj_modes[HUD_POS], (float*)&new_measures.m_hands_offset[0][0], _delta_pos, 0.f, 0.f, "%.7f");
-            ImGui::DragFloat3(hud_adj_modes[HUD_ROT], (float*)&new_measures.m_hands_offset[1][0], _delta_rot, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[HUD_POS], (float*)&new_measures.m_hands_attach[0], _delta_pos, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[HUD_ROT], (float*)&new_measures.m_hands_attach[1], _delta_rot, 0.f, 0.f, "%.7f");
             ImGui::DragFloat3(hud_adj_modes[HUD_POS_AIM], (float*)&new_measures.m_hands_offset[0][1], _delta_pos, 0.f, 0.f, "%.7f");
             ImGui::DragFloat3(hud_adj_modes[HUD_ROT_AIM], (float*)&new_measures.m_hands_offset[1][1], _delta_rot, 0.f, 0.f, "%.7f");
             ImGui::DragFloat3(hud_adj_modes[HUD_POS_GL], (float*)&new_measures.m_hands_offset[0][2], _delta_pos, 0.f, 0.f, "%.7f");
@@ -158,9 +153,9 @@ void CHudTuner::OnFrame()
                     ImGui::LogToClipboard();
                     xr_sprintf(selectable, "[%s]\n", m_sect_name.c_str());
                     ImGui::LogText(selectable);
-                    xr_sprintf(selectable, "hands_position%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[0][0].x, new_measures.m_hands_offset[0][0].y, new_measures.m_hands_offset[0][0].z);
+                    xr_sprintf(selectable, "hands_position%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_attach[0].x, new_measures.m_hands_attach[0].y, new_measures.m_hands_attach[0].z);
                     ImGui::LogText(selectable);
-                    xr_sprintf(selectable, "hands_orientation%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[1][0].x, new_measures.m_hands_offset[1][0].y, new_measures.m_hands_offset[1][0].z);
+                    xr_sprintf(selectable, "hands_orientation%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_attach[1].x, new_measures.m_hands_attach[1].y, new_measures.m_hands_attach[1].z);
                     ImGui::LogText(selectable);
                     xr_sprintf(selectable, "aim_hud_offset_pos%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[0][1].x, new_measures.m_hands_offset[0][1].y, new_measures.m_hands_offset[0][1].z);
                     ImGui::LogText(selectable);
