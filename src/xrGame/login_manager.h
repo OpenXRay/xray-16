@@ -68,6 +68,8 @@ public:
     void stop_setting_unique_nick();
 
     profile const* get_current_profile() const { return m_current_profile; };
+    void init_default_profile();
+
     void delete_profile_obj(); // deletes m_current_profile and clears m_login_operation_cb
     void forgot_password(char const* url);
 

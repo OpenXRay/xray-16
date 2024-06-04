@@ -28,6 +28,8 @@ login_manager::login_manager(CGameSpy_Full* fullgs_obj)
     m_gamespy_patching = fullgs_obj->GetGameSpyPatching();
     VERIFY(m_gamespy_patching);
     m_current_profile = NULL;
+
+    init_default_profile();
 }
 
 login_manager::~login_manager() { xr_delete(m_current_profile); }
@@ -223,6 +225,13 @@ void login_manager::reinit_connection_tasks()
         tmp_acc_mngr->reinit_suggest_unique_nicks();
     }
 #endif
+}
+
+void login_manager::init_default_profile()
+{
+    string512 name;
+    GetPlayerName_FromRegistry(name, sizeof(name));
+    m_current_profile = xr_new<profile>(0, name, "", false);
 }
 
 void login_manager::delete_profile_obj() { xr_delete(m_current_profile); }
