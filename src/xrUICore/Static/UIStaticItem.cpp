@@ -6,6 +6,7 @@ CUIStaticItem::CUIStaticItem()
     uFlags.zero();
     vSize.set(0, 0);
     TextureRect.set(0, 0, 0, 0);
+    eMirrorMode = tmNone;
     vHeadingPivot.set(0, 0);
     vHeadingOffset.set(0, 0);
     dwColor = 0xffffffff;
@@ -55,6 +56,12 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
     //текстурные координаты
     LTt.set(TextureRect.x1 / ts.x, TextureRect.y1 / ts.y);
     RBt.set(TextureRect.x2 / ts.x, TextureRect.y2 / ts.y);
+
+    // Check mirror mode
+    if (tmMirrorHorisontal == eMirrorMode || tmMirrorBoth == eMirrorMode)
+        std::swap(LTt.x, RBt.x);
+    if (tmMirrorVertical == eMirrorMode || tmMirrorBoth == eMirrorMode)
+        std::swap(LTt.y, RBt.y);
 
     float offset = -0.5f;
     if (UI().m_currentPointType == IUIRender::pttLIT)
@@ -130,6 +137,12 @@ void CUIStaticItem::RenderInternal(float angle)
     Fvector2 LTt, RBt;
     LTt.set(TextureRect.x1 / ts.x + hp.x, TextureRect.y1 / ts.y + hp.y);
     RBt.set(TextureRect.x2 / ts.x + hp.x, TextureRect.y2 / ts.y + hp.y);
+
+    // Check mirror mode
+    if (tmMirrorHorisontal == eMirrorMode || tmMirrorBoth == eMirrorMode)
+        std::swap(LTt.x, RBt.x);
+    if (tmMirrorVertical == eMirrorMode || tmMirrorBoth == eMirrorMode)
+        std::swap(LTt.y, RBt.y);
 
     float kx = UI().get_current_kx();
 

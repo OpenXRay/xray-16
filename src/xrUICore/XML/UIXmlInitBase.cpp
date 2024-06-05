@@ -143,6 +143,14 @@ bool CUIXmlInitBase::InitStatic(CUIXml& xml_doc, pcstr path, int index, CUIStati
     InitTexture(xml_doc, path, index, pWnd);
     InitTextureOffset(xml_doc, path, index, pWnd);
 
+    shared_str mirroring = xml_doc.ReadAttrib(path, index, "mirror", "");
+    if (0 == xr_strcmp(mirroring, "h"))
+        pWnd->GetStaticItem()->SetMirrorMode(tmMirrorHorisontal);
+    else if (0 == xr_strcmp(mirroring, "v"))
+        pWnd->GetStaticItem()->SetMirrorMode(tmMirrorVertical);
+    else if (0 == xr_strcmp(mirroring, "b"))
+        pWnd->GetStaticItem()->SetMirrorMode(tmMirrorBoth);
+
     const int flag = xml_doc.ReadAttribInt(path, index, "heading", 0);
     pWnd->EnableHeading((flag) ? true : false);
 

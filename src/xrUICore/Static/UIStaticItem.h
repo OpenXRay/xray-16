@@ -6,6 +6,14 @@
 #include "xrCore/xrstring.h"
 #endif
 
+enum EUIMirroring
+{
+    tmNone,
+    tmMirrorHorisontal,
+    tmMirrorVertical,
+    tmMirrorBoth
+};
+
 class XRUICORE_API CUIStaticItem
 {
 protected:
@@ -22,6 +30,7 @@ public:
     Fvector2 vHeadingPivot;
     Fvector2 vHeadingOffset;
     Flags8 uFlags;
+    EUIMirroring eMirrorMode;
 
     ui_shader hShader;
     Fvector2 vPos;
@@ -65,6 +74,9 @@ public:
     void ResetHeadingPivot();
     IC bool GetFixedLTWhileHeading() const { return !!uFlags.test(flFixedLTWhileHeading); }
     Fvector2 GetHeadingPivot() { return vHeadingPivot; }
+    IC void SetMirrorMode(EUIMirroring m) { eMirrorMode = m; }
+    IC EUIMirroring GetMirrorMode() { return eMirrorMode; }
+
 private:
     void RenderInternal(const Fvector2& pos);
     void RenderInternal(float angle);
