@@ -57,9 +57,9 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
     RBt.set(TextureRect.x2 / ts.x, TextureRect.y2 / ts.y);
 
     // Check mirror mode
-    if (tmMirrorHorisontal == eMirrorMode || tmMirrorBoth == eMirrorMode)
+    if (EUIMirroring::Horisontal == eMirrorMode || EUIMirroring::Both == eMirrorMode)
         std::swap(LTt.x, RBt.x);
-    if (tmMirrorVertical == eMirrorMode || tmMirrorBoth == eMirrorMode)
+    if (EUIMirroring::Vertical == eMirrorMode || EUIMirroring::Both == eMirrorMode)
         std::swap(LTt.y, RBt.y);
 
     float offset = -0.5f;
