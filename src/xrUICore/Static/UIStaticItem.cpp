@@ -6,7 +6,6 @@ CUIStaticItem::CUIStaticItem()
     uFlags.zero();
     vSize.set(0, 0);
     TextureRect.set(0, 0, 0, 0);
-    eMirrorMode = tmNone;
     vHeadingPivot.set(0, 0);
     vHeadingOffset.set(0, 0);
     dwColor = 0xffffffff;

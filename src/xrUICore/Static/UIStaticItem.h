@@ -6,12 +6,12 @@
 #include "xrCore/xrstring.h"
 #endif
 
-enum EUIMirroring
+enum cls EUIMirroring
 {
-    tmNone,
-    tmMirrorHorisontal,
-    tmMirrorVertical,
-    tmMirrorBoth
+    None,
+    Horisontal,
+    Vertical,
+    Both
 };
 
 class XRUICORE_API CUIStaticItem
@@ -30,7 +30,7 @@ public:
     Fvector2 vHeadingPivot;
     Fvector2 vHeadingOffset;
     Flags8 uFlags;
-    EUIMirroring eMirrorMode;
+    EUIMirroring eMirrorMode{};
 
     ui_shader hShader;
     Fvector2 vPos;
