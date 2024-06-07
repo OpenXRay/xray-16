@@ -138,9 +138,9 @@ void CUIStaticItem::RenderInternal(float angle)
     RBt.set(TextureRect.x2 / ts.x + hp.x, TextureRect.y2 / ts.y + hp.y);
 
     // Check mirror mode
-    if (tmMirrorHorisontal == eMirrorMode || tmMirrorBoth == eMirrorMode)
+    if (EUIMirroring::Horisontal == eMirrorMode || EUIMirroring::Both == eMirrorMode)
         std::swap(LTt.x, RBt.x);
-    if (tmMirrorVertical == eMirrorMode || tmMirrorBoth == eMirrorMode)
+    if (EUIMirroring::Vertical == eMirrorMode || EUIMirroring::Both == eMirrorMode)
         std::swap(LTt.y, RBt.y);
 
     float kx = UI().get_current_kx();
