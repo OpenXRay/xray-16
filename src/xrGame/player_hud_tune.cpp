@@ -71,7 +71,8 @@ void CHudTuner::OnFrame()
     if (!g_player_hud)
         return;
 
-    auto CalcColumnCount = [](float columnWidth) -> int {
+    auto calcColumnCount = [](float columnWidth) -> int
+    {
         float windowWidth = ImGui::GetWindowWidth();
         int columnCount = _max(1, static_cast<int>(windowWidth / columnWidth));
         return columnCount;
@@ -189,7 +190,7 @@ void CHudTuner::OnFrame()
 
                 ImGui::SliderFloat("Debug Point Size", &debug_point_size, 0.00005f, 1.f, "%.5f");
 
-                if (ImGui::BeginTable("Show Debug Widgets", CalcColumnCount(210.f)))
+                if (ImGui::BeginTable("Show Debug Widgets", calcColumnCount(210.f)))
                 {
                     ImGui::TableNextColumn();
                     if (ImGui::RadioButton("Draw Fire Point", draw_fp)) { draw_fp = !draw_fp; };
@@ -276,7 +277,7 @@ void CHudTuner::OnFrame()
             ImGui::Text("Bone Count = %i", ik->LL_BoneCount());
             ImGui::Text("Root Bone = %s, ID: %i", ik->LL_BoneName_dbg(ik->LL_GetBoneRoot()), ik->LL_GetBoneRoot());
 
-            if (ImGui::BeginTable("Bone Visibility", CalcColumnCount(125.f)))
+            if (ImGui::BeginTable("Bone Visibility", calcColumnCount(125.f)))
             {
                 for (const auto& [bone_name, bone_id] : *ik->LL_Bones())
                 {
@@ -296,7 +297,7 @@ void CHudTuner::OnFrame()
             }
 
             ImGui::NewLine();
-            if (ImGui::BeginTable("Animations", CalcColumnCount(125.f)))
+            if (ImGui::BeginTable("Animations", calcColumnCount(125.f)))
             {
                 for (const auto& [anim_name, motion] : current_hud_item->m_hand_motions.m_anims)
                 {
