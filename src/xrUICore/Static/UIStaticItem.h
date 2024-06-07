@@ -6,7 +6,7 @@
 #include "xrCore/xrstring.h"
 #endif
 
-enum cls EUIMirroring
+enum class EUIMirroring
 {
     None,
     Horisontal,
